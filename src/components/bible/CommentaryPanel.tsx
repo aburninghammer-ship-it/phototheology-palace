@@ -82,7 +82,7 @@ export const CommentaryPanel = ({ book, chapter, verse, verseText, onClose }: Co
     );
   };
 
-  const generateCommentary = async (refresh = false) => {
+  const generateCommentary = async (refresh = false, includeSOP = false) => {
     if (analysisMode === "applied" && selectedPrinciples.length === 0 && !refresh) {
       toast({
         title: "Select Principles",
@@ -103,6 +103,7 @@ export const CommentaryPanel = ({ book, chapter, verse, verseText, onClose }: Co
           selectedPrinciples: (analysisMode === "applied" && !refresh) 
             ? selectedPrinciples.map(id => PRINCIPLE_OPTIONS.find(p => p.id === id)?.label)
             : undefined,
+          includeSOP: includeSOP,
         },
       });
 
@@ -199,7 +200,7 @@ export const CommentaryPanel = ({ book, chapter, verse, verseText, onClose }: Co
 
           <div className="flex gap-2">
             <Button
-              onClick={() => generateCommentary(false)}
+              onClick={() => generateCommentary(false, false)}
               disabled={loading || (analysisMode === "applied" && selectedPrinciples.length === 0)}
               className="flex-1 gradient-royal text-white shadow-blue"
             >
@@ -216,9 +217,24 @@ export const CommentaryPanel = ({ book, chapter, verse, verseText, onClose }: Co
               )}
             </Button>
             
+            <Button
+              onClick={() => generateCommentary(false, true)}
+              disabled={loading || (analysisMode === "applied" && selectedPrinciples.length === 0)}
+              variant="outline"
+              className="flex-1"
+              title="Include Spirit of Prophecy commentary"
+            >
+              {loading ? (
+                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+              ) : (
+                <Sparkles className="h-4 w-4 mr-2" />
+              )}
+              + SOP
+            </Button>
+            
             {commentary && (
               <Button
-                onClick={() => generateCommentary(true)}
+                onClick={() => generateCommentary(true, false)}
                 disabled={loading}
                 variant="outline"
                 className="flex-1"

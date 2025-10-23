@@ -142,7 +142,10 @@ serve(async (req) => {
       room_type,
       question,
       roomPurpose,
-      availableCategories
+      availableCategories,
+      includeSOP,
+      difficulty,
+      symbolCount
     } = await req.json();
     
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
@@ -304,12 +307,14 @@ Provide deep, thoughtful analysis while remaining clear and accessible.`;
 
 Verse text: "${verseText.text}"
 
+${includeSOP ? `**IMPORTANT:** Include Spirit of Prophecy (Ellen White) insights on this verse or related passages. Label them clearly as "SOP Commentary:" Use her writings to illuminate the text.` : ''}
+
 Structure your commentary:
 1. Opening insight (2-3 sentences)
 2. Apply each selected principle/lens to this verse
-3. Show how these principles interconnect when applied to this verse
-4. Practical application
-5. One profound closing thought
+${includeSOP ? '3. SOP Commentary: Share relevant Ellen White insights\n4.' : '3.'} Show how these principles interconnect when applied to this verse
+${includeSOP ? '5.' : '4.'} Practical application
+${includeSOP ? '6.' : '5.'} One profound closing thought
 
 Make it scholarly yet accessible. Show creative connections.
 IMPORTANT: At the end, include a line: "PRINCIPLES_USED: ${principleList}"`;
@@ -439,6 +444,36 @@ Available categories: ${categoriesText}
 
 Return JSON: { "commentary": "...", "challengeCategory": "specific challenge with book/room/principle name" }`;
       }
+
+    } else if (mode === "equations-challenge") {
+      systemPrompt = `You are Jeeves, creating biblical equations using Phototheology codes.
+Use the standardized codes for sanctuary furniture, feasts, and palace floors to create meaningful equations.
+Return valid JSON only.`;
+
+      userPrompt = `Create a biblical equation at "${difficulty}" difficulty with ${symbolCount} symbols/principles.
+
+Use these standard codes:
+SANCTUARY: BA (Brazen Altar), LA (Laver), ST (Showbread Table), GC (Golden Candlestick), AI (Altar of Incense), AR (Ark), MS (Mercy Seat), VL (Veil)
+FEASTS: PO (Passover), UB (Unleavened Bread), FF (Firstfruits), PN (Pentecost), TR (Trumpets), AT (Atonement), TB (Tabernacles), SB (Sabbath)
+PALACE FLOORS: FD (Foundation), WS (Wisdom), KG (Kingdom), LW (Law), GR (Grace), PR (Prophecy), GL (Glory), NC (New Creation)
+OTHER: CH (Christ), HS (Holy Spirit), CL (Calvary), RS (Resurrection), SC (Second Coming), NJ (New Jerusalem)
+
+Create an equation that:
+1. Uses exactly ${symbolCount} codes
+2. Relates to a specific Bible verse
+3. Tells a coherent theological story
+4. Shows relationships using + (and), → (leads to), = (equals)
+
+Example for easy (3 codes): "BA + CH → MS" (Brazen Altar + Christ → Mercy Seat)
+
+Return JSON:
+{
+  "verse": "Book Chapter:Verse",
+  "equation": "Your equation using the codes above",
+  "symbols": ["Code 1: Full Name", "Code 2: Full Name", ...],
+  "difficulty": "${difficulty}",
+  "explanation": "3-4 paragraph explanation of how this equation reveals biblical truth, connecting to the verse. Explain each symbol's role and how they relate."
+}`;
 
     } else if (mode === "chain-chess-feedback") {
       systemPrompt = `You are Jeeves, scoring Chain Chess responses! 
@@ -774,6 +809,28 @@ Make questions clear, answers comprehensive, and include verse references when r
       } catch {
         return new Response(
           JSON.stringify({ drills: [] }),
+          { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
+    }
+
+    // For equations-challenge mode, parse JSON
+    if (mode === "equations-challenge") {
+      try {
+        const parsed = JSON.parse(content);
+        return new Response(
+          JSON.stringify(parsed),
+          { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      } catch {
+        return new Response(
+          JSON.stringify({
+            verse: "John 3:16",
+            equation: "CH + GR → NC",
+            symbols: ["CH: Christ", "GR: Grace", "NC: New Creation"],
+            difficulty: difficulty || "easy",
+            explanation: "Unable to generate equation. Please try again."
+          }),
           { headers: { ...corsHeaders, "Content-Type": "application/json" } }
         );
       }

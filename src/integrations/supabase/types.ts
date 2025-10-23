@@ -225,6 +225,39 @@ export type Database = {
         }
         Relationships: []
       }
+      equation_codes: {
+        Row: {
+          biblical_reference: string | null
+          category: string
+          code: string
+          created_at: string | null
+          description: string
+          floor_association: string | null
+          id: string
+          name: string
+        }
+        Insert: {
+          biblical_reference?: string | null
+          category: string
+          code: string
+          created_at?: string | null
+          description: string
+          floor_association?: string | null
+          id?: string
+          name: string
+        }
+        Update: {
+          biblical_reference?: string | null
+          category?: string
+          code?: string
+          created_at?: string | null
+          description?: string
+          floor_association?: string | null
+          id?: string
+          name?: string
+        }
+        Relationships: []
+      }
       feedback: {
         Row: {
           category: string | null

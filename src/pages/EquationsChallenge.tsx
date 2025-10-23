@@ -100,6 +100,79 @@ export default function EquationsChallenge() {
           </CardContent>
         </Card>
 
+          <Card className="mb-6">
+          <CardHeader>
+            <CardTitle>Equation Code Reference</CardTitle>
+            <CardDescription>Standard codes used across the platform</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              <div>
+                <h3 className="font-semibold mb-2 text-primary">Sanctuary Furniture</h3>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+                  <Badge variant="outline" className="justify-start">BA - Brazen Altar</Badge>
+                  <Badge variant="outline" className="justify-start">LA - Laver</Badge>
+                  <Badge variant="outline" className="justify-start">ST - Showbread Table</Badge>
+                  <Badge variant="outline" className="justify-start">GC - Golden Candlestick</Badge>
+                  <Badge variant="outline" className="justify-start">AI - Altar of Incense</Badge>
+                  <Badge variant="outline" className="justify-start">AR - Ark of Covenant</Badge>
+                  <Badge variant="outline" className="justify-start">MS - Mercy Seat</Badge>
+                  <Badge variant="outline" className="justify-start">VL - Veil</Badge>
+                </div>
+              </div>
+              
+              <div>
+                <h3 className="font-semibold mb-2 text-primary">Biblical Feasts</h3>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+                  <Badge variant="outline" className="justify-start">PO - Passover</Badge>
+                  <Badge variant="outline" className="justify-start">UB - Unleavened Bread</Badge>
+                  <Badge variant="outline" className="justify-start">FF - Firstfruits</Badge>
+                  <Badge variant="outline" className="justify-start">PN - Pentecost</Badge>
+                  <Badge variant="outline" className="justify-start">TR - Trumpets</Badge>
+                  <Badge variant="outline" className="justify-start">AT - Atonement</Badge>
+                  <Badge variant="outline" className="justify-start">TB - Tabernacles</Badge>
+                  <Badge variant="outline" className="justify-start">SB - Sabbath</Badge>
+                </div>
+              </div>
+              
+              <div>
+                <h3 className="font-semibold mb-2 text-primary">Palace Floors</h3>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+                  <Badge variant="outline" className="justify-start">FD - Foundation</Badge>
+                  <Badge variant="outline" className="justify-start">WS - Wisdom</Badge>
+                  <Badge variant="outline" className="justify-start">KG - Kingdom</Badge>
+                  <Badge variant="outline" className="justify-start">LW - Law</Badge>
+                  <Badge variant="outline" className="justify-start">GR - Grace</Badge>
+                  <Badge variant="outline" className="justify-start">PR - Prophecy</Badge>
+                  <Badge variant="outline" className="justify-start">GL - Glory</Badge>
+                  <Badge variant="outline" className="justify-start">NC - New Creation</Badge>
+                </div>
+              </div>
+              
+              <div>
+                <h3 className="font-semibold mb-2 text-primary">Key Symbols</h3>
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+                  <Badge variant="outline" className="justify-start">CH - Christ</Badge>
+                  <Badge variant="outline" className="justify-start">HS - Holy Spirit</Badge>
+                  <Badge variant="outline" className="justify-start">CL - Calvary</Badge>
+                  <Badge variant="outline" className="justify-start">RS - Resurrection</Badge>
+                  <Badge variant="outline" className="justify-start">SC - Second Coming</Badge>
+                  <Badge variant="outline" className="justify-start">NJ - New Jerusalem</Badge>
+                </div>
+              </div>
+              
+              <div className="mt-4 p-3 bg-muted rounded-lg">
+                <h4 className="font-semibold mb-1 text-sm">Operators:</h4>
+                <p className="text-sm text-muted-foreground">
+                  <span className="font-mono font-bold">+</span> (and/with) • 
+                  <span className="font-mono font-bold"> →</span> (leads to/results in) • 
+                  <span className="font-mono font-bold"> =</span> (equals/completes)
+                </p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
         {/* Difficulty Selection */}
         <Card className="mb-6">
           <CardHeader>
