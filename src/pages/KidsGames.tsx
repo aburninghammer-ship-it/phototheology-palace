@@ -17,6 +17,11 @@ const KidsGames = () => {
     { id: "color_prophet", name: "🎨 Color the Prophets", description: "Color pictures of Bible heroes like Daniel, Moses, and David while learning their stories.", icon: "✏️" },
     { id: "palace_builder", name: "🏗️ Palace Builder", description: "Build your very own memory palace! Place pictures in rooms to remember your favorite verses.", icon: "🏛️" },
     { id: "story_time", name: "📖 Story Time", description: "Listen to exciting Bible stories with colorful pictures and fun sound effects!", icon: "🎵" },
+    { id: "jeeves_friend", name: "🤖 Jeeves' Friend", description: "Help Jeeves organize Bible stories! Put pictures in the right rooms and learn the palace.", icon: "🎯" },
+    { id: "animal_ark", name: "🦁 Animal Ark", description: "Learn about animals in the Bible! From Noah's ark to Daniel's lions, discover God's creatures.", icon: "🐘" },
+    { id: "treasure_finder", name: "💎 Treasure Finder", description: "Find hidden gems in Bible verses! Click on special words to discover what they mean.", icon: "✨" },
+    { id: "song_sing", name: "🎶 Sing & Learn", description: "Sing fun songs about Bible stories! Learn verses through music and rhythm.", icon: "🎤" },
+    { id: "hero_cards", name: "🦸 Bible Heroes", description: "Collect cards of Bible heroes! Learn what made them special and brave.", icon: "⭐" },
   ];
 
   const middleKidsGames = [
@@ -25,6 +30,11 @@ const KidsGames = () => {
     { id: "jeeves_helper", name: "🤖 Jeeves' Helper", description: "Help Jeeves organize verses into the correct rooms. Learn why each verse belongs where it does.", icon: "🎓" },
     { id: "verse_builder", name: "🧩 Verse Builder", description: "Complete Bible verses by filling in the missing words. Start easy and unlock harder challenges!", icon: "📝" },
     { id: "timeline_adventure", name: "⏰ Timeline Adventure", description: "Travel through Bible history! Put events in the right order from Creation to Jesus and beyond.", icon: "📅" },
+    { id: "sanctuary_quest", name: "⛪ Sanctuary Quest", description: "Explore the tabernacle! Learn about each piece of furniture and what it means for Jesus.", icon: "🕯️" },
+    { id: "prophecy_path", name: "🔮 Prophecy Path", description: "Follow the path of prophecy from Daniel to Revelation! Connect the dots across time.", icon: "🗺️" },
+    { id: "symbol_safari", name: "🦅 Symbol Safari", description: "Hunt for biblical symbols! Find eagles, lions, lambs and learn what each represents.", icon: "🔍" },
+    { id: "feast_festival", name: "🎊 Feast Festival", description: "Celebrate God's feasts! Learn about Passover, Pentecost and more through fun activities.", icon: "🎉" },
+    { id: "parable_picker", name: "📚 Parable Picker", description: "Match Jesus' parables to their meanings! Learn the lessons Jesus taught through stories.", icon: "💭" },
   ];
 
   const olderKidsGames = [
@@ -33,6 +43,11 @@ const KidsGames = () => {
     { id: "prophecy_puzzle", name: "🔮 Prophecy Puzzle", description: "Connect Old Testament prophecies with their New Testament fulfillments. Unlock the prophetic timeline!", icon: "📜" },
     { id: "principle_challenge", name: "💪 Principle Challenge", description: "Take on advanced challenges matching complex verses to multiple principles. Think deeply!", icon: "🧠" },
     { id: "study_creator", name: "✍️ Study Creator", description: "Create your own Bible study guides using Palace principles. Share them with friends!", icon: "📚" },
+    { id: "dimension_diver", name: "💎 Dimension Diver", description: "Dive deep into all 5 dimensions of a verse! Uncover literal, Christ, personal, church, and heaven meanings.", icon: "🌊" },
+    { id: "cycle_climber", name: "🔄 Cycle Climber", description: "Climb through the 8 covenant cycles! From Adam to the Return, see God's redemptive patterns.", icon: "🪜" },
+    { id: "cross_linker", name: "🔗 Cross Reference Linker", description: "Build massive cross-reference chains! Connect verses across the entire Bible to see God's unified message.", icon: "🕸️" },
+    { id: "apologetics_arena", name: "🛡️ Apologetics Arena", description: "Defend the faith! Answer tough questions about the Bible using Scripture and sound reasoning.", icon: "⚔️" },
+    { id: "wisdom_warrior", name: "⚡ Wisdom Warrior", description: "Battle against wrong thinking! Apply biblical wisdom to real-life scenarios and tough choices.", icon: "🧙" },
   ];
 
   if (!user) return null;

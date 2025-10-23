@@ -37,6 +37,9 @@ import PhototheologyGPT from "./pages/PhototheologyGPT";
 import DanielRevelationGPT from "./pages/DanielRevelationGPT";
 import ApologeticsGPT from "./pages/ApologeticsGPT";
 import LessonQuarterlyGPT from "./pages/LessonQuarterlyGPT";
+import TreasureHunt from "./pages/TreasureHunt";
+import TreasureHuntPlay from "./pages/TreasureHuntPlay";
+import TrainingDrills from "./pages/TrainingDrills";
 import Profile from "./pages/Profile";
 import Pricing from "./pages/Pricing";
 import Auth from "./pages/Auth";
@@ -64,6 +67,9 @@ function App() {
             <Route path="/games" element={<ProtectedRoute><Games /></ProtectedRoute>} />
             <Route path="/games/chain-chess/:gameId/:mode?" element={<ProtectedRoute><ChainChess /></ProtectedRoute>} />
             <Route path="/kids-games" element={<ProtectedRoute><KidsGames /></ProtectedRoute>} />
+            <Route path="/treasure-hunt" element={<ProtectedRoute><TreasureHunt /></ProtectedRoute>} />
+            <Route path="/treasure-hunt/:huntId" element={<ProtectedRoute><TreasureHuntPlay /></ProtectedRoute>} />
+            <Route path="/training-drills" element={<ProtectedRoute><TrainingDrills /></ProtectedRoute>} />
             <Route path="/live-study" element={<ProtectedRoute><LiveStudy /></ProtectedRoute>} />
             <Route path="/live-study/:roomId" element={<ProtectedRoute><LiveStudyRoom /></ProtectedRoute>} />
             <Route path="/community" element={<ProtectedRoute><Community /></ProtectedRoute>} />

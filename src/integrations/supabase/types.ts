@@ -634,6 +634,193 @@ export type Database = {
         }
         Relationships: []
       }
+      training_drills: {
+        Row: {
+          created_at: string | null
+          description: string
+          drill_number: number
+          id: string
+          prompt: string
+          room_tag: string
+          title: string
+        }
+        Insert: {
+          created_at?: string | null
+          description: string
+          drill_number: number
+          id?: string
+          prompt: string
+          room_tag: string
+          title: string
+        }
+        Update: {
+          created_at?: string | null
+          description?: string
+          drill_number?: number
+          id?: string
+          prompt?: string
+          room_tag?: string
+          title?: string
+        }
+        Relationships: []
+      }
+      treasure_hunt_answers: {
+        Row: {
+          clue_id: string
+          hunt_id: string
+          id: string
+          is_correct: boolean
+          submitted_at: string | null
+          user_answer: string
+          user_id: string
+        }
+        Insert: {
+          clue_id: string
+          hunt_id: string
+          id?: string
+          is_correct: boolean
+          submitted_at?: string | null
+          user_answer: string
+          user_id: string
+        }
+        Update: {
+          clue_id?: string
+          hunt_id?: string
+          id?: string
+          is_correct?: boolean
+          submitted_at?: string | null
+          user_answer?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "treasure_hunt_answers_clue_id_fkey"
+            columns: ["clue_id"]
+            isOneToOne: false
+            referencedRelation: "treasure_hunt_clues"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "treasure_hunt_answers_hunt_id_fkey"
+            columns: ["hunt_id"]
+            isOneToOne: false
+            referencedRelation: "treasure_hunts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      treasure_hunt_clues: {
+        Row: {
+          clue_number: number
+          correct_answer: string
+          created_at: string | null
+          hint: string
+          hunt_id: string
+          id: string
+          principle: string
+          room_tag: string
+        }
+        Insert: {
+          clue_number: number
+          correct_answer: string
+          created_at?: string | null
+          hint: string
+          hunt_id: string
+          id?: string
+          principle: string
+          room_tag: string
+        }
+        Update: {
+          clue_number?: number
+          correct_answer?: string
+          created_at?: string | null
+          hint?: string
+          hunt_id?: string
+          id?: string
+          principle?: string
+          room_tag?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "treasure_hunt_clues_hunt_id_fkey"
+            columns: ["hunt_id"]
+            isOneToOne: false
+            referencedRelation: "treasure_hunts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      treasure_hunt_participants: {
+        Row: {
+          completed_at: string | null
+          completion_time_seconds: number | null
+          current_clue: number | null
+          hunt_id: string
+          id: string
+          joined_at: string | null
+          user_id: string
+        }
+        Insert: {
+          completed_at?: string | null
+          completion_time_seconds?: number | null
+          current_clue?: number | null
+          hunt_id: string
+          id?: string
+          joined_at?: string | null
+          user_id: string
+        }
+        Update: {
+          completed_at?: string | null
+          completion_time_seconds?: number | null
+          current_clue?: number | null
+          hunt_id?: string
+          id?: string
+          joined_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "treasure_hunt_participants_hunt_id_fkey"
+            columns: ["hunt_id"]
+            isOneToOne: false
+            referencedRelation: "treasure_hunts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      treasure_hunts: {
+        Row: {
+          biblical_conclusion: string
+          created_at: string | null
+          created_by: string | null
+          difficulty: string
+          expires_at: string
+          id: string
+          title: string
+          total_clues: number
+        }
+        Insert: {
+          biblical_conclusion: string
+          created_at?: string | null
+          created_by?: string | null
+          difficulty: string
+          expires_at: string
+          id?: string
+          title: string
+          total_clues: number
+        }
+        Update: {
+          biblical_conclusion?: string
+          created_at?: string | null
+          created_by?: string | null
+          difficulty?: string
+          expires_at?: string
+          id?: string
+          title?: string
+          total_clues?: number
+        }
+        Relationships: []
+      }
       user_achievements: {
         Row: {
           achievement_id: string | null
@@ -659,6 +846,38 @@ export type Database = {
             columns: ["achievement_id"]
             isOneToOne: false
             referencedRelation: "achievements"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_drill_completions: {
+        Row: {
+          completed_at: string | null
+          drill_id: string
+          id: string
+          response: string | null
+          user_id: string
+        }
+        Insert: {
+          completed_at?: string | null
+          drill_id: string
+          id?: string
+          response?: string | null
+          user_id: string
+        }
+        Update: {
+          completed_at?: string | null
+          drill_id?: string
+          id?: string
+          response?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_drill_completions_drill_id_fkey"
+            columns: ["drill_id"]
+            isOneToOne: false
+            referencedRelation: "training_drills"
             referencedColumns: ["id"]
           },
         ]

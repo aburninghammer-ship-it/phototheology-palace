@@ -280,6 +280,37 @@ Structure your commentary:
 Make it scholarly yet accessible.
 IMPORTANT: At the end, include a line: "PRINCIPLES_USED: ${principleList}"`;
     
+    } else if (mode === "generate-drills") {
+      const { roomTag, roomName, roomPurpose, roomMethod } = await req.json();
+      
+      systemPrompt = `You are Jeeves, a master trainer creating dynamic practice drills for palace room mastery.
+Generate 10 unique, progressive training drills that help users master this specific room's methodology.`;
+
+      userPrompt = `Create 10 training drills for the ${roomName} (${roomTag}) room.
+
+Room Purpose: ${roomPurpose}
+Room Method: ${roomMethod}
+
+For each drill, provide:
+1. A clear, actionable title (5-8 words)
+2. A brief description (1-2 sentences explaining what skill this drill builds)
+3. A specific prompt/challenge (2-3 sentences giving the user a concrete task)
+
+Make drills progressively harder (1-3 beginner, 4-7 intermediate, 8-10 advanced).
+Vary the approach - use different verses, different angles, different challenges.
+Make them practical and immediately applicable.
+
+Return JSON format:
+{
+  "drills": [
+    {
+      "title": "Drill title",
+      "description": "What this builds",
+      "prompt": "Specific task for the user"
+    }
+  ]
+}`;
+
     } else if (mode === "generate-chart") {
       systemPrompt = `You are Jeeves, a data visualization expert for Bible study.
 Generate simple, clear chart data in JSON format for visualizing biblical concepts.`;
@@ -666,6 +697,22 @@ Make questions clear, answers comprehensive, and include verse references when r
 
     const data = await response.json();
     const content = data.choices[0]?.message?.content || "No response generated";
+
+    // For generate-drills mode, parse JSON
+    if (mode === "generate-drills") {
+      try {
+        const parsed = JSON.parse(content);
+        return new Response(
+          JSON.stringify(parsed),
+          { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      } catch {
+        return new Response(
+          JSON.stringify({ drills: [] }),
+          { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
+    }
 
     // For generate-flashcards mode, parse JSON
     if (mode === "generate-flashcards") {

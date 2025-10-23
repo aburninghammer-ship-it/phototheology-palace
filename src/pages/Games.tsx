@@ -90,6 +90,36 @@ const Games = () => {
       description: "Place biblical events, prophecies, and their fulfillments in chronological order. Master the flow of redemptive history from Genesis to Revelation.",
       skills: "Biblical Timeline, Historical Context, Prophetic Understanding"
     },
+    { 
+      id: "symbol_decoder", 
+      name: "Symbol Decoder", 
+      description: "Decode biblical symbols and types across Scripture. Match symbols like lamb, rock, water, and bread to their meanings and Christ fulfillments.",
+      skills: "Typology, Symbolism, Cross-References"
+    },
+    { 
+      id: "sanctuary_architect", 
+      name: "Sanctuary Architect", 
+      description: "Map Bible passages to sanctuary articles and services. Build the complete picture of how Christ fulfills each element from altar to ark.",
+      skills: "Sanctuary System, Prophetic Fulfillment, Systematic Theology"
+    },
+    { 
+      id: "feast_calendar", 
+      name: "Feast Calendar", 
+      description: "Connect biblical events and prophecies to the seven feasts of Israel. Discover the prophetic timeline hidden in God's appointed times.",
+      skills: "Feast System, Prophetic Timeline, Redemptive History"
+    },
+    { 
+      id: "dimension_detective", 
+      name: "Dimension Detective", 
+      description: "Analyze verses through all five dimensions: Literal, Christ, Personal, Church, Heaven. See the full diamond from every angle.",
+      skills: "Multi-dimensional Analysis, Hermeneutics, Application"
+    },
+    { 
+      id: "cycle_navigator", 
+      name: "Cycle Navigator", 
+      description: "Place stories and prophecies within the eight covenant cycles from Adam to Christ's Return. Navigate the patterns of redemptive history.",
+      skills: "Covenant Theology, Historical Patterns, Cyclical Analysis"
+    },
   ];
 
   if (!user) return null;
