@@ -6,6 +6,8 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
 import Palace from "./pages/Palace";
 import FloorDetail from "./pages/FloorDetail";
+import Bible from "./pages/Bible";
+import BibleChapter from "./pages/BibleChapter";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -20,6 +22,8 @@ const App = () => (
           <Route path="/" element={<Index />} />
           <Route path="/palace" element={<Palace />} />
           <Route path="/floor/:floorNumber" element={<FloorDetail />} />
+          <Route path="/bible" element={<Bible />} />
+          <Route path="/bible/:book/:chapter" element={<BibleChapter />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

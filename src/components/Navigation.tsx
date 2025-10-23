@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 
 export const Navigation = () => {
   const location = useLocation();
+  const isBiblePage = location.pathname.startsWith('/bible');
   
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 bg-card/90 backdrop-blur-xl border-b border-border shadow-purple">
@@ -35,6 +36,14 @@ export const Navigation = () => {
               className={location.pathname === "/palace" ? "gradient-royal shadow-blue" : "hover:bg-muted"}
             >
               <Link to="/palace">The Palace</Link>
+            </Button>
+            <Button
+              variant={isBiblePage ? "default" : "ghost"}
+              asChild
+              size="sm"
+              className={isBiblePage ? "gradient-ocean shadow-blue" : "hover:bg-muted"}
+            >
+              <Link to="/bible/John/3">Bible</Link>
             </Button>
           </div>
         </div>

@@ -37,9 +37,9 @@ const Index = () => {
               </Link>
             </Button>
             <Button asChild size="lg" className="gradient-ocean text-white shadow-blue hover:shadow-hover hover:scale-105 transition-all">
-              <Link to="/floor/1">
+              <Link to="/bible/John/3">
                 <BookOpen className="mr-2 h-5 w-5" />
-                Start Floor 1
+                Read the Bible
               </Link>
             </Button>
           </div>
