@@ -8,9 +8,12 @@ interface VerseViewProps {
   onSelect: () => void;
   showPrinciples?: boolean;
   isHighlighted?: boolean;
+  principles?: string[];
 }
 
-export const VerseView = ({ verse, isSelected, onSelect, showPrinciples, isHighlighted }: VerseViewProps) => {
+export const VerseView = ({ verse, isSelected, onSelect, showPrinciples, isHighlighted, principles }: VerseViewProps) => {
+  const displayPrinciples = principles || ["2D", "@Ab", "Altar", "Passover"];
+  const colors = ["gradient-palace", "gradient-ocean", "gradient-sunset", "gradient-warmth", "gradient-royal"];
   return (
     <div
       className={`group cursor-pointer transition-all duration-300 p-3 rounded-lg ${
@@ -38,19 +41,16 @@ export const VerseView = ({ verse, isSelected, onSelect, showPrinciples, isHighl
           
           {showPrinciples && (
             <div className="flex gap-2 mt-2 flex-wrap">
-              <Badge variant="outline" className="text-xs gradient-palace text-white">
-                <Sparkles className="h-3 w-3 mr-1" />
-                2D
-              </Badge>
-              <Badge variant="outline" className="text-xs gradient-ocean text-white">
-                @Ab
-              </Badge>
-              <Badge variant="outline" className="text-xs gradient-sunset text-white">
-                Altar
-              </Badge>
-              <Badge variant="outline" className="text-xs gradient-warmth text-white">
-                Passover
-              </Badge>
+              {displayPrinciples.map((principle, idx) => (
+                <Badge 
+                  key={idx} 
+                  variant="outline" 
+                  className={`text-xs ${colors[idx % colors.length]} text-white`}
+                >
+                  {idx === 0 && <Sparkles className="h-3 w-3 mr-1" />}
+                  {principle}
+                </Badge>
+              ))}
             </div>
           )}
         </div>

@@ -28,6 +28,7 @@ export const CommentaryPanel = ({ book, chapter, verse, verseText, onClose }: Co
   const [selectedPrinciples, setSelectedPrinciples] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
   const [commentary, setCommentary] = useState<string | null>(null);
+  const [usedPrinciples, setUsedPrinciples] = useState<string[]>([]);
   const { toast } = useToast();
 
   const togglePrinciple = (id: string) => {
@@ -36,8 +37,8 @@ export const CommentaryPanel = ({ book, chapter, verse, verseText, onClose }: Co
     );
   };
 
-  const generateCommentary = async () => {
-    if (selectedPrinciples.length === 0) {
+  const generateCommentary = async (refresh = false) => {
+    if (selectedPrinciples.length === 0 && !refresh) {
       toast({
         title: "Select Principles",
         description: "Please select at least one principle for commentary",
@@ -54,7 +55,7 @@ export const CommentaryPanel = ({ book, chapter, verse, verseText, onClose }: Co
           book,
           chapter,
           verseText: { verse, text: verseText },
-          selectedPrinciples: selectedPrinciples.map(
+          selectedPrinciples: refresh ? undefined : selectedPrinciples.map(
             id => PRINCIPLE_OPTIONS.find(p => p.id === id)?.label
           ),
         },
@@ -62,6 +63,7 @@ export const CommentaryPanel = ({ book, chapter, verse, verseText, onClose }: Co
 
       if (error) throw error;
       setCommentary(data.content);
+      setUsedPrinciples(data.principlesUsed || []);
     } catch (error: any) {
       console.error("Commentary error:", error);
       toast({
@@ -115,31 +117,60 @@ export const CommentaryPanel = ({ book, chapter, verse, verseText, onClose }: Co
             </div>
           </div>
 
-          <Button
-            onClick={generateCommentary}
-            disabled={loading || selectedPrinciples.length === 0}
-            className="w-full gradient-royal text-white shadow-blue"
-          >
-            {loading ? (
-              <>
-                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                Generating commentary...
-              </>
-            ) : (
-              <>
-                <Sparkles className="h-4 w-4 mr-2" />
-                Generate Commentary
-              </>
+          <div className="flex gap-2">
+            <Button
+              onClick={() => generateCommentary(false)}
+              disabled={loading || selectedPrinciples.length === 0}
+              className="flex-1 gradient-royal text-white shadow-blue"
+            >
+              {loading ? (
+                <>
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  Generating...
+                </>
+              ) : (
+                <>
+                  <Sparkles className="h-4 w-4 mr-2" />
+                  Generate
+                </>
+              )}
+            </Button>
+            
+            {commentary && (
+              <Button
+                onClick={() => generateCommentary(true)}
+                disabled={loading}
+                variant="outline"
+                className="flex-1"
+              >
+                {loading ? (
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                ) : (
+                  <Sparkles className="h-4 w-4 mr-2" />
+                )}
+                Refresh
+              </Button>
             )}
-          </Button>
+          </div>
         </div>
 
         {commentary && (
           <ScrollArea className="h-[400px] mt-4">
             <div className="p-4 rounded-lg bg-gradient-to-br from-primary/5 to-secondary/5 border-2 border-primary/30">
-              <div className="flex items-center gap-2 mb-3">
-                <Sparkles className="h-5 w-5 text-primary" />
-                <span className="font-semibold">Jeeves says:</span>
+              <div className="flex items-center justify-between mb-3">
+                <div className="flex items-center gap-2">
+                  <Sparkles className="h-5 w-5 text-primary" />
+                  <span className="font-semibold">Jeeves says:</span>
+                </div>
+                {usedPrinciples.length > 0 && (
+                  <div className="flex gap-1">
+                    {usedPrinciples.map((principle, idx) => (
+                      <Badge key={idx} variant="outline" className="text-xs">
+                        {principle}
+                      </Badge>
+                    ))}
+                  </div>
+                )}
               </div>
               <div className="prose prose-sm max-w-none text-foreground">
                 {commentary.split('\n\n').map((paragraph, idx) => (

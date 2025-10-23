@@ -624,85 +624,11 @@ export interface KidsLesson {
   activity: string;
 }
 
-export const kidsRevelationLessons: KidsLesson[] = [
-  {
-    id: 1,
-    title: "Jesus Shines Like the Sun!",
-    bibleVerse: "Revelation 1:17-18 - 'Don't be afraid! I am alive forever!'",
-    story: "John was on an island called Patmos. He saw Jesus shining brighter than the sun! Jesus had stars in His hand and walked among golden lamps. Jesus told John, 'Don't be scared! I'm alive and I'll always be with My churches.'",
-    question: "When you feel alone or scared, how does knowing Jesus is always with you help?",
-    activity: "Draw Jesus with bright light all around Him and seven golden lamps!"
-  },
-  {
-    id: 2,
-    title: "Remember Your First Love",
-    bibleVerse: "Revelation 2:4 - 'You have left your first love.'",
-    story: "Jesus wrote a letter to the church in Ephesus. He said they worked hard and were patient, but they forgot how much they loved Him at first. Like when you get a new toy and play with it all the time, then forget about it later!",
-    question: "What can you do today to show Jesus you love Him?",
-    activity: "Make a 'I Love Jesus' card with your favorite thing about Jesus!"
-  },
-  {
-    id: 3,
-    title: "Faithful Even When It's Hard",
-    bibleVerse: "Revelation 2:10 - 'Be faithful even when it's hard.'",
-    story: "The church in Smyrna was poor and faced hard times, but they stayed faithful to Jesus. They trusted Him even when others were mean to them.",
-    question: "How can you be brave and trust Jesus when things are tough?",
-    activity: "Draw a crown to remind you to be faithful like the Smyrna church."
-  },
-  {
-    id: 4,
-    title: "Don't Give In to Bad Choices",
-    bibleVerse: "Revelation 2:13 - 'Where Satan's throne is.'",
-    story: "The church in Pergamos had some people making bad choices and mixing wrong teachings. Jesus told them to be strong and not give in.",
-    question: "What bad choices can you say no to with Jesus' help?",
-    activity: "Make a 'No!' sign to remind you to choose good."
-  },
-  {
-    id: 5,
-    title: "Stay Away from Bad Influences",
-    bibleVerse: "Revelation 2:20 - 'Don't listen to Jezebel.'",
-    story: "Some people tried to trick the church with lies and bad teachings. Jesus warned them to stay true to Him.",
-    question: "Who or what tries to trick you? How can you stay true to Jesus?",
-    activity: "Draw a shield to protect yourself from bad influences."
-  },
-  {
-    id: 6,
-    title: "Wake Up and Be Alive!",
-    bibleVerse: "Revelation 3:1 - 'You have a name that you live, but you are dead.'",
-    story: "The church in Sardis looked alive but was not really living for Jesus. Jesus wants us to be truly alive in Him.",
-    question: "How can you show you really love Jesus every day?",
-    activity: "Write or draw ways you can live for Jesus."
-  },
-  {
-    id: 7,
-    title: "Open Doors and New Chances",
-    bibleVerse: "Revelation 3:8 - 'I have set before you an open door.'",
-    story: "Jesus told the church in Philadelphia that He opened a door for them to do great things. He gives us chances to grow and help others.",
-    question: "What new things is Jesus asking you to try?",
-    activity: "Draw a big open door and write what you want to do for Jesus."
-  },
-  {
-    id: 8,
-    title: "God's Amazing Throne Room",
-    bibleVerse: "Revelation 4:11 - 'You created everything, God!'",
-    story: "John saw God's throne room in heaven! It was full of beautiful colors like a rainbow. Angels sang praises to God day and night.",
-    question: "What things did God create that make you want to praise Him?",
-    activity: "Draw or color a rainbow and write 'God Made Everything!'"
-  },
-  {
-    id: 9,
-    title: "The Lamb Who Saves Us",
-    bibleVerse: "Revelation 5:9 - 'You are worthy, Jesus!'",
-    story: "John saw Jesus as a Lamb who was sacrificed to save us. Everyone in heaven sang to Him because He rescued us from sin!",
-    question: "Why is Jesus special to you?",
-    activity: "Draw a lamb and write 'Jesus Saves Me!'"
-  },
-  {
-    id: 10,
-    title: "Jesus Wins Every Battle!",
-    bibleVerse: "Revelation 19:16 - 'King of Kings!'",
-    story: "Jesus rides on a white horse and wins every battle against evil. He is the King who defeats all bad things!",
-    question: "How does it feel knowing Jesus always wins?",
-    activity: "Draw Jesus on a white horse wearing a crown!"
-  }
-];
+export const kidsRevelationLessons: KidsLesson[] = revelationLessons.map(lesson => ({
+  id: lesson.id,
+  title: lesson.title,
+  bibleVerse: `${lesson.scriptureAnchor} - ${lesson.scriptureText}`,
+  story: lesson.unlockingInsight,
+  question: lesson.reflectionQuestion,
+  activity: `Reflect on: ${lesson.personalEndurance}`
+}));

@@ -251,7 +251,20 @@ Only include verses that have meaningful connections. Return as JSON array: [...
       systemPrompt = `You are Jeeves, a theologian providing insightful Bible commentary using specific analytical frameworks.
 Provide deep, thoughtful analysis while remaining clear and accessible.`;
 
-      const principleList = selectedPrinciples?.join(", ") || "all available principles";
+      // Random principle selection for refresh mode
+      const allPrinciples = ["2D", "3D", "Sanctuary", "Feasts", "Parables", "Prophecy", "Covenant", "Types & Shadows"];
+      let usedPrinciples: string[];
+      
+      if (!selectedPrinciples || selectedPrinciples.length === 0) {
+        // Refresh mode: randomly select 2-4 principles
+        const count = Math.floor(Math.random() * 3) + 2; // 2-4 principles
+        const shuffled = [...allPrinciples].sort(() => Math.random() - 0.5);
+        usedPrinciples = shuffled.slice(0, count);
+      } else {
+        usedPrinciples = selectedPrinciples;
+      }
+      
+      const principleList = usedPrinciples.join(", ");
       
       userPrompt = `Provide commentary on ${book} ${chapter}:${verseText.verse} using these analytical lenses: ${principleList}
 
@@ -264,8 +277,32 @@ Structure your commentary:
 4. Practical application
 5. One profound closing thought
 
-Make it scholarly yet accessible.`;
+Make it scholarly yet accessible.
+IMPORTANT: At the end, include a line: "PRINCIPLES_USED: ${principleList}"`;
     
+    } else if (mode === "generate-chart") {
+      systemPrompt = `You are Jeeves, a data visualization expert for Bible study.
+Generate simple, clear chart data in JSON format for visualizing biblical concepts.`;
+
+      const { chartType, chartData, chartTitle } = await req.json();
+      
+      userPrompt = `Create a ${chartType} chart with the title "${chartTitle}".
+
+Generate JSON data for the chart in this format:
+{
+  "type": "${chartType}",
+  "title": "${chartTitle}",
+  "data": [
+    { "label": "Category 1", "value": 10 },
+    { "label": "Category 2", "value": 20 }
+  ],
+  "description": "Brief 1-2 sentence explanation of what this chart shows"
+}
+
+Chart context: ${chartData || "General Bible study visualization"}
+
+Make it educational and insightful.`;
+
     } else if (mode === "chain-chess") {
       systemPrompt = `You are Jeeves, an enthusiastic Bible study companion playing Chain Chess!
 Your role is to make insightful biblical commentary that builds connections between verses and principles.
@@ -648,6 +685,27 @@ Make questions clear, answers comprehensive, and include verse references when r
       }
     }
 
+    // For generate-chart mode, parse JSON
+    if (mode === "generate-chart") {
+      try {
+        const parsed = JSON.parse(content);
+        return new Response(
+          JSON.stringify(parsed),
+          { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      } catch {
+        return new Response(
+          JSON.stringify({
+            type: "bar",
+            title: "Chart Data",
+            data: [],
+            description: "Unable to generate chart data"
+          }),
+          { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
+    }
+
     // For prophecy-signal mode, parse JSON
     if (mode === "prophecy-signal") {
       try {
@@ -699,8 +757,20 @@ Make questions clear, answers comprehensive, and include verse references when r
       }
     }
 
+    // Extract principles used from commentary mode
+    let responseData: any = { content };
+    if (mode === "commentary") {
+      const principlesMatch = content.match(/PRINCIPLES_USED: (.+)$/m);
+      if (principlesMatch) {
+        const principlesUsed = principlesMatch[1].split(", ");
+        responseData.principlesUsed = principlesUsed;
+        // Remove the PRINCIPLES_USED line from content
+        responseData.content = content.replace(/\n?PRINCIPLES_USED: .+$/m, '').trim();
+      }
+    }
+
     return new Response(
-      JSON.stringify({ content }),
+      JSON.stringify(responseData),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   } catch (e) {
