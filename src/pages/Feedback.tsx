@@ -61,12 +61,20 @@ const Feedback = () => {
   return (
     <div className="min-h-screen bg-background">
       <Navigation />
+      
+      {/* Hero Section */}
+      <div className="bg-gradient-to-br from-blue-600 via-indigo-600 to-purple-600 text-white py-12 px-4">
+        <div className="container mx-auto max-w-4xl text-center">
+          <MessageCircle className="h-16 w-16 mx-auto mb-4" />
+          <h1 className="text-5xl font-bold mb-4">We Value Your Feedback</h1>
+          <p className="text-xl text-blue-100">
+            Help us make Phototheology better for everyone. Share your ideas, report bugs, or suggest improvements.
+          </p>
+        </div>
+      </div>
+
       <main className="container mx-auto px-4 py-8">
         <div className="max-w-2xl mx-auto space-y-6">
-          <h1 className="text-4xl font-bold flex items-center gap-2">
-            <MessageCircle className="h-8 w-8" />
-            Feedback
-          </h1>
 
           <Card>
             <CardHeader>

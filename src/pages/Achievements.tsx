@@ -42,12 +42,60 @@ const Achievements = () => {
   return (
     <div className="min-h-screen bg-background">
       <Navigation />
+      
+      {/* Hero Section */}
+      <div className="bg-gradient-to-br from-purple-600 via-purple-700 to-pink-600 text-white py-12 px-4">
+        <div className="container mx-auto max-w-6xl">
+          <div className="flex items-center gap-4 mb-4">
+            <Award className="h-16 w-16" />
+            <div>
+              <h1 className="text-5xl font-bold">Achievements</h1>
+              <p className="text-purple-200 text-lg">Unlock badges as you master Phototheology</p>
+            </div>
+          </div>
+
+          {/* Progress Stats */}
+          <div className="grid md:grid-cols-3 gap-4 mt-8">
+            <Card className="bg-white/10 backdrop-blur border-white/20">
+              <CardHeader className="pb-3">
+                <CardTitle className="text-white/90 text-sm font-normal">Unlocked</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-4xl font-bold text-white">
+                  {userAchievements.size} / {achievements.length}
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-white/10 backdrop-blur border-white/20">
+              <CardHeader className="pb-3">
+                <CardTitle className="text-white/90 text-sm font-normal">Total Points</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-4xl font-bold text-white">
+                  {achievements
+                    .filter(a => userAchievements.has(a.id))
+                    .reduce((sum, a) => sum + (a.points || 0), 0)}
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-white/10 backdrop-blur border-white/20">
+              <CardHeader className="pb-3">
+                <CardTitle className="text-white/90 text-sm font-normal">Progress</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-4xl font-bold text-white">
+                  {achievements.length > 0 ? Math.round((userAchievements.size / achievements.length) * 100) : 0}%
+                </p>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+      </div>
+
       <main className="container mx-auto px-4 py-8">
         <div className="max-w-6xl mx-auto space-y-8">
-          <h1 className="text-4xl font-bold flex items-center gap-2">
-            <Award className="h-8 w-8 text-purple-500" />
-            Achievements
-          </h1>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
             {achievements.map((achievement) => {
@@ -55,23 +103,41 @@ const Achievements = () => {
               return (
                 <Card
                   key={achievement.id}
-                  className={isUnlocked ? "border-primary" : "opacity-50"}
+                  className={`transition-all ${
+                    isUnlocked 
+                      ? "border-2 border-yellow-500 bg-gradient-to-br from-yellow-50 to-amber-50 dark:from-yellow-900/20 dark:to-amber-900/20 shadow-lg" 
+                      : "opacity-50 grayscale"
+                  }`}
                 >
                   <CardHeader>
                     <CardTitle className="flex items-center justify-between">
-                      <span>{achievement.name}</span>
+                      <div className="flex items-center gap-3">
+                        <div className={`text-4xl ${isUnlocked ? '' : 'grayscale opacity-50'}`}>
+                          {achievement.icon || '🏆'}
+                        </div>
+                        <span className="text-lg">{achievement.name}</span>
+                      </div>
                       {isUnlocked ? (
-                        <Award className="h-5 w-5 text-yellow-500" />
+                        <Award className="h-6 w-6 text-yellow-500" />
                       ) : (
-                        <Lock className="h-5 w-5" />
+                        <Lock className="h-6 w-6 text-muted-foreground" />
                       )}
                     </CardTitle>
-                    <CardDescription>{achievement.description}</CardDescription>
+                    <CardDescription className="text-base pl-14">
+                      {achievement.description}
+                    </CardDescription>
                   </CardHeader>
-                  <CardContent>
-                    <p className="text-sm text-muted-foreground">
-                      {achievement.points} points
-                    </p>
+                  <CardContent className="pl-14">
+                    <div className="flex items-center justify-between">
+                      <p className="text-sm font-semibold text-purple-600 dark:text-purple-400">
+                        +{achievement.points} points
+                      </p>
+                      {isUnlocked && (
+                        <p className="text-xs text-muted-foreground">
+                          ✓ Unlocked
+                        </p>
+                      )}
+                    </div>
                   </CardContent>
                 </Card>
               );
