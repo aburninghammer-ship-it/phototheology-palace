@@ -6,8 +6,9 @@ import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { Trophy, Gamepad2, Users, UserPlus, Share2 } from "lucide-react";
+import { Trophy, Gamepad2, Users, UserPlus, Share2, Sparkles, RefreshCw } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { MonthlyGameCard } from "@/components/MonthlyGameCard";
 
 const Games = () => {
   const { user } = useAuth();
@@ -15,12 +16,41 @@ const Games = () => {
   const { toast } = useToast();
   const [activeGames, setActiveGames] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [monthlyGames, setMonthlyGames] = useState<any[]>([]);
+  const [userRatings, setUserRatings] = useState<Record<string, number>>({});
+  const [generatingGames, setGeneratingGames] = useState(false);
 
   useEffect(() => {
     if (user) {
       fetchActiveGames();
+      fetchMonthlyGames();
     }
   }, [user]);
+
+  const fetchMonthlyGames = async () => {
+    const { data: games } = await supabase
+      .from("monthly_games")
+      .select("*")
+      .eq("is_active", true)
+      .order("created_at", { ascending: false });
+
+    setMonthlyGames(games || []);
+
+    // Fetch user ratings
+    if (user && games) {
+      const { data: ratings } = await supabase
+        .from("game_ratings")
+        .select("game_id, rating")
+        .eq("user_id", user.id)
+        .in("game_id", games.map(g => g.id));
+
+      const ratingsMap: Record<string, number> = {};
+      ratings?.forEach(r => {
+        ratingsMap[r.game_id] = r.rating;
+      });
+      setUserRatings(ratingsMap);
+    }
+  };
 
   const fetchActiveGames = async () => {
     const { data } = await supabase
@@ -56,6 +86,30 @@ const Games = () => {
 
   const startChainChess = async (vsJeeves: boolean) => {
     navigate(`/games/chain-chess/new${vsJeeves ? '/jeeves' : ''}`);
+  };
+
+  const generateMonthlyGames = async () => {
+    setGeneratingGames(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("generate-monthly-games");
+      
+      if (error) throw error;
+
+      toast({
+        title: "Games Generated!",
+        description: `${data.games.length} new games created for this month`,
+      });
+
+      fetchMonthlyGames();
+    } catch (error: any) {
+      toast({
+        title: "Generation Failed",
+        description: error.message || "Failed to generate games",
+        variant: "destructive",
+      });
+    } finally {
+      setGeneratingGames(false);
+    }
   };
 
   const adultGames = [
@@ -170,6 +224,42 @@ const Games = () => {
                 </div>
               </CardContent>
             </Card>
+          )}
+
+          {/* Monthly AI-Generated Games */}
+          {monthlyGames.length > 0 && (
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h2 className="text-2xl font-bold flex items-center gap-2">
+                    <Sparkles className="h-6 w-6 text-purple-500" />
+                    Monthly Games
+                  </h2>
+                  <p className="text-muted-foreground">
+                    AI-generated games that refresh monthly
+                  </p>
+                </div>
+                <Button 
+                  onClick={generateMonthlyGames} 
+                  disabled={generatingGames}
+                  variant="outline"
+                  size="sm"
+                >
+                  <RefreshCw className={`mr-2 h-4 w-4 ${generatingGames ? 'animate-spin' : ''}`} />
+                  {generatingGames ? 'Generating...' : 'Generate New'}
+                </Button>
+              </div>
+              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {monthlyGames.map((game) => (
+                  <MonthlyGameCard
+                    key={game.id}
+                    game={game}
+                    userRating={userRatings[game.id]}
+                    onRatingUpdate={fetchMonthlyGames}
+                  />
+                ))}
+              </div>
+            </div>
           )}
 
           <Card className="mb-6 bg-gradient-to-r from-purple-50 to-blue-50 dark:from-purple-900/20 dark:to-blue-900/20">

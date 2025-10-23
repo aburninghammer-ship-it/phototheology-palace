@@ -30,3 +30,6 @@ verify_jwt = true
 
 [functions.daily-content-generator]
 verify_jwt = false
+
+[functions.generate-monthly-games]
+verify_jwt = false

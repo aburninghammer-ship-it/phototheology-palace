@@ -423,6 +423,41 @@ export type Database = {
           },
         ]
       }
+      game_ratings: {
+        Row: {
+          created_at: string | null
+          feedback: string | null
+          game_id: string
+          id: string
+          rating: number
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          feedback?: string | null
+          game_id: string
+          id?: string
+          rating: number
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          feedback?: string | null
+          game_id?: string
+          id?: string
+          rating?: number
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "game_ratings_game_id_fkey"
+            columns: ["game_id"]
+            isOneToOne: false
+            referencedRelation: "monthly_games"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       game_scores: {
         Row: {
           created_at: string
@@ -492,6 +527,54 @@ export type Database = {
           status?: string | null
           updated_at?: string | null
           winner_id?: string | null
+        }
+        Relationships: []
+      }
+      monthly_games: {
+        Row: {
+          average_rating: number | null
+          categories: Json
+          created_at: string | null
+          difficulty: string
+          expires_at: string | null
+          game_description: string
+          game_name: string
+          game_rules: Json
+          game_type: string
+          id: string
+          is_active: boolean | null
+          month_year: string
+          play_count: number | null
+        }
+        Insert: {
+          average_rating?: number | null
+          categories: Json
+          created_at?: string | null
+          difficulty: string
+          expires_at?: string | null
+          game_description: string
+          game_name: string
+          game_rules: Json
+          game_type: string
+          id?: string
+          is_active?: boolean | null
+          month_year: string
+          play_count?: number | null
+        }
+        Update: {
+          average_rating?: number | null
+          categories?: Json
+          created_at?: string | null
+          difficulty?: string
+          expires_at?: string | null
+          game_description?: string
+          game_name?: string
+          game_rules?: Json
+          game_type?: string
+          id?: string
+          is_active?: boolean | null
+          month_year?: string
+          play_count?: number | null
         }
         Relationships: []
       }
