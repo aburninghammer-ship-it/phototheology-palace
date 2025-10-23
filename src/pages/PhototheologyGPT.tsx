@@ -41,7 +41,7 @@ const PhototheologyGPT = () => {
             </CardHeader>
             <CardContent className="p-6">
               <div 
-                id="deployment-ac7e1d1e-1b82-4f73-812e-5d1d59b50f34"
+                id="deployment-b46b8e5c-2531-4030-aff5-ca67db822bc8"
                 style={{ minHeight: '600px' }}
               />
             </CardContent>
