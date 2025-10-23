@@ -11,6 +11,14 @@ const GamePlay = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
 
+  useEffect(() => {
+    // Redirect to actual implemented games
+    if (gameId === "palace_quiz" || gameId === "verse_match" || gameId === "principle_puzzle") {
+      navigate(`/games/${gameId}${mode ? `/${mode}` : ''}`, { replace: true });
+      return;
+    }
+  }, [gameId, mode, navigate]);
+
   const gameData: Record<string, { name: string; description: string; skills: string }> = {
     palace_quiz: { 
       name: "Palace Quiz", 

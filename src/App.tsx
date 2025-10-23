@@ -17,6 +17,9 @@ import LiveStudy from "./pages/LiveStudy";
 import LiveStudyRoom from "./pages/LiveStudyRoom";
 import KidsGamePlay from "./pages/KidsGamePlay";
 import GamePlay from "./pages/GamePlay";
+import PalaceQuiz from "./pages/PalaceQuiz";
+import VerseMatch from "./pages/VerseMatch";
+import PrinciplePuzzle from "./pages/PrinciplePuzzle";
 import Community from "./pages/Community";
 import Leaderboard from "./pages/Leaderboard";
 import Achievements from "./pages/Achievements";
@@ -69,6 +72,9 @@ function App() {
             <Route path="/daily-challenges" element={<ProtectedRoute><DailyChallenges /></ProtectedRoute>} />
             <Route path="/games" element={<ProtectedRoute><Games /></ProtectedRoute>} />
             <Route path="/games/chain-chess/:gameId/:mode?" element={<ProtectedRoute><ChainChess /></ProtectedRoute>} />
+            <Route path="/games/palace_quiz/:mode?" element={<ProtectedRoute><PalaceQuiz /></ProtectedRoute>} />
+            <Route path="/games/verse_match/:mode?" element={<ProtectedRoute><VerseMatch /></ProtectedRoute>} />
+            <Route path="/games/principle_puzzle/:mode?" element={<ProtectedRoute><PrinciplePuzzle /></ProtectedRoute>} />
             <Route path="/games/:gameId/:mode?" element={<ProtectedRoute><GamePlay /></ProtectedRoute>} />
             <Route path="/kids-games" element={<ProtectedRoute><KidsGames /></ProtectedRoute>} />
             <Route path="/kids-games/:gameId" element={<ProtectedRoute><KidsGamePlay /></ProtectedRoute>} />
