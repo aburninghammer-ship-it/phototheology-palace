@@ -209,6 +209,7 @@ export const BibleReader = () => {
               book={book}
               chapter={chapter}
               verse={selectedVerse}
+              verseText={chapterData.verses.find(v => v.verse === selectedVerse)?.text || ""}
               onClose={() => setSelectedVerse(null)}
             />
           ) : (

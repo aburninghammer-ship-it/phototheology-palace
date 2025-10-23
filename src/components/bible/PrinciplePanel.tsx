@@ -6,19 +6,22 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { getVerseAnnotations } from "@/services/bibleApi";
 import { VerseAnnotation } from "@/types/bible";
-import { X, ExternalLink, Heart, BookOpen, Layers, Calendar, Building2 } from "lucide-react";
+import { X, ExternalLink, Heart, BookOpen, Layers, Calendar, Building2, Save } from "lucide-react";
 import { Link } from "react-router-dom";
+import { useToast } from "@/hooks/use-toast";
 
 interface PrinciplePanelProps {
   book: string;
   chapter: number;
   verse: number;
+  verseText: string;
   onClose: () => void;
 }
 
-export const PrinciplePanel = ({ book, chapter, verse, onClose }: PrinciplePanelProps) => {
+export const PrinciplePanel = ({ book, chapter, verse, verseText, onClose }: PrinciplePanelProps) => {
   const [annotation, setAnnotation] = useState<VerseAnnotation | null>(null);
   const [loading, setLoading] = useState(true);
+  const { toast } = useToast();
 
   useEffect(() => {
     loadAnnotation();
@@ -31,9 +34,36 @@ export const PrinciplePanel = ({ book, chapter, verse, onClose }: PrinciplePanel
       setAnnotation(data);
     } catch (error) {
       console.error("Failed to load annotations:", error);
+      toast({
+        title: "Analysis Failed",
+        description: "Could not analyze this verse. Please try again.",
+        variant: "destructive",
+      });
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleSaveAsGem = () => {
+    if (!annotation) return;
+    
+    // Create gem text
+    const gemText = `${book} ${chapter}:${verse}\n"${verseText}"\n\nPrinciples: ${
+      [
+        ...(annotation.principles.dimensions || []),
+        ...(annotation.principles.cycles || []),
+        ...(annotation.principles.sanctuary || []),
+        ...(annotation.principles.feasts || [])
+      ].join(", ")
+    }\n\n${annotation.commentary}`;
+    
+    // Copy to clipboard
+    navigator.clipboard.writeText(gemText);
+    
+    toast({
+      title: "Gem Saved!",
+      description: "Analysis copied to clipboard. Paste it into your notes.",
+    });
   };
 
   if (loading || !annotation) {
@@ -217,7 +247,15 @@ export const PrinciplePanel = ({ book, chapter, verse, onClose }: PrinciplePanel
         </Tabs>
         
         <div className="mt-4 pt-4 border-t flex gap-2">
-          <Button size="sm" className="gradient-sunset text-white flex-1 shadow-pink">
+          <Button 
+            size="sm" 
+            onClick={handleSaveAsGem}
+            className="gradient-palace text-white flex-1 shadow-purple"
+          >
+            <Save className="h-4 w-4 mr-1" />
+            Save as Gem
+          </Button>
+          <Button size="sm" variant="outline" className="flex-1">
             <BookOpen className="h-4 w-4 mr-1" />
             Export Study
           </Button>

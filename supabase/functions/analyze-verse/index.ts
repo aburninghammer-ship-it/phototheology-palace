@@ -23,27 +23,44 @@ serve(async (req) => {
 
 Verse text: "${verseText}"
 
-Provide a JSON response with the following structure:
+CRITICAL INSTRUCTIONS:
+1. Read the verse carefully and identify ONLY the principles that genuinely fit this specific verse
+2. You MUST vary your selections - different verses should have different principle combinations
+3. Select 4-8 total principles across all categories (not all from one category)
+4. Be highly selective - only choose principles that authentically connect to this verse's content
+5. DO NOT default to the same principles for every verse
+
+Provide a JSON response with this structure:
 {
-  "dimensions": ["2D", "3D", "4D", "5D"], // Which dimensional readings apply? 2D=Christ in me, 3D=Christ in Church, 4D=Christ in prophecy, 5D=Christ in heaven
-  "cycles": ["@Ab", "@Mo", "@Cy", "@CyC", "@Sp"], // Which covenant cycles? @Ab=Abraham, @Mo=Moses, @Cy=Cyrus, @CyC=Christ, @Sp=Spirit
-  "sanctuary": ["Altar", "Laver", "Lampstand", "Table", "Incense", "Veil", "Ark"], // Which sanctuary articles connect?
-  "feasts": ["Passover", "Unleavened Bread", "Firstfruits", "Pentecost", "Trumpets", "Atonement", "Tabernacles"], // Which feast connections?
+  "dimensions": [], // Pick 1-2 that fit: "2D"=Christ in me, "3D"=Christ in Church, "4D"=Christ in prophecy, "5D"=Christ in heaven
+  "cycles": [], // Pick 0-2 that fit: "@Ad"=Adam, "@No"=Noah, "@Ab"=Abraham, "@Mo"=Moses, "@Cy"=Cyrus, "@CyC"=Christ, "@Sp"=Spirit, "@Re"=Return
+  "sanctuary": [], // Pick 0-2 that fit: "Gate", "Altar", "Laver", "Lampstand", "Table", "Incense", "Veil", "Ark"
+  "feasts": [], // Pick 0-2 that fit: "Passover", "Unleavened Bread", "Firstfruits", "Pentecost", "Trumpets", "Atonement", "Tabernacles"
   "crossReferences": [
     {
       "book": "Genesis",
       "chapter": 3,
       "verse": 15,
-      "reason": "Brief explanation of the connection",
+      "reason": "Brief explanation",
       "principleType": "Type/Antitype|Parallel|Echo|Contextual",
       "confidence": 85
     }
   ], // Provide 2-4 highly relevant cross references
-  "commentary": "A 100-150 word explanation of how this verse fits into the palace framework, explaining the dimensions, cycles, and sanctuary connections",
-  "christCenter": "A 100-150 word explanation of how Christ is revealed in this verse"
+  "commentary": "100-150 words explaining which principles apply and WHY they fit this specific verse",
+  "christCenter": "100-150 words explaining how Christ is revealed in THIS verse"
 }
 
-Be selective - only include dimensions/cycles/sanctuary/feasts that genuinely apply. Not every verse touches every element. Focus on quality over quantity. Make sure cross-references are genuinely connected by theme, typology, or direct quotation.`;
+IMPORTANT EXAMPLES OF SELECTIVITY:
+- A verse about water might connect to Laver (cleansing) or baptism
+- A verse about sacrifice clearly connects to Altar and Passover
+- A verse about God's presence connects to Ark and Tabernacles
+- A verse about light connects to Lampstand
+- A verse about prayer connects to Incense
+- A historical narrative in Exodus connects to @Mo cycle
+- A promise to Abraham connects to @Ab cycle
+- A resurrection theme connects to Firstfruits feast
+
+Analyze THIS specific verse with fresh eyes - what principles genuinely fit its unique content?`;
 
     const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
       method: 'POST',
