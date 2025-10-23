@@ -62,6 +62,14 @@ export const Navigation = () => {
             >
               <Link to="/bible/John/3">Bible</Link>
             </Button>
+            <Button
+              variant={location.pathname === "/power-of-the-lamb" ? "default" : "ghost"}
+              asChild
+              size="sm"
+              className={location.pathname === "/power-of-the-lamb" ? "bg-gradient-to-r from-red-600 to-orange-600 text-white shadow-lg" : "hover:bg-muted"}
+            >
+              <Link to="/power-of-the-lamb">🔥 Power of the Lamb</Link>
+            </Button>
 
             {user ? (
               <>
