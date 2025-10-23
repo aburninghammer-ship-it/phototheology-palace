@@ -152,13 +152,42 @@ const ProphecyWatch = () => {
 
         {/* Signals List */}
         <div className="container mx-auto px-4 py-8 max-w-6xl">
+          <Card className="mb-8 bg-gradient-to-r from-indigo-50 to-purple-50 dark:from-indigo-900/20 dark:to-purple-900/20">
+            <CardHeader>
+              <CardTitle className="text-2xl">What is Prophecy Watch?</CardTitle>
+              <CardDescription className="text-base leading-relaxed">
+                Prophecy Watch is your AI-powered tool for identifying and tracking current events that may align with biblical prophecy. 
+                Using insights from Daniel, Revelation, and other prophetic books, the system generates "signals" - observations about 
+                world events, technological developments, political shifts, and spiritual movements that could be significant in understanding 
+                the times we're living in. Each signal connects current events to scriptural prophecy, helping you watch and pray with wisdom.
+              </CardDescription>
+            </CardHeader>
+          </Card>
+
           {filteredSignals.length === 0 ? (
             <div className="text-center py-20">
               <Telescope className="h-24 w-24 text-muted-foreground mx-auto mb-6 opacity-30" />
               <h2 className="text-2xl font-bold mb-2 text-muted-foreground">No Signals Yet</h2>
               <p className="text-muted-foreground mb-6">
-                Generate your first prophetic signal to start watching
+                Generate your first prophetic signal to start watching. AI will analyze current events through a biblical lens.
               </p>
+              <div className="max-w-2xl mx-auto mt-8 p-6 bg-slate-50 dark:bg-slate-900 rounded-lg">
+                <h3 className="font-semibold mb-3">Example Signal Categories:</h3>
+                <div className="grid md:grid-cols-2 gap-3 text-left">
+                  <div className="p-3 bg-white dark:bg-slate-800 rounded">
+                    <strong className="text-blue-600">Political:</strong> Rise of global governance, peace treaties in the Middle East
+                  </div>
+                  <div className="p-3 bg-white dark:bg-slate-800 rounded">
+                    <strong className="text-green-600">Natural:</strong> Earthquakes, famines, celestial signs
+                  </div>
+                  <div className="p-3 bg-white dark:bg-slate-800 rounded">
+                    <strong className="text-purple-600">Technological:</strong> Mark of the beast systems, surveillance, AI
+                  </div>
+                  <div className="p-3 bg-white dark:bg-slate-800 rounded">
+                    <strong className="text-orange-600">Spiritual:</strong> Falling away, revival, persecution of believers
+                  </div>
+                </div>
+              </div>
             </div>
           ) : (
             <div className="grid gap-4">
