@@ -230,12 +230,11 @@ export default function SpiritualTraining() {
 
         {/* Training Tabs */}
         <Tabs defaultValue="scenarios" className="w-full">
-          <TabsList className="grid w-full grid-cols-5">
+          <TabsList className="grid w-full grid-cols-4">
             <TabsTrigger value="scenarios">Battle Scenarios</TabsTrigger>
             <TabsTrigger value="besetting">Besetting Sins</TabsTrigger>
             <TabsTrigger value="animals">Animal Styles</TabsTrigger>
             <TabsTrigger value="weapons">Spiritual Weapons</TabsTrigger>
-            <TabsTrigger value="courses">Courses</TabsTrigger>
           </TabsList>
 
           {/* Battle Scenarios */}
