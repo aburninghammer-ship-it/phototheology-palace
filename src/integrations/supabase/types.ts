@@ -435,33 +435,57 @@ export type Database = {
       profiles: {
         Row: {
           avatar_url: string | null
+          chain_chess_streak: number | null
           created_at: string | null
+          daily_study_streak: number | null
           display_name: string | null
+          equations_streak: number | null
+          gem_creation_streak: number | null
           id: string
           last_seen: string | null
           level: number | null
+          longest_chess_streak: number | null
+          longest_equations_streak: number | null
+          longest_gem_streak: number | null
+          longest_study_streak: number | null
           points: number | null
           updated_at: string | null
           username: string
         }
         Insert: {
           avatar_url?: string | null
+          chain_chess_streak?: number | null
           created_at?: string | null
+          daily_study_streak?: number | null
           display_name?: string | null
+          equations_streak?: number | null
+          gem_creation_streak?: number | null
           id: string
           last_seen?: string | null
           level?: number | null
+          longest_chess_streak?: number | null
+          longest_equations_streak?: number | null
+          longest_gem_streak?: number | null
+          longest_study_streak?: number | null
           points?: number | null
           updated_at?: string | null
           username: string
         }
         Update: {
           avatar_url?: string | null
+          chain_chess_streak?: number | null
           created_at?: string | null
+          daily_study_streak?: number | null
           display_name?: string | null
+          equations_streak?: number | null
+          gem_creation_streak?: number | null
           id?: string
           last_seen?: string | null
           level?: number | null
+          longest_chess_streak?: number | null
+          longest_equations_streak?: number | null
+          longest_gem_streak?: number | null
+          longest_study_streak?: number | null
           points?: number | null
           updated_at?: string | null
           username?: string
