@@ -220,11 +220,11 @@ export const palaceFloors: Floor[] = [
         id: "hf",
         name: "History/Social Freestyle",
         tag: "HF",
-        purpose: "Read culture through Scripture.",
-        coreQuestion: "How does the Bible frame this moment in history?",
-        method: "Headline → biblical frame → pastoral insight.",
-        examples: ["Economic crisis → Ecclesiastes vanity → eternal investment focus"],
-        pitfalls: ["Culture reading Scripture instead of vice versa"],
+        purpose: "Draw lessons from secular history, social studies, and current events—applying them to the gospel or text under consideration.",
+        coreQuestion: "How does this secular historical event or social phenomenon illuminate the Bible passage I'm studying?",
+        method: "Identify a secular event (past or present) → connect to gospel truth or specific text → extract the spiritual lesson.",
+        examples: ["Fall of Rome → Rev 13-18 Babylon's fall → pride precedes collapse", "Modern refugee crisis → Ruth's immigration story → God's care for displaced", "Industrial Revolution → Tower of Babel → human ambition vs divine sovereignty"],
+        pitfalls: ["Using biblical history instead of secular", "Culture reading Scripture instead of vice versa", "Political agenda over gospel truth"],
         deliverable: "HF note"
       },
       {
