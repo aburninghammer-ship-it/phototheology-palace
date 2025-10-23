@@ -46,10 +46,10 @@ const Index = () => {
             Phototheology
           </h1>
           
-          <p className="text-xl md:text-2xl text-foreground/80 mb-8 leading-relaxed max-w-2xl mx-auto animate-fade-in font-medium">
-            Transform Bible study into a <span className="text-palace-blue font-bold">palace of meaning</span>. 
-            Store Scripture as <span className="text-palace-teal font-bold">vivid images</span>, patterns, 
-            and structures through an <span className="text-palace-orange font-bold">8-floor, 38-room</span> method.
+          <p className="text-xl md:text-2xl text-foreground mb-8 leading-relaxed max-w-2xl mx-auto animate-fade-in font-normal">
+            Transform Bible study into a <strong className="font-bold">palace of meaning</strong>. 
+            Store Scripture as <strong className="font-bold">vivid images</strong>, patterns, 
+            and structures through an <strong className="font-bold">8-floor, 38-room</strong> method.
           </p>
           
           <div className="flex flex-col sm:flex-row gap-3 justify-center animate-slide-up">
