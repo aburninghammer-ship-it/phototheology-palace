@@ -73,7 +73,7 @@ export default function EquationsChallenge() {
     <div className="min-h-screen bg-background">
       <Navigation />
       
-      <main className="container mx-auto px-4 py-8 max-w-4xl">
+      <main className="container mx-auto px-4 pt-24 pb-8 max-w-4xl">
         <div className="text-center space-y-4 mb-8">
           <div className="flex items-center justify-center gap-3">
             <Calculator className="h-12 w-12 text-primary" />

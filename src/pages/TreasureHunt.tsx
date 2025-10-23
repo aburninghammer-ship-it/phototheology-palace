@@ -131,7 +131,7 @@ const TreasureHunt = () => {
   return (
     <div className="min-h-screen bg-background">
       <Navigation />
-      <main className="container mx-auto px-4 py-8">
+      <main className="container mx-auto px-4 pt-24 pb-8">
         <div className="max-w-6xl mx-auto space-y-8">
           <div className="text-center space-y-4">
             <h1 className="text-5xl font-bold flex items-center justify-center gap-3">

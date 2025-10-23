@@ -157,7 +157,7 @@ const TreasureHuntPlay = () => {
     return (
       <div className="min-h-screen bg-background">
         <Navigation />
-        <main className="container mx-auto px-4 py-8">
+        <main className="container mx-auto px-4 pt-24 pb-8">
           <div className="max-w-3xl mx-auto space-y-8">
             <Card className="border-yellow-500 border-2">
               <CardHeader className="text-center">
@@ -186,7 +186,7 @@ const TreasureHuntPlay = () => {
   return (
     <div className="min-h-screen bg-background">
       <Navigation />
-      <main className="container mx-auto px-4 py-8">
+      <main className="container mx-auto px-4 pt-24 pb-8">
         <div className="max-w-3xl mx-auto space-y-8">
           {/* Progress */}
           <Card>
