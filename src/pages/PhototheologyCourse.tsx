@@ -289,21 +289,21 @@ export default function PhototheologyCourse() {
                           <h3 className="font-semibold text-primary mb-2">Activity (10-20 min)</h3>
                           <p className="text-foreground whitespace-pre-line">{selectedDayData.activity}</p>
                           
-                          {'simplifiedActivity' in selectedDayData && (
+                          {'simplifiedActivity' in selectedDayData && selectedDayData.simplifiedActivity && (
                             <div className="mt-4 p-3 bg-purple-500/10 border border-purple-500/20 rounded-lg">
                               <h4 className="font-semibold text-purple-700 dark:text-purple-300 mb-2">
                                 Simplified Activity
                               </h4>
-                              <p className="text-sm">{selectedDayData.simplifiedActivity}</p>
+                              <p className="text-sm">{String(selectedDayData.simplifiedActivity)}</p>
                             </div>
                           )}
                           
-                          {'funElement' in selectedDayData && (
+                          {'funElement' in selectedDayData && selectedDayData.funElement && (
                             <div className="mt-3 p-3 bg-yellow-500/10 border border-yellow-500/20 rounded-lg">
                               <h4 className="font-semibold text-yellow-700 dark:text-yellow-300 mb-2">
                                 🎉 Fun Element
                               </h4>
-                              <p className="text-sm">{selectedDayData.funElement}</p>
+                              <p className="text-sm">{String(selectedDayData.funElement)}</p>
                             </div>
                           )}
                         </div>
