@@ -258,6 +258,205 @@ export type Database = {
         }
         Relationships: []
       }
+      escape_room_attempts: {
+        Row: {
+          completed_at: string | null
+          created_at: string
+          hints_used: number
+          id: string
+          is_team: boolean
+          room_id: string
+          score: number
+          started_at: string
+          team_members: string[] | null
+          time_elapsed_seconds: number | null
+          user_id: string
+        }
+        Insert: {
+          completed_at?: string | null
+          created_at?: string
+          hints_used?: number
+          id?: string
+          is_team?: boolean
+          room_id: string
+          score?: number
+          started_at?: string
+          team_members?: string[] | null
+          time_elapsed_seconds?: number | null
+          user_id: string
+        }
+        Update: {
+          completed_at?: string | null
+          created_at?: string
+          hints_used?: number
+          id?: string
+          is_team?: boolean
+          room_id?: string
+          score?: number
+          started_at?: string
+          team_members?: string[] | null
+          time_elapsed_seconds?: number | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "escape_room_attempts_room_id_fkey"
+            columns: ["room_id"]
+            isOneToOne: false
+            referencedRelation: "escape_rooms"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      escape_room_puzzles: {
+        Row: {
+          created_at: string
+          expected_verses: string[]
+          floor_number: number | null
+          id: string
+          points_partial: number
+          points_perfect: number
+          principle: string
+          prompt: string
+          puzzle_number: number
+          room_id: string
+          room_tag: string
+          time_cap_minutes: number | null
+          typology_notes: string | null
+        }
+        Insert: {
+          created_at?: string
+          expected_verses: string[]
+          floor_number?: number | null
+          id?: string
+          points_partial?: number
+          points_perfect?: number
+          principle: string
+          prompt: string
+          puzzle_number: number
+          room_id: string
+          room_tag: string
+          time_cap_minutes?: number | null
+          typology_notes?: string | null
+        }
+        Update: {
+          created_at?: string
+          expected_verses?: string[]
+          floor_number?: number | null
+          id?: string
+          points_partial?: number
+          points_perfect?: number
+          principle?: string
+          prompt?: string
+          puzzle_number?: number
+          room_id?: string
+          room_tag?: string
+          time_cap_minutes?: number | null
+          typology_notes?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "escape_room_puzzles_room_id_fkey"
+            columns: ["room_id"]
+            isOneToOne: false
+            referencedRelation: "escape_rooms"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      escape_room_solutions: {
+        Row: {
+          attempt_id: string
+          created_at: string
+          id: string
+          is_correct: boolean
+          points_earned: number
+          principle_used: string
+          puzzle_id: string
+          room_justification: string
+          submitted_at: string
+          submitted_verses: string[]
+        }
+        Insert: {
+          attempt_id: string
+          created_at?: string
+          id?: string
+          is_correct?: boolean
+          points_earned?: number
+          principle_used: string
+          puzzle_id: string
+          room_justification: string
+          submitted_at?: string
+          submitted_verses: string[]
+        }
+        Update: {
+          attempt_id?: string
+          created_at?: string
+          id?: string
+          is_correct?: boolean
+          points_earned?: number
+          principle_used?: string
+          puzzle_id?: string
+          room_justification?: string
+          submitted_at?: string
+          submitted_verses?: string[]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "escape_room_solutions_attempt_id_fkey"
+            columns: ["attempt_id"]
+            isOneToOne: false
+            referencedRelation: "escape_room_attempts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "escape_room_solutions_puzzle_id_fkey"
+            columns: ["puzzle_id"]
+            isOneToOne: false
+            referencedRelation: "escape_room_puzzles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      escape_rooms: {
+        Row: {
+          biblical_conclusion: string | null
+          category: string | null
+          created_at: string
+          difficulty: string
+          expires_at: string
+          id: string
+          max_hints: number
+          mode: string
+          time_limit_minutes: number
+          title: string
+        }
+        Insert: {
+          biblical_conclusion?: string | null
+          category?: string | null
+          created_at?: string
+          difficulty?: string
+          expires_at: string
+          id?: string
+          max_hints?: number
+          mode: string
+          time_limit_minutes?: number
+          title: string
+        }
+        Update: {
+          biblical_conclusion?: string | null
+          category?: string | null
+          created_at?: string
+          difficulty?: string
+          expires_at?: string
+          id?: string
+          max_hints?: number
+          mode?: string
+          time_limit_minutes?: number
+          title?: string
+        }
+        Relationships: []
+      }
       feedback: {
         Row: {
           category: string | null
