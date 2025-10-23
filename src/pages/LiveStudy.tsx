@@ -36,12 +36,25 @@ const LiveStudy = () => {
   }, [user]);
 
   const fetchRooms = async () => {
-    const { data } = await supabase
+    const { data: roomsData } = await supabase
       .from("study_rooms")
-      .select("*, profiles!study_rooms_host_id_fkey(username)")
+      .select("*")
       .eq("is_public", true);
     
-    setRooms(data || []);
+    if (roomsData) {
+      const roomsWithProfiles = await Promise.all(
+        roomsData.map(async (room) => {
+          const { data: profile } = await supabase
+            .from("profiles")
+            .select("username")
+            .eq("id", room.host_id)
+            .single();
+          
+          return { ...room, profiles: profile || { username: "Unknown" } };
+        })
+      );
+      setRooms(roomsWithProfiles);
+    }
   };
 
   const createRoom = async () => {

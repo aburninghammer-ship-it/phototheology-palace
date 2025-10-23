@@ -14,6 +14,7 @@ import Games from "./pages/Games";
 import ChainChess from "./pages/ChainChess";
 import KidsGames from "./pages/KidsGames";
 import LiveStudy from "./pages/LiveStudy";
+import LiveStudyRoom from "./pages/LiveStudyRoom";
 import Community from "./pages/Community";
 import Leaderboard from "./pages/Leaderboard";
 import Achievements from "./pages/Achievements";
@@ -64,6 +65,7 @@ function App() {
             <Route path="/games/chain-chess/:gameId/:mode?" element={<ProtectedRoute><ChainChess /></ProtectedRoute>} />
             <Route path="/kids-games" element={<ProtectedRoute><KidsGames /></ProtectedRoute>} />
             <Route path="/live-study" element={<ProtectedRoute><LiveStudy /></ProtectedRoute>} />
+            <Route path="/live-study/:roomId" element={<ProtectedRoute><LiveStudyRoom /></ProtectedRoute>} />
             <Route path="/community" element={<ProtectedRoute><Community /></ProtectedRoute>} />
             <Route path="/leaderboard" element={<ProtectedRoute><Leaderboard /></ProtectedRoute>} />
             <Route path="/achievements" element={<ProtectedRoute><Achievements /></ProtectedRoute>} />
