@@ -44,9 +44,9 @@ const ChainChess = () => {
   const isVsJeeves = mode === "jeeves";
 
   useEffect(() => {
-    if (user && !gameId) {
+    if (user && (!gameId || gameId === "new")) {
       initializeGame();
-    } else if (gameId) {
+    } else if (gameId && gameId !== "new") {
       loadGame();
     }
   }, [user, gameId]);
