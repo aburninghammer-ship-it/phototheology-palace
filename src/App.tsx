@@ -9,6 +9,7 @@ import Palace from "./pages/Palace";
 
 import Bible from "./pages/Bible";
 import BibleChapter from "./pages/BibleChapter";
+import BibleSearch from "./pages/BibleSearch";
 import DailyChallenges from "./pages/DailyChallenges";
 import EquationsChallenge from "./pages/EquationsChallenge";
 import Games from "./pages/Games";
@@ -73,6 +74,7 @@ function App() {
             <Route path="/palace" element={<ProtectedRoute><Palace /></ProtectedRoute>} />
             
             <Route path="/bible" element={<ProtectedRoute><Bible /></ProtectedRoute>} />
+            <Route path="/bible/search" element={<ProtectedRoute><BibleSearch /></ProtectedRoute>} />
             <Route path="/bible/:book/:chapter" element={<ProtectedRoute><BibleChapter /></ProtectedRoute>} />
             <Route path="/daily-challenges" element={<ProtectedRoute><DailyChallenges /></ProtectedRoute>} />
             <Route path="/equations-challenge" element={<ProtectedRoute><EquationsChallenge /></ProtectedRoute>} />
