@@ -96,68 +96,57 @@ export const searchBible = async (query: string): Promise<Verse[]> => {
   }
 };
 
-// Mock data for demonstration - replace with actual principle database
+// Dynamic verse analysis using AI
 export const getVerseAnnotations = async (book: string, chapter: number, verse: number) => {
-  // Enhanced mock data based on verse
-  const isJohn316 = book === "John" && chapter === 3 && verse === 16;
-  
-  return {
-    verseId: `${book}-${chapter}-${verse}`,
-    principles: {
-      dimensions: isJohn316 ? ["2D" as const, "3D" as const, "4D" as const] : ["2D" as const],
-      cycles: ["@Ab" as const, "@Cy" as const],
-      sanctuary: isJohn316 ? ["Altar" as const, "Ark" as const] : ["Altar" as const],
-      feasts: ["Passover" as const],
-      frames: ["F03" as const]
-    },
-    crossReferences: isJohn316 ? [
+  try {
+    // First fetch the verse text
+    const chapterData = await fetchChapter(book, chapter);
+    const verseData = chapterData.verses.find(v => v.verse === verse);
+    
+    if (!verseData) {
+      throw new Error('Verse not found');
+    }
+
+    // Call the edge function to analyze the verse
+    const response = await fetch(
+      `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/analyze-verse`,
       {
-        book: "Exodus",
-        chapter: 12,
-        verse: 13,
-        reason: "Typology: Blood protection prefigures Christ's sacrifice",
-        principleType: "Type/Antitype",
-        confidence: 95
-      },
-      {
-        book: "Romans",
-        chapter: 5,
-        verse: 8,
-        reason: "Direct parallel: God demonstrates His love through sacrifice",
-        principleType: "Parallel",
-        confidence: 98
-      },
-      {
-        book: "Numbers",
-        chapter: 21,
-        verse: 9,
-        reason: "Type: Bronze serpent lifted up prefigures Christ lifted up",
-        principleType: "Type/Antitype",
-        confidence: 92
-      },
-      {
-        book: "1 John",
-        chapter: 4,
-        verse: 9,
-        reason: "Echo: God sent His Son as a manifestation of love",
-        principleType: "Echo",
-        confidence: 96
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+        },
+        body: JSON.stringify({
+          book,
+          chapter,
+          verse,
+          verseText: verseData.text
+        })
       }
-    ] : [
-      {
-        book: "Romans",
-        chapter: 3,
-        verse: 23,
-        reason: "Context: Universal need for salvation",
-        principleType: "Contextual",
-        confidence: 85
-      }
-    ],
-    commentary: isJohn316 
-      ? "This verse stands as the gospel in miniature, weaving together multiple theological dimensions. Through the 2D lens (Christ in me), it speaks to personal salvation. The 3D lens (Church) reveals God's redemptive plan for all believers. The Sanctuary connection to the Altar emphasizes the substitutionary sacrifice, while the Passover feast connection roots it in covenant history. The @Ab cycle places it within the Abrahamic promise of blessing all nations."
-      : "This verse contributes to the larger narrative of new birth and spiritual transformation. The dialogue with Nicodemus establishes the necessity of divine regeneration for entering God's kingdom.",
-    christCenter: isJohn316
-      ? "Christ is the central figure—the 'only begotten Son' who embodies God's love. He is both the gift and the giver of eternal life. The verse points to His sacrificial death (implicit in 'gave') and His role as the exclusive means of salvation. He is the fulfillment of the bronze serpent type (v.14), the manifestation of divine love, and the bridge between God's holiness and human need."
-      : "Christ reveals Himself as the authoritative teacher who has come from heaven, possessing divine knowledge and authority to declare spiritual truth."
-  };
+    );
+
+    if (!response.ok) {
+      throw new Error('Failed to analyze verse');
+    }
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error('Error getting verse annotations:', error);
+    
+    // Fallback to basic mock data
+    return {
+      verseId: `${book}-${chapter}-${verse}`,
+      principles: {
+        dimensions: ["2D" as const],
+        cycles: ["@CyC" as const],
+        sanctuary: [],
+        feasts: [],
+        frames: []
+      },
+      crossReferences: [],
+      commentary: "Analysis temporarily unavailable. Please try again.",
+      christCenter: "Every verse reveals Christ, the Author and Finisher of our faith."
+    };
+  }
 };

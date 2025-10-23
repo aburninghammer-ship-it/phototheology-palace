@@ -41,12 +41,25 @@ export const PrinciplePanel = ({ book, chapter, verse, onClose }: PrinciplePanel
       <Card className="sticky top-24">
         <CardHeader>
           <div className="flex items-start justify-between">
-            <CardTitle>Loading...</CardTitle>
+            <div>
+              <CardTitle className="font-serif text-xl">
+                {book} {chapter}:{verse}
+              </CardTitle>
+              <CardDescription>Analyzing with AI...</CardDescription>
+            </div>
             <Button variant="ghost" size="sm" onClick={onClose}>
               <X className="h-4 w-4" />
             </Button>
           </div>
         </CardHeader>
+        <CardContent>
+          <div className="flex items-center justify-center py-8">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+          </div>
+          <p className="text-sm text-muted-foreground text-center">
+            Analyzing through the Palace framework...
+          </p>
+        </CardContent>
       </Card>
     );
   }
