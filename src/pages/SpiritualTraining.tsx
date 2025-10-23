@@ -257,10 +257,10 @@ export default function SpiritualTraining() {
           <TabsContent value="courses" className="space-y-4">
             <div className="grid gap-6 md:grid-cols-2">
               {[
-                { title: "The Blueprint Course", description: "Foundation for spiritual warfare", icon: BookOpen, link: "/blueprint-course" },
-                { title: "Daniel Course", description: "Standing firm in hostile territory", icon: Shield, link: null },
+                { title: "50-Day Phototheology Course", description: "Visual theology memory palace training", icon: BookOpen, link: "/phototheology-course" },
+                { title: "40-Day Daniel Course", description: "Prophecy, faithfulness, and God's sovereignty", icon: Scroll, link: "/daniel-course" },
+                { title: "The Blueprint Course", description: "Foundation for spiritual warfare", icon: Shield, link: "/blueprint-course" },
                 { title: "Revelation Course", description: "Understanding end-time warfare", icon: Flame, link: null },
-                { title: "Phototheology Course", description: "Visual theology training", icon: Trophy, link: null },
               ].map((course) => (
                 <Card key={course.title}>
                   <CardHeader>
