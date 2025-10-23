@@ -1,9 +1,19 @@
 import { Navigation } from "@/components/Navigation";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Sparkles, Shield, Book } from "lucide-react";
-import { SandboxedEmbed } from "@/components/SandboxedEmbed";
+import { useEffect } from "react";
 
 const ApologeticsGPT = () => {
+  useEffect(() => {
+    const script = document.createElement('script');
+    script.src = 'https://studio.pickaxe.co/api/embed/bundle.js';
+    script.defer = true;
+    document.body.appendChild(script);
+
+    return () => {
+      document.body.removeChild(script);
+    };
+  }, []);
 
   return (
     <div className="min-h-screen bg-background">
@@ -29,12 +39,10 @@ const ApologeticsGPT = () => {
                 Get answers to tough questions about faith, science, history, and biblical reliability. Learn to defend the gospel with grace and truth.
               </CardDescription>
             </CardHeader>
-            <CardContent className="p-0">
-              <SandboxedEmbed
-                scriptUrl="https://phototheologygpt.com/api/embed/bundle.js"
-                embedId="deployment-a3183e57-2e65-466d-bcff-ac232a6231ea"
-                minHeight="600px"
-                title="ApologeticsGPT Chat Interface"
+            <CardContent className="p-6">
+              <div 
+                id="deployment-ff68ff00-288c-4616-ad0d-4af391166a8e"
+                style={{ minHeight: '600px' }}
               />
             </CardContent>
           </Card>
