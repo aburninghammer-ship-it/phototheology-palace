@@ -26,9 +26,14 @@ export const SandboxedEmbed = ({
 }: SandboxedEmbedProps) => {
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const [error, setError] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     if (!iframeRef.current) return;
+
+    const timer = setTimeout(() => {
+      setLoading(false);
+    }, 3000);
 
     // Create isolated HTML document for iframe
     const iframeDoc = `
@@ -42,6 +47,7 @@ export const SandboxedEmbed = ({
             body { 
               font-family: system-ui, -apple-system, sans-serif;
               overflow-x: hidden;
+              min-height: ${minHeight};
             }
             #${embedId} { 
               width: 100%; 
@@ -54,6 +60,7 @@ export const SandboxedEmbed = ({
           <script 
             src="${scriptUrl}" 
             defer
+            onload="parent.postMessage({type:'embed-loaded', embedId:'${embedId}'}, '*')"
             onerror="parent.postMessage({type:'embed-error', embedId:'${embedId}'}, '*')"
           ></script>
         </body>
@@ -71,17 +78,27 @@ export const SandboxedEmbed = ({
     } catch (err) {
       console.error("Failed to initialize sandboxed embed:", err);
       setError(true);
+      setLoading(false);
     }
 
-    // Listen for error messages from iframe
+    // Listen for messages from iframe
     const handleMessage = (event: MessageEvent) => {
-      if (event.data?.type === 'embed-error' && event.data?.embedId === embedId) {
-        setError(true);
+      if (event.data?.embedId === embedId) {
+        if (event.data?.type === 'embed-error') {
+          console.error("Embed script failed to load");
+          setError(true);
+          setLoading(false);
+        } else if (event.data?.type === 'embed-loaded') {
+          setLoading(false);
+        }
       }
     };
 
     window.addEventListener('message', handleMessage);
-    return () => window.removeEventListener('message', handleMessage);
+    return () => {
+      window.removeEventListener('message', handleMessage);
+      clearTimeout(timer);
+    };
   }, [scriptUrl, embedId, minHeight]);
 
   if (error) {
@@ -96,17 +113,40 @@ export const SandboxedEmbed = ({
   }
 
   return (
-    <iframe
-      ref={iframeRef}
-      title={title}
-      sandbox="allow-scripts allow-same-origin allow-forms allow-popups"
-      style={{
-        width: '100%',
-        minHeight,
-        border: 'none',
-        display: 'block'
-      }}
-      loading="lazy"
-    />
+    <div style={{ position: 'relative', minHeight }}>
+      {loading && (
+        <div 
+          style={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            background: 'rgba(255, 255, 255, 0.9)',
+            zIndex: 10
+          }}
+        >
+          <div style={{ textAlign: 'center' }}>
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-2"></div>
+            <p className="text-sm text-muted-foreground">Loading chat interface...</p>
+          </div>
+        </div>
+      )}
+      <iframe
+        ref={iframeRef}
+        title={title}
+        sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-popups-to-escape-sandbox"
+        style={{
+          width: '100%',
+          minHeight,
+          border: 'none',
+          display: 'block'
+        }}
+        loading="eager"
+      />
+    </div>
   );
 };
