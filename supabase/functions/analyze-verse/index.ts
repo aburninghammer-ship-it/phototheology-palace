@@ -23,19 +23,70 @@ serve(async (req) => {
 
 Verse text: "${verseText}"
 
-CRITICAL INSTRUCTIONS:
-1. Read the verse carefully and identify ONLY the principles that genuinely fit this specific verse
-2. You MUST vary your selections - different verses should have different principle combinations
-3. Select 4-8 total principles across all categories (not all from one category)
-4. Be highly selective - only choose principles that authentically connect to this verse's content
-5. DO NOT default to the same principles for every verse
+🚨 CRITICAL - YOU ARE FAILING THIS TEST 🚨
+Your previous analyses have been WRONG because you keep selecting the SAME principles (2D, @CyC, Lampstand) for EVERY verse.
+This is INCORRECT. Each verse is unique and requires DIFFERENT principle combinations.
+
+MANDATORY REQUIREMENTS:
+1. READ the actual verse content CAREFULLY before selecting principles
+2. Select 4-8 TOTAL principles that GENUINELY fit THIS specific verse
+3. VARY your selections - no two verses should have identical principle sets
+4. DO NOT use 2D + @CyC + Lampstand as your default - this is WRONG
+5. If a principle doesn't authentically connect to the verse's content, DO NOT include it
+
+SELECTION GUIDELINES BY CATEGORY:
+
+Dimensions (pick 1-2 that genuinely fit):
+- "2D" = Personal relationship with Christ, individual faith, Christ in me
+- "3D" = Church community, body of Christ, ecclesiology
+- "4D" = Prophecy, end times, apocalyptic themes
+- "5D" = Heaven, celestial realm, divine throne room
+
+Cycles (pick 0-2 that fit the historical/theological context):
+- "@Ad" = Creation, fall, sin entering world
+- "@No" = Judgment, deliverance through water, new beginnings
+- "@Ab" = Faith, covenant promises, seed promise
+- "@Mo" = Law, exodus, liberation, Sinai covenant
+- "@Cy" = Restoration, rebuilding, return from exile
+- "@CyC" = Christ's incarnation, ministry, first coming
+- "@Sp" = Pentecost, Spirit's work, church age
+- "@Re" = Second coming, final judgment, new earth
+
+Sanctuary (pick 0-2 that connect to the verse's imagery):
+- "Gate" = Entry, conversion, beginning of journey
+- "Altar" = Sacrifice, substitution, atonement
+- "Laver" = Cleansing, baptism, purification
+- "Lampstand" = Light, witness, illumination, Holy Spirit
+- "Table" = Fellowship, communion, provision
+- "Incense" = Prayer, intercession, worship
+- "Veil" = Access to God, barrier removed, mystery
+- "Ark" = God's presence, mercy seat, law fulfilled
+
+Feasts (pick 0-2 that match the verse's themes):
+- "Passover" = Lamb's blood, deliverance, redemption
+- "Unleavened Bread" = Purity, separation from sin
+- "Firstfruits" = Resurrection, new life, Christ risen
+- "Pentecost" = Spirit outpouring, church birth, harvest
+- "Trumpets" = Warning, awakening, announcement
+- "Atonement" = Cleansing, forgiveness, Day of the Lord
+- "Tabernacles" = God dwelling with us, joy, pilgrimage
+
+TESTING YOUR UNDERSTANDING - Examples:
+- John 3:16 ("For God so loved...") → 2D, @CyC, Altar, Passover (God's love, Christ's gift, sacrifice)
+- John 1:1 ("In the beginning...") → 5D, @Ad, Ark (Divine Word, creation, pre-existence)
+- John 14:2 ("I go to prepare...") → 2D, 5D, @Re, Tabernacles (personal promise, heaven, future dwelling)
+- John 15:5 ("I am the vine...") → 2D, 3D, Table (abiding in Christ, connected to body, fellowship)
+
+NOW ANALYZE ${book} ${chapter}:${verse}:
+What does THIS verse actually say? What principles authentically connect to its content?
+Be specific. Be varied. Be correct.
 
 Provide a JSON response with this structure:
 {
-  "dimensions": [], // Pick 1-2 that fit: "2D"=Christ in me, "3D"=Christ in Church, "4D"=Christ in prophecy, "5D"=Christ in heaven
-  "cycles": [], // Pick 0-2 that fit: "@Ad"=Adam, "@No"=Noah, "@Ab"=Abraham, "@Mo"=Moses, "@Cy"=Cyrus, "@CyC"=Christ, "@Sp"=Spirit, "@Re"=Return
-  "sanctuary": [], // Pick 0-2 that fit: "Gate", "Altar", "Laver", "Lampstand", "Table", "Incense", "Veil", "Ark"
-  "feasts": [], // Pick 0-2 that fit: "Passover", "Unleavened Bread", "Firstfruits", "Pentecost", "Trumpets", "Atonement", "Tabernacles"
+  "dimensions": [],
+  "cycles": [],
+  "sanctuary": [],
+  "feasts": [],
   "crossReferences": [
     {
       "book": "Genesis",
@@ -45,22 +96,10 @@ Provide a JSON response with this structure:
       "principleType": "Type/Antitype|Parallel|Echo|Contextual",
       "confidence": 85
     }
-  ], // Provide 2-4 highly relevant cross references
-  "commentary": "100-150 words explaining which principles apply and WHY they fit this specific verse",
-  "christCenter": "100-150 words explaining how Christ is revealed in THIS verse"
-}
-
-IMPORTANT EXAMPLES OF SELECTIVITY:
-- A verse about water might connect to Laver (cleansing) or baptism
-- A verse about sacrifice clearly connects to Altar and Passover
-- A verse about God's presence connects to Ark and Tabernacles
-- A verse about light connects to Lampstand
-- A verse about prayer connects to Incense
-- A historical narrative in Exodus connects to @Mo cycle
-- A promise to Abraham connects to @Ab cycle
-- A resurrection theme connects to Firstfruits feast
-
-Analyze THIS specific verse with fresh eyes - what principles genuinely fit its unique content?`;
+  ],
+  "commentary": "100-150 words explaining which principles apply and WHY they fit this specific verse based on its actual content",
+  "christCenter": "100-150 words explaining how Christ is revealed in THIS specific verse"
+}`;
 
     const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
       method: 'POST',
@@ -73,7 +112,7 @@ Analyze THIS specific verse with fresh eyes - what principles genuinely fit its 
         messages: [
           {
             role: 'system',
-            content: 'You are a biblical scholar trained in the Phototheology Palace method. Analyze verses through this framework with precision and theological depth. Return only valid JSON.'
+            content: 'You are a biblical scholar trained in the Phototheology Palace method. You MUST analyze each verse uniquely - selecting different principle combinations based on the actual verse content. DO NOT use the same principles for every verse. Your previous analyses have been incorrect because you defaulted to 2D + @CyC + Lampstand repeatedly. Read each verse carefully and select principles that genuinely fit. Return only valid JSON.'
           },
           {
             role: 'user',
