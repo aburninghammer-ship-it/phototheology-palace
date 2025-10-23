@@ -136,8 +136,8 @@ export const palaceFloors: Floor[] = [
         coreQuestion: "What did the words mean then, and what did the world look like there?",
         method: "3–5 terms to define; 1–2 cultural notes; 2–3 commentary excerpts (label source).",
         examples: [
-          "John 21: agapaō vs phileō nuance",
-          "Rev 3: Laodicea's eye-salve economy"
+          "John 21: ἀγαπάω (agapaō, Strong's G25 - divine, selfless love) vs φιλέω (phileō, Strong's G5368 - affectionate friendship) — Jesus asks Peter using agapaō twice, Peter responds with phileō; third time Jesus uses phileō",
+          "Rev 3:18: 'eye-salve' (κολλούριον, kollourion) — Laodicea was famous for Phrygian powder eye medicine. Matthew Henry: 'Christ offers them spiritual eye-salve that they might see their own wretchedness and his grace.' Cultural note: Laodicea's lukewarm water supply came from hot springs 6 miles away, arriving neither hot nor cold"
         ],
         pitfalls: ["Letting commentary overrule Scripture"],
         deliverable: "Wordlist + notes + brief synthesis"
