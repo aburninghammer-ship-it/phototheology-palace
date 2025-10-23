@@ -1,15 +1,125 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.7.1';
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
+// Rate limiting configuration
+const RATE_LIMIT_WINDOW_HOURS = 1;
+const RATE_LIMIT_MAX_REQUESTS = 100;
+
+async function checkRateLimit(supabase: any, userId: string, endpoint: string): Promise<{ allowed: boolean; remaining: number }> {
+  const windowStart = new Date();
+  windowStart.setHours(windowStart.getHours() - RATE_LIMIT_WINDOW_HOURS);
+
+  // Get or create rate limit record
+  const { data: existingLimit, error: fetchError } = await supabase
+    .from('rate_limits')
+    .select('*')
+    .eq('user_id', userId)
+    .eq('endpoint', endpoint)
+    .single();
+
+  if (fetchError && fetchError.code !== 'PGRST116') {
+    console.error('Error fetching rate limit:', fetchError);
+    return { allowed: true, remaining: RATE_LIMIT_MAX_REQUESTS };
+  }
+
+  const now = new Date();
+
+  if (!existingLimit) {
+    // Create new rate limit record
+    await supabase
+      .from('rate_limits')
+      .insert({
+        user_id: userId,
+        endpoint,
+        request_count: 1,
+        window_start: now.toISOString(),
+      });
+    return { allowed: true, remaining: RATE_LIMIT_MAX_REQUESTS - 1 };
+  }
+
+  const limitWindowStart = new Date(existingLimit.window_start);
+  const hoursSinceWindowStart = (now.getTime() - limitWindowStart.getTime()) / (1000 * 60 * 60);
+
+  if (hoursSinceWindowStart >= RATE_LIMIT_WINDOW_HOURS) {
+    // Reset the window
+    await supabase
+      .from('rate_limits')
+      .update({
+        request_count: 1,
+        window_start: now.toISOString(),
+        updated_at: now.toISOString(),
+      })
+      .eq('user_id', userId)
+      .eq('endpoint', endpoint);
+    return { allowed: true, remaining: RATE_LIMIT_MAX_REQUESTS - 1 };
+  }
+
+  if (existingLimit.request_count >= RATE_LIMIT_MAX_REQUESTS) {
+    return { allowed: false, remaining: 0 };
+  }
+
+  // Increment request count
+  await supabase
+    .from('rate_limits')
+    .update({
+      request_count: existingLimit.request_count + 1,
+      updated_at: now.toISOString(),
+    })
+    .eq('user_id', userId)
+    .eq('endpoint', endpoint);
+
+  return { allowed: true, remaining: RATE_LIMIT_MAX_REQUESTS - existingLimit.request_count - 1 };
+}
+
 serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
   try {
-    const { 
+    // Initialize Supabase client for rate limiting
+    const supabaseUrl = Deno.env.get('SUPABASE_URL') ?? '';
+    const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '';
+    const supabase = createClient(supabaseUrl, supabaseServiceKey);
+
+    // Check rate limit for authenticated users
+    const authHeader = req.headers.get('authorization');
+    let userId: string | null = null;
+    
+    if (authHeader) {
+      const token = authHeader.replace('Bearer ', '');
+      const { data: { user }, error: authError } = await supabase.auth.getUser(token);
+      if (!authError && user) {
+        userId = user.id;
+        
+        // Enforce rate limiting
+        const { allowed, remaining } = await checkRateLimit(supabase, userId, 'jeeves');
+        
+        if (!allowed) {
+          return new Response(
+            JSON.stringify({ 
+              error: 'Rate limit exceeded. Please try again later.',
+              retryAfter: RATE_LIMIT_WINDOW_HOURS * 60
+            }),
+            { 
+              status: 429, 
+              headers: { 
+                ...corsHeaders, 
+                'Content-Type': 'application/json',
+                'X-RateLimit-Limit': RATE_LIMIT_MAX_REQUESTS.toString(),
+                'X-RateLimit-Remaining': '0',
+                'Retry-After': (RATE_LIMIT_WINDOW_HOURS * 3600).toString()
+              } 
+            }
+          );
+        }
+      }
+    }
+
+    const {
       roomTag, 
       roomName, 
       principle, 
@@ -339,12 +449,7 @@ Make questions clear, answers comprehensive, and include verse references when r
         throw new Error('LOVABLE_API_KEY not configured');
       }
 
-      // Import supabase client
-      const { createClient } = await import('https://esm.sh/@supabase/supabase-js@2.7.1');
-      const supabaseClient = createClient(
-        Deno.env.get('SUPABASE_URL') ?? '',
-        Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
-      );
+      // Use the already initialized supabase client from rate limiting
 
       // Generate image using Lovable AI
       const imagePrompt = verse_reference 
@@ -382,20 +487,16 @@ Make questions clear, answers comprehensive, and include verse references when r
         throw new Error('No image URL in response');
       }
 
-      // Get authenticated user
-      const authHeader = req.headers.get('Authorization')!;
-      const token = authHeader.replace('Bearer ', '');
-      const { data: { user } } = await supabaseClient.auth.getUser(token);
-      
-      if (!user) {
+      // userId is already verified from rate limiting check above
+      if (!userId) {
         throw new Error('User not authenticated');
       }
 
       // Store image in database
-      const { data: insertData, error: insertError } = await supabaseClient
+      const { data: insertData, error: insertError } = await supabase
         .from('bible_images')
         .insert({
-          user_id: user.id,
+          user_id: userId,
           room_type,
           description,
           verse_reference: verse_reference || null,
