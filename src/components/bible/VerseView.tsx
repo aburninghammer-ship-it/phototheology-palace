@@ -7,14 +7,17 @@ interface VerseViewProps {
   isSelected: boolean;
   onSelect: () => void;
   showPrinciples?: boolean;
+  isHighlighted?: boolean;
 }
 
-export const VerseView = ({ verse, isSelected, onSelect, showPrinciples }: VerseViewProps) => {
+export const VerseView = ({ verse, isSelected, onSelect, showPrinciples, isHighlighted }: VerseViewProps) => {
   return (
     <div
       className={`group cursor-pointer transition-all duration-300 p-3 rounded-lg ${
         isSelected
           ? "bg-primary/10 border-2 border-primary shadow-lg"
+          : isHighlighted
+          ? "bg-accent/20 border-2 border-accent shadow-md animate-pulse-glow"
           : "hover:bg-muted/50 border-2 border-transparent"
       }`}
       onClick={onSelect}

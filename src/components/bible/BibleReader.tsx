@@ -4,9 +4,11 @@ import { fetchChapter } from "@/services/bibleApi";
 import { Chapter } from "@/types/bible";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ChevronLeft, ChevronRight, BookOpen, Loader2 } from "lucide-react";
+import { ChevronLeft, ChevronRight, BookOpen, Loader2, Link2, MessageSquare } from "lucide-react";
 import { VerseView } from "./VerseView";
 import { PrinciplePanel } from "./PrinciplePanel";
+import { ChainReferencePanel } from "./ChainReferencePanel";
+import { CommentaryPanel } from "./CommentaryPanel";
 
 export const BibleReader = () => {
   const { book = "John", chapter: chapterParam = "3" } = useParams();
@@ -17,6 +19,9 @@ export const BibleReader = () => {
   const [loading, setLoading] = useState(true);
   const [selectedVerse, setSelectedVerse] = useState<number | null>(null);
   const [principleMode, setPrincipleMode] = useState(false);
+  const [chainReferenceMode, setChainReferenceMode] = useState(false);
+  const [commentaryMode, setCommentaryMode] = useState(false);
+  const [highlightedVerses, setHighlightedVerses] = useState<number[]>([]);
 
   useEffect(() => {
     loadChapter();
@@ -97,11 +102,42 @@ export const BibleReader = () => {
         <Button
           variant={principleMode ? "default" : "outline"}
           size="sm"
-          onClick={() => setPrincipleMode(!principleMode)}
+          onClick={() => {
+            setPrincipleMode(!principleMode);
+            setChainReferenceMode(false);
+            setCommentaryMode(false);
+          }}
           className={principleMode ? "gradient-palace" : ""}
         >
           <BookOpen className="h-4 w-4 mr-2" />
           Principle Mode
+        </Button>
+        <Button
+          variant={chainReferenceMode ? "default" : "outline"}
+          size="sm"
+          onClick={() => {
+            setChainReferenceMode(!chainReferenceMode);
+            setPrincipleMode(false);
+            setCommentaryMode(false);
+            setHighlightedVerses([]);
+          }}
+          className={chainReferenceMode ? "gradient-palace" : ""}
+        >
+          <Link2 className="h-4 w-4 mr-2" />
+          Chain Reference
+        </Button>
+        <Button
+          variant={commentaryMode ? "default" : "outline"}
+          size="sm"
+          onClick={() => {
+            setCommentaryMode(!commentaryMode);
+            setPrincipleMode(false);
+            setChainReferenceMode(false);
+          }}
+          className={commentaryMode ? "gradient-ocean" : ""}
+        >
+          <MessageSquare className="h-4 w-4 mr-2" />
+          Commentary
         </Button>
       </div>
 
@@ -117,15 +153,31 @@ export const BibleReader = () => {
                   isSelected={selectedVerse === verse.verse}
                   onSelect={() => setSelectedVerse(verse.verse)}
                   showPrinciples={principleMode}
+                  isHighlighted={highlightedVerses.includes(verse.verse)}
                 />
               ))}
             </div>
           </Card>
         </div>
 
-        {/* Principle/Commentary Panel */}
+        {/* Right Panel - Dynamic based on mode */}
         <div className="lg:col-span-1">
-          {selectedVerse ? (
+          {chainReferenceMode ? (
+            <ChainReferencePanel
+              book={book}
+              chapter={chapter}
+              verses={chapterData.verses}
+              onHighlight={setHighlightedVerses}
+            />
+          ) : commentaryMode && selectedVerse ? (
+            <CommentaryPanel
+              book={book}
+              chapter={chapter}
+              verse={selectedVerse}
+              verseText={chapterData.verses.find(v => v.verse === selectedVerse)?.text || ""}
+              onClose={() => setSelectedVerse(null)}
+            />
+          ) : selectedVerse ? (
             <PrinciplePanel
               book={book}
               chapter={chapter}
@@ -136,7 +188,9 @@ export const BibleReader = () => {
             <Card className="p-6 text-center text-muted-foreground sticky top-24">
               <BookOpen className="h-12 w-12 mx-auto mb-3 text-primary/50" />
               <p className="text-sm">
-                Select a verse to view principles, cross-references, and commentary
+                {commentaryMode
+                  ? "Select a verse for AI-powered commentary using your chosen principles"
+                  : "Select a verse to view principles, cross-references, and commentary"}
               </p>
             </Card>
           )}

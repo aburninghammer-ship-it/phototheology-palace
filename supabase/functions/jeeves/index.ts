@@ -9,11 +9,10 @@ serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
   try {
-    const { roomTag, roomName, principle, mode } = await req.json();
+    const { roomTag, roomName, principle, mode, book, chapter, verses, verseText, selectedPrinciples } = await req.json();
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY is not configured");
 
-    // Build different prompts based on mode
     let systemPrompt = "";
     let userPrompt = "";
 
@@ -48,6 +47,45 @@ Structure the exercise:
 4. Offer one example answer to demonstrate the principle
 
 Make it challenging but doable. Encourage deep thinking.`;
+
+    } else if (mode === "chain-reference") {
+      systemPrompt = `You are Jeeves, a Bible scholar specializing in finding connections between Scripture and parables.
+Analyze verses and identify where parables connect. Be specific and insightful.
+Return your response as a JSON array.`;
+
+      userPrompt = `Analyze ${book} ${chapter} for connections to Jesus's parables.
+
+Verses to analyze:
+${verses.map((v: any) => `Verse ${v.verse}: ${v.text}`).join('\n')}
+
+For each verse that connects to a parable, return a JSON object with:
+{
+  "verse": verse_number,
+  "parable": "Name of the parable",
+  "connection": "3-6 sentence explanation of how this verse connects to the parable",
+  "expounded": "Deeper 2-3 paragraph theological explanation of the connection"
+}
+
+Only include verses that have meaningful connections to parables. Return as JSON array: [...]`;
+
+    } else if (mode === "commentary") {
+      systemPrompt = `You are Jeeves, a theologian providing insightful Bible commentary using specific analytical frameworks.
+Provide deep, thoughtful analysis while remaining clear and accessible.`;
+
+      const principleList = selectedPrinciples?.join(", ") || "all available principles";
+      
+      userPrompt = `Provide commentary on ${book} ${chapter}:${verseText.verse} using these analytical lenses: ${principleList}
+
+Verse text: "${verseText.text}"
+
+Structure your commentary:
+1. Opening insight (2-3 sentences)
+2. Analysis through each selected principle/lens
+3. How these principles interconnect in this verse
+4. Practical application
+5. One profound closing thought
+
+Make it scholarly yet accessible.`;
     }
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
