@@ -64,7 +64,7 @@ const FloorDetail = () => {
             </h2>
             <div className="grid md:grid-cols-2 gap-6">
               {floor.rooms.map((room) => (
-                <RoomCard key={room.id} room={room} />
+                <RoomCard key={room.id} room={room} floorNumber={floor.number} />
               ))}
             </div>
           </div>
