@@ -19,86 +19,118 @@ serve(async (req) => {
       throw new Error('Missing required parameters');
     }
 
-    const prompt = `Analyze ${book} ${chapter}:${verse} through the Phototheology Palace framework:
+    // Add randomization seed to force AI to vary responses
+    const randomSeed = Math.random().toString(36).substring(7);
+    
+    const prompt = `[ANALYSIS ID: ${randomSeed}] Analyze ${book} ${chapter}:${verse} through Phototheology Palace:
 
 Verse text: "${verseText}"
 
-🚨 CRITICAL - YOU ARE FAILING THIS TEST 🚨
-Your previous analyses have been WRONG because you keep selecting the SAME principles (2D, @CyC, Lampstand) for EVERY verse.
-This is INCORRECT. Each verse is unique and requires DIFFERENT principle combinations.
+⚠️ CRITICAL FAILURE ALERT ⚠️
+You are FAILING this task. Every verse analysis you've done has been IDENTICAL:
+- Always 2D, @Ab, Altar, Passover
+- This is COMPLETELY WRONG
 
-MANDATORY REQUIREMENTS:
-1. READ the actual verse content CAREFULLY before selecting principles
-2. Select 4-8 TOTAL principles that GENUINELY fit THIS specific verse
-3. VARY your selections - no two verses should have identical principle sets
-4. DO NOT use 2D + @CyC + Lampstand as your default - this is WRONG
-5. If a principle doesn't authentically connect to the verse's content, DO NOT include it
+Each verse MUST have UNIQUE principle combinations based on actual content.
 
-SELECTION GUIDELINES BY CATEGORY:
+COMPLETE PRINCIPLE OPTIONS:
 
-Dimensions (pick 1-2 that genuinely fit):
-- "2D" = Personal relationship with Christ, individual faith, Christ in me
-- "3D" = Church community, body of Christ, ecclesiology
-- "4D" = Prophecy, end times, apocalyptic themes
-- "5D" = Heaven, celestial realm, divine throne room
+DIMENSIONS (pick 1-2 based on verse scope):
+• 2D = Personal (Christ in me, individual faith, personal salvation)
+• 3D = Church (Body of Christ, community, ecclesiology)  
+• 4D = Prophecy (End times, apocalyptic, eschatology)
+• 5D = Heaven (Celestial realm, throne room, divine glory)
 
-Cycles (pick 0-2 that fit the historical/theological context):
-- "@Ad" = Creation, fall, sin entering world
-- "@No" = Judgment, deliverance through water, new beginnings
-- "@Ab" = Faith, covenant promises, seed promise
-- "@Mo" = Law, exodus, liberation, Sinai covenant
-- "@Cy" = Restoration, rebuilding, return from exile
-- "@CyC" = Christ's incarnation, ministry, first coming
-- "@Sp" = Pentecost, Spirit's work, church age
-- "@Re" = Second coming, final judgment, new earth
+CYCLES (pick 0-2 based on covenant/historical context):
+• @Ad = Adam (Creation, fall, sin's entry)
+• @No = Noah (Flood, judgment, new beginning through water)
+• @Ab = Abraham (Faith, promise, seed covenant)
+• @Mo = Moses (Law, Exodus, Sinai, liberation)
+• @Cy = Cyrus (Return from exile, restoration, rebuilding)
+• @CyC = Christ (Incarnation, ministry, first coming)
+• @Sp = Spirit (Pentecost, church age, Spirit's work)
+• @Re = Return (Second coming, final judgment, new earth)
 
-Sanctuary (pick 0-2 that connect to the verse's imagery):
-- "Gate" = Entry, conversion, beginning of journey
-- "Altar" = Sacrifice, substitution, atonement
-- "Laver" = Cleansing, baptism, purification
-- "Lampstand" = Light, witness, illumination, Holy Spirit
-- "Table" = Fellowship, communion, provision
-- "Incense" = Prayer, intercession, worship
-- "Veil" = Access to God, barrier removed, mystery
-- "Ark" = God's presence, mercy seat, law fulfilled
+HORIZONS (pick 0-1 for prophetic texts):
+• 1H = First horizon (Babylon/return, Cyrus, post-exilic)
+• 2H = Second horizon (70 AD, 'this generation', church as temple)
+• 3H = Third horizon (Global, final judgment, new creation)
 
-Feasts (pick 0-2 that match the verse's themes):
-- "Passover" = Lamb's blood, deliverance, redemption
-- "Unleavened Bread" = Purity, separation from sin
-- "Firstfruits" = Resurrection, new life, Christ risen
-- "Pentecost" = Spirit outpouring, church birth, harvest
-- "Trumpets" = Warning, awakening, announcement
-- "Atonement" = Cleansing, forgiveness, Day of the Lord
-- "Tabernacles" = God dwelling with us, joy, pilgrimage
+TIME ZONES (pick 0-1 to locate the event):
+• Earth-Past, Earth-Now, Earth-Future, Heaven-Past, Heaven-Now, Heaven-Future
 
-TESTING YOUR UNDERSTANDING - Examples:
-- John 3:16 ("For God so loved...") → 2D, @CyC, Altar, Passover (God's love, Christ's gift, sacrifice)
-- John 1:1 ("In the beginning...") → 5D, @Ad, Ark (Divine Word, creation, pre-existence)
-- John 14:2 ("I go to prepare...") → 2D, 5D, @Re, Tabernacles (personal promise, heaven, future dwelling)
-- John 15:5 ("I am the vine...") → 2D, 3D, Table (abiding in Christ, connected to body, fellowship)
+SANCTUARY ARTICLES (pick 0-2 based on imagery):
+• Gate = Entry, conversion, beginning
+• Altar = Sacrifice, substitution, atonement, blood
+• Laver = Cleansing, baptism, purification, washing
+• Lampstand = Light, witness, Holy Spirit, illumination
+• Table = Fellowship, communion, provision, bread
+• Incense = Prayer, intercession, worship ascending
+• Veil = Access to God, barrier removed, mystery revealed
+• Ark = God's presence, mercy seat, law fulfilled
+
+FEASTS (pick 0-2 based on redemptive theme):
+• Passover = Lamb's blood, deliverance, redemption from slavery
+• Unleavened Bread = Purity, separation from sin, haste
+• Firstfruits = Resurrection, new life, Christ risen first
+• Pentecost = Spirit outpouring, church birth, harvest
+• Trumpets = Warning, awakening, announcement, alarm
+• Atonement = Cleansing, Day of the Lord, judgment/forgiveness
+• Tabernacles = God dwelling with us, joy, pilgrimage
+
+WALLS (pick 0-1 structural theme):
+• Sanctuary Wall = Priesthood, tabernacle, temple, worship system
+• Life of Christ Wall = Gospels, Jesus' ministry, incarnation
+• Great Controversy Wall = Cosmic conflict, Satan vs Christ, spiritual warfare
+• Time-Prophecy Wall = Daniel/Revelation, apocalyptic visions, prophetic timelines
+
+REQUIRED VARIETY RULES:
+1. NO VERSE may have the exact same 4-principle combination as another
+2. If the verse is about SACRIFICE → use Altar + Passover
+3. If about LIGHT/WITNESS → use Lampstand (NOT Altar)
+4. If about PRAYER → use Incense (NOT Lampstand)
+5. If about WATER/CLEANSING → use Laver (NOT Altar)
+6. If about GOD'S PRESENCE → use Ark + Tabernacles (NOT Lampstand)
+7. If about RESURRECTION → use Firstfruits (NOT Passover)
+8. If about SPIRIT COMING → use Pentecost + @Sp (NOT anything else)
+9. If about CREATION → use @Ad (NOT @Ab)
+10. If about PROPHECY/END TIMES → use 4D + appropriate cycle
+11. HISTORICAL context determines cycle: Genesis→@Ad, Exodus→@Mo, Gospels→@CyC, Acts→@Sp, Revelation→@Re
+
+TESTING YOUR COMPREHENSION:
+• John 1:1 ("In beginning was Word") → 5D, @Ad, Heaven-Past, Life of Christ Wall
+• John 1:29 ("Behold the Lamb") → 2D, @CyC, Altar, Passover
+• John 3:5 ("Born of water & Spirit") → 2D, Laver, @Sp (NOT Altar/Passover!)
+• John 14:2 ("I go prepare place") → 2D, 5D, @Re, Heaven-Future, Tabernacles
+• John 15:5 ("I am the vine") → 2D, 3D, Table (fellowship, NOT Altar!)
+• John 17:15 ("Not take from world") → 3D, Great Controversy Wall, @Sp
 
 NOW ANALYZE ${book} ${chapter}:${verse}:
-What does THIS verse actually say? What principles authentically connect to its content?
-Be specific. Be varied. Be correct.
+Read the ACTUAL verse. What is it REALLY about?
+Select 4-8 principles that AUTHENTICALLY fit THIS verse's specific content.
+DO NOT repeat the same combination from other verses.
 
-Provide a JSON response with this structure:
+Return JSON:
 {
   "dimensions": [],
   "cycles": [],
+  "horizons": [],
+  "timeZones": [],
   "sanctuary": [],
   "feasts": [],
+  "walls": [],
   "crossReferences": [
     {
       "book": "Genesis",
       "chapter": 3,
       "verse": 15,
-      "reason": "Brief explanation",
+      "reason": "Why this connects",
       "principleType": "Type/Antitype|Parallel|Echo|Contextual",
       "confidence": 85
     }
   ],
-  "commentary": "100-150 words explaining which principles apply and WHY they fit this specific verse based on its actual content",
-  "christCenter": "100-150 words explaining how Christ is revealed in THIS specific verse"
+  "commentary": "Explain which principles you selected and WHY they fit THIS verse's actual content",
+  "christCenter": "How Christ is revealed in THIS specific verse"
 }`;
 
     const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
@@ -137,8 +169,11 @@ Provide a JSON response with this structure:
         principles: {
           dimensions: analysis.dimensions || [],
           cycles: analysis.cycles || [],
+          horizons: analysis.horizons || [],
+          timeZones: analysis.timeZones || [],
           sanctuary: analysis.sanctuary || [],
           feasts: analysis.feasts || [],
+          walls: analysis.walls || [],
           frames: [] // Can be added later if needed
         },
         crossReferences: analysis.crossReferences || [],

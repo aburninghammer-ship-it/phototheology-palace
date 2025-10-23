@@ -52,8 +52,11 @@ export const PrinciplePanel = ({ book, chapter, verse, verseText, onClose }: Pri
       [
         ...(annotation.principles.dimensions || []),
         ...(annotation.principles.cycles || []),
+        ...(annotation.principles.horizons || []),
+        ...(annotation.principles.timeZones || []),
         ...(annotation.principles.sanctuary || []),
-        ...(annotation.principles.feasts || [])
+        ...(annotation.principles.feasts || []),
+        ...(annotation.principles.walls || [])
       ].join(", ")
     }\n\n${annotation.commentary}`;
     
@@ -147,7 +150,7 @@ export const PrinciplePanel = ({ book, chapter, verse, verseText, onClose }: Pri
               )}
               
               {/* Cycles */}
-              {annotation.principles.cycles && (
+              {annotation.principles.cycles && annotation.principles.cycles.length > 0 && (
                 <div className="space-y-2">
                   <h4 className="font-semibold text-sm flex items-center gap-2">
                     <div className="w-2 h-2 rounded-full gradient-ocean" />
@@ -157,6 +160,40 @@ export const PrinciplePanel = ({ book, chapter, verse, verseText, onClose }: Pri
                     {annotation.principles.cycles.map((cycle) => (
                       <Badge key={cycle} className="gradient-ocean text-white shadow-blue">
                         {cycle}
+                      </Badge>
+                    ))}
+                  </div>
+                </div>
+              )}
+              
+              {/* Horizons */}
+              {annotation.principles.horizons && annotation.principles.horizons.length > 0 && (
+                <div className="space-y-2">
+                  <h4 className="font-semibold text-sm flex items-center gap-2">
+                    <div className="w-2 h-2 rounded-full gradient-sunset" />
+                    Horizons
+                  </h4>
+                  <div className="flex gap-2 flex-wrap">
+                    {annotation.principles.horizons.map((horizon) => (
+                      <Badge key={horizon} className="gradient-sunset text-white shadow-pink">
+                        {horizon}
+                      </Badge>
+                    ))}
+                  </div>
+                </div>
+              )}
+              
+              {/* Time Zones */}
+              {annotation.principles.timeZones && annotation.principles.timeZones.length > 0 && (
+                <div className="space-y-2">
+                  <h4 className="font-semibold text-sm flex items-center gap-2">
+                    <div className="w-2 h-2 rounded-full gradient-royal" />
+                    Time Zones
+                  </h4>
+                  <div className="flex gap-2 flex-wrap">
+                    {annotation.principles.timeZones.map((zone) => (
+                      <Badge key={zone} className="gradient-royal text-white shadow-blue">
+                        {zone}
                       </Badge>
                     ))}
                   </div>
@@ -181,7 +218,7 @@ export const PrinciplePanel = ({ book, chapter, verse, verseText, onClose }: Pri
               )}
               
               {/* Feasts */}
-              {annotation.principles.feasts && (
+              {annotation.principles.feasts && annotation.principles.feasts.length > 0 && (
                 <div className="space-y-2">
                   <h4 className="font-semibold text-sm flex items-center gap-2">
                     <Calendar className="w-4 h-4 text-accent" />
@@ -191,6 +228,23 @@ export const PrinciplePanel = ({ book, chapter, verse, verseText, onClose }: Pri
                     {annotation.principles.feasts.map((feast) => (
                       <Badge key={feast} className="gradient-sunset text-white shadow-pink">
                         {feast}
+                      </Badge>
+                    ))}
+                  </div>
+                </div>
+              )}
+              
+              {/* Walls */}
+              {annotation.principles.walls && annotation.principles.walls.length > 0 && (
+                <div className="space-y-2">
+                  <h4 className="font-semibold text-sm flex items-center gap-2">
+                    <Building2 className="w-4 h-4 text-palace-blue" />
+                    Walls
+                  </h4>
+                  <div className="flex gap-2 flex-wrap">
+                    {annotation.principles.walls.map((wall) => (
+                      <Badge key={wall} className="gradient-palace text-white shadow-purple">
+                        {wall}
                       </Badge>
                     ))}
                   </div>

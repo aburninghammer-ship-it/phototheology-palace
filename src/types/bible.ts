@@ -17,7 +17,7 @@ export type PrincipleType =
   | "Heaven-Past" | "Heaven-Now" | "Heaven-Future"
   | "Earth-Past" | "Earth-Now" | "Earth-Future";
 
-export type CycleType = "@Ad" | "@Se" | "@No" | "@Ab" | "@Mo" | "@Cy" | "@Sp" | "@Re";
+export type CycleType = "@Ad" | "@No" | "@Ab" | "@Mo" | "@Cy" | "@CyC" | "@Sp" | "@Re";
 
 export type SanctuaryArticle = 
   | "Gate" | "Altar" | "Laver" | "Lampstand" 
@@ -28,6 +28,12 @@ export type FeastType =
   | "Pentecost" | "Trumpets" | "Atonement" | "Tabernacles";
 
 export type FrameType = "F01" | "F02" | "F03" | "F04" | "F05" | "F06" | "F07" | "F08" | "F09" | "F10" | "F11" | "F12";
+
+export type HorizonType = "1H" | "2H" | "3H";
+
+export type TimeZoneType = "Earth-Past" | "Earth-Now" | "Earth-Future" | "Heaven-Past" | "Heaven-Now" | "Heaven-Future";
+
+export type WallType = "Sanctuary Wall" | "Life of Christ Wall" | "Great Controversy Wall" | "Time-Prophecy Wall";
 
 export interface CrossReference {
   book: string;
@@ -43,8 +49,11 @@ export interface VerseAnnotation {
   principles: {
     dimensions?: PrincipleType[];
     cycles?: CycleType[];
+    horizons?: HorizonType[];
+    timeZones?: TimeZoneType[];
     sanctuary?: SanctuaryArticle[];
     feasts?: FeastType[];
+    walls?: WallType[];
     frames?: FrameType[];
   };
   crossReferences: CrossReference[];
