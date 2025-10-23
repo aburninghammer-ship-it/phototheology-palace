@@ -97,12 +97,17 @@ const ChainChess = () => {
       if (error) throw error;
 
       setGame(newGame);
+      setCurrentVerse("John 3:16");
       await fetchVerseText("John 3:16");
-      navigate(`/games/chain-chess/${newGame.id}${isVsJeeves ? "/jeeves" : ""}`);
       setGameStarted(true);
+      
+      // Navigate after setting state
+      navigate(`/games/chain-chess/${newGame.id}${isVsJeeves ? "/jeeves" : ""}`, { replace: true });
 
-      // Jeeves makes first move
-      await jeevesMove(newGame.id, true);
+      // Jeeves makes first move after a brief delay to ensure state is set
+      setTimeout(async () => {
+        await jeevesMove(newGame.id, true);
+      }, 500);
     } catch (error: any) {
       toast({
         title: "Error",
