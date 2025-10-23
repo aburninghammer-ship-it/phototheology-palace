@@ -3,6 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Badge } from "@/components/ui/badge";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Loader2, Link2, Sparkles, ChevronDown, ChevronUp } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -10,7 +11,7 @@ import { Verse } from "@/types/bible";
 
 interface ChainReferenceResult {
   verse: number;
-  parable: string;
+  principle: string;
   connection: string;
   expounded: string;
 }
@@ -22,18 +23,33 @@ interface ChainReferencePanelProps {
   onHighlight: (verseNumbers: number[]) => void;
 }
 
+const PRINCIPLES = [
+  { value: "parables", label: "Parables of Jesus" },
+  { value: "prophecy", label: "Prophecy Connections" },
+  { value: "life-of-christ", label: "Life of Christ Wall" },
+  { value: "70-weeks", label: "70 Week Connections" },
+  { value: "2d", label: "2D Christ Dimension" },
+  { value: "3d", label: "3D Kingdom Dimension" },
+  { value: "sanctuary", label: "Sanctuary Principles" },
+  { value: "feasts", label: "Feast Connections" },
+  { value: "types", label: "Types & Shadows" },
+  { value: "covenant", label: "Covenant Themes" },
+];
+
 export const ChainReferencePanel = ({ book, chapter, verses, onHighlight }: ChainReferencePanelProps) => {
   const [loading, setLoading] = useState(false);
   const [results, setResults] = useState<ChainReferenceResult[]>([]);
   const [expandedVerse, setExpandedVerse] = useState<number | null>(null);
+  const [selectedPrinciple, setSelectedPrinciple] = useState<string>("parables");
   const { toast } = useToast();
 
-  const analyzeParables = async () => {
+  const analyzePrinciple = async () => {
     setLoading(true);
     try {
       const { data, error } = await supabase.functions.invoke("jeeves", {
         body: {
           mode: "chain-reference",
+          principle: selectedPrinciple,
           book,
           chapter,
           verses: verses.map(v => ({ verse: v.verse, text: v.text })),
@@ -55,7 +71,7 @@ export const ChainReferencePanel = ({ book, chapter, verses, onHighlight }: Chai
         console.error("Failed to parse AI response:", parseError);
         toast({
           title: "Error",
-          description: "Failed to parse parable connections",
+          description: "Failed to parse principle connections",
           variant: "destructive",
         });
         return;
@@ -64,15 +80,16 @@ export const ChainReferencePanel = ({ book, chapter, verses, onHighlight }: Chai
       setResults(parsedResults);
       onHighlight(parsedResults.map(r => r.verse));
 
+      const principleLabel = PRINCIPLES.find(p => p.value === selectedPrinciple)?.label;
       toast({
         title: "Analysis Complete",
-        description: `Found ${parsedResults.length} parable connections`,
+        description: `Found ${parsedResults.length} ${principleLabel} connections`,
       });
     } catch (error: any) {
       console.error("Chain reference error:", error);
       toast({
         title: "Error",
-        description: error.message || "Failed to analyze parables",
+        description: error.message || "Failed to analyze principle",
         variant: "destructive",
       });
     } finally {
@@ -88,30 +105,46 @@ export const ChainReferencePanel = ({ book, chapter, verses, onHighlight }: Chai
           Chain Reference Mode
         </CardTitle>
         <CardDescription className="text-white/90">
-          Find parable connections in this chapter
+          Find principle connections in this chapter
         </CardDescription>
       </CardHeader>
 
-      <CardContent className="pt-6">
+      <CardContent className="pt-6 space-y-4">
+        <div className="space-y-2">
+          <label className="text-sm font-medium">Select Principle to Analyze</label>
+          <Select value={selectedPrinciple} onValueChange={setSelectedPrinciple}>
+            <SelectTrigger className="w-full">
+              <SelectValue placeholder="Choose a principle" />
+            </SelectTrigger>
+            <SelectContent>
+              {PRINCIPLES.map((principle) => (
+                <SelectItem key={principle.value} value={principle.value}>
+                  {principle.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+
         <Button
-          onClick={analyzeParables}
+          onClick={analyzePrinciple}
           disabled={loading}
-          className="w-full gradient-royal text-white shadow-blue mb-4"
+          className="w-full gradient-royal text-white shadow-blue"
         >
           {loading ? (
             <>
               <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-              Analyzing parables...
+              Analyzing {PRINCIPLES.find(p => p.value === selectedPrinciple)?.label}...
             </>
           ) : (
             <>
               <Sparkles className="h-4 w-4 mr-2" />
-              Find Parable Connections
+              Find Connections
             </>
           )}
         </Button>
 
-        <ScrollArea className="h-[500px]">
+        <ScrollArea className="h-[450px]">
           {results.length > 0 ? (
             <div className="space-y-3">
               {results.map((result) => (
@@ -124,7 +157,7 @@ export const ChainReferencePanel = ({ book, chapter, verses, onHighlight }: Chai
                       Verse {result.verse}
                     </Badge>
                     <span className="text-sm font-semibold text-primary">
-                      {result.parable}
+                      {result.principle}
                     </span>
                   </div>
                   
@@ -162,8 +195,8 @@ export const ChainReferencePanel = ({ book, chapter, verses, onHighlight }: Chai
             <div className="text-center py-12 text-muted-foreground">
               <Link2 className="h-12 w-12 mx-auto mb-3 text-primary/50" />
               <p className="text-sm">
-                Click "Find Parable Connections" to discover how verses in this chapter
-                connect to Jesus's parables
+                Select a principle and click "Find Connections" to discover how verses 
+                in this chapter connect to that biblical principle
               </p>
             </div>
           )}

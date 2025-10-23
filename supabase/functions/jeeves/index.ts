@@ -183,24 +183,69 @@ Structure the exercise:
 Make it challenging but doable. Encourage deep thinking.`;
 
     } else if (mode === "chain-reference") {
-      systemPrompt = `You are Jeeves, a Bible scholar specializing in finding connections between Scripture and parables.
-Analyze verses and identify where parables connect. Be specific and insightful.
+      const principleMap: Record<string, { name: string; description: string }> = {
+        "parables": { 
+          name: "Parables of Jesus", 
+          description: "connections to Christ's parables and their deeper meanings" 
+        },
+        "prophecy": { 
+          name: "Prophetic Connections", 
+          description: "prophetic fulfillments, types, and future events" 
+        },
+        "life-of-christ": { 
+          name: "Life of Christ Wall", 
+          description: "connections to events in Christ's earthly ministry and life" 
+        },
+        "70-weeks": { 
+          name: "70 Week Prophecy", 
+          description: "connections to Daniel's 70-week prophecy and timeline" 
+        },
+        "2d": { 
+          name: "2D Christ Dimension", 
+          description: "personal Christ-centered relationship and individual salvation themes" 
+        },
+        "3d": { 
+          name: "3D Kingdom Dimension", 
+          description: "corporate church body, community, and kingdom expansion themes" 
+        },
+        "sanctuary": { 
+          name: "Sanctuary Principles", 
+          description: "connections to the tabernacle/temple services, furniture, and rituals" 
+        },
+        "feasts": { 
+          name: "Feast Connections", 
+          description: "connections to the biblical feasts and their prophetic significance" 
+        },
+        "types": { 
+          name: "Types & Shadows", 
+          description: "Old Testament types and shadows pointing to Christ" 
+        },
+        "covenant": { 
+          name: "Covenant Themes", 
+          description: "covenant promises, conditions, and relationship dynamics" 
+        },
+      };
+
+      const selectedPrinciple = principleMap[principle] || principleMap["parables"];
+      
+      systemPrompt = `You are Jeeves, a Bible scholar specializing in finding ${selectedPrinciple.name}.
+Analyze verses and identify where these principles connect. Be specific and insightful.
 Return your response as a JSON array.`;
 
-      userPrompt = `Analyze ${book} ${chapter} for connections to Jesus's parables.
+      userPrompt = `Analyze ${book} ${chapter} for ${selectedPrinciple.description}.
 
 Verses to analyze:
 ${verses.map((v: any) => `Verse ${v.verse}: ${v.text}`).join('\n')}
 
-For each verse that connects to a parable, return a JSON object with:
+For each verse that connects to ${selectedPrinciple.name}, return a JSON object with:
 {
   "verse": verse_number,
-  "parable": "Name of the parable",
-  "connection": "3-6 sentence explanation of how this verse connects to the parable",
-  "expounded": "Deeper 2-3 paragraph theological explanation of the connection"
+  "principle": "Specific name/title of the connection (e.g., 'The Good Samaritan', 'Day of Atonement', 'Messiah's Ministry')",
+  "connection": "3-6 sentence explanation of how this verse connects to ${selectedPrinciple.name}",
+  "expounded": "Deeper 2-3 paragraph theological explanation of the connection with scholarly insight"
 }
 
-Only include verses that have meaningful connections to parables. Return as JSON array: [...]`;
+Only include verses that have meaningful connections. Return as JSON array: [...]`;
 
     } else if (mode === "commentary") {
       systemPrompt = `You are Jeeves, a theologian providing insightful Bible commentary using specific analytical frameworks.
