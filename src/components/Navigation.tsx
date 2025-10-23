@@ -117,6 +117,9 @@ export const Navigation = () => {
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />
                     <DropdownMenuItem asChild>
+                      <Link to="/daniel-revelation-gpt">🤖 Daniel & Revelation GPT</Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild>
                       <Link to="/revelation-course/kids">📚 Revelation for Kids</Link>
                     </DropdownMenuItem>
                     <DropdownMenuItem asChild>
