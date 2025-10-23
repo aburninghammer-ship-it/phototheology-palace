@@ -107,9 +107,20 @@ export const PrinciplePanel = ({ book, chapter, verse, verseText, onClose }: Pri
             </CardTitle>
             <CardDescription>Principle Analysis</CardDescription>
           </div>
-          <Button variant="ghost" size="sm" onClick={onClose} className="hover:bg-destructive/10">
-            <X className="h-4 w-4" />
-          </Button>
+          <div className="flex gap-2">
+            <Button 
+              variant="outline" 
+              size="sm" 
+              onClick={loadAnnotation}
+              disabled={loading}
+              className="hover:bg-primary/10"
+            >
+              Refresh
+            </Button>
+            <Button variant="ghost" size="sm" onClick={onClose} className="hover:bg-destructive/10">
+              <X className="h-4 w-4" />
+            </Button>
+          </div>
         </div>
       </CardHeader>
       
