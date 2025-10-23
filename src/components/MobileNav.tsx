@@ -51,9 +51,14 @@ export const MobileNav = () => {
                   Phototheology Bible
                 </Button>
               </Link>
-              <Link to="/power-of-the-lamb">
+              <Link to="/games">
                 <Button variant="ghost" className="w-full justify-start">
-                  🔥 Power of the Lamb
+                  🎮 Games
+                </Button>
+              </Link>
+              <Link to="/phototheologygpt">
+                <Button variant="ghost" className="w-full justify-start">
+                  🤖 GPTs
                 </Button>
               </Link>
               <Link to="/spiritual-training">

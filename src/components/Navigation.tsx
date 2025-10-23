@@ -77,33 +77,76 @@ export const Navigation = () => {
                   <Link to="/bible/John/3">📖 Phototheology Bible</Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
+                  <Link to="/bible-image-library">🎨 Image Library</Link>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button 
+                  variant={location.pathname.startsWith("/games") || location.pathname === "/kids-games" ? "default" : "ghost"}
+                  size="sm"
+                  className={location.pathname.startsWith("/games") || location.pathname === "/kids-games" ? "gradient-royal shadow-blue" : "hover:bg-muted"}
+                >
+                  Games
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent>
+                <DropdownMenuItem asChild>
+                  <Link to="/games">🎮 Palace Games</Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link to="/kids-games">👶 Kids Games</Link>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button 
+                  variant={location.pathname.includes("gpt") ? "default" : "ghost"}
+                  size="sm"
+                  className={location.pathname.includes("gpt") ? "gradient-palace shadow-purple" : "hover:bg-muted"}
+                >
+                  GPTs
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent>
+                <DropdownMenuItem asChild>
                   <Link to="/phototheologygpt">🤖 PhototheologyGPT</Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
                   <Link to="/apologetics-gpt">🛡️ ApologeticsGPT</Link>
                 </DropdownMenuItem>
-                <DropdownMenuSeparator />
                 <DropdownMenuItem asChild>
-                  <Link to="/bible-image-library">🎨 Image Library</Link>
+                  <Link to="/daniel-revelation-gpt">📜 Daniel & Revelation GPT</Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link to="/lesson-quarterly-gpt">📅 Lesson Quarterly GPT</Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link to="/kidgpt">👶 KidGPT</Link>
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
-            <Button
-              variant={location.pathname === "/power-of-the-lamb" ? "default" : "ghost"}
-              asChild
-              size="sm"
-              className={location.pathname === "/power-of-the-lamb" ? "bg-gradient-to-r from-red-600 to-orange-600 text-white shadow-lg" : "hover:bg-muted"}
-            >
-              <Link to="/power-of-the-lamb">🔥 Power of the Lamb</Link>
-            </Button>
-            <Button
-              variant={location.pathname === "/spiritual-training" ? "default" : "ghost"}
-              asChild
-              size="sm"
-              className={location.pathname === "/spiritual-training" ? "bg-gradient-to-r from-purple-600 to-blue-600 text-white shadow-lg" : "hover:bg-muted"}
-            >
-              <Link to="/spiritual-training">⚔️ Spiritual Training</Link>
-            </Button>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button 
+                  variant={location.pathname === "/spiritual-training" || location.pathname === "/power-of-the-lamb" ? "default" : "ghost"}
+                  size="sm"
+                  className={location.pathname === "/spiritual-training" || location.pathname === "/power-of-the-lamb" ? "bg-gradient-to-r from-purple-600 to-blue-600 text-white shadow-lg" : "hover:bg-muted"}
+                >
+                  ⚔️ Spiritual Training
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent>
+                <DropdownMenuItem asChild>
+                  <Link to="/spiritual-training">⚔️ Spiritual Training</Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link to="/power-of-the-lamb">🔥 Power of the Lamb</Link>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
 
             <DropdownMenu>
                   <DropdownMenuTrigger asChild>
@@ -125,18 +168,8 @@ export const Navigation = () => {
                     <DropdownMenuItem asChild>
                       <Link to="/revelation-course">Revelation Course</Link>
                     </DropdownMenuItem>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem asChild>
-                      <Link to="/daniel-revelation-gpt">🤖 Daniel & Revelation GPT</Link>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem asChild>
-                      <Link to="/lesson-quarterly-gpt">📅 Lesson Quarterly GPT</Link>
-                    </DropdownMenuItem>
                     <DropdownMenuItem asChild>
                       <Link to="/revelation-course/kids">📚 Revelation for Kids</Link>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem asChild>
-                      <Link to="/kidgpt">🤖 KidGPT</Link>
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
@@ -150,12 +183,6 @@ export const Navigation = () => {
                   <DropdownMenuContent>
                     <DropdownMenuItem asChild>
                       <Link to="/daily-challenges">Daily Challenges</Link>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem asChild>
-                      <Link to="/games">Palace Games</Link>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem asChild>
-                      <Link to="/kids-games">Kids Games</Link>
                     </DropdownMenuItem>
                     <DropdownMenuItem asChild>
                       <Link to="/live-study">Live Study</Link>
