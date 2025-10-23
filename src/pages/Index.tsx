@@ -36,20 +36,20 @@ const Index = () => {
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(262,83%,58%,0.08),transparent_60%),radial-gradient(circle_at_70%_60%,rgba(340,82%,62%,0.08),transparent_60%)]" />
         
         <div className="container mx-auto max-w-4xl text-center relative z-10">
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full gradient-sunset border border-white/10 mb-6 shadow-sm animate-fade-in">
-            <Building2 className="h-3.5 w-3.5 text-white" />
-            <span className="text-xs font-medium text-white/95">The Palace of Biblical Wisdom</span>
-            <Sparkles className="h-3.5 w-3.5 text-white/80" />
+          <div className="inline-flex items-center gap-2 px-5 py-2 rounded-full gradient-sunset border border-white/10 mb-6 shadow-sm animate-fade-in">
+            <Building2 className="h-4 w-4 text-white" />
+            <span className="text-sm font-semibold text-white">The Palace of Biblical Wisdom</span>
+            <Sparkles className="h-4 w-4 text-white" />
           </div>
           
           <h1 className="font-serif text-5xl md:text-7xl font-bold mb-5 bg-gradient-palace bg-clip-text text-transparent animate-slide-up">
             Phototheology
           </h1>
           
-          <p className="text-lg md:text-xl text-muted-foreground mb-8 leading-relaxed max-w-2xl mx-auto animate-fade-in">
-            Transform Bible study into a <span className="text-primary font-semibold">palace of meaning</span>. 
-            Store Scripture as <span className="text-secondary font-semibold">vivid images</span>, patterns, 
-            and structures through an <span className="text-accent font-semibold">8-floor, 38-room</span> method.
+          <p className="text-xl md:text-2xl text-foreground/80 mb-8 leading-relaxed max-w-2xl mx-auto animate-fade-in font-medium">
+            Transform Bible study into a <span className="text-primary font-bold">palace of meaning</span>. 
+            Store Scripture as <span className="text-secondary font-bold">vivid images</span>, patterns, 
+            and structures through an <span className="text-accent font-bold">8-floor, 38-room</span> method.
           </p>
           
           <div className="flex flex-col sm:flex-row gap-3 justify-center animate-slide-up">
@@ -80,37 +80,37 @@ const Index = () => {
             <div className="inline-flex items-center justify-center w-12 h-12 gradient-royal rounded-xl mb-3">
               <Layers className="h-5 w-5 text-white" />
             </div>
-            <h2 className="font-serif text-3xl md:text-4xl font-bold mb-2 bg-gradient-royal bg-clip-text text-transparent">
+            <h2 className="font-serif text-4xl md:text-5xl font-bold mb-3 bg-gradient-royal bg-clip-text text-transparent">
               The Vision
             </h2>
           </div>
           
-          <div className="space-y-4 text-base leading-relaxed">
-            <div className="p-5 rounded-xl bg-gradient-to-r from-primary/5 to-secondary/5 border border-primary/10 transition-all hover:border-primary/20">
-              <p className="text-muted-foreground">
+          <div className="space-y-5 text-lg leading-relaxed">
+            <div className="p-6 rounded-xl bg-gradient-to-r from-primary/5 to-secondary/5 border border-primary/10 transition-all hover:border-primary/20">
+              <p className="text-foreground/85">
                 Phototheology exists because the Bible is not only a book of words; it is a book of{" "}
-                <span className="font-semibold text-foreground">images, symbols, and living stories</span>. 
+                <span className="font-bold text-foreground">images, symbols, and living stories</span>. 
                 God has always taught visually and narratively—Adam clothed in skins, 
                 Noah's rainbow, Abraham's stars, Moses' sanctuary, Jesus' parables, John's Revelation movie.
               </p>
             </div>
             
-            <div className="p-5 rounded-xl bg-gradient-to-r from-secondary/5 to-accent/5 border border-secondary/10 transition-all hover:border-secondary/20">
-              <p className="text-muted-foreground">
+            <div className="p-6 rounded-xl bg-gradient-to-r from-secondary/5 to-accent/5 border border-secondary/10 transition-all hover:border-secondary/20">
+              <p className="text-foreground/85">
                 Phototheology restores that method. It teaches you to store Scripture as{" "}
-                <span className="font-semibold text-foreground">images, patterns, and structures</span>. 
+                <span className="font-bold text-foreground">images, patterns, and structures</span>. 
                 Instead of random notes scattered across a page, your mind becomes a{" "}
-                <em className="text-foreground font-medium">palace of meaning</em>, 
+                <em className="text-foreground font-semibold">palace of meaning</em>, 
                 with every story, verse, and prophecy stored in its proper chamber.
               </p>
             </div>
             
-            <div className="p-6 rounded-xl gradient-sunset text-white text-center">
-              <Sparkles className="h-8 w-8 mx-auto mb-3 opacity-90" />
-              <p className="font-medium text-lg">
+            <div className="p-7 rounded-xl gradient-sunset text-white text-center">
+              <Sparkles className="h-10 w-10 mx-auto mb-4" />
+              <p className="font-semibold text-xl mb-3">
                 The vision is not just information—it is <strong>formation</strong>.
               </p>
-              <p className="mt-2 text-sm text-white/90">
+              <p className="text-base text-white/95 leading-relaxed">
                 Think Phototheologically: reflexively seeing Christ in all Scripture, 
                 instinctively mapping verses into cycles, instantly recalling patterns and prophecies.
               </p>
@@ -126,10 +126,10 @@ const Index = () => {
             <div className="inline-flex items-center justify-center w-12 h-12 gradient-warmth rounded-xl mb-3">
               <Zap className="h-5 w-5 text-white" />
             </div>
-            <h2 className="font-serif text-3xl md:text-4xl font-bold mb-2 bg-gradient-sunset bg-clip-text text-transparent">
+            <h2 className="font-serif text-4xl md:text-5xl font-bold mb-3 bg-gradient-sunset bg-clip-text text-transparent">
               The Eight-Floor Method
             </h2>
-            <p className="text-sm text-muted-foreground max-w-2xl mx-auto">
+            <p className="text-lg text-foreground/75 max-w-2xl mx-auto font-medium">
               Each floor builds upon the last, creating a complete system for biblical mastery
             </p>
           </div>
@@ -139,9 +139,9 @@ const Index = () => {
               <div className="w-11 h-11 rounded-lg gradient-palace flex items-center justify-center mb-3 group-hover:scale-105 transition-transform">
                 <BookOpen className="h-5 w-5 text-white" />
               </div>
-              <h3 className="font-serif text-lg font-bold mb-2 text-primary">Floors 1-2</h3>
-              <p className="text-xs text-muted-foreground leading-relaxed">
-                <strong className="text-foreground">Furnishing & Investigation</strong> — Fill your shelves with stories 
+              <h3 className="font-serif text-xl font-bold mb-2 text-primary">Floors 1-2</h3>
+              <p className="text-base text-foreground/80 leading-relaxed">
+                <strong className="text-foreground font-semibold">Furnishing & Investigation</strong> — Fill your shelves with stories 
                 and become a detective of the Word.
               </p>
             </div>
@@ -150,9 +150,9 @@ const Index = () => {
               <div className="w-11 h-11 rounded-lg gradient-sunset flex items-center justify-center mb-3 group-hover:scale-105 transition-transform">
                 <Lightbulb className="h-5 w-5 text-white" />
               </div>
-              <h3 className="font-serif text-lg font-bold mb-2 text-secondary">Floors 3-4</h3>
-              <p className="text-xs text-muted-foreground leading-relaxed">
-                <strong className="text-foreground">Freestyle & Next Level</strong> — Connect Scripture to daily life 
+              <h3 className="font-serif text-xl font-bold mb-2 text-secondary">Floors 3-4</h3>
+              <p className="text-base text-foreground/80 leading-relaxed">
+                <strong className="text-foreground font-semibold">Freestyle & Next Level</strong> — Connect Scripture to daily life 
                 and expand through Christ-centered dimensions.
               </p>
             </div>
@@ -161,9 +161,9 @@ const Index = () => {
               <div className="w-11 h-11 rounded-lg gradient-ocean flex items-center justify-center mb-3 group-hover:scale-105 transition-transform">
                 <Building2 className="h-5 w-5 text-white" />
               </div>
-              <h3 className="font-serif text-lg font-bold mb-2 text-palace-blue">Floors 5-6</h3>
-              <p className="text-xs text-muted-foreground leading-relaxed">
-                <strong className="text-foreground">Vision & Horizons</strong> — Open the prophetic telescope; 
+              <h3 className="font-serif text-xl font-bold mb-2 text-palace-blue">Floors 5-6</h3>
+              <p className="text-base text-foreground/80 leading-relaxed">
+                <strong className="text-foreground font-semibold">Vision & Horizons</strong> — Open the prophetic telescope; 
                 see sanctuary, feasts, cycles, and cosmic dimensions.
               </p>
             </div>
@@ -172,9 +172,9 @@ const Index = () => {
               <div className="w-11 h-11 rounded-lg gradient-warmth flex items-center justify-center mb-3 group-hover:scale-105 transition-transform">
                 <Crown className="h-5 w-5 text-white" />
               </div>
-              <h3 className="font-serif text-lg font-bold mb-2 text-accent">Floors 7-8</h3>
-              <p className="text-xs text-muted-foreground leading-relaxed">
-                <strong className="text-foreground">Spiritual & Master</strong> — Bring heart into fire, 
+              <h3 className="font-serif text-xl font-bold mb-2 text-accent">Floors 7-8</h3>
+              <p className="text-base text-foreground/80 leading-relaxed">
+                <strong className="text-foreground font-semibold">Spiritual & Master</strong> — Bring heart into fire, 
                 then let the palace become reflexive thought.
               </p>
             </div>
@@ -190,10 +190,10 @@ const Index = () => {
               <Sparkles className="h-3.5 w-3.5 text-accent" />
               <span className="text-xs font-medium text-accent">Floor 0 - Advanced Modes</span>
             </div>
-            <h2 className="font-serif text-3xl md:text-4xl font-bold mb-2 bg-gradient-royal bg-clip-text text-transparent">
+            <h2 className="font-serif text-4xl md:text-5xl font-bold mb-3 bg-gradient-royal bg-clip-text text-transparent">
               AI-Powered Study Tools
             </h2>
-            <p className="text-sm text-muted-foreground max-w-2xl mx-auto">
+            <p className="text-lg text-foreground/75 max-w-2xl mx-auto font-medium">
               Specialized tools for deep analysis and real-world application
             </p>
           </div>
@@ -204,8 +204,8 @@ const Index = () => {
                 <div className="w-12 h-12 rounded-lg bg-white/80 dark:bg-gray-800/80 flex items-center justify-center mb-4 group-hover:scale-105 transition-transform">
                   <Scale className="h-6 w-6 text-red-500" />
                 </div>
-                <h3 className="font-serif text-lg font-bold mb-2 text-foreground">Culture & Controversy</h3>
-                <p className="text-sm text-muted-foreground leading-relaxed">
+                <h3 className="font-serif text-xl font-bold mb-2 text-foreground">Culture & Controversy</h3>
+                <p className="text-base text-foreground/75 leading-relaxed">
                   Analyze current events through Jesus' teachings.
                 </p>
               </div>
@@ -216,8 +216,8 @@ const Index = () => {
                 <div className="w-12 h-12 rounded-lg bg-white/80 dark:bg-gray-800/80 flex items-center justify-center mb-4 group-hover:scale-105 transition-transform">
                   <Telescope className="h-6 w-6 text-blue-600" />
                 </div>
-                <h3 className="font-serif text-lg font-bold mb-2 text-foreground">Prophecy Watch</h3>
-                <p className="text-sm text-muted-foreground leading-relaxed">
+                <h3 className="font-serif text-xl font-bold mb-2 text-foreground">Prophecy Watch</h3>
+                <p className="text-base text-foreground/75 leading-relaxed">
                   Monitor end-time events and fulfillment of prophecy.
                 </p>
               </div>
@@ -228,8 +228,8 @@ const Index = () => {
                 <div className="w-12 h-12 rounded-lg bg-white/80 dark:bg-gray-800/80 flex items-center justify-center mb-4 group-hover:scale-105 transition-transform">
                   <Search className="h-6 w-6 text-blue-600" />
                 </div>
-                <h3 className="font-serif text-lg font-bold mb-2 text-foreground">Research Mode</h3>
-                <p className="text-sm text-muted-foreground leading-relaxed">
+                <h3 className="font-serif text-xl font-bold mb-2 text-foreground">Research Mode</h3>
+                <p className="text-base text-foreground/75 leading-relaxed">
                   Deep biblical study with comprehensive research.
                 </p>
               </div>
@@ -240,8 +240,8 @@ const Index = () => {
                 <div className="w-12 h-12 rounded-lg bg-white/80 dark:bg-gray-800/80 flex items-center justify-center mb-4 group-hover:scale-105 transition-transform">
                   <Image className="h-6 w-6 text-purple-600" />
                 </div>
-                <h3 className="font-serif text-lg font-bold mb-2 text-foreground">Bible Image Library</h3>
-                <p className="text-sm text-muted-foreground leading-relaxed">
+                <h3 className="font-serif text-xl font-bold mb-2 text-foreground">Bible Image Library</h3>
+                <p className="text-base text-foreground/75 leading-relaxed">
                   AI-generated visual interpretations of Scripture.
                 </p>
               </div>
@@ -252,8 +252,8 @@ const Index = () => {
                 <div className="w-12 h-12 rounded-lg bg-white/80 dark:bg-gray-800/80 flex items-center justify-center mb-4 group-hover:scale-105 transition-transform">
                   <Film className="h-6 w-6 text-orange-600" />
                 </div>
-                <h3 className="font-serif text-lg font-bold mb-2 text-foreground">Sermon Builder</h3>
-                <p className="text-sm text-muted-foreground leading-relaxed">
+                <h3 className="font-serif text-xl font-bold mb-2 text-foreground">Sermon Builder</h3>
+                <p className="text-base text-foreground/75 leading-relaxed">
                   Build sermons with 5 Smooth Stones methodology.
                 </p>
               </div>
@@ -264,8 +264,8 @@ const Index = () => {
                 <div className="w-12 h-12 rounded-lg bg-white/80 dark:bg-gray-800/80 flex items-center justify-center mb-4 group-hover:scale-105 transition-transform">
                   <Brain className="h-6 w-6 text-green-600" />
                 </div>
-                <h3 className="font-serif text-lg font-bold mb-2 text-foreground">Flashcards</h3>
-                <p className="text-sm text-muted-foreground leading-relaxed">
+                <h3 className="font-serif text-xl font-bold mb-2 text-foreground">Flashcards</h3>
+                <p className="text-base text-foreground/75 leading-relaxed">
                   Master Bible knowledge with interactive study cards.
                 </p>
               </div>
@@ -283,15 +283,15 @@ const Index = () => {
             <Building2 className="h-7 w-7 text-white" />
           </div>
           
-          <h2 className="font-serif text-3xl md:text-4xl font-bold mb-4 bg-gradient-palace bg-clip-text text-transparent">
+          <h2 className="font-serif text-4xl md:text-5xl font-bold mb-5 bg-gradient-palace bg-clip-text text-transparent">
             Enter the Palace
           </h2>
           
-          <p className="text-base md:text-lg text-muted-foreground mb-8 leading-relaxed">
-            Each floor has its own discipline. Together they form a <span className="text-foreground font-semibold">complete method</span> of Bible study 
-            that combines <span className="text-foreground font-semibold">memory</span>, <span className="text-foreground font-semibold">imagination</span>, 
-            <span className="text-foreground font-semibold">theology</span>, <span className="text-foreground font-semibold">prophecy</span>, 
-            and <span className="text-foreground font-semibold">devotion</span>.
+          <p className="text-xl md:text-2xl text-foreground/80 mb-8 leading-relaxed font-medium">
+            Each floor has its own discipline. Together they form a <span className="text-foreground font-bold">complete method</span> of Bible study 
+            that combines <span className="text-foreground font-bold">memory</span>, <span className="text-foreground font-bold">imagination</span>, 
+            <span className="text-foreground font-bold">theology</span>, <span className="text-foreground font-bold">prophecy</span>, 
+            and <span className="text-foreground font-bold">devotion</span>.
           </p>
           
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
