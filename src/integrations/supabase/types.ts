@@ -255,6 +255,77 @@ export type Database = {
         }
         Relationships: []
       }
+      flashcard_sets: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          is_ai_generated: boolean
+          is_public: boolean
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_ai_generated?: boolean
+          is_public?: boolean
+          title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_ai_generated?: boolean
+          is_public?: boolean
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      flashcards: {
+        Row: {
+          answer: string
+          created_at: string
+          id: string
+          order_index: number
+          question: string
+          set_id: string
+          verse_reference: string | null
+        }
+        Insert: {
+          answer: string
+          created_at?: string
+          id?: string
+          order_index?: number
+          question: string
+          set_id: string
+          verse_reference?: string | null
+        }
+        Update: {
+          answer?: string
+          created_at?: string
+          id?: string
+          order_index?: number
+          question?: string
+          set_id?: string
+          verse_reference?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "flashcards_set_id_fkey"
+            columns: ["set_id"]
+            isOneToOne: false
+            referencedRelation: "flashcard_sets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       game_chat: {
         Row: {
           created_at: string | null
@@ -394,6 +465,51 @@ export type Database = {
           points?: number | null
           updated_at?: string | null
           username?: string
+        }
+        Relationships: []
+      }
+      sermons: {
+        Row: {
+          bridges: Json | null
+          created_at: string
+          current_step: number
+          id: string
+          movie_structure: Json | null
+          sermon_style: string
+          smooth_stones: Json | null
+          status: string
+          theme_passage: string
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          bridges?: Json | null
+          created_at?: string
+          current_step?: number
+          id?: string
+          movie_structure?: Json | null
+          sermon_style: string
+          smooth_stones?: Json | null
+          status?: string
+          theme_passage: string
+          title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          bridges?: Json | null
+          created_at?: string
+          current_step?: number
+          id?: string
+          movie_structure?: Json | null
+          sermon_style?: string
+          smooth_stones?: Json | null
+          status?: string
+          theme_passage?: string
+          title?: string
+          updated_at?: string
+          user_id?: string
         }
         Relationships: []
       }

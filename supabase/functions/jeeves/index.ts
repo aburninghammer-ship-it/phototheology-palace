@@ -209,6 +209,85 @@ Structure your research:
 7. Further Study (suggest related topics and passages)
 
 Include verse citations, cross-references, and scholarly depth. Make it comprehensive but accessible.`;
+    
+    } else if (mode === "sermon-setup") {
+      const { title, theme, style } = await req.json();
+      systemPrompt = "You are Jeeves, a sermon preparation assistant. Help preachers organize their thoughts and structure powerful messages.";
+      userPrompt = `A preacher is preparing a sermon with this setup:
+Title: "${title}"
+Theme/Passage: "${theme}"
+Style: "${style}"
+
+Provide guidance on:
+1. How to develop this theme effectively
+2. Key Scripture passages to consider
+3. Potential sermon structure suggestions
+4. Important theological points to address
+
+Be encouraging and practical. Help them think through the sermon, but don't write it for them.`;
+
+    } else if (mode === "sermon-stones") {
+      const { theme, existingStones } = await req.json();
+      systemPrompt = "You are Jeeves, helping identify powerful AHA moments (smooth stones) for sermons.";
+      userPrompt = `For a sermon on "${theme}", suggest 2-3 potential smooth stones (powerful Phototheology insights).
+${existingStones.length > 0 ? `\nThey already have: ${existingStones.join('; ')}` : ''}
+
+Each stone should be:
+- A mind-blowing biblical insight
+- Memorable and quotable
+- Connected to the theme
+- Different from what they already have
+
+Present them as options, not mandates.`;
+
+    } else if (mode === "sermon-bridges") {
+      const { stones, existingBridges } = await req.json();
+      systemPrompt = "You are Jeeves, helping create narrative bridges between sermon points.";
+      userPrompt = `Help create bridges to connect these 5 smooth stones into a flowing narrative:
+${stones.map((s: string, i: number) => `Stone ${i+1}: ${s}`).join('\n')}
+
+${existingBridges.length > 0 ? `\nExisting bridges: ${existingBridges.join('; ')}` : ''}
+
+Suggest 2-3 potential bridge transitions that:
+- Flow naturally between the stones
+- Maintain narrative momentum
+- Keep the audience engaged
+- Build toward a climax`;
+
+    } else if (mode === "sermon-structure") {
+      const { stones, bridges } = await req.json();
+      systemPrompt = "You are Jeeves, helping structure sermons like movies.";
+      userPrompt = `Given these sermon elements:
+Stones: ${stones.join('; ')}
+Bridges: ${bridges.join('; ')}
+
+Suggest how to structure this like a movie:
+1. Opening Hook - How to grab attention immediately
+2. Rising Action - Building tension and interest
+3. Climax - The transformative moment
+4. Resolution - How it all comes together
+5. Call to Action - What the audience should do
+
+Be specific but flexible. Help them see the cinematic potential.`;
+
+    } else if (mode === "generate-flashcards") {
+      const { topic } = await req.json();
+      systemPrompt = `You are Jeeves, creating Bible study flashcards. Return your response as valid JSON only.`;
+      userPrompt = `Create 10 flashcards about: "${topic}"
+
+Return ONLY valid JSON in this exact format:
+{
+  "flashcards": [
+    {
+      "question": "Question text here",
+      "answer": "Answer text here", 
+      "verse_reference": "Book Chapter:Verse or null"
+    }
+  ]
+}
+
+Make questions clear, answers comprehensive, and include verse references when relevant.`;
+
     } else if (mode === "generate-image") {
       const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
       if (!LOVABLE_API_KEY) {
@@ -330,6 +409,24 @@ Include verse citations, cross-references, and scholarly depth. Make it comprehe
 
     const data = await response.json();
     const content = data.choices[0]?.message?.content || "No response generated";
+
+    // For generate-flashcards mode, parse JSON
+    if (mode === "generate-flashcards") {
+      try {
+        const parsed = JSON.parse(content);
+        return new Response(
+          JSON.stringify(parsed),
+          { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      } catch {
+        return new Response(
+          JSON.stringify({
+            flashcards: []
+          }),
+          { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
+    }
 
     // For prophecy-signal mode, parse JSON
     if (mode === "prophecy-signal") {
