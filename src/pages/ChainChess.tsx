@@ -45,6 +45,21 @@ const ChainChess = () => {
   const categories = ["Books of the Bible", "Rooms of the Palace", "Principles of the Palace"];
   const isVsJeeves = mode === "jeeves";
 
+  // Pool of verses to randomly select from
+  const versePool = [
+    "John 3:16", "Psalm 23:1", "Romans 8:28", "Philippians 4:13", "Proverbs 3:5-6",
+    "Isaiah 40:31", "Jeremiah 29:11", "Matthew 6:33", "2 Timothy 3:16", "Hebrews 11:1",
+    "1 Corinthians 13:4", "Ephesians 2:8", "Romans 12:2", "Joshua 1:9", "Psalm 46:1",
+    "Matthew 28:19", "John 14:6", "Galatians 5:22", "Colossians 3:2", "James 1:2-3",
+    "1 Peter 5:7", "Revelation 21:4", "Genesis 1:1", "Exodus 20:3", "Deuteronomy 6:5",
+    "Psalm 119:105", "Isaiah 53:5", "Matthew 5:16", "Luke 6:31", "Acts 1:8",
+    "Romans 3:23", "1 John 4:8", "Revelation 3:20", "Mark 16:15", "John 1:1"
+  ];
+
+  const getRandomVerse = () => {
+    return versePool[Math.floor(Math.random() * versePool.length)];
+  };
+
   useEffect(() => {
     if (user && gameId && gameId !== "new") {
       loadGame();
@@ -77,6 +92,9 @@ const ChainChess = () => {
     }
 
     try {
+      // Get a random verse for this game
+      const randomVerse = getRandomVerse();
+      
       // Create new game
       const { data: newGame, error } = await supabase
         .from("games")
@@ -88,7 +106,7 @@ const ChainChess = () => {
           status: "in_progress",
           game_state: { 
             categories: selectedGameCategories,
-            verse: "John 3:16" 
+            verse: randomVerse
           },
         })
         .select()
@@ -97,8 +115,8 @@ const ChainChess = () => {
       if (error) throw error;
 
       setGame(newGame);
-      setCurrentVerse("John 3:16");
-      await fetchVerseText("John 3:16");
+      setCurrentVerse(randomVerse);
+      await fetchVerseText(randomVerse);
       setGameStarted(true);
       
       // Navigate after setting state
