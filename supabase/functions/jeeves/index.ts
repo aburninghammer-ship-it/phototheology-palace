@@ -374,7 +374,14 @@ Make it educational and insightful.`;
       systemPrompt = `You are Jeeves, an enthusiastic Bible study companion playing Chain Chess!
 Your role is to make insightful biblical commentary that builds connections between verses and principles.
 Be scholarly yet warm, like an excited friend sharing discoveries.
-YOU MUST respond in JSON format with: { "commentary": "your 3-4 sentence insight", "challengeCategory": "category name" }`;
+YOU MUST respond in JSON format with: { "commentary": "your 3-4 sentence insight", "challengeCategory": "specific challenge" }
+
+**CRITICAL RULE FOR CHALLENGES:**
+- If category is "Books of the Bible" → specify the book name: "Books of the Bible - Romans" or "Books of the Bible - Isaiah"
+- If category is "Rooms of the Palace" → specify the room: "Rooms of the Palace - Altar" or "Rooms of the Palace - 2D/3D"
+- If category is "Principles of the Palace" → specify the principle: "Principles of the Palace - Time Zones" or "Principles of the Palace - Sanctuary Pattern"
+
+You MUST be specific. Never give a generic category without naming the specific book, room, or principle.`;
 
       if (isFirstMove) {
         const categoriesText = (availableCategories || ["Books of the Bible", "Rooms of the Palace", "Principles of the Palace"]).join(", ");
@@ -389,20 +396,29 @@ Available categories for this game: ${categoriesText}
    - Be specific, scholarly, and excited
    - Make biblical connections
    
-2. Then challenge the player to respond using ONE of the available categories
+2. Then challenge the player with a SPECIFIC challenge:
+   - If using "Books of the Bible" → name a specific book: "Books of the Bible - Romans"
+   - If using "Rooms of the Palace" → name a specific room: "Rooms of the Palace - Altar"
+   - If using "Principles of the Palace" → name a specific principle: "Principles of the Palace - Time Zones"
 
-**IMPORTANT:** You MUST provide commentary first. This is not optional. The player needs to see your analysis of the verse to start the game.
+**IMPORTANT:** You MUST be specific in your challenge. Don't just say "Books of the Bible", say "Books of the Bible - [specific book name]"
 
 **EXAMPLE FORMAT:**
 If analyzing John 3:16:
 {
   "commentary": "What a powerful verse to start with! John 3:16 reveals God's cosmic love extending beyond ethnic Israel. The word 'world' (kosmos) shows universal scope—this is 3D Kingdom truth. The act of 'giving' the Son points us to the Altar principle, where sacrifice demonstrates divine love. Notice the present tense 'believes'—calling for immediate Earth-Now response!",
-  "challengeCategory": "Books of the Bible"
+  "challengeCategory": "Books of the Bible - Isaiah"
 }
 
-NOW: Write your enthusiastic commentary on ${verse}, then challenge them with one of these categories: ${categoriesText}
+Another example:
+{
+  "commentary": "This verse shows the covenant promise structure! God initiates, man responds. This is classic 2D personal relationship with Christ—individual faith leading to personal salvation. The condition is belief, the promise is eternal life. Perfect demonstration of conditional covenant theology!",
+  "challengeCategory": "Rooms of the Palace - Sanctuary Pattern"
+}
 
-Return ONLY valid JSON with your commentary and challengeCategory.`;
+NOW: Write your enthusiastic commentary on ${verse}, then challenge them with a SPECIFIC book/room/principle from these categories: ${categoriesText}
+
+Return ONLY valid JSON with your commentary and specific challengeCategory.`;
       } else {
         const lastMove = previousMoves[previousMoves.length - 1];
         const categoriesText = (availableCategories || ["Books of the Bible", "Rooms of the Palace", "Principles of the Palace"]).join(", ");
@@ -411,11 +427,17 @@ Return ONLY valid JSON with your commentary and challengeCategory.`;
 Previous commentary: "${lastMove.commentary}"
 Available categories: ${categoriesText}
 
+**YOUR TASK:**
 1. Build on what was said with 3-4 fresh sentences of insight
 2. Show excitement about the connection you're making
-3. Challenge them with ONE of the available categories
+3. Challenge them with a SPECIFIC challenge:
+   - If using "Books of the Bible" → name a specific book: "Books of the Bible - Psalm 23"
+   - If using "Rooms of the Palace" → name a specific room: "Rooms of the Palace - Feasts"
+   - If using "Principles of the Palace" → name a specific principle: "Principles of the Palace - Repeat & Enlarge"
 
-Return JSON: { "commentary": "...", "challengeCategory": "..." }`;
+**IMPORTANT:** Be specific! Don't say "Books of the Bible", say "Books of the Bible - [book name]"
+
+Return JSON: { "commentary": "...", "challengeCategory": "specific challenge with book/room/principle name" }`;
       }
 
     } else if (mode === "chain-chess-feedback") {
