@@ -22,12 +22,44 @@ const FRUITS_OF_SPIRIT = [
   { name: "Self-Control", description: "Mastery over desires", color: "bg-orange-500" },
 ];
 
+const ANIMAL_STYLES = [
+  { name: "Lion", description: "Bold courage and strength", trait: "Courage in righteousness", color: "bg-amber-600" },
+  { name: "Lamb", description: "Sacrificial humility", trait: "Willing submission to God", color: "bg-slate-100" },
+  { name: "Eagle", description: "Soaring vision and perspective", trait: "Heavenly-minded focus", color: "bg-sky-600" },
+  { name: "Serpent", description: "Wise discernment", trait: "Shrewd as serpents, innocent as doves", color: "bg-emerald-700" },
+  { name: "Dove", description: "Pure innocence", trait: "Gentle and harmless", color: "bg-blue-200" },
+  { name: "Ox", description: "Patient endurance", trait: "Steady faithfulness under burden", color: "bg-brown-600" },
+];
+
+const SPIRITUAL_WEAPONS = [
+  { name: "Sword of the Spirit", description: "The Word of God", verse: "Ephesians 6:17", color: "bg-blue-600" },
+  { name: "Shield of Faith", description: "Quenches fiery darts", verse: "Ephesians 6:16", color: "bg-purple-600" },
+  { name: "Helmet of Salvation", description: "Protects the mind", verse: "Ephesians 6:17", color: "bg-yellow-600" },
+  { name: "Breastplate of Righteousness", description: "Guards the heart", verse: "Ephesians 6:14", color: "bg-green-600" },
+  { name: "Belt of Truth", description: "Foundation of integrity", verse: "Ephesians 6:14", color: "bg-indigo-600" },
+  { name: "Gospel Shoes", description: "Readiness to share peace", verse: "Ephesians 6:15", color: "bg-red-600" },
+  { name: "Prayer", description: "Direct communication with God", verse: "Ephesians 6:18", color: "bg-pink-600" },
+];
+
+const BESETTING_SINS = [
+  { name: "Pride", weakness: "Humility neglected", counter: ["Gentleness", "Self-Control"], animal: "Lion" },
+  { name: "Anger", weakness: "Peace abandoned", counter: ["Patience", "Self-Control"], animal: "Ox" },
+  { name: "Lust", weakness: "Self-control lost", counter: ["Self-Control", "Faithfulness"], animal: "Dove" },
+  { name: "Greed", weakness: "Contentment rejected", counter: ["Goodness", "Self-Control"], animal: "Lamb" },
+  { name: "Envy", weakness: "Love withheld", counter: ["Love", "Joy"], animal: "Eagle" },
+  { name: "Laziness", weakness: "Diligence despised", counter: ["Faithfulness", "Self-Control"], animal: "Ox" },
+  { name: "Gluttony", weakness: "Discipline dismissed", counter: ["Self-Control", "Patience"], animal: "Lamb" },
+];
+
 type Scenario = {
   id: string;
   title: string;
   situation: string;
   correctFruits: string[];
-  options: { fruits: string[]; explanation: string }[];
+  correctAnimal?: string;
+  correctWeapon?: string;
+  besettingSin?: string;
+  options: { fruits: string[]; animal?: string; weapon?: string; explanation: string }[];
 };
 
 const TRAINING_SCENARIOS: Scenario[] = [
@@ -36,32 +68,83 @@ const TRAINING_SCENARIOS: Scenario[] = [
     title: "Workplace Conflict",
     situation: "Your coworker takes credit for your work in front of your boss. You feel anger rising within you.",
     correctFruits: ["Self-Control", "Patience", "Gentleness"],
+    correctAnimal: "Ox",
+    correctWeapon: "Shield of Faith",
+    besettingSin: "Anger",
     options: [
-      { fruits: ["Self-Control", "Patience", "Gentleness"], explanation: "Correct! Self-control keeps you from reacting in anger, patience helps you endure the injustice, and gentleness guides your response." },
-      { fruits: ["Love", "Joy", "Peace"], explanation: "While love is always needed, this situation specifically requires self-control to manage anger, patience to endure, and gentleness in confrontation." },
-      { fruits: ["Faithfulness", "Goodness", "Kindness"], explanation: "These fruits are important, but the immediate battle requires self-control over anger, patience under injustice, and gentleness in response." },
+      { fruits: ["Self-Control", "Patience", "Gentleness"], animal: "Ox", weapon: "Shield of Faith", explanation: "Correct! Like the Ox's patient endurance, you need self-control over anger, patience to endure injustice, and gentleness in response. The Shield of Faith quenches the fiery darts of rage." },
+      { fruits: ["Love", "Joy", "Peace"], animal: "Lion", weapon: "Sword of the Spirit", explanation: "While the Lion's courage and love are always needed, this besetting sin of anger requires the Ox's patience, self-control, and the Shield of Faith to extinguish wrath." },
+      { fruits: ["Faithfulness", "Goodness", "Kindness"], animal: "Dove", weapon: "Breastplate of Righteousness", explanation: "The Dove's innocence is admirable, but conquering anger requires the Ox's endurance, self-control, and the Shield of Faith." },
     ],
   },
   {
-    id: "family-criticism",
-    title: "Family Criticism",
-    situation: "A family member constantly criticizes your life choices. Every gathering becomes tense and painful.",
-    correctFruits: ["Patience", "Love", "Self-Control"],
+    id: "social-media-envy",
+    title: "Social Media Comparison",
+    situation: "Scrolling through social media, you see others' success and feel intense envy consuming your peace.",
+    correctFruits: ["Love", "Joy", "Contentment"],
+    correctAnimal: "Eagle",
+    correctWeapon: "Helmet of Salvation",
+    besettingSin: "Envy",
     options: [
-      { fruits: ["Patience", "Love", "Self-Control"], explanation: "Correct! Patience to endure repeated criticism, love to see beyond the hurt, and self-control to respond wisely." },
-      { fruits: ["Joy", "Peace", "Gentleness"], explanation: "While these help, the core battle requires patience under repeated offense, love despite hurt, and self-control in your reactions." },
-      { fruits: ["Faithfulness", "Goodness", "Kindness"], explanation: "These are valuable, but this trial specifically tests patience under repetition, love despite pain, and self-control in response." },
+      { fruits: ["Love", "Joy", "Contentment"], animal: "Eagle", weapon: "Helmet of Salvation", explanation: "Correct! Like the Eagle rising above, gain heavenly perspective. The Helmet of Salvation protects your mind from comparison's poison. Love rejoices with others, joy finds contentment in God." },
+      { fruits: ["Patience", "Kindness", "Gentleness"], animal: "Lamb", weapon: "Gospel Shoes", explanation: "The Lamb's gentleness is good, but envy requires the Eagle's higher vision and the Helmet protecting your thoughts from toxic comparison." },
+      { fruits: ["Faithfulness", "Self-Control", "Peace"], animal: "Ox", weapon: "Belt of Truth", explanation: "While valuable, defeating envy needs the Eagle's perspective to see God's unique plan for you, protected by the Helmet of Salvation." },
     ],
   },
   {
-    id: "financial-pressure",
-    title: "Financial Pressure",
-    situation: "Bills are piling up and you're tempted to compromise your integrity for a quick financial gain.",
-    correctFruits: ["Faithfulness", "Self-Control", "Peace"],
+    id: "temptation-lust",
+    title: "Temptation in Privacy",
+    situation: "Alone with access to harmful content, temptation whispers that no one will know.",
+    correctFruits: ["Self-Control", "Faithfulness", "Purity"],
+    correctAnimal: "Dove",
+    correctWeapon: "Sword of the Spirit",
+    besettingSin: "Lust",
     options: [
-      { fruits: ["Faithfulness", "Self-Control", "Peace"], explanation: "Correct! Faithfulness to God's principles, self-control over desperation, and peace trusting in His provision." },
-      { fruits: ["Love", "Joy", "Kindness"], explanation: "While important, this battle requires faithfulness to remain true, self-control over fear, and peace in trusting God." },
-      { fruits: ["Patience", "Gentleness", "Goodness"], explanation: "These have their place, but the core struggle needs faithfulness to principle, self-control over panic, and peace in God's care." },
+      { fruits: ["Self-Control", "Faithfulness", "Purity"], animal: "Dove", weapon: "Sword of the Spirit", explanation: "Correct! The Dove represents purity and innocence. The Sword of the Spirit (God's Word) cuts through temptation. Self-control masters desire, faithfulness keeps covenant with God." },
+      { fruits: ["Love", "Peace", "Kindness"], animal: "Lamb", weapon: "Shield of Faith", explanation: "The Lamb's sacrifice is beautiful, but conquering lust requires the Dove's purity and the Sword of the Spirit to defeat desire." },
+      { fruits: ["Patience", "Goodness", "Gentleness"], animal: "Lion", weapon: "Breastplate of Righteousness", explanation: "The Lion's strength helps, but this sin requires the Dove's innocence and the Sword cutting away impure thoughts." },
+    ],
+  },
+  {
+    id: "financial-greed",
+    title: "Opportunity for Dishonest Gain",
+    situation: "You discover a way to make extra money that's technically legal but morally questionable.",
+    correctFruits: ["Faithfulness", "Self-Control", "Contentment"],
+    correctAnimal: "Lamb",
+    correctWeapon: "Belt of Truth",
+    besettingSin: "Greed",
+    options: [
+      { fruits: ["Faithfulness", "Self-Control", "Contentment"], animal: "Lamb", weapon: "Belt of Truth", explanation: "Correct! Like the Lamb who owns nothing yet lacks nothing, defeat greed through contentment. The Belt of Truth anchors you in integrity. Faithfulness to God, self-control over desire." },
+      { fruits: ["Love", "Joy", "Peace"], animal: "Eagle", weapon: "Helmet of Salvation", explanation: "The Eagle's vision helps, but greed requires the Lamb's contentment with little and the Belt of Truth to expose dishonesty." },
+      { fruits: ["Patience", "Kindness", "Gentleness"], animal: "Dove", weapon: "Gospel Shoes", explanation: "These are valuable, but conquering greed needs the Lamb's simplicity and the Belt of Truth holding you to righteousness." },
+    ],
+  },
+  {
+    id: "recognition-pride",
+    title: "Pride in Achievement",
+    situation: "You've accomplished something significant and feel superior to others who haven't.",
+    correctFruits: ["Gentleness", "Humility", "Self-Control"],
+    correctAnimal: "Lamb",
+    correctWeapon: "Gospel Shoes",
+    besettingSin: "Pride",
+    options: [
+      { fruits: ["Gentleness", "Humility", "Self-Control"], animal: "Lamb", weapon: "Gospel Shoes", explanation: "Correct! The Lamb demonstrates ultimate humility—Jesus, though worthy of all honor, took the form of a servant. Gospel Shoes keep you ready to serve, not lord over others. Gentleness and self-control defeat pride." },
+      { fruits: ["Love", "Kindness", "Patience"], animal: "Lion", weapon: "Sword of the Spirit", explanation: "The Lion's strength can fuel pride. This sin requires the Lamb's humility and Gospel Shoes of service." },
+      { fruits: ["Faithfulness", "Goodness", "Peace"], animal: "Eagle", weapon: "Shield of Faith", explanation: "While good, pride is conquered by the Lamb's lowliness and Gospel Shoes that keep you a servant." },
+    ],
+  },
+  {
+    id: "spiritual-laziness",
+    title: "Spiritual Complacency",
+    situation: "You keep putting off prayer, Bible study, and spiritual disciplines. Laziness has become comfortable.",
+    correctFruits: ["Faithfulness", "Self-Control", "Diligence"],
+    correctAnimal: "Ox",
+    correctWeapon: "Belt of Truth",
+    besettingSin: "Laziness",
+    options: [
+      { fruits: ["Faithfulness", "Self-Control", "Diligence"], animal: "Ox", weapon: "Belt of Truth", explanation: "Correct! The Ox embodies steady, faithful labor. The Belt of Truth exposes laziness for what it is—spiritual neglect. Faithfulness maintains disciplines, self-control resists comfort, diligence perseveres." },
+      { fruits: ["Love", "Joy", "Peace"], animal: "Dove", weapon: "Helmet of Salvation", explanation: "The Dove is gentle, but conquering laziness requires the Ox's steady work ethic and the Belt of Truth to face reality." },
+      { fruits: ["Patience", "Kindness", "Goodness"], animal: "Eagle", weapon: "Sword of the Spirit", explanation: "These help, but laziness needs the Ox's relentless labor and the Belt of Truth to stop making excuses." },
     ],
   },
 ];
@@ -147,9 +230,11 @@ export default function SpiritualTraining() {
 
         {/* Training Tabs */}
         <Tabs defaultValue="scenarios" className="w-full">
-          <TabsList className="grid w-full grid-cols-3">
+          <TabsList className="grid w-full grid-cols-5">
             <TabsTrigger value="scenarios">Battle Scenarios</TabsTrigger>
-            <TabsTrigger value="fruits">Fruits Training</TabsTrigger>
+            <TabsTrigger value="besetting">Besetting Sins</TabsTrigger>
+            <TabsTrigger value="animals">Animal Styles</TabsTrigger>
+            <TabsTrigger value="weapons">Spiritual Weapons</TabsTrigger>
             <TabsTrigger value="courses">Courses</TabsTrigger>
           </TabsList>
 
@@ -190,21 +275,33 @@ export default function SpiritualTraining() {
                       </p>
                     </div>
 
-                    <div className="space-y-3">
+                     <div className="space-y-3">
                       {selectedScenario.options.map((option, index) => (
                         <Button
                           key={index}
                           variant={userAnswer === index ? "default" : "outline"}
-                          className="w-full text-left justify-start h-auto py-4"
+                          className="w-full text-left justify-start h-auto py-4 px-4"
                           onClick={() => handleScenarioAnswer(index)}
                           disabled={showResult}
                         >
-                          <div className="flex flex-wrap gap-2">
-                            {option.fruits.map((fruit) => (
-                              <Badge key={fruit} variant="secondary">
-                                {fruit}
-                              </Badge>
-                            ))}
+                          <div className="space-y-2 w-full">
+                            <div className="flex flex-wrap gap-2">
+                              {option.fruits.map((fruit) => (
+                                <Badge key={fruit} variant="secondary">
+                                  {fruit}
+                                </Badge>
+                              ))}
+                            </div>
+                            {option.animal && (
+                              <div className="text-sm text-muted-foreground">
+                                Style: {option.animal}
+                              </div>
+                            )}
+                            {option.weapon && (
+                              <div className="text-sm text-muted-foreground">
+                                Weapon: {option.weapon}
+                              </div>
+                            )}
                           </div>
                         </Button>
                       ))}
@@ -222,6 +319,105 @@ export default function SpiritualTraining() {
                     )}
                   </div>
                 )}
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* Besetting Sins */}
+          <TabsContent value="besetting" className="space-y-4">
+            <Card>
+              <CardHeader>
+                <CardTitle>Besetting Sins: Know Your Enemy</CardTitle>
+                <CardDescription>
+                  Every warrior faces recurring battles. These sins "easily beset us" (Hebrews 12:1). Training identifies the patterns without confession—learn to recognize and defeat them.
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                  {BESETTING_SINS.map((sin) => (
+                    <Card key={sin.name} className="border-2 border-destructive/20">
+                      <CardHeader>
+                        <CardTitle className="text-lg text-destructive">{sin.name}</CardTitle>
+                        <CardDescription className="space-y-2">
+                          <p className="text-sm italic">{sin.weakness}</p>
+                          <div className="pt-2">
+                            <p className="text-xs font-semibold">Counter with:</p>
+                            <div className="flex flex-wrap gap-1 mt-1">
+                              {sin.counter.map((fruit) => (
+                                <Badge key={fruit} variant="outline" className="text-xs">
+                                  {fruit}
+                                </Badge>
+                              ))}
+                            </div>
+                          </div>
+                          <p className="text-xs pt-2">
+                            <span className="font-semibold">Animal Style:</span> {sin.animal}
+                          </p>
+                        </CardDescription>
+                      </CardHeader>
+                    </Card>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* Animal Styles */}
+          <TabsContent value="animals" className="space-y-4">
+            <Card>
+              <CardHeader>
+                <CardTitle>Biblical Animal Styles</CardTitle>
+                <CardDescription>
+                  Scripture uses animals to teach spiritual warfare tactics. Each style represents different aspects of Christ-like character.
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                  {ANIMAL_STYLES.map((animal) => (
+                    <Card key={animal.name} className="border-2">
+                      <CardHeader>
+                        <div className="flex items-center gap-2">
+                          <div className={`w-4 h-4 rounded-full ${animal.color}`} />
+                          <CardTitle className="text-lg">{animal.name}</CardTitle>
+                        </div>
+                        <CardDescription className="space-y-1">
+                          <p className="font-semibold text-sm">{animal.description}</p>
+                          <p className="text-xs italic">{animal.trait}</p>
+                        </CardDescription>
+                      </CardHeader>
+                    </Card>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* Spiritual Weapons */}
+          <TabsContent value="weapons" className="space-y-4">
+            <Card>
+              <CardHeader>
+                <CardTitle>Armor of God: Spiritual Weapons</CardTitle>
+                <CardDescription>
+                  "Put on the whole armor of God, that you may be able to stand against the schemes of the devil." - Ephesians 6:11
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="grid gap-4 md:grid-cols-2">
+                  {SPIRITUAL_WEAPONS.map((weapon) => (
+                    <Card key={weapon.name} className="border-2">
+                      <CardHeader>
+                        <div className="flex items-center gap-2">
+                          <div className={`w-4 h-4 rounded-full ${weapon.color}`} />
+                          <CardTitle className="text-lg">{weapon.name}</CardTitle>
+                        </div>
+                        <CardDescription className="space-y-1">
+                          <p className="font-semibold text-sm">{weapon.description}</p>
+                          <p className="text-xs italic text-primary">{weapon.verse}</p>
+                        </CardDescription>
+                      </CardHeader>
+                    </Card>
+                  ))}
+                </div>
               </CardContent>
             </Card>
           </TabsContent>
