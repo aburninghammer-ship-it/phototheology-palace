@@ -227,15 +227,25 @@ Your role is to make insightful biblical commentary that builds connections betw
 Be scholarly yet warm, like an excited friend sharing discoveries.`;
 
       if (isFirstMove) {
-        userPrompt = `Start a Chain Chess game on ${verse}.
+        userPrompt = `Welcome to Chain Chess! Let me explain how this game works:
 
-1. Share an insightful 3-4 sentence commentary on this verse
-2. End by challenging the player to respond using ONE of these categories:
-   - Books of the Bible
-   - Rooms of the Palace
-   - Principles of the Palace
+**HOW TO PLAY:**
+Chain Chess is a collaborative Bible study game where we build commentary together on a verse. Each turn, one player adds insightful commentary, then challenges the other to respond using a specific category:
+- **Books of the Bible**: Connect to other scripture passages
+- **Rooms of the Palace**: Relate to Phototheology Palace principles (Altar, Laver, Lampstand, Table, etc.)
+- **Principles of the Palace**: Apply specific lenses (2D/3D, Time Zones, Horizons, etc.)
 
-Make it engaging and set a high bar for the conversation!`;
+The goal is to build increasingly rich understanding while maintaining scholarly accuracy. You'll be scored on insight, relevance, and connections made!
+
+**EXAMPLE:**
+For John 3:16, I might say: "This verse reveals God's cosmic love extending beyond ethnic Israel. The word 'world' (kosmos) shows the universal scope of salvation—this is clearly a 3D Kingdom truth. The act of 'giving' the Son points us to the Altar principle, where sacrifice demonstrates divine love. Notice the present tense 'believes'—this is Earth-Now timeline, calling for immediate response."
+
+Then I'd challenge: "Your turn! Respond using: Books of the Bible"
+
+**NOW LET'S BEGIN!**
+Our verse is ${verse}
+
+Share an insightful 3-4 sentence commentary on this verse, then challenge the player to respond using ONE of the three categories. Make it engaging and scholarly!`;
       } else {
         const lastMove = previousMoves[previousMoves.length - 1];
         userPrompt = `Continue the Chain Chess game on ${verse}.

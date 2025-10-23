@@ -105,14 +105,30 @@ const ChainChess = () => {
       const parts = verseRef.match(/^(\d?\s?\w+)\s(\d+):(\d+)$/);
       if (parts) {
         const [, book, chapter, verse] = parts;
+        // Format the book name properly (replace spaces with underscores for API)
+        const formattedBook = book.trim().replace(/\s+/g, '%20');
         const response = await fetch(
-          `https://bible-api.com/${book}${chapter}:${verse}?translation=kjv`
+          `https://bible-api.com/${formattedBook}%20${chapter}:${verse}?translation=kjv`
         );
+        
+        if (!response.ok) {
+          throw new Error(`API returned ${response.status}`);
+        }
+        
         const data = await response.json();
-        setVerseText(data.text || "");
+        
+        if (data.text) {
+          setVerseText(data.text.trim());
+        } else if (data.verses && data.verses[0]) {
+          setVerseText(data.verses[0].text.trim());
+        } else {
+          setVerseText("For God so loved the world, that he gave his only begotten Son, that whosoever believeth in him should not perish, but have everlasting life.");
+        }
       }
     } catch (error) {
       console.error("Error fetching verse text:", error);
+      // Fallback text for John 3:16
+      setVerseText("For God so loved the world, that he gave his only begotten Son, that whosoever believeth in him should not perish, but have everlasting life.");
     }
   };
 
