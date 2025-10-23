@@ -25,37 +25,46 @@ const DailyChallenges = () => {
 
   const fetchDailyChallenge = async () => {
     console.log("=== Fetching Daily Challenge ===");
-    // Get current date in user's timezone, but set to start of day
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    console.log("Today (start of day):", today.toISOString());
     
-    const tomorrow = new Date(today);
-    tomorrow.setDate(tomorrow.getDate() + 1);
-    console.log("Tomorrow:", tomorrow.toISOString());
+    // Get current date/time
+    const now = new Date();
+    console.log("Current time:", now.toISOString());
 
-    const { data, error } = await supabase
+    // Query for active challenges - get today's challenge or the most recent active one
+    const { data: challenges, error } = await supabase
       .from("challenges")
       .select("*")
       .eq("challenge_type", "daily")
-      .gte("starts_at", today.toISOString())
-      .lt("starts_at", tomorrow.toISOString())
-      .maybeSingle();
+      .order("starts_at", { ascending: false });
 
-    console.log("Challenge query result:", { data, error });
+    console.log("All daily challenges:", challenges);
 
     if (error) {
-      console.error("Error fetching challenge:", error);
+      console.error("Error fetching challenges:", error);
+      return;
     }
 
-    setDailyChallenge(data);
+    if (!challenges || challenges.length === 0) {
+      console.log("No daily challenges found in database");
+      setDailyChallenge(null);
+      return;
+    }
+
+    // Find today's challenge - the most recent one that has started
+    const todayChallenge = challenges.find(c => {
+      const startDate = new Date(c.starts_at);
+      return startDate <= now;
+    });
+
+    console.log("Selected challenge:", todayChallenge);
+    setDailyChallenge(todayChallenge || null);
     
     // Check submission after we have the challenge data
-    if (data) {
+    if (todayChallenge) {
       const { data: submission } = await supabase
         .from("challenge_submissions")
         .select("*")
-        .eq("challenge_id", data.id)
+        .eq("challenge_id", todayChallenge.id)
         .eq("user_id", user!.id)
         .maybeSingle();
 
