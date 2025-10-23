@@ -55,14 +55,29 @@ export const Navigation = () => {
             >
               <Link to="/palace">The Palace</Link>
             </Button>
-            <Button
-              variant={isBiblePage ? "default" : "ghost"}
-              asChild
-              size="sm"
-              className={isBiblePage ? "gradient-ocean shadow-blue" : "hover:bg-muted"}
-            >
-              <Link to="/bible/John/3">Phototheology Digital Bible</Link>
-            </Button>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button 
+                  variant={isBiblePage ? "default" : "ghost"}
+                  size="sm"
+                  className={isBiblePage ? "gradient-ocean shadow-blue" : "hover:bg-muted"}
+                >
+                  Bible Tools
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent>
+                <DropdownMenuItem asChild>
+                  <Link to="/bible/John/3">📖 Digital Bible</Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link to="/phototheologygpt">🤖 PhototheologyGPT</Link>
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem asChild>
+                  <Link to="/bible-images">🎨 Image Library</Link>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
             <Button
               variant={location.pathname === "/power-of-the-lamb" ? "default" : "ghost"}
               asChild
