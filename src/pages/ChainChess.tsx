@@ -15,8 +15,10 @@ import { WebRTCCall } from "@/components/WebRTCCall";
 
 interface Move {
   player: string;
+  verse?: string; // User's verse response
   commentary: string;
   category?: string;
+  challengeCategory?: string; // Challenge for next player
   jeeves_feedback?: string;
   score?: number;
   timestamp: string;
@@ -41,6 +43,8 @@ const ChainChess = () => {
   const [opponentScore, setOpponentScore] = useState(0);
   const [gameStarted, setGameStarted] = useState(false);
   const [selectedGameCategories, setSelectedGameCategories] = useState<string[]>([]);
+  const [difficultyLevel, setDifficultyLevel] = useState<"kids" | "adults">("adults");
+  const [userVerse, setUserVerse] = useState("");
 
   const categories = ["Books of the Bible", "Rooms of the Palace", "Principles of the Palace"];
   const isVsJeeves = mode === "jeeves";
@@ -106,7 +110,8 @@ const ChainChess = () => {
           status: "in_progress",
           game_state: { 
             categories: selectedGameCategories,
-            verse: randomVerse
+            verse: randomVerse,
+            difficulty: difficultyLevel
           },
         })
         .select()
@@ -229,8 +234,10 @@ const ChainChess = () => {
         const moveData = move.move_data as any;
         return {
           player: moveData.player,
+          verse: moveData.verse,
           commentary: moveData.commentary,
           category: moveData.category,
+          challengeCategory: moveData.challengeCategory,
           jeeves_feedback: moveData.jeeves_feedback,
           score: moveData.score,
           timestamp: move.created_at,
@@ -269,6 +276,7 @@ const ChainChess = () => {
           isFirstMove: isFirst,
           previousMoves: moves,
           availableCategories: selectedGameCategories,
+          difficulty: game?.game_state?.difficulty || difficultyLevel,
         },
       });
 
@@ -309,8 +317,9 @@ const ChainChess = () => {
       console.log("=== Creating Jeeves Move ===");
       const move = {
         player: "jeeves",
+        verse: data.verse || currentVerse,
         commentary: data.commentary,
-        category: data.challengeCategory || "General",
+        challengeCategory: data.challengeCategory || "Books of the Bible",
         score: data.score || 8,
         timestamp: new Date().toISOString(),
       };
@@ -355,10 +364,10 @@ const ChainChess = () => {
   };
 
   const submitMove = async () => {
-    if (!commentary.trim() || !selectedCategory) {
+    if (!commentary.trim() || !selectedCategory || !userVerse.trim()) {
       toast({
         title: "Missing information",
-        description: "Please provide commentary and select a category",
+        description: "Please provide your verse, commentary, and challenge category",
         variant: "destructive",
       });
       return;
@@ -371,9 +380,12 @@ const ChainChess = () => {
         body: {
           mode: "chain-chess-feedback",
           verse: currentVerse,
+          userVerse: userVerse,
           userCommentary: commentary,
-          category: selectedCategory,
+          challengeCategory: challengeCategory,
+          newChallengeCategory: selectedCategory,
           previousMoves: moves,
+          difficulty: game?.game_state?.difficulty || difficultyLevel,
         },
       });
 
@@ -381,8 +393,9 @@ const ChainChess = () => {
 
       const move = {
         player: "user",
+        verse: userVerse,
         commentary: commentary,
-        category: selectedCategory,
+        challengeCategory: selectedCategory,
         jeeves_feedback: feedback.feedback,
         score: feedback.score,
         timestamp: new Date().toISOString(),
@@ -395,6 +408,7 @@ const ChainChess = () => {
       });
 
       setCommentary("");
+      setUserVerse("");
       setSelectedCategory("");
       setIsMyTurn(false);
 
@@ -538,14 +552,37 @@ const ChainChess = () => {
           {!gameStarted && (
             <Card className="max-w-2xl mx-auto">
               <CardHeader>
-                <CardTitle className="text-2xl">Choose Game Categories</CardTitle>
+                <CardTitle className="text-2xl">Setup Chain Chess</CardTitle>
                 <CardDescription>
-                  Select which categories Jeeves can use to challenge you during the game.
-                  You can select one, two, or all three categories.
+                  Configure your game settings before starting
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
                 <div className="space-y-3">
+                  <label className="text-sm font-medium">Difficulty Level</label>
+                  <div className="flex gap-3">
+                    <Button
+                      variant={difficultyLevel === "kids" ? "default" : "outline"}
+                      onClick={() => setDifficultyLevel("kids")}
+                      className="flex-1"
+                    >
+                      Kids
+                    </Button>
+                    <Button
+                      variant={difficultyLevel === "adults" ? "default" : "outline"}
+                      onClick={() => setDifficultyLevel("adults")}
+                      className="flex-1"
+                    >
+                      Adults
+                    </Button>
+                  </div>
+                </div>
+
+                <div className="space-y-3">
+                  <label className="text-sm font-medium">Game Categories</label>
+                  <CardDescription className="text-sm">
+                    Select which categories Jeeves can use to challenge you
+                  </CardDescription>
                   {categories.map((cat) => (
                     <Button
                       key={cat}
@@ -570,7 +607,7 @@ const ChainChess = () => {
                   size="lg"
                   disabled={selectedGameCategories.length === 0}
                 >
-                  Start Game with {selectedGameCategories.length} {selectedGameCategories.length === 1 ? "Category" : "Categories"}
+                  Start Game ({difficultyLevel === "kids" ? "Kids" : "Adults"} Level)
                 </Button>
               </CardContent>
             </Card>
@@ -625,13 +662,19 @@ const ChainChess = () => {
                           )}
                         </div>
                         
-                        {move.category && (
-                          <p className="text-sm text-muted-foreground mb-2">
-                            Category: {move.category}
+                        {move.verse && move.player === "user" && (
+                          <p className="text-sm font-semibold text-primary mb-2">
+                            Verse: {move.verse}
                           </p>
                         )}
                         
                         <p className="mb-2">{move.commentary}</p>
+                        
+                        {move.challengeCategory && (
+                          <p className="text-sm text-muted-foreground mt-2 italic">
+                            Challenge: {move.challengeCategory}
+                          </p>
+                        )}
                         
                         {move.jeeves_feedback && (
                           <div className="mt-3 p-3 bg-white dark:bg-gray-800 rounded border-l-4 border-purple-500">
@@ -660,7 +703,7 @@ const ChainChess = () => {
                 <CardTitle>Your Turn</CardTitle>
                 {challengeCategory && (
                   <CardDescription className="text-lg">
-                    Respond using: <Badge>{challengeCategory}</Badge>
+                    Build on Jeeves' thought using: <Badge>{challengeCategory}</Badge>
                   </CardDescription>
                 )}
               </CardHeader>
@@ -668,12 +711,26 @@ const ChainChess = () => {
                 {isMyTurn && !processing ? (
                   <>
                     <div className="space-y-2">
+                      <label className="text-sm font-medium">Your Verse</label>
+                      <input
+                        type="text"
+                        placeholder="Add a verse from the challenged category (e.g., Romans 8:28)"
+                        value={userVerse}
+                        onChange={(e) => setUserVerse(e.target.value)}
+                        className="w-full px-3 py-2 border rounded-md bg-background"
+                      />
+                      <p className="text-xs text-muted-foreground">
+                        Choose a verse that relates to the challenge: {challengeCategory}
+                      </p>
+                    </div>
+
+                    <div className="space-y-2">
                       <label className="text-sm font-medium">Your Commentary</label>
                       <Textarea
-                        placeholder="Build on the previous commentary using the challenge category... (emojis supported 😊)"
+                        placeholder="Build on Jeeves' thought and connect your verse... (emojis supported 😊)"
                         value={commentary}
                         onChange={(e) => setCommentary(e.target.value)}
-                        rows={8}
+                        rows={6}
                       />
                       <div className="flex justify-end">
                         <EmojiPicker 
@@ -684,7 +741,7 @@ const ChainChess = () => {
 
                      <div className="space-y-2">
                       <label className="text-sm font-medium">
-                        Choose a category for Jeeves' next response:
+                        Challenge Jeeves with:
                       </label>
                       <div className="flex flex-wrap gap-2">
                         {selectedGameCategories.map((cat) => (
@@ -699,7 +756,7 @@ const ChainChess = () => {
                       </div>
                     </div>
 
-                    <Button onClick={submitMove} className="w-full" disabled={!commentary.trim() || !selectedCategory}>
+                    <Button onClick={submitMove} className="w-full" disabled={!commentary.trim() || !selectedCategory || !userVerse.trim()}>
                       Submit Response
                     </Button>
 
