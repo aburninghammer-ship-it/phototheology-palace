@@ -9,6 +9,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
 import { MessageSquare, Plus, Heart } from "lucide-react";
+import { EmojiPicker } from "@/components/EmojiPicker";
 
 const Community = () => {
   const { user, loading } = useAuth();
@@ -112,12 +113,19 @@ const Community = () => {
                   value={newTitle}
                   onChange={(e) => setNewTitle(e.target.value)}
                 />
-                <Textarea
-                  placeholder="Share your thoughts..."
-                  value={newContent}
-                  onChange={(e) => setNewContent(e.target.value)}
-                  rows={4}
-                />
+                <div className="space-y-2">
+                  <Textarea
+                    placeholder="Share your thoughts... (emojis supported 😊)"
+                    value={newContent}
+                    onChange={(e) => setNewContent(e.target.value)}
+                    rows={4}
+                  />
+                  <div className="flex justify-end">
+                    <EmojiPicker 
+                      onEmojiSelect={(emoji) => setNewContent(newContent + emoji)}
+                    />
+                  </div>
+                </div>
                 <div className="flex gap-2">
                   <Button onClick={createPost}>Post</Button>
                   <Button variant="outline" onClick={() => setShowNewPost(false)}>

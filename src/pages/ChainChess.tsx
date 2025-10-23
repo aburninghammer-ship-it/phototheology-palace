@@ -10,6 +10,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
 import { Trophy, MessageSquare, Sparkles, Target } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { EmojiPicker } from "@/components/EmojiPicker";
 
 interface Move {
   player: string;
@@ -399,11 +400,16 @@ const ChainChess = () => {
                     <div className="space-y-2">
                       <label className="text-sm font-medium">Your Commentary</label>
                       <Textarea
-                        placeholder="Build on the previous commentary using the challenge category..."
+                        placeholder="Build on the previous commentary using the challenge category... (emojis supported 😊)"
                         value={commentary}
                         onChange={(e) => setCommentary(e.target.value)}
                         rows={8}
                       />
+                      <div className="flex justify-end">
+                        <EmojiPicker 
+                          onEmojiSelect={(emoji) => setCommentary(commentary + emoji)}
+                        />
+                      </div>
                     </div>
 
                     <div className="space-y-2">
