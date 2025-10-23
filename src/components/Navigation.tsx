@@ -1,5 +1,5 @@
 import { Link, useLocation } from "react-router-dom";
-import { Building2, Sparkles, Users, LogOut } from "lucide-react";
+import { Building2, Sparkles, Users, LogOut, BookOpen } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
 import { useActiveUsers } from "@/hooks/useActiveUsers";
@@ -8,6 +8,7 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
+  DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
 
 export const Navigation = () => {
@@ -78,6 +79,36 @@ export const Navigation = () => {
             >
               <Link to="/spiritual-training">⚔️ Spiritual Training</Link>
             </Button>
+
+            <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" size="sm">
+                      <BookOpen className="mr-2 h-4 w-4" />
+                      Courses
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent>
+                    <DropdownMenuItem asChild>
+                      <Link to="/blueprint-course">Blueprint Course</Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild>
+                      <Link to="/daniel-course">Daniel Course</Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild>
+                      <Link to="/phototheology-course">Phototheology Course</Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild>
+                      <Link to="/revelation-course">Revelation Course</Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem asChild>
+                      <Link to="/revelation-course/kids">📚 Revelation for Kids</Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild>
+                      <Link to="/kidgpt">🤖 KidGPT</Link>
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
 
             <DropdownMenu>
                   <DropdownMenuTrigger asChild>

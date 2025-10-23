@@ -29,6 +29,9 @@ import SpiritualTraining from "./pages/SpiritualTraining";
 import BlueprintCourse from "./pages/BlueprintCourse";
 import PhototheologyCourse from "./pages/PhototheologyCourse";
 import DanielCourse from "./pages/DanielCourse";
+import RevelationCourse from "./pages/RevelationCourse";
+import RevelationCourseKids from "./pages/RevelationCourseKids";
+import KidGPT from "./pages/KidGPT";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -66,6 +69,9 @@ function App() {
           <Route path="/blueprint-course" element={<BlueprintCourse />} />
           <Route path="/phototheology-course" element={<PhototheologyCourse />} />
           <Route path="/daniel-course" element={<DanielCourse />} />
+          <Route path="/revelation-course" element={<RevelationCourse />} />
+          <Route path="/revelation-course/kids" element={<RevelationCourseKids />} />
+          <Route path="/kidgpt" element={<KidGPT />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>

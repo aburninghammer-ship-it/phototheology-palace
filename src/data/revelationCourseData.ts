@@ -680,6 +680,29 @@ export const kidsRevelationLessons: KidsLesson[] = [
     story: "Jesus told the church in Philadelphia that He opened a door for them to do great things. He gives us chances to grow and help others.",
     question: "What new things is Jesus asking you to try?",
     activity: "Draw a big open door and write what you want to do for Jesus."
+  },
+  {
+    id: 8,
+    title: "God's Amazing Throne Room",
+    bibleVerse: "Revelation 4:11 - 'You created everything, God!'",
+    story: "John saw God's throne room in heaven! It was full of beautiful colors like a rainbow. Angels sang praises to God day and night.",
+    question: "What things did God create that make you want to praise Him?",
+    activity: "Draw or color a rainbow and write 'God Made Everything!'"
+  },
+  {
+    id: 9,
+    title: "The Lamb Who Saves Us",
+    bibleVerse: "Revelation 5:9 - 'You are worthy, Jesus!'",
+    story: "John saw Jesus as a Lamb who was sacrificed to save us. Everyone in heaven sang to Him because He rescued us from sin!",
+    question: "Why is Jesus special to you?",
+    activity: "Draw a lamb and write 'Jesus Saves Me!'"
+  },
+  {
+    id: 10,
+    title: "Jesus Wins Every Battle!",
+    bibleVerse: "Revelation 19:16 - 'King of Kings!'",
+    story: "Jesus rides on a white horse and wins every battle against evil. He is the King who defeats all bad things!",
+    question: "How does it feel knowing Jesus always wins?",
+    activity: "Draw Jesus on a white horse wearing a crown!"
   }
-  // Additional kids lessons can be added similarly
 ];
