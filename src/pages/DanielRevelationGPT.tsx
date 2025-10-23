@@ -32,7 +32,7 @@ const DanielRevelationGPT = () => {
             <CardContent className="p-0">
               <SandboxedEmbed
                 scriptUrl="https://phototheologygpt.com/api/embed/bundle.js"
-                embedId="deployment-f6c8b84b-543b-4920-8ed5-3c8a817956c1"
+                embedId="deployment-f476232e-cd16-4b73-b412-d9492c0f5fb7"
                 minHeight="600px"
                 title="Daniel & Revelation GPT Chat Interface"
               />
