@@ -39,14 +39,14 @@ const ChainChess = () => {
   const [processing, setProcessing] = useState(false);
   const [userScore, setUserScore] = useState(0);
   const [opponentScore, setOpponentScore] = useState(0);
+  const [gameStarted, setGameStarted] = useState(false);
+  const [selectedGameCategories, setSelectedGameCategories] = useState<string[]>([]);
 
   const categories = ["Books of the Bible", "Rooms of the Palace", "Principles of the Palace"];
   const isVsJeeves = mode === "jeeves";
 
   useEffect(() => {
-    if (user && (!gameId || gameId === "new")) {
-      initializeGame();
-    } else if (gameId && gameId !== "new") {
+    if (user && gameId && gameId !== "new") {
       loadGame();
     }
   }, [user, gameId]);
@@ -66,7 +66,16 @@ const ChainChess = () => {
     }
   }, [gameId]);
 
-  const initializeGame = async () => {
+  const startGameWithCategories = async () => {
+    if (selectedGameCategories.length === 0) {
+      toast({
+        title: "Select Categories",
+        description: "Please select at least one category to play with",
+        variant: "destructive",
+      });
+      return;
+    }
+
     try {
       // Create new game
       const { data: newGame, error } = await supabase
@@ -75,9 +84,12 @@ const ChainChess = () => {
           game_type: "chain_chess",
           player1_id: user!.id,
           player2_id: isVsJeeves ? null : null,
-          current_turn: user!.id,
+          current_turn: null, // Jeeves will go first
           status: "in_progress",
-          game_state: { categories: 3, verse: "John 3:16" },
+          game_state: { 
+            categories: selectedGameCategories,
+            verse: "John 3:16" 
+          },
         })
         .select()
         .single();
@@ -87,6 +99,7 @@ const ChainChess = () => {
       setGame(newGame);
       await fetchVerseText("John 3:16");
       navigate(`/games/chain-chess/${newGame.id}${isVsJeeves ? "/jeeves" : ""}`);
+      setGameStarted(true);
 
       // Jeeves makes first move
       await jeevesMove(newGame.id, true);
@@ -97,6 +110,14 @@ const ChainChess = () => {
         variant: "destructive",
       });
     }
+  };
+
+  const toggleGameCategory = (category: string) => {
+    setSelectedGameCategories(prev => 
+      prev.includes(category) 
+        ? prev.filter(c => c !== category)
+        : [...prev, category]
+    );
   };
 
   const fetchVerseText = async (verseRef: string) => {
@@ -146,6 +167,8 @@ const ChainChess = () => {
       setCurrentVerse(verse);
       await fetchVerseText(verse);
       setIsMyTurn(data.current_turn === user!.id);
+      setSelectedGameCategories(gameState?.categories || categories);
+      setGameStarted(true);
       loadMoves();
     }
   };
@@ -188,7 +211,7 @@ const ChainChess = () => {
           verse: currentVerse,
           isFirstMove: isFirst,
           previousMoves: moves,
-          categories: 3,
+          availableCategories: selectedGameCategories,
         },
       });
 
@@ -210,6 +233,15 @@ const ChainChess = () => {
 
       setChallengeCategory(data.challengeCategory);
       setIsMyTurn(true);
+
+      // Update game state
+      await supabase
+        .from("games")
+        .update({
+          current_turn: user!.id,
+          updated_at: new Date().toISOString(),
+        })
+        .eq("id", currentGameId);
     } catch (error: any) {
       toast({
         title: "Error",
@@ -380,25 +412,71 @@ const ChainChess = () => {
               <Trophy className="h-8 w-8 text-yellow-500" />
               Chain Chess
             </h1>
-            <div className="flex gap-2 items-center">
-              <Badge variant="secondary" className="text-lg">
-                <Target className="mr-2 h-4 w-4" />
-                You: {userScore}
-              </Badge>
-              <Badge variant="secondary" className="text-lg">
-                <Sparkles className="mr-2 h-4 w-4" />
-                {isVsJeeves ? "Jeeves" : "Opponent"}: {opponentScore}
-              </Badge>
-              <Button variant="outline" size="sm" onClick={shareInviteLink}>
-                <Share2 className="h-4 w-4 mr-2" />
-                Share
-              </Button>
-              <Button variant="outline" size="sm" onClick={copyInviteLink}>
-                <Copy className="h-4 w-4 mr-2" />
-                Copy Link
-              </Button>
-            </div>
+            {gameStarted && (
+              <div className="flex gap-2 items-center">
+                <Badge variant="secondary" className="text-lg">
+                  <Target className="mr-2 h-4 w-4" />
+                  You: {userScore}
+                </Badge>
+                <Badge variant="secondary" className="text-lg">
+                  <Sparkles className="mr-2 h-4 w-4" />
+                  {isVsJeeves ? "Jeeves" : "Opponent"}: {opponentScore}
+                </Badge>
+                <Button variant="outline" size="sm" onClick={shareInviteLink}>
+                  <Share2 className="h-4 w-4 mr-2" />
+                  Share
+                </Button>
+                <Button variant="outline" size="sm" onClick={copyInviteLink}>
+                  <Copy className="h-4 w-4 mr-2" />
+                  Copy Link
+                </Button>
+              </div>
+            )}
           </div>
+
+          {!gameStarted && (
+            <Card className="max-w-2xl mx-auto">
+              <CardHeader>
+                <CardTitle className="text-2xl">Choose Game Categories</CardTitle>
+                <CardDescription>
+                  Select which categories Jeeves can use to challenge you during the game.
+                  You can select one, two, or all three categories.
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <div className="space-y-3">
+                  {categories.map((cat) => (
+                    <Button
+                      key={cat}
+                      variant={selectedGameCategories.includes(cat) ? "default" : "outline"}
+                      onClick={() => toggleGameCategory(cat)}
+                      className="w-full h-auto py-4 text-left justify-start"
+                    >
+                      <div>
+                        <div className="font-semibold">{cat}</div>
+                        <div className="text-sm opacity-80">
+                          {cat === "Books of the Bible" && "Connect to other scripture passages"}
+                          {cat === "Rooms of the Palace" && "Relate to Phototheology Palace principles"}
+                          {cat === "Principles of the Palace" && "Apply specific lenses (2D/3D, Time Zones, etc.)"}
+                        </div>
+                      </div>
+                    </Button>
+                  ))}
+                </div>
+                <Button 
+                  onClick={startGameWithCategories}
+                  className="w-full"
+                  size="lg"
+                  disabled={selectedGameCategories.length === 0}
+                >
+                  Start Game with {selectedGameCategories.length} {selectedGameCategories.length === 1 ? "Category" : "Categories"}
+                </Button>
+              </CardContent>
+            </Card>
+          )}
+
+          {gameStarted && (
+            <>
 
           <Card>
             <CardHeader>
@@ -503,12 +581,12 @@ const ChainChess = () => {
                       </div>
                     </div>
 
-                    <div className="space-y-2">
+                     <div className="space-y-2">
                       <label className="text-sm font-medium">
                         Choose a category for Jeeves' next response:
                       </label>
                       <div className="flex flex-wrap gap-2">
-                        {categories.map((cat) => (
+                        {selectedGameCategories.map((cat) => (
                           <Button
                             key={cat}
                             variant={selectedCategory === cat ? "default" : "outline"}
@@ -549,6 +627,8 @@ const ChainChess = () => {
               </CardContent>
             </Card>
           </div>
+          </>
+          )}
         </div>
       </main>
     </div>

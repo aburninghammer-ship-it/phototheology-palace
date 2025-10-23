@@ -335,44 +335,48 @@ Chart context: ${chartData || "General Bible study visualization"}
 Make it educational and insightful.`;
 
     } else if (mode === "chain-chess") {
+      const { availableCategories } = await req.json();
+      
       systemPrompt = `You are Jeeves, an enthusiastic Bible study companion playing Chain Chess!
 Your role is to make insightful biblical commentary that builds connections between verses and principles.
-Be scholarly yet warm, like an excited friend sharing discoveries.`;
+Be scholarly yet warm, like an excited friend sharing discoveries.
+YOU MUST respond in JSON format with: { "commentary": "your 3-4 sentence insight", "challengeCategory": "category name" }`;
 
       if (isFirstMove) {
-        userPrompt = `Welcome to Chain Chess! Let me explain how this game works:
+        const categoriesText = availableCategories.join(", ");
+        userPrompt = `You're starting a Chain Chess game! You go FIRST. The verse is ${verse}.
 
-**HOW TO PLAY:**
-Chain Chess is a collaborative Bible study game where we build commentary together on a verse. Each turn, one player adds insightful commentary, then challenges the other to respond using a specific category:
-- **Books of the Bible**: Connect to other scripture passages
-- **Rooms of the Palace**: Relate to Phototheology Palace principles (Altar, Laver, Lampstand, Table, etc.)
-- **Principles of the Palace**: Apply specific lenses (2D/3D, Time Zones, Horizons, etc.)
+Available categories for this game: ${categoriesText}
 
-The goal is to build increasingly rich understanding while maintaining scholarly accuracy. You'll be scored on insight, relevance, and connections made!
+**YOUR TASK:**
+1. Provide 3-4 sentences of insightful commentary on ${verse}
+   - Use one of the available categories in your commentary
+   - Be specific and scholarly
+   - Show excitement about the verse's meaning
+   
+2. Challenge the player to respond using ONE of the available categories
 
-**EXAMPLE:**
-For John 3:16, I might say: "This verse reveals God's cosmic love extending beyond ethnic Israel. The word 'world' (kosmos) shows the universal scope of salvation—this is clearly a 3D Kingdom truth. The act of 'giving' the Son points us to the Altar principle, where sacrifice demonstrates divine love. Notice the present tense 'believes'—this is Earth-Now timeline, calling for immediate response."
+**EXAMPLE FORMAT:**
+If analyzing John 3:16 with "Rooms of the Palace" available:
+{
+  "commentary": "This verse reveals God's cosmic love extending beyond ethnic Israel! The word 'world' (kosmos) shows universal scope—this is clearly 3D Kingdom truth. The act of 'giving' the Son points us directly to the Altar principle, where sacrifice demonstrates divine love. Notice the present tense 'believes'—calling for immediate Earth-Now response!",
+  "challengeCategory": "Books of the Bible"
+}
 
-Then I'd challenge: "Your turn! Respond using: Books of the Bible"
-
-**NOW LET'S BEGIN!**
-Our verse is ${verse}
-
-Share an insightful 3-4 sentence commentary on this verse, then challenge the player to respond using ONE of the three categories. Make it engaging and scholarly!`;
+NOW: Analyze ${verse} using the available categories. Return ONLY valid JSON.`;
       } else {
         const lastMove = previousMoves[previousMoves.length - 1];
-        userPrompt = `Continue the Chain Chess game on ${verse}.
+        const categoriesText = availableCategories.join(", ");
+        userPrompt = `Continue Chain Chess on ${verse}.
 
 Previous commentary: "${lastMove.commentary}"
+Available categories: ${categoriesText}
 
-1. Build on what was said by adding 3-4 sentences of fresh insight
-2. Show excitement about the connection
-3. Challenge them to respond using ONE of these categories:
-   - Books of the Bible
-   - Rooms of the Palace  
-   - Principles of the Palace
+1. Build on what was said with 3-4 fresh sentences of insight
+2. Show excitement about the connection you're making
+3. Challenge them with ONE of the available categories
 
-Be enthusiastic and encouraging!`;
+Return JSON: { "commentary": "...", "challengeCategory": "..." }`;
       }
 
     } else if (mode === "chain-chess-feedback") {
@@ -776,16 +780,29 @@ Make questions clear, answers comprehensive, and include verse references when r
     
     // For chain-chess and chain-chess-feedback modes, parse the response
     if (mode === "chain-chess") {
-      const lines = content.split('\n');
-      const commentary = lines.slice(0, -2).join('\n').trim();
-      const challengeCategory = ["Books of the Bible", "Rooms of the Palace", "Principles of the Palace"][
-        Math.floor(Math.random() * 3)
-      ];
-      
-      return new Response(
-        JSON.stringify({ commentary, challengeCategory, score: 8 }),
-        { headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
+      try {
+        const parsed = JSON.parse(content);
+        return new Response(
+          JSON.stringify({ 
+            commentary: parsed.commentary || content,
+            challengeCategory: parsed.challengeCategory || "Books of the Bible",
+            score: 8 
+          }),
+          { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      } catch {
+        // Fallback if not JSON
+        const lines = content.split('\n');
+        const commentary = lines.slice(0, -2).join('\n').trim();
+        const challengeCategory = ["Books of the Bible", "Rooms of the Palace", "Principles of the Palace"][
+          Math.floor(Math.random() * 3)
+        ];
+        
+        return new Response(
+          JSON.stringify({ commentary, challengeCategory, score: 8 }),
+          { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
     } else if (mode === "chain-chess-feedback") {
       try {
         const parsed = JSON.parse(content);
