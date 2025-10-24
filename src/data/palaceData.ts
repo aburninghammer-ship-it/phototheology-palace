@@ -44,15 +44,15 @@ export const palaceFloors: Floor[] = [
         id: "ir",
         name: "Imagination Room",
         tag: "IR",
-        purpose: "The Imagination Room invites you to step into the biblical narrative with all five senses, transforming intellectual knowledge into lived experience. Through 2-5 minute immersive exercises, you'll feel the wet sand beneath your feet at the Red Sea, smell the night air in Gethsemane, and sense the weight on your chest as Jesus prayed. This sanctified empathy burns stories into your emotional memory far deeper than mere facts ever could. When you preach or teach these passages later, you won't just recite events—you'll transport your listeners into the story because you've been there yourself.",
+        purpose: "The Imagination Room is where you learn to experience Scripture with your whole being, not just your intellect. God gave you an imagination as a sacred gift for encountering His Word—use it to step inside the biblical narrative with all five senses fully engaged. Feel the texture of the dusty road under Jesus' feet. Hear the crack of the whip against His back. Smell the myrrh and aloes at His burial. Taste the salt of Peter's tears. See the crimson spreading across Pilate's basin. This isn't escapism or emotionalism—it's the difference between knowing about the Red Sea crossing and feeling the cold spray on your face as walls of water tower above you. When imagination sanctifies your study, Scripture stops being a history book and becomes a living encounter. The stories burn into your emotional memory with such intensity that years later, you won't just teach the facts—you'll transport others into the experience because you've truly been there. This room trains you to ask: What does this passage feel like in my body, in my senses, in my gut? Because truth that touches only the mind will never transform the heart, but truth experienced with sanctified imagination becomes unforgettable and life-changing.",
         coreQuestion: "What does it feel like to stand there?",
-        method: "2–5 minute immersive 'step-in': engage all five senses (sights, sounds, touch, smell, taste); then write 1 sentence of personal resonance.",
+        method: "Use your imagination to step fully into the biblical scene. Engage all five senses: What do you see, hear, touch, smell, and taste? Let the passage become a lived experience, not just information. Then capture in one sentence how this sensory encounter resonates with your own story.",
         examples: [
-          "Red Sea: feet in wet sand, wind in face",
-          "Gethsemane: weight on chest, night air"
+          "Red Sea crossing: Feel your feet in wet sand, wind whipping your face, the roar of water held back by invisible hands, salt spray on your lips, the smell of fear and faith mingled in the crowd",
+          "Gethsemane: Sense the crushing weight on your chest as you pray, the cool night air, the taste of copper fear in your mouth, the rough bark of the olive tree against your back, the distant sound of soldiers' footsteps"
         ],
-        pitfalls: ["Speculation beyond text", "Melodrama"],
-        deliverable: "Short paragraph + one feeling word"
+        pitfalls: ["Speculation beyond text", "Melodrama", "Adding details Scripture doesn't give", "Making it about your creativity instead of the text's reality"],
+        deliverable: "Short paragraph describing your sensory experience + one sentence of personal resonance"
       },
       {
         id: "24fps",
