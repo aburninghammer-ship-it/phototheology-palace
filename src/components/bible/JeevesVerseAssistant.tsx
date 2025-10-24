@@ -9,6 +9,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Bot, Sparkles, Send, Loader2, X } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { palaceFloors } from "@/data/palaceData";
+import { JeevesResponseValidator } from "./JeevesResponseValidator";
 
 interface JeevesVerseAssistantProps {
   book: string;
@@ -280,21 +281,31 @@ export const JeevesVerseAssistant = ({ book, chapter, verse, verseText, onClose 
 
         {/* Response Display */}
         {response && (
-          <ScrollArea className="h-[300px]">
-            <div className="p-4 bg-gradient-to-br from-primary/5 to-secondary/5 rounded-xl border-2 border-primary/30 animate-fade-in space-y-3">
-              <div className="flex items-center gap-2 mb-3">
-                <Bot className="h-5 w-5 text-primary" />
-                <span className="font-semibold text-foreground">Jeeves responds:</span>
+          <>
+            <JeevesResponseValidator 
+              response={response}
+              onValidated={(isValid) => {
+                if (!isValid) {
+                  console.warn("Jeeves hallucinated content:", response);
+                }
+              }}
+            />
+            <ScrollArea className="h-[300px]">
+              <div className="p-4 bg-gradient-to-br from-primary/5 to-secondary/5 rounded-xl border-2 border-primary/30 animate-fade-in space-y-3">
+                <div className="flex items-center gap-2 mb-3">
+                  <Bot className="h-5 w-5 text-primary" />
+                  <span className="font-semibold text-foreground">Jeeves responds:</span>
+                </div>
+                <div className="prose prose-sm max-w-none text-foreground">
+                  {response.split('\n\n').map((paragraph, idx) => (
+                    <p key={idx} className="mb-3 leading-relaxed">
+                      {paragraph}
+                    </p>
+                  ))}
+                </div>
               </div>
-              <div className="prose prose-sm max-w-none text-foreground">
-                {response.split('\n\n').map((paragraph, idx) => (
-                  <p key={idx} className="mb-3 leading-relaxed">
-                    {paragraph}
-                  </p>
-                ))}
-              </div>
-            </div>
-          </ScrollArea>
+            </ScrollArea>
+          </>
         )}
       </CardContent>
     </Card>

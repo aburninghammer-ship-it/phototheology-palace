@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.7.1';
+import { PALACE_SCHEMA } from './palace-schema.ts';
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -256,7 +257,11 @@ Only include verses that have meaningful connections. Return as JSON array: [...
 
     } else if (mode === "commentary-revealed") {
       systemPrompt = `You are Jeeves, a theologian analyzing Bible verses to identify which principles and dimensions are REVEALED or PRESENT in the text itself.
-Focus on discovering what's already there, not applying external frameworks.`;
+Focus on discovering what's already there, not applying external frameworks.
+
+${PALACE_SCHEMA}
+
+⚠️ CRITICAL: Only reference rooms that exist in the Palace Schema above. Never make up methodologies.`;
 
       userPrompt = `Analyze ${book} ${chapter}:${verseText.verse} to identify which principles and dimensions are REVEALED in the text.
 
@@ -279,7 +284,16 @@ IMPORTANT: At the end, list the principles you identified: "PRINCIPLES_REVEALED:
 
     } else if (mode === "commentary-applied") {
       systemPrompt = `You are Jeeves, a theologian providing insightful Bible commentary by APPLYING specific analytical frameworks to verses.
-Provide deep, thoughtful analysis while remaining clear and accessible.`;
+Provide deep, thoughtful analysis while remaining clear and accessible.
+
+${PALACE_SCHEMA}
+
+⚠️ CRITICAL INSTRUCTIONS:
+1. Only use rooms that exist in the Palace Schema above
+2. Use the EXACT methodology listed for each room
+3. If using Bible Freestyle (BF): List verse relatives, don't write philosophical analysis
+4. If using Connect-6 (C6): Discuss GENRE, not the 6 themes (those are in Theme Room)
+5. Never invent new rooms or modify existing methods`;
 
       // Random principle selection for refresh mode
       const allPrinciples = [
