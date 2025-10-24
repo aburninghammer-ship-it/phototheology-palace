@@ -311,22 +311,24 @@ const QuarterlyStudy = () => {
                   </div>
                 )}
 
-                {/* Day Tabs */}
+                {/* Day Selection */}
                 {lessonContent && lessonContent.days && (
                   <div className="mt-4">
-                    <ScrollArea className="w-full">
-                      <Tabs value={selectedDay} onValueChange={setSelectedDay}>
-                        <div className="overflow-x-auto pb-2">
-                          <TabsList className="inline-flex w-auto">
-                            {lessonContent.days.map((day: any, idx: number) => (
-                              <TabsTrigger key={day.id} value={day.id} className="whitespace-nowrap">
-                                {day.title || `Day ${idx + 1}`}
-                              </TabsTrigger>
-                            ))}
-                          </TabsList>
-                        </div>
-                      </Tabs>
-                    </ScrollArea>
+                    <label className="text-sm font-medium mb-2 block">
+                      Select Day
+                    </label>
+                    <Select value={selectedDay} onValueChange={setSelectedDay}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Choose a day..." />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {lessonContent.days.map((day: any, idx: number) => (
+                          <SelectItem key={day.id} value={day.id}>
+                            {day.title || `Day ${idx + 1}`}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                   </div>
                 )}
               </CardContent>
