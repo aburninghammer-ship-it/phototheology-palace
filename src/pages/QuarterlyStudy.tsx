@@ -290,9 +290,15 @@ const QuarterlyStudy = () => {
                 {/* Read Online Link */}
                 {selectedLesson && (
                   <div className="mt-4 p-4 bg-primary/5 rounded-lg border border-primary/20">
-                    <p className="text-sm text-muted-foreground mb-2">
-                      📖 Read the official lesson online:
+                    <p className="text-sm font-medium mb-2">
+                      📖 Access the lesson text:
                     </p>
+                    <ol className="text-xs text-muted-foreground space-y-1 mb-3">
+                      <li>1. Click the link below to open the lesson page</li>
+                      <li>2. <strong>Scroll down past the videos</strong> to find "Read Lesson"</li>
+                      <li>3. Copy the text you want to study</li>
+                      <li>4. Paste it into the text area below</li>
+                    </ol>
                     <a
                       href={`https://www.sabbath.school/Lesson?year=2025&quarter=4&lesson=${selectedLesson.index}`}
                       target="_blank"
@@ -302,9 +308,6 @@ const QuarterlyStudy = () => {
                       <BookOpen className="h-4 w-4" />
                       Open Lesson {selectedLesson.index}: {selectedLesson.title}
                     </a>
-                    <p className="text-xs text-muted-foreground mt-2">
-                      Copy the content you want to analyze and paste it below ↓
-                    </p>
                   </div>
                 )}
 
