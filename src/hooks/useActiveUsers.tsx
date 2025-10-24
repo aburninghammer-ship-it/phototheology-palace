@@ -62,8 +62,7 @@ export const useActiveUsers = () => {
         {
           event: 'UPDATE',
           schema: 'public',
-          table: 'profiles',
-          filter: 'last_seen=gte.' + new Date(Date.now() - 5 * 60 * 1000).toISOString()
+          table: 'profiles'
         },
         () => {
           // When any profile is updated, refetch the count
