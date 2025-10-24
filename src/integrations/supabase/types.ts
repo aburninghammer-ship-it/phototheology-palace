@@ -327,6 +327,48 @@ export type Database = {
         }
         Relationships: []
       }
+      drill_results: {
+        Row: {
+          completed_at: string
+          created_at: string
+          drill_data: Json
+          drill_type: string
+          floor_number: number
+          id: string
+          max_score: number
+          room_id: string
+          score: number
+          time_seconds: number | null
+          user_id: string
+        }
+        Insert: {
+          completed_at?: string
+          created_at?: string
+          drill_data?: Json
+          drill_type: string
+          floor_number: number
+          id?: string
+          max_score: number
+          room_id: string
+          score?: number
+          time_seconds?: number | null
+          user_id: string
+        }
+        Update: {
+          completed_at?: string
+          created_at?: string
+          drill_data?: Json
+          drill_type?: string
+          floor_number?: number
+          id?: string
+          max_score?: number
+          room_id?: string
+          score?: number
+          time_seconds?: number | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       equation_codes: {
         Row: {
           biblical_reference: string | null

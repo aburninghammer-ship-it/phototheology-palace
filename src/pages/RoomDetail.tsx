@@ -2,7 +2,7 @@ import { useParams, Link, useNavigate } from "react-router-dom";
 import { palaceFloors } from "@/data/palaceData";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { ArrowLeft, Target, HelpCircle, BookOpen, AlertCircle, CheckCircle, Trophy, Lock } from "lucide-react";
+import { ArrowLeft, Target, HelpCircle, BookOpen, AlertCircle, CheckCircle, Trophy, Lock, Dumbbell } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { JeevesAssistant } from "@/components/JeevesAssistant";
@@ -10,7 +10,10 @@ import { useRoomProgress } from "@/hooks/useRoomProgress";
 import { useAuth } from "@/hooks/useAuth";
 import { useRoomUnlock } from "@/hooks/useRoomUnlock";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import { PracticeDrill } from "@/components/practice/PracticeDrill";
+import { getDrillsByRoom, getDrillName } from "@/data/drillQuestions";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 export default function RoomDetail() {
   const { floorNumber, roomId } = useParams();
@@ -18,6 +21,7 @@ export default function RoomDetail() {
   const { user } = useAuth();
   const floor = palaceFloors.find(f => f.number === Number(floorNumber));
   const room = floor?.rooms.find(r => r.id === roomId);
+  const [showDrill, setShowDrill] = useState(false);
   
   const { 
     progress, 
@@ -30,6 +34,10 @@ export default function RoomDetail() {
     Number(floorNumber), 
     roomId || ""
   );
+
+  const drillQuestions = room ? getDrillsByRoom(room.id) : [];
+  const drillName = room ? getDrillName(room.id) : "Practice Drill";
+  const hasDrills = drillQuestions.length > 0;
 
   // Redirect if room is locked
   useEffect(() => {
@@ -217,14 +225,49 @@ export default function RoomDetail() {
 
           <div className="lg:col-span-1">
             {isUnlocked ? (
-              <JeevesAssistant
-                roomTag={room.tag}
-                roomName={room.name}
-                principle={room.purpose}
-                floorNumber={floor.number}
-                roomId={room.id}
-                onExerciseComplete={markExerciseComplete}
-              />
+              <div className="space-y-4">
+                {hasDrills && (
+                  <Card className="border-2 border-accent/20">
+                    <CardHeader>
+                      <CardTitle className="flex items-center gap-2">
+                        <Dumbbell className="h-5 w-5 text-accent" />
+                        Practice Drill
+                      </CardTitle>
+                      <CardDescription>
+                        Test your knowledge with {drillName}
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      <Button
+                        onClick={() => setShowDrill(!showDrill)}
+                        variant={showDrill ? "secondary" : "default"}
+                        className="w-full"
+                      >
+                        {showDrill ? "Hide Drill" : "Start Practice"}
+                      </Button>
+                    </CardContent>
+                  </Card>
+                )}
+                
+                {showDrill && hasDrills ? (
+                  <PracticeDrill
+                    floorNumber={floor!.number}
+                    roomId={room!.id}
+                    roomName={room!.name}
+                    drillType={drillName}
+                    questions={drillQuestions}
+                  />
+                ) : (
+                  <JeevesAssistant
+                    roomTag={room.tag}
+                    roomName={room.name}
+                    principle={room.purpose}
+                    floorNumber={floor.number}
+                    roomId={room.id}
+                    onExerciseComplete={markExerciseComplete}
+                  />
+                )}
+              </div>
             ) : (
               <Card className="opacity-60">
                 <CardHeader>
