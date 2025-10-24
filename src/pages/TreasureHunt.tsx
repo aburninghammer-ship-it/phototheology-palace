@@ -4,28 +4,41 @@ import { Navigation } from "@/components/Navigation";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Input } from "@/components/ui/input";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { Trophy, Clock, Users, Lightbulb, CheckCircle2, XCircle } from "lucide-react";
+import { Trophy, Clock, Lightbulb, CheckCircle2, PlayCircle, Target } from "lucide-react";
 import { RoomPrerequisites } from "@/components/RoomPrerequisites";
 import { ShareChallenge } from "@/components/ShareChallenge";
+
+interface Clue {
+  clue_number: number;
+  hint: string;
+  clue_type: 'theme' | 'room' | 'principle' | 'verse';
+  correct_answers: string[];
+  explanation: string;
+}
 
 interface TreasureHunt {
   id: string;
   title: string;
-  difficulty: string;
-  expires_at: string;
-  total_clues: number;
+  difficulty: 'beginner' | 'pro' | 'scholar';
+  category: string;
+  time_limit_hours: number;
   biblical_conclusion: string;
+  final_verse: string;
+  final_verse_text: string;
+  expires_at: string;
+  clues: Clue[];
 }
 
 interface Participation {
+  id: string;
   hunt_id: string;
-  current_clue: number;
+  current_clue_number: number;
   completed_at: string | null;
-  completion_time_seconds: number | null;
+  time_elapsed_seconds: number | null;
+  is_completed: boolean;
 }
 
 const TreasureHunt = () => {
@@ -48,17 +61,18 @@ const TreasureHunt = () => {
     const { data, error } = await supabase
       .from('treasure_hunts')
       .select('*')
+      .eq('is_active', true)
       .order('created_at', { ascending: false });
 
     if (!error && data) {
-      setHunts(data);
+      setHunts(data as unknown as TreasureHunt[]);
     }
     setLoading(false);
   };
 
   const fetchMyParticipations = async () => {
     const { data, error } = await supabase
-      .from('treasure_hunt_participants')
+      .from('treasure_hunt_participations')
       .select('*')
       .eq('user_id', user?.id);
 
@@ -69,7 +83,7 @@ const TreasureHunt = () => {
 
   const joinHunt = async (huntId: string) => {
     const { error } = await supabase
-      .from('treasure_hunt_participants')
+      .from('treasure_hunt_participations')
       .insert({
         hunt_id: huntId,
         user_id: user?.id,
@@ -112,10 +126,9 @@ const TreasureHunt = () => {
 
   const getDifficultyColor = (difficulty: string) => {
     switch (difficulty) {
-      case 'easy': return 'bg-green-500';
-      case 'intermediate': return 'bg-yellow-500';
-      case 'advance': return 'bg-orange-500';
-      case 'pro': return 'bg-red-500';
+      case 'beginner': return 'bg-green-500';
+      case 'pro': return 'bg-orange-500';
+      case 'scholar': return 'bg-red-500';
       default: return 'bg-gray-500';
     }
   };
@@ -138,11 +151,11 @@ const TreasureHunt = () => {
           <div className="text-center space-y-4">
             <h1 className="text-5xl font-bold flex items-center justify-center gap-3">
               <Trophy className="h-12 w-12 text-yellow-500" />
-              24-Hour Treasure Hunts
+              Treasure Hunts
             </h1>
             <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-              Join 24-hour biblical treasure hunts! Jeeves creates a conclusion using palace rooms and principles. 
-              Follow clues step-by-step to reach the right answer. New challenge every 24 hours!
+              Follow Jeeves' reasoning through progressive clues—from theme to Palace room to principle to the final verse treasure. 
+              Understand WHY each step leads to the next in biblical study methodology.
             </p>
           </div>
 
@@ -155,8 +168,8 @@ const TreasureHunt = () => {
               <CardDescription>Choose a difficulty level to join</CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                {['easy', 'intermediate', 'advance', 'pro'].map((diff) => (
+              <div className="grid grid-cols-3 gap-4">
+                {['beginner', 'pro', 'scholar'].map((diff) => (
                   <Button
                     key={diff}
                     variant={selectedDifficulty === diff ? "default" : "outline"}
@@ -190,20 +203,32 @@ const TreasureHunt = () => {
                         <CardTitle className="flex items-center gap-2">
                           {hunt.title}
                         </CardTitle>
-                        <Badge className={getDifficultyColor(hunt.difficulty)}>
-                          {hunt.difficulty}
-                        </Badge>
+                        <CardDescription className="space-y-1">
+                          <div>{getTimeRemaining(hunt.expires_at)}</div>
+                          <div className="text-xs">{hunt.category}</div>
+                        </CardDescription>
                       </div>
                     </div>
-                    <CardDescription className="flex items-center gap-2 mt-2">
-                      <Clock className="h-4 w-4" />
-                      {getTimeRemaining(hunt.expires_at)}
-                    </CardDescription>
                   </CardHeader>
                   <CardContent className="space-y-4">
-                    <div className="text-sm text-muted-foreground">
-                      <Lightbulb className="h-4 w-4 inline mr-2" />
-                      {hunt.total_clues} clues to solve
+                    <div className="flex items-center justify-between">
+                      <Badge className={getDifficultyColor(hunt.difficulty)}>
+                        {hunt.difficulty}
+                      </Badge>
+                      <span className="text-sm text-muted-foreground">
+                        {hunt.time_limit_hours}h • {hunt.clues.length} clues
+                      </span>
+                    </div>
+
+                    <div className="space-y-2">
+                      <p className="text-sm text-muted-foreground">
+                        {hunt.biblical_conclusion.substring(0, 120)}...
+                      </p>
+                      {participation && !participation.completed_at && (
+                        <div className="text-xs text-primary font-medium">
+                          Progress: Clue {participation.current_clue_number} of {hunt.clues.length}
+                        </div>
+                      )}
                     </div>
 
                     <div className="flex gap-2">
@@ -213,6 +238,7 @@ const TreasureHunt = () => {
                           className="flex-1"
                           variant="outline"
                         >
+                          <Trophy className="h-4 w-4 mr-2" />
                           View Results
                         </Button>
                       ) : isActive ? (
@@ -220,13 +246,15 @@ const TreasureHunt = () => {
                           onClick={() => navigate(`/treasure-hunt/${hunt.id}`)}
                           className="flex-1"
                         >
-                          Continue Hunt (Clue {participation.current_clue}/{hunt.total_clues})
+                          <PlayCircle className="h-4 w-4 mr-2" />
+                          Continue Hunt
                         </Button>
                       ) : (
                         <Button
                           onClick={() => joinHunt(hunt.id)}
                           className="flex-1"
                         >
+                          <Target className="h-4 w-4 mr-2" />
                           Join Hunt
                         </Button>
                       )}

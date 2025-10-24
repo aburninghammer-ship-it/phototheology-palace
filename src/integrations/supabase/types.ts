@@ -1528,13 +1528,6 @@ export type Database = {
             referencedRelation: "treasure_hunt_clues"
             referencedColumns: ["id"]
           },
-          {
-            foreignKeyName: "treasure_hunt_answers_hunt_id_fkey"
-            columns: ["hunt_id"]
-            isOneToOne: false
-            referencedRelation: "treasure_hunts"
-            referencedColumns: ["id"]
-          },
         ]
       }
       treasure_hunt_clues: {
@@ -1568,15 +1561,7 @@ export type Database = {
           principle?: string
           room_tag?: string
         }
-        Relationships: [
-          {
-            foreignKeyName: "treasure_hunt_clues_hunt_id_fkey"
-            columns: ["hunt_id"]
-            isOneToOne: false
-            referencedRelation: "treasure_hunts"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       treasure_hunt_participants: {
         Row: {
@@ -1606,9 +1591,51 @@ export type Database = {
           joined_at?: string | null
           user_id?: string
         }
+        Relationships: []
+      }
+      treasure_hunt_participations: {
+        Row: {
+          clues_completed: Json
+          completed_at: string | null
+          current_clue_number: number
+          hints_used: number
+          hunt_id: string
+          id: string
+          is_completed: boolean
+          started_at: string
+          time_elapsed_seconds: number | null
+          total_attempts: number
+          user_id: string
+        }
+        Insert: {
+          clues_completed?: Json
+          completed_at?: string | null
+          current_clue_number?: number
+          hints_used?: number
+          hunt_id: string
+          id?: string
+          is_completed?: boolean
+          started_at?: string
+          time_elapsed_seconds?: number | null
+          total_attempts?: number
+          user_id: string
+        }
+        Update: {
+          clues_completed?: Json
+          completed_at?: string | null
+          current_clue_number?: number
+          hints_used?: number
+          hunt_id?: string
+          id?: string
+          is_completed?: boolean
+          started_at?: string
+          time_elapsed_seconds?: number | null
+          total_attempts?: number
+          user_id?: string
+        }
         Relationships: [
           {
-            foreignKeyName: "treasure_hunt_participants_hunt_id_fkey"
+            foreignKeyName: "treasure_hunt_participations_hunt_id_fkey"
             columns: ["hunt_id"]
             isOneToOne: false
             referencedRelation: "treasure_hunts"
@@ -1619,33 +1646,45 @@ export type Database = {
       treasure_hunts: {
         Row: {
           biblical_conclusion: string
-          created_at: string | null
-          created_by: string | null
+          category: string
+          clues: Json
+          created_at: string
           difficulty: string
           expires_at: string
+          final_verse: string
+          final_verse_text: string
           id: string
+          is_active: boolean
+          time_limit_hours: number
           title: string
-          total_clues: number
         }
         Insert: {
           biblical_conclusion: string
-          created_at?: string | null
-          created_by?: string | null
+          category: string
+          clues?: Json
+          created_at?: string
           difficulty: string
           expires_at: string
+          final_verse: string
+          final_verse_text: string
           id?: string
+          is_active?: boolean
+          time_limit_hours?: number
           title: string
-          total_clues: number
         }
         Update: {
           biblical_conclusion?: string
-          created_at?: string | null
-          created_by?: string | null
+          category?: string
+          clues?: Json
+          created_at?: string
           difficulty?: string
           expires_at?: string
+          final_verse?: string
+          final_verse_text?: string
           id?: string
+          is_active?: boolean
+          time_limit_hours?: number
           title?: string
-          total_clues?: number
         }
         Relationships: []
       }
