@@ -61,6 +61,11 @@ export const MobileNav = () => {
                   🎨 Image Library
                 </Button>
               </Link>
+              <Link to="/quarterly-study">
+                <Button variant="ghost" className="w-full justify-start" size="sm">
+                  📅 Amplified Quarterly
+                </Button>
+              </Link>
               
               <Separator className="my-2" />
               <div className="text-xs font-semibold text-muted-foreground px-2 py-1">Games</div>

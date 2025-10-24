@@ -149,7 +149,13 @@ serve(async (req) => {
       difficulty,
       symbolCount,
       challengeCategory,
-      newChallengeCategory
+      newChallengeCategory,
+      lessonTitle,
+      dayTitle,
+      lessonContent,
+      bibleVerses,
+      selectedRoom,
+      selectedPrinciple
     } = await req.json();
     
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
@@ -158,7 +164,33 @@ serve(async (req) => {
     let systemPrompt = "";
     let userPrompt = "";
 
-    if (mode === "example") {
+    if (mode === "quarterly_analysis") {
+      systemPrompt = `You are Jeeves, an expert Bible study assistant who helps students apply the 37-Room Phototheology Palace framework and the 6 Principle Lenses to Sabbath School lessons. You provide insightful, practical analysis that helps students see deeper connections in Scripture.
+      
+${PALACE_SCHEMA}`;
+      
+      const framework = selectedRoom || selectedPrinciple || 'general palace framework';
+      
+      userPrompt = `Analyze this Sabbath School lesson using ${framework}:
+
+Lesson: ${lessonTitle}
+Day: ${dayTitle}
+
+Bible Verses Referenced:
+${bibleVerses?.join(', ') || 'See lesson content'}
+
+Lesson Content (excerpt):
+${lessonContent?.substring(0, 2500) || 'Content not available'}
+
+Please provide:
+1. How ${framework} applies to this specific lesson
+2. Key insights and connections you discover through this lens
+3. Practical applications for daily spiritual life
+4. Questions for deeper reflection
+
+Keep your response conversational, insightful, and practical. Help the student see connections they might have missed. Use the specific methodology from the palace room if applicable.`;
+
+    } else if (mode === "example") {
       systemPrompt = `You are Jeeves, a wise and scholarly Bible study assistant for Phototheology. 
 Your role is to demonstrate how biblical principles work by providing clear, varied examples.
 Always choose DIFFERENT verses for examples - never repeat the same verse.
