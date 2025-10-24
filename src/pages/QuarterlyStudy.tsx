@@ -21,6 +21,8 @@ const QuarterlyStudy = () => {
   const [jeevesResponse, setJeevesResponse] = useState<any>(null);
   const [selectedRoom, setSelectedRoom] = useState<string>("");
   const [selectedPrinciple, setSelectedPrinciple] = useState<string>("");
+  const [userLessonInput, setUserLessonInput] = useState<string>("");
+  const [userQuestion, setUserQuestion] = useState<string>("");
   const { toast } = useToast();
 
   const rooms = [
@@ -160,20 +162,10 @@ const QuarterlyStudy = () => {
       return;
     }
 
-    const currentDay = lessonContent?.days?.find((d: any) => d.id === selectedDay);
-    if (!currentDay) {
+    if (!userLessonInput.trim()) {
       toast({
-        title: "No Lesson Content",
-        description: "Please select a lesson first",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    if (!currentDay.read && !currentDay.content) {
-      toast({
-        title: "No Content Available",
-        description: "This lesson has no content to analyze",
+        title: "Lesson Content Required",
+        description: "Please paste the lesson content you want to analyze",
         variant: "destructive",
       });
       return;
@@ -184,12 +176,13 @@ const QuarterlyStudy = () => {
       const { data, error } = await supabase.functions.invoke("jeeves", {
         body: {
           mode: "quarterly_analysis",
-          lessonTitle: selectedLesson?.title,
-          dayTitle: currentDay.title,
-          lessonContent: currentDay.read || currentDay.content,
+          lessonTitle: selectedLesson?.title || "Quarterly Study",
+          dayTitle: selectedDay || "Daily Study",
+          lessonContent: userLessonInput,
           bibleVerses: selectedLesson?.bible_verses || [],
           selectedRoom,
           selectedPrinciple,
+          userQuestion: userQuestion.trim() || undefined,
         },
       });
 
@@ -249,26 +242,15 @@ const QuarterlyStudy = () => {
             <CardHeader className="gradient-palace text-white">
               <CardTitle className="font-serif text-2xl flex items-center justify-between flex-wrap gap-4">
                 <span>{quarterly.title}</span>
-                <div className="flex gap-2">
-                  <a
-                    href="https://www.sabbath.school/LessonBook"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-sm bg-white/20 hover:bg-white/30 px-4 py-2 rounded-lg transition-all flex items-center gap-2"
-                  >
-                    <BookOpen className="h-4 w-4" />
-                    Quarterly PDF
-                  </a>
-                  <a
-                    href="https://www.sabbath.school"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-sm bg-white/20 hover:bg-white/30 px-4 py-2 rounded-lg transition-all flex items-center gap-2"
-                  >
-                    <BookOpen className="h-4 w-4" />
-                    Official Site
-                  </a>
-                </div>
+                <a
+                  href="https://www.sabbath.school/LessonBook"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-sm bg-white/20 hover:bg-white/30 px-4 py-2 rounded-lg transition-all flex items-center gap-2"
+                >
+                  <BookOpen className="h-4 w-4" />
+                  Quarterly PDF
+                </a>
               </CardTitle>
               <CardDescription className="text-white/90">
                 {quarterly.quarter} • {quarterly.description}
@@ -339,53 +321,28 @@ const QuarterlyStudy = () => {
               </CardContent>
             </Card>
 
-            {/* Lesson Content */}
-            {loading && !lessonContent ? (
-              <Card>
-                <CardContent className="flex items-center justify-center h-[500px]">
-                  <Loader2 className="h-8 w-8 animate-spin text-primary" />
-                </CardContent>
-              </Card>
-            ) : getCurrentDayContent() ? (
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <BookOpen className="h-5 w-5" />
-                    {getCurrentDayContent()?.title}
-                  </CardTitle>
-                  {selectedLesson?.bible_verses && selectedLesson.bible_verses.length > 0 && (
-                    <div className="flex flex-wrap gap-2 mt-2">
-                      {selectedLesson.bible_verses.slice(0, 5).map((verse, idx) => (
-                        <Badge key={idx} variant="secondary">
-                          {verse}
-                        </Badge>
-                      ))}
-                    </div>
-                  )}
-                </CardHeader>
-                <CardContent>
-                  <ScrollArea className="h-[500px]">
-                    <div className="prose prose-sm max-w-none dark:prose-invert">
-                      <div dangerouslySetInnerHTML={{ 
-                        __html: getCurrentDayContent()?.read || getCurrentDayContent()?.content || "No content available" 
-                      }} />
-                    </div>
-                  </ScrollArea>
-                </CardContent>
-              </Card>
-            ) : selectedLesson ? (
-              <Card>
-                <CardContent className="flex flex-col items-center justify-center h-[500px] text-center">
-                  <BookOpen className="h-12 w-12 text-muted-foreground mb-4" />
-                  <p className="text-muted-foreground">
-                    No content available for this lesson yet.
-                  </p>
-                  <p className="text-sm text-muted-foreground mt-2">
-                    Select a day above to view lesson content.
-                  </p>
-                </CardContent>
-              </Card>
-            ) : null}
+            {/* Lesson Content Input */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <BookOpen className="h-5 w-5" />
+                  Paste Lesson Content to Amplify
+                </CardTitle>
+                <CardDescription>
+                  Copy text from the official PDF and paste it here to analyze with Palace Rooms and Principles
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <ScrollArea className="h-[500px]">
+                  <textarea
+                    value={userLessonInput}
+                    onChange={(e) => setUserLessonInput(e.target.value)}
+                    className="w-full min-h-[450px] p-4 rounded-lg border bg-background resize-none focus:outline-none focus:ring-2 focus:ring-primary"
+                    placeholder="Paste the lesson content here... Include:&#10;• Bible passages&#10;• Key quotes&#10;• Discussion points&#10;• Any text you want to analyze&#10;&#10;Then select a Room or Principle and click 'Apply Framework' to get Jeeves' insights!"
+                  />
+                </ScrollArea>
+              </CardContent>
+            </Card>
           </div>
 
           {/* Right Column - Jeeves Assistant */}
@@ -439,6 +396,19 @@ const QuarterlyStudy = () => {
                       ))}
                     </SelectContent>
                   </Select>
+                </div>
+
+                {/* Question Input */}
+                <div>
+                  <label className="text-sm font-medium mb-2 block">
+                    Ask Jeeves a Question (Optional)
+                  </label>
+                  <textarea
+                    value={userQuestion}
+                    onChange={(e) => setUserQuestion(e.target.value)}
+                    className="w-full min-h-[80px] p-3 rounded-lg border bg-background resize-none focus:outline-none focus:ring-2 focus:ring-primary text-sm"
+                    placeholder="E.g., How does this passage reveal Christ? What pattern repeats throughout Scripture? How can I apply this today?"
+                  />
                 </div>
 
                 <Button
