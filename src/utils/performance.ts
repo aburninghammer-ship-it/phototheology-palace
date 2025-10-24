@@ -81,3 +81,44 @@ export const memoize = <T extends (...args: any[]) => any>(fn: T): T => {
     return result;
   }) as T;
 };
+
+/**
+ * Create an intersection observer for lazy loading
+ */
+export const createLazyLoadObserver = (
+  callback: (entry: IntersectionObserverEntry) => void,
+  options?: IntersectionObserverInit
+) => {
+  return new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          callback(entry);
+        }
+      });
+    },
+    { rootMargin: "50px", ...options }
+  );
+};
+
+/**
+ * Preload a resource (image, font, etc.)
+ */
+export const preloadResource = (href: string, as: string) => {
+  const link = document.createElement("link");
+  link.rel = "preload";
+  link.as = as;
+  link.href = href;
+  document.head.appendChild(link);
+};
+
+/**
+ * Check if connection is slow (useful for adaptive loading)
+ */
+export const isSlowConnection = (): boolean => {
+  if ('connection' in navigator) {
+    const conn = (navigator as any).connection;
+    return conn?.effectiveType === 'slow-2g' || conn?.effectiveType === '2g' || conn?.saveData;
+  }
+  return false;
+};

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { Suspense, lazy } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -6,69 +6,73 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { OfflineIndicator } from "@/components/OfflineIndicator";
-import Index from "./pages/Index";
-import Palace from "./pages/Palace";
-import FloorDetail from "./pages/FloorDetail";
-import RoomDetail from "./pages/RoomDetail";
-
-import Bible from "./pages/Bible";
-import BibleChapter from "./pages/BibleChapter";
-import BibleSearch from "./pages/BibleSearch";
-import DailyChallenges from "./pages/DailyChallenges";
-import EquationsChallenge from "./pages/EquationsChallenge";
-import Games from "./pages/Games";
-import ChainChess from "./pages/ChainChess";
-import KidsGames from "./pages/KidsGames";
-import LiveStudy from "./pages/LiveStudy";
-import LiveStudyRoom from "./pages/LiveStudyRoom";
-import KidsGamePlay from "./pages/KidsGamePlay";
-import GamePlay from "./pages/GamePlay";
-import PalaceQuiz from "./pages/PalaceQuiz";
-import VerseMatch from "./pages/VerseMatch";
-import PrinciplePuzzle from "./pages/PrinciplePuzzle";
-import Community from "./pages/Community";
-import Leaderboard from "./pages/Leaderboard";
-import Achievements from "./pages/Achievements";
-import Feedback from "./pages/Feedback";
-import CultureControversy from "./pages/CultureControversy";
-import ProphecyWatch from "./pages/ProphecyWatch";
-import ResearchMode from "./pages/ResearchMode";
-import BibleImageLibrary from "./pages/BibleImageLibrary";
-import SermonBuilder from "./pages/SermonBuilder";
-import Flashcards from "./pages/Flashcards";
-import PowerOfTheLamb from "./pages/PowerOfTheLamb";
-import SpiritualTraining from "./pages/SpiritualTraining";
-import BlueprintCourse from "./pages/BlueprintCourse";
-import PhototheologyCourse from "./pages/PhototheologyCourse";
-import DanielCourse from "./pages/DanielCourse";
-import RevelationCourse from "./pages/RevelationCourse";
-import RevelationCourseKids from "./pages/RevelationCourseKids";
-import KidGPT from "./pages/KidGPT";
-import PhototheologyGPT from "./pages/PhototheologyGPT";
-import DanielRevelationGPT from "./pages/DanielRevelationGPT";
-import ApologeticsGPT from "./pages/ApologeticsGPT";
-import LessonQuarterlyGPT from "./pages/LessonQuarterlyGPT";
-import QuarterlyStudy from "./pages/QuarterlyStudy";
-import TreasureHunt from "./pages/TreasureHunt";
-import TreasureHuntPlay from "./pages/TreasureHuntPlay";
-import TrainingDrills from "./pages/TrainingDrills";
-import EscapeRoom from "./pages/EscapeRoom";
-import EscapeRoomPlay from "./pages/EscapeRoomPlay";
-import Profile from "./pages/Profile";
-import Pricing from "./pages/Pricing";
-import Auth from "./pages/Auth";
-import CriticsAnalysis from "./pages/CriticsAnalysis";
-import Referrals from "./pages/Referrals";
-import StudentVerification from "./pages/StudentVerification";
-import AccessCode from "./pages/AccessCode";
-import AdminAccessCodes from "./pages/AdminAccessCodes";
-import Onboarding from "./pages/Onboarding";
-import Dashboard from "./pages/Dashboard";
-import Certificates from "./pages/Certificates";
-import StudyPartners from "./pages/StudyPartners";
-import MemorizationVerses from "./pages/MemorizationVerses";
-import NotFound from "./pages/NotFound";
+import { LoadingScreen } from "@/components/LoadingScreen";
 import { ProtectedRoute } from "./components/ProtectedRoute";
+
+// Critical pages - load immediately
+import Index from "./pages/Index";
+import Auth from "./pages/Auth";
+import Pricing from "./pages/Pricing";
+
+// Lazy load all other pages
+const Palace = lazy(() => import("./pages/Palace"));
+const FloorDetail = lazy(() => import("./pages/FloorDetail"));
+const RoomDetail = lazy(() => import("./pages/RoomDetail"));
+const Bible = lazy(() => import("./pages/Bible"));
+const BibleChapter = lazy(() => import("./pages/BibleChapter"));
+const BibleSearch = lazy(() => import("./pages/BibleSearch"));
+const DailyChallenges = lazy(() => import("./pages/DailyChallenges"));
+const EquationsChallenge = lazy(() => import("./pages/EquationsChallenge"));
+const Games = lazy(() => import("./pages/Games"));
+const ChainChess = lazy(() => import("./pages/ChainChess"));
+const KidsGames = lazy(() => import("./pages/KidsGames"));
+const LiveStudy = lazy(() => import("./pages/LiveStudy"));
+const LiveStudyRoom = lazy(() => import("./pages/LiveStudyRoom"));
+const KidsGamePlay = lazy(() => import("./pages/KidsGamePlay"));
+const GamePlay = lazy(() => import("./pages/GamePlay"));
+const PalaceQuiz = lazy(() => import("./pages/PalaceQuiz"));
+const VerseMatch = lazy(() => import("./pages/VerseMatch"));
+const PrinciplePuzzle = lazy(() => import("./pages/PrinciplePuzzle"));
+const Community = lazy(() => import("./pages/Community"));
+const Leaderboard = lazy(() => import("./pages/Leaderboard"));
+const Achievements = lazy(() => import("./pages/Achievements"));
+const Feedback = lazy(() => import("./pages/Feedback"));
+const CultureControversy = lazy(() => import("./pages/CultureControversy"));
+const ProphecyWatch = lazy(() => import("./pages/ProphecyWatch"));
+const ResearchMode = lazy(() => import("./pages/ResearchMode"));
+const BibleImageLibrary = lazy(() => import("./pages/BibleImageLibrary"));
+const SermonBuilder = lazy(() => import("./pages/SermonBuilder"));
+const Flashcards = lazy(() => import("./pages/Flashcards"));
+const PowerOfTheLamb = lazy(() => import("./pages/PowerOfTheLamb"));
+const SpiritualTraining = lazy(() => import("./pages/SpiritualTraining"));
+const BlueprintCourse = lazy(() => import("./pages/BlueprintCourse"));
+const PhototheologyCourse = lazy(() => import("./pages/PhototheologyCourse"));
+const DanielCourse = lazy(() => import("./pages/DanielCourse"));
+const RevelationCourse = lazy(() => import("./pages/RevelationCourse"));
+const RevelationCourseKids = lazy(() => import("./pages/RevelationCourseKids"));
+const KidGPT = lazy(() => import("./pages/KidGPT"));
+const PhototheologyGPT = lazy(() => import("./pages/PhototheologyGPT"));
+const DanielRevelationGPT = lazy(() => import("./pages/DanielRevelationGPT"));
+const ApologeticsGPT = lazy(() => import("./pages/ApologeticsGPT"));
+const LessonQuarterlyGPT = lazy(() => import("./pages/LessonQuarterlyGPT"));
+const QuarterlyStudy = lazy(() => import("./pages/QuarterlyStudy"));
+const TreasureHunt = lazy(() => import("./pages/TreasureHunt"));
+const TreasureHuntPlay = lazy(() => import("./pages/TreasureHuntPlay"));
+const TrainingDrills = lazy(() => import("./pages/TrainingDrills"));
+const EscapeRoom = lazy(() => import("./pages/EscapeRoom"));
+const EscapeRoomPlay = lazy(() => import("./pages/EscapeRoomPlay"));
+const Profile = lazy(() => import("./pages/Profile"));
+const CriticsAnalysis = lazy(() => import("./pages/CriticsAnalysis"));
+const Referrals = lazy(() => import("./pages/Referrals"));
+const StudentVerification = lazy(() => import("./pages/StudentVerification"));
+const AccessCode = lazy(() => import("./pages/AccessCode"));
+const AdminAccessCodes = lazy(() => import("./pages/AdminAccessCodes"));
+const Onboarding = lazy(() => import("./pages/Onboarding"));
+const Dashboard = lazy(() => import("./pages/Dashboard"));
+const Certificates = lazy(() => import("./pages/Certificates"));
+const StudyPartners = lazy(() => import("./pages/StudyPartners"));
+const MemorizationVerses = lazy(() => import("./pages/MemorizationVerses"));
+const NotFound = lazy(() => import("./pages/NotFound"));
 
 const queryClient = new QueryClient();
 
@@ -81,7 +85,8 @@ function App() {
           <Sonner />
           <OfflineIndicator />
           <BrowserRouter>
-            <Routes>
+            <Suspense fallback={<LoadingScreen />}>
+              <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/auth" element={<Auth />} />
             <Route path="/onboarding" element={
@@ -162,10 +167,11 @@ function App() {
             <Route path="/study-partners" element={<ProtectedRoute><StudyPartners /></ProtectedRoute>} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
-          </Routes>
-        </BrowserRouter>
-      </TooltipProvider>
-    </QueryClientProvider>
+              </Routes>
+            </Suspense>
+          </BrowserRouter>
+        </TooltipProvider>
+      </QueryClientProvider>
     </ErrorBoundary>
   );
 }

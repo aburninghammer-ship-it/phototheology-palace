@@ -15,4 +15,34 @@ export default defineConfig(({ mode }) => ({
       "@": path.resolve(__dirname, "./src"),
     },
   },
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          // Vendor chunks for better caching
+          'react-vendor': ['react', 'react-dom', 'react-router-dom'],
+          'ui-vendor': ['@radix-ui/react-dialog', '@radix-ui/react-dropdown-menu', '@radix-ui/react-tabs'],
+          'query-vendor': ['@tanstack/react-query'],
+          // Separate chunks for large feature groups
+          'games': [
+            './src/pages/Games.tsx',
+            './src/pages/ChainChess.tsx',
+            './src/pages/VerseMatch.tsx',
+            './src/pages/PrinciplePuzzle.tsx',
+          ],
+          'courses': [
+            './src/pages/RevelationCourse.tsx',
+            './src/pages/DanielCourse.tsx',
+            './src/pages/BlueprintCourse.tsx',
+          ],
+          'gpts': [
+            './src/pages/DanielRevelationGPT.tsx',
+            './src/pages/PhototheologyGPT.tsx',
+            './src/pages/KidGPT.tsx',
+          ],
+        },
+      },
+    },
+    chunkSizeWarningLimit: 1000,
+  },
 }));
