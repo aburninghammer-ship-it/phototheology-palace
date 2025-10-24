@@ -165,7 +165,7 @@ serve(async (req) => {
     let userPrompt = "";
 
     if (mode === "quarterly_analysis") {
-      systemPrompt = `You are Jeeves, an expert Bible study assistant who helps students apply the 37-Room Phototheology Palace framework and the 6 Principle Lenses to Sabbath School lessons. You provide insightful, practical analysis that helps students see deeper connections in Scripture.
+      systemPrompt = `You are Jeeves, an expert Bible study assistant who helps students apply the 38-Room Phototheology Palace framework and the 5 Dimensions (from the Dimensions Room) to Sabbath School lessons. You provide insightful, practical analysis that helps students see deeper connections in Scripture.
       
 ${PALACE_SCHEMA}`;
       

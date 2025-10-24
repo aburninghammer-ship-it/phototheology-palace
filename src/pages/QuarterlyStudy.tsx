@@ -24,28 +24,28 @@ const QuarterlyStudy = () => {
   const { toast } = useToast();
 
   const rooms = [
-    "Room 1: Story Context", "Room 2: Verse Genetics", "Room 3: Bible Freestyle",
-    "Room 4: Midrash Machine", "Room 5: Sabbath Studies", "Room 6: Law Lab",
-    "Room 7: Image Lab", "Room 8: Connect-6", "Room 9: Theme Room",
-    "Room 10: Apocalyptic Equations", "Room 11: Poetry Pentameter", "Room 12: Type & Antitype",
-    "Room 13: Cycles Within", "Room 14: Controversy Map", "Room 15: Numbers Speak",
-    "Room 16: Prophetic Chiasm", "Room 17: Last Things", "Room 18: Throne Room",
-    "Room 19: Judgment Hour", "Room 20: Covenant Code", "Room 21: Sacred Space",
-    "Room 22: Feast Framework", "Room 23: Sanctuary Articles", "Room 24: Musical Torah",
-    "Room 25: Wisdom Literature", "Room 26: Lament & Praise", "Room 27: Prophetic Oracle",
-    "Room 28: Gospel Harmony", "Room 29: Epistle Logic", "Room 30: Kingdom Parables",
-    "Room 31: Miracle Signs", "Room 32: Sermon Analysis", "Room 33: Church History",
-    "Room 34: Cultural Context", "Room 35: Spiritual Warfare", "Room 36: End Times",
-    "Room 37: New Jerusalem"
+    "Room 1: Story Room (SR)", "Room 2: Imagination Room (IR)", "Room 3: 24FPS Room (24)", 
+    "Room 4: Bible Rendered (BR)", "Room 5: Translation Room (TR)", "Room 6: Gems Room (GR)",
+    "Room 7: Observation Room (OR)", "Room 8: Def-Com Room (DC)", "Room 9: Symbols/Types (ST)", 
+    "Room 10: Questions Room (QR)", "Room 11: Q&A Chains (QA)",
+    "Room 12: Nature Freestyle (NF)", "Room 13: Personal Freestyle (PF)", "Room 14: Bible Freestyle (BF)", 
+    "Room 15: History Freestyle (HF)", "Room 16: Listening Room (LR)",
+    "Room 17: Concentration Room (CR)", "Room 18: Dimensions Room (DR)", "Room 19: Connect-6 (C6)", 
+    "Room 20: Theme Room (TRm)", "Room 21: Time Zone (TZ)", "Room 22: Patterns Room (PRm)", 
+    "Room 23: Parallels Room (P‖)", "Room 24: Fruit Room (FRt)",
+    "Room 25: Blue Room - Sanctuary (BL)", "Room 26: Prophecy Room (PR)", "Room 27: Three Angels (3A)", 
+    "Room 28: Feasts Room (FE)", "Room 29: Christ in Every Chapter (CEC)", "Room 30: Room 66 (R66)",
+    "Room 31: Three Heavens (1H/2H/3H)", "Room 32: Eight Cycles (@)", "Room 33: Juice Room (JR)",
+    "Room 34: Fire Room (FRm)", "Room 35: Meditation Room (MR)", "Room 36: Speed Room (SRm)",
+    "Room 37: Reflexive Mastery (∞)"
   ];
 
-  const principles = [
-    "Literal Lens",
-    "Christ Lens",
-    "Me Lens",
-    "Church Lens",
-    "Heaven Lens",
-    "Future Lens"
+  const dimensions = [
+    "Literal Dimension",
+    "Christ Dimension",
+    "Me Dimension",
+    "Church Dimension",
+    "Heaven Dimension"
   ];
 
   useEffect(() => {
@@ -204,7 +204,7 @@ const QuarterlyStudy = () => {
             Amplified Quarterly Study
           </h1>
           <p className="text-muted-foreground max-w-2xl mx-auto">
-            Apply the 37 Palace Rooms and 6 Principle Lenses to your Sabbath School lessons
+            Apply the 38 Palace Rooms and 5 Dimensions to your Sabbath School lessons
           </p>
         </div>
 
@@ -345,19 +345,19 @@ const QuarterlyStudy = () => {
                   </Select>
                 </div>
 
-                {/* Principle Selection */}
+                {/* Dimension Selection */}
                 <div>
                   <label className="text-sm font-medium mb-2 block">
-                    Select a Principle Lens
+                    Select a Dimension (from DR Room)
                   </label>
                   <Select value={selectedPrinciple} onValueChange={setSelectedPrinciple}>
                     <SelectTrigger>
-                      <SelectValue placeholder="Choose a lens..." />
+                      <SelectValue placeholder="Choose a dimension..." />
                     </SelectTrigger>
                     <SelectContent>
-                      {principles.map((principle) => (
-                        <SelectItem key={principle} value={principle}>
-                          {principle}
+                      {dimensions.map((dimension) => (
+                        <SelectItem key={dimension} value={dimension}>
+                          {dimension}
                         </SelectItem>
                       ))}
                     </SelectContent>
