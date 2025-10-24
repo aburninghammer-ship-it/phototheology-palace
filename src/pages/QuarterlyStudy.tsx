@@ -265,22 +265,9 @@ const QuarterlyStudy = () => {
             {/* Lesson Selector */}
             <Card>
               <CardHeader>
-                <CardTitle className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <Calendar className="h-5 w-5" />
-                    Select Lesson
-                  </div>
-                  {selectedLesson && selectedLesson.full_read && (
-                    <a
-                      href={selectedLesson.full_read}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-sm bg-primary text-primary-foreground px-3 py-1 rounded-lg hover:bg-primary/90 transition-all flex items-center gap-2"
-                    >
-                      <BookOpen className="h-3 w-3" />
-                      View Official PDF
-                    </a>
-                  )}
+                <CardTitle className="flex items-center gap-2">
+                  <Calendar className="h-5 w-5" />
+                  Select Lesson
                 </CardTitle>
               </CardHeader>
               <CardContent>
