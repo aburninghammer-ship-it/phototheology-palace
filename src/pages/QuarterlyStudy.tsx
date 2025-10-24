@@ -287,6 +287,27 @@ const QuarterlyStudy = () => {
                   </SelectContent>
                 </Select>
 
+                {/* Read Online Link */}
+                {selectedLesson && (
+                  <div className="mt-4 p-4 bg-primary/5 rounded-lg border border-primary/20">
+                    <p className="text-sm text-muted-foreground mb-2">
+                      📖 Read the official lesson online:
+                    </p>
+                    <a
+                      href={`https://www.sabbath.school/Lesson?year=2025&quarter=4&lesson=${selectedLesson.index}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-sm text-primary hover:underline font-medium flex items-center gap-2"
+                    >
+                      <BookOpen className="h-4 w-4" />
+                      Open Lesson {selectedLesson.index}: {selectedLesson.title}
+                    </a>
+                    <p className="text-xs text-muted-foreground mt-2">
+                      Copy the content you want to analyze and paste it below ↓
+                    </p>
+                  </div>
+                )}
+
                 {/* Day Tabs */}
                 {lessonContent && lessonContent.days && (
                   <div className="mt-4">
