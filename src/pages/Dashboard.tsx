@@ -7,6 +7,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
 import { useReadingHistory } from "@/hooks/useReadingHistory";
+import { SpacedRepetitionReview } from "@/components/SpacedRepetitionReview";
 import { 
   BookOpen, 
   Flame, 
@@ -16,7 +17,8 @@ import {
   Clock,
   Award,
   Play,
-  History
+  History,
+  Users
 } from "lucide-react";
 
 interface DashboardStats {
@@ -177,32 +179,26 @@ export default function Dashboard() {
                 <BookOpen className="mr-2 h-4 w-4" />
                 Continue Revelation Course
               </Button>
+              <Button 
+                variant="outline" 
+                className="w-full justify-start"
+                onClick={() => navigate("/certificates")}
+              >
+                <Award className="mr-2 h-4 w-4" />
+                My Certificates
+              </Button>
+              <Button 
+                variant="outline" 
+                className="w-full justify-start"
+                onClick={() => navigate("/study-partners")}
+              >
+                <Users className="mr-2 h-4 w-4" />
+                Study Partners
+              </Button>
             </CardContent>
           </Card>
 
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <TrendingUp className="h-5 w-5" />
-                Today's Goals
-              </CardTitle>
-              <CardDescription>Complete these to maintain your streak</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              <div className="flex items-center justify-between p-3 rounded-lg bg-muted/50">
-                <span className="text-sm">Read 1 chapter</span>
-                <span className="text-xs text-muted-foreground">Not started</span>
-              </div>
-              <div className="flex items-center justify-between p-3 rounded-lg bg-muted/50">
-                <span className="text-sm">Complete 1 training drill</span>
-                <span className="text-xs text-muted-foreground">Not started</span>
-              </div>
-              <div className="flex items-center justify-between p-3 rounded-lg bg-muted/50">
-                <span className="text-sm">Win 1 game</span>
-                <span className="text-xs text-muted-foreground">Not started</span>
-              </div>
-            </CardContent>
-          </Card>
+          <SpacedRepetitionReview />
         </div>
 
         {/* Recent Reading */}

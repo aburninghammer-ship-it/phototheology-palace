@@ -1,30 +1,79 @@
 import { Navigation } from "@/components/Navigation";
 import { FloorCard } from "@/components/FloorCard";
 import { palaceFloors } from "@/data/palaceData";
-import { Building2 } from "lucide-react";
+import { Building2, Award, TrendingUp } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { Progress } from "@/components/ui/progress";
+import { useAuth } from "@/hooks/useAuth";
+import { useCourseProgress } from "@/hooks/useCourseProgress";
+import { Link } from "react-router-dom";
 
 const Palace = () => {
+  const { user } = useAuth();
+  const { progress } = useCourseProgress("Memory Palace");
+  
+  const totalRooms = 38;
+  const completedRooms = progress?.completed_lessons?.length || 0;
+  const progressPercentage = progress?.progress_percentage || 0;
+
   return (
     <div className="min-h-screen bg-gradient-subtle">
       <Navigation />
       
       <div className="pt-24 pb-16 px-4">
         <div className="container mx-auto max-w-6xl">
-          {/* Header */}
-          <div className="text-center mb-12">
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-accent/10 border border-accent/20 mb-4">
-              <Building2 className="h-4 w-4 text-accent" />
-              <span className="text-sm font-medium text-accent">38 Rooms of Wisdom</span>
+          {/* Hero Header */}
+          <div className="text-center mb-8">
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-palace border border-white/10 mb-4 shadow-lg">
+              <Building2 className="h-4 w-4 text-white" />
+              <span className="text-sm font-semibold text-white">The Master System</span>
             </div>
             
-            <h1 className="font-serif text-4xl md:text-5xl font-bold mb-4">
+            <h1 className="font-serif text-5xl md:text-6xl font-bold mb-4 bg-gradient-palace bg-clip-text text-transparent">
               The Eight-Floor Palace
             </h1>
             
-            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              Climb through the palace of Bible study. Each floor represents a level of mastery, 
-              with rooms teaching specific principles for storing and interpreting Scripture.
+            <p className="text-xl text-foreground max-w-2xl mx-auto mb-6">
+              Master Bible typology through our revolutionary <strong>8-floor, 38-room memory system</strong>. See Christ everywhere in Scripture.
             </p>
+
+            {user && (
+              <Card className="max-w-md mx-auto mb-6">
+                <CardContent className="pt-6">
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="flex items-center gap-2">
+                      <TrendingUp className="h-4 w-4 text-primary" />
+                      <span className="font-medium">Your Progress</span>
+                    </div>
+                    <span className="text-sm text-muted-foreground">
+                      {completedRooms} / {totalRooms} rooms
+                    </span>
+                  </div>
+                  <Progress value={progressPercentage} className="mb-2" />
+                  <p className="text-sm text-muted-foreground">
+                    {progressPercentage}% complete
+                  </p>
+                </CardContent>
+              </Card>
+            )}
+            
+            <div className="flex gap-3 justify-center">
+              <Button asChild size="lg" className="gradient-palace text-white">
+                <Link to={user ? `/palace-quiz/${palaceFloors[0].rooms[0].tag}` : "/auth"}>
+                  <Building2 className="mr-2 h-4 w-4" />
+                  {user ? "Continue Learning" : "Start Your Journey"}
+                </Link>
+              </Button>
+              {progress?.completed_at && (
+                <Button asChild size="lg" variant="outline">
+                  <Link to="/certificates">
+                    <Award className="mr-2 h-4 w-4" />
+                    View Certificate
+                  </Link>
+                </Button>
+              )}
+            </div>
           </div>
 
           {/* Palace Metaphor */}

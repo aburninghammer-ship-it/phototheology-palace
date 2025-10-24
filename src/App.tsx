@@ -60,6 +60,8 @@ import AccessCode from "./pages/AccessCode";
 import AdminAccessCodes from "./pages/AdminAccessCodes";
 import Onboarding from "./pages/Onboarding";
 import Dashboard from "./pages/Dashboard";
+import Certificates from "./pages/Certificates";
+import StudyPartners from "./pages/StudyPartners";
 import MemorizationVerses from "./pages/MemorizationVerses";
 import NotFound from "./pages/NotFound";
 import { ProtectedRoute } from "./components/ProtectedRoute";
@@ -148,6 +150,8 @@ function App() {
             <Route path="/referrals" element={<ProtectedRoute><Referrals /></ProtectedRoute>} />
             <Route path="/student-verify" element={<ProtectedRoute><StudentVerification /></ProtectedRoute>} />
             <Route path="/admin/access-codes" element={<ProtectedRoute><AdminAccessCodes /></ProtectedRoute>} />
+            <Route path="/certificates" element={<ProtectedRoute><Certificates /></ProtectedRoute>} />
+            <Route path="/study-partners" element={<ProtectedRoute><StudyPartners /></ProtectedRoute>} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>

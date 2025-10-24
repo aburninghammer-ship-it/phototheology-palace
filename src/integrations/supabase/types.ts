@@ -116,6 +116,39 @@ export type Database = {
         }
         Relationships: []
       }
+      certificates: {
+        Row: {
+          certificate_data: Json
+          certificate_type: string
+          course_name: string
+          id: string
+          is_public: boolean
+          issued_at: string
+          share_token: string | null
+          user_id: string
+        }
+        Insert: {
+          certificate_data?: Json
+          certificate_type: string
+          course_name: string
+          id?: string
+          is_public?: boolean
+          issued_at?: string
+          share_token?: string | null
+          user_id: string
+        }
+        Update: {
+          certificate_data?: Json
+          certificate_type?: string
+          course_name?: string
+          id?: string
+          is_public?: boolean
+          issued_at?: string
+          share_token?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       challenge_submissions: {
         Row: {
           ai_feedback: string | null
@@ -255,6 +288,42 @@ export type Database = {
           title?: string
           updated_at?: string | null
           user_id?: string | null
+        }
+        Relationships: []
+      }
+      course_progress: {
+        Row: {
+          completed_at: string | null
+          completed_lessons: Json
+          course_name: string
+          current_lesson: string | null
+          id: string
+          last_accessed_at: string
+          progress_percentage: number
+          started_at: string
+          user_id: string
+        }
+        Insert: {
+          completed_at?: string | null
+          completed_lessons?: Json
+          course_name: string
+          current_lesson?: string | null
+          id?: string
+          last_accessed_at?: string
+          progress_percentage?: number
+          started_at?: string
+          user_id: string
+        }
+        Update: {
+          completed_at?: string | null
+          completed_lessons?: Json
+          course_name?: string
+          current_lesson?: string | null
+          id?: string
+          last_accessed_at?: string
+          progress_percentage?: number
+          started_at?: string
+          user_id?: string
         }
         Relationships: []
       }
@@ -1089,6 +1158,48 @@ export type Database = {
         }
         Relationships: []
       }
+      spaced_repetition_items: {
+        Row: {
+          content: Json
+          created_at: string
+          ease_factor: number
+          id: string
+          interval_days: number
+          item_id: string
+          item_type: string
+          last_reviewed_at: string | null
+          next_review_date: string
+          repetitions: number
+          user_id: string
+        }
+        Insert: {
+          content?: Json
+          created_at?: string
+          ease_factor?: number
+          id?: string
+          interval_days?: number
+          item_id: string
+          item_type: string
+          last_reviewed_at?: string | null
+          next_review_date?: string
+          repetitions?: number
+          user_id: string
+        }
+        Update: {
+          content?: Json
+          created_at?: string
+          ease_factor?: number
+          id?: string
+          interval_days?: number
+          item_id?: string
+          item_type?: string
+          last_reviewed_at?: string | null
+          next_review_date?: string
+          repetitions?: number
+          user_id?: string
+        }
+        Relationships: []
+      }
       special_access_codes: {
         Row: {
           code: string
@@ -1119,6 +1230,60 @@ export type Database = {
           is_active?: boolean
           max_uses?: number | null
           used_count?: number
+        }
+        Relationships: []
+      }
+      study_activities: {
+        Row: {
+          activity_data: Json
+          activity_type: string
+          created_at: string
+          id: string
+          is_public: boolean
+          user_id: string
+        }
+        Insert: {
+          activity_data?: Json
+          activity_type: string
+          created_at?: string
+          id?: string
+          is_public?: boolean
+          user_id: string
+        }
+        Update: {
+          activity_data?: Json
+          activity_type?: string
+          created_at?: string
+          id?: string
+          is_public?: boolean
+          user_id?: string
+        }
+        Relationships: []
+      }
+      study_partners: {
+        Row: {
+          accepted_at: string | null
+          created_at: string
+          id: string
+          partner_id: string
+          status: string
+          user_id: string
+        }
+        Insert: {
+          accepted_at?: string | null
+          created_at?: string
+          id?: string
+          partner_id: string
+          status?: string
+          user_id: string
+        }
+        Update: {
+          accepted_at?: string | null
+          created_at?: string
+          id?: string
+          partner_id?: string
+          status?: string
+          user_id?: string
         }
         Relationships: []
       }

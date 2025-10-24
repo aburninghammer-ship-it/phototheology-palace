@@ -166,9 +166,15 @@ export const SimplifiedNav = () => {
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-48">
-              <DropdownMenuItem asChild>
-                <Link to="/profile">Profile</Link>
-              </DropdownMenuItem>
+            <DropdownMenuItem asChild>
+              <Link to="/certificates">Certificates</Link>
+            </DropdownMenuItem>
+            <DropdownMenuItem asChild>
+              <Link to="/study-partners">Study Partners</Link>
+            </DropdownMenuItem>
+            <DropdownMenuItem asChild>
+              <Link to="/profile">Profile</Link>
+            </DropdownMenuItem>
               <DropdownMenuItem asChild>
                 <Link to="/referrals">Referrals</Link>
               </DropdownMenuItem>
