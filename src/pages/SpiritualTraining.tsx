@@ -9,6 +9,7 @@ import { Sword, Shield, Target, BookOpen, Flame, Trophy, Scroll } from "lucide-r
 import { Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { SpacedRepetitionReview } from "@/components/SpacedRepetitionReview";
 
 const FRUITS_OF_SPIRIT = [
   { name: "Love", description: "Selfless care for others", color: "bg-red-500" },
@@ -229,13 +230,19 @@ export default function SpiritualTraining() {
         </Card>
 
         {/* Training Tabs */}
-        <Tabs defaultValue="scenarios" className="w-full">
-          <TabsList className="grid w-full grid-cols-4">
+        <Tabs defaultValue="review" className="w-full">
+          <TabsList className="grid w-full grid-cols-5">
+            <TabsTrigger value="review">Spaced Review</TabsTrigger>
             <TabsTrigger value="scenarios">Battle Scenarios</TabsTrigger>
             <TabsTrigger value="besetting">Besetting Sins</TabsTrigger>
             <TabsTrigger value="animals">Animal Styles</TabsTrigger>
             <TabsTrigger value="weapons">Spiritual Weapons</TabsTrigger>
           </TabsList>
+
+          {/* Spaced Repetition Review */}
+          <TabsContent value="review" className="space-y-4">
+            <SpacedRepetitionReview />
+          </TabsContent>
 
           {/* Battle Scenarios */}
           <TabsContent value="scenarios" className="space-y-4">

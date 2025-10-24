@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "./useAuth";
+import { toast } from "sonner";
 
 interface RepetitionItem {
   id: string;
@@ -46,10 +47,26 @@ export const useSpacedRepetition = () => {
   };
 
   const addItem = async (itemType: string, itemId: string, content: any) => {
-    if (!user) return;
+    if (!user) {
+      toast.error("Please sign in to add review items");
+      return;
+    }
 
     try {
-      const { error } = await supabase.from("spaced_repetition_items").upsert({
+      // Check if already exists
+      const { data: existing } = await supabase
+        .from("spaced_repetition_items")
+        .select("id")
+        .eq("user_id", user.id)
+        .eq("item_id", itemId)
+        .maybeSingle();
+
+      if (existing) {
+        toast.info("Already in your review queue");
+        return;
+      }
+
+      const { error } = await supabase.from("spaced_repetition_items").insert({
         user_id: user.id,
         item_type: itemType,
         item_id: itemId,
@@ -58,9 +75,11 @@ export const useSpacedRepetition = () => {
       });
 
       if (error) throw error;
+      toast.success("Added to review queue! 📚");
       loadDueItems();
     } catch (error) {
       console.error("Error adding item:", error);
+      toast.error("Failed to add item");
     }
   };
 
@@ -115,11 +134,33 @@ export const useSpacedRepetition = () => {
         .eq("id", itemId);
 
       if (error) throw error;
+      
+      const messages = ["Again", "Try again", "Keep trying", "Good", "Great!", "Perfect! 🌟"];
+      toast.success(messages[quality]);
+      
       loadDueItems();
     } catch (error) {
       console.error("Error reviewing item:", error);
+      toast.error("Failed to save review");
     }
   };
 
-  return { dueItems, loading, addItem, reviewItem, loadDueItems };
+  const getDueCount = async (): Promise<number> => {
+    if (!user) return 0;
+
+    try {
+      const { count } = await supabase
+        .from("spaced_repetition_items")
+        .select("*", { count: "exact", head: true })
+        .eq("user_id", user.id)
+        .lte("next_review_date", new Date().toISOString());
+
+      return count || 0;
+    } catch (error) {
+      console.error("Error getting due count:", error);
+      return 0;
+    }
+  };
+
+  return { dueItems, loading, addItem, reviewItem, loadDueItems, getDueCount };
 };

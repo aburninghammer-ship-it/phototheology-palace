@@ -2,7 +2,7 @@ import { useParams, Link, useNavigate } from "react-router-dom";
 import { palaceFloors } from "@/data/palaceData";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { ArrowLeft, Target, HelpCircle, BookOpen, AlertCircle, CheckCircle, Trophy, Lock, Dumbbell } from "lucide-react";
+import { ArrowLeft, Target, HelpCircle, BookOpen, AlertCircle, CheckCircle, Trophy, Lock, Dumbbell, Brain } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { JeevesAssistant } from "@/components/JeevesAssistant";
@@ -14,6 +14,7 @@ import { useEffect, useState } from "react";
 import { PracticeDrill } from "@/components/practice/PracticeDrill";
 import { getDrillsByRoom, getDrillName } from "@/data/drillQuestions";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useSpacedRepetition } from "@/hooks/useSpacedRepetition";
 
 export default function RoomDetail() {
   const { floorNumber, roomId } = useParams();
@@ -34,10 +35,26 @@ export default function RoomDetail() {
     Number(floorNumber), 
     roomId || ""
   );
+  
+  const { addItem } = useSpacedRepetition();
 
   const drillQuestions = room ? getDrillsByRoom(room.id) : [];
   const drillName = room ? getDrillName(room.id) : "Practice Drill";
   const hasDrills = drillQuestions.length > 0;
+
+  const handleAddToReview = () => {
+    if (!room) return;
+    addItem(
+      "room_content",
+      `${floorNumber}-${roomId}`,
+      {
+        question: room.coreQuestion,
+        answer: room.method,
+        room_name: room.name,
+        floor: floorNumber,
+      }
+    );
+  };
 
   // Redirect if room is locked
   useEffect(() => {
@@ -118,9 +135,22 @@ export default function RoomDetail() {
           <div className="lg:col-span-2 space-y-6">
             <Card>
               <CardHeader>
-                <div className="flex items-center gap-2">
-                  <HelpCircle className="h-5 w-5 text-primary" />
-                  <CardTitle>Core Question</CardTitle>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <HelpCircle className="h-5 w-5 text-primary" />
+                    <CardTitle>Core Question</CardTitle>
+                  </div>
+                  {user && (
+                    <Button
+                      onClick={handleAddToReview}
+                      variant="outline"
+                      size="sm"
+                      className="gap-2"
+                    >
+                      <Brain className="h-4 w-4" />
+                      Add to Review
+                    </Button>
+                  )}
                 </div>
               </CardHeader>
               <CardContent>

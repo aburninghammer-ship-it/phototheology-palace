@@ -2,8 +2,9 @@ import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./ui/card";
 import { Button } from "./ui/button";
 import { Progress } from "./ui/progress";
+import { Badge } from "./ui/badge";
 import { useSpacedRepetition } from "@/hooks/useSpacedRepetition";
-import { Brain, Check, X } from "lucide-react";
+import { Brain, Check, X, AlertCircle } from "lucide-react";
 
 export const SpacedRepetitionReview = () => {
   const { dueItems, reviewItem } = useSpacedRepetition();
@@ -55,52 +56,74 @@ export const SpacedRepetitionReview = () => {
         <Progress value={progress} className="mt-2" />
       </CardHeader>
       <CardContent className="space-y-4">
-        <div className="p-6 rounded-lg bg-muted/50">
-          <p className="font-medium mb-2">Question:</p>
-          <p className="text-lg">{currentItem.content.question}</p>
+        <div className="space-y-3">
+          <div className="flex items-center justify-between">
+            <Badge variant="secondary">{currentItem.item_type}</Badge>
+            <span className="text-xs text-muted-foreground">
+              Review #{currentItem.repetitions + 1}
+            </span>
+          </div>
+          
+          <div className="p-6 rounded-lg bg-muted/50 border">
+            <p className="text-lg leading-relaxed">
+              {currentItem.content.question || currentItem.content.text}
+            </p>
+            {currentItem.content.reference && (
+              <p className="text-sm text-muted-foreground mt-2">
+                {currentItem.content.reference}
+              </p>
+            )}
+          </div>
         </div>
 
         {showAnswer ? (
           <>
-            <div className="p-6 rounded-lg bg-primary/5 border border-primary/20">
-              <p className="font-medium mb-2">Answer:</p>
-              <p className="text-lg">{currentItem.content.answer}</p>
+            <div className="p-6 rounded-lg bg-primary/5 border border-primary">
+              <p className="font-medium text-primary mb-2">Answer:</p>
+              <p className="text-lg leading-relaxed">{currentItem.content.answer}</p>
             </div>
 
-            <div className="space-y-2">
-              <p className="text-sm text-muted-foreground text-center mb-3">
-                How well did you remember?
+            <div className="space-y-3">
+              <p className="text-sm text-muted-foreground text-center">
+                How well did you remember this?
               </p>
-              <div className="grid grid-cols-3 gap-2">
+              <div className="grid grid-cols-2 gap-2">
                 <Button
-                  variant="outline"
-                  onClick={() => handleReview(1)}
-                  className="flex-col h-auto py-3"
+                  variant="destructive"
+                  onClick={() => handleReview(0)}
+                  className="gap-2 h-auto py-3"
                 >
-                  <X className="h-4 w-4 mb-1 text-destructive" />
-                  <span className="text-xs">Forgot</span>
+                  <X className="h-4 w-4" />
+                  <span>Forgot</span>
                 </Button>
                 <Button
                   variant="outline"
                   onClick={() => handleReview(3)}
-                  className="flex-col h-auto py-3"
+                  className="gap-2 h-auto py-3"
                 >
-                  <span className="text-lg mb-1">🤔</span>
-                  <span className="text-xs">Hard</span>
+                  <AlertCircle className="h-4 w-4" />
+                  <span>Hard</span>
                 </Button>
                 <Button
                   variant="outline"
-                  onClick={() => handleReview(5)}
-                  className="flex-col h-auto py-3"
+                  onClick={() => handleReview(4)}
+                  className="gap-2 h-auto py-3"
                 >
-                  <Check className="h-4 w-4 mb-1 text-success" />
-                  <span className="text-xs">Easy</span>
+                  <span>Good</span>
+                </Button>
+                <Button
+                  variant="default"
+                  onClick={() => handleReview(5)}
+                  className="gap-2 h-auto py-3"
+                >
+                  <Check className="h-4 w-4" />
+                  <span>Easy</span>
                 </Button>
               </div>
             </div>
           </>
         ) : (
-          <Button onClick={() => setShowAnswer(true)} className="w-full">
+          <Button onClick={() => setShowAnswer(true)} className="w-full" size="lg">
             Show Answer
           </Button>
         )}
