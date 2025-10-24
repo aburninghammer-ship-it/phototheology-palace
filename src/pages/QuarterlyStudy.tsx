@@ -232,7 +232,7 @@ const QuarterlyStudy = () => {
             Amplified Quarterly Study
           </h1>
           <p className="text-muted-foreground max-w-2xl mx-auto">
-            Apply the 38 Palace Rooms and 5 Dimensions to your Sabbath School lessons
+            Apply the 38 Palace Rooms to your Sabbath School lessons
           </p>
         </div>
 
