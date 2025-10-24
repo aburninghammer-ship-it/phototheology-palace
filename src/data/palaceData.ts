@@ -44,9 +44,9 @@ export const palaceFloors: Floor[] = [
         id: "ir",
         name: "Imagination Room",
         tag: "IR",
-        purpose: "The Imagination Room invites you to step into the biblical narrative with all five senses, transforming intellectual knowledge into lived experience. Through guided 2-5 minute exercises, you'll feel the wet sand beneath your feet at the Red Sea, smell the night air in Gethsemane, and sense the weight on your chest as Jesus prayed. This sanctified empathy burns stories into your emotional memory far deeper than mere facts ever could. When you preach or teach these passages later, you won't just recite events—you'll transport your listeners into the story because you've been there yourself.",
+        purpose: "The Imagination Room invites you to step into the biblical narrative with all five senses, transforming intellectual knowledge into lived experience. Through 2-5 minute immersive exercises, you'll feel the wet sand beneath your feet at the Red Sea, smell the night air in Gethsemane, and sense the weight on your chest as Jesus prayed. This sanctified empathy burns stories into your emotional memory far deeper than mere facts ever could. When you preach or teach these passages later, you won't just recite events—you'll transport your listeners into the story because you've been there yourself.",
         coreQuestion: "What does it feel like to stand there?",
-        method: "2–5 minute guided 'step-in': sights, sounds, touch, smell; then 1 sentence of personal resonance.",
+        method: "2–5 minute immersive 'step-in': engage all five senses (sights, sounds, touch, smell, taste); then write 1 sentence of personal resonance.",
         examples: [
           "Red Sea: feet in wet sand, wind in face",
           "Gethsemane: weight on chest, night air"
