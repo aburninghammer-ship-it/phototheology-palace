@@ -79,9 +79,6 @@ export const Navigation = () => {
                 <DropdownMenuItem asChild>
                   <Link to="/bible-image-library">🎨 Image Library</Link>
                 </DropdownMenuItem>
-                <DropdownMenuItem asChild>
-                  <Link to="/quarterly-study">📅 Amplified Quarterly</Link>
-                </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
             <DropdownMenu>

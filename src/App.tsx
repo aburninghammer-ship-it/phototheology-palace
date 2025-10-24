@@ -54,7 +54,6 @@ const KidGPT = lazy(() => import("./pages/KidGPT"));
 const PhototheologyGPT = lazy(() => import("./pages/PhototheologyGPT"));
 const DanielRevelationGPT = lazy(() => import("./pages/DanielRevelationGPT"));
 const ApologeticsGPT = lazy(() => import("./pages/ApologeticsGPT"));
-const QuarterlyStudy = lazy(() => import("./pages/QuarterlyStudy"));
 const TreasureHunt = lazy(() => import("./pages/TreasureHunt"));
 const TreasureHuntPlay = lazy(() => import("./pages/TreasureHuntPlay"));
 const TrainingDrills = lazy(() => import("./pages/TrainingDrills"));
@@ -155,7 +154,6 @@ function App() {
           <Route path="/phototheologygpt" element={<ProtectedRoute><PhototheologyGPT /></ProtectedRoute>} />
           <Route path="/daniel-revelation-gpt" element={<ProtectedRoute><DanielRevelationGPT /></ProtectedRoute>} />
           <Route path="/apologetics-gpt" element={<ProtectedRoute><ApologeticsGPT /></ProtectedRoute>} />
-          <Route path="/quarterly-study" element={<ProtectedRoute><QuarterlyStudy /></ProtectedRoute>} />
             <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
             <Route path="/critics-analysis" element={<ProtectedRoute><CriticsAnalysis /></ProtectedRoute>} />
             <Route path="/referrals" element={<ProtectedRoute><Referrals /></ProtectedRoute>} />
