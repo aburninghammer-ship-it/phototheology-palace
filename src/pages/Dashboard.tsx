@@ -9,6 +9,7 @@ import { useNavigate } from "react-router-dom";
 import { useReadingHistory } from "@/hooks/useReadingHistory";
 import { SpacedRepetitionReview } from "@/components/SpacedRepetitionReview";
 import { DashboardSkeleton } from "@/components/SkeletonLoader";
+import { Brain, Building2 } from "lucide-react";
 import { 
   BookOpen, 
   Flame, 
@@ -19,7 +20,10 @@ import {
   Award,
   Play,
   History,
-  Users
+  Users,
+  Star,
+  Sparkles,
+  ChevronRight
 } from "lucide-react";
 
 interface DashboardStats {
@@ -31,6 +35,77 @@ interface DashboardStats {
   studyStreak: number;
   recentActivity: string[];
 }
+
+const featuredContent = [
+  {
+    day: 1, // Monday
+    title: "Chain Chess",
+    description: "Master typological connections by linking Bible verses in this strategic game",
+    path: "/chain-chess",
+    icon: Target,
+    gradient: "gradient-ocean",
+    reason: "Perfect for building pattern recognition skills"
+  },
+  {
+    day: 2, // Tuesday
+    title: "Treasure Hunt",
+    description: "Solve clues and discover hidden biblical principles in this timed adventure",
+    path: "/treasure-hunt",
+    icon: Sparkles,
+    gradient: "gradient-palace",
+    reason: "Great for applied learning and time management"
+  },
+  {
+    day: 3, // Wednesday
+    title: "Phototheology GPT",
+    description: "Chat with AI trained on Daniel & Revelation to deepen your understanding",
+    path: "/daniel-revelation-gpt",
+    icon: Brain,
+    gradient: "gradient-dreamy",
+    reason: "Ideal for answering specific questions"
+  },
+  {
+    day: 4, // Thursday
+    title: "Memory Palace",
+    description: "Explore the 3D visual journey through Bible typology and sanctuary principles",
+    path: "/palace",
+    icon: Building2,
+    gradient: "gradient-ocean",
+    reason: "Best for visual learners and comprehensive overview"
+  },
+  {
+    day: 5, // Friday
+    title: "Escape Rooms",
+    description: "Race against the clock to solve principle-based Bible puzzles",
+    path: "/escape-room",
+    icon: Clock,
+    gradient: "gradient-palace",
+    reason: "Excellent for competitive learners"
+  },
+  {
+    day: 6, // Saturday
+    title: "Community & Study Partners",
+    description: "Connect with fellow students, share insights, and grow together",
+    path: "/community",
+    icon: Users,
+    gradient: "gradient-dreamy",
+    reason: "Perfect for collaborative learning"
+  },
+  {
+    day: 0, // Sunday
+    title: "Revelation Course",
+    description: "Follow our structured course for deep, comprehensive Bible study",
+    path: "/revelation-course",
+    icon: BookOpen,
+    gradient: "gradient-ocean",
+    reason: "Ideal for systematic, thorough learning"
+  },
+];
+
+const getFeaturedToday = () => {
+  const today = new Date().getDay();
+  return featuredContent.find(item => item.day === today) || featuredContent[0];
+};
 
 export default function Dashboard() {
   const { user } = useAuth();
@@ -47,6 +122,8 @@ export default function Dashboard() {
   });
   const [loading, setLoading] = useState(true);
   const [recentReading, setRecentReading] = useState<any[]>([]);
+  const featured = getFeaturedToday();
+  const FeaturedIcon = featured.icon;
 
   useEffect(() => {
     if (user) {
@@ -99,6 +176,40 @@ export default function Dashboard() {
           <h1 className="text-4xl font-bold mb-2">Welcome back! 👋</h1>
           <p className="text-muted-foreground">Here's your learning progress</p>
         </div>
+
+        {/* Featured Today */}
+        <Card className={`mb-8 ${featured.gradient} border-0 text-white overflow-hidden relative`}>
+          <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent" />
+          <CardHeader className="relative z-10">
+            <div className="flex items-start justify-between">
+              <div className="flex items-center gap-3">
+                <div className="p-3 rounded-xl bg-white/20 backdrop-blur-sm">
+                  <Star className="h-6 w-6 text-white" />
+                </div>
+                <div>
+                  <CardTitle className="text-2xl text-white mb-1">Featured Today</CardTitle>
+                  <CardDescription className="text-white/80">{featured.reason}</CardDescription>
+                </div>
+              </div>
+              <div className="p-3 rounded-xl bg-white/20 backdrop-blur-sm">
+                <FeaturedIcon className="h-8 w-8 text-white" />
+              </div>
+            </div>
+          </CardHeader>
+          <CardContent className="relative z-10">
+            <h3 className="text-xl font-bold text-white mb-2">{featured.title}</h3>
+            <p className="text-white/90 mb-4">{featured.description}</p>
+            <Button 
+              onClick={() => navigate(featured.path)}
+              variant="secondary"
+              size="lg"
+              className="bg-white text-primary hover:bg-white/90 font-semibold"
+            >
+              Try it now
+              <ChevronRight className="ml-2 h-5 w-5" />
+            </Button>
+          </CardContent>
+        </Card>
 
         {/* Main Stats Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
