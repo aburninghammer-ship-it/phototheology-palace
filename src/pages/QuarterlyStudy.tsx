@@ -348,7 +348,7 @@ const QuarterlyStudy = () => {
                 {/* Dimension Selection */}
                 <div>
                   <label className="text-sm font-medium mb-2 block">
-                    Select a Dimension (from DR Room)
+                    Select a Principle
                   </label>
                   <Select value={selectedPrinciple} onValueChange={setSelectedPrinciple}>
                     <SelectTrigger>
