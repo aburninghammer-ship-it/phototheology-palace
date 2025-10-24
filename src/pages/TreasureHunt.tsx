@@ -10,6 +10,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { Trophy, Clock, Users, Lightbulb, CheckCircle2, XCircle } from "lucide-react";
 import { RoomPrerequisites } from "@/components/RoomPrerequisites";
+import { ShareChallenge } from "@/components/ShareChallenge";
 
 interface TreasureHunt {
   id: string;
@@ -205,29 +206,36 @@ const TreasureHunt = () => {
                       {hunt.total_clues} clues to solve
                     </div>
 
-                    {isCompleted ? (
-                      <Button
-                        onClick={() => navigate(`/treasure-hunt/${hunt.id}`)}
-                        className="w-full"
-                        variant="outline"
-                      >
-                        View Results
-                      </Button>
-                    ) : isActive ? (
-                      <Button
-                        onClick={() => navigate(`/treasure-hunt/${hunt.id}`)}
-                        className="w-full"
-                      >
-                        Continue Hunt (Clue {participation.current_clue}/{hunt.total_clues})
-                      </Button>
-                    ) : (
-                      <Button
-                        onClick={() => joinHunt(hunt.id)}
-                        className="w-full"
-                      >
-                        Join Hunt
-                      </Button>
-                    )}
+                    <div className="flex gap-2">
+                      {isCompleted ? (
+                        <Button
+                          onClick={() => navigate(`/treasure-hunt/${hunt.id}`)}
+                          className="flex-1"
+                          variant="outline"
+                        >
+                          View Results
+                        </Button>
+                      ) : isActive ? (
+                        <Button
+                          onClick={() => navigate(`/treasure-hunt/${hunt.id}`)}
+                          className="flex-1"
+                        >
+                          Continue Hunt (Clue {participation.current_clue}/{hunt.total_clues})
+                        </Button>
+                      ) : (
+                        <Button
+                          onClick={() => joinHunt(hunt.id)}
+                          className="flex-1"
+                        >
+                          Join Hunt
+                        </Button>
+                      )}
+                      <ShareChallenge
+                        challengeType="treasure-hunt"
+                        challengeId={hunt.id}
+                        challengeTitle={hunt.title}
+                      />
+                    </div>
                   </CardContent>
                 </Card>
               );

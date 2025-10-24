@@ -9,6 +9,7 @@ import { Clock, Users, Trophy, Zap } from "lucide-react";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { RoomPrerequisites } from "@/components/RoomPrerequisites";
+import { ShareChallenge } from "@/components/ShareChallenge";
 
 interface AvailableRoom {
   id: string;
@@ -310,14 +311,21 @@ export default function EscapeRoom() {
                     </div>
                   </CardHeader>
                   <CardContent>
-                    <div className="flex items-center justify-between text-sm">
-                      <div className="flex items-center gap-2 text-muted-foreground">
-                        <Clock className="w-4 h-4" />
-                        <span>{room.time_limit_minutes} min</span>
+                    <div className="space-y-3">
+                      <div className="flex items-center justify-between text-sm">
+                        <div className="flex items-center gap-2 text-muted-foreground">
+                          <Clock className="w-4 h-4" />
+                          <span>{room.time_limit_minutes} min</span>
+                        </div>
+                        <div className="text-xs text-muted-foreground">
+                          {formatTimeRemaining(room.expires_at)}
+                        </div>
                       </div>
-                      <div className="text-xs text-muted-foreground">
-                        {formatTimeRemaining(room.expires_at)}
-                      </div>
+                      <ShareChallenge
+                        challengeType="escape-room"
+                        challengeId={room.id}
+                        challengeTitle={room.title}
+                      />
                     </div>
                   </CardContent>
                 </Card>
