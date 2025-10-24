@@ -99,11 +99,6 @@ export const MobileNav = () => {
                   📜 Daniel & Revelation GPT
                 </Button>
               </Link>
-              <Link to="/lesson-quarterly-gpt">
-                <Button variant="ghost" className="w-full justify-start" size="sm">
-                  📅 Lesson Quarterly GPT
-                </Button>
-              </Link>
               <Link to="/kidgpt">
                 <Button variant="ghost" className="w-full justify-start" size="sm">
                   👶 KidGPT

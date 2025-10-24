@@ -124,9 +124,6 @@ export const Navigation = () => {
                   <Link to="/daniel-revelation-gpt">📜 Daniel & Revelation GPT</Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
-                  <Link to="/lesson-quarterly-gpt">📅 Lesson Quarterly GPT</Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem asChild>
                   <Link to="/kidgpt">👶 KidGPT</Link>
                 </DropdownMenuItem>
               </DropdownMenuContent>
