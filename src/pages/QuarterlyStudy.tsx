@@ -65,6 +65,10 @@ const QuarterlyStudy = () => {
       if (currentLesson) {
         setSelectedLesson(currentLesson);
         loadLessonContent(quarterly.id, currentLesson.id);
+        toast({
+          title: "This Week's Lesson",
+          description: `Lesson ${currentLesson.index}: ${currentLesson.title}`,
+        });
       } else {
         setSelectedLesson(quarterly.lessons[0]);
         loadLessonContent(quarterly.id, quarterly.lessons[0].id);
@@ -208,9 +212,20 @@ const QuarterlyStudy = () => {
         {quarterly && (
           <Card className="mb-6 border-2 border-primary/20">
             <CardHeader className="gradient-palace text-white">
-              <CardTitle className="font-serif text-2xl">{quarterly.title}</CardTitle>
+              <CardTitle className="font-serif text-2xl flex items-center justify-between">
+                <span>{quarterly.title}</span>
+                <a
+                  href="https://www.sabbath.school/LessonBook"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-sm bg-white/20 hover:bg-white/30 px-4 py-2 rounded-lg transition-all flex items-center gap-2"
+                >
+                  <BookOpen className="h-4 w-4" />
+                  View PDF
+                </a>
+              </CardTitle>
               <CardDescription className="text-white/90">
-                {quarterly.quarter}
+                {quarterly.quarter} • {quarterly.description}
               </CardDescription>
             </CardHeader>
           </Card>
