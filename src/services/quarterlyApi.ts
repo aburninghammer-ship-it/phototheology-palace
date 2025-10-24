@@ -144,20 +144,48 @@ export async function getQuarterlyLesson(
       };
     }
     
-    // Fallback: Return basic structure
+    // Fallback: Return basic structure with actual content
+    const fallbackContent = `
+      <h3>Lesson Overview</h3>
+      <p>This is a fallback lesson view. The Sabbath School API is currently unavailable, but you can still practice using the Palace Rooms and Principles to analyze this sample content.</p>
+      
+      <h4>Key Bible Text: Joshua 1:8-9</h4>
+      <p>"This Book of the Law shall not depart from your mouth, but you shall meditate in it day and night, that you may observe to do according to all that is written in it. For then you will make your way prosperous, and then you will have good success. Have I not commanded you? Be strong and of good courage; do not be afraid, nor be dismayed, for the Lord your God is with you wherever you go."</p>
+      
+      <h4>Introduction</h4>
+      <p>Joshua stands at the threshold of a new era. Moses, the great deliverer and lawgiver, has died, and now Joshua must lead Israel into the Promised Land. God's call to Joshua is clear: "Be strong and of good courage." This is not a call based on human strength but on trust in God's promises and presence.</p>
+      
+      <h4>The Promise of God's Presence</h4>
+      <p>Three times in the opening chapter, God commands Joshua to be strong and courageous. This repetition emphasizes both the difficulty of the task ahead and the sufficiency of God's enabling power. The source of Joshua's courage was not self-confidence but God-confidence. The Lord promised, "I will not leave you nor forsake you" (Joshua 1:5).</p>
+      
+      <h4>The Importance of God's Word</h4>
+      <p>Success in Joshua's mission depended on his faithfulness to God's Word. He was instructed to meditate on it day and night and to be careful to obey everything written in it. This was not merely intellectual study but transformative engagement with divine revelation that would shape his decisions and actions.</p>
+      
+      <h4>Application for Today</h4>
+      <p>Like Joshua, we face challenges that seem overwhelming. Whether it's spiritual battles, difficult relationships, or uncertain futures, God's call to us is the same: "Be strong and courageous." Our strength comes not from ourselves but from God's presence and His Word. As we meditate on Scripture and trust in His promises, we too can face our "Promised Land" moments with faith and courage.</p>
+      
+      <h4>Discussion Questions</h4>
+      <ul>
+        <li>What "Promised Land" challenges are you facing in your life right now?</li>
+        <li>How does meditating on God's Word day and night help you navigate difficulties?</li>
+        <li>In what ways can you practice God's presence in your daily life?</li>
+        <li>What does it mean to be "strong and courageous" in a Christian context?</li>
+      </ul>
+    `;
+    
     return {
       lesson: {
         id: lessonId,
-        title: "Lesson Study",
-        bible_reading: "Joshua 1-24",
+        title: "Faith and Courage: Lessons from Joshua",
+        bible_reading: "Joshua 1:1-9",
       },
       days: [
-        { id: "01", title: "Sunday - Introduction", date: "", read: "Study Joshua and discover God's faithfulness. Use the palace rooms and principle lenses to dig deeper into the text.", content: "Study Joshua and discover God's faithfulness." },
-        { id: "02", title: "Monday - Deeper Study", date: "", read: "Continue your study with Jeeves' help. Apply different palace rooms to see new insights.", content: "Continue your study with Jeeves' help." },
-        { id: "03", title: "Tuesday - Application", date: "", read: "Apply what you've learned to your life today.", content: "Apply what you've learned to your life today." },
-        { id: "04", title: "Wednesday - Connection", date: "", read: "Connect this lesson to Christ and His ministry.", content: "Connect this lesson to Christ and His ministry." },
-        { id: "05", title: "Thursday - Reflection", date: "", read: "Reflect on the key principles from this week.", content: "Reflect on the key principles from this week." },
-        { id: "06", title: "Friday - Further Study", date: "", read: "Explore additional resources and Spirit of Prophecy insights.", content: "Explore additional resources and insights." },
+        { id: "01", title: "Sunday - God's Call to Joshua", date: "", read: fallbackContent, content: fallbackContent },
+        { id: "02", title: "Monday - The Promise of Presence", date: "", read: fallbackContent.replace("Introduction", "God's Presence"), content: fallbackContent },
+        { id: "03", title: "Tuesday - Meditating on God's Word", date: "", read: fallbackContent.replace("Introduction", "The Power of Scripture"), content: fallbackContent },
+        { id: "04", title: "Wednesday - Courage in Action", date: "", read: fallbackContent.replace("Introduction", "Putting Faith to Work"), content: fallbackContent },
+        { id: "05", title: "Thursday - Trusting God's Promises", date: "", read: fallbackContent.replace("Introduction", "The Faithfulness of God"), content: fallbackContent },
+        { id: "06", title: "Friday - Living with Courage", date: "", read: fallbackContent.replace("Introduction", "Practical Application"), content: fallbackContent },
       ],
     };
   } catch (error) {

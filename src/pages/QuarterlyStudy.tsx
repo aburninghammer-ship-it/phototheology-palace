@@ -142,7 +142,23 @@ const QuarterlyStudy = () => {
     }
 
     const currentDay = lessonContent?.days?.find((d: any) => d.id === selectedDay);
-    if (!currentDay) return;
+    if (!currentDay) {
+      toast({
+        title: "No Lesson Content",
+        description: "Please select a lesson first",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (!currentDay.read && !currentDay.content) {
+      toast({
+        title: "No Content Available",
+        description: "This lesson has no content to analyze",
+        variant: "destructive",
+      });
+      return;
+    }
 
     setAnalyzing(true);
     try {
