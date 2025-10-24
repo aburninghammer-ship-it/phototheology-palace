@@ -8,6 +8,8 @@ import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { OfflineIndicator } from "@/components/OfflineIndicator";
 import Index from "./pages/Index";
 import Palace from "./pages/Palace";
+import FloorDetail from "./pages/FloorDetail";
+import RoomDetail from "./pages/RoomDetail";
 
 import Bible from "./pages/Bible";
 import BibleChapter from "./pages/BibleChapter";
@@ -104,6 +106,8 @@ function App() {
               </ProtectedRoute>
             } />
             <Route path="/palace" element={<ProtectedRoute><Palace /></ProtectedRoute>} />
+            <Route path="/palace/floor/:floorNumber" element={<ProtectedRoute><FloorDetail /></ProtectedRoute>} />
+            <Route path="/palace/floor/:floorNumber/room/:roomId" element={<ProtectedRoute><RoomDetail /></ProtectedRoute>} />
             
             <Route path="/bible" element={<ProtectedRoute><Bible /></ProtectedRoute>} />
             <Route path="/bible/search" element={<ProtectedRoute><BibleSearch /></ProtectedRoute>} />
