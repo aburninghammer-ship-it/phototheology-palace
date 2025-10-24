@@ -1,0 +1,54 @@
+-- Update treasure hunts to 24 hours and add more clues
+UPDATE treasure_hunts
+SET 
+  time_limit_hours = 24,
+  clues = '[
+    {"clue_number": 1, "hint": "This overarching theme connects Jesus Christ as both the sacrificial offering and the victorious ruler. What theological concept bridges His death and reign?", "clue_type": "theme", "correct_answers": ["Lamb", "The Lamb", "Lamb of God", "Victory", "Victorious Lamb"], "explanation": "The Lamb represents Jesus as both sacrifice and victor - the central theme of Revelation."},
+    {"clue_number": 2, "hint": "In the Palace, there is a specific room dedicated to understanding Christ through symbolic representations and typological patterns. Which room focuses on symbols?", "clue_type": "room", "correct_answers": ["Symbol Room", "SR", "Symbols", "Symbol"], "explanation": "The Symbol Room (SR) is where we decode the rich imagery of Revelation, including the Lamb."},
+    {"clue_number": 3, "hint": "This room teaches that ancient sanctuary practices and Old Testament stories pointed forward to Christ. What methodology does this room use?", "clue_type": "principle", "correct_answers": ["Typology", "Types", "Typological", "Type"], "explanation": "Typology shows how Old Testament patterns prefigure New Testament realities."},
+    {"clue_number": 4, "hint": "Within the Symbol Room, which specific principle explains how the Passover lamb and sanctuary sacrifices all pointed to Jesus?", "clue_type": "principle", "correct_answers": ["Sanctuary typology", "Sacrifice typology", "Lamb typology", "Passover typology"], "explanation": "The sanctuary and sacrifice systems were types pointing to Christ."},
+    {"clue_number": 5, "hint": "This verse shows the Lamb receiving worship as the One who was slain and redeemed people from every nation. It is in Revelation chapter 5.", "clue_type": "verse", "correct_answers": ["Revelation 5:9", "Rev 5:9", "5:9"], "explanation": "Revelation 5:9 - the new song to the Lamb who was slain."},
+    {"clue_number": 6, "hint": "After identifying the Lamb, what attribute of God does this victory reveal? The Lamb shows God is both just and ___.", "clue_type": "theme", "correct_answers": ["Merciful", "Mercy", "Loving", "Love", "Gracious"], "explanation": "The Lamb reveals God''s mercy and love through sacrificial redemption."},
+    {"clue_number": 7, "hint": "Which Palace room focuses on the character and attributes of God as revealed through biblical narrative?", "clue_type": "room", "correct_answers": ["Throne Room", "TR", "Throne"], "explanation": "The Throne Room reveals God''s character, justice, and mercy."},
+    {"clue_number": 8, "hint": "The book of Revelation repeatedly shows the Lamb on the throne. What chapter first introduces the Lamb standing as though it had been slain?", "clue_type": "verse", "correct_answers": ["Revelation 5", "Rev 5", "Chapter 5", "5"], "explanation": "Revelation 5 introduces the Lamb in the throne room vision."},
+    {"clue_number": 9, "hint": "In Revelation, those who overcome do so by the blood of the Lamb and what else? (Hint: their testimony)", "clue_type": "theme", "correct_answers": ["Word of their testimony", "Testimony", "Witness", "Their testimony"], "explanation": "Revelation 12:11 - they overcame by the blood and their testimony."},
+    {"clue_number": 10, "hint": "This verse in Revelation 12 describes victory through the Lamb''s blood and the word of testimony.", "clue_type": "verse", "correct_answers": ["Revelation 12:11", "Rev 12:11", "12:11"], "explanation": "Revelation 12:11 - the victory formula of the saints."}
+  ]'::jsonb
+WHERE title = 'The Lamb''s Victory Path';
+
+UPDATE treasure_hunts
+SET 
+  time_limit_hours = 24,
+  clues = '[
+    {"clue_number": 1, "hint": "Revelation unfolds God''s plan through time, from John''s day to the end. What broad concept describes this unfolding of events?", "clue_type": "theme", "correct_answers": ["Prophecy", "Prophetic timeline", "Timeline", "Historicism"], "explanation": "Revelation presents a prophetic timeline of history."},
+    {"clue_number": 2, "hint": "In the Palace, which room is dedicated to understanding the sequence and timing of prophetic events?", "clue_type": "room", "correct_answers": ["Time Room", "TM", "Time"], "explanation": "The Time Room (TM) focuses on prophetic chronology and sequences."},
+    {"clue_number": 3, "hint": "This interpretive method views Revelation''s prophecies as unfolding progressively through church history. What is it called?", "clue_type": "principle", "correct_answers": ["Historicism", "Historicist", "Historical interpretation"], "explanation": "Historicism interprets prophecy as continuous fulfillment through history."},
+    {"clue_number": 4, "hint": "Revelation has seven churches, seven seals, seven trumpets, and seven bowls. What structural principle is this?", "clue_type": "principle", "correct_answers": ["Septenary structure", "Sevenfold", "Seven", "Heptadic"], "explanation": "The septenary (sevenfold) structure organizes Revelation into groups of seven."},
+    {"clue_number": 5, "hint": "The seven churches represent both literal churches and what else throughout history?", "clue_type": "theme", "correct_answers": ["Church ages", "Periods", "Eras", "Epochs", "Time periods"], "explanation": "The seven churches can represent successive periods of church history."},
+    {"clue_number": 6, "hint": "Which church represents the final era before Christ returns, known for being lukewarm?", "clue_type": "verse", "correct_answers": ["Laodicea", "Laodicean", "Revelation 3:14-22", "Rev 3:14"], "explanation": "Laodicea is the seventh church, representing the final age."},
+    {"clue_number": 7, "hint": "After the seven seals, what judgment sequence sounds forth warnings to the earth?", "clue_type": "theme", "correct_answers": ["Seven trumpets", "Trumpets", "7 trumpets"], "explanation": "The seven trumpets follow the seals in Revelation''s timeline."},
+    {"clue_number": 8, "hint": "Which chapter introduces the seven trumpets being given to seven angels?", "clue_type": "verse", "correct_answers": ["Revelation 8", "Rev 8", "Chapter 8", "8"], "explanation": "Revelation 8 begins the trumpet sequence."},
+    {"clue_number": 9, "hint": "The time prophecy of 1260 days appears multiple times. What other time periods are equivalent to this?", "clue_type": "principle", "correct_answers": ["42 months", "Time times and half a time", "3.5 years", "1260 years"], "explanation": "These are equivalent prophetic time periods in Revelation."},
+    {"clue_number": 10, "hint": "The woman in Revelation 12 is protected in the wilderness for 1260 days. What verse states this?", "clue_type": "verse", "correct_answers": ["Revelation 12:6", "Rev 12:6", "12:6"], "explanation": "Revelation 12:6 mentions the 1260-day period."},
+    {"clue_number": 11, "hint": "What comes after the trumpets in the judgment sequence?", "clue_type": "theme", "correct_answers": ["Seven bowls", "Bowls", "Seven plagues", "7 bowls", "Last plagues"], "explanation": "The seven bowls (or seven last plagues) come after the trumpets."},
+    {"clue_number": 12, "hint": "Which chapter describes the seven bowls of God''s wrath being poured out?", "clue_type": "verse", "correct_answers": ["Revelation 16", "Rev 16", "Chapter 16", "16"], "explanation": "Revelation 16 details the seven bowl judgments."}
+  ]'::jsonb
+WHERE title = 'The Prophetic Timeline';
+
+UPDATE treasure_hunts
+SET 
+  time_limit_hours = 24,
+  clues = '[
+    {"clue_number": 1, "hint": "God reveals His nature through the cosmic conflict. What overarching theme describes the battle between good and evil in Revelation?", "clue_type": "theme", "correct_answers": ["Great Controversy", "Cosmic conflict", "War", "Spiritual warfare", "Conflict"], "explanation": "The great controversy theme runs throughout Revelation."},
+    {"clue_number": 2, "hint": "Which Palace room focuses on understanding God''s character as revealed through the biblical narrative?", "clue_type": "room", "correct_answers": ["Throne Room", "TR", "Throne"], "explanation": "The Throne Room (TR) reveals God''s character and justice."},
+    {"clue_number": 3, "hint": "Revelation shows God is both sovereign on His throne and intimately involved in history. What attribute balances His justice and mercy?", "clue_type": "principle", "correct_answers": ["Love", "Character", "Righteousness", "Holiness"], "explanation": "God''s character perfectly balances all His attributes."},
+    {"clue_number": 4, "hint": "In Revelation, who is the accuser of the brethren who is cast down?", "clue_type": "theme", "correct_answers": ["Satan", "Devil", "Dragon", "Accuser"], "explanation": "Satan is identified as the accuser cast down in Revelation 12."},
+    {"clue_number": 5, "hint": "Which verse describes Satan being cast out of heaven and no longer having access?", "clue_type": "verse", "correct_answers": ["Revelation 12:9", "Rev 12:9", "12:9", "Revelation 12:10"], "explanation": "Revelation 12:9-10 describes Satan''s expulsion."},
+    {"clue_number": 6, "hint": "The throne room vision in Revelation 4-5 reveals God''s character through what activity surrounding the throne?", "clue_type": "theme", "correct_answers": ["Worship", "Praise", "Adoration"], "explanation": "Continuous worship reveals God''s worthiness and character."},
+    {"clue_number": 7, "hint": "The 24 elders cast their crowns before the throne. What verse describes this act of worship?", "clue_type": "verse", "correct_answers": ["Revelation 4:10", "Rev 4:10", "4:10"], "explanation": "Revelation 4:10 shows the elders worshiping."},
+    {"clue_number": 8, "hint": "God''s character is vindicated at the end when all see His judgments are true and ___.", "clue_type": "theme", "correct_answers": ["Righteous", "Just", "Fair", "Holy"], "explanation": "God''s judgments are declared righteous and true."},
+    {"clue_number": 9, "hint": "Which chapter contains the great multitude declaring God''s judgments are true and righteous?", "clue_type": "verse", "correct_answers": ["Revelation 19", "Rev 19", "Chapter 19", "19"], "explanation": "Revelation 19 includes the vindication of God''s character."},
+    {"clue_number": 10, "hint": "The final chapters show God dwelling with humanity. What does this reveal about His deepest desire?", "clue_type": "theme", "correct_answers": ["Relationship", "Fellowship", "Communion", "Unity", "Presence"], "explanation": "God desires intimate relationship with His people."},
+    {"clue_number": 11, "hint": "God will wipe away every tear and there will be no more death. What verse contains this beautiful promise?", "clue_type": "verse", "correct_answers": ["Revelation 21:4", "Rev 21:4", "21:4"], "explanation": "Revelation 21:4 - the promise of no more tears or death."}
+  ]'::jsonb
+WHERE title = 'The Character Reflection';
