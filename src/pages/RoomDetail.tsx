@@ -2,15 +2,25 @@ import { useParams, Link } from "react-router-dom";
 import { palaceFloors } from "@/data/palaceData";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { ArrowLeft, Target, HelpCircle, BookOpen, AlertCircle, CheckCircle } from "lucide-react";
+import { ArrowLeft, Target, HelpCircle, BookOpen, AlertCircle, CheckCircle, Trophy } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { JeevesAssistant } from "@/components/JeevesAssistant";
+import { useRoomProgress } from "@/hooks/useRoomProgress";
+import { useAuth } from "@/hooks/useAuth";
 
 export default function RoomDetail() {
   const { floorNumber, roomId } = useParams();
+  const { user } = useAuth();
   const floor = palaceFloors.find(f => f.number === Number(floorNumber));
   const room = floor?.rooms.find(r => r.id === roomId);
+  
+  const { 
+    progress, 
+    loading: progressLoading, 
+    markExerciseComplete, 
+    markRoomComplete 
+  } = useRoomProgress(Number(floorNumber), roomId || "");
 
   if (!floor || !room) {
     return (
@@ -57,6 +67,13 @@ export default function RoomDetail() {
           </div>
           <h1 className="text-4xl font-serif font-bold mb-4">{room.name}</h1>
           <p className="text-lg leading-relaxed">{room.purpose}</p>
+          
+          {user && progress?.completed_at && (
+            <div className="mt-4 flex items-center gap-2 text-white">
+              <Trophy className="h-5 w-5" />
+              <span className="font-medium">Room Completed!</span>
+            </div>
+          )}
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -131,9 +148,41 @@ export default function RoomDetail() {
                 </div>
               </CardHeader>
               <CardContent>
-                <p className="font-medium">{room.deliverable}</p>
+                <p className="font-medium mb-4">{room.deliverable}</p>
+                {user && !progress?.completed_at && (
+                  <Button 
+                    onClick={markRoomComplete}
+                    disabled={progressLoading}
+                    className="w-full"
+                  >
+                    <CheckCircle className="mr-2 h-4 w-4" />
+                    Mark Room Complete
+                  </Button>
+                )}
               </CardContent>
             </Card>
+
+            {user && progress && (
+              <Card>
+                <CardHeader>
+                  <CardTitle>Your Progress</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-2">
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Exercises Completed:</span>
+                    <span className="font-medium">{progress.exercises_completed.length}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Drill Attempts:</span>
+                    <span className="font-medium">{progress.drill_attempts}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Best Score:</span>
+                    <span className="font-medium">{progress.best_drill_score}</span>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
           </div>
 
           <div className="lg:col-span-1">
@@ -141,6 +190,9 @@ export default function RoomDetail() {
               roomTag={room.tag}
               roomName={room.name}
               principle={room.purpose}
+              floorNumber={floor.number}
+              roomId={room.id}
+              onExerciseComplete={markExerciseComplete}
             />
           </div>
         </div>

@@ -1113,6 +1113,48 @@ export type Database = {
         }
         Relationships: []
       }
+      room_progress: {
+        Row: {
+          best_drill_score: number
+          completed_at: string | null
+          created_at: string
+          drill_attempts: number
+          exercises_completed: Json
+          floor_number: number
+          id: string
+          notes: string | null
+          room_id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          best_drill_score?: number
+          completed_at?: string | null
+          created_at?: string
+          drill_attempts?: number
+          exercises_completed?: Json
+          floor_number: number
+          id?: string
+          notes?: string | null
+          room_id: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          best_drill_score?: number
+          completed_at?: string | null
+          created_at?: string
+          drill_attempts?: number
+          exercises_completed?: Json
+          floor_number?: number
+          id?: string
+          notes?: string | null
+          room_id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       sermons: {
         Row: {
           bridges: Json | null

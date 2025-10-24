@@ -116,6 +116,8 @@ export const RoomCard = ({ room, floorNumber }: RoomCardProps) => {
           roomTag={room.tag}
           roomName={room.name}
           principle={room.purpose.split('.')[0]}
+          floorNumber={floorNumber}
+          roomId={room.id}
         />
       </div>
     </div>

@@ -11,9 +11,19 @@ interface JeevesAssistantProps {
   roomTag: string;
   roomName: string;
   principle: string;
+  floorNumber: number;
+  roomId: string;
+  onExerciseComplete?: (type: string) => void;
 }
 
-export const JeevesAssistant = ({ roomTag, roomName, principle }: JeevesAssistantProps) => {
+export const JeevesAssistant = ({ 
+  roomTag, 
+  roomName, 
+  principle,
+  floorNumber,
+  roomId,
+  onExerciseComplete 
+}: JeevesAssistantProps) => {
   const [loading, setLoading] = useState(false);
   const [exampleContent, setExampleContent] = useState<string | null>(null);
   const [exerciseContent, setExerciseContent] = useState<string | null>(null);
@@ -35,8 +45,10 @@ export const JeevesAssistant = ({ roomTag, roomName, principle }: JeevesAssistan
 
       if (mode === "example") {
         setExampleContent(data.content);
+        onExerciseComplete?.("example");
       } else {
         setExerciseContent(data.content);
+        onExerciseComplete?.("exercise");
       }
     } catch (error: any) {
       console.error("Jeeves error:", error);
