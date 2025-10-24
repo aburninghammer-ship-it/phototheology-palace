@@ -253,7 +253,7 @@ const QuarterlyStudy = () => {
                     <TabsList className="grid w-full grid-cols-3">
                       <TabsTrigger value="content">Content</TabsTrigger>
                       <TabsTrigger value="verses">Bible Verses</TabsTrigger>
-                      <TabsTrigger value="phototheology">Phototheology</TabsTrigger>
+                      <TabsTrigger value="phototheology">Amplified Quarterly Lesson</TabsTrigger>
                     </TabsList>
                     
                     <TabsContent value="content" className="space-y-4">
