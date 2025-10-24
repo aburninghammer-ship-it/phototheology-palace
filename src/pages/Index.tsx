@@ -1,13 +1,15 @@
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Navigation } from "@/components/Navigation";
-import { Building2, BookOpen, Sparkles, Lightbulb, Crown, Layers, Zap, Scale, Telescope, Search, Image, Film, Brain, Share2 } from "lucide-react";
+import { Building2, BookOpen, Sparkles, Lightbulb, Crown, Layers, Zap, Scale, Telescope, Search, Image, Film, Brain, Share2, Users } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
+import { useActiveUsers } from "@/hooks/useActiveUsers";
 
 const Index = () => {
   const { toast } = useToast();
   const { user } = useAuth();
+  const activeCount = useActiveUsers();
 
   const handleShare = () => {
     const shareData = {
@@ -36,10 +38,17 @@ const Index = () => {
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(59,130,246,0.08),transparent_60%),radial-gradient(circle_at_70%_60%,rgba(20,184,166,0.08),transparent_60%)]" />
         
         <div className="container mx-auto max-w-4xl text-center relative z-10">
-          <div className="inline-flex items-center gap-2 px-5 py-2 rounded-full gradient-ocean border border-white/10 mb-6 shadow-sm animate-fade-in">
-            <Building2 className="h-4 w-4 text-white" />
-            <span className="text-sm font-semibold text-white">The Phototheology Palace</span>
-            <Sparkles className="h-4 w-4 text-white" />
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-3 mb-6">
+            <div className="inline-flex items-center gap-2 px-5 py-2 rounded-full gradient-ocean border border-white/10 shadow-sm animate-fade-in">
+              <Building2 className="h-4 w-4 text-white" />
+              <span className="text-sm font-semibold text-white">The Phototheology Palace</span>
+              <Sparkles className="h-4 w-4 text-white" />
+            </div>
+            
+            <div className="inline-flex items-center gap-2 px-5 py-2 rounded-full bg-card/80 backdrop-blur-sm border border-border shadow-sm animate-fade-in">
+              <Users className="h-4 w-4 text-primary" />
+              <span className="text-sm font-semibold text-foreground">{activeCount} online now</span>
+            </div>
           </div>
           
           <h1 className="font-serif text-5xl md:text-7xl font-bold mb-5 bg-gradient-ocean bg-clip-text text-transparent animate-slide-up">
