@@ -110,7 +110,7 @@ export async function getCurrentQuarterly(language: string = "en"): Promise<Quar
         start_date: lesson.dates.split('–')[0] + `, ${year}`,
         end_date: lesson.dates.split('–')[1] + `, ${year}`,
         index: index + 1,
-        full_read: `https://www.sabbath.school/SSchool/${year}/${quarter}/EAQ${String(year).slice(2)}${quarter}_${lesson.id}.pdf`,
+        full_read: `https://www.sabbath.school/SSchool/${year}/${quarter}/EAQ${quarter}${String(year).slice(2)}_${lesson.id}.pdf`,
         bible_verses: lesson.bible_verses,
       })),
       quarter: `Q${quarter} ${year}`,
