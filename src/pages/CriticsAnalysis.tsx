@@ -124,12 +124,14 @@ export default function CriticsAnalysis() {
 
         {analysis && (
           <Tabs defaultValue="summary" className="w-full">
-            <TabsList className="grid w-full grid-cols-4">
-              <TabsTrigger value="summary">Summary</TabsTrigger>
-              <TabsTrigger value="claims">Claims & Rebuttals</TabsTrigger>
-              <TabsTrigger value="fallacies">Logical Fallacies</TabsTrigger>
-              <TabsTrigger value="biblical">Biblical Responses</TabsTrigger>
-            </TabsList>
+            <div className="overflow-x-auto -mx-4 px-4 md:mx-0 md:px-0">
+              <TabsList className="inline-flex min-w-full md:w-auto">
+                <TabsTrigger value="summary" className="flex-1 md:flex-initial">Summary</TabsTrigger>
+                <TabsTrigger value="claims" className="flex-1 md:flex-initial">Claims & Rebuttals</TabsTrigger>
+                <TabsTrigger value="fallacies" className="flex-1 md:flex-initial">Logical Fallacies</TabsTrigger>
+                <TabsTrigger value="biblical" className="flex-1 md:flex-initial">Biblical Responses</TabsTrigger>
+              </TabsList>
+            </div>
 
             <TabsContent value="summary" className="space-y-4">
               <Card>

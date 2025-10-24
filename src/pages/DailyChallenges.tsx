@@ -4,6 +4,7 @@ import { Navigation } from "@/components/Navigation";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
+import { Badge } from "@/components/ui/badge";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
@@ -157,15 +158,30 @@ const DailyChallenges = () => {
                 </div>
               </CardHeader>
               <CardContent className="space-y-4">
-                <RoomPrerequisites rooms={["SR", "OR", "DC", "QR", "NF", "CR"]} />
+                {dailyChallenge.requiredRooms && dailyChallenge.requiredRooms.length > 0 && (
+                  <div className="mb-4">
+                    <RoomPrerequisites rooms={dailyChallenge.requiredRooms} />
+                  </div>
+                )}
                 
-                <p>{dailyChallenge.description}</p>
+                {dailyChallenge.requiredPrinciples && dailyChallenge.requiredPrinciples.length > 0 && (
+                  <div className="space-y-2">
+                    <h3 className="font-semibold">Using These Principles:</h3>
+                    <div className="flex flex-wrap gap-2">
+                      {dailyChallenge.requiredPrinciples.map((principle: string, idx: number) => (
+                        <Badge key={idx} variant="secondary">{principle}</Badge>
+                      ))}
+                    </div>
+                  </div>
+                )}
+                
+                <p className="text-lg">{dailyChallenge.description}</p>
                 
                 <div className="space-y-2">
                   <h3 className="font-semibold">Verses to Study:</h3>
                   <ul className="list-disc list-inside space-y-1">
                     {dailyChallenge.verses.map((verse: string, idx: number) => (
-                      <li key={idx}>{verse}</li>
+                      <li key={idx} className="text-sm">{verse}</li>
                     ))}
                   </ul>
                 </div>

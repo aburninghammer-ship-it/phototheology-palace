@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -233,13 +234,15 @@ const TrainingDrills = () => {
             </Card>
           ) : (
             <Tabs value={selectedRoom || ""} onValueChange={setSelectedRoom}>
-              <TabsList className="grid grid-cols-4 lg:grid-cols-8 w-full">
-                {palaceFloors.map((floor) => (
-                  <TabsTrigger key={floor.number} value={`floor-${floor.number}`} className="text-xs">
-                    Floor {floor.number}
-                  </TabsTrigger>
-                ))}
-              </TabsList>
+              <ScrollArea className="w-full">
+                <TabsList className="inline-flex w-full md:w-auto">
+                  {palaceFloors.map((floor) => (
+                    <TabsTrigger key={floor.number} value={`floor-${floor.number}`} className="text-xs flex-shrink-0">
+                      Floor {floor.number}
+                    </TabsTrigger>
+                  ))}
+                </TabsList>
+              </ScrollArea>
 
               {palaceFloors.map((floor) => (
                 <TabsContent key={floor.number} value={`floor-${floor.number}`} className="space-y-4">

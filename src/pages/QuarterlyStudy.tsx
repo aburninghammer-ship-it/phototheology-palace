@@ -276,11 +276,13 @@ const QuarterlyStudy = () => {
                   </div>
                 ) : (
                   <Tabs defaultValue="content" className="w-full">
-                    <TabsList className="grid w-full grid-cols-3">
-                      <TabsTrigger value="content">Content</TabsTrigger>
-                      <TabsTrigger value="verses">Bible Verses</TabsTrigger>
-                      <TabsTrigger value="phototheology">Amplified Quarterly Lesson</TabsTrigger>
-                    </TabsList>
+                    <div className="overflow-x-auto -mx-4 px-4 md:mx-0 md:px-0">
+                      <TabsList className="inline-flex min-w-full md:w-auto">
+                        <TabsTrigger value="content" className="flex-1 md:flex-initial">Content</TabsTrigger>
+                        <TabsTrigger value="verses" className="flex-1 md:flex-initial">Bible Verses</TabsTrigger>
+                        <TabsTrigger value="phototheology" className="flex-1 md:flex-initial">Amplified Lesson</TabsTrigger>
+                      </TabsList>
+                    </div>
                     
                     <TabsContent value="content" className="space-y-4">
                       <ScrollArea className="h-[500px] pr-4">

@@ -231,13 +231,15 @@ export default function SpiritualTraining() {
 
         {/* Training Tabs */}
         <Tabs defaultValue="review" className="w-full">
-          <TabsList className="grid w-full grid-cols-5">
-            <TabsTrigger value="review">Spaced Review</TabsTrigger>
-            <TabsTrigger value="scenarios">Battle Scenarios</TabsTrigger>
-            <TabsTrigger value="besetting">Besetting Sins</TabsTrigger>
-            <TabsTrigger value="animals">Animal Styles</TabsTrigger>
-            <TabsTrigger value="weapons">Spiritual Weapons</TabsTrigger>
-          </TabsList>
+          <div className="overflow-x-auto -mx-4 px-4 md:mx-0 md:px-0">
+            <TabsList className="inline-flex min-w-full md:w-auto">
+              <TabsTrigger value="review" className="flex-1 md:flex-initial">Spaced Review</TabsTrigger>
+              <TabsTrigger value="scenarios" className="flex-1 md:flex-initial">Battle Scenarios</TabsTrigger>
+              <TabsTrigger value="besetting" className="flex-1 md:flex-initial">Besetting Sins</TabsTrigger>
+              <TabsTrigger value="animals" className="flex-1 md:flex-initial">Animal Styles</TabsTrigger>
+              <TabsTrigger value="weapons" className="flex-1 md:flex-initial">Spiritual Weapons</TabsTrigger>
+            </TabsList>
+          </div>
 
           {/* Spaced Repetition Review */}
           <TabsContent value="review" className="space-y-4">
