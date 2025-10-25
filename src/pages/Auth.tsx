@@ -30,7 +30,7 @@ export default function Auth() {
   const [signupDisplayName, setSignupDisplayName] = useState("");
   const [referralCode, setReferralCode] = useState("");
 
-  // Get referral code from URL and load saved credentials on mount
+  // Get referral code from URL and load saved email on mount
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const ref = params.get('ref');
@@ -38,12 +38,10 @@ export default function Auth() {
       setReferralCode(ref);
     }
 
-    // Load saved credentials
+    // Load saved email only (never store passwords)
     const savedEmail = localStorage.getItem('rememberedEmail');
-    const savedPassword = localStorage.getItem('rememberedPassword');
-    if (savedEmail && savedPassword) {
+    if (savedEmail) {
       setLoginEmail(savedEmail);
-      setLoginPassword(savedPassword);
       setRememberMe(true);
     }
   }, []);
@@ -99,14 +97,15 @@ export default function Auth() {
         return;
       }
 
-      // Save credentials if remember me is checked
+      // Save email only if remember me is checked (never store passwords)
       if (rememberMe) {
         localStorage.setItem('rememberedEmail', loginEmail);
-        localStorage.setItem('rememberedPassword', loginPassword);
       } else {
         localStorage.removeItem('rememberedEmail');
-        localStorage.removeItem('rememberedPassword');
       }
+      
+      // Clean up any legacy password storage
+      localStorage.removeItem('rememberedPassword');
 
       toast.success("Welcome back!");
       navigate("/");
