@@ -33,77 +33,66 @@ const PalaceQuiz = () => {
   
   const isVsJeeves = mode === "jeeves";
 
-  const rooms = [
-    "Foundation",
-    "Investigation", 
-    "Freestyle",
-    "Next Level",
-    "Vision",
-    "Horizons",
-    "Spiritual Training",
-    "Master Level"
-  ];
-
   const questions: Question[] = [
     {
       principle: "Time Zones (Past, Present, Future)",
-      correctRoom: "Foundation",
-      options: ["Foundation", "Investigation", "Vision", "Horizons"],
-      explanation: "Time Zones is a foundational principle that helps us understand prophecy across past, present, and future contexts."
+      correctRoom: "Time Zone Room (TZ)",
+      options: ["Time Zone Room (TZ)", "Observation Room (OR)", "Blue Room (BL)", "Three Heavens Floor"],
+      explanation: "Time Zone Room on Floor 4 locates passages across past, present, and future to understand how texts relate to different eras in God's plan."
     },
     {
-      principle: "Chain References",
-      correctRoom: "Investigation",
-      options: ["Investigation", "Foundation", "Next Level", "Freestyle"],
-      explanation: "Chain References is an investigation tool where we follow connected verses throughout Scripture to build comprehensive understanding."
+      principle: "Following Connected Verses (Q&A Chains)",
+      correctRoom: "Q&A Room (QA)",
+      options: ["Q&A Room (QA)", "Story Room (SR)", "Dimensions Room (DR)", "Bible Freestyle (BF)"],
+      explanation: "The Q&A Room on Floor 2 is where Scripture answers Scripture—verses cross-examine and corroborate each other like witnesses in court."
     },
     {
       principle: "Christ in All Scripture",
-      correctRoom: "Next Level",
-      options: ["Next Level", "Foundation", "Vision", "Spiritual Training"],
-      explanation: "Seeing Christ in All Scripture takes Bible study to the next level by revealing how every text points to Jesus."
+      correctRoom: "Concentration Room (CR)",
+      options: ["Concentration Room (CR)", "Story Room (SR)", "Blue Room (BL)", "Fire Room (FRm)"],
+      explanation: "The Concentration Room on Floor 4 insists every text must reveal Christ—using the lens that bends all light until Jesus comes into focus."
     },
     {
-      principle: "Repeat and Enlarge",
-      correctRoom: "Foundation",
-      options: ["Foundation", "Investigation", "Horizons", "Vision"],
-      explanation: "Repeat and Enlarge is a foundational pattern showing how God reveals truth progressively throughout Scripture."
+      principle: "Story Beats (3-7 punchy scenes)",
+      correctRoom: "Story Room (SR)",
+      options: ["Story Room (SR)", "Imagination Room (IR)", "24FPS Room (24)", "Translation Room (TR)"],
+      explanation: "Story Room on Floor 1 crystallizes narratives into 3-7 memorable beats that capture action and sequence, like movie clips."
     },
     {
-      principle: "Sanctuary Pattern",
-      correctRoom: "Vision",
-      options: ["Vision", "Horizons", "Foundation", "Next Level"],
-      explanation: "The Sanctuary Pattern opens prophetic vision by showing Christ's ministry and the plan of salvation."
+      principle: "Sanctuary Pattern (Altar, Laver, Lampstand)",
+      correctRoom: "Blue Room (BL)",
+      options: ["Blue Room (BL)", "Prophecy Room (PR)", "Three Angels Room (3A)", "Theme Room (TRm)"],
+      explanation: "The Blue Room on Floor 5 maps the sanctuary as the architectural blueprint of salvation—every piece of furniture traces to Christ."
     },
     {
-      principle: "Seven Feasts",
-      correctRoom: "Horizons",
-      options: ["Horizons", "Vision", "Foundation", "Investigation"],
-      explanation: "The Seven Feasts expand our horizons by revealing God's prophetic timeline through Israel's appointed times."
+      principle: "Types and Symbols (OT pointing to Christ)",
+      correctRoom: "Symbols/Types Room (ST)",
+      options: ["Symbols/Types Room (ST)", "Prophecy Room (PR)", "Story Room (SR)", "Patterns Room (PRm)"],
+      explanation: "Symbols/Types Room on Floor 2 builds the profile of God's universal imagery—lamb=Christ, rock=Christ, light=truth."
     },
     {
-      principle: "Prayer and Scripture",
-      correctRoom: "Spiritual Training",
-      options: ["Spiritual Training", "Foundation", "Next Level", "Master Level"],
-      explanation: "Prayer and Scripture are essential spiritual disciplines that train us in righteousness and communion with God."
+      principle: "Experiencing with All Five Senses",
+      correctRoom: "Imagination Room (IR)",
+      options: ["Imagination Room (IR)", "Fire Room (FRm)", "Meditation Room (MR)", "Story Room (SR)"],
+      explanation: "Imagination Room on Floor 1 trains you to step inside Scripture with all senses engaged—feel the spray, smell the myrrh, taste the salt."
     },
     {
-      principle: "Five Dimensions",
-      correctRoom: "Next Level",
-      options: ["Next Level", "Foundation", "Vision", "Freestyle"],
-      explanation: "Five Dimensions (Literal, Christ, Personal, Church, Heaven) takes interpretation to the next level by examining every angle."
+      principle: "Five Dimensions (Literal, Christ, Me, Church, Heaven)",
+      correctRoom: "Dimensions Room (DR)",
+      options: ["Dimensions Room (DR)", "Concentration Room (CR)", "Time Zone Room (TZ)", "Theme Room (TRm)"],
+      explanation: "Dimensions Room on Floor 4 stretches every passage across 5 dimensions like examining a diamond under different lights."
     },
     {
-      principle: "Types and Symbols",
-      correctRoom: "Investigation",
-      options: ["Investigation", "Vision", "Foundation", "Horizons"],
-      explanation: "Types and Symbols require investigation to discover how Old Testament figures and objects point to Christ."
+      principle: "Observing Without Interpreting (Detective Work)",
+      correctRoom: "Observation Room (OR)",
+      options: ["Observation Room (OR)", "Questions Room (QR)", "Story Room (SR)", "Def-Com Room (DC)"],
+      explanation: "Observation Room on Floor 2 is the detective's notebook—logging details without rushing to meaning, gathering fingerprints before theories."
     },
     {
-      principle: "Prophetic Headlines",
-      correctRoom: "Vision",
-      options: ["Vision", "Horizons", "Investigation", "Foundation"],
-      explanation: "Prophetic Headlines open our vision to see the big picture themes running through Scripture."
+      principle: "Verse Genetics (Finding Verse Relatives)",
+      correctRoom: "Bible Freestyle (BF)",
+      options: ["Bible Freestyle (BF)", "Q&A Room (QA)", "Patterns Room (PRm)", "Parallels Room (P‖)"],
+      explanation: "Bible Freestyle on Floor 3 trains spontaneous verse connections—every verse has siblings, cousins, and distant relatives across Scripture."
     }
   ];
 
