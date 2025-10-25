@@ -39,6 +39,8 @@ interface Participation {
   completed_at: string | null;
   time_elapsed_seconds: number | null;
   is_completed: boolean;
+  started_at?: string;
+  created_at?: string;
 }
 
 const TreasureHunt = () => {
@@ -111,15 +113,20 @@ const TreasureHunt = () => {
     }
   };
 
-  const getTimeRemaining = (expiresAt: string) => {
+  const getTimeRemaining = (huntId: string, timeLimit: number) => {
+    const participation = getParticipation(huntId);
+    if (!participation) return `${timeLimit}h limit`;
+
     const now = new Date().getTime();
-    const expiry = new Date(expiresAt).getTime();
-    const diff = expiry - now;
+    const startTime = new Date(participation.started_at || Date.now()).getTime();
+    const limitMs = timeLimit * 60 * 60 * 1000; // Convert hours to milliseconds
+    const deadline = startTime + limitMs;
+    const remaining = deadline - now;
 
-    if (diff <= 0) return "Expired";
+    if (remaining <= 0) return "Time expired";
 
-    const hours = Math.floor(diff / (1000 * 60 * 60));
-    const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+    const hours = Math.floor(remaining / (1000 * 60 * 60));
+    const minutes = Math.floor((remaining % (1000 * 60 * 60)) / (1000 * 60));
 
     return `${hours}h ${minutes}m remaining`;
   };
@@ -204,7 +211,7 @@ const TreasureHunt = () => {
                           {hunt.title}
                         </CardTitle>
                         <CardDescription className="space-y-1">
-                          <div>{getTimeRemaining(hunt.expires_at)}</div>
+                          <div>{getTimeRemaining(hunt.id, hunt.time_limit_hours)}</div>
                           <div className="text-xs">{hunt.category}</div>
                         </CardDescription>
                       </div>

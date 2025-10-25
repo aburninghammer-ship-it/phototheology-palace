@@ -676,12 +676,25 @@ export const palaceFloors: Floor[] = [
         id: "cec",
         name: "Christ in Every Chapter",
         tag: "CEC",
-        purpose: "Make Christ explicit in every chapter of a book.",
-        coreQuestion: "How is Jesus present in this chapter?",
-        method: "CEC-Name: Christ title/role. CEC-Act: What He does. CEC-Crosslink: 1–2 confirming texts.",
-        examples: ["Gen 3: Name=Seed of woman; Act=Crushes serpent; Crosslink=Rom 16:20, Rev 12:9"],
-        pitfalls: ["Vague 'God in general' instead of concrete Christ-line"],
-        deliverable: "Three-line CEC note per chapter"
+        purpose: "The Christ in Every Chapter Room enforces the non-negotiable interpretive principle: ALL Scripture is about Jesus. Luke 24:27 and John 5:39 make this explicit—'beginning with Moses and all the Prophets, he interpreted to them in all the Scriptures the things concerning himself' and 'these are they which testify of me.' This room prevents the fatal error of treating large portions of Scripture as merely historical, moral, or theological—without explicitly connecting them to Christ. Every chapter of every book must yield a Christ-line: His title/role, His action, and confirming cross-references. This isn't allegorizing (finding Jesus in random details); it's recognizing that the entire canon is Christocentric revelation. The CEC discipline trains you to ask relentlessly: Where is Jesus HERE? How does THIS chapter point to, foreshadow, or fulfill Him? By the time you've done CEC work through an entire book, you'll have a comprehensive Christ-map that transforms Bible study from history lessons into gospel encounters.",
+        coreQuestion: "How is Jesus present in this chapter—explicitly, typologically, or thematically—and what does He accomplish here?",
+        method: "STEP-BY-STEP METHODOLOGY:\n\n1. READ the chapter thoroughly\n2. IDENTIFY Christ's presence using three modes:\n\nMODE 1: EXPLICIT (Direct references to Jesus/Messiah)\n• NT passages about Jesus' life, teachings, death, resurrection\n• OT prophecies directly naming Messiah\n• Example: Isaiah 53 = Suffering Servant explicitly identified as Messiah\n\nMODE 2: TYPOLOGICAL (OT persons, events, objects foreshadowing Christ)\n• Persons: Adam (second Adam), Moses (prophet-deliverer), David (king), Melchizedek (priest)\n• Events: Passover (sacrificial lamb), Red Sea (baptism/death-resurrection), Manna (bread of life)\n• Objects: Bronze serpent (lifted up), Ark (God's presence), Temple (body of Christ)\n• Example: Genesis 22 = Isaac bound as type of Son offered\n\nMODE 3: THEMATIC (Themes that find ultimate fulfillment in Christ)\n• Redemption, covenant, sacrifice, kingship, priesthood, prophecy\n• Promises fulfilled in Christ\n• Example: Joshua leading into Promised Land = Jesus leading into salvation rest\n\n3. NAME Christ's title/role in this chapter:\n• What is He called or what role does He fill?\n• Examples: Lamb, King, Prophet, Priest, Judge, Deliverer, Mediator, Cornerstone\n\n4. STATE Christ's action/accomplishment:\n• What does He DO in/through this chapter?\n• Examples: Atones, rules, reveals, intercedes, conquers, fulfills\n\n5. CROSSLINK with 1-2 NT texts that explicitly connect this chapter to Christ:\n• Find where NT writers quote or reference this chapter about Jesus\n• If no direct NT quote, find thematic parallel\n\nKEY PRINCIPLES:\n• EVERY CHAPTER without exception has a Christ-line—find it\n• EXPLICIT mode (direct references) is strongest; TYPOLOGICAL requires biblical warrant; THEMATIC must have NT confirmation\n• Don't force Christ into the text; FIND Christ in the text by seeing the whole canon's trajectory\n• If you can't find Christ easily, you're not looking hard enough or broadly enough—ask: What does NT say about this passage/theme?\n• CEC prevents moralism (making it about 'be like David') by making it about 'see David's greater Son'",
+        examples: [
+          "Genesis 3: NAME=Seed of Woman • ACT=Promises to crush serpent's head, inaugurates redemption plan • CROSSLINK=Romans 16:20 (God will soon crush Satan under your feet), Revelation 12:9 (dragon defeated by woman's offspring)",
+          "Exodus 12: NAME=Passover Lamb • ACT=Blood substitutes for firstborn, delivers from death and slavery • CROSSLINK=1 Corinthians 5:7 (Christ our Passover sacrificed for us), John 1:29 (Lamb of God who takes away sin)",
+          "Joshua 1: NAME=True Joshua (Jesus) • ACT=Leads people into promised rest where Moses could not • CROSSLINK=Hebrews 4:8-9 (If Joshua had given them rest, God would not speak of another day—Sabbath rest remains)",
+          "Psalm 23: NAME=Good Shepherd • ACT=Guides, provides, protects, prepares table, leads to eternal dwelling • CROSSLINK=John 10:11 (I am the good shepherd who lays down life for sheep), Hebrews 13:20 (great Shepherd of the sheep)",
+          "Isaiah 53: NAME=Suffering Servant • ACT=Bears griefs, carries sorrows, pierced for transgressions, makes many righteous • CROSSLINK=Acts 8:32-35 (Philip explains this is Jesus), 1 Peter 2:24 (bore our sins in body on tree)",
+          "Daniel 7: NAME=Son of Man • ACT=Comes with clouds, given dominion and eternal kingdom • CROSSLINK=Matthew 26:64 (Jesus claims to be Son of Man coming on clouds), Revelation 1:7 (coming with clouds, every eye will see)"
+        ],
+        pitfalls: [
+          "MORALISM: Making passage about 'be like this hero' instead of 'see this hero point to Christ'",
+          "VAGUE 'GOD IN GENERAL': Saying 'God loves us' without naming Christ specifically",
+          "ALLEGORIZING RANDOMLY: Finding Jesus in details Scripture doesn't authorize (e.g., 'rope was scarlet = blood of Christ' when text doesn't indicate that)",
+          "SKIPPING HARD CHAPTERS: Giving up on genealogies, laws, or obscure passages—every chapter has Christ",
+          "NO NT CROSSLINK: Failing to confirm your Christ-reading with New Testament validation"
+        ],
+        deliverable: "CEC Note (3 lines): NAME (Christ's title/role) • ACT (what He does/accomplishes in this chapter) • CROSSLINK (1-2 NT texts confirming Christ-connection)"
       },
       {
         id: "r66",
