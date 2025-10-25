@@ -115,6 +115,14 @@ const Games = () => {
 
   const adultGames = [
     { 
+      id: "palace_cards", 
+      name: "Palace Card Match", 
+      description: "Match pairs of palace room cards in this beautiful memory game inspired by physical Phototheology cards. Flip cards to find matching rooms across the eight floors.",
+      featured: true,
+      skills: "Memory, Visual Recognition, Palace Room Knowledge",
+      requiredRooms: ["SR", "IR"]
+    },
+    { 
       id: "chain_chess", 
       name: "Chain Chess", 
       description: "Build biblical commentary chains by connecting verses, principles, and Palace rooms. Challenge Jeeves or other players to create the deepest theological connections.",
@@ -311,7 +319,16 @@ const Games = () => {
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-2">
-                    {game.id === "chain_chess" ? (
+                    {game.id === "palace_cards" ? (
+                      <Button
+                        onClick={() => navigate(`/games/palace-cards`)}
+                        className="w-full"
+                        variant="default"
+                      >
+                        <Gamepad2 className="mr-2 h-4 w-4" />
+                        Play Now
+                      </Button>
+                    ) : game.id === "chain_chess" ? (
                       <>
                         <Button
                           onClick={() => startChainChess(false)}

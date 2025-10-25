@@ -26,6 +26,7 @@ const EquationsChallenge = lazy(() => import("./pages/EquationsChallenge"));
 const Games = lazy(() => import("./pages/Games"));
 const ChainChess = lazy(() => import("./pages/ChainChess"));
 const ConcentrationGame = lazy(() => import("./pages/ConcentrationGame"));
+const PalaceCardGame = lazy(() => import("./pages/PalaceCardGame"));
 const KidsGames = lazy(() => import("./pages/KidsGames"));
 const LiveStudy = lazy(() => import("./pages/LiveStudy"));
 const LiveStudyRoom = lazy(() => import("./pages/LiveStudyRoom"));
@@ -126,6 +127,7 @@ function App() {
             <Route path="/games" element={<ProtectedRoute><Games /></ProtectedRoute>} />
             <Route path="/games/chain-chess/:gameId/:mode?" element={<ProtectedRoute><ChainChess /></ProtectedRoute>} />
             <Route path="/games/concentration" element={<ProtectedRoute><ConcentrationGame /></ProtectedRoute>} />
+            <Route path="/games/palace-cards" element={<ProtectedRoute><PalaceCardGame /></ProtectedRoute>} />
             <Route path="/games/palace_quiz/:mode?" element={<ProtectedRoute><PalaceQuiz /></ProtectedRoute>} />
             <Route path="/games/verse_match/:mode?" element={<ProtectedRoute><VerseMatch /></ProtectedRoute>} />
             <Route path="/games/principle_puzzle/:mode?" element={<ProtectedRoute><PrinciplePuzzle /></ProtectedRoute>} />
