@@ -8,7 +8,7 @@ import { Card } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { toast } from "sonner";
-import { Image, Search, Heart, Trash2, RefreshCw, Loader2 } from "lucide-react";
+import { Image, Search, Heart, Trash2, RefreshCw, Loader2, ArrowLeft, MessageCircle, Send, X } from "lucide-react";
 
 interface BibleImage {
   id: string;
@@ -29,6 +29,9 @@ export default function BibleImageLibrary() {
   const [searchQuery, setSearchQuery] = useState("");
   const [activeFilter, setActiveFilter] = useState<"all" | "translation" | "24fps">("all");
   const [activeTab, setActiveTab] = useState<"all" | "favorites">("all");
+  const [jeevesOpen, setJeevesOpen] = useState(false);
+  const [jeevesPrompt, setJeevesPrompt] = useState("");
+  const [jeevesGenerating, setJeevesGenerating] = useState(false);
   
   const [newImage, setNewImage] = useState({
     room_type: "24fps",
@@ -182,6 +185,37 @@ export default function BibleImageLibrary() {
     }
   };
 
+  const generateWithJeeves = async () => {
+    if (!jeevesPrompt.trim()) {
+      toast.error("Please describe what image you'd like Jeeves to create");
+      return;
+    }
+
+    setJeevesGenerating(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("jeeves", {
+        body: {
+          mode: "generate-image",
+          description: jeevesPrompt,
+          verse_reference: null,
+          room_type: "24fps",
+        },
+      });
+
+      if (error) throw error;
+
+      toast.success("Jeeves generated your image successfully!");
+      setJeevesPrompt("");
+      setJeevesOpen(false);
+      fetchImages();
+    } catch (error) {
+      console.error("Error generating image with Jeeves:", error);
+      toast.error("Jeeves couldn't generate the image. Please try again.");
+    } finally {
+      setJeevesGenerating(false);
+    }
+  };
+
   const stats = {
     total: images.length,
     translation: images.filter(img => img.room_type === "translation").length,
@@ -193,11 +227,23 @@ export default function BibleImageLibrary() {
       {/* Header */}
       <div className="bg-gradient-to-r from-purple-900/90 to-indigo-900/90 backdrop-blur-sm border-b border-white/10 py-8 px-6">
         <div className="max-w-7xl mx-auto">
-          <div className="flex items-center gap-4 mb-2">
-            <Image className="w-12 h-12 text-white" />
-            <h1 className="text-4xl font-bold text-white">Bible Image Library</h1>
+          <div className="flex items-center justify-between mb-2">
+            <div className="flex items-center gap-4">
+              <Image className="w-12 h-12 text-white" />
+              <div>
+                <h1 className="text-4xl font-bold text-white">Bible Image Library</h1>
+                <p className="text-purple-200 text-lg">Your visual interpretations of Scripture</p>
+              </div>
+            </div>
+            <Button
+              onClick={() => navigate("/palace")}
+              variant="outline"
+              className="bg-white/10 text-white border-white/20 hover:bg-white/20"
+            >
+              <ArrowLeft className="w-4 h-4 mr-2" />
+              Back to Palace
+            </Button>
           </div>
-          <p className="text-purple-200 text-lg">Your visual interpretations of Scripture</p>
         </div>
       </div>
 
@@ -446,6 +492,90 @@ export default function BibleImageLibrary() {
           </TabsContent>
         </Tabs>
       </div>
+
+      {/* Jeeves Floating Button */}
+      {!jeevesOpen && (
+        <Button
+          onClick={() => setJeevesOpen(true)}
+          className="fixed bottom-6 right-6 h-16 w-16 rounded-full shadow-2xl bg-primary hover:bg-primary/90 z-50"
+          size="icon"
+        >
+          <MessageCircle className="w-6 h-6" />
+        </Button>
+      )}
+
+      {/* Jeeves Chat Panel */}
+      {jeevesOpen && (
+        <Card className="fixed bottom-6 right-6 w-96 h-[500px] shadow-2xl z-50 bg-card flex flex-col">
+          <div className="flex items-center justify-between p-4 border-b border-border">
+            <div className="flex items-center gap-2">
+              <MessageCircle className="w-5 h-5 text-primary" />
+              <h3 className="font-semibold text-card-foreground">Jeeves - Image Assistant</h3>
+            </div>
+            <Button
+              onClick={() => setJeevesOpen(false)}
+              variant="ghost"
+              size="icon"
+              className="h-8 w-8"
+            >
+              <X className="w-4 h-4" />
+            </Button>
+          </div>
+          
+          <div className="flex-1 p-4 overflow-y-auto">
+            <div className="space-y-4">
+              <div className="bg-muted p-3 rounded-lg">
+                <p className="text-sm text-muted-foreground">
+                  👋 Hello! I'm Jeeves, your biblical image assistant. Tell me what biblical scene or concept you'd like me to visualize, and I'll create a beautiful image for you.
+                </p>
+              </div>
+              
+              <div className="bg-muted p-3 rounded-lg">
+                <p className="text-sm text-muted-foreground font-medium mb-2">Try saying:</p>
+                <ul className="text-sm text-muted-foreground space-y-1">
+                  <li>• "Create an image of David and Goliath"</li>
+                  <li>• "Show me the parting of the Red Sea"</li>
+                  <li>• "Visualize the Garden of Eden"</li>
+                  <li>• "Generate an image for Psalm 23"</li>
+                </ul>
+              </div>
+
+              {jeevesGenerating && (
+                <div className="bg-primary/10 p-3 rounded-lg flex items-center gap-2">
+                  <Loader2 className="w-4 h-4 animate-spin text-primary" />
+                  <p className="text-sm text-primary">Jeeves is creating your image...</p>
+                </div>
+              )}
+            </div>
+          </div>
+
+          <div className="p-4 border-t border-border">
+            <div className="flex gap-2">
+              <Textarea
+                placeholder="Describe the biblical image you want..."
+                value={jeevesPrompt}
+                onChange={(e) => setJeevesPrompt(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" && !e.shiftKey) {
+                    e.preventDefault();
+                    generateWithJeeves();
+                  }
+                }}
+                className="min-h-[80px] resize-none"
+                disabled={jeevesGenerating}
+              />
+              <Button
+                onClick={generateWithJeeves}
+                disabled={jeevesGenerating || !jeevesPrompt.trim()}
+                size="icon"
+                className="h-20 w-20 shrink-0"
+              >
+                <Send className="w-5 h-5" />
+              </Button>
+            </div>
+          </div>
+        </Card>
+      )}
     </div>
   );
 }
