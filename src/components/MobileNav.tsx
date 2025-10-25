@@ -7,7 +7,7 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
-import { Menu, Building2, BookOpen, Sparkles, User, CreditCard, LogOut, Gift } from "lucide-react";
+import { Menu, Building2, BookOpen, Sparkles, User, CreditCard, LogOut, Gift, Clock } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { Separator } from "@/components/ui/separator";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -166,6 +166,12 @@ export const MobileNav = () => {
               <Separator className="my-2" />
               <div className="text-xs font-semibold text-muted-foreground px-2 py-1">Community</div>
               
+              <Link to="/escape-room">
+                <Button variant="ghost" className="w-full justify-start font-semibold text-primary" size="sm">
+                  <Clock className="h-4 w-4 mr-2" />
+                  🚨 Escape Rooms
+                </Button>
+              </Link>
               <Link to="/daily-challenges">
                 <Button variant="ghost" className="w-full justify-start" size="sm">
                   📅 Daily Challenges

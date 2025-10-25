@@ -1,6 +1,6 @@
 import { Link, useLocation } from "react-router-dom";
 // Import all required icons from lucide-react
-import { Building2, Sparkles, Users, BookOpen, User, CreditCard, LogOut, Gift } from "lucide-react";
+import { Building2, Sparkles, Users, BookOpen, User, CreditCard, LogOut, Gift, Clock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
 import { useActiveUsers } from "@/hooks/useActiveUsers";
@@ -191,6 +191,12 @@ export const Navigation = () => {
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent>
+                    <DropdownMenuItem asChild>
+                      <Link to="/escape-room" className="font-semibold text-primary">
+                        <Clock className="h-4 w-4 mr-2" />
+                        🚨 Escape Rooms
+                      </Link>
+                    </DropdownMenuItem>
                     <DropdownMenuItem asChild>
                       <Link to="/daily-challenges">📅 Daily Challenges</Link>
                     </DropdownMenuItem>
