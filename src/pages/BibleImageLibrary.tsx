@@ -8,7 +8,7 @@ import { Card } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { toast } from "sonner";
-import { Image, Search, Heart, Trash2, RefreshCw, Loader2, ArrowLeft, MessageCircle, Send, X } from "lucide-react";
+import { Image, Search, Heart, Trash2, RefreshCw, Loader2, ArrowLeft, MessageCircle, Send, X, Edit } from "lucide-react";
 
 interface BibleImage {
   id: string;
@@ -32,6 +32,9 @@ export default function BibleImageLibrary() {
   const [jeevesOpen, setJeevesOpen] = useState(false);
   const [jeevesPrompt, setJeevesPrompt] = useState("");
   const [jeevesGenerating, setJeevesGenerating] = useState(false);
+  
+  const [editingImage, setEditingImage] = useState<BibleImage | null>(null);
+  const [editForm, setEditForm] = useState({ description: "", verse_reference: "" });
   
   const [newImage, setNewImage] = useState({
     room_type: "24fps",
@@ -216,6 +219,42 @@ export default function BibleImageLibrary() {
     }
   };
 
+  const startEdit = (image: BibleImage) => {
+    setEditingImage(image);
+    setEditForm({
+      description: image.description,
+      verse_reference: image.verse_reference || "",
+    });
+  };
+
+  const saveEdit = async () => {
+    if (!editingImage) return;
+
+    try {
+      const { error } = await supabase
+        .from("bible_images")
+        .update({
+          description: editForm.description,
+          verse_reference: editForm.verse_reference || null,
+        })
+        .eq("id", editingImage.id);
+
+      if (error) throw error;
+
+      setImages(images.map(img => 
+        img.id === editingImage.id 
+          ? { ...img, description: editForm.description, verse_reference: editForm.verse_reference || null }
+          : img
+      ));
+      
+      toast.success("Image updated successfully");
+      setEditingImage(null);
+    } catch (error) {
+      console.error("Error updating image:", error);
+      toast.error("Failed to update image");
+    }
+  };
+
   const stats = {
     total: images.length,
     translation: images.filter(img => img.room_type === "translation").length,
@@ -263,6 +302,27 @@ export default function BibleImageLibrary() {
             <p className="text-5xl font-bold text-white">{stats.fps24}</p>
           </Card>
         </div>
+
+        {/* Jeeves Assistant Card */}
+        <Card className="mb-6 bg-gradient-to-r from-indigo-500/20 to-purple-500/20 backdrop-blur-sm border-white/20 p-6">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <div className="bg-white/20 p-3 rounded-full">
+                <MessageCircle className="w-8 h-8 text-white" />
+              </div>
+              <div>
+                <h3 className="text-xl font-bold text-white mb-1">Ask Jeeves for Images</h3>
+                <p className="text-purple-100">Your AI assistant for biblical imagery</p>
+              </div>
+            </div>
+            <Button
+              onClick={() => setJeevesOpen(true)}
+              className="bg-white text-purple-900 hover:bg-white/90"
+            >
+              Chat with Jeeves
+            </Button>
+          </div>
+        </Card>
 
         {/* Search Bar */}
         <div className="mb-6">
@@ -395,6 +455,14 @@ export default function BibleImageLibrary() {
                         <Button
                           size="icon"
                           variant="ghost"
+                          onClick={() => startEdit(image)}
+                          className="bg-white/20 hover:bg-white/30"
+                        >
+                          <Edit className="w-5 h-5 text-white" />
+                        </Button>
+                        <Button
+                          size="icon"
+                          variant="ghost"
                           onClick={() => regenerateImage(image)}
                           className="bg-white/20 hover:bg-white/30"
                         >
@@ -459,6 +527,14 @@ export default function BibleImageLibrary() {
                         <Button
                           size="icon"
                           variant="ghost"
+                          onClick={() => startEdit(image)}
+                          className="bg-white/20 hover:bg-white/30"
+                        >
+                          <Edit className="w-5 h-5 text-white" />
+                        </Button>
+                        <Button
+                          size="icon"
+                          variant="ghost"
                           onClick={() => regenerateImage(image)}
                           className="bg-white/20 hover:bg-white/30"
                         >
@@ -503,6 +579,37 @@ export default function BibleImageLibrary() {
           <MessageCircle className="w-6 h-6" />
         </Button>
       )}
+
+      {/* Edit Image Dialog */}
+      <Dialog open={!!editingImage} onOpenChange={(open) => !open && setEditingImage(null)}>
+        <DialogContent className="bg-card text-card-foreground">
+          <DialogHeader>
+            <DialogTitle>Edit Image Details</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div>
+              <label className="text-sm font-medium mb-2 block">Verse Reference</label>
+              <Input
+                placeholder="e.g., John 3:16"
+                value={editForm.verse_reference}
+                onChange={(e) => setEditForm({ ...editForm, verse_reference: e.target.value })}
+              />
+            </div>
+            <div>
+              <label className="text-sm font-medium mb-2 block">Description</label>
+              <Textarea
+                placeholder="Describe the image..."
+                value={editForm.description}
+                onChange={(e) => setEditForm({ ...editForm, description: e.target.value })}
+                rows={4}
+              />
+            </div>
+            <Button onClick={saveEdit} className="w-full">
+              Save Changes
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
 
       {/* Jeeves Chat Panel */}
       {jeevesOpen && (
