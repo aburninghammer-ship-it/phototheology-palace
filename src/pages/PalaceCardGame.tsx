@@ -12,20 +12,22 @@ interface GameCard {
   floorName: string;
   roomTag: string;
   roomName: string;
+  roomPurpose: string;
   color: string;
+  tagline: string;
   isFlipped: boolean;
   isMatched: boolean;
 }
 
 const FLOOR_COLORS = [
-  { floor: 1, color: "from-red-600 to-red-800", border: "border-red-500" },
-  { floor: 2, color: "from-blue-600 to-blue-800", border: "border-blue-500" },
-  { floor: 3, color: "from-green-600 to-green-800", border: "border-green-500" },
-  { floor: 4, color: "from-yellow-600 to-yellow-800", border: "border-yellow-500" },
-  { floor: 5, color: "from-purple-600 to-purple-800", border: "border-purple-500" },
-  { floor: 6, color: "from-orange-600 to-orange-800", border: "border-orange-500" },
-  { floor: 7, color: "from-pink-600 to-pink-800", border: "border-pink-500" },
-  { floor: 8, color: "from-teal-600 to-teal-800", border: "border-teal-500" },
+  { floor: 1, color: "from-red-600 to-red-800", border: "border-red-500", tagline: "TRAIN KEY TACTICS" },
+  { floor: 2, color: "from-blue-600 to-blue-800", border: "border-blue-500", tagline: "BECOME A DETECTIVE" },
+  { floor: 3, color: "from-green-600 to-green-800", border: "border-green-500", tagline: "FURNISH YOUR PALACE" },
+  { floor: 4, color: "from-yellow-600 to-yellow-800", border: "border-yellow-500", tagline: "EXPAND YOUR MIND" },
+  { floor: 5, color: "from-purple-600 to-purple-800", border: "border-purple-500", tagline: "TRAIN YOUR VISION" },
+  { floor: 6, color: "from-orange-600 to-orange-800", border: "border-orange-500", tagline: "REFINE EVERYTHING" },
+  { floor: 7, color: "from-pink-600 to-pink-800", border: "border-pink-500", tagline: "IGNITE YOUR HEART" },
+  { floor: 8, color: "from-teal-600 to-teal-800", border: "border-teal-500", tagline: "MASTER THE PALACE" },
 ];
 
 export default function PalaceCardGame() {
@@ -52,7 +54,9 @@ export default function PalaceCardGame() {
           floorName: floor.name,
           roomTag: room.tag,
           roomName: room.name,
+          roomPurpose: room.purpose.substring(0, 150) + "...",
           color: colorScheme.color,
+          tagline: colorScheme.tagline,
           isFlipped: false,
           isMatched: false,
         });
@@ -188,42 +192,79 @@ export default function PalaceCardGame() {
                 }`}
                 style={{ transformStyle: "preserve-3d" }}
               >
-                {/* Card Back */}
+                {/* Card Back - Phototheology Branding */}
                 <div
                   className={`absolute w-full h-full rounded-xl bg-gradient-to-br ${card.color} border-4 ${
                     FLOOR_COLORS.find(c => c.floor === card.floorNumber)?.border
-                  } shadow-2xl flex flex-col items-center justify-center p-4`}
+                  } shadow-2xl flex flex-col`}
                   style={{ backfaceVisibility: "hidden" }}
                 >
-                  <div className="text-center">
-                    <h2 className="text-2xl font-bold text-white mb-2" style={{ 
-                      textShadow: "2px 2px 4px rgba(0,0,0,0.5), 0 0 10px rgba(255,215,0,0.3)",
-                      fontFamily: "serif"
-                    }}>
-                      PHOTO
-                    </h2>
-                    <h3 className="text-xl font-bold text-white mb-4" style={{ 
-                      textShadow: "2px 2px 4px rgba(0,0,0,0.5)",
-                      fontFamily: "serif"
-                    }}>
-                      THEOLOGY
-                    </h3>
-                    <div className="w-16 h-16 mx-auto bg-white/20 rounded-full flex items-center justify-center backdrop-blur-sm mb-3">
-                      <div className="text-3xl">🧩</div>
+                  {/* Top Section with Title */}
+                  <div className="flex-1 flex flex-col items-center justify-center p-4 relative">
+                    {/* Decorative pattern overlay */}
+                    <div className="absolute inset-0 opacity-10" style={{
+                      backgroundImage: "repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(255,255,255,.1) 10px, rgba(255,255,255,.1) 20px)"
+                    }}></div>
+                    
+                    <div className="relative z-10 text-center">
+                      <h2 className="text-3xl font-bold text-yellow-300 mb-1" style={{ 
+                        textShadow: "3px 3px 6px rgba(0,0,0,0.8), 0 0 15px rgba(255,215,0,0.5)",
+                        fontFamily: "serif",
+                        letterSpacing: "0.05em"
+                      }}>
+                        PHOTO
+                      </h2>
+                      <h3 className="text-2xl font-bold text-yellow-300" style={{ 
+                        textShadow: "3px 3px 6px rgba(0,0,0,0.8), 0 0 15px rgba(255,215,0,0.5)",
+                        fontFamily: "serif",
+                        letterSpacing: "0.05em"
+                      }}>
+                        THEOLOGY
+                      </h3>
+                      
+                      {/* Puzzle and Bible Image Representation */}
+                      <div className="mt-6 mb-4">
+                        <div className="w-20 h-20 mx-auto bg-gradient-to-br from-white/20 to-white/5 rounded-lg flex items-center justify-center backdrop-blur-sm border-2 border-white/30">
+                          <div className="text-4xl">🧩</div>
+                        </div>
+                        <div className="mt-2 text-xs text-white/80 font-mono">
+                          📖
+                        </div>
+                      </div>
                     </div>
-                    <p className="text-sm text-white/90 font-semibold" style={{
-                      textShadow: "1px 1px 2px rgba(0,0,0,0.5)"
+                  </div>
+                  
+                  {/* Bottom Section with Tagline */}
+                  <div className="h-16 bg-gradient-to-t from-black/40 to-transparent flex items-center justify-center px-4">
+                    <p className="text-xs text-yellow-200 font-bold tracking-wider text-center" style={{
+                      textShadow: "2px 2px 4px rgba(0,0,0,0.8)"
                     }}>
-                      Floor {card.floorNumber}
+                      {card.tagline}
                     </p>
+                  </div>
+                  
+                  {/* Bottom cityscape silhouette */}
+                  <div className="h-8 bg-gradient-to-t from-black/60 to-transparent relative overflow-hidden">
+                    <div className="absolute bottom-0 left-0 right-0 flex items-end justify-center gap-1 px-2">
+                      {[...Array(12)].map((_, i) => (
+                        <div
+                          key={i}
+                          className="bg-yellow-400/40"
+                          style={{
+                            width: `${Math.random() * 8 + 4}px`,
+                            height: `${Math.random() * 20 + 10}px`,
+                          }}
+                        />
+                      ))}
+                    </div>
                   </div>
                 </div>
 
-                {/* Card Front */}
+                {/* Card Front - Room Details */}
                 <div
-                  className={`absolute w-full h-full rounded-xl bg-gradient-to-br from-background to-muted border-4 ${
+                  className={`absolute w-full h-full rounded-xl bg-gradient-to-br from-amber-50 to-amber-100 dark:from-gray-800 dark:to-gray-900 border-4 ${
                     FLOOR_COLORS.find(c => c.floor === card.floorNumber)?.border
-                  } shadow-2xl flex flex-col items-center justify-center p-4 ${
+                  } shadow-2xl flex flex-col ${
                     card.isMatched ? "opacity-50" : ""
                   }`}
                   style={{ 
@@ -231,19 +272,62 @@ export default function PalaceCardGame() {
                     transform: "rotateY(180deg)"
                   }}
                 >
-                  <div className="text-center">
-                    <div className={`text-4xl font-bold mb-2 bg-gradient-to-r ${card.color} bg-clip-text text-transparent`}>
-                      {card.roomTag}
+                  {/* Top Banner with Room Name */}
+                  <div className="bg-gradient-to-r from-yellow-400 via-yellow-500 to-yellow-400 px-3 py-2 rounded-t-lg border-b-2 border-yellow-600">
+                    <h3 className="text-center font-bold text-gray-800 text-sm uppercase tracking-wide" style={{
+                      textShadow: "1px 1px 2px rgba(0,0,0,0.2)"
+                    }}>
+                      {card.roomName}
+                    </h3>
+                  </div>
+                  
+                  {/* Main Content Area */}
+                  <div className="flex-1 p-3 flex flex-col justify-between bg-gradient-to-b from-amber-100/50 to-amber-50/30 dark:from-gray-800/50 dark:to-gray-900/30">
+                    {/* Room Tag */}
+                    <div className="text-center">
+                      <div className={`text-5xl font-bold mb-2 bg-gradient-to-r ${card.color} bg-clip-text text-transparent`}>
+                        {card.roomTag}
+                      </div>
                     </div>
-                    <h4 className="text-sm font-semibold mb-2">{card.roomName}</h4>
-                    <p className="text-xs text-muted-foreground">
-                      {card.floorName}
-                    </p>
+                    
+                    {/* Room Purpose/Description */}
+                    <div className="flex-1 flex items-center justify-center px-2">
+                      <p className="text-xs text-center leading-relaxed text-gray-700 dark:text-gray-300">
+                        {card.roomPurpose}
+                      </p>
+                    </div>
+                    
+                    {/* Match Trophy */}
                     {card.isMatched && (
-                      <div className="mt-3">
-                        <Trophy className="w-6 h-6 mx-auto text-yellow-500" />
+                      <div className="text-center mb-2">
+                        <Trophy className="w-8 h-8 mx-auto text-yellow-500 drop-shadow-lg" />
                       </div>
                     )}
+                  </div>
+                  
+                  {/* Bottom Section - Floor Info */}
+                  <div className={`bg-gradient-to-r ${card.color} px-3 py-2 rounded-b-lg`}>
+                    <div className="text-center">
+                      <p className="text-xs text-white font-semibold" style={{
+                        textShadow: "1px 1px 2px rgba(0,0,0,0.5)"
+                      }}>
+                        {card.floorNumber}ST FLOOR: {card.floorName.toUpperCase()}
+                      </p>
+                    </div>
+                    
+                    {/* Cityscape silhouette */}
+                    <div className="mt-1 flex items-end justify-center gap-px">
+                      {[...Array(10)].map((_, i) => (
+                        <div
+                          key={i}
+                          className="bg-yellow-300/60"
+                          style={{
+                            width: "6px",
+                            height: `${Math.random() * 8 + 4}px`,
+                          }}
+                        />
+                      ))}
+                    </div>
                   </div>
                 </div>
               </div>
