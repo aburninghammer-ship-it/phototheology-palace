@@ -123,6 +123,14 @@ const Games = () => {
       requiredRooms: ["QR", "QA", "CR", "DR", "ST"]
     },
     { 
+      id: "concentration", 
+      name: "Biblical Parallels Concentration", 
+      description: "Match Old Testament events with their New Testament fulfillments. Find typological parallels like Moses→Joshua matching John Baptist→Jesus transitions.",
+      featured: true,
+      skills: "Typology, Pattern Recognition, Biblical Parallels",
+      requiredRooms: ["ST", "P‖", "CR", "DR"]
+    },
+    { 
       id: "palace_quiz", 
       name: "Palace Quiz", 
       description: "Test your mastery of the 9 Rooms and 50 Principles. Race against time to correctly identify which room each principle belongs to and explain their connections.",
@@ -322,6 +330,15 @@ const Games = () => {
                           Play vs Jeeves
                         </Button>
                       </>
+                    ) : game.id === "concentration" ? (
+                      <Button
+                        onClick={() => navigate(`/games/concentration`)}
+                        className="w-full"
+                        variant="default"
+                      >
+                        <Gamepad2 className="mr-2 h-4 w-4" />
+                        Play Now
+                      </Button>
                     ) : game.id === "palace_quiz" || game.id === "verse_match" || game.id === "principle_puzzle" ? (
                       <>
                         <Button
