@@ -502,20 +502,21 @@ You MUST be specific. Never give a generic category without naming the specific 
         const categoriesText = (availableCategories || ["Books of the Bible", "Rooms of the Palace", "Principles of the Palace"]).join(", ");
         userPrompt = `You're starting a Chain Chess game! You go FIRST. 
 
-**THE VERSE FOR THIS GAME IS: ${verse}**
+**YOU CHOOSE THE OPENING VERSE!**
 
-This verse is FIXED. You MUST comment on THIS verse - ${verse} - not any other verse.
+Pick any powerful, well-known Bible verse to start the game. This will be the foundation verse for the entire game.
 
 Available categories for this game: ${categoriesText}
 
 **YOUR CRITICAL TASK:**
-1. The verse field in your JSON response MUST be: "${verse}" (this exact verse - DO NOT change it or pick a different verse!)
+1. Choose an excellent opening verse (like John 3:16, Romans 8:28, Psalm 23:1, etc.)
 
-2. Write 3-4 sentences of insightful, enthusiastic commentary SPECIFICALLY ABOUT ${verse}:
-   - Explain what ${verse} means
-   - Use one of the available categories to analyze ${verse}
-   - Be specific, scholarly, and excited about ${verse}
-   - Make biblical connections to ${verse}
+2. Give a 3-4 sentence exposition/build on that verse:
+   - Explain what the verse means
+   - Share biblical insight using original language (Greek/Hebrew) if relevant
+   - Show why this verse is profound
+   - Connect to theological truth
+   - Be enthusiastic and scholarly!
    
 3. Then challenge the player with a SPECIFIC challenge:
    - If using "Books of the Bible" → name a specific book: "Books of the Bible - Romans"
@@ -523,23 +524,23 @@ Available categories for this game: ${categoriesText}
    - If using "Principles of the Palace" → name a specific principle: "Principles of the Palace - 2D/3D"
 
 **IMPORTANT:** 
-- The "verse" in your JSON MUST be "${verse}" - do not change this!
-- Your commentary MUST be about ${verse} specifically
+- Choose a clear, powerful verse to start
+- Your commentary should be an exposition/build that teaches about the verse
 - You MUST be specific in your challenge category
 
-**EXAMPLE FORMAT (for a different verse):**
+**EXAMPLE FORMAT:**
 {
-  "verse": "Psalm 23:1",
-  "commentary": "What a beautiful declaration of trust! Psalm 23:1 portrays Yahweh as the divine Shepherd who provides completely for His flock. The Hebrew 'ra'ah' (shepherd) emphasizes both guidance and provision. This pastoral imagery, so central to Israel's identity, reveals God's intimate, caring relationship with His people.",
-  "challengeCategory": "Books of the Bible - Isaiah"
+  "verse": "John 3:16",
+  "commentary": "What a magnificent cornerstone to begin our theological exploration! John 3:16 encapsulates the very heart of the Gospel, articulating God's unconditional 'agape' love for a fallen world. The phrase 'only begotten Son' (Greek: monogenēs) emphasizes Christ's unique divine filiation. This verse frames salvation not as human achievement but as divine initiative, freely offered to 'whosoever believes.'",
+  "challengeCategory": "Books of the Bible - Romans"
 }
 
 **FOR THIS GAME:**
-NOW: Write your enthusiastic commentary specifically about ${verse}, then challenge them with a SPECIFIC challenge from these categories: ${categoriesText}
+NOW: Choose your opening verse, give an insightful exposition, then challenge them with a SPECIFIC challenge from these categories: ${categoriesText}
 
 Return ONLY valid JSON with:
-- verse: "${verse}" (exactly as shown)
-- commentary: (your insightful thought about ${verse})
+- verse: (your chosen verse reference)
+- commentary: (your insightful exposition on the verse)
 - challengeCategory: (specific challenge with book/room/principle name)`;
       } else {
         const lastMove = previousMoves[previousMoves.length - 1];

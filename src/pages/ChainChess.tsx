@@ -48,6 +48,7 @@ const ChainChess = () => {
   const [userVerse, setUserVerse] = useState("");
   const [chatMessages, setChatMessages] = useState<Array<{ userId: string; userName: string; message: string; timestamp: string }>>([]);
   const [userDisplayName, setUserDisplayName] = useState<string>("");
+  const [whoStarts, setWhoStarts] = useState<"jeeves" | "player" | null>(null);
 
   const categories = ["Books of the Bible", "Rooms of the Palace", "Principles of the Palace"];
   const isVsJeeves = mode === "jeeves";
@@ -125,9 +126,18 @@ const ChainChess = () => {
       return;
     }
 
+    if (!whoStarts) {
+      toast({
+        title: "Choose Who Starts",
+        description: "Please select who should make the first move",
+        variant: "destructive",
+      });
+      return;
+    }
+
     try {
-      // Get a random verse for this game
-      const randomVerse = getRandomVerse();
+      // Jeeves chooses the verse if he starts, otherwise use a random one for player to respond to
+      const randomVerse = whoStarts === "jeeves" ? getRandomVerse() : getRandomVerse();
       
       // Create new game
       const { data: newGame, error } = await supabase
@@ -136,12 +146,13 @@ const ChainChess = () => {
           game_type: "chain_chess",
           player1_id: user!.id,
           player2_id: isVsJeeves ? null : null,
-          current_turn: null, // Jeeves will go first
+          current_turn: whoStarts === "player" ? user!.id : null,
           status: "in_progress",
           game_state: { 
             categories: selectedGameCategories,
             verse: randomVerse,
-            difficulty: difficultyLevel
+            difficulty: difficultyLevel,
+            whoStarts: whoStarts
           },
         })
         .select()
@@ -157,10 +168,15 @@ const ChainChess = () => {
       // Navigate after setting state
       navigate(`/games/chain-chess/${newGame.id}${isVsJeeves ? "/jeeves" : ""}`, { replace: true });
 
-      // Jeeves makes first move after a brief delay to ensure state is set
-      setTimeout(async () => {
-        await jeevesMove(newGame.id, true);
-      }, 500);
+      if (whoStarts === "jeeves") {
+        // Jeeves makes first move - he chooses verse and gives exposition
+        setTimeout(async () => {
+          await jeevesMove(newGame.id, true);
+        }, 500);
+      } else {
+        // Player goes first
+        setIsMyTurn(true);
+      }
     } catch (error: any) {
       toast({
         title: "Error",
@@ -381,6 +397,25 @@ const ChainChess = () => {
       if (insertError) {
         console.error("Error saving move:", insertError);
         throw insertError;
+      }
+
+      // If this is the first move and Jeeves chose a verse, update the game verse
+      if (isFirst && data.verse) {
+        setCurrentVerse(data.verse);
+        await fetchVerseText(data.verse);
+        
+        // Update game state with Jeeves' chosen verse
+        await supabase
+          .from("games")
+          .update({
+            game_state: {
+              categories: selectedGameCategories,
+              verse: data.verse,
+              difficulty: game?.game_state?.difficulty || difficultyLevel,
+              whoStarts: "jeeves"
+            }
+          })
+          .eq("id", currentGameId);
       }
 
       setChallengeCategory(data.challengeCategory);
@@ -614,7 +649,7 @@ const ChainChess = () => {
           {!gameStarted && (
             <Card className="max-w-2xl mx-auto">
               <CardHeader>
-                <CardTitle className="text-2xl">Setup Chain Chess</CardTitle>
+                <CardTitle className="text-2xl">Setup Chain Chess with Jeeves</CardTitle>
                 <CardDescription>
                   Configure your game settings before starting
                 </CardDescription>
@@ -641,9 +676,42 @@ const ChainChess = () => {
                 </div>
 
                 <div className="space-y-3">
+                  <label className="text-sm font-medium">Who should start first?</label>
+                  <CardDescription className="text-sm">
+                    Choose who makes the opening move
+                  </CardDescription>
+                  <div className="flex gap-3">
+                    <Button
+                      variant={whoStarts === "jeeves" ? "default" : "outline"}
+                      onClick={() => setWhoStarts("jeeves")}
+                      className="flex-1 h-auto py-4"
+                    >
+                      <div>
+                        <div className="font-semibold">🤖 Jeeves Starts</div>
+                        <div className="text-xs opacity-80 mt-1">
+                          Jeeves will choose the verse and give an exposition
+                        </div>
+                      </div>
+                    </Button>
+                    <Button
+                      variant={whoStarts === "player" ? "default" : "outline"}
+                      onClick={() => setWhoStarts("player")}
+                      className="flex-1 h-auto py-4"
+                    >
+                      <div>
+                        <div className="font-semibold">👤 You Start</div>
+                        <div className="text-xs opacity-80 mt-1">
+                          You choose the verse and make the first move
+                        </div>
+                      </div>
+                    </Button>
+                  </div>
+                </div>
+
+                <div className="space-y-3">
                   <label className="text-sm font-medium">Game Categories</label>
                   <CardDescription className="text-sm">
-                    Select which categories Jeeves can use to challenge you
+                    Select which categories can be used for challenges
                   </CardDescription>
                   {categories.map((cat) => (
                     <Button
@@ -667,7 +735,7 @@ const ChainChess = () => {
                   onClick={startGameWithCategories}
                   className="w-full"
                   size="lg"
-                  disabled={selectedGameCategories.length === 0}
+                  disabled={selectedGameCategories.length === 0 || !whoStarts}
                 >
                   Start Game ({difficultyLevel === "kids" ? "Kids" : "Adults"} Level)
                 </Button>
