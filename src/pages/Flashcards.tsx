@@ -10,6 +10,8 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Switch } from "@/components/ui/switch";
 import { toast } from "sonner";
 import { Brain, Sparkles, Plus, Loader2, Trash2, Eye, ChevronLeft, ChevronRight } from "lucide-react";
+import { flashcardSetSchema, aiPromptSchema } from "@/lib/validationSchemas";
+import { sanitizeText } from "@/lib/sanitize";
 
 interface FlashcardSet {
   id: string;
@@ -88,17 +90,16 @@ export default function Flashcards() {
   };
 
   const generateWithAI = async () => {
-    if (!aiPrompt.trim()) {
-      toast.error("Please enter a topic for AI generation");
-      return;
-    }
-
-    setGenerating(true);
     try {
+      // Validate AI prompt
+      const validatedPrompt = aiPromptSchema.parse(aiPrompt);
+      const sanitizedPrompt = sanitizeText(validatedPrompt);
+
+      setGenerating(true);
       const { data, error } = await supabase.functions.invoke("jeeves", {
         body: {
           mode: "generate-flashcards",
-          topic: aiPrompt,
+          topic: sanitizedPrompt,
         },
       });
 
@@ -141,28 +142,39 @@ export default function Flashcards() {
       toast.success("Flashcard set generated successfully!");
       setAiPrompt("");
       fetchSets();
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error generating flashcards:", error);
-      toast.error("Failed to generate flashcards");
+      if (error.name === 'ZodError') {
+        toast.error(error.errors[0]?.message || "Invalid input");
+      } else {
+        toast.error("Failed to generate flashcards");
+      }
     } finally {
       setGenerating(false);
     }
   };
 
   const createCustomSet = async () => {
-    if (!newSet.title.trim()) {
-      toast.error("Please enter a title");
-      return;
-    }
-
     try {
+      // Validate input
+      const validatedData = flashcardSetSchema.parse({
+        title: newSet.title,
+        description: newSet.description || undefined
+      });
+
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error("Not authenticated");
 
+      // Sanitize inputs
+      const sanitizedTitle = sanitizeText(validatedData.title);
+      const sanitizedDescription = validatedData.description 
+        ? sanitizeText(validatedData.description) 
+        : null;
+
       const { error } = await supabase.from("flashcard_sets").insert({
         user_id: user.id,
-        title: newSet.title,
-        description: newSet.description,
+        title: sanitizedTitle,
+        description: sanitizedDescription,
         is_public: newSet.is_public,
         is_ai_generated: false,
       });
@@ -172,9 +184,13 @@ export default function Flashcards() {
       toast.success("Custom set created!");
       setNewSet({ title: "", description: "", is_public: false });
       fetchSets();
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error creating set:", error);
-      toast.error("Failed to create set");
+      if (error.name === 'ZodError') {
+        toast.error(error.errors[0]?.message || "Invalid input");
+      } else {
+        toast.error("Failed to create set");
+      }
     }
   };
 
@@ -337,6 +353,7 @@ export default function Flashcards() {
                   value={aiPrompt}
                   onChange={(e) => setAiPrompt(e.target.value)}
                   rows={3}
+                  maxLength={200}
                 />
                 <Button onClick={generateWithAI} disabled={generating} className="w-full">
                   {generating ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
@@ -364,6 +381,7 @@ export default function Flashcards() {
                     placeholder="e.g., My Favorite Verses"
                     value={newSet.title}
                     onChange={(e) => setNewSet({ ...newSet, title: e.target.value })}
+                    maxLength={100}
                   />
                 </div>
                 <div>
@@ -373,6 +391,7 @@ export default function Flashcards() {
                     value={newSet.description}
                     onChange={(e) => setNewSet({ ...newSet, description: e.target.value })}
                     rows={2}
+                    maxLength={500}
                   />
                 </div>
                 <div className="flex items-center justify-between">

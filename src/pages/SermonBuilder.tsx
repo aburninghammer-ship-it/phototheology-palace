@@ -8,6 +8,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
 import { Film, Mic, BookOpen, TrendingUp, ArrowRight, CheckCircle2, Loader2 } from "lucide-react";
+import { sermonTitleSchema, sermonThemeSchema, sermonStoneSchema, sermonBridgeSchema } from "@/lib/validationSchemas";
+import { sanitizeText } from "@/lib/sanitize";
 
 const STEPS = [
   { num: 1, title: "Setup", icon: BookOpen },
@@ -71,29 +73,38 @@ export default function SermonBuilder() {
   };
 
   const addSmoothStone = () => {
-    if (!newStone.trim()) {
-      toast.error("Please enter a smooth stone insight");
-      return;
+    try {
+      const validated = sermonStoneSchema.parse(newStone);
+      const sanitized = sanitizeText(validated);
+      setSermon({ ...sermon, smooth_stones: [...sermon.smooth_stones, sanitized] });
+      setNewStone("");
+      toast.success("Smooth stone added!");
+    } catch (error: any) {
+      toast.error(error.errors?.[0]?.message || "Invalid stone format");
     }
-    setSermon({ ...sermon, smooth_stones: [...sermon.smooth_stones, newStone] });
-    setNewStone("");
-    toast.success("Smooth stone added!");
   };
 
   const addBridge = () => {
-    if (!newBridge.trim()) {
-      toast.error("Please enter a bridge connection");
-      return;
+    try {
+      const validated = sermonBridgeSchema.parse(newBridge);
+      const sanitized = sanitizeText(validated);
+      setSermon({ ...sermon, bridges: [...sermon.bridges, sanitized] });
+      setNewBridge("");
+      toast.success("Bridge added!");
+    } catch (error: any) {
+      toast.error(error.errors?.[0]?.message || "Invalid bridge format");
     }
-    setSermon({ ...sermon, bridges: [...sermon.bridges, newBridge] });
-    setNewBridge("");
-    toast.success("Bridge added!");
   };
 
   const nextStep = () => {
-    if (currentStep === 1 && (!sermon.title || !sermon.theme_passage)) {
-      toast.error("Please complete all setup fields");
-      return;
+    if (currentStep === 1) {
+      try {
+        sermonTitleSchema.parse(sermon.title);
+        sermonThemeSchema.parse(sermon.theme_passage);
+      } catch (error: any) {
+        toast.error(error.errors?.[0]?.message || "Invalid input");
+        return;
+      }
     }
     if (currentStep === 2 && sermon.smooth_stones.length < 5) {
       toast.error("Please add 5 smooth stones (insights)");
@@ -198,6 +209,7 @@ export default function SermonBuilder() {
                         value={sermon.title}
                         onChange={(e) => setSermon({ ...sermon, title: e.target.value })}
                         className="pr-10"
+                        maxLength={200}
                       />
                       <Mic className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
                     </div>
@@ -212,6 +224,7 @@ export default function SermonBuilder() {
                         onChange={(e) => setSermon({ ...sermon, theme_passage: e.target.value })}
                         rows={4}
                         className="pr-10"
+                        maxLength={500}
                       />
                       <Mic className="absolute right-3 top-3 w-5 h-5 text-muted-foreground" />
                     </div>
@@ -268,6 +281,7 @@ export default function SermonBuilder() {
                       value={newStone}
                       onChange={(e) => setNewStone(e.target.value)}
                       rows={3}
+                      maxLength={1000}
                     />
                     <Button onClick={addSmoothStone} className="w-full">
                       Add Stone ({sermon.smooth_stones.length}/5)
@@ -309,6 +323,7 @@ export default function SermonBuilder() {
                       value={newBridge}
                       onChange={(e) => setNewBridge(e.target.value)}
                       rows={3}
+                      maxLength={1000}
                     />
                     <Button onClick={addBridge} className="w-full">
                       Add Bridge ({sermon.bridges.length}/4+)

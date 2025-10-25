@@ -10,6 +10,8 @@ import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
 import { MessageSquare, Plus, Heart } from "lucide-react";
 import { EmojiPicker } from "@/components/EmojiPicker";
+import { communityPostSchema } from "@/lib/validationSchemas";
+import { sanitizeHtml } from "@/lib/sanitize";
 
 const Community = () => {
   const { user, loading } = useAuth();
@@ -47,16 +49,25 @@ const Community = () => {
   };
 
   const createPost = async () => {
-    if (!newTitle.trim() || !newContent.trim()) return;
-
     try {
+      // Validate input
+      const validatedData = communityPostSchema.parse({
+        title: newTitle,
+        content: newContent,
+        category: "general"
+      });
+
+      // Sanitize content before storing
+      const sanitizedTitle = sanitizeHtml(validatedData.title);
+      const sanitizedContent = sanitizeHtml(validatedData.content);
+
       const { error } = await supabase
         .from("community_posts")
         .insert({
           user_id: user!.id,
-          title: newTitle,
-          content: newContent,
-          category: "general",
+          title: sanitizedTitle,
+          content: sanitizedContent,
+          category: validatedData.category,
         });
 
       if (error) throw error;
@@ -70,11 +81,19 @@ const Community = () => {
       setNewContent("");
       setShowNewPost(false);
     } catch (error: any) {
-      toast({
-        title: "Error",
-        description: error.message,
-        variant: "destructive",
-      });
+      if (error.name === 'ZodError') {
+        toast({
+          title: "Validation Error",
+          description: error.errors[0]?.message || "Invalid input",
+          variant: "destructive",
+        });
+      } else {
+        toast({
+          title: "Error",
+          description: error.message,
+          variant: "destructive",
+        });
+      }
     }
   };
 
@@ -106,6 +125,7 @@ const Community = () => {
                   placeholder="Post title..."
                   value={newTitle}
                   onChange={(e) => setNewTitle(e.target.value)}
+                  maxLength={200}
                 />
                 <div className="space-y-2">
                   <Textarea
@@ -113,6 +133,7 @@ const Community = () => {
                     value={newContent}
                     onChange={(e) => setNewContent(e.target.value)}
                     rows={4}
+                    maxLength={10000}
                   />
                   <div className="flex justify-end">
                     <EmojiPicker 

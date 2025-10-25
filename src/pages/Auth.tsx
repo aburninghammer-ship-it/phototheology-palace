@@ -11,8 +11,14 @@ import { Building2, Sparkles, Mail, Lock, User, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { z } from "zod";
 
-const emailSchema = z.string().email("Please enter a valid email address");
-const passwordSchema = z.string().min(6, "Password must be at least 6 characters");
+const emailSchema = z.string().email("Please enter a valid email address").max(255, "Email is too long");
+const passwordSchema = z.string().min(6, "Password must be at least 6 characters").max(128, "Password is too long");
+const displayNameSchema = z.string()
+  .trim()
+  .min(2, "Name must be at least 2 characters")
+  .max(50, "Name must be less than 50 characters")
+  .regex(/^[a-zA-Z0-9\s\-_]+$/, "Name can only contain letters, numbers, spaces, hyphens, and underscores");
+const referralCodeSchema = z.string().trim().max(20).regex(/^[A-Z0-9]*$/).optional();
 
 export default function Auth() {
   const navigate = useNavigate();
@@ -125,9 +131,26 @@ export default function Auth() {
       return;
     }
 
-    if (!signupDisplayName.trim()) {
-      setError("Please enter a display name");
-      return;
+    // Validate display name
+    try {
+      displayNameSchema.parse(signupDisplayName);
+    } catch (e) {
+      if (e instanceof z.ZodError) {
+        setError(e.errors[0].message);
+        return;
+      }
+    }
+
+    // Validate referral code if provided
+    if (referralCode) {
+      try {
+        referralCodeSchema.parse(referralCode);
+      } catch (e) {
+        if (e instanceof z.ZodError) {
+          setError("Invalid referral code format");
+          return;
+        }
+      }
     }
 
     setLoading(true);
@@ -298,7 +321,11 @@ export default function Auth() {
                       onChange={(e) => setSignupDisplayName(e.target.value)}
                       required
                       disabled={loading}
+                      maxLength={50}
                     />
+                    <p className="text-xs text-muted-foreground">
+                      2-50 characters. Letters, numbers, spaces, hyphens, and underscores only.
+                    </p>
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="signup-email">
