@@ -2,11 +2,40 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Settings, Type, BookOpen } from "lucide-react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Settings, Type, BookOpen, Languages } from "lucide-react";
 import { useUserPreferences } from "@/hooks/useUserPreferences";
+import { BIBLE_TRANSLATIONS, Translation } from "@/services/bibleApi";
+import { useParams, useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
 
 export const ReadingControls = () => {
   const { preferences, updatePreference } = useUserPreferences();
+  const { book = "John", chapter: chapterParam = "3" } = useParams();
+  const navigate = useNavigate();
+  const [translation, setTranslation] = useState<Translation>("kjv");
+
+  useEffect(() => {
+    // Get translation from URL parameter
+    const params = new URLSearchParams(window.location.search);
+    const urlTranslation = params.get("t");
+    if (urlTranslation) {
+      setTranslation(urlTranslation as Translation);
+    }
+  }, []);
+
+  const handleTranslationChange = (value: Translation) => {
+    setTranslation(value);
+    // Navigate with translation parameter
+    navigate(`/bible/${book}/${chapterParam}?t=${value}`);
+    setTimeout(() => window.location.reload(), 100);
+  };
 
   return (
     <Popover>
@@ -18,6 +47,25 @@ export const ReadingControls = () => {
       </PopoverTrigger>
       <PopoverContent className="w-80">
         <div className="space-y-4">
+          <div>
+            <h4 className="font-medium mb-3 flex items-center gap-2">
+              <Languages className="h-4 w-4" />
+              Translation
+            </h4>
+            <Select value={translation} onValueChange={handleTranslationChange}>
+              <SelectTrigger>
+                <SelectValue placeholder="Select translation" />
+              </SelectTrigger>
+              <SelectContent>
+                {BIBLE_TRANSLATIONS.map((trans) => (
+                  <SelectItem key={trans.value} value={trans.value}>
+                    {trans.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
           <div>
             <h4 className="font-medium mb-3 flex items-center gap-2">
               <Type className="h-4 w-4" />

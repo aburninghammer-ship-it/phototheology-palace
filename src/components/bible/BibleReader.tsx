@@ -1,11 +1,12 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { fetchChapter } from "@/services/bibleApi";
+import { fetchChapter, Translation } from "@/services/bibleApi";
 import { Chapter } from "@/types/bible";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight, BookOpen, Loader2, Link2, MessageSquare, Bot, Bookmark } from "lucide-react";
 import { VerseView } from "./VerseView";
+import { StrongsVerseView } from "./StrongsVerseView";
 import { PrinciplePanel } from "./PrinciplePanel";
 import { ChainReferencePanel } from "./ChainReferencePanel";
 import { CommentaryPanel } from "./CommentaryPanel";
@@ -32,6 +33,16 @@ export const BibleReader = () => {
   const [commentaryMode, setCommentaryMode] = useState(false);
   const [jeevesMode, setJeevesMode] = useState(false);
   const [highlightedVerses, setHighlightedVerses] = useState<number[]>([]);
+  const [translation, setTranslation] = useState<Translation>("kjv");
+
+  useEffect(() => {
+    // Get translation from URL parameter
+    const params = new URLSearchParams(window.location.search);
+    const urlTranslation = params.get("t");
+    if (urlTranslation) {
+      setTranslation(urlTranslation as Translation);
+    }
+  }, []);
 
   const { trackReading } = useReadingHistory();
   const { addBookmark, isBookmarked } = useBookmarks();
@@ -47,7 +58,9 @@ export const BibleReader = () => {
     setLoading(true);
     setError(null);
     try {
-      const data = await fetchChapter(book, chapter);
+      // Use 'kjv' for API call even if 'kjv-strongs' is selected
+      const apiTranslation = translation === "kjv-strongs" ? "kjv" : translation;
+      const data = await fetchChapter(book, chapter, apiTranslation as Translation);
       setChapterData(data);
       setError(null);
     } catch (error) {
@@ -208,16 +221,27 @@ export const BibleReader = () => {
         <div className="lg:col-span-2">
           <Card className={`p-6 shadow-elegant hover:shadow-hover transition-smooth ${preferences.reading_mode === 'focus' ? 'max-w-3xl mx-auto' : ''}`}>
             <div className={`space-y-4 ${fontSizeClass}`}>
-              {chapterData.verses.map((verse) => (
-                <VerseView
-                  key={`${verse.book}-${verse.chapter}-${verse.verse}`}
-                  verse={verse}
-                  isSelected={selectedVerse === verse.verse}
-                  onSelect={() => setSelectedVerse(verse.verse)}
-                  showPrinciples={principleMode}
-                  isHighlighted={highlightedVerses.includes(verse.verse)}
-                />
-              ))}
+              {chapterData.verses.map((verse) => 
+                translation === "kjv-strongs" ? (
+                  <StrongsVerseView
+                    key={`${verse.book}-${verse.chapter}-${verse.verse}`}
+                    verse={verse}
+                    isSelected={selectedVerse === verse.verse}
+                    onSelect={() => setSelectedVerse(verse.verse)}
+                    showPrinciples={principleMode}
+                    isHighlighted={highlightedVerses.includes(verse.verse)}
+                  />
+                ) : (
+                  <VerseView
+                    key={`${verse.book}-${verse.chapter}-${verse.verse}`}
+                    verse={verse}
+                    isSelected={selectedVerse === verse.verse}
+                    onSelect={() => setSelectedVerse(verse.verse)}
+                    showPrinciples={principleMode}
+                    isHighlighted={highlightedVerses.includes(verse.verse)}
+                  />
+                )
+              )}
             </div>
           </Card>
         </div>
