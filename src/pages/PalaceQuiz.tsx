@@ -36,63 +36,63 @@ const PalaceQuiz = () => {
   const questions: Question[] = [
     {
       principle: "Time Zones (Past, Present, Future)",
-      correctRoom: "Time Zone Room (TZ)",
-      options: ["Time Zone Room (TZ)", "Observation Room (OR)", "Blue Room (BL)", "Three Heavens Floor"],
-      explanation: "Time Zone Room on Floor 4 locates passages across past, present, and future to understand how texts relate to different eras in God's plan."
+      correctRoom: "Time Zone Room",
+      options: ["Time Zone Room", "Observation Room", "Blue Room", "Three Heavens Floor"],
+      explanation: "Time Zone Room (TZ) on Floor 4 locates passages across past, present, and future to understand how texts relate to different eras in God's plan."
     },
     {
       principle: "Following Connected Verses (Q&A Chains)",
-      correctRoom: "Q&A Room (QA)",
-      options: ["Q&A Room (QA)", "Story Room (SR)", "Dimensions Room (DR)", "Bible Freestyle (BF)"],
-      explanation: "The Q&A Room on Floor 2 is where Scripture answers Scripture—verses cross-examine and corroborate each other like witnesses in court."
+      correctRoom: "Q&A Room",
+      options: ["Q&A Room", "Story Room", "Dimensions Room", "Bible Freestyle"],
+      explanation: "The Q&A Room (QA) on Floor 2 is where Scripture answers Scripture—verses cross-examine and corroborate each other like witnesses in court."
     },
     {
       principle: "Christ in All Scripture",
-      correctRoom: "Concentration Room (CR)",
-      options: ["Concentration Room (CR)", "Story Room (SR)", "Blue Room (BL)", "Fire Room (FRm)"],
-      explanation: "The Concentration Room on Floor 4 insists every text must reveal Christ—using the lens that bends all light until Jesus comes into focus."
+      correctRoom: "Concentration Room",
+      options: ["Concentration Room", "Story Room", "Blue Room", "Fire Room"],
+      explanation: "The Concentration Room (CR) on Floor 4 insists every text must reveal Christ—using the lens that bends all light until Jesus comes into focus."
     },
     {
       principle: "Story Beats (3-7 punchy scenes)",
-      correctRoom: "Story Room (SR)",
-      options: ["Story Room (SR)", "Imagination Room (IR)", "24FPS Room (24)", "Translation Room (TR)"],
-      explanation: "Story Room on Floor 1 crystallizes narratives into 3-7 memorable beats that capture action and sequence, like movie clips."
+      correctRoom: "Story Room",
+      options: ["Story Room", "Imagination Room", "24FPS Room", "Translation Room"],
+      explanation: "Story Room (SR) on Floor 1 crystallizes narratives into 3-7 memorable beats that capture action and sequence, like movie clips."
     },
     {
       principle: "Sanctuary Pattern (Altar, Laver, Lampstand)",
-      correctRoom: "Blue Room (BL)",
-      options: ["Blue Room (BL)", "Prophecy Room (PR)", "Three Angels Room (3A)", "Theme Room (TRm)"],
-      explanation: "The Blue Room on Floor 5 maps the sanctuary as the architectural blueprint of salvation—every piece of furniture traces to Christ."
+      correctRoom: "Blue Room",
+      options: ["Blue Room", "Prophecy Room", "Three Angels Room", "Theme Room"],
+      explanation: "The Blue Room (BL) on Floor 5 maps the sanctuary as the architectural blueprint of salvation—every piece of furniture traces to Christ."
     },
     {
       principle: "Types and Symbols (OT pointing to Christ)",
-      correctRoom: "Symbols/Types Room (ST)",
-      options: ["Symbols/Types Room (ST)", "Prophecy Room (PR)", "Story Room (SR)", "Patterns Room (PRm)"],
-      explanation: "Symbols/Types Room on Floor 2 builds the profile of God's universal imagery—lamb=Christ, rock=Christ, light=truth."
+      correctRoom: "Symbols/Types Room",
+      options: ["Symbols/Types Room", "Prophecy Room", "Story Room", "Patterns Room"],
+      explanation: "Symbols/Types Room (ST) on Floor 2 builds the profile of God's universal imagery—lamb=Christ, rock=Christ, light=truth."
     },
     {
       principle: "Experiencing with All Five Senses",
-      correctRoom: "Imagination Room (IR)",
-      options: ["Imagination Room (IR)", "Fire Room (FRm)", "Meditation Room (MR)", "Story Room (SR)"],
-      explanation: "Imagination Room on Floor 1 trains you to step inside Scripture with all senses engaged—feel the spray, smell the myrrh, taste the salt."
+      correctRoom: "Imagination Room",
+      options: ["Imagination Room", "Fire Room", "Meditation Room", "Story Room"],
+      explanation: "Imagination Room (IR) on Floor 1 trains you to step inside Scripture with all senses engaged—feel the spray, smell the myrrh, taste the salt."
     },
     {
       principle: "Five Dimensions (Literal, Christ, Me, Church, Heaven)",
-      correctRoom: "Dimensions Room (DR)",
-      options: ["Dimensions Room (DR)", "Concentration Room (CR)", "Time Zone Room (TZ)", "Theme Room (TRm)"],
-      explanation: "Dimensions Room on Floor 4 stretches every passage across 5 dimensions like examining a diamond under different lights."
+      correctRoom: "Dimensions Room",
+      options: ["Dimensions Room", "Concentration Room", "Time Zone Room", "Theme Room"],
+      explanation: "Dimensions Room (DR) on Floor 4 stretches every passage across 5 dimensions like examining a diamond under different lights."
     },
     {
       principle: "Observing Without Interpreting (Detective Work)",
-      correctRoom: "Observation Room (OR)",
-      options: ["Observation Room (OR)", "Questions Room (QR)", "Story Room (SR)", "Def-Com Room (DC)"],
-      explanation: "Observation Room on Floor 2 is the detective's notebook—logging details without rushing to meaning, gathering fingerprints before theories."
+      correctRoom: "Observation Room",
+      options: ["Observation Room", "Questions Room", "Story Room", "Def-Com Room"],
+      explanation: "Observation Room (OR) on Floor 2 is the detective's notebook—logging details without rushing to meaning, gathering fingerprints before theories."
     },
     {
       principle: "Verse Genetics (Finding Verse Relatives)",
-      correctRoom: "Bible Freestyle (BF)",
-      options: ["Bible Freestyle (BF)", "Q&A Room (QA)", "Patterns Room (PRm)", "Parallels Room (P‖)"],
-      explanation: "Bible Freestyle on Floor 3 trains spontaneous verse connections—every verse has siblings, cousins, and distant relatives across Scripture."
+      correctRoom: "Bible Freestyle",
+      options: ["Bible Freestyle", "Q&A Room", "Patterns Room", "Parallels Room"],
+      explanation: "Bible Freestyle (BF) on Floor 3 trains spontaneous verse connections—every verse has siblings, cousins, and distant relatives across Scripture."
     }
   ];
 

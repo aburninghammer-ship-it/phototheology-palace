@@ -700,177 +700,164 @@ const ChainChess = () => {
                 />
               )}
               
-              <Card className="h-[600px]">
+              <Card className="flex flex-col" style={{ height: '800px' }}>
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <MessageSquare className="h-5 w-5" />
                     Game Conversation
                   </CardTitle>
+                  {challengeCategory && (
+                    <CardDescription className="text-sm">
+                      Current Challenge: <Badge variant="outline">{challengeCategory}</Badge>
+                    </CardDescription>
+                  )}
                 </CardHeader>
-              <CardContent>
-                <ScrollArea className="h-[480px] pr-4">
-                  <div className="space-y-4">
-                    {moves.map((move, idx) => (
-                      <div key={idx} className={`p-4 rounded-lg ${move.player === "jeeves" ? "bg-purple-50 dark:bg-purple-900/20" : "bg-blue-50 dark:bg-blue-900/20"}`}>
-                        <div className="flex items-center gap-2 mb-2">
-                          <Badge variant={move.player === "jeeves" ? "default" : "secondary"}>
-                            {move.player === "jeeves" ? "Jeeves" : "You"}
-                          </Badge>
-                          {move.score && (
-                            <Badge variant="outline">
-                              <Trophy className="mr-1 h-3 w-3" />
-                              {move.score}/10
+                <CardContent className="flex-1 flex flex-col space-y-4">
+                  <ScrollArea className="flex-1 pr-4">
+                    <div className="space-y-4">
+                      {moves.map((move, idx) => (
+                        <div key={idx} className={`p-4 rounded-lg ${move.player === "jeeves" ? "bg-purple-50 dark:bg-purple-900/20" : "bg-blue-50 dark:bg-blue-900/20"}`}>
+                          <div className="flex items-center gap-2 mb-2">
+                            <Badge variant={move.player === "jeeves" ? "default" : "secondary"}>
+                              {move.player === "jeeves" ? "Jeeves" : "You"}
                             </Badge>
+                            {move.score && (
+                              <Badge variant="outline">
+                                <Trophy className="mr-1 h-3 w-3" />
+                                {move.score}/10
+                              </Badge>
+                            )}
+                          </div>
+                          
+                          {move.verse && (
+                            <p className="text-sm font-semibold text-primary mb-2">
+                              {move.player === "jeeves" ? "Jeeves' Verse: " : "Your Verse: "}
+                              {move.verse}
+                            </p>
+                          )}
+                          
+                          {move.commentary ? (
+                            <div className="mb-2">
+                              {move.player === "jeeves" && (
+                                <p className="text-xs font-semibold text-purple-600 dark:text-purple-400 mb-1">
+                                  💭 Jeeves' Thought:
+                                </p>
+                              )}
+                              <p className="text-foreground">
+                                {move.commentary}
+                              </p>
+                            </div>
+                          ) : (
+                            <div className="mb-2 p-2 bg-destructive/10 rounded border border-destructive/20">
+                              <p className="text-xs text-destructive">
+                                ⚠️ Missing commentary - there was an error.
+                              </p>
+                            </div>
+                          )}
+                          
+                          {move.challengeCategory && (
+                            <div className="mt-2 p-2 bg-background/50 rounded border-l-2 border-primary">
+                              <p className="text-sm font-semibold text-primary">
+                                Challenge: {move.challengeCategory}
+                              </p>
+                            </div>
+                          )}
+                          
+                          {move.jeeves_feedback && (
+                            <div className="mt-3 p-3 bg-white dark:bg-gray-800 rounded border-l-4 border-purple-500">
+                              <p className="text-sm font-semibold text-purple-600 dark:text-purple-400 mb-1">
+                                Jeeves' Feedback:
+                              </p>
+                              <p className="text-sm">{move.jeeves_feedback}</p>
+                            </div>
                           )}
                         </div>
-                        
-                        {/* ALWAYS show verse for both Jeeves and user */}
-                        {move.verse && (
-                          <p className="text-sm font-semibold text-primary mb-2">
-                            {move.player === "jeeves" ? "Jeeves' Verse: " : "Your Verse: "}
-                            {move.verse}
-                          </p>
-                        )}
-                        
-                        {/* Display commentary with clear labeling */}
-                        {move.commentary ? (
-                          <div className="mb-2">
-                            {move.player === "jeeves" && (
-                              <p className="text-xs font-semibold text-purple-600 dark:text-purple-400 mb-1">
-                                💭 Jeeves' Thought:
-                              </p>
-                            )}
-                            <p className={move.player === "jeeves" ? "text-foreground" : "text-foreground"}>
-                              {move.commentary}
-                            </p>
-                          </div>
-                        ) : (
-                          <div className="mb-2 p-2 bg-destructive/10 rounded border border-destructive/20">
-                            <p className="text-xs text-destructive">
-                              ⚠️ Missing commentary - there was an error. Please check the console for details.
-                            </p>
-                          </div>
-                        )}
-                        
-                        {move.challengeCategory && (
-                          <div className="mt-2 p-2 bg-background/50 rounded border-l-2 border-primary">
-                            <p className="text-sm font-semibold text-primary">
-                              Challenge: {move.challengeCategory}
-                            </p>
-                          </div>
-                        )}
-                        
-                        {move.jeeves_feedback && (
-                          <div className="mt-3 p-3 bg-white dark:bg-gray-800 rounded border-l-4 border-purple-500">
-                            <p className="text-sm font-semibold text-purple-600 dark:text-purple-400 mb-1">
-                              Jeeves' Feedback:
-                            </p>
-                            <p className="text-sm">{move.jeeves_feedback}</p>
-                          </div>
-                        )}
-                      </div>
-                    ))}
-                    {processing && (
-                      <div className="text-center text-muted-foreground">
-                        <Sparkles className="h-6 w-6 animate-spin mx-auto mb-2" />
-                        Thinking...
-                      </div>
-                    )}
-                  </div>
-                </ScrollArea>
-              </CardContent>
-              </Card>
-
-              <Card className="h-[600px]">
-              <CardHeader>
-                <CardTitle>Your Turn</CardTitle>
-                {challengeCategory && (
-                  <CardDescription className="text-lg">
-                    Build on Jeeves' thought using: <Badge>{challengeCategory}</Badge>
-                  </CardDescription>
-                )}
-              </CardHeader>
-              <CardContent className="space-y-4">
-                {isMyTurn && !processing ? (
-                  <>
-                    <div className="space-y-2">
-                      <label className="text-sm font-medium">Your Verse</label>
-                      <input
-                        type="text"
-                        placeholder={
-                          challengeCategory?.includes(" - ") 
-                            ? `Add a verse related to: ${challengeCategory.split(" - ")[1]}`
-                            : "Add a verse from the challenged category (e.g., Romans 8:28)"
-                        }
-                        value={userVerse}
-                        onChange={(e) => setUserVerse(e.target.value)}
-                        className="w-full px-3 py-2 border rounded-md bg-background"
-                      />
-                      <p className="text-xs text-muted-foreground">
-                        Choose a verse that relates to: <span className="font-semibold">{challengeCategory}</span>
-                      </p>
+                      ))}
+                      {processing && (
+                        <div className="text-center text-muted-foreground">
+                          <Sparkles className="h-6 w-6 animate-spin mx-auto mb-2" />
+                          Thinking...
+                        </div>
+                      )}
                     </div>
+                  </ScrollArea>
 
-                    <div className="space-y-2">
-                      <label className="text-sm font-medium">Your Commentary</label>
-                      <Textarea
-                        placeholder="Build on Jeeves' thought and connect your verse... (emojis supported 😊)"
-                        value={commentary}
-                        onChange={(e) => setCommentary(e.target.value)}
-                        rows={6}
-                      />
-                      <div className="flex justify-end">
-                        <EmojiPicker 
-                          onEmojiSelect={(emoji) => setCommentary(commentary + emoji)}
+                  {isMyTurn && !processing ? (
+                    <div className="space-y-3 pt-4 border-t">
+                      <div className="space-y-2">
+                        <label className="text-sm font-medium">Your Verse</label>
+                        <input
+                          type="text"
+                          placeholder={
+                            challengeCategory?.includes(" - ") 
+                              ? `Add a verse related to: ${challengeCategory.split(" - ")[1]}`
+                              : "Add a verse from the challenged category (e.g., Romans 8:28)"
+                          }
+                          value={userVerse}
+                          onChange={(e) => setUserVerse(e.target.value)}
+                          className="w-full px-3 py-2 border rounded-md bg-background"
                         />
                       </div>
-                    </div>
 
-                     <div className="space-y-2">
-                      <label className="text-sm font-medium">
-                        Challenge Jeeves with:
-                      </label>
-                      <div className="flex flex-wrap gap-2">
-                        {selectedGameCategories.map((cat) => (
-                          <Button
-                            key={cat}
-                            variant={selectedCategory === cat ? "default" : "outline"}
-                            onClick={() => setSelectedCategory(cat)}
-                          >
-                            {cat}
-                          </Button>
-                        ))}
+                      <div className="space-y-2">
+                        <label className="text-sm font-medium">Your Commentary</label>
+                        <Textarea
+                          placeholder="Build on Jeeves' thought and connect your verse..."
+                          value={commentary}
+                          onChange={(e) => setCommentary(e.target.value)}
+                          rows={4}
+                        />
+                        <div className="flex justify-end">
+                          <EmojiPicker 
+                            onEmojiSelect={(emoji) => setCommentary(commentary + emoji)}
+                          />
+                        </div>
                       </div>
-                    </div>
 
-                    <Button onClick={submitMove} className="w-full" disabled={!commentary.trim() || !selectedCategory || !userVerse.trim()}>
-                      Submit Response
-                    </Button>
+                      <div className="space-y-2">
+                        <label className="text-sm font-medium">Challenge Jeeves with:</label>
+                        <div className="flex flex-wrap gap-2">
+                          {selectedGameCategories.map((cat) => (
+                            <Button
+                              key={cat}
+                              variant={selectedCategory === cat ? "default" : "outline"}
+                              onClick={() => setSelectedCategory(cat)}
+                              size="sm"
+                            >
+                              {cat}
+                            </Button>
+                          ))}
+                        </div>
+                      </div>
 
-                    {moves.length >= 6 && (
-                      <Button onClick={endGame} variant="secondary" className="w-full">
-                        End Game
+                      <Button onClick={submitMove} className="w-full" disabled={!commentary.trim() || !selectedCategory || !userVerse.trim()}>
+                        Submit Response
                       </Button>
-                    )}
-                  </>
-                ) : (
-                  <div className="text-center py-12">
-                    {processing ? (
-                      <>
-                        <Sparkles className="h-12 w-12 animate-spin mx-auto mb-4 text-purple-500" />
-                        <p className="text-muted-foreground">
-                          {isVsJeeves ? "Jeeves is thinking..." : "Waiting for opponent..."}
+
+                      {moves.length >= 6 && (
+                        <Button onClick={endGame} variant="secondary" className="w-full">
+                          End Game
+                        </Button>
+                      )}
+                    </div>
+                  ) : (
+                    <div className="text-center py-8 border-t">
+                      {processing ? (
+                        <>
+                          <Sparkles className="h-8 w-8 animate-spin mx-auto mb-2 text-purple-500" />
+                          <p className="text-sm text-muted-foreground">
+                            {isVsJeeves ? "Jeeves is thinking..." : "Waiting for opponent..."}
+                          </p>
+                        </>
+                      ) : (
+                        <p className="text-sm text-muted-foreground">
+                          Waiting for your turn...
                         </p>
-                      </>
-                    ) : (
-                      <p className="text-muted-foreground">
-                        Waiting for your turn...
-                      </p>
-                    )}
-                  </div>
-                )}
-              </CardContent>
-            </Card>
+                      )}
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
             </div>
 
             {/* Text Chat Sidebar */}
