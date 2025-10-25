@@ -57,7 +57,7 @@ export const palaceFloors: Floor[] = [
         coreQuestion: "What does it feel like to stand there?",
         method: "Use your imagination to step fully into the biblical scene. Engage all five senses: What do you see, hear, touch, smell, and taste? Let the passage become a lived experience, not just information. Then capture in one sentence how this sensory encounter resonates with your own story.",
         examples: [
-          "Red Sea crossing: Feel your feet in wet sand, wind whipping your face, the roar of water held back by invisible hands, salt spray on your lips, the smell of fear and faith mingled in the crowd",
+          "Red Sea crossing: Wind whipping your face, the roar of water held back by invisible hands, salt spray on your lips, towering walls on both sides, the smell of fear and faith mingled in the crowd",
           "Gethsemane: Sense the crushing weight on your chest as you pray, the cool night air, the taste of copper fear in your mouth, the rough bark of the olive tree against your back, the distant sound of soldiers' footsteps"
         ],
         pitfalls: ["Speculation beyond text", "Melodrama", "Adding details Scripture doesn't give", "Making it about your creativity instead of the text's reality"],
