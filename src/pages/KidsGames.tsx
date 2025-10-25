@@ -22,6 +22,13 @@ const KidsGames = () => {
     { id: "treasure_finder", name: "💎 Treasure Finder", description: "Find hidden gems in Bible verses! Click on special words to discover what they mean.", icon: "✨" },
     { id: "song_sing", name: "🎶 Sing & Learn", description: "Sing fun songs about Bible stories! Learn verses through music and rhythm.", icon: "🎤" },
     { id: "hero_cards", name: "🦸 Bible Heroes", description: "Collect cards of Bible heroes! Learn what made them special and brave.", icon: "⭐" },
+    { id: "rainbow_promise", name: "🌈 Rainbow Promise", description: "Learn about God's promises! Paint rainbows and discover what each color means.", icon: "☁️" },
+    { id: "angel_messenger", name: "👼 Angel Messenger", description: "Help angels deliver good news! Fly through clouds and share happy messages from God.", icon: "✉️" },
+    { id: "fruit_garden", name: "🍎 Fruit Garden", description: "Grow the fruits of the Spirit! Water your garden and watch love, joy, and peace bloom.", icon: "🌱" },
+    { id: "shepherd_search", name: "🐑 Shepherd Search", description: "Help the Good Shepherd find lost sheep! Count sheep and learn about Jesus' love.", icon: "🧺" },
+    { id: "tower_build", name: "🗼 Tower Builder", description: "Build the tower of Babel! Learn about different languages and how people spread around the world.", icon: "🧱" },
+    { id: "prayer_time", name: "🙏 Prayer Time", description: "Learn simple prayers! Practice talking to God about your day, friends, and family.", icon: "💫" },
+    { id: "creation_craft", name: "🌍 Creation Week", description: "Make the world in 7 days! Add sun, moon, animals, and rest on the Sabbath.", icon: "☀️" },
   ];
 
   const middleKidsGames = [
@@ -35,6 +42,13 @@ const KidsGames = () => {
     { id: "symbol_safari", name: "🦅 Symbol Safari", description: "Hunt for biblical symbols! Find eagles, lions, lambs and learn what each represents.", icon: "🔍" },
     { id: "feast_festival", name: "🎊 Feast Festival", description: "Celebrate God's feasts! Learn about Passover, Pentecost and more through fun activities.", icon: "🎉" },
     { id: "parable_picker", name: "📚 Parable Picker", description: "Match Jesus' parables to their meanings! Learn the lessons Jesus taught through stories.", icon: "💭" },
+    { id: "miracle_maker", name: "✨ Miracle Maker", description: "Recreate Jesus' miracles! Turn water to wine, feed 5000, and walk on water in this interactive game.", icon: "🌊" },
+    { id: "armor_builder", name: "🛡️ Armor of God", description: "Put on the full armor of God! Learn about each piece and how it protects you spiritually.", icon: "⚔️" },
+    { id: "temple_builder", name: "⛩️ Temple Builder", description: "Build Solomon's Temple! Place each room and object correctly while learning their meanings.", icon: "🏛️" },
+    { id: "psalm_composer", name: "🎼 Psalm Composer", description: "Create music from the Psalms! Turn verses into melodies and share your worship songs.", icon: "🎹" },
+    { id: "disciple_trainer", name: "🎒 Disciple Trainer", description: "Train to be a disciple! Follow Jesus' footsteps and learn what it means to be a follower.", icon: "👣" },
+    { id: "covenant_keeper", name: "📜 Covenant Keeper", description: "Track God's covenants through history! From Noah to Jesus, see how God keeps His promises.", icon: "🤝" },
+    { id: "wisdom_seeker", name: "🦉 Wisdom Seeker", description: "Collect wisdom from Proverbs! Solve riddles and apply wise sayings to everyday situations.", icon: "💡" },
   ];
 
   const olderKidsGames = [
@@ -48,6 +62,12 @@ const KidsGames = () => {
     { id: "cross_linker", name: "🔗 Cross Reference Linker", description: "Build massive cross-reference chains! Connect verses across the entire Bible to see God's unified message.", icon: "🕸️" },
     { id: "apologetics_arena", name: "🛡️ Apologetics Arena", description: "Defend the faith! Answer tough questions about the Bible using Scripture and sound reasoning.", icon: "⚔️" },
     { id: "wisdom_warrior", name: "⚡ Wisdom Warrior", description: "Battle against wrong thinking! Apply biblical wisdom to real-life scenarios and tough choices.", icon: "🧙" },
+    { id: "hebrew_decoder", name: "🔤 Hebrew Decoder", description: "Unlock original Hebrew meanings! Discover deeper truths by studying words in their original language.", icon: "📖" },
+    { id: "greek_scholar", name: "📚 Greek Scholar", description: "Master New Testament Greek! Learn key words and see how they reveal Jesus throughout Scripture.", icon: "✍️" },
+    { id: "typology_tracker", name: "🎯 Typology Tracker", description: "Find types and shadows of Christ! Match Old Testament symbols to their New Testament fulfillment.", icon: "🔍" },
+    { id: "eschatology_explorer", name: "🌅 End Times Explorer", description: "Navigate prophetic timelines! Study Daniel and Revelation to understand God's final plan.", icon: "⏳" },
+    { id: "sanctuary_scholar", name: "🕯️ Sanctuary Scholar", description: "Master the sanctuary system! Learn how every detail points to Jesus' ministry in heaven.", icon: "⛪" },
+    { id: "debate_master", name: "🗣️ Debate Master", description: "Prepare biblical defenses! Practice responding to challenges about faith with Scripture and logic.", icon: "💬" },
   ];
 
   if (!user) return null;
