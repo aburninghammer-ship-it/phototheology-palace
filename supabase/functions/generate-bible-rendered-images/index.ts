@@ -24,8 +24,27 @@ serve(async (req) => {
       throw new Error('No authorization header');
     }
 
-    // Create Supabase client with user's auth token
+    const token = authHeader.replace('Bearer ', '');
+
+    // Create Supabase client
     const supabaseClient = createClient(
+      Deno.env.get('SUPABASE_URL') ?? '',
+      Deno.env.get('SUPABASE_ANON_KEY') ?? '',
+      {
+        auth: { persistSession: false }
+      }
+    );
+
+    // Get user from auth token
+    const { data: { user }, error: userError } = await supabaseClient.auth.getUser(token);
+
+    if (userError || !user) {
+      console.error('Auth error:', userError);
+      throw new Error('Unauthorized');
+    }
+
+    // Create a client with the user's token for RLS
+    const authenticatedClient = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_ANON_KEY') ?? '',
       {
@@ -35,12 +54,6 @@ serve(async (req) => {
         auth: { persistSession: false }
       }
     );
-
-    const { data: { user }, error: userError } = await supabaseClient.auth.getUser();
-
-    if (userError || !user) {
-      throw new Error('Unauthorized');
-    }
 
     const { setNumber } = await req.json();
 
@@ -138,7 +151,7 @@ Style: Modern, symbolic, with rich biblical imagery. Use warm golden and deep bl
     }
 
     // Save to bible_images table
-    const { data: imageRecord, error: imageError } = await supabaseClient
+    const { data: imageRecord, error: imageError } = await authenticatedClient
       .from('bible_images')
       .insert({
         user_id: user.id,

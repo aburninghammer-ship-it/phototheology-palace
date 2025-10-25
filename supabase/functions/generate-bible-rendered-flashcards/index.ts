@@ -18,8 +18,29 @@ serve(async (req) => {
       throw new Error('No authorization header');
     }
 
-    // Create Supabase client with user's auth token
+    const token = authHeader.replace('Bearer ', '');
+
+    // Create Supabase client
     const supabaseClient = createClient(
+      Deno.env.get('SUPABASE_URL') ?? '',
+      Deno.env.get('SUPABASE_ANON_KEY') ?? '',
+      {
+        auth: {
+          persistSession: false,
+        },
+      }
+    );
+
+    // Get user from auth token
+    const { data: { user }, error: userError } = await supabaseClient.auth.getUser(token);
+
+    if (userError || !user) {
+      console.error('Auth error:', userError);
+      throw new Error('Unauthorized');
+    }
+
+    // Create a client with the user's token for RLS
+    const authenticatedClient = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_ANON_KEY') ?? '',
       {
@@ -32,17 +53,10 @@ serve(async (req) => {
       }
     );
 
-    // Get user from auth
-    const { data: { user }, error: userError } = await supabaseClient.auth.getUser();
-
-    if (userError || !user) {
-      throw new Error('Unauthorized');
-    }
-
     console.log('Generating Bible Rendered flashcard set for user:', user.id);
 
     // Create the flashcard set
-    const { data: flashcardSet, error: setError } = await supabaseClient
+    const { data: flashcardSet, error: setError } = await authenticatedClient
       .from('flashcard_sets')
       .insert({
         user_id: user.id,
@@ -124,7 +138,7 @@ serve(async (req) => {
       verse_reference: set.range
     }));
 
-    const { error: flashcardsError } = await supabaseClient
+    const { error: flashcardsError } = await authenticatedClient
       .from('flashcards')
       .insert(flashcards);
 
