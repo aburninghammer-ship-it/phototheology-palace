@@ -19,22 +19,19 @@ export const ReadingControls = () => {
   const { preferences, updatePreference } = useUserPreferences();
   const { book = "John", chapter: chapterParam = "3" } = useParams();
   const navigate = useNavigate();
-  const [translation, setTranslation] = useState<Translation>("kjv");
+  const [translation, setTranslation] = useState<Translation>(preferences.bible_translation as Translation);
 
   useEffect(() => {
-    // Get translation from URL parameter
-    const params = new URLSearchParams(window.location.search);
-    const urlTranslation = params.get("t");
-    if (urlTranslation) {
-      setTranslation(urlTranslation as Translation);
-    }
-  }, []);
+    // Sync with preferences
+    setTranslation(preferences.bible_translation as Translation);
+  }, [preferences.bible_translation]);
 
-  const handleTranslationChange = (value: Translation) => {
+  const handleTranslationChange = async (value: Translation) => {
     setTranslation(value);
+    // Save to preferences
+    await updatePreference("bible_translation", value);
     // Navigate with translation parameter
     navigate(`/bible/${book}/${chapterParam}?t=${value}`);
-    setTimeout(() => window.location.reload(), 100);
   };
 
   return (

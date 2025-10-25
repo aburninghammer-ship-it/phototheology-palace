@@ -71,19 +71,29 @@ export const useUserPreferences = () => {
     if (!user) return;
 
     try {
+      // First update local state immediately for responsive UI
+      setPreferences((prev) => ({ ...prev, [key]: value }));
+
+      // Then update database
       const { error } = await supabase
         .from("user_preferences")
         .upsert({
           user_id: user.id,
-          [key]: value,
+          bible_font_size: key === "bible_font_size" ? value : preferences.bible_font_size,
+          bible_translation: key === "bible_translation" ? value : preferences.bible_translation,
+          reading_mode: key === "reading_mode" ? value : preferences.reading_mode,
+          theme_preference: key === "theme_preference" ? value : preferences.theme_preference,
           updated_at: new Date().toISOString(),
         }, {
           onConflict: "user_id"
         });
 
-      if (error) throw error;
-
-      setPreferences((prev) => ({ ...prev, [key]: value }));
+      if (error) {
+        console.error("Error updating preference:", error);
+        // Revert on error
+        setPreferences((prev) => ({ ...prev, [key]: preferences[key] }));
+        throw error;
+      }
     } catch (error) {
       console.error("Error updating preference:", error);
     }

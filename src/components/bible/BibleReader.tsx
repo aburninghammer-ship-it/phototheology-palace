@@ -33,26 +33,29 @@ export const BibleReader = () => {
   const [commentaryMode, setCommentaryMode] = useState(false);
   const [jeevesMode, setJeevesMode] = useState(false);
   const [highlightedVerses, setHighlightedVerses] = useState<number[]>([]);
-  const [translation, setTranslation] = useState<Translation>("kjv");
-
-  useEffect(() => {
-    // Get translation from URL parameter
-    const params = new URLSearchParams(window.location.search);
-    const urlTranslation = params.get("t");
-    if (urlTranslation) {
-      setTranslation(urlTranslation as Translation);
-    }
-  }, []);
-
+  
   const { trackReading } = useReadingHistory();
   const { addBookmark, isBookmarked } = useBookmarks();
   const { preferences } = useUserPreferences();
   const { handleError } = useErrorHandler();
+  
+  const [translation, setTranslation] = useState<Translation>(preferences.bible_translation as Translation);
+
+  useEffect(() => {
+    // Get translation from URL parameter or use preference
+    const params = new URLSearchParams(window.location.search);
+    const urlTranslation = params.get("t");
+    if (urlTranslation) {
+      setTranslation(urlTranslation as Translation);
+    } else {
+      setTranslation(preferences.bible_translation as Translation);
+    }
+  }, [preferences.bible_translation, window.location.search]);
 
   useEffect(() => {
     loadChapter();
     trackReading(book, chapter);
-  }, [book, chapter]);
+  }, [book, chapter, translation]);
 
   const loadChapter = async () => {
     setLoading(true);
