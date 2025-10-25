@@ -157,7 +157,7 @@ export type Database = {
           id: string
           rating: number | null
           submitted_at: string | null
-          user_id: string | null
+          user_id: string
         }
         Insert: {
           ai_feedback?: string | null
@@ -166,7 +166,7 @@ export type Database = {
           id?: string
           rating?: number | null
           submitted_at?: string | null
-          user_id?: string | null
+          user_id: string
         }
         Update: {
           ai_feedback?: string | null
@@ -175,7 +175,7 @@ export type Database = {
           id?: string
           rating?: number | null
           submitted_at?: string | null
-          user_id?: string | null
+          user_id?: string
         }
         Relationships: [
           {
@@ -232,21 +232,21 @@ export type Database = {
           created_at: string | null
           id: string
           post_id: string | null
-          user_id: string | null
+          user_id: string
         }
         Insert: {
           content: string
           created_at?: string | null
           id?: string
           post_id?: string | null
-          user_id?: string | null
+          user_id: string
         }
         Update: {
           content?: string
           created_at?: string | null
           id?: string
           post_id?: string | null
-          user_id?: string | null
+          user_id?: string
         }
         Relationships: [
           {
@@ -267,7 +267,7 @@ export type Database = {
           likes: number | null
           title: string
           updated_at: string | null
-          user_id: string | null
+          user_id: string
         }
         Insert: {
           category?: string | null
@@ -277,7 +277,7 @@ export type Database = {
           likes?: number | null
           title: string
           updated_at?: string | null
-          user_id?: string | null
+          user_id: string
         }
         Update: {
           category?: string | null
@@ -287,7 +287,7 @@ export type Database = {
           likes?: number | null
           title?: string
           updated_at?: string | null
-          user_id?: string | null
+          user_id?: string
         }
         Relationships: []
       }
@@ -708,21 +708,21 @@ export type Database = {
           game_id: string | null
           id: string
           message: string
-          user_id: string | null
+          user_id: string
         }
         Insert: {
           created_at?: string | null
           game_id?: string | null
           id?: string
           message: string
-          user_id?: string | null
+          user_id: string
         }
         Update: {
           created_at?: string | null
           game_id?: string | null
           id?: string
           message?: string
-          user_id?: string | null
+          user_id?: string
         }
         Relationships: [
           {
@@ -839,7 +839,7 @@ export type Database = {
           game_state: Json | null
           game_type: string
           id: string
-          player1_id: string | null
+          player1_id: string
           player2_id: string | null
           status: string | null
           updated_at: string | null
@@ -852,7 +852,7 @@ export type Database = {
           game_state?: Json | null
           game_type: string
           id?: string
-          player1_id?: string | null
+          player1_id: string
           player2_id?: string | null
           status?: string | null
           updated_at?: string | null
@@ -865,7 +865,7 @@ export type Database = {
           game_state?: Json | null
           game_type?: string
           id?: string
-          player1_id?: string | null
+          player1_id?: string
           player2_id?: string | null
           status?: string | null
           updated_at?: string | null
