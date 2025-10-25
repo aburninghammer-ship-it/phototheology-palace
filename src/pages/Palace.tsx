@@ -1,5 +1,5 @@
 import { Navigation } from "@/components/Navigation";
-import { FloorCard } from "@/components/FloorCard";
+import { VisualPalace } from "@/components/VisualPalace";
 import { palaceFloors } from "@/data/palaceData";
 import { Building2, Award, TrendingUp } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -113,11 +113,9 @@ const Palace = () => {
             </div>
           </div>
 
-          {/* Floors Grid */}
-          <div className="space-y-6">
-            {palaceFloors.map((floor) => (
-              <FloorCard key={floor.number} floor={floor} />
-            ))}
+          {/* Visual Palace */}
+          <div className="mb-12">
+            <VisualPalace />
           </div>
         </div>
       </div>
