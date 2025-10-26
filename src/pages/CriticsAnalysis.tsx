@@ -5,9 +5,10 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
-import { Loader2, AlertTriangle, CheckCircle, Video } from "lucide-react";
+import { Loader2, AlertTriangle, CheckCircle, Video, Sparkles } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { Separator } from "@/components/ui/separator";
 
 interface AnalysisResult {
   videoType: "pro-SDA" | "anti-SDA";
@@ -34,6 +35,40 @@ export default function CriticsAnalysis() {
   const [videoUrl, setVideoUrl] = useState("");
   const [loading, setLoading] = useState(false);
   const [analysis, setAnalysis] = useState<AnalysisResult | null>(null);
+  const [jeevesLoading, setJeevesLoading] = useState(false);
+  const [jeevesContent, setJeevesContent] = useState<{ example?: string; exercise?: string }>({});
+  
+  const fetchJeevesContent = async (mode: "example" | "exercise") => {
+    setJeevesLoading(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("jeeves", {
+        body: { 
+          room: {
+            name: "Critical Analysis",
+            tag: "CA",
+            purpose: "Defend Seventh-day Adventist theology against critics using biblical evidence, historical apologetics, scientific harmony, and philosophical reasoning.",
+            coreQuestion: "How do we respond to anti-SDA arguments with robust biblical and apologetic defense?",
+            method: "Extract specific claims from critics → Provide detailed biblical rebuttals with 4-6 verses → Identify logical fallacies → Apply apologetics frameworks (biblical, historical, scientific, philosophical) → Show superior explanatory power of SDA interpretation"
+          },
+          mode 
+        }
+      });
+
+      if (error) throw error;
+      
+      setJeevesContent(prev => ({
+        ...prev,
+        [mode]: data.content
+      }));
+      
+      toast.success(`${mode === "example" ? "Example" : "Exercise"} loaded!`);
+    } catch (error: any) {
+      console.error("Jeeves error:", error);
+      toast.error(error.message || "Failed to load content");
+    } finally {
+      setJeevesLoading(false);
+    }
+  };
 
   const extractVideoId = (url: string): string | null => {
     const patterns = [
@@ -119,6 +154,100 @@ export default function CriticsAnalysis() {
                 )}
               </Button>
             </div>
+          </CardContent>
+        </Card>
+
+        <Card className="mb-8">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Sparkles className="w-5 h-5" />
+              Jeeves Apologetics Assistant
+            </CardTitle>
+            <CardDescription>
+              Get examples and practice exercises for defending SDA theology against critics
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Tabs defaultValue="examples" className="w-full">
+              <TabsList className="grid w-full grid-cols-2">
+                <TabsTrigger value="examples">Examples</TabsTrigger>
+                <TabsTrigger value="practice">Practice</TabsTrigger>
+              </TabsList>
+              
+              <TabsContent value="examples" className="space-y-4">
+                {!jeevesContent.example ? (
+                  <div className="text-center py-8">
+                    <p className="text-muted-foreground mb-4">
+                      Get a detailed example of how to respond to a common anti-SDA argument
+                    </p>
+                    <Button 
+                      onClick={() => fetchJeevesContent("example")}
+                      disabled={jeevesLoading}
+                    >
+                      {jeevesLoading ? (
+                        <>
+                          <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                          Loading...
+                        </>
+                      ) : (
+                        "Get Example"
+                      )}
+                    </Button>
+                  </div>
+                ) : (
+                  <div className="prose prose-sm max-w-none">
+                    <div className="whitespace-pre-wrap bg-muted/50 p-4 rounded-lg">
+                      {jeevesContent.example}
+                    </div>
+                    <Button 
+                      variant="outline" 
+                      onClick={() => fetchJeevesContent("example")}
+                      disabled={jeevesLoading}
+                      className="mt-4"
+                    >
+                      Get Another Example
+                    </Button>
+                  </div>
+                )}
+              </TabsContent>
+              
+              <TabsContent value="practice" className="space-y-4">
+                {!jeevesContent.exercise ? (
+                  <div className="text-center py-8">
+                    <p className="text-muted-foreground mb-4">
+                      Practice defending SDA doctrine with a challenging exercise
+                    </p>
+                    <Button 
+                      onClick={() => fetchJeevesContent("exercise")}
+                      disabled={jeevesLoading}
+                    >
+                      {jeevesLoading ? (
+                        <>
+                          <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                          Loading...
+                        </>
+                      ) : (
+                        "Get Exercise"
+                      )}
+                    </Button>
+                  </div>
+                ) : (
+                  <div className="prose prose-sm max-w-none">
+                    <div className="whitespace-pre-wrap bg-muted/50 p-4 rounded-lg">
+                      {jeevesContent.exercise}
+                    </div>
+                    <Button 
+                      variant="outline" 
+                      onClick={() => fetchJeevesContent("exercise")}
+                      disabled={jeevesLoading}
+                      className="mt-4"
+                    >
+                      Get Another Exercise
+                    </Button>
+                  </div>
+                )}
+              </TabsContent>
+            </Tabs>
           </CardContent>
         </Card>
 
