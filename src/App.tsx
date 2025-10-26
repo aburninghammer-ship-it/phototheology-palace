@@ -76,6 +76,17 @@ const Certificates = lazy(() => import("./pages/Certificates"));
 const StudyPartners = lazy(() => import("./pages/StudyPartners"));
 const MemorizationVerses = lazy(() => import("./pages/MemorizationVerses"));
 const VerseMemoryHall = lazy(() => import("./pages/VerseMemoryHall"));
+const ChefChallenge = lazy(() => import("./pages/ChefChallenge"));
+const ChainWar = lazy(() => import("./pages/games/ChainWar"));
+const SanctuaryRun = lazy(() => import("./pages/games/SanctuaryRun"));
+const TimeZoneInvasion = lazy(() => import("./pages/games/TimeZoneInvasion"));
+const Connect6Draft = lazy(() => import("./pages/games/Connect6Draft"));
+const ChristLock = lazy(() => import("./pages/games/ChristLock"));
+const ControversyRaid = lazy(() => import("./pages/games/ControversyRaid"));
+const EscapeTheDragon = lazy(() => import("./pages/games/EscapeTheDragon"));
+const EquationBuilder = lazy(() => import("./pages/games/EquationBuilder"));
+const WitnessTrial = lazy(() => import("./pages/games/WitnessTrial"));
+const FrameSnapshot = lazy(() => import("./pages/games/FrameSnapshot"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
 const queryClient = new QueryClient();
@@ -127,6 +138,17 @@ function App() {
             <Route path="/growth-journal" element={<ProtectedRoute><GrowthJournal /></ProtectedRoute>} />
             <Route path="/equations-challenge" element={<ProtectedRoute><EquationsChallenge /></ProtectedRoute>} />
             <Route path="/games" element={<ProtectedRoute><Games /></ProtectedRoute>} />
+            <Route path="/games/chef-challenge" element={<ProtectedRoute><ChefChallenge /></ProtectedRoute>} />
+            <Route path="/games/chain-war" element={<ProtectedRoute><ChainWar /></ProtectedRoute>} />
+            <Route path="/games/sanctuary-run" element={<ProtectedRoute><SanctuaryRun /></ProtectedRoute>} />
+            <Route path="/games/time-zone-invasion" element={<ProtectedRoute><TimeZoneInvasion /></ProtectedRoute>} />
+            <Route path="/games/connect6-draft" element={<ProtectedRoute><Connect6Draft /></ProtectedRoute>} />
+            <Route path="/games/christ-lock" element={<ProtectedRoute><ChristLock /></ProtectedRoute>} />
+            <Route path="/games/controversy-raid" element={<ProtectedRoute><ControversyRaid /></ProtectedRoute>} />
+            <Route path="/games/escape-dragon" element={<ProtectedRoute><EscapeTheDragon /></ProtectedRoute>} />
+            <Route path="/games/equation-builder" element={<ProtectedRoute><EquationBuilder /></ProtectedRoute>} />
+            <Route path="/games/witness-trial" element={<ProtectedRoute><WitnessTrial /></ProtectedRoute>} />
+            <Route path="/games/frame-snapshot" element={<ProtectedRoute><FrameSnapshot /></ProtectedRoute>} />
             <Route path="/games/chain-chess/:gameId/:mode?" element={<ProtectedRoute><ChainChess /></ProtectedRoute>} />
             <Route path="/games/concentration" element={<ProtectedRoute><ConcentrationGame /></ProtectedRoute>} />
             <Route path="/games/palace-cards" element={<ProtectedRoute><PalaceCardGame /></ProtectedRoute>} />

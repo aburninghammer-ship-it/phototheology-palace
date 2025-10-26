@@ -172,8 +172,121 @@ const Games = () => {
 
   const competitiveGames = [
     { 
+      id: "chef_challenge", 
+      name: "🍳 THE CHEF CHALLENGE", 
+      description: "Create a 'biblical recipe' – a mini-sermon using ONLY Bible verse references. No commentary, just verses flowing together. Timed challenge with star ratings from Jeeves!",
+      featured: true,
+      highlighted: true,
+      skills: "Verse Mastery, Theological Flow, Scripture Memory",
+      requiredRooms: ["SR", "CR", "QA", "BF"],
+      players: "1",
+      duration: "10-20 min"
+    },
+    { 
+      id: "chain_war", 
+      name: "⛓️ CHAIN WAR", 
+      description: "Build biblical commentary chains using PT symbols. Play 2-3 cards, cite a verse, explain connections. Jeeves validates: valid chain = points!",
+      featured: true,
+      highlighted: true,
+      skills: "Biblical Knowledge, PT Symbols, Chain Building",
+      requiredRooms: ["QR", "QA", "CR", "DR"],
+      players: "1-4",
+      duration: "15-30 min"
+    },
+    { 
+      id: "sanctuary_run", 
+      name: "⛪ SANCTUARY RUN", 
+      description: "Tell the gospel story through 3 random sanctuary items in order. Include verses for each. Coherent narrative wins!",
+      featured: true,
+      highlighted: true,
+      skills: "Sanctuary System, Gospel Flow, Storytelling",
+      requiredRooms: ["BL", "CR", "SR"],
+      players: "1-4",
+      duration: "10-15 min"
+    },
+    { 
+      id: "time_zone_invasion", 
+      name: "🌍 TIME ZONE INVASION", 
+      description: "Pick 2 time zones (Hpa, Hp, Hf, Epa, Ep, Ef) for a given verse and defend your prophetic framing. Best explanation wins!",
+      featured: true,
+      skills: "Prophetic Framing, Time Zones, Eschatology",
+      requiredRooms: ["TZ", "PR", "FR"],
+      players: "1v1, group",
+      duration: "10-20 min"
+    },
+    { 
+      id: "connect6_draft", 
+      name: "📚 CONNECT-6 DRAFT", 
+      description: "Pick a doctrine, play 2 genre cards (Pr, Go, Ep, Hi, Po, Pa), name verses from each. Prove doctrine across genres!",
+      featured: true,
+      skills: "Genre Mastery, Doctrine Defense, Cross-References",
+      requiredRooms: ["C6", "CR", "QA"],
+      players: "1v1, group",
+      duration: "15-20 min"
+    },
+    { 
+      id: "christ_lock", 
+      name: "✝️ CHRIST LOCK", 
+      description: "Draw a Christ-focus card (2D, |LC, ⊙), get a random verse, explain how it reveals Jesus. Collect all cards to win!",
+      featured: true,
+      skills: "Christ-Centered Reading, Hermeneutics, Typology",
+      requiredRooms: ["CR", "ST", "DR"],
+      players: "1 or 1v1",
+      duration: "15-25 min"
+    },
+    { 
+      id: "controversy_raid", 
+      name: "⚔️ CONTROVERSY RAID", 
+      description: "Face modern issues (compromise, persecution, deception). Play 1 card (|GC, ⚖, ≅, ∥), diagnose biblically. Capture strongholds!",
+      featured: true,
+      skills: "Spiritual Warfare, Cultural Analysis, Apologetics",
+      requiredRooms: ["GR", "ST", "QA", "CR"],
+      players: "1, group",
+      duration: "20-30 min"
+    },
+    { 
+      id: "escape_dragon", 
+      name: "🐉 ESCAPE THE DRAGON", 
+      description: "Co-op end-time survival. Face attacks (false worship, persecution), play 2 cards, defend theologically. Lose 3 lives = dragon wins!",
+      featured: true,
+      skills: "Rev 12-14 Themes, End-Time Theology, Defense",
+      requiredRooms: ["PR", "3A", "TZ", "BL"],
+      players: "1 or co-op",
+      duration: "20-40 min"
+    },
+    { 
+      id: "equation_builder", 
+      name: "🧮 EQUATION BUILDER", 
+      description: "Build 3-5 card equations using PT operators (+, →, ∥, ≅, ⊙, ⚖) to explain doctrines. Tightest equation wins!",
+      featured: true,
+      skills: "PT Operators, Doctrinal Synthesis, Logic",
+      requiredRooms: ["DR", "CR", "TRm"],
+      players: "1v1 or solo",
+      duration: "10-20 min"
+    },
+    { 
+      id: "witness_trial", 
+      name: "⚖️ WITNESS TRIAL", 
+      description: "Draw 3 cards, face a street objection ('Why Jesus?' etc.), answer using all 3 cards. Jury votes: convincing or weak?",
+      featured: true,
+      skills: "Apologetics, Evangelism, Scripture Defense",
+      requiredRooms: ["QA", "CR", "FRt"],
+      players: "1v1, group",
+      duration: "15-25 min"
+    },
+    { 
+      id: "frame_snapshot", 
+      name: "🎬 FRAME SNAPSHOT", 
+      description: "Given 4 cards (frames + walls), build a 4-part salvation narrative. Lock the frame if coherent!",
+      featured: true,
+      skills: "24FPS Method, Narrative Theology, Storytelling",
+      requiredRooms: ["24F", "SR", "CR"],
+      players: "1, group storytelling",
+      duration: "15-20 min"
+    },
+    { 
       id: "chain_chess", 
-      name: "Chain Chess", 
+      name: "Chain Chess",
       description: "Build biblical commentary chains by connecting verses, principles, and Palace rooms. Challenge Jeeves or other players to create the deepest theological connections.",
       featured: true,
       skills: "Biblical Knowledge, Critical Thinking, Memory Palace Mastery",

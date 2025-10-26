@@ -2,9 +2,10 @@ import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { supabase } from "@/integrations/supabase/client";
-import { Bot, Sparkles, BookOpen, Dumbbell, Loader2 } from "lucide-react";
+import { Bot, Sparkles, BookOpen, Dumbbell, Loader2, HelpCircle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 interface JeevesAssistantProps {
@@ -27,6 +28,8 @@ export const JeevesAssistant = ({
   const [loading, setLoading] = useState(false);
   const [exampleContent, setExampleContent] = useState<string | null>(null);
   const [exerciseContent, setExerciseContent] = useState<string | null>(null);
+  const [question, setQuestion] = useState("");
+  const [answer, setAnswer] = useState<string | null>(null);
   const { toast } = useToast();
 
   const fetchJeevesResponse = async (mode: "example" | "exercise") => {
@@ -62,6 +65,32 @@ export const JeevesAssistant = ({
     }
   };
 
+  const askJeeves = async () => {
+    if (!question.trim()) return;
+    setLoading(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("jeeves", {
+        body: {
+          mode: "qa",
+          roomTag,
+          roomName,
+          principle,
+          question,
+        },
+      });
+      if (error) throw error;
+      setAnswer(data.answer);
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to get answer",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <Card className="sticky top-24 shadow-elegant hover:shadow-hover transition-smooth border-2 border-primary/20">
       <CardHeader className="gradient-palace text-white">
@@ -83,7 +112,7 @@ export const JeevesAssistant = ({
       
       <CardContent className="pt-6">
         <Tabs defaultValue="examples" className="w-full">
-          <TabsList className="grid w-full grid-cols-2 mb-4">
+          <TabsList className="grid w-full grid-cols-3 mb-4">
             <TabsTrigger value="examples">
               <BookOpen className="h-4 w-4 mr-2" />
               Examples
@@ -91,6 +120,10 @@ export const JeevesAssistant = ({
             <TabsTrigger value="exercise">
               <Dumbbell className="h-4 w-4 mr-2" />
               Practice
+            </TabsTrigger>
+            <TabsTrigger value="qa">
+              <HelpCircle className="h-4 w-4 mr-2" />
+              Ask Jeeves
             </TabsTrigger>
           </TabsList>
           
@@ -170,6 +203,56 @@ export const JeevesAssistant = ({
                   </div>
                   <div className="prose prose-sm max-w-none text-foreground">
                     {exerciseContent.split('\n\n').map((paragraph, idx) => (
+                      <p key={idx} className="mb-3 leading-relaxed">
+                        {paragraph}
+                      </p>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </TabsContent>
+            
+            <TabsContent value="qa" className="mt-0 space-y-4">
+              <div className="p-4 bg-muted/30 rounded-lg border border-border">
+                <p className="text-sm text-muted-foreground mb-3">
+                  Ask Jeeves any question about <strong className="text-foreground">{roomName}</strong>
+                </p>
+                <div className="space-y-3">
+                  <Input
+                    value={question}
+                    onChange={(e) => setQuestion(e.target.value)}
+                    placeholder="e.g., Find Christ in Genesis 5"
+                    onKeyDown={(e) => e.key === 'Enter' && askJeeves()}
+                    className="bg-background"
+                  />
+                  <Button
+                    onClick={askJeeves}
+                    disabled={loading || !question.trim()}
+                    className="w-full gradient-forest text-white"
+                  >
+                    {loading ? (
+                      <>
+                        <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                        Thinking...
+                      </>
+                    ) : (
+                      <>
+                        <HelpCircle className="h-4 w-4 mr-2" />
+                        Ask Jeeves
+                      </>
+                    )}
+                  </Button>
+                </div>
+              </div>
+              
+              {answer && (
+                <div className="p-4 bg-gradient-to-br from-green-500/5 to-emerald-500/5 rounded-xl border-2 border-green-500/30 animate-fade-in">
+                  <div className="flex items-center gap-2 mb-3">
+                    <Bot className="h-5 w-5 text-green-600" />
+                    <span className="font-semibold text-foreground">Jeeves answers:</span>
+                  </div>
+                  <div className="prose prose-sm max-w-none text-foreground">
+                    {answer.split('\n\n').map((paragraph, idx) => (
                       <p key={idx} className="mb-3 leading-relaxed">
                         {paragraph}
                       </p>
