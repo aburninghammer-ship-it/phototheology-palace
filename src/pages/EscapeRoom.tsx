@@ -30,6 +30,7 @@ export default function EscapeRoom() {
   const [category, setCategory] = useState<string>("sanctuary");
   const [scenario, setScenario] = useState("");
   const [teamMode, setTeamMode] = useState<"solo" | "team">("solo");
+  const [difficulty, setDifficulty] = useState<"easy" | "medium" | "hard" | "pro">("medium");
   const [availableRooms, setAvailableRooms] = useState<AvailableRoom[]>([]);
 
   // All Palace rooms available for Room-as-Room mode
@@ -92,7 +93,8 @@ export default function EscapeRoom() {
         body: { 
           mode, 
           category: (mode === 'category_gauntlet' || mode === 'room_as_room') ? category : null,
-          scenario: mode === 'live_mission' ? scenario : null
+          scenario: mode === 'live_mission' ? scenario : null,
+          difficulty: mode === 'floor_race' ? difficulty : 'pro'
         }
       });
 
@@ -291,7 +293,7 @@ export default function EscapeRoom() {
                 <div className="flex items-center space-x-2">
                   <RadioGroupItem value="floor_race" id="race" />
                   <Label htmlFor="race" className="cursor-pointer">
-                    Floor-by-Floor Race (60 min) - Sprint ascent
+                    Floor-by-Floor Race (30-60 min) - Sprint ascent with difficulty levels
                   </Label>
                 </div>
                 <div className="flex items-center space-x-2">
@@ -353,6 +355,42 @@ export default function EscapeRoom() {
                     </>
                   )}
                 </RadioGroup>
+              </div>
+            )}
+
+            {/* Difficulty Selection for Floor Race */}
+            {mode === "floor_race" && (
+              <div className="space-y-3">
+                <Label className="text-base font-semibold">Difficulty Level</Label>
+                <RadioGroup value={difficulty} onValueChange={(v) => setDifficulty(v as any)}>
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="easy" id="easy" />
+                    <Label htmlFor="easy" className="cursor-pointer">
+                      Easy - 4 floors + summit (25 pts, ~30 min)
+                    </Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="medium" id="medium" />
+                    <Label htmlFor="medium" className="cursor-pointer">
+                      Medium - 5 floors + summit (30 pts, ~40 min)
+                    </Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="hard" id="hard" />
+                    <Label htmlFor="hard" className="cursor-pointer">
+                      Hard - 7 floors + summit (40 pts, ~50 min)
+                    </Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="pro" id="pro" />
+                    <Label htmlFor="pro" className="cursor-pointer">
+                      Pro - All 8 floors + summit (45 pts, full 60 min)
+                    </Label>
+                  </div>
+                </RadioGroup>
+                <p className="text-xs text-muted-foreground">
+                  Higher difficulty = more floors to race through before reaching the summit
+                </p>
               </div>
             )}
 

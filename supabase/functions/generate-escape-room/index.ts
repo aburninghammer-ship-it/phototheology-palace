@@ -23,9 +23,9 @@ serve(async (req) => {
       throw new Error('LOVABLE_API_KEY not configured');
     }
 
-    const { mode, category, scenario } = await req.json();
+    const { mode, category, scenario, difficulty = 'medium' } = await req.json();
     
-    console.log('Generating escape room with params:', { mode, category, scenario });
+    console.log('Generating escape room with params:', { mode, category, scenario, difficulty });
 
     let systemPrompt = '';
     let puzzles: any[] = [];
@@ -274,52 +274,70 @@ Format as JSON:
 }`;
 
     } else if (mode === 'floor_race') {
-      // Generate Floor Race puzzles
+      // Generate Floor Race puzzles with difficulty-based floor counts
+      const floorCounts: Record<string, number> = {
+        easy: 4,
+        medium: 5,
+        hard: 7,
+        pro: 8
+      };
+      const numFloors = floorCounts[difficulty] || 5;
+      const maxPoints = (numFloors * 5) + 5; // 5 pts per floor + 5 for summit
+      
       systemPrompt = `CRITICAL: Return ONLY valid JSON. Do NOT wrap your response in markdown code blocks or backticks.
 
-Create a 60-minute Floor-by-Floor Race escape room with 7 floor puzzles + 1 Summit Meta.
+Create a ${difficulty.toUpperCase()} difficulty Floor-by-Floor Race escape room with ${numFloors} floor puzzles + 1 Summit Meta (max ${maxPoints} pts).
 
-FLOOR THEMES:
-1. Foundations (Story + Symbols): Proto-gospel, type-antitype basics
-2. Blue/Sanctuary (Altar–Laver): Sacrifice and cleansing typology
-3. 24FPS + Christ in Every Chapter: Cross frames across Scripture
-4. Mathematics/Timeline + Room 66: Prophetic counts + global gospel
-5. Feasts + Blue (Holy Place): Festival typology + furniture
-6. Defense/Doctrine + Law/Worship: Spirit personhood + end-time identity
-7. Judgment Scene (Dan-Rev): Heavenly court + Rev 14:7
+FLOOR RACE CONCEPT:
+Ascend through Palace floors in order (1→2→3→4→5→6→7→8), solving one puzzle per floor. Each puzzle uses ONE room from that floor. Players demonstrate ability to move UP the palace efficiently.
 
-Create 7 floor puzzles + 1 Summit Meta. Each floor puzzle must:
-- Use 2-3 rooms from that floor's theme
-- Specify room_tag and principle
-- Give a clear prompt requiring 2-3 KJV verses
-- List expected_verses
-- Include brief typology_notes
-- Perfect: 4 pts, Partial: 2 pts
-- Time cap: 6 minutes per floor
+DIFFICULTY-BASED FLOOR SELECTION:
+- EASY (4 floors): Use floors 1, 2, 4, 5 + summit (foundational skills only)
+- MEDIUM (5 floors): Use floors 1, 2, 4, 5, 7 + summit (skip cycles & freestyle)
+- HARD (7 floors): Use floors 1, 2, 3, 4, 5, 6, 7 + summit (skip floor 8)
+- PRO (8 floors): All floors 1-8 + summit (complete ascent)
 
-Summit Meta ("Maker, Mercy, Judgment"):
-- Requires selecting best verses from prior floors
-- One verse each for: Creator, Redeemer, Judge
-- 5-7 line synthesis showing why worship (Rev 14:7) requires all three
-- Score: 10 pts
+PUZZLE SETUP PER FLOOR (only generate puzzles for the ${numFloors} floors required by ${difficulty} difficulty):
+- Floor 1 (Furnishing): Use SR|IR|TR|GR - Test memory, storytelling, or translation
+- Floor 2 (Investigation): Use OR|DC|ST|QR - Test detailed observation or typology
+- Floor 3 (Freestyle): Use NF|PF|BF|HF|LR - Test real-world application or verse connections
+- Floor 4 (Next Level): Use CR|DR|C6|TRm|TZ|PRm|P‖|FRt - Test Christ-centered depth
+- Floor 5 (Vision): Use BL|PR|3A - Test sanctuary or prophecy understanding
+- Floor 6 (Cycles): Use any @cycle or Time Zone - Test historical/eschatological positioning
+- Floor 7 (Spiritual/Emotional): Use FRm|MR|SRm - Test devotional depth or speed application
+- Floor 8 (Master): Meta-puzzle combining ALL principles reflexively (only for PRO difficulty)
 
-Format as JSON:
+TIME CAP PER PUZZLE: 
+- Floors 1-3: 6 minutes each
+- Floors 4-6: 8 minutes each  
+- Floor 7-8: 10 minutes each
+- Summit: 5 points bonus puzzle
+
+POINTS SYSTEM:
+- Each floor puzzle: 5 pts
+- Summit Meta: 5 pts (synthesizing prior floor insights)
+- Total: ${maxPoints} pts max
+
+Format as JSON - ONLY generate ${numFloors} floor puzzles + 1 summit puzzle (total ${numFloors + 1} puzzles):
 {
-  "title": "string (compelling title for this floor race)",
-  "biblical_conclusion": "string (2-3 sentence synthesis)",
+  "title": "string (e.g., 'Floor Race [${difficulty.toUpperCase()}]: Sprint to Summit')",
+  "mode": "floor_race",
+  "difficulty": "${difficulty}",
+  "time_limit_minutes": ${difficulty === 'easy' ? 35 : difficulty === 'medium' ? 45 : difficulty === 'hard' ? 55 : 60},
+  "biblical_conclusion": "string (what completing these ${numFloors} floors trains them for, 2-3 sentences)",
   "puzzles": [
     {
-      "puzzle_number": 1,
-      "floor_number": 1,
-      "room_tag": "EXACT tag",
-      "principle": "EXACT core question",
-      "prompt": "Challenge requiring 2-3 verses (2-3 sentences)",
+      "puzzle_number": 1-${numFloors + 1},
+      "floor_number": 1-${numFloors} (null for summit),
+      "room_tag": "room_code",
+      "principle": "Exact principle or method being tested",
+      "prompt": "Challenge prompt (2-3 sentences)",
       "expected_verses": ["Book Chapter:Verse"],
-      "typology_notes": "Brief guidance (1-2 sentences)"
+      "typology_notes": "Hint text (only revealed if requested)"
     }
   ]
 }`;
-    }
+     }
 
     const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
       method: 'POST',
