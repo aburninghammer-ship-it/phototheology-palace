@@ -166,6 +166,8 @@ interface RoomDoorProps {
 const RoomDoor = ({ room, floorNumber, theme, user }: RoomDoorProps) => {
   const { isUnlocked, loading } = useRoomUnlock(floorNumber, room.id);
 
+  console.log(`RoomDoor: floor=${floorNumber}, roomId=${room.id}, name=${room.name}, isUnlocked=${isUnlocked}, loading=${loading}`);
+
   return (
     <Link
       to={`/palace/floor/${floorNumber}/room/${room.id}`}
