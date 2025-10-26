@@ -94,6 +94,9 @@ export function WebRTCCall({ roomId, userId, userName }: WebRTCCallProps) {
       iceServers: [
         { urls: "stun:stun.l.google.com:19302" },
         { urls: "stun:stun1.l.google.com:19302" },
+        { urls: "stun:stun2.l.google.com:19302" },
+        { urls: "stun:stun3.l.google.com:19302" },
+        { urls: "stun:stun4.l.google.com:19302" },
       ],
     };
 
@@ -123,7 +126,7 @@ export function WebRTCCall({ roomId, userId, userName }: WebRTCCallProps) {
           type: "broadcast",
           event: "ice-candidate",
           payload: {
-            candidate: event.candidate,
+            candidate: event.candidate.toJSON(),
             from: userId,
             to: remoteUserId,
           },
@@ -165,6 +168,9 @@ export function WebRTCCall({ roomId, userId, userName }: WebRTCCallProps) {
       iceServers: [
         { urls: "stun:stun.l.google.com:19302" },
         { urls: "stun:stun1.l.google.com:19302" },
+        { urls: "stun:stun2.l.google.com:19302" },
+        { urls: "stun:stun3.l.google.com:19302" },
+        { urls: "stun:stun4.l.google.com:19302" },
       ],
     };
 
@@ -194,7 +200,7 @@ export function WebRTCCall({ roomId, userId, userName }: WebRTCCallProps) {
           type: "broadcast",
           event: "ice-candidate",
           payload: {
-            candidate: event.candidate,
+            candidate: event.candidate.toJSON(),
             from: userId,
             to: from,
           },
