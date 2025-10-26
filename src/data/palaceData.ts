@@ -269,6 +269,113 @@ export const palaceFloors: Floor[] = [
     ]
   },
   {
+    number: 2,
+    name: "Investigation",
+    subtitle: "Detective Work for Width",
+    description: "Transform into a biblical detective. Master observation, definitions, symbols, questioning, and cross-examination to uncover every clue Scripture provides.",
+    rooms: [
+      {
+        id: "or",
+        name: "Observation Room",
+        tag: "OR",
+        purpose: "The Observation Room trains you to become a forensic examiner of Scripture—noticing details that casual readers miss entirely. Like a detective at a crime scene who bags every fingerprint, hair fiber, and footprint before drawing conclusions, you're learning to LOG everything you see in the text before you interpret it. This discipline prevents the fatal error of interpretation-before-observation, where readers jump to 'what it means' without first establishing 'what it says.' In this room, you're not allowed to comment, theologize, or spiritualize—you simply describe what's on the page with ruthless precision. Why does Luke 15:20 say the father 'ran' instead of 'walked'? Why 'a great way off' instead of 'nearby'? Why 'fell on his neck' instead of 'embraced him'? Each of these choices by the biblical author is a clue. Observation is the foundation of all sound interpretation—you can't understand what you haven't first SEEN. The Observation Room turns you into a noticer, someone who reads slowly, carefully, and with detective-level attention to detail. Over time, this trained eye becomes instinctive, and you'll spot patterns, contrasts, and emphases that unlock meaning.",
+        coreQuestion: "What exactly does the text say—without interpretation?",
+        method: "📋 STEP-BY-STEP METHODOLOGY:\n\n1️⃣ Read the passage 3 times slowly (no skimming)\n\n2️⃣ Write down EVERYTHING you observe—aim for 30-50 observations\n\n3️⃣ Categories to observe:\n   • STRUCTURE: How is it arranged? Paragraph breaks? Lists?\n   • REPETITION: What words/phrases repeat?\n   • CONTRAST: What's being compared or opposed?\n   • CONJUNCTIONS: Therefore, but, for, because—what do they connect?\n   • VERBS: Tense, mood, voice—what's the action?\n   • NOUNS: Who/what is mentioned?\n   • ADJECTIVES: What descriptions are given?\n   • OMISSIONS: What's surprisingly NOT said?\n   • SETTING: Time, place, circumstance\n   • SPEAKERS: Who's talking to whom?\n\n4️⃣ Format: Simple bullet list, no interpretation\n   ✅ 'Father ran' (verb of motion)\n   ❌ 'Father ran because he loved his son' (interpretation)\n\n5️⃣ Review: Can someone else verify each observation by looking at the text?\n\n🎯 KEY PRINCIPLES:\n• 🔬 Observation ≠ Interpretation—don't cross that line yet\n• 📊 Quantity matters—aim for 30+ observations to train your eye\n• 🎯 Be SPECIFIC—'he ran' not 'he moved quickly'\n• 📖 Stay inside the passage—don't pull in outside information yet\n• ✍️ Write it down—don't just think it",
+        examples: [
+          "Luke 15:20 observations: 1) 'When he was yet a great way off' 2) 'his father saw him' (father was watching) 3) 'had compassion' (emotion stated before action) 4) 'ran' (verb of urgency) 5) 'fell on his neck' (physical embrace) 6) 'kissed him' (repeated action in Greek) 7) Son hasn't spoken yet 8) Father acts first",
+          "Genesis 1:1 observations: 1) Opens with 'In the beginning' 2) 'God' is subject 3) 'created' is verb 4) 'heavens and earth' are objects 5) No explanation of God's origin 6) Creation assumes God's existence 7) Hebrew word 'bara' (created) used 8) Singular verb with plural noun Elohim"
+        ],
+        pitfalls: [
+          "Jumping to interpretation too quickly",
+          "Writing fewer than 20 observations (you haven't looked hard enough)",
+          "Making observations that aren't verifiable in the text",
+          "Using theological language instead of descriptive language",
+          "Skipping 'boring' details (conjunctions, word order, etc.)"
+        ],
+        deliverable: "30-50 observations listed in bullets—pure description, zero interpretation"
+      },
+      {
+        id: "dc",
+        name: "Def-Com Room",
+        tag: "DC",
+        purpose: "The Def-Com Room is your forensic laboratory where you put biblical words and contexts under the microscope. 'Def' stands for Definitions (lexical work in Greek/Hebrew), and 'Com' stands for Commentary (historical, cultural, and contextual insights from expert witnesses). This room recognizes that the Bible was written in ancient languages to ancient people, and sometimes the distance between our world and theirs conceals meaning. When Jesus asks Peter 'Do you love me?' (John 21), the English hides the fact that Jesus uses 'agapao' twice and Peter responds with 'phileo'—until the third time when Jesus drops to 'phileo' as well. That nuance changes everything. The Def-Com Room trains you to consult lexicons for word meanings, cultural backgrounds for context, and scholarly commentaries as expert witnesses. But here's the crucial guardrail: commentaries are witnesses, not judges. They supply useful information, but Scripture itself is the final authority. You're not outsourcing interpretation—you're gathering evidence. This room is particularly vital for difficult passages, contested translations, or texts where cultural gap creates confusion.",
+        coreQuestion: "What do the original words mean, and what was the cultural context?",
+        method: "🔬 STEP-BY-STEP METHODOLOGY:\n\n1️⃣ DEFINITIONS (Greek/Hebrew work):\n   a) Identify 3-5 key words in your passage that carry theological weight\n   b) Look up each word in a Greek/Hebrew lexicon (Strong's, BDAG, HALOT)\n   c) Note: Original word, root meaning, range of meanings, how it's used elsewhere\n   d) Ask: Does the original language reveal something hidden in English?\n\n2️⃣ COMMENTARY (Cultural/Historical context):\n   a) Consult 2-3 trusted commentaries on your passage\n   b) Look for: Historical setting, cultural practices, geographical details, literary context\n   c) Note: What background information illuminates this text?\n   d) Cross-check: Do multiple commentaries agree or disagree?\n\n3️⃣ SYNTHESIS:\n   • For each word/context point, write 1-2 sentences on how it clarifies the passage\n   • Always cite your sources\n   • Test: Does this help me understand the text, or just add trivia?\n\n🎯 KEY PRINCIPLES:\n• 📚 Commentaries are expert witnesses, not the jury—you still decide\n• 🔍 Not every word needs lexical work—focus on theologically loaded terms\n• ⚖️ Balance: Don't get lost in word studies and miss the passage's point\n• 🎓 Use multiple commentaries to avoid bias from a single scholar\n• ✝️ Let Scripture interpret Scripture first, THEN consult outside help",
+        examples: [
+          "John 21:15-17 (Greek work): Jesus asks 'agapas me' (do you love me with covenant love?) twice; Peter answers 'philo se' (I love you as a friend). Third time, Jesus drops to 'phileis me'—meeting Peter where he is. This reveals Jesus' tender accommodation and Peter's self-awareness after his denial.",
+          "Laodicea (Rev 3:14-22): Historical context reveals Laodicea was wealthy, known for banking, textile industry (black wool), and a medical school producing eye-salve. Christ's counsel to 'buy gold, white garments, and eye-salve' directly confronts their civic pride—they're spiritually bankrupt, naked, and blind despite physical wealth."
+        ],
+        pitfalls: [
+          "Using commentaries as crutches instead of training wheels",
+          "Getting lost in lexical rabbit trails that don't illuminate the passage",
+          "Cherry-picking commentaries that confirm your bias",
+          "Treating any single commentary as infallible",
+          "Ignoring cultural context and assuming modern Western perspective",
+          "Doing word studies on every word (paralysis by analysis)"
+        ],
+        deliverable: "Word study notes (3-5 key words with lexical findings) + Cultural/historical insights (2-4 paragraphs) + Synthesis showing how this clarifies the passage"
+      },
+      {
+        id: "st",
+        name: "Symbols/Types Room",
+        tag: "ST",
+        purpose: "The Symbols/Types Room is where you build God's own symbol dictionary by tracking how He uses specific images throughout Scripture—and how they all point to Christ. Unlike secular symbols that can mean anything (a heart can mean love, courage, or just the organ), biblical symbols have CONSISTENT meaning because God is their Author. When you see 'lamb' in Scripture, it carries the same sacrificial freight from Genesis 22 (ram caught in thicket) to Exodus 12 (Passover) to Isaiah 53 (led to slaughter) to John 1:29 (Behold the Lamb) to Revelation 5 (Lamb who was slain). This room trains you to trace each symbol through the canon, noting its SCOPE (where it appears), its SIGN (what it represents), and its Christ-LOCUS (how Jesus fulfills it). You're not free-associating ('water makes me think of beaches')—you're letting Scripture interpret Scripture. When you've built symbol cards for Lamb, Rock, Light, Water, Bread, Temple, Vine, Door, Shepherd, and others, you possess a theology-packed vocabulary that unlocks hundreds of passages. The Symbols/Types Room keeps you from eisegesis (reading in) by anchoring your interpretation in God's own repeated imagery. Every symbol card you create becomes a reusable interpretive tool.",
+        coreQuestion: "What is this symbol's consistent biblical meaning and how does it find fulfillment in Christ?",
+        method: "🔍 STEP-BY-STEP METHODOLOGY (Building a Symbol Card):\n\n1️⃣ IDENTIFY the symbol (Lamb, Rock, Light, Water, Bread, etc.)\n\n2️⃣ SCOPE: Track the symbol through Scripture—where does it appear?\n   • 📚 List 5-10 key texts where the symbol shows up\n   • 🔄 Note if usage is consistent or if there are variations\n\n3️⃣ SIGN: What does the symbol consistently represent?\n   • 🎯 Sacrifice? Provision? Judgment? Presence?\n   • ✍️ Write a 1-sentence definition\n\n4️⃣ CHRIST-LOCUS: How does Jesus fulfill this symbol?\n   • ✝️ Find NT passages where Christ is explicitly connected to the symbol\n   • 📝 Write 1-2 sentences on fulfillment\n\n5️⃣ Build your card:\n   Symbol → Scope (texts) → Sign (meaning) → Christ-locus (fulfillment)\n\n6️⃣ Store the card for reuse—you'll reference it in future study\n\n🔑 COMMON BIBLICAL SYMBOLS TO MAP:\n• 🐑 LAMB: Sacrifice, substitution, innocence\n• 🗿 ROCK: Stability, refuge, foundation, judgment\n• 💡 LIGHT: Truth, revelation, presence, holiness\n• 💧 WATER: Life, cleansing, Spirit, Word\n• 🍞 BREAD: Provision, sustenance, Word\n• ⛪ TEMPLE: God's dwelling, holiness, access\n• 🍇 VINE: Life source, fruitfulness, covenant relationship\n• 🚪 DOOR: Access, salvation, exclusive entry\n• 🐑 SHEPHERD: Care, guidance, protection, ownership\n\n🎯 KEY PRINCIPLES:\n• 📖 Let Scripture define symbols—not your imagination\n• 🔄 Symbols are CONSISTENT across the canon (God is the Author)\n• 📚 Multiple texts create biblical vocabulary—single texts create speculation\n• ✝️ Christ is the ultimate reality behind every type and symbol\n• 🏗️ Build your library over time—each card is permanent infrastructure",
+        examples: [
+          "LAMB Symbol Card:\n→ SCOPE: Gen 22:8 (God will provide), Ex 12:3-13 (Passover), Isa 53:7 (led to slaughter), John 1:29 (Behold the Lamb), 1 Cor 5:7 (Christ our Passover), 1 Pet 1:19 (without blemish), Rev 5:6-12 (Lamb on throne)\n→ SIGN: Substitutionary sacrifice—innocent dies in place of guilty\n→ CHRIST-LOCUS: Jesus is the Lamb of God who takes away sin (John 1:29); slain from foundation of world (Rev 13:8); Passover fulfilled at crucifixion (1 Cor 5:7)",
+          "ROCK Symbol Card:\n→ SCOPE: Ex 17:6 (water from rock), Deut 32:4 (Rock of salvation), Ps 18:2 (my Rock), Isa 28:16 (cornerstone), Matt 16:18 (build on this rock), 1 Cor 10:4 (Rock was Christ), 1 Pet 2:6-8 (living stone)\n→ SIGN: Immovable foundation, refuge in storm, source of life-giving water\n→ CHRIST-LOCUS: Christ is the Rock struck for us (1 Cor 10:4); foundation stone (Isa 28:16, 1 Pet 2:6); living water flows from Him (John 7:38)"
+        ],
+        pitfalls: [
+          "Free-associating symbols without biblical warrant",
+          "Ignoring canonical usage—assuming one-time symbols are universal",
+          "Missing Christ connections—types exist to point to Him",
+          "Allegorizing everything—not every detail is symbolic"
+        ],
+        deliverable: "Symbol cards—each shows: Symbol → Scope (5-10 texts) → Sign (meaning) → Christ-locus (fulfillment)",
+        prerequisites: [{ floor: 1, room: "sr" }, { floor: 1, room: "tr" }]
+      },
+      {
+        id: "qr",
+        name: "Questions Room",
+        tag: "QR",
+        purpose: "The Questions Room is where you become a relentless interrogator of Scripture—because the quality of your understanding is directly proportional to the quality of your questions. Most Bible readers barely scratch the surface with weak questions like 'What does this mean to me?' This room demands three types of precision questioning that unlock exponentially deeper insight. First, INTRA-textual questions probe WITHIN the passage itself: Why does the author use 'therefore' here? Why is this genealogy placed NOW? Why does Jesus say 'woman' instead of 'mother'? Second, INTER-textual questions connect ACROSS Scripture: How does this passage relate to its Old Testament quotation? What other texts describe this same event differently? Third, PT-framework questions leverage Phototheology's infrastructure: Which cycle is this? What sanctuary element is in view? What room methodology best fits this text? By training yourself to generate 25 questions in each category (75 total when fully trained), you're creating a diagnostic tool that exposes hidden meaning.",
+        coreQuestion: "What must be asked inside the text, across texts, and in PT-framework?",
+        method: "STEP-BY-STEP METHODOLOGY (Three Question Types):\n\nLEVEL 1: INTRA-TEXTUAL (Within—Target: 25)\nAsk about structure, word choice, grammar, omissions, characters, setting\n\nLEVEL 2: INTER-TEXTUAL (Across—Target: 25)\nAsk about quotations, parallels, allusions, typology, themes, contrasts\n\nLEVEL 3: PT-FRAMEWORK (Target: 25)\nAsk about cycles, sanctuary, Christ, dimensions, time zones, genres, rooms",
+        examples: [
+          "John 11:35 INTRA: Why shortest verb? Why record emotion? Why weep if resurrection coming?",
+          "John 11:35 INTER: Compare to weeping over Jerusalem? Fits 'Man of sorrows'?",
+          "John 11:35 PT: Which cycle? Which dimension? Earth-Now or Heaven-Now?"
+        ],
+        pitfalls: [
+          "Stopping at surface questions",
+          "Generating fewer than 20 per category",
+          "Ignoring challenging questions"
+        ],
+        deliverable: "Question map: INTRA (25) | INTER (25) | PT (25). Beginners start with 5-10 per category.",
+        prerequisites: [{ floor: 1, room: "sr" }]
+      },
+      {
+        id: "qa",
+        name: "Q&A Chains Room",
+        tag: "QA",
+        purpose: "The Q&A Chains Room is where you let Scripture interpret Scripture by systematically answering the questions you generated in the Questions Room. This is the payoff—but you must resist the temptation to insert your opinions or commentary. Instead, you become a curator, finding 2-4 biblical cross-references that DIRECTLY address each question, then synthesizing what those texts say. The genius of Q&A Chains is that it keeps you tethered to the text: when you ask 'Why did the father run?' you don't speculate—you go to Psalm 103:13 ('As a father has compassion'), Isaiah 49:15 ('Can a mother forget?'), and Luke 15:20 itself (compassion moved him), then synthesize.",
+        coreQuestion: "Where does the Bible itself supply the answer?",
+        method: "STEP-BY-STEP:\n1. Import questions from QR\n2. Select 5-10 strongest questions\n3. For each: Find 2-4 cross-references\n4. Synthesize what texts collectively teach\n5. Format: Question → Refs → Synthesis",
+        examples: [
+          "Q: Why did father run? (Luke 15:20)\nRefs: Ps 103:13, Isa 49:15, Ezek 33:11, Luke 15:20b\nSynthesis: Divine compassion actively pursues the repentant before full confession."
+        ],
+        pitfalls: [
+          "Proof-texting out of context",
+          "Using only 1 text instead of 2-4",
+          "Sneaking opinion into synthesis"
+        ],
+        deliverable: "5-10 answer chains: Question → Refs → Synthesis",
+        prerequisites: [{ floor: 1, room: "sr" }, { floor: 2, room: "qr" }]
+      }
+    ]
+  },
+  {
     number: 3,
     name: "Freestyle",
     subtitle: "Time & Daily Integration",
