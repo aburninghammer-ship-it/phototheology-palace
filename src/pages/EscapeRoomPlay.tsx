@@ -169,11 +169,17 @@ export default function EscapeRoomPlay() {
 
       // Move to next puzzle or finish
       if (currentPuzzleIndex < puzzles.length - 1) {
-        setCurrentPuzzleIndex(prev => prev + 1);
-        setSubmittedVerses("");
-        setRoomJustification("");
-        setPrincipleUsed("");
-        setShowHint(false);
+        const nextPuzzleNumber = currentPuzzleIndex + 2; // +2 because index is 0-based
+        setTimeout(() => {
+          setCurrentPuzzleIndex(prev => prev + 1);
+          setSubmittedVerses("");
+          setRoomJustification("");
+          setPrincipleUsed("");
+          setShowHint(false);
+          toast.info(`Moving to Puzzle ${nextPuzzleNumber}...`, {
+            duration: 3000,
+          });
+        }, 1000);
       } else {
         finishAttempt(true);
       }
@@ -259,8 +265,8 @@ export default function EscapeRoomPlay() {
         </div>
 
         {/* Current Puzzle */}
-        <Card className="border-primary/20 mb-6">
-          <CardHeader>
+        <Card className="border-primary/20 mb-6 transition-all duration-300">
+          <CardHeader className="bg-gradient-to-r from-primary/5 to-transparent">
             <div className="flex items-center justify-between">
               <div>
                 <CardTitle className="flex items-center gap-2">
@@ -269,9 +275,12 @@ export default function EscapeRoomPlay() {
                       Floor {currentPuzzle.floor_number}
                     </span>
                   )}
-                  <span>Puzzle {currentPuzzle.puzzle_number}</span>
+                  <span className="text-2xl font-bold text-primary">Puzzle {currentPuzzle.puzzle_number}</span>
                   <span className="text-sm font-normal text-muted-foreground">
-                    ({currentPuzzle.room_tag})
+                    of {puzzles.length}
+                  </span>
+                  <span className="text-xs font-normal text-muted-foreground px-2 py-1 bg-accent/10 rounded">
+                    {currentPuzzle.room_tag}
                   </span>
                 </CardTitle>
                 <CardDescription className="mt-1">
