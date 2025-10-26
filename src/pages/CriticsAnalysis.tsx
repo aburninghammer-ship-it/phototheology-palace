@@ -97,7 +97,7 @@ export default function CriticsAnalysis() {
           <CardHeader>
             <CardTitle>Analyze Video</CardTitle>
             <CardDescription>
-              Analyze videos about biblical teaching. Affirm sound doctrine or identify and rebut false teaching, anti-biblical claims, or anti-Trinity arguments.
+              Enter a YouTube video URL to receive a detailed biblical analysis and response.
             </CardDescription>
           </CardHeader>
           <CardContent>

@@ -26,25 +26,63 @@ serve(async (req) => {
     const videoId = videoIdMatch[1];
     console.log("Video ID:", videoId);
 
-    // Try to fetch transcript using YouTube's API
-    let transcript = "";
-    try {
-      // Try to get captions/transcript
-      const captionsUrl = `https://www.youtube.com/watch?v=${videoId}`;
-      console.log("Attempting to fetch video data from:", captionsUrl);
-      
-      // Note: In production, you might want to use YouTube Data API v3
-      // For now, we'll proceed with video ID and let AI analyze based on that
-      transcript = "Transcript not available - analyzing based on video content";
-    } catch (error) {
-      console.log("Could not fetch transcript:", error);
-      transcript = "Transcript unavailable";
-    }
-
-    // Call Lovable AI to analyze the video
     const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
+    const YOUTUBE_API_KEY = Deno.env.get('YOUTUBE_API_KEY');
+    
     if (!LOVABLE_API_KEY) {
       throw new Error("LOVABLE_API_KEY not configured");
+    }
+    
+    if (!YOUTUBE_API_KEY) {
+      throw new Error("YOUTUBE_API_KEY not configured. Please add your YouTube Data API v3 key to analyze videos accurately.");
+    }
+
+    // Fetch video metadata from YouTube Data API
+    let videoData = {
+      title: "",
+      description: "",
+      channelTitle: "",
+      tags: [] as string[],
+      categoryId: ""
+    };
+    
+    try {
+      const youtubeApiUrl = `https://www.googleapis.com/youtube/v3/videos?part=snippet&id=${videoId}&key=${YOUTUBE_API_KEY}`;
+      console.log("Fetching video metadata from YouTube API...");
+      
+      const videoResponse = await fetch(youtubeApiUrl);
+      if (videoResponse.ok) {
+        const videoJson = await videoResponse.json();
+        if (videoJson.items && videoJson.items.length > 0) {
+          const snippet = videoJson.items[0].snippet;
+          videoData = {
+            title: snippet.title || "",
+            description: snippet.description || "",
+            channelTitle: snippet.channelTitle || "",
+            tags: snippet.tags || [],
+            categoryId: snippet.categoryId || ""
+          };
+          console.log("Video metadata fetched successfully");
+        }
+      }
+    } catch (error) {
+      console.log("Could not fetch video metadata:", error);
+    }
+
+    // Try to fetch captions if available
+    let captions = "";
+    try {
+      const captionsUrl = `https://www.googleapis.com/youtube/v3/captions?part=snippet&videoId=${videoId}&key=${YOUTUBE_API_KEY}`;
+      const captionsResponse = await fetch(captionsUrl);
+      if (captionsResponse.ok) {
+        const captionsJson = await captionsResponse.json();
+        if (captionsJson.items && captionsJson.items.length > 0) {
+          captions = "Captions are available for this video.";
+          console.log("Captions found");
+        }
+      }
+    } catch (error) {
+      console.log("Could not fetch captions info:", error);
     }
 
     const systemPrompt = `You are Jeeves, a knowledgeable biblical scholar and apologist specializing in defending biblical truth.
@@ -94,19 +132,29 @@ Return your analysis in the following JSON structure:
   "additionalNotes": "Any additional context, historical information, or important considerations"
 }`;
 
-    const userPrompt = `Please analyze this YouTube video: ${videoUrl}
+    const userPrompt = `Please analyze this YouTube video comprehensively:
 
-Video ID: ${videoId}
-${transcript !== "Transcript unavailable" ? `Transcript: ${transcript}` : "Note: Transcript not available, please analyze based on the video URL and common content patterns for similar videos."}
+VIDEO URL: ${videoUrl}
+VIDEO ID: ${videoId}
 
-IMPORTANT INSTRUCTIONS:
-1. First determine the video type (pro-biblical or anti-biblical)
-2. If it's pro-biblical doctrine: Affirm why it's correct with Scripture and sound theology
-3. If it's anti-biblical/anti-doctrine/anti-Trinity: Show why it's wrong with detailed biblical rebuttals
-4. Identify all logical fallacies used
-5. Provide comprehensive biblical responses
+VIDEO METADATA:
+- Title: ${videoData.title}
+- Channel: ${videoData.channelTitle}
+- Description: ${videoData.description}
+- Tags: ${videoData.tags.join(", ")}
+${captions ? `- ${captions}` : ""}
 
-Provide a comprehensive analysis with claims, responses (affirmation or rebuttal), logical fallacies, and biblical support.`;
+Based on this video information, provide a thorough biblical analysis:
+
+ANALYSIS REQUIREMENTS:
+1. Determine if the video is pro-biblical or anti-biblical based on the title, description, channel, and tags
+2. Analyze the main theological claims or positions evident from the metadata
+3. If pro-biblical: Affirm the sound doctrine with Scripture and explain why it's correct
+4. If anti-biblical: Provide detailed biblical rebuttals showing why the claims are wrong
+5. Identify any logical fallacies that may be present based on common patterns in similar content
+6. Provide comprehensive biblical responses with specific verse references
+
+Be thorough and accurate based on the available video information.`;
 
     console.log("Calling Lovable AI...");
     const aiResponse = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
