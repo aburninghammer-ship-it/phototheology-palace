@@ -26,7 +26,7 @@ verify_jwt = false
 verify_jwt = false
 
 [functions.analyze-critic-video]
-verify_jwt = true
+verify_jwt = false
 
 [functions.daily-content-generator]
 verify_jwt = false
