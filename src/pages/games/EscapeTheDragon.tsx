@@ -6,6 +6,12 @@ import { Textarea } from "@/components/ui/textarea";
 import { ArrowLeft, Heart, Skull } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 const DRAGON_ATTACKS = [
   "False worship law enforced",
@@ -21,6 +27,18 @@ const DRAGON_ATTACKS = [
 const DEFENSE_CARDS = [
   "Ep", "Ef", "|GC", "|TP", "|S", "⚖", "ALTAR", "LAMP", "ARK"
 ];
+
+const CARD_EXPLANATIONS: Record<string, string> = {
+  "Ep": "Epistles Prophecy - Prophetic teachings in New Testament letters",
+  "Ef": "Epistles Faith - Faith and doctrine from New Testament letters",
+  "|GC": "Great Controversy - Cosmic conflict between Christ and Satan",
+  "|TP": "Time Prophecy - Daniel/Revelation prophetic timelines",
+  "|S": "Sanctuary - Hebrew sanctuary system pointing to Christ",
+  "⚖": "Judgment - God's righteous judgment and justice",
+  "ALTAR": "Altar - Sacrifice of Christ on the cross",
+  "LAMP": "Lampstand - Light of truth, witness, Holy Spirit",
+  "ARK": "Ark of Covenant - God's law, mercy seat, His presence"
+};
 
 export default function EscapeTheDragon() {
   const navigate = useNavigate();
@@ -80,20 +98,28 @@ export default function EscapeTheDragon() {
       const { survived, feedback } = data;
 
       if (survived) {
-        toast.success(`Defense successful! ${feedback}`);
+        toast.success(`Defense successful! ${feedback}`, {
+          duration: 8000, // 8 seconds to read the feedback
+        });
         setRound(prev => prev + 1);
         
         if (round >= 10) {
-          toast.success("🏆 Victory! You survived 10 dragon attacks!");
+          toast.success("🏆 Victory! You survived 10 dragon attacks!", {
+            duration: 6000,
+          });
         } else {
           startRound();
         }
       } else {
         setLives(prev => prev - 1);
-        toast.error(`Failed defense: ${feedback}`);
+        toast.error(`Failed defense: ${feedback}`, {
+          duration: 8000, // 8 seconds to read the feedback
+        });
         
         if (lives - 1 <= 0) {
-          toast.error("💀 The dragon wins. Game over.");
+          toast.error("💀 The dragon wins. Game over.", {
+            duration: 6000,
+          });
         } else {
           startRound();
         }
@@ -195,20 +221,29 @@ export default function EscapeTheDragon() {
               <CardTitle className="text-orange-300">Your Defense Cards</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="grid grid-cols-3 md:grid-cols-5 gap-2">
-                {hand.map(card => (
-                  <Button
-                    key={card}
-                    variant={selectedCards.includes(card) ? "default" : "outline"}
-                    onClick={() => toggleCard(card)}
-                    className="h-16 text-lg font-bold"
-                  >
-                    {card}
-                  </Button>
-                ))}
-              </div>
+              <TooltipProvider>
+                <div className="grid grid-cols-3 md:grid-cols-5 gap-2">
+                  {hand.map(card => (
+                    <Tooltip key={card}>
+                      <TooltipTrigger asChild>
+                        <Button
+                          variant={selectedCards.includes(card) ? "default" : "outline"}
+                          onClick={() => toggleCard(card)}
+                          className="h-16 text-lg font-bold"
+                        >
+                          {card}
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent className="max-w-xs">
+                        <p className="font-semibold">{card}</p>
+                        <p className="text-sm">{CARD_EXPLANATIONS[card]}</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  ))}
+                </div>
+              </TooltipProvider>
               <p className="text-sm text-muted-foreground mt-2">
-                Select 2 cards to defend (30 seconds to answer)
+                Select 2 cards to defend (tap cards for explanations)
               </p>
             </CardContent>
           </Card>
