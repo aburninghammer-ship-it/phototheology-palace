@@ -146,11 +146,11 @@ const Games = () => {
       duration: "20-30 min"
     },
     { 
-      id: "verse_poker", 
-      name: "Verse Poker", 
-      description: "Biblical poker where you build 'hands' using verse cards, room cards, and principle cards. Create combinations like 'Sanctuary Flush' (5 sanctuary-related verses) or 'Prophetic Straight' (Daniel→Revelation progression).",
+      id: "scripture_combinations", 
+      name: "Scripture Combinations", 
+      description: "Build powerful hands using verse cards, room principle cards, and prophecy cards. Create winning combinations like 'Sanctuary Sequence' (5 sanctuary-related verses), 'Prophetic Chain' (Daniel→Revelation progression), or 'Christ-Centered Suite' (5 verses revealing the same aspect of Christ).",
       featured: false,
-      skills: "Combination Building, Biblical Knowledge, Strategic Thinking",
+      skills: "Pattern Recognition, Biblical Knowledge, Strategic Thinking",
       requiredRooms: ["ST", "BL", "PR", "QA"],
       players: "2-6",
       duration: "15-20 min"
@@ -380,7 +380,7 @@ const Games = () => {
                 </p>
               </div>
 
-              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+              <div className="grid md:grid-cols-2 gap-6">
                 {cardGames.map((game) => (
                   <Card key={game.id} className={game.featured ? "border-amber-500 shadow-lg" : ""}>
                     <CardHeader>
@@ -435,38 +435,20 @@ const Games = () => {
                   <Lock className="h-5 w-5 text-red-600" />
                   Palace Escape Rooms
                 </h3>
-                <p className="text-sm text-muted-foreground mb-3">
-                  Timed biblical challenges that lock you inside Palace theology. Use room methodologies to solve Scripture puzzles and escape before time runs out.
+                <p className="text-sm text-muted-foreground">
+                  60-minute biblical crisis scenarios where you must apply Palace principles under pressure. Defend the faith, solve mysteries, or decode prophecy before time runs out.
                 </p>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-xs">
-                  <div className="bg-white dark:bg-slate-800 p-2 rounded border">
-                    <div className="font-semibold text-primary">Room-as-Room</div>
-                    <div className="text-muted-foreground">Master one methodology (45 min)</div>
-                  </div>
-                  <div className="bg-white dark:bg-slate-800 p-2 rounded border">
-                    <div className="font-semibold text-accent">Category Gauntlet</div>
-                    <div className="text-muted-foreground">Prophecy/Sanctuary specialist (60 min)</div>
-                  </div>
-                  <div className="bg-white dark:bg-slate-800 p-2 rounded border">
-                    <div className="font-semibold text-orange-600">Live Mission</div>
-                    <div className="text-muted-foreground">Apologetics training (30 min)</div>
-                  </div>
-                  <div className="bg-white dark:bg-slate-800 p-2 rounded border">
-                    <div className="font-semibold text-purple-600">Async Hunt</div>
-                    <div className="text-muted-foreground">Crisis defense (24 hrs)</div>
-                  </div>
-                </div>
               </div>
 
-              <div className="grid md:grid-cols-2 gap-6">
+              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {escapeRooms.map((game) => (
                   <Card key={game.id} className="border-red-500 shadow-lg">
                     <CardHeader>
-                      <CardTitle className="flex items-center gap-2 text-xl">
-                        <Flame className="h-6 w-6 text-red-500" />
+                      <CardTitle className="flex items-center gap-2">
+                        <Lock className="h-5 w-5 text-red-500" />
                         {game.name}
                       </CardTitle>
-                      <CardDescription className="min-h-[100px] text-base">{game.description}</CardDescription>
+                      <CardDescription className="min-h-[80px]">{game.description}</CardDescription>
                       <div className="pt-2 space-y-2">
                         <div className="flex gap-4 text-xs text-muted-foreground">
                           <span>👥 {game.players}</span>
@@ -482,12 +464,12 @@ const Games = () => {
                     </CardHeader>
                     <CardContent>
                       <Button
-                        onClick={() => navigate('/escape-room')}
-                        className="w-full bg-red-600 hover:bg-red-700"
-                        size="lg"
+                        onClick={() => navigate(`/escape-room`)}
+                        className="w-full"
+                        variant="default"
                       >
-                        <Lock className="mr-2 h-5 w-5" />
-                        Enter Escape Rooms
+                        <Lock className="mr-2 h-4 w-4" />
+                        Enter Escape Room
                       </Button>
                     </CardContent>
                   </Card>
