@@ -426,11 +426,11 @@ export default function PalaceCardGame() {
                     <div className="absolute bottom-2 right-2 w-8 h-8 border-r-4 border-b-4 border-amber-400/50 rounded-br-lg" />
                     
                     {/* Top Gold Banner */}
-                    <div className="relative bg-gradient-to-r from-amber-400 via-yellow-500 to-amber-400 px-4 py-3 shadow-lg">
+                    <div className="relative bg-gradient-to-r from-amber-400 via-yellow-500 to-amber-400 px-3 py-2 shadow-lg">
                       <div className="absolute inset-0 opacity-20" style={{
                         backgroundImage: "repeating-linear-gradient(90deg, transparent, transparent 10px, rgba(0,0,0,.1) 10px, rgba(0,0,0,.1) 11px)"
                       }} />
-                      <h3 className="relative text-center font-black text-gray-900 text-base uppercase tracking-wide" style={{
+                      <h3 className="relative text-center font-black text-gray-900 text-sm uppercase tracking-wide" style={{
                         fontFamily: "'Cinzel', serif",
                         textShadow: "1px 1px 2px rgba(255,255,255,0.5)"
                       }}>
