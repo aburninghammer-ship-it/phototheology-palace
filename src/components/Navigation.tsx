@@ -17,7 +17,7 @@ export const Navigation = () => {
   const location = useLocation();
   const isBiblePage = location.pathname.startsWith('/bible');
   const { user, signOut } = useAuth();
-  const activeCount = useActiveUsers();
+  const { activeCount } = useActiveUsers();
   
   return (
     <>

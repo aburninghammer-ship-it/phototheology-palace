@@ -1,8 +1,17 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 
+interface ActiveUser {
+  id: string;
+  username: string;
+  display_name: string | null;
+  avatar_url: string | null;
+  last_seen: string;
+}
+
 export const useActiveUsers = () => {
   const [activeCount, setActiveCount] = useState(0);
+  const [activeUsers, setActiveUsers] = useState<ActiveUser[]>([]);
   const [retryCount, setRetryCount] = useState(0);
   const maxRetries = 3;
 
@@ -31,13 +40,15 @@ export const useActiveUsers = () => {
       
       try {
         const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000).toISOString();
-        const { count, error } = await supabase
+        const { data, count, error } = await supabase
           .from("profiles")
-          .select("*", { count: "exact", head: true })
-          .gte("last_seen", fiveMinutesAgo);
+          .select("id, username, display_name, avatar_url, last_seen", { count: "exact" })
+          .gte("last_seen", fiveMinutesAgo)
+          .order("last_seen", { ascending: false });
         
         if (!error && isSubscribed) {
           setActiveCount(count || 0);
+          setActiveUsers(data || []);
         }
       } catch (error) {
         // Silently fail - this is not critical functionality
@@ -87,5 +98,5 @@ export const useActiveUsers = () => {
     }
   }, [retryCount]);
 
-  return activeCount;
+  return { activeCount, activeUsers };
 };

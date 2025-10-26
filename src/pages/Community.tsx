@@ -8,15 +8,18 @@ import { Input } from "@/components/ui/input";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
-import { MessageSquare, Plus, Heart } from "lucide-react";
+import { MessageSquare, Plus, Heart, Users } from "lucide-react";
 import { EmojiPicker } from "@/components/EmojiPicker";
 import { communityPostSchema } from "@/lib/validationSchemas";
 import { sanitizeHtml } from "@/lib/sanitize";
+import { useActiveUsers } from "@/hooks/useActiveUsers";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 const Community = () => {
   const { user, loading } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { activeCount, activeUsers } = useActiveUsers();
   const [posts, setPosts] = useState<any[]>([]);
   const [showNewPost, setShowNewPost] = useState(false);
   const [newTitle, setNewTitle] = useState("");
@@ -114,6 +117,41 @@ const Community = () => {
               New Post
             </Button>
           </div>
+
+          {/* Who's Online Section */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Users className="h-5 w-5" />
+                Who's Online ({activeCount})
+              </CardTitle>
+              <CardDescription>Members active in the last 5 minutes</CardDescription>
+            </CardHeader>
+            <CardContent>
+              {activeUsers.length > 0 ? (
+                <div className="flex flex-wrap gap-3">
+                  {activeUsers.map((activeUser) => (
+                    <div
+                      key={activeUser.id}
+                      className="flex items-center gap-2 bg-accent/50 rounded-full px-3 py-1.5"
+                    >
+                      <Avatar className="h-6 w-6">
+                        <AvatarImage src={activeUser.avatar_url || undefined} />
+                        <AvatarFallback className="text-xs">
+                          {(activeUser.display_name || activeUser.username).charAt(0).toUpperCase()}
+                        </AvatarFallback>
+                      </Avatar>
+                      <span className="text-sm font-medium">
+                        {activeUser.display_name || activeUser.username}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-sm text-muted-foreground">No one else is currently online</p>
+              )}
+            </CardContent>
+          </Card>
 
           {showNewPost && (
             <Card>

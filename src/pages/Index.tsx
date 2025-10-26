@@ -9,7 +9,7 @@ import { useActiveUsers } from "@/hooks/useActiveUsers";
 const Index = () => {
   const { toast } = useToast();
   const { user } = useAuth();
-  const activeCount = useActiveUsers();
+  const { activeCount } = useActiveUsers();
 
   const handleShare = () => {
     const shareData = {
