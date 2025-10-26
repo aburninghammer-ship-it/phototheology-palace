@@ -10,7 +10,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
 interface AnalysisResult {
-  videoType: "pro-biblical" | "anti-biblical";
+  videoType: "pro-SDA" | "anti-SDA";
   summary: string;
   mainClaims: Array<{
     claim: string;
@@ -89,7 +89,7 @@ export default function CriticsAnalysis() {
             Critics Analysis
           </h1>
           <p className="text-muted-foreground">
-            Analyze videos about biblical teaching. Affirm sound doctrine or rebut false teaching with Scripture, identify logical fallacies, and provide biblical responses.
+            Jeeves analyzes videos to defend Seventh-day Adventist theology and debunk anti-SDA critics with biblical evidence and sound doctrine.
           </p>
         </div>
 
@@ -97,7 +97,7 @@ export default function CriticsAnalysis() {
           <CardHeader>
             <CardTitle>Analyze Video</CardTitle>
             <CardDescription>
-              Enter a YouTube video URL to receive a detailed biblical analysis and response.
+              Enter a YouTube video URL to receive a detailed SDA apologetic analysis defending biblical truth against critics.
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -139,9 +139,9 @@ export default function CriticsAnalysis() {
                   <CardTitle className="flex items-center gap-2">
                     Video Summary
                     <Badge variant={
-                      analysis.videoType === "pro-biblical" ? "default" : "destructive"
+                      analysis.videoType === "pro-SDA" ? "default" : "destructive"
                     }>
-                      {analysis.videoType === "pro-biblical" ? "Pro-Biblical" : "Anti-Biblical"}
+                      {analysis.videoType === "pro-SDA" ? "Pro-SDA" : "Anti-SDA"}
                     </Badge>
                   </CardTitle>
                 </CardHeader>
