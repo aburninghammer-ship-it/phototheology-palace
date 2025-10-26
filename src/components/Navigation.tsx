@@ -56,6 +56,14 @@ export const Navigation = () => {
               <Link to="/">Home</Link>
             </Button>
             <Button
+              variant={location.pathname === "/app-tour" ? "default" : "ghost"}
+              asChild
+              size="sm"
+              className={location.pathname === "/app-tour" ? "gradient-ocean shadow-blue" : "hover:bg-muted"}
+            >
+              <Link to="/app-tour">📖 App Tour</Link>
+            </Button>
+            <Button
               variant={location.pathname === "/palace" ? "default" : "ghost"}
               asChild
               size="sm"

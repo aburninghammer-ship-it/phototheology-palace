@@ -41,6 +41,11 @@ export const MobileNav = () => {
                   Home
                 </Button>
               </Link>
+              <Link to="/app-tour">
+                <Button variant="ghost" className="w-full justify-start" size="sm">
+                  📖 App Tour
+                </Button>
+              </Link>
               <Link to="/palace">
                 <Button variant="ghost" className="w-full justify-start" size="sm">
                   <Building2 className="h-4 w-4 mr-2" />

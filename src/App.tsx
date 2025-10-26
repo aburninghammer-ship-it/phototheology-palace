@@ -48,6 +48,7 @@ const SermonBuilder = lazy(() => import("./pages/SermonBuilder"));
 const Flashcards = lazy(() => import("./pages/Flashcards"));
 const PowerOfTheLamb = lazy(() => import("./pages/PowerOfTheLamb"));
 const SpiritualTraining = lazy(() => import("./pages/SpiritualTraining"));
+const AppTour = lazy(() => import("./pages/AppTour"));
 const BlueprintCourse = lazy(() => import("./pages/BlueprintCourse"));
 const PhototheologyCourse = lazy(() => import("./pages/PhototheologyCourse"));
 const DanielCourse = lazy(() => import("./pages/DanielCourse"));
@@ -115,6 +116,7 @@ function App() {
               </ProtectedRoute>
             } />
             <Route path="/pricing" element={<Pricing />} />
+            <Route path="/app-tour" element={<AppTour />} />
             <Route path="/access" element={
               <ProtectedRoute>
                 <AccessCode />
