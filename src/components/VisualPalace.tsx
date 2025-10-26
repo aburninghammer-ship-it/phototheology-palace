@@ -78,7 +78,7 @@ export const VisualPalace = () => {
       {/* Palace Structure */}
       <div className="relative flex flex-col-reverse gap-6">
         {palaceFloors.map((floor, floorIndex) => {
-          const theme = FLOOR_THEMES[floorIndex];
+          const theme = FLOOR_THEMES[floor.number - 1]; // Use floor.number to get correct theme
           return (
             <FloorSection 
               key={floor.number} 
