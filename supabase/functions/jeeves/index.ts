@@ -165,7 +165,8 @@ serve(async (req) => {
       existingStones,
       stones,
       existingBridges,
-      bridges
+      bridges,
+      scope
     } = await req.json();
     
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
@@ -728,8 +729,7 @@ Structure your analysis:
 Be scholarly, compassionate, and clear. Cite specific verses.`;
 
     } else if (mode === "prophecy-signal") {
-      const { scope } = await req.json();
-      const scopeContext = scope === "america" 
+      const scopeContext = scope === "america"
         ? "Focus on events in the United States of America" 
         : "Focus on events globally, outside the United States";
       
