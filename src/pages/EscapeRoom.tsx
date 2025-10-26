@@ -27,10 +27,43 @@ export default function EscapeRoom() {
   const [isGenerating, setIsGenerating] = useState(false);
   const [isBatchGenerating, setIsBatchGenerating] = useState(false);
   const [mode, setMode] = useState<"room_as_room" | "category_gauntlet" | "floor_race" | "live_mission" | "async_hunt">("room_as_room");
-  const [category, setCategory] = useState<"sanctuary" | "prophecy" | "story" | "symbols" | "christ_concentration" | "dimensions" | "gospel_mission">("sanctuary");
+  const [category, setCategory] = useState<string>("sanctuary");
   const [scenario, setScenario] = useState("");
   const [teamMode, setTeamMode] = useState<"solo" | "team">("solo");
   const [availableRooms, setAvailableRooms] = useState<AvailableRoom[]>([]);
+
+  // All Palace rooms available for Room-as-Room mode
+  const allPalaceRooms = [
+    { id: "sanctuary", label: "Sanctuary (BL) - Furniture & Typology", floor: 5 },
+    { id: "prophecy", label: "Prophecy (PR) - Timelines & Symbols", floor: 5 },
+    { id: "three_angels", label: "Three Angels (3A) - Final Messages", floor: 5 },
+    { id: "feasts", label: "Feasts (FE) - Biblical Festivals", floor: 5 },
+    { id: "story", label: "Story Room (SR) - Narrative Flow", floor: 1 },
+    { id: "imagination", label: "Imagination (IR) - Immersion", floor: 1 },
+    { id: "translation", label: "Translation (TR) - Verse to Image", floor: 1 },
+    { id: "gems", label: "Gems Room (GR) - Key Insights", floor: 1 },
+    { id: "observation", label: "Observation (OR) - Detective Work", floor: 2 },
+    { id: "def_com", label: "Def-Com (DC) - Definitions", floor: 2 },
+    { id: "types", label: "Symbols/Types (ST) - Typology", floor: 2 },
+    { id: "questions", label: "Questions (QR) - Investigation", floor: 2 },
+    { id: "nature_freestyle", label: "Nature Freestyle (NF)", floor: 3 },
+    { id: "personal_freestyle", label: "Personal Freestyle (PF)", floor: 3 },
+    { id: "bible_freestyle", label: "Bible Freestyle (BF)", floor: 3 },
+    { id: "history_freestyle", label: "History Freestyle (HF)", floor: 3 },
+    { id: "listening", label: "Listening Room (LR)", floor: 3 },
+    { id: "christ_concentration", label: "Concentration (CR) - Christ Focus", floor: 4 },
+    { id: "dimensions", label: "Dimensions (DR) - 5 Layers", floor: 4 },
+    { id: "connect_6", label: "Connect 6 (C6) - Genre Analysis", floor: 4 },
+    { id: "theme", label: "Theme Room (TRm) - Walls", floor: 4 },
+    { id: "time_zone", label: "Time Zone (TZ) - Past/Present/Future", floor: 4 },
+    { id: "patterns", label: "Patterns (PRm) - Motifs", floor: 4 },
+    { id: "parallels", label: "Parallels (P‖) - Mirrored Actions", floor: 4 },
+    { id: "fruit", label: "Fruit Room (FRt) - Character Test", floor: 4 },
+    { id: "juice", label: "Juice Room (JR) - Full Extraction", floor: 6 },
+    { id: "fire", label: "Fire Room (FRm) - Conviction", floor: 7 },
+    { id: "meditation", label: "Meditation (MR) - Deep Reflection", floor: 7 },
+    { id: "speed", label: "Speed Room (SRm) - Quick Recall", floor: 7 },
+  ];
 
   useEffect(() => {
     loadAvailableRooms();
@@ -282,46 +315,21 @@ export default function EscapeRoom() {
                 <Label className="text-base font-semibold">
                   {mode === "room_as_room" ? "Palace Room" : "Category"}
                 </Label>
-                <RadioGroup value={category} onValueChange={(v) => setCategory(v as any)}>
+                <RadioGroup value={category} onValueChange={(v) => setCategory(v)}>
                   {mode === "room_as_room" ? (
-                    <>
-                      <div className="flex items-center space-x-2">
-                        <RadioGroupItem value="sanctuary" id="sanctuary" />
-                        <Label htmlFor="sanctuary" className="cursor-pointer">
-                          Sanctuary (BL) - Furniture mapping, typology
-                        </Label>
+                    <div className="space-y-4">
+                      <p className="text-sm text-muted-foreground">Choose any Palace room to escape from:</p>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3 max-h-96 overflow-y-auto pr-2">
+                        {allPalaceRooms.map((room) => (
+                          <div key={room.id} className="flex items-center space-x-2">
+                            <RadioGroupItem value={room.id} id={room.id} />
+                            <Label htmlFor={room.id} className="cursor-pointer text-sm">
+                              <span className="text-xs text-muted-foreground">Floor {room.floor}:</span> {room.label}
+                            </Label>
+                          </div>
+                        ))}
                       </div>
-                      <div className="flex items-center space-x-2">
-                        <RadioGroupItem value="prophecy" id="prophecy" />
-                        <Label htmlFor="prophecy" className="cursor-pointer">
-                          Prophecy (PR) - Daniel/Revelation timelines
-                        </Label>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <RadioGroupItem value="story" id="story" />
-                        <Label htmlFor="story" className="cursor-pointer">
-                          Story (SR) - Narrative sequencing
-                        </Label>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <RadioGroupItem value="symbols" id="symbols" />
-                        <Label htmlFor="symbols" className="cursor-pointer">
-                          Symbols (ST) - Biblical typology
-                        </Label>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <RadioGroupItem value="christ_concentration" id="christ" />
-                        <Label htmlFor="christ" className="cursor-pointer">
-                          Christ Concentration (CR) - Finding Jesus
-                        </Label>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <RadioGroupItem value="dimensions" id="dimensions" />
-                        <Label htmlFor="dimensions" className="cursor-pointer">
-                          Dimensions (DR) - 5-layer analysis
-                        </Label>
-                      </div>
-                    </>
+                    </div>
                   ) : (
                     <>
                       <div className="flex items-center space-x-2">
