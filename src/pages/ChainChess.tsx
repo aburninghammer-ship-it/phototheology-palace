@@ -312,7 +312,7 @@ const ChainChess = () => {
     }
   };
 
-  const jeevesMove = async (currentGameId: string, isFirst = false) => {
+  const jeevesMove = async (currentGameId: string, isFirst = false, userChallenge?: string) => {
     setProcessing(true);
     try {
       console.log("=== Jeeves Move Start ===");
@@ -320,14 +320,37 @@ const ChainChess = () => {
       console.log("Current verse:", currentVerse);
       console.log("Game ID:", currentGameId);
       console.log("Available categories:", selectedGameCategories);
-      console.log("Previous moves:", moves);
+      console.log("User's challenge to Jeeves:", userChallenge);
+      
+      // Reload moves to get the latest including user's just-submitted move
+      const { data: latestMoves } = await supabase
+        .from("game_moves")
+        .select("*")
+        .eq("game_id", currentGameId)
+        .order("created_at", { ascending: true });
+      
+      const formattedMoves = latestMoves?.map((move) => {
+        const moveData = move.move_data as any;
+        return {
+          player: moveData.player,
+          verse: moveData.verse,
+          commentary: moveData.commentary,
+          category: moveData.category,
+          challengeCategory: moveData.challengeCategory,
+          jeeves_feedback: moveData.jeeves_feedback,
+          score: moveData.score,
+          timestamp: move.created_at,
+        };
+      }) || [];
+      
+      console.log("Latest moves for Jeeves:", formattedMoves);
       
       const { data, error } = await supabase.functions.invoke("jeeves", {
         body: {
           mode: "chain-chess",
           verse: currentVerse,
           isFirstMove: isFirst,
-          previousMoves: moves,
+          previousMoves: formattedMoves,
           availableCategories: selectedGameCategories,
           difficulty: game?.game_state?.difficulty || difficultyLevel,
         },
@@ -504,6 +527,9 @@ const ChainChess = () => {
         move_data: move,
       });
 
+      // Store the challenge before clearing form
+      const userChallengeToJeeves = selectedCategory;
+
       // Clear form
       setCommentary("");
       setUserVerse("");
@@ -534,10 +560,10 @@ const ChainChess = () => {
       if (isVsJeeves) {
         console.log("=== Triggering Jeeves Response ===");
         console.log("Game ID:", gameId);
-        console.log("User's challenge:", selectedCategory);
+        console.log("User's challenge:", userChallengeToJeeves);
         setTimeout(async () => {
           console.log("=== Jeeves Move Triggered ===");
-          await jeevesMove(gameId!, false);
+          await jeevesMove(gameId!, false, userChallengeToJeeves);
         }, 1500);
       }
     } catch (error: any) {
