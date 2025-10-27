@@ -161,6 +161,10 @@ function App() {
             <Route path="/games/escape-dragon" element={<ProtectedRoute><EscapeTheDragon /></ProtectedRoute>} />
             <Route path="/games/equation-builder" element={<ProtectedRoute><EquationBuilder /></ProtectedRoute>} />
             <Route path="/games/witness-trial" element={<ProtectedRoute><WitnessTrial /></ProtectedRoute>} />
+            <Route path="/games/question-room" element={<ProtectedRoute>{lazy(() => import("@/pages/games/QuestionRoom"))()}</ProtectedRoute>} />
+            <Route path="/games/freestyle-room" element={<ProtectedRoute>{lazy(() => import("@/pages/games/FreestyleRoom"))()}</ProtectedRoute>} />
+            <Route path="/games/verse-genetics" element={<ProtectedRoute>{lazy(() => import("@/pages/games/VerseGenetics"))()}</ProtectedRoute>} />
+            <Route path="/games/observation-room" element={<ProtectedRoute>{lazy(() => import("@/pages/games/ObservationRoom"))()}</ProtectedRoute>} />
             <Route path="/games/frame-snapshot" element={<ProtectedRoute><FrameSnapshot /></ProtectedRoute>} />
             <Route path="/games/story-room" element={<ProtectedRoute><StoryRoomGame /></ProtectedRoute>} />
             <Route path="/games/observation-room" element={<ProtectedRoute><ObservationGame /></ProtectedRoute>} />

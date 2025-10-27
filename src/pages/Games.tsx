@@ -44,6 +44,54 @@ const Games = () => {
       route: "/games/palace-cards"
     },
     {
+      id: "question_room",
+      name: "Question Room",
+      description: "Ask relentless questions about Scripture! Practice intratextual, intertextual, and phototheological interrogation.",
+      icon: "❓",
+      floor: 2,
+      timed: true,
+      rooms: ["QR"],
+      modes: ["solo"],
+      difficulties: ["easy", "medium", "hard"],
+      route: "/games/question-room"
+    },
+    {
+      id: "freestyle_room",
+      name: "Freestyle Room",
+      description: "Random objects appear—freestyle biblical connections on the spot! Solo practice or 2-player battle.",
+      icon: "✨",
+      floor: 3,
+      timed: false,
+      rooms: ["NF", "PF", "BF"],
+      modes: ["solo", "2p"],
+      difficulties: ["easy", "medium"],
+      route: "/games/freestyle-room"
+    },
+    {
+      id: "verse_genetics",
+      name: "Verse Genetics",
+      description: "Trace Scripture's family tree! Find sibling verses, cousins, and distant relatives across the Bible.",
+      icon: "🧬",
+      floor: 3,
+      timed: true,
+      rooms: ["BF"],
+      modes: ["solo"],
+      difficulties: ["medium", "hard"],
+      route: "/games/verse-genetics"
+    },
+    {
+      id: "observation_room",
+      name: "Observation Room",
+      description: "Become a detective! Find hidden clues in verses by observing every detail like a crime scene investigator.",
+      icon: "🔍",
+      floor: 2,
+      timed: true,
+      rooms: ["OR"],
+      modes: ["solo"],
+      difficulties: ["easy", "medium", "hard"],
+      route: "/games/observation-room"
+    },
+    {
       id: "speed_verse",
       name: "Speed Verse Recall",
       description: "Memorize verses quickly and recall them under time pressure. How many can you remember?",
