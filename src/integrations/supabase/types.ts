@@ -1862,6 +1862,7 @@ export type Database = {
       }
       user_gems: {
         Row: {
+          category: string | null
           created_at: string
           floor_number: number
           gem_content: string
@@ -1872,6 +1873,7 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          category?: string | null
           created_at?: string
           floor_number: number
           gem_content: string
@@ -1882,6 +1884,7 @@ export type Database = {
           user_id: string
         }
         Update: {
+          category?: string | null
           created_at?: string
           floor_number?: number
           gem_content?: string

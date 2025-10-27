@@ -15,6 +15,7 @@ interface UserGem {
   gem_name: string;
   gem_content: string;
   created_at: string;
+  category?: string;
 }
 
 interface UserGemsListProps {
@@ -66,6 +67,28 @@ export function UserGemsList({ floorNumber, roomId }: UserGemsListProps) {
 
     try {
       setSubmitting(true);
+      
+      // Categorize the gem using AI
+      let category = "Other";
+      try {
+        const { data: categoryData, error: categoryError } = await supabase.functions.invoke(
+          "categorize-gem",
+          {
+            body: {
+              gemName: gemName.trim(),
+              gemContent: gemContent.trim(),
+            },
+          }
+        );
+
+        if (!categoryError && categoryData?.category) {
+          category = categoryData.category;
+        }
+      } catch (catError) {
+        console.error("Error categorizing gem:", catError);
+        // Continue with default category if categorization fails
+      }
+
       const { error } = await supabase
         .from("user_gems")
         .insert({
@@ -74,11 +97,12 @@ export function UserGemsList({ floorNumber, roomId }: UserGemsListProps) {
           gem_content: gemContent.trim(),
           room_id: roomId,
           floor_number: floorNumber,
+          category: category,
         });
 
       if (error) throw error;
 
-      toast.success("Gem added successfully!");
+      toast.success(`Gem added to ${category}!`);
       setGemName("");
       setGemContent("");
       setShowForm(false);
@@ -194,34 +218,56 @@ export function UserGemsList({ floorNumber, roomId }: UserGemsListProps) {
             <p>No gems saved yet. Start collecting your insights!</p>
           </div>
         ) : (
-          <div className="space-y-3">
-            {gems.map((gem) => (
-              <div
-                key={gem.id}
-                className="p-4 border rounded-lg bg-card hover:shadow-md transition-shadow"
-              >
-                <div className="flex items-start justify-between gap-2 mb-2">
-                  <h4 className="font-semibold text-base flex items-center gap-2">
-                    <Gem className="h-4 w-4 text-primary flex-shrink-0" />
-                    {gem.gem_name}
-                  </h4>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => handleDelete(gem.id)}
-                    className="h-8 w-8 p-0 text-destructive hover:text-destructive hover:bg-destructive/10"
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
+          <div className="space-y-6">
+            {(() => {
+              // Group gems by category
+              const gemsByCategory = gems.reduce((acc, gem) => {
+                const cat = gem.category || "Other";
+                if (!acc[cat]) acc[cat] = [];
+                acc[cat].push(gem);
+                return acc;
+              }, {} as Record<string, typeof gems>);
+
+              // Sort categories alphabetically
+              const sortedCategories = Object.keys(gemsByCategory).sort();
+
+              return sortedCategories.map((category) => (
+                <div key={category}>
+                  <h3 className="text-lg font-semibold mb-3 flex items-center gap-2 text-primary">
+                    <Gem className="h-5 w-5" />
+                    {category}
+                  </h3>
+                  <div className="space-y-3 ml-2">
+                    {gemsByCategory[category].map((gem) => (
+                      <div
+                        key={gem.id}
+                        className="p-4 border rounded-lg bg-card hover:shadow-md transition-shadow"
+                      >
+                        <div className="flex items-start justify-between gap-2 mb-2">
+                          <h4 className="font-semibold text-base">
+                            {gem.gem_name}
+                          </h4>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleDelete(gem.id)}
+                            className="h-8 w-8 p-0 text-destructive hover:text-destructive hover:bg-destructive/10"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
+                        <p className="text-sm text-muted-foreground whitespace-pre-wrap">
+                          {gem.gem_content}
+                        </p>
+                        <p className="text-xs text-muted-foreground mt-2">
+                          Added {new Date(gem.created_at).toLocaleDateString()}
+                        </p>
+                      </div>
+                    ))}
+                  </div>
                 </div>
-                <p className="text-sm text-muted-foreground whitespace-pre-wrap">
-                  {gem.gem_content}
-                </p>
-                <p className="text-xs text-muted-foreground mt-2">
-                  Added {new Date(gem.created_at).toLocaleDateString()}
-                </p>
-              </div>
-            ))}
+              ));
+            })()}
           </div>
         )}
       </CardContent>
