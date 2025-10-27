@@ -37,7 +37,7 @@ export const MessagingSidebar = () => {
     isLoading
   } = useDirectMessages();
 
-  const [view, setView] = useState<'list' | 'chat' | 'users'>('list');
+  const [view, setView] = useState<'list' | 'chat' | 'users'>('users');
   const [messageInput, setMessageInput] = useState('');
   const [typingTimeout, setTypingTimeout] = useState<NodeJS.Timeout | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -94,7 +94,7 @@ export const MessagingSidebar = () => {
               variant="ghost"
               size="icon"
               className="relative"
-              onClick={() => setView('list')}
+              onClick={() => setView('users')}
             >
               <MessageCircle className="h-5 w-5" />
               {totalUnread > 0 && (
