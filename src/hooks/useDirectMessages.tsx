@@ -190,18 +190,42 @@ export const useDirectMessages = () => {
 
   // Send a message
   const sendMessage = useCallback(async (content: string) => {
-    if (!user || !activeConversationId || !content.trim()) return;
+    console.log('sendMessage called', { user: !!user, activeConversationId, content: content.trim() });
+    
+    if (!user) {
+      console.error('No user found');
+      return;
+    }
+    
+    if (!activeConversationId) {
+      console.error('No active conversation');
+      toast({
+        title: 'Error',
+        description: 'No active conversation',
+        variant: 'destructive'
+      });
+      return;
+    }
+    
+    if (!content.trim()) {
+      console.error('Empty message');
+      return;
+    }
 
     try {
-      const { error } = await supabase
+      console.log('Inserting message...');
+      const { data, error } = await supabase
         .from('messages')
         .insert({
           conversation_id: activeConversationId,
           sender_id: user.id,
           content: content.trim()
-        });
+        })
+        .select();
 
       if (error) throw error;
+      
+      console.log('Message inserted successfully', data);
 
       // Update conversation timestamp
       await supabase
