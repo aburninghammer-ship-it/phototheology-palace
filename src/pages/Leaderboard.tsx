@@ -60,13 +60,54 @@ const Leaderboard = () => {
   };
 
   const fetchLeaders = async () => {
-    const { data } = await supabase
-      .from("profiles")
-      .select("id, username, display_name, points, level")
-      .order("points", { ascending: false })
-      .limit(50);
-    
-    setLeaders(data || []);
+    if (sortBy === 'points') {
+      // Sort by points (default)
+      const { data } = await supabase
+        .from("profiles")
+        .select("id, username, display_name, points, level")
+        .order("points", { ascending: false })
+        .limit(50);
+      
+      setLeaders(data || []);
+    } else if (sortBy === 'challenges') {
+      // Sort by challenges completed
+      const { data: profiles } = await supabase
+        .from("profiles")
+        .select("id, username, display_name, points, level");
+
+      if (profiles) {
+        // Get challenge counts for each user
+        const leadersWithChallenges = await Promise.all(
+          profiles.map(async (profile) => {
+            const { data: submissions } = await supabase
+              .from("challenge_submissions")
+              .select("id")
+              .eq("user_id", profile.id);
+            
+            return {
+              ...profile,
+              challengeCount: submissions?.length || 0
+            };
+          })
+        );
+
+        // Sort by challenge count and take top 50
+        const sorted = leadersWithChallenges
+          .sort((a, b) => b.challengeCount - a.challengeCount)
+          .slice(0, 50);
+        
+        setLeaders(sorted);
+      }
+    } else if (sortBy === 'studies') {
+      // Sort by study activity (daily streak)
+      const { data } = await supabase
+        .from("profiles")
+        .select("id, username, display_name, points, level, daily_study_streak")
+        .order("daily_study_streak", { ascending: false })
+        .limit(50);
+      
+      setLeaders(data || []);
+    }
   };
 
   if (!user) return null;
@@ -164,21 +205,17 @@ const Leaderboard = () => {
                   variant={sortBy === 'challenges' ? 'default' : 'outline'}
                   onClick={() => setSortBy('challenges')}
                   className="flex items-center gap-2"
-                  disabled
                 >
                   <Target className="h-4 w-4" />
                   By Challenges
-                  <Badge variant="secondary" className="ml-1">Soon</Badge>
                 </Button>
                 <Button
                   variant={sortBy === 'studies' ? 'default' : 'outline'}
                   onClick={() => setSortBy('studies')}
                   className="flex items-center gap-2"
-                  disabled
                 >
                   <Trophy className="h-4 w-4" />
                   By Studies
-                  <Badge variant="secondary" className="ml-1">Soon</Badge>
                 </Button>
               </div>
             </CardContent>
@@ -217,13 +254,29 @@ const Leaderboard = () => {
                             )}
                           </div>
                           <p className="text-sm text-muted-foreground">
-                            Level {leader.level} • 0 challenges • 0 studies
+                            Level {leader.level} • {sortBy === 'challenges' ? leader.challengeCount || 0 : 0} challenges • {sortBy === 'studies' ? leader.daily_study_streak || 0 : 0} day streak
                           </p>
                         </div>
                       </div>
                       <div className="text-right">
-                        <p className="text-3xl font-bold text-purple-600 dark:text-purple-400">{leader.points}</p>
-                        <p className="text-sm text-muted-foreground">points</p>
+                        {sortBy === 'points' && (
+                          <>
+                            <p className="text-3xl font-bold text-purple-600 dark:text-purple-400">{leader.points}</p>
+                            <p className="text-sm text-muted-foreground">points</p>
+                          </>
+                        )}
+                        {sortBy === 'challenges' && (
+                          <>
+                            <p className="text-3xl font-bold text-purple-600 dark:text-purple-400">{leader.challengeCount || 0}</p>
+                            <p className="text-sm text-muted-foreground">challenges</p>
+                          </>
+                        )}
+                        {sortBy === 'studies' && (
+                          <>
+                            <p className="text-3xl font-bold text-purple-600 dark:text-purple-400">{leader.daily_study_streak || 0}</p>
+                            <p className="text-sm text-muted-foreground">day streak</p>
+                          </>
+                        )}
                       </div>
                     </div>
                   );
