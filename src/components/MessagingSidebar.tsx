@@ -18,11 +18,11 @@ import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
-import { MessageCircle, Send, ArrowLeft, Users as UsersIcon } from 'lucide-react';
+import { MessageCircle, Send, ArrowLeft, Users as UsersIcon, X } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 
 export const MessagingSidebar = () => {
-  const { state } = useSidebar();
+  const { state, toggleSidebar } = useSidebar();
   const { user } = useAuth();
   const { activeUsers } = useActiveUsers();
   const {
@@ -121,13 +121,22 @@ export const MessagingSidebar = () => {
             <SidebarGroup>
               <SidebarGroupLabel className="flex items-center justify-between px-4">
                 <span>Messages</span>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => setView('users')}
-                >
-                  <UsersIcon className="h-4 w-4" />
-                </Button>
+                <div className="flex items-center gap-2">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setView('users')}
+                  >
+                    <UsersIcon className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={toggleSidebar}
+                  >
+                    <X className="h-4 w-4" />
+                  </Button>
+                </div>
               </SidebarGroupLabel>
               <SidebarGroupContent>
                 {isLoading ? (
@@ -195,16 +204,25 @@ export const MessagingSidebar = () => {
         {view === 'users' && (
           <>
             <SidebarGroup>
-              <SidebarGroupLabel className="flex items-center gap-2 px-4">
+              <SidebarGroupLabel className="flex items-center justify-between px-4">
+                <div className="flex items-center gap-2">
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => setView('list')}
+                    className="h-6 w-6"
+                  >
+                    <ArrowLeft className="h-4 w-4" />
+                  </Button>
+                  <span>Active Users</span>
+                </div>
                 <Button
                   variant="ghost"
-                  size="icon"
-                  onClick={() => setView('list')}
-                  className="h-6 w-6"
+                  size="sm"
+                  onClick={toggleSidebar}
                 >
-                  <ArrowLeft className="h-4 w-4" />
+                  <X className="h-4 w-4" />
                 </Button>
-                <span>Active Users</span>
               </SidebarGroupLabel>
               <SidebarGroupContent>
                 <ScrollArea className="h-[calc(100vh-200px)]">
@@ -271,6 +289,13 @@ export const MessagingSidebar = () => {
                   </p>
                 )}
               </div>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={toggleSidebar}
+              >
+                <X className="h-4 w-4" />
+              </Button>
             </div>
 
             {/* Messages */}
