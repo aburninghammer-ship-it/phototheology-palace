@@ -250,9 +250,10 @@ export default function PalaceCardGame() {
     try {
       const { data, error } = await supabase.functions.invoke('validate-principle-application', {
         body: {
-          principle: `Parallel: ${pair.card1.eventTitle} ↔ ${pair.card2.eventTitle}`,
+          principle: `Parallel: ${pair.card1.eventTitle} ↔ ${pair.card2.eventTitle}. Key connection: ${pair.parallelKey}`,
           application: pair.userAnswer,
           correctAnswer: pair.parallelKey,
+          validateConcept: true, // Focus on conceptual understanding, not verse citations
         },
       });
 
@@ -391,18 +392,18 @@ export default function PalaceCardGame() {
               {matchedPairs.map((pair, index) => (
                 <Card
                   key={`pair-${index}`}
-                  className={`overflow-hidden ${pair.isValidated ? 'ring-2 ring-green-500' : ''}`}
+                  className={`overflow-hidden bg-card/95 backdrop-blur ${pair.isValidated ? 'ring-2 ring-green-500' : ''}`}
                 >
                   <div className={`h-2 bg-gradient-to-r ${pair.card1.color}`} />
                   <CardContent className="p-6 space-y-4">
-                    <div className="border-l-4 border-primary pl-4">
+                    <div className="bg-muted/50 rounded-lg p-4 border-l-4 border-primary">
                       <h3 className="font-bold text-base mb-1">{pair.card1.eventTitle}</h3>
                       <p className="text-sm text-muted-foreground">{pair.card1.eventReference}</p>
                     </div>
 
-                    <div className="text-center text-2xl">⇅</div>
+                    <div className="text-center text-2xl opacity-50">⇅</div>
 
-                    <div className="border-l-4 border-secondary pl-4">
+                    <div className="bg-muted/50 rounded-lg p-4 border-l-4 border-primary">
                       <h3 className="font-bold text-base mb-1">{pair.card2.eventTitle}</h3>
                       <p className="text-sm text-muted-foreground">{pair.card2.eventReference}</p>
                     </div>
@@ -411,13 +412,13 @@ export default function PalaceCardGame() {
                       <>
                         <div className="space-y-2">
                           <label className="text-sm font-medium">
-                            Explain how these events parallel:
+                            Explain how these events parallel (no verse required):
                           </label>
                           <Textarea
                             value={pair.userAnswer}
                             onChange={(e) => handleAnswerChange(index, e.target.value)}
-                            placeholder="What connects these biblical events?"
-                            className="min-h-[100px]"
+                            placeholder="Focus on the connections and patterns between these events..."
+                            className="min-h-[100px] bg-background/50"
                           />
                         </div>
                         <Button
