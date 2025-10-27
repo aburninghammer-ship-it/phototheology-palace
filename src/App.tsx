@@ -167,6 +167,8 @@ function App() {
             <Route path="/games/concentration-room" element={<ProtectedRoute><ConcentrationRoom /></ProtectedRoute>} />
             <Route path="/games/dimensions-room" element={<ProtectedRoute><DimensionsRoom /></ProtectedRoute>} />
             <Route path="/games/blue-room" element={<ProtectedRoute><BlueRoomGame /></ProtectedRoute>} />
+            {/* Redirect routes for easier access */}
+            <Route path="/chain-chess" element={<ProtectedRoute><ChainChess /></ProtectedRoute>} />
             <Route path="/games/chain-chess/:gameId/:mode?" element={<ProtectedRoute><ChainChess /></ProtectedRoute>} />
             <Route path="/games/concentration" element={<ProtectedRoute><ConcentrationGame /></ProtectedRoute>} />
             <Route path="/games/palace-cards" element={<ProtectedRoute><PalaceCardGame /></ProtectedRoute>} />
