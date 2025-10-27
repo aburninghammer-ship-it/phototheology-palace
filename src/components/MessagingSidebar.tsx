@@ -240,10 +240,11 @@ export const MessagingSidebar = () => {
 
           {/* Right Panel - Chat Window */}
           <div className="flex-1 flex flex-col">
-            {activeConversationId && activeConversation ? (
-              <>
-                {/* Chat Header */}
-                <div className="flex items-center gap-2 p-3 border-b">
+            {activeConversationId ? (
+              activeConversation ? (
+                <>
+                  {/* Chat Header */}
+                  <div className="flex items-center gap-2 p-3 border-b">
                   <Avatar className="h-9 w-9">
                     <AvatarImage src={activeConversation.other_user.avatar_url || undefined} />
                     <AvatarFallback>
@@ -341,6 +342,14 @@ export const MessagingSidebar = () => {
                   </div>
                 </div>
               </>
+              ) : (
+                <div className="flex-1 flex items-center justify-center p-6">
+                  <div className="text-center text-muted-foreground">
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-3" />
+                    <p className="text-sm">Loading conversation...</p>
+                  </div>
+                </div>
+              )
             ) : (
               <div className="flex-1 flex items-center justify-center p-6">
                 <div className="text-center text-muted-foreground">
