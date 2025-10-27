@@ -95,10 +95,6 @@ const ObservationGame = lazy(() => import("./pages/games/ObservationGame"));
 const ConcentrationRoom = lazy(() => import("./pages/games/ConcentrationRoom"));
 const DimensionsRoom = lazy(() => import("./pages/games/DimensionsRoom"));
 const BlueRoomGame = lazy(() => import("./pages/games/BlueRoomGame"));
-const QuestionRoom = lazy(() => import("./pages/games/QuestionRoom"));
-const FreestyleRoom = lazy(() => import("./pages/games/FreestyleRoom"));
-const VerseGenetics = lazy(() => import("./pages/games/VerseGenetics"));
-const ObservationRoomGame = lazy(() => import("./pages/games/ObservationRoom"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
 const queryClient = new QueryClient();
@@ -165,12 +161,9 @@ function App() {
             <Route path="/games/escape-dragon" element={<ProtectedRoute><EscapeTheDragon /></ProtectedRoute>} />
             <Route path="/games/equation-builder" element={<ProtectedRoute><EquationBuilder /></ProtectedRoute>} />
             <Route path="/games/witness-trial" element={<ProtectedRoute><WitnessTrial /></ProtectedRoute>} />
-            <Route path="/games/question-room" element={<ProtectedRoute><QuestionRoom /></ProtectedRoute>} />
-            <Route path="/games/freestyle-room" element={<ProtectedRoute><FreestyleRoom /></ProtectedRoute>} />
-            <Route path="/games/verse-genetics" element={<ProtectedRoute><VerseGenetics /></ProtectedRoute>} />
-            <Route path="/games/observation-room" element={<ProtectedRoute><ObservationRoomGame /></ProtectedRoute>} />
             <Route path="/games/frame-snapshot" element={<ProtectedRoute><FrameSnapshot /></ProtectedRoute>} />
             <Route path="/games/story-room" element={<ProtectedRoute><StoryRoomGame /></ProtectedRoute>} />
+            <Route path="/games/observation-room" element={<ProtectedRoute><ObservationGame /></ProtectedRoute>} />
             <Route path="/games/concentration-room" element={<ProtectedRoute><ConcentrationRoom /></ProtectedRoute>} />
             <Route path="/games/dimensions-room" element={<ProtectedRoute><DimensionsRoom /></ProtectedRoute>} />
             <Route path="/games/blue-room" element={<ProtectedRoute><BlueRoomGame /></ProtectedRoute>} />

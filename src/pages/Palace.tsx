@@ -6,15 +6,16 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { useAuth } from "@/hooks/useAuth";
-import { usePalaceProgress } from "@/hooks/usePalaceProgress";
+import { useCourseProgress } from "@/hooks/useCourseProgress";
 import { Link } from "react-router-dom";
 
 const Palace = () => {
   const { user } = useAuth();
-  const { completedRooms, loading } = usePalaceProgress();
+  const { progress } = useCourseProgress("Memory Palace");
   
   const totalRooms = 38;
-  const progressPercentage = totalRooms > 0 ? Math.round((completedRooms / totalRooms) * 100) : 0;
+  const completedRooms = progress?.completed_lessons?.length || 0;
+  const progressPercentage = progress?.progress_percentage || 0;
 
   return (
     <div className="min-h-screen bg-gradient-subtle">
@@ -61,10 +62,10 @@ const Palace = () => {
               <Button asChild size="lg" className="gradient-palace text-white">
                 <Link to={user ? "/games/palace_quiz" : "/auth"}>
                   <Building2 className="mr-2 h-4 w-4" />
-              {user ? "Continue Learning" : "Start Your Journey"}
+                  {user ? "Continue Learning" : "Start Your Journey"}
                 </Link>
               </Button>
-              {completedRooms === totalRooms && (
+              {progress?.completed_at && (
                 <Button asChild size="lg" variant="outline">
                   <Link to="/certificates">
                     <Award className="mr-2 h-4 w-4" />
