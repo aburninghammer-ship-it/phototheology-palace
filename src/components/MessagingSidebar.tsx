@@ -54,14 +54,19 @@ export const MessagingSidebar = () => {
       console.log('Open chat sidebar event received:', e.detail);
       if (e.detail?.conversationId) {
         setActiveConversationId(e.detail.conversationId);
-        toggleSidebar();
+        // Use setOpen to force sidebar open if it's available
+        if (setOpen) {
+          setOpen(true);
+        } else if (state === 'collapsed') {
+          toggleSidebar();
+        }
         setActiveTab('conversations');
       }
     };
     
     window.addEventListener('open-chat-sidebar' as any, handleOpenChat);
     return () => window.removeEventListener('open-chat-sidebar' as any, handleOpenChat);
-  }, [setActiveConversationId, toggleSidebar]);
+  }, [setActiveConversationId, toggleSidebar, setOpen, state]);
 
   // Auto-scroll to bottom when messages change
   useEffect(() => {
@@ -69,9 +74,13 @@ export const MessagingSidebar = () => {
   }, [messages]);
 
   const handleStartChat = async (userId: string) => {
+    console.log('👤 Starting chat with user:', userId);
     const convId = await startConversation(userId);
     if (convId) {
+      console.log('✅ Conversation created/found:', convId);
       setActiveConversationId(convId);
+    } else {
+      console.error('❌ Failed to create/find conversation');
     }
   };
 
@@ -189,12 +198,16 @@ export const MessagingSidebar = () => {
                 ) : (
                   <ScrollArea className="h-full">
                     <div className="space-y-1 p-2">
-                      {conversations.map((conv) => {
+                       {conversations.map((conv) => {
                         const isActive = conv.id === activeConversationId;
                         return (
                           <button
                             key={conv.id}
-                            onClick={() => setActiveConversationId(conv.id)}
+                            onClick={() => {
+                              console.log('📱 Conversation clicked:', conv.id);
+                              console.log('Other user:', conv.other_user.display_name);
+                              setActiveConversationId(conv.id);
+                            }}
                             className={`w-full p-2 rounded-lg hover:bg-accent transition-colors text-left ${
                               isActive ? 'bg-accent' : ''
                             }`}

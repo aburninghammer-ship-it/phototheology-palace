@@ -194,30 +194,33 @@ export const useDirectMessages = () => {
 
   // Send a message
   const sendMessage = useCallback(async (content: string) => {
-    console.log('sendMessage called', { user: !!user, activeConversationId, content: content.trim() });
+    console.log('=== SENDING MESSAGE ===');
+    console.log('User:', user?.id);
+    console.log('Active Conversation:', activeConversationId);
+    console.log('Content:', content.trim());
     
     if (!user) {
-      console.error('No user found');
+      console.error('❌ No user found');
       return;
     }
     
     if (!activeConversationId) {
-      console.error('No active conversation');
+      console.error('❌ No active conversation');
       toast({
         title: 'Error',
-        description: 'No active conversation',
+        description: 'No active conversation selected',
         variant: 'destructive'
       });
       return;
     }
     
     if (!content.trim()) {
-      console.error('Empty message');
+      console.error('❌ Empty message');
       return;
     }
 
     try {
-      console.log('Inserting message...');
+      console.log('📤 Inserting message into database...');
       const { data, error } = await supabase
         .from('messages')
         .insert({
@@ -225,22 +228,33 @@ export const useDirectMessages = () => {
           sender_id: user.id,
           content: content.trim()
         })
-        .select();
+        .select()
+        .single();
 
-      if (error) throw error;
+      if (error) {
+        console.error('❌ Database error:', error);
+        throw error;
+      }
       
-      console.log('Message inserted successfully', data);
+      console.log('✅ Message inserted successfully:', data);
 
       // Update conversation timestamp
-      await supabase
+      console.log('📅 Updating conversation timestamp...');
+      const { error: updateError } = await supabase
         .from('conversations')
         .update({ updated_at: new Date().toISOString() })
         .eq('id', activeConversationId);
-    } catch (error) {
-      console.error('Error sending message:', error);
+
+      if (updateError) {
+        console.error('⚠️ Failed to update conversation timestamp:', updateError);
+      } else {
+        console.log('✅ Conversation timestamp updated');
+      }
+    } catch (error: any) {
+      console.error('❌ Error sending message:', error);
       toast({
-        title: 'Error',
-        description: 'Failed to send message',
+        title: 'Failed to send message',
+        description: error.message || 'Please try again',
         variant: 'destructive'
       });
     }
