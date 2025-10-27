@@ -76,15 +76,20 @@ export const useDirectMessages = () => {
             .limit(1)
             .single();
 
-          // Count unread messages
+          // Count unread messages - first get read message IDs, then filter
+          const { data: readStatus } = await supabase
+            .from('message_read_status')
+            .select('message_id')
+            .eq('user_id', user.id);
+          
+          const readMessageIds = readStatus?.map(r => r.message_id) || [];
+          
           const { data: unreadMessages } = await supabase
             .from('messages')
             .select('id')
             .eq('conversation_id', convo.id)
             .neq('sender_id', user.id)
-            .not('id', 'in', `(
-              SELECT message_id FROM message_read_status WHERE user_id = '${user.id}'
-            )`);
+            .not('id', 'in', `(${readMessageIds.length > 0 ? readMessageIds.join(',') : 'null'})`);
 
           return {
             ...convo,

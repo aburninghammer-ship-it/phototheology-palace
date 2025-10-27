@@ -39,11 +39,11 @@ export const useActiveUsers = () => {
       if (!isSubscribed || retryCount >= maxRetries) return;
       
       try {
-        const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000).toISOString();
+        const fifteenMinutesAgo = new Date(Date.now() - 15 * 60 * 1000).toISOString();
         const { data, count, error } = await supabase
           .from("profiles")
           .select("id, username, display_name, avatar_url, last_seen", { count: "exact" })
-          .gte("last_seen", fiveMinutesAgo)
+          .gte("last_seen", fifteenMinutesAgo)
           .order("last_seen", { ascending: false });
         
         if (!error && isSubscribed) {
