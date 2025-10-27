@@ -8,6 +8,8 @@ import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { OfflineIndicator } from "@/components/OfflineIndicator";
 import { LoadingScreen } from "@/components/LoadingScreen";
 import { ProtectedRoute } from "./components/ProtectedRoute";
+import { SidebarProvider } from "@/components/ui/sidebar";
+import { MessagingSidebar } from "@/components/MessagingSidebar";
 
 // Critical pages - load immediately
 import Index from "./pages/Index";
@@ -101,8 +103,12 @@ function App() {
           <Sonner />
           <OfflineIndicator />
           <BrowserRouter>
-            <Suspense fallback={<LoadingScreen />}>
-              <Routes>
+            <SidebarProvider defaultOpen={false}>
+              <div className="min-h-screen flex w-full">
+                <MessagingSidebar />
+                <main className="flex-1">
+                  <Suspense fallback={<LoadingScreen />}>
+                    <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/auth" element={<Auth />} />
             <Route path="/onboarding" element={
@@ -197,10 +203,13 @@ function App() {
             <Route path="/admin/access-codes" element={<ProtectedRoute><AdminAccessCodes /></ProtectedRoute>} />
             <Route path="/certificates" element={<ProtectedRoute><Certificates /></ProtectedRoute>} />
             <Route path="/study-partners" element={<ProtectedRoute><StudyPartners /></ProtectedRoute>} />
-            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-            <Route path="*" element={<NotFound />} />
-              </Routes>
-            </Suspense>
+                {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+                <Route path="*" element={<NotFound />} />
+                    </Routes>
+                  </Suspense>
+                </main>
+              </div>
+            </SidebarProvider>
           </BrowserRouter>
         </TooltipProvider>
       </QueryClientProvider>

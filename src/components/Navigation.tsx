@@ -1,10 +1,13 @@
 import { Link, useLocation } from "react-router-dom";
 // Import all required icons from lucide-react
-import { Building2, Sparkles, Users, BookOpen, User, CreditCard, LogOut, Gift, Clock } from "lucide-react";
+import { Building2, Sparkles, Users, BookOpen, User, CreditCard, LogOut, Gift, Clock, MessageCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
 import { useActiveUsers } from "@/hooks/useActiveUsers";
 import { MobileNav } from "@/components/MobileNav";
+import { useSidebar } from "@/components/ui/sidebar";
+import { useDirectMessages } from "@/hooks/useDirectMessages";
+import { Badge } from "@/components/ui/badge";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -18,6 +21,10 @@ export const Navigation = () => {
   const isBiblePage = location.pathname.startsWith('/bible');
   const { user, signOut } = useAuth();
   const { activeCount } = useActiveUsers();
+  const { toggleSidebar } = useSidebar();
+  const { conversations } = useDirectMessages();
+  
+  const totalUnread = conversations.reduce((sum, c) => sum + c.unread_count, 0);
   
   return (
     <>
@@ -36,10 +43,29 @@ export const Navigation = () => {
           
           <div className="flex items-center gap-3">
             {user && (
-              <div className="hidden md:flex items-center gap-2 text-sm text-muted-foreground">
-                <Users className="h-4 w-4" />
-                <span>{activeCount} active</span>
-              </div>
+              <>
+                <div className="hidden md:flex items-center gap-2 text-sm text-muted-foreground">
+                  <Users className="h-4 w-4" />
+                  <span>{activeCount} active</span>
+                </div>
+                
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={toggleSidebar}
+                  className="relative"
+                >
+                  <MessageCircle className="h-4 w-4" />
+                  {totalUnread > 0 && (
+                    <Badge 
+                      variant="destructive" 
+                      className="absolute -top-1 -right-1 h-4 w-4 p-0 flex items-center justify-center text-[10px]"
+                    >
+                      {totalUnread > 9 ? '9+' : totalUnread}
+                    </Badge>
+                  )}
+                </Button>
+              </>
             )}
 
             {user ? (
