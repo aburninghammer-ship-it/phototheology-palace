@@ -28,9 +28,9 @@ export const Navigation = () => {
   
   return (
     <>
-      <nav className="fixed top-0 left-0 right-0 z-50 bg-card/95 backdrop-blur-xl border-b border-border shadow-purple">
+      <nav className="fixed top-0 left-0 right-0 z-40 bg-card/95 backdrop-blur-xl border-b border-border shadow-sm">
         <div className="container mx-auto px-4">
-          <div className="flex items-center justify-between h-14">
+          <div className="flex items-center justify-between h-12">
           <Link to="/" className="flex items-center gap-2 group">
             <div className="relative">
               <Building2 className="h-6 w-6 text-primary transition-all duration-300 group-hover:scale-110" />
@@ -329,7 +329,7 @@ export const Navigation = () => {
       </div>
     </nav>
     {/* Spacer to prevent content from being hidden behind fixed nav */}
-    <div className="h-14" />
+    <div className="h-12" />
     </>
   );
 };

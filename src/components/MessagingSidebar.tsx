@@ -259,7 +259,7 @@ export const MessagingSidebar = () => {
         {view === 'chat' && activeConversation && (
           <div className="flex flex-col h-full">
             {/* Chat Header */}
-            <div className="flex items-center gap-3 p-4 border-b">
+            <div className="flex items-center gap-2 p-3 border-b">
               <Button
                 variant="ghost"
                 size="icon"
@@ -267,7 +267,7 @@ export const MessagingSidebar = () => {
                   setActiveConversationId(null);
                   setView('list');
                 }}
-                className="h-8 w-8"
+                className="h-7 w-7"
               >
                 <ArrowLeft className="h-4 w-4" />
               </Button>
@@ -277,12 +277,12 @@ export const MessagingSidebar = () => {
                   {activeConversation.other_user.display_name?.charAt(0) || '?'}
                 </AvatarFallback>
               </Avatar>
-              <div className="flex-1">
-                <h3 className="font-medium text-sm">
+              <div className="flex-1 min-w-0">
+                <h3 className="font-medium text-sm truncate">
                   {activeConversation.other_user.display_name}
                 </h3>
                 {activeConversation.other_user.last_seen && (
-                  <p className="text-xs text-muted-foreground">
+                  <p className="text-xs text-muted-foreground truncate">
                     {formatDistanceToNow(new Date(activeConversation.other_user.last_seen), { 
                       addSuffix: true 
                     })}
@@ -291,8 +291,18 @@ export const MessagingSidebar = () => {
               </div>
               <Button
                 variant="ghost"
-                size="sm"
+                size="icon"
+                onClick={() => setView('users')}
+                className="h-7 w-7"
+                title="Browse active users"
+              >
+                <UsersIcon className="h-4 w-4" />
+              </Button>
+              <Button
+                variant="ghost"
+                size="icon"
                 onClick={toggleSidebar}
+                className="h-7 w-7"
               >
                 <X className="h-4 w-4" />
               </Button>
