@@ -8,13 +8,12 @@ import {
   SidebarContent,
   useSidebar
 } from '@/components/ui/sidebar';
-import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
-import { MessageCircle, Send, Users as UsersIcon, X } from 'lucide-react';
+import { MessageCircle, Users as UsersIcon, X } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 
 export const MessagingSidebar = () => {
