@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useDirectMessages } from '@/hooks/useDirectMessages';
 import { useAuth } from '@/hooks/useAuth';
 import { useActiveUsers } from '@/hooks/useActiveUsers';
+import { ChatInput } from '@/components/ChatInput';
 import {
   Sidebar,
   SidebarContent,
@@ -33,8 +34,6 @@ export const MessagingSidebar = () => {
   } = useDirectMessages();
 
   const [activeTab, setActiveTab] = useState<'active' | 'conversations'>('active');
-  const [messageInput, setMessageInput] = useState('');
-  const [typingTimeout, setTypingTimeout] = useState<NodeJS.Timeout | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const activeConversation = conversations.find(c => c.id === activeConversationId);
@@ -50,32 +49,6 @@ export const MessagingSidebar = () => {
     const convId = await startConversation(userId);
     if (convId) {
       setActiveConversationId(convId);
-    }
-  };
-
-  const handleSendMessage = async () => {
-    if (!messageInput.trim()) return;
-    
-    await sendMessage(messageInput);
-    setMessageInput('');
-    updateTypingIndicator(false);
-  };
-
-  const handleTyping = (value: string) => {
-    setMessageInput(value);
-    
-    if (typingTimeout) {
-      clearTimeout(typingTimeout);
-    }
-
-    if (value.trim()) {
-      updateTypingIndicator(true);
-      const timeout = setTimeout(() => {
-        updateTypingIndicator(false);
-      }, 3000);
-      setTypingTimeout(timeout);
-    } else {
-      updateTypingIndicator(false);
     }
   };
 
@@ -319,27 +292,13 @@ export const MessagingSidebar = () => {
 
                 {/* Message Input */}
                 <div className="p-3 border-t">
-                  <div className="flex gap-2">
-                    <Input
-                      value={messageInput}
-                      onChange={(e) => handleTyping(e.target.value)}
-                      onKeyDown={(e) => {
-                        if (e.key === 'Enter' && !e.shiftKey) {
-                          e.preventDefault();
-                          handleSendMessage();
-                        }
-                      }}
-                      placeholder="Type a message..."
-                      className="flex-1"
-                    />
-                    <Button
-                      size="icon"
-                      onClick={handleSendMessage}
-                      disabled={!messageInput.trim()}
-                    >
-                      <Send className="h-4 w-4" />
-                    </Button>
-                  </div>
+                  <ChatInput
+                    onSend={async (message) => {
+                      await sendMessage(message);
+                      updateTypingIndicator(false);
+                    }}
+                    placeholder="Type a message..."
+                  />
                 </div>
               </>
               ) : (
