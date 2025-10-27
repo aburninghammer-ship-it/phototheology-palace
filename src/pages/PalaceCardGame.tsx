@@ -153,9 +153,31 @@ export default function PalaceCardGame() {
     const selectedPairs = shuffled.slice(0, totalPairs);
     const allPairs = [...PARALLEL_PAIRS];
     
+    // Create a mapping of themes to avoid similar parallels as distractors
+    const themeKeywords = (parallelKey: string) => {
+      const lower = parallelKey.toLowerCase();
+      const themes: string[] = [];
+      if (lower.includes('defeat') || lower.includes('victory') || lower.includes('enemy')) themes.push('victory');
+      if (lower.includes('sacrifice') || lower.includes('offering') || lower.includes('death')) themes.push('sacrifice');
+      if (lower.includes('deliver') || lower.includes('freedom') || lower.includes('bondage') || lower.includes('slavery')) themes.push('deliverance');
+      if (lower.includes('creation') || lower.includes('life') || lower.includes('firstfruits')) themes.push('creation');
+      if (lower.includes('rest') || lower.includes('completed')) themes.push('rest');
+      if (lower.includes('light') || lower.includes('darkness')) themes.push('light');
+      if (lower.includes('save') || lower.includes('salvation')) themes.push('salvation');
+      return themes;
+    };
+    
     const cards: EventCard[] = selectedPairs.map((pair, index) => {
-      // Get 3 random distractors from other pairs
-      const otherPairs = allPairs.filter(p => p !== pair);
+      const pairThemes = themeKeywords(pair.parallelKey);
+      
+      // Get distractors from pairs with DIFFERENT themes to avoid plausible parallels
+      const otherPairs = allPairs.filter(p => {
+        if (p === pair) return false;
+        const otherThemes = themeKeywords(p.parallelKey);
+        // Avoid pairs that share ANY themes
+        return !pairThemes.some(theme => otherThemes.includes(theme));
+      });
+      
       const shuffledOthers = otherPairs.sort(() => Math.random() - 0.5);
       const distractors = shuffledOthers.slice(0, 3).map(p => ({
         title: p.event2Title,
