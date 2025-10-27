@@ -5,12 +5,6 @@ import { useActiveUsers } from '@/hooks/useActiveUsers';
 import {
   Sidebar,
   SidebarContent,
-  SidebarGroup,
-  SidebarGroupContent,
-  SidebarGroupLabel,
-  SidebarMenu,
-  SidebarMenuItem,
-  SidebarMenuButton,
   useSidebar
 } from '@/components/ui/sidebar';
 import { Input } from '@/components/ui/input';
@@ -18,7 +12,8 @@ import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
-import { MessageCircle, Send, ArrowLeft, Users as UsersIcon, X } from 'lucide-react';
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
+import { MessageCircle, Send, Users as UsersIcon, X } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 
 export const MessagingSidebar = () => {
@@ -37,7 +32,7 @@ export const MessagingSidebar = () => {
     isLoading
   } = useDirectMessages();
 
-  const [view, setView] = useState<'list' | 'chat' | 'users'>('users');
+  const [activeTab, setActiveTab] = useState<'active' | 'conversations'>('active');
   const [messageInput, setMessageInput] = useState('');
   const [typingTimeout, setTypingTimeout] = useState<NodeJS.Timeout | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -55,7 +50,6 @@ export const MessagingSidebar = () => {
     const convId = await startConversation(userId);
     if (convId) {
       setActiveConversationId(convId);
-      setView('chat');
     }
   };
 
@@ -94,7 +88,7 @@ export const MessagingSidebar = () => {
               variant="ghost"
               size="icon"
               className="relative"
-              onClick={() => setView('users')}
+              onClick={toggleSidebar}
             >
               <MessageCircle className="h-5 w-5" />
               {totalUnread > 0 && (
@@ -113,270 +107,250 @@ export const MessagingSidebar = () => {
   }
 
   return (
-    <Sidebar className="w-80" collapsible="icon">
-      <SidebarContent>
-        {/* Conversation List View */}
-        {view === 'list' && (
-          <>
-            <SidebarGroup>
-              <SidebarGroupLabel className="flex items-center justify-between px-4">
-                <span>Messages</span>
-                <div className="flex items-center gap-2">
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => setView('users')}
-                  >
-                    <UsersIcon className="h-4 w-4" />
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={toggleSidebar}
-                  >
-                    <X className="h-4 w-4" />
-                  </Button>
-                </div>
-              </SidebarGroupLabel>
-              <SidebarGroupContent>
+    <Sidebar className="w-96" collapsible="icon">
+      <SidebarContent className="flex flex-col h-full">
+        {/* Header */}
+        <div className="flex items-center justify-between p-4 border-b">
+          <h2 className="font-semibold text-lg">Messages</h2>
+          <Button variant="ghost" size="icon" onClick={toggleSidebar} className="h-8 w-8">
+            <X className="h-4 w-4" />
+          </Button>
+        </div>
+
+        {/* Split Layout */}
+        <div className="flex-1 flex overflow-hidden">
+          {/* Left Panel - User List */}
+          <div className="w-64 border-r flex flex-col">
+            <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as any)} className="flex flex-col h-full">
+              <TabsList className="grid w-full grid-cols-2 m-2">
+                <TabsTrigger value="active" className="text-xs">
+                  <UsersIcon className="h-3 w-3 mr-1" />
+                  Active ({activeUsers.filter(u => u.id !== user?.id).length})
+                </TabsTrigger>
+                <TabsTrigger value="conversations" className="text-xs relative">
+                  <MessageCircle className="h-3 w-3 mr-1" />
+                  Chats
+                  {totalUnread > 0 && (
+                    <Badge variant="destructive" className="ml-1 h-4 w-4 p-0 flex items-center justify-center text-[10px]">
+                      {totalUnread}
+                    </Badge>
+                  )}
+                </TabsTrigger>
+              </TabsList>
+
+              <TabsContent value="active" className="flex-1 m-0 overflow-hidden">
+                <ScrollArea className="h-full">
+                  <div className="space-y-1 p-2">
+                    {activeUsers
+                      .filter(u => u.id !== user?.id)
+                      .map((activeUser) => {
+                        const isActive = conversations.find(c => c.other_user.id === activeUser.id)?.id === activeConversationId;
+                        return (
+                          <button
+                            key={activeUser.id}
+                            onClick={() => handleStartChat(activeUser.id)}
+                            className={`w-full p-2 rounded-lg hover:bg-accent transition-colors text-left ${
+                              isActive ? 'bg-accent' : ''
+                            }`}
+                          >
+                            <div className="flex items-center gap-2">
+                              <div className="relative flex-shrink-0">
+                                <Avatar className="h-9 w-9">
+                                  <AvatarImage src={activeUser.avatar_url || undefined} />
+                                  <AvatarFallback className="text-xs">
+                                    {activeUser.display_name?.charAt(0) || '?'}
+                                  </AvatarFallback>
+                                </Avatar>
+                                <span className="absolute bottom-0 right-0 h-2.5 w-2.5 bg-green-500 rounded-full border-2 border-background" />
+                              </div>
+                              <span className="font-medium text-sm truncate">
+                                {activeUser.display_name}
+                              </span>
+                            </div>
+                          </button>
+                        );
+                      })}
+                  </div>
+                </ScrollArea>
+              </TabsContent>
+
+              <TabsContent value="conversations" className="flex-1 m-0 overflow-hidden">
                 {isLoading ? (
-                  <div className="p-4 text-center text-muted-foreground">
+                  <div className="p-4 text-center text-sm text-muted-foreground">
                     Loading...
                   </div>
                 ) : conversations.length === 0 ? (
-                  <div className="p-4 text-center text-muted-foreground">
+                  <div className="p-4 text-center text-sm text-muted-foreground">
                     <p className="mb-2">No conversations yet</p>
                     <Button
                       variant="outline"
                       size="sm"
-                      onClick={() => setView('users')}
+                      onClick={() => setActiveTab('active')}
                     >
-                      Start a conversation
+                      Find someone to chat with
                     </Button>
                   </div>
                 ) : (
-                  <ScrollArea className="h-[calc(100vh-200px)]">
-                    <SidebarMenu>
-                      {conversations.map((conv) => (
-                        <SidebarMenuItem key={conv.id}>
-                          <SidebarMenuButton
-                            onClick={() => {
-                              setActiveConversationId(conv.id);
-                              setView('chat');
-                            }}
-                            className="w-full justify-start gap-3 h-auto py-3"
+                  <ScrollArea className="h-full">
+                    <div className="space-y-1 p-2">
+                      {conversations.map((conv) => {
+                        const isActive = conv.id === activeConversationId;
+                        return (
+                          <button
+                            key={conv.id}
+                            onClick={() => setActiveConversationId(conv.id)}
+                            className={`w-full p-2 rounded-lg hover:bg-accent transition-colors text-left ${
+                              isActive ? 'bg-accent' : ''
+                            }`}
                           >
-                            <Avatar className="h-10 w-10">
-                              <AvatarImage src={conv.other_user.avatar_url || undefined} />
-                              <AvatarFallback>
-                                {conv.other_user.display_name?.charAt(0) || '?'}
-                              </AvatarFallback>
-                            </Avatar>
-                            <div className="flex-1 text-left overflow-hidden">
-                              <div className="flex items-center justify-between">
-                                <span className="font-medium truncate">
-                                  {conv.other_user.display_name}
-                                </span>
-                                {conv.unread_count > 0 && (
-                                  <Badge variant="destructive" className="ml-2 h-5 w-5 p-0 flex items-center justify-center text-xs">
-                                    {conv.unread_count}
-                                  </Badge>
-                                )}
-                              </div>
-                              {conv.last_message && (
-                                <p className="text-xs text-muted-foreground truncate">
-                                  {conv.last_message.content}
-                                </p>
-                              )}
-                            </div>
-                          </SidebarMenuButton>
-                        </SidebarMenuItem>
-                      ))}
-                    </SidebarMenu>
-                  </ScrollArea>
-                )}
-              </SidebarGroupContent>
-            </SidebarGroup>
-          </>
-        )}
-
-        {/* Active Users View */}
-        {view === 'users' && (
-          <>
-            <SidebarGroup>
-              <SidebarGroupLabel className="flex items-center justify-between px-4">
-                <div className="flex items-center gap-2">
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => setView('list')}
-                    className="h-6 w-6"
-                  >
-                    <ArrowLeft className="h-4 w-4" />
-                  </Button>
-                  <span>Active Users</span>
-                </div>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={toggleSidebar}
-                >
-                  <X className="h-4 w-4" />
-                </Button>
-              </SidebarGroupLabel>
-              <SidebarGroupContent>
-                <ScrollArea className="h-[calc(100vh-200px)]">
-                  <SidebarMenu>
-                    {activeUsers
-                      .filter(u => u.id !== user?.id)
-                      .map((activeUser) => (
-                        <SidebarMenuItem key={activeUser.id}>
-                          <SidebarMenuButton
-                            onClick={() => handleStartChat(activeUser.id)}
-                            className="w-full justify-start gap-3 h-auto py-3"
-                          >
-                            <div className="relative">
-                              <Avatar className="h-10 w-10">
-                                <AvatarImage src={activeUser.avatar_url || undefined} />
-                                <AvatarFallback>
-                                  {activeUser.display_name?.charAt(0) || '?'}
+                            <div className="flex items-center gap-2">
+                              <Avatar className="h-9 w-9 flex-shrink-0">
+                                <AvatarImage src={conv.other_user.avatar_url || undefined} />
+                                <AvatarFallback className="text-xs">
+                                  {conv.other_user.display_name?.charAt(0) || '?'}
                                 </AvatarFallback>
                               </Avatar>
-                              <span className="absolute bottom-0 right-0 h-3 w-3 bg-green-500 rounded-full border-2 border-background" />
+                              <div className="flex-1 min-w-0">
+                                <div className="flex items-center justify-between gap-1">
+                                  <span className="font-medium text-sm truncate">
+                                    {conv.other_user.display_name}
+                                  </span>
+                                  {conv.unread_count > 0 && (
+                                    <Badge variant="destructive" className="h-4 w-4 p-0 flex items-center justify-center text-[10px] flex-shrink-0">
+                                      {conv.unread_count}
+                                    </Badge>
+                                  )}
+                                </div>
+                                {conv.last_message && (
+                                  <p className="text-xs text-muted-foreground truncate">
+                                    {conv.last_message.content}
+                                  </p>
+                                )}
+                              </div>
                             </div>
-                            <span className="font-medium">{activeUser.display_name}</span>
-                          </SidebarMenuButton>
-                        </SidebarMenuItem>
-                      ))}
-                  </SidebarMenu>
-                </ScrollArea>
-              </SidebarGroupContent>
-            </SidebarGroup>
-          </>
-        )}
-
-        {/* Chat View */}
-        {view === 'chat' && activeConversation && (
-          <div className="flex flex-col h-full">
-            {/* Chat Header */}
-            <div className="flex items-center gap-2 p-3 border-b">
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => {
-                  setActiveConversationId(null);
-                  setView('users');
-                }}
-                className="h-7 w-7"
-              >
-                <ArrowLeft className="h-4 w-4" />
-              </Button>
-              <Avatar className="h-8 w-8">
-                <AvatarImage src={activeConversation.other_user.avatar_url || undefined} />
-                <AvatarFallback>
-                  {activeConversation.other_user.display_name?.charAt(0) || '?'}
-                </AvatarFallback>
-              </Avatar>
-              <div className="flex-1 min-w-0">
-                <h3 className="font-medium text-sm truncate">
-                  {activeConversation.other_user.display_name}
-                </h3>
-                {activeConversation.other_user.last_seen && (
-                  <p className="text-xs text-muted-foreground truncate">
-                    {formatDistanceToNow(new Date(activeConversation.other_user.last_seen), { 
-                      addSuffix: true 
-                    })}
-                  </p>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </ScrollArea>
                 )}
-              </div>
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={toggleSidebar}
-                className="h-7 w-7"
-              >
-                <X className="h-4 w-4" />
-              </Button>
-            </div>
+              </TabsContent>
+            </Tabs>
+          </div>
 
-            {/* Messages */}
-            <ScrollArea className="flex-1 p-4">
-              <div className="space-y-4">
-                {messages.map((message) => {
-                  const isOwn = message.sender_id === user?.id;
-                  const isRead = message.read_by && message.read_by.length > 1;
+          {/* Right Panel - Chat Window */}
+          <div className="flex-1 flex flex-col">
+            {activeConversationId && activeConversation ? (
+              <>
+                {/* Chat Header */}
+                <div className="flex items-center gap-2 p-3 border-b">
+                  <Avatar className="h-9 w-9">
+                    <AvatarImage src={activeConversation.other_user.avatar_url || undefined} />
+                    <AvatarFallback>
+                      {activeConversation.other_user.display_name?.charAt(0) || '?'}
+                    </AvatarFallback>
+                  </Avatar>
+                  <div className="flex-1 min-w-0">
+                    <h3 className="font-medium text-sm truncate">
+                      {activeConversation.other_user.display_name}
+                    </h3>
+                    {activeConversation.other_user.last_seen && (
+                      <p className="text-xs text-muted-foreground truncate">
+                        {formatDistanceToNow(new Date(activeConversation.other_user.last_seen), { 
+                          addSuffix: true 
+                        })}
+                      </p>
+                    )}
+                  </div>
+                </div>
 
-                  return (
-                    <div
-                      key={message.id}
-                      className={`flex ${isOwn ? 'justify-end' : 'justify-start'}`}
-                    >
-                      <div
-                        className={`max-w-[75%] rounded-lg px-3 py-2 ${
-                          isOwn
-                            ? 'bg-primary text-primary-foreground'
-                            : 'bg-muted'
-                        }`}
-                      >
-                        <p className="text-sm">{message.content}</p>
-                        <div className="flex items-center gap-1 mt-1">
-                          <span className="text-[10px] opacity-70">
-                            {formatDistanceToNow(new Date(message.created_at), { 
-                              addSuffix: true 
-                            })}
-                          </span>
-                          {isOwn && isRead && (
-                            <span className="text-[10px] opacity-70">• Read</span>
-                          )}
+                {/* Messages */}
+                <ScrollArea className="flex-1 p-4">
+                  <div className="space-y-3">
+                    {messages.map((message) => {
+                      const isOwn = message.sender_id === user?.id;
+                      const isRead = message.read_by && message.read_by.length > 1;
+
+                      return (
+                        <div
+                          key={message.id}
+                          className={`flex ${isOwn ? 'justify-end' : 'justify-start'}`}
+                        >
+                          <div
+                            className={`max-w-[75%] rounded-lg px-3 py-2 ${
+                              isOwn
+                                ? 'bg-primary text-primary-foreground'
+                                : 'bg-muted'
+                            }`}
+                          >
+                            <p className="text-sm break-words">{message.content}</p>
+                            <div className="flex items-center gap-1 mt-1">
+                              <span className="text-[10px] opacity-70">
+                                {formatDistanceToNow(new Date(message.created_at), { 
+                                  addSuffix: true 
+                                })}
+                              </span>
+                              {isOwn && isRead && (
+                                <span className="text-[10px] opacity-70">• Read</span>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })}
+                    
+                    {/* Typing Indicator */}
+                    {typingUsers.size > 0 && (
+                      <div className="flex justify-start">
+                        <div className="bg-muted rounded-lg px-3 py-2">
+                          <div className="flex gap-1">
+                            <span className="w-2 h-2 bg-primary rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
+                            <span className="w-2 h-2 bg-primary rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
+                            <span className="w-2 h-2 bg-primary rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  );
-                })}
-                
-                {/* Typing Indicator */}
-                {typingUsers.size > 0 && (
-                  <div className="flex justify-start">
-                    <div className="bg-muted rounded-lg px-3 py-2">
-                      <div className="flex gap-1">
-                        <span className="w-2 h-2 bg-primary rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
-                        <span className="w-2 h-2 bg-primary rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
-                        <span className="w-2 h-2 bg-primary rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
-                      </div>
-                    </div>
+                    )}
+                    
+                    <div ref={messagesEndRef} />
                   </div>
-                )}
-                
-                <div ref={messagesEndRef} />
-              </div>
-            </ScrollArea>
+                </ScrollArea>
 
-            {/* Message Input */}
-            <div className="p-4 border-t">
-              <div className="flex gap-2">
-                <Input
-                  value={messageInput}
-                  onChange={(e) => handleTyping(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter' && !e.shiftKey) {
-                      e.preventDefault();
-                      handleSendMessage();
-                    }
-                  }}
-                  placeholder="Type a message..."
-                  className="flex-1"
-                />
-                <Button
-                  size="icon"
-                  onClick={handleSendMessage}
-                  disabled={!messageInput.trim()}
-                >
-                  <Send className="h-4 w-4" />
-                </Button>
+                {/* Message Input */}
+                <div className="p-3 border-t">
+                  <div className="flex gap-2">
+                    <Input
+                      value={messageInput}
+                      onChange={(e) => handleTyping(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' && !e.shiftKey) {
+                          e.preventDefault();
+                          handleSendMessage();
+                        }
+                      }}
+                      placeholder="Type a message..."
+                      className="flex-1"
+                    />
+                    <Button
+                      size="icon"
+                      onClick={handleSendMessage}
+                      disabled={!messageInput.trim()}
+                    >
+                      <Send className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </div>
+              </>
+            ) : (
+              <div className="flex-1 flex items-center justify-center p-6">
+                <div className="text-center text-muted-foreground">
+                  <MessageCircle className="h-12 w-12 mx-auto mb-3 opacity-50" />
+                  <p className="text-sm">Select a conversation or active user to start chatting</p>
+                </div>
               </div>
-            </div>
+            )}
           </div>
-        )}
+        </div>
       </SidebarContent>
     </Sidebar>
   );
