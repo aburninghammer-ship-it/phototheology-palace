@@ -158,7 +158,7 @@ export default function Auth() {
     try {
       const redirectUrl = `${window.location.origin}/`;
       
-      const { error } = await supabase.auth.signUp({
+      const { data, error } = await supabase.auth.signUp({
         email: signupEmail,
         password: signupPassword,
         options: {
@@ -171,7 +171,7 @@ export default function Auth() {
       });
 
       if (error) {
-        if (error.message.includes("already registered")) {
+        if (error.message.includes("already registered") || error.message.includes("User already registered")) {
           setError("This email is already registered. Please login instead.");
         } else if (error.message.includes("invalid email")) {
           setError("Please enter a valid email address.");
@@ -181,8 +181,15 @@ export default function Auth() {
         return;
       }
 
-      toast.success("Account created! Welcome to Phototheology!");
-      navigate("/onboarding");
+      // Check if user was created (not just "fake" success for existing email)
+      if (data.user && data.session) {
+        toast.success("Account created! Welcome to Phototheology!");
+        navigate("/onboarding");
+      } else if (data.user && !data.session) {
+        toast.success("Account created! Please check your email to verify your account.");
+      } else {
+        setError("Account creation failed. This email may already be registered. Please try logging in instead.");
+      }
     } catch (err) {
       setError("An unexpected error occurred. Please try again.");
       console.error("Signup error:", err);
