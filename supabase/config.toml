@@ -48,3 +48,6 @@ verify_jwt = true
 
 [functions.generate-bible-rendered-images]
 verify_jwt = true
+
+[functions.apply-spiritual-weapon]
+verify_jwt = false

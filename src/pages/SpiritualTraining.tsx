@@ -5,7 +5,9 @@ import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Sword, Shield, Target, BookOpen, Flame, Trophy, Scroll } from "lucide-react";
+import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Sword, Shield, Target, BookOpen, Flame, Trophy, Scroll, Loader2 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -296,6 +298,12 @@ export default function SpiritualTraining() {
   const [selectedScenario, setSelectedScenario] = useState<Scenario | null>(null);
   const [userAnswer, setUserAnswer] = useState<number | null>(null);
   const [showResult, setShowResult] = useState(false);
+  
+  // Spiritual Weapon Application states
+  const [selectedWeapon, setSelectedWeapon] = useState<typeof SPIRITUAL_WEAPONS[0] | null>(null);
+  const [lifeSituation, setLifeSituation] = useState("");
+  const [isLoadingGuidance, setIsLoadingGuidance] = useState(false);
+  const [weaponGuidance, setWeaponGuidance] = useState("");
 
   const fetchDailyEncouragement = async () => {
     setLoadingEncouragement(true);
@@ -325,6 +333,37 @@ export default function SpiritualTraining() {
     setSelectedScenario(null);
     setUserAnswer(null);
     setShowResult(false);
+  };
+
+  const handleApplyWeapon = async () => {
+    if (!selectedWeapon || !lifeSituation.trim()) {
+      toast.error("Please select a weapon and describe your situation");
+      return;
+    }
+
+    setIsLoadingGuidance(true);
+    setWeaponGuidance("");
+
+    try {
+      const { data, error } = await supabase.functions.invoke('apply-spiritual-weapon', {
+        body: { weapon: selectedWeapon, situation: lifeSituation }
+      });
+
+      if (error) throw error;
+
+      if (data.error) {
+        toast.error(data.error);
+        return;
+      }
+
+      setWeaponGuidance(data.guidance);
+      toast.success("Guidance received!");
+    } catch (error) {
+      console.error('Error getting weapon guidance:', error);
+      toast.error("Failed to get guidance. Please try again.");
+    } finally {
+      setIsLoadingGuidance(false);
+    }
   };
 
   return (
@@ -566,6 +605,81 @@ export default function SpiritualTraining() {
                     </Card>
                   ))}
                 </div>
+              </CardContent>
+            </Card>
+
+            {/* AI-Powered Weapon Application */}
+            <Card className="border-primary/20">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Shield className="w-5 h-5" />
+                  Apply Weapons to Your Life
+                </CardTitle>
+                <CardDescription>
+                  Get personalized guidance on how to apply a spiritual weapon to a specific situation you're facing.
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">Select a Weapon</label>
+                  <Select
+                    value={selectedWeapon?.name}
+                    onValueChange={(name) => {
+                      const weapon = SPIRITUAL_WEAPONS.find(w => w.name === name);
+                      setSelectedWeapon(weapon || null);
+                      setWeaponGuidance(""); // Clear previous guidance
+                    }}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Choose a spiritual weapon..." />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {SPIRITUAL_WEAPONS.map((weapon) => (
+                        <SelectItem key={weapon.name} value={weapon.name}>
+                          {weapon.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">Describe Your Situation</label>
+                  <Textarea
+                    placeholder="Example: I'm facing criticism at work and struggling not to respond defensively..."
+                    value={lifeSituation}
+                    onChange={(e) => setLifeSituation(e.target.value)}
+                    className="min-h-[100px]"
+                  />
+                </div>
+
+                <Button 
+                  onClick={handleApplyWeapon}
+                  disabled={isLoadingGuidance || !selectedWeapon || !lifeSituation.trim()}
+                  className="w-full"
+                >
+                  {isLoadingGuidance ? (
+                    <>
+                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                      Getting Guidance...
+                    </>
+                  ) : (
+                    <>
+                      <Sword className="w-4 h-4 mr-2" />
+                      Get Application Guidance
+                    </>
+                  )}
+                </Button>
+
+                {weaponGuidance && (
+                  <Card className="bg-muted/50">
+                    <CardContent className="pt-6">
+                      <div className="prose prose-sm max-w-none">
+                        <div className="whitespace-pre-wrap">{weaponGuidance}</div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                )}
               </CardContent>
             </Card>
           </TabsContent>
