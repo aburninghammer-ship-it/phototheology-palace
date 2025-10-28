@@ -7,6 +7,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Navigation } from "@/components/Navigation";
 import { Footer } from "@/components/Footer";
 import { EmpowerYourMembers } from "@/components/churches/EmpowerYourMembers";
+import phototheologyHero from "@/assets/phototheology-hero.png";
 
 const Index = () => {
   const { toast } = useToast();
@@ -40,6 +41,15 @@ const Index = () => {
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(59,130,246,0.08),transparent_60%),radial-gradient(circle_at_70%_60%,rgba(20,184,166,0.08),transparent_60%)]" />
         
         <div className="container mx-auto max-w-4xl text-center relative z-10">
+          {/* Hero Image */}
+          <div className="mb-8 animate-fade-in">
+            <img 
+              src={phototheologyHero} 
+              alt="Phototheology - See the Bible with New Eyes" 
+              className="w-full max-w-3xl mx-auto rounded-2xl shadow-2xl"
+            />
+          </div>
+          
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3 mb-6">
             <div className="inline-flex items-center gap-2 px-5 py-2 rounded-full gradient-ocean border border-white/10 shadow-sm animate-fade-in">
               <Building2 className="h-4 w-4 text-white" />
