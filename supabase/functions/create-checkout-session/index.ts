@@ -17,9 +17,9 @@ interface CheckoutRequest {
 }
 
 const tierPricing = {
-  tier1: { price: 19900, name: "Church Access", seats: 50 },
-  tier2: { price: 39900, name: "Leadership Tools", seats: 150 },
-  tier3: { price: 69900, name: "Growth & Evangelism Suite", seats: 300 },
+  tier1: { priceId: "price_1SNEzoFGDAd3RU8Iwa8PSyLw", name: "Church Access", seats: 50 },
+  tier2: { priceId: "price_1SNFDxFGDAd3RU8IrvW3c5eS", name: "Leadership Tools", seats: 150 },
+  tier3: { priceId: "price_1SNFFMFGDAd3RU8IoasLs7ag", name: "Growth & Evangelism Suite", seats: 300 },
 };
 
 serve(async (req) => {
@@ -97,17 +97,7 @@ serve(async (req) => {
       payment_method_types: ['card'],
       line_items: [
         {
-          price_data: {
-            currency: 'usd',
-            product_data: {
-              name: `${pricing.name} - ${church_name}`,
-              description: `Up to ${pricing.seats} members`,
-            },
-            recurring: {
-              interval: 'month',
-            },
-            unit_amount: pricing.price,
-          },
+          price: pricing.priceId,
           quantity: 1,
         },
       ],
@@ -132,7 +122,7 @@ serve(async (req) => {
   } catch (error) {
     console.error('Error creating checkout session:', error);
     return new Response(
-      JSON.stringify({ error: error.message || 'Internal server error' }),
+      JSON.stringify({ error: error instanceof Error ? error.message : 'Internal server error' }),
       { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
   }
