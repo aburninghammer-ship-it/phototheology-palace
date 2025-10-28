@@ -39,7 +39,10 @@ export const useDirectMessages = () => {
 
   // Fetch conversations with unread counts
   const fetchConversations = useCallback(async () => {
-    if (!user?.id) return;
+    if (!user?.id) {
+      console.log('No user ID, skipping conversation fetch');
+      return;
+    }
 
     console.log('Fetching conversations for user:', user.id);
     try {
@@ -81,6 +84,21 @@ export const useDirectMessages = () => {
             .single();
 
           // Count unread messages - first get read message IDs, then filter
+          // Only query if user.id exists (extra guard)
+          if (!user?.id) {
+            return {
+              ...convo,
+              other_user: profile || {
+                id: otherId,
+                display_name: 'Unknown User',
+                avatar_url: null,
+                last_seen: null
+              },
+              last_message: lastMsg || undefined,
+              unread_count: 0
+            };
+          }
+
           const { data: readStatus } = await supabase
             .from('message_read_status')
             .select('message_id')
@@ -88,7 +106,7 @@ export const useDirectMessages = () => {
           
           const readMessageIds = readStatus?.map(r => r.message_id) || [];
           
-          // Build query for unread messages
+          // Build query for unread messages (user.id is guaranteed to exist here)
           let unreadQuery = supabase
             .from('messages')
             .select('id')
@@ -126,7 +144,10 @@ export const useDirectMessages = () => {
 
   // Fetch messages for active conversation
   const fetchMessages = useCallback(async (conversationId: string) => {
-    if (!user) return;
+    if (!user?.id) {
+      console.log('No user ID, skipping message fetch');
+      return;
+    }
 
     try {
       const { data, error } = await supabase
@@ -169,7 +190,10 @@ export const useDirectMessages = () => {
 
   // Start a conversation with a user
   const startConversation = useCallback(async (otherUserId: string) => {
-    if (!user) return null;
+    if (!user?.id) {
+      console.log('No user ID, cannot start conversation');
+      return null;
+    }
 
     try {
       const { data, error } = await supabase.rpc('get_or_create_conversation', {
