@@ -1327,6 +1327,36 @@ export type Database = {
         }
         Relationships: []
       }
+      research_notes: {
+        Row: {
+          content: string
+          created_at: string | null
+          id: string
+          parent_research: string
+          sub_topic: string
+          updated_at: string | null
+          user_id: string | null
+        }
+        Insert: {
+          content: string
+          created_at?: string | null
+          id?: string
+          parent_research: string
+          sub_topic: string
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          content?: string
+          created_at?: string | null
+          id?: string
+          parent_research?: string
+          sub_topic?: string
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       room_exercises: {
         Row: {
           created_at: string | null

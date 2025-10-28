@@ -1,12 +1,15 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Navigation } from "@/components/Navigation";
+import { GameLeaderboard } from "@/components/GameLeaderboard";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 import { Trophy, ArrowLeft, CheckCircle, XCircle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/hooks/useAuth";
+import { supabase } from "@/integrations/supabase/client";
 
 const storyQuizzes = [
   {
@@ -44,6 +47,7 @@ const storyQuizzes = [
 export default function StoryRoomGame() {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { user } = useAuth();
   const [currentQuiz, setCurrentQuiz] = useState(0);
   const [userSequence, setUserSequence] = useState<string[]>([]);
   const [availableScenes, setAvailableScenes] = useState<string[]>([]);
@@ -58,6 +62,32 @@ export default function StoryRoomGame() {
     setUserSequence([]);
     setFeedback("");
   }, [currentQuiz]);
+
+  // Save score when game completes
+  useEffect(() => {
+    if (isComplete && user && score > 0) {
+      saveScore();
+    }
+  }, [isComplete, user, score]);
+
+  const saveScore = async () => {
+    if (!user) return;
+    
+    try {
+      await supabase.from("game_scores").insert({
+        user_id: user.id,
+        game_type: "story_room",
+        score: score,
+        mode: "solo",
+        metadata: {
+          total_questions: storyQuizzes.length,
+          completed_at: new Date().toISOString(),
+        },
+      });
+    } catch (error) {
+      console.error("Error saving score:", error);
+    }
+  };
 
   const shuffleArray = (array: string[]) => {
     const newArray = [...array];
