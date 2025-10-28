@@ -91,13 +91,35 @@ serve(async (req) => {
     console.log('Downloading Greek NT...');
     const tagntUrl = 'https://raw.githubusercontent.com/STEPBible/STEPBible-Data/master/TAGNT%20-%20Translators%20Amalgamated%20Greek%20NT%20-%20STEPBible.org%20CC%20BY.txt';
     const tagntResponse = await fetch(tagntUrl);
+    
+    if (!tagntResponse.ok) {
+      console.error('Failed to download Greek NT:', tagntResponse.status, tagntResponse.statusText);
+      return new Response(
+        JSON.stringify({ error: `Failed to download Greek NT: ${tagntResponse.status} ${tagntResponse.statusText}` }),
+        { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+    
     const tagntText = await tagntResponse.text();
+    console.log('Greek NT download size:', tagntText.length, 'characters');
+    console.log('Greek NT first 200 chars:', tagntText.substring(0, 200));
 
     // Download Hebrew OT (TAHOT)
     console.log('Downloading Hebrew OT...');
     const tahotUrl = 'https://raw.githubusercontent.com/STEPBible/STEPBible-Data/master/TAHOT%20-%20Translators%20Amalgamated%20Hebrew%20OT%20-%20STEPBible.org%20CC%20BY.txt';
     const tahotResponse = await fetch(tahotUrl);
+    
+    if (!tahotResponse.ok) {
+      console.error('Failed to download Hebrew OT:', tahotResponse.status, tahotResponse.statusText);
+      return new Response(
+        JSON.stringify({ error: `Failed to download Hebrew OT: ${tahotResponse.status} ${tahotResponse.statusText}` }),
+        { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+    
     const tahotText = await tahotResponse.text();
+    console.log('Hebrew OT download size:', tahotText.length, 'characters');
+    console.log('Hebrew OT first 200 chars:', tahotText.substring(0, 200));
 
     console.log('Parsing data...');
     const verses: any[] = [];
