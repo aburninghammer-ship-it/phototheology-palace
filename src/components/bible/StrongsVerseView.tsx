@@ -76,7 +76,9 @@ export const StrongsVerseView = ({
           
           <div className="flex-1">
             <div className="text-foreground leading-relaxed">
-              {strongsData ? (
+              {isLoading ? (
+                <p className="text-muted-foreground animate-pulse">{verse.text}</p>
+              ) : strongsData?.words ? (
                 <span>
                   {strongsData.words.map((word, idx) => (
                     <span key={idx}>
@@ -147,7 +149,7 @@ export const StrongsVerseView = ({
               </div>
             )}
 
-            {strongsData && (
+            {strongsData?.words && !isLoading && (
               <div className="mt-2 text-xs text-primary/60 italic font-semibold">
                 ✨ Click superscript numbers to see Hebrew/Greek definitions
               </div>
