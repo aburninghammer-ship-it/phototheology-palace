@@ -1193,6 +1193,8 @@ export const getVerseWithStrongs = async (book: string, chapter: number, verse: 
   text: string;
   words: Array<{ text: string; strongs?: string }>
 } | null> => {
+  console.log(`[Strong's] Fetching ${book} ${chapter}:${verse}`);
+  
   try {
     // Try to fetch from database first
     const { data, error } = await supabase
@@ -1204,6 +1206,7 @@ export const getVerseWithStrongs = async (book: string, chapter: number, verse: 
       .order('word_position');
     
     if (data && data.length > 0 && !error) {
+      console.log(`[Strong's] Found in database: ${book} ${chapter}:${verse}`);
       const words = data.map(row => ({
         text: row.word_text,
         strongs: row.strongs_number || undefined
@@ -1213,11 +1216,23 @@ export const getVerseWithStrongs = async (book: string, chapter: number, verse: 
       
       return { text, words };
     }
+    
+    if (error) {
+      console.error(`[Strong's] Database error for ${book} ${chapter}:${verse}:`, error);
+    }
   } catch (error) {
-    console.error('Error fetching verse with Strong\'s from database:', error);
+    console.error('[Strong\'s] Error fetching verse from database:', error);
   }
   
   // Fallback to hardcoded data
   const key = `${book}-${chapter}-${verse}`;
-  return VERSES_WITH_STRONGS[key] || null;
+  const hardcodedData = VERSES_WITH_STRONGS[key];
+  
+  if (hardcodedData) {
+    console.log(`[Strong's] Found in hardcoded data: ${key}`);
+  } else {
+    console.log(`[Strong's] No data available for: ${key}`);
+  }
+  
+  return hardcodedData || null;
 };
