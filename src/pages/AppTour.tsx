@@ -128,12 +128,12 @@ const AppTour = () => {
   ];
 
   const quickStart = [
-    { step: 1, title: "Create Your Account", action: "Sign up with email", icon: Target },
-    { step: 2, title: "Complete Onboarding", action: "Learn the basics (5 min)", icon: PlayCircle },
-    { step: 3, title: "Enter The Palace", action: "Start Floor 1, Room 1", icon: Building2 },
-    { step: 4, title: "Play Your First Game", action: "Try Palace Quiz", icon: Gamepad2 },
-    { step: 5, title: "Read With Tools", action: "Open the Phototheology Bible", icon: BookOpen },
-    { step: 6, title: "Join Community", action: "Connect with other learners", icon: Users }
+    { step: 1, title: "Create Your Account", action: "Sign up with email", icon: Target, id: "create-account" },
+    { step: 2, title: "Complete Onboarding", action: "Learn the basics (5 min)", icon: PlayCircle, id: "onboarding" },
+    { step: 3, title: "Enter The Palace", action: "Start Floor 1, Room 1", icon: Building2, id: "palace" },
+    { step: 4, title: "Start Your First Game", action: "Try Palace Quiz", icon: Gamepad2, id: "first-game" },
+    { step: 5, title: "Explore Bible Tools", action: "Open the Phototheology Bible with Strong's definitions", icon: BookOpen, id: "bible-tools" },
+    { step: 6, title: "Join Community", action: "Connect with other learners", icon: Users, id: "community" }
   ];
 
   return (
@@ -167,7 +167,11 @@ const AppTour = () => {
           <CardContent>
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
               {quickStart.map((item) => (
-                <div key={item.step} className="flex gap-3 p-4 rounded-lg bg-card border border-border hover:border-palace-blue/40 transition-all group">
+                <a 
+                  key={item.step} 
+                  href={`#${item.id}`}
+                  className="flex gap-3 p-4 rounded-lg bg-card border border-border hover:border-palace-blue/40 transition-all group cursor-pointer"
+                >
                   <div className="flex-shrink-0">
                     <div className="w-10 h-10 rounded-full gradient-ocean flex items-center justify-center text-white font-bold group-hover:scale-110 transition-transform">
                       {item.step}
@@ -177,7 +181,7 @@ const AppTour = () => {
                     <h3 className="font-semibold mb-1 text-foreground">{item.title}</h3>
                     <p className="text-sm text-muted-foreground">{item.action}</p>
                   </div>
-                </div>
+                </a>
               ))}
             </div>
           </CardContent>
@@ -187,8 +191,9 @@ const AppTour = () => {
         <div className="space-y-8">
           {sections.map((section, index) => {
             const IconComponent = section.icon;
+            const sectionId = quickStart[index]?.id || `section-${index}`;
             return (
-              <Card key={index} className="border-2 hover:border-palace-blue/40 transition-all">
+              <Card key={index} id={sectionId} className="border-2 hover:border-palace-blue/40 transition-all scroll-mt-20">
                 <CardHeader>
                   <div className="flex items-start justify-between">
                     <div className="flex items-center gap-3">

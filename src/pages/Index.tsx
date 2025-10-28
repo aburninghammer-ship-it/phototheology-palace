@@ -52,7 +52,7 @@ const Index = () => {
           </div>
           
           <h1 className="font-serif text-5xl md:text-7xl font-bold mb-5 bg-gradient-ocean bg-clip-text text-transparent animate-slide-up">
-            Master Bible Typology
+            Transform Your Bible Study Forever
           </h1>
           
           <p className="text-xl md:text-2xl text-foreground mb-4 leading-relaxed max-w-2xl mx-auto animate-fade-in font-normal">

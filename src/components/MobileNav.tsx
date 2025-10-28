@@ -41,9 +41,14 @@ export const MobileNav = () => {
                   Home
                 </Button>
               </Link>
+              
+              <Separator className="my-2" />
+              <div className="text-xs font-semibold text-muted-foreground px-2 py-1 uppercase tracking-wide">Quick Links</div>
+              
               <Link to="/app-tour">
                 <Button variant="ghost" className="w-full justify-start" size="sm">
-                  📖 App Tour
+                  <BookOpen className="h-4 w-4 mr-2" />
+                  App Tour
                 </Button>
               </Link>
               <Link to="/palace">
@@ -274,6 +279,11 @@ export const MobileNav = () => {
             </>
           ) : (
             <>
+              <div className="text-center mb-4">
+                <h3 className="font-serif text-lg font-semibold mb-2 text-foreground">Get Started</h3>
+                <p className="text-sm text-muted-foreground mb-4">Begin your Phototheology journey</p>
+              </div>
+              
               <Link to="/app-tour">
                 <Button variant="outline" className="w-full border-2 border-palace-blue text-palace-blue font-semibold">
                   <BookOpen className="h-4 w-4 mr-2" />

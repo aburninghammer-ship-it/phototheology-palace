@@ -120,6 +120,12 @@ export default function Onboarding() {
           <CardDescription className="text-lg mt-2">
             Let's personalize your Bible learning journey
           </CardDescription>
+          <div className="mt-4 p-3 bg-muted/50 rounded-lg text-sm text-left">
+            <p className="text-muted-foreground">
+              <strong className="text-foreground">Your preferences help us:</strong> Recommend the best starting point and tailor your experience. 
+              You can change these anytime in your profile settings.
+            </p>
+          </div>
         </CardHeader>
         <CardContent className="space-y-6">
           <div className="mb-6">
