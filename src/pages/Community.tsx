@@ -26,7 +26,7 @@ const Community = () => {
   const [newContent, setNewContent] = useState("");
 
   useEffect(() => {
-    if (user) {
+    if (user && user.id) {
       fetchPosts();
 
       const channel = supabase

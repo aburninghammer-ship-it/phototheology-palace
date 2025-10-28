@@ -57,8 +57,15 @@ export default function AppUpdateIdeas() {
     fetchIdeas();
   }, [user, navigate]);
 
+  // Redirect if user becomes unauthenticated
+  useEffect(() => {
+    if (!user) {
+      navigate("/auth");
+    }
+  }, [user, navigate]);
+
   const fetchIdeas = async () => {
-    if (!user) return;
+    if (!user || !user.id) return;
 
     try {
       setLoading(true);
@@ -80,7 +87,11 @@ export default function AppUpdateIdeas() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!user) return;
+    if (!user || !user.id) {
+      toast.error("Please log in to submit ideas");
+      navigate("/auth");
+      return;
+    }
 
     setErrors({});
 
@@ -152,7 +163,9 @@ export default function AppUpdateIdeas() {
     return labels[cat] || cat;
   };
 
-  if (!user) return null;
+  if (!user || !user.id) {
+    return null;
+  }
 
   return (
     <div className="min-h-screen bg-gradient-subtle">

@@ -287,7 +287,7 @@ export const useDirectMessages = () => {
 
   // Set up realtime subscriptions
   useEffect(() => {
-    if (!user) return;
+    if (!user || !user.id) return;
 
     console.log('Setting up realtime subscriptions for user:', user.id);
 

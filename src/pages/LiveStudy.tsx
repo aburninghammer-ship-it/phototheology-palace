@@ -19,7 +19,7 @@ const LiveStudy = () => {
   const [creating, setCreating] = useState(false);
 
   useEffect(() => {
-    if (user) {
+    if (user && user.id) {
       fetchRooms();
       
       const channel = supabase

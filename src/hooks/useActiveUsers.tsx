@@ -17,6 +17,7 @@ export const useActiveUsers = () => {
 
   useEffect(() => {
     let isSubscribed = true;
+    let realtimeChannel: any = null;
     
     const updateLastSeen = async () => {
       if (!isSubscribed || retryCount >= maxRetries) return;
@@ -72,28 +73,34 @@ export const useActiveUsers = () => {
         }
       }, 60000);
 
-      // Set up realtime subscription for profile updates (only if not exceeding retries)
-      const channel = supabase
-        .channel('profiles-active-users')
-        .on(
-          'postgres_changes',
-          {
-            event: 'UPDATE',
-            schema: 'public',
-            table: 'profiles'
-          },
-          () => {
-            if (isSubscribed && retryCount < maxRetries) {
-              fetchActiveUsers();
+      // Set up realtime subscription for profile updates (only if not exceeding retries and user is authenticated)
+      supabase.auth.getUser().then(({ data: { user } }) => {
+        if (!user?.id || !isSubscribed) return;
+        
+        realtimeChannel = supabase
+          .channel('profiles-active-users')
+          .on(
+            'postgres_changes',
+            {
+              event: 'UPDATE',
+              schema: 'public',
+              table: 'profiles'
+            },
+            () => {
+              if (isSubscribed && retryCount < maxRetries) {
+                fetchActiveUsers();
+              }
             }
-          }
-        )
-        .subscribe();
+          )
+          .subscribe();
+      });
 
       return () => {
         isSubscribed = false;
         clearInterval(interval);
-        supabase.removeChannel(channel);
+        if (realtimeChannel) {
+          supabase.removeChannel(realtimeChannel);
+        }
       };
     }
   }, [retryCount]);
