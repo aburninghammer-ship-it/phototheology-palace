@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Navigation } from "@/components/Navigation";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -10,6 +10,13 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
 import { MessageCircle } from "lucide-react";
+import { z } from "zod";
+
+const feedbackSchema = z.object({
+  title: z.string().trim().min(1, "Title is required").max(200, "Title must be less than 200 characters"),
+  description: z.string().trim().min(1, "Description is required").max(2000, "Description must be less than 2000 characters"),
+  category: z.enum(["bug", "feature", "improvement"], { required_error: "Please select a category" })
+});
 
 const Feedback = () => {
   const { user, loading } = useAuth();
@@ -22,7 +29,17 @@ const Feedback = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!title.trim() || !description.trim()) return;
+
+    // Validate input
+    const validation = feedbackSchema.safeParse({ title, description, category });
+    if (!validation.success) {
+      toast({
+        title: "Validation Error",
+        description: validation.error.errors[0].message,
+        variant: "destructive",
+      });
+      return;
+    }
 
     setSubmitting(true);
     try {
@@ -30,9 +47,9 @@ const Feedback = () => {
         .from("feedback")
         .insert({
           user_id: user!.id,
-          title,
-          description,
-          category,
+          title: validation.data.title,
+          description: validation.data.description,
+          category: validation.data.category,
         });
 
       if (error) throw error;
@@ -42,9 +59,10 @@ const Feedback = () => {
         description: "Thank you for helping us improve Phototheology.",
       });
 
-      setTitle("");
-      setDescription("");
-      setCategory("feature");
+      // Redirect to dashboard after successful submission
+      setTimeout(() => {
+        navigate("/dashboard");
+      }, 1500);
     } catch (error: any) {
       toast({
         title: "Error",
