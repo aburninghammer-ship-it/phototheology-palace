@@ -101,6 +101,8 @@ const AppUpdateIdeas = lazy(() => import("./pages/AppUpdateIdeas"));
 const ChurchAdmin = lazy(() => import("./pages/ChurchAdmin"));
 const JoinChurch = lazy(() => import("./pages/JoinChurch"));
 const ChurchSignup = lazy(() => import("./pages/ChurchSignup"));
+const ChurchSignupSuccess = lazy(() => import("./pages/ChurchSignupSuccess"));
+const ChurchSignupCancelled = lazy(() => import("./pages/ChurchSignupCancelled"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
 const queryClient = new QueryClient();
@@ -227,6 +229,8 @@ function App() {
             <Route path="/church-admin" element={<ProtectedRoute><ChurchAdmin /></ProtectedRoute>} />
             <Route path="/join-church" element={<ProtectedRoute><JoinChurch /></ProtectedRoute>} />
             <Route path="/church-signup" element={<ChurchSignup />} />
+            <Route path="/church-signup/success" element={<ChurchSignupSuccess />} />
+            <Route path="/church-signup/cancelled" element={<ChurchSignupCancelled />} />
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                 <Route path="*" element={<NotFound />} />
                     </Routes>

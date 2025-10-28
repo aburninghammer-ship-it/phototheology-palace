@@ -98,11 +98,11 @@ export default function ChurchSignup() {
     setStep('processing');
 
     try {
-      // Call edge function to create church and set up admin
-      const { data, error } = await supabase.functions.invoke('create-church', {
+      // Create Stripe checkout session
+      const { data, error } = await supabase.functions.invoke('create-checkout-session', {
         body: {
-          church_name: churchName,
           tier: selectedTier,
+          church_name: churchName,
           billing_email: billingEmail,
           contact_person: contactPerson || null,
           contact_phone: contactPhone || null,
@@ -112,21 +112,16 @@ export default function ChurchSignup() {
 
       if (error) throw error;
 
-      if (!data.success) {
-        throw new Error(data.error || "Failed to create church");
+      if (!data.url) {
+        throw new Error("Failed to create checkout session");
       }
 
-      toast.success("Church registered successfully!");
-      
-      // Redirect to church admin dashboard
-      setTimeout(() => {
-        navigate("/church-admin");
-      }, 1500);
+      // Redirect to Stripe Checkout
+      window.location.href = data.url;
     } catch (error: any) {
-      console.error('Error creating church:', error);
-      toast.error(error.message || "Failed to register church");
+      console.error('Error creating checkout session:', error);
+      toast.error(error.message || "Failed to start checkout");
       setStep('info');
-    } finally {
       setLoading(false);
     }
   };
