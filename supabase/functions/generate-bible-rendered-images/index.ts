@@ -117,40 +117,81 @@ serve(async (req) => {
 
     console.log(`Generating image for Set ${set.num}: ${set.name}`);
 
-    const prompt = `Create a symbolic, artistic representation of the biblical theme "${set.name}" (${set.symbol}). 
+    const prompt = `Generate a symbolic, artistic representation of the biblical theme "${set.name}". 
     
+Symbol: ${set.symbol}
 Theme: ${set.desc}
 Biblical Range: ${set.range}
 
-Style: Modern, symbolic, with rich biblical imagery. Use warm golden and deep blue tones. The image should be iconic and memorable, capturing the spiritual essence of this biblical period. Include subtle symbolism that represents the theme without being literal. Professional Bible study visual.`;
+Create a modern, iconic image with rich biblical symbolism. Use warm golden and deep blue tones reminiscent of sacred art. The image should be memorable and capture the spiritual essence of this biblical period. Include the symbol ${set.symbol} creatively integrated into the composition. Professional quality for Bible study visualization.`;
 
-    const response = await fetch('https://ai.gateway.lovable.dev/v1/images/generations', {
+    const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${LOVABLE_API_KEY}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'black-forest-labs/flux-1.1-pro',
-        prompt: prompt,
-        width: 1024,
-        height: 1024
+        model: 'google/gemini-2.5-flash-image-preview',
+        messages: [
+          {
+            role: 'user',
+            content: prompt
+          }
+        ],
+        modalities: ['image', 'text']
       }),
     });
 
     if (!response.ok) {
+      if (response.status === 429) {
+        throw new Error('Rate limit exceeded. Please wait a moment and try again.');
+      }
+      if (response.status === 402) {
+        throw new Error('AI credits depleted. Please add credits to your workspace.');
+      }
       const errorText = await response.text();
       console.error('AI API error:', response.status, errorText);
       throw new Error(`AI API error: ${response.status}`);
     }
 
     const data = await response.json();
-    const imageUrl = data.data?.[0]?.url;
+    console.log('AI response received');
+    
+    const imageBase64 = data.choices?.[0]?.message?.images?.[0]?.image_url?.url;
 
-    if (!imageUrl) {
+    if (!imageBase64) {
       console.error('API response:', JSON.stringify(data));
       throw new Error('No image generated from AI');
     }
+
+    // Upload the base64 image to Supabase Storage
+    const base64Data = imageBase64.split(',')[1];
+    const fileName = `bible-rendered-${set.num}-${Date.now()}.png`;
+    
+    const { data: uploadData, error: uploadError } = await authenticatedClient
+      .storage
+      .from('bible-images')
+      .upload(fileName, 
+        Uint8Array.from(atob(base64Data), c => c.charCodeAt(0)),
+        {
+          contentType: 'image/png',
+          upsert: false
+        }
+      );
+
+    if (uploadError) {
+      console.error('Storage upload error:', uploadError);
+      throw uploadError;
+    }
+
+    // Get public URL
+    const { data: { publicUrl } } = authenticatedClient
+      .storage
+      .from('bible-images')
+      .getPublicUrl(fileName);
+
+    const imageUrl = publicUrl;
 
     // Save to bible_images table
     const { data: imageRecord, error: imageError } = await authenticatedClient

@@ -1,9 +1,9 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Sparkles, BookOpen, ImageIcon, Home } from "lucide-react";
+import { Sparkles, BookOpen, ImageIcon, Home, Wand2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { bibleRenderedSets } from "@/data/bibleRenderedSets";
 import { supabase } from "@/integrations/supabase/client";
@@ -14,6 +14,7 @@ const BibleRenderedRoom = () => {
   const navigate = useNavigate();
   const [generatingFlashcards, setGeneratingFlashcards] = useState(false);
   const [generatingImages, setGeneratingImages] = useState<number | null>(null);
+  const [setImages, setSetImages] = useState<Record<number, string>>({});
 
   const generateFlashcards = async () => {
     try {
@@ -32,6 +33,34 @@ const BibleRenderedRoom = () => {
     }
   };
 
+  useEffect(() => {
+    loadSetImages();
+  }, []);
+
+  const loadSetImages = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('bible_images')
+        .select('verse_reference, image_url')
+        .eq('room_type', 'Bible Rendered')
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+
+      const imageMap: Record<number, string> = {};
+      data?.forEach((img) => {
+        const set = bibleRenderedSets.find(s => s.range === img.verse_reference);
+        if (set && !imageMap[set.number]) {
+          imageMap[set.number] = img.image_url;
+        }
+      });
+      
+      setSetImages(imageMap);
+    } catch (error) {
+      console.error('Error loading images:', error);
+    }
+  };
+
   const generateImage = async (setNumber: number) => {
     try {
       setGeneratingImages(setNumber);
@@ -42,10 +71,10 @@ const BibleRenderedRoom = () => {
       if (error) throw error;
       
       toast.success(`Image generated for Set ${setNumber}!`);
-      console.log('Image generated:', data);
-    } catch (error) {
+      await loadSetImages(); // Reload images to show new one
+    } catch (error: any) {
       console.error('Error generating image:', error);
-      toast.error('Failed to generate image');
+      toast.error(error.message || 'Failed to generate image');
     } finally {
       setGeneratingImages(null);
     }
@@ -145,6 +174,15 @@ const BibleRenderedRoom = () => {
                         </div>
                       </CardHeader>
                       <CardContent className="space-y-3">
+                        {setImages[set.number] && (
+                          <div className="rounded-lg overflow-hidden border border-border">
+                            <img 
+                              src={setImages[set.number]} 
+                              alt={`${set.name} - ${set.range}`}
+                              className="w-full h-48 object-cover"
+                            />
+                          </div>
+                        )}
                         <div>
                           <p className="text-sm font-medium text-primary mb-1">
                             {set.range}
@@ -155,13 +193,13 @@ const BibleRenderedRoom = () => {
                         </div>
                         <Button 
                           size="sm" 
-                          variant="outline"
+                          variant={setImages[set.number] ? "outline" : "default"}
                           className="w-full"
                           onClick={() => generateImage(set.number)}
                           disabled={generatingImages === set.number}
                         >
-                          <ImageIcon className="h-3 w-3 mr-2" />
-                          {generatingImages === set.number ? 'Generating...' : 'Generate Image'}
+                          <Wand2 className="h-3 w-3 mr-2" />
+                          {generatingImages === set.number ? 'Generating...' : setImages[set.number] ? 'Regenerate Image' : 'Generate Image'}
                         </Button>
                       </CardContent>
                     </Card>
