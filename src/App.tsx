@@ -98,6 +98,8 @@ const BlueRoomGame = lazy(() => import("./pages/games/BlueRoomGame"));
 const PublicImageLibrary = lazy(() => import("./pages/PublicImageLibrary"));
 const BibleStudyLeader = lazy(() => import("./pages/BibleStudyLeader"));
 const AppUpdateIdeas = lazy(() => import("./pages/AppUpdateIdeas"));
+const ChurchAdmin = lazy(() => import("./pages/ChurchAdmin"));
+const JoinChurch = lazy(() => import("./pages/JoinChurch"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
 const queryClient = new QueryClient();
@@ -221,6 +223,8 @@ function App() {
             <Route path="/admin/access-codes" element={<ProtectedRoute><AdminAccessCodes /></ProtectedRoute>} />
             <Route path="/certificates" element={<ProtectedRoute><Certificates /></ProtectedRoute>} />
             <Route path="/study-partners" element={<ProtectedRoute><StudyPartners /></ProtectedRoute>} />
+            <Route path="/church-admin" element={<ProtectedRoute><ChurchAdmin /></ProtectedRoute>} />
+            <Route path="/join-church" element={<ProtectedRoute><JoinChurch /></ProtectedRoute>} />
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                 <Route path="*" element={<NotFound />} />
                     </Routes>

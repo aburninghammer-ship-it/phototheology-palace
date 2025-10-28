@@ -6,6 +6,7 @@ import { useActiveUsers } from "@/hooks/useActiveUsers";
 import { useToast } from "@/hooks/use-toast";
 import { Navigation } from "@/components/Navigation";
 import { Footer } from "@/components/Footer";
+import { EmpowerYourMembers } from "@/components/churches/EmpowerYourMembers";
 
 const Index = () => {
   const { toast } = useToast();
@@ -298,6 +299,9 @@ const Index = () => {
           </div>
         </div>
       </section>
+
+      {/* Empower Your Members Section */}
+      <EmpowerYourMembers />
 
       {/* CTA Section */}
       <section className="py-20 px-4 bg-card/40 backdrop-blur-sm relative overflow-hidden">
