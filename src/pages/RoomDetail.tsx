@@ -22,6 +22,24 @@ import { QuickStartGuide } from "@/components/palace/QuickStartGuide";
 import { ValueProposition } from "@/components/palace/ValueProposition";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 
+// Room IDs that have quick start guides
+const QUICK_START_ROOMS = new Set([
+  // Floor 1
+  'sr', 'ir', '24fps', 'br', 'tr', 'gr',
+  // Floor 2
+  'or', 'dc', 'st', 'qr', 'qa',
+  // Floor 3
+  'nf', 'pf', 'bf', 'hf', 'lr',
+  // Floor 4
+  'cr', 'dr', 'c6', 'trm', 'tz', 'prm', 'p||', 'frt', 'cec', 'r66',
+  // Floor 5
+  'bl', 'pr', '3a', 'fe',
+  // Floor 6
+  '123h', 'cycles', 'jr',
+  // Floor 7
+  'frm', 'mr', 'srm'
+]);
+
 export default function RoomDetail() {
   const { floorNumber, roomId } = useParams();
   const navigate = useNavigate();
@@ -32,9 +50,8 @@ export default function RoomDetail() {
   const [methodExpanded, setMethodExpanded] = useState(false);
   const [examplesExpanded, setExamplesExpanded] = useState(false);
   
-  // Show Quick Start by default for Floor 1-3 rooms
-  const isEarlyFloor = Number(floorNumber) <= 3;
-  const showQuickStart = isEarlyFloor && ['sr', 'ir', '24fps', 'br', 'tr', 'gr', 'or', 'dc', 'st'].includes(roomId || '');
+  // Show Quick Start by default for ALL rooms that have quick starts defined
+  const showQuickStart = room && QUICK_START_ROOMS.has(room.id);
   
   const { 
     progress, 
@@ -145,12 +162,12 @@ export default function RoomDetail() {
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <div className="lg:col-span-2 space-y-6">
-            {/* Value Proposition - Show for early floors */}
+            {/* Value Proposition - Show for all rooms */}
             {showQuickStart && (
               <ValueProposition roomId={room.id} />
             )}
 
-            {/* Quick Start Guide - Show for early floors */}
+            {/* Quick Start Guide - Show for all rooms */}
             {showQuickStart && (
               <QuickStartGuide roomId={room.id} roomName={room.name} />
             )}
@@ -180,7 +197,7 @@ export default function RoomDetail() {
               </CardContent>
             </Card>
 
-            {/* Method - Collapsible for early floors */}
+            {/* Method - Collapsible for all floors */}
             <Collapsible open={methodExpanded} onOpenChange={setMethodExpanded}>
               <Card>
                 <CardHeader>
@@ -193,7 +210,7 @@ export default function RoomDetail() {
                       <ChevronDown className={`h-5 w-5 transition-transform ${methodExpanded ? 'rotate-180' : ''}`} />
                     </div>
                   </CollapsibleTrigger>
-                  {!methodExpanded && isEarlyFloor && (
+                  {!methodExpanded && (
                     <CardDescription className="text-sm">
                       Detailed step-by-step guide (click to expand when ready)
                     </CardDescription>
@@ -207,7 +224,7 @@ export default function RoomDetail() {
               </Card>
             </Collapsible>
 
-            {/* Examples - Collapsible for early floors */}
+            {/* Examples - Collapsible for all floors */}
             <Collapsible open={examplesExpanded} onOpenChange={setExamplesExpanded}>
               <Card>
                 <CardHeader>
@@ -220,7 +237,7 @@ export default function RoomDetail() {
                       <ChevronDown className={`h-5 w-5 transition-transform ${examplesExpanded ? 'rotate-180' : ''}`} />
                     </div>
                   </CollapsibleTrigger>
-                  {!examplesExpanded && isEarlyFloor && (
+                  {!examplesExpanded && (
                     <CardDescription className="text-sm">
                       More examples to explore (click to expand)
                     </CardDescription>
