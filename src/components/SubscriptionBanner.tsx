@@ -3,12 +3,29 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
-import { Sparkles, AlertTriangle, GraduationCap, Crown, Gift } from "lucide-react";
+import { Sparkles, AlertTriangle, GraduationCap, Crown, Gift, Building2 } from "lucide-react";
 
 export function SubscriptionBanner() {
   const { subscription, loading } = useSubscription();
 
   if (loading) return null;
+  
+  // Church member - show different banner
+  if (subscription.church.hasChurchAccess) {
+    return (
+      <Alert className="mb-4 border-primary/20 bg-primary/5">
+        <Building2 className="h-4 w-4 text-primary" />
+        <AlertDescription>
+          <strong className="text-primary">Church Member Access:</strong> You have access through your church organization. 
+          {subscription.church.churchRole === 'admin' && (
+            <Link to="/church-admin" className="ml-2 underline hover:text-primary">
+              Manage your church →
+            </Link>
+          )}
+        </AlertDescription>
+      </Alert>
+    );
+  }
 
   const now = new Date();
   const trialEndsAt = subscription.trialEndsAt ? new Date(subscription.trialEndsAt) : null;

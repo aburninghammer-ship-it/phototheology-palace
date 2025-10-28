@@ -295,6 +295,231 @@ export type Database = {
         }
         Relationships: []
       }
+      church_campaign_participation: {
+        Row: {
+          campaign_id: string
+          completed_at: string | null
+          created_at: string
+          id: string
+          time_spent: number | null
+          user_id: string
+        }
+        Insert: {
+          campaign_id: string
+          completed_at?: string | null
+          created_at?: string
+          id?: string
+          time_spent?: number | null
+          user_id: string
+        }
+        Update: {
+          campaign_id?: string
+          completed_at?: string | null
+          created_at?: string
+          id?: string
+          time_spent?: number | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "church_campaign_participation_campaign_id_fkey"
+            columns: ["campaign_id"]
+            isOneToOne: false
+            referencedRelation: "church_campaigns"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      church_campaigns: {
+        Row: {
+          challenge_id: string | null
+          church_id: string
+          created_at: string
+          created_by: string
+          description: string | null
+          ends_at: string
+          id: string
+          is_active: boolean
+          starts_at: string
+          title: string
+        }
+        Insert: {
+          challenge_id?: string | null
+          church_id: string
+          created_at?: string
+          created_by: string
+          description?: string | null
+          ends_at: string
+          id?: string
+          is_active?: boolean
+          starts_at?: string
+          title: string
+        }
+        Update: {
+          challenge_id?: string | null
+          church_id?: string
+          created_at?: string
+          created_by?: string
+          description?: string | null
+          ends_at?: string
+          id?: string
+          is_active?: boolean
+          starts_at?: string
+          title?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "church_campaigns_challenge_id_fkey"
+            columns: ["challenge_id"]
+            isOneToOne: false
+            referencedRelation: "challenges"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "church_campaigns_church_id_fkey"
+            columns: ["church_id"]
+            isOneToOne: false
+            referencedRelation: "churches"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      church_invitations: {
+        Row: {
+          accepted_at: string | null
+          church_id: string
+          created_at: string
+          expires_at: string
+          id: string
+          invitation_code: string
+          invited_by: string
+          invited_email: string
+          role: Database["public"]["Enums"]["church_member_role"]
+          status: string
+        }
+        Insert: {
+          accepted_at?: string | null
+          church_id: string
+          created_at?: string
+          expires_at: string
+          id?: string
+          invitation_code: string
+          invited_by: string
+          invited_email: string
+          role?: Database["public"]["Enums"]["church_member_role"]
+          status?: string
+        }
+        Update: {
+          accepted_at?: string | null
+          church_id?: string
+          created_at?: string
+          expires_at?: string
+          id?: string
+          invitation_code?: string
+          invited_by?: string
+          invited_email?: string
+          role?: Database["public"]["Enums"]["church_member_role"]
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "church_invitations_church_id_fkey"
+            columns: ["church_id"]
+            isOneToOne: false
+            referencedRelation: "churches"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      church_members: {
+        Row: {
+          church_id: string
+          id: string
+          invited_by: string | null
+          joined_at: string
+          role: Database["public"]["Enums"]["church_member_role"]
+          user_id: string
+        }
+        Insert: {
+          church_id: string
+          id?: string
+          invited_by?: string | null
+          joined_at?: string
+          role?: Database["public"]["Enums"]["church_member_role"]
+          user_id: string
+        }
+        Update: {
+          church_id?: string
+          id?: string
+          invited_by?: string | null
+          joined_at?: string
+          role?: Database["public"]["Enums"]["church_member_role"]
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "church_members_church_id_fkey"
+            columns: ["church_id"]
+            isOneToOne: false
+            referencedRelation: "churches"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      churches: {
+        Row: {
+          billing_email: string
+          branded_name: string | null
+          contact_person: string | null
+          contact_phone: string | null
+          created_at: string
+          id: string
+          logo_url: string | null
+          max_seats: number
+          name: string
+          stripe_customer_id: string | null
+          subscription_ends_at: string | null
+          subscription_started_at: string
+          subscription_status: string
+          tier: Database["public"]["Enums"]["church_tier"]
+          updated_at: string
+        }
+        Insert: {
+          billing_email: string
+          branded_name?: string | null
+          contact_person?: string | null
+          contact_phone?: string | null
+          created_at?: string
+          id?: string
+          logo_url?: string | null
+          max_seats?: number
+          name: string
+          stripe_customer_id?: string | null
+          subscription_ends_at?: string | null
+          subscription_started_at?: string
+          subscription_status?: string
+          tier?: Database["public"]["Enums"]["church_tier"]
+          updated_at?: string
+        }
+        Update: {
+          billing_email?: string
+          branded_name?: string | null
+          contact_person?: string | null
+          contact_phone?: string | null
+          created_at?: string
+          id?: string
+          logo_url?: string | null
+          max_seats?: number
+          name?: string
+          stripe_customer_id?: string | null
+          subscription_ends_at?: string | null
+          subscription_started_at?: string
+          subscription_status?: string
+          tier?: Database["public"]["Enums"]["church_tier"]
+          updated_at?: string
+        }
+        Relationships: []
+      }
       community_comments: {
         Row: {
           content: string
@@ -2211,12 +2436,26 @@ export type Database = {
       }
     }
     Functions: {
+      accept_church_invitation: {
+        Args: { _invitation_code: string }
+        Returns: Json
+      }
       cleanup_old_rate_limits: { Args: never; Returns: undefined }
       cleanup_old_typing_indicators: { Args: never; Returns: undefined }
       generate_referral_code: { Args: { user_id: string }; Returns: string }
+      get_available_seats: { Args: { _church_id: string }; Returns: number }
       get_or_create_conversation: {
         Args: { other_user_id: string }
         Returns: string
+      }
+      has_church_access: {
+        Args: { _user_id: string }
+        Returns: {
+          church_id: string
+          church_tier: string
+          has_access: boolean
+          role: string
+        }[]
       }
       has_role: {
         Args: {
@@ -2229,10 +2468,16 @@ export type Database = {
         Args: { points_to_add: number; user_id: string }
         Returns: undefined
       }
+      is_church_admin: {
+        Args: { _church_id: string; _user_id: string }
+        Returns: boolean
+      }
       redeem_access_code: { Args: { access_code: string }; Returns: Json }
     }
     Enums: {
       app_role: "admin" | "moderator" | "user"
+      church_member_role: "admin" | "leader" | "member"
+      church_tier: "tier1" | "tier2" | "tier3"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -2361,6 +2606,8 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["admin", "moderator", "user"],
+      church_member_role: ["admin", "leader", "member"],
+      church_tier: ["tier1", "tier2", "tier3"],
     },
   },
 } as const
