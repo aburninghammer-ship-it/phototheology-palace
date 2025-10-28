@@ -128,7 +128,11 @@ export const MessagingSidebar = () => {
           className="fixed inset-0 bg-black/50 z-40 md:hidden"
           onClick={() => {
             console.log('🎭 Backdrop clicked - closing sidebar');
-            toggleSidebar();
+            if (setOpen) {
+              setOpen(false);
+            } else {
+              toggleSidebar();
+            }
           }}
           aria-label="Close sidebar"
         />
@@ -146,7 +150,11 @@ export const MessagingSidebar = () => {
             size="icon"
             onClick={() => {
               console.log('❌ Closing sidebar via floating button');
-              toggleSidebar();
+              if (setOpen) {
+                setOpen(false);
+              } else {
+                toggleSidebar();
+              }
             }}
             className="absolute top-2 right-2 z-50 h-8 w-8 hover:bg-destructive/10 bg-background/80 backdrop-blur-sm shadow-sm"
             aria-label="Close sidebar"
