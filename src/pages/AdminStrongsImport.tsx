@@ -11,6 +11,7 @@ import { Loader2, Upload, AlertCircle, CheckCircle2 } from "lucide-react";
 export default function AdminStrongsImport() {
   const [jsonInput, setJsonInput] = useState("");
   const [isImporting, setIsImporting] = useState(false);
+  const [isAutoImporting, setIsAutoImporting] = useState(false);
   const [result, setResult] = useState<any>(null);
   const { toast } = useToast();
   const navigate = useNavigate();
@@ -70,6 +71,58 @@ export default function AdminStrongsImport() {
     }
   };
 
+  const handleAutoImport = async () => {
+    setIsAutoImporting(true);
+    setResult(null);
+
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        throw new Error("Not authenticated");
+      }
+
+      toast({
+        title: "Starting Import",
+        description: "Downloading and processing STEPBible data... This may take a few minutes.",
+      });
+
+      const response = await supabase.functions.invoke('import-stepbible');
+
+      if (response.error) {
+        throw response.error;
+      }
+
+      const stats = response.data.stats;
+      setResult({
+        success: true,
+        statistics: {
+          versesInserted: stats.imported,
+          versesUpdated: 0,
+          strongsEntriesInserted: 0,
+          versesSkipped: stats.skipped_lines,
+          errors: stats.errors > 0 ? [`${stats.errors} verses failed to import`] : [],
+          errorCount: stats.errors,
+        }
+      });
+
+      toast({
+        title: "Import Complete",
+        description: `Successfully imported ${stats.imported} verses with Strong's numbers!`,
+      });
+
+    } catch (error: any) {
+      console.error("Auto-import error:", error);
+      toast({
+        title: "Import Failed",
+        description: error.message,
+        variant: "destructive",
+      });
+      setResult({ success: false, error: error.message });
+    } finally {
+      setIsAutoImporting(false);
+    }
+  };
+
   const exampleFormat = {
     verses: [
       {
@@ -117,6 +170,38 @@ export default function AdminStrongsImport() {
       </div>
 
       <div className="grid gap-6">
+        <Card className="bg-gradient-to-br from-primary/5 to-accent/5 border-primary/20">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Upload className="h-5 w-5" />
+              Automatic Import (Recommended)
+            </CardTitle>
+            <CardDescription>
+              Automatically download and import ~31,102 verses with Strong's numbers from STEPBible (Hebrew OT + Greek NT)
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Button
+              onClick={handleAutoImport}
+              disabled={isAutoImporting}
+              size="lg"
+              className="w-full"
+            >
+              {isAutoImporting ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Importing from STEPBible...
+                </>
+              ) : (
+                <>
+                  <Upload className="mr-2 h-4 w-4" />
+                  Import from STEPBible (Automatic)
+                </>
+              )}
+            </Button>
+          </CardContent>
+        </Card>
+
         <Card>
           <CardHeader>
             <CardTitle>JSON Format Example</CardTitle>
@@ -133,9 +218,9 @@ export default function AdminStrongsImport() {
 
         <Card>
           <CardHeader>
-            <CardTitle>Import Data</CardTitle>
+            <CardTitle>Manual Import (JSON)</CardTitle>
             <CardDescription>
-              Paste your JSON data below (up to 10,000 verses per batch recommended)
+              Or paste your own JSON data below (up to 10,000 verses per batch recommended)
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
