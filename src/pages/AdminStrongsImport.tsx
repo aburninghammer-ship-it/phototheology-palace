@@ -86,7 +86,11 @@ export default function AdminStrongsImport() {
         description: "Downloading and processing STEPBible data... This may take a few minutes.",
       });
 
-      const response = await supabase.functions.invoke('import-stepbible');
+      const response = await supabase.functions.invoke('import-stepbible', {
+        headers: {
+          Authorization: `Bearer ${session.access_token}`
+        }
+      });
 
       if (response.error) {
         throw response.error;
