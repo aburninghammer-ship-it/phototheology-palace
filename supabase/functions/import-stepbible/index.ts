@@ -53,11 +53,10 @@ serve(async (req) => {
     }
 
     console.log('Checking admin role for user:', user.id);
-    const { data: roleData, error: roleError } = await supabase
+    const { data: roles, error: roleError } = await supabase
       .from('user_roles')
       .select('role')
-      .eq('user_id', user.id)
-      .maybeSingle();
+      .eq('user_id', user.id);
 
     if (roleError) {
       console.error('Role check error:', roleError);
@@ -67,17 +66,18 @@ serve(async (req) => {
       });
     }
 
-    if (!roleData) {
-      console.error('No role found for user:', user.id);
+    if (!roles || roles.length === 0) {
+      console.error('No roles found for user:', user.id);
       return new Response(JSON.stringify({ error: 'Admin access required: No role assigned' }), {
         status: 403,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
     }
 
-    if (roleData.role !== 'admin') {
-      console.error('User role is not admin:', roleData.role);
-      return new Response(JSON.stringify({ error: 'Admin access required: User is ' + roleData.role }), {
+    const hasAdminRole = roles.some(r => r.role === 'admin');
+    if (!hasAdminRole) {
+      console.error('User does not have admin role. Roles:', roles.map(r => r.role));
+      return new Response(JSON.stringify({ error: 'Admin access required' }), {
         status: 403,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
