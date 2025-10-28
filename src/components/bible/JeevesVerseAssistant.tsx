@@ -22,7 +22,7 @@ interface JeevesVerseAssistantProps {
 
 export const JeevesVerseAssistant = ({ book, chapter, verse, verseText, onClose }: JeevesVerseAssistantProps) => {
   const [question, setQuestion] = useState("");
-  const [selectedRoom, setSelectedRoom] = useState<string>("");
+  const [selectedRoom, setSelectedRoom] = useState<string>("general");
   const [response, setResponse] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
@@ -167,7 +167,7 @@ export const JeevesVerseAssistant = ({ book, chapter, verse, verseText, onClose 
               <SelectValue placeholder="Choose a principle to analyze through..." />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">General Analysis</SelectItem>
+              <SelectItem value="general">General Analysis</SelectItem>
               
               {/* Dimensions */}
               <div className="px-2 py-1.5 text-xs font-semibold text-muted-foreground bg-muted/50">
