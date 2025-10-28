@@ -293,6 +293,12 @@ export const Navigation = () => {
                         Referrals
                       </Link>
                     </DropdownMenuItem>
+                    <DropdownMenuItem asChild>
+                      <Link to="/app-update-ideas">
+                        <Sparkles className="h-4 w-4 mr-2" />
+                        💡 Submit Ideas
+                      </Link>
+                    </DropdownMenuItem>
                     <DropdownMenuSeparator />
                     <DropdownMenuItem onClick={signOut}>
                       <LogOut className="h-4 w-4 mr-2" />

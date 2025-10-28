@@ -47,6 +47,39 @@ export type Database = {
         }
         Relationships: []
       }
+      app_update_ideas: {
+        Row: {
+          category: string | null
+          created_at: string | null
+          description: string
+          id: string
+          status: string | null
+          title: string
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          category?: string | null
+          created_at?: string | null
+          description: string
+          id?: string
+          status?: string | null
+          title: string
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          category?: string | null
+          created_at?: string | null
+          description?: string
+          id?: string
+          status?: string | null
+          title?: string
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       bible_images: {
         Row: {
           created_at: string

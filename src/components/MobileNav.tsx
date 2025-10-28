@@ -253,6 +253,12 @@ export const MobileNav = () => {
                   Referrals
                 </Button>
               </Link>
+              <Link to="/app-update-ideas">
+                <Button variant="ghost" className="w-full justify-start" size="sm">
+                  <Sparkles className="h-4 w-4 mr-2" />
+                  💡 Submit Ideas
+                </Button>
+              </Link>
               
               <Separator className="my-2" />
               
