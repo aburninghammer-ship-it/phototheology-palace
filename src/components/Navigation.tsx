@@ -127,6 +127,9 @@ export const Navigation = () => {
                 <DropdownMenuItem asChild>
                   <Link to="/quarterly-study">📅 Amplified Quarterly</Link>
                 </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link to="/bible-study-leader">👥 Lead a Bible Study</Link>
+                </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
             <DropdownMenu>
