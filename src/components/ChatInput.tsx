@@ -28,7 +28,7 @@ export function ChatInput({ onSend, placeholder = "Type a message... (emojis sup
   };
 
   return (
-    <div className="flex gap-2 items-end">
+    <div className="flex gap-3 items-end">
       <div className="flex-1 space-y-2">
         <Textarea
           value={message}
@@ -36,8 +36,8 @@ export function ChatInput({ onSend, placeholder = "Type a message... (emojis sup
           onKeyDown={handleKeyDown}
           placeholder={placeholder}
           disabled={disabled}
-          rows={2}
-          className="resize-none"
+          rows={3}
+          className="resize-none text-base py-3 px-4 rounded-xl"
         />
         <div className="flex justify-end">
           <EmojiPicker onEmojiSelect={(emoji) => setMessage(message + emoji)} />
@@ -47,9 +47,9 @@ export function ChatInput({ onSend, placeholder = "Type a message... (emojis sup
         onClick={handleSend} 
         disabled={disabled || !message.trim()}
         size="icon"
-        className="h-10 w-10 shrink-0"
+        className="h-12 w-12 shrink-0 rounded-xl"
       >
-        <Send className="h-4 w-4" />
+        <Send className="h-5 w-5" />
       </Button>
     </div>
   );

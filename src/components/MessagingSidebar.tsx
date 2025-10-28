@@ -91,29 +91,30 @@ export const MessagingSidebar = () => {
 
   if (isCollapsed) {
     return (
-      <Sidebar className="w-14 border-r bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60" collapsible="icon" side="left">
+      <Sidebar className="w-16 md:w-14 border-r bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60" collapsible="icon" side="left">
         <SidebarContent>
           <div className="p-2 flex flex-col items-center">
             <Button
               variant="ghost"
               size="icon"
-              className="relative"
+              className="relative h-12 w-12 md:h-10 md:w-10"
               onClick={() => {
                 console.log('🔄 Expanding sidebar from collapsed state');
                 toggleSidebar();
               }}
               aria-label="Open messages"
             >
-              <MessageCircle className="h-5 w-5" />
+              <MessageCircle className="h-6 w-6 md:h-5 md:w-5" />
               {totalUnread > 0 && (
                 <Badge 
                   variant="destructive" 
-                  className="absolute -top-1 -right-1 h-4 w-4 p-0 flex items-center justify-center text-[10px]"
+                  className="absolute -top-1 -right-1 h-5 w-5 md:h-4 md:w-4 p-0 flex items-center justify-center text-[10px] font-bold animate-pulse"
                 >
                   {totalUnread > 9 ? '9+' : totalUnread}
                 </Badge>
               )}
             </Button>
+            <p className="text-[10px] text-muted-foreground mt-1 text-center">Chat</p>
           </div>
         </SidebarContent>
       </Sidebar>
@@ -139,7 +140,7 @@ export const MessagingSidebar = () => {
       )}
       
       <Sidebar 
-        className="w-96 border-r bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 z-50" 
+        className="w-full md:w-[500px] lg:w-[600px] border-r bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 z-50 max-w-full" 
         collapsible="icon" 
         side="left"
       >
@@ -172,7 +173,7 @@ export const MessagingSidebar = () => {
         {/* Split Layout */}
         <div className="flex-1 flex overflow-hidden">
           {/* Left Panel - User List */}
-          <div className="w-64 border-r flex flex-col">
+          <div className="w-full md:w-72 lg:w-80 border-r flex flex-col md:block hidden">
             <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as any)} className="flex flex-col h-full">
               <TabsList className="grid w-full grid-cols-2 m-2">
                 <TabsTrigger value="active" className="text-xs">
@@ -321,9 +322,9 @@ export const MessagingSidebar = () => {
                   </div>
                 </div>
 
-                {/* Messages */}
-                <ScrollArea className="flex-1 p-4">
-                  <div className="space-y-3">
+                 {/* Messages */}
+                <ScrollArea className="flex-1 p-4 md:p-6">
+                  <div className="space-y-4">
                     {messages.map((message) => {
                       const isOwn = message.sender_id === user?.id;
                       const isRead = message.read_by && message.read_by.length > 1;
@@ -334,13 +335,13 @@ export const MessagingSidebar = () => {
                           className={`flex ${isOwn ? 'justify-end' : 'justify-start'}`}
                         >
                           <div
-                            className={`max-w-[75%] rounded-lg px-3 py-2 ${
+                            className={`max-w-[85%] md:max-w-[75%] rounded-2xl px-4 py-3 ${
                               isOwn
-                                ? 'bg-primary text-primary-foreground'
-                                : 'bg-muted'
+                                ? 'bg-primary text-primary-foreground shadow-md'
+                                : 'bg-muted shadow-sm'
                             }`}
                           >
-                            <p className="text-sm break-words">{message.content}</p>
+                            <p className="text-base break-words leading-relaxed">{message.content}</p>
                             <div className="flex items-center gap-1 mt-1">
                               <span className="text-[10px] opacity-70">
                                 {formatDistanceToNow(new Date(message.created_at), { 
@@ -374,7 +375,7 @@ export const MessagingSidebar = () => {
                 </ScrollArea>
 
                 {/* Message Input */}
-                <div className="p-3 border-t">
+                <div className="p-4 md:p-6 border-t bg-background/50">
                   <ChatInput
                     onSend={async (message) => {
                       await sendMessage(message);
