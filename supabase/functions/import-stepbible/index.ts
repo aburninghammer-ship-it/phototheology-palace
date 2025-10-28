@@ -107,49 +107,68 @@ serve(async (req) => {
     // Parse function for TSV data
     const parseData = (text: string, testament: 'OT' | 'NT') => {
       const lines = text.split('\n');
+      console.log(`Processing ${lines.length} lines from ${testament}`);
       
-      for (const line of lines) {
+      for (let i = 0; i < lines.length; i++) {
+        const line = lines[i];
+        
+        // Skip empty lines and comments
         if (!line.trim() || line.startsWith('#') || line.startsWith('$')) {
           continue;
         }
 
         const fields = line.split('\t');
-        if (fields.length < 8) {
+        
+        // STEPBible format has many fields, we need at least reference and strongs
+        if (fields.length < 2) {
           skippedLines++;
           continue;
         }
 
         const ref = fields[0]; // e.g., "Gen.1.1" or "Mat.1.1"
-        const orig = fields[1]; // Original language text
-        const strongs = fields[5]; // Strong's numbers (space-separated)
-        const gloss = fields[6]; // English gloss
-        const morph = fields[7]; // Morphology
-
-        if (!ref || !strongs || strongs === '–') {
-          skippedLines++;
-          continue;
-        }
-
-        // Parse reference: Book.Chapter.Verse
-        const refParts = ref.split('.');
-        if (refParts.length !== 3) {
-          skippedLines++;
-          continue;
-        }
-
-        const [book, chapter, verse] = refParts;
         
-        // Parse Strong's numbers (can be multiple per word)
-        const strongsNumbers = strongs.split(/\s+/).filter(s => s && s !== '–');
+        // Strong's numbers are typically in one of the middle fields
+        // Try fields 4, 5, or 6 as they often contain Strong's data
+        let strongs = '';
+        let orig = fields[1] || '';
+        
+        for (let fieldIdx = 4; fieldIdx <= Math.min(6, fields.length - 1); fieldIdx++) {
+          if (fields[fieldIdx] && fields[fieldIdx].match(/[HG]\d+/)) {
+            strongs = fields[fieldIdx];
+            break;
+          }
+        }
+
+        if (!ref || !strongs || strongs === '–' || strongs === '-') {
+          skippedLines++;
+          continue;
+        }
+
+        // Parse reference: Book.Chapter.Verse or Book.Chapter.Verse.Word
+        const refParts = ref.split('.');
+        if (refParts.length < 3) {
+          skippedLines++;
+          continue;
+        }
+
+        const book = refParts[0];
+        const chapter = refParts[1];
+        const verse = refParts[2];
+        
+        // Parse Strong's numbers (can be multiple per word, space or comma separated)
+        const strongsNumbers = strongs
+          .split(/[\s,]+/)
+          .map(s => s.trim())
+          .filter(s => s && s !== '–' && s !== '-' && s.match(/[HG]\d+/));
         
         if (strongsNumbers.length === 0) {
           skippedLines++;
           continue;
         }
 
-        // Create words array
+        // Create words array - extract just the numbers from Strong's format (H123 -> 123)
         const words: StrongsWord[] = strongsNumbers.map((strongsNum, idx) => ({
-          strongs_number: strongsNum.replace(/[^\d]/g, ''), // Remove letters, keep numbers
+          strongs_number: strongsNum.replace(/[^\d]/g, ''), // Remove H/G prefix
           word: orig || '',
           position: idx + 1
         }));
@@ -163,7 +182,14 @@ serve(async (req) => {
         });
 
         processedVerses++;
+        
+        // Log progress every 1000 verses
+        if (processedVerses % 1000 === 0) {
+          console.log(`Processed ${processedVerses} verses so far...`);
+        }
       }
+      
+      console.log(`Completed parsing ${testament}: ${processedVerses} verses total`);
     };
 
     parseData(tahotText, 'OT');
