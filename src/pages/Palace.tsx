@@ -7,15 +7,37 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { useAuth } from "@/hooks/useAuth";
 import { useCourseProgress } from "@/hooks/useCourseProgress";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
+import { useEffect } from "react";
 
 const Palace = () => {
   const { user } = useAuth();
   const { progress } = useCourseProgress("Memory Palace");
+  const [searchParams] = useSearchParams();
   
   const totalRooms = 38;
   const completedRooms = progress?.completed_lessons?.length || 0;
   const progressPercentage = progress?.progress_percentage || 0;
+
+  useEffect(() => {
+    const roomParam = searchParams.get('room');
+    if (roomParam) {
+      // Find which floor this room belongs to
+      const floorNumber = palaceFloors.findIndex(floor => 
+        floor.rooms.some(room => room.tag === roomParam)
+      ) + 1;
+      
+      if (floorNumber > 0) {
+        // Scroll to that floor
+        setTimeout(() => {
+          const floorElement = document.getElementById(`floor-${floorNumber}`);
+          if (floorElement) {
+            floorElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          }
+        }, 100);
+      }
+    }
+  }, [searchParams]);
 
   return (
     <div className="min-h-screen bg-gradient-subtle">
@@ -83,30 +105,30 @@ const Palace = () => {
             </h2>
             <div className="grid md:grid-cols-2 gap-4 text-sm text-muted-foreground">
               <div>
-                <p className="mb-2">
+                <p id="floor-1" className="mb-2 scroll-mt-24">
                   <strong className="text-foreground">The 1st Floor</strong> fills your shelves with stories and images (width).
                 </p>
-                <p className="mb-2">
+                <p id="floor-2" className="mb-2 scroll-mt-24">
                   <strong className="text-foreground">The 2nd Floor</strong> trains you as a detective with magnifying glass in hand.
                 </p>
-                <p className="mb-2">
+                <p id="floor-3" className="mb-2 scroll-mt-24">
                   <strong className="text-foreground">The 3rd Floor</strong> teaches freestyle, spontaneous connections in daily life.
                 </p>
-                <p className="mb-2">
+                <p id="floor-4" className="mb-2 scroll-mt-24">
                   <strong className="text-foreground">The 4th Floor</strong> expands depth through Christ-centered, dimensional study.
                 </p>
               </div>
               <div>
-                <p className="mb-2">
+                <p id="floor-5" className="mb-2 scroll-mt-24">
                   <strong className="text-foreground">The 5th Floor</strong> opens the prophetic telescope.
                 </p>
-                <p className="mb-2">
+                <p id="floor-6" className="mb-2 scroll-mt-24">
                   <strong className="text-foreground">The 6th Floor</strong> situates everything in the cycles of history and the heavens.
                 </p>
-                <p className="mb-2">
+                <p id="floor-7" className="mb-2 scroll-mt-24">
                   <strong className="text-foreground">The 7th Floor</strong> brings heart and soul into the fire of experience.
                 </p>
-                <p>
+                <p id="floor-8" className="scroll-mt-24">
                   <strong className="text-foreground">The 8th Floor</strong> removes the scaffolding altogether: Phototheology becomes reflexive thought.
                 </p>
               </div>

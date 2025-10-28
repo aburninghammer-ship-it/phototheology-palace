@@ -152,9 +152,14 @@ export const PrinciplePanel = ({ book, chapter, verse, verseText, onClose }: Pri
                   </h4>
                   <div className="flex gap-2 flex-wrap mb-3">
                     {annotation.roomsUsed.map((room) => (
-                      <Badge key={room} variant="secondary" className="bg-white/20">
-                        {room}
-                      </Badge>
+                      <Link key={room} to={`/palace?room=${room}`}>
+                        <Badge 
+                          variant="secondary" 
+                          className="bg-white/20 hover:bg-white/30 cursor-pointer transition-smooth hover-lift"
+                        >
+                          {room}
+                        </Badge>
+                      </Link>
                     ))}
                   </div>
                   {annotation.floorsCovered && (

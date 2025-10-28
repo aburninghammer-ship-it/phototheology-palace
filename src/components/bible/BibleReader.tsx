@@ -28,6 +28,7 @@ export const BibleReader = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [selectedVerse, setSelectedVerse] = useState<number | null>(null);
+  const [selectedVerses, setSelectedVerses] = useState<number[]>([]);
   const [principleMode, setPrincipleMode] = useState(false);
   const [chainReferenceMode, setChainReferenceMode] = useState(false);
   const [commentaryMode, setCommentaryMode] = useState(false);
@@ -82,6 +83,21 @@ export const BibleReader = () => {
     if (newChapter > 0) {
       navigate(`/bible/${book}/${newChapter}`);
       setSelectedVerse(null);
+      setSelectedVerses([]);
+    }
+  };
+
+  const handleVerseClick = (verseNum: number) => {
+    if (principleMode) {
+      // Multi-select in principle mode
+      setSelectedVerses(prev => 
+        prev.includes(verseNum) 
+          ? prev.filter(v => v !== verseNum)
+          : [...prev, verseNum].sort((a, b) => a - b)
+      );
+    } else {
+      // Single select in other modes
+      setSelectedVerse(verseNum);
     }
   };
 
@@ -168,11 +184,13 @@ export const BibleReader = () => {
             setChainReferenceMode(false);
             setCommentaryMode(false);
             setJeevesMode(false);
+            setSelectedVerses([]);
+            setSelectedVerse(null);
           }}
           className={principleMode ? "gradient-palace" : ""}
         >
           <BookOpen className="h-4 w-4 mr-2" />
-          Principle Mode
+          Principle Mode {selectedVerses.length > 0 && `(${selectedVerses.length})`}
         </Button>
         <Button
           variant={chainReferenceMode ? "default" : "outline"}
@@ -229,8 +247,8 @@ export const BibleReader = () => {
                   <StrongsVerseView
                     key={`${verse.book}-${verse.chapter}-${verse.verse}`}
                     verse={verse}
-                    isSelected={selectedVerse === verse.verse}
-                    onSelect={() => setSelectedVerse(verse.verse)}
+                    isSelected={principleMode ? selectedVerses.includes(verse.verse) : selectedVerse === verse.verse}
+                    onSelect={() => handleVerseClick(verse.verse)}
                     showPrinciples={principleMode}
                     isHighlighted={highlightedVerses.includes(verse.verse)}
                   />
@@ -238,8 +256,8 @@ export const BibleReader = () => {
                   <VerseView
                     key={`${verse.book}-${verse.chapter}-${verse.verse}`}
                     verse={verse}
-                    isSelected={selectedVerse === verse.verse}
-                    onSelect={() => setSelectedVerse(verse.verse)}
+                    isSelected={principleMode ? selectedVerses.includes(verse.verse) : selectedVerse === verse.verse}
+                    onSelect={() => handleVerseClick(verse.verse)}
                     showPrinciples={principleMode}
                     isHighlighted={highlightedVerses.includes(verse.verse)}
                   />
@@ -274,6 +292,32 @@ export const BibleReader = () => {
               verseText={chapterData.verses.find(v => v.verse === selectedVerse)?.text || ""}
               onClose={() => setSelectedVerse(null)}
             />
+          ) : principleMode && selectedVerses.length > 0 ? (
+            <Card className="p-6 sticky top-24 space-y-4">
+              <div className="flex items-center justify-between">
+                <h3 className="font-semibold">Selected Verses ({selectedVerses.length})</h3>
+                <Button variant="ghost" size="sm" onClick={() => setSelectedVerses([])}>
+                  Clear
+                </Button>
+              </div>
+              <div className="space-y-2 max-h-[400px] overflow-auto">
+                {selectedVerses.map(v => (
+                  <div key={v} className="p-3 rounded-lg border bg-card/50 text-sm">
+                    <span className="font-semibold text-primary">{v}.</span>{" "}
+                    {chapterData.verses.find(verse => verse.verse === v)?.text}
+                  </div>
+                ))}
+              </div>
+              {selectedVerses.length === 1 && (
+                <PrinciplePanel
+                  book={book}
+                  chapter={chapter}
+                  verse={selectedVerses[0]}
+                  verseText={chapterData.verses.find(v => v.verse === selectedVerses[0])?.text || ""}
+                  onClose={() => setSelectedVerses([])}
+                />
+              )}
+            </Card>
           ) : selectedVerse ? (
             <PrinciplePanel
               book={book}
@@ -286,7 +330,9 @@ export const BibleReader = () => {
             <Card className="p-6 text-center text-muted-foreground sticky top-24">
               <BookOpen className="h-12 w-12 mx-auto mb-3 text-primary/50" />
               <p className="text-sm">
-                {jeevesMode
+                {principleMode
+                  ? "Select one or more verses to analyze with Phototheology principles"
+                  : jeevesMode
                   ? "Select a verse to ask Jeeves questions using any room or principle"
                   : commentaryMode
                   ? "Select a verse for AI-powered commentary using your chosen principles"

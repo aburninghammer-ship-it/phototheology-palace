@@ -86,7 +86,8 @@ const MemorizationVerses = () => {
 
     setFetchingVerse(true);
     try {
-      const chapterData = await fetchChapter(selectedBook, parseInt(selectedChapter));
+      // Default to KJV for Memory Verse Challenge
+      const chapterData = await fetchChapter(selectedBook, parseInt(selectedChapter), 'kjv');
       const foundVerse = chapterData.verses.find(v => v.verse === parseInt(selectedVerse));
       
       if (foundVerse) {
