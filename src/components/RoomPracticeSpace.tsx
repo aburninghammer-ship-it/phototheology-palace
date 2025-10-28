@@ -7,8 +7,9 @@ import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { toast } from "sonner";
-import { BookOpen, Plus, Trash2, Loader2, Edit, Check, X } from "lucide-react";
+import { BookOpen, Plus, Trash2, Loader2, Edit, Check, X, Sparkles } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { BiblePracticeTile } from "./BiblePracticeTile";
 
 interface RoomExercise {
   id: string;
@@ -36,6 +37,10 @@ export function RoomPracticeSpace({ floorNumber, roomId, roomName, roomPrinciple
   const [verseRef, setVerseRef] = useState("");
   const [exerciseTitle, setExerciseTitle] = useState("");
   const [exerciseContent, setExerciseContent] = useState("");
+  const [showAIPractice, setShowAIPractice] = useState(false);
+  const [practiceVerseRef, setPracticeVerseRef] = useState("");
+  const [practiceBibleText, setPracticeBibleText] = useState("");
+  const [loadingBibleText, setLoadingBibleText] = useState(false);
 
   useEffect(() => {
     if (user) {
@@ -154,6 +159,41 @@ export function RoomPracticeSpace({ floorNumber, roomId, roomName, roomPrinciple
     }
   };
 
+  const handleStartAIPractice = async () => {
+    const reference = prompt("Enter verse or chapter reference (e.g., John 3:16, Genesis 22):");
+    if (!reference) return;
+
+    try {
+      setLoadingBibleText(true);
+      setPracticeVerseRef(reference);
+      
+      // Fetch Bible text from the Bible API
+      const book = reference.split(/\s+/)[0];
+      const rest = reference.substring(book.length).trim();
+      const [chapterStr] = rest.split(':');
+      const chapter = parseInt(chapterStr);
+
+      const { data, error } = await supabase.functions.invoke('bible-api', {
+        body: { book, chapter, version: 'kjv' }
+      });
+
+      if (error) throw error;
+
+      if (data?.verses) {
+        const text = data.verses.map((v: any) => `${v.verse} ${v.text}`).join('\n');
+        setPracticeBibleText(text);
+        setShowAIPractice(true);
+      } else {
+        throw new Error('No Bible text found');
+      }
+    } catch (error) {
+      console.error("Error fetching Bible text:", error);
+      toast.error("Could not load Bible text. Please check the reference and try again.");
+    } finally {
+      setLoadingBibleText(false);
+    }
+  };
+
   if (!user) {
     return (
       <Alert>
@@ -165,41 +205,73 @@ export function RoomPracticeSpace({ floorNumber, roomId, roomName, roomPrinciple
   }
 
   return (
-    <Card>
-      <CardHeader>
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <BookOpen className="h-5 w-5 text-primary" />
-            <CardTitle>Practice Box</CardTitle>
+    <>
+      {showAIPractice && (
+        <BiblePracticeTile
+          verseReference={practiceVerseRef}
+          bibleText={practiceBibleText}
+          roomName={roomName}
+          roomPrinciple={roomPrinciple}
+          onClose={() => setShowAIPractice(false)}
+        />
+      )}
+      
+      <Card>
+        <CardHeader>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <BookOpen className="h-5 w-5 text-primary" />
+              <CardTitle>Practice Box</CardTitle>
+            </div>
+            <div className="flex gap-2">
+              <Button
+                onClick={handleStartAIPractice}
+                size="sm"
+                variant="default"
+                className="gradient-palace"
+                disabled={loadingBibleText}
+              >
+                {loadingBibleText ? (
+                  <>
+                    <Loader2 className="h-4 w-4 mr-1 animate-spin" />
+                    Loading...
+                  </>
+                ) : (
+                  <>
+                    <Sparkles className="h-4 w-4 mr-1" />
+                    AI Practice
+                  </>
+                )}
+              </Button>
+              <Button
+                onClick={() => {
+                  if (showForm && !editingId) {
+                    handleCancelEdit();
+                  } else {
+                    setShowForm(!showForm);
+                  }
+                }}
+                size="sm"
+                variant={showForm ? "outline" : "default"}
+              >
+                {showForm ? (
+                  <>
+                    <X className="h-4 w-4 mr-1" />
+                    Cancel
+                  </>
+                ) : (
+                  <>
+                    <Plus className="h-4 w-4 mr-1" />
+                    New Practice
+                  </>
+                )}
+              </Button>
+            </div>
           </div>
-          <Button
-            onClick={() => {
-              if (showForm && !editingId) {
-                handleCancelEdit();
-              } else {
-                setShowForm(!showForm);
-              }
-            }}
-            size="sm"
-            variant={showForm ? "outline" : "default"}
-          >
-            {showForm ? (
-              <>
-                <X className="h-4 w-4 mr-1" />
-                Cancel
-              </>
-            ) : (
-              <>
-                <Plus className="h-4 w-4 mr-1" />
-                New Practice
-              </>
-            )}
-          </Button>
-        </div>
-        <CardDescription>
-          Apply the {roomName} principle to any verse or story
-        </CardDescription>
-      </CardHeader>
+          <CardDescription>
+            Apply the {roomName} principle to any verse or story
+          </CardDescription>
+        </CardHeader>
       <CardContent className="space-y-4">
         {showForm && (
           <form onSubmit={handleSubmit} className="space-y-4 p-4 border rounded-lg bg-accent/5">
@@ -329,5 +401,6 @@ export function RoomPracticeSpace({ floorNumber, roomId, roomName, roomPrinciple
         )}
       </CardContent>
     </Card>
+    </>
   );
 }
