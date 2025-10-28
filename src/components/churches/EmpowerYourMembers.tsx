@@ -159,15 +159,15 @@ export const EmpowerYourMembers = () => {
               onClick={() => navigate("/pricing")}
               className="text-lg px-8 py-6"
             >
-              View Church Pricing
+              View Individual Plans
             </Button>
             <Button 
               size="lg" 
-              variant="outline"
-              onClick={() => navigate("/contact")}
-              className="text-lg px-8 py-6"
+              variant="default"
+              onClick={() => navigate("/church-signup")}
+              className="text-lg px-8 py-6 bg-gradient-to-r from-primary to-primary/80"
             >
-              Schedule a Demo
+              Register Your Church
             </Button>
           </div>
         </div>

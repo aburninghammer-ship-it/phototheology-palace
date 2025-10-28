@@ -3,7 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Check, Sparkles, Star, Crown, Zap, GraduationCap } from "lucide-react";
+import { Check, Sparkles, Star, Crown, Zap, GraduationCap, Building2, ArrowRight } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -192,6 +192,40 @@ export default function Pricing() {
             Start with a free trial, upgrade anytime to unlock more features
           </p>
         </div>
+
+        {/* Church Plans CTA */}
+        <Card className="mb-12 border-2 border-primary/20 bg-gradient-to-r from-primary/5 to-primary/10 max-w-4xl mx-auto">
+          <CardContent className="p-6 md:p-8">
+            <div className="flex flex-col md:flex-row items-center justify-between gap-6">
+              <div className="flex items-start gap-4">
+                <div className="p-3 rounded-lg bg-primary/10">
+                  <Building2 className="h-8 w-8 text-primary" />
+                </div>
+                <div>
+                  <h3 className="text-2xl font-bold mb-2">Looking for Church Licensing?</h3>
+                  <p className="text-muted-foreground mb-3">
+                    Unite your entire congregation around one discipleship system. Get bulk pricing for 50-300 members.
+                  </p>
+                  <div className="flex flex-wrap gap-2">
+                    <Badge variant="secondary">Church-Wide Campaigns</Badge>
+                    <Badge variant="secondary">Member Management</Badge>
+                    <Badge variant="secondary">Analytics</Badge>
+                  </div>
+                </div>
+              </div>
+              <Button 
+                asChild 
+                size="lg"
+                className="whitespace-nowrap gap-2"
+              >
+                <Link to="/church-signup">
+                  View Church Plans
+                  <ArrowRight className="h-4 w-4" />
+                </Link>
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
 
         {/* Pricing Cards */}
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8 max-w-7xl mx-auto">
