@@ -2566,6 +2566,7 @@ export type Database = {
           chapter: number
           created_at: string | null
           id: string
+          position: number
           strongs_number: string | null
           verse: number
           word_position: number
@@ -2576,6 +2577,7 @@ export type Database = {
           chapter: number
           created_at?: string | null
           id?: string
+          position?: number
           strongs_number?: string | null
           verse: number
           word_position: number
@@ -2586,6 +2588,7 @@ export type Database = {
           chapter?: number
           created_at?: string | null
           id?: string
+          position?: number
           strongs_number?: string | null
           verse?: number
           word_position?: number
