@@ -164,7 +164,7 @@ serve(async (req) => {
         }
 
         const words: StrongsWord[] = strongsNumbers.map((strongsNum, idx) => ({
-          strongs_number: strongsNum.replace(/[^\d]/g, ''),
+          strongs_number: strongsNum,
           word: orig || '',
           position: idx + 1
         }));
