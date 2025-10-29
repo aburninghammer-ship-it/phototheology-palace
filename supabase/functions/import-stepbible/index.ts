@@ -87,89 +87,47 @@ serve(async (req) => {
 
     console.log('Starting STEPBible import...');
 
-    // STEPBible files are split into multiple parts
     const baseUrl = 'https://raw.githubusercontent.com/STEPBible/STEPBible-Data/master/Translators%20Amalgamated%20OT%2BNT/';
     
-    // Download Greek NT (TAGNT) - split into 2 parts
-    console.log('Downloading Greek NT parts...');
-    const tagntParts = [
-      'TAGNT%20Mat-Jhn%20-%20Translators%20Amalgamated%20Greek%20NT%20-%20STEPBible.org%20CC-BY.txt',
-      'TAGNT%20Act-Rev%20-%20Translators%20Amalgamated%20Greek%20NT%20-%20STEPBible.org%20CC-BY.txt'
+    // Process files one at a time to avoid memory issues
+    const allParts: Array<{ url: string; testament: 'NT' | 'OT' }> = [
+      { url: 'TAGNT%20Mat-Jhn%20-%20Translators%20Amalgamated%20Greek%20NT%20-%20STEPBible.org%20CC-BY.txt', testament: 'NT' },
+      { url: 'TAGNT%20Act-Rev%20-%20Translators%20Amalgamated%20Greek%20NT%20-%20STEPBible.org%20CC-BY.txt', testament: 'NT' },
+      { url: 'TAHOT%20Gen-Deu%20-%20Translators%20Amalgamated%20Hebrew%20OT%20-%20STEPBible.org%20CC%20BY.txt', testament: 'OT' },
+      { url: 'TAHOT%20Jos-Est%20-%20Translators%20Amalgamated%20Hebrew%20OT%20-%20STEPBible.org%20CC%20BY.txt', testament: 'OT' },
+      { url: 'TAHOT%20Job-Sng%20-%20Translators%20Amalgamated%20Hebrew%20OT%20-%20STEPBible.org%20CC%20BY.txt', testament: 'OT' },
+      { url: 'TAHOT%20Isa-Mal%20-%20Translators%20Amalgamated%20Hebrew%20OT%20-%20STEPBible.org%20CC%20BY.txt', testament: 'OT' }
     ];
-    
-    let tagntText = '';
-    for (const part of tagntParts) {
-      console.log(`Downloading ${part}...`);
-      const response = await fetch(baseUrl + part);
-      if (!response.ok) {
-        console.error(`Failed to download ${part}:`, response.status, response.statusText);
-        return new Response(
-          JSON.stringify({ error: `Failed to download ${part}: ${response.status} ${response.statusText}` }),
-          { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-        );
-      }
-      const text = await response.text();
-      tagntText += text + '\n';
-      console.log(`Downloaded ${part}: ${text.length} characters`);
-    }
-    console.log('Greek NT total size:', tagntText.length, 'characters');
 
-    // Download Hebrew OT (TAHOT) - split into 4 parts
-    console.log('Downloading Hebrew OT parts...');
-    const tahotParts = [
-      'TAHOT%20Gen-Deu%20-%20Translators%20Amalgamated%20Hebrew%20OT%20-%20STEPBible.org%20CC%20BY.txt',
-      'TAHOT%20Jos-Est%20-%20Translators%20Amalgamated%20Hebrew%20OT%20-%20STEPBible.org%20CC%20BY.txt',
-      'TAHOT%20Job-Sng%20-%20Translators%20Amalgamated%20Hebrew%20OT%20-%20STEPBible.org%20CC%20BY.txt',
-      'TAHOT%20Isa-Mal%20-%20Translators%20Amalgamated%20Hebrew%20OT%20-%20STEPBible.org%20CC%20BY.txt'
-    ];
-    
-    let tahotText = '';
-    for (const part of tahotParts) {
-      console.log(`Downloading ${part}...`);
-      const response = await fetch(baseUrl + part);
-      if (!response.ok) {
-        console.error(`Failed to download ${part}:`, response.status, response.statusText);
-        return new Response(
-          JSON.stringify({ error: `Failed to download ${part}: ${response.status} ${response.statusText}` }),
-          { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-        );
-      }
-      const text = await response.text();
-      tahotText += text + '\n';
-      console.log(`Downloaded ${part}: ${text.length} characters`);
-    }
-    console.log('Hebrew OT total size:', tahotText.length, 'characters');
+    let totalImported = 0;
+    let totalErrors = 0;
+    let totalProcessed = 0;
+    let totalSkipped = 0;
 
-    console.log('Parsing data...');
-    const verses: any[] = [];
-    let processedVerses = 0;
-    let skippedLines = 0;
-
-    // Parse function for TSV data
-    const parseData = (text: string, testament: 'OT' | 'NT') => {
+    // Parse function for TSV data - processes and imports immediately
+    const parseAndImportFile = async (text: string, testament: 'OT' | 'NT', fileName: string) => {
       const lines = text.split('\n');
-      console.log(`Processing ${lines.length} lines from ${testament}`);
+      console.log(`Processing ${lines.length} lines from ${fileName}`);
+      
+      let fileProcessed = 0;
+      let fileSkipped = 0;
+      let batchVerses: any[] = [];
+      const batchSize = 50;
       
       for (let i = 0; i < lines.length; i++) {
         const line = lines[i];
         
-        // Skip empty lines and comments
         if (!line.trim() || line.startsWith('#') || line.startsWith('$')) {
           continue;
         }
 
         const fields = line.split('\t');
-        
-        // STEPBible format has many fields, we need at least reference and strongs
         if (fields.length < 2) {
-          skippedLines++;
+          fileSkipped++;
           continue;
         }
 
-        const ref = fields[0]; // e.g., "Gen.1.1" or "Mat.1.1"
-        
-        // Strong's numbers are typically in one of the middle fields
-        // Try fields 4, 5, or 6 as they often contain Strong's data
+        const ref = fields[0];
         let strongs = '';
         let orig = fields[1] || '';
         
@@ -181,14 +139,13 @@ serve(async (req) => {
         }
 
         if (!ref || !strongs || strongs === '–' || strongs === '-') {
-          skippedLines++;
+          fileSkipped++;
           continue;
         }
 
-        // Parse reference: Book.Chapter.Verse or Book.Chapter.Verse.Word
         const refParts = ref.split('.');
         if (refParts.length < 3) {
-          skippedLines++;
+          fileSkipped++;
           continue;
         }
 
@@ -196,25 +153,23 @@ serve(async (req) => {
         const chapter = refParts[1];
         const verse = refParts[2];
         
-        // Parse Strong's numbers (can be multiple per word, space or comma separated)
         const strongsNumbers = strongs
           .split(/[\s,]+/)
           .map(s => s.trim())
           .filter(s => s && s !== '–' && s !== '-' && s.match(/[HG]\d+/));
         
         if (strongsNumbers.length === 0) {
-          skippedLines++;
+          fileSkipped++;
           continue;
         }
 
-        // Create words array - extract just the numbers from Strong's format (H123 -> 123)
         const words: StrongsWord[] = strongsNumbers.map((strongsNum, idx) => ({
-          strongs_number: strongsNum.replace(/[^\d]/g, ''), // Remove H/G prefix
+          strongs_number: strongsNum.replace(/[^\d]/g, ''),
           word: orig || '',
           position: idx + 1
         }));
 
-        verses.push({
+        batchVerses.push({
           book,
           chapter: parseInt(chapter),
           verse: parseInt(verse),
@@ -222,34 +177,40 @@ serve(async (req) => {
           words
         });
 
-        processedVerses++;
+        fileProcessed++;
         
-        // Log progress every 1000 verses
-        if (processedVerses % 1000 === 0) {
-          console.log(`Processed ${processedVerses} verses so far...`);
+        // Import batch when it reaches batch size
+        if (batchVerses.length >= batchSize) {
+          const { imported, errors } = await importBatch(batchVerses, supabase);
+          totalImported += imported;
+          totalErrors += errors;
+          batchVerses = []; // Clear batch
+        }
+        
+        if (fileProcessed % 500 === 0) {
+          console.log(`Processed ${fileProcessed} verses from ${fileName}...`);
         }
       }
       
-      console.log(`Completed parsing ${testament}: ${processedVerses} verses total`);
+      // Import remaining verses
+      if (batchVerses.length > 0) {
+        const { imported, errors } = await importBatch(batchVerses, supabase);
+        totalImported += imported;
+        totalErrors += errors;
+      }
+      
+      console.log(`Completed ${fileName}: ${fileProcessed} verses`);
+      totalProcessed += fileProcessed;
+      totalSkipped += fileSkipped;
     };
 
-    parseData(tahotText, 'OT');
-    parseData(tagntText, 'NT');
-
-    console.log(`Parsed ${processedVerses} verses (skipped ${skippedLines} lines)`);
-
-    // Import in batches
-    console.log('Importing to database...');
-    let imported = 0;
-    let errors = 0;
-    const batchSize = 100;
-
-    for (let i = 0; i < verses.length; i += batchSize) {
-      const batch = verses.slice(i, i + batchSize);
+    // Import batch helper
+    const importBatch = async (verses: any[], supabase: any) => {
+      let imported = 0;
+      let errors = 0;
       
-      for (const verseData of batch) {
+      for (const verseData of verses) {
         try {
-          // Delete existing words for this verse
           await supabase
             .from('verses_strongs')
             .delete()
@@ -257,7 +218,6 @@ serve(async (req) => {
             .eq('chapter', verseData.chapter)
             .eq('verse', verseData.verse);
 
-          // Insert new words
           if (verseData.words.length > 0) {
             const { error: insertError } = await supabase
               .from('verses_strongs')
@@ -281,22 +241,43 @@ serve(async (req) => {
             }
           }
         } catch (err) {
-          console.error(`Error processing verse:`, err);
+          console.error('Error processing verse:', err);
           errors++;
         }
       }
+      
+      return { imported, errors };
+    };
 
-      console.log(`Progress: ${Math.min(i + batchSize, verses.length)}/${verses.length} verses`);
+    // Process each file one at a time
+    for (const part of allParts) {
+      console.log(`Downloading and processing ${part.url}...`);
+      
+      try {
+        const response = await fetch(baseUrl + part.url);
+        if (!response.ok) {
+          console.error(`Failed to download ${part.url}:`, response.status);
+          continue;
+        }
+        
+        const text = await response.text();
+        console.log(`Downloaded ${part.url}: ${text.length} chars`);
+        
+        await parseAndImportFile(text, part.testament, part.url);
+      } catch (err) {
+        console.error(`Error processing ${part.url}:`, err);
+      }
     }
+
 
     return new Response(
       JSON.stringify({
         success: true,
         stats: {
-          total_verses: processedVerses,
-          imported,
-          errors,
-          skipped_lines: skippedLines
+          total_verses: totalProcessed,
+          imported: totalImported,
+          errors: totalErrors,
+          skipped_lines: totalSkipped
         }
       }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
