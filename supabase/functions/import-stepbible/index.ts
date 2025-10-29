@@ -122,10 +122,16 @@ serve(async (req) => {
         strongs_number: entry.strongs_number,
         word: entry.word,
         transliteration: entry.transliteration,
+        pronunciation: entry.pronunciation,
         language: entry.language,
         definition: entry.definition,
-        gloss: entry.usage?.split('.')[0] || '', // First sentence as gloss
-        morph: '' // Not available in this format
+        kjv_translation: entry.usage?.split('.')[0] || '',
+        occurrences: entry.occurrences || 0,
+        sanctuary_link: entry.sanctuary_link || null,
+        time_zone_code: entry.time_zone_code || null,
+        dimension_code: entry.dimension_code || null,
+        cycle_code: entry.cycle_association || null,
+        pt_notes: entry.floor_rooms?.join(', ') || null
       };
       console.log(`Inserting Strong's ${entry.strongs_number}: ${entry.word}`);
       const { error } = await supabase.from('strongs_dictionary').upsert(dictEntry, { onConflict: 'strongs_number' });
