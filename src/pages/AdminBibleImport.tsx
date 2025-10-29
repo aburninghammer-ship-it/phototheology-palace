@@ -22,6 +22,7 @@ export default function AdminBibleImport() {
   const [uploadingFile, setUploadingFile] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const strongsCsvInputRef = useRef<HTMLInputElement>(null);
+  const versesCsvInputRef = useRef<HTMLInputElement>(null);
 
   const parseCSV = (csv: string) => {
     const lines = csv.trim().split('\n');
@@ -293,6 +294,38 @@ export default function AdminBibleImport() {
     }
   };
 
+  const handleVersesCsvUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    try {
+      toast({
+        title: "Reading file...",
+        description: `Processing ${file.name}`,
+      });
+
+      const fileContent = await file.text();
+      setVersesData(fileContent);
+
+      toast({
+        title: "File loaded",
+        description: "File content loaded. Click 'Import Verses' to process.",
+      });
+
+      // Reset file input
+      if (versesCsvInputRef.current) {
+        versesCsvInputRef.current.value = '';
+      }
+    } catch (error: any) {
+      console.error('File read error:', error);
+      toast({
+        title: "File read failed",
+        description: error.message,
+        variant: "destructive",
+      });
+    }
+  };
+
   if (!user) {
     return null;
   }
@@ -404,9 +437,46 @@ export default function AdminBibleImport() {
 
               <Card>
                 <CardHeader>
+                  <CardTitle>Upload Tokenized Verses CSV/JSON File</CardTitle>
+                  <CardDescription>
+                    Choose a CSV or JSON file with format: book, chapter, verse_num, tokens (JSONB array)
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="bg-muted/50 p-4 rounded-lg space-y-2">
+                    <p className="text-sm font-semibold">Expected CSV Format:</p>
+                    <pre className="text-xs">book,chapter,verse_num,tokens
+"Genesis",1,1,"[{`{\"t\":\"In\",\"s\":\"H7225\"},{\"t\":\"the\",\"s\":null}...`}]"</pre>
+                    <p className="text-sm font-semibold mt-3">Expected JSON Format:</p>
+                    <pre className="text-xs">[{`{"book":"Genesis","chapter":1,"verse_num":1,"tokens":[{"t":"In","s":"H7225"}]}`}]</pre>
+                  </div>
+
+                  <input
+                    ref={versesCsvInputRef}
+                    type="file"
+                    accept=".csv,.json,.txt"
+                    onChange={handleVersesCsvUpload}
+                    className="hidden"
+                    id="verses-csv-upload"
+                  />
+
+                  <Button 
+                    onClick={() => versesCsvInputRef.current?.click()}
+                    disabled={importing}
+                    className="w-full"
+                    size="lg"
+                  >
+                    <FileText className="h-4 w-4 mr-2" />
+                    Choose CSV/JSON File
+                  </Button>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader>
                   <CardTitle>Manual Import (Tokenized Verses)</CardTitle>
                   <CardDescription>
-                    Paste CSV or JSON with format: book, chapter, verse_num, tokens (JSONB array)
+                    Or paste CSV or JSON with format: book, chapter, verse_num, tokens (JSONB array)
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">

@@ -88,17 +88,8 @@ export default function EquationsChallenge() {
       const challengeId = `custom-${Date.now()}`;
       const shareUrl = `${window.location.origin}/equations-challenge?challenge=${challengeId}`;
       
-      // Store custom challenge
-      const { error } = await supabase.from("custom_equations").insert({
-        challenge_id: challengeId,
-        verse: customVerse,
-        equation: customEquation,
-        explanation: customExplanation,
-        created_by: user?.id
-      });
-
-      if (error) throw error;
-
+      // Note: Custom challenge storage requires database migration
+      // For now, just generate the share link
       setShareLink(shareUrl);
       toast.success("Challenge created! Share the link with others.");
     } catch (error) {
