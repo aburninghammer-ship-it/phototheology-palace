@@ -13,6 +13,8 @@ export default function AdminStrongsImport() {
   const [isImporting, setIsImporting] = useState(false);
   const [isAutoImporting, setIsAutoImporting] = useState(false);
   const [result, setResult] = useState<any>(null);
+  const [hebrewFile, setHebrewFile] = useState<File | null>(null);
+  const [greekFile, setGreekFile] = useState<File | null>(null);
   const { toast } = useToast();
   const navigate = useNavigate();
 
@@ -56,6 +58,62 @@ export default function AdminStrongsImport() {
         toast({
           title: "Import Successful",
           description: `Imported ${response.data.statistics.versesInserted + response.data.statistics.versesUpdated} verses`,
+        });
+      }
+    } catch (error: any) {
+      console.error("Import error:", error);
+      toast({
+        title: "Import Failed",
+        description: error.message,
+        variant: "destructive",
+      });
+      setResult({ success: false, error: error.message });
+    } finally {
+      setIsImporting(false);
+    }
+  };
+
+  const handleFileImport = async () => {
+    if (!hebrewFile && !greekFile) {
+      toast({
+        title: "Error",
+        description: "Please select at least one lexicon file to import",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsImporting(true);
+    setResult(null);
+
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        throw new Error("Not authenticated");
+      }
+
+      toast({
+        title: "Starting Import",
+        description: "Processing lexicon files... This may take a few minutes.",
+      });
+
+      const hebrewContent = hebrewFile ? await hebrewFile.text() : null;
+      const greekContent = greekFile ? await greekFile.text() : null;
+
+      const response = await supabase.functions.invoke('import-strongs-lexicon', {
+        body: { hebrewContent, greekContent }
+      });
+
+      if (response.error) {
+        throw response.error;
+      }
+
+      setResult(response.data);
+      
+      if (response.data.success) {
+        toast({
+          title: "Import Successful",
+          description: `Imported ${response.data.statistics.hebrewImported} Hebrew + ${response.data.statistics.greekImported} Greek entries`,
         });
       }
     } catch (error: any) {
@@ -178,7 +236,61 @@ export default function AdminStrongsImport() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Upload className="h-5 w-5" />
-              Automatic Import (Recommended)
+              Import Lexicon Files (Recommended)
+            </CardTitle>
+            <CardDescription>
+              Upload the TBESH (Hebrew) and TBESG (Greek) lexicon files from STEPBible.org. These files contain complete Strong's definitions.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium mb-2">
+                Hebrew Lexicon (TBESH_*.txt)
+              </label>
+              <input
+                type="file"
+                accept=".txt"
+                onChange={(e) => setHebrewFile(e.target.files?.[0] || null)}
+                className="block w-full text-sm file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-primary file:text-primary-foreground hover:file:bg-primary/90"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium mb-2">
+                Greek Lexicon (TBESG_*.txt)
+              </label>
+              <input
+                type="file"
+                accept=".txt"
+                onChange={(e) => setGreekFile(e.target.files?.[0] || null)}
+                className="block w-full text-sm file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-primary file:text-primary-foreground hover:file:bg-primary/90"
+              />
+            </div>
+            <Button
+              onClick={handleFileImport}
+              disabled={isImporting || (!hebrewFile && !greekFile)}
+              size="lg"
+              className="w-full"
+            >
+              {isImporting ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Importing Lexicon...
+                </>
+              ) : (
+                <>
+                  <Upload className="mr-2 h-4 w-4" />
+                  Import Lexicon Files
+                </>
+              )}
+            </Button>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Upload className="h-5 w-5" />
+              Import Bible Verses (Optional)
             </CardTitle>
             <CardDescription>
               Import the complete KJV Bible (31,102 verses) with Strong's numbers and Phototheology codes. This process takes 5-10 minutes and includes:
@@ -281,24 +393,46 @@ export default function AdminStrongsImport() {
               {result.statistics ? (
                 <div className="space-y-4">
                   <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                    <div className="bg-muted p-4 rounded-lg">
-                      <div className="text-2xl font-bold text-green-600">
-                        {result.statistics.versesInserted}
+                    {result.statistics.hebrewImported !== undefined && (
+                      <div className="bg-muted p-4 rounded-lg">
+                        <div className="text-2xl font-bold text-green-600">
+                          {result.statistics.hebrewImported}
+                        </div>
+                        <div className="text-sm text-muted-foreground">Hebrew Entries</div>
                       </div>
-                      <div className="text-sm text-muted-foreground">Verses Inserted</div>
-                    </div>
-                    <div className="bg-muted p-4 rounded-lg">
-                      <div className="text-2xl font-bold text-blue-600">
-                        {result.statistics.versesUpdated}
+                    )}
+                    {result.statistics.greekImported !== undefined && (
+                      <div className="bg-muted p-4 rounded-lg">
+                        <div className="text-2xl font-bold text-blue-600">
+                          {result.statistics.greekImported}
+                        </div>
+                        <div className="text-sm text-muted-foreground">Greek Entries</div>
                       </div>
-                      <div className="text-sm text-muted-foreground">Verses Updated</div>
-                    </div>
-                    <div className="bg-muted p-4 rounded-lg">
-                      <div className="text-2xl font-bold text-orange-600">
-                        {result.statistics.strongsEntriesInserted}
+                    )}
+                    {result.statistics.versesInserted !== undefined && (
+                      <div className="bg-muted p-4 rounded-lg">
+                        <div className="text-2xl font-bold text-green-600">
+                          {result.statistics.versesInserted}
+                        </div>
+                        <div className="text-sm text-muted-foreground">Verses Inserted</div>
                       </div>
-                      <div className="text-sm text-muted-foreground">Strong's Entries</div>
-                    </div>
+                    )}
+                    {result.statistics.versesUpdated !== undefined && result.statistics.versesUpdated > 0 && (
+                      <div className="bg-muted p-4 rounded-lg">
+                        <div className="text-2xl font-bold text-blue-600">
+                          {result.statistics.versesUpdated}
+                        </div>
+                        <div className="text-sm text-muted-foreground">Verses Updated</div>
+                      </div>
+                    )}
+                    {result.statistics.strongsEntriesInserted !== undefined && result.statistics.strongsEntriesInserted > 0 && (
+                      <div className="bg-muted p-4 rounded-lg">
+                        <div className="text-2xl font-bold text-orange-600">
+                          {result.statistics.strongsEntriesInserted}
+                        </div>
+                        <div className="text-sm text-muted-foreground">Strong's Entries</div>
+                      </div>
+                    )}
                     {result.statistics.versesSkipped > 0 && (
                       <div className="bg-muted p-4 rounded-lg">
                         <div className="text-2xl font-bold text-red-600">
