@@ -124,8 +124,14 @@ serve(async (req) => {
         gloss: entry.usage?.split('.')[0] || '', // First sentence as gloss
         morph: '' // Not available in this format
       };
+      console.log(`Inserting Strong's ${entry.strongs_number}: ${entry.word}`);
       const { error } = await supabase.from('strongs_dictionary').upsert(dictEntry, { onConflict: 'strongs_number' });
-      if (!error) strongsInserted++;
+      if (error) {
+        console.error(`Error inserting ${entry.strongs_number}:`, error);
+      } else {
+        strongsInserted++;
+        console.log(`✓ Successfully inserted ${entry.strongs_number}`);
+      }
     }
 
     console.log(`Imported ${strongsInserted} Strong's entries with PT codes`);
