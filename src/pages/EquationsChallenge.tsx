@@ -4,7 +4,9 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
-import { Calculator, Trophy, Target, Clock } from "lucide-react";
+import { Textarea } from "@/components/ui/textarea";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Calculator, Trophy, Target, Clock, RefreshCw, Share2, Plus } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { toast } from "sonner";
@@ -27,6 +29,13 @@ export default function EquationsChallenge() {
   const [userAnswer, setUserAnswer] = useState("");
   const [showResult, setShowResult] = useState(false);
   const [score, setScore] = useState(0);
+  const [mode, setMode] = useState<"solve" | "create">("solve");
+  
+  // Custom challenge creation state
+  const [customVerse, setCustomVerse] = useState("");
+  const [customEquation, setCustomEquation] = useState("");
+  const [customExplanation, setCustomExplanation] = useState("");
+  const [shareLink, setShareLink] = useState("");
 
   const difficultyInfo = {
     easy: { symbols: 3, color: "bg-green-500", description: "3 principles" },
@@ -67,6 +76,40 @@ export default function EquationsChallenge() {
     // For now, we'll just show the explanation
     setShowResult(true);
     setScore(score + 1);
+  };
+
+  const createCustomChallenge = async () => {
+    if (!customVerse || !customEquation || !customExplanation) {
+      toast.error("Please fill in all fields");
+      return;
+    }
+
+    try {
+      const challengeId = `custom-${Date.now()}`;
+      const shareUrl = `${window.location.origin}/equations-challenge?challenge=${challengeId}`;
+      
+      // Store custom challenge
+      const { error } = await supabase.from("custom_equations").insert({
+        challenge_id: challengeId,
+        verse: customVerse,
+        equation: customEquation,
+        explanation: customExplanation,
+        created_by: user?.id
+      });
+
+      if (error) throw error;
+
+      setShareLink(shareUrl);
+      toast.success("Challenge created! Share the link with others.");
+    } catch (error) {
+      console.error("Error creating challenge:", error);
+      toast.error("Failed to create challenge");
+    }
+  };
+
+  const copyShareLink = () => {
+    navigator.clipboard.writeText(shareLink);
+    toast.success("Link copied to clipboard!");
   };
 
   return (
@@ -222,55 +265,80 @@ export default function EquationsChallenge() {
           </CardContent>
         </Card>
 
-        {/* Difficulty Selection */}
-        <Card className="mb-6">
-          <CardHeader>
-            <CardTitle>Select Difficulty</CardTitle>
-            <CardDescription>Choose your challenge level</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              {(Object.keys(difficultyInfo) as Difficulty[]).map((diff) => (
-                <Button
-                  key={diff}
-                  variant={difficulty === diff ? "default" : "outline"}
-                  onClick={() => setDifficulty(diff)}
-                  className="flex flex-col h-auto py-4"
-                >
-                  <span className="capitalize font-bold">{diff}</span>
-                  <span className="text-xs text-muted-foreground mt-1">
-                    {difficultyInfo[diff].description}
-                  </span>
-                </Button>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
+        {/* Mode Tabs */}
+        <Tabs value={mode} onValueChange={(v) => setMode(v as "solve" | "create")} className="mb-6">
+          <TabsList className="grid w-full grid-cols-2">
+            <TabsTrigger value="solve">
+              <Calculator className="h-4 w-4 mr-2" />
+              Solve Challenges
+            </TabsTrigger>
+            <TabsTrigger value="create">
+              <Plus className="h-4 w-4 mr-2" />
+              Create Challenge
+            </TabsTrigger>
+          </TabsList>
 
-        {/* Equation Display */}
-        {!currentEquation ? (
-          <Card>
-            <CardContent className="py-12 text-center">
-              <Calculator className="h-16 w-16 mx-auto mb-4 text-muted-foreground" />
-              <p className="text-lg text-muted-foreground mb-6">
-                Ready to solve an equation? Click below to start!
-              </p>
-              <Button onClick={generateEquation} disabled={loading} size="lg">
-                {loading ? "Generating..." : "Generate New Equation"}
-              </Button>
-            </CardContent>
-          </Card>
-        ) : (
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center justify-between">
-                <span>Current Challenge</span>
-                <Badge className={difficultyInfo[difficulty].color}>
-                  {difficulty}
-                </Badge>
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-6">
+          <TabsContent value="solve" className="space-y-6">
+            {/* Difficulty Selection */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Select Difficulty</CardTitle>
+                <CardDescription>Choose your challenge level</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                  {(Object.keys(difficultyInfo) as Difficulty[]).map((diff) => (
+                    <Button
+                      key={diff}
+                      variant={difficulty === diff ? "default" : "outline"}
+                      onClick={() => setDifficulty(diff)}
+                      className="flex flex-col h-auto py-4"
+                    >
+                      <span className="capitalize font-bold">{diff}</span>
+                      <span className="text-xs text-muted-foreground mt-1">
+                        {difficultyInfo[diff].description}
+                      </span>
+                    </Button>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Equation Display */}
+            {!currentEquation ? (
+            <Card>
+              <CardContent className="py-12 text-center">
+                <Calculator className="h-16 w-16 mx-auto mb-4 text-muted-foreground" />
+                <p className="text-lg text-muted-foreground mb-6">
+                  Ready to solve an equation? Click below to start!
+                </p>
+                <Button onClick={generateEquation} disabled={loading} size="lg">
+                  {loading ? "Generating..." : "Generate New Equation"}
+                </Button>
+              </CardContent>
+            </Card>
+          ) : (
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center justify-between">
+                  <span>Current Challenge</span>
+                  <div className="flex items-center gap-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={generateEquation}
+                      disabled={loading}
+                    >
+                      <RefreshCw className="h-4 w-4 mr-2" />
+                      Regenerate
+                    </Button>
+                    <Badge className={difficultyInfo[difficulty].color}>
+                      {difficulty}
+                    </Badge>
+                  </div>
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-6">
               {/* Verse Reference */}
               <div className="p-4 bg-muted rounded-lg">
                 <p className="font-semibold text-lg mb-2">{currentEquation.verse}</p>
@@ -311,21 +379,96 @@ export default function EquationsChallenge() {
                 </div>
               )}
 
-              {/* Result */}
-              {showResult && (
-                <Card className="border-green-500 bg-green-50 dark:bg-green-900/20">
-                  <CardContent className="pt-6 space-y-4">
-                    <h3 className="font-bold text-lg">Jeeves' Explanation:</h3>
-                    <p className="whitespace-pre-wrap">{currentEquation.explanation}</p>
-                    <Button onClick={generateEquation} className="w-full">
-                      Next Equation
-                    </Button>
-                  </CardContent>
-                </Card>
-              )}
-            </CardContent>
-          </Card>
-        )}
+                {/* Result */}
+                {showResult && (
+                  <Card className="border-green-500 bg-green-50 dark:bg-green-900/20">
+                    <CardContent className="pt-6 space-y-4">
+                      <h3 className="font-bold text-lg">Jeeves' Explanation:</h3>
+                      <p className="whitespace-pre-wrap">{currentEquation.explanation}</p>
+                      <Button onClick={generateEquation} className="w-full">
+                        Next Equation
+                      </Button>
+                    </CardContent>
+                  </Card>
+                )}
+              </CardContent>
+            </Card>
+          )}
+          </TabsContent>
+
+          <TabsContent value="create" className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle>Create Custom Challenge</CardTitle>
+                <CardDescription>
+                  Build your own equation challenge to share with others
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div>
+                  <label className="text-sm font-medium mb-2 block">
+                    Verse Reference
+                  </label>
+                  <Input
+                    value={customVerse}
+                    onChange={(e) => setCustomVerse(e.target.value)}
+                    placeholder="e.g., John 3:16"
+                  />
+                </div>
+
+                <div>
+                  <label className="text-sm font-medium mb-2 block">
+                    Equation
+                  </label>
+                  <Input
+                    value={customEquation}
+                    onChange={(e) => setCustomEquation(e.target.value)}
+                    placeholder="e.g., @70w + @CyC + PO → CR + ABO + MS = @Re + 3H"
+                  />
+                </div>
+
+                <div>
+                  <label className="text-sm font-medium mb-2 block">
+                    Explanation
+                  </label>
+                  <Textarea
+                    value={customExplanation}
+                    onChange={(e) => setCustomExplanation(e.target.value)}
+                    placeholder="Explain how the symbols connect to reveal Christ in this passage..."
+                    rows={6}
+                  />
+                </div>
+
+                <Button 
+                  onClick={createCustomChallenge} 
+                  className="w-full" 
+                  size="lg"
+                  disabled={!user}
+                >
+                  Create & Share Challenge
+                </Button>
+
+                {shareLink && (
+                  <Card className="bg-primary/5 border-primary">
+                    <CardContent className="pt-6 space-y-3">
+                      <p className="font-semibold">Challenge Created!</p>
+                      <div className="flex gap-2">
+                        <Input value={shareLink} readOnly className="flex-1" />
+                        <Button variant="outline" onClick={copyShareLink}>
+                          <Share2 className="h-4 w-4 mr-2" />
+                          Copy
+                        </Button>
+                      </div>
+                      <p className="text-sm text-muted-foreground">
+                        Share this link with others to challenge them!
+                      </p>
+                    </CardContent>
+                  </Card>
+                )}
+              </CardContent>
+            </Card>
+          </TabsContent>
+        </Tabs>
       </main>
     </div>
   );
