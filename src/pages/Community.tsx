@@ -145,9 +145,21 @@ const Community = () => {
               {activeUsers.length > 0 ? (
                 <div className="flex flex-wrap gap-3">
                   {activeUsers.map((activeUser) => (
-                    <div
+                    <button
                       key={activeUser.id}
-                      className="flex items-center gap-2 bg-accent/50 rounded-full px-3 py-1.5"
+                      onClick={() => {
+                        // Dispatch event to open chat sidebar with this user
+                        window.dispatchEvent(
+                          new CustomEvent('open-chat-sidebar', {
+                            detail: { userId: activeUser.id }
+                          })
+                        );
+                        toast({
+                          title: "Opening chat",
+                          description: `Starting conversation with ${activeUser.display_name || activeUser.username}`,
+                        });
+                      }}
+                      className="flex items-center gap-2 bg-accent/50 hover:bg-accent rounded-full px-3 py-1.5 transition-colors cursor-pointer"
                     >
                       <Avatar className="h-6 w-6">
                         <AvatarImage src={activeUser.avatar_url || undefined} />
@@ -158,7 +170,8 @@ const Community = () => {
                       <span className="text-sm font-medium">
                         {activeUser.display_name || activeUser.username}
                       </span>
-                    </div>
+                      <MessageSquare className="h-3 w-3 text-muted-foreground" />
+                    </button>
                   ))}
                 </div>
               ) : (

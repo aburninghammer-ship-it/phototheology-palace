@@ -55,8 +55,10 @@ export const MessagingSidebar = () => {
 
   // Listen for window event to force sidebar open (for deep-linked notifications)
   useEffect(() => {
-    const handleOpenChat = (e: CustomEvent) => {
+    const handleOpenChat = async (e: CustomEvent) => {
       console.log('Open chat sidebar event received:', e.detail);
+      
+      // Handle conversationId (from notifications)
       if (e.detail?.conversationId) {
         setActiveConversationId(e.detail.conversationId);
         // Use setOpen to force sidebar open if it's available
@@ -67,11 +69,25 @@ export const MessagingSidebar = () => {
         }
         setActiveTab('conversations');
       }
+      
+      // Handle userId (from community page)
+      if (e.detail?.userId) {
+        const convId = await startConversation(e.detail.userId);
+        if (convId) {
+          setActiveConversationId(convId);
+          if (setOpen) {
+            setOpen(true);
+          } else if (state === 'collapsed') {
+            toggleSidebar();
+          }
+          setActiveTab('conversations');
+        }
+      }
     };
     
     window.addEventListener('open-chat-sidebar' as any, handleOpenChat);
     return () => window.removeEventListener('open-chat-sidebar' as any, handleOpenChat);
-  }, [setActiveConversationId, toggleSidebar, setOpen, state]);
+  }, [setActiveConversationId, toggleSidebar, setOpen, state, startConversation]);
 
   // Auto-scroll to bottom when messages change
   useEffect(() => {
