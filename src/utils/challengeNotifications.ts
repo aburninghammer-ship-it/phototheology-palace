@@ -15,13 +15,14 @@ interface ShareChallengeOptions {
   title: string;
   content: string;
   metadata?: Record<string, any>;
+  broadcastToLive?: boolean; // New option to broadcast to all live users
 }
 
 /**
  * Share a challenge to the community and notify interested users
  */
 export async function shareChallengeToCommunity(options: ShareChallengeOptions) {
-  const { userId, displayName, challengeType, title, content, metadata = {} } = options;
+  const { userId, displayName, challengeType, title, content, metadata = {}, broadcastToLive = true } = options;
 
   try {
     // Create community post
@@ -69,6 +70,30 @@ export async function shareChallengeToCommunity(options: ShareChallengeOptions) 
       }));
 
       await supabase.from('notifications').insert(notifications);
+    }
+
+    // Broadcast to all live users if enabled
+    if (broadcastToLive) {
+      const challengeLabels: Record<ChallengeType, string> = {
+        equation_challenges: 'Equation Challenge',
+        christ_chapter_challenges: 'Christ Chapter Challenge',
+        sanctuary_challenges: 'Sanctuary Challenge',
+        dimension_challenges: 'Dimension Drill',
+        connect6_challenges: 'Connect-6 Challenge',
+        fruit_check_challenges: 'Fruit Check Challenge',
+      };
+
+      await supabase.channel('live-notifications').send({
+        type: 'broadcast',
+        event: 'challenge-shared',
+        payload: {
+          type: 'challenge-shared',
+          message: '🔔 New Challenge Alert!',
+          challengeType: challengeLabels[challengeType],
+          userName: displayName,
+          link: '/community'
+        }
+      });
     }
 
     return { success: true, postId: newPost?.id };

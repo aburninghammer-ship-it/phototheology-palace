@@ -10,6 +10,7 @@ import { LoadingScreen } from "@/components/LoadingScreen";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { MessagingSidebar } from "@/components/MessagingSidebar";
+import { LiveNotificationsProvider } from "@/components/LiveNotificationsProvider";
 
 // Critical pages - load immediately
 import Index from "./pages/Index";
@@ -115,16 +116,17 @@ function App() {
     <ErrorBoundary>
       <QueryClientProvider client={queryClient}>
         <TooltipProvider>
-          <Toaster />
-          <Sonner />
-          <OfflineIndicator />
-          <BrowserRouter>
-            <SidebarProvider defaultOpen={false}>
-              <div className="min-h-screen flex w-full">
-                <MessagingSidebar />
-                <main className="flex-1 w-full overflow-x-hidden">
-                  <Suspense fallback={<LoadingScreen />}>
-                    <Routes>
+          <LiveNotificationsProvider>
+            <Toaster />
+            <Sonner />
+            <OfflineIndicator />
+            <BrowserRouter>
+              <SidebarProvider defaultOpen={false}>
+                <div className="min-h-screen flex w-full">
+                  <MessagingSidebar />
+                  <main className="flex-1 w-full overflow-x-hidden">
+                    <Suspense fallback={<LoadingScreen />}>
+                      <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/auth" element={<Auth />} />
             <Route path="/onboarding" element={
@@ -245,6 +247,7 @@ function App() {
               </div>
             </SidebarProvider>
           </BrowserRouter>
+          </LiveNotificationsProvider>
         </TooltipProvider>
       </QueryClientProvider>
     </ErrorBoundary>

@@ -396,7 +396,21 @@ Can you help solve this equation? Share your interpretation and insights!
         await supabase.from('notifications').insert(notifications);
       }
 
-      toast.success("Equation shared to community!");
+      // Broadcast to all live users
+      const liveChannel = supabase.channel('live-notifications');
+      await liveChannel.send({
+        type: 'broadcast',
+        event: 'challenge-shared',
+        payload: {
+          type: 'challenge-shared',
+          message: '🔔 New Challenge Alert!',
+          challengeType: 'Equation Challenge',
+          userName: displayName,
+          link: '/community'
+        }
+      });
+
+      toast.success("Equation shared to community! All online users notified.");
     } catch (error) {
       console.error("Error sharing to community:", error);
       toast.error("Failed to share to community");
