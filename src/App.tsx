@@ -77,6 +77,7 @@ const BibleRenderedRoom = lazy(() => import("./pages/BibleRenderedRoom"));
 const Dashboard = lazy(() => import("./pages/Dashboard"));
 const Certificates = lazy(() => import("./pages/Certificates"));
 const StudyPartners = lazy(() => import("./pages/StudyPartners"));
+const Streaks = lazy(() => import("./pages/Streaks"));
 const MemorizationVerses = lazy(() => import("./pages/MemorizationVerses"));
 const VerseMemoryHall = lazy(() => import("./pages/VerseMemoryHall"));
 const ChefChallenge = lazy(() => import("./pages/ChefChallenge"));
@@ -228,6 +229,7 @@ function App() {
             <Route path="/admin/strongs-import" element={<ProtectedRoute><AdminStrongsImport /></ProtectedRoute>} />
             <Route path="/certificates" element={<ProtectedRoute><Certificates /></ProtectedRoute>} />
             <Route path="/study-partners" element={<ProtectedRoute><StudyPartners /></ProtectedRoute>} />
+            <Route path="/streaks" element={<ProtectedRoute><Streaks /></ProtectedRoute>} />
             <Route path="/church-admin" element={<ProtectedRoute><ChurchAdmin /></ProtectedRoute>} />
             <Route path="/join-church" element={<ProtectedRoute><JoinChurch /></ProtectedRoute>} />
             <Route path="/church-signup" element={<ChurchSignup />} />

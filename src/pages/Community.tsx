@@ -46,7 +46,7 @@ const Community = () => {
     try {
       const { data, error } = await supabase
         .from("community_posts")
-        .select("*, profiles!community_posts_user_id_fkey(username, display_name)")
+        .select("*, profiles(username, display_name)")
         .order("created_at", { ascending: false });
       
       if (error) {
