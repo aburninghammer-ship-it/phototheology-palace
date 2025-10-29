@@ -8,6 +8,7 @@ import { MobileNav } from "@/components/MobileNav";
 import { useSidebar } from "@/components/ui/sidebar";
 import { useDirectMessages } from "@/hooks/useDirectMessages";
 import { Badge } from "@/components/ui/badge";
+import { NotificationCenter } from "@/components/NotificationCenter";
 import {
   Tooltip,
   TooltipContent,
@@ -76,6 +77,8 @@ export const Navigation = () => {
                     </Badge>
                   )}
                 </Button>
+
+                <NotificationCenter />
               </>
             )}
 

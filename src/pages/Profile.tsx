@@ -12,6 +12,7 @@ import { User, Mail, Trophy, Star, Calendar, Upload, Loader2 } from "lucide-reac
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { SubscriptionBanner } from "@/components/SubscriptionBanner";
+import { NotificationPreferences } from "@/components/NotificationPreferences";
 
 export default function Profile() {
   const { user } = useAuth();
@@ -256,6 +257,9 @@ export default function Profile() {
               </Button>
             </CardContent>
           </Card>
+
+          {/* Notification Preferences */}
+          <NotificationPreferences />
         </div>
       </div>
     </div>

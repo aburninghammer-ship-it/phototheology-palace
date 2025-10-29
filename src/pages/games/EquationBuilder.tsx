@@ -101,16 +101,43 @@ ${explanation}
 
 Can you improve this equation or offer insights? Share your thoughts!`;
 
-      const { error: postError } = await supabase
+      const { data: newPost, error: postError } = await supabase
         .from('community_posts')
         .insert({
           user_id: user.id,
           title: postTitle,
           content: postContent,
           category: 'challenge'
-        });
+        })
+        .select()
+        .single();
 
       if (postError) throw postError;
+
+      // Get users who want equation challenge notifications (excluding the poster)
+      const { data: interestedUsers } = await supabase
+        .from('notification_preferences')
+        .select('user_id')
+        .eq('equation_challenges', true)
+        .neq('user_id', user.id);
+
+      // Create notifications for interested users
+      if (interestedUsers && interestedUsers.length > 0) {
+        const notifications = interestedUsers.map(u => ({
+          user_id: u.user_id,
+          type: 'equation_challenge',
+          title: 'New Equation Challenge!',
+          message: `${displayName} shared a new equation builder challenge`,
+          link: `/community`,
+          metadata: {
+            post_id: newPost?.id,
+            equation: equationString,
+            prompt: currentPrompt
+          }
+        }));
+
+        await supabase.from('notifications').insert(notifications);
+      }
 
       toast.success("Equation shared to community!");
     } catch (error) {

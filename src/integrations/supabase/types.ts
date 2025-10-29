@@ -1583,6 +1583,72 @@ export type Database = {
         }
         Relationships: []
       }
+      notification_preferences: {
+        Row: {
+          community_posts: boolean
+          created_at: string
+          equation_challenges: boolean
+          id: string
+          study_reminders: boolean
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          community_posts?: boolean
+          created_at?: string
+          equation_challenges?: boolean
+          id?: string
+          study_reminders?: boolean
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          community_posts?: boolean
+          created_at?: string
+          equation_challenges?: boolean
+          id?: string
+          study_reminders?: boolean
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      notifications: {
+        Row: {
+          created_at: string
+          id: string
+          is_read: boolean
+          link: string | null
+          message: string
+          metadata: Json | null
+          title: string
+          type: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_read?: boolean
+          link?: string | null
+          message: string
+          metadata?: Json | null
+          title: string
+          type: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_read?: boolean
+          link?: string | null
+          message?: string
+          metadata?: Json | null
+          title?: string
+          type?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           access_code_used: string | null
