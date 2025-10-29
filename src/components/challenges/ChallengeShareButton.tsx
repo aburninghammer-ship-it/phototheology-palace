@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
-import { Share2, Loader2, Trophy } from "lucide-react";
+import { Share2, Loader2, Trophy, Copy, Check } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { toast } from "sonner";
@@ -31,6 +31,18 @@ export const ChallengeShareButton = ({
     highlights: string[];
     feedback: string;
   } | null>(null);
+  const [copied, setCopied] = useState(false);
+
+  const copyResponse = async () => {
+    try {
+      await navigator.clipboard.writeText(response);
+      setCopied(true);
+      toast.success("Response copied to clipboard!");
+      setTimeout(() => setCopied(false), 2000);
+    } catch (error) {
+      toast.error("Failed to copy response");
+    }
+  };
 
   const handleShare = async () => {
     if (!user) {
@@ -139,9 +151,30 @@ export const ChallengeShareButton = ({
 
             {/* Response Editor */}
             <div>
-              <label className="text-sm font-medium mb-2 block">
-                Your Response:
-              </label>
+              <div className="flex items-center justify-between mb-2">
+                <label className="text-sm font-medium">
+                  Your Response:
+                </label>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  onClick={copyResponse}
+                  className="h-8"
+                >
+                  {copied ? (
+                    <>
+                      <Check className="h-4 w-4 mr-1" />
+                      Copied!
+                    </>
+                  ) : (
+                    <>
+                      <Copy className="h-4 w-4 mr-1" />
+                      Copy
+                    </>
+                  )}
+                </Button>
+              </div>
               <Textarea
                 value={response}
                 onChange={(e) => setResponse(e.target.value)}
