@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useSearchParams } from "react-router-dom";
 import { Navigation } from "@/components/Navigation";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -8,10 +9,17 @@ import { Textarea } from "@/components/ui/textarea";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
-import { Calculator, Trophy, Target, Clock, RefreshCw, Share2, Plus, Sparkles } from "lucide-react";
+import { Calculator, Trophy, Target, Clock, RefreshCw, Share2, Plus, Sparkles, Copy, Check } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { toast } from "sonner";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
 type Difficulty = "easy" | "intermediate" | "advanced" | "pro";
 
@@ -34,6 +42,7 @@ interface PrincipleCode {
 
 export default function EquationsChallenge() {
   const { user } = useAuth();
+  const [searchParams] = useSearchParams();
   const [difficulty, setDifficulty] = useState<Difficulty>("easy");
   const [currentEquation, setCurrentEquation] = useState<Equation | null>(null);
   const [loading, setLoading] = useState(false);
@@ -45,10 +54,15 @@ export default function EquationsChallenge() {
   const [jeevesSolution, setJeevesSolution] = useState("");
   
   // Custom challenge creation state
+  const [customTitle, setCustomTitle] = useState("");
   const [customVerse, setCustomVerse] = useState("");
   const [customEquation, setCustomEquation] = useState("");
   const [customExplanation, setCustomExplanation] = useState("");
+  const [customDifficulty, setCustomDifficulty] = useState<Difficulty>("easy");
+  const [shareDialogOpen, setShareDialogOpen] = useState(false);
   const [shareLink, setShareLink] = useState("");
+  const [shareCode, setShareCode] = useState("");
+  const [copied, setCopied] = useState(false);
   
   // Principle selection state
   const [availablePrinciples, setAvailablePrinciples] = useState<PrincipleCode[]>([]);
@@ -65,7 +79,13 @@ export default function EquationsChallenge() {
   // Load available principles on mount
   useEffect(() => {
     loadPrinciples();
-  }, []);
+    
+    // Check if there's a shared challenge in the URL
+    const challengeCode = searchParams.get('challenge');
+    if (challengeCode) {
+      loadSharedChallenge(challengeCode);
+    }
+  }, [searchParams]);
 
   const loadPrinciples = async () => {
     setPrinciplesLoading(true);
@@ -174,29 +194,114 @@ export default function EquationsChallenge() {
     }
   };
 
+  const loadSharedChallenge = async (code: string) => {
+    try {
+      const { data, error } = await supabase
+        .from('equation_challenges')
+        .select('*')
+        .eq('share_code', code)
+        .single();
+      
+      if (error) throw error;
+      
+      if (data) {
+        setCurrentEquation({
+          verse: data.verse,
+          equation: data.equation,
+          symbols: data.symbols,
+          difficulty: data.difficulty as Difficulty,
+          explanation: data.explanation
+        });
+        setMode("solve");
+        toast.success("Loaded shared challenge!");
+        
+        // Increment solve count
+        await supabase
+          .from('equation_challenges')
+          .update({ solve_count: (data.solve_count || 0) + 1 })
+          .eq('id', data.id);
+      }
+    } catch (error) {
+      console.error("Error loading shared challenge:", error);
+      toast.error("Failed to load shared challenge");
+    }
+  };
+
   const createCustomChallenge = async () => {
-    if (!customVerse || !customEquation || !customExplanation) {
+    if (!customTitle || !customVerse || !customEquation || !customExplanation) {
       toast.error("Please fill in all fields");
       return;
     }
 
+    if (selectedPrinciples.length === 0) {
+      toast.error("Please select at least one principle");
+      return;
+    }
+
+    if (!user) {
+      toast.error("Please sign in to create challenges");
+      return;
+    }
+
+    setLoading(true);
     try {
-      const challengeId = `custom-${Date.now()}`;
-      const shareUrl = `${window.location.origin}/equations-challenge?challenge=${challengeId}`;
+      // Generate share code
+      const { data: codeData, error: codeError } = await supabase
+        .rpc('generate_challenge_share_code');
       
-      // Note: Custom challenge storage requires database migration
-      // For now, just generate the share link
+      if (codeError) throw codeError;
+      
+      const shareCode = codeData as string;
+      
+      // Create challenge
+      const { error: insertError } = await supabase
+        .from('equation_challenges')
+        .insert({
+          created_by: user.id,
+          title: customTitle,
+          verse: customVerse,
+          equation: customEquation,
+          explanation: customExplanation,
+          difficulty: customDifficulty,
+          symbols: selectedPrinciples,
+          share_code: shareCode,
+          is_public: true
+        });
+      
+      if (insertError) throw insertError;
+      
+      const shareUrl = `${window.location.origin}/equations-challenge?challenge=${shareCode}`;
       setShareLink(shareUrl);
-      toast.success("Challenge created! Share the link with others.");
+      setShareCode(shareCode);
+      setShareDialogOpen(true);
+      
+      toast.success("Challenge created successfully!");
     } catch (error) {
       console.error("Error creating challenge:", error);
       toast.error("Failed to create challenge");
+    } finally {
+      setLoading(false);
     }
   };
 
-  const copyShareLink = () => {
-    navigator.clipboard.writeText(shareLink);
-    toast.success("Link copied to clipboard!");
+  const copyShareLink = async () => {
+    try {
+      await navigator.clipboard.writeText(shareLink);
+      setCopied(true);
+      toast.success("Link copied to clipboard!");
+      setTimeout(() => setCopied(false), 2000);
+    } catch (error) {
+      toast.error("Failed to copy link");
+    }
+  };
+
+  const resetCreateForm = () => {
+    setCustomTitle("");
+    setCustomVerse("");
+    setCustomEquation("");
+    setCustomExplanation("");
+    setSelectedPrinciples([]);
+    setCustomDifficulty("easy");
   };
 
   return (
@@ -456,158 +561,197 @@ export default function EquationsChallenge() {
           <TabsContent value="create" className="space-y-6">
             <Card>
               <CardHeader>
-                <CardTitle>Create Custom Challenge</CardTitle>
+                <CardTitle>Create Your Own Challenge</CardTitle>
                 <CardDescription>
-                  Build your own equation challenge to share with others
+                  Build a custom equation challenge to share with others
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
+                {/* Challenge Title */}
                 <div>
-                  <label className="text-sm font-medium mb-2 block">
-                    Verse Reference
-                  </label>
+                  <Label htmlFor="title">Challenge Title</Label>
                   <Input
-                    value={customVerse}
-                    onChange={(e) => setCustomVerse(e.target.value)}
-                    placeholder="e.g., John 3:16"
+                    id="title"
+                    value={customTitle}
+                    onChange={(e) => setCustomTitle(e.target.value)}
+                    placeholder="e.g., The Gospel in Genesis 3:15"
                   />
                 </div>
 
-                {/* Principle Selector */}
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between">
-                    <label className="text-sm font-medium">
-                      Select Principles for Your Equation
-                    </label>
-                    <Badge variant="secondary">
-                      {selectedPrinciples.length} selected
-                    </Badge>
+                {/* Difficulty Selection */}
+                <div>
+                  <Label className="text-base font-semibold mb-3 block">Difficulty</Label>
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                    {(Object.keys(difficultyInfo) as Difficulty[]).map((diff) => (
+                      <Button
+                        key={diff}
+                        variant={customDifficulty === diff ? "default" : "outline"}
+                        onClick={() => setCustomDifficulty(diff)}
+                        className="flex flex-col h-auto py-3"
+                      >
+                        <span className="capitalize font-bold text-sm">{diff}</span>
+                      </Button>
+                    ))}
                   </div>
-                  
+                </div>
+
+                {/* Principle Selection */}
+                <div>
+                  <Label className="text-base font-semibold mb-3 block">
+                    Select Principles ({selectedPrinciples.length} selected)
+                  </Label>
                   {principlesLoading ? (
-                    <div className="text-center py-8 text-muted-foreground">
-                      Loading principles...
-                    </div>
+                    <div className="text-center py-4">Loading principles...</div>
                   ) : (
-                    <div className="max-h-[400px] overflow-y-auto border rounded-lg p-4 space-y-4">
-                      {Object.entries(
-                        availablePrinciples.reduce((acc, principle) => {
-                          if (!acc[principle.category]) {
-                            acc[principle.category] = [];
-                          }
-                          acc[principle.category].push(principle);
-                          return acc;
-                        }, {} as Record<string, PrincipleCode[]>)
-                      ).map(([category, principles]) => (
-                        <div key={category} className="space-y-2">
-                          <h4 className="font-semibold text-sm text-primary">
-                            {category}
-                          </h4>
-                          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 pl-2">
-                            {principles.map((principle) => (
-                              <div
-                                key={principle.id}
-                                className="flex items-start space-x-2 p-2 rounded hover:bg-muted/50 transition-colors"
-                              >
-                                <Checkbox
-                                  id={principle.id}
-                                  checked={selectedPrinciples.includes(principle.code)}
-                                  onCheckedChange={() => togglePrinciple(principle.code)}
-                                />
-                                <div className="flex-1 min-w-0">
+                    <div className="space-y-4 max-h-96 overflow-y-auto p-4 border rounded-lg">
+                      {[
+                        { key: 'floor1', title: 'Floor 1 — Furnishing' },
+                        { key: 'floor2', title: 'Floor 2 — Investigation' },
+                        { key: 'floor3', title: 'Floor 3 — Freestyle' },
+                        { key: 'floor4', title: 'Floor 4 — Next Level' },
+                        { key: 'floor4_dimensions', title: '↳ Dimensions' },
+                        { key: 'floor4_genres', title: '↳ Connect-6 Genres' },
+                        { key: 'floor4_themes', title: '↳ Theme Walls' },
+                        { key: 'floor4_timezones', title: '↳ Time Zones' },
+                        { key: 'floor4_fruit', title: '↳ Fruit of the Spirit' },
+                        { key: 'floor5', title: 'Floor 5 — Vision' },
+                        { key: 'floor5_sanctuary', title: '↳ Sanctuary Furniture' },
+                        { key: 'floor5_prophecy', title: '↳ Prophecy Timelines' },
+                        { key: 'floor5_angels', title: '↳ Three Angels' },
+                        { key: 'floor5_feasts', title: '↳ Biblical Feasts' },
+                        { key: 'floor6_heavens', title: 'Floor 6 — Three Heavens' },
+                        { key: 'floor6_cycles', title: '↳ Eight Cycles' },
+                        { key: 'floor6', title: '↳ Cycle Rooms' },
+                        { key: 'floor7', title: 'Floor 7 — Spiritual' }
+                      ].map(({ key, title }) => {
+                        const categoryPrinciples = availablePrinciples.filter(p => p.category === key);
+                        if (categoryPrinciples.length === 0) return null;
+                        
+                        return (
+                          <div key={key} className="space-y-2">
+                            <h3 className="font-semibold text-sm text-primary">{title}</h3>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-2 pl-4">
+                              {categoryPrinciples.map((principle) => (
+                                <div key={principle.id} className="flex items-center space-x-2">
+                                  <Checkbox
+                                    id={principle.code}
+                                    checked={selectedPrinciples.includes(principle.code)}
+                                    onCheckedChange={() => togglePrinciple(principle.code)}
+                                  />
                                   <Label
-                                    htmlFor={principle.id}
-                                    className="text-sm font-medium cursor-pointer flex items-center gap-2"
+                                    htmlFor={principle.code}
+                                    className="text-xs cursor-pointer"
                                   >
-                                    <code className="font-mono text-xs bg-muted px-1.5 py-0.5 rounded">
-                                      {principle.code}
-                                    </code>
-                                    <span className="truncate">{principle.name}</span>
+                                    {principle.code} - {principle.name}
                                   </Label>
-                                  {principle.floor_association && (
-                                    <p className="text-xs text-muted-foreground mt-0.5">
-                                      Floor: {principle.floor_association}
-                                    </p>
-                                  )}
                                 </div>
-                              </div>
-                            ))}
+                              ))}
+                            </div>
                           </div>
-                        </div>
-                      ))}
-                      
-                      {availablePrinciples.length === 0 && (
-                        <div className="text-center py-8 text-muted-foreground">
-                          No principles available yet
-                        </div>
-                      )}
+                        );
+                      })}
                     </div>
                   )}
-                  
-                  <Button
-                    onClick={buildEquationFromPrinciples}
-                    variant="outline"
-                    className="w-full"
-                    disabled={selectedPrinciples.length === 0}
-                  >
-                    <Calculator className="h-4 w-4 mr-2" />
-                    Build Equation from Selected Principles
-                  </Button>
                 </div>
 
-                <div>
-                  <label className="text-sm font-medium mb-2 block">
-                    Equation (or build using principles above)
-                  </label>
-                  <Input
-                    value={customEquation}
-                    onChange={(e) => setCustomEquation(e.target.value)}
-                    placeholder="e.g., @70w + @CyC + PO → CR + ABO + MS = @Re + 3H"
-                  />
-                </div>
-
-                <div>
-                  <label className="text-sm font-medium mb-2 block">
-                    Explanation
-                  </label>
-                  <Textarea
-                    value={customExplanation}
-                    onChange={(e) => setCustomExplanation(e.target.value)}
-                    placeholder="Explain how the symbols connect to reveal Christ in this passage..."
-                    rows={6}
-                  />
-                </div>
-
+                {/* Build Equation Helper */}
                 <Button 
-                  onClick={createCustomChallenge} 
-                  className="w-full" 
-                  size="lg"
-                  disabled={!user}
+                  onClick={buildEquationFromPrinciples} 
+                  variant="outline"
+                  className="w-full"
+                  disabled={selectedPrinciples.length === 0}
                 >
-                  Create & Share Challenge
+                  <Calculator className="h-4 w-4 mr-2" />
+                  Build Equation from Selected ({selectedPrinciples.length} principles)
                 </Button>
 
-                {shareLink && (
-                  <Card className="bg-primary/5 border-primary">
-                    <CardContent className="pt-6 space-y-3">
-                      <p className="font-semibold">Challenge Created!</p>
-                      <div className="flex gap-2">
-                        <Input value={shareLink} readOnly className="flex-1" />
-                        <Button variant="outline" onClick={copyShareLink}>
-                          <Share2 className="h-4 w-4 mr-2" />
-                          Copy
-                        </Button>
-                      </div>
-                      <p className="text-sm text-muted-foreground">
-                        Share this link with others to challenge them!
-                      </p>
-                    </CardContent>
-                  </Card>
-                )}
+                {/* Challenge Details */}
+                <div className="space-y-4">
+                  <div>
+                    <Label htmlFor="verse">Verse Reference</Label>
+                    <Input
+                      id="verse"
+                      value={customVerse}
+                      onChange={(e) => setCustomVerse(e.target.value)}
+                      placeholder="e.g., John 3:16"
+                    />
+                  </div>
+
+                  <div>
+                    <Label htmlFor="equation">Equation</Label>
+                    <Input
+                      id="equation"
+                      value={customEquation}
+                      onChange={(e) => setCustomEquation(e.target.value)}
+                      placeholder="e.g., CR + SAN-ALT = @Re"
+                      className="font-mono"
+                    />
+                  </div>
+
+                  <div>
+                    <Label htmlFor="explanation">Explanation / Solution</Label>
+                    <Textarea
+                      id="explanation"
+                      value={customExplanation}
+                      onChange={(e) => setCustomExplanation(e.target.value)}
+                      placeholder="Explain how the principles connect to the verse..."
+                      className="min-h-32"
+                    />
+                  </div>
+                </div>
+
+                {/* Create Button */}
+                <div className="flex gap-3">
+                  <Button 
+                    onClick={createCustomChallenge} 
+                    className="flex-1"
+                    size="lg"
+                    disabled={loading}
+                  >
+                    <Share2 className="h-4 w-4 mr-2" />
+                    {loading ? "Creating..." : "Create & Share Challenge"}
+                  </Button>
+                  <Button 
+                    onClick={resetCreateForm}
+                    variant="outline"
+                    size="lg"
+                  >
+                    Reset
+                  </Button>
+                </div>
               </CardContent>
             </Card>
           </TabsContent>
         </Tabs>
+
+        {/* Share Dialog */}
+        <Dialog open={shareDialogOpen} onOpenChange={setShareDialogOpen}>
+          <DialogContent className="sm:max-w-md">
+            <DialogHeader>
+              <DialogTitle>Challenge Created Successfully! 🎉</DialogTitle>
+              <DialogDescription>
+                Share this link with others to challenge them
+              </DialogDescription>
+            </DialogHeader>
+            <div className="space-y-4">
+              <div className="p-4 bg-muted rounded-lg space-y-2">
+                <p className="text-sm font-semibold">Share Code:</p>
+                <p className="text-2xl font-mono font-bold text-primary">{shareCode}</p>
+              </div>
+              
+              <div className="flex items-center gap-2">
+                <Input value={shareLink} readOnly className="flex-1 font-mono text-sm" />
+                <Button onClick={copyShareLink} variant="outline" size="icon">
+                  {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
+                </Button>
+              </div>
+              
+              <p className="text-xs text-muted-foreground">
+                Anyone with this link can attempt your challenge. They don't need to solve it before you share!
+              </p>
+            </div>
+          </DialogContent>
+        </Dialog>
       </main>
     </div>
   );

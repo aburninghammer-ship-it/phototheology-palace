@@ -819,6 +819,54 @@ export type Database = {
           },
         ]
       }
+      equation_challenges: {
+        Row: {
+          created_at: string | null
+          created_by: string
+          difficulty: string
+          equation: string
+          explanation: string
+          id: string
+          is_public: boolean | null
+          share_code: string
+          solve_count: number | null
+          symbols: string[]
+          title: string
+          updated_at: string | null
+          verse: string
+        }
+        Insert: {
+          created_at?: string | null
+          created_by: string
+          difficulty: string
+          equation: string
+          explanation: string
+          id?: string
+          is_public?: boolean | null
+          share_code: string
+          solve_count?: number | null
+          symbols: string[]
+          title: string
+          updated_at?: string | null
+          verse: string
+        }
+        Update: {
+          created_at?: string | null
+          created_by?: string
+          difficulty?: string
+          equation?: string
+          explanation?: string
+          id?: string
+          is_public?: boolean | null
+          share_code?: string
+          solve_count?: number | null
+          symbols?: string[]
+          title?: string
+          updated_at?: string | null
+          verse?: string
+        }
+        Relationships: []
+      }
       equation_codes: {
         Row: {
           biblical_reference: string | null
@@ -2727,6 +2775,7 @@ export type Database = {
       }
       cleanup_old_rate_limits: { Args: never; Returns: undefined }
       cleanup_old_typing_indicators: { Args: never; Returns: undefined }
+      generate_challenge_share_code: { Args: never; Returns: string }
       generate_referral_code: { Args: { user_id: string }; Returns: string }
       get_available_seats: { Args: { _church_id: string }; Returns: number }
       get_or_create_conversation: {
