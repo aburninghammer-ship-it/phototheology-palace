@@ -518,7 +518,7 @@ Can you help solve this equation? Share your interpretation and insights!
             {/* Equation Display */}
             {!currentEquation ? (
             <Card>
-              <CardContent className="py-12 text-center">
+              <CardContent className="py-12 text-center space-y-4">
                 <Calculator className="h-16 w-16 mx-auto mb-4 text-muted-foreground" />
                 <p className="text-lg text-muted-foreground mb-6">
                   Ready to solve an equation? Click below to start!
@@ -526,6 +526,20 @@ Can you help solve this equation? Share your interpretation and insights!
                 <Button onClick={generateEquation} disabled={loading} size="lg">
                   {loading ? "Generating..." : "Generate New Equation"}
                 </Button>
+                
+                {/* Share to Community Button - Disabled State */}
+                <Button
+                  onClick={shareEquationToCommunity}
+                  variant="outline"
+                  className="w-full mt-4"
+                  disabled={true}
+                >
+                  <Share2 className="h-4 w-4 mr-2" />
+                  Share to Community - Get Help Solving This!
+                </Button>
+                <p className="text-xs text-muted-foreground">
+                  Generate an equation first to share with the community
+                </p>
               </CardContent>
             </Card>
           ) : (
