@@ -302,10 +302,10 @@ export const Navigation = () => {
               <TooltipTrigger asChild>
                 <DropdownMenu>
                    <DropdownMenuTrigger asChild>
-                    <Button 
-                      variant={location.pathname === "/community" || location.pathname === "/achievements" || location.pathname === "/escape-room" || location.pathname === "/leaderboard" || location.pathname === "/study-partners" || location.pathname === "/live-study" || location.pathname === "/streaks" || location.pathname === "/treasure-hunt" ? "default" : "ghost"}
+                     <Button 
+                      variant={location.pathname === "/community" || location.pathname === "/achievements" || location.pathname === "/escape-room" || location.pathname === "/leaderboard" || location.pathname === "/study-partners" || location.pathname === "/live-study" || location.pathname === "/streaks" || location.pathname === "/treasure-hunt" || location.pathname === "/equations-challenge" ? "default" : "ghost"}
                       size="sm"
-                      className={location.pathname === "/community" || location.pathname === "/achievements" || location.pathname === "/escape-room" || location.pathname === "/leaderboard" || location.pathname === "/study-partners" || location.pathname === "/live-study" || location.pathname === "/streaks" || location.pathname === "/treasure-hunt" ? "gradient-palace shadow-purple text-xs" : "hover:bg-muted text-xs"}
+                      className={location.pathname === "/community" || location.pathname === "/achievements" || location.pathname === "/escape-room" || location.pathname === "/leaderboard" || location.pathname === "/study-partners" || location.pathname === "/live-study" || location.pathname === "/streaks" || location.pathname === "/treasure-hunt" || location.pathname === "/equations-challenge" ? "gradient-palace shadow-purple text-xs" : "hover:bg-muted text-xs"}
                     >
                       <Users className="mr-1 h-3 w-3" />
                       Community
@@ -330,6 +330,9 @@ export const Navigation = () => {
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
                   <Link to="/treasure-hunt">💎 Treasure Hunt</Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link to="/equations-challenge">🧮 Equations Challenge</Link>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem asChild>
