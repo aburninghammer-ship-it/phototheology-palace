@@ -229,12 +229,7 @@ export default function EquationsChallenge() {
 
   const createCustomChallenge = async () => {
     if (!customTitle || !customVerse || !customEquation || !customExplanation) {
-      toast.error("Please fill in all fields");
-      return;
-    }
-
-    if (selectedPrinciples.length === 0) {
-      toast.error("Please select at least one principle");
+      toast.error("Please fill in all fields (Title, Verse, Equation, and Explanation)");
       return;
     }
 
@@ -253,6 +248,11 @@ export default function EquationsChallenge() {
       
       const shareCode = codeData as string;
       
+      // Extract principles from equation if none selected
+      const principlesArray = selectedPrinciples.length > 0 
+        ? selectedPrinciples 
+        : customEquation.match(/[A-Z@][A-Z0-9\-_]+/g) || [];
+      
       // Create challenge
       const { error: insertError } = await supabase
         .from('equation_challenges')
@@ -263,7 +263,7 @@ export default function EquationsChallenge() {
           equation: customEquation,
           explanation: customExplanation,
           difficulty: customDifficulty,
-          symbols: selectedPrinciples,
+          symbols: principlesArray,
           share_code: shareCode,
           is_public: true
         });
@@ -655,15 +655,20 @@ export default function EquationsChallenge() {
                 </div>
 
                 {/* Build Equation Helper */}
-                <Button 
-                  onClick={buildEquationFromPrinciples} 
-                  variant="outline"
-                  className="w-full"
-                  disabled={selectedPrinciples.length === 0}
-                >
-                  <Calculator className="h-4 w-4 mr-2" />
-                  Build Equation from Selected ({selectedPrinciples.length} principles)
-                </Button>
+                {selectedPrinciples.length > 0 && (
+                  <Button 
+                    onClick={buildEquationFromPrinciples} 
+                    variant="outline"
+                    className="w-full"
+                  >
+                    <Calculator className="h-4 w-4 mr-2" />
+                    Build Equation from Selected ({selectedPrinciples.length} principles)
+                  </Button>
+                )}
+                
+                <p className="text-sm text-muted-foreground text-center">
+                  Select principles above to auto-build, or type your equation manually below
+                </p>
 
                 {/* Challenge Details */}
                 <div className="space-y-4">
