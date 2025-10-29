@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
-import { MessageSquare, Plus, Heart, Users, Reply, Send, Sparkles } from "lucide-react";
+import { MessageSquare, Plus, Heart, Users, Reply, Send, Sparkles, Pencil, Trash2 } from "lucide-react";
 import { EmojiPicker } from "@/components/EmojiPicker";
 import { communityPostSchema } from "@/lib/validationSchemas";
 import { sanitizeHtml } from "@/lib/sanitize";
@@ -30,6 +30,8 @@ const Community = () => {
   const [newComment, setNewComment] = useState<Record<string, string>>({});
   const [replyingTo, setReplyingTo] = useState<Record<string, string | null>>({});
   const [expandedPosts, setExpandedPosts] = useState<Record<string, boolean>>({});
+  const [editingComment, setEditingComment] = useState<string | null>(null);
+  const [editContent, setEditContent] = useState<string>("");
 
   useEffect(() => {
     if (user && user.id) {
@@ -206,6 +208,70 @@ const Community = () => {
       }, 500);
     } catch (error: any) {
       console.error('Error adding comment:', error);
+      toast({
+        title: "Error",
+        description: error.message,
+        variant: "destructive",
+      });
+    }
+  };
+
+  const deleteComment = async (commentId: string) => {
+    try {
+      const { error } = await supabase
+        .from("community_comments")
+        .delete()
+        .eq("id", commentId);
+
+      if (error) throw error;
+
+      toast({
+        title: "Comment deleted",
+      });
+
+      fetchPosts();
+    } catch (error: any) {
+      console.error('Error deleting comment:', error);
+      toast({
+        title: "Error",
+        description: error.message,
+        variant: "destructive",
+      });
+    }
+  };
+
+  const startEditComment = (commentId: string, content: string) => {
+    setEditingComment(commentId);
+    setEditContent(content);
+  };
+
+  const cancelEditComment = () => {
+    setEditingComment(null);
+    setEditContent("");
+  };
+
+  const saveEditComment = async (commentId: string) => {
+    if (!editContent.trim()) return;
+
+    try {
+      const sanitizedContent = sanitizeHtml(editContent);
+      
+      const { error } = await supabase
+        .from("community_comments")
+        .update({ content: sanitizedContent })
+        .eq("id", commentId);
+
+      if (error) throw error;
+
+      toast({
+        title: "Comment updated",
+      });
+
+      setEditingComment(null);
+      setEditContent("");
+      fetchPosts();
+    } catch (error: any) {
+      console.error('Error updating comment:', error);
       toast({
         title: "Error",
         description: error.message,
@@ -446,16 +512,68 @@ const Community = () => {
                                            })}
                                          </span>
                                        </div>
-                                       <p className="text-sm leading-relaxed whitespace-pre-wrap">{comment.content}</p>
-                                       <Button
-                                         variant="ghost"
-                                         size="sm"
-                                         className="h-7 px-2 text-xs"
-                                         onClick={() => setReplyingTo({ ...replyingTo, [post.id]: comment.id })}
-                                       >
-                                         <Reply className="h-3 w-3 mr-1" />
-                                         Reply
-                                       </Button>
+                                       {editingComment === comment.id ? (
+                                         <div className="space-y-2">
+                                           <Textarea
+                                             value={editContent}
+                                             onChange={(e) => setEditContent(e.target.value)}
+                                             rows={3}
+                                             className="text-sm"
+                                           />
+                                           <div className="flex gap-2">
+                                             <Button
+                                               size="sm"
+                                               onClick={() => saveEditComment(comment.id)}
+                                             >
+                                               Save
+                                             </Button>
+                                             <Button
+                                               size="sm"
+                                               variant="ghost"
+                                               onClick={cancelEditComment}
+                                             >
+                                               Cancel
+                                             </Button>
+                                           </div>
+                                         </div>
+                                       ) : (
+                                         <>
+                                           <p className="text-sm leading-relaxed whitespace-pre-wrap">{comment.content}</p>
+                                           <div className="flex items-center gap-2">
+                                             <Button
+                                               variant="ghost"
+                                               size="sm"
+                                               className="h-7 px-2 text-xs"
+                                               onClick={() => setReplyingTo({ ...replyingTo, [post.id]: comment.id })}
+                                             >
+                                               <Reply className="h-3 w-3 mr-1" />
+                                               Reply
+                                             </Button>
+                                             {comment.user_id === user?.id && (
+                                               <>
+                                                 <Button
+                                                   variant="ghost"
+                                                   size="sm"
+                                                   className="h-7 px-2 text-xs"
+                                                   onClick={() => startEditComment(comment.id, comment.content)}
+                                                 >
+                                                   <Pencil className="h-3 w-3 mr-1" />
+                                                   Edit
+                                                 </Button>
+                                                 <Button
+                                                   variant="ghost"
+                                                   size="sm"
+                                                   className="h-7 px-2 text-xs text-destructive hover:text-destructive"
+                                                   onClick={() => deleteComment(comment.id)}
+                                                 >
+                                                   <Trash2 className="h-3 w-3 mr-1" />
+                                                   Delete
+                                                 </Button>
+                                               </>
+                                             )}
+                                           </div>
+                                         </>
+                                       )}
                                      </div>
                                    </div>
                                  </div>
@@ -486,7 +604,57 @@ const Community = () => {
                                                  })}
                                                </span>
                                              </div>
-                                             <p className="text-xs leading-relaxed whitespace-pre-wrap">{reply.content}</p>
+                                             {editingComment === reply.id ? (
+                                               <div className="space-y-2">
+                                                 <Textarea
+                                                   value={editContent}
+                                                   onChange={(e) => setEditContent(e.target.value)}
+                                                   rows={2}
+                                                   className="text-xs"
+                                                 />
+                                                 <div className="flex gap-2">
+                                                   <Button
+                                                     size="sm"
+                                                     onClick={() => saveEditComment(reply.id)}
+                                                   >
+                                                     Save
+                                                   </Button>
+                                                   <Button
+                                                     size="sm"
+                                                     variant="ghost"
+                                                     onClick={cancelEditComment}
+                                                   >
+                                                     Cancel
+                                                   </Button>
+                                                 </div>
+                                               </div>
+                                             ) : (
+                                               <>
+                                                 <p className="text-xs leading-relaxed whitespace-pre-wrap">{reply.content}</p>
+                                                 {reply.user_id === user?.id && (
+                                                   <div className="flex items-center gap-2 mt-1">
+                                                     <Button
+                                                       variant="ghost"
+                                                       size="sm"
+                                                       className="h-6 px-2 text-xs"
+                                                       onClick={() => startEditComment(reply.id, reply.content)}
+                                                     >
+                                                       <Pencil className="h-2.5 w-2.5 mr-1" />
+                                                       Edit
+                                                     </Button>
+                                                     <Button
+                                                       variant="ghost"
+                                                       size="sm"
+                                                       className="h-6 px-2 text-xs text-destructive hover:text-destructive"
+                                                       onClick={() => deleteComment(reply.id)}
+                                                     >
+                                                       <Trash2 className="h-2.5 w-2.5 mr-1" />
+                                                       Delete
+                                                     </Button>
+                                                   </div>
+                                                 )}
+                                               </>
+                                             )}
                                            </div>
                                          </div>
                                        </div>
