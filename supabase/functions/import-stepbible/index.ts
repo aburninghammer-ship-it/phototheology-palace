@@ -87,39 +87,58 @@ serve(async (req) => {
 
     console.log('Starting STEPBible import...');
 
-    // Download Greek NT (TAGNT)
-    console.log('Downloading Greek NT...');
-    const tagntUrl = 'https://raw.githubusercontent.com/STEPBible/STEPBible-Data/master/TAGNT%20-%20Translators%20Amalgamated%20Greek%20NT%20-%20STEPBible.org%20CC%20BY.txt';
-    const tagntResponse = await fetch(tagntUrl);
+    // STEPBible files are split into multiple parts
+    const baseUrl = 'https://raw.githubusercontent.com/STEPBible/STEPBible-Data/master/Translators%20Amalgamated%20OT%2BNT/';
     
-    if (!tagntResponse.ok) {
-      console.error('Failed to download Greek NT:', tagntResponse.status, tagntResponse.statusText);
-      return new Response(
-        JSON.stringify({ error: `Failed to download Greek NT: ${tagntResponse.status} ${tagntResponse.statusText}` }),
-        { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
+    // Download Greek NT (TAGNT) - split into 2 parts
+    console.log('Downloading Greek NT parts...');
+    const tagntParts = [
+      'TAGNT%20Mat-Jhn%20-%20Translators%20Amalgamated%20Greek%20NT%20-%20STEPBible.org%20CC-BY.txt',
+      'TAGNT%20Act-Rev%20-%20Translators%20Amalgamated%20Greek%20NT%20-%20STEPBible.org%20CC-BY.txt'
+    ];
+    
+    let tagntText = '';
+    for (const part of tagntParts) {
+      console.log(`Downloading ${part}...`);
+      const response = await fetch(baseUrl + part);
+      if (!response.ok) {
+        console.error(`Failed to download ${part}:`, response.status, response.statusText);
+        return new Response(
+          JSON.stringify({ error: `Failed to download ${part}: ${response.status} ${response.statusText}` }),
+          { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+      const text = await response.text();
+      tagntText += text + '\n';
+      console.log(`Downloaded ${part}: ${text.length} characters`);
     }
-    
-    const tagntText = await tagntResponse.text();
-    console.log('Greek NT download size:', tagntText.length, 'characters');
-    console.log('Greek NT first 200 chars:', tagntText.substring(0, 200));
+    console.log('Greek NT total size:', tagntText.length, 'characters');
 
-    // Download Hebrew OT (TAHOT)
-    console.log('Downloading Hebrew OT...');
-    const tahotUrl = 'https://raw.githubusercontent.com/STEPBible/STEPBible-Data/master/TAHOT%20-%20Translators%20Amalgamated%20Hebrew%20OT%20-%20STEPBible.org%20CC%20BY.txt';
-    const tahotResponse = await fetch(tahotUrl);
+    // Download Hebrew OT (TAHOT) - split into 4 parts
+    console.log('Downloading Hebrew OT parts...');
+    const tahotParts = [
+      'TAHOT%20Gen-Deu%20-%20Translators%20Amalgamated%20Hebrew%20OT%20-%20STEPBible.org%20CC%20BY.txt',
+      'TAHOT%20Jos-Est%20-%20Translators%20Amalgamated%20Hebrew%20OT%20-%20STEPBible.org%20CC%20BY.txt',
+      'TAHOT%20Job-Sng%20-%20Translators%20Amalgamated%20Hebrew%20OT%20-%20STEPBible.org%20CC%20BY.txt',
+      'TAHOT%20Isa-Mal%20-%20Translators%20Amalgamated%20Hebrew%20OT%20-%20STEPBible.org%20CC%20BY.txt'
+    ];
     
-    if (!tahotResponse.ok) {
-      console.error('Failed to download Hebrew OT:', tahotResponse.status, tahotResponse.statusText);
-      return new Response(
-        JSON.stringify({ error: `Failed to download Hebrew OT: ${tahotResponse.status} ${tahotResponse.statusText}` }),
-        { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
+    let tahotText = '';
+    for (const part of tahotParts) {
+      console.log(`Downloading ${part}...`);
+      const response = await fetch(baseUrl + part);
+      if (!response.ok) {
+        console.error(`Failed to download ${part}:`, response.status, response.statusText);
+        return new Response(
+          JSON.stringify({ error: `Failed to download ${part}: ${response.status} ${response.statusText}` }),
+          { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+      const text = await response.text();
+      tahotText += text + '\n';
+      console.log(`Downloaded ${part}: ${text.length} characters`);
     }
-    
-    const tahotText = await tahotResponse.text();
-    console.log('Hebrew OT download size:', tahotText.length, 'characters');
-    console.log('Hebrew OT first 200 chars:', tahotText.substring(0, 200));
+    console.log('Hebrew OT total size:', tahotText.length, 'characters');
 
     console.log('Parsing data...');
     const verses: any[] = [];
