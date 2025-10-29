@@ -34,7 +34,7 @@ Deno.serve(async (req) => {
 
     // Fetch KJV verses with Strong's numbers from STEPBible GitHub
     const response = await fetch(
-      'https://raw.githubusercontent.com/STEPBible/STEPBible-Data/master/TAGNT%20-%20Translators%20Amalgamated%20Greek%20NT%20-%20STEPBible.org%20CC%20BY-SA.txt'
+      'https://raw.githubusercontent.com/STEPBible/STEPBible-Data/master/Translators%20Amalgamated%20OT%2BNT%20-%20STEPBible.org%20CC%20BY.txt'
     );
 
     if (!response.ok) {
