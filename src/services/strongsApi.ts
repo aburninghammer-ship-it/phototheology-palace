@@ -141,6 +141,14 @@ export const getStrongsEntry = async (number: string): Promise<StrongsEntry | nu
       .eq('strongs_number', number)
       .maybeSingle();
     
+    if (error) {
+      console.error(`Error fetching Strong's ${number}:`, error);
+    }
+    
+    if (!data) {
+      console.warn(`Strong's number ${number} not found in database`);
+    }
+    
     if (data && !error) {
       return {
         number: data.strongs_number,
