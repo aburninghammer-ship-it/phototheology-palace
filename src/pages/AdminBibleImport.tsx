@@ -21,6 +21,7 @@ export default function AdminBibleImport() {
   const [importResults, setImportResults] = useState<any>(null);
   const [uploadingFile, setUploadingFile] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const strongsCsvInputRef = useRef<HTMLInputElement>(null);
 
   const parseCSV = (csv: string) => {
     const lines = csv.trim().split('\n');
@@ -260,6 +261,38 @@ export default function AdminBibleImport() {
     }
   };
 
+  const handleStrongsCsvUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    try {
+      toast({
+        title: "Reading file...",
+        description: `Processing ${file.name}`,
+      });
+
+      const fileContent = await file.text();
+      setStrongsData(fileContent);
+
+      toast({
+        title: "File loaded",
+        description: "CSV content loaded. Click 'Import Strong's Entries' to process.",
+      });
+
+      // Reset file input
+      if (strongsCsvInputRef.current) {
+        strongsCsvInputRef.current.value = '';
+      }
+    } catch (error: any) {
+      console.error('File read error:', error);
+      toast({
+        title: "File read failed",
+        description: error.message,
+        variant: "destructive",
+      });
+    }
+  };
+
   if (!user) {
     return null;
   }
@@ -408,9 +441,44 @@ export default function AdminBibleImport() {
             <TabsContent value="strongs" className="space-y-4">
               <Card>
                 <CardHeader>
-                  <CardTitle>Import Strong's Lexicon (with PT annotations)</CardTitle>
+                  <CardTitle>Upload Strong's Lexicon CSV File</CardTitle>
                   <CardDescription>
-                    Paste CSV with: strongs_id, lemma, language, part_of_speech, short_gloss, long_definition, sanctuary_link, time_zone_code, dimension_code
+                    Choose a CSV file with PT annotations (strongs_id, lemma, language, part_of_speech, short_gloss, long_definition, sanctuary_link, time_zone_code, dimension_code)
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="bg-muted/50 p-4 rounded-lg space-y-2">
+                    <p className="text-sm font-semibold">Expected CSV Format:</p>
+                    <pre className="text-xs">strongs_id,lemma,language,part_of_speech,short_gloss,long_definition,sanctuary_link,time_zone_code,dimension_code
+"H0430","ʼElohim","Hebrew","noun","God","Creator God...","SAN-ARK","Hpa→Ef","3D"</pre>
+                  </div>
+
+                  <input
+                    ref={strongsCsvInputRef}
+                    type="file"
+                    accept=".csv,.txt"
+                    onChange={handleStrongsCsvUpload}
+                    className="hidden"
+                    id="strongs-csv-upload"
+                  />
+
+                  <Button 
+                    onClick={() => strongsCsvInputRef.current?.click()}
+                    disabled={importing}
+                    className="w-full"
+                    size="lg"
+                  >
+                    <FileText className="h-4 w-4 mr-2" />
+                    Choose CSV File
+                  </Button>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle>Import Strong's Lexicon (Manual CSV Paste)</CardTitle>
+                  <CardDescription>
+                    Or paste CSV with: strongs_id, lemma, language, part_of_speech, short_gloss, long_definition, sanctuary_link, time_zone_code, dimension_code
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
