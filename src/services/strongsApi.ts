@@ -134,9 +134,9 @@ export const parseStrongsFromText = (text: string): { word: string; strongs: str
 // Get Strong's entry by number
 export const getStrongsEntry = async (number: string): Promise<StrongsEntry | null> => {
   try {
-    // Try to fetch from strongs_dictionary first
+    // Try to fetch from strongs_entries first
     const { data, error } = await supabase
-      .from('strongs_dictionary')
+      .from('strongs_entries')
       .select('*')
       .eq('strongs_number', number)
       .maybeSingle();
@@ -149,16 +149,16 @@ export const getStrongsEntry = async (number: string): Promise<StrongsEntry | nu
         pronunciation: data.pronunciation || '',
         language: data.language as 'Hebrew' | 'Greek',
         definition: data.definition,
-        usage: data.kjv_translation ? data.kjv_translation.split(', ') : [],
+        usage: data.kjv_translations ? data.kjv_translations.split(', ') : [],
         occurrences: data.occurrences || 0,
         derivation: data.definition || '',
         // Phototheology fields
         sanctuary_link: data.sanctuary_link,
         time_zone_code: data.time_zone_code,
         dimension_code: data.dimension_code,
-        cycle_code: data.cycle_code,
-        prophecy_link: data.prophecy_link,
-        pt_notes: data.pt_notes
+        cycle_code: data.cycle_association,
+        prophecy_link: undefined,
+        pt_notes: undefined
       };
     }
   } catch (error) {
