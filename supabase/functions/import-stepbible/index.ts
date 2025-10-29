@@ -114,7 +114,17 @@ serve(async (req) => {
 
     let strongsInserted = 0;
     for (const entry of strongsEntries) {
-      const { error } = await supabase.from('strongs_entries').upsert(entry, { onConflict: 'strongs_number' });
+      // Map to strongs_dictionary table columns
+      const dictEntry = {
+        strongs_number: entry.strongs_number,
+        word: entry.word,
+        transliteration: entry.transliteration,
+        language: entry.language,
+        definition: entry.definition,
+        gloss: entry.usage?.split('.')[0] || '', // First sentence as gloss
+        morph: '' // Not available in this format
+      };
+      const { error } = await supabase.from('strongs_dictionary').upsert(dictEntry, { onConflict: 'strongs_number' });
       if (!error) strongsInserted++;
     }
 
