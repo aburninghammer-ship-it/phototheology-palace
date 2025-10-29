@@ -277,10 +277,7 @@ const Community = () => {
       
       const { error } = await supabase
         .from("community_comments")
-        .update({ 
-          content: sanitizedContent,
-          updated_at: new Date().toISOString()
-        })
+        .update({ content: sanitizedContent })
         .eq("id", commentId);
 
       if (error) {
