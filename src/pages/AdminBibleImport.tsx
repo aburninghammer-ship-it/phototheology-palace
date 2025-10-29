@@ -17,6 +17,8 @@ export default function AdminBibleImport() {
   const [versesData, setVersesData] = useState("");
   const [strongsData, setStrongsData] = useState("");
   const [importing, setImporting] = useState(false);
+  const [autoImporting, setAutoImporting] = useState(false);
+  const [importResults, setImportResults] = useState<any>(null);
 
   const parseCSV = (csv: string) => {
     const lines = csv.trim().split('\n');
@@ -101,6 +103,46 @@ export default function AdminBibleImport() {
       });
     } finally {
       setImporting(false);
+    }
+  };
+
+  const handleAutoImport = async () => {
+    setAutoImporting(true);
+    setImportResults(null);
+    
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        throw new Error('Not authenticated');
+      }
+
+      toast({
+        title: "Starting import...",
+        description: "Fetching data from STEPBible. This may take a moment.",
+      });
+
+      const { data, error } = await supabase.functions.invoke('import-stepbible-verses', {
+        headers: {
+          Authorization: `Bearer ${session.access_token}`,
+        },
+      });
+
+      if (error) throw error;
+
+      setImportResults(data);
+      toast({
+        title: "Import Complete!",
+        description: data.message,
+      });
+    } catch (error: any) {
+      console.error('Auto-import error:', error);
+      toast({
+        title: "Import failed",
+        description: error.message,
+        variant: "destructive",
+      });
+    } finally {
+      setAutoImporting(false);
     }
   };
 
@@ -192,7 +234,47 @@ export default function AdminBibleImport() {
             <TabsContent value="verses" className="space-y-4">
               <Card>
                 <CardHeader>
-                  <CardTitle>Import Tokenized Verses</CardTitle>
+                  <CardTitle>Import from STEPBible (Automatic)</CardTitle>
+                  <CardDescription>
+                    Automatically fetch and import KJV verses with Strong's numbers from STEPBible
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="bg-muted/50 p-4 rounded-lg space-y-2">
+                    <p className="text-sm">
+                      This will automatically download and import Bible verses with Strong's concordance numbers from the STEPBible project.
+                    </p>
+                    <p className="text-xs text-muted-foreground">
+                      Data source: <a href="https://github.com/STEPBible/STEPBible-Data" target="_blank" rel="noopener noreferrer" className="underline">STEPBible-Data Repository</a>
+                    </p>
+                  </div>
+
+                  <Button 
+                    onClick={handleAutoImport}
+                    disabled={autoImporting}
+                    className="w-full"
+                    size="lg"
+                  >
+                    <Database className="h-4 w-4 mr-2" />
+                    {autoImporting ? "Importing from STEPBible..." : "Start Automatic Import"}
+                  </Button>
+
+                  {importResults && (
+                    <div className="bg-green-500/10 border border-green-500/20 rounded-lg p-4">
+                      <p className="font-semibold text-green-600 dark:text-green-400">
+                        ✓ Import Successful
+                      </p>
+                      <p className="text-sm text-muted-foreground mt-2">
+                        Imported {importResults.imported} verses
+                      </p>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle>Manual Import (Tokenized Verses)</CardTitle>
                   <CardDescription>
                     Paste CSV or JSON with format: book, chapter, verse_num, tokens (JSONB array)
                   </CardDescription>
