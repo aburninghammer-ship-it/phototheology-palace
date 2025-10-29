@@ -4,11 +4,23 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { Sparkles, AlertTriangle, GraduationCap, Crown, Gift, Building2 } from "lucide-react";
+import { useState, useEffect } from "react";
 
 export function SubscriptionBanner() {
   const { subscription, loading } = useSubscription();
+  const [showBanner, setShowBanner] = useState(false);
 
-  if (loading) return null;
+  // Delay showing the banner to prevent flash on mount
+  useEffect(() => {
+    if (!loading) {
+      const timer = setTimeout(() => setShowBanner(true), 150);
+      return () => clearTimeout(timer);
+    } else {
+      setShowBanner(false);
+    }
+  }, [loading]);
+
+  if (loading || !showBanner) return null;
   
   // Church member - show different banner
   if (subscription.church.hasChurchAccess) {

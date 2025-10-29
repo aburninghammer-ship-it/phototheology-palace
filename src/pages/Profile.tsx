@@ -163,21 +163,22 @@ export default function Profile() {
             <CardHeader>
               <div className="flex items-center gap-4">
                 <div className="relative group">
-                  <Avatar className="h-20 w-20">
+                  <Avatar className="h-20 w-20 ring-2 ring-muted hover:ring-primary transition-all">
                     <AvatarImage src={profile?.avatar_url} />
                     <AvatarFallback className="bg-gradient-palace text-white text-2xl">
                       {profile?.display_name?.[0]?.toUpperCase() || user?.email?.[0]?.toUpperCase()}
                     </AvatarFallback>
                   </Avatar>
+                  {/* Upload button overlay - always slightly visible */}
                   <button
                     onClick={() => fileInputRef.current?.click()}
                     disabled={uploading}
-                    className="absolute inset-0 flex items-center justify-center bg-black/60 rounded-full opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer disabled:cursor-not-allowed"
+                    className="absolute inset-0 flex items-center justify-center bg-black/40 group-hover:bg-black/60 rounded-full opacity-40 group-hover:opacity-100 transition-all cursor-pointer disabled:cursor-not-allowed"
                   >
                     {uploading ? (
                       <Loader2 className="h-6 w-6 text-white animate-spin" />
                     ) : (
-                      <Upload className="h-6 w-6 text-white" />
+                      <Upload className="h-6 w-6 text-white drop-shadow-lg" />
                     )}
                   </button>
                   <input
