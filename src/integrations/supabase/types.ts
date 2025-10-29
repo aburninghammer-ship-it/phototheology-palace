@@ -1909,37 +1909,55 @@ export type Database = {
       strongs_dictionary: {
         Row: {
           created_at: string
+          cycle_code: string | null
           definition: string
+          dimension_code: string | null
           id: string
           kjv_translation: string | null
           language: string
           occurrences: number | null
           pronunciation: string | null
+          prophecy_link: string | null
+          pt_notes: string | null
+          sanctuary_link: string | null
           strongs_number: string
+          time_zone_code: string | null
           transliteration: string | null
           word: string
         }
         Insert: {
           created_at?: string
+          cycle_code?: string | null
           definition: string
+          dimension_code?: string | null
           id?: string
           kjv_translation?: string | null
           language: string
           occurrences?: number | null
           pronunciation?: string | null
+          prophecy_link?: string | null
+          pt_notes?: string | null
+          sanctuary_link?: string | null
           strongs_number: string
+          time_zone_code?: string | null
           transliteration?: string | null
           word: string
         }
         Update: {
           created_at?: string
+          cycle_code?: string | null
           definition?: string
+          dimension_code?: string | null
           id?: string
           kjv_translation?: string | null
           language?: string
           occurrences?: number | null
           pronunciation?: string | null
+          prophecy_link?: string | null
+          pt_notes?: string | null
+          sanctuary_link?: string | null
           strongs_number?: string
+          time_zone_code?: string | null
           transliteration?: string | null
           word?: string
         }

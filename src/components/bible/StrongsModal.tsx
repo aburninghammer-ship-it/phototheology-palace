@@ -7,7 +7,8 @@ import {
 } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { Loader2, Book, Languages, TrendingUp } from "lucide-react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Loader2, Book, Languages, TrendingUp, Church, Clock, Box, Repeat, Scroll } from "lucide-react";
 import { getStrongsEntry, StrongsEntry } from "@/services/strongsApi";
 
 interface StrongsModalProps {
@@ -132,68 +133,114 @@ export const StrongsModal = ({ strongsNumber, isOpen, onClose }: StrongsModalPro
                 </>
               )}
 
-              {/* Phototheology Extensions */}
+              {/* Phototheology Tabs */}
               {(entry.sanctuary_link || entry.time_zone_code || entry.dimension_code || 
-                entry.cycle_association || entry.floor_rooms) && (
+                entry.cycle_code || entry.prophecy_link || entry.pt_notes) && (
                 <>
                   <Separator />
-                  <div className="mt-6 space-y-4 pt-6 border-t-2 border-palace-teal/20">
-                    <h3 className="font-semibold text-lg flex items-center gap-2">
-                      <span className="text-palace-teal text-2xl">🏰</span>
-                      Phototheology Palace Connections
-                    </h3>
+                  <Tabs defaultValue="lexicon" className="mt-6">
+                    <TabsList className="grid w-full grid-cols-5">
+                      <TabsTrigger value="lexicon">
+                        <Book className="h-4 w-4 mr-1" />
+                        Lexicon
+                      </TabsTrigger>
+                      <TabsTrigger value="sanctuary" disabled={!entry.sanctuary_link}>
+                        <Church className="h-4 w-4 mr-1" />
+                        Sanctuary
+                      </TabsTrigger>
+                      <TabsTrigger value="timezones" disabled={!entry.time_zone_code}>
+                        <Clock className="h-4 w-4 mr-1" />
+                        Time-Zones
+                      </TabsTrigger>
+                      <TabsTrigger value="dimensions" disabled={!entry.dimension_code}>
+                        <Box className="h-4 w-4 mr-1" />
+                        Dimensions
+                      </TabsTrigger>
+                      <TabsTrigger value="prophecy" disabled={!entry.cycle_code && !entry.prophecy_link}>
+                        <Repeat className="h-4 w-4 mr-1" />
+                        Prophecy
+                      </TabsTrigger>
+                    </TabsList>
 
-                    {entry.sanctuary_link && (
-                      <div className="bg-palace-sand/20 p-4 rounded-lg border border-palace-teal/20">
-                        <h4 className="font-medium mb-2 text-palace-teal flex items-center gap-2">
-                          📍 Sanctuary Link
+                    <TabsContent value="lexicon" className="space-y-4 mt-4">
+                      <div className="bg-muted/30 p-4 rounded-lg">
+                        <p className="text-sm leading-relaxed">{entry.definition}</p>
+                      </div>
+                      {entry.pt_notes && (
+                        <div className="bg-palace-sand/20 p-4 rounded-lg border border-palace-teal/20">
+                          <h4 className="font-medium mb-2 text-palace-teal flex items-center gap-2">
+                            <Scroll className="h-4 w-4" />
+                            Phototheology Notes
+                          </h4>
+                          <p className="text-sm leading-relaxed whitespace-pre-line">{entry.pt_notes}</p>
+                        </div>
+                      )}
+                    </TabsContent>
+
+                    <TabsContent value="sanctuary" className="mt-4">
+                      <div className="bg-palace-sand/20 p-6 rounded-lg border border-palace-teal/20">
+                        <h4 className="font-semibold mb-3 text-palace-teal flex items-center gap-2 text-lg">
+                          <Church className="h-5 w-5" />
+                          Sanctuary Connection
                         </h4>
                         <p className="text-sm leading-relaxed">{entry.sanctuary_link}</p>
                       </div>
-                    )}
+                    </TabsContent>
 
-                    {entry.time_zone_code && (
-                      <div className="bg-palace-sand/20 p-4 rounded-lg border border-palace-teal/20">
-                        <h4 className="font-medium mb-2 text-palace-teal flex items-center gap-2">
-                          ⏰ Time-Zone Code
+                    <TabsContent value="timezones" className="mt-4">
+                      <div className="bg-palace-sand/20 p-6 rounded-lg border border-palace-teal/20">
+                        <h4 className="font-semibold mb-3 text-palace-teal flex items-center gap-2 text-lg">
+                          <Clock className="h-5 w-5" />
+                          Time-Zone Placement
                         </h4>
-                        <p className="text-sm font-mono">{entry.time_zone_code}</p>
+                        <p className="text-lg font-mono bg-muted/50 p-3 rounded">{entry.time_zone_code}</p>
+                        <p className="text-xs text-muted-foreground mt-3">
+                          Format: H/E (Heaven/Earth) + pa/pr/f (past/present/future)
+                        </p>
                       </div>
-                    )}
+                    </TabsContent>
 
-                    {entry.dimension_code && (
-                      <div className="bg-palace-sand/20 p-4 rounded-lg border border-palace-teal/20">
-                        <h4 className="font-medium mb-2 text-palace-teal flex items-center gap-2">
-                          📐 Dimension Code
+                    <TabsContent value="dimensions" className="mt-4">
+                      <div className="bg-palace-sand/20 p-6 rounded-lg border border-palace-teal/20">
+                        <h4 className="font-semibold mb-3 text-palace-teal flex items-center gap-2 text-lg">
+                          <Box className="h-5 w-5" />
+                          Dimension Room
                         </h4>
-                        <p className="text-sm font-mono">{entry.dimension_code}</p>
-                      </div>
-                    )}
-
-                    {entry.cycle_association && (
-                      <div className="bg-palace-sand/20 p-4 rounded-lg border border-palace-teal/20">
-                        <h4 className="font-medium mb-2 text-palace-teal flex items-center gap-2">
-                          🔄 Cycle Association
-                        </h4>
-                        <p className="text-sm font-mono">{entry.cycle_association}</p>
-                      </div>
-                    )}
-
-                    {entry.floor_rooms && entry.floor_rooms.length > 0 && (
-                      <div className="bg-palace-sand/20 p-4 rounded-lg border border-palace-teal/20">
-                        <h4 className="font-medium mb-2 text-palace-teal flex items-center gap-2">
-                          🏛️ Palace Rooms
-                        </h4>
-                        <div className="flex flex-wrap gap-2">
-                          {entry.floor_rooms.map((room, idx) => (
-                            <span key={idx} className="px-3 py-1 bg-palace-teal/20 text-palace-teal rounded-full text-sm font-medium border border-palace-teal/30">
-                              {room}
-                            </span>
-                          ))}
+                        <p className="text-lg font-mono bg-muted/50 p-3 rounded">{entry.dimension_code}</p>
+                        <div className="mt-3 text-sm space-y-1">
+                          <p className="text-muted-foreground">Dimensions:</p>
+                          <ul className="list-disc list-inside space-y-1 ml-2">
+                            <li>1D = Literal meaning</li>
+                            <li>2D = Symbolic/Typological</li>
+                            <li>3D = Christ-centered fulfillment</li>
+                            <li>4D = Church application</li>
+                            <li>5D = Heavenly/Eternal perspective</li>
+                          </ul>
                         </div>
                       </div>
-                    )}
-                  </div>
+                    </TabsContent>
+
+                    <TabsContent value="prophecy" className="mt-4 space-y-4">
+                      {entry.cycle_code && (
+                        <div className="bg-palace-sand/20 p-6 rounded-lg border border-palace-teal/20">
+                          <h4 className="font-semibold mb-3 text-palace-teal flex items-center gap-2 text-lg">
+                            <Repeat className="h-5 w-5" />
+                            Cycle Code
+                          </h4>
+                          <p className="text-lg font-mono bg-muted/50 p-3 rounded">{entry.cycle_code}</p>
+                        </div>
+                      )}
+                      {entry.prophecy_link && (
+                        <div className="bg-palace-sand/20 p-6 rounded-lg border border-palace-teal/20">
+                          <h4 className="font-semibold mb-3 text-palace-teal flex items-center gap-2 text-lg">
+                            <Scroll className="h-5 w-5" />
+                            Prophetic Timeline
+                          </h4>
+                          <p className="text-sm leading-relaxed">{entry.prophecy_link}</p>
+                        </div>
+                      )}
+                    </TabsContent>
+                  </Tabs>
                 </>
               )}
             </div>
