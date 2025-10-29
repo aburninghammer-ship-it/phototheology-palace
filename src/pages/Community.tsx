@@ -62,7 +62,7 @@ const Community = () => {
         .from("community_posts")
         .select(`
           *,
-          profiles!community_posts_user_id_fkey(username, display_name)
+          profiles:user_id(username, display_name, avatar_url)
         `)
         .order("created_at", { ascending: false });
       
@@ -76,6 +76,7 @@ const Community = () => {
         return;
       }
       
+      console.log('Fetched posts with profiles:', data);
       setPosts(data || []);
       
       // Fetch comments for all posts
@@ -85,15 +86,21 @@ const Community = () => {
           .from("community_comments")
           .select(`
             *,
-            profiles!community_comments_user_id_fkey(username, display_name)
+            profiles:user_id(username, display_name, avatar_url)
           `)
           .in("post_id", postIds)
           .order("created_at", { ascending: true });
         
-        console.log('Fetched comments:', commentsData);
+        console.log('Fetched comments with profiles:', commentsData);
         
         if (commentsError) {
           console.error('Error fetching comments:', commentsError);
+          toast({
+            title: "Error loading comments",
+            description: commentsError.message,
+            variant: "destructive",
+          });
+          return;
         }
         
         if (commentsData) {
@@ -104,12 +111,17 @@ const Community = () => {
             }
             commentsByPost[comment.post_id].push(comment);
           });
-          console.log('Comments by post:', commentsByPost);
+          console.log('Comments organized by post:', commentsByPost);
           setComments(commentsByPost);
         }
       }
     } catch (error: any) {
       console.error('Unexpected error fetching posts:', error);
+      toast({
+        title: "Error",
+        description: "Failed to load community data. Please refresh the page.",
+        variant: "destructive",
+      });
     }
   };
 
@@ -359,14 +371,15 @@ const Community = () => {
                     <div className="flex items-start justify-between">
                       <div className="flex items-center gap-3 flex-1">
                         <Avatar className="h-10 w-10 border-2 border-primary/20">
+                          <AvatarImage src={post.profiles?.avatar_url || undefined} />
                           <AvatarFallback className="bg-primary/10">
-                            {(post.profiles?.display_name || post.profiles?.username || 'U').charAt(0).toUpperCase()}
+                            {(post.profiles?.display_name || post.profiles?.username || user?.email || 'U').charAt(0).toUpperCase()}
                           </AvatarFallback>
                         </Avatar>
                         <div>
                           <CardTitle className="text-xl">{post.title}</CardTitle>
                           <CardDescription className="flex items-center gap-2 mt-1">
-                            <span className="font-medium">{post.profiles?.display_name || post.profiles?.username}</span>
+                            <span className="font-medium">{post.profiles?.display_name || post.profiles?.username || 'Anonymous'}</span>
                             <span>•</span>
                             <span>{new Date(post.created_at).toLocaleDateString('en-US', { 
                               month: 'short', 
@@ -411,70 +424,72 @@ const Community = () => {
                             {postComments.map((comment) => (
                               <div key={comment.id} className="space-y-3">
                                 {/* Top-level Comment */}
-                                <div className="bg-accent/20 rounded-xl p-4 hover:bg-accent/30 transition-colors">
-                                  <div className="flex items-start gap-3">
-                                    <Avatar className="h-8 w-8 border border-primary/20">
-                                      <AvatarFallback className="text-xs bg-primary/10">
-                                        {(comment.profiles?.display_name || comment.profiles?.username || 'U').charAt(0).toUpperCase()}
-                                      </AvatarFallback>
-                                    </Avatar>
-                                    <div className="flex-1 space-y-2">
-                                      <div className="flex items-center gap-2">
-                                        <span className="text-sm font-semibold">
-                                          {comment.profiles?.display_name || comment.profiles?.username}
-                                        </span>
-                                        <span className="text-xs text-muted-foreground">
-                                          {new Date(comment.created_at).toLocaleDateString('en-US', { 
-                                            month: 'short', 
-                                            day: 'numeric',
-                                            hour: '2-digit',
-                                            minute: '2-digit'
-                                          })}
-                                        </span>
-                                      </div>
-                                      <p className="text-sm leading-relaxed whitespace-pre-wrap">{comment.content}</p>
-                                      <Button
-                                        variant="ghost"
-                                        size="sm"
-                                        className="h-7 px-2 text-xs"
-                                        onClick={() => setReplyingTo({ ...replyingTo, [post.id]: comment.id })}
-                                      >
-                                        <Reply className="h-3 w-3 mr-1" />
-                                        Reply
-                                      </Button>
-                                    </div>
-                                  </div>
-                                </div>
+                                  <div className="bg-accent/20 rounded-xl p-4 hover:bg-accent/30 transition-colors">
+                                   <div className="flex items-start gap-3">
+                                     <Avatar className="h-8 w-8 border border-primary/20">
+                                       <AvatarImage src={comment.profiles?.avatar_url || undefined} />
+                                       <AvatarFallback className="text-xs bg-primary/10">
+                                         {(comment.profiles?.display_name || comment.profiles?.username || 'U').charAt(0).toUpperCase()}
+                                       </AvatarFallback>
+                                     </Avatar>
+                                     <div className="flex-1 space-y-2">
+                                       <div className="flex items-center gap-2">
+                                         <span className="text-sm font-semibold">
+                                           {comment.profiles?.display_name || comment.profiles?.username || 'Anonymous'}
+                                         </span>
+                                         <span className="text-xs text-muted-foreground">
+                                           {new Date(comment.created_at).toLocaleDateString('en-US', { 
+                                             month: 'short', 
+                                             day: 'numeric',
+                                             hour: '2-digit',
+                                             minute: '2-digit'
+                                           })}
+                                         </span>
+                                       </div>
+                                       <p className="text-sm leading-relaxed whitespace-pre-wrap">{comment.content}</p>
+                                       <Button
+                                         variant="ghost"
+                                         size="sm"
+                                         className="h-7 px-2 text-xs"
+                                         onClick={() => setReplyingTo({ ...replyingTo, [post.id]: comment.id })}
+                                       >
+                                         <Reply className="h-3 w-3 mr-1" />
+                                         Reply
+                                       </Button>
+                                     </div>
+                                   </div>
+                                 </div>
 
                                 {/* Nested Replies */}
                                 {comment.replies && comment.replies.length > 0 && (
                                   <div className="ml-12 space-y-3">
                                     {comment.replies.map((reply: any) => (
-                                      <div key={reply.id} className="bg-accent/10 rounded-lg p-3 border-l-2 border-primary/20">
-                                        <div className="flex items-start gap-2">
-                                          <Avatar className="h-7 w-7">
-                                            <AvatarFallback className="text-xs bg-primary/10">
-                                              {(reply.profiles?.display_name || reply.profiles?.username || 'U').charAt(0).toUpperCase()}
-                                            </AvatarFallback>
-                                          </Avatar>
-                                          <div className="flex-1 space-y-1">
-                                            <div className="flex items-center gap-2">
-                                              <span className="text-xs font-semibold">
-                                                {reply.profiles?.display_name || reply.profiles?.username}
-                                              </span>
-                                              <span className="text-xs text-muted-foreground">
-                                                {new Date(reply.created_at).toLocaleDateString('en-US', { 
-                                                  month: 'short', 
-                                                  day: 'numeric',
-                                                  hour: '2-digit',
-                                                  minute: '2-digit'
-                                                })}
-                                              </span>
-                                            </div>
-                                            <p className="text-xs leading-relaxed whitespace-pre-wrap">{reply.content}</p>
-                                          </div>
-                                        </div>
-                                      </div>
+                                       <div key={reply.id} className="bg-accent/10 rounded-lg p-3 border-l-2 border-primary/20">
+                                         <div className="flex items-start gap-2">
+                                           <Avatar className="h-7 w-7">
+                                             <AvatarImage src={reply.profiles?.avatar_url || undefined} />
+                                             <AvatarFallback className="text-xs bg-primary/10">
+                                               {(reply.profiles?.display_name || reply.profiles?.username || 'U').charAt(0).toUpperCase()}
+                                             </AvatarFallback>
+                                           </Avatar>
+                                           <div className="flex-1 space-y-1">
+                                             <div className="flex items-center gap-2">
+                                               <span className="text-xs font-semibold">
+                                                 {reply.profiles?.display_name || reply.profiles?.username || 'Anonymous'}
+                                               </span>
+                                               <span className="text-xs text-muted-foreground">
+                                                 {new Date(reply.created_at).toLocaleDateString('en-US', { 
+                                                   month: 'short', 
+                                                   day: 'numeric',
+                                                   hour: '2-digit',
+                                                   minute: '2-digit'
+                                                 })}
+                                               </span>
+                                             </div>
+                                             <p className="text-xs leading-relaxed whitespace-pre-wrap">{reply.content}</p>
+                                           </div>
+                                         </div>
+                                       </div>
                                     ))}
                                   </div>
                                 )}
