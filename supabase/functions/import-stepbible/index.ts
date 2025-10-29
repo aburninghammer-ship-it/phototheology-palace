@@ -227,7 +227,7 @@ serve(async (req) => {
                   chapter: verseData.chapter,
                   verse: verseData.verse,
                   strongs_number: word.strongs_number,
-                  word: word.word,
+                  word_text: word.word,
                   word_position: word.position,
                   position: word.position,
                   testament: verseData.testament
