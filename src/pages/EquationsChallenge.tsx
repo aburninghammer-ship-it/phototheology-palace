@@ -76,11 +76,17 @@ export default function EquationsChallenge() {
         .order('category', { ascending: true })
         .order('name', { ascending: true });
       
-      if (error) throw error;
-      setAvailablePrinciples(data || []);
+      if (error) {
+        console.error("Error loading principles:", error);
+        toast.error("Failed to load principles");
+        setAvailablePrinciples([]);
+      } else {
+        setAvailablePrinciples(data || []);
+      }
     } catch (error) {
       console.error("Error loading principles:", error);
       toast.error("Failed to load principles");
+      setAvailablePrinciples([]);
     } finally {
       setPrinciplesLoading(false);
     }
