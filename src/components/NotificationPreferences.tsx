@@ -12,6 +12,11 @@ export function NotificationPreferences() {
   const [loading, setLoading] = useState(true);
   const [preferences, setPreferences] = useState({
     equation_challenges: true,
+    christ_chapter_challenges: true,
+    sanctuary_challenges: true,
+    dimension_challenges: true,
+    connect6_challenges: true,
+    fruit_check_challenges: true,
     community_posts: true,
     study_reminders: true,
   });
@@ -37,6 +42,11 @@ export function NotificationPreferences() {
       if (data) {
         setPreferences({
           equation_challenges: data.equation_challenges,
+          christ_chapter_challenges: data.christ_chapter_challenges,
+          sanctuary_challenges: data.sanctuary_challenges,
+          dimension_challenges: data.dimension_challenges,
+          connect6_challenges: data.connect6_challenges,
+          fruit_check_challenges: data.fruit_check_challenges,
           community_posts: data.community_posts,
           study_reminders: data.study_reminders,
         });
@@ -90,11 +100,18 @@ export function NotificationPreferences() {
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
+        <div className="mb-4">
+          <h3 className="font-semibold mb-2">Challenge Notifications</h3>
+          <p className="text-sm text-muted-foreground mb-4">
+            Choose which challenge types you want to be notified about
+          </p>
+        </div>
+
         <div className="flex items-center justify-between">
           <div className="space-y-0.5">
             <Label htmlFor="equation-challenges">Equation Challenges</Label>
             <p className="text-sm text-muted-foreground">
-              Get notified when someone shares a new equation challenge
+              Phototheology equation building challenges
             </p>
           </div>
           <Switch
@@ -102,6 +119,80 @@ export function NotificationPreferences() {
             checked={preferences.equation_challenges}
             onCheckedChange={(checked) => updatePreference('equation_challenges', checked)}
           />
+        </div>
+
+        <div className="flex items-center justify-between">
+          <div className="space-y-0.5">
+            <Label htmlFor="christ-chapter">Christ in Every Chapter</Label>
+            <p className="text-sm text-muted-foreground">
+              Find Christ in every chapter challenges
+            </p>
+          </div>
+          <Switch
+            id="christ-chapter"
+            checked={preferences.christ_chapter_challenges}
+            onCheckedChange={(checked) => updatePreference('christ_chapter_challenges', checked)}
+          />
+        </div>
+
+        <div className="flex items-center justify-between">
+          <div className="space-y-0.5">
+            <Label htmlFor="sanctuary">Sanctuary Map Challenges</Label>
+            <p className="text-sm text-muted-foreground">
+              Biblical sanctuary pattern challenges
+            </p>
+          </div>
+          <Switch
+            id="sanctuary"
+            checked={preferences.sanctuary_challenges}
+            onCheckedChange={(checked) => updatePreference('sanctuary_challenges', checked)}
+          />
+        </div>
+
+        <div className="flex items-center justify-between">
+          <div className="space-y-0.5">
+            <Label htmlFor="dimension">5 Dimension Drill Challenges</Label>
+            <p className="text-sm text-muted-foreground">
+              Multi-dimensional Bible study challenges
+            </p>
+          </div>
+          <Switch
+            id="dimension"
+            checked={preferences.dimension_challenges}
+            onCheckedChange={(checked) => updatePreference('dimension_challenges', checked)}
+          />
+        </div>
+
+        <div className="flex items-center justify-between">
+          <div className="space-y-0.5">
+            <Label htmlFor="connect6">Connect-6 Genre Challenges</Label>
+            <p className="text-sm text-muted-foreground">
+              Biblical genre classification challenges
+            </p>
+          </div>
+          <Switch
+            id="connect6"
+            checked={preferences.connect6_challenges}
+            onCheckedChange={(checked) => updatePreference('connect6_challenges', checked)}
+          />
+        </div>
+
+        <div className="flex items-center justify-between">
+          <div className="space-y-0.5">
+            <Label htmlFor="fruit-check">Fruit Check Challenges</Label>
+            <p className="text-sm text-muted-foreground">
+              Spiritual fruit application challenges
+            </p>
+          </div>
+          <Switch
+            id="fruit-check"
+            checked={preferences.fruit_check_challenges}
+            onCheckedChange={(checked) => updatePreference('fruit_check_challenges', checked)}
+          />
+        </div>
+
+        <div className="border-t pt-4 mt-4">
+          <h3 className="font-semibold mb-4">Other Notifications</h3>
         </div>
 
         <div className="flex items-center justify-between">

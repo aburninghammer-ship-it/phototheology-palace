@@ -1585,28 +1585,43 @@ export type Database = {
       }
       notification_preferences: {
         Row: {
+          christ_chapter_challenges: boolean
           community_posts: boolean
+          connect6_challenges: boolean
           created_at: string
+          dimension_challenges: boolean
           equation_challenges: boolean
+          fruit_check_challenges: boolean
           id: string
+          sanctuary_challenges: boolean
           study_reminders: boolean
           updated_at: string
           user_id: string
         }
         Insert: {
+          christ_chapter_challenges?: boolean
           community_posts?: boolean
+          connect6_challenges?: boolean
           created_at?: string
+          dimension_challenges?: boolean
           equation_challenges?: boolean
+          fruit_check_challenges?: boolean
           id?: string
+          sanctuary_challenges?: boolean
           study_reminders?: boolean
           updated_at?: string
           user_id: string
         }
         Update: {
+          christ_chapter_challenges?: boolean
           community_posts?: boolean
+          connect6_challenges?: boolean
           created_at?: string
+          dimension_challenges?: boolean
           equation_challenges?: boolean
+          fruit_check_challenges?: boolean
           id?: string
+          sanctuary_challenges?: boolean
           study_reminders?: boolean
           updated_at?: string
           user_id?: string
