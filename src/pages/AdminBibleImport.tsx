@@ -10,7 +10,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Upload, Database, BookOpen } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 
-const AdminBibleImport = () => {
+export default function AdminBibleImport() {
   const { user } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -265,6 +265,4 @@ const AdminBibleImport = () => {
       </main>
     </div>
   );
-};
-
-export default AdminBibleImport;
+}
