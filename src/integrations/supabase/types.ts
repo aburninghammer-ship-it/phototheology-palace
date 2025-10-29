@@ -119,6 +119,36 @@ export type Database = {
         }
         Relationships: []
       }
+      bible_verses_tokenized: {
+        Row: {
+          book: string
+          chapter: number
+          created_at: string | null
+          id: string
+          text_kjv: string
+          tokens: Json
+          verse_num: number
+        }
+        Insert: {
+          book: string
+          chapter: number
+          created_at?: string | null
+          id?: string
+          text_kjv: string
+          tokens: Json
+          verse_num: number
+        }
+        Update: {
+          book?: string
+          chapter?: number
+          created_at?: string | null
+          id?: string
+          text_kjv?: string
+          tokens?: Json
+          verse_num?: number
+        }
+        Relationships: []
+      }
       bookmarks: {
         Row: {
           book: string
@@ -1910,13 +1940,18 @@ export type Database = {
       strongs_entries: {
         Row: {
           created_at: string | null
+          cycle_association: string | null
           definition: string
+          dimension_code: string | null
+          floor_rooms: string[] | null
           id: string
           kjv_translations: string | null
           language: string
           occurrences: number | null
           pronunciation: string | null
+          sanctuary_link: string | null
           strongs_number: string
+          time_zone_code: string | null
           transliteration: string | null
           updated_at: string | null
           usage: string | null
@@ -1924,13 +1959,18 @@ export type Database = {
         }
         Insert: {
           created_at?: string | null
+          cycle_association?: string | null
           definition: string
+          dimension_code?: string | null
+          floor_rooms?: string[] | null
           id?: string
           kjv_translations?: string | null
           language: string
           occurrences?: number | null
           pronunciation?: string | null
+          sanctuary_link?: string | null
           strongs_number: string
+          time_zone_code?: string | null
           transliteration?: string | null
           updated_at?: string | null
           usage?: string | null
@@ -1938,13 +1978,18 @@ export type Database = {
         }
         Update: {
           created_at?: string | null
+          cycle_association?: string | null
           definition?: string
+          dimension_code?: string | null
+          floor_rooms?: string[] | null
           id?: string
           kjv_translations?: string | null
           language?: string
           occurrences?: number | null
           pronunciation?: string | null
+          sanctuary_link?: string | null
           strongs_number?: string
+          time_zone_code?: string | null
           transliteration?: string | null
           updated_at?: string | null
           usage?: string | null
