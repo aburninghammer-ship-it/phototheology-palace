@@ -133,6 +133,8 @@ serve(async (req) => {
       verseText, 
       selectedPrinciples,
       verse,
+      equation,
+      symbols,
       isFirstMove,
       previousMoves,
       userCommentary,
@@ -777,6 +779,39 @@ CRITICAL: Use EXCLUSIVELY these codes - DO NOT invent or hallucinate any symbols
   "explanation": "3-4 paragraph explanation: (1) Introduce the verse and its context, (2) Walk through each principle in the equation showing how it relates to the verse, (3) Show how the principles connect to form a theological conclusion, (4) Close with the profound insight this equation reveals"
 }`;
 
+    } else if (mode === "solve-equation") {
+      systemPrompt = `You are Jeeves, the master Phototheology teacher. When given a biblical equation, you solve it step-by-step, showing how each principle connects to reveal deeper truth about Christ and Scripture.
+
+CRITICAL: Be thorough, clear, and educational. Show your work like a master teacher demonstrating to a student.`;
+
+      userPrompt = `I need you to solve this Phototheology equation step-by-step:
+
+📖 **Verse:** ${requestBody.verse}
+🔢 **Equation:** ${requestBody.equation}
+📋 **Symbols Used:** ${requestBody.symbols?.join(', ')}
+
+Please provide a masterful solution with these sections:
+
+**1. Verse Context (2-3 sentences)**
+What's happening in this passage? Set the scene.
+
+**2. Breaking Down the Equation (walk through each symbol)**
+For each principle in the equation, explain:
+• What this principle means
+• How it connects to the verse
+• What insight it reveals
+
+**3. The Flow of Logic**
+Show how the operators (+, →, =) connect the principles to build the theological argument. What's the progression of thought?
+
+**4. The Profound Insight**
+What does this equation ultimately reveal about Christ, salvation, or God's plan? What's the "aha!" moment?
+
+**5. Practical Application**
+How should this change how we read Scripture or live our lives?
+
+Format with clear headers, bullet points, and paragraphs. Be enthusiastic and insightful!`;
+
     } else if (mode === "chain-chess-feedback") {
       // All variables already extracted from req.json() above
       const difficultyContext = difficulty === "kids"
@@ -1324,6 +1359,14 @@ Keep it conversational and practical.`;
           { headers: { ...corsHeaders, "Content-Type": "application/json" } }
         );
       }
+    }
+
+    // For solve-equation mode, return text solution
+    if (mode === "solve-equation") {
+      return new Response(
+        JSON.stringify({ solution: content }),
+        { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
     }
 
     // For generate-flashcards mode, parse JSON

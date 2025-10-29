@@ -6,7 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Calculator, Trophy, Target, Clock, RefreshCw, Share2, Plus } from "lucide-react";
+import { Calculator, Trophy, Target, Clock, RefreshCw, Share2, Plus, Sparkles } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { toast } from "sonner";
@@ -30,6 +30,8 @@ export default function EquationsChallenge() {
   const [showResult, setShowResult] = useState(false);
   const [score, setScore] = useState(0);
   const [mode, setMode] = useState<"solve" | "create">("solve");
+  const [jeevesLoading, setJeevesLoading] = useState(false);
+  const [jeevesSolution, setJeevesSolution] = useState("");
   
   // Custom challenge creation state
   const [customVerse, setCustomVerse] = useState("");
@@ -76,6 +78,34 @@ export default function EquationsChallenge() {
     // For now, we'll just show the explanation
     setShowResult(true);
     setScore(score + 1);
+  };
+
+  const challengeJeeves = async () => {
+    if (!currentEquation) return;
+    
+    setJeevesLoading(true);
+    setJeevesSolution("");
+    
+    try {
+      const { data, error } = await supabase.functions.invoke("jeeves", {
+        body: {
+          mode: "solve-equation",
+          equation: currentEquation.equation,
+          verse: currentEquation.verse,
+          symbols: currentEquation.symbols
+        }
+      });
+
+      if (error) throw error;
+
+      setJeevesSolution(data.solution);
+      toast.success("Jeeves has solved the equation!");
+    } catch (error) {
+      console.error("Error getting Jeeves' solution:", error);
+      toast.error("Failed to get Jeeves' solution");
+    } finally {
+      setJeevesLoading(false);
+    }
   };
 
   const createCustomChallenge = async () => {
@@ -364,9 +394,34 @@ export default function EquationsChallenge() {
                       className="w-full"
                     />
                   </div>
-                  <Button onClick={checkAnswer} className="w-full" size="lg">
-                    Submit Answer
-                  </Button>
+                  <div className="grid grid-cols-2 gap-3">
+                    <Button onClick={checkAnswer} className="w-full" size="lg">
+                      Submit Answer
+                    </Button>
+                    <Button 
+                      onClick={challengeJeeves} 
+                      variant="outline"
+                      className="w-full" 
+                      size="lg"
+                      disabled={jeevesLoading}
+                    >
+                      <Sparkles className="h-4 w-4 mr-2" />
+                      {jeevesLoading ? "Asking Jeeves..." : "Challenge Jeeves"}
+                    </Button>
+                  </div>
+                  
+                  {/* Jeeves' Solution */}
+                  {jeevesSolution && (
+                    <Card className="border-primary bg-primary/5">
+                      <CardContent className="pt-6 space-y-4">
+                        <div className="flex items-center gap-2">
+                          <Sparkles className="h-5 w-5 text-primary" />
+                          <h3 className="font-bold text-lg">Jeeves' Solution:</h3>
+                        </div>
+                        <p className="whitespace-pre-wrap">{jeevesSolution}</p>
+                      </CardContent>
+                    </Card>
+                  )}
                 </div>
               )}
 
