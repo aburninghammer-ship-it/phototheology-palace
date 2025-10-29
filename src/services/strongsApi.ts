@@ -11,6 +11,12 @@ export interface StrongsEntry {
   usage: string[];
   occurrences: number;
   derivation?: string;
+  // Phototheology Extensions
+  sanctuary_link?: string;
+  time_zone_code?: string;
+  dimension_code?: string;
+  cycle_association?: string;
+  floor_rooms?: string[];
 }
 
 // Sample Strong's data for demonstration

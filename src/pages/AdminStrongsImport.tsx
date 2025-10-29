@@ -181,7 +181,12 @@ export default function AdminStrongsImport() {
               Automatic Import (Recommended)
             </CardTitle>
             <CardDescription>
-              Automatically download and import ~31,102 verses with Strong's numbers from STEPBible (Hebrew OT + Greek NT)
+              Import the complete KJV Bible (31,102 verses) with Strong's numbers and Phototheology codes. This process takes 5-10 minutes and includes:
+              <ul className="list-disc list-inside mt-2 text-sm">
+                <li>All 66 books (Genesis → Revelation)</li>
+                <li>Word-by-word Strong's mappings</li>
+                <li>Phototheology codes (Sanctuary links, Time-zones, Palace rooms)</li>
+              </ul>
             </CardDescription>
           </CardHeader>
           <CardContent>

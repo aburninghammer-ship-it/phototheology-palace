@@ -40,7 +40,7 @@ export const StrongsModal = ({ strongsNumber, isOpen, onClose }: StrongsModalPro
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+      <DialogContent className="max-w-3xl max-h-[85vh] overflow-y-auto">
         {loading ? (
           <div className="flex items-center justify-center p-12">
             <Loader2 className="h-8 w-8 animate-spin text-primary" />
@@ -128,6 +128,71 @@ export const StrongsModal = ({ strongsNumber, isOpen, onClose }: StrongsModalPro
                       Derivation
                     </h3>
                     <p className="text-sm italic text-foreground/80">{entry.derivation}</p>
+                  </div>
+                </>
+              )}
+
+              {/* Phototheology Extensions */}
+              {(entry.sanctuary_link || entry.time_zone_code || entry.dimension_code || 
+                entry.cycle_association || entry.floor_rooms) && (
+                <>
+                  <Separator />
+                  <div className="mt-6 space-y-4 pt-6 border-t-2 border-palace-teal/20">
+                    <h3 className="font-semibold text-lg flex items-center gap-2">
+                      <span className="text-palace-teal text-2xl">🏰</span>
+                      Phototheology Palace Connections
+                    </h3>
+
+                    {entry.sanctuary_link && (
+                      <div className="bg-palace-sand/20 p-4 rounded-lg border border-palace-teal/20">
+                        <h4 className="font-medium mb-2 text-palace-teal flex items-center gap-2">
+                          📍 Sanctuary Link
+                        </h4>
+                        <p className="text-sm leading-relaxed">{entry.sanctuary_link}</p>
+                      </div>
+                    )}
+
+                    {entry.time_zone_code && (
+                      <div className="bg-palace-sand/20 p-4 rounded-lg border border-palace-teal/20">
+                        <h4 className="font-medium mb-2 text-palace-teal flex items-center gap-2">
+                          ⏰ Time-Zone Code
+                        </h4>
+                        <p className="text-sm font-mono">{entry.time_zone_code}</p>
+                      </div>
+                    )}
+
+                    {entry.dimension_code && (
+                      <div className="bg-palace-sand/20 p-4 rounded-lg border border-palace-teal/20">
+                        <h4 className="font-medium mb-2 text-palace-teal flex items-center gap-2">
+                          📐 Dimension Code
+                        </h4>
+                        <p className="text-sm font-mono">{entry.dimension_code}</p>
+                      </div>
+                    )}
+
+                    {entry.cycle_association && (
+                      <div className="bg-palace-sand/20 p-4 rounded-lg border border-palace-teal/20">
+                        <h4 className="font-medium mb-2 text-palace-teal flex items-center gap-2">
+                          🔄 Cycle Association
+                        </h4>
+                        <p className="text-sm font-mono">{entry.cycle_association}</p>
+                      </div>
+                    )}
+
+                    {entry.floor_rooms && entry.floor_rooms.length > 0 && (
+                      <div className="bg-palace-sand/20 p-4 rounded-lg border border-palace-teal/20">
+                        <h4 className="font-medium mb-2 text-palace-teal flex items-center gap-2">
+                          🏛️ Palace Rooms
+                        </h4>
+                        <div className="flex flex-wrap gap-2">
+                          {entry.floor_rooms.map((room, idx) => (
+                            <span key={idx} className="px-3 py-1 bg-palace-teal/20 text-palace-teal rounded-full text-sm font-medium border border-palace-teal/30">
+                              {room}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                    )}
                   </div>
                 </>
               )}
