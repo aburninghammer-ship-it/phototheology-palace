@@ -214,17 +214,17 @@ export const Navigation = () => {
                   </DropdownMenuTrigger>
               <DropdownMenuContent>
                 <DropdownMenuItem asChild>
-                  <Link to="/phototheologygpt">🤖 PhototheologyGPT</Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem asChild>
-                  <Link to="/apologetics-gpt">🛡️ ApologeticsGPT</Link>
+                <Link to="/phototheologygpt">🤖 Phototheology GPT</Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <Link to="/apologetics-gpt">🛡️ Apologetics GPT</Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
                   <Link to="/daniel-revelation-gpt">📜 Daniel & Revelation GPT</Link>
                 </DropdownMenuItem>
-                <DropdownMenuItem asChild>
-                  <Link to="/kidgpt">👶 KidGPT</Link>
-                </DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <Link to="/kidgpt">👶 Kid GPT</Link>
+              </DropdownMenuItem>
               </DropdownMenuContent>
                 </DropdownMenu>
               </TooltipTrigger>

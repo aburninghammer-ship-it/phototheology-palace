@@ -57,7 +57,7 @@ const featuredContent = [
   },
   {
     day: 3, // Wednesday
-    title: "Phototheology GPT",
+    title: "Daniel & Revelation GPT",
     description: "Chat with AI trained on Daniel & Revelation to deepen your understanding",
     path: "/daniel-revelation-gpt",
     icon: Brain,

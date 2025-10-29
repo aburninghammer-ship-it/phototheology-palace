@@ -20,21 +20,21 @@ const ApologeticsGPT = () => {
       <Navigation />
       <main className="container mx-auto px-4 py-8">
         <div className="max-w-4xl mx-auto space-y-6">
-          <div className="text-center space-y-2">
-            <h1 className="text-5xl font-bold flex items-center justify-center gap-2 text-primary">
-              <Shield className="h-10 w-10" />
-              ApologeticsGPT
-            </h1>
-            <p className="text-xl text-muted-foreground">AI-Powered Defense of the Faith</p>
-            <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground">
-              <Sparkles className="h-4 w-4" />
-              <span>Equip yourself to defend biblical truth with confidence</span>
-            </div>
-          </div>
-
-          <Card className="border-2 border-primary/20">
-            <CardHeader className="bg-gradient-to-r from-blue-500/10 to-green-500/10">
-              <CardTitle className="text-2xl">Chat with ApologeticsGPT</CardTitle>
+              <div className="text-center space-y-2">
+                <h1 className="text-5xl font-bold flex items-center justify-center gap-2 text-primary">
+                  <Shield className="h-10 w-10" />
+                  Apologetics GPT
+                </h1>
+                <p className="text-xl text-muted-foreground">AI-Powered Defense of the Faith</p>
+                <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground">
+                  <Sparkles className="h-4 w-4" />
+                  <span>Equip yourself to defend biblical truth with confidence</span>
+                </div>
+              </div>
+    
+              <Card className="border-2 border-primary/20">
+                <CardHeader className="bg-gradient-to-r from-blue-500/10 to-green-500/10">
+                  <CardTitle className="text-2xl">Chat with Apologetics GPT</CardTitle>
               <CardDescription className="text-base">
                 Get answers to tough questions about faith, science, history, and biblical reliability. Learn to defend the gospel with grace and truth.
               </CardDescription>

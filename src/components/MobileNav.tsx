@@ -121,12 +121,12 @@ export const MobileNav = () => {
               
               <Link to="/phototheologygpt">
                 <Button variant="ghost" className="w-full justify-start" size="sm">
-                  🤖 PhototheologyGPT
+                  🤖 Phototheology GPT
                 </Button>
               </Link>
               <Link to="/apologetics-gpt">
                 <Button variant="ghost" className="w-full justify-start" size="sm">
-                  🛡️ ApologeticsGPT
+                  🛡️ Apologetics GPT
                 </Button>
               </Link>
               <Link to="/daniel-revelation-gpt">
@@ -136,7 +136,7 @@ export const MobileNav = () => {
               </Link>
               <Link to="/kidgpt">
                 <Button variant="ghost" className="w-full justify-start" size="sm">
-                  👶 KidGPT
+                  👶 Kid GPT
                 </Button>
               </Link>
               
