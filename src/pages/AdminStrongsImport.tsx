@@ -7,6 +7,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2, Upload, AlertCircle, CheckCircle2, FileText } from "lucide-react";
+import { BibleImportPanel } from "@/components/admin/BibleImportPanel";
 
 export default function AdminStrongsImport() {
   const [jsonInput, setJsonInput] = useState("");
@@ -401,11 +402,14 @@ export default function AdminStrongsImport() {
       </div>
 
       <div className="grid gap-6">
+        {/* BibleSDK Import Panel */}
+        <BibleImportPanel />
+
         <Card className="bg-gradient-to-br from-primary/5 to-accent/5 border-primary/20">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <FileText className="h-5 w-5" />
-              Quick Import - Paste Data (Recommended!)
+              Quick Import - Paste Data
             </CardTitle>
             <CardDescription>
               Paste tab-separated or comma-separated data directly. Format: StrongsNumber, Word, Transliteration, Pronunciation, Definition, KJV_Translation
