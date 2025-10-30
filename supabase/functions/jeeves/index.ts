@@ -204,68 +204,68 @@ serve(async (req) => {
     let userPrompt = "";
 
     if (mode === "strongs-lookup") {
-      // Import biblesdk for Strong's lookup
-      const { getVerses } = await import('npm:biblesdk@0.4.0');
-      
       try {
-        // Map book names to biblesdk codes
-        const bookCodeMap: Record<string, string> = {
-          'Genesis': 'GEN', 'Exodus': 'EXO', 'Leviticus': 'LEV', 'Numbers': 'NUM', 'Deuteronomy': 'DEU',
-          'Joshua': 'JOS', 'Judges': 'JDG', 'Ruth': 'RUT', '1 Samuel': '1SA', '2 Samuel': '2SA',
-          '1 Kings': '1KI', '2 Kings': '2KI', '1 Chronicles': '1CH', '2 Chronicles': '2CH',
-          'Ezra': 'EZR', 'Nehemiah': 'NEH', 'Esther': 'EST', 'Job': 'JOB', 'Psalms': 'PSA',
-          'Proverbs': 'PRO', 'Ecclesiastes': 'ECC', 'Song of Solomon': 'SNG', 'Isaiah': 'ISA',
-          'Jeremiah': 'JER', 'Lamentations': 'LAM', 'Ezekiel': 'EZK', 'Daniel': 'DAN',
-          'Hosea': 'HOS', 'Joel': 'JOL', 'Amos': 'AMO', 'Obadiah': 'OBA', 'Jonah': 'JON',
-          'Micah': 'MIC', 'Nahum': 'NAM', 'Habakkuk': 'HAB', 'Zephaniah': 'ZEP',
-          'Haggai': 'HAG', 'Zechariah': 'ZEC', 'Malachi': 'MAL', 'Matthew': 'MAT',
-          'Mark': 'MRK', 'Luke': 'LUK', 'John': 'JHN', 'Acts': 'ACT', 'Romans': 'ROM',
-          '1 Corinthians': '1CO', '2 Corinthians': '2CO', 'Galatians': 'GAL', 'Ephesians': 'EPH',
-          'Philippians': 'PHP', 'Colossians': 'COL', '1 Thessalonians': '1TH', '2 Thessalonians': '2TH',
-          '1 Timothy': '1TI', '2 Timothy': '2TI', 'Titus': 'TIT', 'Philemon': 'PHM',
-          'Hebrews': 'HEB', 'James': 'JAS', '1 Peter': '1PE', '2 Peter': '2PE',
-          '1 John': '1JN', '2 John': '2JN', '3 John': '3JN', 'Jude': 'JUD', 'Revelation': 'REV'
-        };
+        // Query the strongs_verses table directly to get Strong's data
+        const { data: strongsData, error: strongsError } = await supabase
+          .from('strongs_verses')
+          .select('words')
+          .eq('book', book)
+          .eq('chapter', chapter)
+          .eq('verse', verse)
+          .maybeSingle();
 
-        const bookCode = bookCodeMap[book];
-        if (!bookCode) {
-          throw new Error(`Unknown book: ${book}`);
+        if (strongsError) {
+          console.error('Database error:', strongsError);
+          throw new Error('Failed to fetch Strong\'s data from database');
         }
 
-        // Fetch verse with Strong's data from biblesdk
-        const response: any = await getVerses(bookCode, chapter, [verse, verse]);
-        
-        if (!response || !response.phrases || response.phrases.length === 0) {
+        if (!strongsData || !strongsData.words) {
           throw new Error('No Strong\'s data found for this verse');
         }
 
-        // Extract Strong's data and build response
-        const verseWords = response.phrases
-          .filter((p: any) => p.verse === verse)
-          .map((p: any) => ({
-            text: p.text,
-            strongs: p.strongs_number ? `${p.strongs_type}${p.strongs_number}` : null,
-            transliteration: p.transliteration,
-            definition: p.definition,
-            hebrew_word: p.hebrew_word,
-            greek_word: p.greek_word
-          }));
+        const words = strongsData.words as Array<{ text: string; strongs?: string }>;
+        
+        // Get full verse text
+        const fullText = words.map(w => w.text).join(' ').trim();
+        
+        // Build list of words with Strong's numbers
+        const wordsWithStrongs = words.filter(w => w.strongs);
+        
+        if (wordsWithStrongs.length === 0) {
+          throw new Error('No Strong\'s numbers found for this verse');
+        }
 
-        // Build structured response
-        const strongsInfo = verseWords
-          .filter((w: any) => w.strongs)
-          .map((w: any) => {
-            const lang = w.strongs?.startsWith('H') ? 'Hebrew' : 'Greek';
-            const originalWord = w.strongs?.startsWith('H') ? w.hebrew_word : w.greek_word;
-            return `
-**${w.text}** (${w.strongs})
-- **Original ${lang}:** ${originalWord || 'N/A'}
-- **Transliteration:** ${w.transliteration || 'N/A'}
-- **Definition:** ${w.definition || 'No definition available'}
+        // Fetch definitions from strongs_lexicon for each Strong's number
+        const strongsNumbers = wordsWithStrongs.map(w => w.strongs).filter(Boolean);
+        const { data: lexiconData } = await supabase
+          .from('strongs_lexicon')
+          .select('strongs_number, word, transliteration, pronunciation, definition')
+          .in('strongs_number', strongsNumbers);
+
+        const lexiconMap = new Map(
+          lexiconData?.map(l => [l.strongs_number, l]) || []
+        );
+
+        // Build the Strong's analysis
+        const strongsInfo = wordsWithStrongs
+          .map((w) => {
+            const strongsNum = w.strongs!;
+            const lexEntry = lexiconMap.get(strongsNum);
+            const lang = strongsNum.startsWith('H') ? 'Hebrew' : 'Greek';
+            
+            if (!lexEntry) {
+              return `**"${w.text}"** (${strongsNum})
+- Original ${lang} word information pending
+`;
+            }
+            
+            return `**"${w.text}"** (${strongsNum})
+- **Original ${lang}:** ${lexEntry.word || 'N/A'}
+- **Transliteration:** ${lexEntry.transliteration || 'N/A'}
+- **Pronunciation:** ${lexEntry.pronunciation || 'N/A'}
+- **Definition:** ${lexEntry.definition || 'No definition available'}
 `;
           }).join('\n');
-
-        const fullText = verseWords.map((w: any) => w.text).join(' ').trim();
 
         return new Response(
           JSON.stringify({
@@ -273,14 +273,15 @@ serve(async (req) => {
 
 **Verse Text:** ${fullText}
 
-${strongsInfo || 'No Strong\'s numbers found for this verse.'}
+${strongsInfo}
 
 ---
 
 💡 **How to Use This:**
-- Click on the superscript numbers in the Bible text to see individual word definitions
-- Compare different translations to understand the nuances
-- Look for repeated Strong's numbers to find thematic connections`
+- Each word above shows its original Hebrew or Greek meaning
+- Compare these definitions to understand the verse's deeper meaning
+- Look for patterns in how words are used throughout Scripture
+- Click individual superscript numbers in the text for more details`
           }),
           { headers: { ...corsHeaders, "Content-Type": "application/json" } }
         );
@@ -294,7 +295,7 @@ This verse may not have Strong's concordance data available yet, or there was an
 
 **What you can try:**
 - Check if the verse reference is correct
-- Try another verse
+- Try another verse from the demonstration list
 - The full Bible Strong's import is still in progress
 
 Error: ${error.message}`
