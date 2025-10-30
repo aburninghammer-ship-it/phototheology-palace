@@ -255,6 +255,8 @@ export const BibleReader = () => {
                 <VerseView
                   key={`${verse.book}-${verse.chapter}-${verse.verse}`}
                   verse={verse}
+                  book={book}
+                  chapter={chapter}
                   isSelected={principleMode ? selectedVerses.includes(verse.verse) : selectedVerse === verse.verse}
                   onSelect={() => handleVerseClick(verse.verse)}
                   showPrinciples={principleMode}
