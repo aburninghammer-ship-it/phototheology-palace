@@ -10,6 +10,27 @@ interface ImportProgress {
   versesImported: number;
 }
 
+interface BibleSDKPhrase {
+  book: string;
+  text: string;
+  usfm: string[];
+  position: number;
+  verse: number | null;
+  verse_position: number | null;
+  chapter: number;
+  strongs_number: number | null;
+  strongs_type: string | null;
+  transliteration: string | null;
+  definition: string | null;
+  hebrew_word: string | null;
+  greek_word: string | null;
+}
+
+interface BibleSDKResponse {
+  phrases: BibleSDKPhrase[];
+  prev: any;
+}
+
 export const useBibleImport = () => {
   const [isImporting, setIsImporting] = useState(false);
   const [progress, setProgress] = useState<ImportProgress | null>(null);
@@ -29,29 +50,49 @@ export const useBibleImport = () => {
         });
 
         // Fetch verses for this chapter from BibleSDK
-        const verses = await getVerses(bookCode, chapter, [1, 999]);
+        const response = await getVerses(bookCode, chapter, [1, 999]) as unknown as BibleSDKResponse;
         
-        if (!verses || verses.length === 0) {
+        if (!response || !response.phrases || response.phrases.length === 0) {
           console.warn(`No verses found for ${bookCode} chapter ${chapter}`);
           continue;
         }
 
-        // Process verses - BibleSDK returns simple verse objects
-        const versesToInsert = verses.map((verse: any) => {
-          // Simple tokenization - split by words for now
-          // Strong's numbers would need to be fetched separately if available
-          const words = verse.text.split(/\s+/).filter(w => w.length > 0);
-          const tokens = words.map((word: string, index: number) => ({
-            position: index,
-            word: word.replace(/[^\w\s'-]/g, ''),
-            strongs: null, // Would need separate API call for Strong's data
-          }));
+        // Group phrases by verse number (filter out metadata with null verse)
+        const verseGroups = new Map<number, BibleSDKPhrase[]>();
+        response.phrases.forEach((phrase) => {
+          if (phrase.verse !== null) {
+            if (!verseGroups.has(phrase.verse)) {
+              verseGroups.set(phrase.verse, []);
+            }
+            verseGroups.get(phrase.verse)!.push(phrase);
+          }
+        });
+
+        // Process each verse
+        const versesToInsert = Array.from(verseGroups.entries()).map(([verseNum, phrases]) => {
+          // Build full verse text from phrases
+          const verseText = phrases
+            .map(p => p.text)
+            .join('')
+            .trim();
+
+          // Build token array with Strong's data (only phrases with strongs_number)
+          const tokens = phrases
+            .filter(p => p.strongs_number !== null)
+            .map((p, idx) => ({
+              position: idx,
+              word: p.text.trim(),
+              strongs: p.strongs_number ? `${p.strongs_type}${p.strongs_number}` : null,
+              definition: p.definition || null,
+              hebrew_word: p.hebrew_word || null,
+              greek_word: p.greek_word || null,
+            }));
 
           return {
             book: bookCode,
             chapter: chapter,
-            verse_num: verse.verse,
-            text_kjv: verse.text.trim(),
+            verse_num: verseNum,
+            text_kjv: verseText,
             tokens: tokens,
           };
         });
