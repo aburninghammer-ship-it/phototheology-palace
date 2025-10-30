@@ -162,7 +162,7 @@ const Index = () => {
             <div className="inline-flex items-center justify-center w-12 h-12 gradient-forest rounded-xl mb-3">
               <Zap className="h-5 w-5 text-white" />
             </div>
-            <h2 className="font-serif text-4xl md:text-5xl font-bold mb-3 bg-gradient-forest bg-clip-text text-transparent">
+            <h2 className="font-serif text-4xl md:text-5xl font-bold mb-3 bg-gradient-to-r from-palace-green to-palace-teal bg-clip-text text-transparent">
               The Eight-Floor Method
             </h2>
             <p className="text-lg text-foreground/75 max-w-2xl mx-auto font-medium">
@@ -226,7 +226,7 @@ const Index = () => {
               <Sparkles className="h-3.5 w-3.5 text-palace-teal" />
               <span className="text-xs font-medium text-palace-teal">Floor 0 - Advanced Modes</span>
             </div>
-            <h2 className="font-serif text-4xl md:text-5xl font-bold mb-3 bg-gradient-ocean bg-clip-text text-transparent">
+            <h2 className="font-serif text-4xl md:text-5xl font-bold mb-3 bg-gradient-to-r from-palace-blue to-palace-teal bg-clip-text text-transparent">
               AI-Powered Study Tools
             </h2>
             <p className="text-lg text-foreground/75 max-w-2xl mx-auto font-medium">
