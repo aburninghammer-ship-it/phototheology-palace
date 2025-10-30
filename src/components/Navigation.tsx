@@ -386,6 +386,12 @@ export const Navigation = () => {
                         💡 Submit Ideas
                       </Link>
                     </DropdownMenuItem>
+                    <DropdownMenuItem asChild>
+                      <Link to="/admin/bible-import">
+                        <BookOpen className="h-4 w-4 mr-2" />
+                        📖 Admin: Bible Import
+                      </Link>
+                    </DropdownMenuItem>
                     <DropdownMenuSeparator />
                     <DropdownMenuItem onClick={signOut}>
                       <LogOut className="h-4 w-4 mr-2" />
