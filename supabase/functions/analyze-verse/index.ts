@@ -28,8 +28,7 @@ serve(async (req) => {
       return new Response(
         JSON.stringify({
           verseId: `${book}-${chapter}-${verse}`,
-          principles: [],
-          principlesData: {
+          principles: {
             dimensions: [],
             cycles: [],
             horizons: [],
@@ -37,7 +36,13 @@ serve(async (req) => {
             sanctuary: [],
             feasts: [],
             walls: []
-          }
+          },
+          crossReferences: [],
+          commentary: "",
+          christCenter: "",
+          roomsUsed: [],
+          floorsCovered: [],
+          roomAnalysis: {}
         }),
         { 
           headers: { 
@@ -138,8 +143,7 @@ Return JSON with ONLY the principles that CLEARLY and GENUINELY apply. If none a
     return new Response(
       JSON.stringify({
         verseId: `${book}-${chapter}-${verse}`,
-        principles: limitedPrinciples,
-        principlesData: {
+        principles: {
           dimensions: analysis.dimensions || [],
           cycles: analysis.cycles || [],
           horizons: analysis.horizons || [],
@@ -147,7 +151,13 @@ Return JSON with ONLY the principles that CLEARLY and GENUINELY apply. If none a
           sanctuary: analysis.sanctuary || [],
           feasts: analysis.feasts || [],
           walls: analysis.walls || []
-        }
+        },
+        crossReferences: [],
+        commentary: "",
+        christCenter: "",
+        roomsUsed: [],
+        floorsCovered: [],
+        roomAnalysis: {}
       }),
       { 
         headers: { 

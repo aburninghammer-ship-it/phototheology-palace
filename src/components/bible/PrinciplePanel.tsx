@@ -184,7 +184,7 @@ export const PrinciplePanel = ({ book, chapter, verse, verseText, onClose }: Pri
               )}
               
               {/* Dimensions */}
-              {annotation.principles.dimensions && (
+              {annotation.principles.dimensions && annotation.principles.dimensions.length > 0 && (
                 <div className="space-y-2">
                   <h4 className="font-semibold text-sm flex items-center gap-2">
                     <div className="w-2 h-2 rounded-full gradient-palace" />
@@ -252,7 +252,7 @@ export const PrinciplePanel = ({ book, chapter, verse, verseText, onClose }: Pri
               )}
               
               {/* Sanctuary */}
-              {annotation.principles.sanctuary && (
+              {annotation.principles.sanctuary && annotation.principles.sanctuary.length > 0 && (
                 <div className="space-y-2">
                   <h4 className="font-semibold text-sm flex items-center gap-2">
                     <Building2 className="w-4 h-4 text-palace-blue" />
@@ -314,7 +314,8 @@ export const PrinciplePanel = ({ book, chapter, verse, verseText, onClose }: Pri
             </TabsContent>
             
             <TabsContent value="cross-refs" className="space-y-3 mt-0">
-              {annotation.crossReferences.map((ref, idx) => (
+              {annotation.crossReferences && annotation.crossReferences.length > 0 ? (
+                annotation.crossReferences.map((ref, idx) => (
                 <Link
                   key={idx}
                   to={`/bible/${ref.book}/${ref.chapter}`}
@@ -334,7 +335,12 @@ export const PrinciplePanel = ({ book, chapter, verse, verseText, onClose }: Pri
                     </p>
                   </div>
                 </Link>
-              ))}
+              ))
+              ) : (
+                <div className="text-center py-8 text-muted-foreground">
+                  <p className="text-sm">No cross-references found for this verse</p>
+                </div>
+              )}
             </TabsContent>
             
             <TabsContent value="christ" className="mt-0">
