@@ -595,7 +595,11 @@ ${PALACE_SCHEMA}
 
 Verse text: "${verseText.text}"
 
-${includeSOP ? `**IMPORTANT:** Include Spirit of Prophecy (Ellen White) insights on this verse or related passages. Label them clearly with 📜 emoji as "SOP Commentary:" Use her writings to illuminate the text.` : ''}
+${includeSOP ? `**IMPORTANT - SOP ANALYSIS:** Search for Ellen White statements that directly apply to or amplify this specific verse (${book} ${chapter}:${verseText.verse}). 
+• If you find relevant statements, cite them with the book/chapter and show how they illuminate the verse
+• If NO relevant Ellen White statements are found for this verse, simply state: "No statements found to amplify this verse."
+• Do NOT provide generic Ellen White quotes - only include statements that specifically address this verse or passage
+• Label clearly with 📜 emoji as "SOP Commentary:"` : ''}
 
 **FORMATTING INSTRUCTIONS - CRITICAL:**
 - Start with a warm opening using an emoji (📖, ✨, 🔍)
