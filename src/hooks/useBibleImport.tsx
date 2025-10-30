@@ -28,49 +28,31 @@ export const useBibleImport = () => {
           versesImported: totalVersesImported,
         });
 
-        // Fetch tokenized verses for this chapter from BibleSDK
-        const tokenizedData = await getVerses(bookCode, chapter, [1, 999]);
+        // Fetch verses for this chapter from BibleSDK
+        const verses = await getVerses(bookCode, chapter, [1, 999]);
         
-        if (!tokenizedData || tokenizedData.length === 0) {
+        if (!verses || verses.length === 0) {
           console.warn(`No verses found for ${bookCode} chapter ${chapter}`);
           continue;
         }
 
-        // Group tokens by verse number
-        const verseGroups = new Map<number, any[]>();
-        tokenizedData.forEach((token: any) => {
-          if (!verseGroups.has(token.verse)) {
-            verseGroups.set(token.verse, []);
-          }
-          verseGroups.get(token.verse)!.push(token);
-        });
-
-        // Process each verse
-        const versesToInsert = Array.from(verseGroups.entries()).map(([verseNum, tokens]) => {
-          // Build full verse text from tokens
-          const verseText = tokens
-            .map(t => t.text)
-            .join('')
-            .replace(/\s+/g, ' ')
-            .trim();
-
-          // Build token array with Strong's data
-          const tokenArray = tokens
-            .filter(t => t.strongs_number) // Only include tokens with Strong's numbers
-            .map((t, idx) => ({
-              position: idx,
-              word: t.text.trim(),
-              strongs: t.strongs_number ? `${t.strongs_type}${t.strongs_number}` : null,
-              definition: t.definition || null,
-              original_word: t.hebrew_word || t.greek_word || null,
-            }));
+        // Process verses - BibleSDK returns simple verse objects
+        const versesToInsert = verses.map((verse: any) => {
+          // Simple tokenization - split by words for now
+          // Strong's numbers would need to be fetched separately if available
+          const words = verse.text.split(/\s+/).filter(w => w.length > 0);
+          const tokens = words.map((word: string, index: number) => ({
+            position: index,
+            word: word.replace(/[^\w\s'-]/g, ''),
+            strongs: null, // Would need separate API call for Strong's data
+          }));
 
           return {
             book: bookCode,
             chapter: chapter,
-            verse_num: verseNum,
-            text_kjv: verseText,
-            tokens: tokenArray,
+            verse_num: verse.verse,
+            text_kjv: verse.text.trim(),
+            tokens: tokens,
           };
         });
 
