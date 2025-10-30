@@ -54,6 +54,21 @@ const Feedback = () => {
 
       if (error) throw error;
 
+      // Send email notification
+      try {
+        await supabase.functions.invoke('send-feedback-email', {
+          body: {
+            category: validation.data.category,
+            title: validation.data.title,
+            description: validation.data.description,
+            userEmail: user?.email
+          }
+        });
+      } catch (emailError) {
+        console.error('Failed to send email notification:', emailError);
+        // Don't fail the whole operation if email fails
+      }
+
       toast({
         title: "Feedback submitted!",
         description: "Thank you for helping us improve Phototheology.",

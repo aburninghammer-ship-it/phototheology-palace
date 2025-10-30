@@ -60,3 +60,6 @@ verify_jwt = true
 
 [functions.bulk-import-hardcoded-strongs]
 verify_jwt = false
+
+[functions.send-feedback-email]
+verify_jwt = false
