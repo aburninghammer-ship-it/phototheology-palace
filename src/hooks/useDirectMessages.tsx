@@ -41,6 +41,7 @@ export const useDirectMessages = () => {
   const fetchConversations = useCallback(async () => {
     if (!user?.id) {
       console.log('No user ID, skipping conversation fetch');
+      setIsLoading(false);
       return;
     }
 
