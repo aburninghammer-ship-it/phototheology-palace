@@ -1,14 +1,55 @@
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Progress } from "@/components/ui/progress";
-import { useBibleImport } from "@/hooks/useBibleImport";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
 import { Book, Loader2 } from "lucide-react";
 
 export const BibleImportPanel = () => {
-  const { importBook, isImporting, progress } = useBibleImport();
+  const [isImporting, setIsImporting] = useState(false);
+  const [progress, setProgress] = useState<string>("");
+  const { toast } = useToast();
 
-  const handleImportGenesis = async () => {
-    await importBook('GEN', 'Genesis', 50);
+  const handleImportBible = async () => {
+    setIsImporting(true);
+    setProgress("Starting Bible import...");
+
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        throw new Error('Not authenticated');
+      }
+
+      toast({
+        title: "Starting Import",
+        description: "Importing all 66 books of the Bible. This will take several minutes...",
+      });
+
+      const { data, error } = await supabase.functions.invoke('import-bible-verses', {
+        headers: {
+          Authorization: `Bearer ${session.access_token}`,
+        },
+      });
+
+      if (error) throw error;
+
+      setProgress(`Complete! Imported ${data.totalVersesImported} verses from ${data.booksImported} books`);
+      
+      toast({
+        title: "Import Complete!",
+        description: `Successfully imported ${data.totalVersesImported} verses from all 66 books`,
+      });
+    } catch (error: any) {
+      console.error('Import error:', error);
+      setProgress(`Error: ${error.message}`);
+      toast({
+        title: "Import Failed",
+        description: error.message,
+        variant: "destructive",
+      });
+    } finally {
+      setIsImporting(false);
+    }
   };
 
   return (
@@ -24,22 +65,13 @@ export const BibleImportPanel = () => {
       </CardHeader>
       <CardContent className="space-y-4">
         {progress && (
-          <div className="space-y-2">
-            <div className="flex justify-between text-sm">
-              <span className="text-muted-foreground">
-                Importing {progress.book} - Chapter {progress.chapter} of {progress.totalChapters}
-              </span>
-              <span className="font-medium">{progress.versesImported} verses</span>
-            </div>
-            <Progress 
-              value={(progress.chapter / progress.totalChapters) * 100} 
-              className="h-2"
-            />
+          <div className="bg-muted/50 p-3 rounded-lg">
+            <p className="text-sm font-medium">{progress}</p>
           </div>
         )}
 
         <Button 
-          onClick={handleImportGenesis} 
+          onClick={handleImportBible} 
           disabled={isImporting}
           size="lg"
           className="w-full"
@@ -47,18 +79,18 @@ export const BibleImportPanel = () => {
           {isImporting ? (
             <>
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              Importing Genesis...
+              Importing Full Bible...
             </>
           ) : (
             <>
               <Book className="mr-2 h-4 w-4" />
-              Import Genesis (50 chapters)
+              Import Full Bible (All 66 Books)
             </>
           )}
         </Button>
 
         <p className="text-xs text-muted-foreground">
-          This will fetch all verses from Genesis using the BibleSDK API and store them with tokenized Strong's numbers in the database.
+          This will fetch all verses from all 66 books of the Bible using the BibleSDK API and store them with tokenized Strong's numbers. This process will take several minutes.
         </p>
       </CardContent>
     </Card>
