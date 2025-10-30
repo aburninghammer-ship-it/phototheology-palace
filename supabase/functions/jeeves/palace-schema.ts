@@ -182,6 +182,42 @@ export const PALACE_SCHEMA = `
 **Core Question:** How does this feast point to Christ's ministry?
 **METHOD:** Feast → OT observance → Christ's fulfillment → Our participation → Eternal celebration.
 
+### CEC - Christ in Every Chapter
+**Purpose:** Enforce the principle that ALL Scripture is about Jesus
+**Core Question:** How is Jesus present in this chapter—explicitly, typologically, or thematically—and what does He accomplish here?
+**METHOD:** 
+1. READ the chapter thoroughly
+2. IDENTIFY Christ's presence using three modes:
+   - MODE 1: EXPLICIT (Direct references to Jesus/Messiah)
+   - MODE 2: TYPOLOGICAL (OT persons, events, objects foreshadowing Christ)
+   - MODE 3: THEMATIC (Themes that find ultimate fulfillment in Christ)
+3. NAME Christ's title/role in this chapter
+4. STATE Christ's action/accomplishment
+5. CROSSLINK with 1-2 NT texts that explicitly connect this chapter to Christ
+
+**Example:** Genesis 3: NAME=Seed of Woman • ACT=Promises to crush serpent's head • CROSSLINK=Romans 16:20, Revelation 12:9
+
+### R66 - Room 66
+**Purpose:** Trace a SINGLE THEME through all 66 books of the Bible
+**Core Question:** How does this single theme develop, escalate, and find fulfillment across all 66 books of the Bible?
+**METHOD:**
+1. CHOOSE A THEME that spans the entire Bible (examples: The Lamb, The Seed, The Kingdom, The Temple, The Covenant)
+2. CREATE A 66-ROW GRID: Book Name → Claim (≤14 words) → Proof-Text → Tags
+3. WORK THROUGH EACH BOOK showing how the theme appears
+4. MAINTAIN PROGRESSIVE REVELATION: Show how theme STARTS → DEVELOPS → CLIMAXES in Christ → CONSUMMATES in Revelation
+5. WRITE A CONSTELLATION (100-120 words): Synthesize the entire 66-book journey in narrative form
+
+**Example:** The Lamb theme: From substitute ram in Genesis 22 → Passover sacrifice in Exodus 12 → suffering servant in Isaiah 53 → Christ crucified in the Gospels → victorious Lion-Lamb in Revelation 5
+
+---
+
+## FLOOR 6: THREE HEAVENS & CYCLES
+
+### 1H/2H/3H - Three Heavens
+**Purpose:** Recognize multiple horizons of prophetic fulfillment
+**Core Question:** Which redemptive-historical horizon: First Heaven (Babylon/return), Second Heaven (AD 70/church age), or Third Heaven (final judgment/new creation)?
+**METHOD:** Identify audience, timeframe, language scale, and fulfillment indicators.
+
 ---
 
 ## COMMON ERRORS TO AVOID
@@ -208,7 +244,7 @@ export const PALACE_SCHEMA = `
 
 Before responding with Palace content, verify:
 - ✅ Room name exists in this schema
-- ✅ Room tag matches this schema (SR, IR, 24, BR, TR, GR, OR, DC, ST, QR, QA, NF, PF, BF, HF, LR, CR, DR, C6, TRm, TZ, PRm, P‖, FRt, BL, PR, 3A, FE)
+- ✅ Room tag matches this schema (SR, IR, 24, BR, TR, GR, OR, DC, ST, QR, QA, NF, PF, BF, HF, LR, CR, DR, C6, TRm, TZ, PRm, P‖, FRt, BL, PR, 3A, FE, CEC, R66, 1H/2H/3H)
 - ✅ Method used matches the exact method listed here
 - ✅ Purpose aligns with room's actual purpose
 - ✅ Not confusing Connect-6 (genre) with Theme Room (6 walls)
