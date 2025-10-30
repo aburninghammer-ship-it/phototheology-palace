@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { fetchChapter, Translation } from "@/services/bibleApi";
+import { fetchChapter, Translation, getVerseAnnotations } from "@/services/bibleApi";
 import { Chapter } from "@/types/bible";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -34,6 +34,7 @@ export const BibleReader = () => {
   const [commentaryMode, setCommentaryMode] = useState(false);
   const [jeevesMode, setJeevesMode] = useState(false);
   const [highlightedVerses, setHighlightedVerses] = useState<number[]>([]);
+  const [versePrinciples, setVersePrinciples] = useState<Record<number, string[]>>({});
   
   const { trackReading } = useReadingHistory();
   const { addBookmark, isBookmarked } = useBookmarks();
@@ -99,14 +100,34 @@ export const BibleReader = () => {
     }
   };
 
-  const handleVerseClick = (verseNum: number) => {
+  const handleVerseClick = async (verseNum: number) => {
     if (principleMode) {
       // Multi-select in principle mode
-      setSelectedVerses(prev => 
-        prev.includes(verseNum) 
-          ? prev.filter(v => v !== verseNum)
-          : [...prev, verseNum].sort((a, b) => a - b)
-      );
+      const newSelection = selectedVerses.includes(verseNum) 
+        ? selectedVerses.filter(v => v !== verseNum)
+        : [...selectedVerses, verseNum].sort((a, b) => a - b);
+      
+      setSelectedVerses(newSelection);
+      
+      // Fetch principles for newly selected verse
+      if (!selectedVerses.includes(verseNum) && !versePrinciples[verseNum]) {
+        try {
+          const annotation = await getVerseAnnotations(book, chapter, verseNum);
+          const allPrinciples = [
+            ...(annotation.principles.dimensions || []),
+            ...(annotation.principles.cycles || []),
+            ...(annotation.principles.horizons || []),
+            ...(annotation.principles.sanctuary || []),
+            ...(annotation.principles.feasts || []),
+          ];
+          setVersePrinciples(prev => ({
+            ...prev,
+            [verseNum]: allPrinciples
+          }));
+        } catch (error) {
+          console.error("Failed to fetch principles:", error);
+        }
+      }
     } else {
       // Single select in other modes
       setSelectedVerse(verseNum);
@@ -197,6 +218,7 @@ export const BibleReader = () => {
             setCommentaryMode(false);
             setJeevesMode(false);
             setSelectedVerses([]);
+            setVersePrinciples({});
             setSelectedVerse(null);
           }}
           className={principleMode ? "gradient-palace" : ""}
@@ -261,7 +283,8 @@ export const BibleReader = () => {
                     verse={verse}
                     isSelected={principleMode ? selectedVerses.includes(verse.verse) : selectedVerse === verse.verse}
                     onSelect={() => handleVerseClick(verse.verse)}
-                    showPrinciples={principleMode}
+                    showPrinciples={principleMode && selectedVerses.includes(verse.verse)}
+                    principles={versePrinciples[verse.verse]}
                     isHighlighted={highlightedVerses.includes(verse.verse)}
                   />
                 ) : (

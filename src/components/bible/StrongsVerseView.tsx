@@ -36,7 +36,6 @@ export const StrongsVerseView = ({
   const [jeevesResponse, setJeevesResponse] = useState<string | null>(null);
   const { toast } = useToast();
   
-  const displayPrinciples = principles || ["2D", "@Ab", "Altar", "Passover"];
   const colors = ["gradient-palace", "gradient-ocean", "gradient-sunset", "gradient-warmth", "gradient-royal"];
   
   useEffect(() => {
@@ -175,9 +174,9 @@ export const StrongsVerseView = ({
               )}
             </div>
             
-            {showPrinciples && (
+            {showPrinciples && principles && principles.length > 0 && (
               <div className="flex gap-2 mt-2 flex-wrap">
-                {displayPrinciples.map((principle, idx) => (
+                {principles.map((principle, idx) => (
                   <Badge 
                     key={idx} 
                     variant="outline" 
