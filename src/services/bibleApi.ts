@@ -6,7 +6,6 @@ const BIBLE_API_BASE = "https://bible-api.com";
 // Available translations
 export const BIBLE_TRANSLATIONS = [
   { value: "kjv", label: "King James Version (KJV)" },
-  { value: "kjv-strongs", label: "KJV with Strong's Numbers" },
   { value: "web", label: "World English Bible (WEB)" },
   { value: "bbe", label: "Bible in Basic English (BBE)" },
   { value: "clementine", label: "Clementine Latin Vulgate" },

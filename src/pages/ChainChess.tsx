@@ -269,6 +269,23 @@ const ChainChess = () => {
     console.log("=== Loading Moves ===");
     console.log("Game ID:", gameId);
     
+    // First get the game state to check whose turn it is
+    const { data: gameData, error: gameError } = await supabase
+      .from("games")
+      .select("current_turn")
+      .eq("id", gameId)
+      .single();
+
+    if (gameError) {
+      console.error("Error loading game:", gameError);
+    } else if (gameData) {
+      // Update isMyTurn based on whose turn it is
+      // null means Jeeves' turn, user.id means user's turn
+      setIsMyTurn(gameData.current_turn === user!.id);
+      console.log("Current turn:", gameData.current_turn);
+      console.log("Is my turn:", gameData.current_turn === user!.id);
+    }
+    
     const { data, error } = await supabase
       .from("game_moves")
       .select("*")
@@ -538,11 +555,11 @@ const ChainChess = () => {
       setSpecificChallenge("");
       setIsMyTurn(false);
 
-      // Update game state
+      // Update game state - set turn to NULL (Jeeves' turn)
       await supabase
         .from("games")
         .update({
-          current_turn: isVsJeeves ? user!.id : null,
+          current_turn: null, // null means it's Jeeves' turn
           updated_at: new Date().toISOString(),
         })
         .eq("id", gameId);
