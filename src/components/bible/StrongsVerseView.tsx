@@ -7,7 +7,6 @@ import { getVerseWithStrongs } from "@/services/strongsApi";
 import { supabase } from "@/integrations/supabase/client";
 import { Sparkles, Bot, Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { formatJeevesResponse } from "@/lib/formatJeevesResponse";
 
 interface StrongsVerseViewProps {
   verse: Verse;
@@ -36,6 +35,7 @@ export const StrongsVerseView = ({
   const [jeevesResponse, setJeevesResponse] = useState<string | null>(null);
   const { toast } = useToast();
   
+  const displayPrinciples = principles || ["2D", "@Ab", "Altar", "Passover"];
   const colors = ["gradient-palace", "gradient-ocean", "gradient-sunset", "gradient-warmth", "gradient-royal"];
   
   useEffect(() => {
@@ -174,9 +174,9 @@ export const StrongsVerseView = ({
               )}
             </div>
             
-            {showPrinciples && principles && principles.length > 0 && (
+            {showPrinciples && (
               <div className="flex gap-2 mt-2 flex-wrap">
-                {principles.map((principle, idx) => (
+                {displayPrinciples.map((principle, idx) => (
                   <Badge 
                     key={idx} 
                     variant="outline" 
@@ -222,13 +222,13 @@ export const StrongsVerseView = ({
 
             {/* Jeeves Response */}
             {jeevesResponse && (
-              <div className="mt-3 p-4 bg-gradient-to-br from-primary/10 to-accent/10 rounded-lg border border-primary/20">
-                <div className="flex items-center gap-2 mb-3">
-                  <Bot className="h-5 w-5 text-primary" />
+              <div className="mt-3 p-3 bg-gradient-to-br from-primary/10 to-accent/10 rounded-lg border border-primary/20">
+                <div className="flex items-center gap-2 mb-2">
+                  <Bot className="h-4 w-4 text-primary" />
                   <span className="text-sm font-semibold text-primary">Jeeves says:</span>
                 </div>
                 <div className="prose prose-sm max-w-none text-foreground">
-                  {formatJeevesResponse(jeevesResponse)}
+                  <div dangerouslySetInnerHTML={{ __html: jeevesResponse.replace(/\n/g, '<br />') }} />
                 </div>
               </div>
             )}
