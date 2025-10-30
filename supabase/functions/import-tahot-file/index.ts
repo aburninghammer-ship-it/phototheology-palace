@@ -1,5 +1,5 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.3';
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.7.1';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -12,147 +12,153 @@ serve(async (req) => {
   }
 
   try {
-    const supabase = createClient(
+    const supabaseClient = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     );
 
-    // Verify user is authenticated
-    const authHeader = req.headers.get('Authorization');
-    if (!authHeader) {
-      throw new Error('Unauthorized');
-    }
-
-    const { data: { user }, error: userError } = await supabase.auth.getUser(
-      authHeader.replace('Bearer ', '')
-    );
-
-    if (userError || !user) {
-      throw new Error('Unauthorized');
-    }
-
-    console.log('Starting TAHOT file import...');
-
-    // Get the file content from request body
-    const { fileContent } = await req.json();
+    // Verify admin access
+    const authHeader = req.headers.get('Authorization')!;
+    const token = authHeader.replace('Bearer ', '');
+    const { data: { user }, error: authError } = await supabaseClient.auth.getUser(token);
     
-    if (!fileContent) {
-      throw new Error('No file content provided');
+    if (authError || !user) {
+      return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+        status: 401,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
     }
 
-    const lines = fileContent.split('\n').filter((line: string) => line.trim());
-    console.log(`Processing ${lines.length} lines...`);
+    // Check if user is admin
+    const { data: roleData } = await supabaseClient
+      .from('user_roles')
+      .select('role')
+      .eq('user_id', user.id)
+      .eq('role', 'admin')
+      .single();
 
-    // Book name mapping - both OT and NT
+    if (!roleData) {
+      return new Response(JSON.stringify({ error: 'Admin access required' }), {
+        status: 403,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
+    const { tahotContent } = await req.json();
+
+    if (!tahotContent) {
+      throw new Error('No TAHOT content provided');
+    }
+
+    console.log('Parsing TAHOT file...');
+    const lines = tahotContent.split('\n');
+    
+    let versesImported = 0;
+    let errors: string[] = [];
+    const batchSize = 50;
+    let batch: any[] = [];
+
+    // Book name mapping
     const bookMap: Record<string, string> = {
-      // Old Testament
       'Gen': 'Genesis', 'Exo': 'Exodus', 'Lev': 'Leviticus', 'Num': 'Numbers', 'Deu': 'Deuteronomy',
       'Jos': 'Joshua', 'Jdg': 'Judges', 'Rut': 'Ruth', '1Sa': '1 Samuel', '2Sa': '2 Samuel',
       '1Ki': '1 Kings', '2Ki': '2 Kings', '1Ch': '1 Chronicles', '2Ch': '2 Chronicles',
       'Ezr': 'Ezra', 'Neh': 'Nehemiah', 'Est': 'Esther', 'Job': 'Job', 'Psa': 'Psalms',
-      'Pro': 'Proverbs', 'Ecc': 'Ecclesiastes', 'Sng': 'Song of Solomon',
-      'Isa': 'Isaiah', 'Jer': 'Jeremiah', 'Lam': 'Lamentations', 'Ezk': 'Ezekiel',
-      'Dan': 'Daniel', 'Hos': 'Hosea', 'Joe': 'Joel', 'Amo': 'Amos', 'Oba': 'Obadiah',
-      'Jon': 'Jonah', 'Mic': 'Micah', 'Nah': 'Nahum', 'Hab': 'Habakkuk', 'Zep': 'Zephaniah',
-      'Hag': 'Haggai', 'Zec': 'Zechariah', 'Mal': 'Malachi',
-      // New Testament
-      'Mat': 'Matthew', 'Mrk': 'Mark', 'Luk': 'Luke', 'Jhn': 'John',
-      'Act': 'Acts', 'Rom': 'Romans', '1Co': '1 Corinthians', '2Co': '2 Corinthians',
+      'Pro': 'Proverbs', 'Ecc': 'Ecclesiastes', 'Sol': 'Song of Solomon', 'Isa': 'Isaiah',
+      'Jer': 'Jeremiah', 'Lam': 'Lamentations', 'Eze': 'Ezekiel', 'Dan': 'Daniel',
+      'Hos': 'Hosea', 'Joe': 'Joel', 'Amo': 'Amos', 'Oba': 'Obadiah', 'Jon': 'Jonah',
+      'Mic': 'Micah', 'Nah': 'Nahum', 'Hab': 'Habakkuk', 'Zep': 'Zephaniah', 'Hag': 'Haggai',
+      'Zec': 'Zechariah', 'Mal': 'Malachi', 'Mat': 'Matthew', 'Mar': 'Mark', 'Luk': 'Luke',
+      'Joh': 'John', 'Act': 'Acts', 'Rom': 'Romans', '1Co': '1 Corinthians', '2Co': '2 Corinthians',
       'Gal': 'Galatians', 'Eph': 'Ephesians', 'Php': 'Philippians', 'Col': 'Colossians',
       '1Th': '1 Thessalonians', '2Th': '2 Thessalonians', '1Ti': '1 Timothy', '2Ti': '2 Timothy',
-      'Tit': 'Titus', 'Phm': 'Philemon', 'Heb': 'Hebrews', 'Jas': 'James',
-      '1Pe': '1 Peter', '2Pe': '2 Peter', '1Jn': '1 John', '2Jn': '2 John', '3Jn': '3 John',
-      'Jud': 'Jude', 'Rev': 'Revelation'
+      'Tit': 'Titus', 'Phm': 'Philemon', 'Heb': 'Hebrews', 'Jas': 'James', '1Pe': '1 Peter',
+      '2Pe': '2 Peter', '1Jo': '1 John', '2Jo': '2 John', '3Jo': '3 John', 'Jud': 'Jude',
+      'Rev': 'Revelation'
     };
 
-    const verses: any[] = [];
-    const verseMap = new Map<string, any>();
-
     for (const line of lines) {
-      // Skip header lines and comment lines
-      if (line.startsWith('#') || line.startsWith('Eng (Heb)') || line.length < 10) {
+      const trimmedLine = line.trim();
+      if (!trimmedLine || trimmedLine.startsWith('$') || trimmedLine.startsWith('#')) {
         continue;
       }
 
-      const parts = line.split('\t');
-      if (parts.length < 4) continue;
+      try {
+        const parts = trimmedLine.split('\t');
+        if (parts.length < 6) continue;
 
-      // Parse the reference: e.g., "Gen.1.1#01=L" or "Mat.1.1#01=NKO"
-      const refPart = parts[0];
-      const refMatch = refPart.match(/^([A-Za-z0-9]+)\.(\d+)\.(\d+)#(\d+)/);
-      
-      if (!refMatch) continue;
+        // Parse TAHOT format: Ref, English, Hebrew, Transliteration, Strongs, Morph
+        const ref = parts[0]; // e.g., "Gen.1.1"
+        const [bookCode, chapterStr, verseStr] = ref.split('.');
+        const book = bookMap[bookCode];
+        if (!book) continue;
 
-      const bookCode = refMatch[1];
-      const book = bookMap[bookCode];
-      if (!book) continue;
+        const chapter = parseInt(chapterStr);
+        const verse_num = parseInt(verseStr);
+        const englishText = parts[1];
+        const hebrewText = parts[2];
+        const transliteration = parts[3];
+        const strongsRaw = parts[4];
+        
+        // Parse tokens with Strong's numbers
+        const words = englishText.split(/\s+/);
+        const hebrewWords = hebrewText.split(/\s+/);
+        const translitWords = transliteration.split(/\s+/);
+        const strongsNums = strongsRaw.split(/\s+/);
 
-      const chapter = parseInt(refMatch[2]);
-      const verseNum = parseInt(refMatch[3]);
-      const wordNum = parseInt(refMatch[4]);
+        const tokens: any[] = [];
+        for (let i = 0; i < words.length; i++) {
+          const word = words[i].replace(/[^\w\s'-]/g, '');
+          const strongsNum = strongsNums[i] && strongsNums[i] !== '0' ? strongsNums[i] : null;
+          const hebrew = hebrewWords[i] || null;
+          const translit = translitWords[i] || null;
 
-      // TAGNT/TAHOT format:
-      // parts[0] = Reference (Mat.1.1#01=NKO)
-      // parts[1] = Greek/Hebrew word (Βίβλος)
-      // parts[2] = English translation ([The] book)
-      // parts[3] = dStrongs with grammar (G0976=N-NSF)
-      const hebrew = parts[1] || '';
-      const translation = parts[2] || '';  // English translation is in column 2
-      const dStrongs = parts[3] || '';      // Strong's is in column 3
-      const transliteration = '';           // Not directly available in this format
+          tokens.push({
+            t: word,
+            s: strongsNum,
+            h: hebrew,
+            tr: translit
+          });
+        }
 
-      // Create verse key
-      const verseKey = `${book}:${chapter}:${verseNum}`;
-
-      // Get or create verse entry
-      if (!verseMap.has(verseKey)) {
-        verseMap.set(verseKey, {
+        batch.push({
           book,
           chapter,
-          verse_num: verseNum,
-          tokens: [],
-          text_kjv: ''
+          verse_num,
+          text_kjv: englishText,
+          tokens
         });
+
+        // Insert batch when full
+        if (batch.length >= batchSize) {
+          const { error } = await supabaseClient
+            .from('bible_verses_tokenized')
+            .upsert(batch, {
+              onConflict: 'book,chapter,verse_num',
+              ignoreDuplicates: false
+            });
+
+          if (error) {
+            errors.push(`Batch error: ${error.message}`);
+          } else {
+            versesImported += batch.length;
+          }
+
+          batch = [];
+          
+          if (versesImported % 500 === 0) {
+            console.log(`Imported ${versesImported} verses...`);
+          }
+        }
+      } catch (e) {
+        const errorMsg = e instanceof Error ? e.message : String(e);
+        errors.push(`Line parse error: ${errorMsg}`);
       }
-
-      const verse = verseMap.get(verseKey);
-
-      // Parse Strong's numbers from dStrongs
-      // Format: H9003/{H7225G} or {H1254A} for Hebrew, G0976 for Greek
-      const strongsMatches = dStrongs.match(/[HG]\d+[A-Z]?/g);
-      const strongsNum = strongsMatches ? strongsMatches.find((s: string) => /[HG]\d{4}/.test(s)) : null;
-
-      // Add token
-      verse.tokens.push({
-        t: translation.replace(/[<>\[\]()]/g, '').trim(), // Remove angle/square/round brackets
-        s: strongsNum,
-        h: hebrew.replace(/[\/\\()]/g, ''), // Remove separators and parentheses
-        tr: transliteration
-      });
     }
 
-    // Convert map to array and build text_kjv
-    for (const [key, verse] of verseMap) {
-      // Build text from tokens
-      verse.text_kjv = verse.tokens
-        .map((t: any) => t.t)
-        .join(' ')
-        .replace(/\s+/g, ' ')
-        .trim();
-      
-      verses.push(verse);
-    }
-
-    console.log(`Parsed ${verses.length} verses`);
-
-    // Insert in batches of 1000
-    const batchSize = 1000;
-    let imported = 0;
-
-    for (let i = 0; i < verses.length; i += batchSize) {
-      const batch = verses.slice(i, i + batchSize);
-      
-      const { error } = await supabase
+    // Insert remaining batch
+    if (batch.length > 0) {
+      const { error } = await supabaseClient
         .from('bible_verses_tokenized')
         .upsert(batch, {
           onConflict: 'book,chapter,verse_num',
@@ -160,36 +166,35 @@ serve(async (req) => {
         });
 
       if (error) {
-        console.error(`Error inserting batch ${i / batchSize + 1}:`, error);
-        throw error;
+        errors.push(`Final batch error: ${error.message}`);
+      } else {
+        versesImported += batch.length;
       }
-
-      imported += batch.length;
-      console.log(`Imported ${imported} of ${verses.length} verses`);
     }
 
-    console.log(`Successfully imported ${imported} verses`);
-
-    return new Response(
-      JSON.stringify({
-        success: true,
-        imported,
-        message: `Successfully imported ${imported} verses from TAHOT file`
-      }),
-      { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-    );
-
-  } catch (error: any) {
-    console.error('Import error:', error);
-    return new Response(
-      JSON.stringify({
-        success: false,
-        error: error.message
-      }),
-      {
-        status: 500,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+    const result = {
+      success: true,
+      statistics: {
+        versesImported,
+        errors: errors.slice(0, 50),
+        errorCount: errors.length
       }
-    );
+    };
+
+    console.log('TAHOT import complete:', result.statistics);
+
+    return new Response(JSON.stringify(result), {
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    });
+  } catch (error) {
+    console.error('Error in import-tahot-file:', error);
+    const errorMsg = error instanceof Error ? error.message : String(error);
+    return new Response(JSON.stringify({ 
+      success: false,
+      error: errorMsg
+    }), {
+      status: 500,
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    });
   }
 });

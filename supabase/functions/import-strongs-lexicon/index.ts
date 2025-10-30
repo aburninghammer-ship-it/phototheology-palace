@@ -95,9 +95,19 @@ serve(async (req) => {
             definition: parts[7].trim().replace(/<br>/gi, '\n').replace(/<[^>]*>/g, '')
           };
 
+          const dbEntry = {
+            strongs_number: entry.strongs_number,
+            word: entry.word,
+            transliteration: entry.transliteration,
+            language: entry.language,
+            definition: entry.definition,
+            kjv_translation: entry.gloss || '',
+            pt_notes: entry.morph || null
+          };
+
           const { error } = await supabaseClient
             .from('strongs_dictionary')
-            .upsert(entry, {
+            .upsert(dbEntry, {
               onConflict: 'strongs_number',
               ignoreDuplicates: false
             });
@@ -154,9 +164,19 @@ serve(async (req) => {
             definition: parts[7].trim().replace(/<br>/gi, '\n').replace(/<[^>]*>/g, '')
           };
 
+          const dbEntry = {
+            strongs_number: entry.strongs_number,
+            word: entry.word,
+            transliteration: entry.transliteration,
+            language: entry.language,
+            definition: entry.definition,
+            kjv_translation: entry.gloss || '',
+            pt_notes: entry.morph || null
+          };
+
           const { error } = await supabaseClient
             .from('strongs_dictionary')
-            .upsert(entry, {
+            .upsert(dbEntry, {
               onConflict: 'strongs_number',
               ignoreDuplicates: false
             });

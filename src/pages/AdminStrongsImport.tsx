@@ -6,7 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, Upload, AlertCircle, CheckCircle2 } from "lucide-react";
+import { Loader2, Upload, AlertCircle, CheckCircle2, FileText } from "lucide-react";
 
 export default function AdminStrongsImport() {
   const [jsonInput, setJsonInput] = useState("");
@@ -16,6 +16,7 @@ export default function AdminStrongsImport() {
   const [hebrewFile, setHebrewFile] = useState<File | null>(null);
   const [greekFile, setGreekFile] = useState<File | null>(null);
   const [csvFile, setCsvFile] = useState<File | null>(null);
+  const [tahotFile, setTahotFile] = useState<File | null>(null);
   const { toast } = useToast();
   const navigate = useNavigate();
 
@@ -185,6 +186,61 @@ export default function AdminStrongsImport() {
     }
   };
 
+  const handleTahotImport = async () => {
+    if (!tahotFile) {
+      toast({
+        title: "Error",
+        description: "Please select a TAHOT file to import",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsImporting(true);
+    setResult(null);
+
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        throw new Error("Not authenticated");
+      }
+
+      toast({
+        title: "Starting TAHOT Import",
+        description: "Processing Bible verses with Strong's numbers... This may take several minutes.",
+      });
+
+      const tahotContent = await tahotFile.text();
+
+      const response = await supabase.functions.invoke('import-tahot-file', {
+        body: { tahotContent }
+      });
+
+      if (response.error) {
+        throw response.error;
+      }
+
+      setResult(response.data);
+      
+      if (response.data.success) {
+        toast({
+          title: "Import Successful",
+          description: `Imported ${response.data.statistics.versesImported} verses with Strong's numbers`,
+        });
+      }
+    } catch (error: any) {
+      console.error("TAHOT import error:", error);
+      toast({
+        title: "Import Failed",
+        description: error.message,
+        variant: "destructive",
+      });
+      setResult({ success: false, error: error.message });
+    } finally {
+      setIsImporting(false);
+    }
+  };
+
   const handleAutoImport = async () => {
     setIsAutoImporting(true);
     setResult(null);
@@ -196,8 +252,8 @@ export default function AdminStrongsImport() {
       }
 
       toast({
-        title: "Starting Import",
-        description: "Downloading and processing STEPBible data... This may take a few minutes.",
+        title: "Starting Sample Import",
+        description: "Importing sample Strong's entries... (Note: This only imports a few sample entries for testing)",
       });
 
       const response = await supabase.functions.invoke('import-stepbible', {
@@ -210,22 +266,11 @@ export default function AdminStrongsImport() {
         throw response.error;
       }
 
-      const stats = response.data.stats;
-      setResult({
-        success: true,
-        statistics: {
-          versesInserted: stats.imported,
-          versesUpdated: 0,
-          strongsEntriesInserted: 0,
-          versesSkipped: stats.skipped_lines,
-          errors: stats.errors > 0 ? [`${stats.errors} verses failed to import`] : [],
-          errorCount: stats.errors,
-        }
-      });
-
+      setResult(response.data);
+      
       toast({
-        title: "Import Complete",
-        description: `Successfully imported ${stats.imported} verses with Strong's numbers!`,
+        title: "Sample Import Complete",
+        description: `Imported sample data. For full Bible, use the file upload methods above.`,
       });
 
     } catch (error: any) {
@@ -488,15 +533,72 @@ export default function AdminStrongsImport() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Upload className="h-5 w-5" />
-              Import Bible Verses (Optional)
+              Import Bible Verses with Strong's (TAHOT Format)
             </CardTitle>
             <CardDescription>
-              Import the complete KJV Bible (31,102 verses) with Strong's numbers and Phototheology codes. This process takes 5-10 minutes and includes:
-              <ul className="list-disc list-inside mt-2 text-sm">
-                <li>All 66 books (Genesis → Revelation)</li>
-                <li>Word-by-word Strong's mappings</li>
-                <li>Phototheology codes (Sanctuary links, Time-zones, Palace rooms)</li>
-              </ul>
+              Upload a TAHOT-formatted Bible file (TSV/TXT) with Hebrew/Greek Strong's numbers mapped to each word. Download from STEPBible.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="flex items-center justify-center w-full">
+              <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-lg cursor-pointer bg-muted/50 hover:bg-muted/80 transition-colors">
+                <div className="flex flex-col items-center justify-center pt-5 pb-6">
+                  <FileText className="h-10 w-10 mb-3 text-muted-foreground" />
+                  <p className="mb-2 text-sm text-muted-foreground">
+                    <span className="font-semibold">Click to upload</span> TAHOT file
+                  </p>
+                  <p className="text-xs text-muted-foreground">TSV or TXT file</p>
+                </div>
+                <input
+                  type="file"
+                  className="hidden"
+                  accept=".txt,.tsv"
+                  onChange={(e) => setTahotFile(e.target.files?.[0] || null)}
+                />
+              </label>
+            </div>
+            {tahotFile && (
+              <div className="flex items-center gap-2 p-2 bg-muted rounded">
+                <FileText className="h-4 w-4" />
+                <span className="text-sm flex-1">{tahotFile.name}</span>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setTahotFile(null)}
+                >
+                  ✕
+                </Button>
+              </div>
+            )}
+            <Button
+              onClick={handleTahotImport}
+              disabled={isImporting || !tahotFile}
+              size="lg"
+              className="w-full"
+            >
+              {isImporting ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Importing Bible Verses...
+                </>
+              ) : (
+                <>
+                  <Upload className="mr-2 h-4 w-4" />
+                  Import TAHOT Bible File
+                </>
+              )}
+            </Button>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Upload className="h-5 w-5" />
+              Import Sample Data (Testing Only)
+            </CardTitle>
+            <CardDescription>
+              Import a few sample Strong's entries and verses for testing. This does NOT import the full Bible - use the file upload methods above for complete data.
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -509,12 +611,12 @@ export default function AdminStrongsImport() {
               {isAutoImporting ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Importing from STEPBible...
+                  Importing Sample Data...
                 </>
               ) : (
                 <>
                   <Upload className="mr-2 h-4 w-4" />
-                  Import from STEPBible (Automatic)
+                  Import Sample Data Only
                 </>
               )}
             </Button>
@@ -621,6 +723,14 @@ export default function AdminStrongsImport() {
                           {result.statistics.versesInserted}
                         </div>
                         <div className="text-sm text-muted-foreground">Verses Inserted</div>
+                      </div>
+                    )}
+                    {result.statistics.versesImported !== undefined && (
+                      <div className="bg-muted p-4 rounded-lg">
+                        <div className="text-2xl font-bold text-green-600">
+                          {result.statistics.versesImported}
+                        </div>
+                        <div className="text-sm text-muted-foreground">Verses Imported</div>
                       </div>
                     )}
                     {result.statistics.versesUpdated !== undefined && result.statistics.versesUpdated > 0 && (
