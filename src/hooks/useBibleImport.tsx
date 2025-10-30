@@ -28,29 +28,49 @@ export const useBibleImport = () => {
           versesImported: totalVersesImported,
         });
 
-        // Fetch verses for this chapter from BibleSDK (translation, book, chapter, [start verse, end verse])
-        const verses = await getVerses(bookCode, chapter, [1, 999]);
+        // Fetch tokenized verses for this chapter from BibleSDK
+        const tokenizedData = await getVerses(bookCode, chapter, [1, 999]);
         
-        if (!verses || verses.length === 0) {
+        if (!tokenizedData || tokenizedData.length === 0) {
           console.warn(`No verses found for ${bookCode} chapter ${chapter}`);
           continue;
         }
 
-        // Process verses into batches for insertion
-        const versesToInsert = verses.map((verse: any) => {
-          // Parse tokens from verse text
-          const tokens = verse.text.split(/\s+/).map((word: string, index: number) => ({
-            word: word.replace(/[^\w\s'-]/g, ''),
-            position: index,
-            strongs: verse.strongs?.[index] || null,
-          }));
+        // Group tokens by verse number
+        const verseGroups = new Map<number, any[]>();
+        tokenizedData.forEach((token: any) => {
+          if (!verseGroups.has(token.verse)) {
+            verseGroups.set(token.verse, []);
+          }
+          verseGroups.get(token.verse)!.push(token);
+        });
+
+        // Process each verse
+        const versesToInsert = Array.from(verseGroups.entries()).map(([verseNum, tokens]) => {
+          // Build full verse text from tokens
+          const verseText = tokens
+            .map(t => t.text)
+            .join('')
+            .replace(/\s+/g, ' ')
+            .trim();
+
+          // Build token array with Strong's data
+          const tokenArray = tokens
+            .filter(t => t.strongs_number) // Only include tokens with Strong's numbers
+            .map((t, idx) => ({
+              position: idx,
+              word: t.text.trim(),
+              strongs: t.strongs_number ? `${t.strongs_type}${t.strongs_number}` : null,
+              definition: t.definition || null,
+              original_word: t.hebrew_word || t.greek_word || null,
+            }));
 
           return {
             book: bookCode,
             chapter: chapter,
-            verse_num: verse.verse,
-            text_kjv: verse.text,
-            tokens: tokens,
+            verse_num: verseNum,
+            text_kjv: verseText,
+            tokens: tokenArray,
           };
         });
 
