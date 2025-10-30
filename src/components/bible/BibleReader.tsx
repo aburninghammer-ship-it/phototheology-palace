@@ -6,7 +6,6 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight, BookOpen, Loader2, Link2, MessageSquare, Bot, Bookmark } from "lucide-react";
 import { VerseView } from "./VerseView";
-import { StrongsVerseView } from "./StrongsVerseView";
 import { PrinciplePanel } from "./PrinciplePanel";
 import { ChainReferencePanel } from "./ChainReferencePanel";
 import { CommentaryPanel } from "./CommentaryPanel";
@@ -69,9 +68,7 @@ export const BibleReader = () => {
         return;
       }
       
-      // Use 'kjv' for API call even if 'kjv-strongs' is selected
-      const apiTranslation = translation === "kjv-strongs" ? "kjv" : translation;
-      const data = await fetchChapter(book, chapter, apiTranslation as Translation);
+      const data = await fetchChapter(book, chapter, translation);
       setChapterData(data);
       setError(null);
     } catch (error) {
@@ -254,27 +251,16 @@ export const BibleReader = () => {
         <div className="lg:col-span-2">
           <Card className={`p-6 shadow-elegant hover:shadow-hover transition-smooth ${preferences.reading_mode === 'focus' ? 'max-w-3xl mx-auto' : ''}`}>
             <div className={`space-y-4 ${fontSizeClass}`}>
-              {chapterData.verses.map((verse) => 
-                translation === "kjv-strongs" ? (
-                  <StrongsVerseView
-                    key={`${verse.book}-${verse.chapter}-${verse.verse}`}
-                    verse={verse}
-                    isSelected={principleMode ? selectedVerses.includes(verse.verse) : selectedVerse === verse.verse}
-                    onSelect={() => handleVerseClick(verse.verse)}
-                    showPrinciples={principleMode}
-                    isHighlighted={highlightedVerses.includes(verse.verse)}
-                  />
-                ) : (
-                  <VerseView
-                    key={`${verse.book}-${verse.chapter}-${verse.verse}`}
-                    verse={verse}
-                    isSelected={principleMode ? selectedVerses.includes(verse.verse) : selectedVerse === verse.verse}
-                    onSelect={() => handleVerseClick(verse.verse)}
-                    showPrinciples={principleMode}
-                    isHighlighted={highlightedVerses.includes(verse.verse)}
-                  />
-                )
-              )}
+              {chapterData.verses.map((verse) => (
+                <VerseView
+                  key={`${verse.book}-${verse.chapter}-${verse.verse}`}
+                  verse={verse}
+                  isSelected={principleMode ? selectedVerses.includes(verse.verse) : selectedVerse === verse.verse}
+                  onSelect={() => handleVerseClick(verse.verse)}
+                  showPrinciples={principleMode}
+                  isHighlighted={highlightedVerses.includes(verse.verse)}
+                />
+              ))}
             </div>
           </Card>
         </div>
