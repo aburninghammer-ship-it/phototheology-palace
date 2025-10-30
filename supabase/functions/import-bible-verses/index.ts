@@ -98,23 +98,32 @@ const BIBLE_BOOKS = [
 ];
 
 Deno.serve(async (req) => {
+  // Log request details for debugging
+  console.log('=== Import Bible Verses Function Called ===');
+  console.log('Method:', req.method);
+  console.log('Headers:', Object.fromEntries(req.headers.entries()));
+  
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
+    console.log('Creating Supabase client...');
     const supabaseClient = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '',
     );
 
+    console.log('Parsing request body...');
     const { bookCode } = await req.json().catch(() => ({}));
+    console.log('Book code:', bookCode);
     
     // If bookCode is provided, import just that book, otherwise import all books
     const booksToImport = bookCode 
       ? BIBLE_BOOKS.filter(b => b.code === bookCode)
       : BIBLE_BOOKS;
 
+    console.log(`Will import ${booksToImport.length} books`);
     let totalVersesImported = 0;
     const results: any[] = [];
 
