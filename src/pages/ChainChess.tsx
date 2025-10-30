@@ -538,11 +538,11 @@ const ChainChess = () => {
       setSpecificChallenge("");
       setIsMyTurn(false);
 
-      // Update game state
+      // Update game state - set turn to null for Jeeves
       await supabase
         .from("games")
         .update({
-          current_turn: isVsJeeves ? user!.id : null,
+          current_turn: null, // Jeeves' turn now
           updated_at: new Date().toISOString(),
         })
         .eq("id", gameId);
