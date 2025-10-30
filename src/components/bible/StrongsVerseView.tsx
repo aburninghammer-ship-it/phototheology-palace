@@ -1,9 +1,12 @@
 import { useState, useEffect } from "react";
 import { Verse } from "@/types/bible";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { StrongsModal } from "./StrongsModal";
 import { getVerseWithStrongs } from "@/services/strongsApi";
-import { Sparkles } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { Sparkles, Bot, Loader2 } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 
 interface StrongsVerseViewProps {
   verse: Verse;
@@ -28,6 +31,9 @@ export const StrongsVerseView = ({
     words: Array<{ text: string; strongs?: string }>;
   } | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [jeevesLoading, setJeevesLoading] = useState(false);
+  const [jeevesResponse, setJeevesResponse] = useState<string | null>(null);
+  const { toast } = useToast();
   
   const displayPrinciples = principles || ["2D", "@Ab", "Altar", "Passover"];
   const colors = ["gradient-palace", "gradient-ocean", "gradient-sunset", "gradient-warmth", "gradient-royal"];
@@ -51,6 +57,40 @@ export const StrongsVerseView = ({
   const handleStrongsClick = (strongsNumber: string, e: React.MouseEvent) => {
     e.stopPropagation();
     setSelectedStrongs(strongsNumber);
+  };
+
+  const handleAskJeevesForStrongs = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setJeevesLoading(true);
+    setJeevesResponse(null);
+    
+    try {
+      const { data, error } = await supabase.functions.invoke("jeeves", {
+        body: {
+          mode: "strongs-lookup",
+          book: verse.book,
+          chapter: verse.chapter,
+          verse: verse.verse,
+        },
+      });
+
+      if (error) throw error;
+
+      setJeevesResponse(data.content);
+      toast({
+        title: "Strong's Data Retrieved",
+        description: "Jeeves has fetched the concordance data for this verse",
+      });
+    } catch (error: any) {
+      console.error("Jeeves Strong's lookup error:", error);
+      toast({
+        title: "Error",
+        description: error.message || "Failed to get Strong's data from Jeeves",
+        variant: "destructive",
+      });
+    } finally {
+      setJeevesLoading(false);
+    }
   };
 
   return (
@@ -152,6 +192,44 @@ export const StrongsVerseView = ({
             {strongsData?.words && !isLoading && (
               <div className="mt-2 text-xs text-primary/60 italic font-semibold">
                 ✨ Click superscript numbers to see Hebrew/Greek definitions
+              </div>
+            )}
+
+            {/* Jeeves Strong's Lookup Button */}
+            {!strongsData?.words && !isLoading && (
+              <div className="mt-3">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleAskJeevesForStrongs}
+                  disabled={jeevesLoading}
+                  className="w-full"
+                >
+                  {jeevesLoading ? (
+                    <>
+                      <Loader2 className="h-3 w-3 mr-2 animate-spin" />
+                      Jeeves is fetching Strong's data...
+                    </>
+                  ) : (
+                    <>
+                      <Bot className="h-3 w-3 mr-2" />
+                      Ask Jeeves for Strong's Numbers
+                    </>
+                  )}
+                </Button>
+              </div>
+            )}
+
+            {/* Jeeves Response */}
+            {jeevesResponse && (
+              <div className="mt-3 p-3 bg-gradient-to-br from-primary/10 to-accent/10 rounded-lg border border-primary/20">
+                <div className="flex items-center gap-2 mb-2">
+                  <Bot className="h-4 w-4 text-primary" />
+                  <span className="text-sm font-semibold text-primary">Jeeves says:</span>
+                </div>
+                <div className="prose prose-sm max-w-none text-foreground">
+                  <div dangerouslySetInnerHTML={{ __html: jeevesResponse.replace(/\n/g, '<br />') }} />
+                </div>
               </div>
             )}
           </div>
