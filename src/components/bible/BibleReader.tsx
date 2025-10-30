@@ -35,6 +35,7 @@ export const BibleReader = () => {
   const [jeevesMode, setJeevesMode] = useState(false);
   const [highlightedVerses, setHighlightedVerses] = useState<number[]>([]);
   const [versePrinciples, setVersePrinciples] = useState<Record<number, string[]>>({});
+  const [loadingPrinciples, setLoadingPrinciples] = useState(false);
   
   const { trackReading } = useReadingHistory();
   const { addBookmark, isBookmarked } = useBookmarks();
@@ -58,6 +59,47 @@ export const BibleReader = () => {
     loadChapter();
     trackReading(book, chapter);
   }, [book, chapter, translation]);
+
+  // Fetch principles for all verses when Principle Mode is activated
+  useEffect(() => {
+    if (principleMode && chapterData && Object.keys(versePrinciples).length === 0) {
+      fetchAllVersePrinciples();
+    }
+  }, [principleMode, chapterData]);
+
+  const fetchAllVersePrinciples = async () => {
+    if (!chapterData || loadingPrinciples) return;
+    
+    setLoadingPrinciples(true);
+    const principlesMap: Record<number, string[]> = {};
+    
+    // Fetch principles for each verse in parallel
+    const promises = chapterData.verses.map(async (verse) => {
+      try {
+        const annotation = await getVerseAnnotations(book, chapter, verse.verse);
+        
+        // Filter principles to only floors 3-6 (Freestyle, Next Level, Vision, Three Heavens)
+        const allPrinciples = [
+          ...(annotation.principles.dimensions || []), // Floor 4
+          ...(annotation.principles.cycles || []), // Floor 6
+          ...(annotation.principles.horizons || []), // Floor 6
+          ...(annotation.principles.sanctuary || []), // Floor 5
+          ...(annotation.principles.feasts || []), // Floor 6
+          ...(annotation.principles.timeZones || []), // Floor 4
+          ...(annotation.principles.walls || []), // Floor 4
+        ];
+        
+        principlesMap[verse.verse] = allPrinciples;
+      } catch (error) {
+        console.error(`Failed to fetch principles for verse ${verse.verse}:`, error);
+        principlesMap[verse.verse] = [];
+      }
+    });
+    
+    await Promise.all(promises);
+    setVersePrinciples(principlesMap);
+    setLoadingPrinciples(false);
+  };
 
   const loadChapter = async () => {
     setLoading(true);
@@ -108,26 +150,6 @@ export const BibleReader = () => {
         : [...selectedVerses, verseNum].sort((a, b) => a - b);
       
       setSelectedVerses(newSelection);
-      
-      // Fetch principles for newly selected verse
-      if (!selectedVerses.includes(verseNum) && !versePrinciples[verseNum]) {
-        try {
-          const annotation = await getVerseAnnotations(book, chapter, verseNum);
-          const allPrinciples = [
-            ...(annotation.principles.dimensions || []),
-            ...(annotation.principles.cycles || []),
-            ...(annotation.principles.horizons || []),
-            ...(annotation.principles.sanctuary || []),
-            ...(annotation.principles.feasts || []),
-          ];
-          setVersePrinciples(prev => ({
-            ...prev,
-            [verseNum]: allPrinciples
-          }));
-        } catch (error) {
-          console.error("Failed to fetch principles:", error);
-        }
-      }
     } else {
       // Single select in other modes
       setSelectedVerse(verseNum);
@@ -208,7 +230,7 @@ export const BibleReader = () => {
       </div>
 
       {/* Mode Toggles */}
-      <div className="flex gap-2 flex-wrap">
+      <div className="flex gap-2 flex-wrap items-center">
         <Button
           variant={principleMode ? "default" : "outline"}
           size="sm"
@@ -226,6 +248,12 @@ export const BibleReader = () => {
           <BookOpen className="h-4 w-4 mr-2" />
           Principle Mode {selectedVerses.length > 0 && `(${selectedVerses.length})`}
         </Button>
+        {principleMode && loadingPrinciples && (
+          <span className="text-xs text-muted-foreground flex items-center gap-1">
+            <Loader2 className="h-3 w-3 animate-spin" />
+            Loading principles...
+          </span>
+        )}
         <Button
           variant={chainReferenceMode ? "default" : "outline"}
           size="sm"
@@ -283,7 +311,7 @@ export const BibleReader = () => {
                     verse={verse}
                     isSelected={principleMode ? selectedVerses.includes(verse.verse) : selectedVerse === verse.verse}
                     onSelect={() => handleVerseClick(verse.verse)}
-                    showPrinciples={principleMode && selectedVerses.includes(verse.verse)}
+                    showPrinciples={principleMode}
                     principles={versePrinciples[verse.verse]}
                     isHighlighted={highlightedVerses.includes(verse.verse)}
                   />
@@ -293,7 +321,7 @@ export const BibleReader = () => {
                     verse={verse}
                     isSelected={principleMode ? selectedVerses.includes(verse.verse) : selectedVerse === verse.verse}
                     onSelect={() => handleVerseClick(verse.verse)}
-                    showPrinciples={principleMode && selectedVerses.includes(verse.verse)}
+                    showPrinciples={principleMode}
                     principles={versePrinciples[verse.verse]}
                     isHighlighted={highlightedVerses.includes(verse.verse)}
                   />
