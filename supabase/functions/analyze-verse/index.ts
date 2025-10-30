@@ -181,14 +181,13 @@ Return JSON:
         messages: [
           {
             role: 'system',
-            content: 'You are a biblical scholar MASTER of the 37-room Phototheology Palace. CRITICAL REQUIREMENTS: 1) Analyze each verse using 8-12 DIFFERENT rooms from multiple floors. 2) ALWAYS write room abbreviations with full names in parentheses: "SR (Story Room)", "DC (Def-Com Room)", "DR (Dimensions Room)". 3) When using DC (Def-Com Room), MUST include Hebrew/Greek definitions with Strong\'s numbers AND cite standard commentaries (Gill, Clarke, Matthew Henry, Barnes). 4) For DR (Dimensions Room), clarify which dimensions: 1D=Literal, 2D=Christ, 3D=Me, 4D=Church, 5D=Heaven. 5) Provide specific insights for EACH room. Return only valid JSON with roomsUsed array and roomAnalysis object using full room names.'
+            content: 'You are a biblical scholar MASTER of the 37-room Phototheology Palace. CRITICAL REQUIREMENTS: 1) Analyze each verse using 8-12 DIFFERENT rooms from multiple floors. 2) ALWAYS write room abbreviations with full names in parentheses: "SR (Story Room)", "DC (Def-Com Room)", "DR (Dimensions Room)". 3) When using DC (Def-Com Room), MUST include Hebrew/Greek definitions with Strong\'s numbers AND cite standard commentaries (Gill, Clarke, Matthew Henry, Barnes). 4) For DR (Dimensions Room), clarify which dimensions: 1D=Literal, 2D=Christ, 3D=Me, 4D=Church, 5D=Heaven. 5) Provide specific insights for EACH room. Return ONLY valid JSON with no markdown formatting - start directly with { and end with }.'
           },
           {
             role: 'user',
             content: prompt
           }
-        ],
-        response_format: { type: 'json_object' }
+        ]
       }),
     });
 
@@ -198,7 +197,20 @@ Return JSON:
 
     const data = await response.json();
     const analysisText = data.choices[0].message.content;
-    const analysis = JSON.parse(analysisText);
+    
+    // Clean up potential markdown code blocks from Gemini response
+    let cleanedText = analysisText.trim();
+    if (cleanedText.startsWith('```json')) {
+      cleanedText = cleanedText.slice(7);
+    } else if (cleanedText.startsWith('```')) {
+      cleanedText = cleanedText.slice(3);
+    }
+    if (cleanedText.endsWith('```')) {
+      cleanedText = cleanedText.slice(0, -3);
+    }
+    cleanedText = cleanedText.trim();
+    
+    const analysis = JSON.parse(cleanedText);
 
     return new Response(
       JSON.stringify({
