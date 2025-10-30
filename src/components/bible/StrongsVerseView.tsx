@@ -3,6 +3,7 @@ import { Verse } from "@/types/bible";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { StrongsModal } from "./StrongsModal";
+import { HebrewGreekAnalysisDialog } from "./HebrewGreekAnalysisDialog";
 import { getVerseWithStrongs } from "@/services/strongsApi";
 import { supabase } from "@/integrations/supabase/client";
 import { Sparkles, Bot, Loader2 } from "lucide-react";
@@ -28,11 +29,13 @@ export const StrongsVerseView = ({
   const [selectedStrongs, setSelectedStrongs] = useState<string | null>(null);
   const [strongsData, setStrongsData] = useState<{
     text: string;
-    words: Array<{ text: string; strongs?: string }>;
+    words: Array<{ text: string; strongs?: string; lemma?: string; transliteration?: string; part_of_speech?: string }>;
   } | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [jeevesLoading, setJeevesLoading] = useState(false);
   const [jeevesResponse, setJeevesResponse] = useState<string | null>(null);
+  const [analysisDialogOpen, setAnalysisDialogOpen] = useState(false);
+  const [selectedWordForAnalysis, setSelectedWordForAnalysis] = useState<any>(null);
   const { toast } = useToast();
   
   const displayPrinciples = principles || ["2D", "@Ab", "Altar", "Passover"];
@@ -57,6 +60,21 @@ export const StrongsVerseView = ({
   const handleStrongsClick = (strongsNumber: string, e: React.MouseEvent) => {
     e.stopPropagation();
     setSelectedStrongs(strongsNumber);
+  };
+
+  const handleAIAnalysisClick = (word: any, e: React.MouseEvent) => {
+    e.stopPropagation();
+    setSelectedWordForAnalysis({
+      strongsNumber: word.strongs,
+      lemma: word.lemma || word.text,
+      transliteration: word.transliteration || 'N/A',
+      part_of_speech: word.part_of_speech || 'N/A',
+      verseText: verse.text,
+      book: verse.book,
+      chapter: verse.chapter,
+      verse: verse.verse
+    });
+    setAnalysisDialogOpen(true);
   };
 
   const handleAskJeevesForStrongs = async (e: React.MouseEvent) => {
@@ -121,16 +139,27 @@ export const StrongsVerseView = ({
               ) : strongsData?.words ? (
                 <span>
                   {strongsData.words.map((word, idx) => (
-                    <span key={idx}>
+                    <span key={idx} className="relative group/word">
                       {word.text}
                       {word.strongs && (
-                        <sup 
-                          className="text-xs text-primary/70 hover:text-primary cursor-pointer font-semibold ml-0.5 transition-colors"
-                          onClick={(e) => handleStrongsClick(word.strongs!, e)}
-                          title={`Click to see Strong's ${word.strongs}`}
-                        >
-                          {word.strongs.replace(/[GH]/, "")}
-                        </sup>
+                        <>
+                          <sup 
+                            className="text-xs text-primary/70 hover:text-primary cursor-pointer font-semibold ml-0.5 transition-colors"
+                            onClick={(e) => handleStrongsClick(word.strongs!, e)}
+                            title={`Click to see Strong's ${word.strongs}`}
+                          >
+                            {word.strongs.replace(/[GH]/, "")}
+                          </sup>
+                          <span 
+                            className="inline-block ml-1 cursor-pointer"
+                            onClick={(e) => handleAIAnalysisClick(word, e)}
+                            title="AI Analysis of this word"
+                          >
+                            <Sparkles 
+                              className="w-3 h-3 opacity-0 group-hover/word:opacity-100 transition-opacity text-primary"
+                            />
+                          </span>
+                        </>
                       )}
                       {idx < strongsData.words.length - 1 && " "}
                     </span>
@@ -190,8 +219,9 @@ export const StrongsVerseView = ({
             )}
 
             {strongsData?.words && !isLoading && (
-              <div className="mt-2 text-xs text-primary/60 italic font-semibold">
-                ✨ Click superscript numbers to see Hebrew/Greek definitions
+              <div className="mt-2 text-xs text-primary/60 italic font-semibold flex items-center gap-2">
+                <Sparkles className="h-3 w-3" />
+                Hover over words & click ✨ for AI Hebrew/Greek analysis, or click numbers for definitions
               </div>
             )}
 
@@ -241,6 +271,17 @@ export const StrongsVerseView = ({
         isOpen={!!selectedStrongs}
         onClose={() => setSelectedStrongs(null)}
       />
+
+      {selectedWordForAnalysis && (
+        <HebrewGreekAnalysisDialog
+          isOpen={analysisDialogOpen}
+          onClose={() => {
+            setAnalysisDialogOpen(false);
+            setSelectedWordForAnalysis(null);
+          }}
+          wordData={selectedWordForAnalysis}
+        />
+      )}
     </>
   );
 };
