@@ -167,6 +167,53 @@ export const PALACE_SCHEMA = `
 **Core Question:** How does this sanctuary element reveal Christ's work?
 **METHOD:** Furniture/Service → Christ's office → Our experience → Eternal reality.
 
+#### Sanctuary Furniture Principles (Sub-rooms of BL):
+
+**ABO - Altar of Burnt Offering**
+**Purpose:** Understand sacrifice and atonement through Christ's death
+**Core Question:** How does the altar point to Christ's substitutionary death?
+**METHOD:** Altar service → Christ's cross → Our surrender → Eternal reconciliation
+
+**LV - Laver**
+**Purpose:** See cleansing and sanctification
+**Core Question:** How does washing reveal our need for spiritual cleansing?
+**METHOD:** Water washing → Word/Spirit cleansing → Daily sanctification → Perfect purity
+
+**LS - Lampstand (Menorah)**
+**Purpose:** Understand the light of God's presence and the Spirit
+**Core Question:** How does the lampstand reveal Christ as Light and the Spirit's work?
+**METHOD:** Seven lamps → Christ the Light → Spirit's illumination → Eternal radiance
+
+**SB - Table of Showbread**
+**Purpose:** See Christ as the Bread of Life
+**Core Question:** How does the showbread reveal Christ sustaining His people?
+**METHOD:** Twelve loaves → Christ's body → Word sustains us → Eternal feast
+
+**AI - Altar of Incense**
+**Purpose:** Understand prayer and intercession
+**Core Question:** How does incense reveal Christ's mediatorial work?
+**METHOD:** Rising smoke → Christ's intercession → Our prayers joined → Eternal access
+
+**VL - Veil**
+**Purpose:** Understand separation and access to God
+**Core Question:** How does the torn veil reveal access through Christ?
+**METHOD:** Barrier → Christ's body torn → We enter boldly → Face-to-face communion
+
+**ARK - Ark of the Covenant**
+**Purpose:** See God's throne, law, and mercy united
+**Core Question:** How does the ark reveal God's character and Christ's fulfillment of law?
+**METHOD:** Law inside → Christ fulfills → Mercy covers → Throne of grace
+
+**MS - Mercy Seat**
+**Purpose:** Understand atonement and God's throne of grace
+**Core Question:** How does blood on the mercy seat reveal Christ's atonement?
+**METHOD:** Blood sprinkled → Christ's blood applied → Mercy received → Eternal throne
+
+**GT - Gate**
+**Purpose:** Understand the one way of entrance
+**Core Question:** How does the gate reveal Christ as the only way?
+**METHOD:** Single entrance → Christ the Door → We enter salvation → Eternal access
+
 ### PR - Prophecy Room
 **Purpose:** Decode prophetic timelines
 **Core Question:** What does this prophecy reveal about God's plan?
@@ -181,6 +228,43 @@ export const PALACE_SCHEMA = `
 **Purpose:** See Christ in the Biblical feasts
 **Core Question:** How does this feast point to Christ's ministry?
 **METHOD:** Feast → OT observance → Christ's fulfillment → Our participation → Eternal celebration.
+
+#### Individual Feast Principles (Sub-rooms of FE):
+
+**PO - Passover**
+**Purpose:** See Christ as the Passover Lamb
+**Core Question:** How does Passover point to Christ's sacrifice?
+**METHOD:** Lamb's blood → Christ crucified at Passover → Deliverance from sin → Eternal redemption
+
+**UB - Unleavened Bread**
+**Purpose:** Understand putting away sin and living pure
+**Core Question:** How does unleavened bread reveal the sinless life in Christ?
+**METHOD:** Removing leaven → Christ without sin → Walking in purity → Eternal holiness
+
+**FF - Firstfruits**
+**Purpose:** See Christ's resurrection as firstfruits
+**Core Question:** How does firstfruits point to Christ's resurrection and ours?
+**METHOD:** First sheaf offered → Christ rises → We follow in resurrection → Eternal harvest
+
+**PT - Pentecost**
+**Purpose:** Understand the outpouring of the Holy Spirit
+**Core Question:** How does Pentecost reveal the Spirit's work in the church?
+**METHOD:** Fifty days → Spirit poured out → Church empowered → Eternal fellowship
+
+**TR - Trumpets (Rosh Hashanah)**
+**Purpose:** See the call to repentance and awakening
+**Core Question:** How do the trumpets announce God's intervention?
+**METHOD:** Trumpet blast → Call to prepare → Christ's return announced → Eternal gathering
+
+**DA - Day of Atonement (Yom Kippur)**
+**Purpose:** Understand judgment and final cleansing
+**Core Question:** How does atonement day reveal Christ's final ministry?
+**METHOD:** High priest enters Most Holy → Christ cleanses sanctuary → Judgment → Eternal purity
+
+**TB - Tabernacles (Sukkot)**
+**Purpose:** See God dwelling with His people
+**Core Question:** How does Tabernacles point to God's eternal presence?
+**METHOD:** Dwelling in booths → Christ tabernacled among us → We dwell with God → Eternal presence
 
 ### CEC - Christ in Every Chapter
 **Purpose:** Enforce the principle that ALL Scripture is about Jesus
@@ -244,7 +328,7 @@ export const PALACE_SCHEMA = `
 
 Before responding with Palace content, verify:
 - ✅ Room name exists in this schema
-- ✅ Room tag matches this schema (SR, IR, 24, BR, TR, GR, OR, DC, ST, QR, QA, NF, PF, BF, HF, LR, CR, DR, C6, TRm, TZ, PRm, P‖, FRt, BL, PR, 3A, FE, CEC, R66, 1H/2H/3H)
+- ✅ Room tag matches this schema (SR, IR, 24, BR, TR, GR, OR, DC, ST, QR, QA, NF, PF, BF, HF, LR, CR, DR, C6, TRm, TZ, PRm, P‖, FRt, BL, ABO, LV, LS, SB, AI, VL, ARK, MS, GT, PR, 3A, FE, PO, UB, FF, PT, TR, DA, TB, CEC, R66, 1H/2H/3H)
 - ✅ Method used matches the exact method listed here
 - ✅ Purpose aligns with room's actual purpose
 - ✅ Not confusing Connect-6 (genre) with Theme Room (6 walls)
