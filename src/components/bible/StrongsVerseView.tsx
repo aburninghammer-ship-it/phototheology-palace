@@ -7,6 +7,7 @@ import { getVerseWithStrongs } from "@/services/strongsApi";
 import { supabase } from "@/integrations/supabase/client";
 import { Sparkles, Bot, Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { formatJeevesResponse } from "@/lib/formatJeevesResponse";
 
 interface StrongsVerseViewProps {
   verse: Verse;
@@ -222,13 +223,13 @@ export const StrongsVerseView = ({
 
             {/* Jeeves Response */}
             {jeevesResponse && (
-              <div className="mt-3 p-3 bg-gradient-to-br from-primary/10 to-accent/10 rounded-lg border border-primary/20">
-                <div className="flex items-center gap-2 mb-2">
-                  <Bot className="h-4 w-4 text-primary" />
+              <div className="mt-3 p-4 bg-gradient-to-br from-primary/10 to-accent/10 rounded-lg border border-primary/20">
+                <div className="flex items-center gap-2 mb-3">
+                  <Bot className="h-5 w-5 text-primary" />
                   <span className="text-sm font-semibold text-primary">Jeeves says:</span>
                 </div>
                 <div className="prose prose-sm max-w-none text-foreground">
-                  <div dangerouslySetInnerHTML={{ __html: jeevesResponse.replace(/\n/g, '<br />') }} />
+                  {formatJeevesResponse(jeevesResponse)}
                 </div>
               </div>
             )}
