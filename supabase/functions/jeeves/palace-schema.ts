@@ -293,6 +293,24 @@ export const PALACE_SCHEMA = `
 
 **Example:** The Lamb theme: From substitute ram in Genesis 22 → Passover sacrifice in Exodus 12 → suffering servant in Isaiah 53 → Christ crucified in the Gospels → victorious Lion-Lamb in Revelation 5
 
+### MATH - Mathematics Room
+**Purpose:** Read Scripture through the lens of six major time prophecies that structure salvation history
+**Core Question:** Which time prophecy does this passage fulfill, foreshadow, or connect to, and how does it reveal God's precise timing in redemptive history?
+**METHOD:**
+1. REVIEW THE SIX TIME PROPHECIES:
+   - @120: Noah's 120-year warning before Flood (Genesis 6:3)
+   - @400: Israel's 400-year Egyptian captivity (Genesis 15:13)
+   - @70y: 70-year Babylonian exile (Jeremiah 25:11-12, 29:10)
+   - @490: 70-weeks prophecy/Messiah's timeline (Daniel 9:24-27, 457 BC to AD 34)
+   - @1260: 1260-year papal persecution period (Daniel 7:25, Revelation 11-13, AD 538-1798)
+   - @2300: 2300-year sanctuary cleansing/investigative judgment (Daniel 8:14, 457 BC to AD 1844)
+2. IDENTIFY which time prophecy your passage connects to
+3. STATE the connection: Which prophecy? What's the timeframe? How is it fulfilled?
+4. CALCULATE if necessary (especially @490 and @2300 starting from 457 BC decree)
+5. EXTRACT theological lesson: What does this timeline reveal about God's sovereignty?
+
+**Example:** Daniel 9:25 connects to @490 • 457 BC + 483 years = AD 27 • Jesus baptized exactly on prophetic schedule • Lesson: Messiah arrived precisely when predicted
+
 ---
 
 ## FLOOR 6: THREE HEAVENS & CYCLES
@@ -328,7 +346,7 @@ export const PALACE_SCHEMA = `
 
 Before responding with Palace content, verify:
 - ✅ Room name exists in this schema
-- ✅ Room tag matches this schema (SR, IR, 24, BR, TR, GR, OR, DC, ST, QR, QA, NF, PF, BF, HF, LR, CR, DR, C6, TRm, TZ, PRm, P‖, FRt, BL, ABO, LV, LS, SB, AI, VL, ARK, MS, GT, PR, 3A, FE, PO, UB, FF, PT, TR, DA, TB, CEC, R66, 1H/2H/3H)
+- ✅ Room tag matches this schema (SR, IR, 24, BR, TR, GR, OR, DC, ST, QR, QA, NF, PF, BF, HF, LR, CR, DR, C6, TRm, TZ, PRm, P‖, FRt, BL, ABO, LV, LS, SB, AI, VL, ARK, MS, GT, PR, 3A, FE, PO, UB, FF, PT, TR, DA, TB, CEC, R66, MATH, 1H/2H/3H)
 - ✅ Method used matches the exact method listed here
 - ✅ Purpose aligns with room's actual purpose
 - ✅ Not confusing Connect-6 (genre) with Theme Room (6 walls)

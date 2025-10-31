@@ -3,6 +3,8 @@ import { palaceFloors, type Room, type Floor } from "@/data/palaceData";
 /**
  * CRITICAL: This file ensures Jeeves NEVER hallucinates Palace content.
  * All room references must match exactly what exists in palaceData.ts
+ * 
+ * LAST UPDATED: Added Mathematics Room (MATH) to Floor 5 - Vision Floor
  */
 
 export interface ValidatedRoom {
