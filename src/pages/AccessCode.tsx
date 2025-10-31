@@ -47,20 +47,31 @@ export default function AccessCode() {
     try {
       const { data, error } = await supabase.rpc('redeem_access_code', {
         code_input: code.trim()
-      }) as { data: { success: boolean; message?: string; error?: string } | null; error: any };
+      });
 
-      if (error) throw error;
+      if (error) {
+        console.error('RPC Error:', error);
+        toast({
+          title: "Error",
+          description: error.message || "Failed to redeem access code",
+          variant: "destructive",
+        });
+        return;
+      }
 
-      if (data && data.success) {
+      // The RPC function returns a JSONB object
+      const result = typeof data === 'string' ? JSON.parse(data) : data;
+      
+      if (result && result.success) {
         toast({
           title: "Success!",
-          description: data.message || "Lifetime access granted!",
+          description: result.message || "Access granted!",
         });
         setTimeout(() => navigate('/'), 2000);
       } else {
         toast({
           title: "Error",
-          description: data?.error || "Failed to redeem code",
+          description: result?.error || "Failed to redeem code",
           variant: "destructive",
         });
       }
@@ -68,7 +79,7 @@ export default function AccessCode() {
       console.error('Error redeeming code:', error);
       toast({
         title: "Error",
-        description: "Failed to redeem access code",
+        description: error instanceof Error ? error.message : "Failed to redeem access code",
         variant: "destructive",
       });
     } finally {
