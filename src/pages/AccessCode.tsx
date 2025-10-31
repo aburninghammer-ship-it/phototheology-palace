@@ -28,7 +28,7 @@ export default function AccessCode() {
     setLoading(true);
     try {
       const { data, error } = await supabase.rpc('redeem_access_code', {
-        access_code: code.trim()
+        code_input: code.trim()
       }) as { data: { success: boolean; message?: string; error?: string } | null; error: any };
 
       if (error) throw error;

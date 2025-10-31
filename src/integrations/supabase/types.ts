@@ -2108,6 +2108,7 @@ export type Database = {
           expires_at: string
           id: string
           is_active: boolean
+          is_lifetime: boolean | null
           max_uses: number | null
           used_count: number
         }
@@ -2119,6 +2120,7 @@ export type Database = {
           expires_at: string
           id?: string
           is_active?: boolean
+          is_lifetime?: boolean | null
           max_uses?: number | null
           used_count?: number
         }
@@ -2130,6 +2132,7 @@ export type Database = {
           expires_at?: string
           id?: string
           is_active?: boolean
+          is_lifetime?: boolean | null
           max_uses?: number | null
           used_count?: number
         }
@@ -2970,7 +2973,7 @@ export type Database = {
         Args: { _church_id: string; _user_id: string }
         Returns: boolean
       }
-      redeem_access_code: { Args: { access_code: string }; Returns: Json }
+      redeem_access_code: { Args: { code_input: string }; Returns: Json }
     }
     Enums: {
       app_role: "admin" | "moderator" | "user"

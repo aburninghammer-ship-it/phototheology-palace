@@ -7,16 +7,19 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2, Copy, Gift } from "lucide-react";
 import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
 
 export default function AdminAccessCodes() {
   const { toast } = useToast();
   const [maxUses, setMaxUses] = useState<string>("");
   const [accessDurationMonths, setAccessDurationMonths] = useState<string>("3");
+  const [isLifetime, setIsLifetime] = useState(false);
   const [loading, setLoading] = useState(false);
   const [generatedCode, setGeneratedCode] = useState<{
     code: string;
     link: string;
     expiresAt: string;
+    isLifetime?: boolean;
     duration?: number;
   } | null>(null);
 
@@ -29,7 +32,8 @@ export default function AdminAccessCodes() {
       const response = await supabase.functions.invoke('generate-access-code', {
         body: { 
           maxUses: maxUses ? parseInt(maxUses) : null,
-          accessDurationMonths: accessDurationMonths ? parseInt(accessDurationMonths) : null
+          accessDurationMonths: isLifetime ? null : (accessDurationMonths ? parseInt(accessDurationMonths) : null),
+          isLifetime: isLifetime
         }
       });
 
@@ -40,7 +44,8 @@ export default function AdminAccessCodes() {
         code: response.data.code,
         link: `${window.location.origin}/access?code=${response.data.code}`,
         expiresAt: response.data.expiresAt,
-        duration: accessDurationMonths ? parseInt(accessDurationMonths) : undefined
+        isLifetime: isLifetime,
+        duration: !isLifetime && accessDurationMonths ? parseInt(accessDurationMonths) : undefined
       });
 
       toast({
@@ -82,21 +87,38 @@ export default function AdminAccessCodes() {
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
-            <div className="space-y-2">
-              <Label htmlFor="accessDuration">Access Duration (Months)</Label>
-              <Input
-                id="accessDuration"
-                type="number"
-                placeholder="3"
-                value={accessDurationMonths}
-                onChange={(e) => setAccessDurationMonths(e.target.value)}
+            <div className="flex items-center space-x-2">
+              <Checkbox
+                id="lifetime"
+                checked={isLifetime}
+                onCheckedChange={(checked) => setIsLifetime(checked as boolean)}
                 disabled={loading}
-                min="1"
               />
-              <p className="text-sm text-muted-foreground">
-                Number of months of premium access. Leave blank for lifetime access.
-              </p>
+              <Label
+                htmlFor="lifetime"
+                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+              >
+                Grant Lifetime Access
+              </Label>
             </div>
+
+            {!isLifetime && (
+              <div className="space-y-2">
+                <Label htmlFor="accessDuration">Access Duration (Months)</Label>
+                <Input
+                  id="accessDuration"
+                  type="number"
+                  placeholder="3"
+                  value={accessDurationMonths}
+                  onChange={(e) => setAccessDurationMonths(e.target.value)}
+                  disabled={loading}
+                  min="1"
+                />
+                <p className="text-sm text-muted-foreground">
+                  Number of months of premium access
+                </p>
+              </div>
+            )}
 
             <div className="space-y-2">
               <Label htmlFor="maxUses">Maximum Uses (optional)</Label>
@@ -161,13 +183,15 @@ export default function AdminAccessCodes() {
                 </div>
 
                 <div className="text-sm text-muted-foreground">
-                  <p>Expires: {new Date(generatedCode.expiresAt).toLocaleString()}</p>
-                  <p className="mt-2">
-                    {generatedCode.duration 
-                      ? `This code grants ${generatedCode.duration} months of premium access.`
-                      : "This code grants lifetime premium access."
+                  <p>Code expires in 24 hours: {new Date(generatedCode.expiresAt).toLocaleString()}</p>
+                  <p className="mt-2 font-semibold">
+                    {generatedCode.isLifetime
+                      ? "🎉 This code grants LIFETIME premium access!"
+                      : `This code grants ${generatedCode.duration} months of premium access.`
                     }
-                    {" "}The link will expire in 24 hours from generation.
+                  </p>
+                  <p className="mt-1 text-xs">
+                    The redemption link expires in 24 hours, but once redeemed, the access will be {generatedCode.isLifetime ? 'permanent' : `valid for ${generatedCode.duration} months`}.
                   </p>
                 </div>
               </div>

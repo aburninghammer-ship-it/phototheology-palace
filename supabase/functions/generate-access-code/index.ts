@@ -42,7 +42,7 @@ serve(async (req) => {
       );
     }
 
-    const { maxUses, accessDurationMonths } = await req.json();
+    const { maxUses, accessDurationMonths, isLifetime } = await req.json();
 
     // Generate random code
     const code = 'PT-' + Math.random().toString(36).substring(2, 10).toUpperCase();
@@ -57,13 +57,14 @@ serve(async (req) => {
         expires_at: expiresAt.toISOString(),
         max_uses: maxUses || null,
         access_duration_months: accessDurationMonths || null,
+        is_lifetime: isLifetime || false,
       })
       .select()
       .single();
 
     if (error) throw error;
 
-    console.log(`Access code generated: ${code}, expires at: ${expiresAt}`);
+    console.log(`Access code generated: ${code}, expires at: ${expiresAt}, lifetime: ${isLifetime || false}`);
 
     return new Response(
       JSON.stringify({ 
