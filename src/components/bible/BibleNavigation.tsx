@@ -10,6 +10,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { BIBLE_BOOKS } from "@/types/bible";
 import { Search, BookOpen } from "lucide-react";
 
@@ -18,6 +19,7 @@ export const BibleNavigation = () => {
   const [selectedBook, setSelectedBook] = useState("John");
   const [chapter, setChapter] = useState("1");
   const [searchQuery, setSearchQuery] = useState("");
+  const [searchMode, setSearchMode] = useState<"reference" | "word">("reference");
 
   const handleNavigate = () => {
     if (selectedBook && chapter) {
@@ -28,8 +30,7 @@ export const BibleNavigation = () => {
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     if (searchQuery) {
-      // Parse search query (e.g., "John 3:16" or "Genesis 1" or word search)
-      navigate(`/bible/search?q=${encodeURIComponent(searchQuery)}&mode=reference`);
+      navigate(`/bible/search?q=${encodeURIComponent(searchQuery)}&mode=${searchMode}`);
     }
   };
 
@@ -75,10 +76,17 @@ export const BibleNavigation = () => {
         </Button>
         
         {/* Search */}
-        <div className="pt-3 border-t border-border/50">
+        <div className="pt-3 border-t border-border/50 space-y-3">
+          <Tabs value={searchMode} onValueChange={(value) => setSearchMode(value as "reference" | "word")}>
+            <TabsList className="grid w-full grid-cols-2">
+              <TabsTrigger value="reference">Reference</TabsTrigger>
+              <TabsTrigger value="word">Word Search</TabsTrigger>
+            </TabsList>
+          </Tabs>
+          
           <form onSubmit={handleSearch} className="flex gap-2">
             <Input
-              placeholder="Search Bible (e.g., John 3:16)"
+              placeholder={searchMode === "reference" ? "Search Bible (e.g., John 3:16)" : "Search for words (e.g., faith)"}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />
