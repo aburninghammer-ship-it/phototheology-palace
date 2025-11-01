@@ -267,19 +267,26 @@ export const PALACE_SCHEMA = `
 **METHOD:** Dwelling in booths → Christ tabernacled among us → We dwell with God → Eternal presence
 
 ### CEC - Christ in Every Chapter
-**Purpose:** Enforce the principle that ALL Scripture is about Jesus
-**Core Question:** How is Jesus present in this chapter—explicitly, typologically, or thematically—and what does He accomplish here?
-**METHOD:** 
-1. READ the chapter thoroughly
-2. IDENTIFY Christ's presence using three modes:
-   - MODE 1: EXPLICIT (Direct references to Jesus/Messiah)
-   - MODE 2: TYPOLOGICAL (OT persons, events, objects foreshadowing Christ)
-   - MODE 3: THEMATIC (Themes that find ultimate fulfillment in Christ)
-3. NAME Christ's title/role in this chapter
-4. STATE Christ's action/accomplishment
-5. CROSSLINK with 1-2 NT texts that explicitly connect this chapter to Christ
+**Purpose:** Enforce the principle that ALL Scripture is about Jesus (the Bible's "Where's Waldo?" book)
+**Core Question:** Where is Jesus in this chapter using the 5 'Finding Waldo' methods?
+**METHOD - THE 5 'FINDING WALDO' METHODS:**
+1. **METHOD 1 - Red-Striped Promise:** Look for promises of rescue, blessing, or a coming King/Redeemer
+2. **METHOD 2 - Types & Shadows:** Find people, objects, or events that look like Jesus (Passover lamb, Joseph betrayed→exalted, Rock struck for water, etc.)
+3. **METHOD 3 - Gospel Trail:** Trace the pattern of sin→cry→rescue (mess that only a Savior can fix)
+4. **METHOD 4 - God's Heart:** Every revelation of God IS Jesus—"If you've seen Me, you've seen the Father" (John 14:9)
+5. **METHOD 5 - Unfinished Story:** Find temporary/incomplete solutions pointing to Christ as final answer (David's throne→Christ's eternal throne, Solomon's temple→Christ's body, exile return→ultimate homecoming)
 
-**Example:** Genesis 3: NAME=Seed of Woman • ACT=Promises to crush serpent's head • CROSSLINK=Romans 16:20, Revelation 12:9
+**APPLICATION STEPS:**
+1. READ the chapter thoroughly
+2. APPLY ALL 5 METHODS systematically to find Christ
+3. NAME Christ's title/role (Lamb, King, Shepherd, Deliverer, Prophet, Priest, etc.)
+4. STATE Christ's action/accomplishment (atones, delivers, fulfills, reveals, judges, restores)
+5. CROSSLINK with 1-2 NT texts confirming the Christ-connection
+
+**Examples:**
+- Genesis 3: METHODS 1,3,5 | NAME=Seed of Woman/Last Adam | ACT=Promises to crush serpent, inaugurates redemption | CROSSLINK=Rom 5:17-19, Rom 16:20, Rev 12:9
+- Exodus 12: METHODS 2,3,4 | NAME=Passover Lamb | ACT=Blood substitutes, delivers from death/slavery | CROSSLINK=1 Cor 5:7, John 1:29, 1 Pet 1:18-19
+- Jonah 2: METHODS 2,3,4 | NAME=Sign Prophet/Greater Jonah | ACT=Dies, buried, rises on third day | CROSSLINK=Matt 12:39-40, Luke 11:29-30
 
 ### R66 - Room 66
 **Purpose:** Trace a SINGLE THEME through all 66 books of the Bible
