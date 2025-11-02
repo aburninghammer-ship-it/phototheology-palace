@@ -9,7 +9,6 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { Upload, Database, BookOpen, FileText } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
-import { BibleImportPanel } from "@/components/admin/BibleImportPanel";
 
 export default function AdminBibleImport() {
   const { user } = useAuth();
@@ -585,9 +584,6 @@ export default function AdminBibleImport() {
             </TabsList>
 
             <TabsContent value="verses" className="space-y-4">
-              {/* BibleSDK Import Panel */}
-              <BibleImportPanel />
-              
               <Card>
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
