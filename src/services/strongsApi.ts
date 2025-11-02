@@ -1317,6 +1317,7 @@ export const getVerseWithStrongs = async (book: string, chapter: number, verse: 
     
     if (data && !error) {
       console.log(`[Strong's] Found in database: ${book} ${chapter}:${verse}`);
+      console.log(`[Strong's] Sample token data:`, data.tokens[0]);
       
       // Parse the tokens JSONB array - handle both old format (t/s) and new format (word/strongs)
       const tokens = data.tokens as Array<{ 
@@ -1328,12 +1329,24 @@ export const getVerseWithStrongs = async (book: string, chapter: number, verse: 
         definition?: string | null;
         hebrew_word?: string | null;
         greek_word?: string | null;
+        transliteration?: string | null;
       }>;
+      
+      // Check if we have transliteration but no English - this means data needs re-import
+      const firstToken = tokens[0];
+      const hasTransliteration = firstToken?.transliteration;
+      const hasEnglish = firstToken?.t && !firstToken.t.match(/[\u0590-\u05FF]/); // Check if not Hebrew
+      
+      if (hasTransliteration && !hasEnglish) {
+        console.warn(`[Strong's] ${book} ${chapter}:${verse} contains transliteration instead of English. Please re-import this chapter.`);
+      }
       
       const words = tokens.map(token => ({
         text: token.t || token.word || '',
         strongs: token.s || token.strongs || undefined
       }));
+      
+      console.log(`[Strong's] First word extracted:`, words[0]);
       
       return {
         text: data.text_kjv,
