@@ -12,15 +12,14 @@ interface ActiveUser {
 export const useActiveUsers = () => {
   const [activeCount, setActiveCount] = useState(0);
   const [activeUsers, setActiveUsers] = useState<ActiveUser[]>([]);
-  const [retryCount, setRetryCount] = useState(0);
-  const maxRetries = 3;
 
   useEffect(() => {
     let isSubscribed = true;
     let realtimeChannel: any = null;
+    let interval: NodeJS.Timeout | null = null;
     
     const updateLastSeen = async () => {
-      if (!isSubscribed || retryCount >= maxRetries) return;
+      if (!isSubscribed) return;
       
       try {
         const { data: { user } } = await supabase.auth.getUser();
@@ -31,13 +30,12 @@ export const useActiveUsers = () => {
             .eq("id", user.id);
         }
       } catch (error) {
-        // Silently fail - this is not critical functionality
-        setRetryCount(prev => prev + 1);
+        console.error("Error updating last_seen:", error);
       }
     };
 
     const fetchActiveUsers = async () => {
-      if (!isSubscribed || retryCount >= maxRetries) return;
+      if (!isSubscribed) return;
       
       try {
         const fifteenMinutesAgo = new Date(Date.now() - 15 * 60 * 1000).toISOString();
@@ -52,58 +50,58 @@ export const useActiveUsers = () => {
           setActiveUsers(data || []);
         }
       } catch (error) {
-        // Silently fail - this is not critical functionality
-        setRetryCount(prev => prev + 1);
+        console.error("Error fetching active users:", error);
       }
     };
 
-    // Only proceed if we haven't exceeded retry limit
-    if (retryCount < maxRetries) {
+    const init = async () => {
+      // Get current user and set up everything
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user || !isSubscribed) return;
+
       // Update user's last_seen immediately
-      updateLastSeen();
+      await updateLastSeen();
       
       // Fetch active users count immediately
-      fetchActiveUsers();
+      await fetchActiveUsers();
       
-      // Update every 60 seconds (reduced frequency)
-      const interval = setInterval(() => {
-        if (retryCount < maxRetries) {
+      // Update every 30 seconds
+      interval = setInterval(() => {
+        if (isSubscribed) {
           updateLastSeen();
           fetchActiveUsers();
         }
-      }, 60000);
+      }, 30000);
 
-      // Set up realtime subscription for profile updates (only if not exceeding retries and user is authenticated)
-      supabase.auth.getUser().then(({ data: { user } }) => {
-        if (!user?.id || !isSubscribed) return;
-        
-        realtimeChannel = supabase
-          .channel('profiles-active-users')
-          .on(
-            'postgres_changes',
-            {
-              event: 'UPDATE',
-              schema: 'public',
-              table: 'profiles'
-            },
-            () => {
-              if (isSubscribed && retryCount < maxRetries) {
-                fetchActiveUsers();
-              }
+      // Set up realtime subscription for profile updates
+      realtimeChannel = supabase
+        .channel('profiles-active-users')
+        .on(
+          'postgres_changes',
+          {
+            event: 'UPDATE',
+            schema: 'public',
+            table: 'profiles'
+          },
+          () => {
+            if (isSubscribed) {
+              fetchActiveUsers();
             }
-          )
-          .subscribe();
-      });
+          }
+        )
+        .subscribe();
+    };
 
-      return () => {
-        isSubscribed = false;
-        clearInterval(interval);
-        if (realtimeChannel) {
-          supabase.removeChannel(realtimeChannel);
-        }
-      };
-    }
-  }, [retryCount]);
+    init();
+
+    return () => {
+      isSubscribed = false;
+      if (interval) clearInterval(interval);
+      if (realtimeChannel) {
+        supabase.removeChannel(realtimeChannel);
+      }
+    };
+  }, []);
 
   return { activeCount, activeUsers };
 };
