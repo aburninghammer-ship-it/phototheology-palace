@@ -142,8 +142,24 @@ Deno.serve(async (req) => {
 
         try {
           console.log(`Calling BibleSDK getVerses with code: ${book.code}`);
-          // Fetch verses 1-176 (longest chapter is Psalm 119 with 176 verses)
-          const response = await getVerses(book.code, chapter, [1, 176]) as unknown as BibleSDKResponse;
+          
+          // Try different verse ranges (most chapters have < 50 verses, Psalm 119 has 176)
+          let response: BibleSDKResponse | null = null;
+          const rangesToTry = [176, 100, 75, 50, 40, 30, 20, 10];
+          
+          for (const maxVerse of rangesToTry) {
+            try {
+              response = await getVerses(book.code, chapter, [1, maxVerse]) as unknown as BibleSDKResponse;
+              console.log(`Successfully fetched ${book.code} ${chapter} with range [1, ${maxVerse}]`);
+              break;
+            } catch (rangeError: any) {
+              if (rangeError.message?.includes('out of range')) {
+                continue; // Try next smaller range
+              }
+              throw rangeError; // Different error, rethrow
+            }
+          }
+          
           console.log(`BibleSDK response for ${book.code} ${chapter}:`, response ? 'received' : 'null', response?.phrases?.length || 0, 'phrases');
           
           if (!response || !response.phrases || response.phrases.length === 0) {
