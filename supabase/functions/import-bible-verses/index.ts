@@ -116,14 +116,21 @@ Deno.serve(async (req) => {
 
     console.log('Parsing request body...');
     const { bookCode } = await req.json().catch(() => ({}));
-    console.log('Book code:', bookCode);
+    console.log('Book code received:', bookCode);
     
     // If bookCode is provided, import just that book, otherwise import all books
+    // Make comparison case-insensitive
     const booksToImport = bookCode 
-      ? BIBLE_BOOKS.filter(b => b.code === bookCode)
+      ? BIBLE_BOOKS.filter(b => b.code.toLowerCase() === bookCode.toLowerCase())
       : BIBLE_BOOKS;
 
-    console.log(`Will import ${booksToImport.length} books`);
+    if (bookCode && booksToImport.length === 0) {
+      console.error(`Book code "${bookCode}" not found in BIBLE_BOOKS array`);
+      console.log('Available codes:', BIBLE_BOOKS.map(b => b.code).join(', '));
+      throw new Error(`Book code "${bookCode}" not recognized`);
+    }
+
+    console.log(`Will import ${booksToImport.length} book(s):`, booksToImport.map(b => b.name).join(', '));
     let totalVersesImported = 0;
     const results: any[] = [];
 
@@ -134,7 +141,9 @@ Deno.serve(async (req) => {
         console.log(`Fetching ${book.code} chapter ${chapter}...`);
 
         try {
+          console.log(`Calling BibleSDK getVerses with code: ${book.code}`);
           const response = await getVerses(book.code, chapter, [1, 999]) as unknown as BibleSDKResponse;
+          console.log(`BibleSDK response for ${book.code} ${chapter}:`, response ? 'received' : 'null', response?.phrases?.length || 0, 'phrases');
           
           if (!response || !response.phrases || response.phrases.length === 0) {
             console.warn(`No verses found for ${book.code} chapter ${chapter}`);
@@ -217,14 +226,19 @@ Deno.serve(async (req) => {
       console.log(`✓ Completed ${book.name}: imported verses`);
     }
 
+    const response = {
+      success: true,
+      message: `Successfully imported ${totalVersesImported} verses from ${booksToImport.map(b => b.name).join(', ')}`,
+      totalVerses: totalVersesImported,
+      booksImported: booksToImport.length,
+      bookNames: booksToImport.map(b => b.name),
+      errors: results.filter(r => r.error),
+    };
+    
+    console.log('Import complete:', response);
+    
     return new Response(
-      JSON.stringify({
-        success: true,
-        message: `Successfully imported ${totalVersesImported} verses`,
-        totalVersesImported,
-        booksImported: booksToImport.length,
-        errors: results.filter(r => r.error),
-      }),
+      JSON.stringify(response),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } },
     );
   } catch (error: any) {
