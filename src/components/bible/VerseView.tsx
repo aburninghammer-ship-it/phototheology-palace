@@ -1,7 +1,7 @@
 import { useState, useMemo } from "react";
 import { Verse } from "@/types/bible";
 import { Badge } from "@/components/ui/badge";
-import { Sparkles, Loader2, X } from "lucide-react";
+import { Sparkles, Loader2, BookOpen } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -70,6 +70,10 @@ export const VerseView = ({ verse, isSelected, onSelect, showPrinciples, isHighl
   const [selectedPrinciple, setSelectedPrinciple] = useState<string>("");
   const [explanation, setExplanation] = useState<string>("");
   const [loading, setLoading] = useState(false);
+  const [wordDialogOpen, setWordDialogOpen] = useState(false);
+  const [selectedWord, setSelectedWord] = useState<string>("");
+  const [wordAnalysis, setWordAnalysis] = useState<string>("");
+  const [wordLoading, setWordLoading] = useState(false);
   const { toast } = useToast();
 
   // Generate stable principles for this verse
@@ -79,6 +83,38 @@ export const VerseView = ({ verse, isSelected, onSelect, showPrinciples, isHighl
   );
   
   const colors = ["bg-blue-600", "bg-green-600", "bg-orange-600", "bg-red-600"];
+
+  const handleWordClick = async (word: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    setSelectedWord(word);
+    setWordDialogOpen(true);
+    setWordLoading(true);
+    setWordAnalysis("");
+
+    try {
+      const { data, error } = await supabase.functions.invoke("analyze-hebrew-greek", {
+        body: {
+          word,
+          verse: verse.text,
+          context: verse.text,
+          book: book || "Unknown"
+        }
+      });
+
+      if (error) throw error;
+      setWordAnalysis(data.analysis);
+    } catch (error: any) {
+      console.error("Word analysis error:", error);
+      toast({
+        title: "Error",
+        description: error.message || "Failed to analyze word",
+        variant: "destructive",
+      });
+      setWordAnalysis("Unable to analyze word at this time.");
+    } finally {
+      setWordLoading(false);
+    }
+  };
 
   const handlePrincipleClick = async (principle: string, e: React.MouseEvent) => {
     e.stopPropagation();
@@ -114,6 +150,25 @@ export const VerseView = ({ verse, isSelected, onSelect, showPrinciples, isHighl
     }
   };
 
+  const renderVerseText = (text: string) => {
+    const words = text.split(/(\s+|[.,;:!?])/);
+    return words.map((word, index) => {
+      if (word.trim() && word.length > 2 && /^[a-zA-Z]+$/.test(word)) {
+        return (
+          <span
+            key={index}
+            className="cursor-pointer hover:bg-primary/10 hover:underline rounded px-0.5 transition-colors"
+            onClick={(e) => handleWordClick(word, e)}
+            title="Click for Hebrew/Greek analysis"
+          >
+            {word}
+          </span>
+        );
+      }
+      return <span key={index}>{word}</span>;
+    });
+  };
+
   return (
     <>
       <div
@@ -137,7 +192,7 @@ export const VerseView = ({ verse, isSelected, onSelect, showPrinciples, isHighl
           
           <div className="flex-1">
             <p className="text-foreground leading-relaxed">
-              {verse.text}
+              {renderVerseText(verse.text)}
             </p>
             
             {showPrinciples && (
@@ -158,6 +213,32 @@ export const VerseView = ({ verse, isSelected, onSelect, showPrinciples, isHighl
           </div>
         </div>
       </div>
+
+      <Dialog open={wordDialogOpen} onOpenChange={setWordDialogOpen}>
+        <DialogContent className="max-w-2xl max-h-[80vh]">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <BookOpen className="h-5 w-5 text-primary" />
+              <span>Hebrew/Greek Analysis: {selectedWord}</span>
+            </DialogTitle>
+            <DialogDescription>
+              {book} {chapter}:{verse.verse}
+            </DialogDescription>
+          </DialogHeader>
+          
+          <ScrollArea className="max-h-[60vh]">
+            {wordLoading ? (
+              <div className="flex items-center justify-center py-12">
+                <Loader2 className="h-8 w-8 animate-spin text-primary" />
+              </div>
+            ) : (
+              <div className="prose prose-sm max-w-none p-4">
+                {formatJeevesResponse(wordAnalysis)}
+              </div>
+            )}
+          </ScrollArea>
+        </DialogContent>
+      </Dialog>
 
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
         <DialogContent className="max-w-2xl max-h-[80vh]">
