@@ -154,17 +154,23 @@ Deno.serve(async (req) => {
 
           // Process each verse
           const versesToInsert = Array.from(verseGroups.entries()).map(([verseNum, phrases]) => {
-            const verseText = phrases.map(p => p.text).join('').trim();
-            const tokens = phrases
-              .filter(p => p.strongs_number !== null)
-              .map((p, idx) => ({
-                position: idx,
-                word: p.text.trim(),
-                strongs: p.strongs_number ? `${p.strongs_type}${p.strongs_number}` : null,
-                definition: p.definition || null,
-                hebrew_word: p.hebrew_word || null,
-                greek_word: p.greek_word || null,
-              }));
+            // Build KJV text by using English words when available, fallback to text
+            const verseText = phrases.map(p => {
+              // For KJV text, we want the actual English word
+              // BibleSDK may have the English in the text field for KJV
+              return p.text;
+            }).join('').trim();
+            
+            // For tokens, store each word with its Strong's number
+            const tokens = phrases.map((p, idx) => ({
+              position: idx,
+              t: p.text.trim(), // Store the English KJV word
+              s: p.strongs_number ? `${p.strongs_type}${p.strongs_number}` : null,
+              transliteration: p.transliteration || null,
+              definition: p.definition || null,
+              hebrew_word: p.hebrew_word || null,
+              greek_word: p.greek_word || null,
+            }));
 
             return {
               book: book.code,
