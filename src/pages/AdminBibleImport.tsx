@@ -151,6 +151,114 @@ export default function AdminBibleImport() {
     }
   };
 
+  const handleNewTestamentImport = async () => {
+    setAutoImporting(true);
+    setImportResults(null);
+    
+    const ntBooks = [
+      { code: 'Mat', name: 'Matthew' },
+      { code: 'Mar', name: 'Mark' },
+      { code: 'Luk', name: 'Luke' },
+      { code: 'Jhn', name: 'John' },
+      { code: 'Act', name: 'Acts' },
+      { code: 'Rom', name: 'Romans' },
+      { code: '1Co', name: '1 Corinthians' },
+      { code: '2Co', name: '2 Corinthians' },
+      { code: 'Gal', name: 'Galatians' },
+      { code: 'Eph', name: 'Ephesians' },
+      { code: 'Php', name: 'Philippians' },
+      { code: 'Col', name: 'Colossians' },
+      { code: '1Th', name: '1 Thessalonians' },
+      { code: '2Th', name: '2 Thessalonians' },
+      { code: '1Ti', name: '1 Timothy' },
+      { code: '2Ti', name: '2 Timothy' },
+      { code: 'Tit', name: 'Titus' },
+      { code: 'Phm', name: 'Philemon' },
+      { code: 'Heb', name: 'Hebrews' },
+      { code: 'Jas', name: 'James' },
+      { code: '1Pe', name: '1 Peter' },
+      { code: '2Pe', name: '2 Peter' },
+      { code: '1Jn', name: '1 John' },
+      { code: '2Jn', name: '2 John' },
+      { code: '3Jn', name: '3 John' },
+      { code: 'Jud', name: 'Jude' },
+      { code: 'Rev', name: 'Revelation' }
+    ];
+
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        throw new Error('Not authenticated');
+      }
+
+      toast({
+        title: "Starting New Testament import",
+        description: "Importing all 27 NT books with Strong's data...",
+      });
+
+      let imported = 0;
+      let failed = 0;
+      let totalVerses = 0;
+      const errors: string[] = [];
+
+      for (const book of ntBooks) {
+        try {
+          toast({
+            title: `Importing ${book.name}...`,
+            description: `Processing book ${imported + 1} of ${ntBooks.length}`,
+          });
+          
+          const { data, error } = await supabase.functions.invoke('import-bible-verses', {
+            headers: {
+              Authorization: `Bearer ${session.access_token}`,
+            },
+            body: { bookCode: book.code }
+          });
+          
+          if (error) {
+            failed++;
+            errors.push(`${book.name}: ${error.message}`);
+          } else {
+            imported++;
+            if (data?.totalVerses) {
+              totalVerses += data.totalVerses;
+            }
+          }
+          
+          // Small delay to avoid rate limits
+          await new Promise(resolve => setTimeout(resolve, 500));
+        } catch (err: any) {
+          failed++;
+          errors.push(`${book.name}: ${err.message}`);
+        }
+      }
+
+      const resultData = {
+        message: `Imported ${imported} of ${ntBooks.length} NT books`,
+        imported,
+        failed,
+        totalVerses,
+        errors: errors.length > 0 ? errors : undefined
+      };
+      
+      setImportResults(resultData);
+      
+      toast({
+        title: "Import complete!",
+        description: `Successfully imported ${imported} books with ${totalVerses} verses`,
+      });
+    } catch (error: any) {
+      console.error('NT import error:', error);
+      toast({
+        title: "Import failed",
+        description: error.message,
+        variant: "destructive",
+      });
+    } finally {
+      setAutoImporting(false);
+    }
+  };
+
   const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
@@ -359,6 +467,59 @@ export default function AdminBibleImport() {
             <TabsContent value="verses" className="space-y-4">
               {/* BibleSDK Import Panel */}
               <BibleImportPanel />
+              
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <BookOpen className="h-5 w-5" />
+                    Import New Testament
+                  </CardTitle>
+                  <CardDescription>
+                    Import all 27 New Testament books (Matthew through Revelation) with Strong's numbers from BibleSDK
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="bg-muted/50 p-4 rounded-lg space-y-2">
+                    <p className="text-sm">
+                      This will automatically import all New Testament books with Greek Strong's numbers. The process may take 10-15 minutes.
+                    </p>
+                    <p className="text-xs text-muted-foreground">
+                      Books included: Matthew, Mark, Luke, John, Acts, Romans, 1-2 Corinthians, Galatians, Ephesians, Philippians, Colossians, 1-2 Thessalonians, 1-2 Timothy, Titus, Philemon, Hebrews, James, 1-2 Peter, 1-3 John, Jude, Revelation
+                    </p>
+                  </div>
+
+                  <Button 
+                    onClick={handleNewTestamentImport}
+                    disabled={autoImporting}
+                    className="w-full"
+                    size="lg"
+                  >
+                    <Database className="h-4 w-4 mr-2" />
+                    {autoImporting ? "Importing New Testament..." : "Import All New Testament Books"}
+                  </Button>
+
+                  {importResults && (
+                    <div className="bg-green-500/10 border border-green-500/20 rounded-lg p-4 space-y-2">
+                      <p className="font-semibold text-green-600 dark:text-green-400">
+                        ✓ {importResults.message}
+                      </p>
+                      {importResults.totalVerses && (
+                        <p className="text-sm text-muted-foreground">
+                          Total verses imported: {importResults.totalVerses}
+                        </p>
+                      )}
+                      {importResults.errors && importResults.errors.length > 0 && (
+                        <div className="mt-2 text-xs text-red-600 dark:text-red-400">
+                          <p className="font-semibold">Errors:</p>
+                          {importResults.errors.map((err: string, i: number) => (
+                            <p key={i}>• {err}</p>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
               
               <Card>
                 <CardHeader>
