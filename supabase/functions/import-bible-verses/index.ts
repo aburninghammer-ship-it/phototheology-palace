@@ -146,18 +146,26 @@ Deno.serve(async (req) => {
           // Try different verse ranges (most chapters have < 50 verses, Psalm 119 has 176)
           let response: BibleSDKResponse | null = null;
           const rangesToTry = [176, 100, 75, 50, 40, 30, 20, 10];
+          let lastError: Error | null = null;
           
           for (const maxVerse of rangesToTry) {
             try {
+              console.log(`Trying ${book.code} ${chapter} with range [1, ${maxVerse}]`);
               response = await getVerses(book.code, chapter, [1, maxVerse]) as unknown as BibleSDKResponse;
-              console.log(`Successfully fetched ${book.code} ${chapter} with range [1, ${maxVerse}]`);
+              console.log(`✓ Successfully fetched ${book.code} ${chapter} with range [1, ${maxVerse}]`);
               break;
             } catch (rangeError: any) {
-              if (rangeError.message?.includes('out of range')) {
+              console.log(`Failed range [1, ${maxVerse}]: ${rangeError.message}`);
+              lastError = rangeError;
+              if (rangeError.message?.includes('out of range') || rangeError.message?.includes('Invalid verse range')) {
                 continue; // Try next smaller range
               }
               throw rangeError; // Different error, rethrow
             }
+          }
+          
+          if (!response) {
+            throw lastError || new Error('Failed to fetch verses with any range');
           }
           
           console.log(`BibleSDK response for ${book.code} ${chapter}:`, response ? 'received' : 'null', response?.phrases?.length || 0, 'phrases');
