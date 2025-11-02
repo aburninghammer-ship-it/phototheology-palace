@@ -32,10 +32,9 @@ Deno.serve(async (req) => {
 
     console.log('Starting Bible verses import...');
 
-    // Use a simpler approach - fetch from a working Bible API
-    // We'll use the API.Bible service which provides KJV with reliable access
+    // Use the 2024 branch (legacy version) which has the old CSV structure
     const response = await fetch(
-      'https://raw.githubusercontent.com/scrollmapper/bible_databases/master/csv/t_kjv.csv'
+      'https://raw.githubusercontent.com/scrollmapper/bible_databases/2024/csv/t_kjv.csv'
     );
 
     if (!response.ok) {
