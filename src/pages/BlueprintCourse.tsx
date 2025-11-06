@@ -4,7 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Badge } from "@/components/ui/badge";
-import { BookOpen, Lock, CheckCircle2, Sparkles, Users } from "lucide-react";
+import { BookOpen, Sparkles, Users } from "lucide-react";
 import { blueprintLessons } from "@/data/blueprintCourseData";
 import { blueprintLessonsKids } from "@/data/blueprintCourseDataKids";
 
@@ -178,11 +178,7 @@ export default function BlueprintCourse() {
                       <CardTitle className="text-lg mb-2">{part.title}</CardTitle>
                       <CardDescription>{part.description}</CardDescription>
                     </div>
-                    {part.completed ? (
-                      <CheckCircle2 className="w-5 h-5 text-green-500" />
-                    ) : (
-                      <Lock className="w-5 h-5 text-muted-foreground" />
-                    )}
+                    <BookOpen className="w-5 h-5 text-primary" />
                   </div>
                 </CardHeader>
                 <CardContent>
