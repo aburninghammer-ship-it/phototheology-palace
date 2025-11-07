@@ -14,7 +14,11 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
 import { BIBLE_BOOKS } from "@/types/bible";
-import { fetchChapter } from "@/services/bibleApi";
+import { fetchChapter, BIBLE_TRANSLATIONS } from "@/services/bibleApi";
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Check, ChevronsUpDown } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 interface MemorizationVerse {
   id: string;
@@ -42,9 +46,11 @@ const MemorizationVerses = () => {
   const [selectedBook, setSelectedBook] = useState("");
   const [selectedChapter, setSelectedChapter] = useState("");
   const [selectedVerse, setSelectedVerse] = useState("");
+  const [selectedTranslation, setSelectedTranslation] = useState("kjv");
   const [verseText, setVerseText] = useState("");
   const [notes, setNotes] = useState("");
   const [fetchingVerse, setFetchingVerse] = useState(false);
+  const [bookSearchOpen, setBookSearchOpen] = useState(false);
 
   useEffect(() => {
     if (user) {
@@ -86,8 +92,11 @@ const MemorizationVerses = () => {
 
     setFetchingVerse(true);
     try {
-      // Default to KJV for Memory Verse Challenge
-      const chapterData = await fetchChapter(selectedBook, parseInt(selectedChapter), 'kjv');
+      const chapterData = await fetchChapter(
+        selectedBook, 
+        parseInt(selectedChapter), 
+        selectedTranslation as "kjv" | "web" | "bbe" | "almeida" | "clementine"
+      );
       const foundVerse = chapterData.verses.find(v => v.verse === parseInt(selectedVerse));
       
       if (foundVerse) {
@@ -224,19 +233,66 @@ const MemorizationVerses = () => {
                 </DialogHeader>
                 
                 <div className="space-y-4">
+                  <div className="space-y-2">
+                    <Label>Bible Translation</Label>
+                    <Select value={selectedTranslation} onValueChange={setSelectedTranslation}>
+                      <SelectTrigger className="w-full">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent className="bg-card border-border z-50">
+                        {BIBLE_TRANSLATIONS.map((trans) => (
+                          <SelectItem key={trans.value} value={trans.value}>
+                            {trans.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+
                   <div className="grid grid-cols-3 gap-4">
                     <div className="space-y-2">
                       <Label>Book</Label>
-                      <Select value={selectedBook} onValueChange={setSelectedBook}>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select book" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {BIBLE_BOOKS.map(book => (
-                            <SelectItem key={book} value={book}>{book}</SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
+                      <Popover open={bookSearchOpen} onOpenChange={setBookSearchOpen}>
+                        <PopoverTrigger asChild>
+                          <Button
+                            variant="outline"
+                            role="combobox"
+                            aria-expanded={bookSearchOpen}
+                            className="w-full justify-between"
+                          >
+                            {selectedBook || "Select book"}
+                            <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                          </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-[200px] p-0 bg-card border-border z-50">
+                          <Command>
+                            <CommandInput placeholder="Search books..." />
+                            <CommandList>
+                              <CommandEmpty>No book found.</CommandEmpty>
+                              <CommandGroup>
+                                {BIBLE_BOOKS.map((book) => (
+                                  <CommandItem
+                                    key={book}
+                                    value={book}
+                                    onSelect={() => {
+                                      setSelectedBook(book);
+                                      setBookSearchOpen(false);
+                                    }}
+                                  >
+                                    <Check
+                                      className={cn(
+                                        "mr-2 h-4 w-4",
+                                        selectedBook === book ? "opacity-100" : "opacity-0"
+                                      )}
+                                    />
+                                    {book}
+                                  </CommandItem>
+                                ))}
+                              </CommandGroup>
+                            </CommandList>
+                          </Command>
+                        </PopoverContent>
+                      </Popover>
                     </div>
                     
                     <div className="space-y-2">
