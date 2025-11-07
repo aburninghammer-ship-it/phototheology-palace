@@ -276,7 +276,7 @@ export default function Flashcards() {
                 <SelectTrigger className="w-[140px] bg-white/20 text-white border-white/40">
                   <SelectValue />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent className="bg-card border-border z-50">
                   {BIBLE_TRANSLATIONS.map((trans) => (
                     <SelectItem key={trans.value} value={trans.value}>
                       {trans.label}
