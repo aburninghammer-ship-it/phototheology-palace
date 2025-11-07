@@ -8,10 +8,12 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Switch } from "@/components/ui/switch";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
 import { Brain, Sparkles, Plus, Loader2, Trash2, Eye, ChevronLeft, ChevronRight } from "lucide-react";
 import { flashcardSetSchema, aiPromptSchema } from "@/lib/validationSchemas";
 import { sanitizeText } from "@/lib/sanitize";
+import { BIBLE_TRANSLATIONS } from "@/services/bibleApi";
 
 interface FlashcardSet {
   id: string;
@@ -41,6 +43,7 @@ export default function Flashcards() {
   const [studyCards, setStudyCards] = useState<Flashcard[]>([]);
   const [currentCardIndex, setCurrentCardIndex] = useState(0);
   const [showAnswer, setShowAnswer] = useState(false);
+  const [selectedTranslation, setSelectedTranslation] = useState("kjv");
 
   const [newSet, setNewSet] = useState({
     title: "",
@@ -258,13 +261,31 @@ export default function Flashcards() {
     return (
       <div className="min-h-screen bg-gradient-to-br from-purple-900 via-purple-800 to-indigo-900 flex items-center justify-center p-6">
         <div className="max-w-2xl w-full">
-          <Button
-            onClick={() => setStudyMode(false)}
-            variant="outline"
-            className="mb-4 bg-white/20 text-white border-white/40"
-          >
-            Exit Study Mode
-          </Button>
+          <div className="flex items-center justify-between mb-4">
+            <Button
+              onClick={() => setStudyMode(false)}
+              variant="outline"
+              className="bg-white/20 text-white border-white/40"
+            >
+              Exit Study Mode
+            </Button>
+            
+            <div className="flex items-center gap-2">
+              <label className="text-sm text-white">Bible Version:</label>
+              <Select value={selectedTranslation} onValueChange={setSelectedTranslation}>
+                <SelectTrigger className="w-[140px] bg-white/20 text-white border-white/40">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {BIBLE_TRANSLATIONS.map((trans) => (
+                    <SelectItem key={trans.value} value={trans.value}>
+                      {trans.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
 
           <Card className="bg-white/95 backdrop-blur-sm min-h-[400px] flex flex-col">
             <CardHeader>
