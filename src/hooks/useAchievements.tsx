@@ -7,6 +7,7 @@ export const useAchievements = () => {
   const { user } = useAuth();
   const { toast } = useToast();
   const [checking, setChecking] = useState(false);
+  const [unlockedAchievement, setUnlockedAchievement] = useState<any>(null);
 
   const checkAndAwardAchievements = async () => {
     if (!user || checking) return;
@@ -128,17 +129,15 @@ export const useAchievements = () => {
         .update({ points: (profile?.points || 0) + (achievement.points || 0) })
         .eq("id", user.id);
 
-      // Show notification
-      toast({
-        title: "🏆 Achievement Unlocked!",
-        description: `${achievement.icon || "🎉"} ${achievement.name} (+${achievement.points} points)`,
-        duration: 5000,
-      });
+      // Trigger animated notification
+      setUnlockedAchievement(achievement);
     }
   };
 
   return {
     checkAndAwardAchievements,
     unlockAchievement,
+    unlockedAchievement,
+    clearUnlockedAchievement: () => setUnlockedAchievement(null),
   };
 };

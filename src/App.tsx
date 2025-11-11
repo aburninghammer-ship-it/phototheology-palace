@@ -11,6 +11,7 @@ import { ProtectedRoute } from "./components/ProtectedRoute";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { MessagingSidebar } from "@/components/MessagingSidebar";
 import { LiveNotificationsProvider } from "@/components/LiveNotificationsProvider";
+import { AchievementProvider } from "@/components/AchievementProvider";
 
 // Critical pages - load immediately
 import Index from "./pages/Index";
@@ -124,11 +125,12 @@ function App() {
           <OfflineIndicator />
           <BrowserRouter>
             <LiveNotificationsProvider>
-              <SidebarProvider defaultOpen={false}>
-                <div className="min-h-screen flex w-full">
-                  <MessagingSidebar />
-                  <main className="flex-1 w-full overflow-x-hidden">
-                    <Suspense fallback={<LoadingScreen />}>
+              <AchievementProvider>
+                <SidebarProvider defaultOpen={false}>
+                  <div className="min-h-screen flex w-full">
+                    <MessagingSidebar />
+                    <main className="flex-1 w-full overflow-x-hidden">
+                      <Suspense fallback={<LoadingScreen />}>
                       <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/auth" element={<Auth />} />
@@ -249,10 +251,11 @@ function App() {
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                 <Route path="*" element={<NotFound />} />
                     </Routes>
-                  </Suspense>
-                </main>
-              </div>
-            </SidebarProvider>
+                    </Suspense>
+                  </main>
+                </div>
+              </SidebarProvider>
+              </AchievementProvider>
             </LiveNotificationsProvider>
           </BrowserRouter>
         </TooltipProvider>
