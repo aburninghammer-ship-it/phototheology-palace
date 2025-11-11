@@ -3,6 +3,12 @@ import { Footer } from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 import { 
   BookOpen, 
   Brain,
@@ -18,7 +24,8 @@ import {
   TrendingUp,
   Target,
   Search,
-  Layers
+  Layers,
+  HelpCircle
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
@@ -569,7 +576,131 @@ const Index = () => {
               </CardContent>
             </Card>
           </div>
-          
+        </div>
+      </section>
+
+      {/* FAQ Section */}
+      <section className="py-24 px-4 sm:px-6 lg:px-8 bg-muted/30">
+        <div className="max-w-4xl mx-auto">
+          <div className="text-center mb-16">
+            <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-primary/20 mb-4">
+              <HelpCircle className="w-8 h-8 text-primary" />
+            </div>
+            <h2 className="text-4xl md:text-5xl font-bold mb-4">Frequently Asked Questions</h2>
+            <p className="text-xl text-muted-foreground">
+              Everything you need to know about the Palace Method
+            </p>
+          </div>
+
+          <Accordion type="single" collapsible className="space-y-4">
+            <AccordionItem value="item-1" className="bg-background rounded-lg border px-6">
+              <AccordionTrigger className="text-left hover:no-underline">
+                <span className="font-semibold">What is the Palace Method?</span>
+              </AccordionTrigger>
+              <AccordionContent className="text-muted-foreground">
+                The Palace Method is a visual memory system for Bible study based on the ancient "memory palace" technique. 
+                Instead of trying to remember isolated verses or facts, you build a mental structure with 8 floors and multiple rooms—each 
+                teaching a specific skill like observation, Christ-centered interpretation, prophecy, and more. As you progress through 
+                the floors, the system becomes reflexive, allowing you to recall Scripture instantly and understand how everything connects.
+              </AccordionContent>
+            </AccordionItem>
+
+            <AccordionItem value="item-2" className="bg-background rounded-lg border px-6">
+              <AccordionTrigger className="text-left hover:no-underline">
+                <span className="font-semibold">How is this different from traditional Bible study?</span>
+              </AccordionTrigger>
+              <AccordionContent className="text-muted-foreground">
+                Traditional Bible study often involves reading, note-taking, and commentary without a unified system for retention or application. 
+                Phototheology provides a structured framework that combines memory techniques, visual learning, Christ-centered interpretation, 
+                and AI-guided practice. Instead of forgetting what you study by next week, you build a permanent mental library that grows 
+                stronger with use. Plus, our AI assistant (Jeeves) helps validate your insights and guide you through the method step-by-step.
+              </AccordionContent>
+            </AccordionItem>
+
+            <AccordionItem value="item-3" className="bg-background rounded-lg border px-6">
+              <AccordionTrigger className="text-left hover:no-underline">
+                <span className="font-semibold">Do I need to memorize the entire Bible?</span>
+              </AccordionTrigger>
+              <AccordionContent className="text-muted-foreground">
+                No! The goal isn't rote memorization of every verse. Instead, you learn to store key stories, patterns, and principles 
+                as visual anchors. Think of it like knowing your way around a familiar building—you don't memorize every brick, but you 
+                know where everything is and can find what you need instantly. The system helps you remember the structure and flow of 
+                Scripture, making deeper study and teaching much easier.
+              </AccordionContent>
+            </AccordionItem>
+
+            <AccordionItem value="item-4" className="bg-background rounded-lg border px-6">
+              <AccordionTrigger className="text-left hover:no-underline">
+                <span className="font-semibold">What's included in the free version?</span>
+              </AccordionTrigger>
+              <AccordionContent className="text-muted-foreground">
+                The free version includes full access to all 8 floors of the Palace Method, guided courses (Daniel, Revelation, Blueprint), 
+                basic AI assistance with Jeeves for study questions, interactive games and drills, and community features. You can learn 
+                the entire method and start building your palace without paying anything. Paid plans unlock advanced AI tools, sermon building, 
+                church admin features, and ministry resources.
+              </AccordionContent>
+            </AccordionItem>
+
+            <AccordionItem value="item-5" className="bg-background rounded-lg border px-6">
+              <AccordionTrigger className="text-left hover:no-underline">
+                <span className="font-semibold">Can I cancel my subscription anytime?</span>
+              </AccordionTrigger>
+              <AccordionContent className="text-muted-foreground">
+                Yes! There are no long-term contracts or cancellation fees. You can downgrade to the free plan or cancel your subscription 
+                at any time from your account settings. Even if you cancel, you'll retain access to your progress and the core Palace Method 
+                training—you'll just lose access to premium features like advanced AI tools and sermon builder.
+              </AccordionContent>
+            </AccordionItem>
+
+            <AccordionItem value="item-6" className="bg-background rounded-lg border px-6">
+              <AccordionTrigger className="text-left hover:no-underline">
+                <span className="font-semibold">Is this suitable for beginners?</span>
+              </AccordionTrigger>
+              <AccordionContent className="text-muted-foreground">
+                Absolutely! The Palace Method is designed to meet you where you are. Floor 1 starts with the basics—turning Bible stories 
+                into mental images. The AI assistant provides explanations at your level, and there's age-appropriate content for kids and teens. 
+                Whether you've never studied the Bible systematically or you're a seminary graduate, the structured approach helps you build 
+                from foundation to mastery at your own pace.
+              </AccordionContent>
+            </AccordionItem>
+
+            <AccordionItem value="item-7" className="bg-background rounded-lg border px-6">
+              <AccordionTrigger className="text-left hover:no-underline">
+                <span className="font-semibold">How long does it take to see results?</span>
+              </AccordionTrigger>
+              <AccordionContent className="text-muted-foreground">
+                Most users notice improved recall within the first week of practicing the Floor 1 techniques (Story Room, Imagination Room). 
+                By the time you reach Floor 4, many report being able to teach Scripture with new confidence. Full mastery (Floor 8, where 
+                the method becomes reflexive) typically takes 6-12 months of consistent practice—but you'll experience benefits at every stage. 
+                Think of it like learning an instrument: you can play simple songs early on, but true fluency comes with dedicated practice.
+              </AccordionContent>
+            </AccordionItem>
+
+            <AccordionItem value="item-8" className="bg-background rounded-lg border px-6">
+              <AccordionTrigger className="text-left hover:no-underline">
+                <span className="font-semibold">Can churches use this for group studies?</span>
+              </AccordionTrigger>
+              <AccordionContent className="text-muted-foreground">
+                Yes! Churches love Phototheology for group studies. The Church License includes admin dashboards to track member progress, 
+                ready-to-use curriculum for small groups and Sabbath School, campaign tools (like our Daniel or Revelation studies), and 
+                ministry launch resources. Pastors can assign content, monitor engagement, and identify emerging leaders. Many churches run 
+                church-wide campaigns where everyone progresses through the Palace together, creating a unified discipleship culture.
+              </AccordionContent>
+            </AccordionItem>
+          </Accordion>
+
+          <div className="mt-12 text-center">
+            <p className="text-muted-foreground mb-4">Still have questions?</p>
+            <Button variant="outline" size="lg" onClick={() => navigate("/feedback")}>
+              Contact Support
+            </Button>
+          </div>
+        </div>
+      </section>
+
+      {/* Final CTA */}
+      <section className="py-24 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-6xl mx-auto">
           <Card className="bg-primary text-primary-foreground border-0 p-8 text-center">
             <h3 className="text-3xl font-bold mb-4">Ready to Transform Your Bible Study?</h3>
             <p className="text-lg mb-6 opacity-90">
