@@ -5,6 +5,7 @@ import { Edit, Trash2, Download, Share2, Presentation } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import jsPDF from "jspdf";
 
 interface SeriesListProps {
   series: any[];
@@ -32,6 +33,81 @@ export const SeriesList = ({ series, onUpdate }: SeriesListProps) => {
     } catch (error: any) {
       console.error('Error deleting series:', error);
       toast.error('Failed to delete series');
+    }
+  };
+
+  const handleExport = async (seriesId: string, seriesTitle: string) => {
+    try {
+      const { data: lessons, error } = await supabase
+        .from('bible_study_lessons')
+        .select('*')
+        .eq('series_id', seriesId)
+        .order('lesson_number');
+
+      if (error) throw error;
+
+      const pdf = new jsPDF();
+      const pageWidth = pdf.internal.pageSize.getWidth();
+      const margin = 20;
+      let yPos = margin;
+
+      // Title
+      pdf.setFontSize(20);
+      pdf.text(seriesTitle, margin, yPos);
+      yPos += 15;
+
+      // Add each lesson
+      lessons?.forEach((lesson, index) => {
+        if (yPos > 250) {
+          pdf.addPage();
+          yPos = margin;
+        }
+
+        pdf.setFontSize(16);
+        pdf.text(`Lesson ${lesson.lesson_number}: ${lesson.title}`, margin, yPos);
+        yPos += 10;
+
+        pdf.setFontSize(12);
+        
+        // Big Idea
+        if (lesson.big_idea) {
+          pdf.setFont(undefined, 'bold');
+          pdf.text('Big Idea:', margin, yPos);
+          pdf.setFont(undefined, 'normal');
+          yPos += 7;
+          const bigIdeaText = pdf.splitTextToSize(lesson.big_idea, pageWidth - margin * 2);
+          pdf.text(bigIdeaText, margin, yPos);
+          yPos += (bigIdeaText.length * 7) + 5;
+        }
+
+        // Christ Emphasis
+        if (lesson.christ_emphasis) {
+          pdf.setFont(undefined, 'bold');
+          pdf.text('Christ Emphasis:', margin, yPos);
+          pdf.setFont(undefined, 'normal');
+          yPos += 7;
+          const christText = pdf.splitTextToSize(lesson.christ_emphasis, pageWidth - margin * 2);
+          pdf.text(christText, margin, yPos);
+          yPos += (christText.length * 7) + 5;
+        }
+
+        // Key Passages
+        if (lesson.key_passages) {
+          pdf.setFont(undefined, 'bold');
+          pdf.text('Key Passages:', margin, yPos);
+          pdf.setFont(undefined, 'normal');
+          yPos += 7;
+          const passagesText = pdf.splitTextToSize(lesson.key_passages, pageWidth - margin * 2);
+          pdf.text(passagesText, margin, yPos);
+          yPos += (passagesText.length * 7) + 10;
+        }
+      });
+
+      pdf.save(`${seriesTitle.replace(/[^a-z0-9]/gi, '_')}.pdf`);
+      toast.success('Series exported to PDF');
+    } catch (error: any) {
+      console.error('Error exporting series:', error);
+      toast.error('Failed to export series');
     }
   };
 
@@ -97,7 +173,7 @@ export const SeriesList = ({ series, onUpdate }: SeriesListProps) => {
               <Button
                 size="sm"
                 variant="outline"
-                onClick={() => {/* Export functionality to be added */}}
+                onClick={() => handleExport(s.id, s.title)}
               >
                 <Download className="h-4 w-4" />
               </Button>
