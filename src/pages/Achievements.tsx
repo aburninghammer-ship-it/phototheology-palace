@@ -8,8 +8,10 @@ import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
-import { Award, Lock, Share2, Grid3x3, List, Trophy } from "lucide-react";
+import { Award, Lock, Share2, Grid3x3, List, Trophy, FileText } from "lucide-react";
 import { ShareAchievementButton } from "@/components/ShareAchievementButton";
+import { AchievementProgress } from "@/components/AchievementProgress";
+import { AchievementCertificate } from "@/components/AchievementCertificate";
 import { useToast } from "@/hooks/use-toast";
 
 const Achievements = () => {
@@ -23,6 +25,15 @@ const Achievements = () => {
   const [filterType, setFilterType] = useState<"all" | "unlocked" | "locked">("all");
   const [viewMode, setViewMode] = useState<"gallery" | "list">("gallery");
   const [sortBy, setSortBy] = useState<"points" | "name">("points");
+  const [categoryFilter, setCategoryFilter] = useState<string>("all");
+  const [certificateAchievement, setCertificateAchievement] = useState<any>(null);
+  const [userStats, setUserStats] = useState({
+    roomsCompleted: 0,
+    drillsCompleted: 0,
+    perfectDrills: 0,
+    studyStreak: 0,
+    floorsCompleted: 0,
+  });
 
   useEffect(() => {
     if (user) {
@@ -35,6 +46,7 @@ const Achievements = () => {
     const { data } = await supabase
       .from("achievements")
       .select("*")
+      .order("category", { ascending: true })
       .order("points", { ascending: false });
     
     setAchievements(data || []);
@@ -48,18 +60,55 @@ const Achievements = () => {
     
     setUserAchievements(new Set(data?.map(a => a.achievement_id) || []));
     setUserAchievementData(data || []);
+
+    // Fetch user stats
+    const { data: roomProgress } = await supabase
+      .from("room_progress")
+      .select("floor_number")
+      .eq("user_id", user!.id)
+      .not("completed_at", "is", null);
+
+    const { data: drillResults } = await supabase
+      .from("drill_results")
+      .select("score, max_score")
+      .eq("user_id", user!.id);
+
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("daily_study_streak")
+      .eq("id", user!.id)
+      .single();
+
+    const uniqueFloors = new Set(roomProgress?.map(r => r.floor_number) || []);
+    const perfectCount = drillResults?.filter(d => d.score === d.max_score).length || 0;
+
+    setUserStats({
+      roomsCompleted: roomProgress?.length || 0,
+      drillsCompleted: drillResults?.length || 0,
+      perfectDrills: perfectCount,
+      studyStreak: profile?.daily_study_streak || 0,
+      floorsCompleted: uniqueFloors.size,
+    });
   };
 
   const filteredAchievements = achievements.filter((achievement) => {
     const isUnlocked = userAchievements.has(achievement.id);
     if (filterType === "unlocked") return isUnlocked;
     if (filterType === "locked") return !isUnlocked;
+    if (categoryFilter !== "all" && achievement.category !== categoryFilter) return false;
     return true;
   }).sort((a, b) => {
     if (sortBy === "points") return (b.points || 0) - (a.points || 0);
     if (sortBy === "name") return a.name.localeCompare(b.name);
     return 0;
   });
+
+  const categories = Array.from(new Set(achievements.map(a => a.category || 'general')));
+  const categoryStats = categories.map(cat => ({
+    category: cat,
+    total: achievements.filter(a => a.category === cat).length,
+    unlocked: achievements.filter(a => a.category === cat && userAchievements.has(a.id)).length,
+  }));
 
   const toggleSelection = (id: string) => {
     const newSelection = new Set(selectedIds);
@@ -153,6 +202,47 @@ const Achievements = () => {
       </div>
 
       <main className="container mx-auto px-4 py-8 max-w-7xl">
+        {/* Category Stats & Progress */}
+        <div className="mb-8 space-y-4">
+          {/* Category Cards */}
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
+            <Card 
+              className={`cursor-pointer transition-all ${
+                categoryFilter === "all" ? 'ring-2 ring-primary' : ''
+              }`}
+              onClick={() => setCategoryFilter('all')}
+            >
+              <CardContent className="p-3 text-center">
+                <div className="text-2xl font-bold text-primary">
+                  {userAchievements.size}/{achievements.length}
+                </div>
+                <div className="text-xs text-muted-foreground">All</div>
+              </CardContent>
+            </Card>
+            {categoryStats.map(stat => (
+              <Card 
+                key={stat.category}
+                className={`cursor-pointer transition-all ${
+                  categoryFilter === stat.category ? 'ring-2 ring-primary' : ''
+                }`}
+                onClick={() => setCategoryFilter(stat.category === categoryFilter ? 'all' : stat.category)}
+              >
+                <CardContent className="p-3 text-center">
+                  <div className="text-2xl font-bold text-primary">{stat.unlocked}/{stat.total}</div>
+                  <div className="text-xs text-muted-foreground capitalize">{stat.category}</div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+
+          {/* Achievement Progress */}
+          <AchievementProgress 
+            achievements={achievements}
+            userAchievements={userAchievementData}
+            userStats={userStats}
+          />
+        </div>
+
         {/* Filters and Controls */}
         <div className="mb-6 space-y-4">
           <div className="flex flex-wrap items-center justify-between gap-4">
@@ -330,11 +420,24 @@ const Achievements = () => {
                           +{achievement.points} pts
                         </Badge>
                         {isUnlocked && (
-                          <ShareAchievementButton
-                            achievement={achievement}
-                            variant="ghost"
-                            size="icon"
-                          />
+                          <>
+                            <ShareAchievementButton
+                              achievement={achievement}
+                              variant="ghost"
+                              size="icon"
+                            />
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setCertificateAchievement(achievement);
+                              }}
+                              title="Print Certificate"
+                            >
+                              <FileText className="h-4 w-4" />
+                            </Button>
+                          </>
                         )}
                       </div>
                     </div>
@@ -345,6 +448,15 @@ const Achievements = () => {
           </div>
         )}
       </main>
+
+      {/* Certificate Dialog */}
+      {certificateAchievement && (
+        <AchievementCertificate
+          open={!!certificateAchievement}
+          onClose={() => setCertificateAchievement(null)}
+          achievement={certificateAchievement}
+        />
+      )}
     </div>
   );
 };

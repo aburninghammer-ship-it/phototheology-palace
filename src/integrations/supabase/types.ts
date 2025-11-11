@@ -16,6 +16,7 @@ export type Database = {
     Tables: {
       achievements: {
         Row: {
+          category: string | null
           created_at: string | null
           description: string | null
           icon: string | null
@@ -26,6 +27,7 @@ export type Database = {
           requirement_type: string | null
         }
         Insert: {
+          category?: string | null
           created_at?: string | null
           description?: string | null
           icon?: string | null
@@ -36,6 +38,7 @@ export type Database = {
           requirement_type?: string | null
         }
         Update: {
+          category?: string | null
           created_at?: string | null
           description?: string | null
           icon?: string | null
