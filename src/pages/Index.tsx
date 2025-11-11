@@ -89,10 +89,10 @@ const Index = () => {
             <Button 
               size="lg" 
               variant="outline"
-              onClick={() => navigate("/app-tour")}
+              onClick={() => navigate("/interactive-demo")}
               className="text-lg px-8 py-6"
             >
-              Watch How It Works
+              Try Interactive Demo
             </Button>
           </div>
           
@@ -168,6 +168,27 @@ const Index = () => {
                   <Badge variant="secondary">Teaching Tools</Badge>
                   <Badge variant="secondary">Ministry Launch</Badge>
                 </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* CTA to try interactive demo */}
+          <div className="mt-12 text-center">
+            <Card className="bg-gradient-to-r from-primary/10 to-accent/10 border-primary/20">
+              <CardContent className="py-8">
+                <h3 className="text-2xl font-bold mb-3">Want to try it yourself?</h3>
+                <p className="text-muted-foreground mb-6 max-w-2xl mx-auto">
+                  Experience Floor 1 basics in our 5-minute interactive demo—no sign-up required
+                </p>
+                <Button 
+                  size="lg"
+                  onClick={() => navigate("/interactive-demo")}
+                  className="gap-2"
+                >
+                  <Sparkles className="h-5 w-5" />
+                  Try Interactive Demo
+                  <ChevronRight className="h-5 w-5" />
+                </Button>
               </CardContent>
             </Card>
           </div>
@@ -718,10 +739,10 @@ const Index = () => {
               <Button 
                 size="lg" 
                 variant="outline"
-                onClick={() => navigate("/app-tour")}
+                onClick={() => navigate("/interactive-demo")}
                 className="text-lg px-8 py-6 bg-transparent border-primary-foreground text-primary-foreground hover:bg-primary-foreground/10"
               >
-                Take the Tour
+                Try Demo First
               </Button>
             </div>
           </Card>

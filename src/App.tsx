@@ -17,6 +17,7 @@ import { AchievementProvider } from "@/components/AchievementProvider";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import Pricing from "./pages/Pricing";
+import InteractiveDemo from "./pages/InteractiveDemo";
 
 // Lazy load all other pages
 const Palace = lazy(() => import("./pages/Palace"));
@@ -131,9 +132,10 @@ function App() {
                     <MessagingSidebar />
                     <main className="flex-1 w-full overflow-x-hidden">
                       <Suspense fallback={<LoadingScreen />}>
-                      <Routes>
+                       <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/auth" element={<Auth />} />
+            <Route path="/interactive-demo" element={<InteractiveDemo />} />
             <Route path="/onboarding" element={
               <ProtectedRoute>
                 <Onboarding />
