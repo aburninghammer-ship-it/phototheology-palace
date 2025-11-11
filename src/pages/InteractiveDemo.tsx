@@ -18,11 +18,23 @@ import {
   CheckCircle2,
   Sparkles,
   Brain,
-  RotateCcw
+  RotateCcw,
+  HelpCircle
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { DemoCompletionCertificate } from "@/components/DemoCompletionCertificate";
 import { useToast } from "@/hooks/use-toast";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+
+const stepHints = {
+  0: "💡 Tip: Enter your name to get a personalized completion certificate, or click 'Next' to continue!",
+  1: "💡 Tip: Take your time to visualize the story like a movie. Close your eyes and see each scene play out. Then click 'Next' when ready!",
+  2: "💡 Tip: Try writing down what you imagined in the text box below, or click 'Next' to move forward!",
+  3: "💡 Tip: Try creating your own emoji/image for Genesis 6 (Noah's Ark) in the practice box below!",
+  4: "💡 Tip: Think of a verse you know and try to visualize it as a simple image. You can type your idea or just click 'Next'!",
+  5: "💡 Tip: Share how you would visualize a Bible story using what you've learned! Or click 'Next' to see your completion certificate.",
+  6: "💡 Tip: Ready to unlock all 8 floors? Click 'Create Your Free Account' to get started!",
+};
 
 const demoSteps = [
   {
@@ -155,6 +167,8 @@ export default function InteractiveDemo() {
   const [completedSteps, setCompletedSteps] = useState<number[]>([]);
   const [showCertificate, setShowCertificate] = useState(false);
   const [userName, setUserName] = useState("");
+  const [showHint, setShowHint] = useState(false);
+  const [lastInteractionTime, setLastInteractionTime] = useState(Date.now());
 
   const step = demoSteps[currentStep];
   const progress = ((currentStep + 1) / demoSteps.length) * 100;
@@ -192,7 +206,34 @@ export default function InteractiveDemo() {
     }
   }, [currentStep, completedSteps, userName]);
 
+  // Reset hint when step changes
+  useEffect(() => {
+    setShowHint(false);
+    setLastInteractionTime(Date.now());
+  }, [currentStep]);
+
+  // Track inactivity and show hint after 30 seconds
+  useEffect(() => {
+    const checkInactivity = setInterval(() => {
+      const timeSinceLastInteraction = Date.now() - lastInteractionTime;
+      
+      if (timeSinceLastInteraction > 30000 && !showHint) {
+        setShowHint(true);
+      }
+    }, 1000);
+
+    return () => clearInterval(checkInactivity);
+  }, [lastInteractionTime, showHint]);
+
+  // Track user interactions
+  const trackInteraction = () => {
+    setLastInteractionTime(Date.now());
+    setShowHint(false);
+  };
+
   const handleNext = () => {
+    trackInteraction();
+    
     // Mark current step as completed
     if (!completedSteps.includes(currentStep)) {
       setCompletedSteps([...completedSteps, currentStep]);
@@ -214,6 +255,8 @@ export default function InteractiveDemo() {
   };
 
   const handlePrevious = () => {
+    trackInteraction();
+    
     if (currentStep > 0) {
       setCurrentStep(currentStep - 1);
       setUserInput("");
@@ -318,6 +361,7 @@ export default function InteractiveDemo() {
                           onChange={(e) => {
                             setUserInput(e.target.value);
                             setUserName(e.target.value);
+                            trackInteraction();
                           }}
                           placeholder="Enter your name"
                           className="max-w-xs"
@@ -405,6 +449,7 @@ export default function InteractiveDemo() {
                         onChange={(e) => {
                           setUserInput(e.target.value);
                           setHasInteracted(true);
+                          trackInteraction();
                         }}
                         placeholder="Share what you experienced in your imagination..."
                         className="min-h-24"
@@ -449,6 +494,7 @@ export default function InteractiveDemo() {
                           onChange={(e) => {
                             setUserInput(e.target.value);
                             setHasInteracted(true);
+                            trackInteraction();
                           }}
                           placeholder="Example: 🚢🌊 (Ark on waves)"
                           className="flex-1"
@@ -499,6 +545,7 @@ export default function InteractiveDemo() {
                         onChange={(e) => {
                           setUserInput(e.target.value);
                           setHasInteracted(true);
+                          trackInteraction();
                         }}
                         placeholder="Example: For 'I can do all things through Christ' → 💪✝️ (Strength from the cross)"
                         className="min-h-20"
@@ -555,6 +602,7 @@ export default function InteractiveDemo() {
                         onChange={(e) => {
                           setUserInput(e.target.value);
                           setHasInteracted(true);
+                          trackInteraction();
                         }}
                         placeholder="Example: 'The Good Samaritan - I see a beaten traveler on the road, religious leaders walking past, then a Samaritan stopping with compassion...'"
                         className="min-h-32"
@@ -623,6 +671,25 @@ export default function InteractiveDemo() {
                 )}
               </CardContent>
             </Card>
+
+            {/* Inactivity Hint */}
+            <AnimatePresence>
+              {showHint && (
+                <motion.div
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  transition={{ duration: 0.3 }}
+                >
+                  <Alert className="mb-6 bg-primary/5 border-primary/20">
+                    <HelpCircle className="h-4 w-4" />
+                    <AlertDescription>
+                      {stepHints[currentStep as keyof typeof stepHints]}
+                    </AlertDescription>
+                  </Alert>
+                </motion.div>
+              )}
+            </AnimatePresence>
 
             {/* Navigation */}
             <div className="flex items-center justify-between">
