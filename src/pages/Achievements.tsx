@@ -2,15 +2,27 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Navigation } from "@/components/Navigation";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Badge } from "@/components/ui/badge";
+import { Checkbox } from "@/components/ui/checkbox";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
-import { Award, Lock } from "lucide-react";
+import { Award, Lock, Share2, Grid3x3, List, Trophy } from "lucide-react";
+import { ShareAchievementButton } from "@/components/ShareAchievementButton";
+import { useToast } from "@/hooks/use-toast";
 
 const Achievements = () => {
   const { user, loading } = useAuth();
   const navigate = useNavigate();
+  const { toast } = useToast();
   const [achievements, setAchievements] = useState<any[]>([]);
   const [userAchievements, setUserAchievements] = useState<Set<string>>(new Set());
+  const [userAchievementData, setUserAchievementData] = useState<any[]>([]);
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [filterType, setFilterType] = useState<"all" | "unlocked" | "locked">("all");
+  const [viewMode, setViewMode] = useState<"gallery" | "list">("gallery");
+  const [sortBy, setSortBy] = useState<"points" | "name">("points");
 
   useEffect(() => {
     if (user) {
@@ -35,6 +47,52 @@ const Achievements = () => {
       .eq("user_id", user!.id);
     
     setUserAchievements(new Set(data?.map(a => a.achievement_id) || []));
+    setUserAchievementData(data || []);
+  };
+
+  const filteredAchievements = achievements.filter((achievement) => {
+    const isUnlocked = userAchievements.has(achievement.id);
+    if (filterType === "unlocked") return isUnlocked;
+    if (filterType === "locked") return !isUnlocked;
+    return true;
+  }).sort((a, b) => {
+    if (sortBy === "points") return (b.points || 0) - (a.points || 0);
+    if (sortBy === "name") return a.name.localeCompare(b.name);
+    return 0;
+  });
+
+  const toggleSelection = (id: string) => {
+    const newSelection = new Set(selectedIds);
+    if (newSelection.has(id)) {
+      newSelection.delete(id);
+    } else {
+      if (userAchievements.has(id)) {
+        newSelection.add(id);
+      }
+    }
+    setSelectedIds(newSelection);
+  };
+
+  const selectAllUnlocked = () => {
+    setSelectedIds(new Set(Array.from(userAchievements)));
+  };
+
+  const clearSelection = () => {
+    setSelectedIds(new Set());
+  };
+
+  const bulkShare = () => {
+    const selectedAchievements = achievements.filter(a => selectedIds.has(a.id));
+    const achievementNames = selectedAchievements.map(a => a.name).join(", ");
+    const totalPoints = selectedAchievements.reduce((sum, a) => sum + (a.points || 0), 0);
+    
+    const text = `Just unlocked ${selectedIds.size} achievements on Phototheology Palace! 🎉\n\n${achievementNames}\n\n+${totalPoints} points earned!\n\n${window.location.origin}/achievements`;
+    
+    navigator.clipboard.writeText(text);
+    toast({
+      title: "Copied to clipboard!",
+      description: `Share text for ${selectedIds.size} achievements ready to paste.`,
+    });
   };
 
   if (!user) return null;
@@ -94,62 +152,198 @@ const Achievements = () => {
         </div>
       </div>
 
-      <main className="container mx-auto px-4 py-8">
-        <div className="max-w-6xl mx-auto space-y-8">
+      <main className="container mx-auto px-4 py-8 max-w-7xl">
+        {/* Filters and Controls */}
+        <div className="mb-6 space-y-4">
+          <div className="flex flex-wrap items-center justify-between gap-4">
+            <Tabs value={filterType} onValueChange={(v: any) => setFilterType(v)} className="w-auto">
+              <TabsList>
+                <TabsTrigger value="all" className="gap-2">
+                  <Award className="h-4 w-4" />
+                  All ({achievements.length})
+                </TabsTrigger>
+                <TabsTrigger value="unlocked" className="gap-2">
+                  <Trophy className="h-4 w-4" />
+                  Unlocked ({userAchievements.size})
+                </TabsTrigger>
+                <TabsTrigger value="locked" className="gap-2">
+                  <Lock className="h-4 w-4" />
+                  Locked ({achievements.length - userAchievements.size})
+                </TabsTrigger>
+              </TabsList>
+            </Tabs>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {achievements.map((achievement) => {
+            <div className="flex items-center gap-2">
+              <Button
+                variant={viewMode === "gallery" ? "default" : "outline"}
+                size="sm"
+                onClick={() => setViewMode("gallery")}
+              >
+                <Grid3x3 className="h-4 w-4" />
+              </Button>
+              <Button
+                variant={viewMode === "list" ? "default" : "outline"}
+                size="sm"
+                onClick={() => setViewMode("list")}
+              >
+                <List className="h-4 w-4" />
+              </Button>
+
+              <div className="h-6 w-px bg-border mx-2" />
+
+              <select
+                value={sortBy}
+                onChange={(e) => setSortBy(e.target.value as any)}
+                className="h-9 rounded-md border border-input bg-background px-3 text-sm"
+              >
+                <option value="points">Points</option>
+                <option value="name">Name</option>
+              </select>
+            </div>
+          </div>
+
+          {/* Bulk Actions */}
+          {selectedIds.size > 0 && (
+            <div className="flex items-center justify-between p-4 bg-primary/10 rounded-lg border border-primary/20">
+              <div className="flex items-center gap-3">
+                <Badge variant="secondary" className="text-base px-3 py-1">
+                  {selectedIds.size} selected
+                </Badge>
+                <Button variant="outline" size="sm" onClick={clearSelection}>
+                  Clear
+                </Button>
+                <Button variant="outline" size="sm" onClick={selectAllUnlocked}>
+                  Select All Unlocked
+                </Button>
+              </div>
+              <Button onClick={bulkShare} className="gap-2">
+                <Share2 className="h-4 w-4" />
+                Share Selected
+              </Button>
+            </div>
+          )}
+        </div>
+
+        {/* Achievement Grid/List */}
+        {filteredAchievements.length === 0 ? (
+          <div className="text-center py-12 text-muted-foreground">
+            No achievements found matching your filters.
+          </div>
+        ) : viewMode === "gallery" ? (
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+            {filteredAchievements.map((achievement) => {
               const isUnlocked = userAchievements.has(achievement.id);
+              const isSelected = selectedIds.has(achievement.id);
+
               return (
                 <Card
                   key={achievement.id}
-                  className={`transition-all ${
+                  className={`transition-all cursor-pointer ${
                     isUnlocked 
-                      ? "border-2 border-yellow-500 bg-gradient-to-br from-yellow-50 to-amber-50 dark:from-yellow-900/20 dark:to-amber-900/20 shadow-lg" 
-                      : "opacity-50 grayscale"
-                  }`}
+                      ? "border-2 border-yellow-500/50 bg-gradient-to-br from-yellow-50 to-amber-50 dark:from-yellow-900/20 dark:to-amber-900/20" 
+                      : "opacity-60 grayscale hover:opacity-70"
+                  } ${isSelected ? "ring-2 ring-primary shadow-lg" : ""}`}
+                  onClick={() => isUnlocked && toggleSelection(achievement.id)}
                 >
-                  <CardHeader>
-                    <CardTitle className="flex items-center justify-between">
-                      <div className="flex items-center gap-3">
-                        <div className={`text-4xl ${isUnlocked ? '' : 'grayscale opacity-50'}`}>
-                          {achievement.icon || '🏆'}
-                        </div>
-                        <span className="text-lg">{achievement.name}</span>
-                      </div>
-                      {isUnlocked ? (
-                        <Award className="h-6 w-6 text-yellow-500" />
-                      ) : (
-                        <Lock className="h-6 w-6 text-muted-foreground" />
-                      )}
-                    </CardTitle>
-                    <CardDescription className="text-base pl-14">
-                      {achievement.description}
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent className="pl-14">
-                    <div className="flex items-center justify-between">
-                      <p className="text-sm font-semibold text-purple-600 dark:text-purple-400">
-                        +{achievement.points} points
-                      </p>
+                  <CardHeader className="space-y-3">
+                    <div className="flex items-start justify-between">
+                      <div className="text-5xl mb-2">{achievement.icon || '🏆'}</div>
                       {isUnlocked && (
-                        <p className="text-xs text-muted-foreground">
-                          ✓ Unlocked
-                        </p>
+                        <Checkbox
+                          checked={isSelected}
+                          onCheckedChange={() => toggleSelection(achievement.id)}
+                          onClick={(e) => e.stopPropagation()}
+                        />
                       )}
+                    </div>
+                    <div>
+                      <CardTitle className="text-lg flex items-center gap-2">
+                        {achievement.name}
+                        {isUnlocked ? (
+                          <Award className="h-4 w-4 text-yellow-600" />
+                        ) : (
+                          <Lock className="h-4 w-4 text-muted-foreground" />
+                        )}
+                      </CardTitle>
+                      <CardDescription className="text-sm mt-2">
+                        {achievement.description}
+                      </CardDescription>
+                    </div>
+                  </CardHeader>
+                  <CardContent className="space-y-3">
+                    <div className="flex items-center justify-between">
+                      <Badge variant="secondary" className="font-semibold">
+                        +{achievement.points} pts
+                      </Badge>
+                    </div>
+                    {isUnlocked && (
+                      <ShareAchievementButton
+                        achievement={achievement}
+                        variant="outline"
+                        size="sm"
+                      />
+                    )}
+                  </CardContent>
+                </Card>
+              );
+            })}
+          </div>
+        ) : (
+          <div className="space-y-2">
+            {filteredAchievements.map((achievement) => {
+              const isUnlocked = userAchievements.has(achievement.id);
+              const isSelected = selectedIds.has(achievement.id);
+
+              return (
+                <Card
+                  key={achievement.id}
+                  className={`transition-all cursor-pointer ${
+                    isUnlocked 
+                      ? "border-l-4 border-l-yellow-500 hover:shadow-md" 
+                      : "opacity-60 grayscale"
+                  } ${isSelected ? "ring-2 ring-primary" : ""}`}
+                  onClick={() => isUnlocked && toggleSelection(achievement.id)}
+                >
+                  <CardContent className="p-4">
+                    <div className="flex items-center gap-4">
+                      {isUnlocked && (
+                        <Checkbox
+                          checked={isSelected}
+                          onCheckedChange={() => toggleSelection(achievement.id)}
+                          onClick={(e) => e.stopPropagation()}
+                        />
+                      )}
+                      <div className="text-3xl">{achievement.icon || '🏆'}</div>
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2 mb-1">
+                          <h3 className="font-semibold">{achievement.name}</h3>
+                          {isUnlocked ? (
+                            <Award className="h-4 w-4 text-yellow-600" />
+                          ) : (
+                            <Lock className="h-4 w-4 text-muted-foreground" />
+                          )}
+                        </div>
+                        <p className="text-sm text-muted-foreground">{achievement.description}</p>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <Badge variant="secondary" className="font-semibold">
+                          +{achievement.points} pts
+                        </Badge>
+                        {isUnlocked && (
+                          <ShareAchievementButton
+                            achievement={achievement}
+                            variant="ghost"
+                            size="icon"
+                          />
+                        )}
+                      </div>
                     </div>
                   </CardContent>
                 </Card>
               );
             })}
           </div>
-
-          {achievements.length === 0 && (
-            <div className="text-center py-12 text-muted-foreground">
-              No achievements available yet. Check back soon!
-            </div>
-          )}
-        </div>
+        )}
       </main>
     </div>
   );
