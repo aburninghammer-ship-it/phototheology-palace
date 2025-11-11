@@ -1,10 +1,13 @@
 import { useEffect, useState } from "react";
 import { Alert, AlertDescription } from "./ui/alert";
-import { WifiOff, Wifi } from "lucide-react";
+import { WifiOff, Wifi, Database } from "lucide-react";
+import { Button } from "./ui/button";
+import { useNavigate } from "react-router-dom";
 
 export const OfflineIndicator = () => {
   const [isOnline, setIsOnline] = useState(navigator.onLine);
   const [wasOffline, setWasOffline] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const handleOnline = () => {
@@ -42,9 +45,20 @@ export const OfflineIndicator = () => {
           ) : (
             <>
               <WifiOff className="h-4 w-4" />
-              <AlertDescription>
-                You're offline. Some features may not work.
-              </AlertDescription>
+              <div className="flex-1">
+                <AlertDescription className="mb-2">
+                  You're offline. Using cached content.
+                </AlertDescription>
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  onClick={() => navigate('/offline-manager')}
+                  className="w-full"
+                >
+                  <Database className="h-3 w-3 mr-2" />
+                  Manage Offline Content
+                </Button>
+              </div>
             </>
           )}
         </div>

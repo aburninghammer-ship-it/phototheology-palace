@@ -19,6 +19,7 @@ import Auth from "./pages/Auth";
 import Pricing from "./pages/Pricing";
 import InteractiveDemo from "./pages/InteractiveDemo";
 import Install from "./pages/Install";
+import OfflineManager from "./pages/OfflineManager";
 
 // Lazy load all other pages
 const Palace = lazy(() => import("./pages/Palace"));
@@ -137,6 +138,7 @@ function App() {
             <Route path="/" element={<Index />} />
             <Route path="/auth" element={<Auth />} />
             <Route path="/install" element={<Install />} />
+            <Route path="/offline-manager" element={<OfflineManager />} />
             <Route path="/interactive-demo" element={<InteractiveDemo />} />
             <Route path="/onboarding" element={
               <ProtectedRoute>
