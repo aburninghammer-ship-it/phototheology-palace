@@ -4,7 +4,7 @@ import { fetchChapter, Translation } from "@/services/bibleApi";
 import { Chapter } from "@/types/bible";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ChevronLeft, ChevronRight, BookOpen, Loader2, Link2, MessageSquare, Bot, Bookmark, Sparkles } from "lucide-react";
+import { ChevronLeft, ChevronRight, BookOpen, Loader2, Link2, MessageSquare, Bot, Bookmark, Sparkles, Upload } from "lucide-react";
 import { VerseView } from "./VerseView";
 import { StrongsVerseView } from "./StrongsVerseView";
 import { PrinciplePanel } from "./PrinciplePanel";
@@ -18,6 +18,7 @@ import { useReadingHistory } from "@/hooks/useReadingHistory";
 import { useBookmarks } from "@/hooks/useBookmarks";
 import { useUserPreferences } from "@/hooks/useUserPreferences";
 import { useErrorHandler } from "@/hooks/useErrorHandler";
+import { ImportPassageDialog } from "@/components/series-builder/ImportPassageDialog";
 
 export const BibleReader = () => {
   const { book = "John", chapter: chapterParam = "3" } = useParams();
@@ -35,6 +36,7 @@ export const BibleReader = () => {
   const [jeevesMode, setJeevesMode] = useState(false);
   const [strongsMode, setStrongsMode] = useState(false);
   const [highlightedVerses, setHighlightedVerses] = useState<number[]>([]);
+  const [importDialogOpen, setImportDialogOpen] = useState(false);
   
   const { trackReading } = useReadingHistory();
   const { addBookmark, isBookmarked } = useBookmarks();
@@ -263,7 +265,25 @@ export const BibleReader = () => {
           <Bot className="h-4 w-4 mr-2" />
           Ask Jeeves
         </Button>
+        {selectedVerse && (
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setImportDialogOpen(true)}
+            className="gradient-palace"
+          >
+            <Upload className="h-4 w-4 mr-2" />
+            Import to Lesson
+          </Button>
+        )}
       </div>
+
+      <ImportPassageDialog
+        open={importDialogOpen}
+        onOpenChange={setImportDialogOpen}
+        passage={`${book} ${chapter}:${selectedVerse}`}
+        verseText={selectedVerse ? chapterData.verses.find(v => v.verse === selectedVerse)?.text || "" : ""}
+      />
 
       <div className="grid lg:grid-cols-3 gap-6">
         {/* Main Reading Pane */}
