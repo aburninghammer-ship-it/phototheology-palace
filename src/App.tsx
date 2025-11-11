@@ -99,6 +99,7 @@ const DimensionsRoom = lazy(() => import("./pages/games/DimensionsRoom"));
 const BlueRoomGame = lazy(() => import("./pages/games/BlueRoomGame"));
 const PublicImageLibrary = lazy(() => import("./pages/PublicImageLibrary"));
 const BibleStudyLeader = lazy(() => import("./pages/BibleStudyLeader"));
+const BibleStudySeriesBuilder = lazy(() => import("./pages/BibleStudySeriesBuilder"));
 const AppUpdateIdeas = lazy(() => import("./pages/AppUpdateIdeas"));
 const ChurchAdmin = lazy(() => import("./pages/ChurchAdmin"));
 const JoinChurch = lazy(() => import("./pages/JoinChurch"));
@@ -221,7 +222,8 @@ function App() {
           <Route path="/daniel-revelation-gpt" element={<ProtectedRoute><DanielRevelationGPT /></ProtectedRoute>} />
           <Route path="/apologetics-gpt" element={<ProtectedRoute><ApologeticsGPT /></ProtectedRoute>} />
           <Route path="/quarterly-study" element={<ProtectedRoute><QuarterlyStudy /></ProtectedRoute>} />
-          <Route path="/bible-study-leader" element={<ProtectedRoute><BibleStudyLeader /></ProtectedRoute>} />
+           <Route path="/bible-study-leader" element={<ProtectedRoute><BibleStudyLeader /></ProtectedRoute>} />
+           <Route path="/bible-study-series-builder" element={<ProtectedRoute><BibleStudySeriesBuilder /></ProtectedRoute>} />
             <Route path="/public-image-library" element={<ProtectedRoute><PublicImageLibrary /></ProtectedRoute>} />
             <Route path="/app-update-ideas" element={<ProtectedRoute><AppUpdateIdeas /></ProtectedRoute>} />
             <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />

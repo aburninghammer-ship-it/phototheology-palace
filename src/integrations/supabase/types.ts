@@ -119,6 +119,119 @@ export type Database = {
         }
         Relationships: []
       }
+      bible_study_lessons: {
+        Row: {
+          big_idea: string | null
+          christ_emphasis: string | null
+          core_points: string[] | null
+          created_at: string | null
+          discussion_questions: string[] | null
+          id: string
+          key_passages: string | null
+          key_rooms: string[] | null
+          lesson_number: number
+          main_floors: string[] | null
+          palace_activity: string | null
+          palace_mapping_notes: string | null
+          series_id: string
+          take_home_challenge: string | null
+          title: string
+          updated_at: string | null
+        }
+        Insert: {
+          big_idea?: string | null
+          christ_emphasis?: string | null
+          core_points?: string[] | null
+          created_at?: string | null
+          discussion_questions?: string[] | null
+          id?: string
+          key_passages?: string | null
+          key_rooms?: string[] | null
+          lesson_number: number
+          main_floors?: string[] | null
+          palace_activity?: string | null
+          palace_mapping_notes?: string | null
+          series_id: string
+          take_home_challenge?: string | null
+          title: string
+          updated_at?: string | null
+        }
+        Update: {
+          big_idea?: string | null
+          christ_emphasis?: string | null
+          core_points?: string[] | null
+          created_at?: string | null
+          discussion_questions?: string[] | null
+          id?: string
+          key_passages?: string | null
+          key_rooms?: string[] | null
+          lesson_number?: number
+          main_floors?: string[] | null
+          palace_activity?: string | null
+          palace_mapping_notes?: string | null
+          series_id?: string
+          take_home_challenge?: string | null
+          title?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "bible_study_lessons_series_id_fkey"
+            columns: ["series_id"]
+            isOneToOne: false
+            referencedRelation: "bible_study_series"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      bible_study_series: {
+        Row: {
+          audience_type: string
+          context: string
+          created_at: string | null
+          description: string | null
+          id: string
+          is_template: boolean | null
+          lesson_count: number
+          primary_goal: string
+          status: string | null
+          theme_subject: string
+          title: string
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          audience_type: string
+          context: string
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          is_template?: boolean | null
+          lesson_count: number
+          primary_goal: string
+          status?: string | null
+          theme_subject: string
+          title: string
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          audience_type?: string
+          context?: string
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          is_template?: boolean | null
+          lesson_count?: number
+          primary_goal?: string
+          status?: string | null
+          theme_subject?: string
+          title?: string
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       bible_verses_tokenized: {
         Row: {
           book: string
