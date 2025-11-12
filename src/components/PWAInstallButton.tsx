@@ -14,6 +14,28 @@ export function PWAInstallButton() {
   const [isIOS, setIsIOS] = useState(false);
 
   useEffect(() => {
+    // Check if already installed
+    const isStandalone = window.matchMedia('(display-mode: standalone)').matches;
+    
+    // If already installed, don't show the button
+    if (isStandalone) {
+      setIsInstallable(false);
+      return;
+    }
+
+    // Check if iOS
+    const isIOSDevice = /iPad|iPhone|iPod/.test(navigator.userAgent) && !(window as any).MSStream;
+    setIsIOS(isIOSDevice);
+    
+    // Check if mobile
+    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    
+    // Always show on mobile devices (iOS or Android)
+    if (isMobile) {
+      setIsInstallable(true);
+    }
+
+    // Listen for install prompt event (Android)
     const handler = (e: Event) => {
       e.preventDefault();
       setDeferredPrompt(e as BeforeInstallPromptEvent);
@@ -21,23 +43,6 @@ export function PWAInstallButton() {
     };
 
     window.addEventListener('beforeinstallprompt', handler);
-
-    // Check if already installed
-    const isStandalone = window.matchMedia('(display-mode: standalone)').matches;
-    
-    // Check if iOS
-    const isIOSDevice = /iPad|iPhone|iPod/.test(navigator.userAgent) && !(window as any).MSStream;
-    setIsIOS(isIOSDevice);
-    
-    // Show button for iOS devices (unless already installed)
-    if (isIOSDevice && !isStandalone) {
-      setIsInstallable(true);
-    }
-
-    if (isStandalone) {
-      setIsInstallable(false);
-    }
-
     return () => window.removeEventListener('beforeinstallprompt', handler);
   }, []);
 
