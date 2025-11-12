@@ -63,25 +63,31 @@ export function PWAInstallButton() {
   const handleInstall = async () => {
     console.log('Install button clicked', { isIOS, hasDeferredPrompt: !!deferredPrompt });
     
-    // If we have the native prompt, use it
-    if (deferredPrompt && !isIOS) {
+    // If we have the native prompt (Chrome/Edge desktop & Android), trigger it automatically
+    if (deferredPrompt) {
       try {
-        console.log('Triggering install prompt');
+        console.log('Triggering native browser install prompt');
         await deferredPrompt.prompt();
         const { outcome } = await deferredPrompt.userChoice;
         console.log('Install prompt outcome:', outcome);
 
         if (outcome === 'accepted') {
+          console.log('User accepted the install prompt');
           setDeferredPrompt(null);
           setIsInstallable(false);
+        } else {
+          console.log('User dismissed the install prompt');
         }
       } catch (error) {
         console.error('Error showing install prompt:', error);
+        // If native prompt fails, show instructions as fallback
+        setShowInstructions(true);
       }
       return;
     }
 
-    // Otherwise show instructions dialog
+    // Fallback: show manual instructions for browsers that don't support automatic install
+    console.log('No native install prompt available, showing manual instructions');
     setShowInstructions(true);
   };
 
