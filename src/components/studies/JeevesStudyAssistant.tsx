@@ -41,7 +41,7 @@ export const JeevesStudyAssistant = ({ studyContext }: JeevesStudyAssistantProps
       const { data, error } = await supabase.functions.invoke("jeeves", {
         body: {
           mode: researchMode ? "research" : "qa",
-          question: userMessage,
+          ...(researchMode ? { query: userMessage } : { question: userMessage }),
           context: studyContext || "General Bible study assistance",
           conversationHistory: messages, // Send previous messages for context
         },
