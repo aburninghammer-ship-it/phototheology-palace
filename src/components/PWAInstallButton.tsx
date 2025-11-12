@@ -42,9 +42,9 @@ export function PWAInstallButton() {
       userAgent: navigator.userAgent 
     });
     
-    // Always show on mobile devices (iOS or Android) unless already installed
-    if (isMobile && !isStandalone) {
-      console.log('Showing install button for mobile device');
+    // Show on all devices unless already installed - PWAs work on desktop too!
+    if (!isStandalone) {
+      console.log('Showing install button - app not yet installed');
       setIsInstallable(true);
     }
 
