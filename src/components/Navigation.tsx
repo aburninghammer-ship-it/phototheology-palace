@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { Building2, Sparkles, Users, User, CreditCard, LogOut, MessageCircle } from "lucide-react";
+import { Building2, Sparkles, Users, User, CreditCard, LogOut, MessageCircle, Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
 import { useActiveUsers } from "@/hooks/useActiveUsers";
@@ -90,6 +90,13 @@ export const Navigation = () => {
                       <Link to="/series-builder">Series Builder</Link>
                     </Button>
                     
+                    <Button asChild size="sm" className="gap-2 bg-gradient-to-r from-primary to-accent text-primary-foreground hover:opacity-90">
+                      <Link to="/install">
+                        <Download className="h-4 w-4" />
+                        Download App
+                      </Link>
+                    </Button>
+                    
                     {/* Account Dropdown */}
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
@@ -143,6 +150,13 @@ export const Navigation = () => {
                     
                     <Button variant="ghost" asChild size="sm">
                       <Link to="/series-builder">Series Builder</Link>
+                    </Button>
+                    
+                    <Button asChild size="sm" variant="outline" className="gap-2">
+                      <Link to="/install">
+                        <Download className="h-4 w-4" />
+                        Download App
+                      </Link>
                     </Button>
                     
                     <Button asChild size="sm">

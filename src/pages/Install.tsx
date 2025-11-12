@@ -43,17 +43,19 @@ export default function Install() {
   };
 
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center p-4">
-      <Card className="max-w-md w-full p-8 text-center space-y-6">
+    <div className="min-h-screen bg-gradient-to-br from-primary/5 via-background to-accent/5 flex items-center justify-center p-4">
+      <Card className="max-w-md w-full p-8 text-center space-y-6 border-2 shadow-2xl">
         <div className="flex justify-center">
-          <div className="w-20 h-20 bg-primary/10 rounded-2xl flex items-center justify-center">
-            <Smartphone className="w-10 h-10 text-primary" />
+          <div className="w-24 h-24 bg-gradient-to-br from-primary to-accent rounded-2xl flex items-center justify-center shadow-lg">
+            <Smartphone className="w-12 h-12 text-white" />
           </div>
         </div>
 
         <div className="space-y-2">
-          <h1 className="text-3xl font-bold">Install Phototheology</h1>
-          <p className="text-muted-foreground">
+          <h1 className="text-4xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+            Install Phototheology
+          </h1>
+          <p className="text-lg text-muted-foreground">
             Get the full app experience on your device
           </p>
         </div>

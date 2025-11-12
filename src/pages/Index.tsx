@@ -25,7 +25,9 @@ import {
   Target,
   Search,
   Layers,
-  HelpCircle
+  HelpCircle,
+  Download,
+  Smartphone
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
@@ -64,6 +66,31 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-background">
       <Navigation />
+      
+      {/* Download App Banner */}
+      <div className="bg-gradient-to-r from-primary via-primary/90 to-accent py-3 px-4">
+        <div className="max-w-7xl mx-auto flex items-center justify-between flex-wrap gap-3">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-lg bg-white/20 flex items-center justify-center">
+              <Smartphone className="w-6 h-6 text-white" />
+            </div>
+            <div className="text-white">
+              <p className="font-semibold text-sm sm:text-base">Get the Phototheology App</p>
+              <p className="text-xs sm:text-sm text-white/90">Works offline • Fast loading • Home screen icon</p>
+            </div>
+          </div>
+          <Button 
+            asChild 
+            size="sm" 
+            className="bg-white text-primary hover:bg-white/90 gap-2 shadow-lg"
+          >
+            <Link to="/install">
+              <Download className="h-4 w-4" />
+              Download Now
+            </Link>
+          </Button>
+        </div>
+      </div>
       
       {/* Hero Section - Pain First */}
       <section className="relative overflow-hidden pt-32 pb-24 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-primary/5 via-background to-accent/5">
