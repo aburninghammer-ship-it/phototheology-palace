@@ -41,6 +41,19 @@ export function useLiveNotifications() {
           duration: 5000,
         });
       })
+      .on('broadcast', { event: 'daily-challenge' }, (payload) => {
+        const notification = payload.payload as any;
+        
+        // Show daily challenge notification
+        toast(notification.message, {
+          description: notification.title,
+          action: notification.link ? {
+            label: "Take Challenge",
+            onClick: () => navigate(notification.link)
+          } : undefined,
+          duration: 8000,
+        });
+      })
       .subscribe((status) => {
         if (status === 'SUBSCRIBED') {
           console.log('✅ Subscribed to live notifications');
