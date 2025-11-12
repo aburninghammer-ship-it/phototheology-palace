@@ -59,6 +59,8 @@ export function PWAInstallButton() {
   }, []);
 
   const handleInstall = async () => {
+    console.log('Install button clicked', { isIOS, hasDeferredPrompt: !!deferredPrompt });
+    
     if (isIOS) {
       // Show iOS install instructions
       alert('To install this app on iOS:\n\n1. Tap the Share button (box with arrow) at the bottom\n2. Scroll down and tap "Add to Home Screen"\n3. Tap "Add" in the top right');
@@ -66,17 +68,24 @@ export function PWAInstallButton() {
     }
 
     if (!deferredPrompt) {
+      console.log('No deferred prompt available, showing manual instructions');
       // For browsers that don't support the install prompt
       alert('To install this app:\n\n1. Open your browser menu (3 dots)\n2. Look for "Install app" or "Add to Home Screen"\n3. Follow the prompts to install');
       return;
     }
 
-    deferredPrompt.prompt();
-    const { outcome } = await deferredPrompt.userChoice;
+    try {
+      console.log('Triggering install prompt');
+      await deferredPrompt.prompt();
+      const { outcome } = await deferredPrompt.userChoice;
+      console.log('Install prompt outcome:', outcome);
 
-    if (outcome === 'accepted') {
-      setDeferredPrompt(null);
-      setIsInstallable(false);
+      if (outcome === 'accepted') {
+        setDeferredPrompt(null);
+        setIsInstallable(false);
+      }
+    } catch (error) {
+      console.error('Error showing install prompt:', error);
     }
   };
 
