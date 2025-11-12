@@ -160,8 +160,8 @@ export const MessagingSidebar = () => {
 
         {/* Split Layout */}
         <div className="flex-1 flex overflow-hidden">
-          {/* Left Panel - User List */}
-          <div className="w-full md:w-72 lg:w-80 border-r flex flex-col md:block hidden">
+          {/* Left Panel - User List - Show on mobile when no active conversation */}
+          <div className={`w-full md:w-72 lg:w-80 md:border-r flex flex-col ${activeConversationId && !isMobile ? 'hidden md:flex' : isMobile && activeConversationId ? 'hidden' : 'flex'}`}>
             <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as any)} className="flex flex-col h-full">
               <TabsList className="grid w-full grid-cols-2 m-2">
                 <TabsTrigger value="active" className="text-xs">
@@ -283,13 +283,23 @@ export const MessagingSidebar = () => {
             </Tabs>
           </div>
 
-          {/* Right Panel - Chat Window */}
-          <div className="flex-1 flex flex-col">
+          {/* Right Panel - Chat Window - Show on mobile only when conversation is active */}
+          <div className={`flex-1 flex flex-col ${isMobile && !activeConversationId ? 'hidden' : 'flex'}`}>
             {activeConversationId ? (
               activeConversation ? (
                 <>
                   {/* Chat Header */}
                   <div className="flex items-center gap-2 p-3 border-b">
+                  {isMobile && (
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => setActiveConversationId(null)}
+                      className="mr-2"
+                    >
+                      <X className="h-4 w-4" />
+                    </Button>
+                  )}
                   <Avatar className="h-9 w-9">
                     <AvatarImage src={activeConversation.other_user.avatar_url || undefined} />
                     <AvatarFallback>
