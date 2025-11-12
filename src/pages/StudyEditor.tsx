@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Navigation } from "@/components/Navigation";
 import { Button } from "@/components/ui/button";
@@ -17,6 +17,10 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
 import { Card } from "@/components/ui/card";
+import { JeevesStudyAssistant } from "@/components/studies/JeevesStudyAssistant";
+import { ScriptureInsertDialog } from "@/components/studies/ScriptureInsertDialog";
+import { TextFormatToolbar } from "@/components/studies/TextFormatToolbar";
+import { ShareStudyDialog } from "@/components/studies/ShareStudyDialog";
 
 interface Study {
   id: string;
@@ -40,6 +44,7 @@ const StudyEditor = () => {
   const [tagInput, setTagInput] = useState("");
   const [isFavorite, setIsFavorite] = useState(false);
   const [hasChanges, setHasChanges] = useState(false);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   useEffect(() => {
     if (id && user) {
@@ -127,6 +132,62 @@ const StudyEditor = () => {
     }
   };
 
+  const handleFormat = (format: string) => {
+    const textarea = textareaRef.current;
+    if (!textarea) return;
+
+    const start = textarea.selectionStart;
+    const end = textarea.selectionEnd;
+    const selectedText = content.substring(start, end);
+    
+    let newText = content;
+    let newCursorPos = start;
+
+    if (format.startsWith("#") || format.startsWith(">") || format.startsWith("•")) {
+      // For headings, quotes, and bullets, insert at line start
+      const lineStart = content.lastIndexOf("\n", start - 1) + 1;
+      newText = content.substring(0, lineStart) + format + " " + content.substring(lineStart);
+      newCursorPos = lineStart + format.length + 1;
+    } else {
+      // For bold/italic, wrap selection
+      const wrapper = format;
+      if (selectedText) {
+        newText = content.substring(0, start) + wrapper.replace(/\*/g, selectedText) + content.substring(end);
+        newCursorPos = start + wrapper.length;
+      } else {
+        newText = content.substring(0, start) + wrapper + content.substring(end);
+        newCursorPos = start + Math.floor(wrapper.length / 2);
+      }
+    }
+
+    setContent(newText);
+    setHasChanges(true);
+    
+    setTimeout(() => {
+      textarea.focus();
+      textarea.setSelectionRange(newCursorPos, newCursorPos);
+    }, 0);
+  };
+
+  const handleInsertScripture = (text: string) => {
+    const textarea = textareaRef.current;
+    if (!textarea) {
+      setContent(content + text);
+      setHasChanges(true);
+      return;
+    }
+
+    const start = textarea.selectionStart;
+    const newText = content.substring(0, start) + text + content.substring(start);
+    setContent(newText);
+    setHasChanges(true);
+    
+    setTimeout(() => {
+      textarea.focus();
+      textarea.setSelectionRange(start + text.length, start + text.length);
+    }, 0);
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-background">
@@ -156,6 +217,7 @@ const StudyEditor = () => {
           </Button>
           
           <div className="flex items-center gap-2">
+            <ShareStudyDialog title={title} content={content} />
             <Button
               variant="ghost"
               size="icon"
@@ -190,72 +252,90 @@ const StudyEditor = () => {
           </div>
         </div>
 
-        {/* Editor */}
-        <Card className="p-6">
-          {/* Title */}
-          <Input
-            value={title}
-            onChange={(e) => {
-              setTitle(e.target.value);
-              setHasChanges(true);
-            }}
-            placeholder="Study Title"
-            className="text-3xl font-bold border-0 px-0 focus-visible:ring-0 mb-6"
-          />
-
-          {/* Tags */}
-          <div className="mb-6">
-            <div className="flex items-center gap-2 mb-3">
-              <Tag className="w-4 h-4 text-muted-foreground" />
-              <span className="text-sm font-medium">Tags</span>
-            </div>
-            <div className="flex flex-wrap gap-2 mb-3">
-              {tags.map((tag) => (
-                <Badge key={tag} variant="secondary" className="gap-1 pr-1">
-                  {tag}
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="h-4 w-4 p-0 hover:bg-transparent"
-                    onClick={() => removeTag(tag)}
-                  >
-                    <X className="w-3 h-3" />
-                  </Button>
-                </Badge>
-              ))}
-            </div>
-            <div className="flex gap-2">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Main Editor */}
+          <div className="lg:col-span-2">
+            <Card className="p-6">
+              {/* Title */}
               <Input
-                value={tagInput}
-                onChange={(e) => setTagInput(e.target.value)}
-                onKeyPress={handleKeyPress}
-                placeholder="Add a tag..."
-                className="max-w-xs"
+                value={title}
+                onChange={(e) => {
+                  setTitle(e.target.value);
+                  setHasChanges(true);
+                }}
+                placeholder="Study Title"
+                className="text-3xl font-bold border-0 px-0 focus-visible:ring-0 mb-6"
               />
-              <Button onClick={addTag} variant="outline" size="sm">
-                Add
-              </Button>
-            </div>
+
+              {/* Tags */}
+              <div className="mb-6">
+                <div className="flex items-center gap-2 mb-3">
+                  <Tag className="w-4 h-4 text-muted-foreground" />
+                  <span className="text-sm font-medium">Tags</span>
+                </div>
+                <div className="flex flex-wrap gap-2 mb-3">
+                  {tags.map((tag) => (
+                    <Badge key={tag} variant="secondary" className="gap-1 pr-1">
+                      {tag}
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-4 w-4 p-0 hover:bg-transparent"
+                        onClick={() => removeTag(tag)}
+                      >
+                        <X className="w-3 h-3" />
+                      </Button>
+                    </Badge>
+                  ))}
+                </div>
+                <div className="flex gap-2">
+                  <Input
+                    value={tagInput}
+                    onChange={(e) => setTagInput(e.target.value)}
+                    onKeyPress={handleKeyPress}
+                    placeholder="Add a tag..."
+                    className="max-w-xs"
+                  />
+                  <Button onClick={addTag} variant="outline" size="sm">
+                    Add
+                  </Button>
+                </div>
+              </div>
+
+              {/* Formatting Toolbar */}
+              <div className="mb-4 flex gap-2">
+                <TextFormatToolbar onFormat={handleFormat} />
+                <ScriptureInsertDialog onInsert={handleInsertScripture} />
+              </div>
+
+              {/* Content */}
+              <Textarea
+                ref={textareaRef}
+                value={content}
+                onChange={(e) => {
+                  setContent(e.target.value);
+                  setHasChanges(true);
+                }}
+                placeholder="Start writing your study notes here...
+
+You can use:
+• **bold** for emphasis
+• *italic* for subtle emphasis
+• # for headings
+• > for quotes
+• • for bullet points
+
+Or use the formatting toolbar above!"
+                className="min-h-[500px] border-0 px-0 focus-visible:ring-0 resize-none text-base leading-relaxed"
+              />
+            </Card>
           </div>
 
-          {/* Content */}
-          <Textarea
-            value={content}
-            onChange={(e) => {
-              setContent(e.target.value);
-              setHasChanges(true);
-            }}
-            placeholder="Start writing your study notes here...
-
-You can include:
-• Observations and insights
-• Cross-references and connections
-• Personal reflections
-• Application points
-• Questions to explore further"
-            className="min-h-[500px] border-0 px-0 focus-visible:ring-0 resize-none text-base leading-relaxed"
-          />
-        </Card>
+          {/* Sidebar with Jeeves */}
+          <div className="lg:col-span-1">
+            <JeevesStudyAssistant studyContext={`Title: ${title}\n\nContent: ${content.substring(0, 500)}`} />
+          </div>
+        </div>
 
         {/* Auto-save indicator */}
         {hasChanges && (

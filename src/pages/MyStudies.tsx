@@ -29,6 +29,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { StudyTemplates } from "@/components/studies/StudyTemplates";
 
 interface Study {
   id: string;
@@ -77,15 +78,15 @@ const MyStudies = () => {
     }
   };
 
-  const createNewStudy = async () => {
+  const createNewStudy = async (title = "Untitled Study", content = "") => {
     try {
       const { data, error } = await supabase
         .from("user_studies")
         .insert([
           {
             user_id: user?.id,
-            title: "Untitled Study",
-            content: "",
+            title,
+            content,
           },
         ])
         .select()
@@ -101,6 +102,10 @@ const MyStudies = () => {
         variant: "destructive",
       });
     }
+  };
+
+  const handleTemplateSelect = (template: { name: string; content: string }) => {
+    createNewStudy(template.name, template.content);
   };
 
   const toggleFavorite = async (studyId: string, currentStatus: boolean) => {
@@ -173,10 +178,13 @@ const MyStudies = () => {
               Your personal Bible study notes and insights
             </p>
           </div>
-          <Button onClick={createNewStudy} size="lg" className="gap-2">
-            <Plus className="w-5 h-5" />
-            New Study
-          </Button>
+          <div className="flex gap-2">
+            <StudyTemplates onSelect={handleTemplateSelect} />
+            <Button onClick={() => createNewStudy()} size="lg" className="gap-2">
+              <Plus className="w-5 h-5" />
+              New Study
+            </Button>
+          </div>
         </div>
 
         {/* Search */}
@@ -202,7 +210,7 @@ const MyStudies = () => {
               <p className="text-muted-foreground mb-6">
                 Create your first study to start taking notes
               </p>
-              <Button onClick={createNewStudy} className="gap-2">
+              <Button onClick={() => createNewStudy()} className="gap-2">
                 <Plus className="w-5 h-5" />
                 Create First Study
               </Button>
