@@ -15,10 +15,13 @@ export function PWAInstallButton() {
 
   useEffect(() => {
     // Check if already installed
-    const isStandalone = window.matchMedia('(display-mode: standalone)').matches;
+    const isStandalone = window.matchMedia('(display-mode: standalone)').matches 
+      || (window.navigator as any).standalone === true
+      || document.referrer.includes('android-app://');
     
     // If already installed, don't show the button
     if (isStandalone) {
+      console.log('App already installed');
       setIsInstallable(false);
       return;
     }
@@ -27,17 +30,26 @@ export function PWAInstallButton() {
     const isIOSDevice = /iPad|iPhone|iPod/.test(navigator.userAgent) && !(window as any).MSStream;
     setIsIOS(isIOSDevice);
     
-    // Check if mobile
+    // Check if mobile (any mobile device)
     const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
     
-    // Always show on mobile devices (iOS or Android)
-    if (isMobile) {
+    console.log('PWA Install Button - Device detection:', { 
+      isIOSDevice, 
+      isMobile, 
+      isStandalone,
+      userAgent: navigator.userAgent 
+    });
+    
+    // Always show on mobile devices (iOS or Android) unless already installed
+    if (isMobile && !isStandalone) {
+      console.log('Showing install button for mobile device');
       setIsInstallable(true);
     }
 
-    // Listen for install prompt event (Android)
+    // Listen for install prompt event (Android/Desktop Chrome)
     const handler = (e: Event) => {
       e.preventDefault();
+      console.log('beforeinstallprompt event fired');
       setDeferredPrompt(e as BeforeInstallPromptEvent);
       setIsInstallable(true);
     };
@@ -49,11 +61,15 @@ export function PWAInstallButton() {
   const handleInstall = async () => {
     if (isIOS) {
       // Show iOS install instructions
-      alert('To install this app on iOS:\n\n1. Tap the Share button (box with arrow)\n2. Scroll down and tap "Add to Home Screen"\n3. Tap "Add" in the top right');
+      alert('To install this app on iOS:\n\n1. Tap the Share button (box with arrow) at the bottom\n2. Scroll down and tap "Add to Home Screen"\n3. Tap "Add" in the top right');
       return;
     }
 
-    if (!deferredPrompt) return;
+    if (!deferredPrompt) {
+      // For browsers that don't support the install prompt
+      alert('To install this app:\n\n1. Open your browser menu (3 dots)\n2. Look for "Install app" or "Add to Home Screen"\n3. Follow the prompts to install');
+      return;
+    }
 
     deferredPrompt.prompt();
     const { outcome } = await deferredPrompt.userChoice;
@@ -63,9 +79,6 @@ export function PWAInstallButton() {
       setIsInstallable(false);
     }
   };
-
-  // Debug logging
-  console.log('PWA Install Button State:', { isInstallable, isIOS, hasPrompt: !!deferredPrompt });
 
   if (!isInstallable) return null;
 
