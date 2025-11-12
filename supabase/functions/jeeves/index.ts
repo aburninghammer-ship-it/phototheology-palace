@@ -1551,11 +1551,19 @@ Return JSON: { "approved": true/false, "rating": 1-5, "feedback": "brief comment
 - Keep text easy to read and conversational
       
 ${PALACE_SCHEMA}`;
-      userPrompt = `A student asks: "${question}"
+      
+      const contextSection = context ? `
+
+**STUDY CONTEXT:**
+${context}
+
+Incorporate this context into your answer when relevant.` : '';
+      
+      userPrompt = `A student asks: "${question}"${contextSection}
 
 Provide a clear, insightful answer in clear paragraphs:
 
-Paragraph 1: Directly address their question
+Paragraph 1: Directly address their question${context ? ' in light of their study context' : ''}
 
 Paragraph 2: Use biblical references and examples
 

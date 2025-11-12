@@ -179,7 +179,10 @@ const StudyEditor = () => {
         })
         .eq("id", id);
 
-      if (error) throw error;
+      if (error) {
+        console.error("Supabase error details:", error);
+        throw error;
+      }
 
       setHasChanges(false);
       setLastSaved(new Date());
@@ -187,11 +190,12 @@ const StudyEditor = () => {
         title: "Success",
         description: "Study saved successfully",
       });
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error saving study:", error);
+      const errorMessage = error?.message || error?.details || "Failed to save study";
       toast({
         title: "Error",
-        description: "Failed to save study",
+        description: errorMessage,
         variant: "destructive",
       });
     } finally {
