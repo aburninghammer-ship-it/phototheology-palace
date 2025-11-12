@@ -11,6 +11,7 @@ interface BeforeInstallPromptEvent extends Event {
 export function PWAInstallButton() {
   const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null);
   const [isInstallable, setIsInstallable] = useState(false);
+  const [isIOS, setIsIOS] = useState(false);
 
   useEffect(() => {
     const handler = (e: Event) => {
@@ -22,7 +23,18 @@ export function PWAInstallButton() {
     window.addEventListener('beforeinstallprompt', handler);
 
     // Check if already installed
-    if (window.matchMedia('(display-mode: standalone)').matches) {
+    const isStandalone = window.matchMedia('(display-mode: standalone)').matches;
+    
+    // Check if iOS
+    const isIOSDevice = /iPad|iPhone|iPod/.test(navigator.userAgent) && !(window as any).MSStream;
+    setIsIOS(isIOSDevice);
+    
+    // Show button for iOS devices (unless already installed)
+    if (isIOSDevice && !isStandalone) {
+      setIsInstallable(true);
+    }
+
+    if (isStandalone) {
       setIsInstallable(false);
     }
 
@@ -30,6 +42,12 @@ export function PWAInstallButton() {
   }, []);
 
   const handleInstall = async () => {
+    if (isIOS) {
+      // Show iOS install instructions
+      alert('To install this app on iOS:\n\n1. Tap the Share button (box with arrow)\n2. Scroll down and tap "Add to Home Screen"\n3. Tap "Add" in the top right');
+      return;
+    }
+
     if (!deferredPrompt) return;
 
     deferredPrompt.prompt();

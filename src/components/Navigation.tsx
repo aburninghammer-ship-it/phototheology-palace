@@ -41,10 +41,10 @@ export const Navigation = () => {
             </Link>
           
             <div className="flex items-center gap-2 md:gap-4">
+              <PWAInstallButton />
+              
               {user && (
                 <>
-                  <PWAInstallButton />
-                  
                   <div className="hidden md:flex items-center gap-2 text-sm text-muted-foreground">
                     <Users className="h-4 w-4" />
                     <span>{activeCount} active</span>
@@ -254,17 +254,13 @@ export const Navigation = () => {
                       <Link to="/community">Community</Link>
                     </Button>
                     
-                    <PWAInstallButton />
-                    
                     <Button asChild size="sm" className="whitespace-nowrap">
                       <Link to="/auth">Log In</Link>
                     </Button>
                   </div>
 
                   {/* Mobile Navigation for logged-out users */}
-                  <div className="md:hidden flex items-center gap-2">
-                    <PWAInstallButton />
-                    
+                  <div className="md:hidden">
                     <Button asChild size="sm">
                       <Link to="/auth">Log In</Link>
                     </Button>
