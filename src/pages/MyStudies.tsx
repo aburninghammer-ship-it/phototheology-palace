@@ -43,7 +43,7 @@ interface Study {
 
 const MyStudies = () => {
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const { toast } = useToast();
   const [studies, setStudies] = useState<Study[]>([]);
   const [loading, setLoading] = useState(true);
@@ -52,10 +52,10 @@ const MyStudies = () => {
   const [studyToDelete, setStudyToDelete] = useState<string | null>(null);
 
   useEffect(() => {
-    if (user) {
+    if (user && !authLoading) {
       fetchStudies();
     }
-  }, [user]);
+  }, [user, authLoading]);
 
   const fetchStudies = async () => {
     try {
@@ -189,7 +189,12 @@ const MyStudies = () => {
           </div>
           <div className="flex gap-2">
             <StudyTemplates onSelect={handleTemplateSelect} />
-            <Button onClick={() => createNewStudy()} size="lg" className="gap-2">
+            <Button 
+              onClick={() => createNewStudy()} 
+              size="lg" 
+              className="gap-2"
+              disabled={authLoading || !user}
+            >
               <Plus className="w-5 h-5" />
               New Study
             </Button>
@@ -207,7 +212,7 @@ const MyStudies = () => {
           />
         </div>
 
-        {loading ? (
+        {loading || authLoading ? (
           <div className="text-center py-12">
             <p className="text-muted-foreground">Loading your studies...</p>
           </div>
@@ -219,7 +224,7 @@ const MyStudies = () => {
               <p className="text-muted-foreground mb-6">
                 Create your first study to start taking notes
               </p>
-              <Button onClick={() => createNewStudy()} className="gap-2">
+              <Button onClick={() => createNewStudy()} className="gap-2" disabled={authLoading || !user}>
                 <Plus className="w-5 h-5" />
                 Create First Study
               </Button>
