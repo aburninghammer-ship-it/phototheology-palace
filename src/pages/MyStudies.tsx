@@ -79,11 +79,7 @@ const MyStudies = () => {
   };
 
   const createNewStudy = async (title = "Untitled Study", content = "") => {
-    // Verify we have a valid session before proceeding
-    const { data: { session }, error: sessionError } = await supabase.auth.getSession();
-    
-    if (sessionError || !session) {
-      console.error("No valid session:", sessionError);
+    if (!user?.id) {
       toast({
         title: "Authentication Required",
         description: "Please sign in to create a study",
@@ -93,33 +89,44 @@ const MyStudies = () => {
     }
 
     try {
+      // Get a fresh session to ensure auth token is current
+      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+      
+      if (sessionError || !session?.user?.id) {
+        console.error("Session error:", sessionError);
+        throw new Error("Unable to verify authentication. Please try signing out and back in.");
+      }
+
+      // Use the session's access token explicitly
       const { data, error } = await supabase
         .from("user_studies")
-        .insert([
-          {
-            user_id: session.user.id,
-            title,
-            content,
-          },
-        ])
+        .insert({
+          user_id: session.user.id,
+          title,
+          content,
+        })
         .select()
         .single();
 
       if (error) {
-        console.error("Supabase error:", error);
+        console.error("Database error:", error);
+        // Check if it's an RLS error
+        if (error.message.includes("row-level security")) {
+          throw new Error("Permission denied. Please try signing out and back in.");
+        }
         throw error;
       }
       
-      navigate(`/my-studies/${data.id}`);
       toast({
         title: "Success",
         description: "Study created successfully",
       });
+      navigate(`/my-studies/${data.id}`);
     } catch (error) {
       console.error("Error creating study:", error);
       toast({
         title: "Error",
-        description: error instanceof Error ? error.message : "Failed to create new study",
+        description: error instanceof Error ? error.message : "Failed to create new study. Please try again.",
         variant: "destructive",
       });
     }
