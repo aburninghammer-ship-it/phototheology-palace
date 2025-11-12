@@ -135,7 +135,7 @@ export default function PrincipleCards() {
         description: "Waiting for players to join..."
       });
 
-      navigate(`/games/principle-cards/${game.id}`);
+      navigate(`/games/principle-cards/game/${game.id}`);
     } catch (error: any) {
       console.error("Error creating game:", error);
       toast({
@@ -166,7 +166,7 @@ export default function PrincipleCards() {
         description: "Get ready to play!"
       });
 
-      navigate(`/games/principle-cards/${gameId}`);
+      navigate(`/games/principle-cards/game/${gameId}`);
     } catch (error: any) {
       console.error("Error joining game:", error);
       toast({
@@ -183,11 +183,19 @@ export default function PrincipleCards() {
       
       <div className="container mx-auto px-4 py-8 pt-24 max-w-6xl">
         {/* Header */}
-        <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold mb-2">Principle Cards</h1>
-          <p className="text-muted-foreground mb-4">
-            Multiplayer game where principles become cards - match them to scenarios!
-          </p>
+        <div className="mb-8">
+          <div className="flex items-center justify-between mb-4">
+            <div>
+              <h1 className="text-4xl font-bold mb-2">Principle Cards</h1>
+              <p className="text-muted-foreground">
+                Multiplayer game where principles become cards - match them to scenarios!
+              </p>
+            </div>
+            <Button onClick={() => navigate("/games/principle-cards/tournaments")} variant="outline" size="lg">
+              <Trophy className="w-5 h-5 mr-2" />
+              Tournaments
+            </Button>
+          </div>
           <SocialShareButton
             title="Join me in Principle Cards!"
             description="A fun multiplayer game where biblical principles become cards. Test your knowledge and compete with friends!"
@@ -304,7 +312,7 @@ export default function PrincipleCards() {
                       </Button>
                     )}
                     <Button
-                      onClick={() => navigate(`/games/principle-cards/${game.id}`)}
+                      onClick={() => navigate(`/games/principle-cards/game/${game.id}`)}
                       variant="outline"
                       className="flex-1"
                     >
