@@ -19,7 +19,14 @@ export function NotificationCenter() {
 
   const handleNotificationClick = (notification: any) => {
     markAsRead(notification.id);
-    if (notification.link) {
+    
+    // Handle message notifications by opening the messaging sidebar
+    if (notification.type === 'message' || notification.type === 'direct_message') {
+      // Dispatch custom event to open messaging sidebar
+      window.dispatchEvent(new CustomEvent('open-chat-sidebar', {
+        detail: { conversationId: notification.metadata?.conversation_id }
+      }));
+    } else if (notification.link) {
       navigate(notification.link);
     }
   };
