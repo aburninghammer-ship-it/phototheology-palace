@@ -4,7 +4,7 @@
  */
 
 const DB_NAME = 'PhototheologyDB';
-const DB_VERSION = 1;
+const DB_VERSION = 2;
 
 export interface OfflineVerse {
   book: string;
@@ -64,6 +64,13 @@ class OfflineStorage {
         if (!db.objectStoreNames.contains('userData')) {
           const userStore = db.createObjectStore('userData', { keyPath: 'key' });
           userStore.createIndex('timestamp', 'timestamp', { unique: false });
+        }
+
+        // Pending changes store (for background sync)
+        if (!db.objectStoreNames.contains('pendingChanges')) {
+          const pendingStore = db.createObjectStore('pendingChanges', { keyPath: 'id' });
+          pendingStore.createIndex('type', 'type', { unique: false });
+          pendingStore.createIndex('timestamp', 'timestamp', { unique: false });
         }
       };
     });

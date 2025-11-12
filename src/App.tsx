@@ -6,6 +6,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { OfflineIndicator } from "@/components/OfflineIndicator";
+import { SyncStatusIndicator } from "@/components/SyncStatusIndicator";
 import { LoadingScreen } from "@/components/LoadingScreen";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 import { SidebarProvider } from "@/components/ui/sidebar";
@@ -264,6 +265,8 @@ function App() {
               </AchievementProvider>
             </LiveNotificationsProvider>
           </BrowserRouter>
+          <OfflineIndicator />
+          <SyncStatusIndicator />
         </TooltipProvider>
       </QueryClientProvider>
     </ErrorBoundary>
