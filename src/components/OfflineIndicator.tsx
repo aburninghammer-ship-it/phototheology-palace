@@ -1,10 +1,13 @@
 import { useEffect, useState } from "react";
 import { Alert, AlertDescription } from "./ui/alert";
-import { WifiOff, Wifi } from "lucide-react";
+import { WifiOff, Wifi, HardDrive } from "lucide-react";
+import { Button } from "./ui/button";
+import { useNavigate } from "react-router-dom";
 
 export const OfflineIndicator = () => {
   const [isOnline, setIsOnline] = useState(navigator.onLine);
   const [wasOffline, setWasOffline] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const handleOnline = () => {
@@ -33,19 +36,32 @@ export const OfflineIndicator = () => {
   return (
     <div className="fixed bottom-4 right-4 z-50 max-w-sm animate-slide-up">
       <Alert variant={isOnline ? "default" : "destructive"}>
-        <div className="flex items-center gap-2">
-          {isOnline ? (
-            <>
-              <Wifi className="h-4 w-4" />
-              <AlertDescription>Back online! Your changes will sync.</AlertDescription>
-            </>
-          ) : (
-            <>
-              <WifiOff className="h-4 w-4" />
-              <AlertDescription>
-                You're offline. Some features may not work.
-              </AlertDescription>
-            </>
+        <div className="flex items-center justify-between gap-2">
+          <div className="flex items-center gap-2">
+            {isOnline ? (
+              <>
+                <Wifi className="h-4 w-4" />
+                <AlertDescription>Back online! Your changes will sync.</AlertDescription>
+              </>
+            ) : (
+              <>
+                <WifiOff className="h-4 w-4" />
+                <AlertDescription>
+                  You're offline. Some features may not work.
+                </AlertDescription>
+              </>
+            )}
+          </div>
+          {!isOnline && (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => navigate('/offline-content')}
+              className="ml-2 flex-shrink-0"
+            >
+              <HardDrive className="w-3 h-3 mr-1" />
+              View Cache
+            </Button>
           )}
         </div>
       </Alert>

@@ -115,6 +115,7 @@ const ChurchSignupSuccess = lazy(() => import("./pages/ChurchSignupSuccess"));
 const ChurchSignupCancelled = lazy(() => import("./pages/ChurchSignupCancelled"));
 const AdminStrongsImport = lazy(() => import("./pages/AdminStrongsImport"));
 const AdminBibleImport = lazy(() => import("./pages/AdminBibleImport"));
+const OfflineContent = lazy(() => import("./pages/OfflineContent"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
 const queryClient = new QueryClient();
@@ -246,6 +247,7 @@ function App() {
            <Route path="/series/:seriesId/present" element={<ProtectedRoute><SeriesPresenter /></ProtectedRoute>} />
             <Route path="/public-image-library" element={<ProtectedRoute><PublicImageLibrary /></ProtectedRoute>} />
             <Route path="/app-update-ideas" element={<ProtectedRoute><AppUpdateIdeas /></ProtectedRoute>} />
+            <Route path="/offline-content" element={<ProtectedRoute><OfflineContent /></ProtectedRoute>} />
             <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
             <Route path="/critics-analysis" element={<ProtectedRoute><CriticsAnalysis /></ProtectedRoute>} />
             <Route path="/referrals" element={<ProtectedRoute><Referrals /></ProtectedRoute>} />
