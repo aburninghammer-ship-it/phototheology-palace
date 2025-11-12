@@ -126,8 +126,9 @@ function App() {
         <TooltipProvider>
           <Toaster />
           <Sonner />
-          <OfflineIndicator />
           <BrowserRouter>
+            <OfflineIndicator />
+            <SyncStatusIndicator />
             <LiveNotificationsProvider>
               <AchievementProvider>
                 <SidebarProvider defaultOpen={false}>
