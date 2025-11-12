@@ -89,9 +89,40 @@ export const Navigation = () => {
                       <Link to="/games">Games</Link>
                     </Button>
                     
-                    <Button variant="ghost" asChild size="sm" className="whitespace-nowrap">
-                      <Link to="/phototheologygpt">GPTs</Link>
-                    </Button>
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="ghost" size="sm" className="whitespace-nowrap">
+                          <Sparkles className="h-4 w-4 mr-1" />
+                          GPTs
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end" className="w-56 bg-card border-border z-50">
+                        <DropdownMenuItem asChild>
+                          <Link to="/phototheologygpt" className="cursor-pointer">
+                            <Sparkles className="mr-2 h-4 w-4" />
+                            Phototheology GPT
+                          </Link>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem asChild>
+                          <Link to="/kidgpt" className="cursor-pointer">
+                            <Sparkles className="mr-2 h-4 w-4" />
+                            Kid GPT
+                          </Link>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem asChild>
+                          <Link to="/daniel-revelation-gpt" className="cursor-pointer">
+                            <Sparkles className="mr-2 h-4 w-4" />
+                            Daniel & Revelation GPT
+                          </Link>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem asChild>
+                          <Link to="/apologetics-gpt" className="cursor-pointer">
+                            <Sparkles className="mr-2 h-4 w-4" />
+                            Apologetics GPT
+                          </Link>
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
                     
                     <Button variant="ghost" asChild size="sm" className="whitespace-nowrap">
                       <Link to="/phototheology-course">Courses</Link>
@@ -168,9 +199,40 @@ export const Navigation = () => {
                       <Link to="/games">Games</Link>
                     </Button>
                     
-                    <Button variant="ghost" asChild size="sm" className="whitespace-nowrap">
-                      <Link to="/phototheologygpt">GPTs</Link>
-                    </Button>
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="ghost" size="sm" className="whitespace-nowrap">
+                          <Sparkles className="h-4 w-4 mr-1" />
+                          GPTs
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end" className="w-56 bg-card border-border z-50">
+                        <DropdownMenuItem asChild>
+                          <Link to="/phototheologygpt" className="cursor-pointer">
+                            <Sparkles className="mr-2 h-4 w-4" />
+                            Phototheology GPT
+                          </Link>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem asChild>
+                          <Link to="/kidgpt" className="cursor-pointer">
+                            <Sparkles className="mr-2 h-4 w-4" />
+                            Kid GPT
+                          </Link>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem asChild>
+                          <Link to="/daniel-revelation-gpt" className="cursor-pointer">
+                            <Sparkles className="mr-2 h-4 w-4" />
+                            Daniel & Revelation GPT
+                          </Link>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem asChild>
+                          <Link to="/apologetics-gpt" className="cursor-pointer">
+                            <Sparkles className="mr-2 h-4 w-4" />
+                            Apologetics GPT
+                          </Link>
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
                     
                     <Button variant="ghost" asChild size="sm" className="whitespace-nowrap">
                       <Link to="/phototheology-course">Courses</Link>
