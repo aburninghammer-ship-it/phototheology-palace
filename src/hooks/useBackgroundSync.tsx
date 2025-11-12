@@ -1,14 +1,20 @@
 import { useEffect, useState } from "react";
 import { syncQueue, SyncAction } from "@/services/syncQueue";
 import { supabase } from "@/integrations/supabase/client";
-import { useAuth } from "./useAuth";
 import { useToast } from "./use-toast";
 
 export const useBackgroundSync = () => {
-  const { user } = useAuth();
   const { toast } = useToast();
+  const [user, setUser] = useState<any>(null);
   const [pendingCount, setPendingCount] = useState(0);
   const [isSyncing, setIsSyncing] = useState(false);
+
+  // Get current user without using navigate
+  useEffect(() => {
+    supabase.auth.getUser().then(({ data }) => {
+      setUser(data.user);
+    });
+  }, []);
 
   // Update pending count
   const updatePendingCount = async () => {
