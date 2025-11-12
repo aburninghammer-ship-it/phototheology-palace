@@ -4,15 +4,17 @@ import { Navigation } from "@/components/Navigation";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
-import { Flame, Share2, BookOpen } from "lucide-react";
+import { Flame, Share2, BookOpen, ChefHat, Calculator } from "lucide-react";
 import { DimensionDrillChallenge } from "@/components/challenges/DimensionDrillChallenge";
 import { Connect6Challenge } from "@/components/challenges/Connect6Challenge";
 import { SanctuaryMapChallenge } from "@/components/challenges/SanctuaryMapChallenge";
 import { ChristChapterChallenge } from "@/components/challenges/ChristChapterChallenge";
 import { FruitCheckChallenge } from "@/components/challenges/FruitCheckChallenge";
+import { SubjectConnectionChallenge } from "@/components/challenges/SubjectConnectionChallenge";
 
 const DailyChallenges = () => {
   const { user } = useAuth();
@@ -31,9 +33,9 @@ const DailyChallenges = () => {
   const fetchDailyChallenge = async () => {
     const now = new Date();
     
-    // Get today's challenge based on rotation
+    // Get today's challenge based on 30-day rotation
     const dayOfYear = Math.floor((now.getTime() - new Date(now.getFullYear(), 0, 0).getTime()) / 86400000);
-    const rotationDay = (dayOfYear % 14) + 1; // 14-day rotation
+    const rotationDay = (dayOfYear % 30) + 1; // 30-day rotation
 
     const { data: challenges, error } = await supabase
       .from("challenges")
@@ -135,6 +137,8 @@ const DailyChallenges = () => {
         return <ChristChapterChallenge {...props} />;
       case "fruit-check":
         return <FruitCheckChallenge {...props} />;
+      case "subject-connection":
+        return <SubjectConnectionChallenge {...props} />;
       default:
         return (
           <Card>
@@ -154,11 +158,11 @@ const DailyChallenges = () => {
     <div className="min-h-screen bg-background">
       <Navigation />
       <main className="container mx-auto px-4 pt-24 pb-8">
-        <div className="max-w-4xl mx-auto space-y-6">
+        <div className="max-w-6xl mx-auto space-y-6">
           <div className="flex items-center justify-between flex-wrap gap-4">
             <h1 className="text-4xl font-bold flex items-center gap-2">
               <Flame className="h-8 w-8 text-orange-500" />
-              Daily Challenges
+              Challenges
             </h1>
             <div className="flex gap-2">
               <Button onClick={() => navigate("/growth-journal")} variant="outline" className="gap-2">
@@ -172,40 +176,89 @@ const DailyChallenges = () => {
             </div>
           </div>
 
-          <div className="bg-gradient-to-r from-primary/10 to-primary/5 p-4 rounded-lg border border-primary/20">
-            <h2 className="font-semibold mb-2">About Daily Challenges</h2>
-            <p className="text-sm text-muted-foreground">
-              Each day brings a new challenge designed to train you in Phototheology principles. 
-              Complete challenges to build your Growth Journal and develop reflexive biblical thinking.
-              We rotate through 14 different challenge types on a schedule.
-            </p>
-          </div>
+          <Tabs defaultValue="daily" className="space-y-6">
+            <TabsList className="grid w-full grid-cols-3">
+              <TabsTrigger value="daily" className="gap-2">
+                <Flame className="h-4 w-4" />
+                Daily Challenge
+              </TabsTrigger>
+              <TabsTrigger value="chef" className="gap-2">
+                <ChefHat className="h-4 w-4" />
+                Chef Challenge
+              </TabsTrigger>
+              <TabsTrigger value="equations" className="gap-2">
+                <Calculator className="h-4 w-4" />
+                Equations
+              </TabsTrigger>
+            </TabsList>
 
-          {dailyChallenge ? (
-            <>
-              <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                <Badge variant={
-                  dailyChallenge.challenge_tier === "Quick" ? "default" :
-                  dailyChallenge.challenge_tier === "Core" ? "secondary" :
-                  "outline"
-                }>
-                  {dailyChallenge.challenge_tier}
-                </Badge>
-                <span>•</span>
-                <span>Day {dailyChallenge.day_in_rotation} of 14</span>
+            <TabsContent value="daily" className="space-y-6">
+              <div className="bg-gradient-to-r from-primary/10 to-primary/5 p-4 rounded-lg border border-primary/20">
+                <h2 className="font-semibold mb-2">About Daily Challenges</h2>
+                <p className="text-sm text-muted-foreground">
+                  Each day brings a new challenge designed to train you in Phototheology principles. 
+                  Complete challenges to build your Growth Journal and develop reflexive biblical thinking.
+                  We rotate through 30 different challenge types on a schedule.
+                </p>
               </div>
 
-              {renderChallenge()}
-            </>
-          ) : (
-            <Card>
-              <CardContent className="py-12 text-center">
-                <p className="text-muted-foreground">
-                  No challenge available right now. Challenges are generated daily. Check back soon!
-                </p>
-              </CardContent>
-            </Card>
-          )}
+              {dailyChallenge ? (
+                <>
+                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                    <Badge variant={
+                      dailyChallenge.challenge_tier === "Quick" ? "default" :
+                      dailyChallenge.challenge_tier === "Core" ? "secondary" :
+                      "outline"
+                    }>
+                      {dailyChallenge.challenge_tier}
+                    </Badge>
+                    <span>•</span>
+                    <span>Day {dailyChallenge.day_in_rotation} of 30</span>
+                  </div>
+
+                  {renderChallenge()}
+                </>
+              ) : (
+                <Card>
+                  <CardContent className="py-12 text-center">
+                    <p className="text-muted-foreground">
+                      No challenge available right now. Challenges are generated daily. Check back soon!
+                    </p>
+                  </CardContent>
+                </Card>
+              )}
+            </TabsContent>
+
+            <TabsContent value="chef">
+              <Card>
+                <CardContent className="py-8 text-center space-y-4">
+                  <ChefHat className="w-16 h-16 mx-auto text-orange-600" />
+                  <h3 className="text-2xl font-bold">Chef Challenge</h3>
+                  <p className="text-muted-foreground max-w-md mx-auto">
+                    Create "biblical recipes" – coherent mini-sermons using only Bible verse references
+                  </p>
+                  <Button onClick={() => navigate("/chef-challenge")} size="lg">
+                    Start Chef Challenge
+                  </Button>
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            <TabsContent value="equations">
+              <Card>
+                <CardContent className="py-8 text-center space-y-4">
+                  <Calculator className="w-16 h-16 mx-auto text-primary" />
+                  <h3 className="text-2xl font-bold">Equations Challenge</h3>
+                  <p className="text-muted-foreground max-w-md mx-auto">
+                    Decode biblical equations using palace principles and symbols
+                  </p>
+                  <Button onClick={() => navigate("/equations-challenge")} size="lg">
+                    Start Equations Challenge
+                  </Button>
+                </CardContent>
+              </Card>
+            </TabsContent>
+          </Tabs>
         </div>
       </main>
     </div>

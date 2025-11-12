@@ -15,11 +15,22 @@ Deno.serve(async (req) => {
     const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
     const supabase = createClient(supabaseUrl, supabaseKey);
 
-    // Calculate which day in the 14-day rotation
+    // Calculate which day in the 30-day rotation
     const startDate = new Date('2025-01-01'); // Reference start date
     const today = new Date();
     const daysSinceStart = Math.floor((today.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
-    const dayInRotation = (daysSinceStart % 14) + 1;
+    const dayInRotation = (daysSinceStart % 30) + 1;
+
+    // Check if we need to generate new challenges (on day 25 of each cycle)
+    if (dayInRotation === 25) {
+      console.log('Day 25 detected - triggering new challenge generation');
+      const { error: genError } = await supabase.functions.invoke('generate-30-challenges');
+      if (genError) {
+        console.error('Error generating new challenges:', genError);
+      } else {
+        console.log('✅ New 30-day challenge cycle generated');
+      }
+    }
 
     console.log(`Sending daily challenge for day ${dayInRotation} of rotation`);
 
