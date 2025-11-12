@@ -75,15 +75,19 @@ export const Navigation = () => {
                   {/* Desktop Navigation - Lean */}
                   <div className="hidden md:flex items-center gap-2">
                     <Button variant="ghost" asChild size="sm">
-                      <Link to="/palace">Product</Link>
+                      <Link to="/palace">Palace</Link>
                     </Button>
                     
                     <Button variant="ghost" asChild size="sm">
-                      <Link to="/pricing">Pricing</Link>
+                      <Link to="/games">Games</Link>
                     </Button>
                     
                     <Button variant="ghost" asChild size="sm">
-                      <Link to="/community">Community</Link>
+                      <Link to="/phototheology-gpt">GPTs</Link>
+                    </Button>
+                    
+                    <Button variant="ghost" asChild size="sm">
+                      <Link to="/phototheology-course">Courses</Link>
                     </Button>
                     
                     <Button variant="ghost" asChild size="sm">
@@ -137,15 +141,19 @@ export const Navigation = () => {
                   {/* Desktop Navigation for logged-out users */}
                   <div className="hidden md:flex items-center gap-2">
                     <Button variant="ghost" asChild size="sm">
-                      <Link to="/palace">Product</Link>
+                      <Link to="/palace">Palace</Link>
                     </Button>
                     
                     <Button variant="ghost" asChild size="sm">
-                      <Link to="/pricing">Pricing</Link>
+                      <Link to="/games">Games</Link>
                     </Button>
                     
                     <Button variant="ghost" asChild size="sm">
-                      <Link to="/community">Community</Link>
+                      <Link to="/phototheology-gpt">GPTs</Link>
+                    </Button>
+                    
+                    <Button variant="ghost" asChild size="sm">
+                      <Link to="/phototheology-course">Courses</Link>
                     </Button>
                     
                     <Button variant="ghost" asChild size="sm">

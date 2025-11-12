@@ -483,6 +483,168 @@ const Index = () => {
         </div>
       </section>
 
+      {/* Games Section */}
+      <section className="py-24 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-6xl mx-auto">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl md:text-5xl font-bold mb-4">Interactive Games & Challenges</h2>
+            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+              Master biblical concepts through engaging gameplay and competitive challenges
+            </p>
+          </div>
+          
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <Card className="group hover:shadow-lg transition-all cursor-pointer" onClick={() => navigate("/concentration-game")}>
+              <CardHeader>
+                <Brain className="w-12 h-12 text-primary mb-4 group-hover:scale-110 transition-transform" />
+                <CardTitle>Concentration Game</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-muted-foreground">Match verses with their principles in this memory challenge.</p>
+              </CardContent>
+            </Card>
+            
+            <Card className="group hover:shadow-lg transition-all cursor-pointer" onClick={() => navigate("/chain-chess")}>
+              <CardHeader>
+                <Target className="w-12 h-12 text-accent mb-4 group-hover:scale-110 transition-transform" />
+                <CardTitle>Chain Chess</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-muted-foreground">Build verse chains and connect Scripture strategically.</p>
+              </CardContent>
+            </Card>
+            
+            <Card className="group hover:shadow-lg transition-all cursor-pointer" onClick={() => navigate("/escape-room")}>
+              <CardHeader>
+                <Sparkles className="w-12 h-12 text-primary mb-4 group-hover:scale-110 transition-transform" />
+                <CardTitle>Escape Rooms</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-muted-foreground">Solve biblical puzzles to escape themed rooms.</p>
+              </CardContent>
+            </Card>
+          </div>
+          
+          <div className="mt-8 text-center">
+            <Button size="lg" onClick={() => navigate("/games")} className="gap-2">
+              View All Games <ChevronRight className="h-5 w-5" />
+            </Button>
+          </div>
+        </div>
+      </section>
+
+      {/* GPTs Section */}
+      <section className="py-24 px-4 sm:px-6 lg:px-8 bg-muted/30">
+        <div className="max-w-6xl mx-auto">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl md:text-5xl font-bold mb-4">AI Study Assistants</h2>
+            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+              Specialized AI tools for deep analysis and personalized guidance
+            </p>
+          </div>
+          
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <Card className="group hover:shadow-lg transition-all cursor-pointer" onClick={() => navigate("/phototheology-gpt")}>
+              <CardHeader>
+                <ImageIcon className="w-12 h-12 text-primary mb-4 group-hover:scale-110 transition-transform" />
+                <CardTitle>Phototheology GPT</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-muted-foreground">Visual theology and image analysis assistant.</p>
+              </CardContent>
+            </Card>
+            
+            <Card className="group hover:shadow-lg transition-all cursor-pointer" onClick={() => navigate("/daniel-revelation-gpt")}>
+              <CardHeader>
+                <Sparkles className="w-12 h-12 text-accent mb-4 group-hover:scale-110 transition-transform" />
+                <CardTitle>Daniel & Revelation</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-muted-foreground">Prophecy expert for end-time studies.</p>
+              </CardContent>
+            </Card>
+            
+            <Card className="group hover:shadow-lg transition-all cursor-pointer" onClick={() => navigate("/apologetics-gpt")}>
+              <CardHeader>
+                <Brain className="w-12 h-12 text-primary mb-4 group-hover:scale-110 transition-transform" />
+                <CardTitle>Apologetics GPT</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-muted-foreground">Defend your faith with biblical reasoning.</p>
+              </CardContent>
+            </Card>
+            
+            <Card className="group hover:shadow-lg transition-all cursor-pointer" onClick={() => navigate("/kid-gpt")}>
+              <CardHeader>
+                <Heart className="w-12 h-12 text-accent mb-4 group-hover:scale-110 transition-transform" />
+                <CardTitle>Kid GPT</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-muted-foreground">Age-appropriate Bible study for children.</p>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+      </section>
+
+      {/* Courses Section */}
+      <section className="py-24 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-6xl mx-auto">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl md:text-5xl font-bold mb-4">Structured Courses</h2>
+            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+              Comprehensive guided studies for mastering biblical books and concepts
+            </p>
+          </div>
+          
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <Card className="group hover:shadow-lg transition-all cursor-pointer" onClick={() => navigate("/phototheology-course")}>
+              <CardHeader>
+                <BookOpen className="w-12 h-12 text-primary mb-4 group-hover:scale-110 transition-transform" />
+                <CardTitle>Phototheology Course</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-muted-foreground">50-day journey through the complete Palace Method.</p>
+                <Badge className="mt-2" variant="secondary">50 Days</Badge>
+              </CardContent>
+            </Card>
+            
+            <Card className="group hover:shadow-lg transition-all cursor-pointer" onClick={() => navigate("/daniel-course")}>
+              <CardHeader>
+                <Layers className="w-12 h-12 text-accent mb-4 group-hover:scale-110 transition-transform" />
+                <CardTitle>Daniel Course</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-muted-foreground">Deep dive into prophecy and God's sovereignty.</p>
+                <Badge className="mt-2" variant="secondary">12 Chapters</Badge>
+              </CardContent>
+            </Card>
+            
+            <Card className="group hover:shadow-lg transition-all cursor-pointer" onClick={() => navigate("/revelation-course")}>
+              <CardHeader>
+                <Sparkles className="w-12 h-12 text-primary mb-4 group-hover:scale-110 transition-transform" />
+                <CardTitle>Revelation Course</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-muted-foreground">Unlock the mysteries of end-time prophecy.</p>
+                <Badge className="mt-2" variant="secondary">22 Chapters</Badge>
+              </CardContent>
+            </Card>
+            
+            <Card className="group hover:shadow-lg transition-all cursor-pointer" onClick={() => navigate("/blueprint-course")}>
+              <CardHeader>
+                <Target className="w-12 h-12 text-accent mb-4 group-hover:scale-110 transition-transform" />
+                <CardTitle>Blueprint Course</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-muted-foreground">Master the sanctuary system and its meaning.</p>
+                <Badge className="mt-2" variant="secondary">Structured Path</Badge>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+      </section>
+
       {/* Advanced Modes - Floor 0 */}
       <section className="py-24 px-4 sm:px-6 lg:px-8 bg-muted/30">
         <div className="max-w-6xl mx-auto">
