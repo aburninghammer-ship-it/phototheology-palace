@@ -179,7 +179,8 @@ export const Navigation = () => {
                   </div>
 
                   {/* Mobile Navigation */}
-                  <div className="md:hidden">
+                  <div className="md:hidden flex items-center gap-2">
+                    <PWAInstallButton />
                     <MobileNav />
                   </div>
                 </>
