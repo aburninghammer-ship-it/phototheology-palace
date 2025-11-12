@@ -74,6 +74,8 @@ const EscapeRoom = lazy(() => import("./pages/EscapeRoom"));
 const EscapeRoomPlay = lazy(() => import("./pages/EscapeRoomPlay"));
 const Profile = lazy(() => import("./pages/Profile"));
 const UserProfile = lazy(() => import("./pages/UserProfile"));
+const PrincipleCards = lazy(() => import("./pages/PrincipleCards"));
+const PrincipleCardsGame = lazy(() => import("./pages/PrincipleCardsGame"));
 const CriticsAnalysis = lazy(() => import("./pages/CriticsAnalysis"));
 const Referrals = lazy(() => import("./pages/Referrals"));
 const StudentVerification = lazy(() => import("./pages/StudentVerification"));
@@ -203,6 +205,8 @@ function App() {
             <Route path="/games/concentration-room" element={<ProtectedRoute><ConcentrationRoom /></ProtectedRoute>} />
             <Route path="/games/dimensions-room" element={<ProtectedRoute><DimensionsRoom /></ProtectedRoute>} />
             <Route path="/games/blue-room" element={<ProtectedRoute><BlueRoomGame /></ProtectedRoute>} />
+            <Route path="/games/principle-cards" element={<ProtectedRoute><PrincipleCards /></ProtectedRoute>} />
+            <Route path="/games/principle-cards/:gameId" element={<ProtectedRoute><PrincipleCardsGame /></ProtectedRoute>} />
             {/* Redirect routes for easier access */}
             <Route path="/chain-chess" element={<ProtectedRoute><ChainChess /></ProtectedRoute>} />
             <Route path="/games/chain-chess/:gameId/:mode?" element={<ProtectedRoute><ChainChess /></ProtectedRoute>} />

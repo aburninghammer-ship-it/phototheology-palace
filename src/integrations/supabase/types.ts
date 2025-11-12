@@ -1819,6 +1819,127 @@ export type Database = {
         }
         Relationships: []
       }
+      principle_card_games: {
+        Row: {
+          created_at: string
+          current_round: number
+          ended_at: string | null
+          host_user_id: string
+          id: string
+          max_players: number
+          room_id: string
+          started_at: string | null
+          status: string
+          total_rounds: number
+          winner_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          current_round?: number
+          ended_at?: string | null
+          host_user_id: string
+          id?: string
+          max_players?: number
+          room_id: string
+          started_at?: string | null
+          status?: string
+          total_rounds?: number
+          winner_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          current_round?: number
+          ended_at?: string | null
+          host_user_id?: string
+          id?: string
+          max_players?: number
+          room_id?: string
+          started_at?: string | null
+          status?: string
+          total_rounds?: number
+          winner_id?: string | null
+        }
+        Relationships: []
+      }
+      principle_card_players: {
+        Row: {
+          cards_won: number
+          game_id: string
+          id: string
+          joined_at: string
+          score: number
+          user_id: string
+        }
+        Insert: {
+          cards_won?: number
+          game_id: string
+          id?: string
+          joined_at?: string
+          score?: number
+          user_id: string
+        }
+        Update: {
+          cards_won?: number
+          game_id?: string
+          id?: string
+          joined_at?: string
+          score?: number
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "principle_card_players_game_id_fkey"
+            columns: ["game_id"]
+            isOneToOne: false
+            referencedRelation: "principle_card_games"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      principle_card_rounds: {
+        Row: {
+          card_description: string
+          card_principle: string
+          completed_at: string | null
+          correct_player_id: string | null
+          created_at: string
+          game_id: string
+          id: string
+          round_number: number
+          scenario_text: string
+        }
+        Insert: {
+          card_description: string
+          card_principle: string
+          completed_at?: string | null
+          correct_player_id?: string | null
+          created_at?: string
+          game_id: string
+          id?: string
+          round_number: number
+          scenario_text: string
+        }
+        Update: {
+          card_description?: string
+          card_principle?: string
+          completed_at?: string | null
+          correct_player_id?: string | null
+          created_at?: string
+          game_id?: string
+          id?: string
+          round_number?: number
+          scenario_text?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "principle_card_rounds_game_id_fkey"
+            columns: ["game_id"]
+            isOneToOne: false
+            referencedRelation: "principle_card_games"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           access_code_used: string | null

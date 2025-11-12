@@ -68,6 +68,18 @@ const Games = () => {
       route: "/games/verse_match"
     },
     {
+      id: "principle-cards",
+      name: "Principle Cards",
+      description: "Multiplayer card game where principles become cards! Match them to scenarios and compete.",
+      icon: "🎴",
+      floor: 4,
+      timed: false,
+      rooms: ["All"],
+      modes: ["multiplayer"],
+      difficulties: ["medium"],
+      route: "/games/principle-cards"
+    },
+    {
       id: "observation_room",
       name: "Observation Detective",
       description: "Spot hidden details in Scripture passages. Train your investigative eye like a detective!",
