@@ -1,4 +1,4 @@
-import React, { Suspense, lazy } from "react";
+import React, { Suspense, lazy, useState } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -13,6 +13,8 @@ import { SidebarProvider } from "@/components/ui/sidebar";
 import { MessagingSidebar } from "@/components/MessagingSidebar";
 import { LiveNotificationsProvider } from "@/components/LiveNotificationsProvider";
 import { AchievementProvider } from "@/components/AchievementProvider";
+import { SplashScreen } from "@/components/SplashScreen";
+import { AnimatePresence } from "framer-motion";
 
 // Critical pages - load immediately
 import Index from "./pages/Index";
@@ -118,6 +120,8 @@ const NotFound = lazy(() => import("./pages/NotFound"));
 const queryClient = new QueryClient();
 
 function App() {
+  const [showSplash, setShowSplash] = useState(true);
+
   return (
     <ErrorBoundary>
       <QueryClientProvider client={queryClient}>
@@ -126,7 +130,13 @@ function App() {
           <Sonner />
           <OfflineIndicator />
           <PWAUpdatePrompt />
-          <BrowserRouter>
+          <AnimatePresence mode="wait">
+            {showSplash && (
+              <SplashScreen onComplete={() => setShowSplash(false)} />
+            )}
+          </AnimatePresence>
+          {!showSplash && (
+            <BrowserRouter>
             <LiveNotificationsProvider>
               <AchievementProvider>
                 <SidebarProvider defaultOpen={false}>
@@ -262,6 +272,7 @@ function App() {
               </AchievementProvider>
             </LiveNotificationsProvider>
           </BrowserRouter>
+          )}
         </TooltipProvider>
       </QueryClientProvider>
     </ErrorBoundary>
