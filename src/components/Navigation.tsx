@@ -90,7 +90,7 @@ export const Navigation = () => {
                     </Button>
                     
                     <Button variant="ghost" asChild size="sm" className="whitespace-nowrap">
-                      <Link to="/phototheology-gpt">GPTs</Link>
+                      <Link to="/phototheologygpt">GPTs</Link>
                     </Button>
                     
                     <Button variant="ghost" asChild size="sm" className="whitespace-nowrap">
@@ -169,7 +169,7 @@ export const Navigation = () => {
                     </Button>
                     
                     <Button variant="ghost" asChild size="sm" className="whitespace-nowrap">
-                      <Link to="/phototheology-gpt">GPTs</Link>
+                      <Link to="/phototheologygpt">GPTs</Link>
                     </Button>
                     
                     <Button variant="ghost" asChild size="sm" className="whitespace-nowrap">
