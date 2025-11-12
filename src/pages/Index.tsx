@@ -65,6 +65,33 @@ const Index = () => {
     <div className="min-h-screen bg-background">
       <Navigation />
       
+      {/* Quick Access Banner for Authenticated Users */}
+      {user && (
+        <div className="sticky top-0 z-40 bg-gradient-to-r from-primary to-accent border-b border-border/50 backdrop-blur-sm shadow-lg">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center">
+                  <BookOpen className="w-5 h-5 text-white" />
+                </div>
+                <div>
+                  <p className="text-white font-semibold text-sm">Welcome back!</p>
+                  <p className="text-white/80 text-xs">Continue your journey through the Palace</p>
+                </div>
+              </div>
+              <Button 
+                onClick={() => navigate("/palace")}
+                className="bg-white text-primary hover:bg-white/90 shadow-lg font-semibold"
+                size="lg"
+              >
+                Enter Palace
+                <ChevronRight className="ml-2 h-5 w-5" />
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+      
       {/* Hero Section - Pain First */}
       <section className="relative overflow-hidden pt-32 pb-24 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-primary/5 via-background to-accent/5">
         <div className="max-w-6xl mx-auto text-center">
