@@ -79,6 +79,10 @@ export const Navigation = () => {
                     </Button>
                     
                     <Button variant="ghost" asChild size="sm">
+                      <Link to="/bible">Bible</Link>
+                    </Button>
+                    
+                    <Button variant="ghost" asChild size="sm">
                       <Link to="/games">Games</Link>
                     </Button>
                     
@@ -91,7 +95,15 @@ export const Navigation = () => {
                     </Button>
                     
                     <Button variant="ghost" asChild size="sm">
-                      <Link to="/series-builder">Series Builder</Link>
+                      <Link to="/series-builder">Series</Link>
+                    </Button>
+                    
+                    <Button variant="ghost" asChild size="sm">
+                      <Link to="/pricing">Pricing</Link>
+                    </Button>
+                    
+                    <Button variant="ghost" asChild size="sm">
+                      <Link to="/community">Community</Link>
                     </Button>
                     
                     <Button asChild size="sm" className="gap-2 bg-gradient-to-r from-primary to-accent text-primary-foreground hover:opacity-90">
@@ -145,6 +157,10 @@ export const Navigation = () => {
                     </Button>
                     
                     <Button variant="ghost" asChild size="sm">
+                      <Link to="/bible">Bible</Link>
+                    </Button>
+                    
+                    <Button variant="ghost" asChild size="sm">
                       <Link to="/games">Games</Link>
                     </Button>
                     
@@ -157,7 +173,15 @@ export const Navigation = () => {
                     </Button>
                     
                     <Button variant="ghost" asChild size="sm">
-                      <Link to="/series-builder">Series Builder</Link>
+                      <Link to="/series-builder">Series</Link>
+                    </Button>
+                    
+                    <Button variant="ghost" asChild size="sm">
+                      <Link to="/pricing">Pricing</Link>
+                    </Button>
+                    
+                    <Button variant="ghost" asChild size="sm">
+                      <Link to="/community">Community</Link>
                     </Button>
                     
                     <Button asChild size="sm" variant="outline" className="gap-2">
