@@ -79,11 +79,11 @@ const MyStudies = () => {
   };
 
   const createNewStudy = async (title = "Untitled Study", content = "") => {
-    console.log("createNewStudy called, user:", user);
-    console.log("authLoading:", authLoading);
+    // Verify we have a valid session before proceeding
+    const { data: { session }, error: sessionError } = await supabase.auth.getSession();
     
-    if (!user?.id) {
-      console.error("No user ID available");
+    if (sessionError || !session) {
+      console.error("No valid session:", sessionError);
       toast({
         title: "Authentication Required",
         description: "Please sign in to create a study",
@@ -93,12 +93,11 @@ const MyStudies = () => {
     }
 
     try {
-      console.log("Attempting to insert study with user_id:", user.id);
       const { data, error } = await supabase
         .from("user_studies")
         .insert([
           {
-            user_id: user.id,
+            user_id: session.user.id,
             title,
             content,
           },
@@ -110,8 +109,12 @@ const MyStudies = () => {
         console.error("Supabase error:", error);
         throw error;
       }
-      console.log("Study created successfully:", data);
+      
       navigate(`/my-studies/${data.id}`);
+      toast({
+        title: "Success",
+        description: "Study created successfully",
+      });
     } catch (error) {
       console.error("Error creating study:", error);
       toast({
