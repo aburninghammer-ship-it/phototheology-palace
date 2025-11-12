@@ -28,8 +28,10 @@ export const JeevesStudyAssistant = ({ studyContext }: JeevesStudyAssistantProps
     if (!input.trim() || loading) return;
 
     const userMessage = input.trim();
+    const updatedMessages = [...messages, { role: "user" as const, content: userMessage }];
+    
     setInput("");
-    setMessages(prev => [...prev, { role: "user", content: userMessage }]);
+    setMessages(updatedMessages);
     setLoading(true);
 
     try {
@@ -38,6 +40,7 @@ export const JeevesStudyAssistant = ({ studyContext }: JeevesStudyAssistantProps
           mode: "qa",
           question: userMessage,
           context: studyContext || "General Bible study assistance",
+          conversationHistory: messages, // Send previous messages for context
         },
       });
 

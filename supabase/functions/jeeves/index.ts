@@ -1542,6 +1542,8 @@ Return JSON: { "approved": true/false, "rating": 1-5, "feedback": "brief comment
 
     } else if (mode === "qa") {
       // Q&A mode for "Ask Jeeves" in rooms - properties already destructured from requestBody
+      const { conversationHistory } = requestBody;
+      
       systemPrompt = `You are Jeeves, a wise and enthusiastic Bible study assistant for Phototheology. Answer questions clearly and biblically, using the Palace framework when relevant.
 
 **CRITICAL FORMATTING REQUIREMENTS:**
@@ -1549,6 +1551,7 @@ Return JSON: { "approved": true/false, "rating": 1-5, "feedback": "brief comment
 - Separate each paragraph with a blank line
 - Use bullet points (•) for lists
 - Keep text easy to read and conversational
+- Remember the conversation context and build on previous questions
       
 ${PALACE_SCHEMA}`;
       
@@ -1558,12 +1561,19 @@ ${PALACE_SCHEMA}`;
 ${context}
 
 Incorporate this context into your answer when relevant.` : '';
+
+      const historySection = conversationHistory && conversationHistory.length > 0 ? `
+
+**CONVERSATION HISTORY:**
+${conversationHistory.map((msg: any) => `${msg.role === 'user' ? 'Student' : 'Jeeves'}: ${msg.content}`).join('\n\n')}
+
+Use this conversation history to provide contextual answers that build on previous discussion.` : '';
       
-      userPrompt = `A student asks: "${question}"${contextSection}
+      userPrompt = `A student asks: "${question}"${contextSection}${historySection}
 
 Provide a clear, insightful answer in clear paragraphs:
 
-Paragraph 1: Directly address their question${context ? ' in light of their study context' : ''}
+Paragraph 1: Directly address their question${context ? ' in light of their study context' : ''}${historySection ? ' and previous conversation' : ''}
 
 Paragraph 2: Use biblical references and examples
 
