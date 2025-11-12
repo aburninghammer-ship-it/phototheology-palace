@@ -360,13 +360,21 @@ export default function InteractiveDemo() {
                         What's your name? (Optional - for your certificate)
                       </label>
                       <Input
+                        type="text"
                         value={userName}
                         onChange={(e) => {
+                          console.log('Name input changed:', e.target.value);
                           setUserName(e.target.value);
                           trackInteraction();
                         }}
+                        onFocus={(e) => {
+                          console.log('Input focused');
+                          e.target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        }}
+                        onBlur={() => console.log('Input blurred')}
                         placeholder="Enter your name"
                         className="max-w-xs"
+                        autoComplete="off"
                       />
                     </div>
                     
