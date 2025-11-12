@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Download } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
 
 interface BeforeInstallPromptEvent extends Event {
   prompt: () => Promise<void>;
@@ -45,12 +46,17 @@ export function PWAInstallButton() {
   return (
     <Button
       onClick={handleInstall}
-      variant="outline"
       size="sm"
-      className="gap-2"
+      className="relative gap-2 bg-gradient-to-r from-primary to-accent hover:from-primary/90 hover:to-accent/90 text-primary-foreground shadow-lg hover:shadow-xl transition-all duration-300 animate-pulse-subtle font-semibold"
     >
-      <Download className="h-4 w-4" />
+      <Download className="h-4 w-4 animate-bounce" />
       <span className="hidden sm:inline">Install App</span>
+      <Badge 
+        variant="secondary" 
+        className="absolute -top-1 -right-1 h-5 w-5 p-0 flex items-center justify-center text-[10px] bg-accent text-accent-foreground animate-pulse"
+      >
+        !
+      </Badge>
     </Button>
   );
 }
