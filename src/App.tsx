@@ -112,7 +112,6 @@ const ChurchSignupSuccess = lazy(() => import("./pages/ChurchSignupSuccess"));
 const ChurchSignupCancelled = lazy(() => import("./pages/ChurchSignupCancelled"));
 const AdminStrongsImport = lazy(() => import("./pages/AdminStrongsImport"));
 const AdminBibleImport = lazy(() => import("./pages/AdminBibleImport"));
-const InstallApp = lazy(() => import("./pages/InstallApp"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
 const queryClient = new QueryClient();
@@ -251,7 +250,6 @@ function App() {
             <Route path="/church-signup" element={<ChurchSignup />} />
             <Route path="/church-signup/success" element={<ChurchSignupSuccess />} />
             <Route path="/church-signup/cancelled" element={<ChurchSignupCancelled />} />
-            <Route path="/install-app" element={<InstallApp />} />
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                 <Route path="*" element={<NotFound />} />
                     </Routes>

@@ -103,10 +103,6 @@ export const Navigation = () => {
                     </Button>
                     
                     <Button variant="ghost" asChild size="sm" className="whitespace-nowrap">
-                      <Link to="/install-app">Download</Link>
-                    </Button>
-                    
-                    <Button variant="ghost" asChild size="sm" className="whitespace-nowrap">
                       <Link to="/pricing">Pricing</Link>
                     </Button>
                     
@@ -179,10 +175,6 @@ export const Navigation = () => {
                     
                     <Button variant="ghost" asChild size="sm" className="whitespace-nowrap">
                       <Link to="/series-builder">Series</Link>
-                    </Button>
-                    
-                    <Button variant="ghost" asChild size="sm" className="whitespace-nowrap">
-                      <Link to="/install-app">Download</Link>
                     </Button>
                     
                     <Button variant="ghost" asChild size="sm" className="whitespace-nowrap">
