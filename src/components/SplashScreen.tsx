@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
+import { WifiOff, Wifi } from "lucide-react";
 
 interface SplashScreenProps {
   onComplete: () => void;
@@ -7,8 +8,16 @@ interface SplashScreenProps {
 
 export const SplashScreen = ({ onComplete }: SplashScreenProps) => {
   const [progress, setProgress] = useState(0);
+  const [isOnline, setIsOnline] = useState(navigator.onLine);
 
   useEffect(() => {
+    // Check online status
+    const handleOnline = () => setIsOnline(true);
+    const handleOffline = () => setIsOnline(false);
+
+    window.addEventListener('online', handleOnline);
+    window.addEventListener('offline', handleOffline);
+
     // Simulate loading progress
     const interval = setInterval(() => {
       setProgress(prev => {
@@ -21,7 +30,11 @@ export const SplashScreen = ({ onComplete }: SplashScreenProps) => {
       });
     }, 30);
 
-    return () => clearInterval(interval);
+    return () => {
+      clearInterval(interval);
+      window.removeEventListener('online', handleOnline);
+      window.removeEventListener('offline', handleOffline);
+    };
   }, [onComplete]);
 
   return (
@@ -225,15 +238,49 @@ export const SplashScreen = ({ onComplete }: SplashScreenProps) => {
           />
         </motion.div>
 
-        {/* Loading text */}
-        <motion.p
-          className="text-white/70 text-sm tracking-wider"
+        {/* Connection Status & Loading text */}
+        <motion.div
+          className="flex flex-col items-center gap-3"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 1.2 }}
         >
-          Entering the Palace...
-        </motion.p>
+          {!isOnline ? (
+            <>
+              <motion.div
+                className="flex items-center gap-2 px-4 py-2 bg-amber-500/20 border border-amber-500/30 rounded-full backdrop-blur-sm"
+                initial={{ scale: 0.9 }}
+                animate={{ scale: 1 }}
+                transition={{
+                  repeat: Infinity,
+                  duration: 1.5,
+                  repeatType: "reverse"
+                }}
+              >
+                <WifiOff className="w-4 h-4 text-amber-300" />
+                <span className="text-amber-100 text-xs font-medium">Offline Mode</span>
+              </motion.div>
+              <p className="text-white/80 text-sm tracking-wide text-center max-w-xs">
+                No internet connection detected.<br />
+                <span className="text-white/60 text-xs">You can still access saved content and features.</span>
+              </p>
+            </>
+          ) : (
+            <>
+              <motion.div
+                className="flex items-center gap-2 px-4 py-2 bg-emerald-500/20 border border-emerald-500/30 rounded-full backdrop-blur-sm"
+                initial={{ scale: 0.9 }}
+                animate={{ scale: 1 }}
+              >
+                <Wifi className="w-4 h-4 text-emerald-300" />
+                <span className="text-emerald-100 text-xs font-medium">Connected</span>
+              </motion.div>
+              <p className="text-white/70 text-sm tracking-wider">
+                Entering the Palace...
+              </p>
+            </>
+          )}
+        </motion.div>
       </div>
 
       {/* Decorative stars */}
