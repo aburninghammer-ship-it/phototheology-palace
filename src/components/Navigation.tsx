@@ -40,9 +40,11 @@ export const Navigation = () => {
               </span>
             </Link>
           
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-2 md:gap-4">
               {user && (
                 <>
+                  <PWAInstallButton />
+                  
                   <div className="hidden md:flex items-center gap-2 text-sm text-muted-foreground">
                     <Users className="h-4 w-4" />
                     <span>{activeCount} active</span>
@@ -68,8 +70,6 @@ export const Navigation = () => {
                   </Button>
 
                   <NotificationCenter />
-                  
-                  <PWAInstallButton />
                 </>
               )}
 
@@ -179,8 +179,7 @@ export const Navigation = () => {
                   </div>
 
                   {/* Mobile Navigation */}
-                  <div className="md:hidden flex items-center gap-2">
-                    <PWAInstallButton />
+                  <div className="md:hidden">
                     <MobileNav />
                   </div>
                 </>
@@ -263,7 +262,7 @@ export const Navigation = () => {
                   </div>
 
                   {/* Mobile Navigation for logged-out users */}
-                  <div className="md:hidden">
+                  <div className="md:hidden flex items-center gap-2">
                     <PWAInstallButton />
                     
                     <Button asChild size="sm">
