@@ -191,19 +191,23 @@ export default function InteractiveDemo() {
         console.error("Error loading demo progress:", error);
       }
     }
-  }, []);
+  }, [toast]);
 
-  // Save progress to localStorage whenever it changes
+  // Save progress to localStorage whenever it changes (debounced)
   useEffect(() => {
-    if (currentStep > 0 || completedSteps.length > 0) {
-      const progressData = {
-        currentStep,
-        completedSteps,
-        userName,
-        lastUpdated: new Date().toISOString(),
-      };
-      localStorage.setItem("demo_progress", JSON.stringify(progressData));
-    }
+    const timeoutId = setTimeout(() => {
+      if (currentStep > 0 || completedSteps.length > 0 || userName) {
+        const progressData = {
+          currentStep,
+          completedSteps,
+          userName,
+          lastUpdated: new Date().toISOString(),
+        };
+        localStorage.setItem("demo_progress", JSON.stringify(progressData));
+      }
+    }, 500);
+    
+    return () => clearTimeout(timeoutId);
   }, [currentStep, completedSteps, userName]);
 
   // Reset hint when step changes
