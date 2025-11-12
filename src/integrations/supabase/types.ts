@@ -3155,12 +3155,24 @@ export type Database = {
         }
         Returns: boolean
       }
+      has_study_access: {
+        Args: { study_id_param: string; user_id_param: string }
+        Returns: boolean
+      }
+      has_study_edit_access: {
+        Args: { study_id_param: string; user_id_param: string }
+        Returns: boolean
+      }
       increment_user_points: {
         Args: { points_to_add: number; user_id: string }
         Returns: undefined
       }
       is_church_admin: {
         Args: { _church_id: string; _user_id: string }
+        Returns: boolean
+      }
+      is_study_owner: {
+        Args: { study_id_param: string; user_id_param: string }
         Returns: boolean
       }
       redeem_access_code: { Args: { code_input: string }; Returns: Json }
