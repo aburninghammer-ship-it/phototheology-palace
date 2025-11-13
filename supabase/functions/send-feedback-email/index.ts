@@ -27,7 +27,7 @@ const handler = async (req: Request): Promise<Response> => {
 
     const emailResponse = await resend.emails.send({
       from: "Phototheology Feedback <onboarding@resend.dev>",
-      to: ["aburninghammer@yahoo.com"],
+      to: ["aburninghammer@gmail.com"],
       subject: `New Feedback: ${category} - ${title}`,
       html: `
         <h2>New Feedback Submission</h2>
