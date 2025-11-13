@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { Building2, Sparkles, Users, User, CreditCard, LogOut, MessageCircle } from "lucide-react";
+import { Building2, Sparkles, Users, User, CreditCard, LogOut, MessageCircle, BookOpen, Calendar, Image } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
 import { useActiveUsers } from "@/hooks/useActiveUsers";
@@ -104,17 +104,48 @@ export const Navigation = () => {
                 <>
                   {/* Desktop Navigation - Horizontal Scroll on Smaller Screens */}
                   <div className="hidden md:flex items-center gap-2 overflow-x-auto scrollbar-hide max-w-2xl">
-                    <Button variant="ghost" asChild size="sm" className="whitespace-nowrap">
-                      <Link to="/palace">Palace</Link>
-                    </Button>
-                    
-                    <Button variant="ghost" asChild size="sm" className="whitespace-nowrap">
-                      <Link to="/bible">Bible</Link>
-                    </Button>
-                    
-                    <Button variant="ghost" asChild size="sm" className="whitespace-nowrap">
-                      <Link to="/my-studies">My Studies</Link>
-                    </Button>
+                  <Button variant="ghost" asChild size="sm" className="whitespace-nowrap">
+                    <Link to="/palace">Palace</Link>
+                  </Button>
+                  
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="ghost" size="sm" className="whitespace-nowrap">
+                        <BookOpen className="h-4 w-4 mr-1" />
+                        Bible
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end" className="w-56 bg-card border-border z-50">
+                      <DropdownMenuItem asChild>
+                        <Link to="/bible" className="cursor-pointer">
+                          <BookOpen className="mr-2 h-4 w-4" />
+                          Bible Reader
+                        </Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem asChild>
+                        <Link to="/quarterly-study" className="cursor-pointer">
+                          <Calendar className="mr-2 h-4 w-4" />
+                          Amplified Quarterly
+                        </Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem asChild>
+                        <Link to="/bible-image-library" className="cursor-pointer">
+                          <Image className="mr-2 h-4 w-4" />
+                          Image Library
+                        </Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem asChild>
+                        <Link to="/bible-study-leader" className="cursor-pointer">
+                          <Users className="mr-2 h-4 w-4" />
+                          Lead Bible Study
+                        </Link>
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                  
+                  <Button variant="ghost" asChild size="sm" className="whitespace-nowrap">
+                    <Link to="/my-studies">My Studies</Link>
+                  </Button>
                     
                     <Button variant="ghost" asChild size="sm" className="whitespace-nowrap">
                       <Link to="/games">Games</Link>
