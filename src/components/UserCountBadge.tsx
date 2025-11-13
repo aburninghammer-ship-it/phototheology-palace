@@ -1,9 +1,13 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Users } from "lucide-react";
+import Confetti from "react-confetti";
+import { useWindowSize } from "react-use";
 
 export function UserCountBadge() {
   const [userCount, setUserCount] = useState<number | null>(null);
+  const [showConfetti, setShowConfetti] = useState(false);
+  const { width, height } = useWindowSize();
 
   useEffect(() => {
     const fetchUserCount = async () => {
@@ -37,6 +41,9 @@ export function UserCountBadge() {
             newProfile.has_lifetime_access === true
           ) {
             setUserCount((prev) => (prev || 0) + 1);
+            // Trigger confetti celebration
+            setShowConfetti(true);
+            setTimeout(() => setShowConfetti(false), 5000);
           }
         }
       )
@@ -50,7 +57,17 @@ export function UserCountBadge() {
   if (userCount === null) return null;
 
   return (
-    <div className="inline-flex items-center gap-3 px-6 py-3 rounded-full bg-gradient-to-r from-primary/20 to-accent/20 border-2 border-primary/40 backdrop-blur-sm shadow-lg hover:shadow-xl transition-all duration-300 animate-in fade-in slide-in-from-bottom-4">
+    <>
+      {showConfetti && (
+        <Confetti
+          width={width}
+          height={height}
+          recycle={false}
+          numberOfPieces={200}
+          gravity={0.3}
+        />
+      )}
+      <div className="inline-flex items-center gap-3 px-6 py-3 rounded-full bg-gradient-to-r from-primary/20 to-accent/20 border-2 border-primary/40 backdrop-blur-sm shadow-lg hover:shadow-xl transition-all duration-300 animate-in fade-in slide-in-from-bottom-4">
       <div className="relative">
         <Users className="w-6 h-6 text-primary" />
         <div className="absolute -top-1 -right-1 w-3 h-3 bg-green-500 rounded-full animate-pulse" />
@@ -64,5 +81,6 @@ export function UserCountBadge() {
         </span>
       </div>
     </div>
+    </>
   );
 }
