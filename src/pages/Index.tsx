@@ -99,7 +99,7 @@ const Index = () => {
       {/* Hero Section - Pain First */}
       <section className="relative overflow-hidden pt-32 pb-24 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-primary/5 via-background to-accent/5">
         <div className="max-w-6xl mx-auto text-center">
-          <div className="flex justify-center mb-6">
+          <div className="flex justify-center mb-8">
             <UserCountBadge />
           </div>
           

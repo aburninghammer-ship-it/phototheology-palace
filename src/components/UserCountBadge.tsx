@@ -50,11 +50,19 @@ export function UserCountBadge() {
   if (userCount === null) return null;
 
   return (
-    <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 backdrop-blur-sm">
-      <Users className="w-4 h-4 text-primary" />
-      <span className="text-sm font-semibold text-foreground">
-        {userCount} users and counting
-      </span>
+    <div className="inline-flex items-center gap-3 px-6 py-3 rounded-full bg-gradient-to-r from-primary/20 to-accent/20 border-2 border-primary/40 backdrop-blur-sm shadow-lg hover:shadow-xl transition-all duration-300 animate-in fade-in slide-in-from-bottom-4">
+      <div className="relative">
+        <Users className="w-6 h-6 text-primary" />
+        <div className="absolute -top-1 -right-1 w-3 h-3 bg-green-500 rounded-full animate-pulse" />
+      </div>
+      <div className="flex flex-col items-start">
+        <span className="text-2xl font-bold text-primary tabular-nums">
+          {userCount}
+        </span>
+        <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+          Users & Counting
+        </span>
+      </div>
     </div>
   );
 }
