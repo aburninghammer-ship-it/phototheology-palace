@@ -117,7 +117,7 @@ export default function Pricing() {
       ctaText: "Get Essential",
       ctaVariant: "default" as const,
       monthlyUrl: "https://buy.stripe.com/4gM8wP6U37zoavefiY6EU07",
-      annualUrl: "https://buy.stripe.com/4gM8wP6U37zoavefiY6EU07", // TODO: Replace with annual Stripe link
+      annualUrl: "https://buy.stripe.com/4gM8wPguD4ncdHqc6M6EU0a",
       features: [
         "Everything in Free Trial (continued)",
         "Phototheology GPT - Main AI Assistant",
@@ -149,7 +149,7 @@ export default function Pricing() {
       ctaText: "Get Premium",
       ctaVariant: "default" as const,
       monthlyUrl: "https://buy.stripe.com/aFa3cvemv7zo46Q9YE6EU08",
-      annualUrl: "https://buy.stripe.com/aFa3cvemv7zo46Q9YE6EU08", // TODO: Replace with annual Stripe link
+      annualUrl: "https://buy.stripe.com/eVq8wPfqz06WcDm7Qw6EU0b",
       popular: true,
       features: [
         "Everything in Essential",
