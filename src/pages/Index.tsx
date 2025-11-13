@@ -32,6 +32,8 @@ import { useAuth } from "@/hooks/useAuth";
 import { useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import heroImage from "@/assets/phototheology-hero.png";
+import practiceWithAi from "@/assets/practice-with-ai.png";
+import masterDeploy from "@/assets/master-deploy.png";
 
 const Index = () => {
   const navigate = useNavigate();
@@ -173,9 +175,7 @@ const Index = () => {
                 <p className="text-muted-foreground mb-4">
                   Jeeves, your AI study partner, guides you through drills, answers questions, and validates your insights using the Palace framework—like having a seminary professor 24/7.
                 </p>
-                <div className="bg-muted p-4 rounded border border-border">
-                  <p className="text-sm italic">"Let's map this verse into the Concentration Room and test it with the Fruit Room..."</p>
-                </div>
+                <img src={practiceWithAi} alt="AI study assistant" className="rounded border border-border" />
               </CardContent>
             </Card>
             
@@ -191,11 +191,7 @@ const Index = () => {
                 <p className="text-muted-foreground mb-4">
                   By Floor 8, the Palace becomes reflexive—you think Phototheologically without trying. Then deploy: build sermons, teach classes, lead ministries with confidence.
                 </p>
-                <div className="flex flex-wrap gap-2">
-                  <Badge variant="secondary">Sermon Builder</Badge>
-                  <Badge variant="secondary">Teaching Tools</Badge>
-                  <Badge variant="secondary">Ministry Launch</Badge>
-                </div>
+                <img src={masterDeploy} alt="Ministry leadership and deployment" className="rounded border border-border" />
               </CardContent>
             </Card>
           </div>
