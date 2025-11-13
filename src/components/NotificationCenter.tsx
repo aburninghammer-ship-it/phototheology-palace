@@ -17,11 +17,9 @@ export function NotificationCenter() {
   const { notifications, unreadCount, markAsRead, markAllAsRead } = useNotifications();
   const navigate = useNavigate();
 
-  const handleNotificationClick = (notification: any, e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    
-    markAsRead(notification.id);
+  const handleNotificationClick = async (notification: any) => {
+    // Mark as read first and wait for it to complete
+    await markAsRead(notification.id);
     
     // Handle message notifications by opening the messaging sidebar
     if (notification.type === 'message' || notification.type === 'direct_message') {
@@ -84,8 +82,10 @@ export function NotificationCenter() {
                 className={`flex flex-col items-start gap-1 p-3 cursor-pointer ${
                   !notification.is_read ? 'bg-muted/50' : ''
                 }`}
-                onSelect={(e) => e.preventDefault()}
-                onClick={(e) => handleNotificationClick(notification, e)}
+                onSelect={(e) => {
+                  e.preventDefault();
+                  handleNotificationClick(notification);
+                }}
               >
                 <div className="flex items-start justify-between w-full">
                   <div className="flex-1">
