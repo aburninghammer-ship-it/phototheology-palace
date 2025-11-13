@@ -15,6 +15,10 @@ import { SanctuaryMapChallenge } from "@/components/challenges/SanctuaryMapChall
 import { ChristChapterChallenge } from "@/components/challenges/ChristChapterChallenge";
 import { FruitCheckChallenge } from "@/components/challenges/FruitCheckChallenge";
 import { SubjectConnectionChallenge } from "@/components/challenges/SubjectConnectionChallenge";
+import { ChefRecipeChallenge } from "@/components/challenges/ChefRecipeChallenge";
+import { EquationDecodeChallenge } from "@/components/challenges/EquationDecodeChallenge";
+import { SeventyQuestionsChallenge } from "@/components/challenges/SeventyQuestionsChallenge";
+import { PrincipleStudyChallenge } from "@/components/challenges/PrincipleStudyChallenge";
 
 const DailyChallenges = () => {
   const { user } = useAuth();
@@ -139,6 +143,14 @@ const DailyChallenges = () => {
         return <FruitCheckChallenge {...props} />;
       case "subject-connection":
         return <SubjectConnectionChallenge {...props} />;
+      case "chef-recipe":
+        return <ChefRecipeChallenge {...props} />;
+      case "equation-decode":
+        return <EquationDecodeChallenge {...props} />;
+      case "70-questions":
+        return <SeventyQuestionsChallenge {...props} />;
+      case "principle-study":
+        return <PrincipleStudyChallenge {...props} />;
       default:
         return (
           <Card>
@@ -198,7 +210,8 @@ const DailyChallenges = () => {
                 <p className="text-sm text-muted-foreground">
                   Each day brings a new challenge designed to train you in Phototheology principles. 
                   Complete challenges to build your Growth Journal and develop reflexive biblical thinking.
-                  We rotate through 30 different challenge types on a schedule.
+                  We rotate through 30 different Bible study challenges: dimension drills, chef recipes, 
+                  equation decoding, 70 questions, principle studies, and more!
                 </p>
               </div>
 

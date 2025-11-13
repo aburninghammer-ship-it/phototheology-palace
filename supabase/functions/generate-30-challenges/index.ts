@@ -25,12 +25,16 @@ serve(async (req) => {
     console.log('Generating 30 daily challenges...');
 
     const challengeTypes = [
-      { type: "dimension-drill", tier: "Core", principle: "5 Dimensions (DR)" },
-      { type: "connect-6", tier: "Quick", principle: "Connect 6 Genres (C6)" },
-      { type: "sanctuary-map", tier: "Deep", principle: "Sanctuary Blueprint (BL)" },
-      { type: "christ-chapter", tier: "Core", principle: "Christ in Every Chapter (CEC)" },
-      { type: "fruit-check", tier: "Quick", principle: "Fruit Test (FRt)" },
-      { type: "subject-connection", tier: "Core", principle: "Theme Connections (TRm)" },
+      { type: "dimension-drill", tier: "Quick", principle: "Dimensions Room (DR)" },
+      { type: "connect-6", tier: "Quick", principle: "Connect 6 Room (C6)" },
+      { type: "sanctuary-map", tier: "Core", principle: "Blue Room (BL)" },
+      { type: "christ-chapter", tier: "Core", principle: "Concentration Room (CR)" },
+      { type: "fruit-check", tier: "Quick", principle: "Fruit Room (FRt)" },
+      { type: "subject-connection", tier: "Core", principle: "Multiple Rooms" },
+      { type: "chef-recipe", tier: "Quick", principle: "Bible Freestyle (BF) + Concentration Room (CR)" },
+      { type: "equation-decode", tier: "Core", principle: "Multiple Palace Principles" },
+      { type: "70-questions", tier: "Deep", principle: "Questions Room (QR)" },
+      { type: "principle-study", tier: "Core", principle: "Multiple Rooms" }
     ];
 
     const difficulties = ["easy", "intermediate", "advanced"];
@@ -40,19 +44,106 @@ serve(async (req) => {
       const challengeType = challengeTypes[day % challengeTypes.length];
       const difficulty = difficulties[Math.floor((day - 1) / 10)];
 
-      const prompt = `Create a Phototheology daily challenge for Day ${day} of 30.
+      const prompt = `Generate a daily Phototheology challenge for Day ${day} of 30.
 
 Challenge Type: ${challengeType.type}
+Tier: ${challengeType.tier}
+Principle: ${challengeType.principle}
 Difficulty: ${difficulty}
-Principle Focus: ${challengeType.principle}
 
-Create a ${challengeType.type} challenge that teaches users to apply ${challengeType.principle} to Scripture study.
+${challengeType.type === "chef-recipe" ? `
+For chef-recipe challenges:
+- Provide a theological theme (e.g., "The Gospel in 5 verses", "Sanctuary service from altar to ark", "State of the dead")
+- Challenge users to create a coherent mini-sermon using ONLY Bible verse references (no commentary)
+- Require 5-7 verses minimum
+- Verses should flow together and build a complete theological point
 
-${challengeType.type === "subject-connection" ? `
-For SUBJECT CONNECTION challenges:
+Return JSON with:
+{
+  "title": "engaging title (e.g., 'Biblical Recipe: The Gospel Journey')",
+  "description": "brief instructions (50-75 words)",
+  "challenge_subtype": "chef-recipe",
+  "challenge_tier": "${challengeType.tier}",
+  "difficulty": "${difficulty}",
+  "principle_used": "${challengeType.principle}",
+  "ui_config": {
+    "theme": "the theological theme to build",
+    "min_verses": 5
+  },
+  "passage_reference": "Theme-based (no specific passage)",
+  "expected_insights": ["insight about verse selection", "insight about theological flow"]
+}
+` : challengeType.type === "equation-decode" ? `
+For equation-decode challenges:
+- Provide a Bible verse
+- Create an equation using Palace principle codes (e.g., "CR + 2D + BL + @CyC = ?")
+- Use real Palace codes: CR (Concentration), DR (Dimensions), BL (Blue/Sanctuary), @CyC (Cyrus-Christ cycle), 1H/2H/3H (Heavens), etc.
+- Challenge users to decode what each symbol means and how they combine to reveal Christ
+
+Return JSON with:
+{
+  "title": "engaging title (e.g., 'Decode: John 3:16')",
+  "description": "brief instructions (50-75 words)",
+  "challenge_subtype": "equation-decode",
+  "challenge_tier": "${challengeType.tier}",
+  "difficulty": "${difficulty}",
+  "principle_used": "${challengeType.principle}",
+  "ui_config": {
+    "equation": "CR + 2D + BL + @CyC",
+    "hints": ["What does CR reveal about Christ?", "How does the sanctuary pattern appear?"]
+  },
+  "passage_reference": "Book Chapter:Verse",
+  "expected_insights": ["insight about Christ-centered reading", "insight about sanctuary/cycles"]
+}
+` : challengeType.type === "70-questions" ? `
+For 70-questions challenges:
+- Provide a Bible passage (typically 3-10 verses)
+- Challenge users to ask 70 questions (or aim for it): Intratextual, Intertextual, Phototheological
+- Intratextual: questions within the text (Why this word? Why this order?)
+- Intertextual: questions across Scripture (Where else? How does this connect?)
+- Phototheological: questions within PT framework (Which rooms? Which cycle?)
+
+Return JSON with:
+{
+  "title": "engaging title (e.g., '70 Questions on Daniel 7:13-14')",
+  "description": "instructions emphasizing question types (75-100 words)",
+  "challenge_subtype": "70-questions",
+  "challenge_tier": "${challengeType.tier}",
+  "difficulty": "${difficulty}",
+  "principle_used": "${challengeType.principle}",
+  "ui_config": {
+    "target_questions": 70
+  },
+  "passage_reference": "Book Chapter:Verse(s)",
+  "expected_insights": ["insight about interrogation depth", "insight about cross-textual connections"]
+}
+` : challengeType.type === "principle-study" ? `
+For principle-study challenges:
+- Provide a Bible passage
+- Specify 2-3 Palace principles to apply (e.g., "Apply Dimensions Room, Patterns Room, and Cycles")
+- Guide users through a structured study using those principles
+- Include prompts like "How does the 5D (Heaven) dimension appear?" or "What cycle does this fall in?"
+
+Return JSON with:
+{
+  "title": "engaging title (e.g., 'Multi-Principle Study: Isaiah 53')",
+  "description": "detailed study instructions (100-150 words)",
+  "challenge_subtype": "principle-study",
+  "challenge_tier": "${challengeType.tier}",
+  "difficulty": "${difficulty}",
+  "principle_used": "${challengeType.principle}",
+  "ui_config": {
+    "principles": ["Dimensions Room (DR)", "Patterns Room (PRm)", "Cycles (@Cy)"],
+    "prompts": ["What does the 5D dimension reveal?", "What pattern repeats here?", "Which cycle frames this text?"]
+  },
+  "passage_reference": "Book Chapter:Verse(s)",
+  "expected_insights": ["insight about multi-dimensional reading", "insight about cycle placement"]
+}
+` : challengeType.type === "subject-connection" ? `
+For subject-connection challenges:
 - Present 2-3 biblical subjects that seem unrelated at first
 - Guide users to discover deep connections between them using Palace principles
-- Example subjects: "7 Churches of Revelation + Sanctuary Furniture", "Parable of Sower + Exodus Red Sea Crossing", "Daniel's Beasts + Christ's Parables"
+- Example subjects: "7 Churches of Revelation + Sanctuary Furniture", "Parable of Sower + Exodus Red Sea Crossing"
 - Users should identify: shared symbols, parallel patterns, Christ-centered connections, prophetic links
 
 Return JSON with:
@@ -68,7 +159,7 @@ Return JSON with:
     "connection_prompts": ["What symbols appear in both?", "How does Christ connect them?", "What prophetic pattern links them?"],
     "hints": ["hint 1", "hint 2"]
   },
-  "passage_reference": "Book Chapter:Verse(s)",
+  "passage_reference": "Multiple passages",
   "expected_insights": ["insight 1", "insight 2", "insight 3"]
 }
 ` : `
