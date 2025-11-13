@@ -168,10 +168,13 @@ const RoomDoor = ({ room, floorNumber, theme, user }: RoomDoorProps) => {
 
   console.log(`RoomDoor: floor=${floorNumber}, roomId=${room.id}, name=${room.name}, isUnlocked=${isUnlocked}, loading=${loading}`);
 
+  // Always show as unlocked in the visual palace (preview mode)
+  const showAsUnlocked = true;
+
   return (
     <Link
       to={`/palace/floor/${floorNumber}/room/${room.id}`}
-      className={`group relative ${!isUnlocked ? 'pointer-events-none' : ''}`}
+      className="group relative"
     >
       <div className="flex flex-col gap-2">
         {/* Door Card - Clean Design */}
@@ -179,10 +182,7 @@ const RoomDoor = ({ room, floorNumber, theme, user }: RoomDoorProps) => {
           className={`
             relative aspect-[3/4] rounded-xl overflow-hidden
             transition-all duration-300 cursor-pointer
-            ${isUnlocked 
-              ? `bg-gradient-to-br ${theme.gradient} hover:scale-105 shadow-lg hover:shadow-2xl` 
-              : 'bg-gradient-to-br from-muted to-muted-foreground/20 opacity-50'
-            }
+            bg-gradient-to-br ${theme.gradient} hover:scale-105 shadow-lg hover:shadow-2xl
           `}
         >
           {/* Simple border frame */}
@@ -206,23 +206,21 @@ const RoomDoor = ({ room, floorNumber, theme, user }: RoomDoorProps) => {
             </div>
           </div>
 
-          {/* Lock/Unlock indicator */}
+          {/* Lock/Unlock indicator - Show actual status */}
           <div className="absolute bottom-3 right-3">
             {isUnlocked ? (
               <div className="w-6 h-6 rounded-full bg-green-500/30 backdrop-blur-sm border border-green-400/50 flex items-center justify-center">
                 <div className="w-2 h-2 rounded-full bg-green-400" />
               </div>
             ) : (
-              <div className="w-6 h-6 rounded-full bg-red-500/30 backdrop-blur-sm border border-red-400/50 flex items-center justify-center">
-                <Lock className="h-3 w-3 text-red-400" />
+              <div className="w-6 h-6 rounded-full bg-amber-500/30 backdrop-blur-sm border border-amber-400/50 flex items-center justify-center">
+                <Lock className="h-3 w-3 text-amber-400" />
               </div>
             )}
           </div>
 
           {/* Subtle shine on hover */}
-          {isUnlocked && (
-            <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 bg-gradient-to-br from-white/20 via-transparent to-transparent" />
-          )}
+          <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 bg-gradient-to-br from-white/20 via-transparent to-transparent" />
         </div>
       </div>
     </Link>
