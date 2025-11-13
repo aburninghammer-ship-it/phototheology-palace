@@ -8,10 +8,12 @@ import { Check, Sparkles, Star, Crown, Zap, GraduationCap, Building2, ArrowRight
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { useState } from "react";
 
 export default function Pricing() {
   const { user } = useAuth();
   const navigate = useNavigate();
+  const [billingPeriod, setBillingPeriod] = useState<'monthly' | 'annual'>('monthly');
 
   const startFreeTrial = async () => {
     if (!user) {
@@ -78,14 +80,16 @@ export default function Pricing() {
       name: "Free Trial",
       icon: Sparkles,
       iconColor: "text-gray-600",
-      price: "$0",
+      monthlyPrice: "$0",
+      annualPrice: "$0",
       period: "7 days",
       description: "Try Phototheology risk-free",
       badge: "No Credit Card Required",
       badgeVariant: "secondary" as const,
       ctaText: "Start Free Trial",
       ctaVariant: "default" as const,
-      ctaUrl: "#",
+      monthlyUrl: "#",
+      annualUrl: "#",
       features: [
         "FULL ACCESS - Everything unlocked for 7 days",
         "The Palace (8 floors, 40+ rooms)",
@@ -102,14 +106,18 @@ export default function Pricing() {
       name: "Essential",
       icon: Star,
       iconColor: "text-blue-600",
-      price: "$9",
+      monthlyPrice: "$9",
+      annualPrice: "$90",
+      monthlySavings: null,
+      annualSavings: "Save $18/year",
       period: "per month",
       description: "Perfect for serious Bible students",
       badge: "Best Value",
       badgeVariant: "default" as const,
       ctaText: "Get Essential",
       ctaVariant: "default" as const,
-      ctaUrl: "https://buy.stripe.com/4gM8wP6U37zoavefiY6EU07",
+      monthlyUrl: "https://buy.stripe.com/4gM8wP6U37zoavefiY6EU07",
+      annualUrl: "https://buy.stripe.com/4gM8wP6U37zoavefiY6EU07", // TODO: Replace with annual Stripe link
       features: [
         "Everything in Free Trial (continued)",
         "Phototheology GPT - Main AI Assistant",
@@ -130,14 +138,18 @@ export default function Pricing() {
       name: "Premium",
       icon: Crown,
       iconColor: "text-purple-600",
-      price: "$15",
+      monthlyPrice: "$15",
+      annualPrice: "$150",
+      monthlySavings: null,
+      annualSavings: "Save $30/year",
       period: "per month",
       description: "Everything you need to master Phototheology",
       badge: "Most Popular",
       badgeVariant: "secondary" as const,
       ctaText: "Get Premium",
       ctaVariant: "default" as const,
-      ctaUrl: "https://buy.stripe.com/aFa3cvemv7zo46Q9YE6EU08",
+      monthlyUrl: "https://buy.stripe.com/aFa3cvemv7zo46Q9YE6EU08",
+      annualUrl: "https://buy.stripe.com/aFa3cvemv7zo46Q9YE6EU08", // TODO: Replace with annual Stripe link
       popular: true,
       features: [
         "Everything in Essential",
@@ -165,14 +177,16 @@ export default function Pricing() {
       name: "Student",
       icon: GraduationCap,
       iconColor: "text-green-600",
-      price: "FREE",
+      monthlyPrice: "FREE",
+      annualPrice: "FREE",
       period: "for 1 year",
       description: "Full Premium access for verified students",
       badge: ".edu Email Required",
       badgeVariant: "default" as const,
       ctaText: "Verify Student Status",
       ctaVariant: "default" as const,
-      ctaUrl: "/student-verify",
+      monthlyUrl: "/student-verify",
+      annualUrl: "/student-verify",
       features: [
         "Everything in Premium - 100% FREE",
         "All AI GPTs unlocked",
@@ -202,6 +216,31 @@ export default function Pricing() {
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
             Start with a free trial, upgrade anytime to unlock more features
           </p>
+          
+          {/* Billing Period Toggle */}
+          <div className="flex items-center justify-center gap-3 mt-8">
+            <span className={`text-sm font-medium ${billingPeriod === 'monthly' ? 'text-foreground' : 'text-muted-foreground'}`}>
+              Monthly
+            </span>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setBillingPeriod(billingPeriod === 'monthly' ? 'annual' : 'monthly')}
+              className="relative h-8 w-16 rounded-full p-0 transition-all"
+            >
+              <div className={`absolute inset-0 rounded-full transition-colors ${billingPeriod === 'annual' ? 'bg-primary' : 'bg-muted'}`} />
+              <div className={`absolute top-1 h-6 w-6 rounded-full bg-background shadow-md transition-transform ${billingPeriod === 'annual' ? 'translate-x-9' : 'translate-x-1'}`} />
+            </Button>
+            <span className={`text-sm font-medium ${billingPeriod === 'annual' ? 'text-foreground' : 'text-muted-foreground'}`}>
+              Annual
+            </span>
+            {billingPeriod === 'annual' && (
+              <Badge variant="secondary" className="ml-2">
+                <Sparkles className="h-3 w-3 mr-1" />
+                Save 2 months
+              </Badge>
+            )}
+          </div>
         </div>
 
         {/* Church Plans CTA */}
@@ -266,8 +305,25 @@ export default function Pricing() {
                 <CardTitle className="text-2xl mb-2">{plan.name}</CardTitle>
                 <CardDescription>{plan.description}</CardDescription>
                 <div className="mt-4">
-                  <div className="text-5xl font-bold">{plan.price}</div>
-                  <div className="text-sm text-muted-foreground mt-1">/ {plan.period}</div>
+                  <div className="text-5xl font-bold">
+                    {billingPeriod === 'monthly' ? plan.monthlyPrice : plan.annualPrice}
+                  </div>
+                  <div className="text-sm text-muted-foreground mt-1">
+                    {plan.id === 'free' ? (
+                      `/ ${plan.period}`
+                    ) : plan.id === 'student' ? (
+                      `/ ${plan.period}`
+                    ) : billingPeriod === 'monthly' ? (
+                      '/ per month'
+                    ) : (
+                      '/ per year'
+                    )}
+                  </div>
+                  {billingPeriod === 'annual' && plan.annualSavings && (
+                    <Badge variant="secondary" className="mt-2">
+                      {plan.annualSavings}
+                    </Badge>
+                  )}
                 </div>
               </CardHeader>
 
@@ -290,7 +346,7 @@ export default function Pricing() {
                     className="w-full bg-green-600 hover:bg-green-700"
                     size="lg"
                   >
-                    <Link to={plan.ctaUrl}>
+                    <Link to={billingPeriod === 'monthly' ? plan.monthlyUrl : plan.annualUrl}>
                       {plan.ctaText}
                     </Link>
                   </Button>
@@ -311,11 +367,11 @@ export default function Pricing() {
                     size="lg"
                   >
                     <a
-                      href={plan.ctaUrl}
+                      href={billingPeriod === 'monthly' ? plan.monthlyUrl : plan.annualUrl}
                       target="_blank"
                       rel="noopener noreferrer"
                     >
-                      {plan.ctaText}
+                      {plan.ctaText} {billingPeriod === 'annual' ? '(Annual)' : '(Monthly)'}
                     </a>
                   </Button>
                 )}
