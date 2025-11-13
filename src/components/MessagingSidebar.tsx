@@ -55,16 +55,26 @@ export const MessagingSidebar = () => {
 
   // Listen for window event to force sidebar open (for deep-linked notifications)
   useEffect(() => {
+    console.log('📬 MessagingSidebar: Setting up event listener for open-chat-sidebar');
+    
     const handleOpenChat = async (e: CustomEvent) => {
-      console.log('Open chat sidebar event received:', e.detail);
+      console.log('📬 MessagingSidebar: Event received!', {
+        type: e.type,
+        detail: e.detail,
+        conversationId: e.detail?.conversationId,
+        userId: e.detail?.userId
+      });
       
       // Handle conversationId (from notifications)
       if (e.detail?.conversationId) {
+        console.log('📬 MessagingSidebar: Setting conversation:', e.detail.conversationId);
         setActiveConversationId(e.detail.conversationId);
         // Use setOpen to force sidebar open if it's available
         if (setOpen) {
+          console.log('📬 MessagingSidebar: Opening sidebar with setOpen');
           setOpen(true);
         } else if (state === 'collapsed') {
+          console.log('📬 MessagingSidebar: Toggling sidebar');
           toggleSidebar();
         }
         setActiveTab('conversations');
@@ -72,8 +82,10 @@ export const MessagingSidebar = () => {
       
       // Handle userId (from community page)
       if (e.detail?.userId) {
+        console.log('📬 MessagingSidebar: Starting conversation with user:', e.detail.userId);
         const convId = await startConversation(e.detail.userId);
         if (convId) {
+          console.log('📬 MessagingSidebar: Conversation started:', convId);
           setActiveConversationId(convId);
           if (setOpen) {
             setOpen(true);
@@ -81,13 +93,24 @@ export const MessagingSidebar = () => {
             toggleSidebar();
           }
           setActiveTab('conversations');
+        } else {
+          console.error('📬 MessagingSidebar: Failed to start conversation');
         }
+      }
+      
+      if (!e.detail?.conversationId && !e.detail?.userId) {
+        console.error('📬 MessagingSidebar: No conversationId or userId in event detail!');
       }
     };
     
     window.addEventListener('open-chat-sidebar' as any, handleOpenChat);
-    return () => window.removeEventListener('open-chat-sidebar' as any, handleOpenChat);
-  }, [setActiveConversationId, toggleSidebar, setOpen, state, startConversation]);
+    console.log('📬 MessagingSidebar: Event listener registered');
+    
+    return () => {
+      console.log('📬 MessagingSidebar: Removing event listener');
+      window.removeEventListener('open-chat-sidebar' as any, handleOpenChat);
+    };
+  }, [setActiveConversationId, toggleSidebar, setOpen, state, startConversation, setActiveTab]);
 
   // Auto-scroll to bottom when messages change
   useEffect(() => {

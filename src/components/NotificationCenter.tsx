@@ -18,6 +18,15 @@ export function NotificationCenter() {
   const navigate = useNavigate();
 
   const handleNotificationClick = (notification: any) => {
+    console.log('🔔 Notification clicked:', {
+      id: notification.id,
+      type: notification.type,
+      title: notification.title,
+      message: notification.message,
+      metadata: notification.metadata,
+      link: notification.link
+    });
+    
     markAsRead(notification.id);
     
     // Handle message notifications by opening the messaging sidebar
@@ -28,17 +37,25 @@ export function NotificationCenter() {
       const conversationId = notification.metadata?.conversation_id || notification.metadata?.conversationId;
       const userId = notification.metadata?.sender_id || notification.metadata?.user_id || notification.metadata?.userId;
       
+      console.log('📬 Extracted IDs:', { conversationId, userId });
       console.log('📬 Dispatching open-chat-sidebar event with:', { conversationId, userId });
       
       // Dispatch custom event to open messaging sidebar
-      window.dispatchEvent(new CustomEvent('open-chat-sidebar', {
+      const event = new CustomEvent('open-chat-sidebar', {
         detail: { 
           conversationId,
           userId 
         }
-      }));
+      });
+      
+      console.log('📬 Event created:', event);
+      window.dispatchEvent(event);
+      console.log('📬 Event dispatched');
     } else if (notification.link) {
+      console.log('🔗 Navigating to:', notification.link);
       navigate(notification.link);
+    } else {
+      console.log('⚠️ No action defined for this notification');
     }
   };
 
