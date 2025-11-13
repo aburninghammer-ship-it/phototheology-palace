@@ -217,27 +217,34 @@ export default function Pricing() {
             Start with a free trial, upgrade anytime to unlock more features
           </p>
           
-          {/* Billing Period Toggle */}
-          <div className="flex items-center justify-center gap-3 mt-8">
-            <span className={`text-sm font-medium ${billingPeriod === 'monthly' ? 'text-foreground' : 'text-muted-foreground'}`}>
-              Monthly
-            </span>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setBillingPeriod(billingPeriod === 'monthly' ? 'annual' : 'monthly')}
-              className="relative h-8 w-16 rounded-full p-0 transition-all"
-            >
-              <div className={`absolute inset-0 rounded-full transition-colors ${billingPeriod === 'annual' ? 'bg-primary' : 'bg-muted'}`} />
-              <div className={`absolute top-1 h-6 w-6 rounded-full bg-background shadow-md transition-transform ${billingPeriod === 'annual' ? 'translate-x-9' : 'translate-x-1'}`} />
-            </Button>
-            <span className={`text-sm font-medium ${billingPeriod === 'annual' ? 'text-foreground' : 'text-muted-foreground'}`}>
-              Annual
-            </span>
+          {/* Billing Period Toggle - Enhanced */}
+          <div className="flex flex-col items-center justify-center gap-4 mt-8">
+            <div className="flex items-center justify-center gap-4 p-2 rounded-2xl bg-muted/50 border-2 border-primary/20">
+              <button
+                onClick={() => setBillingPeriod('monthly')}
+                className={`px-6 py-3 rounded-xl font-semibold text-base transition-all ${
+                  billingPeriod === 'monthly' 
+                    ? 'bg-background text-foreground shadow-lg scale-105' 
+                    : 'text-muted-foreground hover:text-foreground'
+                }`}
+              >
+                Monthly
+              </button>
+              <button
+                onClick={() => setBillingPeriod('annual')}
+                className={`px-6 py-3 rounded-xl font-semibold text-base transition-all ${
+                  billingPeriod === 'annual' 
+                    ? 'bg-primary text-primary-foreground shadow-lg scale-105' 
+                    : 'text-muted-foreground hover:text-foreground'
+                }`}
+              >
+                Annual
+              </button>
+            </div>
             {billingPeriod === 'annual' && (
-              <Badge variant="secondary" className="ml-2">
-                <Sparkles className="h-3 w-3 mr-1" />
-                Save 2 months
+              <Badge variant="default" className="gradient-palace text-white border-0 px-4 py-2 text-base animate-pulse">
+                <Sparkles className="h-4 w-4 mr-2" />
+                Save 2 Months Free - Best Value!
               </Badge>
             )}
           </div>
