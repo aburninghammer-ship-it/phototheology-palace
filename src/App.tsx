@@ -123,6 +123,8 @@ const AdminBibleImport = lazy(() => import("./pages/AdminBibleImport"));
 const OfflineContent = lazy(() => import("./pages/OfflineContent"));
 const MyStudies = lazy(() => import("./pages/MyStudies"));
 const StudyEditor = lazy(() => import("./pages/StudyEditor"));
+const PrivacyPolicy = lazy(() => import("./pages/PrivacyPolicy"));
+const TermsOfService = lazy(() => import("./pages/TermsOfService"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
 const queryClient = new QueryClient();
@@ -278,6 +280,8 @@ function App() {
             <Route path="/church-signup" element={<ChurchSignup />} />
             <Route path="/church-signup/success" element={<ChurchSignupSuccess />} />
             <Route path="/church-signup/cancelled" element={<ChurchSignupCancelled />} />
+            <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+            <Route path="/terms-of-service" element={<TermsOfService />} />
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                 <Route path="*" element={<NotFound />} />
                     </Routes>
