@@ -1586,8 +1586,10 @@ export type Database = {
           id: string
           last_reviewed: string | null
           mastery_level: number
+          next_review_date: string | null
           notes: string | null
           review_count: number
+          review_interval_days: number | null
           user_id: string
           verse: number
           verse_reference: string
@@ -1600,8 +1602,10 @@ export type Database = {
           id?: string
           last_reviewed?: string | null
           mastery_level?: number
+          next_review_date?: string | null
           notes?: string | null
           review_count?: number
+          review_interval_days?: number | null
           user_id: string
           verse: number
           verse_reference: string
@@ -1614,8 +1618,10 @@ export type Database = {
           id?: string
           last_reviewed?: string | null
           mastery_level?: number
+          next_review_date?: string | null
           notes?: string | null
           review_count?: number
+          review_interval_days?: number | null
           user_id?: string
           verse?: number
           verse_reference?: string
