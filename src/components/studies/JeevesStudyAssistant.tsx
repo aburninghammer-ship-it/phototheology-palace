@@ -223,18 +223,24 @@ export const JeevesStudyAssistant = ({ studyContext, studyId, onContentUpdate }:
                   >
                     <div className="flex flex-col gap-2 max-w-[85%]">
                       <div
-                        className={`rounded-lg p-3 ${
+                        className={`rounded-lg ${
                           msg.role === "user"
-                            ? "bg-primary text-primary-foreground"
-                            : "bg-muted"
+                            ? "bg-gradient-to-br from-primary to-primary/80 text-primary-foreground p-3"
+                            : "bg-gradient-to-br from-card to-muted/50 border border-border/50 p-4 shadow-sm"
                         }`}
                       >
                         {msg.role === "assistant" ? (
-                          <div className="prose prose-sm max-w-none">
-                            {formatJeevesResponse(msg.content)}
+                          <div className="prose prose-sm max-w-none dark:prose-invert">
+                            <div className="flex items-start gap-2 mb-3">
+                              <span className="text-2xl flex-shrink-0">🤖</span>
+                              <span className="font-semibold text-primary">Jeeves says:</span>
+                            </div>
+                            <div className="jeeves-response">
+                              {formatJeevesResponse(msg.content)}
+                            </div>
                           </div>
                         ) : (
-                          <p className="text-sm">{msg.content}</p>
+                          <p className="text-sm font-medium">{msg.content}</p>
                         )}
                       </div>
                       {msg.role === "assistant" && studyId && researchMode && (
