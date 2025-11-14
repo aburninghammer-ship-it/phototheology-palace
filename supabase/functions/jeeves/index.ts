@@ -1535,48 +1535,41 @@ Return JSON: { "coherent": true/false, "feedback": "brief comment" }`;
       const { minVerses, maxVerses, difficulty, theme } = requestBody;
       const numVerses = Math.floor(Math.random() * (maxVerses - minVerses + 1)) + minVerses;
       
-      systemPrompt = `You are Jeeves, an expert Bible teacher selecting random verses for a theological creative challenge. Your task is to select ${numVerses} Bible verses that are INTENTIONALLY UNRELATED - from different books, different themes, different contexts, different time periods. The student will creatively connect them into a coherent narrative.
-
-CRITICAL: Return ONLY valid JSON in this exact format:
-{
-  "verses": ["Genesis 1:1", "Psalm 23:1", "John 3:16", ...]
-}
-
-Make sure:
-- Verses are from DIVERSE books (Old and New Testament mix)
-- NO obvious thematic connections
-- Proper verse references (Book Chapter:Verse format)
-- Exactly ${numVerses} verses`;
+      console.log(`=== GENERATING ${numVerses} CHEF VERSES (${difficulty} level) ===`);
       
-      userPrompt = `Generate ${numVerses} random, unrelated Bible verse references for a "${theme}" challenge at ${difficulty} level.
+      systemPrompt = `You are Jeeves, a Bible verse selector. Generate EXACTLY ${numVerses} random, unrelated Bible verses.
 
-Requirements:
-- Mix of Old and New Testament
-- Different books and contexts
-- Intentionally challenging to connect
-- Return ONLY the JSON object with "verses" array`;
+CRITICAL RULES:
+1. Return ONLY valid JSON - no markdown, no explanations
+2. Use this EXACT format: {"verses":["Genesis 1:1","Psalm 23:1",...]}
+3. Include EXACTLY ${numVerses} verses
+4. Mix Old and New Testament
+5. Make verses intentionally unrelated
+6. Use proper format: "Book Chapter:Verse"`;
+      
+      userPrompt = `Generate ${numVerses} random Bible verse references for "${theme}" (${difficulty} level). Return ONLY the JSON object.`;
 
     } else if (mode === "check_chef_recipe") {
       // Check player's Chef Challenge recipe
       const { theme, recipe, verses, difficulty } = requestBody;
-      systemPrompt = `You are Jeeves, evaluating a creative Bible study exercise. The student was given random, unrelated verses and challenged to weave them into a coherent theological narrative on "${theme}".
+      
+      console.log(`=== CHECKING CHEF RECIPE (${difficulty} level) ===`);
+      
+      systemPrompt = `You are Jeeves, evaluating a creative Bible study. Student had ${verses.length} random verses to create a narrative on "${theme}".
 
-Evaluate based on:
-1. **Creativity** - How innovative are the connections?
-2. **Biblical Accuracy** - Are verses used properly in context?
-3. **Coherence** - Does the narrative flow logically?
-4. **Thematic Fit** - Does it address the theme?
+Grade on:
+1. Creativity - Innovative connections?
+2. Biblical Accuracy - Proper context?
+3. Coherence - Logical flow?
+4. Theme Fit - Addresses "${theme}"?
 
-Be encouraging, specific, and constructive. Use emojis naturally.
+Be encouraging. Use emojis.
 
 Return ONLY valid JSON:
-{
-  "rating": 1-5,
-  "feedback": "2-3 sentences with specific praise and one suggestion"
-}`;
+{"rating":1-5,"feedback":"2-3 sentences"}`;
       
-      userPrompt = `Verses given: ${verses.join(', ')}
-Theme: ${theme}
+      userPrompt = `Verses: ${verses.join(', ')}
+Recipe: ${recipe}
 Difficulty: ${difficulty}
 
 Student's Recipe:
@@ -1585,26 +1578,26 @@ ${recipe}
 Evaluate this creative connection.`;
 
     } else if (mode === "get_chef_model_answer") {
-      // Get Jeeves's model answer for Chef Challenge
+      // Get model answer for Chef Challenge
       const { theme, verses, difficulty } = requestBody;
-      systemPrompt = `You are Jeeves, demonstrating masterful biblical interpretation. Show how to creatively yet faithfully connect these seemingly unrelated verses into a powerful, coherent narrative addressing "${theme}".
+      
+      console.log(`=== GENERATING MODEL ANSWER (${difficulty} level) ===`);
+      
+      systemPrompt = `You are Jeeves, demonstrating a creative theological narrative on "${theme}" using random verses.
 
-Use Phototheological principles:
-- Christ-centered interpretation
-- Typology where appropriate
-- Creative but faithful connections
-- Clear, inspiring writing with emojis
+Requirements:
+- Use ALL ${verses.length} verses naturally
+- Maintain biblical accuracy
+- Create logical flow
+- Address theme creatively
+- Keep 2-3 paragraphs
+- Use emojis sparingly
 
 Return ONLY valid JSON:
-{
-  "modelAnswer": "Your 3-4 paragraph narrative with emojis and engaging formatting"
-}`;
+{"modelAnswer":"your narrative"}`;
       
-      userPrompt = `Verses to connect: ${verses.join(', ')}
-Theme: ${theme}
-Difficulty: ${difficulty}
-
-Create a masterful example showing how these verses connect to address the theme. Be creative, insightful, and inspiring!`;
+      userPrompt = `Create a ${difficulty}-level narrative using: ${verses.join(', ')}
+Theme: ${theme}`;
 
     } else if (mode === "validate_chef_recipe") {
       // Legacy Chef Challenge validation - properties already destructured from requestBody

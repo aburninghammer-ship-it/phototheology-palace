@@ -22,13 +22,14 @@ export const ChefRecipeChallenge = ({ challenge, onSubmit, hasSubmitted }: ChefR
   const [showModelAnswer, setShowModelAnswer] = useState(false);
   const [modelAnswer, setModelAnswer] = useState("");
   const [feedback, setFeedback] = useState<any>(null);
-  const [difficulty, setDifficulty] = useState<"beginner" | "intermediate" | "master">("master");
+  const [difficulty, setDifficulty] = useState<"easy" | "intermediate" | "pro" | "master">("intermediate");
   const { toast } = useToast();
 
   const difficultyConfig = {
-    beginner: { min: 3, max: 5, label: "Beginner (3-5 verses)" },
-    intermediate: { min: 5, max: 7, label: "Intermediate (5-7 verses)" },
-    master: { min: 7, max: 10, label: "Master (7-10 verses)" }
+    easy: { min: 3, max: 4, label: "Easy (3-4 verses)", icon: "🌱" },
+    intermediate: { min: 5, max: 6, label: "Intermediate (5-6 verses)", icon: "🔥" },
+    pro: { min: 7, max: 8, label: "Pro (7-8 verses)", icon: "💎" },
+    master: { min: 9, max: 10, label: "Master (9-10 verses)", icon: "👑" }
   };
 
   // Auto-generate verses on mount
@@ -216,25 +217,21 @@ export const ChefRecipeChallenge = ({ challenge, onSubmit, hasSubmitted }: ChefR
               🎲 New Ingredients
             </Button>
           </div>
-          <div className="grid grid-cols-3 gap-2">
-            {(["beginner", "intermediate", "master"] as const).map((level) => (
+          <div className="grid grid-cols-2 gap-2">
+            {(["easy", "intermediate", "pro", "master"] as const).map((level) => (
               <Button
                 key={level}
                 variant={difficulty === level ? "default" : "outline"}
                 onClick={() => {
-                  setDifficulty(level);
-                  // Only regenerate if difficulty actually changed
                   if (level !== difficulty) {
+                    setDifficulty(level);
                     setTimeout(() => generateVerses(), 100);
                   }
                 }}
                 className="w-full"
                 disabled={isLoading || hasSubmitted}
               >
-                {level === "beginner" && "🌱 "}
-                {level === "intermediate" && "🔥 "}
-                {level === "master" && "👑 "}
-                {level.charAt(0).toUpperCase() + level.slice(1)}
+                {difficultyConfig[level].icon} {level.charAt(0).toUpperCase() + level.slice(1)}
               </Button>
             ))}
           </div>
