@@ -67,7 +67,7 @@ export const Navigation = () => {
               </span>
             </Link>
           
-            <div className="flex items-center gap-2 md:gap-4">
+            <div className="flex items-center gap-2 md:gap-4 flex-1 justify-end">
               <PWAInstallButton />
               
               {user && (
@@ -103,14 +103,14 @@ export const Navigation = () => {
               {user ? (
                 <>
                   {/* Desktop Navigation - Horizontal Scroll */}
-                  <div className="hidden md:flex items-center gap-2 overflow-x-auto scrollbar-hide flex-1">
-                  <Button variant="ghost" asChild size="sm" className="whitespace-nowrap">
+                  <div className="hidden lg:flex items-center gap-1 overflow-x-auto max-w-2xl">
+                  <Button variant="ghost" asChild size="sm" className="whitespace-nowrap shrink-0">
                     <Link to="/palace">Palace</Link>
                   </Button>
                   
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" size="sm" className="whitespace-nowrap">
+                      <Button variant="ghost" size="sm" className="whitespace-nowrap shrink-0">
                         <BookOpen className="h-4 w-4 mr-1" />
                         Bible
                       </Button>
@@ -143,17 +143,17 @@ export const Navigation = () => {
                     </DropdownMenuContent>
                   </DropdownMenu>
                   
-                  <Button variant="ghost" asChild size="sm" className="whitespace-nowrap">
+                  <Button variant="ghost" asChild size="sm" className="whitespace-nowrap shrink-0">
                     <Link to="/my-studies">My Studies</Link>
                   </Button>
                     
-                    <Button variant="ghost" asChild size="sm" className="whitespace-nowrap">
+                    <Button variant="ghost" asChild size="sm" className="whitespace-nowrap shrink-0">
                       <Link to="/games">Games</Link>
                     </Button>
                     
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" size="sm" className="whitespace-nowrap">
+                        <Button variant="ghost" size="sm" className="whitespace-nowrap shrink-0">
                           <Sparkles className="h-4 w-4 mr-1" />
                           GPTs
                         </Button>
@@ -186,36 +186,36 @@ export const Navigation = () => {
                       </DropdownMenuContent>
                     </DropdownMenu>
                     
-                    <Button variant="ghost" asChild size="sm" className="whitespace-nowrap">
+                    <Button variant="ghost" asChild size="sm" className="whitespace-nowrap shrink-0">
                       <Link to="/phototheology-course">Courses</Link>
                     </Button>
                     
-                    <Button variant="ghost" asChild size="sm" className="whitespace-nowrap">
+                    <Button variant="ghost" asChild size="sm" className="whitespace-nowrap shrink-0">
                       <Link to="/daily-challenges">Challenges</Link>
                     </Button>
                     
-                    <Button variant="ghost" asChild size="sm" className="whitespace-nowrap">
+                    <Button variant="ghost" asChild size="sm" className="whitespace-nowrap shrink-0">
                       <Link to="/achievements">Achievements</Link>
                     </Button>
                     
-                    <Button variant="ghost" asChild size="sm" className="whitespace-nowrap">
+                    <Button variant="ghost" asChild size="sm" className="whitespace-nowrap shrink-0">
                       <Link to="/series-builder">Series</Link>
                     </Button>
                     
-                    <Button variant="ghost" asChild size="sm" className="whitespace-nowrap">
+                    <Button variant="ghost" asChild size="sm" className="whitespace-nowrap shrink-0">
                       <Link to="/pricing">Pricing</Link>
                     </Button>
                     
-                    <Button variant="ghost" asChild size="sm" className="whitespace-nowrap">
+                    <Button variant="ghost" asChild size="sm" className="whitespace-nowrap shrink-0">
                       <Link to="/community">Community</Link>
                     </Button>
                     
                     {/* Account Dropdown */}
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" size="sm" className="gap-2">
+                        <Button variant="ghost" size="sm" className="gap-2 shrink-0">
                           <User className="h-4 w-4" />
-                          <span className="hidden lg:inline">Account</span>
+                          <span className="hidden xl:inline">Account</span>
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end" className="w-56 bg-card border-border z-50">
