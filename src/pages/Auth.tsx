@@ -192,6 +192,19 @@ export default function Auth() {
 
       // Check if user was created (not just "fake" success for existing email)
       if (data.user && data.session) {
+        // Send signup notification
+        try {
+          await supabase.functions.invoke('send-signup-notification', {
+            body: {
+              userEmail: signupEmail,
+              displayName: signupDisplayName,
+              userId: data.user.id,
+            }
+          });
+        } catch (notifError) {
+          console.error('Failed to send signup notification:', notifError);
+        }
+        
         toast.success("Account created! Welcome to Phototheology!");
         navigate("/onboarding");
       } else if (data.user && !data.session) {
