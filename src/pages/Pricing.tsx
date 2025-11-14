@@ -179,6 +179,8 @@ export default function Pricing() {
       iconColor: "text-green-600",
       monthlyPrice: "$4.99",
       annualPrice: "$49.99",
+      monthlySavings: null,
+      annualSavings: "Save $10/year",
       period: "per month",
       description: "Full Premium access for verified students",
       badge: ".edu Email Required",
@@ -187,6 +189,7 @@ export default function Pricing() {
       ctaVariant: "default" as const,
       monthlyUrl: "/student-verify",
       annualUrl: "/student-verify",
+      stripePriceId: "price_1STVXrFGDAd3RU8Ia2NbKJWo",
       features: [
         "Everything in Premium - 100% FREE",
         "All AI GPTs unlocked",
