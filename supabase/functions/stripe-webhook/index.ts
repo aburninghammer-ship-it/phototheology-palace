@@ -60,6 +60,10 @@ serve(async (req) => {
           break;
         }
 
+        // Get subscription details
+        const subscription = await stripe.subscriptions.retrieve(session.subscription as string);
+        const renewalDate = new Date(subscription.current_period_end * 1000);
+
         // Create church
         const { data: church, error: churchError } = await supabase
           .from('churches')
@@ -71,8 +75,8 @@ serve(async (req) => {
             contact_person: metadata.contact_person || null,
             contact_phone: metadata.contact_phone || null,
             subscription_status: 'active',
+            subscription_ends_at: renewalDate.toISOString(),
             stripe_customer_id: session.customer as string,
-            stripe_subscription_id: session.subscription as string,
           })
           .select()
           .single();
@@ -150,52 +154,21 @@ serve(async (req) => {
       case 'customer.subscription.updated': {
         const subscription = receivedEvent.data.object as Stripe.Subscription;
         const customerId = subscription.customer as string;
+        const renewalDate = new Date(subscription.current_period_end * 1000);
 
-        // Update church subscription status
+        // Update church subscription status and renewal date
         const { error } = await supabase
           .from('churches')
           .update({
             subscription_status: subscription.status === 'active' ? 'active' : 'cancelled',
-            stripe_subscription_id: subscription.id,
+            subscription_ends_at: renewalDate.toISOString(),
           })
           .eq('stripe_customer_id', customerId);
 
         if (error) {
           console.error('Error updating subscription:', error);
         } else {
-          console.log(`Subscription updated for customer ${customerId}: ${subscription.status}`);
-        }
-
-        // Update renewal date in profiles
-        if (subscription.current_period_end) {
-          const renewalDate = new Date(subscription.current_period_end * 1000);
-          
-          // Find user associated with this church
-          const { data: church } = await supabase
-            .from('churches')
-            .select('id')
-            .eq('stripe_customer_id', customerId)
-            .single();
-
-          if (church) {
-            const { data: members } = await supabase
-              .from('church_members')
-              .select('user_id')
-              .eq('church_id', church.id)
-              .eq('role', 'admin');
-
-            if (members && members.length > 0) {
-              for (const member of members) {
-                await supabase
-                  .from('profiles')
-                  .update({
-                    subscription_renewal_date: renewalDate.toISOString(),
-                  })
-                  .eq('id', member.user_id);
-              }
-              console.log(`Updated renewal date: ${renewalDate.toISOString()}`);
-            }
-          }
+          console.log(`Subscription updated for customer ${customerId}: ${subscription.status}, renewal: ${renewalDate.toISOString()}`);
         }
         break;
       }
