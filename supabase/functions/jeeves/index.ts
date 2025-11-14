@@ -1535,38 +1535,76 @@ Return JSON: { "coherent": true/false, "feedback": "brief comment" }`;
       const { minVerses, maxVerses, difficulty, theme } = requestBody;
       const numVerses = Math.floor(Math.random() * (maxVerses - minVerses + 1)) + minVerses;
       
-      systemPrompt = `You are Jeeves, selecting random Bible verses for a theological challenge. Select ${numVerses} verses that are INTENTIONALLY UNRELATED to each other - different books, different themes, different contexts. The challenge is for the student to creatively connect them. Make it interesting and challenging.`;
-      userPrompt = `Theme: ${theme}
-Difficulty: ${difficulty}
+      systemPrompt = `You are Jeeves, an expert Bible teacher selecting random verses for a theological creative challenge. Your task is to select ${numVerses} Bible verses that are INTENTIONALLY UNRELATED - from different books, different themes, different contexts, different time periods. The student will creatively connect them into a coherent narrative.
 
-Generate exactly ${numVerses} random Bible verse references (just the references, not the text). They should be from diverse books and have little obvious connection to make the challenge interesting.
+CRITICAL: Return ONLY valid JSON in this exact format:
+{
+  "verses": ["Genesis 1:1", "Psalm 23:1", "John 3:16", ...]
+}
 
-Return JSON: { "verses": ["reference1", "reference2", ...] }`;
+Make sure:
+- Verses are from DIVERSE books (Old and New Testament mix)
+- NO obvious thematic connections
+- Proper verse references (Book Chapter:Verse format)
+- Exactly ${numVerses} verses`;
+      
+      userPrompt = `Generate ${numVerses} random, unrelated Bible verse references for a "${theme}" challenge at ${difficulty} level.
+
+Requirements:
+- Mix of Old and New Testament
+- Different books and contexts
+- Intentionally challenging to connect
+- Return ONLY the JSON object with "verses" array`;
 
     } else if (mode === "check_chef_recipe") {
       // Check player's Chef Challenge recipe
       const { theme, recipe, verses, difficulty } = requestBody;
-      systemPrompt = `You are Jeeves, evaluating how well a student connected unrelated Bible verses into a coherent theological narrative on the theme "${theme}". Be encouraging but honest. Rate creativity, biblical accuracy, and thematic coherence.`;
-      userPrompt = `Given verses: ${verses.join(', ')}
+      systemPrompt = `You are Jeeves, evaluating a creative Bible study exercise. The student was given random, unrelated verses and challenged to weave them into a coherent theological narrative on "${theme}".
+
+Evaluate based on:
+1. **Creativity** - How innovative are the connections?
+2. **Biblical Accuracy** - Are verses used properly in context?
+3. **Coherence** - Does the narrative flow logically?
+4. **Thematic Fit** - Does it address the theme?
+
+Be encouraging, specific, and constructive. Use emojis naturally.
+
+Return ONLY valid JSON:
+{
+  "rating": 1-5,
+  "feedback": "2-3 sentences with specific praise and one suggestion"
+}`;
+      
+      userPrompt = `Verses given: ${verses.join(', ')}
 Theme: ${theme}
 Difficulty: ${difficulty}
 
-Student's narrative:
+Student's Recipe:
 ${recipe}
 
-Evaluate this recipe. Return JSON: { "rating": 1-5, "feedback": "2-3 sentences of specific feedback with emojis" }`;
+Evaluate this creative connection.`;
 
     } else if (mode === "get_chef_model_answer") {
       // Get Jeeves's model answer for Chef Challenge
       const { theme, verses, difficulty } = requestBody;
-      systemPrompt = `You are Jeeves, demonstrating how to masterfully connect seemingly unrelated Bible verses into a coherent theological narrative. Be creative, insightful, and show deep biblical connections.`;
-      userPrompt = `Theme: ${theme}
-Verses to connect: ${verses.join(', ')}
+      systemPrompt = `You are Jeeves, demonstrating masterful biblical interpretation. Show how to creatively yet faithfully connect these seemingly unrelated verses into a powerful, coherent narrative addressing "${theme}".
+
+Use Phototheological principles:
+- Christ-centered interpretation
+- Typology where appropriate
+- Creative but faithful connections
+- Clear, inspiring writing with emojis
+
+Return ONLY valid JSON:
+{
+  "modelAnswer": "Your 3-4 paragraph narrative with emojis and engaging formatting"
+}`;
+      
+      userPrompt = `Verses to connect: ${verses.join(', ')}
+Theme: ${theme}
 Difficulty: ${difficulty}
 
-Write a masterful 3-4 paragraph narrative showing how these verses connect to address the theme. Be creative, use typology, Christ-centered interpretation, and phototheological principles. Make it inspiring and insightful with emojis.
-
-Return JSON: { "modelAnswer": "your narrative with emojis and formatting" }`;
+Create a masterful example showing how these verses connect to address the theme. Be creative, insightful, and inspiring!`;
 
     } else if (mode === "validate_chef_recipe") {
       // Legacy Chef Challenge validation - properties already destructured from requestBody
@@ -2024,17 +2062,30 @@ ${roomContent}
          "validate_witness", "validate_frame", "validate_chef_recipe", "generate_chef_verses",
          "check_chef_recipe", "get_chef_model_answer"].includes(mode)) {
       try {
+        console.log(`=== ${mode.toUpperCase()} RESPONSE ===`);
+        console.log("Raw content:", content);
         const parsed = JSON.parse(content);
+        console.log("Parsed JSON:", parsed);
+        
+        if (mode === "generate_chef_verses") {
+          console.log("Verses generated:", parsed.verses?.length || 0);
+          console.log("Verse list:", parsed.verses);
+        }
+        
         return new Response(
           JSON.stringify(parsed),
           { headers: { ...corsHeaders, "Content-Type": "application/json" } }
         );
-      } catch {
+      } catch (parseError) {
+        console.error(`=== ERROR PARSING ${mode.toUpperCase()} ===`);
+        console.error("Parse error:", parseError);
+        console.error("Raw content:", content);
         return new Response(
           JSON.stringify({ 
             error: "Failed to parse validation response",
             valid: false,
-            feedback: "Unable to validate. Please try again."
+            feedback: "Unable to validate. Please try again.",
+            rawContent: content.substring(0, 500)
           }),
           { headers: { ...corsHeaders, "Content-Type": "application/json" } }
         );

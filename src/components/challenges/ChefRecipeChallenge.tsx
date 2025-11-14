@@ -17,41 +17,61 @@ interface ChefRecipeChallengeProps {
 export const ChefRecipeChallenge = ({ challenge, onSubmit, hasSubmitted }: ChefRecipeChallengeProps) => {
   const [recipe, setRecipe] = useState("");
   const [verses, setVerses] = useState<string[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
   const [isChecking, setIsChecking] = useState(false);
   const [showModelAnswer, setShowModelAnswer] = useState(false);
   const [modelAnswer, setModelAnswer] = useState("");
   const [feedback, setFeedback] = useState<any>(null);
+  const [difficulty, setDifficulty] = useState<"beginner" | "intermediate" | "master">("master");
   const { toast } = useToast();
 
-  const minVerses = challenge.ui_config?.min_verses || 7;
-  const maxVerses = challenge.ui_config?.max_verses || 10;
-  const difficulty = challenge.difficulty || "master";
-
-  useEffect(() => {
-    generateVerses();
-  }, []);
+  const difficultyConfig = {
+    beginner: { min: 3, max: 5, label: "Beginner (3-5 verses)" },
+    intermediate: { min: 5, max: 7, label: "Intermediate (5-7 verses)" },
+    master: { min: 7, max: 10, label: "Master (7-10 verses)" }
+  };
 
   const generateVerses = async () => {
     setIsLoading(true);
+    setVerses([]);
+    setRecipe("");
+    setFeedback(null);
+    setShowModelAnswer(false);
+    setModelAnswer("");
+    
     try {
+      const config = difficultyConfig[difficulty];
       const { data, error } = await supabase.functions.invoke("jeeves", {
         body: {
           mode: "generate_chef_verses",
-          minVerses,
-          maxVerses,
+          minVerses: config.min,
+          maxVerses: config.max,
           difficulty,
           theme: challenge.ui_config?.theme || challenge.title,
         },
       });
 
-      if (error) throw error;
-      setVerses(data.verses || []);
-    } catch (error) {
+      if (error) {
+        console.error("Jeeves error:", error);
+        throw error;
+      }
+      
+      console.log("Jeeves response:", data);
+      
+      if (data && data.verses && Array.isArray(data.verses)) {
+        setVerses(data.verses);
+        toast({
+          title: "Ingredients Ready! 🎲",
+          description: `${data.verses.length} random verses generated for your recipe.`,
+        });
+      } else {
+        throw new Error("Invalid response format from Jeeves");
+      }
+    } catch (error: any) {
       console.error("Error generating verses:", error);
       toast({
         title: "Error",
-        description: "Failed to generate verses. Please try again.",
+        description: error.message || "Failed to generate verses. Please try again.",
         variant: "destructive",
       });
     } finally {
@@ -155,33 +175,75 @@ export const ChefRecipeChallenge = ({ challenge, onSubmit, hasSubmitted }: ChefR
           <Badge>Quick • 5-10 min</Badge>
         </div>
         <CardDescription className="mt-2">
-          Create a "biblical recipe" – a coherent mini-sermon using ONLY Bible verse references
+          Jeeves provides random "ingredients" (Bible verses). You cook up a coherent theological "recipe" connecting them!
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="bg-muted p-4 rounded-lg">
-          <p className="font-semibold mb-2">Theme:</p>
+          <p className="font-semibold mb-2">🎯 Theme:</p>
           <p className="text-lg">{challenge.ui_config?.theme || challenge.description}</p>
         </div>
 
-        {isLoading && verses.length === 0 ? (
-          <div className="flex items-center justify-center py-8">
+        <div className="space-y-3">
+          <div className="flex items-center justify-between">
+            <label className="text-sm font-medium">Select Difficulty Level:</label>
+            <Button onClick={generateVerses} size="sm" variant="outline" disabled={isLoading}>
+              🎲 New Ingredients
+            </Button>
+          </div>
+          <div className="grid grid-cols-3 gap-2">
+            {(["beginner", "intermediate", "master"] as const).map((level) => (
+              <Button
+                key={level}
+                variant={difficulty === level ? "default" : "outline"}
+                onClick={() => setDifficulty(level)}
+                className="w-full"
+                disabled={isLoading || hasSubmitted}
+              >
+                {level === "beginner" && "🌱 "}
+                {level === "intermediate" && "🔥 "}
+                {level === "master" && "👑 "}
+                {level.charAt(0).toUpperCase() + level.slice(1)}
+              </Button>
+            ))}
+          </div>
+          <p className="text-xs text-muted-foreground text-center">
+            {difficultyConfig[difficulty].label}
+          </p>
+        </div>
+
+        {isLoading ? (
+          <div className="flex flex-col items-center justify-center py-8 space-y-2">
             <Loader2 className="h-6 w-6 animate-spin text-orange-600" />
-            <span className="ml-2">Jeeves is selecting random verses...</span>
+            <span className="text-sm">Jeeves is gathering random ingredients...</span>
+          </div>
+        ) : verses.length === 0 ? (
+          <div className="bg-orange-50 dark:bg-orange-900/20 p-6 rounded-lg text-center">
+            <ChefHat className="h-12 w-12 mx-auto mb-3 text-orange-600" />
+            <p className="font-medium mb-2">Ready to cook up a biblical recipe?</p>
+            <p className="text-sm text-muted-foreground mb-4">
+              Click the difficulty level above to get your random verse ingredients!
+            </p>
           </div>
         ) : (
           <>
-            <div className="bg-orange-50 dark:bg-orange-900/20 p-4 rounded-lg space-y-3">
-              <p className="font-semibold">🎲 Your Random Verses ({verses.length}):</p>
-              <div className="bg-white dark:bg-gray-800 p-3 rounded border">
+            <div className="bg-gradient-to-r from-orange-50 to-amber-50 dark:from-orange-900/20 dark:to-amber-900/20 p-4 rounded-lg space-y-3 border-2 border-orange-200 dark:border-orange-800">
+              <div className="flex items-center justify-between">
+                <p className="font-semibold text-lg">🥘 Your Ingredients ({verses.length} verses):</p>
+                <Badge variant="outline" className="bg-white dark:bg-gray-800">
+                  {difficulty}
+                </Badge>
+              </div>
+              <div className="bg-white dark:bg-gray-800 p-4 rounded border-2 border-orange-300 dark:border-orange-700">
                 {verses.map((verse, idx) => (
-                  <div key={idx} className="text-sm font-mono mb-1">
-                    {verse}
+                  <div key={idx} className="flex items-start gap-2 mb-2 last:mb-0">
+                    <span className="text-orange-600 font-bold">•</span>
+                    <span className="font-mono text-sm">{verse}</span>
                   </div>
                 ))}
               </div>
-              <p className="text-xs text-muted-foreground">
-                These verses are intentionally unrelated. Your challenge: weave them into a coherent theological narrative!
+              <p className="text-xs text-muted-foreground italic">
+                ⚡ Challenge: These verses are intentionally unrelated! Weave them into a coherent theological narrative addressing the theme.
               </p>
             </div>
 
