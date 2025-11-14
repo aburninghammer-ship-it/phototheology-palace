@@ -60,7 +60,7 @@ serve(async (req) => {
     const tierSeats = {
       tier1: 50,
       tier2: 150,
-      tier3: 300
+      tier3: 500
     };
 
     // Check if user is already part of a church

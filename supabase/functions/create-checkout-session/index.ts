@@ -19,7 +19,7 @@ interface CheckoutRequest {
 const tierPricing = {
   tier1: { priceId: "price_1SNEzoFGDAd3RU8Iwa8PSyLw", name: "Church Access", seats: 50 },
   tier2: { priceId: "price_1SNFDxFGDAd3RU8IrvW3c5eS", name: "Leadership Tools", seats: 150 },
-  tier3: { priceId: "price_1SNFFMFGDAd3RU8IoasLs7ag", name: "Growth & Evangelism Suite", seats: 300 },
+  tier3: { priceId: "price_1SNFFMFGDAd3RU8IoasLs7ag", name: "Growth & Evangelism Suite", seats: 500 },
 };
 
 serve(async (req) => {
