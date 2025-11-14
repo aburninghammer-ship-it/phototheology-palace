@@ -46,6 +46,9 @@ export const ChefRecipeChallenge = ({ challenge, onSubmit, hasSubmitted }: ChefR
     
     try {
       const config = difficultyConfig[difficulty];
+      console.log("=== CALLING JEEVES TO GENERATE VERSES ===");
+      console.log("Config:", { min: config.min, max: config.max, difficulty, theme: challenge.ui_config?.theme || challenge.title });
+      
       const { data, error } = await supabase.functions.invoke("jeeves", {
         body: {
           mode: "generate_chef_verses",
@@ -56,29 +59,46 @@ export const ChefRecipeChallenge = ({ challenge, onSubmit, hasSubmitted }: ChefR
         },
       });
 
+      console.log("=== JEEVES RESPONSE ===");
+      console.log("Error:", error);
+      console.log("Data:", data);
+
       if (error) {
-        console.error("Jeeves error:", error);
-        throw error;
+        console.error("Jeeves error details:", error);
+        throw new Error(error.message || "Failed to call Jeeves");
       }
       
-      console.log("Jeeves response:", data);
-      
-      if (data && data.verses && Array.isArray(data.verses)) {
-        setVerses(data.verses);
-        toast({
-          title: "Ingredients Ready! 🎲",
-          description: `${data.verses.length} random verses generated for your recipe.`,
-        });
-      } else {
-        throw new Error("Invalid response format from Jeeves");
+      if (!data) {
+        throw new Error("No data returned from Jeeves");
       }
-    } catch (error: any) {
-      console.error("Error generating verses:", error);
+      
+      if (!data.verses || !Array.isArray(data.verses)) {
+        console.error("Invalid data structure:", data);
+        throw new Error("Invalid response format - missing verses array");
+      }
+      
+      if (data.verses.length === 0) {
+        throw new Error("Jeeves returned empty verses array");
+      }
+      
+      console.log("Successfully received verses:", data.verses);
+      setVerses(data.verses);
       toast({
-        title: "Error",
-        description: error.message || "Failed to generate verses. Please try again.",
+        title: "Ingredients Ready! 🎲",
+        description: `${data.verses.length} random verses generated for your recipe.`,
+      });
+    } catch (error: any) {
+      console.error("=== ERROR GENERATING VERSES ===");
+      console.error("Error type:", error.constructor.name);
+      console.error("Error message:", error.message);
+      console.error("Full error:", error);
+      toast({
+        title: "Failed to Generate Ingredients",
+        description: error.message || "Unable to generate verses. Please try again.",
         variant: "destructive",
       });
+      // Set empty verses to show the error state
+      setVerses([]);
     } finally {
       setIsLoading(false);
     }
