@@ -8,7 +8,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
-import { Flame, Share2, BookOpen, ChefHat, Calculator } from "lucide-react";
+import { Flame, BookOpen, ChefHat, Calculator } from "lucide-react";
+import { EnhancedSocialShare } from "@/components/EnhancedSocialShare";
 import { DimensionDrillChallenge } from "@/components/challenges/DimensionDrillChallenge";
 import { Connect6Challenge } from "@/components/challenges/Connect6Challenge";
 import { SanctuaryMapChallenge } from "@/components/challenges/SanctuaryMapChallenge";
@@ -103,22 +104,23 @@ const DailyChallenges = () => {
     }
   };
 
-  const handleShare = () => {
-    const shareData = {
+  const getShareContent = () => {
+    if (!dailyChallenge) return {
       title: 'Daily Phototheology Challenge',
-      text: `Join me in today's Bible study challenge! Today: ${dailyChallenge?.challenge_tier} challenge training ${dailyChallenge?.principle_used}`,
+      content: 'Join me in today\'s Bible study challenge!',
       url: `${window.location.origin}/daily-challenges`
     };
 
-    if (navigator.share) {
-      navigator.share(shareData).catch(() => {});
-    } else {
-      navigator.clipboard.writeText(`${shareData.title}\n${shareData.text}\n${shareData.url}`);
-      toast({
-        title: "Invitation copied!",
-        description: "Share link copied to clipboard!",
-      });
-    }
+    const challengeTypeLabel = dailyChallenge.challenge_subtype?.replace(/-/g, ' ')
+      .split(' ')
+      .map((word: string) => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(' ') || 'Challenge';
+
+    return {
+      title: `${challengeTypeLabel} - Daily Phototheology Challenge`,
+      content: dailyChallenge.description || `Today's challenge: ${challengeTypeLabel}. Training ${dailyChallenge.principle_used || 'biblical principles'}. Join me in deepening our understanding of Scripture!`,
+      url: `${window.location.origin}/daily-challenges`
+    };
   };
 
   const renderChallenge = () => {
@@ -181,10 +183,7 @@ const DailyChallenges = () => {
                 <BookOpen className="h-4 w-4" />
                 Growth Journal
               </Button>
-              <Button onClick={handleShare} variant="outline" className="gap-2">
-                <Share2 className="h-4 w-4" />
-                Share
-              </Button>
+              <EnhancedSocialShare {...getShareContent()} />
             </div>
           </div>
 
