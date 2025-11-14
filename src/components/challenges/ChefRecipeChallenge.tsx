@@ -31,6 +31,11 @@ export const ChefRecipeChallenge = ({ challenge, onSubmit, hasSubmitted }: ChefR
     master: { min: 7, max: 10, label: "Master (7-10 verses)" }
   };
 
+  // Auto-generate verses on mount
+  useEffect(() => {
+    generateVerses();
+  }, []);
+
   const generateVerses = async () => {
     setIsLoading(true);
     setVerses([]);
@@ -196,7 +201,13 @@ export const ChefRecipeChallenge = ({ challenge, onSubmit, hasSubmitted }: ChefR
               <Button
                 key={level}
                 variant={difficulty === level ? "default" : "outline"}
-                onClick={() => setDifficulty(level)}
+                onClick={() => {
+                  setDifficulty(level);
+                  // Only regenerate if difficulty actually changed
+                  if (level !== difficulty) {
+                    setTimeout(() => generateVerses(), 100);
+                  }
+                }}
                 className="w-full"
                 disabled={isLoading || hasSubmitted}
               >
