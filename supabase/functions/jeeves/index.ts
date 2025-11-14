@@ -1530,8 +1530,46 @@ Player's narrative: ${narrative}
 Does this form a coherent 4-part salvation story using these frames?
 Return JSON: { "coherent": true/false, "feedback": "brief comment" }`;
 
+    } else if (mode === "generate_chef_verses") {
+      // Generate random verses for Chef Challenge
+      const { minVerses, maxVerses, difficulty, theme } = requestBody;
+      const numVerses = Math.floor(Math.random() * (maxVerses - minVerses + 1)) + minVerses;
+      
+      systemPrompt = `You are Jeeves, selecting random Bible verses for a theological challenge. Select ${numVerses} verses that are INTENTIONALLY UNRELATED to each other - different books, different themes, different contexts. The challenge is for the student to creatively connect them. Make it interesting and challenging.`;
+      userPrompt = `Theme: ${theme}
+Difficulty: ${difficulty}
+
+Generate exactly ${numVerses} random Bible verse references (just the references, not the text). They should be from diverse books and have little obvious connection to make the challenge interesting.
+
+Return JSON: { "verses": ["reference1", "reference2", ...] }`;
+
+    } else if (mode === "check_chef_recipe") {
+      // Check player's Chef Challenge recipe
+      const { theme, recipe, verses, difficulty } = requestBody;
+      systemPrompt = `You are Jeeves, evaluating how well a student connected unrelated Bible verses into a coherent theological narrative on the theme "${theme}". Be encouraging but honest. Rate creativity, biblical accuracy, and thematic coherence.`;
+      userPrompt = `Given verses: ${verses.join(', ')}
+Theme: ${theme}
+Difficulty: ${difficulty}
+
+Student's narrative:
+${recipe}
+
+Evaluate this recipe. Return JSON: { "rating": 1-5, "feedback": "2-3 sentences of specific feedback with emojis" }`;
+
+    } else if (mode === "get_chef_model_answer") {
+      // Get Jeeves's model answer for Chef Challenge
+      const { theme, verses, difficulty } = requestBody;
+      systemPrompt = `You are Jeeves, demonstrating how to masterfully connect seemingly unrelated Bible verses into a coherent theological narrative. Be creative, insightful, and show deep biblical connections.`;
+      userPrompt = `Theme: ${theme}
+Verses to connect: ${verses.join(', ')}
+Difficulty: ${difficulty}
+
+Write a masterful 3-4 paragraph narrative showing how these verses connect to address the theme. Be creative, use typology, Christ-centered interpretation, and phototheological principles. Make it inspiring and insightful with emojis.
+
+Return JSON: { "modelAnswer": "your narrative with emojis and formatting" }`;
+
     } else if (mode === "validate_chef_recipe") {
-      // Chef Challenge validation - properties already destructured from requestBody
+      // Legacy Chef Challenge validation - properties already destructured from requestBody
       systemPrompt = `You are Jeeves, the head chef validating biblical recipes. Check creativity, biblical accuracy, and thematic fit.`;
       userPrompt = `Recipe theme: ${theme}
 Difficulty: ${difficulty}
@@ -1983,7 +2021,8 @@ ${roomContent}
     // Parse JSON responses for game validation modes
     if (["validate_chain", "validate_sanctuary", "validate_time_zones", "validate_connect6", 
          "validate_christ", "validate_controversy", "validate_dragon_defense", "validate_equation",
-         "validate_witness", "validate_frame", "validate_chef_recipe"].includes(mode)) {
+         "validate_witness", "validate_frame", "validate_chef_recipe", "generate_chef_verses",
+         "check_chef_recipe", "get_chef_model_answer"].includes(mode)) {
       try {
         const parsed = JSON.parse(content);
         return new Response(

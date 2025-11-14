@@ -224,8 +224,6 @@ const DailyChallenges = () => {
                     }>
                       {dailyChallenge.challenge_tier}
                     </Badge>
-                    <span>•</span>
-                    <span>Day {dailyChallenge.day_in_rotation} of 30</span>
                   </div>
 
                   {renderChallenge()}
