@@ -69,7 +69,9 @@ export const RichTextEditor = ({
   return (
     <div className="border rounded-lg overflow-hidden bg-background">
       <RichTextToolbar editor={editor} disabled={disabled} />
-      <EditorContent editor={editor} className="prose-editor" />
+      <div className="overflow-y-auto max-h-[600px]">
+        <EditorContent editor={editor} className="prose-editor" />
+      </div>
     </div>
   );
 };
