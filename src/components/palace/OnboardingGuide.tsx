@@ -22,6 +22,20 @@ export const OnboardingGuide = ({ roomId, roomName, onComplete }: OnboardingGuid
     }
   }, [roomId]);
 
+  const handleClose = () => {
+    localStorage.setItem(`onboarding_guide_${roomId}`, "completed");
+    setIsVisible(false);
+    onComplete();
+  };
+
+  const handleNext = () => {
+    if (currentStep < steps.length - 1) {
+      setCurrentStep(currentStep + 1);
+    } else {
+      handleClose();
+    }
+  };
+
   const steps = [
     {
       title: "Welcome to the Story Room! 🎬",
@@ -45,15 +59,24 @@ export const OnboardingGuide = ({ roomId, roomName, onComplete }: OnboardingGuid
       content: (
         <div className="space-y-3">
           <div className="grid gap-2">
-            <div className="p-3 border rounded hover:bg-accent cursor-pointer transition">
+            <div 
+              className="p-3 border rounded hover:bg-accent cursor-pointer transition"
+              onClick={handleNext}
+            >
               <p className="font-semibold">Genesis 37 - Joseph</p>
               <p className="text-xs text-muted-foreground">From favored son to Egyptian slave</p>
             </div>
-            <div className="p-3 border rounded hover:bg-accent cursor-pointer transition">
+            <div 
+              className="p-3 border rounded hover:bg-accent cursor-pointer transition"
+              onClick={handleNext}
+            >
               <p className="font-semibold">1 Samuel 17 - David & Goliath</p>
               <p className="text-xs text-muted-foreground">Shepherd boy defeats giant warrior</p>
             </div>
-            <div className="p-3 border rounded hover:bg-accent cursor-pointer transition">
+            <div 
+              className="p-3 border rounded hover:bg-accent cursor-pointer transition"
+              onClick={handleNext}
+            >
               <p className="font-semibold">Daniel 6 - Lions' Den</p>
               <p className="text-xs text-muted-foreground">Prayer, plot, and divine protection</p>
             </div>
@@ -80,20 +103,6 @@ export const OnboardingGuide = ({ roomId, roomName, onComplete }: OnboardingGuid
       )
     }
   ];
-
-  const handleNext = () => {
-    if (currentStep < steps.length - 1) {
-      setCurrentStep(currentStep + 1);
-    } else {
-      handleClose();
-    }
-  };
-
-  const handleClose = () => {
-    localStorage.setItem(`onboarding_guide_${roomId}`, "completed");
-    setIsVisible(false);
-    onComplete();
-  };
 
   if (!isVisible) return null;
 
