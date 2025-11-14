@@ -221,7 +221,7 @@ const MemorizationVerses = () => {
         .update({ 
           next_review_date: nextReview.toISOString(),
           review_interval_days: intervalDays
-        })
+        } as any)
         .eq("id", verseId);
 
       if (error) throw error;

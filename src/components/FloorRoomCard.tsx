@@ -13,26 +13,29 @@ interface FloorRoomCardProps {
 
 export const FloorRoomCard = ({ room, floorNumber, gradient }: FloorRoomCardProps) => {
   const { isUnlocked, loading } = useRoomUnlock(floorNumber, room.id);
+  
+  // Show locked appearance during loading to prevent flash
+  const showLocked = loading || !isUnlocked;
 
   return (
     <Link 
       to={`/palace/floor/${floorNumber}/room/${room.id}`}
-      className={!isUnlocked ? "pointer-events-none" : ""}
+      className={showLocked ? "pointer-events-none" : ""}
     >
-      <Card className={`group hover-lift h-full cursor-pointer transition-all duration-300 ${!isUnlocked ? 'opacity-60' : ''}`}>
+      <Card className={`group hover-lift h-full cursor-pointer transition-all duration-300 ${showLocked ? 'opacity-60' : ''}`}>
         <CardHeader>
           <div className="flex items-start justify-between">
             <div className="flex-1">
               <div className="flex items-center gap-2 mb-3">
-                {!isUnlocked && !loading && (
+                {showLocked && (
                   <Lock className="h-4 w-4 text-destructive" />
                 )}
                 <Badge className={`${gradient} text-white`}>
                   {room.tag}
                 </Badge>
-                {!isUnlocked && (
+                {showLocked && (
                   <Badge variant="destructive" className="text-xs">
-                    Locked
+                    {loading ? "Checking..." : "Locked"}
                   </Badge>
                 )}
               </div>
@@ -42,10 +45,10 @@ export const FloorRoomCard = ({ room, floorNumber, gradient }: FloorRoomCardProp
               </CardDescription>
             </div>
             <div className={`p-2 rounded-full ${gradient}`}>
-              {isUnlocked ? (
-                <ChevronRight className="h-4 w-4 text-white" />
-              ) : (
+              {showLocked ? (
                 <Lock className="h-4 w-4 text-white" />
+              ) : (
+                <ChevronRight className="h-4 w-4 text-white" />
               )}
             </div>
           </div>
