@@ -144,7 +144,27 @@ export const EnhancedSocialShare = ({
 
         <div className="space-y-4">
           <div>
-            <label className="text-sm font-medium mb-2 block">Your Message</label>
+            <div className="flex items-center justify-between mb-2">
+              <label className="text-sm font-medium">Your Message</label>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={handleCopy}
+                className="h-8 gap-2"
+              >
+                {copied ? (
+                  <>
+                    <Check className="h-3 w-3" />
+                    Copied!
+                  </>
+                ) : (
+                  <>
+                    <Copy className="h-3 w-3" />
+                    Copy Message
+                  </>
+                )}
+              </Button>
+            </div>
             <Textarea
               value={customMessage}
               onChange={(e) => setCustomMessage(e.target.value)}
@@ -152,6 +172,9 @@ export const EnhancedSocialShare = ({
               placeholder="Add your thoughts..."
               className="w-full"
             />
+            <p className="text-xs text-muted-foreground mt-1">
+              💡 Tip: Click "Copy Message" then paste into your social post
+            </p>
           </div>
 
           <div>
@@ -163,13 +186,6 @@ export const EnhancedSocialShare = ({
                 readOnly
                 className="flex-1 px-3 py-2 text-sm border rounded-md bg-muted"
               />
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={handleCopy}
-              >
-                {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
-              </Button>
             </div>
           </div>
 
