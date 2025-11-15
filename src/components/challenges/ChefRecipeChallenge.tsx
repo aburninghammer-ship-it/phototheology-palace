@@ -19,6 +19,7 @@ export const ChefRecipeChallenge = ({ challenge, onSubmit, hasSubmitted }: ChefR
   const [verses, setVerses] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isChecking, setIsChecking] = useState(false);
+  const [isLoadingModel, setIsLoadingModel] = useState(false);
   const [showModelAnswer, setShowModelAnswer] = useState(false);
   const [modelAnswer, setModelAnswer] = useState("");
   const [feedback, setFeedback] = useState<any>(null);
@@ -123,7 +124,7 @@ export const ChefRecipeChallenge = ({ challenge, onSubmit, hasSubmitted }: ChefR
       return;
     }
 
-    setIsLoading(true);
+    setIsLoadingModel(true);
     try {
       const { data, error } = await supabase.functions.invoke("jeeves", {
         body: {
@@ -145,7 +146,7 @@ export const ChefRecipeChallenge = ({ challenge, onSubmit, hasSubmitted }: ChefR
         variant: "destructive",
       });
     } finally {
-      setIsLoading(false);
+      setIsLoadingModel(false);
     }
   };
 
@@ -364,10 +365,19 @@ export const ChefRecipeChallenge = ({ challenge, onSubmit, hasSubmitted }: ChefR
                     onClick={handleShowModelAnswer} 
                     variant="secondary"
                     className="flex-1"
-                    disabled={isLoading}
+                    disabled={isLoadingModel}
                   >
-                    <Eye className="mr-2 h-4 w-4" />
-                    {showModelAnswer ? "Hide" : "Show"} Model Answer
+                    {isLoadingModel ? (
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        Loading...
+                      </>
+                    ) : (
+                      <>
+                        <Eye className="mr-2 h-4 w-4" />
+                        {showModelAnswer ? "Hide" : "Show"} Model Answer
+                      </>
+                    )}
                   </Button>
                 </div>
 

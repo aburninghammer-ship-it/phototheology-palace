@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
-import { ChefHat, ArrowLeft, Loader2, Eye, Share2 } from "lucide-react";
+import { ChefHat, ArrowLeft, Loader2, Eye, Share2, RefreshCw } from "lucide-react";
 import { SocialShareButton } from "@/components/SocialShareButton";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
@@ -51,6 +51,7 @@ export default function ChefChallenge() {
   const [recipe, setRecipe] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [isChecking, setIsChecking] = useState(false);
+  const [isLoadingModel, setIsLoadingModel] = useState(false);
   const [feedback, setFeedback] = useState<any>(null);
   const [showModelAnswer, setShowModelAnswer] = useState(false);
   const [modelAnswer, setModelAnswer] = useState("");
@@ -173,7 +174,7 @@ export default function ChefChallenge() {
       setShowModelAnswer(!showModelAnswer);
       return;
     }
-    setIsLoading(true);
+    setIsLoadingModel(true);
     try {
       const {
         data,
@@ -194,7 +195,7 @@ export default function ChefChallenge() {
         description: "Failed to get model answer. Please try again."
       });
     } finally {
-      setIsLoading(false);
+      setIsLoadingModel(false);
     }
   };
   const handleSubmit = async () => {
@@ -320,10 +321,32 @@ export default function ChefChallenge() {
                     ⚡ Challenge: These verses are intentionally random and unrelated! Your goal is to creatively weave them into a coherent Bible study.
                   </p>
                   
-                  <Button onClick={handleShare} variant="outline" className="w-full border-orange-300 hover:bg-orange-50 dark:border-orange-700 dark:hover:bg-orange-900/20">
-                    <Share2 className="mr-2 h-4 w-4" />
-                    🆘 Help Me Make This Dish
-                  </Button>
+                  <div className="flex gap-2">
+                    <Button onClick={handleShare} variant="outline" className="flex-1 border-orange-300 hover:bg-orange-50 dark:border-orange-700 dark:hover:bg-orange-900/20">
+                      <Share2 className="mr-2 h-4 w-4" />
+                      🆘 Help Me
+                    </Button>
+                    {!hasSubmitted && (
+                      <Button 
+                        onClick={generateVerses} 
+                        variant="outline"
+                        className="flex-1"
+                        disabled={isLoading}
+                      >
+                        {isLoading ? (
+                          <>
+                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                            Regenerating...
+                          </>
+                        ) : (
+                          <>
+                            <RefreshCw className="mr-2 h-4 w-4" />
+                            Regenerate
+                          </>
+                        )}
+                      </Button>
+                    )}
+                  </div>
                 </div>
 
                 {!hasSubmitted ? <>
@@ -351,9 +374,18 @@ export default function ChefChallenge() {
                             Checking...
                           </> : "Check My Recipe"}
                       </Button>
-                      <Button onClick={handleShowModelAnswer} variant="secondary" className="flex-1" disabled={isLoading}>
-                        <Eye className="mr-2 h-4 w-4" />
-                        {showModelAnswer ? "Hide" : "Show"} Model Answer
+                      <Button onClick={handleShowModelAnswer} variant="secondary" className="flex-1" disabled={isLoadingModel}>
+                        {isLoadingModel ? (
+                          <>
+                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                            Loading...
+                          </>
+                        ) : (
+                          <>
+                            <Eye className="mr-2 h-4 w-4" />
+                            {showModelAnswer ? "Hide" : "Show"} Model Answer
+                          </>
+                        )}
                       </Button>
                     </div>
 
