@@ -601,11 +601,40 @@ ${PALACE_SCHEMA}
 
 Verse text: "${verseText.text}"
 
-${includeSOP ? `**IMPORTANT - SOP ANALYSIS:** Search for Ellen White statements that directly apply to or amplify this specific verse (${book} ${chapter}:${verseText.verse}). 
-• If you find relevant statements, cite them with the book/chapter and show how they illuminate the verse
-• If NO relevant Ellen White statements are found for this verse, simply state: "No statements found to amplify this verse."
-• Do NOT provide generic Ellen White quotes - only include statements that specifically address this verse or passage
-• Label clearly with 📜 emoji as "SOP Commentary:"` : ''}
+${includeSOP ? `**CRITICAL - SPIRIT OF PROPHECY (SOP) ANALYSIS:**
+
+You are searching Ellen G. White's writings for commentary on ${book} ${chapter}:${verseText.verse}.
+
+**MANDATORY FORMAT:**
+
+📜 **SOP (Spirit of Prophecy) Commentary**
+
+**If commentary exists:**
+Provide 3-5 distinct Ellen G. White statements or passages that illuminate this specific verse. For EACH quote:
+
+**Quote 1:**
+"[Full relevant quote]"
+— *Book Title*, Chapter X, Page Y
+
+[1-2 sentences explaining how this illuminates ${book} ${chapter}:${verseText.verse}]
+
+**Quote 2:**
+[Repeat format]
+
+**If NO commentary exists:**
+Simply state:
+
+📜 **SOP (Spirit of Prophecy) Commentary**
+
+Ellen G. White does not appear to have written specific commentary on ${book} ${chapter}:${verseText.verse}. While the verse is profound, no direct EGW statements were found addressing this particular text.
+
+**CRITICAL RULES:**
+• Only include statements that DIRECTLY address ${book} ${chapter}:${verseText.verse} or its immediate context
+• Always cite book title, chapter (if applicable), and page number
+• Do NOT provide generic Ellen White quotes unrelated to this verse
+• Do NOT invent citations or quotes
+• Expound briefly on how each quote relates to the verse
+• Vary your quotes each time you regenerate to show different perspectives` : ''}
 
 **FORMATTING INSTRUCTIONS - CRITICAL:**
 - Start with a warm opening using an emoji (📖, ✨, 🔍)
@@ -621,9 +650,7 @@ ${includeSOP ? `**IMPORTANT - SOP ANALYSIS:** Search for Ellen White statements 
 - Keep language warm and conversational
 - End with an encouraging closing thought with emoji
 
-${includeSOP ? '\n📜 **SOP Commentary**\nShare relevant Ellen White insights in a warm, accessible paragraph.\n\n' : ''}
-
-✨ **Interconnections**
+${includeSOP ? '' : '✨ **Interconnections**'}
 Show how these principles work together when applied to this verse. Use 2-3 sentences.
 
 🎯 **Practical Application**
@@ -635,6 +662,105 @@ End with one profound, inspiring insight.
 Keep it warm and easy to understand, visually appealing, and easy to scan.
       
       IMPORTANT: At the very end, on a new line, include: "PRINCIPLES_USED: ${principleList}"`;
+    
+    } else if (mode === "commentary-sop") {
+      systemPrompt = `You are Jeeves, a biblical scholar deeply familiar with the writings of Ellen G. White (Spirit of Prophecy/SOP).
+
+**CRITICAL TASK:**
+Search Ellen G. White's writings for commentary specifically on ${book} ${chapter}:${verseText.verse}.
+
+**CRITICAL FORMATTING REQUIREMENTS:**
+- Format ALL responses in clear paragraphs (2-4 sentences each)
+- Separate each paragraph with a blank line
+- Use emojis for visual clarity (📜 💡 ✨ 🔍)
+- ALWAYS cite: Book Title, Chapter (if applicable), and Page Number
+- Provide 3-5 distinct quotes when available
+- When NO commentary exists, clearly state it
+- VARY your selections each time to show different perspectives
+
+${PALACE_SCHEMA}
+
+**THEOLOGICAL GUARDRAILS:**
+${PALACE_SCHEMA.split('## CRITICAL THEOLOGICAL GUARDRAILS')[1]?.split('---')[0] || ''}`;
+
+      userPrompt = `Search Ellen G. White's writings for commentary on ${book} ${chapter}:${verseText.verse}
+
+Verse text: "${verseText.text}"
+
+**MANDATORY FORMAT:**
+
+📜 **SOP (Spirit of Prophecy) Commentary**
+
+**If commentary EXISTS (3-5 quotes):**
+
+**Quote 1:**
+"[Full relevant quote from Ellen White]"
+— *Book Title*, Chapter X, Page Y
+
+💡 [1-2 sentences explaining how this illuminates ${book} ${chapter}:${verseText.verse}]
+
+**Quote 2:**
+"[Another distinct quote]"
+— *Book Title*, Chapter X, Page Y
+
+💡 [Brief explanation of illumination]
+
+[Continue for 3-5 quotes total]
+
+✨ **Summary Insight**
+[1-2 sentences tying the EGW commentary together and showing its overall illumination of the verse]
+
+**If NO commentary exists:**
+
+📜 **SOP (Spirit of Prophecy) Commentary**
+
+Ellen G. White does not appear to have written specific commentary on ${book} ${chapter}:${verseText.verse}. While this verse holds profound truth, no direct EGW statements were found addressing this particular text.
+
+💡 You may find general principles related to this passage in broader EGW writings on [mention the general topic/book of the Bible], but no specific verse-level commentary is available.
+
+**CRITICAL RULES:**
+• Only include statements that DIRECTLY address ${book} ${chapter}:${verseText.verse} or its immediate context (within 2-3 verses)
+• ALWAYS cite book title, chapter (if applicable), and page number
+• Do NOT provide generic Ellen White quotes unrelated to this specific verse
+• Do NOT invent citations or fabricate quotes
+• Vary your selections to show different perspectives from EGW's writings
+• Briefly expound on each quote's relevance
+• If truly no commentary exists, clearly state it—don't force generic quotes`;
+
+      const sopResponse = await fetch(
+        "https://ai.gateway.lovable.dev/v1/chat/completions",
+        {
+          method: "POST",
+          headers: {
+            "Authorization": `Bearer ${LOVABLE_API_KEY}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            model: "google/gemini-2.5-flash",
+            messages: [
+              { role: "system", content: systemPrompt },
+              { role: "user", content: userPrompt },
+            ],
+          }),
+        }
+      );
+
+      if (!sopResponse.ok) {
+        const errorText = await sopResponse.text();
+        console.error('AI Gateway error:', sopResponse.status, errorText);
+        throw new Error(`AI Gateway error: ${sopResponse.status}`);
+      }
+
+      const sopData = await sopResponse.json();
+      const sopContent = sopData.choices?.[0]?.message?.content || "No SOP commentary generated.";
+
+      return new Response(
+        JSON.stringify({ 
+          content: sopContent,
+          principlesUsed: ["Spirit of Prophecy (SOP)"]
+        }),
+        { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
     
     } else if (mode === "principle-amplification") {
       systemPrompt = `You are Jeeves, a friendly biblical scholar helping friends understand how Phototheology principles amplify and illuminate Scripture.

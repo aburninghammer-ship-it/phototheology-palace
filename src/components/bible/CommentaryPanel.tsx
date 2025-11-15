@@ -129,6 +129,7 @@ export const CommentaryPanel = ({ book, chapter, verse, verseText, onClose }: Co
   const [commentary, setCommentary] = useState<string | null>(null);
   const [usedPrinciples, setUsedPrinciples] = useState<string[]>([]);
   const [analysisMode, setAnalysisMode] = useState<"revealed" | "applied">("applied");
+  const [sopMode, setSopMode] = useState(false);
   const { toast } = useToast();
 
   const togglePrinciple = (id: string) => {
@@ -138,7 +139,7 @@ export const CommentaryPanel = ({ book, chapter, verse, verseText, onClose }: Co
   };
 
   const generateCommentary = async (refresh = false, includeSOP = false) => {
-    if (analysisMode === "applied" && selectedPrinciples.length === 0 && !refresh) {
+    if (analysisMode === "applied" && selectedPrinciples.length === 0 && !refresh && !includeSOP) {
       toast({
         title: "Select Principles",
         description: "Please select at least one principle for applied analysis",
@@ -148,14 +149,15 @@ export const CommentaryPanel = ({ book, chapter, verse, verseText, onClose }: Co
     }
 
     setLoading(true);
+    setSopMode(includeSOP);
     try {
       const { data, error } = await supabase.functions.invoke("jeeves", {
         body: {
-          mode: analysisMode === "revealed" ? "commentary-revealed" : "commentary-applied",
+          mode: includeSOP ? "commentary-sop" : (analysisMode === "revealed" ? "commentary-revealed" : "commentary-applied"),
           book,
           chapter,
           verseText: { verse, text: verseText },
-          selectedPrinciples: (analysisMode === "applied" && !refresh) 
+          selectedPrinciples: (analysisMode === "applied" && !refresh && !includeSOP) 
             ? selectedPrinciples.map(id => PRINCIPLE_OPTIONS.find(p => p.id === id)?.label)
             : undefined,
           includeSOP: includeSOP,
@@ -274,20 +276,20 @@ export const CommentaryPanel = ({ book, chapter, verse, verseText, onClose }: Co
             
             <Button
               onClick={() => generateCommentary(false, true)}
-              disabled={loading || (analysisMode === "applied" && selectedPrinciples.length === 0)}
+              disabled={loading}
               variant="outline"
               className="flex-1"
-              title="Include Spirit of Prophecy commentary"
+              title="Spirit of Prophecy (Ellen G. White) commentary on this verse"
             >
               {loading ? (
                 <Loader2 className="h-4 w-4 mr-2 animate-spin" />
               ) : (
                 <Sparkles className="h-4 w-4 mr-2" />
               )}
-              + SOP
+              SOP
             </Button>
             
-            {commentary && (
+            {commentary && !sopMode && (
               <Button
                 onClick={() => generateCommentary(true, false)}
                 disabled={loading}
@@ -300,6 +302,23 @@ export const CommentaryPanel = ({ book, chapter, verse, verseText, onClose }: Co
                   <Sparkles className="h-4 w-4 mr-2" />
                 )}
                 {analysisMode === "revealed" ? "Re-analyze" : "Random Refresh"}
+              </Button>
+            )}
+            
+            {commentary && sopMode && (
+              <Button
+                onClick={() => generateCommentary(false, true)}
+                disabled={loading}
+                variant="outline"
+                className="flex-1"
+                title="Get a fresh batch of Ellen G. White quotes on this verse"
+              >
+                {loading ? (
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                ) : (
+                  <Sparkles className="h-4 w-4 mr-2" />
+                )}
+                Regenerate SOP
               </Button>
             )}
           </div>
