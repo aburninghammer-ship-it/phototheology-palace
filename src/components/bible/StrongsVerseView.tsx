@@ -8,6 +8,7 @@ import { getVerseWithStrongs } from "@/services/strongsApi";
 import { supabase } from "@/integrations/supabase/client";
 import { Sparkles, Bot, Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { sanitizeHtml } from "@/lib/sanitize";
 
 interface StrongsVerseViewProps {
   verse: Verse;
@@ -274,7 +275,7 @@ export const StrongsVerseView = ({
                   <span className="text-sm font-semibold text-primary">Jeeves says:</span>
                 </div>
                 <div className="prose prose-sm max-w-none text-foreground">
-                  <div dangerouslySetInnerHTML={{ __html: jeevesResponse.replace(/\n/g, '<br />') }} />
+                  <div dangerouslySetInnerHTML={{ __html: sanitizeHtml(jeevesResponse.replace(/\n/g, '<br />')) }} />
                 </div>
               </div>
             )}
@@ -298,7 +299,7 @@ export const StrongsVerseView = ({
               </div>
             ) : wordAnalysis ? (
               <div className="prose prose-sm dark:prose-invert max-w-none p-4">
-                <div dangerouslySetInnerHTML={{ __html: wordAnalysis.replace(/\n/g, '<br/>') }} />
+                <div dangerouslySetInnerHTML={{ __html: sanitizeHtml(wordAnalysis.replace(/\n/g, '<br/>')) }} />
               </div>
             ) : null}
           </ScrollArea>
