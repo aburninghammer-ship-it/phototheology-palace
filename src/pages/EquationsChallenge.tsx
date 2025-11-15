@@ -386,10 +386,18 @@ export default function EquationsChallenge() {
 ${currentEquation.equation}
 \`\`\`
 
-📚 **Explanation:**
+📚 **Understanding This Challenge (For Newcomers):**
+
 ${currentEquation.explanation}
 
-🎯 Can you help solve this equation? Share your interpretation and insights! Also, write out the entire verse.
+---
+
+💡 **Symbols Used in This Equation:**
+${currentEquation.symbols.map((s, i) => `${i + 1}. ${s}`).join('\n')}
+
+---
+
+🎯 **Your Task:** Can you help solve this equation? Share your interpretation and insights below! Also, write out the entire verse and explain how the principles connect.
 
 ⚡ *Difficulty: ${difficulty}*`;
 
@@ -714,6 +722,27 @@ ${currentEquation.explanation}
                   ))}
                 </div>
               </div>
+
+              {/* Challenge Explanation - What & How */}
+              <Card className="border-amber-500/30 bg-gradient-to-br from-amber-50/50 via-yellow-50/50 to-orange-50/50 dark:from-amber-900/20 dark:via-yellow-900/20 dark:to-orange-900/20">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2 text-lg">
+                    <span className="text-2xl">💡</span>
+                    Understanding This Challenge
+                    <span className="text-2xl">📚</span>
+                  </CardTitle>
+                  <CardDescription>
+                    New to Phototheology? Here's what these principles mean and how to solve the equation!
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="prose dark:prose-invert max-w-none">
+                    <div className="whitespace-pre-wrap text-sm leading-relaxed">
+                      {currentEquation.explanation}
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
 
               {/* Share to Community Button */}
               <Button
