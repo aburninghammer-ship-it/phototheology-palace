@@ -333,11 +333,137 @@ export const Navigation = () => {
               )}
             </div>
           </div>
+          
+          {/* Horizontal Tab Navigation - Second row, only for authenticated users */}
+          {user && (
+            <div className="border-t border-border/40">
+              <div className="max-w-7xl mx-auto overflow-x-auto scrollbar-hide">
+                <div className="flex items-center gap-1 py-2 px-2">
+                  <Link 
+                    to="/palace" 
+                    className="px-3 py-1.5 text-sm font-medium text-foreground hover:text-primary hover:bg-accent/50 rounded-md transition-colors whitespace-nowrap"
+                  >
+                    Palace
+                  </Link>
+                  <Link 
+                    to="/bible" 
+                    className="px-3 py-1.5 text-sm font-medium text-foreground hover:text-primary hover:bg-accent/50 rounded-md transition-colors whitespace-nowrap flex items-center gap-1"
+                  >
+                    <BookOpen className="h-3.5 w-3.5" />
+                    Bible
+                  </Link>
+                  <Link 
+                    to="/my-studies" 
+                    className="px-3 py-1.5 text-sm font-medium text-foreground hover:text-primary hover:bg-accent/50 rounded-md transition-colors whitespace-nowrap"
+                  >
+                    My Studies
+                  </Link>
+                  <Link 
+                    to="/games" 
+                    className="px-3 py-1.5 text-sm font-medium text-foreground hover:text-primary hover:bg-accent/50 rounded-md transition-colors whitespace-nowrap"
+                  >
+                    Games
+                  </Link>
+                  
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <button className="px-3 py-1.5 text-sm font-medium text-foreground hover:text-primary hover:bg-accent/50 rounded-md transition-colors whitespace-nowrap flex items-center gap-1">
+                        <Sparkles className="h-3.5 w-3.5" />
+                        GPTs
+                      </button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="start" className="w-56 bg-card border-border z-50">
+                      <DropdownMenuItem asChild>
+                        <Link to="/phototheology-gpt">Phototheology GPT</Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem asChild>
+                        <Link to="/daniel-revelation-gpt">Daniel & Revelation GPT</Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem asChild>
+                        <Link to="/apologetics-gpt">Apologetics GPT</Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem asChild>
+                        <Link to="/culture-controversy">Culture & Controversy GPT</Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem asChild>
+                        <Link to="/kid-gpt">KidGPT</Link>
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                  
+                  <Link 
+                    to="/revelation-course" 
+                    className="px-3 py-1.5 text-sm font-medium text-foreground hover:text-primary hover:bg-accent/50 rounded-md transition-colors whitespace-nowrap"
+                  >
+                    Courses
+                  </Link>
+                  <Link 
+                    to="/daily-challenges" 
+                    className="px-3 py-1.5 text-sm font-medium text-foreground hover:text-primary hover:bg-accent/50 rounded-md transition-colors whitespace-nowrap"
+                  >
+                    Challenges
+                  </Link>
+                  <Link 
+                    to="/achievements" 
+                    className="px-3 py-1.5 text-sm font-medium text-foreground hover:text-primary hover:bg-accent/50 rounded-md transition-colors whitespace-nowrap"
+                  >
+                    Achievements
+                  </Link>
+                  <Link 
+                    to="/bible-study-series" 
+                    className="px-3 py-1.5 text-sm font-medium text-foreground hover:text-primary hover:bg-accent/50 rounded-md transition-colors whitespace-nowrap"
+                  >
+                    Series
+                  </Link>
+                  <Link 
+                    to="/pricing" 
+                    className="px-3 py-1.5 text-sm font-medium text-foreground hover:text-primary hover:bg-accent/50 rounded-md transition-colors whitespace-nowrap"
+                  >
+                    Pricing
+                  </Link>
+                  <Link 
+                    to="/community" 
+                    className="px-3 py-1.5 text-sm font-medium text-foreground hover:text-primary hover:bg-accent/50 rounded-md transition-colors whitespace-nowrap"
+                  >
+                    Community
+                  </Link>
+                  
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <button className="px-3 py-1.5 text-sm font-medium text-foreground hover:text-primary hover:bg-accent/50 rounded-md transition-colors whitespace-nowrap flex items-center gap-1">
+                        <User className="h-3.5 w-3.5" />
+                        Account
+                      </button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end" className="w-56 bg-card border-border z-50">
+                      <DropdownMenuItem asChild>
+                        <Link to="/profile">
+                          <User className="h-4 w-4 mr-2" />
+                          Profile
+                        </Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem asChild>
+                        <Link to="/pricing">
+                          <CreditCard className="h-4 w-4 mr-2" />
+                          Subscription
+                        </Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem onClick={() => signOut()}>
+                        <LogOut className="h-4 w-4 mr-2" />
+                        Sign Out
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       </nav>
       
-      {/* Spacer div */}
-      <div className="h-16" />
+      {/* Spacer div - increased for tabs row */}
+      <div className={user ? "h-32" : "h-16"} />
     </>
   );
 };
