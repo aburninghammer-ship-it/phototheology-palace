@@ -318,7 +318,7 @@ export const ChefRecipeChallenge = ({ challenge, onSubmit, hasSubmitted }: ChefR
                   title={`Chef Challenge: ${challenge.title}`}
                   content={`🍳 ${challenge.ui_config?.theme || challenge.description}\n\n🥘 Ingredients (${verses.length} verses):\n${verses.map((v: any, i: number) => `${i + 1}. ${v.reference}: "${v.text}"`).join('\n\n')}\n\nCan you create a theological recipe connecting all these verses?`}
                   url={`${window.location.origin}/daily-challenges`}
-                  buttonText="Share Challenge"
+                  buttonText="📱 Share to Social Media"
                   buttonVariant="default"
                 />
               </div>
@@ -327,7 +327,12 @@ export const ChefRecipeChallenge = ({ challenge, onSubmit, hasSubmitted }: ChefR
             {!hasSubmitted ? (
               <>
                 <div className="space-y-2">
-                  <label className="text-sm font-medium">Your Biblical Recipe:</label>
+                  <label className="text-sm font-medium">Step 3: Write Your Recipe (Use ONLY the Ingredient Verses Above!)</label>
+                  <div className="bg-yellow-50 dark:bg-yellow-900/20 p-3 rounded border border-yellow-300 dark:border-yellow-700 mb-2">
+                    <p className="text-sm font-semibold text-yellow-900 dark:text-yellow-100">
+                      ⚠️ IMPORTANT: Use ONLY the {verses.length} ingredient verses shown above. Do NOT add any other verses!
+                    </p>
+                  </div>
                   <Textarea
                     placeholder="Use ONLY the verses provided above to build a creative Bible study.&#10;&#10;Example:&#10;Start with Genesis 1:1 to establish creation...&#10;Then connect Psalm 23:1 to show God as provider...&#10;Finally, John 3:16 reveals the ultimate provision...&#10;&#10;Be creative and make unexpected connections!"
                     value={recipe}
@@ -335,8 +340,8 @@ export const ChefRecipeChallenge = ({ challenge, onSubmit, hasSubmitted }: ChefR
                     rows={10}
                     className="font-mono"
                   />
-                  <p className="text-xs text-muted-foreground">
-                    Use ONLY the ingredient verses above - do not add extra verses. Explain how these specific verses connect to address the theme.
+                  <p className="text-xs text-muted-foreground font-semibold">
+                    ✅ Use ONLY the {verses.length} ingredient verses above • ❌ Do NOT add extra verses
                   </p>
                 </div>
 
