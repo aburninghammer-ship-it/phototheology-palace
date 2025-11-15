@@ -113,6 +113,25 @@ export const MobileNav = () => {
               </Link>
               
               <Separator className="my-2" />
+              <div className="text-xs font-semibold text-muted-foreground px-2 py-1">Research Tools</div>
+              
+              <Link to="/research-mode">
+                <Button variant="ghost" className="w-full justify-start" size="sm">
+                  🔬 Research Mode
+                </Button>
+              </Link>
+              <Link to="/prophecy-watch">
+                <Button variant="ghost" className="w-full justify-start" size="sm">
+                  👁️ Prophecy Watch
+                </Button>
+              </Link>
+              <Link to="/culture-controversy">
+                <Button variant="ghost" className="w-full justify-start" size="sm">
+                  🌍 Culture & Controversy
+                </Button>
+              </Link>
+              
+              <Separator className="my-2" />
               <div className="text-xs font-semibold text-muted-foreground px-2 py-1">Games</div>
               
               <Link to="/games">
