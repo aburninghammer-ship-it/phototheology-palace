@@ -223,7 +223,7 @@ export default function ChefChallenge() {
               <Badge>Quick • 5-10 min</Badge>
             </div>
             <CardDescription className="mt-2">
-              Use the verses (ingredients) Jeeves has provided and create a recipe from it.
+              📖 <strong>The Rules:</strong> Create a dish from the ingredients Jeeves will provide. This means the user must tie the verses into together to create a bible study that makes sense.
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
