@@ -13,13 +13,17 @@ interface EnhancedSocialShareProps {
   content: string;
   url: string;
   defaultMessage?: string;
+  buttonText?: string;
+  buttonVariant?: "default" | "outline" | "secondary" | "ghost" | "link" | "destructive";
 }
 
 export const EnhancedSocialShare = ({
   title,
   content,
   url,
-  defaultMessage
+  defaultMessage,
+  buttonText = "Share",
+  buttonVariant = "outline"
 }: EnhancedSocialShareProps) => {
   const { user } = useAuth();
   const [open, setOpen] = useState(false);
@@ -105,9 +109,9 @@ export const EnhancedSocialShare = ({
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant="outline" className="gap-2">
+        <Button variant={buttonVariant} className="gap-2">
           <Share2 className="h-4 w-4" />
-          Share
+          {buttonText}
         </Button>
       </DialogTrigger>
       

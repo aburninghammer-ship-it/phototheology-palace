@@ -216,14 +216,21 @@ const DailyChallenges = () => {
 
               {dailyChallenge ? (
                 <>
-                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                    <Badge variant={
-                      dailyChallenge.challenge_tier === "Quick" ? "default" :
-                      dailyChallenge.challenge_tier === "Core" ? "secondary" :
-                      "outline"
-                    }>
-                      {dailyChallenge.challenge_tier}
-                    </Badge>
+                  <div className="flex items-center justify-between flex-wrap gap-4">
+                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                      <Badge variant={
+                        dailyChallenge.challenge_tier === "Quick" ? "default" :
+                        dailyChallenge.challenge_tier === "Core" ? "secondary" :
+                        "outline"
+                      }>
+                        {dailyChallenge.challenge_tier}
+                      </Badge>
+                    </div>
+                    <EnhancedSocialShare 
+                      {...getShareContent()} 
+                      buttonText="Share This Challenge"
+                      buttonVariant="default"
+                    />
                   </div>
 
                   {renderChallenge()}
