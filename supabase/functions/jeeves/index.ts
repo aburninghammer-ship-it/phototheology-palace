@@ -1582,11 +1582,11 @@ Return JSON: { "coherent": true/false, "feedback": "brief comment" }`;
       
       console.log(`=== GENERATING ${numVerses} CHEF VERSES (${difficulty} level) ===`);
       
-      // Fetch random verses from database
+      // Fetch random verses from database - get more to ensure we can pick unique books
       const { data: randomVerses, error: verseError } = await supabase
         .from('bible_verses_tokenized')
         .select('book, chapter, verse_num, text_kjv')
-        .limit(numVerses * 10); // Get more than needed to randomize
+        .limit(numVerses * 20); // Get many more to ensure unique books
       
       if (verseError || !randomVerses || randomVerses.length === 0) {
         console.error("Error fetching verses:", verseError);
@@ -1596,12 +1596,29 @@ Return JSON: { "coherent": true/false, "feedback": "brief comment" }`;
         );
       }
       
-      // Randomly select verses
+      // Randomly select verses ensuring no duplicates from same book
       const shuffled = randomVerses.sort(() => 0.5 - Math.random());
-      const selectedVerses = shuffled.slice(0, numVerses).map(v => ({
-        reference: `${v.book} ${v.chapter}:${v.verse_num}`,
-        text: v.text_kjv
-      }));
+      const selectedVerses: Array<{ reference: string; text: string }> = [];
+      const usedBooks = new Set<string>();
+      
+      for (const verse of shuffled) {
+        if (!usedBooks.has(verse.book)) {
+          selectedVerses.push({
+            reference: `${verse.book} ${verse.chapter}:${verse.verse_num}`,
+            text: verse.text_kjv
+          });
+          usedBooks.add(verse.book);
+          
+          if (selectedVerses.length === numVerses) {
+            break;
+          }
+        }
+      }
+      
+      // If we couldn't get enough unique books, log a warning
+      if (selectedVerses.length < numVerses) {
+        console.warn(`Only found ${selectedVerses.length} verses from unique books, needed ${numVerses}`);
+      }
       
       console.log("Verses selected:", selectedVerses.length);
       
