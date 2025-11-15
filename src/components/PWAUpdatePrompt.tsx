@@ -61,7 +61,10 @@ export function PWAUpdatePrompt() {
           <AlertDescription className="mt-2 flex items-center gap-2">
             <span className="flex-1 text-sm">Click reload to update to the latest version</span>
             <Button 
-              onClick={() => updateServiceWorker(true)} 
+              onClick={() => {
+                updateServiceWorker(true);
+                window.location.reload();
+              }} 
               variant="default" 
               size="sm"
             >
