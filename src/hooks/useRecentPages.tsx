@@ -49,8 +49,37 @@ const getPageTitle = (path: string): string => {
     return "Bible Reader";
   }
   
-  // Default to path
-  return path.split("/").pop()?.replace(/-/g, " ") || "Unknown Page";
+  // Check for My Studies paths with UUID
+  if (path.startsWith("/my-studies/") && path.length > 13) {
+    return "Study";
+  }
+  
+  // Check for Series paths with UUID
+  if (path.startsWith("/series/") && path.includes("/lesson/")) {
+    return "Series Lesson";
+  }
+  if (path.startsWith("/series/") && path.includes("/present")) {
+    return "Series Presenter";
+  }
+  
+  // Check for Escape Room and Treasure Hunt dynamic routes
+  if (path.startsWith("/escape-room/play/")) {
+    return "Escape Room";
+  }
+  if (path.startsWith("/treasure-hunt/")) {
+    return "Treasure Hunt";
+  }
+  if (path.startsWith("/live-study/") && path.length > 12) {
+    return "Live Study";
+  }
+  
+  // Default to formatted path
+  const lastSegment = path.split("/").pop() || "";
+  // Check if it looks like a UUID (contains multiple hyphens and hexadecimal characters)
+  if (lastSegment.match(/^[a-f0-9-]{36}$/i)) {
+    return "Unknown Page";
+  }
+  return lastSegment.replace(/-/g, " ") || "Unknown Page";
 };
 
 export const useRecentPages = () => {
