@@ -9,7 +9,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
-import { Calculator, Trophy, Target, Clock, RefreshCw, Share2, Plus, Sparkles, Copy, Check, Loader2, Facebook, Twitter } from "lucide-react";
+import { Calculator, Trophy, Target, Clock, RefreshCw, Share2, Plus, Sparkles, Loader2, Copy, Check } from "lucide-react";
+import { SocialShareButton } from "@/components/SocialShareButton";
 import { ChallengeShareButton } from "@/components/challenges/ChallengeShareButton";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
@@ -21,12 +22,6 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 
 type Difficulty = "easy" | "intermediate" | "advanced" | "pro";
 
@@ -702,67 +697,14 @@ ${currentEquation.symbols.map((s, i) => `${i + 1}. ${s}`).join('\n')}
                     </Button>
                     {currentEquation && (
                       <>
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button
-                              variant="outline"
-                              size="sm"
-                            >
-                              <Share2 className="h-4 w-4 mr-2" />
-                              Share
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end" className="w-56">
-                            <DropdownMenuItem
-                              onClick={() => {
-                                const shareMessage = `🧮 Can you help me solve this Biblical Equation? 🤔\n\n📖 ${currentEquation.verse}\n\n🎯 Equation: ${currentEquation.equation}\n\n✨ This challenge uses Phototheology principles to unlock deeper meanings in Scripture!\n\n🔑 Principles used: ${currentEquation.symbols.slice(0, 3).join(", ")}${currentEquation.symbols.length > 3 ? "..." : ""}\n\n💡 Think you can crack it? Share your insights!\n\n🚀 Try it yourself at: ${window.location.origin}/equations-challenge`;
-                                const appUrl = window.location.origin + "/equations-challenge";
-                                
-                                // Check if mobile and has native share
-                                const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-                                if (isMobile && navigator.share) {
-                                  navigator.share({
-                                    title: "Biblical Equation Challenge",
-                                    text: shareMessage,
-                                    url: appUrl
-                                  }).catch(() => {
-                                    navigator.clipboard.writeText(shareMessage);
-                                    toast.success("Copied! Paste on social media 🎉");
-                                  });
-                                } else {
-                                  // Desktop fallback
-                                  const text = encodeURIComponent(shareMessage);
-                                  const url = encodeURIComponent(appUrl);
-                                  window.open(`https://www.facebook.com/sharer/sharer.php?u=${url}&quote=${text}`, '_blank');
-                                }
-                              }}
-                            >
-                              <Facebook className="h-4 w-4 mr-2" />
-                              Share on Facebook
-                            </DropdownMenuItem>
-                            <DropdownMenuItem
-                              onClick={() => {
-                                const shareMessage = `🧮 Can you help me solve this Biblical Equation? 🤔\n\n📖 ${currentEquation.verse}\n\n🎯 Equation: ${currentEquation.equation}\n\n✨ This challenge uses Phototheology principles to unlock deeper meanings in Scripture!\n\n🔑 Principles used: ${currentEquation.symbols.slice(0, 3).join(", ")}${currentEquation.symbols.length > 3 ? "..." : ""}\n\n💡 Think you can crack it? Share your insights!\n\n🚀 Try it yourself at: ${window.location.origin}/equations-challenge`;
-                                const text = encodeURIComponent(shareMessage);
-                                const url = encodeURIComponent(window.location.origin + "/equations-challenge");
-                                window.open(`https://twitter.com/intent/tweet?text=${text}&url=${url}`, '_blank');
-                              }}
-                            >
-                              <Twitter className="h-4 w-4 mr-2" />
-                              Share on Twitter
-                            </DropdownMenuItem>
-                            <DropdownMenuItem
-                              onClick={() => {
-                                const shareMessage = `🧮 Can you help me solve this Biblical Equation? 🤔\n\n📖 ${currentEquation.verse}\n\n🎯 Equation: ${currentEquation.equation}\n\n✨ This challenge uses Phototheology principles to unlock deeper meanings in Scripture!\n\n🔑 Principles used: ${currentEquation.symbols.slice(0, 3).join(", ")}${currentEquation.symbols.length > 3 ? "..." : ""}\n\n💡 Think you can crack it? Share your insights!\n\n🚀 Try it yourself at: ${window.location.origin}/equations-challenge`;
-                                navigator.clipboard.writeText(shareMessage);
-                                toast.success("Copied to clipboard! 📋");
-                              }}
-                            >
-                              <Copy className="h-4 w-4 mr-2" />
-                              Copy to Clipboard
-                            </DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
+                        <SocialShareButton
+                          title="🧮 Biblical Equation Challenge"
+                          description={`📖 ${currentEquation.verse}\n\n🎯 Equation: ${currentEquation.equation}\n\n✨ This challenge uses Phototheology principles to unlock deeper meanings in Scripture!\n\n🔑 Principles: ${currentEquation.symbols.slice(0, 3).join(", ")}${currentEquation.symbols.length > 3 ? "..." : ""}`}
+                          url={`${window.location.origin}/equations-challenge`}
+                          variant="dropdown"
+                          size="sm"
+                          buttonText="Share"
+                        />
                       </>
                     )}
                     <Badge className={difficultyInfo[difficulty].color}>
