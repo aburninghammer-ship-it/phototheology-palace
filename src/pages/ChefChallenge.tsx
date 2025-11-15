@@ -339,7 +339,7 @@ export default function ChefChallenge() {
                 {!hasSubmitted ? (
                   <>
                     <div className="space-y-2">
-                      <label className="text-sm font-medium">Step 3: Create Your Biblical Recipe</label>
+                      <label className="text-sm font-medium">Create Your Biblical Recipe</label>
                       <Textarea
                         placeholder="Use the verses above to build a creative Bible study.&#10;&#10;Example:&#10;Start with Genesis 1:1 to establish creation...&#10;Then connect Psalm 23:1 to show God as provider...&#10;Finally, John 3:16 reveals the ultimate provision...&#10;&#10;Be creative and make unexpected connections!"
                         value={recipe}

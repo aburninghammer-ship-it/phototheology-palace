@@ -189,13 +189,6 @@ export const ChefRecipeChallenge = ({ challenge, onSubmit, hasSubmitted }: ChefR
           </div>
           <div className="flex items-center gap-2">
             <Badge>Quick • 5-10 min</Badge>
-            <EnhancedSocialShare
-              title={`Chef Challenge: ${challenge.title}`}
-              content={`🍳 ${challenge.ui_config?.theme || challenge.description}\n\nJoin me in creating a creative Bible study from random verses! Can you connect unrelated scriptures into a coherent theological message?`}
-              url={`${window.location.origin}/daily-challenges`}
-              buttonText="Share"
-              buttonVariant="ghost"
-            />
           </div>
         </div>
         <CardDescription className="mt-2">
@@ -305,13 +298,6 @@ export const ChefRecipeChallenge = ({ challenge, onSubmit, hasSubmitted }: ChefR
                     </>
                   )}
                 </Button>
-                <EnhancedSocialShare
-                  title={`Chef Challenge: ${challenge.title}`}
-                  content={`🍳 ${challenge.ui_config?.theme || challenge.description}\n\n🥘 Ingredients (${verses.length} verses):\n${verses.map((v: any, i: number) => `${i + 1}. ${v.reference}: "${v.text}"`).join('\n\n')}\n\nCan you create a theological recipe connecting all these verses?`}
-                  url={`${window.location.origin}/daily-challenges`}
-                  buttonText="📱 Share to Social Media"
-                  buttonVariant="default"
-                />
               </div>
             )}
 
