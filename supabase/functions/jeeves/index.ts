@@ -1603,44 +1603,56 @@ Return JSON: { "coherent": true/false, "feedback": "brief comment" }`;
       const shuffledBooks = allBibleBooks.sort(() => 0.5 - Math.random());
       
       const selectedVerses: Array<{ reference: string; text: string }> = [];
-      const bookUsageCount = new Map<string, number>();
+      const usedBooks = new Set<string>();
       
-      // Iterate through shuffled books, max 2 verses per book
+      // Iterate through shuffled books - ONLY 1 verse per book
       for (const book of shuffledBooks) {
         if (selectedVerses.length >= numVerses) break;
-        
-        const currentUsage = bookUsageCount.get(book) || 0;
-        if (currentUsage >= 2) continue; // Max 2 verses per book
+        if (usedBooks.has(book)) continue; // Already used this book
         
         // Query verses from this book in the database
         const { data: bookVerses, error } = await supabase
           .from('bible_verses_tokenized')
-          .select('book, chapter, verse_num, text_kjv')
+          .select('book, chapter, verse_num')
           .eq('book', book)
           .limit(100);
         
         if (!error && bookVerses && bookVerses.length > 0) {
-          // Get 1 or 2 random verses from this book (depending on how many we need)
-          const versesToTake = Math.min(2 - currentUsage, numVerses - selectedVerses.length);
-          const shuffled = bookVerses.sort(() => 0.5 - Math.random()).slice(0, versesToTake);
+          // Get exactly 1 random verse from this book
+          const randomVerse = bookVerses[Math.floor(Math.random() * bookVerses.length)];
           
-          for (const verse of shuffled) {
-            selectedVerses.push({
-              reference: `${verse.book} ${verse.chapter}:${verse.verse_num}`,
-              text: verse.text_kjv
-            });
-            bookUsageCount.set(book, (bookUsageCount.get(book) || 0) + 1);
+          // Fetch the actual English text from Bible API
+          try {
+            const bibleApiUrl = `https://bible-api.com/${encodeURIComponent(book)}+${randomVerse.chapter}:${randomVerse.verse_num}?translation=kjv`;
+            console.log(`Fetching: ${bibleApiUrl}`);
+            
+            const response = await fetch(bibleApiUrl);
+            if (response.ok) {
+              const data = await response.json();
+              if (data.text && data.text.trim()) {
+                selectedVerses.push({
+                  reference: `${book} ${randomVerse.chapter}:${randomVerse.verse_num}`,
+                  text: data.text.trim().replace(/\n/g, ' ')
+                });
+                usedBooks.add(book);
+                console.log(`✓ Added verse from ${book}`);
+              }
+            } else {
+              console.warn(`Failed to fetch ${book} ${randomVerse.chapter}:${randomVerse.verse_num}, status: ${response.status}`);
+            }
+          } catch (err) {
+            console.error(`Error fetching verse from ${book}:`, err);
           }
         }
       }
       
-      console.log(`Generated ${selectedVerses.length} verses from ${bookUsageCount.size} different books`);
-      console.log(`Book usage:`, Array.from(bookUsageCount.entries()));
+      console.log(`Generated ${selectedVerses.length} verses from ${usedBooks.size} different books`);
+      console.log(`Books used:`, Array.from(usedBooks));
       
       if (selectedVerses.length < numVerses) {
         return new Response(
           JSON.stringify({ 
-            error: `Only found ${selectedVerses.length} verses. Database needs more Bible content.`,
+            error: `Only found ${selectedVerses.length} verses. Bible API may be rate limiting.`,
             verses: selectedVerses 
           }),
           { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 400 }
