@@ -5,11 +5,16 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
-import { ChefHat, ArrowLeft, Loader2, Eye } from "lucide-react";
+import { ChefHat, ArrowLeft, Loader2, Eye, Share2 } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { formatJeevesResponse } from "@/lib/formatJeevesResponse";
+
+interface Verse {
+  reference: string;
+  text: string;
+}
 
 const difficultyConfig = {
   easy: { min: 3, max: 4, label: "Easy (3-4 verses)", icon: "🌱" },
@@ -18,22 +23,12 @@ const difficultyConfig = {
   master: { min: 9, max: 10, label: "Master (9-10 verses)", icon: "👑" }
 };
 
-const THEMES = [
-  "The Gospel Journey",
-  "God's Character",
-  "Salvation History",
-  "Faith and Works",
-  "The Remnant",
-  "End Time Events",
-  "Christ in Prophecy",
-  "The Sanctuary"
-];
 
 export default function ChefChallenge() {
   const navigate = useNavigate();
   const { user } = useAuth();
   const [difficulty, setDifficulty] = useState<keyof typeof difficultyConfig>("intermediate");
-  const [verses, setVerses] = useState<string[]>([]);
+  const [verses, setVerses] = useState<Verse[]>([]);
   const [recipe, setRecipe] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [isChecking, setIsChecking] = useState(false);
@@ -41,6 +36,27 @@ export default function ChefChallenge() {
   const [showModelAnswer, setShowModelAnswer] = useState(false);
   const [modelAnswer, setModelAnswer] = useState("");
   const [hasSubmitted, setHasSubmitted] = useState(false);
+
+  const handleShare = () => {
+    const verseRefs = verses.map(v => v.reference).join(', ');
+    const text = `🧑‍🍳 Help me make this Chef Challenge dish!\n\nI need to tie these ${verses.length} random verses together:\n${verseRefs}\n\nCan you help me create a creative Bible study?`;
+    const url = window.location.href;
+    
+    if (navigator.share) {
+      navigator.share({
+        title: 'Chef Challenge - Help Me!',
+        text: text,
+        url: url
+      }).catch(() => {
+        // Fallback to copying
+        navigator.clipboard.writeText(`${text}\n\n${url}`);
+        toast.success("Challenge copied to clipboard!");
+      });
+    } else {
+      navigator.clipboard.writeText(`${text}\n\n${url}`);
+      toast.success("Challenge copied to clipboard!");
+    }
+  };
 
   const generateVerses = async () => {
     setIsLoading(true);
@@ -88,7 +104,7 @@ export default function ChefChallenge() {
       }
       
       console.log("Successfully received verses:", data.verses);
-      setVerses(data.verses);
+      setVerses(data.verses as Verse[]);
       toast.success(`Ingredients Ready! 🎲`, {
         description: `${data.verses.length} random verses generated.`
       });
@@ -169,22 +185,29 @@ export default function ChefChallenge() {
   };
 
   const handleSubmit = async () => {
-    if (!recipe.trim()) return;
+    if (!recipe.trim() || !user) return;
     
     setIsLoading(true);
     try {
-      if (user) {
-        await supabase.from('challenge_submissions').insert({
-          user_id: user.id,
-          content: recipe.trim(),
-          submission_data: {
-            recipe: recipe.trim(),
-            verses,
-            feedback,
-            difficulty
-          },
-          principle_applied: "Bible Freestyle (BF) + Concentration Room (CR)"
-        });
+      const submissionData = {
+        user_id: user.id,
+        content: recipe.trim(),
+        submission_data: {
+          recipe: recipe.trim(),
+          verses,
+          feedback,
+          difficulty
+        } as any,
+        principle_applied: "Bible Freestyle (BF) + Concentration Room (CR)"
+      };
+      
+      const { error: submitError } = await supabase
+        .from('challenge_submissions')
+        .insert(submissionData);
+        
+      if (submitError) {
+        console.error("Submission error:", submitError);
+        throw submitError;
       }
       
       setHasSubmitted(true);
@@ -291,17 +314,26 @@ export default function ChefChallenge() {
                       {difficulty}
                     </Badge>
                   </div>
-                  <div className="bg-white dark:bg-gray-800 p-4 rounded border-2 border-orange-300 dark:border-orange-700">
+                  <div className="bg-white dark:bg-gray-800 p-4 rounded border-2 border-orange-300 dark:border-orange-700 space-y-3">
                     {verses.map((verse, idx) => (
-                      <div key={idx} className="flex items-start gap-2 mb-2 last:mb-0">
-                        <span className="text-orange-600 font-bold">•</span>
-                        <span className="font-mono text-sm">{verse}</span>
+                      <div key={idx} className="space-y-1">
+                        <p className="text-orange-600 font-bold text-sm">{verse.reference}</p>
+                        <p className="text-sm italic pl-4 border-l-2 border-orange-200 dark:border-orange-800">"{verse.text}"</p>
                       </div>
                     ))}
                   </div>
                   <p className="text-xs text-muted-foreground italic">
                     ⚡ Challenge: These verses are intentionally random and unrelated! Your goal is to creatively weave them into a coherent Bible study.
                   </p>
+                  
+                  <Button 
+                    onClick={handleShare} 
+                    variant="outline"
+                    className="w-full border-orange-300 hover:bg-orange-50 dark:border-orange-700 dark:hover:bg-orange-900/20"
+                  >
+                    <Share2 className="mr-2 h-4 w-4" />
+                    🆘 Help Me Make This Dish
+                  </Button>
                 </div>
 
                 {!hasSubmitted ? (

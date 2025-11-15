@@ -1531,45 +1531,62 @@ Does this form a coherent 4-part salvation story using these frames?
 Return JSON: { "coherent": true/false, "feedback": "brief comment" }`;
 
     } else if (mode === "generate_chef_verses") {
-      // Generate random verses for Chef Challenge
-      const { minVerses, maxVerses, difficulty, theme } = requestBody;
+      // Generate random verses for Chef Challenge with full text
+      const { minVerses, maxVerses, difficulty } = requestBody;
       const numVerses = Math.floor(Math.random() * (maxVerses - minVerses + 1)) + minVerses;
       
       console.log(`=== GENERATING ${numVerses} CHEF VERSES (${difficulty} level) ===`);
       
-      systemPrompt = `You are Jeeves, a Bible verse selector. Generate EXACTLY ${numVerses} random, unrelated Bible verses.
-
-CRITICAL RULES:
-1. Return ONLY valid JSON - no markdown, no explanations
-2. Use this EXACT format: {"verses":["Genesis 1:1","Psalm 23:1",...]}
-3. Include EXACTLY ${numVerses} verses
-4. Mix Old and New Testament
-5. Make verses intentionally unrelated
-6. Use proper format: "Book Chapter:Verse"`;
+      // Fetch random verses from database
+      const { data: randomVerses, error: verseError } = await supabase
+        .from('bible_verses_tokenized')
+        .select('book, chapter, verse_num, text_kjv')
+        .limit(numVerses * 10); // Get more than needed to randomize
       
-      userPrompt = `Generate ${numVerses} random Bible verse references for "${theme}" (${difficulty} level). Return ONLY the JSON object.`;
+      if (verseError || !randomVerses || randomVerses.length === 0) {
+        console.error("Error fetching verses:", verseError);
+        return new Response(
+          JSON.stringify({ error: "Failed to fetch verses" }),
+          { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 500 }
+        );
+      }
+      
+      // Randomly select verses
+      const shuffled = randomVerses.sort(() => 0.5 - Math.random());
+      const selectedVerses = shuffled.slice(0, numVerses).map(v => ({
+        reference: `${v.book} ${v.chapter}:${v.verse_num}`,
+        text: v.text_kjv
+      }));
+      
+      console.log("Verses selected:", selectedVerses.length);
+      
+      return new Response(
+        JSON.stringify({ verses: selectedVerses }),
+        { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
 
     } else if (mode === "check_chef_recipe") {
       // Check player's Chef Challenge recipe
-      const { theme, recipe, verses, difficulty } = requestBody;
+      const { recipe, verses, difficulty } = requestBody;
       
       console.log(`=== CHECKING CHEF RECIPE (${difficulty} level) ===`);
       
-      systemPrompt = `You are Jeeves, evaluating a creative Bible study. Student had ${verses.length} random verses to create a narrative on "${theme}".
+      const verseRefs = verses.map((v: any) => v.reference).join(', ');
+      
+      systemPrompt = `You are Jeeves, evaluating a creative Bible study. Student had ${verses.length} random, unrelated verses to tie together.
 
 Grade on:
 1. Creativity - Innovative connections?
 2. Biblical Accuracy - Proper context?
 3. Coherence - Logical flow?
-4. Theme Fit - Addresses "${theme}"?
+4. Integration - Used all verses?
 
 Be encouraging. Use emojis.
 
 Return ONLY valid JSON:
 {"rating":1-5,"feedback":"2-3 sentences"}`;
       
-      userPrompt = `Verses: ${verses.join(', ')}
-Recipe: ${recipe}
+      userPrompt = `Verses given: ${verseRefs}
 Difficulty: ${difficulty}
 
 Student's Recipe:
@@ -1579,25 +1596,26 @@ Evaluate this creative connection.`;
 
     } else if (mode === "get_chef_model_answer") {
       // Get model answer for Chef Challenge
-      const { theme, verses, difficulty } = requestBody;
+      const { verses, difficulty } = requestBody;
       
       console.log(`=== GENERATING MODEL ANSWER (${difficulty} level) ===`);
       
-      systemPrompt = `You are Jeeves, demonstrating a creative theological narrative on "${theme}" using random verses.
+      const verseRefs = verses.map((v: any) => v.reference).join(', ');
+      
+      systemPrompt = `You are Jeeves, demonstrating how to creatively tie random, unrelated Bible verses into a cohesive Bible study.
 
 Requirements:
 - Use ALL ${verses.length} verses naturally
 - Maintain biblical accuracy
 - Create logical flow
-- Address theme creatively
+- Show creative connections
 - Keep 2-3 paragraphs
 - Use emojis sparingly
 
 Return ONLY valid JSON:
 {"modelAnswer":"your narrative"}`;
       
-      userPrompt = `Create a ${difficulty}-level narrative using: ${verses.join(', ')}
-Theme: ${theme}`;
+      userPrompt = `Create a ${difficulty}-level Bible study connecting these random verses: ${verseRefs}`;
 
     } else if (mode === "validate_chef_recipe") {
       // Legacy Chef Challenge validation - properties already destructured from requestBody
