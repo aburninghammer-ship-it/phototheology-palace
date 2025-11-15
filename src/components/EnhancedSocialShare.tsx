@@ -160,42 +160,27 @@ export const EnhancedSocialShare = ({
               <Button
                 variant="outline"
                 className="gap-2"
-                onClick={() => isConnected('facebook') ? handlePost('facebook') : handleNativeShare('facebook')}
-                disabled={posting === 'facebook'}
+                onClick={() => handleNativeShare('facebook')}
               >
-                {posting === 'facebook' ? (
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                ) : (
-                  <Facebook className="h-4 w-4 text-blue-600" />
-                )}
+                <Facebook className="h-4 w-4 text-blue-600" />
                 Facebook
               </Button>
 
               <Button
                 variant="outline"
                 className="gap-2"
-                onClick={() => isConnected('twitter') ? handlePost('twitter') : handleNativeShare('twitter')}
-                disabled={posting === 'twitter'}
+                onClick={() => handleNativeShare('twitter')}
               >
-                {posting === 'twitter' ? (
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                ) : (
-                  <Twitter className="h-4 w-4 text-sky-500" />
-                )}
+                <Twitter className="h-4 w-4 text-sky-500" />
                 Twitter
               </Button>
 
               <Button
                 variant="outline"
                 className="gap-2"
-                onClick={() => isConnected('linkedin') ? handlePost('linkedin') : handleNativeShare('linkedin')}
-                disabled={posting === 'linkedin'}
+                onClick={() => handleNativeShare('linkedin')}
               >
-                {posting === 'linkedin' ? (
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                ) : (
-                  <Linkedin className="h-4 w-4 text-blue-700" />
-                )}
+                <Linkedin className="h-4 w-4 text-blue-700" />
                 LinkedIn
               </Button>
             </div>
