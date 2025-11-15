@@ -97,13 +97,32 @@ export const EnhancedSocialShare = ({
   };
 
   const handleNativeShare = async (platform: 'facebook' | 'twitter' | 'linkedin') => {
-    const shareUrl = platform === 'facebook' 
-      ? `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`
-      : platform === 'twitter'
-      ? `https://twitter.com/intent/tweet?text=${encodeURIComponent(customMessage)}&url=${encodeURIComponent(url)}`
-      : `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(url)}`;
-    
-    window.open(shareUrl, '_blank');
+    // Try Web Share API first (most reliable)
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: title,
+          text: customMessage,
+          url: url,
+        });
+        toast.success("Shared successfully!");
+        return;
+      } catch (error) {
+        // User cancelled or share failed, continue to fallback
+        if ((error as Error).name !== 'AbortError') {
+          console.error('Web Share API error:', error);
+        }
+      }
+    }
+
+    // Fallback: Copy to clipboard and show platform-specific instructions
+    try {
+      await navigator.clipboard.writeText(`${customMessage}\n\n${url}`);
+      const platformName = platform.charAt(0).toUpperCase() + platform.slice(1);
+      toast.success(`Link copied! Open ${platformName} to paste and share.`);
+    } catch (error) {
+      toast.error("Unable to share. Please copy the link manually.");
+    }
   };
 
   return (
