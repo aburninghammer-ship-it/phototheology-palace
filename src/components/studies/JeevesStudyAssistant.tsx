@@ -230,12 +230,12 @@ export const JeevesStudyAssistant = ({ studyContext, studyId, onContentUpdate }:
                         }`}
                       >
                         {msg.role === "assistant" ? (
-                          <div className="prose prose-sm max-w-none dark:prose-invert">
-                            <div className="flex items-start gap-2 mb-3">
+                          <div className="space-y-4">
+                            <div className="flex items-start gap-2 mb-4">
                               <span className="text-2xl flex-shrink-0">🤖</span>
                               <span className="font-semibold text-primary">Jeeves says:</span>
                             </div>
-                            <div className="jeeves-response">
+                            <div className="jeeves-response space-y-3">
                               {formatJeevesResponse(msg.content)}
                             </div>
                           </div>
