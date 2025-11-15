@@ -1596,7 +1596,7 @@ Return JSON: { "coherent": true/false, "feedback": "brief comment" }`;
         );
       }
       
-      // Shuffle and select unique books
+      // HARD RULE: Each verse must be from a different book
       const shuffled = randomVerses.sort(() => 0.5 - Math.random());
       const selectedRefs: Array<{ book: string; chapter: number; verse_num: number }> = [];
       const usedBooks = new Set<string>();
@@ -1609,15 +1609,16 @@ Return JSON: { "coherent": true/false, "feedback": "brief comment" }`;
         }
       }
       
-      // If still need more, add from any book
+      // If we couldn't find enough unique books, fail with clear error
       if (selectedRefs.length < numVerses) {
-        for (const verse of shuffled) {
-          const refKey = `${verse.book}_${verse.chapter}_${verse.verse_num}`;
-          if (!selectedRefs.some(r => `${r.book}_${r.chapter}_${r.verse_num}` === refKey)) {
-            selectedRefs.push(verse);
-            if (selectedRefs.length === numVerses) break;
-          }
-        }
+        console.error(`Only found ${selectedRefs.length} verses from unique books, needed ${numVerses}`);
+        return new Response(
+          JSON.stringify({ 
+            error: `Could only find ${selectedRefs.length} verses from unique books. Try a lower difficulty level.`,
+            verses: [] 
+          }),
+          { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 400 }
+        );
       }
       
       // Fetch actual verse text from Bible API
