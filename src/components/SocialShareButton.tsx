@@ -66,24 +66,9 @@ export const SocialShareButton: React.FC<SocialShareButtonProps> = ({
     window.open(facebookUrl, '_blank', 'width=600,height=400');
   };
   
-  const shareToLinkedIn = async () => {
-    // Try native share first
-    if (navigator.share) {
-      try {
-        await navigator.share({
-          title,
-          text: description,
-          url: shareUrl,
-        });
-        return;
-      } catch (err) {
-        // Fall through to copy if user cancels
-      }
-    }
-    
-    // Fallback: Copy link and notify user
-    await copyToClipboard();
-    toast.info("Link copied! Paste it into LinkedIn to share.");
+  const shareToLinkedIn = () => {
+    const linkedInUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(shareUrl)}`;
+    window.open(linkedInUrl, '_blank', 'width=600,height=400');
   };
 
   const shareToInstagram = async () => {
@@ -109,7 +94,8 @@ export const SocialShareButton: React.FC<SocialShareButtonProps> = ({
   const shareViaEmail = () => {
     const emailSubject = encodeURIComponent(title);
     const emailBody = encodeURIComponent(shareText);
-    window.location.href = `mailto:?subject=${emailSubject}&body=${emailBody}`;
+    const mailtoUrl = `mailto:?subject=${emailSubject}&body=${emailBody}`;
+    window.open(mailtoUrl, '_blank');
   };
 
   const handleNativeShare = async () => {
