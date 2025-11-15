@@ -13,14 +13,12 @@ interface VerseCard {
   parallelId: string;
   isFlipped: boolean;
   isSelected: boolean;
-  color: string;
 }
 
 interface ParallelPair {
   verse1: { reference: string; text: string };
   verse2: { reference: string; text: string };
   parallelExplanation: string;
-  color: string;
 }
 
 // Biblical parallel pairs for the matching game
@@ -34,8 +32,7 @@ const PARALLEL_PAIRS: ParallelPair[] = [
       reference: "John 3:16",
       text: "For God so loved the world, that he gave his only begotten Son, that whosoever believeth in him should not perish, but have everlasting life."
     },
-    parallelExplanation: "Both passages show a father offering his only beloved son as a sacrifice on a mountain. Abraham with Isaac on Mount Moriah parallels God the Father giving Jesus on Calvary.",
-    color: "from-amber-600 to-yellow-700"
+    parallelExplanation: "Both passages show a father offering his only beloved son as a sacrifice on a mountain. Abraham with Isaac on Mount Moriah parallels God the Father giving Jesus on Calvary."
   },
   {
     verse1: {
@@ -46,8 +43,7 @@ const PARALLEL_PAIRS: ParallelPair[] = [
       reference: "1 Corinthians 5:7",
       text: "Purge out therefore the old leaven, that ye may be a new lump, as ye are unleavened. For even Christ our passover is sacrificed for us."
     },
-    parallelExplanation: "The Passover lamb's blood protected Israel from death in Egypt. Christ is our Passover lamb whose blood saves us from spiritual death—both are unblemished sacrifices at appointed times that bring deliverance.",
-    color: "from-red-600 to-rose-700"
+    parallelExplanation: "The Passover lamb's blood protected Israel from death in Egypt. Christ is our Passover lamb whose blood saves us from spiritual death—both are unblemished sacrifices at appointed times that bring deliverance."
   },
   {
     verse1: {
@@ -58,8 +54,7 @@ const PARALLEL_PAIRS: ParallelPair[] = [
       reference: "Matthew 12:40",
       text: "For as Jonas was three days and three nights in the whale's belly; so shall the Son of man be three days and three nights in the heart of the earth."
     },
-    parallelExplanation: "Jesus himself declares this parallel: Jonah's three days in the fish foreshadows Christ's three days in the tomb. Both emerge alive as a sign to their generation.",
-    color: "from-blue-600 to-cyan-700"
+    parallelExplanation: "Jesus himself declares this parallel: Jonah's three days in the fish foreshadows Christ's three days in the tomb. Both emerge alive as a sign to their generation."
   },
   {
     verse1: {
@@ -70,8 +65,7 @@ const PARALLEL_PAIRS: ParallelPair[] = [
       reference: "John 3:14-15",
       text: "And as Moses lifted up the serpent in the wilderness, even so must the Son of man be lifted up: That whosoever believeth in him should not perish, but have eternal life."
     },
-    parallelExplanation: "The bronze serpent lifted up brought healing from deadly snake bites. Jesus connects this directly to His crucifixion—lifted up on the cross, He brings healing from the serpent's (Satan's) deadly bite of sin.",
-    color: "from-bronze-600 to-copper-700"
+    parallelExplanation: "The bronze serpent lifted up brought healing from deadly snake bites. Jesus connects this directly to His crucifixion—lifted up on the cross, He brings healing from the serpent's (Satan's) deadly bite of sin."
   },
   {
     verse1: {
@@ -82,8 +76,7 @@ const PARALLEL_PAIRS: ParallelPair[] = [
       reference: "Ephesians 5:25-27",
       text: "Husbands, love your wives, even as Christ also loved the church, and gave himself for it; That he might sanctify and cleanse it with the washing of water by the word, That he might present it to himself a glorious church."
     },
-    parallelExplanation: "Eve was formed from Adam's wounded side while he slept in a death-like state. The church, Christ's bride, was born from His pierced side while He 'slept' in death on the cross.",
-    color: "from-pink-600 to-rose-700"
+    parallelExplanation: "Eve was formed from Adam's wounded side while he slept in a death-like state. The church, Christ's bride, was born from His pierced side while He 'slept' in death on the cross."
   },
   {
     verse1: {
@@ -94,8 +87,7 @@ const PARALLEL_PAIRS: ParallelPair[] = [
       reference: "1 Corinthians 10:4",
       text: "And did all drink the same spiritual drink: for they drank of that spiritual Rock that followed them: and that Rock was Christ."
     },
-    parallelExplanation: "Paul explicitly states the rock Moses struck was Christ. The rock struck once provided life-giving water; Christ struck once on the cross provides living water of eternal life.",
-    color: "from-stone-600 to-gray-700"
+    parallelExplanation: "Paul explicitly states the rock Moses struck was Christ. The rock struck once provided life-giving water; Christ struck once on the cross provides living water of eternal life."
   },
   {
     verse1: {
@@ -106,8 +98,7 @@ const PARALLEL_PAIRS: ParallelPair[] = [
       reference: "Acts 7:9-10",
       text: "And the patriarchs, moved with envy, sold Joseph into Egypt: but God was with him, And delivered him out of all his afflictions, and gave him favour and wisdom in the sight of Pharaoh king of Egypt; and he made him governor over Egypt and all his house."
     },
-    parallelExplanation: "Joseph rejected by his brothers, sold for silver, exalted to save many parallels Jesus rejected by His people, betrayed for silver, exalted to God's right hand to save the world. Both say 'you meant evil, but God meant it for good.'",
-    color: "from-gold-600 to-yellow-700"
+    parallelExplanation: "Joseph rejected by his brothers, sold for silver, exalted to save many parallels Jesus rejected by His people, betrayed for silver, exalted to God's right hand to save the world. Both say 'you meant evil, but God meant it for good.'"
   },
   {
     verse1: {
@@ -118,8 +109,7 @@ const PARALLEL_PAIRS: ParallelPair[] = [
       reference: "Acts 1:9",
       text: "And when he had spoken these things, while they beheld, he was taken up; and a cloud received him out of their sight."
     },
-    parallelExplanation: "Both Elijah and Jesus ascended into heaven in the presence of their disciples. The dramatic ascensions marked the transfer of ministry and the promise of return—Elisha received Elijah's mantle; the church received the Holy Spirit.",
-    color: "from-sky-600 to-blue-700"
+    parallelExplanation: "Both Elijah and Jesus ascended into heaven in the presence of their disciples. The dramatic ascensions marked the transfer of ministry and the promise of return—Elisha received Elijah's mantle; the church received the Holy Spirit."
   },
   {
     verse1: {
@@ -130,8 +120,7 @@ const PARALLEL_PAIRS: ParallelPair[] = [
       reference: "Isaiah 53:6",
       text: "All we like sheep have gone astray; we have turned every one to his own way; and the LORD hath laid on him the iniquity of us all."
     },
-    parallelExplanation: "The scapegoat ceremonially carried Israel's sins into the wilderness. Isaiah prophesies this finds fulfillment in Christ who literally bore our iniquities, carrying our sins away from us 'as far as the east is from the west.'",
-    color: "from-gray-600 to-stone-700"
+    parallelExplanation: "The scapegoat ceremonially carried Israel's sins into the wilderness. Isaiah prophesies this finds fulfillment in Christ who literally bore our iniquities, carrying our sins away from us 'as far as the east is from the west.'"
   },
   {
     verse1: {
@@ -142,8 +131,7 @@ const PARALLEL_PAIRS: ParallelPair[] = [
       reference: "Colossians 2:15",
       text: "And having spoiled principalities and powers, he made a shew of them openly, triumphing over them in it."
     },
-    parallelExplanation: "David, the unlikely shepherd, defeated the giant enemy of God's people with a stone to the head. Jesus, the humble servant, crushed the serpent's head and defeated Satan, the giant enemy of souls, through the cross.",
-    color: "from-indigo-600 to-blue-700"
+    parallelExplanation: "David, the unlikely shepherd, defeated the giant enemy of God's people with a stone to the head. Jesus, the humble servant, crushed the serpent's head and defeated Satan, the giant enemy of souls, through the cross."
   }
 ];
 
@@ -198,8 +186,7 @@ export default function PalaceCardGame() {
         isParallel: true,
         parallelId,
         isFlipped: false,
-        isSelected: false,
-        color: 'from-slate-700 to-slate-800'
+        isSelected: false
       },
       {
         id: `card-2-${Date.now()}`,
@@ -208,8 +195,7 @@ export default function PalaceCardGame() {
         isParallel: true,
         parallelId,
         isFlipped: false,
-        isSelected: false,
-        color: 'from-slate-700 to-slate-800'
+        isSelected: false
       },
       ...selectedDistractors.map((verse, idx) => ({
         id: `card-distractor-${idx}-${Date.now()}`,
@@ -218,8 +204,7 @@ export default function PalaceCardGame() {
         isParallel: false,
         parallelId: '',
         isFlipped: false,
-        isSelected: false,
-        color: 'from-slate-700 to-slate-800'
+        isSelected: false
       }))
     ];
 
