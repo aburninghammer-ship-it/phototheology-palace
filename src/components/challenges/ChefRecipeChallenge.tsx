@@ -1,13 +1,12 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
-import { ChefHat, Loader2, Eye, RefreshCw } from "lucide-react";
+import { ChefHat, Loader2, Eye, RefreshCw, Share2, Facebook, Twitter } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { formatJeevesResponse } from "@/lib/formatJeevesResponse";
-import { EnhancedSocialShare } from "@/components/EnhancedSocialShare";
 
 interface ChefRecipeChallengeProps {
   challenge: any;
@@ -27,10 +26,10 @@ export const ChefRecipeChallenge = ({ challenge, onSubmit, hasSubmitted }: ChefR
   const { toast } = useToast();
 
   const difficultyConfig = {
-    easy: { min: 3, max: 4, label: "Easy (3-4 verses)", icon: "🌱" },
-    intermediate: { min: 5, max: 6, label: "Intermediate (5-6 verses)", icon: "🔥" },
-    pro: { min: 7, max: 8, label: "Pro (7-8 verses)", icon: "💎" },
-    master: { min: 9, max: 10, label: "Master (9-10 verses)", icon: "👑" }
+    easy: { min: 3, max: 4, label: "Easy", icon: "🌱", description: "3-4 verses" },
+    intermediate: { min: 5, max: 6, label: "Intermediate", icon: "🔥", description: "5-6 verses" },
+    pro: { min: 7, max: 8, label: "Pro", icon: "💎", description: "7-8 verses" },
+    master: { min: 9, max: 10, label: "Master", icon: "👑", description: "9-10 verses" }
   };
 
   // Remove auto-generation - user must click the button
@@ -45,9 +44,6 @@ export const ChefRecipeChallenge = ({ challenge, onSubmit, hasSubmitted }: ChefR
     
     try {
       const config = difficultyConfig[difficulty];
-      console.log("=== CALLING JEEVES TO GENERATE VERSES ===");
-      console.log("Config:", { min: config.min, max: config.max, difficulty, theme: challenge.ui_config?.theme || challenge.title });
-      
       const { data, error } = await supabase.functions.invoke("jeeves", {
         body: {
           mode: "generate_chef_verses",
@@ -58,45 +54,22 @@ export const ChefRecipeChallenge = ({ challenge, onSubmit, hasSubmitted }: ChefR
         },
       });
 
-      console.log("=== JEEVES RESPONSE ===");
-      console.log("Error:", error);
-      console.log("Data:", data);
-
-      if (error) {
-        console.error("Jeeves error details:", error);
-        throw new Error(error.message || "Failed to call Jeeves");
+      if (error) throw new Error(error.message || "Failed to generate verses");
+      if (!data?.verses || !Array.isArray(data.verses) || data.verses.length === 0) {
+        throw new Error("Invalid response format");
       }
       
-      if (!data) {
-        throw new Error("No data returned from Jeeves");
-      }
-      
-      if (!data.verses || !Array.isArray(data.verses)) {
-        console.error("Invalid data structure:", data);
-        throw new Error("Invalid response format - missing verses array");
-      }
-      
-      if (data.verses.length === 0) {
-        throw new Error("Jeeves returned empty verses array");
-      }
-      
-      console.log("Successfully received verses:", data.verses);
       setVerses(data.verses);
       toast({
         title: "Ingredients Ready! 🎲",
         description: `${data.verses.length} random verses generated for your recipe.`,
       });
     } catch (error: any) {
-      console.error("=== ERROR GENERATING VERSES ===");
-      console.error("Error type:", error.constructor.name);
-      console.error("Error message:", error.message);
-      console.error("Full error:", error);
       toast({
         title: "Failed to Generate Ingredients",
         description: error.message || "Unable to generate verses. Please try again.",
         variant: "destructive",
       });
-      // Set empty verses to show the error state
       setVerses([]);
     } finally {
       setIsLoading(false);
@@ -177,15 +150,33 @@ export const ChefRecipeChallenge = ({ challenge, onSubmit, hasSubmitted }: ChefR
   };
 
   const handleSubmit = () => {
-    if (!recipe.trim()) return;
-    
+    if (!recipe.trim()) {
+      toast({
+        title: "Recipe Required",
+        description: "Please write your recipe before submitting.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     onSubmit({
       recipe: recipe.trim(),
       verses,
       feedback,
-      theme: challenge.ui_config?.theme || challenge.title,
-      principle_applied: "Bible Freestyle (BF) + Concentration Room (CR)"
+      difficulty,
     });
+  };
+
+  const shareToFacebook = () => {
+    const url = encodeURIComponent(window.location.href);
+    const text = encodeURIComponent(`I just completed the Chef Challenge on Phototheology! 🍳 Can you create a Bible study from ${verses.length} random verses?`);
+    window.open(`https://www.facebook.com/sharer/sharer.php?u=${url}&quote=${text}`, '_blank', 'width=600,height=400');
+  };
+
+  const shareToTwitter = () => {
+    const url = encodeURIComponent(window.location.href);
+    const text = encodeURIComponent(`I just completed the Chef Challenge on Phototheology! 🍳 Can you create a Bible study from ${verses.length} random verses? #Phototheology #BibleStudy`);
+    window.open(`https://twitter.com/intent/tweet?text=${text}&url=${url}`, '_blank', 'width=600,height=400');
   };
 
   return (
