@@ -478,7 +478,7 @@ export const danielCourse: CourseDay[] = [
     focus: "Multiple fulfillments of Daniel's warning",
     scripture: "Matthew 24:15",
     scriptureText: "When ye therefore shall see the abomination of desolation, spoken of by Daniel the prophet, stand in the holy place, (whoso readeth, let him understand).",
-    activity: "Map multiple fulfillments: 168 BC (Antiochus), 70 AD (Rome destroys temple), End times (mark of beast). Link Dan 9:27, 11:31, 12:11, Matt 24:15, Rev 13:14-15.",
+    activity: "Map multiple fulfillments: 70 AD (Rome destroys temple), End times (mark of beast). Link Dan 9:27, 11:31, 12:11, Matt 24:15, Rev 13:14-15. Note: The little horn of Daniel 8 represents papal Rome, not Antiochus.",
     reflection: "What is the final 'abomination' before Jesus returns?",
     prayer: "Keep me from the abomination, Lord. Seal me as Yours."
   },
