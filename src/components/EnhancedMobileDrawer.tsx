@@ -78,7 +78,16 @@ const categoryConfig = {
       { to: "/phototheologygpt", label: "Phototheology GPT", icon: "🤖" },
       { to: "/apologetics-gpt", label: "Apologetics GPT", icon: "🛡️" },
       { to: "/daniel-revelation-gpt", label: "Daniel & Revelation", icon: "📜" },
+      { to: "/culture-controversy", label: "Culture & Controversy", icon: "🌍" },
       { to: "/kidgpt", label: "Kid GPT", icon: "👶" },
+    ],
+  },
+  research: {
+    title: "Research",
+    icon: Zap,
+    links: [
+      { to: "/research-mode", label: "Research Mode", icon: "🔬" },
+      { to: "/prophecy-watch", label: "Prophecy Watch", icon: "👁️" },
     ],
   },
   community: {

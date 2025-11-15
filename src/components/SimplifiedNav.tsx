@@ -40,6 +40,12 @@ export const SimplifiedNav = () => {
     { to: "/training-drills", label: "Training Drills", icon: Gamepad2 },
   ];
 
+  const researchLinks = [
+    { to: "/research-mode", label: "Research Mode", icon: BookOpen },
+    { to: "/prophecy-watch", label: "Prophecy Watch", icon: BookOpen },
+    { to: "/culture-controversy", label: "Culture & Controversy", icon: BookOpen },
+  ];
+
   const learnLinks = [
     { to: "/palace", label: "Memory Palace", icon: GraduationCap },
     { to: "/revelation-course", label: "Revelation Course", icon: GraduationCap },
