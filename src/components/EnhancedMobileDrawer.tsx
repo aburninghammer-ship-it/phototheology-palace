@@ -41,6 +41,7 @@ const categoryConfig = {
     links: [
       { to: "/bible", label: "Bible Reader", icon: "📖" },
       { to: "/my-studies", label: "My Studies", icon: "📝" },
+      { to: "/palace/floor/1/room/gr", label: "Produce a Gem", icon: "💎" },
       { to: "/verse-memory-hall", label: "Verse Memory", icon: "🧠" },
       { to: "/bible-image-library", label: "Image Library", icon: "🎨" },
       { to: "/quarterly-study", label: "Amplified Quarterly", icon: "📅" },

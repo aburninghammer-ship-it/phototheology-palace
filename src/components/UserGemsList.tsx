@@ -68,6 +68,27 @@ export function UserGemsList({ floorNumber, roomId }: UserGemsListProps) {
     try {
       setSubmitting(true);
       
+      // Moderate content before saving
+      const combinedContent = `${gemName.trim()} - ${gemContent.trim()}`;
+      const { data: moderationData, error: moderationError } = await supabase.functions.invoke(
+        "moderate-content",
+        {
+          body: {
+            content: combinedContent,
+            type: "text",
+          },
+        }
+      );
+
+      if (moderationError) {
+        console.error("Moderation error:", moderationError);
+        // Continue anyway if moderation fails
+      } else if (moderationData && !moderationData.safe) {
+        toast.error(`Content not allowed: ${moderationData.reason}`);
+        setSubmitting(false);
+        return;
+      }
+      
       // Categorize the gem using AI
       let category = "Other";
       try {
