@@ -1582,11 +1582,12 @@ Return JSON: { "coherent": true/false, "feedback": "brief comment" }`;
       
       console.log(`=== GENERATING ${numVerses} CHEF VERSES (${difficulty} level) ===`);
       
-      // Fetch random verses from database - get more to ensure we can pick unique books
+      // Fetch random verses from database - ensure we get complete verse text
       const { data: randomVerses, error: verseError } = await supabase
         .from('bible_verses_tokenized')
         .select('book, chapter, verse_num, text_kjv')
-        .limit(numVerses * 20); // Get many more to ensure unique books
+        .not('text_kjv', 'is', null)
+        .limit(500); // Get many verses to ensure unique books
       
       if (verseError || !randomVerses || randomVerses.length === 0) {
         console.error("Error fetching verses:", verseError);
@@ -1596,16 +1597,16 @@ Return JSON: { "coherent": true/false, "feedback": "brief comment" }`;
         );
       }
       
-      // Randomly select verses ensuring no duplicates from same book
+      // First pass: Try to get verses from unique books
       const shuffled = randomVerses.sort(() => 0.5 - Math.random());
       const selectedVerses: Array<{ reference: string; text: string }> = [];
       const usedBooks = new Set<string>();
       
       for (const verse of shuffled) {
-        if (!usedBooks.has(verse.book)) {
+        if (!usedBooks.has(verse.book) && verse.text_kjv && verse.text_kjv.trim()) {
           selectedVerses.push({
             reference: `${verse.book} ${verse.chapter}:${verse.verse_num}`,
-            text: verse.text_kjv
+            text: verse.text_kjv.trim() // Ensure full verse text with no extra whitespace
           });
           usedBooks.add(verse.book);
           
@@ -1615,12 +1616,31 @@ Return JSON: { "coherent": true/false, "feedback": "brief comment" }`;
         }
       }
       
-      // If we couldn't get enough unique books, log a warning
+      // Second pass: If we still need more verses, add from any book
       if (selectedVerses.length < numVerses) {
-        console.warn(`Only found ${selectedVerses.length} verses from unique books, needed ${numVerses}`);
+        console.warn(`Only found ${selectedVerses.length} verses from unique books, adding more verses from any book`);
+        for (const verse of shuffled) {
+          if (verse.text_kjv && verse.text_kjv.trim()) {
+            // Check if this exact verse is already added
+            const verseRef = `${verse.book} ${verse.chapter}:${verse.verse_num}`;
+            const alreadyAdded = selectedVerses.some(v => v.reference === verseRef);
+            
+            if (!alreadyAdded) {
+              selectedVerses.push({
+                reference: verseRef,
+                text: verse.text_kjv.trim()
+              });
+              
+              if (selectedVerses.length === numVerses) {
+                break;
+              }
+            }
+          }
+        }
       }
       
       console.log("Verses selected:", selectedVerses.length);
+      console.log("Sample verse length:", selectedVerses[0]?.text.length || 0);
       
       return new Response(
         JSON.stringify({ verses: selectedVerses }),
