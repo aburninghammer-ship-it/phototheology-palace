@@ -11,19 +11,23 @@ import { SeriesTemplateList } from "@/components/series-builder/SeriesTemplateLi
 import { SeriesList } from "@/components/series-builder/SeriesList";
 
 const BibleStudySeriesBuilder = () => {
-  const { user } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const [showWizard, setShowWizard] = useState(false);
   const [showTemplates, setShowTemplates] = useState(false);
   const [userSeries, setUserSeries] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    if (authLoading) {
+      return; // Wait for auth to load
+    }
+    
     if (user) {
       loadUserSeries();
     } else {
       setLoading(false);
     }
-  }, [user]);
+  }, [user, authLoading]);
 
   const loadUserSeries = async () => {
     if (!user) return;
@@ -47,14 +51,33 @@ const BibleStudySeriesBuilder = () => {
     }
   };
 
+  // Show loading state while auth is initializing
+  if (authLoading) {
+    return (
+      <div className="min-h-screen bg-background">
+        <Navigation />
+        <main className="container mx-auto px-4 py-8">
+          <div className="max-w-2xl mx-auto text-center space-y-4">
+            <Loader2 className="h-8 w-8 animate-spin mx-auto" />
+            <p className="text-muted-foreground">Loading...</p>
+          </div>
+        </main>
+      </div>
+    );
+  }
+
   if (!user) {
     return (
       <div className="min-h-screen bg-background">
         <Navigation />
         <main className="container mx-auto px-4 py-8">
           <div className="max-w-2xl mx-auto text-center space-y-4">
+            <BookOpen className="h-16 w-16 mx-auto text-primary mb-4" />
             <h1 className="text-3xl font-bold">Bible Study Series Builder</h1>
-            <p className="text-muted-foreground">Please sign in to create and manage Bible study series.</p>
+            <p className="text-muted-foreground mb-4">Please sign in to create and manage Bible study series.</p>
+            <Button onClick={() => window.location.href = '/auth'}>
+              Sign In
+            </Button>
           </div>
         </main>
       </div>
