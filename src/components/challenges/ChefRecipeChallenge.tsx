@@ -32,10 +32,7 @@ export const ChefRecipeChallenge = ({ challenge, onSubmit, hasSubmitted }: ChefR
     master: { min: 9, max: 10, label: "Master (9-10 verses)", icon: "👑" }
   };
 
-  // Auto-generate verses on mount
-  useEffect(() => {
-    generateVerses();
-  }, []);
+  // Remove auto-generation - user must click the button
 
   const generateVerses = async () => {
     setIsLoading(true);
@@ -210,34 +207,46 @@ export const ChefRecipeChallenge = ({ challenge, onSubmit, hasSubmitted }: ChefR
           <p className="text-lg">{challenge.ui_config?.theme || challenge.description}</p>
         </div>
 
-        <div className="space-y-3">
-          <div className="flex items-center justify-between">
-            <label className="text-sm font-medium">Select Difficulty Level:</label>
-            <Button onClick={generateVerses} size="sm" variant="outline" disabled={isLoading}>
-              🎲 New Ingredients
+        <div className="space-y-4">
+          <div>
+            <label className="text-sm font-medium block mb-2">Step 1: Select Your Challenge Level</label>
+            <div className="grid grid-cols-2 gap-2">
+              {(["easy", "intermediate", "pro", "master"] as const).map((level) => (
+                <Button
+                  key={level}
+                  variant={difficulty === level ? "default" : "outline"}
+                  onClick={() => setDifficulty(level)}
+                  className="w-full"
+                  disabled={isLoading || hasSubmitted}
+                >
+                  {difficultyConfig[level].icon} {level.charAt(0).toUpperCase() + level.slice(1)}
+                </Button>
+              ))}
+            </div>
+            <p className="text-xs text-muted-foreground text-center mt-2">
+              {difficultyConfig[difficulty].label}
+            </p>
+          </div>
+
+          <div>
+            <label className="text-sm font-medium block mb-2">Step 2: Get Your Ingredients</label>
+            <Button 
+              onClick={generateVerses} 
+              className="w-full bg-orange-600 hover:bg-orange-700" 
+              disabled={isLoading || hasSubmitted}
+            >
+              {isLoading ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Jeeves is selecting verses...
+                </>
+              ) : (
+                <>
+                  🎲 Generate Challenge Ingredients
+                </>
+              )}
             </Button>
           </div>
-          <div className="grid grid-cols-2 gap-2">
-            {(["easy", "intermediate", "pro", "master"] as const).map((level) => (
-              <Button
-                key={level}
-                variant={difficulty === level ? "default" : "outline"}
-                onClick={() => {
-                  if (level !== difficulty) {
-                    setDifficulty(level);
-                    setTimeout(() => generateVerses(), 100);
-                  }
-                }}
-                className="w-full"
-                disabled={isLoading || hasSubmitted}
-              >
-                {difficultyConfig[level].icon} {level.charAt(0).toUpperCase() + level.slice(1)}
-              </Button>
-            ))}
-          </div>
-          <p className="text-xs text-muted-foreground text-center">
-            {difficultyConfig[difficulty].label}
-          </p>
         </div>
 
         {isLoading ? (
