@@ -34,80 +34,80 @@ All colors MUST be HSL.
 
 @layer base {
   :root {
-    --background: 250 100% 98%;
-    --foreground: 240 60% 15%;
+    --background: 0 0% 98%;
+    --foreground: 0 0% 10%;
 
     --card: 0 0% 100%;
-    --card-foreground: 240 60% 15%;
+    --card-foreground: 0 0% 10%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 240 60% 15%;
+    --popover-foreground: 0 0% 10%;
 
-    --primary: 210 85% 50%;
+    --primary: 38 75% 50%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 180 70% 45%;
-    --secondary-foreground: 0 0% 100%;
+    --secondary: 38 75% 50%;
+    --secondary-foreground: 0 0% 98%;
 
-    --muted: 250 60% 96%;
-    --muted-foreground: 240 40% 40%;
+    --muted: 40 20% 92%;
+    --muted-foreground: 0 0% 40%;
 
-    --accent: 45 100% 51%;
-    --accent-foreground: 240 60% 15%;
+    --accent: 40 85% 58%;
+    --accent-foreground: 0 0% 10%;
 
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 250 40% 90%;
-    --input: 250 40% 90%;
-    --ring: 210 85% 50%;
+    --border: 40 20% 85%;
+    --input: 40 20% 85%;
+    --ring: 40 85% 55%;
 
     --radius: 0.75rem;
 
-    /* Vibrant Palace tokens */
-    --palace-purple: 210 85% 50%;
-    --palace-purple-light: 210 75% 65%;
-    --palace-pink: 190 70% 50%;
-    --palace-pink-light: 190 60% 65%;
-    --palace-blue: 210 100% 56%;
-    --palace-blue-light: 210 90% 70%;
-    --palace-teal: 180 77% 44%;
-    --palace-teal-light: 180 60% 60%;
-    --palace-orange: 25 95% 53%;
-    --palace-orange-light: 25 90% 65%;
-    --palace-yellow: 45 100% 51%;
-    --palace-green: 142 76% 36%;
-    --palace-green-light: 142 60% 55%;
+    /* Power of the Lamb Palace tokens */
+    --palace-purple: 40 85% 55%;
+    --palace-purple-light: 42 75% 65%;
+    --palace-pink: 38 75% 50%;
+    --palace-pink-light: 40 65% 60%;
+    --palace-blue: 210 40% 35%;
+    --palace-blue-light: 210 30% 50%;
+    --palace-teal: 42 80% 55%;
+    --palace-teal-light: 42 70% 65%;
+    --palace-orange: 38 90% 58%;
+    --palace-orange-light: 40 85% 65%;
+    --palace-yellow: 45 95% 65%;
+    --palace-green: 142 40% 40%;
+    --palace-green-light: 142 35% 55%;
     
-    /* Vibrant gradients */
-    --gradient-palace: linear-gradient(135deg, hsl(210 85% 50%) 0%, hsl(190 70% 50%) 100%);
-    --gradient-royal: linear-gradient(135deg, hsl(210 85% 50%) 0%, hsl(180 77% 44%) 100%);
-    --gradient-sunset: linear-gradient(135deg, hsl(340 82% 62%) 0%, hsl(25 95% 53%) 50%, hsl(45 100% 51%) 100%);
-    --gradient-ocean: linear-gradient(135deg, hsl(210 100% 56%) 0%, hsl(180 77% 44%) 100%);
-    --gradient-forest: linear-gradient(135deg, hsl(180 77% 44%) 0%, hsl(142 76% 36%) 100%);
-    --gradient-warmth: linear-gradient(135deg, hsl(25 95% 53%) 0%, hsl(45 100% 51%) 100%);
-    --gradient-dreamy: linear-gradient(135deg, hsl(210 75% 65%) 0%, hsl(190 60% 65%) 50%, hsl(180 70% 60%) 100%);
-    --gradient-subtle: linear-gradient(180deg, hsl(250 100% 98%) 0%, hsl(260 60% 96%) 100%);
+    /* Elegant gradients with gold tones */
+    --gradient-palace: linear-gradient(135deg, hsl(40 85% 55%) 0%, hsl(38 75% 50%) 100%);
+    --gradient-royal: linear-gradient(135deg, hsl(40 85% 55%) 0%, hsl(42 80% 55%) 100%);
+    --gradient-sunset: linear-gradient(135deg, hsl(38 90% 58%) 0%, hsl(40 85% 55%) 50%, hsl(45 95% 65%) 100%);
+    --gradient-ocean: linear-gradient(135deg, hsl(210 40% 35%) 0%, hsl(42 80% 55%) 100%);
+    --gradient-forest: linear-gradient(135deg, hsl(42 80% 55%) 0%, hsl(142 40% 40%) 100%);
+    --gradient-warmth: linear-gradient(135deg, hsl(38 90% 58%) 0%, hsl(45 95% 65%) 100%);
+    --gradient-dreamy: linear-gradient(135deg, hsl(42 75% 65%) 0%, hsl(40 65% 60%) 50%, hsl(42 70% 65%) 100%);
+    --gradient-subtle: linear-gradient(180deg, hsl(0 0% 98%) 0%, hsl(40 20% 96%) 100%);
     
-    /* Colorful shadows */
-    --shadow-purple: 0 8px 32px -8px hsl(210 85% 50% / 0.4);
-    --shadow-pink: 0 8px 32px -8px hsl(190 70% 50% / 0.4);
-    --shadow-blue: 0 8px 32px -8px hsl(210 100% 56% / 0.4);
-    --shadow-elegant: 0 4px 20px -4px hsl(210 85% 50% / 0.2);
-    --shadow-hover: 0 12px 40px -8px hsl(210 85% 50% / 0.35);
-    --shadow-glow: 0 0 40px hsl(210 85% 50% / 0.3);
+    /* Warm shadows */
+    --shadow-purple: 0 8px 32px -8px hsl(40 85% 55% / 0.4);
+    --shadow-pink: 0 8px 32px -8px hsl(38 75% 50% / 0.4);
+    --shadow-blue: 0 8px 32px -8px hsl(210 40% 35% / 0.4);
+    --shadow-elegant: 0 4px 20px -4px hsl(40 85% 55% / 0.2);
+    --shadow-hover: 0 12px 40px -8px hsl(40 85% 55% / 0.35);
+    --shadow-glow: 0 0 40px hsl(40 85% 55% / 0.3);
     
     --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     --transition-bounce: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
 
     --sidebar-background: 0 0% 98%;
-    --sidebar-foreground: 240 5.3% 26.1%;
-    --sidebar-primary: 210 85% 50%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 250 60% 96%;
-    --sidebar-accent-foreground: 240 60% 15%;
-    --sidebar-border: 250 40% 90%;
-    --sidebar-ring: 210 85% 50%;
+    --sidebar-foreground: 0 0% 15%;
+    --sidebar-primary: 40 85% 55%;
+    --sidebar-primary-foreground: 0 0% 10%;
+    --sidebar-accent: 40 20% 92%;
+    --sidebar-accent-foreground: 0 0% 10%;
+    --sidebar-border: 40 20% 85%;
+    --sidebar-ring: 40 85% 55%;
   }
 
   .dark {
