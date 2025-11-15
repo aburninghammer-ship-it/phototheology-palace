@@ -219,7 +219,7 @@ export const ChefRecipeChallenge = ({ challenge, onSubmit, hasSubmitted }: ChefR
 
         <div className="space-y-4">
           <div>
-            <label className="text-sm font-medium block mb-2">Step 1: Select Your Challenge Level</label>
+            <label className="text-sm font-medium block mb-2">Select Your Challenge Level</label>
             <div className="grid grid-cols-2 gap-2">
               {(["easy", "intermediate", "pro", "master"] as const).map((level) => (
                 <Button
@@ -239,8 +239,8 @@ export const ChefRecipeChallenge = ({ challenge, onSubmit, hasSubmitted }: ChefR
           </div>
 
           <div>
-            <label className="text-sm font-medium block mb-2">Step 2: Get Your Ingredients</label>
-            <Button 
+            <label className="text-sm font-medium block mb-2">Get Your Ingredients</label>
+            <Button
               onClick={generateVerses} 
               className="w-full bg-orange-600 hover:bg-orange-700" 
               disabled={isLoading || hasSubmitted}
