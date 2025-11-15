@@ -1601,34 +1601,41 @@ Return JSON: { "coherent": true/false, "feedback": "brief comment" }`;
       const uniqueBooks = Array.from(new Set(allVerses.map(v => v.book)));
       console.log(`Found ${uniqueBooks.length} unique books in database`);
       
-      // Step 3: Select verses (prefer unique books, but allow repeats if needed)
+      // Step 3: Select verses - ALWAYS prefer unique books first
       const selectedRefs: Array<{ book: string; chapter: number; verse_num: number }> = [];
+      const usedBooks = new Set<string>();
+      const usedKeys = new Set<string>();
       
-      if (uniqueBooks.length >= numVerses) {
-        // Ideal case: enough unique books for one verse per book
-        const selectedBooks = uniqueBooks.sort(() => 0.5 - Math.random()).slice(0, numVerses);
-        console.log(`Selected books: ${selectedBooks.join(', ')}`);
+      // First pass: Get one verse from each unique book available
+      const shuffledBooks = uniqueBooks.sort(() => 0.5 - Math.random());
+      
+      for (const book of shuffledBooks) {
+        if (selectedRefs.length >= numVerses) break;
         
-        for (const book of selectedBooks) {
-          const bookVerses = allVerses.filter(v => v.book === book);
-          if (bookVerses.length > 0) {
-            const randomVerse = bookVerses[Math.floor(Math.random() * bookVerses.length)];
-            selectedRefs.push(randomVerse);
-          }
+        const bookVerses = allVerses.filter(v => v.book === book);
+        if (bookVerses.length > 0) {
+          const randomVerse = bookVerses[Math.floor(Math.random() * bookVerses.length)];
+          selectedRefs.push(randomVerse);
+          usedBooks.add(book);
+          usedKeys.add(`${randomVerse.book}-${randomVerse.chapter}-${randomVerse.verse_num}`);
         }
-      } else {
-        // Fallback: not enough books, so allow multiple verses from same books
-        console.log(`Warning: Only ${uniqueBooks.length} books available for ${numVerses} verses - allowing repeats`);
+      }
+      
+      console.log(`Selected ${selectedRefs.length} verses from ${usedBooks.size} unique books`);
+      
+      // Second pass: If we still need more verses (fewer books than required),
+      // select additional verses from any book, avoiding exact duplicates
+      if (selectedRefs.length < numVerses) {
+        console.log(`Warning: Only ${uniqueBooks.length} unique books available for ${numVerses} verses - adding ${numVerses - selectedRefs.length} more verses`);
         const shuffledVerses = allVerses.sort(() => 0.5 - Math.random());
         
-        // Select random verses, avoiding exact duplicates (same book+chapter+verse)
-        const usedKeys = new Set<string>();
         for (const verse of shuffledVerses) {
+          if (selectedRefs.length >= numVerses) break;
+          
           const key = `${verse.book}-${verse.chapter}-${verse.verse_num}`;
           if (!usedKeys.has(key)) {
             selectedRefs.push(verse);
             usedKeys.add(key);
-            if (selectedRefs.length >= numVerses) break;
           }
         }
       }
