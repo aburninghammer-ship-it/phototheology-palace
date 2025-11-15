@@ -1,20 +1,22 @@
 import { Navigation } from "@/components/Navigation";
 import { VisualPalace } from "@/components/VisualPalace";
 import { palaceFloors } from "@/data/palaceData";
-import { Building2, Award, TrendingUp } from "lucide-react";
+import { Building2, Award, TrendingUp, BookOpen, Target } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useAuth } from "@/hooks/useAuth";
 import { usePalaceProgress } from "@/hooks/usePalaceProgress";
 import { Link, useSearchParams } from "react-router-dom";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Footer } from "@/components/Footer";
 
 const Palace = () => {
   const { user } = useAuth();
   const { completedRooms, totalRooms, progressPercentage, loading } = usePalaceProgress();
   const [searchParams] = useSearchParams();
+  const [activeTab, setActiveTab] = useState<"explore" | "progress">("explore");
 
   useEffect(() => {
     const roomParam = searchParams.get('room');
@@ -96,7 +98,7 @@ const Palace = () => {
           </div>
 
           {/* Palace Metaphor */}
-          <div className="mb-12 p-6 rounded-lg bg-card border border-border shadow-elegant">
+          <div className="mb-8 p-6 rounded-lg bg-card border border-border shadow-elegant">
             <h2 className="font-serif text-2xl font-semibold mb-4 text-center">
               The Palace Metaphor
             </h2>
@@ -132,10 +134,108 @@ const Palace = () => {
             </div>
           </div>
 
-          {/* Visual Palace */}
-          <div className="mb-12">
-            <VisualPalace />
-          </div>
+          {/* Mode Tabs */}
+          <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as "explore" | "progress")} className="mb-6">
+            <TabsList className="grid w-full grid-cols-2">
+              <TabsTrigger value="explore">
+                <Building2 className="h-4 w-4 mr-2" />
+                Explore Palace
+              </TabsTrigger>
+              <TabsTrigger value="progress">
+                <Target className="h-4 w-4 mr-2" />
+                Your Progress
+              </TabsTrigger>
+            </TabsList>
+
+            <TabsContent value="explore" className="space-y-6">
+              {/* Visual Palace */}
+              <div className="mb-12">
+                <VisualPalace />
+              </div>
+            </TabsContent>
+
+            <TabsContent value="progress" className="space-y-6">
+              {/* Progress Overview */}
+              <Card>
+                <CardContent className="pt-6 space-y-6">
+                  <div className="text-center">
+                    <h3 className="text-2xl font-bold mb-2">Your Journey Through the Palace</h3>
+                    <p className="text-muted-foreground">Track your progress as you master each room</p>
+                  </div>
+
+                  {user ? (
+                    <>
+                      <div className="flex items-center justify-between mb-2">
+                        <div className="flex items-center gap-2">
+                          <TrendingUp className="h-5 w-5 text-primary" />
+                          <span className="font-medium text-lg">Overall Progress</span>
+                        </div>
+                        <span className="text-lg font-bold text-primary">
+                          {completedRooms} / {totalRooms} rooms
+                        </span>
+                      </div>
+                      <Progress value={progressPercentage} className="h-3 mb-2" />
+                      <p className="text-center text-2xl font-bold text-primary">
+                        {progressPercentage}% Complete
+                      </p>
+
+                      {/* Floor-by-Floor Breakdown */}
+                      <div className="mt-8 space-y-4">
+                        <h4 className="font-semibold text-lg mb-4">Progress by Floor</h4>
+                        {palaceFloors.map((floor, index) => {
+                          const floorRoomsTotal = floor.rooms.length;
+                          const floorRoomsCompleted = floor.rooms.filter(room => 
+                            // This would need actual completion data - simplified for now
+                            false
+                          ).length;
+                          const floorProgress = floorRoomsTotal > 0 ? (floorRoomsCompleted / floorRoomsTotal) * 100 : 0;
+                          
+                          return (
+                            <div key={floor.number} className="space-y-2">
+                              <div className="flex items-center justify-between">
+                                <span className="font-medium">{floor.name}</span>
+                                <span className="text-sm text-muted-foreground">
+                                  {floorRoomsCompleted} / {floorRoomsTotal} rooms
+                                </span>
+                              </div>
+                              <Progress value={floorProgress} className="h-2" />
+                            </div>
+                          );
+                        })}
+                      </div>
+
+                      <div className="flex gap-3 justify-center mt-8">
+                        <Button asChild size="lg" className="gradient-palace text-white">
+                          <Link to="/games/palace_quiz">
+                            <BookOpen className="mr-2 h-4 w-4" />
+                            Continue Training
+                          </Link>
+                        </Button>
+                        {completedRooms === totalRooms && (
+                          <Button asChild size="lg" variant="outline">
+                            <Link to="/certificates">
+                              <Award className="mr-2 h-4 w-4" />
+                              View Certificate
+                            </Link>
+                          </Button>
+                        )}
+                      </div>
+                    </>
+                  ) : (
+                    <div className="text-center py-8">
+                      <BookOpen className="h-16 w-16 mx-auto mb-4 text-muted-foreground" />
+                      <p className="text-lg mb-4">Sign in to track your progress through the Palace</p>
+                      <Button asChild size="lg" className="gradient-palace text-white">
+                        <Link to="/auth">
+                          Get Started
+                        </Link>
+                      </Button>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            </TabsContent>
+          </Tabs>
         </div>
       </div>
       <Footer />
