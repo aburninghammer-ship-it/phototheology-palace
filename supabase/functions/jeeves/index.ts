@@ -1582,39 +1582,56 @@ Return JSON: { "coherent": true/false, "feedback": "brief comment" }`;
       
       console.log(`=== GENERATING ${numVerses} CHEF VERSES (${difficulty} level) ===`);
       
-      // Fetch random verse references from database
-      const { data: randomVerses, error: verseError } = await supabase
+      // HARD RULE: Each verse must be from a different book
+      // Step 1: Get all unique books from database
+      const { data: allVerses, error: versesError } = await supabase
         .from('bible_verses_tokenized')
         .select('book, chapter, verse_num')
-        .limit(500);
+        .limit(2000); // Get a large sample to ensure book diversity
       
-      if (verseError || !randomVerses || randomVerses.length === 0) {
-        console.error("Error fetching verse references:", verseError);
+      if (versesError || !allVerses || allVerses.length === 0) {
+        console.error("Error fetching verses:", versesError);
         return new Response(
-          JSON.stringify({ error: "Failed to fetch verse references" }),
+          JSON.stringify({ error: "Failed to fetch verses from database" }),
           { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 500 }
         );
       }
       
-      // HARD RULE: Each verse must be from a different book
-      const shuffled = randomVerses.sort(() => 0.5 - Math.random());
-      const selectedRefs: Array<{ book: string; chapter: number; verse_num: number }> = [];
-      const usedBooks = new Set<string>();
+      // Step 2: Get unique books and shuffle them
+      const uniqueBooks = Array.from(new Set(allVerses.map(v => v.book)));
+      console.log(`Found ${uniqueBooks.length} unique books in database`);
       
-      for (const verse of shuffled) {
-        if (!usedBooks.has(verse.book)) {
-          selectedRefs.push(verse);
-          usedBooks.add(verse.book);
-          if (selectedRefs.length === numVerses) break;
+      if (uniqueBooks.length < numVerses) {
+        console.error(`Not enough unique books (${uniqueBooks.length}) for ${numVerses} verses`);
+        return new Response(
+          JSON.stringify({ 
+            error: `Not enough unique books available. Try a lower difficulty level.`,
+            verses: [] 
+          }),
+          { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 400 }
+        );
+      }
+      
+      // Step 3: Select random books
+      const selectedBooks = uniqueBooks.sort(() => 0.5 - Math.random()).slice(0, numVerses);
+      console.log(`Selected books: ${selectedBooks.join(', ')}`);
+      
+      // Step 4: Get one random verse from each selected book
+      const selectedRefs: Array<{ book: string; chapter: number; verse_num: number }> = [];
+      
+      for (const book of selectedBooks) {
+        const bookVerses = allVerses.filter(v => v.book === book);
+        if (bookVerses.length > 0) {
+          const randomVerse = bookVerses[Math.floor(Math.random() * bookVerses.length)];
+          selectedRefs.push(randomVerse);
         }
       }
       
-      // If we couldn't find enough unique books, fail with clear error
       if (selectedRefs.length < numVerses) {
-        console.error(`Only found ${selectedRefs.length} verses from unique books, needed ${numVerses}`);
+        console.error(`Only found ${selectedRefs.length} verses, needed ${numVerses}`);
         return new Response(
           JSON.stringify({ 
-            error: `Could only find ${selectedRefs.length} verses from unique books. Try a lower difficulty level.`,
+            error: `Could only retrieve ${selectedRefs.length} verses. Please try again.`,
             verses: [] 
           }),
           { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 400 }
