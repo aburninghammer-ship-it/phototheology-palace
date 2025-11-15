@@ -192,13 +192,32 @@ export default function EquationsChallenge() {
         body: {
           mode: "equations-challenge",
           difficulty: difficulty,
-          symbolCount: difficultyInfo[difficulty].symbols
+          symbolCount: difficultyInfo[difficulty].symbols,
+          randomSeed: Date.now() + Math.random() // Ensure unique equations each time
         }
       });
 
       if (error) throw error;
 
-      setCurrentEquation(data);
+      // Validate that we got the correct number of symbols
+      const expectedCount = difficultyInfo[difficulty].symbols;
+      if (data.symbols && data.symbols.length !== expectedCount) {
+        console.warn(`Expected ${expectedCount} symbols but got ${data.symbols.length}. Retrying...`);
+        // Retry once
+        const { data: retryData, error: retryError } = await supabase.functions.invoke("jeeves", {
+          body: {
+            mode: "equations-challenge",
+            difficulty: difficulty,
+            symbolCount: expectedCount,
+            randomSeed: Date.now() + Math.random()
+          }
+        });
+        
+        if (retryError) throw retryError;
+        setCurrentEquation(retryData);
+      } else {
+        setCurrentEquation(data);
+      }
       
       // Start timer if enabled
       if (timerEnabled) {
@@ -676,20 +695,70 @@ ${currentEquation.symbols.map((s, i) => `${i + 1}. ${s}`).join('\n')}
                       Regenerate
                     </Button>
                     {currentEquation && (
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => {
-                          const shareMessage = `🧮 Can you help me solve this Biblical Equation? 🤔\n\n📖 ${currentEquation.verse}\n\n🎯 Equation: ${currentEquation.equation}\n\n✨ This challenge uses Phototheology principles to unlock deeper meanings in Scripture!\n\n🔑 Principles used: ${currentEquation.symbols.slice(0, 3).join(", ")}${currentEquation.symbols.length > 3 ? "..." : ""}\n\n💡 Think you can crack it? Share your insights!\n\n🚀 Try it yourself at:`;
-                          const appUrl = window.location.origin + "/equations-challenge";
-                          
-                          navigator.clipboard.writeText(`${shareMessage}\n${appUrl}`);
-                          toast.success("Challenge copied! Now paste it on social media to get help from your friends! 🎉");
-                        }}
-                      >
-                        <Share2 className="h-4 w-4 mr-2" />
-                        Share
-                      </Button>
+                      <>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => {
+                            const shareMessage = `🧮 Can you help me solve this Biblical Equation? 🤔\n\n📖 ${currentEquation.verse}\n\n🎯 Equation: ${currentEquation.equation}\n\n✨ This challenge uses Phototheology principles to unlock deeper meanings in Scripture!\n\n🔑 Principles used: ${currentEquation.symbols.slice(0, 3).join(", ")}${currentEquation.symbols.length > 3 ? "..." : ""}\n\n💡 Think you can crack it? Share your insights!\n\n🚀 Try it yourself at:`;
+                            const appUrl = window.location.origin + "/equations-challenge";
+                            
+                            // Open native share dialogs for different platforms
+                            const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+                            
+                            if (isMobile && navigator.share) {
+                              // Use native mobile share
+                              navigator.share({
+                                title: "Biblical Equation Challenge",
+                                text: shareMessage,
+                                url: appUrl
+                              }).catch(() => {
+                                // Fallback to clipboard
+                                navigator.clipboard.writeText(`${shareMessage}\n${appUrl}`);
+                                toast.success("Copied! Paste on social media 🎉");
+                              });
+                            } else {
+                              // Desktop - show share menu
+                              const text = encodeURIComponent(shareMessage);
+                              const url = encodeURIComponent(appUrl);
+                              
+                              // Create temporary dropdown menu
+                              const shareMenu = document.createElement('div');
+                              shareMenu.className = 'absolute right-0 top-full mt-2 bg-background border rounded-lg shadow-lg p-2 z-50 flex flex-col gap-2';
+                              shareMenu.innerHTML = `
+                                <a href="https://www.facebook.com/sharer/sharer.php?u=${url}&quote=${text}" target="_blank" class="flex items-center gap-2 px-3 py-2 hover:bg-accent rounded">
+                                  <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+                                  Facebook
+                                </a>
+                                <a href="https://twitter.com/intent/tweet?text=${text}&url=${url}" target="_blank" class="flex items-center gap-2 px-3 py-2 hover:bg-accent rounded">
+                                  <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z"/></svg>
+                                  Twitter
+                                </a>
+                                <button class="flex items-center gap-2 px-3 py-2 hover:bg-accent rounded text-left w-full" onclick="navigator.clipboard.writeText('${shareMessage.replace(/'/g, "\\'")}\\n${appUrl}'); this.parentElement.remove(); alert('Copied to clipboard!');">
+                                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+                                  Copy to Clipboard
+                                </button>
+                              `;
+                              
+                              const button = event.currentTarget as HTMLElement;
+                              const container = button.parentElement;
+                              container?.appendChild(shareMenu);
+                              
+                              // Remove menu when clicking outside
+                              setTimeout(() => {
+                                document.addEventListener('click', (e) => {
+                                  if (!shareMenu.contains(e.target as Node)) {
+                                    shareMenu.remove();
+                                  }
+                                }, { once: true });
+                              }, 100);
+                            }
+                          }}
+                        >
+                          <Share2 className="h-4 w-4 mr-2" />
+                          Share
+                        </Button>
+                      </>
                     )}
                     <Badge className={difficultyInfo[difficulty].color}>
                       {difficulty}

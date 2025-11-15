@@ -992,6 +992,8 @@ Return valid JSON only.`;
 
 **CRITICAL REQUIREMENT: Your equation MUST include EXACTLY ${symbolCount} Phototheology codes - no more, no less!**
 
+**VARIETY REQUIREMENT: Generate a completely unique equation. Random seed: ${requestBody.randomSeed || Date.now()}. Never repeat the same verse or code combination.**
+
 **YOU MUST USE THIS SPECIFIC BIBLE PASSAGE AS THE FOUNDATION:** ${selectedPassage}
 
 CRITICAL INSTRUCTIONS:
@@ -1971,10 +1973,34 @@ ${roomContent}
       }
     }
 
-    // For equations-challenge mode, parse JSON
+    // For equations-challenge mode, parse JSON and validate
     if (mode === "equations-challenge") {
       try {
         const parsed = JSON.parse(content);
+        
+        // Validate symbol count matches request
+        const expectedCount = requestBody.symbolCount || 3;
+        if (parsed.symbols && parsed.symbols.length !== expectedCount) {
+          console.error(`Symbol count mismatch: expected ${expectedCount}, got ${parsed.symbols.length}`);
+          // Return error so frontend can retry
+          return new Response(
+            JSON.stringify({
+              error: "Invalid symbol count",
+              expectedCount,
+              actualCount: parsed.symbols.length,
+              verse: "Please try regenerating...",
+              equation: "Retry needed",
+              symbols: [],
+              difficulty: difficulty || "easy",
+              explanation: "The AI generated an incorrect number of symbols. Please click Regenerate to try again."
+            }),
+            { 
+              status: 400,
+              headers: { ...corsHeaders, "Content-Type": "application/json" } 
+            }
+          );
+        }
+        
         return new Response(
           JSON.stringify(parsed),
           { headers: { ...corsHeaders, "Content-Type": "application/json" } }
