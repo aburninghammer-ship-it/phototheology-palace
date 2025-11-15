@@ -61,24 +61,9 @@ export const SocialShareButton: React.FC<SocialShareButtonProps> = ({
     window.open(twitterUrl, '_blank', 'width=600,height=400');
   };
   
-  const shareToFacebook = async () => {
-    // Try native share first (works best on mobile and avoids Facebook blocking)
-    if (navigator.share) {
-      try {
-        await navigator.share({
-          title,
-          text: description,
-          url: shareUrl,
-        });
-        return;
-      } catch (err) {
-        // Fall through to copy if user cancels
-      }
-    }
-    
-    // Fallback: Copy link and notify user to paste in Facebook
-    await copyToClipboard();
-    toast.info("Link copied! Paste it into Facebook to share.");
+  const shareToFacebook = () => {
+    const facebookUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`;
+    window.open(facebookUrl, '_blank', 'width=600,height=400');
   };
   
   const shareToLinkedIn = async () => {
