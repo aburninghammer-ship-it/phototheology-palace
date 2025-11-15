@@ -9,6 +9,7 @@ import { useDirectMessages } from "@/hooks/useDirectMessages";
 import { Badge } from "@/components/ui/badge";
 import { NotificationCenter } from "@/components/NotificationCenter";
 import { PWAInstallButton } from "@/components/PWAInstallButton";
+import { ThemeToggle } from "@/components/ThemeToggle";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -69,6 +70,7 @@ export const Navigation = () => {
           
             <div className="flex items-center gap-2 md:gap-4 flex-1 justify-end">
               <PWAInstallButton />
+              <ThemeToggle />
               
               {user && (
                 <>

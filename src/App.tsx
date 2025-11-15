@@ -15,6 +15,7 @@ import { LiveNotificationsProvider } from "@/components/LiveNotificationsProvide
 import { AchievementProvider } from "@/components/AchievementProvider";
 import { SplashScreen } from "@/components/SplashScreen";
 import { AnimatePresence } from "framer-motion";
+import { ThemeProvider } from "next-themes";
 
 // Critical pages - load immediately
 import Index from "./pages/Index";
@@ -135,6 +136,7 @@ function App() {
   return (
     <ErrorBoundary>
       <QueryClientProvider client={queryClient}>
+        <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
         <TooltipProvider>
           <Toaster />
           <Sonner />
@@ -294,6 +296,7 @@ function App() {
           </BrowserRouter>
           )}
         </TooltipProvider>
+        </ThemeProvider>
       </QueryClientProvider>
     </ErrorBoundary>
   );
