@@ -969,7 +969,13 @@ CRITICAL: Use EXCLUSIVELY these codes - DO NOT invent or hallucinate any symbols
 
 **YOU MUST USE THIS SPECIFIC BIBLE PASSAGE AS THE FOUNDATION:** ${selectedPassage}
 
-Build your equation to illuminate THIS specific passage. If it's a well-known story or account, identify it briefly (e.g., "The Binding of Isaac" for Genesis 22:1-14).
+CRITICAL INSTRUCTIONS:
+1. First, write out the FULL TEXT of this verse/passage (use KJV translation)
+2. Then build your equation to illuminate THIS specific passage
+3. If it's a well-known story or account, identify it briefly (e.g., "The Binding of Isaac" for Genesis 22:1-14)
+
+Structure your verse field in the JSON response as:
+"verse": "**Verse Text (KJV):** [Full verse text here]\\n\\n**Reference:** ${selectedPassage}\\n\\n[Story/Account name if applicable]"
 
 **USE ONLY THESE AUTHENTIC PHOTOTHEOLOGY CODES:**
 
