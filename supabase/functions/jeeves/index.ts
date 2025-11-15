@@ -970,12 +970,13 @@ CRITICAL: Use EXCLUSIVELY these codes - DO NOT invent or hallucinate any symbols
 **YOU MUST USE THIS SPECIFIC BIBLE PASSAGE AS THE FOUNDATION:** ${selectedPassage}
 
 CRITICAL INSTRUCTIONS:
-1. First, write out the FULL TEXT of this verse/passage (use KJV translation)
-2. Then build your equation to illuminate THIS specific passage
-3. If it's a well-known story or account, identify it briefly (e.g., "The Binding of Isaac" for Genesis 22:1-14)
+1. Write out the FULL TEXT of the verse(s) from ${selectedPassage} using KJV translation
+2. Put the actual verse text in the "verse" field - just the Scripture text itself, nothing else
+3. Then build your equation to illuminate THIS specific passage
+4. If it's a well-known story/account, you can briefly mention it in your explanation
 
-Structure your verse field in the JSON response as:
-"verse": "**Verse Text (KJV):** [Full verse text here]\\n\\n**Reference:** ${selectedPassage}\\n\\n[Story/Account name if applicable]"
+Example verse field format:
+"verse": "For God so loved the world, that he gave his only begotten Son, that whosoever believeth in him should not perish, but have everlasting life. (John 3:16)"
 
 **USE ONLY THESE AUTHENTIC PHOTOTHEOLOGY CODES:**
 
