@@ -675,6 +675,22 @@ ${currentEquation.symbols.map((s, i) => `${i + 1}. ${s}`).join('\n')}
                       <RefreshCw className="h-4 w-4 mr-2" />
                       Regenerate
                     </Button>
+                    {currentEquation && (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => {
+                          const shareMessage = `🧮 Can you help me solve this Biblical Equation? 🤔\n\n📖 ${currentEquation.verse}\n\n🎯 Equation: ${currentEquation.equation}\n\n✨ This challenge uses Phototheology principles to unlock deeper meanings in Scripture!\n\n🔑 Principles used: ${currentEquation.symbols.slice(0, 3).join(", ")}${currentEquation.symbols.length > 3 ? "..." : ""}\n\n💡 Think you can crack it? Share your insights!\n\n🚀 Try it yourself at:`;
+                          const appUrl = window.location.origin + "/equations-challenge";
+                          
+                          navigator.clipboard.writeText(`${shareMessage}\n${appUrl}`);
+                          toast.success("Challenge copied! Now paste it on social media to get help from your friends! 🎉");
+                        }}
+                      >
+                        <Share2 className="h-4 w-4 mr-2" />
+                        Share
+                      </Button>
+                    )}
                     <Badge className={difficultyInfo[difficulty].color}>
                       {difficulty}
                     </Badge>
