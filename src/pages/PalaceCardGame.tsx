@@ -425,7 +425,7 @@ export default function PalaceCardGame() {
                 {/* Front - Reference */}
                 <div
                   onClick={() => handleCardClick(card.id)}
-                  className={`absolute w-full h-full rounded-xl bg-gradient-to-br ${card.color} border-4 ${
+                  className={`absolute w-full h-full rounded-xl bg-gradient-to-br from-slate-700 to-slate-800 border-4 ${
                     card.isSelected ? 'border-amber-400 shadow-[0_0_20px_rgba(251,191,36,0.5)]' : 'border-slate-600'
                   } shadow-xl flex flex-col items-center justify-center p-4 hover:border-amber-500/50 transition-colors`}
                   style={{ backfaceVisibility: "hidden" }}
