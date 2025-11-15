@@ -334,7 +334,7 @@ export const ChefRecipeChallenge = ({ challenge, onSubmit, hasSubmitted }: ChefR
                     </p>
                   </div>
                   <Textarea
-                    placeholder="Use ONLY the verses provided above to build a creative Bible study.&#10;&#10;Example:&#10;Start with Genesis 1:1 to establish creation...&#10;Then connect Psalm 23:1 to show God as provider...&#10;Finally, John 3:16 reveals the ultimate provision...&#10;&#10;Be creative and make unexpected connections!"
+                    placeholder="Use ONLY the ingredient verses shown above to weave them into one cohesive theological study.&#10;&#10;Example approach:&#10;Start with [first verse] to establish the foundation...&#10;Connect it to [second verse] by showing how...&#10;Weave in [third verse] to reveal...&#10;Conclude with [final verse] bringing it all together...&#10;&#10;Make creative connections between these random verses!"
                     value={recipe}
                     onChange={(e) => setRecipe(e.target.value)}
                     rows={10}
