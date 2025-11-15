@@ -189,36 +189,40 @@ export default function EquationsChallenge() {
     setUserAnswer("");
 
     try {
-      const { data, error } = await supabase.functions.invoke("jeeves", {
-        body: {
-          mode: "equations-challenge",
-          difficulty: difficulty,
-          symbolCount: difficultyInfo[difficulty].symbols,
-          randomSeed: Date.now() + Math.random() // Ensure unique equations each time
-        }
-      });
-
-      if (error) throw error;
-
-      // Validate that we got the correct number of symbols
       const expectedCount = difficultyInfo[difficulty].symbols;
-      if (data.symbols && data.symbols.length !== expectedCount) {
-        console.warn(`Expected ${expectedCount} symbols but got ${data.symbols.length}. Retrying...`);
-        // Retry once
-        const { data: retryData, error: retryError } = await supabase.functions.invoke("jeeves", {
+      let validEquation = null;
+      let attempts = 0;
+      const maxAttempts = 5;
+
+      // Retry up to 5 times until we get an equation with the correct number of symbols
+      while (!validEquation && attempts < maxAttempts) {
+        attempts++;
+        
+        const { data, error } = await supabase.functions.invoke("jeeves", {
           body: {
             mode: "equations-challenge",
             difficulty: difficulty,
             symbolCount: expectedCount,
-            randomSeed: Date.now() + Math.random()
+            randomSeed: Date.now() + Math.random() + attempts // Ensure unique equations each attempt
           }
         });
-        
-        if (retryError) throw retryError;
-        setCurrentEquation(retryData);
-      } else {
-        setCurrentEquation(data);
+
+        if (error) throw error;
+
+        // Strict validation: ONLY accept equations with the EXACT expected count
+        if (data.symbols && data.symbols.length === expectedCount) {
+          validEquation = data;
+          console.log(`✓ Valid equation generated with ${expectedCount} symbols on attempt ${attempts}`);
+        } else {
+          console.warn(`✗ Attempt ${attempts}: Expected ${expectedCount} symbols but got ${data.symbols?.length || 0}. Retrying...`);
+        }
       }
+
+      if (!validEquation) {
+        throw new Error(`Failed to generate valid equation after ${maxAttempts} attempts. Expected ${expectedCount} symbols.`);
+      }
+
+      setCurrentEquation(validEquation);
       
       // Start timer if enabled
       if (timerEnabled) {
@@ -227,7 +231,7 @@ export default function EquationsChallenge() {
       }
     } catch (error) {
       console.error("Error generating equation:", error);
-      toast.error("Failed to generate equation");
+      toast.error("Failed to generate a valid equation. Please try again.");
     } finally {
       setLoading(false);
     }
