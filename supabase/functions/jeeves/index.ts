@@ -1576,71 +1576,84 @@ Does this form a coherent 4-part salvation story using these frames?
 Return JSON: { "coherent": true/false, "feedback": "brief comment" }`;
 
     } else if (mode === "generate_chef_verses") {
-      // Generate random verses for Chef Challenge with full text
+      // Generate random verses for Chef Challenge with proper KJV text from Bible API
       const { minVerses, maxVerses, difficulty } = requestBody;
       const numVerses = Math.floor(Math.random() * (maxVerses - minVerses + 1)) + minVerses;
       
       console.log(`=== GENERATING ${numVerses} CHEF VERSES (${difficulty} level) ===`);
       
-      // Fetch random verses from database - ensure we get complete verse text
+      // Fetch random verse references from database
       const { data: randomVerses, error: verseError } = await supabase
         .from('bible_verses_tokenized')
-        .select('book, chapter, verse_num, text_kjv')
-        .not('text_kjv', 'is', null)
-        .limit(500); // Get many verses to ensure unique books
+        .select('book, chapter, verse_num')
+        .limit(500);
       
       if (verseError || !randomVerses || randomVerses.length === 0) {
-        console.error("Error fetching verses:", verseError);
+        console.error("Error fetching verse references:", verseError);
         return new Response(
-          JSON.stringify({ error: "Failed to fetch verses" }),
+          JSON.stringify({ error: "Failed to fetch verse references" }),
           { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 500 }
         );
       }
       
-      // First pass: Try to get verses from unique books
+      // Shuffle and select unique books
       const shuffled = randomVerses.sort(() => 0.5 - Math.random());
-      const selectedVerses: Array<{ reference: string; text: string }> = [];
+      const selectedRefs: Array<{ book: string; chapter: number; verse_num: number }> = [];
       const usedBooks = new Set<string>();
       
       for (const verse of shuffled) {
-        if (!usedBooks.has(verse.book) && verse.text_kjv && verse.text_kjv.trim()) {
-          selectedVerses.push({
-            reference: `${verse.book} ${verse.chapter}:${verse.verse_num}`,
-            text: verse.text_kjv.trim() // Ensure full verse text with no extra whitespace
-          });
+        if (!usedBooks.has(verse.book)) {
+          selectedRefs.push(verse);
           usedBooks.add(verse.book);
-          
-          if (selectedVerses.length === numVerses) {
-            break;
+          if (selectedRefs.length === numVerses) break;
+        }
+      }
+      
+      // If still need more, add from any book
+      if (selectedRefs.length < numVerses) {
+        for (const verse of shuffled) {
+          const refKey = `${verse.book}_${verse.chapter}_${verse.verse_num}`;
+          if (!selectedRefs.some(r => `${r.book}_${r.chapter}_${r.verse_num}` === refKey)) {
+            selectedRefs.push(verse);
+            if (selectedRefs.length === numVerses) break;
           }
         }
       }
       
-      // Second pass: If we still need more verses, add from any book
-      if (selectedVerses.length < numVerses) {
-        console.warn(`Only found ${selectedVerses.length} verses from unique books, adding more verses from any book`);
-        for (const verse of shuffled) {
-          if (verse.text_kjv && verse.text_kjv.trim()) {
-            // Check if this exact verse is already added
-            const verseRef = `${verse.book} ${verse.chapter}:${verse.verse_num}`;
-            const alreadyAdded = selectedVerses.some(v => v.reference === verseRef);
-            
-            if (!alreadyAdded) {
+      // Fetch actual verse text from Bible API
+      const selectedVerses: Array<{ reference: string; text: string }> = [];
+      
+      for (const ref of selectedRefs) {
+        try {
+          const bibleApiUrl = `https://bible-api.com/${ref.book}+${ref.chapter}:${ref.verse_num}?translation=kjv`;
+          console.log(`Fetching: ${bibleApiUrl}`);
+          
+          const response = await fetch(bibleApiUrl);
+          if (response.ok) {
+            const data = await response.json();
+            if (data.text && data.text.trim()) {
               selectedVerses.push({
-                reference: verseRef,
-                text: verse.text_kjv.trim()
+                reference: `${ref.book} ${ref.chapter}:${ref.verse_num}`,
+                text: data.text.trim().replace(/\n/g, ' ')
               });
-              
-              if (selectedVerses.length === numVerses) {
-                break;
-              }
             }
+          } else {
+            console.warn(`Failed to fetch ${ref.book} ${ref.chapter}:${ref.verse_num}, status: ${response.status}`);
           }
+        } catch (err) {
+          console.error(`Error fetching verse ${ref.book} ${ref.chapter}:${ref.verse_num}:`, err);
         }
+      }
+      
+      if (selectedVerses.length === 0) {
+        return new Response(
+          JSON.stringify({ error: "Failed to fetch verse text from Bible API" }),
+          { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 500 }
+        );
       }
       
       console.log("Verses selected:", selectedVerses.length);
-      console.log("Sample verse length:", selectedVerses[0]?.text.length || 0);
+      console.log("Sample verse:", selectedVerses[0]);
       
       return new Response(
         JSON.stringify({ verses: selectedVerses }),
