@@ -26,6 +26,7 @@ export const SimplifiedNav = () => {
     { to: "/dashboard", label: "Dashboard", icon: Home },
     { to: "/bible", label: "Bible Reader", icon: BookOpen },
     { to: "/bible/search", label: "Search", icon: BookOpen },
+    { to: "/palace/floor/1/room/gr", label: "Produce a Gem", icon: BookOpen },
     { to: "/bible-image-library", label: "Image Library", icon: BookOpen },
     { to: "/quarterly-study", label: "Quarterly Study", icon: BookOpen },
     { to: "/memorization", label: "Memorization", icon: BookOpen },

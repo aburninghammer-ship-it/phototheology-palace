@@ -113,6 +113,26 @@ export default function BibleImageLibrary() {
 
     setGenerating(true);
     try {
+      // Moderate the image description
+      const { data: moderationData, error: moderationError } = await supabase.functions.invoke(
+        "moderate-content",
+        {
+          body: {
+            content: `${newImage.description} ${newImage.verse_reference || ""}`,
+            type: "image",
+          },
+        }
+      );
+
+      if (moderationError) {
+        console.error("Moderation error:", moderationError);
+        // Continue anyway if moderation fails
+      } else if (moderationData && !moderationData.safe) {
+        toast.error(`Image prompt not allowed: ${moderationData.reason}`);
+        setGenerating(false);
+        return;
+      }
+
       const { data, error } = await supabase.functions.invoke("jeeves", {
         body: {
           mode: "generate-image",
@@ -193,6 +213,26 @@ export default function BibleImageLibrary() {
   const regenerateImage = async (image: BibleImage) => {
     setGenerating(true);
     try {
+      // Moderate the image description
+      const { data: moderationData, error: moderationError } = await supabase.functions.invoke(
+        "moderate-content",
+        {
+          body: {
+            content: `${image.description} ${image.verse_reference || ""}`,
+            type: "image",
+          },
+        }
+      );
+
+      if (moderationError) {
+        console.error("Moderation error:", moderationError);
+        // Continue anyway if moderation fails
+      } else if (moderationData && !moderationData.safe) {
+        toast.error(`Image prompt not allowed: ${moderationData.reason}`);
+        setGenerating(false);
+        return;
+      }
+
       const { data, error } = await supabase.functions.invoke("jeeves", {
         body: {
           mode: "generate-image",
