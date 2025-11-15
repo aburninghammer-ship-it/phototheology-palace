@@ -7,6 +7,7 @@ import { ChefHat, Loader2, Eye } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { formatJeevesResponse } from "@/lib/formatJeevesResponse";
+import { ShareChallengeButton } from "@/components/ShareChallengeButton";
 
 interface ChefRecipeChallengeProps {
   challenge: any;
@@ -338,6 +339,19 @@ export const ChefRecipeChallenge = ({ challenge, onSubmit, hasSubmitted }: ChefR
                     <Eye className="mr-2 h-4 w-4" />
                     {showModelAnswer ? "Hide" : "Show"} Model Answer
                   </Button>
+                </div>
+
+                <div className="flex gap-2">
+                  <ShareChallengeButton
+                    challengeData={{
+                      type: "chef",
+                      title: challenge.title,
+                      content: `${challenge.ui_config?.theme || challenge.description}\n\n🥘 Ingredients (${verses.length} verses):\n${verses.map((v: any, i: number) => `${i + 1}. ${v.reference}: "${v.text}"`).join('\n\n')}\n\n🍳 Can you create a theological recipe connecting all these verses?`,
+                      difficulty
+                    }}
+                    size="default"
+                    variant="outline"
+                  />
                 </div>
 
                 {showModelAnswer && modelAnswer && (
