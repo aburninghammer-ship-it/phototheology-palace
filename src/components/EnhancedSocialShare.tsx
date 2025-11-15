@@ -98,17 +98,12 @@ export const EnhancedSocialShare = ({
 
   const handleNativeShare = async (platform: 'facebook' | 'twitter' | 'linkedin') => {
     const shareUrl = platform === 'facebook' 
-      ? `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}&quote=${encodeURIComponent(customMessage)}`
+      ? `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`
       : platform === 'twitter'
       ? `https://twitter.com/intent/tweet?text=${encodeURIComponent(customMessage)}&url=${encodeURIComponent(url)}`
       : `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(url)}`;
     
-    // Open in new tab without popup restrictions
-    const newWindow = window.open(shareUrl, '_blank', 'noopener,noreferrer');
-    if (!newWindow || newWindow.closed || typeof newWindow.closed === 'undefined') {
-      // Popup was blocked, try direct link as fallback
-      window.location.href = shareUrl;
-    }
+    window.open(shareUrl, '_blank');
   };
 
   return (
