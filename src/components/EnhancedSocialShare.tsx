@@ -103,7 +103,12 @@ export const EnhancedSocialShare = ({
       ? `https://twitter.com/intent/tweet?text=${encodeURIComponent(customMessage)}&url=${encodeURIComponent(url)}`
       : `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(url)}`;
     
-    window.open(shareUrl, '_blank', 'width=600,height=400');
+    // Open in new tab without popup restrictions
+    const newWindow = window.open(shareUrl, '_blank', 'noopener,noreferrer');
+    if (!newWindow || newWindow.closed || typeof newWindow.closed === 'undefined') {
+      // Popup was blocked, try direct link as fallback
+      window.location.href = shareUrl;
+    }
   };
 
   return (
