@@ -327,7 +327,7 @@ export const ChefRecipeChallenge = ({ challenge, onSubmit, hasSubmitted }: ChefR
             {!hasSubmitted ? (
               <>
                 <div className="space-y-2">
-                  <label className="text-sm font-medium">Step 3: Write Your Recipe (Use ONLY the Ingredient Verses Above!)</label>
+                  <label className="text-sm font-medium">Write Your Recipe (Use ONLY the Ingredient Verses Above!)</label>
                   <div className="bg-yellow-50 dark:bg-yellow-900/20 p-3 rounded border border-yellow-300 dark:border-yellow-700 mb-2">
                     <p className="text-sm font-semibold text-yellow-900 dark:text-yellow-100">
                       ⚠️ IMPORTANT: Use ONLY the {verses.length} ingredient verses shown above. Do NOT add any other verses!
