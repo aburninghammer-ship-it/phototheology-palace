@@ -33,7 +33,6 @@ export default function ChefChallenge() {
   const navigate = useNavigate();
   const { user } = useAuth();
   const [difficulty, setDifficulty] = useState<keyof typeof difficultyConfig>("intermediate");
-  const [theme] = useState(THEMES[Math.floor(Math.random() * THEMES.length)]);
   const [verses, setVerses] = useState<string[]>([]);
   const [recipe, setRecipe] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -55,7 +54,7 @@ export default function ChefChallenge() {
     try {
       const config = difficultyConfig[difficulty];
       console.log("=== CALLING JEEVES TO GENERATE VERSES ===");
-      console.log("Config:", { min: config.min, max: config.max, difficulty, theme });
+      console.log("Config:", { min: config.min, max: config.max, difficulty });
       
       const { data, error } = await supabase.functions.invoke("jeeves", {
         body: {
@@ -63,7 +62,6 @@ export default function ChefChallenge() {
           minVerses: config.min,
           maxVerses: config.max,
           difficulty,
-          theme,
         },
       });
 
@@ -119,7 +117,6 @@ export default function ChefChallenge() {
       const { data, error } = await supabase.functions.invoke("jeeves", {
         body: {
           mode: "check_chef_recipe",
-          theme,
           recipe: recipe.trim(),
           verses,
           difficulty,
@@ -153,7 +150,6 @@ export default function ChefChallenge() {
       const { data, error } = await supabase.functions.invoke("jeeves", {
         body: {
           mode: "get_chef_model_answer",
-          theme,
           verses,
           difficulty,
         },
@@ -185,7 +181,6 @@ export default function ChefChallenge() {
             recipe: recipe.trim(),
             verses,
             feedback,
-            theme,
             difficulty
           },
           principle_applied: "Bible Freestyle (BF) + Concentration Room (CR)"
@@ -223,14 +218,10 @@ export default function ChefChallenge() {
               <Badge>Quick • 5-10 min</Badge>
             </div>
             <CardDescription className="mt-2">
-              📖 <strong>The Rules:</strong> Create a dish from the ingredients Jeeves will provide. This means the user must tie the verses into together to create a bible study that makes sense.
+              📖 <strong>The Rules:</strong> Jeeves will provide completely random verses that appear unrelated. Your goal is to creatively tie them together into a cohesive Bible study that makes sense.
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="bg-muted p-4 rounded-lg">
-              <p className="font-semibold mb-2">🎯 Theme:</p>
-              <p className="text-lg">{theme}</p>
-            </div>
 
             <div className="space-y-4">
               <div>
@@ -309,7 +300,7 @@ export default function ChefChallenge() {
                     ))}
                   </div>
                   <p className="text-xs text-muted-foreground italic">
-                    ⚡ Challenge: These verses are intentionally unrelated! Weave them into a coherent theological narrative addressing the theme.
+                    ⚡ Challenge: These verses are intentionally random and unrelated! Your goal is to creatively weave them into a coherent Bible study.
                   </p>
                 </div>
 
@@ -318,14 +309,14 @@ export default function ChefChallenge() {
                     <div className="space-y-2">
                       <label className="text-sm font-medium">Step 3: Create Your Biblical Recipe</label>
                       <Textarea
-                        placeholder="Use the verses above to build a theological narrative.&#10;&#10;Example:&#10;Start with Genesis 1:1 to establish creation...&#10;Then connect Psalm 23:1 to show God as provider...&#10;Finally, John 3:16 reveals the ultimate provision...&#10;&#10;Be creative and make connections!"
+                        placeholder="Use the verses above to build a creative Bible study.&#10;&#10;Example:&#10;Start with Genesis 1:1 to establish creation...&#10;Then connect Psalm 23:1 to show God as provider...&#10;Finally, John 3:16 reveals the ultimate provision...&#10;&#10;Be creative and make unexpected connections!"
                         value={recipe}
                         onChange={(e) => setRecipe(e.target.value)}
                         rows={10}
                         className="font-mono"
                       />
                       <p className="text-xs text-muted-foreground">
-                        Explain how these verses connect to make a complete theological point on the theme.
+                        Explain how these seemingly unrelated verses connect to make a complete theological point.
                       </p>
                     </div>
 
