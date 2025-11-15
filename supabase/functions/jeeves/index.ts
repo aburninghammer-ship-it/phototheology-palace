@@ -1636,6 +1636,28 @@ Return JSON: { "coherent": true/false, "feedback": "brief comment" }`;
       
       systemPrompt = `You are Jeeves, evaluating a creative Bible study. Student had ${verses.length} random, unrelated verses to tie together.
 
+**CRITICAL: If you mention Phototheology codes, you MUST ONLY use these approved codes:**
+Floor 1: 24, BR, GR, IR, SR, TR
+Floor 2: DC, OR, QA, QB, ST
+Floor 3: BF, HF, LR, NF, PF
+Floor 4 Rooms: CR, C6, DR, FRT, ∥, ≈, TRM, TZ
+Floor 4 Dimensions: 1D, 2D, 3D, 4D, 5D
+Floor 4 Connect-6: Ep, Go, Hi, Pa, Po, Pr
+Floor 4 Theme: \\G, |GC, \\H, |LC, |S, |TP
+Floor 4 Time Zones: Ef, En, Epa, Hf, Hpa, Hp
+Floor 4 Fruit: -f, -ge, -g, -j, -ls, -lv, -m, -p, -t
+Floor 5: BL, CEC, FE, PR, R66, 3A
+Floor 5 Sanctuary: SAN-ALT, SAN-INCENSE, SAN-ARK, SAN-LAMP, SAN-LAVER, SAN-BREAD
+Floor 5 Prophecy: @120, @1260, @2300, @400, @70w, @70y
+Floor 5 Angels: 3AM-1, 3AM-2, 3AM-3
+Floor 5 Feasts: FE-AT, FE-FI, FE-PA, FE-PE, FE-TA, FE-TR, FE-UN
+Floor 6: DoL¹/NE¹, DoL²/NE², DoL³/NE³
+Floor 6 Cycles: @Ab, @Ad, @Cy, @Sp, @Mo, @No, @Re, @Se
+Floor 6 Rooms: 8C, JR
+Floor 7: FRM, MR, SRM
+
+**NEVER use codes like "CH", "NC", "Grace", "New Creation", "Christ" as codes - these are NOT valid!**
+
 Grade on:
 1. Creativity - Innovative connections?
 2. Biblical Accuracy - Proper context?
@@ -1664,6 +1686,28 @@ Evaluate this creative connection.`;
       const verseRefs = verses.map((v: any) => v.reference).join(', ');
       
       systemPrompt = `You are Jeeves, demonstrating how to creatively tie random, unrelated Bible verses into a cohesive Bible study.
+
+**CRITICAL: If you mention Phototheology codes, you MUST ONLY use these approved codes:**
+Floor 1: 24, BR, GR, IR, SR, TR
+Floor 2: DC, OR, QA, QB, ST
+Floor 3: BF, HF, LR, NF, PF
+Floor 4 Rooms: CR, C6, DR, FRT, ∥, ≈, TRM, TZ
+Floor 4 Dimensions: 1D, 2D, 3D, 4D, 5D
+Floor 4 Connect-6: Ep, Go, Hi, Pa, Po, Pr
+Floor 4 Theme: \\G, |GC, \\H, |LC, |S, |TP
+Floor 4 Time Zones: Ef, En, Epa, Hf, Hpa, Hp
+Floor 4 Fruit: -f, -ge, -g, -j, -ls, -lv, -m, -p, -t
+Floor 5: BL, CEC, FE, PR, R66, 3A
+Floor 5 Sanctuary: SAN-ALT, SAN-INCENSE, SAN-ARK, SAN-LAMP, SAN-LAVER, SAN-BREAD
+Floor 5 Prophecy: @120, @1260, @2300, @400, @70w, @70y
+Floor 5 Angels: 3AM-1, 3AM-2, 3AM-3
+Floor 5 Feasts: FE-AT, FE-FI, FE-PA, FE-PE, FE-TA, FE-TR, FE-UN
+Floor 6: DoL¹/NE¹, DoL²/NE², DoL³/NE³
+Floor 6 Cycles: @Ab, @Ad, @Cy, @Sp, @Mo, @No, @Re, @Se
+Floor 6 Rooms: 8C, JR
+Floor 7: FRM, MR, SRM
+
+**NEVER use codes like "CH", "NC", "Grace", "New Creation", "Christ" as codes - these are NOT valid!**
 
 Requirements:
 - Use ALL ${verses.length} verses naturally
