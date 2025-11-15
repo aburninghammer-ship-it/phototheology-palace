@@ -1,231 +1,413 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Navigation } from "@/components/Navigation";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
-import { ChefHat, Clock, Trophy, ArrowLeft, Send } from "lucide-react";
+import { ChefHat, ArrowLeft, Loader2, Eye } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
-import { ShareChallengeButton } from "@/components/ShareChallengeButton";
+import { formatJeevesResponse } from "@/lib/formatJeevesResponse";
 
-const DIFFICULTY_LEVELS = [
-  { name: "Apprentice", time: 20, ingredients: 3, description: "3 Bible verses, 20 minutes" },
-  { name: "Chef", time: 15, ingredients: 5, description: "5 verses, 15 minutes" },
-  { name: "Master Chef", time: 10, ingredients: 7, description: "7 verses, 10 minutes, complex doctrine" },
-];
+const difficultyConfig = {
+  easy: { min: 3, max: 4, label: "Easy (3-4 verses)", icon: "🌱" },
+  intermediate: { min: 5, max: 6, label: "Intermediate (5-6 verses)", icon: "🔥" },
+  pro: { min: 7, max: 8, label: "Pro (7-8 verses)", icon: "💎" },
+  master: { min: 9, max: 10, label: "Master (9-10 verses)", icon: "👑" }
+};
 
-const RECIPE_THEMES = [
-  "The Gospel in 3-5 verses",
-  "Sanctuary service from altar to ark",
-  "Sabbath truth across Scripture",
-  "State of the dead",
-  "Second coming signs",
-  "Remnant characteristics",
-  "Christ in the Psalms",
-  "Daniel's prophecies simplified",
+const THEMES = [
+  "The Gospel Journey",
+  "God's Character",
+  "Salvation History",
+  "Faith and Works",
+  "The Remnant",
+  "End Time Events",
+  "Christ in Prophecy",
+  "The Sanctuary"
 ];
 
 export default function ChefChallenge() {
   const navigate = useNavigate();
   const { user } = useAuth();
-  const [difficulty, setDifficulty] = useState<typeof DIFFICULTY_LEVELS[0] | null>(null);
-  const [theme, setTheme] = useState("");
+  const [difficulty, setDifficulty] = useState<keyof typeof difficultyConfig>("intermediate");
+  const [theme] = useState(THEMES[Math.floor(Math.random() * THEMES.length)]);
+  const [verses, setVerses] = useState<string[]>([]);
   const [recipe, setRecipe] = useState("");
-  const [timeLeft, setTimeLeft] = useState(0);
-  const [started, setStarted] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isChecking, setIsChecking] = useState(false);
+  const [feedback, setFeedback] = useState<any>(null);
+  const [showModelAnswer, setShowModelAnswer] = useState(false);
+  const [modelAnswer, setModelAnswer] = useState("");
+  const [hasSubmitted, setHasSubmitted] = useState(false);
 
-  const startChallenge = (level: typeof DIFFICULTY_LEVELS[0]) => {
-    setDifficulty(level);
-    const randomTheme = RECIPE_THEMES[Math.floor(Math.random() * RECIPE_THEMES.length)];
-    setTheme(randomTheme);
-    setTimeLeft(level.time * 60);
-    setStarted(true);
+  const generateVerses = async () => {
+    setIsLoading(true);
+    setVerses([]);
+    setRecipe("");
+    setFeedback(null);
+    setShowModelAnswer(false);
+    setModelAnswer("");
+    setHasSubmitted(false);
     
-    const timer = setInterval(() => {
-      setTimeLeft(prev => {
-        if (prev <= 1) {
-          clearInterval(timer);
-          toast.error("Time's up! Submit what you have.");
-          return 0;
-        }
-        return prev - 1;
+    try {
+      const config = difficultyConfig[difficulty];
+      console.log("=== CALLING JEEVES TO GENERATE VERSES ===");
+      console.log("Config:", { min: config.min, max: config.max, difficulty, theme });
+      
+      const { data, error } = await supabase.functions.invoke("jeeves", {
+        body: {
+          mode: "generate_chef_verses",
+          minVerses: config.min,
+          maxVerses: config.max,
+          difficulty,
+          theme,
+        },
       });
-    }, 1000);
+
+      console.log("=== JEEVES RESPONSE ===");
+      console.log("Error:", error);
+      console.log("Data:", data);
+
+      if (error) {
+        console.error("Jeeves error details:", error);
+        throw new Error(error.message || "Failed to call Jeeves");
+      }
+      
+      if (!data) {
+        throw new Error("No data returned from Jeeves");
+      }
+      
+      if (!data.verses || !Array.isArray(data.verses)) {
+        console.error("Invalid data structure:", data);
+        throw new Error("Invalid response format - missing verses array");
+      }
+      
+      if (data.verses.length === 0) {
+        throw new Error("Jeeves returned empty verses array");
+      }
+      
+      console.log("Successfully received verses:", data.verses);
+      setVerses(data.verses);
+      toast.success(`Ingredients Ready! 🎲`, {
+        description: `${data.verses.length} random verses generated.`
+      });
+    } catch (error: any) {
+      console.error("=== ERROR GENERATING VERSES ===");
+      console.error("Error message:", error.message);
+      toast.error("Failed to Generate Ingredients", {
+        description: error.message || "Unable to generate verses. Please try again."
+      });
+      setVerses([]);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  const handleSubmit = async () => {
+  const handleCheck = async () => {
     if (!recipe.trim()) {
-      toast.error("Write your biblical recipe first!");
+      toast.error("No Recipe", {
+        description: "Write your recipe first!"
+      });
       return;
     }
 
-    setIsSubmitting(true);
-
+    setIsChecking(true);
     try {
-      const { data, error } = await supabase.functions.invoke('jeeves', {
+      const { data, error } = await supabase.functions.invoke("jeeves", {
         body: {
-          mode: "validate_chef_recipe",
+          mode: "check_chef_recipe",
           theme,
-          recipe,
-          difficulty: difficulty?.name,
-          requiredVerses: difficulty?.ingredients,
-        }
+          recipe: recipe.trim(),
+          verses,
+          difficulty,
+        },
       });
 
       if (error) throw error;
-
-      const { quality, feedback, stars } = data;
-
-      toast.success(`${stars}/5 Stars! ${feedback}`);
-
-      if (user) {
-        await supabase.from('challenge_submissions').insert({
-          user_id: user.id,
-          challenge_id: `chef_${difficulty?.name}`,
-          content: JSON.stringify({ theme, recipe, stars }),
-          submission_data: { theme, recipe, quality, stars },
-        });
-      }
-
-      setStarted(false);
-      setRecipe("");
+      setFeedback(data);
+      
+      toast.success("Recipe Checked! ⭐", {
+        description: data.feedback || "Great work!"
+      });
     } catch (error) {
-      console.error(error);
-      toast.error("Failed to submit recipe");
+      console.error("Error checking recipe:", error);
+      toast.error("Error", {
+        description: "Failed to check recipe. Please try again."
+      });
     } finally {
-      setIsSubmitting(false);
+      setIsChecking(false);
     }
   };
 
-  const formatTime = (seconds: number) => {
-    const mins = Math.floor(seconds / 60);
-    const secs = seconds % 60;
-    return `${mins}:${secs.toString().padStart(2, '0')}`;
+  const handleShowModelAnswer = async () => {
+    if (modelAnswer) {
+      setShowModelAnswer(!showModelAnswer);
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("jeeves", {
+        body: {
+          mode: "get_chef_model_answer",
+          theme,
+          verses,
+          difficulty,
+        },
+      });
+
+      if (error) throw error;
+      setModelAnswer(data.modelAnswer || "");
+      setShowModelAnswer(true);
+    } catch (error) {
+      console.error("Error getting model answer:", error);
+      toast.error("Error", {
+        description: "Failed to get model answer. Please try again."
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  if (!started) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-orange-50 via-amber-50 to-yellow-50 dark:from-orange-950 dark:via-amber-950 dark:to-yellow-950">
-        <Navigation />
-        <div className="container mx-auto px-4 py-12">
-          <Button variant="ghost" onClick={() => navigate("/games")} className="mb-6">
-            <ArrowLeft className="mr-2" />
-            Back to Games
-          </Button>
-
-          <div className="max-w-4xl mx-auto">
-            <div className="text-center mb-12">
-              <ChefHat className="w-20 h-20 mx-auto mb-4 text-orange-600" />
-              <h1 className="text-5xl font-bold mb-4 bg-gradient-to-r from-orange-600 to-amber-600 bg-clip-text text-transparent">
-                🍳 THE CHEF CHALLENGE
-              </h1>
-              <p className="text-xl text-muted-foreground">
-                Create a "biblical recipe" – a coherent mini-sermon using only Bible verses
-              </p>
-            </div>
-
-            <Card className="mb-8 border-orange-500/50 bg-gradient-to-br from-orange-100/50 to-amber-100/50 dark:from-orange-900/20 dark:to-amber-900/20">
-              <CardHeader>
-                <CardTitle>How It Works</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3 text-sm">
-                <p>🎯 <strong>Your Mission:</strong> Build a complete theological point using ONLY Bible verse references</p>
-                <p>📖 <strong>The Rules:</strong> No commentary, no transitions – just verses that flow together</p>
-                <p>⭐ <strong>Scoring:</strong> Jeeves rates your recipe on clarity, flow, and doctrinal accuracy (1-5 stars)</p>
-                <p>🏆 <strong>Example:</strong> "Gospel in 3 verses" → Romans 3:23, Romans 6:23, John 3:16</p>
-              </CardContent>
-            </Card>
-
-            <div className="grid md:grid-cols-3 gap-6">
-              {DIFFICULTY_LEVELS.map((level) => (
-                <Card key={level.name} className="hover:shadow-xl transition-shadow cursor-pointer group border-2 hover:border-orange-500" onClick={() => startChallenge(level)}>
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      <ChefHat className="w-5 h-5 text-orange-600" />
-                      {level.name}
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-3">
-                      <Badge className="bg-orange-600 text-white">{level.description}</Badge>
-                      <div className="text-sm text-muted-foreground space-y-1">
-                        <p>⏱️ {level.time} minutes</p>
-                        <p>📖 {level.ingredients} verses minimum</p>
-                      </div>
-                      <Button className="w-full group-hover:bg-orange-600">
-                        Start Challenge
-                      </Button>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  }
+  const handleSubmit = async () => {
+    if (!recipe.trim()) return;
+    
+    setIsLoading(true);
+    try {
+      if (user) {
+        await supabase.from('challenge_submissions').insert({
+          user_id: user.id,
+          content: recipe.trim(),
+          submission_data: {
+            recipe: recipe.trim(),
+            verses,
+            feedback,
+            theme,
+            difficulty
+          },
+          principle_applied: "Bible Freestyle (BF) + Concentration Room (CR)"
+        });
+      }
+      
+      setHasSubmitted(true);
+      toast.success("Recipe Submitted!", {
+        description: "Added to your Growth Journal."
+      });
+    } catch (error) {
+      console.error("Error submitting:", error);
+      toast.error("Failed to submit recipe");
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-orange-50 via-amber-50 to-yellow-50 dark:from-orange-950 dark:via-amber-950 dark:to-yellow-950">
       <Navigation />
-      <div className="container mx-auto px-4 py-8">
-        <div className="max-w-4xl mx-auto">
-          <div className="flex justify-between items-center mb-6">
-            <div>
-              <h2 className="text-3xl font-bold flex items-center gap-2">
-                <ChefHat className="w-8 h-8 text-orange-600" />
-                {difficulty?.name} Challenge
-              </h2>
-              <p className="text-muted-foreground">Theme: {theme}</p>
-            </div>
-            <div className="text-right">
-              <div className={`text-4xl font-bold ${timeLeft < 60 ? 'text-red-600 animate-pulse' : 'text-orange-600'}`}>
-                <Clock className="w-8 h-8 inline mr-2" />
-                {formatTime(timeLeft)}
-              </div>
-              <p className="text-sm text-muted-foreground">Time remaining</p>
-            </div>
-          </div>
+      <div className="container mx-auto px-4 py-12 max-w-4xl">
+        <Button variant="ghost" onClick={() => navigate("/games")} className="mb-6">
+          <ArrowLeft className="mr-2" />
+          Back to Games
+        </Button>
 
-          <Card className="mb-6">
-            <CardHeader>
-              <CardTitle>Your Biblical Recipe</CardTitle>
-              <p className="text-sm text-muted-foreground">
-                Use at least {difficulty?.ingredients} Bible verses. No commentary – just verses!
-              </p>
-            </CardHeader>
-            <CardContent>
-              <Textarea
-                value={recipe}
-                onChange={(e) => setRecipe(e.target.value)}
-                placeholder="Example:&#10;Romans 3:23&#10;Romans 6:23&#10;John 3:16&#10;&#10;Write your verse references here..."
-                className="min-h-80 font-mono text-base"
-              />
-              <div className="flex gap-2 mt-4">
-                <Button onClick={handleSubmit} disabled={isSubmitting || !recipe.trim()} className="flex-1 bg-orange-600 hover:bg-orange-700">
-                  <Send className="mr-2" />
-                  {isSubmitting ? "Submitting..." : "Submit Recipe"}
-                </Button>
-                <ShareChallengeButton
-                  challengeData={{
-                    type: "chef",
-                    title: `${difficulty?.name} Chef Challenge: ${theme}`,
-                    content: `Create a biblical recipe on the theme: "${theme}"\n\nRequirements:\n- ${difficulty?.ingredients} verses minimum\n- ${difficulty?.time} minutes time limit\n- Build a complete theological point using ONLY Bible verse references`,
-                    difficulty: difficulty?.name
-                  }}
-                />
-                <Button variant="outline" onClick={() => setStarted(false)}>
-                  Cancel
+        <Card>
+          <CardHeader>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <ChefHat className="h-5 w-5 text-orange-600" />
+                <CardTitle>Chef Challenge</CardTitle>
+              </div>
+              <Badge>Quick • 5-10 min</Badge>
+            </div>
+            <CardDescription className="mt-2">
+              Use the verses (ingredients) Jeeves has provided and create a recipe from it.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="bg-muted p-4 rounded-lg">
+              <p className="font-semibold mb-2">🎯 Theme:</p>
+              <p className="text-lg">{theme}</p>
+            </div>
+
+            <div className="space-y-4">
+              <div>
+                <label className="text-sm font-medium block mb-2">Step 1: Select Your Challenge Level</label>
+                <div className="grid grid-cols-2 gap-2">
+                  {(["easy", "intermediate", "pro", "master"] as const).map((level) => (
+                    <Button
+                      key={level}
+                      variant={difficulty === level ? "default" : "outline"}
+                      onClick={() => setDifficulty(level)}
+                      className="w-full"
+                      disabled={isLoading || hasSubmitted || verses.length > 0}
+                    >
+                      {difficultyConfig[level].icon} {level.charAt(0).toUpperCase() + level.slice(1)}
+                    </Button>
+                  ))}
+                </div>
+                <p className="text-xs text-muted-foreground text-center mt-2">
+                  {difficultyConfig[difficulty].label}
+                </p>
+              </div>
+
+              <div>
+                <label className="text-sm font-medium block mb-2">Step 2: Get Your Ingredients</label>
+                <Button 
+                  onClick={generateVerses} 
+                  className="w-full bg-orange-600 hover:bg-orange-700" 
+                  disabled={isLoading || hasSubmitted || verses.length > 0}
+                >
+                  {isLoading ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Jeeves is selecting verses...
+                    </>
+                  ) : verses.length > 0 ? (
+                    <>
+                      ✓ Ingredients Generated
+                    </>
+                  ) : (
+                    <>
+                      🎲 Generate Challenge Ingredients
+                    </>
+                  )}
                 </Button>
               </div>
-            </CardContent>
-          </Card>
-        </div>
+            </div>
+
+            {isLoading && verses.length === 0 ? (
+              <div className="flex flex-col items-center justify-center py-8 space-y-2">
+                <Loader2 className="h-6 w-6 animate-spin text-orange-600" />
+                <span className="text-sm">Jeeves is gathering random ingredients...</span>
+              </div>
+            ) : verses.length === 0 ? (
+              <div className="bg-orange-50 dark:bg-orange-900/20 p-6 rounded-lg text-center">
+                <ChefHat className="h-12 w-12 mx-auto mb-3 text-orange-600" />
+                <p className="font-medium mb-2">Ready to cook up a biblical recipe?</p>
+                <p className="text-sm text-muted-foreground">
+                  Select a difficulty level and click "Generate Challenge Ingredients"!
+                </p>
+              </div>
+            ) : (
+              <>
+                <div className="bg-gradient-to-r from-orange-50 to-amber-50 dark:from-orange-900/20 dark:to-amber-900/20 p-4 rounded-lg space-y-3 border-2 border-orange-200 dark:border-orange-800">
+                  <div className="flex items-center justify-between">
+                    <p className="font-semibold text-lg">🥘 Your Ingredients ({verses.length} verses):</p>
+                    <Badge variant="outline" className="bg-white dark:bg-gray-800">
+                      {difficulty}
+                    </Badge>
+                  </div>
+                  <div className="bg-white dark:bg-gray-800 p-4 rounded border-2 border-orange-300 dark:border-orange-700">
+                    {verses.map((verse, idx) => (
+                      <div key={idx} className="flex items-start gap-2 mb-2 last:mb-0">
+                        <span className="text-orange-600 font-bold">•</span>
+                        <span className="font-mono text-sm">{verse}</span>
+                      </div>
+                    ))}
+                  </div>
+                  <p className="text-xs text-muted-foreground italic">
+                    ⚡ Challenge: These verses are intentionally unrelated! Weave them into a coherent theological narrative addressing the theme.
+                  </p>
+                </div>
+
+                {!hasSubmitted ? (
+                  <>
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium">Step 3: Create Your Biblical Recipe</label>
+                      <Textarea
+                        placeholder="Use the verses above to build a theological narrative.&#10;&#10;Example:&#10;Start with Genesis 1:1 to establish creation...&#10;Then connect Psalm 23:1 to show God as provider...&#10;Finally, John 3:16 reveals the ultimate provision...&#10;&#10;Be creative and make connections!"
+                        value={recipe}
+                        onChange={(e) => setRecipe(e.target.value)}
+                        rows={10}
+                        className="font-mono"
+                      />
+                      <p className="text-xs text-muted-foreground">
+                        Explain how these verses connect to make a complete theological point on the theme.
+                      </p>
+                    </div>
+
+                    {feedback && (
+                      <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg space-y-2">
+                        <p className="font-semibold">✨ Jeeves's Feedback:</p>
+                        <div className="text-sm">{formatJeevesResponse(feedback.feedback || "")}</div>
+                        {feedback.rating && (
+                          <div className="flex items-center gap-1">
+                            {"⭐".repeat(feedback.rating)}
+                            <span className="text-xs ml-2">({feedback.rating}/5)</span>
+                          </div>
+                        )}
+                      </div>
+                    )}
+
+                    <div className="flex gap-2">
+                      <Button 
+                        onClick={handleCheck} 
+                        variant="outline"
+                        className="flex-1"
+                        disabled={!recipe.trim() || isChecking}
+                      >
+                        {isChecking ? (
+                          <>
+                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                            Checking...
+                          </>
+                        ) : (
+                          "Check My Recipe"
+                        )}
+                      </Button>
+                      <Button 
+                        onClick={handleShowModelAnswer} 
+                        variant="secondary"
+                        className="flex-1"
+                        disabled={isLoading}
+                      >
+                        <Eye className="mr-2 h-4 w-4" />
+                        {showModelAnswer ? "Hide" : "Show"} Model Answer
+                      </Button>
+                    </div>
+
+                    {showModelAnswer && modelAnswer && (
+                      <div className="bg-purple-50 dark:bg-purple-900/20 p-4 rounded-lg space-y-2">
+                        <p className="font-semibold">🤖 Jeeves's Model Answer:</p>
+                        <div className="text-sm">{formatJeevesResponse(modelAnswer)}</div>
+                      </div>
+                    )}
+
+                    <Button 
+                      onClick={handleSubmit} 
+                      className="w-full bg-orange-600 hover:bg-orange-700"
+                      disabled={!recipe.trim() || isLoading}
+                    >
+                      Submit Recipe to Growth Journal
+                    </Button>
+                  </>
+                ) : (
+                  <div className="bg-green-50 dark:bg-green-900/20 p-4 rounded-lg text-center space-y-4">
+                    <p className="text-green-800 dark:text-green-200">
+                      ✓ Recipe Complete! Added to your Growth Journal.
+                    </p>
+                    <Button 
+                      onClick={() => {
+                        setVerses([]);
+                        setRecipe("");
+                        setFeedback(null);
+                        setShowModelAnswer(false);
+                        setModelAnswer("");
+                        setHasSubmitted(false);
+                      }}
+                      variant="outline"
+                    >
+                      Start New Challenge
+                    </Button>
+                  </div>
+                )}
+              </>
+            )}
+          </CardContent>
+        </Card>
       </div>
     </div>
   );
