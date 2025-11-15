@@ -199,7 +199,7 @@ export default function PalaceCardGame() {
         parallelId,
         isFlipped: false,
         isSelected: false,
-        color: parallelPair.color
+        color: 'from-slate-700 to-slate-800'
       },
       {
         id: `card-2-${Date.now()}`,
@@ -209,7 +209,7 @@ export default function PalaceCardGame() {
         parallelId,
         isFlipped: false,
         isSelected: false,
-        color: parallelPair.color
+        color: 'from-slate-700 to-slate-800'
       },
       ...selectedDistractors.map((verse, idx) => ({
         id: `card-distractor-${idx}-${Date.now()}`,
