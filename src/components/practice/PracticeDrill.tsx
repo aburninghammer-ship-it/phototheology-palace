@@ -54,9 +54,10 @@ export const PracticeDrill = ({
     // Auto-advance after showing result
     setTimeout(() => {
       if (currentQuestionIndex < questions.length - 1) {
-        setCurrentQuestionIndex(currentQuestionIndex + 1);
-        setSelectedAnswer(null);
+        // Move to next question and reset state
         setShowResult(false);
+        setSelectedAnswer(null);
+        setCurrentQuestionIndex(currentQuestionIndex + 1);
       } else {
         completeDrill(newAnswers);
       }

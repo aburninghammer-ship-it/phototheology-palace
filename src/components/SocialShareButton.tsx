@@ -16,7 +16,7 @@ import {
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
-import { Share2, Copy, Check, Twitter, Facebook, Linkedin, Mail } from "lucide-react";
+import { Share2, Copy, Check, Twitter, Facebook, Linkedin, Mail, Instagram } from "lucide-react";
 import { toast } from "sonner";
 
 interface SocialShareButtonProps {
@@ -81,9 +81,44 @@ export const SocialShareButton: React.FC<SocialShareButtonProps> = ({
     toast.info("Link copied! Paste it into Facebook to share.");
   };
   
-  const shareToLinkedIn = () => {
-    const linkedInUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(shareUrl)}`;
-    window.open(linkedInUrl, '_blank', 'width=600,height=400');
+  const shareToLinkedIn = async () => {
+    // Try native share first
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title,
+          text: description,
+          url: shareUrl,
+        });
+        return;
+      } catch (err) {
+        // Fall through to copy if user cancels
+      }
+    }
+    
+    // Fallback: Copy link and notify user
+    await copyToClipboard();
+    toast.info("Link copied! Paste it into LinkedIn to share.");
+  };
+
+  const shareToInstagram = async () => {
+    // Instagram only works with native share on mobile
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title,
+          text: description,
+          url: shareUrl,
+        });
+        return;
+      } catch (err) {
+        // Fall through to copy if user cancels
+      }
+    }
+    
+    // Fallback: Copy link and notify user
+    await copyToClipboard();
+    toast.info("Link copied! Instagram only supports sharing on mobile - paste the link in your Instagram story or bio.");
   };
 
   const shareViaEmail = () => {
@@ -135,6 +170,10 @@ export const SocialShareButton: React.FC<SocialShareButtonProps> = ({
           <DropdownMenuItem onClick={shareToLinkedIn}>
             <Linkedin className="h-4 w-4 mr-2" />
             Share on LinkedIn
+          </DropdownMenuItem>
+          <DropdownMenuItem onClick={shareToInstagram}>
+            <Instagram className="h-4 w-4 mr-2" />
+            Share on Instagram
           </DropdownMenuItem>
           <DropdownMenuSeparator />
           <DropdownMenuItem onClick={shareViaEmail}>
@@ -197,6 +236,14 @@ export const SocialShareButton: React.FC<SocialShareButtonProps> = ({
                 title="Share on LinkedIn"
               >
                 <Linkedin className="h-4 w-4" />
+              </Button>
+              <Button
+                variant="outline"
+                onClick={shareToInstagram}
+                className="w-full"
+                title="Share on Instagram"
+              >
+                <Instagram className="h-4 w-4" />
               </Button>
               <Button
                 variant="outline"
