@@ -272,10 +272,10 @@ export const ChefRecipeChallenge = ({ challenge, onSubmit, hasSubmitted }: ChefR
                 </Badge>
               </div>
               <div className="bg-white dark:bg-gray-800 p-4 rounded border-2 border-orange-300 dark:border-orange-700">
-                {verses.map((verse, idx) => (
-                  <div key={idx} className="flex items-start gap-2 mb-2 last:mb-0">
-                    <span className="text-orange-600 font-bold">•</span>
-                    <span className="font-mono text-sm">{verse}</span>
+                {verses.map((verse: any, idx) => (
+                  <div key={idx} className="mb-4 last:mb-0">
+                    <p className="font-semibold text-orange-600 mb-1">{verse.reference}</p>
+                    <p className="text-sm italic pl-4 border-l-2 border-orange-300">"{verse.text}"</p>
                   </div>
                 ))}
               </div>
