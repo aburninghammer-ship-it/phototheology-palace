@@ -3,11 +3,11 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
-import { ChefHat, Loader2, Eye } from "lucide-react";
+import { ChefHat, Loader2, Eye, RefreshCw } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { formatJeevesResponse } from "@/lib/formatJeevesResponse";
-import { ShareChallengeButton } from "@/components/ShareChallengeButton";
+import { EnhancedSocialShare } from "@/components/EnhancedSocialShare";
 
 interface ChefRecipeChallengeProps {
   challenge: any;
@@ -285,24 +285,34 @@ export const ChefRecipeChallenge = ({ challenge, onSubmit, hasSubmitted }: ChefR
               </p>
             </div>
 
-            {!hasSubmitted && (
-              <Button 
-                onClick={generateVerses} 
-                variant="outline"
-                className="w-full"
-                disabled={isLoading}
-              >
-                {isLoading ? (
-                  <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Regenerating...
-                  </>
-                ) : (
-                  <>
-                    🔄 Regenerate Challenge Ingredients
-                  </>
-                )}
-              </Button>
+            {!hasSubmitted && verses.length > 0 && (
+              <div className="flex gap-2">
+                <Button 
+                  onClick={generateVerses} 
+                  variant="outline"
+                  className="flex-1"
+                  disabled={isLoading}
+                >
+                  {isLoading ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Regenerating...
+                    </>
+                  ) : (
+                    <>
+                      <RefreshCw className="mr-2 h-4 w-4" />
+                      Regenerate Ingredients
+                    </>
+                  )}
+                </Button>
+                <EnhancedSocialShare
+                  title={`Chef Challenge: ${challenge.title}`}
+                  content={`🍳 ${challenge.ui_config?.theme || challenge.description}\n\n🥘 Ingredients (${verses.length} verses):\n${verses.map((v: any, i: number) => `${i + 1}. ${v.reference}: "${v.text}"`).join('\n\n')}\n\nCan you create a theological recipe connecting all these verses?`}
+                  url={`${window.location.origin}/daily-challenges`}
+                  buttonText="Share Challenge"
+                  buttonVariant="default"
+                />
+              </div>
             )}
 
             {!hasSubmitted ? (
@@ -359,19 +369,6 @@ export const ChefRecipeChallenge = ({ challenge, onSubmit, hasSubmitted }: ChefR
                     <Eye className="mr-2 h-4 w-4" />
                     {showModelAnswer ? "Hide" : "Show"} Model Answer
                   </Button>
-                </div>
-
-                <div className="flex gap-2">
-                  <ShareChallengeButton
-                    challengeData={{
-                      type: "chef",
-                      title: challenge.title,
-                      content: `${challenge.ui_config?.theme || challenge.description}\n\n🥘 Ingredients (${verses.length} verses):\n${verses.map((v: any, i: number) => `${i + 1}. ${v.reference}: "${v.text}"`).join('\n\n')}\n\n🍳 Can you create a theological recipe connecting all these verses?`,
-                      difficulty
-                    }}
-                    size="default"
-                    variant="outline"
-                  />
                 </div>
 
                 {showModelAnswer && modelAnswer && (
