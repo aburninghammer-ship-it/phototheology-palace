@@ -138,6 +138,11 @@ const ChainChess = () => {
     }
 
     try {
+      console.log("=== STARTING NEW GAME ===");
+      console.log("isVsJeeves:", isVsJeeves);
+      console.log("mode:", mode);
+      console.log("whoStarts:", whoStarts);
+      
       // Jeeves chooses the verse if he starts, otherwise use a random one for player to respond to
       const randomVerse = whoStarts === "jeeves" ? getRandomVerse() : getRandomVerse();
       
@@ -154,7 +159,8 @@ const ChainChess = () => {
             categories: selectedGameCategories,
             verse: randomVerse,
             difficulty: difficultyLevel,
-            whoStarts: whoStarts
+            whoStarts: whoStarts,
+            isVsJeeves: isVsJeeves // Store in game state!
           },
         })
         .select()
@@ -168,7 +174,9 @@ const ChainChess = () => {
       setGameStarted(true);
       
       // Navigate immediately to the game page
-      navigate(`/games/chain-chess/${newGame.id}${isVsJeeves ? "/jeeves" : ""}`, { replace: true });
+      const newUrl = `/games/chain-chess/${newGame.id}${isVsJeeves ? "/jeeves" : ""}`;
+      console.log("Navigating to:", newUrl);
+      navigate(newUrl, { replace: true });
       
       if (whoStarts === "jeeves") {
         // Jeeves makes first move - show processing state
@@ -246,6 +254,11 @@ const ChainChess = () => {
   };
 
   const loadGame = async () => {
+    console.log("=== LOAD GAME ===");
+    console.log("gameId:", gameId);
+    console.log("mode from URL:", mode);
+    console.log("isVsJeeves:", isVsJeeves);
+    
     const { data } = await supabase
       .from("games")
       .select("*")
@@ -253,6 +266,9 @@ const ChainChess = () => {
       .single();
 
     if (data) {
+      console.log("Game data loaded:", data);
+      console.log("Game state:", data.game_state);
+      
       setGame(data);
       const gameState = data.game_state as any;
       const verse = gameState?.verse || "John 3:16";
@@ -261,7 +277,14 @@ const ChainChess = () => {
       setIsMyTurn(data.current_turn === user!.id);
       setSelectedGameCategories(gameState?.categories || categories);
       setGameStarted(true);
+      
+      console.log("isMyTurn set to:", data.current_turn === user!.id);
+      console.log("current_turn:", data.current_turn);
+      console.log("user id:", user!.id);
+      
       loadMoves();
+    } else {
+      console.log("No game data found");
     }
   };
 
@@ -573,15 +596,41 @@ const ChainChess = () => {
       await new Promise(resolve => setTimeout(resolve, 500));
       await loadMoves();
 
+      // Determine if this is a Jeeves game from URL mode OR game state
+      const gameState = game?.game_state as any;
+      const isJeevesGame = isVsJeeves || gameState?.isVsJeeves || mode === "jeeves";
+      
+      console.log("=== Checking if Jeeves should respond ===");
+      console.log("isVsJeeves:", isVsJeeves);
+      console.log("mode:", mode);
+      console.log("gameState.isVsJeeves:", gameState?.isVsJeeves);
+      console.log("Final isJeevesGame:", isJeevesGame);
+      
       // Jeeves responds after loading user's move
-      if (isVsJeeves) {
+      if (isJeevesGame) {
         console.log("=== Triggering Jeeves Response ===");
         console.log("Game ID:", gameId);
         console.log("User's challenge:", userChallengeToJeeves);
+        console.log("isVsJeeves:", isVsJeeves);
+        console.log("mode:", mode);
+        
         setTimeout(async () => {
-          console.log("=== Jeeves Move Triggered ===");
-          await jeevesMove(gameId!, false, userChallengeToJeeves);
+          try {
+            console.log("=== Jeeves Move Triggered ===");
+            await jeevesMove(gameId!, false, userChallengeToJeeves);
+          } catch (error) {
+            console.error("Error in Jeeves move setTimeout:", error);
+            toast({
+              title: "Error",
+              description: "Jeeves encountered an error responding. Please refresh the page.",
+              variant: "destructive",
+            });
+            setIsMyTurn(true);
+            setProcessing(false);
+          }
         }, 1500);
+      } else {
+        console.log("NOT triggering Jeeves - isVsJeeves:", isVsJeeves, "mode:", mode, "gameState.isVsJeeves:", gameState?.isVsJeeves);
       }
     } catch (error: any) {
       toast({
