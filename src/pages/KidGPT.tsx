@@ -5,20 +5,38 @@ import { useEffect, useState } from "react";
 
 const KidGPT = () => {
   const [scriptLoaded, setScriptLoaded] = useState(false);
+  const [loadError, setLoadError] = useState(false);
 
   useEffect(() => {
     const script = document.createElement('script');
     script.src = 'https://studio.pickaxe.co/api/embed/bundle.js';
     script.defer = true;
-    script.onload = () => setScriptLoaded(true);
+    script.onload = () => {
+      setScriptLoaded(true);
+      console.log('Kid GPT script loaded successfully');
+    };
+    script.onerror = () => {
+      setLoadError(true);
+      console.error('Failed to load Kid GPT script');
+    };
+    
+    // Timeout after 10 seconds
+    const timeout = setTimeout(() => {
+      if (!scriptLoaded) {
+        setLoadError(true);
+        console.error('Kid GPT script load timeout');
+      }
+    }, 10000);
+
     document.body.appendChild(script);
 
     return () => {
+      clearTimeout(timeout);
       if (document.body.contains(script)) {
         document.body.removeChild(script);
       }
     };
-  }, []);
+  }, [scriptLoaded]);
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-50 to-purple-50 dark:from-gray-900 dark:to-purple-900">
@@ -45,11 +63,23 @@ const KidGPT = () => {
               </CardDescription>
             </CardHeader>
             <CardContent className="p-2 md:p-6">
-              {!scriptLoaded && (
-                <div className="flex items-center justify-center" style={{ minHeight: '600px' }}>
+              {loadError ? (
+                <div className="flex flex-col items-center justify-center gap-4" style={{ minHeight: '600px' }}>
+                  <p className="text-destructive font-semibold">Failed to load Kid GPT</p>
+                  <p className="text-muted-foreground text-sm">Please refresh the page to try again</p>
+                  <button 
+                    onClick={() => window.location.reload()} 
+                    className="px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90"
+                  >
+                    Refresh Page
+                  </button>
+                </div>
+              ) : !scriptLoaded ? (
+                <div className="flex flex-col items-center justify-center gap-4" style={{ minHeight: '600px' }}>
+                  <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
                   <p className="text-muted-foreground">Loading Kid GPT...</p>
                 </div>
-              )}
+              ) : null}
               <div 
                 id="deployment-ac7e1d1e-1b82-4f73-812e-5d1d59b50f34"
                 style={{ minHeight: '500px', width: '100%' }}
