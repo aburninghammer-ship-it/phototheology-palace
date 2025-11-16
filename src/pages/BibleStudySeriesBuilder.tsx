@@ -20,6 +20,8 @@ const BibleStudySeriesBuilder = () => {
   useEffect(() => {
     if (user) {
       loadUserSeries();
+    } else {
+      setLoading(false);
     }
   }, [user]);
 
