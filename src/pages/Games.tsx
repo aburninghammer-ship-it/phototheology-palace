@@ -247,6 +247,30 @@ const Games = () => {
       difficulties: ["medium", "hard", "expert"],
       route: "/games/chain-chess/new"
     },
+    {
+      id: "escape_room",
+      name: "🚪 Escape Room",
+      description: "Solve biblical puzzles and connect verses to escape! Use Palace principles to unlock the door.",
+      icon: "🚪",
+      floor: 4,
+      timed: true,
+      rooms: ["All"],
+      modes: ["solo", "2p"],
+      difficulties: ["medium", "hard", "expert"],
+      route: "/escape-room"
+    },
+    {
+      id: "treasure_hunt",
+      name: "🗺️ Treasure Hunt",
+      description: "Follow biblical clues across Scripture to find hidden treasures! Each clue leads to the next.",
+      icon: "🗺️",
+      floor: 3,
+      timed: false,
+      rooms: ["SR", "QR", "QA"],
+      modes: ["solo"],
+      difficulties: ["easy", "medium", "hard"],
+      route: "/treasure-hunt"
+    },
   ];
 
   const filteredGames = allGames.filter(game => {
