@@ -213,19 +213,16 @@ export const Navigation = () => {
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="start" className="w-56 bg-card border-border z-50">
                       <DropdownMenuItem asChild>
-                        <Link to="/phototheology-gpt">Phototheology GPT</Link>
+                        <Link to="/phototheologygpt">Phototheology GPT</Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem asChild>
+                        <Link to="/kidgpt">Kid GPT</Link>
                       </DropdownMenuItem>
                       <DropdownMenuItem asChild>
                         <Link to="/daniel-revelation-gpt">Daniel & Revelation GPT</Link>
                       </DropdownMenuItem>
                       <DropdownMenuItem asChild>
                         <Link to="/apologetics-gpt">Apologetics GPT</Link>
-                      </DropdownMenuItem>
-                      <DropdownMenuItem asChild>
-                        <Link to="/culture-controversy">Culture & Controversy GPT</Link>
-                      </DropdownMenuItem>
-                      <DropdownMenuItem asChild>
-                        <Link to="/kid-gpt">KidGPT</Link>
                       </DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>
