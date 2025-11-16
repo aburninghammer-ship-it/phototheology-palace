@@ -18,13 +18,19 @@ const Leaderboard = () => {
   const [sortBy, setSortBy] = useState<'points' | 'challenges' | 'studies' | 'rooms'>('points');
   const [timePeriod, setTimePeriod] = useState<'all' | 'monthly' | 'weekly'>('all');
   const [leaderAchievements, setLeaderAchievements] = useState<Record<string, any[]>>({});
+  const [viewMode, setViewMode] = useState<'general' | 'categories'>('general');
+  const [categoryLeaders, setCategoryLeaders] = useState<Record<string, any[]>>({});
 
   useEffect(() => {
     if (user) {
-      fetchLeaders();
+      if (viewMode === 'general') {
+        fetchLeaders();
+      } else {
+        fetchCategoryLeaders();
+      }
       fetchUserStats();
     }
-  }, [user, sortBy, timePeriod]);
+  }, [user, sortBy, timePeriod, viewMode]);
 
   const fetchUserStats = async () => {
     // Get user profile data
@@ -186,6 +192,52 @@ const Leaderboard = () => {
     setLeaderAchievements(achievementsMap);
   };
 
+  const fetchCategoryLeaders = async () => {
+    const categories = ['explorer', 'scholar', 'perfectionist', 'dedicated', 'master'];
+    const categoryData: Record<string, any[]> = {};
+
+    for (const category of categories) {
+      const { data: achievements } = await supabase
+        .from('achievements')
+        .select('id')
+        .eq('category', category);
+
+      if (achievements && achievements.length > 0) {
+        const achievementIds = achievements.map(a => a.id);
+
+        const { data: userAchievements } = await supabase
+          .from('user_achievements')
+          .select(`
+            user_id,
+            profiles!inner(id, username, display_name, points, level, daily_study_streak)
+          `)
+          .in('achievement_id', achievementIds);
+
+        if (userAchievements) {
+          const userCounts = userAchievements.reduce((acc: any, ua: any) => {
+            const userId = ua.user_id;
+            if (!acc[userId]) {
+              acc[userId] = {
+                ...ua.profiles,
+                count: 0
+              };
+            }
+            acc[userId].count += 1;
+            return acc;
+          }, {});
+
+          const topUsers = Object.values(userCounts)
+            .sort((a: any, b: any) => b.count - a.count)
+            .slice(0, 10);
+
+          categoryData[category] = topUsers;
+        }
+      }
+    }
+
+    setCategoryLeaders(categoryData);
+  };
+
   if (!user) return null;
 
   const getRankIcon = (index: number) => {
@@ -277,8 +329,20 @@ const Leaderboard = () => {
 
       <main className="container mx-auto px-4 py-8 max-w-6xl">
         <div className="space-y-6">
-          {/* Time Period and Metric Filters */}
-          <div className="grid md:grid-cols-2 gap-6">
+          {/* View Mode Toggle */}
+          <div className="flex justify-center mb-6">
+            <Tabs value={viewMode} onValueChange={(v) => setViewMode(v as any)} className="w-full max-w-md">
+              <TabsList className="grid w-full grid-cols-2">
+                <TabsTrigger value="general">General Rankings</TabsTrigger>
+                <TabsTrigger value="categories">Category Leaders</TabsTrigger>
+              </TabsList>
+            </Tabs>
+          </div>
+
+          {viewMode === 'general' && (
+            <>
+              {/* Time Period and Metric Filters */}
+              <div className="grid md:grid-cols-2 gap-6">
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
@@ -470,6 +534,89 @@ const Leaderboard = () => {
               </div>
             </CardContent>
           </Card>
+            </>
+          )}
+
+          {viewMode === 'categories' && (
+            <div className="space-y-8">
+              {Object.entries(categoryLeaders).map(([category, users]) => {
+                const categoryConfig = {
+                  explorer: { icon: Target, color: 'from-blue-500 to-cyan-500', title: 'Top Explorers' },
+                  scholar: { icon: Award, color: 'from-purple-500 to-indigo-500', title: 'Top Scholars' },
+                  perfectionist: { icon: Star, color: 'from-green-500 to-emerald-500', title: 'Top Perfectionists' },
+                  dedicated: { icon: Flame, color: 'from-orange-500 to-red-500', title: 'Most Dedicated' },
+                  master: { icon: Crown, color: 'from-yellow-500 to-amber-500', title: 'Masters' }
+                }[category];
+
+                if (!categoryConfig) return null;
+                const Icon = categoryConfig.icon;
+
+                return (
+                  <Card key={category}>
+                    <CardHeader>
+                      <div className="flex items-center gap-3">
+                        <div className={`p-3 rounded-lg bg-gradient-to-br ${categoryConfig.color}`}>
+                          <Icon className="h-6 w-6 text-white" />
+                        </div>
+                        <div>
+                          <CardTitle>{categoryConfig.title}</CardTitle>
+                          <CardDescription>Top achievers in {category}</CardDescription>
+                        </div>
+                      </div>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="space-y-2">
+                        {users.length === 0 ? (
+                          <p className="text-sm text-muted-foreground text-center py-8">
+                            No users in this category yet
+                          </p>
+                        ) : (
+                          users.map((leader: any, idx: number) => (
+                            <div
+                              key={leader.id}
+                              className={`flex items-center justify-between p-4 rounded-lg transition-colors ${
+                                leader.id === user?.id ? 'bg-primary/10 border-2 border-primary' : 'bg-muted/30 hover:bg-muted/50'
+                              }`}
+                            >
+                              <div className="flex items-center gap-4">
+                                <div className="flex items-center gap-3">
+                                  {idx < 3 ? (
+                                    <div className="flex items-center justify-center w-8 h-8">
+                                      {idx === 0 && <Trophy className="h-6 w-6 text-yellow-500" />}
+                                      {idx === 1 && <Medal className="h-6 w-6 text-gray-400" />}
+                                      {idx === 2 && <Medal className="h-6 w-6 text-amber-600" />}
+                                    </div>
+                                  ) : (
+                                    <span className="w-8 text-center font-semibold text-muted-foreground">
+                                      #{idx + 1}
+                                    </span>
+                                  )}
+                                </div>
+                                <div>
+                                  <p className="font-semibold">{leader.display_name || leader.username}</p>
+                                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                                    <Badge variant="secondary">Level {leader.level || 1}</Badge>
+                                    <span className="flex items-center gap-1">
+                                      <Flame className="h-3 w-3" />
+                                      {leader.daily_study_streak || 0} day streak
+                                    </span>
+                                  </div>
+                                </div>
+                              </div>
+                              <div className="text-right">
+                                <p className="text-lg font-bold">{leader.count}</p>
+                                <p className="text-xs text-muted-foreground">achievements</p>
+                              </div>
+                            </div>
+                          ))
+                        )}
+                      </div>
+                    </CardContent>
+                  </Card>
+                );
+              })}
+            </div>
+          )}
         </div>
       </main>
     </div>
