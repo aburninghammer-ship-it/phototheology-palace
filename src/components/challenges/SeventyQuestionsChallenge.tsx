@@ -46,7 +46,10 @@ export const SeventyQuestionsChallenge = ({ challenge, onSubmit, hasSubmitted }:
       <CardContent className="space-y-4">
         <div className="bg-muted p-4 rounded-lg">
           <p className="font-semibold mb-2">Today's Passage:</p>
-          <p className="text-lg italic">{challenge.passage_reference}</p>
+          {challenge.passage_reference && (
+            <p className="text-sm text-muted-foreground mb-1">{challenge.passage_reference}</p>
+          )}
+          <p className="text-lg italic">{challenge.verses?.[0] || challenge.ui_config?.verse_text || "Verse text not available"}</p>
         </div>
 
         <div className="bg-blue-50 dark:bg-blue-900/20 p-3 rounded-lg text-sm space-y-2">

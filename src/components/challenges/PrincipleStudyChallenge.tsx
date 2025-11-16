@@ -41,7 +41,10 @@ export const PrincipleStudyChallenge = ({ challenge, onSubmit, hasSubmitted }: P
       <CardContent className="space-y-4">
         <div className="bg-muted p-4 rounded-lg">
           <p className="font-semibold mb-2">Today's Passage:</p>
-          <p className="text-lg italic mb-3">{challenge.passage_reference}</p>
+          {challenge.passage_reference && (
+            <p className="text-sm text-muted-foreground mb-1">{challenge.passage_reference}</p>
+          )}
+          <p className="text-lg italic mb-3">{challenge.verses?.[0] || challenge.ui_config?.verse_text || "Verse text not available"}</p>
           <p className="text-sm">{challenge.description}</p>
         </div>
 

@@ -41,7 +41,8 @@ export const EquationDecodeChallenge = ({ challenge, onSubmit, hasSubmitted }: E
       <CardContent className="space-y-4">
         <div className="bg-muted p-4 rounded-lg">
           <p className="font-semibold mb-2">Verse:</p>
-          <p className="text-lg italic mb-4">{challenge.passage_reference}</p>
+          <p className="text-sm text-muted-foreground mb-1">{challenge.passage_reference}</p>
+          <p className="text-lg italic mb-4">{challenge.verses?.[0] || challenge.ui_config?.verse_text || "Verse text not available"}</p>
           <p className="font-semibold mb-2">Equation:</p>
           <code className="text-lg font-mono bg-background px-3 py-2 rounded block">
             {challenge.ui_config?.equation}

@@ -53,7 +53,10 @@ export const SanctuaryMapChallenge = ({ challenge, onSubmit, hasSubmitted }: San
       <CardContent className="space-y-4">
         <div className="bg-muted p-4 rounded-lg">
           <p className="font-semibold mb-2">Today's Verse:</p>
-          <p className="text-lg italic">{challenge.verses?.[0]}</p>
+          {challenge.passage_reference && (
+            <p className="text-sm text-muted-foreground mb-1">{challenge.passage_reference}</p>
+          )}
+          <p className="text-lg italic">{challenge.verses?.[0] || challenge.ui_config?.verse_text || "Verse text not available"}</p>
         </div>
 
         <div className="space-y-2">
