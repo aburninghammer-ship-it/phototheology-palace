@@ -54,6 +54,8 @@ export default function BranchStudy() {
       });
 
       if (error) throw error;
+      
+      console.log("BranchStudy start response:", data);
 
       setStudyState({
         anchorText: verseReference.trim(),
@@ -62,7 +64,7 @@ export default function BranchStudy() {
         messages: [
           {
             role: "assistant",
-            content: data.response,
+            content: data.content || data.response, // Support both field names
           },
         ],
       });
@@ -108,6 +110,8 @@ export default function BranchStudy() {
       });
 
       if (error) throw error;
+      
+      console.log("BranchStudy continue response:", data);
 
       // Track new verses and rooms from the response
       const newUsedVerses = [...studyState.usedVerses];
@@ -124,7 +128,7 @@ export default function BranchStudy() {
           ...prev.messages,
           {
             role: "assistant",
-            content: data.response,
+            content: data.content || data.response, // Support both field names
           },
         ],
       }));

@@ -2083,6 +2083,10 @@ Make the titles diverse, covering different themes and biblical books. Be creati
       // BranchStudy mode - interactive branching Bible study
       const { action, verseReference, anchorText, usedVerses, usedRooms, userResponse, conversationHistory } = requestBody;
       
+      console.log("=== BRANCH STUDY REQUEST ===");
+      console.log("Action:", action);
+      console.log("Verse/Story:", verseReference || anchorText);
+      
       if (action === "start") {
         // Starting a new branch study
         systemPrompt = `You are Jeeves running BranchStudy, a branching Bible study mode. Stay in Bible exposition, theology, and application—no fictional role-play.
@@ -2113,6 +2117,10 @@ Keep a warm, pastoral tone. Be clear about sin, judgment, and grace.`;
 Note: This may be a specific verse reference or a story/parable name. If it's a story, identify where it's found in Scripture and provide context.
         
 Provide exposition and reflection questions. Do NOT offer A/B/C options yet.`;
+        
+        console.log("Starting new BranchStudy with:", verseReference);
+        console.log("System prompt length:", systemPrompt.length);
+        console.log("User prompt:", userPrompt);
         
       } else if (action === "continue") {
         // Continuing an existing study
@@ -2584,6 +2592,13 @@ ${roomContent}
         // Remove the PRINCIPLES_USED line from content
         responseData.content = content.replace(/\n?PRINCIPLES_USED: .+$/m, '').trim();
       }
+    }
+    
+    // Log response for branch_study mode
+    if (mode === "branch_study") {
+      console.log("=== BRANCH STUDY RESPONSE ===");
+      console.log("Response length:", content.length);
+      console.log("First 200 chars:", content.substring(0, 200));
     }
 
     return new Response(
