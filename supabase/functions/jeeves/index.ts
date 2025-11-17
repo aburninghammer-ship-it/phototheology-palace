@@ -2182,6 +2182,7 @@ Available Palace rooms (avoid repeating): Story Room (SR), Imagination Room (IR)
       } else if (action === "continue") {
         // Continuing an existing study (user is responding with their own thoughts, not selecting an option)
         const isSummaryRequest = /\b(summarize|end|turn this into a study)\b/i.test(userResponse);
+        const isJeevesLed = studyMode === "jeeves-led";
         
         if (isSummaryRequest) {
           systemPrompt = `You are Jeeves running BranchStudy. The anchor text is: ${anchorText}
@@ -2206,11 +2207,30 @@ Format this as a complete Bible study that could be used with others.`;
 Already used verses: ${(usedVerses || []).join(', ')}
 Already used Palace rooms: ${(usedRooms || []).join(', ')}
 
+${isJeevesLed ? `
+JEEVES-LED MODE: You are driving this study and teaching. The user has shared their thoughts.
+
+Your task:
+1. Acknowledge their response warmly (2-3 sentences), showing you heard them
+2. Build on their reflection with your own teaching:
+   - If they mentioned insights, affirm and expand them theologically
+   - If they asked questions, answer them with biblical depth
+   - Connect their thoughts back to the anchor text and Christ
+3. Then provide brief commentary (2-3 paragraphs) that deepens the study
+4. After your teaching, offer 3 new labeled options (A, B, C):
+   - EITHER three cross-reference verses (with 1-2 line explanation each)
+   - OR three Palace rooms/principles (with 1-2 line explanation of what you'll explore)
+
+This is YOUR teaching moment. Be warm, pastoral, and theologically rich.
+` : `
+TRADITIONAL MODE: The user is exploring with you.
+
 The user has responded to your questions. Now:
 1. Acknowledge their response briefly (1-2 sentences)
 2. Offer exactly 3 labeled options (A, B, C):
    - EITHER three cross-reference verses (with 1-2 line explanation each of how it deepens the anchor text)
    - OR three Phototheology Palace rooms/principles with 1-2 line explanation of what you will explore
+`}
 
 Available Palace rooms to choose from (avoid already used ones): Story Room (SR), Imagination Room (IR), Observation Room (OR), Def-Com Room (DC), Symbols/Types (@T), Questions Room (?), Concentration Room (CR), Dimensions Room (DR), Connect 6 (C6), Patterns (PRm), Parallels (P‖), Fruit Room (FRt), Blue/Sanctuary (BL), Prophecy (PR), Three Angels (3A), Fire Room (FRm), Meditation (MR)
 
@@ -2651,11 +2671,41 @@ ${roomContent}
       }
     }
     
-    // Log response for branch_study mode
+    // Track used verses and rooms for branch_study mode
     if (mode === "branch_study") {
       console.log("=== BRANCH STUDY RESPONSE ===");
       console.log("Response length:", content.length);
       console.log("First 200 chars:", content.substring(0, 200));
+      
+      const { usedVerses = [], usedRooms = [] } = requestBody;
+      const newUsedVerses = [...usedVerses];
+      const newUsedRooms = [...usedRooms];
+      
+      // Extract verse references from the response (simplified pattern)
+      const versePattern = /\b([1-3]?\s*[A-Za-z]+)\s+(\d+):(\d+(?:-\d+)?)\b/g;
+      const verseMatches = content.match(versePattern);
+      if (verseMatches) {
+        verseMatches.forEach((verse: string) => {
+          const normalized = verse.trim();
+          if (!newUsedVerses.includes(normalized)) {
+            newUsedVerses.push(normalized);
+          }
+        });
+      }
+      
+      // Extract room codes from the response
+      const roomCodes = ['SR', 'IR', 'OR', 'DC', '@T', '?', 'CR', 'DR', 'C6', 'PRm', 'P‖', 'FRt', 'BL', 'PR', '3A', 'FRm', 'MR'];
+      roomCodes.forEach((code: string) => {
+        if (content.includes(code) && !newUsedRooms.includes(code)) {
+          newUsedRooms.push(code);
+        }
+      });
+      
+      responseData.usedVerses = newUsedVerses;
+      responseData.usedRooms = newUsedRooms;
+      
+      console.log("Updated usedVerses:", newUsedVerses);
+      console.log("Updated usedRooms:", newUsedRooms);
     }
 
     return new Response(
