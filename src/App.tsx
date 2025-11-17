@@ -104,6 +104,7 @@ const EquationBuilder = lazy(() => import("./pages/games/EquationBuilder"));
 const WitnessTrial = lazy(() => import("./pages/games/WitnessTrial"));
 const PrincipleSprint = lazy(() => import("./pages/games/PrincipleSprint"));
 const ConnectionDash = lazy(() => import("./pages/games/ConnectionDash"));
+const BranchStudy = lazy(() => import("./pages/BranchStudy"));
 const FrameSnapshot = lazy(() => import("./pages/games/FrameSnapshot"));
 const StoryRoomGame = lazy(() => import("./pages/games/StoryRoomGame"));
 const ObservationGame = lazy(() => import("./pages/games/ObservationGame"));
@@ -289,6 +290,7 @@ function App() {
             <Route path="/church-signup/cancelled" element={<ChurchSignupCancelled />} />
             <Route path="/privacy-policy" element={<PrivacyPolicy />} />
             <Route path="/terms-of-service" element={<TermsOfService />} />
+            <Route path="/branch-study" element={<BranchStudy />} />
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                 <Route path="*" element={<NotFound />} />
                     </Routes>

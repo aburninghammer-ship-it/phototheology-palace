@@ -212,6 +212,18 @@ const Games = () => {
       route: "/games/time-zone-invasion"
     },
     {
+      id: "branch_study",
+      name: "📖 BRANCHSTUDY",
+      description: "Interactive branching Bible study with cross-references and Palace principles",
+      icon: "📖",
+      floor: 0,
+      timed: false,
+      rooms: ["All"],
+      modes: ["solo"],
+      difficulties: ["medium"],
+      route: "/branch-study"
+    },
+    {
       id: "christ_lock",
       name: "✝️ CHRIST LOCK",
       description: "Draw a Christ-focus card, get a random verse, explain how it reveals Jesus!",

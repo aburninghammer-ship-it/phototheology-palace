@@ -2079,6 +2079,86 @@ Return ONLY a JSON object with this exact structure:
 
 Make the titles diverse, covering different themes and biblical books. Be creative and engaging.`;
 
+    } else if (mode === "branch_study") {
+      // BranchStudy mode - interactive branching Bible study
+      const { action, verseReference, anchorText, usedVerses, usedRooms, userResponse, conversationHistory } = requestBody;
+      
+      if (action === "start") {
+        // Starting a new branch study
+        systemPrompt = `You are Jeeves running BranchStudy, a branching Bible study mode. Stay in Bible exposition, theology, and application—no fictional role-play.
+
+The user has provided an anchor text: ${verseReference}
+
+Your task:
+1. Quote the verse text (if you know it, otherwise acknowledge the reference)
+2. Give concise exposition (context, key phrases, main theology) in 2-3 paragraphs
+3. Ask 1-3 reflection/application questions
+4. Wait for the user's response (indicate this clearly)
+
+Keep a warm, pastoral tone. Be clear about sin, judgment, and grace. Focus on Christ-centered interpretation.`;
+
+        userPrompt = `Begin a BranchStudy session with the anchor text: ${verseReference}`;
+        
+      } else if (action === "continue") {
+        // Continuing an existing study
+        const isSummaryRequest = /\b(summarize|end|turn this into a study)\b/i.test(userResponse);
+        
+        if (isSummaryRequest) {
+          systemPrompt = `You are Jeeves running BranchStudy. The anchor text is: ${anchorText}
+
+Already used verses: ${(usedVerses || []).join(', ')}
+Already used Palace rooms: ${(usedRooms || []).join(', ')}
+
+The user has requested a summary. Provide:
+1. Summary of the path (anchor + branches chosen)
+2. Short, Christ-centered synthesis of the main doctrine
+3. A teaching outline with:
+   - Title
+   - Key texts
+   - 3-5 main points
+   - 3-5 discussion questions
+   - 1-2 life applications
+
+Format this as a complete Bible study that could be used with others.`;
+        } else {
+          systemPrompt = `You are Jeeves running BranchStudy. The anchor text is: ${anchorText}
+
+Already used verses: ${(usedVerses || []).join(', ')}
+Already used Palace rooms: ${(usedRooms || []).join(', ')}
+
+The user has responded to your questions. Now:
+1. Acknowledge their response briefly (1-2 sentences)
+2. Offer exactly 3 labeled options (A, B, C):
+   - EITHER three cross-reference verses (with 1-2 line explanation each of how it deepens the anchor text)
+   - OR three Phototheology Palace rooms/principles with 1-2 line explanation of what you will explore
+
+Available Palace rooms to choose from (avoid already used ones): Story Room (SR), Imagination Room (IR), Observation Room (OR), Def-Com Room (DC), Symbols/Types (@T), Questions Room (?), Concentration Room (CR), Dimensions Room (DR), Connect 6 (C6), Theme Room (TRm), Time Zone (TZ), Patterns (PRm), Parallels (P‖), Fruit Room (FRt), Blue/Sanctuary (BL), Prophecy (PR), Three Angels (3A), Cycles (@Ad, @No, @Ab, @Mo, @Cy, @CyC, @Sp, @Re), Fire Room (FRm), Meditation (MR)
+
+When presenting options, clearly label them A, B, and C. Be clear about which type you're offering (verses OR rooms, not both in the same set of 3).
+
+Keep responses focused and pastoral. Avoid repetition of already-used verses and rooms.`;
+        }
+        
+        // Build messages from conversation history
+        const messages = [];
+        if (conversationHistory && Array.isArray(conversationHistory)) {
+          conversationHistory.forEach((msg: any) => {
+            messages.push({
+              role: msg.role,
+              content: msg.content
+            });
+          });
+        }
+        
+        // Add current user response
+        messages.push({
+          role: "user",
+          content: userResponse
+        });
+        
+        userPrompt = messages.map((m: any) => m.content).join('\n\n');
+      }
+
     } else if (mode === "room-insight-chat") {
       // Room Insight Chat mode - for asking questions about specific room analysis
       const { roomCode, roomName, roomContent, conversationHistory } = requestBody;
