@@ -10,6 +10,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useErrorHandler } from "@/hooks/useErrorHandler";
 import { formatJeevesResponse } from "@/lib/formatJeevesResponse";
+import { FunctionsHttpError, FunctionsRelayError, FunctionsFetchError } from '@supabase/supabase-js';
 
 interface Message {
   role: "user" | "assistant";
@@ -59,10 +60,29 @@ export default function BranchStudy() {
 
       console.log("📦 Raw response from jeeves:", { data, error });
 
+      // Handle Supabase-specific error types
       if (error) {
-        console.error("❌ Jeeves error object:", error);
-        throw new Error(error.message || "Failed to start study");
+        console.error("❌ Error type:", error.constructor.name);
+        
+        if (error instanceof FunctionsHttpError) {
+          const errorMessage = await error.context.json();
+          console.error("❌ HTTP Error:", errorMessage);
+          throw new Error(`HTTP Error: ${JSON.stringify(errorMessage)}`);
+        } else if (error instanceof FunctionsRelayError) {
+          console.error("❌ Relay Error:", error.message);
+          throw new Error(`Relay Error: ${error.message}`);
+        } else if (error instanceof FunctionsFetchError) {
+          console.error("❌ Fetch Error:", error.message);
+          throw new Error(`Fetch Error: ${error.message}`);
+        } else {
+          console.error("❌ Unknown error:", error);
+          throw error;
+        }
       }
+
+      console.log("📊 Data type:", typeof data);
+      console.log("📊 Data keys:", data ? Object.keys(data) : 'null');
+      console.log("📊 Full data:", JSON.stringify(data, null, 2));
 
       if (!data) {
         console.error("❌ No data received from jeeves");
@@ -75,10 +95,12 @@ export default function BranchStudy() {
       }
 
       const content = data.content || data.response;
-      console.log("✅ Content received:", content?.substring(0, 200) + "...");
+      console.log("✅ Content type:", typeof content);
+      console.log("✅ Content length:", content?.length);
+      console.log("✅ Content preview:", content?.substring(0, 200));
 
       if (!content) {
-        console.error("❌ No content in response:", data);
+        console.error("❌ No content in response. Full data object:", data);
         throw new Error("Jeeves did not provide a response");
       }
 
@@ -96,6 +118,7 @@ export default function BranchStudy() {
 
       console.log("✅ Study state updated successfully");
     } catch (error: any) {
+      console.error("🔥 Caught error:", error);
       handleError(error, {
         title: "Failed to Start Study",
         showToast: true,
