@@ -153,6 +153,11 @@ export const MobileNav = () => {
                   🤖 Phototheology GPT
                 </Button>
               </Link>
+              <Link to="/branch-study">
+                <Button variant="ghost" className="w-full justify-start" size="sm">
+                  🌳 BranchStudy
+                </Button>
+              </Link>
               <Link to="/apologetics-gpt">
                 <Button variant="ghost" className="w-full justify-start" size="sm">
                   🛡️ Apologetics GPT
