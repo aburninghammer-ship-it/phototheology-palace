@@ -102,6 +102,8 @@ const ControversyRaid = lazy(() => import("./pages/games/ControversyRaid"));
 const EscapeTheDragon = lazy(() => import("./pages/games/EscapeTheDragon"));
 const EquationBuilder = lazy(() => import("./pages/games/EquationBuilder"));
 const WitnessTrial = lazy(() => import("./pages/games/WitnessTrial"));
+const PrincipleSprint = lazy(() => import("./pages/games/PrincipleSprint"));
+const ConnectionDash = lazy(() => import("./pages/games/ConnectionDash"));
 const FrameSnapshot = lazy(() => import("./pages/games/FrameSnapshot"));
 const StoryRoomGame = lazy(() => import("./pages/games/StoryRoomGame"));
 const ObservationGame = lazy(() => import("./pages/games/ObservationGame"));
@@ -205,6 +207,8 @@ function App() {
             <Route path="/games/escape-dragon" element={<ProtectedRoute><EscapeTheDragon /></ProtectedRoute>} />
             <Route path="/games/equation-builder" element={<ProtectedRoute><EquationBuilder /></ProtectedRoute>} />
             <Route path="/games/witness-trial" element={<ProtectedRoute><WitnessTrial /></ProtectedRoute>} />
+            <Route path="/games/principle-sprint" element={<ProtectedRoute><PrincipleSprint /></ProtectedRoute>} />
+            <Route path="/games/connection-dash" element={<ProtectedRoute><ConnectionDash /></ProtectedRoute>} />
             <Route path="/games/frame-snapshot" element={<ProtectedRoute><FrameSnapshot /></ProtectedRoute>} />
             <Route path="/games/story-room" element={<ProtectedRoute><StoryRoomGame /></ProtectedRoute>} />
             <Route path="/games/observation-room" element={<ProtectedRoute><ObservationGame /></ProtectedRoute>} />

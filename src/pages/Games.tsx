@@ -271,6 +271,30 @@ const Games = () => {
       difficulties: ["easy", "medium", "hard"],
       route: "/treasure-hunt"
     },
+    {
+      id: "principle_sprint",
+      name: "⚡ Principle Sprint",
+      description: "Speed-based game to identify PT principles quickly! Select all correct principles for each verse before time runs out.",
+      icon: "⚡",
+      floor: 4,
+      timed: true,
+      rooms: ["DR", "TZ", "CR"],
+      modes: ["solo"],
+      difficulties: ["medium", "hard", "expert"],
+      route: "/games/principle-sprint"
+    },
+    {
+      id: "connection_dash",
+      name: "🔗 Connection Dash",
+      description: "Speed game to connect verses and explore interpretations! Find all verses that connect to the main verse quickly.",
+      icon: "🔗",
+      floor: 4,
+      timed: true,
+      rooms: ["BF", "P‖", "QR", "QA"],
+      modes: ["solo"],
+      difficulties: ["medium", "hard", "expert"],
+      route: "/games/connection-dash"
+    },
   ];
 
   const filteredGames = allGames.filter(game => {
