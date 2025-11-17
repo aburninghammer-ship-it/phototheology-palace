@@ -62,22 +62,35 @@ export const MessagingSidebar = () => {
         type: e.type,
         detail: e.detail,
         conversationId: e.detail?.conversationId,
-        userId: e.detail?.userId
+        userId: e.detail?.userId,
+        isMobile
       });
       
       // Handle conversationId (from notifications)
       if (e.detail?.conversationId) {
         console.log('📬 MessagingSidebar: Setting conversation:', e.detail.conversationId);
         setActiveConversationId(e.detail.conversationId);
-        // Use setOpen to force sidebar open if it's available
+        
+        // Force open on mobile and desktop
+        console.log('📬 MessagingSidebar: Opening sidebar (isMobile:', isMobile, ')');
         if (setOpen) {
-          console.log('📬 MessagingSidebar: Opening sidebar with setOpen');
+          console.log('📬 MessagingSidebar: Using setOpen(true)');
           setOpen(true);
-        } else if (state === 'collapsed') {
-          console.log('📬 MessagingSidebar: Toggling sidebar');
+        }
+        // Always try toggleSidebar as fallback on mobile if collapsed
+        if (isMobile || state === 'collapsed') {
+          console.log('📬 MessagingSidebar: Also calling toggleSidebar for mobile/collapsed');
           toggleSidebar();
         }
         setActiveTab('conversations');
+        
+        // Small delay to ensure UI updates
+        setTimeout(() => {
+          if (!open && setOpen) {
+            console.log('📬 MessagingSidebar: Retry opening after delay');
+            setOpen(true);
+          }
+        }, 100);
       }
       
       // Handle userId (from community page)
@@ -89,7 +102,8 @@ export const MessagingSidebar = () => {
           setActiveConversationId(convId);
           if (setOpen) {
             setOpen(true);
-          } else if (state === 'collapsed') {
+          }
+          if (isMobile || state === 'collapsed') {
             toggleSidebar();
           }
           setActiveTab('conversations');

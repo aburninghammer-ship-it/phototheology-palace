@@ -18,6 +18,12 @@ export function NotificationCenter() {
   const navigate = useNavigate();
 
   const handleNotificationClick = async (notification: any) => {
+    console.log('🔔 NotificationCenter: Notification clicked', {
+      id: notification.id,
+      type: notification.type,
+      metadata: notification.metadata
+    });
+    
     // Mark as read first and wait for it to complete
     await markAsRead(notification.id);
     
@@ -27,6 +33,11 @@ export function NotificationCenter() {
       const conversationId = notification.metadata?.conversation_id || notification.metadata?.conversationId;
       const userId = notification.metadata?.sender_id || notification.metadata?.user_id || notification.metadata?.userId;
       
+      console.log('🔔 NotificationCenter: Dispatching open-chat-sidebar event', {
+        conversationId,
+        userId
+      });
+      
       // Dispatch custom event to open messaging sidebar
       window.dispatchEvent(new CustomEvent('open-chat-sidebar', {
         detail: { 
@@ -34,10 +45,13 @@ export function NotificationCenter() {
           userId 
         }
       }));
+      
+      console.log('🔔 NotificationCenter: Event dispatched successfully');
     } else {
       // Check for link in notification or metadata (backwards compatibility)
       const link = notification.link || notification.metadata?.link;
       if (link) {
+        console.log('🔔 NotificationCenter: Navigating to', link);
         navigate(link);
       }
     }
