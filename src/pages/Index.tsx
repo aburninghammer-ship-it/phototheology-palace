@@ -25,7 +25,8 @@ import {
   Target,
   Search,
   Layers,
-  HelpCircle
+  HelpCircle,
+  Share2
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
@@ -35,6 +36,7 @@ import heroImage from "@/assets/phototheology-hero.png";
 import practiceWithAi from "@/assets/practice-with-ai.png";
 import masterDeploy from "@/assets/master-deploy.png";
 import { UserCountBadge } from "@/components/UserCountBadge";
+import { SocialShareButton } from "@/components/SocialShareButton";
 
 const Index = () => {
   const navigate = useNavigate();
@@ -99,8 +101,14 @@ const Index = () => {
       {/* Hero Section - Pain First */}
       <section className="relative overflow-hidden pt-32 pb-24 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-primary/5 via-background to-accent/5">
         <div className="max-w-6xl mx-auto text-center">
-          <div className="flex justify-center mb-8">
+          <div className="flex justify-center items-center gap-4 mb-8">
             <UserCountBadge />
+            <SocialShareButton
+              title="Phototheology - Master Bible Study with Memory Palace"
+              description="Transform your Bible study with the revolutionary Phototheology method. Build your memory palace and master Scripture through visualization, games, and AI assistance."
+              url={window.location.origin}
+              variant="dialog"
+            />
           </div>
           
           <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold mb-6 leading-tight">
