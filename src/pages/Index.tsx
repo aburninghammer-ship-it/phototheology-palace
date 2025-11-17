@@ -108,6 +108,9 @@ const Index = () => {
               description="Transform your Bible study with the revolutionary Phototheology method. Build your memory palace and master Scripture through visualization, games, and AI assistance."
               url={window.location.origin}
               variant="dialog"
+              size="lg"
+              buttonText="Share this app"
+              className="bg-primary hover:bg-primary/90 text-primary-foreground"
             />
           </div>
           
