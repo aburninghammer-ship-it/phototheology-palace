@@ -58,6 +58,7 @@ export default function BranchStudy() {
           mode: "branch_study",
           action: "start",
           verseReference: verseReference.trim(),
+          studyMode: studyState.mode,
         },
       });
 
