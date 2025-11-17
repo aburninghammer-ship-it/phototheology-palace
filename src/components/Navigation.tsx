@@ -10,6 +10,7 @@ import { Badge } from "@/components/ui/badge";
 import { NotificationCenter } from "@/components/NotificationCenter";
 import { PWAInstallButton } from "@/components/PWAInstallButton";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { GlobalSearch } from "@/components/GlobalSearch";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -69,6 +70,7 @@ export const Navigation = () => {
             </Link>
           
             <div className="flex items-center gap-2 md:gap-4 flex-1 justify-end">
+              <GlobalSearch />
               <PWAInstallButton />
               <ThemeToggle />
               
@@ -90,7 +92,7 @@ export const Navigation = () => {
                     <span className="ml-1 hidden sm:inline">Chat</span>
                     {totalUnread > 0 && (
                       <Badge 
-                        variant="destructive" 
+                        variant="destructive"
                         className="absolute -top-1 -right-1 h-4 w-4 p-0 flex items-center justify-center text-[10px]"
                       >
                         {totalUnread > 9 ? '9+' : totalUnread}
