@@ -8,6 +8,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Loader2, BookOpen, Send } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { useErrorHandler } from "@/hooks/useErrorHandler";
 import { formatJeevesResponse } from "@/lib/formatJeevesResponse";
 
 interface Message {
@@ -32,6 +33,7 @@ export default function BranchStudy() {
   });
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
+  const { handleError } = useErrorHandler();
 
   const startStudy = async () => {
     if (!verseReference.trim()) {
@@ -45,6 +47,8 @@ export default function BranchStudy() {
 
     setLoading(true);
     try {
+      console.log("🚀 Starting BranchStudy with verse:", verseReference.trim());
+      
       const { data, error } = await supabase.functions.invoke("jeeves", {
         body: {
           mode: "branch_study",
@@ -53,9 +57,30 @@ export default function BranchStudy() {
         },
       });
 
-      if (error) throw error;
-      
-      console.log("BranchStudy start response:", data);
+      console.log("📦 Raw response from jeeves:", { data, error });
+
+      if (error) {
+        console.error("❌ Jeeves error object:", error);
+        throw new Error(error.message || "Failed to start study");
+      }
+
+      if (!data) {
+        console.error("❌ No data received from jeeves");
+        throw new Error("No response from Jeeves");
+      }
+
+      if (data.error) {
+        console.error("❌ Error in data:", data.error);
+        throw new Error(data.error);
+      }
+
+      const content = data.content || data.response;
+      console.log("✅ Content received:", content?.substring(0, 200) + "...");
+
+      if (!content) {
+        console.error("❌ No content in response:", data);
+        throw new Error("Jeeves did not provide a response");
+      }
 
       setStudyState({
         anchorText: verseReference.trim(),
@@ -64,16 +89,17 @@ export default function BranchStudy() {
         messages: [
           {
             role: "assistant",
-            content: data.content || data.response, // Support both field names
+            content: content,
           },
         ],
       });
+
+      console.log("✅ Study state updated successfully");
     } catch (error: any) {
-      console.error("Error starting study:", error);
-      toast({
-        title: "Error",
-        description: error.message || "Failed to start study",
-        variant: "destructive",
+      handleError(error, {
+        title: "Failed to Start Study",
+        showToast: true,
+        logToConsole: true,
       });
     } finally {
       setLoading(false);
@@ -97,6 +123,8 @@ export default function BranchStudy() {
     setLoading(true);
 
     try {
+      console.log("🔄 Continuing BranchStudy with user response:", userInput.trim());
+      
       const { data, error } = await supabase.functions.invoke("jeeves", {
         body: {
           mode: "branch_study",
@@ -109,9 +137,27 @@ export default function BranchStudy() {
         },
       });
 
-      if (error) throw error;
-      
-      console.log("BranchStudy continue response:", data);
+      console.log("📦 Continue response:", { data, error });
+
+      if (error) {
+        console.error("❌ Continue error:", error);
+        throw new Error(error.message || "Failed to continue study");
+      }
+
+      if (!data) {
+        throw new Error("No response from Jeeves");
+      }
+
+      if (data.error) {
+        throw new Error(data.error);
+      }
+
+      const content = data.content || data.response;
+      console.log("✅ Continue content received:", content?.substring(0, 200) + "...");
+
+      if (!content) {
+        throw new Error("Jeeves did not provide a response");
+      }
 
       // Track new verses and rooms from the response
       const newUsedVerses = [...studyState.usedVerses];
@@ -128,16 +174,17 @@ export default function BranchStudy() {
           ...prev.messages,
           {
             role: "assistant",
-            content: data.content || data.response, // Support both field names
+            content: content,
           },
         ],
       }));
+
+      console.log("✅ Study state updated with continue response");
     } catch (error: any) {
-      console.error("Error in study:", error);
-      toast({
-        title: "Error",
-        description: error.message || "Failed to process response",
-        variant: "destructive",
+      handleError(error, {
+        title: "Failed to Continue Study",
+        showToast: true,
+        logToConsole: true,
       });
     } finally {
       setLoading(false);
