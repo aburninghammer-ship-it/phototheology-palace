@@ -290,7 +290,11 @@ function App() {
             <Route path="/church-signup/cancelled" element={<ChurchSignupCancelled />} />
             <Route path="/privacy-policy" element={<PrivacyPolicy />} />
             <Route path="/terms-of-service" element={<TermsOfService />} />
-            <Route path="/branch-study" element={<BranchStudy />} />
+            <Route path="/branch-study" element={
+              <Suspense fallback={<LoadingScreen />}>
+                <BranchStudy />
+              </Suspense>
+            } />
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                 <Route path="*" element={<NotFound />} />
                     </Routes>
