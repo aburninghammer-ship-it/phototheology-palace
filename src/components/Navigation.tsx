@@ -142,6 +142,12 @@ export const Navigation = () => {
                           </Link>
                         </DropdownMenuItem>
                         <DropdownMenuItem asChild>
+                          <Link to="/branch-study" className="cursor-pointer">
+                            <Sparkles className="mr-2 h-4 w-4" />
+                            BranchStudy
+                          </Link>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem asChild>
                           <Link to="/kidgpt" className="cursor-pointer">
                             <Sparkles className="mr-2 h-4 w-4" />
                             Kid GPT
@@ -216,6 +222,9 @@ export const Navigation = () => {
                     <DropdownMenuContent align="start" className="w-56 bg-card border-border z-50">
                       <DropdownMenuItem asChild>
                         <Link to="/phototheologygpt">Phototheology GPT</Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem asChild>
+                        <Link to="/branch-study">BranchStudy</Link>
                       </DropdownMenuItem>
                       <DropdownMenuItem asChild>
                         <Link to="/kidgpt">Kid GPT</Link>

@@ -30,6 +30,7 @@ const searchItems = [
   
   // AI Assistants (GPTs)
   { title: "Phototheology GPT", path: "/phototheologygpt", icon: Sparkles, category: "AI Assistants" },
+  { title: "BranchStudy", path: "/branch-study", icon: Sparkles, category: "AI Assistants" },
   { title: "Kid GPT", path: "/kidgpt", icon: Sparkles, category: "AI Assistants" },
   { title: "Daniel & Revelation GPT", path: "/daniel-revelation-gpt", icon: Sparkles, category: "AI Assistants" },
   { title: "Apologetics GPT", path: "/apologetics-gpt", icon: Sparkles, category: "AI Assistants" },

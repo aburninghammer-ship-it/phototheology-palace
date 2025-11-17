@@ -76,6 +76,7 @@ const categoryConfig = {
     icon: Sparkles,
     links: [
       { to: "/phototheologygpt", label: "Phototheology GPT", icon: "🤖" },
+      { to: "/branch-study", label: "BranchStudy", icon: "🌳" },
       { to: "/apologetics-gpt", label: "Apologetics GPT", icon: "🛡️" },
       { to: "/daniel-revelation-gpt", label: "Daniel & Revelation", icon: "📜" },
       { to: "/culture-controversy", label: "Culture & Controversy", icon: "🌍" },
