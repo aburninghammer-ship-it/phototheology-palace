@@ -10,7 +10,9 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useErrorHandler } from "@/hooks/useErrorHandler";
 import { formatJeevesResponse } from "@/lib/formatJeevesResponse";
-import { FunctionsHttpError, FunctionsRelayError, FunctionsFetchError } from '@supabase/supabase-js';
+import { JeevesResponseValidator } from "@/components/bible/JeevesResponseValidator";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
 
 interface Message {
   role: "user" | "assistant";
@@ -22,6 +24,7 @@ interface StudyState {
   usedVerses: string[];
   usedRooms: string[];
   messages: Message[];
+  mode: "traditional" | "jeeves-led";
 }
 
 export default function BranchStudy() {
@@ -31,6 +34,7 @@ export default function BranchStudy() {
     usedVerses: [],
     usedRooms: [],
     messages: [],
+    mode: "traditional",
   });
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
@@ -48,8 +52,6 @@ export default function BranchStudy() {
 
     setLoading(true);
     try {
-      console.log("🚀 Starting BranchStudy with verse:", verseReference.trim());
-      
       const { data, error } = await supabase.functions.invoke("jeeves", {
         body: {
           mode: "branch_study",
@@ -58,72 +60,21 @@ export default function BranchStudy() {
         },
       });
 
-      console.log("📦 Raw response from jeeves:", { data, error });
-
-      // Handle Supabase-specific error types
-      if (error) {
-        console.error("❌ Error type:", error.constructor.name);
-        
-        if (error instanceof FunctionsHttpError) {
-          const errorMessage = await error.context.json();
-          console.error("❌ HTTP Error:", errorMessage);
-          throw new Error(`HTTP Error: ${JSON.stringify(errorMessage)}`);
-        } else if (error instanceof FunctionsRelayError) {
-          console.error("❌ Relay Error:", error.message);
-          throw new Error(`Relay Error: ${error.message}`);
-        } else if (error instanceof FunctionsFetchError) {
-          console.error("❌ Fetch Error:", error.message);
-          throw new Error(`Fetch Error: ${error.message}`);
-        } else {
-          console.error("❌ Unknown error:", error);
-          throw error;
-        }
-      }
-
-      console.log("📊 Data type:", typeof data);
-      console.log("📊 Data keys:", data ? Object.keys(data) : 'null');
-      console.log("📊 Full data:", JSON.stringify(data, null, 2));
-
-      if (!data) {
-        console.error("❌ No data received from jeeves");
-        throw new Error("No response from Jeeves");
-      }
-
-      if (data.error) {
-        console.error("❌ Error in data:", data.error);
-        throw new Error(data.error);
-      }
+      if (error) throw error;
+      if (!data || data.error) throw new Error(data?.error || "No response from Jeeves");
 
       const content = data.content || data.response;
-      console.log("✅ Content type:", typeof content);
-      console.log("✅ Content length:", content?.length);
-      console.log("✅ Content preview:", content?.substring(0, 200));
-
-      if (!content) {
-        console.error("❌ No content in response. Full data object:", data);
-        throw new Error("Jeeves did not provide a response");
-      }
+      if (!content) throw new Error("Jeeves did not provide a response");
 
       setStudyState({
         anchorText: verseReference.trim(),
         usedVerses: [verseReference.trim()],
         usedRooms: [],
-        messages: [
-          {
-            role: "assistant",
-            content: content,
-          },
-        ],
+        messages: [{ role: "assistant", content }],
+        mode: studyState.mode,
       });
-
-      console.log("✅ Study state updated successfully");
     } catch (error: any) {
-      console.error("🔥 Caught error:", error);
-      handleError(error, {
-        title: "Failed to Start Study",
-        showToast: true,
-        logToConsole: true,
-      });
+      handleError(error, { title: "Failed to Start Study", showToast: true });
     } finally {
       setLoading(false);
     }
@@ -132,10 +83,8 @@ export default function BranchStudy() {
   const sendMessage = async () => {
     if (!userInput.trim() || !studyState.anchorText) return;
 
-    const userMessage: Message = {
-      role: "user",
-      content: userInput.trim(),
-    };
+    const isOptionSelection = /^[ABC]$/i.test(userInput.trim());
+    const userMessage: Message = { role: "user", content: userInput.trim() };
 
     setStudyState((prev) => ({
       ...prev,
@@ -146,80 +95,40 @@ export default function BranchStudy() {
     setLoading(true);
 
     try {
-      console.log("🔄 Continuing BranchStudy with user response:", userInput.trim());
-      
       const { data, error } = await supabase.functions.invoke("jeeves", {
         body: {
           mode: "branch_study",
-          action: "continue",
+          action: isOptionSelection ? "select_option" : "continue",
           anchorText: studyState.anchorText,
           usedVerses: studyState.usedVerses,
           usedRooms: studyState.usedRooms,
-          userResponse: userInput.trim(),
+          userResponse: userMessage.content,
           conversationHistory: studyState.messages,
+          studyMode: studyState.mode,
         },
       });
 
-      console.log("📦 Continue response:", { data, error });
-
-      if (error) {
-        console.error("❌ Continue error:", error);
-        throw new Error(error.message || "Failed to continue study");
-      }
-
-      if (!data) {
-        throw new Error("No response from Jeeves");
-      }
-
-      if (data.error) {
-        throw new Error(data.error);
-      }
+      if (error) throw error;
+      if (!data || data.error) throw new Error(data?.error || "No response");
 
       const content = data.content || data.response;
-      console.log("✅ Continue content received:", content?.substring(0, 200) + "...");
-
-      if (!content) {
-        throw new Error("Jeeves did not provide a response");
-      }
-
-      // Track new verses and rooms from the response
-      const newUsedVerses = [...studyState.usedVerses];
-      const newUsedRooms = [...studyState.usedRooms];
-
-      if (data.usedVerse) newUsedVerses.push(data.usedVerse);
-      if (data.usedRoom) newUsedRooms.push(data.usedRoom);
+      if (!content) throw new Error("Jeeves did not provide a response");
 
       setStudyState((prev) => ({
         ...prev,
-        usedVerses: newUsedVerses,
-        usedRooms: newUsedRooms,
-        messages: [
-          ...prev.messages,
-          {
-            role: "assistant",
-            content: content,
-          },
-        ],
+        messages: [...prev.messages, { role: "assistant", content }],
+        usedVerses: data.usedVerses || prev.usedVerses,
+        usedRooms: data.usedRooms || prev.usedRooms,
       }));
-
-      console.log("✅ Study state updated with continue response");
     } catch (error: any) {
-      handleError(error, {
-        title: "Failed to Continue Study",
-        showToast: true,
-        logToConsole: true,
-      });
+      handleError(error, { title: "Failed to Continue Study", showToast: true });
     } finally {
       setLoading(false);
     }
   };
 
   const resetStudy = () => {
-    setStudyState({
-      usedVerses: [],
-      usedRooms: [],
-      messages: [],
-    });
+    setStudyState({ usedVerses: [], usedRooms: [], messages: [], mode: "traditional" });
     setVerseReference("");
     setUserInput("");
   };
@@ -227,124 +136,98 @@ export default function BranchStudy() {
   return (
     <div className="min-h-screen bg-background">
       <Navigation />
-      <div className="container max-w-5xl mx-auto px-4 py-8">
-        <Card>
+      <div className="container mx-auto p-4 pt-20">
+        <Card className="max-w-4xl mx-auto">
           <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-2xl">
+            <CardTitle className="flex items-center gap-2">
               <BookOpen className="h-6 w-6" />
-              BranchStudy: Interactive Bible Exposition
+              BranchStudy
             </CardTitle>
-            <p className="text-sm text-muted-foreground mt-2">
-              Explore Scripture through branching paths of cross-references and
-              Phototheology principles. Start with a verse or story (e.g., "Parable of the Good Samaritan"),
-              respond to questions, and choose your next step.
-            </p>
           </CardHeader>
-          <CardContent className="space-y-6">
-            {studyState.messages.length === 0 ? (
+          <CardContent className="space-y-4">
+            {!studyState.anchorText ? (
               <div className="space-y-4">
                 <div>
                   <label className="text-sm font-medium mb-2 block">
-                    Enter Verse Reference or Story Name
+                    Enter a verse reference or story name
                   </label>
-                  <div className="flex gap-2">
-                    <Input
-                      value={verseReference}
-                      onChange={(e) => setVerseReference(e.target.value)}
-                      placeholder="John 3:16 or 'Parable of the Wheat and Tares'"
-                      onKeyDown={(e) => e.key === "Enter" && startStudy()}
-                    />
-                    <Button onClick={startStudy} disabled={loading}>
-                      {loading ? (
-                        <Loader2 className="h-4 w-4 animate-spin" />
-                      ) : (
-                        "Begin Study"
-                      )}
-                    </Button>
-                  </div>
+                  <Input
+                    placeholder="e.g., John 3:16 or Parable of the Sower"
+                    value={verseReference}
+                    onChange={(e) => setVerseReference(e.target.value)}
+                    onKeyPress={(e) => e.key === "Enter" && !loading && startStudy()}
+                    disabled={loading}
+                  />
                 </div>
+                
+                <div className="flex items-center space-x-2 p-4 bg-muted rounded-lg">
+                  <Switch
+                    id="study-mode"
+                    checked={studyState.mode === "jeeves-led"}
+                    onCheckedChange={(checked) =>
+                      setStudyState((prev) => ({ ...prev, mode: checked ? "jeeves-led" : "traditional" }))
+                    }
+                  />
+                  <Label htmlFor="study-mode" className="cursor-pointer">
+                    <div>
+                      <div className="font-medium">Jeeves-Led Study Mode</div>
+                      <div className="text-xs text-muted-foreground">
+                        Jeeves does most of the studying and shares insights with you
+                      </div>
+                    </div>
+                  </Label>
+                </div>
+                
+                <Button onClick={startStudy} disabled={loading || !verseReference.trim()} className="w-full">
+                  {loading ? (
+                    <><Loader2 className="mr-2 h-4 w-4 animate-spin" />Starting Study...</>
+                  ) : (
+                    <><BookOpen className="mr-2 h-4 w-4" />Begin BranchStudy</>
+                  )}
+                </Button>
               </div>
             ) : (
               <div className="space-y-4">
-                <div className="flex justify-between items-center">
-                  <h3 className="font-semibold">
-                    Anchor: {studyState.anchorText}
-                  </h3>
-                  <Button variant="outline" size="sm" onClick={resetStudy}>
-                    Start New Study
-                  </Button>
-                </div>
-                
-                <div className="text-xs text-muted-foreground p-2 bg-muted rounded">
-                  Debug: {studyState.messages.length} message(s) in state
+                <div className="flex items-center justify-between mb-4">
+                  <div>
+                    <h3 className="font-semibold">Studying: {studyState.anchorText}</h3>
+                    <p className="text-sm text-muted-foreground">
+                      Mode: {studyState.mode === "jeeves-led" ? "Jeeves-Led" : "Traditional"}
+                    </p>
+                  </div>
+                  <Button variant="outline" onClick={resetStudy}>New Study</Button>
                 </div>
 
-                <ScrollArea className="h-[500px] border rounded-lg p-4">
+                <ScrollArea className="h-[400px] border rounded-lg p-4">
                   <div className="space-y-4">
-                     {studyState.messages.map((msg, idx) => (
-                      <div
-                        key={idx}
-                        className={`p-4 rounded-lg ${
-                          msg.role === "user"
-                            ? "bg-primary/10 ml-8"
-                            : "bg-muted mr-8"
-                        }`}
-                      >
-                        <div className="font-semibold text-xs mb-2 text-muted-foreground uppercase">
-                          {msg.role === "user" ? "You" : "Jeeves"}
+                    {studyState.messages.map((msg, idx) => (
+                      <div key={idx}>
+                        <div className={`p-4 rounded-lg ${msg.role === "user" ? "bg-primary text-primary-foreground ml-8" : "bg-muted mr-8"}`}>
+                          {formatJeevesResponse(msg.content)}
                         </div>
-                        {msg.content ? (
-                          <div className="prose prose-sm max-w-none dark:prose-invert">
-                            {formatJeevesResponse(msg.content)}
-                          </div>
-                        ) : (
-                          <div className="text-destructive text-sm">
-                            [No content - Debug: {JSON.stringify(msg)}]
-                          </div>
-                        )}
+                        {msg.role === "assistant" && <JeevesResponseValidator response={msg.content} />}
                       </div>
                     ))}
-                    {loading && (
-                      <div className="flex items-center gap-2 text-muted-foreground">
-                        <Loader2 className="h-4 w-4 animate-spin" />
-                        <span>Jeeves is thinking...</span>
-                      </div>
-                    )}
                   </div>
                 </ScrollArea>
 
                 <div className="flex gap-2">
                   <Textarea
+                    placeholder="Type your response or choose A/B/C..."
                     value={userInput}
                     onChange={(e) => setUserInput(e.target.value)}
-                    placeholder="Type your response or choose an option (A, B, or C)..."
-                    className="min-h-[80px]"
-                    onKeyDown={(e) => {
-                      if (e.key === "Enter" && !e.shiftKey) {
-                        e.preventDefault();
-                        sendMessage();
-                      }
-                    }}
+                    onKeyPress={(e) => e.key === "Enter" && !e.shiftKey && !loading && (e.preventDefault(), sendMessage())}
+                    disabled={loading}
+                    rows={3}
                   />
-                  <Button
-                    onClick={sendMessage}
-                    disabled={loading || !userInput.trim()}
-                    size="icon"
-                    className="h-[80px] w-[80px]"
-                  >
-                    <Send className="h-5 w-5" />
+                  <Button onClick={sendMessage} disabled={loading || !userInput.trim()} size="icon" className="self-end">
+                    {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
                   </Button>
                 </div>
 
                 <div className="text-xs text-muted-foreground space-y-1">
-                  <p>
-                    <strong>Path tracked:</strong> {studyState.usedVerses.length}{" "}
-                    verses, {studyState.usedRooms.length} rooms
-                  </p>
-                  <p>
-                    Type "summarize", "end", or "turn this into a study" to
-                    conclude
-                  </p>
+                  <p>Used: {studyState.usedVerses.length} verses, {studyState.usedRooms.length} rooms</p>
+                  <p>Type "summarize", "end", or "turn this into a study" to conclude</p>
                 </div>
               </div>
             )}

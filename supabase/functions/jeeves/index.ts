@@ -2081,10 +2081,11 @@ Make the titles diverse, covering different themes and biblical books. Be creati
 
     } else if (mode === "branch_study") {
       // BranchStudy mode - interactive branching Bible study
-      const { action, verseReference, anchorText, usedVerses, usedRooms, userResponse, conversationHistory } = requestBody;
+      const { action, verseReference, anchorText, usedVerses, usedRooms, userResponse, conversationHistory, studyMode } = requestBody;
       
       console.log("=== BRANCH STUDY REQUEST ===");
       console.log("Action:", action);
+      console.log("Study Mode:", studyMode);
       console.log("Verse/Story:", verseReference || anchorText);
       
       if (action === "start") {
@@ -2122,8 +2123,64 @@ Provide exposition and reflection questions. Do NOT offer A/B/C options yet.`;
         console.log("System prompt length:", systemPrompt.length);
         console.log("User prompt:", userPrompt);
         
+      } else if (action === "select_option") {
+        // User has selected an option (A, B, or C)
+        const selectedOption = userResponse.toUpperCase();
+        const isJeevesLed = studyMode === "jeeves-led";
+        
+        systemPrompt = `You are Jeeves running BranchStudy. The anchor text is: ${anchorText}
+
+Already used verses: ${(usedVerses || []).join(', ')}
+Already used Palace rooms: ${(usedRooms || []).join(', ')}
+
+The user selected option ${selectedOption} from your previous set of options.
+
+${isJeevesLed ? `
+JEEVES-LED MODE: You are driving this study. The user wants YOU to explore and teach.
+
+Your task:
+1. Identify what option ${selectedOption} was (extract from conversation history)
+2. ${selectedOption === 'A' || selectedOption === 'B' || selectedOption === 'C' ? `Provide rich exposition on that ${conversationHistory.some((msg: any) => msg.content.includes('verse') || msg.content.includes('Scripture')) ? 'verse' : 'room'}:` : ''}
+   - If it's a verse: Quote it in full, provide context, explain key phrases, connect to Christ, show application (3-4 paragraphs)
+   - If it's a Palace room: Explain the principle deeply, apply it to the anchor text with specific examples, show the theological weight (3-4 paragraphs)
+3. After your exposition, offer 3 new labeled options (A, B, C) to continue the study
+4. Track which verses/rooms have been used
+
+Keep responses warm, pastoral, and Christ-centered. This is YOUR teaching moment.
+` : `
+TRADITIONAL MODE: The user is responding to your questions.
+
+Your task:
+1. Acknowledge their selection of option ${selectedOption} (1 sentence)
+2. Provide a brief comment on what that option reveals (2-3 sentences)
+3. Offer 3 new labeled options (A, B, C) to continue exploring
+
+Keep it conversational but let the user do more of the reflection.
+`}
+
+Available Palace rooms (avoid repeating): Story Room (SR), Imagination Room (IR), Observation Room (OR), Def-Com Room (DC), Symbols/Types (@T), Questions Room (?), Concentration Room (CR), Dimensions Room (DR), Connect 6 (C6), Patterns (PRm), Parallels (P‖), Fruit Room (FRt), Blue/Sanctuary (BL), Prophecy (PR), Three Angels (3A), Fire Room (FRm), Meditation (MR)`;
+
+        // Build messages from conversation history
+        const messages = [];
+        if (conversationHistory && Array.isArray(conversationHistory)) {
+          conversationHistory.forEach((msg: any) => {
+            messages.push({
+              role: msg.role,
+              content: msg.content
+            });
+          });
+        }
+        
+        // Add current selection
+        messages.push({
+          role: "user",
+          content: `I choose ${selectedOption}`
+        });
+        
+        userPrompt = messages.map((m: any) => m.content).join('\n\n');
+        
       } else if (action === "continue") {
-        // Continuing an existing study
+        // Continuing an existing study (user is responding with their own thoughts, not selecting an option)
         const isSummaryRequest = /\b(summarize|end|turn this into a study)\b/i.test(userResponse);
         
         if (isSummaryRequest) {
@@ -2155,7 +2212,7 @@ The user has responded to your questions. Now:
    - EITHER three cross-reference verses (with 1-2 line explanation each of how it deepens the anchor text)
    - OR three Phototheology Palace rooms/principles with 1-2 line explanation of what you will explore
 
-Available Palace rooms to choose from (avoid already used ones): Story Room (SR), Imagination Room (IR), Observation Room (OR), Def-Com Room (DC), Symbols/Types (@T), Questions Room (?), Concentration Room (CR), Dimensions Room (DR), Connect 6 (C6), Theme Room (TRm), Time Zone (TZ), Patterns (PRm), Parallels (P‖), Fruit Room (FRt), Blue/Sanctuary (BL), Prophecy (PR), Three Angels (3A), Cycles (@Ad, @No, @Ab, @Mo, @Cy, @CyC, @Sp, @Re), Fire Room (FRm), Meditation (MR)
+Available Palace rooms to choose from (avoid already used ones): Story Room (SR), Imagination Room (IR), Observation Room (OR), Def-Com Room (DC), Symbols/Types (@T), Questions Room (?), Concentration Room (CR), Dimensions Room (DR), Connect 6 (C6), Patterns (PRm), Parallels (P‖), Fruit Room (FRt), Blue/Sanctuary (BL), Prophecy (PR), Three Angels (3A), Fire Room (FRm), Meditation (MR)
 
 When presenting options, clearly label them A, B, and C. Be clear about which type you're offering (verses OR rooms, not both in the same set of 3).
 
