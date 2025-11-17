@@ -2089,13 +2089,17 @@ Make the titles diverse, covering different themes and biblical books. Be creati
 
 The user has provided an anchor text: ${verseReference}
 
+This may be a verse reference (e.g., "John 3:16") OR a story/parable name (e.g., "Parable of the Wheat and Tares", "Good Samaritan", "David and Goliath").
+
 CRITICAL: This is the INITIAL exposition. Do NOT offer A/B/C options yet. Only exposition and questions.
 
 Your task (in this exact order):
-1. Quote the verse text in full (if you know it)
+1. Identify and locate the text:
+   - If it's a verse reference, quote it in full
+   - If it's a story/parable name, identify the biblical location(s) and provide a brief summary of the narrative
 2. Provide concise exposition in 2-3 paragraphs:
    - Historical/literary context (who wrote it, to whom, when, why)
-   - Key phrases and their significance
+   - Key elements and their significance (phrases for verses, plot points for stories)
    - Main theological point (Christ-centered)
 3. Ask 1-3 reflection/application questions for the user to consider
 4. End with: "Take a moment to reflect on these questions. When you're ready, share your thoughts and I'll offer you paths to explore further."
@@ -2105,8 +2109,10 @@ DO NOT offer verse options or Palace room options yet. That comes after the user
 Keep a warm, pastoral tone. Be clear about sin, judgment, and grace.`;
 
         userPrompt = `Begin a BranchStudy session with the anchor text: ${verseReference}
+
+Note: This may be a specific verse reference or a story/parable name. If it's a story, identify where it's found in Scripture and provide context.
         
-Provide the verse text, exposition, and reflection questions. Do NOT offer A/B/C options yet.`;
+Provide exposition and reflection questions. Do NOT offer A/B/C options yet.`;
         
       } else if (action === "continue") {
         // Continuing an existing study

@@ -162,8 +162,8 @@ export default function BranchStudy() {
             </CardTitle>
             <p className="text-sm text-muted-foreground mt-2">
               Explore Scripture through branching paths of cross-references and
-              Phototheology principles. Start with an anchor text, respond to
-              questions, and choose your next step.
+              Phototheology principles. Start with a verse or story (e.g., "Parable of the Good Samaritan"),
+              respond to questions, and choose your next step.
             </p>
           </CardHeader>
           <CardContent className="space-y-6">
@@ -171,13 +171,13 @@ export default function BranchStudy() {
               <div className="space-y-4">
                 <div>
                   <label className="text-sm font-medium mb-2 block">
-                    Enter Verse Reference (e.g., John 3:16)
+                    Enter Verse Reference or Story Name
                   </label>
                   <div className="flex gap-2">
                     <Input
                       value={verseReference}
                       onChange={(e) => setVerseReference(e.target.value)}
-                      placeholder="John 3:16"
+                      placeholder="John 3:16 or 'Parable of the Wheat and Tares'"
                       onKeyDown={(e) => e.key === "Enter" && startStudy()}
                     />
                     <Button onClick={startStudy} disabled={loading}>
