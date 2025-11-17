@@ -26,21 +26,38 @@ import {
   Search,
   Layers,
   HelpCircle,
-  Share2
+  Share2,
+  Download,
+  X
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import heroImage from "@/assets/phototheology-hero.png";
 import practiceWithAi from "@/assets/practice-with-ai.png";
 import masterDeploy from "@/assets/master-deploy.png";
 import { UserCountBadge } from "@/components/UserCountBadge";
 import { SocialShareButton } from "@/components/SocialShareButton";
+import { PWAInstallButton } from "@/components/PWAInstallButton";
 
 const Index = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
+  const [showInstallBanner, setShowInstallBanner] = useState(false);
+
+  // Check if app should show install banner
+  useEffect(() => {
+    const isStandalone = window.matchMedia('(display-mode: standalone)').matches 
+      || (window.navigator as any).standalone === true
+      || document.referrer.includes('android-app://');
+    
+    const bannerDismissed = localStorage.getItem('installBannerDismissed');
+    
+    if (!isStandalone && !bannerDismissed) {
+      setShowInstallBanner(true);
+    }
+  }, []);
 
   // Redirect authenticated users to onboarding if they haven't completed it
   useEffect(() => {
@@ -66,9 +83,45 @@ const Index = () => {
     checkOnboarding();
   }, [user, navigate]);
 
+  const dismissBanner = () => {
+    setShowInstallBanner(false);
+    localStorage.setItem('installBannerDismissed', 'true');
+  };
+
   return (
     <div className="min-h-screen bg-background">
       <Navigation />
+      
+      {/* Install App Banner */}
+      {showInstallBanner && (
+        <div className="sticky top-16 z-40 bg-gradient-to-r from-primary via-primary/95 to-accent text-primary-foreground shadow-lg border-b border-primary/20 animate-slide-down">
+          <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-3">
+            <div className="flex items-center justify-between gap-3">
+              <div className="flex items-center gap-3 flex-1 min-w-0">
+                <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-primary-foreground/20 flex items-center justify-center flex-shrink-0">
+                  <Download className="w-4 h-4 sm:w-5 sm:h-5" />
+                </div>
+                <div className="min-w-0 flex-1">
+                  <p className="font-bold text-xs sm:text-sm truncate">📱 Get the App!</p>
+                  <p className="text-[10px] sm:text-xs opacity-90 truncate">Install for offline access & better experience</p>
+                </div>
+              </div>
+              <div className="flex items-center gap-2 flex-shrink-0">
+                <PWAInstallButton />
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={dismissBanner}
+                  className="h-8 w-8 text-primary-foreground hover:bg-primary-foreground/20 flex-shrink-0"
+                  aria-label="Dismiss"
+                >
+                  <X className="h-4 w-4" />
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
       
       {/* Quick Access Banner for Authenticated Users */}
       {user && (
