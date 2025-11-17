@@ -2169,7 +2169,31 @@ ${isJeevesLed ? 'Teach richly using PT principles, then IMMEDIATELY present the 
         const isSelectingBranch = optionCount === 2; // User chose from A/B branch
         const isSelectingSpecific = optionCount === 5; // User chose from A-E options
         
+        // Extract all previously presented verses and principles to avoid repetition
+        const conversationText = conversationHistory?.map((m: any) => m.content).join('\n') || '';
+        const presentedVerses = new Set<string>();
+        const presentedPrinciples = new Set<string>();
+        
+        // Extract verse references (e.g., "Genesis 1:1", "John 3:16")
+        const verseMatches = conversationText.matchAll(/([A-Z][a-z]+(?: [A-Z][a-z]+)*) (\d+):(\d+)/g);
+        for (const match of verseMatches) {
+          presentedVerses.add(`${match[1]} ${match[2]}:${match[3]}`);
+        }
+        
+        // Extract room codes (e.g., "SR", "CR", "BL")
+        const roomMatches = conversationText.matchAll(/\b([A-Z]{2,4})\b \(/g);
+        for (const match of roomMatches) {
+          presentedPrinciples.add(match[1]);
+        }
+        
+        const avoidanceList = {
+          verses: Array.from(presentedVerses),
+          principles: Array.from(presentedPrinciples)
+        };
+        
         console.log(`Previous message had ${optionCount} options. isSelectingBranch: ${isSelectingBranch}, isSelectingSpecific: ${isSelectingSpecific}`);
+        console.log('Previously presented verses:', avoidanceList.verses);
+        console.log('Previously presented principles:', avoidanceList.principles);
         
         const levelInstructions = {
           easy: 'Choose verses that follow the general theme and topic of the anchor text. Make connections clear and intuitive.',
@@ -2190,6 +2214,11 @@ ${isJeevesLed ? `
 JEEVES-LED MODE: You teach, user chooses paths. NO reflection questions ever.
 
 ${isSelectingBranch ? `**User chose from A/B branch - Present 5 options:**
+
+**CRITICAL: AVOID REPETITION**
+Already presented verses: ${avoidanceList.verses.length > 0 ? avoidanceList.verses.join(', ') : 'none yet'}
+Already presented principles: ${avoidanceList.principles.length > 0 ? avoidanceList.principles.join(', ') : 'none yet'}
+YOU MUST choose completely NEW and DIFFERENT verses/principles that have NOT been presented before in this study.
 
 ${selectedOption === 'A' ? `If VERSES:
 VERSE SELECTION STRATEGY: ${levelInstructions[level as keyof typeof levelInstructions]}
