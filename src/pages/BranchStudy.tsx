@@ -14,6 +14,7 @@ import { JeevesResponseValidator } from "@/components/bible/JeevesResponseValida
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { OptionCards } from "@/components/branch-study/OptionCards";
+import { cn } from "@/lib/utils";
 
 interface Message {
   role: "user" | "assistant";
@@ -141,13 +142,14 @@ export default function BranchStudy() {
   };
 
   const parseOptions = (content: string): { type: "verse" | "principle"; options: Array<{ label: string; content: string }> } | null => {
-    // Look for options formatted as "A. Genesis 22:8" or "A. CR (Concentration)"
-    const optionRegex = /^([A-E])\.\s+([^\n]+)/gm;
+    // Match options: "A. Genesis 22:8" or "A. Cross-reference verses"
+    const optionRegex = /^([A-E])\.\s+(.+?)(?=\n[A-E]\.|$)/gms;
     const matches = Array.from(content.matchAll(optionRegex));
     
-    // Only parse if we have exactly 5 options (the final verse/principle choices)
-    if (matches.length !== 5) {
-      console.log(`Found ${matches.length} options, need exactly 5`);
+    console.log(`🔍 Found ${matches.length} options in content`);
+    
+    // Accept 2 options (A/B branch) or 5 options (final choices)
+    if (matches.length !== 2 && matches.length !== 5) {
       return null;
     }
     
@@ -156,14 +158,15 @@ export default function BranchStudy() {
       content: match[2].trim()
     }));
     
-    // Detect type based on content
-    const firstContent = options[0].content;
-    const isVerse = /\d+:\d+/.test(firstContent) || /^[1-3]?\s*[A-Z][a-z]+\s+\d+/.test(firstContent);
+    // Detect type: verses have chapter:verse, principles have room codes or descriptive text
+    const firstContent = options[0].content.toLowerCase();
+    const isVerse = /\d+:\d+/.test(options[0].content) || /^[1-3]?\s*[A-Z][a-z]+\s+\d+/.test(options[0].content);
+    const isBranch = firstContent.includes('verse') || firstContent.includes('principle');
     
-    console.log(`Parsed 5 ${isVerse ? 'verse' : 'principle'} options:`, options);
+    console.log(`✨ Parsed ${matches.length} options (type: ${isBranch ? 'branch' : isVerse ? 'verse' : 'principle'})`);
     
     return {
-      type: isVerse ? "verse" : "principle",
+      type: isBranch ? "principle" : isVerse ? "verse" : "principle",
       options
     };
   };
@@ -238,29 +241,41 @@ export default function BranchStudy() {
                   <Button variant="outline" onClick={resetStudy}>New Study</Button>
                 </div>
 
-                <ScrollArea className="h-[500px] border rounded-lg p-4">
-                  <div className="space-y-4">
+                <ScrollArea className="h-[600px] border rounded-lg p-6 bg-gradient-to-b from-background to-muted/20">
+                  <div className="space-y-6">
                     {studyState.messages.map((msg, idx) => {
                       const parsedOptions = msg.role === "assistant" ? parseOptions(msg.content) : null;
                       
                       if (parsedOptions) {
-                        console.log("✅ Displaying option cards for message:", idx);
+                        console.log("✅ Displaying option cards for message:", idx, parsedOptions);
                       }
                       
                       return (
-                        <div key={idx}>
-                          <div className={`p-4 rounded-lg ${msg.role === "user" ? "bg-primary text-primary-foreground ml-8" : "bg-muted mr-8"}`}>
+                        <div key={idx} className="animate-in fade-in slide-in-from-bottom-2">
+                          <div className={cn(
+                            "p-5 rounded-xl shadow-sm",
+                            msg.role === "user" 
+                              ? "bg-primary text-primary-foreground ml-12" 
+                              : "bg-card border-2 mr-12"
+                          )}>
                             {parsedOptions ? (
-                              <div className="space-y-4">
-                                <div>{formatJeevesResponse(msg.content.split(/^[A-E]\./m)[0])}</div>
-                                <OptionCards
-                                  options={parsedOptions.options}
-                                  onSelect={handleOptionSelect}
-                                  type={parsedOptions.type}
-                                />
+                              <div className="space-y-6">
+                                <div className="prose prose-sm max-w-none">
+                                  {formatJeevesResponse(msg.content.split(/^[A-E]\./m)[0])}
+                                </div>
+                                <div className="border-t pt-4">
+                                  <h4 className="text-lg font-semibold mb-4 text-center">Choose Your Path</h4>
+                                  <OptionCards
+                                    options={parsedOptions.options}
+                                    onSelect={handleOptionSelect}
+                                    type={parsedOptions.type}
+                                  />
+                                </div>
                               </div>
                             ) : (
-                              formatJeevesResponse(msg.content)
+                              <div className="prose prose-sm max-w-none">
+                                {formatJeevesResponse(msg.content)}
+                              </div>
                             )}
                           </div>
                           {msg.role === "assistant" && <JeevesResponseValidator response={msg.content} />}

@@ -2099,19 +2099,26 @@ The user has provided an anchor text: ${verseReference}
 This may be a verse reference (e.g., "John 3:16") OR a story/parable name (e.g., "Parable of the Wheat and Tares", "Good Samaritan", "David and Goliath").
 
 ${isJeevesLed ? `
-JEEVES-LED MODE: You are the teacher. The user only chooses paths.
+JEEVES-LED MODE: You are the teacher. The user ONLY chooses paths. NEVER ask for user thoughts or reflections.
 
 Your task:
 1. Identify and locate the text:
    - If it's a verse reference, quote it in full
-   - If it's a story/parable name, identify the biblical location(s) and provide a brief summary of the narrative
-2. Provide concise exposition in 2-3 paragraphs:
-   - Historical/literary context (who wrote it, to whom, when, why)
-   - Key elements and their significance (phrases for verses, plot points for stories)
+   - If it's a story/parable name, identify the biblical location(s) and provide a brief summary
+2. Provide 2-3 paragraphs of rich teaching using PT rooms/principles:
+   - Historical/literary context
+   - Key elements and their significance
    - Main theological point (Christ-centered)
-3. Immediately ask: "Would you like to explore: (A) Cross-reference verses, or (B) Palace principles?"
+3. IMMEDIATELY present the choice in EXACT format:
 
-DO NOT ask reflection questions. DO NOT wait for user thoughts. Just teach, then offer the A/B choice.
+**Choose your next branch:**
+
+A. Cross-reference verses
+B. Palace principles
+
+Type A or B to continue.
+
+CRITICAL: Use exactly this format. NO reflection questions. NO asking what they think.
 ` : `
 TRADITIONAL MODE: Interactive study with user reflection.
 
@@ -2130,7 +2137,7 @@ Keep a warm, pastoral tone. Be clear about sin, judgment, and grace.`;
 
 Note: This may be a specific verse reference or a story/parable name. If it's a story, identify where it's found in Scripture and provide context.
 
-${isJeevesLed ? 'Provide exposition, then immediately ask the user to choose between (A) Cross-reference verses or (B) Palace principles. Do NOT ask for user thoughts or reflection.' : 'Provide exposition and reflection questions. Do NOT offer verse/principle options yet.'}`;
+${isJeevesLed ? 'Teach richly using PT principles, then IMMEDIATELY present the A/B choice in EXACT format shown above. NO reflection questions.' : 'Provide exposition and reflection questions. Do NOT offer verse/principle options yet.'}`;
         
         console.log("Starting new BranchStudy with:", verseReference);
         console.log("System prompt length:", systemPrompt.length);
@@ -2149,18 +2156,32 @@ Already used Palace rooms: ${(usedRooms || []).join(', ')}
 The user selected option ${selectedOption} from your previous set of options.
 
 ${isJeevesLed ? `
-JEEVES-LED MODE: You are the teacher. The user is just choosing the path.
+JEEVES-LED MODE: You teach, user chooses paths. NO reflection questions ever.
 
-Your task:
-1. Identify what option ${selectedOption} was (extract from conversation history)
-2. Begin with: "Excellent choice. Here's the connection..."
-3. REVEAL how this verse/principle connects to the anchor text (2-3 paragraphs):
-   - If verse: Quote it in full, show the parallel, reveal the typology or pattern
-   - If principle: Show how this Palace room illuminates the anchor text
-4. Provide rich theological teaching on this connection (2-3 paragraphs)
-5. Close by asking: "Would you like to explore: (A) Cross-reference verses, or (B) Palace principles?"
+**If user chose A or B (branch choice):**
+Present 5 options in EXACT format:
 
-Make the connection clear and surprising. This is YOUR teaching moment.
+A. [First verse/principle]
+B. [Second verse/principle]
+C. [Third verse/principle]
+D. [Fourth verse/principle]
+E. [Fifth verse/principle]
+
+Choose A, B, C, D, or E.
+
+**If user chose A-E (specific option):**
+1. Begin: "Excellent choice. Here's the connection..."
+2. TEACH deeply on this connection (2-3 paragraphs)
+3. Then present NEW branch:
+
+**Choose your next branch:**
+
+A. Cross-reference verses
+B. Palace principles
+
+Type A or B to continue.
+
+Make connections clear and Christ-centered. NO user reflection questions.
 ` : `
 TRADITIONAL MODE: The user is responding to your questions.
 
