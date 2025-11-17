@@ -2156,9 +2156,20 @@ ${isJeevesLed ? 'Teach richly using PT principles, then IMMEDIATELY present the 
         console.log("User prompt:", userPrompt);
         
       } else if (action === "select_option") {
-        // User has selected an option (A, B, or C)
+        // User has selected an option (A, B, C, D, or E)
         const selectedOption = userResponse.trim().toUpperCase();
         const isJeevesLed = studyMode === "jeeves-led";
+        
+        // Determine if user selected from 2-option branch or 5-option selection
+        const lastAssistantMessage = conversationHistory && conversationHistory.length > 0 
+          ? conversationHistory[conversationHistory.length - 1]?.content || ""
+          : "";
+        
+        const optionCount = (lastAssistantMessage.match(/^[A-E]\./gm) || []).length;
+        const isSelectingBranch = optionCount === 2; // User chose from A/B branch
+        const isSelectingSpecific = optionCount === 5; // User chose from A-E options
+        
+        console.log(`Previous message had ${optionCount} options. isSelectingBranch: ${isSelectingBranch}, isSelectingSpecific: ${isSelectingSpecific}`);
         
         const levelInstructions = {
           easy: 'Choose verses that follow the general theme and topic of the anchor text. Make connections clear and intuitive.',
@@ -2178,10 +2189,9 @@ The user selected option ${selectedOption} from your previous set of options.
 ${isJeevesLed ? `
 JEEVES-LED MODE: You teach, user chooses paths. NO reflection questions ever.
 
-**If user chose A or B (branch choice):**
-Present 5 options in EXACT format:
+${isSelectingBranch ? `**User chose from A/B branch - Present 5 options:**
 
-If VERSES (option A):
+${selectedOption === 'A' ? `If VERSES:
 VERSE SELECTION STRATEGY: ${levelInstructions[level as keyof typeof levelInstructions]}
 
 Format (MUST include full verse text):
@@ -2192,18 +2202,19 @@ D. [Book Chapter:Verse] "[Full verse text quoted]"
 E. [Book Chapter:Verse] "[Full verse text quoted]"
 
 Example:
-A. Proverbs 3:5 "Trust in the LORD with all thine heart; and lean not unto thine own understanding."
-
-If PRINCIPLES (option B):
+A. Proverbs 3:5 "Trust in the LORD with all thine heart; and lean not unto thine own understanding."` : `If PRINCIPLES:
 A. [Room Code] ([Room Name]) - [How it applies]
 B. [Room Code] ([Room Name]) - [How it applies]
-etc.
+C. [Room Code] ([Room Name]) - [How it applies]
+D. [Room Code] ([Room Name]) - [How it applies]
+E. [Room Code] ([Room Name]) - [How it applies]`}
 
-Choose A, B, C, D, or E.
+Choose A, B, C, D, or E.` : ''}
 
-**If user chose A-E (specific option):**
+${isSelectingSpecific ? `**User chose from A-E options - Teach and present NEW branch:**
+
 1. Begin: "Excellent choice. Here's the connection..."
-2. TEACH deeply on this connection (2-3 paragraphs)
+2. TEACH deeply on this connection (2-3 paragraphs minimum) - explain how this verse/principle connects to the anchor text using PT principles
 3. Then present NEW branch:
 
 **Choose your next branch:**
@@ -2211,7 +2222,7 @@ Choose A, B, C, D, or E.
 A. Cross-reference verses
 B. Palace principles
 
-Type A or B to continue.
+Type A or B to continue.` : ''}
 
 Make connections clear and Christ-centered. NO user reflection questions.
 ` : `
