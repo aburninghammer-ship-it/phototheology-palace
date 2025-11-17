@@ -2161,11 +2161,27 @@ JEEVES-LED MODE: You teach, user chooses paths. NO reflection questions ever.
 **If user chose A or B (branch choice):**
 Present 5 options in EXACT format:
 
-A. [First verse/principle]
-B. [Second verse/principle]
-C. [Third verse/principle]
-D. [Fourth verse/principle]
-E. [Fifth verse/principle]
+If VERSES (option A):
+CRITICAL: Choose RANDOM verses that DON'T obviously connect to the anchor.
+- Pick from diverse books (different genres: law, poetry, wisdom, prophecy, gospels, epistles)
+- Avoid obvious thematic matches or cross-references
+- Choose verses that seem unrelated at first glance
+- YOU will later reveal the surprising connection
+
+Format:
+A. [Book Chapter:Verse] "[Full verse text quoted]"
+B. [Book Chapter:Verse] "[Full verse text quoted]"
+C. [Book Chapter:Verse] "[Full verse text quoted]"
+D. [Book Chapter:Verse] "[Full verse text quoted]"
+E. [Book Chapter:Verse] "[Full verse text quoted]"
+
+Example:
+A. Proverbs 3:5 "Trust in the LORD with all thine heart; and lean not unto thine own understanding."
+
+If PRINCIPLES (option B):
+A. [Room Code] ([Room Name]) - [How it applies]
+B. [Room Code] ([Room Name]) - [How it applies]
+etc.
 
 Choose A, B, C, D, or E.
 
@@ -2237,47 +2253,43 @@ The user has requested a summary. Provide:
 
 Format this as a complete Bible study that could be used with others.`;
         } else {
-          // Check if user is choosing category (verses vs principles)
-          const isCategoryChoice = /^[AB]$/i.test(userResponse.trim());
-          const chosenCategory = isCategoryChoice ? userResponse.trim().toUpperCase() : null;
-          
           systemPrompt = `You are Jeeves running BranchStudy. The anchor text is: ${anchorText}
 
 Already used verses: ${(usedVerses || []).join(', ')}
 Already used Palace rooms: ${(usedRooms || []).join(', ')}
 
 ${isJeevesLed ? `
-JEEVES-LED MODE: You are the teacher driving this study.
+JEEVES-LED MODE: User responded. Determine what they chose.
 
-${chosenCategory ? `
-The user chose ${chosenCategory === 'A' ? 'cross-reference verses' : 'Palace principles'}. Now provide:
+**If they typed A or B (branch choice):**
+They want ${userResponse.toUpperCase() === 'A' ? 'verses' : 'principles'}. Provide 5 options:
 
-1. Brief affirmation (1 sentence)
-2. Present exactly 5 labeled options (A, B, C, D, E) that appear unrelated at first:
-   ${chosenCategory === 'A' ? '- List 5 verse references ONLY (e.g., "A. Genesis 22:8" or "B. John 19:30") - do NOT explain the connection yet' : '- List 5 Palace room codes/names ONLY (e.g., "A. CR (Concentration)" or "B. @Mo (Mosaic Cycle)") - do NOT explain how they apply yet'}
+${userResponse.toUpperCase() === 'A' ? `
+CRITICAL: Choose RANDOM verses from different books that DON'T obviously connect.
+- Pick from diverse genres (law, poetry, wisdom, prophecy, gospels, epistles)
+- Avoid obvious thematic matches
+- Choose verses that seem unrelated at first glance
 
-The connections should NOT be obvious. Let them be surprising. You will reveal the connection AFTER they choose.
+Format EXACTLY:
+A. [Book Chapter:Verse] "[Full verse text in quotes]"
+B. [Book Chapter:Verse] "[Full verse text in quotes]"
+C. [Book Chapter:Verse] "[Full verse text in quotes]"
+D. [Book Chapter:Verse] "[Full verse text in quotes]"
+E. [Book Chapter:Verse] "[Full verse text in quotes]"
+
+Example:
+A. Proverbs 3:5 "Trust in the LORD with all thine heart; and lean not unto thine own understanding."
 ` : `
-The user has shared: "${userResponse}"
-
-IMPORTANT: In Jeeves-led mode, you are the teacher. Do NOT ask the user reflection questions.
-
-Your task:
-1. Acknowledge what they shared (1 sentence)
-2. Provide brief teaching that builds on the anchor text (2-3 paragraphs)
-3. Then ask them to choose what to explore next:
-   "Would you like to explore: (A) Cross-reference verses, or (B) Palace principles?"
-
-Be warm, pastoral, and Christ-centered. Guide the study, don't quiz the user.
+Format EXACTLY:
+A. [Room Code] ([Room Name]) - [Brief how it applies]
+B. [Room Code] ([Room Name]) - [Brief how it applies]
+etc.
 `}
-` : `
-TRADITIONAL MODE: The user is exploring with you.
 
-The user has responded to your questions. Now:
-1. Acknowledge their response briefly (1-2 sentences)
-2. Offer exactly 5 labeled options (A, B, C, D, E):
-   - EITHER five cross-reference verses (with 1-2 line explanation each of how it deepens the anchor text)
-   - OR five Phototheology Palace rooms/principles with 1-2 line explanation of what you will explore
+**If they chose A-E (specific option):**
+Teach deeply on that choice, then present new A/B branch.
+` : `
+TRADITIONAL MODE: Acknowledge their reflection, then offer A/B paths.
 `}
 
 Available Palace rooms to choose from (avoid already used ones): Story Room (SR), Imagination Room (IR), Observation Room (OR), Def-Com Room (DC), Symbols/Types (@T), Questions Room (?), Concentration Room (CR), Dimensions Room (DR), Connect 6 (C6), Patterns (PRm), Parallels (P‖), Fruit Room (FRt), Blue/Sanctuary (BL), Prophecy (PR), Three Angels (3A), Fire Room (FRm), Meditation (MR)

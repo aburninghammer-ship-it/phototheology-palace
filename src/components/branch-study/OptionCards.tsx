@@ -8,39 +8,53 @@ interface OptionCardsProps {
   type: "verse" | "principle";
 }
 
+const cardColors = [
+  "from-blue-500/20 to-blue-600/10 border-blue-400/50 hover:border-blue-400",
+  "from-purple-500/20 to-purple-600/10 border-purple-400/50 hover:border-purple-400",
+  "from-green-500/20 to-green-600/10 border-green-400/50 hover:border-green-400",
+  "from-orange-500/20 to-orange-600/10 border-orange-400/50 hover:border-orange-400",
+  "from-pink-500/20 to-pink-600/10 border-pink-400/50 hover:border-pink-400",
+];
+
 export function OptionCards({ options, onSelect, type }: OptionCardsProps) {
   const cols = options.length === 2 ? "md:grid-cols-2" : "md:grid-cols-5";
   
   return (
     <div className={cn("grid grid-cols-1 gap-6 my-8", cols)}>
-      {options.map((option, idx) => (
-        <Card
-          key={option.label}
-          className={cn(
-            "group cursor-pointer transition-all duration-300",
-            "hover:scale-105 hover:shadow-2xl",
-            "border-2 hover:border-primary",
-            "bg-gradient-to-br from-card to-card/50",
-            "animate-in fade-in slide-in-from-bottom-4"
-          )}
-          style={{
-            animationDelay: `${idx * 100}ms`,
-          }}
-          onClick={() => onSelect(option.label)}
-        >
-          <CardContent className="p-6 flex flex-col items-center justify-center min-h-[140px] text-center space-y-3">
-            <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
-              {type === "verse" ? (
-                <BookOpen className="h-6 w-6 text-primary" />
-              ) : (
-                <Compass className="h-6 w-6 text-primary" />
-              )}
-            </div>
-            <div className="text-2xl font-bold text-primary">{option.label}</div>
-            <div className="text-sm font-medium leading-relaxed">{option.content}</div>
-          </CardContent>
-        </Card>
-      ))}
+      {options.map((option, idx) => {
+        const colorClass = cardColors[idx % cardColors.length];
+        
+        return (
+          <Card
+            key={option.label}
+            className={cn(
+              "group cursor-pointer transition-all duration-300",
+              "hover:scale-105 hover:shadow-2xl",
+              "border-2 bg-gradient-to-br",
+              colorClass,
+              "animate-in fade-in slide-in-from-bottom-4"
+            )}
+            style={{
+              animationDelay: `${idx * 100}ms`,
+            }}
+            onClick={() => onSelect(option.label)}
+          >
+            <CardContent className="p-6 flex flex-col items-start min-h-[180px] space-y-3">
+              <div className="w-full flex items-center justify-between mb-2">
+                <div className="text-3xl font-bold">{option.label}</div>
+                <div className="w-10 h-10 rounded-full bg-background/50 flex items-center justify-center">
+                  {type === "verse" ? (
+                    <BookOpen className="h-5 w-5" />
+                  ) : (
+                    <Compass className="h-5 w-5" />
+                  )}
+                </div>
+              </div>
+              <div className="text-sm leading-relaxed text-left">{option.content}</div>
+            </CardContent>
+          </Card>
+        );
+      })}
     </div>
   );
 }
