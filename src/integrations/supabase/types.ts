@@ -1578,6 +1578,80 @@ export type Database = {
         }
         Relationships: []
       }
+      genesis_challenge_daily_progress: {
+        Row: {
+          completed_at: string | null
+          created_at: string | null
+          day_number: number
+          floors_completed: number[] | null
+          id: string
+          participant_id: string
+        }
+        Insert: {
+          completed_at?: string | null
+          created_at?: string | null
+          day_number: number
+          floors_completed?: number[] | null
+          id?: string
+          participant_id: string
+        }
+        Update: {
+          completed_at?: string | null
+          created_at?: string | null
+          day_number?: number
+          floors_completed?: number[] | null
+          id?: string
+          participant_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "genesis_challenge_daily_progress_participant_id_fkey"
+            columns: ["participant_id"]
+            isOneToOne: false
+            referencedRelation: "genesis_challenge_participants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      genesis_challenge_participants: {
+        Row: {
+          completed_at: string | null
+          completed_floors: number[] | null
+          created_at: string | null
+          current_day: number | null
+          email: string
+          id: string
+          last_active_at: string | null
+          name: string | null
+          started_at: string | null
+          user_id: string | null
+        }
+        Insert: {
+          completed_at?: string | null
+          completed_floors?: number[] | null
+          created_at?: string | null
+          current_day?: number | null
+          email: string
+          id?: string
+          last_active_at?: string | null
+          name?: string | null
+          started_at?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          completed_at?: string | null
+          completed_floors?: number[] | null
+          created_at?: string | null
+          current_day?: number | null
+          email?: string
+          id?: string
+          last_active_at?: string | null
+          name?: string | null
+          started_at?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       memorization_verses: {
         Row: {
           added_at: string
