@@ -9,11 +9,11 @@ interface OptionCardsProps {
 }
 
 const cardColors = [
-  "from-blue-500/20 to-blue-600/10 border-blue-400/50 hover:border-blue-400",
-  "from-purple-500/20 to-purple-600/10 border-purple-400/50 hover:border-purple-400",
-  "from-green-500/20 to-green-600/10 border-green-400/50 hover:border-green-400",
-  "from-orange-500/20 to-orange-600/10 border-orange-400/50 hover:border-orange-400",
-  "from-pink-500/20 to-pink-600/10 border-pink-400/50 hover:border-pink-400",
+  "from-blue-500/30 to-blue-600/20 border-blue-500/60 hover:border-blue-400 hover:from-blue-500/40 hover:to-blue-600/30",
+  "from-purple-500/30 to-purple-600/20 border-purple-500/60 hover:border-purple-400 hover:from-purple-500/40 hover:to-purple-600/30",
+  "from-green-500/30 to-green-600/20 border-green-500/60 hover:border-green-400 hover:from-green-500/40 hover:to-green-600/30",
+  "from-orange-500/30 to-orange-600/20 border-orange-500/60 hover:border-orange-400 hover:from-orange-500/40 hover:to-orange-600/30",
+  "from-pink-500/30 to-pink-600/20 border-pink-500/60 hover:border-pink-400 hover:from-pink-500/40 hover:to-pink-600/30",
 ];
 
 export function OptionCards({ options, onSelect, type }: OptionCardsProps) {
