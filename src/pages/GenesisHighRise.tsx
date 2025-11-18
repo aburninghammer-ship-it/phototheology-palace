@@ -425,11 +425,11 @@ export default function GenesisHighRise() {
                       transition={{ duration: 0.3 }}
                       className="space-y-6"
                     >
-                      <div className="relative aspect-square rounded-lg overflow-hidden border-4 border-border shadow-2xl">
+                      <div className="relative aspect-square rounded-lg overflow-hidden border-4 border-border shadow-2xl bg-muted/30 flex items-center justify-center">
                         <img 
                           src={genesisImages[currentFloor - 1]} 
                           alt={`Genesis Chapter ${currentFloor}`}
-                          className="w-full h-full object-cover"
+                          className="w-full h-full object-contain"
                         />
                         {completedFloors.has(currentFloor) && (
                           <div className="absolute top-4 right-4 bg-green-500 text-white p-2 rounded-full">
