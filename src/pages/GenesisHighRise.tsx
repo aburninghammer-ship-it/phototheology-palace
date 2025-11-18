@@ -214,19 +214,25 @@ export default function GenesisHighRise() {
     }, 300);
   };
 
-  const shareChallenge = () => {
+  const shareChallenge = async () => {
     const text = `I'm memorizing the Book of Genesis in 7 days using the High Rise Challenge! 🏢📖 ${completedFloors.size}/50 chapters complete. Join me!`;
     const url = window.location.href;
     
-    if (navigator.share) {
-      navigator.share({ 
-        title: "Genesis High Rise - 7 Day Challenge", 
-        text, 
-        url
-      });
-    } else {
-      navigator.clipboard.writeText(`${text}\n${url}`);
-      toast.success("Challenge link copied to clipboard!");
+    try {
+      if (navigator.share) {
+        await navigator.share({ 
+          title: "Genesis High Rise - 7 Day Challenge", 
+          text, 
+          url
+        });
+        toast.success("Challenge shared successfully!");
+      } else {
+        await navigator.clipboard.writeText(`${text}\n${url}`);
+        toast.success("Challenge link copied to clipboard!");
+      }
+    } catch (error) {
+      // User cancelled the share or clipboard access was denied
+      console.log("Share cancelled or failed:", error);
     }
   };
 
