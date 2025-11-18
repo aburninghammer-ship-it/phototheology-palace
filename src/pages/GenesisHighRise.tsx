@@ -13,6 +13,22 @@ import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
+const GENESIS_ANSWERS = [
+  "Creation", "Adam and Eve", "The Fall of Man", "Cain Kills Abel", "The 'Jean'-eology of Adam",
+  "The Ark", "The Flood", "The Waters Recede", "The Rainbow", "The 'Jean'-eology of Noah",
+  "The Tower of Babel", "Abraham's Journey", "Abraham and Lot Separate", "Abraham and Lot Reunite",
+  "The Covenant with Abraham", "Ishmael", "Circumcision", "God and the Angels Visit Abraham",
+  "Sodom and Gomorrah", "Abraham 'Lies' to Abimelech", "Isaac (The 2nd Comes Before the First)",
+  "Abraham Takes Isaac to Sacrifice", "Sarah Dies", "Isaac and Rebekah 2gether 4ever",
+  "Jacob and Esau: Pottage of Stew", "Isaac Lies to Abimelech", "Jacob Dresses as Esau (7 is a cloak around 2)",
+  "Jacob Flees to Bethel", "Jacob Marries Leah and Rachel", "Jacob Prospers", "Jacob, Leah, Rachel Flee Laban",
+  "Jacob Wrestles with the Angel", "The Twins (Jacob and Esau) Reunite", "The Rape of Dinah, Brothers Protest",
+  "Rachel Dies", "'Jean'-eology of Esau", "The 7 is the Coat on Joseph (3)", "Judah's Moral Fall",
+  "Potiphar's Wife", "Butler and the Baker", "Joseph Ascends to 2nd Highest in Egypt",
+  "The Brothers' First Trip to Egypt", "The Brothers' 2nd Trip to Egypt", "The Cup", "Joseph is Alive",
+  "Israel to Egypt", "Israel to Goshen", "Ephraim and Manasseh Blessed", "Jacob Dies", "Joseph Dies"
+];
+
 const CHALLENGE_MODES = [
   { id: "sequential", name: "Floor by Floor", icon: ChevronUp, description: "Master each floor in order (1-50)" },
   { id: "reverse", name: "Descending", icon: ChevronDown, description: "Go backwards from 50 to 1" },
@@ -44,6 +60,7 @@ export default function GenesisHighRise() {
   const [currentDay, setCurrentDay] = useState(1);
   const [participantId, setParticipantId] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showAnswer, setShowAnswer] = useState(false);
 
   const progress = (completedFloors.size / 50) * 100;
   const currentDayProgress = DAILY_GOALS[currentDay - 1];
@@ -171,6 +188,7 @@ export default function GenesisHighRise() {
 
   const goToNextFloor = () => {
     setShowImage(false);
+    setShowAnswer(false);
     
     setTimeout(async () => {
       const newCompleted = new Set(completedFloors);
@@ -438,11 +456,40 @@ export default function GenesisHighRise() {
                         )}
                       </div>
                       
-                      <div className="text-center space-y-2">
-                        <p className="text-2xl font-bold">Genesis {currentFloor}</p>
+                      <div className="text-center space-y-4">
+                        <p className="text-2xl font-bold">Genesis Chapter {currentFloor}</p>
                         <p className="text-muted-foreground">
                           Study this image. What story does it tell?
                         </p>
+                        
+                        <AnimatePresence mode="wait">
+                          {!showAnswer ? (
+                            <motion.div
+                              initial={{ opacity: 1 }}
+                              exit={{ opacity: 0 }}
+                              className="pt-2"
+                            >
+                              <Button 
+                                onClick={() => setShowAnswer(true)} 
+                                variant="secondary"
+                                size="lg"
+                                className="w-full"
+                              >
+                                Reveal Answer
+                              </Button>
+                            </motion.div>
+                          ) : (
+                            <motion.div
+                              initial={{ opacity: 0, y: 10 }}
+                              animate={{ opacity: 1, y: 0 }}
+                              className="p-6 bg-primary/10 rounded-lg border-2 border-primary/50"
+                            >
+                              <p className="text-lg font-semibold text-primary">
+                                {GENESIS_ANSWERS[currentFloor - 1]}
+                              </p>
+                            </motion.div>
+                          )}
+                        </AnimatePresence>
                       </div>
 
                       <div className="flex gap-3">
@@ -450,7 +497,7 @@ export default function GenesisHighRise() {
                           Next Floor
                           <ChevronUp className="w-4 h-4 ml-2" />
                         </Button>
-                        <Button onClick={() => setMode(null)} variant="outline" size="lg">
+                        <Button onClick={() => { setMode(null); setShowAnswer(false); }} variant="outline" size="lg">
                           Exit Elevator
                         </Button>
                       </div>
