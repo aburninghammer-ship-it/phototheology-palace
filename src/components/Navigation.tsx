@@ -211,6 +211,13 @@ export const Navigation = () => {
                   >
                     Games
                   </Link>
+                  <Link 
+                    to="/genesis-challenge" 
+                    className="px-3 py-1.5 text-sm font-medium text-foreground hover:text-primary hover:bg-accent/50 rounded-md transition-colors whitespace-nowrap flex items-center gap-1"
+                  >
+                    <Building2 className="h-3.5 w-3.5" />
+                    Genesis High Rise
+                  </Link>
                   
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>

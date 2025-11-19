@@ -288,6 +288,50 @@ const Index = () => {
               </CardContent>
             </Card>
           </div>
+
+          {/* Genesis High Rise Challenge */}
+          <div className="mt-8">
+            <Card className="bg-gradient-to-br from-accent/10 via-primary/5 to-accent/10 border-accent/30 overflow-hidden">
+              <CardContent className="py-8 relative">
+                <div className="absolute top-0 right-0 opacity-10">
+                  <Building2 className="h-32 w-32" />
+                </div>
+                <div className="relative z-10">
+                  <Badge className="mb-4 bg-accent/20 text-accent-foreground border-accent/30">
+                    🏢 Featured Challenge
+                  </Badge>
+                  <h3 className="text-2xl font-bold mb-3">Genesis High Rise — 7 Day Challenge</h3>
+                  <p className="text-muted-foreground mb-6 max-w-2xl mx-auto">
+                    Memorize all 50 chapters of Genesis in 7 days! Climb the High Rise floor by floor, using visual memory techniques to master the foundation of Scripture.
+                  </p>
+                  <div className="flex flex-wrap gap-3 justify-center mb-6">
+                    <Badge variant="outline" className="gap-1">
+                      <Target className="h-3 w-3" />
+                      50 Chapters
+                    </Badge>
+                    <Badge variant="outline" className="gap-1">
+                      <TrendingUp className="h-3 w-3" />
+                      7 Days
+                    </Badge>
+                    <Badge variant="outline" className="gap-1">
+                      <Brain className="h-3 w-3" />
+                      Visual Memory
+                    </Badge>
+                  </div>
+                  <Button 
+                    size="lg"
+                    onClick={() => navigate("/genesis-challenge")}
+                    className="gap-2"
+                    variant="default"
+                  >
+                    <Building2 className="h-5 w-5" />
+                    Start Genesis Challenge
+                    <ArrowRight className="h-5 w-5" />
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
         </div>
       </section>
 
