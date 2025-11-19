@@ -42,7 +42,7 @@ export default function ReadingPlans() {
         {/* Header */}
         <div className="text-center mb-12">
           <h1 className="text-4xl font-bold mb-4 text-foreground">
-            Bible Reading Plans
+            Phototheology Bible Reading Plan
           </h1>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
             Journey through Scripture with structured Palace exercises
