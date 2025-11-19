@@ -341,6 +341,18 @@ const Community = () => {
                   <p className="text-muted-foreground text-lg">
                     Connect, share insights, and grow together in faith
                   </p>
+                  <div className="flex items-center gap-2 mt-3">
+                    {posts.filter(p => (comments[p.id]?.length || 0) === 0).length > 0 && (
+                      <Badge variant="secondary" className="flex items-center gap-1">
+                        <Sparkles className="h-3 w-3" />
+                        {posts.filter(p => (comments[p.id]?.length || 0) === 0).length} posts need feedback
+                      </Badge>
+                    )}
+                    <Badge variant="outline" className="flex items-center gap-1">
+                      <Users className="h-3 w-3" />
+                      {activeCount} active now
+                    </Badge>
+                  </div>
                 </div>
                 <Button onClick={() => setShowNewPost(!showNewPost)} size="lg" className="shadow-lg">
                   <Plus className="mr-2 h-5 w-5" />
@@ -464,9 +476,17 @@ const Community = () => {
                             {(post.profiles?.display_name || post.profiles?.username || user?.email || 'U').charAt(0).toUpperCase()}
                           </AvatarFallback>
                         </Avatar>
-                        <div>
-                          <CardTitle className="text-xl">{post.title}</CardTitle>
-                          <CardDescription className="flex items-center gap-2 mt-1">
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2 mb-1">
+                            <CardTitle className="text-xl">{post.title}</CardTitle>
+                            {postComments.length === 0 && (
+                              <Badge variant="secondary" className="flex items-center gap-1 text-xs animate-pulse">
+                                <Sparkles className="h-3 w-3" />
+                                Needs feedback
+                              </Badge>
+                            )}
+                          </div>
+                          <CardDescription className="flex items-center gap-2">
                             <span className="font-medium">{post.profiles?.display_name || post.profiles?.username || 'Anonymous'}</span>
                             <span>•</span>
                             <span>{new Date(post.created_at).toLocaleDateString('en-US', { 
