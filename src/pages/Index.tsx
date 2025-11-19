@@ -603,6 +603,16 @@ const Index = () => {
               </CardContent>
             </Card>
             
+            <Card className="group hover:shadow-lg transition-all cursor-pointer" onClick={() => navigate("/bible-reference")}>
+              <CardHeader>
+                <BookOpen className="w-12 h-12 text-accent mb-4 group-hover:scale-110 transition-transform" />
+                <CardTitle>Bible Reference Library</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-muted-foreground">Comprehensive collection of Bible facts, timelines, maps, and charts.</p>
+              </CardContent>
+            </Card>
+            
             <Card className="group hover:shadow-lg transition-all cursor-pointer" onClick={() => navigate("/sermon-builder")}>
               <CardHeader>
                 <FileText className="w-12 h-12 text-accent mb-4 group-hover:scale-110 transition-transform" />
