@@ -69,6 +69,8 @@ const PhototheologyGPT = lazy(() => import("./pages/PhototheologyGPT"));
 const DanielRevelationGPT = lazy(() => import("./pages/DanielRevelationGPT"));
 const ApologeticsGPT = lazy(() => import("./pages/ApologeticsGPT"));
 const QuarterlyStudy = lazy(() => import("./pages/QuarterlyStudy"));
+const ReadingPlans = lazy(() => import("./pages/ReadingPlans"));
+const DailyReading = lazy(() => import("./pages/DailyReading"));
 const TreasureHunt = lazy(() => import("./pages/TreasureHunt"));
 const TreasureHuntPlay = lazy(() => import("./pages/TreasureHuntPlay"));
 const TrainingDrills = lazy(() => import("./pages/TrainingDrills"));
@@ -194,6 +196,8 @@ function App() {
             <Route path="/bible" element={<ProtectedRoute><Bible /></ProtectedRoute>} />
             <Route path="/bible/search" element={<ProtectedRoute><BibleSearch /></ProtectedRoute>} />
             <Route path="/bible/:book/:chapter" element={<ProtectedRoute><BibleChapter /></ProtectedRoute>} />
+            <Route path="/reading-plans" element={<ProtectedRoute><ReadingPlans /></ProtectedRoute>} />
+            <Route path="/daily-reading" element={<ProtectedRoute><DailyReading /></ProtectedRoute>} />
             <Route path="/memorization-verses" element={<ProtectedRoute><MemorizationVerses /></ProtectedRoute>} />
             <Route path="/verse-memory-hall" element={<ProtectedRoute><VerseMemoryHall /></ProtectedRoute>} />
             <Route path="/daily-challenges" element={<ProtectedRoute><DailyChallenges /></ProtectedRoute>} />
