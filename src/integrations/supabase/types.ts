@@ -899,6 +899,47 @@ export type Database = {
         }
         Relationships: []
       }
+      daily_reading_completions: {
+        Row: {
+          completed_at: string
+          created_at: string | null
+          day_number: number
+          floor_responses: Json | null
+          floors_completed: string[] | null
+          id: string
+          notes: string | null
+          user_progress_id: string
+        }
+        Insert: {
+          completed_at?: string
+          created_at?: string | null
+          day_number: number
+          floor_responses?: Json | null
+          floors_completed?: string[] | null
+          id?: string
+          notes?: string | null
+          user_progress_id: string
+        }
+        Update: {
+          completed_at?: string
+          created_at?: string | null
+          day_number?: number
+          floor_responses?: Json | null
+          floors_completed?: string[] | null
+          id?: string
+          notes?: string | null
+          user_progress_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "daily_reading_completions_user_progress_id_fkey"
+            columns: ["user_progress_id"]
+            isOneToOne: false
+            referencedRelation: "user_reading_progress"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       drill_results: {
         Row: {
           completed_at: string
@@ -2377,6 +2418,39 @@ export type Database = {
         }
         Relationships: []
       }
+      reading_plans: {
+        Row: {
+          created_at: string | null
+          daily_schedule: Json
+          depth_mode: string
+          description: string | null
+          duration_days: number
+          id: string
+          name: string
+          plan_type: string
+        }
+        Insert: {
+          created_at?: string | null
+          daily_schedule: Json
+          depth_mode?: string
+          description?: string | null
+          duration_days: number
+          id?: string
+          name: string
+          plan_type: string
+        }
+        Update: {
+          created_at?: string | null
+          daily_schedule?: Json
+          depth_mode?: string
+          description?: string | null
+          duration_days?: number
+          id?: string
+          name?: string
+          plan_type?: string
+        }
+        Relationships: []
+      }
       referrals: {
         Row: {
           converted_at: string | null
@@ -3517,6 +3591,53 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      user_reading_progress: {
+        Row: {
+          created_at: string | null
+          current_day: number
+          custom_settings: Json | null
+          id: string
+          is_active: boolean | null
+          last_completed_day: number | null
+          plan_id: string
+          started_at: string
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          current_day?: number
+          custom_settings?: Json | null
+          id?: string
+          is_active?: boolean | null
+          last_completed_day?: number | null
+          plan_id: string
+          started_at?: string
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          current_day?: number
+          custom_settings?: Json | null
+          id?: string
+          is_active?: boolean | null
+          last_completed_day?: number | null
+          plan_id?: string
+          started_at?: string
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_reading_progress_plan_id_fkey"
+            columns: ["plan_id"]
+            isOneToOne: false
+            referencedRelation: "reading_plans"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       user_roles: {
         Row: {
