@@ -5,10 +5,12 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
-import { MessageSquare, Plus, Heart, Users, Reply, Send, Sparkles, Pencil, Trash2 } from "lucide-react";
+import { MessageSquare, Plus, Heart, Users, Reply, Send, Sparkles, Pencil, Trash2, Filter } from "lucide-react";
 import { EmojiPicker } from "@/components/EmojiPicker";
 import { communityPostSchema } from "@/lib/validationSchemas";
 import { sanitizeHtml } from "@/lib/sanitize";
@@ -16,6 +18,9 @@ import { useActiveUsers } from "@/hooks/useActiveUsers";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
+
+type SortOption = "latest" | "most_commented" | "needs_feedback";
+type CategoryFilter = "all" | "general" | "prayer" | "study" | "questions";
 
 const Community = () => {
   const { user, loading } = useAuth();
@@ -26,12 +31,15 @@ const Community = () => {
   const [showNewPost, setShowNewPost] = useState(false);
   const [newTitle, setNewTitle] = useState("");
   const [newContent, setNewContent] = useState("");
+  const [newCategory, setNewCategory] = useState<string>("general");
   const [comments, setComments] = useState<Record<string, any[]>>({});
   const [newComment, setNewComment] = useState<Record<string, string>>({});
   const [replyingTo, setReplyingTo] = useState<Record<string, string | null>>({});
   const [expandedPosts, setExpandedPosts] = useState<Record<string, boolean>>({});
   const [editingComment, setEditingComment] = useState<string | null>(null);
   const [editContent, setEditContent] = useState<string>("");
+  const [sortBy, setSortBy] = useState<SortOption>("latest");
+  const [categoryFilter, setCategoryFilter] = useState<CategoryFilter>("all");
 
   useEffect(() => {
     if (user && user.id) {
@@ -133,7 +141,7 @@ const Community = () => {
       const validatedData = communityPostSchema.parse({
         title: newTitle,
         content: newContent,
-        category: "general"
+        category: newCategory
       });
 
       // Sanitize content before storing
@@ -158,6 +166,7 @@ const Community = () => {
 
       setNewTitle("");
       setNewContent("");
+      setNewCategory("general");
       setShowNewPost(false);
     } catch (error: any) {
       if (error.name === 'ZodError') {
@@ -321,7 +330,39 @@ const Community = () => {
     return Array.from(commentMap.values());
   };
 
+  const getFilteredAndSortedPosts = () => {
+    let filtered = posts;
+
+    // Filter by category
+    if (categoryFilter !== "all") {
+      filtered = filtered.filter(p => p.category === categoryFilter);
+    }
+
+    // Sort posts
+    const sorted = [...filtered].sort((a, b) => {
+      switch (sortBy) {
+        case "most_commented":
+          return (comments[b.id]?.length || 0) - (comments[a.id]?.length || 0);
+        case "needs_feedback":
+          const aHasComments = (comments[a.id]?.length || 0) > 0;
+          const bHasComments = (comments[b.id]?.length || 0) > 0;
+          if (aHasComments === bHasComments) {
+            return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+          }
+          return aHasComments ? 1 : -1;
+        case "latest":
+        default:
+          return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+      }
+    });
+
+    return sorted;
+  };
+
   if (!user) return null;
+
+  const filteredPosts = getFilteredAndSortedPosts();
+  const needsFeedbackCount = posts.filter(p => (comments[p.id]?.length || 0) === 0).length;
 
   return (
     <div className="min-h-screen bg-background">
@@ -342,10 +383,10 @@ const Community = () => {
                     Connect, share insights, and grow together in faith
                   </p>
                   <div className="flex items-center gap-2 mt-3">
-                    {posts.filter(p => (comments[p.id]?.length || 0) === 0).length > 0 && (
+                    {needsFeedbackCount > 0 && (
                       <Badge variant="secondary" className="flex items-center gap-1">
                         <Sparkles className="h-3 w-3" />
-                        {posts.filter(p => (comments[p.id]?.length || 0) === 0).length} posts need feedback
+                        {needsFeedbackCount} posts need feedback
                       </Badge>
                     )}
                     <Badge variant="outline" className="flex items-center gap-1">
@@ -363,7 +404,8 @@ const Community = () => {
           </div>
 
           {/* Who's Online Section */}
-          <Card className="border-primary/20">
+          {activeUsers.length > 0 && (
+            <Card className="border-primary/20">
             <CardHeader className="pb-3">
               <div className="flex items-center gap-2">
                 <div className="h-2 w-2 bg-green-500 rounded-full animate-pulse" />
@@ -375,9 +417,8 @@ const Community = () => {
               <CardDescription>Connect with members online</CardDescription>
             </CardHeader>
             <CardContent>
-              {activeUsers.length > 0 ? (
-                <div className="flex flex-wrap gap-2">
-                  {activeUsers.map((activeUser) => (
+              <div className="flex flex-wrap gap-2">
+                {activeUsers.map((activeUser) => (
                     <button
                       key={activeUser.id}
                       onClick={() => {
@@ -406,11 +447,9 @@ const Community = () => {
                     </button>
                   ))}
                 </div>
-              ) : (
-                <p className="text-sm text-muted-foreground">No one else is currently online</p>
-              )}
-            </CardContent>
-          </Card>
+              </CardContent>
+            </Card>
+          )}
 
           {showNewPost && (
             <Card className="border-primary/20 shadow-lg">
@@ -429,6 +468,17 @@ const Community = () => {
                   maxLength={200}
                   className="text-lg font-medium"
                 />
+                <Select value={newCategory} onValueChange={setNewCategory}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select category" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="general">General Discussion</SelectItem>
+                    <SelectItem value="prayer">Prayer Requests</SelectItem>
+                    <SelectItem value="study">Bible Study</SelectItem>
+                    <SelectItem value="questions">Questions</SelectItem>
+                  </SelectContent>
+                </Select>
                 <div className="space-y-2">
                   <Textarea
                     placeholder="Share your thoughts, insights, or questions... (emojis supported 😊)"
@@ -460,8 +510,60 @@ const Community = () => {
             </Card>
           )}
 
+          {/* Filters and Sort */}
+          <Card className="border-primary/20">
+            <CardContent className="pt-6">
+              <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Filter className="h-4 w-4 text-muted-foreground" />
+                  <span className="text-sm font-medium">Filter & Sort</span>
+                </div>
+                <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
+                  <Tabs value={categoryFilter} onValueChange={(v) => setCategoryFilter(v as CategoryFilter)} className="w-full sm:w-auto">
+                    <TabsList className="grid grid-cols-5 w-full sm:w-auto">
+                      <TabsTrigger value="all" className="text-xs">All</TabsTrigger>
+                      <TabsTrigger value="general" className="text-xs">General</TabsTrigger>
+                      <TabsTrigger value="prayer" className="text-xs">Prayer</TabsTrigger>
+                      <TabsTrigger value="study" className="text-xs">Study</TabsTrigger>
+                      <TabsTrigger value="questions" className="text-xs">Questions</TabsTrigger>
+                    </TabsList>
+                  </Tabs>
+                  <Select value={sortBy} onValueChange={(v) => setSortBy(v as SortOption)}>
+                    <SelectTrigger className="w-full sm:w-[180px]">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="latest">Latest First</SelectItem>
+                      <SelectItem value="most_commented">Most Commented</SelectItem>
+                      <SelectItem value="needs_feedback">Needs Feedback</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Posts List */}
           <div className="space-y-6">
-            {posts.map((post) => {
+            {filteredPosts.length === 0 ? (
+              <Card className="border-dashed">
+                <CardContent className="pt-12 pb-12 text-center">
+                  <Sparkles className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
+                  <p className="text-lg font-medium mb-2">No posts yet</p>
+                  <p className="text-muted-foreground mb-4">
+                    {categoryFilter !== "all" 
+                      ? `No posts in the ${categoryFilter} category yet.`
+                      : "Be the first to share something with the community!"}
+                  </p>
+                  {categoryFilter !== "all" && (
+                    <Button variant="outline" onClick={() => setCategoryFilter("all")}>
+                      View All Posts
+                    </Button>
+                  )}
+                </CardContent>
+              </Card>
+            ) : (
+              filteredPosts.map((post) => {
               const postComments = organizeComments(comments[post.id] || []);
               const isExpanded = expandedPosts[post.id];
               
@@ -477,7 +579,7 @@ const Community = () => {
                           </AvatarFallback>
                         </Avatar>
                         <div className="flex-1">
-                          <div className="flex items-center gap-2 mb-1">
+                          <div className="flex items-center gap-2 mb-1 flex-wrap">
                             <CardTitle className="text-xl">{post.title}</CardTitle>
                             {postComments.length === 0 && (
                               <Badge variant="secondary" className="flex items-center gap-1 text-xs animate-pulse">
@@ -486,7 +588,7 @@ const Community = () => {
                               </Badge>
                             )}
                           </div>
-                          <CardDescription className="flex items-center gap-2">
+                          <CardDescription className="flex items-center gap-2 flex-wrap">
                             <span className="font-medium">{post.profiles?.display_name || post.profiles?.username || 'Anonymous'}</span>
                             <span>•</span>
                             <span>{new Date(post.created_at).toLocaleDateString('en-US', { 
@@ -499,7 +601,7 @@ const Community = () => {
                         </div>
                       </div>
                       {post.category && (
-                        <Badge variant="secondary">{post.category}</Badge>
+                        <Badge variant="secondary" className="capitalize">{post.category}</Badge>
                       )}
                     </div>
                   </CardHeader>
@@ -768,7 +870,8 @@ const Community = () => {
                   </CardContent>
                 </Card>
               );
-            })}
+              })
+            )}
           </div>
 
           {posts.length === 0 && !showNewPost && (
