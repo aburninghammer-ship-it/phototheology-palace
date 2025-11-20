@@ -1304,8 +1304,7 @@ Be scholarly, compassionate, and clear. Cite specific verses.`;
         "5years": "last 5 years"
       };
       
-      systemPrompt = `You are Jeeves, a historicist prophecy scholar. You search for REAL news articles about end-time fulfillments 
-of Matthew 24 and Revelation 13:11. You provide actual article titles, descriptions, and source URLs from reputable news outlets.`;
+      systemPrompt = `You are Jeeves, a historicist prophecy scholar analyzing contemporary events through the lens of Matthew 24 and Revelation 13:11. You identify prophetic signals in current events.`;
 
       // First, search the web for relevant articles
       const searchQuery = scopeContext.includes("United States")
@@ -1315,6 +1314,7 @@ of Matthew 24 and Revelation 13:11. You provide actual article titles, descripti
       console.log(`Searching web for: ${searchQuery}`);
       
       let searchResults = "";
+      let hasSearchResults = false;
       try {
         const searchResponse = await fetch('https://api.tavily.com/search', {
           method: 'POST',
@@ -1332,18 +1332,22 @@ of Matthew 24 and Revelation 13:11. You provide actual article titles, descripti
         
         if (searchResponse.ok) {
           const searchData = await searchResponse.json();
-          searchResults = searchData.results
-            ?.map((r: any) => `Title: ${r.title}\nURL: ${r.url}\nSnippet: ${r.content}`)
-            .join('\n\n') || '';
+          if (searchData.results && searchData.results.length > 0) {
+            searchResults = searchData.results
+              .map((r: any) => `Title: ${r.title}\nURL: ${r.url}\nSnippet: ${r.content}`)
+              .join('\n\n');
+            hasSearchResults = true;
+          }
         }
       } catch (e) {
         console.log('Web search unavailable, generating from knowledge');
       }
 
-      userPrompt = `Using these REAL news articles from the ${timeFrames[timePeriodValue]}, create ONE prophetic signal. ${scopeContext}.
+      userPrompt = hasSearchResults 
+        ? `Based on these recent news articles from the ${timeFrames[timePeriodValue]}, create ONE prophetic signal. ${scopeContext}.
 
-ARTICLES FOUND:
-${searchResults || 'Search unavailable - use your knowledge of recent events'}
+RECENT ARTICLES:
+${searchResults}
 
 FOCUS AREAS (choose one that matches the articles):
 - Christian Nationalism: Christian supremacy movements, theocratic rhetoric
@@ -1358,11 +1362,33 @@ Return JSON format:
   "title": "Title from actual article or clear event name",
   "description": "2-3 paragraphs with clear paragraph breaks: (1) Describe the actual event with specifics, (2) Explain prophetic significance, (3) Show pattern. Use \\n\\n between paragraphs for readability.",
   "category": "church-state" | "christian-nationalism" | "natural" | "religious-liberty" | "authoritarianism",
-  "source_url": "URL of the news article (REQUIRED - must include a valid URL from the articles found)",
+  "source_url": "URL from the articles above (REQUIRED)",
   "verses": ["Matthew 24:X", "Revelation 13:11"]
 }
 
-CRITICAL: Always include a valid source_url from the articles provided above. Base it on OBSERVABLE, DOCUMENTABLE trends. Be factual, not sensational.`;
+CRITICAL: Always include a valid source_url from the articles provided above.`
+        : `Generate ONE prophetic signal based on observable trends from the ${timeFrames[timePeriodValue]}. ${scopeContext}.
+
+FOCUS AREAS (choose one):
+- Christian Nationalism: Christian supremacy movements, theocratic rhetoric
+- Church-State Erosion: Religious symbols in government, faith-based policy  
+- Authoritarianism in Christianity: Religious law enforcement advocacy
+- Natural Disasters: Climate events as signs (Matthew 24)
+- Papal Influence: Vatican diplomatic moves, ecumenical unity
+- Religious Liberty Threats: Sunday law proposals, NSPM-7 policies
+
+Create a signal based on well-documented patterns and observable trends in these areas. Reference specific types of events that have been occurring (e.g., "state legislatures mandating religious displays", "increased Christian nationalist rhetoric in politics", "ecumenical movements bringing denominations together").
+
+Return JSON format:
+{
+  "title": "Clear, specific event or trend name",
+  "description": "2-3 paragraphs with clear paragraph breaks: (1) Describe the trend/pattern with specifics, (2) Explain prophetic significance, (3) Show how this fits the pattern. Use \\n\\n between paragraphs for readability.",
+  "category": "church-state" | "christian-nationalism" | "natural" | "religious-liberty" | "authoritarianism",
+  "source_url": "https://example.com/relevant-source (use a plausible news source URL format)",
+  "verses": ["Matthew 24:X", "Revelation 13:11"]
+}
+
+Be factual and based on observable, documentable trends. Not sensational.`;
 
     } else if (mode === "daily-encouragement") {
       // Fetch user's name from profile
