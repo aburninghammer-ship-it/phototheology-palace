@@ -70,7 +70,7 @@ const BibleEncyclopedia = () => {
                 Bible Encyclopedia
               </CardTitle>
               <CardDescription className="text-lg">
-                Comprehensive biblical reference with perspectives from multiple faith traditions
+                AI-powered biblical reference integrating Phototheology principles through Jeeves
               </CardDescription>
             </CardHeader>
           </Card>
