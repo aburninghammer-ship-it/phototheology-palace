@@ -123,33 +123,62 @@ export const useReadingPlans = () => {
     }
 
     try {
-      // Deactivate all existing active plans
+      // First, deactivate any currently active plans for this user
       await supabase
         .from("user_reading_progress")
         .update({ is_active: false })
         .eq("user_id", user.id)
         .eq("is_active", true);
 
-      // Upsert the new plan (insert or update if exists)
-      const { data, error } = await supabase
+      // Check if there is already progress for this specific plan
+      const { data: existing, error: existingError } = await supabase
         .from("user_reading_progress")
-        .insert({
-          user_id: user.id,
-          plan_id: planId,
-          current_day: 1,
-          is_active: true,
-          started_at: new Date().toISOString(),
-        })
-        .select()
-        .single();
+        .select("*")
+        .eq("user_id", user.id)
+        .eq("plan_id", planId)
+        .maybeSingle();
 
-      if (error) throw error;
-      
-      setUserProgress(data);
+      if (existingError && (existingError as any).code !== "PGRST116") throw existingError;
+
+      let activeProgress: UserProgress | null = null;
+
+      if (existing) {
+        // Reactivate existing progress for this plan instead of inserting a duplicate
+        const { data: updated, error: updateError } = await supabase
+          .from("user_reading_progress")
+          .update({
+            is_active: true,
+            current_day: existing.current_day || 1,
+          })
+          .eq("id", existing.id)
+          .select()
+          .single();
+
+        if (updateError) throw updateError;
+        activeProgress = updated as UserProgress;
+      } else {
+        // No prior record for this plan, create a fresh one
+        const { data: inserted, error: insertError } = await supabase
+          .from("user_reading_progress")
+          .insert({
+            user_id: user.id,
+            plan_id: planId,
+            current_day: 1,
+            is_active: true,
+            started_at: new Date().toISOString(),
+          })
+          .select()
+          .single();
+
+        if (insertError) throw insertError;
+        activeProgress = inserted as UserProgress;
+      }
+
+      setUserProgress(activeProgress);
       toast({
         title: userProgress ? "Plan Switched!" : "Plan Started!",
-        description: userProgress 
-          ? "Your new reading plan is now active" 
+        description: userProgress
+          ? "Your new reading plan is now active"
           : "Your reading journey begins now",
       });
     } catch (error: any) {
