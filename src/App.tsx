@@ -201,7 +201,8 @@ function App() {
             <Route path="/bible/:book/:chapter" element={<ProtectedRoute><BibleChapter /></ProtectedRoute>} />
             <Route path="/reading-plans" element={<ProtectedRoute><ReadingPlans /></ProtectedRoute>} />
             <Route path="/bible-reference" element={<ProtectedRoute><BibleReference /></ProtectedRoute>} />
-            <Route path="/bible-encyclopedia" element={<ProtectedRoute><BibleEncyclopedia /></ProtectedRoute>} />
+            <Route path="/encyclopedia" element={<ProtectedRoute><BibleEncyclopedia /></ProtectedRoute>} />
+            <Route path="/encyclopedia/:slug" element={<ProtectedRoute><EncyclopediaArticle /></ProtectedRoute>} />
             <Route path="/daily-reading" element={<ProtectedRoute><DailyReading /></ProtectedRoute>} />
             <Route path="/memorization-verses" element={<ProtectedRoute><MemorizationVerses /></ProtectedRoute>} />
             <Route path="/verse-memory-hall" element={<ProtectedRoute><VerseMemoryHall /></ProtectedRoute>} />
