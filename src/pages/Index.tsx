@@ -43,6 +43,7 @@ import masterDeploy from "@/assets/master-deploy.png";
 import { UserCountBadge } from "@/components/UserCountBadge";
 import { SocialShareButton } from "@/components/SocialShareButton";
 import { PWAInstallButton } from "@/components/PWAInstallButton";
+import { InstantDemo } from "@/components/InstantDemo";
 
 const Index = () => {
   const navigate = useNavigate();
@@ -207,6 +208,10 @@ const Index = () => {
           </div>
         </div>
       </section>
+
+      {/* Instant Demo Section - No signup required */}
+      <InstantDemo />
+
 
       {/* How It Works - 3 Steps */}
       <section className="py-24 px-4 sm:px-6 lg:px-8 bg-muted/30">
