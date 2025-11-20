@@ -234,6 +234,25 @@ const formatInlineText = (text: string): React.ReactNode => {
       continue;
     }
 
+    // Handle URLs (make them clickable links)
+    const urlMatch = remaining.match(/^(https?:\/\/\S+)/);
+    if (urlMatch) {
+      const url = urlMatch[1];
+      parts.push(
+        <a
+          key={`url-${keyCounter++}`}
+          href={url}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="underline text-primary hover:text-primary/80 break-words"
+        >
+          {url}
+        </a>
+      );
+      remaining = remaining.slice(urlMatch[0].length);
+      continue;
+    }
+
     // Regular character
     parts.push(remaining[0]);
     remaining = remaining.slice(1);

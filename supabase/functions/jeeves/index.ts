@@ -2882,23 +2882,36 @@ Style: Professional prophetic chart, clear typography, organized layout, spiritu
     if (mode === "prophecy-signal") {
       try {
         const parsed = JSON.parse(content);
+
+        // Ensure we have a source_url if any URL is present in the response
+        if (!parsed.source_url) {
+          const urlMatch = content.match(/https?:\/\/\S+/);
+          if (urlMatch) {
+            parsed.source_url = urlMatch[0];
+          }
+        }
+
         return new Response(
           JSON.stringify(parsed),
           { headers: { ...corsHeaders, "Content-Type": "application/json" } }
         );
       } catch {
+        const urlMatch = content.match(/https?:\/\/\S+/);
+        const fallbackSourceUrl = urlMatch ? urlMatch[0] : undefined;
+
         return new Response(
           JSON.stringify({
             title: "Prophetic Signal",
             description: content,
             category: "general",
-            verses: []
+            verses: [],
+            source_url: fallbackSourceUrl,
           }),
           { headers: { ...corsHeaders, "Content-Type": "application/json" } }
         );
       }
     }
-    
+
     // For chain-chess and chain-chess-feedback modes, parse the response
     if (mode === "chain-chess") {
       console.log("=== PARSING CHAIN CHESS RESPONSE ===");
