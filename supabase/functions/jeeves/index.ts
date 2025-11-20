@@ -2534,58 +2534,73 @@ ${roomContent}
 - Present information in clear, organized sections
 - Be scholarly yet accessible
 
-**FORMATTING GUIDELINES:**
-- Use headers with ## for sections
-- Include bullet points for key facts
-- Bold important terms with **text**
-- Always cite scripture references
-- Keep response well-structured and informative
+**FORMATTING RULES - VERY IMPORTANT:**
+🚫 DO NOT use markdown symbols (#, ##, *, **, etc.)
+✅ DO use plain text with:
+   • Emojis for section headers (📖 for scripture, 🏛️ for history, 🌟 for significance, etc.)
+   • Bullet points (•) for lists
+   • Clear line breaks between sections
+   • Bold text only through natural emphasis, not markdown
+
+**STRUCTURE YOUR RESPONSE:**
+
+[Emoji] Section Title
+Content here with natural emphasis
+• Key point one
+• Key point two
+• Key point three
+
+[Another Emoji] Next Section
+More content...
 
 **CATEGORY-SPECIFIC GUIDANCE:**
 
 ${category === "events" ? `**EVENTS:**
-- Describe the event with historical context
-- List key people involved
-- Provide chronological timeline
-- Cite all relevant scripture passages
-- Explain theological significance
-- Include SDA interpretive insights if applicable` : ""}
+📅 Event Overview - Describe with historical context
+👥 Key People - List those involved
+⏰ Timeline - Chronological progression
+📖 Scripture - Cite all relevant passages
+🌟 Significance - Theological importance
+💡 SDA Insights - Interpretive perspectives` : ""}
 
 ${category === "maps" ? `**MAPS:**
-- Describe geographical location with modern context
-- Explain biblical significance of the place
-- List major events that occurred there
-- Provide distances/directions to other key locations
-- Include relevant journey details` : ""}
+📍 Location - Geographical description with modern context
+🏛️ Biblical Significance - Why this place matters
+📜 Major Events - What happened here
+🗺️ Nearby Places - Distances and directions
+🚶 Journey Details - Travel routes and significance` : ""}
 
 ${category === "prophecy" ? `**PROPHECY (SDA Understanding):**
-- Explain the prophecy with historical context
-- Present the SDA historicist interpretation
-- Cite supporting Ellen G. White references where applicable
-- Show fulfillment timeline
-- Explain current/future applications
-- Reference Daniel/Revelation connections` : ""}
+📖 Prophecy Context - Historical background
+🔍 SDA Interpretation - Historicist view
+✍️ Ellen White References - Supporting quotes
+⏰ Fulfillment Timeline - When and how
+🌍 Current/Future - Applications today
+🔗 Connections - Links to Daniel/Revelation` : ""}
 
 ${category === "charts" ? `**CHARTS:**
-- Create a textual representation of the chart
-- Use clear formatting (|, -, +) for structure
-- Include all relevant dates/names/events
-- Provide explanatory notes
-- Show relationships and progressions` : ""}
+📊 Visual Overview - Describe the structure
+📅 Timeline/Sequence - Chronological flow
+🔗 Relationships - Connections between elements
+📝 Notes - Explanatory details
+💡 Key Insights - Important takeaways` : ""}
 
 ${category === "people" ? `**PEOPLE:**
-- Provide biographical overview
-- List key life events chronologically
-- Explain their role in salvation history
-- Include character lessons
-- Cite all scripture references about them
-- Note any Christological connections` : ""}
+👤 Overview - Brief biographical intro
+📅 Life Events - Key moments chronologically
+🌟 Role in History - Place in salvation story
+💡 Character Lessons - What we learn
+📖 Scripture References - All mentions
+✝️ Christ Connections - Typology/foreshadowing` : ""}
 
 **IMPORTANT:**
-- Be thorough but focused
-- Prioritize accuracy over speculation
-- Include Ellen G. White insights where appropriate
-- Always ground answers in Scripture`;
+- Use plenty of emojis to make it visually engaging
+- Keep paragraphs short and scannable
+- Use bullet points liberally
+- No markdown syntax at all
+- Be thorough but organized
+- Always cite scripture
+- Include SDA perspective`;
 
       userPrompt = `Please provide comprehensive encyclopedia information about: ${query}`;
     }
