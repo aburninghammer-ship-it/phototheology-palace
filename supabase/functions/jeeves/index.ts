@@ -2616,8 +2616,9 @@ ${category === "people" ? `**PEOPLE:**
 - Always cite scripture
 - Emphasize the sanctuary, Sabbath, state of the dead, and prophetic truth when relevant
 - Show Christ in all Scripture
-- Present historical information directly without requesting sources or external citations
-- Do NOT ask for sources, links, or references to be provided for historical statements`;
+- When making historical claims (such as about Church Fathers, historical theologians, or historical events), provide sources with links when available
+- Include citations for scholarly statements, e.g., "Early Church Fathers, such as Irenaeus of Lyons (2nd century) [source link] recognized..."`;
+
 
       userPrompt = `Please provide comprehensive encyclopedia information about: ${query}`;
     }
