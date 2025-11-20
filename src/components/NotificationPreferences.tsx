@@ -28,6 +28,7 @@ export function NotificationPreferences() {
     community_posts: true,
     study_reminders: true,
     renewal_reminders: true,
+    video_tutorials: true,
   });
 
   useEffect(() => {
@@ -62,6 +63,7 @@ export function NotificationPreferences() {
           community_posts: data.community_posts,
           study_reminders: data.study_reminders,
           renewal_reminders: data.renewal_reminders ?? true,
+          video_tutorials: data.video_tutorials ?? true,
         });
       }
     } catch (error) {
@@ -233,6 +235,20 @@ export function NotificationPreferences() {
             id="study-reminders"
             checked={preferences.study_reminders}
             onCheckedChange={(checked) => updatePreference('study_reminders', checked)}
+          />
+        </div>
+
+        <div className="flex items-center justify-between">
+          <div className="space-y-0.5">
+            <Label htmlFor="video-tutorials">New Video Tutorials</Label>
+            <p className="text-sm text-muted-foreground">
+              Get notified when new training videos are published
+            </p>
+          </div>
+          <Switch
+            id="video-tutorials"
+            checked={preferences.video_tutorials}
+            onCheckedChange={(checked) => updatePreference('video_tutorials', checked)}
           />
         </div>
 

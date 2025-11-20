@@ -1967,6 +1967,7 @@ export type Database = {
           study_reminders: boolean
           updated_at: string
           user_id: string
+          video_tutorials: boolean | null
         }
         Insert: {
           christ_chapter_challenges?: boolean
@@ -1982,6 +1983,7 @@ export type Database = {
           study_reminders?: boolean
           updated_at?: string
           user_id: string
+          video_tutorials?: boolean | null
         }
         Update: {
           christ_chapter_challenges?: boolean
@@ -1997,6 +1999,7 @@ export type Database = {
           study_reminders?: boolean
           updated_at?: string
           user_id?: string
+          video_tutorials?: boolean | null
         }
         Relationships: []
       }
