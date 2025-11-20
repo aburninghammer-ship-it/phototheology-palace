@@ -44,6 +44,7 @@ import { UserCountBadge } from "@/components/UserCountBadge";
 import { SocialShareButton } from "@/components/SocialShareButton";
 import { PWAInstallButton } from "@/components/PWAInstallButton";
 import { InstantDemo } from "@/components/InstantDemo";
+import { ContinueWhereYouLeftOff } from "@/components/ContinueWhereYouLeftOff";
 
 const Index = () => {
   const navigate = useNavigate();
@@ -95,6 +96,13 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-background">
       <Navigation />
+      
+      {/* Continue Where You Left Off - Only for logged in users */}
+      {user && (
+        <div className="container mx-auto px-4 pt-20">
+          <ContinueWhereYouLeftOff />
+        </div>
+      )}
       
       {/* Install App Banner */}
       {showInstallBanner && (
