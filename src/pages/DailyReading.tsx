@@ -19,16 +19,56 @@ export default function DailyReading() {
   const [completing, setCompleting] = useState(false);
   const [regenerating, setRegenerating] = useState(false);
   const [exercises, setExercises] = useState<any[]>([]);
+  const [plan, setPlan] = useState<any>(null);
+  const [todaysPassages, setTodaysPassages] = useState<any[]>([]);
 
   useEffect(() => {
     if (userProgress) {
-      loadExercises();
+      loadPlanAndExercises();
     }
   }, [userProgress]);
 
-  const loadExercises = async () => {
+  const loadPlanAndExercises = async () => {
     if (!userProgress) return;
 
+    // Fetch the plan details
+    const { data: planData, error: planError } = await supabase
+      .from('reading_plans')
+      .select('*')
+      .eq('id', userProgress.plan_id)
+      .single();
+
+    if (planError || !planData) {
+      console.error('Error loading plan:', planError);
+      return;
+    }
+
+    setPlan(planData);
+
+    // Extract today's passages from the plan's daily_schedule
+    const schedule = planData.daily_schedule as any;
+    const dayIndex = userProgress.current_day - 1;
+    
+    // Parse passages based on schedule structure
+    let passages: any[] = [];
+    if (schedule?.chapters && Array.isArray(schedule.chapters)) {
+      // For book-monthly plans with chapter list
+      const chapterNumber = schedule.chapters[dayIndex];
+      if (chapterNumber) {
+        passages = [{
+          book: schedule.book || planData.name.split(' ')[0],
+          chapter: chapterNumber,
+          verses: "1-end"
+        }];
+      }
+    } else if (schedule?.daily_readings && Array.isArray(schedule.daily_readings)) {
+      // For plans with structured daily readings
+      passages = schedule.daily_readings[dayIndex] || [];
+    }
+
+    setTodaysPassages(passages);
+
+    // Generate exercises with real passages
     const result = await generateExercises(false);
     if (result) {
       setExercises(result);
@@ -51,42 +91,6 @@ export default function DailyReading() {
     }
   };
 
-  // Mock daily reading content (this would come from the plan's schedule)
-  const todaysReading = {
-    passages: [
-      { book: "Genesis", chapter: 1, verses: "1-31" },
-      { book: "Psalm", chapter: 1, verses: "1-6" },
-      { book: "Matthew", chapter: 1, verses: "1-25" },
-    ],
-    floors: [
-      { number: 1, name: "Furnishing Floor", icon: Building2, rooms: ["Story Room (SR)", "Imagination Room (IR)", "Translation Room (TR)"] },
-      { number: 2, name: "Investigation Floor", icon: Eye, rooms: ["Observation Room (OR)", "Def-Com Room (DC)", "Questions Room (QR)"] },
-      { number: 3, name: "Freestyle Floor", icon: Sparkles, rooms: ["Nature Freestyle (NF)", "Personal Freestyle (PF)", "Bible Freestyle (BF)"] },
-      { number: 4, name: "Next Level Floor", icon: Target, rooms: ["Concentration Room (CR)", "Dimensions Room (DR)", "Theme Room (TRm)"] },
-    ],
-    floorExercises: {
-      1: {
-        title: "Story Room (SR) + Imagination Room (IR)",
-        prompt: "Visualize Genesis 1 as a movie. Picture light breaking darkness, waters parting, land appearing. Step inside the scene—what do you see, hear, smell?",
-        questions: ["What images come to mind?", "How would you describe each day of creation visually?"]
-      },
-      2: {
-        title: "Observation Room (OR)",
-        prompt: "List 15 observations from Genesis 1. Notice details: repetition of phrases, order of creation, God's words vs. actions.",
-        questions: ["What patterns emerge?", "What surprises you?", "What's repeated?"]
-      },
-      3: {
-        title: "Nature Freestyle (NF) + Personal Freestyle (PF)",
-        prompt: "Connect today's passages to something in nature you saw this week. How does creation around you testify to Genesis 1?",
-        questions: ["What connections emerge?", "How does your life mirror creation themes?"]
-      },
-      4: {
-        title: "Concentration Room (CR)",
-        prompt: "Where is Christ in Genesis 1? (Hint: John 1:1-3, Col 1:16, Heb 1:2) Find Christ as Creator.",
-        questions: ["How does this passage point to Jesus?", "What does it reveal about Him?"]
-      }
-    }
-  };
 
   const handleCompleteDay = async () => {
     if (!userProgress) return;
@@ -99,7 +103,7 @@ export default function DailyReading() {
         .insert({
           user_progress_id: userProgress.id,
           day_number: userProgress.current_day,
-          floors_completed: todaysReading.floors.map(f => String(f.number)),
+          floors_completed: exercises.map(e => String(e.floorNumber)),
         });
 
       // Update progress to next day
@@ -195,25 +199,32 @@ export default function DailyReading() {
             <Book className="h-5 w-5 mr-2 text-primary" />
             Today's Passages
           </h3>
-          <div className="space-y-3">
-            {todaysReading.passages.map((passage, idx) => (
-              <div 
-                key={idx}
-                className="flex items-center justify-between p-4 bg-muted/50 rounded-lg hover:bg-muted transition-colors cursor-pointer"
-                onClick={() => navigate(`/bible/${passage.book}/${passage.chapter}`)}
-              >
-                <div>
-                  <p className="font-semibold text-foreground">
-                    {passage.book} {passage.chapter}
-                  </p>
-                  <p className="text-sm text-muted-foreground">
-                    Verses {passage.verses}
-                  </p>
+          {todaysPassages.length > 0 ? (
+            <div className="space-y-3">
+              {todaysPassages.map((passage, idx) => (
+                <div 
+                  key={idx}
+                  className="flex items-center justify-between p-4 bg-muted/50 rounded-lg hover:bg-muted transition-colors cursor-pointer"
+                  onClick={() => navigate(`/bible/${passage.book}/${passage.chapter}`)}
+                >
+                  <div>
+                    <p className="font-semibold text-foreground">
+                      {passage.book} {passage.chapter}
+                    </p>
+                    <p className="text-sm text-muted-foreground">
+                      Verses {passage.verses}
+                    </p>
+                  </div>
+                  <ArrowRight className="h-4 w-4 text-primary" />
                 </div>
-                <ArrowRight className="h-4 w-4 text-primary" />
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-4 text-muted-foreground">
+              <Book className="h-8 w-8 mx-auto mb-2 opacity-50" />
+              <p>Loading today's passages...</p>
+            </div>
+          )}
         </Card>
 
         {/* Palace Floor Exercises */}
