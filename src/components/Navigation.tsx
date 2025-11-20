@@ -301,6 +301,9 @@ export const Navigation = () => {
                         <Link to="/bible-reference">PT Codebook</Link>
                       </DropdownMenuItem>
                       <DropdownMenuItem asChild>
+                        <Link to="/bible-encyclopedia">Bible Encyclopedia</Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem asChild>
                         <Link to="/quarterly-study">Sabbath School</Link>
                       </DropdownMenuItem>
                       <DropdownMenuItem asChild>
