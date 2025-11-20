@@ -11,6 +11,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { RefreshCw } from "lucide-react";
+import { BIBLE_BOOK_METADATA } from "@/data/bibleBooks";
 
 export default function DailyReading() {
   const { userProgress, loading, generateExercises } = useReadingPlans();
