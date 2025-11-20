@@ -1065,6 +1065,93 @@ export type Database = {
           },
         ]
       }
+      encyclopedia_articles: {
+        Row: {
+          adventist_apologetics_chains: Json | null
+          adventist_controversies: string[] | null
+          adventist_doctrinal_position: string | null
+          chains: Json | null
+          created_at: string | null
+          created_by: string | null
+          cross_refs: string[] | null
+          cultural_notes: string | null
+          historical_background: string | null
+          id: string
+          is_priority: boolean | null
+          is_published: boolean | null
+          lexical_data: Json | null
+          primary_verses: string[]
+          pt_codes: string[] | null
+          pt_commentary: Json | null
+          pt_floors: string[] | null
+          pt_rooms: string[] | null
+          related_game_topics: string[] | null
+          search_vector: unknown
+          slug: string
+          summary_1d: string
+          title: string
+          topic_type: string[]
+          updated_at: string | null
+          visual_hooks: Json | null
+        }
+        Insert: {
+          adventist_apologetics_chains?: Json | null
+          adventist_controversies?: string[] | null
+          adventist_doctrinal_position?: string | null
+          chains?: Json | null
+          created_at?: string | null
+          created_by?: string | null
+          cross_refs?: string[] | null
+          cultural_notes?: string | null
+          historical_background?: string | null
+          id?: string
+          is_priority?: boolean | null
+          is_published?: boolean | null
+          lexical_data?: Json | null
+          primary_verses?: string[]
+          pt_codes?: string[] | null
+          pt_commentary?: Json | null
+          pt_floors?: string[] | null
+          pt_rooms?: string[] | null
+          related_game_topics?: string[] | null
+          search_vector?: unknown
+          slug: string
+          summary_1d: string
+          title: string
+          topic_type?: string[]
+          updated_at?: string | null
+          visual_hooks?: Json | null
+        }
+        Update: {
+          adventist_apologetics_chains?: Json | null
+          adventist_controversies?: string[] | null
+          adventist_doctrinal_position?: string | null
+          chains?: Json | null
+          created_at?: string | null
+          created_by?: string | null
+          cross_refs?: string[] | null
+          cultural_notes?: string | null
+          historical_background?: string | null
+          id?: string
+          is_priority?: boolean | null
+          is_published?: boolean | null
+          lexical_data?: Json | null
+          primary_verses?: string[]
+          pt_codes?: string[] | null
+          pt_commentary?: Json | null
+          pt_floors?: string[] | null
+          pt_rooms?: string[] | null
+          related_game_topics?: string[] | null
+          search_vector?: unknown
+          slug?: string
+          summary_1d?: string
+          title?: string
+          topic_type?: string[]
+          updated_at?: string | null
+          visual_hooks?: Json | null
+        }
+        Relationships: []
+      }
       equation_challenges: {
         Row: {
           created_at: string | null
@@ -3822,6 +3909,18 @@ export type Database = {
         Returns: boolean
       }
       redeem_access_code: { Args: { code_input: string }; Returns: Json }
+      search_encyclopedia_articles: {
+        Args: { limit_count?: number; search_query: string }
+        Returns: {
+          id: string
+          pt_floors: string[]
+          relevance: number
+          slug: string
+          summary_1d: string
+          title: string
+          topic_type: string[]
+        }[]
+      }
     }
     Enums: {
       app_role: "admin" | "moderator" | "user"

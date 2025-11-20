@@ -72,6 +72,7 @@ const QuarterlyStudy = lazy(() => import("./pages/QuarterlyStudy"));
 const ReadingPlans = lazy(() => import("./pages/ReadingPlans"));
 const BibleReference = lazy(() => import("./pages/BibleReference"));
 const BibleEncyclopedia = lazy(() => import("./pages/BibleEncyclopedia"));
+const EncyclopediaArticle = lazy(() => import("./pages/EncyclopediaArticle"));
 const DailyReading = lazy(() => import("./pages/DailyReading"));
 const TreasureHunt = lazy(() => import("./pages/TreasureHunt"));
 const TreasureHuntPlay = lazy(() => import("./pages/TreasureHuntPlay"));
