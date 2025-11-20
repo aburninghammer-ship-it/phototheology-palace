@@ -52,18 +52,37 @@ export default function DailyReading() {
     // Parse passages based on schedule structure
     let passages: any[] = [];
     if (schedule?.chapters && Array.isArray(schedule.chapters)) {
-      // For book-monthly plans with chapter list
+      // For book-monthly plans that already have an explicit chapter list
       const chapterNumber = schedule.chapters[dayIndex];
       if (chapterNumber) {
         passages = [{
           book: schedule.book || planData.name.split(' ')[0],
           chapter: chapterNumber,
-          verses: "1-end"
+          verses: "1-end",
         }];
       }
     } else if (schedule?.daily_readings && Array.isArray(schedule.daily_readings)) {
       // For plans with structured daily readings
       passages = schedule.daily_readings[dayIndex] || [];
+    } else if (schedule?.book) {
+      // Fallback for simple book-monthly plans that only specify a book and chapters_per_day
+      const bookMeta = BIBLE_BOOK_METADATA.find(
+        (b) => b.name.toLowerCase() === String(schedule.book).toLowerCase()
+      );
+
+      if (bookMeta) {
+        const chaptersPerDay = Number(schedule.chapters_per_day) || 1;
+        const approxChapter = Math.ceil(userProgress.current_day * chaptersPerDay);
+        const chapterNumber = Math.min(approxChapter, bookMeta.chapters);
+
+        passages = [
+          {
+            book: bookMeta.name,
+            chapter: chapterNumber,
+            verses: "1-end",
+          },
+        ];
+      }
     }
 
     setTodaysPassages(passages);
