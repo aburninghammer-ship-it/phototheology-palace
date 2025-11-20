@@ -121,23 +121,24 @@ export const useReadingPlans = () => {
     }
 
     try {
-      // Deactivate any existing active plans
-      if (userProgress) {
-        await supabase
-          .from("user_reading_progress")
-          .update({ is_active: false })
-          .eq("user_id", user.id)
-          .eq("is_active", true);
-      }
+      // Deactivate all existing active plans
+      await supabase
+        .from("user_reading_progress")
+        .update({ is_active: false })
+        .eq("user_id", user.id)
+        .eq("is_active", true);
 
-      // Start the new plan
+      // Upsert the new plan (insert or update if exists)
       const { data, error } = await supabase
         .from("user_reading_progress")
-        .insert({
+        .upsert({
           user_id: user.id,
           plan_id: planId,
           current_day: 1,
           is_active: true,
+          started_at: new Date().toISOString(),
+        }, {
+          onConflict: 'user_id,plan_id',
         })
         .select()
         .single();
