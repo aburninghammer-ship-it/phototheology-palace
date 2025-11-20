@@ -39,16 +39,38 @@ serve(async (req) => {
           { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
         );
       }
+    } else {
+      // Delete existing exercises when regenerating to force new generation
+      await supabase
+        .from('reading_plan_daily_exercises')
+        .delete()
+        .eq('user_progress_id', userProgressId)
+        .eq('day_number', dayNumber);
+      
+      console.log('Deleted existing exercises for regeneration');
     }
 
     // Generate exercises using AI
-    const floorsConfigMap: Record<string, { floors: number[]; roomsPerFloor: number }> = {
-      standard: { floors: [1, 2, 3], roomsPerFloor: 2 },
-      focused: { floors: [1, 2, 3, 4, 5], roomsPerFloor: 3 },
-      intensive: { floors: [1, 2, 3, 4, 5, 6, 7, 8], roomsPerFloor: 4 },
-      deep: { floors: [1, 2, 3, 4, 5, 6, 7, 8], roomsPerFloor: 5 }
+    // Helper function to randomly select n unique floors from 1-8
+    const selectRandomFloors = (count: number): number[] => {
+      const allFloors = [1, 2, 3, 4, 5, 6, 7, 8];
+      const shuffled = allFloors.sort(() => Math.random() - 0.5);
+      return shuffled.slice(0, count).sort((a, b) => a - b);
     };
-    const floorsConfig = floorsConfigMap[depthMode] || { floors: [1, 2, 3, 4], roomsPerFloor: 3 };
+
+    const floorsConfigMap: Record<string, { floorCount: number; roomsPerFloor: number }> = {
+      standard: { floorCount: 3, roomsPerFloor: 2 },
+      focused: { floorCount: 5, roomsPerFloor: 3 },
+      intensive: { floorCount: 6, roomsPerFloor: 4 },
+      deep: { floorCount: 8, roomsPerFloor: 5 }
+    };
+    const config = floorsConfigMap[depthMode] || { floorCount: 3, roomsPerFloor: 2 };
+    
+    // Randomly select floors each time (especially important when regenerating)
+    const selectedFloors = selectRandomFloors(config.floorCount);
+    console.log(`Selected floors for ${depthMode} mode (regenerate: ${regenerate}):`, selectedFloors);
+    
+    const floorsConfig = { floors: selectedFloors, roomsPerFloor: config.roomsPerFloor };
 
     const passageText = passages.map((p: any) => `${p.book} ${p.chapter}${p.verses ? `:${p.verses}` : ''}`).join(', ');
 
