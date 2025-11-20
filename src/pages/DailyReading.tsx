@@ -244,7 +244,14 @@ export default function DailyReading() {
                 <div 
                   key={idx}
                   className="flex items-center justify-between p-4 bg-muted/50 rounded-lg hover:bg-muted transition-colors cursor-pointer"
-                  onClick={() => navigate(`/bible/${passage.book}/${passage.chapter}`)}
+                  onClick={() => navigate(`/bible/${passage.book}/${passage.chapter}`, {
+                    state: { 
+                      exercises,
+                      fromReadingPlan: true,
+                      planName: plan?.name,
+                      dayNumber: userProgress.current_day
+                    }
+                  })}
                 >
                   <div>
                     <p className="font-semibold text-foreground">
