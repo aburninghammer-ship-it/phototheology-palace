@@ -2559,7 +2559,7 @@ When relevant to the topic, include interpretations from:
 ⛪ Early Church Fathers (2nd-5th century)
 🇻🇦 Catholic Tradition
 ⚔️ Protestant Reformation views
-📚 Seventh-day Adventist interpretation (especially on prophecy, Sabbath, sanctuary)
+📚 Contemporary Protestant movements
 🕌 Islamic perspective (when discussing shared figures like Abraham, Moses, Jesus)
 ✡️ Jewish rabbinical tradition (especially on Torah and Hebrew scriptures)
 🏛️ Modern biblical scholarship
@@ -2585,10 +2585,10 @@ ${category === "maps" ? `**MAPS:**
 ${category === "prophecy" ? `**PROPHECY:**
 📖 Prophecy Context - Historical background
 🔍 Interpretive Approaches:
-  • Historicist interpretation (Protestant/Adventist)
-  • Preterist interpretation (Catholic/mainstream Protestant)
-  • Futurist interpretation (Dispensationalist)
-  • Idealist interpretation (symbolic/timeless)
+  • Historicist interpretation (continuous fulfillment through history)
+  • Preterist interpretation (fulfilled in the past)
+  • Futurist interpretation (future fulfillment)
+  • Idealist interpretation (symbolic/timeless principles)
 ⏰ Historical Fulfillments - Documented applications
 🌍 Modern Applications - Contemporary relevance
 🔗 Connections - Links across biblical texts` : ""}
