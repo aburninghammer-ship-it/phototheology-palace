@@ -100,7 +100,7 @@ FLOOR 6: THREE HEAVENS & CYCLES (Horizons & History)
 🔹 @ (Eight Cycles Room): Which covenant cycle?
    • @Ad (Adam), @No (Noah), @Ab (Abraham), @Mo (Moses)
    • @Cy (Cyrus), @CyC (Christ), @Sp (Spirit/Church), @Re (Return)
-🔹 JR (Juice Room): What's the essence through multiple palace rooms?
+⚠️ NOTE: The Juice Room (JR) is RESERVED for whole-book analysis (entire books like Genesis or Matthew) and MUST NOT be used for single-verse analysis in this tool. Do not include JR anywhere in your output for this verse.
 
 ═══════════════════════════════════════════════════════════════
 FLOOR 7: SPIRITUAL & EMOTIONAL (Heart & Soul)

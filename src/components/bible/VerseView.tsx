@@ -38,7 +38,8 @@ const ALL_PRINCIPLES = [
   "TZ (Time Zone)", "PRm (Patterns)", "P‖ (Parallels)", "FRt (Fruit)",
   // Rooms Floor 5-7
   "BL (Sanctuary)", "PR (Prophecy)", "3A (Three Angels)", "FE (Feasts)", 
-  "CEC (Christ/Chapter)", "R66 (Room 66)", "JR (Juice)",
+  "CEC (Christ/Chapter)", "R66 (Room 66)",
+  // NOTE: Juice Room (JR) intentionally excluded here – it is reserved for whole-book analysis, never single verses
   "FRm (Fire)", "MR (Meditation)", "SRm (Speed)",
   // Cycles
   "@Ad (Adamic)", "@No (Noahic)", "@Ab (Abrahamic)", "@Mo (Mosaic)",
