@@ -14,6 +14,7 @@ import { toast } from "sonner";
 import { Upload, Play, Video, Trash2 } from "lucide-react";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
 import { SocialShareButton } from "@/components/SocialShareButton";
+import defaultVideoThumbnail from "@/assets/video-training-thumbnail.png";
 import { useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
 
@@ -318,9 +319,11 @@ const VideoTraining = () => {
                           className="object-cover w-full h-full rounded-t-lg"
                         />
                       ) : (
-                        <div className="flex items-center justify-center h-full">
-                          <Video className="h-12 w-12 text-muted-foreground" />
-                        </div>
+                        <img
+                          src={defaultVideoThumbnail}
+                          alt={`Phototheology training video thumbnail for ${video.title}`}
+                          className="object-cover w-full h-full rounded-t-lg"
+                        />
                       )}
                     </AspectRatio>
                   </CardHeader>
