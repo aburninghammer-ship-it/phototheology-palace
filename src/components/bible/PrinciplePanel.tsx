@@ -314,27 +314,55 @@ export const PrinciplePanel = ({ book, chapter, verse, verseText, onClose }: Pri
             </TabsContent>
             
             <TabsContent value="cross-refs" className="space-y-3 mt-0">
-              {annotation.crossReferences.map((ref, idx) => (
-                <Link
-                  key={idx}
-                  to={`/bible/${ref.book}/${ref.chapter}`}
-                  className="block"
-                >
-                  <div className="p-3 rounded-lg border-2 border-border hover:border-primary hover-lift bg-card">
-                    <div className="flex items-start justify-between mb-2">
-                      <span className="font-semibold text-primary">
-                        {ref.book} {ref.chapter}:{ref.verse}
-                      </span>
-                      <Badge variant="outline" className="text-xs">
-                        {ref.confidence}%
-                      </Badge>
+              {annotation.crossReferences.length > 0 ? (
+                annotation.crossReferences.map((ref, idx) => (
+                  <Link
+                    key={idx}
+                    to={`/bible/${ref.book}/${ref.chapter}`}
+                    className="block"
+                  >
+                    <div className="p-3 rounded-lg border-2 border-border hover:border-primary hover-lift bg-card">
+                      <div className="flex items-start justify-between mb-2">
+                        <span className="font-semibold text-primary">
+                          {ref.book} {ref.chapter}:{ref.verse}
+                        </span>
+                        <Badge variant="outline" className="text-xs">
+                          {ref.confidence}%
+                        </Badge>
+                      </div>
+                      <p className="text-xs text-muted-foreground mb-1">
+                        <strong className="text-foreground">{ref.principleType}:</strong> {ref.reason}
+                      </p>
                     </div>
-                    <p className="text-xs text-muted-foreground mb-1">
-                      <strong className="text-foreground">{ref.principleType}:</strong> {ref.reason}
+                  </Link>
+                ))
+              ) : (
+                <div className="p-6 rounded-lg bg-gradient-to-br from-primary/10 via-accent/10 to-primary/5 border border-primary/20 text-center space-y-3">
+                  <ExternalLink className="h-12 w-12 mx-auto text-primary/60" />
+                  <div>
+                    <h4 className="font-semibold text-sm mb-2">Cross-References</h4>
+                    <p className="text-xs text-muted-foreground leading-relaxed">
+                      Cross-references connect this verse to related scriptures throughout the Bible. 
+                      These links help you trace themes, principles, and prophetic patterns across chapters and books.
                     </p>
                   </div>
-                </Link>
-              ))}
+                  <div className="pt-3 space-y-2 text-xs text-muted-foreground">
+                    <p>• <strong>Typology:</strong> Old Testament types pointing to New Testament fulfillment</p>
+                    <p>• <strong>Parallels:</strong> Similar events or teachings in different contexts</p>
+                    <p>• <strong>Principle Echoes:</strong> Related passages using similar PT codes</p>
+                  </div>
+                  <Button
+                    size="sm"
+                    onClick={loadAnnotation}
+                    disabled={loading}
+                    className="mt-3"
+                    variant="outline"
+                  >
+                    <ExternalLink className="h-3 w-3 mr-1" />
+                    Generate Links
+                  </Button>
+                </div>
+              )}
             </TabsContent>
             
             <TabsContent value="christ" className="mt-0">
