@@ -59,6 +59,7 @@ const Flashcards = lazy(() => import("./pages/Flashcards"));
 const PowerOfTheLamb = lazy(() => import("./pages/PowerOfTheLamb"));
 const SpiritualTraining = lazy(() => import("./pages/SpiritualTraining"));
 const AppTour = lazy(() => import("./pages/AppTour"));
+const Courses = lazy(() => import("./pages/Courses"));
 const BlueprintCourse = lazy(() => import("./pages/BlueprintCourse"));
 const PhototheologyCourse = lazy(() => import("./pages/PhototheologyCourse"));
 const DanielCourse = lazy(() => import("./pages/DanielCourse"));
@@ -268,6 +269,7 @@ function App() {
           <Route path="/my-studies/:id" element={<ProtectedRoute><StudyEditor /></ProtectedRoute>} />
           <Route path="/power-of-the-lamb" element={<ProtectedRoute><PowerOfTheLamb /></ProtectedRoute>} />
           <Route path="/spiritual-training" element={<ProtectedRoute><SpiritualTraining /></ProtectedRoute>} />
+          <Route path="/courses" element={<ProtectedRoute><Courses /></ProtectedRoute>} />
           <Route path="/blueprint-course" element={<ProtectedRoute><BlueprintCourse /></ProtectedRoute>} />
           <Route path="/phototheology-course" element={<ProtectedRoute><PhototheologyCourse /></ProtectedRoute>} />
           <Route path="/daniel-course" element={<ProtectedRoute><DanielCourse /></ProtectedRoute>} />

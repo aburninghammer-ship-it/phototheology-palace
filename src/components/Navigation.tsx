@@ -169,7 +169,7 @@ export const Navigation = () => {
                     </DropdownMenu>
                     
                     <Button variant="ghost" asChild size="sm" className="whitespace-nowrap">
-                      <Link to="/phototheology-course">Courses</Link>
+                      <Link to="/courses">Courses</Link>
                     </Button>
                     
                     <Button variant="ghost" asChild size="sm" className="whitespace-nowrap">
@@ -267,7 +267,7 @@ export const Navigation = () => {
                   </DropdownMenu>
                   
                   <Link 
-                    to="/revelation-course" 
+                    to="/courses" 
                     className="px-3 py-1.5 text-sm font-medium text-foreground hover:text-primary hover:bg-accent/50 rounded-md transition-colors whitespace-nowrap"
                   >
                     Courses
