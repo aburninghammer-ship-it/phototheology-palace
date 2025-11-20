@@ -2662,6 +2662,49 @@ ${category === "people" ? `**PEOPLE:**
     // Clean markdown code fencing from JSON responses
     content = content.replace(/^```json\s*/i, '').replace(/\s*```$/i, '').trim();
 
+    // For maps category in encyclopedia mode, generate a map image
+    let mapImageUrl = null;
+    if (mode === "encyclopedia" && category === "maps") {
+      try {
+        console.log("Generating map image for:", query);
+        const imageResponse = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${LOVABLE_API_KEY}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            model: "google/gemini-2.5-flash-image",
+            messages: [
+              {
+                role: "user",
+                content: `Create a detailed biblical map showing: ${query}. The map should include:
+- Clear geographical features (mountains, rivers, seas)
+- Important biblical locations marked with labels
+- Historical travel routes if relevant
+- A simple legend
+- Vintage cartographic style with aged parchment appearance
+- Minimal but clear text labels in English
+Style: Historical biblical atlas map, professional cartography, detailed but readable`
+              }
+            ],
+            modalities: ["image", "text"]
+          })
+        });
+
+        if (imageResponse.ok) {
+          const imageData = await imageResponse.json();
+          mapImageUrl = imageData.choices?.[0]?.message?.images?.[0]?.image_url?.url;
+          console.log("Map image generated successfully");
+        } else {
+          console.error("Failed to generate map image:", imageResponse.status);
+        }
+      } catch (error) {
+        console.error("Error generating map image:", error);
+        // Continue without the image if generation fails
+      }
+    }
+
     // For generate-drills mode, parse JSON
     if (mode === "generate-drills") {
       try {
@@ -2943,6 +2986,12 @@ ${category === "people" ? `**PEOPLE:**
 
     // Extract principles used from commentary mode
     let responseData: any = { content };
+    
+    // Add map image for encyclopedia maps mode
+    if (mode === "encyclopedia" && category === "maps" && mapImageUrl) {
+      responseData.mapImageUrl = mapImageUrl;
+    }
+    
     if (mode === "commentary") {
       const principlesMatch = content.match(/PRINCIPLES_USED: (.+)$/m);
       if (principlesMatch) {

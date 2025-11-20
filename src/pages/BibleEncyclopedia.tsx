@@ -24,6 +24,7 @@ const BibleEncyclopedia = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [searchCategory, setSearchCategory] = useState<"events" | "maps" | "prophecy" | "charts" | "people">("events");
   const [searchResults, setSearchResults] = useState("");
+  const [mapImageUrl, setMapImageUrl] = useState<string | null>(null);
   const [isSearching, setIsSearching] = useState(false);
 
   const handleSearch = async () => {
@@ -31,6 +32,7 @@ const BibleEncyclopedia = () => {
 
     setIsSearching(true);
     setSearchResults("");
+    setMapImageUrl(null);
 
     try {
       const { data, error } = await supabase.functions.invoke("jeeves", {
@@ -44,6 +46,11 @@ const BibleEncyclopedia = () => {
       if (error) throw error;
 
       setSearchResults(data.content || "No results found.");
+      
+      // Set map image if available (for maps category)
+      if (data.mapImageUrl) {
+        setMapImageUrl(data.mapImageUrl);
+      }
     } catch (error: any) {
       console.error("Encyclopedia search error:", error);
       toast({
@@ -217,6 +224,18 @@ const BibleEncyclopedia = () => {
               {/* Results */}
               {searchResults && (
                 <div className="pt-6 border-t">
+                  {/* Map Image Display */}
+                  {mapImageUrl && searchCategory === "maps" && (
+                    <div className="mb-6 rounded-lg overflow-hidden border-2 border-primary/20 shadow-lg">
+                      <img 
+                        src={mapImageUrl} 
+                        alt={`Biblical map of ${searchQuery}`}
+                        className="w-full h-auto"
+                      />
+                    </div>
+                  )}
+                  
+                  {/* Text Content */}
                   <div className="space-y-4 text-foreground">
                     {formatJeevesResponse(searchResults)}
                   </div>
