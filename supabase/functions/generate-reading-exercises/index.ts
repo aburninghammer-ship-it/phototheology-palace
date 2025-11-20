@@ -74,47 +74,8 @@ serve(async (req) => {
 
     const passageText = passages.map((p: any) => `${p.book} ${p.chapter}${p.verses ? `:${p.verses}` : ''}`).join(', ');
 
-    const systemPrompt = `You are a Phototheology Palace guide. Generate floor exercises for today's Bible reading that train students in the 8-Floor method.
+    const systemPrompt = "You are a Phototheology Palace guide. Generate floor exercises for today's Bible reading that train students in the 8-Floor method. Use only the floor numbers provided in the user message and return ONLY valid JSON with an 'exercises' array of { floorNumber, floorName, title, rooms, prompt, questions }.";
 
-For each floor, select ${floorsConfig.roomsPerFloor} different rooms and create prompts that engage the student.
-
-FLOOR 1 (Furnishing - Memory):
-Rooms: Story Room (SR), Imagination Room (IR), 24FPS (24), Bible Rendered (BR), Translation Room (TR), Gems Room (GR)
-
-FLOOR 2 (Investigation):
-Rooms: Observation Room (OR), Def-Com Room (DC), Symbols/Types (@T), Questions Room (?), Q&A Chains (QA)
-
-FLOOR 3 (Freestyle):
-Rooms: Nature Freestyle (NF), Personal Freestyle (PF), Bible Freestyle (BF), History/Social Freestyle (HF), Listening Room (LR)
-
-FLOOR 4 (Next Level):
-Rooms: Concentration Room (CR), Dimensions Room (DR), Connect 6 (C6), Theme Room (TRm), Time Zone (TZ), Patterns Room (PRm), Parallels Room (P‖), Fruit Room (FRt)
-
-FLOOR 5 (Vision):
-Rooms: Blue Room/Sanctuary (BL), Prophecy Room (PR), Three Angels' Room (3A)
-
-FLOOR 6 (Cycles & Heavens):
-Rooms: Cycle Placement (@Ad→@Re), Heaven Horizon (1H/2H/3H), Juice Room (JR)
-
-FLOOR 7 (Spiritual/Emotional):
-Rooms: Fire Room (FRm), Meditation Room (MR), Speed Room (SR)
-
-FLOOR 8 (Master):
-Rooms: Reflexive mastery (no specific rooms, just flowing naturally)
-
-Return ONLY valid JSON with this structure:
-{
-  "exercises": [
-    {
-      "floorNumber": 1,
-      "floorName": "Furnishing Floor",
-      "title": "Story Room (SR) + Imagination Room (IR)",
-      "rooms": ["SR", "IR"],
-      "prompt": "Detailed, engaging prompt that guides the student...",
-      "questions": ["Question 1?", "Question 2?", "Question 3?"]
-    }
-  ]
-}`;
 
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY not configured");
