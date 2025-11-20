@@ -4018,6 +4018,7 @@ export type Database = {
         Args: { study_id_param: string; user_id_param: string }
         Returns: boolean
       }
+      is_video_admin: { Args: { _user_id: string }; Returns: boolean }
       redeem_access_code: { Args: { code_input: string }; Returns: Json }
       search_encyclopedia_articles: {
         Args: { limit_count?: number; search_query: string }

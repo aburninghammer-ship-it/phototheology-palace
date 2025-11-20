@@ -39,16 +39,16 @@ const VideoTraining = () => {
   const [category, setCategory] = useState("general");
   const [videoFile, setVideoFile] = useState<File | null>(null);
 
-  // Check if user is admin
-  const { data: isAdmin } = useQuery({
-    queryKey: ["isAdmin", user?.id],
+  // Check if user is video admin
+  const { data: isVideoAdmin } = useQuery({
+    queryKey: ["isVideoAdmin", user?.id],
     queryFn: async () => {
       if (!user?.id) return false;
       const { data } = await supabase
         .from("user_roles")
         .select("role")
         .eq("user_id", user.id)
-        .eq("role", "admin")
+        .eq("role", "video_admin")
         .single();
       return !!data;
     },
@@ -166,7 +166,7 @@ const VideoTraining = () => {
           </p>
         </div>
         
-        {isAdmin && (
+        {isVideoAdmin && (
           <Dialog>
             <DialogTrigger asChild>
               <Button>
@@ -302,7 +302,7 @@ const VideoTraining = () => {
           <DialogHeader>
             <DialogTitle className="flex items-center justify-between">
               <span>{selectedVideo?.title}</span>
-              {isAdmin && selectedVideo && (
+              {isVideoAdmin && selectedVideo && (
                 <Button
                   variant="destructive"
                   size="icon"
