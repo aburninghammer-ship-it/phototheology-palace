@@ -2615,7 +2615,9 @@ ${category === "people" ? `**PEOPLE:**
 - Be thorough but organized
 - Always cite scripture
 - Emphasize the sanctuary, Sabbath, state of the dead, and prophetic truth when relevant
-- Show Christ in all Scripture`;
+- Show Christ in all Scripture
+- Present historical information directly without requesting sources or external citations
+- Do NOT ask for sources, links, or references to be provided for historical statements`;
 
       userPrompt = `Please provide comprehensive encyclopedia information about: ${query}`;
     }
@@ -2662,11 +2664,32 @@ ${category === "people" ? `**PEOPLE:**
     // Clean markdown code fencing from JSON responses
     content = content.replace(/^```json\s*/i, '').replace(/\s*```$/i, '').trim();
 
-    // For maps category in encyclopedia mode, generate a map image
+    // For maps or charts category in encyclopedia mode, generate an image
     let mapImageUrl = null;
-    if (mode === "encyclopedia" && category === "maps") {
+    if (mode === "encyclopedia" && (category === "maps" || category === "charts")) {
       try {
-        console.log("Generating map image for:", query);
+        const imageType = category === "maps" ? "map" : "chart";
+        console.log(`Generating ${imageType} image for:`, query);
+        
+        const imagePrompt = category === "maps" 
+          ? `Create a detailed biblical map showing: ${query}. The map should include:
+- Clear geographical features (mountains, rivers, seas)
+- Important biblical locations marked with labels
+- Historical travel routes if relevant
+- A simple legend
+- Vintage cartographic style with aged parchment appearance
+- Minimal but clear text labels in English
+Style: Historical biblical atlas map, professional cartography, detailed but readable`
+          : `Create a detailed biblical prophecy chart for: ${query}. The chart should include:
+- Clear timeline or sequential structure
+- Key prophetic symbols and interpretations
+- Color-coded sections for different periods or kingdoms
+- Biblical references labeled on relevant sections
+- Clean, professional prophetic chart style
+- Easy to read text labels and annotations
+- Historicist perspective showing continuous fulfillment
+Style: Professional prophetic chart, clear typography, organized layout, spiritual yet scholarly`;
+
         const imageResponse = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
           method: "POST",
           headers: {
@@ -2678,14 +2701,7 @@ ${category === "people" ? `**PEOPLE:**
             messages: [
               {
                 role: "user",
-                content: `Create a detailed biblical map showing: ${query}. The map should include:
-- Clear geographical features (mountains, rivers, seas)
-- Important biblical locations marked with labels
-- Historical travel routes if relevant
-- A simple legend
-- Vintage cartographic style with aged parchment appearance
-- Minimal but clear text labels in English
-Style: Historical biblical atlas map, professional cartography, detailed but readable`
+                content: imagePrompt
               }
             ],
             modalities: ["image", "text"]
@@ -2695,12 +2711,12 @@ Style: Historical biblical atlas map, professional cartography, detailed but rea
         if (imageResponse.ok) {
           const imageData = await imageResponse.json();
           mapImageUrl = imageData.choices?.[0]?.message?.images?.[0]?.image_url?.url;
-          console.log("Map image generated successfully");
+          console.log(`${imageType.charAt(0).toUpperCase() + imageType.slice(1)} image generated successfully`);
         } else {
-          console.error("Failed to generate map image:", imageResponse.status);
+          console.error(`Failed to generate ${imageType} image:`, imageResponse.status);
         }
       } catch (error) {
-        console.error("Error generating map image:", error);
+        console.error(`Error generating ${category} image:`, error);
         // Continue without the image if generation fails
       }
     }
@@ -2987,8 +3003,8 @@ Style: Historical biblical atlas map, professional cartography, detailed but rea
     // Extract principles used from commentary mode
     let responseData: any = { content };
     
-    // Add map image for encyclopedia maps mode
-    if (mode === "encyclopedia" && category === "maps" && mapImageUrl) {
+    // Add map/chart image for encyclopedia maps or charts mode
+    if (mode === "encyclopedia" && (category === "maps" || category === "charts") && mapImageUrl) {
       responseData.mapImageUrl = mapImageUrl;
     }
     

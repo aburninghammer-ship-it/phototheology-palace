@@ -224,12 +224,12 @@ const BibleEncyclopedia = () => {
               {/* Results */}
               {searchResults && (
                 <div className="pt-6 border-t">
-                  {/* Map Image Display */}
-                  {mapImageUrl && searchCategory === "maps" && (
+                  {/* Map/Chart Image Display */}
+                  {mapImageUrl && (searchCategory === "maps" || searchCategory === "charts") && (
                     <div className="mb-6 rounded-lg overflow-hidden border-2 border-primary/20 shadow-lg">
                       <img 
                         src={mapImageUrl} 
-                        alt={`Biblical map of ${searchQuery}`}
+                        alt={searchCategory === "maps" ? `Biblical map of ${searchQuery}` : `Prophetic chart for ${searchQuery}`}
                         className="w-full h-auto"
                       />
                     </div>
