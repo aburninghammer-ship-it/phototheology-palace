@@ -132,11 +132,14 @@ serve(async (req) => {
             if (subscription.current_period_end) {
               const renewalDate = new Date(subscription.current_period_end * 1000);
               
-              // Update user profile with renewal date
+              // Update user profile with renewal date and payment tracking
               await supabase
                 .from('profiles')
                 .update({
                   subscription_renewal_date: renewalDate.toISOString(),
+                  payment_source: 'stripe',
+                  stripe_subscription_id: subscription.id,
+                  is_recurring: true
                 })
                 .eq('id', metadata.user_id);
               
