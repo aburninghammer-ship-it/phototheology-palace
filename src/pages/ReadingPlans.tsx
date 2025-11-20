@@ -1,6 +1,7 @@
 import { Navigation } from "@/components/Navigation";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
 import { useReadingPlans } from "@/hooks/useReadingPlans";
 import { useNavigate } from "react-router-dom";
 import { Book, Calendar, Clock, Play, LogIn, Building2, BookOpen, Layers, Target } from "lucide-react";
@@ -45,8 +46,22 @@ export default function ReadingPlans() {
     return (
       <div className="min-h-screen bg-background">
         <Navigation />
-        <div className="container mx-auto px-4 py-8 flex items-center justify-center">
-          <p className="text-muted-foreground">Loading reading plans...</p>
+        <div className="container mx-auto px-4 py-8 max-w-6xl">
+          <div className="text-center mb-12">
+            <Skeleton className="h-16 w-16 mx-auto mb-4 rounded-lg" />
+            <Skeleton className="h-10 w-96 mx-auto mb-4" />
+            <Skeleton className="h-6 w-[500px] mx-auto" />
+          </div>
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {[...Array(6)].map((_, i) => (
+              <Card key={i} className="p-6">
+                <Skeleton className="h-6 w-3/4 mb-4" />
+                <Skeleton className="h-4 w-full mb-2" />
+                <Skeleton className="h-4 w-5/6 mb-6" />
+                <Skeleton className="h-10 w-full" />
+              </Card>
+            ))}
+          </div>
         </div>
       </div>
     );
