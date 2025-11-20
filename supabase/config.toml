@@ -81,3 +81,7 @@ verify_jwt = false
 
 # Social media posting requires authentication
 [functions.post-to-social]
+verify_jwt = true
+
+[functions.generate-reading-exercises]
+verify_jwt = true
