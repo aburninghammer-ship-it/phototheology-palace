@@ -3,11 +3,13 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useReadingPlans } from "@/hooks/useReadingPlans";
 import { useNavigate } from "react-router-dom";
-import { Book, Calendar, Clock, Play } from "lucide-react";
+import { Book, Calendar, Clock, Play, LogIn } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { useAuth } from "@/hooks/useAuth";
 
 export default function ReadingPlans() {
   const { plans, userProgress, loading, startPlan } = useReadingPlans();
+  const { user } = useAuth();
   const navigate = useNavigate();
 
   const getDifficultyColor = (depthMode: string) => {
@@ -103,12 +105,26 @@ export default function ReadingPlans() {
               </div>
 
               <Button
-                onClick={() => handleStartPlan(plan.id)}
+                onClick={() => user ? handleStartPlan(plan.id) : navigate("/auth")}
                 disabled={userProgress !== null}
                 className="w-full"
               >
-                <Play className="h-4 w-4 mr-2" />
-                {userProgress ? "Plan Active" : "Start Plan"}
+                {!user ? (
+                  <>
+                    <LogIn className="h-4 w-4 mr-2" />
+                    Sign In to Start
+                  </>
+                ) : userProgress ? (
+                  <>
+                    <Play className="h-4 w-4 mr-2" />
+                    Plan Active
+                  </>
+                ) : (
+                  <>
+                    <Play className="h-4 w-4 mr-2" />
+                    Start Plan
+                  </>
+                )}
               </Button>
             </Card>
           ))}
