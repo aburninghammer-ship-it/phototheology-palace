@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { formatJeevesResponse } from "@/lib/formatJeevesResponse";
 import {
   Book,
   Search,
@@ -215,9 +216,9 @@ const BibleEncyclopedia = () => {
 
               {/* Results */}
               {searchResults && (
-                <div className="pt-4 border-t">
-                  <div className="prose prose-sm max-w-none dark:prose-invert">
-                    <div className="whitespace-pre-wrap">{searchResults}</div>
+                <div className="pt-6 border-t">
+                  <div className="space-y-4 text-foreground">
+                    {formatJeevesResponse(searchResults)}
                   </div>
                 </div>
               )}

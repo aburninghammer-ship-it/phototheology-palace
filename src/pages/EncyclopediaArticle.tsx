@@ -9,7 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Loader2, BookOpen, Layers, Link as LinkIcon, Search } from "lucide-react";
+import { Loader2, BookOpen, Layers, Link as LinkIcon, Search, Sparkles } from "lucide-react";
 import { toast } from "sonner";
 import { formatJeevesResponse } from "@/lib/formatJeevesResponse";
 
@@ -312,9 +312,12 @@ export default function EncyclopediaArticle() {
                   </div>
 
                   {jeevesResponse && (
-                    <div className="mt-6 p-4 bg-secondary/10 rounded-lg">
-                      <h4 className="font-semibold mb-2">Jeeves Says:</h4>
-                      <div className="prose prose-sm max-w-none dark:prose-invert">
+                    <div className="mt-6 p-6 bg-gradient-to-br from-primary/5 to-accent/5 rounded-lg border border-primary/20">
+                      <div className="flex items-center gap-2 mb-4">
+                        <Sparkles className="h-5 w-5 text-primary" />
+                        <h4 className="font-semibold text-lg">Jeeves Says:</h4>
+                      </div>
+                      <div className="space-y-4 text-foreground">
                         {formatJeevesResponse(jeevesResponse)}
                       </div>
                     </div>
