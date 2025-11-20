@@ -244,32 +244,36 @@ const ProphecyWatch = () => {
             <div className="grid gap-4">
               {filteredSignals.map((signal) => (
                 <Card key={signal.id} className="hover:shadow-lg transition-shadow">
-                  <CardHeader>
-                    <div className="flex items-start justify-between">
+                  <CardHeader className="pb-4">
+                    <div className="flex items-start justify-between gap-4">
                       <div className="flex-1">
-                        <CardTitle className="flex items-center gap-2">
-                          <Telescope className="h-5 w-5 text-blue-600" />
+                        <CardTitle className="flex items-center gap-2 text-xl mb-3">
+                          <Telescope className="h-5 w-5 text-blue-600 flex-shrink-0" />
                           {signal.title}
                         </CardTitle>
-                        <CardDescription className="mt-2">{signal.description}</CardDescription>
+                        <CardDescription className="text-base leading-relaxed whitespace-pre-line">
+                          {signal.description}
+                        </CardDescription>
                       </div>
-                      <Badge variant="secondary">{signal.category}</Badge>
+                      <Badge variant="secondary" className="flex-shrink-0">{signal.category}</Badge>
                     </div>
                   </CardHeader>
-                  <CardContent>
-                    <p className="text-sm text-muted-foreground">
-                      Detected: {new Date(signal.created_at).toLocaleDateString()}
-                    </p>
-                    {signal.source_url && (
-                      <a 
-                        href={signal.source_url} 
-                        target="_blank" 
-                        rel="noopener noreferrer"
-                        className="mt-3 inline-flex items-center gap-2 text-sm text-blue-600 hover:text-blue-800 hover:underline font-medium"
-                      >
-                        📰 Read Source Article →
-                      </a>
-                    )}
+                  <CardContent className="pt-4 border-t">
+                    <div className="flex items-center justify-between gap-4">
+                      <p className="text-sm text-muted-foreground">
+                        Detected: {new Date(signal.created_at).toLocaleDateString()}
+                      </p>
+                      {signal.source_url && (
+                        <a 
+                          href={signal.source_url} 
+                          target="_blank" 
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-2 text-sm text-blue-600 hover:text-blue-800 hover:underline font-medium transition-colors"
+                        >
+                          📰 Read Source Article →
+                        </a>
+                      )}
+                    </div>
                   </CardContent>
                 </Card>
               ))}

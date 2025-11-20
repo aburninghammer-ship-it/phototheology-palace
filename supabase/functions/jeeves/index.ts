@@ -1356,13 +1356,13 @@ FOCUS AREAS (choose one that matches the articles):
 Return JSON format:
 {
   "title": "Title from actual article or clear event name",
-  "description": "2-3 paragraphs: (1) Describe the actual event with specifics, (2) Explain prophetic significance, (3) Show pattern",
+  "description": "2-3 paragraphs with clear paragraph breaks: (1) Describe the actual event with specifics, (2) Explain prophetic significance, (3) Show pattern. Use \\n\\n between paragraphs for readability.",
   "category": "church-state" | "christian-nationalism" | "natural" | "religious-liberty" | "authoritarianism",
-  "source_url": "URL of the news article",
+  "source_url": "URL of the news article (REQUIRED - must include a valid URL from the articles found)",
   "verses": ["Matthew 24:X", "Revelation 13:11"]
 }
 
-Base it on OBSERVABLE, DOCUMENTABLE trends. Be factual, not sensational.`;
+CRITICAL: Always include a valid source_url from the articles provided above. Base it on OBSERVABLE, DOCUMENTABLE trends. Be factual, not sensational.`;
 
     } else if (mode === "daily-encouragement") {
       // Fetch user's name from profile
