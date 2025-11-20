@@ -191,6 +191,12 @@ export const MobileNav = () => {
               <Separator className="my-2" />
               <div className="text-xs font-semibold text-muted-foreground px-2 py-1">Courses</div>
               
+              <Link to="/courses">
+                <Button variant="default" className="w-full justify-start mb-2" size="sm">
+                  📚 View All Courses
+                </Button>
+              </Link>
+              
               <Link to="/blueprint-course">
                 <Button variant="ghost" className="w-full justify-start" size="sm">
                   Blueprint Course
