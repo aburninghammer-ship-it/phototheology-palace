@@ -129,7 +129,28 @@ Each exercise should have ${floorsConfig.roomsPerFloor} rooms combined, with one
     
     if (!content) throw new Error('No AI response content');
 
-    const parsed = JSON.parse(content);
+    // Log the raw content for debugging
+    console.log('Raw AI response:', content);
+
+    // Try to extract JSON if it's wrapped in markdown code blocks
+    let jsonString = content.trim();
+    
+    // Remove markdown code blocks if present
+    if (jsonString.startsWith('```json')) {
+      jsonString = jsonString.replace(/^```json\s*/, '').replace(/\s*```$/, '');
+    } else if (jsonString.startsWith('```')) {
+      jsonString = jsonString.replace(/^```\s*/, '').replace(/\s*```$/, '');
+    }
+
+    let parsed;
+    try {
+      parsed = JSON.parse(jsonString);
+    } catch (parseError) {
+      console.error('JSON parse error:', parseError);
+      console.error('Failed to parse content:', jsonString.substring(0, 500));
+      throw new Error(`Invalid JSON from AI: ${parseError instanceof Error ? parseError.message : 'Unknown error'}`);
+    }
+    
     const exercises = parsed.exercises || [];
 
     // Store in database
