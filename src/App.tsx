@@ -91,6 +91,7 @@ const Referrals = lazy(() => import("./pages/Referrals"));
 const StudentVerification = lazy(() => import("./pages/StudentVerification"));
 const AccessCode = lazy(() => import("./pages/AccessCode"));
 import AdminAccessCodes from "./pages/AdminAccessCodes";
+const AdminSubscriptions = lazy(() => import("./pages/AdminSubscriptions"));
 const Onboarding = lazy(() => import("./pages/Onboarding"));
 const BibleRenderedRoom = lazy(() => import("./pages/BibleRenderedRoom"));
 const Dashboard = lazy(() => import("./pages/Dashboard"));
@@ -295,6 +296,7 @@ function App() {
             <Route path="/student-verify" element={<ProtectedRoute><StudentVerification /></ProtectedRoute>} />
             <Route path="/admin/access-codes" element={<ProtectedRoute><AdminAccessCodes /></ProtectedRoute>} />
             <Route path="/admin-access-codes" element={<ProtectedRoute><AdminAccessCodes /></ProtectedRoute>} />
+            <Route path="/admin/subscriptions" element={<ProtectedRoute><AdminSubscriptions /></ProtectedRoute>} />
             <Route path="/admin/strongs-import" element={<ProtectedRoute><AdminStrongsImport /></ProtectedRoute>} />
             <Route path="/admin/bible-import" element={<ProtectedRoute><AdminBibleImport /></ProtectedRoute>} />
             <Route path="/certificates" element={<ProtectedRoute><Certificates /></ProtectedRoute>} />
