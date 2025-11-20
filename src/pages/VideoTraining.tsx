@@ -13,6 +13,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
 import { Upload, Play, Video, Trash2 } from "lucide-react";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
+import { SocialShareButton } from "@/components/SocialShareButton";
+import { useEffect } from "react";
+import { useSearchParams } from "react-router-dom";
 
 interface TrainingVideo {
   id: string;
@@ -29,6 +32,7 @@ interface TrainingVideo {
 const VideoTraining = () => {
   const { user } = useAuth();
   const queryClient = useQueryClient();
+  const [searchParams] = useSearchParams();
   const [selectedVideo, setSelectedVideo] = useState<TrainingVideo | null>(null);
   const [isUploading, setIsUploading] = useState(false);
   const [activeCategory, setActiveCategory] = useState("all");
@@ -75,6 +79,17 @@ const VideoTraining = () => {
       return data as TrainingVideo[];
     },
   });
+
+  // Open video from URL parameter
+  useEffect(() => {
+    const videoId = searchParams.get("video");
+    if (videoId && videos) {
+      const video = videos.find(v => v.id === videoId);
+      if (video) {
+        setSelectedVideo(video);
+      }
+    }
+  }, [searchParams, videos]);
 
   // Upload video mutation
   const uploadMutation = useMutation({
@@ -361,6 +376,15 @@ const VideoTraining = () => {
               {selectedVideo.description && (
                 <p className="text-muted-foreground">{selectedVideo.description}</p>
               )}
+              <div className="flex items-center gap-2 pt-2 border-t">
+                <SocialShareButton
+                  title={selectedVideo.title}
+                  description={selectedVideo.description || "Watch this Phototheology training video"}
+                  url={`${window.location.origin}/video-training?video=${selectedVideo.id}`}
+                  variant="dropdown"
+                  buttonText="Share Video"
+                />
+              </div>
             </div>
           )}
         </DialogContent>
