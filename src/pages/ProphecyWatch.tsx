@@ -16,6 +16,7 @@ interface ProphecySignal {
   description: string;
   category: string;
   created_at: string;
+  source_url?: string;
 }
 
 const ProphecyWatch = () => {
@@ -25,6 +26,7 @@ const ProphecyWatch = () => {
   const [signals, setSignals] = useState<ProphecySignal[]>([]);
   const [filter, setFilter] = useState("all");
   const [scope, setScope] = useState("america");
+  const [timePeriod, setTimePeriod] = useState("1month");
   const [generating, setGenerating] = useState(false);
 
   useEffect(() => {
@@ -48,6 +50,7 @@ const ProphecyWatch = () => {
           description: item.description || "",
           category: item.difficulty || "general",
           created_at: item.created_at,
+          source_url: item.source_url,
         }))
       );
     }
@@ -61,6 +64,7 @@ const ProphecyWatch = () => {
         body: {
           mode: "prophecy-signal",
           scope,
+          timePeriod,
         },
       });
 
@@ -75,6 +79,8 @@ const ProphecyWatch = () => {
         challenge_type: "prophecy",
         difficulty: data.category,
         verses: data.verses || [],
+        source_url: data.source_url,
+        search_timestamp: new Date().toISOString(),
       });
 
       console.log("Insert result:", insertError);
@@ -136,6 +142,21 @@ const ProphecyWatch = () => {
                   </SelectContent>
                 </Select>
               </div>
+              <div className="w-48">
+                <Select value={timePeriod} onValueChange={setTimePeriod}>
+                  <SelectTrigger className="h-16 bg-slate-700 border-slate-600 text-white">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="1month">Last Month</SelectItem>
+                    <SelectItem value="3months">Last 3 Months</SelectItem>
+                    <SelectItem value="6months">Last 6 Months</SelectItem>
+                    <SelectItem value="1year">Last Year</SelectItem>
+                    <SelectItem value="2years">Last 2 Years</SelectItem>
+                    <SelectItem value="5years">Last 5 Years</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
               <Button
                 onClick={generateSignal}
                 disabled={generating}
@@ -144,12 +165,12 @@ const ProphecyWatch = () => {
                 {generating ? (
                   <>
                     <Sparkles className="mr-2 h-5 w-5 animate-spin" />
-                    Generating Signal...
+                    Searching News...
                   </>
                 ) : (
                   <>
                     <Sparkles className="mr-2 h-5 w-5" />
-                    Generate New Signal with AI
+                    Search News Articles
                   </>
                 )}
               </Button>
@@ -239,6 +260,16 @@ const ProphecyWatch = () => {
                     <p className="text-sm text-muted-foreground">
                       Detected: {new Date(signal.created_at).toLocaleDateString()}
                     </p>
+                    {signal.source_url && (
+                      <a 
+                        href={signal.source_url} 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="mt-3 inline-flex items-center gap-2 text-sm text-blue-600 hover:text-blue-800 hover:underline font-medium"
+                      >
+                        📰 Read Source Article →
+                      </a>
+                    )}
                   </CardContent>
                 </Card>
               ))}
