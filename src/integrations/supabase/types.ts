@@ -2579,6 +2579,44 @@ export type Database = {
         }
         Relationships: []
       }
+      reading_plan_daily_exercises: {
+        Row: {
+          created_at: string | null
+          day_number: number
+          floor_exercises: Json
+          id: string
+          passages: Json
+          updated_at: string | null
+          user_progress_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          day_number: number
+          floor_exercises: Json
+          id?: string
+          passages: Json
+          updated_at?: string | null
+          user_progress_id: string
+        }
+        Update: {
+          created_at?: string | null
+          day_number?: number
+          floor_exercises?: Json
+          id?: string
+          passages?: Json
+          updated_at?: string | null
+          user_progress_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reading_plan_daily_exercises_user_progress_id_fkey"
+            columns: ["user_progress_id"]
+            isOneToOne: false
+            referencedRelation: "user_reading_progress"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       reading_plans: {
         Row: {
           created_at: string | null

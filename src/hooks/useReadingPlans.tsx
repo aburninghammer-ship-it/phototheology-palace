@@ -83,6 +83,33 @@ export const useReadingPlans = () => {
     await loadUserProgress();
   };
 
+  const generateExercises = async (regenerate: boolean = false) => {
+    if (!user || !userProgress) return null;
+
+    try {
+      const { data, error } = await supabase.functions.invoke('generate-reading-exercises', {
+        body: {
+          userProgressId: userProgress.id,
+          dayNumber: userProgress.current_day,
+          passages: [], // Will be computed in edge function based on plan
+          depthMode: 'standard', // Will be fetched from plan in edge function
+          regenerate
+        }
+      });
+
+      if (error) throw error;
+      return data?.exercises || null;
+    } catch (error) {
+      console.error('Error generating exercises:', error);
+      toast({
+        title: "Error",
+        description: "Failed to generate exercises",
+        variant: "destructive",
+      });
+      return null;
+    }
+  };
+
   const startPlan = async (planId: string) => {
     if (!user) {
       toast({
@@ -140,5 +167,6 @@ export const useReadingPlans = () => {
     startPlan,
     refetch: loadPlans,
     refetchProgress,
+    generateExercises,
   };
 };

@@ -5,17 +5,51 @@ import { Progress } from "@/components/ui/progress";
 import { useReadingPlans } from "@/hooks/useReadingPlans";
 import { useNavigate } from "react-router-dom";
 import { Book, CheckCircle, ArrowRight, Building2, Eye, Lightbulb, Sparkles, Target } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
+import { RefreshCw } from "lucide-react";
 
 export default function DailyReading() {
-  const { userProgress, loading } = useReadingPlans();
+  const { userProgress, loading, generateExercises } = useReadingPlans();
   const { toast } = useToast();
   const navigate = useNavigate();
   const [completing, setCompleting] = useState(false);
+  const [regenerating, setRegenerating] = useState(false);
+  const [exercises, setExercises] = useState<any[]>([]);
+
+  useEffect(() => {
+    if (userProgress) {
+      loadExercises();
+    }
+  }, [userProgress]);
+
+  const loadExercises = async () => {
+    if (!userProgress) return;
+
+    const result = await generateExercises(false);
+    if (result) {
+      setExercises(result);
+    }
+  };
+
+  const handleRegenerateExercises = async () => {
+    setRegenerating(true);
+    try {
+      const result = await generateExercises(true);
+      if (result) {
+        setExercises(result);
+        toast({
+          title: "Exercises Refreshed!",
+          description: "New room combinations generated for today's study",
+        });
+      }
+    } finally {
+      setRegenerating(false);
+    }
+  };
 
   // Mock daily reading content (this would come from the plan's schedule)
   const todaysReading = {
@@ -184,39 +218,53 @@ export default function DailyReading() {
 
         {/* Palace Floor Exercises */}
         <Card className="p-6 mb-6">
-          <div className="flex items-center gap-2 mb-6">
-            <Building2 className="h-6 w-6 text-primary" />
-            <h3 className="text-xl font-bold text-foreground">Palace Floor Exercises</h3>
+          <div className="flex items-center justify-between mb-6">
+            <div className="flex items-center gap-2">
+              <Building2 className="h-6 w-6 text-primary" />
+              <h3 className="text-xl font-bold text-foreground">Palace Floor Exercises</h3>
+            </div>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleRegenerateExercises}
+              disabled={regenerating || !exercises.length}
+            >
+              <RefreshCw className={`h-4 w-4 mr-2 ${regenerating ? 'animate-spin' : ''}`} />
+              {regenerating ? 'Generating...' : 'Regenerate'}
+            </Button>
           </div>
           
-          <Tabs defaultValue="floor-1" className="w-full">
-            <TabsList className="grid w-full grid-cols-4 mb-6">
-              {todaysReading.floors.map((floor) => {
-                const FloorIcon = floor.icon;
-                return (
-                  <TabsTrigger key={floor.number} value={`floor-${floor.number}`} className="flex flex-col items-center gap-1 py-3">
-                    <FloorIcon className="h-4 w-4" />
-                    <span className="text-xs">Floor {floor.number}</span>
+          {exercises.length === 0 ? (
+            <div className="text-center py-8 text-muted-foreground">
+              <Building2 className="h-12 w-12 mx-auto mb-4 opacity-50" />
+              <p>Loading today's exercises...</p>
+            </div>
+          ) : (
+            <Tabs defaultValue={`floor-${exercises[0]?.floorNumber}`} className="w-full">
+              <TabsList className="grid w-full mb-6" style={{ gridTemplateColumns: `repeat(${exercises.length}, minmax(0, 1fr))` }}>
+                {exercises.map((exercise) => (
+                  <TabsTrigger 
+                    key={exercise.floorNumber} 
+                    value={`floor-${exercise.floorNumber}`} 
+                    className="flex flex-col items-center gap-1 py-3"
+                  >
+                    <Building2 className="h-4 w-4" />
+                    <span className="text-xs">Floor {exercise.floorNumber}</span>
                   </TabsTrigger>
-                );
-              })}
-            </TabsList>
+                ))}
+              </TabsList>
 
-            {todaysReading.floors.map((floor) => {
-              const FloorIcon = floor.icon;
-              const exercise = todaysReading.floorExercises[floor.number];
-              
-              return (
-                <TabsContent key={floor.number} value={`floor-${floor.number}`} className="space-y-4">
+              {exercises.map((exercise) => (
+                <TabsContent key={exercise.floorNumber} value={`floor-${exercise.floorNumber}`} className="space-y-4">
                   <div className="flex items-start gap-4 p-4 bg-primary/5 rounded-lg border border-primary/10">
-                    <FloorIcon className="h-6 w-6 text-primary mt-1 flex-shrink-0" />
+                    <Building2 className="h-6 w-6 text-primary mt-1 flex-shrink-0" />
                     <div className="flex-1">
                       <div className="flex items-center justify-between mb-2">
-                        <h4 className="font-bold text-foreground">{floor.name}</h4>
-                        <Badge variant="outline" className="text-xs">Floor {floor.number}</Badge>
+                        <h4 className="font-bold text-foreground">{exercise.floorName}</h4>
+                        <Badge variant="outline" className="text-xs">Floor {exercise.floorNumber}</Badge>
                       </div>
                       <p className="text-sm text-muted-foreground mb-3">
-                        Rooms: {floor.rooms.join(" • ")}
+                        Rooms: {exercise.rooms.join(" • ")}
                       </p>
                     </div>
                   </div>
@@ -230,10 +278,10 @@ export default function DailyReading() {
                     
                     <div className="space-y-2">
                       <p className="text-sm font-medium text-foreground">Guiding Questions:</p>
-                      <ul className="space-y-1">
-                        {exercise.questions.map((q, idx) => (
-                          <li key={idx} className="text-sm text-muted-foreground flex items-start gap-2">
-                            <span className="text-primary mt-1">•</span>
+                      <ul className="space-y-2">
+                        {exercise.questions?.map((q: string, qIdx: number) => (
+                          <li key={qIdx} className="text-sm text-muted-foreground flex items-start gap-2">
+                            <span className="text-primary mt-0.5">•</span>
                             <span>{q}</span>
                           </li>
                         ))}
@@ -241,9 +289,9 @@ export default function DailyReading() {
                     </div>
                   </Card>
                 </TabsContent>
-              );
-            })}
-          </Tabs>
+              ))}
+            </Tabs>
+          )}
         </Card>
 
         {/* Complete Button */}
