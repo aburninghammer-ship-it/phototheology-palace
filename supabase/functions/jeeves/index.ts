@@ -171,6 +171,7 @@ serve(async (req) => {
       existingBridges,
       bridges,
       scope,
+      timePeriod,
       // Game validation properties
       cards,
       explanation,
@@ -1293,31 +1294,71 @@ Be scholarly, compassionate, and clear. Cite specific verses.`;
         ? "Focus on events in the United States of America" 
         : "Focus on events globally, outside the United States";
       
-      systemPrompt = `You are Jeeves, a historicist prophecy scholar monitoring end-time fulfillments of Matthew 24 and Revelation 13:11.
-You track REAL, documentable events—never sensationalism. Focus on observable patterns showing how America (the lamb-like beast) 
-is speaking with the dragon's voice through Christian Nationalism, church-state erosion, authoritarianism, and religious coercion.`;
+      const timePeriodValue = timePeriod || "1month";
+      const timeFrames: Record<string, string> = {
+        "1month": "last 30 days",
+        "3months": "last 3 months",
+        "6months": "last 6 months",
+        "1year": "last year",
+        "2years": "last 2 years",
+        "5years": "last 5 years"
+      };
+      
+      systemPrompt = `You are Jeeves, a historicist prophecy scholar. You search for REAL news articles about end-time fulfillments 
+of Matthew 24 and Revelation 13:11. You provide actual article titles, descriptions, and source URLs from reputable news outlets.`;
 
-      userPrompt = `Generate a new prophetic signal about REAL current events or trends. ${scopeContext}.
+      // First, search the web for relevant articles
+      const searchQuery = scopeContext.includes("United States")
+        ? `Christian nationalism church state separation USA ${timeFrames[timePeriodValue]}`
+        : `religious authoritarianism global ${timeFrames[timePeriodValue]}`;
+      
+      console.log(`Searching web for: ${searchQuery}`);
+      
+      let searchResults = "";
+      try {
+        const searchResponse = await fetch('https://api.tavily.com/search', {
+          method: 'POST',
+          headers: { 
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${Deno.env.get('TAVILY_API_KEY') || 'tvly-demo-key'}`
+          },
+          body: JSON.stringify({
+            query: searchQuery,
+            search_depth: 'advanced',
+            include_answer: false,
+            max_results: 5
+          })
+        });
+        
+        if (searchResponse.ok) {
+          const searchData = await searchResponse.json();
+          searchResults = searchData.results
+            ?.map((r: any) => `Title: ${r.title}\nURL: ${r.url}\nSnippet: ${r.content}`)
+            .join('\n\n') || '';
+        }
+      } catch (e) {
+        console.log('Web search unavailable, generating from knowledge');
+      }
 
-FOCUS AREAS (choose one):
-- Christian Nationalism: Christian supremacy movements, theocratic rhetoric, religious extremism
-- Church-State Erosion: Ten Commandments in schools, religious symbols in government, faith-based policy
-- Authoritarianism in Christianity: Hate speech by Christian leaders, calls for religious law enforcement
-- Racism in White Evangelicalism: Documented cases of racial supremacy within Christian movements
-- Natural Disasters: Climate events, earthquakes, floods as signs of the times (Matthew 24)
-- Papal Influence: Vatican diplomatic moves, ecumenical unity efforts, Sunday sacredness advocacy
-- Religious Liberty Threats: Sunday law proposals, religious freedom restrictions, NSPM-7 type policies
+      userPrompt = `Using these REAL news articles from the ${timeFrames[timePeriodValue]}, create ONE prophetic signal. ${scopeContext}.
 
-EXCLUDE (never include these):
-- Israel-centric futurism or Middle East "peace treaties"
-- Sensational topics: UN conspiracies, vaccine/chip mark of beast theories
-- Speculative future events without current documentation
+ARTICLES FOUND:
+${searchResults || 'Search unavailable - use your knowledge of recent events'}
+
+FOCUS AREAS (choose one that matches the articles):
+- Christian Nationalism: Christian supremacy movements, theocratic rhetoric
+- Church-State Erosion: Religious symbols in government, faith-based policy  
+- Authoritarianism in Christianity: Religious law enforcement advocacy
+- Natural Disasters: Climate events as signs (Matthew 24)
+- Papal Influence: Vatican diplomatic moves, ecumenical unity
+- Religious Liberty Threats: Sunday law proposals, NSPM-7 policies
 
 Return JSON format:
 {
-  "title": "Clear, factual title",
-  "description": "2-3 paragraphs: (1) Describe the REAL event/trend with specifics, (2) Explain how it fulfills Matthew 24 and/or Revelation 13:11 (America speaking as a dragon), (3) Show the prophetic pattern",
+  "title": "Title from actual article or clear event name",
+  "description": "2-3 paragraphs: (1) Describe the actual event with specifics, (2) Explain prophetic significance, (3) Show pattern",
   "category": "church-state" | "christian-nationalism" | "natural" | "religious-liberty" | "authoritarianism",
+  "source_url": "URL of the news article",
   "verses": ["Matthew 24:X", "Revelation 13:11"]
 }
 

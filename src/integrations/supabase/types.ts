@@ -396,6 +396,8 @@ export type Database = {
           instructions: Json | null
           principle_used: string | null
           room_codes: string[] | null
+          search_timestamp: string | null
+          source_url: string | null
           starts_at: string | null
           title: string
           ui_config: Json | null
@@ -415,6 +417,8 @@ export type Database = {
           instructions?: Json | null
           principle_used?: string | null
           room_codes?: string[] | null
+          search_timestamp?: string | null
+          source_url?: string | null
           starts_at?: string | null
           title: string
           ui_config?: Json | null
@@ -434,6 +438,8 @@ export type Database = {
           instructions?: Json | null
           principle_used?: string | null
           room_codes?: string[] | null
+          search_timestamp?: string | null
+          source_url?: string | null
           starts_at?: string | null
           title?: string
           ui_config?: Json | null
