@@ -165,12 +165,12 @@ const ProphecyWatch = () => {
                 {generating ? (
                   <>
                     <Sparkles className="mr-2 h-5 w-5 animate-spin" />
-                    Searching News...
+                    Generating Signal...
                   </>
                 ) : (
                   <>
                     <Sparkles className="mr-2 h-5 w-5" />
-                    Search News Articles
+                    Generate Signal
                   </>
                 )}
               </Button>
