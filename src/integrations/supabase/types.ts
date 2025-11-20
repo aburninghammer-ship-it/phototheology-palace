@@ -2409,6 +2409,7 @@ export type Database = {
           gem_creation_streak: number | null
           has_lifetime_access: boolean
           id: string
+          is_recurring: boolean | null
           is_student: boolean | null
           last_seen: string | null
           learning_style: string | null
@@ -2421,12 +2422,14 @@ export type Database = {
           longest_study_streak: number | null
           onboarding_completed: boolean | null
           onboarding_step: number | null
+          payment_source: string | null
           points: number | null
           preferred_features: string[] | null
           primary_role: string | null
           promotional_access_expires_at: string | null
           referral_code: string | null
           stripe_customer_id: string | null
+          stripe_subscription_id: string | null
           student_expires_at: string | null
           student_verified_at: string | null
           subscription_renewal_date: string | null
@@ -2450,6 +2453,7 @@ export type Database = {
           gem_creation_streak?: number | null
           has_lifetime_access?: boolean
           id: string
+          is_recurring?: boolean | null
           is_student?: boolean | null
           last_seen?: string | null
           learning_style?: string | null
@@ -2462,12 +2466,14 @@ export type Database = {
           longest_study_streak?: number | null
           onboarding_completed?: boolean | null
           onboarding_step?: number | null
+          payment_source?: string | null
           points?: number | null
           preferred_features?: string[] | null
           primary_role?: string | null
           promotional_access_expires_at?: string | null
           referral_code?: string | null
           stripe_customer_id?: string | null
+          stripe_subscription_id?: string | null
           student_expires_at?: string | null
           student_verified_at?: string | null
           subscription_renewal_date?: string | null
@@ -2491,6 +2497,7 @@ export type Database = {
           gem_creation_streak?: number | null
           has_lifetime_access?: boolean
           id?: string
+          is_recurring?: boolean | null
           is_student?: boolean | null
           last_seen?: string | null
           learning_style?: string | null
@@ -2503,12 +2510,14 @@ export type Database = {
           longest_study_streak?: number | null
           onboarding_completed?: boolean | null
           onboarding_step?: number | null
+          payment_source?: string | null
           points?: number | null
           preferred_features?: string[] | null
           primary_role?: string | null
           promotional_access_expires_at?: string | null
           referral_code?: string | null
           stripe_customer_id?: string | null
+          stripe_subscription_id?: string | null
           student_expires_at?: string | null
           student_verified_at?: string | null
           subscription_renewal_date?: string | null

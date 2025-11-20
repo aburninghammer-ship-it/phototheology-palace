@@ -59,7 +59,7 @@ export default function AdminSubscriptions() {
       // Get user subscriptions
       const { data: profiles } = await supabase
         .from("profiles")
-        .select("subscription_status, subscription_tier, has_lifetime_access, trial_ends_at, student_expires_at, promotional_access_expires_at");
+        .select("subscription_status, subscription_tier, has_lifetime_access, trial_ends_at, student_expires_at, promotional_access_expires_at, payment_source, is_recurring");
 
       // Get church subscriptions
       const { data: churches } = await supabase
@@ -77,24 +77,24 @@ export default function AdminSubscriptions() {
       profiles?.forEach(profile => {
         const trialValid = profile.trial_ends_at && new Date(profile.trial_ends_at) > now;
         const studentValid = profile.student_expires_at && new Date(profile.student_expires_at) > now;
-        const promotionalValid = profile.promotional_access_expires_at && new Date(profile.promotional_access_expires_at) > now;
-
-        if (profile.has_lifetime_access) {
+        
+        // Only count as paid if payment_source is 'stripe' or 'lifetime'
+        const isActuallyPaying = profile.payment_source === 'stripe' || profile.payment_source === 'lifetime';
+        
+        if (profile.has_lifetime_access && profile.payment_source === 'lifetime') {
           totalLifetime++;
           totalPaid++;
           if (profile.subscription_tier === 'essential') tierCounts.essential++;
           else if (profile.subscription_tier === 'premium') tierCounts.premium++;
-        } else if (profile.subscription_status === 'active' && !trialValid) {
+        } else if (profile.subscription_status === 'active' && !trialValid && isActuallyPaying && profile.is_recurring) {
+          // Only count recurring Stripe subscriptions as paid
           totalPaid++;
           if (profile.subscription_tier === 'essential') tierCounts.essential++;
           else if (profile.subscription_tier === 'premium') tierCounts.premium++;
-        } else if (studentValid) {
+        } else if (studentValid && profile.payment_source === 'stripe') {
+          // Only count students who are actually paying via Stripe
           totalPaid++;
           tierCounts.student++;
-        } else if (promotionalValid && profile.subscription_status === 'active') {
-          totalPaid++;
-          if (profile.subscription_tier === 'essential') tierCounts.essential++;
-          else if (profile.subscription_tier === 'premium') tierCounts.premium++;
         } else if (trialValid) {
           totalTrial++;
         }
