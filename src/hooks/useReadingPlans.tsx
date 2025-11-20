@@ -90,6 +90,16 @@ export const useReadingPlans = () => {
     }
 
     try {
+      // Deactivate any existing active plans
+      if (userProgress) {
+        await supabase
+          .from("user_reading_progress")
+          .update({ is_active: false })
+          .eq("user_id", user.id)
+          .eq("is_active", true);
+      }
+
+      // Start the new plan
       const { data, error } = await supabase
         .from("user_reading_progress")
         .insert({
@@ -104,8 +114,10 @@ export const useReadingPlans = () => {
       
       setUserProgress(data);
       toast({
-        title: "Plan Started!",
-        description: "Your reading journey begins now",
+        title: userProgress ? "Plan Switched!" : "Plan Started!",
+        description: userProgress 
+          ? "Your new reading plan is now active" 
+          : "Your reading journey begins now",
       });
     } catch (error: any) {
       console.error("Error starting plan:", error);

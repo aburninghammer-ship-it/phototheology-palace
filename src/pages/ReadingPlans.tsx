@@ -170,10 +170,9 @@ export default function ReadingPlans() {
                       <Button 
                         className="w-full" 
                         onClick={() => handleStartPlan(plan.id)}
-                        disabled={userProgress !== null}
                       >
-                        {userProgress ? "Plan Active" : "Start Plan"}
-                        {!userProgress && <Play className="ml-2 h-4 w-4" />}
+                        {userProgress ? "Switch to This Plan" : "Start Plan"}
+                        <Play className="ml-2 h-4 w-4" />
                       </Button>
                     ) : (
                       <Button 
@@ -245,13 +244,12 @@ export default function ReadingPlans() {
                       <Button 
                         className="w-full" 
                         onClick={() => handleStartPlan(plan.id)}
-                        disabled={userProgress !== null}
                       >
-                        {userProgress ? "Plan Active" : "Start Plan"}
-                        {!userProgress && <Play className="ml-2 h-4 w-4" />}
+                        {userProgress ? "Switch to This Plan" : "Start Plan"}
+                        <Play className="ml-2 h-4 w-4" />
                       </Button>
                     ) : (
-                      <Button 
+                      <Button
                         className="w-full" 
                         variant="outline"
                         onClick={() => navigate('/auth')}
