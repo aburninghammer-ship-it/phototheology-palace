@@ -182,6 +182,11 @@ export default function DailyReading() {
               <p className="text-muted-foreground">
                 Your daily reading assignment
               </p>
+              {plan && (
+                <p className="text-sm text-muted-foreground mt-1">
+                  Current plan: {plan.name}
+                </p>
+              )}
             </div>
             <div className="text-right">
               <p className="text-sm text-muted-foreground">Progress</p>

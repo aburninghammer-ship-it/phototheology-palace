@@ -137,6 +137,7 @@ export const useReadingPlans = () => {
           user_id: user.id,
           plan_id: planId,
           current_day: 1,
+          is_active: true,
         })
         .select()
         .single();

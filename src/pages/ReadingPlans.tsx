@@ -12,6 +12,7 @@ export default function ReadingPlans() {
   const { plans, userProgress, loading, startPlan, refetchProgress } = useReadingPlans();
   const { user } = useAuth();
   const navigate = useNavigate();
+  const activePlan = userProgress ? plans.find((p) => p.id === userProgress.plan_id) : null;
 
   const getDifficultyColor = (depthMode: string) => {
     switch (depthMode) {
@@ -86,11 +87,14 @@ export default function ReadingPlans() {
           <Card className="mb-8 p-6 border-primary bg-primary/5">
             <div className="flex items-center justify-between">
               <div>
-                <h3 className="text-lg font-semibold text-foreground mb-2">
-                  Your Current Plan
+                <h3 className="text-lg font-semibold text-foreground mb-1">
+                  Current Plan: {activePlan?.name || "Reading Plan"}
                 </h3>
-                <p className="text-muted-foreground">
-                  Day {userProgress.current_day} of your reading journey
+                <p className="text-sm text-muted-foreground">
+                  Day {userProgress.current_day}
+                  {activePlan?.duration_days && (
+                    <span> / {activePlan.duration_days} days total</span>
+                  )}
                 </p>
               </div>
               <Button onClick={() => navigate("/daily-reading")}>
