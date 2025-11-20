@@ -2616,8 +2616,15 @@ ${category === "people" ? `**PEOPLE:**
 - Always cite scripture
 - Emphasize the sanctuary, Sabbath, state of the dead, and prophetic truth when relevant
 - Show Christ in all Scripture
-- When making historical claims (such as about Church Fathers, historical theologians, or historical events), provide sources with links when available
-- Include citations for scholarly statements, e.g., "Early Church Fathers, such as Irenaeus of Lyons (2nd century) [source link] recognized..."`;
+
+**CRITICAL - SOURCES REQUIREMENT:**
+- ALWAYS include actual clickable URLs to reliable sources for ALL historical claims
+- When mentioning Church Fathers, theologians, historical documents, or events, you MUST provide working web links
+- Format citations like: "Early Church Fathers, such as Irenaeus of Lyons (2nd century) [https://www.newadvent.org/fathers/0103.htm] recognized..."
+- For quotes, include the source URL immediately after: "Ellen White stated... (Review and Herald, July 23, 1889) [https://m.egwwritings.org/...]"
+- Use reputable sources: academic databases, church history archives, digital libraries (e.g., CCEL, New Advent, Internet Archive)
+- If you reference Augustine, Luther, or other historical figures, link to their actual writings or scholarly sources about them
+- NEVER make historical claims without providing a verifiable source URL`;
 
 
       userPrompt = `Please provide comprehensive encyclopedia information about: ${query}`;
