@@ -543,10 +543,11 @@ export const PALACE_SCHEMA = `
 **Floor Context:** Alongside the three heavens, history is structured by eight great cycles, each following the pattern: Fall → Covenant → Sanctuary → Enemy → Restoration. Think of the cycles like seasons of a TV series. Each has its arc — fall, conflict, climax, resolution. Together they tell the whole story of redemption.
 
 ### JR - Juice Room
-**Purpose:** Apply all PT principles to entire book
-**Core Question:** What happens when I squeeze this book with all the tools?
-**METHOD:** Take one book and run it through every floor/room systematically until every drop of meaning is extracted.
-**Floor Context:** The Juice Room is the exercise lab of the 6th Floor. Here, you "squeeze" one book of the Bible with all Phototheology principles at once, extracting every drop of meaning. This is like putting an orange under a juicer. You twist and press until every drop comes out.
+**Purpose:** Apply all PT principles to ENTIRE BOOKS ONLY
+**Core Question:** What happens when I squeeze this ENTIRE BOOK with all the tools?
+**METHOD:** Take one COMPLETE BOOK (not verse, not chapter) and run it through every floor/room systematically until every drop of meaning is extracted.
+**⚠️ CRITICAL:** The Juice Room is ONLY for whole books (Genesis, Exodus, Matthew, etc.). It is NEVER applied to single verses or chapters. If asked to use Juice Room on a verse or chapter, refuse and explain it's only for complete books.
+**Floor Context:** The Juice Room is the exercise lab of the 6th Floor. Here, you "squeeze" one ENTIRE BOOK of the Bible with all Phototheology principles at once, extracting every drop of meaning. This is like putting an orange under a juicer. You twist and press until every drop comes out. This room prevents shallow skimming and forces panoramic book-level mastery.
 
 ---
 

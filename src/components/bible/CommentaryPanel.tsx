@@ -94,7 +94,7 @@ const PRINCIPLE_OPTIONS = [
   { id: "cyc", label: "Cyrus-Christ Cycle (@CyC)", color: "gradient-sunset" },
   { id: "sp", label: "Holy Spirit Cycle (@Sp)", color: "gradient-warmth" },
   { id: "re", label: "Remnant Cycle (@Re)", color: "gradient-palace" },
-  { id: "jr", label: "Juice Room (JR)", color: "gradient-ocean" },
+  // Note: Juice Room (JR) intentionally excluded - only for whole books, not verses
   
   // Floor 7 - Spiritual & Emotional (Transformation)
   { id: "frm", label: "Fire Room (FRm)", color: "gradient-royal" },
