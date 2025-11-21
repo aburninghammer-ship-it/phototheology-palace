@@ -69,6 +69,8 @@ const categoryConfig = {
       { to: "/blueprint-stronghold", label: "Breaking Strongholds", icon: "🛡️" },
       { to: "/blueprint-weight-loss", label: "Weight Loss", icon: "⚖️" },
       { to: "/blueprint-mental-health", label: "Mental Health", icon: "🧠" },
+      { to: "/blueprint-financial", label: "Financial Stability", icon: "💰" },
+      { to: "/blueprint-stress", label: "Stress Management", icon: "🧘" },
     ],
   },
   learn: {
