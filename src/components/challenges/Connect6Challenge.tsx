@@ -33,7 +33,7 @@ export const Connect6Challenge = ({ challenge, onSubmit, hasSubmitted }: Connect
       target_genre: challenge.ui_config?.targetGenre,
       connected_verse: connectedVerse.trim(),
       explanation: explanation.trim(),
-      principle_applied: "Connect-6 Genres (C6)"
+      principle_applied: "Connect-6 (C6): Cross-Genre Synthesis"
     });
   };
 
@@ -50,7 +50,7 @@ export const Connect6Challenge = ({ challenge, onSubmit, hasSubmitted }: Connect
           <Badge variant="secondary">Core • 10-15 min</Badge>
         </div>
         <CardDescription className="mt-2">
-          Principle: Connect-6 Genres (C6) - Build chains across Scripture types
+          Principle: Connect-6 (C6) - Connect this text across multiple genres OR synthesize verses from all genres
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">

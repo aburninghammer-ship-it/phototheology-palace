@@ -70,7 +70,7 @@ FLOOR 4: NEXT LEVEL (Christ-Centered Structure)
    • 3D = Me (personal application, how it applies to my life)
    • 4D = Church (corporate body, ecclesiology, community)
    • 5D = Heaven (celestial realm, throne room, divine glory)
-🔹 C6 (Connect-6 Room): Which genre? (Prophecy/Parable/Epistle/History/Gospel/Poetry)
+🔹 C6 (Connect-6 Room): How does this text connect across genres? Which genres illuminate it? Can you link it to Prophecy/Parable/Epistle/History/Gospel/Poetry?
 🔹 TRm (Theme Room): Which structural span? (Sanctuary/Life of Christ/Great Controversy/Time-Prophecy/Gospel/Heaven)
 🔹 TZ (Time Zone): Earth-Past/Now/Future OR Heaven-Past/Now/Future
 🔹 PRm (Patterns Room): What recurring motif appears across Scripture?
