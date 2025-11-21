@@ -4114,6 +4114,36 @@ export type Database = {
         }
         Relationships: []
       }
+      weight_loss_blueprint_progress: {
+        Row: {
+          article_id: number
+          completed_at: string
+          created_at: string
+          id: string
+          notes: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          article_id: number
+          completed_at?: string
+          created_at?: string
+          id?: string
+          notes?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          article_id?: number
+          completed_at?: string
+          created_at?: string
+          id?: string
+          notes?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       user_growth_journal: {
