@@ -139,6 +139,7 @@ const StudyEditor = lazy(() => import("./pages/StudyEditor"));
 const PrivacyPolicy = lazy(() => import("./pages/PrivacyPolicy"));
 const TermsOfService = lazy(() => import("./pages/TermsOfService"));
 const NotFound = lazy(() => import("./pages/NotFound"));
+const AuthCallback = lazy(() => import("./pages/AuthCallback"));
 
 const queryClient = new QueryClient();
 
@@ -172,6 +173,7 @@ function App() {
             <Route path="/" element={<Index />} />
             <Route path="/genesis-challenge" element={<GenesisHighRise />} />
             <Route path="/auth" element={<Auth />} />
+            <Route path="/auth/callback" element={<AuthCallback />} />
             <Route path="/interactive-demo" element={<InteractiveDemo />} />
             <Route path="/onboarding" element={
               <ProtectedRoute>
