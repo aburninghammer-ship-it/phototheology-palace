@@ -456,20 +456,47 @@ God's law doesn't change. His design for health doesn't change. But His mercy is
 export const WEIGHT_LOSS_INTRO = {
   title: "The Sanctuary Blueprint for Weight Loss",
   subtitle: "Using the Six Articles of Furniture to Rebuild the Body, the Will, and the Mind in God's Order",
-  sanctuaryExplanation: `**Understanding the Hebrew Sanctuary**
+  sanctuaryExplanation: `## Understanding the Hebrew Sanctuary
 
-In the Old Testament, God gave Moses a detailed pattern for the sanctuary (Exodus 25:8-9)—a sacred tent where God's presence would dwell among His people. This wasn't just a building; it was a divine blueprint showing humanity how to approach a holy God.
+In the Old Testament, God gave Moses a detailed pattern for the sanctuary (Exodus 25:8-9)—a sacred tent where God's presence would dwell among His people. This wasn't just a building; it was a divine blueprint showing humanity how to approach a holy God and walk through life transformation.
 
-The sanctuary contained six primary articles of furniture, arranged in a specific order:
+### The Six Articles of Furniture
 
-1. **Altar of Sacrifice** (Outer Court) - Where animals were sacrificed; death to sin
-2. **The Laver** (Outer Court) - A bronze basin for washing; cleansing and reflection
-3. **Table of Shewbread** (Holy Place) - Twelve loaves of bread; daily provision and fellowship
-4. **Golden Candlestick** (Holy Place) - Seven-branched lampstand; light and revelation
-5. **Altar of Incense** (Holy Place) - Fragrant smoke rising; prayer and worship
-6. **Ark of the Covenant** (Most Holy Place) - God's throne; His presence, law, and mercy
+The sanctuary contained six primary articles of furniture, arranged in a specific progressive order from the outer court to the Most Holy Place:
 
-**God's Way is for EVERY Area of Life**
+🔥 **1. Altar of Sacrifice** (Outer Court)  
+Where animals were sacrificed as substitutes for sin; represents death to the old self and complete surrender.  
+📖 *Scriptural Foundation:* Leviticus 1-7; Hebrews 10:1-10  
+🔗 [Learn more about the Altar of Sacrifice](https://www.biblegateway.com/passage/?search=Exodus+27%3A1-8&version=KJV)
+
+💧 **2. The Laver** (Outer Court)  
+A bronze basin filled with water for ceremonial washing; symbolizes cleansing, self-reflection, and preparation for service.  
+📖 *Scriptural Foundation:* Exodus 30:17-21; Ephesians 5:26  
+🔗 [Explore the Laver's significance](https://www.biblegateway.com/passage/?search=Exodus+30%3A17-21&version=KJV)
+
+🍞 **3. Table of Shewbread** (Holy Place)  
+Twelve loaves of bread representing the twelve tribes; signifies God's daily provision, consistency, and fellowship.  
+📖 *Scriptural Foundation:* Leviticus 24:5-9; John 6:35  
+🔗 [Discover the Bread of Presence](https://www.biblegateway.com/passage/?search=Leviticus+24%3A5-9&version=KJV)
+
+🕯️ **4. Golden Candlestick/Menorah** (Holy Place)  
+Seven-branched lampstand that burned continually; represents the Holy Spirit's light, revelation, and guidance.  
+📖 *Scriptural Foundation:* Exodus 25:31-40; John 8:12; Revelation 1:20  
+🔗 [Study the Golden Lampstand](https://www.biblegateway.com/passage/?search=Exodus+25%3A31-40&version=KJV)
+
+🌸 **5. Altar of Incense** (Holy Place)  
+Golden altar where fragrant incense burned continually; symbolizes prayer, worship, and intimate communion with God.  
+📖 *Scriptural Foundation:* Exodus 30:1-10; Psalm 141:2; Revelation 5:8  
+🔗 [Understand the Altar of Incense](https://www.biblegateway.com/passage/?search=Exodus+30%3A1-10&version=KJV)
+
+⚡ **6. Ark of the Covenant** (Most Holy Place)  
+God's throne on earth containing the Law, Manna, and Aaron's Rod; represents God's presence, covenant, mercy, and ultimate restoration.  
+📖 *Scriptural Foundation:* Exodus 25:10-22; Hebrews 9:1-5  
+🔗 [Discover the Ark of the Covenant](https://www.biblegateway.com/passage/?search=Exodus+25%3A10-22&version=KJV)
+
+---
+
+### God's Way is for EVERY Area of Life
 
 Here's the revelation: The sanctuary pattern wasn't just for worship services. It's God's master blueprint for how He works in every dimension of human life. The same God who designed the path to His presence also designed the path to freedom, healing, relationships, and restoration.
 
