@@ -1849,6 +1849,36 @@ export type Database = {
         }
         Relationships: []
       }
+      marriage_blueprint_progress: {
+        Row: {
+          article_id: number
+          completed_at: string
+          created_at: string
+          id: string
+          notes: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          article_id: number
+          completed_at?: string
+          created_at?: string
+          id?: string
+          notes?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          article_id?: number
+          completed_at?: string
+          created_at?: string
+          id?: string
+          notes?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       memorization_verses: {
         Row: {
           added_at: string
