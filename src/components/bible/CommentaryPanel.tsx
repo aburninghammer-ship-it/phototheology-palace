@@ -4,7 +4,8 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Badge } from "@/components/ui/badge";
-import { Loader2, MessageSquare, Sparkles, X } from "lucide-react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Loader2, MessageSquare, Sparkles, X, BookOpen } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { formatJeevesResponse } from "@/lib/formatJeevesResponse";
@@ -115,6 +116,21 @@ const PRINCIPLE_OPTIONS = [
   { id: "asc-5", label: "Heaven Ascension (Asc-5)", color: "gradient-sunset" },
 ];
 
+const COMMENTARY_OPTIONS = [
+  { value: "clarke", label: "Adam Clarke's Commentary" },
+  { value: "barnes", label: "Albert Barnes' Notes" },
+  { value: "gill", label: "John Gill's Exposition" },
+  { value: "henry", label: "Matthew Henry's Concise" },
+  { value: "jfb", label: "Jamieson-Fausset-Brown" },
+  { value: "keil-delitzsch", label: "Keil & Delitzsch (OT)" },
+  { value: "wesley", label: "John Wesley's Notes" },
+  { value: "pulpit", label: "The Pulpit Commentary" },
+  { value: "cambridge", label: "Cambridge Bible for Schools" },
+  { value: "ellicott", label: "Ellicott's Commentary" },
+  { value: "benson", label: "Benson Commentary" },
+  { value: "sop", label: "Spirit of Prophecy (Ellen G. White)" },
+];
+
 interface CommentaryPanelProps {
   book: string;
   chapter: number;
@@ -129,7 +145,8 @@ export const CommentaryPanel = ({ book, chapter, verse, verseText, onClose }: Co
   const [commentary, setCommentary] = useState<string | null>(null);
   const [usedPrinciples, setUsedPrinciples] = useState<string[]>([]);
   const [analysisMode, setAnalysisMode] = useState<"revealed" | "applied">("applied");
-  const [sopMode, setSopMode] = useState(false);
+  const [selectedCommentary, setSelectedCommentary] = useState<string>("clarke");
+  const [commentaryMode, setCommentaryMode] = useState(false);
   const { toast } = useToast();
 
   const togglePrinciple = (id: string) => {
@@ -138,8 +155,8 @@ export const CommentaryPanel = ({ book, chapter, verse, verseText, onClose }: Co
     );
   };
 
-  const generateCommentary = async (refresh = false, includeSOP = false) => {
-    if (analysisMode === "applied" && selectedPrinciples.length === 0 && !refresh && !includeSOP) {
+  const generateCommentary = async (refresh = false, useClassicCommentary = false) => {
+    if (analysisMode === "applied" && selectedPrinciples.length === 0 && !refresh && !useClassicCommentary) {
       toast({
         title: "Select Principles",
         description: "Please select at least one principle for applied analysis",
@@ -149,18 +166,18 @@ export const CommentaryPanel = ({ book, chapter, verse, verseText, onClose }: Co
     }
 
     setLoading(true);
-    setSopMode(includeSOP);
+    setCommentaryMode(useClassicCommentary);
     try {
       const { data, error } = await supabase.functions.invoke("jeeves", {
         body: {
-          mode: includeSOP ? "commentary-sop" : (analysisMode === "revealed" ? "commentary-revealed" : "commentary-applied"),
+          mode: useClassicCommentary ? "commentary-classic" : (analysisMode === "revealed" ? "commentary-revealed" : "commentary-applied"),
           book,
           chapter,
           verseText: { verse, text: verseText },
-          selectedPrinciples: (analysisMode === "applied" && !refresh && !includeSOP) 
+          selectedPrinciples: (analysisMode === "applied" && !refresh && !useClassicCommentary) 
             ? selectedPrinciples.map(id => PRINCIPLE_OPTIONS.find(p => p.id === id)?.label)
             : undefined,
-          includeSOP: includeSOP,
+          classicCommentary: useClassicCommentary ? selectedCommentary : undefined,
         },
       });
 
@@ -255,72 +272,76 @@ export const CommentaryPanel = ({ book, chapter, verse, verseText, onClose }: Co
             </div>
           )}
 
-          <div className="flex gap-2">
-            <Button
-              onClick={() => generateCommentary(false, false)}
-              disabled={loading || (analysisMode === "applied" && selectedPrinciples.length === 0)}
-              className="flex-1 gradient-royal text-white shadow-blue"
-            >
-              {loading ? (
-                <>
-                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                  Analyzing...
-                </>
-              ) : (
-                <>
-                  <Sparkles className="h-4 w-4 mr-2" />
-                  {analysisMode === "revealed" ? "Analyze" : "Generate"}
-                </>
-              )}
-            </Button>
-            
-            <Button
-              onClick={() => generateCommentary(false, true)}
-              disabled={loading}
-              variant="outline"
-              className="flex-1"
-              title="Spirit of Prophecy (Ellen G. White) commentary on this verse"
-            >
-              {loading ? (
-                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-              ) : (
-                <Sparkles className="h-4 w-4 mr-2" />
-              )}
-              SOP
-            </Button>
-            
-            {commentary && !sopMode && (
+          <div className="space-y-3">
+            <div className="flex gap-2">
               <Button
-                onClick={() => generateCommentary(true, false)}
-                disabled={loading}
-                variant="outline"
-                className="flex-1"
+                onClick={() => generateCommentary(false, false)}
+                disabled={loading || (analysisMode === "applied" && selectedPrinciples.length === 0)}
+                className="flex-1 gradient-royal text-white shadow-blue"
               >
                 {loading ? (
-                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  <>
+                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                    Analyzing...
+                  </>
                 ) : (
-                  <Sparkles className="h-4 w-4 mr-2" />
+                  <>
+                    <Sparkles className="h-4 w-4 mr-2" />
+                    {analysisMode === "revealed" ? "Analyze" : "Generate"}
+                  </>
                 )}
-                {analysisMode === "revealed" ? "Re-analyze" : "Random Refresh"}
               </Button>
-            )}
-            
-            {commentary && sopMode && (
-              <Button
-                onClick={() => generateCommentary(false, true)}
-                disabled={loading}
-                variant="outline"
-                className="flex-1"
-                title="Get a fresh batch of Ellen G. White quotes on this verse"
-              >
-                {loading ? (
-                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                ) : (
-                  <Sparkles className="h-4 w-4 mr-2" />
-                )}
-                Regenerate SOP
-              </Button>
-            )}
+              
+              {commentary && !commentaryMode && (
+                <Button
+                  onClick={() => generateCommentary(true, false)}
+                  disabled={loading}
+                  variant="outline"
+                  className="flex-1"
+                >
+                  {loading ? (
+                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  ) : (
+                    <Sparkles className="h-4 w-4 mr-2" />
+                  )}
+                  {analysisMode === "revealed" ? "Re-analyze" : "Random Refresh"}
+                </Button>
+              )}
+            </div>
+
+            <div className="border-t pt-3">
+              <h4 className="text-sm font-semibold mb-2 flex items-center gap-2">
+                <BookOpen className="h-4 w-4" />
+                Classic Commentaries
+              </h4>
+              <div className="flex gap-2">
+                <Select value={selectedCommentary} onValueChange={setSelectedCommentary}>
+                  <SelectTrigger className="flex-1">
+                    <SelectValue placeholder="Select a commentary" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {COMMENTARY_OPTIONS.map((option) => (
+                      <SelectItem key={option.value} value={option.value}>
+                        {option.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <Button
+                  onClick={() => generateCommentary(false, true)}
+                  disabled={loading}
+                  variant="outline"
+                  className="whitespace-nowrap"
+                >
+                  {loading ? (
+                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  ) : (
+                    <BookOpen className="h-4 w-4 mr-2" />
+                  )}
+                  Load
+                </Button>
+              </div>
+            </div>
           </div>
         </div>
 

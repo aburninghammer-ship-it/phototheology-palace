@@ -201,7 +201,9 @@ serve(async (req) => {
       context,
       primaryGoal,
       themeSubject,
-      lessonCount
+      lessonCount,
+      // Commentary properties
+      classicCommentary
     } = requestBody;
     
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
@@ -819,6 +821,148 @@ Ellen G. White does not appear to have written specific commentary on ${book} ${
         JSON.stringify({ 
           content: sopContent,
           principlesUsed: ["Spirit of Prophecy (SOP)"]
+        }),
+        { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    
+    } else if (mode === "commentary-classic") {
+      const commentaryMap: Record<string, { name: string; era: string; style: string }> = {
+        "clarke": { 
+          name: "Adam Clarke", 
+          era: "18th-19th century (Methodist scholar)",
+          style: "Thorough textual analysis with historical and linguistic depth"
+        },
+        "barnes": { 
+          name: "Albert Barnes", 
+          era: "19th century (Presbyterian minister)",
+          style: "Clear, practical exposition with theological clarity"
+        },
+        "gill": { 
+          name: "John Gill", 
+          era: "18th century (Baptist theologian)",
+          style: "Deep doctrinal commentary with Reformed perspective"
+        },
+        "henry": { 
+          name: "Matthew Henry", 
+          era: "17th-18th century (Presbyterian minister)",
+          style: "Devotional and practical with rich spiritual application"
+        },
+        "jfb": { 
+          name: "Jamieson-Fausset-Brown", 
+          era: "19th century (collective work)",
+          style: "Concise, scholarly exposition with cross-references"
+        },
+        "keil-delitzsch": { 
+          name: "Keil & Delitzsch", 
+          era: "19th century (German Lutheran scholars)",
+          style: "Academic Old Testament commentary with linguistic precision"
+        },
+        "wesley": { 
+          name: "John Wesley", 
+          era: "18th century (Methodist founder)",
+          style: "Brief, practical notes with spiritual emphasis"
+        },
+        "pulpit": { 
+          name: "The Pulpit Commentary", 
+          era: "19th century (collective work)",
+          style: "Comprehensive exposition with homiletics and exegesis"
+        },
+        "cambridge": { 
+          name: "Cambridge Bible for Schools", 
+          era: "19th-20th century (Anglican scholars)",
+          style: "Educational commentary with literary and historical notes"
+        },
+        "ellicott": { 
+          name: "Ellicott's Commentary", 
+          era: "19th century (Anglican bishop)",
+          style: "Scholarly with attention to Greek/Hebrew text"
+        },
+        "benson": { 
+          name: "Joseph Benson", 
+          era: "18th-19th century (Methodist minister)",
+          style: "Practical notes with theological application"
+        },
+        "sop": { 
+          name: "Ellen G. White (Spirit of Prophecy)", 
+          era: "19th-20th century (Adventist pioneer)",
+          style: "Prophetic insights with spiritual application"
+        },
+      };
+
+      const selectedInfo = commentaryMap[classicCommentary] || commentaryMap["clarke"];
+      
+      systemPrompt = `You are a scholar presenting commentary on Bible verses in the style and perspective of ${selectedInfo.name}.
+
+${selectedInfo.name}'s Background:
+• Era: ${selectedInfo.era}
+• Style: ${selectedInfo.style}
+
+CRITICAL FORMATTING REQUIREMENTS (FOLLOW ALL OF THESE):
+- Do NOT use any markdown formatting at all (no bold, no italics, no headings).
+- Do NOT use asterisks (*) anywhere in the response.
+- Write in clear paragraphs, with a blank line between each paragraph.
+- Use emojis sparingly and appropriately (📖 💡 ✨ 🔍).
+- When you need lists, use the bullet character "•" at the start of the line, followed by a space.
+- Keep the tone scholarly but accessible.
+- Present the commentary authentically in ${selectedInfo.name}'s voice and theological perspective.
+
+Your task is to provide insightful commentary on this verse AS IF you were ${selectedInfo.name}, drawing on typical interpretive approaches and theological emphases of that commentator.`;
+
+      userPrompt = `Provide ${selectedInfo.name}'s commentary on this verse:
+
+${book} ${chapter}:${verse}
+"${verseText.text}"
+
+STRUCTURE (use plain text section labels, not markdown):
+
+Context and Setting
+Write 2-3 sentences establishing the historical and literary context of this verse.
+
+Textual Analysis
+Provide 2-3 paragraphs analyzing the text itself, including:
+• Key words or phrases that deserve attention
+• Grammatical or syntactical observations
+• Cross-references to related passages
+
+Theological Insights
+Write 2-3 paragraphs explaining the theological significance and doctrinal implications from ${selectedInfo.name}'s perspective.
+
+Practical Application
+Conclude with 1-2 paragraphs on how this verse applies to Christian life and practice.
+
+Present this in a voice and style consistent with ${selectedInfo.name}'s actual published works. Be authentic to the commentator's era, theological tradition, and interpretive approach.`;
+
+      const classicResponse = await fetch(
+        "https://ai.gateway.lovable.dev/v1/chat/completions",
+        {
+          method: "POST",
+          headers: {
+            "Authorization": `Bearer ${LOVABLE_API_KEY}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            model: "google/gemini-2.5-flash",
+            messages: [
+              { role: "system", content: systemPrompt },
+              { role: "user", content: userPrompt },
+            ],
+          }),
+        }
+      );
+
+      if (!classicResponse.ok) {
+        const errorText = await classicResponse.text();
+        console.error('AI Gateway error:', classicResponse.status, errorText);
+        throw new Error(`AI Gateway error: ${classicResponse.status}`);
+      }
+
+      const classicData = await classicResponse.json();
+      const classicContent = classicData.choices?.[0]?.message?.content || "No commentary generated.";
+
+      return new Response(
+        JSON.stringify({ 
+          content: classicContent,
+          principlesUsed: [selectedInfo.name]
         }),
         { headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
