@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Navigation } from "@/components/Navigation";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -8,55 +8,53 @@ import { Textarea } from "@/components/ui/textarea";
 import { Heart, Flame, BookOpen, CheckCircle2, ArrowLeft } from "lucide-react";
 import { SANCTUARY_GRIEF_ARTICLES, GRIEF_BLUEPRINT_INTRO } from "@/data/blueprintGriefData";
 import { useToast } from "@/hooks/use-toast";
-import { supabase } from "@/integrations/supabase/client";
-import { useAuth } from "@/hooks/useAuth";
+
+const STORAGE_KEY = "grief_blueprint_progress";
 
 export default function BlueprintGrief() {
   const [selectedArticle, setSelectedArticle] = useState<number | null>(null);
   const [notes, setNotes] = useState<Record<number, string>>({});
   const [completedArticles, setCompletedArticles] = useState<number[]>([]);
   const { toast } = useToast();
-  const { user } = useAuth();
+
+  useEffect(() => {
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if (saved) {
+      const data = JSON.parse(saved);
+      setNotes(data.notes || {});
+      setCompletedArticles(data.completed || []);
+    }
+  }, []);
 
   const currentArticle = selectedArticle 
     ? SANCTUARY_GRIEF_ARTICLES.find(a => a.id === selectedArticle) 
     : null;
 
-  const handleComplete = async (articleId: number) => {
-    if (!user) {
-      toast({
-        title: "Sign in required",
-        description: "Please sign in to track your progress",
-        variant: "destructive"
-      });
-      return;
-    }
+  const handleComplete = (articleId: number) => {
+    const newCompleted = [...completedArticles, articleId];
+    setCompletedArticles(newCompleted);
+    
+    const progressData = {
+      notes,
+      completed: newCompleted
+    };
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(progressData));
 
-    try {
-      const { error } = await supabase
-        .from('grief_blueprint_progress')
-        .upsert({
-          user_id: user.id,
-          article_id: articleId,
-          completed_at: new Date().toISOString(),
-          notes: notes[articleId] || null
-        });
+    toast({
+      title: "Progress saved!",
+      description: `${SANCTUARY_GRIEF_ARTICLES.find(a => a.id === articleId)?.name} completed`,
+    });
+  };
 
-      if (error) throw error;
-
-      setCompletedArticles(prev => [...prev, articleId]);
-      toast({
-        title: "Progress saved!",
-        description: `${SANCTUARY_GRIEF_ARTICLES.find(a => a.id === articleId)?.name} completed`,
-      });
-    } catch (error) {
-      console.error('Error saving progress:', error);
-      toast({
-        title: "Error",
-        description: "Failed to save progress. Please try again.",
-        variant: "destructive"
-      });
-    }
+  const handleNotesChange = (articleId: number, value: string) => {
+    const newNotes = { ...notes, [articleId]: value };
+    setNotes(newNotes);
+    
+    const progressData = {
+      notes: newNotes,
+      completed: completedArticles
+    };
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(progressData));
   };
 
   return (
@@ -224,10 +222,7 @@ export default function BlueprintGrief() {
                       placeholder="Write your thoughts, feelings, and insights here..."
                       className="min-h-[150px]"
                       value={notes[currentArticle?.id || 0] || ""}
-                      onChange={(e) => setNotes(prev => ({
-                        ...prev,
-                        [currentArticle?.id || 0]: e.target.value
-                      }))}
+                      onChange={(e) => handleNotesChange(currentArticle?.id || 0, e.target.value)}
                     />
                   </div>
 
