@@ -81,20 +81,54 @@ Return ONLY valid JSON with this structure (no markdown, no code blocks):
   ]
 }`;
 
+    const requestBody: any = {
+      model: "google/gemini-2.5-flash",
+      messages: [
+        { role: "system", content: systemPrompt },
+        { role: "user", content: userPrompt }
+      ],
+      temperature: 0.7,
+      tools: [
+        {
+          type: "function",
+          function: {
+            name: "generate_verse_links",
+            description: "Generate verse connections through palace principles",
+            parameters: {
+              type: "object",
+              properties: {
+                links: {
+                  type: "array",
+                  items: {
+                    type: "object",
+                    properties: {
+                      reference: { type: "string", description: "Bible verse reference (e.g., John 1:29)" },
+                      principle: { type: "string", description: "Palace principle used for connection" },
+                      explanation: { type: "string", description: "1-2 sentence explanation of the connection" }
+                    },
+                    required: ["reference", "principle", "explanation"],
+                    additionalProperties: false
+                  },
+                  minItems: 4,
+                  maxItems: 8
+                }
+              },
+              required: ["links"],
+              additionalProperties: false
+            }
+          }
+        }
+      ],
+      tool_choice: { type: "function", function: { name: "generate_verse_links" } }
+    };
+
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
       headers: {
         "Authorization": `Bearer ${LOVABLE_API_KEY}`,
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({
-        model: "google/gemini-2.5-flash",
-        messages: [
-          { role: "system", content: systemPrompt },
-          { role: "user", content: userPrompt }
-        ],
-        temperature: 0.7,
-      }),
+      body: JSON.stringify(requestBody),
     });
 
     if (!response.ok) {
@@ -116,37 +150,23 @@ Return ONLY valid JSON with this structure (no markdown, no code blocks):
     }
 
     const data = await response.json();
-    const content = data.choices?.[0]?.message?.content;
+    const toolCall = data.choices?.[0]?.message?.tool_calls?.[0];
 
-    if (!content) {
-      throw new Error("No content in AI response");
+    if (!toolCall || toolCall.function?.name !== "generate_verse_links") {
+      console.error("No valid tool call in response:", JSON.stringify(data));
+      throw new Error("AI did not return structured output");
     }
 
-    // Parse the JSON response
+    // Parse the function arguments (already structured JSON from tool calling)
     let parsedLinks;
     try {
-      // Remove markdown code blocks if present
-      let cleanContent = content.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
-      
-      // Sanitize by removing/escaping control characters
-      cleanContent = cleanContent.replace(/[\u0000-\u001F\u007F-\u009F]/g, (char: string) => {
-        const replacements: Record<string, string> = {
-          '\n': '\\n',
-          '\r': '\\r',
-          '\t': '\\t',
-          '\b': '\\b',
-          '\f': '\\f'
-        };
-        return replacements[char] || '';
-      });
-      
-      parsedLinks = JSON.parse(cleanContent);
+      parsedLinks = JSON.parse(toolCall.function.arguments);
     } catch (parseError) {
-      console.error("Failed to parse AI response:", content.substring(0, 500));
-      throw new Error(`Invalid JSON response from AI: ${parseError instanceof Error ? parseError.message : 'Unknown error'}`);
+      console.error("Failed to parse tool call arguments:", toolCall.function.arguments);
+      throw new Error(`Invalid tool call response: ${parseError instanceof Error ? parseError.message : 'Unknown error'}`);
     }
 
-    // Validate and limit to 4-8 links
+    // Validate links
     const links = parsedLinks.links || [];
     const validatedLinks = links.slice(0, 8).map((link: any) => ({
       reference: link.reference || "Unknown",
