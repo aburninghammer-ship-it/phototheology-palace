@@ -233,20 +233,20 @@ export const PrinciplePanel = ({ book, chapter, verse, verseText, onClose }: Pri
       
       <CardContent>
         <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
-          <TabsList className="grid w-full grid-cols-4">
-            <TabsTrigger value="lenses">
+          <TabsList className="flex w-full flex-wrap gap-1 h-auto p-1">
+            <TabsTrigger value="lenses" className="flex-1 min-w-[100px]">
               <Layers className="h-4 w-4 mr-1" />
               Lenses
             </TabsTrigger>
-            <TabsTrigger value="scripture-links">
+            <TabsTrigger value="scripture-links" className="flex-1 min-w-[120px]">
               <LinkIcon className="h-4 w-4 mr-1" />
               Scripture Link
             </TabsTrigger>
-            <TabsTrigger value="principle-links">
+            <TabsTrigger value="principle-links" className="flex-1 min-w-[130px]">
               <ExternalLink className="h-4 w-4 mr-1" />
               Principle Links
             </TabsTrigger>
-            <TabsTrigger value="christ">
+            <TabsTrigger value="christ" className="flex-1 min-w-[90px]">
               <Heart className="h-4 w-4 mr-1" />
               Christ
             </TabsTrigger>
