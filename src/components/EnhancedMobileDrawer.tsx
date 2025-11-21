@@ -67,6 +67,8 @@ const categoryConfig = {
       { to: "/blueprint-marriage", label: "Dating & Marriage", icon: "💍" },
       { to: "/blueprint-grief", label: "Grieving", icon: "💙" },
       { to: "/blueprint-stronghold", label: "Breaking Strongholds", icon: "🛡️" },
+      { to: "/blueprint-weight-loss", label: "Weight Loss", icon: "⚖️" },
+      { to: "/blueprint-mental-health", label: "Mental Health", icon: "🧠" },
     ],
   },
   learn: {

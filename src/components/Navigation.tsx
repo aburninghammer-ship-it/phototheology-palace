@@ -290,6 +290,12 @@ export const Navigation = () => {
                       <DropdownMenuItem asChild>
                         <Link to="/blueprint-stronghold">Breaking Strongholds</Link>
                       </DropdownMenuItem>
+                      <DropdownMenuItem asChild>
+                        <Link to="/blueprint-weightloss">Weight Loss</Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem asChild>
+                        <Link to="/blueprint-mentalhealth">Mental Health</Link>
+                      </DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>
                   <Link 
