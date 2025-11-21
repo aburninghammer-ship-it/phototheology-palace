@@ -123,6 +123,7 @@ serve(async (req) => {
     // Parse request body once to avoid "Body already consumed" error
     const requestBody = await req.json();
     const {
+      action,
       roomTag, 
       roomName, 
       principle, 
@@ -208,6 +209,115 @@ serve(async (req) => {
     
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY is not configured");
+
+    const PRINCIPLES = [
+      { code: "P‖", name: "Parallels" },
+      { code: "PRm", name: "Patterns" },
+      { code: "@T", name: "Types" },
+      { code: "CR", name: "Christ-Centered" },
+      { code: "BL", name: "Sanctuary" },
+      { code: "FE", name: "Feasts" },
+      { code: "DR", name: "Dimensions" },
+      { code: "TZ", name: "Time Zones" },
+    ];
+
+    // Handle Scripture Chain action
+    if (action === 'generate_scripture_chain') {
+      const { verse: verseText, book, chapter, verseNumber } = requestBody;
+      
+      const prompt = `Given this verse from ${book} ${chapter}:${verseNumber} - "${verseText}"
+
+Find 4-8 other Bible verses that connect to this verse through Phototheology principles (types, parallels, patterns, Christ-centered connections, etc.). For each connection:
+1. Provide the verse reference
+2. Include the verse text
+3. Explain how it connects and which PT principle links them
+4. Name the principle used (e.g., "Type", "Parallel", "Pattern", "Christ-Center", etc.)
+
+Return as JSON array with objects containing: verse, text, connection, principle`;
+
+      const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${LOVABLE_API_KEY}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          model: 'google/gemini-2.5-flash',
+          messages: [
+            { role: 'system', content: 'You are a Phototheology expert helping users discover connections between Bible verses using Phototheology principles.' },
+            { role: 'user', content: prompt }
+          ],
+        }),
+      });
+
+      const data = await response.json();
+      let content = data.choices[0].message.content;
+      
+      // Clean control characters
+      content = content.replace(/[\x00-\x1F\x7F-\x9F]/g, '');
+      
+      // Extract JSON
+      const jsonMatch = content.match(/\[[\s\S]*\]/);
+      if (jsonMatch) {
+        const links = JSON.parse(jsonMatch[0]);
+        return new Response(
+          JSON.stringify({ links }),
+          { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+      
+      throw new Error('Failed to parse scripture chain from response');
+    }
+
+    // Handle Principle Chapter Scan action
+    if (action === 'scan_chapter_for_principle') {
+      const { book, chapter, principle } = requestBody;
+      
+      const principleName = PRINCIPLES.find(p => p.code === principle)?.name || principle;
+      
+      const prompt = `Scan ${book} chapter ${chapter} and find all verses where the Phototheology principle "${principleName}" can be applied.
+
+For each verse you identify:
+1. Provide the verse reference (e.g., "${book} ${chapter}:5")
+2. Include the verse text
+3. Explain specifically how ${principleName} applies to that verse
+4. Be selective - only include verses where the principle genuinely applies
+
+Return as JSON array with objects containing: verse, text, connection, principle`;
+
+      const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${LOVABLE_API_KEY}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          model: 'google/gemini-2.5-flash',
+          messages: [
+            { role: 'system', content: 'You are a Phototheology expert analyzing Bible chapters to identify where specific principles apply.' },
+            { role: 'user', content: prompt }
+          ],
+        }),
+      });
+
+      const data = await response.json();
+      let content = data.choices[0].message.content;
+      
+      // Clean control characters
+      content = content.replace(/[\x00-\x1F\x7F-\x9F]/g, '');
+      
+      // Extract JSON
+      const jsonMatch = content.match(/\[[\s\S]*\]/);
+      if (jsonMatch) {
+        const results = JSON.parse(jsonMatch[0]);
+        return new Response(
+          JSON.stringify({ results }),
+          { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+      
+      throw new Error('Failed to parse principle scan from response');
+    }
 
     let systemPrompt = "";
     let userPrompt = "";
