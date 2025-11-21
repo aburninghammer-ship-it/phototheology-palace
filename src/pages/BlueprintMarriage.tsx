@@ -10,6 +10,7 @@ import { SANCTUARY_MARRIAGE_ARTICLES, MARRIAGE_BLUEPRINT_INTRO } from "@/data/bl
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
+import { EnhancedSocialShare } from "@/components/EnhancedSocialShare";
 
 export default function BlueprintMarriage() {
   const [selectedArticle, setSelectedArticle] = useState<number | null>(null);
@@ -75,6 +76,15 @@ export default function BlueprintMarriage() {
               <p className="text-xl text-muted-foreground">
                 {MARRIAGE_BLUEPRINT_INTRO.subtitle}
               </p>
+              <div className="flex justify-center">
+                <EnhancedSocialShare
+                  title="The Sanctuary Blueprint for Dating, Courtship & Marriage"
+                  content="Discover God's 6-step blueprint for relationships—from dating to covenant marriage. A powerful sanctuary-based guide!"
+                  url={window.location.href}
+                  defaultMessage="🏛️ Just discovered this amazing resource: The Sanctuary Blueprint for Dating, Courtship & Marriage!\n\nIt maps God's 6-step sanctuary pattern to relationships—from surrender & self-reflection to covenant marriage.\n\nThis has completely changed how I view relationships! 💍✨"
+                  buttonText="Share This Resource"
+                />
+              </div>
               <div className="max-w-3xl mx-auto bg-primary/5 p-6 rounded-lg border border-primary/20">
                 <p className="text-base leading-relaxed whitespace-pre-line">
                   {MARRIAGE_BLUEPRINT_INTRO.description}
