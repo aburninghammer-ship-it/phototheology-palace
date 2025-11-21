@@ -4,12 +4,10 @@ import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Loader2, Link2, Sparkles, ChevronDown, ChevronUp } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { Verse } from "@/types/bible";
-import { VerseLinksPanel } from "./VerseLinksPanel";
 
 interface ChainReferenceResult {
   verse: number;
@@ -43,7 +41,6 @@ export const ChainReferencePanel = ({ book, chapter, verses, onHighlight }: Chai
   const [results, setResults] = useState<ChainReferenceResult[]>([]);
   const [expandedVerse, setExpandedVerse] = useState<number | null>(null);
   const [selectedPrinciple, setSelectedPrinciple] = useState<string>("parables");
-  const [selectedVerse, setSelectedVerse] = useState<Verse | null>(verses[0] || null);
   const { toast } = useToast();
 
   const analyzePrinciple = async () => {
@@ -105,151 +102,105 @@ export const ChainReferencePanel = ({ book, chapter, verses, onHighlight }: Chai
       <CardHeader className="gradient-palace text-white">
         <CardTitle className="flex items-center gap-2">
           <Link2 className="h-5 w-5" />
-          Links Mode
+          Chain Reference Mode
         </CardTitle>
         <CardDescription className="text-white/90">
-          Discover connections through palace principles
+          Find principle connections in this chapter
         </CardDescription>
       </CardHeader>
 
-      <CardContent className="pt-6">
-        <Tabs defaultValue="verse-links" className="w-full">
-          <TabsList className="grid w-full grid-cols-2 mb-4">
-            <TabsTrigger value="verse-links">Verse Links</TabsTrigger>
-            <TabsTrigger value="chapter-analysis">Chapter Analysis</TabsTrigger>
-          </TabsList>
+      <CardContent className="pt-6 space-y-4">
+        <div className="space-y-2">
+          <label className="text-sm font-medium">Select Principle to Analyze</label>
+          <Select value={selectedPrinciple} onValueChange={setSelectedPrinciple}>
+            <SelectTrigger className="w-full">
+              <SelectValue placeholder="Choose a principle" />
+            </SelectTrigger>
+            <SelectContent>
+              {PRINCIPLES.map((principle) => (
+                <SelectItem key={principle.value} value={principle.value}>
+                  {principle.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
 
-          <TabsContent value="verse-links" className="space-y-4">
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Select Verse</label>
-              <Select 
-                value={selectedVerse?.verse.toString()} 
-                onValueChange={(v) => setSelectedVerse(verses.find(verse => verse.verse === parseInt(v)) || null)}
-              >
-                <SelectTrigger className="w-full">
-                  <SelectValue placeholder="Choose a verse" />
-                </SelectTrigger>
-                <SelectContent className="max-h-[200px]">
-                  {verses.map((verse) => (
-                    <SelectItem key={verse.verse} value={verse.verse.toString()}>
-                      Verse {verse.verse}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
+        <Button
+          onClick={analyzePrinciple}
+          disabled={loading}
+          className="w-full gradient-royal text-white shadow-blue"
+        >
+          {loading ? (
+            <>
+              <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+              Analyzing {PRINCIPLES.find(p => p.value === selectedPrinciple)?.label}...
+            </>
+          ) : (
+            <>
+              <Sparkles className="h-4 w-4 mr-2" />
+              Find Connections
+            </>
+          )}
+        </Button>
 
-            {selectedVerse && (
-              <div className="p-3 rounded-lg border bg-muted/50 text-sm mb-4">
-                <span className="font-semibold text-primary">{selectedVerse.verse}.</span>{" "}
-                {selectedVerse.text}
-              </div>
-            )}
-
-            {selectedVerse && (
-              <VerseLinksPanel
-                book={book}
-                chapter={chapter}
-                verse={selectedVerse.verse}
-                verseText={selectedVerse.text}
-              />
-            )}
-          </TabsContent>
-
-          <TabsContent value="chapter-analysis" className="space-y-4">
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Select Principle to Analyze</label>
-              <Select value={selectedPrinciple} onValueChange={setSelectedPrinciple}>
-                <SelectTrigger className="w-full">
-                  <SelectValue placeholder="Choose a principle" />
-                </SelectTrigger>
-                <SelectContent>
-                  {PRINCIPLES.map((principle) => (
-                    <SelectItem key={principle.value} value={principle.value}>
-                      {principle.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-
-            <Button
-              onClick={analyzePrinciple}
-              disabled={loading}
-              className="w-full gradient-royal text-white shadow-blue"
-            >
-              {loading ? (
-                <>
-                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                  Analyzing {PRINCIPLES.find(p => p.value === selectedPrinciple)?.label}...
-                </>
-              ) : (
-                <>
-                  <Sparkles className="h-4 w-4 mr-2" />
-                  Find Connections
-                </>
-              )}
-            </Button>
-
-            <ScrollArea className="h-[400px]">
-              {results.length > 0 ? (
-                <div className="space-y-3">
-                  {results.map((result) => (
-                    <div
-                      key={result.verse}
-                      className="p-4 rounded-lg border-2 border-primary/30 bg-gradient-to-br from-primary/5 to-secondary/5"
-                    >
-                      <div className="flex items-start justify-between mb-2">
-                        <Badge className="gradient-palace text-white">
-                          Verse {result.verse}
-                        </Badge>
-                        <span className="text-sm font-semibold text-primary">
-                          {result.principle}
-                        </span>
-                      </div>
-                      
-                      <p className="text-sm text-foreground leading-relaxed mb-3">
-                        {result.connection}
-                      </p>
-
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => setExpandedVerse(expandedVerse === result.verse ? null : result.verse)}
-                        className="w-full justify-between"
-                      >
-                        <span className="text-xs font-semibold">Expound</span>
-                        {expandedVerse === result.verse ? (
-                          <ChevronUp className="h-4 w-4" />
-                        ) : (
-                          <ChevronDown className="h-4 w-4" />
-                        )}
-                      </Button>
-
-                      {expandedVerse === result.verse && (
-                        <div className="mt-3 pt-3 border-t text-sm text-muted-foreground leading-relaxed">
-                          {result.expounded.split('\n\n').map((para, idx) => (
-                            <p key={idx} className="mb-2">
-                              {para}
-                            </p>
-                          ))}
-                        </div>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <div className="text-center py-12 text-muted-foreground">
-                  <Link2 className="h-12 w-12 mx-auto mb-3 text-primary/50" />
-                  <p className="text-sm">
-                    Select a principle and click "Find Connections" to discover how verses 
-                    in this chapter connect to that biblical principle
+        <ScrollArea className="h-[450px]">
+          {results.length > 0 ? (
+            <div className="space-y-3">
+              {results.map((result) => (
+                <div
+                  key={result.verse}
+                  className="p-4 rounded-lg border-2 border-primary/30 bg-gradient-to-br from-primary/5 to-secondary/5"
+                >
+                  <div className="flex items-start justify-between mb-2">
+                    <Badge className="gradient-palace text-white">
+                      Verse {result.verse}
+                    </Badge>
+                    <span className="text-sm font-semibold text-primary">
+                      {result.principle}
+                    </span>
+                  </div>
+                  
+                  <p className="text-sm text-foreground leading-relaxed mb-3">
+                    {result.connection}
                   </p>
+
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setExpandedVerse(expandedVerse === result.verse ? null : result.verse)}
+                    className="w-full justify-between"
+                  >
+                    <span className="text-xs font-semibold">Expound</span>
+                    {expandedVerse === result.verse ? (
+                      <ChevronUp className="h-4 w-4" />
+                    ) : (
+                      <ChevronDown className="h-4 w-4" />
+                    )}
+                  </Button>
+
+                  {expandedVerse === result.verse && (
+                    <div className="mt-3 pt-3 border-t text-sm text-muted-foreground leading-relaxed">
+                      {result.expounded.split('\n\n').map((para, idx) => (
+                        <p key={idx} className="mb-2">
+                          {para}
+                        </p>
+                      ))}
+                    </div>
+                  )}
                 </div>
-              )}
-            </ScrollArea>
-          </TabsContent>
-        </Tabs>
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-12 text-muted-foreground">
+              <Link2 className="h-12 w-12 mx-auto mb-3 text-primary/50" />
+              <p className="text-sm">
+                Select a principle and click "Find Connections" to discover how verses 
+                in this chapter connect to that biblical principle
+              </p>
+            </div>
+          )}
+        </ScrollArea>
       </CardContent>
     </Card>
   );

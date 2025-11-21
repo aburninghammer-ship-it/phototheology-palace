@@ -24,14 +24,6 @@ serve(async (req) => {
     
     const prompt = `[ANALYSIS ID: ${randomSeed}] Analyze ${book} ${chapter}:${verse} through the COMPLETE 37-Room Phototheology Palace:
 
-CRITICAL FORMATTING REQUIREMENTS:
-• Use paragraph breaks (double line breaks) between sections
-• Use bullet points (•) for all lists - NEVER use asterisks
-• Use emojis throughout to highlight sections and key points
-• Write in a genuine, warm tone - avoid phrases like "Ah, my friend" or "ah"
-• NO asterisks (*) for bold or emphasis - use plain text
-• Keep paragraphs conversational and clear (2-4 sentences each)
-
 Verse text: "${verseText}"
 
 🏛️ MANDATORY: UTILIZE ALL 37 PALACE ROOMS AS ANALYTICAL LENSES 🏛️
@@ -224,30 +216,8 @@ Return only valid JSON with roomsUsed array and roomAnalysis object using full r
     }
 
     const data = await response.json();
-    let analysisText = data.choices[0].message.content;
-    
-    // Sanitize the JSON string by removing/escaping control characters
-    // This prevents "Bad control character in string literal" errors
-    analysisText = analysisText
-      .replace(/[\u0000-\u001F\u007F-\u009F]/g, (char: string) => {
-        // Replace common control characters with their escape sequences
-        const replacements: Record<string, string> = {
-          '\n': '\\n',
-          '\r': '\\r',
-          '\t': '\\t',
-          '\b': '\\b',
-          '\f': '\\f'
-        };
-        return replacements[char] || '';
-      });
-    
-    let analysis;
-    try {
-      analysis = JSON.parse(analysisText);
-    } catch (parseError) {
-      console.error('Failed to parse AI response:', analysisText.substring(0, 500));
-      throw new Error(`JSON parsing failed: ${parseError instanceof Error ? parseError.message : 'Unknown error'}`);
-    }
+    const analysisText = data.choices[0].message.content;
+    const analysis = JSON.parse(analysisText);
 
     return new Response(
       JSON.stringify({

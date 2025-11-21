@@ -67,11 +67,6 @@ const PRINCIPLE_OPTIONS = [
   // Floor 4 - Next Level (Christ-Centered Depth)
   { id: "cr", label: "Concentration Room (CR)", color: "gradient-ocean" },
   { id: "dr", label: "Dimensions Room (DR)", color: "gradient-royal" },
-  { id: "1d", label: "1D - Literal", color: "gradient-sunset" },
-  { id: "2d", label: "2D - Christ", color: "gradient-warmth" },
-  { id: "3d", label: "3D - Me", color: "gradient-palace" },
-  { id: "4d", label: "4D - Church", color: "gradient-ocean" },
-  { id: "5d", label: "5D - Heaven", color: "gradient-royal" },
   { id: "c6", label: "Connect-6 (C6)", color: "gradient-sunset" },
   { id: "trm", label: "Theme Room (TRm)", color: "gradient-warmth" },
   { id: "tz", label: "Time Zone (TZ)", color: "gradient-palace" },
@@ -191,7 +186,7 @@ export const CommentaryPanel = ({ book, chapter, verse, verseText, onClose }: Co
           <div>
             <CardTitle className="flex items-center gap-2">
               <MessageSquare className="h-5 w-5" />
-              Phototheology Study Bible
+              Jeeves Commentary
             </CardTitle>
             <CardDescription className="text-white/90">
               {book} {chapter}:{verse}

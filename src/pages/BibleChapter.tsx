@@ -65,7 +65,7 @@ const BibleChapter = () => {
                           <Badge variant="outline" className="text-xs">Floor {exercise.floorNumber}</Badge>
                         </div>
                         <p className="text-xs text-muted-foreground mb-2">
-                          Rooms: {Array.isArray(exercise.rooms) ? exercise.rooms.join(" • ") : exercise.rooms || "No rooms specified"}
+                          Rooms: {exercise.rooms.join(" • ")}
                         </p>
                       </div>
                     </div>

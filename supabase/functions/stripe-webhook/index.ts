@@ -43,37 +43,8 @@ serve(async (req) => {
         const session = receivedEvent.data.object as Stripe.Checkout.Session;
         const metadata = session.metadata;
 
-        // Handle individual subscriber (not church)
-        if (!metadata || !metadata.tier) {
-          console.log('Individual subscriber checkout completed');
-          
-          // Send notification for individual paid subscriber
-          try {
-            const customerEmail = session.customer_email || session.customer_details?.email;
-            const customerName = session.customer_details?.name;
-            
-            if (session.amount_total && session.amount_total > 0) {
-              await supabase.functions.invoke('send-purchase-notification', {
-                body: {
-                  userEmail: customerEmail,
-                  userName: customerName,
-                  amount: session.amount_total,
-                  currency: session.currency || 'usd',
-                  product: 'Individual Subscription',
-                  subscriptionTier: session.mode === 'subscription' ? 'Recurring' : 'One-time',
-                }
-              });
-              console.log('Individual subscriber notification sent');
-            }
-          } catch (emailError) {
-            console.error('Failed to send individual subscriber notification:', emailError);
-          }
-          break;
-        }
-
-        // Church subscription logic (existing)
-        if (!metadata.user_id) {
-          console.error('Missing user_id in church subscription metadata');
+        if (!metadata || !metadata.user_id || !metadata.tier) {
+          console.error('Missing metadata in session');
           break;
         }
 
@@ -221,32 +192,6 @@ serve(async (req) => {
           console.error('Error cancelling subscription:', error);
         } else {
           console.log(`Subscription cancelled for customer ${customerId}`);
-        }
-        break;
-      }
-
-      case 'customer.subscription.created': {
-        const subscription = receivedEvent.data.object as Stripe.Subscription;
-        const customerId = subscription.customer as string;
-        
-        // Send notification for new subscription
-        try {
-          const customer = await stripe.customers.retrieve(customerId) as Stripe.Customer;
-          const price = subscription.items.data[0]?.price;
-          
-          await supabase.functions.invoke('send-purchase-notification', {
-            body: {
-              userEmail: customer.email,
-              userName: customer.name,
-              amount: price?.unit_amount || 0,
-              currency: price?.currency || 'usd',
-              product: 'New Subscription',
-              subscriptionTier: price?.recurring?.interval || 'monthly',
-            }
-          });
-          console.log('New subscription notification sent for customer:', customerId);
-        } catch (error) {
-          console.error('Failed to send new subscription notification:', error);
         }
         break;
       }

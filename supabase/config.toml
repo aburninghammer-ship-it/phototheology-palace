@@ -85,6 +85,3 @@ verify_jwt = true
 
 [functions.generate-reading-exercises]
 verify_jwt = true
-
-[functions.generate-verse-links]
-verify_jwt = false
