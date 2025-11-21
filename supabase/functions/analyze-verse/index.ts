@@ -143,11 +143,11 @@ Return JSON:
   "roomsUsed": ["SR (Story Room)", "DR (Dimensions Room)", "BL (Blue/Sanctuary Room)", "CR (Concentration Room)", "FE (Feasts Room)", "OR (Observation Room)", "GR (Gems Room)", "MR (Meditation Room)"],
   "floorsCovered": [1, 2, 4, 5, 7],
   "roomAnalysis": {
-    "SR (Story Room)": "Story beat analysis here",
-    "DR (Dimensions Room)": "1D: Literal reading shows... 2D: Christ is revealed as... 3D: For me personally this means... 4D: The Church learns... 5D: Heaven perspective shows...",
-    "DC (Def-Com Room)": "Hebrew/Greek: [word] (Strong's H####/G####) means [definition]. Gill's Commentary notes: [quote]. Clarke adds: [quote].",
-    "BL (Blue/Sanctuary Room)": "Sanctuary connection here",
-    "etc": "Always include full room names in parentheses"
+    "SR (Story Room)": "This verse opens a pivotal narrative moment 🌙 where Nicodemus, a respected Pharisee and ruler, approaches Jesus under the cover of darkness. The story beat here is one of cautious curiosity meeting divine revelation. Notice how the nighttime setting adds dramatic tension to what becomes one of Scripture's most famous dialogues.",
+    "DR (Dimensions Room)": "Let's explore this verse through five dimensions:\n\n1D (Literal): The text plainly tells us that Nicodemus, identified as a Pharisee and ruler of the Jews, came to Jesus at night and acknowledged Him as a teacher from God based on the miracles He performed.\n\n2D (Christ): Nicodemus's words point directly to Jesus's divine authority and mission ✝️ Even this tentative acknowledgment reveals Christ as one sent from God, performing works that only God could enable.\n\n3D (Me): This challenges me personally to consider my own approach to Christ 🙏 Do I come in secret like Nicodemus, or do I boldly acknowledge Him? The verse invites honest self-examination about my own spiritual seeking.\n\n4D (Church): For the believing community, this reminds us that even religious leaders need genuine encounters with Jesus ⛪ It shows that position and knowledge alone don't replace personal revelation.\n\n5D (Heaven): From heaven's perspective, we see God's patience with seekers 🌟 Even tentative faith and nighttime visits are met with grace and profound teaching.",
+    "DC (Def-Com Room)": "The Greek word for 'miracles' here is sēmeia (Strong's G4592), meaning 'signs' or 'tokens.' These weren't just displays of power but divine signatures authenticating Jesus's identity.\n\nMatthew Henry's commentary notes: 'Nicodemus came by night, perhaps for fear of the Jews, or perhaps to have the more free conversation with Christ.' 📚\n\nGill's Exposition adds: 'He came to Jesus by night; not from any bad principles or intentions, but from fear of the Jews, lest he should be turned out of the synagogue.'",
+    "BL (Blue/Sanctuary Room)": "The nighttime visit echoes the Old Testament pattern where God often revealed Himself in darkness or through night visions ⛪ Just as the sanctuary lamp burned continually through the night, Christ the Light receives this seeker in darkness.",
+    "etc": "Continue with additional rooms using natural paragraphs and emojis"
   },
   "dimensions": ["2D", "3D"],
   "cycles": ["@CyC"],
@@ -166,8 +166,8 @@ Return JSON:
       "confidence": 85
     }
   ],
-  "commentary": "MUST explain which 8-12 rooms you used and WHY each fits THIS verse's content. Always write room abbreviations with full names: 'SR (Story Room)', 'DC (Def-Com Room)', 'DR (Dimensions Room)'. For DC room, include Hebrew/Greek with Strong's numbers and commentary citations. For DR room, clarify which dimensions (1D=Literal, 2D=Christ, 3D=Me, 4D=Church, 5D=Heaven). Show how rooms from different floors work together.",
-  "christCenter": "How Christ is revealed through the specific rooms analyzed"
+  "commentary": "Write a warm, flowing analysis explaining which 8-12 rooms you used and WHY each fits THIS verse's content. Use emojis throughout (✨ 📖 🙏 ❤️ 💡) to make it engaging. Break into natural paragraphs with spacing. NEVER use asterisks for bold. Always write room abbreviations with full names: 'SR (Story Room)', 'DC (Def-Com Room)', 'DR (Dimensions Room)'. For DC room, include Hebrew/Greek with Strong's numbers and commentary citations. For DR room, clarify which dimensions (1D=Literal, 2D=Christ, 3D=Me, 4D=Church, 5D=Heaven). Show how rooms from different floors work together in a conversational way.",
+  "christCenter": "Write a warm, flowing explanation of how Christ is revealed through the specific rooms analyzed. Use emojis naturally (✝️ ✨ 🙏). Break into paragraphs if needed. NEVER use asterisks. Show Christ as the center through the lenses of the rooms you analyzed."
 }`;
 
     const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
@@ -181,7 +181,26 @@ Return JSON:
         messages: [
           {
             role: 'system',
-            content: 'You are a biblical scholar MASTER of the 37-room Phototheology Palace. CRITICAL REQUIREMENTS: 1) Analyze each verse using 8-12 DIFFERENT rooms from multiple floors. 2) ALWAYS write room abbreviations with full names in parentheses: "SR (Story Room)", "DC (Def-Com Room)", "DR (Dimensions Room)". 3) When using DC (Def-Com Room), MUST include Hebrew/Greek definitions with Strong\'s numbers AND cite standard commentaries (Gill, Clarke, Matthew Henry, Barnes). 4) For DR (Dimensions Room), clarify which dimensions: 1D=Literal, 2D=Christ, 3D=Me, 4D=Church, 5D=Heaven. 5) Provide specific insights for EACH room. Return only valid JSON with roomsUsed array and roomAnalysis object using full room names.'
+            content: `You are a biblical scholar MASTER of the 37-room Phototheology Palace. 
+
+CRITICAL FORMATTING REQUIREMENTS:
+• Write in natural, flowing paragraphs with proper spacing between ideas
+• Use emojis liberally throughout your analysis to make it engaging and visual (✨ 📖 🙏 ❤️ 💡 ⛪ ✝️ 🌟 etc.)
+• NEVER use asterisks (*) for emphasis or bold text
+• Instead of "**word**" just write the word naturally in context
+• Break up long sections with blank lines to create breathing room
+• Use bullet points with emojis (• or ✨) for lists
+• Write in a warm, conversational yet scholarly tone
+• Each room analysis should be its own clear paragraph
+
+ANALYSIS REQUIREMENTS:
+1) Analyze each verse using 8-12 DIFFERENT rooms from multiple floors
+2) ALWAYS write room abbreviations with full names in parentheses: "SR (Story Room)", "DC (Def-Com Room)", "DR (Dimensions Room)"
+3) When using DC (Def-Com Room), MUST include Hebrew/Greek definitions with Strong's numbers AND cite standard commentaries (Gill, Clarke, Matthew Henry, Barnes)
+4) For DR (Dimensions Room), clarify which dimensions: 1D=Literal, 2D=Christ, 3D=Me, 4D=Church, 5D=Heaven
+5) Provide specific insights for EACH room
+
+Return only valid JSON with roomsUsed array and roomAnalysis object using full room names.`
           },
           {
             role: 'user',
