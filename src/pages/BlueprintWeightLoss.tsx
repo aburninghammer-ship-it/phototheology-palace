@@ -9,6 +9,7 @@ import { Scale, Flame, BookOpen, CheckCircle2, ArrowLeft } from "lucide-react";
 import { WEIGHT_LOSS_ARTICLES, WEIGHT_LOSS_INTRO } from "@/data/blueprintWeightLossData";
 import { useToast } from "@/hooks/use-toast";
 import { EnhancedSocialShare } from "@/components/EnhancedSocialShare";
+import { BlueprintMap } from "@/components/blueprint/BlueprintMap";
 
 const STORAGE_KEY = "weightloss_blueprint_progress";
 
@@ -102,47 +103,15 @@ export default function BlueprintWeightLoss() {
               </div>
             </section>
 
-            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-              {WEIGHT_LOSS_ARTICLES.map((article) => {
-                const isCompleted = completedArticles.includes(article.id);
-                
-                return (
-                  <Card 
-                    key={article.id}
-                    className="cursor-pointer hover:border-primary transition-all hover:shadow-lg relative"
-                    onClick={() => setSelectedArticle(article.id)}
-                  >
-                    {isCompleted && (
-                      <div className="absolute top-2 right-2">
-                        <CheckCircle2 className="w-6 h-6 text-green-500" />
-                      </div>
-                    )}
-                    <CardHeader>
-                      <div className="flex items-start gap-3">
-                        <Flame className="w-8 h-8 text-primary flex-shrink-0 mt-1" />
-                        <div className="flex-1">
-                          <Badge variant="outline" className="mb-2">
-                            Article {article.id} of 6
-                          </Badge>
-                          <CardTitle className="text-xl mb-2">{article.name}</CardTitle>
-                          <CardDescription className="text-base font-semibold">
-                            {article.principle}
-                          </CardDescription>
-                        </div>
-                      </div>
-                    </CardHeader>
-                    <CardContent>
-                      <p className="text-sm text-muted-foreground mb-3">
-                        <span className="font-semibold">Sanctuary:</span> {article.sanctuaryMeaning}
-                      </p>
-                      <p className="text-sm text-primary font-semibold">
-                        Weight Loss: "{article.weightLossPrinciple}"
-                      </p>
-                    </CardContent>
-                  </Card>
-                );
-              })}
-            </div>
+            <BlueprintMap
+              items={WEIGHT_LOSS_ARTICLES.map(article => ({
+                id: article.id,
+                name: article.name,
+                step: `Step ${article.id}`
+              }))}
+              completedItems={completedArticles}
+              onItemClick={setSelectedArticle}
+            />
           </>
         ) : (
           <Card>

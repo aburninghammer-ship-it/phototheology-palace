@@ -9,6 +9,7 @@ import { ArrowLeft, CheckCircle2, Brain, Flame, BookOpen } from "lucide-react";
 import { MENTAL_HEALTH_ARTICLES, MENTAL_HEALTH_INTRO } from "@/data/blueprintMentalHealthData";
 import { useToast } from "@/hooks/use-toast";
 import { EnhancedSocialShare } from "@/components/EnhancedSocialShare";
+import { BlueprintMap } from "@/components/blueprint/BlueprintMap";
 
 const STORAGE_KEY = "mentalhealth_blueprint_progress";
 
@@ -101,44 +102,15 @@ export default function BlueprintMentalHealth() {
               </div>
             </section>
 
-            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-              {MENTAL_HEALTH_ARTICLES.map((article) => {
-                const isCompleted = completedArticles.includes(article.id);
-                
-                return (
-                  <Card 
-                    key={article.id}
-                    className="cursor-pointer hover:border-primary transition-all hover:shadow-lg relative"
-                    onClick={() => setSelectedArticle(article.id)}
-                  >
-                    {isCompleted && (
-                      <div className="absolute top-2 right-2">
-                        <CheckCircle2 className="w-6 h-6 text-green-500" />
-                      </div>
-                    )}
-                    <CardHeader>
-                      <div className="flex items-start gap-3">
-                        <Flame className="w-8 h-8 text-primary flex-shrink-0 mt-1" />
-                        <div className="flex-1">
-                          <Badge variant="outline" className="mb-2">
-                            Article {article.id} of 6
-                          </Badge>
-                          <CardTitle className="text-xl mb-2">{article.name}</CardTitle>
-                          <CardDescription className="text-base font-semibold">
-                            {article.sanctuaryMeaning}
-                          </CardDescription>
-                        </div>
-                      </div>
-                    </CardHeader>
-                    <CardContent>
-                      <p className="text-sm text-primary font-semibold">
-                        "{article.mentalHealthPrinciple}"
-                      </p>
-                    </CardContent>
-                  </Card>
-                );
-              })}
-            </div>
+            <BlueprintMap
+              items={MENTAL_HEALTH_ARTICLES.map(article => ({
+                id: article.id,
+                name: article.name,
+                step: `Step ${article.id}`
+              }))}
+              completedItems={completedArticles}
+              onItemClick={setSelectedArticle}
+            />
           </>
         ) : (
           <Card>

@@ -6,6 +6,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { CheckCircle2, ArrowLeft } from "lucide-react";
 import { EnhancedSocialShare } from "@/components/EnhancedSocialShare";
 import { blueprintStressData, sanctuaryExplanation } from "@/data/blueprintStressData";
+import { BlueprintMap } from "@/components/blueprint/BlueprintMap";
 
 const BlueprintStress = () => {
   const [selectedArticle, setSelectedArticle] = useState<number | null>(null);
@@ -152,34 +153,15 @@ const BlueprintStress = () => {
           />
         </div>
 
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {blueprintStressData.map((article) => (
-            <Card
-              key={article.id}
-              className="cursor-pointer hover:shadow-lg transition-shadow"
-              onClick={() => setSelectedArticle(article.id)}
-            >
-              <CardHeader>
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-sm font-medium text-primary">{article.step}</span>
-                  {completedArticles.includes(article.id) && (
-                    <CheckCircle2 className="h-5 w-5 text-green-500" />
-                  )}
-                </div>
-                <CardTitle>{article.name}</CardTitle>
-                <CardDescription>{article.principle}</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <p className="text-sm text-muted-foreground">
-                  <strong>Sanctuary:</strong> {article.sanctuaryMeaning}
-                </p>
-                <p className="text-sm text-muted-foreground mt-2">
-                  <strong>Stress:</strong> {article.stressPrinciple}
-                </p>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
+        <BlueprintMap
+          items={blueprintStressData.map(article => ({
+            id: article.id,
+            name: article.name,
+            step: `Step ${article.id}`
+          }))}
+          completedItems={completedArticles}
+          onItemClick={setSelectedArticle}
+        />
       </div>
     </div>
   );
