@@ -126,11 +126,24 @@ Return ONLY valid JSON with this structure (no markdown, no code blocks):
     let parsedLinks;
     try {
       // Remove markdown code blocks if present
-      const cleanContent = content.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
+      let cleanContent = content.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
+      
+      // Sanitize by removing/escaping control characters
+      cleanContent = cleanContent.replace(/[\u0000-\u001F\u007F-\u009F]/g, (char: string) => {
+        const replacements: Record<string, string> = {
+          '\n': '\\n',
+          '\r': '\\r',
+          '\t': '\\t',
+          '\b': '\\b',
+          '\f': '\\f'
+        };
+        return replacements[char] || '';
+      });
+      
       parsedLinks = JSON.parse(cleanContent);
     } catch (parseError) {
-      console.error("Failed to parse AI response:", content);
-      throw new Error("Invalid JSON response from AI");
+      console.error("Failed to parse AI response:", content.substring(0, 500));
+      throw new Error(`Invalid JSON response from AI: ${parseError instanceof Error ? parseError.message : 'Unknown error'}`);
     }
 
     // Validate and limit to 4-8 links
