@@ -130,6 +130,52 @@ export const Navigation = () => {
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
                         <Button variant="ghost" size="sm" className="whitespace-nowrap">
+                          <Building2 className="h-4 w-4 mr-1" />
+                          Blueprints
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end" className="w-56 bg-card border-border z-50">
+                        <DropdownMenuItem asChild>
+                          <Link to="/blueprint-marriage" className="cursor-pointer">
+                            💍 Dating & Marriage
+                          </Link>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem asChild>
+                          <Link to="/blueprint-grief" className="cursor-pointer">
+                            💙 Grieving
+                          </Link>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem asChild>
+                          <Link to="/blueprint-stronghold" className="cursor-pointer">
+                            🛡️ Breaking Strongholds
+                          </Link>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem asChild>
+                          <Link to="/blueprint-weight-loss" className="cursor-pointer">
+                            ⚖️ Weight Loss
+                          </Link>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem asChild>
+                          <Link to="/blueprint-mental-health" className="cursor-pointer">
+                            🧠 Mental Health
+                          </Link>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem asChild>
+                          <Link to="/blueprint-financial" className="cursor-pointer">
+                            💰 Financial Stability
+                          </Link>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem asChild>
+                          <Link to="/blueprint-stress" className="cursor-pointer">
+                            🧘 Stress Management
+                          </Link>
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="ghost" size="sm" className="whitespace-nowrap">
                           <Sparkles className="h-4 w-4 mr-1" />
                           GPTs
                         </Button>
