@@ -54,10 +54,11 @@ const ALL_PRINCIPLES = [
   "TR (Trumpets)", "DA (Atonement)", "TB (Tabernacles)",
 ];
 
-// Generate stable random principles per verse using verse number as seed
+// Generate dynamic random principles per verse - changes each time
 const generateVersePrinciples = (verseNumber: number): string[] => {
-  // Use verse number as seed for consistent randomization
-  const seed = verseNumber * 7919; // Prime number multiplier for better distribution
+  // Use verse number + random factor for varied principles each time
+  const randomFactor = Math.floor(Math.random() * 10000);
+  const seed = (verseNumber * 7919 + randomFactor); // Dynamic seed
   const shuffled = [...ALL_PRINCIPLES].sort((a, b) => {
     const hashA = (a.charCodeAt(0) * seed + a.length) % 1000;
     const hashB = (b.charCodeAt(0) * seed + b.length) % 1000;
@@ -77,10 +78,10 @@ export const VerseView = ({ verse, isSelected, onSelect, showPrinciples, isHighl
   const [wordLoading, setWordLoading] = useState(false);
   const { toast } = useToast();
 
-  // Generate stable principles for this verse
+  // Generate dynamic principles for this verse (regenerates when showPrinciples toggles)
   const displayPrinciples = useMemo(
     () => principles || generateVersePrinciples(verse.verse),
-    [verse.verse, principles]
+    [verse.verse, principles, showPrinciples]
   );
   
   const colors = ["bg-blue-600", "bg-green-600", "bg-orange-600", "bg-red-600"];
