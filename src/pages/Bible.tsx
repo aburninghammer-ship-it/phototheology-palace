@@ -16,7 +16,7 @@ const Bible = () => {
           <div className="mb-8 flex items-start justify-between">
             <div>
               <h1 className="font-serif text-4xl md:text-5xl font-bold mb-2 bg-gradient-palace bg-clip-text text-transparent">
-                Phototheology Bible
+                Phototheology Study Bible (PSB)
               </h1>
               <p className="text-lg text-muted-foreground">
                 Scripture through principle lenses
