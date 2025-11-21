@@ -44,6 +44,10 @@ export default function Auth() {
   const [signupPassword, setSignupPassword] = useState("");
   const [signupDisplayName, setSignupDisplayName] = useState("");
   const [referralCode, setReferralCode] = useState("");
+  
+  // Password reset
+  const [showPasswordReset, setShowPasswordReset] = useState(false);
+  const [resetEmail, setResetEmail] = useState("");
 
   // Get referral code from URL and load saved email on mount
   useEffect(() => {
@@ -127,6 +131,37 @@ export default function Auth() {
     } catch (err) {
       setError("An unexpected error occurred. Please try again.");
       console.error("Login error:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handlePasswordReset = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError("");
+    
+    if (!validateEmail(resetEmail)) {
+      return;
+    }
+
+    setLoading(true);
+    
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(resetEmail, {
+        redirectTo: `${window.location.origin}/auth`,
+      });
+
+      if (error) {
+        setError(error.message || "Failed to send reset email");
+        return;
+      }
+
+      toast.success("Password reset email sent! Check your inbox.");
+      setShowPasswordReset(false);
+      setResetEmail("");
+    } catch (err) {
+      setError("An unexpected error occurred. Please try again.");
+      console.error("Password reset error:", err);
     } finally {
       setLoading(false);
     }
@@ -238,7 +273,7 @@ export default function Auth() {
         </Link>
 
         <Card className="glass-card">
-          <Tabs defaultValue="login" className="w-full">
+          <Tabs defaultValue="login" className="w-full" onValueChange={() => setShowPasswordReset(false)}>
             <TabsList className="grid w-full grid-cols-2">
               <TabsTrigger value="login">Login</TabsTrigger>
               <TabsTrigger value="signup">Sign Up</TabsTrigger>
@@ -246,80 +281,153 @@ export default function Auth() {
 
             {/* Login Tab */}
             <TabsContent value="login">
-              <form onSubmit={handleLogin}>
-                <CardHeader>
-                  <CardTitle>Welcome Back</CardTitle>
-                  <CardDescription>
-                    Login to continue your journey through the Palace
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  {error && (
-                    <Alert variant="destructive">
-                      <AlertDescription>{error}</AlertDescription>
-                    </Alert>
-                  )}
-                  <div className="space-y-2">
-                    <Label htmlFor="login-email">
-                      <Mail className="h-4 w-4 inline mr-2" />
-                      Email
-                    </Label>
-                    <Input
-                      id="login-email"
-                      type="email"
-                      placeholder="your@email.com"
-                      value={loginEmail}
-                      onChange={(e) => setLoginEmail(e.target.value)}
-                      required
-                      disabled={loading}
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="login-password">
-                      <Lock className="h-4 w-4 inline mr-2" />
-                      Password
-                    </Label>
-                    <Input
-                      id="login-password"
-                      type="password"
-                      placeholder="••••••••"
-                      value={loginPassword}
-                      onChange={(e) => setLoginPassword(e.target.value)}
-                      required
-                      disabled={loading}
-                    />
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <input
-                      type="checkbox"
-                      id="remember-me"
-                      checked={rememberMe}
-                      onChange={(e) => setRememberMe(e.target.checked)}
-                      className="h-4 w-4 rounded border-input"
-                      disabled={loading}
-                    />
-                    <Label htmlFor="remember-me" className="text-sm font-normal cursor-pointer">
-                      Remember me
-                    </Label>
-                  </div>
-                </CardContent>
-                <CardFooter>
-                  <Button 
-                    type="submit" 
-                    className="w-full gradient-palace" 
-                    disabled={loading}
-                  >
-                    {loading ? (
-                      <>
-                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                        Logging in...
-                      </>
-                    ) : (
-                      "Login"
+              {showPasswordReset ? (
+                <form onSubmit={handlePasswordReset}>
+                  <CardHeader>
+                    <CardTitle>Reset Password</CardTitle>
+                    <CardDescription>
+                      Enter your email to receive a password reset link
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    {error && (
+                      <Alert variant="destructive">
+                        <AlertDescription>{error}</AlertDescription>
+                      </Alert>
                     )}
-                  </Button>
-                </CardFooter>
-              </form>
+                    <div className="space-y-2">
+                      <Label htmlFor="reset-email">
+                        <Mail className="h-4 w-4 inline mr-2" />
+                        Email
+                      </Label>
+                      <Input
+                        id="reset-email"
+                        type="email"
+                        placeholder="your@email.com"
+                        value={resetEmail}
+                        onChange={(e) => setResetEmail(e.target.value)}
+                        required
+                        disabled={loading}
+                      />
+                    </div>
+                  </CardContent>
+                  <CardFooter className="flex flex-col gap-2">
+                    <Button 
+                      type="submit" 
+                      className="w-full gradient-palace" 
+                      disabled={loading}
+                    >
+                      {loading ? (
+                        <>
+                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                          Sending...
+                        </>
+                      ) : (
+                        "Send Reset Link"
+                      )}
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      className="w-full"
+                      onClick={() => {
+                        setShowPasswordReset(false);
+                        setResetEmail("");
+                        setError("");
+                      }}
+                      disabled={loading}
+                    >
+                      Back to Login
+                    </Button>
+                  </CardFooter>
+                </form>
+              ) : (
+                <form onSubmit={handleLogin}>
+                  <CardHeader>
+                    <CardTitle>Welcome Back</CardTitle>
+                    <CardDescription>
+                      Login to continue your journey through the Palace
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    {error && (
+                      <Alert variant="destructive">
+                        <AlertDescription>{error}</AlertDescription>
+                      </Alert>
+                    )}
+                    <div className="space-y-2">
+                      <Label htmlFor="login-email">
+                        <Mail className="h-4 w-4 inline mr-2" />
+                        Email
+                      </Label>
+                      <Input
+                        id="login-email"
+                        type="email"
+                        placeholder="your@email.com"
+                        value={loginEmail}
+                        onChange={(e) => setLoginEmail(e.target.value)}
+                        required
+                        disabled={loading}
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="login-password">
+                        <Lock className="h-4 w-4 inline mr-2" />
+                        Password
+                      </Label>
+                      <Input
+                        id="login-password"
+                        type="password"
+                        placeholder="••••••••"
+                        value={loginPassword}
+                        onChange={(e) => setLoginPassword(e.target.value)}
+                        required
+                        disabled={loading}
+                      />
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center space-x-2">
+                        <input
+                          type="checkbox"
+                          id="remember-me"
+                          checked={rememberMe}
+                          onChange={(e) => setRememberMe(e.target.checked)}
+                          className="h-4 w-4 rounded border-input"
+                          disabled={loading}
+                        />
+                        <Label htmlFor="remember-me" className="text-sm font-normal cursor-pointer">
+                          Remember me
+                        </Label>
+                      </div>
+                      <Button
+                        type="button"
+                        variant="link"
+                        className="px-0 text-sm"
+                        onClick={() => setShowPasswordReset(true)}
+                        disabled={loading}
+                      >
+                        Forgot password?
+                      </Button>
+                    </div>
+                  </CardContent>
+                  <CardFooter>
+                    <Button 
+                      type="submit" 
+                      className="w-full gradient-palace" 
+                      disabled={loading}
+                    >
+                      {loading ? (
+                        <>
+                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                          Logging in...
+                        </>
+                      ) : (
+                        "Login"
+                      )}
+                    </Button>
+                  </CardFooter>
+                </form>
+              )}
             </TabsContent>
 
             {/* Signup Tab */}
