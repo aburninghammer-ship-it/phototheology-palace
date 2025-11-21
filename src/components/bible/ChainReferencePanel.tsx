@@ -9,10 +9,20 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { Verse } from "@/types/bible";
 
+interface CrossReference {
+  reference: string;
+  relationship: string;
+  confidence: number;
+  note: string;
+}
+
 interface ChainReferenceResult {
   verse: number;
+  reference: string;
   principle: string;
+  ptCodes: string[];
   connection: string;
+  crossReferences: CrossReference[];
   expounded: string;
 }
 
@@ -153,9 +163,20 @@ export const ChainReferencePanel = ({ book, chapter, verses, onHighlight }: Chai
                   className="p-4 rounded-lg border-2 border-primary/30 bg-gradient-to-br from-primary/5 to-secondary/5"
                 >
                   <div className="flex items-start justify-between mb-2">
-                    <Badge className="gradient-palace text-white">
-                      Verse {result.verse}
-                    </Badge>
+                    <div className="flex items-center gap-2">
+                      <Badge className="gradient-palace text-white">
+                        {result.reference || `Verse ${result.verse}`}
+                      </Badge>
+                      {result.ptCodes && result.ptCodes.length > 0 && (
+                        <div className="flex gap-1">
+                          {result.ptCodes.map((code, idx) => (
+                            <Badge key={idx} variant="outline" className="text-xs">
+                              {code}
+                            </Badge>
+                          ))}
+                        </div>
+                      )}
+                    </div>
                     <span className="text-sm font-semibold text-primary">
                       {result.principle}
                     </span>
@@ -164,6 +185,24 @@ export const ChainReferencePanel = ({ book, chapter, verses, onHighlight }: Chai
                   <p className="text-sm text-foreground leading-relaxed mb-3">
                     {result.connection}
                   </p>
+
+                  {result.crossReferences && result.crossReferences.length > 0 && (
+                    <div className="mb-3 space-y-1">
+                      <p className="text-xs font-semibold text-muted-foreground mb-1">Cross References:</p>
+                      {result.crossReferences.map((ref, idx) => (
+                        <div key={idx} className="flex items-start gap-2 text-xs">
+                          <Badge variant="secondary" className="text-xs">
+                            {ref.reference}
+                          </Badge>
+                          <div className="flex-1">
+                            <span className="font-medium text-primary">{ref.relationship}</span>
+                            <span className="text-muted-foreground"> ({ref.confidence}%)</span>
+                            <p className="text-muted-foreground mt-0.5">{ref.note}</p>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
 
                   <Button
                     variant="ghost"

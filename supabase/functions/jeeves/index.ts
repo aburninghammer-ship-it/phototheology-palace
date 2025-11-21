@@ -497,22 +497,44 @@ Make it challenging but doable. Encourage deep thinking.`;
       
       systemPrompt = `You are Jeeves, a Bible scholar specializing in finding ${selectedPrinciple.name}.
 Analyze verses and identify where these principles connect. Be specific and insightful.
-Return your response as a JSON array.`;
+Return your response as a JSON array with 4-8 verse connections.
+
+**CRITICAL FORMATTING REQUIREMENTS:**
+- Use bullet points (•) for lists, NOT asterisks (*)
+- NEVER use asterisks (*) at the start of lines
+- Use paragraph breaks for readability
+- Keep text conversational and engaging`;
 
       userPrompt = `Analyze ${book} ${chapter} for ${selectedPrinciple.description}.
 
 Verses to analyze:
 ${verses.map((v: any) => `Verse ${v.verse}: ${v.text}`).join('\n')}
 
+**REQUIREMENTS:**
+1. Return 4-8 verse connections (find the most meaningful ones)
+2. Include cross-references to OTHER Bible verses that support each connection
+3. Add specific PT principle codes where applicable (e.g., @CyC, 2H, CR, BL)
+
 For each verse that connects to ${selectedPrinciple.name}, return a JSON object with:
 {
   "verse": verse_number,
+  "reference": "${book} ${chapter}:verse_number",
   "principle": "Specific name/title of the connection (e.g., 'The Good Samaritan', 'Day of Atonement', 'Messiah's Ministry')",
-  "connection": "3-6 sentence explanation of how this verse connects to ${selectedPrinciple.name}",
-  "expounded": "Deeper 2-3 paragraph theological explanation of the connection with scholarly insight"
+  "ptCodes": ["Array of relevant PT codes like CR, BL, @CyC, 2H, etc."],
+  "connection": "4-7 sentence explanation of how this verse connects to ${selectedPrinciple.name}. Use bullet points (•) for lists, never asterisks.",
+  "crossReferences": [
+    {
+      "reference": "Book Chapter:Verse",
+      "relationship": "Contextual|Parallel|Type|Prophecy|Echo",
+      "confidence": 85-98,
+      "note": "Brief 1-2 sentence explanation of this cross-reference connection"
+    }
+  ],
+  "expounded": "Deeper 2-3 paragraph theological explanation of the connection with scholarly insight. Use paragraph breaks. Use bullet points (•) for lists, never asterisks."
 }
 
-Only include verses that have meaningful connections. Return as JSON array: [...]`;
+Focus on quality connections. Prioritize verses with rich theological depth and clear principle alignments.
+Return as JSON array: [...]`;
 
     } else if (mode === "commentary-revealed") {
       systemPrompt = `You are Jeeves, a theologian analyzing Bible verses to identify which principles and dimensions are REVEALED or PRESENT in the text itself.
