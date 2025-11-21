@@ -39,22 +39,63 @@ export const SocialMediaConnect = () => {
   });
 
   const handleConnect = async (platform: Platform) => {
+    if (!user) {
+      toast({
+        title: "Authentication Required",
+        description: "Please sign in to connect social media accounts.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setConnecting(platform);
     
     try {
-      // In a real implementation, this would initiate OAuth flow
-      // For now, we'll show a message about the feature
+      let provider: 'facebook' | 'twitter' | 'linkedin_oidc';
+      let scopes = '';
+      
+      switch (platform) {
+        case 'facebook':
+          provider = 'facebook';
+          scopes = 'public_profile,email,pages_manage_posts';
+          break;
+        case 'twitter':
+          provider = 'twitter';
+          scopes = 'tweet.read,tweet.write,users.read';
+          break;
+        case 'linkedin':
+          provider = 'linkedin_oidc';
+          scopes = 'openid,profile,email,w_member_social';
+          break;
+        default:
+          throw new Error('Unsupported platform');
+      }
+
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider,
+        options: {
+          scopes,
+          redirectTo: `${window.location.origin}/auth/callback?platform=${platform}`,
+          queryParams: {
+            access_type: 'offline',
+            prompt: 'consent',
+          },
+        },
+      });
+
+      if (error) throw error;
+
       toast({
-        title: "Social Media Connection",
-        description: `To connect ${platform}, you'll need to set up OAuth credentials in your Lovable Cloud backend. Visit the settings to configure social media integrations.`,
+        title: "Redirecting...",
+        description: `Opening ${platform} authorization page...`,
       });
     } catch (error: any) {
+      console.error('OAuth connection error:', error);
       toast({
         title: "Connection Failed",
-        description: error.message,
+        description: error.message || `Failed to connect to ${platform}. Please try again.`,
         variant: "destructive",
       });
-    } finally {
       setConnecting(null);
     }
   };
