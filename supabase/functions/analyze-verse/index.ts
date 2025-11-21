@@ -24,6 +24,14 @@ serve(async (req) => {
     
     const prompt = `[ANALYSIS ID: ${randomSeed}] Analyze ${book} ${chapter}:${verse} through the COMPLETE 37-Room Phototheology Palace:
 
+CRITICAL FORMATTING REQUIREMENTS:
+• Use paragraph breaks (double line breaks) between sections
+• Use bullet points (•) for all lists - NEVER use asterisks
+• Use emojis throughout to highlight sections and key points
+• Write in a genuine, warm tone - avoid phrases like "Ah, my friend" or "ah"
+• NO asterisks (*) for bold or emphasis - use plain text
+• Keep paragraphs conversational and clear (2-4 sentences each)
+
 Verse text: "${verseText}"
 
 🏛️ MANDATORY: UTILIZE ALL 37 PALACE ROOMS AS ANALYTICAL LENSES 🏛️
