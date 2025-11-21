@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -147,7 +147,36 @@ export const CommentaryPanel = ({ book, chapter, verse, verseText, onClose }: Co
   const [analysisMode, setAnalysisMode] = useState<"revealed" | "applied">("applied");
   const [selectedCommentary, setSelectedCommentary] = useState<string>("clarke");
   const [commentaryMode, setCommentaryMode] = useState(false);
+  const [availableCommentaries, setAvailableCommentaries] = useState<string[]>([]);
+  const [checkingAvailability, setCheckingAvailability] = useState(true);
   const { toast } = useToast();
+
+  // Check which commentaries are available on mount
+  useEffect(() => {
+    const checkAvailability = async () => {
+      try {
+        const { data, error } = await supabase.functions.invoke("jeeves", {
+          body: {
+            mode: "check-commentary-availability",
+            book,
+            chapter,
+            verseText: { verse, text: verseText },
+          },
+        });
+
+        if (error) throw error;
+        setAvailableCommentaries(data.available || []);
+      } catch (error) {
+        console.error("Error checking commentary availability:", error);
+        // Default to all if check fails
+        setAvailableCommentaries(COMMENTARY_OPTIONS.map(c => c.value));
+      } finally {
+        setCheckingAvailability(false);
+      }
+    };
+    
+    checkAvailability();
+  }, [book, chapter, verse, verseText]);
 
   const togglePrinciple = (id: string) => {
     setSelectedPrinciples(prev =>
@@ -313,6 +342,9 @@ export const CommentaryPanel = ({ book, chapter, verse, verseText, onClose }: Co
               <h4 className="text-sm font-semibold mb-2 flex items-center gap-2">
                 <BookOpen className="h-4 w-4" />
                 Classic Commentaries
+                {checkingAvailability && (
+                  <Loader2 className="h-3 w-3 animate-spin text-muted-foreground" />
+                )}
               </h4>
               <div className="flex gap-2">
                 <Select value={selectedCommentary} onValueChange={setSelectedCommentary}>
@@ -320,11 +352,24 @@ export const CommentaryPanel = ({ book, chapter, verse, verseText, onClose }: Co
                     <SelectValue placeholder="Select a commentary" />
                   </SelectTrigger>
                   <SelectContent>
-                    {COMMENTARY_OPTIONS.map((option) => (
-                      <SelectItem key={option.value} value={option.value}>
-                        {option.label}
-                      </SelectItem>
-                    ))}
+                    {COMMENTARY_OPTIONS.map((option) => {
+                      const isAvailable = availableCommentaries.includes(option.value);
+                      return (
+                        <SelectItem 
+                          key={option.value} 
+                          value={option.value}
+                          disabled={!checkingAvailability && !isAvailable}
+                          className={isAvailable ? "font-semibold" : "text-muted-foreground"}
+                        >
+                          {option.label}
+                          {!checkingAvailability && (
+                            <span className="ml-2">
+                              {isAvailable ? "✓" : "—"}
+                            </span>
+                          )}
+                        </SelectItem>
+                      );
+                    })}
                   </SelectContent>
                 </Select>
                 <Button

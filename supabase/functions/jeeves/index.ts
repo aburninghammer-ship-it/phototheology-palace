@@ -935,6 +935,101 @@ Ellen G. White does not appear to have written specific commentary on ${book} ${
         { headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     
+    } else if (mode === "check-commentary-availability") {
+      // Check which classic commentaries have content for this verse
+      const commentaryUrls: Record<string, { name: string; searchUrl: string }> = {
+        "clarke": { 
+          name: "Adam Clarke's Commentary",
+          searchUrl: `https://www.studylight.org/commentaries/eng/acc/${book.toLowerCase().replace(/ /g, '-')}/${chapter}.html`
+        },
+        "barnes": { 
+          name: "Barnes' Notes on the Bible",
+          searchUrl: `https://www.studylight.org/commentaries/eng/bnb/${book.toLowerCase().replace(/ /g, '-')}/${chapter}.html`
+        },
+        "gill": { 
+          name: "Gill's Exposition of the Bible",
+          searchUrl: `https://www.studylight.org/commentaries/eng/geb/${book.toLowerCase().replace(/ /g, '-')}/${chapter}.html`
+        },
+        "henry": { 
+          name: "Matthew Henry's Concise Commentary",
+          searchUrl: `https://www.studylight.org/commentaries/eng/mhm/${book.toLowerCase().replace(/ /g, '-')}/${chapter}.html`
+        },
+        "jfb": { 
+          name: "Jamieson-Fausset-Brown Bible Commentary",
+          searchUrl: `https://www.studylight.org/commentaries/eng/jfb/${book.toLowerCase().replace(/ /g, '-')}/${chapter}.html`
+        },
+        "keil-delitzsch": { 
+          name: "Keil and Delitzsch Biblical Commentary",
+          searchUrl: `https://www.studylight.org/commentaries/eng/kdo/${book.toLowerCase().replace(/ /g, '-')}/${chapter}.html`
+        },
+        "wesley": { 
+          name: "Wesley's Explanatory Notes",
+          searchUrl: `https://www.studylight.org/commentaries/eng/wen/${book.toLowerCase().replace(/ /g, '-')}/${chapter}.html`
+        },
+        "pulpit": { 
+          name: "Pulpit Commentary",
+          searchUrl: `https://www.studylight.org/commentaries/eng/tpc/${book.toLowerCase().replace(/ /g, '-')}/${chapter}.html`
+        },
+        "cambridge": { 
+          name: "Cambridge Bible for Schools and Colleges",
+          searchUrl: `https://www.studylight.org/commentaries/eng/cbb/${book.toLowerCase().replace(/ /g, '-')}/${chapter}.html`
+        },
+        "ellicott": { 
+          name: "Ellicott's Commentary for English Readers",
+          searchUrl: `https://www.studylight.org/commentaries/eng/ebc/${book.toLowerCase().replace(/ /g, '-')}/${chapter}.html`
+        },
+        "benson": { 
+          name: "Benson Commentary",
+          searchUrl: `https://www.studylight.org/commentaries/eng/rbc/${book.toLowerCase().replace(/ /g, '-')}/${chapter}.html`
+        },
+      };
+
+      const availableCommentaries: string[] = [];
+      
+      // Check each commentary (limit to 6 concurrent checks for performance)
+      const commentaryKeys = Object.keys(commentaryUrls).filter(key => key !== 'sop');
+      const checkPromises = commentaryKeys.map(async (key) => {
+        try {
+          const commentary = commentaryUrls[key];
+          const response = await fetch(commentary.searchUrl, {
+            method: 'GET',
+            headers: { 'User-Agent': 'Mozilla/5.0' }
+          });
+          
+          if (!response.ok) return null;
+          
+          const html = await response.text();
+          const versePattern = new RegExp(`verse ${verseText.verse}[\\s\\S]{0,100}`, 'i');
+          
+          // Check if the page mentions this specific verse
+          if (versePattern.test(html)) {
+            return key;
+          }
+          return null;
+        } catch (error) {
+          console.error(`Error checking ${key}:`, error);
+          return null;
+        }
+      });
+
+      const results = await Promise.all(checkPromises);
+      results.forEach(result => {
+        if (result) availableCommentaries.push(result);
+      });
+
+      // Always include SOP as available
+      availableCommentaries.push('sop');
+
+      return new Response(
+        JSON.stringify({ 
+          available: availableCommentaries,
+          book,
+          chapter,
+          verse: verseText.verse
+        }),
+        { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+
     } else if (mode === "commentary-classic") {
       // Map commentators to their StudyLight.org URLs
       const commentaryUrls: Record<string, { name: string; searchUrl: string }> = {
