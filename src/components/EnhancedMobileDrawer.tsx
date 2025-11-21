@@ -60,6 +60,15 @@ const categoryConfig = {
       { to: "/escape-room", label: "Escape Rooms", icon: "🚨" },
     ],
   },
+  blueprints: {
+    title: "Blueprints",
+    icon: Building2,
+    links: [
+      { to: "/blueprint-marriage", label: "Dating & Marriage", icon: "💍" },
+      { to: "/blueprint-grief", label: "Grieving", icon: "💙" },
+      { to: "/blueprint-stronghold", label: "Breaking Strongholds", icon: "🛡️" },
+    ],
+  },
   learn: {
     title: "Learn",
     icon: GraduationCap,
