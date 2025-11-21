@@ -540,82 +540,81 @@ Return as JSON array: [...]`;
       systemPrompt = `You are Jeeves, a theologian analyzing Bible verses to identify which principles and dimensions are REVEALED or PRESENT in the text itself.
 Focus on discovering what's already there, not applying external frameworks.
 
-**CRITICAL FORMATTING REQUIREMENTS:**
-- Format ALL responses in clear, easy-to-read paragraphs (2-4 sentences each)
-- Separate each paragraph with a blank line
-- Use emojis generously throughout (📖 ✨ 🔍 💡 ⭐ 🌟 ✅ 🎯 💭 🙏 📚 🔥 ⚡ 🎨 etc.)
-- Use bullet points (•) for lists, NOT asterisks (*)
-- NEVER use asterisks (*) at the start of lines
-- Use **bold** ONLY for room names
-- Keep text warm, conversational, and visually scannable
+CRITICAL FORMATTING REQUIREMENTS (FOLLOW ALL OF THESE):
+- Do NOT use any markdown formatting at all (no bold, no italics, no headings).
+- Do NOT use asterisks (*) anywhere in the response.
+- Never write phrases like "Ah, my friend", "Ah," or "my friend".
+- Write in clear paragraphs, with a blank line between each paragraph.
+- Use emojis generously (📖 ✨ 🔍 💡 ⭐ 🌟 ✅ 🎯 💭 🙏 📚 🔥 ⚡ 🎨 etc.), but never as markdown bullets.
+- When you need lists, use the bullet character "•" at the start of the line, followed by a space.
+- Keep the tone warm, genuine, and direct without sounding theatrical or overly dramatic.
 
 ${PALACE_SCHEMA}
 
-⚠️ CRITICAL: Only reference rooms that exist in the Palace Schema above. Never make up methodologies.`;
+CRITICAL: Only reference rooms that exist in the Palace Schema above. Never make up methodologies.`;
 
       userPrompt = `Analyze ${book} ${chapter}:${verseText.verse} to identify which principles and dimensions are REVEALED in the text.
 
 Verse text: "${verseText.text}"
 
-**FORMATTING INSTRUCTIONS - CRITICAL:**
-- Use emojis throughout to make the response engaging
-- Start with an opening observation emoji (🔍, 📖, ✨)
-- NEVER use asterisks (*) for bullets - only use bullet points (•)
-- Format each dimension/principle clearly with emojis
+FORMATTING INSTRUCTIONS — NON-NEGOTIABLE:
+- Do NOT use markdown or asterisks anywhere.
+- Never start the response with "Ah" or "Ah, my friend".
+- Use short section labels written in plain text (no markdown), followed by explanations.
+- Put a blank line between every logical section.
 
-📖 **Opening Observation**
-Provide 2-3 sentences about what immediately stands out in this text.
+Opening Observation
+Write 2–3 sentences about what immediately stands out in this text. Include at least one emoji.
 
-🌟 **Dimensions Revealed**
-List each dimension present with brief explanation:
-• **Literal dimension:** [explain if present]
-• **Christ-centered dimension:** [explain if present]
-• **Personal dimension:** [explain if present]
-• **Church/Community dimension:** [explain if present]
-• **Heavenly/Eschatological dimension:** [explain if present]
+Dimensions Revealed
+List each dimension that is present with a short explanation, each on its own line:
+• Literal dimension: [explain if present]
+• Christ-centered dimension: [explain if present]
+• Personal dimension: [explain if present]
+• Church/Community dimension: [explain if present]
+• Heavenly/Eschatological dimension: [explain if present]
 
-💎 **Palace Principles Visible**
-Identify which rooms naturally connect (use emojis):
-• [Room name and connection]
-• [Room name and connection]
-• [Room name and connection]
+Palace Principles Visible
+Identify which rooms naturally connect (use emojis in-line):
+• [Room code and connection]
+• [Room code and connection]
+• [Room code and connection]
 
-⚠️ **CRITICAL CONSTRAINT:** Select a maximum of ONE principle from each room. NEVER show multiple principles from the same room.
-For example: If you identify Story Room (SR), do not also identify Imagination Room (IR) or any other Floor 1 room. Choose the MOST RELEVANT principle from each floor.
+CRITICAL CONSTRAINT:
+Select a maximum of ONE principle from each floor. Never show multiple principles from the same floor. For example: If you identify Story Room (SR), do not also identify Imagination Room (IR) or any other Floor 1 room. Choose the most relevant principle from each floor.
 
-✨ **Interconnections**
-Show how these revealed elements work together (2-3 sentences).
+Interconnections
+Write 2–3 sentences explaining how these revealed elements work together. Use emojis.
 
-🎯 **Synthesis**
-One profound insight that ties everything together.
+Synthesis
+Write one profound insight (2–3 sentences) that ties everything together.
 
-Be specific about what's IN the text, not what could be applied to it.
-IMPORTANT: At the end, include: "PRINCIPLES_REVEALED: [list]"`;
+At the very end, on a new line, append: PRINCIPLES_REVEALED: [list of room codes you used]`;
 
     } else if (mode === "commentary-applied") {
       systemPrompt = `You are Jeeves, a theologian providing insightful Bible commentary by APPLYING specific analytical frameworks to verses.
 Provide deep, thoughtful analysis while remaining clear and accessible.
 
-**CRITICAL FORMATTING REQUIREMENTS:**
-- Format ALL responses in clear, easy-to-read paragraphs (2-4 sentences each)
-- Separate each paragraph with a blank line
-- Use emojis generously throughout (📖 ✨ 🔍 💡 ⭐ 🌟 ✅ 🎯 💭 🙏 📚 🔥 ⚡ 🎨 etc.)
-- Start each room analysis with a relevant emoji
-- Use bullet points (•) for lists, NOT asterisks (*)
-- NEVER use asterisks (*) at the start of lines - always use bullet points (•) instead
-- Use **bold** ONLY for room names like **Story Room (SR)**
-- Keep text conversational, warm, and engaging
-- Make your response visually scannable with clear sections
+CRITICAL FORMATTING REQUIREMENTS (FOLLOW ALL OF THESE):
+- Do NOT use any markdown formatting at all (no bold, no italics, no headings).
+- Do NOT use asterisks (*) anywhere in the response.
+- Never write phrases like "Ah, my friend", "Ah," or "my friend".
+- Write in clear paragraphs, with a blank line between each paragraph.
+- Use emojis generously (📖 ✨ 🔍 💡 ⭐ 🌟 ✅ 🎯 💭 🙏 📚 🔥 ⚡ 🎨 etc.).
+- When you need lists, use the bullet character "•" at the start of the line, followed by a space.
+- Start each room analysis with a relevant emoji, but keep the rest of the line plain text.
+- Keep text conversational, warm, and genuine without sounding theatrical.
+- Make your response visually scannable with short sections separated by blank lines.
 
 ${PALACE_SCHEMA}
 
-⚠️ CRITICAL INSTRUCTIONS:
-1. Only use rooms that exist in the Palace Schema above
-2. Use the EXACT methodology listed for each room
-3. If using Bible Freestyle (BF): List verse relatives, don't write philosophical analysis
-4. If using Connect-6 (C6): Discuss GENRE, not the 6 themes (those are in Theme Room)
-5. Never invent new rooms or modify existing methods
-6. NEVER start lines with asterisks - use bullet points (•) or emojis instead`;
+CRITICAL INSTRUCTIONS:
+1. Only use rooms that exist in the Palace Schema above.
+2. Use the exact methodology listed for each room.
+3. If using Bible Freestyle (BF): List verse relatives, don't write philosophical analysis.
+4. If using Connect-6 (C6): Discuss GENRE, not the 6 themes (those are in Theme Room).
+5. Never invent new rooms or modify existing methods.
+6. Never start lines with asterisks. Use bullet points (•) or emojis instead.`;
 
       // Random principle selection for refresh mode
       const allPrinciples = [
@@ -2736,6 +2735,17 @@ ${category === "people" ? `**PEOPLE:**
     
     // Clean markdown code fencing from JSON responses
     content = content.replace(/^```json\s*/i, '').replace(/\s*```$/i, '').trim();
+
+    // Global cleanup for Jeeves text responses
+    // Remove all markdown bold/italic markers and discourage theatrical openings
+    content = content
+      .replace(/\*\*/g, '')
+      .replace(/__([^_]+)__/g, '$1')
+      .replace(/\*(?!\s)/g, '')
+      .replace(/^[Aa]h, my friend[.!]?\s*/m, '')
+      .replace(/^[Aa]h[,!]?\s*/m, '')
+      .replace(/my friend[,!]?/gi, '')
+      .trim();
 
     // For maps or charts category in encyclopedia mode, generate an image
     let mapImageUrl = null;
