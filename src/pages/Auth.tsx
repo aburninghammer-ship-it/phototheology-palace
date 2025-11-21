@@ -402,8 +402,11 @@ export default function Auth() {
                       <Button
                         type="button"
                         variant="link"
-                        className="px-0 text-sm"
-                        onClick={() => setShowPasswordReset(true)}
+                        className="px-0 text-sm text-primary hover:text-primary/80 font-medium"
+                        onClick={() => {
+                          setShowPasswordReset(true);
+                          setError("");
+                        }}
                         disabled={loading}
                       >
                         Forgot password?
