@@ -15,7 +15,7 @@ import { Separator } from "@/components/ui/separator";
 import { SubscriptionBanner } from "@/components/SubscriptionBanner";
 import { NotificationPreferences } from "@/components/NotificationPreferences";
 import { SubscriptionRenewal } from "@/components/SubscriptionRenewal";
-import { SocialMediaConnect } from "@/components/SocialMediaConnect";
+
 
 export default function Profile() {
   const { user } = useAuth();
@@ -292,9 +292,6 @@ export default function Profile() {
               </Button>
             </CardContent>
           </Card>
-
-          {/* Social Media Connections */}
-          <SocialMediaConnect />
 
           {/* Subscription & Renewal */}
           <SubscriptionRenewal />
