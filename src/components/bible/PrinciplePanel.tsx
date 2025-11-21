@@ -54,6 +54,7 @@ export const PrinciplePanel = ({ book, chapter, verse, verseText, onClose }: Pri
   const [linksLoading, setLinksLoading] = useState(false);
   const [chainReferences, setChainReferences] = useState<ChainReference[]>([]);
   const [selectedPrinciple, setSelectedPrinciple] = useState<string>("parables");
+  const [activeTab, setActiveTab] = useState<string>("principles");
   const { toast } = useToast();
 
   useEffect(() => {
@@ -78,6 +79,8 @@ export const PrinciplePanel = ({ book, chapter, verse, verseText, onClose }: Pri
   };
 
   const generateLinks = async () => {
+    if (linksLoading) return; // Prevent duplicate calls
+    
     setLinksLoading(true);
     try {
       const { data, error } = await supabase.functions.invoke("jeeves", {
@@ -124,6 +127,14 @@ export const PrinciplePanel = ({ book, chapter, verse, verseText, onClose }: Pri
       });
     } finally {
       setLinksLoading(false);
+    }
+  };
+
+  // Auto-generate links when switching to the Links tab
+  const handleTabChange = (value: string) => {
+    setActiveTab(value);
+    if (value === "cross-refs" && chainReferences.length === 0 && !linksLoading) {
+      generateLinks();
     }
   };
 
@@ -206,7 +217,7 @@ export const PrinciplePanel = ({ book, chapter, verse, verseText, onClose }: Pri
       </CardHeader>
       
       <CardContent>
-        <Tabs defaultValue="principles" className="w-full">
+        <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
           <TabsList className="grid w-full grid-cols-3">
             <TabsTrigger value="principles">
               <Layers className="h-4 w-4 mr-1" />
@@ -395,99 +406,102 @@ export const PrinciplePanel = ({ book, chapter, verse, verseText, onClose }: Pri
             </TabsContent>
             
             <TabsContent value="cross-refs" className="space-y-3 mt-0">
-              <div className="space-y-3">
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">Select Principle to Analyze</label>
-                  <Select value={selectedPrinciple} onValueChange={setSelectedPrinciple}>
-                    <SelectTrigger className="w-full">
-                      <SelectValue placeholder="Choose a principle" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {PRINCIPLES.map((principle) => (
-                        <SelectItem key={principle.value} value={principle.value}>
-                          {principle.label}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <Button
-                  onClick={generateLinks}
-                  disabled={linksLoading}
-                  className="w-full gradient-royal text-white"
-                  size="sm"
-                >
-                  {linksLoading ? (
-                    <>
-                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                      Generating Links...
-                    </>
-                  ) : (
-                    <>
-                      <Sparkles className="h-4 w-4 mr-2" />
-                      Generate Links
-                    </>
-                  )}
-                </Button>
-
-                {chainReferences.length > 0 ? (
-                  <div className="space-y-3">
-                    {chainReferences.map((result, idx) => (
-                      <div
-                        key={idx}
-                        className="p-3 rounded-lg border-2 border-primary/30 bg-gradient-to-br from-primary/5 to-secondary/5"
-                      >
-                        <div className="flex items-start justify-between mb-2">
-                          <div className="flex items-center gap-2 flex-wrap">
-                            <Badge className="gradient-palace text-white text-xs">
-                              {result.reference}
-                            </Badge>
-                            {result.ptCodes && result.ptCodes.length > 0 && (
-                              <div className="flex gap-1">
-                                {result.ptCodes.map((code, i) => (
-                                  <Badge key={i} variant="outline" className="text-xs">
-                                    {code}
-                                  </Badge>
-                                ))}
-                              </div>
-                            )}
-                          </div>
-                        </div>
-                        
-                        <p className="text-xs text-foreground leading-relaxed mb-2">
-                          {result.connection}
-                        </p>
-
-                        {result.crossReferences && result.crossReferences.length > 0 && (
-                          <div className="space-y-1">
-                            <p className="text-xs font-semibold text-muted-foreground">Cross References:</p>
-                            {result.crossReferences.map((ref, i) => (
-                              <div key={i} className="flex items-start gap-2 text-xs bg-card/50 p-2 rounded">
-                                <Badge variant="secondary" className="text-xs shrink-0">
-                                  {ref.reference}
-                                </Badge>
-                                <div className="flex-1 min-w-0">
-                                  <span className="font-medium text-primary">{ref.relationship}</span>
-                                  <span className="text-muted-foreground"> ({ref.confidence}%)</span>
-                                  <p className="text-muted-foreground mt-0.5">{ref.note}</p>
-                                </div>
-                              </div>
-                            ))}
-                          </div>
-                        )}
-                      </div>
-                    ))}
-                  </div>
-                ) : (
-                  <div className="text-center py-8 text-muted-foreground">
-                    <ExternalLink className="h-10 w-10 mx-auto mb-2 text-primary/50" />
-                    <p className="text-xs">
-                      Select a principle and generate links to discover related scriptures
+              {linksLoading ? (
+                <div className="flex flex-col items-center justify-center py-12 space-y-4">
+                  <Loader2 className="h-12 w-12 animate-spin text-primary" />
+                  <div className="text-center space-y-2">
+                    <p className="text-sm font-medium">Generating Scripture Links...</p>
+                    <p className="text-xs text-muted-foreground">
+                      Analyzing {PRINCIPLES.find(p => p.value === selectedPrinciple)?.label}
                     </p>
                   </div>
-                )}
-              </div>
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium">Select Principle to Analyze</label>
+                    <Select value={selectedPrinciple} onValueChange={(value) => {
+                      setSelectedPrinciple(value);
+                      setChainReferences([]); // Clear previous results when changing principle
+                    }}>
+                      <SelectTrigger className="w-full">
+                        <SelectValue placeholder="Choose a principle" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {PRINCIPLES.map((principle) => (
+                          <SelectItem key={principle.value} value={principle.value}>
+                            {principle.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <Button
+                    onClick={generateLinks}
+                    disabled={linksLoading}
+                    className="w-full gradient-royal text-white"
+                    size="sm"
+                  >
+                    <Sparkles className="h-4 w-4 mr-2" />
+                    Regenerate Links
+                  </Button>
+
+                  {chainReferences.length > 0 ? (
+                    <div className="space-y-3">
+                      {chainReferences.map((result, idx) => (
+                        <div
+                          key={idx}
+                          className="p-3 rounded-lg border-2 border-primary/30 bg-gradient-to-br from-primary/5 to-secondary/5"
+                        >
+                          <div className="flex items-start justify-between mb-2">
+                            <div className="flex items-center gap-2 flex-wrap">
+                              <Badge className="gradient-palace text-white text-xs">
+                                {result.reference}
+                              </Badge>
+                              {result.ptCodes && result.ptCodes.length > 0 && (
+                                <div className="flex gap-1">
+                                  {result.ptCodes.map((code, i) => (
+                                    <Badge key={i} variant="outline" className="text-xs">
+                                      {code}
+                                    </Badge>
+                                  ))}
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                          
+                          <p className="text-xs text-foreground leading-relaxed mb-2">
+                            {result.connection}
+                          </p>
+
+                          {result.crossReferences && result.crossReferences.length > 0 && (
+                            <div className="space-y-1">
+                              <p className="text-xs font-semibold text-muted-foreground">Cross References:</p>
+                              {result.crossReferences.map((ref, i) => (
+                                <div key={i} className="flex items-start gap-2 text-xs bg-card/50 p-2 rounded">
+                                  <Badge variant="secondary" className="text-xs shrink-0">
+                                    {ref.reference}
+                                  </Badge>
+                                  <div className="flex-1 min-w-0">
+                                    <span className="font-medium text-primary">{ref.relationship}</span>
+                                    <span className="text-muted-foreground"> ({ref.confidence}%)</span>
+                                    <p className="text-muted-foreground mt-0.5">{ref.note}</p>
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="text-center py-8 text-muted-foreground">
+                      <p className="text-sm">No links found. Try a different principle.</p>
+                    </div>
+                  )}
+                </div>
+              )}
             </TabsContent>
             
             <TabsContent value="christ" className="mt-0">
