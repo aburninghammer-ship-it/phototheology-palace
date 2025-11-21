@@ -8,6 +8,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Heart, Flame, BookOpen, CheckCircle2, ArrowLeft } from "lucide-react";
 import { SANCTUARY_GRIEF_ARTICLES, GRIEF_BLUEPRINT_INTRO } from "@/data/blueprintGriefData";
 import { useToast } from "@/hooks/use-toast";
+import { EnhancedSocialShare } from "@/components/EnhancedSocialShare";
 
 const STORAGE_KEY = "grief_blueprint_progress";
 
@@ -72,6 +73,15 @@ export default function BlueprintGrief() {
               <p className="text-xl text-muted-foreground">
                 {GRIEF_BLUEPRINT_INTRO.subtitle}
               </p>
+              <div className="flex justify-center">
+                <EnhancedSocialShare
+                  title="The Sanctuary Blueprint for Grieving"
+                  content="God's 6-step pattern to navigate grief—from shock to restoration. A sacred map through loss and pain."
+                  url={window.location.href}
+                  defaultMessage="💙 Found this powerful resource for anyone walking through grief:\n\nThe Sanctuary Blueprint for Grieving maps God's healing process through 6 sanctuary steps—from surrender and tears to hope and restoration.\n\nGrief is sacred terrain, and this is the map. 🕊️"
+                  buttonText="Share This Resource"
+                />
+              </div>
               <div className="max-w-3xl mx-auto bg-primary/5 p-6 rounded-lg border border-primary/20">
                 <p className="text-base leading-relaxed whitespace-pre-line">
                   {GRIEF_BLUEPRINT_INTRO.description}

@@ -8,6 +8,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Shield, Flame, BookOpen, CheckCircle2, ArrowLeft } from "lucide-react";
 import { SANCTUARY_STRONGHOLD_ARTICLES, STRONGHOLD_BLUEPRINT_INTRO } from "@/data/blueprintStrongholdData";
 import { useToast } from "@/hooks/use-toast";
+import { EnhancedSocialShare } from "@/components/EnhancedSocialShare";
 
 const STORAGE_KEY = "stronghold_blueprint_progress";
 
@@ -72,6 +73,15 @@ export default function BlueprintStronghold() {
               <p className="text-xl text-muted-foreground">
                 {STRONGHOLD_BLUEPRINT_INTRO.subtitle}
               </p>
+              <div className="flex justify-center">
+                <EnhancedSocialShare
+                  title="The Sanctuary Blueprint for Breaking Strongholds & Habits"
+                  content="God's 6-step architectural demolition plan for sin patterns, addictions, and mental strongholds."
+                  url={window.location.href}
+                  defaultMessage="⚡ This resource is a game-changer for anyone fighting strongholds:\n\nThe Sanctuary Blueprint for Breaking Strongholds maps God's 6-step freedom process—from renunciation and accountability to renewed mind and covenant identity.\n\nStrongholds break by process, not willpower. 🔥🛡️"
+                  buttonText="Share This Resource"
+                />
+              </div>
               <div className="max-w-3xl mx-auto bg-primary/5 p-6 rounded-lg border border-primary/20">
                 <p className="text-base leading-relaxed whitespace-pre-line">
                   {STRONGHOLD_BLUEPRINT_INTRO.description}
