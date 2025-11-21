@@ -7,11 +7,16 @@ import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Sword, Shield, Target, BookOpen, Flame, Trophy, Scroll, Loader2 } from "lucide-react";
+import { Sword, Shield, Target, BookOpen, Flame, Trophy, Scroll, Loader2, GraduationCap, Dumbbell } from "lucide-react";
 import { Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { SpacedRepetitionReview } from "@/components/SpacedRepetitionReview";
+import { DOJO_LESSONS } from "@/data/artOfWarLessons";
+import { LessonCard } from "@/components/dojo/LessonCard";
+import { LessonDetail } from "@/components/dojo/LessonDetail";
+import { ThirtyDayChallenge } from "@/components/dojo/ThirtyDayChallenge";
+import { CharacteristicTracker } from "@/components/dojo/CharacteristicTracker";
 
 const FRUITS_OF_SPIRIT = [
   { name: "Love", description: "Selfless care for others", color: "bg-red-500" },
@@ -305,6 +310,74 @@ export default function SpiritualTraining() {
   const [isLoadingGuidance, setIsLoadingGuidance] = useState(false);
   const [weaponGuidance, setWeaponGuidance] = useState("");
 
+  // Lesson states
+  const [selectedLesson, setSelectedLesson] = useState<string | null>(null);
+  const [completedLessons, setCompletedLessons] = useState<string[]>([]);
+  const [lessonNotes, setLessonNotes] = useState<Record<string, string>>({});
+  const [userId, setUserId] = useState<string | null>(null);
+
+  useEffect(() => {
+    checkUser();
+  }, []);
+
+  useEffect(() => {
+    if (userId) {
+      fetchLessonProgress();
+    }
+  }, [userId]);
+
+  const checkUser = async () => {
+    const { data: { user } } = await supabase.auth.getUser();
+    setUserId(user?.id || null);
+  };
+
+  const fetchLessonProgress = async () => {
+    if (!userId) return;
+
+    const { data, error } = await supabase
+      .from('dojo_lessons')
+      .select('*')
+      .eq('user_id', userId);
+
+    if (!error && data) {
+      setCompletedLessons(data.filter(l => l.completed).map(l => l.lesson_id));
+      const notes: Record<string, string> = {};
+      data.forEach(l => {
+        if (l.notes) notes[l.lesson_id] = l.notes;
+      });
+      setLessonNotes(notes);
+    }
+  };
+
+  const handleLessonComplete = async (lessonId: string, notes: string) => {
+    if (!userId) {
+      toast.error("Please log in to save progress");
+      return;
+    }
+
+    try {
+      const { error } = await supabase
+        .from('dojo_lessons')
+        .upsert({
+          user_id: userId,
+          lesson_id: lessonId,
+          completed: true,
+          notes: notes,
+          completed_at: new Date().toISOString()
+        }, {
+          onConflict: 'user_id,lesson_id'
+        });
+
+      if (error) throw error;
+
+      toast.success("Lesson progress saved!");
+      await fetchLessonProgress();
+    } catch (error) {
+      console.error("Error saving lesson:", error);
+      toast.error("Failed to save progress");
+    }
+  };
+
   const fetchDailyEncouragement = async () => {
     setLoadingEncouragement(true);
     try {
@@ -409,16 +482,76 @@ export default function SpiritualTraining() {
         </Card>
 
         {/* Training Tabs */}
-        <Tabs defaultValue="review" className="w-full">
-          <div className="overflow-x-auto -mx-4 px-4 md:mx-0 md:px-0">
-            <TabsList className="inline-flex min-w-full md:w-auto">
-              <TabsTrigger value="review" className="flex-1 md:flex-initial">Spaced Review</TabsTrigger>
-              <TabsTrigger value="scenarios" className="flex-1 md:flex-initial">Battle Scenarios</TabsTrigger>
-              <TabsTrigger value="besetting" className="flex-1 md:flex-initial">Besetting Sins</TabsTrigger>
-              <TabsTrigger value="animals" className="flex-1 md:flex-initial">Animal Styles</TabsTrigger>
-              <TabsTrigger value="weapons" className="flex-1 md:flex-initial">Spiritual Weapons</TabsTrigger>
+        <Tabs defaultValue="lessons" className="w-full">
+          <ScrollArea className="w-full">
+            <TabsList className="inline-flex w-full">
+              <TabsTrigger value="lessons" className="flex-1">
+                <GraduationCap className="w-4 h-4 mr-2" />
+                Lessons
+              </TabsTrigger>
+              <TabsTrigger value="challenges" className="flex-1">
+                <Dumbbell className="w-4 h-4 mr-2" />
+                30-Day Challenge
+              </TabsTrigger>
+              <TabsTrigger value="characteristics" className="flex-1">
+                <Target className="w-4 h-4 mr-2" />
+                Character Tracker
+              </TabsTrigger>
+              <TabsTrigger value="scenarios" className="flex-1">
+                <Shield className="w-4 h-4 mr-2" />
+                Battle Scenarios
+              </TabsTrigger>
+              <TabsTrigger value="weapons" className="flex-1">
+                <Sword className="w-4 h-4 mr-2" />
+                Weapons
+              </TabsTrigger>
             </TabsList>
-          </div>
+          </ScrollArea>
+
+          {/* Lessons Tab */}
+          <TabsContent value="lessons" className="space-y-4">
+            {selectedLesson ? (
+              <LessonDetail
+                lesson={DOJO_LESSONS.find(l => l.id === selectedLesson)!}
+                onBack={() => setSelectedLesson(null)}
+                onComplete={handleLessonComplete}
+                isCompleted={completedLessons.includes(selectedLesson)}
+                existingNotes={lessonNotes[selectedLesson]}
+              />
+            ) : (
+              <div className="space-y-4">
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Art of War Training Manual</CardTitle>
+                    <CardDescription>
+                      Master the principles of spiritual warfare through systematic study of holy war against self.
+                      Progress: {completedLessons.length} / {DOJO_LESSONS.length} lessons
+                    </CardDescription>
+                  </CardHeader>
+                </Card>
+                <div className="grid gap-4 md:grid-cols-2">
+                  {DOJO_LESSONS.map((lesson) => (
+                    <LessonCard
+                      key={lesson.id}
+                      lesson={lesson}
+                      isCompleted={completedLessons.includes(lesson.id)}
+                      onStart={setSelectedLesson}
+                    />
+                  ))}
+                </div>
+              </div>
+            )}
+          </TabsContent>
+
+          {/* 30-Day Challenge Tab */}
+          <TabsContent value="challenges" className="space-y-4">
+            <ThirtyDayChallenge />
+          </TabsContent>
+
+          {/* Character Tracker Tab */}
+          <TabsContent value="characteristics" className="space-y-4">
+            <CharacteristicTracker />
+          </TabsContent>
 
           {/* Spaced Repetition Review */}
           <TabsContent value="review" className="space-y-4">

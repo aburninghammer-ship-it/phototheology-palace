@@ -1,0 +1,13 @@
+-- Fix security linter warnings by using CREATE OR REPLACE instead of DROP
+
+CREATE OR REPLACE FUNCTION update_dojo_updated_at()
+RETURNS TRIGGER 
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = 'public'
+AS $$
+BEGIN
+  NEW.updated_at = now();
+  RETURN NEW;
+END;
+$$;
