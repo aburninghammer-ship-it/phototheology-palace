@@ -4,6 +4,7 @@ import { fetchChapter, Translation } from "@/services/bibleApi";
 import { Chapter } from "@/types/bible";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ChevronLeft, ChevronRight, BookOpen, Loader2, Link2, MessageSquare, Bot, Bookmark, Sparkles, Upload } from "lucide-react";
 import { VerseView } from "./VerseView";
 import { StrongsVerseView } from "./StrongsVerseView";
@@ -31,9 +32,6 @@ export const BibleReader = () => {
   const [selectedVerse, setSelectedVerse] = useState<number | null>(null);
   const [selectedVerses, setSelectedVerses] = useState<number[]>([]);
   const [principleMode, setPrincipleMode] = useState(false);
-  const [chainReferenceMode, setChainReferenceMode] = useState(false);
-  const [commentaryMode, setCommentaryMode] = useState(false);
-  const [jeevesMode, setJeevesMode] = useState(false);
   const [strongsMode, setStrongsMode] = useState(false);
   const [highlightedVerses, setHighlightedVerses] = useState<number[]>([]);
   const [importDialogOpen, setImportDialogOpen] = useState(false);
@@ -195,9 +193,6 @@ export const BibleReader = () => {
           onClick={() => {
             setStrongsMode(!strongsMode);
             setPrincipleMode(false);
-            setChainReferenceMode(false);
-            setCommentaryMode(false);
-            setJeevesMode(false);
           }}
           className={strongsMode ? "bg-gradient-to-r from-amber-600 to-orange-600 text-white shadow-lg" : ""}
         >
@@ -210,9 +205,6 @@ export const BibleReader = () => {
           onClick={() => {
             setPrincipleMode(!principleMode);
             setStrongsMode(false);
-            setChainReferenceMode(false);
-            setCommentaryMode(false);
-            setJeevesMode(false);
             setSelectedVerses([]);
             setSelectedVerse(null);
           }}
@@ -220,50 +212,6 @@ export const BibleReader = () => {
         >
           <BookOpen className="h-4 w-4 mr-2" />
           Principle Mode {selectedVerses.length > 0 && `(${selectedVerses.length})`}
-        </Button>
-        <Button
-          variant={chainReferenceMode ? "default" : "outline"}
-          size="sm"
-          onClick={() => {
-            setChainReferenceMode(!chainReferenceMode);
-            setStrongsMode(false);
-            setPrincipleMode(false);
-            setCommentaryMode(false);
-            setJeevesMode(false);
-            setHighlightedVerses([]);
-          }}
-          className={chainReferenceMode ? "gradient-palace" : ""}
-        >
-          <Link2 className="h-4 w-4 mr-2" />
-          Links
-        </Button>
-        <Button
-          variant={commentaryMode ? "default" : "outline"}
-          size="sm"
-          onClick={() => {
-            setCommentaryMode(!commentaryMode);
-            setStrongsMode(false);
-            setPrincipleMode(false);
-            setChainReferenceMode(false);
-          }}
-          className={commentaryMode ? "gradient-ocean" : ""}
-        >
-          <MessageSquare className="h-4 w-4 mr-2" />
-          Commentary
-        </Button>
-        <Button
-          variant={jeevesMode ? "default" : "outline"}
-          size="sm"
-          onClick={() => {
-            setJeevesMode(!jeevesMode);
-            setStrongsMode(false);
-            setPrincipleMode(false);
-            setChainReferenceMode(false);
-          }}
-          className={jeevesMode ? "bg-gradient-to-r from-purple-600 to-blue-600 text-white shadow-lg" : ""}
-        >
-          <Bot className="h-4 w-4 mr-2" />
-          Ask Jeeves
         </Button>
         {selectedVerse && (
           <Button
@@ -319,84 +267,69 @@ export const BibleReader = () => {
           </Card>
         </div>
 
-        {/* Right Panel - Dynamic based on mode */}
-        <div className="lg:col-span-1 space-y-6">
-          {chainReferenceMode ? (
-            <ChainReferencePanel
-              book={book}
-              chapter={chapter}
-              verses={chapterData.verses}
-              onHighlight={setHighlightedVerses}
-            />
-          ) : (commentaryMode || jeevesMode) && selectedVerse ? (
-            <>
-              {commentaryMode && (
-                <CommentaryPanel
+        {/* Right Panel - Jeeves Assistant with Tabs */}
+        <div className="lg:col-span-1">
+          <Card className="p-6 sticky top-24">
+            <Tabs defaultValue="links" className="w-full">
+              <TabsList className="grid w-full grid-cols-3">
+                <TabsTrigger value="links" className="flex items-center gap-2">
+                  <Link2 className="h-4 w-4" />
+                  Links
+                </TabsTrigger>
+                <TabsTrigger value="commentary" className="flex items-center gap-2">
+                  <MessageSquare className="h-4 w-4" />
+                  Commentary
+                </TabsTrigger>
+                <TabsTrigger value="jeeves" className="flex items-center gap-2">
+                  <Bot className="h-4 w-4" />
+                  Jeeves
+                </TabsTrigger>
+              </TabsList>
+
+              <TabsContent value="links" className="mt-4">
+                <ChainReferencePanel
                   book={book}
                   chapter={chapter}
-                  verse={selectedVerse}
-                  verseText={chapterData.verses.find(v => v.verse === selectedVerse)?.text || ""}
-                  onClose={() => setCommentaryMode(false)}
+                  verses={chapterData.verses}
+                  onHighlight={setHighlightedVerses}
                 />
-              )}
-              {jeevesMode && (
-                <JeevesVerseAssistant
-                  book={book}
-                  chapter={chapter}
-                  verse={selectedVerse}
-                  verseText={chapterData.verses.find(v => v.verse === selectedVerse)?.text || ""}
-                  onClose={() => setJeevesMode(false)}
-                />
-              )}
-            </>
-          ) : principleMode && selectedVerses.length > 0 ? (
-            <Card className="p-6 sticky top-24 space-y-4">
-              <div className="flex items-center justify-between">
-                <h3 className="font-semibold">Selected Verses ({selectedVerses.length})</h3>
-                <Button variant="ghost" size="sm" onClick={() => setSelectedVerses([])}>
-                  Clear
-                </Button>
-              </div>
-              <div className="space-y-2 max-h-[400px] overflow-auto">
-                {selectedVerses.map(v => (
-                  <div key={v} className="p-3 rounded-lg border bg-card/50 text-sm">
-                    <span className="font-semibold text-primary">{v}.</span>{" "}
-                    {chapterData.verses.find(verse => verse.verse === v)?.text}
+              </TabsContent>
+
+              <TabsContent value="commentary" className="mt-4">
+                {selectedVerse ? (
+                  <CommentaryPanel
+                    book={book}
+                    chapter={chapter}
+                    verse={selectedVerse}
+                    verseText={chapterData.verses.find(v => v.verse === selectedVerse)?.text || ""}
+                    onClose={() => setSelectedVerse(null)}
+                  />
+                ) : (
+                  <div className="text-center text-muted-foreground py-8">
+                    <MessageSquare className="h-12 w-12 mx-auto mb-3 text-primary/50" />
+                    <p className="text-sm">Select a verse to view commentary</p>
                   </div>
-                ))}
-              </div>
-              {selectedVerses.length === 1 && (
-                <PrinciplePanel
-                  book={book}
-                  chapter={chapter}
-                  verse={selectedVerses[0]}
-                  verseText={chapterData.verses.find(v => v.verse === selectedVerses[0])?.text || ""}
-                  onClose={() => setSelectedVerses([])}
-                />
-              )}
-            </Card>
-          ) : selectedVerse ? (
-            <PrinciplePanel
-              book={book}
-              chapter={chapter}
-              verse={selectedVerse}
-              verseText={chapterData.verses.find(v => v.verse === selectedVerse)?.text || ""}
-              onClose={() => setSelectedVerse(null)}
-            />
-          ) : (
-            <Card className="p-6 text-center text-muted-foreground sticky top-24">
-              <BookOpen className="h-12 w-12 mx-auto mb-3 text-primary/50" />
-              <p className="text-sm">
-                {strongsMode
-                  ? "Click on words with ✨ for AI Hebrew/Greek analysis, or click Strong's numbers for definitions"
-                  : principleMode
-                  ? "Select one or more verses to analyze with Phototheology principles"
-                  : (jeevesMode || commentaryMode)
-                  ? "Select a verse to interact with AI commentary and ask questions"
-                  : "Select a verse to view principles, cross-references, and commentary"}
-              </p>
-            </Card>
-          )}
+                )}
+              </TabsContent>
+
+              <TabsContent value="jeeves" className="mt-4">
+                {selectedVerse ? (
+                  <JeevesVerseAssistant
+                    book={book}
+                    chapter={chapter}
+                    verse={selectedVerse}
+                    verseText={chapterData.verses.find(v => v.verse === selectedVerse)?.text || ""}
+                    onClose={() => setSelectedVerse(null)}
+                  />
+                ) : (
+                  <div className="text-center text-muted-foreground py-8">
+                    <Bot className="h-12 w-12 mx-auto mb-3 text-primary/50" />
+                    <p className="text-sm">Select a verse to ask Jeeves</p>
+                  </div>
+                )}
+              </TabsContent>
+            </Tabs>
+          </Card>
         </div>
       </div>
     </div>
