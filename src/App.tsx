@@ -66,6 +66,8 @@ const BlueprintMentalHealth = lazy(() => import("./pages/BlueprintMentalHealth")
 const BlueprintMarriage = lazy(() => import("./pages/BlueprintMarriage"));
 const BlueprintGrief = lazy(() => import("./pages/BlueprintGrief"));
 const BlueprintStronghold = lazy(() => import("./pages/BlueprintStronghold"));
+const BlueprintFinancial = lazy(() => import("./pages/BlueprintFinancial"));
+const BlueprintStress = lazy(() => import("./pages/BlueprintStress"));
 const PhototheologyCourse = lazy(() => import("./pages/PhototheologyCourse"));
 const DanielCourse = lazy(() => import("./pages/DanielCourse"));
 const RevelationCourse = lazy(() => import("./pages/RevelationCourse"));
@@ -284,6 +286,8 @@ function App() {
           <Route path="/blueprint-marriage" element={<ProtectedRoute><BlueprintMarriage /></ProtectedRoute>} />
           <Route path="/blueprint-grief" element={<ProtectedRoute><BlueprintGrief /></ProtectedRoute>} />
           <Route path="/blueprint-stronghold" element={<ProtectedRoute><BlueprintStronghold /></ProtectedRoute>} />
+          <Route path="/blueprint-financial" element={<ProtectedRoute><BlueprintFinancial /></ProtectedRoute>} />
+          <Route path="/blueprint-stress" element={<ProtectedRoute><BlueprintStress /></ProtectedRoute>} />
           <Route path="/phototheology-course" element={<ProtectedRoute><PhototheologyCourse /></ProtectedRoute>} />
           <Route path="/daniel-course" element={<ProtectedRoute><DanielCourse /></ProtectedRoute>} />
           <Route path="/revelation-course" element={<ProtectedRoute><RevelationCourse /></ProtectedRoute>} />
