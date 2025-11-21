@@ -216,7 +216,20 @@ Return only valid JSON with roomsUsed array and roomAnalysis object using full r
     }
 
     const data = await response.json();
-    const analysisText = data.choices[0].message.content;
+    let analysisText = data.choices[0].message.content;
+    
+    // Clean up any control characters that might break JSON parsing
+    analysisText = analysisText
+      .replace(/[\u0000-\u001F\u007F-\u009F]/g, '') // Remove control characters
+      .trim();
+    
+    // Try to extract JSON if wrapped in markdown code blocks
+    const jsonMatch = analysisText.match(/```json\s*([\s\S]*?)\s*```/) || 
+                      analysisText.match(/```\s*([\s\S]*?)\s*```/);
+    if (jsonMatch) {
+      analysisText = jsonMatch[1].trim();
+    }
+    
     const analysis = JSON.parse(analysisText);
 
     return new Response(
