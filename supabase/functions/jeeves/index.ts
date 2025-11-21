@@ -826,111 +826,85 @@ Ellen G. White does not appear to have written specific commentary on ${book} ${
       );
     
     } else if (mode === "commentary-classic") {
-      const commentaryMap: Record<string, { name: string; era: string; style: string }> = {
+      // Map commentators to their StudyLight.org URLs
+      const commentaryUrls: Record<string, { name: string; searchUrl: string }> = {
         "clarke": { 
-          name: "Adam Clarke", 
-          era: "18th-19th century (Methodist scholar)",
-          style: "Thorough textual analysis with historical and linguistic depth"
+          name: "Adam Clarke's Commentary",
+          searchUrl: `https://www.studylight.org/commentaries/eng/acc/${book.toLowerCase().replace(/ /g, '-')}/${chapter}.html`
         },
         "barnes": { 
-          name: "Albert Barnes", 
-          era: "19th century (Presbyterian minister)",
-          style: "Clear, practical exposition with theological clarity"
+          name: "Barnes' Notes on the Bible",
+          searchUrl: `https://www.studylight.org/commentaries/eng/bnb/${book.toLowerCase().replace(/ /g, '-')}/${chapter}.html`
         },
         "gill": { 
-          name: "John Gill", 
-          era: "18th century (Baptist theologian)",
-          style: "Deep doctrinal commentary with Reformed perspective"
+          name: "Gill's Exposition of the Bible",
+          searchUrl: `https://www.studylight.org/commentaries/eng/geb/${book.toLowerCase().replace(/ /g, '-')}/${chapter}.html`
         },
         "henry": { 
-          name: "Matthew Henry", 
-          era: "17th-18th century (Presbyterian minister)",
-          style: "Devotional and practical with rich spiritual application"
+          name: "Matthew Henry's Concise Commentary",
+          searchUrl: `https://www.studylight.org/commentaries/eng/mhm/${book.toLowerCase().replace(/ /g, '-')}/${chapter}.html`
         },
         "jfb": { 
-          name: "Jamieson-Fausset-Brown", 
-          era: "19th century (collective work)",
-          style: "Concise, scholarly exposition with cross-references"
+          name: "Jamieson-Fausset-Brown Bible Commentary",
+          searchUrl: `https://www.studylight.org/commentaries/eng/jfb/${book.toLowerCase().replace(/ /g, '-')}/${chapter}.html`
         },
         "keil-delitzsch": { 
-          name: "Keil & Delitzsch", 
-          era: "19th century (German Lutheran scholars)",
-          style: "Academic Old Testament commentary with linguistic precision"
+          name: "Keil and Delitzsch Biblical Commentary",
+          searchUrl: `https://www.studylight.org/commentaries/eng/kdo/${book.toLowerCase().replace(/ /g, '-')}/${chapter}.html`
         },
         "wesley": { 
-          name: "John Wesley", 
-          era: "18th century (Methodist founder)",
-          style: "Brief, practical notes with spiritual emphasis"
+          name: "Wesley's Explanatory Notes",
+          searchUrl: `https://www.studylight.org/commentaries/eng/wen/${book.toLowerCase().replace(/ /g, '-')}/${chapter}.html`
         },
         "pulpit": { 
-          name: "The Pulpit Commentary", 
-          era: "19th century (collective work)",
-          style: "Comprehensive exposition with homiletics and exegesis"
+          name: "Pulpit Commentary",
+          searchUrl: `https://www.studylight.org/commentaries/eng/tpc/${book.toLowerCase().replace(/ /g, '-')}/${chapter}.html`
         },
         "cambridge": { 
-          name: "Cambridge Bible for Schools", 
-          era: "19th-20th century (Anglican scholars)",
-          style: "Educational commentary with literary and historical notes"
+          name: "Cambridge Bible for Schools and Colleges",
+          searchUrl: `https://www.studylight.org/commentaries/eng/cbb/${book.toLowerCase().replace(/ /g, '-')}/${chapter}.html`
         },
         "ellicott": { 
-          name: "Ellicott's Commentary", 
-          era: "19th century (Anglican bishop)",
-          style: "Scholarly with attention to Greek/Hebrew text"
+          name: "Ellicott's Commentary for English Readers",
+          searchUrl: `https://www.studylight.org/commentaries/eng/ebc/${book.toLowerCase().replace(/ /g, '-')}/${chapter}.html`
         },
         "benson": { 
-          name: "Joseph Benson", 
-          era: "18th-19th century (Methodist minister)",
-          style: "Practical notes with theological application"
+          name: "Benson Commentary",
+          searchUrl: `https://www.studylight.org/commentaries/eng/rbc/${book.toLowerCase().replace(/ /g, '-')}/${chapter}.html`
         },
         "sop": { 
-          name: "Ellen G. White (Spirit of Prophecy)", 
-          era: "19th-20th century (Adventist pioneer)",
-          style: "Prophetic insights with spiritual application"
+          name: "Spirit of Prophecy",
+          searchUrl: "" // SOP handled separately above
         },
       };
 
-      const selectedInfo = commentaryMap[classicCommentary] || commentaryMap["clarke"];
+      const selectedCommentary = commentaryUrls[classicCommentary] || commentaryUrls["clarke"];
       
-      systemPrompt = `You are a scholar presenting commentary on Bible verses in the style and perspective of ${selectedInfo.name}.
+      // Use AI to extract and format the commentary from the web page
+      systemPrompt = `You are a biblical scholar extracting commentary text from a classic Bible commentary webpage.
 
-${selectedInfo.name}'s Background:
-• Era: ${selectedInfo.era}
-• Style: ${selectedInfo.style}
+Your task is to:
+1. Find the commentary text for ${book} ${chapter}:${verse} from the provided webpage content
+2. Extract ONLY the actual words written by the original commentator - do not paraphrase or generate new text
+3. Format it cleanly for reading, preserving the original author's voice and style
 
-CRITICAL FORMATTING REQUIREMENTS (FOLLOW ALL OF THESE):
-- Do NOT use any markdown formatting at all (no bold, no italics, no headings).
-- Do NOT use asterisks (*) anywhere in the response.
-- Write in clear paragraphs, with a blank line between each paragraph.
-- Use emojis sparingly and appropriately (📖 💡 ✨ 🔍).
-- When you need lists, use the bullet character "•" at the start of the line, followed by a space.
-- Keep the tone scholarly but accessible.
-- Present the commentary authentically in ${selectedInfo.name}'s voice and theological perspective.
+CRITICAL FORMATTING REQUIREMENTS:
+- Do NOT use any markdown formatting (no bold, italics, headings)
+- Do NOT use asterisks (*) anywhere
+- Write in clear paragraphs with blank lines between them
+- Use the bullet character "•" for any lists
+- If the webpage doesn't contain commentary for this specific verse, say "Commentary not available for this verse"
+- ONLY extract and present what the original commentator actually wrote
 
-Your task is to provide insightful commentary on this verse AS IF you were ${selectedInfo.name}, drawing on typical interpretive approaches and theological emphases of that commentator.`;
+Present the actual historical commentary text, preserving the original author's words and perspective.`;
 
-      userPrompt = `Provide ${selectedInfo.name}'s commentary on this verse:
+      userPrompt = `Extract the commentary for ${book} ${chapter}:${verse} from ${selectedCommentary.name}.
 
-${book} ${chapter}:${verse}
-"${verseText.text}"
+Search query to find the source: "${selectedCommentary.name} ${book} ${chapter}:${verse}"
 
-STRUCTURE (use plain text section labels, not markdown):
+Find the actual commentary text written by the original author for this specific verse and present it verbatim. If you cannot find specific commentary for verse ${verse}, look for commentary on the surrounding verses ${Math.max(1, verse - 1)}-${verse + 1} that includes discussion of verse ${verse}.
 
-Context and Setting
-Write 2-3 sentences establishing the historical and literary context of this verse.
-
-Textual Analysis
-Provide 2-3 paragraphs analyzing the text itself, including:
-• Key words or phrases that deserve attention
-• Grammatical or syntactical observations
-• Cross-references to related passages
-
-Theological Insights
-Write 2-3 paragraphs explaining the theological significance and doctrinal implications from ${selectedInfo.name}'s perspective.
-
-Practical Application
-Conclude with 1-2 paragraphs on how this verse applies to Christian life and practice.
-
-Present this in a voice and style consistent with ${selectedInfo.name}'s actual published works. Be authentic to the commentator's era, theological tradition, and interpretive approach.`;
+The verse text is: "${verseText.text}"`;
 
       const classicResponse = await fetch(
         "https://ai.gateway.lovable.dev/v1/chat/completions",
@@ -946,6 +920,9 @@ Present this in a voice and style consistent with ${selectedInfo.name}'s actual 
               { role: "system", content: systemPrompt },
               { role: "user", content: userPrompt },
             ],
+            tools: [{
+              type: "google_search"
+            }]
           }),
         }
       );
@@ -962,7 +939,7 @@ Present this in a voice and style consistent with ${selectedInfo.name}'s actual 
       return new Response(
         JSON.stringify({ 
           content: classicContent,
-          principlesUsed: [selectedInfo.name]
+          principlesUsed: [selectedCommentary.name]
         }),
         { headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
