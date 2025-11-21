@@ -128,7 +128,7 @@ const COMMENTARY_OPTIONS = [
   { value: "cambridge", label: "Cambridge Bible for Schools" },
   { value: "ellicott", label: "Ellicott's Commentary" },
   { value: "benson", label: "Benson Commentary" },
-  { value: "sop", label: "Spirit of Prophecy (Ellen G. White)" },
+  { value: "sop", label: "Spirit of Prophecy (SOP)" },
 ];
 
 interface CommentaryPanelProps {
@@ -197,16 +197,22 @@ export const CommentaryPanel = ({ book, chapter, verse, verseText, onClose }: Co
     setLoading(true);
     setCommentaryMode(useClassicCommentary);
     try {
+      // Determine the correct mode
+      let mode = analysisMode === "revealed" ? "commentary-revealed" : "commentary-applied";
+      if (useClassicCommentary) {
+        mode = selectedCommentary === "sop" ? "commentary-sop" : "commentary-classic";
+      }
+
       const { data, error } = await supabase.functions.invoke("jeeves", {
         body: {
-          mode: useClassicCommentary ? "commentary-classic" : (analysisMode === "revealed" ? "commentary-revealed" : "commentary-applied"),
+          mode,
           book,
           chapter,
           verseText: { verse, text: verseText },
           selectedPrinciples: (analysisMode === "applied" && !refresh && !useClassicCommentary) 
             ? selectedPrinciples.map(id => PRINCIPLE_OPTIONS.find(p => p.id === id)?.label)
             : undefined,
-          classicCommentary: useClassicCommentary ? selectedCommentary : undefined,
+          classicCommentary: useClassicCommentary && selectedCommentary !== "sop" ? selectedCommentary : undefined,
         },
       });
 

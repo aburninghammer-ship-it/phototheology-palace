@@ -1085,11 +1085,26 @@ Ellen G. White does not appear to have written specific commentary on ${book} ${
 
       const selectedCommentary = commentaryUrls[classicCommentary] || commentaryUrls["clarke"];
       
+      // Fetch the actual webpage
+      let webpageContent = "";
+      try {
+        const webResponse = await fetch(selectedCommentary.searchUrl, {
+          method: 'GET',
+          headers: { 'User-Agent': 'Mozilla/5.0' }
+        });
+        
+        if (webResponse.ok) {
+          webpageContent = await webResponse.text();
+        }
+      } catch (error) {
+        console.error('Error fetching webpage:', error);
+      }
+
       // Use AI to extract and format the commentary from the web page
       systemPrompt = `You are a biblical scholar extracting commentary text from a classic Bible commentary webpage.
 
 Your task is to:
-1. Find the commentary text for ${book} ${chapter}:${verse} from the provided webpage content
+1. Find the commentary text for ${book} ${chapter}:${verseText.verse} from the provided webpage content
 2. Extract ONLY the actual words written by the original commentator - do not paraphrase or generate new text
 3. Format it cleanly for reading, preserving the original author's voice and style
 
@@ -1103,13 +1118,13 @@ CRITICAL FORMATTING REQUIREMENTS:
 
 Present the actual historical commentary text, preserving the original author's words and perspective.`;
 
-      userPrompt = `Extract the commentary for ${book} ${chapter}:${verse} from ${selectedCommentary.name}.
+      userPrompt = `Here is the HTML content from ${selectedCommentary.name} for ${book} ${chapter}:
 
-Search query to find the source: "${selectedCommentary.name} ${book} ${chapter}:${verse}"
+${webpageContent.slice(0, 50000)}
 
-Find the actual commentary text written by the original author for this specific verse and present it verbatim. If you cannot find specific commentary for verse ${verse}, look for commentary on the surrounding verses ${Math.max(1, verse - 1)}-${verse + 1} that includes discussion of verse ${verse}.
+Extract the commentary specifically for verse ${verseText.verse}. The verse text is: "${verseText.text}"
 
-The verse text is: "${verseText.text}"`;
+Find and present the original commentator's words for this specific verse. If you cannot find specific commentary for verse ${verseText.verse}, state clearly that commentary is not available.`;
 
       const classicResponse = await fetch(
         "https://ai.gateway.lovable.dev/v1/chat/completions",
@@ -1125,9 +1140,6 @@ The verse text is: "${verseText.text}"`;
               { role: "system", content: systemPrompt },
               { role: "user", content: userPrompt },
             ],
-            tools: [{
-              type: "google_search"
-            }]
           }),
         }
       );
@@ -1139,7 +1151,10 @@ The verse text is: "${verseText.text}"`;
       }
 
       const classicData = await classicResponse.json();
-      const classicContent = classicData.choices?.[0]?.message?.content || "No commentary generated.";
+      let classicContent = classicData.choices?.[0]?.message?.content || "No commentary generated.";
+      
+      // Clean control characters
+      classicContent = classicContent.replace(/[\x00-\x1F\x7F-\x9F]/g, '');
 
       return new Response(
         JSON.stringify({ 
