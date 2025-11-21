@@ -946,6 +946,69 @@ export type Database = {
           },
         ]
       }
+      dojo_challenges: {
+        Row: {
+          challenge_type: string
+          completed_at: string | null
+          created_at: string | null
+          day_number: number
+          id: string
+          reflection: string | null
+          user_id: string
+        }
+        Insert: {
+          challenge_type: string
+          completed_at?: string | null
+          created_at?: string | null
+          day_number: number
+          id?: string
+          reflection?: string | null
+          user_id: string
+        }
+        Update: {
+          challenge_type?: string
+          completed_at?: string | null
+          created_at?: string | null
+          day_number?: number
+          id?: string
+          reflection?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      dojo_lessons: {
+        Row: {
+          completed: boolean | null
+          completed_at: string | null
+          created_at: string | null
+          id: string
+          lesson_id: string
+          notes: string | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          completed?: boolean | null
+          completed_at?: string | null
+          created_at?: string | null
+          id?: string
+          lesson_id: string
+          notes?: string | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          completed?: boolean | null
+          completed_at?: string | null
+          created_at?: string | null
+          id?: string
+          lesson_id?: string
+          notes?: string | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       drill_results: {
         Row: {
           completed_at: string
@@ -3985,6 +4048,39 @@ export type Database = {
           word?: string
           word_position?: number
           word_text?: string
+        }
+        Relationships: []
+      }
+      warrior_characteristics: {
+        Row: {
+          characteristic_name: string
+          created_at: string | null
+          id: string
+          last_practiced_at: string | null
+          level: number | null
+          practices_completed: number | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          characteristic_name: string
+          created_at?: string | null
+          id?: string
+          last_practiced_at?: string | null
+          level?: number | null
+          practices_completed?: number | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          characteristic_name?: string
+          created_at?: string | null
+          id?: string
+          last_practiced_at?: string | null
+          level?: number | null
+          practices_completed?: number | null
+          updated_at?: string | null
+          user_id?: string
         }
         Relationships: []
       }
