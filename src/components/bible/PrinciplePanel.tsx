@@ -214,7 +214,7 @@ export const PrinciplePanel = ({ book, chapter, verse, verseText, onClose }: Pri
             </TabsTrigger>
             <TabsTrigger value="cross-refs">
               <ExternalLink className="h-4 w-4 mr-1" />
-              Scripture Link
+              Principle Links
             </TabsTrigger>
             <TabsTrigger value="christ">
               <Heart className="h-4 w-4 mr-1" />
