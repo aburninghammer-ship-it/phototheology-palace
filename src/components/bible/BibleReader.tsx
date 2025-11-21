@@ -233,9 +233,9 @@ export const BibleReader = () => {
         verseText={selectedVerse ? chapterData.verses.find(v => v.verse === selectedVerse)?.text || "" : ""}
       />
 
-      <div className="grid lg:grid-cols-3 gap-6">
+      <div className="grid md:grid-cols-3 gap-6">
         {/* Main Reading Pane */}
-        <div className="lg:col-span-2">
+        <div className="md:col-span-2">
           <Card className={`p-6 shadow-elegant hover:shadow-hover transition-smooth ${preferences.reading_mode === 'focus' ? 'max-w-3xl mx-auto' : ''}`}>
             <div className={`space-y-4 ${fontSizeClass}`}>
               {strongsMode ? (
@@ -268,7 +268,7 @@ export const BibleReader = () => {
         </div>
 
         {/* Right Panel - Jeeves Assistant with Tabs */}
-        <div className="lg:col-span-1">
+        <div className="md:col-span-1">
           <Card className="p-6 sticky top-24">
             <Tabs defaultValue="links" className="w-full">
               <TabsList className="grid w-full grid-cols-3">
