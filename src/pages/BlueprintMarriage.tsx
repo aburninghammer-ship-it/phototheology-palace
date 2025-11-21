@@ -85,6 +85,16 @@ export default function BlueprintMarriage() {
                   buttonText="Share This Resource"
                 />
               </div>
+              
+              {/* Sanctuary Explanation */}
+              <div className="max-w-4xl mx-auto bg-muted/30 p-8 rounded-lg border-2 border-primary/30">
+                <div className="prose prose-sm max-w-none dark:prose-invert">
+                  <div className="whitespace-pre-line text-base leading-relaxed">
+                    {MARRIAGE_BLUEPRINT_INTRO.sanctuaryExplanation}
+                  </div>
+                </div>
+              </div>
+
               <div className="max-w-3xl mx-auto bg-primary/5 p-6 rounded-lg border border-primary/20">
                 <p className="text-base leading-relaxed whitespace-pre-line">
                   {MARRIAGE_BLUEPRINT_INTRO.description}

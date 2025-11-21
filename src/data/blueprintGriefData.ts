@@ -363,6 +363,42 @@ but because God sits above it.`,
 export const GRIEF_BLUEPRINT_INTRO = {
   title: "The Sanctuary Blueprint for Grieving",
   subtitle: "How God's Six-Step Pattern Leads You Through Shock, Pain, Lament, Hope, and Restoration",
+  sanctuaryExplanation: `**Understanding the Hebrew Sanctuary**
+
+In the Old Testament, God gave Moses a detailed pattern for the sanctuary (Exodus 25:8-9)—a sacred tent where God's presence would dwell among His people. This wasn't just a building; it was a divine blueprint showing humanity how to approach a holy God.
+
+The sanctuary contained six primary articles of furniture, arranged in a specific order:
+
+1. **Altar of Sacrifice** (Outer Court) - Where animals were sacrificed; death to sin
+2. **The Laver** (Outer Court) - A bronze basin for washing; cleansing and reflection
+3. **Table of Shewbread** (Holy Place) - Twelve loaves of bread; daily provision and fellowship
+4. **Golden Candlestick** (Holy Place) - Seven-branched lampstand; light and revelation
+5. **Altar of Incense** (Holy Place) - Fragrant smoke rising; prayer and worship
+6. **Ark of the Covenant** (Most Holy Place) - God's throne; His presence, law, and mercy
+
+**God's Way is for EVERY Area of Life**
+
+Here's the revelation: The sanctuary pattern wasn't just for worship services. It's God's master blueprint for how He works in every dimension of human life. The same God who designed the path to His presence also designed the path to freedom, healing, relationships, and restoration.
+
+The sanctuary principles apply to:
+• Breaking strongholds and addictions
+• Navigating grief and loss
+• Building healthy relationships and marriages
+• Personal transformation and sanctification
+• Emotional healing and mental renewal
+• Spiritual warfare and victory
+
+**Practical Application for Life**
+
+When you understand the sanctuary pattern, you unlock God's methodology for life change. Just as the Israelite couldn't skip the altar and jump straight into God's presence, we cannot skip the necessary steps in our own journey toward freedom, healing, or covenant relationships.
+
+The sanctuary teaches us that transformation is:
+• **Progressive** - Each step prepares you for the next
+• **Ordered** - Sequence matters; you can't skip stages
+• **Architectural** - Built with intention, not left to chance
+• **Christ-Centered** - Every piece points to Jesus, our ultimate High Priest
+
+This blueprint reveals that God's way is not random or chaotic. He has a pattern, a process, and a path. Whether you're fighting sin, grieving loss, or building a marriage—the sanctuary shows you the way.`,
   description: `Grief is sacred terrain.
 The sanctuary is God's map through that terrain.
 
