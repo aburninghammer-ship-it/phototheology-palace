@@ -83,7 +83,19 @@ export const SocialMediaConnect = () => {
         },
       });
 
-      if (error) throw error;
+      if (error) {
+        if (error.message?.includes('not enabled') || error.message?.includes('Provider')) {
+          toast({
+            title: "OAuth Not Configured",
+            description: `${platform.charAt(0).toUpperCase() + platform.slice(1)} OAuth is not set up yet. Please contact the administrator to configure social media integrations.`,
+            variant: "destructive",
+          });
+        } else {
+          throw error;
+        }
+        setConnecting(null);
+        return;
+      }
 
       toast({
         title: "Redirecting...",
