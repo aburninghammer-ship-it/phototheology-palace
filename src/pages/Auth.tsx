@@ -8,7 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Building2, Sparkles, Mail, Lock, User, Loader2 } from "lucide-react";
+import { Sword, Shield, Sparkles, Mail, Lock, User, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { z } from "zod";
 
@@ -260,16 +260,14 @@ export default function Auth() {
       <div className="w-full max-w-md">
         {/* Logo Header */}
         <Link to="/" className="block text-center mb-8 group">
-          <div className="inline-flex items-center gap-2 mb-4">
-            <div className="relative">
-              <Building2 className="h-12 w-12 text-primary transition-transform group-hover:scale-110" />
-              <Sparkles className="h-5 w-5 text-accent absolute -top-1 -right-1 animate-pulse-glow" />
-            </div>
+          <div className="inline-flex items-center justify-center gap-3 mb-4">
+            <Sword className="h-12 w-12 text-primary transition-transform group-hover:rotate-12" />
+            <Shield className="h-12 w-12 text-primary transition-transform group-hover:scale-110" />
           </div>
           <h1 className="text-4xl font-serif font-bold bg-gradient-palace bg-clip-text text-transparent mb-2">
-            Phototheology
+            Christian Art of War Dojo
           </h1>
-          <p className="text-muted-foreground">The Palace of Biblical Wisdom</p>
+          <p className="text-muted-foreground">Train Your Spirit, Master the Battle Within</p>
         </Link>
 
         <Card className="glass-card">
