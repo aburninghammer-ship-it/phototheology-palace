@@ -243,7 +243,7 @@ export const Navigation = () => {
                     className="px-3 py-1.5 text-sm font-medium text-foreground hover:text-primary hover:bg-accent/50 rounded-md transition-colors whitespace-nowrap flex items-center gap-1"
                   >
                     <BookOpen className="h-3.5 w-3.5" />
-                    Bible
+                    PSB
                   </Link>
                   <Link 
                     to="/reading-plans" 

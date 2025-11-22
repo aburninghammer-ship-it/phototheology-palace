@@ -39,7 +39,7 @@ const categoryConfig = {
     title: "Study",
     icon: BookOpen,
     links: [
-      { to: "/bible", label: "Bible Reader", icon: "📖" },
+      { to: "/bible", label: "Phototheology Study Bible (PSB)", icon: "📖" },
       { to: "/my-studies", label: "My Studies", icon: "📝" },
       { to: "/palace/floor/1/room/gr", label: "Produce a Gem", icon: "💎" },
       { to: "/verse-memory-hall", label: "Verse Memory", icon: "🧠" },
