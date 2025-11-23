@@ -127,7 +127,9 @@ serve(async (req) => {
       roomTag, 
       roomName, 
       principle, 
-      mode, 
+      mode,
+      message,
+      context: requestContext,
       book, 
       chapter, 
       verses, 
@@ -322,7 +324,22 @@ Return as JSON array with objects containing: verse, text, connection, principle
     let systemPrompt = "";
     let userPrompt = "";
 
-    if (mode === "strongs-lookup") {
+    // Handle simple demo/message mode
+    if (requestContext === "demo" || (message && !mode)) {
+      systemPrompt = `You are Jeeves, a friendly AI study assistant who helps people understand the Bible using Phototheology principles. 
+
+You're warm, knowledgeable, and accessible. When answering questions:
+- Be concise but insightful (2-3 short paragraphs)
+- Use relevant Bible verses
+- Show how Phototheology principles can illuminate the passage
+- Use emojis appropriately (📖 ✨ 🔍 💡)
+- Format with clear paragraph breaks
+- Keep it conversational and encouraging
+
+${PALACE_SCHEMA}`;
+
+      userPrompt = message || "Tell me about Phototheology and how it helps with Bible study.";
+    } else if (mode === "strongs-lookup") {
       // Import biblesdk for Strong's lookup
       const { getVerses } = await import('npm:biblesdk@0.4.0');
       

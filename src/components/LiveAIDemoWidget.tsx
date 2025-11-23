@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Sparkles, Send, Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/hooks/useAuth";
 
 const SAMPLE_QUESTIONS = [
   "What does Genesis 22 teach about faith?",
@@ -18,6 +19,7 @@ export const LiveAIDemoWidget = () => {
   const [response, setResponse] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
+  const { user } = useAuth();
 
   const handleAsk = async (questionText?: string) => {
     const q = questionText || question;
@@ -36,15 +38,19 @@ export const LiveAIDemoWidget = () => {
 
       if (error) throw error;
 
-      setResponse(data.response);
+      setResponse(data.content || data.response || "No response received");
     } catch (error) {
       console.error('Error asking Jeeves:', error);
+      const errorMessage = user 
+        ? "Unable to process your question. Please try again."
+        : "This is a preview. Sign up to chat with Jeeves, your AI study assistant who knows the Phototheology Palace method inside and out!";
+      
       toast({
-        title: "Demo unavailable",
-        description: "Please sign up to access the full AI assistant",
+        title: user ? "Error" : "Demo unavailable",
+        description: user ? "Please try again" : "Please sign up to access the full AI assistant",
         variant: "destructive",
       });
-      setResponse("This is a preview. Sign up to chat with Jeeves, your AI study assistant who knows the Phototheology Palace method inside and out!");
+      setResponse(errorMessage);
     } finally {
       setIsLoading(false);
     }
