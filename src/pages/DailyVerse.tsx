@@ -9,6 +9,8 @@ import { toast } from "sonner";
 import { useAuth } from "@/hooks/useAuth";
 
 interface PrincipleBreakdown {
+  principle_revealed: string;
+  principle_applied: string;
   principle_code: string;
   principle_name: string;
   application: string;
@@ -164,16 +166,29 @@ export default function DailyVerse() {
               Palace Principles Applied
             </CardTitle>
             <CardDescription>
-              Today we're exploring this verse through {todayVerse.principles_used.length} powerful principles
+              Today we're exploring this verse through 7 powerful principles
             </CardDescription>
           </CardHeader>
-          <CardContent>
-            <div className="flex flex-wrap gap-2">
-              {todayVerse.principles_used.map((code) => (
-                <Badge key={code} variant="outline">
-                  {code}
-                </Badge>
-              ))}
+          <CardContent className="space-y-4">
+            <div>
+              <h4 className="font-semibold mb-2 text-sm">Principles Revealed (Categories)</h4>
+              <div className="flex flex-wrap gap-2">
+                {todayVerse.breakdown.breakdown.map((item, idx) => (
+                  <Badge key={`revealed-${idx}`} variant="secondary">
+                    {item.principle_revealed}
+                  </Badge>
+                ))}
+              </div>
+            </div>
+            <div>
+              <h4 className="font-semibold mb-2 text-sm">Principles Applied (Specific Applications)</h4>
+              <div className="flex flex-wrap gap-2">
+                {todayVerse.breakdown.breakdown.map((item, idx) => (
+                  <Badge key={`applied-${idx}`} variant="outline">
+                    {item.principle_applied}
+                  </Badge>
+                ))}
+              </div>
             </div>
           </CardContent>
         </Card>
@@ -183,10 +198,16 @@ export default function DailyVerse() {
           {todayVerse.breakdown.breakdown.map((item, index) => (
             <Card key={index}>
               <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-lg">
-                  <Badge>{item.principle_code}</Badge>
-                  {item.principle_name}
-                </CardTitle>
+                <div className="space-y-2">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <Badge variant="secondary">{item.principle_revealed}</Badge>
+                    <span className="text-muted-foreground">→</span>
+                    <Badge>{item.principle_applied}</Badge>
+                  </div>
+                  <CardTitle className="text-lg">
+                    {item.principle_name}
+                  </CardTitle>
+                </div>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div>

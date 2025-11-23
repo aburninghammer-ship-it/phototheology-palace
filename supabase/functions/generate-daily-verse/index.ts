@@ -6,29 +6,37 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
+// Genre codes for Connect 6
+const GENRE_CODES = {
+  gospel: "📖Gospel",
+  law: "⚖️Law", 
+  history: "📜History",
+  poetry: "🎵Poetry",
+  prophecy: "🔮Prophecy",
+  epistle: "✉️Epistle"
+};
+
 // Palace principles that can be applied
 const PALACE_PRINCIPLES = [
-  { code: "SR", name: "Story Room", description: "Turn verse into vivid mental movie with concrete imagery" },
-  { code: "IR", name: "Imagination Room", description: "Immerse yourself IN the scene - sensory details as if present" },
-  { code: "OR", name: "Observation Room", description: "Notice specific details, literary devices, textual clues" },
-  { code: "DC", name: "Def-Com", description: "Examine Greek/Hebrew meanings and context" },
-  { code: "ST", name: "Symbols/Types", description: "Identify concrete symbols/types pointing to Christ (e.g., lamb=Christ)" },
-  { code: "CR", name: "Concentration Room", description: "Show HOW Christ is revealed in this verse" },
-  { code: "DR", name: "Dimensions Room", description: "Move through MULTIPLE dimensions showing meaning unfold (Literal→Christ→Me→Church→Heaven)" },
-  { code: "C6", name: "Connect 6", description: "Connect to SPECIFIC verse from DIFFERENT genre with full reference" },
-  { code: "TRm", name: "Theme Room", description: "Map to Palace walls (Sanctuary, Life of Christ, Great Controversy, etc.)" },
-  { code: "TZ", name: "Time Zone (6 zones)", description: "Map to specific zones: EARTH Past/Present/Future and HEAVEN Past/Present/Future" },
-  { code: "PRm", name: "Patterns Room", description: "Name pattern and give at least one other biblical example with reference" },
-  { code: "P‖", name: "Parallels Room", description: "Cite at least ONE specific parallel event with reference" },
-  { code: "FRt", name: "Fruit Room", description: "Name specific Christlike character trait this cultivates" },
-  { code: "BL", name: "Blue Room", description: "Connect to specific sanctuary furniture/services" },
-  { code: "PR", name: "Prophecy Room", description: "Align with prophetic timelines" },
-  { code: "@Cycles", name: "Cycles Room", description: "Identify which cycle this belongs to and connect to another cycle" },
-  { code: "@Ad", name: "Adamic Cycle", description: "First cycle: Fall → Promise → Seed conflict" },
-  { code: "@Mo", name: "Mosaic Cycle", description: "Exodus → Covenant → Sanctuary nation" },
-  { code: "@CyC", name: "Cyrus-Christ Cycle", description: "Type meets antitype in Christ" },
-  { code: "@Sp", name: "Spirit Cycle", description: "Church age under Spirit power" },
-  { code: "@Re", name: "Remnant Cycle", description: "Final witness before Second Coming" }
+  { code: "SR", name: "Story Room", description: "Turn verse into vivid mental movie with concrete imagery", category: "1st Floor" },
+  { code: "IR", name: "Imagination Room", description: "Immerse yourself IN the scene - sensory details as if present", category: "1st Floor" },
+  { code: "OR", name: "Observation Room", description: "Notice specific details, literary devices, textual clues", category: "2nd Floor" },
+  { code: "DC", name: "Def-Com", description: "Examine Greek/Hebrew meanings and context", category: "2nd Floor" },
+  { code: "ST", name: "Symbols/Types", description: "Identify concrete symbols/types pointing to Christ (e.g., lamb=Christ)", category: "2nd Floor" },
+  { code: "CR", name: "Concentration Room", description: "Show HOW Christ is revealed in this verse", category: "4th Floor" },
+  { code: "DR", name: "Dimensions Room", description: "Move through MULTIPLE dimensions showing meaning unfold (Literal→Christ→Me→Church→Heaven)", category: "4th Floor" },
+  { code: "TRm", name: "Theme Room", description: "Map to Palace walls (Sanctuary, Life of Christ, Great Controversy, etc.)", category: "4th Floor" },
+  { code: "TZ", name: "Time Zone (6 zones)", description: "Map to specific zones: EARTH Past/Present/Future and HEAVEN Past/Present/Future", category: "4th Floor" },
+  { code: "PRm", name: "Patterns Room", description: "Name pattern and give at least one other biblical example with reference", category: "4th Floor" },
+  { code: "P‖", name: "Parallels Room", description: "Cite at least ONE specific parallel event with reference", category: "4th Floor" },
+  { code: "FRt", name: "Fruit Room", description: "Name specific Christlike character trait this cultivates", category: "4th Floor" },
+  { code: "BL", name: "Blue Room", description: "Connect to specific sanctuary furniture/services", category: "5th Floor" },
+  { code: "PR", name: "Prophecy Room", description: "Align with prophetic timelines", category: "5th Floor" },
+  { code: "@Ad", name: "Adamic Cycle", description: "First cycle: Fall → Promise → Seed conflict", category: "6th Floor" },
+  { code: "@Mo", name: "Mosaic Cycle", description: "Exodus → Covenant → Sanctuary nation", category: "6th Floor" },
+  { code: "@CyC", name: "Cyrus-Christ Cycle", description: "Type meets antitype in Christ", category: "6th Floor" },
+  { code: "@Sp", name: "Spirit Cycle", description: "Church age under Spirit power", category: "6th Floor" },
+  { code: "@Re", name: "Remnant Cycle", description: "Final witness before Second Coming", category: "6th Floor" }
 ];
 
 serve(async (req) => {
@@ -60,8 +68,8 @@ serve(async (req) => {
       );
     }
     
-    // Select 3-7 random principles
-    const numPrinciples = 3 + Math.floor(Math.random() * 5); // 3 to 7
+    // Always select exactly 7 principles
+    const numPrinciples = 7;
     const shuffled = [...PALACE_PRINCIPLES].sort(() => Math.random() - 0.5);
     const selectedPrinciples = shuffled.slice(0, numPrinciples);
     
@@ -72,14 +80,21 @@ serve(async (req) => {
     // Generate breakdown using Lovable AI with specific instructions per principle
     const principlesDesc = selectedPrinciples.map(p => `- ${p.code} (${p.name}): ${p.description}`).join('\n');
     
-    const prompt = `You are a Phototheology expert analyzing Scripture. Break down this verse using EXACTLY AND ONLY the following ${numPrinciples} palace principles listed below.
+    const prompt = `You are a Phototheology expert analyzing Scripture. Break down this verse using EXACTLY 7 palace principles listed below.
 
-**CRITICAL**: You MUST use ONLY these ${numPrinciples} principles - do NOT add any other principles or codes not listed here:
+**CRITICAL**: You MUST use EXACTLY these 7 principles - do NOT add any other principles or codes not listed here:
 
 ${principlesDesc}
 
 Verse: ${verseReference}
 "${verseText}"
+
+**GENRE IDENTIFICATION**: First, identify what genre/category this verse belongs to (Gospel, Law, History, Poetry, Prophecy, or Epistle). This will be the "principle_revealed".
+
+**SPECIFIC CODES FOR MULTI-CATEGORY PRINCIPLES**:
+- For Connect 6: Use specific genre codes (📖Gospel, ⚖️Law, 📜History, 🎵Poetry, 🔮Prophecy, ✉️Epistle) not "C6"
+- For Time Zone: Use specific zone codes (🌍Past, 🌍Now, 🌍Future, ☁️Past, ☁️Now, ☁️Future) not "TZ"
+- For Cycles: Use specific cycle codes (@Ad, @Mo, @CyC, @Sp, @Re) not "@Cycles"
 
 CRITICAL INSTRUCTIONS FOR EACH PRINCIPLE TYPE:
 
@@ -117,27 +132,31 @@ Example: "This verse spans multiple zones: EARTH Past - the cross event (He gave
 
 **Cycles Room (@Cycles)**: Identify which cycle this verse belongs to (e.g., @CyC for Gospel era, @Mo for Exodus era) AND connect to another cycle. Example: "This @CyC (Christ) verse echoes @Mo (Mosaic) - as Moses lifted the serpent (Num 21:9), so Christ was lifted up."
 
-For EACH principle listed above (EXACTLY ${numPrinciples} principles, no more, no less), provide:
-1. application: A specific, concrete application showing HOW the principle is applied to this verse (not just what the principle is)
-2. key_insight: A memorable "gem" that comes from applying this principle
-3. practical_takeaway: A clear action step the reader can take today
+For EACH of the 7 principles listed above, provide:
+1. principle_revealed: The CATEGORY this verse belongs to (e.g., "📖Gospel" if it's from a Gospel)
+2. principle_applied: The SPECIFIC code applied (use specific genre/zone/cycle codes, not general room codes)
+3. application: A specific, concrete application showing HOW the principle is applied
+4. key_insight: A memorable "gem" from this application
+5. practical_takeaway: A clear action step
 
-**CRITICAL VALIDATION**: Your response MUST contain EXACTLY ${numPrinciples} items in the breakdown array, using ONLY the principle codes listed above. Do NOT add any additional principles or codes.
+**CRITICAL VALIDATION**: Your response MUST contain EXACTLY 7 items in the breakdown array.
 
 Format your response as a structured JSON with this exact schema:
 {
   "breakdown": [
     {
-      "principle_code": "code from the list above ONLY",
-      "principle_name": "name from the list above ONLY",
-      "application": "specific, concrete application showing HOW this principle reveals something in the verse",
-      "key_insight": "memorable insight from this application",
+      "principle_revealed": "category this verse belongs to (e.g., 📖Gospel, 🎵Poetry, etc.)",
+      "principle_applied": "specific code applied (e.g., 📜History for C6 connection, 🌍Now for TZ, @Mo for cycles)",
+      "principle_code": "code from principles list",
+      "principle_name": "name from principles list",
+      "application": "specific, concrete application",
+      "key_insight": "memorable insight",
       "practical_takeaway": "clear action step"
     }
   ]
 }
 
-Make it engaging, Christ-centered, specific, and practically applicable. Remember: ONLY use the ${numPrinciples} principles explicitly listed above.`;
+Make it engaging, Christ-centered, specific, and practically applicable. Remember: Use EXACTLY 7 principles with specific category codes.`;
 
     const aiResponse = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
       method: 'POST',
