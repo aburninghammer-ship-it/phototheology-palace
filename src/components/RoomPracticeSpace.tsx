@@ -160,37 +160,61 @@ export function RoomPracticeSpace({ floorNumber, roomId, roomName, roomPrinciple
   };
 
   const handleStartAIPractice = async () => {
-    const reference = prompt("Enter verse or chapter reference (e.g., John 3:16, Genesis 22):");
-    if (!reference) return;
+    const choice = confirm(
+      "Would you like to:\n\n" +
+      "✅ Click OK to use a Bible verse/chapter\n" +
+      "❌ Click Cancel to input your own story"
+    );
 
-    try {
-      setLoadingBibleText(true);
-      setPracticeVerseRef(reference);
-      
-      // Fetch Bible text from the Bible API
-      const book = reference.split(/\s+/)[0];
-      const rest = reference.substring(book.length).trim();
-      const [chapterStr] = rest.split(':');
-      const chapter = parseInt(chapterStr);
+    if (choice) {
+      // Bible reference option
+      const reference = prompt("Enter verse or chapter reference (e.g., John 3:16, Genesis 22):");
+      if (!reference) return;
 
-      const { data, error } = await supabase.functions.invoke('bible-api', {
-        body: { book, chapter, version: 'kjv' }
-      });
+      try {
+        setLoadingBibleText(true);
+        setPracticeVerseRef(reference);
+        
+        // Fetch Bible text from the Bible API
+        const book = reference.split(/\s+/)[0];
+        const rest = reference.substring(book.length).trim();
+        const [chapterStr] = rest.split(':');
+        const chapter = parseInt(chapterStr);
 
-      if (error) throw error;
+        const { data, error } = await supabase.functions.invoke('bible-api', {
+          body: { book, chapter, version: 'kjv' }
+        });
 
-      if (data?.verses) {
-        const text = data.verses.map((v: any) => `${v.verse} ${v.text}`).join('\n');
-        setPracticeBibleText(text);
-        setShowAIPractice(true);
-      } else {
-        throw new Error('No Bible text found');
+        if (error) throw error;
+
+        if (data?.verses) {
+          const text = data.verses.map((v: any) => `${v.verse} ${v.text}`).join('\n');
+          setPracticeBibleText(text);
+          setShowAIPractice(true);
+        } else {
+          throw new Error('No Bible text found');
+        }
+      } catch (error) {
+        console.error("Error fetching Bible text:", error);
+        toast.error("Could not load Bible text. Please check the reference and try again.");
+      } finally {
+        setLoadingBibleText(false);
       }
-    } catch (error) {
-      console.error("Error fetching Bible text:", error);
-      toast.error("Could not load Bible text. Please check the reference and try again.");
-    } finally {
-      setLoadingBibleText(false);
+    } else {
+      // Custom story option
+      const storyTitle = prompt("Enter a title for your story (e.g., David and Goliath, The Prodigal Son):");
+      if (!storyTitle) return;
+
+      const storyContent = prompt(
+        "Enter your story or text:\n\n" +
+        "(You can paste any story, personal experience, or text you'd like to practice with)"
+      );
+      
+      if (!storyContent) return;
+
+      setPracticeVerseRef(storyTitle);
+      setPracticeBibleText(storyContent);
+      setShowAIPractice(true);
     }
   };
 

@@ -80,7 +80,7 @@ export function BiblePracticeTile({
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <BookOpen className="h-5 w-5 text-primary" />
-            <CardTitle>Bible Practice with AI Feedback</CardTitle>
+            <CardTitle>Practice with AI Feedback</CardTitle>
           </div>
           {onClose && (
             <Button variant="ghost" size="sm" onClick={onClose}>
@@ -104,14 +104,14 @@ export function BiblePracticeTile({
               size="sm"
               onClick={() => setShowBible(!showBible)}
             >
-              {showBible ? "Hide Text" : "Show Text"}
+              {showBible ? "Hide" : "Show"}
             </Button>
           </div>
           
           {showBible && (
             <ScrollArea className="h-48 rounded-lg border bg-muted/30 p-4">
               <p className="text-sm leading-relaxed whitespace-pre-wrap">
-                {bibleText || "Loading Bible text..."}
+                {bibleText || "Loading text..."}
               </p>
             </ScrollArea>
           )}
@@ -170,7 +170,7 @@ export function BiblePracticeTile({
         {/* Instructions */}
         <Alert>
           <AlertDescription className="text-xs">
-            <strong>How it works:</strong> Read the Bible text above, write your practice applying the {roomName} principle, then click "Get AI Feedback" for personalized mentoring on your work.
+            <strong>How it works:</strong> Read the text above, write your practice applying the {roomName} principle, then click "Get AI Feedback" for personalized mentoring on your work.
           </AlertDescription>
         </Alert>
       </CardContent>
