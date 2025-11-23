@@ -96,6 +96,7 @@ const TournamentDetail = lazy(() => import("./pages/TournamentDetail"));
 const CriticsAnalysis = lazy(() => import("./pages/CriticsAnalysis"));
 const Referrals = lazy(() => import("./pages/Referrals"));
 const StudentVerification = lazy(() => import("./pages/StudentVerification"));
+const DeleteAccount = lazy(() => import("./pages/DeleteAccount"));
 const AccessCode = lazy(() => import("./pages/AccessCode"));
 import AdminAccessCodes from "./pages/AdminAccessCodes";
 const AdminSubscriptions = lazy(() => import("./pages/AdminSubscriptions"));
@@ -327,6 +328,7 @@ function App() {
             <Route path="/church-signup/cancelled" element={<ChurchSignupCancelled />} />
             <Route path="/privacy-policy" element={<PrivacyPolicy />} />
             <Route path="/terms-of-service" element={<TermsOfService />} />
+            <Route path="/delete-account" element={<DeleteAccount />} />
             <Route path="/branch-study" element={
               <Suspense fallback={<LoadingScreen />}>
                 <BranchStudy />
