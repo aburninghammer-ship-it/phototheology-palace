@@ -1,11 +1,14 @@
 import { SimplifiedNav } from "@/components/SimplifiedNav";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { MasteryBadge } from "@/components/mastery/MasteryBadge";
 import { XpProgressBar } from "@/components/mastery/XpProgressBar";
+import { MasteryMap } from "@/components/mastery/MasteryMap";
+import { ReportCardDisplay } from "@/components/mastery/ReportCardDisplay";
 import { useMastery, useAllRoomMasteries, useGlobalMasterTitle } from "@/hooks/useMastery";
 import { useMasteryStreak } from "@/hooks/useMasteryStreak";
-import { Flame, Trophy, Crown, Target, TrendingUp, Zap } from "lucide-react";
+import { Flame, Trophy, Crown, Target, TrendingUp, Zap, Map as MapIcon, FileText } from "lucide-react";
 import { getGlobalTitle, getNextGlobalTitleMilestone } from "@/utils/masteryCalculations";
 
 export default function MasteryDashboard() {
@@ -95,122 +98,151 @@ export default function MasteryDashboard() {
           </Card>
         </div>
 
-        {/* Demo Section */}
-        <Card className="mb-8 bg-gradient-to-br from-primary/5 to-accent/5 border-primary/20">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Zap className="h-5 w-5 text-primary" />
-              Demo Room - Test the System
-            </CardTitle>
-            <CardDescription>
-              Try out the mastery system by earning XP in this demo room
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            {demoRoom.mastery && (
-              <>
-                <div className="flex items-center gap-4">
-                  <MasteryBadge level={demoRoom.mastery.mastery_level} size="lg" />
-                  <div className="flex-1">
-                    <div className="text-sm text-muted-foreground mb-1">
-                      Level {demoRoom.mastery.mastery_level} Progress
-                    </div>
-                    <XpProgressBar
-                      currentXp={demoRoom.mastery.xp_current}
-                      xpRequired={demoRoom.mastery.xp_required}
-                      level={demoRoom.mastery.mastery_level}
-                      showLabel={false}
-                    />
-                  </div>
-                </div>
-                
-                <div className="flex gap-2">
-                  <Button
-                    onClick={handleAwardDemoXp}
-                    disabled={demoRoom.isAwarding}
-                    className="flex-1"
-                  >
-                    <Target className="mr-2 h-4 w-4" />
-                    Complete Perfect Drill (+90 XP)
-                  </Button>
-                </div>
+        {/* Tabbed Content */}
+        <Tabs defaultValue="overview" className="space-y-6">
+          <TabsList className="grid w-full grid-cols-3">
+            <TabsTrigger value="overview">Overview</TabsTrigger>
+            <TabsTrigger value="map">
+              <MapIcon className="h-4 w-4 mr-2" />
+              Map
+            </TabsTrigger>
+            <TabsTrigger value="reports">
+              <FileText className="h-4 w-4 mr-2" />
+              Reports
+            </TabsTrigger>
+          </TabsList>
 
-                <div className="grid grid-cols-3 gap-4 p-4 bg-background/50 rounded-lg">
-                  <div className="text-center">
-                    <div className="text-2xl font-bold">
-                      {demoRoom.mastery.total_drills_completed}
+          <TabsContent value="overview" className="space-y-6">
+            {/* Demo Section */}
+            <Card className="bg-gradient-to-br from-primary/5 to-accent/5 border-primary/20">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Zap className="h-5 w-5 text-primary" />
+                  Demo Room - Test the System
+                </CardTitle>
+                <CardDescription>
+                  Try out the mastery system by earning XP in this demo room
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {demoRoom.mastery && (
+                  <>
+                    <div className="flex items-center gap-4">
+                      <MasteryBadge level={demoRoom.mastery.mastery_level} size="lg" />
+                      <div className="flex-1">
+                        <div className="text-sm text-muted-foreground mb-1">
+                          Level {demoRoom.mastery.mastery_level} Progress
+                        </div>
+                        <XpProgressBar
+                          currentXp={demoRoom.mastery.xp_current}
+                          xpRequired={demoRoom.mastery.xp_required}
+                          level={demoRoom.mastery.mastery_level}
+                          showLabel={false}
+                        />
+                      </div>
                     </div>
-                    <div className="text-xs text-muted-foreground">Drills</div>
-                  </div>
-                  <div className="text-center">
-                    <div className="text-2xl font-bold">
-                      {demoRoom.mastery.total_exercises_completed}
+                    
+                    <div className="flex gap-2">
+                      <Button
+                        onClick={handleAwardDemoXp}
+                        disabled={demoRoom.isAwarding}
+                        className="flex-1"
+                      >
+                        <Target className="mr-2 h-4 w-4" />
+                        Complete Perfect Drill (+90 XP)
+                      </Button>
                     </div>
-                    <div className="text-xs text-muted-foreground">Exercises</div>
-                  </div>
-                  <div className="text-center">
-                    <div className="text-2xl font-bold">
-                      {demoRoom.mastery.perfect_scores_count}
-                    </div>
-                    <div className="text-xs text-muted-foreground">Perfect Scores</div>
-                  </div>
-                </div>
-              </>
-            )}
-          </CardContent>
-        </Card>
 
-        {/* All Rooms Progress */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <TrendingUp className="h-5 w-5" />
-              All Rooms Progress
-            </CardTitle>
-            <CardDescription>
-              Your mastery levels across all Palace rooms
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            {allMasteries && allMasteries.length > 0 ? (
-              <div className="space-y-4">
-                {allMasteries.map((mastery) => (
-                  <div
-                    key={mastery.id}
-                    className="flex items-center gap-4 p-4 rounded-lg border bg-card/50 hover:bg-card/80 transition-colors"
-                  >
-                    <MasteryBadge level={mastery.mastery_level} size="md" showTitle={false} />
-                    <div className="flex-1 min-w-0">
-                      <div className="font-semibold truncate">
-                        Floor {mastery.floor_number} - {mastery.room_id}
+                    <div className="grid grid-cols-3 gap-4 p-4 bg-background/50 rounded-lg">
+                      <div className="text-center">
+                        <div className="text-2xl font-bold">
+                          {demoRoom.mastery.total_drills_completed}
+                        </div>
+                        <div className="text-xs text-muted-foreground">Drills</div>
                       </div>
-                      <XpProgressBar
-                        currentXp={mastery.xp_current}
-                        xpRequired={mastery.xp_required}
-                        level={mastery.mastery_level}
-                        className="mt-2"
-                      />
-                    </div>
-                    <div className="text-right">
-                      <div className="text-sm font-semibold">
-                        {mastery.total_drills_completed + mastery.total_exercises_completed}
+                      <div className="text-center">
+                        <div className="text-2xl font-bold">
+                          {demoRoom.mastery.total_exercises_completed}
+                        </div>
+                        <div className="text-xs text-muted-foreground">Exercises</div>
                       </div>
-                      <div className="text-xs text-muted-foreground">activities</div>
+                      <div className="text-center">
+                        <div className="text-2xl font-bold">
+                          {demoRoom.mastery.perfect_scores_count}
+                        </div>
+                        <div className="text-xs text-muted-foreground">Perfect Scores</div>
+                      </div>
                     </div>
+                  </>
+                )}
+              </CardContent>
+            </Card>
+
+            {/* All Rooms Progress */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <TrendingUp className="h-5 w-5" />
+                  All Rooms Progress
+                </CardTitle>
+                <CardDescription>
+                  Your mastery levels across all Palace rooms
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                {allMasteries && allMasteries.length > 0 ? (
+                  <div className="space-y-4">
+                    {allMasteries.map((mastery) => (
+                      <div
+                        key={mastery.id}
+                        className="flex items-center gap-4 p-4 rounded-lg border bg-card/50 hover:bg-card/80 transition-colors"
+                      >
+                        <MasteryBadge level={mastery.mastery_level} size="md" showTitle={false} />
+                        <div className="flex-1 min-w-0">
+                          <div className="font-semibold truncate">
+                            Floor {mastery.floor_number} - {mastery.room_id}
+                          </div>
+                          <XpProgressBar
+                            currentXp={mastery.xp_current}
+                            xpRequired={mastery.xp_required}
+                            level={mastery.mastery_level}
+                            className="mt-2"
+                          />
+                        </div>
+                        <div className="text-right">
+                          <div className="text-sm font-semibold">
+                            {mastery.total_drills_completed + mastery.total_exercises_completed}
+                          </div>
+                          <div className="text-xs text-muted-foreground">activities</div>
+                        </div>
+                      </div>
+                    ))}
                   </div>
-                ))}
-              </div>
-            ) : (
-              <div className="text-center py-12 text-muted-foreground">
-                <Target className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                <p className="text-lg font-medium mb-2">No Progress Yet</p>
-                <p className="text-sm">
-                  Start practicing in Palace rooms to build your mastery!
-                </p>
-              </div>
-            )}
-          </CardContent>
-        </Card>
+                ) : (
+                  <div className="text-center py-12 text-muted-foreground">
+                    <Target className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                    <p className="text-lg font-medium mb-2">No Progress Yet</p>
+                    <p className="text-sm">
+                      Start practicing in Palace rooms to build your mastery!
+                    </p>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="map">
+            <MasteryMap />
+          </TabsContent>
+
+          <TabsContent value="reports">
+            <ReportCardDisplay
+              roomId="demo-room"
+              roomName="Demo Room"
+              currentLevel={demoRoom.mastery?.mastery_level || 1}
+            />
+          </TabsContent>
+        </Tabs>
       </div>
     </div>
   );

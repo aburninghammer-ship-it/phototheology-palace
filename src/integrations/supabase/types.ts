@@ -3148,6 +3148,36 @@ export type Database = {
         }
         Relationships: []
       }
+      room_report_cards: {
+        Row: {
+          created_at: string
+          id: string
+          mastery_level: number
+          report_data: Json
+          room_id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          mastery_level: number
+          report_data: Json
+          room_id: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          mastery_level?: number
+          report_data?: Json
+          room_id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       sermon_titles: {
         Row: {
           created_at: string | null
