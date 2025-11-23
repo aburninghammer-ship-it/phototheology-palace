@@ -31,6 +31,10 @@ import { RoomMentorChat } from "@/components/mastery/RoomMentorChat";
 import { ReportCardDisplay } from "@/components/mastery/ReportCardDisplay";
 import { useFocusedRoom } from "@/hooks/useFocusedRoom";
 import { MasteryOnboarding } from "@/components/mastery/MasteryOnboarding";
+import { TrainingDashboard } from "@/components/mastery/TrainingDashboard";
+import { ContinueTraining } from "@/components/mastery/ContinueTraining";
+import { MilestoneTest } from "@/components/mastery/MilestoneTest";
+import { useRoomCurriculum } from "@/hooks/useRoomCurriculum";
 
 // Room IDs that have quick start guides
 const QUICK_START_ROOMS = new Set([
@@ -83,6 +87,21 @@ export default function RoomDetail() {
   const { mastery, isLoading: masteryLoading, awardXp, isAwarding } = useMastery(roomId || "", Number(floorNumber));
   const { addItem } = useSpacedRepetition();
   const { focusedRoom, isFocused, setFocusedRoom, clearFocusedRoom, isSettingFocus } = useFocusedRoom();
+  
+  // Training curriculum system
+  const {
+    curriculum,
+    progress: curriculumProgress,
+    nextActivity,
+    availableActivities,
+    completionPercentage: curriculumCompletion,
+    completeActivity,
+    passMilestoneTest,
+  } = useRoomCurriculum(roomId || "", room?.name || "", Number(floorNumber));
+
+  // Training UI state
+  const [showMilestoneTest, setShowMilestoneTest] = useState(false);
+  const [currentTestLevel, setCurrentTestLevel] = useState<number | null>(null);
 
   const drillQuestions = room ? getDrillsByRoom(room.id) : [];
   const drillName = room ? getDrillName(room.id) : "Practice Drill";
@@ -661,6 +680,74 @@ export default function RoomDetail() {
                   </Card>
                 )}
 
+                {/* Continue Training - Show next activity */}
+                {mastery && !(mastery.mastery_level === 1 && mastery.xp_current === 0) && !showMilestoneTest && (
+                  <ContinueTraining
+                    nextActivity={nextActivity}
+                    roomName={room.name}
+                    onContinue={() => {
+                      if (nextActivity?.type === "milestone_test") {
+                        const testLevel = curriculum.milestoneTests.find(
+                          (t) => t.activityId === nextActivity.id
+                        )?.level;
+                        if (testLevel) {
+                          setCurrentTestLevel(testLevel);
+                          setShowMilestoneTest(true);
+                        }
+                      } else {
+                        // Switch to practice tab
+                        const practiceTab = document.querySelector('[value="practice"]') as HTMLElement;
+                        practiceTab?.click();
+                        window.scrollTo({ top: 0, behavior: 'smooth' });
+                      }
+                    }}
+                  />
+                )}
+
+                {/* Milestone Test View */}
+                {showMilestoneTest && currentTestLevel && (
+                  <MilestoneTest
+                    level={currentTestLevel}
+                    activityId={nextActivity?.id || ""}
+                    roomName={room.name}
+                    onPass={(activityId) => {
+                      passMilestoneTest({ testLevel: currentTestLevel, activityId });
+                      setShowMilestoneTest(false);
+                      setCurrentTestLevel(null);
+                    }}
+                    onCancel={() => {
+                      setShowMilestoneTest(false);
+                      setCurrentTestLevel(null);
+                    }}
+                  />
+                )}
+
+                {/* Training Dashboard - Full activity list */}
+                {mastery && !(mastery.mastery_level === 1 && mastery.xp_current === 0) && !showMilestoneTest && (
+                  <TrainingDashboard
+                    roomName={room.name}
+                    curriculum={curriculum}
+                    completedActivities={(curriculumProgress?.completed_activities as string[]) || []}
+                    currentLevel={mastery.mastery_level}
+                    onActivityClick={(activity) => {
+                      if (activity.type === "milestone_test") {
+                        const testLevel = curriculum.milestoneTests.find(
+                          (t) => t.activityId === activity.id
+                        )?.level;
+                        if (testLevel) {
+                          setCurrentTestLevel(testLevel);
+                          setShowMilestoneTest(true);
+                        }
+                      } else {
+                        // Switch to practice tab for other activities
+                        const practiceTab = document.querySelector('[value="practice"]') as HTMLElement;
+                        practiceTab?.click();
+                        window.scrollTo({ top: 0, behavior: 'smooth' });
+                      }
+                    }}
+                  />
+                )}
+
                 {/* Focus Room Control */}
                 <Card>
                   <CardHeader>
@@ -717,6 +804,10 @@ export default function RoomDetail() {
                           roomName={room.name}
                           drillType={drillName}
                           questions={drillQuestions}
+                          curriculumActivityId={nextActivity?.id}
+                          onCurriculumComplete={(activityId, xpEarned) => 
+                            completeActivity({ activityId, xpEarned })
+                          }
                         />
                       )}
                     </CardContent>

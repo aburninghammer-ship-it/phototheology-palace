@@ -17,6 +17,8 @@ interface PracticeDrillProps {
   roomName: string;
   drillType: string;
   questions: DrillQuestion[];
+  curriculumActivityId?: string;
+  onCurriculumComplete?: (activityId: string, xpEarned: number) => void;
 }
 
 export const PracticeDrill = ({
@@ -25,6 +27,8 @@ export const PracticeDrill = ({
   roomName,
   drillType,
   questions,
+  curriculumActivityId,
+  onCurriculumComplete,
 }: PracticeDrillProps) => {
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null);
@@ -109,6 +113,14 @@ export const PracticeDrill = ({
     };
 
     await saveDrillResult(drillType, result, { questionCount: questions.length });
+    
+    // Mark curriculum activity as complete if provided
+    if (curriculumActivityId && onCurriculumComplete) {
+      const isPerfect = score === questions.length;
+      const xpEarned = isPerfect ? 75 : 25; // Higher XP for perfect scores
+      onCurriculumComplete(curriculumActivityId, xpEarned);
+    }
+    
     setCompleted(true);
   };
 
