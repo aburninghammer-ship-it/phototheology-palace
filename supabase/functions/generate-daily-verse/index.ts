@@ -162,7 +162,7 @@ Make it engaging, Christ-centered, and practically applicable.`;
         type: 'daily_verse',
         title: '🌅 Today\'s Verse of the Day',
         message: `${verseReference} - Explore with ${numPrinciples} Palace principles!`,
-        action_url: '/daily-verse',
+        link: '/daily-verse',
         metadata: {
           verse_id: newVerse.id,
           verse_reference: verseReference
