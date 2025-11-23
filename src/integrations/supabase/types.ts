@@ -1888,6 +1888,174 @@ export type Database = {
         }
         Relationships: []
       }
+      guild_challenge_participants: {
+        Row: {
+          challenge_id: string | null
+          completed_at: string | null
+          contribution_count: number | null
+          id: string
+          user_id: string | null
+        }
+        Insert: {
+          challenge_id?: string | null
+          completed_at?: string | null
+          contribution_count?: number | null
+          id?: string
+          user_id?: string | null
+        }
+        Update: {
+          challenge_id?: string | null
+          completed_at?: string | null
+          contribution_count?: number | null
+          id?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "guild_challenge_participants_challenge_id_fkey"
+            columns: ["challenge_id"]
+            isOneToOne: false
+            referencedRelation: "guild_challenges"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      guild_challenges: {
+        Row: {
+          challenge_description: string | null
+          challenge_title: string
+          created_at: string | null
+          current_completions: number | null
+          ends_at: string
+          guild_id: string | null
+          id: string
+          is_completed: boolean | null
+          reward_xp: number | null
+          room_id: string
+          starts_at: string | null
+          target_completions: number | null
+        }
+        Insert: {
+          challenge_description?: string | null
+          challenge_title: string
+          created_at?: string | null
+          current_completions?: number | null
+          ends_at: string
+          guild_id?: string | null
+          id?: string
+          is_completed?: boolean | null
+          reward_xp?: number | null
+          room_id: string
+          starts_at?: string | null
+          target_completions?: number | null
+        }
+        Update: {
+          challenge_description?: string | null
+          challenge_title?: string
+          created_at?: string | null
+          current_completions?: number | null
+          ends_at?: string
+          guild_id?: string | null
+          id?: string
+          is_completed?: boolean | null
+          reward_xp?: number | null
+          room_id?: string
+          starts_at?: string | null
+          target_completions?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "guild_challenges_guild_id_fkey"
+            columns: ["guild_id"]
+            isOneToOne: false
+            referencedRelation: "guilds"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      guild_members: {
+        Row: {
+          contribution_xp: number | null
+          guild_id: string | null
+          id: string
+          joined_at: string | null
+          role: string | null
+          user_id: string | null
+        }
+        Insert: {
+          contribution_xp?: number | null
+          guild_id?: string | null
+          id?: string
+          joined_at?: string | null
+          role?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          contribution_xp?: number | null
+          guild_id?: string | null
+          id?: string
+          joined_at?: string | null
+          role?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "guild_members_guild_id_fkey"
+            columns: ["guild_id"]
+            isOneToOne: false
+            referencedRelation: "guilds"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      guilds: {
+        Row: {
+          created_at: string | null
+          created_by: string | null
+          current_streak: number | null
+          description: string | null
+          focus_rooms: string[] | null
+          guild_image_url: string | null
+          guild_type: string
+          id: string
+          is_active: boolean | null
+          max_members: number | null
+          name: string
+          total_xp: number | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          created_by?: string | null
+          current_streak?: number | null
+          description?: string | null
+          focus_rooms?: string[] | null
+          guild_image_url?: string | null
+          guild_type: string
+          id?: string
+          is_active?: boolean | null
+          max_members?: number | null
+          name: string
+          total_xp?: number | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          created_by?: string | null
+          current_streak?: number | null
+          description?: string | null
+          focus_rooms?: string[] | null
+          guild_image_url?: string | null
+          guild_type?: string
+          id?: string
+          is_active?: boolean | null
+          max_members?: number | null
+          name?: string
+          total_xp?: number | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       learning_predictions: {
         Row: {
           actual_outcome: string | null
