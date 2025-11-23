@@ -5,9 +5,11 @@ import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
-import { Dumbbell, CheckCircle, XCircle, Clock, Trophy } from "lucide-react";
+import { Dumbbell, CheckCircle, XCircle, Clock, Trophy, ArrowRight } from "lucide-react";
 import { DrillQuestion, DrillResult, useDrills } from "@/hooks/useDrills";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { palaceFloors } from "@/data/palaceData";
+import { useNavigate } from "react-router-dom";
 
 interface PracticeDrillProps {
   floorNumber: number;
@@ -32,8 +34,39 @@ export const PracticeDrill = ({
   const [completed, setCompleted] = useState(false);
   
   const { saveDrillResult } = useDrills(floorNumber, roomId);
+  const navigate = useNavigate();
   const currentQuestion = questions[currentQuestionIndex];
   const progress = ((currentQuestionIndex + 1) / questions.length) * 100;
+
+  // Find next room in sequence
+  const getNextRoom = () => {
+    const currentFloor = palaceFloors.find(f => f.number === floorNumber);
+    if (!currentFloor) return null;
+
+    const currentRoomIndex = currentFloor.rooms.findIndex(r => r.id === roomId);
+    if (currentRoomIndex === -1) return null;
+
+    // Check if there's a next room on the same floor
+    if (currentRoomIndex < currentFloor.rooms.length - 1) {
+      return {
+        floor: floorNumber,
+        room: currentFloor.rooms[currentRoomIndex + 1]
+      };
+    }
+
+    // Move to the first room of the next floor
+    const nextFloor = palaceFloors.find(f => f.number === floorNumber + 1);
+    if (nextFloor && nextFloor.rooms.length > 0) {
+      return {
+        floor: nextFloor.number,
+        room: nextFloor.rooms[0]
+      };
+    }
+
+    return null;
+  };
+
+  const nextRoom = getNextRoom();
 
   useEffect(() => {
     setStartTime(Date.now());
@@ -132,9 +165,20 @@ export const PracticeDrill = ({
             ))}
           </div>
 
-          <Button onClick={restart} className="w-full">
-            Practice Again
-          </Button>
+          <div className="flex gap-2">
+            <Button onClick={restart} variant="outline" className="flex-1">
+              Practice Again
+            </Button>
+            {nextRoom && (
+              <Button 
+                onClick={() => navigate(`/palace/floor/${nextRoom.floor}/room/${nextRoom.room.id}`)}
+                className="flex-1 gradient-palace"
+              >
+                Next Room
+                <ArrowRight className="ml-2 h-4 w-4" />
+              </Button>
+            )}
+          </div>
         </CardContent>
       </Card>
     );
