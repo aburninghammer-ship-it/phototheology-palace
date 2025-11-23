@@ -30,6 +30,7 @@ import { XpProgressBar } from "@/components/mastery/XpProgressBar";
 import { RoomMentorChat } from "@/components/mastery/RoomMentorChat";
 import { ReportCardDisplay } from "@/components/mastery/ReportCardDisplay";
 import { useFocusedRoom } from "@/hooks/useFocusedRoom";
+import { MasteryOnboarding } from "@/components/mastery/MasteryOnboarding";
 
 // Room IDs that have quick start guides
 const QUICK_START_ROOMS = new Set([
@@ -399,8 +400,22 @@ export default function RoomDetail() {
 
               {/* MASTER THIS ROOM TAB */}
               <TabsContent value="master" className="space-y-6 mt-6">
-                {/* Mastery Overview */}
-                {mastery && (
+                {/* Show Onboarding for Novices (Level 1 with 0 XP) */}
+                {mastery && mastery.mastery_level === 1 && mastery.xp_current === 0 && (
+                  <MasteryOnboarding 
+                    roomName={room.name}
+                    onStartPractice={() => {
+                      // Switch to practice tab
+                      const practiceTab = document.querySelector('[value="practice"]') as HTMLElement;
+                      practiceTab?.click();
+                      // Scroll to top
+                      window.scrollTo({ top: 0, behavior: 'smooth' });
+                    }}
+                  />
+                )}
+
+                {/* Mastery Overview - Show for users who have started */}
+                {mastery && !(mastery.mastery_level === 1 && mastery.xp_current === 0) && (
                   <Card className="border-2 border-primary/20 bg-gradient-to-br from-primary/5 to-accent/5">
                     <CardHeader>
                       <CardTitle className="flex items-center gap-2">
