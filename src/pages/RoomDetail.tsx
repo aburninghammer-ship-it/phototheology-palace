@@ -417,46 +417,46 @@ export default function RoomDetail() {
                       <h4 className="font-semibold text-sm">The Five Mastery Levels:</h4>
                       
                       <div className="space-y-2">
-                        <div className="flex items-start gap-3 p-2 rounded-lg bg-slate-500/10">
+                        <div className="flex items-start gap-3 p-2 rounded-lg bg-slate-500/10 border border-slate-500/20">
                           <Star className="h-4 w-4 text-slate-500 mt-0.5" />
                           <div className="flex-1">
-                            <div className="font-medium text-sm">Level 1: Novice</div>
+                            <div className="font-medium text-sm">Level 1: Novice <span className="text-slate-500">(Gray Badge)</span></div>
                             <div className="text-xs text-muted-foreground">Starting point. Begin exploring the room's principles.</div>
                             <div className="text-xs font-semibold mt-1">→ Reach 100 XP to advance</div>
                           </div>
                         </div>
 
-                        <div className="flex items-start gap-3 p-2 rounded-lg bg-blue-500/10">
+                        <div className="flex items-start gap-3 p-2 rounded-lg bg-blue-500/10 border border-blue-500/20">
                           <Award className="h-4 w-4 text-blue-500 mt-0.5" />
                           <div className="flex-1">
-                            <div className="font-medium text-sm">Level 2: Apprentice</div>
+                            <div className="font-medium text-sm">Level 2: Apprentice <span className="text-blue-500">(Blue Badge)</span></div>
                             <div className="text-xs text-muted-foreground">Building familiarity. You're making connections.</div>
                             <div className="text-xs font-semibold mt-1">→ Reach 250 XP to advance</div>
                           </div>
                         </div>
 
-                        <div className="flex items-start gap-3 p-2 rounded-lg bg-purple-500/10">
+                        <div className="flex items-start gap-3 p-2 rounded-lg bg-purple-500/10 border border-purple-500/20">
                           <Trophy className="h-4 w-4 text-purple-500 mt-0.5" />
                           <div className="flex-1">
-                            <div className="font-medium text-sm">Level 3: Practitioner</div>
+                            <div className="font-medium text-sm">Level 3: Practitioner <span className="text-purple-500">(Purple Badge)</span></div>
                             <div className="text-xs text-muted-foreground">Confident application. You can teach this room's principles.</div>
                             <div className="text-xs font-semibold mt-1">→ Reach 500 XP to advance</div>
                           </div>
                         </div>
 
-                        <div className="flex items-start gap-3 p-2 rounded-lg bg-amber-500/10">
+                        <div className="flex items-start gap-3 p-2 rounded-lg bg-amber-500/10 border border-amber-500/30">
                           <Crown className="h-4 w-4 text-amber-500 mt-0.5" />
                           <div className="flex-1">
-                            <div className="font-medium text-sm">Level 4: Expert</div>
+                            <div className="font-medium text-sm">Level 4: Expert <span className="text-amber-500">(Gold Badge)</span></div>
                             <div className="text-xs text-muted-foreground">Deep understanding. Mentor Mode unlocked for personalized AI guidance.</div>
                             <div className="text-xs font-semibold mt-1">→ Reach 1,000 XP to advance</div>
                           </div>
                         </div>
 
                         <div className="flex items-start gap-3 p-2 rounded-lg bg-gradient-to-r from-amber-500/20 to-yellow-300/20 border border-amber-500/30">
-                          <Sparkles className="h-4 w-4 text-amber-500 mt-0.5" />
+                          <Sparkles className="h-4 w-4 text-amber-500 mt-0.5 animate-pulse" />
                           <div className="flex-1">
-                            <div className="font-medium text-sm">Level 5: Master</div>
+                            <div className="font-medium text-sm">Level 5: Master <span className="bg-gradient-to-r from-amber-400 to-yellow-300 bg-clip-text text-transparent">(Golden Badge)</span></div>
                             <div className="text-xs text-muted-foreground">Complete mastery. This room's patterns are permanently encoded in your mind.</div>
                             <div className="text-xs font-semibold mt-1 text-amber-600">✨ Maximum Level Reached</div>
                           </div>
