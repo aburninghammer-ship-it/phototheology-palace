@@ -233,12 +233,12 @@ export default function MasteryDashboard() {
                       <div
                         key={index}
                         className={cn(
-                          "p-4 rounded-lg border transition-all",
-                          isCurrent && titleInfo.bgColor + " " + titleInfo.borderColor,
-                          isUnlocked && !isCurrent && "bg-accent/5 border-accent/20",
-                          !isUnlocked && "bg-muted/5 opacity-60"
-                        )}
-                      >
+                           "p-4 rounded-lg border transition-all",
+                           isCurrent && titleInfo.bgColor + " " + titleInfo.borderColor,
+                           isUnlocked && !isCurrent && "bg-accent/5 border-accent/20",
+                           !isUnlocked && "bg-muted/5"
+                         )}
+                       >
                         <div className="flex items-start gap-3">
                           <div className="text-2xl">{titleInfo.emoji}</div>
                           <div className="flex-1">
