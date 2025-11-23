@@ -40,6 +40,9 @@ const categoryConfig = {
     icon: BookOpen,
     links: [
       { to: "/bible", label: "Phototheology Study Bible (PSB)", icon: "📖" },
+      { to: "/reading-plans", label: "Reading Plans", icon: "📅" },
+      { to: "/encyclopedia", label: "Encyclopedia", icon: "🔍" },
+      { to: "/video-training", label: "Video Training", icon: "🎥" },
       { to: "/my-studies", label: "My Studies", icon: "📝" },
       { to: "/palace/floor/1/room/gr", label: "Produce a Gem", icon: "💎" },
       { to: "/verse-memory-hall", label: "Verse Memory", icon: "🧠" },
@@ -108,11 +111,22 @@ const categoryConfig = {
     title: "Community",
     icon: Users,
     links: [
+      { to: "/guilds", label: "Guilds", icon: "⚔️" },
       { to: "/community", label: "Community Chat", icon: "💬" },
       { to: "/live-study", label: "Live Study", icon: "📺" },
       { to: "/leaderboard", label: "Leaderboard", icon: "🏅" },
       { to: "/achievements", label: "Achievements", icon: "🎖️" },
+      { to: "/streaks", label: "Streaks", icon: "🔥" },
       { to: "/feedback", label: "Feedback", icon: "💡" },
+    ],
+  },
+  mastery: {
+    title: "Progress",
+    icon: Trophy,
+    links: [
+      { to: "/mastery-dashboard", label: "Mastery Dashboard", icon: "🎯" },
+      { to: "/genesis-challenge", label: "Genesis High Rise", icon: "🏢" },
+      { to: "/spiritual-training", label: "Christian Art of War Dojo", icon: "⚔️" },
     ],
   },
 };
