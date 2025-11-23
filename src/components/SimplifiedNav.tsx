@@ -24,6 +24,7 @@ export const SimplifiedNav = () => {
 
   const studyLinks = [
     { to: "/dashboard", label: "Dashboard", icon: Home },
+    { to: "/daily-verse", label: "Verse of the Day", icon: BookOpen },
     { to: "/bible", label: "Bible Reader", icon: BookOpen },
     { to: "/bible/search", label: "Search", icon: BookOpen },
     { to: "/palace/floor/1/room/gr", label: "Produce a Gem", icon: BookOpen },

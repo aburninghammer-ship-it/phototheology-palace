@@ -136,14 +136,29 @@ Make it engaging, Christ-centered, and practically applicable.`;
     
     if (insertError) throw insertError;
     
-    // Create notifications for all users
-    const { data: profiles } = await supabase
+    // Get users who have daily verse notifications enabled
+    const { data: usersWithPrefs } = await supabase
+      .from('notification_preferences')
+      .select('user_id')
+      .eq('daily_verse_enabled', true);
+    
+    // Get all users who don't have preferences set (default to enabled)
+    const { data: allProfiles } = await supabase
       .from('profiles')
       .select('id');
     
-    if (profiles && profiles.length > 0) {
-      const notifications = profiles.map(profile => ({
-        user_id: profile.id,
+    const usersWithPrefsIds = new Set(usersWithPrefs?.map(p => p.user_id) || []);
+    const allUserIds = allProfiles?.map(p => p.id) || [];
+    
+    // Include users with explicit opt-in AND users without any preference (default enabled)
+    const usersToNotify = allUserIds.filter(userId => {
+      const hasPreference = Array.from(usersWithPrefsIds).some(id => id === userId);
+      return hasPreference || !usersWithPrefsIds.has(userId);
+    });
+    
+    if (usersToNotify.length > 0) {
+      const notifications = usersToNotify.map(userId => ({
+        user_id: userId,
         type: 'daily_verse',
         title: '🌅 Today\'s Verse of the Day',
         message: `${verseReference} - Explore with ${numPrinciples} Palace principles!`,
@@ -153,14 +168,20 @@ Make it engaging, Christ-centered, and practically applicable.`;
         }
       }));
       
-      await supabase.from('notifications').insert(notifications);
+      const { error: notifError } = await supabase
+        .from('notifications')
+        .insert(notifications);
+      
+      if (notifError) {
+        console.error('Error creating notifications:', notifError);
+      }
     }
     
     return new Response(
       JSON.stringify({ 
         success: true, 
         verse: newVerse,
-        notifications_sent: profiles?.length || 0 
+        notifications_sent: usersToNotify.length
       }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );

@@ -2,6 +2,7 @@ import { SimplifiedNav } from "@/components/SimplifiedNav";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { NotificationPreferences } from "@/components/NotificationPreferences";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Book, Sparkles, CheckCircle2, Calendar } from "lucide-react";
@@ -177,6 +178,9 @@ export default function DailyVerse() {
             </div>
           </CardContent>
         </Card>
+
+        {/* Notification Preferences */}
+        <NotificationPreferences />
 
         {/* Breakdown */}
         <div className="space-y-4">
