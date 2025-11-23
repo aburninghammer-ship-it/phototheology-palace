@@ -116,7 +116,10 @@ serve(async (req) => {
     const verseText = "For God so loved the world, that he gave his only begotten Son, that whosoever believeth in him should not perish, but have everlasting life.";
     
     // Generate breakdown using Lovable AI with specific instructions per principle
-    const principlesDesc = selectedPrinciples.map(p => `- ${p.code} (${p.name}): ${p.description}`).join('\n');
+    const principlesWithFloors = selectedPrinciples.map((p, idx) => {
+      const floorNum = idx + 1;
+      return `Floor ${floorNum}: ${p.code} - ${p.name} (${p.description})`;
+    }).join('\n');
     
     const prompt = `You are a Phototheology expert demonstrating the CREATIVE GENIUS of the Phototheology system.
 
@@ -126,23 +129,17 @@ Verse: ${verseReference}
 **THE POWER OF PHOTOTHEOLOGY**:
 Phototheology's genius is that ANY verse can be analyzed through MULTIPLE analytical lenses to extract deeper meaning. You are NOT just identifying what the verse reveals - you are ACTIVELY APPLYING different tools to discover hidden connections and insights.
 
-**STEP 1 - VERSE GENRE (What is Revealed)**:
+**CRITICAL - FLOOR ASSIGNMENTS**:
+You MUST use the principles in the EXACT order given below. The floor number is determined by the position in the list:
+
+${principlesWithFloors}
+
+**VERSE GENRE (What is Revealed)**:
 First, identify the verse's literary category - what TYPE of text this is:
 Use ONE of these codes: 📖Gospel, ⚖️Law, 📜History, 🎵Poetry, 🔮Prophecy, or ✉️Epistle
 
-**STEP 2 - CREATIVE APPLICATION (Principles Applied)**:
-Now CREATIVELY APPLY these 7 randomly selected analytical tools to discover NEW insights:
-
-${principlesDesc}
-
 **CRITICAL UNDERSTANDING**:
 These principles are ANALYTICAL TOOLS, not just descriptions of what the verse "is about."
-- A history verse (📜History) can be analyzed through Prophecy Room (PR) to find prophetic shadows
-- A law verse (⚖️Law) can be examined through Story Room (SR) to visualize narrative context  
-- ANY verse can be placed in cycles (@Mo, @CyC, etc.) to understand redemptive timeline
-- Use Symbols/Types (ST) to find Christ-types even in unexpected places
-- Apply Patterns (PRm) to show biblical patterns repeating across Scripture
-
 Show the FLEXIBILITY and DEPTH of Phototheology by making creative, insightful connections that reveal Christ in fresh ways.
 
 **CRITICAL - SPECIFIC CODES FOR principle_applied**:
@@ -211,24 +208,26 @@ Example: "This verse spans multiple zones: EARTH Past - the cross event (He gave
 **Cycles Room (@Cycles)**: Identify which cycle this verse belongs to (e.g., @CyC for Gospel era, @Mo for Exodus era) AND connect to another cycle. Example: "This @CyC (Christ) verse echoes @Mo (Mosaic) - as Moses lifted the serpent (Num 21:9), so Christ was lifted up."
 
 For EACH of the 7 principles listed above, provide:
-1. principle_applied: The SPECIFIC emoji/symbol code (MUST be exact: 📖Gospel, 🌍Now, @Mo, SR, etc.)
-2. application: A ROBUST, detailed paragraph (2-3 sentences minimum) showing HOW the principle is applied. Do not give a single sentence - develop the thought fully with concrete examples and connections.
-3. key_insight: A memorable "gem" from this application
-4. practical_takeaway: A clear, actionable step the reader can take today
+1. principle_applied: The principle code exactly as shown (e.g., IR, ST, NF, DR-Christ, etc.)
+2. floor: The floor number from the list above (Floor 1, Floor 2, Floor 3, Floor 4, Floor 5, Floor 6, or Floor 7)
+3. application: A ROBUST, detailed paragraph (2-3 sentences minimum) showing HOW the principle is applied
+4. key_insight: A memorable "gem" from this application
+5. practical_takeaway: A clear, actionable step the reader can take today
 
 **CRITICAL VALIDATION**: 
 - verse_genre: ONE genre code (📖Gospel, ⚖️Law, 📜History, 🎵Poetry, 🔮Prophecy, or ✉️Epistle)
-- breakdown: EXACTLY 7 items
-- Each principle_applied MUST use the EXACT emoji/symbol codes shown above (📖Gospel not "C6", 🌍Now not "TZ", @Mo not "Mosaic")
+- breakdown: EXACTLY 7 items IN THE ORDER LISTED ABOVE
+- Each principle_applied MUST match the code from the list above
+- Each floor MUST match the floor number from the list above (Floor 1 through Floor 7)
 
 Format your response as a structured JSON with this exact schema:
 {
   "verse_genre": "📖Gospel",
   "breakdown": [
     {
-      "principle_applied": "🌍Now",
-      "principle_code": "TZ",
-      "principle_name": "Time Zone (6 zones)",
+      "principle_applied": "IR",
+      "principle_code": "IR",
+      "principle_name": "Imagination Room",
       "floor": "Floor 1",
       "application": "specific, concrete application",
       "key_insight": "memorable insight",
@@ -236,8 +235,6 @@ Format your response as a structured JSON with this exact schema:
     }
   ]
 }
-
-IMPORTANT: The "floor" field must match the floor number where the principle comes from (Floor 1, Floor 2, Floor 3, Floor 4, Floor 5, Floor 6, or Floor 7).
 
 Make it engaging, Christ-centered, specific, and practically applicable.`;
 
