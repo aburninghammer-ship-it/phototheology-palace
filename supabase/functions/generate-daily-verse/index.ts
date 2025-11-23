@@ -60,8 +60,8 @@ serve(async (req) => {
       );
     }
     
-    // Select 3-5 random principles
-    const numPrinciples = 3 + Math.floor(Math.random() * 3); // 3 to 5
+    // Select 3-7 random principles
+    const numPrinciples = 3 + Math.floor(Math.random() * 5); // 3 to 7
     const shuffled = [...PALACE_PRINCIPLES].sort(() => Math.random() - 0.5);
     const selectedPrinciples = shuffled.slice(0, numPrinciples);
     
@@ -72,7 +72,9 @@ serve(async (req) => {
     // Generate breakdown using Lovable AI with specific instructions per principle
     const principlesDesc = selectedPrinciples.map(p => `- ${p.code} (${p.name}): ${p.description}`).join('\n');
     
-    const prompt = `You are a Phototheology expert analyzing Scripture. Break down this verse using the following ${numPrinciples} palace principles:
+    const prompt = `You are a Phototheology expert analyzing Scripture. Break down this verse using EXACTLY AND ONLY the following ${numPrinciples} palace principles listed below.
+
+**CRITICAL**: You MUST use ONLY these ${numPrinciples} principles - do NOT add any other principles or codes not listed here:
 
 ${principlesDesc}
 
@@ -115,17 +117,19 @@ Example: "This verse spans multiple zones: EARTH Past - the cross event (He gave
 
 **Cycles Room (@Cycles)**: Identify which cycle this verse belongs to (e.g., @CyC for Gospel era, @Mo for Exodus era) AND connect to another cycle. Example: "This @CyC (Christ) verse echoes @Mo (Mosaic) - as Moses lifted the serpent (Num 21:9), so Christ was lifted up."
 
-For EACH principle, provide:
+For EACH principle listed above (EXACTLY ${numPrinciples} principles, no more, no less), provide:
 1. application: A specific, concrete application showing HOW the principle is applied to this verse (not just what the principle is)
 2. key_insight: A memorable "gem" that comes from applying this principle
 3. practical_takeaway: A clear action step the reader can take today
+
+**CRITICAL VALIDATION**: Your response MUST contain EXACTLY ${numPrinciples} items in the breakdown array, using ONLY the principle codes listed above. Do NOT add any additional principles or codes.
 
 Format your response as a structured JSON with this exact schema:
 {
   "breakdown": [
     {
-      "principle_code": "code",
-      "principle_name": "name",
+      "principle_code": "code from the list above ONLY",
+      "principle_name": "name from the list above ONLY",
       "application": "specific, concrete application showing HOW this principle reveals something in the verse",
       "key_insight": "memorable insight from this application",
       "practical_takeaway": "clear action step"
@@ -133,7 +137,7 @@ Format your response as a structured JSON with this exact schema:
   ]
 }
 
-Make it engaging, Christ-centered, specific, and practically applicable.`;
+Make it engaging, Christ-centered, specific, and practically applicable. Remember: ONLY use the ${numPrinciples} principles explicitly listed above.`;
 
     const aiResponse = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
       method: 'POST',
