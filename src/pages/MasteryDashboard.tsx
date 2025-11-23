@@ -48,12 +48,42 @@ export default function MasteryDashboard() {
       <SimplifiedNav />
       <div className="container mx-auto px-4 py-8 max-w-7xl">
         {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-4xl font-bold mb-2 flex items-center gap-3">
-            <Crown className="h-10 w-10 text-primary" />
-            Mastery System
-          </h1>
-          <p className="text-muted-foreground">Track your progress and level up in every room</p>
+        <div className="mb-8 space-y-4">
+          <div>
+            <h1 className="text-4xl font-bold mb-2 flex items-center gap-3">
+              <Crown className="h-10 w-10 text-primary" />
+              Mastery System
+            </h1>
+            <p className="text-muted-foreground">Track your progress and level up in every room</p>
+          </div>
+
+          {/* Always-visible quick overview so this works on mobile too */}
+          <Card className="border-primary/20 bg-card/80">
+            <CardHeader className="pb-3">
+              <CardTitle className="flex items-center gap-2 text-base">
+                <TrendingUp className="h-4 w-4 text-primary" />
+                How Mastery Works
+              </CardTitle>
+              <CardDescription>
+                Each room has 5 mastery levels (Novice → Apprentice → Adept → Expert → Master). You earn XP
+                by completing drills, exercises, and perfect scores until you reach Level 5 in that room.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="grid grid-cols-1 md:grid-cols-3 gap-3 text-sm">
+              <div>
+                <p className="font-semibold mb-1">1. Pick a room</p>
+                <p className="text-muted-foreground">Focus on one Palace room and practice it repeatedly.</p>
+              </div>
+              <div>
+                <p className="font-semibold mb-1">2. Earn XP</p>
+                <p className="text-muted-foreground">Drills, exercises, and perfect runs add XP toward the next level.</p>
+              </div>
+              <div>
+                <p className="font-semibold mb-1">3. Reach Level 5</p>
+                <p className="text-muted-foreground">Master multiple rooms to unlock global titles across the Palace.</p>
+              </div>
+            </CardContent>
+          </Card>
         </div>
 
         {/* Global Stats Grid */}
