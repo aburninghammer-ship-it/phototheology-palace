@@ -19,6 +19,7 @@ import defaultVideoThumbnail from "@/assets/video-training-thumbnail.png";
 import { useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
+import { Testimonials } from "@/components/Testimonials";
 
 interface TrainingVideo {
   id: string;
@@ -428,6 +429,8 @@ const VideoTraining = () => {
           )}
         </DialogContent>
       </Dialog>
+      
+      <Testimonials />
     </div>
   );
 };
