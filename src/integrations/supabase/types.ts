@@ -3470,6 +3470,48 @@ export type Database = {
         }
         Relationships: []
       }
+      room_curriculum_progress: {
+        Row: {
+          completed_activities: Json | null
+          created_at: string | null
+          current_activity_index: number | null
+          curriculum_completed: boolean | null
+          floor_number: number
+          id: string
+          last_activity_at: string | null
+          milestone_tests_passed: Json | null
+          room_id: string
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          completed_activities?: Json | null
+          created_at?: string | null
+          current_activity_index?: number | null
+          curriculum_completed?: boolean | null
+          floor_number: number
+          id?: string
+          last_activity_at?: string | null
+          milestone_tests_passed?: Json | null
+          room_id: string
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          completed_activities?: Json | null
+          created_at?: string | null
+          current_activity_index?: number | null
+          curriculum_completed?: boolean | null
+          floor_number?: number
+          id?: string
+          last_activity_at?: string | null
+          milestone_tests_passed?: Json | null
+          room_id?: string
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       room_exercises: {
         Row: {
           created_at: string | null
