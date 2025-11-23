@@ -15,20 +15,20 @@ interface BlueprintMapProps {
 
 export const BlueprintMap = ({ items, completedItems, onItemClick }: BlueprintMapProps) => {
   // Map items by ID to their position in the sanctuary layout
-  // Following the pattern: 1=bottom, 2=middle bottom, 3,4,5=middle row (left to right), 6=top
+  // Following traditional sanctuary order: Outer Court (1,2) → Holy Place (3,4,5) → Most Holy (6)
   const getItemPosition = (id: number) => {
     switch (id) {
-      case 1: // Altar of Sacrifice - Bottom
-        return { bottom: "8%", left: "50%", transform: "translateX(-50%)" };
-      case 2: // Laver - Middle Bottom
-        return { bottom: "28%", left: "50%", transform: "translateX(-50%)" };
-      case 3: // Table of Shewbread - Middle Right
-        return { top: "50%", right: "15%", transform: "translateY(-50%)" };
-      case 4: // Altar of Incense - Middle Center
-        return { top: "50%", left: "50%", transform: "translate(-50%, -50%)" };
-      case 5: // Golden Candlestick - Middle Left
-        return { top: "50%", left: "15%", transform: "translateY(-50%)" };
-      case 6: // Ark of the Covenant - Top
+      case 1: // Altar of Sacrifice - Outer Court entrance
+        return { bottom: "5%", left: "50%", transform: "translateX(-50%)" };
+      case 2: // Laver - Outer Court before Holy Place
+        return { bottom: "22%", left: "50%", transform: "translateX(-50%)" };
+      case 3: // Table of Shewbread - Holy Place RIGHT (North side)
+        return { top: "48%", right: "18%", transform: "translateY(-50%)" };
+      case 4: // Golden Candlestick - Holy Place LEFT (South side)
+        return { top: "48%", left: "18%", transform: "translateY(-50%)" };
+      case 5: // Altar of Incense - Holy Place CENTER (before veil)
+        return { top: "35%", left: "50%", transform: "translateX(-50%)" };
+      case 6: // Ark of the Covenant - Most Holy Place
         return { top: "10%", left: "50%", transform: "translateX(-50%)" };
       default:
         return { top: "50%", left: "50%", transform: "translate(-50%, -50%)" };
@@ -36,32 +36,40 @@ export const BlueprintMap = ({ items, completedItems, onItemClick }: BlueprintMa
   };
 
   return (
-    <div className="relative w-full max-w-5xl mx-auto aspect-[4/3] bg-gradient-to-br from-primary/5 via-background to-primary/10 rounded-2xl border-2 border-primary/20 shadow-2xl overflow-hidden">
-      {/* Background decorative elements */}
-      <div className="absolute inset-0 bg-[url('/placeholder.svg')] opacity-5" />
+    <div className="relative w-full max-w-5xl mx-auto aspect-[4/3] bg-gradient-to-t from-amber-950/20 via-amber-900/10 to-sky-950/30 rounded-2xl border-2 border-primary/20 shadow-2xl overflow-hidden">
+      {/* Background texture */}
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.1)_1px,transparent_1px)] bg-[size:20px_20px] opacity-30" />
       
-      {/* Outer Court border */}
-      <div className="absolute inset-8 border-2 border-dashed border-primary/30 rounded-xl" />
+      {/* Outer Court - Large rectangle at bottom */}
+      <div className="absolute left-[10%] right-[10%] bottom-[3%] h-[40%] border-2 border-amber-700/40 bg-gradient-to-t from-amber-900/20 to-transparent rounded-lg">
+        <div className="absolute -top-3 left-4 bg-background px-2 py-0.5 text-xs font-semibold text-amber-700">Outer Court</div>
+      </div>
       
-      {/* Holy Place border */}
-      <div className="absolute top-[35%] left-[20%] right-[20%] bottom-[45%] border-2 border-primary/40 rounded-lg bg-primary/5" />
+      {/* Holy Place - Medium rectangle in middle */}
+      <div className="absolute left-[15%] right-[15%] top-[32%] h-[30%] border-2 border-amber-600/50 bg-gradient-to-t from-amber-800/30 to-amber-700/20 rounded-lg shadow-inner">
+        <div className="absolute -top-3 left-4 bg-background px-2 py-0.5 text-xs font-semibold text-amber-600">Holy Place</div>
+      </div>
       
-      {/* Most Holy Place border */}
-      <div className="absolute top-[8%] left-[35%] right-[35%] h-[20%] border-2 border-primary/50 rounded-lg bg-primary/10" />
+      {/* Most Holy Place - Small rectangle at top */}
+      <div className="absolute left-[30%] right-[30%] top-[6%] h-[18%] border-2 border-yellow-500/60 bg-gradient-to-t from-yellow-600/40 to-yellow-500/30 rounded-lg shadow-lg">
+        <div className="absolute -top-3 left-4 bg-background px-2 py-0.5 text-xs font-semibold text-yellow-600">Most Holy Place</div>
+      </div>
 
-      {/* Connection arrows */}
+      {/* Connection arrows - Following sanctuary path */}
       <svg className="absolute inset-0 w-full h-full pointer-events-none" style={{ zIndex: 1 }}>
         <defs>
           <marker id="arrowhead" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
-            <polygon points="0 0, 10 3, 0 6" fill="hsl(var(--primary))" opacity="0.5" />
+            <polygon points="0 0, 10 3, 0 6" fill="hsl(var(--primary))" opacity="0.6" />
           </marker>
         </defs>
-        {/* Arrow from 1 to 2 */}
-        <path d="M 50% 85% L 50% 70%" stroke="hsl(var(--primary))" strokeWidth="2" opacity="0.4" fill="none" markerEnd="url(#arrowhead)" />
-        {/* Arrow from 2 to middle section */}
-        <path d="M 50% 60% L 50% 50%" stroke="hsl(var(--primary))" strokeWidth="2" opacity="0.4" fill="none" markerEnd="url(#arrowhead)" />
-        {/* Arrow from middle to top */}
-        <path d="M 50% 40% L 50% 25%" stroke="hsl(var(--primary))" strokeWidth="2" opacity="0.4" fill="none" markerEnd="url(#arrowhead)" />
+        {/* Path: Altar → Laver */}
+        <path d="M 50% 92% L 50% 75%" stroke="hsl(var(--primary))" strokeWidth="2" opacity="0.5" fill="none" markerEnd="url(#arrowhead)" />
+        {/* Path: Laver → Holy Place entrance */}
+        <path d="M 50% 65% L 50% 50%" stroke="hsl(var(--primary))" strokeWidth="2" opacity="0.5" fill="none" markerEnd="url(#arrowhead)" />
+        {/* Path: Through Holy Place to Incense Altar */}
+        <path d="M 50% 50% L 50% 38%" stroke="hsl(var(--primary))" strokeWidth="2" opacity="0.5" fill="none" markerEnd="url(#arrowhead)" />
+        {/* Path: Incense → Most Holy Place */}
+        <path d="M 50% 32% L 50% 26%" stroke="hsl(var(--primary))" strokeWidth="2" opacity="0.5" fill="none" markerEnd="url(#arrowhead)" />
       </svg>
 
       {/* Sanctuary items */}
@@ -104,8 +112,8 @@ export const BlueprintMap = ({ items, completedItems, onItemClick }: BlueprintMa
                 {item.id === 1 && "🔥"}
                 {item.id === 2 && "💧"}
                 {item.id === 3 && "🍞"}
-                {item.id === 4 && "🌸"}
-                {item.id === 5 && "🕯️"}
+                {item.id === 4 && "🕯️"}
+                {item.id === 5 && "🌸"}
                 {item.id === 6 && "⚡"}
               </span>
             </div>
