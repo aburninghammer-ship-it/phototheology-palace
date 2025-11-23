@@ -32,6 +32,7 @@ import { SocialShareButton } from "@/components/SocialShareButton";
 import { PWAInstallButton } from "@/components/PWAInstallButton";
 import { LiveAIDemoWidget } from "@/components/LiveAIDemoWidget";
 import { Download } from "lucide-react";
+import { Testimonials } from "@/components/Testimonials";
 
 const Index = () => {
   const navigate = useNavigate();
@@ -570,6 +571,9 @@ const Index = () => {
           </Card>
         </div>
       </section>
+
+      {/* SECTION 9.5 — Testimonials */}
+      <Testimonials />
 
       {/* SECTION 10 — Final CTA */}
       <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-primary/10 via-accent/5 to-primary/10">
