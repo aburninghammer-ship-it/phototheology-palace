@@ -9,6 +9,7 @@ import { Book, Sparkles, CheckCircle2, Calendar, Share2 } from "lucide-react";
 import { toast } from "sonner";
 import { useAuth } from "@/hooks/useAuth";
 import { useState } from "react";
+import { Helmet } from "react-helmet-async";
 
 interface PrincipleBreakdown {
   principle_applied: string;
@@ -168,8 +169,35 @@ export default function DailyVerse() {
     );
   }
 
+  const shareUrl = `${window.location.origin}/daily-verse`;
+  const shareTitle = todayVerse ? `${todayVerse.verse_reference} - Daily Verse` : "Daily Verse - Phototheology";
+  const shareDescription = todayVerse 
+    ? `Phototheology's 7-floor analysis of ${todayVerse.verse_reference}: ${todayVerse.verse_text.slice(0, 100)}...`
+    : "Explore today's Bible verse through Phototheology's unique 7-floor analysis";
+
   return (
     <div className="min-h-screen gradient-dreamy">
+      <Helmet>
+        <title>{shareTitle}</title>
+        <meta name="description" content={shareDescription} />
+        
+        {/* Open Graph / Facebook */}
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content={shareUrl} />
+        <meta property="og:title" content={shareTitle} />
+        <meta property="og:description" content={shareDescription} />
+        <meta property="og:image" content={`${window.location.origin}/phototheology-hero.png`} />
+        <meta property="og:image:width" content="1200" />
+        <meta property="og:image:height" content="630" />
+        
+        {/* Twitter */}
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:url" content={shareUrl} />
+        <meta name="twitter:title" content={shareTitle} />
+        <meta name="twitter:description" content={shareDescription} />
+        <meta name="twitter:image" content={`${window.location.origin}/phototheology-hero.png`} />
+      </Helmet>
+      
       <SimplifiedNav />
       <div className="container mx-auto px-4 py-8 max-w-4xl space-y-6">
         {/* Header */}
