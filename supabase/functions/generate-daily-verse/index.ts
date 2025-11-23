@@ -18,25 +18,46 @@ const GENRE_CODES = {
 
 // Palace principles that can be applied
 const PALACE_PRINCIPLES = [
+  // Floor 1 - Furnishing (Width)
   { code: "SR", name: "Story Room", description: "Turn verse into vivid mental movie with concrete imagery", category: "1st Floor" },
   { code: "IR", name: "Imagination Room", description: "Immerse yourself IN the scene - sensory details as if present", category: "1st Floor" },
+  
+  // Floor 2 - Investigation (Width)
   { code: "OR", name: "Observation Room", description: "Notice specific details, literary devices, textual clues", category: "2nd Floor" },
   { code: "DC", name: "Def-Com", description: "Examine Greek/Hebrew meanings and context", category: "2nd Floor" },
   { code: "ST", name: "Symbols/Types", description: "Identify concrete symbols/types pointing to Christ (e.g., lamb=Christ)", category: "2nd Floor" },
+  
+  // Floor 3 - Freestyle (Time)
+  { code: "NF", name: "Nature Freestyle", description: "Connect to nature elements (tree, storm, sunrise, etc.)", category: "3rd Floor" },
+  { code: "PF", name: "Personal Freestyle", description: "Apply to personal life experiences and journey", category: "3rd Floor" },
+  { code: "BF", name: "Bible Freestyle", description: "Connect to related verses through verse genetics", category: "3rd Floor" },
+  
+  // Floor 4 - Next Level (Depth)
   { code: "CR", name: "Concentration Room", description: "Show HOW Christ is revealed in this verse", category: "4th Floor" },
-  { code: "DR", name: "Dimensions Room", description: "Move through MULTIPLE dimensions showing meaning unfold (Literal→Christ→Me→Church→Heaven)", category: "4th Floor" },
+  { code: "DR-Lit", name: "Literal Dimension", description: "What the text literally means", category: "4th Floor" },
+  { code: "DR-Christ", name: "Christ Dimension", description: "How does it point to Jesus?", category: "4th Floor" },
+  { code: "DR-Me", name: "Personal Dimension", description: "How does it apply to me?", category: "4th Floor" },
+  { code: "DR-Church", name: "Church Dimension", description: "How does it apply to the church?", category: "4th Floor" },
+  { code: "DR-Heaven", name: "Heaven Dimension", description: "How does it apply to heaven/eternity?", category: "4th Floor" },
   { code: "TRm", name: "Theme Room", description: "Map to Palace walls (Sanctuary, Life of Christ, Great Controversy, etc.)", category: "4th Floor" },
-  { code: "TZ", name: "Time Zone (6 zones)", description: "Map to specific zones: EARTH Past/Present/Future and HEAVEN Past/Present/Future", category: "4th Floor" },
   { code: "PRm", name: "Patterns Room", description: "Name pattern and give at least one other biblical example with reference", category: "4th Floor" },
   { code: "P‖", name: "Parallels Room", description: "Cite at least ONE specific parallel event with reference", category: "4th Floor" },
   { code: "FRt", name: "Fruit Room", description: "Name specific Christlike character trait this cultivates", category: "4th Floor" },
+  
+  // Floor 5 - Vision (Depth)
   { code: "BL", name: "Blue Room", description: "Connect to specific sanctuary furniture/services", category: "5th Floor" },
   { code: "PR", name: "Prophecy Room", description: "Align with prophetic timelines", category: "5th Floor" },
+  
+  // Floor 6 - Three Heavens & Cycles (Depth)
   { code: "@Ad", name: "Adamic Cycle", description: "First cycle: Fall → Promise → Seed conflict", category: "6th Floor" },
   { code: "@Mo", name: "Mosaic Cycle", description: "Exodus → Covenant → Sanctuary nation", category: "6th Floor" },
   { code: "@CyC", name: "Cyrus-Christ Cycle", description: "Type meets antitype in Christ", category: "6th Floor" },
   { code: "@Sp", name: "Spirit Cycle", description: "Church age under Spirit power", category: "6th Floor" },
-  { code: "@Re", name: "Remnant Cycle", description: "Final witness before Second Coming", category: "6th Floor" }
+  { code: "@Re", name: "Remnant Cycle", description: "Final witness before Second Coming", category: "6th Floor" },
+  
+  // Floor 7 - Spiritual & Emotional (Height)
+  { code: "FRm", name: "Fire Room", description: "Feel the emotional weight and conviction of the text", category: "7th Floor" },
+  { code: "MR", name: "Meditation Room", description: "Slow down and marinate in the truth", category: "7th Floor" }
 ];
 
 serve(async (req) => {
@@ -165,7 +186,7 @@ CRITICAL INSTRUCTIONS FOR EACH PRINCIPLE TYPE:
 
 **Concentration Room (CR)**: Explicitly show HOW Christ is revealed in this specific verse.
 
-**Dimensions Room (DR)**: Move through AT LEAST TWO dimensions showing how meaning unfolds. Example: "Literal: the text says X. Christ dimension: this reveals Christ as Y. Me dimension: this means for me Z."
+**Dimensions (DR-Lit, DR-Christ, DR-Me, DR-Church, DR-Heaven)**: Pick ONE specific dimension and show how the verse reveals meaning in that layer. Example for DR-Christ: "This verse reveals Christ as the ultimate gift - God's own Son given for humanity's redemption."
 
 **Connect 6 (C6)**: You MUST connect to a SPECIFIC verse or story from a DIFFERENT GENRE with full reference. 
 - If verse is Gospel → connect to Prophecy, Psalm, Law, History, or Epistle
