@@ -2871,6 +2871,9 @@ export type Database = {
           daily_study_streak: number | null
           display_name: string | null
           equations_streak: number | null
+          focused_room_floor: number | null
+          focused_room_id: string | null
+          focused_room_set_at: string | null
           gem_creation_streak: number | null
           has_lifetime_access: boolean
           id: string
@@ -2915,6 +2918,9 @@ export type Database = {
           daily_study_streak?: number | null
           display_name?: string | null
           equations_streak?: number | null
+          focused_room_floor?: number | null
+          focused_room_id?: string | null
+          focused_room_set_at?: string | null
           gem_creation_streak?: number | null
           has_lifetime_access?: boolean
           id: string
@@ -2959,6 +2965,9 @@ export type Database = {
           daily_study_streak?: number | null
           display_name?: string | null
           equations_streak?: number | null
+          focused_room_floor?: number | null
+          focused_room_id?: string | null
+          focused_room_set_at?: string | null
           gem_creation_streak?: number | null
           has_lifetime_access?: boolean
           id?: string
