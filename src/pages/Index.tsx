@@ -46,6 +46,7 @@ import { UserCountBadge } from "@/components/UserCountBadge";
 import { SocialShareButton } from "@/components/SocialShareButton";
 import { PWAInstallButton } from "@/components/PWAInstallButton";
 import { InstantDemo } from "@/components/InstantDemo";
+import { LiveAIDemoWidget } from "@/components/LiveAIDemoWidget";
 import { ContinueWhereYouLeftOff } from "@/components/ContinueWhereYouLeftOff";
 
 const Index = () => {
@@ -165,9 +166,9 @@ const Index = () => {
         </div>
       )}
       
-      {/* Hero Section - Pain First */}
+      {/* Hero Section - Clear Value Prop */}
       <section className="relative overflow-hidden pt-32 pb-24 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-primary/5 via-background to-accent/5">
-        <div className="max-w-6xl mx-auto text-center">
+        <div className="max-w-6xl mx-auto">
           <div className="flex justify-center items-center gap-4 mb-8">
             <UserCountBadge />
             <SocialShareButton
@@ -181,40 +182,123 @@ const Index = () => {
             />
           </div>
           
-          <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold mb-6 leading-tight">
-            Your Mind Was Designed to<br />
-            <span className="text-primary">Understand and Remember the Bible Visually</span>
-          </h1>
-          
-          <p className="text-xl md:text-2xl text-muted-foreground mb-8 max-w-3xl mx-auto leading-relaxed">
-            Stop closing your Bible confused. The Palace Method shows you how to study step-by-step and turns Scripture into a visual map—
-            <span className="font-semibold text-foreground">so every story, verse, and prophecy finally makes sense and sticks.</span>
-          </p>
-          
-          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12">
-            <Button 
-              size="lg" 
-              onClick={() => navigate(user ? "/palace" : "/auth")}
-              className="text-lg px-8 py-6 shadow-lg hover:shadow-xl transition-shadow"
-            >
-              Start Free Trial <ChevronRight className="ml-2 h-5 w-5" />
-            </Button>
-            <Button 
-              size="lg" 
-              variant="outline"
-              onClick={() => navigate("/interactive-demo")}
-              className="text-lg px-8 py-6"
-            >
-              Try Interactive Demo
-            </Button>
+          <div className="text-center mb-12">
+            <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold mb-6 leading-tight">
+              Stop Getting Lost in Bible Study
+            </h1>
+            
+            <p className="text-xl md:text-2xl text-muted-foreground mb-8 max-w-3xl mx-auto leading-relaxed">
+              Phototheology turns Scripture into a <span className="font-semibold text-foreground">visual Palace</span> you can actually <span className="text-primary font-semibold">understand, remember, and navigate</span>.
+            </p>
+            
+            {/* Social Proof */}
+            <div className="mb-8">
+              <p className="text-lg text-muted-foreground">
+                ⭐ Over <span className="font-bold text-primary">20,000 people</span> have used Phototheology to transform their Bible study
+              </p>
+            </div>
+            
+            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12">
+              <Button 
+                size="lg" 
+                onClick={() => navigate("/interactive-demo")}
+                className="text-lg px-8 py-6 shadow-lg hover:shadow-xl transition-shadow gap-2"
+              >
+                <Play className="h-5 w-5" />
+                New to Phototheology? Start Here — 60-Second Tour
+              </Button>
+              <Button 
+                size="lg" 
+                variant="outline"
+                onClick={() => navigate(user ? "/palace" : "/auth")}
+                className="text-lg px-8 py-6"
+              >
+                Start Free Trial <ChevronRight className="ml-2 h-5 w-5" />
+              </Button>
+            </div>
           </div>
           
-          <div className="relative max-w-4xl mx-auto">
-            <img 
-              src={heroImage} 
-              alt="Phototheology Palace Interface" 
-              className="rounded-lg shadow-2xl border-2 border-border"
-            />
+          {/* Hero Video */}
+          <div className="relative max-w-4xl mx-auto mb-8">
+            <video 
+              autoPlay 
+              loop 
+              muted 
+              playsInline
+              className="rounded-lg shadow-2xl border-2 border-border w-full"
+              poster={heroImage}
+            >
+              <source src="/videos/app-opener.mp4" type="video/mp4" />
+              <img 
+                src={heroImage} 
+                alt="Phototheology Palace Interface" 
+                className="rounded-lg shadow-2xl border-2 border-border"
+              />
+            </video>
+          </div>
+        </div>
+      </section>
+
+      {/* Pain Points Section - First Scroll */}
+      <section className="py-16 px-4 sm:px-6 lg:px-8 bg-muted/50">
+        <div className="max-w-6xl mx-auto">
+          <h2 className="text-3xl md:text-4xl font-bold text-center mb-12">
+            Do These Sound Familiar?
+          </h2>
+          
+          <div className="grid md:grid-cols-3 gap-6">
+            <Card className="border-2 border-destructive/20 bg-destructive/5">
+              <CardHeader>
+                <div className="w-12 h-12 rounded-full bg-destructive/20 flex items-center justify-center mb-3">
+                  <HelpCircle className="w-6 h-6 text-destructive" />
+                </div>
+                <CardTitle className="text-xl">"I don't understand the Bible"</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-muted-foreground">
+                  Stories feel disconnected. Prophecies are confusing. You close your Bible more confused than when you opened it.
+                </p>
+              </CardContent>
+            </Card>
+            
+            <Card className="border-2 border-destructive/20 bg-destructive/5">
+              <CardHeader>
+                <div className="w-12 h-12 rounded-full bg-destructive/20 flex items-center justify-center mb-3">
+                  <Search className="w-6 h-6 text-destructive" />
+                </div>
+                <CardTitle className="text-xl">"I don't know how to study it"</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-muted-foreground">
+                  You read but don't retain. You want to go deeper but don't know where to start or what method to use.
+                </p>
+              </CardContent>
+            </Card>
+            
+            <Card className="border-2 border-destructive/20 bg-destructive/5">
+              <CardHeader>
+                <div className="w-12 h-12 rounded-full bg-destructive/20 flex items-center justify-center mb-3">
+                  <Brain className="w-6 h-6 text-destructive" />
+                </div>
+                <CardTitle className="text-xl">"I can't remember what I read"</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-muted-foreground">
+                  By next week, it's gone. You can't recall verses, connections, or even basic storylines when you need them.
+                </p>
+              </CardContent>
+            </Card>
+          </div>
+          
+          <div className="text-center mt-12">
+            <p className="text-2xl font-bold mb-4">
+              <span className="text-primary">Phototheology is your single solution.</span>
+            </p>
+            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+              A complete system that teaches you <span className="font-semibold">how to study</span>, 
+              helps you <span className="font-semibold">understand deeply</span>, 
+              and ensures you <span className="font-semibold">remember permanently</span>.
+            </p>
           </div>
         </div>
       </section>
@@ -222,6 +306,12 @@ const Index = () => {
       {/* Instant Demo Section - No signup required */}
       <InstantDemo />
 
+      {/* Live AI Demo Widget */}
+      <section className="py-16 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-4xl mx-auto">
+          <LiveAIDemoWidget />
+        </div>
+      </section>
 
       {/* How It Works - 3 Steps */}
       <section className="py-24 px-4 sm:px-6 lg:px-8 bg-muted/30">
