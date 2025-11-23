@@ -18,6 +18,7 @@ import { SocialShareButton } from "@/components/SocialShareButton";
 import defaultVideoThumbnail from "@/assets/video-training-thumbnail.png";
 import { useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
+import { Helmet } from "react-helmet-async";
 
 interface TrainingVideo {
   id: string;
@@ -195,8 +196,41 @@ const VideoTraining = () => {
     { value: "advanced", label: "Advanced" },
   ];
 
+  // Dynamic meta tags for social sharing
+  const shareUrl = selectedVideo 
+    ? `${window.location.origin}/video-training?video=${selectedVideo.id}`
+    : `${window.location.origin}/video-training`;
+  const shareTitle = selectedVideo 
+    ? `${selectedVideo.title} - Phototheology Video Training`
+    : "Video Training - Phototheology";
+  const shareDescription = selectedVideo?.description 
+    || "Learn how to use Phototheology with step-by-step video tutorials";
+  const shareImage = selectedVideo?.thumbnail_url 
+    || `${window.location.origin}/phototheology-hero.png`;
+
   return (
     <div className="container mx-auto px-4 py-8 max-w-7xl">
+      <Helmet>
+        <title>{shareTitle}</title>
+        <meta name="description" content={shareDescription} />
+        
+        {/* Open Graph / Facebook */}
+        <meta property="og:type" content="video.other" />
+        <meta property="og:url" content={shareUrl} />
+        <meta property="og:title" content={shareTitle} />
+        <meta property="og:description" content={shareDescription} />
+        <meta property="og:image" content={shareImage} />
+        <meta property="og:image:width" content="1280" />
+        <meta property="og:image:height" content="720" />
+        
+        {/* Twitter */}
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:url" content={shareUrl} />
+        <meta name="twitter:title" content={shareTitle} />
+        <meta name="twitter:description" content={shareDescription} />
+        <meta name="twitter:image" content={shareImage} />
+      </Helmet>
+      
       <Navigation />
       <div className="flex justify-between items-center mb-8">
         <div>
