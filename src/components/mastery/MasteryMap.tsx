@@ -1,11 +1,14 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { useAllRoomMasteries } from "@/hooks/useMastery";
 import { MasteryBadge } from "./MasteryBadge";
-import { Map as MapIcon, TrendingUp, Lock } from "lucide-react";
+import { Map as MapIcon, TrendingUp, Lock, Target, ArrowRight } from "lucide-react";
 import { palaceFloors } from "@/data/palaceData";
+import { useNavigate } from "react-router-dom";
 
 export const MasteryMap = () => {
   const { data: masteries, isLoading } = useAllRoomMasteries();
+  const navigate = useNavigate();
 
   if (isLoading) {
     return <div className="text-center py-8">Loading mastery map...</div>;
@@ -64,7 +67,7 @@ export const MasteryMap = () => {
                     return (
                       <div
                         key={room.id}
-                        className={`p-4 rounded-lg border-2 transition-all ${
+                        className={`p-4 rounded-lg border-2 transition-all hover:shadow-lg cursor-pointer ${
                           isMastered
                             ? "bg-gradient-to-br from-amber-50 to-yellow-50 dark:from-amber-950/20 dark:to-yellow-950/20 border-amber-300"
                             : isStarted
@@ -84,7 +87,7 @@ export const MasteryMap = () => {
                           )}
                         </div>
                         {isStarted && (
-                          <div className="mt-2">
+                          <div className="mt-2 mb-3">
                             <div className="w-full bg-background/50 rounded-full h-1.5">
                               <div
                                 className="bg-primary rounded-full h-1.5 transition-all"
@@ -93,6 +96,16 @@ export const MasteryMap = () => {
                             </div>
                           </div>
                         )}
+                        <Button
+                          size="sm"
+                          variant={isMastered ? "outline" : "default"}
+                          className="w-full mt-2"
+                          onClick={() => navigate(`/palace/floor/${floor.number}/room/${room.id}`)}
+                        >
+                          <Target className="h-3 w-3 mr-1" />
+                          {isMastered ? "Review" : isStarted ? "Continue Mastery" : "Start Mastering"}
+                          <ArrowRight className="h-3 w-3 ml-1" />
+                        </Button>
                       </div>
                     );
                   })}
@@ -122,7 +135,7 @@ export const MasteryMap = () => {
                 return (
                   <div
                     key={room.id}
-                    className="p-4 rounded-lg bg-background border-2 border-primary/20"
+                    className="p-4 rounded-lg bg-background border-2 border-primary/20 hover:shadow-lg transition-shadow"
                   >
                     <div className="flex items-start justify-between mb-2">
                       <div>
@@ -133,7 +146,17 @@ export const MasteryMap = () => {
                       </div>
                       {level > 0 && <MasteryBadge level={level} size="sm" showTitle={false} />}
                     </div>
-                    <p className="text-sm text-muted-foreground line-clamp-2">{room.purpose}</p>
+                    <p className="text-sm text-muted-foreground line-clamp-2 mb-3">{room.purpose}</p>
+                    <Button
+                      size="sm"
+                      variant="secondary"
+                      className="w-full"
+                      onClick={() => navigate(`/palace/floor/${room.floorNumber}/room/${room.id}`)}
+                    >
+                      <Target className="h-3 w-3 mr-1" />
+                      {level > 0 ? "Continue" : "Start"}
+                      <ArrowRight className="h-3 w-3 ml-1" />
+                    </Button>
                   </div>
                 );
               })}
