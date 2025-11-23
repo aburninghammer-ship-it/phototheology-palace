@@ -11,6 +11,11 @@ import {
 export const NavigationStyleToggle = () => {
   const { preferences, updatePreference } = useUserPreferences();
 
+  const handleStyleChange = (style: "full" | "simplified") => {
+    console.log("Navigation style changing to:", style);
+    updatePreference("navigation_style", style);
+  };
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -25,18 +30,20 @@ export const NavigationStyleToggle = () => {
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
         <DropdownMenuItem
-          onClick={() => updatePreference("navigation_style", "full")}
+          onClick={() => handleStyleChange("full")}
           className={preferences.navigation_style === "full" ? "bg-accent" : ""}
         >
           <LayoutGrid className="h-4 w-4 mr-2" />
           Full Navigation
+          {preferences.navigation_style === "full" && <span className="ml-auto">✓</span>}
         </DropdownMenuItem>
         <DropdownMenuItem
-          onClick={() => updatePreference("navigation_style", "simplified")}
+          onClick={() => handleStyleChange("simplified")}
           className={preferences.navigation_style === "simplified" ? "bg-accent" : ""}
         >
           <Menu className="h-4 w-4 mr-2" />
           Simplified Navigation
+          {preferences.navigation_style === "simplified" && <span className="ml-auto">✓</span>}
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
