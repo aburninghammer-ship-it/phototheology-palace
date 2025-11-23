@@ -138,6 +138,7 @@ const JoinChurch = lazy(() => import("./pages/JoinChurch"));
 const ChurchSignup = lazy(() => import("./pages/ChurchSignup"));
 const ChurchSignupSuccess = lazy(() => import("./pages/ChurchSignupSuccess"));
 const ChurchSignupCancelled = lazy(() => import("./pages/ChurchSignupCancelled"));
+const ManageSubscription = lazy(() => import("./pages/ManageSubscription"));
 const AdminStrongsImport = lazy(() => import("./pages/AdminStrongsImport"));
 const AdminBibleImport = lazy(() => import("./pages/AdminBibleImport"));
 const OfflineContent = lazy(() => import("./pages/OfflineContent"));
@@ -326,6 +327,7 @@ function App() {
             <Route path="/church-signup" element={<ChurchSignup />} />
             <Route path="/church-signup/success" element={<ChurchSignupSuccess />} />
             <Route path="/church-signup/cancelled" element={<ChurchSignupCancelled />} />
+            <Route path="/manage-subscription" element={<ManageSubscription />} />
             <Route path="/privacy-policy" element={<PrivacyPolicy />} />
             <Route path="/terms-of-service" element={<TermsOfService />} />
             <Route path="/delete-account" element={<DeleteAccount />} />
