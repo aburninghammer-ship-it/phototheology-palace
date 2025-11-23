@@ -208,12 +208,15 @@ Format your response as a structured JSON with this exact schema:
       "principle_applied": "🌍Now",
       "principle_code": "TZ",
       "principle_name": "Time Zone (6 zones)",
+      "floor": "Floor 1",
       "application": "specific, concrete application",
       "key_insight": "memorable insight",
       "practical_takeaway": "clear action step"
     }
   ]
 }
+
+IMPORTANT: The "floor" field must match the floor number where the principle comes from (Floor 1, Floor 2, Floor 3, Floor 4, Floor 5, Floor 6, or Floor 7).
 
 Make it engaging, Christ-centered, specific, and practically applicable.`;
 

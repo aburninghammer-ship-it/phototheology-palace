@@ -14,6 +14,7 @@ interface PrincipleBreakdown {
   principle_applied: string;
   principle_code: string;
   principle_name: string;
+  floor?: string;
   application: string;
   key_insight: string;
   practical_takeaway: string;
@@ -253,11 +254,24 @@ export default function DailyVerse() {
 
         {/* Breakdown */}
         <div className="space-y-4">
-          {todayVerse.breakdown.breakdown.map((item, index) => (
+          {todayVerse.breakdown.breakdown
+            .sort((a, b) => {
+              const floorA = parseInt(a.floor?.match(/\d+/)?.[0] || '0');
+              const floorB = parseInt(b.floor?.match(/\d+/)?.[0] || '0');
+              return floorA - floorB;
+            })
+            .map((item, index) => (
             <Card key={index}>
               <CardHeader>
                 <div className="space-y-2">
-                  <Badge className="w-fit">{item.principle_applied}</Badge>
+                  <div className="flex items-center gap-2">
+                    {item.floor && (
+                      <Badge variant="secondary" className="text-xs">
+                        {item.floor}
+                      </Badge>
+                    )}
+                    <Badge className="w-fit">{item.principle_applied}</Badge>
+                  </div>
                   <CardTitle className="text-lg">
                     {item.principle_name}
                   </CardTitle>
