@@ -466,6 +466,103 @@ export default function RoomDetail() {
 
                     <Separator />
 
+                    <div className="space-y-3">
+                      <h4 className="font-semibold text-sm">Mastering Multiple Rooms: Global Master Titles</h4>
+                      <p className="text-xs text-muted-foreground">
+                        As you master multiple rooms, you gain global ranks that represent your depth of understanding across the Palace.
+                      </p>
+                      
+                      <div className="space-y-2">
+                        <div className="flex items-start gap-3 p-2 rounded-lg bg-blue-500/10 border border-blue-500/20">
+                          <div className="h-4 w-4 rounded-full bg-blue-500 mt-0.5 flex-shrink-0" />
+                          <div className="flex-1">
+                            <div className="font-medium text-sm text-blue-600">BLUE MASTER — 1–3 Rooms Mastered</div>
+                            <div className="text-xs text-muted-foreground mt-0.5">
+                              <strong>Requirements:</strong> None beyond room mastery<br />
+                              <strong>Reward:</strong> Blue Master title
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="flex items-start gap-3 p-2 rounded-lg bg-red-500/10 border border-red-500/20">
+                          <div className="h-4 w-4 rounded-full bg-red-500 mt-0.5 flex-shrink-0" />
+                          <div className="flex-1">
+                            <div className="font-medium text-sm text-red-600">RED MASTER — 4–9 Rooms Mastered</div>
+                            <div className="text-xs text-muted-foreground mt-0.5">
+                              <strong>Requirements:</strong> 7-day global streak<br />
+                              <strong>Reward:</strong> Red Master title + Red Challenges
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="flex items-start gap-3 p-2 rounded-lg bg-yellow-500/10 border border-yellow-500/20">
+                          <div className="h-4 w-4 rounded-full bg-yellow-500 mt-0.5 flex-shrink-0" />
+                          <div className="flex-1">
+                            <div className="font-medium text-sm text-yellow-600">GOLD MASTER — 10–18 Rooms Mastered</div>
+                            <div className="text-xs text-muted-foreground mt-0.5">
+                              <strong>Requirements:</strong> 14-day global streak<br />
+                              <strong>Reward:</strong> Gold Master title + advanced chain tools
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="flex items-start gap-3 p-2 rounded-lg bg-purple-500/10 border border-purple-500/20">
+                          <div className="h-4 w-4 rounded-full bg-purple-500 mt-0.5 flex-shrink-0" />
+                          <div className="flex-1">
+                            <div className="font-medium text-sm text-purple-600">PURPLE MASTER — 19–27 Rooms Mastered</div>
+                            <div className="text-xs text-muted-foreground mt-0.5">
+                              <strong>Requirements:</strong> 21-day global streak<br />
+                              <strong>Reward:</strong> Purple Master title + create-your-own drills
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="flex items-start gap-3 p-2 rounded-lg bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-600">
+                          <div className="h-4 w-4 rounded-full bg-white border-2 border-gray-400 mt-0.5 flex-shrink-0" />
+                          <div className="flex-1">
+                            <div className="font-medium text-sm">WHITE MASTER — 28–37 Rooms Mastered</div>
+                            <div className="text-xs text-muted-foreground mt-0.5">
+                              <strong>Requirements:</strong> 30-day global streak<br />
+                              <strong>Reward:</strong> White Master title + Temple Mode + prophecy maps
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="flex items-start gap-3 p-3 rounded-lg bg-gradient-to-br from-gray-900 to-gray-700 border-2 border-gray-800">
+                          <div className="h-4 w-4 rounded-full bg-black border-2 border-gray-500 mt-0.5 flex-shrink-0" />
+                          <div className="flex-1">
+                            <div className="font-medium text-sm text-white">⚫ BLACK MASTER — 38 ROOMS MASTERED</div>
+                            <div className="text-xs text-gray-300 mt-1 italic">The Phototheology equivalent of a spiritual black belt.</div>
+                            <div className="text-xs text-gray-200 mt-2 space-y-1">
+                              <div><strong>Final Requirements:</strong></div>
+                              <ul className="list-disc list-inside space-y-0.5 ml-2">
+                                <li>38 rooms mastered at Level 5</li>
+                                <li>Final Master Exam</li>
+                                <li>12-verse chain creation</li>
+                                <li>Teach-the-Palace test</li>
+                                <li>3 prophetic integration exercises</li>
+                                <li>60-day global streak</li>
+                              </ul>
+                              <div className="mt-2"><strong>Rewards:</strong></div>
+                              <ul className="list-disc list-inside space-y-0.5 ml-2">
+                                <li>Black Master Title</li>
+                                <li>Black Palace Mode</li>
+                                <li>Shadow Chains (advanced mode)</li>
+                                <li>Prophetic Lattice Engine</li>
+                                <li>Mentor privileges in the app</li>
+                                <li>Access to the 8th-floor Revelation Chamber</li>
+                              </ul>
+                              <div className="mt-2 text-amber-300 font-semibold">
+                                Only the most disciplined, consistent, and skilled users will ever reach this tier.
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <Separator />
+
                     <div className="space-y-2">
                       <h4 className="font-semibold text-sm">How to Earn XP:</h4>
                       <div className="grid grid-cols-2 gap-2 text-xs">
