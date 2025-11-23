@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { SimplifiedNav } from "@/components/SimplifiedNav";
+import { Navigation } from "@/components/Navigation";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
@@ -10,6 +11,7 @@ import { useReadingHistory } from "@/hooks/useReadingHistory";
 import { SpacedRepetitionReview } from "@/components/SpacedRepetitionReview";
 import { DashboardSkeleton } from "@/components/SkeletonLoader";
 import { PalaceProgressDashboard } from "@/components/PalaceProgressDashboard";
+import { useUserPreferences } from "@/hooks/useUserPreferences";
 import { Brain, Building2 } from "lucide-react";
 import { 
   BookOpen, 
@@ -112,6 +114,7 @@ export default function Dashboard() {
   const { user } = useAuth();
   const navigate = useNavigate();
   const { getRecentReading } = useReadingHistory();
+  const { preferences } = useUserPreferences();
   const [stats, setStats] = useState<DashboardStats>({
     dailyStreak: 0,
     totalPoints: 0,
@@ -171,7 +174,7 @@ export default function Dashboard() {
 
   return (
     <div className="min-h-screen gradient-dreamy">
-      <SimplifiedNav />
+      {preferences.navigation_style === "simplified" ? <SimplifiedNav /> : <Navigation />}
       <div className="container mx-auto px-4 py-8 max-w-7xl">
         <div className="mb-8">
           <h1 className="text-4xl font-bold mb-2">Welcome back! 👋</h1>
