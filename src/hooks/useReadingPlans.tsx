@@ -24,6 +24,7 @@ interface UserProgress {
   started_at: string;
   created_at: string;
   updated_at: string;
+  preferred_translation?: string;
 }
 
 export const useReadingPlans = () => {
@@ -112,7 +113,7 @@ export const useReadingPlans = () => {
     }
   };
 
-  const startPlan = async (planId: string) => {
+  const startPlan = async (planId: string, translation: string = "kjv") => {
     if (!user) {
       toast({
         title: "Authentication Required",
@@ -149,6 +150,7 @@ export const useReadingPlans = () => {
           .update({
             is_active: true,
             current_day: existing.current_day || 1,
+            preferred_translation: translation,
           })
           .eq("id", existing.id)
           .select()
@@ -166,6 +168,7 @@ export const useReadingPlans = () => {
             current_day: 1,
             is_active: true,
             started_at: new Date().toISOString(),
+            preferred_translation: translation,
           })
           .select()
           .single();

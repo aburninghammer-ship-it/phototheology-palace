@@ -13,6 +13,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { RefreshCw } from "lucide-react";
 import { BIBLE_BOOK_METADATA } from "@/data/bibleBooks";
+import { BIBLE_TRANSLATIONS } from "@/services/bibleApi";
 
 export default function DailyReading() {
   const { userProgress, loading, generateExercises } = useReadingPlans();
@@ -217,9 +218,16 @@ export default function DailyReading() {
                 Your daily reading assignment
               </p>
               {plan && (
-                <p className="text-sm text-muted-foreground mt-1">
-                  Current plan: {plan.name}
-                </p>
+                <div className="flex items-center gap-2 mt-1">
+                  <p className="text-sm text-muted-foreground">
+                    {plan.name}
+                  </p>
+                  {userProgress.preferred_translation && (
+                    <Badge variant="outline" className="text-xs">
+                      {BIBLE_TRANSLATIONS.find(t => t.value === userProgress.preferred_translation)?.label.split('(')[1]?.replace(')', '') || userProgress.preferred_translation.toUpperCase()}
+                    </Badge>
+                  )}
+                </div>
               )}
             </div>
             <div className="text-right">
@@ -244,7 +252,7 @@ export default function DailyReading() {
                 <div 
                   key={idx}
                   className="flex items-center justify-between p-4 bg-muted/50 rounded-lg hover:bg-muted transition-colors cursor-pointer"
-                  onClick={() => navigate(`/bible/${passage.book}/${passage.chapter}`, {
+                  onClick={() => navigate(`/bible/${passage.book}/${passage.chapter}?t=${userProgress.preferred_translation || 'kjv'}`, {
                     state: { 
                       exercises,
                       fromReadingPlan: true,

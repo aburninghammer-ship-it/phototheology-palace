@@ -4758,6 +4758,7 @@ export type Database = {
           is_active: boolean | null
           last_completed_day: number | null
           plan_id: string
+          preferred_translation: string | null
           started_at: string
           updated_at: string | null
           user_id: string
@@ -4770,6 +4771,7 @@ export type Database = {
           is_active?: boolean | null
           last_completed_day?: number | null
           plan_id: string
+          preferred_translation?: string | null
           started_at?: string
           updated_at?: string | null
           user_id: string
@@ -4782,6 +4784,7 @@ export type Database = {
           is_active?: boolean | null
           last_completed_day?: number | null
           plan_id?: string
+          preferred_translation?: string | null
           started_at?: string
           updated_at?: string | null
           user_id?: string

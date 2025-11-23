@@ -8,12 +8,20 @@ import { Book, Calendar, Clock, Play, LogIn, Building2, BookOpen, Layers, Target
 import { Badge } from "@/components/ui/badge";
 import { useAuth } from "@/hooks/useAuth";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useState } from "react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { BIBLE_TRANSLATIONS } from "@/services/bibleApi";
 
 export default function ReadingPlans() {
   const { plans, userProgress, loading, startPlan, refetchProgress } = useReadingPlans();
   const { user } = useAuth();
   const navigate = useNavigate();
   const activePlan = userProgress ? plans.find((p) => p.id === userProgress.plan_id) : null;
+  const [selectedPlanId, setSelectedPlanId] = useState<string | null>(null);
+  const [selectedTranslation, setSelectedTranslation] = useState("kjv");
+  const [showTranslationDialog, setShowTranslationDialog] = useState(false);
 
   const getDifficultyColor = (depthMode: string) => {
     switch (depthMode) {
@@ -33,9 +41,16 @@ export default function ReadingPlans() {
     }
   };
 
-  const handleStartPlan = async (planId: string) => {
-    await startPlan(planId);
+  const handleOpenTranslationDialog = (planId: string) => {
+    setSelectedPlanId(planId);
+    setShowTranslationDialog(true);
+  };
+
+  const handleStartPlan = async () => {
+    if (!selectedPlanId) return;
+    await startPlan(selectedPlanId, selectedTranslation);
     await refetchProgress();
+    setShowTranslationDialog(false);
     navigate("/daily-reading");
   };
 
@@ -190,7 +205,7 @@ export default function ReadingPlans() {
                     {user ? (
                       <Button 
                         className="w-full" 
-                        onClick={() => handleStartPlan(plan.id)}
+                        onClick={() => handleOpenTranslationDialog(plan.id)}
                       >
                         {userProgress ? "Switch to This Plan" : "Start Plan"}
                         <Play className="ml-2 h-4 w-4" />
@@ -264,7 +279,7 @@ export default function ReadingPlans() {
                     {user ? (
                       <Button 
                         className="w-full" 
-                        onClick={() => handleStartPlan(plan.id)}
+                        onClick={() => handleOpenTranslationDialog(plan.id)}
                       >
                         {userProgress ? "Switch to This Plan" : "Start Plan"}
                         <Play className="ml-2 h-4 w-4" />
@@ -292,6 +307,43 @@ export default function ReadingPlans() {
           </Card>
         )}
       </div>
+
+      {/* Translation Selection Dialog */}
+      <Dialog open={showTranslationDialog} onOpenChange={setShowTranslationDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Choose Your Bible Translation</DialogTitle>
+            <DialogDescription>
+              Select the translation you'd like to use for this reading plan
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label htmlFor="translation">Translation</Label>
+              <Select value={selectedTranslation} onValueChange={setSelectedTranslation}>
+                <SelectTrigger id="translation">
+                  <SelectValue placeholder="Select a translation" />
+                </SelectTrigger>
+                <SelectContent>
+                  {BIBLE_TRANSLATIONS.map((translation) => (
+                    <SelectItem key={translation.value} value={translation.value}>
+                      {translation.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowTranslationDialog(false)}>
+              Cancel
+            </Button>
+            <Button onClick={handleStartPlan}>
+              Start Plan
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
