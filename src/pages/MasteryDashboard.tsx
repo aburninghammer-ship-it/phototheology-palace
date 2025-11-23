@@ -10,6 +10,7 @@ import { useMastery, useAllRoomMasteries, useGlobalMasterTitle } from "@/hooks/u
 import { useMasteryStreak } from "@/hooks/useMasteryStreak";
 import { Flame, Trophy, Crown, Target, TrendingUp, Zap, Map as MapIcon, FileText } from "lucide-react";
 import { getGlobalTitle, getNextGlobalTitleMilestone } from "@/utils/masteryCalculations";
+import { cn } from "@/lib/utils";
 
 export default function MasteryDashboard() {
   const { data: allMasteries, isLoading: masteriesLoading } = useAllRoomMasteries();
@@ -143,6 +144,73 @@ export default function MasteryDashboard() {
           </TabsList>
 
           <TabsContent value="overview" className="space-y-6">
+            {/* Global Title Progression */}
+            <Card className="bg-gradient-to-br from-amber-500/10 to-yellow-500/10 border-amber-500/20">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Crown className="h-5 w-5 text-amber-500" />
+                  Global Master Titles
+                </CardTitle>
+                <CardDescription>
+                  Master rooms to unlock prestigious titles across the Palace
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-2">
+                  {[
+                    { level: 1, title: "Novice Scholar", rooms: 0, color: "text-gray-400" },
+                    { level: 2, title: "Diligent Student", rooms: 5, color: "text-blue-400" },
+                    { level: 3, title: "Devoted Learner", rooms: 10, color: "text-green-400" },
+                    { level: 4, title: "Palace Navigator", rooms: 20, color: "text-purple-400" },
+                    { level: 5, title: "Wisdom Seeker", rooms: 30, color: "text-pink-400" },
+                    { level: 6, title: "Palace Guardian", rooms: 45, color: "text-orange-400" },
+                    { level: 7, title: "Master Theologian", rooms: 60, color: "text-red-400" },
+                    { level: 8, title: "Grand Palace Master", rooms: 80, color: "text-amber-400" },
+                  ].map((titleInfo) => {
+                    const isUnlocked = roomsMastered >= titleInfo.rooms;
+                    const isCurrent = currentGlobalTitle === titleInfo.title;
+                    
+                    return (
+                      <div
+                        key={titleInfo.level}
+                        className={cn(
+                          "flex items-center justify-between p-3 rounded-lg border transition-all",
+                          isCurrent && "bg-primary/10 border-primary/30",
+                          isUnlocked && !isCurrent && "bg-accent/5 border-accent/20",
+                          !isUnlocked && "opacity-50 bg-muted/5"
+                        )}
+                      >
+                        <div className="flex items-center gap-3">
+                          <div className={cn(
+                            "w-8 h-8 rounded-full flex items-center justify-center font-bold",
+                            isUnlocked ? "bg-primary/20 text-primary" : "bg-muted text-muted-foreground"
+                          )}>
+                            {titleInfo.level}
+                          </div>
+                          <div>
+                            <div className={cn("font-semibold", titleInfo.color)}>
+                              {titleInfo.title}
+                              {isCurrent && <span className="ml-2 text-xs text-primary">(Current)</span>}
+                            </div>
+                            <div className="text-xs text-muted-foreground">
+                              {titleInfo.rooms === 0 ? "Starting title" : `${titleInfo.rooms} rooms mastered`}
+                            </div>
+                          </div>
+                        </div>
+                        {isUnlocked ? (
+                          <Crown className="h-5 w-5 text-amber-500" />
+                        ) : (
+                          <div className="text-xs text-muted-foreground">
+                            {titleInfo.rooms - roomsMastered} more
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              </CardContent>
+            </Card>
+
             {/* How It Works - Explanatory Section */}
             <Card className="bg-gradient-to-br from-accent/10 to-primary/5 border-primary/20">
               <CardHeader>
