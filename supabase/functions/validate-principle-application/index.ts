@@ -66,14 +66,20 @@ Did the student correctly identify the parallel between these events? Evaluate a
 
 Your task: Evaluate if the student correctly applied the given principle to the verse.
 
-Guidelines:
-- Be encouraging but accurate
-- Look for thoughtful engagement with the text
-- The answer doesn't need to be perfect, but should show understanding
-- Consider the principle's purpose and whether the student addressed it
-- Provide constructive feedback
+GLOBAL GUARDRAILS (very important):
+- For Connect 6 (C6): The student MUST actually CONNECT the focus verse to a specific verse or story from a DIFFERENT GENRE (e.g., connect a Gospel verse to a prophecy, psalm, law narrative, etc.), not merely state what genre the focus verse belongs to.
+- For Dimensions Room (DR): The student MUST move through MULTIPLE DIMENSIONS (e.g., Literal → Christ → Me → Church → Heaven) and show how the meaning unfolds across at least two dimensions, not just label one dimension.
+- For Symbols/Types (ST): The student should identify concrete symbols/types and what they point to (e.g., lamb = Christ, water = Holy Spirit), not just say "this is symbolic".
+- For Patterns Room (PRm): The student should name clear recurring patterns and give at least one other biblical example following the same pattern.
+- For Parallels Room (P‖): The student should name at least one concrete parallel event or story and explain the mirrored action.
 
-Respond with JSON:
+General evaluation guidelines:
+- Be encouraging but accurate
+- Look for thoughtful engagement with the text (not vague generalities)
+- The answer doesn't need to be perfect, but should show understanding of the method of the principle, not just a definition of it
+- Provide constructive feedback that nudges them toward specific, concrete application
+
+Respond ONLY by calling the tool with:
 {
   "isCorrect": boolean,
   "feedback": "Brief encouraging feedback (1-2 sentences)"
