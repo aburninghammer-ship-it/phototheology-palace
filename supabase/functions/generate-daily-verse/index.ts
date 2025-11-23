@@ -68,29 +68,25 @@ serve(async (req) => {
       );
     }
     
-    // Select 7 diverse principles from different categories to showcase Phototheology's creative genius
+    // Select exactly one principle from each of the first 7 floors
     const floorOneRooms = PALACE_PRINCIPLES.filter(p => p.category === "1st Floor");
     const floorTwoRooms = PALACE_PRINCIPLES.filter(p => p.category === "2nd Floor");
+    const floorThreeRooms = PALACE_PRINCIPLES.filter(p => p.category === "3rd Floor");
     const floorFourRooms = PALACE_PRINCIPLES.filter(p => p.category === "4th Floor");
     const floorFiveRooms = PALACE_PRINCIPLES.filter(p => p.category === "5th Floor");
     const floorSixRooms = PALACE_PRINCIPLES.filter(p => p.category === "6th Floor");
+    const floorSevenRooms = PALACE_PRINCIPLES.filter(p => p.category === "7th Floor");
     
-    // Guarantee variety by selecting from different floors
+    // Pick exactly one principle from each floor (1-7)
     const selectedPrinciples = [
-      // Pick 1-2 from Floor 1 (visualization/imagination)
       floorOneRooms[Math.floor(Math.random() * floorOneRooms.length)],
-      // Pick 1 from Floor 2 (investigation)
       floorTwoRooms[Math.floor(Math.random() * floorTwoRooms.length)],
-      // Pick 2-3 from Floor 4 (depth)
+      floorThreeRooms[Math.floor(Math.random() * floorThreeRooms.length)],
       floorFourRooms[Math.floor(Math.random() * floorFourRooms.length)],
-      floorFourRooms[Math.floor(Math.random() * floorFourRooms.length)],
-      // Pick 1 from Floor 5 or 6 (prophecy/cycles)
-      ...[...floorFiveRooms, ...floorSixRooms].sort(() => Math.random() - 0.5).slice(0, 1),
-      // Fill remaining slots randomly
-      ...PALACE_PRINCIPLES.sort(() => Math.random() - 0.5).slice(0, 2)
-    ]
-      .filter((v, i, a) => a.findIndex(t => t.code === v.code) === i) // Remove duplicates by code
-      .slice(0, 7); // Limit to exactly 7
+      floorFiveRooms[Math.floor(Math.random() * floorFiveRooms.length)],
+      floorSixRooms[Math.floor(Math.random() * floorSixRooms.length)],
+      floorSevenRooms[Math.floor(Math.random() * floorSevenRooms.length)]
+    ].filter(Boolean); // Remove any undefined if a floor has no principles
     
     console.log('Selected diverse principles:', selectedPrinciples.map(p => `${p.code} (${p.category})`));
     
