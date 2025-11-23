@@ -190,7 +190,7 @@ export default function DailyVerse() {
             </p>
           </div>
           <div className="flex gap-2">
-            {!hasRead && (
+            {user && !hasRead && (
               <Button
                 onClick={() => markAsReadMutation.mutate()}
                 disabled={markAsReadMutation.isPending}
@@ -199,7 +199,7 @@ export default function DailyVerse() {
                 Mark as Read
               </Button>
             )}
-            {hasRead && (
+            {user && hasRead && (
               <Badge variant="secondary" className="text-sm">
                 <CheckCircle2 className="mr-2 h-4 w-4" />
                 Completed Today
@@ -211,6 +211,23 @@ export default function DailyVerse() {
             </Button>
           </div>
         </div>
+
+        {/* Sign Up Prompt for Non-Authenticated Users */}
+        {!user && (
+          <Card className="border-primary bg-gradient-to-r from-primary/10 to-accent/10">
+            <CardContent className="py-6">
+              <div className="text-center space-y-4">
+                <h3 className="text-xl font-semibold">Get Your Daily Verse Every Day</h3>
+                <p className="text-muted-foreground">
+                  Sign up to track your progress, mark verses as read, and unlock the full Phototheology experience with 7 unique perspectives on every verse.
+                </p>
+                <Button asChild size="lg" className="mt-2">
+                  <a href="/auth">Sign Up Free</a>
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        )}
 
         {/* Verse Display */}
         <Card className="border-primary/20 bg-gradient-to-br from-primary/5 to-accent/5">
