@@ -10,6 +10,8 @@ import { toast } from "sonner";
 import { useAuth } from "@/hooks/useAuth";
 import { useState } from "react";
 import { Helmet } from "react-helmet-async";
+import { useUserPreferences } from "@/hooks/useUserPreferences";
+import { Navigation } from "@/components/Navigation";
 
 interface PrincipleBreakdown {
   principle_applied: string;
@@ -35,6 +37,7 @@ interface DailyVerse {
 
 export default function DailyVerse() {
   const { user } = useAuth();
+  const { preferences } = useUserPreferences();
   const queryClient = useQueryClient();
   const [shareDialogOpen, setShareDialogOpen] = useState(false);
   const [shareData, setShareData] = useState<{
@@ -198,7 +201,7 @@ export default function DailyVerse() {
         <meta name="twitter:image" content={`${window.location.origin}/phototheology-hero.png`} />
       </Helmet>
       
-      <SimplifiedNav />
+      {preferences.navigation_style === "full" ? <Navigation /> : <SimplifiedNav />}
       <div className="container mx-auto px-4 py-8 max-w-4xl space-y-6">
         {/* Header */}
         <div className="flex items-center justify-between">

@@ -4757,6 +4757,7 @@ export type Database = {
           bible_font_size: string | null
           bible_translation: string | null
           id: string
+          navigation_style: string | null
           reading_mode: string | null
           theme_preference: string | null
           updated_at: string
@@ -4766,6 +4767,7 @@ export type Database = {
           bible_font_size?: string | null
           bible_translation?: string | null
           id?: string
+          navigation_style?: string | null
           reading_mode?: string | null
           theme_preference?: string | null
           updated_at?: string
@@ -4775,6 +4777,7 @@ export type Database = {
           bible_font_size?: string | null
           bible_translation?: string | null
           id?: string
+          navigation_style?: string | null
           reading_mode?: string | null
           theme_preference?: string | null
           updated_at?: string

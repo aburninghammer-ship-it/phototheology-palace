@@ -14,6 +14,7 @@ import { Sheet, SheetContent, SheetTrigger, SheetHeader, SheetTitle } from "@/co
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
 import { GlobalSearch } from "./GlobalSearch";
+import { NavigationStyleToggle } from "./NavigationStyleToggle";
 
 export const SimplifiedNav = () => {
   const { user, signOut } = useAuth();
@@ -166,6 +167,8 @@ export const SimplifiedNav = () => {
 
         <div className="flex items-center gap-2">
           <GlobalSearch />
+          
+          <NavigationStyleToggle />
           
           <Button asChild variant="ghost" size="sm" className="hidden md:flex">
             <Link to="/pricing"><Crown className="h-4 w-4 mr-1" />Upgrade</Link>

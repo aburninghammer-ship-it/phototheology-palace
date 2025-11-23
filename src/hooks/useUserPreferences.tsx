@@ -7,6 +7,7 @@ interface UserPreferences {
   bible_translation: string;
   reading_mode: "default" | "focus" | "study";
   theme_preference: "light" | "dark" | "system";
+  navigation_style: "simplified" | "full";
 }
 
 const defaultPreferences: UserPreferences = {
@@ -14,6 +15,7 @@ const defaultPreferences: UserPreferences = {
   bible_translation: "kjv",
   reading_mode: "default",
   theme_preference: "system",
+  navigation_style: "full",
 };
 
 export const useUserPreferences = () => {
@@ -49,6 +51,7 @@ export const useUserPreferences = () => {
           bible_translation: data.bible_translation,
           reading_mode: data.reading_mode as any,
           theme_preference: data.theme_preference as any,
+          navigation_style: (data.navigation_style as any) || "full",
         });
       } else {
         // Create default preferences
@@ -83,6 +86,7 @@ export const useUserPreferences = () => {
           bible_translation: key === "bible_translation" ? value : preferences.bible_translation,
           reading_mode: key === "reading_mode" ? value : preferences.reading_mode,
           theme_preference: key === "theme_preference" ? value : preferences.theme_preference,
+          navigation_style: key === "navigation_style" ? value : preferences.navigation_style,
           updated_at: new Date().toISOString(),
         }, {
           onConflict: "user_id"

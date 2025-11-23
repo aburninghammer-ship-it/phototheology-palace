@@ -11,6 +11,7 @@ import { NotificationCenter } from "@/components/NotificationCenter";
 import { PWAInstallButton } from "@/components/PWAInstallButton";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { GlobalSearch } from "@/components/GlobalSearch";
+import { NavigationStyleToggle } from "@/components/NavigationStyleToggle";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -99,6 +100,8 @@ export const Navigation = () => {
                       </Badge>
                     )}
                   </Button>
+
+                  <NavigationStyleToggle />
 
                   <NotificationCenter />
                 </>
