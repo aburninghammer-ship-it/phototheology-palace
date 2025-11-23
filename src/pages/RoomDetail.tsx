@@ -2,13 +2,14 @@ import { useParams, Link, useNavigate } from "react-router-dom";
 import { palaceFloors } from "@/data/palaceData";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { ArrowLeft, Target, HelpCircle, BookOpen, AlertCircle, CheckCircle, Trophy, Lock, Dumbbell, Brain, ChevronDown } from "lucide-react";
+import { ArrowLeft, Target, HelpCircle, BookOpen, AlertCircle, CheckCircle, Trophy, Lock, Dumbbell, Brain, ChevronDown, Swords } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { JeevesAssistant } from "@/components/JeevesAssistant";
 import { useRoomProgress } from "@/hooks/useRoomProgress";
 import { useAuth } from "@/hooks/useAuth";
 import { useRoomUnlock } from "@/hooks/useRoomUnlock";
+import { useMastery } from "@/hooks/useMastery";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { useEffect, useState } from "react";
 import { PracticeDrill } from "@/components/practice/PracticeDrill";
@@ -24,6 +25,10 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/component
 import { ChristChapterFindings } from "@/components/ChristChapterFindings";
 import { OnboardingGuide } from "@/components/palace/OnboardingGuide";
 import { SermonTitlesList } from "@/components/SermonTitlesList";
+import { MasteryBadge } from "@/components/mastery/MasteryBadge";
+import { XpProgressBar } from "@/components/mastery/XpProgressBar";
+import { RoomMentorChat } from "@/components/mastery/RoomMentorChat";
+import { ReportCardDisplay } from "@/components/mastery/ReportCardDisplay";
 
 // Room IDs that have quick start guides
 const QUICK_START_ROOMS = new Set([
@@ -73,11 +78,15 @@ export default function RoomDetail() {
     roomId || ""
   );
   
+  const { mastery, isLoading: masteryLoading } = useMastery(roomId || "", Number(floorNumber));
   const { addItem } = useSpacedRepetition();
 
   const drillQuestions = room ? getDrillsByRoom(room.id) : [];
   const drillName = room ? getDrillName(room.id) : "Practice Drill";
   const hasDrills = drillQuestions.length > 0;
+  
+  // Check if mentor mode is unlocked (Expert or Master level)
+  const mentorModeUnlocked = mastery && mastery.mastery_level >= 4;
 
   const handleAddToReview = () => {
     if (!room) return;
@@ -539,6 +548,40 @@ export default function RoomDetail() {
           <div className="lg:col-span-1">
             {isUnlocked ? (
               <div className="space-y-4">
+                {/* Mastery Progress Card */}
+                {mastery && (
+                  <Card className="border-2 border-primary/20">
+                    <CardHeader>
+                      <CardTitle className="flex items-center gap-2">
+                        <Trophy className="h-5 w-5 text-primary" />
+                        Room Mastery
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                      <div className="flex items-center justify-between">
+                        <MasteryBadge level={mastery.mastery_level} />
+                        <span className="text-sm text-muted-foreground">
+                          {mastery.total_drills_completed + mastery.total_exercises_completed} activities
+                        </span>
+                      </div>
+                      <XpProgressBar
+                        currentXp={mastery.xp_current}
+                        xpRequired={mastery.xp_required}
+                        level={mastery.mastery_level}
+                      />
+                    </CardContent>
+                  </Card>
+                )}
+
+                {/* Mentor Mode - Unlocked at Expert (Level 4+) */}
+                {mentorModeUnlocked && mastery && (
+                  <RoomMentorChat
+                    roomId={room!.id}
+                    roomName={room!.name}
+                    masteryLevel={mastery.mastery_level}
+                  />
+                )}
+
                 {hasDrills && (
                   <Card className="border-2 border-accent/20">
                     <CardHeader>
@@ -570,7 +613,7 @@ export default function RoomDetail() {
                     drillType={drillName}
                     questions={drillQuestions}
                   />
-                ) : (
+                ) : !mentorModeUnlocked && (
                   <JeevesAssistant
                     roomTag={room.tag}
                     roomName={room.name}
