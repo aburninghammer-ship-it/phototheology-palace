@@ -223,7 +223,7 @@ const Index = () => {
             <video 
               autoPlay 
               loop 
-              muted 
+              controls
               playsInline
               className="rounded-lg shadow-2xl border-2 border-border w-full"
               poster={heroImage}
