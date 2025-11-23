@@ -24,24 +24,24 @@ serve(async (req) => {
 
     // Generate social media summary showcasing the 7 principles
     const principlesSummary = breakdown.map((item: any, idx: number) => 
-      `${idx + 1}. ${item.principle_applied} (${item.floor}): ${item.key_insight}`
-    ).join('\n');
+      `Floor ${idx + 1} - ${item.principle_applied}: ${item.key_insight}`
+    ).join('\n\n');
 
-    const summaryPrompt = `Create an engaging social media post (max 280 characters) for this daily Bible verse that highlights how Phototheology's unique 7-principle analysis provides deeper understanding:
+    const summaryPrompt = `Create an engaging explanation (2-3 sentences, max 400 characters) for sharing this daily Bible verse that showcases Phototheology's unique 7-floor analysis:
 
 Verse: ${verseReference}
-Text: "${verseText}"
+"${verseText}"
 
-7 Principles Applied:
+7-Floor Analysis Applied:
 ${principlesSummary}
 
-Your summary should:
-- Tease the depth of understanding these 7 different perspectives provide
-- Emphasize that this verse is analyzed through 7 unique lenses (floors of the Palace)
-- Create curiosity about the app's ability to reveal layers of meaning
-- End with a call to explore the full 7-principle breakdown in Phototheology
+Your explanation should:
+- Clearly communicate what makes this analysis special (7 different perspectives from 7 floors of study)
+- Use natural, accessible language (avoid awkward phrases like "God-Kind life")
+- Create genuine curiosity about the deeper meaning revealed
+- Be inspiring yet conversational
 
-Be inspiring and highlight the unique multi-dimensional commentary approach.`;
+Focus on how each floor reveals a different dimension of truth in this verse.`;
 
     const summaryResponse = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
       method: 'POST',
@@ -63,13 +63,13 @@ Be inspiring and highlight the unique multi-dimensional commentary approach.`;
     const summaryData = await summaryResponse.json();
     const summary = summaryData.choices[0].message.content;
 
-    // Generate simple verse image
-    const imagePrompt = `Create a beautiful, simple, inspirational image for this Bible verse:
+    // Generate simple verse image (compact for social sharing)
+    const imagePrompt = `Create a compact, beautiful image for this Bible verse (optimized for social media thumbnail size):
 
 "${verseText}"
 - ${verseReference}
 
-Style: Clean, modern, with elegant typography. Use warm, inspiring colors. The verse text should be clearly readable and centered. Include subtle decorative elements like light rays, gentle gradients, or minimal biblical imagery. Professional social media graphic style.`;
+Style: Simple and clean with elegant typography on a warm gradient background. The verse text should be clearly readable. Minimal design - no complex imagery, just beautiful text presentation. Square format, suitable as a small preview image for sharing.`;
 
     const imageResponse = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
       method: 'POST',
@@ -98,7 +98,7 @@ Style: Clean, modern, with elegant typography. Use warm, inspiring colors. The v
 
     return new Response(
       JSON.stringify({
-        summary,
+        summary: `${summary}\n\nExplore the full 7-floor analysis: https://phototheology.lovable.app/daily-verse`,
         imageBase64,
         appUrl: 'https://phototheology.lovable.app/daily-verse'
       }),
