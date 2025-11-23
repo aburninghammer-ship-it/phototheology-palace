@@ -1851,49 +1851,40 @@ export type Database = {
       }
       global_master_titles: {
         Row: {
-          black_master_at: string | null
-          blue_master_at: string | null
           created_at: string
-          current_title: string
-          gold_master_at: string | null
+          floors_completed: number
           id: string
-          purple_master_at: string | null
-          red_master_at: string | null
           rooms_mastered: number
+          title: string
+          title_level: number
           total_xp: number
+          unlocked_at: string | null
           updated_at: string
           user_id: string
-          white_master_at: string | null
         }
         Insert: {
-          black_master_at?: string | null
-          blue_master_at?: string | null
           created_at?: string
-          current_title?: string
-          gold_master_at?: string | null
+          floors_completed?: number
           id?: string
-          purple_master_at?: string | null
-          red_master_at?: string | null
           rooms_mastered?: number
+          title?: string
+          title_level?: number
           total_xp?: number
+          unlocked_at?: string | null
           updated_at?: string
           user_id: string
-          white_master_at?: string | null
         }
         Update: {
-          black_master_at?: string | null
-          blue_master_at?: string | null
           created_at?: string
-          current_title?: string
-          gold_master_at?: string | null
+          floors_completed?: number
           id?: string
-          purple_master_at?: string | null
-          red_master_at?: string | null
           rooms_mastered?: number
+          title?: string
+          title_level?: number
           total_xp?: number
+          unlocked_at?: string | null
           updated_at?: string
           user_id?: string
-          white_master_at?: string | null
         }
         Relationships: []
       }
@@ -1931,30 +1922,30 @@ export type Database = {
         Row: {
           created_at: string
           current_streak: number
-          global_streak: number
           id: string
           last_activity_date: string
           longest_streak: number
+          total_active_days: number
           updated_at: string
           user_id: string
         }
         Insert: {
           created_at?: string
           current_streak?: number
-          global_streak?: number
           id?: string
           last_activity_date?: string
           longest_streak?: number
+          total_active_days?: number
           updated_at?: string
           user_id: string
         }
         Update: {
           created_at?: string
           current_streak?: number
-          global_streak?: number
           id?: string
           last_activity_date?: string
           longest_streak?: number
+          total_active_days?: number
           updated_at?: string
           user_id?: string
         }
@@ -2110,49 +2101,43 @@ export type Database = {
       }
       microlearning_content: {
         Row: {
-          application: string | null
           content: string
           created_at: string
-          estimated_seconds: number
+          estimated_minutes: number
           floor_number: number
           id: string
           lesson_number: number
-          level_requirement: number
-          principle: string
-          reflection_question: string | null
+          mastery_level: number
+          principle_focus: string | null
           room_id: string
           title: string
-          verse_example: string | null
+          verse_reference: string | null
         }
         Insert: {
-          application?: string | null
           content: string
           created_at?: string
-          estimated_seconds?: number
+          estimated_minutes?: number
           floor_number: number
           id?: string
           lesson_number: number
-          level_requirement?: number
-          principle: string
-          reflection_question?: string | null
+          mastery_level: number
+          principle_focus?: string | null
           room_id: string
           title: string
-          verse_example?: string | null
+          verse_reference?: string | null
         }
         Update: {
-          application?: string | null
           content?: string
           created_at?: string
-          estimated_seconds?: number
+          estimated_minutes?: number
           floor_number?: number
           id?: string
           lesson_number?: number
-          level_requirement?: number
-          principle?: string
-          reflection_question?: string | null
+          mastery_level?: number
+          principle_focus?: string | null
           room_id?: string
           title?: string
-          verse_example?: string | null
+          verse_reference?: string | null
         }
         Relationships: []
       }
@@ -2184,15 +2169,7 @@ export type Database = {
           user_id?: string
           user_response?: string | null
         }
-        Relationships: [
-          {
-            foreignKeyName: "microlearning_progress_content_id_fkey"
-            columns: ["content_id"]
-            isOneToOne: false
-            referencedRelation: "microlearning_content"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       monthly_games: {
         Row: {
@@ -3084,48 +3061,48 @@ export type Database = {
       room_mastery_levels: {
         Row: {
           created_at: string
-          current_level: number
           floor_number: number
           id: string
-          level_1_completed_at: string | null
-          level_2_completed_at: string | null
-          level_3_completed_at: string | null
-          level_4_completed_at: string | null
-          level_5_completed_at: string | null
+          last_activity_at: string | null
+          mastery_level: number
+          perfect_scores_count: number
           room_id: string
+          total_drills_completed: number
+          total_exercises_completed: number
           updated_at: string
           user_id: string
-          xp_earned: number
+          xp_current: number
+          xp_required: number
         }
         Insert: {
           created_at?: string
-          current_level?: number
           floor_number: number
           id?: string
-          level_1_completed_at?: string | null
-          level_2_completed_at?: string | null
-          level_3_completed_at?: string | null
-          level_4_completed_at?: string | null
-          level_5_completed_at?: string | null
+          last_activity_at?: string | null
+          mastery_level?: number
+          perfect_scores_count?: number
           room_id: string
+          total_drills_completed?: number
+          total_exercises_completed?: number
           updated_at?: string
           user_id: string
-          xp_earned?: number
+          xp_current?: number
+          xp_required?: number
         }
         Update: {
           created_at?: string
-          current_level?: number
           floor_number?: number
           id?: string
-          level_1_completed_at?: string | null
-          level_2_completed_at?: string | null
-          level_3_completed_at?: string | null
-          level_4_completed_at?: string | null
-          level_5_completed_at?: string | null
+          last_activity_at?: string | null
+          mastery_level?: number
+          perfect_scores_count?: number
           room_id?: string
+          total_drills_completed?: number
+          total_exercises_completed?: number
           updated_at?: string
           user_id?: string
-          xp_earned?: number
+          xp_current?: number
+          xp_required?: number
         }
         Relationships: []
       }
@@ -4424,6 +4401,18 @@ export type Database = {
         Args: { _invitation_code: string }
         Returns: Json
       }
+      award_room_xp: {
+        Args: {
+          p_drill_completed?: boolean
+          p_exercise_completed?: boolean
+          p_floor_number: number
+          p_perfect_score?: boolean
+          p_room_id: string
+          p_user_id: string
+          p_xp_amount: number
+        }
+        Returns: Json
+      }
       cleanup_old_rate_limits: { Args: never; Returns: undefined }
       cleanup_old_typing_indicators: { Args: never; Returns: undefined }
       generate_challenge_share_code: { Args: never; Returns: string }
@@ -4483,6 +4472,7 @@ export type Database = {
           topic_type: string[]
         }[]
       }
+      update_mastery_streak: { Args: { p_user_id: string }; Returns: Json }
     }
     Enums: {
       app_role: "admin" | "moderator" | "user" | "video_admin"
