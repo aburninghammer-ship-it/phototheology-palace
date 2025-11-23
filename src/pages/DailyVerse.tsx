@@ -101,7 +101,7 @@ export default function DailyVerse() {
         body: {
           verseReference: todayVerse.verse_reference,
           verseText: todayVerse.verse_text,
-          principles: todayVerse.principles_used,
+          breakdown: todayVerse.breakdown.breakdown,
         },
       });
 
