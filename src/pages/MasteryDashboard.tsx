@@ -236,7 +236,7 @@ export default function MasteryDashboard() {
                           "p-4 rounded-lg border transition-all",
                           isCurrent && titleInfo.bgColor + " " + titleInfo.borderColor,
                           isUnlocked && !isCurrent && "bg-accent/5 border-accent/20",
-                          !isUnlocked && "opacity-50 bg-muted/5"
+                          !isUnlocked && "bg-muted/5 opacity-60"
                         )}
                       >
                         <div className="flex items-start gap-3">
