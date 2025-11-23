@@ -27,7 +27,7 @@ const testimonials: Testimonial[] = [
     author: "T.D."
   },
   {
-    quote: "This keeps transforming my understanding. The insights are so powerful I keep chewing on them long after the session.",
+    quote: "This was transforming—life changing. You can't help but fall in love with God all over again.",
     author: "Z.D."
   },
   {
@@ -35,28 +35,16 @@ const testimonials: Testimonial[] = [
     author: "A."
   },
   {
-    quote: "You can't help but fall in love with God all over again.",
-    author: "Z.D."
-  },
-  {
     quote: "This connected the whole Bible for me. It's all connected.",
     author: "A.K."
   },
   {
-    quote: "This gave me new hunger for God's Word—devouring the daily bread, going deep!",
-    author: "R.T."
-  },
-  {
-    quote: "This was transforming—life changing. This breaks us.",
-    author: "Z.D."
-  },
-  {
     quote: "I wish there was a study group for this—it helps me connect the rooms and understand it so much more deeply.",
-    author: "Anonymous"
+    author: "S.B."
   },
   {
-    quote: "Good stuff. Really enjoyed this teaching.",
-    author: "J.B."
+    quote: "This has truly been a blessing. We're on a beautiful journey.",
+    author: "B.D."
   }
 ];
 
