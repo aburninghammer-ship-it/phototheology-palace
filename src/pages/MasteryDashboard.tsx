@@ -113,6 +113,91 @@ export default function MasteryDashboard() {
           </TabsList>
 
           <TabsContent value="overview" className="space-y-6">
+            {/* How It Works - Explanatory Section */}
+            <Card className="bg-gradient-to-br from-accent/10 to-primary/5 border-primary/20">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Target className="h-5 w-5 text-primary" />
+                  How to Master Rooms
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="space-y-3 text-sm">
+                  <div className="flex gap-3">
+                    <div className="flex-shrink-0 w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold">
+                      1
+                    </div>
+                    <div>
+                      <p className="font-semibold mb-1">Choose a Room</p>
+                      <p className="text-muted-foreground">Start with any Palace room from Floors 1-8. Each room teaches a specific skill.</p>
+                    </div>
+                  </div>
+                  
+                  <div className="flex gap-3">
+                    <div className="flex-shrink-0 w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold">
+                      2
+                    </div>
+                    <div>
+                      <p className="font-semibold mb-1">Complete Activities</p>
+                      <p className="text-muted-foreground">
+                        Earn XP by completing drills (+30 XP), exercises (+40 XP), and perfect scores (+20 bonus XP).
+                      </p>
+                    </div>
+                  </div>
+                  
+                  <div className="flex gap-3">
+                    <div className="flex-shrink-0 w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold">
+                      3
+                    </div>
+                    <div>
+                      <p className="font-semibold mb-1">Level Up</p>
+                      <p className="text-muted-foreground">
+                        Progress through 5 mastery levels: Novice → Apprentice → Adept → Expert → Master.
+                      </p>
+                    </div>
+                  </div>
+                  
+                  <div className="flex gap-3">
+                    <div className="flex-shrink-0 w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold">
+                      4
+                    </div>
+                    <div>
+                      <p className="font-semibold mb-1">Master All Rooms</p>
+                      <p className="text-muted-foreground">
+                        Achieve Level 5 in multiple rooms to unlock global titles and become a Palace Master.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="p-4 bg-background/50 rounded-lg border">
+                  <p className="text-xs font-semibold mb-2 text-primary">XP Requirements per Level:</p>
+                  <div className="grid grid-cols-5 gap-2 text-xs text-center">
+                    <div>
+                      <div className="font-bold">L1→L2</div>
+                      <div className="text-muted-foreground">100 XP</div>
+                    </div>
+                    <div>
+                      <div className="font-bold">L2→L3</div>
+                      <div className="text-muted-foreground">200 XP</div>
+                    </div>
+                    <div>
+                      <div className="font-bold">L3→L4</div>
+                      <div className="text-muted-foreground">400 XP</div>
+                    </div>
+                    <div>
+                      <div className="font-bold">L4→L5</div>
+                      <div className="text-muted-foreground">800 XP</div>
+                    </div>
+                    <div>
+                      <div className="font-bold">Total</div>
+                      <div className="text-muted-foreground">1500 XP</div>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
             {/* Demo Section */}
             <Card className="bg-gradient-to-br from-primary/5 to-accent/5 border-primary/20">
               <CardHeader>
