@@ -39,10 +39,6 @@ const testimonials: Testimonial[] = [
     author: "A.K."
   },
   {
-    quote: "I wish there was a study group for this—it helps me connect the rooms and understand it so much more deeply.",
-    author: "S.B."
-  },
-  {
     quote: "This has truly been a blessing. We're on a beautiful journey.",
     author: "B.D."
   }
