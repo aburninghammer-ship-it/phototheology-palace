@@ -94,10 +94,34 @@ Now apply EXACTLY these 7 palace principles listed below:
 
 ${principlesDesc}
 
-**SPECIFIC CODES FOR MULTI-CATEGORY PRINCIPLES**:
-- For Connect 6: Use specific genre codes (📖Gospel, ⚖️Law, 📜History, 🎵Poetry, 🔮Prophecy, ✉️Epistle) - connect to DIFFERENT genre than verse
-- For Time Zone: Use specific zone codes (🌍Past, 🌍Now, 🌍Future, ☁️Past, ☁️Now, ☁️Future)
-- For Cycles: Use specific cycle codes (@Ad, @Mo, @CyC, @Sp, @Re)
+**CRITICAL - SPECIFIC CODES FOR principle_applied**:
+You MUST use these EXACT emoji/symbol codes in the principle_applied field:
+
+For Connect 6 room: Use EXACT genre emoji codes:
+  - 📖Gospel (not C6 or gospel)
+  - ⚖️Law (not C6 or law)
+  - 📜History (not C6 or history)
+  - 🎵Poetry (not C6 or poetry)
+  - 🔮Prophecy (not C6 or prophecy)
+  - ✉️Epistle (not C6 or epistle)
+
+For Time Zone room: Use EXACT zone emoji codes:
+  - 🌍Past (not TZ or Earth Past)
+  - 🌍Now (not TZ or Earth Now)
+  - 🌍Future (not TZ or Earth Future)
+  - ☁️Past (not TZ or Heaven Past)
+  - ☁️Now (not TZ or Heaven Now)
+  - ☁️Future (not TZ or Heaven Future)
+
+For Cycle rooms: Use EXACT cycle codes:
+  - @Ad (not Cycles or Adamic)
+  - @Mo (not Cycles or Mosaic)
+  - @CyC (not Cycles or Cyrus-Christ)
+  - @Sp (not Cycles or Spirit)
+  - @Re (not Cycles or Remnant)
+
+For all other rooms (SR, IR, OR, DC, ST, CR, DR, TRm, PRm, P‖, FRt, BL, PR):
+  - Use the exact room code as-is (e.g., SR, OR, CR)
 
 CRITICAL INSTRUCTIONS FOR EACH PRINCIPLE TYPE:
 
@@ -136,23 +160,24 @@ Example: "This verse spans multiple zones: EARTH Past - the cross event (He gave
 **Cycles Room (@Cycles)**: Identify which cycle this verse belongs to (e.g., @CyC for Gospel era, @Mo for Exodus era) AND connect to another cycle. Example: "This @CyC (Christ) verse echoes @Mo (Mosaic) - as Moses lifted the serpent (Num 21:9), so Christ was lifted up."
 
 For EACH of the 7 principles listed above, provide:
-1. principle_applied: The SPECIFIC code applied (use specific genre/zone/cycle codes like 📜History, 🌍Now, @Mo)
+1. principle_applied: The SPECIFIC emoji/symbol code (MUST be exact: 📖Gospel, 🌍Now, @Mo, SR, etc.)
 2. application: A specific, concrete application showing HOW the principle is applied
 3. key_insight: A memorable "gem" from this application
 4. practical_takeaway: A clear action step
 
-**CRITICAL VALIDATION**: Your response MUST contain:
-- verse_genre: ONE genre code for the verse itself (📖Gospel, ⚖️Law, 📜History, 🎵Poetry, 🔮Prophecy, or ✉️Epistle)
+**CRITICAL VALIDATION**: 
+- verse_genre: ONE genre code (📖Gospel, ⚖️Law, 📜History, 🎵Poetry, 🔮Prophecy, or ✉️Epistle)
 - breakdown: EXACTLY 7 items
+- Each principle_applied MUST use the EXACT emoji/symbol codes shown above (📖Gospel not "C6", 🌍Now not "TZ", @Mo not "Mosaic")
 
 Format your response as a structured JSON with this exact schema:
 {
   "verse_genre": "📖Gospel",
   "breakdown": [
     {
-      "principle_applied": "specific code (e.g., 📜History for C6, 🌍Now for TZ, @Mo for cycles)",
-      "principle_code": "code from principles list",
-      "principle_name": "name from principles list",
+      "principle_applied": "🌍Now",
+      "principle_code": "TZ",
+      "principle_name": "Time Zone (6 zones)",
       "application": "specific, concrete application",
       "key_insight": "memorable insight",
       "practical_takeaway": "clear action step"
@@ -160,7 +185,7 @@ Format your response as a structured JSON with this exact schema:
   ]
 }
 
-Make it engaging, Christ-centered, specific, and practically applicable. Remember: Identify verse_genre first, then apply EXACTLY 7 principles.`;
+Make it engaging, Christ-centered, specific, and practically applicable.`;
 
     const aiResponse = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
       method: 'POST',
