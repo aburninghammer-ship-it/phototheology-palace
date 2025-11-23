@@ -1849,6 +1849,54 @@ export type Database = {
         }
         Relationships: []
       }
+      global_master_titles: {
+        Row: {
+          black_master_at: string | null
+          blue_master_at: string | null
+          created_at: string
+          current_title: string
+          gold_master_at: string | null
+          id: string
+          purple_master_at: string | null
+          red_master_at: string | null
+          rooms_mastered: number
+          total_xp: number
+          updated_at: string
+          user_id: string
+          white_master_at: string | null
+        }
+        Insert: {
+          black_master_at?: string | null
+          blue_master_at?: string | null
+          created_at?: string
+          current_title?: string
+          gold_master_at?: string | null
+          id?: string
+          purple_master_at?: string | null
+          red_master_at?: string | null
+          rooms_mastered?: number
+          total_xp?: number
+          updated_at?: string
+          user_id: string
+          white_master_at?: string | null
+        }
+        Update: {
+          black_master_at?: string | null
+          blue_master_at?: string | null
+          created_at?: string
+          current_title?: string
+          gold_master_at?: string | null
+          id?: string
+          purple_master_at?: string | null
+          red_master_at?: string | null
+          rooms_mastered?: number
+          total_xp?: number
+          updated_at?: string
+          user_id?: string
+          white_master_at?: string | null
+        }
+        Relationships: []
+      }
       marriage_blueprint_progress: {
         Row: {
           article_id: number
@@ -1874,6 +1922,39 @@ export type Database = {
           created_at?: string
           id?: string
           notes?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      mastery_streaks: {
+        Row: {
+          created_at: string
+          current_streak: number
+          global_streak: number
+          id: string
+          last_activity_date: string
+          longest_streak: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          current_streak?: number
+          global_streak?: number
+          id?: string
+          last_activity_date?: string
+          longest_streak?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          current_streak?: number
+          global_streak?: number
+          id?: string
+          last_activity_date?: string
+          longest_streak?: number
           updated_at?: string
           user_id?: string
         }
@@ -2023,6 +2104,92 @@ export type Database = {
             columns: ["conversation_id"]
             isOneToOne: false
             referencedRelation: "conversations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      microlearning_content: {
+        Row: {
+          application: string | null
+          content: string
+          created_at: string
+          estimated_seconds: number
+          floor_number: number
+          id: string
+          lesson_number: number
+          level_requirement: number
+          principle: string
+          reflection_question: string | null
+          room_id: string
+          title: string
+          verse_example: string | null
+        }
+        Insert: {
+          application?: string | null
+          content: string
+          created_at?: string
+          estimated_seconds?: number
+          floor_number: number
+          id?: string
+          lesson_number: number
+          level_requirement?: number
+          principle: string
+          reflection_question?: string | null
+          room_id: string
+          title: string
+          verse_example?: string | null
+        }
+        Update: {
+          application?: string | null
+          content?: string
+          created_at?: string
+          estimated_seconds?: number
+          floor_number?: number
+          id?: string
+          lesson_number?: number
+          level_requirement?: number
+          principle?: string
+          reflection_question?: string | null
+          room_id?: string
+          title?: string
+          verse_example?: string | null
+        }
+        Relationships: []
+      }
+      microlearning_progress: {
+        Row: {
+          completed_at: string
+          content_id: string
+          created_at: string
+          id: string
+          time_spent_seconds: number | null
+          user_id: string
+          user_response: string | null
+        }
+        Insert: {
+          completed_at?: string
+          content_id: string
+          created_at?: string
+          id?: string
+          time_spent_seconds?: number | null
+          user_id: string
+          user_response?: string | null
+        }
+        Update: {
+          completed_at?: string
+          content_id?: string
+          created_at?: string
+          id?: string
+          time_spent_seconds?: number | null
+          user_id?: string
+          user_response?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "microlearning_progress_content_id_fkey"
+            columns: ["content_id"]
+            isOneToOne: false
+            referencedRelation: "microlearning_content"
             referencedColumns: ["id"]
           },
         ]
@@ -2911,6 +3078,54 @@ export type Database = {
           updated_at?: string | null
           user_id?: string
           verse_reference?: string
+        }
+        Relationships: []
+      }
+      room_mastery_levels: {
+        Row: {
+          created_at: string
+          current_level: number
+          floor_number: number
+          id: string
+          level_1_completed_at: string | null
+          level_2_completed_at: string | null
+          level_3_completed_at: string | null
+          level_4_completed_at: string | null
+          level_5_completed_at: string | null
+          room_id: string
+          updated_at: string
+          user_id: string
+          xp_earned: number
+        }
+        Insert: {
+          created_at?: string
+          current_level?: number
+          floor_number: number
+          id?: string
+          level_1_completed_at?: string | null
+          level_2_completed_at?: string | null
+          level_3_completed_at?: string | null
+          level_4_completed_at?: string | null
+          level_5_completed_at?: string | null
+          room_id: string
+          updated_at?: string
+          user_id: string
+          xp_earned?: number
+        }
+        Update: {
+          created_at?: string
+          current_level?: number
+          floor_number?: number
+          id?: string
+          level_1_completed_at?: string | null
+          level_2_completed_at?: string | null
+          level_3_completed_at?: string | null
+          level_4_completed_at?: string | null
+          level_5_completed_at?: string | null
+          room_id?: string
+          updated_at?: string
+          user_id?: string
+          xp_earned?: number
         }
         Relationships: []
       }
