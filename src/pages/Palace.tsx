@@ -204,7 +204,13 @@ const Palace = () => {
                         })}
                       </div>
 
-                      <div className="flex gap-3 justify-center mt-8">
+                      <div className="flex flex-col sm:flex-row gap-3 justify-center mt-8">
+                        <Button asChild size="lg" variant="secondary">
+                          <Link to="/mastery?tab=map">
+                            <Target className="mr-2 h-4 w-4" />
+                            Choose Room to Master
+                          </Link>
+                        </Button>
                         <Button asChild size="lg" className="gradient-palace text-white">
                           <Link to="/games/palace_quiz">
                             <BookOpen className="mr-2 h-4 w-4" />
