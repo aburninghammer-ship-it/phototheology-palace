@@ -88,3 +88,6 @@ verify_jwt = true
 
 [functions.cleanup-cancelled-users]
 verify_jwt = false
+
+[functions.generate-daily-verse]
+verify_jwt = false

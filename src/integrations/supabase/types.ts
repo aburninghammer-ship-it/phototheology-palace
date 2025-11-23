@@ -946,6 +946,36 @@ export type Database = {
           },
         ]
       }
+      daily_verses: {
+        Row: {
+          breakdown: Json
+          created_at: string | null
+          date: string
+          id: string
+          principles_used: string[]
+          verse_reference: string
+          verse_text: string
+        }
+        Insert: {
+          breakdown: Json
+          created_at?: string | null
+          date: string
+          id?: string
+          principles_used: string[]
+          verse_reference: string
+          verse_text: string
+        }
+        Update: {
+          breakdown?: Json
+          created_at?: string | null
+          date?: string
+          id?: string
+          principles_used?: string[]
+          verse_reference?: string
+          verse_text?: string
+        }
+        Relationships: []
+      }
       dojo_challenges: {
         Row: {
           challenge_type: string
@@ -4852,6 +4882,35 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      user_verse_readings: {
+        Row: {
+          id: string
+          read_at: string | null
+          user_id: string
+          verse_id: string
+        }
+        Insert: {
+          id?: string
+          read_at?: string | null
+          user_id: string
+          verse_id: string
+        }
+        Update: {
+          id?: string
+          read_at?: string | null
+          user_id?: string
+          verse_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_verse_readings_verse_id_fkey"
+            columns: ["verse_id"]
+            isOneToOne: false
+            referencedRelation: "daily_verses"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       verses_strongs: {
         Row: {
