@@ -143,6 +143,7 @@ const OfflineContent = lazy(() => import("./pages/OfflineContent"));
 const VideoTraining = lazy(() => import("./pages/VideoTraining"));
 const MyStudies = lazy(() => import("./pages/MyStudies"));
 const StudyEditor = lazy(() => import("./pages/StudyEditor"));
+const MasteryDashboard = lazy(() => import("./pages/MasteryDashboard"));
 const PrivacyPolicy = lazy(() => import("./pages/PrivacyPolicy"));
 const TermsOfService = lazy(() => import("./pages/TermsOfService"));
 const NotFound = lazy(() => import("./pages/NotFound"));
@@ -329,6 +330,11 @@ function App() {
               <Suspense fallback={<LoadingScreen />}>
                 <BranchStudy />
               </Suspense>
+            } />
+            <Route path="/mastery" element={
+              <ProtectedRoute>
+                <MasteryDashboard />
+              </ProtectedRoute>
             } />
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                 <Route path="*" element={<NotFound />} />
