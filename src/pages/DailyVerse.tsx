@@ -2,11 +2,13 @@ import { SimplifiedNav } from "@/components/SimplifiedNav";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { Book, Sparkles, CheckCircle2, Calendar } from "lucide-react";
+import { Book, Sparkles, CheckCircle2, Calendar, Share2 } from "lucide-react";
 import { toast } from "sonner";
 import { useAuth } from "@/hooks/useAuth";
+import { useState } from "react";
 
 interface PrincipleBreakdown {
   principle_applied: string;
@@ -32,6 +34,13 @@ interface DailyVerse {
 export default function DailyVerse() {
   const { user } = useAuth();
   const queryClient = useQueryClient();
+  const [shareDialogOpen, setShareDialogOpen] = useState(false);
+  const [shareData, setShareData] = useState<{
+    summary: string;
+    imageBase64: string;
+    appUrl: string;
+  } | null>(null);
+  const [isGeneratingShare, setIsGeneratingShare] = useState(false);
   
   const { data: todayVerse, isLoading } = useQuery({
     queryKey: ['daily-verse', new Date().toISOString().split('T')[0]],
@@ -79,6 +88,56 @@ export default function DailyVerse() {
       toast.success("Marked as read! Keep up the daily practice.");
     },
   });
+
+  const handleShare = async () => {
+    if (!todayVerse) return;
+    
+    setIsGeneratingShare(true);
+    setShareDialogOpen(true);
+    
+    try {
+      const { data, error } = await supabase.functions.invoke('generate-daily-verse-share', {
+        body: {
+          verseReference: todayVerse.verse_reference,
+          verseText: todayVerse.verse_text,
+          principles: todayVerse.principles_used,
+        },
+      });
+
+      if (error) throw error;
+      setShareData(data);
+    } catch (error) {
+      console.error('Error generating share content:', error);
+      toast.error("Share generation failed. Please try again later.");
+      setShareDialogOpen(false);
+    } finally {
+      setIsGeneratingShare(false);
+    }
+  };
+
+  const copyToClipboard = async (text: string) => {
+    await navigator.clipboard.writeText(text);
+    toast.success("Copied to clipboard!");
+  };
+
+  const shareToFacebook = () => {
+    if (!shareData) return;
+    const url = encodeURIComponent(shareData.appUrl);
+    const quote = encodeURIComponent(shareData.summary);
+    window.open(`https://www.facebook.com/sharer/sharer.php?u=${url}&quote=${quote}`, '_blank');
+  };
+
+  const shareToTwitter = () => {
+    if (!shareData) return;
+    const text = encodeURIComponent(`${shareData.summary}\n\n${shareData.appUrl}`);
+    window.open(`https://twitter.com/intent/tweet?text=${text}`, '_blank');
+  };
+
+  const shareToWhatsApp = () => {
+    if (!shareData) return;
+    const text = encodeURIComponent(`${shareData.summary}\n\n${shareData.appUrl}`);
+    window.open(`https://wa.me/?text=${text}`, '_blank');
+  };
 
   if (isLoading) {
     return (
@@ -129,21 +188,27 @@ export default function DailyVerse() {
               })}
             </p>
           </div>
-          {!hasRead && (
-            <Button
-              onClick={() => markAsReadMutation.mutate()}
-              disabled={markAsReadMutation.isPending}
-            >
-              <CheckCircle2 className="mr-2 h-4 w-4" />
-              Mark as Read
+          <div className="flex gap-2">
+            {!hasRead && (
+              <Button
+                onClick={() => markAsReadMutation.mutate()}
+                disabled={markAsReadMutation.isPending}
+              >
+                <CheckCircle2 className="mr-2 h-4 w-4" />
+                Mark as Read
+              </Button>
+            )}
+            {hasRead && (
+              <Badge variant="secondary" className="text-sm">
+                <CheckCircle2 className="mr-2 h-4 w-4" />
+                Completed Today
+              </Badge>
+            )}
+            <Button onClick={handleShare} variant="outline">
+              <Share2 className="mr-2 h-4 w-4" />
+              Share
             </Button>
-          )}
-          {hasRead && (
-            <Badge variant="secondary" className="text-sm">
-              <CheckCircle2 className="mr-2 h-4 w-4" />
-              Completed Today
-            </Badge>
-          )}
+          </div>
         </div>
 
         {/* Verse Display */}
@@ -216,6 +281,64 @@ export default function DailyVerse() {
           ))}
         </div>
       </div>
+
+      <Dialog open={shareDialogOpen} onOpenChange={setShareDialogOpen}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>Share Daily Verse</DialogTitle>
+          </DialogHeader>
+          
+          {isGeneratingShare ? (
+            <div className="flex items-center justify-center py-12">
+              <div className="text-center space-y-4">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
+                <p className="text-muted-foreground">Generating shareable content...</p>
+              </div>
+            </div>
+          ) : shareData ? (
+            <div className="space-y-6">
+              {/* Generated Image */}
+              <div className="rounded-lg overflow-hidden border">
+                <img 
+                  src={shareData.imageBase64} 
+                  alt="Daily Verse" 
+                  className="w-full h-auto"
+                />
+              </div>
+
+              {/* Share Text */}
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Share Text</label>
+                <div className="p-4 bg-muted rounded-lg">
+                  <p className="text-sm">{shareData.summary}</p>
+                  <p className="text-sm text-primary mt-2">{shareData.appUrl}</p>
+                </div>
+                <Button 
+                  onClick={() => copyToClipboard(`${shareData.summary}\n\n${shareData.appUrl}`)}
+                  variant="outline"
+                  size="sm"
+                  className="w-full"
+                >
+                  Copy Text
+                </Button>
+              </div>
+
+              {/* Social Media Buttons */}
+              <div className="grid grid-cols-3 gap-3">
+                <Button onClick={shareToFacebook} className="w-full">
+                  Facebook
+                </Button>
+                <Button onClick={shareToTwitter} className="w-full">
+                  Twitter
+                </Button>
+                <Button onClick={shareToWhatsApp} className="w-full">
+                  WhatsApp
+                </Button>
+              </div>
+            </div>
+          ) : null}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
