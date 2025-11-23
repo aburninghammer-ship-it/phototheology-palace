@@ -1888,6 +1888,41 @@ export type Database = {
         }
         Relationships: []
       }
+      guild_activities: {
+        Row: {
+          activity_data: Json | null
+          activity_type: string
+          created_at: string | null
+          guild_id: string
+          id: string
+          user_id: string | null
+        }
+        Insert: {
+          activity_data?: Json | null
+          activity_type: string
+          created_at?: string | null
+          guild_id: string
+          id?: string
+          user_id?: string | null
+        }
+        Update: {
+          activity_data?: Json | null
+          activity_type?: string
+          created_at?: string | null
+          guild_id?: string
+          id?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "guild_activities_guild_id_fkey"
+            columns: ["guild_id"]
+            isOneToOne: false
+            referencedRelation: "guilds"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       guild_challenge_participants: {
         Row: {
           challenge_id: string | null
@@ -1913,6 +1948,41 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "guild_challenge_participants_challenge_id_fkey"
+            columns: ["challenge_id"]
+            isOneToOne: false
+            referencedRelation: "guild_challenges"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      guild_challenge_participation: {
+        Row: {
+          challenge_id: string
+          completed_at: string | null
+          created_at: string | null
+          id: string
+          user_id: string
+          xp_earned: number | null
+        }
+        Insert: {
+          challenge_id: string
+          completed_at?: string | null
+          created_at?: string | null
+          id?: string
+          user_id: string
+          xp_earned?: number | null
+        }
+        Update: {
+          challenge_id?: string
+          completed_at?: string | null
+          created_at?: string | null
+          id?: string
+          user_id?: string
+          xp_earned?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "guild_challenge_participation_challenge_id_fkey"
             columns: ["challenge_id"]
             isOneToOne: false
             referencedRelation: "guild_challenges"
