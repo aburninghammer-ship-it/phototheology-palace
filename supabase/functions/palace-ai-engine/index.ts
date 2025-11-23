@@ -35,7 +35,7 @@ serve(async (req) => {
       // Generate comprehensive learning profile analysis
       const analysisPrompt = `You are the Palace AI Engine, an advanced adaptive learning system for biblical study using the Phototheology method.
 
-Analyze this user's learning data and generate a comprehensive learning profile:
+Analyze this user's learning data with DEEP PATTERN RECOGNITION to identify blind spots and predict struggles:
 
 DRILL RESULTS (${drillResults.data?.length || 0} recent attempts):
 ${JSON.stringify(drillResults.data?.slice(0, 20) || [], null, 2)}
@@ -55,16 +55,35 @@ ${JSON.stringify(reportCards.data?.map(r => ({
   mistakes: r.report_data?.mistakes
 })) || [], null, 2)}
 
+CRITICAL ANALYSIS REQUIREMENTS:
+
+1. BLIND SPOT DETECTION - Identify what the user DOESN'T KNOW they don't know:
+   - Patterns they consistently miss but don't recognize
+   - Principles they skip over without realizing
+   - Connections they fail to make repeatedly
+   - Look for room transitions where confusion increases
+
+2. STRUGGLE PREDICTION - Forecast future difficulties:
+   - Based on current weaknesses, predict which verses/concepts will be hard
+   - Identify prerequisite knowledge gaps that will cause future problems
+   - Detect cognitive load patterns (when do they get overwhelmed?)
+   - Predict which room principles will conflict with their current understanding
+
+3. HIDDEN STRENGTHS - Find untapped potential:
+   - Skills they use unconsciously
+   - Natural learning patterns they don't recognize
+   - Transferable abilities from strong rooms to weak rooms
+
 Generate a JSON response with this EXACT structure (no additional text):
 {
   "top_strengths": [
-    {"room_id": "string", "skill": "string", "confidence_score": 0.9, "evidence": "string"}
+    {"room_id": "SR", "skill": "Visual memory", "confidence_score": 0.92, "evidence": "Consistently scores 90%+ on image recall"}
   ],
   "identified_weaknesses": [
-    {"room_id": "string", "skill": "string", "error_pattern": "string", "frequency": "high|medium|low"}
+    {"room_id": "CR", "skill": "Christ connections", "error_pattern": "Misses typological links", "frequency": "high"}
   ],
   "blind_spots": [
-    {"room_id": "string", "principle": "string", "missed_count": 5, "context": "string"}
+    {"room_id": "PRm", "principle": "Covenant patterns", "missed_count": 12, "context": "Never applies Abrahamic covenant structure to NT passages", "severity": "critical"}
   ],
   "learning_style": "visual|analytical|intuitive|mixed",
   "optimal_difficulty": "easy|medium|hard|expert",
@@ -74,10 +93,12 @@ Generate a JSON response with this EXACT structure (no additional text):
   "speed_improvement": [{"date": "2025-01-15", "avg_time": 45}],
   "consistency_score": 0.75,
   "predicted_struggles": [
-    {"verse_ref": "Daniel 8:14", "room_id": "PR", "reason": "Complex prophecy interpretation", "confidence": 0.8}
+    {"verse_ref": "Daniel 8:14", "room_id": "PR", "reason": "Requires sanctuary knowledge (blind spot) + time calculation (weakness)", "confidence": 0.87, "will_struggle_when": "Encountering symbolic time prophecy"}
   ],
-  "recommended_focus_areas": ["Sanctuary Room", "Prophecy Room"],
-  "next_challenge_level": "medium|hard|expert"
+  "recommended_focus_areas": ["Fill sanctuary knowledge gap before prophecy", "Practice covenant patterns"],
+  "next_challenge_level": "medium|hard|expert",
+  "cognitive_load_threshold": 3,
+  "learning_velocity": "accelerating|steady|plateauing|declining"
 }`;
 
       const aiResponse = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {

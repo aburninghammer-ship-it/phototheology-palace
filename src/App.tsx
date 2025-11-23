@@ -147,6 +147,8 @@ const MyStudies = lazy(() => import("./pages/MyStudies"));
 const StudyEditor = lazy(() => import("./pages/StudyEditor"));
 const MasteryDashboard = lazy(() => import("./pages/MasteryDashboard"));
 const PalaceAI = lazy(() => import("./pages/PalaceAI"));
+const Guilds = lazy(() => import("./pages/Guilds"));
+const GuildDetail = lazy(() => import("./pages/GuildDetail"));
 const PrivacyPolicy = lazy(() => import("./pages/PrivacyPolicy"));
 const TermsOfService = lazy(() => import("./pages/TermsOfService"));
 const NotFound = lazy(() => import("./pages/NotFound"));
@@ -344,6 +346,16 @@ function App() {
             <Route path="/palace-ai" element={
               <ProtectedRoute>
                 <PalaceAI />
+              </ProtectedRoute>
+            } />
+            <Route path="/guilds" element={
+              <ProtectedRoute>
+                <Guilds />
+              </ProtectedRoute>
+            } />
+            <Route path="/guild/:guildId" element={
+              <ProtectedRoute>
+                <GuildDetail />
               </ProtectedRoute>
             } />
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
