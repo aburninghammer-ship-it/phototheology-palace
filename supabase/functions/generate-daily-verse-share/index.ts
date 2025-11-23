@@ -11,22 +11,33 @@ serve(async (req) => {
   }
 
   try {
-    const { verseReference, verseText, principles } = await req.json();
+    const { verseReference, verseText, breakdown } = await req.json();
 
     const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
     if (!LOVABLE_API_KEY) {
       throw new Error('LOVABLE_API_KEY not configured');
     }
 
-    // Generate social media summary
-    const summaryPrompt = `Create a concise, engaging social media post (max 280 characters) for this daily Bible verse:
+    // Generate social media summary showcasing the 7 principles
+    const principlesSummary = breakdown.map((item: any, idx: number) => 
+      `${idx + 1}. ${item.principle_applied} (${item.floor}): ${item.key_insight}`
+    ).join('\n');
+
+    const summaryPrompt = `Create an engaging social media post (max 280 characters) for this daily Bible verse that highlights how Phototheology's unique 7-principle analysis provides deeper understanding:
 
 Verse: ${verseReference}
 Text: "${verseText}"
 
-Key principles: ${principles.slice(0, 3).join(', ')}
+7 Principles Applied:
+${principlesSummary}
 
-Make it inspiring, shareable, and include a call to discover more in the Phototheology app.`;
+Your summary should:
+- Tease the depth of understanding these 7 different perspectives provide
+- Emphasize that this verse is analyzed through 7 unique lenses (floors of the Palace)
+- Create curiosity about the app's ability to reveal layers of meaning
+- End with a call to explore the full 7-principle breakdown in Phototheology
+
+Be inspiring and highlight the unique multi-dimensional commentary approach.`;
 
     const summaryResponse = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
       method: 'POST',
