@@ -68,10 +68,31 @@ serve(async (req) => {
       );
     }
     
-    // Always select exactly 7 principles
-    const numPrinciples = 7;
-    const shuffled = [...PALACE_PRINCIPLES].sort(() => Math.random() - 0.5);
-    const selectedPrinciples = shuffled.slice(0, numPrinciples);
+    // Select 7 diverse principles from different categories to showcase Phototheology's creative genius
+    const floorOneRooms = PALACE_PRINCIPLES.filter(p => p.category === "1st Floor");
+    const floorTwoRooms = PALACE_PRINCIPLES.filter(p => p.category === "2nd Floor");
+    const floorFourRooms = PALACE_PRINCIPLES.filter(p => p.category === "4th Floor");
+    const floorFiveRooms = PALACE_PRINCIPLES.filter(p => p.category === "5th Floor");
+    const floorSixRooms = PALACE_PRINCIPLES.filter(p => p.category === "6th Floor");
+    
+    // Guarantee variety by selecting from different floors
+    const selectedPrinciples = [
+      // Pick 1-2 from Floor 1 (visualization/imagination)
+      floorOneRooms[Math.floor(Math.random() * floorOneRooms.length)],
+      // Pick 1 from Floor 2 (investigation)
+      floorTwoRooms[Math.floor(Math.random() * floorTwoRooms.length)],
+      // Pick 2-3 from Floor 4 (depth)
+      floorFourRooms[Math.floor(Math.random() * floorFourRooms.length)],
+      floorFourRooms[Math.floor(Math.random() * floorFourRooms.length)],
+      // Pick 1 from Floor 5 or 6 (prophecy/cycles)
+      ...[...floorFiveRooms, ...floorSixRooms].sort(() => Math.random() - 0.5).slice(0, 1),
+      // Fill remaining slots randomly
+      ...PALACE_PRINCIPLES.sort(() => Math.random() - 0.5).slice(0, 2)
+    ]
+      .filter((v, i, a) => a.findIndex(t => t.code === v.code) === i) // Remove duplicates by code
+      .slice(0, 7); // Limit to exactly 7
+    
+    console.log('Selected diverse principles:', selectedPrinciples.map(p => `${p.code} (${p.category})`));
     
     // For demo, using a meaningful verse - in production, you'd have a curated list
     const verseReference = "John 3:16";
@@ -80,19 +101,32 @@ serve(async (req) => {
     // Generate breakdown using Lovable AI with specific instructions per principle
     const principlesDesc = selectedPrinciples.map(p => `- ${p.code} (${p.name}): ${p.description}`).join('\n');
     
-    const prompt = `You are a Phototheology expert analyzing Scripture.
+    const prompt = `You are a Phototheology expert demonstrating the CREATIVE GENIUS of the Phototheology system.
 
 Verse: ${verseReference}
 "${verseText}"
 
-**STEP 1 - IDENTIFY GENRE (Principles Revealed)**:
-First, identify what genre/category this verse belongs to: Gospel, Law, History, Poetry, Prophecy, or Epistle.
-Use these codes: 📖Gospel, ⚖️Law, 📜History, 🎵Poetry, 🔮Prophecy, or ✉️Epistle
+**THE POWER OF PHOTOTHEOLOGY**:
+Phototheology's genius is that ANY verse can be analyzed through MULTIPLE analytical lenses to extract deeper meaning. You are NOT just identifying what the verse reveals - you are ACTIVELY APPLYING different tools to discover hidden connections and insights.
 
-**STEP 2 - APPLY 7 PRINCIPLES (Principles Applied)**:
-Now apply EXACTLY these 7 palace principles listed below:
+**STEP 1 - VERSE GENRE (What is Revealed)**:
+First, identify the verse's literary category - what TYPE of text this is:
+Use ONE of these codes: 📖Gospel, ⚖️Law, 📜History, 🎵Poetry, 🔮Prophecy, or ✉️Epistle
+
+**STEP 2 - CREATIVE APPLICATION (Principles Applied)**:
+Now CREATIVELY APPLY these 7 randomly selected analytical tools to discover NEW insights:
 
 ${principlesDesc}
+
+**CRITICAL UNDERSTANDING**:
+These principles are ANALYTICAL TOOLS, not just descriptions of what the verse "is about."
+- A history verse (📜History) can be analyzed through Prophecy Room (PR) to find prophetic shadows
+- A law verse (⚖️Law) can be examined through Story Room (SR) to visualize narrative context  
+- ANY verse can be placed in cycles (@Mo, @CyC, etc.) to understand redemptive timeline
+- Use Symbols/Types (ST) to find Christ-types even in unexpected places
+- Apply Patterns (PRm) to show biblical patterns repeating across Scripture
+
+Show the FLEXIBILITY and DEPTH of Phototheology by making creative, insightful connections that reveal Christ in fresh ways.
 
 **CRITICAL - SPECIFIC CODES FOR principle_applied**:
 You MUST use these EXACT emoji/symbol codes in the principle_applied field:
@@ -250,7 +284,7 @@ Make it engaging, Christ-centered, specific, and practically applicable.`;
         user_id: userId,
         type: 'daily_verse',
         title: '🌅 Today\'s Verse of the Day',
-        message: `${verseReference} - Explore with ${numPrinciples} Palace principles!`,
+        message: `${verseReference} - Explore with 7 Palace principles!`,
         link: '/daily-verse',
         metadata: {
           verse_id: newVerse.id,
