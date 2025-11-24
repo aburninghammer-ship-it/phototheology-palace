@@ -19,7 +19,7 @@ export const JeevesMasterProgram = ({
   const [showDetails, setShowDetails] = useState(false);
 
   return (
-    <Card className="border-2 border-primary/30 bg-gradient-to-br from-primary/5 via-accent/5 to-background">
+    <Card className="border-2 border-emerald-500/40 bg-gradient-to-br from-emerald-500/10 via-teal-500/10 to-cyan-500/5 shadow-lg shadow-emerald-500/10">
       <CardHeader>
         <div className="flex items-start justify-between">
           <div className="flex items-start gap-3">
@@ -35,7 +35,7 @@ export const JeevesMasterProgram = ({
               </CardDescription>
             </div>
           </div>
-          <Badge variant="secondary" className="bg-primary/10 text-primary">
+          <Badge variant="secondary" className="bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 border-emerald-500/30">
             <Sparkles className="h-3 w-3 mr-1" />
             AI-Powered
           </Badge>
