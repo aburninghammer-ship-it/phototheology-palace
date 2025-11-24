@@ -203,7 +203,15 @@ export const FloorProgressTower: React.FC<FloorProgressTowerProps> = ({
               </div>
               <div className="flex items-center gap-2">
                 <div className="w-3 h-3 rounded-full bg-white border border-border" />
-                <span>White Master (Floors 5-6)</span>
+                <span>White Master (Floor 5)</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-3 h-3 rounded-full bg-white border border-border" />
+                <span>White Master (Floor 6)</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-3 h-3 rounded-full bg-gray-800 border border-border" />
+                <span>Black Candidate (Floor 7)</span>
               </div>
               <div className="flex items-center gap-2">
                 <div className="w-3 h-3 rounded-full bg-black" />
