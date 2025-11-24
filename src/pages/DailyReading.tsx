@@ -15,6 +15,60 @@ import { RefreshCw } from "lucide-react";
 import { BIBLE_BOOK_METADATA } from "@/data/bibleBooks";
 import { BIBLE_TRANSLATIONS } from "@/services/bibleApi";
 
+type ChapterRef = { book: string; chapter: number };
+
+const getBooksForPlanType = (planType: string, planName: string): string[] => {
+  switch (planType) {
+    case "full_bible":
+      return BIBLE_BOOK_METADATA.map((b) => b.name);
+    case "new_testament":
+      return BIBLE_BOOK_METADATA.filter((b) => b.position >= 40).map((b) => b.name);
+    case "old_testament":
+      return BIBLE_BOOK_METADATA.filter((b) => b.position <= 39).map((b) => b.name);
+    case "wisdom_books":
+      // Current wisdom plan is Psalms & Proverbs
+      return ["Psalms", "Proverbs"];
+    default:
+      return [];
+  }
+};
+
+const buildChapterList = (books: string[]): ChapterRef[] => {
+  const chapters: ChapterRef[] = [];
+  for (const bookName of books) {
+    const meta = BIBLE_BOOK_METADATA.find((b) => b.name === bookName);
+    if (!meta) continue;
+    for (let c = 1; c <= meta.chapters; c++) {
+      chapters.push({ book: bookName, chapter: c });
+    }
+  }
+  return chapters;
+};
+
+const generateSequentialPassagesForPlan = (
+  planType: string,
+  planName: string,
+  durationDays: number,
+  dayNumber: number
+) => {
+  const books = getBooksForPlanType(planType, planName);
+  if (!books.length || durationDays <= 0) return [] as any[];
+
+  const allChapters = buildChapterList(books);
+  if (!allChapters.length) return [] as any[];
+
+  const chaptersPerDay = Math.ceil(allChapters.length / durationDays);
+  const startIndex = (dayNumber - 1) * chaptersPerDay;
+  if (startIndex >= allChapters.length) return [] as any[];
+
+  const todaysChapters = allChapters.slice(startIndex, startIndex + chaptersPerDay);
+  return todaysChapters.map((ref) => ({
+    book: ref.book,
+    chapter: ref.chapter,
+    verses: "1-end",
+  }));
+};
+
 export default function DailyReading() {
   const { userProgress, loading, generateExercises } = useReadingPlans();
   const { toast } = useToast();
@@ -95,6 +149,16 @@ export default function DailyReading() {
             },
           ];
         }
+      }
+
+      // If we still don't have passages, derive them based on plan type
+      if (passages.length === 0 && planData.plan_type) {
+        passages = generateSequentialPassagesForPlan(
+          planData.plan_type,
+          planData.name,
+          planData.duration_days,
+          userProgress.current_day
+        );
       }
 
       console.log('Loaded passages for day', userProgress.current_day, ':', passages);
