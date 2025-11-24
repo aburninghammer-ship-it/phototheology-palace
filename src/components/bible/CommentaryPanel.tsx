@@ -365,8 +365,8 @@ export const CommentaryPanel = ({ book, chapter, verse, verseText, onClose }: Co
                         <SelectItem 
                           key={option.value} 
                           value={option.value}
-                          disabled={!checkingAvailability && !isAvailable}
-                          className={isAvailable ? "font-semibold" : "text-muted-foreground"}
+                          disabled={loading}
+                          className="font-semibold"
                         >
                           {option.label}
                           {!checkingAvailability && (
