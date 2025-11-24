@@ -151,32 +151,12 @@ export const CommentaryPanel = ({ book, chapter, verse, verseText, onClose }: Co
   const [checkingAvailability, setCheckingAvailability] = useState(true);
   const { toast } = useToast();
 
-  // Check which commentaries are available on mount
+  // Set all commentaries as available by default
   useEffect(() => {
-    const checkAvailability = async () => {
-      try {
-        const { data, error } = await supabase.functions.invoke("jeeves", {
-          body: {
-            mode: "check-commentary-availability",
-            book,
-            chapter,
-            verseText: { verse, text: verseText },
-          },
-        });
-
-        if (error) throw error;
-        setAvailableCommentaries(data.available || []);
-      } catch (error) {
-        console.error("Error checking commentary availability:", error);
-        // Default to all if check fails
-        setAvailableCommentaries(COMMENTARY_OPTIONS.map(c => c.value));
-      } finally {
-        setCheckingAvailability(false);
-      }
-    };
-    
-    checkAvailability();
-  }, [book, chapter, verse, verseText]);
+    // All commentaries are available
+    setAvailableCommentaries(COMMENTARY_OPTIONS.map(c => c.value));
+    setCheckingAvailability(false);
+  }, []);
 
   const togglePrinciple = (id: string) => {
     setSelectedPrinciples(prev =>
