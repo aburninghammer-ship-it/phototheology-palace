@@ -65,6 +65,7 @@ export default function RoomDetail() {
   const [methodExpanded, setMethodExpanded] = useState(false);
   const [examplesExpanded, setExamplesExpanded] = useState(false);
   const [showOnboardingGuide, setShowOnboardingGuide] = useState(true);
+  const [activeTab, setActiveTab] = useState("learn");
   
   // Check if this is the first room visit after onboarding (Story Room)
   const isFirstRoomVisit = Number(floorNumber) === 1 && roomId === "sr" && 
@@ -228,7 +229,7 @@ export default function RoomDetail() {
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <div className="lg:col-span-2">
-            <Tabs defaultValue="learn" className="w-full">
+            <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
               <TabsList className="grid w-full grid-cols-3">
                 <TabsTrigger value="learn">Learn</TabsTrigger>
                 <TabsTrigger value="practice">Practice</TabsTrigger>
@@ -634,8 +635,7 @@ export default function RoomDetail() {
                     roomPrinciple={room.purpose}
                     onStartProgram={() => {
                       // Switch to practice tab and scroll to training
-                      const practiceTab = document.querySelector('[value="practice"]') as HTMLElement;
-                      practiceTab?.click();
+                      setActiveTab("practice");
                       setTimeout(() => {
                         const trainingSection = document.getElementById('training-dashboard');
                         trainingSection?.scrollIntoView({ behavior: 'smooth' });
