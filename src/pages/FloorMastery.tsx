@@ -55,7 +55,7 @@ export default function FloorMastery() {
       <div className="container mx-auto px-4 py-8 max-w-6xl">
         <div className="mb-8">
           <h1 className="text-4xl font-bold mb-2">Floor-Based Mastery</h1>
-          <p className="text-muted-foreground">
+          <p className="text-foreground/80">
             Climb the Palace floor by floor. Each level builds on the previous. Only the worthy
             reach the 8th Floor.
           </p>
