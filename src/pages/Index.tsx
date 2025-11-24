@@ -95,6 +95,11 @@ const Index = () => {
       {/* Magic Eye Hero Section */}
       <MagicEyeHero />
 
+      {/* User Count Badge */}
+      <div className="flex justify-center py-8 bg-gradient-to-b from-background to-muted/30">
+        <UserCountBadge />
+      </div>
+
       {/* SECTION 2 — The Pain Point */}
       <section className="py-16 px-4 sm:px-6 lg:px-8 bg-muted/30">
         <div className="max-w-4xl mx-auto text-center">
