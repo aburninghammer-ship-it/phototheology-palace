@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { BookOpen, Sparkles, Users } from "lucide-react";
 import { blueprintLessons } from "@/data/blueprintCourseData";
 import { blueprintLessonsKids } from "@/data/blueprintCourseDataKids";
+import { BlueprintJeevesChat } from "@/components/blueprint/BlueprintJeevesChat";
 
 const COURSE_PARTS = [
   {
@@ -207,24 +208,41 @@ export default function BlueprintCourse() {
               <CardDescription className="text-lg">{currentPart?.description}</CardDescription>
             </CardHeader>
             <CardContent>
-              <ScrollArea className="h-[600px]">
-                <div className="prose prose-sm max-w-none space-y-6">
-                  <div className="bg-muted p-6 rounded-lg">
-                    <h3 className="text-lg font-semibold mb-3">Topics Covered:</h3>
-                    <ul className="space-y-2">
-                      {currentPart?.topics.map((topic, i) => (
-                        <li key={i} className="text-base">{topic}</li>
-                      ))}
-                    </ul>
-                  </div>
+              {(() => {
+                if (ageGroup === 'adult') {
+                  const lesson = blueprintLessons.find(l => l.id === selectedPart);
+                  if (!lesson) return null;
 
-                  {(() => {
-                    if (ageGroup === 'adult') {
-                      const lesson = blueprintLessons.find(l => l.id === selectedPart);
-                      if (!lesson) return null;
+                  const lessonContent = `
+                    Title: ${lesson.title}
+                    Focus: ${lesson.focus}
+                    Scripture: ${lesson.scripture} - ${lesson.scriptureText}
+                    Key Points: ${lesson.keyPoints.join('; ')}
+                    Historical Context: ${lesson.historicalContext}
+                    Prophetic Application: ${lesson.propheticApplication}
+                    Practical Application: ${lesson.practicalApplication}
+                    Cross References: ${lesson.crossReferences.join('; ')}
+                  `;
+
+                  return (
+                    <>
+                      <BlueprintJeevesChat 
+                        lessonId={selectedPart}
+                        lessonTitle={lesson.title}
+                        lessonContent={lessonContent}
+                      />
                       
-                      return (
-                        <div className="space-y-6">
+                      <ScrollArea className="h-[600px]">
+                        <div className="prose prose-sm max-w-none space-y-6">
+                          <div className="bg-muted p-6 rounded-lg">
+                            <h3 className="text-lg font-semibold mb-3">Topics Covered:</h3>
+                            <ul className="space-y-2">
+                              {currentPart?.topics.map((topic, i) => (
+                                <li key={i} className="text-base">{topic}</li>
+                              ))}
+                            </ul>
+                          </div>
+
                           <div>
                             <h3 className="font-semibold text-primary mb-2 flex items-center gap-2">
                               <Sparkles className="h-4 w-4" />
@@ -281,70 +299,81 @@ export default function BlueprintCourse() {
                             </ul>
                           </div>
                         </div>
-                      );
-                    } else {
-                      const kidsLesson = blueprintLessonsKids.find(l => l.id === selectedPart && l.ageGroup === ageGroup);
-                      if (!kidsLesson) return null;
+                      </ScrollArea>
+                    </>
+                  );
+                } else {
+                  const kidsLesson = blueprintLessonsKids.find(l => l.id === selectedPart && l.ageGroup === ageGroup);
+                  if (!kidsLesson) return null;
 
-                      return (
-                        <div className="space-y-6">
-                          <div>
-                            <h3 className="font-semibold text-primary mb-2 flex items-center gap-2">
-                              <Sparkles className="h-4 w-4" />
-                              Focus
-                            </h3>
-                            <p>{kidsLesson.focus}</p>
-                          </div>
-
-                          <div className="bg-primary/5 p-4 rounded-lg border border-primary/10">
-                            <h3 className="font-semibold text-primary mb-2">Scripture: {kidsLesson.scripture}</h3>
-                            <p className="italic">"{kidsLesson.scriptureText}"</p>
-                          </div>
-
-                          <div>
-                            <h3 className="font-semibold text-primary mb-2">Key Points</h3>
-                            <ul className="list-disc pl-5 space-y-1">
-                              {kidsLesson.keyPoints.map((point, i) => (
-                                <li key={i}>{point}</li>
-                              ))}
-                            </ul>
-                          </div>
-
-                          <div className="bg-blue-50 dark:bg-blue-950 p-4 rounded-lg">
-                            <h3 className="font-semibold text-primary mb-2">Story Time</h3>
-                            <p className="leading-relaxed">{kidsLesson.storyTime}</p>
-                          </div>
-
-                          <div className="bg-yellow-50 dark:bg-yellow-950 p-4 rounded-lg">
-                            <h3 className="font-semibold text-primary mb-2">🎨 Fun Activity</h3>
-                            <p className="leading-relaxed">{kidsLesson.funActivity}</p>
-                          </div>
-
-                          <div>
-                            <h3 className="font-semibold text-primary mb-2">Practical Application</h3>
-                            <p className="leading-relaxed">{kidsLesson.practicalApplication}</p>
-                          </div>
-
-                          <div className="bg-purple-50 dark:bg-purple-950 p-4 rounded-lg">
-                            <h3 className="font-semibold text-primary mb-2">Memory Verse</h3>
-                            <p className="italic">{kidsLesson.memoryVerse}</p>
-                          </div>
-
-                          <div className="bg-secondary/50 p-4 rounded-lg">
-                            <h3 className="font-semibold mb-2">Think About This</h3>
-                            <p className="italic">{kidsLesson.questionToThink}</p>
-                          </div>
-
-                          <div className="bg-primary/10 p-4 rounded-lg">
-                            <h3 className="font-semibold text-primary mb-2">Prayer</h3>
-                            <p className="italic">"{kidsLesson.prayer}"</p>
-                          </div>
+                  return (
+                    <ScrollArea className="h-[600px]">
+                      <div className="prose prose-sm max-w-none space-y-6">
+                        <div className="bg-muted p-6 rounded-lg">
+                          <h3 className="text-lg font-semibold mb-3">Topics Covered:</h3>
+                          <ul className="space-y-2">
+                            {currentPart?.topics.map((topic, i) => (
+                              <li key={i} className="text-base">{topic}</li>
+                            ))}
+                          </ul>
                         </div>
-                      );
-                    }
-                  })()}
-                </div>
-              </ScrollArea>
+
+                        <div>
+                          <h3 className="font-semibold text-primary mb-2 flex items-center gap-2">
+                            <Sparkles className="h-4 w-4" />
+                            Focus
+                          </h3>
+                          <p>{kidsLesson.focus}</p>
+                        </div>
+
+                        <div className="bg-primary/5 p-4 rounded-lg border border-primary/10">
+                          <h3 className="font-semibold text-primary mb-2">Scripture: {kidsLesson.scripture}</h3>
+                          <p className="italic">"{kidsLesson.scriptureText}"</p>
+                        </div>
+
+                        <div>
+                          <h3 className="font-semibold text-primary mb-2">Key Points</h3>
+                          <ul className="list-disc pl-5 space-y-1">
+                            {kidsLesson.keyPoints.map((point, i) => (
+                              <li key={i}>{point}</li>
+                            ))}
+                          </ul>
+                        </div>
+
+                        <div className="bg-blue-50 dark:bg-blue-950 p-4 rounded-lg">
+                          <h3 className="font-semibold text-primary mb-2">Story Time</h3>
+                          <p className="leading-relaxed">{kidsLesson.storyTime}</p>
+                        </div>
+
+                        <div className="bg-yellow-50 dark:bg-yellow-950 p-4 rounded-lg">
+                          <h3 className="font-semibold text-primary mb-2">🎨 Fun Activity</h3>
+                          <p className="leading-relaxed">{kidsLesson.funActivity}</p>
+                        </div>
+
+                        <div>
+                          <h3 className="font-semibold text-primary mb-2">Practical Application</h3>
+                          <p className="leading-relaxed">{kidsLesson.practicalApplication}</p>
+                        </div>
+
+                        <div className="bg-purple-50 dark:bg-purple-950 p-4 rounded-lg">
+                          <h3 className="font-semibold text-primary mb-2">Memory Verse</h3>
+                          <p className="italic">{kidsLesson.memoryVerse}</p>
+                        </div>
+
+                        <div className="bg-secondary/50 p-4 rounded-lg">
+                          <h3 className="font-semibold mb-2">Think About This</h3>
+                          <p className="italic">{kidsLesson.questionToThink}</p>
+                        </div>
+
+                        <div className="bg-primary/10 p-4 rounded-lg">
+                          <h3 className="font-semibold text-primary mb-2">Prayer</h3>
+                          <p className="italic">"{kidsLesson.prayer}"</p>
+                        </div>
+                      </div>
+                    </ScrollArea>
+                  );
+                }
+              })()}
             </CardContent>
           </Card>
         )}
