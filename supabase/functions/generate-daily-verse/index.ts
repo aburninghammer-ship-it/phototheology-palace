@@ -111,9 +111,35 @@ serve(async (req) => {
     
     console.log('Selected diverse principles:', selectedPrinciples.map(p => `${p.code} (${p.category})`));
     
-    // For demo, using a meaningful verse - in production, you'd have a curated list
-    const verseReference = "John 3:16";
-    const verseText = "For God so loved the world, that he gave his only begotten Son, that whosoever believeth in him should not perish, but have everlasting life.";
+    // Curated list of impactful verses across genres and books
+    const VERSE_LIBRARY = [
+      { ref: "John 3:16", text: "For God so loved the world, that he gave his only begotten Son, that whosoever believeth in him should not perish, but have everlasting life." },
+      { ref: "Psalm 23:1", text: "The LORD is my shepherd; I shall not want." },
+      { ref: "Philippians 4:13", text: "I can do all things through Christ which strengtheneth me." },
+      { ref: "Proverbs 3:5-6", text: "Trust in the LORD with all thine heart; and lean not unto thine own understanding. In all thy ways acknowledge him, and he shall direct thy paths." },
+      { ref: "Romans 8:28", text: "And we know that all things work together for good to them that love God, to them who are the called according to his purpose." },
+      { ref: "Isaiah 40:31", text: "But they that wait upon the LORD shall renew their strength; they shall mount up with wings as eagles; they shall run, and not be weary; and they shall walk, and not faint." },
+      { ref: "Matthew 11:28", text: "Come unto me, all ye that labour and are heavy laden, and I will give you rest." },
+      { ref: "Jeremiah 29:11", text: "For I know the thoughts that I think toward you, saith the LORD, thoughts of peace, and not of evil, to give you an expected end." },
+      { ref: "2 Timothy 1:7", text: "For God hath not given us the spirit of fear; but of power, and of love, and of a sound mind." },
+      { ref: "Joshua 1:9", text: "Have not I commanded thee? Be strong and of a good courage; be not afraid, neither be thou dismayed: for the LORD thy God is with thee whithersoever thou goest." },
+      { ref: "1 Corinthians 13:4-5", text: "Charity suffereth long, and is kind; charity envieth not; charity vaunteth not itself, is not puffed up, Doth not behave itself unseemly, seeketh not her own, is not easily provoked, thinketh no evil." },
+      { ref: "Ephesians 2:8-9", text: "For by grace are ye saved through faith; and that not of yourselves: it is the gift of God: Not of works, lest any man should boast." },
+      { ref: "Hebrews 11:1", text: "Now faith is the substance of things hoped for, the evidence of things not seen." },
+      { ref: "Revelation 21:4", text: "And God shall wipe away all tears from their eyes; and there shall be no more death, neither sorrow, nor crying, neither shall there be any more pain: for the former things are passed away." },
+      { ref: "Genesis 1:1", text: "In the beginning God created the heaven and the earth." },
+      { ref: "Exodus 20:8", text: "Remember the sabbath day, to keep it holy." },
+      { ref: "Daniel 12:3", text: "And they that be wise shall shine as the brightness of the firmament; and they that turn many to righteousness as the stars for ever and ever." },
+      { ref: "1 John 4:19", text: "We love him, because he first loved us." },
+      { ref: "Galatians 5:22-23", text: "But the fruit of the Spirit is love, joy, peace, longsuffering, gentleness, goodness, faith, Meekness, temperance: against such there is no law." },
+      { ref: "Colossians 3:2", text: "Set your affection on things above, not on things on the earth." },
+    ];
+    
+    // Select verse based on day of year to ensure daily rotation
+    const dayOfYear = Math.floor((Date.now() - new Date(new Date().getFullYear(), 0, 0).getTime()) / 86400000);
+    const selectedVerse = VERSE_LIBRARY[dayOfYear % VERSE_LIBRARY.length];
+    const verseReference = selectedVerse.ref;
+    const verseText = selectedVerse.text;
     
     // Generate breakdown using Lovable AI with specific instructions per principle
     const principlesWithFloors = selectedPrinciples.map((p, idx) => {
