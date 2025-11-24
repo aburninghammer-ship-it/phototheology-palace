@@ -1626,6 +1626,51 @@ export type Database = {
           },
         ]
       }
+      floor_assessments: {
+        Row: {
+          ai_feedback: Json
+          assessment_type: string
+          attempt_number: number
+          completed_at: string
+          created_at: string
+          floor_number: number
+          id: string
+          passed: boolean
+          questions_data: Json
+          score: number
+          user_answers: Json
+          user_id: string
+        }
+        Insert: {
+          ai_feedback?: Json
+          assessment_type: string
+          attempt_number?: number
+          completed_at?: string
+          created_at?: string
+          floor_number: number
+          id?: string
+          passed: boolean
+          questions_data?: Json
+          score: number
+          user_answers?: Json
+          user_id: string
+        }
+        Update: {
+          ai_feedback?: Json
+          assessment_type?: string
+          attempt_number?: number
+          completed_at?: string
+          created_at?: string
+          floor_number?: number
+          id?: string
+          passed?: boolean
+          questions_data?: Json
+          score?: number
+          user_answers?: Json
+          user_id?: string
+        }
+        Relationships: []
+      }
       game_chat: {
         Row: {
           created_at: string | null
@@ -1881,38 +1926,41 @@ export type Database = {
       }
       global_master_titles: {
         Row: {
+          black_master_exam_passed_at: string | null
           created_at: string
+          current_floor: number
           floors_completed: number
+          global_streak_days: number
           id: string
-          rooms_mastered: number
-          title: string
-          title_level: number
+          last_global_practice_date: string | null
+          master_title: string | null
           total_xp: number
-          unlocked_at: string | null
           updated_at: string
           user_id: string
         }
         Insert: {
+          black_master_exam_passed_at?: string | null
           created_at?: string
+          current_floor?: number
           floors_completed?: number
+          global_streak_days?: number
           id?: string
-          rooms_mastered?: number
-          title?: string
-          title_level?: number
+          last_global_practice_date?: string | null
+          master_title?: string | null
           total_xp?: number
-          unlocked_at?: string | null
           updated_at?: string
           user_id: string
         }
         Update: {
+          black_master_exam_passed_at?: string | null
           created_at?: string
+          current_floor?: number
           floors_completed?: number
+          global_streak_days?: number
           id?: string
-          rooms_mastered?: number
-          title?: string
-          title_level?: number
+          last_global_practice_date?: string | null
+          master_title?: string | null
           total_xp?: number
-          unlocked_at?: string | null
           updated_at?: string
           user_id?: string
         }
@@ -3704,6 +3752,42 @@ export type Database = {
         }
         Relationships: []
       }
+      room_scope_configs: {
+        Row: {
+          created_at: string
+          curriculum_percentage_required: number
+          floor_number: number
+          id: string
+          room_id: string
+          scope_data: Json
+          scope_description: string
+          streak_requirement: number
+          xp_requirement: number
+        }
+        Insert: {
+          created_at?: string
+          curriculum_percentage_required?: number
+          floor_number: number
+          id?: string
+          room_id: string
+          scope_data?: Json
+          scope_description: string
+          streak_requirement: number
+          xp_requirement: number
+        }
+        Update: {
+          created_at?: string
+          curriculum_percentage_required?: number
+          floor_number?: number
+          id?: string
+          room_id?: string
+          scope_data?: Json
+          scope_description?: string
+          streak_requirement?: number
+          xp_requirement?: number
+        }
+        Relationships: []
+      }
       sermon_titles: {
         Row: {
           created_at: string | null
@@ -4626,6 +4710,48 @@ export type Database = {
           total_sessions?: number | null
           updated_at?: string | null
           user_id?: string | null
+        }
+        Relationships: []
+      }
+      user_floor_progress: {
+        Row: {
+          created_at: string
+          floor_assessment_passed_at: string | null
+          floor_assessment_score: number | null
+          floor_completed_at: string | null
+          floor_number: number
+          id: string
+          is_unlocked: boolean
+          rooms_completed: number
+          rooms_required: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          floor_assessment_passed_at?: string | null
+          floor_assessment_score?: number | null
+          floor_completed_at?: string | null
+          floor_number: number
+          id?: string
+          is_unlocked?: boolean
+          rooms_completed?: number
+          rooms_required: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          floor_assessment_passed_at?: string | null
+          floor_assessment_score?: number | null
+          floor_completed_at?: string | null
+          floor_number?: number
+          id?: string
+          is_unlocked?: boolean
+          rooms_completed?: number
+          rooms_required?: number
+          updated_at?: string
+          user_id?: string
         }
         Relationships: []
       }

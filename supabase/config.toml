@@ -92,5 +92,8 @@ verify_jwt = false
 [functions.generate-daily-verse]
 verify_jwt = false
 
-[functions.grade-teaching-demo]
+[functions.grade-floor-assessment]
+verify_jwt = true
+
+[functions.grade-floor-assessment]
 verify_jwt = true
