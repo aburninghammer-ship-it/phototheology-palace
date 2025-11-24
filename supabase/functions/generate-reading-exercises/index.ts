@@ -90,7 +90,7 @@ serve(async (req) => {
 
     const passageText = passages.map((p: any) => `${p.book} ${p.chapter}${p.verses ? `:${p.verses}` : ''}`).join(', ');
 
-    const systemPrompt = "You are a Phototheology Palace guide. Generate floor exercises for today's Bible reading that train students in the 8-Floor method. Use only the floor numbers provided in the user message and return ONLY valid JSON with an 'exercises' array of { floorNumber, floorName, title, rooms, prompt, questions }.";
+    const systemPrompt = "You are a Phototheology Palace guide. Generate floor exercises for today's Bible reading that train students in the 8-Floor method. Use only the floor numbers provided in the user message and return ONLY valid JSON with an 'exercises' array. Each exercise object MUST have: floorNumber (number), floorName (string), title (string), rooms (array of strings), prompt (string), questions (array of strings).";
 
 
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
@@ -110,7 +110,9 @@ serve(async (req) => {
             role: "user", 
             content: `Generate ${floorsConfig.floors.length} floor exercises (floors ${floorsConfig.floors.join(', ')}) for: ${passageText}. 
             
-Each exercise should have ${floorsConfig.roomsPerFloor} rooms combined, with one unified prompt and 3 guiding questions. Make the prompts engaging, Christ-centered, and practical. Vary which rooms are used to keep it fresh.` 
+Each exercise should combine ${floorsConfig.roomsPerFloor} different rooms from that floor. Make the prompts engaging, Christ-centered, and practical. Vary which rooms are used to keep it fresh.
+
+IMPORTANT: The 'rooms' field MUST be an array of strings, for example: ["Story Room", "Observation Room"] or ["Concentration", "Dimensions", "Theme"].` 
           }
         ],
         response_format: { type: "json_object" }
