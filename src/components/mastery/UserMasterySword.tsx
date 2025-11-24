@@ -9,15 +9,47 @@ interface UserMasterySwordProps {
   isOwner?: boolean;
 }
 
-const MASTERY_COLORS: Record<string, { color: string; label: string }> = {
-  "none": { color: "text-green-500", label: "Apprentice (Green Sword)" },
-  "blue": { color: "text-blue-500", label: "Blue Master" },
-  "red": { color: "text-red-500", label: "Red Master" },
-  "gold": { color: "text-yellow-600", label: "Gold Master" },
-  "purple": { color: "text-purple-500", label: "Purple Master" },
-  "white": { color: "text-gray-400", label: "White Master" },
-  "black_candidate": { color: "text-gray-600", label: "Black Candidate" },
-  "black": { color: "text-black dark:text-white", label: "Black Master" },
+const MASTERY_COLORS: Record<string, { color: string; label: string; glow: string }> = {
+  "none": { 
+    color: "text-green-500", 
+    label: "Apprentice (Green Sword)",
+    glow: "drop-shadow-[0_0_8px_rgba(34,197,94,0.8)]"
+  },
+  "blue": { 
+    color: "text-blue-500", 
+    label: "Blue Master",
+    glow: "drop-shadow-[0_0_8px_rgba(59,130,246,0.8)]"
+  },
+  "red": { 
+    color: "text-red-500", 
+    label: "Red Master",
+    glow: "drop-shadow-[0_0_8px_rgba(239,68,68,0.8)]"
+  },
+  "gold": { 
+    color: "text-yellow-600", 
+    label: "Gold Master",
+    glow: "drop-shadow-[0_0_8px_rgba(202,138,4,0.8)]"
+  },
+  "purple": { 
+    color: "text-purple-500", 
+    label: "Purple Master",
+    glow: "drop-shadow-[0_0_8px_rgba(168,85,247,0.8)]"
+  },
+  "white": { 
+    color: "text-gray-400", 
+    label: "White Master",
+    glow: "drop-shadow-[0_0_8px_rgba(156,163,175,0.8)]"
+  },
+  "black_candidate": { 
+    color: "text-gray-600", 
+    label: "Black Candidate",
+    glow: "drop-shadow-[0_0_8px_rgba(75,85,99,0.8)]"
+  },
+  "black": { 
+    color: "text-black dark:text-white", 
+    label: "Black Master",
+    glow: "drop-shadow-[0_0_8px_rgba(255,255,255,0.8)]"
+  },
 };
 
 const SIZE_CLASSES = {
@@ -35,9 +67,13 @@ export const UserMasterySword: React.FC<UserMasterySwordProps> = ({
   // Determine sword color based on master title or current floor
   let swordConfig = MASTERY_COLORS["none"]; // Default green for apprentices
   
-  // Palace Owner gets special treatment
+  // Palace Owner gets special treatment with golden glow
   if (isOwner) {
-    swordConfig = { ...MASTERY_COLORS["black"], label: "Palace Founder (Black Sword)" };
+    swordConfig = { 
+      ...MASTERY_COLORS["black"], 
+      label: "Palace Founder (Black Sword)",
+      glow: "drop-shadow-[0_0_8px_rgba(234,179,8,0.8)]"
+    };
   } else if (masterTitle === "black") {
     swordConfig = MASTERY_COLORS["black"];
   } else if (currentFloor >= 7) {
@@ -61,7 +97,7 @@ export const UserMasterySword: React.FC<UserMasterySwordProps> = ({
           <DialogTrigger asChild>
             <TooltipTrigger asChild>
               <button className="focus:outline-none relative">
-                <Sword className={`${swordConfig.color} ${SIZE_CLASSES[size]} cursor-pointer hover:opacity-80 transition-opacity ${isOwner ? 'animate-pulse drop-shadow-[0_0_8px_rgba(234,179,8,0.8)]' : ''}`} />
+                <Sword className={`${swordConfig.color} ${SIZE_CLASSES[size]} ${swordConfig.glow} animate-pulse cursor-pointer hover:opacity-80 transition-opacity`} />
               </button>
             </TooltipTrigger>
           </DialogTrigger>
