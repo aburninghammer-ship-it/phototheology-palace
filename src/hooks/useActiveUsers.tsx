@@ -9,7 +9,6 @@ interface ActiveUser {
   last_seen: string;
   current_floor?: number;
   master_title?: string | null;
-  is_owner?: boolean;
 }
 
 export const useActiveUsers = () => {
@@ -58,22 +57,13 @@ export const useActiveUsers = () => {
             .select("user_id, current_floor, master_title")
             .in("user_id", userIds);
           
-          // Check for admin/owner roles
-          const { data: rolesData } = await supabase
-            .from("user_roles")
-            .select("user_id, role")
-            .in("user_id", userIds)
-            .eq("role", "admin");
-          
           // Merge mastery data with user data
           const usersWithMastery = data.map(user => {
             const mastery = masteryData?.find(m => m.user_id === user.id);
-            const isOwner = rolesData?.some(r => r.user_id === user.id);
             return {
               ...user,
               current_floor: mastery?.current_floor || 0,
-              master_title: isOwner ? 'black' : (mastery?.master_title || null),
-              is_owner: isOwner,
+              master_title: mastery?.master_title || null,
             };
           });
           
