@@ -6,6 +6,7 @@ interface UserMasterySwordProps {
   masterTitle?: string | null;
   currentFloor?: number;
   size?: "sm" | "md" | "lg";
+  isOwner?: boolean;
 }
 
 const MASTERY_COLORS: Record<string, { color: string; label: string }> = {
@@ -28,12 +29,16 @@ const SIZE_CLASSES = {
 export const UserMasterySword: React.FC<UserMasterySwordProps> = ({ 
   masterTitle, 
   currentFloor = 0,
-  size = "md" 
+  size = "md",
+  isOwner = false
 }) => {
   // Determine sword color based on master title or current floor
   let swordConfig = MASTERY_COLORS["none"]; // Default green for apprentices
   
-  if (masterTitle === "black") {
+  // Palace Owner gets special treatment
+  if (isOwner) {
+    swordConfig = { ...MASTERY_COLORS["black"], label: "Palace Founder (Black Sword)" };
+  } else if (masterTitle === "black") {
     swordConfig = MASTERY_COLORS["black"];
   } else if (currentFloor >= 7) {
     swordConfig = MASTERY_COLORS["black_candidate"];
@@ -55,8 +60,8 @@ export const UserMasterySword: React.FC<UserMasterySwordProps> = ({
         <Tooltip>
           <DialogTrigger asChild>
             <TooltipTrigger asChild>
-              <button className="focus:outline-none">
-                <Sword className={`${swordConfig.color} ${SIZE_CLASSES[size]} cursor-pointer hover:opacity-80 transition-opacity`} />
+              <button className="focus:outline-none relative">
+                <Sword className={`${swordConfig.color} ${SIZE_CLASSES[size]} cursor-pointer hover:opacity-80 transition-opacity ${isOwner ? 'animate-pulse drop-shadow-[0_0_8px_rgba(234,179,8,0.8)]' : ''}`} />
               </button>
             </TooltipTrigger>
           </DialogTrigger>
@@ -137,6 +142,14 @@ export const UserMasterySword: React.FC<UserMasterySwordProps> = ({
               <div>
                 <p className="font-bold text-lg">Black Sword - Black Master</p>
                 <p className="text-sm">Complete all 8 floors to achieve the highest mastery level</p>
+              </div>
+            </div>
+            
+            <div className="flex items-center gap-3 p-4 bg-gradient-to-r from-yellow-500/20 to-amber-600/20 rounded-lg border-2 border-yellow-500/50 mt-2">
+              <Sword className="text-black dark:text-white h-6 w-6 animate-pulse drop-shadow-[0_0_8px_rgba(234,179,8,0.8)]" />
+              <div>
+                <p className="font-bold text-lg">Palace Founder - Special Black Sword</p>
+                <p className="text-sm">Reserved for the founder of the Phototheology Palace with a distinctive golden glow</p>
               </div>
             </div>
           </div>
