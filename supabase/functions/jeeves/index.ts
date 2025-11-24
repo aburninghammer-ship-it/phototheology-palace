@@ -1,6 +1,21 @@
 import { serve } from "https://deno.land/std@0.224.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.7.1';
-import { PALACE_SCHEMA, THEOLOGICAL_REASONING } from './palace-schema.ts';
+import { 
+  PALACE_SCHEMA, 
+  MASTER_IDENTITY,
+  THINKING_PROCESS,
+  UNIVERSAL_RESPONSE_RULES,
+  APPLICATION_ENGINE,
+  MASTERY_SYSTEM,
+  THEOLOGICAL_REASONING,
+  INTERACTION_MODES,
+  GUARDRAILS,
+  REQUEST_HANDLING,
+  NEVER_DO_THIS,
+  ALWAYS_DO_THIS,
+  FORMATTING_REQUIREMENTS,
+  CLOSING_BEHAVIOR
+} from './palace-schema.ts';
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
