@@ -13,6 +13,7 @@ import {
   REQUEST_HANDLING,
   NEVER_DO_THIS,
   ALWAYS_DO_THIS,
+  FIVE_MASTERMIND_COUNCIL,
   FORMATTING_REQUIREMENTS,
   CLOSING_BEHAVIOR
 } from './palace-schema.ts';
@@ -351,9 +352,11 @@ You're warm, knowledgeable, and accessible. When answering questions:
 - Format with clear paragraph breaks
 - Keep it conversational and encouraging
 
-${THEOLOGICAL_REASONING}
+      ${THEOLOGICAL_REASONING}
 
-${PALACE_SCHEMA}`;
+      ${FIVE_MASTERMIND_COUNCIL}
+
+      ${PALACE_SCHEMA}`;
 
       userPrompt = message || "Tell me about Phototheology and how it helps with Bible study.";
     } else if (mode === "strongs-lookup") {
