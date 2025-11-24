@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Eye, EyeOff, ChevronRight } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import magicEyeImage from "@/assets/magic-eye.png";
 import {
   Dialog,
   DialogContent,
@@ -92,12 +93,11 @@ export const MagicEyeHero = () => {
               className="relative"
             >
               <img
-                src="/placeholder.svg"
+                src={magicEyeImage}
                 alt="Magic Eye - Find the hidden sanctuary"
                 className="w-full h-auto"
                 style={{
                   minHeight: "300px",
-                  background: "linear-gradient(45deg, #667eea 0%, #764ba2 50%, #f093fb 100%)",
                 }}
               />
               
