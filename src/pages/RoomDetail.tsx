@@ -30,12 +30,12 @@ import { XpProgressBar } from "@/components/mastery/XpProgressBar";
 import { RoomMentorChat } from "@/components/mastery/RoomMentorChat";
 import { ReportCardDisplay } from "@/components/mastery/ReportCardDisplay";
 import { useFocusedRoom } from "@/hooks/useFocusedRoom";
-import { MasteryOnboarding } from "@/components/mastery/MasteryOnboarding";
 import { TrainingDashboard } from "@/components/mastery/TrainingDashboard";
 import { ContinueTraining } from "@/components/mastery/ContinueTraining";
 import { MilestoneTest } from "@/components/mastery/MilestoneTest";
 import { useRoomCurriculum } from "@/hooks/useRoomCurriculum";
 import { MasteryProgramEnrollment } from "@/components/mastery/MasteryProgramEnrollment";
+import { JeevesMasterProgram } from "@/components/mastery/JeevesMasterProgram";
 
 // Room IDs that have quick start guides
 const QUICK_START_ROOMS = new Set([
@@ -627,16 +627,19 @@ export default function RoomDetail() {
                   </CardContent>
                 </Card>
 
-                {/* Show Onboarding for Novices (Level 1 with 0 XP) */}
+                {/* Jeeves Master Program - Show for new users (Level 1 with 0 XP) */}
                 {mastery && mastery.mastery_level === 1 && mastery.xp_current === 0 && (
-                  <MasteryOnboarding 
+                  <JeevesMasterProgram 
                     roomName={room.name}
-                    onStartPractice={() => {
-                      // Switch to practice tab
+                    roomPrinciple={room.purpose}
+                    onStartProgram={() => {
+                      // Switch to practice tab and scroll to training
                       const practiceTab = document.querySelector('[value="practice"]') as HTMLElement;
                       practiceTab?.click();
-                      // Scroll to top
-                      window.scrollTo({ top: 0, behavior: 'smooth' });
+                      setTimeout(() => {
+                        const trainingSection = document.getElementById('training-dashboard');
+                        trainingSection?.scrollIntoView({ behavior: 'smooth' });
+                      }, 100);
                     }}
                   />
                 )}
@@ -741,28 +744,30 @@ export default function RoomDetail() {
 
                 {/* Training Dashboard - Full activity list */}
                 {mastery && !(mastery.mastery_level === 1 && mastery.xp_current === 0) && !showMilestoneTest && (
-                  <TrainingDashboard
-                    roomName={room.name}
-                    curriculum={curriculum}
-                    completedActivities={(curriculumProgress?.completed_activities as string[]) || []}
-                    currentLevel={mastery.mastery_level}
-                    onActivityClick={(activity) => {
-                      if (activity.type === "milestone_test") {
-                        const testLevel = curriculum.milestoneTests.find(
-                          (t) => t.activityId === activity.id
-                        )?.level;
-                        if (testLevel) {
-                          setCurrentTestLevel(testLevel);
-                          setShowMilestoneTest(true);
+                  <div id="training-dashboard">
+                    <TrainingDashboard
+                      roomName={room.name}
+                      curriculum={curriculum}
+                      completedActivities={(curriculumProgress?.completed_activities as string[]) || []}
+                      currentLevel={mastery.mastery_level}
+                      onActivityClick={(activity) => {
+                        if (activity.type === "milestone_test") {
+                          const testLevel = curriculum.milestoneTests.find(
+                            (t) => t.activityId === activity.id
+                          )?.level;
+                          if (testLevel) {
+                            setCurrentTestLevel(testLevel);
+                            setShowMilestoneTest(true);
+                          }
+                        } else {
+                          // Switch to practice tab for other activities
+                          const practiceTab = document.querySelector('[value="practice"]') as HTMLElement;
+                          practiceTab?.click();
+                          window.scrollTo({ top: 0, behavior: 'smooth' });
                         }
-                      } else {
-                        // Switch to practice tab for other activities
-                        const practiceTab = document.querySelector('[value="practice"]') as HTMLElement;
-                        practiceTab?.click();
-                        window.scrollTo({ top: 0, behavior: 'smooth' });
-                      }
-                    }}
-                  />
+                      }}
+                    />
+                  </div>
                 )}
 
                 {/* Focus Room Control */}

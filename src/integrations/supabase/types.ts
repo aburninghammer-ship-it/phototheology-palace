@@ -3190,6 +3190,7 @@ export type Database = {
           bio: string | null
           chain_chess_streak: number | null
           created_at: string | null
+          current_floor: number | null
           daily_study_streak: number | null
           display_name: string | null
           equations_streak: number | null
@@ -3210,6 +3211,7 @@ export type Database = {
           longest_equations_streak: number | null
           longest_gem_streak: number | null
           longest_study_streak: number | null
+          master_title: string | null
           onboarding_completed: boolean | null
           onboarding_step: number | null
           payment_source: string | null
@@ -3238,6 +3240,7 @@ export type Database = {
           bio?: string | null
           chain_chess_streak?: number | null
           created_at?: string | null
+          current_floor?: number | null
           daily_study_streak?: number | null
           display_name?: string | null
           equations_streak?: number | null
@@ -3258,6 +3261,7 @@ export type Database = {
           longest_equations_streak?: number | null
           longest_gem_streak?: number | null
           longest_study_streak?: number | null
+          master_title?: string | null
           onboarding_completed?: boolean | null
           onboarding_step?: number | null
           payment_source?: string | null
@@ -3286,6 +3290,7 @@ export type Database = {
           bio?: string | null
           chain_chess_streak?: number | null
           created_at?: string | null
+          current_floor?: number | null
           daily_study_streak?: number | null
           display_name?: string | null
           equations_streak?: number | null
@@ -3306,6 +3311,7 @@ export type Database = {
           longest_equations_streak?: number | null
           longest_gem_streak?: number | null
           longest_study_streak?: number | null
+          master_title?: string | null
           onboarding_completed?: boolean | null
           onboarding_step?: number | null
           payment_source?: string | null
