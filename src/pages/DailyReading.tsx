@@ -58,6 +58,9 @@ export default function DailyReading() {
       const schedule = planData.daily_schedule as any;
       const dayIndex = userProgress.current_day - 1;
       
+      console.log('Plan schedule structure:', schedule);
+      console.log('Current day index:', dayIndex);
+      
       // Parse passages based on schedule structure
       let passages: any[] = [];
       if (schedule?.chapters && Array.isArray(schedule.chapters)) {
@@ -103,11 +106,14 @@ export default function DailyReading() {
           description: "Unable to determine today's reading. Please check your plan.",
           variant: "destructive",
         });
+        setTodaysPassages([]);
+        setExercises([]);
+        return;
       }
 
       setTodaysPassages(passages);
 
-      // Generate exercises with the actual passages and depth mode
+      // Only generate exercises if we have passages
       const result = await generateExercisesWithPassages(passages, planData.depth_mode, false);
       if (result) {
         setExercises(result);
@@ -125,7 +131,19 @@ export default function DailyReading() {
   const generateExercisesWithPassages = async (passages: any[], depthMode: string, regenerate: boolean) => {
     if (!userProgress) return null;
 
+    // Don't attempt to generate if no passages
+    if (!passages || passages.length === 0) {
+      console.error('Cannot generate exercises: no passages provided');
+      return null;
+    }
+
     try {
+      console.log('Calling generate-reading-exercises with:', {
+        passages,
+        depthMode,
+        regenerate
+      });
+
       const { data, error } = await supabase.functions.invoke('generate-reading-exercises', {
         body: {
           userProgressId: userProgress.id,
