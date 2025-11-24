@@ -9,7 +9,6 @@ import {
   ArrowLeft,
   Save,
   Star,
-  Tag,
   X,
   Loader2,
   Download
@@ -442,7 +441,6 @@ const StudyEditor = () => {
               {/* Tags */}
               <div className="mb-6">
                 <div className="flex items-center gap-2 mb-3">
-                  <Tag className="w-4 h-4 text-muted-foreground" />
                   <span className="text-sm font-medium">Tags</span>
                 </div>
                 <div className="flex flex-wrap gap-2 mb-3">
