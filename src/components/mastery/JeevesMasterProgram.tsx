@@ -23,34 +23,40 @@ export const JeevesMasterProgram = ({
       <CardHeader>
         <div className="flex items-start justify-between">
           <div className="flex items-start gap-3">
-            <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
-              <Bot className="h-6 w-6 text-primary" />
+            <div className="w-12 h-12 rounded-full bg-emerald-500/20 flex items-center justify-center flex-shrink-0">
+              <Bot className="h-6 w-6 text-emerald-600 dark:text-emerald-400" />
             </div>
             <div>
-              <CardTitle className="text-xl mb-1">
-                Master {roomName} with Jeeves
+              <CardTitle className="text-xl mb-1 text-emerald-900 dark:text-emerald-100">
+                🎯 Start Your Official Mastery Journey
               </CardTitle>
-              <CardDescription className="text-base">
-                Your AI guide through a structured mastery program
+              <CardDescription className="text-base font-medium text-emerald-700 dark:text-emerald-300">
+                You haven't started the {roomName} mastery program yet
               </CardDescription>
             </div>
           </div>
           <Badge variant="secondary" className="bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 border-emerald-500/30">
             <Sparkles className="h-3 w-3 mr-1" />
-            AI-Powered
+            Official Program
           </Badge>
         </div>
       </CardHeader>
       <CardContent className="space-y-4">
-        {/* Welcome Message */}
-        <div className="p-4 rounded-lg bg-card border space-y-2">
-          <div className="flex items-center gap-2 text-sm font-medium">
-            <Bot className="h-4 w-4 text-primary" />
-            <span>Jeeves says:</span>
+        {/* Important Notice */}
+        <div className="p-4 rounded-lg bg-emerald-500/10 border-2 border-emerald-500/30 space-y-3">
+          <div className="flex items-start gap-3">
+            <div className="w-8 h-8 rounded-full bg-amber-500/20 flex items-center justify-center flex-shrink-0 mt-0.5">
+              <Target className="h-4 w-4 text-amber-600 dark:text-amber-400" />
+            </div>
+            <div className="space-y-2">
+              <p className="font-semibold text-emerald-900 dark:text-emerald-100">
+                This is NOT casual practice — This is your official mastery program
+              </p>
+              <p className="text-sm text-emerald-800 dark:text-emerald-200 leading-relaxed">
+                When you click "Begin Mastery Program" below, you'll officially enroll in a structured, 5-level training journey for <strong>{roomPrinciple.toLowerCase()}</strong>. Jeeves will guide you from Novice to Master with lessons, drills, and assessments. Your progress will be tracked and saved.
+              </p>
+            </div>
           </div>
-          <p className="text-sm text-muted-foreground leading-relaxed">
-            "Welcome! I'm Jeeves, your personal Phototheology mentor. I'll guide you through mastering <strong>{roomPrinciple.toLowerCase()}</strong>. Together, we'll progress through 5 levels—from Novice to Master—using structured lessons, practice drills, and personalized feedback."
-          </p>
         </div>
 
         {/* Program Features */}
@@ -149,11 +155,11 @@ export const JeevesMasterProgram = ({
         <div className="flex flex-col gap-2 pt-2">
           <Button 
             onClick={onStartProgram}
-            className="w-full h-11 gradient-palace"
+            className="w-full h-12 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-semibold text-base shadow-lg"
             size="lg"
           >
             <Trophy className="mr-2 h-5 w-5" />
-            Begin Mastery Program
+            🚀 Yes, Start My Official Mastery Program
           </Button>
           
           <Button
