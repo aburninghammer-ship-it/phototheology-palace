@@ -14,7 +14,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
 import { BIBLE_BOOKS } from "@/types/bible";
-import { fetchChapter, BIBLE_TRANSLATIONS } from "@/services/bibleApi";
+import { fetchChapter, BIBLE_TRANSLATIONS, Translation } from "@/services/bibleApi";
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Check, ChevronsUpDown } from "lucide-react";
@@ -97,7 +97,7 @@ const MemorizationVerses = () => {
       const chapterData = await fetchChapter(
         selectedBook, 
         parseInt(selectedChapter), 
-        selectedTranslation as "kjv" | "web" | "bbe" | "almeida" | "clementine"
+        selectedTranslation as Translation
       );
       const foundVerse = chapterData.verses.find(v => v.verse === parseInt(selectedVerse));
       

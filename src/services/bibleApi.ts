@@ -8,10 +8,12 @@ const BIBLE_API_BASE = "https://bible-api.com";
 // Available translations
 export const BIBLE_TRANSLATIONS = [
   { value: "kjv", label: "King James Version (KJV)" },
+  { value: "niv", label: "New International Version (NIV)" },
+  { value: "esv", label: "English Standard Version (ESV)" },
+  { value: "nkjv", label: "New King James Version (NKJV)" },
+  { value: "nlt", label: "New Living Translation (NLT)" },
+  { value: "nasb", label: "New American Standard Bible (NASB)" },
   { value: "web", label: "World English Bible (WEB)" },
-  { value: "bbe", label: "Bible in Basic English (BBE)" },
-  { value: "clementine", label: "Clementine Latin Vulgate" },
-  { value: "almeida", label: "João Ferreira de Almeida (Portuguese)" },
 ] as const;
 
 export type Translation = typeof BIBLE_TRANSLATIONS[number]["value"];
