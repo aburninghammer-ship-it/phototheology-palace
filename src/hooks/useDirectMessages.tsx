@@ -12,6 +12,7 @@ export interface Message {
   content: string;
   created_at: string;
   is_deleted: boolean;
+  images?: string[];
   read_by?: string[];
 }
 
@@ -219,11 +220,12 @@ export const useDirectMessages = () => {
   }, [user, fetchConversations, toast]);
 
   // Send a message
-  const sendMessage = useCallback(async (content: string) => {
+  const sendMessage = useCallback(async (content: string, images?: string[]) => {
     console.log('=== SENDING MESSAGE ===');
     console.log('User:', user?.id);
     console.log('Active Conversation:', activeConversationId);
     console.log('Content:', content.trim());
+    console.log('Images:', images?.length || 0);
     
     if (!user) {
       console.error('❌ No user found');
@@ -240,7 +242,7 @@ export const useDirectMessages = () => {
       return;
     }
     
-    if (!content.trim()) {
+    if (!content.trim() && (!images || images.length === 0)) {
       console.error('❌ Empty message');
       return;
     }
@@ -252,7 +254,8 @@ export const useDirectMessages = () => {
         .insert({
           conversation_id: activeConversationId,
           sender_id: user.id,
-          content: content.trim()
+          content: content.trim(),
+          images: images || null
         })
         .select()
         .single();

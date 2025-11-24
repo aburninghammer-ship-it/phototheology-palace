@@ -2393,6 +2393,7 @@ export type Database = {
           created_at: string
           edited_at: string | null
           id: string
+          images: string[] | null
           is_deleted: boolean
           sender_id: string
         }
@@ -2402,6 +2403,7 @@ export type Database = {
           created_at?: string
           edited_at?: string | null
           id?: string
+          images?: string[] | null
           is_deleted?: boolean
           sender_id: string
         }
@@ -2411,6 +2413,7 @@ export type Database = {
           created_at?: string
           edited_at?: string | null
           id?: string
+          images?: string[] | null
           is_deleted?: boolean
           sender_id?: string
         }

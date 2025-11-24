@@ -355,7 +355,7 @@ export const MessagingSidebar = () => {
                       const isRead = message.read_by && message.read_by.length > 1;
 
                       return (
-                        <div
+                         <div
                           key={message.id}
                           className={`flex ${isOwn ? 'justify-end' : 'justify-start'}`}
                         >
@@ -366,7 +366,21 @@ export const MessagingSidebar = () => {
                                 : 'bg-muted shadow-sm'
                             }`}
                           >
-                            <p className="text-base break-words leading-relaxed">{message.content}</p>
+                            {message.images && message.images.length > 0 && (
+                              <div className="flex gap-2 mb-2 flex-wrap">
+                                {message.images.map((img: string, imgIdx: number) => (
+                                  <img
+                                    key={imgIdx}
+                                    src={img}
+                                    alt={`Attached image ${imgIdx + 1}`}
+                                    className="max-w-[200px] rounded-lg border"
+                                  />
+                                ))}
+                              </div>
+                            )}
+                            {message.content && (
+                              <p className="text-base break-words leading-relaxed">{message.content}</p>
+                            )}
                             <div className="flex items-center gap-1 mt-1">
                               <span className="text-[10px] opacity-70">
                                 {formatDistanceToNow(new Date(message.created_at), { 
