@@ -419,7 +419,9 @@ const Community = () => {
             </CardHeader>
             <CardContent>
               <div className="flex flex-wrap gap-2">
-                {activeUsers.map((activeUser) => (
+                {activeUsers
+                  .filter((activeUser) => activeUser.id !== user.id)
+                  .map((activeUser) => (
                     <button
                       key={activeUser.id}
                       onClick={() => {
