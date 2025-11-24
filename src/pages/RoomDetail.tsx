@@ -628,8 +628,8 @@ export default function RoomDetail() {
                   </CardContent>
                 </Card>
 
-                {/* Jeeves Master Program - Show for new users (Level 1 with 0 XP) */}
-                {mastery && mastery.mastery_level === 1 && mastery.xp_current === 0 && (
+                {/* Jeeves Master Program - Show for new users or users who haven't started this room yet */}
+                {(!mastery || (mastery.mastery_level === 1 && mastery.xp_current === 0)) && (
                   <JeevesMasterProgram 
                     roomName={room.name}
                     roomPrinciple={room.purpose}
@@ -644,8 +644,8 @@ export default function RoomDetail() {
                   />
                 )}
 
-                {/* Mastery Overview - Show for users who have started */}
-                {mastery && !(mastery.mastery_level === 1 && mastery.xp_current === 0) && (
+                {/* Mastery Overview - Show for users who have started and made progress */}
+                {mastery && (mastery.mastery_level > 1 || mastery.xp_current > 0) && (
                   <Card className="border-2 border-primary/20 bg-gradient-to-br from-primary/5 to-accent/5">
                     <CardHeader>
                       <CardTitle className="flex items-center gap-2">
