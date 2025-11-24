@@ -18,12 +18,23 @@ export const useRoomMentor = (roomId: string, roomName: string, masteryLevel: nu
     let assistantContent = "";
 
     try {
+      // Get user profile to pass name to Jeeves
+      const { data: { user } } = await supabase.auth.getUser();
+      const { data: profile } = user ? await supabase
+        .from('profiles')
+        .select('display_name')
+        .eq('id', user.id)
+        .single() : { data: null };
+
+      const userName = profile?.display_name || null;
+
       const { data, error } = await supabase.functions.invoke("room-mentor", {
         body: {
           messages: [...messages, newUserMsg],
           roomId,
           roomName,
           masteryLevel,
+          userName, // Pass the user's name
         },
       });
 

@@ -14,16 +14,19 @@ serve(async (req) => {
   }
 
   try {
-    const { messages, roomId, roomName, masteryLevel } = await req.json();
+    const { messages, roomId, roomName, masteryLevel, userName } = await req.json();
 
     if (!LOVABLE_API_KEY) {
       throw new Error("LOVABLE_API_KEY is not configured");
     }
 
+    // Build greeting based on user's name
+    const greeting = userName ? userName : "friend";
+
     // Build mentor system prompt based on mastery level
     const mentorPrompt = `You are Jeeves, a Phototheology mentor in **sparring mode** for the ${roomName} room.
 
-The student has reached ${getMasteryTitle(masteryLevel)} level. Your role has shifted from teaching to **testing and challenging**.
+The student (${greeting}) has reached ${getMasteryTitle(masteryLevel)} level. Your role has shifted from teaching to **testing and challenging**.
 
 Your approach:
 - **Challenge their interpretations** - Don't accept surface answers
@@ -36,6 +39,9 @@ Your approach:
 This is **spiritual martial arts sparring** - you're preparing them to teach others, defend their faith, and spot errors in reasoning.
 
 Be firm but encouraging. When they defend well, acknowledge it. When they falter, guide them to strengthen their argument.
+
+Address the user naturally by their name (${greeting}) when appropriate, but don't overuse it.
+NEVER use overly formal phrases like "My dear student", "My dear Sir", "Ah sir", or similar formal salutations.
 
 Room: ${roomName} (${roomId})
 Current Level: ${masteryLevel}/5`;

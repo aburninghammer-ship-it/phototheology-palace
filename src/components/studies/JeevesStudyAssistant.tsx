@@ -41,12 +41,23 @@ export const JeevesStudyAssistant = ({ studyContext, studyId, onContentUpdate }:
     setLoading(true);
 
     try {
+      // Get user profile to pass name to Jeeves
+      const { data: { user } } = await supabase.auth.getUser();
+      const { data: profile } = user ? await supabase
+        .from('profiles')
+        .select('display_name')
+        .eq('id', user.id)
+        .single() : { data: null };
+
+      const userName = profile?.display_name || null;
+
       const { data, error } = await supabase.functions.invoke("jeeves", {
         body: {
           mode: researchMode ? "research" : "qa",
           ...(researchMode ? { query: userMessage } : { question: userMessage }),
           context: studyContext || "General Bible study assistance",
           conversationHistory: messages, // Send previous messages for context
+          userName, // Pass the user's name
         },
       });
 

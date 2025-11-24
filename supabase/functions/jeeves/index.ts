@@ -222,7 +222,9 @@ serve(async (req) => {
       themeSubject,
       lessonCount,
       // Commentary properties
-      classicCommentary
+      classicCommentary,
+      // User identification
+      userName
     } = requestBody;
     
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
@@ -340,17 +342,23 @@ Return as JSON array with objects containing: verse, text, connection, principle
     let systemPrompt = "";
     let userPrompt = "";
 
+    // Build greeting based on user's name
+    const greeting = userName ? userName : "friend";
+
     // Handle simple demo/message mode
     if (requestContext === "demo" || (message && !mode)) {
       systemPrompt = `You are Jeeves, a friendly AI study assistant who helps people understand the Bible using Phototheology principles. 
 
 You're warm, knowledgeable, and accessible. When answering questions:
+- Address the user naturally by their name (${greeting}) when appropriate, but don't overuse it
 - Be concise but insightful (2-3 short paragraphs)
 - Use relevant Bible verses
 - Show how Phototheology principles can illuminate the passage
 - Use emojis appropriately (📖 ✨ 🔍 💡)
 - Format with clear paragraph breaks
 - Keep it conversational and encouraging
+- NEVER use overly formal phrases like "My dear student", "My dear Sir", "Ah sir", or similar formal salutations
+- Keep your tone friendly and warm but natural, like a knowledgeable friend helping another friend
 
       ${THEOLOGICAL_REASONING}
 

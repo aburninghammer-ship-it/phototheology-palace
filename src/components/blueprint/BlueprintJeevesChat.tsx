@@ -40,12 +40,23 @@ export function BlueprintJeevesChat({ lessonId, lessonTitle, lessonContent }: Bl
     setIsLoading(true);
 
     try {
+      // Get user profile to pass name to Jeeves
+      const { data: { user } } = await supabase.auth.getUser();
+      const { data: profile } = user ? await supabase
+        .from('profiles')
+        .select('display_name')
+        .eq('id', user.id)
+        .single() : { data: null };
+
+      const userName = profile?.display_name || null;
+
       const { data, error } = await supabase.functions.invoke("blueprint-mentor", {
         body: {
           messages: [...messages, userMessage],
           lessonId,
           lessonTitle,
           lessonContext: lessonContent,
+          userName, // Pass the user's name
         },
       });
 
