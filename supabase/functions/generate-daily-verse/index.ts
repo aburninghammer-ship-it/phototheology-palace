@@ -72,7 +72,8 @@ serve(async (req) => {
     
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
     
-    // Get today's date
+    // Get today's date and force parameter
+    const { force } = await req.json().catch(() => ({ force: false }));
     const today = new Date().toISOString().split('T')[0];
     
     // Check if we already have a verse for today
@@ -82,11 +83,21 @@ serve(async (req) => {
       .eq('date', today)
       .single();
     
-    if (existingVerse) {
+    if (existingVerse && !force) {
       return new Response(
         JSON.stringify({ message: 'Daily verse already exists for today', verse: existingVerse }),
         { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
+    }
+    
+    // If force regeneration, delete existing verse
+    if (existingVerse && force) {
+      await supabase
+        .from('daily_verses')
+        .delete()
+        .eq('date', today);
+      
+      console.log('Force regeneration: deleted existing verse for', today);
     }
     
     // Select exactly one principle from each of the first 7 floors

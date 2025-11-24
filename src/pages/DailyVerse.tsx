@@ -12,6 +12,7 @@ import { useState } from "react";
 import { Helmet } from "react-helmet-async";
 import { useUserPreferences } from "@/hooks/useUserPreferences";
 import { Navigation } from "@/components/Navigation";
+import { RegenerateDailyVerse } from "@/components/RegenerateDailyVerse";
 
 interface PrincipleBreakdown {
   principle_applied: string;
@@ -221,6 +222,7 @@ export default function DailyVerse() {
             </p>
           </div>
           <div className="flex gap-2">
+            <RegenerateDailyVerse onRegenerated={() => queryClient.invalidateQueries({ queryKey: ['daily-verse'] })} />
             {user && !hasRead && (
               <Button
                 onClick={() => markAsReadMutation.mutate()}
