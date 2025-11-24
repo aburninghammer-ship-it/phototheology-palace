@@ -98,6 +98,11 @@ export const MagicEyeHero = () => {
                 style={{
                   minHeight: "300px",
                 }}
+                onError={(e) => {
+                  console.error("Image failed to load:", e);
+                  console.log("Image src:", e.currentTarget.src);
+                }}
+                onLoad={() => console.log("Image loaded successfully")}
               />
               
               {/* Reveal overlay */}
