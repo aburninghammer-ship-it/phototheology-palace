@@ -72,8 +72,8 @@ serve(async (req) => {
     
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
     
-    // Get today's date and force parameter
-    const { force } = await req.json().catch(() => ({ force: false }));
+    // Get today's date, force parameter, and optional verse reference
+    const { force, verse_reference } = await req.json().catch(() => ({ force: false, verse_reference: null }));
     const today = new Date().toISOString().split('T')[0];
     
     // Check if we already have a verse for today
@@ -122,28 +122,53 @@ serve(async (req) => {
     
     console.log('Selected diverse principles:', selectedPrinciples.map(p => `${p.code} (${p.category})`));
     
-    // Fetch a random verse from the entire Bible
-    // Use a deterministic seed based on date to ensure same verse for the day
-    const daysSinceEpoch = Math.floor(Date.now() / (1000 * 60 * 60 * 24));
+    // Fetch verse - either specified or random based on day
+    let verseReference: string;
+    let verseText: string;
     
-    const { data: verses, error: verseError } = await supabase
-      .from('bible_verses_tokenized')
-      .select('book, chapter, verse_num, text_kjv')
-      .order('book', { ascending: true })
-      .order('chapter', { ascending: true })
-      .order('verse_num', { ascending: true });
-    
-    if (verseError || !verses || verses.length === 0) {
-      console.error('Error fetching verses:', verseError);
-      throw new Error('Could not fetch verses from database');
+    if (verse_reference) {
+      // Parse the provided verse reference (e.g., "2 Timothy 1:7")
+      const match = verse_reference.match(/^(.+?)\s+(\d+):(\d+)$/);
+      if (!match) throw new Error('Invalid verse reference format');
+      
+      const [, book, chapter, verse_num] = match;
+      const { data: verseData, error: verseError } = await supabase
+        .from('bible_verses_tokenized')
+        .select('text_kjv')
+        .eq('book', book)
+        .eq('chapter', parseInt(chapter))
+        .eq('verse_num', parseInt(verse_num))
+        .single();
+      
+      if (verseError || !verseData) {
+        throw new Error(`Could not find verse: ${verse_reference}`);
+      }
+      
+      verseReference = verse_reference;
+      verseText = verseData.text_kjv;
+    } else {
+      // Use deterministic seed based on date to ensure same verse for the day
+      const daysSinceEpoch = Math.floor(Date.now() / (1000 * 60 * 60 * 24));
+      
+      const { data: verses, error: verseError } = await supabase
+        .from('bible_verses_tokenized')
+        .select('book, chapter, verse_num, text_kjv')
+        .order('book', { ascending: true })
+        .order('chapter', { ascending: true })
+        .order('verse_num', { ascending: true });
+      
+      if (verseError || !verses || verses.length === 0) {
+        console.error('Error fetching verses:', verseError);
+        throw new Error('Could not fetch verses from database');
+      }
+      
+      // Use day-based seed to select a verse deterministically
+      const selectedIndex = daysSinceEpoch % verses.length;
+      const selectedVerse = verses[selectedIndex];
+      
+      verseReference = `${selectedVerse.book} ${selectedVerse.chapter}:${selectedVerse.verse_num}`;
+      verseText = selectedVerse.text_kjv;
     }
-    
-    // Use day-based seed to select a verse deterministically
-    const selectedIndex = daysSinceEpoch % verses.length;
-    const selectedVerse = verses[selectedIndex];
-    
-    const verseReference = `${selectedVerse.book} ${selectedVerse.chapter}:${selectedVerse.verse_num}`;
-    const verseText = selectedVerse.text_kjv;
     
     // Generate breakdown using Lovable AI with specific instructions per principle
     const principlesWithFloors = selectedPrinciples.map((p, idx) => {
