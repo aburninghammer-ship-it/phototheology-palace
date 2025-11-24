@@ -14,57 +14,57 @@ const MASTER_TITLE_GROUPS = [
   {
     title: "BLUE MASTER",
     floors: [1],
-    roomRange: "1-3 Rooms Mastered",
+    floorLabel: "Floor 1",
     color: "blue",
     bg: "bg-blue-500",
     text: "text-blue-500",
-    requirements: "None beyond room mastery",
+    requirements: "Complete Floor 1 assessment",
     rewards: "Blue Master title"
   },
   {
     title: "RED MASTER",
     floors: [2],
-    roomRange: "4-9 Rooms Mastered",
+    floorLabel: "Floor 2",
     color: "red",
     bg: "bg-red-500",
     text: "text-red-500",
-    requirements: "7-day global streak",
+    requirements: "7-day global streak + Floor 2 assessment",
     rewards: "Red Master title + Red Challenges"
   },
   {
     title: "GOLD MASTER",
     floors: [3],
-    roomRange: "10-18 Rooms Mastered",
+    floorLabel: "Floor 3",
     color: "yellow",
     bg: "bg-yellow-500",
     text: "text-yellow-500",
-    requirements: "14-day global streak",
+    requirements: "14-day global streak + Floor 3 assessment",
     rewards: "Gold Master title + advanced chain tools"
   },
   {
     title: "PURPLE MASTER",
     floors: [4],
-    roomRange: "19-27 Rooms Mastered",
+    floorLabel: "Floor 4",
     color: "purple",
     bg: "bg-purple-500",
     text: "text-purple-500",
-    requirements: "21-day global streak",
+    requirements: "21-day global streak + Floor 4 assessment",
     rewards: "Purple Master title + create-your-own drills"
   },
   {
     title: "WHITE MASTER",
     floors: [5, 6],
-    roomRange: "28-37 Rooms Mastered",
+    floorLabel: "Floors 5-6",
     color: "white",
     bg: "bg-white border border-border",
     text: "text-white",
-    requirements: "30-day global streak",
+    requirements: "30-day global streak + Floors 5 & 6 assessments",
     rewards: "White Master title + Temple Mode + prophecy maps"
   },
   {
     title: "BLACK CANDIDATE",
     floors: [7],
-    roomRange: "38-40 Rooms Mastered",
+    floorLabel: "Floor 7",
     color: "gray",
     bg: "bg-gray-800",
     text: "text-gray-300",
@@ -74,7 +74,7 @@ const MASTER_TITLE_GROUPS = [
   {
     title: "BLACK MASTER",
     floors: [8],
-    roomRange: "41+ Rooms Mastered",
+    floorLabel: "Floor 8",
     color: "black",
     bg: "bg-black",
     text: "text-white",
@@ -98,18 +98,13 @@ export const FloorProgressTower: React.FC<FloorProgressTowerProps> = ({
     );
   };
 
-  // Calculate total rooms mastered and which group is active
-  const totalRoomsMastered = floors.reduce((sum, f) => sum + f.rooms_completed, 0);
-
   const getGroupStatus = (group: typeof MASTER_TITLE_GROUPS[0]) => {
-    const groupFloors = group.floors.map(fn => floors.find(f => f.floor_number === fn));
-    const completedRooms = groupFloors.reduce((sum, f) => sum + (f?.rooms_completed || 0), 0);
-    const totalRooms = groupFloors.reduce((sum, f) => sum + (f?.rooms_required || 0), 0);
-    const roomsRemaining = totalRooms - completedRooms;
+    const groupFloors = group.floors.map(fn => floors.find(f => f.floor_number === fn)).filter(Boolean);
     const allComplete = groupFloors.every(f => f?.floor_completed_at);
     const isActive = group.floors.includes(globalTitle?.current_floor);
+    const anyUnlocked = groupFloors.some(f => f?.is_unlocked);
 
-    return { completedRooms, totalRooms, roomsRemaining, allComplete, isActive };
+    return { allComplete, isActive, anyUnlocked, groupFloors };
   };
 
   return (
@@ -141,7 +136,7 @@ export const FloorProgressTower: React.FC<FloorProgressTowerProps> = ({
                         {group.color === 'blue' ? '1' : group.color === 'red' ? '2' : group.color === 'yellow' ? '3' : group.color === 'purple' ? '4' : group.color === 'white' ? '5-6' : group.color === 'gray' ? '7' : '8'}
                       </div>
                       <h3 className={`font-bold text-lg uppercase ${group.text}`}>
-                        {group.title} — {group.roomRange}
+                        {group.title} — {group.floorLabel}
                       </h3>
                     </div>
                     <ChevronDown className={`h-5 w-5 transition-transform ${openSections.includes(index) ? 'rotate-180' : ''}`} />
@@ -180,10 +175,15 @@ export const FloorProgressTower: React.FC<FloorProgressTowerProps> = ({
                           );
                         })}
                       </div>
-
-                      {status.roomsRemaining > 0 && (
-                        <p className="text-sm text-primary mt-2">
-                          {status.roomsRemaining} more {status.roomsRemaining === 1 ? 'room' : 'rooms'} to unlock
+                      
+                      {!status.allComplete && status.anyUnlocked && (
+                        <p className="text-sm text-muted-foreground mt-2">
+                          Progress: {status.groupFloors.filter(f => f?.floor_completed_at).length}/{status.groupFloors.length} floors completed
+                        </p>
+                      )}
+                      {!status.anyUnlocked && (
+                        <p className="text-sm text-muted-foreground mt-2">
+                          Complete previous floors to unlock
                         </p>
                       )}
                       
