@@ -419,12 +419,13 @@ const Community = () => {
             </CardHeader>
             <CardContent>
               <div className="flex flex-wrap gap-2">
-                {activeUsers
-                  .filter((activeUser) => activeUser.id !== user.id)
-                  .map((activeUser) => (
+                {activeUsers.map((activeUser) => {
+                  const isCurrentUser = activeUser.id === user.id;
+                  return (
                     <button
                       key={activeUser.id}
                       onClick={() => {
+                        if (isCurrentUser) return; // Prevent clicking on own profile
                         window.dispatchEvent(
                           new CustomEvent('open-chat-sidebar', {
                             detail: { userId: activeUser.id }
@@ -435,7 +436,11 @@ const Community = () => {
                           description: `Starting conversation with ${activeUser.display_name || activeUser.username}`,
                         });
                       }}
-                      className="flex items-center gap-2 bg-gradient-to-r from-primary/10 to-accent/10 hover:from-primary/20 hover:to-accent/20 rounded-full px-4 py-2 transition-all duration-300 cursor-pointer border border-primary/10"
+                      className={`flex items-center gap-2 rounded-full px-4 py-2 transition-all duration-300 border border-primary/10 ${
+                        isCurrentUser 
+                          ? 'bg-primary/20 cursor-default' 
+                          : 'bg-gradient-to-r from-primary/10 to-accent/10 hover:from-primary/20 hover:to-accent/20 cursor-pointer'
+                      }`}
                     >
                       <Avatar className="h-7 w-7 border-2 border-primary/20">
                         <AvatarImage src={activeUser.avatar_url || undefined} />
@@ -452,9 +457,10 @@ const Community = () => {
                       <span className="text-sm font-medium">
                         {activeUser.display_name || activeUser.username}
                       </span>
-                      <MessageSquare className="h-3.5 w-3.5 text-primary" />
+                      {!isCurrentUser && <MessageSquare className="h-3.5 w-3.5 text-primary" />}
                     </button>
-                  ))}
+                  );
+                })}
                 </div>
               </CardContent>
             </Card>
