@@ -5262,7 +5262,7 @@ export type Database = {
       update_mastery_streak: { Args: { p_user_id: string }; Returns: Json }
     }
     Enums: {
-      app_role: "admin" | "moderator" | "user" | "video_admin"
+      app_role: "admin" | "moderator" | "user" | "video_admin" | "owner"
       church_member_role: "admin" | "leader" | "member"
       church_tier: "tier1" | "tier2" | "tier3"
     }
@@ -5392,7 +5392,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      app_role: ["admin", "moderator", "user", "video_admin"],
+      app_role: ["admin", "moderator", "user", "video_admin", "owner"],
       church_member_role: ["admin", "leader", "member"],
       church_tier: ["tier1", "tier2", "tier3"],
     },
