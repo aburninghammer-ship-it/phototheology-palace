@@ -7,6 +7,8 @@ interface ActiveUser {
   display_name: string | null;
   avatar_url: string | null;
   last_seen: string;
+  current_floor?: number;
+  master_title?: string | null;
 }
 
 export const useActiveUsers = () => {
@@ -47,9 +49,26 @@ export const useActiveUsers = () => {
           .gte("last_seen", fifteenMinutesAgo)
           .order("last_seen", { ascending: false });
         
-        if (!error && isSubscribed) {
+        if (!error && isSubscribed && data) {
+          // Fetch mastery data for active users
+          const userIds = data.map(u => u.id);
+          const { data: masteryData } = await supabase
+            .from("global_master_titles")
+            .select("user_id, current_floor, master_title")
+            .in("user_id", userIds);
+          
+          // Merge mastery data with user data
+          const usersWithMastery = data.map(user => {
+            const mastery = masteryData?.find(m => m.user_id === user.id);
+            return {
+              ...user,
+              current_floor: mastery?.current_floor || 0,
+              master_title: mastery?.master_title || null,
+            };
+          });
+          
           setActiveCount(count || 0);
-          setActiveUsers(data || []);
+          setActiveUsers(usersWithMastery);
         }
       } catch (error) {
         // Silently fail - this is not critical functionality

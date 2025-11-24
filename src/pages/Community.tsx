@@ -18,6 +18,7 @@ import { useActiveUsers } from "@/hooks/useActiveUsers";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
+import { UserMasterySword } from "@/components/mastery/UserMasterySword";
 
 type SortOption = "latest" | "most_commented" | "needs_feedback";
 type CategoryFilter = "all" | "general" | "prayer" | "study" | "questions";
@@ -440,6 +441,11 @@ const Community = () => {
                           {(activeUser.display_name || activeUser.username).charAt(0).toUpperCase()}
                         </AvatarFallback>
                       </Avatar>
+                      <UserMasterySword 
+                        masterTitle={activeUser.master_title} 
+                        currentFloor={activeUser.current_floor || 0}
+                        size="sm"
+                      />
                       <span className="text-sm font-medium">
                         {activeUser.display_name || activeUser.username}
                       </span>
