@@ -59,18 +59,6 @@ export default function DailyVerse() {
       
       if (error) throw error;
       
-      // If it's John 3:16, trigger regeneration with the new system
-      if (data.verse_reference === 'John 3:16') {
-        console.log('Detected old verse, triggering regeneration...');
-        const { error: regenError } = await supabase.functions.invoke('generate-daily-verse', {
-          body: { force: true }
-        });
-        if (!regenError) {
-          // Wait a moment then refetch
-          setTimeout(() => window.location.reload(), 2000);
-        }
-      }
-      
       return data as unknown as DailyVerse;
     },
   });
