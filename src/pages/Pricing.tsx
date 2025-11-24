@@ -129,8 +129,10 @@ export default function Pricing() {
         "Flashcards & Memory Tools",
         "Bible Image Library access",
         "Growth Journal & Spiritual Training",
-        "Unlimited Daily Challenges",
-        "Treasure Hunts & Escape Rooms (limited)",
+        "Art of War Dojo (3 lessons only)",
+        "2 Dojo Weapons (Sword & Shield)",
+        "1 Creature Style (Crane)",
+        "Limited Treasure Hunts & Escape Rooms",
       ],
     },
     {
@@ -143,8 +145,8 @@ export default function Pricing() {
       monthlySavings: null,
       annualSavings: "Save $30/year",
       period: "per month",
-      description: "Everything you need to master Phototheology",
-      badge: "Most Popular",
+      description: "Complete spiritual warfare & mastery system",
+      badge: "Most Popular - Best Value",
       badgeVariant: "default" as const,
       ctaText: "Get Premium",
       ctaVariant: "default" as const,
@@ -152,24 +154,25 @@ export default function Pricing() {
       annualUrl: "https://buy.stripe.com/eVq8wPfqz06WcDm7Qw6EU0b",
       popular: true,
       features: [
-        "Everything in Essential",
-        "All 4 Specialized AI GPTs:",
-        "  • Kid GPT (family-friendly learning)",
-        "  • Daniel & Revelation GPT",
-        "  • Apologetics GPT",
-        "  • Quarterly Study GPT",
-        "All 4 Courses (Daniel, Revelation, Revelation Kids)",
-        "20+ Palace-based Games (Story Room, Blue Room, etc.)",
-        "Advanced multiplayer games",
-        "All Kids Games (age-appropriate content)",
-        "Unlimited Treasure Hunts & Escape Rooms",
-        "Prophecy Watch alerts",
-        "Culture & Controversy analysis",
-        "Critics Analysis tool",
-        "Power of the Lamb devotionals",
-        "Bible Study Leader tools",
-        "Priority support",
-        "Early access to new features",
+        "🔥 Everything in Essential PLUS:",
+        "⚔️ COMPLETE ART OF WAR DOJO:",
+        "  • All 30+ War Lessons (Holy War, Self-Combat, Victory)",
+        "  • 12 Supernatural Weapons (Myrrh-Power, Burning Hammer, etc.)",
+        "  • 4 Creature Styles (Crane, Mantis, Snake, Dragon)",
+        "  • 5 Spiritual Eponyms (Goliath, Judas, Peter, Jacob, Pharaoh)",
+        "  • 7-Rank Progression System (Recruit → Lion-Faced Champion)",
+        "  • 5 Time Zones of Warfare (Minute Warrior training)",
+        "  • War Council & Battle Analysis",
+        "  • Sparring Simulations & Combination Codes",
+        "🤖 All 4 Specialized AI GPTs (Kid, Daniel/Rev, Apologetics, Quarterly)",
+        "📚 All Premium Courses (Daniel, Revelation, Kids)",
+        "🎮 20+ Palace Games + All Kids Games",
+        "🏆 Unlimited Treasure Hunts & Escape Rooms",
+        "📡 Prophecy Watch Alerts",
+        "🛡️ Critics Analysis & Controversy Tools",
+        "📖 Power of the Lamb Devotionals",
+        "👥 Bible Study Leader Tools",
+        "⚡ Priority Support + Early Access",
       ],
     },
     {
@@ -454,6 +457,48 @@ export default function Pricing() {
                       <td className="text-center p-4 text-muted-foreground">Limited</td>
                       <td className="text-center p-4 bg-primary/5">Unlimited</td>
                       <td className="text-center p-4">Unlimited</td>
+                    </tr>
+                    <tr className="border-b bg-yellow-500/5">
+                      <td className="p-4 font-semibold">⚔️ Art of War Dojo - Complete System</td>
+                      <td className="text-center p-4">—</td>
+                      <td className="text-center p-4 text-muted-foreground">3 Lessons Only</td>
+                      <td className="text-center p-4 bg-primary/5"><Check className="h-5 w-5 text-primary mx-auto" /></td>
+                      <td className="text-center p-4"><Check className="h-5 w-5 text-primary mx-auto" /></td>
+                    </tr>
+                    <tr className="border-b">
+                      <td className="p-4 pl-8">→ All 30+ War Lessons</td>
+                      <td className="text-center p-4">—</td>
+                      <td className="text-center p-4">—</td>
+                      <td className="text-center p-4 bg-primary/5"><Check className="h-5 w-5 text-primary mx-auto" /></td>
+                      <td className="text-center p-4"><Check className="h-5 w-5 text-primary mx-auto" /></td>
+                    </tr>
+                    <tr className="border-b">
+                      <td className="p-4 pl-8">→ 12 Supernatural Weapons</td>
+                      <td className="text-center p-4">—</td>
+                      <td className="text-center p-4 text-muted-foreground">2 Only</td>
+                      <td className="text-center p-4 bg-primary/5"><Check className="h-5 w-5 text-primary mx-auto" /></td>
+                      <td className="text-center p-4"><Check className="h-5 w-5 text-primary mx-auto" /></td>
+                    </tr>
+                    <tr className="border-b">
+                      <td className="p-4 pl-8">→ 4 Creature Combat Styles</td>
+                      <td className="text-center p-4">—</td>
+                      <td className="text-center p-4 text-muted-foreground">1 Only</td>
+                      <td className="text-center p-4 bg-primary/5"><Check className="h-5 w-5 text-primary mx-auto" /></td>
+                      <td className="text-center p-4"><Check className="h-5 w-5 text-primary mx-auto" /></td>
+                    </tr>
+                    <tr className="border-b">
+                      <td className="p-4 pl-8">→ Spiritual Eponyms & Time Zones</td>
+                      <td className="text-center p-4">—</td>
+                      <td className="text-center p-4">—</td>
+                      <td className="text-center p-4 bg-primary/5"><Check className="h-5 w-5 text-primary mx-auto" /></td>
+                      <td className="text-center p-4"><Check className="h-5 w-5 text-primary mx-auto" /></td>
+                    </tr>
+                    <tr className="border-b">
+                      <td className="p-4 pl-8">→ Rank Progression System (7 Levels)</td>
+                      <td className="text-center p-4">—</td>
+                      <td className="text-center p-4">—</td>
+                      <td className="text-center p-4 bg-primary/5"><Check className="h-5 w-5 text-primary mx-auto" /></td>
+                      <td className="text-center p-4"><Check className="h-5 w-5 text-primary mx-auto" /></td>
                     </tr>
                     <tr className="border-b">
                       <td className="p-4">Phototheology GPT (Main AI)</td>
