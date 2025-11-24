@@ -212,7 +212,7 @@ export const PracticeDrill = ({
         <CardTitle className="text-xl">{currentQuestion.question}</CardTitle>
       </CardHeader>
       <CardContent className="space-y-6">
-        <RadioGroup value={selectedAnswer?.toString()} onValueChange={(val) => handleAnswerSelect(parseInt(val))}>
+        <RadioGroup value={selectedAnswer !== null ? selectedAnswer.toString() : ""} onValueChange={(val) => handleAnswerSelect(parseInt(val))}>
           <div className="space-y-3">
             {currentQuestion.options.map((option, index) => (
               <div

@@ -35,6 +35,7 @@ import { TrainingDashboard } from "@/components/mastery/TrainingDashboard";
 import { ContinueTraining } from "@/components/mastery/ContinueTraining";
 import { MilestoneTest } from "@/components/mastery/MilestoneTest";
 import { useRoomCurriculum } from "@/hooks/useRoomCurriculum";
+import { MasteryProgramEnrollment } from "@/components/mastery/MasteryProgramEnrollment";
 
 // Room IDs that have quick start guides
 const QUICK_START_ROOMS = new Set([
@@ -419,6 +420,22 @@ export default function RoomDetail() {
 
               {/* MASTER THIS ROOM TAB */}
               <TabsContent value="master" className="space-y-6 mt-6">
+                {/* Mastery Program Enrollment */}
+                <MasteryProgramEnrollment
+                  roomName={room.name}
+                  roomTag={room.tag}
+                  floorNumber={floor.number}
+                  totalActivities={curriculum?.activities?.length || 0}
+                  completedActivities={((curriculumProgress?.completed_activities as string[]) || []).length}
+                  masteryLevel={mastery?.mastery_level || 1}
+                  onBeginMastery={() => {
+                    // Scroll to training dashboard
+                    const trainingSection = document.getElementById('training-dashboard');
+                    trainingSection?.scrollIntoView({ behavior: 'smooth' });
+                  }}
+                  isEnrolled={mastery ? mastery.xp_current > 0 || mastery.mastery_level > 1 : false}
+                />
+
                 {/* Mastery System Explanation */}
                 <Card className="bg-gradient-to-br from-primary/10 to-accent/10 border-primary/20">
                   <CardHeader>
