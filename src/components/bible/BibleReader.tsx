@@ -424,6 +424,7 @@ export const BibleReader = () => {
                   verse={selectedVerses[0]}
                   verseText={chapterData.verses.find(v => v.verse === selectedVerses[0])?.text || ""}
                   onClose={() => setSelectedVerses([])}
+                  onHighlight={setHighlightedVerses}
                 />
               )}
             </Card>
@@ -443,6 +444,7 @@ export const BibleReader = () => {
                 verse={selectedVerse}
                 verseText={chapterData.verses.find(v => v.verse === selectedVerse)?.text || ""}
                 onClose={() => setSelectedVerse(null)}
+                onHighlight={setHighlightedVerses}
               />
               <VerseImageAttachment
                 book={book}
