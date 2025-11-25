@@ -734,6 +734,9 @@ export const FORMATTING_REQUIREMENTS = `
 - Use **bold** ONLY for room names and key terms
 - Keep text warm, conversational, and visually scannable
 - Start sections with relevant emojis that match the content
+- **NEVER use encircled letters (Ⓐ Ⓑ Ⓒ etc.) or any special Unicode formatting characters**
+- **Use ONLY plain text, standard bold (**text**), and regular emojis**
+- **Do NOT use special symbols or decorative Unicode characters to highlight words**
 `;
 
 // ============================================================
