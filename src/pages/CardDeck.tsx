@@ -59,11 +59,28 @@ const TIME_ZONE_CARDS = [
 
 // Dimensions Room Cards - each dimension gets its own card
 const DIMENSIONS_CARDS = [
-  { code: "DR-Lit", name: "Literal-Historical", roomName: "Dimensions", question: "What actually happened in the original context? What did it mean to the original audience?", floor: 4 },
-  { code: "DR-Chr", name: "Christological", roomName: "Dimensions", question: "How does this text reveal, foreshadow, or fulfill Christ?", floor: 4 },
-  { code: "DR-Per", name: "Personal", roomName: "Dimensions", question: "What does this mean for YOUR walk with God today? How should you respond?", floor: 4 },
-  { code: "DR-Ecc", name: "Ecclesiological", roomName: "Dimensions", question: "What does this teach the church corporately? How does it shape our worship, mission, or unity?", floor: 4 },
-  { code: "DR-Esc", name: "Eschatological", roomName: "Dimensions", question: "How will this be perfected in the new creation? What does it reveal about our eternal hope?", floor: 4 },
+  { code: "DR-1D", name: "1D (Literal-Historical)", roomName: "Dimensions", question: "What actually happened in the original context? What did it mean to the original audience?", floor: 4 },
+  { code: "DR-2D", name: "2D (Christological)", roomName: "Dimensions", question: "How does this text reveal, foreshadow, or fulfill Christ?", floor: 4 },
+  { code: "DR-3D", name: "3D (Personal)", roomName: "Dimensions", question: "What does this mean for YOUR walk with God today? How should you respond?", floor: 4 },
+  { code: "DR-4D", name: "4D (Ecclesiological)", roomName: "Dimensions", question: "What does this teach the church corporately? How does it shape our worship, mission, or unity?", floor: 4 },
+  { code: "DR-5D", name: "5D (Eschatological)", roomName: "Dimensions", question: "How will this be perfected in the new creation? What does it reveal about our eternal hope?", floor: 4 },
+];
+
+// Math Room Cards - each time prophecy gets its own card
+const MATH_ROOM_CARDS = [
+  { code: "MR-70W", name: "70 Weeks", roomName: "Math Room", question: "Apply the 70 weeks prophecy (Daniel 9) to understand this text's timeline and fulfillment", floor: 5 },
+  { code: "MR-1260", name: "1260 Years", roomName: "Math Room", question: "Apply the 1260 year prophecy to understand this text's historical fulfillment", floor: 5 },
+  { code: "MR-2300", name: "2300 Days", roomName: "Math Room", question: "Apply the 2300 day prophecy (Daniel 8:14) to understand this text's sanctuary timeline", floor: 5 },
+  { code: "MR-120", name: "120 Years (Noah)", roomName: "Math Room", question: "Apply Noah's 120 year prophecy of patience and warning to this text", floor: 5 },
+  { code: "MR-400", name: "400 Years (Captivity)", roomName: "Math Room", question: "Apply the 400 years of captivity prophecy (Genesis 15:13) to this text", floor: 5 },
+  { code: "MR-70Y", name: "70 Years (Exile)", roomName: "Math Room", question: "Apply the 70 years of Babylonian exile (Jeremiah 25:11) to this text", floor: 5 },
+];
+
+// Three Angels Room Cards - each angel gets its own card
+const THREE_ANGELS_CARDS = [
+  { code: "3A-1st", name: "First Angel", roomName: "Three Angels", question: "Apply the First Angel's message (fear God, give glory, hour of judgment, worship Creator) to this text", floor: 5 },
+  { code: "3A-2nd", name: "Second Angel", roomName: "Three Angels", question: "Apply the Second Angel's message (Babylon is fallen) to this text and identify false systems", floor: 5 },
+  { code: "3A-3rd", name: "Third Angel", roomName: "Three Angels", question: "Apply the Third Angel's message (warning against beast, mark, patience of saints) to this text", floor: 5 },
 ];
 
 // Theme Room Cards - each span gets its own card
@@ -118,7 +135,7 @@ export default function CardDeck() {
     palaceFloors.forEach((floor) => {
       floor.rooms.forEach((room) => {
         // Skip rooms that have individual sub-principle cards
-        if (room.id === "c6" || room.id === "tz" || room.id === "dr" || room.id === "trm") {
+        if (room.id === "c6" || room.id === "tz" || room.id === "dr" || room.id === "trm" || room.id === "mr" || room.id === "3a") {
           return;
         }
         
@@ -178,6 +195,30 @@ export default function CardDeck() {
         question: theme.question,
         floor: theme.floor,
         floorColor: FLOOR_COLORS[(theme.floor - 1) % FLOOR_COLORS.length],
+      });
+    });
+    
+    // Add Math Room cards
+    MATH_ROOM_CARDS.forEach((math) => {
+      cards.push({
+        id: math.code.toLowerCase(),
+        code: math.code,
+        name: `${math.roomName} - ${math.name}`,
+        question: math.question,
+        floor: math.floor,
+        floorColor: FLOOR_COLORS[(math.floor - 1) % FLOOR_COLORS.length],
+      });
+    });
+    
+    // Add Three Angels cards
+    THREE_ANGELS_CARDS.forEach((angel) => {
+      cards.push({
+        id: angel.code.toLowerCase(),
+        code: angel.code,
+        name: `${angel.roomName} - ${angel.name}`,
+        question: angel.question,
+        floor: angel.floor,
+        floorColor: FLOOR_COLORS[(angel.floor - 1) % FLOOR_COLORS.length],
       });
     });
     
