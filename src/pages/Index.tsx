@@ -516,7 +516,7 @@ const Index = () => {
               onClick={() => navigate(user ? "/palace" : "/auth")}
               className="text-xl px-10 py-7 shadow-xl gradient-palace"
             >
-              Get Started Free
+              Enter App
               <ChevronRight className="ml-2 h-6 w-6" />
             </Button>
             <Button 
@@ -527,6 +527,18 @@ const Index = () => {
             >
               <Play className="mr-2 h-6 w-6" />
               Watch the Demo
+            </Button>
+          </div>
+          
+          <div className="mt-6">
+            <Button 
+              size="lg" 
+              variant="secondary"
+              onClick={() => navigate("/access-code")}
+              className="text-lg px-8 py-6"
+            >
+              <Shield className="mr-2 h-5 w-5" />
+              Redeem Code
             </Button>
           </div>
         </div>
