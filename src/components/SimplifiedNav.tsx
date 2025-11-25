@@ -25,6 +25,9 @@ export const SimplifiedNav = () => {
 
   const closeMobile = () => setMobileOpen(false);
 
+  // Debug logging
+  console.log("SimplifiedNav - Current navigation style:", preferences.navigation_style);
+
   const studyLinks = [
     { to: "/dashboard", label: "Dashboard", icon: Home },
     { to: "/daily-verse", label: "Verse of the Day", icon: BookOpen },
