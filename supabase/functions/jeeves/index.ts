@@ -224,7 +224,11 @@ serve(async (req) => {
       // Commentary properties
       classicCommentary,
       // User identification
-      userName
+      userName,
+      // Card deck properties
+      roomId,
+      userAnswer,
+      textType
     } = requestBody;
     
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
@@ -423,6 +427,89 @@ You're warm, personable, and genuinely excited about studying Scripture together
       ${PALACE_SCHEMA}`;
 
       userPrompt = message || "Tell me about Phototheology and how it helps with Bible study.";
+    } else if (mode === "help") {
+      // Card Deck Help Mode - provide guidance for applying a principle
+      const textTypeLabel = textType === "story" ? "story" : "verse";
+      
+      // Get application-based prompt based on room
+      const getApplicationPrompt = (roomTag: string, roomName: string) => {
+        // For Three Heavens and Cycles rooms, use application-based language
+        if (roomTag === "1H" || roomTag === "DoL¹/NE¹" || roomName.includes("First Heaven")) {
+          return `Apply something from the First Heaven (1H/DoL¹/NE¹) - the Babylonian destruction and restoration cycle - to this ${textTypeLabel}.`;
+        }
+        if (roomTag === "2H" || roomTag === "DoL²/NE²" || roomName.includes("Second Heaven")) {
+          return `Connect a theme, text, or story from the Second Heaven (2H/DoL²/NE²) - the 70 AD temple destruction and New-Covenant order - to this ${textTypeLabel}.`;
+        }
+        if (roomTag === "3H" || roomTag === "DoL³/NE³" || roomName.includes("Third Heaven")) {
+          return `Apply something from the Third Heaven (3H/DoL³/NE³) - the final cosmic judgment and new creation - to this ${textTypeLabel}.`;
+        }
+        
+        // For Cycle rooms, use application-based language
+        if (roomTag.startsWith("@")) {
+          return `Apply the ${roomName} pattern/cycle to this ${textTypeLabel}.`;
+        }
+        
+        // For other rooms, use the core principle
+        return `Apply ${roomTag} (${roomName}) to this ${textTypeLabel}.`;
+      };
+      
+      systemPrompt = `You are Jeeves, a warm and encouraging study guide helping students apply Phototheology principles to biblical texts.
+
+**TASK:** Provide helpful guidance for applying ${roomTag} (${roomName}) to the student's ${textTypeLabel}.
+
+**CRITICAL:** This is an APPLICATION exercise, not an identification exercise. The student should APPLY the principle to their text, not categorize or identify which category the text fits into.
+
+Application prompt: ${getApplicationPrompt(roomTag, roomName)}
+
+**FORMATTING:**
+- Use clear paragraphs (2-4 sentences each)
+- Separate paragraphs with blank lines
+- Use emojis for visual appeal (📖 ✨ 🔍 💡)
+- Use bullet points (•) for lists
+- Keep tone warm and encouraging
+
+${PALACE_SCHEMA}`;
+
+      userPrompt = `The student is working on applying ${roomTag} (${roomName}) to this ${textTypeLabel}:
+
+${textTypeLabel === "verse" ? "Verse:" : "Story:"} ${verseText}
+
+${userAnswer ? `Their current work: ${userAnswer}` : "They haven't started yet."}
+
+Provide guidance on how to APPLY ${roomTag} to this ${textTypeLabel}. Help them see connections, patterns, or applications. Give 2-3 specific suggestions or insights they can use.`;
+
+    } else if (mode === "grade") {
+      // Card Deck Grade Mode - evaluate student's application
+      const textTypeLabel = textType === "story" ? "story" : "verse";
+      
+      systemPrompt = `You are Jeeves, a warm and insightful teacher evaluating how well students APPLY Phototheology principles to biblical texts.
+
+**TASK:** Evaluate this student's application of ${roomTag} (${roomName}) to their ${textTypeLabel}.
+
+**EVALUATION CRITERIA:**
+• Did they actually APPLY the principle (not just identify or categorize)?
+• Is the application biblically sound and relevant?
+• Did they demonstrate understanding of the ${roomTag} methodology?
+• Are there insights they could deepen or expand?
+
+**FORMATTING:**
+- Start with warm encouragement
+- Use emojis (✅ 💡 ⭐ 🎯)
+- Give 2-3 specific strengths
+- Offer 1-2 suggestions for deepening
+- End with an encouraging note
+
+${PALACE_SCHEMA}`;
+
+      userPrompt = `Evaluate this application of ${roomTag} (${roomName}):
+
+${textTypeLabel === "verse" ? "Verse:" : "Story:"} ${verseText}
+
+Student's Application:
+${userAnswer}
+
+Provide warm, insightful feedback that affirms what they did well and gently guides them to deepen their application.`;
+
     } else if (mode === "strongs-lookup") {
       // Import biblesdk for Strong's lookup
       const { getVerses } = await import('npm:biblesdk@0.4.0');

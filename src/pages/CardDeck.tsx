@@ -36,7 +36,10 @@ const FLOOR_COLORS = [
 
 export default function CardDeck() {
   const { toast } = useToast();
+  const [textType, setTextType] = useState<"verse" | "story">("verse");
+  const [verseInput, setVerseInput] = useState("");
   const [verseText, setVerseText] = useState("");
+  const [displayText, setDisplayText] = useState("");
   const [allCards, setAllCards] = useState<PrincipleCard[]>([]);
   const [selectedCard, setSelectedCard] = useState<PrincipleCard | null>(null);
   const [flippedCards, setFlippedCards] = useState<Set<string>>(new Set());
@@ -80,11 +83,24 @@ export default function CardDeck() {
     }
   }, [timerEnabled, isTimerActive, timeRemaining, toast]);
 
+  const handleSetText = () => {
+    if (!verseInput.trim()) {
+      toast({
+        title: "Add text first",
+        description: "Please enter a verse or story before continuing.",
+        variant: "destructive",
+      });
+      return;
+    }
+    setVerseText(verseInput);
+    setDisplayText(verseInput);
+  };
+
   const pickRandomCard = () => {
     if (!verseText.trim()) {
       toast({
-        title: "Add a verse first",
-        description: "Please enter a verse or story before drawing a card.",
+        title: "Set your text first",
+        description: "Please set your verse or story before drawing a card.",
         variant: "destructive",
       });
       return;
@@ -121,6 +137,7 @@ export default function CardDeck() {
           roomName: selectedCard.name,
           verseText: verseText,
           userAnswer: userAnswer,
+          textType: textType,
         },
       });
 
@@ -157,6 +174,7 @@ export default function CardDeck() {
           roomName: selectedCard.name,
           verseText: verseText,
           userAnswer: userAnswer,
+          textType: textType,
         },
       });
 
@@ -192,48 +210,94 @@ export default function CardDeck() {
           {/* Header */}
           <div className="text-center space-y-2">
             <h1 className="text-4xl font-bold bg-gradient-palace bg-clip-text text-transparent">
-              Phototheology Card Deck
+              Phototheology Study Deck
             </h1>
             <p className="text-muted-foreground">
               Apply every Palace principle to your chosen verse or story
             </p>
           </div>
 
-          {/* Verse Input Section */}
+          {/* Text Selection and Input Section */}
           <Card className="border-2">
             <CardHeader>
-              <CardTitle>Your Verse or Story</CardTitle>
+              <CardTitle>Choose Your Study Text</CardTitle>
               <CardDescription>
-                Enter the biblical text you want to study through the Palace principles
+                Select verse or story, then enter the biblical text
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
+              <div className="flex gap-4">
+                <Button
+                  variant={textType === "verse" ? "default" : "outline"}
+                  onClick={() => setTextType("verse")}
+                  className="flex-1"
+                >
+                  Verse
+                </Button>
+                <Button
+                  variant={textType === "story" ? "default" : "outline"}
+                  onClick={() => setTextType("story")}
+                  className="flex-1"
+                >
+                  Story
+                </Button>
+              </div>
+              
               <Textarea
-                placeholder="Enter your verse or story here... (e.g., John 3:16 - 'For God so loved the world...')"
-                value={verseText}
-                onChange={(e) => setVerseText(e.target.value)}
+                placeholder={
+                  textType === "verse"
+                    ? "Enter verse reference and text (e.g., John 3:16 - 'For God so loved the world...')"
+                    : "Enter story name and summary (e.g., Parable of the Sower - A farmer went out to sow...)"
+                }
+                value={verseInput}
+                onChange={(e) => setVerseInput(e.target.value)}
                 className="min-h-[100px]"
               />
               
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <Switch
-                    id="timer-mode"
-                    checked={timerEnabled}
-                    onCheckedChange={setTimerEnabled}
-                  />
-                  <Label htmlFor="timer-mode" className="cursor-pointer">
-                    Enable Timer (2 min per card)
-                  </Label>
-                </div>
-                
-                <Button onClick={pickRandomCard} className="gradient-palace">
-                  <Sparkles className="h-4 w-4 mr-2" />
-                  Jeeves, Pick a Card!
-                </Button>
-              </div>
+              <Button onClick={handleSetText} className="w-full">
+                Set {textType === "verse" ? "Verse" : "Story"}
+              </Button>
             </CardContent>
           </Card>
+
+          {/* Display Selected Text */}
+          {displayText && (
+            <Card className="border-2 border-primary/50 bg-primary/5">
+              <CardContent className="pt-6">
+                <div className="text-sm text-muted-foreground mb-2">
+                  {textType === "verse" ? "Selected Verse:" : "Selected Story:"}
+                </div>
+                <div className="text-lg font-medium">
+                  {displayText}
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Pick Card Section */}
+          {displayText && (
+            <Card className="border-2">
+              <CardContent className="pt-6">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <Switch
+                      id="timer-mode"
+                      checked={timerEnabled}
+                      onCheckedChange={setTimerEnabled}
+                    />
+                    <Label htmlFor="timer-mode" className="cursor-pointer">
+                      Enable Timer (2 min per card)
+                    </Label>
+                  </div>
+                  
+                  <Button onClick={pickRandomCard} className="gradient-palace">
+                    <Sparkles className="h-4 w-4 mr-2" />
+                    Jeeves, Pick a Card!
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          )}
 
           {/* Selected Card Section */}
           {selectedCard && (
@@ -249,8 +313,8 @@ export default function CardDeck() {
                       <CardTitle className="text-2xl">
                         {selectedCard.name}
                       </CardTitle>
-                      <CardDescription className="text-base">
-                        {selectedCard.question}
+                      <CardDescription className="text-base text-foreground font-medium">
+                        Apply {selectedCard.code} to your {textType}
                       </CardDescription>
                       <Badge variant="outline">Floor {selectedCard.floor}</Badge>
                     </div>
@@ -266,7 +330,7 @@ export default function CardDeck() {
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <Textarea
-                    placeholder={`Apply ${selectedCard.code} to your verse...`}
+                    placeholder={`How does ${selectedCard.code} apply to this ${textType}? Write your application here...`}
                     value={userAnswer}
                     onChange={(e) => setUserAnswer(e.target.value)}
                     className="min-h-[150px]"
