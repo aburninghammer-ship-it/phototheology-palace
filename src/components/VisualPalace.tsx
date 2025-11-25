@@ -1,7 +1,8 @@
 import { Link } from "react-router-dom";
-import { Sparkles, Eye, Search, Zap, BookOpen, Telescope, Globe, Flame, Crown } from "lucide-react";
+import { Sparkles, Eye, Search, Zap, BookOpen, Telescope, Globe, Flame, Crown, Lock, CheckCircle } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { palaceFloors } from "@/data/palaceData";
+import { useRoomUnlock } from "@/hooks/useRoomUnlock";
 
 // Floor-specific icons and theming
 const FLOOR_THEMES = [
@@ -163,7 +164,8 @@ interface RoomDoorProps {
 }
 
 const RoomDoor = ({ room, floorNumber, theme, user }: RoomDoorProps) => {
-  // Always show rooms as unlocked in preview mode on home page
+  const { isUnlocked, loading } = useRoomUnlock(floorNumber, room.id);
+  
   return (
     <Link
       to={`/palace/floor/${floorNumber}/room/${room.id}`}
@@ -199,11 +201,21 @@ const RoomDoor = ({ room, floorNumber, theme, user }: RoomDoorProps) => {
             </div>
           </div>
 
-          {/* Lock/Unlock indicator - Always unlocked in preview */}
+          {/* Lock/Unlock indicator */}
           <div className="absolute bottom-3 right-3">
-            <div className="w-6 h-6 rounded-full bg-green-500/30 backdrop-blur-sm border border-green-400/50 flex items-center justify-center">
-              <div className="w-2 h-2 rounded-full bg-green-400" />
-            </div>
+            {loading ? (
+              <div className="w-6 h-6 rounded-full bg-gray-500/30 backdrop-blur-sm border border-gray-400/50 flex items-center justify-center">
+                <div className="w-2 h-2 rounded-full bg-gray-400 animate-pulse" />
+              </div>
+            ) : isUnlocked ? (
+              <div className="w-6 h-6 rounded-full bg-green-500/30 backdrop-blur-sm border border-green-400/50 flex items-center justify-center">
+                <CheckCircle className="w-4 h-4 text-green-400" />
+              </div>
+            ) : (
+              <div className="w-6 h-6 rounded-full bg-red-500/30 backdrop-blur-sm border border-red-400/50 flex items-center justify-center">
+                <Lock className="w-4 h-4 text-red-400" />
+              </div>
+            )}
           </div>
 
           {/* Subtle shine on hover */}
