@@ -20,6 +20,8 @@ import { useUserPreferences } from "@/hooks/useUserPreferences";
 import { useErrorHandler } from "@/hooks/useErrorHandler";
 import { ImportPassageDialog } from "@/components/series-builder/ImportPassageDialog";
 import { useBibleState } from "@/hooks/useBibleState";
+import { VerseImageAttachment } from "./VerseImageAttachment";
+import { ApologeticsPanel } from "./ApologeticsPanel";
 
 export const BibleReader = () => {
   const { book = "John", chapter: chapterParam = "3" } = useParams();
@@ -395,13 +397,26 @@ export const BibleReader = () => {
               )}
             </Card>
           ) : selectedVerse ? (
-            <PrinciplePanel
-              book={book}
-              chapter={chapter}
-              verse={selectedVerse}
-              verseText={chapterData.verses.find(v => v.verse === selectedVerse)?.text || ""}
-              onClose={() => setSelectedVerse(null)}
-            />
+            <>
+              <PrinciplePanel
+                book={book}
+                chapter={chapter}
+                verse={selectedVerse}
+                verseText={chapterData.verses.find(v => v.verse === selectedVerse)?.text || ""}
+                onClose={() => setSelectedVerse(null)}
+              />
+              <VerseImageAttachment
+                book={book}
+                chapter={chapter}
+                verse={selectedVerse}
+              />
+              <ApologeticsPanel
+                book={book}
+                chapter={chapter}
+                verse={selectedVerse}
+                verseText={chapterData.verses.find(v => v.verse === selectedVerse)?.text || ""}
+              />
+            </>
           ) : (
             <Card className="p-6 text-center text-muted-foreground sticky top-24">
               <BookOpen className="h-12 w-12 mx-auto mb-3 text-primary/50" />
