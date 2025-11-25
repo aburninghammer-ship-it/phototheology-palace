@@ -15,7 +15,7 @@ export const formatJeevesResponse = (text: string): React.ReactNode[] => {
 
   const blocks: React.ReactNode[] = [];
 
-  // Split into blocks by double newlines OR by sentences for better readability
+  // Split into blocks by double newlines
   const sections = cleanedText.split(/\n\n+/).filter(s => s.trim());
 
   sections.forEach((section, sectionIdx) => {
@@ -33,14 +33,14 @@ export const formatJeevesResponse = (text: string): React.ReactNode[] => {
         blocks.push(
           <div 
             key={`heading-${sectionIdx}`} 
-            className={`mb-4 mt-6 ${level === 1 ? 'text-2xl' : level === 2 ? 'text-xl' : 'text-lg'} font-bold text-primary flex items-center gap-2`}
+            className={`mb-6 mt-8 ${level === 1 ? 'text-2xl' : level === 2 ? 'text-xl' : 'text-lg'} font-bold text-primary flex items-center gap-3`}
           >
             <span className="text-2xl">{emoji}</span>
             <span>{formatInlineText(headingText)}</span>
           </div>
         );
         
-        // Process remaining lines
+        // Process remaining lines with extra spacing
         if (lines.length > 1) {
           const remainingText = lines.slice(1).join('\n');
           blocks.push(...formatSection(remainingText, sectionIdx));
@@ -78,7 +78,7 @@ const formatSection = (text: string, baseKey: number): React.ReactNode[] => {
       .trim();
     
     blocks.push(
-      <div key={`quote-${baseKey}`} className="my-4 pl-4 border-l-4 border-primary/30 bg-accent/20 p-4 rounded-r-lg italic">
+      <div key={`quote-${baseKey}`} className="my-6 pl-5 border-l-4 border-primary/30 bg-accent/20 p-5 rounded-r-lg italic">
         <span className="text-xl mr-2">💭</span>
         {formatInlineText(quoteContent)}
       </div>
@@ -95,9 +95,9 @@ const formatSection = (text: string, baseKey: number): React.ReactNode[] => {
         listItems.push(
           <li 
             key={`bullet-${baseKey}-${idx}`} 
-            className="flex items-start gap-3 p-3 rounded-lg hover:bg-accent/5 transition-all group"
+            className="flex items-start gap-4 p-4 pl-6 rounded-lg hover:bg-accent/5 transition-all group mb-3"
           >
-            <span className="text-lg mt-0.5 flex-shrink-0 group-hover:scale-110 transition-transform">
+            <span className="text-lg mt-1 flex-shrink-0 group-hover:scale-110 transition-transform">
               {emoji}
             </span>
             <span className="flex-1 leading-relaxed text-base">
@@ -108,7 +108,7 @@ const formatSection = (text: string, baseKey: number): React.ReactNode[] => {
       } else if (trimmedLine) {
         // Sub-content within list
         listItems.push(
-          <div key={`bullet-text-${baseKey}-${idx}`} className="ml-9 mb-2 text-sm text-muted-foreground">
+          <div key={`bullet-text-${baseKey}-${idx}`} className="ml-12 mb-3 pl-4 border-l-2 border-muted text-sm text-muted-foreground leading-relaxed">
             {formatInlineText(trimmedLine)}
           </div>
         );
@@ -116,7 +116,7 @@ const formatSection = (text: string, baseKey: number): React.ReactNode[] => {
     });
 
     blocks.push(
-      <ul key={`list-${baseKey}`} className="mb-6 space-y-2 list-none pl-0">
+      <ul key={`list-${baseKey}`} className="mb-8 space-y-1 list-none pl-0">
         {listItems}
       </ul>
     );
@@ -132,9 +132,9 @@ const formatSection = (text: string, baseKey: number): React.ReactNode[] => {
         listItems.push(
           <li 
             key={`numbered-${baseKey}-${idx}`} 
-            className="flex items-start gap-3 p-3 rounded-lg hover:bg-accent/5 transition-all"
+            className="flex items-start gap-4 p-4 pl-6 rounded-lg hover:bg-accent/5 transition-all mb-3"
           >
-            <span className="flex-shrink-0 w-6 h-6 rounded-full bg-primary/10 text-primary font-bold text-sm flex items-center justify-center">
+            <span className="flex-shrink-0 w-7 h-7 rounded-full bg-primary/10 text-primary font-bold text-sm flex items-center justify-center mt-0.5">
               {number}
             </span>
             <span className="flex-1 leading-relaxed text-base">
@@ -146,36 +146,43 @@ const formatSection = (text: string, baseKey: number): React.ReactNode[] => {
     });
 
     blocks.push(
-      <ol key={`numbered-list-${baseKey}`} className="mb-6 space-y-2 list-none pl-0">
+      <ol key={`numbered-list-${baseKey}`} className="mb-8 space-y-1 list-none pl-0">
         {listItems}
       </ol>
     );
   } else {
-    // Split long paragraphs into sentences for better readability
-    const sentences = text.match(/[^.!?]+[.!?]+/g) || [text];
+    // Handle regular paragraphs with sentence-based splitting
+    const content = lines.join(' ').trim();
     
-    if (sentences.length > 3) {
-      // Break into smaller paragraphs every 2-3 sentences
+    // Split into sentences
+    const sentences = content.match(/[^.!?]+[.!?]+(\s|$)/g) || [content];
+    
+    // Group sentences into paragraphs (2-3 sentences each)
+    if (sentences.length > 4) {
       const chunks: string[] = [];
-      for (let i = 0; i < sentences.length; i += 2) {
-        chunks.push(sentences.slice(i, i + 2).join(' ').trim());
+      for (let i = 0; i < sentences.length; i += 3) {
+        const chunk = sentences.slice(i, i + 3).join(' ').trim();
+        if (chunk) chunks.push(chunk);
       }
       
       chunks.forEach((chunk, idx) => {
-        if (chunk) {
-          blocks.push(
-            <p key={`para-${baseKey}-${idx}`} className="mb-4 leading-relaxed text-base">
-              {formatInlineText(chunk)}
-            </p>
-          );
-        }
+        blocks.push(
+          <p 
+            key={`para-${baseKey}-${idx}`} 
+            className="mb-5 leading-relaxed text-base pl-4 border-l-2 border-transparent hover:border-primary/20 transition-colors"
+          >
+            {formatInlineText(chunk)}
+          </p>
+        );
       });
     } else {
-      // Short paragraph, keep as-is
-      const content = lines.join(' ').trim();
+      // Short content, keep as single paragraph
       if (content) {
         blocks.push(
-          <p key={`para-${baseKey}`} className="mb-4 leading-relaxed text-base">
+          <p 
+            key={`para-${baseKey}`} 
+            className="mb-5 leading-relaxed text-base pl-4 border-l-2 border-transparent hover:border-primary/20 transition-colors"
+          >
             {formatInlineText(content)}
           </p>
         );
