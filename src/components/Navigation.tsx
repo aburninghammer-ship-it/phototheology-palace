@@ -75,13 +75,17 @@ export const Navigation = () => {
               <PWAInstallButton />
               <ThemeToggle />
               
+              {/* Live User Count - Always Visible */}
+              <div className="hidden md:flex items-center gap-2 text-sm text-muted-foreground">
+                <div className="relative">
+                  <Users className="h-4 w-4" />
+                  <div className="absolute -top-1 -right-1 w-2 h-2 bg-green-500 rounded-full animate-pulse" />
+                </div>
+                <span className="font-medium">{activeCount} live</span>
+              </div>
+              
               {user && (
                 <>
-                  <div className="hidden md:flex items-center gap-2 text-sm text-muted-foreground">
-                    <Users className="h-4 w-4" />
-                    <span>{activeCount} active</span>
-                  </div>
-                  
                   <Button
                     variant="ghost"
                     size="sm"
@@ -113,12 +117,20 @@ export const Navigation = () => {
                   <div className="md:hidden">
                     <EnhancedMobileDrawer />
                   </div>
+                  
+                  {/* Enter App Button - Desktop Only */}
+                  <Button asChild className="hidden md:flex gradient-palace whitespace-nowrap">
+                    <Link to="/palace">
+                      <Building2 className="h-4 w-4 mr-2" />
+                      Enter App
+                    </Link>
+                  </Button>
                 </>
               ) : (
                 <>
-                  {/* Sign In Button for logged-out users */}
-                  <Button asChild className="whitespace-nowrap">
-                    <Link to="/auth">Sign In</Link>
+                  {/* Enter App Button for logged-out users */}
+                  <Button asChild className="gradient-palace whitespace-nowrap">
+                    <Link to="/auth">Enter App</Link>
                   </Button>
                   
                   {/* Desktop Navigation for logged-out users - Horizontal Scroll */}
