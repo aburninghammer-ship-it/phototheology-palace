@@ -159,6 +159,7 @@ const TermsOfService = lazy(() => import("./pages/TermsOfService"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 const AuthCallback = lazy(() => import("./pages/AuthCallback"));
 const PalaceExplorer = lazy(() => import("./pages/PalaceExplorer"));
+const CardDeck = lazy(() => import("./pages/CardDeck"));
 
 const queryClient = new QueryClient();
 
@@ -222,6 +223,7 @@ function App() {
             <Route path="/palace/explorer" element={<ProtectedRoute><PalaceExplorer /></ProtectedRoute>} />
             <Route path="/palace/floor/:floorNumber" element={<ProtectedRoute><FloorDetail /></ProtectedRoute>} />
             <Route path="/palace/floor/:floorNumber/room/:roomId" element={<ProtectedRoute><RoomDetail /></ProtectedRoute>} />
+            <Route path="/card-deck" element={<ProtectedRoute><CardDeck /></ProtectedRoute>} />
             
             <Route path="/bible" element={<ProtectedRoute><Bible /></ProtectedRoute>} />
             <Route path="/bible/search" element={<ProtectedRoute><BibleSearch /></ProtectedRoute>} />
