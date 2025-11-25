@@ -1,6 +1,51 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.7.1";
 
+// Use Bible Gateway scraping approach
+async function fetchVerseText(reference: string): Promise<string> {
+  try {
+    const apiUrl = `https://bible-api.com/${encodeURIComponent(reference)}?translation=kjv`;
+    
+    const response = await fetch(apiUrl);
+    if (!response.ok) {
+      throw new Error(`Bible API error: ${response.status}`);
+    }
+    
+    const data = await response.json();
+    return data.text.trim();
+  } catch (error) {
+    console.error('Error fetching verse:', error);
+    throw new Error(`Could not fetch verse: ${reference}`);
+  }
+}
+
+// Convert full book names to standard 3-letter abbreviations
+function getBookAbbreviation(bookName: string): string {
+  const bookMap: Record<string, string> = {
+    'Genesis': 'GEN', 'Exodus': 'EXO', 'Leviticus': 'LEV', 'Numbers': 'NUM', 'Deuteronomy': 'DEU',
+    'Joshua': 'JOS', 'Judges': 'JDG', 'Ruth': 'RUT', '1 Samuel': '1SA', '2 Samuel': '2SA',
+    '1 Kings': '1KI', '2 Kings': '2KI', '1 Chronicles': '1CH', '2 Chronicles': '2CH',
+    'Ezra': 'EZR', 'Nehemiah': 'NEH', 'Esther': 'EST', 'Job': 'JOB', 'Psalms': 'PSA',
+    'Proverbs': 'PRO', 'Ecclesiastes': 'ECC', 'Song of Solomon': 'SNG', 'Isaiah': 'ISA',
+    'Jeremiah': 'JER', 'Lamentations': 'LAM', 'Ezekiel': 'EZK', 'Daniel': 'DAN',
+    'Hosea': 'HOS', 'Joel': 'JOL', 'Amos': 'AMO', 'Obadiah': 'OBA', 'Jonah': 'JON',
+    'Micah': 'MIC', 'Nahum': 'NAM', 'Habakkuk': 'HAB', 'Zephaniah': 'ZEP', 'Haggai': 'HAG',
+    'Zechariah': 'ZEC', 'Malachi': 'MAL', 'Matthew': 'MAT', 'Mark': 'MRK', 'Luke': 'LUK',
+    'John': 'JHN', 'Acts': 'ACT', 'Romans': 'ROM', '1 Corinthians': '1CO', '2 Corinthians': '2CO',
+    'Galatians': 'GAL', 'Ephesians': 'EPH', 'Philippians': 'PHP', 'Colossians': 'COL',
+    '1 Thessalonians': '1TH', '2 Thessalonians': '2TH', '1 Timothy': '1TI', '2 Timothy': '2TI',
+    'Titus': 'TIT', 'Philemon': 'PHM', 'Hebrews': 'HEB', 'James': 'JAS', '1 Peter': '1PE',
+    '2 Peter': '2PE', '1 John': '1JN', '2 John': '2JN', '3 John': '3JN', 'Jude': 'JUD',
+    'Revelation': 'REV'
+  };
+  
+  const abbrev = bookMap[bookName];
+  if (!abbrev) {
+    throw new Error(`Unknown book name: ${bookName}`);
+  }
+  return abbrev;
+}
+
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
@@ -127,32 +172,21 @@ serve(async (req) => {
     let verseText: string;
     
     if (verse_reference) {
-      // Parse the provided verse reference (e.g., "2 Timothy 1:7")
-      const match = verse_reference.match(/^(.+?)\s+(\d+):(\d+)$/);
-      if (!match) throw new Error('Invalid verse reference format');
-      
-      const [, book, chapter, verse_num] = match;
-      const { data: verseData, error: verseError } = await supabase
-        .from('bible_verses_tokenized')
-        .select('text_kjv')
-        .eq('book', book)
-        .eq('chapter', parseInt(chapter))
-        .eq('verse_num', parseInt(verse_num))
-        .single();
-      
-      if (verseError || !verseData) {
-        throw new Error(`Could not find verse: ${verse_reference}`);
-      }
-      
+      // Fetch actual KJV English text from Bible API
       verseReference = verse_reference;
-      verseText = verseData.text_kjv;
+      try {
+        verseText = await fetchVerseText(verse_reference);
+      } catch (error) {
+        console.error(`Error fetching verse: ${verse_reference}`, error);
+        throw new Error(`Could not fetch verse: ${verse_reference}`);
+      }
     } else {
       // Use deterministic seed based on date to ensure same verse for the day
       const daysSinceEpoch = Math.floor(Date.now() / (1000 * 60 * 60 * 24));
       
       const { data: verses, error: verseError } = await supabase
         .from('bible_verses_tokenized')
-        .select('book, chapter, verse_num, text_kjv')
+        .select('book, chapter, verse_num')
         .order('book', { ascending: true })
         .order('chapter', { ascending: true })
         .order('verse_num', { ascending: true });
@@ -167,7 +201,14 @@ serve(async (req) => {
       const selectedVerse = verses[selectedIndex];
       
       verseReference = `${selectedVerse.book} ${selectedVerse.chapter}:${selectedVerse.verse_num}`;
-      verseText = selectedVerse.text_kjv;
+      
+      // Fetch actual KJV text from Bible API
+      try {
+        verseText = await fetchVerseText(verseReference);
+      } catch (error) {
+        console.error(`Error fetching verse: ${verseReference}`, error);
+        throw new Error(`Could not fetch verse text for: ${verseReference}`);
+      }
     }
     
     // Generate breakdown using Lovable AI with specific instructions per principle
