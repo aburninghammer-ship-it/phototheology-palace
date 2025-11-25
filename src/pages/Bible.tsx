@@ -10,28 +10,29 @@ const Bible = () => {
     <div className="min-h-screen gradient-subtle">
       <Navigation />
       
-      <div className="pt-24 pb-16 px-4">
+      <div className="pt-24 pb-16 px-3 sm:px-4 md:px-6">
         <div className="container mx-auto max-w-7xl">
           {/* Header */}
-          <div className="mb-8 flex items-start justify-between">
+          <div className="mb-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
             <div>
-              <h1 className="font-serif text-4xl md:text-5xl font-bold mb-2 bg-gradient-palace bg-clip-text text-transparent">
+              <h1 className="font-serif text-3xl sm:text-4xl md:text-5xl font-bold mb-2 bg-gradient-palace bg-clip-text text-transparent">
                 Phototheology Study Bible (PSB)
               </h1>
-              <p className="text-lg text-muted-foreground">
+              <p className="text-base sm:text-lg text-muted-foreground">
                 Scripture through principle lenses
               </p>
             </div>
-            <Button asChild variant="outline" className="gradient-dreamy border-primary/20">
+            <Button asChild variant="outline" className="gradient-dreamy border-primary/20 whitespace-nowrap">
               <Link to="/memorization-verses">
                 <BookMarked className="h-4 w-4 mr-2" />
-                My Memorization Verses
+                <span className="hidden sm:inline">My Memorization Verses</span>
+                <span className="sm:hidden">Memorization</span>
               </Link>
             </Button>
           </div>
 
           {/* Navigation */}
-          <div className="mb-8">
+          <div className="mb-6 sm:mb-8">
             <BibleNavigation />
           </div>
 

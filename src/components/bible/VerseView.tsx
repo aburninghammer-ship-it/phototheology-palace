@@ -214,15 +214,15 @@ export const VerseView = ({ verse, isSelected, onSelect, showPrinciples, isHighl
                 ))}
                 <Button
                   variant="ghost"
-                  size="icon"
-                  className="h-6 w-6"
+                  size="sm"
+                  className="h-8 px-2 touch-manipulation"
                   onClick={(e) => {
                     e.stopPropagation();
                     setRegenerateTrigger(prev => prev + 1);
                   }}
                   title="Regenerate principles"
                 >
-                  <RefreshCw className="h-3 w-3" />
+                  <RefreshCw className="h-4 w-4" />
                 </Button>
               </div>
             )}

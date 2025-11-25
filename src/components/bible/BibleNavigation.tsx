@@ -43,11 +43,11 @@ export const BibleNavigation = () => {
   };
 
   return (
-    <Card className="p-6 gradient-dreamy border-2 border-primary/20 shadow-elegant">
+    <Card className="p-4 sm:p-6 gradient-dreamy border-2 border-primary/20 shadow-elegant">
       <div className="space-y-4">
         <div className="flex items-center gap-2 mb-2">
           <BookOpen className="h-5 w-5 text-primary" />
-          <h3 className="font-serif text-lg font-semibold">Navigate Bible</h3>
+          <h3 className="font-serif text-base sm:text-lg font-semibold">Navigate Bible</h3>
         </div>
         
         {/* Quick Navigation */}
@@ -65,20 +65,22 @@ export const BibleNavigation = () => {
             </SelectContent>
           </Select>
           
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-2 gap-2 sm:gap-3">
             <Input
               type="number"
               placeholder="Chapter"
               value={chapter}
               onChange={(e) => setChapter(e.target.value)}
               min="1"
+              className="touch-manipulation"
             />
             <Input
               type="number"
-              placeholder="Verse (optional)"
+              placeholder="Verse"
               value={verse}
               onChange={(e) => setVerse(e.target.value)}
               min="1"
+              className="touch-manipulation"
             />
           </div>
         </div>
@@ -114,11 +116,12 @@ export const BibleNavigation = () => {
           
           <form onSubmit={handleSearch} className="flex gap-2">
             <Input
-              placeholder={searchMode === "reference" ? "Search Bible (e.g., John 3:16)" : "Search for words or phrases (e.g., love one another)"}
+              placeholder={searchMode === "reference" ? "e.g., John 3:16" : "e.g., love one another"}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
+              className="touch-manipulation"
             />
-            <Button type="submit" size="icon" variant="outline">
+            <Button type="submit" size="icon" variant="outline" className="touch-manipulation flex-shrink-0">
               <Search className="h-4 w-4" />
             </Button>
           </form>

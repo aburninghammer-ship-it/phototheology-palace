@@ -143,18 +143,18 @@ export default function AdminAccessCodes() {
   return (
     <div className="min-h-screen gradient-dreamy">
       <Navigation />
-      <div className="container max-w-4xl mx-auto px-4 py-12">
+      <div className="container max-w-4xl mx-auto px-3 sm:px-4 md:px-6 py-8 sm:py-12">
         <Card>
-          <CardHeader className="text-center">
+          <CardHeader className="text-center px-4 sm:px-6">
             <div className="mx-auto w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mb-4">
               <Gift className="h-6 w-6 text-primary" />
             </div>
-            <CardTitle>Invite Users to Premium Access</CardTitle>
-            <CardDescription>
+            <CardTitle className="text-xl sm:text-2xl">Invite Users to Premium Access</CardTitle>
+            <CardDescription className="text-sm sm:text-base">
               Generate codes or send personalized email invitations with lifetime or temporary access
             </CardDescription>
           </CardHeader>
-          <CardContent>
+          <CardContent className="px-4 sm:px-6">
             <Tabs defaultValue="email" className="w-full">
               <TabsList className="w-full">
                 <TabsTrigger value="email">
