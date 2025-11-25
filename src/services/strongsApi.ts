@@ -1334,11 +1334,18 @@ export const getVerseWithStrongs = async (book: string, chapter: number, verse: 
       
       // Check if we have transliteration but no English - this means data needs re-import
       const firstToken = tokens[0];
-      const hasTransliteration = firstToken?.transliteration;
-      const hasEnglish = firstToken?.t && !firstToken.t.match(/[\u0590-\u05FF]/); // Check if not Hebrew
+      const textValue = firstToken?.t || firstToken?.word || '';
       
-      if (hasTransliteration && !hasEnglish) {
-        console.warn(`[Strong's] ${book} ${chapter}:${verse} contains transliteration instead of English. Please re-import this chapter.`);
+      // Detect if the text contains transliteration markers (dots and slashes)
+      // Transliteration typically has patterns like: va./, 'a., bi/sh., etc.
+      const isTransliteration = textValue.includes('./') || 
+                                 (textValue.includes('.') && textValue.includes('/')) ||
+                                 textValue.match(/[a-z]\.[A-Z]/);
+      
+      if (isTransliteration) {
+        console.warn(`[Strong's] ${book} ${chapter}:${verse} contains transliteration instead of English. Skipping Strong's display.`);
+        // Return null to fall back to regular verse display
+        return null;
       }
       
       const words = tokens.map(token => ({
