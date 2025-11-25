@@ -22,6 +22,8 @@ import { ImportPassageDialog } from "@/components/series-builder/ImportPassageDi
 import { useBibleState } from "@/hooks/useBibleState";
 import { VerseImageAttachment } from "./VerseImageAttachment";
 import { ApologeticsPanel } from "./ApologeticsPanel";
+import { PTCodeSearch } from "./PTCodeSearch";
+import { ThematicTagging } from "./ThematicTagging";
 
 export const BibleReader = () => {
   const { book = "John", chapter: chapterParam = "3" } = useParams();
@@ -199,6 +201,8 @@ export const BibleReader = () => {
           </Button>
         </div>
       </div>
+
+      <PTCodeSearch />
 
       {/* Mode Toggles */}
       <div className="flex gap-2 flex-wrap">
@@ -411,6 +415,12 @@ export const BibleReader = () => {
                 verse={selectedVerse}
               />
               <ApologeticsPanel
+                book={book}
+                chapter={chapter}
+                verse={selectedVerse}
+                verseText={chapterData.verses.find(v => v.verse === selectedVerse)?.text || ""}
+              />
+              <ThematicTagging
                 book={book}
                 chapter={chapter}
                 verse={selectedVerse}
