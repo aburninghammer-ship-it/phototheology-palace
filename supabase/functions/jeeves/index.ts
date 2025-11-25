@@ -2224,6 +2224,39 @@ Return JSON: { "coherent": true/false, "feedback": "brief comment" }`;
       
       console.log(`=== GENERATING ${numVerses} CHEF VERSES (${difficulty} level) ===`);
       
+      // Genealogy chapters to exclude (low context)
+      const excludedChapters: Record<string, number[]> = {
+        'Genesis': [5, 10, 11, 36], // Genealogies
+        'Exodus': [6], // Genealogy section
+        'Numbers': [1, 2, 3, 7, 26, 33], // Census lists and genealogies
+        '1 Chronicles': [1, 2, 3, 4, 5, 6, 7, 8, 9], // Extensive genealogies
+        'Ezra': [2, 8], // Lists of returnees
+        'Nehemiah': [7, 11, 12], // Lists and genealogies
+        'Matthew': [1], // Genealogy of Jesus
+        'Luke': [3], // Genealogy of Jesus
+        '1 Timothy': [1], // Partial - warning against genealogies
+      };
+      
+      // Helper function to check if verse has meaningful content
+      const hasGoodContext = (text: string): boolean => {
+        // Remove verse numbers and extra spaces
+        const cleanText = text.replace(/\d+/g, '').trim();
+        
+        // Verse must be at least 50 characters (roughly 8-10 words)
+        if (cleanText.length < 50) return false;
+        
+        // Check if verse is mostly names (pattern: "X begat Y; and Y begat Z")
+        const begatCount = (text.match(/begat|begot|son of|daughter of/gi) || []).length;
+        if (begatCount >= 2) return false;
+        
+        // Check if verse contains mostly capitalized words (likely names)
+        const words = cleanText.split(/\s+/);
+        const capitalizedWords = words.filter(w => /^[A-Z][a-z]+/.test(w)).length;
+        if (capitalizedWords / words.length > 0.6) return false;
+        
+        return true;
+      };
+      
       // All 66 books of the Bible
       const allBibleBooks = [
         'Genesis', 'Exodus', 'Leviticus', 'Numbers', 'Deuteronomy',
@@ -2260,30 +2293,54 @@ Return JSON: { "coherent": true/false, "feedback": "brief comment" }`;
           .limit(100);
         
         if (!error && bookVerses && bookVerses.length > 0) {
-          // Get exactly 1 random verse from this book
-          const randomVerse = bookVerses[Math.floor(Math.random() * bookVerses.length)];
+          // Filter out excluded chapters
+          const validVerses = bookVerses.filter(v => {
+            const excludedForBook = excludedChapters[book] || [];
+            return !excludedForBook.includes(v.chapter);
+          });
           
-          // Fetch the actual English text from Bible API
-          try {
-            const bibleApiUrl = `https://bible-api.com/${encodeURIComponent(book)}+${randomVerse.chapter}:${randomVerse.verse_num}?translation=kjv`;
-            console.log(`Fetching: ${bibleApiUrl}`);
+          if (validVerses.length === 0) continue;
+          
+          // Try up to 5 times to find a good verse from this book
+          let attempts = 0;
+          let verseAdded = false;
+          
+          while (attempts < 5 && !verseAdded) {
+            attempts++;
+            const randomVerse = validVerses[Math.floor(Math.random() * validVerses.length)];
             
-            const response = await fetch(bibleApiUrl);
-            if (response.ok) {
-              const data = await response.json();
-              if (data.text && data.text.trim()) {
-                selectedVerses.push({
-                  reference: `${book} ${randomVerse.chapter}:${randomVerse.verse_num}`,
-                  text: data.text.trim().replace(/\n/g, ' ')
-                });
-                usedBooks.add(book);
-                console.log(`✓ Added verse from ${book}`);
+            // Fetch the actual English text from Bible API
+            try {
+              const bibleApiUrl = `https://bible-api.com/${encodeURIComponent(book)}+${randomVerse.chapter}:${randomVerse.verse_num}?translation=kjv`;
+              console.log(`Fetching: ${bibleApiUrl}`);
+              
+              const response = await fetch(bibleApiUrl);
+              if (response.ok) {
+                const data = await response.json();
+                const verseText = data.text?.trim().replace(/\n/g, ' ');
+                
+                // Check if verse has good context
+                if (verseText && hasGoodContext(verseText)) {
+                  selectedVerses.push({
+                    reference: `${book} ${randomVerse.chapter}:${randomVerse.verse_num}`,
+                    text: verseText
+                  });
+                  usedBooks.add(book);
+                  verseAdded = true;
+                  console.log(`✓ Added verse from ${book} (attempt ${attempts})`);
+                } else {
+                  console.log(`⚠ Skipped low-context verse from ${book} ${randomVerse.chapter}:${randomVerse.verse_num}`);
+                }
+              } else {
+                console.warn(`Failed to fetch ${book} ${randomVerse.chapter}:${randomVerse.verse_num}, status: ${response.status}`);
               }
-            } else {
-              console.warn(`Failed to fetch ${book} ${randomVerse.chapter}:${randomVerse.verse_num}, status: ${response.status}`);
+            } catch (err) {
+              console.error(`Error fetching verse from ${book}:`, err);
             }
-          } catch (err) {
-            console.error(`Error fetching verse from ${book}:`, err);
+          }
+          
+          if (!verseAdded) {
+            console.warn(`⚠ Could not find good verse from ${book} after ${attempts} attempts`);
           }
         }
       }
