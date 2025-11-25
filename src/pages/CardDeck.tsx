@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Navigation } from "@/components/Navigation";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -13,6 +13,9 @@ import { useToast } from "@/hooks/use-toast";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
+import palaceImage from "@/assets/palace-card-back.jpg";
+import { Users, Copy, Check } from "lucide-react";
+import { RealtimeChannel } from "@supabase/supabase-js";
 
 interface PrincipleCard {
   id: string;
@@ -103,6 +106,11 @@ export default function CardDeck() {
   const [timerEnabled, setTimerEnabled] = useState(false);
   const [timeRemaining, setTimeRemaining] = useState(120);
   const [isTimerActive, setIsTimerActive] = useState(false);
+  const [sessionId, setSessionId] = useState<string>("");
+  const [isInSession, setIsInSession] = useState(false);
+  const [participants, setParticipants] = useState<any[]>([]);
+  const [copied, setCopied] = useState(false);
+  const channelRef = useRef<RealtimeChannel | null>(null);
 
   useEffect(() => {
     // Build all principle cards from palace data
@@ -214,6 +222,7 @@ export default function CardDeck() {
     }
     setVerseText(verseInput);
     setDisplayText(verseInput);
+    broadcastTextSet();
   };
 
   const pickRandomCard = () => {
@@ -231,7 +240,107 @@ export default function CardDeck() {
     setFeedback("");
     setTimeRemaining(120);
     setIsTimerActive(timerEnabled);
+    
+    // Broadcast card selection to all participants in session
+    if (isInSession && channelRef.current) {
+      channelRef.current.send({
+        type: 'broadcast',
+        event: 'card-selected',
+        payload: { card: randomCard }
+      });
+    }
   };
+
+  const createSession = () => {
+    const newSessionId = Math.random().toString(36).substring(2, 10).toUpperCase();
+    setSessionId(newSessionId);
+    joinSession(newSessionId);
+  };
+
+  const joinSession = (id: string) => {
+    const channel = supabase.channel(`study-deck-${id}`, {
+      config: {
+        presence: {
+          key: Math.random().toString(36).substring(7),
+        },
+      },
+    });
+
+    channel
+      .on('presence', { event: 'sync' }, () => {
+        const state = channel.presenceState();
+        const users = Object.values(state).flat();
+        setParticipants(users);
+      })
+      .on('broadcast', { event: 'card-selected' }, ({ payload }) => {
+        setSelectedCard(payload.card);
+        setUserAnswer("");
+        setFeedback("");
+        setTimeRemaining(120);
+        setIsTimerActive(timerEnabled);
+      })
+      .on('broadcast', { event: 'text-set' }, ({ payload }) => {
+        setVerseText(payload.verseText);
+        setDisplayText(payload.verseText);
+        setTextType(payload.textType);
+      })
+      .subscribe(async (status) => {
+        if (status === 'SUBSCRIBED') {
+          await channel.track({
+            online_at: new Date().toISOString(),
+          });
+          setIsInSession(true);
+          toast({
+            title: "Session joined!",
+            description: `Connected to session ${id}`,
+          });
+        }
+      });
+
+    channelRef.current = channel;
+  };
+
+  const leaveSession = () => {
+    if (channelRef.current) {
+      supabase.removeChannel(channelRef.current);
+      channelRef.current = null;
+    }
+    setIsInSession(false);
+    setSessionId("");
+    setParticipants([]);
+    toast({
+      title: "Session left",
+      description: "You've left the collaboration session",
+    });
+  };
+
+  const copySessionId = () => {
+    navigator.clipboard.writeText(sessionId);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+    toast({
+      title: "Session ID copied!",
+      description: "Share this ID with others to collaborate",
+    });
+  };
+
+  const broadcastTextSet = () => {
+    if (isInSession && channelRef.current) {
+      channelRef.current.send({
+        type: 'broadcast',
+        event: 'text-set',
+        payload: { verseText: verseInput, textType }
+      });
+    }
+  };
+
+  useEffect(() => {
+    return () => {
+      if (channelRef.current) {
+        supabase.removeChannel(channelRef.current);
+      }
+    };
+  }, []);
 
   const flipCard = (cardId: string) => {
     setFlippedCards((prev) => {
@@ -328,13 +437,75 @@ export default function CardDeck() {
       <main className="container mx-auto px-4 pt-24 pb-12">
         <div className="max-w-6xl mx-auto space-y-6">
           {/* Header */}
-          <div className="text-center space-y-2">
+          <div className="text-center space-y-4">
             <h1 className="text-4xl font-bold bg-gradient-palace bg-clip-text text-transparent">
               Phototheology Study Deck
             </h1>
             <p className="text-muted-foreground">
               Apply every Palace principle to your chosen verse or story
             </p>
+            
+            {/* Collaboration Controls */}
+            <Card className="border-2 border-primary/30">
+              <CardContent className="pt-6">
+                {!isInSession ? (
+                  <div className="flex flex-col sm:flex-row gap-3 items-center justify-center">
+                    <Button onClick={createSession} className="gradient-palace gap-2">
+                      <Users className="h-4 w-4" />
+                      Start Collaboration Session
+                    </Button>
+                    <div className="flex gap-2 items-center">
+                      <span className="text-sm text-muted-foreground">or</span>
+                      <Input
+                        placeholder="Enter Session ID"
+                        value={sessionId}
+                        onChange={(e) => setSessionId(e.target.value.toUpperCase())}
+                        className="w-32"
+                      />
+                      <Button 
+                        onClick={() => joinSession(sessionId)} 
+                        disabled={!sessionId}
+                        variant="outline"
+                      >
+                        Join
+                      </Button>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-center gap-3">
+                      <Badge variant="default" className="gap-2">
+                        <Users className="h-3 w-3" />
+                        {participants.length} participant{participants.length !== 1 ? 's' : ''}
+                      </Badge>
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm font-mono bg-muted px-3 py-1 rounded">
+                          {sessionId}
+                        </span>
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          onClick={copySessionId}
+                          className="h-8 w-8 p-0"
+                        >
+                          {copied ? (
+                            <Check className="h-4 w-4 text-green-500" />
+                          ) : (
+                            <Copy className="h-4 w-4" />
+                          )}
+                        </Button>
+                      </div>
+                      <Button onClick={leaveSession} variant="outline" size="sm">
+                        Leave Session
+                      </Button>
+                    </div>
+                    <p className="text-xs text-muted-foreground text-center">
+                      Share the session ID with others to collaborate in real-time
+                    </p>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
           </div>
 
           {/* Text Selection and Input Section */}
@@ -533,39 +704,59 @@ export default function CardDeck() {
                           flippedCards.has(card.id) ? "rotate-y-180" : ""
                         }`}
                       >
-                        {/* Front of card (Principle Code) */}
+                        {/* Front of card (Palace with Principle Code) */}
                         <div
-                          className={`absolute inset-0 bg-gradient-to-br ${card.floorColor} rounded-lg border-2 shadow-xl backface-hidden flex flex-col items-center justify-center p-4 text-center glow-effect`}
+                          className="absolute inset-0 rounded-lg border-2 shadow-xl backface-hidden overflow-hidden glow-effect"
+                          style={{
+                            backgroundImage: `url(${palaceImage})`,
+                            backgroundSize: 'cover',
+                            backgroundPosition: 'center',
+                          }}
                         >
-                          <div className="text-xs text-white/80 mb-1 font-semibold">
-                            Floor {card.floor}
-                          </div>
-                          <div className="text-3xl font-bold mb-1 text-white drop-shadow-lg">
-                            {card.code}
-                          </div>
-                          <div className="text-xs font-semibold text-white/90">
-                            {card.name}
+                          <div className={`absolute inset-0 bg-gradient-to-b from-black/70 via-black/50 to-black/70`} />
+                          <div className="relative h-full flex flex-col items-center justify-center p-4 text-center">
+                            <div className="absolute top-2 left-0 right-0 text-xs text-amber-300/90 font-bold tracking-wider">
+                              FLOOR {card.floor}
+                            </div>
+                            <div className="text-4xl font-bold mb-2 text-amber-100 drop-shadow-[0_2px_8px_rgba(0,0,0,0.8)]">
+                              {card.code}
+                            </div>
+                            <div className="text-xs font-semibold text-amber-200/90 drop-shadow-lg px-2">
+                              {card.name}
+                            </div>
+                            <div className="absolute bottom-2 left-0 right-0 flex justify-center gap-1">
+                              <div className="w-1 h-1 rounded-full bg-amber-400/60" />
+                              <div className="w-1 h-1 rounded-full bg-amber-400/60" />
+                              <div className="w-1 h-1 rounded-full bg-amber-400/60" />
+                            </div>
                           </div>
                         </div>
 
-                        {/* Back of card (Designed Question Card) */}
+                        {/* Back of card (Ornate Design with Question) */}
                         <div
-                          className={`absolute inset-0 bg-gradient-to-br from-slate-800 via-slate-900 to-slate-950 rounded-lg border-2 border-amber-400/50 shadow-xl backface-hidden rotate-y-180 overflow-hidden`}
+                          className="absolute inset-0 rounded-lg border-2 border-amber-500/50 shadow-xl backface-hidden rotate-y-180 overflow-hidden"
+                          style={{
+                            backgroundImage: `url(${palaceImage})`,
+                            backgroundSize: 'cover',
+                            backgroundPosition: 'center',
+                            filter: 'brightness(0.7) sepia(0.3) hue-rotate(10deg)',
+                          }}
                         >
-                          <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,_rgba(251,191,36,0.1)_0%,_transparent_50%)]" />
-                          <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-amber-400/30 to-transparent" />
-                          <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-amber-400/30 to-transparent" />
+                          <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/70 to-black/60" />
+                          <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,_rgba(251,191,36,0.15)_0%,_transparent_60%)]" />
+                          <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-amber-400/40 to-transparent" />
+                          <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-amber-400/40 to-transparent" />
                           <div className="relative h-full flex flex-col items-center justify-center p-4 text-center">
-                            <div className="text-xs font-bold text-amber-400/70 mb-2 tracking-wider">
-                              FLOOR {card.floor}
+                            <div className="text-xs font-bold text-amber-400/80 mb-3 tracking-wider drop-shadow-lg">
+                              FLOOR {card.floor} • {card.code}
                             </div>
-                            <p className="text-xs leading-relaxed text-amber-50 font-medium">
+                            <p className="text-xs leading-relaxed text-amber-50 font-medium drop-shadow-[0_1px_4px_rgba(0,0,0,0.8)]">
                               {card.question}
                             </p>
-                            <div className="absolute bottom-3 left-0 right-0 flex justify-center gap-1">
-                              <div className="w-1 h-1 rounded-full bg-amber-400/40" />
-                              <div className="w-1 h-1 rounded-full bg-amber-400/40" />
-                              <div className="w-1 h-1 rounded-full bg-amber-400/40" />
+                            <div className="absolute bottom-3 left-0 right-0 flex justify-center gap-1.5">
+                              <div className="w-1.5 h-1.5 rounded-full bg-amber-400/50 shadow-lg" />
+                              <div className="w-1.5 h-1.5 rounded-full bg-amber-400/50 shadow-lg" />
+                              <div className="w-1.5 h-1.5 rounded-full bg-amber-400/50 shadow-lg" />
                             </div>
                           </div>
                         </div>
