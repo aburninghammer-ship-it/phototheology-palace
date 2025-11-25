@@ -401,7 +401,13 @@ export default function CardDeck() {
     };
   }, []);
 
-  const flipCard = (cardId: string) => {
+  const flipCard = (cardId: string, event: React.MouseEvent) => {
+    // If shift key is held, select the card instead of flipping
+    if (event.shiftKey) {
+      selectCard(cardId);
+      return;
+    }
+    
     setFlippedCards((prev) => {
       const newSet = new Set(prev);
       if (newSet.has(cardId)) {
@@ -411,6 +417,40 @@ export default function CardDeck() {
       }
       return newSet;
     });
+  };
+
+  const selectCard = (cardId: string) => {
+    if (!verseText.trim()) {
+      toast({
+        title: "Set your text first",
+        description: "Please set your verse or story before selecting a card.",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    const card = allCards.find(c => c.id === cardId);
+    if (card) {
+      setSelectedCard(card);
+      setUserAnswer("");
+      setFeedback("");
+      setTimeRemaining(120);
+      setIsTimerActive(timerEnabled);
+      
+      toast({
+        title: "Card selected!",
+        description: `Now apply ${card.code} to your ${textType}`,
+      });
+      
+      // Broadcast card selection to all participants in session
+      if (isInSession && channelRef.current) {
+        channelRef.current.send({
+          type: 'broadcast',
+          event: 'card-selected',
+          payload: { card }
+        });
+      }
+    }
   };
 
   const getHelp = async () => {
@@ -743,7 +783,7 @@ export default function CardDeck() {
             <CardHeader>
               <CardTitle>All Palace Principle Cards</CardTitle>
               <CardDescription>
-                Click any card to flip and see its explanation
+                Click to flip and read • Shift+Click to select a card • Or let Jeeves pick one for you
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -756,7 +796,8 @@ export default function CardDeck() {
                       animate={{ opacity: 1, scale: 1 }}
                       whileHover={{ scale: 1.05 }}
                       className="relative h-32 cursor-pointer perspective-1000"
-                      onClick={() => flipCard(card.id)}
+                      onClick={(e) => flipCard(card.id, e)}
+                      title="Click to flip • Shift+Click to select card"
                     >
                       <div
                         className={`relative w-full h-full transition-transform duration-500 preserve-3d ${

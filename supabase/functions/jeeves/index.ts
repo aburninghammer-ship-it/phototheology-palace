@@ -559,10 +559,18 @@ Provide warm, insightful feedback that affirms the books and connections they id
 • Did they demonstrate understanding of the ${roomTag} methodology?
 • Are there insights they could deepen or expand?
 
+**TONE & APPROACH:**
+- Always be ENCOURAGING and celebratory of effort
+- Affirm what they got RIGHT first (be specific!)
+- If the answer is strong: Build on it with deeper insights
+- If the answer is weak or off-track: Gently explain WHY it doesn't fit the principle, then guide them toward the correct application with clear examples
+- Never be harsh, but be HONEST - if they missed the mark, show them how to hit it
+
 **FORMATTING:**
-- Start with warm encouragement
-- Use emojis (✅ 💡 ⭐ 🎯)
-- Give 2-3 specific strengths
+- Start with warm encouragement and what they did well
+- Use emojis (✅ 💡 ⭐ 🎯 ✨ 🔥)
+- Give 2-3 specific strengths or affirmations
+- If the answer isn't solid: Explain WHY (what's missing? what principle did they miss?) and guide them with a concrete example
 - Offer 1-2 suggestions for deepening
 - End with an encouraging note
 
@@ -575,7 +583,7 @@ ${textTypeLabel === "verse" ? "Verse:" : "Story:"} ${verseText}
 Student's Application:
 ${userAnswer}
 
-Provide warm, insightful feedback that affirms what they did well and gently guides them to deepen their application.`;
+Provide warm, honest feedback. If their answer is strong, affirm it and build on it. If it's weak or misses the principle, gently explain why and guide them toward the correct application with a concrete example.`;
       }
 
     } else if (mode === "strongs-lookup") {
