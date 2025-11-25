@@ -1,11 +1,15 @@
+import { useState } from "react";
 import { Navigation } from "@/components/Navigation";
 import { BibleReader } from "@/components/bible/BibleReader";
 import { BibleNavigation } from "@/components/bible/BibleNavigation";
 import { Button } from "@/components/ui/button";
-import { BookMarked } from "lucide-react";
+import { BookMarked, HelpCircle } from "lucide-react";
 import { Link } from "react-router-dom";
+import { StudyBibleDemoDialog } from "@/components/bible/StudyBibleDemoDialog";
 
 const Bible = () => {
+  const [demoOpen, setDemoOpen] = useState(false);
+
   return (
     <div className="min-h-screen gradient-subtle">
       <Navigation />
@@ -22,14 +26,27 @@ const Bible = () => {
                 Scripture through principle lenses
               </p>
             </div>
-            <Button asChild variant="outline" className="gradient-dreamy border-primary/20 whitespace-nowrap">
-              <Link to="/memorization-verses">
-                <BookMarked className="h-4 w-4 mr-2" />
-                <span className="hidden sm:inline">My Memorization Verses</span>
-                <span className="sm:hidden">Memorization</span>
-              </Link>
-            </Button>
+            <div className="flex gap-2 flex-wrap">
+              <Button 
+                variant="outline" 
+                className="border-accent/20 whitespace-nowrap"
+                onClick={() => setDemoOpen(true)}
+              >
+                <HelpCircle className="h-4 w-4 mr-2" />
+                <span className="hidden sm:inline">How to Use</span>
+                <span className="sm:hidden">Help</span>
+              </Button>
+              <Button asChild variant="outline" className="gradient-dreamy border-primary/20 whitespace-nowrap">
+                <Link to="/memorization-verses">
+                  <BookMarked className="h-4 w-4 mr-2" />
+                  <span className="hidden sm:inline">My Memorization Verses</span>
+                  <span className="sm:hidden">Memorization</span>
+                </Link>
+              </Button>
+            </div>
           </div>
+
+          <StudyBibleDemoDialog open={demoOpen} onOpenChange={setDemoOpen} />
 
           {/* Navigation */}
           <div className="mb-6 sm:mb-8">
