@@ -494,12 +494,24 @@ export const palaceFloors: Floor[] = [
         id: "tz",
         name: "Time Zone",
         tag: "TZ",
-        purpose: "Locate the text in Heaven/Earth × Past/Now/Future (6 zones).",
-        coreQuestion: "Where does this event sit in God's timeline?",
-        method: "Choose 1–2 zones and justify: Earth-Past, Earth-Now, Earth-Future, Heaven-Past, Heaven-Now, Heaven-Future.",
-        examples: ["Ex 12 → Earth-Past; Heb 9 → Heaven-Now; Rev 21 → Heaven-Future"],
-        pitfalls: ["Confusing near/far fulfillments"],
-        deliverable: "TZ tag + one sentence"
+        purpose: "The Time Zone Room trains you to view ANY biblical text through the lens of the six time zones—Heaven-Past, Heaven-Present, Heaven-Future, Earth-Past, Earth-Present, Earth-Future. This is not about locating WHERE a text is positioned in history, but about understanding a text WITHIN THE CONTEXT of any or all of the six zones. For example, Phil 2:5 ('Let this mind be in you which was also in Christ Jesus') can be understood through Heaven-Past (Lucifer rejected the mind of Christ, leading to his fall), or through Earth-Future (those sealed at the end of time must have the mind of Christ). The power of TZ is that it allows you to see how a single verse resonates across multiple temporal-spatial dimensions. In Principles Mode, you must choose a SPECIFIC time zone and explain how the text speaks within that particular context.",
+        coreQuestion: "How does this text speak when viewed through the lens of a specific time zone?",
+        method: "STEP-BY-STEP METHODOLOGY:\n\n1️⃣ READ the passage you're studying\n\n2️⃣ SELECT one specific time zone to explore:\n   • Heaven-Past: Events before earth's creation (Lucifer's rebellion, war in heaven, divine counsel)\n   • Heaven-Present: Current heavenly realities (Christ's intercession, sanctuary ministry, angelic activity)\n   • Heaven-Future: Final heavenly realities (new heaven, eternal throne, no more temple)\n   • Earth-Past: Historical biblical events already fulfilled\n   • Earth-Present: Current application to believers living now\n   • Earth-Future: End-time events, Second Coming, millennial reign, new earth\n\n3️⃣ EXPLAIN how the text speaks within that chosen time zone context\n   • What does this passage reveal about that time zone?\n   • How does viewing it through this lens deepen understanding?\n\n4️⃣ OPTIONALLY explore the same text through additional time zones for richer insight\n\n🔑 KEY PRINCIPLES:\n• TZ is a LENS, not a LOCATION—you're not determining when the text was written, but HOW it speaks across time zones\n• The same text can legitimately speak to multiple time zones\n• In Principles Mode, you MUST name which specific zone you're using\n• Don't confuse this with historicist timeline placement—that's Prophecy Room (PR) territory\n• TZ reveals how biblical truths resonate across past, present, and future in both earthly and heavenly realms",
+        examples: [
+          "Philippians 2:5-8 ('Let this mind be in you...') viewed through multiple zones:\n→ HEAVEN-PAST: Shows Christ's pre-incarnate humility—He didn't grasp equality with God as robbery\n→ EARTH-PAST: Historical incarnation—Christ took servant form, became obedient to death\n→ EARTH-PRESENT: Current application—believers must cultivate this same humble mindset today\n→ EARTH-FUTURE: Those sealed in the final crisis will have fully developed this mind of Christ\n→ HEAVEN-PAST (contrast): Lucifer REJECTED this mindset, grasping for equality through rebellion",
+          
+          "Exodus 12 (Passover) through time zones:\n→ EARTH-PAST: Historical deliverance from Egypt via lamb's blood\n→ EARTH-PRESENT: Christ our Passover has been sacrificed for us (1 Cor 5:7)—we apply His blood by faith now\n→ EARTH-FUTURE: Final Passover fulfillment at Second Coming—deliverance from this world\n→ HEAVEN-PRESENT: Christ's blood pleads in heavenly sanctuary on our behalf\n→ HEAVEN-FUTURE: Lamb on the throne in New Jerusalem (Rev 22)",
+          
+          "Revelation 12:7-9 (War in Heaven):\n→ HEAVEN-PAST: Lucifer's original rebellion and expulsion from heaven before earth's creation\n→ EARTH-PAST: Satan's defeat at Calvary—'now is the prince of this world cast out' (John 12:31)\n→ EARTH-PRESENT: Ongoing spiritual warfare—'the accuser of our brethren' still active\n→ EARTH-FUTURE: Satan's final defeat and confinement (Rev 20)\n→ HEAVEN-FUTURE: No more Satan—perfect peace in new creation"
+        ],
+        pitfalls: [
+          "CONFUSING TZ WITH HISTORICAL PLACEMENT: This isn't about dating when something happened, but viewing it through temporal-spatial contexts",
+          "FORCING ZONES: Not every text naturally speaks to all six zones—some fit better in certain zones than others",
+          "FAILING TO NAME THE ZONE: In Principles Mode, you must explicitly state WHICH zone you're using",
+          "MIXING UP WITH PROPHECY ROOM: PR is about prophetic timelines; TZ is about interpretive lenses across time-space",
+          "VAGUE APPLICATION: 'This applies to us today' isn't enough—explain HOW the text speaks within that specific zone"
+        ],
+        deliverable: "TZ note: [Specific zone chosen] + 2-3 sentences explaining how the text speaks within that zone's context. Optional: Additional zones explored with brief explanations."
       },
       {
         id: "prm",

@@ -909,10 +909,11 @@ export const PALACE_SCHEMA = `
 **Floor Context:** The Theme Room organizes Scripture along the great walls and ceilings of biblical architecture. Think of a palace with main structural supports. Placing texts on these "walls" prevents you from scattering them randomly.
 
 ### TZ - Time Zone
-**Purpose:** Place events in God's prophetic timeline
-**Core Question:** When is this in God's calendar?
-**METHOD:** Label: Creation, Patriarchs, Exodus, Conquest, Kingdom, Exile, Return, Intertestamental, Christ's First Coming, Church Age, Christ's Second Coming, New Earth.
-**Floor Context:** The Time Zone Room locates passages across three tenses: past, present, and future, and two levels: Heaven and Earth, for a total of 6 time zones. This is like tracking flights on a radar screen. Each verse is either landed, in-flight, or scheduled to arrive.
+**Purpose:** View ANY text through the lens of the 6 time zones (Heaven/Earth × Past/Present/Future)
+**Core Question:** How does this text speak when viewed through the lens of a specific time zone?
+**METHOD:** Choose ONE specific zone: Heaven-Past • Heaven-Present • Heaven-Future • Earth-Past • Earth-Present • Earth-Future. Explain how the text speaks within that zone's context. Example: Phil 2:5 through Heaven-Past (Lucifer rejected the mind of Christ) OR Earth-Future (sealed saints must have this mind).
+**⚠️ CRITICAL:** This is NOT about locating WHERE a text is positioned in history—that's timeline placement. TZ is about viewing a text THROUGH THE CONTEXT of any time zone. The same verse can be understood through multiple zones. You must NAME which specific zone you're using.
+**Floor Context:** The Time Zone Room is a lens, not a location tool. It views passages across Heaven and Earth, each in three temporal dimensions (Past/Present/Future), creating 6 interpretive contexts. Any text can be understood through one or more of these zones.
 
 ### PRm - Patterns Room
 **Purpose:** Identify recurring motifs
