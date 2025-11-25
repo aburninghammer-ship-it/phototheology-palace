@@ -8,6 +8,7 @@ interface DirectMessagesContextType {
   setActiveConversationId: (id: string | null) => void;
   startConversation: (otherUserId: string) => Promise<string>;
   sendMessage: (content: string, images?: string[]) => Promise<void>;
+  sendNudge: () => Promise<void>;
   updateTypingIndicator: (isTyping: boolean) => Promise<void>;
   typingUsers: Set<string>;
   isLoading: boolean;

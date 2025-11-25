@@ -13,8 +13,14 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
-import { MessageCircle, Users as UsersIcon, X } from 'lucide-react';
+import { MessageCircle, Users as UsersIcon, X, BellRing } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 export const MessagingSidebar = () => {
   const { state, toggleSidebar, open, setOpen, isMobile } = useSidebar();
@@ -27,6 +33,7 @@ export const MessagingSidebar = () => {
     setActiveConversationId,
     startConversation,
     sendMessage,
+    sendNudge,
     updateTypingIndicator,
     typingUsers,
     isLoading
@@ -345,6 +352,23 @@ export const MessagingSidebar = () => {
                       </p>
                     )}
                   </div>
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={sendNudge}
+                          className="h-8 w-8 hover:bg-accent"
+                        >
+                          <BellRing className="h-4 w-4" />
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>Send a nudge 👋</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
                 </div>
 
                  {/* Messages */}

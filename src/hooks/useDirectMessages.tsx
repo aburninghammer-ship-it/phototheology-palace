@@ -282,6 +282,54 @@ export const useDirectMessages = () => {
     }
   }, [user, activeConversationId, toast]);
 
+  // Send a nudge notification
+  const sendNudge = useCallback(async () => {
+    if (!user || !activeConversationId) return;
+
+    const conversation = conversations.find(c => c.id === activeConversationId);
+    if (!conversation) return;
+
+    const recipientId = conversation.participant1_id === user.id 
+      ? conversation.participant2_id 
+      : conversation.participant1_id;
+
+    try {
+      // Get sender's profile for display name
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('display_name')
+        .eq('id', user.id)
+        .single();
+
+      // Create a nudge notification
+      const { error } = await supabase
+        .from('notifications')
+        .insert({
+          user_id: recipientId,
+          type: 'nudge',
+          title: '👋 Nudge!',
+          message: `${profile?.display_name || 'Someone'} is waiting for your reply`,
+          metadata: {
+            conversation_id: activeConversationId,
+            sender_id: user.id
+          }
+        });
+
+      if (error) throw error;
+
+      toast({
+        title: 'Nudge sent! 👋',
+        description: 'They\'ll get a notification'
+      });
+    } catch (error: any) {
+      toast({
+        title: 'Failed to send nudge',
+        description: error.message || 'Please try again',
+        variant: 'destructive'
+      });
+    }
+  }, [user, activeConversationId, conversations, toast]);
+
   // Update typing indicator
   const updateTypingIndicator = useCallback(async (isTyping: boolean) => {
     if (!user || !activeConversationId) return;
@@ -477,6 +525,7 @@ export const useDirectMessages = () => {
     setActiveConversationId,
     startConversation,
     sendMessage,
+    sendNudge,
     updateTypingIndicator,
     typingUsers,
     isLoading,
