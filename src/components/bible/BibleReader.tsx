@@ -25,6 +25,10 @@ import { ApologeticsPanel } from "./ApologeticsPanel";
 import { PTCodeSearch } from "./PTCodeSearch";
 import { ThematicTagging } from "./ThematicTagging";
 import { ThemeCrossReference } from "./ThemeCrossReference";
+import { MemoryToolsPanel } from "./MemoryToolsPanel";
+import { StudyModeSelector } from "./StudyModeSelector";
+import { UserMetricsDashboard } from "./UserMetricsDashboard";
+import { DimensionFilter } from "./DimensionFilter";
 
 export const BibleReader = () => {
   const { book = "John", chapter: chapterParam = "3" } = useParams();
@@ -37,6 +41,16 @@ export const BibleReader = () => {
   const [selectedVerse, setSelectedVerse] = useState<number | null>(null);
   const [highlightedVerses, setHighlightedVerses] = useState<number[]>([]);
   const [importDialogOpen, setImportDialogOpen] = useState(false);
+  const [activeDimensions, setActiveDimensions] = useState<string[]>(["1D", "2D", "3D", "4D", "5D"]);
+  const [studyMode, setStudyMode] = useState<"beginner" | "advanced" | "apologetics">("advanced");
+  
+  const toggleDimension = (dimension: string) => {
+    setActiveDimensions(prev =>
+      prev.includes(dimension)
+        ? prev.filter(d => d !== dimension)
+        : [...prev, dimension]
+    );
+  };
   
   const {
     selectedVerses,
@@ -313,7 +327,11 @@ export const BibleReader = () => {
 
       <div className="grid lg:grid-cols-3 gap-6">
         {/* Main Reading Pane */}
-        <div className="lg:col-span-2">
+        <div className="lg:col-span-2 space-y-6">
+          {/* Study Mode & Metrics */}
+          <StudyModeSelector activeMode={studyMode} onModeChange={setStudyMode} />
+          <UserMetricsDashboard />
+          
           <Card className={`p-6 shadow-elegant hover:shadow-hover transition-smooth ${preferences.reading_mode === 'focus' ? 'max-w-3xl mx-auto' : ''}`}>
             <div className={`space-y-4 ${fontSizeClass}`}>
               {strongsMode ? (
@@ -347,6 +365,14 @@ export const BibleReader = () => {
 
         {/* Right Panel - Dynamic based on mode */}
         <div className="lg:col-span-1 space-y-6" ref={jeevesRef}>
+          {/* Dimension Filter (Advanced Mode Only) */}
+          {studyMode === "advanced" && (
+            <DimensionFilter 
+              activeDimensions={activeDimensions}
+              onToggle={toggleDimension}
+            />
+          )}
+          
           {chainReferenceMode ? (
             <ChainReferencePanel
               book={book}
@@ -403,6 +429,14 @@ export const BibleReader = () => {
             </Card>
           ) : selectedVerse ? (
             <>
+              {/* Always show Memory Tools */}
+              <MemoryToolsPanel
+                book={book}
+                chapter={chapter}
+                verse={selectedVerse}
+                verseText={chapterData.verses.find(v => v.verse === selectedVerse)?.text || ""}
+              />
+              
               <PrinciplePanel
                 book={book}
                 chapter={chapter}
@@ -415,21 +449,33 @@ export const BibleReader = () => {
                 chapter={chapter}
                 verse={selectedVerse}
               />
-              <ApologeticsPanel
-                book={book}
-                chapter={chapter}
-                verse={selectedVerse}
-                verseText={chapterData.verses.find(v => v.verse === selectedVerse)?.text || ""}
-              />
-              <ThematicTagging
-                book={book}
-                chapter={chapter}
-                verse={selectedVerse}
-                verseText={chapterData.verses.find(v => v.verse === selectedVerse)?.text || ""}
-              />
-              <ThemeCrossReference
-                currentVerse={`${book} ${chapter}:${selectedVerse}`}
-              />
+              
+              {/* Apologetics Panel (Apologetics & Advanced modes) */}
+              {(studyMode === "apologetics" || studyMode === "advanced") && (
+                <ApologeticsPanel
+                  book={book}
+                  chapter={chapter}
+                  verse={selectedVerse}
+                  verseText={chapterData.verses.find(v => v.verse === selectedVerse)?.text || ""}
+                />
+              )}
+              
+              {/* Thematic Tagging (Advanced & Beginner modes) */}
+              {(studyMode === "advanced" || studyMode === "beginner") && (
+                <ThematicTagging
+                  book={book}
+                  chapter={chapter}
+                  verse={selectedVerse}
+                  verseText={chapterData.verses.find(v => v.verse === selectedVerse)?.text || ""}
+                />
+              )}
+              
+              {/* Theme Cross-Reference (Advanced mode) */}
+              {studyMode === "advanced" && (
+                <ThemeCrossReference
+                  currentVerse={`${book} ${chapter}:${selectedVerse}`}
+                />
+              )}
             </>
           ) : (
             <Card className="p-6 text-center text-muted-foreground sticky top-24">
