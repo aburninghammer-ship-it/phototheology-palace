@@ -10,11 +10,13 @@ import { Image, Upload, X, Palette } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { GenerateImageDialog } from "./GenerateImageDialog";
 
 interface VerseImageAttachmentProps {
   book: string;
   chapter: number;
   verse: number;
+  verseText?: string;
 }
 
 const FLOOR_COLORS = [
@@ -28,7 +30,7 @@ const FLOOR_COLORS = [
   { floor: 8, name: "Floor 8 - Master", color: "gradient-royal" },
 ];
 
-export const VerseImageAttachment = ({ book, chapter, verse }: VerseImageAttachmentProps) => {
+export const VerseImageAttachment = ({ book, chapter, verse, verseText = "" }: VerseImageAttachmentProps) => {
   const [images, setImages] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
@@ -147,18 +149,18 @@ export const VerseImageAttachment = ({ book, chapter, verse }: VerseImageAttachm
       </div>
 
       <p className="text-xs text-muted-foreground">
-        Attach images to create mental palace visual anchors for this verse
+        Generate or upload images to create mental palace visual anchors for this verse
       </p>
 
-      {/* Upload Section */}
+      {/* Image Generation and Upload Section */}
       <div className="space-y-3">
         <div>
-          <Label htmlFor="description" className="text-xs">Description</Label>
+          <Label htmlFor="description" className="text-xs">Description (Optional)</Label>
           <Textarea
             id="description"
             value={description}
             onChange={(e) => setDescription(e.target.value)}
-            placeholder="Describe what this image represents..."
+            placeholder="Describe what this image should represent..."
             className="text-xs"
             rows={2}
           />
@@ -183,15 +185,22 @@ export const VerseImageAttachment = ({ book, chapter, verse }: VerseImageAttachm
           </Select>
         </div>
 
-        <div>
+        <div className="grid grid-cols-2 gap-2">
+          <GenerateImageDialog
+            verseRef={verseRef}
+            verseText={verseText}
+            selectedFloor={selectedFloor}
+            description={description}
+            onSuccess={loadImages}
+          />
+
           <Label htmlFor="image-upload" className="cursor-pointer">
-            <div className="border-2 border-dashed rounded-lg p-4 hover:bg-accent/5 transition-colors text-center">
-              <Upload className="h-8 w-8 mx-auto mb-2 text-muted-foreground" />
-              <p className="text-xs text-muted-foreground">
-                Click to upload or drag and drop
-              </p>
-              <p className="text-xs text-muted-foreground mt-1">PNG, JPG up to 10MB</p>
-            </div>
+            <Button variant="outline" size="sm" className="w-full" asChild>
+              <div>
+                <Upload className="h-4 w-4 mr-2" />
+                Upload Image
+              </div>
+            </Button>
             <Input
               id="image-upload"
               type="file"
