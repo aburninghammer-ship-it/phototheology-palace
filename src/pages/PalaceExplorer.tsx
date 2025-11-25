@@ -3,7 +3,8 @@ import { PalaceMap } from "@/components/bible/PalaceMap";
 import { ThemeCrossReference } from "@/components/bible/ThemeCrossReference";
 import { PTCodeSearch } from "@/components/bible/PTCodeSearch";
 import { Card } from "@/components/ui/card";
-import { Building2, Info } from "lucide-react";
+import { HowItWorksDialog } from "@/components/HowItWorksDialog";
+import { Building2, Info, Map, Search, Tag, BookOpen } from "lucide-react";
 
 export default function PalaceExplorer() {
   const [selectedRoom, setSelectedRoom] = useState<{code: string; name: string} | null>(null);
@@ -16,11 +17,58 @@ export default function PalaceExplorer() {
     <div className="container mx-auto p-6 space-y-6">
       {/* Header */}
       <div className="space-y-2">
-        <div className="flex items-center gap-3">
-          <Building2 className="h-8 w-8 text-primary" />
-          <h1 className="font-serif text-4xl font-bold bg-gradient-palace bg-clip-text text-transparent">
-            Palace Explorer
-          </h1>
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <Building2 className="h-8 w-8 text-primary" />
+            <h1 className="font-serif text-4xl font-bold bg-gradient-palace bg-clip-text text-transparent">
+              Palace Explorer
+            </h1>
+          </div>
+          <HowItWorksDialog
+            title="How to Use Palace Explorer"
+            steps={[
+              {
+                title: "Interactive Palace Map",
+                description: "Click on any floor or room in the visual palace map to explore its details and associated principles.",
+                highlights: [
+                  "8 floors representing PT levels",
+                  "Click rooms to see details",
+                  "Visual navigation system"
+                ],
+                icon: Map,
+              },
+              {
+                title: "PT Code Search",
+                description: "Search for any Phototheology code (like @Mo, CR, TRm) to instantly find its meaning, floor location, and related principles.",
+                highlights: [
+                  "Search by code or name",
+                  "Find floors and rooms",
+                  "Learn principle meanings"
+                ],
+                icon: Search,
+              },
+              {
+                title: "Selected Room Details",
+                description: "When you click a room on the map, its name and code appear in the left panel for quick reference.",
+                highlights: [
+                  "Shows room code",
+                  "Displays full name",
+                  "Quick identification"
+                ],
+                icon: Tag,
+              },
+              {
+                title: "Theme Cross-Reference",
+                description: "Use the theme selector to see how different biblical themes connect across the palace structure.",
+                highlights: [
+                  "Browse by theme",
+                  "See cross-connections",
+                  "Understand relationships"
+                ],
+                icon: BookOpen,
+              },
+            ]}
+          />
         </div>
         <p className="text-muted-foreground">
           Navigate the Phototheology Palace, search rooms, and discover theme connections

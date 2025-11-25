@@ -8,102 +8,97 @@ import {
   ChevronLeft, 
   BookOpen, 
   MessageSquare, 
-  Download,
-  Lightbulb,
+  Languages,
   Search,
-  Sparkles
+  Code,
+  Layers,
+  Sparkles,
+  Filter
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
 const demoSteps = [
   {
     title: "Welcome to Study Bible",
-    description: "The Study Bible is your AI-powered companion for deep biblical study using the Phototheology Palace Method.",
+    description: "Your comprehensive Bible study tool with Phototheology integration. Let's explore the key features.",
     highlights: [
-      "Access 66 books of the Bible",
-      "AI-powered analysis through Palace Rooms",
-      "Export your studies",
-      "Chat with Jeeves, your study partner"
+      "Multiple translations available",
+      "AI-powered study tools",
+      "Phototheology principle analysis"
     ],
-    icon: BookOpen
+    icon: BookOpen,
   },
   {
-    title: "Select Your Passage",
-    description: "Start by choosing any book, chapter, and verse from the Bible. The interface makes it easy to navigate through Scripture.",
+    title: "Choose Your Translation",
+    description: "Select from multiple Bible translations using the dropdown at the top of the page. Switch between KJV, NIV, ESV, and more.",
     highlights: [
-      "Choose from all 66 books",
-      "Navigate by chapter and verse",
-      "View the selected passage in KJV",
-      "Context is preserved throughout"
+      "Translation selector in header",
+      "Compare different versions",
+      "Instant chapter reload"
     ],
-    icon: Search
+    icon: Languages,
   },
   {
-    title: "Choose Your Analysis Mode",
-    description: "Select between Rooms Mode (explore through specific Palace rooms) or Principles Mode (apply specific interpretive principles).",
+    title: "Word Search",
+    description: "Use the search bar to find specific words or phrases across the entire Bible. Results show context and verse references.",
     highlights: [
-      "Rooms Mode: Story Room, Symbols, Sanctuary, etc.",
-      "Principles Mode: Time Zones, Dimensions, Cycles, etc.",
-      "Each provides unique insights",
-      "Switch modes anytime"
+      "Search any word or phrase",
+      "See all occurrences",
+      "Jump directly to verses"
     ],
-    icon: Lightbulb
+    icon: Search,
   },
   {
-    title: "Get AI Analysis",
-    description: "Click 'Analyze with Jeeves' and receive comprehensive biblical analysis using Phototheology methodology.",
+    title: "PT Codes Search",
+    description: "Search for Phototheology codes (like @Mo, CR, TRm) to find principles and rooms. Quickly access the PT framework.",
     highlights: [
-      "Instant AI-powered insights",
-      "Follows Palace Method principles",
-      "Christ-centered interpretation",
-      "Multiple perspectives on the text"
+      "Search all PT codes",
+      "Find floors and rooms",
+      "Learn principle meanings"
     ],
-    icon: Sparkles
+    icon: Code,
   },
   {
-    title: "Explore Room Analysis",
-    description: "In Rooms Mode, see how different Palace Rooms reveal unique aspects of the passage. Each room answers a specific question.",
+    title: "Study Modes",
+    description: "Toggle powerful study modes using buttons above the text: Strong's Numbers, Principle Links, Chain References, and Commentary.",
     highlights: [
-      "Story Room: What happened and in what order?",
-      "Symbols Room: What do the types point to?",
-      "Sanctuary Room: How does it map to Christ?",
-      "And many more rooms to explore"
+      "Strong's - Original language",
+      "Principles - PT analysis",
+      "Links - Cross-references",
+      "Commentary - Insights"
     ],
-    icon: BookOpen
+    icon: Layers,
   },
   {
-    title: "Apply Principles",
-    description: "In Principles Mode, you MUST choose specific principles (like Earth-Future or Heaven-Past for Time Zones). Jeeves applies them to reveal deeper meaning.",
+    title: "Principle Modes",
+    description: "In Principle Links, choose 'Ask Jeeves' for AI questions or 'Scan Chapter' to find all verses where a PT principle applies.",
     highlights: [
-      "Select specific principles (required)",
-      "Time Zones: View text through 6 contexts",
-      "Dimensions: 5D interpretation",
-      "Cycles: Place in redemption history"
+      "Ask Jeeves - Verse Q&A",
+      "Scan Chapter - Auto-detect",
+      "Select any PT principle"
     ],
-    icon: Lightbulb
+    icon: Sparkles,
   },
   {
-    title: "Chat with Jeeves",
-    description: "Have a conversation with Jeeves about your passage. Ask questions, dig deeper, or explore connections to other Scripture.",
+    title: "Commentary Panel",
+    description: "Select a verse and enable Commentary mode to read traditional insights, historical background, and cultural context.",
     highlights: [
-      "Ask follow-up questions",
-      "Explore cross-references",
-      "Request deeper analysis",
-      "Get clarification on concepts"
+      "Select any verse",
+      "Toggle Commentary button",
+      "Read expert analysis"
     ],
-    icon: MessageSquare
+    icon: MessageSquare,
   },
   {
-    title: "Export Your Study",
-    description: "Save your complete analysis as a Markdown file. Includes verse text, principles, room analysis, and all insights.",
+    title: "Dimension Filter",
+    description: "Apply the 5-Dimension filter to view verses through different lenses: Literal, Christ, Me, Church, and Heaven.",
     highlights: [
-      "Download as .md file",
-      "Includes all analysis",
-      "Share with others",
-      "Build your study library"
+      "5 layers of meaning",
+      "Toggle multiple dimensions",
+      "Combine for deeper study"
     ],
-    icon: Download
-  }
+    icon: Filter,
+  },
 ];
 
 interface StudyBibleDemoDialogProps {
