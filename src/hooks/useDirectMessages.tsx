@@ -221,19 +221,8 @@ export const useDirectMessages = () => {
 
   // Send a message
   const sendMessage = useCallback(async (content: string, images?: string[]) => {
-    console.log('=== SENDING MESSAGE ===');
-    console.log('User:', user?.id);
-    console.log('Active Conversation:', activeConversationId);
-    console.log('Content:', content.trim());
-    console.log('Images:', images?.length || 0);
-    
-    if (!user) {
-      console.error('❌ No user found');
-      return;
-    }
-    
+    if (!user) return;
     if (!activeConversationId) {
-      console.error('❌ No active conversation');
       toast({
         title: 'Error',
         description: 'No active conversation selected',
@@ -241,14 +230,23 @@ export const useDirectMessages = () => {
       });
       return;
     }
+    if (!content.trim() && (!images || images.length === 0)) return;
+
+    // Optimistic update - add message to UI immediately
+    const optimisticMessage: Message = {
+      id: `temp-${Date.now()}`,
+      conversation_id: activeConversationId,
+      sender_id: user.id,
+      content: content.trim(),
+      images: images || undefined,
+      created_at: new Date().toISOString(),
+      is_deleted: false,
+      read_by: []
+    };
     
-    if (!content.trim() && (!images || images.length === 0)) {
-      console.error('❌ Empty message');
-      return;
-    }
+    setMessages(prev => [...prev, optimisticMessage]);
 
     try {
-      console.log('📤 Inserting message into database...');
       const { data, error } = await supabase
         .from('messages')
         .insert({
@@ -260,27 +258,22 @@ export const useDirectMessages = () => {
         .select()
         .single();
 
-      if (error) {
-        console.error('❌ Database error:', error);
-        throw error;
-      }
+      if (error) throw error;
       
-      console.log('✅ Message inserted successfully:', data);
+      // Replace optimistic message with real one
+      setMessages(prev => prev.map(msg => 
+        msg.id === optimisticMessage.id ? { ...data, read_by: [] } : msg
+      ));
 
-      // Update conversation timestamp
-      console.log('📅 Updating conversation timestamp...');
-      const { error: updateError } = await supabase
+      // Update conversation timestamp in background (non-blocking)
+      supabase
         .from('conversations')
         .update({ updated_at: new Date().toISOString() })
-        .eq('id', activeConversationId);
-
-      if (updateError) {
-        console.error('⚠️ Failed to update conversation timestamp:', updateError);
-      } else {
-        console.log('✅ Conversation timestamp updated');
-      }
+        .eq('id', activeConversationId)
+        .then();
     } catch (error: any) {
-      console.error('❌ Error sending message:', error);
+      // Remove optimistic message on error
+      setMessages(prev => prev.filter(msg => msg.id !== optimisticMessage.id));
       toast({
         title: 'Failed to send message',
         description: error.message || 'Please try again',
