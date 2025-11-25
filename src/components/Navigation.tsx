@@ -5,7 +5,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { useActiveUsers } from "@/hooks/useActiveUsers";
 import { EnhancedMobileDrawer } from "@/components/EnhancedMobileDrawer";
 import { useSidebar } from "@/components/ui/sidebar";
-import { useDirectMessages } from "@/hooks/useDirectMessages";
+import { useDirectMessagesContext } from "@/contexts/DirectMessagesContext";
 import { Badge } from "@/components/ui/badge";
 import { NotificationCenter } from "@/components/NotificationCenter";
 import { PWAInstallButton } from "@/components/PWAInstallButton";
@@ -24,7 +24,7 @@ export const Navigation = () => {
   const { user, signOut, loading } = useAuth();
   const { activeCount } = useActiveUsers();
   const { toggleSidebar } = useSidebar();
-  const { conversations } = useDirectMessages();
+  const { conversations } = useDirectMessagesContext();
   
   const totalUnread = conversations.reduce((sum, c) => sum + c.unread_count, 0);
 

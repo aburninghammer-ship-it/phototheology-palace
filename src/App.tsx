@@ -13,6 +13,7 @@ import { SidebarProvider } from "@/components/ui/sidebar";
 import { MessagingSidebar } from "@/components/MessagingSidebar";
 import { LiveNotificationsProvider } from "@/components/LiveNotificationsProvider";
 import { AchievementProvider } from "@/components/AchievementProvider";
+import { DirectMessagesProvider } from "@/contexts/DirectMessagesContext";
 import { SplashScreen } from "@/components/SplashScreen";
 import { AnimatePresence } from "framer-motion";
 import { ThemeProvider } from "next-themes";
@@ -182,7 +183,8 @@ function App() {
             <BrowserRouter>
               <LiveNotificationsProvider>
                 <AchievementProvider>
-                  <UserPreferencesProvider>
+                  <DirectMessagesProvider>
+                    <UserPreferencesProvider>
                     <SidebarProvider defaultOpen={false}>
                       <div className="min-h-screen flex w-full">
                         <MessagingSidebar />
@@ -383,7 +385,8 @@ function App() {
                   </main>
                 </div>
               </SidebarProvider>
-            </UserPreferencesProvider>
+              </UserPreferencesProvider>
+            </DirectMessagesProvider>
           </AchievementProvider>
         </LiveNotificationsProvider>
       </BrowserRouter>

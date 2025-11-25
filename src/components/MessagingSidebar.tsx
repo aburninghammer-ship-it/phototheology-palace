@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { useDirectMessages } from '@/hooks/useDirectMessages';
+import { useDirectMessagesContext } from '@/contexts/DirectMessagesContext';
 import { useAuth } from '@/hooks/useAuth';
 import { useActiveUsers } from '@/hooks/useActiveUsers';
 import { ChatInput } from '@/components/ChatInput';
@@ -30,7 +30,7 @@ export const MessagingSidebar = () => {
     updateTypingIndicator,
     typingUsers,
     isLoading
-  } = useDirectMessages();
+  } = useDirectMessagesContext();
 
   const [activeTab, setActiveTab] = useState<'active' | 'conversations'>('active');
   const messagesEndRef = useRef<HTMLDivElement>(null);
