@@ -97,6 +97,39 @@ const PRINCIPLE_OPTIONS = [
   { id: "re", label: "Remnant Cycle (@Re)", color: "gradient-palace" },
   // Note: Juice Room (JR) intentionally excluded - only for whole books, not verses
   
+  // Time Zones (Six Zones)
+  { id: "heaven-past", label: "Heaven-Past", color: "gradient-sunset" },
+  { id: "heaven-now", label: "Heaven-Now", color: "gradient-warmth" },
+  { id: "heaven-future", label: "Heaven-Future", color: "gradient-palace" },
+  { id: "earth-past", label: "Earth-Past", color: "gradient-ocean" },
+  { id: "earth-now", label: "Earth-Now", color: "gradient-royal" },
+  { id: "earth-future", label: "Earth-Future", color: "gradient-sunset" },
+  
+  // Sanctuary Articles
+  { id: "gate", label: "Gate", color: "gradient-warmth" },
+  { id: "altar", label: "Altar of Sacrifice", color: "gradient-palace" },
+  { id: "laver", label: "Laver", color: "gradient-ocean" },
+  { id: "lampstand", label: "Golden Lampstand", color: "gradient-royal" },
+  { id: "table", label: "Table of Shewbread", color: "gradient-sunset" },
+  { id: "incense", label: "Altar of Incense", color: "gradient-warmth" },
+  { id: "veil", label: "Veil", color: "gradient-palace" },
+  { id: "ark", label: "Ark of the Covenant", color: "gradient-ocean" },
+  
+  // Feasts
+  { id: "passover", label: "Passover", color: "gradient-royal" },
+  { id: "unleavened-bread", label: "Unleavened Bread", color: "gradient-sunset" },
+  { id: "firstfruits", label: "Firstfruits", color: "gradient-warmth" },
+  { id: "pentecost", label: "Pentecost", color: "gradient-palace" },
+  { id: "trumpets", label: "Trumpets", color: "gradient-ocean" },
+  { id: "atonement", label: "Day of Atonement", color: "gradient-royal" },
+  { id: "tabernacles", label: "Feast of Tabernacles", color: "gradient-sunset" },
+  
+  // Walls (Theme Room Structure)
+  { id: "sanctuary-wall", label: "Sanctuary Wall", color: "gradient-warmth" },
+  { id: "life-of-christ-wall", label: "Life of Christ Wall", color: "gradient-palace" },
+  { id: "great-controversy-wall", label: "Great Controversy Wall", color: "gradient-ocean" },
+  { id: "time-prophecy-wall", label: "Time Prophecy Wall", color: "gradient-royal" },
+  
   // Floor 7 - Spiritual & Emotional (Transformation)
   { id: "frm", label: "Fire Room (FRm)", color: "gradient-royal" },
   { id: "mr", label: "Meditation Room (MR)", color: "gradient-sunset" },
