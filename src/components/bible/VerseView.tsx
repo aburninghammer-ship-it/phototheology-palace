@@ -1,7 +1,8 @@
 import { useState, useMemo } from "react";
 import { Verse } from "@/types/bible";
 import { Badge } from "@/components/ui/badge";
-import { Sparkles, Loader2, BookOpen } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Sparkles, Loader2, BookOpen, RefreshCw } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -76,12 +77,13 @@ export const VerseView = ({ verse, isSelected, onSelect, showPrinciples, isHighl
   const [selectedWord, setSelectedWord] = useState<string>("");
   const [wordAnalysis, setWordAnalysis] = useState<string>("");
   const [wordLoading, setWordLoading] = useState(false);
+  const [regenerateTrigger, setRegenerateTrigger] = useState(0);
   const { toast } = useToast();
 
-  // Generate dynamic principles for this verse (regenerates when showPrinciples toggles)
+  // Generate dynamic principles for this verse (regenerates when regenerateTrigger changes)
   const displayPrinciples = useMemo(
     () => principles || generateVersePrinciples(verse.verse),
-    [verse.verse, principles, showPrinciples]
+    [verse.verse, principles, regenerateTrigger]
   );
   
   const colors = ["bg-blue-600", "bg-green-600", "bg-orange-600", "bg-red-600"];
@@ -198,7 +200,7 @@ export const VerseView = ({ verse, isSelected, onSelect, showPrinciples, isHighl
             </p>
             
             {showPrinciples && (
-              <div className="flex gap-2 mt-2 flex-wrap">
+              <div className="flex gap-2 mt-2 flex-wrap items-center">
                 {displayPrinciples.map((principle, idx) => (
                   <Badge 
                     key={idx} 
@@ -210,6 +212,18 @@ export const VerseView = ({ verse, isSelected, onSelect, showPrinciples, isHighl
                     {principle}
                   </Badge>
                 ))}
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-6 w-6"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setRegenerateTrigger(prev => prev + 1);
+                  }}
+                  title="Regenerate principles"
+                >
+                  <RefreshCw className="h-3 w-3" />
+                </Button>
               </div>
             )}
           </div>
