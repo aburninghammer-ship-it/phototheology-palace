@@ -266,6 +266,12 @@ export const Navigation = () => {
                     Phototheology Study Bible
                   </Link>
                   <Link 
+                    to="/study-bible-demo" 
+                    className="px-3 py-1.5 text-sm font-medium text-foreground hover:text-primary hover:bg-accent/50 rounded-md transition-colors whitespace-nowrap flex items-center gap-1"
+                  >
+                    🎬 Study Bible Demo
+                  </Link>
+                  <Link 
                     to="/reading-plans" 
                     className="px-3 py-1.5 text-sm font-medium text-foreground hover:text-primary hover:bg-accent/50 rounded-md transition-colors whitespace-nowrap flex items-center gap-1"
                   >

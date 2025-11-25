@@ -14,6 +14,7 @@ import { Button } from "./ui/button";
 const searchItems = [
   // Study & Bible
   { title: "Bible Reader", path: "/bible", icon: BookOpen, category: "Study & Bible" },
+  { title: "Study Bible Demo", path: "/study-bible-demo", icon: Sparkles, category: "Study & Bible", badge: "New" },
   { title: "Memory Palace", path: "/palace", icon: BookMarked, category: "Study & Bible" },
   { title: "Bible Search", path: "/bible-search", icon: Search, category: "Study & Bible" },
   { title: "Bible Image Library", path: "/bible-image-library", icon: Image, category: "Study & Bible" },

@@ -159,6 +159,7 @@ const TermsOfService = lazy(() => import("./pages/TermsOfService"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 const AuthCallback = lazy(() => import("./pages/AuthCallback"));
 const PalaceExplorer = lazy(() => import("./pages/PalaceExplorer"));
+const StudyBibleDemo = lazy(() => import("./pages/StudyBibleDemo"));
 
 const queryClient = new QueryClient();
 
@@ -226,6 +227,7 @@ function App() {
             <Route path="/bible" element={<ProtectedRoute><Bible /></ProtectedRoute>} />
             <Route path="/bible/search" element={<ProtectedRoute><BibleSearch /></ProtectedRoute>} />
             <Route path="/bible/:book/:chapter" element={<ProtectedRoute><BibleChapter /></ProtectedRoute>} />
+            <Route path="/study-bible-demo" element={<ProtectedRoute><StudyBibleDemo /></ProtectedRoute>} />
             <Route path="/daily-verse" element={<ProtectedRoute><DailyVerse /></ProtectedRoute>} />
             <Route path="/reading-plans" element={<ProtectedRoute><ReadingPlans /></ProtectedRoute>} />
             <Route path="/bible-reference" element={<ProtectedRoute><BibleReference /></ProtectedRoute>} />

@@ -40,6 +40,7 @@ const categoryConfig = {
     icon: BookOpen,
     links: [
       { to: "/bible", label: "Phototheology Study Bible (PSB)", icon: "📖" },
+      { to: "/study-bible-demo", label: "📺 Study Bible Demo", icon: "🎬" },
       { to: "/reading-plans", label: "Reading Plans", icon: "📅" },
       { to: "/encyclopedia", label: "Encyclopedia", icon: "🔍" },
       { to: "/video-training", label: "Video Training", icon: "🎥" },
