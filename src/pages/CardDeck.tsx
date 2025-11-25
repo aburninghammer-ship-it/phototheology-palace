@@ -253,6 +253,49 @@ export default function CardDeck() {
     }
   }, [timerEnabled, isTimerActive, timeRemaining, toast]);
 
+  // Common Bible stories mapped to verse ranges
+  const storyMap: Record<string, { verses: string; chapters?: number }> = {
+    "creation": { verses: "Genesis 1-2", chapters: 2 },
+    "fall": { verses: "Genesis 3", chapters: 1 },
+    "noah": { verses: "Genesis 6-9", chapters: 4 },
+    "babel": { verses: "Genesis 11:1-9" },
+    "abraham": { verses: "Genesis 12-25", chapters: 14 },
+    "isaac": { verses: "Genesis 21-35", chapters: 15 },
+    "jacob": { verses: "Genesis 25-50", chapters: 26 },
+    "joseph": { verses: "Genesis 37-50", chapters: 14 },
+    "moses birth": { verses: "Exodus 2:1-10" },
+    "burning bush": { verses: "Exodus 3-4", chapters: 2 },
+    "plagues": { verses: "Exodus 7-12", chapters: 6 },
+    "exodus": { verses: "Exodus 12-15", chapters: 4 },
+    "red sea": { verses: "Exodus 14" },
+    "ten commandments": { verses: "Exodus 19-20", chapters: 2 },
+    "golden calf": { verses: "Exodus 32" },
+    "tabernacle": { verses: "Exodus 25-40", chapters: 16 },
+    "david goliath": { verses: "1 Samuel 17" },
+    "david": { verses: "1 Samuel 16-1 Kings 2", chapters: 30 },
+    "elijah": { verses: "1 Kings 17-2 Kings 2", chapters: 12 },
+    "daniel": { verses: "Daniel 1-12", chapters: 12 },
+    "fiery furnace": { verses: "Daniel 3" },
+    "lions den": { verses: "Daniel 6" },
+    "jonah": { verses: "Jonah 1-4", chapters: 4 },
+    "job": { verses: "Job 1-42", chapters: 42 },
+    "annunciation": { verses: "Luke 1:26-38" },
+    "nativity": { verses: "Luke 2:1-20" },
+    "baptism jesus": { verses: "Matthew 3:13-17" },
+    "temptation": { verses: "Matthew 4:1-11" },
+    "sermon mount": { verses: "Matthew 5-7", chapters: 3 },
+    "prodigal son": { verses: "Luke 15:11-32" },
+    "good samaritan": { verses: "Luke 10:25-37" },
+    "lazarus": { verses: "John 11" },
+    "triumphal entry": { verses: "Matthew 21:1-11" },
+    "last supper": { verses: "Matthew 26:17-30" },
+    "gethsemane": { verses: "Matthew 26:36-46" },
+    "crucifixion": { verses: "Matthew 27:32-56" },
+    "resurrection": { verses: "Matthew 28" },
+    "pentecost": { verses: "Acts 2" },
+    "conversion paul": { verses: "Acts 9:1-19" },
+  };
+
   const handleSetText = async () => {
     if (!verseInput.trim()) {
       toast({
@@ -263,14 +306,75 @@ export default function CardDeck() {
       return;
     }
     
-    // If it's a verse, fetch the actual text from the Bible API
-    if (textType === "verse") {
+    // Check if input matches a known story
+    if (textType === "story") {
+      const lowerInput = verseInput.toLowerCase().trim();
+      const matchedStory = Object.keys(storyMap).find(story => 
+        lowerInput.includes(story)
+      );
+      
+      if (matchedStory) {
+        const story = storyMap[matchedStory];
+        
+        // If story is too broad (more than 5 chapters), prompt user
+        if (story.chapters && story.chapters > 5) {
+          toast({
+            title: "Story too broad",
+            description: `The ${matchedStory} story spans ${story.chapters} chapters (${story.verses}). Please specify a particular section.`,
+            variant: "destructive",
+          });
+          setDisplayText(`Story: ${matchedStory}\nSpans: ${story.verses}\n\nPlease specify which section you'd like to study (e.g., "${matchedStory} beginning" or provide specific chapters).`);
+          return;
+        }
+        
+        // Fetch the story verses
+        try {
+          setIsLoading(true);
+          const verses = await searchBible(story.verses);
+          if (verses && verses.length > 0) {
+            const fullText = verses.map(v => v.text).join(" ");
+            setVerseText(fullText);
+            setDisplayText(`${story.verses} (${matchedStory}): ${fullText}`);
+            toast({
+              title: "Story verses loaded",
+              description: `Retrieved ${verses.length} verse${verses.length > 1 ? 's' : ''} for ${matchedStory}`,
+            });
+          } else {
+            setVerseText(story.verses);
+            setDisplayText(`${story.verses} (${matchedStory})`);
+            toast({
+              title: "Story reference set",
+              description: "Could not fetch verse text. Using reference only.",
+            });
+          }
+        } catch (error) {
+          console.error("Error fetching story verses:", error);
+          setVerseText(story.verses);
+          setDisplayText(`${story.verses} (${matchedStory})`);
+          toast({
+            title: "Error fetching verses",
+            description: "Using reference only. Please check your connection.",
+            variant: "destructive",
+          });
+        } finally {
+          setIsLoading(false);
+        }
+      } else {
+        // No match found, just use entered text
+        setVerseText(verseInput);
+        setDisplayText(verseInput);
+        toast({
+          title: "Story set",
+          description: "Custom story text entered.",
+        });
+      }
+    } else {
+      // For verses, fetch the actual text from the Bible API
       try {
         setIsLoading(true);
         const verses = await searchBible(verseInput);
         
         if (verses && verses.length > 0) {
-          // Combine all verses into a single text
           const fullText = verses.map(v => v.text).join(" ");
           setVerseText(fullText);
           setDisplayText(`${verseInput}: ${fullText}`);
@@ -279,7 +383,6 @@ export default function CardDeck() {
             description: `Retrieved ${verses.length} verse${verses.length > 1 ? 's' : ''}`,
           });
         } else {
-          // Fallback to just using the reference if API fails
           setVerseText(verseInput);
           setDisplayText(verseInput);
           toast({
@@ -300,10 +403,6 @@ export default function CardDeck() {
       } finally {
         setIsLoading(false);
       }
-    } else {
-      // For stories, just use the entered text
-      setVerseText(verseInput);
-      setDisplayText(verseInput);
     }
     
     broadcastTextSet();
@@ -726,9 +825,65 @@ export default function CardDeck() {
                 <div className="text-sm text-muted-foreground mb-2">
                   {textType === "verse" ? "Selected Verse:" : "Selected Story:"}
                 </div>
-                <div className="text-lg font-medium">
+                <div className="text-lg font-medium whitespace-pre-wrap mb-4">
                   {displayText}
                 </div>
+                
+                {/* Study Tools Links */}
+                {displayText.includes(":") && (
+                  <div className="pt-4 border-t border-border/30">
+                    <p className="text-xs text-muted-foreground mb-2">Study Tools:</p>
+                    <div className="flex flex-wrap gap-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="text-xs h-8"
+                        onClick={() => {
+                          const ref = displayText.split(":")[0].trim();
+                          window.open(`https://www.blueletterbible.org/search/search.cfm?Criteria=${encodeURIComponent(ref)}&t=KJV`, '_blank');
+                        }}
+                      >
+                        Hebrew/Greek
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="text-xs h-8"
+                        onClick={() => {
+                          const ref = displayText.split(":")[0].trim();
+                          const urlRef = ref.toLowerCase().replace(/\s+/g, '_').replace(/:/g, '-');
+                          window.open(`https://biblehub.com/interlinear/${encodeURIComponent(urlRef)}.htm`, '_blank');
+                        }}
+                      >
+                        Interlinear
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="text-xs h-8"
+                        onClick={() => {
+                          const ref = displayText.split(":")[0].trim();
+                          const urlRef = ref.toLowerCase().replace(/\s+/g, '_').replace(/:/g, '-');
+                          window.open(`https://biblehub.com/commentaries/${encodeURIComponent(urlRef)}.htm`, '_blank');
+                        }}
+                      >
+                        Commentaries
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="text-xs h-8"
+                        onClick={() => {
+                          const ref = displayText.split(":")[0].trim();
+                          const urlRef = ref.toLowerCase().replace(/\s+/g, '_').replace(/:/g, '-');
+                          window.open(`https://biblehub.com/crossref/${encodeURIComponent(urlRef)}.htm`, '_blank');
+                        }}
+                      >
+                        Cross References
+                      </Button>
+                    </div>
+                  </div>
+                )}
               </CardContent>
             </Card>
           )}
