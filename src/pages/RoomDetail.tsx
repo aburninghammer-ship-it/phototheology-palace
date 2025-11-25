@@ -137,12 +137,7 @@ export default function RoomDetail() {
     }
   };
 
-  // Redirect if room is locked
-  useEffect(() => {
-    if (!unlockLoading && !isUnlocked && user) {
-      navigate(`/palace/floor/${floorNumber}`);
-    }
-  }, [isUnlocked, unlockLoading, user, navigate, floorNumber]);
+  // Don't redirect - let users see why room is locked
 
   if (!floor || !room) {
     return (
@@ -187,16 +182,31 @@ export default function RoomDetail() {
           </Button>
         </Link>
 
-        {!isUnlocked && !unlockLoading && (
-          <Alert className="mb-6 border-destructive/50 bg-destructive/10">
-            <Lock className="h-4 w-4" />
-            <AlertDescription>
-              <strong>Room Locked:</strong> You must complete these rooms first:
-              <ul className="list-disc list-inside mt-2">
-                {missingPrerequisites.map((prereq, idx) => (
-                  <li key={idx}>{prereq}</li>
-                ))}
-              </ul>
+        {!isUnlocked && !unlockLoading && user && (
+          <Alert className="mb-6 border-destructive bg-destructive/20">
+            <Lock className="h-5 w-5 text-destructive" />
+            <AlertDescription className="text-base">
+              <strong className="text-lg block mb-2">🔒 This Room is Locked</strong>
+              {missingPrerequisites.length > 0 ? (
+                <>
+                  <p className="mb-2">To unlock this room, you need to complete:</p>
+                  <ul className="list-disc list-inside mt-2 space-y-1 ml-2">
+                    {missingPrerequisites.map((prereq, idx) => (
+                      <li key={idx} className="font-medium">{prereq}</li>
+                    ))}
+                  </ul>
+                </>
+              ) : (
+                <p>Complete the previous floor to unlock this room.</p>
+              )}
+              <div className="mt-4">
+                <Link to={`/palace/floor/${floorNumber}`}>
+                  <Button variant="outline" size="sm">
+                    <ArrowLeft className="mr-2 h-4 w-4" />
+                    Back to Floor {floorNumber}
+                  </Button>
+                </Link>
+              </div>
             </AlertDescription>
           </Alert>
         )}
