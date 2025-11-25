@@ -16,6 +16,7 @@ import { Label } from "@/components/ui/label";
 import palaceImage from "@/assets/palace-card-back.jpg";
 import { Users, Copy, Check } from "lucide-react";
 import { RealtimeChannel } from "@supabase/supabase-js";
+import { searchBible } from "@/services/bibleApi";
 
 interface PrincipleCard {
   id: string;
@@ -107,14 +108,6 @@ const CYCLE_CARDS = [
   { code: "2H", name: "Second Heaven", question: "Connect a theme or story from the Second Heaven (70 AD/New Covenant) to this text", floor: 6 },
   { code: "3H", name: "Third Heaven", question: "Connect a theme or story from the Third Heaven (Final Judgment/New Creation) to this text", floor: 6 },
 ];
-
-// Room 66 Card
-const ROOM_66_CARD = { 
-  code: "R66", 
-  name: "Room 66", 
-  question: "Trace one theme through all 66 books with a crisp claim per book", 
-  floor: 4 
-};
 
 export default function CardDeck() {
   const { toast } = useToast();
@@ -242,16 +235,6 @@ export default function CardDeck() {
       });
     });
     
-    // Add Room 66 card
-    cards.push({
-      id: ROOM_66_CARD.code.toLowerCase(),
-      code: ROOM_66_CARD.code,
-      name: ROOM_66_CARD.name,
-      question: ROOM_66_CARD.question,
-      floor: ROOM_66_CARD.floor,
-      floorColor: FLOOR_COLORS[(ROOM_66_CARD.floor - 1) % FLOOR_COLORS.length],
-    });
-    
     setAllCards(cards);
   }, []);
 
@@ -270,7 +253,7 @@ export default function CardDeck() {
     }
   }, [timerEnabled, isTimerActive, timeRemaining, toast]);
 
-  const handleSetText = () => {
+  const handleSetText = async () => {
     if (!verseInput.trim()) {
       toast({
         title: "Add text first",
@@ -279,8 +262,50 @@ export default function CardDeck() {
       });
       return;
     }
-    setVerseText(verseInput);
-    setDisplayText(verseInput);
+    
+    // If it's a verse, fetch the actual text from the Bible API
+    if (textType === "verse") {
+      try {
+        setIsLoading(true);
+        const verses = await searchBible(verseInput);
+        
+        if (verses && verses.length > 0) {
+          // Combine all verses into a single text
+          const fullText = verses.map(v => v.text).join(" ");
+          setVerseText(fullText);
+          setDisplayText(`${verseInput}: ${fullText}`);
+          toast({
+            title: "Verse loaded",
+            description: `Retrieved ${verses.length} verse${verses.length > 1 ? 's' : ''}`,
+          });
+        } else {
+          // Fallback to just using the reference if API fails
+          setVerseText(verseInput);
+          setDisplayText(verseInput);
+          toast({
+            title: "Verse reference set",
+            description: "Could not fetch verse text. Using reference only.",
+            variant: "destructive",
+          });
+        }
+      } catch (error) {
+        console.error("Error fetching verse:", error);
+        setVerseText(verseInput);
+        setDisplayText(verseInput);
+        toast({
+          title: "Error fetching verse",
+          description: "Using reference only. Please check your connection.",
+          variant: "destructive",
+        });
+      } finally {
+        setIsLoading(false);
+      }
+    } else {
+      // For stories, just use the entered text
+      setVerseText(verseInput);
+      setDisplayText(verseInput);
+    }
+    
     broadcastTextSet();
   };
 
