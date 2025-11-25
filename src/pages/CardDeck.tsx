@@ -6,7 +6,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { palaceFloors } from "@/data/palaceData";
-import { Sparkles, HelpCircle, Timer, RefreshCw, Send } from "lucide-react";
+import { Sparkles, HelpCircle, Timer, RefreshCw, Send, BookOpen, Loader2 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -17,6 +17,7 @@ import palaceImage from "@/assets/palace-card-back.jpg";
 import { Users, Copy, Check } from "lucide-react";
 import { RealtimeChannel } from "@supabase/supabase-js";
 import { searchBible } from "@/services/bibleApi";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 
 interface PrincipleCard {
   id: string;
@@ -129,6 +130,12 @@ export default function CardDeck() {
   const [participants, setParticipants] = useState<any[]>([]);
   const [copied, setCopied] = useState(false);
   const channelRef = useRef<RealtimeChannel | null>(null);
+  
+  // Word analysis state
+  const [wordDialogOpen, setWordDialogOpen] = useState(false);
+  const [selectedWord, setSelectedWord] = useState("");
+  const [wordAnalysis, setWordAnalysis] = useState("");
+  const [wordLoading, setWordLoading] = useState(false);
 
   useEffect(() => {
     // Build all principle cards from palace data
@@ -543,6 +550,67 @@ export default function CardDeck() {
     });
   };
 
+  const handleWordClick = async (word: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    setSelectedWord(word);
+    setWordDialogOpen(true);
+    setWordLoading(true);
+    setWordAnalysis("");
+
+    try {
+      const verseRef = displayText.split(":")[0]?.trim() || "";
+      const { data, error } = await supabase.functions.invoke("analyze-hebrew-greek", {
+        body: { word, verseReference: verseRef },
+      });
+
+      if (error) throw error;
+      setWordAnalysis(data.analysis || "No analysis available.");
+    } catch (error: any) {
+      console.error("Word analysis error:", error);
+      toast({
+        title: "Analysis Error",
+        description: "Failed to analyze word",
+      });
+      setWordAnalysis("Unable to analyze word at this time.");
+    } finally {
+      setWordLoading(false);
+    }
+  };
+
+  const renderVerseText = (text: string) => {
+    // Split text to separate verse reference from verse text
+    const parts = text.split(/:\s*/);
+    if (parts.length < 2) {
+      return <span>{text}</span>;
+    }
+
+    const reference = parts[0] + ":";
+    const verseText = parts.slice(1).join(": ");
+    
+    const words = verseText.split(/(\s+|[.,;:!?])/);
+    
+    return (
+      <>
+        <span className="font-semibold">{reference}</span>{" "}
+        {words.map((word, index) => {
+          if (word.trim() && word.length > 2 && /^[a-zA-Z]+$/.test(word)) {
+            return (
+              <span
+                key={index}
+                className="cursor-pointer hover:bg-primary/10 hover:underline rounded px-0.5 transition-colors"
+                onClick={(e) => handleWordClick(word, e)}
+                title="Click for Hebrew/Greek analysis"
+              >
+                {word}
+              </span>
+            );
+          }
+          return <span key={index}>{word}</span>;
+        })}
+      </>
+    );
+  };
+
   const selectCard = (cardId: string) => {
     if (!verseText.trim()) {
       toast({
@@ -826,64 +894,8 @@ export default function CardDeck() {
                   {textType === "verse" ? "Selected Verse:" : "Selected Story:"}
                 </div>
                 <div className="text-lg font-medium whitespace-pre-wrap mb-4">
-                  {displayText}
+                  {textType === "verse" && displayText.includes(":") ? renderVerseText(displayText) : displayText}
                 </div>
-                
-                {/* Study Tools Links */}
-                {displayText.includes(":") && (
-                  <div className="pt-4 border-t border-border/30">
-                    <p className="text-xs text-muted-foreground mb-2">Study Tools:</p>
-                    <div className="flex flex-wrap gap-2">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        className="text-xs h-8"
-                        onClick={() => {
-                          const ref = displayText.split(":")[0].trim();
-                          window.open(`https://www.blueletterbible.org/search/search.cfm?Criteria=${encodeURIComponent(ref)}&t=KJV`, '_blank');
-                        }}
-                      >
-                        Hebrew/Greek
-                      </Button>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        className="text-xs h-8"
-                        onClick={() => {
-                          const ref = displayText.split(":")[0].trim();
-                          const urlRef = ref.toLowerCase().replace(/\s+/g, '_').replace(/:/g, '-');
-                          window.open(`https://biblehub.com/interlinear/${encodeURIComponent(urlRef)}.htm`, '_blank');
-                        }}
-                      >
-                        Interlinear
-                      </Button>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        className="text-xs h-8"
-                        onClick={() => {
-                          const ref = displayText.split(":")[0].trim();
-                          const urlRef = ref.toLowerCase().replace(/\s+/g, '_').replace(/:/g, '-');
-                          window.open(`https://biblehub.com/commentaries/${encodeURIComponent(urlRef)}.htm`, '_blank');
-                        }}
-                      >
-                        Commentaries
-                      </Button>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        className="text-xs h-8"
-                        onClick={() => {
-                          const ref = displayText.split(":")[0].trim();
-                          const urlRef = ref.toLowerCase().replace(/\s+/g, '_').replace(/:/g, '-');
-                          window.open(`https://biblehub.com/crossref/${encodeURIComponent(urlRef)}.htm`, '_blank');
-                        }}
-                      >
-                        Cross References
-                      </Button>
-                    </div>
-                  </div>
-                )}
               </CardContent>
             </Card>
           )}
@@ -1095,6 +1107,36 @@ export default function CardDeck() {
           </Card>
         </div>
       </main>
+
+      {/* Word Analysis Dialog */}
+      <Dialog open={wordDialogOpen} onOpenChange={setWordDialogOpen}>
+        <DialogContent className="max-w-2xl max-h-[80vh]">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <BookOpen className="h-5 w-5 text-primary" />
+              <span>Hebrew/Greek Analysis: {selectedWord}</span>
+            </DialogTitle>
+            <DialogDescription>
+              {displayText.split(":")[0]?.trim()}
+            </DialogDescription>
+          </DialogHeader>
+          
+          <ScrollArea className="max-h-[60vh]">
+            {wordLoading ? (
+              <div className="flex items-center justify-center py-12">
+                <Loader2 className="h-8 w-8 animate-spin text-primary" />
+              </div>
+            ) : (
+              <div className="space-y-4 p-4">
+                <div 
+                  className="prose prose-sm dark:prose-invert max-w-none"
+                  dangerouslySetInnerHTML={{ __html: wordAnalysis }}
+                />
+              </div>
+            )}
+          </ScrollArea>
+        </DialogContent>
+      </Dialog>
 
       <style>{`
         .perspective-1000 {
