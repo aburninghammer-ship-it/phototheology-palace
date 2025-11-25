@@ -10,6 +10,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { formatJeevesResponse } from "@/lib/formatJeevesResponse";
 import { RoomInsightChat } from "./RoomInsightChat";
+import { DimensionFilter } from "./DimensionFilter";
 
 // Helper function to parse room insights from commentary
 const parseRoomInsights = (commentary: string) => {
@@ -182,6 +183,7 @@ export const CommentaryPanel = ({ book, chapter, verse, verseText, onClose }: Co
   const [commentaryMode, setCommentaryMode] = useState(false);
   const [availableCommentaries, setAvailableCommentaries] = useState<string[]>([]);
   const [checkingAvailability, setCheckingAvailability] = useState(true);
+  const [activeDimensions, setActiveDimensions] = useState<string[]>(["2D"]); // Default to Christ dimension
   const { toast } = useToast();
 
   // Check which commentaries are available for this specific verse
@@ -286,6 +288,16 @@ export const CommentaryPanel = ({ book, chapter, verse, verseText, onClose }: Co
 
       <CardContent className="pt-6">
         <div className="space-y-4">
+          {/* Dimension Filter */}
+          <DimensionFilter
+            activeDimensions={activeDimensions}
+            onToggle={(dim) => {
+              setActiveDimensions(prev =>
+                prev.includes(dim) ? prev.filter(d => d !== dim) : [...prev, dim]
+              );
+            }}
+          />
+          
           <div>
             <h4 className="text-sm font-semibold mb-3">Analysis Mode:</h4>
             <div className="flex gap-2 mb-4">
