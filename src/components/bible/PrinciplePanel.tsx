@@ -18,6 +18,7 @@ interface PrinciplePanelProps {
   verse: number;
   verseText: string;
   onClose: () => void;
+  onHighlight?: (verses: number[]) => void;
 }
 
 const PRINCIPLES = [
@@ -84,7 +85,7 @@ interface ChainReference {
   principle: string;
 }
 
-export const PrinciplePanel = ({ book, chapter, verse, verseText, onClose }: PrinciplePanelProps) => {
+export const PrinciplePanel = ({ book, chapter, verse, verseText, onClose, onHighlight }: PrinciplePanelProps) => {
   const [annotation, setAnnotation] = useState<VerseAnnotation | null>(null);
   const [loading, setLoading] = useState(true);
   const [scriptureLinks, setScriptureLinks] = useState<ChainReference[]>([]);
@@ -175,6 +176,17 @@ export const PrinciplePanel = ({ book, chapter, verse, verseText, onClose }: Pri
       
       if (data?.results) {
         setPrincipleResults(data.results);
+        
+        // Extract verse numbers and highlight them
+        const verseNumbers = data.results.map((result: ChainReference) => {
+          const match = result.verse.match(/:(\d+)/);
+          return match ? parseInt(match[1]) : null;
+        }).filter((v: number | null): v is number => v !== null);
+        
+        if (onHighlight) {
+          onHighlight(verseNumbers);
+        }
+        
         toast({
           title: "Principle Analysis Complete",
           description: `Found ${data.results.length} verses where ${selectedPrinciple} applies`,
@@ -604,6 +616,10 @@ export const PrinciplePanel = ({ book, chapter, verse, verseText, onClose }: Pri
                 <Select value={selectedPrinciple} onValueChange={(value) => {
                   setSelectedPrinciple(value);
                   setPrincipleResults([]);
+                  // Clear highlights when changing principle
+                  if (onHighlight) {
+                    onHighlight([]);
+                  }
                 }}>
                   <SelectTrigger className="flex-1">
                     <SelectValue placeholder="Select a principle..." />
@@ -624,6 +640,20 @@ export const PrinciplePanel = ({ book, chapter, verse, verseText, onClose }: Pri
                   <Sparkles className="h-4 w-4 mr-1" />
                   {principleLoading ? "Analyzing..." : "Scan Chapter"}
                 </Button>
+                {principleResults.length > 0 && (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => {
+                      setPrincipleResults([]);
+                      if (onHighlight) {
+                        onHighlight([]);
+                      }
+                    }}
+                  >
+                    Clear
+                  </Button>
+                )}
               </div>
 
               {principleLoading && (
