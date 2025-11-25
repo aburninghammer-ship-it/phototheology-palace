@@ -363,8 +363,8 @@ export const BibleReader = () => {
           </Card>
         </div>
 
-        {/* Right Panel - Dynamic based on mode */}
-        <div className="lg:col-span-1 space-y-6" ref={jeevesRef}>
+        {/* Right Panel - Dynamic based on mode - Floating/Sticky */}
+        <div className="lg:col-span-1 space-y-6 sticky top-24 self-start max-h-[calc(100vh-7rem)] overflow-y-auto" ref={jeevesRef}>
           {/* Dimension Filter (Advanced Mode Only) */}
           {studyMode === "advanced" && (
             <DimensionFilter 
@@ -402,7 +402,7 @@ export const BibleReader = () => {
               )}
             </>
           ) : principleMode && selectedVerses.length > 0 ? (
-            <Card className="p-6 sticky top-24 space-y-4">
+            <Card className="p-6 space-y-4">
               <div className="flex items-center justify-between">
                 <h3 className="font-semibold">Selected Verses ({selectedVerses.length})</h3>
                 <Button variant="ghost" size="sm" onClick={() => setSelectedVerses([])}>
