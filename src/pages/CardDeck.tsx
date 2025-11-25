@@ -13,6 +13,7 @@ import { useToast } from "@/hooks/use-toast";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
+import palaceImage from "@/assets/palace-card-back.jpg";
 
 interface PrincipleCard {
   id: string;
@@ -24,14 +25,29 @@ interface PrincipleCard {
 }
 
 const FLOOR_COLORS = [
-  "from-purple-500/20 to-pink-500/20 border-purple-500/30",
-  "from-blue-500/20 to-cyan-500/20 border-blue-500/30",
-  "from-green-500/20 to-emerald-500/20 border-green-500/30",
-  "from-yellow-500/20 to-orange-500/20 border-yellow-500/30",
-  "from-red-500/20 to-rose-500/20 border-red-500/30",
-  "from-indigo-500/20 to-purple-500/20 border-indigo-500/30",
-  "from-pink-500/20 to-fuchsia-500/20 border-pink-500/30",
-  "from-amber-500/20 to-yellow-500/20 border-amber-500/30",
+  "from-purple-600 via-pink-600 to-purple-700 border-purple-400",
+  "from-blue-600 via-cyan-600 to-blue-700 border-cyan-400",
+  "from-green-600 via-emerald-600 to-green-700 border-emerald-400",
+  "from-yellow-600 via-orange-600 to-yellow-700 border-orange-400",
+  "from-red-600 via-rose-600 to-red-700 border-rose-400",
+  "from-indigo-600 via-purple-600 to-indigo-700 border-indigo-400",
+  "from-pink-600 via-fuchsia-600 to-pink-700 border-fuchsia-400",
+  "from-amber-600 via-yellow-600 to-amber-700 border-amber-400",
+];
+
+// Additional cycle and heaven cards
+const CYCLE_CARDS = [
+  { code: "@Ad", name: "Adamic Cycle", question: "Apply the Adamic cycle (creation, fall, promise) to this text", floor: 6 },
+  { code: "@No", name: "Noahic Cycle", question: "Apply the Noahic cycle (flood, preservation, covenant) to this text", floor: 6 },
+  { code: "@Ab", name: "Abrahamic Cycle", question: "Apply the Abrahamic cycle (faith, promise, seed) to this text", floor: 6 },
+  { code: "@Mo", name: "Mosaic Cycle", question: "Apply the Mosaic cycle (law, tabernacle, priesthood) to this text", floor: 6 },
+  { code: "@Cy", name: "Cyrusic Cycle", question: "Apply the Cyrusic cycle (exile, restoration, temple rebuilt) to this text", floor: 6 },
+  { code: "@CyC", name: "Cyrus-Christ Cycle", question: "Apply the Cyrus-Christ cycle (type to antitype, deliverer to Deliverer) to this text", floor: 6 },
+  { code: "@Sp", name: "Spirit Cycle", question: "Apply the Spirit cycle (Pentecost, church age, mission) to this text", floor: 6 },
+  { code: "@Re", name: "Remnant Cycle", question: "Apply the Remnant cycle (final conflict, judgment, new creation) to this text", floor: 6 },
+  { code: "1H", name: "First Heaven", question: "Connect a theme or story from the First Heaven (Babylon/Restoration) to this text", floor: 6 },
+  { code: "2H", name: "Second Heaven", question: "Connect a theme or story from the Second Heaven (70 AD/New Covenant) to this text", floor: 6 },
+  { code: "3H", name: "Third Heaven", question: "Connect a theme or story from the Third Heaven (Final Judgment/New Creation) to this text", floor: 6 },
 ];
 
 export default function CardDeck() {
@@ -65,6 +81,19 @@ export default function CardDeck() {
         });
       });
     });
+    
+    // Add cycle and heaven cards
+    CYCLE_CARDS.forEach((cycle) => {
+      cards.push({
+        id: cycle.code.toLowerCase(),
+        code: cycle.code,
+        name: cycle.name,
+        question: cycle.question,
+        floor: cycle.floor,
+        floorColor: FLOOR_COLORS[(cycle.floor - 1) % FLOOR_COLORS.length],
+      });
+    });
+    
     setAllCards(cards);
   }, []);
 
@@ -415,26 +444,34 @@ export default function CardDeck() {
                       >
                         {/* Front of card (Principle Code) */}
                         <div
-                          className={`absolute inset-0 bg-gradient-to-br ${card.floorColor} rounded-lg border-2 shadow-lg backface-hidden flex flex-col items-center justify-center p-4 text-center glow-effect`}
+                          className={`absolute inset-0 bg-gradient-to-br ${card.floorColor} rounded-lg border-2 shadow-xl backface-hidden flex flex-col items-center justify-center p-4 text-center glow-effect`}
                         >
-                          <div className="text-xs text-muted-foreground mb-1">
+                          <div className="text-xs text-white/80 mb-1 font-semibold">
                             Floor {card.floor}
                           </div>
-                          <div className="text-2xl font-bold mb-1">
+                          <div className="text-3xl font-bold mb-1 text-white drop-shadow-lg">
                             {card.code}
                           </div>
-                          <div className="text-xs font-medium">
+                          <div className="text-xs font-semibold text-white/90">
                             {card.name}
                           </div>
                         </div>
 
-                        {/* Back of card (Explanation) */}
+                        {/* Back of card (Palace with Question) */}
                         <div
-                          className={`absolute inset-0 bg-gradient-to-br ${card.floorColor} rounded-lg border-2 shadow-lg backface-hidden rotate-y-180 flex items-center justify-center p-4 text-center`}
+                          className="absolute inset-0 rounded-lg border-2 shadow-xl backface-hidden rotate-y-180 overflow-hidden"
+                          style={{
+                            backgroundImage: `url(${palaceImage})`,
+                            backgroundSize: 'cover',
+                            backgroundPosition: 'center',
+                          }}
                         >
-                          <p className="text-xs leading-relaxed">
-                            {card.question}
-                          </p>
+                          <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/60 to-black/30" />
+                          <div className="relative h-full flex items-center justify-center p-4 text-center">
+                            <p className="text-xs leading-relaxed text-white font-medium drop-shadow-lg">
+                              {card.question}
+                            </p>
+                          </div>
                         </div>
                       </div>
                     </motion.div>
@@ -460,7 +497,7 @@ export default function CardDeck() {
           transform: rotateY(180deg);
         }
         .glow-effect {
-          box-shadow: 0 0 20px rgba(var(--primary), 0.3);
+          box-shadow: 0 0 30px rgba(255, 255, 255, 0.3), 0 0 60px rgba(var(--primary), 0.2);
         }
       `}</style>
     </div>
