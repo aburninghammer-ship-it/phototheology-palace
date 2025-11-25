@@ -13,7 +13,6 @@ import { useToast } from "@/hooks/use-toast";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
-import palaceImage from "@/assets/palace-card-back.jpg";
 
 interface PrincipleCard {
   id: string;
@@ -33,6 +32,45 @@ const FLOOR_COLORS = [
   "from-indigo-600 via-purple-600 to-indigo-700 border-indigo-400",
   "from-pink-600 via-fuchsia-600 to-pink-700 border-fuchsia-400",
   "from-amber-600 via-yellow-600 to-amber-700 border-amber-400",
+];
+
+// Connect 6 Genre Cards - each genre gets its own card
+const CONNECT_6_CARDS = [
+  { code: "C6-Pr", name: "Prophecy", roomName: "Connect 6", question: "Connect this text to a prophecy passage and explain how they illuminate each other", floor: 4 },
+  { code: "C6-Pa", name: "Parable", roomName: "Connect 6", question: "Connect this text to a parable and explain how they illuminate each other", floor: 4 },
+  { code: "C6-Ep", name: "Epistle", roomName: "Connect 6", question: "Connect this text to an epistle passage and explain how they illuminate each other", floor: 4 },
+  { code: "C6-Hi", name: "History", roomName: "Connect 6", question: "Connect this text to a historical narrative and explain how they illuminate each other", floor: 4 },
+  { code: "C6-Go", name: "Gospel", roomName: "Connect 6", question: "Connect this text to a gospel passage and explain how they illuminate each other", floor: 4 },
+  { code: "C6-Po", name: "Poetry", roomName: "Connect 6", question: "Connect this text to a poetry/psalm passage and explain how they illuminate each other", floor: 4 },
+];
+
+// Time Zone Cards - each zone gets its own card
+const TIME_ZONE_CARDS = [
+  { code: "TZ-HP", name: "Heaven-Past", roomName: "Time Zone", question: "How does this text speak when viewed through Heaven-Past (before earth's creation, Lucifer's rebellion)?", floor: 4 },
+  { code: "TZ-HN", name: "Heaven-Present", roomName: "Time Zone", question: "How does this text speak when viewed through Heaven-Present (Christ's intercession, sanctuary ministry)?", floor: 4 },
+  { code: "TZ-HF", name: "Heaven-Future", roomName: "Time Zone", question: "How does this text speak when viewed through Heaven-Future (new heaven, eternal throne)?", floor: 4 },
+  { code: "TZ-EP", name: "Earth-Past", roomName: "Time Zone", question: "How does this text speak when viewed through Earth-Past (historical biblical events already fulfilled)?", floor: 4 },
+  { code: "TZ-EN", name: "Earth-Present", roomName: "Time Zone", question: "How does this text speak when viewed through Earth-Present (current application to believers today)?", floor: 4 },
+  { code: "TZ-EF", name: "Earth-Future", roomName: "Time Zone", question: "How does this text speak when viewed through Earth-Future (end-time events, Second Coming)?", floor: 4 },
+];
+
+// Dimensions Room Cards - each dimension gets its own card
+const DIMENSIONS_CARDS = [
+  { code: "DR-Lit", name: "Literal-Historical", roomName: "Dimensions", question: "What actually happened in the original context? What did it mean to the original audience?", floor: 4 },
+  { code: "DR-Chr", name: "Christological", roomName: "Dimensions", question: "How does this text reveal, foreshadow, or fulfill Christ?", floor: 4 },
+  { code: "DR-Per", name: "Personal", roomName: "Dimensions", question: "What does this mean for YOUR walk with God today? How should you respond?", floor: 4 },
+  { code: "DR-Ecc", name: "Ecclesiological", roomName: "Dimensions", question: "What does this teach the church corporately? How does it shape our worship, mission, or unity?", floor: 4 },
+  { code: "DR-Esc", name: "Eschatological", roomName: "Dimensions", question: "How will this be perfected in the new creation? What does it reveal about our eternal hope?", floor: 4 },
+];
+
+// Theme Room Cards - each span gets its own card
+const THEME_CARDS = [
+  { code: "TRm-Sanc", name: "Sanctuary Wall", roomName: "Theme", question: "How does this passage relate to God's dwelling, sacrifice, priesthood, or mediation?", floor: 4 },
+  { code: "TRm-Life", name: "Life of Christ Wall", roomName: "Theme", question: "How does this passage relate to Jesus' birth, ministry, death, resurrection, or ascension?", floor: 4 },
+  { code: "TRm-GC", name: "Great Controversy Wall", roomName: "Theme", question: "How does this passage expose the cosmic battle between Christ and Satan, truth and error?", floor: 4 },
+  { code: "TRm-Time", name: "Time-Prophecy Wall", roomName: "Theme", question: "How does this passage provide prophetic chronology or apocalyptic vision?", floor: 4 },
+  { code: "TRm-Gosp", name: "Gospel Floor", roomName: "Theme", question: "How does this passage articulate the foundation of salvation by grace through faith?", floor: 4 },
+  { code: "TRm-Heav", name: "Heaven Ceiling", roomName: "Theme", question: "How does this passage describe the ultimate eschatological hope and final restoration?", floor: 4 },
 ];
 
 // Additional cycle and heaven cards
@@ -71,6 +109,11 @@ export default function CardDeck() {
     const cards: PrincipleCard[] = [];
     palaceFloors.forEach((floor) => {
       floor.rooms.forEach((room) => {
+        // Skip rooms that have individual sub-principle cards
+        if (room.id === "c6" || room.id === "tz" || room.id === "dr" || room.id === "trm") {
+          return;
+        }
+        
         cards.push({
           id: room.id,
           code: room.tag,
@@ -79,6 +122,54 @@ export default function CardDeck() {
           floor: floor.number,
           floorColor: FLOOR_COLORS[(floor.number - 1) % FLOOR_COLORS.length],
         });
+      });
+    });
+    
+    // Add Connect 6 genre cards
+    CONNECT_6_CARDS.forEach((genre) => {
+      cards.push({
+        id: genre.code.toLowerCase(),
+        code: genre.code,
+        name: `${genre.roomName} - ${genre.name}`,
+        question: genre.question,
+        floor: genre.floor,
+        floorColor: FLOOR_COLORS[(genre.floor - 1) % FLOOR_COLORS.length],
+      });
+    });
+    
+    // Add Time Zone cards
+    TIME_ZONE_CARDS.forEach((zone) => {
+      cards.push({
+        id: zone.code.toLowerCase(),
+        code: zone.code,
+        name: `${zone.roomName} - ${zone.name}`,
+        question: zone.question,
+        floor: zone.floor,
+        floorColor: FLOOR_COLORS[(zone.floor - 1) % FLOOR_COLORS.length],
+      });
+    });
+    
+    // Add Dimensions cards
+    DIMENSIONS_CARDS.forEach((dimension) => {
+      cards.push({
+        id: dimension.code.toLowerCase(),
+        code: dimension.code,
+        name: `${dimension.roomName} - ${dimension.name}`,
+        question: dimension.question,
+        floor: dimension.floor,
+        floorColor: FLOOR_COLORS[(dimension.floor - 1) % FLOOR_COLORS.length],
+      });
+    });
+    
+    // Add Theme cards
+    THEME_CARDS.forEach((theme) => {
+      cards.push({
+        id: theme.code.toLowerCase(),
+        code: theme.code,
+        name: `${theme.roomName} - ${theme.name}`,
+        question: theme.question,
+        floor: theme.floor,
+        floorColor: FLOOR_COLORS[(theme.floor - 1) % FLOOR_COLORS.length],
       });
     });
     
@@ -457,20 +548,25 @@ export default function CardDeck() {
                           </div>
                         </div>
 
-                        {/* Back of card (Palace with Question) */}
+                        {/* Back of card (Designed Question Card) */}
                         <div
-                          className="absolute inset-0 rounded-lg border-2 shadow-xl backface-hidden rotate-y-180 overflow-hidden"
-                          style={{
-                            backgroundImage: `url(${palaceImage})`,
-                            backgroundSize: 'cover',
-                            backgroundPosition: 'center',
-                          }}
+                          className={`absolute inset-0 bg-gradient-to-br from-slate-800 via-slate-900 to-slate-950 rounded-lg border-2 border-amber-400/50 shadow-xl backface-hidden rotate-y-180 overflow-hidden`}
                         >
-                          <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/60 to-black/30" />
-                          <div className="relative h-full flex items-center justify-center p-4 text-center">
-                            <p className="text-xs leading-relaxed text-white font-medium drop-shadow-lg">
+                          <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,_rgba(251,191,36,0.1)_0%,_transparent_50%)]" />
+                          <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-amber-400/30 to-transparent" />
+                          <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-amber-400/30 to-transparent" />
+                          <div className="relative h-full flex flex-col items-center justify-center p-4 text-center">
+                            <div className="text-xs font-bold text-amber-400/70 mb-2 tracking-wider">
+                              FLOOR {card.floor}
+                            </div>
+                            <p className="text-xs leading-relaxed text-amber-50 font-medium">
                               {card.question}
                             </p>
+                            <div className="absolute bottom-3 left-0 right-0 flex justify-center gap-1">
+                              <div className="w-1 h-1 rounded-full bg-amber-400/40" />
+                              <div className="w-1 h-1 rounded-full bg-amber-400/40" />
+                              <div className="w-1 h-1 rounded-full bg-amber-400/40" />
+                            </div>
                           </div>
                         </div>
                       </div>
