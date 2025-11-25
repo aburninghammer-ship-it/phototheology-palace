@@ -18,6 +18,7 @@ import { Users, Copy, Check } from "lucide-react";
 import { RealtimeChannel } from "@supabase/supabase-js";
 import { searchBible } from "@/services/bibleApi";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import ReactMarkdown from 'react-markdown';
 
 interface PrincipleCard {
   id: string;
@@ -558,9 +559,19 @@ export default function CardDeck() {
     setWordAnalysis("");
 
     try {
-      const verseRef = displayText.split(":")[0]?.trim() || "";
+      // Extract verse reference and full text from displayText
+      const parts = displayText.split(/:\s*/);
+      const verseReference = parts[0]?.trim() || "";
+      const verseText = parts.slice(1).join(": ").trim();
+      const book = verseReference.split(/\s+/)[0] || "";
+
       const { data, error } = await supabase.functions.invoke("analyze-hebrew-greek", {
-        body: { word, verseReference: verseRef },
+        body: { 
+          word, 
+          verse: verseReference,
+          context: verseText,
+          book: book
+        },
       });
 
       if (error) throw error;
@@ -1128,10 +1139,9 @@ export default function CardDeck() {
               </div>
             ) : (
               <div className="space-y-4 p-4">
-                <div 
-                  className="prose prose-sm dark:prose-invert max-w-none"
-                  dangerouslySetInnerHTML={{ __html: wordAnalysis }}
-                />
+                <div className="prose prose-sm dark:prose-invert max-w-none">
+                  <ReactMarkdown>{wordAnalysis}</ReactMarkdown>
+                </div>
               </div>
             )}
           </ScrollArea>
