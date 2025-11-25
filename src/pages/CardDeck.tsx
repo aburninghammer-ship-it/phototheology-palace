@@ -453,6 +453,50 @@ export default function CardDeck() {
     }
   };
 
+  // Helper function to render card question with links for DefCom cards
+  const renderCardQuestion = (card: PrincipleCard) => {
+    const isDefCom = card.code === "DC";
+    
+    if (!isDefCom) {
+      return card.question;
+    }
+    
+    // Parse DefCom question to add hyperlinks
+    const bracketMatch = card.question.match(/^(.+?)(\[.+?\])$/);
+    if (!bracketMatch) {
+      return card.question;
+    }
+    
+    const mainText = bracketMatch[1].trim();
+    
+    return (
+      <>
+        {mainText}{' '}
+        <span className="text-blue-300 underline text-[10px]">
+          <a 
+            href="https://www.blueletterbible.org/" 
+            target="_blank" 
+            rel="noopener noreferrer"
+            onClick={(e) => e.stopPropagation()}
+            className="hover:text-blue-200"
+          >
+            Greek/Hebrew
+          </a>
+          {' • '}
+          <a 
+            href="https://www.biblehub.com/" 
+            target="_blank" 
+            rel="noopener noreferrer"
+            onClick={(e) => e.stopPropagation()}
+            className="hover:text-blue-200"
+          >
+            Commentary
+          </a>
+        </span>
+      </>
+    );
+  };
+
   const getHelp = async () => {
     if (!selectedCard || !verseText) return;
     setIsLoading(true);
@@ -853,7 +897,7 @@ export default function CardDeck() {
                               FLOOR {card.floor} • {card.code}
                             </div>
                             <p className="text-xs leading-relaxed text-white font-medium drop-shadow-[0_1px_6px_rgba(0,0,0,0.9)]">
-                              {card.question}
+                              {renderCardQuestion(card)}
                             </p>
                             <div className="absolute bottom-3 left-0 right-0 flex justify-center gap-1.5">
                               <div className="w-1.5 h-1.5 rounded-full bg-white/60 shadow-lg" />
