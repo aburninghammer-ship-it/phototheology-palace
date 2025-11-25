@@ -116,6 +116,11 @@ export const Navigation = () => {
                 </>
               ) : (
                 <>
+                  {/* Sign In Button for logged-out users */}
+                  <Button asChild className="whitespace-nowrap">
+                    <Link to="/auth">Sign In</Link>
+                  </Button>
+                  
                   {/* Desktop Navigation for logged-out users - Horizontal Scroll */}
                   <div className="hidden md:flex items-center gap-2 overflow-x-auto scrollbar-hide max-w-2xl">
                     <Button variant="ghost" asChild size="sm" className="whitespace-nowrap">
