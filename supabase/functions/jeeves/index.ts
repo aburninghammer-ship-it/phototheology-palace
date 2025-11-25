@@ -295,6 +295,61 @@ Return as JSON array with objects containing: verse, text, connection, principle
       
       const principleName = PRINCIPLES.find(p => p.code === principle)?.name || principle;
       
+      // Special handling for multi-principle rooms to enforce valid sub-principles
+      let systemPromptAddition = '';
+      
+      if (principle === 'Theme Room (TRm)' || principleName.includes('Theme Room')) {
+        systemPromptAddition = `
+
+CRITICAL: The Theme Room (TRm) has EXACTLY 6 themes/walls that form the structural framework of biblical architecture:
+
+1. **Sanctuary Wall** - Texts that connect to the sanctuary system, its furniture, services, and symbolism
+2. **Life of Christ Wall** - Texts anchoring in Christ's incarnation, ministry, death, resurrection, and ascension
+3. **Great Controversy Wall** - Texts revealing the cosmic battle between Christ and Satan
+4. **Time Prophecy Wall** - Verses tied to prophetic timelines and prophetic periods
+5. **Gospel Floor** - The foundation: justification, sanctification, glorification
+6. **Heaven Ceiling** - The final hope: new creation, eternal life, God's dwelling with humanity
+
+You MUST identify which of these 6 specific themes applies to each verse. DO NOT invent other themes like "Truth, Righteousness, Morality" or any other concepts. ONLY use the 6 themes listed above.
+
+For each verse, identify which ONE theme from the list above is most prominent and explain how it connects to that specific wall/floor/ceiling.`;
+      } else if (principle === 'Dimensions Room (DR)' || principleName.includes('Dimensions')) {
+        systemPromptAddition = `
+
+CRITICAL: The Dimensions Room (DR) has EXACTLY 5 dimensions:
+1. **Literal (1D)** - What the text literally says
+2. **Christ (2D)** - How it points to Jesus
+3. **Me (3D)** - Personal application
+4. **Church (4D)** - Application to the community of believers
+5. **Heaven (5D)** - Eschatological/eternal perspective
+
+ONLY use these 5 dimensions. Do not invent other dimensions.`;
+      } else if (principle === 'Connect-6 (C6)' || principleName.includes('Connect-6')) {
+        systemPromptAddition = `
+
+CRITICAL: Connect-6 (C6) identifies GENRE, not themes. The 6 valid genres are:
+1. **Prophecy** - Symbolic, apocalyptic literature
+2. **Parable** - Story with hidden spiritual meaning
+3. **Epistle** - Letters with doctrinal teaching
+4. **History** - Narrative of events
+5. **Gospel** - Jesus' life and ministry
+6. **Poetry** - Hebrew poetry (parallelism, metaphor)
+
+ONLY use these 6 genres. Do not invent categories like "Divine Attributes" or "Wisdom Literature."`;
+      } else if (principle === 'Time Zone (TZ)' || principleName.includes('Time Zone')) {
+        systemPromptAddition = `
+
+CRITICAL: The Time Zone Room (TZ) views texts through 6 specific time zone lenses (Heaven/Earth × Past/Present/Future):
+1. **Heaven-Past** - Viewing text through pre-fall heaven context
+2. **Heaven-Present** - Viewing text through current heavenly ministry context
+3. **Heaven-Future** - Viewing text through eternal new creation context
+4. **Earth-Past** - Viewing text through historical biblical events
+5. **Earth-Present** - Viewing text through current human experience
+6. **Earth-Future** - Viewing text through end-time prophecy context
+
+You MUST specify which ONE time zone lens you're using for each verse. A verse can be understood through multiple zones, but you must name the specific zone you're applying.`;
+      }
+      
       const prompt = `Scan ${book} chapter ${chapter} and find all verses where the Phototheology principle "${principleName}" can be applied.
 
 For each verse you identify:
@@ -314,7 +369,7 @@ Return as JSON array with objects containing: verse, text, connection, principle
         body: JSON.stringify({
           model: 'google/gemini-2.5-flash',
           messages: [
-            { role: 'system', content: 'You are a Phototheology expert analyzing Bible chapters to identify where specific principles apply.' },
+            { role: 'system', content: `You are a Phototheology expert analyzing Bible chapters to identify where specific principles apply.${systemPromptAddition}` },
             { role: 'user', content: prompt }
           ],
         }),
