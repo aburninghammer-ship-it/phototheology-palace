@@ -66,12 +66,15 @@ serve(async (req) => {
 
     console.log(`Access code generated: ${code}, expires at: ${expiresAt}, lifetime: ${isLifetime || false}`);
 
+    // Get the app's base URL from the request origin
+    const origin = req.headers.get('origin') || 'https://phototheology.lovable.app';
+    
     return new Response(
       JSON.stringify({ 
         success: true, 
         code: data.code,
         expiresAt: data.expires_at,
-        link: `${Deno.env.get('VITE_SUPABASE_URL')}/access?code=${data.code}`
+        link: `${origin}/access-code?code=${data.code}`
       }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
