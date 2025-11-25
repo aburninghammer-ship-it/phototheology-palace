@@ -198,16 +198,103 @@ ANALYSIS REQUIREMENTS:
 2) ALWAYS write room abbreviations with full names in parentheses: "SR (Story Room)", "DC (Def-Com Room)", "DR (Dimensions Room)"
 3) When using DC (Def-Com Room), MUST include Hebrew/Greek definitions with Strong's numbers AND cite standard commentaries (Gill, Clarke, Matthew Henry, Barnes)
 4) For DR (Dimensions Room), clarify which dimensions: 1D=Literal, 2D=Christ, 3D=Me, 4D=Church, 5D=Heaven
-5) Provide specific insights for EACH room
-
-Return only valid JSON with roomsUsed array and roomAnalysis object using full room names.`
+5) Provide specific insights for EACH room`
           },
           {
             role: 'user',
             content: prompt
           }
         ],
-        response_format: { type: 'json_object' }
+        tools: [
+          {
+            type: 'function',
+            function: {
+              name: 'analyze_verse',
+              description: 'Analyze a Bible verse through the Phototheology Palace rooms',
+              parameters: {
+                type: 'object',
+                properties: {
+                  roomsUsed: {
+                    type: 'array',
+                    items: { type: 'string' },
+                    description: 'List of 8-12 rooms used with full names like "SR (Story Room)"'
+                  },
+                  floorsCovered: {
+                    type: 'array',
+                    items: { type: 'number' },
+                    description: 'Floor numbers covered (1-8)'
+                  },
+                  roomAnalysis: {
+                    type: 'object',
+                    description: 'Analysis for each room used, with room name as key',
+                    additionalProperties: { type: 'string' }
+                  },
+                  dimensions: {
+                    type: 'array',
+                    items: { type: 'string' },
+                    description: 'Dimensions used: 1D, 2D, 3D, 4D, 5D'
+                  },
+                  cycles: {
+                    type: 'array',
+                    items: { type: 'string' },
+                    description: 'Covenant cycles: @Ad, @No, @Ab, @Mo, @Cy, @CyC, @Sp, @Re'
+                  },
+                  horizons: {
+                    type: 'array',
+                    items: { type: 'string' },
+                    description: 'Prophetic horizons: 1H, 2H, 3H'
+                  },
+                  timeZones: {
+                    type: 'array',
+                    items: { type: 'string' },
+                    description: 'Time zones: Earth-Past, Earth-Now, Earth-Future, Heaven-Past, Heaven-Now, Heaven-Future'
+                  },
+                  sanctuary: {
+                    type: 'array',
+                    items: { type: 'string' },
+                    description: 'Sanctuary elements: Gate, Altar, Laver, Lampstand, Table, Incense, Veil, Ark'
+                  },
+                  feasts: {
+                    type: 'array',
+                    items: { type: 'string' },
+                    description: 'Feasts: Passover, Unleavened Bread, Firstfruits, Pentecost, Trumpets, Atonement, Tabernacles'
+                  },
+                  walls: {
+                    type: 'array',
+                    items: { type: 'string' },
+                    description: 'Theme walls: Sanctuary Wall, Life of Christ Wall, Great Controversy Wall, Time Prophecy Wall, Gospel Floor, Heaven Ceiling'
+                  },
+                  crossReferences: {
+                    type: 'array',
+                    items: {
+                      type: 'object',
+                      properties: {
+                        book: { type: 'string' },
+                        chapter: { type: 'number' },
+                        verse: { type: 'number' },
+                        reason: { type: 'string' },
+                        principleType: { type: 'string' },
+                        confidence: { type: 'number' }
+                      },
+                      required: ['book', 'chapter', 'verse', 'reason']
+                    }
+                  },
+                  commentary: {
+                    type: 'string',
+                    description: 'Warm flowing analysis explaining which rooms were used and why'
+                  },
+                  christCenter: {
+                    type: 'string',
+                    description: '2-3 paragraphs showing specifically how Christ appears in this verse'
+                  }
+                },
+                required: ['roomsUsed', 'floorsCovered', 'roomAnalysis', 'commentary', 'christCenter'],
+                additionalProperties: false
+              }
+            }
+          }
+        ],
+        tool_choice: { type: 'function', function: { name: 'analyze_verse' } }
       }),
     });
 
@@ -216,21 +303,14 @@ Return only valid JSON with roomsUsed array and roomAnalysis object using full r
     }
 
     const data = await response.json();
-    let analysisText = data.choices[0].message.content;
     
-    // Clean up any control characters that might break JSON parsing
-    analysisText = analysisText
-      .replace(/[\u0000-\u001F\u007F-\u009F]/g, '') // Remove control characters
-      .trim();
-    
-    // Try to extract JSON if wrapped in markdown code blocks
-    const jsonMatch = analysisText.match(/```json\s*([\s\S]*?)\s*```/) || 
-                      analysisText.match(/```\s*([\s\S]*?)\s*```/);
-    if (jsonMatch) {
-      analysisText = jsonMatch[1].trim();
+    // Extract structured output from tool call
+    const toolCall = data.choices[0].message.tool_calls?.[0];
+    if (!toolCall || !toolCall.function.arguments) {
+      throw new Error('No tool call response from AI');
     }
     
-    const analysis = JSON.parse(analysisText);
+    const analysis = JSON.parse(toolCall.function.arguments);
 
     return new Response(
       JSON.stringify({
