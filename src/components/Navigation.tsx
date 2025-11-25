@@ -266,6 +266,13 @@ export const Navigation = () => {
                     Phototheology Study Bible
                   </Link>
                   <Link 
+                    to="/card-deck" 
+                    className="px-3 py-1.5 text-sm font-medium text-foreground hover:text-primary hover:bg-accent/50 rounded-md transition-colors whitespace-nowrap flex items-center gap-1"
+                  >
+                    <Sparkles className="h-3.5 w-3.5" />
+                    Phototheology Study Deck
+                  </Link>
+                  <Link 
                     to="/reading-plans" 
                     className="px-3 py-1.5 text-sm font-medium text-foreground hover:text-primary hover:bg-accent/50 rounded-md transition-colors whitespace-nowrap flex items-center gap-1"
                   >
@@ -297,13 +304,6 @@ export const Navigation = () => {
                     className="px-3 py-1.5 text-sm font-medium text-foreground hover:text-primary hover:bg-accent/50 rounded-md transition-colors whitespace-nowrap"
                   >
                     Games
-                  </Link>
-                  <Link 
-                    to="/card-deck" 
-                    className="px-3 py-1.5 text-sm font-medium text-foreground hover:text-primary hover:bg-accent/50 rounded-md transition-colors whitespace-nowrap flex items-center gap-1"
-                  >
-                    <Sparkles className="h-3.5 w-3.5" />
-                    Card Deck
                   </Link>
                   <Link 
                     to="/genesis-challenge" 
