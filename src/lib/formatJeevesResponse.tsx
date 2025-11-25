@@ -14,9 +14,8 @@ export const formatJeevesResponse = (text: string): React.ReactNode[] => {
     .trim();
 
   const blocks: React.ReactNode[] = [];
-  let currentIndex = 0;
 
-  // Split into blocks by double newlines
+  // Split into blocks by double newlines OR by sentences for better readability
   const sections = cleanedText.split(/\n\n+/).filter(s => s.trim());
 
   sections.forEach((section, sectionIdx) => {
@@ -57,7 +56,7 @@ export const formatJeevesResponse = (text: string): React.ReactNode[] => {
 };
 
 /**
- * Format a section (paragraph, list, or quote)
+ * Format a section (paragraph, list, or quote) with enhanced visual appeal
  */
 const formatSection = (text: string, baseKey: number): React.ReactNode[] => {
   const lines = text.split('\n');
@@ -152,14 +151,35 @@ const formatSection = (text: string, baseKey: number): React.ReactNode[] => {
       </ol>
     );
   } else {
-    // Regular paragraph
-    const content = lines.join(' ').trim();
-    if (content) {
-      blocks.push(
-        <p key={`para-${baseKey}`} className="mb-4 leading-relaxed text-base">
-          {formatInlineText(content)}
-        </p>
-      );
+    // Split long paragraphs into sentences for better readability
+    const sentences = text.match(/[^.!?]+[.!?]+/g) || [text];
+    
+    if (sentences.length > 3) {
+      // Break into smaller paragraphs every 2-3 sentences
+      const chunks: string[] = [];
+      for (let i = 0; i < sentences.length; i += 2) {
+        chunks.push(sentences.slice(i, i + 2).join(' ').trim());
+      }
+      
+      chunks.forEach((chunk, idx) => {
+        if (chunk) {
+          blocks.push(
+            <p key={`para-${baseKey}-${idx}`} className="mb-4 leading-relaxed text-base">
+              {formatInlineText(chunk)}
+            </p>
+          );
+        }
+      });
+    } else {
+      // Short paragraph, keep as-is
+      const content = lines.join(' ').trim();
+      if (content) {
+        blocks.push(
+          <p key={`para-${baseKey}`} className="mb-4 leading-relaxed text-base">
+            {formatInlineText(content)}
+          </p>
+        );
+      }
     }
   }
 
@@ -167,7 +187,7 @@ const formatSection = (text: string, baseKey: number): React.ReactNode[] => {
 };
 
 /**
- * Format inline text with bold, italic, code, and emojis
+ * Format inline text with bold, italic, code, emojis, and PT room codes
  */
 const formatInlineText = (text: string): React.ReactNode => {
   const parts: React.ReactNode[] = [];
@@ -175,6 +195,34 @@ const formatInlineText = (text: string): React.ReactNode => {
   let keyCounter = 0;
 
   while (remaining.length > 0) {
+    // Handle PT room codes (e.g., SR, DR, 1D, @Ab, ∞)
+    const roomCodeMatch = remaining.match(/^([A-Z]{1,3}R?m?|∞|@[A-Z][a-z]+|\d+D)(\s*\([^)]+\))?/);
+    if (roomCodeMatch) {
+      const code = roomCodeMatch[1];
+      const description = roomCodeMatch[2] || '';
+      const roomColor = getRoomColor(code);
+      
+      parts.push(
+        <span 
+          key={`room-${keyCounter++}`} 
+          className="inline-flex items-center gap-1 mx-0.5"
+        >
+          <span 
+            className={`px-2 py-0.5 rounded-md font-bold text-xs ${roomColor} border shadow-sm`}
+          >
+            {code}
+          </span>
+          {description && (
+            <span className="text-sm text-muted-foreground italic">
+              {description}
+            </span>
+          )}
+        </span>
+      );
+      remaining = remaining.slice(roomCodeMatch[0].length);
+      continue;
+    }
+
     // Handle bold text (**text** or __text__)
     const boldMatch = remaining.match(/^(\*\*|__)(.*?)\1/);
     if (boldMatch) {
@@ -262,21 +310,68 @@ const formatInlineText = (text: string): React.ReactNode => {
 };
 
 /**
+ * Get color styling for PT room codes
+ */
+const getRoomColor = (code: string): string => {
+  // Floor 1 - Furnishing (Width)
+  if (code.match(/^(SR|IR|24F?|BR|TR|GR)$/)) return 'bg-blue-100 text-blue-700 border-blue-300';
+  
+  // Floor 2 - Investigation (Width)
+  if (code.match(/^(OR|DC|ST|QR|QA)$/)) return 'bg-purple-100 text-purple-700 border-purple-300';
+  
+  // Floor 3 - Freestyle (Time)
+  if (code.match(/^(NF|PF|BF|HF|LR)$/)) return 'bg-green-100 text-green-700 border-green-300';
+  
+  // Floor 4 - Next Level (Depth)
+  if (code.match(/^(CR|DR|C6|TRm|TZ|PRm|P\|\||FRt)$/)) return 'bg-orange-100 text-orange-700 border-orange-300';
+  
+  // Floor 5 - Vision (Depth)
+  if (code.match(/^(BL|PR|3A)$/)) return 'bg-red-100 text-red-700 border-red-300';
+  
+  // Floor 6 - Cycles & Heavens (Depth)
+  if (code.match(/^@(Ad|No|Ab|Mo|Cy|CyC|Sp|Re)$/)) return 'bg-indigo-100 text-indigo-700 border-indigo-300';
+  if (code.match(/^(1H|2H|3H|JR)$/)) return 'bg-indigo-100 text-indigo-700 border-indigo-300';
+  
+  // Floor 7 - Spiritual/Emotional (Height)
+  if (code.match(/^(FRm|MR|SR)$/)) return 'bg-pink-100 text-pink-700 border-pink-300';
+  
+  // Floor 8 - Master (Height)
+  if (code === '∞') return 'bg-yellow-100 text-yellow-700 border-yellow-300';
+  
+  // Dimensions
+  if (code.match(/^\d+D$/)) return 'bg-cyan-100 text-cyan-700 border-cyan-300';
+  
+  // Default
+  return 'bg-gray-100 text-gray-700 border-gray-300';
+};
+
+/**
  * Get contextual emoji for headings
  */
 const getHeadingEmoji = (text: string): string => {
   const lower = text.toLowerCase();
   
-  if (lower.includes('key') || lower.includes('important')) return '🔑';
+  // PT-specific rooms and concepts
+  if (lower.includes('story room') || lower.includes('sr')) return '📚';
+  if (lower.includes('observation') || lower.includes('or')) return '🔍';
+  if (lower.includes('dimension') || lower.includes('dr')) return '🌐';
+  if (lower.includes('concentration') || lower.includes('cr')) return '🎯';
+  if (lower.includes('theme room') || lower.includes('trm')) return '🏛️';
+  if (lower.includes('pattern') || lower.includes('prm')) return '🔄';
+  if (lower.includes('parallel') || lower.includes('p||')) return '⚖️';
+  if (lower.includes('fruit room') || lower.includes('frt')) return '🍇';
+  if (lower.includes('imagination') || lower.includes('ir')) return '✨';
+  if (lower.includes('meditation') || lower.includes('mr')) return '🧘';
+  if (lower.includes('bible freestyle') || lower.includes('bf')) return '🔗';
+  if (lower.includes('infinity') || lower.includes('∞')) return '♾️';
+  
+  // Biblical themes
+  if (lower.includes('christ') || lower.includes('jesus') || lower.includes('messiah')) return '✝️';
+  if (lower.includes('prophecy') || lower.includes('vision')) return '🔮';
+  if (lower.includes('sanctuary') || lower.includes('temple')) return '⛪';
+  if (lower.includes('gospel') || lower.includes('good news')) return '📣';
   if (lower.includes('summary') || lower.includes('conclusion')) return '📝';
-  if (lower.includes('question') || lower.includes('why')) return '❓';
-  if (lower.includes('example') || lower.includes('instance')) return '💡';
-  if (lower.includes('warning') || lower.includes('caution')) return '⚠️';
-  if (lower.includes('note') || lower.includes('remember')) return '📌';
-  if (lower.includes('christ') || lower.includes('jesus')) return '✝️';
-  if (lower.includes('scripture') || lower.includes('verse')) return '📖';
-  if (lower.includes('prayer') || lower.includes('worship')) return '🙏';
-  if (lower.includes('study') || lower.includes('learn')) return '📚';
+  if (lower.includes('key') || lower.includes('important')) return '🔑';
   
   return '✨';
 };
@@ -287,24 +382,29 @@ const getHeadingEmoji = (text: string): string => {
 const getBulletEmoji = (text: string): string => {
   const lower = text.toLowerCase();
   
-  if (lower.includes('christ') || lower.includes('jesus') || lower.includes('messiah')) return '✝️';
-  if (lower.includes('prayer') || lower.includes('pray')) return '🙏';
-  if (lower.includes('love') || lower.includes('grace')) return '❤️';
-  if (lower.includes('wisdom') || lower.includes('understand')) return '🧠';
-  if (lower.includes('faith') || lower.includes('believe')) return '⭐';
-  if (lower.includes('hope') || lower.includes('promise')) return '🌟';
-  if (lower.includes('peace') || lower.includes('rest')) return '☮️';
-  if (lower.includes('joy') || lower.includes('rejoice')) return '😊';
-  if (lower.includes('spirit') || lower.includes('holy')) return '🕊️';
-  if (lower.includes('light') || lower.includes('truth')) return '💡';
-  if (lower.includes('bible') || lower.includes('scripture') || lower.includes('verse')) return '📖';
-  if (lower.includes('temple') || lower.includes('sanctuary')) return '⛪';
-  if (lower.includes('covenant') || lower.includes('promise')) return '🤝';
-  if (lower.includes('prophet') || lower.includes('prophecy')) return '🔮';
-  if (lower.includes('angel')) return '👼';
-  if (lower.includes('heaven')) return '☁️';
-  if (lower.includes('cross') || lower.includes('crucif')) return '✞';
-  if (lower.includes('resurrection') || lower.includes('risen')) return '🌅';
+  // PT room/floor references
+  if (lower.match(/\b(sr|story room)\b/)) return '📚';
+  if (lower.match(/\b(or|observation)\b/)) return '🔍';
+  if (lower.match(/\b(dr|dimension)\b/)) return '🌐';
+  if (lower.match(/\b(cr|concentration)\b/)) return '🎯';
+  if (lower.match(/\b(trm|theme)\b/)) return '🏛️';
+  if (lower.match(/\b(ir|imagination)\b/)) return '✨';
+  if (lower.match(/\b(mr|meditation)\b/)) return '🧘';
+  if (lower.match(/\b(bf|freestyle)\b/)) return '🔗';
+  if (lower.match(/\b(frt|fruit)\b/)) return '🍇';
   
-  return '✨';
+  // Content types
+  if (lower.includes('christ') || lower.includes('jesus')) return '✝️';
+  if (lower.includes('light')) return '💡';
+  if (lower.includes('truth')) return '💎';
+  if (lower.includes('transparent') || lower.includes('reveal')) return '🪟';
+  if (lower.includes('work') || lower.includes('deed')) return '🔨';
+  if (lower.includes('god')) return '🙏';
+  if (lower.includes('love') || lower.includes('grace')) return '❤️';
+  if (lower.includes('wisdom')) return '🧠';
+  if (lower.includes('prayer')) return '🙏';
+  if (lower.includes('scripture') || lower.includes('verse')) return '📖';
+  if (lower.includes('heaven')) return '☁️';
+  
+  return '▪️';
 };
