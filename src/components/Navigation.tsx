@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { Building2, Sparkles, Users, User, CreditCard, LogOut, MessageCircle, BookOpen, Calendar, Image, Search, Video, Sword, Crown, Shield, Gift } from "lucide-react";
+import { Building2, Sparkles, Users, User, CreditCard, LogOut, MessageCircle, BookOpen, Calendar, Image, Search, Video, Sword, Crown, Shield } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
 import { useActiveUsers } from "@/hooks/useActiveUsers";
@@ -70,23 +70,8 @@ export const Navigation = () => {
               </span>
             </Link>
           
-            <div className="flex items-center gap-2 md:gap-3 flex-1 justify-end">
+            <div className="flex items-center gap-2 md:gap-4 flex-1 justify-end">
               <GlobalSearch />
-              
-              {/* Prominent Redeem Code button - always visible */}
-              <Button 
-                asChild 
-                variant="outline" 
-                size="sm"
-                className="gradient-palace text-white border-0 shadow-purple hover:shadow-glow whitespace-nowrap"
-              >
-                <Link to="/redeem-code">
-                  <Gift className="h-4 w-4 mr-1.5" />
-                  <span className="hidden sm:inline">Redeem Code</span>
-                  <span className="sm:hidden">Code</span>
-                </Link>
-              </Button>
-              
               <PWAInstallButton />
               <ThemeToggle />
               
@@ -131,16 +116,9 @@ export const Navigation = () => {
                 </>
               ) : (
                 <>
-                  {/* Prominent Sign In Button for logged-out users */}
-                  <Button 
-                    asChild 
-                    size="default"
-                    className="whitespace-nowrap gradient-palace text-white shadow-purple hover:shadow-glow"
-                  >
-                    <Link to="/auth">
-                      <User className="h-4 w-4 mr-1.5" />
-                      Sign In
-                    </Link>
+                  {/* Sign In Button for logged-out users */}
+                  <Button asChild className="whitespace-nowrap">
+                    <Link to="/auth">Sign In</Link>
                   </Button>
                   
                   {/* Desktop Navigation for logged-out users - Horizontal Scroll */}

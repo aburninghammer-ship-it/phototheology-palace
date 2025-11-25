@@ -21,8 +21,7 @@ import {
   Building2,
   Play,
   Shield,
-  Quote,
-  Gift
+  Quote
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
@@ -483,15 +482,6 @@ const Index = () => {
                 View Pricing Details
                 <ChevronRight className="ml-2 h-5 w-5" />
               </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => navigate("/redeem-code")}
-                className="w-full mt-2"
-              >
-                <Gift className="mr-2 h-4 w-4" />
-                Redeem Access Code
-              </Button>
               <p className="text-sm text-muted-foreground mt-4">
                 <Shield className="h-4 w-4 inline mr-1" />
                 Risk-free. No credit card required to start.
@@ -537,17 +527,6 @@ const Index = () => {
             >
               <Play className="mr-2 h-6 w-6" />
               Watch the Demo
-            </Button>
-          </div>
-          
-          <div className="mt-6">
-            <Button
-              variant="link"
-              onClick={() => navigate("/redeem-code")}
-              className="text-sm text-muted-foreground hover:text-primary"
-            >
-              <Gift className="mr-2 h-4 w-4" />
-              Have a special access code?
             </Button>
           </div>
         </div>

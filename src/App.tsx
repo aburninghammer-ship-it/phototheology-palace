@@ -156,8 +156,7 @@ const GuildDetail = lazy(() => import("./pages/GuildDetail"));
 const PrivacyPolicy = lazy(() => import("./pages/PrivacyPolicy"));
 const TermsOfService = lazy(() => import("./pages/TermsOfService"));
 const NotFound = lazy(() => import("./pages/NotFound"));
-import AuthCallback from "./pages/AuthCallback";
-const RedeemCode = lazy(() => import("./pages/RedeemCode"));
+const AuthCallback = lazy(() => import("./pages/AuthCallback"));
 
 const queryClient = new QueryClient();
 
@@ -209,11 +208,6 @@ function App() {
             <Route path="/access" element={
               <ProtectedRoute>
                 <AccessCode />
-              </ProtectedRoute>
-            } />
-            <Route path="/redeem-code" element={
-              <ProtectedRoute>
-                <RedeemCode />
               </ProtectedRoute>
             } />
             <Route path="/student-verification" element={
