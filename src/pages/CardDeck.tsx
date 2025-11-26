@@ -1146,7 +1146,6 @@ export default function CardDeck() {
                         pickRandomCard();
                         setFeedback("");
                         setUserAnswer("");
-                        setConversationHistory([]);
                       }}
                       className="w-full gradient-palace"
                     >
@@ -1162,7 +1161,7 @@ export default function CardDeck() {
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2">
                       <MessageCircle className="h-5 w-5 text-primary" />
-                      Conversation History
+                      Present Deck Study
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
