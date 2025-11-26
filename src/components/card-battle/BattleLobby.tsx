@@ -53,9 +53,11 @@ export function BattleLobby({ mode, onBattleStart, onBack }: Props) {
   const [availableUsers, setAvailableUsers] = useState<any[]>([]);
   const [currentBattleId, setCurrentBattleId] = useState<string | null>(null);
   const [invitingUsers, setInvitingUsers] = useState<Set<string>>(new Set());
+  const [teamAName, setTeamAName] = useState("Team Alpha");
+  const [teamBName, setTeamBName] = useState("Team Beta");
 
   useEffect(() => {
-    if (mode === 'user_vs_user') {
+    if (mode === 'user_vs_user' || mode === 'team_vs_team') {
       loadAvailableUsers();
     }
   }, [mode]);
@@ -237,17 +239,19 @@ export function BattleLobby({ mode, onBattleStart, onBack }: Props) {
       // Decide who starts based on mode
       const initialCurrentTurnPlayer = mode === 'jeeves_vs_jeeves'
         ? (whoGoesFirst === 'dr_jeeves' ? 'jeeves_1' : 'jeeves_2')
+        : mode === 'team_vs_team'
+        ? 'team_a'
         : `user_${user.id}`;
       
-      // Generate battle code for multiplayer
-      const newBattleCode = mode === 'user_vs_user' ? generateBattleCode() : null;
+      // Generate battle code for multiplayer modes
+      const newBattleCode = (mode === 'user_vs_user' || mode === 'team_vs_team') ? generateBattleCode() : null;
       
       // Create battle
       const { data: battle, error: battleError } = await supabase
         .from('pt_card_battles')
         .insert({
           game_mode: mode,
-          status: mode === 'user_vs_user' ? 'waiting' : 'waiting',
+          status: (mode === 'user_vs_user' || mode === 'team_vs_team') ? 'waiting' : 'waiting',
           story_text: finalStoryText,
           story_reference: finalReference || null,
           current_turn_player: initialCurrentTurnPlayer,
@@ -296,6 +300,17 @@ export function BattleLobby({ mode, onBattleStart, onBack }: Props) {
           display_name: 'Professor Jeeves',
           cards_in_hand: shuffled.slice(7, 14),
         });
+      } else if (mode === 'team_vs_team') {
+        // Create team A with host
+        players.push({
+          battle_id: battle.id,
+          player_id: `user_${user.id}`,
+          player_type: 'human',
+          user_id: user.id,
+          display_name: 'You',
+          team_name: teamAName,
+          cards_in_hand: shuffled.slice(0, 7),
+        });
       }
 
       const { error: playersError } = await supabase
@@ -304,8 +319,8 @@ export function BattleLobby({ mode, onBattleStart, onBack }: Props) {
 
       if (playersError) throw playersError;
 
-      // For user_vs_user mode, wait for opponent
-      if (mode === 'user_vs_user') {
+      // For multiplayer modes, wait for opponent
+      if (mode === 'user_vs_user' || mode === 'team_vs_team') {
         setBattleCode(newBattleCode!);
         setCurrentBattleId(battle.id);
         setWaitingForOpponent(true);
@@ -613,8 +628,8 @@ export function BattleLobby({ mode, onBattleStart, onBack }: Props) {
           </div>
         </CardHeader>
         <CardContent className="space-y-6">
-          {/* Join Battle Option for user_vs_user */}
-          {mode === 'user_vs_user' && (
+          {/* Join Battle Option for multiplayer modes */}
+          {(mode === 'user_vs_user' || mode === 'team_vs_team') && (
             <div className="space-y-4 mb-6 p-4 bg-purple-500/20 rounded-lg border-2 border-purple-400/30">
               <h3 className="font-bold text-white text-lg">Join an Existing Battle</h3>
               <div className="flex gap-2">
@@ -633,7 +648,7 @@ export function BattleLobby({ mode, onBattleStart, onBack }: Props) {
                   {isJoining ? 'Joining...' : 'Join Battle'}
                 </Button>
               </div>
-              <p className="text-xs text-purple-200">Have a code? Enter it above to join your friend's battle!</p>
+              <p className="text-xs text-purple-200">Have a code? Enter it above to join {mode === 'team_vs_team' ? 'a team battle' : "your friend's battle"}!</p>
             </div>
           )}
 
@@ -661,6 +676,32 @@ export function BattleLobby({ mode, onBattleStart, onBack }: Props) {
               className="bg-white/10 border-white/20 text-white placeholder:text-white/50"
             />
           </div>
+
+          {mode === 'team_vs_team' && (
+            <div className="space-y-4">
+              <Label className="text-white">Team Names</Label>
+              <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-2">
+                  <Input
+                    value={teamAName}
+                    onChange={(e) => setTeamAName(e.target.value)}
+                    placeholder="Team A name..."
+                    className="bg-green-500/20 border-green-400/30 text-white placeholder:text-white/50"
+                  />
+                  <p className="text-xs text-green-300">Your team</p>
+                </div>
+                <div className="space-y-2">
+                  <Input
+                    value={teamBName}
+                    onChange={(e) => setTeamBName(e.target.value)}
+                    placeholder="Team B name..."
+                    className="bg-orange-500/20 border-orange-400/30 text-white placeholder:text-white/50"
+                  />
+                  <p className="text-xs text-orange-300">Opposing team</p>
+                </div>
+              </div>
+            </div>
+          )}
 
           {mode === 'jeeves_vs_jeeves' && (
             <div className="space-y-2">
