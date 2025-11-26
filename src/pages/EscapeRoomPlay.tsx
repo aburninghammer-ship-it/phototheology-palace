@@ -172,16 +172,14 @@ export default function EscapeRoomPlay() {
       // Move to next puzzle or finish
       if (currentPuzzleIndex < puzzles.length - 1) {
         const nextPuzzleNumber = currentPuzzleIndex + 2; // +2 because index is 0-based
-        setTimeout(() => {
-          setCurrentPuzzleIndex(prev => prev + 1);
-          setSubmittedVerses("");
-          setRoomJustification("");
-          setPrincipleUsed("");
-          setShowHint(false);
-          toast.info(`Moving to Puzzle ${nextPuzzleNumber}...`, {
-            duration: 3000,
-          });
-        }, 1000);
+        toast.info(`Moving to Puzzle ${nextPuzzleNumber}...`);
+        
+        // Update state immediately
+        setCurrentPuzzleIndex(prev => prev + 1);
+        setSubmittedVerses("");
+        setRoomJustification("");
+        setPrincipleUsed("");
+        setShowHint(false);
       } else {
         finishAttempt(true);
       }
