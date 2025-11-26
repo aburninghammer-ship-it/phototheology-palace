@@ -199,7 +199,12 @@ export default function CardDeck() {
     palaceFloors.forEach((floor) => {
       floor.rooms.forEach((room) => {
         // Skip rooms that have individual sub-principle cards
-        if (room.id === "c6" || room.id === "tz" || room.id === "dr" || room.id === "trm" || room.id === "mr" || room.id === "3a" || room.id === "bl" || room.id === "fr") {
+        // c6 = Connect 6 (6 genres), tz = Time Zone (6 zones), dr = Dimensions (5 dimensions)
+        // trm = Theme (6 themes), mr = Math Room (6 prophecies), 3a = Three Angels (3 angels)
+        // bl = Blue Room (8 sanctuary items), feast = Feast Room (7 feasts), frt = Fruit Room (9 fruits)
+        if (room.id === "c6" || room.id === "tz" || room.id === "dr" || 
+            room.id === "trm" || room.id === "mr" || room.id === "3a" || 
+            room.id === "bl" || room.id === "feast" || room.id === "frt") {
           return;
         }
         
