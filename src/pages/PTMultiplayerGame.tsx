@@ -155,7 +155,6 @@ const PTMultiplayerGame = () => {
   const [myCards, setMyCards] = useState<Card[]>([]);
   const [loading, setLoading] = useState(true);
   
-  const [selectedCardType, setSelectedCardType] = useState<string>("");
   const [cardValue, setCardValue] = useState<string>("");
   const [explanation, setExplanation] = useState<string>("");
   const [submitting, setSubmitting] = useState(false);
@@ -258,7 +257,7 @@ const PTMultiplayerGame = () => {
   };
 
   const handlePlayCard = async () => {
-    if (!selectedCardType || !cardValue || !explanation || !currentPlayer || !game) {
+    if (!cardValue || !explanation || !currentPlayer || !game) {
       toast({ title: "Missing information", description: "Please fill all fields", variant: "destructive" });
       return;
     }
@@ -281,7 +280,7 @@ const PTMultiplayerGame = () => {
         body: {
           gameId: game.id,
           playerId: currentPlayer.id,
-          cardType: selectedCardType,
+          cardType: "principle",
           cardData: { value: cardValue },
           explanation: explanation,
           studyTopic: game.study_topic,
@@ -300,7 +299,6 @@ const PTMultiplayerGame = () => {
       });
 
       // Clear form
-      setSelectedCardType("");
       setCardValue("");
       setExplanation("");
 
