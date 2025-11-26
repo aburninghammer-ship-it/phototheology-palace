@@ -372,8 +372,36 @@ export function BattleArena({ battle, currentUserId, onBack }: Props) {
   };
 
   const handleJeevesPlay = async () => {
+    console.log('🤖 Jeeves Play button clicked!');
+    console.log('Players:', players);
+    
     const jeevesPlayer = players.find(p => p.player_id === 'jeeves_1');
-    if (!jeevesPlayer || jeevesPlayer.cards_in_hand.length === 0) return;
+    console.log('Found Jeeves player:', jeevesPlayer);
+    
+    if (!jeevesPlayer) {
+      console.log('❌ Jeeves player not found');
+      toast({
+        title: "Error",
+        description: "Jeeves player not found in the game",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    if (jeevesPlayer.cards_in_hand.length === 0) {
+      console.log('❌ Jeeves has no cards left');
+      toast({
+        title: "Game Over",
+        description: "Jeeves has no cards left to play!",
+      });
+      return;
+    }
+
+    console.log('✅ Jeeves starting to play...');
+    toast({
+      title: "Jeeves is Thinking...",
+      description: "Selecting a card and preparing a response...",
+    });
 
     setIsSubmitting(true);
     try {
@@ -381,18 +409,21 @@ export function BattleArena({ battle, currentUserId, onBack }: Props) {
       const randomCard = jeevesPlayer.cards_in_hand[
         Math.floor(Math.random() * jeevesPlayer.cards_in_hand.length)
       ];
+      console.log('🎴 Jeeves selected card:', randomCard);
 
       // Generate a response from Jeeves
       const jeevesResponses = [
-        `Through ${randomCard}, we see this story illuminates the sanctuary pattern where...`,
-        `Applying ${randomCard} reveals how this narrative parallels the covenant structure of...`,
-        `Using ${randomCard}, we discover Christ as the central figure who fulfills...`,
-        `The principle ${randomCard} helps us understand this text in the cycle of redemption where...`,
-        `When viewed through ${randomCard}, this passage connects to the broader prophetic timeline...`
+        `Through ${randomCard}, we see this story illuminates the sanctuary pattern where Christ's substitutionary sacrifice is prefigured. The narrative reveals how God's dwelling presence among His people points forward to the incarnation.`,
+        `Applying ${randomCard} reveals how this narrative parallels the covenant structure established at Sinai. We observe the pattern of grace preceding law, and mercy triumphing over judgment.`,
+        `Using ${randomCard}, we discover Christ as the central figure who fulfills this typological pattern. The text becomes a window into the great controversy between good and evil.`,
+        `The principle ${randomCard} helps us understand this text in the cycle of redemption where God's faithfulness spans generations. Each detail connects to the broader narrative of salvation history.`,
+        `When viewed through ${randomCard}, this passage connects to the broader prophetic timeline. We see echoes of Daniel's visions and Revelation's unveiling of final events.`
       ];
       
       const randomResponse = jeevesResponses[Math.floor(Math.random() * jeevesResponses.length)];
+      console.log('📝 Jeeves response:', randomResponse);
 
+      console.log('🎯 Calling judge-card-battle edge function...');
       const { data, error } = await supabase.functions.invoke('judge-card-battle', {
         body: {
           battleId: battle.id,
@@ -403,20 +434,37 @@ export function BattleArena({ battle, currentUserId, onBack }: Props) {
         },
       });
 
-      if (error) throw error;
+      if (error) {
+        console.error('❌ Edge function error:', error);
+        throw error;
+      }
+
+      console.log('✅ Judgment received:', data);
 
       await loadPlayers();
       await loadMoves();
 
       if (data.judgment.verdict === 'approved') {
         toast({
-          title: "Jeeves Played",
-          description: `${randomCard}: ${data.judgment.feedback}`,
+          title: "🤖 Jeeves Played Successfully!",
+          description: `Card: ${randomCard} | Points: ${data.judgment.totalPoints}`,
+        });
+      } else {
+        toast({
+          title: "🤖 Jeeves' Move Rejected",
+          description: `Card: ${randomCard} was rejected!`,
+          variant: "destructive",
         });
       }
     } catch (error: any) {
-      console.error('Error with Jeeves play:', error);
+      console.error('❌ Error with Jeeves play:', error);
+      toast({
+        title: "Error",
+        description: error.message || "Failed to process Jeeves' turn",
+        variant: "destructive",
+      });
     } finally {
+      console.log('✅ Jeeves turn complete');
       setIsSubmitting(false);
     }
   };
