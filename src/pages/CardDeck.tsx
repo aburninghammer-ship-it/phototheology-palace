@@ -96,6 +96,29 @@ const THEME_CARDS = [
   { code: "TRm-Heav", name: "Heaven Ceiling", roomName: "Theme", question: "How does this passage describe the ultimate eschatological hope and final restoration?", floor: 4 },
 ];
 
+// Blue Room - Sanctuary Items
+const BLUE_ROOM_CARDS = [
+  { code: "BL-Gate", name: "Gate/Door", roomName: "Blue Room", question: "How does this text reveal Christ as the Gate/Door to God's presence (John 10:9)?", floor: 5 },
+  { code: "BL-Altar", name: "Bronze Altar", roomName: "Blue Room", question: "How does this text connect to sacrifice, atonement, and Christ's blood at the altar?", floor: 5 },
+  { code: "BL-Laver", name: "Laver", roomName: "Blue Room", question: "How does this text reveal cleansing, washing, and sanctification (Eph 5:26)?", floor: 5 },
+  { code: "BL-Lamp", name: "Lampstand", roomName: "Blue Room", question: "How does this text illuminate light, testimony, and the Spirit's work (Rev 1:20)?", floor: 5 },
+  { code: "BL-Table", name: "Table of Showbread", roomName: "Blue Room", question: "How does this text show Christ as the Bread of Life and provision (John 6:35)?", floor: 5 },
+  { code: "BL-Incense", name: "Altar of Incense", roomName: "Blue Room", question: "How does this text reveal prayer, intercession, and Christ's mediation (Rev 8:3-4)?", floor: 5 },
+  { code: "BL-Veil", name: "Veil", roomName: "Blue Room", question: "How does this text connect to the torn veil and access to God (Heb 10:19-20)?", floor: 5 },
+  { code: "BL-Ark", name: "Ark of the Covenant", roomName: "Blue Room", question: "How does this text reveal God's throne, law, and mercy seat (Rom 3:25)?", floor: 5 },
+];
+
+// Feast Room - Biblical Feasts
+const FEAST_ROOM_CARDS = [
+  { code: "FR-Pass", name: "Passover", roomName: "Feast Room", question: "How does this text connect to Passover and Christ as our Passover Lamb (1 Cor 5:7)?", floor: 5 },
+  { code: "FR-Unlv", name: "Unleavened Bread", roomName: "Feast Room", question: "How does this text relate to removing sin/leaven and living in purity?", floor: 5 },
+  { code: "FR-First", name: "Firstfruits", roomName: "Feast Room", question: "How does this text connect to Christ's resurrection as the firstfruits (1 Cor 15:20)?", floor: 5 },
+  { code: "FR-Pent", name: "Pentecost", roomName: "Feast Room", question: "How does this text relate to the outpouring of the Holy Spirit (Acts 2)?", floor: 5 },
+  { code: "FR-Trum", name: "Trumpets", roomName: "Feast Room", question: "How does this text connect to the call to awakening and gathering?", floor: 5 },
+  { code: "FR-Aton", name: "Day of Atonement", roomName: "Feast Room", question: "How does this text reveal judgment, cleansing, and final atonement (Lev 16)?", floor: 5 },
+  { code: "FR-Tab", name: "Tabernacles", roomName: "Feast Room", question: "How does this text point to God dwelling with us and future restoration?", floor: 5 },
+];
+
 // Additional cycle and heaven cards
 const CYCLE_CARDS = [
   { code: "@Ad", name: "Adamic Cycle", question: "Apply the Adamic cycle (creation, fall, promise) to this text", floor: 6 },
@@ -144,7 +167,7 @@ export default function CardDeck() {
     palaceFloors.forEach((floor) => {
       floor.rooms.forEach((room) => {
         // Skip rooms that have individual sub-principle cards
-        if (room.id === "c6" || room.id === "tz" || room.id === "dr" || room.id === "trm" || room.id === "mr" || room.id === "3a") {
+        if (room.id === "c6" || room.id === "tz" || room.id === "dr" || room.id === "trm" || room.id === "mr" || room.id === "3a" || room.id === "bl" || room.id === "fr") {
           return;
         }
         
@@ -228,6 +251,30 @@ export default function CardDeck() {
         question: angel.question,
         floor: angel.floor,
         floorColor: FLOOR_COLORS[(angel.floor - 1) % FLOOR_COLORS.length],
+      });
+    });
+    
+    // Add Blue Room cards
+    BLUE_ROOM_CARDS.forEach((item) => {
+      cards.push({
+        id: item.code.toLowerCase(),
+        code: item.code,
+        name: `${item.roomName} - ${item.name}`,
+        question: item.question,
+        floor: item.floor,
+        floorColor: FLOOR_COLORS[(item.floor - 1) % FLOOR_COLORS.length],
+      });
+    });
+    
+    // Add Feast Room cards
+    FEAST_ROOM_CARDS.forEach((feast) => {
+      cards.push({
+        id: feast.code.toLowerCase(),
+        code: feast.code,
+        name: `${feast.roomName} - ${feast.name}`,
+        question: feast.question,
+        floor: feast.floor,
+        floorColor: FLOOR_COLORS[(feast.floor - 1) % FLOOR_COLORS.length],
       });
     });
     

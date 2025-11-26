@@ -80,7 +80,9 @@ const PTMultiplayerLobby = () => {
 
   const gameModes = [
     { id: "free-for-all", label: "Free-For-All", icon: Users, desc: "Everyone competes individually" },
+    { id: "1v1-jeeves", label: "1v1 vs Jeeves", icon: Target, desc: "You vs AI Jeeves opponent" },
     { id: "team", label: "Team Mode", icon: Crown, desc: "Form teams and collaborate" },
+    { id: "team-vs-jeeves", label: "Team vs Jeeves", icon: Swords, desc: "Your team vs AI Jeeves" },
     { id: "council", label: "Council Mode", icon: Target, desc: "Debate before Jeeves judges" },
     { id: "boss", label: "Boss Mode", icon: Swords, desc: "Unite against AI Boss" },
     { id: "battle-royale", label: "Battle Royale", icon: Zap, desc: "Chaos and random crises" }

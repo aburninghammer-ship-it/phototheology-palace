@@ -8,7 +8,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Loader2, Users, Trophy, Clock, Sparkles } from "lucide-react";
+import { Loader2, Users, Trophy, Clock, Sparkles, Bot } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 
 interface Player {
   id: string;
@@ -68,6 +69,8 @@ const PTMultiplayerGame = () => {
   const [cardValue, setCardValue] = useState<string>("");
   const [explanation, setExplanation] = useState<string>("");
   const [submitting, setSubmitting] = useState(false);
+
+  const isVsJeevesMode = game?.game_mode === "1v1-jeeves" || game?.game_mode === "team-vs-jeeves";
 
   useEffect(() => {
     if (!gameId) return;
@@ -225,232 +228,266 @@ const PTMultiplayerGame = () => {
   const isHost = currentPlayer && game.host_id === currentPlayer.user_id;
 
   return (
-    <div className="container mx-auto py-6 px-4">
-      {/* Header */}
-      <div className="mb-6">
-        <div className="flex items-center justify-between mb-2">
-          <h1 className="text-3xl font-bold">PT Multiplayer: Jeeves the Judge</h1>
-          <Badge variant={game.status === 'active' ? 'default' : 'secondary'}>
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 py-6 px-4">
+      <div className="container mx-auto max-w-7xl">
+        {/* Header */}
+        <div className="mb-6 text-center">
+          <div className="flex items-center justify-center gap-2 mb-2">
+            <h1 className="text-4xl font-bold text-white">PT Multiplayer</h1>
+            {isVsJeevesMode && <Bot className="w-8 h-8 text-purple-400" />}
+          </div>
+          <p className="text-purple-200">Study Topic: <span className="font-semibold">{game.study_topic}</span></p>
+          <Badge variant={game.status === 'active' ? 'default' : 'secondary'} className="mt-2">
             {game.status.toUpperCase()}
           </Badge>
         </div>
-        <p className="text-muted-foreground">Study Topic: <span className="font-semibold">{game.study_topic}</span></p>
-        <p className="text-sm text-muted-foreground">Mode: {game.game_mode}</p>
-      </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Players Sidebar */}
-        <Card className="p-4 lg:col-span-1">
-          <div className="flex items-center gap-2 mb-4">
-            <Users className="w-5 h-5" />
-            <h2 className="font-bold text-lg">Players ({players.length})</h2>
-          </div>
-          <ScrollArea className="h-[400px]">
-            <div className="space-y-3">
-              {players.map((player) => (
-                <div 
-                  key={player.id} 
-                  className={`flex items-center gap-3 p-3 rounded-lg transition-colors ${
-                    game.current_turn_player_id === player.id ? 'bg-primary/10 border-2 border-primary' : 'bg-muted/30'
+        {/* Game Table Layout */}
+        <div className="relative">
+          {/* Opponent's Side (Top) */}
+          <div className="mb-8">
+            <AnimatePresence>
+              {players.filter(p => p.id !== currentPlayer?.id).map((player, idx) => (
+                <motion.div
+                  key={player.id}
+                  initial={{ y: -50, opacity: 0 }}
+                  animate={{ y: 0, opacity: 1 }}
+                  transition={{ delay: idx * 0.1 }}
+                  className={`flex items-center justify-center gap-3 p-4 rounded-xl mb-2 ${
+                    game.current_turn_player_id === player.id 
+                      ? 'bg-gradient-to-r from-purple-600 to-blue-600 shadow-lg shadow-purple-500/50' 
+                      : 'bg-slate-800/80 backdrop-blur'
                   }`}
                 >
-                  <Avatar>
-                    <AvatarFallback>{player.display_name[0]}</AvatarFallback>
+                  <Avatar className="w-10 h-10 border-2 border-purple-400">
+                    <AvatarFallback className="bg-purple-600 text-white">{player.display_name[0]}</AvatarFallback>
                   </Avatar>
                   <div className="flex-1">
-                    <p className="font-semibold text-sm">{player.display_name}</p>
-                    <div className="flex gap-2 text-xs text-muted-foreground">
+                    <p className="font-semibold text-white flex items-center gap-2">
+                      {player.display_name}
+                      {player.display_name.includes('Jeeves') && <Bot className="w-4 h-4 text-purple-400" />}
+                    </p>
+                    <div className="flex gap-3 text-sm text-purple-200">
                       <span>🃏 {player.cards_remaining}</span>
                       <span>⭐ {player.score}pts</span>
                     </div>
-                    {player.skip_next_turn && (
-                      <Badge variant="destructive" className="text-xs mt-1">Skip Turn</Badge>
-                    )}
-                    {player.consecutive_rejections > 0 && (
-                      <p className="text-xs text-red-500">❌ {player.consecutive_rejections}</p>
-                    )}
                   </div>
-                </div>
+                  {player.skip_next_turn && (
+                    <Badge variant="destructive" className="text-xs">Skip Turn</Badge>
+                  )}
+                </motion.div>
               ))}
-            </div>
-          </ScrollArea>
-        </Card>
+            </AnimatePresence>
+          </div>
 
-        {/* Game Area */}
-        <Card className="p-6 lg:col-span-2">
-          {game.status === 'waiting' && (
-            <div className="text-center py-8">
-              <h2 className="text-2xl font-bold mb-4">Waiting for Players...</h2>
-              <p className="text-muted-foreground mb-6">
-                {players.length} player{players.length !== 1 ? 's' : ''} joined
-              </p>
-              {isHost && (
-                <Button onClick={startGame} size="lg">
-                  <Sparkles className="w-5 h-5 mr-2" />
-                  Start Game
-                </Button>
-              )}
-            </div>
-          )}
-
-          {game.status === 'active' && (
-            <div>
-              <div className="mb-6">
-                <h3 className="text-xl font-bold mb-2">
-                  {isMyTurn ? "🎯 Your Turn!" : `⏳ Waiting for ${players.find(p => p.id === game.current_turn_player_id)?.display_name}'s play...`}
-                </h3>
-              </div>
-
-              {isMyTurn && !currentPlayer?.skip_next_turn && (
-                <div className="space-y-4 mb-6">
-                  <div>
-                    <label className="block text-sm font-medium mb-2">Select Card Type</label>
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
-                      {CARD_TYPES.slice(0, 6).map((card) => (
-                        <Button
-                          key={card.type}
-                          variant={selectedCardType === card.type ? "default" : "outline"}
-                          onClick={() => setSelectedCardType(card.type)}
-                          className="h-auto py-3 text-xs"
-                        >
-                          {card.label}
-                        </Button>
-                      ))}
-                    </div>
-                  </div>
-
-                  {selectedCardType && (
-                    <>
-                      <div>
-                        <label className="block text-sm font-medium mb-2">
-                          Card Value (e.g., @Cy, Story Room, John 3:16)
-                        </label>
-                        <input
-                          type="text"
-                          value={cardValue}
-                          onChange={(e) => setCardValue(e.target.value)}
-                          className="w-full px-3 py-2 rounded-md border bg-background"
-                          placeholder="Enter the specific card (e.g., @Cy, Prophecy Room, Exodus 12:13)"
-                        />
-                      </div>
-
-                      <div>
-                        <label className="block text-sm font-medium mb-2">
-                          Explain Your Play (How does this advance the study?)
-                        </label>
-                        <Textarea
-                          value={explanation}
-                          onChange={(e) => setExplanation(e.target.value)}
-                          placeholder="Explain how this card connects to the study topic and advances our understanding..."
-                          rows={4}
-                          className="resize-none"
-                        />
-                      </div>
-
-                      <Button 
-                        onClick={handlePlayCard} 
-                        disabled={submitting || !cardValue || !explanation}
-                        className="w-full"
-                        size="lg"
-                      >
-                        {submitting ? (
-                          <>
-                            <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                            Jeeves is judging...
-                          </>
-                        ) : (
-                          <>
-                            <Sparkles className="w-4 h-4 mr-2" />
-                            Submit to Jeeves
-                          </>
-                        )}
-                      </Button>
-                    </>
+          {/* Playing Field (Center) */}
+          <Card className="bg-gradient-to-br from-green-900 to-emerald-950 border-4 border-yellow-600 shadow-2xl relative overflow-hidden">
+            {/* Table texture overlay */}
+            <div className="absolute inset-0 opacity-10 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-white to-transparent"></div>
+            
+            <div className="relative z-10 p-8">
+              {game.status === 'waiting' && (
+                <div className="text-center py-12">
+                  <h2 className="text-3xl font-bold mb-4 text-white">Waiting for Players...</h2>
+                  <p className="text-purple-200 mb-6">
+                    {players.length} player{players.length !== 1 ? 's' : ''} joined
+                  </p>
+                  {isHost && (
+                    <Button onClick={startGame} size="lg" className="bg-purple-600 hover:bg-purple-700">
+                      <Sparkles className="w-5 h-5 mr-2" />
+                      Start Game
+                    </Button>
                   )}
                 </div>
               )}
 
-              {/* Move History */}
-              <div className="mt-8">
-                <h3 className="font-bold text-lg mb-4 flex items-center gap-2">
-                  <Clock className="w-5 h-5" />
-                  Recent Moves
-                </h3>
-                <ScrollArea className="h-[300px]">
-                  <div className="space-y-3">
-                    {moves.map((move) => {
-                      const player = players.find(p => p.id === move.player_id);
-                      const verdictColor = 
-                        move.jeeves_verdict === 'approved' ? 'text-green-600' :
-                        move.jeeves_verdict === 'partial' ? 'text-yellow-600' :
-                        'text-red-600';
-                      const verdictIcon =
-                        move.jeeves_verdict === 'approved' ? '✔' :
-                        move.jeeves_verdict === 'partial' ? '△' :
-                        '✘';
+              {game.status === 'active' && (
+                <div>
+                  <div className="mb-6 text-center">
+                    <h3 className="text-2xl font-bold text-white mb-2">
+                      {isMyTurn ? "🎯 Your Turn!" : `⏳ ${players.find(p => p.id === game.current_turn_player_id)?.display_name}'s turn...`}
+                    </h3>
+                  </div>
 
-                      return (
-                        <Card key={move.id} className="p-4">
-                          <div className="flex items-start gap-3">
-                            <Avatar className="w-8 h-8">
-                              <AvatarFallback className="text-xs">
-                                {player?.display_name[0] || '?'}
-                              </AvatarFallback>
-                            </Avatar>
-                            <div className="flex-1">
-                              <div className="flex items-center gap-2 mb-1">
-                                <p className="font-semibold text-sm">{player?.display_name}</p>
-                                <Badge variant="outline" className="text-xs">
-                                  {move.card_type}
-                                </Badge>
-                                {move.card_data?.value && (
-                                  <Badge variant="secondary" className="text-xs">
-                                    {move.card_data.value}
+                  {/* Recent Moves Feed */}
+                  <ScrollArea className="h-[300px] mb-6">
+                    <div className="space-y-3">
+                      {moves.map((move) => {
+                        const player = players.find(p => p.id === move.player_id);
+                        const verdictColor = 
+                          move.jeeves_verdict === 'approved' ? 'border-green-500 bg-green-950/50' :
+                          move.jeeves_verdict === 'partial' ? 'border-yellow-500 bg-yellow-950/50' :
+                          'border-red-500 bg-red-950/50';
+                        const verdictIcon =
+                          move.jeeves_verdict === 'approved' ? '✔' :
+                          move.jeeves_verdict === 'partial' ? '△' :
+                          '✘';
+
+                        return (
+                          <motion.div
+                            key={move.id}
+                            initial={{ scale: 0.9, opacity: 0 }}
+                            animate={{ scale: 1, opacity: 1 }}
+                            className={`p-4 rounded-lg border-2 backdrop-blur ${verdictColor}`}
+                          >
+                            <div className="flex items-start gap-3">
+                              <Avatar className="w-8 h-8">
+                                <AvatarFallback className="text-xs bg-slate-700 text-white">
+                                  {player?.display_name[0] || '?'}
+                                </AvatarFallback>
+                              </Avatar>
+                              <div className="flex-1">
+                                <div className="flex items-center gap-2 mb-1">
+                                  <p className="font-semibold text-sm text-white">{player?.display_name}</p>
+                                  <Badge variant="outline" className="text-xs">
+                                    {move.card_type}
                                   </Badge>
+                                  {move.card_data?.value && (
+                                    <Badge variant="secondary" className="text-xs">
+                                      {move.card_data.value}
+                                    </Badge>
+                                  )}
+                                </div>
+                                <p className="text-sm text-purple-100 mb-2">{move.explanation}</p>
+                                <div className={`text-sm font-semibold mb-1 ${
+                                  move.jeeves_verdict === 'approved' ? 'text-green-400' :
+                                  move.jeeves_verdict === 'partial' ? 'text-yellow-400' :
+                                  'text-red-400'
+                                }`}>
+                                  {verdictIcon} Jeeves: {move.jeeves_verdict.toUpperCase()}
+                                </div>
+                                <p className="text-xs text-purple-200 italic">{move.jeeves_feedback}</p>
+                                {move.points_awarded > 0 && (
+                                  <p className="text-xs text-green-400 font-semibold mt-1">
+                                    +{move.points_awarded} points
+                                  </p>
                                 )}
                               </div>
-                              <p className="text-sm text-foreground/80 mb-2">{move.explanation}</p>
-                              <div className={`text-sm font-semibold ${verdictColor} mb-1`}>
-                                {verdictIcon} Jeeves: {move.jeeves_verdict.toUpperCase()}
-                              </div>
-                              <p className="text-xs text-muted-foreground italic">{move.jeeves_feedback}</p>
-                              {move.points_awarded > 0 && (
-                                <p className="text-xs text-green-600 font-semibold mt-1">
-                                  +{move.points_awarded} points
-                                </p>
-                              )}
                             </div>
-                          </div>
-                        </Card>
-                      );
-                    })}
-                  </div>
-                </ScrollArea>
-              </div>
-            </div>
-          )}
-
-          {game.status === 'completed' && (
-            <div className="text-center py-12">
-              <Trophy className="w-16 h-16 mx-auto mb-4 text-yellow-500" />
-              <h2 className="text-3xl font-bold mb-4">Game Complete!</h2>
-              {players.sort((a, b) => a.cards_remaining - a.cards_remaining || b.score - a.score)[0] && (
-                <div>
-                  <p className="text-xl mb-2">Winner:</p>
-                  <p className="text-2xl font-bold text-primary">
-                    {players.sort((a, b) => a.cards_remaining - a.cards_remaining || b.score - a.score)[0].display_name}
-                  </p>
-                  <p className="text-muted-foreground mt-2">
-                    Score: {players[0].score} points
-                  </p>
+                          </motion.div>
+                        );
+                      })}
+                    </div>
+                  </ScrollArea>
                 </div>
               )}
-              <Button onClick={() => navigate('/card-deck')} className="mt-6">
-                Back to Deck
-              </Button>
+
+              {game.status === 'completed' && (
+                <div className="text-center py-12">
+                  <Trophy className="w-16 h-16 mx-auto mb-4 text-yellow-400" />
+                  <h2 className="text-3xl font-bold mb-4 text-white">Game Complete!</h2>
+                  {players.sort((a, b) => a.cards_remaining - a.cards_remaining || b.score - a.score)[0] && (
+                    <div>
+                      <p className="text-xl mb-2 text-purple-200">Winner:</p>
+                      <p className="text-2xl font-bold text-yellow-400">
+                        {players.sort((a, b) => a.cards_remaining - a.cards_remaining || b.score - a.score)[0].display_name}
+                      </p>
+                      <p className="text-purple-200 mt-2">
+                        Score: {players[0].score} points
+                      </p>
+                    </div>
+                  )}
+                  <Button onClick={() => navigate('/card-deck')} className="mt-6">
+                    Back to Deck
+                  </Button>
+                </div>
+              )}
             </div>
+          </Card>
+
+          {/* Your Side (Bottom) */}
+          {currentPlayer && (
+            <motion.div
+              initial={{ y: 50, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              className="mt-8"
+            >
+              <Card className={`p-6 ${isMyTurn ? 'bg-gradient-to-r from-blue-600 to-purple-600 shadow-lg shadow-blue-500/50' : 'bg-slate-800/80 backdrop-blur'}`}>
+                <div className="flex items-center gap-3 mb-4">
+                  <Avatar className="w-12 h-12 border-2 border-blue-400">
+                    <AvatarFallback className="bg-blue-600 text-white">{currentPlayer.display_name[0]}</AvatarFallback>
+                  </Avatar>
+                  <div className="flex-1">
+                    <p className="font-semibold text-white text-lg">{currentPlayer.display_name} (You)</p>
+                    <div className="flex gap-4 text-sm text-blue-200">
+                      <span>🃏 {currentPlayer.cards_remaining} cards</span>
+                      <span>⭐ {currentPlayer.score} points</span>
+                    </div>
+                  </div>
+                </div>
+
+                {isMyTurn && !currentPlayer.skip_next_turn && game.status === 'active' && (
+                  <div className="space-y-4">
+                    <div>
+                      <label className="block text-sm font-medium mb-2 text-white">Select Card Type</label>
+                      <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+                        {CARD_TYPES.slice(0, 6).map((card) => (
+                          <Button
+                            key={card.type}
+                            variant={selectedCardType === card.type ? "default" : "outline"}
+                            onClick={() => setSelectedCardType(card.type)}
+                            className="h-auto py-3 text-xs"
+                          >
+                            {card.label}
+                          </Button>
+                        ))}
+                      </div>
+                    </div>
+
+                    {selectedCardType && (
+                      <>
+                        <div>
+                          <label className="block text-sm font-medium mb-2 text-white">
+                            Card Value (e.g., @Cy, Story Room, John 3:16)
+                          </label>
+                          <input
+                            type="text"
+                            value={cardValue}
+                            onChange={(e) => setCardValue(e.target.value)}
+                            className="w-full px-3 py-2 rounded-md border bg-background"
+                            placeholder="Enter the specific card (e.g., @Cy, Prophecy Room, Exodus 12:13)"
+                          />
+                        </div>
+
+                        <div>
+                          <label className="block text-sm font-medium mb-2 text-white">
+                            Explain Your Play (How does this advance the study?)
+                          </label>
+                          <Textarea
+                            value={explanation}
+                            onChange={(e) => setExplanation(e.target.value)}
+                            placeholder="Explain how this card connects to the study topic and advances our understanding..."
+                            rows={4}
+                            className="resize-none"
+                          />
+                        </div>
+
+                        <Button 
+                          onClick={handlePlayCard} 
+                          disabled={submitting || !cardValue || !explanation}
+                          className="w-full bg-yellow-500 hover:bg-yellow-600 text-black font-bold"
+                          size="lg"
+                        >
+                          {submitting ? (
+                            <>
+                              <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                              Jeeves is judging...
+                            </>
+                          ) : (
+                            <>
+                              <Sparkles className="w-4 h-4 mr-2" />
+                              Submit to Jeeves
+                            </>
+                          )}
+                        </Button>
+                      </>
+                    )}
+                  </div>
+                )}
+              </Card>
+            </motion.div>
           )}
-        </Card>
+        </div>
       </div>
     </div>
   );
