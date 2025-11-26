@@ -214,7 +214,10 @@ const PTMultiplayerGame = () => {
             .eq('game_id', gameId)
             .order('joined_at');
           
-          if (updatedPlayers) setPlayers(updatedPlayers);
+          if (updatedPlayers) {
+            setPlayers(updatedPlayers);
+            playersRes.data = updatedPlayers;
+          }
         }
       }
       
@@ -236,9 +239,55 @@ const PTMultiplayerGame = () => {
           })));
         }
       }
+
+      // Auto-start game if it's still waiting
+      if (gameRes.data?.status === 'waiting' && gameRes.data.host_id === user.id && playersRes.data && playersRes.data.length > 0) {
+        await autoStartGame(gameRes.data.id, playersRes.data);
+      }
     }
 
     setLoading(false);
+  };
+
+  const autoStartGame = async (gameId: string, playersList: Player[]) => {
+    try {
+      // Deal the cards
+      const { error: dealError } = await supabase.functions.invoke('deal-pt-cards', {
+        body: { gameId }
+      });
+
+      if (dealError) {
+        console.error("Error dealing cards:", dealError);
+        return;
+      }
+
+      // Activate the game
+      const { error } = await supabase
+        .from('pt_multiplayer_games')
+        .update({ 
+          status: 'active',
+          current_turn_player_id: playersList[0]?.id ?? null,
+        })
+        .eq('id', gameId);
+
+      if (error) {
+        console.error("Error auto-starting game:", error);
+        return;
+      }
+
+      // Update local state
+      setGame((prev) =>
+        prev
+          ? {
+              ...prev,
+              status: 'active',
+              current_turn_player_id: playersList[0]?.id ?? null,
+            }
+          : prev
+      );
+    } catch (error) {
+      console.error("Error in auto-start:", error);
+    }
   };
 
   const subscribeToUpdates = () => {
