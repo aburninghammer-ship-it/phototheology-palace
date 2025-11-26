@@ -324,7 +324,7 @@ Judge this play. Is it theologically sound, correctly applied, and meaningfully 
       .order('joined_at');
 
     if (allPlayers && allPlayers.length > 0) {
-      const currentIndex = allPlayers.findIndex(p => p.id === playerId);
+      const currentIndex = allPlayers.findIndex((p) => p.id === playerId);
       const nextIndex = (currentIndex + 1) % allPlayers.length;
       const nextPlayer = allPlayers[nextIndex];
 
@@ -333,50 +333,6 @@ Judge this play. Is it theologically sound, correctly applied, and meaningfully 
         .from('pt_multiplayer_games')
         .update({ current_turn_player_id: nextPlayer.id })
         .eq('id', gameId);
-
-      // Check if we need to trigger Jeeves' turn automatically
-      const isVsJeevesMode =
-        gameData?.game_mode === '1v1-jeeves' ||
-        gameData?.game_mode === 'team-vs-jeeves' ||
-        gameData?.game_mode === 'jeeves-vs-jeeves';
-      
-      if (isVsJeevesMode && nextPlayer.display_name.includes('Jeeves')) {
-        // Add a 4-second delay in Jeeves vs Jeeves mode to allow observers to read
-        const delayMs = gameData?.game_mode === 'jeeves-vs-jeeves' ? 4000 : 1500;
-        
-        // Use setTimeout-like delay for Deno
-        await new Promise(resolve => setTimeout(resolve, delayMs));
-        
-        const jeevesJudgmentResponse = await fetch(
-          `${Deno.env.get("SUPABASE_URL")}/functions/v1/judge-pt-card-play`,
-          {
-            method: "POST",
-            headers: {
-              "Authorization": `Bearer ${Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")}`,
-              "Content-Type": "application/json",
-              "apikey": Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") || "",
-            },
-            body: JSON.stringify({
-              gameId,
-              playerId: nextPlayer.id,
-              cardType: "principle",
-              cardData: null,
-              explanation: "",
-              studyTopic,
-              isCombo: false,
-              comboCards: null,
-              autoPlayForPlayer: true,
-            }),
-          }
-        );
-
-        if (!jeevesJudgmentResponse.ok) {
-          const errorText = await jeevesJudgmentResponse.text();
-          console.error("Failed to judge Jeeves' play:", errorText);
-        } else {
-          console.log("Jeeves played successfully after delay!");
-        }
-      }
     }
 
     return new Response(

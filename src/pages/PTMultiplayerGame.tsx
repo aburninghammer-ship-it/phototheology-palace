@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -155,6 +155,8 @@ const PTMultiplayerGame = () => {
   const [myCards, setMyCards] = useState<Card[]>([]);
   const [loading, setLoading] = useState(true);
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
+  const [isJeevesThinking, setIsJeevesThinking] = useState(false);
+  const jeevesTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   
   const [cardValue, setCardValue] = useState<string>("");
   const [explanation, setExplanation] = useState<string>("");
@@ -322,10 +324,10 @@ const PTMultiplayerGame = () => {
     ) {
       try {
         let startingPlayerId: string | null = null;
-        const alpha = playersData.find(p => p.display_name.includes("Alpha"));
+        const alpha = playersData.find((p) => p.display_name.includes("Alpha"));
         startingPlayerId = alpha?.id ?? playersData[0].id;
 
-        const { error: fixError } = await supabase
+        await supabase
           .from('pt_multiplayer_games')
           .update({
             status: 'active',
@@ -333,27 +335,11 @@ const PTMultiplayerGame = () => {
           })
           .eq('id', gameData.id)
           .is('current_turn_player_id', null);
-
-        if (!fixError && startingPlayerId) {
-          await supabase.functions.invoke('judge-pt-card-play', {
-            body: {
-              gameId: gameData.id,
-              playerId: startingPlayerId,
-              cardType: "principle",
-              cardData: null,
-              explanation: "",
-              studyTopic: gameData.study_topic,
-              isCombo: false,
-              comboCards: null,
-              autoPlayForPlayer: true,
-            },
-          });
-        }
       } catch (e) {
         console.error('Error auto-starting Jeeves vs Jeeves game', e);
       }
     }
-
+ 
     console.log('PTMulti fetchGameData', {
       game: gameData,
       players: playersData?.map(p => ({ id: p.id, display_name: p.display_name, user_id: p.user_id })),
@@ -365,18 +351,88 @@ const PTMultiplayerGame = () => {
   const subscribeToUpdates = () => {
     const channel = supabase
       .channel(`pt-game-${gameId}`)
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'pt_multiplayer_games', filter: `id=eq.${gameId}` }, 
-        () => fetchGameData())
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'pt_multiplayer_players', filter: `game_id=eq.${gameId}` }, 
-        () => fetchGameData())
-      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'pt_multiplayer_moves', filter: `game_id=eq.${gameId}` }, 
-        () => fetchGameData())
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'pt_multiplayer_games', filter: `id=eq.${gameId}` },
+        () => fetchGameData()
+      )
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'pt_multiplayer_players', filter: `game_id=eq.${gameId}` },
+        () => fetchGameData()
+      )
+      .on(
+        'postgres_changes',
+        { event: 'INSERT', schema: 'public', table: 'pt_multiplayer_moves', filter: `game_id=eq.${gameId}` },
+        () => fetchGameData()
+      )
       .subscribe();
 
     return () => {
       supabase.removeChannel(channel);
     };
   };
+
+  // Automatically trigger Jeeves moves when it's Jeeves' turn
+  useEffect(() => {
+    if (!game || loading || !isVsJeevesMode) return;
+    if (game.status !== "active" || !game.current_turn_player_id) return;
+
+    const nextPlayer = players.find((p) => p.id === game.current_turn_player_id);
+    if (!nextPlayer || !nextPlayer.display_name.includes("Jeeves")) return;
+
+    // Avoid overlapping timers
+    if (isJeevesThinking) return;
+
+    const delayMs = game.game_mode === "jeeves-vs-jeeves" ? 4000 : 1500;
+
+    if (jeevesTimeoutRef.current) {
+      clearTimeout(jeevesTimeoutRef.current);
+    }
+
+    jeevesTimeoutRef.current = setTimeout(async () => {
+      try {
+        setIsJeevesThinking(true);
+        const { error } = await supabase.functions.invoke("judge-pt-card-play", {
+          body: {
+            gameId: game.id,
+            playerId: nextPlayer.id,
+            cardType: "principle",
+            cardData: null,
+            explanation: "",
+            studyTopic: game.study_topic,
+            isCombo: false,
+            comboCards: null,
+            autoPlayForPlayer: true,
+          },
+        });
+
+        if (error) {
+          console.error("Error invoking Jeeves move:", error);
+          toast({
+            title: "Jeeves error",
+            description: "Jeeves had trouble playing his move.",
+            variant: "destructive",
+          });
+        }
+      } catch (err) {
+        console.error("Error in automatic Jeeves move:", err);
+        toast({
+          title: "Jeeves error",
+          description: "Automatic Jeeves move failed.",
+          variant: "destructive",
+        });
+      } finally {
+        setIsJeevesThinking(false);
+      }
+    }, delayMs);
+
+    return () => {
+      if (jeevesTimeoutRef.current) {
+        clearTimeout(jeevesTimeoutRef.current);
+      }
+    };
+  }, [game, players, isVsJeevesMode, loading, toast, isJeevesThinking]);
 
   const handlePlayCard = async () => {
     if (!cardValue || !explanation || !currentPlayer || !game) {
