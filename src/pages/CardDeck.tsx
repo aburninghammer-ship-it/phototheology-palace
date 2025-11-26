@@ -833,7 +833,7 @@ export default function CardDeck() {
       </div>
       <Navigation />
       
-      <main className="container mx-auto px-4 pt-24 pb-12 relative z-10">
+      <div role="main" className="container mx-auto px-4 pt-24 pb-12 relative z-10">
         <div className="max-w-6xl mx-auto space-y-6">
           {/* Header */}
           <motion.div 
@@ -1187,7 +1187,7 @@ export default function CardDeck() {
             </CardContent>
           </Card>
         </div>
-      </main>
+      </div>
 
       {/* Word Analysis Dialog */}
       <Dialog open={wordDialogOpen} onOpenChange={setWordDialogOpen}>
@@ -1218,7 +1218,9 @@ export default function CardDeck() {
         </DialogContent>
       </Dialog>
 
-      <style>{`
+      <style
+        dangerouslySetInnerHTML={{
+          __html: `
         .perspective-1000 {
           perspective: 1000px;
         }
@@ -1232,9 +1234,11 @@ export default function CardDeck() {
           transform: rotateY(180deg);
         }
         .glow-effect {
-          box-shadow: 0 0 30px rgba(255, 255, 255, 0.3), 0 0 60px rgba(var(--primary), 0.2);
+          box-shadow: 0 0 30px rgba(255, 255, 255, 0.3), 0 0 60px rgba(0, 0, 0, 0.4);
         }
-      `}</style>
+      `,
+        }}
+      />
     </div>
   );
 }
