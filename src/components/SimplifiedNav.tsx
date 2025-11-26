@@ -9,7 +9,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useAuth } from "@/hooks/useAuth";
-import { BookOpen, Gamepad2, GraduationCap, Users, User, Menu, Home, Crown, Settings } from "lucide-react";
+import { BookOpen, Gamepad2, GraduationCap, Users, User, Menu, Home, Crown, Settings, Brain } from "lucide-react";
 import { Sheet, SheetContent, SheetTrigger, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
@@ -180,6 +180,9 @@ export const SimplifiedNav = () => {
                 </Button>
                 <Button asChild variant="ghost" size="sm">
                   <Link to="/games"><Gamepad2 className="h-4 w-4 mr-1" />Games</Link>
+                </Button>
+                <Button asChild variant="ghost" size="sm">
+                  <Link to="/memory"><Brain className="h-4 w-4 mr-1" />Memory</Link>
                 </Button>
               </>
             )}

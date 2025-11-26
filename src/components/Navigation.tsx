@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { Building2, Sparkles, Users, User, CreditCard, LogOut, MessageCircle, BookOpen, Calendar, Image, Search, Video, Sword, Crown, Shield } from "lucide-react";
+import { Building2, Sparkles, Users, User, CreditCard, LogOut, MessageCircle, BookOpen, Calendar, Image, Search, Video, Sword, Crown, Shield, Brain } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
 import { useActiveUsers } from "@/hooks/useActiveUsers";
@@ -145,6 +145,13 @@ export const Navigation = () => {
                     
                     <Button variant="ghost" asChild size="sm" className="whitespace-nowrap">
                       <Link to="/games">Games</Link>
+                    </Button>
+                    
+                    <Button variant="ghost" asChild size="sm" className="whitespace-nowrap">
+                      <Link to="/memory">
+                        <Brain className="h-4 w-4 mr-1" />
+                        Memory
+                      </Link>
                     </Button>
                     
                     <DropdownMenu>
@@ -306,7 +313,14 @@ export const Navigation = () => {
                     Games
                   </Link>
                   <Link 
-                    to="/genesis-challenge" 
+                    to="/memory" 
+                    className="px-3 py-1.5 text-sm font-medium text-foreground hover:text-primary hover:bg-accent/50 rounded-md transition-colors whitespace-nowrap flex items-center gap-1"
+                  >
+                    <Brain className="h-3.5 w-3.5" />
+                    Memory Palace
+                  </Link>
+                  <Link 
+                    to="/genesis-challenge"
                     className="px-3 py-1.5 text-sm font-medium text-foreground hover:text-primary hover:bg-accent/50 rounded-md transition-colors whitespace-nowrap flex items-center gap-1"
                   >
                     <Building2 className="h-3.5 w-3.5" />
