@@ -21,8 +21,11 @@ export function useLiveNotifications() {
   useEffect(() => {
     if (!user) return;
 
+    // Create unique channel ID to prevent duplicates
+    const channelId = `live-notifications-${user.id}-${Date.now()}`;
+    
     // Subscribe to live notifications channel
-    const liveChannel = supabase.channel('live-notifications', {
+    const liveChannel = supabase.channel(channelId, {
       config: {
         broadcast: { self: false } // Don't receive your own broadcasts
       }
@@ -67,9 +70,9 @@ export function useLiveNotifications() {
     setChannel(liveChannel);
 
     return () => {
-      liveChannel.unsubscribe();
+      supabase.removeChannel(liveChannel);
     };
-  }, [user, navigate]);
+  }, [user?.id]); // Only depend on user.id, not the whole user object or navigate
 
   const broadcastChallenge = async (challengeType: string, userName: string) => {
     if (!channel) return;
