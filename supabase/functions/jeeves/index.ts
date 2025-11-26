@@ -490,6 +490,14 @@ List at least 4 books of the Bible that connect to this ${textTypeLabel}, with s
 
 **TASK:** Provide helpful guidance for applying ${roomTag} (${roomName}) to the student's ${textTypeLabel}.
 
+**YOUR RESPONSE MUST HAVE TWO PARTS:**
+
+**PART 1 - EXPLAIN THE PRINCIPLE (2-3 sentences):**
+First, briefly explain what ${roomTag} (${roomName}) is and what it means in Phototheology. Help the student understand the principle before they apply it.
+
+**PART 2 - PROVIDE THE CHALLENGE:**
+Then, provide specific guidance on how to apply this principle to their ${textTypeLabel}.
+
 **CRITICAL:** This is an APPLICATION exercise, not an identification exercise. The student should APPLY the principle to their text, not categorize or identify which category the text fits into.
 
 Application prompt: ${getApplicationPrompt(roomTag, roomName)}
@@ -500,6 +508,7 @@ Application prompt: ${getApplicationPrompt(roomTag, roomName)}
 - Use emojis for visual appeal (📖 ✨ 🔍 💡)
 - Use bullet points (•) for lists
 - Keep tone warm and encouraging
+- Make sure to FIRST explain the principle, THEN give the application challenge
 
 ${PALACE_SCHEMA}`;
 
@@ -509,7 +518,7 @@ ${textTypeLabel === "verse" ? "Verse:" : "Story:"} ${verseText}
 
 ${userAnswer ? `Their current work: ${userAnswer}` : "They haven't started yet."}
 
-Provide guidance on how to APPLY ${roomTag} to this ${textTypeLabel}. Help them see connections, patterns, or applications. Give 2-3 specific suggestions or insights they can use.`;
+FIRST, explain what ${roomTag} (${roomName}) means in 2-3 sentences. THEN, provide guidance on how to APPLY ${roomTag} to this ${textTypeLabel}. Help them see connections, patterns, or applications. Give 2-3 specific suggestions or insights they can use.`;
       }
 
     } else if (mode === "grade") {
