@@ -162,7 +162,7 @@ const PTMultiplayerLobby = () => {
 
           <Button 
             onClick={handleCreateGame} 
-            disabled={creating}
+            disabled={creating || !studyTopic}
             size="lg"
             className="w-full"
           >
