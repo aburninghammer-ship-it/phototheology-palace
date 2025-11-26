@@ -2459,6 +2459,203 @@ export type Database = {
         }
         Relationships: []
       }
+      memory_game_sessions: {
+        Row: {
+          completed: boolean | null
+          completed_at: string | null
+          created_at: string | null
+          game_type: string
+          id: string
+          list_id: string
+          score: number | null
+          time_spent_seconds: number | null
+          user_id: string
+        }
+        Insert: {
+          completed?: boolean | null
+          completed_at?: string | null
+          created_at?: string | null
+          game_type: string
+          id?: string
+          list_id: string
+          score?: number | null
+          time_spent_seconds?: number | null
+          user_id: string
+        }
+        Update: {
+          completed?: boolean | null
+          completed_at?: string | null
+          created_at?: string | null
+          game_type?: string
+          id?: string
+          list_id?: string
+          score?: number | null
+          time_spent_seconds?: number | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "memory_game_sessions_list_id_fkey"
+            columns: ["list_id"]
+            isOneToOne: false
+            referencedRelation: "memory_verse_lists"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      memory_list_collaborators: {
+        Row: {
+          id: string
+          joined_at: string | null
+          list_id: string
+          role: string | null
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          joined_at?: string | null
+          list_id: string
+          role?: string | null
+          user_id: string
+        }
+        Update: {
+          id?: string
+          joined_at?: string | null
+          list_id?: string
+          role?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "memory_list_collaborators_list_id_fkey"
+            columns: ["list_id"]
+            isOneToOne: false
+            referencedRelation: "memory_verse_lists"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      memory_verse_list_items: {
+        Row: {
+          created_at: string | null
+          id: string
+          list_id: string
+          order_index: number
+          verse_reference: string
+          verse_text: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          list_id: string
+          order_index: number
+          verse_reference: string
+          verse_text: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          list_id?: string
+          order_index?: number
+          verse_reference?: string
+          verse_text?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "memory_verse_list_items_list_id_fkey"
+            columns: ["list_id"]
+            isOneToOne: false
+            referencedRelation: "memory_verse_lists"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      memory_verse_lists: {
+        Row: {
+          bible_version: string | null
+          created_at: string | null
+          description: string | null
+          id: string
+          is_collaborative: boolean | null
+          is_public: boolean | null
+          target_verse_count: number | null
+          title: string
+          topic: string | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          bible_version?: string | null
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          is_collaborative?: boolean | null
+          is_public?: boolean | null
+          target_verse_count?: number | null
+          title: string
+          topic?: string | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          bible_version?: string | null
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          is_collaborative?: boolean | null
+          is_public?: boolean | null
+          target_verse_count?: number | null
+          title?: string
+          topic?: string | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      memory_verse_mastery: {
+        Row: {
+          created_at: string | null
+          id: string
+          last_practiced_at: string | null
+          list_id: string
+          mastery_level: number | null
+          next_review_at: string | null
+          times_practiced: number | null
+          user_id: string
+          verse_reference: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          last_practiced_at?: string | null
+          list_id: string
+          mastery_level?: number | null
+          next_review_at?: string | null
+          times_practiced?: number | null
+          user_id: string
+          verse_reference: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          last_practiced_at?: string | null
+          list_id?: string
+          mastery_level?: number | null
+          next_review_at?: string | null
+          times_practiced?: number | null
+          user_id?: string
+          verse_reference?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "memory_verse_mastery_list_id_fkey"
+            columns: ["list_id"]
+            isOneToOne: false
+            referencedRelation: "memory_verse_lists"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       mental_health_blueprint_progress: {
         Row: {
           article_id: number
