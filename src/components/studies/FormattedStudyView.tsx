@@ -6,8 +6,20 @@ interface FormattedStudyViewProps {
 }
 
 export const FormattedStudyView = ({ content }: FormattedStudyViewProps) => {
+  // Clean content to remove any circular capital letter artifacts
+  const cleanContent = (text: string) => {
+    // Remove any HTML-like tags that might create circular letters
+    return text
+      .replace(/<span[^>]*class="[^"]*capital-letter[^"]*"[^>]*>([A-Z])<\/span>/gi, '$1')
+      .replace(/\[([A-Z])\]/g, '$1') // Remove [A] style brackets
+      .replace(/\{([A-Z])\}/g, '$1') // Remove {A} style braces
+      .trim();
+  };
+
+  const cleanedContent = cleanContent(content);
+  
   // Split content by Jeeves Research sections
-  const sections = content.split(/(?=### Jeeves Research:)/);
+  const sections = cleanedContent.split(/(?=### Jeeves Research:)/);
   
   return (
     <div className="space-y-6">
@@ -28,49 +40,34 @@ export const FormattedStudyView = ({ content }: FormattedStudyViewProps) => {
           const jeevesContent = lines.slice(timestampIndex + 1).join('\n').trim();
           
           return (
-            <Card key={index} className="p-6 bg-gradient-to-br from-card to-muted/30 border-primary/20">
-              <div className="mb-4 pb-4 border-b border-border/50">
-                <div className="flex items-start gap-2 mb-2">
-                  <span className="text-2xl">🤖</span>
+            <Card key={index} className="p-6 bg-gradient-to-br from-card to-muted/30 border-primary/20 shadow-lg">
+              <div className="mb-6 pb-4 border-b border-border/50">
+                <div className="flex items-start gap-3 mb-2">
+                  <span className="text-3xl">🤖</span>
                   <div className="flex-1">
-                    <h3 className="font-semibold text-primary">
-                      {questionLine?.replace("### Jeeves Research:", "").trim() || "Research"}
+                    <h3 className="text-xl font-bold text-primary mb-1">
+                      {questionLine?.replace("### Jeeves Research:", "").trim() || "Jeeves Research"}
                     </h3>
                     {timestampLine && (
-                      <p className="text-xs text-muted-foreground mt-1">
+                      <p className="text-xs text-muted-foreground">
                         {timestampLine.replace(/\*/g, "")}
                       </p>
                     )}
                   </div>
                 </div>
               </div>
-              <div className="jeeves-response space-y-3">
+              <div className="jeeves-response space-y-4">
                 {formatJeevesResponse(jeevesContent)}
               </div>
             </Card>
           );
         }
         
-        // Regular content (non-Jeeves)
+        // Regular content (non-Jeeves) - use formatJeevesResponse for consistency
         return (
-          <Card key={index} className="p-6">
-            <div className="prose prose-sm dark:prose-invert max-w-none">
-              {section.split('\n').map((line, i) => {
-                if (!line.trim()) return <br key={i} />;
-                if (line.startsWith('###')) {
-                  return <h3 key={i} className="text-xl font-bold mb-3 mt-4">{line.replace('###', '')}</h3>;
-                }
-                if (line.startsWith('##')) {
-                  return <h2 key={i} className="text-2xl font-bold mb-3 mt-4">{line.replace('##', '')}</h2>;
-                }
-                if (line.startsWith('# ')) {
-                  return <h1 key={i} className="text-3xl font-bold mb-4 mt-4">{line.replace('# ', '')}</h1>;
-                }
-                if (line.startsWith('- ')) {
-                  return <li key={i} className="ml-4">{line.replace('- ', '')}</li>;
-                }
-                return <p key={i} className="mb-2">{line}</p>;
-              })}
+          <Card key={index} className="p-6 shadow-sm">
+            <div className="formatted-content space-y-4">
+              {formatJeevesResponse(section)}
             </div>
           </Card>
         );
