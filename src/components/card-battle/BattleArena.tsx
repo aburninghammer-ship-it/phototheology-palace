@@ -298,12 +298,38 @@ export function BattleArena({ battle, currentUserId, onBack }: Props) {
 
     setIsSubmitting(true);
     try {
+      // Check if the input is just a Bible reference and fetch the text
+      let finalResponse = response.trim();
+      const referencePattern = /^([1-3]?\s?[A-Za-z]+)\s+(\d+):(\d+)$/;
+      const match = finalResponse.match(referencePattern);
+      
+      if (match) {
+        const [, book, chapter, verse] = match;
+        try {
+          const { data: bibleData, error: bibleError } = await supabase.functions.invoke('bible-api', {
+            body: { book: book.trim(), chapter: parseInt(chapter) }
+          });
+          
+          if (bibleData?.verses && !bibleError) {
+            const verseNum = parseInt(verse);
+            const verseData = bibleData.verses.find((v: any) => v.verse === verseNum);
+            if (verseData) {
+              finalResponse = `${book} ${chapter}:${verse} - ${verseData.text}`;
+              setResponse(finalResponse); // Update the UI with the full text
+            }
+          }
+        } catch (error) {
+          console.error('Error fetching verse text:', error);
+          // Continue with just the reference if fetch fails
+        }
+      }
+
       const { data, error } = await supabase.functions.invoke('judge-card-battle', {
         body: {
           battleId: battle.id,
           playerId: `user_${currentUserId}`,
           cardCode: selectedCard,
-          responseText: response,
+          responseText: finalResponse,
           storyText: battle.story_text,
           userDisplayName: userDisplayName,
         },
