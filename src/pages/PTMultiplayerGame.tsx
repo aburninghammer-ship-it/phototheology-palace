@@ -487,6 +487,27 @@ const PTMultiplayerGame = () => {
       
       // Refresh game data to ensure UI is in sync
       await fetchGameData();
+
+      // In Jeeves vs Jeeves mode, immediately trigger the first Jeeves move
+      if (game.game_mode === "jeeves-vs-jeeves" && startingPlayerId) {
+        const { error: jeevesStartError } = await supabase.functions.invoke('judge-pt-card-play', {
+          body: {
+            gameId: game.id,
+            playerId: startingPlayerId,
+            cardType: "principle",
+            cardData: null,
+            explanation: "",
+            studyTopic: game.study_topic,
+            isCombo: false,
+            comboCards: null,
+            autoPlayForPlayer: true,
+          },
+        });
+
+        if (jeevesStartError) {
+          console.error("Error triggering initial Jeeves move:", jeevesStartError);
+        }
+      }
     } catch (error: any) {
       console.error("Error starting game:", error);
       toast({ 
