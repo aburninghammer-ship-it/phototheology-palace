@@ -9,6 +9,9 @@ verify_jwt = false
 [functions.judge-card-battle]
 verify_jwt = false
 
+[functions.challenge-judgment]
+verify_jwt = false
+
 [functions.start-pt-game]
 verify_jwt = false
 
