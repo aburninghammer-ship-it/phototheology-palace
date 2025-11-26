@@ -3378,6 +3378,157 @@ export type Database = {
         }
         Relationships: []
       }
+      pt_battle_moves: {
+        Row: {
+          battle_id: string
+          bonuses: Json | null
+          card_used: string
+          created_at: string
+          id: string
+          judge_feedback: string
+          judge_verdict: string
+          move_number: number
+          player_id: string
+          points_awarded: number
+          response_text: string
+        }
+        Insert: {
+          battle_id: string
+          bonuses?: Json | null
+          card_used: string
+          created_at?: string
+          id?: string
+          judge_feedback: string
+          judge_verdict: string
+          move_number: number
+          player_id: string
+          points_awarded?: number
+          response_text: string
+        }
+        Update: {
+          battle_id?: string
+          bonuses?: Json | null
+          card_used?: string
+          created_at?: string
+          id?: string
+          judge_feedback?: string
+          judge_verdict?: string
+          move_number?: number
+          player_id?: string
+          points_awarded?: number
+          response_text?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pt_battle_moves_battle_id_fkey"
+            columns: ["battle_id"]
+            isOneToOne: false
+            referencedRelation: "pt_card_battles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      pt_battle_players: {
+        Row: {
+          battle_id: string
+          cards_in_hand: Json
+          cards_played: Json
+          display_name: string
+          id: string
+          is_active: boolean | null
+          joined_at: string
+          player_id: string
+          player_type: string
+          score: number
+          team_name: string | null
+          user_id: string | null
+        }
+        Insert: {
+          battle_id: string
+          cards_in_hand?: Json
+          cards_played?: Json
+          display_name: string
+          id?: string
+          is_active?: boolean | null
+          joined_at?: string
+          player_id: string
+          player_type: string
+          score?: number
+          team_name?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          battle_id?: string
+          cards_in_hand?: Json
+          cards_played?: Json
+          display_name?: string
+          id?: string
+          is_active?: boolean | null
+          joined_at?: string
+          player_id?: string
+          player_type?: string
+          score?: number
+          team_name?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pt_battle_players_battle_id_fkey"
+            columns: ["battle_id"]
+            isOneToOne: false
+            referencedRelation: "pt_card_battles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      pt_card_battles: {
+        Row: {
+          created_at: string
+          current_turn_player: string
+          game_mode: string
+          game_settings: Json | null
+          host_user_id: string | null
+          id: string
+          is_saved: boolean | null
+          saved_by_user_id: string | null
+          status: string
+          story_reference: string | null
+          story_text: string
+          updated_at: string
+          winner: string | null
+        }
+        Insert: {
+          created_at?: string
+          current_turn_player: string
+          game_mode: string
+          game_settings?: Json | null
+          host_user_id?: string | null
+          id?: string
+          is_saved?: boolean | null
+          saved_by_user_id?: string | null
+          status?: string
+          story_reference?: string | null
+          story_text: string
+          updated_at?: string
+          winner?: string | null
+        }
+        Update: {
+          created_at?: string
+          current_turn_player?: string
+          game_mode?: string
+          game_settings?: Json | null
+          host_user_id?: string | null
+          id?: string
+          is_saved?: boolean | null
+          saved_by_user_id?: string | null
+          status?: string
+          story_reference?: string | null
+          story_text?: string
+          updated_at?: string
+          winner?: string | null
+        }
+        Relationships: []
+      }
       pt_multiplayer_deck: {
         Row: {
           card_data: Json

@@ -20,6 +20,8 @@ import { searchBible } from "@/services/bibleApi";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import ReactMarkdown from 'react-markdown';
 import jsPDF from 'jspdf';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { PTCardBattle } from "@/components/card-battle/PTCardBattle";
 
 interface PrincipleCard {
   id: string;
@@ -1116,11 +1118,27 @@ export default function CardDeck() {
           {/* Header */}
           <div className="text-center space-y-4">
             <h1 className="text-4xl font-bold bg-gradient-palace bg-clip-text text-transparent">
-              Phototheology Study Deck
+              Phototheology Card Deck
             </h1>
             <p className="text-muted-foreground">
-              Apply every Palace principle to your chosen verse or story
+              Study Scripture with Phototheology principles
             </p>
+          </div>
+
+          {/* Main Tabs */}
+          <Tabs defaultValue="study" className="w-full">
+            <TabsList className="grid w-full grid-cols-2 mb-6">
+              <TabsTrigger value="study" className="text-lg">
+                Study Deck
+              </TabsTrigger>
+              <TabsTrigger value="battle" className="text-lg">
+                Card Battle ⚔️
+              </TabsTrigger>
+            </TabsList>
+
+            <TabsContent value="study" className="space-y-6">
+              {/* Study Deck Content */}
+              <div className="space-y-6">
             
             {/* Multiplayer mode temporarily disabled */}
 
@@ -1550,6 +1568,14 @@ export default function CardDeck() {
               </div>
             </CardContent>
           </Card>
+          {/* End Study Deck Tab */}
+          </TabsContent>
+
+          {/* Card Battle Tab */}
+          <TabsContent value="battle">
+            <PTCardBattle />
+          </TabsContent>
+        </Tabs>
         </div>
       </main>
 
