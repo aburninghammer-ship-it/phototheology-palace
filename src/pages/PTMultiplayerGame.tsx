@@ -630,8 +630,9 @@ const PTMultiplayerGame = () => {
                     </h3>
                   </div>
 
-                  {/* Jeeves Turn Button */}
-                  {isVsJeevesMode && players.find(p => p.id === game.current_turn_player_id)?.display_name.includes('Jeeves') && (
+                  {/* Jeeves Turn Button (for human vs Jeeves modes only) */}
+                  {isVsJeevesMode && game.game_mode !== "jeeves-vs-jeeves" &&
+                    players.find(p => p.id === game.current_turn_player_id)?.display_name.includes('Jeeves') && (
                     <motion.div
                       initial={{ opacity: 0, scale: 0.9 }}
                       animate={{ opacity: 1, scale: 1 }}

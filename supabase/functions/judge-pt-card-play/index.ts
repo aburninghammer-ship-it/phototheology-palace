@@ -12,33 +12,10 @@ serve(async (req) => {
   }
 
   try {
-    // Check if this is a service role call (Jeeves auto-play)
-    const authHeader = req.headers.get("Authorization") || "";
-    const isServiceRoleCall = authHeader.includes(Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") || "");
-    
     const supabaseClient = createClient(
       Deno.env.get("SUPABASE_URL") ?? "",
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "",
     );
-
-    // Only require user auth if not coming from service role (Jeeves auto-play)
-    if (!isServiceRoleCall) {
-      // Validate user auth for human players
-      const userClient = createClient(
-        Deno.env.get("SUPABASE_URL") ?? "",
-        Deno.env.get("SUPABASE_ANON_KEY") ?? "",
-        {
-          global: {
-            headers: { Authorization: authHeader },
-          },
-        }
-      );
-      
-      const { data: { user } } = await userClient.auth.getUser();
-      if (!user) {
-        throw new Error("Unauthorized");
-      }
-    }
 
     const body = await req.json();
     let { 
