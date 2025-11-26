@@ -237,6 +237,29 @@ export default function DailyVerse() {
                 Completed Today
               </Badge>
             )}
+            <Button
+              onClick={async () => {
+                try {
+                  toast.info("Refreshing principles for today's verse...");
+                  const { error } = await supabase.functions.invoke('generate-daily-verse', {
+                    body: {
+                      force: true,
+                      verse_reference: todayVerse.verse_reference,
+                    },
+                  });
+                  if (error) throw error;
+                  await refetch();
+                  toast.success("Updated principles for today's verse.");
+                } catch (err) {
+                  console.error('Error refreshing daily verse principles:', err);
+                  toast.error("Could not refresh principles. Please try again.");
+                }
+              }}
+              variant="outline"
+            >
+              <Sparkles className="mr-2 h-4 w-4" />
+              Refresh Principles
+            </Button>
             <Button onClick={handleShare} variant="outline">
               <Share2 className="mr-2 h-4 w-4" />
               Share
