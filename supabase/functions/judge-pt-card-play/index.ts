@@ -364,6 +364,12 @@ Judge this play. Is it theologically sound, correctly applied, and meaningfully 
         gameData?.game_mode === 'jeeves-vs-jeeves';
       
       if (isVsJeevesMode && nextPlayer.display_name.includes('Jeeves')) {
+        // Add a 4-second delay in Jeeves vs Jeeves mode to allow observers to read
+        const delayMs = gameData?.game_mode === 'jeeves-vs-jeeves' ? 4000 : 1500;
+        
+        // Use setTimeout-like delay for Deno
+        await new Promise(resolve => setTimeout(resolve, delayMs));
+        
         const jeevesJudgmentResponse = await fetch(
           `${Deno.env.get("SUPABASE_URL")}/functions/v1/judge-pt-card-play`,
           {
@@ -391,7 +397,7 @@ Judge this play. Is it theologically sound, correctly applied, and meaningfully 
           const errorText = await jeevesJudgmentResponse.text();
           console.error("Failed to judge Jeeves' play:", errorText);
         } else {
-          console.log("Jeeves played successfully!");
+          console.log("Jeeves played successfully after delay!");
         }
       }
     }
