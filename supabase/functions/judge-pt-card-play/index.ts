@@ -267,24 +267,28 @@ Judge this play. Is it theologically sound, correctly applied, and meaningfully 
       }
     }
 
-    // After judgment, check if we need to trigger Jeeves' turn
-    const isVsJeevesMode = gameData?.game_mode === '1v1-jeeves' || gameData?.game_mode === 'team-vs-jeeves';
-    
-    if (isVsJeevesMode && (judgment.verdict === 'approved' || judgment.verdict === 'rejected')) {
-      // Get all players
-      const { data: allPlayers } = await supabaseClient
-        .from('pt_multiplayer_players')
-        .select('*')
-        .eq('game_id', gameId)
-        .order('joined_at');
+    // After judgment, advance the turn
+    const { data: allPlayers } = await supabaseClient
+      .from('pt_multiplayer_players')
+      .select('*')
+      .eq('game_id', gameId)
+      .order('joined_at');
 
-      if (allPlayers) {
-        const currentIndex = allPlayers.findIndex(p => p.id === playerId);
-        const nextIndex = (currentIndex + 1) % allPlayers.length;
-        const nextPlayer = allPlayers[nextIndex];
+    if (allPlayers && allPlayers.length > 0) {
+      const currentIndex = allPlayers.findIndex(p => p.id === playerId);
+      const nextIndex = (currentIndex + 1) % allPlayers.length;
+      const nextPlayer = allPlayers[nextIndex];
 
-        // If next player is Jeeves, trigger his turn automatically
-        if (nextPlayer.display_name.includes('Jeeves')) {
+      // Update game to advance turn to next player
+      await supabaseClient
+        .from('pt_multiplayer_games')
+        .update({ current_turn_player_id: nextPlayer.id })
+        .eq('id', gameId);
+
+      // Check if we need to trigger Jeeves' turn automatically
+      const isVsJeevesMode = gameData?.game_mode === '1v1-jeeves' || gameData?.game_mode === 'team-vs-jeeves';
+      
+      if (isVsJeevesMode && nextPlayer.display_name.includes('Jeeves')) {
           // Get Jeeves' cards
           const { data: jeevesCards } = await supabaseClient
             .from('pt_multiplayer_deck')
@@ -356,7 +360,6 @@ Provide a 2-3 sentence explanation of how this principle applies to the study to
               console.log("Jeeves played successfully!");
             }
           }
-        }
       }
     }
 
