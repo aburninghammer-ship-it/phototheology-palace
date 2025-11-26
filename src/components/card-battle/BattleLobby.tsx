@@ -171,7 +171,7 @@ export function BattleLobby({ mode, onBattleStart, onBack }: Props) {
           player_id: 'jeeves_1',
           player_type: 'ai',
           user_id: null,
-          display_name: 'Jeeves Alpha',
+          display_name: 'Dr. Jeeves',
           cards_in_hand: shuffled.slice(0, 7),
         });
         players.push({
@@ -179,7 +179,7 @@ export function BattleLobby({ mode, onBattleStart, onBack }: Props) {
           player_id: 'jeeves_2',
           player_type: 'ai',
           user_id: null,
-          display_name: 'Jeeves Beta',
+          display_name: 'Professor Jeeves',
           cards_in_hand: shuffled.slice(7, 14),
         });
       }
