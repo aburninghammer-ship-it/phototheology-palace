@@ -9,6 +9,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { ArrowLeft, Sparkles, Scroll } from "lucide-react";
 import { GameMode } from "./PTCardBattle";
+import { getVerses } from "biblesdk";
 
 interface Props {
   mode: GameMode;
@@ -58,6 +59,68 @@ export function BattleLobby({ mode, onBattleStart, onBack }: Props) {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('Not authenticated');
 
+      // Check if input is just a reference and fetch the full verse text
+      let finalStoryText = storyText;
+      let finalReference = storyReference;
+      
+      // Pattern to detect simple Bible references (e.g., "Rev 13:11", "John 3:16")
+      const simpleRefPattern = /^(\d?\s?[A-Za-z]+\.?\s?\d+:\d+)$/;
+      if (simpleRefPattern.test(storyText.trim())) {
+        try {
+          // Map common book names to BibleSDK codes
+          const bookMap: Record<string, string> = {
+            'Gen': 'GEN', 'Genesis': 'GEN', 'Ex': 'EXO', 'Exodus': 'EXO',
+            'Lev': 'LEV', 'Leviticus': 'LEV', 'Num': 'NUM', 'Numbers': 'NUM',
+            'Deut': 'DEU', 'Deuteronomy': 'DEU', 'Josh': 'JOS', 'Joshua': 'JOS',
+            'Judg': 'JDG', 'Judges': 'JDG', 'Ruth': 'RUT', '1 Sam': '1SA',
+            '2 Sam': '2SA', '1 Kings': '1KI', '2 Kings': '2KI', '1 Chr': '1CH',
+            '2 Chr': '2CH', 'Ezra': 'EZR', 'Neh': 'NEH', 'Esth': 'EST',
+            'Job': 'JOB', 'Ps': 'PSA', 'Psalm': 'PSA', 'Psalms': 'PSA',
+            'Prov': 'PRO', 'Proverbs': 'PRO', 'Eccl': 'ECC', 'Ecclesiastes': 'ECC',
+            'Song': 'SNG', 'Is': 'ISA', 'Isaiah': 'ISA', 'Jer': 'JER',
+            'Jeremiah': 'JER', 'Lam': 'LAM', 'Ezek': 'EZK', 'Ezekiel': 'EZK',
+            'Dan': 'DAN', 'Daniel': 'DAN', 'Hos': 'HOS', 'Joel': 'JOL',
+            'Amos': 'AMO', 'Obad': 'OBA', 'Jonah': 'JON', 'Mic': 'MIC',
+            'Nah': 'NAM', 'Hab': 'HAB', 'Zeph': 'ZEP', 'Hag': 'HAG',
+            'Zech': 'ZEC', 'Mal': 'MAL',
+            'Matt': 'MAT', 'Matthew': 'MAT', 'Mark': 'MRK', 'Luke': 'LUK',
+            'John': 'JHN', 'Acts': 'ACT', 'Rom': 'ROM', 'Romans': 'ROM',
+            '1 Cor': '1CO', '2 Cor': '2CO', 'Gal': 'GAL', 'Galatians': 'GAL',
+            'Eph': 'EPH', 'Ephesians': 'EPH', 'Phil': 'PHP', 'Philippians': 'PHP',
+            'Col': 'COL', 'Colossians': 'COL', '1 Thess': '1TH', '2 Thess': '2TH',
+            '1 Tim': '1TI', '2 Tim': '2TI', 'Titus': 'TIT', 'Philem': 'PHM',
+            'Heb': 'HEB', 'Hebrews': 'HEB', 'James': 'JAS', '1 Pet': '1PE',
+            '2 Pet': '2PE', '1 John': '1JN', '2 John': '2JN', '3 John': '3JN',
+            'Jude': 'JUD', 'Rev': 'REV', 'Revelation': 'REV'
+          };
+          
+          // Parse the reference
+          const match = storyText.trim().match(/^(\d?\s?[A-Za-z]+)\.?\s?(\d+):(\d+)$/);
+          if (match) {
+            const bookName = match[1].trim();
+            const chapter = parseInt(match[2]);
+            const verse = parseInt(match[3]);
+            
+            const bookCode = bookMap[bookName] || bookMap[bookName.replace('.', '')];
+            if (bookCode) {
+              const response: any = await getVerses(bookCode, chapter, [verse, verse]);
+              if (response && response.phrases && response.phrases.length > 0) {
+                finalStoryText = response.phrases.map((p: any) => p.text).join(' ');
+                finalReference = storyText.trim();
+                
+                toast({
+                  title: "Verse Loaded",
+                  description: `Fetched full text for ${storyText.trim()}`,
+                });
+              }
+            }
+          }
+        } catch (error) {
+          console.error('Error fetching verse:', error);
+          // Continue with original text if fetch fails
+        }
+      }
+
       // Shuffle and deal cards
       const shuffled = shuffleArray(ALL_PRINCIPLE_CARDS);
       
@@ -67,8 +130,8 @@ export function BattleLobby({ mode, onBattleStart, onBack }: Props) {
         .insert({
           game_mode: mode,
           status: 'waiting',
-          story_text: storyText,
-          story_reference: storyReference || null,
+          story_text: finalStoryText,
+          story_reference: finalReference || null,
           current_turn_player: `user_${user.id}`,
           host_user_id: user.id,
         })
@@ -163,9 +226,12 @@ export function BattleLobby({ mode, onBattleStart, onBack }: Props) {
             <Textarea
               value={storyText}
               onChange={(e) => setStoryText(e.target.value)}
-              placeholder="Enter the Bible passage or story that players will amplify with their principle cards..."
+              placeholder="Enter a Bible reference (e.g., Rev. 13:11) or paste a full story/passage..."
               className="min-h-32 bg-white/10 border-white/20 text-white placeholder:text-white/50"
             />
+            <p className="text-xs text-purple-200">
+              💡 Tip: Enter just a verse reference (like "John 3:16") and the full text will be automatically loaded!
+            </p>
           </div>
 
           <div className="space-y-2">
@@ -173,7 +239,7 @@ export function BattleLobby({ mode, onBattleStart, onBack }: Props) {
             <Input
               value={storyReference}
               onChange={(e) => setStoryReference(e.target.value)}
-              placeholder="e.g., Genesis 22:1-19"
+              placeholder="e.g., Genesis 22:1-19 (auto-filled if you enter a reference above)"
               className="bg-white/10 border-white/20 text-white placeholder:text-white/50"
             />
           </div>
