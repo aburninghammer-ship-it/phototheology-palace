@@ -18,6 +18,7 @@ interface Props {
 
 interface Player {
   player_id: string;
+  player_type: string;
   display_name: string;
   cards_in_hand: string[];
   cards_played: string[];
@@ -221,6 +222,7 @@ export function BattleArena({ battle, currentUserId, onBack }: Props) {
     if (data) {
       setPlayers(data.map(p => ({
         player_id: p.player_id,
+        player_type: p.player_type,
         display_name: p.display_name,
         cards_in_hand: Array.isArray(p.cards_in_hand) ? p.cards_in_hand.filter((c): c is string => typeof c === 'string') : [],
         cards_played: Array.isArray(p.cards_played) ? p.cards_played.filter((c): c is string => typeof c === 'string') : [],
@@ -374,15 +376,19 @@ export function BattleArena({ battle, currentUserId, onBack }: Props) {
   const handleJeevesPlay = async () => {
     console.log('🤖 Jeeves Play button clicked!');
     console.log('Players:', players);
+    console.log('Current turn player:', battle.current_turn_player);
     
-    const jeevesPlayer = players.find(p => p.player_id === 'jeeves_1');
+    // Find whichever Jeeves player's turn it is
+    const jeevesPlayer = players.find(p => 
+      p.player_type === 'ai' && p.player_id === battle.current_turn_player
+    );
     console.log('Found Jeeves player:', jeevesPlayer);
     
     if (!jeevesPlayer) {
-      console.log('❌ Jeeves player not found');
+      console.log('❌ Jeeves player not found or not their turn');
       toast({
         title: "Error",
-        description: "Jeeves player not found in the game",
+        description: "It's not Jeeves' turn or Jeeves player not found",
         variant: "destructive",
       });
       return;
@@ -392,14 +398,14 @@ export function BattleArena({ battle, currentUserId, onBack }: Props) {
       console.log('❌ Jeeves has no cards left');
       toast({
         title: "Game Over",
-        description: "Jeeves has no cards left to play!",
+        description: `${jeevesPlayer.display_name} has no cards left to play!`,
       });
       return;
     }
 
-    console.log('✅ Jeeves starting to play...');
+    console.log(`✅ ${jeevesPlayer.display_name} starting to play...`);
     toast({
-      title: "Jeeves is Thinking...",
+      title: `${jeevesPlayer.display_name} is Thinking...`,
       description: "Selecting a card and preparing a response...",
     });
 
@@ -446,12 +452,12 @@ export function BattleArena({ battle, currentUserId, onBack }: Props) {
 
       if (data.judgment.verdict === 'approved') {
         toast({
-          title: "🤖 Jeeves Played Successfully!",
+          title: `🤖 ${jeevesPlayer.display_name} Played Successfully!`,
           description: `Card: ${randomCard} | Points: ${data.judgment.totalPoints}`,
         });
       } else {
         toast({
-          title: "🤖 Jeeves' Move Rejected",
+          title: `🤖 ${jeevesPlayer.display_name}'s Move Rejected`,
           description: `Card: ${randomCard} was rejected!`,
           variant: "destructive",
         });
