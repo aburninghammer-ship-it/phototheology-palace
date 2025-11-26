@@ -487,7 +487,8 @@ export function BattleArena({ battle, currentUserId, onBack }: Props) {
 
   const currentPlayer = players.find(p => p.player_id === `user_${currentUserId}`);
   const opponent = players.find(p => p.player_id !== `user_${currentUserId}`);
-
+  const isJeevesVsJeeves = battle.game_mode === 'jeeves_vs_jeeves';
+  const aiPlayers = players.filter(p => p.player_type === 'ai');
   if (gameStatus === 'completed') {
     return (
       <motion.div
@@ -608,80 +609,106 @@ export function BattleArena({ battle, currentUserId, onBack }: Props) {
       </Card>
 
       {/* Players */}
-      <div className="grid md:grid-cols-2 gap-6">
-        {/* Opponent */}
-        {opponent && (
-          <Card className="bg-red-500/20 backdrop-blur-xl border-red-400/30">
-            <CardContent className="pt-6">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-xl font-bold text-white">{opponent.display_name}</h3>
-                <Badge className="bg-red-500 text-white">
-                  <Trophy className="h-3 w-3 mr-1" />
-                  {opponent.score}
-                </Badge>
-              </div>
-              <div className="flex gap-2">
-                {Array.from({ length: opponent.cards_in_hand.length }).map((_, i) => (
-                  <div
-                    key={i}
-                    className="w-12 h-16 rounded bg-gradient-to-br from-red-600 to-pink-600 border-2 border-red-400/50"
-                  />
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-        )}
+      {isJeevesVsJeeves ? (
+        <div className="grid md:grid-cols-2 gap-6">
+          {aiPlayers.map((jeeves) => (
+            <Card key={jeeves.player_id} className="bg-red-500/20 backdrop-blur-xl border-red-400/30">
+              <CardContent className="pt-6">
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-xl font-bold text-white">{jeeves.display_name}</h3>
+                  <Badge className="bg-red-500 text-white">
+                    <Trophy className="h-3 w-3 mr-1" />
+                    {jeeves.score}
+                  </Badge>
+                </div>
+                <div className="flex gap-2">
+                  {Array.from({ length: jeeves.cards_in_hand.length }).map((_, i) => (
+                    <div
+                      key={i}
+                      className="w-12 h-16 rounded bg-gradient-to-br from-red-600 to-pink-600 border-2 border-red-400/50"
+                    />
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      ) : (
+        <div className="grid md:grid-cols-2 gap-6">
+          {/* Opponent */}
+          {opponent && (
+            <Card className="bg-red-500/20 backdrop-blur-xl border-red-400/30">
+              <CardContent className="pt-6">
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-xl font-bold text-white">{opponent.display_name}</h3>
+                  <Badge className="bg-red-500 text-white">
+                    <Trophy className="h-3 w-3 mr-1" />
+                    {opponent.score}
+                  </Badge>
+                </div>
+                <div className="flex gap-2">
+                  {Array.from({ length: opponent.cards_in_hand.length }).map((_, i) => (
+                    <div
+                      key={i}
+                      className="w-12 h-16 rounded bg-gradient-to-br from-red-600 to-pink-600 border-2 border-red-400/50"
+                    />
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          )}
 
-        {/* Current Player */}
-        {currentPlayer && (
-          <Card className="bg-blue-500/20 backdrop-blur-xl border-blue-400/30">
-            <CardContent className="pt-6">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-xl font-bold text-white">{currentPlayer.display_name}</h3>
-                <Badge className="bg-blue-500 text-white">
-                  <Trophy className="h-3 w-3 mr-1" />
-                  {currentPlayer.score}
-                </Badge>
-              </div>
-              <div className="grid grid-cols-7 gap-2">
-                {currentPlayer.cards_in_hand.map((card) => (
-                  <div key={card} className="relative">
-                    <motion.div
-                      whileHover={{ scale: 1.1, y: -10 }}
-                      whileTap={{ scale: 0.95 }}
-                      onClick={() => setSelectedCard(card)}
-                      className={`
-                        relative cursor-pointer rounded-lg p-2 text-center text-xs font-bold
-                        bg-gradient-to-br from-purple-600 to-pink-600 border-2
-                        ${selectedCard === card ? 'border-amber-400 shadow-[0_0_20px_rgba(251,191,36,0.8)]' : 'border-purple-400/50'}
-                      `}
-                    >
-                      <img src={palaceImage} alt="card" className="w-full h-12 object-cover rounded mb-1 opacity-30" />
-                      <span className="text-white drop-shadow-lg">{card}</span>
-                    </motion.div>
-                    <Popover>
-                      <PopoverTrigger asChild>
-                        <button 
-                          className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-purple-600 border border-white/30 flex items-center justify-center text-white/80 hover:bg-purple-500 hover:text-white transition-colors z-10"
-                          onClick={(e) => e.stopPropagation()}
-                        >
-                          <HelpCircle className="w-3 h-3" />
-                        </button>
-                      </PopoverTrigger>
-                      <PopoverContent className="w-80 bg-gradient-to-br from-purple-900 to-pink-900 border-purple-400/30">
-                        <div className="space-y-2">
-                          <h4 className="font-bold text-amber-300">{PRINCIPLE_INFO[card]?.name || card}</h4>
-                          <p className="text-sm text-white/90">{PRINCIPLE_INFO[card]?.description || "Phototheology principle"}</p>
-                        </div>
-                      </PopoverContent>
-                    </Popover>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-        )}
-      </div>
+          {/* Current Player */}
+          {currentPlayer && (
+            <Card className="bg-blue-500/20 backdrop-blur-xl border-blue-400/30">
+              <CardContent className="pt-6">
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-xl font-bold text-white">{currentPlayer.display_name}</h3>
+                  <Badge className="bg-blue-500 text-white">
+                    <Trophy className="h-3 w-3 mr-1" />
+                    {currentPlayer.score}
+                  </Badge>
+                </div>
+                <div className="grid grid-cols-7 gap-2">
+                  {currentPlayer.cards_in_hand.map((card) => (
+                    <div key={card} className="relative">
+                      <motion.div
+                        whileHover={{ scale: 1.1, y: -10 }}
+                        whileTap={{ scale: 0.95 }}
+                        onClick={() => setSelectedCard(card)}
+                        className={`
+                          relative cursor-pointer rounded-lg p-2 text-center text-xs font-bold
+                          bg-gradient-to-br from-purple-600 to-pink-600 border-2
+                          ${selectedCard === card ? 'border-amber-400 shadow-[0_0_20px_rgba(251,191,36,0.8)]' : 'border-purple-400/50'}
+                        `}
+                      >
+                        <img src={palaceImage} alt="card" className="w-full h-12 object-cover rounded mb-1 opacity-30" />
+                        <span className="text-white drop-shadow-lg">{card}</span>
+                      </motion.div>
+                      <Popover>
+                        <PopoverTrigger asChild>
+                          <button 
+                            className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-purple-600 border border-white/30 flex items-center justify-center text-white/80 hover:bg-purple-500 hover:text-white transition-colors z-10"
+                            onClick={(e) => e.stopPropagation()}
+                          >
+                            <HelpCircle className="w-3 h-3" />
+                          </button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-80 bg-gradient-to-br from-purple-900 to-pink-900 border-purple-400/30">
+                          <div className="space-y-2">
+                            <h4 className="font-bold text-amber-300">{PRINCIPLE_INFO[card]?.name || card}</h4>
+                            <p className="text-sm text-white/90">{PRINCIPLE_INFO[card]?.description || "Phototheology principle"}</p>
+                          </div>
+                        </PopoverContent>
+                      </Popover>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          )}
+        </div>
+      )}
 
       {/* Move History */}
       {moves.length > 0 && (
