@@ -7,6 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { ChefHat, ArrowLeft, Loader2, Eye, Share2, RefreshCw } from "lucide-react";
 import { SocialShareButton } from "@/components/SocialShareButton";
+import { TextShareButton } from "@/components/TextShareButton";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
@@ -249,14 +250,24 @@ export default function ChefChallenge() {
               <div className="flex items-center gap-2">
                 <Badge>Quick • 5-10 min</Badge>
                 {verses.length > 0 && (
-                  <SocialShareButton
-                    title="🍳 Chef Challenge - Help Me Make a Bible Study Recipe!"
-                    description={`🧑‍🍳 Can you help me with this Chef Challenge on Phototheology?\n\n🎲 I've been given ${verses.length} completely RANDOM Bible verses that seem totally unrelated:\n\n📖 ${verses.slice(0, 3).map(v => v.reference).join("\n📖 ")}${verses.length > 3 ? `\n📖 ...and ${verses.length - 3} more!` : ""}\n\n🎯 The Challenge: Tie them together into ONE creative, meaningful Bible study!\n\n💡 Think you can find the connections? Can you help me "cook up" something amazing from these random ingredients?\n\n✨ Join me and see what recipe we can create together!`}
-                    url={window.location.href}
-                    variant="dropdown"
-                    size="sm"
-                    buttonText="Share"
-                  />
+                  <>
+                    <TextShareButton
+                      type="chef"
+                      title={`Chef Challenge with ${verses.length} random verses`}
+                      description={verses.slice(0, 3).map(v => v.reference).join(", ") + (verses.length > 3 ? ` and ${verses.length - 3} more!` : "")}
+                      data={{ verseCount: verses.length }}
+                      variant="outline"
+                      size="sm"
+                    />
+                    <SocialShareButton
+                      title="🍳 Chef Challenge - Help Me Make a Bible Study Recipe!"
+                      description={`🧑‍🍳 Can you help me with this Chef Challenge on Phototheology?\n\n🎲 I've been given ${verses.length} completely RANDOM Bible verses that seem totally unrelated:\n\n📖 ${verses.slice(0, 3).map(v => v.reference).join("\n📖 ")}${verses.length > 3 ? `\n📖 ...and ${verses.length - 3} more!` : ""}\n\n🎯 The Challenge: Tie them together into ONE creative, meaningful Bible study!\n\n💡 Think you can find the connections? Can you help me "cook up" something amazing from these random ingredients?\n\n✨ Join me and see what recipe we can create together!`}
+                      url={window.location.href}
+                      variant="dropdown"
+                      size="sm"
+                      buttonText="Share"
+                    />
+                  </>
                 )}
               </div>
             </div>

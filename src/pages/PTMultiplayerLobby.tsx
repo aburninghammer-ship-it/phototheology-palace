@@ -7,7 +7,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Gamepad2, Users, Crown, Swords, Target, Zap, Loader2 } from "lucide-react";
+import { Gamepad2, Users, Crown, Swords, Target, Zap, Loader2, ArrowLeft } from "lucide-react";
+import { TextShareButton } from "@/components/TextShareButton";
 
 const PTMultiplayerLobby = () => {
   const navigate = useNavigate();
@@ -90,6 +91,23 @@ const PTMultiplayerLobby = () => {
 
   return (
     <div className="container mx-auto py-8 px-4 max-w-4xl">
+      <div className="flex items-center justify-between mb-6">
+        <Button
+          onClick={() => navigate("/card-deck")}
+          variant="ghost"
+        >
+          <ArrowLeft className="w-4 h-4 mr-2" />
+          Back to Deck
+        </Button>
+        
+        <TextShareButton
+          type="game"
+          title="Phototheology Card Study Multiplayer"
+          description="Play against Jeeves or team up! Master Bible symbolism through competitive card matching."
+          variant="outline"
+        />
+      </div>
+
       <div className="text-center mb-8">
         <div className="inline-flex items-center gap-3 mb-3">
           <Gamepad2 className="w-10 h-10 text-primary" />

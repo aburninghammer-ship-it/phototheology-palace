@@ -8,6 +8,7 @@ import { ArrowLeft, Calculator, Share2, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
+import { TextShareButton } from "@/components/TextShareButton";
 
 const EQUATION_PIECES = [
   "1D", "2D", "3D", "4D", "5D",
@@ -290,26 +291,35 @@ Can you improve this equation or offer insights? Share your thoughts!`;
                 className="bg-black/60 border-fuchsia-500/30 text-white min-h-32"
               />
               
-              {/* Share to Community Button */}
+              {/* Share Buttons */}
               {selectedPieces.length >= 3 && explanation.trim() && (
-                <Button
-                  onClick={shareEquationToCommunity}
-                  variant="outline"
-                  className="w-full"
-                  disabled={sharingToCommunity}
-                >
-                  {sharingToCommunity ? (
-                    <>
-                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                      Sharing...
-                    </>
-                  ) : (
-                    <>
-                      <Share2 className="h-4 w-4 mr-2" />
-                      Share to Community - Get Help Solving This!
-                    </>
-                  )}
-                </Button>
+                <div className="flex gap-2">
+                  <TextShareButton
+                    type="equation"
+                    title={`Equation: ${selectedPieces.join(" ")}`}
+                    description={currentPrompt}
+                    variant="outline"
+                    className="flex-1 border-fuchsia-500/30 hover:bg-fuchsia-500/10"
+                  />
+                  <Button
+                    onClick={shareEquationToCommunity}
+                    variant="outline"
+                    className="flex-1 border-fuchsia-500/30 hover:bg-fuchsia-500/10"
+                    disabled={sharingToCommunity}
+                  >
+                    {sharingToCommunity ? (
+                      <>
+                        <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                        Sharing...
+                      </>
+                    ) : (
+                      <>
+                        <Share2 className="h-4 w-4 mr-2" />
+                        Share to Community
+                      </>
+                    )}
+                  </Button>
+                </div>
               )}
 
               <div className="flex gap-2">
