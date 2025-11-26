@@ -6,6 +6,9 @@ verify_jwt = false
 [functions.judge-pt-card-play]
 verify_jwt = false
 
+[functions.start-pt-game]
+verify_jwt = false
+
 [api]
 enabled = true
 port = 54321

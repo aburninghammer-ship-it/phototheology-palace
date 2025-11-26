@@ -263,65 +263,36 @@ const PTMultiplayerGame = () => {
 
   const autoStartGame = async (gameId: string, playersList: Player[]) => {
     try {
-      console.log('[PTMultiplayer] Auto-start: checking existing cards for game', gameId);
+      console.log('[PTMultiplayer] Auto-start: invoking start-pt-game for game', gameId);
 
-      const { data: existingCards, error: existingCardsError } = await supabase
-        .from('pt_multiplayer_deck')
-        .select('id')
-        .eq('game_id', gameId)
-        .limit(1);
-
-      if (existingCardsError) {
-        console.error('[PTMultiplayer] Error checking existing cards:', existingCardsError);
-      }
-
-      if (!existingCards || existingCards.length === 0) {
-        console.log('[PTMultiplayer] Auto-start: dealing cards for game', gameId);
-        const { error: dealError } = await supabase.functions.invoke('deal-pt-cards', {
-          body: { gameId }
-        });
-
-        if (dealError) {
-          console.error('[PTMultiplayer] Error dealing cards:', dealError);
-          toast({
-            title: 'Error starting game',
-            description: dealError.message || 'Failed to deal cards for this game.',
-            variant: 'destructive',
-          });
-          return;
-        }
-      } else {
-        console.log('[PTMultiplayer] Auto-start: cards already dealt, skipping deal function');
-      }
-
-      console.log('[PTMultiplayer] Auto-start: activating game', gameId);
-      const { error } = await supabase
-        .from('pt_multiplayer_games')
-        .update({ 
-          status: 'active',
-          current_turn_player_id: playersList[0]?.id ?? null,
-        })
-        .eq('id', gameId);
+      const { data, error } = await supabase.functions.invoke('start-pt-game', {
+        body: { gameId },
+      });
 
       if (error) {
-        console.error('[PTMultiplayer] Error auto-starting game:', error);
+        console.error('[PTMultiplayer] Error starting game via function:', error);
         toast({
           title: 'Error starting game',
-          description: error.message || 'Failed to activate this game.',
+          description: error.message || 'Failed to start this game.',
           variant: 'destructive',
         });
         return;
       }
 
-      setGame((prev) =>
-        prev
-          ? {
-              ...prev,
-              status: 'active',
-              current_turn_player_id: playersList[0]?.id ?? null,
-            }
-          : prev
-      );
+      const updatedGame = data?.game as Partial<Game> | undefined;
+
+      if (updatedGame) {
+        console.log('[PTMultiplayer] Game started, updated status:', updatedGame.status);
+        setGame((prev) =>
+          prev
+            ? {
+                ...prev,
+                status: updatedGame.status ?? prev.status,
+                current_turn_player_id: updatedGame.current_turn_player_id ?? prev.current_turn_player_id,
+              }
+            : prev,
+        );
+      }
     } catch (error: any) {
       console.error('[PTMultiplayer] Error in auto-start:', error);
       toast({
