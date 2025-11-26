@@ -290,9 +290,9 @@ export function BattleArena({ battle, currentUserId, onBack }: Props) {
         await loadPlayers();
         await loadMoves();
 
-        // If playing against Jeeves, he plays next after approval
-        if (battle.mode === 'vs_jeeves') {
-          setTimeout(() => handleJeevesPlay(), 2000);
+        // If playing against Jeeves (not jeeves vs jeeves), he plays next after approval
+        if (battle.game_mode === 'user_vs_jeeves') {
+          setTimeout(() => handleJeevesPlay('jeeves_1'), 2000);
         }
       }
 
@@ -339,9 +339,9 @@ export function BattleArena({ battle, currentUserId, onBack }: Props) {
         await loadPlayers();
         await loadMoves();
 
-        // Jeeves plays next after successful challenge
-        if (battle.mode === 'vs_jeeves') {
-          setTimeout(() => handleJeevesPlay(), 2000);
+        // Jeeves plays next after successful challenge (not in jeeves vs jeeves)
+        if (battle.game_mode === 'user_vs_jeeves') {
+          setTimeout(() => handleJeevesPlay('jeeves_1'), 2000);
         }
       } else {
         toast({
@@ -374,23 +374,12 @@ export function BattleArena({ battle, currentUserId, onBack }: Props) {
     });
   };
 
-  const handleJeevesPlay = async () => {
-    console.log('🤖 Jeeves Play button clicked!');
+  const handleJeevesPlay = async (jeevesId: string) => {
+    console.log(`🤖 ${jeevesId} Play button clicked!`);
     console.log('Players:', players);
 
-    // Find an AI player (Jeeves) to play
-    const aiPlayers = players.filter(p => p.player_type === 'ai');
-    let jeevesPlayer: Player | undefined;
-
-    if (battle.game_mode === 'jeeves_vs_jeeves') {
-      // In Jeeves vs Jeeves, pick the Jeeves with cards left (prefer the one with more cards)
-      jeevesPlayer = aiPlayers
-        .filter(p => p.cards_in_hand.length > 0)
-        .sort((a, b) => b.cards_in_hand.length - a.cards_in_hand.length)[0];
-    } else {
-      // In other modes, just use the first AI player
-      jeevesPlayer = aiPlayers[0];
-    }
+    // Find the specific Jeeves player
+    const jeevesPlayer = players.find(p => p.player_id === jeevesId);
 
     console.log('Selected Jeeves player:', jeevesPlayer);
     
@@ -851,7 +840,7 @@ export function BattleArena({ battle, currentUserId, onBack }: Props) {
             />
           </div>
           
-          {!showRejectionOptions && (
+          {!showRejectionOptions && !isJeevesVsJeeves && (
             <div className="grid grid-cols-2 gap-3">
               <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
                 <Button
@@ -872,7 +861,7 @@ export function BattleArena({ battle, currentUserId, onBack }: Props) {
               
               <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
                 <Button
-                  onClick={handleJeevesPlay}
+                  onClick={() => handleJeevesPlay('jeeves_1')}
                   disabled={isSubmitting}
                   className="w-full bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 font-bold py-6 text-lg shadow-lg"
                 >

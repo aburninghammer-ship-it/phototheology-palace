@@ -43,6 +43,7 @@ export function BattleLobby({ mode, onBattleStart, onBack }: Props) {
   const [storyText, setStoryText] = useState("");
   const [storyReference, setStoryReference] = useState("");
   const [isCreating, setIsCreating] = useState(false);
+  const [whoGoesFirst, setWhoGoesFirst] = useState<'dr_jeeves' | 'professor_jeeves'>('dr_jeeves');
 
   const handleCreateBattle = async () => {
     if (!storyText.trim()) {
@@ -126,7 +127,7 @@ export function BattleLobby({ mode, onBattleStart, onBack }: Props) {
       
       // Decide who starts based on mode
       const initialCurrentTurnPlayer = mode === 'jeeves_vs_jeeves'
-        ? 'jeeves_1'
+        ? (whoGoesFirst === 'dr_jeeves' ? 'jeeves_1' : 'jeeves_2')
         : `user_${user.id}`;
       
       // Create battle
@@ -264,6 +265,40 @@ export function BattleLobby({ mode, onBattleStart, onBack }: Props) {
               className="bg-white/10 border-white/20 text-white placeholder:text-white/50"
             />
           </div>
+
+          {mode === 'jeeves_vs_jeeves' && (
+            <div className="space-y-2">
+              <Label className="text-white">Who Goes First?</Label>
+              <div className="grid grid-cols-2 gap-3">
+                <motion.button
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  onClick={() => setWhoGoesFirst('dr_jeeves')}
+                  className={`p-4 rounded-lg border-2 transition-all ${
+                    whoGoesFirst === 'dr_jeeves'
+                      ? 'bg-amber-500/30 border-amber-400 shadow-lg'
+                      : 'bg-white/5 border-white/20 hover:bg-white/10'
+                  }`}
+                >
+                  <div className="text-white font-bold text-lg">Dr. Jeeves</div>
+                  <div className="text-white/70 text-sm">First to play</div>
+                </motion.button>
+                <motion.button
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  onClick={() => setWhoGoesFirst('professor_jeeves')}
+                  className={`p-4 rounded-lg border-2 transition-all ${
+                    whoGoesFirst === 'professor_jeeves'
+                      ? 'bg-purple-500/30 border-purple-400 shadow-lg'
+                      : 'bg-white/5 border-white/20 hover:bg-white/10'
+                  }`}
+                >
+                  <div className="text-white font-bold text-lg">Professor Jeeves</div>
+                  <div className="text-white/70 text-sm">First to play</div>
+                </motion.button>
+              </div>
+            </div>
+          )}
 
           <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
             <Button
