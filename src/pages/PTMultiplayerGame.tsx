@@ -230,17 +230,23 @@ const PTMultiplayerGame = () => {
           .insert(inserts);
 
         if (jeevesError) {
-          console.error('Error ensuring Jeeves players:', jeevesError);
-        } else {
-          const { data: refreshedPlayers } = await supabase
-            .from('pt_multiplayer_players')
-            .select('*')
-            .eq('game_id', gameId)
-            .order('joined_at');
-
-          if (refreshedPlayers) {
-            playersData = refreshedPlayers as Player[];
+          // Ignore duplicate key errors (players already exist) but still refresh list
+          if ((jeevesError as any).code === '23505') {
+            console.warn('Jeeves players already exist, ignoring duplicate insert:', jeevesError);
+          } else {
+            console.error('Error ensuring Jeeves players:', jeevesError);
           }
+        }
+
+        // In all cases, refresh players to get current state from the database
+        const { data: refreshedPlayers } = await supabase
+          .from('pt_multiplayer_players')
+          .select('*')
+          .eq('game_id', gameId)
+          .order('joined_at');
+
+        if (refreshedPlayers) {
+          playersData = refreshedPlayers as Player[];
         }
       }
     }
