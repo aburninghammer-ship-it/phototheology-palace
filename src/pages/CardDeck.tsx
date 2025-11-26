@@ -18,6 +18,7 @@ import { Users, Copy, Check } from "lucide-react";
 import { RealtimeChannel } from "@supabase/supabase-js";
 import { searchBible } from "@/services/bibleApi";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import ReactMarkdown from 'react-markdown';
 import jsPDF from 'jspdf';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -1346,9 +1347,43 @@ export default function CardDeck() {
                 <CardHeader>
                   <div className="flex items-start justify-between">
                     <div className="space-y-2">
-                      <CardTitle className="text-2xl">
-                        {selectedCard.name}
-                      </CardTitle>
+                      <div className="flex items-center gap-2">
+                        <CardTitle className="text-2xl">
+                          {selectedCard.name}
+                        </CardTitle>
+                        <Popover>
+                          <PopoverTrigger asChild>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-8 w-8 rounded-full hover:bg-background/20"
+                            >
+                              <HelpCircle className="h-5 w-5" />
+                            </Button>
+                          </PopoverTrigger>
+                          <PopoverContent className="w-80">
+                            <div className="space-y-3">
+                              <div className="space-y-1">
+                                <h4 className="font-bold text-lg">{selectedCard.code}</h4>
+                                <p className="text-sm text-muted-foreground font-semibold">
+                                  Phototheology Principle
+                                </p>
+                              </div>
+                              <div className="space-y-2">
+                                <p className="text-sm font-medium">
+                                  {selectedCard.name}
+                                </p>
+                                <p className="text-sm text-muted-foreground">
+                                  {selectedCard.question}
+                                </p>
+                              </div>
+                              <div className="pt-2 border-t">
+                                <Badge variant="secondary">Floor {selectedCard.floor}</Badge>
+                              </div>
+                            </div>
+                          </PopoverContent>
+                        </Popover>
+                      </div>
                       <CardDescription className="text-base text-foreground font-medium">
                         Apply {selectedCard.code} to your {textType}
                       </CardDescription>
