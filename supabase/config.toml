@@ -6,6 +6,9 @@ verify_jwt = false
 [functions.judge-pt-card-play]
 verify_jwt = false
 
+[functions.judge-card-battle]
+verify_jwt = false
+
 [functions.start-pt-game]
 verify_jwt = false
 
@@ -100,9 +103,6 @@ verify_jwt = false
 
 [functions.generate-daily-verse]
 verify_jwt = false
-
-[functions.grade-floor-assessment]
-verify_jwt = true
 
 [functions.grade-floor-assessment]
 verify_jwt = true
