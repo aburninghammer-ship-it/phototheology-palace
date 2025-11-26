@@ -766,9 +766,23 @@ export default function CardDeck() {
       if (error) throw error;
       setFeedback(data.content || "Sorry, I couldn't generate help right now.");
     } catch (error: any) {
+      const rawMessage = error?.message as string | undefined;
+      const status = (error as any)?.status ?? (error as any)?.code;
+
+      let description = "Please try again";
+      if (status === 402 || rawMessage?.includes("402")) {
+        description = "Jeeves is temporarily unavailable (study assistant credits are exhausted). Please try again later.";
+      } else if (status === 429 || rawMessage?.toLowerCase().includes("rate limit")) {
+        description = "You're asking Jeeves very quickly. Please wait a bit and try again.";
+      } else if (rawMessage && !rawMessage.includes("non-2xx")) {
+        description = rawMessage;
+      } else {
+        description = "Our study assistant hit an error while helping. Please try again in a moment.";
+      }
+
       toast({
         title: "Help request failed",
-        description: error.message || "Please try again",
+        description,
         variant: "destructive",
       });
     } finally {
@@ -807,9 +821,23 @@ export default function CardDeck() {
         description: "Jeeves has reviewed your application.",
       });
     } catch (error: any) {
+      const rawMessage = error?.message as string | undefined;
+      const status = (error as any)?.status ?? (error as any)?.code;
+
+      let description = "Please try again";
+      if (status === 402 || rawMessage?.includes("402")) {
+        description = "Jeeves is temporarily unavailable (study assistant credits are exhausted). Please try again later.";
+      } else if (status === 429 || rawMessage?.toLowerCase().includes("rate limit")) {
+        description = "You're asking Jeeves very quickly. Please wait a bit and try again.";
+      } else if (rawMessage && !rawMessage.includes("non-2xx")) {
+        description = rawMessage;
+      } else {
+        description = "Our study assistant hit an error while grading. Please try again in a moment.";
+      }
+
       toast({
         title: "Submission failed",
-        description: error.message || "Please try again",
+        description,
         variant: "destructive",
       });
     } finally {
