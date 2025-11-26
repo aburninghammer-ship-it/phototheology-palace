@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -7,9 +7,11 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { ArrowLeft, Sparkles, Scroll } from "lucide-react";
+import { ArrowLeft, Sparkles, Scroll, Copy, Share2, Users, Send } from "lucide-react";
 import { GameMode } from "./PTCardBattle";
 import { getVerses } from "biblesdk";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 interface Props {
   mode: GameMode;
@@ -48,9 +50,92 @@ export function BattleLobby({ mode, onBattleStart, onBack }: Props) {
   const [waitingForOpponent, setWaitingForOpponent] = useState(false);
   const [joinCode, setJoinCode] = useState("");
   const [isJoining, setIsJoining] = useState(false);
+  const [availableUsers, setAvailableUsers] = useState<any[]>([]);
+  const [currentBattleId, setCurrentBattleId] = useState<string | null>(null);
+  const [invitingUsers, setInvitingUsers] = useState<Set<string>>(new Set());
+
+  useEffect(() => {
+    if (mode === 'user_vs_user') {
+      loadAvailableUsers();
+    }
+  }, [mode]);
 
   const generateBattleCode = () => {
     return Math.random().toString(36).substring(2, 8).toUpperCase();
+  };
+
+  const loadAvailableUsers = async () => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      // Get users who were online in the last 5 minutes
+      const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000).toISOString();
+      
+      const { data: profiles } = await supabase
+        .from('profiles')
+        .select('id, display_name, avatar_url, last_seen')
+        .neq('id', user.id)
+        .gte('last_seen', fiveMinutesAgo)
+        .order('last_seen', { ascending: false })
+        .limit(10);
+
+      setAvailableUsers(profiles || []);
+    } catch (error) {
+      console.error('Error loading available users:', error);
+    }
+  };
+
+  const handleInviteUser = async (invitedUserId: string) => {
+    if (!battleCode || !currentBattleId) return;
+    
+    setInvitingUsers(prev => new Set(prev).add(invitedUserId));
+    
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error('Not authenticated');
+
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('display_name')
+        .eq('id', user.id)
+        .single();
+
+      // Create notification for invited user
+      await supabase
+        .from('notifications')
+        .insert({
+          user_id: invitedUserId,
+          type: 'battle_invite',
+          title: 'Battle Invitation',
+          message: `${profile?.display_name || 'A Phototheologist'} invites you to a Card Battle!`,
+          link: `/card-deck`,
+          metadata: {
+            battle_code: battleCode,
+            battle_id: currentBattleId,
+            inviter_id: user.id,
+            inviter_name: profile?.display_name || 'A Phototheologist'
+          }
+        });
+
+      toast({
+        title: "Invitation Sent!",
+        description: "Your friend will receive a notification",
+      });
+    } catch (error: any) {
+      console.error('Error inviting user:', error);
+      toast({
+        title: "Error",
+        description: "Failed to send invitation",
+        variant: "destructive",
+      });
+    } finally {
+      setInvitingUsers(prev => {
+        const newSet = new Set(prev);
+        newSet.delete(invitedUserId);
+        return newSet;
+      });
+    }
   };
 
   const handleCreateBattle = async () => {
@@ -222,6 +307,7 @@ export function BattleLobby({ mode, onBattleStart, onBack }: Props) {
       // For user_vs_user mode, wait for opponent
       if (mode === 'user_vs_user') {
         setBattleCode(newBattleCode!);
+        setCurrentBattleId(battle.id);
         setWaitingForOpponent(true);
         
         // Subscribe to battle updates
@@ -244,9 +330,12 @@ export function BattleLobby({ mode, onBattleStart, onBack }: Props) {
           })
           .subscribe();
         
+        // Reload available users for invites
+        loadAvailableUsers();
+        
         toast({
           title: "Battle Created!",
-          description: "Share the code with your opponent!",
+          description: "Share the code or invite a friend!",
         });
       } else {
         // Start battle immediately for vs Jeeves and Jeeves vs Jeeves
@@ -374,44 +463,127 @@ export function BattleLobby({ mode, onBattleStart, onBack }: Props) {
         initial={{ opacity: 0, scale: 0.9 }}
         animate={{ opacity: 1, scale: 1 }}
         exit={{ opacity: 0, scale: 0.9 }}
+        className="space-y-6"
       >
         <Card className="bg-white/10 backdrop-blur-xl border-white/20 text-white">
-          <CardContent className="pt-6 text-center space-y-6">
-            <motion.div
-              animate={{ rotate: 360 }}
-              transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
-              className="inline-block"
-            >
-              <Sparkles className="h-16 w-16 text-amber-400" />
-            </motion.div>
-            
-            <h2 className="text-3xl font-bold">Waiting for Opponent...</h2>
-            
-            <div className="bg-gradient-to-r from-amber-500/20 to-orange-500/20 p-6 rounded-lg border-2 border-amber-400/30">
-              <p className="text-sm text-purple-200 mb-3">Share this code with your friend:</p>
-              <div className="text-5xl font-bold text-amber-400 tracking-widest mb-3">{battleCode}</div>
-              <Button
-                onClick={() => {
-                  navigator.clipboard.writeText(battleCode);
-                  toast({ title: "Copied!", description: "Battle code copied to clipboard" });
-                }}
-                className="bg-amber-500 hover:bg-amber-600"
+          <CardContent className="pt-6 space-y-6">
+            <div className="text-center space-y-4">
+              <motion.div
+                animate={{ rotate: 360 }}
+                transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+                className="inline-block"
               >
-                Copy Code
-              </Button>
+                <Sparkles className="h-16 w-16 text-amber-400" />
+              </motion.div>
+              
+              <h2 className="text-3xl font-bold">Waiting for Opponent...</h2>
+              
+              <div className="bg-gradient-to-r from-amber-500/20 to-orange-500/20 p-8 rounded-lg border-2 border-amber-400/30">
+                <p className="text-sm text-purple-200 mb-3">Share this code with your friend:</p>
+                <div className="text-6xl font-bold text-amber-400 tracking-widest mb-4 font-mono">
+                  {battleCode}
+                </div>
+                <div className="flex gap-2 justify-center">
+                  <Button
+                    onClick={() => {
+                      navigator.clipboard.writeText(battleCode);
+                      toast({ title: "Copied!", description: "Battle code copied to clipboard" });
+                    }}
+                    className="bg-amber-500 hover:bg-amber-600"
+                  >
+                    <Copy className="mr-2 h-4 w-4" />
+                    Copy Code
+                  </Button>
+                  <Button
+                    onClick={() => {
+                      const shareText = `Join my Phototheology Card Battle! Use code: ${battleCode}`;
+                      if (navigator.share) {
+                        navigator.share({ title: 'Battle Invitation', text: shareText });
+                      } else {
+                        navigator.clipboard.writeText(shareText);
+                        toast({ title: "Copied!", description: "Share message copied" });
+                      }
+                    }}
+                    variant="outline"
+                    className="border-amber-400/50 text-amber-400 hover:bg-amber-400/10"
+                  >
+                    <Share2 className="mr-2 h-4 w-4" />
+                    Share
+                  </Button>
+                </div>
+              </div>
             </div>
-
-            <p className="text-purple-200">They can join by entering this code in the VS Player lobby</p>
-            
-            <Button
-              onClick={onBack}
-              variant="outline"
-              className="border-white/30 text-white hover:bg-white/10"
-            >
-              Cancel
-            </Button>
           </CardContent>
         </Card>
+
+        {/* Invite Users Directly */}
+        {availableUsers.length > 0 && (
+          <Card className="bg-white/10 backdrop-blur-xl border-white/20 text-white">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Users className="h-5 w-5 text-purple-400" />
+                Invite a Phototheologist
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <ScrollArea className="h-64">
+                <div className="space-y-2">
+                  {availableUsers.map((user) => (
+                    <motion.div
+                      key={user.id}
+                      initial={{ opacity: 0, x: -20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      className="flex items-center justify-between p-3 rounded-lg bg-white/5 hover:bg-white/10 transition-colors border border-white/10"
+                    >
+                      <div className="flex items-center gap-3">
+                        <Avatar className="h-10 w-10 border-2 border-purple-400/50">
+                          <AvatarFallback className="bg-gradient-to-br from-purple-500 to-pink-500 text-white">
+                            {user.display_name?.[0]?.toUpperCase() || '?'}
+                          </AvatarFallback>
+                        </Avatar>
+                        <div>
+                          <p className="font-semibold">{user.display_name || 'Anonymous'}</p>
+                          <p className="text-xs text-purple-300">
+                            Active {Math.round((Date.now() - new Date(user.last_seen).getTime()) / 60000)} min ago
+                          </p>
+                        </div>
+                      </div>
+                      <Button
+                        onClick={() => handleInviteUser(user.id)}
+                        disabled={invitingUsers.has(user.id)}
+                        size="sm"
+                        className="bg-purple-500 hover:bg-purple-600"
+                      >
+                        {invitingUsers.has(user.id) ? (
+                          'Sending...'
+                        ) : (
+                          <>
+                            <Send className="mr-1 h-3 w-3" />
+                            Invite
+                          </>
+                        )}
+                      </Button>
+                    </motion.div>
+                  ))}
+                </div>
+              </ScrollArea>
+              {availableUsers.length === 0 && (
+                <p className="text-center text-purple-300 py-8">No users currently online</p>
+              )}
+            </CardContent>
+          </Card>
+        )}
+
+        <div className="text-center">
+          <Button
+            onClick={onBack}
+            variant="outline"
+            className="border-white/30 text-white hover:bg-white/10"
+          >
+            <ArrowLeft className="mr-2 h-4 w-4" />
+            Cancel & Go Back
+          </Button>
+        </div>
       </motion.div>
     );
   }
