@@ -40,6 +40,7 @@ import { MagicEyeEasterEgg } from "@/components/MagicEyeEasterEgg";
 import { ExplainerVideo } from "@/components/ExplainerVideo";
 import { WhatPhototheologyDoes } from "@/components/WhatPhototheologyDoes";
 import { WhyPeopleSwitching } from "@/components/WhyPeopleSwitching";
+import { InsideThePalace } from "@/components/InsideThePalace";
 
 const Index = () => {
   const navigate = useNavigate();
@@ -113,110 +114,21 @@ const Index = () => {
         <UserCountBadge />
       </div>
 
-      {/* SECTION 2 — The Pain Point */}
-      <section className="py-16 px-4 sm:px-6 lg:px-8 bg-muted/30">
-        <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-3xl md:text-4xl font-bold mb-8">
-            Ever felt like your Bible study is:
-          </h2>
-          
-          <div className="grid md:grid-cols-3 gap-6 mb-8">
-            <div className="p-6 bg-card rounded-lg border-2 border-destructive/20">
-              <HelpCircle className="h-12 w-12 mx-auto mb-3 text-destructive" />
-              <p className="font-semibold mb-2">A list of disconnected verses?</p>
-            </div>
-            <div className="p-6 bg-card rounded-lg border-2 border-destructive/20">
-              <Brain className="h-12 w-12 mx-auto mb-3 text-destructive" />
-              <p className="font-semibold mb-2">Hard to understand?</p>
-            </div>
-            <div className="p-6 bg-card rounded-lg border-2 border-destructive/20">
-              <Target className="h-12 w-12 mx-auto mb-3 text-destructive" />
-              <p className="font-semibold mb-2">Easy to forget?</p>
-            </div>
-          </div>
-
-          <p className="text-xl text-muted-foreground mb-4">
-            You're not alone.
+      {/* Simplified Pain Point */}
+      <section className="py-12 px-4 sm:px-6 lg:px-8 bg-muted/30">
+        <div className="max-w-3xl mx-auto text-center space-y-4">
+          <p className="text-2xl md:text-3xl font-bold">
+            Most Christians struggle because we were never taught{" "}
+            <span className="text-primary">how the Bible connects</span>.
           </p>
-          <p className="text-xl font-semibold mb-2">
-            Most Christians struggle because we were never taught <span className="text-primary">how the Bible connects</span>.
-          </p>
-          <p className="text-2xl font-bold text-primary mt-6">
+          <p className="text-xl text-muted-foreground">
             Phototheology fixes that.
           </p>
         </div>
       </section>
 
-      {/* SECTION 3 — The Promise */}
-      <section className="py-20 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-5xl mx-auto">
-          <h2 className="text-4xl md:text-5xl font-bold text-center mb-12">
-            With Phototheology, you will:
-          </h2>
-          
-          <div className="grid md:grid-cols-2 gap-8">
-            <Card className="border-2 border-primary/20">
-              <CardContent className="pt-6">
-                <div className="flex items-start gap-4">
-                  <div className="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center flex-shrink-0">
-                    <Check className="h-6 w-6 text-primary" />
-                  </div>
-                  <div>
-                    <h3 className="font-bold text-lg mb-2">See how everything interlocks</h3>
-                    <p className="text-muted-foreground">Stories, prophecies, and themes finally connect in your mind.</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card className="border-2 border-primary/20">
-              <CardContent className="pt-6">
-                <div className="flex items-start gap-4">
-                  <div className="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center flex-shrink-0">
-                    <Check className="h-6 w-6 text-primary" />
-                  </div>
-                  <div>
-                    <h3 className="font-bold text-lg mb-2">Understand each book visually</h3>
-                    <p className="text-muted-foreground">Not abstractly — with clear, memorable mental images.</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card className="border-2 border-primary/20">
-              <CardContent className="pt-6">
-                <div className="flex items-start gap-4">
-                  <div className="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center flex-shrink-0">
-                    <Check className="h-6 w-6 text-primary" />
-                  </div>
-                  <div>
-                    <h3 className="font-bold text-lg mb-2">Build a mental map you'll never lose</h3>
-                    <p className="text-muted-foreground">Scripture becomes permanently stored, instantly accessible.</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card className="border-2 border-primary/20">
-              <CardContent className="pt-6">
-                <div className="flex items-start gap-4">
-                  <div className="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center flex-shrink-0">
-                    <Check className="h-6 w-6 text-primary" />
-                  </div>
-                  <div>
-                    <h3 className="font-bold text-lg mb-2">Learn faster, retain more</h3>
-                    <p className="text-muted-foreground">Study with confidence using proven memory techniques.</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-
-          <p className="text-xl text-center mt-12 text-muted-foreground">
-            It's the first Bible study system designed for <span className="font-semibold text-foreground">the way your mind actually works</span> — visually.
-          </p>
-        </div>
-      </section>
+      {/* Inside the Palace - Features */}
+      <InsideThePalace />
 
       {/* SECTION 4 — Simple Palace Explanation */}
       <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-primary/5 to-accent/5">
