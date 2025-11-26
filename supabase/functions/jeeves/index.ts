@@ -105,12 +105,24 @@ serve(async (req) => {
     // Check rate limit for authenticated users
     const authHeader = req.headers.get('authorization');
     let userId: string | null = null;
+    let userFirstName: string | null = null;
     
     if (authHeader) {
       const token = authHeader.replace('Bearer ', '');
       const { data: { user }, error: authError } = await supabase.auth.getUser(token);
       if (!authError && user) {
         userId = user.id;
+        
+        // Fetch user's first name from profiles
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('first_name')
+          .eq('id', user.id)
+          .single();
+        
+        if (profile?.first_name) {
+          userFirstName = profile.first_name;
+        }
         
         // Enforce rate limiting
         const { allowed, remaining } = await checkRateLimit(supabase, userId, 'jeeves');
@@ -402,7 +414,8 @@ Return as JSON array with objects containing: verse, text, connection, principle
     let userPrompt = "";
 
     // Build greeting based on user's name
-    const greeting = userName ? userName : "friend";
+    // Priority: userName from request body, then fetched userFirstName, then generic "friend"
+    const greeting = userName || userFirstName || "friend";
 
     // Handle simple demo/message mode
     if (requestContext === "demo" || (message && !mode)) {

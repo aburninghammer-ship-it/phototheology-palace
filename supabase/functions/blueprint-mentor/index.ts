@@ -1,4 +1,5 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.7.1';
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -18,8 +19,33 @@ serve(async (req) => {
       throw new Error("LOVABLE_API_KEY is not configured");
     }
 
+    // Initialize Supabase client and fetch user's name
+    const supabaseUrl = Deno.env.get('SUPABASE_URL') ?? '';
+    const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '';
+    const supabase = createClient(supabaseUrl, supabaseServiceKey);
+    
+    let userFirstName: string | null = null;
+    const authHeader = req.headers.get('authorization');
+    
+    if (authHeader) {
+      const token = authHeader.replace('Bearer ', '');
+      const { data: { user } } = await supabase.auth.getUser(token);
+      if (user) {
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('first_name')
+          .eq('id', user.id)
+          .single();
+        
+        if (profile?.first_name) {
+          userFirstName = profile.first_name;
+        }
+      }
+    }
+
     // Build greeting based on user's name
-    const greeting = userName ? userName : "friend";
+    // Priority: userName from request body, then fetched userFirstName, then generic "friend"
+    const greeting = userName || userFirstName || "friend";
 
     const systemPrompt = `You are Jeeves, ${greeting}'s friendly study partner helping them understand the Blueprint prophecy course based on "Operation Blueprint: Earth's Final Movie" by Ivor Myers.
 

@@ -1,5 +1,6 @@
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.7.1';
 
 const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
 
@@ -20,8 +21,33 @@ serve(async (req) => {
       throw new Error("LOVABLE_API_KEY is not configured");
     }
 
+    // Initialize Supabase client and fetch user's name
+    const supabaseUrl = Deno.env.get('SUPABASE_URL') ?? '';
+    const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '';
+    const supabase = createClient(supabaseUrl, supabaseServiceKey);
+    
+    let userFirstName: string | null = null;
+    const authHeader = req.headers.get('authorization');
+    
+    if (authHeader) {
+      const token = authHeader.replace('Bearer ', '');
+      const { data: { user } } = await supabase.auth.getUser(token);
+      if (user) {
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('first_name')
+          .eq('id', user.id)
+          .single();
+        
+        if (profile?.first_name) {
+          userFirstName = profile.first_name;
+        }
+      }
+    }
+
     // Build greeting based on user's name
-    const greeting = userName ? userName : "friend";
+    // Priority: userName from request body, then fetched userFirstName, then generic "friend"
+    const greeting = userName || userFirstName || "friend";
 
     // Build mentor system prompt based on mastery level
     const mentorPrompt = `You are Jeeves, ${greeting}'s training partner in **sparring mode** for the ${roomName} room.
