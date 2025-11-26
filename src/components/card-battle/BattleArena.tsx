@@ -175,8 +175,11 @@ export function BattleArena({ battle, currentUserId, onBack }: Props) {
   const [isChallenging, setIsChallenging] = useState(false);
   const [hasAutoStarted, setHasAutoStarted] = useState(false);
   const [showJudgmentFeedback, setShowJudgmentFeedback] = useState(false);
+  const [userDisplayName, setUserDisplayName] = useState<string>("You");
+  const [isUserTurn, setIsUserTurn] = useState(true);
 
   useEffect(() => {
+    loadUserProfile();
     loadPlayers();
     loadMoves();
     
@@ -224,6 +227,25 @@ export function BattleArena({ battle, currentUserId, onBack }: Props) {
     }
   }, [hasAutoStarted, battle.shouldAutoStart, players.length, battle.current_turn_player]);
 
+  const loadUserProfile = async () => {
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('display_name')
+      .eq('id', currentUserId)
+      .single();
+    
+    if (profile?.display_name) {
+      setUserDisplayName(profile.display_name);
+      
+      // Update the player's display name in the battle
+      await supabase
+        .from('pt_battle_players')
+        .update({ display_name: profile.display_name })
+        .eq('battle_id', battle.id)
+        .eq('player_id', `user_${currentUserId}`);
+    }
+  };
+
   const loadPlayers = async () => {
     const { data } = await supabase
       .from('pt_battle_players')
@@ -252,6 +274,15 @@ export function BattleArena({ battle, currentUserId, onBack }: Props) {
     
     if (data) {
       setMoves(data);
+      
+      // Determine whose turn it is based on last move
+      if (data.length > 0) {
+        const lastMove = data[0];
+        const wasUserMove = lastMove.player_id === `user_${currentUserId}`;
+        setIsUserTurn(!wasUserMove); // Toggle turn
+      } else {
+        setIsUserTurn(true); // User goes first if no moves yet
+      }
     }
   };
 
@@ -274,6 +305,7 @@ export function BattleArena({ battle, currentUserId, onBack }: Props) {
           cardCode: selectedCard,
           responseText: response,
           storyText: battle.story_text,
+          userDisplayName: userDisplayName,
         },
       });
 
@@ -825,15 +857,15 @@ export function BattleArena({ battle, currentUserId, onBack }: Props) {
               <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
                 <Button
                   onClick={handlePlayCard}
-                  disabled={!selectedCard || !response.trim() || isSubmitting}
-                  className="w-full bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 font-bold py-6 text-lg shadow-lg"
+                  disabled={!selectedCard || !response.trim() || isSubmitting || !isUserTurn}
+                  className="w-full bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 font-bold py-6 text-lg shadow-lg disabled:opacity-50"
                 >
-                  {isSubmitting ? (
+                  {isSubmitting && isUserTurn ? (
                     'Submitting...'
                   ) : (
                     <>
                       <Send className="mr-2 h-5 w-5" />
-                      Submit to Jeeves
+                      {isUserTurn ? 'Submit to Jeeves' : '⏳ Waiting for Jeeves'}
                     </>
                   )}
                 </Button>
@@ -842,14 +874,14 @@ export function BattleArena({ battle, currentUserId, onBack }: Props) {
               <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
                 <Button
                   onClick={() => handleJeevesPlay('jeeves_1')}
-                  disabled={isSubmitting}
-                  className="w-full bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 font-bold py-6 text-lg shadow-lg"
+                  disabled={isSubmitting || isUserTurn}
+                  className="w-full bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 font-bold py-6 text-lg shadow-lg disabled:opacity-50"
                 >
-                  {isSubmitting ? (
+                  {isSubmitting && !isUserTurn ? (
                     'Jeeves is playing...'
                   ) : (
                     <>
-                      🤖 Jeeves Play Your Turn
+                      🤖 {!isUserTurn ? 'Jeeves Play Your Turn' : `⏳ ${userDisplayName}, Your Turn!`}
                     </>
                   )}
                 </Button>

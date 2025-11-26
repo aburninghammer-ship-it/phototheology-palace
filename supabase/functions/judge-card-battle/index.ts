@@ -18,11 +18,13 @@ serve(async (req) => {
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     );
 
-    const { battleId, playerId, cardCode, responseText, storyText } = await req.json();
+    const { battleId, playerId, cardCode, responseText, storyText, userDisplayName } = await req.json();
 
     if (!battleId || !playerId || !cardCode || !responseText || !storyText) {
       throw new Error('Missing required fields');
     }
+    
+    const playerName = userDisplayName || 'player';
 
     // Get recent moves for context
     const { data: recentMoves } = await supabaseClient
@@ -82,6 +84,7 @@ CRITICAL FORMATTING RULES FOR FEEDBACK:
 - DO break feedback into clear paragraphs with blank lines between them for readability
 - Keep feedback warm, encouraging, and detailed (3-5 sentences minimum)
 - Make it conversational and personal, as if speaking directly to the player
+- ALWAYS address the player by their name: ${playerName}
 
 Response format (JSON only):
 {
