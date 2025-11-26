@@ -243,6 +243,13 @@ const PTMultiplayerGame = () => {
       // Auto-start game if it's still waiting
       if (gameRes.data?.status === 'waiting' && gameRes.data.host_id === user.id && playersRes.data && playersRes.data.length > 0) {
         await autoStartGame(gameRes.data.id, playersRes.data);
+        // Refresh game data after auto-start
+        const { data: updatedGame } = await supabase
+          .from('pt_multiplayer_games')
+          .select('*')
+          .eq('id', gameId)
+          .single();
+        if (updatedGame) setGame(updatedGame);
       }
     }
 
