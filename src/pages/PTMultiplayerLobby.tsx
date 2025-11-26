@@ -158,12 +158,14 @@ const PTMultiplayerLobby = () => {
 
         <div className="text-center mb-8">
           <div className="inline-flex items-center gap-3 mb-3">
-            <div className="p-3 rounded-xl bg-gradient-to-br from-cyan-400 to-blue-500 shadow-lg shadow-blue-500/50">
+            <div className="p-3 rounded-xl bg-gradient-to-br from-cyan-400 via-blue-500 to-purple-600 shadow-2xl shadow-blue-500/50 animate-pulse">
               <Gamepad2 className="w-10 h-10 text-white" />
             </div>
-            <h1 className="text-4xl font-bold text-white">PT Multiplayer Card Study</h1>
+            <h1 className="text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 via-blue-400 to-purple-500">
+              PT Multiplayer Card Study
+            </h1>
           </div>
-          <p className="text-gray-300 text-lg">
+          <p className="text-gray-200 text-lg font-medium drop-shadow-lg">
             Competitive Bible study where Jeeves judges every move
           </p>
         </div>
@@ -206,69 +208,95 @@ const PTMultiplayerLobby = () => {
                         htmlFor={mode.id}
                         onClick={() => setGameMode(mode.id)}
                         style={
-                          gameMode === mode.id
-                            ? mode.id === "free-for-all"
-                              ? {
-                                  backgroundImage:
-                                    "linear-gradient(135deg, hsl(205, 100%, 55%), hsl(190, 100%, 60%))",
-                                  boxShadow:
-                                    "0 0 30px hsla(195, 100%, 60%, 0.6)",
-                                }
-                              : mode.id === "1v1-jeeves"
-                              ? {
-                                  backgroundImage:
-                                    "linear-gradient(135deg, hsl(270, 95%, 65%), hsl(320, 95%, 65%))",
-                                  boxShadow:
-                                    "0 0 30px hsla(290, 95%, 65%, 0.6)",
-                                }
-                              : mode.id === "team"
-                              ? {
-                                  backgroundImage:
-                                    "linear-gradient(135deg, hsl(30, 95%, 60%), hsl(45, 95%, 60%))",
-                                  boxShadow:
-                                    "0 0 30px hsla(35, 95%, 60%, 0.6)",
-                                }
-                              : mode.id === "team-vs-jeeves"
-                              ? {
-                                  backgroundImage:
-                                    "linear-gradient(135deg, hsl(340, 90%, 60%), hsl(10, 95%, 60%))",
-                                  boxShadow:
-                                    "0 0 30px hsla(5, 95%, 60%, 0.6)",
-                                }
-                              : mode.id === "council"
-                              ? {
-                                  backgroundImage:
-                                    "linear-gradient(135deg, hsl(260, 95%, 70%), hsl(290, 95%, 65%))",
-                                  boxShadow:
-                                    "0 0 30px hsla(270, 95%, 65%, 0.6)",
-                                }
-                              : mode.id === "boss"
-                              ? {
-                                  backgroundImage:
-                                    "linear-gradient(135deg, hsl(355, 90%, 55%), hsl(20, 95%, 60%))",
-                                  boxShadow:
-                                    "0 0 30px hsla(10, 95%, 60%, 0.6)",
-                                }
-                              : mode.id === "battle-royale"
-                              ? {
-                                  backgroundImage:
-                                    "linear-gradient(135deg, hsl(50, 95%, 60%), hsl(140, 70%, 55%))",
-                                  boxShadow:
-                                    "0 0 30px hsla(90, 70%, 55%, 0.6)",
-                                }
-                              : undefined
+                          mode.id === "free-for-all"
+                            ? {
+                                backgroundImage: gameMode === mode.id
+                                  ? "linear-gradient(135deg, hsl(205, 100%, 55%), hsl(190, 100%, 60%))"
+                                  : "linear-gradient(135deg, hsla(205, 100%, 55%, 0.3), hsla(190, 100%, 60%, 0.3))",
+                                boxShadow: gameMode === mode.id
+                                  ? "0 0 30px hsla(195, 100%, 60%, 0.6)"
+                                  : undefined,
+                                borderColor: gameMode === mode.id ? "transparent" : "hsla(195, 100%, 60%, 0.4)"
+                              }
+                            : mode.id === "1v1-jeeves"
+                            ? {
+                                backgroundImage: gameMode === mode.id
+                                  ? "linear-gradient(135deg, hsl(270, 95%, 65%), hsl(320, 95%, 65%))"
+                                  : "linear-gradient(135deg, hsla(270, 95%, 65%, 0.3), hsla(320, 95%, 65%, 0.3))",
+                                boxShadow: gameMode === mode.id
+                                  ? "0 0 30px hsla(290, 95%, 65%, 0.6)"
+                                  : undefined,
+                                borderColor: gameMode === mode.id ? "transparent" : "hsla(290, 95%, 65%, 0.4)"
+                              }
+                            : mode.id === "jeeves-vs-jeeves"
+                            ? {
+                                backgroundImage: gameMode === mode.id
+                                  ? "linear-gradient(135deg, hsl(280, 95%, 65%), hsl(260, 95%, 70%))"
+                                  : "linear-gradient(135deg, hsla(280, 95%, 65%, 0.3), hsla(260, 95%, 70%, 0.3))",
+                                boxShadow: gameMode === mode.id
+                                  ? "0 0 30px hsla(270, 95%, 65%, 0.6)"
+                                  : undefined,
+                                borderColor: gameMode === mode.id ? "transparent" : "hsla(270, 95%, 65%, 0.4)"
+                              }
+                            : mode.id === "team"
+                            ? {
+                                backgroundImage: gameMode === mode.id
+                                  ? "linear-gradient(135deg, hsl(30, 95%, 60%), hsl(45, 95%, 60%))"
+                                  : "linear-gradient(135deg, hsla(30, 95%, 60%, 0.3), hsla(45, 95%, 60%, 0.3))",
+                                boxShadow: gameMode === mode.id
+                                  ? "0 0 30px hsla(35, 95%, 60%, 0.6)"
+                                  : undefined,
+                                borderColor: gameMode === mode.id ? "transparent" : "hsla(35, 95%, 60%, 0.4)"
+                              }
+                            : mode.id === "team-vs-jeeves"
+                            ? {
+                                backgroundImage: gameMode === mode.id
+                                  ? "linear-gradient(135deg, hsl(340, 90%, 60%), hsl(10, 95%, 60%))"
+                                  : "linear-gradient(135deg, hsla(340, 90%, 60%, 0.3), hsla(10, 95%, 60%, 0.3))",
+                                boxShadow: gameMode === mode.id
+                                  ? "0 0 30px hsla(5, 95%, 60%, 0.6)"
+                                  : undefined,
+                                borderColor: gameMode === mode.id ? "transparent" : "hsla(5, 95%, 60%, 0.4)"
+                              }
+                            : mode.id === "council"
+                            ? {
+                                backgroundImage: gameMode === mode.id
+                                  ? "linear-gradient(135deg, hsl(260, 95%, 70%), hsl(290, 95%, 65%))"
+                                  : "linear-gradient(135deg, hsla(260, 95%, 70%, 0.3), hsla(290, 95%, 65%, 0.3))",
+                                boxShadow: gameMode === mode.id
+                                  ? "0 0 30px hsla(270, 95%, 65%, 0.6)"
+                                  : undefined,
+                                borderColor: gameMode === mode.id ? "transparent" : "hsla(270, 95%, 65%, 0.4)"
+                              }
+                            : mode.id === "boss"
+                            ? {
+                                backgroundImage: gameMode === mode.id
+                                  ? "linear-gradient(135deg, hsl(355, 90%, 55%), hsl(20, 95%, 60%))"
+                                  : "linear-gradient(135deg, hsla(355, 90%, 55%, 0.3), hsla(20, 95%, 60%, 0.3))",
+                                boxShadow: gameMode === mode.id
+                                  ? "0 0 30px hsla(10, 95%, 60%, 0.6)"
+                                  : undefined,
+                                borderColor: gameMode === mode.id ? "transparent" : "hsla(10, 95%, 60%, 0.4)"
+                              }
+                            : mode.id === "battle-royale"
+                            ? {
+                                backgroundImage: gameMode === mode.id
+                                  ? "linear-gradient(135deg, hsl(50, 95%, 60%), hsl(140, 70%, 55%))"
+                                  : "linear-gradient(135deg, hsla(50, 95%, 60%, 0.3), hsla(140, 70%, 55%, 0.3))",
+                                boxShadow: gameMode === mode.id
+                                  ? "0 0 30px hsla(90, 70%, 55%, 0.6)"
+                                  : undefined,
+                                borderColor: gameMode === mode.id ? "transparent" : "hsla(90, 70%, 55%, 0.4)"
+                              }
                             : undefined
                         }
-                        className="flex flex-col gap-2 p-4 rounded-xl border-2 border-white/20 cursor-pointer transition-all hover:scale-105 hover:border-white/40 hover:shadow-lg peer-data-[state=checked]:border-transparent peer-data-[state=checked]:shadow-2xl relative overflow-hidden"
+                        className="flex flex-col gap-2 p-4 rounded-xl border-2 cursor-pointer transition-all hover:scale-105 hover:brightness-125 peer-data-[state=checked]:scale-110 relative overflow-hidden backdrop-blur-sm"
                       >
-                        <div className="absolute inset-0 bg-gradient-to-br opacity-0 group-hover:opacity-20 transition-opacity" style={{ 
-                          backgroundImage: `linear-gradient(to bottom right, var(--tw-gradient-stops))` 
-                        }} />
                         <div className="flex items-center gap-2 relative z-10">
-                          <mode.icon className="w-5 h-5 text-white" />
-                          <span className="font-semibold text-white">{mode.label}</span>
+                          <mode.icon className="w-5 h-5 text-white drop-shadow-lg" />
+                          <span className="font-semibold text-white drop-shadow-md">{mode.label}</span>
                         </div>
-                        <span className="text-xs text-white/80 relative z-10">{mode.desc}</span>
+                        <span className="text-xs text-white/90 relative z-10 drop-shadow">{mode.desc}</span>
                       </Label>
                     </div>
                   ))}
@@ -300,7 +328,7 @@ const PTMultiplayerLobby = () => {
               onClick={handleCreateGame} 
               disabled={creating}
               size="lg"
-              className="w-full bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700 text-white font-bold text-lg shadow-lg shadow-cyan-500/50 hover:shadow-cyan-600/60 transition-all"
+              className="w-full bg-gradient-to-r from-cyan-500 via-blue-600 to-purple-600 hover:from-cyan-600 hover:via-blue-700 hover:to-purple-700 text-white font-bold text-lg shadow-xl shadow-cyan-500/50 hover:shadow-purple-600/60 transition-all duration-300 border-2 border-white/20"
             >
               {creating ? (
                 <>
@@ -318,36 +346,36 @@ const PTMultiplayerLobby = () => {
         </Card>
 
         {/* Rules Summary */}
-        <Card className="mt-6 p-6 bg-black/40 backdrop-blur-sm border-white/10">
+        <Card className="mt-6 p-6 bg-gradient-to-br from-black/60 via-purple-900/30 to-black/60 backdrop-blur-sm border-2 border-purple-500/30 shadow-xl shadow-purple-500/20">
           <h3 className="font-bold text-xl mb-4 text-white flex items-center gap-2">
             <span className="text-2xl">📘</span> Quick Rules
           </h3>
-          <ul className="space-y-3 text-sm text-gray-300">
-            <li className="flex items-start gap-2">
+          <ul className="space-y-3 text-sm text-gray-200">
+            <li className="flex items-start gap-2 hover:bg-white/5 p-2 rounded-lg transition-colors">
               <span className="text-green-400 mt-0.5">✓</span>
               <span>Each player starts with 7 cards</span>
             </li>
-            <li className="flex items-start gap-2">
+            <li className="flex items-start gap-2 hover:bg-white/5 p-2 rounded-lg transition-colors">
               <span className="text-blue-400 mt-0.5">✓</span>
               <span>Play a card and explain how it advances the study</span>
             </li>
-            <li className="flex items-start gap-2">
+            <li className="flex items-start gap-2 hover:bg-white/5 p-2 rounded-lg transition-colors">
               <span className="text-purple-400 mt-0.5">✓</span>
               <span>Jeeves judges: ✔ Approved, △ Partial, or ✘ Rejected</span>
             </li>
-            <li className="flex items-start gap-2">
+            <li className="flex items-start gap-2 hover:bg-white/5 p-2 rounded-lg transition-colors">
               <span className="text-cyan-400 mt-0.5">✓</span>
               <span>Approved = discard card + points</span>
             </li>
-            <li className="flex items-start gap-2">
+            <li className="flex items-start gap-2 hover:bg-white/5 p-2 rounded-lg transition-colors">
               <span className="text-orange-400 mt-0.5">✓</span>
               <span>Rejected = draw 1 card</span>
             </li>
-            <li className="flex items-start gap-2">
+            <li className="flex items-start gap-2 hover:bg-white/5 p-2 rounded-lg transition-colors">
               <span className="text-red-400 mt-0.5">✓</span>
               <span>3 rejections in a row = skip next turn</span>
             </li>
-            <li className="flex items-start gap-2">
+            <li className="flex items-start gap-2 hover:bg-white/5 p-2 rounded-lg transition-colors">
               <span className="text-yellow-400 mt-0.5">✓</span>
               <span>First to 0 cards wins (or highest score in Council Mode)</span>
             </li>
