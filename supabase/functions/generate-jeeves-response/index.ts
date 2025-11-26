@@ -11,7 +11,7 @@ serve(async (req) => {
   }
 
   try {
-    const { cardCode, storyText, storyReference } = await req.json();
+    const { cardCode, storyText, storyReference, opponentName, jeevesName } = await req.json();
 
     if (!cardCode || !storyText) {
       throw new Error('Missing required fields: cardCode and storyText');
@@ -63,8 +63,11 @@ serve(async (req) => {
 
     const principleDesc = principleInfo[cardCode] || cardCode;
     const referenceText = storyReference ? ` (${storyReference})` : '';
+    const addressOpponent = opponentName ? `Your opponent is ${opponentName}. When addressing them, start by using their name naturally in your response.` : '';
 
-    const systemPrompt = `You are Jeeves, a Phototheology expert playing PT Card Battle.
+    const systemPrompt = `You are ${jeevesName || 'Jeeves'}, a Phototheology expert playing PT Card Battle.
+
+${addressOpponent}
 
 Your task: Apply the given PT principle card to illuminate the Bible text with depth, insight, and biblical grounding.
 
@@ -78,6 +81,8 @@ Guidelines:
 - Include practical spiritual application when natural
 
 CRITICAL FORMATTING RULES:
+- NEVER start your response with "Ah." or similar generic greetings - it sounds fake and impersonal
+${opponentName ? `- Start by addressing your opponent naturally using their name (e.g., "${opponentName},")` : ''}
 - DO NOT use asterisks (*) or double asterisks (**) for emphasis
 - DO NOT use any markdown formatting at all
 - DO use emojis generously throughout your response (✨ 🎯 💡 📖 🔥 ⚡ 🌟 ⛪ 🙏 etc.)

@@ -78,20 +78,21 @@ Bonuses (add +1 point each, max 2 bonuses):
 - "practical": Includes actionable spiritual application
 
 CRITICAL FORMATTING RULES FOR FEEDBACK:
+- NEVER start your feedback with "Ah." or similar generic greetings - it sounds fake and impersonal
+- ALWAYS start by addressing the player by their name: ${playerName}
 - DO NOT use asterisks (*) or double asterisks (**) for emphasis
 - DO NOT use markdown formatting at all
 - DO use emojis generously to add warmth and clarity (✨ 🎯 💡 📖 🔥 ⚡ 🌟 etc.)
 - DO break feedback into clear paragraphs with blank lines between them for readability
 - Keep feedback warm, encouraging, and detailed (3-5 sentences minimum)
 - Make it conversational and personal, as if speaking directly to the player
-- ALWAYS address the player by their name: ${playerName}
 
 Response format (JSON only):
 {
   "verdict": "approved" | "rejected",
   "points": 0-3,
   "bonuses": ["cross_reference", "typology", "practical"],
-  "feedback": "Warm, detailed feedback with emojis and clear paragraph breaks. No asterisks or markdown allowed."
+  "feedback": "Warm, detailed feedback with emojis and clear paragraph breaks. No asterisks or markdown allowed. Start by addressing the player by name (${playerName})."
 }`;
 
     const userPrompt = `Card Played: ${cardCode}

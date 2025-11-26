@@ -461,11 +461,18 @@ export function BattleArena({ battle, currentUserId, onBack }: Props) {
 
       // Generate a quality response from Jeeves using AI
       console.log('🤖 Generating Jeeves response via AI...');
+      
+      // Determine opponent name
+      const opponentPlayer = players.find(p => p.player_id !== jeevesPlayer.player_id);
+      const opponentName = opponentPlayer?.display_name || null;
+      
       const { data: aiData, error: aiError } = await supabase.functions.invoke('generate-jeeves-response', {
         body: {
           cardCode: randomCard,
           storyText: battle.story_text,
           storyReference: battle.story_reference,
+          opponentName: opponentName,
+          jeevesName: jeevesPlayer.display_name,
         }
       });
 
