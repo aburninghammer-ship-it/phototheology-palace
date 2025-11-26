@@ -154,12 +154,16 @@ const PTMultiplayerGame = () => {
   const [currentPlayer, setCurrentPlayer] = useState<Player | null>(null);
   const [myCards, setMyCards] = useState<Card[]>([]);
   const [loading, setLoading] = useState(true);
+  const [currentUserId, setCurrentUserId] = useState<string | null>(null);
   
   const [cardValue, setCardValue] = useState<string>("");
   const [explanation, setExplanation] = useState<string>("");
   const [submitting, setSubmitting] = useState(false);
 
-  const isVsJeevesMode = game?.game_mode === "1v1-jeeves" || game?.game_mode === "team-vs-jeeves";
+  const isVsJeevesMode =
+    game?.game_mode === "1v1-jeeves" ||
+    game?.game_mode === "team-vs-jeeves" ||
+    game?.game_mode === "jeeves-vs-jeeves";
 
   useEffect(() => {
     if (!gameId) return;
@@ -181,45 +185,54 @@ const PTMultiplayerGame = () => {
     if (movesRes.data) setMoves(movesRes.data);
 
     const { data: { user } } = await supabase.auth.getUser();
+    if (user) {
+      setCurrentUserId(user.id);
+    }
+
     if (user && playersRes.data) {
-      let cp = playersRes.data.find(p => p.user_id === user.id);
-      
-      // Auto-join: If user is not in players list yet, add them
-      if (!cp && gameRes.data) {
-        const { data: profileData } = await supabase
-          .from('profiles')
-          .select('display_name')
-          .eq('id', user.id)
-          .single();
+      let cp: Player | null = null;
 
-        const displayName = profileData?.display_name || 'Player';
+      // In Jeeves vs Jeeves mode, humans are spectators only – don't auto-join
+      if (gameRes.data?.game_mode !== "jeeves-vs-jeeves") {
+        cp = playersRes.data.find((p) => p.user_id === user.id) || null;
         
-        const { data: newPlayer } = await supabase
-          .from('pt_multiplayer_players')
-          .insert({
-            game_id: gameId,
-            user_id: user.id,
-            display_name: displayName,
-          })
-          .select()
-          .single();
+        // Auto-join: If user is not in players list yet, add them
+        if (!cp && gameRes.data) {
+          const { data: profileData } = await supabase
+            .from('profiles')
+            .select('display_name')
+            .eq('id', user.id)
+            .single();
 
-        if (newPlayer) {
-          cp = newPlayer;
-          // Refresh players list
-          const { data: updatedPlayers } = await supabase
-            .from('pt_multiplayer_players')
-            .select('*')
-            .eq('game_id', gameId)
-            .order('joined_at');
+          const displayName = profileData?.display_name || 'Player';
           
-          if (updatedPlayers) setPlayers(updatedPlayers);
+          const { data: newPlayer } = await supabase
+            .from('pt_multiplayer_players')
+            .insert({
+              game_id: gameId,
+              user_id: user.id,
+              display_name: displayName,
+            })
+            .select()
+            .single();
+
+          if (newPlayer) {
+            cp = newPlayer;
+            // Refresh players list
+            const { data: updatedPlayers } = await supabase
+              .from('pt_multiplayer_players')
+              .select('*')
+              .eq('game_id', gameId)
+              .order('joined_at');
+            
+            if (updatedPlayers) setPlayers(updatedPlayers);
+          }
         }
       }
       
-      setCurrentPlayer(cp || null);
+      setCurrentPlayer(cp);
 
-      // Fetch my cards
+      // Fetch my cards when I'm an active player
       if (cp) {
         const { data: cardsData } = await supabase
           .from('pt_multiplayer_deck')
@@ -234,6 +247,8 @@ const PTMultiplayerGame = () => {
             card_data: card.card_data as { value: string; name: string }
           })));
         }
+      } else {
+        setMyCards([]);
       }
     }
 
@@ -416,7 +431,9 @@ const PTMultiplayerGame = () => {
   }
 
   const isMyTurn = currentPlayer && game.current_turn_player_id === currentPlayer.id;
-  const isHost = currentPlayer && game.host_id === currentPlayer.user_id;
+  const isHost =
+    (currentPlayer && game.host_id === currentPlayer.user_id) ||
+    (!currentPlayer && currentUserId && game.host_id === currentUserId);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 py-6 px-4">

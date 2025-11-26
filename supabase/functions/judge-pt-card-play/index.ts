@@ -286,7 +286,10 @@ Judge this play. Is it theologically sound, correctly applied, and meaningfully 
         .eq('id', gameId);
 
       // Check if we need to trigger Jeeves' turn automatically
-      const isVsJeevesMode = gameData?.game_mode === '1v1-jeeves' || gameData?.game_mode === 'team-vs-jeeves';
+      const isVsJeevesMode =
+        gameData?.game_mode === '1v1-jeeves' ||
+        gameData?.game_mode === 'team-vs-jeeves' ||
+        gameData?.game_mode === 'jeeves-vs-jeeves';
       
       if (isVsJeevesMode && nextPlayer.display_name.includes('Jeeves')) {
           // Get Jeeves' cards

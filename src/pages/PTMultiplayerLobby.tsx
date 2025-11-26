@@ -52,17 +52,54 @@ const PTMultiplayerLobby = () => {
 
       if (gameError) throw gameError;
 
-      // Add host as first player
-      const { error: playerError } = await supabase
-        .from('pt_multiplayer_players')
-        .insert({
-          game_id: game.id,
-          user_id: user.id,
-          display_name: profile?.display_name || 'Player',
-          cards_remaining: 7
-        });
+      // Set up initial players based on game mode
+      if (gameMode === "jeeves-vs-jeeves") {
+        // Two AI players only – user is a spectator
+        const { error: jeevesError } = await supabase
+          .from('pt_multiplayer_players')
+          .insert([
+            {
+              game_id: game.id,
+              user_id: 'jeeves-alpha',
+              display_name: 'Jeeves Alpha',
+              cards_remaining: 7,
+            },
+            {
+              game_id: game.id,
+              user_id: 'jeeves-beta',
+              display_name: 'Jeeves Beta',
+              cards_remaining: 7,
+            },
+          ]);
 
-      if (playerError) throw playerError;
+        if (jeevesError) throw jeevesError;
+      } else {
+        // Add host as first player
+        const { error: playerError } = await supabase
+          .from('pt_multiplayer_players')
+          .insert({
+            game_id: game.id,
+            user_id: user.id,
+            display_name: profile?.display_name || 'Player',
+            cards_remaining: 7,
+          });
+
+        if (playerError) throw playerError;
+
+        // Add Jeeves opponent in Jeeves modes
+        if (gameMode === "1v1-jeeves" || gameMode === "team-vs-jeeves") {
+          const { error: jeevesError } = await supabase
+            .from('pt_multiplayer_players')
+            .insert({
+              game_id: game.id,
+              user_id: 'jeeves',
+              display_name: 'Jeeves',
+              cards_remaining: 7,
+            });
+
+          if (jeevesError) throw jeevesError;
+        }
+      }
 
       toast({ title: "Game created!", description: "Waiting for players to join..." });
       navigate(`/pt-multiplayer/${game.id}`);
@@ -82,6 +119,7 @@ const PTMultiplayerLobby = () => {
   const gameModes = [
     { id: "free-for-all", label: "Free-For-All", icon: Users, desc: "Everyone competes individually", gradient: "from-blue-500 to-cyan-500" },
     { id: "1v1-jeeves", label: "1v1 vs Jeeves", icon: Target, desc: "You vs AI Jeeves opponent", gradient: "from-purple-500 to-pink-500" },
+    { id: "jeeves-vs-jeeves", label: "Jeeves vs Jeeves", icon: Target, desc: "Watch two Jeeves battle it out", gradient: "from-fuchsia-500 to-indigo-500" },
     { id: "team", label: "Team Mode", icon: Crown, desc: "Form teams and collaborate", gradient: "from-orange-500 to-amber-500" },
     { id: "team-vs-jeeves", label: "Team vs Jeeves", icon: Swords, desc: "Your team vs AI Jeeves", gradient: "from-rose-500 to-red-500" },
     { id: "council", label: "Council Mode", icon: Target, desc: "Debate before Jeeves judges", gradient: "from-violet-500 to-purple-500" },
