@@ -682,7 +682,7 @@ export function BattleArena({ battle, currentUserId, onBack }: Props) {
 
           <div>
             <label className="text-sm font-medium text-white mb-2 block">
-              Your Turn Jeeves {selectedCard && <Badge className="ml-2 bg-amber-500">{selectedCard}</Badge>}
+              Your Response {selectedCard && <Badge className="ml-2 bg-amber-500">{selectedCard}</Badge>}
             </label>
             <Textarea
               value={response}
@@ -694,22 +694,40 @@ export function BattleArena({ battle, currentUserId, onBack }: Props) {
           </div>
           
           {!showRejectionOptions && (
-            <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-              <Button
-                onClick={handlePlayCard}
-                disabled={!selectedCard || !response.trim() || isSubmitting}
-                className="w-full bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 font-bold py-6 text-lg shadow-lg"
-              >
-                {isSubmitting ? (
-                  'Jeeves is judging...'
-                ) : (
-                  <>
-                    <Send className="mr-2 h-5 w-5" />
-                    Play Card & Submit to Jeeves
-                  </>
-                )}
-              </Button>
-            </motion.div>
+            <div className="grid grid-cols-2 gap-3">
+              <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+                <Button
+                  onClick={handlePlayCard}
+                  disabled={!selectedCard || !response.trim() || isSubmitting}
+                  className="w-full bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 font-bold py-6 text-lg shadow-lg"
+                >
+                  {isSubmitting ? (
+                    'Submitting...'
+                  ) : (
+                    <>
+                      <Send className="mr-2 h-5 w-5" />
+                      Submit to Jeeves
+                    </>
+                  )}
+                </Button>
+              </motion.div>
+              
+              <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+                <Button
+                  onClick={handleJeevesPlay}
+                  disabled={isSubmitting}
+                  className="w-full bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 font-bold py-6 text-lg shadow-lg"
+                >
+                  {isSubmitting ? (
+                    'Jeeves is playing...'
+                  ) : (
+                    <>
+                      🤖 Jeeves Play Your Turn
+                    </>
+                  )}
+                </Button>
+              </motion.div>
+            </div>
           )}
         </CardContent>
       </Card>
