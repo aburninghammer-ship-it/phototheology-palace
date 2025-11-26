@@ -34,7 +34,7 @@ const PTMultiplayerLobby = () => {
         .from('profiles')
         .select('display_name')
         .eq('id', user.id)
-        .single();
+        .maybeSingle();
 
       // Create game
       const { data: game, error: gameError } = await supabase
