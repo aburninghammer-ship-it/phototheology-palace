@@ -62,8 +62,15 @@ Show how verse correlates to feast significance.
 - Great Controversy Wall: Cosmic battle, Satan vs Christ
 - Time Prophecy Wall: Daniel/Revelation timelines
 
+**HEBREW/GREEK ANALYSIS**:
+Identify 2-4 key words with:
+- Original word (Hebrew/Greek)
+- Transliteration
+- Strong's number (if applicable)
+- Core meaning
+
 **CROSS-REFERENCES**:
-Provide related verses showing same PT principles with:
+Provide 3-5 related verses showing same PT principles with:
 - Verse reference (book chapter:verse)
 - Reason for connection
 - PT principles shared (dimensions, cycles, sanctuary, etc.)
@@ -77,7 +84,16 @@ Return ONLY valid JSON with this structure:
   "sanctuary_connections": [{"article": "Altar", "explanation": "Specific connection with reference"}],
   "feast_connections": [{"feast": "Passover", "explanation": "How verse relates to feast"}],
   "walls": ["Sanctuary Wall", "Life of Christ Wall"],
-  "cross_references": [{"verse": "John 1:29", "reason": "Both show Christ as Lamb", "principles": ["@Mo", "Altar"]}]
+  "hebrew_greek": {
+    "key_words": [
+      {"word": "ἀγαπάω", "transliteration": "agapaō", "strong": "G25", "meaning": "sacrificial love"},
+      {"word": "κόσμος", "transliteration": "kosmos", "strong": "G2889", "meaning": "world/humanity"}
+    ]
+  },
+  "cross_references": [
+    {"verse": "John 1:29", "reason": "Both show Christ as Lamb", "principles": ["@Mo", "Altar", "2D"]},
+    {"verse": "Romans 5:8", "reason": "God's love demonstrated in Christ", "principles": ["@CyC", "2D", "3D"]}
+  ]
 }`;
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {

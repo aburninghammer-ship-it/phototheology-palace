@@ -2596,6 +2596,7 @@ export type Database = {
         Row: {
           created_at: string | null
           discovery_unlocked_at: string | null
+          hebrew_greek: Json | null
           id: string
           list_id: string
           order_index: number
@@ -2607,6 +2608,7 @@ export type Database = {
         Insert: {
           created_at?: string | null
           discovery_unlocked_at?: string | null
+          hebrew_greek?: Json | null
           id?: string
           list_id: string
           order_index: number
@@ -2618,6 +2620,7 @@ export type Database = {
         Update: {
           created_at?: string | null
           discovery_unlocked_at?: string | null
+          hebrew_greek?: Json | null
           id?: string
           list_id?: string
           order_index?: number
@@ -2644,6 +2647,7 @@ export type Database = {
           id: string
           is_collaborative: boolean | null
           is_public: boolean | null
+          is_template: boolean | null
           pt_principles: Json | null
           target_verse_count: number | null
           title: string
@@ -2658,6 +2662,7 @@ export type Database = {
           id?: string
           is_collaborative?: boolean | null
           is_public?: boolean | null
+          is_template?: boolean | null
           pt_principles?: Json | null
           target_verse_count?: number | null
           title: string
@@ -2672,6 +2677,7 @@ export type Database = {
           id?: string
           is_collaborative?: boolean | null
           is_public?: boolean | null
+          is_template?: boolean | null
           pt_principles?: Json | null
           target_verse_count?: number | null
           title?: string

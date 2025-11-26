@@ -1,9 +1,10 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Sparkles, BookOpen, Heart, Shield, Sun, Lightbulb } from "lucide-react";
+import { Sparkles, BookOpen, Heart, Shield, Sun, Lightbulb, Users } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
 
 interface MemoryListTemplatesProps {
   userId: string;
@@ -117,6 +118,21 @@ const TEMPLATES = [
 export function MemoryListTemplates({ userId }: MemoryListTemplatesProps) {
   const navigate = useNavigate();
 
+  // Fetch user-created templates
+  const { data: userTemplates } = useQuery({
+    queryKey: ["memory-templates"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("memory_verse_lists")
+        .select("*, memory_verse_list_items(count)")
+        .eq("is_template", true)
+        .order("created_at", { ascending: false });
+
+      if (error) throw error;
+      return data;
+    },
+  });
+
   const createFromTemplate = async (template: typeof TEMPLATES[0]) => {
     try {
       const { data, error } = await supabase
@@ -142,7 +158,6 @@ export function MemoryListTemplates({ userId }: MemoryListTemplatesProps) {
         verse_reference: verse,
         order_index: index,
         verse_text: "", // Will be populated when user adds
-        pt_room_codes: template.roomCodes,
       }));
 
       const { error: itemsError } = await supabase
@@ -159,65 +174,171 @@ export function MemoryListTemplates({ userId }: MemoryListTemplatesProps) {
     }
   };
 
+  const createFromUserTemplate = async (templateList: any) => {
+    try {
+      // Copy the template list
+      const { data: newList, error: listError } = await supabase
+        .from("memory_verse_lists")
+        .insert({
+          user_id: userId,
+          title: templateList.title,
+          description: templateList.description,
+          topic: templateList.topic,
+          bible_version: templateList.bible_version,
+          is_public: false,
+          is_collaborative: false,
+          target_verse_count: templateList.target_verse_count,
+        })
+        .select()
+        .single();
+
+      if (listError) throw listError;
+
+      // Copy all verses from the template
+      const { data: templateVerses, error: fetchError } = await supabase
+        .from("memory_verse_list_items")
+        .select("*")
+        .eq("list_id", templateList.id)
+        .order("order_index");
+
+      if (fetchError) throw fetchError;
+
+      const verseItems = templateVerses.map((v) => ({
+        list_id: newList.id,
+        verse_reference: v.verse_reference,
+        verse_text: v.verse_text,
+        order_index: v.order_index,
+        pt_insights: v.pt_insights,
+        hebrew_greek: v.hebrew_greek,
+      }));
+
+      const { error: itemsError } = await supabase
+        .from("memory_verse_list_items")
+        .insert(verseItems);
+
+      if (itemsError) throw itemsError;
+
+      toast.success(`Created "${templateList.title}" from template!`);
+      navigate(`/memory/list/${newList.id}`);
+    } catch (error) {
+      console.error("Error creating from user template:", error);
+      toast.error("Failed to create list from template");
+    }
+  };
+
   return (
-    <div className="space-y-6">
-      <div className="text-center space-y-2">
-        <h3 className="text-2xl font-bold bg-gradient-to-r from-palace-purple via-palace-pink to-palace-blue bg-clip-text text-transparent">
-          Choose a Memory Theme
-        </h3>
-        <p className="text-muted-foreground">
-          Quick-start with curated verse collections organized by PT rooms
-        </p>
+    <div className="space-y-8">
+      {/* Curated Templates Section */}
+      <div className="space-y-6">
+        <div className="text-center space-y-2">
+          <h3 className="text-2xl font-bold bg-gradient-to-r from-palace-purple via-palace-pink to-palace-blue bg-clip-text text-transparent">
+            Curated Memory Themes
+          </h3>
+          <p className="text-muted-foreground">
+            Quick-start with pre-built verse collections organized by PT rooms
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {TEMPLATES.map((template) => {
+            const Icon = template.icon;
+            return (
+              <Card 
+                key={template.id}
+                className={`group relative overflow-hidden border-2 hover:scale-105 transition-all duration-300 hover:${template.shadow}`}
+              >
+                <div className={`absolute inset-0 bg-gradient-to-br ${template.gradient} opacity-10 group-hover:opacity-20 transition-opacity`} />
+                
+                <CardHeader className="relative">
+                  <div className="flex items-center gap-3 mb-2">
+                    <div className={`p-3 rounded-xl bg-gradient-to-br ${template.gradient}`}>
+                      <Icon className="h-6 w-6 text-white" />
+                    </div>
+                    <div className="flex flex-wrap gap-1">
+                      {template.roomCodes.slice(0, 3).map((code) => (
+                        <span 
+                          key={code}
+                          className="text-xs px-2 py-1 rounded-full bg-primary/10 text-primary font-mono"
+                        >
+                          {code}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                  <CardTitle className="text-xl">{template.title}</CardTitle>
+                  <CardDescription>{template.description}</CardDescription>
+                </CardHeader>
+
+                <CardContent className="relative space-y-4">
+                  <div className="space-y-1">
+                    <p className="text-sm font-medium text-muted-foreground">Includes:</p>
+                    <p className="text-sm">{template.verses.length} verses</p>
+                  </div>
+
+                  <Button 
+                    onClick={() => createFromTemplate(template)}
+                    className={`w-full bg-gradient-to-r ${template.gradient} hover:opacity-90`}
+                  >
+                    <Sparkles className="h-4 w-4 mr-2" />
+                    Start Memorizing
+                  </Button>
+                </CardContent>
+              </Card>
+            );
+          })}
+        </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {TEMPLATES.map((template) => {
-          const Icon = template.icon;
-          return (
-            <Card 
-              key={template.id}
-              className={`group relative overflow-hidden border-2 hover:scale-105 transition-all duration-300 hover:${template.shadow}`}
-            >
-              <div className={`absolute inset-0 bg-gradient-to-br ${template.gradient} opacity-10 group-hover:opacity-20 transition-opacity`} />
-              
-              <CardHeader className="relative">
-                <div className="flex items-center gap-3 mb-2">
-                  <div className={`p-3 rounded-xl bg-gradient-to-br ${template.gradient}`}>
-                    <Icon className="h-6 w-6 text-white" />
-                  </div>
-                  <div className="flex flex-wrap gap-1">
-                    {template.roomCodes.slice(0, 3).map((code) => (
-                      <span 
-                        key={code}
-                        className="text-xs px-2 py-1 rounded-full bg-primary/10 text-primary font-mono"
-                      >
-                        {code}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-                <CardTitle className="text-xl">{template.title}</CardTitle>
-                <CardDescription>{template.description}</CardDescription>
-              </CardHeader>
+      {/* Community Templates Section */}
+      {userTemplates && userTemplates.length > 0 && (
+        <div className="space-y-6">
+          <div className="text-center space-y-2">
+            <h3 className="text-2xl font-bold bg-gradient-to-r from-palace-teal via-palace-blue to-palace-purple bg-clip-text text-transparent">
+              Community Templates
+            </h3>
+            <p className="text-muted-foreground">
+              Lists created and curated by the Phototheology community
+            </p>
+          </div>
 
-              <CardContent className="relative space-y-4">
-                <div className="space-y-1">
-                  <p className="text-sm font-medium text-muted-foreground">Includes:</p>
-                  <p className="text-sm">{template.verses.length} verses</p>
-                </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {userTemplates.map((template) => (
+              <Card 
+                key={template.id}
+                className="group relative overflow-hidden border-2 hover:scale-105 transition-all duration-300 hover:shadow-blue"
+              >
+                <div className="absolute inset-0 bg-gradient-to-br from-palace-blue/10 to-palace-teal/10 opacity-50 group-hover:opacity-70 transition-opacity" />
+                
+                <CardHeader className="relative">
+                  <div className="flex items-center gap-2 mb-2">
+                    <div className="p-3 rounded-xl bg-gradient-to-br from-palace-blue to-palace-teal">
+                      <Users className="h-6 w-6 text-white" />
+                    </div>
+                  </div>
+                  <CardTitle className="text-xl">{template.title}</CardTitle>
+                  <CardDescription>{template.description}</CardDescription>
+                </CardHeader>
 
-                <Button 
-                  onClick={() => createFromTemplate(template)}
-                  className={`w-full bg-gradient-to-r ${template.gradient} hover:opacity-90`}
-                >
-                  <Sparkles className="h-4 w-4 mr-2" />
-                  Start Memorizing
-                </Button>
-              </CardContent>
-            </Card>
-          );
-        })}
-      </div>
+                <CardContent className="relative space-y-4">
+                  <div className="space-y-1">
+                    <p className="text-sm font-medium text-muted-foreground">Includes:</p>
+                    <p className="text-sm">{template.target_verse_count} verses</p>
+                    <p className="text-xs text-muted-foreground">{template.bible_version.toUpperCase()}</p>
+                  </div>
+
+                  <Button 
+                    onClick={() => createFromUserTemplate(template)}
+                    className="w-full bg-gradient-to-r from-palace-blue to-palace-teal hover:opacity-90"
+                  >
+                    <Sparkles className="h-4 w-4 mr-2" />
+                    Use This Template
+                  </Button>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 }

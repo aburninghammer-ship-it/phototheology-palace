@@ -5,9 +5,11 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { ArrowLeft, Plus, Trash2, GripVertical, Save } from "lucide-react";
+import { Switch } from "@/components/ui/switch";
+import { ArrowLeft, Plus, Trash2, Save, Sparkles } from "lucide-react";
 import { toast } from "sonner";
 import { MemoryVerseSearchDialog } from "@/components/memory/MemoryVerseSearchDialog";
+import { VerseWithPTAnalysis } from "@/components/memory/VerseWithPTAnalysis";
 
 export default function MemoryListEditor() {
   const { listId } = useParams();
@@ -17,6 +19,7 @@ export default function MemoryListEditor() {
   const [list, setList] = useState<any>(null);
   const [verses, setVerses] = useState<any[]>([]);
   const [showVerseInsert, setShowVerseInsert] = useState(false);
+  const [isTemplate, setIsTemplate] = useState(false);
 
   useEffect(() => {
     if (listId) {
@@ -35,6 +38,7 @@ export default function MemoryListEditor() {
 
       if (error) throw error;
       setList(data);
+      setIsTemplate(data.is_template || false);
     } catch (error) {
       console.error("Error fetching list:", error);
       toast.error("Failed to load list");
@@ -95,7 +99,27 @@ export default function MemoryListEditor() {
     }
   };
 
-  const handleReorder = async (index: number, direction: "up" | "down") => {
+  const handleToggleTemplate = async () => {
+    try {
+      const { error } = await supabase
+        .from("memory_verse_lists")
+        .update({ is_template: !isTemplate })
+        .eq("id", listId);
+
+      if (error) throw error;
+      setIsTemplate(!isTemplate);
+      toast.success(
+        !isTemplate 
+          ? "List marked as template - now visible to all users!" 
+          : "List unmarked as template"
+      );
+    } catch (error) {
+      console.error("Error updating template status:", error);
+      toast.error("Failed to update template status");
+    }
+  };
+
+  const handleReorder = async (verseId: string, index: number, direction: "up" | "down") => {
     if (
       (direction === "up" && index === 0) ||
       (direction === "down" && index === verses.length - 1)
@@ -107,7 +131,6 @@ export default function MemoryListEditor() {
     const targetIndex = direction === "up" ? index - 1 : index + 1;
     [newVerses[index], newVerses[targetIndex]] = [newVerses[targetIndex], newVerses[index]];
 
-    // Update order_index for all verses
     const updates = newVerses.map((verse, idx) => ({
       id: verse.id,
       order_index: idx,
@@ -151,13 +174,29 @@ export default function MemoryListEditor() {
                 {list?.description || "No description"}
               </CardDescription>
             </CardHeader>
-            <CardContent>
+            <CardContent className="space-y-4">
               <div className="flex items-center gap-4 text-sm text-muted-foreground">
                 <span>Target: {list?.target_verse_count} verses</span>
                 <span>•</span>
                 <span>Current: {verses.length} verses</span>
                 <span>•</span>
                 <span>{list?.bible_version.toUpperCase()}</span>
+              </div>
+              
+              <div className="flex items-center justify-between p-4 bg-muted/50 rounded-lg">
+                <div className="flex items-center gap-2">
+                  <Sparkles className="h-4 w-4 text-primary" />
+                  <div>
+                    <p className="font-semibold text-sm">Mark as Template</p>
+                    <p className="text-xs text-muted-foreground">
+                      Make this list available as a curated template for all users
+                    </p>
+                  </div>
+                </div>
+                <Switch
+                  checked={isTemplate}
+                  onCheckedChange={handleToggleTemplate}
+                />
               </div>
             </CardContent>
           </Card>
@@ -181,45 +220,19 @@ export default function MemoryListEditor() {
                 </div>
               ) : (
                 verses.map((verse, index) => (
-                  <Card key={verse.id} className="p-4">
-                    <div className="flex items-start gap-3">
-                      <div className="flex flex-col gap-1 mt-1">
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="h-6 w-6"
-                          onClick={() => handleReorder(index, "up")}
-                          disabled={index === 0}
-                        >
-                          <GripVertical className="h-3 w-3" />
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="h-6 w-6"
-                          onClick={() => handleReorder(index, "down")}
-                          disabled={index === verses.length - 1}
-                        >
-                          <GripVertical className="h-3 w-3" />
-                        </Button>
-                      </div>
-                      
-                      <div className="flex-1">
-                        <p className="font-semibold text-sm text-primary">
-                          {verse.verse_reference}
-                        </p>
-                        <p className="text-sm mt-1">{verse.verse_text}</p>
-                      </div>
-
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => handleDeleteVerse(verse.id)}
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  </Card>
+                  <VerseWithPTAnalysis
+                    key={verse.id}
+                    verseId={verse.id}
+                    reference={verse.verse_reference}
+                    text={verse.verse_text}
+                    orderIndex={index}
+                    ptInsights={verse.pt_insights}
+                    hebrewGreek={verse.hebrew_greek}
+                    onDelete={() => handleDeleteVerse(verse.id)}
+                    onReorder={(dir) => handleReorder(verse.id, index, dir)}
+                    canMoveUp={index > 0}
+                    canMoveDown={index < verses.length - 1}
+                  />
                 ))
               )}
             </CardContent>
