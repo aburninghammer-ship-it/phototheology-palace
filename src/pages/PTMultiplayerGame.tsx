@@ -105,7 +105,41 @@ const PTMultiplayerGame = () => {
 
     const { data: { user } } = await supabase.auth.getUser();
     if (user && playersRes.data) {
-      const cp = playersRes.data.find(p => p.user_id === user.id);
+      let cp = playersRes.data.find(p => p.user_id === user.id);
+      
+      // Auto-join: If user is not in players list yet, add them
+      if (!cp && gameRes.data) {
+        const { data: profileData } = await supabase
+          .from('profiles')
+          .select('display_name')
+          .eq('id', user.id)
+          .single();
+
+        const displayName = profileData?.display_name || 'Player';
+        
+        const { data: newPlayer } = await supabase
+          .from('pt_multiplayer_players')
+          .insert({
+            game_id: gameId,
+            user_id: user.id,
+            display_name: displayName,
+          })
+          .select()
+          .single();
+
+        if (newPlayer) {
+          cp = newPlayer;
+          // Refresh players list
+          const { data: updatedPlayers } = await supabase
+            .from('pt_multiplayer_players')
+            .select('*')
+            .eq('game_id', gameId)
+            .order('joined_at');
+          
+          if (updatedPlayers) setPlayers(updatedPlayers);
+        }
+      }
+      
       setCurrentPlayer(cp || null);
 
       // Fetch my cards
