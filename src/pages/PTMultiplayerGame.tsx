@@ -159,6 +159,7 @@ const PTMultiplayerGame = () => {
   const [cardValue, setCardValue] = useState<string>("");
   const [explanation, setExplanation] = useState<string>("");
   const [submitting, setSubmitting] = useState(false);
+  const [startingGame, setStartingGame] = useState(false);
 
   const isVsJeevesMode = game?.game_mode === "1v1-jeeves" || game?.game_mode === "team-vs-jeeves";
 
@@ -262,24 +263,38 @@ const PTMultiplayerGame = () => {
 
   const autoStartGame = async (gameId: string, playersList: Player[]) => {
     try {
-      console.log('[PTMultiplayer] Auto-start: dealing cards for game', gameId);
-      // Deal the cards
-      const { error: dealError } = await supabase.functions.invoke('deal-pt-cards', {
-        body: { gameId }
-      });
+      console.log('[PTMultiplayer] Auto-start: checking existing cards for game', gameId);
 
-      if (dealError) {
-        console.error('[PTMultiplayer] Error dealing cards:', dealError);
-        toast({
-          title: 'Error starting game',
-          description: dealError.message || 'Failed to deal cards for this game.',
-          variant: 'destructive',
+      const { data: existingCards, error: existingCardsError } = await supabase
+        .from('pt_multiplayer_deck')
+        .select('id')
+        .eq('game_id', gameId)
+        .limit(1);
+
+      if (existingCardsError) {
+        console.error('[PTMultiplayer] Error checking existing cards:', existingCardsError);
+      }
+
+      if (!existingCards || existingCards.length === 0) {
+        console.log('[PTMultiplayer] Auto-start: dealing cards for game', gameId);
+        const { error: dealError } = await supabase.functions.invoke('deal-pt-cards', {
+          body: { gameId }
         });
-        return;
+
+        if (dealError) {
+          console.error('[PTMultiplayer] Error dealing cards:', dealError);
+          toast({
+            title: 'Error starting game',
+            description: dealError.message || 'Failed to deal cards for this game.',
+            variant: 'destructive',
+          });
+          return;
+        }
+      } else {
+        console.log('[PTMultiplayer] Auto-start: cards already dealt, skipping deal function');
       }
 
       console.log('[PTMultiplayer] Auto-start: activating game', gameId);
-      // Activate the game
       const { error } = await supabase
         .from('pt_multiplayer_games')
         .update({ 
@@ -298,7 +313,6 @@ const PTMultiplayerGame = () => {
         return;
       }
 
-      // Update local state
       setGame((prev) =>
         prev
           ? {
@@ -332,6 +346,17 @@ const PTMultiplayerGame = () => {
     return () => {
       supabase.removeChannel(channel);
     };
+  };
+
+  const handleManualStartGame = async () => {
+    if (!game || players.length === 0) return;
+
+    setStartingGame(true);
+    try {
+      await autoStartGame(game.id, players);
+    } finally {
+      setStartingGame(false);
+    }
   };
 
   const handlePlayCard = async () => {
@@ -539,6 +564,20 @@ const PTMultiplayerGame = () => {
                   <Loader2 className="w-12 h-12 animate-spin mx-auto mb-4 text-purple-400" />
                   <h2 className="text-2xl font-bold text-white">Setting up the game...</h2>
                   <p className="text-purple-200 mt-2">Jeeves is dealing the cards</p>
+                  <Button
+                    onClick={handleManualStartGame}
+                    disabled={startingGame}
+                    className="mt-6"
+                  >
+                    {startingGame ? (
+                      <>
+                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                        Starting...
+                      </>
+                    ) : (
+                      'Start game now'
+                    )}
+                  </Button>
                 </div>
               )}
 
