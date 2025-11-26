@@ -55,7 +55,11 @@ export default function MemoryGamePlay() {
   };
 
   const handleStartGame = (gameType: string) => {
-    navigate(`/memory/game/${listId}/${gameType}`);
+    if (gameType === "memory-palace") {
+      navigate(`/memory/palace-builder/${listId}`);
+    } else {
+      navigate(`/memory/game/${listId}/${gameType}`);
+    }
   };
 
   if (loading) return null;
