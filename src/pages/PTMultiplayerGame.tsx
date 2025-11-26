@@ -191,17 +191,35 @@ const PTMultiplayerGame = () => {
     if (!game || !currentPlayer) return;
     
     try {
-      await supabase
+      const { error } = await supabase
         .from('pt_multiplayer_games')
         .update({ 
           status: 'active',
-          current_turn_player_id: players[0]?.id 
+          current_turn_player_id: players[0]?.id ?? null,
         })
         .eq('id', game.id);
-        
+
+      if (error) throw error;
+
+      // Optimistically update local state so the host sees the game start immediately
+      setGame((prev) =>
+        prev
+          ? {
+              ...prev,
+              status: 'active',
+              current_turn_player_id: players[0]?.id ?? null,
+            }
+          : prev
+      );
+      
       toast({ title: "Game started!" });
     } catch (error: any) {
-      toast({ title: "Error starting game", description: error.message, variant: "destructive" });
+      console.error("Error starting game:", error);
+      toast({ 
+        title: "Error starting game", 
+        description: error.message || "Something went wrong", 
+        variant: "destructive" 
+      });
     }
   };
 
