@@ -153,6 +153,8 @@ const PTMultiplayerGame = () => {
   const [moves, setMoves] = useState<Move[]>([]);
   const [currentPlayer, setCurrentPlayer] = useState<Player | null>(null);
   const [myCards, setMyCards] = useState<Card[]>([]);
+  const [jeevesAlphaCards, setJeevesAlphaCards] = useState<Card[]>([]);
+  const [jeevesBetaCards, setJeevesBetaCards] = useState<Card[]>([]);
   const [loading, setLoading] = useState(true);
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
   const [isJeevesThinking, setIsJeevesThinking] = useState(false);
@@ -312,6 +314,44 @@ const PTMultiplayerGame = () => {
         }
       } else {
         setMyCards([]);
+      }
+
+      // In Jeeves vs Jeeves mode, fetch both Jeeves' cards for spectators
+      if (gameData?.game_mode === "jeeves-vs-jeeves") {
+        const alpha = playersData.find(p => p.display_name.includes('Alpha'));
+        const beta = playersData.find(p => p.display_name.includes('Beta'));
+
+        if (alpha) {
+          const { data: alphaCards } = await supabase
+            .from('pt_multiplayer_deck')
+            .select('*')
+            .eq('game_id', gameId)
+            .eq('drawn_by', alpha.id)
+            .eq('is_drawn', true);
+          
+          if (alphaCards) {
+            setJeevesAlphaCards(alphaCards.map(card => ({
+              ...card,
+              card_data: card.card_data as { value: string; name: string }
+            })));
+          }
+        }
+
+        if (beta) {
+          const { data: betaCards } = await supabase
+            .from('pt_multiplayer_deck')
+            .select('*')
+            .eq('game_id', gameId)
+            .eq('drawn_by', beta.id)
+            .eq('is_drawn', true);
+          
+          if (betaCards) {
+            setJeevesBetaCards(betaCards.map(card => ({
+              ...card,
+              card_data: card.card_data as { value: string; name: string }
+            })));
+          }
+        }
       }
     }
 
@@ -662,39 +702,69 @@ const PTMultiplayerGame = () => {
 
         {/* Game Table Layout */}
         <div className="relative">
-          {/* Opponent's Side (Top) */}
+          {/* Opponent's Side (Top) - Show hands in Jeeves vs Jeeves */}
           <div className="mb-8">
             <AnimatePresence>
-              {players.filter(p => p.id !== currentPlayer?.id).map((player, idx) => (
-                <motion.div
-                  key={player.id}
-                  initial={{ y: -50, opacity: 0 }}
-                  animate={{ y: 0, opacity: 1 }}
-                  transition={{ delay: idx * 0.1 }}
-                  className={`flex items-center justify-center gap-3 p-4 rounded-xl mb-2 ${
-                    game.current_turn_player_id === player.id 
-                      ? 'bg-gradient-to-r from-purple-600 to-blue-600 shadow-lg shadow-purple-500/50' 
-                      : 'bg-slate-800/80 backdrop-blur'
-                  }`}
-                >
-                  <Avatar className="w-10 h-10 border-2 border-purple-400">
-                    <AvatarFallback className="bg-purple-600 text-white">{player.display_name[0]}</AvatarFallback>
-                  </Avatar>
-                  <div className="flex-1">
-                    <p className="font-semibold text-white flex items-center gap-2">
-                      {player.display_name}
-                      {player.display_name.includes('Jeeves') && <Bot className="w-4 h-4 text-purple-400" />}
-                    </p>
-                    <div className="flex gap-3 text-sm text-purple-200">
-                      <span>🃏 {player.cards_remaining}</span>
-                      <span>⭐ {player.score}pts</span>
+              {players.filter(p => p.id !== currentPlayer?.id).map((player, idx) => {
+                const isAlpha = player.display_name.includes('Alpha');
+                const isBeta = player.display_name.includes('Beta');
+                const playerCards = isAlpha ? jeevesAlphaCards : isBeta ? jeevesBetaCards : [];
+                
+                return (
+                  <motion.div
+                    key={player.id}
+                    initial={{ y: -50, opacity: 0 }}
+                    animate={{ y: 0, opacity: 1 }}
+                    transition={{ delay: idx * 0.1 }}
+                    className="mb-4"
+                  >
+                    <div className={`flex items-center justify-center gap-3 p-4 rounded-xl ${
+                      game.current_turn_player_id === player.id 
+                        ? 'bg-gradient-to-r from-purple-600 to-blue-600 shadow-lg shadow-purple-500/50' 
+                        : 'bg-slate-800/80 backdrop-blur'
+                    }`}>
+                      <Avatar className="w-10 h-10 border-2 border-purple-400">
+                        <AvatarFallback className="bg-purple-600 text-white">{player.display_name[0]}</AvatarFallback>
+                      </Avatar>
+                      <div className="flex-1">
+                        <p className="font-semibold text-white flex items-center gap-2">
+                          {player.display_name}
+                          {player.display_name.includes('Jeeves') && <Bot className="w-4 h-4 text-purple-400" />}
+                        </p>
+                        <div className="flex gap-3 text-sm text-purple-200">
+                          <span>🃏 {player.cards_remaining}</span>
+                          <span>⭐ {player.score}pts</span>
+                        </div>
+                      </div>
+                      {player.skip_next_turn && (
+                        <Badge variant="destructive" className="text-xs">Skip Turn</Badge>
+                      )}
                     </div>
-                  </div>
-                  {player.skip_next_turn && (
-                    <Badge variant="destructive" className="text-xs">Skip Turn</Badge>
-                  )}
-                </motion.div>
-              ))}
+
+                    {/* Show Jeeves cards in Jeeves vs Jeeves mode */}
+                    {game.game_mode === "jeeves-vs-jeeves" && playerCards.length > 0 && (
+                      <div className="mt-2 px-2">
+                        <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-7 gap-2">
+                          {playerCards.map((card) => (
+                            <motion.div
+                              key={card.id}
+                              initial={{ scale: 0.8, opacity: 0 }}
+                              animate={{ scale: 1, opacity: 1 }}
+                              className="relative"
+                            >
+                              <Card className="bg-gradient-to-br from-purple-900 to-indigo-900 border-2 border-purple-600 p-2">
+                                <Badge variant="outline" className="bg-purple-700/50 text-white border-purple-400 text-xs w-full justify-center">
+                                  {card.card_data.value}
+                                </Badge>
+                              </Card>
+                            </motion.div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </motion.div>
+                );
+              })}
             </AnimatePresence>
           </div>
 
