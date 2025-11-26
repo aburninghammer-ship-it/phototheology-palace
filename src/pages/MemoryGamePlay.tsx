@@ -3,8 +3,9 @@ import { useParams, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { ArrowLeft, Brain, Gamepad2, Shuffle, Type } from "lucide-react";
+import { ArrowLeft, Brain, Gamepad2, Shuffle, Type, Sparkles } from "lucide-react";
 import { toast } from "sonner";
+import { Badge } from "@/components/ui/badge";
 
 export default function MemoryGamePlay() {
   const { listId } = useParams();
@@ -12,6 +13,7 @@ export default function MemoryGamePlay() {
   const [loading, setLoading] = useState(true);
   const [list, setList] = useState<any>(null);
   const [verses, setVerses] = useState<any[]>([]);
+  const [undiscoveredCount, setUndiscoveredCount] = useState(0);
 
   useEffect(() => {
     if (listId) {
@@ -39,6 +41,10 @@ export default function MemoryGamePlay() {
 
       setList(listRes.data);
       setVerses(versesRes.data || []);
+      
+      // Count undiscovered PT insights
+      const undiscovered = versesRes.data?.filter(v => !v.pt_discovered).length || 0;
+      setUndiscoveredCount(undiscovered);
     } catch (error) {
       console.error("Error fetching data:", error);
       toast.error("Failed to load list");
@@ -93,9 +99,15 @@ export default function MemoryGamePlay() {
 
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold mb-2">{list?.title}</h1>
-          <p className="text-muted-foreground">
+          <p className="text-muted-foreground mb-2">
             {verses.length} verses • {list?.bible_version.toUpperCase()}
           </p>
+          {undiscoveredCount > 0 && (
+            <Badge variant="secondary" className="bg-primary/10 text-primary">
+              <Sparkles className="h-3 w-3 mr-1" />
+              {undiscoveredCount} PT insights to discover
+            </Badge>
+          )}
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

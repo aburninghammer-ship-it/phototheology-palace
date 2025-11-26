@@ -114,6 +114,7 @@ const VerseMemoryHall = lazy(() => import("./pages/VerseMemoryHall"));
 const Memory = lazy(() => import("./pages/Memory"));
 const MemoryListEditor = lazy(() => import("./pages/MemoryListEditor"));
 const MemoryGamePlay = lazy(() => import("./pages/MemoryGamePlay"));
+const MemoryGameComplete = lazy(() => import("./pages/MemoryGameComplete"));
 const ChefChallenge = lazy(() => import("./pages/ChefChallenge"));
 const ChainWar = lazy(() => import("./pages/games/ChainWar"));
 const SanctuaryRun = lazy(() => import("./pages/games/SanctuaryRun"));
@@ -248,6 +249,7 @@ function App() {
             <Route path="/memory" element={<ProtectedRoute><Memory /></ProtectedRoute>} />
             <Route path="/memory/list/:listId" element={<ProtectedRoute><MemoryListEditor /></ProtectedRoute>} />
             <Route path="/memory/play/:listId" element={<ProtectedRoute><MemoryGamePlay /></ProtectedRoute>} />
+            <Route path="/memory/complete/:listId" element={<ProtectedRoute><MemoryGameComplete /></ProtectedRoute>} />
             <Route path="/daily-challenges" element={<ProtectedRoute><DailyChallenges /></ProtectedRoute>} />
             <Route path="/growth-journal" element={<ProtectedRoute><GrowthJournal /></ProtectedRoute>} />
             <Route path="/equations-challenge" element={<ProtectedRoute><EquationsChallenge /></ProtectedRoute>} />

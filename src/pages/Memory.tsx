@@ -11,6 +11,8 @@ import { MemoryListCard } from "@/components/memory/MemoryListCard";
 import { MyMemoryLists } from "@/components/memory/MyMemoryLists";
 import { PublicMemoryLists } from "@/components/memory/PublicMemoryLists";
 import { CollaborativeMemoryLists } from "@/components/memory/CollaborativeMemoryLists";
+import PTMasteryTracker from "@/components/memory/PTMasteryTracker";
+import PTModeToggle from "@/components/memory/PTModeToggle";
 
 export default function Memory() {
   const navigate = useNavigate();
@@ -44,8 +46,18 @@ export default function Memory() {
             </h1>
           </div>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Master Bible verses through interactive games and spaced repetition
+            Master Bible verses through interactive games with PT principles
           </p>
+        </div>
+
+        {/* PT Mastery & Mode Toggle */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+          <div className="lg:col-span-2">
+            <PTMasteryTracker />
+          </div>
+          <div>
+            <PTModeToggle />
+          </div>
         </div>
 
         {/* Quick Stats */}

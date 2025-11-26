@@ -2538,25 +2538,34 @@ export type Database = {
       memory_verse_list_items: {
         Row: {
           created_at: string | null
+          discovery_unlocked_at: string | null
           id: string
           list_id: string
           order_index: number
+          pt_discovered: boolean | null
+          pt_insights: Json | null
           verse_reference: string
           verse_text: string
         }
         Insert: {
           created_at?: string | null
+          discovery_unlocked_at?: string | null
           id?: string
           list_id: string
           order_index: number
+          pt_discovered?: boolean | null
+          pt_insights?: Json | null
           verse_reference: string
           verse_text: string
         }
         Update: {
           created_at?: string | null
+          discovery_unlocked_at?: string | null
           id?: string
           list_id?: string
           order_index?: number
+          pt_discovered?: boolean | null
+          pt_insights?: Json | null
           verse_reference?: string
           verse_text?: string
         }
@@ -2578,6 +2587,7 @@ export type Database = {
           id: string
           is_collaborative: boolean | null
           is_public: boolean | null
+          pt_principles: Json | null
           target_verse_count: number | null
           title: string
           topic: string | null
@@ -2591,6 +2601,7 @@ export type Database = {
           id?: string
           is_collaborative?: boolean | null
           is_public?: boolean | null
+          pt_principles?: Json | null
           target_verse_count?: number | null
           title: string
           topic?: string | null
@@ -2604,6 +2615,7 @@ export type Database = {
           id?: string
           is_collaborative?: boolean | null
           is_public?: boolean | null
+          pt_principles?: Json | null
           target_verse_count?: number | null
           title?: string
           topic?: string | null
@@ -3771,6 +3783,78 @@ export type Database = {
           story_text?: string
           updated_at?: string
           winner?: string | null
+        }
+        Relationships: []
+      }
+      pt_cross_references: {
+        Row: {
+          connection_type: string
+          created_at: string | null
+          explanation: string | null
+          id: string
+          principle_codes: string[]
+          source_verse: string
+          strength: number | null
+          target_verse: string
+        }
+        Insert: {
+          connection_type: string
+          created_at?: string | null
+          explanation?: string | null
+          id?: string
+          principle_codes: string[]
+          source_verse: string
+          strength?: number | null
+          target_verse: string
+        }
+        Update: {
+          connection_type?: string
+          created_at?: string | null
+          explanation?: string | null
+          id?: string
+          principle_codes?: string[]
+          source_verse?: string
+          strength?: number | null
+          target_verse?: string
+        }
+        Relationships: []
+      }
+      pt_mastery: {
+        Row: {
+          created_at: string | null
+          first_encountered_at: string | null
+          id: string
+          last_practiced_at: string | null
+          mastery_level: number | null
+          principle_code: string
+          principle_type: string
+          updated_at: string | null
+          user_id: string
+          verses_memorized: string[] | null
+        }
+        Insert: {
+          created_at?: string | null
+          first_encountered_at?: string | null
+          id?: string
+          last_practiced_at?: string | null
+          mastery_level?: number | null
+          principle_code: string
+          principle_type: string
+          updated_at?: string | null
+          user_id: string
+          verses_memorized?: string[] | null
+        }
+        Update: {
+          created_at?: string | null
+          first_encountered_at?: string | null
+          id?: string
+          last_practiced_at?: string | null
+          mastery_level?: number | null
+          principle_code?: string
+          principle_type?: string
+          updated_at?: string | null
+          user_id?: string
+          verses_memorized?: string[] | null
         }
         Relationships: []
       }
@@ -5569,6 +5653,39 @@ export type Database = {
           reading_mode?: string | null
           theme_preference?: string | null
           updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      user_pt_preferences: {
+        Row: {
+          auto_suggest_cross_refs: boolean | null
+          created_at: string | null
+          id: string
+          palace_view_enabled: boolean | null
+          pt_mode: string | null
+          show_insights_after_game: boolean | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          auto_suggest_cross_refs?: boolean | null
+          created_at?: string | null
+          id?: string
+          palace_view_enabled?: boolean | null
+          pt_mode?: string | null
+          show_insights_after_game?: boolean | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          auto_suggest_cross_refs?: boolean | null
+          created_at?: string | null
+          id?: string
+          palace_view_enabled?: boolean | null
+          pt_mode?: string | null
+          show_insights_after_game?: boolean | null
+          updated_at?: string | null
           user_id?: string
         }
         Relationships: []
