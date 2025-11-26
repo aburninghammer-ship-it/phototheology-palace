@@ -311,7 +311,11 @@ const PTMultiplayerGame = () => {
       } else {
         setMyCards([]);
       }
-    }
+    console.log('PTMulti fetchGameData', {
+      game: gameData,
+      players: playersData?.map(p => ({ id: p.id, display_name: p.display_name, user_id: p.user_id })),
+      movesCount: movesRes.data?.length ?? 0,
+    });
 
     setLoading(false);
   };
