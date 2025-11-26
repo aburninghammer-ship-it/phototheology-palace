@@ -65,6 +65,84 @@ const CARD_TYPES = [
   { type: "sabotage", label: "Sabotage Card", color: "bg-gray-700" },
 ];
 
+// Principle explanations
+const PRINCIPLE_EXPLANATIONS: Record<string, string> = {
+  // Cycles
+  "@Ad": "Adamic Cycle - Eden to Promise",
+  "@No": "Noahic Cycle - Flood to Covenant",
+  "@Ab": "Abrahamic Cycle - Call to Covenant People",
+  "@Mo": "Mosaic Cycle - Exodus to Sanctuary Nation",
+  "@Cy": "Cyrusic Cycle - Exile to Return & Rebuild",
+  "@CyC": "Cyrus-Christ Cycle - Type to Antitype Deliverer",
+  "@Sp": "Holy Spirit Cycle - Church Age to Pentecost",
+  "@Re": "Remnant Cycle - End-Time Witness to Second Coming",
+  
+  // Floor 1 - Furnishing
+  "SR": "Story Room - Recall narratives in sequence",
+  "IR": "Imagination Room - Step inside the story",
+  "24F": "24FPS - One image per chapter",
+  "BR": "Bible Rendered - Master images per 24 chapters",
+  "TR": "Translation Room - Words become pictures",
+  "GR": "Gems Room - Store powerful insights",
+  
+  // Floor 2 - Investigation
+  "OR": "Observation Room - Notice details like a detective",
+  "DC": "Def-Com - Greek/Hebrew definitions & context",
+  "ST": "Symbols/Types - God's universal language",
+  "QR": "Questions Room - Interrogate until truth emerges",
+  "QA": "Q&A Chains - Scripture answers Scripture",
+  
+  // Floor 3 - Freestyle
+  "NF": "Nature Freestyle - Creation teaches Scripture",
+  "PF": "Personal Freestyle - Your life as object lesson",
+  "BF": "Bible Freestyle - Verse genetics & connections",
+  "HF": "History Freestyle - World events through Bible lens",
+  "LR": "Listening Room - Turn conversations into connections",
+  
+  // Floor 4 - Next Level
+  "CR": "Concentration - Every text reveals Christ",
+  "DR": "Dimensions - 5 layers of meaning",
+  "C6": "Connect 6 - Genre rules of language",
+  "TRm": "Theme Room - Great walls of biblical architecture",
+  "TZ": "Time Zone - Past, present, future placement",
+  "PRm": "Patterns Room - God's fingerprints across Scripture",
+  "P‖": "Parallels Room - Mirrored actions across time",
+  "FRt": "Fruit Room - Test for Christlike character",
+  "CEC": "Christ in Every Chapter - Explicit Christ-thread",
+  "R66": "Room 66 - One theme through all 66 books",
+  
+  // Floor 5 - Vision
+  "BL": "Blue/Sanctuary - Blueprint of redemption",
+  "PR": "Prophecy Room - Timelines aligned like stars",
+  "3A": "Three Angels - Final gospel & mission",
+  
+  // Floor 6 - Three Heavens
+  "JR": "Juice Room - Squeeze every drop of meaning",
+  
+  // Floor 7 - Spiritual
+  "FRm": "Fire Room - Truth burns into heart",
+  "MR": "Meditation Room - Marinate in truth",
+  "SRm": "Speed Room - Rapid recall & application",
+  
+  // Dimensions
+  "Asc-1": "Text Ascension - Word level study",
+  "Asc-2": "Chapter Ascension - Storyline placement",
+  "Asc-3": "Book Ascension - Overarching theme",
+  "Asc-4": "Cycle Ascension - Covenant cycle",
+  "Asc-5": "Heaven Ascension - Cosmic context",
+  
+  // Expansions
+  "Exp-W": "Width Expansion - Content & memory",
+  "Exp-T": "Time Expansion - Continuous practice",
+  "Exp-D": "Depth Expansion - Christ-centered structure",
+  "Exp-H": "Height Expansion - Transformation & mastery",
+  
+  // Heavens
+  "1H": "First Heaven - Babylon & Restoration",
+  "2H": "Second Heaven - New Covenant order",
+  "3H": "Third Heaven - Final cosmic renewal",
+};
+
 const PTMultiplayerGame = () => {
   const { gameId } = useParams();
   const navigate = useNavigate();
@@ -512,16 +590,30 @@ const PTMultiplayerGame = () => {
                 {myCards.length > 0 && (
                   <div className="mb-4">
                     <label className="block text-sm font-medium mb-2 text-white">Your Cards (Principles)</label>
-                    <div className="flex flex-wrap gap-2">
+                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
                       {myCards.map((card) => (
-                        <Badge
+                        <motion.div
                           key={card.id}
-                          variant="secondary"
-                          className="text-sm px-3 py-1 bg-purple-600 hover:bg-purple-700 cursor-pointer"
-                          onClick={() => setCardValue(card.card_data.value)}
+                          whileHover={{ scale: 1.05 }}
+                          whileTap={{ scale: 0.95 }}
                         >
-                          {card.card_data.value}
-                        </Badge>
+                          <Card
+                            className="cursor-pointer transition-all hover:shadow-lg hover:border-purple-400 bg-gradient-to-br from-purple-900 to-indigo-900 border-2 border-purple-600"
+                            onClick={() => setCardValue(card.card_data.value)}
+                          >
+                            <div className="p-3">
+                              <div className="flex items-center justify-between mb-2">
+                                <Badge variant="outline" className="bg-purple-700/50 text-white border-purple-400">
+                                  {card.card_data.value}
+                                </Badge>
+                                <Sparkles className="w-4 h-4 text-purple-300" />
+                              </div>
+                              <p className="text-xs text-purple-100 leading-tight">
+                                {PRINCIPLE_EXPLANATIONS[card.card_data.value] || "Phototheology Principle"}
+                              </p>
+                            </div>
+                          </Card>
+                        </motion.div>
                       ))}
                     </div>
                   </div>
