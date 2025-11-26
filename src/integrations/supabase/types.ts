@@ -3336,6 +3336,221 @@ export type Database = {
         }
         Relationships: []
       }
+      pt_multiplayer_deck: {
+        Row: {
+          card_data: Json
+          card_type: string
+          drawn_at: string | null
+          drawn_by: string | null
+          game_id: string
+          id: string
+          is_drawn: boolean | null
+        }
+        Insert: {
+          card_data: Json
+          card_type: string
+          drawn_at?: string | null
+          drawn_by?: string | null
+          game_id: string
+          id?: string
+          is_drawn?: boolean | null
+        }
+        Update: {
+          card_data?: Json
+          card_type?: string
+          drawn_at?: string | null
+          drawn_by?: string | null
+          game_id?: string
+          id?: string
+          is_drawn?: boolean | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pt_multiplayer_deck_drawn_by_fkey"
+            columns: ["drawn_by"]
+            isOneToOne: false
+            referencedRelation: "pt_multiplayer_players"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pt_multiplayer_deck_game_id_fkey"
+            columns: ["game_id"]
+            isOneToOne: false
+            referencedRelation: "pt_multiplayer_games"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      pt_multiplayer_games: {
+        Row: {
+          completed_at: string | null
+          created_at: string | null
+          current_turn_player_id: string | null
+          game_mode: string
+          generated_study: Json | null
+          host_id: string
+          id: string
+          max_players: number | null
+          settings: Json | null
+          status: string | null
+          study_topic: string
+          updated_at: string | null
+          winner_id: string | null
+        }
+        Insert: {
+          completed_at?: string | null
+          created_at?: string | null
+          current_turn_player_id?: string | null
+          game_mode: string
+          generated_study?: Json | null
+          host_id: string
+          id?: string
+          max_players?: number | null
+          settings?: Json | null
+          status?: string | null
+          study_topic: string
+          updated_at?: string | null
+          winner_id?: string | null
+        }
+        Update: {
+          completed_at?: string | null
+          created_at?: string | null
+          current_turn_player_id?: string | null
+          game_mode?: string
+          generated_study?: Json | null
+          host_id?: string
+          id?: string
+          max_players?: number | null
+          settings?: Json | null
+          status?: string | null
+          study_topic?: string
+          updated_at?: string | null
+          winner_id?: string | null
+        }
+        Relationships: []
+      }
+      pt_multiplayer_moves: {
+        Row: {
+          card_data: Json
+          card_type: string
+          clarification_attempt_at: string | null
+          clarification_text: string | null
+          combo_cards: Json | null
+          created_at: string | null
+          explanation: string
+          game_id: string
+          id: string
+          is_combo: boolean | null
+          jeeves_feedback: string | null
+          jeeves_verdict: string | null
+          move_number: number
+          player_id: string
+          points_awarded: number | null
+        }
+        Insert: {
+          card_data: Json
+          card_type: string
+          clarification_attempt_at?: string | null
+          clarification_text?: string | null
+          combo_cards?: Json | null
+          created_at?: string | null
+          explanation: string
+          game_id: string
+          id?: string
+          is_combo?: boolean | null
+          jeeves_feedback?: string | null
+          jeeves_verdict?: string | null
+          move_number: number
+          player_id: string
+          points_awarded?: number | null
+        }
+        Update: {
+          card_data?: Json
+          card_type?: string
+          clarification_attempt_at?: string | null
+          clarification_text?: string | null
+          combo_cards?: Json | null
+          created_at?: string | null
+          explanation?: string
+          game_id?: string
+          id?: string
+          is_combo?: boolean | null
+          jeeves_feedback?: string | null
+          jeeves_verdict?: string | null
+          move_number?: number
+          player_id?: string
+          points_awarded?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pt_multiplayer_moves_game_id_fkey"
+            columns: ["game_id"]
+            isOneToOne: false
+            referencedRelation: "pt_multiplayer_games"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pt_multiplayer_moves_player_id_fkey"
+            columns: ["player_id"]
+            isOneToOne: false
+            referencedRelation: "pt_multiplayer_players"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      pt_multiplayer_players: {
+        Row: {
+          cards_remaining: number | null
+          consecutive_rejections: number | null
+          display_name: string
+          game_id: string
+          hand: Json | null
+          id: string
+          is_active: boolean | null
+          joined_at: string | null
+          score: number | null
+          skip_next_turn: boolean | null
+          team: string | null
+          user_id: string
+        }
+        Insert: {
+          cards_remaining?: number | null
+          consecutive_rejections?: number | null
+          display_name: string
+          game_id: string
+          hand?: Json | null
+          id?: string
+          is_active?: boolean | null
+          joined_at?: string | null
+          score?: number | null
+          skip_next_turn?: boolean | null
+          team?: string | null
+          user_id: string
+        }
+        Update: {
+          cards_remaining?: number | null
+          consecutive_rejections?: number | null
+          display_name?: string
+          game_id?: string
+          hand?: Json | null
+          id?: string
+          is_active?: boolean | null
+          joined_at?: string | null
+          score?: number | null
+          skip_next_turn?: boolean | null
+          team?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pt_multiplayer_players_game_id_fkey"
+            columns: ["game_id"]
+            isOneToOne: false
+            referencedRelation: "pt_multiplayer_games"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       rate_limits: {
         Row: {
           created_at: string
