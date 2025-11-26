@@ -6,7 +6,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { palaceFloors } from "@/data/palaceData";
-import { Sparkles, HelpCircle, Timer, RefreshCw, Send, BookOpen, Loader2 } from "lucide-react";
+import { Sparkles, HelpCircle, Timer, RefreshCw, Send, BookOpen, Loader2, MessageCircle } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -146,6 +146,11 @@ export default function CardDeck() {
   const [userAnswer, setUserAnswer] = useState("");
   const [feedback, setFeedback] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [conversationHistory, setConversationHistory] = useState<Array<{
+    role: "user" | "jeeves";
+    content: string;
+    timestamp: Date;
+  }>>([]);
   const [timerEnabled, setTimerEnabled] = useState(false);
   const [timeRemaining, setTimeRemaining] = useState(120);
   const [isTimerActive, setIsTimerActive] = useState(false);
@@ -816,6 +821,11 @@ export default function CardDeck() {
 
       if (error) throw error;
       setFeedback(data.content || "Answer submitted!");
+      setConversationHistory(prev => [
+        ...prev,
+        { role: "user", content: userAnswer, timestamp: new Date() },
+        { role: "jeeves", content: data.content || "Answer submitted!", timestamp: new Date() }
+      ]);
       toast({
         title: "Answer graded!",
         description: "Jeeves has reviewed your application.",
@@ -1111,12 +1121,58 @@ export default function CardDeck() {
                         pickRandomCard();
                         setFeedback("");
                         setUserAnswer("");
+                        setConversationHistory([]);
                       }}
                       className="w-full gradient-palace"
                     >
                       <Sparkles className="h-4 w-4 mr-2" />
                       Draw Next Card
                     </Button>
+                  </CardContent>
+                </Card>
+              )}
+
+              {conversationHistory.length > 0 && (
+                <Card className="border-primary/20">
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <MessageCircle className="h-5 w-5 text-primary" />
+                      Conversation History
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <ScrollArea className="h-[400px] rounded-md border p-4 space-y-4">
+                      {conversationHistory.map((message, index) => (
+                        <div
+                          key={index}
+                          className={`p-4 rounded-lg space-y-2 ${
+                            message.role === "user"
+                              ? "bg-muted/50 border-l-4 border-primary"
+                              : "bg-accent/30 border-l-4 border-secondary"
+                          }`}
+                        >
+                          <div className="flex items-center gap-2 mb-2">
+                            {message.role === "user" ? (
+                              <>
+                                <span className="text-lg">👤</span>
+                                <span className="font-semibold text-primary">Your Answer #{Math.floor(index / 2) + 1}</span>
+                              </>
+                            ) : (
+                              <>
+                                <span className="text-lg">🎓</span>
+                                <span className="font-semibold text-secondary">Jeeves' Feedback #{Math.floor(index / 2) + 1}</span>
+                              </>
+                            )}
+                          </div>
+                          <div className="prose prose-sm dark:prose-invert max-w-none whitespace-pre-wrap">
+                            {message.content}
+                          </div>
+                          <div className="text-xs text-muted-foreground mt-2">
+                            ⏰ {message.timestamp.toLocaleTimeString()}
+                          </div>
+                        </div>
+                      ))}
+                    </ScrollArea>
                   </CardContent>
                 </Card>
               )}
