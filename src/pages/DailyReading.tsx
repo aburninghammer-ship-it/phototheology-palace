@@ -11,9 +11,10 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
-import { RefreshCw } from "lucide-react";
+import { RefreshCw, FileText } from "lucide-react";
 import { BIBLE_BOOK_METADATA } from "@/data/bibleBooks";
 import { BIBLE_TRANSLATIONS } from "@/services/bibleApi";
+import { Textarea } from "@/components/ui/textarea";
 
 type ChapterRef = { book: string; chapter: number };
 
@@ -78,6 +79,7 @@ export default function DailyReading() {
   const [exercises, setExercises] = useState<any[]>([]);
   const [plan, setPlan] = useState<any>(null);
   const [todaysPassages, setTodaysPassages] = useState<any[]>([]);
+  const [notes, setNotes] = useState<string>("");
 
   useEffect(() => {
     if (userProgress) {
@@ -182,6 +184,18 @@ export default function DailyReading() {
       if (result) {
         setExercises(result);
       }
+
+      // Load existing notes if this day was completed before
+      const { data: completionData } = await supabase
+        .from('daily_reading_completions')
+        .select('notes')
+        .eq('user_progress_id', userProgress.id)
+        .eq('day_number', userProgress.current_day)
+        .maybeSingle();
+      
+      if (completionData?.notes) {
+        setNotes(completionData.notes);
+      }
     } catch (error) {
       console.error('Error in loadPlanAndExercises:', error);
       toast({
@@ -262,13 +276,14 @@ export default function DailyReading() {
     
     setCompleting(true);
     try {
-      // Record completion
+      // Record completion with notes
       await supabase
         .from("daily_reading_completions")
         .insert({
           user_progress_id: userProgress.id,
           day_number: userProgress.current_day,
           floors_completed: exercises.map(e => String(e.floorNumber)),
+          notes: notes.trim() || null,
         });
 
       // Update progress to next day
@@ -500,6 +515,26 @@ export default function DailyReading() {
               ))}
             </Tabs>
           )}
+        </Card>
+
+        {/* Notes Section */}
+        <Card className="p-6 mb-6">
+          <h3 className="text-xl font-bold mb-4 text-foreground flex items-center">
+            <FileText className="h-5 w-5 mr-2 text-primary" />
+            Personal Notes & Reflections
+          </h3>
+          <p className="text-sm text-muted-foreground mb-4">
+            Record your insights, questions, and reflections from today's reading
+          </p>
+          <Textarea
+            value={notes}
+            onChange={(e) => setNotes(e.target.value)}
+            placeholder="What stood out to you today? Any new insights or connections with Christ?"
+            className="min-h-[150px] resize-y"
+          />
+          <p className="text-xs text-muted-foreground mt-2">
+            Your notes will be saved when you complete today's reading
+          </p>
         </Card>
 
         {/* Complete Button */}
