@@ -298,11 +298,8 @@ export function BattleArena({ battle, currentUserId, onBack }: Props) {
         setShowRejectionOptions(false);
         await loadPlayers();
         await loadMoves();
-
-        // If playing against Jeeves (not jeeves vs jeeves), he plays next after approval
-        if (battle.game_mode === 'user_vs_jeeves') {
-          setTimeout(() => handleJeevesPlay('jeeves_1'), 2000);
-        }
+        
+        // In user vs jeeves, user must manually trigger Jeeves' turn - no auto-play
       }
 
     } catch (error: any) {
@@ -347,11 +344,8 @@ export function BattleArena({ battle, currentUserId, onBack }: Props) {
         setShowRejectionOptions(false);
         await loadPlayers();
         await loadMoves();
-
-        // Jeeves plays next after successful challenge (not in jeeves vs jeeves)
-        if (battle.game_mode === 'user_vs_jeeves') {
-          setTimeout(() => handleJeevesPlay('jeeves_1'), 2000);
-        }
+        
+        // User must manually trigger Jeeves' turn - no auto-play
       } else {
         toast({
           title: '❌ Challenge Denied',
