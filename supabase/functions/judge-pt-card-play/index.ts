@@ -12,32 +12,19 @@ serve(async (req) => {
   }
 
   try {
-    // Check if this is a service role call (Jeeves auto-play)
-    const authHeader = req.headers.get("Authorization") || "";
-    const isServiceRoleCall = authHeader.includes(Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") || "");
-    
     const supabaseClient = createClient(
       Deno.env.get("SUPABASE_URL") ?? "",
-      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "",
+      Deno.env.get("SUPABASE_ANON_KEY") ?? "",
+      {
+        global: {
+          headers: { Authorization: req.headers.get("Authorization")! },
+        },
+      }
     );
 
-    // Only require user auth if not coming from service role (Jeeves auto-play)
-    if (!isServiceRoleCall) {
-      // Validate user auth for human players
-      const userClient = createClient(
-        Deno.env.get("SUPABASE_URL") ?? "",
-        Deno.env.get("SUPABASE_ANON_KEY") ?? "",
-        {
-          global: {
-            headers: { Authorization: authHeader },
-          },
-        }
-      );
-      
-      const { data: { user } } = await userClient.auth.getUser();
-      if (!user) {
-        throw new Error("Unauthorized");
-      }
+    const { data: { user } } = await supabaseClient.auth.getUser();
+    if (!user) {
+      throw new Error("Unauthorized");
     }
 
     const { 
@@ -218,13 +205,6 @@ Judge this play. Is it theologically sound, correctly applied, and meaningfully 
 
     if (insertError) throw insertError;
 
-    // Get game info to check mode
-    const { data: gameData } = await supabaseClient
-      .from('pt_multiplayer_games')
-      .select('game_mode')
-      .eq('id', gameId)
-      .single();
-
     // Update player data based on verdict
     if (judgment.verdict === 'approved') {
       // Discard card, add points, reset rejections
@@ -264,99 +244,6 @@ Judge this play. Is it theologically sound, correctly applied, and meaningfully 
             skip_next_turn: skipNextTurn
           })
           .eq('id', playerId);
-      }
-    }
-
-    // After judgment, check if we need to trigger Jeeves' turn
-    const isVsJeevesMode = gameData?.game_mode === '1v1-jeeves' || gameData?.game_mode === 'team-vs-jeeves';
-    
-    if (isVsJeevesMode && (judgment.verdict === 'approved' || judgment.verdict === 'rejected')) {
-      // Get all players
-      const { data: allPlayers } = await supabaseClient
-        .from('pt_multiplayer_players')
-        .select('*')
-        .eq('game_id', gameId)
-        .order('joined_at');
-
-      if (allPlayers) {
-        const currentIndex = allPlayers.findIndex(p => p.id === playerId);
-        const nextIndex = (currentIndex + 1) % allPlayers.length;
-        const nextPlayer = allPlayers[nextIndex];
-
-        // If next player is Jeeves, trigger his turn automatically
-        if (nextPlayer.display_name.includes('Jeeves')) {
-          // Get Jeeves' cards
-          const { data: jeevesCards } = await supabaseClient
-            .from('pt_multiplayer_deck')
-            .select('*')
-            .eq('game_id', gameId)
-            .eq('drawn_by', nextPlayer.id)
-            .eq('is_drawn', true)
-            .limit(1);
-
-          if (jeevesCards && jeevesCards.length > 0) {
-            const jeevesCard = jeevesCards[0];
-            
-            // Generate Jeeves' explanation using AI
-            const jeevesPrompt = `You are Jeeves playing a Phototheology card game on the topic: "${studyTopic}"
-
-Recent context:
-${studyContext}
-
-You drew the principle card: ${jeevesCard.card_data.value}
-
-Provide a 2-3 sentence explanation of how this principle applies to the study topic. Make it insightful and theologically sound, connecting the principle to Scripture.`;
-
-            const jeevesResponse = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-              method: "POST",
-              headers: {
-                "Authorization": `Bearer ${LOVABLE_API_KEY}`,
-                "Content-Type": "application/json",
-              },
-              body: JSON.stringify({
-                model: "google/gemini-2.5-flash",
-                messages: [
-                  { role: "system", content: "You are Jeeves, an AI Bible study companion who plays Phototheology card games. Be insightful, Christ-centered, and concise." },
-                  { role: "user", content: jeevesPrompt }
-                ],
-                temperature: 0.8,
-              }),
-            });
-
-            const jeevesData = await jeevesResponse.json();
-            const jeevesExplanation = jeevesData.choices[0].message.content;
-
-            // Submit Jeeves' play (recursive call to this same function)
-            const jeevesJudgmentResponse = await fetch(
-              `${Deno.env.get("SUPABASE_URL")}/functions/v1/judge-pt-card-play`,
-              {
-                method: "POST",
-                headers: {
-                  "Authorization": `Bearer ${Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")}`,
-                  "Content-Type": "application/json",
-                  "apikey": Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") || "",
-                },
-                body: JSON.stringify({
-                  gameId: gameId,
-                  playerId: nextPlayer.id,
-                  cardType: "principle",
-                  cardData: jeevesCard.card_data,
-                  explanation: jeevesExplanation,
-                  studyTopic: studyTopic,
-                  isCombo: false,
-                  comboCards: null
-                })
-              }
-            );
-
-            if (!jeevesJudgmentResponse.ok) {
-              const errorText = await jeevesJudgmentResponse.text();
-              console.error("Failed to judge Jeeves' play:", errorText);
-            } else {
-              console.log("Jeeves played successfully!");
-            }
-          }
-        }
       }
     }
 

@@ -155,6 +155,7 @@ const PTMultiplayerGame = () => {
   const [myCards, setMyCards] = useState<Card[]>([]);
   const [loading, setLoading] = useState(true);
   
+  const [selectedCardType, setSelectedCardType] = useState<string>("");
   const [cardValue, setCardValue] = useState<string>("");
   const [explanation, setExplanation] = useState<string>("");
   const [submitting, setSubmitting] = useState(false);
@@ -213,45 +214,7 @@ const PTMultiplayerGame = () => {
             .eq('game_id', gameId)
             .order('joined_at');
           
-          if (updatedPlayers) {
-            setPlayers(updatedPlayers);
-            
-            // For vs-Jeeves games, auto-add Jeeves if not present
-            const isVsJeeves = gameRes.data.game_mode === '1v1-jeeves' || gameRes.data.game_mode === 'team-vs-jeeves';
-            if (isVsJeeves) {
-              const jeevesExists = updatedPlayers.some(p => p.display_name.includes('Jeeves'));
-              if (!jeevesExists) {
-                // Add Jeeves as a player
-                const { data: jeevesPlayer } = await supabase
-                  .from('pt_multiplayer_players')
-                  .insert({
-                    game_id: gameId,
-                    user_id: 'jeeves-ai',
-                    display_name: '🤖 Jeeves AI',
-                  })
-                  .select()
-                  .single();
-                
-                if (jeevesPlayer) {
-                  // Refresh players again
-                  const { data: finalPlayers } = await supabase
-                    .from('pt_multiplayer_players')
-                    .select('*')
-                    .eq('game_id', gameId)
-                    .order('joined_at');
-                  
-                  if (finalPlayers && finalPlayers.length >= 2 && gameRes.data.status === 'waiting') {
-                    setPlayers(finalPlayers);
-                    // Auto-start the game
-                    await startGameAutomatically(gameId, finalPlayers);
-                  }
-                }
-              } else if (updatedPlayers.length >= 2 && gameRes.data.status === 'waiting') {
-                // Jeeves exists, auto-start if still waiting
-                await startGameAutomatically(gameId, updatedPlayers);
-              }
-            }
-          }
+          if (updatedPlayers) setPlayers(updatedPlayers);
         }
       }
       
@@ -278,33 +241,6 @@ const PTMultiplayerGame = () => {
     setLoading(false);
   };
 
-  const startGameAutomatically = async (gId: string, playersList: Player[]) => {
-    try {
-      // Deal cards first
-      const { error: dealError } = await supabase.functions.invoke('deal-pt-cards', {
-        body: { gameId: gId }
-      });
-
-      if (dealError) {
-        console.error("Error auto-dealing cards:", dealError);
-        return;
-      }
-
-      // Activate the game
-      await supabase
-        .from('pt_multiplayer_games')
-        .update({ 
-          status: 'active',
-          current_turn_player_id: playersList[0]?.id ?? null,
-        })
-        .eq('id', gId);
-      
-      console.log("Auto-started vs-Jeeves game");
-    } catch (error) {
-      console.error("Error auto-starting game:", error);
-    }
-  };
-
   const subscribeToUpdates = () => {
     const channel = supabase
       .channel(`pt-game-${gameId}`)
@@ -322,7 +258,7 @@ const PTMultiplayerGame = () => {
   };
 
   const handlePlayCard = async () => {
-    if (!cardValue || !explanation || !currentPlayer || !game) {
+    if (!selectedCardType || !cardValue || !explanation || !currentPlayer || !game) {
       toast({ title: "Missing information", description: "Please fill all fields", variant: "destructive" });
       return;
     }
@@ -345,7 +281,7 @@ const PTMultiplayerGame = () => {
         body: {
           gameId: game.id,
           playerId: currentPlayer.id,
-          cardType: "principle",
+          cardType: selectedCardType,
           cardData: { value: cardValue },
           explanation: explanation,
           studyTopic: game.study_topic,
@@ -364,6 +300,7 @@ const PTMultiplayerGame = () => {
       });
 
       // Clear form
+      setSelectedCardType("");
       setCardValue("");
       setExplanation("");
 
@@ -384,37 +321,6 @@ const PTMultiplayerGame = () => {
       toast({
         title: "Error",
         description: error.message || "Failed to submit play",
-        variant: "destructive"
-      });
-    } finally {
-      setSubmitting(false);
-    }
-  };
-
-  const handleJeevesMove = async () => {
-    if (!game) return;
-    
-    setSubmitting(true);
-    try {
-      const { error } = await supabase.functions.invoke('judge-pt-card-play', {
-        body: {
-          gameId: game.id,
-          playerId: 'jeeves',
-          cardType: "principle",
-          cardData: { value: "" },
-          explanation: "",
-          studyTopic: game.study_topic,
-          triggerJeeves: true
-        }
-      });
-
-      if (error) throw error;
-      toast({ title: "Jeeves is making his move..." });
-    } catch (error: any) {
-      console.error("Error triggering Jeeves:", error);
-      toast({
-        title: "Error",
-        description: error.message || "Failed to trigger Jeeves",
         variant: "destructive"
       });
     } finally {
@@ -572,34 +478,6 @@ const PTMultiplayerGame = () => {
                       {isMyTurn ? "🎯 Your Turn!" : `⏳ ${players.find(p => p.id === game.current_turn_player_id)?.display_name}'s turn...`}
                     </h3>
                   </div>
-
-                  {/* Jeeves Turn Button */}
-                  {isVsJeevesMode && players.find(p => p.id === game.current_turn_player_id)?.display_name.includes('Jeeves') && (
-                    <motion.div
-                      initial={{ opacity: 0, scale: 0.9 }}
-                      animate={{ opacity: 1, scale: 1 }}
-                      className="mb-6 text-center"
-                    >
-                      <Button
-                        onClick={handleJeevesMove}
-                        disabled={submitting}
-                        size="lg"
-                        className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white font-semibold px-8 py-4 text-lg"
-                      >
-                        {submitting ? (
-                          <>
-                            <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                            Jeeves is thinking...
-                          </>
-                        ) : (
-                          <>
-                            <Bot className="mr-2 h-5 w-5" />
-                            Jeeves, Your Move
-                          </>
-                        )}
-                      </Button>
-                    </motion.div>
-                  )}
 
                   {/* Recent Moves Feed */}
                   <ScrollArea className="h-[300px] mb-6">
