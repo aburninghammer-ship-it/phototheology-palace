@@ -49,6 +49,9 @@ export function BattleArena({ battle, currentUserId, onBack }: Props) {
   const [winner, setWinner] = useState(battle.winner);
   const [moves, setMoves] = useState<any[]>([]);
   const [expandedMoves, setExpandedMoves] = useState<Set<string>>(new Set());
+  const [lastJudgment, setLastJudgment] = useState<any>(null);
+  const [showRejectionOptions, setShowRejectionOptions] = useState(false);
+  const [isChallenging, setIsChallenging] = useState(false);
 
   useEffect(() => {
     loadPlayers();
@@ -144,21 +147,30 @@ export function BattleArena({ battle, currentUserId, onBack }: Props) {
       if (error) throw error;
 
       const judgment = data.judgment;
+      setLastJudgment(judgment);
       
-      toast({
-        title: judgment.verdict === 'approved' ? '✅ Approved!' : '❌ Rejected',
-        description: judgment.feedback,
-        variant: judgment.verdict === 'approved' ? 'default' : 'destructive',
-      });
+      if (judgment.verdict === 'rejected') {
+        setShowRejectionOptions(true);
+        toast({
+          title: '❌ Rejected by Jeeves',
+          description: "You can challenge Jeeves' judgment or pick another card.",
+          variant: 'destructive',
+        });
+      } else {
+        toast({
+          title: '✅ Approved!',
+          description: judgment.feedback,
+        });
+        setSelectedCard(null);
+        setResponse("");
+        setShowRejectionOptions(false);
+        await loadPlayers();
+        await loadMoves();
 
-      setSelectedCard(null);
-      setResponse("");
-      await loadPlayers();
-      await loadMoves();
-
-      // If playing against Jeeves, he plays next after any judgment
-      if (battle.mode === 'vs_jeeves') {
-        setTimeout(() => handleJeevesPlay(), 2000);
+        // If playing against Jeeves, he plays next after approval
+        if (battle.mode === 'vs_jeeves') {
+          setTimeout(() => handleJeevesPlay(), 2000);
+        }
       }
 
     } catch (error: any) {
@@ -171,6 +183,72 @@ export function BattleArena({ battle, currentUserId, onBack }: Props) {
     } finally {
       setIsSubmitting(false);
     }
+  };
+
+  const handleChallenge = async () => {
+    if (!lastJudgment) return;
+
+    setIsChallenging(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('challenge-judgment', {
+        body: {
+          battleId: battle.id,
+          playerId: `user_${currentUserId}`,
+          originalJudgment: lastJudgment,
+          cardCode: selectedCard,
+          responseText: response,
+          storyText: battle.story_text,
+        },
+      });
+
+      if (error) throw error;
+
+      const finalVerdict = data.finalVerdict;
+      
+      if (finalVerdict === 'challenge_upheld') {
+        toast({
+          title: '✅ Challenge Successful!',
+          description: 'Jeeves has reconsidered - your move is now approved!',
+        });
+        setSelectedCard(null);
+        setResponse("");
+        setShowRejectionOptions(false);
+        await loadPlayers();
+        await loadMoves();
+
+        // Jeeves plays next after successful challenge
+        if (battle.mode === 'vs_jeeves') {
+          setTimeout(() => handleJeevesPlay(), 2000);
+        }
+      } else {
+        toast({
+          title: '❌ Challenge Denied',
+          description: data.explanation || 'Jeeves stands by his original judgment.',
+          variant: 'destructive',
+        });
+        // Keep rejection options visible
+      }
+    } catch (error: any) {
+      console.error('Error challenging:', error);
+      toast({
+        title: "Error",
+        description: error.message,
+        variant: "destructive",
+      });
+    } finally {
+      setIsChallenging(false);
+    }
+  };
+
+  const handlePickAnotherCard = () => {
+    setSelectedCard(null);
+    setResponse("");
+    setShowRejectionOptions(false);
+    setLastJudgment(null);
+    toast({
+      title: "Pick Another Card",
+      description: "Select a different principle card to try again.",
+    });
   };
 
   const handleJeevesPlay = async () => {
@@ -449,6 +527,39 @@ export function BattleArena({ battle, currentUserId, onBack }: Props) {
       {/* Response Area */}
       <Card className="bg-white/10 backdrop-blur-xl border-white/20">
         <CardContent className="pt-6 space-y-4">
+          {/* Show rejection options if card was rejected */}
+          {showRejectionOptions && lastJudgment && (
+            <div className="p-4 bg-red-500/20 border-2 border-red-400/50 rounded-lg space-y-3">
+              <div className="flex items-start gap-2">
+                <span className="text-2xl">❌</span>
+                <div className="flex-1">
+                  <h4 className="font-bold text-red-200 mb-1">Jeeves Rejected Your Move</h4>
+                  <p className="text-sm text-red-100 italic mb-3">"{lastJudgment.feedback}"</p>
+                  <p className="text-sm text-white/80 mb-3">
+                    You can challenge Jeeves' judgment or pick a different card to try again.
+                  </p>
+                </div>
+              </div>
+              
+              <div className="grid grid-cols-2 gap-3">
+                <Button
+                  onClick={handleChallenge}
+                  disabled={isChallenging}
+                  className="bg-amber-600 hover:bg-amber-700 text-white font-bold"
+                >
+                  {isChallenging ? 'Challenging...' : '⚔️ Challenge Jeeves'}
+                </Button>
+                <Button
+                  onClick={handlePickAnotherCard}
+                  variant="outline"
+                  className="border-white/30 text-white hover:bg-white/10"
+                >
+                  🔄 Pick Another Card
+                </Button>
+              </div>
+            </div>
+          )}
+
           <div>
             <label className="text-sm font-medium text-white mb-2 block">
               Your Response {selectedCard && <Badge className="ml-2 bg-amber-500">{selectedCard}</Badge>}
@@ -458,26 +569,28 @@ export function BattleArena({ battle, currentUserId, onBack }: Props) {
               onChange={(e) => setResponse(e.target.value)}
               placeholder="How does your selected principle card amplify this story? Show depth, insight, and biblical grounding..."
               className="min-h-32 bg-white/10 border-white/20 text-white placeholder:text-white/50"
-              disabled={!selectedCard}
+              disabled={!selectedCard || showRejectionOptions}
             />
           </div>
           
-          <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-            <Button
-              onClick={handlePlayCard}
-              disabled={!selectedCard || !response.trim() || isSubmitting}
-              className="w-full bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 font-bold py-6 text-lg shadow-lg"
-            >
-              {isSubmitting ? (
-                'Jeeves is judging...'
-              ) : (
-                <>
-                  <Send className="mr-2 h-5 w-5" />
-                  Play Card & Submit to Jeeves
-                </>
-              )}
-            </Button>
-          </motion.div>
+          {!showRejectionOptions && (
+            <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+              <Button
+                onClick={handlePlayCard}
+                disabled={!selectedCard || !response.trim() || isSubmitting}
+                className="w-full bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 font-bold py-6 text-lg shadow-lg"
+              >
+                {isSubmitting ? (
+                  'Jeeves is judging...'
+                ) : (
+                  <>
+                    <Send className="mr-2 h-5 w-5" />
+                    Play Card & Submit to Jeeves
+                  </>
+                )}
+              </Button>
+            </motion.div>
+          )}
         </CardContent>
       </Card>
     </div>

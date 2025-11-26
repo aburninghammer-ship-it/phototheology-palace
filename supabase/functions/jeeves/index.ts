@@ -609,104 +609,24 @@ Provide warm, honest feedback. If their answer is strong, affirm it and build on
       }
 
     } else if (mode === "strongs-lookup") {
-      // Import biblesdk for Strong's lookup
-      const { getVerses } = await import('npm:biblesdk@0.4.0');
+      // Strong's lookup temporarily disabled due to package configuration
+      // TODO: Re-enable when biblesdk package is properly configured
       
-      try {
-        // Map book names to biblesdk codes
-        const bookCodeMap: Record<string, string> = {
-          'Genesis': 'GEN', 'Exodus': 'EXO', 'Leviticus': 'LEV', 'Numbers': 'NUM', 'Deuteronomy': 'DEU',
-          'Joshua': 'JOS', 'Judges': 'JDG', 'Ruth': 'RUT', '1 Samuel': '1SA', '2 Samuel': '2SA',
-          '1 Kings': '1KI', '2 Kings': '2KI', '1 Chronicles': '1CH', '2 Chronicles': '2CH',
-          'Ezra': 'EZR', 'Nehemiah': 'NEH', 'Esther': 'EST', 'Job': 'JOB', 'Psalms': 'PSA',
-          'Proverbs': 'PRO', 'Ecclesiastes': 'ECC', 'Song of Solomon': 'SNG', 'Isaiah': 'ISA',
-          'Jeremiah': 'JER', 'Lamentations': 'LAM', 'Ezekiel': 'EZK', 'Daniel': 'DAN',
-          'Hosea': 'HOS', 'Joel': 'JOL', 'Amos': 'AMO', 'Obadiah': 'OBA', 'Jonah': 'JON',
-          'Micah': 'MIC', 'Nahum': 'NAM', 'Habakkuk': 'HAB', 'Zephaniah': 'ZEP',
-          'Haggai': 'HAG', 'Zechariah': 'ZEC', 'Malachi': 'MAL', 'Matthew': 'MAT',
-          'Mark': 'MRK', 'Luke': 'LUK', 'John': 'JHN', 'Acts': 'ACT', 'Romans': 'ROM',
-          '1 Corinthians': '1CO', '2 Corinthians': '2CO', 'Galatians': 'GAL', 'Ephesians': 'EPH',
-          'Philippians': 'PHP', 'Colossians': 'COL', '1 Thessalonians': '1TH', '2 Thessalonians': '2TH',
-          '1 Timothy': '1TI', '2 Timothy': '2TI', 'Titus': 'TIT', 'Philemon': 'PHM',
-          'Hebrews': 'HEB', 'James': 'JAS', '1 Peter': '1PE', '2 Peter': '2PE',
-          '1 John': '1JN', '2 John': '2JN', '3 John': '3JN', 'Jude': 'JUD', 'Revelation': 'REV'
-        };
+      return new Response(
+        JSON.stringify({
+          content: `⚠️ **Strong's Concordance Lookup Temporarily Unavailable**
 
-        const bookCode = bookCodeMap[book];
-        if (!bookCode) {
-          throw new Error(`Unknown book: ${book}`);
-        }
+The Strong's concordance lookup feature is currently being updated and is temporarily disabled.
 
-        // Fetch verse with Strong's data from biblesdk
-        const response: any = await getVerses(bookCode, chapter, [verse, verse]);
-        
-        if (!response || !response.phrases || response.phrases.length === 0) {
-          throw new Error('No Strong\'s data found for this verse');
-        }
+**What you can try instead:**
+- Use the **Def-Com Room** (Definition & Commentary) for word studies
+- Try online Strong's concordance tools like BlueLetterBible.org
+- Ask Jeeves to explain specific Greek or Hebrew words in context
 
-        // Extract Strong's data and build response
-        const verseWords = response.phrases
-          .filter((p: any) => p.verse === verse)
-          .map((p: any) => ({
-            text: p.text,
-            strongs: p.strongs_number ? `${p.strongs_type}${p.strongs_number}` : null,
-            transliteration: p.transliteration,
-            definition: p.definition,
-            hebrew_word: p.hebrew_word,
-            greek_word: p.greek_word
-          }));
-
-        // Build structured response
-        const strongsInfo = verseWords
-          .filter((w: any) => w.strongs)
-          .map((w: any) => {
-            const lang = w.strongs?.startsWith('H') ? 'Hebrew' : 'Greek';
-            const originalWord = w.strongs?.startsWith('H') ? w.hebrew_word : w.greek_word;
-            return `
-**${w.text}** (${w.strongs})
-- **Original ${lang}:** ${originalWord || 'N/A'}
-- **Transliteration:** ${w.transliteration || 'N/A'}
-- **Definition:** ${w.definition || 'No definition available'}
-`;
-          }).join('\n');
-
-        const fullText = verseWords.map((w: any) => w.text).join(' ').trim();
-
-        return new Response(
-          JSON.stringify({
-            content: `## ${book} ${chapter}:${verse} - Strong's Concordance
-
-**Verse Text:** ${fullText}
-
-${strongsInfo || 'No Strong\'s numbers found for this verse.'}
-
----
-
-💡 **How to Use This:**
-- Click on the superscript numbers in the Bible text to see individual word definitions
-- Compare different translations to understand the nuances
-- Look for repeated Strong's numbers to find thematic connections`
-          }),
-          { headers: { ...corsHeaders, "Content-Type": "application/json" } }
-        );
-      } catch (error: any) {
-        console.error('Strong\'s lookup error:', error);
-        return new Response(
-          JSON.stringify({
-            content: `⚠️ Unable to fetch Strong's data for ${book} ${chapter}:${verse}. 
-
-This verse may not have Strong's concordance data available yet, or there was an error fetching it.
-
-**What you can try:**
-- Check if the verse reference is correct
-- Try another verse
-- The full Bible Strong's import is still in progress
-
-Error: ${error.message}`
-          }),
-          { headers: { ...corsHeaders, "Content-Type": "application/json" } }
-        );
-      }
+We're working to restore this feature soon. Thank you for your patience! 🙏`
+        }),
+        { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
 
     } else if (mode === "quarterly_analysis") {
       systemPrompt = `You are Jeeves, ${greeting}'s enthusiastic study partner helping them apply the 38-Room Phototheology Palace framework and the 5 Dimensions to Sabbath School lessons. You provide insightful, practical analysis that helps ${greeting} see deeper connections in Scripture.
