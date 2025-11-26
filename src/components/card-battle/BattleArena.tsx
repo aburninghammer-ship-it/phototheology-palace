@@ -721,13 +721,8 @@ export function BattleArena({ battle, currentUserId, onBack }: Props) {
                         {isJeeves ? '🎯 Jeeves\' Response:' : '📝 Your Response:'}
                       </p>
                       <p className="text-sm text-white/80 whitespace-pre-wrap">
-                        {isExpanded ? move.response_text : `${move.response_text.substring(0, 150)}...`}
+                        {move.response_text}
                       </p>
-                      {!isExpanded && move.response_text.length > 150 && (
-                        <button className="text-xs text-amber-400 hover:text-amber-300 mt-1">
-                          Click to see full response
-                        </button>
-                      )}
                     </div>
                     
                     <div className="pt-2 border-t border-white/10">
@@ -859,6 +854,29 @@ export function BattleArena({ battle, currentUserId, onBack }: Props) {
                   )}
                 </Button>
               </motion.div>
+            </div>
+          )}
+
+          {/* Jeeves vs Jeeves Mode: Show play buttons for each Jeeves */}
+          {!showJudgmentFeedback && isJeevesVsJeeves && aiPlayers.length === 2 && (
+            <div className="grid grid-cols-2 gap-3">
+              {aiPlayers.map((jeeves) => (
+                <motion.div key={jeeves.player_id} whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+                  <Button
+                    onClick={() => handleJeevesPlay(jeeves.player_id)}
+                    disabled={isSubmitting}
+                    className="w-full bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 font-bold py-6 text-lg shadow-lg"
+                  >
+                    {isSubmitting ? (
+                      'Playing...'
+                    ) : (
+                      <>
+                        🤖 {jeeves.display_name} Play
+                      </>
+                    )}
+                  </Button>
+                </motion.div>
+              ))}
             </div>
           )}
         </CardContent>

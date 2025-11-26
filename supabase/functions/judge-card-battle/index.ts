@@ -75,12 +75,20 @@ Bonuses (add +1 point each, max 2 bonuses):
 - "typology": Shows Christ-centered or typological depth
 - "practical": Includes actionable spiritual application
 
+CRITICAL FORMATTING RULES FOR FEEDBACK:
+- DO NOT use asterisks (*) or double asterisks (**) for emphasis
+- DO NOT use markdown formatting at all
+- DO use emojis generously to add warmth and clarity (✨ 🎯 💡 📖 🔥 ⚡ 🌟 etc.)
+- DO break feedback into clear paragraphs with blank lines between them for readability
+- Keep feedback warm, encouraging, and detailed (3-5 sentences minimum)
+- Make it conversational and personal, as if speaking directly to the player
+
 Response format (JSON only):
 {
   "verdict": "approved" | "rejected",
   "points": 0-3,
   "bonuses": ["cross_reference", "typology", "practical"],
-  "feedback": "2-3 sentence explanation in Jeeves' encouraging but discerning voice"
+  "feedback": "Warm, detailed feedback with emojis and clear paragraph breaks. No asterisks or markdown allowed."
 }`;
 
     const userPrompt = `Card Played: ${cardCode}
