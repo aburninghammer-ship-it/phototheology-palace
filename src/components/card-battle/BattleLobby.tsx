@@ -44,6 +44,14 @@ export function BattleLobby({ mode, onBattleStart, onBack }: Props) {
   const [storyReference, setStoryReference] = useState("");
   const [isCreating, setIsCreating] = useState(false);
   const [whoGoesFirst, setWhoGoesFirst] = useState<'dr_jeeves' | 'professor_jeeves'>('dr_jeeves');
+  const [battleCode, setBattleCode] = useState<string | null>(null);
+  const [waitingForOpponent, setWaitingForOpponent] = useState(false);
+  const [joinCode, setJoinCode] = useState("");
+  const [isJoining, setIsJoining] = useState(false);
+
+  const generateBattleCode = () => {
+    return Math.random().toString(36).substring(2, 8).toUpperCase();
+  };
 
   const handleCreateBattle = async () => {
     if (!storyText.trim()) {
@@ -146,16 +154,20 @@ export function BattleLobby({ mode, onBattleStart, onBack }: Props) {
         ? (whoGoesFirst === 'dr_jeeves' ? 'jeeves_1' : 'jeeves_2')
         : `user_${user.id}`;
       
+      // Generate battle code for multiplayer
+      const newBattleCode = mode === 'user_vs_user' ? generateBattleCode() : null;
+      
       // Create battle
       const { data: battle, error: battleError } = await supabase
         .from('pt_card_battles')
         .insert({
           game_mode: mode,
-          status: 'waiting',
+          status: mode === 'user_vs_user' ? 'waiting' : 'waiting',
           story_text: finalStoryText,
           story_reference: finalReference || null,
           current_turn_player: initialCurrentTurnPlayer,
           host_user_id: user.id,
+          battle_code: newBattleCode,
         })
         .select()
         .single();
@@ -207,20 +219,51 @@ export function BattleLobby({ mode, onBattleStart, onBack }: Props) {
 
       if (playersError) throw playersError;
 
-      // Start battle immediately for vs Jeeves
-      const { error: updateError } = await supabase
-        .from('pt_card_battles')
-        .update({ status: 'active' })
-        .eq('id', battle.id);
+      // For user_vs_user mode, wait for opponent
+      if (mode === 'user_vs_user') {
+        setBattleCode(newBattleCode!);
+        setWaitingForOpponent(true);
+        
+        // Subscribe to battle updates
+        const channel = supabase
+          .channel(`battle_${battle.id}`)
+          .on('postgres_changes', {
+            event: 'UPDATE',
+            schema: 'public',
+            table: 'pt_card_battles',
+            filter: `id=eq.${battle.id}`
+          }, (payload) => {
+            if (payload.new.status === 'active') {
+              toast({
+                title: "Opponent Joined!",
+                description: "The battle begins!",
+              });
+              channel.unsubscribe();
+              onBattleStart(payload.new);
+            }
+          })
+          .subscribe();
+        
+        toast({
+          title: "Battle Created!",
+          description: "Share the code with your opponent!",
+        });
+      } else {
+        // Start battle immediately for vs Jeeves and Jeeves vs Jeeves
+        const { error: updateError } = await supabase
+          .from('pt_card_battles')
+          .update({ status: 'active' })
+          .eq('id', battle.id);
 
-      if (updateError) throw updateError;
+        if (updateError) throw updateError;
 
-      toast({
-        title: "Battle Created!",
-        description: "Let the duel begin!",
-      });
+        toast({
+          title: "Battle Created!",
+          description: "Let the duel begin!",
+        });
 
-      onBattleStart({ ...battle, shouldAutoStart: mode === 'jeeves_vs_jeeves', firstPlayer: whoGoesFirst });
+        onBattleStart({ ...battle, shouldAutoStart: mode === 'jeeves_vs_jeeves', firstPlayer: whoGoesFirst });
+      }
 
     } catch (error: any) {
       console.error('Error creating battle:', error);
@@ -233,6 +276,138 @@ export function BattleLobby({ mode, onBattleStart, onBack }: Props) {
       setIsCreating(false);
     }
   };
+
+  const handleJoinBattle = async () => {
+    if (!joinCode.trim()) {
+      toast({
+        title: "Code Required",
+        description: "Please enter a battle code",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsJoining(true);
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error('Not authenticated');
+
+      // Find battle by code
+      const { data: battle, error: battleError } = await supabase
+        .from('pt_card_battles')
+        .select('*')
+        .eq('battle_code', joinCode.toUpperCase())
+        .eq('status', 'waiting')
+        .single();
+
+      if (battleError || !battle) {
+        throw new Error('Invalid or expired battle code');
+      }
+
+      // Check if already full
+      const { data: existingPlayers } = await supabase
+        .from('pt_battle_players')
+        .select('*')
+        .eq('battle_id', battle.id);
+
+      if (existingPlayers && existingPlayers.length >= 2) {
+        throw new Error('Battle is already full');
+      }
+
+      // Get remaining cards
+      const usedCards = existingPlayers?.flatMap(p => p.cards_in_hand) || [];
+      const availableCards = ALL_PRINCIPLE_CARDS.filter(c => !usedCards.includes(c));
+      const shuffled = shuffleArray(availableCards);
+
+      // Add player
+      const { error: playerError } = await supabase
+        .from('pt_battle_players')
+        .insert({
+          battle_id: battle.id,
+          player_id: `user_${user.id}`,
+          player_type: 'human',
+          user_id: user.id,
+          display_name: 'Opponent',
+          cards_in_hand: shuffled.slice(0, 7),
+        });
+
+      if (playerError) throw playerError;
+
+      // Activate battle
+      const { error: updateError } = await supabase
+        .from('pt_card_battles')
+        .update({ status: 'active' })
+        .eq('id', battle.id);
+
+      if (updateError) throw updateError;
+
+      toast({
+        title: "Joined Battle!",
+        description: "Let the duel begin!",
+      });
+
+      onBattleStart(battle);
+
+    } catch (error: any) {
+      console.error('Error joining battle:', error);
+      toast({
+        title: "Error",
+        description: error.message,
+        variant: "destructive",
+      });
+    } finally {
+      setIsJoining(false);
+    }
+  };
+
+  // Show waiting screen when waiting for opponent
+  if (waitingForOpponent && battleCode) {
+    return (
+      <motion.div
+        initial={{ opacity: 0, scale: 0.9 }}
+        animate={{ opacity: 1, scale: 1 }}
+        exit={{ opacity: 0, scale: 0.9 }}
+      >
+        <Card className="bg-white/10 backdrop-blur-xl border-white/20 text-white">
+          <CardContent className="pt-6 text-center space-y-6">
+            <motion.div
+              animate={{ rotate: 360 }}
+              transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+              className="inline-block"
+            >
+              <Sparkles className="h-16 w-16 text-amber-400" />
+            </motion.div>
+            
+            <h2 className="text-3xl font-bold">Waiting for Opponent...</h2>
+            
+            <div className="bg-gradient-to-r from-amber-500/20 to-orange-500/20 p-6 rounded-lg border-2 border-amber-400/30">
+              <p className="text-sm text-purple-200 mb-3">Share this code with your friend:</p>
+              <div className="text-5xl font-bold text-amber-400 tracking-widest mb-3">{battleCode}</div>
+              <Button
+                onClick={() => {
+                  navigator.clipboard.writeText(battleCode);
+                  toast({ title: "Copied!", description: "Battle code copied to clipboard" });
+                }}
+                className="bg-amber-500 hover:bg-amber-600"
+              >
+                Copy Code
+              </Button>
+            </div>
+
+            <p className="text-purple-200">They can join by entering this code in the VS Player lobby</p>
+            
+            <Button
+              onClick={onBack}
+              variant="outline"
+              className="border-white/30 text-white hover:bg-white/10"
+            >
+              Cancel
+            </Button>
+          </CardContent>
+        </Card>
+      </motion.div>
+    );
+  }
 
   return (
     <motion.div
@@ -259,6 +434,32 @@ export function BattleLobby({ mode, onBattleStart, onBack }: Props) {
           </div>
         </CardHeader>
         <CardContent className="space-y-6">
+          {/* Join Battle Option for user_vs_user */}
+          {mode === 'user_vs_user' && (
+            <div className="space-y-4 mb-6 p-4 bg-purple-500/20 rounded-lg border-2 border-purple-400/30">
+              <h3 className="font-bold text-white text-lg">Join an Existing Battle</h3>
+              <div className="flex gap-2">
+                <Input
+                  value={joinCode}
+                  onChange={(e) => setJoinCode(e.target.value.toUpperCase())}
+                  placeholder="Enter battle code..."
+                  className="bg-white/10 border-white/20 text-white placeholder:text-white/50 uppercase"
+                  maxLength={6}
+                />
+                <Button
+                  onClick={handleJoinBattle}
+                  disabled={isJoining || !joinCode.trim()}
+                  className="bg-purple-500 hover:bg-purple-600 whitespace-nowrap"
+                >
+                  {isJoining ? 'Joining...' : 'Join Battle'}
+                </Button>
+              </div>
+              <p className="text-xs text-purple-200">Have a code? Enter it above to join your friend's battle!</p>
+            </div>
+          )}
+
+          <div className="border-t border-white/20 pt-6" />
+
           <div className="space-y-2">
             <Label className="text-white">Bible Story or Text</Label>
             <Textarea

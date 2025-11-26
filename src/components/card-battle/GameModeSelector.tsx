@@ -21,7 +21,7 @@ const gameModes = [
     id: 'user_vs_user' as GameMode,
     icon: Swords,
     title: 'VS Player',
-    description: 'Challenge another believer',
+    description: 'Challenge Another Phototheologist',
     gradient: 'from-purple-500 to-pink-500',
     glow: 'shadow-[0_0_50px_rgba(168,85,247,0.5)]',
   },
