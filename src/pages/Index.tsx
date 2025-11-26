@@ -37,6 +37,9 @@ import { Download } from "lucide-react";
 import { Testimonials } from "@/components/Testimonials";
 import { ClearHero } from "@/components/ClearHero";
 import { MagicEyeEasterEgg } from "@/components/MagicEyeEasterEgg";
+import { ExplainerVideo } from "@/components/ExplainerVideo";
+import { WhatPhototheologyDoes } from "@/components/WhatPhototheologyDoes";
+import { WhyPeopleSwitching } from "@/components/WhyPeopleSwitching";
 
 const Index = () => {
   const navigate = useNavigate();
@@ -95,6 +98,15 @@ const Index = () => {
 
       {/* Clear Hero Section */}
       <ClearHero />
+
+      {/* Explainer Video */}
+      <ExplainerVideo />
+
+      {/* What Phototheology Does - 3 Frame Slider */}
+      <WhatPhototheologyDoes />
+
+      {/* Why People Are Switching */}
+      <WhyPeopleSwitching />
 
       {/* User Count Badge */}
       <div className="flex justify-center py-8 bg-gradient-to-b from-background to-muted/30">
