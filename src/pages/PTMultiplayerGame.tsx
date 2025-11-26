@@ -22,6 +22,17 @@ interface Player {
   consecutive_rejections: number;
 }
 
+interface Card {
+  id: string;
+  card_type: string;
+  card_data: {
+    value: string;
+    name: string;
+  };
+  is_drawn: boolean;
+  drawn_by: string | null;
+}
+
 interface Move {
   id: string;
   player_id: string;
@@ -63,6 +74,7 @@ const PTMultiplayerGame = () => {
   const [players, setPlayers] = useState<Player[]>([]);
   const [moves, setMoves] = useState<Move[]>([]);
   const [currentPlayer, setCurrentPlayer] = useState<Player | null>(null);
+  const [myCards, setMyCards] = useState<Card[]>([]);
   const [loading, setLoading] = useState(true);
   
   const [selectedCardType, setSelectedCardType] = useState<string>("");
@@ -95,6 +107,23 @@ const PTMultiplayerGame = () => {
     if (user && playersRes.data) {
       const cp = playersRes.data.find(p => p.user_id === user.id);
       setCurrentPlayer(cp || null);
+
+      // Fetch my cards
+      if (cp) {
+        const { data: cardsData } = await supabase
+          .from('pt_multiplayer_deck')
+          .select('*')
+          .eq('game_id', gameId)
+          .eq('drawn_by', cp.id)
+          .eq('is_drawn', true);
+        
+        if (cardsData) {
+          setMyCards(cardsData.map(card => ({
+            ...card,
+            card_data: card.card_data as { value: string; name: string }
+          })));
+        }
+      }
     }
 
     setLoading(false);
@@ -191,6 +220,17 @@ const PTMultiplayerGame = () => {
     if (!game || !currentPlayer) return;
     
     try {
+      // First, have Jeeves deal the cards
+      const { error: dealError } = await supabase.functions.invoke('deal-pt-cards', {
+        body: { gameId: game.id }
+      });
+
+      if (dealError) {
+        console.error("Error dealing cards:", dealError);
+        throw new Error("Failed to deal cards");
+      }
+
+      // Then activate the game
       const { error } = await supabase
         .from('pt_multiplayer_games')
         .update({ 
@@ -201,7 +241,7 @@ const PTMultiplayerGame = () => {
 
       if (error) throw error;
 
-      // Optimistically update local state so the host sees the game start immediately
+      // Optimistically update local state
       setGame((prev) =>
         prev
           ? {
@@ -212,7 +252,7 @@ const PTMultiplayerGame = () => {
           : prev
       );
       
-      toast({ title: "Game started!" });
+      toast({ title: "🎴 Jeeves has dealt the cards! Game started!" });
     } catch (error: any) {
       console.error("Error starting game:", error);
       toast({ 
@@ -434,72 +474,71 @@ const PTMultiplayerGame = () => {
                   </div>
                 </div>
 
+                {/* Show player's cards */}
+                {myCards.length > 0 && (
+                  <div className="mb-4">
+                    <label className="block text-sm font-medium mb-2 text-white">Your Cards (Principles)</label>
+                    <div className="flex flex-wrap gap-2">
+                      {myCards.map((card) => (
+                        <Badge
+                          key={card.id}
+                          variant="secondary"
+                          className="text-sm px-3 py-1 bg-purple-600 hover:bg-purple-700 cursor-pointer"
+                          onClick={() => setCardValue(card.card_data.value)}
+                        >
+                          {card.card_data.value}
+                        </Badge>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
                 {isMyTurn && !currentPlayer.skip_next_turn && game.status === 'active' && (
                   <div className="space-y-4">
                     <div>
-                      <label className="block text-sm font-medium mb-2 text-white">Select Card Type</label>
-                      <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
-                        {CARD_TYPES.slice(0, 6).map((card) => (
-                          <Button
-                            key={card.type}
-                            variant={selectedCardType === card.type ? "default" : "outline"}
-                            onClick={() => setSelectedCardType(card.type)}
-                            className="h-auto py-3 text-xs"
-                          >
-                            {card.label}
-                          </Button>
-                        ))}
-                      </div>
+                      <label className="block text-sm font-medium mb-2 text-white">
+                        Card Value (Select from your cards above or type)
+                      </label>
+                      <input
+                        type="text"
+                        value={cardValue}
+                        onChange={(e) => setCardValue(e.target.value)}
+                        className="w-full px-3 py-2 rounded-md border bg-background"
+                        placeholder="Click a card above or type (e.g., @Cy, SR, John 3:16)"
+                      />
                     </div>
 
-                    {selectedCardType && (
-                      <>
-                        <div>
-                          <label className="block text-sm font-medium mb-2 text-white">
-                            Card Value (e.g., @Cy, Story Room, John 3:16)
-                          </label>
-                          <input
-                            type="text"
-                            value={cardValue}
-                            onChange={(e) => setCardValue(e.target.value)}
-                            className="w-full px-3 py-2 rounded-md border bg-background"
-                            placeholder="Enter the specific card (e.g., @Cy, Prophecy Room, Exodus 12:13)"
-                          />
-                        </div>
+                    <div>
+                      <label className="block text-sm font-medium mb-2 text-white">
+                        Explain Your Play (How does this advance the study?)
+                      </label>
+                      <Textarea
+                        value={explanation}
+                        onChange={(e) => setExplanation(e.target.value)}
+                        placeholder="Explain how this card connects to the study topic and advances our understanding..."
+                        rows={4}
+                        className="resize-none"
+                      />
+                    </div>
 
-                        <div>
-                          <label className="block text-sm font-medium mb-2 text-white">
-                            Explain Your Play (How does this advance the study?)
-                          </label>
-                          <Textarea
-                            value={explanation}
-                            onChange={(e) => setExplanation(e.target.value)}
-                            placeholder="Explain how this card connects to the study topic and advances our understanding..."
-                            rows={4}
-                            className="resize-none"
-                          />
-                        </div>
-
-                        <Button 
-                          onClick={handlePlayCard} 
-                          disabled={submitting || !cardValue || !explanation}
-                          className="w-full bg-yellow-500 hover:bg-yellow-600 text-black font-bold"
-                          size="lg"
-                        >
-                          {submitting ? (
-                            <>
-                              <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                              Jeeves is judging...
-                            </>
-                          ) : (
-                            <>
-                              <Sparkles className="w-4 h-4 mr-2" />
-                              Submit to Jeeves
-                            </>
-                          )}
-                        </Button>
-                      </>
-                    )}
+                    <Button 
+                      onClick={handlePlayCard} 
+                      disabled={submitting || !cardValue || !explanation}
+                      className="w-full bg-yellow-500 hover:bg-yellow-600 text-black font-bold"
+                      size="lg"
+                    >
+                      {submitting ? (
+                        <>
+                          <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                          Jeeves is judging...
+                        </>
+                      ) : (
+                        <>
+                          <Sparkles className="w-4 h-4 mr-2" />
+                          Submit to Jeeves
+                        </>
+                      )}
+                    </Button>
                   </div>
                 )}
               </Card>

@@ -1,5 +1,11 @@
 project_id = "tdjtumtdkjicnhlpqqzd"
 
+[functions.deal-pt-cards]
+verify_jwt = false
+
+[functions.judge-pt-card-play]
+verify_jwt = false
+
 [api]
 enabled = true
 port = 54321
