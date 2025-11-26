@@ -1099,12 +1099,24 @@ export default function CardDeck() {
                       Jeeves' Feedback
                     </CardTitle>
                   </CardHeader>
-                  <CardContent>
+                  <CardContent className="space-y-4">
                     <ScrollArea className="h-[200px] rounded-md border p-4">
                       <div className="prose prose-sm dark:prose-invert">
                         {feedback}
                       </div>
                     </ScrollArea>
+                    
+                    <Button
+                      onClick={() => {
+                        pickRandomCard();
+                        setFeedback("");
+                        setUserAnswer("");
+                      }}
+                      className="w-full gradient-palace"
+                    >
+                      <Sparkles className="h-4 w-4 mr-2" />
+                      Draw Next Card
+                    </Button>
                   </CardContent>
                 </Card>
               )}
