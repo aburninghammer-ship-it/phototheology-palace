@@ -179,6 +179,7 @@ export function BattleArena({ battle, currentUserId, onBack }: Props) {
   const [userDisplayName, setUserDisplayName] = useState<string>("You");
   const [isUserTurn, setIsUserTurn] = useState(true);
   const [fullStoryText, setFullStoryText] = useState<string>(battle.story_text);
+  const [challengesRemaining, setChallengesRemaining] = useState<number>(3);
 
   // Fetch full verse text if only a reference is provided
   useEffect(() => {
@@ -292,6 +293,12 @@ export function BattleArena({ battle, currentUserId, onBack }: Props) {
         cards_played: Array.isArray(p.cards_played) ? p.cards_played.filter((c): c is string => typeof c === 'string') : [],
         score: p.score,
       })));
+      
+      // Update challenges remaining for current user
+      const currentUserPlayer = data.find(p => p.player_id === `user_${currentUserId}`);
+      if (currentUserPlayer && currentUserPlayer.challenges_remaining !== undefined) {
+        setChallengesRemaining(currentUserPlayer.challenges_remaining);
+      }
     }
   };
 
@@ -404,6 +411,15 @@ export function BattleArena({ battle, currentUserId, onBack }: Props) {
 
   const handleChallenge = async () => {
     if (!lastJudgment) return;
+    
+    if (challengesRemaining <= 0) {
+      toast({
+        title: "No Challenges Remaining",
+        description: "You've used all 3 challenges for this game.",
+        variant: "destructive",
+      });
+      return;
+    }
 
     setIsChallenging(true);
     try {
@@ -421,6 +437,12 @@ export function BattleArena({ battle, currentUserId, onBack }: Props) {
       if (error) throw error;
 
       const finalVerdict = data.finalVerdict;
+      const newChallenges = data.challengesRemaining;
+      
+      // Update challenges remaining
+      if (newChallenges !== undefined) {
+        setChallengesRemaining(newChallenges);
+      }
       
       if (finalVerdict === 'challenge_upheld') {
         toast({
@@ -809,13 +831,18 @@ export function BattleArena({ battle, currentUserId, onBack }: Props) {
               </div>
               
               <div className={showRejectionOptions ? 'grid grid-cols-3 gap-3' : 'grid grid-cols-2 gap-3'}>
-                <Button
-                  onClick={handleChallenge}
-                  disabled={isChallenging}
-                  className="bg-amber-600 hover:bg-amber-700 text-white font-bold"
-                >
-                  {isChallenging ? 'Challenging...' : '⚔️ Challenge Judgment'}
-                </Button>
+                <div className="space-y-1">
+                  <Button
+                    onClick={handleChallenge}
+                    disabled={isChallenging || challengesRemaining <= 0}
+                    className="bg-amber-600 hover:bg-amber-700 text-white font-bold w-full disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {isChallenging ? 'Challenging...' : '⚔️ Challenge Judgment'}
+                  </Button>
+                  <p className="text-xs text-center text-white/70">
+                    {challengesRemaining} {challengesRemaining === 1 ? 'challenge' : 'challenges'} left
+                  </p>
+                </div>
                 {showRejectionOptions && (
                   <Button
                     onClick={handlePickAnotherCard}

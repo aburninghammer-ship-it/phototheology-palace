@@ -81,11 +81,31 @@ If you still believe the original rejection was correct, respond with: "CHALLENG
     const isUpheld = reviewText.toUpperCase().includes('CHALLENGE_UPHELD');
     const finalVerdict = isUpheld ? 'challenge_upheld' : 'challenge_denied';
 
+    // Decrement challenges_remaining regardless of outcome
+    const { data: player } = await supabase
+      .from('pt_battle_players')
+      .select('score, cards_in_hand, challenges_remaining')
+      .eq('battle_id', battleId)
+      .eq('player_id', playerId)
+      .single();
+
+    if (!player) {
+      throw new Error('Player not found');
+    }
+
+    // Check if player has challenges remaining
+    if (player.challenges_remaining <= 0) {
+      return new Response(
+        JSON.stringify({ error: 'No challenges remaining' }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
     // If challenge is upheld, update the move to approved and award points
     if (isUpheld) {
       // Find the most recent rejected move for this player
       const { data: recentMove } = await supabase
-        .from('pt_card_battle_moves')
+        .from('pt_battle_moves')
         .select('*')
         .eq('battle_id', battleId)
         .eq('player_id', playerId)
@@ -97,7 +117,7 @@ If you still believe the original rejection was correct, respond with: "CHALLENG
       if (recentMove) {
         // Update the move to approved
         await supabase
-          .from('pt_card_battle_moves')
+          .from('pt_battle_moves')
           .update({
             judge_verdict: 'approved',
             judge_feedback: `[Challenge Upheld] ${reviewText.replace(/CHALLENGE_UPHELD/i, '').trim()}`,
@@ -105,31 +125,33 @@ If you still believe the original rejection was correct, respond with: "CHALLENG
           })
           .eq('id', recentMove.id);
 
-        // Award points to the player
-        const { data: player } = await supabase
-          .from('pt_card_battle_players')
-          .select('score, cards_in_hand')
+        // Award points and decrement challenges
+        await supabase
+          .from('pt_battle_players')
+          .update({
+            score: player.score + 10,
+            cards_in_hand: player.cards_in_hand.filter((c: string) => c !== cardCode),
+            challenges_remaining: player.challenges_remaining - 1,
+          })
           .eq('battle_id', battleId)
-          .eq('player_id', playerId)
-          .single();
-
-        if (player) {
-          await supabase
-            .from('pt_card_battle_players')
-            .update({
-              score: player.score + 10,
-              cards_in_hand: player.cards_in_hand.filter((c: string) => c !== cardCode),
-            })
-            .eq('battle_id', battleId)
-            .eq('player_id', playerId);
-        }
+          .eq('player_id', playerId);
       }
+    } else {
+      // Challenge denied - just decrement challenges
+      await supabase
+        .from('pt_battle_players')
+        .update({
+          challenges_remaining: player.challenges_remaining - 1,
+        })
+        .eq('battle_id', battleId)
+        .eq('player_id', playerId);
     }
 
     return new Response(
       JSON.stringify({
         finalVerdict,
         explanation: reviewText.replace(/CHALLENGE_(UPHELD|DENIED)/i, '').trim(),
+        challengesRemaining: player.challenges_remaining - 1,
       }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );

@@ -3433,6 +3433,7 @@ export type Database = {
           battle_id: string
           cards_in_hand: Json
           cards_played: Json
+          challenges_remaining: number
           display_name: string
           id: string
           is_active: boolean | null
@@ -3447,6 +3448,7 @@ export type Database = {
           battle_id: string
           cards_in_hand?: Json
           cards_played?: Json
+          challenges_remaining?: number
           display_name: string
           id?: string
           is_active?: boolean | null
@@ -3461,6 +3463,7 @@ export type Database = {
           battle_id?: string
           cards_in_hand?: Json
           cards_played?: Json
+          challenges_remaining?: number
           display_name?: string
           id?: string
           is_active?: boolean | null
