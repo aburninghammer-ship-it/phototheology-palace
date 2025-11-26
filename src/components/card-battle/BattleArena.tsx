@@ -4,9 +4,10 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { ArrowLeft, Send, Trophy, Flame, Sparkles, Save } from "lucide-react";
+import { ArrowLeft, Send, Trophy, Flame, Sparkles, Save, HelpCircle } from "lucide-react";
 import palaceImage from "@/assets/palace-card-back.jpg";
 
 interface Props {
@@ -22,6 +23,21 @@ interface Player {
   cards_played: string[];
   score: number;
 }
+
+// Principle descriptions map
+const PRINCIPLE_INFO: Record<string, { name: string; description: string }> = {
+  "CR": { name: "Concentration Room", description: "Every text must reveal Christ. No matter how ordinary a verse looks, it must point to Jesus." },
+  "DR": { name: "Dimensions Room", description: "View texts through 5 dimensions: Literal, Christ, Me (personal), Church (corporate), and Heaven (eternal)." },
+  "SR": { name: "Story Room", description: "Store Bible stories as vivid mental movies - each story becomes a memorable scene." },
+  "IR": { name: "Imagination Room", description: "Step inside stories with sanctified imagination - feel, see, and experience Scripture emotionally." },
+  "OR": { name: "Observation Room", description: "Notice details without interpretation - log fingerprints and footprints like a detective." },
+  "DC": { name: "Def-Com Room", description: "Test words under microscope - Greek/Hebrew definitions and historical/cultural commentary." },
+  "ST": { name: "Symbols/Types Room", description: "Recognize God's universal language - Lamb=Christ, Rock=Christ, Light=truth." },
+  "QR": { name: "Questions Room", description: "Ask relentless questions until truth emerges - interrogate the text thoroughly." },
+  "PR": { name: "Prophecy Room", description: "Align prophetic timelines like stars in constellations - Daniel, Revelation, and more." },
+  "BL": { name: "Blue Room (Sanctuary)", description: "The sanctuary is the blueprint of salvation - every piece points to Christ's work." },
+  "3A": { name: "Three Angels' Room", description: "The final gospel message from Revelation 14 - everlasting gospel, Babylon fallen, mark warning." },
+};
 
 export function BattleArena({ battle, currentUserId, onBack }: Props) {
   const { toast } = useToast();
@@ -300,20 +316,37 @@ export function BattleArena({ battle, currentUserId, onBack }: Props) {
               </div>
               <div className="grid grid-cols-7 gap-2">
                 {currentPlayer.cards_in_hand.map((card) => (
-                  <motion.div
-                    key={card}
-                    whileHover={{ scale: 1.1, y: -10 }}
-                    whileTap={{ scale: 0.95 }}
-                    onClick={() => setSelectedCard(card)}
-                    className={`
-                      relative cursor-pointer rounded-lg p-2 text-center text-xs font-bold
-                      bg-gradient-to-br from-purple-600 to-pink-600 border-2
-                      ${selectedCard === card ? 'border-amber-400 shadow-[0_0_20px_rgba(251,191,36,0.8)]' : 'border-purple-400/50'}
-                    `}
-                  >
-                    <img src={palaceImage} alt="card" className="w-full h-12 object-cover rounded mb-1 opacity-30" />
-                    <span className="text-white drop-shadow-lg">{card}</span>
-                  </motion.div>
+                  <div key={card} className="relative">
+                    <motion.div
+                      whileHover={{ scale: 1.1, y: -10 }}
+                      whileTap={{ scale: 0.95 }}
+                      onClick={() => setSelectedCard(card)}
+                      className={`
+                        relative cursor-pointer rounded-lg p-2 text-center text-xs font-bold
+                        bg-gradient-to-br from-purple-600 to-pink-600 border-2
+                        ${selectedCard === card ? 'border-amber-400 shadow-[0_0_20px_rgba(251,191,36,0.8)]' : 'border-purple-400/50'}
+                      `}
+                    >
+                      <img src={palaceImage} alt="card" className="w-full h-12 object-cover rounded mb-1 opacity-30" />
+                      <span className="text-white drop-shadow-lg">{card}</span>
+                    </motion.div>
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <button 
+                          className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-purple-600 border border-white/30 flex items-center justify-center text-white/80 hover:bg-purple-500 hover:text-white transition-colors z-10"
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          <HelpCircle className="w-3 h-3" />
+                        </button>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-80 bg-gradient-to-br from-purple-900 to-pink-900 border-purple-400/30">
+                        <div className="space-y-2">
+                          <h4 className="font-bold text-amber-300">{PRINCIPLE_INFO[card]?.name || card}</h4>
+                          <p className="text-sm text-white/90">{PRINCIPLE_INFO[card]?.description || "Phototheology principle"}</p>
+                        </div>
+                      </PopoverContent>
+                    </Popover>
+                  </div>
                 ))}
               </div>
             </CardContent>
@@ -361,7 +394,25 @@ export function BattleArena({ battle, currentUserId, onBack }: Props) {
                           {player?.display_name || 'Unknown'}
                           {isJeeves && <span className="text-amber-400">🤖</span>}
                         </span>
-                        <Badge className="bg-purple-500 text-white font-bold">{move.card_used}</Badge>
+                        <div className="flex items-center gap-1">
+                          <Badge className="bg-purple-500 text-white font-bold">{move.card_used}</Badge>
+                          <Popover>
+                            <PopoverTrigger asChild>
+                              <button 
+                                className="text-white/60 hover:text-purple-400 transition-colors"
+                                onClick={(e) => e.stopPropagation()}
+                              >
+                                <HelpCircle className="w-4 h-4" />
+                              </button>
+                            </PopoverTrigger>
+                            <PopoverContent className="w-80 bg-gradient-to-br from-purple-900 to-pink-900 border-purple-400/30">
+                              <div className="space-y-2">
+                                <h4 className="font-bold text-amber-300">{PRINCIPLE_INFO[move.card_used]?.name || move.card_used}</h4>
+                                <p className="text-sm text-white/90">{PRINCIPLE_INFO[move.card_used]?.description || "Phototheology principle"}</p>
+                              </div>
+                            </PopoverContent>
+                          </Popover>
+                        </div>
                         <Badge className={move.judge_verdict === 'approved' ? 'bg-green-500' : 'bg-red-500'}>
                           {move.judge_verdict === 'approved' ? '✓' : '✗'} {move.points_awarded}pts
                         </Badge>
