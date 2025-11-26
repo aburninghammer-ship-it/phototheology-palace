@@ -302,17 +302,9 @@ const PTMultiplayerGame = () => {
       setCardValue("");
       setExplanation("");
 
-      // Move to next player if approved or rejected
-      if (verdict === 'approved' || verdict === 'rejected') {
-        const currentIndex = players.findIndex(p => p.id === currentPlayer.id);
-        const nextIndex = (currentIndex + 1) % players.length;
-        const nextPlayer = players[nextIndex];
-        
-        await supabase
-          .from('pt_multiplayer_games')
-          .update({ current_turn_player_id: nextPlayer.id })
-          .eq('id', game.id);
-      }
+      // Turn advancement (including Jeeves' auto-plays) is handled entirely
+      // by the backend edge function `judge-pt-card-play` via realtime updates.
+
 
     } catch (error: any) {
       console.error("Error submitting play:", error);
