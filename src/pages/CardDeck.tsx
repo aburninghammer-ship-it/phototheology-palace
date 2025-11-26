@@ -119,6 +119,19 @@ const FEAST_ROOM_CARDS = [
   { code: "FR-Tab", name: "Tabernacles", roomName: "Feast Room", question: "How does this text point to God dwelling with us and future restoration?", floor: 5 },
 ];
 
+// Fruit Room - Fruits of the Spirit (Galatians 5:22-23)
+const FRUIT_ROOM_CARDS = [
+  { code: "FRt-Love", name: "Love", roomName: "Fruit Room", question: "How does this text demonstrate or cultivate agape love—selfless, sacrificial, unconditional?", floor: 4 },
+  { code: "FRt-Joy", name: "Joy", roomName: "Fruit Room", question: "How does this text produce or reveal joy—deep gladness rooted in God's presence?", floor: 4 },
+  { code: "FRt-Peace", name: "Peace", roomName: "Fruit Room", question: "How does this text bring shalom—wholeness, rest, reconciliation with God and others?", floor: 4 },
+  { code: "FRt-Patience", name: "Patience", roomName: "Fruit Room", question: "How does this text cultivate longsuffering—endurance under trial, slowness to anger?", floor: 4 },
+  { code: "FRt-Kindness", name: "Kindness", roomName: "Fruit Room", question: "How does this text demonstrate gentleness—tender compassion and gracious goodwill?", floor: 4 },
+  { code: "FRt-Goodness", name: "Goodness", roomName: "Fruit Room", question: "How does this text reveal moral excellence and benevolent action toward others?", floor: 4 },
+  { code: "FRt-Faithfulness", name: "Faithfulness", roomName: "Fruit Room", question: "How does this text show reliability, trustworthiness, and steadfast loyalty to God?", floor: 4 },
+  { code: "FRt-Gentleness", name: "Gentleness", roomName: "Fruit Room", question: "How does this text display meekness—strength under control, humility, teachability?", floor: 4 },
+  { code: "FRt-SelfControl", name: "Self-Control", roomName: "Fruit Room", question: "How does this text teach temperance—mastery over desires, discipline, restraint?", floor: 4 },
+];
+
 // Additional cycle and heaven cards
 const CYCLE_CARDS = [
   { code: "@Ad", name: "Adamic Cycle", question: "Apply the Adamic cycle (creation, fall, promise) to this text", floor: 6 },
@@ -280,6 +293,18 @@ export default function CardDeck() {
         question: feast.question,
         floor: feast.floor,
         floorColor: FLOOR_COLORS[(feast.floor - 1) % FLOOR_COLORS.length],
+      });
+    });
+    
+    // Add Fruit Room cards
+    FRUIT_ROOM_CARDS.forEach((fruit) => {
+      cards.push({
+        id: fruit.code.toLowerCase(),
+        code: fruit.code,
+        name: `${fruit.roomName} - ${fruit.name}`,
+        question: fruit.question,
+        floor: fruit.floor,
+        floorColor: FLOOR_COLORS[(fruit.floor - 1) % FLOOR_COLORS.length],
       });
     });
     
