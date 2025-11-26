@@ -387,14 +387,28 @@ const PTMultiplayerGame = () => {
         throw new Error("Failed to deal cards");
       }
 
+      // Refresh players to ensure we have latest data after cards dealt
+      const { data: latestPlayers } = await supabase
+        .from('pt_multiplayer_players')
+        .select('*')
+        .eq('game_id', game.id)
+        .order('joined_at');
+
+      if (latestPlayers) {
+        setPlayers(latestPlayers);
+      }
+
       // Determine who takes the first turn
       let startingPlayerId: string | null = null;
-      if (players.length > 0) {
+      const playersToUse = latestPlayers || players;
+      
+      if (playersToUse.length > 0) {
         if (game.game_mode === "jeeves-vs-jeeves") {
-          const alpha = players.find(p => p.display_name.includes('Alpha'));
-          startingPlayerId = alpha?.id ?? players[0].id;
+          const alpha = playersToUse.find(p => p.display_name.includes('Alpha'));
+          startingPlayerId = alpha?.id ?? playersToUse[0].id;
+          console.log('Starting Jeeves vs Jeeves - Alpha player:', alpha, 'Starting ID:', startingPlayerId);
         } else {
-          startingPlayerId = players[0].id;
+          startingPlayerId = playersToUse[0].id;
         }
       }
 
@@ -409,18 +423,10 @@ const PTMultiplayerGame = () => {
 
       if (error) throw error;
 
-      // Optimistically update local state
-      setGame((prev) =>
-        prev
-          ? {
-              ...prev,
-              status: 'active',
-              current_turn_player_id: startingPlayerId,
-            }
-          : prev
-      );
-      
       toast({ title: "🎴 Jeeves has dealt the cards! Game started!" });
+      
+      // Refresh game data to ensure UI is in sync
+      await fetchGameData();
     } catch (error: any) {
       console.error("Error starting game:", error);
       toast({ 
@@ -533,7 +539,7 @@ const PTMultiplayerGame = () => {
                 <div>
                   <div className="mb-6 text-center">
                     <h3 className="text-2xl font-bold text-white mb-2">
-                      {isMyTurn ? "🎯 Your Turn!" : `⏳ ${players.find(p => p.id === game.current_turn_player_id)?.display_name}'s turn...`}
+                      {isMyTurn ? "🎯 Your Turn!" : `⏳ ${players.find(p => p.id === game.current_turn_player_id)?.display_name || 'Next player'}'s turn...`}
                     </h3>
                   </div>
 
