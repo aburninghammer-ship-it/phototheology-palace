@@ -534,6 +534,14 @@ const PTMultiplayerGame = () => {
             
             <div className="relative z-10 p-8">
 
+              {game.status === 'waiting' && (
+                <div className="text-center py-12">
+                  <Loader2 className="w-12 h-12 animate-spin mx-auto mb-4 text-purple-400" />
+                  <h2 className="text-2xl font-bold text-white">Setting up the game...</h2>
+                  <p className="text-purple-200 mt-2">Jeeves is dealing the cards</p>
+                </div>
+              )}
+
               {game.status === 'active' && (
                 <div>
                   <div className="mb-6 text-center">
