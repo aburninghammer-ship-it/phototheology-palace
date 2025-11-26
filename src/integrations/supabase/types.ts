@@ -976,6 +976,48 @@ export type Database = {
         }
         Relationships: []
       }
+      deck_studies: {
+        Row: {
+          cards_used: Json
+          conversation_history: Json
+          created_at: string | null
+          gem_notes: string | null
+          gem_title: string | null
+          id: string
+          is_gem: boolean | null
+          updated_at: string | null
+          user_id: string
+          verse_reference: string | null
+          verse_text: string
+        }
+        Insert: {
+          cards_used?: Json
+          conversation_history?: Json
+          created_at?: string | null
+          gem_notes?: string | null
+          gem_title?: string | null
+          id?: string
+          is_gem?: boolean | null
+          updated_at?: string | null
+          user_id: string
+          verse_reference?: string | null
+          verse_text: string
+        }
+        Update: {
+          cards_used?: Json
+          conversation_history?: Json
+          created_at?: string | null
+          gem_notes?: string | null
+          gem_title?: string | null
+          id?: string
+          is_gem?: boolean | null
+          updated_at?: string | null
+          user_id?: string
+          verse_reference?: string | null
+          verse_text?: string
+        }
+        Relationships: []
+      }
       dojo_challenges: {
         Row: {
           challenge_type: string

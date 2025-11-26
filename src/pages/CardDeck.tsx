@@ -6,7 +6,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { palaceFloors } from "@/data/palaceData";
-import { Sparkles, HelpCircle, Timer, RefreshCw, Send, BookOpen, Loader2, MessageCircle } from "lucide-react";
+import { Sparkles, HelpCircle, Timer, RefreshCw, Send, BookOpen, Loader2, MessageCircle, Save, Gem, User, Bot } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -17,7 +17,7 @@ import palaceImage from "@/assets/palace-card-back.jpg";
 import { Users, Copy, Check } from "lucide-react";
 import { RealtimeChannel } from "@supabase/supabase-js";
 import { searchBible } from "@/services/bibleApi";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import ReactMarkdown from 'react-markdown';
 
 interface PrincipleCard {
@@ -178,6 +178,17 @@ export default function CardDeck() {
   const [selectedWord, setSelectedWord] = useState("");
   const [wordAnalysis, setWordAnalysis] = useState("");
   const [wordLoading, setWordLoading] = useState(false);
+  
+  // Save study state
+  const [saveDialogOpen, setSaveDialogOpen] = useState(false);
+  const [gemTitle, setGemTitle] = useState("");
+  const [gemNotes, setGemNotes] = useState("");
+  const [isSaving, setIsSaving] = useState(false);
+  
+  // Card selection state
+  const [pickMode, setPickMode] = useState<"jeeves" | "user">("jeeves");
+  const [cardPickerOpen, setCardPickerOpen] = useState(false);
+  const [cardsUsed, setCardsUsed] = useState<string[]>([]);
 
   useEffect(() => {
     // Build all principle cards from palace data
@@ -502,8 +513,17 @@ export default function CardDeck() {
       });
       return;
     }
+    
+    if (pickMode === "user") {
+      // User wants to choose card manually
+      setCardPickerOpen(true);
+      return;
+    }
+    
+    // Jeeves chooses randomly
     const randomCard = allCards[Math.floor(Math.random() * allCards.length)];
     setSelectedCard(randomCard);
+    setCardsUsed(prev => [...prev, randomCard.code]);
     setUserAnswer("");
     setFeedback("");
     setTimeRemaining(120);
@@ -516,6 +536,94 @@ export default function CardDeck() {
         event: 'card-selected',
         payload: { card: randomCard }
       });
+    }
+  };
+  
+  const selectCard = (cardId: string) => {
+    const card = allCards.find(c => c.id === cardId);
+    if (card) {
+      setSelectedCard(card);
+      setCardsUsed(prev => [...prev, card.code]);
+      setUserAnswer("");
+      setFeedback("");
+      setTimeRemaining(120);
+      setIsTimerActive(timerEnabled);
+      setCardPickerOpen(false);
+      
+      if (isInSession && channelRef.current) {
+        channelRef.current.send({
+          type: 'broadcast',
+          event: 'card-selected',
+          payload: { card }
+        });
+      }
+    }
+  };
+  
+  const saveStudy = async (asGem: boolean) => {
+    if (!verseText || conversationHistory.length === 0) {
+      toast({
+        title: "Nothing to save",
+        description: "Complete at least one card before saving.",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    if (asGem && !gemTitle.trim()) {
+      toast({
+        title: "Gem title required",
+        description: "Please provide a title for your gem.",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    setIsSaving(true);
+    
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        toast({
+          title: "Authentication required",
+          description: "Please sign in to save your study.",
+          variant: "destructive",
+        });
+        return;
+      }
+      
+      const studyData = {
+        user_id: user.id,
+        verse_text: verseText,
+        verse_reference: displayText.split(':')[0] || verseText.substring(0, 50),
+        cards_used: JSON.stringify(cardsUsed),
+        conversation_history: JSON.stringify(conversationHistory),
+        is_gem: asGem,
+        gem_title: asGem ? gemTitle : null,
+        gem_notes: asGem ? gemNotes : null,
+      };
+      
+      const { error } = await supabase.from('deck_studies').insert(studyData);
+      
+      if (error) throw error;
+      
+      toast({
+        title: asGem ? "Gem saved!" : "Study saved!",
+        description: asGem ? `Your gem "${gemTitle}" has been saved.` : "Your study session has been saved.",
+      });
+      
+      setSaveDialogOpen(false);
+      setGemTitle("");
+      setGemNotes("");
+    } catch (error) {
+      console.error("Error saving study:", error);
+      toast({
+        title: "Save failed",
+        description: "Could not save your study. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSaving(false);
     }
   };
 
@@ -697,40 +805,6 @@ export default function CardDeck() {
         })}
       </>
     );
-  };
-
-  const selectCard = (cardId: string) => {
-    if (!verseText.trim()) {
-      toast({
-        title: "Set your text first",
-        description: "Please set your verse or story before selecting a card.",
-        variant: "destructive",
-      });
-      return;
-    }
-    
-    const card = allCards.find(c => c.id === cardId);
-    if (card) {
-      setSelectedCard(card);
-      setUserAnswer("");
-      setFeedback("");
-      setTimeRemaining(120);
-      setIsTimerActive(timerEnabled);
-      
-      toast({
-        title: "Card selected!",
-        description: `Now apply ${card.code} to your ${textType}`,
-      });
-      
-      // Broadcast card selection to all participants in session
-      if (isInSession && channelRef.current) {
-        channelRef.current.send({
-          type: 'broadcast',
-          event: 'card-selected',
-          payload: { card }
-        });
-      }
-    }
   };
 
   // Helper function to render card question with links for DefCom cards
@@ -1010,6 +1084,7 @@ export default function CardDeck() {
                 value={verseInput}
                 onChange={(e) => setVerseInput(e.target.value)}
                 className="min-h-[100px]"
+                spellCheck={true}
               />
               
               <Button onClick={handleSetText} className="w-full">
@@ -1035,7 +1110,7 @@ export default function CardDeck() {
           {/* Pick Card Section */}
           {displayText && (
             <Card className="border-2">
-              <CardContent className="pt-6">
+              <CardContent className="pt-6 space-y-4">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <Switch
@@ -1047,11 +1122,43 @@ export default function CardDeck() {
                       Enable Timer (2 min per card)
                     </Label>
                   </div>
-                  
-                  <Button onClick={pickRandomCard} className="gradient-palace">
+                </div>
+                
+                {/* Card Pick Mode Selector */}
+                <div className="space-y-2">
+                  <Label className="text-sm font-medium">Who picks the card?</Label>
+                  <div className="flex gap-2">
+                    <Button
+                      variant={pickMode === "jeeves" ? "default" : "outline"}
+                      onClick={() => setPickMode("jeeves")}
+                      className="flex-1 gap-2"
+                    >
+                      <Bot className="h-4 w-4" />
+                      Jeeves Chooses
+                    </Button>
+                    <Button
+                      variant={pickMode === "user" ? "default" : "outline"}
+                      onClick={() => setPickMode("user")}
+                      className="flex-1 gap-2"
+                    >
+                      <User className="h-4 w-4" />
+                      I'll Choose
+                    </Button>
+                  </div>
+                </div>
+                
+                <div className="flex gap-2">
+                  <Button onClick={pickRandomCard} className="flex-1 gradient-palace">
                     <Sparkles className="h-4 w-4 mr-2" />
-                    Jeeves, Pick a Card!
+                    {pickMode === "jeeves" ? "Jeeves, Pick a Card!" : "Choose a Card"}
                   </Button>
+                  
+                  {conversationHistory.length > 0 && (
+                    <Button onClick={() => setSaveDialogOpen(true)} variant="outline" className="gap-2">
+                      <Save className="h-4 w-4" />
+                      Save Study
+                    </Button>
+                  )}
                 </div>
               </CardContent>
             </Card>
@@ -1323,6 +1430,109 @@ export default function CardDeck() {
                 </div>
               </div>
             )}
+          </ScrollArea>
+        </DialogContent>
+      </Dialog>
+      
+      {/* Save Study Dialog */}
+      <Dialog open={saveDialogOpen} onOpenChange={setSaveDialogOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Save Your Study</DialogTitle>
+            <DialogDescription>
+              Save this study session for later reference or save it as a gem
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label>Cards Used: {cardsUsed.length}</Label>
+              <p className="text-sm text-muted-foreground">
+                {cardsUsed.slice(0, 5).join(", ")}
+                {cardsUsed.length > 5 && ` and ${cardsUsed.length - 5} more...`}
+              </p>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="gem-title">Gem Title (optional)</Label>
+              <Input
+                id="gem-title"
+                placeholder="e.g., 'John 3:16 - Love Dimension Study'"
+                value={gemTitle}
+                onChange={(e) => setGemTitle(e.target.value)}
+                spellCheck={true}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="gem-notes">Notes (optional)</Label>
+              <Textarea
+                id="gem-notes"
+                placeholder="Add any additional notes or insights..."
+                value={gemNotes}
+                onChange={(e) => setGemNotes(e.target.value)}
+                className="min-h-[100px]"
+                spellCheck={true}
+              />
+            </div>
+          </div>
+          <DialogFooter className="gap-2">
+            <Button
+              variant="outline"
+              onClick={() => saveStudy(false)}
+              disabled={isSaving}
+              className="gap-2"
+            >
+              <Save className="h-4 w-4" />
+              Save Study
+            </Button>
+            <Button
+              onClick={() => saveStudy(true)}
+              disabled={isSaving || !gemTitle.trim()}
+              className="gap-2"
+            >
+              <Gem className="h-4 w-4" />
+              {isSaving ? "Saving..." : "Save as Gem"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+      
+      {/* Card Picker Dialog */}
+      <Dialog open={cardPickerOpen} onOpenChange={setCardPickerOpen}>
+        <DialogContent className="sm:max-w-4xl max-h-[80vh]">
+          <DialogHeader>
+            <DialogTitle>Choose a Card to Study</DialogTitle>
+            <DialogDescription>
+              Select a principle card to apply to your {textType}
+            </DialogDescription>
+          </DialogHeader>
+          <ScrollArea className="h-[60vh] pr-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+              {allCards.map((card) => (
+                <Card
+                  key={card.id}
+                  className={`cursor-pointer transition-all hover:scale-105 hover:shadow-lg ${card.floorColor} bg-gradient-to-br`}
+                  onClick={() => selectCard(card.id)}
+                >
+                  <CardHeader className="pb-3">
+                    <div className="flex items-start justify-between">
+                      <div className="space-y-1">
+                        <CardTitle className="text-sm">{card.name}</CardTitle>
+                        <Badge variant="outline" className="text-xs">
+                          {card.code}
+                        </Badge>
+                      </div>
+                      <Badge variant="secondary" className="text-xs">
+                        Floor {card.floor}
+                      </Badge>
+                    </div>
+                  </CardHeader>
+                  <CardContent className="pt-0">
+                    <p className="text-xs text-foreground/90 line-clamp-3">
+                      {card.question}
+                    </p>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
           </ScrollArea>
         </DialogContent>
       </Dialog>
