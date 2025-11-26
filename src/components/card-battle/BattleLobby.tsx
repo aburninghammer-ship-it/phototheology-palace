@@ -160,8 +160,24 @@ export function BattleLobby({ mode, onBattleStart, onBack }: Props) {
           display_name: 'Jeeves',
           cards_in_hand: shuffled.slice(7, 14),
         });
+      } else if (mode === 'jeeves_vs_jeeves') {
+        players.push({
+          battle_id: battle.id,
+          player_id: 'jeeves_1',
+          player_type: 'ai',
+          user_id: null,
+          display_name: 'Jeeves Alpha',
+          cards_in_hand: shuffled.slice(0, 7),
+        });
+        players.push({
+          battle_id: battle.id,
+          player_id: 'jeeves_2',
+          player_type: 'ai',
+          user_id: null,
+          display_name: 'Jeeves Beta',
+          cards_in_hand: shuffled.slice(7, 14),
+        });
       }
-      // Add other mode logic as needed
 
       const { error: playersError } = await supabase
         .from('pt_battle_players')
