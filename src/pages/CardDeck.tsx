@@ -1122,17 +1122,8 @@ export default function CardDeck() {
               Apply every Palace principle to your chosen verse or story
             </p>
             
-            {/* Multiplayer Mode Button */}
-            <Button 
-              onClick={() => window.location.href = '/pt-multiplayer'} 
-              variant="outline"
-              size="lg"
-              className="gap-2"
-            >
-              <Users className="h-5 w-5" />
-              Multiplayer Mode: Jeeves the Judge
-            </Button>
-            
+            {/* Multiplayer mode temporarily disabled */}
+
             {/* Collaboration Controls */}
             <Card className="border-2 border-primary/30">
               <CardContent className="pt-6">
