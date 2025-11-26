@@ -12,7 +12,9 @@ const PT_PRINCIPLES = {
   floor1: ["SR", "IR", "24F", "BR", "TR", "GR"],
   floor2: ["OR", "DC", "ST", "QR", "QA"],
   floor3: ["NF", "PF", "BF", "HF", "LR"],
-  floor4: ["CR", "DR", "C6", "TRm", "TZ", "PRm", "P‖", "FRt", "CEC", "R66"],
+  floor4: ["CR", "DR", "C6", "TRm", "TZ", "PRm", "P‖", "CEC", "R66"],
+  // Fruit Room expanded to 9 individual fruits of the Spirit
+  fruitRoom: ["FRt-Love", "FRt-Joy", "FRt-Peace", "FRt-Patience", "FRt-Kindness", "FRt-Goodness", "FRt-Faithfulness", "FRt-Gentleness", "FRt-SelfControl"],
   floor5: ["BL", "PR", "3A"],
   floor6: ["JR"],
   floor7: ["FRm", "MR", "SRm"],
@@ -28,6 +30,7 @@ const ALL_PRINCIPLES = [
   ...PT_PRINCIPLES.floor2,
   ...PT_PRINCIPLES.floor3,
   ...PT_PRINCIPLES.floor4,
+  ...PT_PRINCIPLES.fruitRoom,
   ...PT_PRINCIPLES.floor5,
   ...PT_PRINCIPLES.floor6,
   ...PT_PRINCIPLES.floor7,
