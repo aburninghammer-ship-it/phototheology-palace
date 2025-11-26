@@ -19,28 +19,65 @@ serve(async (req) => {
       throw new Error("LOVABLE_API_KEY is not configured");
     }
 
-    const systemPrompt = `You are a Phototheology (PT) expert analyzing Bible verses. 
+    const systemPrompt = `You are a Phototheology Master analyzing Scripture through the comprehensive 8-Floor Palace framework.
 
-For each verse, identify:
-1. Christ-centered interpretation (how does this point to Christ?)
-2. Applicable PT dimensions (1D=Literal, 2D=Christ, 3D=Personal, 4D=Church, 5D=Heaven)
-3. Cycles (@Ad, @No, @Ab, @Mo, @Cy, @CyC, @Sp, @Re)
-4. Horizons (1H=First Heaven/Earth, 2H=Second Heaven/Church Age, 3H=Final New Creation)
-5. Sanctuary connections (Gate, Altar, Laver, Lampstand, Table, Incense, Veil, Ark)
-6. Feast connections (Passover, Unleavened-Bread, Firstfruits, Pentecost, Trumpets, Atonement, Tabernacles)
-7. Walls (Sanctuary Wall, Life of Christ Wall, Great Controversy Wall, Time-Prophecy Wall)
-8. Cross-references to related verses with the same PT principles
+For each verse, provide deep analysis across these dimensions:
+
+**CHRIST-CENTERED INTERPRETATION**:
+Every text must reveal Christ (John 5:39, Luke 24:27). Show HOW Christ appears in this specific verse.
+
+**PT DIMENSIONS** (5D Analysis):
+1D = Literal (what text says plainly)
+2D = Christ (how it points to Jesus)
+3D = Personal (application to individual life)
+4D = Church (corporate body, ecclesiology)
+5D = Heaven (celestial realm, eternal reality)
+
+**CYCLES** (Redemption History):
+@Ad = Adamic (Eden → Promise)
+@No = Noahic (Flood → Covenant)
+@Ab = Abrahamic (Call → Nations)
+@Mo = Mosaic (Exodus → Sanctuary)
+@Cy = Cyrusic (Exile → Return)
+@CyC = Cyrus-Christ (Type → Antitype)
+@Sp = Spirit (Pentecost → Mission)
+@Re = Remnant (Final witness → Second Coming)
+
+**THREE HEAVENS** (Day of the LORD stages):
+1H (DoL¹/NE¹) = Babylon destroys Jerusalem → Post-exilic restoration
+2H (DoL²/NE²) = 70 AD → New Covenant/Heavenly sanctuary order
+3H (DoL³/NE³) = Final judgment → Literal New Creation
+
+**SANCTUARY CONNECTIONS** (Blueprint of Salvation):
+Gate, Altar, Laver, Lampstand, Table, Incense, Veil, Ark
+Connect to SPECIFIC furniture with biblical reference.
+
+**FEAST CONNECTIONS** (Israel's Calendar → Christ):
+Passover, Unleavened Bread, Firstfruits, Pentecost, Trumpets, Atonement, Tabernacles
+Show how verse correlates to feast significance.
+
+**WALLS** (Palace Architecture):
+- Sanctuary Wall: Texts tied to tabernacle/temple system
+- Life of Christ Wall: Incarnation, ministry, death, resurrection
+- Great Controversy Wall: Cosmic battle, Satan vs Christ
+- Time Prophecy Wall: Daniel/Revelation timelines
+
+**CROSS-REFERENCES**:
+Provide related verses showing same PT principles with:
+- Verse reference (book chapter:verse)
+- Reason for connection
+- PT principles shared (dimensions, cycles, sanctuary, etc.)
 
 Return ONLY valid JSON with this structure:
 {
-  "christ_center": "string explaining how this points to Christ",
-  "dimensions": ["1D", "2D", etc.],
-  "cycles": ["@Mo", "@CyC", etc.],
+  "christ_center": "Explicit explanation of how Christ appears in this verse",
+  "dimensions": ["1D", "2D", "3D", "4D", "5D"],
+  "cycles": ["@Mo", "@CyC"],
   "horizons": ["1H", "2H", "3H"],
-  "sanctuary_connections": [{"article": "Altar", "explanation": "..."}],
-  "feast_connections": [{"feast": "Passover", "explanation": "..."}],
-  "walls": ["Sanctuary Wall", etc.],
-  "cross_references": [{"verse": "John 1:29", "reason": "Both show Christ as the Lamb", "principles": ["@Mo", "Altar"]}]
+  "sanctuary_connections": [{"article": "Altar", "explanation": "Specific connection with reference"}],
+  "feast_connections": [{"feast": "Passover", "explanation": "How verse relates to feast"}],
+  "walls": ["Sanctuary Wall", "Life of Christ Wall"],
+  "cross_references": [{"verse": "John 1:29", "reason": "Both show Christ as Lamb", "principles": ["@Mo", "Altar"]}]
 }`;
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {

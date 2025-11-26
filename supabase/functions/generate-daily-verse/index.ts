@@ -61,48 +61,66 @@ const GENRE_CODES = {
   epistle: "✉️Epistle"
 };
 
-// Palace principles that can be applied
+// Complete Palace principles from the PT knowledge bank
 const PALACE_PRINCIPLES = [
   // Floor 1 - Furnishing (Width)
-  { code: "SR", name: "Story Room", description: "Turn verse into vivid mental movie with concrete imagery", category: "1st Floor" },
-  { code: "IR", name: "Imagination Room", description: "Immerse yourself IN the scene - sensory details as if present", category: "1st Floor" },
+  { code: "SR", name: "Story Room", description: "Turn verse into vivid mental movie - sequence of scenes", category: "1st Floor" },
+  { code: "IR", name: "Imagination Room", description: "Step INSIDE the story - feel, see, hear as if present", category: "1st Floor" },
+  { code: "24F", name: "24FPS Room", description: "Symbolic frame for chapter - memorable image anchor", category: "1st Floor" },
+  { code: "BR", name: "Bible Rendered", description: "Master image for 24-chapter block", category: "1st Floor" },
+  { code: "TR", name: "Translation Room", description: "Turn abstract words into concrete pictures", category: "1st Floor" },
+  { code: "GR", name: "Gems Room", description: "Striking insight that shines - treasury point", category: "1st Floor" },
   
   // Floor 2 - Investigation (Width)
-  { code: "OR", name: "Observation Room", description: "Notice specific details, literary devices, textual clues", category: "2nd Floor" },
-  { code: "DC", name: "Def-Com", description: "Examine Greek/Hebrew meanings and context", category: "2nd Floor" },
-  { code: "ST", name: "Symbols/Types", description: "Identify concrete symbols/types pointing to Christ (e.g., lamb=Christ)", category: "2nd Floor" },
+  { code: "OR", name: "Observation Room", description: "Log forensic details - fingerprints of meaning", category: "2nd Floor" },
+  { code: "DC", name: "Def-Com", description: "Greek/Hebrew + historical/cultural context", category: "2nd Floor" },
+  { code: "ST", name: "Symbols/Types", description: "God's universal language - shadows of Christ", category: "2nd Floor" },
+  { code: "QR", name: "Questions Room", description: "75 questions: intra/inter/phototheological", category: "2nd Floor" },
+  { code: "QA", name: "Q&A Internship", description: "Scripture answers Scripture - witness cross-exam", category: "2nd Floor" },
   
   // Floor 3 - Freestyle (Time)
-  { code: "NF", name: "Nature Freestyle", description: "Connect to nature elements (tree, storm, sunrise, etc.)", category: "3rd Floor" },
-  { code: "PF", name: "Personal Freestyle", description: "Apply to personal life experiences and journey", category: "3rd Floor" },
-  { code: "BF", name: "Bible Freestyle", description: "Connect to related verses through verse genetics", category: "3rd Floor" },
+  { code: "NF", name: "Nature Freestyle", description: "Nature as second book - creation sermon", category: "3rd Floor" },
+  { code: "PF", name: "Personal Freestyle", description: "Life experiences as object lessons", category: "3rd Floor" },
+  { code: "BF", name: "Bible Freestyle", description: "Verse genetics - family tree of Scripture", category: "3rd Floor" },
+  { code: "HF", name: "History Freestyle", description: "Culture, events, society as teaching points", category: "3rd Floor" },
+  { code: "LR", name: "Listening Room", description: "Conversations as springboards for Scripture", category: "3rd Floor" },
   
   // Floor 4 - Next Level (Depth)
-  { code: "CR", name: "Concentration Room", description: "Show HOW Christ is revealed in this verse", category: "4th Floor" },
-  { code: "DR-Lit", name: "Literal Dimension", description: "What the text literally means", category: "4th Floor" },
-  { code: "DR-Christ", name: "Christ Dimension", description: "How does it point to Jesus?", category: "4th Floor" },
-  { code: "DR-Me", name: "Personal Dimension", description: "How does it apply to me?", category: "4th Floor" },
-  { code: "DR-Church", name: "Church Dimension", description: "How does it apply to the church?", category: "4th Floor" },
-  { code: "DR-Heaven", name: "Heaven Dimension", description: "How does it apply to heaven/eternity?", category: "4th Floor" },
-  { code: "TRm", name: "Theme Room", description: "Map to Palace walls (Sanctuary, Life of Christ, Great Controversy, etc.)", category: "4th Floor" },
-  { code: "PRm", name: "Patterns Room", description: "Name pattern and give at least one other biblical example with reference", category: "4th Floor" },
-  { code: "P‖", name: "Parallels Room", description: "Cite at least ONE specific parallel event with reference", category: "4th Floor" },
-  { code: "FRt", name: "Fruit Room", description: "Name specific Christlike character trait this cultivates", category: "4th Floor" },
+  { code: "CR", name: "Concentration Room", description: "Every text must reveal Christ - magnifying glass", category: "4th Floor" },
+  { code: "DR", name: "Dimensions Room", description: "5 layers: Literal/Christ/Me/Church/Heaven", category: "4th Floor" },
+  { code: "C6", name: "Connect 6", description: "Genre classification - language rules", category: "4th Floor" },
+  { code: "TRm", name: "Theme Room", description: "Great walls: Sanctuary/Christ/Controversy/Prophecy", category: "4th Floor" },
+  { code: "TZ", name: "Time Zone", description: "6 zones: Earth/Heaven × Past/Present/Future", category: "4th Floor" },
+  { code: "PRm", name: "Patterns Room", description: "Recurring motifs across Scripture symphony", category: "4th Floor" },
+  { code: "P‖", name: "Parallels Room", description: "Mirrored actions - hall of reflections", category: "4th Floor" },
+  { code: "FRt", name: "Fruit Room", description: "Produces Christlike character - taste test", category: "4th Floor" },
+  { code: "CEC", name: "Christ in Chapter", description: "Name and trace Christ-thread explicitly", category: "4th Floor" },
+  { code: "R66", name: "Room 66", description: "One theme through all 66 books - integrity at scale", category: "4th Floor" },
   
   // Floor 5 - Vision (Depth)
-  { code: "BL", name: "Blue Room", description: "Connect to specific sanctuary furniture/services", category: "5th Floor" },
-  { code: "PR", name: "Prophecy Room", description: "Align with prophetic timelines", category: "5th Floor" },
+  { code: "BL", name: "Blue Room (Sanctuary)", description: "Blueprint of salvation - pattern of all things", category: "5th Floor" },
+  { code: "PR", name: "Prophecy Room", description: "Telescope lens - stars in constellations", category: "5th Floor" },
+  { code: "3A", name: "Three Angels", description: "Final gospel syllabus - Rev 14:6-12", category: "5th Floor" },
+  { code: "Feasts", name: "Feasts Room", description: "Which feast correlates - Israel's calendar pointing to Christ", category: "5th Floor" },
   
   // Floor 6 - Three Heavens & Cycles (Depth)
-  { code: "@Ad", name: "Adamic Cycle", description: "First cycle: Fall → Promise → Seed conflict", category: "6th Floor" },
-  { code: "@Mo", name: "Mosaic Cycle", description: "Exodus → Covenant → Sanctuary nation", category: "6th Floor" },
-  { code: "@CyC", name: "Cyrus-Christ Cycle", description: "Type meets antitype in Christ", category: "6th Floor" },
-  { code: "@Sp", name: "Spirit Cycle", description: "Church age under Spirit power", category: "6th Floor" },
-  { code: "@Re", name: "Remnant Cycle", description: "Final witness before Second Coming", category: "6th Floor" },
+  { code: "@Ad", name: "Adamic Cycle", description: "Eden → Promise → Seed conflict", category: "6th Floor" },
+  { code: "@No", name: "Noahic Cycle", description: "Flood → Rainbow covenant → Reset", category: "6th Floor" },
+  { code: "@Ab", name: "Abrahamic Cycle", description: "Call → Nations blessed → One family", category: "6th Floor" },
+  { code: "@Mo", name: "Mosaic Cycle", description: "Exodus → Sinai → Tabernacle nation", category: "6th Floor" },
+  { code: "@Cy", name: "Cyrusic Cycle", description: "Exile → Return → Temple rebuilt", category: "6th Floor" },
+  { code: "@CyC", name: "Cyrus-Christ Cycle", description: "Type meets Antitype - true Anointed", category: "6th Floor" },
+  { code: "@Sp", name: "Spirit Cycle", description: "Pentecost → Global mission → Spirit power", category: "6th Floor" },
+  { code: "@Re", name: "Remnant Cycle", description: "Final apostasy → Witness → Second Coming", category: "6th Floor" },
+  { code: "1H", name: "First Heaven (DoL¹/NE¹)", description: "Babylon destroys Jerusalem → Post-exilic restoration", category: "6th Floor" },
+  { code: "2H", name: "Second Heaven (DoL²/NE²)", description: "70 AD → New Covenant/Heavenly sanctuary order", category: "6th Floor" },
+  { code: "3H", name: "Third Heaven (DoL³/NE³)", description: "Final judgment → Literal New Creation", category: "6th Floor" },
+  { code: "JR", name: "Juice Room", description: "Squeeze entire book with all PT principles", category: "6th Floor" },
   
   // Floor 7 - Spiritual & Emotional (Height)
-  { code: "FRm", name: "Fire Room", description: "Feel the emotional weight and conviction of the text", category: "7th Floor" },
-  { code: "MR", name: "Meditation Room", description: "Slow down and marinate in the truth", category: "7th Floor" }
+  { code: "FRm", name: "Fire Room", description: "Emotional weight burns - conviction furnace", category: "7th Floor" },
+  { code: "MR", name: "Meditation Room", description: "Slow marination - breathe the words", category: "7th Floor" },
+  { code: "SR", name: "Speed Room", description: "Rapid application - sprint reflexes", category: "7th Floor" }
 ];
 
 serve(async (req) => {
@@ -259,126 +277,130 @@ serve(async (req) => {
       return `Floor ${floorNum}: ${p.code} - ${p.name} (${p.description})`;
     }).join('\n');
     
-    const prompt = `You are a Phototheology expert demonstrating the CREATIVE GENIUS of the Phototheology system.
+    const prompt = `You are a Phototheology Master analyzing Scripture through the 8-Floor Palace framework.
 
 Verse: ${verseReference}
 "${verseText}"
 
-**THE POWER OF PHOTOTHEOLOGY**:
-Phototheology's genius is that ANY verse can be analyzed through MULTIPLE analytical lenses to extract deeper meaning. You are NOT just identifying what the verse reveals - you are ACTIVELY APPLYING different tools to discover hidden connections and insights.
+**PHOTOTHEOLOGY VISION**:
+The Bible is not just words - it's images, symbols, living stories. You're restoring God's visual and narrative teaching method. Every verse belongs in a palace chamber, revealing Christ from a unique angle.
 
-**CRITICAL - FLOOR ASSIGNMENTS**:
-You MUST use the principles in the EXACT order given below. The floor number is determined by the position in the list:
-
+**YOUR ASSIGNED ROOMS** (Use EXACTLY these, in order):
 ${principlesWithFloors}
 
-**VERSE GENRE (What is Revealed)**:
-First, identify the verse's literary category - what TYPE of text this is:
-Use ONE of these codes: 📖Gospel, ⚖️Law, 📜History, 🎵Poetry, 🔮Prophecy, or ✉️Epistle
+**VERSE GENRE** (Connect 6 classification):
+Identify: 📖Gospel, ⚖️Law, 📜History, 🎵Poetry, 🔮Prophecy, or ✉️Epistle
 
-**CRITICAL UNDERSTANDING**:
-These principles are ANALYTICAL TOOLS, not just descriptions of what the verse "is about."
-Show the FLEXIBILITY and DEPTH of Phototheology by making creative, insightful connections that reveal Christ in fresh ways.
+**ROOM-BY-ROOM INSTRUCTIONS**:
 
-**CRITICAL - SPECIFIC CODES FOR principle_applied**:
-You MUST use these EXACT emoji/symbol codes in the principle_applied field:
+**Story Room (SR)**: Sequence of scenes - not summary. Show the mental movie frame by frame.
 
-For Connect 6 room: Use EXACT genre emoji codes:
-  - 📖Gospel (not C6 or gospel)
-  - ⚖️Law (not C6 or law)
-  - 📜History (not C6 or history)
-  - 🎵Poetry (not C6 or poetry)
-  - 🔮Prophecy (not C6 or prophecy)
-  - ✉️Epistle (not C6 or epistle)
+**Imagination Room (IR)**: Step INSIDE. "I feel the sand... I hear the crowd... I smell the burning incense..." Make it sensory and present-tense.
 
-For Time Zone room: Use EXACT zone emoji codes:
-  - 🌍Past (not TZ or Earth Past)
-  - 🌍Now (not TZ or Earth Now)
-  - 🌍Future (not TZ or Earth Future)
-  - ☁️Past (not TZ or Heaven Past)
-  - ☁️Now (not TZ or Heaven Now)
-  - ☁️Future (not TZ or Heaven Future)
+**24FPS (24F)**: Create ONE strange, memorable image to anchor this chapter. Example: Genesis 3 = "snake biting apple-clock" (fall into time).
 
-For Cycle rooms: Use EXACT cycle codes:
-  - @Ad (not Cycles or Adamic)
-  - @Mo (not Cycles or Mosaic)
-  - @CyC (not Cycles or Cyrus-Christ)
-  - @Sp (not Cycles or Spirit)
-  - @Re (not Cycles or Remnant)
+**Translation Room (TR)**: Turn abstract phrase into concrete picture. "Thy word is a lamp" → glowing scroll lighting dark path.
 
-For all other rooms (SR, IR, OR, DC, ST, CR, DR, TRm, PRm, P‖, FRt, BL, PR):
-  - Use the exact room code as-is (e.g., SR, OR, CR)
+**Gems Room (GR)**: A striking, quotable insight. Example: "David took 5 stones because Goliath had 4 brothers (2 Sam 21:22)."
 
-CRITICAL INSTRUCTIONS FOR EACH PRINCIPLE TYPE:
+**Observation Room (OR)**: Forensic details. "Note the word 'yet' in line 3... the repetition of 'behold'... the chiastic structure..."
 
-**Story Room (SR)**: Create a vivid scene with concrete imagery (not generic statements).
+**Def-Com (DC)**: Greek/Hebrew + cultural context. Example: "agapao vs phileo distinction in John 21."
 
-**Imagination Room (IR)**: Place yourself IN the scene - describe sensory details as if you were actually present.
+**Symbols/Types (ST)**: Name the symbol profile. "Lamb = Christ (John 1:29), Rock = Christ (1 Cor 10:4)."
 
-**Observation Room (OR)**: Point out specific words, literary devices, or textual patterns IN THE TEXT.
+**Questions Room (QR)**: Ask 3 probing questions about THIS text. Intra: Why this word? Inter: Where else? PT: Which rooms activate?
 
-**Symbols/Types (ST)**: Name specific symbols with what they represent (e.g., "lamb = Christ in John 1:29", "water = Spirit in John 7:38").
+**Q&A Internship (QA)**: Cross-reference answer. "Why did the father run? Ps 103:13 answers: 'Like as a father pitieth his children.'"
 
-**Concentration Room (CR)**: Explicitly show HOW Christ is revealed in this specific verse.
+**Nature Freestyle (NF)**: "A tree by water → Ps 1, the righteous rooted." Connect to creation.
 
-**Dimensions (DR-Lit, DR-Christ, DR-Me, DR-Church, DR-Heaven)**: Pick ONE specific dimension and show how the verse reveals meaning in that layer. Example for DR-Christ: "This verse reveals Christ as the ultimate gift - God's own Son given for humanity's redemption."
+**Personal Freestyle (PF)**: "Being stuck in traffic → Israel at Red Sea, learning patience."
 
-**Connect 6 (C6)**: You MUST connect to a SPECIFIC verse or story from a DIFFERENT GENRE with full reference. 
-- If verse is Gospel → connect to Prophecy, Psalm, Law, History, or Epistle
-- If verse is Prophecy → connect to Gospel, History, Poetry, Law, or Epistle
-- Example: "This Gospel verse (John 3:16) connects to Leviticus 16:15-16 (Law/Type) - the atoning sacrifice on the Day of Atonement foreshadows God giving His Son."
+**Bible Freestyle (BF)**: Verse genetics. "John 3:16 and Rom 5:8 are brothers - both reveal God's love at the cross."
 
-**Time Zone (TZ)**: You MUST specify which of the 6 TIME ZONES apply:
-- EARTH Past (historical events)
-- EARTH Present (ongoing reality)  
-- EARTH Future (prophecy on earth)
-- HEAVEN Past (what happened in heaven)
-- HEAVEN Present (current heavenly ministry)
-- HEAVEN Future (eternal promises)
-Example: "This verse spans multiple zones: EARTH Past - the cross event (He gave His Son); EARTH Present - ongoing choice to believe; HEAVEN Future - eternal life in God's presence realized."
+**History Freestyle (HF)**: "Social media uniting the world → spirit of Babel (Gen 11)."
 
-**Patterns Room (PRm)**: Name the pattern and give at least ONE other biblical example with reference (e.g., "The 'only son' pattern: Isaac (Gen 22), Christ (John 3:16)").
+**Listening Room (LR)**: "Friend talks anxiety → Phil 4:6, 'be careful for nothing.'"
 
-**Parallels Room (P‖)**: Cite at least ONE specific parallel event with reference (e.g., "This mirrors the bronze serpent in Numbers 21:8-9 - lifted up for healing").
+**Concentration Room (CR)**: Show HOW Christ appears. Not generic - specific to THIS verse.
 
-**Fruit Room (FRt)**: Name the specific fruit of the Spirit (Gal 5:22-23) or Christlike trait this cultivates.
+**Dimensions Room (DR)**: Hit all 5: Literal (what it says), Christ (points to Jesus), Me (applies to me), Church (corporate body), Heaven (eternal reality).
 
-**Blue Room (BL)**: Connect this verse to SPECIFIC sanctuary furniture or services with reference. Example: "This promise of divine strength connects to the altar of incense (Exo 30:7-8) - continual prayer empowers the believer, just as the perpetual incense represents ceaseless intercession before God's throne."
+**Connect 6 (C6)**: Genre rules. Cite ONE cross-genre connection with reference.
 
-**Prophecy Room (PR)**: You MUST connect this verse to a SPECIFIC prophetic passage from Daniel, Revelation, Matthew 24, or other end-time prophecy with full reference. The goal is NOT to assess if the verse itself is prophetic, but to LINK it TO prophetic themes. Example: "This promise of power, love, and sound mind connects directly to Revelation 14:12 - 'Here is the patience of the saints' - equipping God's remnant people to stand firm during the final crisis when the enemy uses fear to silence truth, enabling them to boldly proclaim the three angels' messages."
+**Theme Room (TRm)**: Which wall? Sanctuary/Life of Christ/Great Controversy/Time Prophecy.
 
-**Cycles Room (@Cycles)**: Identify which cycle this verse belongs to (e.g., @CyC for Gospel era, @Mo for Exodus era) AND connect to another cycle. Example: "This @CyC (Christ) verse echoes @Mo (Mosaic) - as Moses lifted the serpent (Num 21:9), so Christ was lifted up."
+**Time Zone (TZ)**: Mark zones: Earth-Past/Now/Future, Heaven-Past/Now/Future. Span multiple if needed.
 
-For EACH of the 7 principles listed above, provide:
+**Patterns Room (PRm)**: Name pattern + biblical examples. "40-day pattern: Noah's rain, Moses on Sinai, Jesus in wilderness."
+
+**Parallels Room (P‖)**: Mirrored action. "Babel (languages divided) || Pentecost (languages united)."
+
+**Fruit Room (FRt)**: Which fruit of Spirit (Gal 5:22-23)? Love, joy, peace, patience, kindness, goodness, faithfulness, gentleness, self-control.
+
+**Christ in Chapter (CEC)**: If analyzing a chapter, name Christ's role explicitly. "Christ as Bread of Life in John 6."
+
+**Room 66 (R66)**: If tracing theme, show ONE crisp claim per book across all 66.
+
+**Blue Room (BL)**: Sanctuary blueprint. Connect to Gate/Altar/Laver/Lampstand/Table/Incense/Veil/Ark with reference.
+
+**Prophecy Room (PR)**: Telescope lens. Connect to Daniel 2/7/8, Rev 13-14 timelines.
+
+**Three Angels (3A)**: Link to Rev 14:6-12 messages. Everlasting gospel, Babylon fallen, beast/mark warning.
+
+**Feasts Room (Feasts)**: Which feast? Passover/Unleavened Bread/Firstfruits/Pentecost/Trumpets/Atonement/Tabernacles. Show correlation.
+
+**Cycles (@Ad/@No/@Ab/@Mo/@Cy/@CyC/@Sp/@Re)**: Place in redemption cycle. Example: John 3:16 = @CyC (Christ fulfills covenant).
+
+**Three Heavens (1H/2H/3H)**: 
+- 1H (DoL¹/NE¹) = Babylon destruction → post-exilic restoration
+- 2H (DoL²/NE²) = 70 AD → New Covenant/heavenly sanctuary
+- 3H (DoL³/NE³) = Final judgment → literal New Creation
+
+**Juice Room (JR)**: If analyzing whole book, squeeze with ALL principles at once.
+
+**Fire Room (FRm)**: Emotional weight. "Feel the crushing loneliness of Gethsemane... tremble at 'My God, why?'"
+
+**Meditation Room (MR)**: Slow marination. "Breathe 'The LORD is my shepherd'... rest in it."
+
+**Speed Room (SR)**: Rapid fire. "Genesis 1-11 in 60 seconds: creation, fall, flood, Babel."
+
+**CRITICAL OUTPUT REQUIREMENTS**:
+
+For EACH principle in your assigned list, provide:
 1. principle_applied: The principle code exactly as shown (e.g., IR, ST, NF, DR-Christ, etc.)
 2. floor: The floor number from the list above (Floor 1, Floor 2, Floor 3, Floor 4, Floor 5, Floor 6, or Floor 7)
 3. application: A ROBUST, detailed paragraph (2-3 sentences minimum) showing HOW the principle is applied
 4. key_insight: A memorable "gem" from this application
 5. practical_takeaway: A clear, actionable step the reader can take today
 
-**CRITICAL VALIDATION**: 
-- verse_genre: ONE genre code (📖Gospel, ⚖️Law, 📜History, 🎵Poetry, 🔮Prophecy, or ✉️Epistle)
-- breakdown: EXACTLY 7 items IN THE ORDER LISTED ABOVE
-- Each principle_applied MUST match the code from the list above
-- Each floor MUST match the floor number from the list above (Floor 1 through Floor 7)
-
-Format your response as a structured JSON with this exact schema:
+**OUTPUT FORMAT** (valid JSON):
 {
   "verse_genre": "📖Gospel",
   "breakdown": [
     {
-      "principle_applied": "IR",
-      "principle_code": "IR",
-      "principle_name": "Imagination Room",
-      "floor": "Floor 1",
-      "application": "specific, concrete application",
-      "key_insight": "memorable insight",
-      "practical_takeaway": "clear action step"
+      "principle_applied": "SR",
+      "principle_code": "SR",
+      "principle_name": "Story Room",
+      "floor": "1st Floor",
+      "application": "Vivid 3+ sentence paragraph showing concrete scene sequence",
+      "key_insight": "Memorable gem - quotable truth revealed",
+      "practical_takeaway": "One clear action step for today"
     }
   ]
 }
 
-Make it engaging, Christ-centered, specific, and practically applicable.`;
+**VALIDATION CHECKLIST**:
+✓ verse_genre = ONE code (📖Gospel/⚖️Law/📜History/🎵Poetry/🔮Prophecy/✉️Epistle)
+✓ breakdown = EXACTLY 7 items, using ASSIGNED principles IN ORDER
+✓ Each principle_applied = exact code from your list (SR, @Mo, BL, etc.)
+✓ Each floor = matches assignment (1st Floor, 2nd Floor... 7th Floor)
+✓ Each application = robust 2-3+ sentences with specifics
+✓ Christ-centered, scripture-saturated, practically applicable
+
+**THE PHOTOTHEOLOGY DIFFERENCE**:
+You're not just explaining the verse. You're demonstrating HOW the Palace system trains believers to think in Scripture reflexively - to see Christ in all things, to connect verses like verse genetics, to feel truth in the Fire Room, to map prophecy in the Telescope. Make every room COME ALIVE.`;
 
     const aiResponse = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
       method: 'POST',
