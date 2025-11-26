@@ -59,12 +59,12 @@ const PRINCIPLE_INFO: Record<string, { name: string; description: string }> = {
   "FRt": { name: "Fruit Room", description: "Test if study produces Christlike character - love, joy, peace, patience, and all fruits of the Spirit." },
   
   // Time Zone sub-cards
-  "TZ-HP": { name: "Heaven-Past", description: "View text through Heaven-Past: before earth's creation, Lucifer's rebellion, the origin of the great controversy." },
-  "TZ-HN": { name: "Heaven-Present", description: "View text through Heaven-Present: Christ's intercession, sanctuary ministry, the mediatorial work happening now." },
-  "TZ-HF": { name: "Heaven-Future", description: "View text through Heaven-Future: new heaven, eternal throne, ultimate restoration with God." },
-  "TZ-EP": { name: "Earth-Past", description: "View text through Earth-Past: historical biblical events already fulfilled in redemptive history." },
-  "TZ-EN": { name: "Earth-Present", description: "View text through Earth-Present: current application to believers today, how we live now." },
-  "TZ-EF": { name: "Earth-Future", description: "View text through Earth-Future: end-time events, Second Coming, final prophecies yet to be fulfilled." },
+  "HP": { name: "Heaven-Past", description: "View text through Heaven-Past: before earth's creation, Lucifer's rebellion, the origin of the great controversy." },
+  "HN": { name: "Heaven-Present", description: "View text through Heaven-Present: Christ's intercession, sanctuary ministry, the mediatorial work happening now." },
+  "HFu": { name: "Heaven-Future", description: "View text through Heaven-Future: new heaven, eternal throne, ultimate restoration with God." },
+  "EPa": { name: "Earth-Past", description: "View text through Earth-Past: historical biblical events already fulfilled in redemptive history." },
+  "EP": { name: "Earth-Present", description: "View text through Earth-Present: current application to believers today, how we live now." },
+  "EF": { name: "Earth-Future", description: "View text through Earth-Future: end-time events, Second Coming, final prophecies yet to be fulfilled." },
   
   // Dimensions sub-cards
   "DR-1D": { name: "1D (Literal-Historical)", description: "What actually happened in the original context? What did it mean to the original audience?" },

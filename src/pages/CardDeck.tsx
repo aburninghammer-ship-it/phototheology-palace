@@ -55,12 +55,12 @@ const CONNECT_6_CARDS = [
 
 // Time Zone Cards - each zone gets its own card
 const TIME_ZONE_CARDS = [
-  { code: "TZ-HP", name: "Heaven-Past", roomName: "Time Zone", question: "How does this text speak when viewed through Heaven-Past (before earth's creation, Lucifer's rebellion)?", floor: 4 },
-  { code: "TZ-HN", name: "Heaven-Present", roomName: "Time Zone", question: "How does this text speak when viewed through Heaven-Present (Christ's intercession, sanctuary ministry)?", floor: 4 },
-  { code: "TZ-HF", name: "Heaven-Future", roomName: "Time Zone", question: "How does this text speak when viewed through Heaven-Future (new heaven, eternal throne)?", floor: 4 },
-  { code: "TZ-EP", name: "Earth-Past", roomName: "Time Zone", question: "How does this text speak when viewed through Earth-Past (historical biblical events already fulfilled)?", floor: 4 },
-  { code: "TZ-EN", name: "Earth-Present", roomName: "Time Zone", question: "How does this text speak when viewed through Earth-Present (current application to believers today)?", floor: 4 },
-  { code: "TZ-EF", name: "Earth-Future", roomName: "Time Zone", question: "How does this text speak when viewed through Earth-Future (end-time events, Second Coming)?", floor: 4 },
+  { code: "HP", name: "Heaven-Past", roomName: "Time Zone", question: "How does this text speak when viewed through Heaven-Past (before earth's creation, Lucifer's rebellion)?", floor: 4 },
+  { code: "HN", name: "Heaven-Present", roomName: "Time Zone", question: "How does this text speak when viewed through Heaven-Present (Christ's intercession, sanctuary ministry)?", floor: 4 },
+  { code: "HFu", name: "Heaven-Future", roomName: "Time Zone", question: "How does this text speak when viewed through Heaven-Future (new heaven, eternal throne)?", floor: 4 },
+  { code: "EPa", name: "Earth-Past", roomName: "Time Zone", question: "How does this text speak when viewed through Earth-Past (historical biblical events already fulfilled)?", floor: 4 },
+  { code: "EP", name: "Earth-Present", roomName: "Time Zone", question: "How does this text speak when viewed through Earth-Present (current application to believers today)?", floor: 4 },
+  { code: "EF", name: "Earth-Future", roomName: "Time Zone", question: "How does this text speak when viewed through Earth-Future (end-time events, Second Coming)?", floor: 4 },
 ];
 
 // Dimensions Room Cards - each dimension gets its own card
