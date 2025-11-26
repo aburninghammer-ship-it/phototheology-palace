@@ -31,9 +31,11 @@ export function BattleArena({ battle, currentUserId, onBack }: Props) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [gameStatus, setGameStatus] = useState(battle.status);
   const [winner, setWinner] = useState(battle.winner);
+  const [moves, setMoves] = useState<any[]>([]);
 
   useEffect(() => {
     loadPlayers();
+    loadMoves();
     
     // Subscribe to battle updates
     const channel = supabase
@@ -45,6 +47,14 @@ export function BattleArena({ battle, currentUserId, onBack }: Props) {
         filter: `battle_id=eq.${battle.id}`
       }, () => {
         loadPlayers();
+      })
+      .on('postgres_changes', {
+        event: '*',
+        schema: 'public',
+        table: 'pt_battle_moves',
+        filter: `battle_id=eq.${battle.id}`
+      }, () => {
+        loadMoves();
       })
       .on('postgres_changes', {
         event: 'UPDATE',
@@ -76,6 +86,19 @@ export function BattleArena({ battle, currentUserId, onBack }: Props) {
         cards_played: Array.isArray(p.cards_played) ? p.cards_played.filter((c): c is string => typeof c === 'string') : [],
         score: p.score,
       })));
+    }
+  };
+
+  const loadMoves = async () => {
+    const { data } = await supabase
+      .from('pt_battle_moves')
+      .select('*')
+      .eq('battle_id', battle.id)
+      .order('move_number', { ascending: false })
+      .limit(5);
+    
+    if (data) {
+      setMoves(data);
     }
   };
 
@@ -114,6 +137,12 @@ export function BattleArena({ battle, currentUserId, onBack }: Props) {
       setSelectedCard(null);
       setResponse("");
       await loadPlayers();
+      await loadMoves();
+
+      // If playing against Jeeves and move was approved, Jeeves plays next
+      if (battle.mode === 'vs_jeeves' && judgment.verdict === 'approved') {
+        setTimeout(() => handleJeevesPlay(), 2000);
+      }
 
     } catch (error: any) {
       console.error('Error playing card:', error);
@@ -122,6 +151,56 @@ export function BattleArena({ battle, currentUserId, onBack }: Props) {
         description: error.message,
         variant: "destructive",
       });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleJeevesPlay = async () => {
+    const jeevesPlayer = players.find(p => p.player_id === 'jeeves_1');
+    if (!jeevesPlayer || jeevesPlayer.cards_in_hand.length === 0) return;
+
+    setIsSubmitting(true);
+    try {
+      // Pick a random card from Jeeves' hand
+      const randomCard = jeevesPlayer.cards_in_hand[
+        Math.floor(Math.random() * jeevesPlayer.cards_in_hand.length)
+      ];
+
+      // Generate a response from Jeeves
+      const jeevesResponses = [
+        `Through ${randomCard}, we see this story illuminates the sanctuary pattern where...`,
+        `Applying ${randomCard} reveals how this narrative parallels the covenant structure of...`,
+        `Using ${randomCard}, we discover Christ as the central figure who fulfills...`,
+        `The principle ${randomCard} helps us understand this text in the cycle of redemption where...`,
+        `When viewed through ${randomCard}, this passage connects to the broader prophetic timeline...`
+      ];
+      
+      const randomResponse = jeevesResponses[Math.floor(Math.random() * jeevesResponses.length)];
+
+      const { data, error } = await supabase.functions.invoke('judge-card-battle', {
+        body: {
+          battleId: battle.id,
+          playerId: 'jeeves_1',
+          cardCode: randomCard,
+          responseText: randomResponse,
+          storyText: battle.story_text,
+        },
+      });
+
+      if (error) throw error;
+
+      await loadPlayers();
+      await loadMoves();
+
+      if (data.judgment.verdict === 'approved') {
+        toast({
+          title: "Jeeves Played",
+          description: `${randomCard}: ${data.judgment.feedback}`,
+        });
+      }
+    } catch (error: any) {
+      console.error('Error with Jeeves play:', error);
     } finally {
       setIsSubmitting(false);
     }
@@ -240,6 +319,48 @@ export function BattleArena({ battle, currentUserId, onBack }: Props) {
           </Card>
         )}
       </div>
+
+      {/* Move History */}
+      {moves.length > 0 && (
+        <Card className="bg-white/10 backdrop-blur-xl border-white/20">
+          <CardContent className="pt-6">
+            <h3 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
+              <Sparkles className="h-5 w-5 text-amber-400" />
+              Recent Moves
+            </h3>
+            <div className="space-y-3">
+              {moves.map((move) => {
+                const player = players.find(p => p.player_id === move.player_id);
+                return (
+                  <motion.div
+                    key={move.id}
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    className={`p-4 rounded-lg border-2 ${
+                      move.judge_verdict === 'approved'
+                        ? 'bg-green-500/10 border-green-400/30'
+                        : 'bg-red-500/10 border-red-400/30'
+                    }`}
+                  >
+                    <div className="flex items-center justify-between mb-2">
+                      <div className="flex items-center gap-2">
+                        <span className="font-bold text-white">{player?.display_name || 'Unknown'}</span>
+                        <Badge className="bg-purple-500">{move.card_used}</Badge>
+                        <Badge className={move.judge_verdict === 'approved' ? 'bg-green-500' : 'bg-red-500'}>
+                          {move.judge_verdict === 'approved' ? '✓' : '✗'} {move.points_awarded}pts
+                        </Badge>
+                      </div>
+                      <span className="text-xs text-white/60">Move #{move.move_number}</span>
+                    </div>
+                    <p className="text-sm text-white/80 mb-2">{move.response_text.substring(0, 150)}...</p>
+                    <p className="text-sm text-purple-200 italic">"{move.judge_feedback}"</p>
+                  </motion.div>
+                );
+              })}
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Response Area */}
       <Card className="bg-white/10 backdrop-blur-xl border-white/20">
