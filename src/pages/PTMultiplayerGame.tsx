@@ -324,12 +324,12 @@ const PTMultiplayerGame = () => {
 
     setStartingGame(true);
     try {
-      await autoStartGame(game.id, players);
+      // Fallback to direct startGame logic which we know successfully calls deal-pt-cards
+      await startGame();
     } finally {
       setStartingGame(false);
     }
   };
-
   const handlePlayCard = async () => {
     if (!selectedCardType || !cardValue || !explanation || !currentPlayer || !game) {
       toast({ title: "Missing information", description: "Please fill all fields", variant: "destructive" });
