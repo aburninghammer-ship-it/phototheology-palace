@@ -1218,23 +1218,6 @@ export default function CardDeck() {
         </DialogContent>
       </Dialog>
 
-      <style>{`
-        .perspective-1000 {
-          perspective: 1000px;
-        }
-        .preserve-3d {
-          transform-style: preserve-3d;
-        }
-        .backface-hidden {
-          backface-visibility: hidden;
-        }
-        .rotate-y-180 {
-          transform: rotateY(180deg);
-        }
-        .glow-effect {
-          box-shadow: 0 0 30px rgba(255, 255, 255, 0.3), 0 0 60px rgba(0, 0, 0, 0.4);
-        }
-      `}</style>
     </div>
   );
 }
