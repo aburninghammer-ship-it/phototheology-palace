@@ -1,11 +1,12 @@
 import { useState } from 'react';
-import { Mic, MicOff, Phone, PhoneOff, Users } from 'lucide-react';
+import { Mic, MicOff, Phone, PhoneOff, Users, Moon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { useVoiceChat } from '@/contexts/VoiceChatContext';
 import { WebRTCCall } from '@/components/WebRTCCall';
 import { useAuth } from '@/hooks/useAuth';
 import { cn } from '@/lib/utils';
+import { useToast } from '@/hooks/use-toast';
 
 interface VoiceChatWidgetProps {
   roomType: 'palace' | 'bible' | 'deck' | 'games' | 'challenges' | 'battle' | 'study';
@@ -15,12 +16,21 @@ interface VoiceChatWidgetProps {
 
 export function VoiceChatWidget({ roomType, roomId, className }: VoiceChatWidgetProps) {
   const { user } = useAuth();
-  const { isVoiceChatActive, currentRoom, isMuted, joinVoiceChat, leaveVoiceChat, toggleMute } = useVoiceChat();
+  const { toast } = useToast();
+  const { isVoiceChatActive, currentRoom, isMuted, isDoNotDisturb, joinVoiceChat, leaveVoiceChat, toggleMute, toggleDoNotDisturb } = useVoiceChat();
   const [showCallUI, setShowCallUI] = useState(false);
   const fullRoomId = `${roomType}-${roomId}`;
   const isInThisRoom = isVoiceChatActive && currentRoom === fullRoomId;
 
   const handleJoin = () => {
+    if (isDoNotDisturb) {
+      toast({
+        title: "Do Not Disturb Active",
+        description: "Turn off DND mode to join voice chat",
+        variant: "destructive",
+      });
+      return;
+    }
     joinVoiceChat(fullRoomId);
     setShowCallUI(true);
   };
@@ -28,6 +38,14 @@ export function VoiceChatWidget({ roomType, roomId, className }: VoiceChatWidget
   const handleLeave = () => {
     leaveVoiceChat();
     setShowCallUI(false);
+  };
+
+  const handleToggleDND = () => {
+    toggleDoNotDisturb();
+    toast({
+      title: isDoNotDisturb ? "Do Not Disturb Off" : "Do Not Disturb On",
+      description: isDoNotDisturb ? "You can now join voice chats" : "You won't receive voice chat notifications",
+    });
   };
 
   if (!user) return null;
@@ -44,6 +62,19 @@ export function VoiceChatWidget({ roomType, roomId, className }: VoiceChatWidget
           </div>
 
           <div className="flex items-center gap-2">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={handleToggleDND}
+              className={cn(
+                "h-9 w-9",
+                isDoNotDisturb && "text-purple-400 bg-purple-400/10"
+              )}
+              title="Do Not Disturb"
+            >
+              <Moon className="h-4 w-4" />
+            </Button>
+
             {isInThisRoom && (
               <Button
                 variant="ghost"
@@ -67,6 +98,7 @@ export function VoiceChatWidget({ roomType, roomId, className }: VoiceChatWidget
               size="sm"
               onClick={isInThisRoom ? handleLeave : handleJoin}
               className="gap-2"
+              disabled={!isInThisRoom && isDoNotDisturb}
             >
               {isInThisRoom ? (
                 <>
