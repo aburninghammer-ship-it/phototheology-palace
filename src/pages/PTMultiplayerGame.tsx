@@ -180,8 +180,69 @@ const PTMultiplayerGame = () => {
       supabase.from('pt_multiplayer_moves').select('*').eq('game_id', gameId).order('created_at', { ascending: false }).limit(20)
     ]);
 
-    if (gameRes.data) setGame(gameRes.data);
-    if (playersRes.data) setPlayers(playersRes.data);
+    let gameData = gameRes.data as Game | null;
+    let playersData = (playersRes.data as Player[]) || [];
+
+    // Ensure Jeeves Alpha & Beta always exist in Jeeves vs Jeeves mode,
+    // even for legacy games created before this logic.
+    if (gameData?.game_mode === "jeeves-vs-jeeves") {
+      const jeevesAlphaId = "00000000-0000-0000-0000-000000000001";
+      const jeevesBetaId = "00000000-0000-0000-0000-000000000002";
+
+      const hasAlpha = playersData.some((p) => p.user_id === jeevesAlphaId);
+      const hasBeta = playersData.some((p) => p.user_id === jeevesBetaId);
+
+      const inserts: any[] = [];
+
+      if (!hasAlpha) {
+        inserts.push({
+          game_id: gameId,
+          user_id: jeevesAlphaId,
+          display_name: 'Black Master Jeeves Alpha',
+          cards_remaining: 7,
+          score: 0,
+          team: null,
+          skip_next_turn: false,
+          consecutive_rejections: 0,
+        });
+      }
+
+      if (!hasBeta) {
+        inserts.push({
+          game_id: gameId,
+          user_id: jeevesBetaId,
+          display_name: 'Black Master Jeeves Beta',
+          cards_remaining: 7,
+          score: 0,
+          team: null,
+          skip_next_turn: false,
+          consecutive_rejections: 0,
+        });
+      }
+
+      if (inserts.length > 0) {
+        const { error: jeevesError } = await supabase
+          .from('pt_multiplayer_players')
+          .insert(inserts);
+
+        if (jeevesError) {
+          console.error('Error ensuring Jeeves players:', jeevesError);
+        } else {
+          const { data: refreshedPlayers } = await supabase
+            .from('pt_multiplayer_players')
+            .select('*')
+            .eq('game_id', gameId)
+            .order('joined_at');
+
+          if (refreshedPlayers) {
+            playersData = refreshedPlayers as Player[];
+          }
+        }
+      }
+    }
+
+    if (gameData) setGame(gameData);
+    setPlayers(playersData);
     if (movesRes.data) setMoves(movesRes.data);
 
     const { data: { user } } = await supabase.auth.getUser();
@@ -189,15 +250,15 @@ const PTMultiplayerGame = () => {
       setCurrentUserId(user.id);
     }
 
-    if (user && playersRes.data) {
+    if (user && playersData.length > 0) {
       let cp: Player | null = null;
 
       // In Jeeves vs Jeeves mode, humans are spectators only – don't auto-join
-      if (gameRes.data?.game_mode !== "jeeves-vs-jeeves") {
-        cp = playersRes.data.find((p) => p.user_id === user.id) || null;
+      if (gameData?.game_mode !== "jeeves-vs-jeeves") {
+        cp = playersData.find((p) => p.user_id === user.id) || null;
         
         // Auto-join: If user is not in players list yet, add them
-        if (!cp && gameRes.data) {
+        if (!cp && gameData) {
           const { data: profileData } = await supabase
             .from('profiles')
             .select('display_name')
@@ -217,7 +278,7 @@ const PTMultiplayerGame = () => {
             .single();
 
           if (newPlayer) {
-            cp = newPlayer;
+            cp = newPlayer as Player;
             // Refresh players list
             const { data: updatedPlayers } = await supabase
               .from('pt_multiplayer_players')
@@ -225,7 +286,7 @@ const PTMultiplayerGame = () => {
               .eq('game_id', gameId)
               .order('joined_at');
             
-            if (updatedPlayers) setPlayers(updatedPlayers);
+            if (updatedPlayers) setPlayers(updatedPlayers as Player[]);
           }
         }
       }
@@ -254,7 +315,6 @@ const PTMultiplayerGame = () => {
 
     setLoading(false);
   };
-
   const subscribeToUpdates = () => {
     const channel = supabase
       .channel(`pt-game-${gameId}`)
