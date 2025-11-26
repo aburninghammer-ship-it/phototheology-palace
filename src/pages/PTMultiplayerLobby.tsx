@@ -65,13 +65,13 @@ const PTMultiplayerLobby = () => {
             {
               game_id: game.id,
               user_id: jeevesAlphaId,
-              display_name: 'Jeeves Alpha',
+              display_name: 'Black Master Jeeves Alpha',
               cards_remaining: 7,
             },
             {
               game_id: game.id,
               user_id: jeevesBetaId,
-              display_name: 'Jeeves Beta',
+              display_name: 'Black Master Jeeves Beta',
               cards_remaining: 7,
             },
           ]);

@@ -365,7 +365,16 @@ const PTMultiplayerGame = () => {
   };
 
   const startGame = async () => {
-    if (!game || !currentPlayer) return;
+    if (!game) return;
+
+    const userIsHost =
+      (currentPlayer && game.host_id === currentPlayer.user_id) ||
+      (!currentPlayer && currentUserId && game.host_id === currentUserId);
+
+    if (!userIsHost) {
+      toast({ title: "Only the host can start the game", variant: "destructive" });
+      return;
+    }
     
     try {
       // First, have Jeeves deal the cards
@@ -378,12 +387,23 @@ const PTMultiplayerGame = () => {
         throw new Error("Failed to deal cards");
       }
 
+      // Determine who takes the first turn
+      let startingPlayerId: string | null = null;
+      if (players.length > 0) {
+        if (game.game_mode === "jeeves-vs-jeeves") {
+          const alpha = players.find(p => p.display_name.includes('Alpha'));
+          startingPlayerId = alpha?.id ?? players[0].id;
+        } else {
+          startingPlayerId = players[0].id;
+        }
+      }
+
       // Then activate the game
       const { error } = await supabase
         .from('pt_multiplayer_games')
         .update({ 
           status: 'active',
-          current_turn_player_id: players[0]?.id ?? null,
+          current_turn_player_id: startingPlayerId,
         })
         .eq('id', game.id);
 
@@ -395,7 +415,7 @@ const PTMultiplayerGame = () => {
           ? {
               ...prev,
               status: 'active',
-              current_turn_player_id: players[0]?.id ?? null,
+              current_turn_player_id: startingPlayerId,
             }
           : prev
       );

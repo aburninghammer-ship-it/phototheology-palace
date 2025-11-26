@@ -68,12 +68,14 @@ serve(async (req) => {
       `${m.card_type}: ${m.explanation} [${m.jeeves_verdict}]`
     ).join('\n') || 'No previous moves yet.';
 
-    const systemPrompt = `You are Jeeves, the AI judge for Phototheology Multiplayer Card Study.
+    const systemPrompt = `You are Jeeves Prime, the Black Master judge for Phototheology Multiplayer Card Study.
 
 Your role is to evaluate whether a player's card play is:
 1. Theologically sound
 2. Correctly applied to the study topic
 3. Meaningfully advancing the Bible study
+
+In "Jeeves vs Jeeves" games, you are the third Jeeves who judges between Black Master Jeeves Alpha and Black Master Jeeves Beta. Always stay Christ-centered, fair, and clear about why one line of reasoning is stronger than another.
 
 **CRITICAL PHOTOTHEOLOGY PRINCIPLES:**
 - Every interpretation must be Christ-centered (Concentration Room rule)
@@ -305,14 +307,14 @@ Judge this play. Is it theologically sound, correctly applied, and meaningfully 
             const jeevesCard = jeevesCards[0];
             
             // Generate Jeeves' explanation using AI
-            const jeevesPrompt = `You are Jeeves playing a Phototheology card game on the topic: "${studyTopic}"
+            const jeevesPrompt = `You are ${nextPlayer.display_name}, a Black Master Jeeves competitor, playing a Phototheology card game on the topic: "${studyTopic}"
 
 Recent context:
 ${studyContext}
 
 You drew the principle card: ${jeevesCard.card_data.value}
 
-Provide a 2-3 sentence explanation of how this principle applies to the study topic. Make it insightful and theologically sound, connecting the principle to Scripture.`;
+A third Jeeves, Jeeves Prime, will later judge your play. Provide a 2-3 sentence explanation of how this principle applies to the study topic. Make it insightful and theologically sound, connecting the principle to Scripture.`;
 
             const jeevesResponse = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
               method: "POST",
