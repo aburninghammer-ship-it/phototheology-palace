@@ -159,7 +159,62 @@ const PTMultiplayerLobby = () => {
                       />
                       <Label
                         htmlFor={mode.id}
-                        className={`flex flex-col gap-2 p-4 rounded-xl border-2 border-white/20 cursor-pointer transition-all hover:scale-105 hover:border-white/40 hover:shadow-lg peer-data-[state=checked]:border-transparent peer-data-[state=checked]:bg-gradient-to-br peer-data-[state=checked]:${mode.gradient} peer-data-[state=checked]:shadow-2xl relative overflow-hidden`}
+                        onClick={() => setGameMode(mode.id)}
+                        style={
+                          gameMode === mode.id
+                            ? mode.id === "free-for-all"
+                              ? {
+                                  backgroundImage:
+                                    "linear-gradient(135deg, hsl(205, 100%, 55%), hsl(190, 100%, 60%))",
+                                  boxShadow:
+                                    "0 0 30px hsla(195, 100%, 60%, 0.6)",
+                                }
+                              : mode.id === "1v1-jeeves"
+                              ? {
+                                  backgroundImage:
+                                    "linear-gradient(135deg, hsl(270, 95%, 65%), hsl(320, 95%, 65%))",
+                                  boxShadow:
+                                    "0 0 30px hsla(290, 95%, 65%, 0.6)",
+                                }
+                              : mode.id === "team"
+                              ? {
+                                  backgroundImage:
+                                    "linear-gradient(135deg, hsl(30, 95%, 60%), hsl(45, 95%, 60%))",
+                                  boxShadow:
+                                    "0 0 30px hsla(35, 95%, 60%, 0.6)",
+                                }
+                              : mode.id === "team-vs-jeeves"
+                              ? {
+                                  backgroundImage:
+                                    "linear-gradient(135deg, hsl(340, 90%, 60%), hsl(10, 95%, 60%))",
+                                  boxShadow:
+                                    "0 0 30px hsla(5, 95%, 60%, 0.6)",
+                                }
+                              : mode.id === "council"
+                              ? {
+                                  backgroundImage:
+                                    "linear-gradient(135deg, hsl(260, 95%, 70%), hsl(290, 95%, 65%))",
+                                  boxShadow:
+                                    "0 0 30px hsla(270, 95%, 65%, 0.6)",
+                                }
+                              : mode.id === "boss"
+                              ? {
+                                  backgroundImage:
+                                    "linear-gradient(135deg, hsl(355, 90%, 55%), hsl(20, 95%, 60%))",
+                                  boxShadow:
+                                    "0 0 30px hsla(10, 95%, 60%, 0.6)",
+                                }
+                              : mode.id === "battle-royale"
+                              ? {
+                                  backgroundImage:
+                                    "linear-gradient(135deg, hsl(50, 95%, 60%), hsl(140, 70%, 55%))",
+                                  boxShadow:
+                                    "0 0 30px hsla(90, 70%, 55%, 0.6)",
+                                }
+                              : undefined
+                            : undefined
+                        }
+                        className="flex flex-col gap-2 p-4 rounded-xl border-2 border-white/20 cursor-pointer transition-all hover:scale-105 hover:border-white/40 hover:shadow-lg peer-data-[state=checked]:border-transparent peer-data-[state=checked]:shadow-2xl relative overflow-hidden"
                       >
                         <div className="absolute inset-0 bg-gradient-to-br opacity-0 group-hover:opacity-20 transition-opacity" style={{ 
                           backgroundImage: `linear-gradient(to bottom right, var(--tw-gradient-stops))` 
