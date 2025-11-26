@@ -26,17 +26,137 @@ interface Player {
 
 // Principle descriptions map
 const PRINCIPLE_INFO: Record<string, { name: string; description: string }> = {
-  "CR": { name: "Concentration Room", description: "Every text must reveal Christ. No matter how ordinary a verse looks, it must point to Jesus." },
-  "DR": { name: "Dimensions Room", description: "View texts through 5 dimensions: Literal, Christ, Me (personal), Church (corporate), and Heaven (eternal)." },
+  // Floor 1 - Furnishing
   "SR": { name: "Story Room", description: "Store Bible stories as vivid mental movies - each story becomes a memorable scene." },
   "IR": { name: "Imagination Room", description: "Step inside stories with sanctified imagination - feel, see, and experience Scripture emotionally." },
+  "24": { name: "24FPS Room", description: "Break Scripture into frames - one symbolic image for each chapter, like a mental film strip." },
+  "BR": { name: "Bible Rendered Room", description: "Map the entire Bible with master images per 24-chapter block - scan all Scripture in minutes." },
+  "TR": { name: "Translation Room", description: "Convert abstract texts into concrete images - turn words into vivid mental pictures." },
+  "GR": { name: "Gems Room", description: "Collect striking insights and powerful discoveries - build your treasury of spiritual weapons." },
+  
+  // Floor 2 - Investigation
   "OR": { name: "Observation Room", description: "Notice details without interpretation - log fingerprints and footprints like a detective." },
   "DC": { name: "Def-Com Room", description: "Test words under microscope - Greek/Hebrew definitions and historical/cultural commentary." },
-  "ST": { name: "Symbols/Types Room", description: "Recognize God's universal language - Lamb=Christ, Rock=Christ, Light=truth." },
+  "ST": { name: "Symbols/Types Room", description: "Recognize God's universal language - Lamb=Christ, Rock=Christ, Light=truth, Water=Spirit." },
   "QR": { name: "Questions Room", description: "Ask relentless questions until truth emerges - interrogate the text thoroughly." },
-  "PR": { name: "Prophecy Room", description: "Align prophetic timelines like stars in constellations - Daniel, Revelation, and more." },
-  "BL": { name: "Blue Room (Sanctuary)", description: "The sanctuary is the blueprint of salvation - every piece points to Christ's work." },
+  "QA": { name: "Q&A Room", description: "Cross-examine witnesses - let Scripture answer Scripture to confirm truth." },
+  
+  // Floor 3 - Freestyle
+  "NF": { name: "Nature Freestyle", description: "See lessons in creation - every flower, bird, and storm becomes a reminder of God's truth." },
+  "PF": { name: "Personal Freestyle", description: "Turn your life into object lessons - every joy, mistake, and delay points back to Scripture." },
+  "BF": { name: "Bible Freestyle", description: "Connect verses spontaneously - every verse is related, trace genealogies of thought on the fly." },
+  "HF": { name: "History Freestyle", description: "Let the Bible interpret the world - see current events and history through Scripture's lens." },
+  "LR": { name: "Listening Room", description: "Turn conversations into connections - listen carefully and instantly link remarks to Scripture." },
+  
+  // Floor 4 - Next Level
+  "CR": { name: "Concentration Room", description: "Every text must reveal Christ. No matter how ordinary a verse looks, it must point to Jesus." },
+  "DR": { name: "Dimensions Room", description: "View texts through 5 dimensions: Literal, Christ, Me (personal), Church (corporate), and Heaven (eternal)." },
+  "C6": { name: "Connect 6 Room", description: "Connect texts across 6 genres: Prophecy, Parable, Epistle, History, Gospel, and Poetry." },
+  "TRm": { name: "Theme Room", description: "Anchor verses on the great walls: Sanctuary, Life of Christ, Great Controversy, Time-Prophecy, Gospel, Heaven." },
+  "TZ": { name: "Time Zone Room", description: "Locate texts across 6 time zones: Heaven-Past, Heaven-Present, Heaven-Future, Earth-Past, Earth-Present, Earth-Future." },
+  "PRm": { name: "Patterns Room", description: "Recognize recurring motifs - 40 days, 3 days, deliverer stories repeating with variation." },
+  "P‖": { name: "Parallels Room", description: "See mirrored actions across time - Babel/Pentecost, Exodus/Return, reflecting history." },
+  "FRt": { name: "Fruit Room", description: "Test if study produces Christlike character - love, joy, peace, patience, and all fruits of the Spirit." },
+  
+  // Time Zone sub-cards
+  "TZ-HP": { name: "Heaven-Past", description: "View text through Heaven-Past: before earth's creation, Lucifer's rebellion, the origin of the great controversy." },
+  "TZ-HN": { name: "Heaven-Present", description: "View text through Heaven-Present: Christ's intercession, sanctuary ministry, the mediatorial work happening now." },
+  "TZ-HF": { name: "Heaven-Future", description: "View text through Heaven-Future: new heaven, eternal throne, ultimate restoration with God." },
+  "TZ-EP": { name: "Earth-Past", description: "View text through Earth-Past: historical biblical events already fulfilled in redemptive history." },
+  "TZ-EN": { name: "Earth-Present", description: "View text through Earth-Present: current application to believers today, how we live now." },
+  "TZ-EF": { name: "Earth-Future", description: "View text through Earth-Future: end-time events, Second Coming, final prophecies yet to be fulfilled." },
+  
+  // Dimensions sub-cards
+  "DR-1D": { name: "1D (Literal-Historical)", description: "What actually happened in the original context? What did it mean to the original audience?" },
+  "DR-2D": { name: "2D (Christological)", description: "How does this text reveal, foreshadow, or fulfill Christ? Where is Jesus in this passage?" },
+  "DR-3D": { name: "3D (Personal)", description: "What does this mean for YOUR walk with God today? How should you personally respond?" },
+  "DR-4D": { name: "4D (Ecclesiological)", description: "What does this teach the church corporately? How does it shape our worship, mission, or unity?" },
+  "DR-5D": { name: "5D (Eschatological)", description: "How will this be perfected in the new creation? What does it reveal about our eternal hope?" },
+  
+  // Connect 6 sub-cards
+  "C6-Pr": { name: "Prophecy", description: "Connect this text to a prophecy passage and explain how they illuminate each other." },
+  "C6-Pa": { name: "Parable", description: "Connect this text to a parable and explain how they illuminate each other." },
+  "C6-Ep": { name: "Epistle", description: "Connect this text to an epistle passage and explain how they illuminate each other." },
+  "C6-Hi": { name: "History", description: "Connect this text to a historical narrative and explain how they illuminate each other." },
+  "C6-Go": { name: "Gospel", description: "Connect this text to a gospel passage and explain how they illuminate each other." },
+  "C6-Po": { name: "Poetry", description: "Connect this text to a poetry/psalm passage and explain how they illuminate each other." },
+  
+  // Theme sub-cards
+  "TRm-Sanc": { name: "Sanctuary Wall", description: "How does this passage relate to God's dwelling, sacrifice, priesthood, or mediation?" },
+  "TRm-Life": { name: "Life of Christ Wall", description: "How does this passage relate to Jesus' birth, ministry, death, resurrection, or ascension?" },
+  "TRm-GC": { name: "Great Controversy Wall", description: "How does this passage expose the cosmic battle between Christ and Satan, truth and error?" },
+  "TRm-Time": { name: "Time-Prophecy Wall", description: "How does this passage provide prophetic chronology or apocalyptic vision?" },
+  "TRm-Gosp": { name: "Gospel Floor", description: "How does this passage articulate the foundation of salvation by grace through faith?" },
+  "TRm-Heav": { name: "Heaven Ceiling", description: "How does this passage describe the ultimate eschatological hope and final restoration?" },
+  
+  // Fruit sub-cards
+  "FRt-Love": { name: "Love", description: "How does this text demonstrate or cultivate agape love—selfless, sacrificial, unconditional?" },
+  "FRt-Joy": { name: "Joy", description: "How does this text produce or reveal joy—deep gladness rooted in God's presence?" },
+  "FRt-Peace": { name: "Peace", description: "How does this text bring shalom—wholeness, rest, reconciliation with God and others?" },
+  "FRt-Patience": { name: "Patience", description: "How does this text cultivate longsuffering—endurance under trial, slowness to anger?" },
+  "FRt-Kindness": { name: "Kindness", description: "How does this text demonstrate gentleness—tender compassion and gracious goodwill?" },
+  "FRt-Goodness": { name: "Goodness", description: "How does this text reveal moral excellence and benevolent action toward others?" },
+  "FRt-Faithfulness": { name: "Faithfulness", description: "How does this text show reliability, trustworthiness, and steadfast loyalty to God?" },
+  "FRt-Gentleness": { name: "Gentleness", description: "How does this text display meekness—strength under control, humility, teachability?" },
+  "FRt-SelfControl": { name: "Self-Control", description: "How does this text teach temperance—mastery over desires, discipline, restraint?" },
+  
+  // Floor 5 - Vision
+  "PR": { name: "Prophecy Room", description: "Align prophetic timelines like stars in constellations - Daniel, Revelation, and repeat-and-enlarge patterns." },
+  "BL": { name: "Blue Room (Sanctuary)", description: "The sanctuary is the blueprint of salvation - every piece of furniture points to Christ's work." },
   "3A": { name: "Three Angels' Room", description: "The final gospel message from Revelation 14 - everlasting gospel, Babylon fallen, mark warning." },
+  
+  // Blue Room sub-cards
+  "BL-Gate": { name: "Gate/Door", description: "Christ as the Gate/Door to God's presence (John 10:9) - the only way to enter the Father's courts." },
+  "BL-Altar": { name: "Bronze Altar", description: "Sacrifice, atonement, and Christ's blood at the altar - where sin meets substitution." },
+  "BL-Laver": { name: "Laver", description: "Cleansing, washing, and sanctification (Eph 5:26) - the Word washing us daily." },
+  "BL-Lamp": { name: "Lampstand", description: "Light, testimony, and the Spirit's work (Rev 1:20) - Christ as the light of the world." },
+  "BL-Table": { name: "Table of Showbread", description: "Christ as the Bread of Life and provision (John 6:35) - sustained by His presence." },
+  "BL-Incense": { name: "Altar of Incense", description: "Prayer, intercession, and Christ's mediation (Rev 8:3-4) - our prayers mingled with His merit." },
+  "BL-Veil": { name: "Veil", description: "The torn veil and access to God (Heb 10:19-20) - Christ's flesh opening the way to the Father." },
+  "BL-Ark": { name: "Ark of the Covenant", description: "God's throne, law, and mercy seat (Rom 3:25) - where justice and mercy meet." },
+  
+  // Feast Room sub-cards
+  "FR-Pass": { name: "Passover", description: "Christ as our Passover Lamb (1 Cor 5:7) - deliverance through His blood." },
+  "FR-Unlv": { name: "Unleavened Bread", description: "Removing sin/leaven and living in purity - putting away the old life." },
+  "FR-First": { name: "Firstfruits", description: "Christ's resurrection as the firstfruits (1 Cor 15:20) - guarantee of our resurrection." },
+  "FR-Pent": { name: "Pentecost", description: "The outpouring of the Holy Spirit (Acts 2) - power for witness and mission." },
+  "FR-Trum": { name: "Trumpets", description: "The call to awakening and gathering - preparing for the day of judgment." },
+  "FR-Aton": { name: "Day of Atonement", description: "Judgment, cleansing, and final atonement (Lev 16) - the investigative judgment." },
+  "FR-Tab": { name: "Tabernacles", description: "God dwelling with us and future restoration - the final harvest and eternal dwelling." },
+  
+  // Math Room sub-cards
+  "MR-70W": { name: "70 Weeks", description: "The 70 weeks prophecy (Daniel 9) - Messiah's timeline and Jerusalem's restoration." },
+  "MR-1260": { name: "1260 Years", description: "The 1260 year prophecy - papal supremacy and the time of tribulation." },
+  "MR-2300": { name: "2300 Days", description: "The 2300 day prophecy (Daniel 8:14) - sanctuary cleansing and investigative judgment." },
+  "MR-120": { name: "120 Years (Noah)", description: "Noah's 120 year prophecy - God's patience and the final warning period." },
+  "MR-400": { name: "400 Years", description: "The 400 years of captivity prophecy (Genesis 15:13) - Israel's bondage in Egypt." },
+  "MR-70Y": { name: "70 Years", description: "The 70 years of Babylonian exile (Jeremiah 25:11) - consequence and restoration." },
+  
+  // Three Angels sub-cards
+  "3A-1st": { name: "First Angel", description: "Fear God, give glory, hour of judgment, worship Creator - the everlasting gospel to all." },
+  "3A-2nd": { name: "Second Angel", description: "Babylon is fallen - exposing false systems and calling God's people out." },
+  "3A-3rd": { name: "Third Angel", description: "Warning against beast, mark, image - the patience of the saints who keep God's commandments." },
+  
+  // Floor 6 - Cycles & Heavens
+  "@Ad": { name: "Adamic Cycle", description: "Creation, fall, promise - the seed promise in Genesis 3:15 and the beginning of redemption." },
+  "@No": { name: "Noahic Cycle", description: "Flood, preservation, covenant - God's faithfulness to preserve a remnant through judgment." },
+  "@Ab": { name: "Abrahamic Cycle", description: "Faith, promise, seed - all nations blessed through Abraham's offspring, Christ." },
+  "@Mo": { name: "Mosaic Cycle", description: "Law, tabernacle, priesthood - the covenant at Sinai and God dwelling among His people." },
+  "@Cy": { name: "Cyrusic Cycle", description: "Exile, restoration, temple rebuilt - return from Babylon and renewed worship." },
+  "@CyC": { name: "Cyrus-Christ Cycle", description: "Type to antitype - Cyrus the deliverer pointing to Christ the true Deliverer." },
+  "@Sp": { name: "Spirit Cycle", description: "Pentecost, church age, mission - the Spirit empowering global witness." },
+  "@Re": { name: "Remnant Cycle", description: "Final conflict, judgment, new creation - the last generation and Christ's return." },
+  "1H": { name: "First Heaven", description: "Babylon/Restoration - the first Day of the Lord and post-exilic renewal (586 BC - return)." },
+  "2H": { name: "Second Heaven", description: "70 AD/New Covenant - the second Day of the Lord and heavenly sanctuary order (church age)." },
+  "3H": { name: "Third Heaven", description: "Final Judgment/New Creation - the third Day of the Lord and literal new heavens and earth." },
+  "JR": { name: "Juice Room", description: "Squeeze one book with all Phototheology principles - extract every drop of meaning." },
+  
+  // Floor 7 - Spiritual & Emotional
+  "FRm": { name: "Fire Room", description: "Let truth burn, convict, and transform - feel the emotional weight of Scripture in your soul." },
+  "MR": { name: "Meditation Room", description: "Slow down and marinate in truth - breathe the words until they saturate your spirit." },
+  "SRm": { name: "Speed Room", description: "Rapid application and quick recall - train reflexes for instant connections in ministry." },
+  "CEC": { name: "Christ in Every Chapter", description: "Name and trace the line to Christ in every chapter - explicit, anchored confession." },
+  "R66": { name: "Room 66", description: "Trace one theme through all 66 books - theology that walks Genesis to Revelation." },
 };
 
 export function BattleArena({ battle, currentUserId, onBack }: Props) {
