@@ -858,69 +858,68 @@ export default function CardDeck() {
               🎮 Multiplayer Mode: Jeeves the Judge
             </Button>
           </motion.div>
-            
-            {/* Collaboration Controls */}
-            <Card className="border-2 bg-gradient-to-br from-cyan-500/90 via-blue-500/90 to-indigo-600/90 backdrop-blur-xl border-white/30 shadow-2xl">
-              <CardContent className="pt-6">
-                {!isInSession ? (
-                  <div className="flex flex-col sm:flex-row gap-3 items-center justify-center">
-                    <Button onClick={createSession} className="bg-gradient-to-r from-green-400 to-emerald-500 hover:from-green-500 hover:to-emerald-600 text-white shadow-lg font-bold gap-2">
-                      <Users className="h-4 w-4" />
-                      Start Collaboration Session
+          
+          {/* Collaboration Controls */}
+          <Card className="border-2 bg-gradient-to-br from-cyan-500/90 via-blue-500/90 to-indigo-600/90 backdrop-blur-xl border-white/30 shadow-2xl">
+            <CardContent className="pt-6">
+              {!isInSession ? (
+                <div className="flex flex-col sm:flex-row gap-3 items-center justify-center">
+                  <Button onClick={createSession} className="bg-gradient-to-r from-green-400 to-emerald-500 hover:from-green-500 hover:to-emerald-600 text-white shadow-lg font-bold gap-2">
+                    <Users className="h-4 w-4" />
+                    Start Collaboration Session
+                  </Button>
+                  <div className="flex gap-2 items-center">
+                    <span className="text-sm text-muted-foreground">or</span>
+                    <Input
+                      placeholder="Enter Session ID"
+                      value={sessionId}
+                      onChange={(e) => setSessionId(e.target.value.toUpperCase())}
+                      className="w-32"
+                    />
+                    <Button 
+                      onClick={() => joinSession(sessionId)} 
+                      disabled={!sessionId}
+                      variant="outline"
+                    >
+                      Join
                     </Button>
-                    <div className="flex gap-2 items-center">
-                      <span className="text-sm text-muted-foreground">or</span>
-                      <Input
-                        placeholder="Enter Session ID"
-                        value={sessionId}
-                        onChange={(e) => setSessionId(e.target.value.toUpperCase())}
-                        className="w-32"
-                      />
-                      <Button 
-                        onClick={() => joinSession(sessionId)} 
-                        disabled={!sessionId}
-                        variant="outline"
+                  </div>
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  <div className="flex items-center justify-center gap-3">
+                    <Badge variant="default" className="gap-2">
+                      <Users className="h-3 w-3" />
+                      {participants.length} participant{participants.length !== 1 ? 's' : ''}
+                    </Badge>
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm font-mono bg-muted px-3 py-1 rounded">
+                        {sessionId}
+                      </span>
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        onClick={copySessionId}
+                        className="h-8 w-8 p-0"
                       >
-                        Join
+                        {copied ? (
+                          <Check className="h-4 w-4 text-green-500" />
+                        ) : (
+                          <Copy className="h-4 w-4" />
+                        )}
                       </Button>
                     </div>
+                    <Button onClick={leaveSession} variant="outline" size="sm">
+                      Leave Session
+                    </Button>
                   </div>
-                ) : (
-                  <div className="space-y-3">
-                    <div className="flex items-center justify-center gap-3">
-                      <Badge variant="default" className="gap-2">
-                        <Users className="h-3 w-3" />
-                        {participants.length} participant{participants.length !== 1 ? 's' : ''}
-                      </Badge>
-                      <div className="flex items-center gap-2">
-                        <span className="text-sm font-mono bg-muted px-3 py-1 rounded">
-                          {sessionId}
-                        </span>
-                        <Button
-                          size="sm"
-                          variant="ghost"
-                          onClick={copySessionId}
-                          className="h-8 w-8 p-0"
-                        >
-                          {copied ? (
-                            <Check className="h-4 w-4 text-green-500" />
-                          ) : (
-                            <Copy className="h-4 w-4" />
-                          )}
-                        </Button>
-                      </div>
-                      <Button onClick={leaveSession} variant="outline" size="sm">
-                        Leave Session
-                      </Button>
-                    </div>
-                    <p className="text-xs text-muted-foreground text-center">
-                      Share the session ID with others to collaborate in real-time
-                    </p>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-          </div>
+                  <p className="text-xs text-muted-foreground text-center">
+                    Share the session ID with others to collaborate in real-time
+                  </p>
+                </div>
+              )}
+            </CardContent>
+          </Card>
 
           {/* Text Selection and Input Section */}
           <Card className="border-2 bg-gradient-to-br from-pink-500/90 via-rose-500/90 to-red-600/90 backdrop-blur-xl border-white/30 shadow-2xl">
