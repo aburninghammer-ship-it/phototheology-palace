@@ -12,10 +12,10 @@ serve(async (req) => {
   }
 
   try {
+    // Use service role key to bypass RLS since Jeeves needs to insert moves for all players
     const supabaseClient = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_ANON_KEY') ?? '',
-      { global: { headers: { Authorization: req.headers.get('Authorization')! } } }
+      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     );
 
     const { battleId, playerId, cardCode, responseText, storyText } = await req.json();
