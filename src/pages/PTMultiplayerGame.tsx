@@ -242,6 +242,7 @@ const PTMultiplayerGame = () => {
 
       // Auto-start game if it's still waiting
       if (gameRes.data?.status === 'waiting' && playersRes.data && playersRes.data.length > 0) {
+        console.log('[PTMultiplayer] Attempting auto-start for game', gameRes.data.id);
         await autoStartGame(gameRes.data.id, playersRes.data);
         // Refresh game data after auto-start
         const { data: updatedGame } = await supabase
@@ -249,7 +250,10 @@ const PTMultiplayerGame = () => {
           .select('*')
           .eq('id', gameId)
           .single();
-        if (updatedGame) setGame(updatedGame);
+        if (updatedGame) {
+          console.log('[PTMultiplayer] Game auto-started, updated status:', updatedGame.status);
+          setGame(updatedGame);
+        }
       }
     }
 
@@ -258,16 +262,23 @@ const PTMultiplayerGame = () => {
 
   const autoStartGame = async (gameId: string, playersList: Player[]) => {
     try {
+      console.log('[PTMultiplayer] Auto-start: dealing cards for game', gameId);
       // Deal the cards
       const { error: dealError } = await supabase.functions.invoke('deal-pt-cards', {
         body: { gameId }
       });
 
       if (dealError) {
-        console.error("Error dealing cards:", dealError);
+        console.error('[PTMultiplayer] Error dealing cards:', dealError);
+        toast({
+          title: 'Error starting game',
+          description: dealError.message || 'Failed to deal cards for this game.',
+          variant: 'destructive',
+        });
         return;
       }
 
+      console.log('[PTMultiplayer] Auto-start: activating game', gameId);
       // Activate the game
       const { error } = await supabase
         .from('pt_multiplayer_games')
@@ -278,7 +289,12 @@ const PTMultiplayerGame = () => {
         .eq('id', gameId);
 
       if (error) {
-        console.error("Error auto-starting game:", error);
+        console.error('[PTMultiplayer] Error auto-starting game:', error);
+        toast({
+          title: 'Error starting game',
+          description: error.message || 'Failed to activate this game.',
+          variant: 'destructive',
+        });
         return;
       }
 
@@ -292,8 +308,13 @@ const PTMultiplayerGame = () => {
             }
           : prev
       );
-    } catch (error) {
-      console.error("Error in auto-start:", error);
+    } catch (error: any) {
+      console.error('[PTMultiplayer] Error in auto-start:', error);
+      toast({
+        title: 'Error starting game',
+        description: error.message || 'Unexpected error while starting the game.',
+        variant: 'destructive',
+      });
     }
   };
 
