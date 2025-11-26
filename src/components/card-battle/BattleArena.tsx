@@ -32,6 +32,7 @@ export function BattleArena({ battle, currentUserId, onBack }: Props) {
   const [gameStatus, setGameStatus] = useState(battle.status);
   const [winner, setWinner] = useState(battle.winner);
   const [moves, setMoves] = useState<any[]>([]);
+  const [expandedMoves, setExpandedMoves] = useState<Set<string>>(new Set());
 
   useEffect(() => {
     loadPlayers();
@@ -331,29 +332,61 @@ export function BattleArena({ battle, currentUserId, onBack }: Props) {
             <div className="space-y-3">
               {moves.map((move) => {
                 const player = players.find(p => p.player_id === move.player_id);
+                const isExpanded = expandedMoves.has(move.id);
+                const isJeeves = move.player_id === 'jeeves_1';
+                
                 return (
                   <motion.div
                     key={move.id}
                     initial={{ opacity: 0, x: -20 }}
                     animate={{ opacity: 1, x: 0 }}
-                    className={`p-4 rounded-lg border-2 ${
+                    className={`p-4 rounded-lg border-2 cursor-pointer transition-all ${
                       move.judge_verdict === 'approved'
-                        ? 'bg-green-500/10 border-green-400/30'
-                        : 'bg-red-500/10 border-red-400/30'
-                    }`}
+                        ? 'bg-green-500/10 border-green-400/30 hover:bg-green-500/20'
+                        : 'bg-red-500/10 border-red-400/30 hover:bg-red-500/20'
+                    } ${isJeeves ? 'border-l-4 border-l-amber-400' : ''}`}
+                    onClick={() => {
+                      const newExpanded = new Set(expandedMoves);
+                      if (isExpanded) {
+                        newExpanded.delete(move.id);
+                      } else {
+                        newExpanded.add(move.id);
+                      }
+                      setExpandedMoves(newExpanded);
+                    }}
                   >
                     <div className="flex items-center justify-between mb-2">
-                      <div className="flex items-center gap-2">
-                        <span className="font-bold text-white">{player?.display_name || 'Unknown'}</span>
-                        <Badge className="bg-purple-500">{move.card_used}</Badge>
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <span className="font-bold text-white flex items-center gap-1">
+                          {player?.display_name || 'Unknown'}
+                          {isJeeves && <span className="text-amber-400">🤖</span>}
+                        </span>
+                        <Badge className="bg-purple-500 text-white font-bold">{move.card_used}</Badge>
                         <Badge className={move.judge_verdict === 'approved' ? 'bg-green-500' : 'bg-red-500'}>
                           {move.judge_verdict === 'approved' ? '✓' : '✗'} {move.points_awarded}pts
                         </Badge>
                       </div>
                       <span className="text-xs text-white/60">Move #{move.move_number}</span>
                     </div>
-                    <p className="text-sm text-white/80 mb-2">{move.response_text.substring(0, 150)}...</p>
-                    <p className="text-sm text-purple-200 italic">"{move.judge_feedback}"</p>
+                    
+                    <div className="mb-3">
+                      <p className={`text-sm font-semibold text-white/90 mb-1 ${isJeeves ? 'text-amber-200' : ''}`}>
+                        {isJeeves ? '🎯 Jeeves\' Response:' : '📝 Your Response:'}
+                      </p>
+                      <p className="text-sm text-white/80 whitespace-pre-wrap">
+                        {isExpanded ? move.response_text : `${move.response_text.substring(0, 150)}...`}
+                      </p>
+                      {!isExpanded && move.response_text.length > 150 && (
+                        <button className="text-xs text-amber-400 hover:text-amber-300 mt-1">
+                          Click to see full response
+                        </button>
+                      )}
+                    </div>
+                    
+                    <div className="pt-2 border-t border-white/10">
+                      <p className="text-xs font-semibold text-purple-300 mb-1">⚖️ Jeeves' Judgment:</p>
+                      <p className="text-sm text-purple-200 italic">"{move.judge_feedback}"</p>
+                    </div>
                   </motion.div>
                 );
               })}
