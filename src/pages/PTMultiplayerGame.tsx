@@ -706,7 +706,9 @@ const PTMultiplayerGame = () => {
             <div className="relative z-10 p-8">
               {game.status === 'waiting' && (
                 <div className="text-center py-12">
-                  <h2 className="text-3xl font-bold mb-4 text-white">Waiting for Players...</h2>
+                  <h2 className="text-3xl font-bold mb-4 text-white">
+                    {game.game_mode === "jeeves-vs-jeeves" ? "Jeeves v Jeeves" : "Waiting for Players..."}
+                  </h2>
                   <p className="text-purple-200 mb-6">
                     {players.length} player{players.length !== 1 ? 's' : ''} joined
                   </p>
