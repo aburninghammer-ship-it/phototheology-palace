@@ -5463,6 +5463,10 @@ export type Database = {
         Returns: boolean
       }
       is_palace_owner: { Args: { _user_id: string }; Returns: boolean }
+      is_player_in_game: {
+        Args: { _game_id: string; _user_id: string }
+        Returns: boolean
+      }
       is_study_owner: {
         Args: { study_id_param: string; user_id_param: string }
         Returns: boolean
