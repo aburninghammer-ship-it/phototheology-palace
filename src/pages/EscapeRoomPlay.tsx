@@ -9,8 +9,9 @@ import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { toast } from "sonner";
-import { Clock, HelpCircle, Trophy, Zap, CheckCircle, XCircle } from "lucide-react";
+import { Clock, HelpCircle, Trophy, Zap, CheckCircle, XCircle, Book } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
+import { BibleDrawer } from "@/components/escape-room/BibleDrawer";
 
 interface Puzzle {
   id: string;
@@ -58,6 +59,7 @@ export default function EscapeRoomPlay() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showHint, setShowHint] = useState(false);
   const [solutions, setSolutions] = useState<any[]>([]);
+  const [bibleDrawerOpen, setBibleDrawerOpen] = useState(false);
 
   useEffect(() => {
     if (!user || !roomId) return;
@@ -240,6 +242,18 @@ export default function EscapeRoomPlay() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-accent/5">
       <Navigation />
+      
+      {/* Floating Bible Button */}
+      <Button
+        onClick={() => setBibleDrawerOpen(true)}
+        className="fixed bottom-6 right-6 h-14 w-14 rounded-full shadow-lg z-50"
+        size="icon"
+      >
+        <Book className="h-6 w-6" />
+      </Button>
+
+      {/* Bible Drawer */}
+      <BibleDrawer open={bibleDrawerOpen} onOpenChange={setBibleDrawerOpen} />
       
       <main className="container mx-auto px-4 pt-20 pb-12 max-w-4xl">
         {/* Header */}
