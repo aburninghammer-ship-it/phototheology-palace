@@ -509,32 +509,44 @@ const PTMultiplayerGame = () => {
                   </div>
 
                   {/* Jeeves Turn Button */}
-                  {isVsJeevesMode && players.find(p => p.id === game.current_turn_player_id)?.display_name.includes('Jeeves') && (
-                    <motion.div
-                      initial={{ opacity: 0, scale: 0.9 }}
-                      animate={{ opacity: 1, scale: 1 }}
-                      className="mb-6 text-center"
-                    >
-                      <Button
-                        onClick={handleJeevesMove}
-                        disabled={submitting}
-                        size="lg"
-                        className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white font-semibold px-8 py-4 text-lg"
+                  {(() => {
+                    const currentTurnPlayer = players.find(p => p.id === game.current_turn_player_id);
+                    const isJeevesPlayer = currentTurnPlayer?.user_id === 'jeeves';
+                    console.log('Jeeves button check:', { 
+                      isVsJeevesMode, 
+                      currentTurnPlayer,
+                      isJeevesPlayer,
+                      currentTurnPlayerId: game.current_turn_player_id,
+                      allPlayers: players.map(p => ({ id: p.id, user_id: p.user_id, name: p.display_name }))
+                    });
+                    
+                    return isVsJeevesMode && isJeevesPlayer && (
+                      <motion.div
+                        initial={{ opacity: 0, scale: 0.9 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        className="mb-6 text-center"
                       >
-                        {submitting ? (
-                          <>
-                            <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                            Jeeves is thinking...
-                          </>
-                        ) : (
-                          <>
-                            <Bot className="mr-2 h-5 w-5" />
-                            Jeeves, Your Move
-                          </>
-                        )}
-                      </Button>
-                    </motion.div>
-                  )}
+                        <Button
+                          onClick={handleJeevesMove}
+                          disabled={submitting}
+                          size="lg"
+                          className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white font-semibold px-8 py-4 text-lg"
+                        >
+                          {submitting ? (
+                            <>
+                              <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                              Jeeves is thinking...
+                            </>
+                          ) : (
+                            <>
+                              <Bot className="mr-2 h-5 w-5" />
+                              Jeeves, Your Move
+                            </>
+                          )}
+                        </Button>
+                      </motion.div>
+                    );
+                  })()}
 
                   {/* Recent Moves Feed */}
                   <ScrollArea className="h-[300px] mb-6">
