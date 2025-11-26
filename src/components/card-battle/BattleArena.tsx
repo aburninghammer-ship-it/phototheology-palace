@@ -425,16 +425,22 @@ export function BattleArena({ battle, currentUserId, onBack }: Props) {
       ];
       console.log('🎴 Jeeves selected card:', randomCard);
 
-      // Generate a response from Jeeves
-      const jeevesResponses = [
-        `Through ${randomCard}, we see this story illuminates the sanctuary pattern where Christ's substitutionary sacrifice is prefigured. The narrative reveals how God's dwelling presence among His people points forward to the incarnation.`,
-        `Applying ${randomCard} reveals how this narrative parallels the covenant structure established at Sinai. We observe the pattern of grace preceding law, and mercy triumphing over judgment.`,
-        `Using ${randomCard}, we discover Christ as the central figure who fulfills this typological pattern. The text becomes a window into the great controversy between good and evil.`,
-        `The principle ${randomCard} helps us understand this text in the cycle of redemption where God's faithfulness spans generations. Each detail connects to the broader narrative of salvation history.`,
-        `When viewed through ${randomCard}, this passage connects to the broader prophetic timeline. We see echoes of Daniel's visions and Revelation's unveiling of final events.`
-      ];
-      
-      const randomResponse = jeevesResponses[Math.floor(Math.random() * jeevesResponses.length)];
+      // Generate a quality response from Jeeves using AI
+      console.log('🤖 Generating Jeeves response via AI...');
+      const { data: aiData, error: aiError } = await supabase.functions.invoke('generate-jeeves-response', {
+        body: {
+          cardCode: randomCard,
+          storyText: battle.story_text,
+          storyReference: battle.story_reference,
+        }
+      });
+
+      if (aiError || !aiData?.response) {
+        console.error('❌ Failed to generate Jeeves response:', aiError);
+        throw new Error('Failed to generate Jeeves response');
+      }
+
+      const randomResponse = aiData.response;
       console.log('📝 Jeeves response:', randomResponse);
 
       console.log('🎯 Calling judge-card-battle edge function...');
