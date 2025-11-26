@@ -166,8 +166,8 @@ serve(async (req) => {
     
     console.log('Recently used principles (last 14 days):', Array.from(recentlyUsedCodes));
     
-    // Helper function to select a principle with weighted randomization
-    // Principles not recently used get higher weight
+    // Helper function to select a principle with aggressive variety enforcement
+    // ALWAYS prefer fresh principles if available, only use recently used as last resort
     function selectWeightedPrinciple(principles: typeof PALACE_PRINCIPLES): typeof PALACE_PRINCIPLES[0] {
       if (principles.length === 0) return null as any;
       
@@ -175,12 +175,15 @@ serve(async (req) => {
       const fresh = principles.filter(p => !recentlyUsedCodes.has(p.code));
       const used = principles.filter(p => recentlyUsedCodes.has(p.code));
       
-      // 80% chance to pick from fresh principles if available
-      if (fresh.length > 0 && Math.random() < 0.8) {
-        return fresh[Math.floor(Math.random() * fresh.length)];
+      // ALWAYS pick from fresh principles if ANY are available
+      if (fresh.length > 0) {
+        const selected = fresh[Math.floor(Math.random() * fresh.length)];
+        console.log(`Selected FRESH principle: ${selected.code} from ${fresh.length} available fresh options`);
+        return selected;
       }
       
-      // Otherwise pick from all available (includes used ones)
+      // Only if no fresh principles available, pick from used ones
+      console.log(`No fresh principles available in this floor, selecting from ${used.length} used options`);
       return principles[Math.floor(Math.random() * principles.length)];
     }
     

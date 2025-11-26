@@ -7,21 +7,15 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { 
   BookOpen, 
-  Brain,
-  Users,
   ChevronRight,
   Check,
-  Church,
-  Heart,
+  X,
+  Building2,
+  Shield,
   Sparkles,
   TrendingUp,
   Target,
-  HelpCircle,
-  X,
-  Building2,
-  Play,
-  Shield,
-  Quote
+  Download
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
@@ -33,7 +27,6 @@ import { UserCountBadge } from "@/components/UserCountBadge";
 import { SocialShareButton } from "@/components/SocialShareButton";
 import { PWAInstallButton } from "@/components/PWAInstallButton";
 import { LiveAIDemoWidget } from "@/components/LiveAIDemoWidget";
-import { Download } from "lucide-react";
 import { StreamlinedTestimonials } from "@/components/StreamlinedTestimonials";
 import { FinalCTA } from "@/components/FinalCTA";
 import { ClearHero } from "@/components/ClearHero";
@@ -294,74 +287,6 @@ const Index = () => {
 
       {/* Magic Eye Easter Egg */}
       <MagicEyeEasterEgg />
-
-      {/* SECTION 7 — Social Proof */}
-      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-accent/5 to-primary/5">
-        <div className="max-w-6xl mx-auto">
-          <h2 className="text-4xl md:text-5xl font-bold text-center mb-4">
-            What Users Are Saying
-          </h2>
-          <p className="text-xl text-muted-foreground text-center mb-12">
-            Real results from real people
-          </p>
-          
-          <div className="grid md:grid-cols-3 gap-8">
-            <Card>
-              <CardContent className="pt-6">
-                <Quote className="h-8 w-8 text-primary mb-4" />
-                <p className="text-muted-foreground italic mb-4">
-                  "Phototheology changed the way I read Scripture forever. I finally see how everything connects."
-                </p>
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center">
-                    <Users className="h-5 w-5 text-primary" />
-                  </div>
-                  <div>
-                    <p className="font-semibold">Sarah M.</p>
-                    <p className="text-sm text-muted-foreground">Bible Study Leader</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardContent className="pt-6">
-                <Quote className="h-8 w-8 text-primary mb-4" />
-                <p className="text-muted-foreground italic mb-4">
-                  "My Bible study group has never been more engaged. Jeeves is a game-changer."
-                </p>
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-accent/20 flex items-center justify-center">
-                    <Church className="h-5 w-5 text-accent" />
-                  </div>
-                  <div>
-                    <p className="font-semibold">Pastor James R.</p>
-                    <p className="text-sm text-muted-foreground">Senior Pastor</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardContent className="pt-6">
-                <Quote className="h-8 w-8 text-primary mb-4" />
-                <p className="text-muted-foreground italic mb-4">
-                  "For the first time, I remember what I study. No more random verses — the whole Bible makes sense."
-                </p>
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center">
-                    <Brain className="h-5 w-5 text-primary" />
-                  </div>
-                  <div>
-                    <p className="font-semibold">David T.</p>
-                    <p className="text-sm text-muted-foreground">Seminary Student</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-        </div>
-      </section>
 
       {/* SECTION 9 — Pricing */}
       <section className="py-20 px-4 sm:px-6 lg:px-8 bg-muted/30">
