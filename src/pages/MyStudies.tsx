@@ -18,6 +18,8 @@ import {
 import { StudyPreviewCard } from "@/components/studies/StudyPreviewCard";
 import { StudySortFilter, SortOption } from "@/components/studies/StudySortFilter";
 import { StudyStats } from "@/components/studies/StudyStats";
+import { StudyTagsManager } from "@/components/studies/StudyTagsManager";
+import { StudyAnalytics } from "@/components/studies/StudyAnalytics";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
@@ -274,12 +276,23 @@ const MyStudies = () => {
   };
 
 const [sortOption, setSortOption] = useState<SortOption>("updated");
+  const [selectedTags, setSelectedTags] = useState<string[]>([]);
 
-  const filteredStudies = studies.filter((study) =>
-    study.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    study.content.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    study.tags.some(tag => tag.toLowerCase().includes(searchQuery.toLowerCase()))
-  );
+  // Get all unique tags from studies
+  const allTags = [...new Set(studies.flatMap(s => s.tags))].sort();
+
+  const filteredStudies = studies.filter((study) => {
+    const matchesSearch = 
+      study.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      study.content.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      study.tags.some(tag => tag.toLowerCase().includes(searchQuery.toLowerCase()));
+    
+    const matchesTags = 
+      selectedTags.length === 0 || 
+      selectedTags.some(tag => study.tags.includes(tag));
+    
+    return matchesSearch && matchesTags;
+  });
 
   // Sort studies based on selected option
   const sortedStudies = [...filteredStudies].sort((a, b) => {
@@ -465,6 +478,9 @@ const [sortOption, setSortOption] = useState<SortOption>("updated");
             {/* Progress Stats */}
             <StudyStats studies={studies} />
 
+            {/* Analytics */}
+            <StudyAnalytics studies={studies} />
+
             {/* Continue Where You Left Off */}
             {mostRecentStudy && (
               <div>
@@ -486,12 +502,21 @@ const [sortOption, setSortOption] = useState<SortOption>("updated");
             )}
 
             {/* Sort & Filter Bar */}
-            <StudySortFilter
-              currentSort={sortOption}
-              onSortChange={setSortOption}
-              totalCount={filteredStudies.length}
-              favoriteCount={favoriteCount}
-            />
+            <div className="flex flex-col sm:flex-row gap-3 justify-between">
+              <StudyTagsManager
+                allTags={allTags}
+                selectedTags={selectedTags}
+                onTagSelect={(tag) => setSelectedTags(prev => [...prev, tag])}
+                onTagDeselect={(tag) => setSelectedTags(prev => prev.filter(t => t !== tag))}
+                onClearFilters={() => setSelectedTags([])}
+              />
+              <StudySortFilter
+                currentSort={sortOption}
+                onSortChange={setSortOption}
+                totalCount={filteredStudies.length}
+                favoriteCount={favoriteCount}
+              />
+            </div>
 
             {/* All Studies Grid */}
             {sortedStudies.length > 1 && (
