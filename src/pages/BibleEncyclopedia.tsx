@@ -43,7 +43,7 @@ const categories = [
   { id: "feasts", name: "Feasts", icon: PartyPopper, preview: "Passover, Pentecost, Tabernacles", description: "Jewish festivals and their fulfillment" },
   { id: "laws", name: "Laws", icon: Scale, preview: "Ten Commandments, Ceremonial Laws", description: "Biblical laws and their application" },
   { id: "prophets", name: "Prophets", icon: Crown, preview: "Isaiah, Daniel, Revelation", description: "Prophetic books and messages" },
-  { id: "doctrines", name: "Doctrines", icon: BookMarked, preview: "Sabbath, Sanctuary, State of the Dead", description: "Seventh-day Adventist doctrinal positions" },
+  { id: "doctrines", name: "Doctrines", icon: BookMarked, preview: "Sabbath, Sanctuary, State of the Dead", description: "Biblical doctrinal teachings and positions" },
   { id: "animals", name: "Animals", icon: PawPrint, preview: "Lion, Lamb, Serpent", description: "Animals and their biblical significance" },
 ];
 
