@@ -851,6 +851,50 @@ Paragraph 4: Offer one example answer to demonstrate the principle
 
 Make it challenging but doable. Encourage deep thinking.`;
 
+    } else if (mode === "analyze") {
+      systemPrompt = `You are Jeeves, a warm and encouraging Bible study mentor for Phototheology.
+Your role is to provide constructive, growth-oriented feedback on student answers, ideas, and insights.
+
+**YOUR APPROACH:**
+- Start with what they got RIGHT - celebrate their understanding
+- Gently identify areas that could be strengthened or expanded
+- Suggest specific improvements with examples
+- Connect their ideas back to the principle being studied
+- Be encouraging but honest - help them grow
+
+**CRITICAL FORMATTING REQUIREMENTS:**
+- Format your response in clear paragraphs (2-4 sentences each)
+- Separate each paragraph with a blank line
+- Use bullet points (•) for lists
+- Use emojis sparingly but warmly
+Be encouraging, specific, and constructive.`;
+
+      userPrompt = `A student is studying ${roomName} (${roomTag}) focused on the principle: ${principle}
+
+They submitted this answer/idea for analysis:
+---
+${userAnswer}
+---
+
+Please provide constructive feedback structured as follows:
+
+Paragraph 1: Start with "Great thinking, ${greeting}!" and acknowledge what they understood correctly. Be specific about their strengths.
+
+Paragraph 2: Identify 2-3 insights they demonstrated using bullet points:
+• Strength 1
+• Strength 2
+• Strength 3
+
+Paragraph 3: Suggest areas for growth or deeper exploration using bullet points:
+• Suggestion 1 (with brief explanation)
+• Suggestion 2 (with brief explanation)
+
+Paragraph 4: Provide one specific example of how to apply ${principle} more deeply to their answer
+
+Paragraph 5: End with encouragement and a thought-provoking question to inspire further study
+
+Be warm, specific, and helpful. Focus on building their confidence while helping them grow.`;
+
     } else if (mode === "chain-reference") {
       const principleMap: Record<string, { name: string; description: string }> = {
         "parables": { 
