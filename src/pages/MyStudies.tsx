@@ -13,7 +13,11 @@ import {
   Calendar,
   Trash2,
   Edit,
-  FileText
+  FileText,
+  Sparkles,
+  Flame,
+  BookMarked,
+  PlayCircle
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
@@ -30,6 +34,93 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { StudyTemplates } from "@/components/studies/StudyTemplates";
+
+const VERSE_ANALYSIS_TEMPLATE = `# Verse Analysis
+
+**Verse:** [Book Chapter:Verse]
+
+**Text:**
+[Insert verse text here]
+
+## Observation (OR)
+• What do I notice in this verse?
+• Key words and phrases:
+• Context:
+
+## Interpretation (IR)
+• What does this mean?
+• How does this apply?
+
+## Christ Connection (CR)
+• How does this reveal Christ?
+
+## Application
+• How does this apply to my life today?
+
+## Prayer
+[Write a prayer based on this verse]`;
+
+const CHAPTER_STUDY_TEMPLATE = `# Chapter Study
+
+**Book & Chapter:** [Book Chapter]
+
+## Overview
+• Main theme:
+• Key events:
+• Important characters:
+
+## Verse-by-Verse Notes
+[Take notes on key verses]
+
+## Dimensions (5D)
+1. **Literal:** What happened?
+2. **Christ:** How does this point to Christ?
+3. **Personal:** What does this mean for me?
+4. **Church:** What does this mean for the church?
+5. **Heaven:** What does this reveal about eternity?
+
+## Cross-References
+• Related passages:
+
+## Key Takeaways
+1.
+2.
+3.
+
+## Application
+How will I apply this today?`;
+
+const THEME_STUDY_TEMPLATE = `# Theme Study
+
+**Theme:** [Your theme here]
+
+## Definition
+What is this theme about?
+
+## Old Testament Examples
+• 
+• 
+• 
+
+## New Testament Examples
+• 
+• 
+• 
+
+## Christ Connection
+How does Christ fulfill or embody this theme?
+
+## Key Verses
+1.
+2.
+3.
+
+## Personal Application
+How does this theme apply to my life?
+
+## Questions to Explore
+• 
+• `;
 
 interface Study {
   id: string;
@@ -236,19 +327,121 @@ const MyStudies = () => {
             <p className="text-muted-foreground">Loading your studies...</p>
           </div>
         ) : studies.length === 0 ? (
-          <Card className="text-center py-12">
-            <CardContent>
-              <FileText className="w-16 h-16 mx-auto mb-4 text-muted-foreground" />
-              <h3 className="text-2xl font-semibold mb-2">No studies yet</h3>
-              <p className="text-muted-foreground mb-6">
-                Create your first study to start taking notes
-              </p>
-              <Button onClick={() => createNewStudy()} className="gap-2" disabled={authLoading || !user}>
-                <Plus className="w-5 h-5" />
-                Create First Study
-              </Button>
-            </CardContent>
-          </Card>
+          <div className="space-y-8">
+            {/* Welcome Card */}
+            <Card className="bg-gradient-to-br from-primary/10 via-accent/5 to-background border-primary/20">
+              <CardHeader className="text-center">
+                <div className="mx-auto w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center mb-4">
+                  <BookOpen className="w-10 h-10 text-primary" />
+                </div>
+                <CardTitle className="text-3xl mb-2">Welcome to My Studies</CardTitle>
+                <CardDescription className="text-base max-w-2xl mx-auto">
+                  This is where your Bible studies will live. Each study is a personal space where you can:
+                  explore passages, apply Phototheology principles, save insights, and build your understanding of Scripture.
+                </CardDescription>
+              </CardHeader>
+            </Card>
+
+            {/* Quick Actions */}
+            <div>
+              <h2 className="text-2xl font-semibold mb-4 flex items-center gap-2">
+                <Sparkles className="w-6 h-6 text-primary" />
+                Quick Start
+              </h2>
+              <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
+                <Card 
+                  className="cursor-pointer hover:shadow-lg hover:border-primary/50 transition-all group"
+                  onClick={() => handleTemplateSelect({ name: "Verse Analysis", content: VERSE_ANALYSIS_TEMPLATE })}
+                >
+                  <CardHeader>
+                    <div className="w-12 h-12 rounded-lg bg-blue-500/10 flex items-center justify-center mb-3 group-hover:bg-blue-500/20 transition-colors">
+                      <BookOpen className="w-6 h-6 text-blue-500" />
+                    </div>
+                    <CardTitle className="text-lg">Study a Verse</CardTitle>
+                    <CardDescription>Deep dive into a single verse with guided questions</CardDescription>
+                  </CardHeader>
+                </Card>
+
+                <Card 
+                  className="cursor-pointer hover:shadow-lg hover:border-primary/50 transition-all group"
+                  onClick={() => handleTemplateSelect({ name: "Chapter Study", content: CHAPTER_STUDY_TEMPLATE })}
+                >
+                  <CardHeader>
+                    <div className="w-12 h-12 rounded-lg bg-purple-500/10 flex items-center justify-center mb-3 group-hover:bg-purple-500/20 transition-colors">
+                      <FileText className="w-6 h-6 text-purple-500" />
+                    </div>
+                    <CardTitle className="text-lg">Study a Chapter</CardTitle>
+                    <CardDescription>Comprehensive analysis of an entire chapter</CardDescription>
+                  </CardHeader>
+                </Card>
+
+                <Card 
+                  className="cursor-pointer hover:shadow-lg hover:border-primary/50 transition-all group"
+                  onClick={() => handleTemplateSelect({ name: "Theme Study", content: THEME_STUDY_TEMPLATE })}
+                >
+                  <CardHeader>
+                    <div className="w-12 h-12 rounded-lg bg-amber-500/10 flex items-center justify-center mb-3 group-hover:bg-amber-500/20 transition-colors">
+                      <Flame className="w-6 h-6 text-amber-500" />
+                    </div>
+                    <CardTitle className="text-lg">Study a Theme</CardTitle>
+                    <CardDescription>Explore a biblical theme across Scripture</CardDescription>
+                  </CardHeader>
+                </Card>
+
+                <Card 
+                  className="cursor-pointer hover:shadow-lg hover:border-primary/50 transition-all group"
+                  onClick={() => createNewStudy()}
+                >
+                  <CardHeader>
+                    <div className="w-12 h-12 rounded-lg bg-green-500/10 flex items-center justify-center mb-3 group-hover:bg-green-500/20 transition-colors">
+                      <Plus className="w-6 h-6 text-green-500" />
+                    </div>
+                    <CardTitle className="text-lg">Start Blank</CardTitle>
+                    <CardDescription>Create a custom study from scratch</CardDescription>
+                  </CardHeader>
+                </Card>
+              </div>
+            </div>
+
+            {/* Tips Card */}
+            <Card className="bg-muted/30">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <BookMarked className="w-5 h-5" />
+                  Why Save Studies?
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                <div className="flex gap-3">
+                  <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center shrink-0 mt-0.5">
+                    <span className="text-primary font-semibold">1</span>
+                  </div>
+                  <div>
+                    <h4 className="font-semibold mb-1">Build Your Palace</h4>
+                    <p className="text-sm text-muted-foreground">Each study applies Palace Rooms and Phototheology principles to help you memorize and understand Scripture deeply.</p>
+                  </div>
+                </div>
+                <div className="flex gap-3">
+                  <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center shrink-0 mt-0.5">
+                    <span className="text-primary font-semibold">2</span>
+                  </div>
+                  <div>
+                    <h4 className="font-semibold mb-1">Track Your Growth</h4>
+                    <p className="text-sm text-muted-foreground">Review past insights and see how your understanding evolves over time.</p>
+                  </div>
+                </div>
+                <div className="flex gap-3">
+                  <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center shrink-0 mt-0.5">
+                    <span className="text-primary font-semibold">3</span>
+                  </div>
+                  <div>
+                    <h4 className="font-semibold mb-1">Prepare Lessons</h4>
+                    <p className="text-sm text-muted-foreground">Use your studies as sermon seeds, teaching material, or discussion starters.</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
         ) : (
           <>
             {/* Favorites Section */}
