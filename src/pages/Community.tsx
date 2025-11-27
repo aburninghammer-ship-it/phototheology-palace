@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useEffect, useState, useMemo } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { Navigation } from "@/components/Navigation";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -19,6 +19,11 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { UserMasterySword } from "@/components/mastery/UserMasterySword";
+import { CommunitySearch } from "@/components/community/CommunitySearch";
+import { CommunityGuidelines } from "@/components/community/CommunityGuidelines";
+import { CommunityNotifications } from "@/components/community/CommunityNotifications";
+import { SharedContentCard } from "@/components/community/SharedContentCard";
+import { TagInput } from "@/components/community/TagInput";
 
 type SortOption = "latest" | "most_commented" | "needs_feedback";
 type CategoryFilter = "all" | "general" | "prayer" | "study" | "questions";
@@ -26,6 +31,7 @@ type CategoryFilter = "all" | "general" | "prayer" | "study" | "questions";
 const Community = () => {
   const { user, loading } = useAuth();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const { toast } = useToast();
   const { activeCount, activeUsers } = useActiveUsers();
   const [posts, setPosts] = useState<any[]>([]);
@@ -33,6 +39,7 @@ const Community = () => {
   const [newTitle, setNewTitle] = useState("");
   const [newContent, setNewContent] = useState("");
   const [newCategory, setNewCategory] = useState<string>("general");
+  const [newTags, setNewTags] = useState<string[]>([]);
   const [comments, setComments] = useState<Record<string, any[]>>({});
   const [newComment, setNewComment] = useState<Record<string, string>>({});
   const [replyingTo, setReplyingTo] = useState<Record<string, string | null>>({});
@@ -41,6 +48,25 @@ const Community = () => {
   const [editContent, setEditContent] = useState<string>("");
   const [sortBy, setSortBy] = useState<SortOption>("latest");
   const [categoryFilter, setCategoryFilter] = useState<CategoryFilter>("all");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedTags, setSelectedTags] = useState<string[]>([]);
+
+  // Extract all unique tags from posts
+  const availableTags = useMemo(() => {
+    const tagSet = new Set<string>();
+    posts.forEach(post => {
+      (post.tags || []).forEach((tag: string) => tagSet.add(tag));
+    });
+    return Array.from(tagSet).sort();
+  }, [posts]);
+
+  // Handle highlight from URL (when navigating from notification)
+  useEffect(() => {
+    const highlightPostId = searchParams.get("post");
+    if (highlightPostId) {
+      setExpandedPosts(prev => ({ ...prev, [highlightPostId]: true }));
+    }
+  }, [searchParams]);
 
   useEffect(() => {
     if (user && user.id) {
@@ -151,12 +177,13 @@ const Community = () => {
 
       const { error } = await supabase
         .from("community_posts")
-        .insert({
+        .insert([{
           user_id: user!.id,
           title: sanitizedTitle,
           content: sanitizedContent,
           category: validatedData.category,
-        });
+          tags: newTags,
+        }]);
 
       if (error) throw error;
 
@@ -168,6 +195,7 @@ const Community = () => {
       setNewTitle("");
       setNewContent("");
       setNewCategory("general");
+      setNewTags([]);
       setShowNewPost(false);
     } catch (error: any) {
       if (error.name === 'ZodError') {
@@ -334,6 +362,22 @@ const Community = () => {
   const getFilteredAndSortedPosts = () => {
     let filtered = posts;
 
+    // Filter by search query
+    if (searchQuery.trim()) {
+      const query = searchQuery.toLowerCase();
+      filtered = filtered.filter(p => 
+        p.title?.toLowerCase().includes(query) ||
+        p.content?.toLowerCase().includes(query)
+      );
+    }
+
+    // Filter by selected tags
+    if (selectedTags.length > 0) {
+      filtered = filtered.filter(p => 
+        selectedTags.some(tag => (p.tags || []).includes(tag))
+      );
+    }
+
     // Filter by category
     if (categoryFilter !== "all") {
       filtered = filtered.filter(p => p.category === categoryFilter);
@@ -360,6 +404,15 @@ const Community = () => {
     return sorted;
   };
 
+  const handleNavigateToPost = (postId: string) => {
+    setExpandedPosts(prev => ({ ...prev, [postId]: true }));
+    // Scroll to post
+    setTimeout(() => {
+      const element = document.getElementById(`post-${postId}`);
+      element?.scrollIntoView({ behavior: "smooth", block: "center" });
+    }, 100);
+  };
+
   if (!user) return null;
 
   const filteredPosts = getFilteredAndSortedPosts();
@@ -368,6 +421,7 @@ const Community = () => {
   return (
     <div className="min-h-screen bg-background">
       <Navigation />
+      {user && <CommunityGuidelines userId={user.id} />}
       <main className="container mx-auto px-4 py-8">
         <div className="max-w-5xl mx-auto space-y-6">
           {/* Header */}
@@ -396,13 +450,29 @@ const Community = () => {
                     </Badge>
                   </div>
                 </div>
-                <Button onClick={() => setShowNewPost(!showNewPost)} size="lg" className="shadow-lg">
-                  <Plus className="mr-2 h-5 w-5" />
-                  New Post
-                </Button>
+                <div className="flex items-center gap-2">
+                  {user && (
+                    <CommunityNotifications 
+                      userId={user.id} 
+                      onNavigateToPost={handleNavigateToPost}
+                    />
+                  )}
+                  <Button onClick={() => setShowNewPost(!showNewPost)} size="lg" className="shadow-lg">
+                    <Plus className="mr-2 h-5 w-5" />
+                    New Post
+                  </Button>
+                </div>
               </div>
             </div>
           </div>
+
+          {/* Search & Tags */}
+          <CommunitySearch
+            onSearch={setSearchQuery}
+            onTagFilter={setSelectedTags}
+            selectedTags={selectedTags}
+            availableTags={availableTags}
+          />
 
           {/* Who's Online Section */}
           {activeUsers.length > 0 && (
@@ -494,6 +564,10 @@ const Community = () => {
                     <SelectItem value="questions">Questions</SelectItem>
                   </SelectContent>
                 </Select>
+                <div>
+                  <label className="text-sm font-medium mb-2 block">Tags (optional)</label>
+                  <TagInput tags={newTags} onChange={setNewTags} maxTags={5} />
+                </div>
                 <div className="space-y-2">
                   <Textarea
                     placeholder="Share your thoughts, insights, or questions... (emojis supported 😊)"
@@ -583,7 +657,7 @@ const Community = () => {
               const isExpanded = expandedPosts[post.id];
               
               return (
-                <Card key={post.id} className="overflow-hidden hover:shadow-lg transition-shadow">
+                <Card key={post.id} id={`post-${post.id}`} className="overflow-hidden hover:shadow-lg transition-shadow">
                   <CardHeader className="bg-gradient-to-r from-primary/5 to-accent/5">
                     <div className="flex items-start justify-between">
                       <div className="flex items-center gap-3 flex-1">
@@ -621,6 +695,22 @@ const Community = () => {
                     </div>
                   </CardHeader>
                   <CardContent className="space-y-4 pt-6">
+                    {/* Tags */}
+                    {post.tags && post.tags.length > 0 && (
+                      <div className="flex flex-wrap gap-1">
+                        {post.tags.map((tag: string) => (
+                          <Badge key={tag} variant="outline" className="text-xs">
+                            #{tag}
+                          </Badge>
+                        ))}
+                      </div>
+                    )}
+                    
+                    {/* Shared Content Card */}
+                    {post.shared_content && (
+                      <SharedContentCard content={post.shared_content} />
+                    )}
+                    
                     <p className="text-base leading-relaxed whitespace-pre-wrap">{post.content}</p>
                     
                     <Separator />

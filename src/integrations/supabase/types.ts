@@ -890,6 +890,51 @@ export type Database = {
           },
         ]
       }
+      community_post_notifications: {
+        Row: {
+          comment_id: string | null
+          created_at: string | null
+          id: string
+          is_read: boolean | null
+          post_id: string
+          type: string
+          user_id: string
+        }
+        Insert: {
+          comment_id?: string | null
+          created_at?: string | null
+          id?: string
+          is_read?: boolean | null
+          post_id: string
+          type: string
+          user_id: string
+        }
+        Update: {
+          comment_id?: string | null
+          created_at?: string | null
+          id?: string
+          is_read?: boolean | null
+          post_id?: string
+          type?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "community_post_notifications_comment_id_fkey"
+            columns: ["comment_id"]
+            isOneToOne: false
+            referencedRelation: "community_comments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "community_post_notifications_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "community_posts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       community_posts: {
         Row: {
           category: string | null
@@ -897,6 +942,9 @@ export type Database = {
           created_at: string | null
           id: string
           likes: number | null
+          search_vector: unknown
+          shared_content: Json | null
+          tags: string[] | null
           title: string
           updated_at: string | null
           user_id: string
@@ -907,6 +955,9 @@ export type Database = {
           created_at?: string | null
           id?: string
           likes?: number | null
+          search_vector?: unknown
+          shared_content?: Json | null
+          tags?: string[] | null
           title: string
           updated_at?: string | null
           user_id: string
@@ -917,6 +968,9 @@ export type Database = {
           created_at?: string | null
           id?: string
           likes?: number | null
+          search_vector?: unknown
+          shared_content?: Json | null
+          tags?: string[] | null
           title?: string
           updated_at?: string | null
           user_id?: string
@@ -3641,6 +3695,7 @@ export type Database = {
           focused_room_set_at: string | null
           gem_creation_streak: number | null
           has_lifetime_access: boolean
+          has_seen_community_guidelines: boolean | null
           id: string
           is_recurring: boolean | null
           is_student: boolean | null
@@ -3691,6 +3746,7 @@ export type Database = {
           focused_room_set_at?: string | null
           gem_creation_streak?: number | null
           has_lifetime_access?: boolean
+          has_seen_community_guidelines?: boolean | null
           id: string
           is_recurring?: boolean | null
           is_student?: boolean | null
@@ -3741,6 +3797,7 @@ export type Database = {
           focused_room_set_at?: string | null
           gem_creation_streak?: number | null
           has_lifetime_access?: boolean
+          has_seen_community_guidelines?: boolean | null
           id?: string
           is_recurring?: boolean | null
           is_student?: boolean | null
