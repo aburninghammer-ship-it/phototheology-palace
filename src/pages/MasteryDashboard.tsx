@@ -6,10 +6,12 @@ import { MasteryBadge } from "@/components/mastery/MasteryBadge";
 import { XpProgressBar } from "@/components/mastery/XpProgressBar";
 import { MasteryMap } from "@/components/mastery/MasteryMap";
 import { ReportCardDisplay } from "@/components/mastery/ReportCardDisplay";
+import { RoomMasteryGrid } from "@/components/mastery/RoomMasteryGrid";
+import { MasteryPassport } from "@/components/mastery/MasteryPassport";
 import { useMastery, useAllRoomMasteries, useGlobalMasterTitle } from "@/hooks/useMastery";
 import { useMasteryStreak } from "@/hooks/useMasteryStreak";
 import { Link } from "react-router-dom";
-import { Sword } from "lucide-react";
+import { Sword, Award, Grid3X3 } from "lucide-react";
 import { Flame, Trophy, Crown, Target, TrendingUp, Zap, Map as MapIcon, FileText, ChevronDown } from "lucide-react";
 import { getGlobalTitle, getNextGlobalTitleMilestone } from "@/utils/masteryCalculations";
 import { cn } from "@/lib/utils";
@@ -140,8 +142,16 @@ export default function MasteryDashboard() {
 
         {/* Tabbed Content */}
         <Tabs defaultValue="overview" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-3">
+          <TabsList className="grid w-full grid-cols-5">
             <TabsTrigger value="overview">Overview</TabsTrigger>
+            <TabsTrigger value="rooms">
+              <Grid3X3 className="h-4 w-4 mr-2" />
+              Rooms
+            </TabsTrigger>
+            <TabsTrigger value="badges">
+              <Award className="h-4 w-4 mr-2" />
+              Badges
+            </TabsTrigger>
             <TabsTrigger value="map">
               <MapIcon className="h-4 w-4 mr-2" />
               Map
@@ -429,6 +439,14 @@ export default function MasteryDashboard() {
                 )}
               </CardContent>
             </Card>
+          </TabsContent>
+
+          <TabsContent value="rooms" className="space-y-6">
+            <RoomMasteryGrid showTrainButton={true} />
+          </TabsContent>
+
+          <TabsContent value="badges">
+            <MasteryPassport />
           </TabsContent>
 
           <TabsContent value="map">
