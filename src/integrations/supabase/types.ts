@@ -5886,6 +5886,57 @@ export type Database = {
           },
         ]
       }
+      verse_palace_mappings: {
+        Row: {
+          book: string
+          chapter: number
+          created_at: string
+          floor_number: number
+          id: string
+          imagery_note: string | null
+          personal_insight: string | null
+          principle_codes: string[] | null
+          room_id: string
+          room_tag: string
+          updated_at: string
+          user_id: string
+          verse: number
+          verse_reference: string
+        }
+        Insert: {
+          book: string
+          chapter: number
+          created_at?: string
+          floor_number: number
+          id?: string
+          imagery_note?: string | null
+          personal_insight?: string | null
+          principle_codes?: string[] | null
+          room_id: string
+          room_tag: string
+          updated_at?: string
+          user_id: string
+          verse: number
+          verse_reference: string
+        }
+        Update: {
+          book?: string
+          chapter?: number
+          created_at?: string
+          floor_number?: number
+          id?: string
+          imagery_note?: string | null
+          personal_insight?: string | null
+          principle_codes?: string[] | null
+          room_id?: string
+          room_tag?: string
+          updated_at?: string
+          user_id?: string
+          verse?: number
+          verse_reference?: string
+        }
+        Relationships: []
+      }
       verses_strongs: {
         Row: {
           book: string
