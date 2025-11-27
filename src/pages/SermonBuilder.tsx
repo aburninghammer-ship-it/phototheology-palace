@@ -7,11 +7,14 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
-import { Film, Mic, BookOpen, TrendingUp, ArrowRight, CheckCircle2, Loader2, Archive } from "lucide-react";
+import { Film, Mic, BookOpen, TrendingUp, ArrowRight, CheckCircle2, Loader2, Archive, Gem, Info } from "lucide-react";
 import { sermonTitleSchema, sermonThemeSchema, sermonStoneSchema, sermonBridgeSchema } from "@/lib/validationSchemas";
 import { sanitizeText } from "@/lib/sanitize";
 import { SermonRichTextArea } from "@/components/sermon/SermonRichTextArea";
 import { SermonPDFExport } from "@/components/sermon/SermonPDFExport";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 const STEPS = [
   { num: 1, title: "Setup", icon: BookOpen },
@@ -22,12 +25,42 @@ const STEPS = [
 ];
 
 const SERMON_STYLES = [
-  "Inductive (Experience → Principle)",
-  "Deductive (Principle → Application)",
-  "Narrative (Story-Driven)",
-  "Expository (Verse-by-Verse)",
-  "Topical (Theme-Focused)"
+  {
+    value: "Inductive (Experience → Principle)",
+    label: "Inductive",
+    description: "Start with experiences, stories, or observations, then lead the audience to discover the biblical principle. Great for skeptical audiences or complex topics."
+  },
+  {
+    value: "Deductive (Principle → Application)",
+    label: "Deductive",
+    description: "State the main truth upfront, then explain, illustrate, and apply it. Traditional and clear—ideal when the audience already trusts Scripture."
+  },
+  {
+    value: "Narrative (Story-Driven)",
+    label: "Narrative",
+    description: "Tell the biblical story with dramatic tension, letting the audience live inside the text. Powerful for emotional engagement and memorable messages."
+  },
+  {
+    value: "Expository (Verse-by-Verse)",
+    label: "Expository",
+    description: "Walk through a passage systematically, explaining each verse in context. Best for teaching-focused congregations who want deep Bible study."
+  },
+  {
+    value: "Topical (Theme-Focused)",
+    label: "Topical",
+    description: "Address a specific topic using multiple Scripture references. Useful for practical life issues, doctrinal studies, or current events."
+  }
 ];
+
+interface UserGem {
+  id: string;
+  title: string;
+  verse1: string;
+  verse2: string;
+  verse3: string;
+  connection_explanation: string;
+  principle_codes: string[] | null;
+}
 
 export default function SermonBuilder() {
   const navigate = useNavigate();
@@ -41,7 +74,7 @@ export default function SermonBuilder() {
   const [sermon, setSermon] = useState({
     title: "",
     theme_passage: "",
-    sermon_style: SERMON_STYLES[0],
+    sermon_style: SERMON_STYLES[0].value,
     smooth_stones: [] as string[],
     bridges: [] as string[],
     movie_structure: {} as any,
@@ -50,6 +83,9 @@ export default function SermonBuilder() {
   const [newStone, setNewStone] = useState("");
   const [newBridge, setNewBridge] = useState("");
   const [aiHelp, setAiHelp] = useState("");
+  const [userGems, setUserGems] = useState<UserGem[]>([]);
+  const [loadingGems, setLoadingGems] = useState(false);
+  const [gemsDialogOpen, setGemsDialogOpen] = useState(false);
 
   useEffect(() => {
     checkAuth();
@@ -134,6 +170,40 @@ export default function SermonBuilder() {
     } catch (error: any) {
       toast.error(error.errors?.[0]?.message || "Invalid bridge format");
     }
+  };
+
+  const loadUserGems = async () => {
+    setLoadingGems(true);
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      const { data, error } = await supabase
+        .from("gems")
+        .select("id, title, verse1, verse2, verse3, connection_explanation, principle_codes")
+        .eq("user_id", user.id)
+        .order("created_at", { ascending: false });
+
+      if (error) throw error;
+      setUserGems(data || []);
+      setGemsDialogOpen(true);
+    } catch (error) {
+      console.error("Error loading gems:", error);
+      toast.error("Failed to load your gems");
+    } finally {
+      setLoadingGems(false);
+    }
+  };
+
+  const addGemAsStone = (gem: UserGem) => {
+    if (sermon.smooth_stones.length >= 5) {
+      toast.error("You already have 5 smooth stones!");
+      return;
+    }
+    const gemContent = `<strong>${gem.title}</strong><br/><em>Verses: ${gem.verse1}, ${gem.verse2}, ${gem.verse3}</em><br/>${gem.connection_explanation}`;
+    setSermon({ ...sermon, smooth_stones: [...sermon.smooth_stones, gemContent] });
+    setGemsDialogOpen(false);
+    toast.success("Gem added as a smooth stone!");
   };
 
   const nextStep = () => {
@@ -299,19 +369,37 @@ export default function SermonBuilder() {
                   </div>
 
                   <div>
-                    <label className="text-sm font-medium mb-2 block">Sermon Style</label>
+                    <label className="text-sm font-medium mb-2 block flex items-center gap-2">
+                      Sermon Style
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <Info className="w-4 h-4 text-muted-foreground cursor-help" />
+                        </TooltipTrigger>
+                        <TooltipContent side="right" className="max-w-xs">
+                          <p className="text-sm">Each style shapes how you present truth. Hover over options to learn more.</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </label>
                     <Select value={sermon.sermon_style} onValueChange={(v) => setSermon({ ...sermon, sermon_style: v })}>
                       <SelectTrigger>
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
                         {SERMON_STYLES.map((style) => (
-                          <SelectItem key={style} value={style}>
-                            {style}
+                          <SelectItem key={style.value} value={style.value}>
+                            <div className="flex flex-col">
+                              <span className="font-medium">{style.label}</span>
+                              <span className="text-xs text-muted-foreground">{style.description}</span>
+                            </div>
                           </SelectItem>
                         ))}
                       </SelectContent>
                     </Select>
+                    {sermon.sermon_style && (
+                      <p className="text-xs text-muted-foreground mt-2">
+                        {SERMON_STYLES.find(s => s.value === sermon.sermon_style)?.description}
+                      </p>
+                    )}
                   </div>
 
                   <Button
@@ -351,9 +439,66 @@ export default function SermonBuilder() {
                       minHeight="80px"
                       themePassage={sermon.theme_passage}
                     />
-                    <Button onClick={addSmoothStone} className="w-full">
-                      Add Stone ({sermon.smooth_stones.length}/5)
-                    </Button>
+                    <div className="flex gap-2">
+                      <Button onClick={addSmoothStone} className="flex-1">
+                        Add Stone ({sermon.smooth_stones.length}/5)
+                      </Button>
+                      <Dialog open={gemsDialogOpen} onOpenChange={setGemsDialogOpen}>
+                        <DialogTrigger asChild>
+                          <Button 
+                            onClick={loadUserGems} 
+                            variant="secondary"
+                            disabled={loadingGems || sermon.smooth_stones.length >= 5}
+                            className="gap-2"
+                          >
+                            {loadingGems ? <Loader2 className="w-4 h-4 animate-spin" /> : <Gem className="w-4 h-4" />}
+                            Pull from My Gems
+                          </Button>
+                        </DialogTrigger>
+                        <DialogContent className="max-w-2xl max-h-[80vh]">
+                          <DialogHeader>
+                            <DialogTitle className="flex items-center gap-2">
+                              <Gem className="w-5 h-5 text-purple-600" />
+                              Select a Gem as a Smooth Stone
+                            </DialogTitle>
+                          </DialogHeader>
+                          <ScrollArea className="max-h-[60vh] pr-4">
+                            {userGems.length === 0 ? (
+                              <div className="text-center py-8 text-muted-foreground">
+                                <Gem className="w-12 h-12 mx-auto mb-3 opacity-30" />
+                                <p>No gems found.</p>
+                                <p className="text-sm">Create gems in the Gems Room to use here!</p>
+                              </div>
+                            ) : (
+                              <div className="space-y-3">
+                                {userGems.map((gem) => (
+                                  <div 
+                                    key={gem.id}
+                                    className="p-4 border rounded-lg hover:bg-purple-50 cursor-pointer transition-colors"
+                                    onClick={() => addGemAsStone(gem)}
+                                  >
+                                    <h4 className="font-semibold text-purple-900">{gem.title}</h4>
+                                    <p className="text-sm text-muted-foreground mt-1">
+                                      {gem.verse1} • {gem.verse2} • {gem.verse3}
+                                    </p>
+                                    <p className="text-sm mt-2 line-clamp-2">{gem.connection_explanation}</p>
+                                    {gem.principle_codes && gem.principle_codes.length > 0 && (
+                                      <div className="flex gap-1 mt-2 flex-wrap">
+                                        {gem.principle_codes.map((code, i) => (
+                                          <span key={i} className="text-xs px-2 py-0.5 bg-purple-100 text-purple-700 rounded">
+                                            {code}
+                                          </span>
+                                        ))}
+                                      </div>
+                                    )}
+                                  </div>
+                                ))}
+                              </div>
+                            )}
+                          </ScrollArea>
+                        </DialogContent>
+                      </Dialog>
+                    </div>
                   </div>
 
                   <Button
