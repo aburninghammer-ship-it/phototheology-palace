@@ -2,6 +2,13 @@ import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
+export interface DeeperInsight {
+  type: "name_meaning" | "genesis_3_15" | "geography" | "number" | "wordplay" | "type_antitype";
+  discovery: string;
+  explanation: string;
+  reference?: string;
+}
+
 export interface SavedAnalysis {
   id: string;
   input_text: string;
@@ -13,6 +20,7 @@ export interface SavedAnalysis {
   palace_rooms: Array<{ code: string; name: string; relevance: string }> | null;
   scripture_connections: Array<{ reference: string; connection: string }> | null;
   typology_layers: Array<{ symbol: string; meaning: string; reference: string }> | null;
+  deeper_insights: DeeperInsight[] | null;
   potential_misinterpretations: string[] | null;
   alignment_check: { status: string; notes: string } | null;
   further_study: string[] | null;
@@ -46,6 +54,7 @@ export const useThoughtAnalysisHistory = () => {
         palace_rooms: item.palace_rooms as Array<{ code: string; name: string; relevance: string }> | null,
         scripture_connections: item.scripture_connections as Array<{ reference: string; connection: string }> | null,
         typology_layers: item.typology_layers as Array<{ symbol: string; meaning: string; reference: string }> | null,
+        deeper_insights: (item.deeper_insights as unknown) as DeeperInsight[] | null,
         alignment_check: item.alignment_check as { status: string; notes: string } | null,
       }));
       
@@ -78,6 +87,7 @@ export const useThoughtAnalysisHistory = () => {
           palace_rooms: analysis.palaceRooms,
           scripture_connections: analysis.scriptureConnections,
           typology_layers: analysis.typologyLayers,
+          deeper_insights: analysis.deeperInsights || [],
           potential_misinterpretations: analysis.potentialMisinterpretations,
           alignment_check: analysis.alignmentCheck,
           further_study: analysis.furtherStudy,

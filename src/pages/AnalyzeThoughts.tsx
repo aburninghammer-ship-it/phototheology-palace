@@ -9,11 +9,11 @@ import { motion, AnimatePresence } from "framer-motion";
 import { 
   Lightbulb, Send, BookOpen, Target, TrendingUp, Sparkles, Building2, Link2, Loader2,
   ChevronDown, AlertTriangle, CheckCircle2, BookMarked, Layers, Shield, GraduationCap,
-  Church, Cross, Moon, Scale, Compass, Save, Download, Copy
+  Church, Cross, Moon, Scale, Compass, Save, Download, Copy, Gem
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { useThoughtAnalysisHistory, SavedAnalysis } from "@/hooks/useThoughtAnalysisHistory";
+import { useThoughtAnalysisHistory, SavedAnalysis, DeeperInsight } from "@/hooks/useThoughtAnalysisHistory";
 import { AnimatedScore } from "@/components/analyze/AnimatedScore";
 import { VoiceInput } from "@/components/analyze/VoiceInput";
 import { AnalysisHistorySidebar } from "@/components/analyze/AnalysisHistorySidebar";
@@ -34,6 +34,7 @@ interface AnalysisResult {
   palaceRooms: { code: string; name: string; relevance: string }[];
   scriptureConnections: { reference: string; connection: string }[];
   typologyLayers: { symbol: string; meaning: string; reference: string }[];
+  deeperInsights?: DeeperInsight[];
   potentialMisinterpretations: string[];
   alignmentCheck: { status: "aligned" | "caution" | "concern"; notes: string };
   furtherStudy: string[];
@@ -143,6 +144,7 @@ const AnalyzeThoughts = () => {
       palaceRooms: analysis.palace_rooms || [],
       scriptureConnections: analysis.scripture_connections || [],
       typologyLayers: analysis.typology_layers || [],
+      deeperInsights: analysis.deeper_insights || [],
       potentialMisinterpretations: analysis.potential_misinterpretations || [],
       alignmentCheck: (analysis.alignment_check as AnalysisResult['alignmentCheck']) || { status: "aligned", notes: "" },
       furtherStudy: analysis.further_study || [],
@@ -484,6 +486,64 @@ const AnalyzeThoughts = () => {
                             <p className="text-sm text-muted-foreground">{l.reference}</p>
                           </div>
                         ))}
+                      </div>
+                    </CardContent>
+                  </Card>
+                </motion.div>
+              )}
+
+              {/* Deeper Insights - Hidden Gems */}
+              {result.deeperInsights && result.deeperInsights.length > 0 && (
+                <motion.div initial={{ opacity: 0, scale: 0.98 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.95 }}>
+                  <Card className="bg-gradient-to-br from-emerald-500/10 via-teal-500/10 to-cyan-500/10 border-emerald-500/30 shadow-lg shadow-emerald-500/5">
+                    <CardHeader className="border-b border-border/50">
+                      <CardTitle className="flex items-center gap-2">
+                        <Gem className="h-5 w-5 text-emerald-400" />
+                        <span className="bg-gradient-to-r from-emerald-200 via-teal-200 to-cyan-200 bg-clip-text text-transparent">
+                          Deeper Insights You May Have Missed
+                        </span>
+                      </CardTitle>
+                      <CardDescription className="text-emerald-300/70">
+                        Hidden connections from name meanings, Genesis 3:15 echoes, and symbolic patterns
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent className="pt-6">
+                      <div className="grid gap-4">
+                        {result.deeperInsights.map((insight, i) => {
+                          const typeLabels: Record<string, { label: string; emoji: string; color: string }> = {
+                            name_meaning: { label: "Name/Word Meaning", emoji: "📖", color: "text-teal-400" },
+                            genesis_3_15: { label: "Genesis 3:15 Echo", emoji: "🐍", color: "text-red-400" },
+                            geography: { label: "Geographic Symbol", emoji: "🏔️", color: "text-sky-400" },
+                            number: { label: "Numerical Pattern", emoji: "🔢", color: "text-purple-400" },
+                            wordplay: { label: "Hebrew/Greek Wordplay", emoji: "✨", color: "text-amber-400" },
+                            type_antitype: { label: "Type-Antitype", emoji: "⚖️", color: "text-blue-400" },
+                          };
+                          const typeInfo = typeLabels[insight.type] || { label: insight.type, emoji: "💡", color: "text-emerald-400" };
+                          
+                          return (
+                            <motion.div 
+                              key={i} 
+                              className="p-5 rounded-xl bg-gradient-to-br from-emerald-500/5 to-teal-500/5 border border-emerald-500/20 hover:border-emerald-500/40 transition-all"
+                              initial={{ opacity: 0, y: 10 }}
+                              animate={{ opacity: 1, y: 0 }}
+                              transition={{ delay: 1.0 + i * 0.1 }}
+                            >
+                              <div className="flex items-center gap-2 mb-3">
+                                <span className="text-xl">{typeInfo.emoji}</span>
+                                <Badge className="bg-emerald-500/20 text-emerald-300 border-emerald-500/30">
+                                  {typeInfo.label}
+                                </Badge>
+                              </div>
+                              <p className={`font-semibold mb-2 ${typeInfo.color}`}>{insight.discovery}</p>
+                              <p className="text-sm text-muted-foreground leading-relaxed">{insight.explanation}</p>
+                              {insight.reference && (
+                                <p className="text-xs text-emerald-400/70 mt-2 flex items-center gap-1">
+                                  <BookOpen className="h-3 w-3" /> {insight.reference}
+                                </p>
+                              )}
+                            </motion.div>
+                          );
+                        })}
                       </div>
                     </CardContent>
                   </Card>
