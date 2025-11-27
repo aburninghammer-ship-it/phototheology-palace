@@ -6,15 +6,19 @@ import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Progress } from "@/components/ui/progress";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
-import { Award, Lock, Share2, Grid3x3, List, Trophy, FileText } from "lucide-react";
+import { Award, Lock, Share2, Grid3x3, List, Trophy, FileText, Map, ChevronRight } from "lucide-react";
 import { ShareAchievementButton } from "@/components/ShareAchievementButton";
 import { AchievementProgress } from "@/components/AchievementProgress";
 import { AchievementCertificate } from "@/components/AchievementCertificate";
+import { AchievementRoadmap } from "@/components/achievements/AchievementRoadmap";
+import { TierBadge } from "@/components/achievements/TierBadge";
 import { useToast } from "@/hooks/use-toast";
 import { categoryIcons, categoryDescriptions, categoryColors } from "@/utils/categoryIcons";
+import { requirementRoutes, getRequirementLabel } from "@/utils/achievementHelpers";
 
 const Achievements = () => {
   const { user, loading } = useAuth();
@@ -28,7 +32,8 @@ const Achievements = () => {
   const [viewMode, setViewMode] = useState<"gallery" | "list">("gallery");
   const [sortBy, setSortBy] = useState<"points" | "name">("points");
   const [categoryFilter, setCategoryFilter] = useState<string>("all");
-  const [certificateAchievement, setCertificateAchievement] = useState<any>(null);
+const [certificateAchievement, setCertificateAchievement] = useState<any>(null);
+  const [mainTab, setMainTab] = useState<"gallery" | "roadmap">("gallery");
   const [userStats, setUserStats] = useState({
     roomsCompleted: 0,
     drillsCompleted: 0,
@@ -213,10 +218,34 @@ const Achievements = () => {
       </div>
 
       <main className="container mx-auto px-4 py-8 max-w-7xl">
-        {/* Category Stats & Progress */}
-        <div className="mb-8 space-y-4">
-          {/* Category Cards */}
-          <TooltipProvider>
+        {/* Main Tab Switch: Gallery vs Roadmap */}
+        <div className="mb-6">
+          <Tabs value={mainTab} onValueChange={(v: any) => setMainTab(v)}>
+            <TabsList className="grid w-full max-w-md grid-cols-2">
+              <TabsTrigger value="gallery" className="gap-2">
+                <Grid3x3 className="h-4 w-4" />
+                Gallery View
+              </TabsTrigger>
+              <TabsTrigger value="roadmap" className="gap-2">
+                <Map className="h-4 w-4" />
+                Journey Roadmap
+              </TabsTrigger>
+            </TabsList>
+          </Tabs>
+        </div>
+
+        {mainTab === "roadmap" ? (
+          <AchievementRoadmap
+            achievements={achievements}
+            userAchievements={userAchievements}
+            userStats={userStats}
+          />
+        ) : (
+          <>
+            {/* Category Stats & Progress */}
+            <div className="mb-8 space-y-4">
+              {/* Category Cards */}
+              <TooltipProvider>
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
               <Card 
                 className={`cursor-pointer transition-all ${
@@ -352,18 +381,33 @@ const Achievements = () => {
               const isSelected = selectedIds.has(achievement.id);
               const CategoryIcon = categoryIcons[achievement.category as keyof typeof categoryIcons] || Trophy;
               const colorGradient = categoryColors[achievement.category as keyof typeof categoryColors] || categoryColors.general;
+              const route = requirementRoutes[achievement.requirement_type];
+              
+              // Calculate progress for locked achievements
+              let current = 0;
+              const target = achievement.requirement_count || 1;
+              if (!isUnlocked) {
+                switch (achievement.requirement_type) {
+                  case "rooms_completed": current = userStats.roomsCompleted; break;
+                  case "drills_completed": current = userStats.drillsCompleted; break;
+                  case "perfect_drills": current = userStats.perfectDrills; break;
+                  case "study_streak": current = userStats.studyStreak; break;
+                  case "floors_completed": current = userStats.floorsCompleted; break;
+                }
+              }
+              const percentage = Math.min((current / target) * 100, 100);
 
               return (
                 <Card
                   key={achievement.id}
-                  className={`transition-all cursor-pointer ${
+                  className={`transition-all ${
                     isUnlocked 
-                      ? "border-2 border-yellow-500/50 bg-gradient-to-br from-yellow-50 to-amber-50 dark:from-yellow-900/20 dark:to-amber-900/20" 
-                      : "opacity-60 grayscale hover:opacity-70"
+                      ? "border-2 border-yellow-500/50 bg-gradient-to-br from-yellow-50 to-amber-50 dark:from-yellow-900/20 dark:to-amber-900/20 cursor-pointer" 
+                      : "hover:shadow-md"
                   } ${isSelected ? "ring-2 ring-primary shadow-lg" : ""}`}
                   onClick={() => isUnlocked && toggleSelection(achievement.id)}
                 >
-                  <CardHeader className="space-y-3">
+                  <CardHeader className="space-y-3 pb-2">
                     <div className="flex items-start justify-between">
                       <div className="relative">
                         <div className="text-5xl mb-2">{achievement.icon || '🏆'}</div>
@@ -371,13 +415,16 @@ const Achievements = () => {
                           <CategoryIcon className="h-3 w-3 text-white" />
                         </div>
                       </div>
-                      {isUnlocked && (
-                        <Checkbox
-                          checked={isSelected}
-                          onCheckedChange={() => toggleSelection(achievement.id)}
-                          onClick={(e) => e.stopPropagation()}
-                        />
-                      )}
+                      <div className="flex items-center gap-2">
+                        <TierBadge points={achievement.points || 0} size="md" />
+                        {isUnlocked && (
+                          <Checkbox
+                            checked={isSelected}
+                            onCheckedChange={() => toggleSelection(achievement.id)}
+                            onClick={(e) => e.stopPropagation()}
+                          />
+                        )}
+                      </div>
                     </div>
                     <div>
                       <CardTitle className="text-lg flex items-center gap-2">
@@ -403,6 +450,34 @@ const Achievements = () => {
                         {achievement.category || 'general'}
                       </Badge>
                     </div>
+                    
+                    {/* Progress bar and requirements for locked achievements */}
+                    {!isUnlocked && (
+                      <div className="space-y-2 pt-2 border-t">
+                        <div className="flex justify-between text-xs">
+                          <span className="text-muted-foreground">
+                            {getRequirementLabel(achievement.requirement_type, target)}
+                          </span>
+                          <span className="font-medium">{current}/{target}</span>
+                        </div>
+                        <Progress value={percentage} className="h-1.5" />
+                        {route && (
+                          <Button
+                            size="sm"
+                            variant={percentage >= 50 ? "default" : "outline"}
+                            className="w-full mt-2 gap-1"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              navigate(route.path);
+                            }}
+                          >
+                            {route.label}
+                            <ChevronRight className="h-3 w-3" />
+                          </Button>
+                        )}
+                      </div>
+                    )}
+                    
                     {isUnlocked && (
                       <ShareAchievementButton
                         achievement={achievement}
@@ -422,14 +497,29 @@ const Achievements = () => {
               const isSelected = selectedIds.has(achievement.id);
               const CategoryIcon = categoryIcons[achievement.category as keyof typeof categoryIcons] || Trophy;
               const colorGradient = categoryColors[achievement.category as keyof typeof categoryColors] || categoryColors.general;
+              const route = requirementRoutes[achievement.requirement_type];
+              
+              // Calculate progress for locked achievements
+              let current = 0;
+              const target = achievement.requirement_count || 1;
+              if (!isUnlocked) {
+                switch (achievement.requirement_type) {
+                  case "rooms_completed": current = userStats.roomsCompleted; break;
+                  case "drills_completed": current = userStats.drillsCompleted; break;
+                  case "perfect_drills": current = userStats.perfectDrills; break;
+                  case "study_streak": current = userStats.studyStreak; break;
+                  case "floors_completed": current = userStats.floorsCompleted; break;
+                }
+              }
+              const percentage = Math.min((current / target) * 100, 100);
 
               return (
                 <Card
                   key={achievement.id}
-                  className={`transition-all cursor-pointer ${
+                  className={`transition-all ${
                     isUnlocked 
-                      ? "border-l-4 border-l-yellow-500 hover:shadow-md" 
-                      : "opacity-60 grayscale"
+                      ? "border-l-4 border-l-yellow-500 hover:shadow-md cursor-pointer" 
+                      : "hover:shadow-sm"
                   } ${isSelected ? "ring-2 ring-primary" : ""}`}
                   onClick={() => isUnlocked && toggleSelection(achievement.id)}
                 >
@@ -448,9 +538,10 @@ const Achievements = () => {
                           <CategoryIcon className="h-2.5 w-2.5 text-white" />
                         </div>
                       </div>
-                      <div className="flex-1">
-                        <div className="flex items-center gap-2 mb-1">
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 mb-1 flex-wrap">
                           <h3 className="font-semibold">{achievement.name}</h3>
+                          <TierBadge points={achievement.points || 0} size="sm" />
                           {isUnlocked ? (
                             <Award className="h-4 w-4 text-yellow-600" />
                           ) : (
@@ -458,12 +549,41 @@ const Achievements = () => {
                           )}
                         </div>
                         <p className="text-sm text-muted-foreground">{achievement.description}</p>
+                        
+                        {/* Progress for locked achievements */}
+                        {!isUnlocked && (
+                          <div className="mt-2 flex items-center gap-3">
+                            <div className="flex-1 max-w-xs">
+                              <div className="flex justify-between text-xs mb-1">
+                                <span className="text-muted-foreground">
+                                  {getRequirementLabel(achievement.requirement_type, target)}
+                                </span>
+                                <span className="font-medium">{current}/{target}</span>
+                              </div>
+                              <Progress value={percentage} className="h-1.5" />
+                            </div>
+                            {route && (
+                              <Button
+                                size="sm"
+                                variant={percentage >= 50 ? "default" : "outline"}
+                                className="gap-1"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  navigate(route.path);
+                                }}
+                              >
+                                {route.label}
+                                <ChevronRight className="h-3 w-3" />
+                              </Button>
+                            )}
+                          </div>
+                        )}
                       </div>
-                      <div className="flex items-center gap-3">
+                      <div className="flex items-center gap-3 flex-shrink-0">
                         <Badge variant="secondary" className="font-semibold">
                           +{achievement.points} pts
                         </Badge>
-                        <Badge variant="outline" className="capitalize gap-1">
+                        <Badge variant="outline" className="capitalize gap-1 hidden sm:flex">
                           <CategoryIcon className="h-3 w-3" />
                           {achievement.category || 'general'}
                         </Badge>
@@ -494,6 +614,8 @@ const Achievements = () => {
               );
             })}
           </div>
+        )}
+          </>
         )}
       </main>
 
