@@ -1,16 +1,17 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { Navigation } from "@/components/Navigation";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
-import { Film, Mic, BookOpen, TrendingUp, ArrowRight, CheckCircle2, Loader2 } from "lucide-react";
+import { Film, Mic, BookOpen, TrendingUp, ArrowRight, CheckCircle2, Loader2, Archive } from "lucide-react";
 import { sermonTitleSchema, sermonThemeSchema, sermonStoneSchema, sermonBridgeSchema } from "@/lib/validationSchemas";
 import { sanitizeText } from "@/lib/sanitize";
+import { SermonRichTextArea } from "@/components/sermon/SermonRichTextArea";
+import { SermonPDFExport } from "@/components/sermon/SermonPDFExport";
 
 const STEPS = [
   { num: 1, title: "Setup", icon: BookOpen },
@@ -30,6 +31,9 @@ const SERMON_STYLES = [
 
 export default function SermonBuilder() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const editId = searchParams.get("id");
+  
   const [currentStep, setCurrentStep] = useState(1);
   const [loading, setLoading] = useState(false);
   const [asking, setAsking] = useState(false);
@@ -49,10 +53,43 @@ export default function SermonBuilder() {
 
   useEffect(() => {
     checkAuth();
-  }, []);
+    if (editId) {
+      loadSermon(editId);
+    }
+  }, [editId]);
 
   const checkAuth = async () => {
     const { data: { session } } = await supabase.auth.getSession();
+    if (!session) navigate("/auth");
+  };
+
+  const loadSermon = async (id: string) => {
+    setLoading(true);
+    try {
+      const { data, error } = await supabase
+        .from("sermons")
+        .select("*")
+        .eq("id", id)
+        .single();
+
+      if (error) throw error;
+      if (data) {
+        setSermon({
+          title: data.title,
+          theme_passage: data.theme_passage,
+          sermon_style: data.sermon_style,
+          smooth_stones: Array.isArray(data.smooth_stones) ? (data.smooth_stones as string[]) : [],
+          bridges: Array.isArray(data.bridges) ? (data.bridges as string[]) : [],
+          movie_structure: data.movie_structure || {},
+        });
+        setCurrentStep(data.current_step || 1);
+      }
+    } catch (error) {
+      console.error("Error loading sermon:", error);
+      toast.error("Failed to load sermon");
+    } finally {
+      setLoading(false);
+    }
   };
 
   const askJeeves = async (mode: string, context: any) => {
@@ -74,10 +111,11 @@ export default function SermonBuilder() {
   };
 
   const addSmoothStone = () => {
+    const plainText = newStone.replace(/<[^>]*>/g, '').trim();
     try {
-      const validated = sermonStoneSchema.parse(newStone);
+      const validated = sermonStoneSchema.parse(plainText);
       const sanitized = sanitizeText(validated);
-      setSermon({ ...sermon, smooth_stones: [...sermon.smooth_stones, sanitized] });
+      setSermon({ ...sermon, smooth_stones: [...sermon.smooth_stones, newStone] });
       setNewStone("");
       toast.success("Smooth stone added!");
     } catch (error: any) {
@@ -86,10 +124,11 @@ export default function SermonBuilder() {
   };
 
   const addBridge = () => {
+    const plainText = newBridge.replace(/<[^>]*>/g, '').trim();
     try {
-      const validated = sermonBridgeSchema.parse(newBridge);
+      const validated = sermonBridgeSchema.parse(plainText);
       const sanitized = sanitizeText(validated);
-      setSermon({ ...sermon, bridges: [...sermon.bridges, sanitized] });
+      setSermon({ ...sermon, bridges: [...sermon.bridges, newBridge] });
       setNewBridge("");
       toast.success("Bridge added!");
     } catch (error: any) {
@@ -101,7 +140,7 @@ export default function SermonBuilder() {
     if (currentStep === 1) {
       try {
         sermonTitleSchema.parse(sermon.title);
-        sermonThemeSchema.parse(sermon.theme_passage);
+        sermonThemeSchema.parse(sermon.theme_passage.replace(/<[^>]*>/g, ''));
       } catch (error: any) {
         toast.error(error.errors?.[0]?.message || "Invalid input");
         return;
@@ -129,7 +168,7 @@ export default function SermonBuilder() {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error("Not authenticated");
 
-      const { error } = await supabase.from("sermons").insert({
+      const sermonData = {
         user_id: user.id,
         title: sermon.title,
         theme_passage: sermon.theme_passage,
@@ -139,9 +178,19 @@ export default function SermonBuilder() {
         movie_structure: sermon.movie_structure,
         current_step: currentStep,
         status: currentStep === 5 ? "complete" : "in_progress",
-      });
+      };
 
-      if (error) throw error;
+      if (editId) {
+        const { error } = await supabase
+          .from("sermons")
+          .update(sermonData)
+          .eq("id", editId);
+        if (error) throw error;
+      } else {
+        const { error } = await supabase.from("sermons").insert(sermonData);
+        if (error) throw error;
+      }
+
       toast.success("Sermon saved successfully!");
     } catch (error) {
       console.error("Error saving sermon:", error);
@@ -151,18 +200,39 @@ export default function SermonBuilder() {
     }
   };
 
+  if (loading && editId) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-purple-900 via-purple-800 to-indigo-900">
+        <Navigation />
+        <div className="flex items-center justify-center h-[60vh]">
+          <Loader2 className="w-8 h-8 text-white animate-spin" />
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-900 via-purple-800 to-indigo-900">
       <Navigation />
       {/* Header */}
       <div className="bg-gradient-to-r from-purple-900/90 to-indigo-900/90 backdrop-blur-sm border-b border-white/10 py-8 px-6">
         <div className="max-w-7xl mx-auto">
-          <div className="flex items-center gap-4 mb-2">
-            <Film className="w-12 h-12 text-white" />
-            <div>
-              <h1 className="text-4xl font-bold text-white">Sermon Builder</h1>
-              <p className="text-purple-200 text-lg">Movie-Model Approach with 5 Smooth Stones</p>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <Film className="w-12 h-12 text-white" />
+              <div>
+                <h1 className="text-4xl font-bold text-white">Sermon Builder</h1>
+                <p className="text-purple-200 text-lg">Movie-Model Approach with 5 Smooth Stones</p>
+              </div>
             </div>
+            <Button 
+              variant="outline" 
+              onClick={() => navigate("/sermon-archive")}
+              className="bg-white/10 border-white/20 text-white hover:bg-white/20"
+            >
+              <Archive className="w-4 h-4 mr-2" />
+              My Sermons
+            </Button>
           </div>
         </div>
       </div>
@@ -219,17 +289,13 @@ export default function SermonBuilder() {
 
                   <div>
                     <label className="text-sm font-medium mb-2 block">Theme / Main Passage</label>
-                    <div className="relative">
-                      <Textarea
-                        placeholder="Enter Bible passage or main theme (e.g., 'John 3:16' or 'God's love for humanity')"
-                        value={sermon.theme_passage}
-                        onChange={(e) => setSermon({ ...sermon, theme_passage: e.target.value })}
-                        rows={4}
-                        className="pr-10"
-                        maxLength={500}
-                      />
-                      <Mic className="absolute right-3 top-3 w-5 h-5 text-muted-foreground" />
-                    </div>
+                    <SermonRichTextArea
+                      content={sermon.theme_passage}
+                      onChange={(content) => setSermon({ ...sermon, theme_passage: content })}
+                      placeholder="Enter Bible passage or main theme (e.g., 'John 3:16' or 'God's love for humanity')"
+                      minHeight="100px"
+                      themePassage={sermon.theme_passage}
+                    />
                   </div>
 
                   <div>
@@ -271,19 +337,19 @@ export default function SermonBuilder() {
                       <div key={idx} className="p-3 bg-purple-50 rounded-lg border border-purple-200">
                         <div className="flex items-start gap-2">
                           <span className="font-bold text-purple-900">Stone {idx + 1}:</span>
-                          <p className="text-sm text-foreground flex-1">{stone}</p>
+                          <div className="text-sm text-foreground flex-1 prose prose-sm" dangerouslySetInnerHTML={{ __html: stone }} />
                         </div>
                       </div>
                     ))}
                   </div>
 
                   <div className="space-y-2">
-                    <Textarea
+                    <SermonRichTextArea
+                      content={newStone}
+                      onChange={setNewStone}
                       placeholder="Enter a Phototheology insight or AHA moment..."
-                      value={newStone}
-                      onChange={(e) => setNewStone(e.target.value)}
-                      rows={3}
-                      maxLength={1000}
+                      minHeight="80px"
+                      themePassage={sermon.theme_passage}
                     />
                     <Button onClick={addSmoothStone} className="w-full">
                       Add Stone ({sermon.smooth_stones.length}/5)
@@ -313,19 +379,19 @@ export default function SermonBuilder() {
                       <div key={idx} className="p-3 bg-blue-50 rounded-lg border border-blue-200">
                         <div className="flex items-start gap-2">
                           <ArrowRight className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
-                          <p className="text-sm text-foreground">{bridge}</p>
+                          <div className="text-sm text-foreground prose prose-sm" dangerouslySetInnerHTML={{ __html: bridge }} />
                         </div>
                       </div>
                     ))}
                   </div>
 
                   <div className="space-y-2">
-                    <Textarea
+                    <SermonRichTextArea
+                      content={newBridge}
+                      onChange={setNewBridge}
                       placeholder="Enter a bridge connection (e.g., 'This leads us to understand...')"
-                      value={newBridge}
-                      onChange={(e) => setNewBridge(e.target.value)}
-                      rows={3}
-                      maxLength={1000}
+                      minHeight="80px"
+                      themePassage={sermon.theme_passage}
                     />
                     <Button onClick={addBridge} className="w-full">
                       Add Bridge ({sermon.bridges.length}/4+)
@@ -353,41 +419,45 @@ export default function SermonBuilder() {
                   <div className="space-y-4">
                     <div>
                       <label className="text-sm font-medium mb-2 block">Opening Hook</label>
-                      <Textarea
+                      <SermonRichTextArea
+                        content={sermon.movie_structure.opening || ""}
+                        onChange={(content) => setSermon({ ...sermon, movie_structure: { ...sermon.movie_structure, opening: content }})}
                         placeholder="How will you grab attention in the first 2 minutes?"
-                        value={sermon.movie_structure.opening || ""}
-                        onChange={(e) => setSermon({ ...sermon, movie_structure: { ...sermon.movie_structure, opening: e.target.value }})}
-                        rows={2}
+                        minHeight="80px"
+                        themePassage={sermon.theme_passage}
                       />
                     </div>
 
                     <div>
                       <label className="text-sm font-medium mb-2 block">Climax / Main Point</label>
-                      <Textarea
+                      <SermonRichTextArea
+                        content={sermon.movie_structure.climax || ""}
+                        onChange={(content) => setSermon({ ...sermon, movie_structure: { ...sermon.movie_structure, climax: content }})}
                         placeholder="What's the transformative moment?"
-                        value={sermon.movie_structure.climax || ""}
-                        onChange={(e) => setSermon({ ...sermon, movie_structure: { ...sermon.movie_structure, climax: e.target.value }})}
-                        rows={3}
+                        minHeight="100px"
+                        themePassage={sermon.theme_passage}
                       />
                     </div>
 
                     <div>
                       <label className="text-sm font-medium mb-2 block">Resolution</label>
-                      <Textarea
+                      <SermonRichTextArea
+                        content={sermon.movie_structure.resolution || ""}
+                        onChange={(content) => setSermon({ ...sermon, movie_structure: { ...sermon.movie_structure, resolution: content }})}
                         placeholder="How does everything come together?"
-                        value={sermon.movie_structure.resolution || ""}
-                        onChange={(e) => setSermon({ ...sermon, movie_structure: { ...sermon.movie_structure, resolution: e.target.value }})}
-                        rows={2}
+                        minHeight="80px"
+                        themePassage={sermon.theme_passage}
                       />
                     </div>
 
                     <div>
                       <label className="text-sm font-medium mb-2 block">Call to Action</label>
-                      <Textarea
+                      <SermonRichTextArea
+                        content={sermon.movie_structure.call_to_action || ""}
+                        onChange={(content) => setSermon({ ...sermon, movie_structure: { ...sermon.movie_structure, call_to_action: content }})}
                         placeholder="What should the audience do now?"
-                        value={sermon.movie_structure.call_to_action || ""}
-                        onChange={(e) => setSermon({ ...sermon, movie_structure: { ...sermon.movie_structure, call_to_action: e.target.value }})}
-                        rows={2}
+                        minHeight="80px"
+                        themePassage={sermon.theme_passage}
                       />
                     </div>
                   </div>
@@ -430,10 +500,13 @@ export default function SermonBuilder() {
                     </div>
                   </div>
 
-                  <Button onClick={saveSermon} disabled={loading} className="w-full" size="lg">
-                    {loading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-                    Save Sermon
-                  </Button>
+                  <div className="flex gap-2">
+                    <Button onClick={saveSermon} disabled={loading} className="flex-1" size="lg">
+                      {loading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+                      Save Sermon
+                    </Button>
+                    <SermonPDFExport sermon={sermon} size="lg" variant="secondary" />
+                  </div>
                 </div>
               )}
 

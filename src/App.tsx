@@ -58,6 +58,7 @@ const ProphecyWatch = lazy(() => import("./pages/ProphecyWatch"));
 const ResearchMode = lazy(() => import("./pages/ResearchMode"));
 const BibleImageLibrary = lazy(() => import("./pages/BibleImageLibrary"));
 const SermonBuilder = lazy(() => import("./pages/SermonBuilder"));
+const SermonArchive = lazy(() => import("./pages/SermonArchive"));
 const Flashcards = lazy(() => import("./pages/Flashcards"));
 const PowerOfTheLamb = lazy(() => import("./pages/PowerOfTheLamb"));
 const SpiritualTraining = lazy(() => import("./pages/SpiritualTraining"));
@@ -313,6 +314,7 @@ function App() {
           <Route path="/research-mode" element={<ProtectedRoute><ResearchMode /></ProtectedRoute>} />
             <Route path="/bible-image-library" element={<ProtectedRoute><BibleImageLibrary /></ProtectedRoute>} />
           <Route path="/sermon-builder" element={<ProtectedRoute><SermonBuilder /></ProtectedRoute>} />
+          <Route path="/sermon-archive" element={<ProtectedRoute><SermonArchive /></ProtectedRoute>} />
           <Route path="/flashcards" element={<ProtectedRoute><Flashcards /></ProtectedRoute>} />
           <Route path="/bible-rendered-room" element={<ProtectedRoute><BibleRenderedRoom /></ProtectedRoute>} />
           <Route path="/my-studies" element={<ProtectedRoute><MyStudies /></ProtectedRoute>} />
