@@ -5276,6 +5276,7 @@ export type Database = {
           alignment_check: Json | null
           categories: Json | null
           created_at: string
+          deeper_insights: Json | null
           encouragement: string | null
           further_study: string[] | null
           growth_areas: string[] | null
@@ -5294,6 +5295,7 @@ export type Database = {
           alignment_check?: Json | null
           categories?: Json | null
           created_at?: string
+          deeper_insights?: Json | null
           encouragement?: string | null
           further_study?: string[] | null
           growth_areas?: string[] | null
@@ -5312,6 +5314,7 @@ export type Database = {
           alignment_check?: Json | null
           categories?: Json | null
           created_at?: string
+          deeper_insights?: Json | null
           encouragement?: string | null
           further_study?: string[] | null
           growth_areas?: string[] | null
