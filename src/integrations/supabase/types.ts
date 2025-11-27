@@ -5271,6 +5271,63 @@ export type Database = {
         }
         Relationships: []
       }
+      thought_analyses: {
+        Row: {
+          alignment_check: Json | null
+          categories: Json | null
+          created_at: string
+          encouragement: string | null
+          further_study: string[] | null
+          growth_areas: string[] | null
+          id: string
+          input_text: string
+          overall_score: number | null
+          palace_rooms: Json | null
+          potential_misinterpretations: string[] | null
+          scripture_connections: Json | null
+          strengths: string[] | null
+          summary: string | null
+          typology_layers: Json | null
+          user_id: string
+        }
+        Insert: {
+          alignment_check?: Json | null
+          categories?: Json | null
+          created_at?: string
+          encouragement?: string | null
+          further_study?: string[] | null
+          growth_areas?: string[] | null
+          id?: string
+          input_text: string
+          overall_score?: number | null
+          palace_rooms?: Json | null
+          potential_misinterpretations?: string[] | null
+          scripture_connections?: Json | null
+          strengths?: string[] | null
+          summary?: string | null
+          typology_layers?: Json | null
+          user_id: string
+        }
+        Update: {
+          alignment_check?: Json | null
+          categories?: Json | null
+          created_at?: string
+          encouragement?: string | null
+          further_study?: string[] | null
+          growth_areas?: string[] | null
+          id?: string
+          input_text?: string
+          overall_score?: number | null
+          palace_rooms?: Json | null
+          potential_misinterpretations?: string[] | null
+          scripture_connections?: Json | null
+          strengths?: string[] | null
+          summary?: string | null
+          typology_layers?: Json | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       training_drills: {
         Row: {
           created_at: string | null
