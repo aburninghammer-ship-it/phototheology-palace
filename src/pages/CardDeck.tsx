@@ -25,6 +25,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { PTCardBattle } from "@/components/card-battle/PTCardBattle";
 import { VoiceChatWidget } from "@/components/voice/VoiceChatWidget";
 import { useAuth } from "@/hooks/useAuth";
+import { StudyDeckInstructions } from "@/components/study-deck/StudyDeckInstructions";
+import { StudyDeckExamples } from "@/components/study-deck/StudyDeckExamples";
 
 interface PrincipleCard {
   id: string;
@@ -1156,6 +1158,10 @@ export default function CardDeck() {
             <TabsContent value="study" className="space-y-6">
               {/* Study Deck Content */}
               <div className="space-y-6">
+            
+            {/* Phase 1: Instructions & Examples */}
+            <StudyDeckInstructions />
+            <StudyDeckExamples />
             
             {/* Multiplayer mode temporarily disabled */}
 
