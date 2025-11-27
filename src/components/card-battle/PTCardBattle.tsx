@@ -11,7 +11,7 @@ import { BattleLobby } from "./BattleLobby";
 import { BattleArena } from "./BattleArena";
 import { GameModeSelector } from "./GameModeSelector";
 
-export type GameMode = 'user_vs_jeeves' | 'user_vs_user' | 'team_vs_team' | 'jeeves_vs_jeeves';
+export type GameMode = 'user_vs_jeeves' | 'user_vs_user' | 'team_vs_team' | 'team_vs_jeeves' | 'jeeves_vs_jeeves';
 
 interface Battle {
   id: string;
