@@ -16,16 +16,58 @@ import {
   Calendar,
   BarChart3,
   Loader2,
-  Sparkles
+  Sparkles,
+  Flame,
+  HelpCircle,
+  Box,
+  Tag,
+  Triangle,
+  Hash,
+  PartyPopper,
+  Scale,
+  Crown,
+  BookMarked,
+  PawPrint,
+  Shuffle
 } from "lucide-react";
+
+const categories = [
+  { id: "themes", name: "Themes", icon: Flame, preview: "Covenant, Exile, Restoration", description: "Major theological themes and concepts" },
+  { id: "questions", name: "Questions", icon: HelpCircle, preview: "Why did God..., What does...", description: "Common biblical questions answered" },
+  { id: "people", name: "People", icon: Users, preview: "Moses, David, Paul", description: "Biographical information about biblical figures" },
+  { id: "places", name: "Places", icon: MapPin, preview: "Jerusalem, Egypt, Babylon", description: "Biblical locations and geography" },
+  { id: "objects", name: "Objects", icon: Box, preview: "Ark, Altar, Lampstand", description: "Sacred and significant items" },
+  { id: "names", name: "Names", icon: Tag, preview: "Immanuel, Alpha, Omega", description: "Names and titles of God and Christ" },
+  { id: "symbols", name: "Symbols", icon: Triangle, preview: "Lion, Lamb, Water", description: "Biblical symbolism and typology" },
+  { id: "numbers", name: "Numbers", icon: Hash, preview: "7, 12, 40, 144,000", description: "Biblical numerology and significance" },
+  { id: "feasts", name: "Feasts", icon: PartyPopper, preview: "Passover, Pentecost, Tabernacles", description: "Jewish festivals and their fulfillment" },
+  { id: "laws", name: "Laws", icon: Scale, preview: "Ten Commandments, Ceremonial Laws", description: "Biblical laws and their application" },
+  { id: "prophets", name: "Prophets", icon: Crown, preview: "Isaiah, Daniel, Revelation", description: "Prophetic books and messages" },
+  { id: "doctrines", name: "Doctrines", icon: BookMarked, preview: "Sabbath, Sanctuary, State of the Dead", description: "Seventh-day Adventist doctrinal positions" },
+  { id: "animals", name: "Animals", icon: PawPrint, preview: "Lion, Lamb, Serpent", description: "Animals and their biblical significance" },
+];
 
 const BibleEncyclopedia = () => {
   const { toast } = useToast();
   const [searchQuery, setSearchQuery] = useState("");
-  const [searchCategory, setSearchCategory] = useState<"events" | "maps" | "prophecy" | "charts" | "people">("events");
+  const [searchCategory, setSearchCategory] = useState<string>("themes");
   const [searchResults, setSearchResults] = useState("");
   const [mapImageUrl, setMapImageUrl] = useState<string | null>(null);
   const [isSearching, setIsSearching] = useState(false);
+
+  const handleRandomEntry = () => {
+    const randomCategory = categories[Math.floor(Math.random() * categories.length)];
+    setSearchCategory(randomCategory.id);
+    
+    // Extract first example from preview
+    const firstExample = randomCategory.preview.split(",")[0].trim();
+    setSearchQuery(firstExample);
+    
+    toast({
+      title: "Random Entry",
+      description: `Exploring ${firstExample} in ${randomCategory.name}`,
+    });
+  };
 
   const handleSearch = async () => {
     if (!searchQuery.trim()) return;
@@ -82,48 +124,50 @@ const BibleEncyclopedia = () => {
             </CardHeader>
           </Card>
 
+          {/* Random Entry Button */}
+          <div className="flex justify-end">
+            <Button
+              variant="outline"
+              onClick={handleRandomEntry}
+              className="gap-2"
+            >
+              <Shuffle className="h-4 w-4" />
+              Random Entry
+            </Button>
+          </div>
+
           {/* Search Categories */}
-          <div className="grid gap-3 md:grid-cols-5">
-            <Button
-              variant={searchCategory === "events" ? "default" : "outline"}
-              className={searchCategory === "events" ? "gradient-palace text-white" : ""}
-              onClick={() => setSearchCategory("events")}
-            >
-              <Calendar className="h-4 w-4 mr-2" />
-              Events
-            </Button>
-            <Button
-              variant={searchCategory === "maps" ? "default" : "outline"}
-              className={searchCategory === "maps" ? "gradient-palace text-white" : ""}
-              onClick={() => setSearchCategory("maps")}
-            >
-              <MapPin className="h-4 w-4 mr-2" />
-              Maps
-            </Button>
-            <Button
-              variant={searchCategory === "prophecy" ? "default" : "outline"}
-              className={searchCategory === "prophecy" ? "gradient-palace text-white" : ""}
-              onClick={() => setSearchCategory("prophecy")}
-            >
-              <Sparkles className="h-4 w-4 mr-2" />
-              Prophecy
-            </Button>
-            <Button
-              variant={searchCategory === "charts" ? "default" : "outline"}
-              className={searchCategory === "charts" ? "gradient-palace text-white" : ""}
-              onClick={() => setSearchCategory("charts")}
-            >
-              <BarChart3 className="h-4 w-4 mr-2" />
-              Charts
-            </Button>
-            <Button
-              variant={searchCategory === "people" ? "default" : "outline"}
-              className={searchCategory === "people" ? "gradient-palace text-white" : ""}
-              onClick={() => setSearchCategory("people")}
-            >
-              <Users className="h-4 w-4 mr-2" />
-              People
-            </Button>
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+            {categories.map((category) => {
+              const Icon = category.icon;
+              const isActive = searchCategory === category.id;
+              
+              return (
+                <Card
+                  key={category.id}
+                  className={`cursor-pointer transition-all hover:shadow-lg hover:scale-105 ${
+                    isActive ? "ring-2 ring-primary shadow-lg" : ""
+                  }`}
+                  onClick={() => setSearchCategory(category.id)}
+                >
+                  <CardHeader className="pb-3">
+                    <CardTitle className="flex items-center gap-2 text-lg">
+                      <Icon className={`h-5 w-5 ${isActive ? "text-primary" : ""}`} />
+                      {category.name}
+                    </CardTitle>
+                    <CardDescription className="text-xs mt-1">
+                      {category.description}
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent className="pt-0">
+                    <div className="text-xs text-muted-foreground">
+                      <span className="font-semibold">Examples: </span>
+                      {category.preview}
+                    </div>
+                  </CardContent>
+                </Card>
+              );
+            })}
           </div>
 
           {/* Search Interface */}
@@ -131,18 +175,10 @@ const BibleEncyclopedia = () => {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Search className="h-5 w-5" />
-                {searchCategory === "events" && "Search Biblical Events"}
-                {searchCategory === "maps" && "Search Places & Geography"}
-                {searchCategory === "prophecy" && "Search Prophetic Events (SDA Understanding)"}
-                {searchCategory === "charts" && "Search Timelines & Charts"}
-                {searchCategory === "people" && "Search Biblical People"}
+                Search {categories.find(c => c.id === searchCategory)?.name}
               </CardTitle>
               <CardDescription>
-                {searchCategory === "events" && "Major events, miracles, and historical moments in scripture"}
-                {searchCategory === "maps" && "Biblical locations, journeys, and geographical context"}
-                {searchCategory === "prophecy" && "Prophetic timelines and end-time events from an SDA perspective"}
-                {searchCategory === "charts" && "Visual timelines, genealogies, and comparative charts"}
-                {searchCategory === "people" && "Biographical information about biblical figures"}
+                {categories.find(c => c.id === searchCategory)?.description}
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -182,41 +218,16 @@ const BibleEncyclopedia = () => {
                 <div className="pt-4 border-t">
                   <div className="text-sm font-semibold mb-2 text-muted-foreground">Quick Examples:</div>
                   <div className="flex gap-2 flex-wrap">
-                    {searchCategory === "events" && (
-                      <>
-                        <Badge variant="outline" className="cursor-pointer hover:bg-primary/10" onClick={() => { setSearchQuery("Exodus from Egypt"); }}>Exodus from Egypt</Badge>
-                        <Badge variant="outline" className="cursor-pointer hover:bg-primary/10" onClick={() => { setSearchQuery("Babylonian Captivity"); }}>Babylonian Captivity</Badge>
-                        <Badge variant="outline" className="cursor-pointer hover:bg-primary/10" onClick={() => { setSearchQuery("Pentecost"); }}>Pentecost</Badge>
-                      </>
-                    )}
-                    {searchCategory === "maps" && (
-                      <>
-                        <Badge variant="outline" className="cursor-pointer hover:bg-primary/10" onClick={() => { setSearchQuery("Jerusalem in Jesus' time"); }}>Jerusalem in Jesus' time</Badge>
-                        <Badge variant="outline" className="cursor-pointer hover:bg-primary/10" onClick={() => { setSearchQuery("Paul's missionary journeys"); }}>Paul's journeys</Badge>
-                        <Badge variant="outline" className="cursor-pointer hover:bg-primary/10" onClick={() => { setSearchQuery("The Promised Land"); }}>Promised Land</Badge>
-                      </>
-                    )}
-                    {searchCategory === "prophecy" && (
-                      <>
-                        <Badge variant="outline" className="cursor-pointer hover:bg-primary/10" onClick={() => { setSearchQuery("70 weeks prophecy"); }}>70 weeks prophecy</Badge>
-                        <Badge variant="outline" className="cursor-pointer hover:bg-primary/10" onClick={() => { setSearchQuery("2300 day prophecy"); }}>2300 days</Badge>
-                        <Badge variant="outline" className="cursor-pointer hover:bg-primary/10" onClick={() => { setSearchQuery("Mark of the Beast"); }}>Mark of the Beast</Badge>
-                      </>
-                    )}
-                    {searchCategory === "charts" && (
-                      <>
-                        <Badge variant="outline" className="cursor-pointer hover:bg-primary/10" onClick={() => { setSearchQuery("Daniel 2 timeline"); }}>Daniel 2 timeline</Badge>
-                        <Badge variant="outline" className="cursor-pointer hover:bg-primary/10" onClick={() => { setSearchQuery("Kings of Israel and Judah"); }}>Kings chart</Badge>
-                        <Badge variant="outline" className="cursor-pointer hover:bg-primary/10" onClick={() => { setSearchQuery("Sanctuary services"); }}>Sanctuary services</Badge>
-                      </>
-                    )}
-                    {searchCategory === "people" && (
-                      <>
-                        <Badge variant="outline" className="cursor-pointer hover:bg-primary/10" onClick={() => { setSearchQuery("King David"); }}>King David</Badge>
-                        <Badge variant="outline" className="cursor-pointer hover:bg-primary/10" onClick={() => { setSearchQuery("Apostle Paul"); }}>Apostle Paul</Badge>
-                        <Badge variant="outline" className="cursor-pointer hover:bg-primary/10" onClick={() => { setSearchQuery("Prophet Daniel"); }}>Prophet Daniel</Badge>
-                      </>
-                    )}
+                    {categories.find(c => c.id === searchCategory)?.preview.split(",").map((example, index) => (
+                      <Badge 
+                        key={index}
+                        variant="outline" 
+                        className="cursor-pointer hover:bg-primary/10" 
+                        onClick={() => setSearchQuery(example.trim())}
+                      >
+                        {example.trim()}
+                      </Badge>
+                    ))}
                   </div>
                 </div>
               )}
