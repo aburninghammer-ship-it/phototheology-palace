@@ -27,17 +27,27 @@ interface UserProgress {
   preferred_translation?: string;
 }
 
+// Map of plan_id -> progress for showing on cards
+interface AllUserProgress {
+  [planId: string]: {
+    current_day: number;
+    last_completed_day: number;
+  };
+}
+
 export const useReadingPlans = () => {
   const { user } = useAuth();
   const { toast } = useToast();
   const [plans, setPlans] = useState<ReadingPlan[]>([]);
   const [userProgress, setUserProgress] = useState<UserProgress | null>(null);
+  const [allProgress, setAllProgress] = useState<AllUserProgress>({});
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     loadPlans();
     if (user) {
       loadUserProgress();
+      loadAllProgress();
     }
   }, [user]);
 
@@ -82,8 +92,33 @@ export const useReadingPlans = () => {
     }
   };
 
+  const loadAllProgress = async () => {
+    if (!user) return;
+
+    try {
+      const { data, error } = await supabase
+        .from("user_reading_progress")
+        .select("plan_id, current_day, last_completed_day")
+        .eq("user_id", user.id);
+
+      if (error) throw error;
+
+      const progressMap: AllUserProgress = {};
+      data?.forEach(p => {
+        progressMap[p.plan_id] = {
+          current_day: p.current_day,
+          last_completed_day: p.last_completed_day
+        };
+      });
+      setAllProgress(progressMap);
+    } catch (error) {
+      console.error("Error loading all progress:", error);
+    }
+  };
+
   const refetchProgress = async () => {
     await loadUserProgress();
+    await loadAllProgress();
   };
 
   const generateExercises = async (regenerate: boolean = false) => {
@@ -198,6 +233,7 @@ export const useReadingPlans = () => {
   return {
     plans,
     userProgress,
+    allProgress,
     loading,
     startPlan,
     refetch: loadPlans,

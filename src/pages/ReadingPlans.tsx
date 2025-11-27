@@ -4,8 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useReadingPlans } from "@/hooks/useReadingPlans";
 import { useNavigate } from "react-router-dom";
-import { Book, Calendar, Clock, Play, LogIn, Building2, BookOpen, Layers, Target } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
+import { Book, Building2, BookOpen, Plus, Play } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useState } from "react";
@@ -13,33 +12,21 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, Di
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { BIBLE_TRANSLATIONS } from "@/services/bibleApi";
+import { PlanProgressCard } from "@/components/reading-plans/PlanProgressCard";
+import { RecommendedPlans } from "@/components/reading-plans/RecommendedPlans";
+import { CustomPlanBuilder } from "@/components/reading-plans/CustomPlanBuilder";
+import { Progress } from "@/components/ui/progress";
+import { Calendar, Target, Layers } from "lucide-react";
 
 export default function ReadingPlans() {
-  const { plans, userProgress, loading, startPlan, refetchProgress } = useReadingPlans();
+  const { plans, userProgress, allProgress, loading, startPlan, refetch, refetchProgress } = useReadingPlans();
   const { user } = useAuth();
   const navigate = useNavigate();
   const activePlan = userProgress ? plans.find((p) => p.id === userProgress.plan_id) : null;
   const [selectedPlanId, setSelectedPlanId] = useState<string | null>(null);
   const [selectedTranslation, setSelectedTranslation] = useState("kjv");
   const [showTranslationDialog, setShowTranslationDialog] = useState(false);
-
-  const getDifficultyColor = (depthMode: string) => {
-    switch (depthMode) {
-      case "standard": return "bg-primary/10 text-primary border-primary/20";
-      case "focused": return "bg-accent/10 text-accent border-accent/20";
-      case "deep": return "bg-secondary/10 text-secondary border-secondary/20";
-      default: return "bg-muted text-muted-foreground border-muted";
-    }
-  };
-
-  const getPTFloorIcon = (depthMode: string) => {
-    switch (depthMode) {
-      case "standard": return { icon: Layers, label: "Floors 1-3" };
-      case "focused": return { icon: Building2, label: "Floors 1-5" };
-      case "deep": return { icon: Target, label: "All 8 Floors" };
-      default: return { icon: BookOpen, label: "Basic" };
-    }
-  };
+  const [showCustomBuilder, setShowCustomBuilder] = useState(false);
 
   const handleOpenTranslationDialog = (planId: string) => {
     setSelectedPlanId(planId);
@@ -54,8 +41,18 @@ export default function ReadingPlans() {
     navigate("/daily-reading");
   };
 
+  const handlePlanCreated = () => {
+    refetch();
+  };
+
   const bookPlans = plans.filter(p => p.plan_type === 'book-monthly');
-  const yearPlans = plans.filter(p => p.plan_type !== 'book-monthly');
+  const yearPlans = plans.filter(p => p.plan_type !== 'book-monthly' && p.plan_type !== 'custom');
+  const customPlans = plans.filter(p => p.plan_type === 'custom');
+
+  // Calculate active plan progress
+  const activeProgressPercent = userProgress && activePlan 
+    ? Math.round((userProgress.current_day / activePlan.duration_days) * 100)
+    : 0;
 
   if (loading) {
     return (
@@ -87,7 +84,7 @@ export default function ReadingPlans() {
       <Navigation />
       
       <div className="container mx-auto px-4 py-8 max-w-6xl">
-      {/* Header */}
+        {/* Header */}
         <div className="text-center mb-12">
           <Building2 className="h-16 w-16 text-primary mx-auto mb-4" />
           <h1 className="text-4xl font-bold mb-4 text-foreground">
@@ -112,38 +109,70 @@ export default function ReadingPlans() {
           </div>
         </div>
 
-        {/* Active Plan Banner */}
-        {userProgress && (
+        {/* Active Plan Banner with Progress */}
+        {userProgress && activePlan && (
           <Card className="mb-8 p-6 border-primary bg-primary/5">
-            <div className="flex items-center justify-between">
-              <div>
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex-1">
                 <h3 className="text-lg font-semibold text-foreground mb-1">
-                  Current Plan: {activePlan?.name || "Reading Plan"}
+                  Current Plan: {activePlan.name}
                 </h3>
-                <p className="text-sm text-muted-foreground">
-                  Day {userProgress.current_day}
-                  {activePlan?.duration_days && (
-                    <span> / {activePlan.duration_days} days total</span>
-                  )}
+                <p className="text-sm text-muted-foreground mb-3">
+                  Day {userProgress.current_day} of {activePlan.duration_days} days
                 </p>
+                <div className="flex items-center gap-3">
+                  <Progress value={activeProgressPercent} className="h-3 flex-1 max-w-xs" />
+                  <span className="text-sm font-medium text-primary">{activeProgressPercent}%</span>
+                </div>
               </div>
-              <Button onClick={() => navigate("/daily-reading")}>
+              <Button onClick={() => navigate("/daily-reading")} size="lg">
+                <Play className="h-4 w-4 mr-2" />
                 Continue Reading
               </Button>
             </div>
           </Card>
         )}
 
+        {/* Recommended Plans Section */}
+        {user && plans.length > 0 && (
+          <RecommendedPlans 
+            plans={plans}
+            userActivity={{
+              recentBooks: Object.keys(allProgress).length > 0 
+                ? plans
+                    .filter(p => allProgress[p.id])
+                    .map(p => p.daily_schedule?.book)
+                    .filter(Boolean)
+                : []
+            }}
+            onSelectPlan={handleOpenTranslationDialog}
+          />
+        )}
+
+        {/* Create Custom Plan Button */}
+        {user && (
+          <div className="flex justify-end mb-6">
+            <Button onClick={() => setShowCustomBuilder(true)} variant="outline">
+              <Plus className="h-4 w-4 mr-2" />
+              Create Custom Plan
+            </Button>
+          </div>
+        )}
+
         {/* Plans Tabs */}
         <Tabs defaultValue="monthly" className="w-full">
-          <TabsList className="grid w-full grid-cols-2 mb-8">
+          <TabsList className="grid w-full grid-cols-3 mb-8">
             <TabsTrigger value="monthly" className="flex items-center gap-2">
               <BookOpen className="h-4 w-4" />
-              Monthly Book Plans
+              Monthly
             </TabsTrigger>
             <TabsTrigger value="yearly" className="flex items-center gap-2">
               <Calendar className="h-4 w-4" />
-              Year-Long Plans
+              Year-Long
+            </TabsTrigger>
+            <TabsTrigger value="custom" className="flex items-center gap-2">
+              <Plus className="h-4 w-4" />
+              My Plans {customPlans.length > 0 && `(${customPlans.length})`}
             </TabsTrigger>
           </TabsList>
 
@@ -156,73 +185,16 @@ export default function ReadingPlans() {
               </p>
             </div>
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {bookPlans.map((plan) => {
-                const FloorIcon = getPTFloorIcon(plan.depth_mode);
-                const bookName = plan.daily_schedule?.book || plan.name.split(' ')[0];
-                
-                return (
-                  <Card key={plan.id} className="p-6 hover:shadow-lg transition-all hover:scale-105 border-2">
-                    <div className="mb-4">
-                      <div className="flex items-center justify-between mb-3">
-                        <div className="flex items-center gap-2">
-                          <Book className="h-8 w-8 text-primary" />
-                          <span className="text-2xl font-bold text-primary">{bookName}</span>
-                        </div>
-                        <Badge className={getDifficultyColor(plan.depth_mode)}>
-                          {plan.depth_mode}
-                        </Badge>
-                      </div>
-                      <h3 className="text-lg font-bold text-foreground mb-2">
-                        {plan.name}
-                      </h3>
-                      <p className="text-muted-foreground text-sm mb-4">
-                        {plan.description}
-                      </p>
-                    </div>
-
-                    <div className="space-y-3 mb-6">
-                      <div className="flex items-center justify-between text-sm">
-                        <div className="flex items-center text-muted-foreground">
-                          <Calendar className="h-4 w-4 mr-2 text-primary" />
-                          <span>{plan.duration_days} days</span>
-                        </div>
-                        <div className="flex items-center text-muted-foreground">
-                          <Clock className="h-4 w-4 mr-2 text-primary" />
-                          <span>{plan.daily_schedule?.estimated_time_minutes || 20} min</span>
-                        </div>
-                      </div>
-                      
-                      <div className="flex items-center gap-2 p-3 bg-primary/5 rounded-lg border border-primary/10">
-                        <FloorIcon.icon className="h-5 w-5 text-primary" />
-                        <span className="text-sm font-medium text-foreground">{FloorIcon.label}</span>
-                      </div>
-
-                      <div className="text-xs text-muted-foreground">
-                        ~{Math.round((plan.daily_schedule?.chapters_per_day || 1) * 10) / 10} chapters/day
-                      </div>
-                    </div>
-
-                    {user ? (
-                      <Button 
-                        className="w-full" 
-                        onClick={() => handleOpenTranslationDialog(plan.id)}
-                      >
-                        {userProgress ? "Switch to This Plan" : "Start Plan"}
-                        <Play className="ml-2 h-4 w-4" />
-                      </Button>
-                    ) : (
-                      <Button 
-                        className="w-full" 
-                        variant="outline"
-                        onClick={() => navigate('/auth')}
-                      >
-                        <LogIn className="mr-2 h-4 w-4" />
-                        Sign in to Start
-                      </Button>
-                    )}
-                  </Card>
-                );
-              })}
+              {bookPlans.map((plan) => (
+                <PlanProgressCard
+                  key={plan.id}
+                  plan={plan}
+                  userProgress={allProgress[plan.id]}
+                  isAuthenticated={!!user}
+                  hasActivePlan={!!userProgress}
+                  onStartPlan={handleOpenTranslationDialog}
+                />
+              ))}
             </div>
           </TabsContent>
 
@@ -235,69 +207,53 @@ export default function ReadingPlans() {
               </p>
             </div>
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {yearPlans.map((plan) => {
-                const FloorIcon = getPTFloorIcon(plan.depth_mode);
-                
-                return (
-                  <Card key={plan.id} className="p-6 hover:shadow-lg transition-all hover:scale-105 border-2">
-                    <div className="mb-4">
-                      <div className="flex items-center justify-between mb-2">
-                        <Book className="h-8 w-8 text-primary" />
-                        <Badge className={getDifficultyColor(plan.depth_mode)}>
-                          {plan.depth_mode}
-                        </Badge>
-                      </div>
-                      <h3 className="text-xl font-bold text-foreground mb-2">
-                        {plan.name}
-                      </h3>
-                      <p className="text-muted-foreground text-sm mb-4">
-                        {plan.description}
-                      </p>
-                    </div>
-
-                    <div className="space-y-3 mb-6">
-                      <div className="flex items-center text-sm text-muted-foreground">
-                        <Calendar className="h-4 w-4 mr-2 text-primary" />
-                        <span>{plan.duration_days} days</span>
-                      </div>
-                      <div className="flex items-center text-sm text-muted-foreground">
-                        <Clock className="h-4 w-4 mr-2 text-primary" />
-                        <span>~{plan.daily_schedule?.estimated_time_minutes || 20} min/day</span>
-                      </div>
-                      
-                      <div className="flex items-center gap-2 p-3 bg-primary/5 rounded-lg border border-primary/10">
-                        <FloorIcon.icon className="h-5 w-5 text-primary" />
-                        <span className="text-sm font-medium text-foreground">{FloorIcon.label}</span>
-                      </div>
-
-                      <div className="flex items-center text-sm text-muted-foreground">
-                        <Book className="h-4 w-4 mr-2 text-primary" />
-                        <span>{plan.plan_type === "complete" ? "Complete Bible" : plan.plan_type}</span>
-                      </div>
-                    </div>
-
-                    {user ? (
-                      <Button 
-                        className="w-full" 
-                        onClick={() => handleOpenTranslationDialog(plan.id)}
-                      >
-                        {userProgress ? "Switch to This Plan" : "Start Plan"}
-                        <Play className="ml-2 h-4 w-4" />
-                      </Button>
-                    ) : (
-                      <Button
-                        className="w-full" 
-                        variant="outline"
-                        onClick={() => navigate('/auth')}
-                      >
-                        <LogIn className="mr-2 h-4 w-4" />
-                        Sign in to Start
-                      </Button>
-                    )}
-                  </Card>
-                );
-              })}
+              {yearPlans.map((plan) => (
+                <PlanProgressCard
+                  key={plan.id}
+                  plan={plan}
+                  userProgress={allProgress[plan.id]}
+                  isAuthenticated={!!user}
+                  hasActivePlan={!!userProgress}
+                  onStartPlan={handleOpenTranslationDialog}
+                />
+              ))}
             </div>
+          </TabsContent>
+
+          {/* Custom Plans */}
+          <TabsContent value="custom">
+            <div className="mb-6">
+              <h2 className="text-2xl font-bold mb-2 text-foreground">My Custom Plans</h2>
+              <p className="text-muted-foreground">
+                Your personalized reading plans tailored to your study goals
+              </p>
+            </div>
+            {customPlans.length > 0 ? (
+              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {customPlans.map((plan) => (
+                  <PlanProgressCard
+                    key={plan.id}
+                    plan={plan}
+                    userProgress={allProgress[plan.id]}
+                    isAuthenticated={!!user}
+                    hasActivePlan={!!userProgress}
+                    onStartPlan={handleOpenTranslationDialog}
+                  />
+                ))}
+              </div>
+            ) : (
+              <Card className="p-12 text-center">
+                <Plus className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
+                <h3 className="text-lg font-semibold mb-2">No Custom Plans Yet</h3>
+                <p className="text-muted-foreground mb-4">
+                  Create your own reading plan with your choice of books and pace
+                </p>
+                <Button onClick={() => setShowCustomBuilder(true)}>
+                  <Plus className="h-4 w-4 mr-2" />
+                  Create Your First Plan
+                </Button>
+              </Card>
+            )}
           </TabsContent>
         </Tabs>
 
@@ -344,6 +300,13 @@ export default function ReadingPlans() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Custom Plan Builder Dialog */}
+      <CustomPlanBuilder
+        open={showCustomBuilder}
+        onOpenChange={setShowCustomBuilder}
+        onPlanCreated={handlePlanCreated}
+      />
     </div>
   );
 }

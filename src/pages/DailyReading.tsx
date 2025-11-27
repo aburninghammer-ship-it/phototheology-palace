@@ -14,6 +14,7 @@ import { Badge } from "@/components/ui/badge";
 import { RefreshCw } from "lucide-react";
 import { BIBLE_BOOK_METADATA } from "@/data/bibleBooks";
 import { BIBLE_TRANSLATIONS } from "@/services/bibleApi";
+import { PTIntegrationPrompt } from "@/components/reading-plans/PTIntegrationPrompt";
 
 type ChapterRef = { book: string; chapter: number };
 
@@ -78,6 +79,8 @@ export default function DailyReading() {
   const [exercises, setExercises] = useState<any[]>([]);
   const [plan, setPlan] = useState<any>(null);
   const [todaysPassages, setTodaysPassages] = useState<any[]>([]);
+  const [showPTPrompt, setShowPTPrompt] = useState(false);
+  const [completedDayNumber, setCompletedDayNumber] = useState(0);
 
   useEffect(() => {
     if (userProgress) {
@@ -271,6 +274,9 @@ export default function DailyReading() {
           floors_completed: exercises.map(e => String(e.floorNumber)),
         });
 
+      // Store day number before updating
+      setCompletedDayNumber(userProgress.current_day);
+
       // Update progress to next day
       const nextDay = userProgress.current_day + 1;
       await supabase
@@ -278,13 +284,8 @@ export default function DailyReading() {
         .update({ current_day: nextDay })
         .eq("id", userProgress.id);
 
-      toast({
-        title: "Day Complete!",
-        description: `Moving to day ${nextDay}`,
-      });
-
-      // Reload the page to show next day
-      window.location.reload();
+      // Show PT integration prompt instead of immediately reloading
+      setShowPTPrompt(true);
     } catch (error) {
       console.error("Error completing day:", error);
       toast({
@@ -295,6 +296,15 @@ export default function DailyReading() {
     } finally {
       setCompleting(false);
     }
+  };
+
+  const handleSkipIntegration = () => {
+    setShowPTPrompt(false);
+    toast({
+      title: "Day Complete!",
+      description: "Moving to next day",
+    });
+    window.location.reload();
   };
 
   if (loading) {
@@ -513,6 +523,17 @@ export default function DailyReading() {
           {completing ? "Completing..." : "Complete Today's Reading"}
         </Button>
       </div>
+
+      {/* PT Integration Prompt */}
+      {todaysPassages.length > 0 && (
+        <PTIntegrationPrompt
+          open={showPTPrompt}
+          onOpenChange={setShowPTPrompt}
+          passage={todaysPassages[0]}
+          dayNumber={completedDayNumber}
+          onSkip={handleSkipIntegration}
+        />
+      )}
     </div>
   );
 }
