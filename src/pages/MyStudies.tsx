@@ -4,25 +4,22 @@ import { Navigation } from "@/components/Navigation";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
 import {
   Plus,
   Search,
   BookOpen,
-  Star,
-  Calendar,
-  Trash2,
-  Edit,
   FileText,
   Sparkles,
   Flame,
   BookMarked,
-  PlayCircle
+  PlayCircle,
+  Star
 } from "lucide-react";
+import { StudyPreviewCard } from "@/components/studies/StudyPreviewCard";
+import { StudySortFilter, SortOption } from "@/components/studies/StudySortFilter";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
-import { formatDistanceToNow } from "date-fns";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -275,14 +272,34 @@ const MyStudies = () => {
     }
   };
 
+const [sortOption, setSortOption] = useState<SortOption>("updated");
+
   const filteredStudies = studies.filter((study) =>
     study.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
     study.content.toLowerCase().includes(searchQuery.toLowerCase()) ||
     study.tags.some(tag => tag.toLowerCase().includes(searchQuery.toLowerCase()))
   );
 
-  const favoriteStudies = filteredStudies.filter((study) => study.is_favorite);
-  const regularStudies = filteredStudies.filter((study) => !study.is_favorite);
+  // Sort studies based on selected option
+  const sortedStudies = [...filteredStudies].sort((a, b) => {
+    switch (sortOption) {
+      case "updated":
+        return new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime();
+      case "created":
+        return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+      case "title":
+        return a.title.localeCompare(b.title);
+      case "favorites":
+        if (a.is_favorite && !b.is_favorite) return -1;
+        if (!a.is_favorite && b.is_favorite) return 1;
+        return new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime();
+      default:
+        return 0;
+    }
+  });
+
+  const favoriteCount = filteredStudies.filter((study) => study.is_favorite).length;
+  const mostRecentStudy = sortedStudies[0];
 
   return (
     <div className="min-h-screen bg-background">
@@ -443,51 +460,50 @@ const MyStudies = () => {
             </Card>
           </div>
         ) : (
-          <>
-            {/* Favorites Section */}
-            {favoriteStudies.length > 0 && (
-              <div className="mb-8">
+          <div className="space-y-8">
+            {/* Continue Where You Left Off */}
+            {mostRecentStudy && (
+              <div>
                 <div className="flex items-center gap-2 mb-4">
-                  <Star className="w-5 h-5 text-amber-500 fill-amber-500" />
-                  <h2 className="text-2xl font-semibold">Favorites</h2>
+                  <PlayCircle className="w-5 h-5 text-primary" />
+                  <h2 className="text-xl font-semibold">Continue Where You Left Off</h2>
                 </div>
-                <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {favoriteStudies.map((study) => (
-                    <StudyCard
-                      key={study.id}
-                      study={study}
-                      onToggleFavorite={toggleFavorite}
-                      onDelete={(id) => {
-                        setStudyToDelete(id);
-                        setDeleteDialogOpen(true);
-                      }}
-                      onEdit={(id) => navigate(`/my-studies/${id}`)}
-                    />
-                  ))}
-                </div>
+                <StudyPreviewCard
+                  study={mostRecentStudy}
+                  variant="featured"
+                  onToggleFavorite={toggleFavorite}
+                  onDelete={(id) => {
+                    setStudyToDelete(id);
+                    setDeleteDialogOpen(true);
+                  }}
+                  onEdit={(id) => navigate(`/my-studies/${id}`)}
+                />
               </div>
             )}
 
-            {/* All Studies */}
-            {regularStudies.length > 0 && (
-              <div>
-                <h2 className="text-2xl font-semibold mb-4">
-                  {favoriteStudies.length > 0 ? "All Studies" : ""}
-                </h2>
-                <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {regularStudies.map((study) => (
-                    <StudyCard
-                      key={study.id}
-                      study={study}
-                      onToggleFavorite={toggleFavorite}
-                      onDelete={(id) => {
-                        setStudyToDelete(id);
-                        setDeleteDialogOpen(true);
-                      }}
-                      onEdit={(id) => navigate(`/my-studies/${id}`)}
-                    />
-                  ))}
-                </div>
+            {/* Sort & Filter Bar */}
+            <StudySortFilter
+              currentSort={sortOption}
+              onSortChange={setSortOption}
+              totalCount={filteredStudies.length}
+              favoriteCount={favoriteCount}
+            />
+
+            {/* All Studies Grid */}
+            {sortedStudies.length > 1 && (
+              <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                {sortedStudies.slice(1).map((study) => (
+                  <StudyPreviewCard
+                    key={study.id}
+                    study={study}
+                    onToggleFavorite={toggleFavorite}
+                    onDelete={(id) => {
+                      setStudyToDelete(id);
+                      setDeleteDialogOpen(true);
+                    }}
+                    onEdit={(id) => navigate(`/my-studies/${id}`)}
+                  />
+                ))}
               </div>
             )}
 
@@ -502,7 +518,7 @@ const MyStudies = () => {
                 </CardContent>
               </Card>
             )}
-          </>
+          </div>
         )}
       </div>
 
@@ -524,101 +540,6 @@ const MyStudies = () => {
         </AlertDialogContent>
       </AlertDialog>
     </div>
-  );
-};
-
-interface StudyCardProps {
-  study: Study;
-  onToggleFavorite: (id: string, currentStatus: boolean) => void;
-  onDelete: (id: string) => void;
-  onEdit: (id: string) => void;
-}
-
-const StudyCard = ({ study, onToggleFavorite, onDelete, onEdit }: StudyCardProps) => {
-  const contentPreview = study.content
-    .replace(/<[^>]*>/g, "") // Remove HTML tags
-    .slice(0, 150);
-
-  return (
-    <Card className="hover:shadow-lg transition-shadow cursor-pointer group">
-      <CardHeader onClick={() => onEdit(study.id)}>
-        <div className="flex items-start justify-between">
-          <div className="flex-1">
-            <CardTitle className="text-xl mb-2 line-clamp-2 group-hover:text-primary transition-colors">
-              {study.title}
-            </CardTitle>
-            <CardDescription className="flex items-center gap-2 text-xs">
-              <Calendar className="w-3 h-3" />
-              {formatDistanceToNow(new Date(study.updated_at), { addSuffix: true })}
-            </CardDescription>
-          </div>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={(e) => {
-              e.stopPropagation();
-              onToggleFavorite(study.id, study.is_favorite);
-            }}
-            className="shrink-0"
-          >
-            <Star
-              className={`w-4 h-4 ${
-                study.is_favorite ? "fill-amber-500 text-amber-500" : ""
-              }`}
-            />
-          </Button>
-        </div>
-      </CardHeader>
-      <CardContent onClick={() => onEdit(study.id)}>
-        {contentPreview && (
-          <p className="text-sm text-muted-foreground line-clamp-3 mb-4">
-            {contentPreview}...
-          </p>
-        )}
-        
-        {study.tags.length > 0 && (
-          <div className="flex flex-wrap gap-2 mb-4">
-            {study.tags.slice(0, 3).map((tag) => (
-              <Badge key={tag} variant="secondary" className="text-xs">
-                {tag}
-              </Badge>
-            ))}
-            {study.tags.length > 3 && (
-              <Badge variant="outline" className="text-xs">
-                +{study.tags.length - 3}
-              </Badge>
-            )}
-          </div>
-        )}
-
-        <div className="flex items-center justify-between pt-4 border-t">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={(e) => {
-              e.stopPropagation();
-              onEdit(study.id);
-            }}
-            className="gap-2"
-          >
-            <Edit className="w-4 h-4" />
-            Edit
-          </Button>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={(e) => {
-              e.stopPropagation();
-              onDelete(study.id);
-            }}
-            className="gap-2 text-destructive hover:text-destructive"
-          >
-            <Trash2 className="w-4 h-4" />
-            Delete
-          </Button>
-        </div>
-      </CardContent>
-    </Card>
   );
 };
 
