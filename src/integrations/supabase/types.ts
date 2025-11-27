@@ -4241,6 +4241,7 @@ export type Database = {
           id: string
           name: string
           plan_type: string
+          user_id: string | null
         }
         Insert: {
           created_at?: string | null
@@ -4251,6 +4252,7 @@ export type Database = {
           id?: string
           name: string
           plan_type: string
+          user_id?: string | null
         }
         Update: {
           created_at?: string | null
@@ -4261,6 +4263,7 @@ export type Database = {
           id?: string
           name?: string
           plan_type?: string
+          user_id?: string | null
         }
         Relationships: []
       }
