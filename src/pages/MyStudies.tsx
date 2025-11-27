@@ -17,6 +17,7 @@ import {
 } from "lucide-react";
 import { StudyPreviewCard } from "@/components/studies/StudyPreviewCard";
 import { StudySortFilter, SortOption } from "@/components/studies/StudySortFilter";
+import { StudyStats } from "@/components/studies/StudyStats";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
@@ -460,7 +461,10 @@ const [sortOption, setSortOption] = useState<SortOption>("updated");
             </Card>
           </div>
         ) : (
-          <div className="space-y-8">
+          <div className="space-y-6">
+            {/* Progress Stats */}
+            <StudyStats studies={studies} />
+
             {/* Continue Where You Left Off */}
             {mostRecentStudy && (
               <div>
