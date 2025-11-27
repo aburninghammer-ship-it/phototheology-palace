@@ -8,6 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { ArrowLeft, Plus, Trash2, Save, Sparkles } from "lucide-react";
 import { toast } from "sonner";
+import { VoiceCallWidget } from "@/components/VoiceCallWidget";
 import { MemoryVerseSearchDialog } from "@/components/memory/MemoryVerseSearchDialog";
 import { VerseWithPTAnalysis } from "@/components/memory/VerseWithPTAnalysis";
 import { JeevesVerseSuggestions } from "@/components/memory/JeevesVerseSuggestions";
@@ -281,6 +282,8 @@ export default function MemoryListEditor() {
         onOpenChange={setShowVerseInsert}
         onAddVerse={handleInsertVerse}
       />
+      
+      <VoiceCallWidget roomId={listId!} roomName={list?.title} />
     </div>
   );
 }
