@@ -144,11 +144,37 @@ Return ONLY valid JSON with this structure:
     let ptInsights;
     try {
       // Try to extract JSON from markdown code blocks if present
+      let jsonStr = content;
       const jsonMatch = content.match(/```json\s*([\s\S]*?)\s*```/) || content.match(/```\s*([\s\S]*?)\s*```/);
-      const jsonStr = jsonMatch ? jsonMatch[1] : content;
-      ptInsights = JSON.parse(jsonStr);
+      if (jsonMatch) {
+        jsonStr = jsonMatch[1].trim();
+      }
+      
+      // Parse and normalize the response
+      const parsed = JSON.parse(jsonStr);
+      
+      // Normalize dimensions if they're objects with explanations
+      if (parsed.dimensions && typeof parsed.dimensions === 'object') {
+        if (Array.isArray(parsed.dimensions)) {
+          // If it's an array but items are strings with explanations, extract just the codes
+          parsed.dimensions = parsed.dimensions.map((dim: any) => {
+            if (typeof dim === 'string') {
+              // Extract dimension code (1D, 2D, etc.) from string like "1D: explanation"
+              const match = dim.match(/^(\d+D)/);
+              return match ? match[1] : dim;
+            }
+            return dim;
+          });
+        } else {
+          // If it's an object, extract just the keys
+          parsed.dimensions = Object.keys(parsed.dimensions);
+        }
+      }
+      
+      ptInsights = parsed;
     } catch (parseError) {
       console.error("Failed to parse AI response:", content);
+      console.error("Parse error:", parseError);
       throw new Error("Failed to parse PT analysis");
     }
 
