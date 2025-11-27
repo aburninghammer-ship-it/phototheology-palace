@@ -15,6 +15,7 @@ import { Separator } from "@/components/ui/separator";
 import { SubscriptionBanner } from "@/components/SubscriptionBanner";
 import { NotificationPreferences } from "@/components/NotificationPreferences";
 import { SubscriptionRenewal } from "@/components/SubscriptionRenewal";
+import { AnnouncementManager } from "@/components/admin/AnnouncementManager";
 
 
 export default function Profile() {
@@ -23,11 +24,24 @@ export default function Profile() {
   const [loading, setLoading] = useState(true);
   const [uploading, setUploading] = useState(false);
   const [displayName, setDisplayName] = useState("");
+  const [isOwner, setIsOwner] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     loadProfile();
+    checkOwnership();
   }, [user]);
+
+  const checkOwnership = async () => {
+    if (!user) return;
+    const { data } = await supabase
+      .from('user_roles')
+      .select('role')
+      .eq('user_id', user.id)
+      .eq('role', 'owner')
+      .single();
+    setIsOwner(!!data);
+  };
 
   const loadProfile = async () => {
     if (!user) return;
@@ -298,6 +312,19 @@ export default function Profile() {
 
           {/* Notification Preferences */}
           <NotificationPreferences />
+
+          {/* Announcements (Owner Only) */}
+          {isOwner && (
+            <Card className="glass-card">
+              <CardHeader>
+                <CardTitle>Announcements</CardTitle>
+                <CardDescription>Send announcements to all users</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <AnnouncementManager />
+              </CardContent>
+            </Card>
+          )}
         </div>
       </div>
     </div>

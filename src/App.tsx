@@ -18,6 +18,7 @@ import { SplashScreen } from "@/components/SplashScreen";
 import { AnimatePresence } from "framer-motion";
 import { ThemeProvider } from "next-themes";
 import { UserPreferencesProvider } from "@/hooks/useUserPreferences";
+import { AnnouncementBanner } from "@/components/AnnouncementBanner";
 
 // Critical pages - load immediately
 import Index from "./pages/Index";
@@ -202,9 +203,11 @@ function App() {
                   <DirectMessagesProvider>
                     <UserPreferencesProvider>
                     <SidebarProvider defaultOpen={false}>
-                      <div className="min-h-screen flex w-full">
-                        <MessagingSidebar />
-                        <main className="flex-1 w-full overflow-x-hidden">
+                      <div className="min-h-screen flex flex-col w-full">
+                        <AnnouncementBanner />
+                        <div className="flex flex-1 w-full">
+                          <MessagingSidebar />
+                          <main className="flex-1 w-full overflow-x-hidden">
                           <Suspense fallback={<LoadingScreen />}>
                             <Routes>
             <Route path="/" element={<Index />} />
@@ -414,6 +417,7 @@ function App() {
                     </Routes>
                     </Suspense>
                   </main>
+                  </div>
                 </div>
               </SidebarProvider>
               </UserPreferencesProvider>
