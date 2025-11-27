@@ -64,8 +64,8 @@ export default function FloorMastery() {
             />
           </div>
           <p className="text-foreground/80">
-            Climb the Palace floor by floor. Each level builds on the previous. Only the worthy
-            reach the 8th Floor. Your sword color shows your current mastery level.
+            Climb the Palace floor by floor. Each level builds on the previous. Every step forward
+            is progress — keep climbing! Your sword color shows your current mastery level.
           </p>
         </div>
 
