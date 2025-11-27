@@ -1175,10 +1175,42 @@ export default function CardDeck() {
           {/* Main Tabs */}
           <Tabs defaultValue="study" className="w-full">
             <TabsList className="grid w-full grid-cols-2 mb-6">
-              <TabsTrigger value="study" className="text-lg">
+              <TabsTrigger 
+                value="study" 
+                className="text-lg"
+                onClick={() => {
+                  const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
+                  const oscillator = audioContext.createOscillator();
+                  const gainNode = audioContext.createGain();
+                  oscillator.connect(gainNode);
+                  gainNode.connect(audioContext.destination);
+                  oscillator.frequency.value = 800;
+                  oscillator.type = 'sine';
+                  gainNode.gain.setValueAtTime(0.2, audioContext.currentTime);
+                  gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.1);
+                  oscillator.start(audioContext.currentTime);
+                  oscillator.stop(audioContext.currentTime + 0.1);
+                }}
+              >
                 Study Deck
               </TabsTrigger>
-              <TabsTrigger value="battle" className="text-lg">
+              <TabsTrigger 
+                value="battle" 
+                className="text-lg"
+                onClick={() => {
+                  const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
+                  const oscillator = audioContext.createOscillator();
+                  const gainNode = audioContext.createGain();
+                  oscillator.connect(gainNode);
+                  gainNode.connect(audioContext.destination);
+                  oscillator.frequency.value = 1000;
+                  oscillator.type = 'sine';
+                  gainNode.gain.setValueAtTime(0.2, audioContext.currentTime);
+                  gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.1);
+                  oscillator.start(audioContext.currentTime);
+                  oscillator.stop(audioContext.currentTime + 0.1);
+                }}
+              >
                 Card Battle ⚔️
               </TabsTrigger>
             </TabsList>
@@ -1621,133 +1653,134 @@ export default function CardDeck() {
           )}
 
           {/* Card Deck Display */}
-          <div className="space-y-6">
-            {/* Phase 3: Filters */}
-            <CardCategoryFilters 
-              selectedFloor={selectedFloor}
-              onFloorSelect={setSelectedFloor}
-              cardCounts={allCards.reduce((acc, card) => {
-                acc[card.floor] = (acc[card.floor] || 0) + 1;
-                return acc;
-              }, {} as Record<number, number>)}
-            />
-            
-            <Card>
-              <CardHeader>
-                <CardTitle>All Palace Principle Cards</CardTitle>
-                <CardDescription>
-                  Click to flip • Shift+Click to select • Ctrl+Click for Jeeves commentary
-                  {selectedFloor && (
-                    <Badge variant="outline" className="ml-2">
-                      Showing Floor {selectedFloor}
-                    </Badge>
-                  )}
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
-                  <AnimatePresence>
-                    {allCards
-                      .filter(card => selectedFloor === null || card.floor === selectedFloor)
-                      .map((card) => (
-                      <motion.div
-                        key={card.id}
-                        initial={{ opacity: 0, scale: 0.9 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        whileHover={{ scale: 1.05 }}
-                        className="relative h-32 cursor-pointer perspective-1000"
-                        onClick={(e) => {
-                          if (e.ctrlKey || e.metaKey) {
-                            setCommentaryCard(card);
-                            setCommentaryOpen(true);
-                          } else {
-                            flipCard(card.id, e);
-                          }
-                        }}
-                        title="Click to flip • Shift+Click to select • Ctrl+Click for commentary"
-                      >
-                      <div
-                        className={`relative w-full h-full transition-transform duration-500 preserve-3d ${
-                          flippedCards.has(card.id) ? "rotate-y-180" : ""
-                        }`}
-                      >
-                         {/* Front of card (Palace with Principle Code) */}
-                        <div
-                          className={`absolute inset-0 rounded-lg border-2 shadow-xl backface-hidden overflow-hidden glow-effect bg-gradient-to-br ${card.floorColor}`}
-                          style={{
-                            backgroundImage: `url(${palaceImage})`,
-                            backgroundSize: 'cover',
-                            backgroundPosition: 'center',
-                            backgroundBlendMode: 'overlay',
+          {displayText && (
+            <div className="space-y-6">
+              {/* Phase 3: Filters */}
+              <CardCategoryFilters 
+                selectedFloor={selectedFloor}
+                onFloorSelect={setSelectedFloor}
+                cardCounts={allCards.reduce((acc, card) => {
+                  acc[card.floor] = (acc[card.floor] || 0) + 1;
+                  return acc;
+                }, {} as Record<number, number>)}
+              />
+              
+              <Card>
+                <CardHeader>
+                  <CardTitle>All Palace Principle Cards</CardTitle>
+                  <CardDescription>
+                    Click to flip • Shift+Click to select • Ctrl+Click for Jeeves commentary
+                    {selectedFloor && (
+                      <Badge variant="outline" className="ml-2">
+                        Showing Floor {selectedFloor}
+                      </Badge>
+                    )}
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+                    <AnimatePresence>
+                      {allCards
+                        .filter(card => selectedFloor === null || card.floor === selectedFloor)
+                        .map((card) => (
+                        <motion.div
+                          key={card.id}
+                          initial={{ opacity: 0, scale: 0.9 }}
+                          animate={{ opacity: 1, scale: 1 }}
+                          whileHover={{ scale: 1.05 }}
+                          className="relative h-32 cursor-pointer perspective-1000"
+                          onClick={(e) => {
+                            if (e.ctrlKey || e.metaKey) {
+                              setCommentaryCard(card);
+                              setCommentaryOpen(true);
+                            } else {
+                              flipCard(card.id, e);
+                            }
                           }}
+                          title="Click to flip • Shift+Click to select • Ctrl+Click for commentary"
                         >
-                          <div className={`absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-black/60`} />
-                          <div className="relative h-full flex flex-col items-center justify-center p-4 text-center">
-                            <div className="absolute top-2 left-0 right-0 text-xs text-white/90 font-bold tracking-wider drop-shadow-lg">
-                              FLOOR {card.floor}
-                            </div>
-                            <div className="text-4xl font-bold mb-2 text-white drop-shadow-[0_2px_12px_rgba(0,0,0,0.9)]">
-                              {card.code}
-                            </div>
-                            <div className="text-xs font-semibold text-white/95 drop-shadow-[0_1px_6px_rgba(0,0,0,0.8)] px-2">
-                              {card.name}
-                            </div>
-                            <div className="absolute bottom-2 left-0 right-0 flex justify-center gap-1">
-                              <div className="w-1 h-1 rounded-full bg-white/70 shadow-lg" />
-                              <div className="w-1 h-1 rounded-full bg-white/70 shadow-lg" />
-                              <div className="w-1 h-1 rounded-full bg-white/70 shadow-lg" />
+                        <div
+                          className={`relative w-full h-full transition-transform duration-500 preserve-3d ${
+                            flippedCards.has(card.id) ? "rotate-y-180" : ""
+                          }`}
+                        >
+                            {/* Front of card (Palace with Principle Code) */}
+                          <div
+                            className={`absolute inset-0 rounded-lg border-2 shadow-xl backface-hidden overflow-hidden glow-effect bg-gradient-to-br ${card.floorColor}`}
+                            style={{
+                              backgroundImage: `url(${palaceImage})`,
+                              backgroundSize: 'cover',
+                              backgroundPosition: 'center',
+                              backgroundBlendMode: 'overlay',
+                            }}
+                          >
+                            <div className={`absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-black/60`} />
+                            <div className="relative h-full flex flex-col items-center justify-center p-4 text-center">
+                              <div className="absolute top-2 left-0 right-0 text-xs text-white/90 font-bold tracking-wider drop-shadow-lg">
+                                FLOOR {card.floor}
+                              </div>
+                              <div className="text-4xl font-bold mb-2 text-white drop-shadow-[0_2px_12px_rgba(0,0,0,0.9)]">
+                                {card.code}
+                              </div>
+                              <div className="text-xs font-semibold text-white/95 drop-shadow-[0_1px_6px_rgba(0,0,0,0.8)] px-2">
+                                {card.name}
+                              </div>
+                              <div className="absolute bottom-2 left-0 right-0 flex justify-center gap-1">
+                                <div className="w-1 h-1 rounded-full bg-white/70 shadow-lg" />
+                                <div className="w-1 h-1 rounded-full bg-white/70 shadow-lg" />
+                                <div className="w-1 h-1 rounded-full bg-white/70 shadow-lg" />
+                              </div>
                             </div>
                           </div>
-                        </div>
 
-                        {/* Back of card (Ornate Design with Question) */}
-                        <div
-                          className={`absolute inset-0 rounded-lg border-2 shadow-xl backface-hidden rotate-y-180 overflow-hidden bg-gradient-to-br ${card.floorColor}`}
-                          style={{
-                            backgroundImage: `url(${palaceImage})`,
-                            backgroundSize: 'cover',
-                            backgroundPosition: 'center',
-                            filter: 'brightness(0.6) sepia(0.2)',
-                            backgroundBlendMode: 'overlay',
-                          }}
-                        >
-                          <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/70 to-black/60" />
-                          <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,_rgba(255,255,255,0.1)_0%,_transparent_60%)]" />
-                          <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/30 to-transparent" />
-                          <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/30 to-transparent" />
-                          <div className="relative h-full flex flex-col items-center justify-center p-4 text-center">
-                            <div className="text-xs font-bold text-white/90 mb-3 tracking-wider drop-shadow-lg">
-                              FLOOR {card.floor} • {card.code}
-                            </div>
-                            <p className="text-xs leading-relaxed text-white font-medium drop-shadow-[0_1px_6px_rgba(0,0,0,0.9)]">
-                              {renderCardQuestion(card)}
-                            </p>
-                            <div className="absolute bottom-3 left-0 right-0 flex justify-center gap-1.5">
-                              <div className="w-1.5 h-1.5 rounded-full bg-white/60 shadow-lg" />
-                              <div className="w-1.5 h-1.5 rounded-full bg-white/60 shadow-lg" />
-                              <div className="w-1.5 h-1.5 rounded-full bg-white/60 shadow-lg" />
+                          {/* Back of card (Ornate Design with Question) */}
+                          <div
+                            className={`absolute inset-0 rounded-lg border-2 shadow-xl backface-hidden rotate-y-180 overflow-hidden bg-gradient-to-br ${card.floorColor}`}
+                            style={{
+                              backgroundImage: `url(${palaceImage})`,
+                              backgroundSize: 'cover',
+                              backgroundPosition: 'center',
+                              filter: 'brightness(0.6) sepia(0.2)',
+                              backgroundBlendMode: 'overlay',
+                            }}
+                          >
+                            <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/70 to-black/60" />
+                            <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,_rgba(255,255,255,0.1)_0%,_transparent_60%)]" />
+                            <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/30 to-transparent" />
+                            <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/30 to-transparent" />
+                            <div className="relative h-full flex flex-col items-center justify-center p-4 text-center">
+                              <div className="text-xs font-bold text-white/90 mb-3 tracking-wider drop-shadow-lg">
+                                FLOOR {card.floor} • {card.code}
+                              </div>
+                              <p className="text-xs leading-relaxed text-white font-medium drop-shadow-[0_1px_6px_rgba(0,0,0,0.9)]">
+                                {renderCardQuestion(card)}
+                              </p>
+                              <div className="absolute bottom-3 left-0 right-0 flex justify-center gap-1.5">
+                                <div className="w-1.5 h-1.5 rounded-full bg-white/60 shadow-lg" />
+                                <div className="w-1.5 h-1.5 rounded-full bg-white/60 shadow-lg" />
+                                <div className="w-1.5 h-1.5 rounded-full bg-white/60 shadow-lg" />
+                              </div>
                             </div>
                           </div>
                         </div>
-                      </div>
-                    </motion.div>
-                  ))}
-                </AnimatePresence>
-              </div>
-            </CardContent>
-          </Card>
+                      </motion.div>
+                    ))}
+                  </AnimatePresence>
+                </div>
+              </CardContent>
+            </Card>
+            
+            {/* Jeeves Commentary Dialog */}
+            <JeevesCommentaryDialog 
+              card={commentaryCard}
+              open={commentaryOpen}
+              onOpenChange={setCommentaryOpen}
+            />
           </div>
-          
-          {/* Jeeves Commentary Dialog */}
-          <JeevesCommentaryDialog 
-            card={commentaryCard}
-            open={commentaryOpen}
-            onOpenChange={setCommentaryOpen}
-          />
+          )}
           
           {/* End Study Deck Tab */}
-          </div>
-          </TabsContent>
+      </TabsContent>
 
           {/* Card Battle Tab */}
           <TabsContent value="battle">
