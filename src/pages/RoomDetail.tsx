@@ -211,41 +211,85 @@ export default function RoomDetail() {
           </Alert>
         )}
 
-        <div className={`${gradient} rounded-lg p-8 mb-8 text-white`}>
-          <div className="flex items-center gap-3 mb-4">
-            <Badge variant="outline" className="text-white border-white/50">
-              {room.tag}
-            </Badge>
-            <Badge variant="outline" className="text-white border-white/50">
-              Floor {floor.number}
-            </Badge>
-            {isThisFocused && (
-              <Badge variant="outline" className="text-white border-amber-500 bg-amber-500/20">
-                <Target className="h-3 w-3 mr-1" />
-                Focus Room
-              </Badge>
-            )}
+        <div className={`${gradient} rounded-2xl p-10 mb-8 text-white relative overflow-hidden shadow-2xl`}>
+          {/* Animated starfield background */}
+          <div className="absolute inset-0 opacity-20">
+            <div className="absolute top-10 right-20 w-2 h-2 bg-white rounded-full animate-pulse" />
+            <div className="absolute top-32 right-40 w-1 h-1 bg-white rounded-full animate-pulse" style={{ animationDelay: "0.5s" }} />
+            <div className="absolute top-20 left-32 w-2 h-2 bg-white rounded-full animate-pulse" style={{ animationDelay: "1s" }} />
+            <div className="absolute bottom-20 left-20 w-1 h-1 bg-white rounded-full animate-pulse" style={{ animationDelay: "1.5s" }} />
+            <div className="absolute bottom-32 right-60 w-2 h-2 bg-white rounded-full animate-pulse" style={{ animationDelay: "2s" }} />
           </div>
-          <h1 className="text-4xl font-serif font-bold mb-4">{room.name}</h1>
-          <p className="text-lg leading-relaxed">{room.purpose}</p>
           
-          {user && progress?.completed_at && (
-            <div className="mt-4 flex items-center gap-2 text-white">
-              <Trophy className="h-5 w-5" />
-              <span className="font-medium">Room Completed!</span>
+          {/* Giant room emoji */}
+          <div className="absolute -right-10 -top-10 text-[200px] opacity-10 select-none">
+            {
+              {sr: "📖", ir: "👁️", "24fps": "🎬", br: "🗺️", tr: "🎨", gr: "💎",
+               or: "🔍", dc: "🧪", st: "🔗", qr: "❓", qa: "💬",
+               nf: "🌿", pf: "🪞", bf: "🧬", hf: "📜", lr: "👂",
+               cr: "✝️", dr: "💠", c6: "📚", trm: "🏛️", tz: "⏰", prm: "🎵", "p||": "🪞", frt: "🍇", cec: "👑", r66: "📿",
+               bl: "⛪", pr: "🔮", "3a": "👼", fe: "🎊",
+               "123h": "☁️", cycles: "🔄", jr: "🍊", math: "🔢",
+               frm: "🔥", mr: "🧘", srm: "⚡"}[room.id] || "⭐"
+            }
+          </div>
+          
+          <div className="relative z-10">
+            <div className="flex flex-wrap items-center gap-3 mb-6">
+              <Badge variant="outline" className="text-white border-white/70 backdrop-blur-sm bg-white/10 px-4 py-1.5 text-lg font-bold shadow-lg">
+                {room.tag}
+              </Badge>
+              <Badge variant="outline" className="text-white border-white/70 backdrop-blur-sm bg-white/10 px-4 py-1.5">
+                Floor {floor.number}
+              </Badge>
+              {isThisFocused && (
+                <Badge variant="outline" className="text-white border-amber-300 bg-amber-500/30 backdrop-blur-sm px-4 py-1.5 shadow-lg">
+                  <Target className="h-4 w-4 mr-1 animate-pulse" />
+                  🎯 Focus Room
+                </Badge>
+              )}
+              {user && progress?.completed_at && (
+                <Badge variant="outline" className="text-white border-green-300 bg-green-500/30 backdrop-blur-sm px-4 py-1.5 shadow-lg">
+                  <Trophy className="h-4 w-4 mr-1" />
+                  ✅ Completed
+                </Badge>
+              )}
             </div>
-          )}
+            
+            <div className="flex items-center gap-4 mb-4">
+              <span className="text-6xl drop-shadow-2xl">
+                {
+                  {sr: "📖", ir: "👁️", "24fps": "🎬", br: "🗺️", tr: "🎨", gr: "💎",
+                   or: "🔍", dc: "🧪", st: "🔗", qr: "❓", qa: "💬",
+                   nf: "🌿", pf: "🪞", bf: "🧬", hf: "📜", lr: "👂",
+                   cr: "✝️", dr: "💠", c6: "📚", trm: "🏛️", tz: "⏰", prm: "🎵", "p||": "🪞", frt: "🍇", cec: "👑", r66: "📿",
+                   bl: "⛪", pr: "🔮", "3a": "👼", fe: "🎊",
+                   "123h": "☁️", cycles: "🔄", jr: "🍊", math: "🔢",
+                   frm: "🔥", mr: "🧘", srm: "⚡"}[room.id] || "⭐"
+                }
+              </span>
+              <div>
+                <h1 className="text-5xl md:text-6xl font-serif font-black drop-shadow-2xl tracking-tight">{room.name}</h1>
+              </div>
+            </div>
+            
+            <p className="text-xl md:text-2xl leading-relaxed opacity-95 drop-shadow-lg">{room.purpose}</p>
+          </div>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <div className="lg:col-span-2">
             <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-              <TabsList className="grid w-full grid-cols-3">
-                <TabsTrigger value="learn">Learn</TabsTrigger>
-                <TabsTrigger value="practice">Practice</TabsTrigger>
-                <TabsTrigger value="master">
+              <TabsList className="grid w-full grid-cols-3 p-1 bg-muted/50 backdrop-blur-sm">
+                <TabsTrigger value="learn" className="data-[state=active]:shadow-glow transition-all duration-300">
+                  📚 Learn
+                </TabsTrigger>
+                <TabsTrigger value="practice" className="data-[state=active]:shadow-glow transition-all duration-300">
+                  🎯 Practice
+                </TabsTrigger>
+                <TabsTrigger value="master" className="data-[state=active]:shadow-glow transition-all duration-300">
                   <Trophy className="h-4 w-4 mr-2" />
-                  Master Room
+                  👑 Master
                 </TabsTrigger>
               </TabsList>
 
@@ -254,19 +298,24 @@ export default function RoomDetail() {
                 {showQuickStart && <ValueProposition roomId={room.id} />}
                 {showQuickStart && <QuickStartGuide roomId={room.id} roomName={room.name} />}
 
-                <Card>
-                  <CardHeader>
+                <Card className="relative overflow-hidden border-2 border-primary/30 hover:border-primary shadow-lg hover:shadow-glow transition-all duration-500">
+                  {/* Glowing corner accent */}
+                  <div className="absolute top-0 right-0 w-32 h-32 bg-primary/10 rounded-full blur-3xl animate-pulse" />
+                  
+                  <CardHeader className="relative z-10">
                     <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        <HelpCircle className="h-5 w-5 text-primary" />
-                        <CardTitle>Core Question</CardTitle>
+                      <div className="flex items-center gap-3">
+                        <div className="p-3 bg-gradient-palace rounded-xl shadow-lg">
+                          <HelpCircle className="h-6 w-6 text-white" />
+                        </div>
+                        <CardTitle className="text-2xl font-bold">💡 Core Question</CardTitle>
                       </div>
                       {user && (
                         <Button
                           onClick={handleAddToReview}
                           variant="outline"
                           size="sm"
-                          className="gap-2"
+                          className="gap-2 hover:shadow-glow transition-all"
                         >
                           <Brain className="h-4 w-4" />
                           Add to Review
@@ -274,62 +323,77 @@ export default function RoomDetail() {
                       )}
                     </div>
                   </CardHeader>
-                  <CardContent>
-                    <p className="text-lg font-medium">{room.coreQuestion}</p>
+                  <CardContent className="relative z-10">
+                    <div className="p-6 bg-gradient-to-br from-primary/5 via-accent/5 to-secondary/5 rounded-xl border-2 border-primary/20">
+                      <p className="text-xl font-bold text-foreground leading-relaxed">{room.coreQuestion}</p>
+                    </div>
                   </CardContent>
                 </Card>
 
                 <Collapsible open={methodExpanded} onOpenChange={setMethodExpanded}>
-                  <Card>
-                    <CardHeader>
+                  <Card className="relative overflow-hidden border-2 border-accent/30 hover:border-accent shadow-lg hover:shadow-glow transition-all duration-500">
+                    {/* Animated gradient orb */}
+                    <div className="absolute -left-10 top-1/2 w-40 h-40 bg-accent/20 rounded-full blur-3xl animate-pulse" />
+                    
+                    <CardHeader className="relative z-10">
                       <CollapsibleTrigger asChild>
                         <div className="flex items-center justify-between cursor-pointer group">
-                          <div className="flex items-center gap-2">
-                            <Target className="h-5 w-5 text-primary" />
-                            <CardTitle>Full Methodology</CardTitle>
+                          <div className="flex items-center gap-3">
+                            <div className="p-3 bg-gradient-warmth rounded-xl shadow-lg">
+                              <Target className="h-6 w-6 text-white" />
+                            </div>
+                            <CardTitle className="text-2xl font-bold group-hover:text-accent transition-colors">🎯 Full Methodology</CardTitle>
                           </div>
-                          <ChevronDown className={`h-5 w-5 transition-transform ${methodExpanded ? 'rotate-180' : ''}`} />
+                          <ChevronDown className={`h-6 w-6 transition-transform duration-300 ${methodExpanded ? 'rotate-180 text-accent' : 'text-muted-foreground'}`} />
                         </div>
                       </CollapsibleTrigger>
                       {!methodExpanded && (
-                        <CardDescription className="text-sm">
-                          Detailed step-by-step guide (click to expand when ready)
+                        <CardDescription className="text-sm ml-16">
+                          ✨ Detailed step-by-step guide (click to expand when ready)
                         </CardDescription>
                       )}
                     </CardHeader>
                     <CollapsibleContent>
-                      <CardContent>
-                        <p className="text-base leading-relaxed whitespace-pre-line">{room.method}</p>
+                      <CardContent className="relative z-10">
+                        <div className="p-6 bg-gradient-to-br from-muted/30 to-muted/10 rounded-xl border border-border">
+                          <p className="text-base leading-relaxed whitespace-pre-line">{room.method}</p>
+                        </div>
                       </CardContent>
                     </CollapsibleContent>
                   </Card>
                 </Collapsible>
 
                 <Collapsible open={examplesExpanded} onOpenChange={setExamplesExpanded}>
-                  <Card>
-                    <CardHeader>
+                  <Card className="relative overflow-hidden border-2 border-secondary/30 hover:border-secondary shadow-lg hover:shadow-glow transition-all duration-500">
+                    {/* Sparkle pattern */}
+                    <div className="absolute top-5 right-5 text-4xl opacity-10">✨</div>
+                    <div className="absolute bottom-5 left-5 text-4xl opacity-10">💫</div>
+                    
+                    <CardHeader className="relative z-10">
                       <CollapsibleTrigger asChild>
                         <div className="flex items-center justify-between cursor-pointer group">
-                          <div className="flex items-center gap-2">
-                            <BookOpen className="h-5 w-5 text-primary" />
-                            <CardTitle>Additional Examples</CardTitle>
+                          <div className="flex items-center gap-3">
+                            <div className="p-3 bg-gradient-ocean rounded-xl shadow-lg">
+                              <BookOpen className="h-6 w-6 text-white" />
+                            </div>
+                            <CardTitle className="text-2xl font-bold group-hover:text-secondary transition-colors">📚 Examples</CardTitle>
                           </div>
-                          <ChevronDown className={`h-5 w-5 transition-transform ${examplesExpanded ? 'rotate-180' : ''}`} />
+                          <ChevronDown className={`h-6 w-6 transition-transform duration-300 ${examplesExpanded ? 'rotate-180 text-secondary' : 'text-muted-foreground'}`} />
                         </div>
                       </CollapsibleTrigger>
                       {!examplesExpanded && (
-                        <CardDescription className="text-sm">
-                          More examples to explore (click to expand)
+                        <CardDescription className="text-sm ml-16">
+                          🌟 Real examples to guide your practice (click to expand)
                         </CardDescription>
                       )}
                     </CardHeader>
                     <CollapsibleContent>
-                      <CardContent>
-                        <ul className="space-y-2">
+                      <CardContent className="relative z-10">
+                        <ul className="space-y-3">
                           {room.examples.map((example, index) => (
-                            <li key={index} className="flex items-start gap-2">
-                              <span className="text-primary mt-1">•</span>
-                              <span>{example}</span>
+                            <li key={index} className="flex items-start gap-3 p-4 rounded-xl bg-gradient-to-r from-secondary/5 to-primary/5 border border-secondary/20 hover:border-secondary/40 transition-all duration-300 hover:shadow-md">
+                              <span className="text-secondary text-2xl font-bold shrink-0">→</span>
+                              <span className="text-sm leading-relaxed">{example}</span>
                             </li>
                           ))}
                         </ul>
@@ -466,48 +530,49 @@ export default function RoomDetail() {
                       <h4 className="font-semibold text-sm">The Five Mastery Levels:</h4>
                       
                       <div className="space-y-2">
-                        <div className="flex items-start gap-3 p-2 rounded-lg bg-slate-500/10 border border-slate-500/20">
-                          <Star className="h-4 w-4 text-slate-500 mt-0.5" />
+                        <div className="flex items-start gap-3 p-3 rounded-xl bg-slate-500/10 border-2 border-slate-500/30 hover:border-slate-500/50 transition-all hover:shadow-lg">
+                          <div className="text-2xl">⚪</div>
                           <div className="flex-1">
-                            <div className="font-medium text-sm">Level 1: Novice <span className="text-slate-500">(Gray Badge)</span></div>
-                            <div className="text-xs text-muted-foreground">Starting point. Begin exploring the room's principles.</div>
-                            <div className="text-xs font-semibold mt-1">→ Reach 100 XP to advance</div>
+                            <div className="font-bold text-base">Level 1: Novice <span className="text-slate-500">(Gray Badge)</span></div>
+                            <div className="text-sm text-muted-foreground">Starting point. Begin exploring the room's principles.</div>
+                            <div className="text-sm font-bold mt-2 text-slate-600">→ Reach 100 XP to advance ⬆️</div>
                           </div>
                         </div>
 
-                        <div className="flex items-start gap-3 p-2 rounded-lg bg-blue-500/10 border border-blue-500/20">
-                          <Award className="h-4 w-4 text-blue-500 mt-0.5" />
+                        <div className="flex items-start gap-3 p-3 rounded-xl bg-blue-500/10 border-2 border-blue-500/30 hover:border-blue-500/50 transition-all hover:shadow-lg">
+                          <div className="text-2xl">🔵</div>
                           <div className="flex-1">
-                            <div className="font-medium text-sm">Level 2: Apprentice <span className="text-blue-500">(Blue Badge)</span></div>
-                            <div className="text-xs text-muted-foreground">Building familiarity. You're making connections.</div>
-                            <div className="text-xs font-semibold mt-1">→ Reach 250 XP to advance</div>
+                            <div className="font-bold text-base">Level 2: Apprentice <span className="text-blue-500">(Blue Badge)</span></div>
+                            <div className="text-sm text-muted-foreground">Building familiarity. You're making connections.</div>
+                            <div className="text-sm font-bold mt-2 text-blue-600">→ Reach 250 XP to advance ⬆️</div>
                           </div>
                         </div>
 
-                        <div className="flex items-start gap-3 p-2 rounded-lg bg-purple-500/10 border border-purple-500/20">
-                          <Trophy className="h-4 w-4 text-purple-500 mt-0.5" />
+
+                        <div className="flex items-start gap-3 p-3 rounded-xl bg-purple-500/10 border-2 border-purple-500/30 hover:border-purple-500/50 transition-all hover:shadow-lg">
+                          <div className="text-2xl">🟣</div>
                           <div className="flex-1">
-                            <div className="font-medium text-sm">Level 3: Practitioner <span className="text-purple-500">(Purple Badge)</span></div>
-                            <div className="text-xs text-muted-foreground">Confident application. You can teach this room's principles.</div>
-                            <div className="text-xs font-semibold mt-1">→ Reach 500 XP to advance</div>
+                            <div className="font-bold text-base">Level 3: Practitioner <span className="text-purple-500">(Purple Badge)</span></div>
+                            <div className="text-sm text-muted-foreground">Confident application. You can teach this room's principles.</div>
+                            <div className="text-sm font-bold mt-2 text-purple-600">→ Reach 500 XP to advance ⬆️</div>
                           </div>
                         </div>
 
-                        <div className="flex items-start gap-3 p-2 rounded-lg bg-amber-500/10 border border-amber-500/30">
-                          <Crown className="h-4 w-4 text-amber-500 mt-0.5" />
+                        <div className="flex items-start gap-3 p-3 rounded-xl bg-amber-500/10 border-2 border-amber-500/40 hover:border-amber-500/60 transition-all hover:shadow-glow">
+                          <div className="text-2xl">🟡</div>
                           <div className="flex-1">
-                            <div className="font-medium text-sm">Level 4: Expert <span className="text-amber-500">(Gold Badge)</span></div>
-                            <div className="text-xs text-muted-foreground">Deep understanding. Mentor Mode unlocked for personalized AI guidance.</div>
-                            <div className="text-xs font-semibold mt-1">→ Reach 1,000 XP to advance</div>
+                            <div className="font-bold text-base">Level 4: Expert <span className="text-amber-500">(Gold Badge)</span></div>
+                            <div className="text-sm text-muted-foreground">Deep understanding. 🤖 Mentor Mode unlocked for personalized AI guidance.</div>
+                            <div className="text-sm font-bold mt-2 text-amber-600">→ Reach 1,000 XP to advance ⬆️</div>
                           </div>
                         </div>
 
-                        <div className="flex items-start gap-3 p-2 rounded-lg bg-gradient-to-r from-amber-500/20 to-yellow-300/20 border border-amber-500/30">
-                          <Sparkles className="h-4 w-4 text-amber-500 mt-0.5 animate-pulse" />
+                        <div className="flex items-start gap-3 p-4 rounded-xl bg-gradient-to-r from-amber-500/20 via-yellow-300/20 to-amber-500/20 border-2 border-amber-400/50 hover:border-amber-400/70 transition-all hover:shadow-mega-glow animate-pulse-glow">
+                          <div className="text-3xl animate-pulse">✨</div>
                           <div className="flex-1">
-                            <div className="font-medium text-sm">Level 5: Master <span className="bg-gradient-to-r from-amber-400 to-yellow-300 bg-clip-text text-transparent">(Golden Badge)</span></div>
-                            <div className="text-xs text-muted-foreground">Complete mastery. This room's patterns are permanently encoded in your mind.</div>
-                            <div className="text-xs font-semibold mt-1 text-amber-600">✨ Maximum Level Reached</div>
+                            <div className="font-black text-lg bg-gradient-to-r from-amber-400 via-yellow-300 to-amber-400 bg-clip-text text-transparent">Level 5: Master (Golden Badge)</div>
+                            <div className="text-sm text-muted-foreground font-medium">Complete mastery. This room's patterns are permanently encoded in your mind. 🧠⚡</div>
+                            <div className="text-sm font-black mt-2 bg-gradient-to-r from-amber-500 to-yellow-400 bg-clip-text text-transparent">🏆 Maximum Level Reached</div>
                           </div>
                         </div>
                       </div>
@@ -521,11 +586,11 @@ export default function RoomDetail() {
                         As you master multiple rooms, you gain global ranks that represent your depth of understanding across the Palace.
                       </p>
                       
-                      <div className="space-y-2">
-                        <div className="flex items-start gap-3 p-2 rounded-lg bg-blue-500/10 border border-blue-500/20">
-                          <div className="h-4 w-4 rounded-full bg-blue-500 mt-0.5 flex-shrink-0" />
+                      <div className="space-y-3">
+                        <div className="flex items-start gap-3 p-3 rounded-xl bg-blue-500/10 border-2 border-blue-500/30 hover:shadow-glow transition-all">
+                          <div className="text-2xl">🔵</div>
                           <div className="flex-1">
-                            <div className="font-medium text-sm text-blue-600">BLUE MASTER — 1–3 Rooms Mastered</div>
+                            <div className="font-bold text-base text-blue-600">BLUE MASTER — 1–3 Rooms 🏆</div>
                             <div className="text-xs text-muted-foreground mt-0.5">
                               <strong>Requirements:</strong> None beyond room mastery<br />
                               <strong>Reward:</strong> Blue Master title
@@ -533,54 +598,54 @@ export default function RoomDetail() {
                           </div>
                         </div>
 
-                        <div className="flex items-start gap-3 p-2 rounded-lg bg-red-500/10 border border-red-500/20">
-                          <div className="h-4 w-4 rounded-full bg-red-500 mt-0.5 flex-shrink-0" />
+                        <div className="flex items-start gap-3 p-3 rounded-xl bg-red-500/10 border-2 border-red-500/30 hover:shadow-glow transition-all">
+                          <div className="text-2xl">🔴</div>
                           <div className="flex-1">
-                            <div className="font-medium text-sm text-red-600">RED MASTER — 4–9 Rooms Mastered</div>
+                            <div className="font-bold text-base text-red-600">RED MASTER — 4–9 Rooms 🔥</div>
                             <div className="text-xs text-muted-foreground mt-0.5">
-                              <strong>Requirements:</strong> 7-day global streak<br />
-                              <strong>Reward:</strong> Red Master title + Red Challenges
+                              <strong>Requirements:</strong> 7-day streak<br />
+                              <strong>Reward:</strong> Red Challenges
                             </div>
                           </div>
                         </div>
 
-                        <div className="flex items-start gap-3 p-2 rounded-lg bg-yellow-500/10 border border-yellow-500/20">
-                          <div className="h-4 w-4 rounded-full bg-yellow-500 mt-0.5 flex-shrink-0" />
+                        <div className="flex items-start gap-3 p-3 rounded-xl bg-yellow-500/10 border-2 border-yellow-500/30 hover:shadow-glow transition-all">
+                          <div className="text-2xl">🟡</div>
                           <div className="flex-1">
-                            <div className="font-medium text-sm text-yellow-600">GOLD MASTER — 10–18 Rooms Mastered</div>
+                            <div className="font-bold text-base text-yellow-600">GOLD MASTER — 10–18 Rooms ⭐</div>
                             <div className="text-xs text-muted-foreground mt-0.5">
-                              <strong>Requirements:</strong> 14-day global streak<br />
-                              <strong>Reward:</strong> Gold Master title + advanced chain tools
+                              <strong>Requirements:</strong> 14-day streak<br />
+                              <strong>Reward:</strong> Advanced chain tools
                             </div>
                           </div>
                         </div>
 
-                        <div className="flex items-start gap-3 p-2 rounded-lg bg-purple-500/10 border border-purple-500/20">
-                          <div className="h-4 w-4 rounded-full bg-purple-500 mt-0.5 flex-shrink-0" />
+                        <div className="flex items-start gap-3 p-3 rounded-xl bg-purple-500/10 border-2 border-purple-500/30 hover:shadow-glow transition-all">
+                          <div className="text-2xl">🟣</div>
                           <div className="flex-1">
-                            <div className="font-medium text-sm text-purple-600">PURPLE MASTER — 19–27 Rooms Mastered</div>
+                            <div className="font-bold text-base text-purple-600">PURPLE MASTER — 19–27 Rooms 💜</div>
                             <div className="text-xs text-muted-foreground mt-0.5">
-                              <strong>Requirements:</strong> 21-day global streak<br />
-                              <strong>Reward:</strong> Purple Master title + create-your-own drills
+                              <strong>Requirements:</strong> 21-day streak<br />
+                              <strong>Reward:</strong> Create-your-own drills
                             </div>
                           </div>
                         </div>
 
-                        <div className="flex items-start gap-3 p-2 rounded-lg bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-600">
-                          <div className="h-4 w-4 rounded-full bg-white border-2 border-gray-400 mt-0.5 flex-shrink-0" />
+                        <div className="flex items-start gap-3 p-3 rounded-xl bg-gray-100 dark:bg-gray-800 border-2 border-gray-300 dark:border-gray-600 hover:shadow-glow transition-all">
+                          <div className="text-2xl">⚪</div>
                           <div className="flex-1">
-                            <div className="font-medium text-sm">WHITE MASTER — 28–37 Rooms Mastered</div>
+                            <div className="font-bold text-base">WHITE MASTER — 28–37 Rooms 🤍</div>
                             <div className="text-xs text-muted-foreground mt-0.5">
-                              <strong>Requirements:</strong> 30-day global streak<br />
-                              <strong>Reward:</strong> White Master title + Temple Mode + prophecy maps
+                              <strong>Requirements:</strong> 30-day streak<br />
+                              <strong>Reward:</strong> Temple Mode + prophecy maps
                             </div>
                           </div>
                         </div>
 
-                        <div className="flex items-start gap-3 p-3 rounded-lg bg-gradient-to-br from-gray-900 to-gray-700 border-2 border-gray-800">
-                          <div className="h-4 w-4 rounded-full bg-black border-2 border-gray-500 mt-0.5 flex-shrink-0" />
+                        <div className="flex items-start gap-3 p-4 rounded-xl bg-gradient-to-br from-gray-900 via-black to-gray-900 border-2 border-gray-700 hover:shadow-mega-glow transition-all">
+                          <div className="text-3xl animate-pulse">⚫</div>
                           <div className="flex-1">
-                            <div className="font-medium text-sm text-white">⚫ BLACK MASTER — 38 ROOMS MASTERED</div>
+                            <div className="font-black text-lg text-white">BLACK MASTER — 38 ROOMS 👑</div>
                             <div className="text-xs text-gray-300 mt-1 italic">The Phototheology equivalent of a spiritual black belt.</div>
                             <div className="text-xs text-gray-200 mt-2 space-y-1">
                               <div><strong>Final Requirements:</strong></div>

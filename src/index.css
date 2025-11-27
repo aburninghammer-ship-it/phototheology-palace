@@ -95,9 +95,11 @@ All colors MUST be HSL.
     --shadow-blue: 0 8px 32px -8px hsl(210 100% 56% / 0.4);
     --shadow-elegant: 0 4px 20px -4px hsl(210 85% 50% / 0.2);
     --shadow-hover: 0 12px 40px -8px hsl(210 85% 50% / 0.35);
-    --shadow-glow: 0 0 40px hsl(210 85% 50% / 0.3);
+    --shadow-glow: 0 0 60px 10px hsl(210 85% 50% / 0.5);
+    --shadow-mega-glow: 0 0 80px 15px hsl(210 85% 50% / 0.6);
     
     --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-bounce: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
     
     /* Animations */
     --animation-gradient: animate-gradient 8s ease infinite;
@@ -251,6 +253,10 @@ All colors MUST be HSL.
     box-shadow: var(--shadow-glow);
   }
   
+  .shadow-mega-glow {
+    box-shadow: var(--shadow-mega-glow);
+  }
+  
   .transition-smooth {
     transition: var(--transition-smooth);
   }
@@ -260,7 +266,27 @@ All colors MUST be HSL.
   }
   
   .hover-lift {
-    @apply transition-all duration-300 hover:-translate-y-1 hover:shadow-hover;
+    transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  
+  .hover-lift:hover {
+    transform: translateY(-8px);
+    box-shadow: var(--shadow-mega-glow);
+  }
+  
+  .animate-pulse-glow {
+    animation: pulse-glow 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  }
+  
+  @keyframes pulse-glow {
+    0%, 100% {
+      opacity: 1;
+      filter: drop-shadow(0 0 8px currentColor);
+    }
+    50% {
+      opacity: 0.7;
+      filter: drop-shadow(0 0 12px currentColor);
+    }
   }
   
   .hover-glow {
