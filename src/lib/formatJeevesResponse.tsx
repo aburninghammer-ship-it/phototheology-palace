@@ -368,7 +368,7 @@ const getHeadingEmoji = (text: string): string => {
   if (lower.includes('parallel') || lower.includes('p||')) return '⚖️';
   if (lower.includes('fruit room') || lower.includes('frt')) return '🍇';
   if (lower.includes('imagination') || lower.includes('ir')) return '✨';
-  if (lower.includes('meditation') || lower.includes('mr')) return '🧘';
+  if (lower.includes('meditation') || lower.includes('mr')) return '🙏';
   if (lower.includes('bible freestyle') || lower.includes('bf')) return '🔗';
   if (lower.includes('infinity') || lower.includes('∞')) return '♾️';
   
@@ -396,7 +396,7 @@ const getBulletEmoji = (text: string): string => {
   if (lower.match(/\b(cr|concentration)\b/)) return '🎯';
   if (lower.match(/\b(trm|theme)\b/)) return '🏛️';
   if (lower.match(/\b(ir|imagination)\b/)) return '✨';
-  if (lower.match(/\b(mr|meditation)\b/)) return '🧘';
+  if (lower.match(/\b(mr|meditation)\b/)) return '🙏';
   if (lower.match(/\b(bf|freestyle)\b/)) return '🔗';
   if (lower.match(/\b(frt|fruit)\b/)) return '🍇';
   

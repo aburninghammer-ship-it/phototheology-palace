@@ -230,7 +230,7 @@ export default function RoomDetail() {
                cr: "✝️", dr: "💠", c6: "📚", trm: "🏛️", tz: "⏰", prm: "🎵", "p||": "🪞", frt: "🍇", cec: "👑", r66: "📿",
                bl: "⛪", pr: "🔮", "3a": "👼", fe: "🎊",
                "123h": "☁️", cycles: "🔄", jr: "🍊", math: "🔢",
-               frm: "🔥", mr: "🧘", srm: "⚡"}[room.id] || "⭐"
+               frm: "🔥", mr: "🙏", srm: "⚡"}[room.id] || "⭐"
             }
           </div>
           
@@ -265,7 +265,7 @@ export default function RoomDetail() {
                    cr: "✝️", dr: "💠", c6: "📚", trm: "🏛️", tz: "⏰", prm: "🎵", "p||": "🪞", frt: "🍇", cec: "👑", r66: "📿",
                    bl: "⛪", pr: "🔮", "3a": "👼", fe: "🎊",
                    "123h": "☁️", cycles: "🔄", jr: "🍊", math: "🔢",
-                   frm: "🔥", mr: "🧘", srm: "⚡"}[room.id] || "⭐"
+                   frm: "🔥", mr: "🙏", srm: "⚡"}[room.id] || "⭐"
                 }
               </span>
               <div>

@@ -20,7 +20,7 @@ const roomEmojis: Record<string, string> = {
   cr: "✝️", dr: "💠", c6: "📚", trm: "🏛️", tz: "⏰", prm: "🎵", "p||": "🪞", frt: "🍇", cec: "👑", r66: "📿",
   bl: "⛪", pr: "🔮", "3a": "👼", fe: "🎊",
   "123h": "☁️", cycles: "🔄", jr: "🍊", math: "🔢",
-  frm: "🔥", mr: "🧘", srm: "⚡"
+  frm: "🔥", mr: "🙏", srm: "⚡"
 };
 
 export const FloorRoomCard = ({ room, floorNumber, gradient }: FloorRoomCardProps) => {
