@@ -61,6 +61,7 @@ const categoryConfig = {
       { to: "/kids-games", label: "Kids Games", icon: "👶" },
       { to: "/training-drills", label: "Training Drills", icon: "⚡" },
       { to: "/daily-challenges", label: "Daily Challenges", icon: "📅" },
+      { to: "/genesis-challenge", label: "Genesis High Rise", icon: "🏢" },
       { to: "/treasure-hunt", label: "Treasure Hunt", icon: "🏆" },
       { to: "/escape-room", label: "Escape Rooms", icon: "🚨" },
     ],
@@ -127,8 +128,8 @@ const categoryConfig = {
     icon: Trophy,
     links: [
       { to: "/mastery-dashboard", label: "Mastery Dashboard", icon: "🎯" },
-      { to: "/genesis-challenge", label: "Genesis High Rise", icon: "🏢" },
       { to: "/spiritual-training", label: "Christian Art of War Dojo", icon: "⚔️" },
+      { to: "/analyze-thoughts", label: "Analyze My Thoughts", icon: "💡" },
     ],
   },
 };

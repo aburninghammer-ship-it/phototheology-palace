@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { Building2, Sparkles, Users, User, CreditCard, LogOut, MessageCircle, BookOpen, Calendar, Image, Search, Video, Sword, Crown, Shield, Brain } from "lucide-react";
+import { Building2, Sparkles, Users, User, CreditCard, LogOut, MessageCircle, BookOpen, Calendar, Image, Search, Video, Sword, Crown, Shield, Brain, Lightbulb, Zap } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
 import { useActiveUsers } from "@/hooks/useActiveUsers";
@@ -320,11 +320,11 @@ export const Navigation = () => {
                     Memory Palace
                   </Link>
                   <Link 
-                    to="/genesis-challenge"
+                    to="/analyze-thoughts" 
                     className="px-3 py-1.5 text-sm font-medium text-foreground hover:text-primary hover:bg-accent/50 rounded-md transition-colors whitespace-nowrap flex items-center gap-1"
                   >
-                    <Building2 className="h-3.5 w-3.5" />
-                    Genesis High Rise
+                    <Lightbulb className="h-3.5 w-3.5" />
+                    Analyze My Thoughts
                   </Link>
                   <Link 
                     to="/spiritual-training" 
@@ -391,12 +391,22 @@ export const Navigation = () => {
                   >
                     Courses
                   </Link>
-                  <Link 
-                    to="/daily-challenges" 
-                    className="px-3 py-1.5 text-sm font-medium text-foreground hover:text-primary hover:bg-accent/50 rounded-md transition-colors whitespace-nowrap"
-                  >
-                    Challenges
-                  </Link>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <button className="px-3 py-1.5 text-sm font-medium text-foreground hover:text-primary hover:bg-accent/50 rounded-md transition-colors whitespace-nowrap flex items-center gap-1">
+                        <Zap className="h-3.5 w-3.5" />
+                        Challenges
+                      </button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="start" className="w-56 bg-card border-border z-50">
+                      <DropdownMenuItem asChild>
+                        <Link to="/daily-challenges">Daily Challenges</Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem asChild>
+                        <Link to="/genesis-challenge">Genesis High Rise</Link>
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
                   <Link 
                     to="/achievements" 
                     className="px-3 py-1.5 text-sm font-medium text-foreground hover:text-primary hover:bg-accent/50 rounded-md transition-colors whitespace-nowrap"
