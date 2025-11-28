@@ -315,104 +315,148 @@ Generate all ${duration} days as a JSON array. Each day should progressively bui
     console.log("Calling AI to generate devotional...");
     console.log("CADE enabled:", !!primaryIssue);
 
-    const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${LOVABLE_API_KEY}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        model: "google/gemini-2.5-flash",
-        messages: [
-          { role: "system", content: systemPrompt },
-          { role: "user", content: userPrompt },
-        ],
-        temperature: 0.7,
-      }),
-    });
-
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error("AI API error:", response.status, errorText);
-      
-      if (response.status === 429) {
-        throw new Error("Rate limit exceeded. Please try again later.");
-      }
-      if (response.status === 402) {
-        throw new Error("AI credits exhausted. Please add credits.");
-      }
-      throw new Error(`AI generation failed: ${response.status}`);
-    }
-
-    const data = await response.json();
-    console.log("AI response received, parsing content...");
-    const content = data.choices?.[0]?.message?.content;
-
-    if (!content) {
-      throw new Error("No content generated");
-    }
+    // For large devotionals (40+ days), use batching to avoid timeouts
+    const batchSize = duration > 21 ? 14 : duration; // Generate in batches of 14 days max
+    const batches = Math.ceil(duration / batchSize);
+    let allDays: any[] = [];
     
-    console.log("Content length:", content.length);
+    for (let batch = 0; batch < batches; batch++) {
+      const startDay = batch * batchSize + 1;
+      const endDay = Math.min((batch + 1) * batchSize, duration);
+      const daysInBatch = endDay - startDay + 1;
+      
+      console.log(`Generating batch ${batch + 1}/${batches}: days ${startDay}-${endDay}`);
+      
+      const batchUserPrompt = batches > 1 
+        ? `Create days ${startDay} to ${endDay} of a ${duration}-day devotional on the theme: "${theme}"
+Format: ${format}
+Study Style: ${studyStyle}${forPersonNote}${issueNote}
 
-    // Parse the JSON from the response
-    let days;
-    try {
-      // Extract JSON from markdown code blocks if present
-      const jsonMatch = content.match(/```(?:json)?\s*([\s\S]*?)```/);
-      let jsonString = jsonMatch ? jsonMatch[1] : content;
+Generate ${daysInBatch} days (starting from day_number ${startDay}) as a JSON array. Each day should progressively build understanding while always pointing to Christ${primaryIssue ? " and addressing their specific struggle with compassion and biblical wisdom" : ""}.
+
+IMPORTANT: Start numbering from day_number: ${startDay}`
+        : userPrompt;
       
-      // Escape literal newlines/tabs within JSON string values
-      let result = '';
-      let inString = false;
-      let escaped = false;
+      // Create AbortController with 120 second timeout for each batch
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 120000);
       
-      for (let i = 0; i < jsonString.length; i++) {
-        const char = jsonString[i];
+      try {
+        const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${LOVABLE_API_KEY}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            model: "google/gemini-2.5-flash",
+            messages: [
+              { role: "system", content: systemPrompt },
+              { role: "user", content: batchUserPrompt },
+            ],
+            temperature: 0.7,
+          }),
+          signal: controller.signal,
+        });
         
-        if (escaped) {
-          result += char;
-          escaped = false;
-          continue;
-        }
-        
-        if (char === '\\') {
-          escaped = true;
-          result += char;
-          continue;
-        }
-        
-        if (char === '"') {
-          inString = !inString;
-          result += char;
-          continue;
-        }
-        
-        if (inString) {
-          if (char === '\n') {
-            result += '\\n';
-          } else if (char === '\r') {
-            result += '\\r';
-          } else if (char === '\t') {
-            result += '\\t';
-          } else {
-            result += char;
+        clearTimeout(timeoutId);
+
+        if (!response.ok) {
+          const errorText = await response.text();
+          console.error("AI API error:", response.status, errorText);
+          
+          if (response.status === 429) {
+            throw new Error("Rate limit exceeded. Please try again later.");
           }
-        } else {
-          result += char;
+          if (response.status === 402) {
+            throw new Error("AI credits exhausted. Please add credits.");
+          }
+          throw new Error(`AI generation failed: ${response.status}`);
         }
+        
+        const data = await response.json();
+        console.log(`Batch ${batch + 1} response received, parsing content...`);
+        const content = data.choices?.[0]?.message?.content;
+
+        if (!content) {
+          throw new Error(`No content generated for batch ${batch + 1}`);
+        }
+        
+        console.log(`Batch ${batch + 1} content length:`, content.length);
+        
+        // Parse batch days from content
+        let batchDays;
+        try {
+          const jsonMatch = content.match(/```(?:json)?\s*([\s\S]*?)```/);
+          let jsonString = jsonMatch ? jsonMatch[1] : content;
+          
+          // Escape literal newlines/tabs within JSON string values
+          let result = '';
+          let inString = false;
+          let escaped = false;
+          
+          for (let i = 0; i < jsonString.length; i++) {
+            const char = jsonString[i];
+            
+            if (escaped) {
+              result += char;
+              escaped = false;
+              continue;
+            }
+            
+            if (char === '\\') {
+              escaped = true;
+              result += char;
+              continue;
+            }
+            
+            if (char === '"') {
+              inString = !inString;
+              result += char;
+              continue;
+            }
+            
+            if (inString) {
+              if (char === '\n') {
+                result += '\\n';
+              } else if (char === '\r') {
+                result += '\\r';
+              } else if (char === '\t') {
+                result += '\\t';
+              } else {
+                result += char;
+              }
+            } else {
+              result += char;
+            }
+          }
+          
+          batchDays = JSON.parse(result.trim());
+          console.log(`Batch ${batch + 1}: parsed ${batchDays.length} days`);
+        } catch (parseError) {
+          console.error(`JSON parse error for batch ${batch + 1}:`, parseError);
+          throw new Error(`Failed to parse devotional content for batch ${batch + 1}`);
+        }
+        
+        allDays = [...allDays, ...batchDays];
+        
+      } catch (fetchError: unknown) {
+        clearTimeout(timeoutId);
+        if (fetchError instanceof Error && fetchError.name === 'AbortError') {
+          throw new Error(`Generation timeout for batch ${batch + 1}. Try a shorter devotional duration.`);
+        }
+        throw fetchError;
       }
-      
-      days = JSON.parse(result.trim());
-      console.log("Successfully parsed", days.length, "days");
-    } catch (parseError) {
-      console.error("JSON parse error:", parseError);
-      console.log("Raw content (first 2000 chars):", content.substring(0, 2000));
-      throw new Error("Failed to parse devotional content");
     }
 
+    // Use allDays from batching
+    const days = allDays;
+    
     if (!Array.isArray(days) || days.length === 0) {
       throw new Error("Invalid devotional format received");
     }
+    
+    console.log("Total days generated:", days.length);
 
     console.log("Inserting days into database...");
     const daysToInsert = days.map((day: any) => ({
