@@ -179,13 +179,26 @@ export default function DevotionalView() {
 
   return (
     <div className="min-h-screen bg-background">
+      {/* Mobile Back Button - Fixed at top */}
+      <div className="md:hidden bg-background border-b px-4 py-2">
+        <Button 
+          variant="ghost" 
+          size="sm" 
+          onClick={() => navigate("/devotionals")} 
+          className="text-muted-foreground hover:text-foreground"
+        >
+          <ArrowLeft className="h-4 w-4 mr-2" />
+          Back to Devotionals
+        </Button>
+      </div>
+
       {/* Colorful Header */}
       <div className={`relative bg-gradient-to-r ${gradient} py-6 px-4`}>
         <div className="absolute inset-0 bg-black/10 pointer-events-none" />
         <div className="relative max-w-4xl mx-auto">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <Button variant="ghost" size="icon" onClick={() => navigate("/devotionals")} className="text-white hover:bg-white/20">
+              <Button variant="ghost" size="icon" onClick={() => navigate("/devotionals")} className="hidden md:flex text-white hover:bg-white/20">
                 <ArrowLeft className="h-5 w-5" />
               </Button>
               <div>
