@@ -4,7 +4,8 @@ import { fetchChapter, Translation } from "@/services/bibleApi";
 import { Chapter } from "@/types/bible";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ChevronLeft, ChevronRight, BookOpen, Loader2, Link2, MessageSquare, Bot, Bookmark, Sparkles, Upload } from "lucide-react";
+import { ChevronLeft, ChevronRight, BookOpen, Loader2, Link2, MessageSquare, Bot, Bookmark, Sparkles, Upload, Volume2 } from "lucide-react";
+import { AudioControls } from "./AudioControls";
 import { VerseView } from "./VerseView";
 import { StrongsVerseView } from "./StrongsVerseView";
 import { PrinciplePanel } from "./PrinciplePanel";
@@ -43,6 +44,8 @@ export const BibleReader = () => {
   const [importDialogOpen, setImportDialogOpen] = useState(false);
   const [activeDimensions, setActiveDimensions] = useState<string[]>(["1D", "2D", "3D", "4D", "5D"]);
   const [studyMode, setStudyMode] = useState<"beginner" | "advanced" | "apologetics">("advanced");
+  const [showAudioControls, setShowAudioControls] = useState(false);
+  const [audioHighlightedVerse, setAudioHighlightedVerse] = useState<number | null>(null);
   
   const toggleDimension = (dimension: string) => {
     setActiveDimensions(prev =>
@@ -219,6 +222,26 @@ export const BibleReader = () => {
 
       <PTCodeSearch />
 
+      {/* Audio Controls */}
+      <div className="flex items-center gap-2">
+        <Button
+          variant={showAudioControls ? "default" : "outline"}
+          size="sm"
+          onClick={() => setShowAudioControls(!showAudioControls)}
+          className={showAudioControls ? "bg-gradient-to-r from-emerald-600 to-teal-600 text-white" : ""}
+        >
+          <Volume2 className="h-4 w-4 mr-2" />
+          Listen
+        </Button>
+        {showAudioControls && (
+          <AudioControls
+            verses={chapterData.verses}
+            onVerseHighlight={setAudioHighlightedVerse}
+            className="flex-1"
+          />
+        )}
+      </div>
+
       {/* Mode Toggles */}
       <div className="flex gap-2 flex-wrap">
         <Button
@@ -343,6 +366,7 @@ export const BibleReader = () => {
                     onSelect={() => handleVerseClick(verse.verse)}
                     showPrinciples={false}
                     isHighlighted={highlightedVerses.includes(verse.verse)}
+                    isAudioPlaying={audioHighlightedVerse === verse.verse}
                   />
                 ))
               ) : (
@@ -356,6 +380,7 @@ export const BibleReader = () => {
                     onSelect={() => handleVerseClick(verse.verse)}
                     showPrinciples={principleMode}
                     isHighlighted={highlightedVerses.includes(verse.verse)}
+                    isAudioPlaying={audioHighlightedVerse === verse.verse}
                   />
                 ))
               )}

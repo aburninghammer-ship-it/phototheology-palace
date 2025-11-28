@@ -5,8 +5,9 @@ import { BIBLE_BOOKS } from "@/types/bible";
 // Using Bible API - you can switch to different APIs or local data
 const BIBLE_API_BASE = "https://bible-api.com";
 
-// Available translations
+// Available translations - expanded list
 export const BIBLE_TRANSLATIONS = [
+  // Popular English translations
   { value: "kjv", label: "King James Version (KJV)" },
   { value: "niv", label: "New International Version (NIV)" },
   { value: "esv", label: "English Standard Version (ESV)" },
@@ -14,6 +15,15 @@ export const BIBLE_TRANSLATIONS = [
   { value: "nlt", label: "New Living Translation (NLT)" },
   { value: "nasb", label: "New American Standard Bible (NASB)" },
   { value: "web", label: "World English Bible (WEB)" },
+  // Additional translations
+  { value: "asv", label: "American Standard Version (ASV)" },
+  { value: "ylt", label: "Young's Literal Translation (YLT)" },
+  { value: "darby", label: "Darby Translation (DARBY)" },
+  { value: "bbe", label: "Bible in Basic English (BBE)" },
+  { value: "clementine", label: "Clementine Latin Vulgate" },
+  { value: "almeida", label: "Almeida (Portuguese)" },
+  { value: "rves", label: "Reina Valera (Spanish)" },
+  { value: "rvr", label: "Reina Valera Revisada (Spanish)" },
 ] as const;
 
 export type Translation = typeof BIBLE_TRANSLATIONS[number]["value"];

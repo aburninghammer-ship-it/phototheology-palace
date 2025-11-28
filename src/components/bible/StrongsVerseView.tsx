@@ -16,6 +16,7 @@ interface StrongsVerseViewProps {
   onSelect: () => void;
   showPrinciples?: boolean;
   isHighlighted?: boolean;
+  isAudioPlaying?: boolean;
   principles?: string[];
 }
 
@@ -25,6 +26,7 @@ export const StrongsVerseView = ({
   onSelect, 
   showPrinciples, 
   isHighlighted,
+  isAudioPlaying,
   principles 
 }: StrongsVerseViewProps) => {
   const [strongsData, setStrongsData] = useState<{
@@ -130,7 +132,9 @@ export const StrongsVerseView = ({
     <>
       <div
         className={`group cursor-pointer transition-all duration-300 p-3 rounded-lg ${
-          isSelected
+          isAudioPlaying
+            ? "bg-emerald-500/20 border-2 border-emerald-500 shadow-lg ring-2 ring-emerald-500/30"
+            : isSelected
             ? "bg-primary/10 border-2 border-primary shadow-lg"
             : isHighlighted
             ? "bg-accent/20 border-2 border-accent shadow-md animate-pulse-glow"
