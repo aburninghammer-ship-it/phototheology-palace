@@ -139,7 +139,7 @@ export function CreateProfileWizard({ onClose, onProfileCreated }: CreateProfile
     struggles: [] as string[],
     current_situation: "",
     spiritual_goals: [] as string[],
-    preferred_tone: "comforting",
+    preferred_tones: [] as string[],
     preferred_themes: [] as string[],
     // Category-specific fields
     grade_level: "",
@@ -171,6 +171,15 @@ export function CreateProfileWizard({ onClose, onProfileCreated }: CreateProfile
     }));
   };
 
+  const toggleTone = (tone: string) => {
+    setFormData((prev) => ({
+      ...prev,
+      preferred_tones: prev.preferred_tones.includes(tone)
+        ? prev.preferred_tones.filter((t) => t !== tone)
+        : [...prev.preferred_tones, tone],
+    }));
+  };
+
   const getRelationshipForCategory = () => {
     switch (formData.category) {
       case "classroom": return "class";
@@ -182,6 +191,8 @@ export function CreateProfileWizard({ onClose, onProfileCreated }: CreateProfile
   };
 
   const handleCreate = async () => {
+    const tonesString = formData.preferred_tones.join(", ");
+    
     const profile = await createProfile.mutateAsync({
       name: formData.name,
       relationship: getRelationshipForCategory(),
@@ -189,7 +200,7 @@ export function CreateProfileWizard({ onClose, onProfileCreated }: CreateProfile
       avatar_emoji: formData.avatar_emoji,
       struggles: formData.struggles,
       current_situation: formData.current_situation || undefined,
-      preferred_tone: formData.preferred_tone,
+      preferred_tone: tonesString,
       preferred_themes: formData.preferred_themes,
     });
 
@@ -206,7 +217,7 @@ export function CreateProfileWizard({ onClose, onProfileCreated }: CreateProfile
         theme,
         format: "room-driven",
         duration: formData.duration,
-        studyStyle: formData.preferred_tone,
+        studyStyle: tonesString,
       });
 
       if (plan) {
@@ -215,7 +226,7 @@ export function CreateProfileWizard({ onClose, onProfileCreated }: CreateProfile
           theme,
           format: "room-driven",
           duration: formData.duration,
-          studyStyle: formData.preferred_tone,
+          studyStyle: tonesString,
         });
       }
 
@@ -238,7 +249,7 @@ export function CreateProfileWizard({ onClose, onProfileCreated }: CreateProfile
       case 2:
         return formData.struggles.length > 0 || formData.current_situation.trim();
       case 3:
-        return formData.preferred_tone && formData.preferred_themes.length > 0;
+        return formData.preferred_tones.length > 0 && formData.preferred_themes.length > 0;
       case 4:
         return true;
       default:
@@ -511,33 +522,38 @@ export function CreateProfileWizard({ onClose, onProfileCreated }: CreateProfile
               </div>
 
               <div>
-                <Label>Preferred Tone</Label>
-                <RadioGroup
-                  value={formData.preferred_tone}
-                  onValueChange={(v) => setFormData({ ...formData, preferred_tone: v })}
-                  className="grid gap-3 mt-3"
-                >
+                <Label>Preferred Tones (select multiple)</Label>
+                <div className="grid gap-3 mt-3">
                   {TONES.map((tone) => (
                     <div
                       key={tone.value}
                       className={cn(
                         "flex items-center space-x-3 p-3 rounded-lg border cursor-pointer transition-colors",
-                        formData.preferred_tone === tone.value
+                        formData.preferred_tones.includes(tone.value)
                           ? "border-primary bg-primary/5"
                           : "hover:bg-muted/50"
                       )}
-                      onClick={() => setFormData({ ...formData, preferred_tone: tone.value })}
+                      onClick={() => toggleTone(tone.value)}
                     >
-                      <RadioGroupItem value={tone.value} id={tone.value} />
+                      <div className={cn(
+                        "h-4 w-4 rounded border flex items-center justify-center",
+                        formData.preferred_tones.includes(tone.value)
+                          ? "bg-primary border-primary"
+                          : "border-muted-foreground"
+                      )}>
+                        {formData.preferred_tones.includes(tone.value) && (
+                          <span className="text-primary-foreground text-xs">✓</span>
+                        )}
+                      </div>
                       <div>
-                        <Label htmlFor={tone.value} className="cursor-pointer font-medium">
+                        <span className="cursor-pointer font-medium">
                           {tone.label}
-                        </Label>
+                        </span>
                         <p className="text-xs text-muted-foreground">{tone.description}</p>
                       </div>
                     </div>
                   ))}
-                </RadioGroup>
+                </div>
               </div>
 
               <div>
