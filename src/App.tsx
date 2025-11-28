@@ -19,6 +19,7 @@ import { AnimatePresence } from "framer-motion";
 import { ThemeProvider } from "next-themes";
 import { UserPreferencesProvider } from "@/hooks/useUserPreferences";
 import { AnnouncementBanner } from "@/components/AnnouncementBanner";
+import { VoiceChatInviteNotification } from "@/components/voice/VoiceChatInviteNotification";
 
 // Critical pages - load immediately
 import Index from "./pages/Index";
@@ -205,6 +206,7 @@ function App() {
                     <SidebarProvider defaultOpen={false}>
                       <div className="min-h-screen flex flex-col w-full">
                         <AnnouncementBanner />
+                        <VoiceChatInviteNotification />
                         <div className="flex flex-1 w-full">
                           <MessagingSidebar />
                           <main className="flex-1 w-full overflow-x-hidden">

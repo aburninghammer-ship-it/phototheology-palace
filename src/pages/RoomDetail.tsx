@@ -36,6 +36,7 @@ import { MilestoneTest } from "@/components/mastery/MilestoneTest";
 import { useRoomCurriculum } from "@/hooks/useRoomCurriculum";
 import { MasteryProgramEnrollment } from "@/components/mastery/MasteryProgramEnrollment";
 import { JeevesMasterProgram } from "@/components/mastery/JeevesMasterProgram";
+import { VoiceChatWidget } from "@/components/voice/VoiceChatWidget";
 
 // Room IDs that have quick start guides
 const QUICK_START_ROOMS = new Set([
@@ -276,6 +277,16 @@ export default function RoomDetail() {
             <p className="text-xl md:text-2xl leading-relaxed opacity-95 drop-shadow-lg">{room.purpose}</p>
           </div>
         </div>
+
+        {/* Voice Chat Widget */}
+        {user && (
+          <VoiceChatWidget
+            roomType="palace"
+            roomId={`floor/${floorNumber}/room/${roomId}`}
+            roomName={`${room.name} (Floor ${floorNumber})`}
+            className="mb-6"
+          />
+        )}
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <div className="lg:col-span-2">

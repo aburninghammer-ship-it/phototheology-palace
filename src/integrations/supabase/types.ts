@@ -6247,6 +6247,39 @@ export type Database = {
         }
         Relationships: []
       }
+      voice_chat_invites: {
+        Row: {
+          created_at: string
+          expires_at: string
+          id: string
+          invitee_id: string
+          inviter_id: string
+          room_id: string
+          room_name: string
+          status: string
+        }
+        Insert: {
+          created_at?: string
+          expires_at?: string
+          id?: string
+          invitee_id: string
+          inviter_id: string
+          room_id: string
+          room_name: string
+          status?: string
+        }
+        Update: {
+          created_at?: string
+          expires_at?: string
+          id?: string
+          invitee_id?: string
+          inviter_id?: string
+          room_id?: string
+          room_name?: string
+          status?: string
+        }
+        Relationships: []
+      }
       warrior_characteristics: {
         Row: {
           characteristic_name: string

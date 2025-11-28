@@ -7,14 +7,16 @@ import { WebRTCCall } from '@/components/WebRTCCall';
 import { useAuth } from '@/hooks/useAuth';
 import { cn } from '@/lib/utils';
 import { useToast } from '@/hooks/use-toast';
+import { VoiceChatInviteDialog } from './VoiceChatInviteDialog';
 
 interface VoiceChatWidgetProps {
   roomType: 'palace' | 'bible' | 'deck' | 'games' | 'challenges' | 'battle' | 'study';
   roomId: string;
+  roomName?: string;
   className?: string;
 }
 
-export function VoiceChatWidget({ roomType, roomId, className }: VoiceChatWidgetProps) {
+export function VoiceChatWidget({ roomType, roomId, roomName, className }: VoiceChatWidgetProps) {
   const { user } = useAuth();
   const { toast } = useToast();
   const { isVoiceChatActive, currentRoom, isMuted, isDoNotDisturb, joinVoiceChat, leaveVoiceChat, toggleMute, toggleDoNotDisturb } = useVoiceChat();
@@ -74,6 +76,13 @@ export function VoiceChatWidget({ roomType, roomId, className }: VoiceChatWidget
             >
               <Moon className="h-4 w-4" />
             </Button>
+
+            {isInThisRoom && (
+              <VoiceChatInviteDialog 
+                roomId={fullRoomId} 
+                roomName={roomName || `${roomType} - ${roomId}`} 
+              />
+            )}
 
             {isInThisRoom && (
               <Button
