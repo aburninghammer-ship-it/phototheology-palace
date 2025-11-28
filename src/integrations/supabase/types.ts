@@ -1404,6 +1404,303 @@ export type Database = {
         }
         Relationships: []
       }
+      devotional_profile_history: {
+        Row: {
+          ai_suggested_message: string | null
+          completed_at: string | null
+          day_id: string | null
+          id: string
+          personal_message: string | null
+          profile_id: string
+          shared_at: string | null
+          shared_via: string
+          used_ai_suggestion: boolean | null
+          viewed_at: string | null
+        }
+        Insert: {
+          ai_suggested_message?: string | null
+          completed_at?: string | null
+          day_id?: string | null
+          id?: string
+          personal_message?: string | null
+          profile_id: string
+          shared_at?: string | null
+          shared_via?: string
+          used_ai_suggestion?: boolean | null
+          viewed_at?: string | null
+        }
+        Update: {
+          ai_suggested_message?: string | null
+          completed_at?: string | null
+          day_id?: string | null
+          id?: string
+          personal_message?: string | null
+          profile_id?: string
+          shared_at?: string | null
+          shared_via?: string
+          used_ai_suggestion?: boolean | null
+          viewed_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "devotional_profile_history_day_id_fkey"
+            columns: ["day_id"]
+            isOneToOne: false
+            referencedRelation: "devotional_days"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "devotional_profile_history_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "devotional_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      devotional_profile_insights: {
+        Row: {
+          areas_improving: string[] | null
+          areas_needing_prayer: string[] | null
+          created_at: string | null
+          emotional_patterns: Json | null
+          id: string
+          insight_period_end: string
+          insight_period_start: string
+          profile_id: string
+          recurring_scriptures: string[] | null
+          spiritual_themes: Json | null
+          suggested_message: string | null
+          suggested_next_plan: string | null
+          suggested_next_theme: string | null
+          weekly_summary: string | null
+        }
+        Insert: {
+          areas_improving?: string[] | null
+          areas_needing_prayer?: string[] | null
+          created_at?: string | null
+          emotional_patterns?: Json | null
+          id?: string
+          insight_period_end: string
+          insight_period_start: string
+          profile_id: string
+          recurring_scriptures?: string[] | null
+          spiritual_themes?: Json | null
+          suggested_message?: string | null
+          suggested_next_plan?: string | null
+          suggested_next_theme?: string | null
+          weekly_summary?: string | null
+        }
+        Update: {
+          areas_improving?: string[] | null
+          areas_needing_prayer?: string[] | null
+          created_at?: string | null
+          emotional_patterns?: Json | null
+          id?: string
+          insight_period_end?: string
+          insight_period_start?: string
+          profile_id?: string
+          recurring_scriptures?: string[] | null
+          spiritual_themes?: Json | null
+          suggested_message?: string | null
+          suggested_next_plan?: string | null
+          suggested_next_theme?: string | null
+          weekly_summary?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "devotional_profile_insights_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "devotional_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      devotional_profile_notes: {
+        Row: {
+          content: string
+          created_at: string | null
+          id: string
+          is_pinned: boolean | null
+          note_type: string
+          profile_id: string
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          content: string
+          created_at?: string | null
+          id?: string
+          is_pinned?: boolean | null
+          note_type?: string
+          profile_id: string
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          content?: string
+          created_at?: string | null
+          id?: string
+          is_pinned?: boolean | null
+          note_type?: string
+          profile_id?: string
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "devotional_profile_notes_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "devotional_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      devotional_profile_schedules: {
+        Row: {
+          created_at: string | null
+          custom_message: string | null
+          day_id: string | null
+          id: string
+          is_recurring: boolean | null
+          is_sent: boolean | null
+          profile_id: string
+          recurrence_pattern: string | null
+          schedule_type: string
+          scheduled_for: string
+          sent_at: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          custom_message?: string | null
+          day_id?: string | null
+          id?: string
+          is_recurring?: boolean | null
+          is_sent?: boolean | null
+          profile_id: string
+          recurrence_pattern?: string | null
+          schedule_type?: string
+          scheduled_for: string
+          sent_at?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          custom_message?: string | null
+          day_id?: string | null
+          id?: string
+          is_recurring?: boolean | null
+          is_sent?: boolean | null
+          profile_id?: string
+          recurrence_pattern?: string | null
+          schedule_type?: string
+          scheduled_for?: string
+          sent_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "devotional_profile_schedules_day_id_fkey"
+            columns: ["day_id"]
+            isOneToOne: false
+            referencedRelation: "devotional_days"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "devotional_profile_schedules_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "devotional_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      devotional_profiles: {
+        Row: {
+          active_plan_id: string | null
+          age_group: string | null
+          avatar_emoji: string | null
+          created_at: string | null
+          current_situation: string | null
+          id: string
+          invite_accepted_at: string | null
+          invite_sent_at: string | null
+          invite_token: string | null
+          is_active: boolean | null
+          last_devotional_sent_at: string | null
+          linked_user_id: string | null
+          name: string
+          preferred_rooms: string[] | null
+          preferred_themes: string[] | null
+          preferred_tone: string | null
+          relationship: string
+          spiritual_goals: string[] | null
+          struggles: string[] | null
+          total_devotionals_sent: number | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          active_plan_id?: string | null
+          age_group?: string | null
+          avatar_emoji?: string | null
+          created_at?: string | null
+          current_situation?: string | null
+          id?: string
+          invite_accepted_at?: string | null
+          invite_sent_at?: string | null
+          invite_token?: string | null
+          is_active?: boolean | null
+          last_devotional_sent_at?: string | null
+          linked_user_id?: string | null
+          name: string
+          preferred_rooms?: string[] | null
+          preferred_themes?: string[] | null
+          preferred_tone?: string | null
+          relationship: string
+          spiritual_goals?: string[] | null
+          struggles?: string[] | null
+          total_devotionals_sent?: number | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          active_plan_id?: string | null
+          age_group?: string | null
+          avatar_emoji?: string | null
+          created_at?: string | null
+          current_situation?: string | null
+          id?: string
+          invite_accepted_at?: string | null
+          invite_sent_at?: string | null
+          invite_token?: string | null
+          is_active?: boolean | null
+          last_devotional_sent_at?: string | null
+          linked_user_id?: string | null
+          name?: string
+          preferred_rooms?: string[] | null
+          preferred_themes?: string[] | null
+          preferred_tone?: string | null
+          relationship?: string
+          spiritual_goals?: string[] | null
+          struggles?: string[] | null
+          total_devotionals_sent?: number | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "devotional_profiles_active_plan_id_fkey"
+            columns: ["active_plan_id"]
+            isOneToOne: false
+            referencedRelation: "devotional_plans"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       devotional_progress: {
         Row: {
           completed_at: string | null
@@ -6825,6 +7122,7 @@ export type Database = {
       cleanup_old_typing_indicators: { Args: never; Returns: undefined }
       delete_cancelled_user_data: { Args: never; Returns: undefined }
       generate_challenge_share_code: { Args: never; Returns: string }
+      generate_profile_invite_token: { Args: never; Returns: string }
       generate_referral_code: { Args: { user_id: string }; Returns: string }
       get_available_seats: { Args: { _church_id: string }; Returns: number }
       get_or_create_conversation: {

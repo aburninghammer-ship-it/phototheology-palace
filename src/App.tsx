@@ -182,6 +182,7 @@ const PTMultiplayerGame = lazy(() => import("./pages/PTMultiplayerGame"));
 const AnalyzeThoughts = lazy(() => import("./pages/AnalyzeThoughts"));
 const Devotionals = lazy(() => import("./pages/Devotionals"));
 const DevotionalView = lazy(() => import("./pages/DevotionalView"));
+const DevotionalProfileDetail = lazy(() => import("./pages/DevotionalProfileDetail"));
 
 const queryClient = new QueryClient();
 
@@ -359,6 +360,7 @@ function App() {
            <Route path="/bible-study-series" element={<ProtectedRoute><BibleStudySeriesBuilder /></ProtectedRoute>} />
            <Route path="/devotionals" element={<ProtectedRoute><Devotionals /></ProtectedRoute>} />
            <Route path="/devotionals/:planId" element={<ProtectedRoute><DevotionalView /></ProtectedRoute>} />
+           <Route path="/devotionals/profile/:profileId" element={<ProtectedRoute><DevotionalProfileDetail /></ProtectedRoute>} />
            <Route path="/bible-study-series/discover" element={<ProtectedRoute><PublicSeriesBrowser /></ProtectedRoute>} />
            <Route path="/series/:seriesId" element={<ProtectedRoute><BibleStudySeriesBuilder /></ProtectedRoute>} />
            <Route path="/series/:seriesId/lesson/:lessonNumber" element={<ProtectedRoute><SeriesLessonEditor /></ProtectedRoute>} />
