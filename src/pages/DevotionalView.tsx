@@ -50,12 +50,28 @@ export default function DevotionalView() {
     });
   };
 
-  if (planLoading || !plan) {
+  if (planLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-50 to-pink-50 dark:from-purple-950/20 dark:to-pink-950/20">
         <div className="text-center">
           <Loader2 className="h-12 w-12 animate-spin text-purple-500 mx-auto mb-4" />
           <p className="text-muted-foreground">Loading your devotional...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!plan) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-50 to-pink-50 dark:from-purple-950/20 dark:to-pink-950/20">
+        <div className="text-center">
+          <BookOpen className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+          <h2 className="text-xl font-bold mb-2">Devotional Not Found</h2>
+          <p className="text-muted-foreground mb-4">This devotional may have been deleted or doesn't exist.</p>
+          <Button onClick={() => navigate("/devotionals")}>
+            <ArrowLeft className="h-4 w-4 mr-2" />
+            Back to Devotionals
+          </Button>
         </div>
       </div>
     );
