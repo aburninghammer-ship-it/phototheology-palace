@@ -2,10 +2,11 @@ import { useEffect, useState } from "react";
 import { Switch } from "./ui/switch";
 import { Label } from "./ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./ui/card";
+import { Button } from "./ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { toast } from "sonner";
-import { Bell, Volume2, Vibrate } from "lucide-react";
+import { Bell, Volume2, Vibrate, BellOff, CheckCircle } from "lucide-react";
 import { 
   getNotificationSoundEnabled, 
   setNotificationSoundEnabled,
@@ -18,6 +19,7 @@ export function NotificationPreferences() {
   const [loading, setLoading] = useState(true);
   const [soundEnabled, setSoundEnabled] = useState(true);
   const [vibrationEnabled, setVibrationEnabled] = useState(true);
+  const [browserPermission, setBrowserPermission] = useState<NotificationPermission>("default");
   const [preferences, setPreferences] = useState({
     equation_challenges: true,
     christ_chapter_challenges: true,
@@ -37,7 +39,32 @@ export function NotificationPreferences() {
     // Load local preferences for sound and vibration
     setSoundEnabled(getNotificationSoundEnabled());
     setVibrationEnabled(getNotificationVibrationEnabled());
+    // Check browser notification permission
+    if ("Notification" in window) {
+      setBrowserPermission(Notification.permission);
+    }
   }, [user]);
+
+  const requestBrowserPermission = async () => {
+    if (!("Notification" in window)) {
+      toast.error("Browser notifications not supported");
+      return;
+    }
+    
+    const permission = await Notification.requestPermission();
+    setBrowserPermission(permission);
+    
+    if (permission === "granted") {
+      toast.success("Browser notifications enabled!");
+      // Send test notification
+      new Notification("Phototheology", {
+        body: "Daily verse notifications are now enabled!",
+        icon: "/favicon.ico"
+      });
+    } else if (permission === "denied") {
+      toast.error("Notification permission denied. Enable in browser settings.");
+    }
+  };
 
   const fetchPreferences = async () => {
     if (!user) return;
@@ -117,6 +144,31 @@ export function NotificationPreferences() {
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
+        {/* Browser Permission Banner */}
+        {"Notification" in window && browserPermission !== "granted" && (
+          <div className="flex items-center justify-between p-4 rounded-lg bg-muted/50 border border-dashed mb-4">
+            <div className="flex items-center gap-3">
+              <BellOff className="h-5 w-5 text-muted-foreground" />
+              <div>
+                <p className="font-medium text-sm">Enable Push Notifications</p>
+                <p className="text-xs text-muted-foreground">
+                  Get daily verse reminders even when you're away
+                </p>
+              </div>
+            </div>
+            <Button size="sm" onClick={requestBrowserPermission}>
+              Enable
+            </Button>
+          </div>
+        )}
+        
+        {browserPermission === "granted" && (
+          <div className="flex items-center gap-2 p-3 rounded-lg bg-green-500/10 text-green-700 dark:text-green-400 mb-4">
+            <CheckCircle className="h-4 w-4" />
+            <span className="text-sm">Push notifications enabled</span>
+          </div>
+        )}
+
         <div className="mb-4">
           <h3 className="font-semibold mb-2">Challenge Notifications</h3>
           <p className="text-sm text-muted-foreground mb-4">

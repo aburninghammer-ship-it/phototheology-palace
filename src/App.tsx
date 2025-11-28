@@ -21,6 +21,7 @@ import { UserPreferencesProvider } from "@/hooks/useUserPreferences";
 import { AnnouncementBanner } from "@/components/AnnouncementBanner";
 import { VoiceChatInviteNotification } from "@/components/voice/VoiceChatInviteNotification";
 import { PageTracker } from "@/components/PageTracker";
+import { DailyVerseNotification } from "@/components/notifications/DailyVerseNotification";
 
 // Critical pages - load immediately
 import Index from "./pages/Index";
@@ -215,6 +216,7 @@ function App() {
                       <div className="min-h-screen flex flex-col w-full">
                         <AnnouncementBanner />
                         <VoiceChatInviteNotification />
+                        <DailyVerseNotification />
                         <div className="flex flex-1 w-full">
                           <MessagingSidebar />
                           <main className="flex-1 w-full overflow-x-hidden">
