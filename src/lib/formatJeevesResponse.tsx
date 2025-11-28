@@ -7,8 +7,14 @@ import React from 'react';
 export const formatJeevesResponse = (text: string): React.ReactNode[] => {
   if (!text) return [];
 
-  // Clean up markdown-style formatting
+  // Decode HTML entities first
   let cleanedText = text
+    .replace(/&gt;/g, '>')
+    .replace(/&lt;/g, '<')
+    .replace(/&amp;/g, '&')
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;/g, "'")
+    .replace(/&nbsp;/g, ' ')
     .replace(/^\s*\*\s+/gm, '• ') // Convert asterisk bullets to bullet points
     .replace(/^\s*-\s+/gm, '• ')  // Normalize dashes to bullets
     .trim();
@@ -29,14 +35,17 @@ export const formatJeevesResponse = (text: string): React.ReactNode[] => {
         const level = headingMatch[1].length;
         const headingText = headingMatch[2];
         const emoji = getHeadingEmoji(headingText);
+        const bgColor = getHeadingBgColor(headingText, level);
         
         blocks.push(
           <div 
             key={`heading-${sectionIdx}`} 
-            className={`mb-6 mt-8 ${level === 1 ? 'text-2xl' : level === 2 ? 'text-xl' : 'text-lg'} font-bold text-primary flex items-center gap-3`}
+            className={`mb-6 mt-8 p-4 rounded-lg ${bgColor}`}
           >
-            <span className="text-2xl">{emoji}</span>
-            <span>{formatInlineText(headingText)}</span>
+            <div className={`${level === 1 ? 'text-2xl' : level === 2 ? 'text-xl' : 'text-lg'} font-bold flex items-center gap-3`}>
+              <span className="text-2xl">{emoji}</span>
+              <span>{formatInlineText(headingText)}</span>
+            </div>
           </div>
         );
         
@@ -56,6 +65,29 @@ export const formatJeevesResponse = (text: string): React.ReactNode[] => {
 };
 
 /**
+ * Get background color for headings based on content
+ */
+const getHeadingBgColor = (text: string, level: number): string => {
+  const lower = text.toLowerCase();
+  
+  // Topic-specific colors
+  if (lower.includes('overview') || lower.includes('introduction')) return 'bg-blue-500/10 border-l-4 border-blue-500';
+  if (lower.includes('biblical') || lower.includes('scripture')) return 'bg-amber-500/10 border-l-4 border-amber-500';
+  if (lower.includes('christ') || lower.includes('jesus')) return 'bg-purple-500/10 border-l-4 border-purple-500';
+  if (lower.includes('application') || lower.includes('practical')) return 'bg-green-500/10 border-l-4 border-green-500';
+  if (lower.includes('analysis') || lower.includes('interpretation')) return 'bg-indigo-500/10 border-l-4 border-indigo-500';
+  if (lower.includes('historical') || lower.includes('history')) return 'bg-orange-500/10 border-l-4 border-orange-500';
+  if (lower.includes('prophecy') || lower.includes('vision')) return 'bg-red-500/10 border-l-4 border-red-500';
+  if (lower.includes('summary') || lower.includes('conclusion')) return 'bg-cyan-500/10 border-l-4 border-cyan-500';
+  if (lower.includes('key') || lower.includes('important')) return 'bg-yellow-500/10 border-l-4 border-yellow-500';
+  
+  // Default based on level
+  if (level === 1) return 'bg-primary/10 border-l-4 border-primary';
+  if (level === 2) return 'bg-accent/50 border-l-4 border-accent-foreground/30';
+  return 'bg-muted/50 border-l-4 border-muted-foreground/30';
+};
+
+/**
  * Format a section (paragraph, list, or quote) with enhanced visual appeal
  */
 const formatSection = (text: string, baseKey: number): React.ReactNode[] => {
@@ -69,20 +101,51 @@ const formatSection = (text: string, baseKey: number): React.ReactNode[] => {
   const isNumberedList = lines.some(line => line.trim().match(/^\d+\.\s+/));
 
   // Check if it's a quote
-  const isQuote = lines.every(line => line.trim().startsWith('>') || line.trim() === '');
+  const isQuote = lines.some(line => line.trim().startsWith('>'));
 
   if (isQuote) {
-    const quoteContent = lines
-      .map(line => line.replace(/^>\s*/, ''))
-      .join('\n')
-      .trim();
+    // Process quotes mixed with regular text
+    let currentQuote: string[] = [];
     
-    blocks.push(
-      <div key={`quote-${baseKey}`} className="my-6 pl-5 border-l-4 border-primary/30 bg-accent/20 p-5 rounded-r-lg italic">
-        <span className="text-xl mr-2">💭</span>
-        {formatInlineText(quoteContent)}
-      </div>
-    );
+    lines.forEach((line, idx) => {
+      if (line.trim().startsWith('>')) {
+        currentQuote.push(line.replace(/^>\s*/, ''));
+      } else if (currentQuote.length > 0) {
+        // End current quote block
+        blocks.push(
+          <div key={`quote-${baseKey}-${idx}`} className="my-6 pl-5 border-l-4 border-amber-500/50 bg-amber-500/10 p-5 rounded-r-lg">
+            <span className="text-xl mr-2">📜</span>
+            <span className="italic font-medium">{formatInlineText(currentQuote.join(' '))}</span>
+          </div>
+        );
+        currentQuote = [];
+        
+        // Process non-quote line
+        if (line.trim()) {
+          blocks.push(
+            <p key={`para-${baseKey}-${idx}`} className="mb-5 leading-relaxed text-base">
+              {formatInlineText(line)}
+            </p>
+          );
+        }
+      } else if (line.trim()) {
+        blocks.push(
+          <p key={`para-${baseKey}-${idx}`} className="mb-5 leading-relaxed text-base">
+            {formatInlineText(line)}
+          </p>
+        );
+      }
+    });
+    
+    // Handle remaining quote
+    if (currentQuote.length > 0) {
+      blocks.push(
+        <div key={`quote-final-${baseKey}`} className="my-6 pl-5 border-l-4 border-amber-500/50 bg-amber-500/10 p-5 rounded-r-lg">
+          <span className="text-xl mr-2">📜</span>
+          <span className="italic font-medium">{formatInlineText(currentQuote.join(' '))}</span>
+        </div>
+      );
+    }
   } else if (isBulletList) {
     const listItems: React.ReactNode[] = [];
     
@@ -95,9 +158,9 @@ const formatSection = (text: string, baseKey: number): React.ReactNode[] => {
         listItems.push(
           <li 
             key={`bullet-${baseKey}-${idx}`} 
-            className="flex items-start gap-4 p-4 pl-6 rounded-lg hover:bg-accent/5 transition-all group mb-3"
+            className="flex items-start gap-4 p-4 pl-6 rounded-lg hover:bg-accent/10 transition-all group mb-2 border-l-2 border-primary/20"
           >
-            <span className="text-lg mt-1 flex-shrink-0 group-hover:scale-110 transition-transform">
+            <span className="text-lg mt-0.5 flex-shrink-0 group-hover:scale-110 transition-transform">
               {emoji}
             </span>
             <span className="flex-1 leading-relaxed text-base">
@@ -116,7 +179,7 @@ const formatSection = (text: string, baseKey: number): React.ReactNode[] => {
     });
 
     blocks.push(
-      <ul key={`list-${baseKey}`} className="mb-8 space-y-1 list-none pl-0">
+      <ul key={`list-${baseKey}`} className="mb-8 space-y-1 list-none pl-0 bg-muted/20 rounded-lg p-4">
         {listItems}
       </ul>
     );
@@ -132,9 +195,9 @@ const formatSection = (text: string, baseKey: number): React.ReactNode[] => {
         listItems.push(
           <li 
             key={`numbered-${baseKey}-${idx}`} 
-            className="flex items-start gap-4 p-4 pl-6 rounded-lg hover:bg-accent/5 transition-all mb-3"
+            className="flex items-start gap-4 p-4 pl-6 rounded-lg hover:bg-accent/10 transition-all mb-2 border-l-2 border-primary/30"
           >
-            <span className="flex-shrink-0 w-7 h-7 rounded-full bg-primary/10 text-primary font-bold text-sm flex items-center justify-center mt-0.5">
+            <span className="flex-shrink-0 w-8 h-8 rounded-full bg-primary/20 text-primary font-bold text-sm flex items-center justify-center mt-0.5 shadow-sm">
               {number}
             </span>
             <span className="flex-1 leading-relaxed text-base">
@@ -146,7 +209,7 @@ const formatSection = (text: string, baseKey: number): React.ReactNode[] => {
     });
 
     blocks.push(
-      <ol key={`numbered-list-${baseKey}`} className="mb-8 space-y-1 list-none pl-0">
+      <ol key={`numbered-list-${baseKey}`} className="mb-8 space-y-1 list-none pl-0 bg-muted/20 rounded-lg p-4">
         {listItems}
       </ol>
     );
@@ -154,30 +217,69 @@ const formatSection = (text: string, baseKey: number): React.ReactNode[] => {
     // Handle regular paragraphs with sentence-based splitting
     const content = lines.join(' ').trim();
     
-    // Split into sentences
-    const sentences = content.match(/[^.!?]+[.!?]+(\s|$)/g) || [content];
+    // Don't process empty content
+    if (!content) return blocks;
     
-    // Group sentences into paragraphs (2-3 sentences each)
-    if (sentences.length > 4) {
-      const chunks: string[] = [];
-      for (let i = 0; i < sentences.length; i += 3) {
-        const chunk = sentences.slice(i, i + 3).join(' ').trim();
-        if (chunk) chunks.push(chunk);
-      }
-      
-      chunks.forEach((chunk, idx) => {
-        blocks.push(
-          <p 
-            key={`para-${baseKey}-${idx}`} 
-            className="mb-5 leading-relaxed text-base pl-4 border-l-2 border-transparent hover:border-primary/20 transition-colors"
-          >
-            {formatInlineText(chunk)}
-          </p>
-        );
-      });
+    // Check if it's a key insight or important point
+    const isKeyInsight = content.toLowerCase().includes('key insight') || 
+                         content.toLowerCase().includes('important') ||
+                         content.toLowerCase().includes('note:') ||
+                         content.toLowerCase().includes('remember:');
+    
+    // Check if it's a cross-reference section
+    const isCrossRef = content.toLowerCase().includes('cross-reference') ||
+                       content.toLowerCase().includes('related verse');
+    
+    if (isKeyInsight) {
+      blocks.push(
+        <div 
+          key={`insight-${baseKey}`} 
+          className="mb-6 p-5 rounded-lg bg-yellow-500/10 border border-yellow-500/30 shadow-sm"
+        >
+          <div className="flex items-start gap-3">
+            <span className="text-2xl">💡</span>
+            <p className="leading-relaxed text-base font-medium">
+              {formatInlineText(content)}
+            </p>
+          </div>
+        </div>
+      );
+    } else if (isCrossRef) {
+      blocks.push(
+        <div 
+          key={`crossref-${baseKey}`} 
+          className="mb-6 p-5 rounded-lg bg-blue-500/10 border border-blue-500/30 shadow-sm"
+        >
+          <div className="flex items-start gap-3">
+            <span className="text-2xl">🔗</span>
+            <p className="leading-relaxed text-base">
+              {formatInlineText(content)}
+            </p>
+          </div>
+        </div>
+      );
     } else {
-      // Short content, keep as single paragraph
-      if (content) {
+      // Split long content into paragraphs for readability
+      const sentences = content.match(/[^.!?]+[.!?]+(\s|$)/g) || [content];
+      
+      if (sentences.length > 5) {
+        const chunks: string[] = [];
+        for (let i = 0; i < sentences.length; i += 3) {
+          const chunk = sentences.slice(i, i + 3).join(' ').trim();
+          if (chunk) chunks.push(chunk);
+        }
+        
+        chunks.forEach((chunk, idx) => {
+          blocks.push(
+            <p 
+              key={`para-${baseKey}-${idx}`} 
+              className="mb-5 leading-relaxed text-base pl-4 border-l-2 border-transparent hover:border-primary/20 transition-colors"
+            >
+              {formatInlineText(chunk)}
+            </p>
+          );
+        });
+      } else {
         blocks.push(
           <p 
             key={`para-${baseKey}`} 
@@ -202,7 +304,30 @@ const formatInlineText = (text: string): React.ReactNode => {
   let keyCounter = 0;
 
   while (remaining.length > 0) {
-    // Handle PT room codes (e.g., SR, DR, 1D, @Ab, ∞) - only match complete codes not followed by lowercase letters
+    // Handle PT room codes with specific variants (e.g., C6-Gospel, DR-Christ, TRm-Sanctuary)
+    const roomCodeVariantMatch = remaining.match(/^(SR|IR|24F|BR|TR|GR|OR|DC|ST|QR|QA|NF|PF|BF|HF|LR|CR|DR|C6|TRm|TZ|PRm|FRt|BL|PR|3A|JR|FRm|MR|SRm|∞|@Ad|@No|@Ab|@Mo|@Cy|@CyC|@Sp|@Re|1H|2H|3H|[1-5]D)[-:]?\s*(Gospel|Law|History|Poetry|Prophecy|Epistle|Literal|Christ|Me|Church|Heaven|Sanctuary|Great Controversy|Time Prophecy|Life of Christ|Love|Joy|Peace|Patience|Kindness|Goodness|Faithfulness|Gentleness|Self-Control|Earth-Past|Earth-Now|Earth-Future|Heaven-Past|Heaven-Now|Heaven-Future)?(?![a-z])/i);
+    if (roomCodeVariantMatch) {
+      const code = roomCodeVariantMatch[1];
+      const variant = roomCodeVariantMatch[2] || '';
+      const roomColor = getRoomColor(code);
+      
+      parts.push(
+        <span 
+          key={`room-${keyCounter++}`} 
+          className="inline-flex items-center gap-1 mx-1"
+        >
+          <span 
+            className={`px-2 py-1 rounded-md font-bold text-xs ${roomColor} border shadow-sm`}
+          >
+            {code}{variant ? `: ${variant}` : ''}
+          </span>
+        </span>
+      );
+      remaining = remaining.slice(roomCodeVariantMatch[0].length);
+      continue;
+    }
+
+    // Handle basic PT room codes (without variants)
     const roomCodeMatch = remaining.match(/^(SR|IR|24F|BR|TR|GR|OR|DC|ST|QR|QA|NF|PF|BF|HF|LR|CR|DR|C6|TRm|TZ|PRm|FRt|BL|PR|3A|JR|FRm|MR|SRm|∞|@Ad|@No|@Ab|@Mo|@Cy|@CyC|@Sp|@Re|1H|2H|3H|[1-5]D)(?![a-z])(\s*\([^)]+\))?/);
     if (roomCodeMatch) {
       const code = roomCodeMatch[1];
@@ -212,10 +337,10 @@ const formatInlineText = (text: string): React.ReactNode => {
       parts.push(
         <span 
           key={`room-${keyCounter++}`} 
-          className="inline-flex items-center gap-1 mx-0.5"
+          className="inline-flex items-center gap-1 mx-1"
         >
           <span 
-            className={`px-2 py-0.5 rounded-md font-bold text-xs ${roomColor} border shadow-sm`}
+            className={`px-2 py-1 rounded-md font-bold text-xs ${roomColor} border shadow-sm`}
           >
             {code}
           </span>
@@ -244,8 +369,8 @@ const formatInlineText = (text: string): React.ReactNode => {
     }
 
     // Handle italic text (*text* or _text_)
-    const italicMatch = remaining.match(/^(\*|_)(.*?)\1/);
-    if (italicMatch) {
+    const italicMatch = remaining.match(/^(\*|_)([^*_]+)\1/);
+    if (italicMatch && !remaining.startsWith('**')) {
       const italicText = italicMatch[2];
       parts.push(
         <em key={`italic-${keyCounter++}`} className="italic text-muted-foreground">
@@ -272,14 +397,14 @@ const formatInlineText = (text: string): React.ReactNode => {
       continue;
     }
 
-    // Handle verse references (e.g., John 3:16, Genesis 1:1-5)
+    // Handle verse references (e.g., John 3:16, Genesis 1:1-5, 1 Corinthians 13:4)
     const verseMatch = remaining.match(/^([1-3]?\s*[A-Z][a-z]+\s+\d+:\d+(-\d+)?)/);
     if (verseMatch) {
       const verseText = verseMatch[1];
       parts.push(
         <span 
           key={`verse-${keyCounter++}`} 
-          className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-primary/10 text-primary font-medium text-sm"
+          className="inline-flex items-center gap-1 px-2 py-1 rounded-full bg-primary/10 text-primary font-medium text-sm mx-1 shadow-sm"
         >
           <span>📖</span>
           <span>{verseText}</span>
@@ -301,7 +426,7 @@ const formatInlineText = (text: string): React.ReactNode => {
           rel="noopener noreferrer"
           className="underline text-primary hover:text-primary/80 break-words"
         >
-          {url}
+          🔗 {url.length > 40 ? url.slice(0, 40) + '...' : url}
         </a>
       );
       remaining = remaining.slice(urlMatch[0].length);
@@ -320,36 +445,36 @@ const formatInlineText = (text: string): React.ReactNode => {
  * Get color styling for PT room codes
  */
 const getRoomColor = (code: string): string => {
-  // Floor 1 - Furnishing (Width)
-  if (code.match(/^(SR|IR|24F?|BR|TR|GR)$/)) return 'bg-blue-100 text-blue-700 border-blue-300';
+  // Floor 1 - Furnishing (Width) - Blue theme
+  if (code.match(/^(SR|IR|24F?|BR|TR|GR)$/)) return 'bg-blue-100 text-blue-700 border-blue-300 dark:bg-blue-900/50 dark:text-blue-300 dark:border-blue-700';
   
-  // Floor 2 - Investigation (Width)
-  if (code.match(/^(OR|DC|ST|QR|QA)$/)) return 'bg-purple-100 text-purple-700 border-purple-300';
+  // Floor 2 - Investigation (Width) - Purple theme
+  if (code.match(/^(OR|DC|ST|QR|QA)$/)) return 'bg-purple-100 text-purple-700 border-purple-300 dark:bg-purple-900/50 dark:text-purple-300 dark:border-purple-700';
   
-  // Floor 3 - Freestyle (Time)
-  if (code.match(/^(NF|PF|BF|HF|LR)$/)) return 'bg-green-100 text-green-700 border-green-300';
+  // Floor 3 - Freestyle (Time) - Green theme
+  if (code.match(/^(NF|PF|BF|HF|LR)$/)) return 'bg-green-100 text-green-700 border-green-300 dark:bg-green-900/50 dark:text-green-300 dark:border-green-700';
   
-  // Floor 4 - Next Level (Depth)
-  if (code.match(/^(CR|DR|C6|TRm|TZ|PRm|P\|\||FRt)$/)) return 'bg-orange-100 text-orange-700 border-orange-300';
+  // Floor 4 - Next Level (Depth) - Orange theme
+  if (code.match(/^(CR|DR|C6|TRm|TZ|PRm|P\|\||FRt)$/)) return 'bg-orange-100 text-orange-700 border-orange-300 dark:bg-orange-900/50 dark:text-orange-300 dark:border-orange-700';
   
-  // Floor 5 - Vision (Depth)
-  if (code.match(/^(BL|PR|3A)$/)) return 'bg-red-100 text-red-700 border-red-300';
+  // Floor 5 - Vision (Depth) - Red theme
+  if (code.match(/^(BL|PR|3A)$/)) return 'bg-red-100 text-red-700 border-red-300 dark:bg-red-900/50 dark:text-red-300 dark:border-red-700';
   
-  // Floor 6 - Cycles & Heavens (Depth)
-  if (code.match(/^@(Ad|No|Ab|Mo|Cy|CyC|Sp|Re)$/)) return 'bg-indigo-100 text-indigo-700 border-indigo-300';
-  if (code.match(/^(1H|2H|3H|JR)$/)) return 'bg-indigo-100 text-indigo-700 border-indigo-300';
+  // Floor 6 - Cycles & Heavens (Depth) - Indigo theme
+  if (code.match(/^@(Ad|No|Ab|Mo|Cy|CyC|Sp|Re)$/)) return 'bg-indigo-100 text-indigo-700 border-indigo-300 dark:bg-indigo-900/50 dark:text-indigo-300 dark:border-indigo-700';
+  if (code.match(/^(1H|2H|3H|JR)$/)) return 'bg-indigo-100 text-indigo-700 border-indigo-300 dark:bg-indigo-900/50 dark:text-indigo-300 dark:border-indigo-700';
   
-  // Floor 7 - Spiritual/Emotional (Height)
-  if (code.match(/^(FRm|MR|SR)$/)) return 'bg-pink-100 text-pink-700 border-pink-300';
+  // Floor 7 - Spiritual/Emotional (Height) - Pink theme
+  if (code.match(/^(FRm|MR|SRm)$/)) return 'bg-pink-100 text-pink-700 border-pink-300 dark:bg-pink-900/50 dark:text-pink-300 dark:border-pink-700';
   
-  // Floor 8 - Master (Height)
-  if (code === '∞') return 'bg-yellow-100 text-yellow-700 border-yellow-300';
+  // Floor 8 - Master (Height) - Gold theme
+  if (code === '∞') return 'bg-yellow-100 text-yellow-700 border-yellow-300 dark:bg-yellow-900/50 dark:text-yellow-300 dark:border-yellow-700';
   
-  // Dimensions
-  if (code.match(/^\d+D$/)) return 'bg-cyan-100 text-cyan-700 border-cyan-300';
+  // Dimensions - Cyan theme
+  if (code.match(/^\d+D$/)) return 'bg-cyan-100 text-cyan-700 border-cyan-300 dark:bg-cyan-900/50 dark:text-cyan-300 dark:border-cyan-700';
   
   // Default
-  return 'bg-gray-100 text-gray-700 border-gray-300';
+  return 'bg-gray-100 text-gray-700 border-gray-300 dark:bg-gray-800 dark:text-gray-300 dark:border-gray-600';
 };
 
 /**
@@ -359,26 +484,36 @@ const getHeadingEmoji = (text: string): string => {
   const lower = text.toLowerCase();
   
   // PT-specific rooms and concepts
-  if (lower.includes('story room') || lower.includes('sr')) return '📚';
-  if (lower.includes('observation') || lower.includes('or')) return '🔍';
-  if (lower.includes('dimension') || lower.includes('dr')) return '🌐';
-  if (lower.includes('concentration') || lower.includes('cr')) return '🎯';
-  if (lower.includes('theme room') || lower.includes('trm')) return '🏛️';
-  if (lower.includes('pattern') || lower.includes('prm')) return '🔄';
+  if (lower.includes('story room') || lower.match(/\bsr\b/)) return '📚';
+  if (lower.includes('observation') || lower.match(/\bor\b/)) return '🔍';
+  if (lower.includes('dimension') || lower.match(/\bdr\b/)) return '🌐';
+  if (lower.includes('concentration') || lower.match(/\bcr\b/)) return '🎯';
+  if (lower.includes('theme room') || lower.match(/\btrm\b/)) return '🏛️';
+  if (lower.includes('pattern') || lower.match(/\bprm\b/)) return '🔄';
   if (lower.includes('parallel') || lower.includes('p||')) return '⚖️';
-  if (lower.includes('fruit room') || lower.includes('frt')) return '🍇';
-  if (lower.includes('imagination') || lower.includes('ir')) return '✨';
-  if (lower.includes('meditation') || lower.includes('mr')) return '🙏';
-  if (lower.includes('bible freestyle') || lower.includes('bf')) return '🔗';
+  if (lower.includes('fruit room') || lower.match(/\bfrt\b/)) return '🍇';
+  if (lower.includes('imagination') || lower.match(/\bir\b/)) return '✨';
+  if (lower.includes('meditation') || lower.match(/\bmr\b/)) return '🙏';
+  if (lower.includes('bible freestyle') || lower.match(/\bbf\b/)) return '🔗';
   if (lower.includes('infinity') || lower.includes('∞')) return '♾️';
   
   // Biblical themes
   if (lower.includes('christ') || lower.includes('jesus') || lower.includes('messiah')) return '✝️';
-  if (lower.includes('prophecy') || lower.includes('vision')) return '🔮';
+  if (lower.includes('prophecy') || lower.includes('prophetic')) return '🔮';
+  if (lower.includes('vision')) return '👁️';
   if (lower.includes('sanctuary') || lower.includes('temple')) return '⛪';
   if (lower.includes('gospel') || lower.includes('good news')) return '📣';
   if (lower.includes('summary') || lower.includes('conclusion')) return '📝';
   if (lower.includes('key') || lower.includes('important')) return '🔑';
+  if (lower.includes('overview') || lower.includes('introduction')) return '📋';
+  if (lower.includes('biblical') || lower.includes('foundation')) return '📜';
+  if (lower.includes('analysis') || lower.includes('interpretation')) return '🔬';
+  if (lower.includes('historical') || lower.includes('history')) return '🏺';
+  if (lower.includes('application') || lower.includes('practical')) return '🎯';
+  if (lower.includes('cross-reference') || lower.includes('related')) return '🔗';
+  if (lower.includes('horn') || lower.includes('daniel')) return '📯';
+  if (lower.includes('beast') || lower.includes('kingdom')) return '🦁';
+  if (lower.includes('roman') || lower.includes('empire')) return '🏛️';
   
   return '✨';
 };
@@ -406,12 +541,21 @@ const getBulletEmoji = (text: string): string => {
   if (lower.includes('truth')) return '💎';
   if (lower.includes('transparent') || lower.includes('reveal')) return '🪟';
   if (lower.includes('work') || lower.includes('deed')) return '🔨';
-  if (lower.includes('god')) return '🙏';
+  if (lower.includes('god') || lower.includes('lord')) return '👑';
   if (lower.includes('love') || lower.includes('grace')) return '❤️';
-  if (lower.includes('wisdom')) return '🧠';
-  if (lower.includes('prayer')) return '🙏';
-  if (lower.includes('scripture') || lower.includes('verse')) return '📖';
-  if (lower.includes('heaven')) return '☁️';
+  if (lower.includes('wisdom') || lower.includes('understand')) return '🧠';
+  if (lower.includes('prayer') || lower.includes('pray')) return '🙏';
+  if (lower.includes('scripture') || lower.includes('verse') || lower.includes('bible')) return '📖';
+  if (lower.includes('heaven') || lower.includes('eternal')) return '☁️';
+  if (lower.includes('prophecy') || lower.includes('prophetic')) return '🔮';
+  if (lower.includes('kingdom') || lower.includes('king')) return '👑';
+  if (lower.includes('horn') || lower.includes('beast')) return '📯';
+  if (lower.includes('fourth') || lower.includes('roman')) return '🏛️';
+  if (lower.includes('little horn') || lower.includes('papacy')) return '⚠️';
+  if (lower.includes('cross-reference') || lower.includes('related')) return '🔗';
+  if (lower.includes('note') || lower.includes('important')) return '📌';
+  if (lower.includes('warning') || lower.includes('caution')) return '⚠️';
+  if (lower.includes('promise') || lower.includes('blessing')) return '🌟';
   
   return '▪️';
 };
