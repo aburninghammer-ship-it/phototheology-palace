@@ -195,24 +195,51 @@ export const useDirectMessages = () => {
   const startConversation = useCallback(async (otherUserId: string) => {
     if (!user?.id) {
       console.log('No user ID, cannot start conversation');
+      toast({
+        title: 'Error',
+        description: 'You must be logged in to start a conversation',
+        variant: 'destructive'
+      });
       return null;
     }
+
+    if (!otherUserId) {
+      console.error('No other user ID provided for conversation');
+      toast({
+        title: 'Error',
+        description: 'Invalid user selected',
+        variant: 'destructive'
+      });
+      return null;
+    }
+
+    console.log('Starting conversation:', { currentUser: user.id, otherUser: otherUserId });
 
     try {
       const { data, error } = await supabase.rpc('get_or_create_conversation', {
         other_user_id: otherUserId
       });
 
-      if (error) throw error;
+      if (error) {
+        console.error('RPC error:', error.message, error.details, error.hint);
+        throw error;
+      }
 
+      if (!data) {
+        console.error('No conversation ID returned from RPC');
+        throw new Error('No conversation ID returned');
+      }
+
+      console.log('Conversation started successfully:', data);
       setActiveConversationId(data);
       await fetchConversations();
       return data;
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error starting conversation:', error);
+      const errorMessage = error?.message || 'Failed to start conversation';
       toast({
         title: 'Error',
-        description: 'Failed to start conversation',
+        description: errorMessage,
         variant: 'destructive'
       });
       return null;
