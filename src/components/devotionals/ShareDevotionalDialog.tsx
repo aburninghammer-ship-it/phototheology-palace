@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Dialog,
   DialogContent,
@@ -105,16 +105,16 @@ export const ShareDevotionalDialog = ({ plan, day, trigger, isPublicView }: Shar
     window.open(`sms:?body=${text}`);
   };
 
-  const handleTriggerClick = () => {
-    setOpen(true);
-  };
-
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       {trigger ? (
-        <div onClick={handleTriggerClick} className="cursor-pointer">
-          {trigger}
-        </div>
+        React.cloneElement(trigger as React.ReactElement, {
+          onClick: (e: React.MouseEvent) => {
+            e.preventDefault();
+            e.stopPropagation();
+            setOpen(true);
+          },
+        })
       ) : (
         <DialogTrigger asChild>
           <Button 
