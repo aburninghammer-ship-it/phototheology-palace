@@ -227,6 +227,7 @@ export function CreateProfileWizard({ onClose, onProfileCreated }: CreateProfile
           format: "room-driven",
           duration: formData.duration,
           studyStyle: tonesString, // Pass actual tones to AI
+          profileName: formData.name, // Pass the profile name for personalization
         });
       }
 
