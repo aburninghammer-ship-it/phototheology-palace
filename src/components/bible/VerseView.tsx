@@ -21,6 +21,7 @@ interface VerseViewProps {
   onSelect: () => void;
   showPrinciples?: boolean;
   isHighlighted?: boolean;
+  isAudioPlaying?: boolean;
   principles?: string[];
   book?: string;
   chapter?: number;
@@ -68,7 +69,7 @@ const generateVersePrinciples = (verseNumber: number): string[] => {
   return shuffled.slice(0, 4);
 };
 
-export const VerseView = ({ verse, isSelected, onSelect, showPrinciples, isHighlighted, principles, book, chapter }: VerseViewProps) => {
+export const VerseView = ({ verse, isSelected, onSelect, showPrinciples, isHighlighted, isAudioPlaying, principles, book, chapter }: VerseViewProps) => {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [selectedPrinciple, setSelectedPrinciple] = useState<string>("");
   const [explanation, setExplanation] = useState<string>("");
@@ -177,7 +178,9 @@ export const VerseView = ({ verse, isSelected, onSelect, showPrinciples, isHighl
     <>
       <div
         className={`group cursor-pointer transition-all duration-300 p-3 rounded-lg ${
-          isSelected
+          isAudioPlaying
+            ? "bg-emerald-500/20 border-2 border-emerald-500 shadow-lg ring-2 ring-emerald-500/30"
+            : isSelected
             ? "bg-primary/10 border-2 border-primary shadow-lg"
             : isHighlighted
             ? "bg-accent/20 border-2 border-accent shadow-md animate-pulse-glow"
