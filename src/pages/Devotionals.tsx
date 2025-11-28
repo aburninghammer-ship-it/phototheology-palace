@@ -186,6 +186,18 @@ export default function Devotionals() {
                   </CardContent>
                   <div className="px-6 pb-4 flex gap-2">
                     <ShareDevotionalDialog plan={plan} />
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="text-destructive hover:text-destructive hover:bg-destructive/10"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setDeleteId(plan.id);
+                      }}
+                    >
+                      <Trash2 className="h-4 w-4 mr-1" />
+                      Delete
+                    </Button>
                   </div>
                 </Card>
               ))}
