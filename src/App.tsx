@@ -87,6 +87,7 @@ const ApologeticsGPT = lazy(() => import("./pages/ApologeticsGPT"));
 const QuarterlyStudy = lazy(() => import("./pages/QuarterlyStudy"));
 const ReadingPlans = lazy(() => import("./pages/ReadingPlans"));
 const BibleReference = lazy(() => import("./pages/BibleReference"));
+const AscensionsExpansions = lazy(() => import("./pages/AscensionsExpansions"));
 const BibleEncyclopedia = lazy(() => import("./pages/BibleEncyclopedia"));
 const EncyclopediaArticle = lazy(() => import("./pages/EncyclopediaArticle"));
 const DailyReading = lazy(() => import("./pages/DailyReading"));
@@ -254,6 +255,7 @@ function App() {
             <Route path="/daily-verse" element={<ProtectedRoute><DailyVerse /></ProtectedRoute>} />
             <Route path="/reading-plans" element={<ProtectedRoute><ReadingPlans /></ProtectedRoute>} />
             <Route path="/bible-reference" element={<ProtectedRoute><BibleReference /></ProtectedRoute>} />
+            <Route path="/ascensions-expansions" element={<ProtectedRoute><AscensionsExpansions /></ProtectedRoute>} />
             <Route path="/encyclopedia" element={<ProtectedRoute><BibleEncyclopedia /></ProtectedRoute>} />
             <Route path="/encyclopedia/:slug" element={<ProtectedRoute><EncyclopediaArticle /></ProtectedRoute>} />
             <Route path="/video-training" element={<ProtectedRoute><VideoTraining /></ProtectedRoute>} />

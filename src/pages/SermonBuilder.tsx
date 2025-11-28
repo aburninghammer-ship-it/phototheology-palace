@@ -381,15 +381,19 @@ export default function SermonBuilder() {
                       </Tooltip>
                     </label>
                     <Select value={sermon.sermon_style} onValueChange={(v) => setSermon({ ...sermon, sermon_style: v })}>
-                      <SelectTrigger>
+                      <SelectTrigger className="h-auto py-3">
                         <SelectValue />
                       </SelectTrigger>
-                      <SelectContent>
+                      <SelectContent className="bg-background border-border">
                         {SERMON_STYLES.map((style) => (
-                          <SelectItem key={style.value} value={style.value}>
-                            <div className="flex flex-col">
-                              <span className="font-medium">{style.label}</span>
-                              <span className="text-xs text-muted-foreground">{style.description}</span>
+                          <SelectItem 
+                            key={style.value} 
+                            value={style.value}
+                            className="py-3 cursor-pointer data-[highlighted]:bg-accent data-[highlighted]:text-accent-foreground"
+                          >
+                            <div className="flex flex-col gap-1">
+                              <span className="font-semibold text-foreground">{style.label}</span>
+                              <span className="text-xs text-muted-foreground whitespace-normal max-w-[300px]">{style.description}</span>
                             </div>
                           </SelectItem>
                         ))}

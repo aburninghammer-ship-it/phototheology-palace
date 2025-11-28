@@ -264,14 +264,19 @@ const ProphecyWatch = () => {
                         Detected: {new Date(signal.created_at).toLocaleDateString()}
                       </p>
                       {signal.source_url && (
-                        <a 
-                          href={signal.source_url} 
-                          target="_blank" 
-                          rel="noopener noreferrer"
-                          className="inline-flex items-center gap-2 text-sm text-blue-600 hover:text-blue-800 hover:underline font-medium transition-colors"
-                        >
-                          📰 Read Source Article →
-                        </a>
+                        <div className="flex items-center gap-2">
+                          <a 
+                            href={signal.source_url} 
+                            target="_blank" 
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center gap-2 text-sm text-blue-600 hover:text-blue-800 hover:underline font-medium transition-colors"
+                          >
+                            📰 Read Source Article →
+                          </a>
+                          <span className="text-xs text-muted-foreground italic" title="AI-generated links may become outdated or unavailable">
+                            (link may expire)
+                          </span>
+                        </div>
                       )}
                     </div>
                   </CardContent>

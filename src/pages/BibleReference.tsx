@@ -425,7 +425,14 @@ const BibleReference = () => {
             </div>
 
             {/* Five Ascensions & Four Expansions */}
-            <div className="grid gap-6 md:grid-cols-2 mt-8">
+            <div className="flex items-center justify-between mb-4 mt-8">
+              <h3 className="text-xl font-bold">Framework: Ascensions & Expansions</h3>
+              <Button variant="outline" size="sm" onClick={() => navigate("/ascensions-expansions")} className="gap-2">
+                <Layers className="h-4 w-4" />
+                Learn More
+              </Button>
+            </div>
+            <div className="grid gap-6 md:grid-cols-2">
               {framework.map((item, idx) => (
                 <Card key={idx} className="hover:shadow-lg transition-shadow">
                   <CardHeader>
