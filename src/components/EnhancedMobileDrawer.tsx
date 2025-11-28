@@ -161,12 +161,16 @@ export const EnhancedMobileDrawer = () => {
       <DrawerContent className="h-[90vh]">
         <DrawerHeader className="border-b">
           <DrawerTitle className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
+            <Link 
+              to="/" 
+              className="flex items-center gap-2 hover:opacity-80 transition-opacity"
+              onClick={handleLinkClick}
+            >
               <Building2 className="h-5 w-5 text-primary" />
               <span className="bg-gradient-palace bg-clip-text text-transparent">
                 Phototheology
               </span>
-            </div>
+            </Link>
             <DrawerClose asChild>
               <Button variant="ghost" size="sm">Close</Button>
             </DrawerClose>
@@ -176,17 +180,28 @@ export const EnhancedMobileDrawer = () => {
         <ScrollArea className="flex-1 px-4">
           {user ? (
             <div className="py-4 space-y-6">
-              {/* Quick Actions */}
-              <div>
+              {/* Quick Actions - Home Button */}
+              <div className="space-y-2">
                 <Button 
                   asChild 
                   variant="default" 
-                  className="w-full justify-start"
+                  className="w-full justify-start gradient-palace"
                   onClick={handleLinkClick}
                 >
                   <Link to="/">
                     <Home className="h-4 w-4 mr-2" />
-                    Home
+                    Back to Home
+                  </Link>
+                </Button>
+                <Button 
+                  asChild 
+                  variant="outline" 
+                  className="w-full justify-start"
+                  onClick={handleLinkClick}
+                >
+                  <Link to="/palace">
+                    <Building2 className="h-4 w-4 mr-2" />
+                    Enter Palace
                   </Link>
                 </Button>
               </div>

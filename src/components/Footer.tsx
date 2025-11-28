@@ -24,6 +24,11 @@ export const Footer = () => {
             <h3 className="font-semibold mb-3 text-foreground">Quick Links</h3>
             <ul className="space-y-2 text-sm">
               <li>
+                <Link to="/" className="text-muted-foreground hover:text-primary transition-colors font-medium">
+                  Home
+                </Link>
+              </li>
+              <li>
                 <Link to="/app-tour" className="text-muted-foreground hover:text-primary transition-colors">
                   App Tour
                 </Link>

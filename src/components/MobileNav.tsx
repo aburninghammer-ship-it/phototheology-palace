@@ -7,7 +7,7 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
-import { Menu, Building2, BookOpen, Sparkles, User, CreditCard, LogOut, Gift, Clock } from "lucide-react";
+import { Menu, Building2, BookOpen, Sparkles, User, CreditCard, LogOut, Gift, Clock, Home } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { Separator } from "@/components/ui/separator";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -24,11 +24,13 @@ export const MobileNav = () => {
       </SheetTrigger>
       <SheetContent side="right" className="w-80">
         <SheetHeader>
-          <SheetTitle className="flex items-center gap-2">
-            <Building2 className="h-5 w-5 text-primary" />
-            <span className="bg-gradient-palace bg-clip-text text-transparent">
-              Phototheology
-            </span>
+          <SheetTitle>
+            <Link to="/" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
+              <Building2 className="h-5 w-5 text-primary" />
+              <span className="bg-gradient-palace bg-clip-text text-transparent">
+                Phototheology
+              </span>
+            </Link>
           </SheetTitle>
         </SheetHeader>
         
@@ -37,8 +39,9 @@ export const MobileNav = () => {
           {user ? (
             <>
               <Link to="/">
-                <Button variant="ghost" className="w-full justify-start" size="sm">
-                  Home
+                <Button variant="default" className="w-full justify-start gradient-palace" size="sm">
+                  <Home className="h-4 w-4 mr-2" />
+                  Back to Home
                 </Button>
               </Link>
               
