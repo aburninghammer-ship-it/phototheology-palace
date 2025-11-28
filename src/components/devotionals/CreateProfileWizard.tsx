@@ -115,6 +115,19 @@ const THEMES = [
   { value: "endtime", label: "End-Time Readiness", gradient: "from-indigo-500 to-purple-500" },
 ];
 
+const SPOUSAL_THEMES = [
+  { value: "communication", label: "Communication", gradient: "from-blue-500 to-cyan-500" },
+  { value: "conflict_resolution", label: "Conflict Resolution", gradient: "from-amber-500 to-orange-500" },
+  { value: "intimacy", label: "Intimacy & Connection", gradient: "from-rose-500 to-pink-500" },
+  { value: "trust", label: "Building Trust", gradient: "from-green-500 to-emerald-500" },
+  { value: "forgiveness_marriage", label: "Forgiveness in Marriage", gradient: "from-purple-500 to-violet-500" },
+  { value: "spiritual_unity", label: "Spiritual Unity", gradient: "from-indigo-500 to-purple-500" },
+  { value: "appreciation", label: "Love & Appreciation", gradient: "from-red-500 to-rose-500" },
+  { value: "finances", label: "Financial Harmony", gradient: "from-emerald-500 to-teal-500" },
+  { value: "parenting_together", label: "Parenting Together", gradient: "from-yellow-500 to-amber-500" },
+  { value: "rekindling", label: "Rekindling Romance", gradient: "from-pink-500 to-fuchsia-500" },
+];
+
 const DURATIONS = [
   { value: 7, label: "7 Days", description: "Quick encouragement" },
   { value: 14, label: "14 Days", description: "Two-week journey" },
@@ -560,7 +573,7 @@ export function CreateProfileWizard({ onClose, onProfileCreated }: CreateProfile
               <div>
                 <Label>Devotional Themes (select multiple)</Label>
                 <div className="grid grid-cols-2 gap-2 mt-3">
-                  {THEMES.map((theme) => (
+                  {(formData.category === "spousal" ? SPOUSAL_THEMES : THEMES).map((theme) => (
                     <Button
                       key={theme.value}
                       variant={formData.preferred_themes.includes(theme.value) ? "default" : "outline"}
