@@ -192,8 +192,6 @@ export function CreateProfileWizard({ onClose, onProfileCreated }: CreateProfile
 
   const handleCreate = async () => {
     const tonesString = formData.preferred_tones.join(", ");
-    // Use first tone for database constraint (study_style expects single value)
-    const primaryTone = formData.preferred_tones[0] || "comforting";
     
     const profile = await createProfile.mutateAsync({
       name: formData.name,
@@ -219,7 +217,7 @@ export function CreateProfileWizard({ onClose, onProfileCreated }: CreateProfile
         theme,
         format: "room-driven",
         duration: formData.duration,
-        studyStyle: primaryTone,
+        studyStyle: "study", // Valid DB value; actual tones passed to AI generator
       });
 
       if (plan) {
@@ -228,7 +226,7 @@ export function CreateProfileWizard({ onClose, onProfileCreated }: CreateProfile
           theme,
           format: "room-driven",
           duration: formData.duration,
-          studyStyle: tonesString,
+          studyStyle: tonesString, // Pass actual tones to AI
         });
       }
 
