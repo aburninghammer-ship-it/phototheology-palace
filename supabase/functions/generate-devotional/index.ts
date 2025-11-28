@@ -46,13 +46,156 @@ const SANCTUARY_STATIONS = [
   "Ark of the Covenant (Law/Mercy/Presence)",
 ];
 
+// CADE - Context-Aware Devotional Engine: Issue-specific guidance
+const CADE_ISSUE_GUIDANCE: Record<string, { sanctuary: Record<string, string>; historical: string[]; biblical: string[]; actionSteps: string[] }> = {
+  racism: {
+    sanctuary: {
+      altar: "Laying down the anger and pain at the foot of the cross - Jesus bore our griefs and carried our sorrows",
+      laver: "Cleansing of shame, internalized oppression, and lies about identity - you are washed in the water of the Word",
+      candlestick: "The Spirit's courage to stand with dignity - the same Spirit that raised Christ empowers you",
+      table: "Identity rooted in the Word of God - you are fearfully and wonderfully made (Psalm 139:14)",
+      incense: "Praying for oppressors and self - following Christ who prayed 'Father, forgive them'",
+      ark: "God's justice and eternal law - He will make all things right"
+    },
+    historical: [
+      "Frederick Douglass found in Scripture the moral power to fight for freedom, declaring that Christianity gave him the authority to call slavery sin.",
+      "Harriet Tubman prayed constantly on the Underground Railroad: 'Lord, I'm going to hold steady on to you and you've got to see me through.'",
+      "Sojourner Truth stood on the truth that all are made in God's image, declaring 'Ain't I a woman?'",
+      "The early Adventist church was one of the few integrated denominations in 19th century America, with a strong abolitionist heritage."
+    ],
+    biblical: [
+      "Joseph experienced discrimination in Egypt, Daniel in Babylon, Esther in Persia - Scripture consistently shows God standing with His children amid unjust systems.",
+      "Jesus Himself endured ethnic hostility as a Galilean: 'Can any good thing come out of Nazareth?' (John 1:46). He knows the feeling personally.",
+      "In Christ there is neither Jew nor Greek, slave nor free - all are one in Christ Jesus (Galatians 3:28)."
+    ],
+    actionSteps: [
+      "Affirm your identity in Christ daily - speak Psalm 139 over yourself",
+      "Practice 'Response, not reaction' - pause before responding to microaggressions",
+      "Find community with believers who understand your experience",
+      "Channel righteous anger into constructive action, following the prophets' example"
+    ]
+  },
+  grief: {
+    sanctuary: {
+      altar: "Surrendering the loss to Christ - placing the weight of grief on the One who bore all our sorrows",
+      laver: "Tears that cleanse the soul - Jesus wept, and so may we (John 11:35)",
+      candlestick: "Light in the valley of shadow - His presence illuminates even death's darkness (Psalm 23:4)",
+      table: "Bread of comfort from Scripture - feeding on promises of reunion and resurrection",
+      incense: "Prayers of lament rising to God - the Psalms give us language for grief",
+      ark: "Promise of resurrection and reunion - death has been swallowed up in victory (1 Cor 15:54)"
+    },
+    historical: [
+      "C.S. Lewis wrote 'A Grief Observed' after losing his wife Joy, finding that God meets us in the darkness and does not abandon us.",
+      "Ellen White lost multiple children and her husband James, yet wrote, 'We sorrow, but not as those without hope.'"
+    ],
+    biblical: [
+      "Jesus wept at Lazarus' tomb (John 11:35), showing that grief is not sinful - even when He knew resurrection was coming.",
+      "David's psalms of lament (Psalm 42, 43, 88) give voice to our deepest sorrow and teach us how to grieve with faith.",
+      "Rachel weeping for her children (Jeremiah 31:15) - God sees maternal grief and promises comfort."
+    ],
+    actionSteps: [
+      "Use grounding exercises: 5 things you can see, 4 you can hear, 3 you can touch...",
+      "Read the Psalms of lament aloud - give your grief a voice",
+      "Keep a grief journal - write letters to your loved one and to God",
+      "Don't rush the process - grief has no timeline"
+    ]
+  },
+  addiction: {
+    sanctuary: {
+      altar: "Daily surrender of the struggle - not a one-time event but a moment-by-moment choice",
+      laver: "Cleansing from guilt and shame - your identity is not the addiction",
+      candlestick: "The Spirit's power for sobriety - you cannot do this alone, but you are not alone",
+      table: "Nourishment replacing the counterfeit - true satisfaction found in Christ",
+      incense: "Intercessory support network - the prayers of the righteous avail much",
+      ark: "God's law as protection, not condemnation - boundaries that lead to freedom"
+    },
+    historical: [
+      "John Newton, former slave trader, found freedom from his past through daily dependence on grace - 'Amazing Grace, how sweet the sound.'",
+      "Many in Scripture struggled with compulsive behaviors, yet found victory through surrender to God."
+    ],
+    biblical: [
+      "Paul's confession in Romans 7: 'What I want to do I do not do, but what I hate I do' - you are not alone in this struggle.",
+      "The prodigal son returned and was received with open arms - no matter how far you've fallen, the Father welcomes you back."
+    ],
+    actionSteps: [
+      "HALT check: Am I Hungry, Angry, Lonely, or Tired? Address these triggers first.",
+      "Build accountability - tell at least one trusted person about your struggle today",
+      "Replace the ritual - find a healthy action to perform when triggered",
+      "Celebrate small victories - each moment of sobriety is a gift from God"
+    ]
+  },
+  fear: {
+    sanctuary: {
+      altar: "Laying down your fears at the cross - casting all your anxiety on Him",
+      laver: "Cleansing the mind of fearful thoughts - renewing through water of the Word",
+      candlestick: "Light dispels darkness - fear cannot survive in God's presence",
+      table: "Feeding on truth that counters lies - 'Perfect love casts out fear' (1 John 4:18)",
+      incense: "Prayer as spiritual warfare - the battle belongs to the Lord",
+      ark: "God's promises of protection - 'Fear not, for I am with you' (Isaiah 41:10)"
+    },
+    historical: [
+      "Martin Luther battled severe anxiety yet found peace in Scripture, famously throwing ink at what he perceived as the devil.",
+      "Charles Spurgeon, the great preacher, openly discussed his struggles with depression and anxiety."
+    ],
+    biblical: [
+      "'Fear not' appears 365 times in Scripture - one for every day of the year.",
+      "Elijah fled in fear from Jezebel (1 Kings 19), yet God met him in the cave and restored him.",
+      "Peter began to sink when he took his eyes off Jesus (Matthew 14:30) - the key is where we focus."
+    ],
+    actionSteps: [
+      "Breath prayer: Inhale 'Fear not,' exhale 'I am with you'",
+      "Scripture reframing: When a fearful thought comes, counter it with a specific Bible verse",
+      "Physical grounding: Feel your feet on the floor, remind yourself you are safe in this moment",
+      "Name the fear specifically - vague fears are harder to fight than named ones"
+    ]
+  }
+};
+
+// SDA Safety guardrails
+const CADE_SAFETY_PROMPT = `
+CRITICAL SDA DOCTRINAL SAFETY RULES - NEVER VIOLATE:
+
+NEVER:
+- Identify the scapegoat as Jesus/Christ
+- Identify Daniel 8's little horn as Antiochus Epiphanes  
+- Set dates for the Second Coming
+- Teach secret rapture theology
+- Reference conspiracy theories (QAnon, Illuminati, etc.)
+- Give anti-medical or anti-science healing advice
+- Express political bias or partisan views
+- Blame victims for abuse or trauma
+- Use guilt manipulation or spiritual shaming
+
+ALWAYS:
+- Keep Christ at the center of every teaching
+- Use KJV Scripture references
+- Apply Sanctuary truth when discussing salvation and healing
+- Honor the Sabbath as God's holy day
+- Point toward the Second Coming with hope, not fear
+- Embrace whole-person health (physical, mental, spiritual, social)
+- Frame struggles within the Great Controversy context
+- Handle trauma with compassion, never judgment
+- Recommend professional help alongside spiritual counsel when appropriate
+`;
+
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
-    const { planId, theme, format, duration, studyStyle, profileName } = await req.json();
+    const { 
+      planId, 
+      theme, 
+      format, 
+      duration, 
+      studyStyle, 
+      profileName,
+      // CADE fields
+      primaryIssue,
+      issueDescription,
+      issueSeverity
+    } = await req.json();
 
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     const SUPABASE_URL = Deno.env.get("SUPABASE_URL");
@@ -72,20 +215,56 @@ serve(async (req) => {
 
     const formatInstructions = getFormatInstructions(format, duration);
     
-    const personalizationNote = profileName 
-      ? `\n\nPERSONALIZATION: This devotional is for someone named "${profileName}". Address them by name throughout the devotional - in prayers, applications, challenges, and encouragement. Make it feel personal and caring, as if you are speaking directly to ${profileName}.`
-      : "";
+    // Build personalization note
+    let personalizationNote = "";
+    if (profileName) {
+      personalizationNote = `\n\nPERSONALIZATION: This devotional is for someone named "${profileName}". Address them by name throughout the devotional - in prayers, applications, challenges, and encouragement. Make it feel personal and caring, as if you are speaking directly to ${profileName}.`;
+    }
+
+    // Build CADE context-aware section
+    let cadeSection = "";
+    if (primaryIssue) {
+      const issueGuidance = CADE_ISSUE_GUIDANCE[primaryIssue] || null;
+      
+      cadeSection = `\n\n=== CADE: CONTEXT-AWARE DEVOTIONAL ENGINE ===
+PRIMARY ISSUE: ${primaryIssue}
+SEVERITY: ${issueSeverity || "moderate"}
+${issueDescription ? `SITUATION DETAILS: ${issueDescription}` : ""}
+
+CRITICAL: Every devotional day MUST address this specific struggle with:
+
+1. ACKNOWLEDGMENT OF REALITY
+   - Gently but truthfully name what they're going through
+   - Validate their experience without minimizing
+   - Show biblical understanding of this struggle
+
+2. DATA + HISTORY ANCHOR (include ONE per day)
+${issueGuidance?.historical?.map(h => `   - ${h}`).join("\n") || "   - Draw from church history and biblical examples of believers facing similar struggles"}
+
+3. SANCTUARY HEALING PATTERN (apply to the issue)
+${issueGuidance?.sanctuary ? Object.entries(issueGuidance.sanctuary).map(([station, meaning]) => `   - ${station.toUpperCase()}: ${meaning}`).join("\n") : "   - Apply each sanctuary station to their specific healing journey"}
+
+4. BIBLICAL PARALLELS
+${issueGuidance?.biblical?.map(b => `   - ${b}`).join("\n") || "   - Show Scripture characters who faced similar struggles"}
+
+5. PRACTICAL ACTION STEPS (specific to their struggle)
+${issueGuidance?.actionSteps?.map(a => `   - ${a}`).join("\n") || "   - Provide concrete, actionable steps for their specific situation"}
+
+6. CHRIST-CENTERED RESOLUTION
+   - How does Jesus specifically meet them in THIS struggle?
+   - What aspect of Christ's character/ministry addresses this issue?
+   - Point to His personal identification with their pain
+
+7. PERSONALIZED PRAYER
+   - Write a prayer that SPECIFICALLY addresses their situation
+   - Not generic - mention the struggle by name
+   - Include both lament and hope
+`;
+    }
 
     const systemPrompt = `You are Jeeves, the Phototheology AI assistant. You create EXTENSIVE, Christ-centered devotionals using the Palace method.
 
-CRITICAL RULES:
-1. Every devotional MUST end with a clear connection to Jesus Christ
-2. Use Seventh-day Adventist theological framework
-3. Never identify the scapegoat as Jesus/Christ
-4. Never identify Daniel 8's little horn as Antiochus Epiphanes
-5. Always use KJV Scripture references
-6. Each day must have vivid visual imagery for memory
-7. MAKE CONTENT EXTENSIVE - each field should be thorough and detailed${personalizationNote}
+${CADE_SAFETY_PROMPT}
 
 PALACE ROOMS AVAILABLE:
 ${PALACE_ROOMS.map(r => `${r.code}: ${r.name} (Floor ${r.floor})`).join("\n")}
@@ -93,17 +272,17 @@ ${PALACE_ROOMS.map(r => `${r.code}: ${r.name} (Floor ${r.floor})`).join("\n")}
 SANCTUARY STATIONS (for Blueprint format):
 ${SANCTUARY_STATIONS.join("\n")}
 
-${formatInstructions}
+${formatInstructions}${personalizationNote}${cadeSection}
 
 CONTENT LENGTH REQUIREMENTS:
 - scripture_text: Include the FULL passage (3-8 verses minimum), not just one verse
 - visual_imagery: 3-5 sentences painting a vivid mental picture with sensory details
 - memory_hook: A memorable phrase PLUS explanation of the mnemonic connection (2-3 sentences)
-- application: 4-6 sentences with SPECIFIC, practical steps for daily life, addressing different life situations
-- prayer: A heartfelt, 5-8 sentence prayer that incorporates the day's themes and scripture
+- application: 4-6 sentences with SPECIFIC, practical steps for daily life, addressing the person's situation directly
+- prayer: A heartfelt, 5-8 sentence prayer that incorporates the day's themes${primaryIssue ? " AND speaks directly to their struggle" : ""}
 - challenge: 2-3 specific actions with explanation of WHY and HOW to do them
 - journal_prompt: 3-4 deep reflection questions that encourage self-examination
-- christ_connection: 4-6 sentences showing EXACTLY how this passage reveals Christ's character, work, or plan of salvation
+- christ_connection: 4-6 sentences showing EXACTLY how this passage reveals Christ's character, work, or plan of salvation${primaryIssue ? " - connect to how Christ meets them in their specific struggle" : ""}
 
 OUTPUT FORMAT - Return a JSON array of ${duration} days with this exact structure for each day:
 {
@@ -113,26 +292,28 @@ OUTPUT FORMAT - Return a JSON array of ${duration} days with this exact structur
   "scripture_text": "The FULL passage text - include multiple verses for context",
   "room_assignment": "Room code from list above",
   "floor_number": number,
-  "visual_imagery": "An extensive, vivid mental picture with sensory details (sight, sound, smell, touch) to anchor this day's truth in memory",
-  "memory_hook": "A memorable phrase or image connection with explanation of the mnemonic technique",
+  "visual_imagery": "An extensive, vivid mental picture with sensory details",
+  "memory_hook": "A memorable phrase or image connection with explanation",
   "cross_references": ["verse1", "verse2", "verse3", "verse4"],
-  "application": "Detailed, practical steps for applying this truth TODAY - be specific about situations, relationships, and choices",
-  "prayer": "An extensive, heartfelt prayer incorporating the scripture and themes",
-  "challenge": "Specific actions to take with clear instructions on how to accomplish them",
-  "journal_prompt": "Multiple deep reflection questions for self-examination and spiritual growth",
+  "application": "Detailed, practical steps for applying this truth TODAY",
+  "prayer": "An extensive, heartfelt prayer incorporating scripture and themes",
+  "challenge": "Specific actions to take with clear instructions",
+  "journal_prompt": "Multiple deep reflection questions",
   "sanctuary_station": "Which sanctuary station this connects to (if applicable)",
-  "christ_connection": "An extensive explanation of how this passage points to Jesus Christ - His character, sacrifice, ministry, or return - REQUIRED and DETAILED"
+  "christ_connection": "Extensive explanation of how this passage points to Jesus Christ"
 }`;
 
     const forPersonNote = profileName ? `\nThis devotional is specifically for: ${profileName}. Address them by name throughout.` : "";
+    const issueNote = primaryIssue ? `\nPRIMARY STRUGGLE: ${primaryIssue}${issueDescription ? ` - ${issueDescription}` : ""}` : "";
 
     const userPrompt = `Create a ${duration}-day devotional on the theme: "${theme}"
 Format: ${format}
-Study Style: ${studyStyle}${forPersonNote}
+Study Style: ${studyStyle}${forPersonNote}${issueNote}
 
-Generate all ${duration} days as a JSON array. Each day should progressively build understanding while always pointing to Christ.`;
+Generate all ${duration} days as a JSON array. Each day should progressively build understanding while always pointing to Christ${primaryIssue ? " and addressing their specific struggle with compassion and biblical wisdom" : ""}.`;
 
     console.log("Calling AI to generate devotional...");
+    console.log("CADE enabled:", !!primaryIssue);
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
@@ -181,7 +362,6 @@ Generate all ${duration} days as a JSON array. Each day should progressively bui
       let jsonString = jsonMatch ? jsonMatch[1] : content;
       
       // Escape literal newlines/tabs within JSON string values
-      // Walk through and find content between quotes, escape control chars there
       let result = '';
       let inString = false;
       let escaped = false;
@@ -208,7 +388,6 @@ Generate all ${duration} days as a JSON array. Each day should progressively bui
         }
         
         if (inString) {
-          // Escape control characters inside strings
           if (char === '\n') {
             result += '\\n';
           } else if (char === '\r') {
@@ -236,7 +415,6 @@ Generate all ${duration} days as a JSON array. Each day should progressively bui
     }
 
     console.log("Inserting days into database...");
-    // Insert all days into the database
     const daysToInsert = days.map((day: any) => ({
       plan_id: planId,
       day_number: day.day_number,
@@ -272,7 +450,7 @@ Generate all ${duration} days as a JSON array. Each day should progressively bui
       .eq("id", planId);
 
     return new Response(
-      JSON.stringify({ success: true, daysGenerated: days.length }),
+      JSON.stringify({ success: true, daysGenerated: days.length, cadeEnabled: !!primaryIssue }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   } catch (error) {

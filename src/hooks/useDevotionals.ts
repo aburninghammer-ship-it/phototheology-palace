@@ -123,6 +123,10 @@ export function useDevotionals() {
       duration: number;
       studyStyle: string;
       profileName?: string;
+      // CADE context
+      primaryIssue?: string;
+      issueDescription?: string;
+      issueSeverity?: string;
     }) => {
       const { data, error } = await supabase.functions.invoke("generate-devotional", {
         body: params,
