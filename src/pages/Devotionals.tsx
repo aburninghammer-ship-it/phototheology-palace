@@ -1,13 +1,16 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Book, Plus, Sparkles, Clock, Calendar, ChevronRight, Trash2, Gift, Heart, Star, Zap } from "lucide-react";
+import { Book, Plus, Sparkles, Clock, Calendar, ChevronRight, Trash2, Gift, Heart, Star, Zap, Users, UserPlus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useDevotionals } from "@/hooks/useDevotionals";
+import { useDevotionalProfiles } from "@/hooks/useDevotionalProfiles";
 import { CreateDevotionalWizard } from "@/components/devotionals/CreateDevotionalWizard";
 import { DevotionalForFriendWizard } from "@/components/devotionals/DevotionalForFriendWizard";
 import { ShareDevotionalDialog } from "@/components/devotionals/ShareDevotionalDialog";
+import { CreateProfileWizard } from "@/components/devotionals/CreateProfileWizard";
+import { DevotionalProfileCard } from "@/components/devotionals/DevotionalProfileCard";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -31,13 +34,23 @@ const formatLabels: Record<string, { label: string; color: string; gradient: str
 export default function Devotionals() {
   const navigate = useNavigate();
   const { plans, plansLoading, deletePlan } = useDevotionals();
+  const { profiles, isLoading: profilesLoading, deleteProfile } = useDevotionalProfiles();
   const [showWizard, setShowWizard] = useState(false);
   const [showFriendWizard, setShowFriendWizard] = useState(false);
+  const [showProfileWizard, setShowProfileWizard] = useState(false);
   const [deleteId, setDeleteId] = useState<string | null>(null);
+  const [deleteProfileId, setDeleteProfileId] = useState<string | null>(null);
 
   const activePlans = plans?.filter((p) => p.status === "active") || [];
   const completedPlans = plans?.filter((p) => p.status === "completed") || [];
   const draftPlans = plans?.filter((p) => p.status === "draft" || p.status === "generating") || [];
+
+  const handleDeleteProfile = () => {
+    if (deleteProfileId) {
+      deleteProfile.mutate(deleteProfileId);
+      setDeleteProfileId(null);
+    }
+  };
 
   const handleDelete = () => {
     if (deleteId) {
@@ -52,6 +65,10 @@ export default function Devotionals() {
 
   if (showFriendWizard) {
     return <DevotionalForFriendWizard onClose={() => setShowFriendWizard(false)} />;
+  }
+
+  if (showProfileWizard) {
+    return <CreateProfileWizard onClose={() => setShowProfileWizard(false)} />;
   }
 
   return (
@@ -90,18 +107,18 @@ export default function Devotionals() {
               </CardContent>
             </Card>
 
-            {/* For a Friend - NEW */}
+            {/* Devotional Profiles - NEW */}
             <Card 
               className="bg-white/10 backdrop-blur-sm border-white/20 hover:bg-white/20 transition-all cursor-pointer group shadow-xl" 
-              onClick={() => setShowFriendWizard(true)}
+              onClick={() => setShowProfileWizard(true)}
             >
               <CardContent className="p-6 flex items-center gap-4">
                 <div className="p-4 rounded-full bg-gradient-to-br from-pink-400 to-rose-400 shadow-lg group-hover:scale-110 transition-transform">
-                  <Gift className="h-6 w-6 text-white" />
+                  <UserPlus className="h-6 w-6 text-white" />
                 </div>
                 <div>
-                  <h3 className="font-bold text-white text-lg">For a Friend</h3>
-                  <p className="text-sm text-white/70">Help someone who's struggling</p>
+                  <h3 className="font-bold text-white text-lg">Create Profile</h3>
+                  <p className="text-sm text-white/70">Minister to loved ones</p>
                 </div>
               </CardContent>
             </Card>
@@ -175,6 +192,60 @@ export default function Devotionals() {
             </div>
           </section>
         )}
+
+        {/* Devotional Profiles Section */}
+        <section>
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-2xl font-bold flex items-center gap-2">
+              <div className="p-2 rounded-lg bg-gradient-to-br from-rose-500 to-pink-500">
+                <Users className="h-5 w-5 text-white" />
+              </div>
+              <span className="bg-gradient-to-r from-rose-600 to-pink-600 bg-clip-text text-transparent">
+                Devotional Profiles
+              </span>
+            </h2>
+            <Button 
+              variant="outline" 
+              onClick={() => setShowProfileWizard(true)}
+              className="border-rose-300 text-rose-700 hover:bg-rose-50 dark:border-rose-700 dark:text-rose-300"
+            >
+              <UserPlus className="h-4 w-4 mr-2" />
+              New Profile
+            </Button>
+          </div>
+          
+          {profiles && profiles.length > 0 ? (
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {profiles.map((profile) => (
+                <DevotionalProfileCard
+                  key={profile.id}
+                  profile={profile}
+                  onSelect={() => navigate(`/devotionals/profile/${profile.id}`)}
+                  onDelete={() => setDeleteProfileId(profile.id)}
+                />
+              ))}
+            </div>
+          ) : (
+            <Card className="border-2 border-dashed border-rose-200 dark:border-rose-800 bg-gradient-to-br from-rose-50/50 to-pink-50/50 dark:from-rose-950/20 dark:to-pink-950/20">
+              <CardContent className="py-10 text-center">
+                <div className="mx-auto w-16 h-16 rounded-full bg-gradient-to-br from-rose-500 to-pink-500 flex items-center justify-center mb-4 shadow-lg">
+                  <Users className="h-8 w-8 text-white" />
+                </div>
+                <h3 className="text-lg font-semibold mb-2">No Profiles Yet</h3>
+                <p className="text-muted-foreground text-sm mb-4 max-w-md mx-auto">
+                  Create devotional profiles for your loved ones and minister to them with personalized, Christ-centered devotionals.
+                </p>
+                <Button 
+                  onClick={() => setShowProfileWizard(true)}
+                  className="bg-gradient-to-r from-rose-500 to-pink-500"
+                >
+                  <UserPlus className="h-4 w-4 mr-2" />
+                  Create First Profile
+                </Button>
+              </CardContent>
+            </Card>
+          )}
+        </section>
 
         {/* Draft/Generating */}
         {draftPlans.length > 0 && (
@@ -301,6 +372,24 @@ export default function Devotionals() {
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
             <AlertDialogAction onClick={handleDelete} className="bg-destructive text-destructive-foreground">
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Delete Profile Confirmation */}
+      <AlertDialog open={!!deleteProfileId} onOpenChange={() => setDeleteProfileId(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Profile?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This will permanently delete this profile and all associated history, notes, and insights.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDeleteProfile} className="bg-destructive text-destructive-foreground">
               Delete
             </AlertDialogAction>
           </AlertDialogFooter>
