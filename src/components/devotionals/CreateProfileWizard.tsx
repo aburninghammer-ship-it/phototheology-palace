@@ -192,6 +192,8 @@ export function CreateProfileWizard({ onClose, onProfileCreated }: CreateProfile
 
   const handleCreate = async () => {
     const tonesString = formData.preferred_tones.join(", ");
+    // Use first tone for database constraint (study_style expects single value)
+    const primaryTone = formData.preferred_tones[0] || "comforting";
     
     const profile = await createProfile.mutateAsync({
       name: formData.name,
@@ -213,11 +215,11 @@ export function CreateProfileWizard({ onClose, onProfileCreated }: CreateProfile
 
       const plan = await createPlan.mutateAsync({
         title: `${formData.name}'s Devotional Journey`,
-        description: `A personalized ${formData.duration}-day devotional for ${formData.name}`,
+        description: `A personalized ${formData.duration}-day devotional for ${formData.name}. Tones: ${tonesString}`,
         theme,
         format: "room-driven",
         duration: formData.duration,
-        studyStyle: tonesString,
+        studyStyle: primaryTone,
       });
 
       if (plan) {
