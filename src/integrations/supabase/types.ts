@@ -1238,6 +1238,223 @@ export type Database = {
         }
         Relationships: []
       }
+      devotional_days: {
+        Row: {
+          additional_content: Json | null
+          application: string | null
+          challenge: string | null
+          christ_connection: string
+          created_at: string | null
+          cross_references: string[] | null
+          day_number: number
+          floor_number: number | null
+          id: string
+          journal_prompt: string | null
+          memory_hook: string | null
+          plan_id: string
+          prayer: string | null
+          room_assignment: string | null
+          sanctuary_station: string | null
+          scripture_reference: string
+          scripture_text: string | null
+          title: string
+          visual_imagery: string | null
+        }
+        Insert: {
+          additional_content?: Json | null
+          application?: string | null
+          challenge?: string | null
+          christ_connection: string
+          created_at?: string | null
+          cross_references?: string[] | null
+          day_number: number
+          floor_number?: number | null
+          id?: string
+          journal_prompt?: string | null
+          memory_hook?: string | null
+          plan_id: string
+          prayer?: string | null
+          room_assignment?: string | null
+          sanctuary_station?: string | null
+          scripture_reference: string
+          scripture_text?: string | null
+          title: string
+          visual_imagery?: string | null
+        }
+        Update: {
+          additional_content?: Json | null
+          application?: string | null
+          challenge?: string | null
+          christ_connection?: string
+          created_at?: string | null
+          cross_references?: string[] | null
+          day_number?: number
+          floor_number?: number | null
+          id?: string
+          journal_prompt?: string | null
+          memory_hook?: string | null
+          plan_id?: string
+          prayer?: string | null
+          room_assignment?: string | null
+          sanctuary_station?: string | null
+          scripture_reference?: string
+          scripture_text?: string | null
+          title?: string
+          visual_imagery?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "devotional_days_plan_id_fkey"
+            columns: ["plan_id"]
+            isOneToOne: false
+            referencedRelation: "devotional_plans"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      devotional_enrollments: {
+        Row: {
+          current_day: number | null
+          enrolled_at: string | null
+          id: string
+          is_active: boolean | null
+          plan_id: string
+          user_id: string
+        }
+        Insert: {
+          current_day?: number | null
+          enrolled_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          plan_id: string
+          user_id: string
+        }
+        Update: {
+          current_day?: number | null
+          enrolled_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          plan_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "devotional_enrollments_plan_id_fkey"
+            columns: ["plan_id"]
+            isOneToOne: false
+            referencedRelation: "devotional_plans"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      devotional_plans: {
+        Row: {
+          completed_at: string | null
+          created_at: string | null
+          current_day: number | null
+          description: string | null
+          duration: number
+          format: string
+          id: string
+          is_public: boolean | null
+          share_token: string | null
+          started_at: string | null
+          status: string | null
+          study_style: string | null
+          theme: string
+          title: string
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          completed_at?: string | null
+          created_at?: string | null
+          current_day?: number | null
+          description?: string | null
+          duration: number
+          format: string
+          id?: string
+          is_public?: boolean | null
+          share_token?: string | null
+          started_at?: string | null
+          status?: string | null
+          study_style?: string | null
+          theme: string
+          title: string
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          completed_at?: string | null
+          created_at?: string | null
+          current_day?: number | null
+          description?: string | null
+          duration?: number
+          format?: string
+          id?: string
+          is_public?: boolean | null
+          share_token?: string | null
+          started_at?: string | null
+          status?: string | null
+          study_style?: string | null
+          theme?: string
+          title?: string
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      devotional_progress: {
+        Row: {
+          completed_at: string | null
+          day_id: string
+          id: string
+          journal_entry: string | null
+          plan_id: string
+          rating: number | null
+          reflection_notes: string | null
+          time_spent_minutes: number | null
+          user_id: string
+        }
+        Insert: {
+          completed_at?: string | null
+          day_id: string
+          id?: string
+          journal_entry?: string | null
+          plan_id: string
+          rating?: number | null
+          reflection_notes?: string | null
+          time_spent_minutes?: number | null
+          user_id: string
+        }
+        Update: {
+          completed_at?: string | null
+          day_id?: string
+          id?: string
+          journal_entry?: string | null
+          plan_id?: string
+          rating?: number | null
+          reflection_notes?: string | null
+          time_spent_minutes?: number | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "devotional_progress_day_id_fkey"
+            columns: ["day_id"]
+            isOneToOne: false
+            referencedRelation: "devotional_days"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "devotional_progress_plan_id_fkey"
+            columns: ["plan_id"]
+            isOneToOne: false
+            referencedRelation: "devotional_plans"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       dojo_challenges: {
         Row: {
           challenge_type: string
