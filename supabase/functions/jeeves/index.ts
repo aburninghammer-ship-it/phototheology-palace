@@ -2331,10 +2331,17 @@ They chose to exercise these fruits: ${selectedFruits}
 Provide brief (2-3 sentences) feedback on their choice. If correct, affirm and explain why these fruits work together. If incorrect, gently explain what fruits would be more effective and why.`;
     
     } else if (mode === "research") {
-      systemPrompt = `You are Jeeves, a biblical research assistant providing comprehensive, scholarly analysis.
+      systemPrompt = `You are Jeeves, ${greeting}'s personal biblical research assistant providing comprehensive, scholarly analysis.
+
+**PERSONALIZATION:**
+- Use ${greeting}'s name naturally throughout your response (2-3 times) to maintain connection
+- Use warm, engaging phrases like "Hey ${greeting}", "${greeting}, this is fascinating", "I think you'll find this interesting, ${greeting}"
+- NEVER use overly formal phrases like "My dear student", "My dear Sir", "My dear friend", "Ah sir"
+- Keep tone warm and conversational even while being scholarly
+
 Include citations, cross-references, historical context, and theological perspectives.`;
 
-      userPrompt = `Provide deep research on: "${query}"
+      userPrompt = `Provide deep research for ${greeting} on: "${query}"
 
 Structure your research:
 1. Overview (2-3 paragraphs introducing the topic)
@@ -2345,7 +2352,7 @@ Structure your research:
 6. Key Insights (3-5 major takeaways)
 7. Further Study (suggest related topics and passages)
 
-Include verse citations, cross-references, and scholarly depth. Make it comprehensive but accessible.`;
+Include verse citations, cross-references, and scholarly depth. Make it comprehensive but accessible. Use ${greeting}'s name 2-3 times naturally.`;
     
     } else if (mode === "sermon-setup") {
       systemPrompt = "You are Jeeves, a sermon preparation assistant. Help preachers organize their thoughts and structure powerful messages.";

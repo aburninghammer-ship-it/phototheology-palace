@@ -42,7 +42,7 @@ export const formatJeevesResponse = (text: string): React.ReactNode[] => {
             key={`heading-${sectionIdx}`} 
             className={`mb-6 mt-8 p-4 rounded-lg ${bgColor}`}
           >
-            <div className={`${level === 1 ? 'text-2xl' : level === 2 ? 'text-xl' : 'text-lg'} font-bold flex items-center gap-3`}>
+            <div className={`${level === 1 ? 'text-2xl' : level === 2 ? 'text-xl' : 'text-lg'} font-bold flex items-center gap-3 text-foreground`}>
               <span className="text-2xl">{emoji}</span>
               <span>{formatInlineText(headingText)}</span>
             </div>
@@ -113,9 +113,9 @@ const formatSection = (text: string, baseKey: number): React.ReactNode[] => {
       } else if (currentQuote.length > 0) {
         // End current quote block
         blocks.push(
-          <div key={`quote-${baseKey}-${idx}`} className="my-6 pl-5 border-l-4 border-amber-500/50 bg-amber-500/10 p-5 rounded-r-lg">
+          <div key={`quote-${baseKey}-${idx}`} className="my-6 pl-5 border-l-4 border-amber-400 bg-amber-500/15 p-5 rounded-r-lg">
             <span className="text-xl mr-2">📜</span>
-            <span className="italic font-medium">{formatInlineText(currentQuote.join(' '))}</span>
+            <span className="italic font-medium text-foreground">{formatInlineText(currentQuote.join(' '))}</span>
           </div>
         );
         currentQuote = [];
@@ -123,14 +123,14 @@ const formatSection = (text: string, baseKey: number): React.ReactNode[] => {
         // Process non-quote line
         if (line.trim()) {
           blocks.push(
-            <p key={`para-${baseKey}-${idx}`} className="mb-5 leading-relaxed text-base">
+            <p key={`para-${baseKey}-${idx}`} className="mb-5 leading-relaxed text-base text-foreground">
               {formatInlineText(line)}
             </p>
           );
         }
       } else if (line.trim()) {
         blocks.push(
-          <p key={`para-${baseKey}-${idx}`} className="mb-5 leading-relaxed text-base">
+          <p key={`para-${baseKey}-${idx}`} className="mb-5 leading-relaxed text-base text-foreground">
             {formatInlineText(line)}
           </p>
         );
@@ -140,9 +140,9 @@ const formatSection = (text: string, baseKey: number): React.ReactNode[] => {
     // Handle remaining quote
     if (currentQuote.length > 0) {
       blocks.push(
-        <div key={`quote-final-${baseKey}`} className="my-6 pl-5 border-l-4 border-amber-500/50 bg-amber-500/10 p-5 rounded-r-lg">
+        <div key={`quote-final-${baseKey}`} className="my-6 pl-5 border-l-4 border-amber-400 bg-amber-500/15 p-5 rounded-r-lg">
           <span className="text-xl mr-2">📜</span>
-          <span className="italic font-medium">{formatInlineText(currentQuote.join(' '))}</span>
+          <span className="italic font-medium text-foreground">{formatInlineText(currentQuote.join(' '))}</span>
         </div>
       );
     }
@@ -158,12 +158,12 @@ const formatSection = (text: string, baseKey: number): React.ReactNode[] => {
         listItems.push(
           <li 
             key={`bullet-${baseKey}-${idx}`} 
-            className="flex items-start gap-4 p-4 pl-6 rounded-lg hover:bg-accent/10 transition-all group mb-2 border-l-2 border-primary/20"
+            className="flex items-start gap-4 p-4 pl-6 rounded-lg hover:bg-accent/20 transition-all group mb-2 border-l-2 border-primary/30"
           >
             <span className="text-lg mt-0.5 flex-shrink-0 group-hover:scale-110 transition-transform">
               {emoji}
             </span>
-            <span className="flex-1 leading-relaxed text-base">
+            <span className="flex-1 leading-relaxed text-base text-foreground">
               {formatInlineText(content)}
             </span>
           </li>
@@ -171,7 +171,7 @@ const formatSection = (text: string, baseKey: number): React.ReactNode[] => {
       } else if (trimmedLine) {
         // Sub-content within list
         listItems.push(
-          <div key={`bullet-text-${baseKey}-${idx}`} className="ml-12 mb-3 pl-4 border-l-2 border-muted text-sm text-muted-foreground leading-relaxed">
+          <div key={`bullet-text-${baseKey}-${idx}`} className="ml-12 mb-3 pl-4 border-l-2 border-muted-foreground/30 text-sm text-foreground/80 leading-relaxed">
             {formatInlineText(trimmedLine)}
           </div>
         );
@@ -179,7 +179,7 @@ const formatSection = (text: string, baseKey: number): React.ReactNode[] => {
     });
 
     blocks.push(
-      <ul key={`list-${baseKey}`} className="mb-8 space-y-1 list-none pl-0 bg-muted/20 rounded-lg p-4">
+      <ul key={`list-${baseKey}`} className="mb-8 space-y-1 list-none pl-0 bg-muted/30 rounded-lg p-4">
         {listItems}
       </ul>
     );
@@ -195,12 +195,12 @@ const formatSection = (text: string, baseKey: number): React.ReactNode[] => {
         listItems.push(
           <li 
             key={`numbered-${baseKey}-${idx}`} 
-            className="flex items-start gap-4 p-4 pl-6 rounded-lg hover:bg-accent/10 transition-all mb-2 border-l-2 border-primary/30"
+            className="flex items-start gap-4 p-4 pl-6 rounded-lg hover:bg-accent/20 transition-all mb-2 border-l-2 border-primary/40"
           >
-            <span className="flex-shrink-0 w-8 h-8 rounded-full bg-primary/20 text-primary font-bold text-sm flex items-center justify-center mt-0.5 shadow-sm">
+            <span className="flex-shrink-0 w-8 h-8 rounded-full bg-primary/25 text-primary font-bold text-sm flex items-center justify-center mt-0.5 shadow-sm">
               {number}
             </span>
-            <span className="flex-1 leading-relaxed text-base">
+            <span className="flex-1 leading-relaxed text-base text-foreground">
               {formatInlineText(content)}
             </span>
           </li>
@@ -209,7 +209,7 @@ const formatSection = (text: string, baseKey: number): React.ReactNode[] => {
     });
 
     blocks.push(
-      <ol key={`numbered-list-${baseKey}`} className="mb-8 space-y-1 list-none pl-0 bg-muted/20 rounded-lg p-4">
+      <ol key={`numbered-list-${baseKey}`} className="mb-8 space-y-1 list-none pl-0 bg-muted/30 rounded-lg p-4">
         {listItems}
       </ol>
     );
@@ -234,11 +234,11 @@ const formatSection = (text: string, baseKey: number): React.ReactNode[] => {
       blocks.push(
         <div 
           key={`insight-${baseKey}`} 
-          className="mb-6 p-5 rounded-lg bg-yellow-500/10 border border-yellow-500/30 shadow-sm"
+          className="mb-6 p-5 rounded-lg bg-yellow-500/15 border border-yellow-400/40 shadow-sm"
         >
           <div className="flex items-start gap-3">
             <span className="text-2xl">💡</span>
-            <p className="leading-relaxed text-base font-medium">
+            <p className="leading-relaxed text-base font-medium text-foreground">
               {formatInlineText(content)}
             </p>
           </div>
@@ -248,11 +248,11 @@ const formatSection = (text: string, baseKey: number): React.ReactNode[] => {
       blocks.push(
         <div 
           key={`crossref-${baseKey}`} 
-          className="mb-6 p-5 rounded-lg bg-blue-500/10 border border-blue-500/30 shadow-sm"
+          className="mb-6 p-5 rounded-lg bg-blue-500/15 border border-blue-400/40 shadow-sm"
         >
           <div className="flex items-start gap-3">
             <span className="text-2xl">🔗</span>
-            <p className="leading-relaxed text-base">
+            <p className="leading-relaxed text-base text-foreground">
               {formatInlineText(content)}
             </p>
           </div>
@@ -273,7 +273,7 @@ const formatSection = (text: string, baseKey: number): React.ReactNode[] => {
           blocks.push(
             <p 
               key={`para-${baseKey}-${idx}`} 
-              className="mb-5 leading-relaxed text-base pl-4 border-l-2 border-transparent hover:border-primary/20 transition-colors"
+              className="mb-5 leading-relaxed text-base text-foreground pl-4 border-l-2 border-transparent hover:border-primary/30 transition-colors"
             >
               {formatInlineText(chunk)}
             </p>
@@ -283,7 +283,7 @@ const formatSection = (text: string, baseKey: number): React.ReactNode[] => {
         blocks.push(
           <p 
             key={`para-${baseKey}`} 
-            className="mb-5 leading-relaxed text-base pl-4 border-l-2 border-transparent hover:border-primary/20 transition-colors"
+            className="mb-5 leading-relaxed text-base text-foreground pl-4 border-l-2 border-transparent hover:border-primary/30 transition-colors"
           >
             {formatInlineText(content)}
           </p>
@@ -373,7 +373,7 @@ const formatInlineText = (text: string): React.ReactNode => {
     if (italicMatch && !remaining.startsWith('**')) {
       const italicText = italicMatch[2];
       parts.push(
-        <em key={`italic-${keyCounter++}`} className="italic text-muted-foreground">
+        <em key={`italic-${keyCounter++}`} className="italic text-foreground/90">
           {italicText}
         </em>
       );
@@ -388,7 +388,7 @@ const formatInlineText = (text: string): React.ReactNode => {
       parts.push(
         <code 
           key={`code-${keyCounter++}`} 
-          className="px-2 py-0.5 rounded bg-muted font-mono text-sm border border-border"
+          className="px-2 py-0.5 rounded bg-muted/50 font-mono text-sm border border-border text-foreground"
         >
           {codeText}
         </code>
