@@ -77,12 +77,11 @@ export function VoiceChatWidget({ roomType, roomId, roomName, className }: Voice
               <Moon className="h-4 w-4" />
             </Button>
 
-            {isInThisRoom && (
-              <VoiceChatInviteDialog 
-                roomId={fullRoomId} 
-                roomName={roomName || `${roomType} - ${roomId}`} 
-              />
-            )}
+            {/* Always show invite dialog - works before and after joining */}
+            <VoiceChatInviteDialog 
+              roomId={fullRoomId} 
+              roomName={roomName || `${roomType} - ${roomId}`} 
+            />
 
             {isInThisRoom && (
               <Button
