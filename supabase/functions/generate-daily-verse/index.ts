@@ -276,6 +276,21 @@ serve(async (req) => {
         throw new Error('Could not fetch verses from database');
       }
       
+      // Chapters to EXCLUDE - genealogies, lists, and low-context passages
+      const EXCLUDED_CHAPTERS: Record<string, number[]> = {
+        'Genesis': [5, 10, 11, 36, 46],           // Genealogies
+        '1 Chronicles': [1, 2, 3, 4, 5, 6, 7, 8, 9, 23, 24, 25, 26, 27], // Extensive genealogies and lists
+        'Ezra': [2, 8, 10],                        // Lists of returnees
+        'Nehemiah': [3, 7, 10, 11, 12],            // Lists of builders, returnees, signatories
+        'Numbers': [1, 2, 3, 4, 7, 26, 31, 33, 34], // Census lists, offerings lists, boundaries
+        'Joshua': [12, 13, 14, 15, 16, 17, 18, 19, 20, 21], // Land allotments
+        'Matthew': [1],                            // Genealogy (though Christ-focused, lacks standalone context)
+        'Luke': [3],                               // Genealogy section
+      };
+      
+      // Books to heavily limit (mostly procedural/ceremonial details)
+      const LOW_CONTEXT_BOOKS = ['Leviticus', '2 Chronicles'];
+      
       // Fetch recently used verse references to avoid repetition
       const thirtyDaysAgo = new Date();
       thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
@@ -286,10 +301,33 @@ serve(async (req) => {
       
       const recentVerseRefs = new Set(recentDailyVerses?.map(v => v.verse_reference) || []);
       
-      // Filter out recently used verses
+      // Filter out recently used verses AND low-context verses
       const availableVerses = verses.filter(v => {
         const ref = `${v.book} ${v.chapter}:${v.verse_num}`;
-        return !recentVerseRefs.has(ref);
+        
+        // Skip recently used
+        if (recentVerseRefs.has(ref)) return false;
+        
+        // Skip excluded chapters
+        const excludedChapters = EXCLUDED_CHAPTERS[v.book];
+        if (excludedChapters && excludedChapters.includes(v.chapter)) {
+          return false;
+        }
+        
+        // Limit low-context books to select meaningful chapters
+        if (LOW_CONTEXT_BOOKS.includes(v.book)) {
+          // Only allow a few theologically rich chapters from these books
+          const allowedChapters: Record<string, number[]> = {
+            'Leviticus': [16, 19, 23, 25, 26], // Day of Atonement, holiness code, feasts
+            '2 Chronicles': [5, 6, 7, 20, 34, 36], // Temple dedication, Jehoshaphat's prayer, Josiah
+          };
+          const allowed = allowedChapters[v.book];
+          if (allowed && !allowed.includes(v.chapter)) {
+            return false;
+          }
+        }
+        
+        return true;
       });
       
       // Use truly random selection from available verses
@@ -298,7 +336,7 @@ serve(async (req) => {
       const selectedVerse = versesToChooseFrom[randomIndex];
       
       verseReference = `${selectedVerse.book} ${selectedVerse.chapter}:${selectedVerse.verse_num}`;
-      console.log(`Randomly selected verse: ${verseReference} from ${versesToChooseFrom.length} available verses`);
+      console.log(`Randomly selected verse: ${verseReference} from ${versesToChooseFrom.length} available (filtered) verses`);
       
       // Fetch actual KJV text from Bible API
       try {
