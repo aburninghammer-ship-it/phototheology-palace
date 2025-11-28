@@ -27,6 +27,54 @@ export interface XpRewardResult {
   xp_required: number;
 }
 
+// Helper to record partnership mastery activity
+async function recordPartnershipActivity(userId: string, xpEarned: number) {
+  try {
+    // Get active partnership
+    const { data: partnership } = await supabase
+      .from('study_partnerships')
+      .select('id')
+      .or(`user1_id.eq.${userId},user2_id.eq.${userId}`)
+      .eq('status', 'active')
+      .maybeSingle();
+
+    if (!partnership) return;
+
+    const today = new Date().toISOString().split('T')[0];
+    
+    // Check if record exists
+    const { data: existing } = await supabase
+      .from('partnership_daily_activity')
+      .select('id, xp_earned')
+      .eq('partnership_id', partnership.id)
+      .eq('user_id', userId)
+      .eq('activity_date', today)
+      .maybeSingle();
+
+    if (existing) {
+      await supabase
+        .from('partnership_daily_activity')
+        .update({
+          completed_mastery: true,
+          xp_earned: (existing.xp_earned || 0) + xpEarned,
+        })
+        .eq('id', existing.id);
+    } else {
+      await supabase
+        .from('partnership_daily_activity')
+        .insert({
+          partnership_id: partnership.id,
+          user_id: userId,
+          activity_date: today,
+          completed_mastery: true,
+          xp_earned: xpEarned,
+        });
+    }
+  } catch (error) {
+    console.error('Failed to record partnership activity:', error);
+  }
+}
+
 export const useMastery = (roomId: string, floorNumber: number) => {
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -86,10 +134,17 @@ export const useMastery = (roomId: string, floorNumber: number) => {
       if (error) throw error;
       return data as unknown as XpRewardResult;
     },
-    onSuccess: (result) => {
+    onSuccess: async (result) => {
       // Invalidate queries
       queryClient.invalidateQueries({ queryKey: ["room-mastery", roomId] });
       queryClient.invalidateQueries({ queryKey: ["global-master-title"] });
+      queryClient.invalidateQueries({ queryKey: ["partnership-activity"] });
+
+      // Record partnership activity
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        await recordPartnershipActivity(user.id, result.xp_awarded);
+      }
 
       // Show toast notification
       if (result.leveled_up) {

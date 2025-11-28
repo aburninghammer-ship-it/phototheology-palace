@@ -3243,6 +3243,91 @@ export type Database = {
         }
         Relationships: []
       }
+      partnership_daily_activity: {
+        Row: {
+          activity_date: string
+          bonus_applied: boolean | null
+          completed_challenge: boolean | null
+          completed_mastery: boolean | null
+          completed_reading: boolean | null
+          created_at: string
+          id: string
+          partnership_id: string
+          user_id: string
+          xp_earned: number | null
+        }
+        Insert: {
+          activity_date?: string
+          bonus_applied?: boolean | null
+          completed_challenge?: boolean | null
+          completed_mastery?: boolean | null
+          completed_reading?: boolean | null
+          created_at?: string
+          id?: string
+          partnership_id: string
+          user_id: string
+          xp_earned?: number | null
+        }
+        Update: {
+          activity_date?: string
+          bonus_applied?: boolean | null
+          completed_challenge?: boolean | null
+          completed_mastery?: boolean | null
+          completed_reading?: boolean | null
+          created_at?: string
+          id?: string
+          partnership_id?: string
+          user_id?: string
+          xp_earned?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "partnership_daily_activity_partnership_id_fkey"
+            columns: ["partnership_id"]
+            isOneToOne: false
+            referencedRelation: "study_partnerships"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      partnership_nudges: {
+        Row: {
+          created_at: string
+          id: string
+          message: string | null
+          nudge_type: string
+          partnership_id: string
+          recipient_id: string
+          sender_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          message?: string | null
+          nudge_type?: string
+          partnership_id: string
+          recipient_id: string
+          sender_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          message?: string | null
+          nudge_type?: string
+          partnership_id?: string
+          recipient_id?: string
+          sender_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "partnership_nudges_partnership_id_fkey"
+            columns: ["partnership_id"]
+            isOneToOne: false
+            referencedRelation: "study_partnerships"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       personalized_drills: {
         Row: {
           addresses_weakness: boolean | null
@@ -5239,6 +5324,57 @@ export type Database = {
           partner_id?: string
           status?: string
           user_id?: string
+        }
+        Relationships: []
+      }
+      study_partnerships: {
+        Row: {
+          accepted_at: string | null
+          bonus_xp_earned: number
+          created_at: string
+          ended_at: string | null
+          id: string
+          invitation_message: string | null
+          last_both_completed_date: string | null
+          longest_streak: number
+          partnership_streak: number
+          status: string
+          total_sessions_together: number
+          updated_at: string
+          user1_id: string
+          user2_id: string | null
+        }
+        Insert: {
+          accepted_at?: string | null
+          bonus_xp_earned?: number
+          created_at?: string
+          ended_at?: string | null
+          id?: string
+          invitation_message?: string | null
+          last_both_completed_date?: string | null
+          longest_streak?: number
+          partnership_streak?: number
+          status?: string
+          total_sessions_together?: number
+          updated_at?: string
+          user1_id: string
+          user2_id?: string | null
+        }
+        Update: {
+          accepted_at?: string | null
+          bonus_xp_earned?: number
+          created_at?: string
+          ended_at?: string | null
+          id?: string
+          invitation_message?: string | null
+          last_both_completed_date?: string | null
+          longest_streak?: number
+          partnership_streak?: number
+          status?: string
+          total_sessions_together?: number
+          updated_at?: string
+          user1_id?: string
+          user2_id?: string | null
         }
         Relationships: []
       }

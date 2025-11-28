@@ -112,3 +112,6 @@ verify_jwt = false
 
 [functions.grade-floor-assessment]
 verify_jwt = true
+
+[functions.send-partner-nudges]
+verify_jwt = false

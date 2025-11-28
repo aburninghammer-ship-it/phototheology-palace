@@ -8,10 +8,12 @@ import { MasteryMap } from "@/components/mastery/MasteryMap";
 import { ReportCardDisplay } from "@/components/mastery/ReportCardDisplay";
 import { RoomMasteryGrid } from "@/components/mastery/RoomMasteryGrid";
 import { MasteryPassport } from "@/components/mastery/MasteryPassport";
+import { PartnerDashboard } from "@/components/partnership/PartnerDashboard";
 import { useMastery, useAllRoomMasteries, useGlobalMasterTitle } from "@/hooks/useMastery";
 import { useMasteryStreak } from "@/hooks/useMasteryStreak";
+import { usePartnership } from "@/hooks/usePartnership";
 import { Link } from "react-router-dom";
-import { Sword, Award, Grid3X3 } from "lucide-react";
+import { Sword, Award, Grid3X3, Users } from "lucide-react";
 import { Flame, Trophy, Crown, Target, TrendingUp, Zap, Map as MapIcon, FileText, ChevronDown } from "lucide-react";
 import { getGlobalTitle, getNextGlobalTitleMilestone } from "@/utils/masteryCalculations";
 import { cn } from "@/lib/utils";
@@ -22,6 +24,7 @@ export default function MasteryDashboard() {
   const { data: allMasteries, isLoading: masteriesLoading } = useAllRoomMasteries();
   const { data: globalTitle } = useGlobalMasterTitle();
   const { streak, isLoading: streakLoading } = useMasteryStreak();
+  const { partnership, bothCompletedToday } = usePartnership();
   const [openTitles, setOpenTitles] = useState<Record<number, boolean>>({});
   
   const roomsMastered = allMasteries?.filter(m => m.mastery_level === 5).length || 0;
@@ -142,8 +145,15 @@ export default function MasteryDashboard() {
 
         {/* Tabbed Content */}
         <Tabs defaultValue="overview" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-5">
+          <TabsList className="grid w-full grid-cols-6">
             <TabsTrigger value="overview">Overview</TabsTrigger>
+            <TabsTrigger value="partner" className="relative">
+              <Users className="h-4 w-4 mr-2" />
+              Partner
+              {partnership?.status === 'active' && bothCompletedToday && (
+                <span className="absolute -top-1 -right-1 h-2 w-2 bg-green-500 rounded-full animate-pulse" />
+              )}
+            </TabsTrigger>
             <TabsTrigger value="rooms">
               <Grid3X3 className="h-4 w-4 mr-2" />
               Rooms
@@ -439,6 +449,10 @@ export default function MasteryDashboard() {
                 )}
               </CardContent>
             </Card>
+          </TabsContent>
+
+          <TabsContent value="partner" className="space-y-6">
+            <PartnerDashboard />
           </TabsContent>
 
           <TabsContent value="rooms" className="space-y-6">
