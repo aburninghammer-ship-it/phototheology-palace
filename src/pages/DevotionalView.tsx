@@ -1,13 +1,13 @@
 import { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { ArrowLeft, Check, ChevronLeft, ChevronRight, BookOpen, Sparkles, Heart, MessageSquare, Star, Loader2, Share2 } from "lucide-react";
+import { ArrowLeft, Check, ChevronLeft, ChevronRight, BookOpen, Sparkles, Heart, MessageSquare, Star, Loader2, Share2, Wand2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { useDevotionalPlan } from "@/hooks/useDevotionals";
+import { useDevotionalPlan, useDevotionals } from "@/hooks/useDevotionals";
 import { ShareDevotionalDialog } from "@/components/devotionals/ShareDevotionalDialog";
 import { cn } from "@/lib/utils";
 
@@ -23,10 +23,22 @@ export default function DevotionalView() {
   const { planId } = useParams<{ planId: string }>();
   const navigate = useNavigate();
   const { plan, days, completedDayIds, completeDay, planLoading, isCompleting } = useDevotionalPlan(planId || "");
+  const { generateDevotional, isGenerating } = useDevotionals();
 
   const [selectedDayIndex, setSelectedDayIndex] = useState(0);
   const [journalEntry, setJournalEntry] = useState("");
   const [rating, setRating] = useState(0);
+
+  const handleGenerate = () => {
+    if (!plan) return;
+    generateDevotional.mutate({
+      planId: plan.id,
+      theme: plan.theme,
+      format: plan.format,
+      duration: plan.duration,
+      studyStyle: plan.study_style || "balanced",
+    });
+  };
 
   if (planLoading || !plan) {
     return (
@@ -34,6 +46,88 @@ export default function DevotionalView() {
         <div className="text-center">
           <Loader2 className="h-12 w-12 animate-spin text-purple-500 mx-auto mb-4" />
           <p className="text-muted-foreground">Loading your devotional...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Show generate UI for draft/generating plans
+  if (plan.status === "draft" || plan.status === "generating" || !days || days.length === 0) {
+    const gradient = formatGradients[plan.format] || formatGradients.standard;
+    return (
+      <div className="min-h-screen bg-background">
+        <div className={`relative bg-gradient-to-r ${gradient} py-6 px-4`}>
+          <div className="absolute inset-0 bg-black/10" />
+          <div className="relative max-w-4xl mx-auto">
+            <div className="flex items-center gap-3">
+              <Button variant="ghost" size="icon" onClick={() => navigate("/devotionals")} className="text-white hover:bg-white/20">
+                <ArrowLeft className="h-5 w-5" />
+              </Button>
+              <div>
+                <h1 className="font-bold text-white text-lg">{plan.title}</h1>
+                <p className="text-white/80 text-sm">{plan.theme}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="max-w-2xl mx-auto px-4 py-12">
+          <Card className="border-2 border-dashed border-amber-300 dark:border-amber-700 bg-gradient-to-br from-amber-50 to-orange-50 dark:from-amber-950/20 dark:to-orange-950/20">
+            <CardContent className="py-12 text-center">
+              {isGenerating || plan.status === "generating" ? (
+                <>
+                  <div className="mx-auto w-20 h-20 rounded-full bg-gradient-to-br from-amber-400 to-orange-400 flex items-center justify-center mb-6 shadow-xl animate-pulse">
+                    <Sparkles className="h-10 w-10 text-white animate-spin" />
+                  </div>
+                  <h3 className="text-2xl font-bold mb-2 bg-gradient-to-r from-amber-600 to-orange-600 bg-clip-text text-transparent">
+                    Generating Your Devotional...
+                  </h3>
+                  <p className="text-muted-foreground mb-4 max-w-md mx-auto">
+                    Jeeves is crafting {plan.duration} days of Christ-centered content. This may take a minute.
+                  </p>
+                  <div className="flex justify-center gap-2">
+                    {[0, 1, 2].map((i) => (
+                      <div
+                        key={i}
+                        className="w-3 h-3 rounded-full bg-amber-500 animate-bounce"
+                        style={{ animationDelay: `${i * 0.2}s` }}
+                      />
+                    ))}
+                  </div>
+                </>
+              ) : (
+                <>
+                  <div className="mx-auto w-20 h-20 rounded-full bg-gradient-to-br from-amber-400 to-orange-400 flex items-center justify-center mb-6 shadow-xl">
+                    <Wand2 className="h-10 w-10 text-white" />
+                  </div>
+                  <h3 className="text-2xl font-bold mb-2 bg-gradient-to-r from-amber-600 to-orange-600 bg-clip-text text-transparent">
+                    Ready to Generate
+                  </h3>
+                  <p className="text-muted-foreground mb-6 max-w-md mx-auto">
+                    Your devotional plan is set up. Click below to have Jeeves generate {plan.duration} days of personalized, Christ-centered content.
+                  </p>
+                  <div className="space-y-4">
+                    <div className="flex flex-wrap justify-center gap-2 text-sm">
+                      <Badge variant="outline" className="border-amber-400 text-amber-700 dark:text-amber-300">
+                        {plan.duration} Days
+                      </Badge>
+                      <Badge variant="outline" className="border-amber-400 text-amber-700 dark:text-amber-300">
+                        {plan.format} Format
+                      </Badge>
+                    </div>
+                    <Button
+                      onClick={handleGenerate}
+                      size="lg"
+                      className="bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600"
+                    >
+                      <Sparkles className="h-5 w-5 mr-2" />
+                      Generate Devotional
+                    </Button>
+                  </div>
+                </>
+              )}
+            </CardContent>
+          </Card>
         </div>
       </div>
     );
