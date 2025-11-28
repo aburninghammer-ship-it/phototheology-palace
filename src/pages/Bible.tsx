@@ -8,6 +8,7 @@ import { Link } from "react-router-dom";
 import { StudyBibleDemoDialog } from "@/components/bible/StudyBibleDemoDialog";
 import { VoiceChatWidget } from "@/components/voice/VoiceChatWidget";
 import { useAuth } from "@/hooks/useAuth";
+import { OfflineIndicator } from "@/components/bible/OfflineIndicator";
 
 const Bible = () => {
   const { user } = useAuth();
@@ -68,6 +69,8 @@ const Bible = () => {
           <BibleReader />
         </div>
       </div>
+      
+      <OfflineIndicator />
     </div>
   );
 };

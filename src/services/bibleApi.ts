@@ -1,6 +1,7 @@
 import { Chapter, Verse } from "@/types/bible";
 import { supabase } from "@/integrations/supabase/client";
 import { BIBLE_BOOKS } from "@/types/bible";
+import { cacheChapter, getCachedChapter, preCacheSurrounding, isOnline } from "./offlineCache";
 
 // Using Bible API - you can switch to different APIs or local data
 const BIBLE_API_BASE = "https://bible-api.com";
@@ -63,6 +64,32 @@ export const fetchChapter = async (book: string, chapter: number, translation: T
     return Promise.resolve(JOHN_3_FALLBACK);
   }
   
+  // Check offline cache first
+  const cached = getCachedChapter(book, chapter, translation);
+  if (cached) {
+    // Pre-cache surrounding chapters in background
+    preCacheSurrounding(book, chapter, translation, fetchChapterFromAPI);
+    return cached;
+  }
+  
+  // If offline and no cache, return placeholder
+  if (!isOnline()) {
+    return {
+      book,
+      chapter,
+      verses: [{
+        book,
+        chapter,
+        verse: 1,
+        text: "You are currently offline and this chapter is not cached. Please connect to the internet to load this chapter."
+      }]
+    };
+  }
+  
+  return fetchChapterFromAPI(book, chapter, translation);
+};
+
+const fetchChapterFromAPI = async (book: string, chapter: number, translation: Translation = "kjv"): Promise<Chapter> => {
   try {
     const response = await fetch(
       `${BIBLE_API_BASE}/${book}${chapter}?translation=${translation}`,
@@ -82,11 +109,19 @@ export const fetchChapter = async (book: string, chapter: number, translation: T
       text: v.text
     }));
     
-    return {
+    const chapterData: Chapter = {
       book: data.reference.split(" ")[0],
       chapter,
       verses
     };
+    
+    // Cache the fetched chapter
+    cacheChapter(book, chapter, translation, chapterData);
+    
+    // Pre-cache surrounding chapters in background
+    preCacheSurrounding(book, chapter, translation, fetchChapterFromAPI);
+    
+    return chapterData;
   } catch (error) {
     console.error("Error fetching chapter:", error);
     

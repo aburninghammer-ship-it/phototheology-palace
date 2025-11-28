@@ -1166,6 +1166,39 @@ export type Database = {
           },
         ]
       }
+      daily_reading_log: {
+        Row: {
+          book: string
+          chapter: number
+          created_at: string
+          id: string
+          read_date: string
+          time_spent_seconds: number | null
+          user_id: string
+          verses_read: number
+        }
+        Insert: {
+          book: string
+          chapter: number
+          created_at?: string
+          id?: string
+          read_date?: string
+          time_spent_seconds?: number | null
+          user_id: string
+          verses_read?: number
+        }
+        Update: {
+          book?: string
+          chapter?: number
+          created_at?: string
+          id?: string
+          read_date?: string
+          time_spent_seconds?: number | null
+          user_id?: string
+          verses_read?: number
+        }
+        Relationships: []
+      }
       daily_verses: {
         Row: {
           breakdown: Json
@@ -5164,6 +5197,42 @@ export type Database = {
         }
         Relationships: []
       }
+      reading_streaks: {
+        Row: {
+          created_at: string
+          current_streak: number
+          id: string
+          last_read_date: string | null
+          longest_streak: number
+          total_chapters_read: number
+          total_verses_read: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          current_streak?: number
+          id?: string
+          last_read_date?: string | null
+          longest_streak?: number
+          total_chapters_read?: number
+          total_verses_read?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          current_streak?: number
+          id?: string
+          last_read_date?: string | null
+          longest_streak?: number
+          total_chapters_read?: number
+          total_verses_read?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       referrals: {
         Row: {
           converted_at: string | null
@@ -6896,6 +6965,72 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      verse_highlights: {
+        Row: {
+          book: string
+          chapter: number
+          color: string
+          created_at: string
+          id: string
+          updated_at: string
+          user_id: string
+          verse: number
+        }
+        Insert: {
+          book: string
+          chapter: number
+          color?: string
+          created_at?: string
+          id?: string
+          updated_at?: string
+          user_id: string
+          verse: number
+        }
+        Update: {
+          book?: string
+          chapter?: number
+          color?: string
+          created_at?: string
+          id?: string
+          updated_at?: string
+          user_id?: string
+          verse?: number
+        }
+        Relationships: []
+      }
+      verse_notes: {
+        Row: {
+          book: string
+          chapter: number
+          content: string
+          created_at: string
+          id: string
+          updated_at: string
+          user_id: string
+          verse: number
+        }
+        Insert: {
+          book: string
+          chapter: number
+          content: string
+          created_at?: string
+          id?: string
+          updated_at?: string
+          user_id: string
+          verse: number
+        }
+        Update: {
+          book?: string
+          chapter?: number
+          content?: string
+          created_at?: string
+          id?: string
+          updated_at?: string
+          user_id?: string
+          verse?: number
+        }
+        Relationships: []
       }
       verse_palace_mappings: {
         Row: {

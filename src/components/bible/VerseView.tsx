@@ -14,6 +14,17 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { formatJeevesResponse } from "@/lib/formatJeevesResponse";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { VerseHighlightMenu } from "./VerseHighlightMenu";
+import { VerseNoteEditor } from "./VerseNoteEditor";
+import { VerseNote } from "@/hooks/useVerseNotes";
+import { cn } from "@/lib/utils";
+
+interface HighlightColor {
+  name: string;
+  value: string;
+  bg: string;
+  border: string;
+}
 
 interface VerseViewProps {
   verse: Verse;
@@ -25,6 +36,14 @@ interface VerseViewProps {
   principles?: string[];
   book?: string;
   chapter?: number;
+  highlightColor?: HighlightColor | null;
+  highlightColors?: HighlightColor[];
+  onHighlight?: (verse: number, color: string) => void;
+  onRemoveHighlight?: (verse: number) => void;
+  notes?: VerseNote[];
+  onAddNote?: (verse: number, content: string) => Promise<VerseNote | null>;
+  onUpdateNote?: (noteId: string, content: string) => void;
+  onDeleteNote?: (noteId: string) => void;
 }
 
 // All available principles from the palace
@@ -69,7 +88,25 @@ const generateVersePrinciples = (verseNumber: number): string[] => {
   return shuffled.slice(0, 4);
 };
 
-export const VerseView = ({ verse, isSelected, onSelect, showPrinciples, isHighlighted, isAudioPlaying, principles, book, chapter }: VerseViewProps) => {
+export const VerseView = ({ 
+  verse, 
+  isSelected, 
+  onSelect, 
+  showPrinciples, 
+  isHighlighted, 
+  isAudioPlaying, 
+  principles, 
+  book, 
+  chapter,
+  highlightColor,
+  highlightColors = [],
+  onHighlight,
+  onRemoveHighlight,
+  notes = [],
+  onAddNote,
+  onUpdateNote,
+  onDeleteNote,
+}: VerseViewProps) => {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [selectedPrinciple, setSelectedPrinciple] = useState<string>("");
   const [explanation, setExplanation] = useState<string>("");
@@ -174,28 +211,70 @@ export const VerseView = ({ verse, isSelected, onSelect, showPrinciples, isHighl
     });
   };
 
+  // Get highlight background class
+  const getHighlightBgClass = () => {
+    if (!highlightColor) return "";
+    const colorMap: Record<string, string> = {
+      yellow: "bg-yellow-200/50 dark:bg-yellow-900/30",
+      green: "bg-green-200/50 dark:bg-green-900/30",
+      blue: "bg-blue-200/50 dark:bg-blue-900/30",
+      pink: "bg-pink-200/50 dark:bg-pink-900/30",
+      purple: "bg-purple-200/50 dark:bg-purple-900/30",
+      orange: "bg-orange-200/50 dark:bg-orange-900/30",
+    };
+    return colorMap[highlightColor.value] || "";
+  };
+
   return (
     <>
       <div
-        className={`group cursor-pointer transition-all duration-300 p-3 rounded-lg ${
+        className={cn(
+          "group cursor-pointer transition-all duration-300 p-3 rounded-lg",
           isAudioPlaying
             ? "bg-emerald-500/20 border-2 border-emerald-500 shadow-lg ring-2 ring-emerald-500/30"
             : isSelected
             ? "bg-primary/10 border-2 border-primary shadow-lg"
             : isHighlighted
             ? "bg-accent/20 border-2 border-accent shadow-md animate-pulse-glow"
+            : highlightColor
+            ? `${getHighlightBgClass()} border-2 border-transparent hover:border-muted`
             : "hover:bg-muted/50 border-2 border-transparent"
-        }`}
+        )}
         onClick={onSelect}
       >
         <div className="flex gap-3">
-          <span
-            className={`font-serif font-bold text-sm flex-shrink-0 ${
-              isSelected ? "text-primary" : "text-muted-foreground group-hover:text-primary"
-            } transition-colors`}
-          >
-            {verse.verse}
-          </span>
+          <div className="flex flex-col items-center gap-1">
+            <span
+              className={cn(
+                "font-serif font-bold text-sm flex-shrink-0 transition-colors",
+                isSelected ? "text-primary" : "text-muted-foreground group-hover:text-primary"
+              )}
+            >
+              {verse.verse}
+            </span>
+            
+            {/* Highlight & Note buttons */}
+            <div className="flex gap-0.5">
+              {onHighlight && onRemoveHighlight && (
+                <VerseHighlightMenu
+                  verse={verse.verse}
+                  currentColor={highlightColor}
+                  colors={highlightColors}
+                  onHighlight={onHighlight}
+                  onRemove={onRemoveHighlight}
+                />
+              )}
+              {onAddNote && onUpdateNote && onDeleteNote && (
+                <VerseNoteEditor
+                  verse={verse.verse}
+                  notes={notes}
+                  onAdd={onAddNote}
+                  onUpdate={onUpdateNote}
+                  onDelete={onDeleteNote}
+                />
+              )}
+            </div>
+          </div>
           
           <div className="flex-1">
             <p className="text-foreground leading-relaxed">

@@ -30,6 +30,10 @@ import { MemoryToolsPanel } from "./MemoryToolsPanel";
 import { StudyModeSelector } from "./StudyModeSelector";
 import { UserMetricsDashboard } from "./UserMetricsDashboard";
 import { DimensionFilter } from "./DimensionFilter";
+import { ReadingStreakBadge } from "./ReadingStreakBadge";
+import { useVerseHighlights } from "@/hooks/useVerseHighlights";
+import { useVerseNotes } from "@/hooks/useVerseNotes";
+import { useReadingStreak } from "@/hooks/useReadingStreak";
 
 export const BibleReader = () => {
   const { book = "John", chapter: chapterParam = "3" } = useParams();
@@ -75,6 +79,23 @@ export const BibleReader = () => {
   const { preferences, loading: preferencesLoading } = useUserPreferences();
   const { handleError } = useErrorHandler();
   
+  // Highlight and notes hooks
+  const { 
+    highlights, 
+    addHighlight, 
+    removeHighlight, 
+    getHighlightColor, 
+    HIGHLIGHT_COLORS 
+  } = useVerseHighlights(book, chapter);
+  const { 
+    notes, 
+    addNote, 
+    updateNote, 
+    deleteNote, 
+    getNotesForVerse 
+  } = useVerseNotes(book, chapter);
+  const { logReading } = useReadingStreak();
+  
   const [translation, setTranslation] = useState<Translation>("kjv");
   const jeevesRef = useRef<HTMLDivElement>(null);
 
@@ -92,6 +113,8 @@ export const BibleReader = () => {
   useEffect(() => {
     loadChapter();
     trackReading(book, chapter);
+    // Log reading for streak tracking
+    logReading(book, chapter, 0);
   }, [book, chapter, translation]);
 
   const loadChapter = async () => {
@@ -189,7 +212,8 @@ export const BibleReader = () => {
           </p>
         </div>
         
-        <div className="flex gap-2 flex-wrap">
+        <div className="flex gap-2 flex-wrap items-center">
+          <ReadingStreakBadge compact />
           <ReadingControls />
           <Button
             variant="outline"
@@ -381,6 +405,14 @@ export const BibleReader = () => {
                     showPrinciples={principleMode}
                     isHighlighted={highlightedVerses.includes(verse.verse)}
                     isAudioPlaying={audioHighlightedVerse === verse.verse}
+                    highlightColor={getHighlightColor(verse.verse)}
+                    highlightColors={HIGHLIGHT_COLORS}
+                    onHighlight={addHighlight}
+                    onRemoveHighlight={removeHighlight}
+                    notes={getNotesForVerse(verse.verse)}
+                    onAddNote={addNote}
+                    onUpdateNote={updateNote}
+                    onDeleteNote={deleteNote}
                   />
                 ))
               )}
