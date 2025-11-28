@@ -261,84 +261,87 @@ export const Navigation = () => {
                 <div className="flex items-center gap-1 py-2 px-2">
                   <Link 
                     to="/palace" 
-                    className="px-3 py-1.5 text-sm font-medium text-foreground hover:text-primary hover:bg-accent/50 rounded-md transition-colors whitespace-nowrap"
+                    className="px-3 py-1.5 text-sm font-medium rounded-md transition-colors whitespace-nowrap flex items-center gap-1 bg-gradient-to-r from-amber-500/10 to-orange-500/10 border border-amber-500/20 hover:from-amber-500/20 hover:to-orange-500/20"
                   >
-                    Palace
+                    <Building2 className="h-3.5 w-3.5 text-amber-500" />
+                    <span className="bg-gradient-to-r from-amber-600 to-orange-600 bg-clip-text text-transparent font-semibold">Palace</span>
                   </Link>
                   <Link 
                     to="/bible" 
-                    className="px-3 py-1.5 text-sm font-medium text-foreground hover:text-primary hover:bg-accent/50 rounded-md transition-colors whitespace-nowrap flex items-center gap-1"
+                    className="px-3 py-1.5 text-sm font-medium rounded-md transition-colors whitespace-nowrap flex items-center gap-1 bg-gradient-to-r from-blue-500/10 to-cyan-500/10 border border-blue-500/20 hover:from-blue-500/20 hover:to-cyan-500/20"
                   >
-                    <BookOpen className="h-3.5 w-3.5" />
-                    Phototheology Study Bible
+                    <BookOpen className="h-3.5 w-3.5 text-blue-500" />
+                    <span className="bg-gradient-to-r from-blue-600 to-cyan-600 bg-clip-text text-transparent font-semibold">Phototheology Study Bible</span>
                   </Link>
                   <Link 
                     to="/card-deck" 
-                    className="px-3 py-1.5 text-sm font-medium text-foreground hover:text-primary hover:bg-accent/50 rounded-md transition-colors whitespace-nowrap flex items-center gap-1"
+                    className="px-3 py-1.5 text-sm font-medium rounded-md transition-colors whitespace-nowrap flex items-center gap-1 bg-gradient-to-r from-violet-500/10 to-purple-500/10 border border-violet-500/20 hover:from-violet-500/20 hover:to-purple-500/20"
                   >
-                    <Sparkles className="h-3.5 w-3.5" />
-                    Phototheology Study Deck
+                    <Sparkles className="h-3.5 w-3.5 text-violet-500" />
+                    <span className="bg-gradient-to-r from-violet-600 to-purple-600 bg-clip-text text-transparent font-semibold">Phototheology Study Deck</span>
                   </Link>
                   <Link 
                     to="/reading-plans" 
-                    className="px-3 py-1.5 text-sm font-medium text-foreground hover:text-primary hover:bg-accent/50 rounded-md transition-colors whitespace-nowrap flex items-center gap-1"
+                    className="px-3 py-1.5 text-sm font-medium rounded-md transition-colors whitespace-nowrap flex items-center gap-1 bg-gradient-to-r from-emerald-500/10 to-teal-500/10 border border-emerald-500/20 hover:from-emerald-500/20 hover:to-teal-500/20"
                   >
-                    <Calendar className="h-3.5 w-3.5" />
-                    Reading Plans
+                    <Calendar className="h-3.5 w-3.5 text-emerald-500" />
+                    <span className="bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent font-semibold">Reading Plans</span>
                   </Link>
                   <Link 
                     to="/devotionals" 
-                    className="px-3 py-1.5 text-sm font-medium text-foreground hover:text-primary hover:bg-accent/50 rounded-md transition-colors whitespace-nowrap flex items-center gap-1 bg-gradient-to-r from-pink-500/10 to-purple-500/10 border border-pink-500/20"
+                    className="px-3 py-1.5 text-sm font-medium rounded-md transition-colors whitespace-nowrap flex items-center gap-1 bg-gradient-to-r from-pink-500/10 to-rose-500/10 border border-pink-500/20 hover:from-pink-500/20 hover:to-rose-500/20"
                   >
                     <BookOpen className="h-3.5 w-3.5 text-pink-500" />
-                    <span className="bg-gradient-to-r from-pink-600 to-purple-600 bg-clip-text text-transparent font-semibold">Devotionals</span>
+                    <span className="bg-gradient-to-r from-pink-600 to-rose-600 bg-clip-text text-transparent font-semibold">Devotionals</span>
                   </Link>
                   <Link 
                     to="/encyclopedia"
-                    className="px-3 py-1.5 text-sm font-medium text-foreground hover:text-primary hover:bg-accent/50 rounded-md transition-colors whitespace-nowrap flex items-center gap-1"
+                    className="px-3 py-1.5 text-sm font-medium rounded-md transition-colors whitespace-nowrap flex items-center gap-1 bg-gradient-to-r from-indigo-500/10 to-blue-500/10 border border-indigo-500/20 hover:from-indigo-500/20 hover:to-blue-500/20"
                   >
-                    <Search className="h-3.5 w-3.5" />
-                    Encyclopedia
+                    <Search className="h-3.5 w-3.5 text-indigo-500" />
+                    <span className="bg-gradient-to-r from-indigo-600 to-blue-600 bg-clip-text text-transparent font-semibold">Encyclopedia</span>
                   </Link>
                   <Link 
                     to="/video-training" 
-                    className="px-3 py-1.5 text-sm font-medium text-foreground hover:text-primary hover:bg-accent/50 rounded-md transition-colors whitespace-nowrap flex items-center gap-1"
+                    className="px-3 py-1.5 text-sm font-medium rounded-md transition-colors whitespace-nowrap flex items-center gap-1 bg-gradient-to-r from-red-500/10 to-orange-500/10 border border-red-500/20 hover:from-red-500/20 hover:to-orange-500/20"
                   >
-                    <Video className="h-3.5 w-3.5" />
-                    Video Training
+                    <Video className="h-3.5 w-3.5 text-red-500" />
+                    <span className="bg-gradient-to-r from-red-600 to-orange-600 bg-clip-text text-transparent font-semibold">Video Training</span>
                   </Link>
                   <Link 
                     to="/my-studies" 
-                    className="px-3 py-1.5 text-sm font-medium text-foreground hover:text-primary hover:bg-accent/50 rounded-md transition-colors whitespace-nowrap"
+                    className="px-3 py-1.5 text-sm font-medium rounded-md transition-colors whitespace-nowrap flex items-center gap-1 bg-gradient-to-r from-sky-500/10 to-blue-500/10 border border-sky-500/20 hover:from-sky-500/20 hover:to-blue-500/20"
                   >
-                    My Studies
+                    <BookOpen className="h-3.5 w-3.5 text-sky-500" />
+                    <span className="bg-gradient-to-r from-sky-600 to-blue-600 bg-clip-text text-transparent font-semibold">My Studies</span>
                   </Link>
                   <Link 
                     to="/games" 
-                    className="px-3 py-1.5 text-sm font-medium text-foreground hover:text-primary hover:bg-accent/50 rounded-md transition-colors whitespace-nowrap"
+                    className="px-3 py-1.5 text-sm font-medium rounded-md transition-colors whitespace-nowrap flex items-center gap-1 bg-gradient-to-r from-fuchsia-500/10 to-pink-500/10 border border-fuchsia-500/20 hover:from-fuchsia-500/20 hover:to-pink-500/20"
                   >
-                    Games
+                    <Zap className="h-3.5 w-3.5 text-fuchsia-500" />
+                    <span className="bg-gradient-to-r from-fuchsia-600 to-pink-600 bg-clip-text text-transparent font-semibold">Games</span>
                   </Link>
                   <Link 
                     to="/memory" 
-                    className="px-3 py-1.5 text-sm font-medium text-foreground hover:text-primary hover:bg-accent/50 rounded-md transition-colors whitespace-nowrap flex items-center gap-1"
+                    className="px-3 py-1.5 text-sm font-medium rounded-md transition-colors whitespace-nowrap flex items-center gap-1 bg-gradient-to-r from-cyan-500/10 to-teal-500/10 border border-cyan-500/20 hover:from-cyan-500/20 hover:to-teal-500/20"
                   >
-                    <Brain className="h-3.5 w-3.5" />
-                    Memory Palace
+                    <Brain className="h-3.5 w-3.5 text-cyan-500" />
+                    <span className="bg-gradient-to-r from-cyan-600 to-teal-600 bg-clip-text text-transparent font-semibold">Memory Palace</span>
                   </Link>
                   <Link 
                     to="/analyze-thoughts" 
-                    className="px-3 py-1.5 text-sm font-medium text-foreground hover:text-primary hover:bg-accent/50 rounded-md transition-colors whitespace-nowrap flex items-center gap-1"
+                    className="px-3 py-1.5 text-sm font-medium rounded-md transition-colors whitespace-nowrap flex items-center gap-1 bg-gradient-to-r from-yellow-500/10 to-amber-500/10 border border-yellow-500/20 hover:from-yellow-500/20 hover:to-amber-500/20"
                   >
-                    <Lightbulb className="h-3.5 w-3.5" />
-                    Analyze My Thoughts
+                    <Lightbulb className="h-3.5 w-3.5 text-yellow-500" />
+                    <span className="bg-gradient-to-r from-yellow-600 to-amber-600 bg-clip-text text-transparent font-semibold">Analyze My Thoughts</span>
                   </Link>
                   <Link 
                     to="/spiritual-training" 
-                    className="px-3 py-1.5 text-sm font-medium text-foreground hover:text-primary hover:bg-accent/50 rounded-md transition-colors whitespace-nowrap flex items-center gap-1"
+                    className="px-3 py-1.5 text-sm font-medium rounded-md transition-colors whitespace-nowrap flex items-center gap-1 bg-gradient-to-r from-slate-500/10 to-zinc-500/10 border border-slate-500/20 hover:from-slate-500/20 hover:to-zinc-500/20"
                   >
-                    <Sword className="h-3.5 w-3.5" />
-                    Christian Art of War Dojo
+                    <Sword className="h-3.5 w-3.5 text-slate-500" />
+                    <span className="bg-gradient-to-r from-slate-600 to-zinc-600 bg-clip-text text-transparent font-semibold">Christian Art of War Dojo</span>
                   </Link>
                   
                   <DropdownMenu>
