@@ -85,15 +85,40 @@ const PALACE_PRINCIPLES = [
   { code: "HF", name: "History Freestyle", description: "Culture, events, society as teaching points", category: "3rd Floor" },
   { code: "LR", name: "Listening Room", description: "Conversations as springboards for Scripture", category: "3rd Floor" },
   
-  // Floor 4 - Next Level (Depth)
+  // Floor 4 - Next Level (Depth) - With specific variants
   { code: "CR", name: "Concentration Room", description: "Every text must reveal Christ - magnifying glass", category: "4th Floor" },
-  { code: "DR", name: "Dimensions Room", description: "5 layers: Literal/Christ/Me/Church/Heaven", category: "4th Floor" },
-  { code: "C6", name: "Connect 6", description: "Genre classification - language rules", category: "4th Floor" },
-  { code: "TRm", name: "Theme Room", description: "Great walls: Sanctuary/Christ/Controversy/Prophecy", category: "4th Floor" },
-  { code: "TZ", name: "Time Zone", description: "6 zones: Earth/Heaven × Past/Present/Future", category: "4th Floor" },
+  { code: "DR-Literal", name: "Dimensions: Literal", description: "What the text literally says - historical/grammatical meaning", category: "4th Floor" },
+  { code: "DR-Christ", name: "Dimensions: Christ", description: "Personal Christ relationship, individual salvation focus", category: "4th Floor" },
+  { code: "DR-Me", name: "Dimensions: Me", description: "Personal application - how it applies to my life", category: "4th Floor" },
+  { code: "DR-Church", name: "Dimensions: Church", description: "Corporate body application - ecclesiology, community", category: "4th Floor" },
+  { code: "DR-Heaven", name: "Dimensions: Heaven", description: "Celestial realm - throne room, divine glory perspective", category: "4th Floor" },
+  { code: "C6-Gospel", name: "Connect 6: Gospel", description: "Genre: Gospel narrative - Christ's life and ministry", category: "4th Floor" },
+  { code: "C6-Law", name: "Connect 6: Law", description: "Genre: Law/Torah - divine commands and regulations", category: "4th Floor" },
+  { code: "C6-History", name: "Connect 6: History", description: "Genre: Historical narrative - events with theological meaning", category: "4th Floor" },
+  { code: "C6-Poetry", name: "Connect 6: Poetry", description: "Genre: Poetry/Wisdom - metaphor, rhythm, parallelism", category: "4th Floor" },
+  { code: "C6-Prophecy", name: "Connect 6: Prophecy", description: "Genre: Prophetic - symbols, codes, future revelation", category: "4th Floor" },
+  { code: "C6-Epistle", name: "Connect 6: Epistle", description: "Genre: Epistle/Letter - doctrinal argument and application", category: "4th Floor" },
+  { code: "TRm-Sanctuary", name: "Theme: Sanctuary Wall", description: "Great wall connecting to sanctuary system", category: "4th Floor" },
+  { code: "TRm-Christ", name: "Theme: Life of Christ Wall", description: "Great wall anchored in Christ's incarnation, ministry, cross, resurrection", category: "4th Floor" },
+  { code: "TRm-GC", name: "Theme: Great Controversy Wall", description: "Great wall revealing cosmic battle between Christ and Satan", category: "4th Floor" },
+  { code: "TRm-Prophecy", name: "Theme: Time Prophecy Wall", description: "Great wall tied to prophetic timelines", category: "4th Floor" },
+  { code: "TZ-EP", name: "Time Zone: Earth-Past", description: "Historical earthly events already fulfilled", category: "4th Floor" },
+  { code: "TZ-EN", name: "Time Zone: Earth-Now", description: "Present earthly application and reality", category: "4th Floor" },
+  { code: "TZ-EF", name: "Time Zone: Earth-Future", description: "Future earthly events prophesied", category: "4th Floor" },
+  { code: "TZ-HP", name: "Time Zone: Heaven-Past", description: "Past heavenly events and decisions", category: "4th Floor" },
+  { code: "TZ-HN", name: "Time Zone: Heaven-Now", description: "Present heavenly ministry and activity", category: "4th Floor" },
+  { code: "TZ-HF", name: "Time Zone: Heaven-Future", description: "Future heavenly culmination and eternity", category: "4th Floor" },
   { code: "PRm", name: "Patterns Room", description: "Recurring motifs across Scripture symphony", category: "4th Floor" },
   { code: "P‖", name: "Parallels Room", description: "Mirrored actions - hall of reflections", category: "4th Floor" },
-  { code: "FRt", name: "Fruit Room", description: "Produces Christlike character - taste test", category: "4th Floor" },
+  { code: "FRt-Love", name: "Fruit: Love", description: "Produces love - agape selfless care", category: "4th Floor" },
+  { code: "FRt-Joy", name: "Fruit: Joy", description: "Produces joy - deep spiritual gladness", category: "4th Floor" },
+  { code: "FRt-Peace", name: "Fruit: Peace", description: "Produces peace - shalom wholeness", category: "4th Floor" },
+  { code: "FRt-Patience", name: "Fruit: Patience", description: "Produces patience - longsuffering endurance", category: "4th Floor" },
+  { code: "FRt-Kindness", name: "Fruit: Kindness", description: "Produces kindness - active goodwill", category: "4th Floor" },
+  { code: "FRt-Goodness", name: "Fruit: Goodness", description: "Produces goodness - moral excellence", category: "4th Floor" },
+  { code: "FRt-Faithfulness", name: "Fruit: Faithfulness", description: "Produces faithfulness - reliable trustworthiness", category: "4th Floor" },
+  { code: "FRt-Gentleness", name: "Fruit: Gentleness", description: "Produces gentleness - meek strength", category: "4th Floor" },
+  { code: "FRt-Self-Control", name: "Fruit: Self-Control", description: "Produces self-control - mastery over desires", category: "4th Floor" },
   { code: "CEC", name: "Christ in Chapter", description: "Name and trace Christ-thread explicitly", category: "4th Floor" },
   { code: "R66", name: "Room 66", description: "One theme through all 66 books - integrity at scale", category: "4th Floor" },
   
@@ -241,26 +266,39 @@ serve(async (req) => {
         throw new Error(`Could not fetch verse: ${verse_reference}`);
       }
     } else {
-      // Use deterministic seed based on date to ensure same verse for the day
-      const daysSinceEpoch = Math.floor(Date.now() / (1000 * 60 * 60 * 24));
-      
+      // Truly random verse selection - not sequential/deterministic
       const { data: verses, error: verseError } = await supabase
         .from('bible_verses_tokenized')
-        .select('book, chapter, verse_num')
-        .order('book', { ascending: true })
-        .order('chapter', { ascending: true })
-        .order('verse_num', { ascending: true });
+        .select('book, chapter, verse_num');
       
       if (verseError || !verses || verses.length === 0) {
         console.error('Error fetching verses:', verseError);
         throw new Error('Could not fetch verses from database');
       }
       
-      // Use day-based seed to select a verse deterministically
-      const selectedIndex = daysSinceEpoch % verses.length;
-      const selectedVerse = verses[selectedIndex];
+      // Fetch recently used verse references to avoid repetition
+      const thirtyDaysAgo = new Date();
+      thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+      const { data: recentDailyVerses } = await supabase
+        .from('daily_verses')
+        .select('verse_reference')
+        .gte('date', thirtyDaysAgo.toISOString().split('T')[0]);
+      
+      const recentVerseRefs = new Set(recentDailyVerses?.map(v => v.verse_reference) || []);
+      
+      // Filter out recently used verses
+      const availableVerses = verses.filter(v => {
+        const ref = `${v.book} ${v.chapter}:${v.verse_num}`;
+        return !recentVerseRefs.has(ref);
+      });
+      
+      // Use truly random selection from available verses
+      const versesToChooseFrom = availableVerses.length > 0 ? availableVerses : verses;
+      const randomIndex = Math.floor(Math.random() * versesToChooseFrom.length);
+      const selectedVerse = versesToChooseFrom[randomIndex];
       
       verseReference = `${selectedVerse.book} ${selectedVerse.chapter}:${selectedVerse.verse_num}`;
+      console.log(`Randomly selected verse: ${verseReference} from ${versesToChooseFrom.length} available verses`);
       
       // Fetch actual KJV text from Bible API
       try {
