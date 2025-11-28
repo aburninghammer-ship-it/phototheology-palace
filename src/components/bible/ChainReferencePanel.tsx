@@ -8,6 +8,7 @@ import { Loader2, Link2, Sparkles, ChevronDown, ChevronUp } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { Verse } from "@/types/bible";
+import { formatJeevesResponse } from "@/lib/formatJeevesResponse";
 
 interface CrossReference {
   reference: string;
@@ -220,11 +221,7 @@ export const ChainReferencePanel = ({ book, chapter, verses, onHighlight }: Chai
 
                   {expandedVerse === result.verse && (
                     <div className="mt-3 pt-3 border-t text-sm text-muted-foreground leading-relaxed">
-                      {result.expounded.split('\n\n').map((para, idx) => (
-                        <p key={idx} className="mb-2">
-                          {para}
-                        </p>
-                      ))}
+                      {formatJeevesResponse(result.expounded)}
                     </div>
                   )}
                 </div>

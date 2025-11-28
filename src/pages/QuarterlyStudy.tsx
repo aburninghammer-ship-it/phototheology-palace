@@ -10,6 +10,7 @@ import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { getCurrentQuarterly, getQuarterlyLesson, type Quarterly, type QuarterlyLesson } from "@/services/quarterlyApi";
 import { Navigation } from "@/components/Navigation";
+import { formatJeevesResponse } from "@/lib/formatJeevesResponse";
 
 const QuarterlyStudy = () => {
   const [quarterly, setQuarterly] = useState<Quarterly | null>(null);
@@ -451,11 +452,7 @@ const QuarterlyStudy = () => {
                         <span className="font-semibold">Jeeves says:</span>
                       </div>
                       <div className="prose prose-sm max-w-none">
-                        {jeevesResponse.content?.split('\n\n').map((paragraph: string, idx: number) => (
-                          <p key={idx} className="mb-3 leading-relaxed">
-                            {paragraph}
-                          </p>
-                        ))}
+                        {formatJeevesResponse(jeevesResponse.content || '')}
                       </div>
                     </div>
                   </ScrollArea>

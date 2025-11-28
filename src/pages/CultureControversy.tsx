@@ -8,6 +8,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { Scale, Link2, Sparkles } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { StyledMarkdownSections } from "@/components/ui/styled-markdown";
 
 const CultureControversy = () => {
   const { toast } = useToast();
@@ -150,20 +151,19 @@ const CultureControversy = () => {
           </Card>
 
           {analysis && (
-            <Card>
+            <Card className="border-2 border-primary/20">
               <CardContent className="p-8">
-                <div className="flex items-center gap-2 mb-6">
-                  <Scale className="h-6 w-6 text-primary" />
-                  <h3 className="text-2xl font-bold">Biblical Analysis</h3>
-                </div>
-                <ScrollArea className="h-[600px] pr-4">
-                  <div className="prose prose-lg dark:prose-invert max-w-none">
-                    {analysis.split("\n").map((paragraph, idx) => (
-                      <p key={idx} className="mb-4">
-                        {paragraph}
-                      </p>
-                    ))}
+                <div className="flex items-center gap-3 mb-6 pb-4 border-b border-primary/20">
+                  <div className="p-3 bg-gradient-to-br from-primary/20 to-primary/10 rounded-xl">
+                    <Scale className="h-6 w-6 text-primary" />
                   </div>
+                  <div>
+                    <h3 className="text-2xl font-bold">Biblical Analysis</h3>
+                    <p className="text-sm text-muted-foreground">Jesus-centered perspective on this topic</p>
+                  </div>
+                </div>
+                <ScrollArea className="h-[700px] pr-4">
+                  <StyledMarkdownSections content={analysis} />
                 </ScrollArea>
               </CardContent>
             </Card>
