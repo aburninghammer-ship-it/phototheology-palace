@@ -175,11 +175,55 @@ Generate all ${duration} days as a JSON array. Each day should progressively bui
     try {
       // Extract JSON from markdown code blocks if present
       const jsonMatch = content.match(/```(?:json)?\s*([\s\S]*?)```/);
-      const jsonString = jsonMatch ? jsonMatch[1] : content;
-      days = JSON.parse(jsonString.trim());
+      let jsonString = jsonMatch ? jsonMatch[1] : content;
+      
+      // Escape literal newlines/tabs within JSON string values
+      // Walk through and find content between quotes, escape control chars there
+      let result = '';
+      let inString = false;
+      let escaped = false;
+      
+      for (let i = 0; i < jsonString.length; i++) {
+        const char = jsonString[i];
+        
+        if (escaped) {
+          result += char;
+          escaped = false;
+          continue;
+        }
+        
+        if (char === '\\') {
+          escaped = true;
+          result += char;
+          continue;
+        }
+        
+        if (char === '"') {
+          inString = !inString;
+          result += char;
+          continue;
+        }
+        
+        if (inString) {
+          // Escape control characters inside strings
+          if (char === '\n') {
+            result += '\\n';
+          } else if (char === '\r') {
+            result += '\\r';
+          } else if (char === '\t') {
+            result += '\\t';
+          } else {
+            result += char;
+          }
+        } else {
+          result += char;
+        }
+      }
+      
+      days = JSON.parse(result.trim());
     } catch (parseError) {
       console.error("JSON parse error:", parseError);
-      console.log("Raw content:", content);
+      console.log("Raw content (first 2000 chars):", content.substring(0, 2000));
       throw new Error("Failed to parse devotional content");
     }
 
