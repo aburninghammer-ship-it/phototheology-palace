@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, cloneElement, isValidElement, ReactElement } from "react";
 import {
   Dialog,
   DialogContent,
@@ -81,22 +81,29 @@ export const ShareDevotionalDialog = ({ plan, day, trigger }: ShareDevotionalDia
     window.open(`sms:?body=${text}`);
   };
 
-  const handleOpen = () => setOpen(true);
+  // Render trigger with click handler
+  const renderTrigger = () => {
+    if (trigger && isValidElement(trigger)) {
+      return cloneElement(trigger as ReactElement<{ onClick?: () => void }>, {
+        onClick: () => setOpen(true),
+      });
+    }
+    return (
+      <Button 
+        variant="outline" 
+        size="sm" 
+        className="gap-2 border-purple-300 text-purple-700 hover:bg-purple-50 dark:border-purple-700 dark:text-purple-300 dark:hover:bg-purple-950"
+        onClick={() => setOpen(true)}
+      >
+        <Share2 className="w-4 h-4" />
+        Share
+      </Button>
+    );
+  };
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      {trigger ? (
-        <div onClick={handleOpen} className="cursor-pointer">
-          {trigger}
-        </div>
-      ) : (
-        <DialogTrigger asChild>
-          <Button variant="outline" size="sm" className="gap-2 border-purple-300 text-purple-700 hover:bg-purple-50 dark:border-purple-700 dark:text-purple-300 dark:hover:bg-purple-950">
-            <Share2 className="w-4 h-4" />
-            Share
-          </Button>
-        </DialogTrigger>
-      )}
+      {renderTrigger()}
       <DialogContent className="bg-gradient-to-br from-background via-background to-purple-50/50 dark:to-purple-950/20">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
