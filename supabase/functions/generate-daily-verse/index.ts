@@ -440,7 +440,7 @@ Identify: 📖Gospel, ⚖️Law, 📜History, 🎵Poetry, 🔮Prophecy, or ✉�
 
 **Meditation Room (MR)**: Slow marination. "Breathe 'The LORD is my shepherd'... rest in it."
 
-**Speed Room (SR)**: CHALLENGE MODE. The Speed Room trains rapid application of palace principles in minutes, not hours. Since this requires real-time practice, CHALLENGE the user: "Your Speed Room Challenge: Take today's verse to the Speed Room and apply 3 different palace principles to it in under 5 minutes. Time yourself! Can you connect it to Christ (CR), find a pattern (PRm), and locate it in a cycle (@) before the clock runs out?"
+**Speed Room (SR)**: CHALLENGE MODE. The Speed Room trains rapid application of palace principles in minutes, not hours. Since this requires real-time practice, CHALLENGE the user: "⏱️ Your Speed Room Challenge: Take today's verse and apply 3 different palace principles. Choose your intensity level: 🟢 5 min (Beginner) | 🟡 3 min (Intermediate) | 🟠 2 min (Advanced) | 🔴 1 min (Master). Can you connect it to Christ (CR), find a pattern (PRm), and locate it in a cycle (@) before your timer runs out?"
 
 **CRITICAL OUTPUT REQUIREMENTS**:
 
