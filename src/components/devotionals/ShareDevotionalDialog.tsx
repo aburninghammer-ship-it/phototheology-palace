@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Dialog,
   DialogContent,
@@ -8,28 +8,52 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Share2, Copy, Download, Check, Mail, MessageCircle } from "lucide-react";
+import { Share2, Copy, Download, Check, Mail, MessageCircle, Gift } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { DevotionalDay, DevotionalPlan } from "@/hooks/useDevotionals";
+import { supabase } from "@/integrations/supabase/client";
 
 interface ShareDevotionalDialogProps {
   plan: DevotionalPlan;
   day?: DevotionalDay;
   trigger?: React.ReactNode;
+  isPublicView?: boolean;
 }
 
-export const ShareDevotionalDialog = ({ plan, day, trigger }: ShareDevotionalDialogProps) => {
+export const ShareDevotionalDialog = ({ plan, day, trigger, isPublicView }: ShareDevotionalDialogProps) => {
   const [open, setOpen] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [shareToken, setShareToken] = useState(plan.share_token);
   const { toast } = useToast();
 
-  const shareUrl = `${window.location.origin}/devotionals/${plan.id}`;
+  // Generate share token if it doesn't exist and make plan public
+  useEffect(() => {
+    const ensureShareToken = async () => {
+      if (!plan.share_token && open) {
+        const token = crypto.randomUUID().slice(0, 12);
+        const { error } = await supabase
+          .from("devotional_plans")
+          .update({ share_token: token, is_public: true })
+          .eq("id", plan.id);
+        
+        if (!error) {
+          setShareToken(token);
+        }
+      }
+    };
+    ensureShareToken();
+  }, [open, plan.id, plan.share_token]);
+
+  const shareUrl = shareToken 
+    ? `${window.location.origin}/shared-devotional/${shareToken}`
+    : `${window.location.origin}/devotionals/${plan.id}`;
 
   const getShareContent = () => {
+    const appInvite = "\n\n🎁 Get free access to personalized devotionals at Phototheology!";
     if (day) {
-      return `📖 ${day.title}\n\n${day.scripture_reference}\n"${day.scripture_text}"\n\n✨ ${day.christ_connection}\n\nFrom: ${plan.title}`;
+      return `📖 ${day.title}\n\n${day.scripture_reference}\n"${day.scripture_text}"\n\n✨ ${day.christ_connection}\n\nFrom: ${plan.title}${appInvite}`;
     }
-    return `📘 ${plan.title}\n\nA ${plan.duration}-day devotional journey on: ${plan.theme}\n\nFormat: ${plan.format}\n\nJoin me on this spiritual journey!`;
+    return `📘 ${plan.title}\n\nA ${plan.duration}-day devotional journey on: ${plan.theme}\n\nFormat: ${plan.format}\n\nJoin me on this spiritual journey!${appInvite}`;
   };
 
   const handleCopyLink = () => {
@@ -43,7 +67,7 @@ export const ShareDevotionalDialog = ({ plan, day, trigger }: ShareDevotionalDia
   };
 
   const handleCopyContent = () => {
-    navigator.clipboard.writeText(getShareContent());
+    navigator.clipboard.writeText(getShareContent() + `\n\n${shareUrl}`);
     toast({
       title: "Content Copied",
       description: "Devotional content copied to clipboard",
@@ -52,8 +76,8 @@ export const ShareDevotionalDialog = ({ plan, day, trigger }: ShareDevotionalDia
 
   const handleDownload = () => {
     const content = day
-      ? `${day.title}\n\n${day.scripture_reference}\n${day.scripture_text}\n\nVisual Imagery:\n${day.visual_imagery}\n\nApplication:\n${day.application}\n\nChrist Connection:\n${day.christ_connection}\n\nPrayer:\n${day.prayer}\n\nChallenge:\n${day.challenge}`
-      : `${plan.title}\n\nTheme: ${plan.theme}\nDuration: ${plan.duration} days\nFormat: ${plan.format}`;
+      ? `${day.title}\n\n${day.scripture_reference}\n${day.scripture_text}\n\nVisual Imagery:\n${day.visual_imagery}\n\nApplication:\n${day.application}\n\nChrist Connection:\n${day.christ_connection}\n\nPrayer:\n${day.prayer}\n\nChallenge:\n${day.challenge}\n\n---\nGet free access to personalized devotionals at: ${window.location.origin}`
+      : `${plan.title}\n\nTheme: ${plan.theme}\nDuration: ${plan.duration} days\nFormat: ${plan.format}\n\n---\nGet free access to personalized devotionals at: ${window.location.origin}`;
     
     const blob = new Blob([content], { type: "text/plain" });
     const url = URL.createObjectURL(blob);
@@ -110,6 +134,14 @@ export const ShareDevotionalDialog = ({ plan, day, trigger }: ShareDevotionalDia
         </DialogHeader>
 
         <div className="space-y-4">
+          {/* Gift Banner */}
+          <div className="p-3 rounded-xl bg-gradient-to-r from-purple-100 to-pink-100 dark:from-purple-950 dark:to-pink-950 border border-purple-200 dark:border-purple-800">
+            <div className="flex items-center gap-2 text-purple-700 dark:text-purple-300">
+              <Gift className="h-4 w-4" />
+              <span className="text-sm font-medium">Recipients get free access to Phototheology devotionals!</span>
+            </div>
+          </div>
+
           {/* Preview */}
           <div className="p-4 rounded-xl bg-gradient-to-br from-purple-100 to-pink-100 dark:from-purple-950 dark:to-pink-950 border border-purple-200 dark:border-purple-800">
             <p className="text-sm font-medium text-purple-900 dark:text-purple-100 line-clamp-3">
@@ -159,4 +191,3 @@ export const ShareDevotionalDialog = ({ plan, day, trigger }: ShareDevotionalDia
     </Dialog>
   );
 };
-
