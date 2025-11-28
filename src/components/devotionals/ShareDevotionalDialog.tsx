@@ -108,13 +108,16 @@ export const ShareDevotionalDialog = ({ plan, day, trigger, isPublicView }: Shar
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       {trigger ? (
-        React.cloneElement(trigger as React.ReactElement, {
-          onClick: (e: React.MouseEvent) => {
-            e.preventDefault();
-            e.stopPropagation();
+        <button 
+          type="button"
+          onClick={() => {
+            console.log("Share button clicked, opening dialog");
             setOpen(true);
-          },
-        })
+          }}
+          className="appearance-none bg-transparent border-none p-0 m-0 cursor-pointer"
+        >
+          {trigger}
+        </button>
       ) : (
         <DialogTrigger asChild>
           <Button 
