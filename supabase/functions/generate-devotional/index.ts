@@ -52,7 +52,7 @@ serve(async (req) => {
   }
 
   try {
-    const { planId, theme, format, duration, studyStyle } = await req.json();
+    const { planId, theme, format, duration, studyStyle, profileName } = await req.json();
 
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     const SUPABASE_URL = Deno.env.get("SUPABASE_URL");
@@ -72,6 +72,10 @@ serve(async (req) => {
 
     const formatInstructions = getFormatInstructions(format, duration);
     
+    const personalizationNote = profileName 
+      ? `\n\nPERSONALIZATION: This devotional is for someone named "${profileName}". Address them by name throughout the devotional - in prayers, applications, challenges, and encouragement. Make it feel personal and caring, as if you are speaking directly to ${profileName}.`
+      : "";
+
     const systemPrompt = `You are Jeeves, the Phototheology AI assistant. You create EXTENSIVE, Christ-centered devotionals using the Palace method.
 
 CRITICAL RULES:
@@ -81,7 +85,7 @@ CRITICAL RULES:
 4. Never identify Daniel 8's little horn as Antiochus Epiphanes
 5. Always use KJV Scripture references
 6. Each day must have vivid visual imagery for memory
-7. MAKE CONTENT EXTENSIVE - each field should be thorough and detailed
+7. MAKE CONTENT EXTENSIVE - each field should be thorough and detailed${personalizationNote}
 
 PALACE ROOMS AVAILABLE:
 ${PALACE_ROOMS.map(r => `${r.code}: ${r.name} (Floor ${r.floor})`).join("\n")}
@@ -120,9 +124,11 @@ OUTPUT FORMAT - Return a JSON array of ${duration} days with this exact structur
   "christ_connection": "An extensive explanation of how this passage points to Jesus Christ - His character, sacrifice, ministry, or return - REQUIRED and DETAILED"
 }`;
 
+    const forPersonNote = profileName ? `\nThis devotional is specifically for: ${profileName}. Address them by name throughout.` : "";
+
     const userPrompt = `Create a ${duration}-day devotional on the theme: "${theme}"
 Format: ${format}
-Study Style: ${studyStyle}
+Study Style: ${studyStyle}${forPersonNote}
 
 Generate all ${duration} days as a JSON array. Each day should progressively build understanding while always pointing to Christ.`;
 
