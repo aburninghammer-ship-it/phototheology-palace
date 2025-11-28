@@ -42,6 +42,7 @@ const categoryConfig = {
       { to: "/bible", label: "Phototheology Study Bible (PSB)", icon: "📖" },
       
       { to: "/reading-plans", label: "Reading Plans", icon: "📅" },
+      { to: "/devotionals", label: "Devotionals", icon: "💜" },
       { to: "/encyclopedia", label: "Encyclopedia", icon: "🔍" },
       { to: "/video-training", label: "Video Training", icon: "🎥" },
       { to: "/my-studies", label: "My Studies", icon: "📝" },

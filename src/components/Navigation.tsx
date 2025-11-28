@@ -287,7 +287,14 @@ export const Navigation = () => {
                     Reading Plans
                   </Link>
                   <Link 
-                    to="/encyclopedia" 
+                    to="/devotionals" 
+                    className="px-3 py-1.5 text-sm font-medium text-foreground hover:text-primary hover:bg-accent/50 rounded-md transition-colors whitespace-nowrap flex items-center gap-1 bg-gradient-to-r from-pink-500/10 to-purple-500/10 border border-pink-500/20"
+                  >
+                    <BookOpen className="h-3.5 w-3.5 text-pink-500" />
+                    <span className="bg-gradient-to-r from-pink-600 to-purple-600 bg-clip-text text-transparent font-semibold">Devotionals</span>
+                  </Link>
+                  <Link 
+                    to="/encyclopedia"
                     className="px-3 py-1.5 text-sm font-medium text-foreground hover:text-primary hover:bg-accent/50 rounded-md transition-colors whitespace-nowrap flex items-center gap-1"
                   >
                     <Search className="h-3.5 w-3.5" />
