@@ -1630,18 +1630,23 @@ export type Database = {
           invite_sent_at: string | null
           invite_token: string | null
           is_active: boolean | null
+          issue_description: string | null
+          issue_severity: string | null
           last_devotional_sent_at: string | null
           linked_user_id: string | null
           name: string
+          pastoral_notes: Json | null
           preferred_rooms: string[] | null
           preferred_themes: string[] | null
           preferred_tone: string | null
+          primary_issue: string | null
           relationship: string
           spiritual_goals: string[] | null
           struggles: string[] | null
           total_devotionals_sent: number | null
           updated_at: string | null
           user_id: string
+          warning_flags: string[] | null
         }
         Insert: {
           active_plan_id?: string | null
@@ -1654,18 +1659,23 @@ export type Database = {
           invite_sent_at?: string | null
           invite_token?: string | null
           is_active?: boolean | null
+          issue_description?: string | null
+          issue_severity?: string | null
           last_devotional_sent_at?: string | null
           linked_user_id?: string | null
           name: string
+          pastoral_notes?: Json | null
           preferred_rooms?: string[] | null
           preferred_themes?: string[] | null
           preferred_tone?: string | null
+          primary_issue?: string | null
           relationship: string
           spiritual_goals?: string[] | null
           struggles?: string[] | null
           total_devotionals_sent?: number | null
           updated_at?: string | null
           user_id: string
+          warning_flags?: string[] | null
         }
         Update: {
           active_plan_id?: string | null
@@ -1678,18 +1688,23 @@ export type Database = {
           invite_sent_at?: string | null
           invite_token?: string | null
           is_active?: boolean | null
+          issue_description?: string | null
+          issue_severity?: string | null
           last_devotional_sent_at?: string | null
           linked_user_id?: string | null
           name?: string
+          pastoral_notes?: Json | null
           preferred_rooms?: string[] | null
           preferred_themes?: string[] | null
           preferred_tone?: string | null
+          primary_issue?: string | null
           relationship?: string
           spiritual_goals?: string[] | null
           struggles?: string[] | null
           total_devotionals_sent?: number | null
           updated_at?: string | null
           user_id?: string
+          warning_flags?: string[] | null
         }
         Relationships: [
           {

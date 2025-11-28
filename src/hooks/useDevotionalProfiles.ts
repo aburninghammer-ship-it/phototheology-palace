@@ -26,6 +26,12 @@ export interface DevotionalProfile {
   total_devotionals_sent: number;
   created_at: string;
   updated_at: string;
+  // CADE fields
+  primary_issue: string | null;
+  issue_description: string | null;
+  issue_severity: string | null;
+  pastoral_notes: unknown[] | null;
+  warning_flags: string[] | null;
 }
 
 export interface ProfileNote {
@@ -103,6 +109,10 @@ export function useDevotionalProfiles() {
       preferred_tone?: string;
       preferred_rooms?: string[];
       preferred_themes?: string[];
+      // CADE fields
+      primary_issue?: string;
+      issue_description?: string;
+      issue_severity?: string;
     }) => {
       // Generate invite token
       const { data: tokenData } = await supabase.rpc("generate_profile_invite_token");
@@ -141,10 +151,13 @@ export function useDevotionalProfiles() {
     mutationFn: async ({
       id,
       ...updates
-    }: Partial<DevotionalProfile> & { id: string }) => {
+    }: Partial<Omit<DevotionalProfile, 'pastoral_notes'>> & { 
+      id: string;
+      pastoral_notes?: unknown[];
+    }) => {
       const { data, error } = await supabase
         .from("devotional_profiles")
-        .update({ ...updates, updated_at: new Date().toISOString() })
+        .update({ ...updates, updated_at: new Date().toISOString() } as never)
         .eq("id", id)
         .select()
         .single();

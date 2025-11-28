@@ -6,10 +6,11 @@ import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { X, ChevronRight, ChevronLeft, User, Heart, Target, Sparkles } from "lucide-react";
+import { X, ChevronRight, ChevronLeft, User, Heart, Target, Sparkles, AlertCircle } from "lucide-react";
 import { useDevotionalProfiles } from "@/hooks/useDevotionalProfiles";
 import { useDevotionals } from "@/hooks/useDevotionals";
 import { cn } from "@/lib/utils";
+import { CADE_ISSUES, ISSUE_SEVERITY } from "@/lib/cadeIssues";
 
 interface CreateProfileWizardProps {
   onClose: () => void;
@@ -160,6 +161,10 @@ export function CreateProfileWizard({ onClose, onProfileCreated }: CreateProfile
     marriage_stage: "",
     dating_stage: "",
     class_size: "",
+    // CADE fields
+    primary_issue: "",
+    issue_description: "",
+    issue_severity: "moderate",
     // Devotional plan settings
     theme: "",
     duration: 7,
@@ -215,6 +220,10 @@ export function CreateProfileWizard({ onClose, onProfileCreated }: CreateProfile
       current_situation: formData.current_situation || undefined,
       preferred_tone: tonesString,
       preferred_themes: formData.preferred_themes,
+      // CADE fields
+      primary_issue: formData.primary_issue || undefined,
+      issue_description: formData.issue_description || undefined,
+      issue_severity: formData.issue_severity || "moderate",
     });
 
     if (formData.generatePlan && profile) {
@@ -239,8 +248,12 @@ export function CreateProfileWizard({ onClose, onProfileCreated }: CreateProfile
           theme,
           format: "room-driven",
           duration: formData.duration,
-          studyStyle: tonesString, // Pass actual tones to AI
-          profileName: formData.name, // Pass the profile name for personalization
+          studyStyle: tonesString,
+          profileName: formData.name,
+          // CADE context
+          primaryIssue: formData.primary_issue || undefined,
+          issueDescription: formData.issue_description || undefined,
+          issueSeverity: formData.issue_severity || undefined,
         });
       }
 
@@ -478,19 +491,80 @@ export function CreateProfileWizard({ onClose, onProfileCreated }: CreateProfile
             </div>
           )}
 
-          {/* Step 2: Struggles & Situation */}
+          {/* Step 2: Primary Issue & Struggles */}
           {step === 2 && (
             <div className="space-y-6">
               <div className="text-center mb-6">
                 <Heart className="h-8 w-8 mx-auto text-rose-500 mb-2" />
                 <h3 className="text-lg font-semibold">What are they going through?</h3>
                 <p className="text-sm text-muted-foreground">
-                  Select their struggles so we can tailor devotionals specifically for them.
+                  Select their primary issue so we can create deeply personalized devotionals.
                 </p>
               </div>
 
+              {/* CADE Primary Issue Selection */}
+              <div className="space-y-3">
+                <Label className="flex items-center gap-2">
+                  <AlertCircle className="h-4 w-4 text-primary" />
+                  Primary Issue (CADE Engine)
+                </Label>
+                <p className="text-xs text-muted-foreground">
+                  Selecting a primary issue enables our Context-Aware Devotional Engine for laser-focused pastoral care.
+                </p>
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 max-h-[200px] overflow-y-auto p-1">
+                  {CADE_ISSUES.map((issue) => (
+                    <Button
+                      key={issue.value}
+                      variant={formData.primary_issue === issue.value ? "default" : "outline"}
+                      className={cn(
+                        "justify-start text-xs h-auto py-2",
+                        formData.primary_issue === issue.value && "ring-2 ring-primary"
+                      )}
+                      onClick={() => setFormData({ ...formData, primary_issue: issue.value })}
+                    >
+                      <span className="mr-1">{issue.emoji}</span>
+                      {issue.label}
+                    </Button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Issue Severity */}
+              {formData.primary_issue && (
+                <div>
+                  <Label>Severity Level</Label>
+                  <div className="flex flex-wrap gap-2 mt-2">
+                    {ISSUE_SEVERITY.map((sev) => (
+                      <Button
+                        key={sev.value}
+                        variant={formData.issue_severity === sev.value ? "default" : "outline"}
+                        size="sm"
+                        onClick={() => setFormData({ ...formData, issue_severity: sev.value })}
+                      >
+                        {sev.label}
+                      </Button>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Issue Description */}
               <div>
-                <Label>Select Struggles (choose all that apply)</Label>
+                <Label>Tell Jeeves What They Are Going Through</Label>
+                <Textarea
+                  placeholder="e.g., 'My daughter has been experiencing racist comments at school and is struggling with her identity...'"
+                  value={formData.issue_description}
+                  onChange={(e) => setFormData({ ...formData, issue_description: e.target.value })}
+                  className="mt-2 min-h-[100px]"
+                />
+                <p className="text-xs text-muted-foreground mt-1">
+                  The more detail you provide, the more personalized the devotionals will be.
+                </p>
+              </div>
+
+              {/* Additional Struggles */}
+              <div>
+                <Label>Additional Struggles (optional)</Label>
                 <div className="flex flex-wrap gap-2 mt-3">
                   {STRUGGLES.map((struggle) => (
                     <Badge
@@ -507,19 +581,6 @@ export function CreateProfileWizard({ onClose, onProfileCreated }: CreateProfile
                     </Badge>
                   ))}
                 </div>
-              </div>
-
-              <div>
-                <Label>Describe Their Situation (Optional)</Label>
-                <Textarea
-                  placeholder="e.g., 'My daughter is struggling with anxiety after losing a friend...'"
-                  value={formData.current_situation}
-                  onChange={(e) => setFormData({ ...formData, current_situation: e.target.value })}
-                  className="mt-2 min-h-[100px]"
-                />
-                <p className="text-xs text-muted-foreground mt-1">
-                  This helps Jeeves create more personalized devotionals.
-                </p>
               </div>
             </div>
           )}
