@@ -31,9 +31,17 @@ export const ExitIntentPopup = () => {
     e.preventDefault();
     if (!email.trim()) return;
     
+    // Trigger the PDF download
+    const link = document.createElement('a');
+    link.href = '/guides/phototheology-starter-guide.pdf';
+    link.download = 'Phototheology-Starter-Guide.pdf';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    
     toast({
-      title: "Guide Sent!",
-      description: "Check your inbox for the free Phototheology starter guide.",
+      title: "Download Started!",
+      description: "Your free Phototheology starter guide is downloading now.",
     });
     setOpen(false);
   };
