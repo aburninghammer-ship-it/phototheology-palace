@@ -29,6 +29,11 @@ export const Footer = () => {
                 </Link>
               </li>
               <li>
+                <Link to="/why-phototheology" className="text-muted-foreground hover:text-primary transition-colors">
+                  Why Phototheology
+                </Link>
+              </li>
+              <li>
                 <Link to="/app-tour" className="text-muted-foreground hover:text-primary transition-colors">
                   App Tour
                 </Link>
