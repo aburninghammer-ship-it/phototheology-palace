@@ -61,8 +61,8 @@ const AMBIENT_TRACKS = [
     name: "Memorization",
     description: "Serene ambient for memory retention",
     category: "memory",
-    // Calm cinematic ambient - same proven URL
-    url: "https://cdn.pixabay.com/audio/2022/08/02/audio_884fe92c21.mp3",
+    // Soft cinematic strings - different from Sanctuary
+    url: "https://cdn.pixabay.com/audio/2022/05/16/audio_35b21f91d5.mp3",
     bpm: 62,
   },
   {
