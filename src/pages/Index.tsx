@@ -228,29 +228,29 @@ const Index = () => {
           </p>
 
           <div className="grid md:grid-cols-2 gap-6 mb-8">
-            <Card>
-              <CardContent className="pt-6">
+            <Card variant="glass">
+              <CardContent className="pt-6 relative z-10">
                 <Check className="h-8 w-8 text-primary mb-3" />
                 <h3 className="font-bold mb-2">Generate Bible study series</h3>
                 <p className="text-sm text-muted-foreground">Complete series with lesson plans and discussion guides</p>
               </CardContent>
             </Card>
-            <Card>
-              <CardContent className="pt-6">
+            <Card variant="glass">
+              <CardContent className="pt-6 relative z-10">
                 <Check className="h-8 w-8 text-primary mb-3" />
                 <h3 className="font-bold mb-2">Build lesson plans</h3>
                 <p className="text-sm text-muted-foreground">Structured, biblical, and Palace-principle based</p>
               </CardContent>
             </Card>
-            <Card>
-              <CardContent className="pt-6">
+            <Card variant="glass">
+              <CardContent className="pt-6 relative z-10">
                 <Check className="h-8 w-8 text-primary mb-3" />
                 <h3 className="font-bold mb-2">Create shareable outlines</h3>
                 <p className="text-sm text-muted-foreground">Export and share with your group or congregation</p>
               </CardContent>
             </Card>
-            <Card>
-              <CardContent className="pt-6">
+            <Card variant="glass">
+              <CardContent className="pt-6 relative z-10">
                 <Check className="h-8 w-8 text-primary mb-3" />
                 <h3 className="font-bold mb-2">Use Palace principles in real time</h3>
                 <p className="text-sm text-muted-foreground">Jeeves keeps everything biblical and structured</p>
