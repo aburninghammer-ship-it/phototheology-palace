@@ -20,6 +20,7 @@ const Leaderboard = () => {
   const [leaderAchievements, setLeaderAchievements] = useState<Record<string, any[]>>({});
   const [viewMode, setViewMode] = useState<'general' | 'categories'>('general');
   const [categoryLeaders, setCategoryLeaders] = useState<Record<string, any[]>>({});
+  const [isInTop100, setIsInTop100] = useState(false);
 
   useEffect(() => {
     if (user) {
@@ -74,7 +75,11 @@ const Leaderboard = () => {
       .order("points", { ascending: false });
 
     const rank = allProfiles?.findIndex(p => p.id === user!.id) ?? -1;
-    setUserRank(rank + 1);
+    const userPosition = rank + 1;
+    setUserRank(userPosition);
+    
+    // Check if user is in top 100 but not in top 50
+    setIsInTop100(userPosition > 50 && userPosition <= 100);
   };
 
   const fetchLeaders = async () => {
@@ -329,6 +334,28 @@ const Leaderboard = () => {
 
       <main className="container mx-auto px-4 py-8 max-w-6xl">
         <div className="space-y-6">
+          {/* Private Top 100 Encouragement Message */}
+          {isInTop100 && (
+            <Card className="bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-900/20 dark:to-orange-900/20 border-amber-300 dark:border-amber-700">
+              <CardContent className="p-6">
+                <div className="flex items-center gap-4">
+                  <div className="p-3 rounded-full bg-amber-100 dark:bg-amber-900/50">
+                    <Star className="h-8 w-8 text-amber-600 dark:text-amber-400" />
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="text-lg font-bold text-amber-800 dark:text-amber-200">
+                      You're in the Top 100! 🔥
+                    </h3>
+                    <p className="text-amber-700 dark:text-amber-300">
+                      You're currently ranked <span className="font-bold">#{userRank}</span>. 
+                      Keep pushing — just a little more effort and you'll make it to the <span className="font-bold">Top 50 Board</span>!
+                    </p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
           {/* View Mode Toggle */}
           <div className="flex justify-center mb-6">
             <Tabs value={viewMode} onValueChange={(v) => setViewMode(v as any)} className="w-full max-w-md">
