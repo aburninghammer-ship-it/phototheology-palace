@@ -90,17 +90,54 @@ export function SimpleVoiceRoom({ roomId, userId, userName, roomName, className 
 
     // Handle remote audio
     pc.ontrack = (event) => {
-      console.log(`Received audio track from: ${remoteUserId}`);
+      console.log(`Received audio track from: ${remoteUserId}`, event.track);
       const [stream] = event.streams;
       
-      let audio = audioElementsRef.current.get(remoteUserId);
-      if (!audio) {
-        audio = new Audio();
-        audio.autoplay = true;
-        audioElementsRef.current.set(remoteUserId, audio);
+      if (!stream) {
+        console.error(`No stream received from: ${remoteUserId}`);
+        return;
       }
+      
+      // Remove existing audio element if any
+      const existingAudio = audioElementsRef.current.get(remoteUserId);
+      if (existingAudio) {
+        existingAudio.pause();
+        existingAudio.srcObject = null;
+      }
+      
+      // Create new audio element with proper settings
+      const audio = new Audio();
+      audio.autoplay = true;
+      audio.setAttribute('playsinline', 'true');
+      audio.volume = 1.0;
+      audio.muted = false;
+      audioElementsRef.current.set(remoteUserId, audio);
+      
+      // Set stream and play with retry
       audio.srcObject = stream;
-      audio.play().catch(e => console.log("Audio play:", e));
+      
+      const playAudio = async () => {
+        try {
+          await audio.play();
+          console.log(`Audio playing for: ${remoteUserId}`);
+        } catch (e) {
+          console.warn("Audio play blocked, retrying on user interaction:", e);
+          // Add click handler to body for user interaction
+          const playOnClick = async () => {
+            try {
+              await audio.play();
+              console.log(`Audio playing after interaction for: ${remoteUserId}`);
+              document.body.removeEventListener('click', playOnClick);
+            } catch (err) {
+              console.error("Audio play error:", err);
+            }
+          };
+          document.body.addEventListener('click', playOnClick, { once: true });
+          toast.info("Click anywhere to enable audio from other users");
+        }
+      };
+      
+      playAudio();
     };
 
     pc.onconnectionstatechange = () => {
