@@ -5,11 +5,12 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
-import { Gamepad2, MapPin, UsersRound, Search } from "lucide-react";
+import { Gamepad2, MapPin, UsersRound, Search, Trophy, Users } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { VoiceChatWidget } from "@/components/voice/VoiceChatWidget";
+import { ChainChessLeaderboard, GroupEscapeRoom } from "@/components/social";
 
 const Games = () => {
   const { user, loading } = useAuth();
@@ -416,6 +417,12 @@ const Games = () => {
             <UsersRound className="mr-2 h-5 w-5" />
             By Mode
           </Button>
+        </div>
+
+        {/* Multiplayer Features Section */}
+        <div className="grid md:grid-cols-2 gap-6 mb-8">
+          <ChainChessLeaderboard />
+          <GroupEscapeRoom />
         </div>
 
         {/* Games Grid */}

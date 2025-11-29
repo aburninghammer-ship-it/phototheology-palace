@@ -1,7 +1,9 @@
 import { Navigation } from "@/components/Navigation";
 import { VisualPalace } from "@/components/VisualPalace";
+import { ProgressivePalace } from "@/components/palace/ProgressivePalace";
+import { PalaceBreadcrumbs } from "@/components/palace/PalaceBreadcrumbs";
 import { palaceFloors } from "@/data/palaceData";
-import { Building2, Award, TrendingUp, BookOpen, Target } from "lucide-react";
+import { Building2, Award, TrendingUp, BookOpen, Target, LayoutGrid, List } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
@@ -18,6 +20,7 @@ const Palace = () => {
   const { completedRooms, totalRooms, progressPercentage, loading } = usePalaceProgress();
   const [searchParams] = useSearchParams();
   const [activeTab, setActiveTab] = useState<"explore" | "progress">("explore");
+  const [viewMode, setViewMode] = useState<"visual" | "list">("list"); // Default to progressive list for new users
 
   useEffect(() => {
     const roomParam = searchParams.get('room');
@@ -45,6 +48,9 @@ const Palace = () => {
       
       <div className="pt-24 pb-16 px-4">
         <div className="container mx-auto max-w-6xl">
+          {/* Breadcrumbs */}
+          <PalaceBreadcrumbs />
+          
           {/* Hero Header */}
           <div className="text-center mb-8">
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full gradient-palace border border-white/20 mb-4 shadow-lg">
@@ -157,9 +163,33 @@ const Palace = () => {
             </TabsList>
 
             <TabsContent value="explore" className="space-y-6">
-              {/* Visual Palace */}
+              {/* View Mode Toggle */}
+              <div className="flex justify-end gap-2">
+                <Button
+                  variant={viewMode === "list" ? "default" : "outline"}
+                  size="sm"
+                  onClick={() => setViewMode("list")}
+                >
+                  <List className="h-4 w-4 mr-2" />
+                  Guided View
+                </Button>
+                <Button
+                  variant={viewMode === "visual" ? "default" : "outline"}
+                  size="sm"
+                  onClick={() => setViewMode("visual")}
+                >
+                  <LayoutGrid className="h-4 w-4 mr-2" />
+                  Full Palace
+                </Button>
+              </div>
+              
+              {/* Palace Display */}
               <div className="mb-12">
-                <VisualPalace />
+                {viewMode === "list" ? (
+                  <ProgressivePalace showStartHere={progressPercentage < 20} />
+                ) : (
+                  <VisualPalace />
+                )}
               </div>
             </TabsContent>
 
