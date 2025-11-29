@@ -80,8 +80,13 @@ export const AudioControls = ({ verses, onVerseHighlight, className }: AudioCont
         }
       };
       
-      audio.onerror = (e) => {
-        console.error("Audio playback error:", e);
+      audio.onerror = () => {
+        const mediaError = audio?.error;
+        console.error("[Audio] Playback error:", {
+          code: mediaError?.code,
+          message: mediaError?.message,
+          src: audio?.src?.substring(0, 100),
+        });
         // Don't show error for silent audio unlock
         if (audio.src !== SILENT_AUDIO) {
           toast.error("Audio playback failed");
@@ -124,25 +129,37 @@ export const AudioControls = ({ verses, onVerseHighlight, className }: AudioCont
 
   const generateTTS = useCallback(async (text: string, voice: VoiceId) => {
     try {
+      console.log("[TTS] Requesting audio for:", text.substring(0, 50));
       const { data, error } = await supabase.functions.invoke("text-to-speech", {
         body: { text, voice },
       });
 
-      if (error) throw error;
-
-      if (data?.audioContent) {
-        const byteCharacters = atob(data.audioContent);
-        const byteNumbers = new Array(byteCharacters.length);
-        for (let i = 0; i < byteCharacters.length; i++) {
-          byteNumbers[i] = byteCharacters.charCodeAt(i);
-        }
-        const byteArray = new Uint8Array(byteNumbers);
-        const blob = new Blob([byteArray], { type: "audio/mpeg" });
-        return URL.createObjectURL(blob);
+      if (error) {
+        console.error("[TTS] Supabase function error:", error);
+        throw error;
       }
-      return null;
+
+      if (!data?.audioContent) {
+        console.error("[TTS] No audio content in response:", data);
+        return null;
+      }
+
+      console.log("[TTS] Received audio, length:", data.audioContent.length);
+      
+      // Decode base64 in chunks to avoid stack overflow on large audio
+      const binaryString = atob(data.audioContent);
+      const len = binaryString.length;
+      const bytes = new Uint8Array(len);
+      for (let i = 0; i < len; i++) {
+        bytes[i] = binaryString.charCodeAt(i);
+      }
+      
+      const blob = new Blob([bytes], { type: "audio/mpeg" });
+      const url = URL.createObjectURL(blob);
+      console.log("[TTS] Created blob URL:", url);
+      return url;
     } catch (e) {
-      console.error("Error generating TTS:", e);
+      console.error("[TTS] Error generating TTS:", e);
       return null;
     }
   }, []);
