@@ -247,7 +247,7 @@ const AMBIENT_TRACKS = [
     category: "hymn-cinematic",
     floor: 1,
     mood: "faithfulness, morning, hope",
-    url: "https://www.bensound.com/bensound-music/bensound-newdawn.mp3",
+    url: "https://www.bensound.com/bensound-music/bensound-sweet.mp3",
     bpm: 60,
   },
   {
