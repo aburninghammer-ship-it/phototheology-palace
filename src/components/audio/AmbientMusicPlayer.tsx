@@ -257,7 +257,7 @@ const AMBIENT_TRACKS = [
     category: "hymn-cinematic",
     floor: 3,
     mood: "holy, reverent, transcendent",
-    url: "https://www.bensound.com/bensound-music/bensound-love.mp3",
+    url: "https://www.bensound.com/bensound-music/bensound-anewbeginning.mp3",
     bpm: 58,
   },
   {
