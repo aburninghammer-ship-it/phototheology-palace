@@ -31,21 +31,30 @@ export const HowItWorksDialog = ({ title, steps, gradient }: HowItWorksDialogPro
   const [currentStep, setCurrentStep] = useState(0);
   const [open, setOpen] = useState(false);
 
+  // Safety guard for empty or invalid steps
+  if (!steps || steps.length === 0) {
+    return null;
+  }
+
+  // Ensure currentStep is within bounds
+  const safeCurrentStep = Math.min(currentStep, steps.length - 1);
+  const currentStepData = steps[safeCurrentStep];
+
   const nextStep = () => {
-    if (currentStep < steps.length - 1) {
-      setCurrentStep(currentStep + 1);
+    if (safeCurrentStep < steps.length - 1) {
+      setCurrentStep(safeCurrentStep + 1);
     }
   };
 
   const prevStep = () => {
-    if (currentStep > 0) {
-      setCurrentStep(currentStep - 1);
+    if (safeCurrentStep > 0) {
+      setCurrentStep(safeCurrentStep - 1);
     }
   };
 
-  const progress = ((currentStep + 1) / steps.length) * 100;
-  const CurrentIcon = steps[currentStep].icon;
-  const stepGradient = gradient || STEP_GRADIENTS[currentStep % STEP_GRADIENTS.length];
+  const progress = ((safeCurrentStep + 1) / steps.length) * 100;
+  const CurrentIcon = currentStepData.icon;
+  const stepGradient = gradient || STEP_GRADIENTS[safeCurrentStep % STEP_GRADIENTS.length];
 
   return (
     <Dialog open={open} onOpenChange={(isOpen) => { setOpen(isOpen); if (!isOpen) setCurrentStep(0); }}>
@@ -62,7 +71,7 @@ export const HowItWorksDialog = ({ title, steps, gradient }: HowItWorksDialogPro
         {/* Animated background orbs */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
           <motion.div
-            key={`orb-${currentStep}`}
+            key={`orb-${safeCurrentStep}`}
             animate={{ 
               scale: [1, 1.2, 1],
               opacity: [0.15, 0.25, 0.15],
@@ -107,9 +116,9 @@ export const HowItWorksDialog = ({ title, steps, gradient }: HowItWorksDialogPro
                   whileHover={{ scale: 1.3 }}
                   whileTap={{ scale: 0.9 }}
                   className={`h-3 rounded-full transition-all duration-300 ${
-                    index === currentStep
+                    index === safeCurrentStep
                       ? `w-10 bg-gradient-to-r ${stepGradient} shadow-lg`
-                      : index < currentStep
+                      : index < safeCurrentStep
                       ? `w-3 bg-gradient-to-r ${STEP_GRADIENTS[index % STEP_GRADIENTS.length]} opacity-60`
                       : "w-3 bg-muted"
                   }`}
@@ -120,7 +129,7 @@ export const HowItWorksDialog = ({ title, steps, gradient }: HowItWorksDialogPro
             {/* Step Content */}
             <AnimatePresence mode="wait">
               <motion.div
-                key={currentStep}
+                key={safeCurrentStep}
                 initial={{ opacity: 0, x: 20 }}
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: -20 }}
@@ -138,20 +147,20 @@ export const HowItWorksDialog = ({ title, steps, gradient }: HowItWorksDialogPro
                   </motion.div>
                   <div>
                     <p className="text-sm text-muted-foreground font-medium">
-                      Step {currentStep + 1} of {steps.length}
+                      Step {safeCurrentStep + 1} of {steps.length}
                     </p>
-                    <h3 className="text-xl font-semibold">{steps[currentStep].title}</h3>
+                    <h3 className="text-xl font-semibold">{currentStepData.title}</h3>
                   </div>
                 </div>
 
                 <p className="text-muted-foreground leading-relaxed">
-                  {steps[currentStep].description}
+                  {currentStepData.description}
                 </p>
 
                 <div className="space-y-2">
                   <p className="font-medium text-sm">Key Features:</p>
                   <ul className="space-y-2">
-                    {steps[currentStep].highlights.map((highlight, index) => (
+                    {currentStepData.highlights.map((highlight, index) => (
                       <motion.li
                         key={index}
                         initial={{ opacity: 0, x: -10 }}
@@ -173,14 +182,14 @@ export const HowItWorksDialog = ({ title, steps, gradient }: HowItWorksDialogPro
               <Button
                 variant="ghost"
                 onClick={prevStep}
-                disabled={currentStep === 0}
+                disabled={safeCurrentStep === 0}
                 className="gap-2"
               >
                 <ChevronLeft className="h-4 w-4" />
                 Previous
               </Button>
 
-              {currentStep === steps.length - 1 ? (
+              {safeCurrentStep === steps.length - 1 ? (
                 <Button 
                   onClick={() => setOpen(false)}
                   className={`bg-gradient-to-r ${stepGradient} hover:opacity-90 text-white border-0`}
