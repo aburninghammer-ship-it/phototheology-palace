@@ -1,6 +1,5 @@
-import { useState } from "react";
+import { useState, useRef, useCallback } from "react";
 import { Button } from "@/components/ui/button";
-import { Slider } from "@/components/ui/slider";
 import {
   Select,
   SelectContent,
@@ -21,10 +20,13 @@ import {
   SkipForward,
   Volume2,
   Settings,
+  Loader2,
 } from "lucide-react";
 import { Verse } from "@/types/bible";
-import { useBibleAudio } from "@/hooks/useBibleAudio";
+import { ELEVENLABS_VOICES, VoiceId } from "@/hooks/useTextToSpeech";
+import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
+import { toast } from "sonner";
 
 interface AudioControlsProps {
   verses: Verse[];
@@ -34,25 +36,151 @@ interface AudioControlsProps {
 
 export const AudioControls = ({ verses, onVerseHighlight, className }: AudioControlsProps) => {
   const [showSettings, setShowSettings] = useState(false);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [currentVerse, setCurrentVerse] = useState(1);
+  const [selectedVoice, setSelectedVoice] = useState<VoiceId>("daniel");
+  const [playbackRate, setPlaybackRate] = useState(1);
   
-  const {
-    isPlaying,
-    currentVerse,
-    playbackRate,
-    availableVoices,
-    selectedVoice,
-    play,
-    pause,
-    stop,
-    nextVerse,
-    previousVerse,
-    changePlaybackRate,
-    changeVoice,
-  } = useBibleAudio(verses, {
-    onVerseChange: onVerseHighlight,
-  });
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const audioUrlRef = useRef<string | null>(null);
 
   const playbackRates = [0.5, 0.75, 1, 1.25, 1.5, 2];
+
+  const cleanupAudio = useCallback(() => {
+    if (audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current = null;
+    }
+    if (audioUrlRef.current) {
+      URL.revokeObjectURL(audioUrlRef.current);
+      audioUrlRef.current = null;
+    }
+  }, []);
+
+  const generateTTS = useCallback(async (text: string) => {
+    try {
+      const { data, error } = await supabase.functions.invoke("text-to-speech", {
+        body: { text, voice: selectedVoice },
+      });
+
+      if (error) throw error;
+
+      if (data?.audioContent) {
+        const byteCharacters = atob(data.audioContent);
+        const byteNumbers = new Array(byteCharacters.length);
+        for (let i = 0; i < byteCharacters.length; i++) {
+          byteNumbers[i] = byteCharacters.charCodeAt(i);
+        }
+        const byteArray = new Uint8Array(byteNumbers);
+        const blob = new Blob([byteArray], { type: "audio/mpeg" });
+        return URL.createObjectURL(blob);
+      }
+      return null;
+    } catch (e) {
+      console.error("Error generating TTS:", e);
+      return null;
+    }
+  }, [selectedVoice]);
+
+  const playVerse = useCallback(async (verseIndex: number) => {
+    if (verseIndex < 0 || verseIndex >= verses.length) {
+      setIsPlaying(false);
+      return;
+    }
+
+    const verse = verses[verseIndex];
+    setCurrentVerse(verse.verse);
+    onVerseHighlight?.(verse.verse);
+    
+    setIsLoading(true);
+    const url = await generateTTS(verse.text);
+    setIsLoading(false);
+
+    if (!url) {
+      toast.error("Failed to generate audio");
+      setIsPlaying(false);
+      return;
+    }
+
+    cleanupAudio();
+    audioUrlRef.current = url;
+
+    const audio = new Audio(url);
+    audio.playbackRate = playbackRate;
+    audioRef.current = audio;
+
+    audio.onended = () => {
+      // Play next verse
+      const nextIndex = verseIndex + 1;
+      if (nextIndex < verses.length) {
+        playVerse(nextIndex);
+      } else {
+        setIsPlaying(false);
+        toast.success("Finished reading");
+      }
+    };
+
+    audio.onerror = () => {
+      toast.error("Audio playback failed");
+      setIsPlaying(false);
+    };
+
+    audio.play();
+  }, [verses, generateTTS, cleanupAudio, playbackRate, onVerseHighlight]);
+
+  const play = useCallback((startVerseIndex?: number) => {
+    const index = startVerseIndex ?? verses.findIndex(v => v.verse === currentVerse);
+    setIsPlaying(true);
+    playVerse(index >= 0 ? index : 0);
+  }, [currentVerse, verses, playVerse]);
+
+  const pause = useCallback(() => {
+    if (audioRef.current) {
+      audioRef.current.pause();
+    }
+    setIsPlaying(false);
+  }, []);
+
+  const stop = useCallback(() => {
+    cleanupAudio();
+    setIsPlaying(false);
+    setCurrentVerse(1);
+    onVerseHighlight?.(1);
+  }, [cleanupAudio, onVerseHighlight]);
+
+  const nextVerse = useCallback(() => {
+    const currentIndex = verses.findIndex(v => v.verse === currentVerse);
+    if (currentIndex < verses.length - 1) {
+      cleanupAudio();
+      if (isPlaying) {
+        playVerse(currentIndex + 1);
+      } else {
+        setCurrentVerse(verses[currentIndex + 1].verse);
+        onVerseHighlight?.(verses[currentIndex + 1].verse);
+      }
+    }
+  }, [verses, currentVerse, isPlaying, cleanupAudio, playVerse, onVerseHighlight]);
+
+  const previousVerse = useCallback(() => {
+    const currentIndex = verses.findIndex(v => v.verse === currentVerse);
+    if (currentIndex > 0) {
+      cleanupAudio();
+      if (isPlaying) {
+        playVerse(currentIndex - 1);
+      } else {
+        setCurrentVerse(verses[currentIndex - 1].verse);
+        onVerseHighlight?.(verses[currentIndex - 1].verse);
+      }
+    }
+  }, [verses, currentVerse, isPlaying, cleanupAudio, playVerse, onVerseHighlight]);
+
+  const changePlaybackRate = useCallback((rate: number) => {
+    setPlaybackRate(rate);
+    if (audioRef.current) {
+      audioRef.current.playbackRate = rate;
+    }
+  }, []);
 
   if (verses.length === 0) return null;
 
@@ -68,7 +196,7 @@ export const AudioControls = ({ verses, onVerseHighlight, className }: AudioCont
           size="icon"
           className="h-8 w-8"
           onClick={previousVerse}
-          disabled={currentVerse <= 1}
+          disabled={currentVerse <= 1 || isLoading}
         >
           <SkipBack className="h-4 w-4" />
         </Button>
@@ -78,8 +206,11 @@ export const AudioControls = ({ verses, onVerseHighlight, className }: AudioCont
           size="icon"
           className="h-10 w-10 rounded-full"
           onClick={() => isPlaying ? pause() : play()}
+          disabled={isLoading}
         >
-          {isPlaying ? (
+          {isLoading ? (
+            <Loader2 className="h-5 w-5 animate-spin" />
+          ) : isPlaying ? (
             <Pause className="h-5 w-5" />
           ) : (
             <Play className="h-5 w-5 ml-0.5" />
@@ -91,7 +222,7 @@ export const AudioControls = ({ verses, onVerseHighlight, className }: AudioCont
           size="icon"
           className="h-8 w-8"
           onClick={nextVerse}
-          disabled={currentVerse >= verses.length}
+          disabled={currentVerse >= verses.length || isLoading}
         >
           <SkipForward className="h-4 w-4" />
         </Button>
@@ -146,23 +277,23 @@ export const AudioControls = ({ verses, onVerseHighlight, className }: AudioCont
             <div>
               <h4 className="font-medium mb-2">Voice</h4>
               <Select
-                value={selectedVoice?.name || ""}
-                onValueChange={(name) => {
-                  const voice = availableVoices.find(v => v.name === name);
-                  if (voice) changeVoice(voice);
-                }}
+                value={selectedVoice}
+                onValueChange={(value) => setSelectedVoice(value as VoiceId)}
               >
                 <SelectTrigger className="w-full">
                   <SelectValue placeholder="Select voice" />
                 </SelectTrigger>
                 <SelectContent>
-                  {availableVoices.map((voice) => (
-                    <SelectItem key={voice.name} value={voice.name}>
-                      {voice.name.replace(/Microsoft|Google/gi, '').trim()}
+                  {ELEVENLABS_VOICES.map((voice) => (
+                    <SelectItem key={voice.id} value={voice.id}>
+                      {voice.name}
                     </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
+              <p className="text-xs text-muted-foreground mt-1">
+                {ELEVENLABS_VOICES.find(v => v.id === selectedVoice)?.description}
+              </p>
             </div>
             
             <div className="sm:hidden">
