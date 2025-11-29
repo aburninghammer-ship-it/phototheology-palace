@@ -166,7 +166,7 @@ const AMBIENT_TRACKS = [
     category: "cinematic",
     floor: 5,
     mood: "wonder, discovery, awe",
-    url: "https://www.bensound.com/bensound-music/bensound-ethereal.mp3",
+    url: "https://www.bensound.com/bensound-music/bensound-adventure.mp3",
     bpm: 60,
   },
   {
