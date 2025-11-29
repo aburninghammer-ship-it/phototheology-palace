@@ -71,7 +71,7 @@ const AMBIENT_TRACKS = [
     category: "floor-4",
     floor: 4,
     mood: "bright, hopeful, radiant",
-    url: "https://www.bensound.com/bensound-music/bensound-dreams.mp3",
+    url: "https://www.bensound.com/bensound-music/bensound-epic.mp3",
     bpm: 65,
   },
   // Floor 5 - Prophecy Floor: cinematic tension, deep strings
