@@ -1,5 +1,6 @@
 import { useParams, Link } from "react-router-dom";
 import { palaceFloors } from "@/data/palaceData";
+import { Navigation } from "@/components/Navigation";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ChevronRight, ArrowLeft, Lock, Layers, BookOpen, Code, Lightbulb } from "lucide-react";
@@ -41,6 +42,7 @@ export default function FloorDetail() {
 
   return (
     <div className="min-h-screen bg-gradient-subtle">
+      <Navigation />
       <div className="container mx-auto px-4 py-8 max-w-6xl">
         <Link to="/palace">
           <Button variant="ghost" className="mb-6">

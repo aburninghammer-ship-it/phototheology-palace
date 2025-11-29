@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
+import { Navigation } from "@/components/Navigation";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ArrowLeft, Shuffle, CheckCircle, XCircle } from "lucide-react";
@@ -169,6 +170,7 @@ export default function MemoryGame() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/20 p-4">
+      <Navigation />
       <div className="container mx-auto max-w-4xl">
         <Button
           variant="ghost"

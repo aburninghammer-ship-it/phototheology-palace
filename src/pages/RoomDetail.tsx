@@ -1,5 +1,6 @@
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { palaceFloors } from "@/data/palaceData";
+import { Navigation } from "@/components/Navigation";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ArrowLeft, Target, HelpCircle, BookOpen, AlertCircle, CheckCircle, Trophy, Lock, Dumbbell, Brain, ChevronDown, Swords, Crown, FileText, Star, Award, Sparkles, Info } from "lucide-react";
@@ -171,6 +172,7 @@ export default function RoomDetail() {
 
   return (
     <div className="min-h-screen bg-gradient-subtle">
+      <Navigation />
       {/* Room Tour for first-time visitors */}
       {showRoomTour && room && floor && (
         <RoomTour

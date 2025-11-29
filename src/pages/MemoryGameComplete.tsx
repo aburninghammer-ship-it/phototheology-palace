@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
+import { Navigation } from "@/components/Navigation";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Trophy, Sparkles, ArrowRight, Home } from "lucide-react";
@@ -116,6 +117,7 @@ export default function MemoryGameComplete() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/20">
+      <Navigation />
       <div className="container mx-auto px-4 py-8 max-w-4xl">
         {!completed ? (
           <Card>
