@@ -143,9 +143,13 @@ interface StudyBibleDemoDialogProps {
 export const StudyBibleDemoDialog = ({ open, onOpenChange }: StudyBibleDemoDialogProps) => {
   const [currentStep, setCurrentStep] = useState(0);
 
+  // Safety guard - ensure currentStep is within bounds
+  const safeCurrentStep = Math.min(Math.max(0, currentStep), demoSteps.length - 1);
+  const currentStepData = demoSteps[safeCurrentStep];
+
   const nextStep = () => {
-    if (currentStep < demoSteps.length - 1) {
-      setCurrentStep(currentStep + 1);
+    if (safeCurrentStep < demoSteps.length - 1) {
+      setCurrentStep(safeCurrentStep + 1);
     } else {
       onOpenChange(false);
       setCurrentStep(0);
@@ -153,12 +157,11 @@ export const StudyBibleDemoDialog = ({ open, onOpenChange }: StudyBibleDemoDialo
   };
 
   const prevStep = () => {
-    if (currentStep > 0) {
-      setCurrentStep(currentStep - 1);
+    if (safeCurrentStep > 0) {
+      setCurrentStep(safeCurrentStep - 1);
     }
   };
 
-  const currentStepData = demoSteps[currentStep];
   const Icon = currentStepData.icon;
   const stepGradient = currentStepData.gradient;
 
@@ -170,7 +173,7 @@ export const StudyBibleDemoDialog = ({ open, onOpenChange }: StudyBibleDemoDialo
         
         {/* Animated background orb */}
         <motion.div
-          key={`orb-${currentStep}`}
+          key={`orb-${safeCurrentStep}`}
           animate={{ 
             scale: [1, 1.2, 1],
             opacity: [0.1, 0.2, 0.1],
@@ -201,17 +204,17 @@ export const StudyBibleDemoDialog = ({ open, onOpenChange }: StudyBibleDemoDialo
             <div>
               <div className="flex items-center justify-between mb-2">
                 <span className="text-sm text-muted-foreground">
-                  Step {currentStep + 1} of {demoSteps.length}
+                  Step {safeCurrentStep + 1} of {demoSteps.length}
                 </span>
                 <Badge variant="outline" className="border-white/20">
-                  {Math.round(((currentStep + 1) / demoSteps.length) * 100)}%
+                  {Math.round(((safeCurrentStep + 1) / demoSteps.length) * 100)}%
                 </Badge>
               </div>
               <div className="h-2 bg-muted/50 rounded-full overflow-hidden backdrop-blur-sm">
                 <motion.div
                   className={`h-full bg-gradient-to-r ${stepGradient} rounded-full`}
                   initial={{ width: 0 }}
-                  animate={{ width: `${((currentStep + 1) / demoSteps.length) * 100}%` }}
+                  animate={{ width: `${((safeCurrentStep + 1) / demoSteps.length) * 100}%` }}
                   transition={{ duration: 0.5, ease: "easeOut" }}
                 />
               </div>
@@ -226,9 +229,9 @@ export const StudyBibleDemoDialog = ({ open, onOpenChange }: StudyBibleDemoDialo
                   whileHover={{ scale: 1.3 }}
                   whileTap={{ scale: 0.9 }}
                   className={`h-2.5 rounded-full transition-all duration-300 ${
-                    index === currentStep
+                    index === safeCurrentStep
                       ? `w-8 bg-gradient-to-r ${stepGradient} shadow-lg`
-                      : index < currentStep
+                      : index < safeCurrentStep
                       ? `w-2.5 bg-gradient-to-r ${s.gradient} opacity-60`
                       : "w-2.5 bg-muted"
                   }`}
@@ -239,7 +242,7 @@ export const StudyBibleDemoDialog = ({ open, onOpenChange }: StudyBibleDemoDialo
             {/* Main Content */}
             <AnimatePresence mode="wait">
               <motion.div
-                key={currentStep}
+                key={safeCurrentStep}
                 initial={{ opacity: 0, x: 20 }}
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: -20 }}
@@ -325,7 +328,7 @@ export const StudyBibleDemoDialog = ({ open, onOpenChange }: StudyBibleDemoDialo
               <Button
                 variant="ghost"
                 onClick={prevStep}
-                disabled={currentStep === 0}
+                disabled={safeCurrentStep === 0}
                 className="gap-2"
               >
                 <ChevronLeft className="h-4 w-4" />
@@ -336,7 +339,7 @@ export const StudyBibleDemoDialog = ({ open, onOpenChange }: StudyBibleDemoDialo
                 onClick={nextStep}
                 className={`gap-2 bg-gradient-to-r ${stepGradient} hover:opacity-90 text-white border-0`}
               >
-                {currentStep === demoSteps.length - 1 ? "Done" : "Next"}
+                {safeCurrentStep === demoSteps.length - 1 ? "Done" : "Next"}
                 <ChevronRight className="h-4 w-4" />
               </Button>
             </div>
