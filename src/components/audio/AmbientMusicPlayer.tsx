@@ -212,7 +212,7 @@ const AMBIENT_TRACKS = [
   },
   {
     id: "hymn-how-great-thou-art",
-    name: "How Great Thou Art (Epic)",
+    name: "Majesty Unveiled",
     description: "Triumphant orchestral crescendo with thundering timpani",
     category: "hymn-cinematic",
     floor: 3,
@@ -222,7 +222,7 @@ const AMBIENT_TRACKS = [
   },
   {
     id: "hymn-be-thou-my-vision",
-    name: "Be Thou My Vision (Celtic Epic)",
+    name: "Vision of Light",
     description: "Celtic strings with cinematic orchestral swells",
     category: "hymn-cinematic",
     floor: 4,
@@ -232,7 +232,7 @@ const AMBIENT_TRACKS = [
   },
   {
     id: "hymn-it-is-well",
-    name: "It Is Well (Orchestral)",
+    name: "Peace Beyond Storm",
     description: "Peaceful strings building to triumphant resolution",
     category: "hymn-cinematic",
     floor: 7,
@@ -242,7 +242,7 @@ const AMBIENT_TRACKS = [
   },
   {
     id: "hymn-great-is-thy-faithfulness",
-    name: "Great Is Thy Faithfulness (Sunrise)",
+    name: "Faithful Dawn",
     description: "Dawn-breaking orchestration with hopeful brass fanfare",
     category: "hymn-cinematic",
     floor: 1,
@@ -252,7 +252,7 @@ const AMBIENT_TRACKS = [
   },
   {
     id: "hymn-holy-holy-holy",
-    name: "Holy Holy Holy (Throne Room)",
+    name: "Throne Room",
     description: "Reverent choir-like strings with celestial atmosphere",
     category: "hymn-cinematic",
     floor: 3,
@@ -262,7 +262,7 @@ const AMBIENT_TRACKS = [
   },
   {
     id: "hymn-mighty-fortress",
-    name: "A Mighty Fortress (Battle Hymn)",
+    name: "Fortress Strong",
     description: "Powerful brass and percussion with fortress-like strength",
     category: "hymn-cinematic",
     floor: 5,
@@ -272,7 +272,7 @@ const AMBIENT_TRACKS = [
   },
   {
     id: "hymn-what-a-friend",
-    name: "What A Friend (Intimate)",
+    name: "Faithful Companion",
     description: "Gentle piano with warm string accompaniment",
     category: "hymn-cinematic",
     floor: 6,
@@ -282,7 +282,7 @@ const AMBIENT_TRACKS = [
   },
   {
     id: "hymn-nearer-my-god",
-    name: "Nearer My God To Thee (Ascent)",
+    name: "Ascending Heights",
     description: "Ascending orchestral journey with ethereal heights",
     category: "hymn-cinematic",
     floor: 7,
@@ -292,7 +292,7 @@ const AMBIENT_TRACKS = [
   },
   {
     id: "hymn-come-thou-fount",
-    name: "Come Thou Fount (Flowing)",
+    name: "Living Waters",
     description: "Flowing strings like living water with grateful heart",
     category: "hymn-cinematic",
     floor: 4,
