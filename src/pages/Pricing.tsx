@@ -15,15 +15,22 @@ export default function Pricing() {
   const navigate = useNavigate();
   const [billingPeriod, setBillingPeriod] = useState<'monthly' | 'annual'>('monthly');
 
+  const startFreeAccount = () => {
+    if (!user) {
+      navigate("/auth");
+      return;
+    }
+    toast.success("Welcome! You have free access to Palace Floors 1-2, Devotionals, and more.");
+    navigate("/palace");
+  };
+
   const startFreeTrial = async () => {
     if (!user) {
-      // Not logged in, redirect to auth
       navigate("/auth");
       return;
     }
 
     try {
-      // Check if user already has an active trial or subscription
       const { data: profile } = await supabase
         .from("profiles")
         .select("trial_started_at, trial_ends_at, subscription_status, is_student")
@@ -32,13 +39,13 @@ export default function Pricing() {
 
       if (profile?.is_student) {
         toast.success("You already have free student access!");
-        navigate("/");
+        navigate("/palace");
         return;
       }
 
       if (profile?.subscription_status === "active") {
         toast.success("You already have an active subscription!");
-        navigate("/");
+        navigate("/palace");
         return;
       }
 
@@ -46,12 +53,11 @@ export default function Pricing() {
         const trialEnd = new Date(profile.trial_ends_at);
         if (trialEnd > new Date()) {
           toast.success("Your free trial is already active!");
-          navigate("/");
+          navigate("/palace");
           return;
         }
       }
 
-      // Start free trial
       const trialStartDate = new Date();
       const trialEndDate = new Date();
       trialEndDate.setDate(trialEndDate.getDate() + 7);
@@ -66,8 +72,8 @@ export default function Pricing() {
 
       if (error) throw error;
 
-      toast.success("🎉 Free trial activated! Enjoy 7 days of full access.");
-      navigate("/");
+      toast.success("🎉 7-day Premium trial activated!");
+      navigate("/palace");
     } catch (error: any) {
       console.error("Error starting trial:", error);
       toast.error("Failed to start trial. Please try again.");
@@ -77,30 +83,30 @@ export default function Pricing() {
   const plans = [
     {
       id: "free",
-      name: "Free Trial",
+      name: "Free Forever",
       icon: Sparkles,
-      iconColor: "text-gray-600",
+      iconColor: "text-green-600",
       monthlyPrice: "$0",
       annualPrice: "$0",
-      period: "7 days",
-      description: "100% unlimited access - try everything!",
-      badge: "No Credit Card Required",
+      period: "forever",
+      description: "Start learning today - no strings attached",
+      badge: "No Credit Card Ever",
       badgeVariant: "secondary" as const,
-      ctaText: "Start Free Trial",
+      ctaText: "Start Free",
       ctaVariant: "default" as const,
       monthlyUrl: "#",
       annualUrl: "#",
       features: [
-        "🔥 UNLIMITED ACCESS FOR 7 DAYS",
-        "✅ Every Feature - No Restrictions",
-        "The Palace (8 floors, 40+ rooms)",
-        "Complete Art of War Dojo",
-        "All 4 AI GPTs unlocked",
-        "All Courses & Games",
-        "Bible Reader with Strong's",
-        "Treasure Hunts & Escape Rooms",
-        "Community & Live Study Rooms",
-        "No credit card required!",
+        "✅ Palace Floors 1-2 (Foundation)",
+        "✅ Daily Devotionals",
+        "✅ Basic Jeeves AI Chat",
+        "✅ Daily Challenge",
+        "✅ Bible Reader with Strong's",
+        "✅ Community Access",
+        "✅ Progress Tracking",
+        "No credit card required",
+        "No trial expiration",
+        "Upgrade anytime",
       ],
     },
     {
@@ -258,6 +264,24 @@ export default function Pricing() {
           </div>
         </div>
 
+        {/* 7-Day Premium Trial Callout */}
+        <Card className="mb-8 border-2 border-accent/30 bg-gradient-to-r from-accent/5 to-primary/5 max-w-2xl mx-auto">
+          <CardContent className="p-6 text-center">
+            <Badge className="mb-3 gradient-palace text-white border-0">
+              <Zap className="h-3 w-3 mr-1" />
+              Try Everything Free
+            </Badge>
+            <h3 className="text-xl font-bold mb-2">Not sure which plan? Try Premium for 7 days.</h3>
+            <p className="text-muted-foreground mb-4">
+              Get full access to all 8 floors, every AI feature, and premium tools. No credit card required.
+            </p>
+            <Button onClick={startFreeTrial} className="gradient-palace">
+              Start 7-Day Premium Trial
+              <ArrowRight className="ml-2 h-4 w-4" />
+            </Button>
+          </CardContent>
+        </Card>
+
         {/* Church Plans CTA */}
         <Card className="mb-12 border-2 border-primary/20 bg-gradient-to-r from-primary/5 to-primary/10 max-w-4xl mx-auto">
           <CardContent className="p-6 md:p-8">
@@ -367,9 +391,9 @@ export default function Pricing() {
                   </Button>
                 ) : plan.id === "free" ? (
                   <Button
-                    onClick={startFreeTrial}
+                    onClick={startFreeAccount}
                     variant={plan.ctaVariant}
-                    className="w-full"
+                    className="w-full bg-green-600 hover:bg-green-700"
                     size="lg"
                   >
                     {plan.ctaText}

@@ -24,16 +24,15 @@ import heroImage from "@/assets/phototheology-hero.png";
 import practiceWithAi from "@/assets/practice-with-ai.png";
 import masterDeploy from "@/assets/master-deploy.png";
 import { UserCountBadge } from "@/components/UserCountBadge";
-import { SocialShareButton } from "@/components/SocialShareButton";
 import { PWAInstallButton } from "@/components/PWAInstallButton";
 import { LiveAIDemoWidget } from "@/components/LiveAIDemoWidget";
 import { StreamlinedTestimonials } from "@/components/StreamlinedTestimonials";
 import { FinalCTA } from "@/components/FinalCTA";
-import { ClearHero } from "@/components/ClearHero";
+import { PunchyHero } from "@/components/PunchyHero";
+import { FreeTierBanner } from "@/components/FreeTierBanner";
 import { MagicEyeEasterEgg } from "@/components/MagicEyeEasterEgg";
 import { ExplainerVideo } from "@/components/ExplainerVideo";
 import { WhatPhototheologyDoes } from "@/components/WhatPhototheologyDoes";
-import { WhyPeopleSwitching } from "@/components/WhyPeopleSwitching";
 import { InsideThePalace } from "@/components/InsideThePalace";
 
 const Index = () => {
@@ -91,8 +90,8 @@ const Index = () => {
         </div>
       )}
 
-      {/* Clear Hero Section */}
-      <ClearHero />
+      {/* Punchy Hero Section - The 10-second hook */}
+      <PunchyHero />
 
       {/* Explainer Video */}
       <ExplainerVideo />
@@ -100,26 +99,13 @@ const Index = () => {
       {/* What Phototheology Does - 3 Frame Slider */}
       <WhatPhototheologyDoes />
 
-      {/* Why People Are Switching */}
-      <WhyPeopleSwitching />
+      {/* Free Tier Banner - Show what's included free */}
+      <FreeTierBanner />
 
       {/* User Count Badge */}
       <div className="flex justify-center py-8 bg-gradient-to-b from-background to-muted/30">
         <UserCountBadge />
       </div>
-
-      {/* Simplified Pain Point */}
-      <section className="py-12 px-4 sm:px-6 lg:px-8 bg-muted/30">
-        <div className="max-w-3xl mx-auto text-center space-y-4">
-          <p className="text-2xl md:text-3xl font-bold">
-            Most Christians struggle because we were never taught{" "}
-            <span className="text-primary">how the Bible connects</span>.
-          </p>
-          <p className="text-xl text-muted-foreground">
-            Phototheology fixes that.
-          </p>
-        </div>
-      </section>
 
       {/* Inside the Palace - Features */}
       <InsideThePalace />
@@ -290,58 +276,105 @@ const Index = () => {
 
       {/* SECTION 9 — Pricing */}
       <section className="py-20 px-4 sm:px-6 lg:px-8 bg-muted/30">
-        <div className="max-w-4xl mx-auto text-center">
+        <div className="max-w-5xl mx-auto text-center">
           <h2 className="text-4xl md:text-5xl font-bold mb-6">
-            Start Free. Cancel Anytime.
+            Free Forever. Upgrade When Ready.
           </h2>
           <p className="text-xl text-muted-foreground mb-8">
-            Full access to the entire Palace and Jeeves included.
+            Start learning today. No credit card. No trial expiring.
           </p>
 
-          <Card className="max-w-2xl mx-auto border-2 border-primary/20">
-            <CardHeader>
-              <div className="text-center">
-                <h3 className="text-3xl font-bold mb-2">Free Trial</h3>
-                <p className="text-muted-foreground">Experience everything Phototheology offers</p>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <ul className="space-y-3 mb-6 text-left">
-                <li className="flex items-center gap-3">
-                  <Check className="h-5 w-5 text-primary flex-shrink-0" />
-                  <span>All 8 floors of the Palace</span>
-                </li>
-                <li className="flex items-center gap-3">
-                  <Check className="h-5 w-5 text-primary flex-shrink-0" />
-                  <span>Unlimited AI assistance with Jeeves</span>
-                </li>
-                <li className="flex items-center gap-3">
-                  <Check className="h-5 w-5 text-primary flex-shrink-0" />
-                  <span>Bible Study Builder</span>
-                </li>
-                <li className="flex items-center gap-3">
-                  <Check className="h-5 w-5 text-primary flex-shrink-0" />
-                  <span>Interactive drills and games</span>
-                </li>
-                <li className="flex items-center gap-3">
-                  <Check className="h-5 w-5 text-primary flex-shrink-0" />
-                  <span>Progress tracking and mastery system</span>
-                </li>
-              </ul>
-              <Button 
-                size="lg" 
-                onClick={() => navigate("/pricing")}
-                className="w-full gradient-palace text-lg"
-              >
-                View Pricing Details
-                <ChevronRight className="ml-2 h-5 w-5" />
-              </Button>
-              <p className="text-sm text-muted-foreground mt-4">
-                <Shield className="h-4 w-4 inline mr-1" />
-                Risk-free. No credit card required to start.
-              </p>
-            </CardContent>
-          </Card>
+          <div className="grid md:grid-cols-2 gap-6 max-w-4xl mx-auto">
+            {/* Free Tier */}
+            <Card className="border-2 border-border">
+              <CardHeader>
+                <div className="text-center">
+                  <Badge className="mb-2">Forever Free</Badge>
+                  <h3 className="text-3xl font-bold mb-2">$0</h3>
+                  <p className="text-muted-foreground">Get started now</p>
+                </div>
+              </CardHeader>
+              <CardContent>
+                <ul className="space-y-3 mb-6 text-left">
+                  <li className="flex items-center gap-3">
+                    <Check className="h-5 w-5 text-primary flex-shrink-0" />
+                    <span>Palace Floors 1-2 (Foundation)</span>
+                  </li>
+                  <li className="flex items-center gap-3">
+                    <Check className="h-5 w-5 text-primary flex-shrink-0" />
+                    <span>Daily Devotionals</span>
+                  </li>
+                  <li className="flex items-center gap-3">
+                    <Check className="h-5 w-5 text-primary flex-shrink-0" />
+                    <span>Basic Jeeves AI Chat</span>
+                  </li>
+                  <li className="flex items-center gap-3">
+                    <Check className="h-5 w-5 text-primary flex-shrink-0" />
+                    <span>Daily Challenge</span>
+                  </li>
+                  <li className="flex items-center gap-3">
+                    <Check className="h-5 w-5 text-primary flex-shrink-0" />
+                    <span>Bible Reader</span>
+                  </li>
+                </ul>
+                <Button 
+                  size="lg" 
+                  onClick={() => navigate(user ? "/palace" : "/auth")}
+                  className="w-full"
+                  variant="outline"
+                >
+                  Start Free
+                </Button>
+              </CardContent>
+            </Card>
+
+            {/* Premium Tier */}
+            <Card className="border-2 border-primary/30 bg-gradient-to-br from-primary/5 to-accent/5">
+              <CardHeader>
+                <div className="text-center">
+                  <Badge className="mb-2 gradient-palace text-white border-0">Most Popular</Badge>
+                  <h3 className="text-3xl font-bold mb-2">$15/mo</h3>
+                  <p className="text-muted-foreground">Full Palace access</p>
+                </div>
+              </CardHeader>
+              <CardContent>
+                <ul className="space-y-3 mb-6 text-left">
+                  <li className="flex items-center gap-3">
+                    <Check className="h-5 w-5 text-primary flex-shrink-0" />
+                    <span><strong>All 8 floors</strong> of the Palace</span>
+                  </li>
+                  <li className="flex items-center gap-3">
+                    <Check className="h-5 w-5 text-primary flex-shrink-0" />
+                    <span><strong>Unlimited</strong> AI with Jeeves</span>
+                  </li>
+                  <li className="flex items-center gap-3">
+                    <Check className="h-5 w-5 text-primary flex-shrink-0" />
+                    <span>All games & escape rooms</span>
+                  </li>
+                  <li className="flex items-center gap-3">
+                    <Check className="h-5 w-5 text-primary flex-shrink-0" />
+                    <span>Sermon Builder & Research Mode</span>
+                  </li>
+                  <li className="flex items-center gap-3">
+                    <Check className="h-5 w-5 text-primary flex-shrink-0" />
+                    <span>Art of War Dojo complete</span>
+                  </li>
+                </ul>
+                <Button 
+                  size="lg" 
+                  onClick={() => navigate("/pricing")}
+                  className="w-full gradient-palace"
+                >
+                  View All Plans
+                  <ChevronRight className="ml-2 h-5 w-5" />
+                </Button>
+                <p className="text-sm text-muted-foreground mt-4 text-center">
+                  <Shield className="h-4 w-4 inline mr-1" />
+                  7-day free trial included
+                </p>
+              </CardContent>
+            </Card>
+          </div>
         </div>
       </section>
 
