@@ -301,16 +301,19 @@ All colors MUST be HSL.
   .glass-card::before {
     content: '';
     position: absolute;
-    inset: -2px;
+    inset: -3px;
     border-radius: inherit;
-    padding: 2px;
+    padding: 3px;
     background: conic-gradient(
       from var(--glow-angle, 0deg),
-      hsl(var(--primary) / 0.8),
+      hsl(var(--palace-orange) / 1),
+      hsl(var(--accent) / 0.9),
+      hsl(var(--palace-pink) / 0.7),
+      hsl(var(--palace-purple) / 0.5),
       hsl(var(--palace-teal) / 0.6),
-      hsl(var(--primary) / 0.3),
-      hsl(var(--palace-orange) / 0.6),
-      hsl(var(--primary) / 0.8)
+      hsl(var(--palace-green) / 0.5),
+      hsl(var(--accent) / 0.7),
+      hsl(var(--palace-orange) / 1)
     );
     -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
     mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
@@ -326,9 +329,9 @@ All colors MUST be HSL.
     inset: 0;
     border-radius: inherit;
     box-shadow: 
-      0 0 30px 5px hsl(var(--primary) / 0.3),
-      0 0 60px 10px hsl(var(--primary) / 0.15),
-      inset 0 0 30px 5px hsl(var(--primary) / 0.05);
+      0 0 40px 8px hsl(var(--palace-orange) / 0.4),
+      0 0 80px 16px hsl(var(--accent) / 0.2),
+      inset 0 0 40px 8px hsl(var(--palace-orange) / 0.08);
     animation: glow-pulse 3s ease-in-out infinite;
     pointer-events: none;
     z-index: -1;
