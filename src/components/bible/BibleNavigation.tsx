@@ -54,10 +54,10 @@ export const BibleNavigation = () => {
         {/* Quick Navigation */}
         <div className="space-y-3">
           <Select value={selectedBook} onValueChange={setSelectedBook}>
-            <SelectTrigger className="bg-background/80 backdrop-blur-sm border-white/20 hover:border-primary/40 transition-colors">
+            <SelectTrigger className="bg-white/10 backdrop-blur-md border-white/20 hover:border-primary/50 hover:bg-white/15 transition-all text-foreground">
               <SelectValue placeholder="Select book" />
             </SelectTrigger>
-            <SelectContent className="max-h-[300px] bg-card/95 backdrop-blur-xl border-white/20">
+            <SelectContent className="max-h-[300px] bg-card/95 backdrop-blur-xl border-white/20 z-50">
               {BIBLE_BOOKS.map((book) => (
                 <SelectItem key={book} value={book}>
                   {book}
@@ -73,7 +73,7 @@ export const BibleNavigation = () => {
               value={chapter}
               onChange={(e) => setChapter(e.target.value)}
               min="1"
-              className="bg-background/80 backdrop-blur-sm border-white/20 hover:border-primary/40 focus:border-primary transition-colors touch-manipulation"
+              className="bg-white/10 backdrop-blur-md border-white/20 hover:border-primary/50 hover:bg-white/15 focus:border-primary focus:bg-white/20 transition-all touch-manipulation placeholder:text-muted-foreground/70"
             />
             <Input
               type="number"
@@ -81,7 +81,7 @@ export const BibleNavigation = () => {
               value={verse}
               onChange={(e) => setVerse(e.target.value)}
               min="1"
-              className="bg-background/80 backdrop-blur-sm border-white/20 hover:border-primary/40 focus:border-primary transition-colors touch-manipulation"
+              className="bg-white/10 backdrop-blur-md border-white/20 hover:border-primary/50 hover:bg-white/15 focus:border-primary focus:bg-white/20 transition-all touch-manipulation placeholder:text-muted-foreground/70"
             />
           </div>
         </div>
@@ -96,18 +96,18 @@ export const BibleNavigation = () => {
         {/* Search */}
         <div className="pt-3 border-t border-white/10 space-y-3">
           <Tabs value={searchMode} onValueChange={(value) => setSearchMode(value as "reference" | "word")}>
-            <TabsList className="grid w-full grid-cols-2 bg-background/60 backdrop-blur-sm border border-white/10">
-              <TabsTrigger value="reference" className="data-[state=active]:bg-primary/20 data-[state=active]:text-primary">Reference</TabsTrigger>
-              <TabsTrigger value="word" className="data-[state=active]:bg-primary/20 data-[state=active]:text-primary">Word Search</TabsTrigger>
+            <TabsList className="grid w-full grid-cols-2 bg-white/10 backdrop-blur-md border border-white/15">
+              <TabsTrigger value="reference" className="data-[state=active]:bg-primary/30 data-[state=active]:text-primary">Reference</TabsTrigger>
+              <TabsTrigger value="word" className="data-[state=active]:bg-primary/30 data-[state=active]:text-primary">Word Search</TabsTrigger>
             </TabsList>
           </Tabs>
           
           {searchMode === "word" && (
             <Select value={searchScope} onValueChange={(value) => setSearchScope(value as "all" | "ot" | "nt")}>
-              <SelectTrigger className="bg-background/80 backdrop-blur-sm border-white/20 hover:border-primary/40 transition-colors">
+              <SelectTrigger className="bg-white/10 backdrop-blur-md border-white/20 hover:border-primary/50 hover:bg-white/15 transition-all text-foreground">
                 <SelectValue placeholder="Search scope" />
               </SelectTrigger>
-              <SelectContent className="bg-card/95 backdrop-blur-xl border-white/20">
+              <SelectContent className="bg-card/95 backdrop-blur-xl border-white/20 z-50">
                 <SelectItem value="all">All Bible (66 books)</SelectItem>
                 <SelectItem value="ot">Old Testament (39 books)</SelectItem>
                 <SelectItem value="nt">New Testament (27 books)</SelectItem>
@@ -120,9 +120,9 @@ export const BibleNavigation = () => {
               placeholder={searchMode === "reference" ? "e.g., John 3:16" : "e.g., love one another"}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="bg-background/80 backdrop-blur-sm border-white/20 hover:border-primary/40 focus:border-primary transition-colors touch-manipulation"
+              className="bg-white/10 backdrop-blur-md border-white/20 hover:border-primary/50 hover:bg-white/15 focus:border-primary focus:bg-white/20 transition-all touch-manipulation placeholder:text-muted-foreground/70"
             />
-            <Button type="submit" size="icon" variant="outline" className="bg-background/80 backdrop-blur-sm border-white/20 hover:border-primary hover:bg-primary/20 transition-all touch-manipulation flex-shrink-0">
+            <Button type="submit" size="icon" variant="outline" className="bg-white/10 backdrop-blur-md border-white/20 hover:border-primary hover:bg-white/20 transition-all touch-manipulation flex-shrink-0">
               <Search className="h-4 w-4" />
             </Button>
           </form>
