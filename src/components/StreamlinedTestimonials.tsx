@@ -34,6 +34,51 @@ const testimonials = [
     author: "Teddy",
     role: "Pastor",
   },
+  {
+    quote: "Phototheology is a new systematic way for me to approach the Word. It gives me confidence to study with just the Holy Spirit, the Word, and me.",
+    author: "Rick",
+    role: "Bible Student",
+  },
+  {
+    quote: "While in class the Holy Spirit showed me the image of Christ even before Pastor Ivor explained it! I thank The Lord for Phototheology.",
+    author: "Mitchell",
+    role: "Student",
+  },
+  {
+    quote: "I'm in love with the Photo-Theology method—it's the blueprint to life.",
+    author: "Toccara",
+    role: "Student",
+  },
+  {
+    quote: "This was transforming—life changing. You can't help but fall in love with God all over again.",
+    author: "Ziyanda",
+    role: "Student",
+  },
+  {
+    quote: "There's so much depth in Phototheology that I find myself going back to the beginning just to take it in slowly.",
+    author: "Alan",
+    role: "Bible Student",
+  },
+  {
+    quote: "This connected the whole Bible for me. It's all connected.",
+    author: "Akila",
+    role: "Student",
+  },
+  {
+    quote: "This truly has been a powerful class! The insights and connections are so powerful I keep chewing on them long after.",
+    author: "Lorna",
+    role: "Student",
+  },
+  {
+    quote: "This is beautiful. The way these concepts unfold lights up Scripture in a new way.",
+    author: "Sofia",
+    role: "Bible Student",
+  },
+  {
+    quote: "No sleep tonight, Bible all night! This study has truly blessed me.",
+    author: "Jenny",
+    role: "Student",
+  },
 ];
 
 export const StreamlinedTestimonials = () => {
