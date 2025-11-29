@@ -247,7 +247,7 @@ const AMBIENT_TRACKS = [
     category: "hymn-cinematic",
     floor: 1,
     mood: "faithfulness, morning, hope",
-    url: "https://www.bensound.com/bensound-music/bensound-sweet.mp3",
+    url: "https://www.bensound.com/bensound-music/bensound-betterdays.mp3",
     bpm: 60,
   },
   {
@@ -257,7 +257,7 @@ const AMBIENT_TRACKS = [
     category: "hymn-cinematic",
     floor: 3,
     mood: "holy, reverent, transcendent",
-    url: "https://www.bensound.com/bensound-music/bensound-deepblue.mp3",
+    url: "https://www.bensound.com/bensound-music/bensound-onceagain.mp3",
     bpm: 58,
   },
   {
