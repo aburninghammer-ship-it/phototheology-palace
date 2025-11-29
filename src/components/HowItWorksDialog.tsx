@@ -1,8 +1,7 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { motion, AnimatePresence } from "framer-motion";
-import { HelpCircle, ChevronRight, ChevronLeft, X } from "lucide-react";
+import { HelpCircle, ChevronRight, ChevronLeft } from "lucide-react";
 import { useState } from "react";
 import { LucideIcon } from "lucide-react";
 
@@ -83,17 +82,7 @@ export const HowItWorksDialog = ({ title, steps, gradient }: HowItWorksDialogPro
 
         <div className="p-6 relative z-10">
           <DialogHeader className="mb-4">
-            <div className="flex items-center justify-between">
-              <DialogTitle className="text-xl">{title}</DialogTitle>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => setOpen(false)}
-                className="h-8 w-8 p-0 hover:bg-destructive/10"
-              >
-                <X className="h-4 w-4" />
-              </Button>
-            </div>
+            <DialogTitle className="text-xl">{title}</DialogTitle>
           </DialogHeader>
 
           <div className="space-y-6">
