@@ -3,6 +3,7 @@ import { Footer } from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { GlassBubbles } from "@/components/ui/glass-bubbles";
 import { BookOpen, Users, Calendar, GraduationCap, ChevronRight } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
@@ -106,10 +107,11 @@ const Courses = () => {
               return (
                 <Card 
                   key={course.id}
-                  className="hover:shadow-lg transition-shadow duration-300 border-2 hover:border-primary/50"
+                  variant="glass"
                 >
-                  <div className={`h-2 bg-gradient-to-r ${course.color}`} />
-                  <CardHeader>
+                  <GlassBubbles />
+                  <div className={`h-2 bg-gradient-to-r ${course.color} relative z-10`} />
+                  <CardHeader className="relative z-10">
                     <div className="flex items-start justify-between mb-3">
                       <div className="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center">
                         <Icon className="h-6 w-6 text-primary" />
@@ -121,7 +123,7 @@ const Courses = () => {
                       {course.description}
                     </CardDescription>
                   </CardHeader>
-                  <CardContent className="space-y-4">
+                  <CardContent className="space-y-4 relative z-10">
                     <div className="flex flex-wrap gap-2">
                       <Badge variant="secondary" className="gap-1">
                         <Calendar className="h-3 w-3" />
@@ -171,11 +173,12 @@ const Courses = () => {
           </div>
 
           {/* FAQ Section */}
-          <Card className="bg-muted/30 border-2">
-            <CardHeader>
+          <Card variant="glass">
+            <GlassBubbles />
+            <CardHeader className="relative z-10">
               <CardTitle className="text-2xl">Course FAQs</CardTitle>
             </CardHeader>
-            <CardContent className="space-y-4">
+            <CardContent className="space-y-4 relative z-10">
               <div>
                 <h3 className="font-semibold mb-2">Which course should I start with?</h3>
                 <p className="text-muted-foreground">
