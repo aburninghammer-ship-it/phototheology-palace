@@ -13,7 +13,8 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
-import { MessageCircle, Users as UsersIcon, X, BellRing } from 'lucide-react';
+import { MessageCircle, Users as UsersIcon, X, BellRing, Phone } from 'lucide-react';
+import { DirectCallButton } from '@/components/voice';
 import { formatDistanceToNow } from 'date-fns';
 import {
   Tooltip,
@@ -352,6 +353,10 @@ export const MessagingSidebar = () => {
                       </p>
                     )}
                   </div>
+                  <DirectCallButton 
+                    otherUserId={activeConversation.other_user.id}
+                    otherUserName={activeConversation.other_user.display_name || 'User'}
+                  />
                   <TooltipProvider>
                     <Tooltip>
                       <TooltipTrigger asChild>
