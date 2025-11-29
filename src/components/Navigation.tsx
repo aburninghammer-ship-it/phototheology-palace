@@ -330,7 +330,14 @@ export const Navigation = () => {
                     <span className="bg-gradient-to-r from-cyan-600 to-teal-600 bg-clip-text text-transparent font-semibold">Memory Palace</span>
                   </Link>
                   <Link 
-                    to="/analyze-thoughts" 
+                    to="/leaderboard" 
+                    className="px-3 py-1.5 text-sm font-medium rounded-md transition-colors whitespace-nowrap flex items-center gap-1 bg-gradient-to-r from-yellow-500/10 to-amber-500/10 border border-yellow-500/20 hover:from-yellow-500/20 hover:to-amber-500/20"
+                  >
+                    <Trophy className="h-3.5 w-3.5 text-yellow-500" />
+                    <span className="bg-gradient-to-r from-yellow-600 to-amber-600 bg-clip-text text-transparent font-semibold">Leaderboard</span>
+                  </Link>
+                  <Link 
+                    to="/analyze-thoughts"
                     className="px-3 py-1.5 text-sm font-medium rounded-md transition-colors whitespace-nowrap flex items-center gap-1 bg-gradient-to-r from-yellow-500/10 to-amber-500/10 border border-yellow-500/20 hover:from-yellow-500/20 hover:to-amber-500/20"
                   >
                     <Lightbulb className="h-3.5 w-3.5 text-yellow-500" />
