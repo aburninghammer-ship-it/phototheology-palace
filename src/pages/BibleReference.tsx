@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { motion } from "framer-motion";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -322,14 +323,33 @@ const BibleReference = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background relative overflow-hidden">
+      {/* Animated Background */}
+      <div className="fixed inset-0 pointer-events-none">
+        <div className="absolute top-20 left-10 w-72 h-72 bg-primary/20 rounded-full blur-3xl animate-pulse" />
+        <div className="absolute bottom-20 right-10 w-96 h-96 bg-accent/15 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }} />
+        <div className="absolute top-1/2 left-1/3 w-80 h-80 bg-primary/10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '2s' }} />
+        <div className="absolute top-1/4 right-1/3 w-64 h-64 bg-accent/10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '3s' }} />
+      </div>
+
       <Navigation />
       
-      <div className="container mx-auto px-4 py-8 max-w-7xl">
-        <div className="mb-8 text-center">
+      <div className="container mx-auto px-4 py-8 max-w-7xl relative z-10">
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="mb-8 text-center"
+        >
           <div className="flex items-center justify-center gap-3 mb-4">
-            <Building2 className="h-12 w-12 text-primary" />
-            <h1 className="text-4xl md:text-5xl font-bold">
+            <motion.div
+              initial={{ scale: 0 }}
+              animate={{ scale: 1 }}
+              transition={{ type: "spring", stiffness: 200, delay: 0.2 }}
+              className="p-3 rounded-full bg-primary/10 backdrop-blur-sm border border-primary/20 shadow-glow"
+            >
+              <Building2 className="h-12 w-12 text-primary" />
+            </motion.div>
+            <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent">
               Phototheology Codebook
             </h1>
           </div>
@@ -337,523 +357,584 @@ const BibleReference = () => {
             Complete Reference Manual: Principles, Cycles, Symbols & Memory Tools
           </p>
           <div className="flex items-center justify-center gap-2 mt-4">
-            <Badge variant="secondary">
+            <Badge variant="secondary" className="bg-primary/20 border-primary/30">
               <Sparkles className="h-3 w-3 mr-1" />
               8 Floors • 8 Cycles • 3 Heavens
             </Badge>
-            <Badge variant="outline">
+            <Badge variant="outline" className="backdrop-blur-sm">
               Complete PT System
             </Badge>
           </div>
-        </div>
+        </motion.div>
 
-        <Tabs defaultValue="principles" className="space-y-6">
-          <TabsList className="grid grid-cols-4 w-full max-w-2xl mx-auto">
-            <TabsTrigger value="principles" className="gap-2">
-              <Building2 className="h-4 w-4" />
-              PT Principles
-            </TabsTrigger>
-            <TabsTrigger value="cycles" className="gap-2">
-              <Clock className="h-4 w-4" />
-              Cycles & Heavens
-            </TabsTrigger>
-            <TabsTrigger value="symbols" className="gap-2">
-              <Code className="h-4 w-4" />
-              Symbol Library
-            </TabsTrigger>
-            <TabsTrigger value="memory" className="gap-2">
-              <ImageIcon className="h-4 w-4" />
-              Memory Tools
-            </TabsTrigger>
-          </TabsList>
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2 }}
+        >
+          <Tabs defaultValue="principles" className="space-y-6">
+            <TabsList className="grid grid-cols-4 w-full max-w-2xl mx-auto backdrop-blur-sm bg-background/50">
+              <TabsTrigger value="principles" className="gap-2">
+                <Building2 className="h-4 w-4" />
+                PT Principles
+              </TabsTrigger>
+              <TabsTrigger value="cycles" className="gap-2">
+                <Clock className="h-4 w-4" />
+                Cycles & Heavens
+              </TabsTrigger>
+              <TabsTrigger value="symbols" className="gap-2">
+                <Code className="h-4 w-4" />
+                Symbol Library
+              </TabsTrigger>
+              <TabsTrigger value="memory" className="gap-2">
+                <ImageIcon className="h-4 w-4" />
+                Memory Tools
+              </TabsTrigger>
+            </TabsList>
 
-          <TabsContent value="principles" className="space-y-6">
-            {/* Palace Floors */}
-            <div className="space-y-4">
-              <div className="text-center mb-6">
-                <h2 className="text-3xl font-bold mb-2">The Eight-Floor Palace</h2>
-                <p className="text-muted-foreground">Each floor builds on the one below - ascending from memory to mastery</p>
-              </div>
-              
-              {floors.map((floor) => (
-                <Card key={floor.number} className="overflow-hidden">
-                  <CardHeader className="bg-accent/50">
-                    <div className="flex items-start justify-between">
-                      <div>
-                        <Badge variant="outline" className="mb-2">Floor {floor.number}</Badge>
-                        <CardTitle className="text-2xl">{floor.name}</CardTitle>
-                        <CardDescription className="mt-1">{floor.focus}</CardDescription>
-                      </div>
-                      <Building2 className="h-8 w-8 text-primary opacity-50" />
-                    </div>
-                  </CardHeader>
-                  {floor.rooms ? (
-                    <CardContent className="pt-6">
-                      <div className="grid gap-3 md:grid-cols-2">
-                        {floor.rooms.map((room, i) => (
-                          <div key={i} className="p-3 rounded-lg bg-accent/30 hover:bg-accent/50 transition-colors">
-                            <div className="flex items-start justify-between gap-2">
-                              <div className="flex items-start gap-2 flex-1">
-                                <Badge variant="secondary" className="text-xs">{room.code}</Badge>
-                                <div className="flex-1">
-                                  <div className="font-semibold text-sm">{room.name}</div>
-                                  <div className="text-xs text-muted-foreground mt-1">{room.purpose}</div>
+            <TabsContent value="principles" className="space-y-6">
+              {/* Palace Floors */}
+              <div className="space-y-4">
+                <div className="text-center mb-6">
+                  <h2 className="text-3xl font-bold mb-2 bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">The Eight-Floor Palace</h2>
+                  <p className="text-muted-foreground">Each floor builds on the one below - ascending from memory to mastery</p>
+                </div>
+                
+                {floors.map((floor, index) => (
+                  <motion.div
+                    key={floor.number}
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 0.05 * index }}
+                  >
+                    <Card variant="glass" className="overflow-hidden hover:shadow-elegant transition-all duration-300">
+                      <CardHeader className="bg-primary/5 backdrop-blur-sm">
+                        <div className="flex items-start justify-between">
+                          <div>
+                            <Badge variant="outline" className="mb-2 bg-primary/10 border-primary/30">Floor {floor.number}</Badge>
+                            <CardTitle className="text-2xl">{floor.name}</CardTitle>
+                            <CardDescription className="mt-1">{floor.focus}</CardDescription>
+                          </div>
+                          <Building2 className="h-8 w-8 text-primary opacity-50" />
+                        </div>
+                      </CardHeader>
+                      {floor.rooms ? (
+                        <CardContent className="pt-6">
+                          <div className="grid gap-3 md:grid-cols-2">
+                            {floor.rooms.map((room, i) => (
+                              <div key={i} className="p-3 rounded-lg bg-accent/20 backdrop-blur-sm hover:bg-accent/30 transition-colors border border-accent/20">
+                                <div className="flex items-start justify-between gap-2">
+                                  <div className="flex items-start gap-2 flex-1">
+                                    <Badge variant="secondary" className="text-xs bg-primary/20">{room.code}</Badge>
+                                    <div className="flex-1">
+                                      <div className="font-semibold text-sm">{room.name}</div>
+                                      <div className="text-xs text-muted-foreground mt-1">{room.purpose}</div>
+                                    </div>
+                                  </div>
+                                  {room.link && (
+                                    <Button
+                                      size="sm"
+                                      variant="ghost"
+                                      className="h-6 px-2 hover:bg-primary/10"
+                                      onClick={() => navigate(room.link)}
+                                    >
+                                      <ChevronRight className="h-3 w-3" />
+                                    </Button>
+                                  )}
                                 </div>
                               </div>
-                              {room.link && (
-                                <Button
-                                  size="sm"
-                                  variant="ghost"
-                                  className="h-6 px-2"
-                                  onClick={() => navigate(room.link)}
-                                >
-                                  <ChevronRight className="h-3 w-3" />
-                                </Button>
-                              )}
+                            ))}
+                          </div>
+                        </CardContent>
+                      ) : (
+                        <CardContent className="pt-6">
+                          <p className="text-sm text-muted-foreground italic">{floor.description}</p>
+                        </CardContent>
+                      )}
+                    </Card>
+                  </motion.div>
+                ))}
+              </div>
+
+              {/* Five Ascensions & Four Expansions */}
+              <div className="flex items-center justify-between mb-4 mt-8">
+                <h3 className="text-xl font-bold">Framework: Ascensions & Expansions</h3>
+                <Button variant="outline" size="sm" onClick={() => navigate("/ascensions-expansions")} className="gap-2 backdrop-blur-sm bg-background/50">
+                  <Layers className="h-4 w-4" />
+                  Learn More
+                </Button>
+              </div>
+              <div className="grid gap-6 md:grid-cols-2">
+                {framework.map((item, idx) => (
+                  <motion.div
+                    key={idx}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.1 * idx }}
+                  >
+                    <Card variant="glass" className="hover:shadow-elegant transition-all duration-300">
+                      <CardHeader>
+                        <div className="flex items-center gap-3">
+                          <Layers className="h-6 w-6 text-primary" />
+                          <div>
+                            <CardTitle>{item.title}</CardTitle>
+                            <CardDescription>{item.subtitle}</CardDescription>
+                          </div>
+                        </div>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="space-y-2">
+                          {item.steps?.map((step, i) => (
+                            <div key={i} className="flex items-start gap-2 p-2 rounded bg-accent/20 backdrop-blur-sm border border-accent/20">
+                              <Badge variant="outline" className="text-xs bg-primary/10">{step.level}</Badge>
+                              <div className="flex-1">
+                                <div className="font-semibold text-sm">{step.name}</div>
+                                <div className="text-xs text-muted-foreground">{step.focus}</div>
+                              </div>
                             </div>
+                          ))}
+                          {item.dimensions?.map((dim, i) => (
+                            <div key={i} className="flex items-start gap-2 p-2 rounded bg-accent/20 backdrop-blur-sm border border-accent/20">
+                              <Badge variant="outline" className="text-xs bg-primary/10">{dim.code}</Badge>
+                              <div className="flex-1">
+                                <div className="font-semibold text-sm">{dim.name}</div>
+                                <div className="text-xs text-muted-foreground">{dim.focus}</div>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </motion.div>
+                ))}
+              </div>
+            </TabsContent>
+
+            <TabsContent value="cycles" className="space-y-6">
+              {/* The Eight Cycles */}
+              <div>
+                <div className="text-center mb-6">
+                  <h2 className="text-3xl font-bold mb-2 bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">The Eight Cycles</h2>
+                  <p className="text-muted-foreground">Fall → Covenant → Sanctuary → Enemy → Restoration</p>
+                </div>
+                
+                <div className="space-y-4">
+                  {cycles.map((cycle, index) => (
+                    <motion.div
+                      key={cycle.code}
+                      initial={{ opacity: 0, x: -20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: 0.05 * index }}
+                    >
+                      <Card variant="glass" className="hover:shadow-elegant transition-all duration-300">
+                        <CardHeader>
+                          <div className="flex items-start justify-between gap-4">
+                            <div className="flex-1">
+                              <div className="flex items-center gap-2 mb-2">
+                                <Badge variant="secondary" className="bg-primary/20 border-primary/30">{cycle.code}</Badge>
+                                <CardTitle className="text-xl">{cycle.name}</CardTitle>
+                              </div>
+                              <CardDescription className="text-sm italic mb-3">
+                                {cycle.description}
+                              </CardDescription>
+                              <div className="p-3 rounded-lg bg-accent/20 backdrop-blur-sm text-sm border border-accent/20">
+                                <div className="font-mono text-xs leading-relaxed">{cycle.pattern}</div>
+                              </div>
+                            </div>
+                            <Target className="h-6 w-6 text-primary opacity-50 flex-shrink-0" />
+                          </div>
+                        </CardHeader>
+                      </Card>
+                    </motion.div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Three Heavens */}
+              <div className="mt-8">
+                <div className="text-center mb-6">
+                  <h2 className="text-3xl font-bold mb-2 bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">The Three Heavens</h2>
+                  <p className="text-muted-foreground">Day-of-the-LORD Horizons: Judgment → Renewal</p>
+                </div>
+                
+                <div className="space-y-4">
+                  {heavens.map((heaven, index) => (
+                    <motion.div
+                      key={heaven.code}
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.1 * index }}
+                    >
+                      <Card variant="glass" className="hover:shadow-elegant transition-all duration-300 border-primary/30">
+                        <CardHeader>
+                          <div className="flex items-start gap-4">
+                            <div className="p-3 rounded-lg bg-primary/10 backdrop-blur-sm">
+                              <Badge className="text-lg px-3 py-1 gradient-palace">{heaven.code}</Badge>
+                            </div>
+                            <div className="flex-1">
+                              <CardTitle className="text-xl mb-2">{heaven.name}</CardTitle>
+                              <CardDescription className="mb-3">{heaven.description}</CardDescription>
+                              <div className="space-y-2 text-sm">
+                                <div className="p-2 rounded bg-destructive/10 backdrop-blur-sm border border-destructive/20">
+                                  <span className="font-semibold">Judgment:</span> {heaven.judgment}
+                                </div>
+                                <div className="p-2 rounded bg-primary/10 backdrop-blur-sm border border-primary/20">
+                                  <span className="font-semibold">Renewal:</span> {heaven.renewal}
+                                </div>
+                                <div className="flex items-center gap-4 text-xs text-muted-foreground pt-2">
+                                  <div><span className="font-semibold">Cycles:</span> {heaven.cycles}</div>
+                                  <div><span className="font-semibold">Key Texts:</span> {heaven.texts}</div>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </CardHeader>
+                      </Card>
+                    </motion.div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Prophecy Watch Link */}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.4 }}
+              >
+                <Card variant="glass" className="border-primary/30">
+                  <CardHeader>
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <CardTitle className="text-2xl flex items-center gap-2">
+                          <Sparkles className="h-6 w-6 text-primary" />
+                          Current Prophecy Updates
+                        </CardTitle>
+                        <CardDescription className="mt-2">
+                          Track real-time fulfillment of biblical prophecy in today's world
+                        </CardDescription>
+                      </div>
+                      <Button onClick={() => navigate('/prophecy-watch')} className="gap-2 gradient-palace shadow-elegant">
+                        View Updates
+                        <ChevronRight className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="grid gap-3 md:grid-cols-3">
+                      <div className="p-3 rounded-lg bg-background/50 backdrop-blur-sm border border-border/50">
+                        <div className="font-semibold text-sm mb-1">World Events</div>
+                        <div className="text-xs text-muted-foreground">
+                          Current events mapped to prophetic timelines
+                        </div>
+                      </div>
+                      <div className="p-3 rounded-lg bg-background/50 backdrop-blur-sm border border-border/50">
+                        <div className="font-semibold text-sm mb-1">Signs Tracking</div>
+                        <div className="text-xs text-muted-foreground">
+                          Monitor fulfillment of end-time signs
+                        </div>
+                      </div>
+                      <div className="p-3 rounded-lg bg-background/50 backdrop-blur-sm border border-border/50">
+                        <div className="font-semibold text-sm mb-1">Biblical Analysis</div>
+                        <div className="text-xs text-muted-foreground">
+                          Compare headlines with Scripture
+                        </div>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </motion.div>
+            </TabsContent>
+
+            <TabsContent value="symbols" className="space-y-6">
+              <div className="text-center mb-6">
+                <h2 className="text-3xl font-bold mb-2 bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">Symbol Library</h2>
+                <p className="text-muted-foreground">God's universal language across Scripture</p>
+              </div>
+
+              {symbols.map((section, idx) => (
+                <motion.div
+                  key={idx}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.1 * idx }}
+                >
+                  <Card variant="glass" className="hover:shadow-elegant transition-all duration-300">
+                    <CardHeader>
+                      <div className="flex items-center gap-3">
+                        <Code className="h-6 w-6 text-primary" />
+                        <CardTitle>{section.category}</CardTitle>
+                      </div>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="space-y-2">
+                        {section.items.map((item, i) => (
+                          <div key={i} className="flex items-start gap-3 p-3 rounded-lg bg-accent/20 backdrop-blur-sm hover:bg-accent/30 transition-colors border border-accent/20">
+                            {item.symbol && (
+                              <>
+                                <div className="flex-shrink-0 w-32">
+                                  <Badge variant="outline" className="w-full justify-center bg-primary/10">{item.symbol}</Badge>
+                                </div>
+                                <ChevronRight className="h-4 w-4 text-primary mt-1 flex-shrink-0" />
+                                <div className="text-sm flex-1">{item.meaning}</div>
+                              </>
+                            )}
+                            {item.event1 && (
+                              <div className="flex-1 space-y-1 text-sm">
+                                <div className="flex items-center gap-2">
+                                  <Badge variant="outline" className="text-xs bg-primary/10">{item.event1}</Badge>
+                                  <span className="text-muted-foreground">↔</span>
+                                  <Badge variant="outline" className="text-xs bg-primary/10">{item.event2}</Badge>
+                                </div>
+                                <div className="text-muted-foreground">{item.parallel}</div>
+                              </div>
+                            )}
                           </div>
                         ))}
                       </div>
                     </CardContent>
-                  ) : (
-                    <CardContent className="pt-6">
-                      <p className="text-sm text-muted-foreground italic">{floor.description}</p>
-                    </CardContent>
-                  )}
-                </Card>
+                  </Card>
+                </motion.div>
               ))}
-            </div>
+            </TabsContent>
 
-            {/* Five Ascensions & Four Expansions */}
-            <div className="flex items-center justify-between mb-4 mt-8">
-              <h3 className="text-xl font-bold">Framework: Ascensions & Expansions</h3>
-              <Button variant="outline" size="sm" onClick={() => navigate("/ascensions-expansions")} className="gap-2">
-                <Layers className="h-4 w-4" />
-                Learn More
-              </Button>
-            </div>
-            <div className="grid gap-6 md:grid-cols-2">
-              {framework.map((item, idx) => (
-                <Card key={idx} className="hover:shadow-lg transition-shadow">
+            <TabsContent value="memory" className="space-y-6">
+              <div className="text-center mb-6">
+                <h2 className="text-3xl font-bold mb-2 bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">Memory Tools</h2>
+                <p className="text-muted-foreground">Transform Scripture into unforgettable visual patterns</p>
+              </div>
+
+              <div className="grid gap-6 md:grid-cols-2">
+                {memoryTools.map((tool, idx) => (
+                  <motion.div
+                    key={idx}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.1 * idx }}
+                  >
+                    <Card variant="glass" className="hover:shadow-elegant transition-all duration-300">
+                      <CardHeader>
+                        <div className="flex items-center gap-3">
+                          <ImageIcon className="h-6 w-6 text-primary" />
+                          <CardTitle>{tool.name}</CardTitle>
+                        </div>
+                        <CardDescription>{tool.description}</CardDescription>
+                      </CardHeader>
+                      <CardContent className="space-y-3">
+                        <div className="p-3 rounded-lg bg-accent/20 backdrop-blur-sm border border-accent/20">
+                          <div className="text-xs font-semibold text-muted-foreground mb-1">Example:</div>
+                          <div className="text-sm">{tool.example}</div>
+                        </div>
+                        <div className="p-3 rounded-lg bg-primary/10 backdrop-blur-sm border border-primary/20">
+                          <div className="text-xs font-semibold text-muted-foreground mb-1">Purpose:</div>
+                          <div className="text-sm">{tool.purpose}</div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </motion.div>
+                ))}
+              </div>
+
+              {/* Integration Card */}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.5 }}
+              >
+                <Card variant="glass" className="border-primary/50 mt-8">
                   <CardHeader>
-                    <div className="flex items-center gap-3">
-                      <Layers className="h-6 w-6 text-primary" />
-                      <div>
-                        <CardTitle>{item.title}</CardTitle>
-                        <CardDescription>{item.subtitle}</CardDescription>
-                      </div>
-                    </div>
+                    <CardTitle className="flex items-center gap-2">
+                      <Sparkles className="h-5 w-5 text-primary" />
+                      Start Using These Tools
+                    </CardTitle>
+                    <CardDescription>
+                      All memory tools are integrated throughout the Phototheology app
+                    </CardDescription>
                   </CardHeader>
-                  <CardContent>
-                    <div className="space-y-2">
-                      {item.steps?.map((step, i) => (
-                        <div key={i} className="flex items-start gap-2 p-2 rounded bg-accent/50">
-                          <Badge variant="outline" className="text-xs">{step.level}</Badge>
-                          <div className="flex-1">
-                            <div className="font-semibold text-sm">{step.name}</div>
-                            <div className="text-xs text-muted-foreground">{step.focus}</div>
-                          </div>
-                        </div>
-                      ))}
-                      {item.dimensions?.map((dim, i) => (
-                        <div key={i} className="flex items-start gap-2 p-2 rounded bg-accent/50">
-                          <Badge variant="outline" className="text-xs">{dim.code}</Badge>
-                          <div className="flex-1">
-                            <div className="font-semibold text-sm">{dim.name}</div>
-                            <div className="text-xs text-muted-foreground">{dim.focus}</div>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
+                  <CardContent className="space-y-2">
+                    <Button variant="outline" className="w-full justify-between backdrop-blur-sm bg-background/50 hover:bg-primary/10" onClick={() => navigate("/palace")}>
+                      Explore the Palace
+                      <ChevronRight className="h-4 w-4" />
+                    </Button>
+                    <Button variant="outline" className="w-full justify-between backdrop-blur-sm bg-background/50 hover:bg-primary/10" onClick={() => navigate("/bible-rendered-room")}>
+                      Bible Rendered Room
+                      <ChevronRight className="h-4 w-4" />
+                    </Button>
+                    <Button variant="outline" className="w-full justify-between backdrop-blur-sm bg-background/50 hover:bg-primary/10" onClick={() => navigate("/bible")}>
+                      Study Scripture
+                      <ChevronRight className="h-4 w-4" />
+                    </Button>
                   </CardContent>
                 </Card>
-              ))}
-            </div>
-          </TabsContent>
+              </motion.div>
+            </TabsContent>
 
-          <TabsContent value="cycles" className="space-y-6">
-            {/* The Eight Cycles */}
-            <div>
-              <div className="text-center mb-6">
-                <h2 className="text-3xl font-bold mb-2">The Eight Cycles</h2>
-                <p className="text-muted-foreground">Fall → Covenant → Sanctuary → Enemy → Restoration</p>
-              </div>
-              
-              <div className="space-y-4">
-                {cycles.map((cycle) => (
-                  <Card key={cycle.code} className="hover:shadow-lg transition-shadow">
-                    <CardHeader>
-                      <div className="flex items-start justify-between gap-4">
-                        <div className="flex-1">
-                          <div className="flex items-center gap-2 mb-2">
-                            <Badge variant="secondary">{cycle.code}</Badge>
-                            <CardTitle className="text-xl">{cycle.name}</CardTitle>
-                          </div>
-                          <CardDescription className="text-sm italic mb-3">
-                            {cycle.description}
-                          </CardDescription>
-                          <div className="p-3 rounded-lg bg-accent/30 text-sm">
-                            <div className="font-mono text-xs leading-relaxed">{cycle.pattern}</div>
-                          </div>
-                        </div>
-                        <Target className="h-6 w-6 text-primary opacity-50 flex-shrink-0" />
-                      </div>
-                    </CardHeader>
-                  </Card>
-                ))}
-              </div>
-            </div>
-
-            {/* Three Heavens */}
-            <div className="mt-8">
-              <div className="text-center mb-6">
-                <h2 className="text-3xl font-bold mb-2">The Three Heavens</h2>
-                <p className="text-muted-foreground">Day-of-the-LORD Horizons: Judgment → Renewal</p>
-              </div>
-              
-              <div className="space-y-4">
-                {heavens.map((heaven) => (
-                  <Card key={heaven.code} className="hover:shadow-lg transition-shadow border-primary/30">
-                    <CardHeader>
-                      <div className="flex items-start gap-4">
-                        <div className="p-3 rounded-lg bg-primary/10">
-                          <Badge className="text-lg px-3 py-1">{heaven.code}</Badge>
-                        </div>
-                        <div className="flex-1">
-                          <CardTitle className="text-xl mb-2">{heaven.name}</CardTitle>
-                          <CardDescription className="mb-3">{heaven.description}</CardDescription>
-                          <div className="space-y-2 text-sm">
-                            <div className="p-2 rounded bg-destructive/10">
-                              <span className="font-semibold">Judgment:</span> {heaven.judgment}
-                            </div>
-                            <div className="p-2 rounded bg-primary/10">
-                              <span className="font-semibold">Renewal:</span> {heaven.renewal}
-                            </div>
-                            <div className="flex items-center gap-4 text-xs text-muted-foreground pt-2">
-                              <div><span className="font-semibold">Cycles:</span> {heaven.cycles}</div>
-                              <div><span className="font-semibold">Key Texts:</span> {heaven.texts}</div>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </CardHeader>
-                  </Card>
-                ))}
-              </div>
-            </div>
-
-            {/* Prophecy Watch Link */}
-            <Card className="bg-gradient-to-br from-primary/10 via-accent/10 to-primary/5 border-primary/30">
-              <CardHeader>
-                <div className="flex items-center justify-between">
-                  <div>
-                    <CardTitle className="text-2xl flex items-center gap-2">
-                      <Sparkles className="h-6 w-6 text-primary" />
-                      Current Prophecy Updates
-                    </CardTitle>
-                    <CardDescription className="mt-2">
-                      Track real-time fulfillment of biblical prophecy in today's world
-                    </CardDescription>
-                  </div>
-                  <Button onClick={() => navigate('/prophecy-watch')} className="gap-2">
-                    View Updates
-                    <ChevronRight className="h-4 w-4" />
-                  </Button>
-                </div>
-              </CardHeader>
-              <CardContent>
-                <div className="grid gap-3 md:grid-cols-3">
-                  <div className="p-3 rounded-lg bg-background/50">
-                    <div className="font-semibold text-sm mb-1">World Events</div>
-                    <div className="text-xs text-muted-foreground">
-                      Current events mapped to prophetic timelines
-                    </div>
-                  </div>
-                  <div className="p-3 rounded-lg bg-background/50">
-                    <div className="font-semibold text-sm mb-1">Signs Tracking</div>
-                    <div className="text-xs text-muted-foreground">
-                      Monitor fulfillment of end-time signs
-                    </div>
-                  </div>
-                  <div className="p-3 rounded-lg bg-background/50">
-                    <div className="font-semibold text-sm mb-1">Biblical Analysis</div>
-                    <div className="text-xs text-muted-foreground">
-                      Compare headlines with Scripture
-                    </div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          <TabsContent value="symbols" className="space-y-6">
-            <div className="text-center mb-6">
-              <h2 className="text-3xl font-bold mb-2">Symbol Library</h2>
-              <p className="text-muted-foreground">God's universal language across Scripture</p>
-            </div>
-
-            {symbols.map((section, idx) => (
-              <Card key={idx} className="hover:shadow-lg transition-shadow">
+            <TabsContent value="encyclopedia" className="space-y-6">
+              {/* Header */}
+              <Card variant="glass" className="border-primary/30">
                 <CardHeader>
-                  <div className="flex items-center gap-3">
-                    <Code className="h-6 w-6 text-primary" />
-                    <CardTitle>{section.category}</CardTitle>
-                  </div>
+                  <CardTitle className="text-3xl flex items-center gap-2">
+                    <Book className="h-8 w-8 text-primary" />
+                    Bible Encyclopedia
+                  </CardTitle>
+                  <CardDescription className="text-lg">
+                    Comprehensive biblical reference powered by AI with Seventh-day Adventist understanding
+                  </CardDescription>
                 </CardHeader>
-                <CardContent>
-                  <div className="space-y-2">
-                    {section.items.map((item, i) => (
-                      <div key={i} className="flex items-start gap-3 p-3 rounded-lg bg-accent/50 hover:bg-accent transition-colors">
-                        {item.symbol && (
+              </Card>
+
+              {/* Search Categories */}
+              <div className="grid gap-3 md:grid-cols-5">
+                <Button
+                  variant={searchCategory === "events" ? "default" : "outline"}
+                  className={searchCategory === "events" ? "gradient-palace text-white" : "backdrop-blur-sm bg-background/50"}
+                  onClick={() => setSearchCategory("events")}
+                >
+                  <Calendar className="h-4 w-4 mr-2" />
+                  Events
+                </Button>
+                <Button
+                  variant={searchCategory === "maps" ? "default" : "outline"}
+                  className={searchCategory === "maps" ? "gradient-palace text-white" : "backdrop-blur-sm bg-background/50"}
+                  onClick={() => setSearchCategory("maps")}
+                >
+                  <MapPin className="h-4 w-4 mr-2" />
+                  Maps
+                </Button>
+                <Button
+                  variant={searchCategory === "prophecy" ? "default" : "outline"}
+                  className={searchCategory === "prophecy" ? "gradient-palace text-white" : "backdrop-blur-sm bg-background/50"}
+                  onClick={() => setSearchCategory("prophecy")}
+                >
+                  <Sparkles className="h-4 w-4 mr-2" />
+                  Prophecy
+                </Button>
+                <Button
+                  variant={searchCategory === "charts" ? "default" : "outline"}
+                  className={searchCategory === "charts" ? "gradient-palace text-white" : "backdrop-blur-sm bg-background/50"}
+                  onClick={() => setSearchCategory("charts")}
+                >
+                  <BarChart3 className="h-4 w-4 mr-2" />
+                  Charts
+                </Button>
+                <Button
+                  variant={searchCategory === "people" ? "default" : "outline"}
+                  className={searchCategory === "people" ? "gradient-palace text-white" : "backdrop-blur-sm bg-background/50"}
+                  onClick={() => setSearchCategory("people")}
+                >
+                  <Users className="h-4 w-4 mr-2" />
+                  People
+                </Button>
+              </div>
+
+              {/* Search Interface */}
+              <Card variant="glass">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Search className="h-5 w-5" />
+                    {searchCategory === "events" && "Search Biblical Events"}
+                    {searchCategory === "maps" && "Search Places & Geography"}
+                    {searchCategory === "prophecy" && "Search Prophetic Events (SDA Understanding)"}
+                    {searchCategory === "charts" && "Search Timelines & Charts"}
+                    {searchCategory === "people" && "Search Biblical People"}
+                  </CardTitle>
+                  <CardDescription>
+                    {searchCategory === "events" && "Major events, miracles, and historical moments in scripture"}
+                    {searchCategory === "maps" && "Biblical locations, journeys, and geographical context"}
+                    {searchCategory === "prophecy" && "Prophetic timelines and end-time events from an SDA perspective"}
+                    {searchCategory === "charts" && "Visual timelines, genealogies, and comparative charts"}
+                    {searchCategory === "people" && "Biographical information about biblical figures"}
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="flex gap-2">
+                    <Input
+                      placeholder={`Search ${searchCategory}...`}
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter" && searchQuery.trim()) {
+                          handleSearch();
+                        }
+                      }}
+                      disabled={isSearching}
+                      className="backdrop-blur-sm bg-background/50"
+                    />
+                    <Button
+                      onClick={handleSearch}
+                      disabled={!searchQuery.trim() || isSearching}
+                      className="gradient-palace text-white shadow-elegant"
+                    >
+                      {isSearching ? (
+                        <>
+                          <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                          Searching...
+                        </>
+                      ) : (
+                        <>
+                          <Search className="h-4 w-4 mr-2" />
+                          Search
+                        </>
+                      )}
+                    </Button>
+                  </div>
+
+                  {/* Quick Examples */}
+                  {!searchResults && (
+                    <div className="pt-4 border-t border-border/50">
+                      <div className="text-sm font-semibold mb-2 text-muted-foreground">Quick Examples:</div>
+                      <div className="flex gap-2 flex-wrap">
+                        {searchCategory === "events" && (
                           <>
-                            <div className="flex-shrink-0 w-32">
-                              <Badge variant="outline" className="w-full justify-center">{item.symbol}</Badge>
-                            </div>
-                            <ChevronRight className="h-4 w-4 text-primary mt-1 flex-shrink-0" />
-                            <div className="text-sm flex-1">{item.meaning}</div>
+                            <Badge variant="outline" className="cursor-pointer hover:bg-primary/10 backdrop-blur-sm" onClick={() => { setSearchQuery("Exodus from Egypt"); }}>Exodus from Egypt</Badge>
+                            <Badge variant="outline" className="cursor-pointer hover:bg-primary/10 backdrop-blur-sm" onClick={() => { setSearchQuery("Babylonian Captivity"); }}>Babylonian Captivity</Badge>
+                            <Badge variant="outline" className="cursor-pointer hover:bg-primary/10 backdrop-blur-sm" onClick={() => { setSearchQuery("Pentecost"); }}>Pentecost</Badge>
                           </>
                         )}
-                        {item.event1 && (
-                          <div className="flex-1 space-y-1 text-sm">
-                            <div className="flex items-center gap-2">
-                              <Badge variant="outline" className="text-xs">{item.event1}</Badge>
-                              <span className="text-muted-foreground">↔</span>
-                              <Badge variant="outline" className="text-xs">{item.event2}</Badge>
-                            </div>
-                            <div className="text-muted-foreground">{item.parallel}</div>
-                          </div>
+                        {searchCategory === "maps" && (
+                          <>
+                            <Badge variant="outline" className="cursor-pointer hover:bg-primary/10 backdrop-blur-sm" onClick={() => { setSearchQuery("Jerusalem in Jesus' time"); }}>Jerusalem in Jesus' time</Badge>
+                            <Badge variant="outline" className="cursor-pointer hover:bg-primary/10 backdrop-blur-sm" onClick={() => { setSearchQuery("Paul's missionary journeys"); }}>Paul's journeys</Badge>
+                            <Badge variant="outline" className="cursor-pointer hover:bg-primary/10 backdrop-blur-sm" onClick={() => { setSearchQuery("The Promised Land"); }}>Promised Land</Badge>
+                          </>
+                        )}
+                        {searchCategory === "prophecy" && (
+                          <>
+                            <Badge variant="outline" className="cursor-pointer hover:bg-primary/10 backdrop-blur-sm" onClick={() => { setSearchQuery("70 weeks prophecy"); }}>70 weeks prophecy</Badge>
+                            <Badge variant="outline" className="cursor-pointer hover:bg-primary/10 backdrop-blur-sm" onClick={() => { setSearchQuery("2300 day prophecy"); }}>2300 days</Badge>
+                            <Badge variant="outline" className="cursor-pointer hover:bg-primary/10 backdrop-blur-sm" onClick={() => { setSearchQuery("Mark of the Beast"); }}>Mark of the Beast</Badge>
+                          </>
+                        )}
+                        {searchCategory === "charts" && (
+                          <>
+                            <Badge variant="outline" className="cursor-pointer hover:bg-primary/10 backdrop-blur-sm" onClick={() => { setSearchQuery("Daniel 2 timeline"); }}>Daniel 2 timeline</Badge>
+                            <Badge variant="outline" className="cursor-pointer hover:bg-primary/10 backdrop-blur-sm" onClick={() => { setSearchQuery("Kings of Israel and Judah"); }}>Kings chart</Badge>
+                            <Badge variant="outline" className="cursor-pointer hover:bg-primary/10 backdrop-blur-sm" onClick={() => { setSearchQuery("Sanctuary services"); }}>Sanctuary services</Badge>
+                          </>
+                        )}
+                        {searchCategory === "people" && (
+                          <>
+                            <Badge variant="outline" className="cursor-pointer hover:bg-primary/10 backdrop-blur-sm" onClick={() => { setSearchQuery("King David"); }}>King David</Badge>
+                            <Badge variant="outline" className="cursor-pointer hover:bg-primary/10 backdrop-blur-sm" onClick={() => { setSearchQuery("Apostle Paul"); }}>Apostle Paul</Badge>
+                            <Badge variant="outline" className="cursor-pointer hover:bg-primary/10 backdrop-blur-sm" onClick={() => { setSearchQuery("Prophet Daniel"); }}>Prophet Daniel</Badge>
+                          </>
                         )}
                       </div>
-                    ))}
-                  </div>
+                    </div>
+                  )}
+
+                  {/* Results */}
+                  {searchResults && (
+                    <div className="pt-4 border-t border-border/50">
+                      <div className="prose prose-sm max-w-none dark:prose-invert">
+                        <div className="whitespace-pre-wrap">{searchResults}</div>
+                      </div>
+                    </div>
+                  )}
                 </CardContent>
               </Card>
-            ))}
-          </TabsContent>
-
-          <TabsContent value="memory" className="space-y-6">
-            <div className="text-center mb-6">
-              <h2 className="text-3xl font-bold mb-2">Memory Tools</h2>
-              <p className="text-muted-foreground">Transform Scripture into unforgettable visual patterns</p>
-            </div>
-
-            <div className="grid gap-6 md:grid-cols-2">
-              {memoryTools.map((tool, idx) => (
-                <Card key={idx} className="hover:shadow-lg transition-shadow">
-                  <CardHeader>
-                    <div className="flex items-center gap-3">
-                      <ImageIcon className="h-6 w-6 text-primary" />
-                      <CardTitle>{tool.name}</CardTitle>
-                    </div>
-                    <CardDescription>{tool.description}</CardDescription>
-                  </CardHeader>
-                  <CardContent className="space-y-3">
-                    <div className="p-3 rounded-lg bg-accent/50">
-                      <div className="text-xs font-semibold text-muted-foreground mb-1">Example:</div>
-                      <div className="text-sm">{tool.example}</div>
-                    </div>
-                    <div className="p-3 rounded-lg bg-primary/10">
-                      <div className="text-xs font-semibold text-muted-foreground mb-1">Purpose:</div>
-                      <div className="text-sm">{tool.purpose}</div>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-
-            {/* Integration Card */}
-            <Card className="border-primary/50 mt-8">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Sparkles className="h-5 w-5" />
-                  Start Using These Tools
-                </CardTitle>
-                <CardDescription>
-                  All memory tools are integrated throughout the Phototheology app
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-2">
-                <Button variant="outline" className="w-full justify-between" onClick={() => navigate("/palace")}>
-                  Explore the Palace
-                  <ChevronRight className="h-4 w-4" />
-                </Button>
-                <Button variant="outline" className="w-full justify-between" onClick={() => navigate("/bible-rendered-room")}>
-                  Bible Rendered Room
-                  <ChevronRight className="h-4 w-4" />
-                </Button>
-                <Button variant="outline" className="w-full justify-between" onClick={() => navigate("/bible")}>
-                  Study Scripture
-                  <ChevronRight className="h-4 w-4" />
-                </Button>
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          <TabsContent value="encyclopedia" className="space-y-6">
-            {/* Header */}
-            <Card className="bg-gradient-to-br from-primary/10 via-accent/10 to-primary/5 border-primary/30">
-              <CardHeader>
-                <CardTitle className="text-3xl flex items-center gap-2">
-                  <Book className="h-8 w-8 text-primary" />
-                  Bible Encyclopedia
-                </CardTitle>
-                <CardDescription className="text-lg">
-                  Comprehensive biblical reference powered by AI with Seventh-day Adventist understanding
-                </CardDescription>
-              </CardHeader>
-            </Card>
-
-            {/* Search Categories */}
-            <div className="grid gap-3 md:grid-cols-5">
-              <Button
-                variant={searchCategory === "events" ? "default" : "outline"}
-                className={searchCategory === "events" ? "gradient-palace text-white" : ""}
-                onClick={() => setSearchCategory("events")}
-              >
-                <Calendar className="h-4 w-4 mr-2" />
-                Events
-              </Button>
-              <Button
-                variant={searchCategory === "maps" ? "default" : "outline"}
-                className={searchCategory === "maps" ? "gradient-palace text-white" : ""}
-                onClick={() => setSearchCategory("maps")}
-              >
-                <MapPin className="h-4 w-4 mr-2" />
-                Maps
-              </Button>
-              <Button
-                variant={searchCategory === "prophecy" ? "default" : "outline"}
-                className={searchCategory === "prophecy" ? "gradient-palace text-white" : ""}
-                onClick={() => setSearchCategory("prophecy")}
-              >
-                <Sparkles className="h-4 w-4 mr-2" />
-                Prophecy
-              </Button>
-              <Button
-                variant={searchCategory === "charts" ? "default" : "outline"}
-                className={searchCategory === "charts" ? "gradient-palace text-white" : ""}
-                onClick={() => setSearchCategory("charts")}
-              >
-                <BarChart3 className="h-4 w-4 mr-2" />
-                Charts
-              </Button>
-              <Button
-                variant={searchCategory === "people" ? "default" : "outline"}
-                className={searchCategory === "people" ? "gradient-palace text-white" : ""}
-                onClick={() => setSearchCategory("people")}
-              >
-                <Users className="h-4 w-4 mr-2" />
-                People
-              </Button>
-            </div>
-
-            {/* Search Interface */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Search className="h-5 w-5" />
-                  {searchCategory === "events" && "Search Biblical Events"}
-                  {searchCategory === "maps" && "Search Places & Geography"}
-                  {searchCategory === "prophecy" && "Search Prophetic Events (SDA Understanding)"}
-                  {searchCategory === "charts" && "Search Timelines & Charts"}
-                  {searchCategory === "people" && "Search Biblical People"}
-                </CardTitle>
-                <CardDescription>
-                  {searchCategory === "events" && "Major events, miracles, and historical moments in scripture"}
-                  {searchCategory === "maps" && "Biblical locations, journeys, and geographical context"}
-                  {searchCategory === "prophecy" && "Prophetic timelines and end-time events from an SDA perspective"}
-                  {searchCategory === "charts" && "Visual timelines, genealogies, and comparative charts"}
-                  {searchCategory === "people" && "Biographical information about biblical figures"}
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="flex gap-2">
-                  <Input
-                    placeholder={`Search ${searchCategory}...`}
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    onKeyDown={(e) => {
-                      if (e.key === "Enter" && searchQuery.trim()) {
-                        handleSearch();
-                      }
-                    }}
-                    disabled={isSearching}
-                  />
-                  <Button
-                    onClick={handleSearch}
-                    disabled={!searchQuery.trim() || isSearching}
-                    className="gradient-palace text-white"
-                  >
-                    {isSearching ? (
-                      <>
-                        <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                        Searching...
-                      </>
-                    ) : (
-                      <>
-                        <Search className="h-4 w-4 mr-2" />
-                        Search
-                      </>
-                    )}
-                  </Button>
-                </div>
-
-                {/* Quick Examples */}
-                {!searchResults && (
-                  <div className="pt-4 border-t">
-                    <div className="text-sm font-semibold mb-2 text-muted-foreground">Quick Examples:</div>
-                    <div className="flex gap-2 flex-wrap">
-                      {searchCategory === "events" && (
-                        <>
-                          <Badge variant="outline" className="cursor-pointer hover:bg-primary/10" onClick={() => { setSearchQuery("Exodus from Egypt"); }}>Exodus from Egypt</Badge>
-                          <Badge variant="outline" className="cursor-pointer hover:bg-primary/10" onClick={() => { setSearchQuery("Babylonian Captivity"); }}>Babylonian Captivity</Badge>
-                          <Badge variant="outline" className="cursor-pointer hover:bg-primary/10" onClick={() => { setSearchQuery("Pentecost"); }}>Pentecost</Badge>
-                        </>
-                      )}
-                      {searchCategory === "maps" && (
-                        <>
-                          <Badge variant="outline" className="cursor-pointer hover:bg-primary/10" onClick={() => { setSearchQuery("Jerusalem in Jesus' time"); }}>Jerusalem in Jesus' time</Badge>
-                          <Badge variant="outline" className="cursor-pointer hover:bg-primary/10" onClick={() => { setSearchQuery("Paul's missionary journeys"); }}>Paul's journeys</Badge>
-                          <Badge variant="outline" className="cursor-pointer hover:bg-primary/10" onClick={() => { setSearchQuery("The Promised Land"); }}>Promised Land</Badge>
-                        </>
-                      )}
-                      {searchCategory === "prophecy" && (
-                        <>
-                          <Badge variant="outline" className="cursor-pointer hover:bg-primary/10" onClick={() => { setSearchQuery("70 weeks prophecy"); }}>70 weeks prophecy</Badge>
-                          <Badge variant="outline" className="cursor-pointer hover:bg-primary/10" onClick={() => { setSearchQuery("2300 day prophecy"); }}>2300 days</Badge>
-                          <Badge variant="outline" className="cursor-pointer hover:bg-primary/10" onClick={() => { setSearchQuery("Mark of the Beast"); }}>Mark of the Beast</Badge>
-                        </>
-                      )}
-                      {searchCategory === "charts" && (
-                        <>
-                          <Badge variant="outline" className="cursor-pointer hover:bg-primary/10" onClick={() => { setSearchQuery("Daniel 2 timeline"); }}>Daniel 2 timeline</Badge>
-                          <Badge variant="outline" className="cursor-pointer hover:bg-primary/10" onClick={() => { setSearchQuery("Kings of Israel and Judah"); }}>Kings chart</Badge>
-                          <Badge variant="outline" className="cursor-pointer hover:bg-primary/10" onClick={() => { setSearchQuery("Sanctuary services"); }}>Sanctuary services</Badge>
-                        </>
-                      )}
-                      {searchCategory === "people" && (
-                        <>
-                          <Badge variant="outline" className="cursor-pointer hover:bg-primary/10" onClick={() => { setSearchQuery("King David"); }}>King David</Badge>
-                          <Badge variant="outline" className="cursor-pointer hover:bg-primary/10" onClick={() => { setSearchQuery("Apostle Paul"); }}>Apostle Paul</Badge>
-                          <Badge variant="outline" className="cursor-pointer hover:bg-primary/10" onClick={() => { setSearchQuery("Prophet Daniel"); }}>Prophet Daniel</Badge>
-                        </>
-                      )}
-                    </div>
-                  </div>
-                )}
-
-                {/* Results */}
-                {searchResults && (
-                  <div className="pt-4 border-t">
-                    <div className="prose prose-sm max-w-none dark:prose-invert">
-                      <div className="whitespace-pre-wrap">{searchResults}</div>
-                    </div>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-          </TabsContent>
-        </Tabs>
+            </TabsContent>
+          </Tabs>
+        </motion.div>
       </div>
     </div>
   );
