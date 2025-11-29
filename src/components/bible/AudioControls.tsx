@@ -1,4 +1,4 @@
-import { useState, useRef, useCallback } from "react";
+import { useState, useRef, useCallback, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Select,
@@ -42,6 +42,7 @@ export const AudioControls = ({ verses, onVerseHighlight, className }: AudioCont
   const [selectedVoice, setSelectedVoice] = useState<VoiceId>("daniel");
   const [playbackRate, setPlaybackRate] = useState(1);
   
+  // Use a persistent audio element to avoid iOS autoplay restrictions
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const audioUrlRef = useRef<string | null>(null);
   const isPlayingRef = useRef(false);
@@ -49,6 +50,7 @@ export const AudioControls = ({ verses, onVerseHighlight, className }: AudioCont
   const versesRef = useRef(verses);
   const playbackRateRef = useRef(playbackRate);
   const selectedVoiceRef = useRef(selectedVoice);
+  const playVerseAtIndexRef = useRef<((index: number) => Promise<void>) | null>(null);
 
   // Keep refs in sync
   versesRef.current = verses;
@@ -57,15 +59,42 @@ export const AudioControls = ({ verses, onVerseHighlight, className }: AudioCont
 
   const playbackRates = [0.5, 0.75, 1, 1.25, 1.5, 2];
 
-  const cleanupAudio = useCallback(() => {
-    if (audioRef.current) {
-      audioRef.current.pause();
-      audioRef.current = null;
+  // Initialize persistent audio element once
+  useEffect(() => {
+    if (!audioRef.current) {
+      const audio = new Audio();
+      audio.onended = () => {
+        if (!isPlayingRef.current) return;
+        
+        const nextIndex = currentIndexRef.current + 1;
+        if (nextIndex < versesRef.current.length) {
+          playVerseAtIndexRef.current?.(nextIndex);
+        } else {
+          setIsPlaying(false);
+          isPlayingRef.current = false;
+          toast.success("Finished reading chapter");
+        }
+      };
+      
+      audio.onerror = () => {
+        console.error("Audio playback error");
+        toast.error("Audio playback failed");
+        setIsPlaying(false);
+        isPlayingRef.current = false;
+      };
+      
+      audioRef.current = audio;
     }
-    if (audioUrlRef.current) {
-      URL.revokeObjectURL(audioUrlRef.current);
-      audioUrlRef.current = null;
-    }
+    
+    return () => {
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current.src = "";
+      }
+      if (audioUrlRef.current) {
+        URL.revokeObjectURL(audioUrlRef.current);
+      }
+    };
   }, []);
 
   const generateTTS = useCallback(async (text: string, voice: VoiceId) => {
@@ -95,8 +124,9 @@ export const AudioControls = ({ verses, onVerseHighlight, className }: AudioCont
 
   const playVerseAtIndex = useCallback(async (verseIndex: number) => {
     const currentVerses = versesRef.current;
+    const audio = audioRef.current;
     
-    if (verseIndex < 0 || verseIndex >= currentVerses.length) {
+    if (verseIndex < 0 || verseIndex >= currentVerses.length || !audio) {
       setIsPlaying(false);
       isPlayingRef.current = false;
       return;
@@ -118,35 +148,39 @@ export const AudioControls = ({ verses, onVerseHighlight, className }: AudioCont
       return;
     }
 
-    cleanupAudio();
+    // Revoke old URL
+    if (audioUrlRef.current) {
+      URL.revokeObjectURL(audioUrlRef.current);
+    }
     audioUrlRef.current = url;
 
-    const audio = new Audio(url);
+    // Update existing audio element instead of creating new one
+    audio.src = url;
     audio.playbackRate = playbackRateRef.current;
-    audioRef.current = audio;
-
-    audio.onended = () => {
-      // Check if still playing before proceeding to next verse
-      if (!isPlayingRef.current) return;
-      
-      const nextIndex = currentIndexRef.current + 1;
-      if (nextIndex < versesRef.current.length) {
-        playVerseAtIndex(nextIndex);
-      } else {
-        setIsPlaying(false);
-        isPlayingRef.current = false;
-        toast.success("Finished reading chapter");
-      }
-    };
-
-    audio.onerror = () => {
-      toast.error("Audio playback failed");
+    
+    try {
+      await audio.play();
+    } catch (err) {
+      console.error("Play error:", err);
+      toast.error("Could not play audio. Please try again.");
       setIsPlaying(false);
       isPlayingRef.current = false;
-    };
+    }
+  }, [generateTTS, onVerseHighlight]);
 
-    audio.play();
-  }, [generateTTS, cleanupAudio, onVerseHighlight]);
+  // Keep the ref updated
+  // Keep the ref updated
+  playVerseAtIndexRef.current = playVerseAtIndex;
+
+  const cleanupAudio = useCallback(() => {
+    if (audioRef.current) {
+      audioRef.current.pause();
+    }
+    if (audioUrlRef.current) {
+      URL.revokeObjectURL(audioUrlRef.current);
+      audioUrlRef.current = null;
+    }
+  }, []);
 
   const play = useCallback((startVerseIndex?: number) => {
     const index = startVerseIndex ?? verses.findIndex(v => v.verse === currentVerse);
