@@ -29,7 +29,6 @@ import {
 // Phototheology Sacred Orchestral Music
 // Rich orchestral, movie soundtrack style (The Chosen, Zimmer, Tyler)
 // BPM 55-70, no lyrics, no synthesizers, pure orchestra
-// Using reliable Pixabay CDN URLs
 const AMBIENT_TRACKS = [
   // Floor 1 - Story Floor: warm strings, gentle narrative
   {
@@ -39,7 +38,7 @@ const AMBIENT_TRACKS = [
     category: "floor-1",
     floor: 1,
     mood: "warm, human, welcoming",
-    url: "https://cdn.pixabay.com/audio/2022/02/15/audio_53a0d22699.mp3",
+    url: "https://www.bensound.com/bensound-music/bensound-slowmotion.mp3",
     bpm: 60,
   },
   // Floor 2 - Pattern Floor: structured strings, reflective
@@ -50,7 +49,7 @@ const AMBIENT_TRACKS = [
     category: "floor-2",
     floor: 2,
     mood: "structured, reflective",
-    url: "https://cdn.pixabay.com/audio/2022/03/15/audio_8bfed30a64.mp3",
+    url: "https://www.bensound.com/bensound-music/bensound-thejazzpiano.mp3",
     bpm: 65,
   },
   // Floor 3 - Sanctuary Floor: reverent strings, harp
@@ -61,7 +60,7 @@ const AMBIENT_TRACKS = [
     category: "floor-3",
     floor: 3,
     mood: "holy, reverent, awe",
-    url: "https://cdn.pixabay.com/audio/2022/09/07/audio_d9b1a44ff5.mp3",
+    url: "https://www.bensound.com/bensound-music/bensound-memories.mp3",
     bpm: 58,
   },
   // Floor 4 - Christ Floor: bright, hopeful orchestra
@@ -72,7 +71,7 @@ const AMBIENT_TRACKS = [
     category: "floor-4",
     floor: 4,
     mood: "bright, hopeful, radiant",
-    url: "https://cdn.pixabay.com/audio/2022/08/02/audio_884fe92c21.mp3",
+    url: "https://www.bensound.com/bensound-music/bensound-romantictimewithyou.mp3",
     bpm: 65,
   },
   // Floor 5 - Prophecy Floor: cinematic tension, deep strings
@@ -83,7 +82,7 @@ const AMBIENT_TRACKS = [
     category: "floor-5",
     floor: 5,
     mood: "cinematic, tense, respectful",
-    url: "https://cdn.pixabay.com/audio/2022/05/16/audio_d6070a5e4c.mp3",
+    url: "https://www.bensound.com/bensound-music/bensound-evolution.mp3",
     bpm: 60,
   },
   // Floor 6 - Freestyle Floor: natural, flowing strings
@@ -94,7 +93,7 @@ const AMBIENT_TRACKS = [
     category: "floor-6",
     floor: 6,
     mood: "open, natural, free",
-    url: "https://cdn.pixabay.com/audio/2022/03/10/audio_f104cca4de.mp3",
+    url: "https://www.bensound.com/bensound-music/bensound-betterdays.mp3",
     bpm: 58,
   },
   // Floor 7 - Wisdom Floor: solemn cello, ancient feel
@@ -105,7 +104,7 @@ const AMBIENT_TRACKS = [
     category: "floor-7",
     floor: 7,
     mood: "solemn, calm, ancient",
-    url: "https://cdn.pixabay.com/audio/2022/10/25/audio_946bc3eb7f.mp3",
+    url: "https://www.bensound.com/bensound-music/bensound-pianomoment.mp3",
     bpm: 60,
   },
   // Special: Blue Room - Typology
@@ -116,7 +115,7 @@ const AMBIENT_TRACKS = [
     category: "blue-room",
     floor: 3,
     mood: "reverent, typological",
-    url: "https://cdn.pixabay.com/audio/2022/01/20/audio_7a59a02d3e.mp3",
+    url: "https://www.bensound.com/bensound-music/bensound-onceagain.mp3",
     bpm: 55,
   },
 ];
