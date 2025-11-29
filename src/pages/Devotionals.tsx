@@ -1,6 +1,9 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Book, Plus, Sparkles, Clock, Calendar, ChevronRight, Trash2, Gift, Heart, Star, Zap, Users, UserPlus, GraduationCap, Home, HeartHandshake } from "lucide-react";
+import { Navigation } from "@/components/Navigation";
+import { SimplifiedNav } from "@/components/SimplifiedNav";
+import { useUserPreferences } from "@/hooks/useUserPreferences";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -32,6 +35,7 @@ const formatLabels: Record<string, { label: string; color: string; gradient: str
 };
 
 export default function Devotionals() {
+  const { preferences } = useUserPreferences();
   const navigate = useNavigate();
   const { plans, plansLoading, deletePlan } = useDevotionals();
   const { profiles, isLoading: profilesLoading, deleteProfile } = useDevotionalProfiles();
@@ -73,6 +77,9 @@ export default function Devotionals() {
 
   return (
     <div className="min-h-screen bg-background">
+      {/* Navigation */}
+      {preferences.navigation_style === "simplified" ? <SimplifiedNav /> : <Navigation />}
+
       {/* Hero Section - Vibrant Gradient */}
       <div className="relative overflow-hidden bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-500 py-12 px-4">
         <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-20" />

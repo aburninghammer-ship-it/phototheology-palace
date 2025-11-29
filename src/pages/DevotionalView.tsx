@@ -1,6 +1,9 @@
 import { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { ArrowLeft, Check, ChevronLeft, ChevronRight, BookOpen, Sparkles, Heart, MessageSquare, Star, Loader2, Share2, Wand2, ExternalLink } from "lucide-react";
+import { Navigation } from "@/components/Navigation";
+import { SimplifiedNav } from "@/components/SimplifiedNav";
+import { useUserPreferences } from "@/hooks/useUserPreferences";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -23,6 +26,7 @@ const formatGradients: Record<string, string> = {
 export default function DevotionalView() {
   const { planId } = useParams<{ planId: string }>();
   const navigate = useNavigate();
+  const { preferences } = useUserPreferences();
   const { plan, days, completedDayIds, completeDay, planLoading, isCompleting } = useDevotionalPlan(planId || "");
   const { generateDevotional, isGenerating } = useDevotionals();
 
@@ -179,18 +183,8 @@ export default function DevotionalView() {
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Mobile Back Button - Fixed at top */}
-      <div className="md:hidden bg-background border-b px-4 py-2">
-        <Button 
-          variant="ghost" 
-          size="sm" 
-          onClick={() => navigate("/devotionals")} 
-          className="text-muted-foreground hover:text-foreground"
-        >
-          <ArrowLeft className="h-4 w-4 mr-2" />
-          Back to Devotionals
-        </Button>
-      </div>
+      {/* Navigation */}
+      {preferences.navigation_style === "simplified" ? <SimplifiedNav /> : <Navigation />}
 
       {/* Colorful Header */}
       <div className={`relative bg-gradient-to-r ${gradient} py-6 px-4`}>
