@@ -10,7 +10,8 @@ import {
   VolumeX, 
   SkipForward,
   Settings,
-  X
+  X,
+  Repeat
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
@@ -379,6 +380,10 @@ export function AmbientMusicPlayer({
     return saved === "true";
   });
   const [showControls, setShowControls] = useState(false);
+  const [isLooping, setIsLooping] = useState(() => {
+    const saved = localStorage.getItem("pt-ambient-loop");
+    return saved !== "false"; // default to true
+  });
 
   const currentTrack = AMBIENT_TRACKS.find(t => t.id === currentTrackId) || AMBIENT_TRACKS[0];
 
@@ -396,7 +401,7 @@ export function AmbientMusicPlayer({
   useEffect(() => {
     if (!audioRef.current) {
       audioRef.current = new Audio();
-      audioRef.current.loop = true;
+      audioRef.current.loop = isLooping;
     }
     
     return () => {
@@ -434,6 +439,14 @@ export function AmbientMusicPlayer({
   useEffect(() => {
     localStorage.setItem("pt-ambient-enabled", isEnabled.toString());
   }, [isEnabled]);
+
+  // Update loop setting
+  useEffect(() => {
+    if (audioRef.current) {
+      audioRef.current.loop = isLooping;
+    }
+    localStorage.setItem("pt-ambient-loop", isLooping.toString());
+  }, [isLooping]);
 
   const togglePlay = async () => {
     if (!audioRef.current) {
@@ -560,6 +573,16 @@ export function AmbientMusicPlayer({
               <Button
                 variant="ghost"
                 size="icon"
+                onClick={() => setIsLooping(!isLooping)}
+                className={cn("h-8 w-8", isLooping && "text-primary")}
+                title={isLooping ? "Loop on" : "Loop off"}
+              >
+                <Repeat className="h-4 w-4" />
+              </Button>
+              
+              <Button
+                variant="ghost"
+                size="icon"
                 onClick={toggleMute}
                 className="h-8 w-8"
               >
@@ -628,6 +651,17 @@ export function AmbientMusicPlayer({
             className="h-8 w-8 shrink-0"
           >
             <SkipForward className="h-4 w-4" />
+          </Button>
+
+          {/* Loop Toggle */}
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => setIsLooping(!isLooping)}
+            className={cn("h-8 w-8 shrink-0", isLooping && "text-primary")}
+            title={isLooping ? "Loop on" : "Loop off"}
+          >
+            <Repeat className="h-4 w-4" />
           </Button>
 
           {/* Volume */}
