@@ -9,42 +9,40 @@ interface Testimonial {
 
 const testimonials: Testimonial[] = [
   {
-    quote: "My spiritual 'pilot light' had gone out, and this teaching helped ignite it again.",
-    author: "P.S.",
-    location: "New York"
+    quote: "This is the type of joy and excitement I've always yearned for when studying the Word. These workshops are so fire! You'll be blessed by the way the Spirit shows up in each training.",
+    author: "Jessica"
   },
   {
-    quote: "I've never heard any pastor teach like this. I was born into the church—and this is on another level.",
-    author: "R.C.",
-    location: "Australia"
+    quote: "Phototheology is a new systematic way for me to approach the Word. It helps me organize my thoughts, gives me the confidence to study with just the Holy Spirit, the Word, and me. No need for pre-made lessons.",
+    author: "Rick"
   },
   {
-    quote: "Phototheology has totally shifted how I study. The visualization tools speak directly to how my mind works—it feels like the Bible finally comes alive.",
-    author: "R.T."
+    quote: "While in class the Holy Spirit showed me the image of Christ even before Pastor Ivor explained it! I thank The Lord for Phototheology.",
+    author: "Mitchell"
   },
   {
-    quote: "I'm in love with the Phototheology method—it's the blueprint to life.",
-    author: "T.D."
+    quote: "Photo-Theology has been a game changer in my personal Bible studies and sermon preparations. It constantly reminds me that the scriptures are divinely inspired.",
+    author: "Teddy"
+  },
+  {
+    quote: "The system of Phototheology is literally mind blowing! It has helped me see and understand Jesus more clearly, specifically in terms of His character and His role in prophecy.",
+    author: "Theo"
+  },
+  {
+    quote: "I'm in love with the Photo-Theology method—it's the blueprint to life.",
+    author: "Toccara"
   },
   {
     quote: "This was transforming—life changing. You can't help but fall in love with God all over again.",
-    author: "Z.D."
+    author: "Ziyanda"
   },
   {
     quote: "There's so much depth in Phototheology that I find myself going back to the beginning just to take it in slowly.",
-    author: "A."
+    author: "Alan"
   },
   {
     quote: "This connected the whole Bible for me. It's all connected.",
-    author: "A.K."
-  },
-  {
-    quote: "This has truly been a blessing. We're on a beautiful journey.",
-    author: "B.D."
-  },
-  {
-    quote: "Thank you so much for bringing this incredible app to the masses like me. What a gift from God! I've already started exploring and am already \"addicted\" to more in depth Bible study. The Bible is becoming more alive and meaningful to me already! God bless you!",
-    author: "Bert"
+    author: "Akila"
   }
 ];
 

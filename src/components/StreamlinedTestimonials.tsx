@@ -3,19 +3,19 @@ import { Quote } from "lucide-react";
 
 const testimonials = [
   {
-    quote: "Phototheology changed the way I read Scripture forever. I finally see how everything connects.",
-    author: "Sarah M.",
-    role: "Bible Study Leader",
+    quote: "My spiritual 'pilot light' had gone out, and this teaching helped ignite it again.",
+    author: "Paul",
+    role: "New York",
   },
   {
-    quote: "My Bible study group has never been more engaged. Jeeves is a game-changer.",
-    author: "Pastor David L.",
-    role: "Church Pastor",
+    quote: "I've never heard any pastor teach like this. I was born into the church—and this is on another level.",
+    author: "Roven",
+    role: "Australia",
   },
   {
-    quote: "I can finally remember what I study. The palace system actually works.",
-    author: "Michael T.",
-    role: "Seminary Student",
+    quote: "Phototheology has totally shifted how I study. The visualization tools speak directly to how my mind works—it feels like the Bible finally comes alive.",
+    author: "Renee",
+    role: "Bible Student",
   },
 ];
 
@@ -24,10 +24,10 @@ export const StreamlinedTestimonials = () => {
     <section className="py-20 px-4 sm:px-6 lg:px-8 bg-muted/20">
       <div className="max-w-6xl mx-auto">
         <h2 className="text-4xl md:text-5xl font-bold text-center mb-4">
-          What Users Are Saying
+          What Students Are Saying
         </h2>
         <p className="text-xl text-muted-foreground text-center mb-12">
-          Real results from real people
+          Real testimonials from Phototheology students around the world
         </p>
         
         <div className="grid md:grid-cols-3 gap-6">
