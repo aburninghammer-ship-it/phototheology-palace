@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Navigation } from "@/components/Navigation";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { GlassBubbles } from "@/components/ui/glass-bubbles";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
@@ -460,7 +461,7 @@ export default function SpiritualTraining() {
         </section>
 
         {/* Daily Encouragement */}
-        <Card className="border-primary/20">
+        <Card variant="glass" className="border-primary/20">
           <CardHeader>
             <div className="flex items-center gap-2">
               <Flame className="w-6 h-6 text-orange-500" />
@@ -520,7 +521,7 @@ export default function SpiritualTraining() {
               />
             ) : (
               <div className="space-y-4">
-                <Card>
+                <Card variant="glass">
                   <CardHeader>
                     <CardTitle>Art of War Training Manual</CardTitle>
                     <CardDescription>
@@ -560,7 +561,7 @@ export default function SpiritualTraining() {
 
           {/* Battle Scenarios */}
           <TabsContent value="scenarios" className="space-y-4">
-            <Card>
+            <Card variant="glass">
               <CardHeader>
                 <div className="flex items-center gap-2">
                   <Target className="w-6 h-6 text-primary" />
@@ -574,7 +575,7 @@ export default function SpiritualTraining() {
                 {!selectedScenario ? (
                   <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
                     {TRAINING_SCENARIOS.map((scenario) => (
-                      <Card key={scenario.id} className="cursor-pointer hover:border-primary transition-colors">
+                      <Card key={scenario.id} variant="glass" className="cursor-pointer hover:border-primary transition-colors">
                         <CardHeader onClick={() => setSelectedScenario(scenario)}>
                           <CardTitle className="text-lg">{scenario.title}</CardTitle>
                           <CardDescription className="line-clamp-3">
@@ -628,7 +629,7 @@ export default function SpiritualTraining() {
                     </div>
 
                     {showResult && userAnswer !== null && (
-                      <Card className={userAnswer === 0 ? "border-green-500" : "border-orange-500"}>
+                      <Card variant="glass" className={userAnswer === 0 ? "border-green-500" : "border-orange-500"}>
                         <CardContent className="pt-6">
                           <p className="mb-4">{selectedScenario.options[userAnswer].explanation}</p>
                           <div className="flex gap-2">
@@ -645,7 +646,7 @@ export default function SpiritualTraining() {
 
           {/* Besetting Sins */}
           <TabsContent value="besetting" className="space-y-4">
-            <Card>
+            <Card variant="glass">
               <CardHeader>
                 <CardTitle>Besetting Sins: Know Your Enemy</CardTitle>
                 <CardDescription>
@@ -655,7 +656,7 @@ export default function SpiritualTraining() {
               <CardContent>
                 <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
                   {BESETTING_SINS.map((sin) => (
-                    <Card key={sin.name} className="border-2 border-destructive/20">
+                    <Card key={sin.name} variant="glass" className="border-2 border-destructive/20">
                       <CardHeader>
                         <CardTitle className="text-lg text-destructive">{sin.name}</CardTitle>
                         <CardDescription className="space-y-2">
@@ -684,7 +685,7 @@ export default function SpiritualTraining() {
 
           {/* Animal Styles */}
           <TabsContent value="animals" className="space-y-4">
-            <Card>
+            <Card variant="glass">
               <CardHeader>
                 <CardTitle>Biblical Animal Styles</CardTitle>
                 <CardDescription>
@@ -694,7 +695,7 @@ export default function SpiritualTraining() {
               <CardContent>
                 <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
                   {ANIMAL_STYLES.map((animal) => (
-                    <Card key={animal.name} className="border-2">
+                    <Card key={animal.name} variant="glass" className="border-2">
                       <CardHeader>
                         <div className="flex items-center gap-2">
                           <div className={`w-4 h-4 rounded-full ${animal.color}`} />
@@ -714,7 +715,7 @@ export default function SpiritualTraining() {
 
           {/* Spiritual Weapons */}
           <TabsContent value="weapons" className="space-y-4">
-            <Card>
+            <Card variant="glass">
               <CardHeader>
                 <CardTitle>Armor of God: Spiritual Weapons</CardTitle>
                 <CardDescription>
@@ -724,7 +725,7 @@ export default function SpiritualTraining() {
               <CardContent>
                 <div className="grid gap-4 md:grid-cols-2">
                   {SPIRITUAL_WEAPONS.map((weapon) => (
-                    <Card key={weapon.name} className="border-2">
+                    <Card key={weapon.name} variant="glass" className="border-2">
                       <CardHeader>
                         <div className="flex items-center gap-2">
                           <div className={`w-4 h-4 rounded-full ${weapon.color}`} />
@@ -742,7 +743,7 @@ export default function SpiritualTraining() {
             </Card>
 
             {/* AI-Powered Weapon Application */}
-            <Card className="border-primary/20">
+            <Card variant="glass" className="border-primary/20">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Shield className="w-5 h-5" />
@@ -805,7 +806,7 @@ export default function SpiritualTraining() {
                 </Button>
 
                 {weaponGuidance && (
-                  <Card className="bg-muted/50">
+                  <Card variant="glass" className="bg-muted/50">
                     <CardContent className="pt-6">
                       <div className="prose prose-sm max-w-none">
                         <div className="whitespace-pre-wrap">{weaponGuidance}</div>
@@ -819,7 +820,7 @@ export default function SpiritualTraining() {
 
           {/* Fruits of the Spirit Training */}
           <TabsContent value="fruits" className="space-y-4">
-            <Card>
+            <Card variant="glass">
               <CardHeader>
                 <CardTitle>9 Fruits of the Spirit</CardTitle>
                 <CardDescription>
@@ -829,7 +830,7 @@ export default function SpiritualTraining() {
               <CardContent>
                 <div className="grid gap-4 md:grid-cols-3">
                   {FRUITS_OF_SPIRIT.map((fruit) => (
-                    <Card key={fruit.name} className="border-2">
+                    <Card key={fruit.name} variant="glass" className="border-2">
                       <CardHeader>
                         <div className="flex items-center gap-2">
                           <div className={`w-4 h-4 rounded-full ${fruit.color}`} />
@@ -853,7 +854,7 @@ export default function SpiritualTraining() {
                 { title: "The Blueprint Course", description: "Foundation for spiritual warfare", icon: Shield, link: "/blueprint-course" },
                 { title: "Revelation Course", description: "Understanding end-time warfare", icon: Flame, link: null },
               ].map((course) => (
-                <Card key={course.title}>
+                <Card key={course.title} variant="glass">
                   <CardHeader>
                     <div className="flex items-center gap-2">
                       <course.icon className="w-6 h-6 text-primary" />
@@ -887,7 +888,7 @@ export default function SpiritualTraining() {
         </Tabs>
 
         {/* Divine Objective Section */}
-        <Card>
+        <Card variant="glass">
           <CardHeader>
             <CardTitle>Divine Objective: Contain and Destroy</CardTitle>
             <CardDescription>
