@@ -3,6 +3,13 @@ import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
 import { Card, CardContent } from "@/components/ui/card";
 import { 
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { 
   Play, 
   Pause, 
   Volume2, 
@@ -10,18 +17,21 @@ import {
   SkipForward, 
   SkipBack,
   Loader2,
-  Headphones
+  Headphones,
+  Mic
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
+import { ELEVENLABS_VOICES, VoiceId } from "@/hooks/useTextToSpeech";
 
 interface AudioNarratorProps {
   text: string;
   title?: string;
   className?: string;
   autoPlay?: boolean;
-  voice?: "alloy" | "echo" | "fable" | "onyx" | "nova" | "shimmer";
+  voice?: VoiceId;
+  showVoiceSelector?: boolean;
 }
 
 export const AudioNarrator = ({ 
@@ -29,7 +39,8 @@ export const AudioNarrator = ({
   title,
   className,
   autoPlay = false,
-  voice = "nova"
+  voice: initialVoice = "daniel",
+  showVoiceSelector = true
 }: AudioNarratorProps) => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -38,6 +49,7 @@ export const AudioNarrator = ({
   const [progress, setProgress] = useState(0);
   const [duration, setDuration] = useState(0);
   const [audioUrl, setAudioUrl] = useState<string | null>(null);
+  const [selectedVoice, setSelectedVoice] = useState<VoiceId>(initialVoice);
   
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
@@ -54,6 +66,22 @@ export const AudioNarrator = ({
     };
   }, [audioUrl]);
 
+  // Reset audio when voice changes
+  const handleVoiceChange = (voice: VoiceId) => {
+    setSelectedVoice(voice);
+    // Clear existing audio so it regenerates with new voice
+    if (audioUrl) {
+      URL.revokeObjectURL(audioUrl);
+      setAudioUrl(null);
+    }
+    if (audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current = null;
+    }
+    setIsPlaying(false);
+    setProgress(0);
+  };
+
   const generateAudio = async () => {
     if (audioUrl) {
       // Already have audio, just play it
@@ -64,14 +92,14 @@ export const AudioNarrator = ({
     setIsLoading(true);
     try {
       const { data, error } = await supabase.functions.invoke("text-to-speech", {
-        body: { text, voice }
+        body: { text, voice: selectedVoice }
       });
 
       if (error) throw error;
 
       if (data?.audioContent) {
         // Convert base64 to blob
-        const audioBlob = base64ToBlob(data.audioContent, "audio/mp3");
+        const audioBlob = base64ToBlob(data.audioContent, "audio/mpeg");
         const url = URL.createObjectURL(audioBlob);
         setAudioUrl(url);
         
@@ -94,9 +122,9 @@ export const AudioNarrator = ({
 
         audio.volume = volume / 100;
         
-        if (autoPlay) {
-          playAudio();
-        }
+        // Auto-play after generation
+        audio.play();
+        setIsPlaying(true);
       }
     } catch (error) {
       console.error("Error generating audio:", error);
@@ -171,16 +199,41 @@ export const AudioNarrator = ({
     return `${mins}:${secs.toString().padStart(2, "0")}`;
   };
 
+  const selectedVoiceInfo = ELEVENLABS_VOICES.find(v => v.id === selectedVoice);
+
   return (
     <Card className={cn("overflow-hidden", className)}>
       <div className="h-1 bg-gradient-to-r from-primary via-accent to-primary" />
-      <CardContent className="p-4">
-        {title && (
-          <div className="flex items-center gap-2 mb-3 text-sm font-medium">
-            <Headphones className="h-4 w-4 text-primary" />
-            {title}
-          </div>
-        )}
+      <CardContent className="p-4 space-y-3">
+        <div className="flex items-center justify-between">
+          {title && (
+            <div className="flex items-center gap-2 text-sm font-medium">
+              <Headphones className="h-4 w-4 text-primary" />
+              {title}
+            </div>
+          )}
+          
+          {showVoiceSelector && (
+            <div className="flex items-center gap-2">
+              <Mic className="h-4 w-4 text-muted-foreground" />
+              <Select value={selectedVoice} onValueChange={(v) => handleVoiceChange(v as VoiceId)}>
+                <SelectTrigger className="w-[140px] h-8 text-xs">
+                  <SelectValue placeholder="Select voice" />
+                </SelectTrigger>
+                <SelectContent className="max-h-[300px]">
+                  {ELEVENLABS_VOICES.map((voice) => (
+                    <SelectItem key={voice.id} value={voice.id} className="text-xs">
+                      <div className="flex flex-col">
+                        <span className="font-medium">{voice.name}</span>
+                        <span className="text-muted-foreground text-[10px]">{voice.description}</span>
+                      </div>
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          )}
+        </div>
         
         <div className="flex items-center gap-3">
           {/* Skip Back */}

@@ -1,12 +1,12 @@
 import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Headphones, Play, Volume2, Settings, BookOpen, Film, Sparkles } from "lucide-react";
+import { Headphones, Settings, BookOpen, Film, Sparkles, Volume2 } from "lucide-react";
 import { AudioNarrator } from "./AudioNarrator";
 import { cn } from "@/lib/utils";
+import { ELEVENLABS_VOICES, VoiceId } from "@/hooks/useTextToSpeech";
 
 interface PTAudioModeProps {
   content: {
@@ -18,7 +18,7 @@ interface PTAudioModeProps {
 }
 
 export const PTAudioMode = ({ content, className }: PTAudioModeProps) => {
-  const [voice, setVoice] = useState<"nova" | "alloy" | "echo" | "onyx">("nova");
+  const [voice, setVoice] = useState<VoiceId>("daniel");
   const [autoAdvance, setAutoAdvance] = useState(true);
   const [showSettings, setShowSettings] = useState(false);
 
@@ -68,15 +68,19 @@ export const PTAudioMode = ({ content, className }: PTAudioModeProps) => {
         <div className="px-6 pb-3 space-y-3 border-b border-border">
           <div className="flex items-center justify-between">
             <label className="text-sm font-medium">Voice</label>
-            <Select value={voice} onValueChange={(v) => setVoice(v as any)}>
-              <SelectTrigger className="w-32">
+            <Select value={voice} onValueChange={(v) => setVoice(v as VoiceId)}>
+              <SelectTrigger className="w-40">
                 <SelectValue />
               </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="nova">Nova (Female)</SelectItem>
-                <SelectItem value="alloy">Alloy (Neutral)</SelectItem>
-                <SelectItem value="echo">Echo (Male)</SelectItem>
-                <SelectItem value="onyx">Onyx (Deep Male)</SelectItem>
+              <SelectContent className="max-h-[300px]">
+                {ELEVENLABS_VOICES.map((v) => (
+                  <SelectItem key={v.id} value={v.id}>
+                    <div className="flex flex-col">
+                      <span>{v.name}</span>
+                      <span className="text-xs text-muted-foreground">{v.description}</span>
+                    </div>
+                  </SelectItem>
+                ))}
               </SelectContent>
             </Select>
           </div>
@@ -100,6 +104,7 @@ export const PTAudioMode = ({ content, className }: PTAudioModeProps) => {
         <AudioNarrator 
           text={content.text}
           voice={voice}
+          showVoiceSelector={false}
         />
       </CardContent>
     </Card>
