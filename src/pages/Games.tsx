@@ -13,6 +13,7 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { VoiceChatWidget } from "@/components/voice/VoiceChatWidget";
 import { ChainChessLeaderboard, GroupEscapeRoom } from "@/components/social";
+import { UnifiedGameRankings } from "@/components/games/UnifiedGameRankings";
 
 const Games = () => {
   const { user, loading } = useAuth();
@@ -430,8 +431,9 @@ const Games = () => {
           </Button>
         </div>
 
-        {/* Multiplayer Features Section */}
-        <div className="grid md:grid-cols-2 gap-6 mb-8">
+        {/* Leaderboards Section */}
+        <div className="grid md:grid-cols-3 gap-6 mb-8">
+          <UnifiedGameRankings />
           <ChainChessLeaderboard />
           <GroupEscapeRoom />
         </div>

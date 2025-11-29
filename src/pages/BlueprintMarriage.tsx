@@ -152,7 +152,7 @@ export default function BlueprintMarriage() {
               <ScrollArea className="h-[600px] pr-4">
                 <div className="space-y-6">
                   {/* Sanctuary Meaning */}
-                  <div className="bg-muted p-4 rounded-lg">
+                  <div className="bg-background/60 backdrop-blur-sm p-4 rounded-xl border border-primary/20 shadow-lg">
                     <h3 className="font-semibold text-lg mb-2 flex items-center gap-2">
                       <BookOpen className="h-5 w-5 text-primary" />
                       Sanctuary Meaning
@@ -161,7 +161,7 @@ export default function BlueprintMarriage() {
                   </div>
 
                   {/* Marriage Principle */}
-                  <div className="bg-primary/5 p-4 rounded-lg border border-primary/20">
+                  <div className="bg-primary/10 backdrop-blur-sm p-4 rounded-xl border border-primary/30 shadow-lg">
                     <h3 className="font-semibold text-lg mb-2 flex items-center gap-2">
                       <Heart className="h-5 w-5 text-primary" />
                       Marriage Principle
@@ -182,7 +182,7 @@ export default function BlueprintMarriage() {
                   </div>
 
                   {/* Reflection Questions */}
-                  <div className="bg-yellow-50 dark:bg-yellow-950 p-4 rounded-lg">
+                  <div className="bg-yellow-500/10 backdrop-blur-sm p-4 rounded-xl border border-yellow-500/20 shadow-lg">
                     <h3 className="font-semibold text-lg mb-3">💭 Reflection Questions</h3>
                     <ul className="space-y-2">
                       {currentArticle?.reflectionQuestions.map((question, i) => (
@@ -192,7 +192,7 @@ export default function BlueprintMarriage() {
                   </div>
 
                   {/* Couple Exercises */}
-                  <div className="bg-blue-50 dark:bg-blue-950 p-4 rounded-lg">
+                  <div className="bg-blue-500/10 backdrop-blur-sm p-4 rounded-xl border border-blue-500/20 shadow-lg">
                     <h3 className="font-semibold text-lg mb-3">👫 Exercises for Couples</h3>
                     <ol className="space-y-3">
                       {currentArticle?.coupleExercises.map((exercise, i) => (
@@ -204,7 +204,7 @@ export default function BlueprintMarriage() {
                   </div>
 
                   {/* Scripture References */}
-                  <div className="bg-purple-50 dark:bg-purple-950 p-4 rounded-lg">
+                  <div className="bg-purple-500/10 backdrop-blur-sm p-4 rounded-xl border border-purple-500/20 shadow-lg">
                     <h3 className="font-semibold text-lg mb-3">📖 Scripture References</h3>
                     <ul className="space-y-1">
                       {currentArticle?.scriptureReferences.map((ref, i) => (
@@ -214,7 +214,7 @@ export default function BlueprintMarriage() {
                   </div>
 
                   {/* Prayer Prompt */}
-                  <div className="bg-primary/10 p-4 rounded-lg border border-primary/20">
+                  <div className="bg-primary/15 backdrop-blur-sm p-4 rounded-xl border border-primary/30 shadow-lg">
                     <h3 className="font-semibold text-lg mb-2 text-primary">🙏 Prayer Together</h3>
                     <p className="italic text-base">{currentArticle?.prayerPrompt}</p>
                   </div>
