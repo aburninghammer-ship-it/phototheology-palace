@@ -151,12 +151,12 @@ const AMBIENT_TRACKS = [
   },
   {
     id: "deep-ocean",
-    name: "Deep Ocean Meditation",
-    description: "Atmospheric depths with ethereal pads and soft strings",
-    category: "meditation",
+    name: "Depths of Mystery",
+    description: "Epic cinematic strings with sweeping orchestral grandeur",
+    category: "cinematic",
     floor: 7,
-    mood: "deep, mysterious, peaceful",
-    url: "https://www.bensound.com/bensound-music/bensound-relaxing.mp3",
+    mood: "epic, mysterious, majestic",
+    url: "https://www.bensound.com/bensound-music/bensound-epic.mp3",
     bpm: 55,
   },
   {
