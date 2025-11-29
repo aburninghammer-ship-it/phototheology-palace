@@ -9,6 +9,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Bot, Sparkles, BookOpen, Dumbbell, Loader2, HelpCircle, Brain, Star, TrendingUp, Building2, BookMarked, CheckCircle2, Lightbulb } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { formatJeevesResponse } from "@/lib/formatJeevesResponse";
+import { QuickAudioButton } from "@/components/audio";
 
 interface JeevesAssistantProps {
   roomTag: string;
@@ -232,9 +233,12 @@ export const JeevesAssistant = ({
               
               {exampleContent && (
                 <div className="p-4 bg-gradient-to-br from-primary/5 to-secondary/5 rounded-xl border-2 border-primary/30 animate-fade-in">
-                  <div className="flex items-center gap-2 mb-3">
-                    <Bot className="h-5 w-5 text-primary" />
-                    <span className="font-semibold text-foreground">Jeeves says:</span>
+                  <div className="flex items-center justify-between gap-2 mb-3">
+                    <div className="flex items-center gap-2">
+                      <Bot className="h-5 w-5 text-primary" />
+                      <span className="font-semibold text-foreground">Jeeves says:</span>
+                    </div>
+                    <QuickAudioButton text={exampleContent} variant="ghost" size="sm" />
                   </div>
                   <div className="prose prose-sm max-w-none text-foreground">
                     {formatJeevesResponse(exampleContent)}
@@ -270,9 +274,12 @@ export const JeevesAssistant = ({
               
               {exerciseContent && (
                 <div className="p-4 bg-gradient-to-br from-accent/5 to-palace-orange/5 rounded-xl border-2 border-accent/30 animate-fade-in">
-                  <div className="flex items-center gap-2 mb-3">
-                    <Bot className="h-5 w-5 text-accent" />
-                    <span className="font-semibold text-foreground">Practice Exercise:</span>
+                  <div className="flex items-center justify-between gap-2 mb-3">
+                    <div className="flex items-center gap-2">
+                      <Bot className="h-5 w-5 text-accent" />
+                      <span className="font-semibold text-foreground">Practice Exercise:</span>
+                    </div>
+                    <QuickAudioButton text={exerciseContent} variant="ghost" size="sm" />
                   </div>
                   <div className="prose prose-sm max-w-none text-foreground">
                     {formatJeevesResponse(exerciseContent)}
@@ -490,9 +497,12 @@ export const JeevesAssistant = ({
               
               {answer && (
                 <div className="p-4 bg-gradient-to-br from-green-500/5 to-emerald-500/5 rounded-xl border-2 border-green-500/30 animate-fade-in">
-                  <div className="flex items-center gap-2 mb-3">
-                    <Bot className="h-5 w-5 text-green-600" />
-                    <span className="font-semibold text-foreground">Jeeves answers:</span>
+                  <div className="flex items-center justify-between gap-2 mb-3">
+                    <div className="flex items-center gap-2">
+                      <Bot className="h-5 w-5 text-green-600" />
+                      <span className="font-semibold text-foreground">Jeeves answers:</span>
+                    </div>
+                    <QuickAudioButton text={answer} variant="ghost" size="sm" />
                   </div>
                   <div className="prose prose-sm max-w-none text-foreground">
                     {formatJeevesResponse(answer)}

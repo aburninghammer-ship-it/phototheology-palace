@@ -10,6 +10,7 @@ import { Scale, Link2, Sparkles } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { StyledMarkdownSections } from "@/components/ui/styled-markdown";
 import { motion } from "framer-motion";
+import { QuickAudioButton } from "@/components/audio";
 
 const CultureControversy = () => {
   const { toast } = useToast();
@@ -241,16 +242,24 @@ const CultureControversy = () => {
             >
               <Card variant="glass" className="border-2 border-primary/20">
                 <CardContent className="p-8">
-                  <div className="flex items-center gap-3 mb-6 pb-4 border-b border-primary/20">
-                    <div className="p-3 bg-gradient-to-br from-primary/20 to-primary/10 rounded-xl backdrop-blur-sm">
-                      <Scale className="h-6 w-6 text-primary" />
+                  <div className="flex items-center justify-between gap-3 mb-6 pb-4 border-b border-primary/20">
+                    <div className="flex items-center gap-3">
+                      <div className="p-3 bg-gradient-to-br from-primary/20 to-primary/10 rounded-xl backdrop-blur-sm">
+                        <Scale className="h-6 w-6 text-primary" />
+                      </div>
+                      <div>
+                        <h3 className="text-2xl font-bold bg-gradient-to-r from-primary to-pink-500 bg-clip-text text-transparent">
+                          Biblical Analysis
+                        </h3>
+                        <p className="text-sm text-muted-foreground">Jesus-centered perspective on this topic</p>
+                      </div>
                     </div>
-                    <div>
-                      <h3 className="text-2xl font-bold bg-gradient-to-r from-primary to-pink-500 bg-clip-text text-transparent">
-                        Biblical Analysis
-                      </h3>
-                      <p className="text-sm text-muted-foreground">Jesus-centered perspective on this topic</p>
-                    </div>
+                    <QuickAudioButton 
+                      text={analysis} 
+                      variant="outline"
+                      size="default"
+                      className="flex-shrink-0"
+                    />
                   </div>
                   <ScrollArea className="h-[700px] pr-4">
                     <StyledMarkdownSections content={analysis} />

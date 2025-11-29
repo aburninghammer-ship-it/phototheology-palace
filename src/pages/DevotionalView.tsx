@@ -14,6 +14,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useDevotionalPlan, useDevotionals } from "@/hooks/useDevotionals";
 import { ShareDevotionalDialog } from "@/components/devotionals/ShareDevotionalDialog";
 import { cn } from "@/lib/utils";
+import { QuickAudioButton } from "@/components/audio";
 
 const formatGradients: Record<string, string> = {
   standard: "from-blue-500 via-cyan-500 to-teal-500",
@@ -273,9 +274,16 @@ export default function DevotionalView() {
           <Card className="overflow-hidden border-0 shadow-xl">
             <div className={`h-2 bg-gradient-to-r ${gradient}`} />
             <CardHeader className="bg-gradient-to-br from-indigo-50 to-purple-50 dark:from-indigo-950/50 dark:to-purple-950/50 pb-2">
-              <CardTitle className="text-base flex items-center gap-2 text-indigo-700 dark:text-indigo-300">
-                <BookOpen className="h-5 w-5" />
-                {currentDay.scripture_reference}
+              <CardTitle className="text-base flex items-center justify-between gap-2 text-indigo-700 dark:text-indigo-300">
+                <div className="flex items-center gap-2">
+                  <BookOpen className="h-5 w-5" />
+                  {currentDay.scripture_reference}
+                </div>
+                <QuickAudioButton 
+                  text={`${currentDay.scripture_reference}. ${currentDay.scripture_text}`} 
+                  variant="ghost" 
+                  size="sm" 
+                />
               </CardTitle>
             </CardHeader>
             <CardContent className="bg-gradient-to-br from-indigo-50 to-purple-50 dark:from-indigo-950/50 dark:to-purple-950/50 pt-0">
@@ -341,9 +349,17 @@ export default function DevotionalView() {
               <Card className="border-0 bg-gradient-to-br from-rose-500 via-pink-500 to-purple-500 text-white shadow-2xl overflow-hidden">
                 <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-10" />
                 <CardHeader className="pb-2 relative">
-                  <CardTitle className="text-lg flex items-center gap-2">
-                    <Heart className="h-6 w-6 fill-white" />
-                    Christ Connection
+                  <CardTitle className="text-lg flex items-center justify-between gap-2">
+                    <div className="flex items-center gap-2">
+                      <Heart className="h-6 w-6 fill-white" />
+                      Christ Connection
+                    </div>
+                    <QuickAudioButton 
+                      text={currentDay.christ_connection} 
+                      variant="ghost" 
+                      size="sm"
+                      className="text-white hover:bg-white/20"
+                    />
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="relative">

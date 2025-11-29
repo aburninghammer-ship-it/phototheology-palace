@@ -12,6 +12,7 @@ import { useState } from "react";
 import { Helmet } from "react-helmet-async";
 import { useUserPreferences } from "@/hooks/useUserPreferences";
 import { Navigation } from "@/components/Navigation";
+import { QuickAudioButton } from "@/components/audio";
 
 interface PrincipleBreakdown {
   principle_applied: string;
@@ -287,7 +288,14 @@ export default function DailyVerse() {
         {/* Verse Display */}
         <Card className="border-primary/20 bg-gradient-to-br from-primary/5 to-accent/5">
           <CardHeader>
-            <CardTitle className="text-2xl text-center">{todayVerse.verse_reference}</CardTitle>
+            <div className="flex items-center justify-between">
+              <CardTitle className="text-2xl text-center flex-1">{todayVerse.verse_reference}</CardTitle>
+              <QuickAudioButton 
+                text={`${todayVerse.verse_reference}. ${todayVerse.verse_text}`} 
+                variant="outline"
+                size="sm"
+              />
+            </div>
           </CardHeader>
           <CardContent>
             <blockquote className="text-xl text-center italic leading-relaxed px-6">

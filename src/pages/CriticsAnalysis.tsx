@@ -9,6 +9,7 @@ import { Loader2, AlertTriangle, CheckCircle, Video, Sparkles } from "lucide-rea
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Separator } from "@/components/ui/separator";
+import { QuickAudioButton } from "@/components/audio";
 
 interface AnalysisResult {
   videoType: "pro-SDA" | "anti-SDA";
@@ -196,6 +197,10 @@ export default function CriticsAnalysis() {
                   </div>
                 ) : (
                   <div className="prose prose-sm max-w-none">
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-sm font-medium">Example Response</span>
+                      <QuickAudioButton text={jeevesContent.example || ""} variant="ghost" size="sm" />
+                    </div>
                     <div className="whitespace-pre-wrap bg-muted/50 p-4 rounded-lg">
                       {jeevesContent.example}
                     </div>
@@ -233,6 +238,10 @@ export default function CriticsAnalysis() {
                   </div>
                 ) : (
                   <div className="prose prose-sm max-w-none">
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-sm font-medium">Practice Exercise</span>
+                      <QuickAudioButton text={jeevesContent.exercise || ""} variant="ghost" size="sm" />
+                    </div>
                     <div className="whitespace-pre-wrap bg-muted/50 p-4 rounded-lg">
                       {jeevesContent.exercise}
                     </div>
@@ -265,13 +274,16 @@ export default function CriticsAnalysis() {
             <TabsContent value="summary" className="space-y-4">
               <Card>
                 <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    Video Summary
-                    <Badge variant={
-                      analysis.videoType === "pro-SDA" ? "default" : "destructive"
-                    }>
-                      {analysis.videoType === "pro-SDA" ? "Pro-SDA" : "Anti-SDA"}
-                    </Badge>
+                  <CardTitle className="flex items-center justify-between gap-2">
+                    <div className="flex items-center gap-2">
+                      Video Summary
+                      <Badge variant={
+                        analysis.videoType === "pro-SDA" ? "default" : "destructive"
+                      }>
+                        {analysis.videoType === "pro-SDA" ? "Pro-SDA" : "Anti-SDA"}
+                      </Badge>
+                    </div>
+                    <QuickAudioButton text={analysis.summary} variant="ghost" size="sm" />
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
@@ -282,7 +294,10 @@ export default function CriticsAnalysis() {
               {analysis.additionalNotes && (
                 <Card>
                   <CardHeader>
-                    <CardTitle>Additional Notes</CardTitle>
+                    <CardTitle className="flex items-center justify-between">
+                      Additional Notes
+                      <QuickAudioButton text={analysis.additionalNotes} variant="ghost" size="sm" />
+                    </CardTitle>
                   </CardHeader>
                   <CardContent>
                     <p className="whitespace-pre-wrap">{analysis.additionalNotes}</p>

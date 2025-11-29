@@ -17,6 +17,7 @@ import { useThoughtAnalysisHistory, SavedAnalysis, DeeperInsight } from "@/hooks
 import { AnimatedScore } from "@/components/analyze/AnimatedScore";
 import { VoiceInput } from "@/components/analyze/VoiceInput";
 import { AnalysisHistorySidebar } from "@/components/analyze/AnalysisHistorySidebar";
+import { QuickAudioButton } from "@/components/audio";
 
 interface AnalysisResult {
   summary: string;
@@ -355,7 +356,13 @@ const AnalyzeThoughts = () => {
                     <CardContent className="pt-6">
                       <div className="flex items-start gap-3">
                         <div className="p-2 rounded-full bg-purple-500/20"><BookMarked className="h-5 w-5 text-purple-400" /></div>
-                        <div><p className="font-medium mb-1 text-purple-200">Summary</p><p className="text-muted-foreground">{result.summary}</p></div>
+                        <div className="flex-1">
+                          <div className="flex items-center justify-between mb-1">
+                            <p className="font-medium text-purple-200">Summary</p>
+                            <QuickAudioButton text={result.summary} variant="ghost" size="sm" />
+                          </div>
+                          <p className="text-muted-foreground">{result.summary}</p>
+                        </div>
                       </div>
                     </CardContent>
                   </Card>

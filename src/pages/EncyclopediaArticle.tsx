@@ -12,6 +12,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Loader2, BookOpen, Layers, Link as LinkIcon, Search, Sparkles } from "lucide-react";
 import { toast } from "sonner";
 import { formatJeevesResponse } from "@/lib/formatJeevesResponse";
+import { QuickAudioButton } from "@/components/audio";
 
 interface Article {
   id: string;
@@ -114,11 +115,16 @@ export default function EncyclopediaArticle() {
         {/* Header */}
         <Card className="mb-6">
           <CardHeader>
-            <div className="flex items-start justify-between">
+            <div className="flex items-start justify-between gap-4">
               <div className="flex-1">
                 <CardTitle className="text-3xl mb-2">{article.title}</CardTitle>
                 <CardDescription className="text-lg">{article.summary_1d}</CardDescription>
               </div>
+              <QuickAudioButton 
+                text={`${article.title}. ${article.summary_1d}`} 
+                variant="outline"
+                size="default"
+              />
             </div>
             <div className="flex flex-wrap gap-2 mt-4">
               {article.topic_type?.map((type) => (
@@ -227,19 +233,28 @@ export default function EncyclopediaArticle() {
               <TabsContent value="background" className="space-y-4">
                 {article.historical_background && (
                   <div>
-                    <h3 className="font-semibold text-lg mb-2">Historical Background</h3>
+                    <div className="flex items-center justify-between mb-2">
+                      <h3 className="font-semibold text-lg">Historical Background</h3>
+                      <QuickAudioButton text={article.historical_background} variant="ghost" size="sm" />
+                    </div>
                     <p className="text-muted-foreground">{article.historical_background}</p>
                   </div>
                 )}
                 {article.cultural_notes && (
                   <div>
-                    <h3 className="font-semibold text-lg mb-2">Cultural Notes</h3>
+                    <div className="flex items-center justify-between mb-2">
+                      <h3 className="font-semibold text-lg">Cultural Notes</h3>
+                      <QuickAudioButton text={article.cultural_notes} variant="ghost" size="sm" />
+                    </div>
                     <p className="text-muted-foreground">{article.cultural_notes}</p>
                   </div>
                 )}
                 {article.adventist_doctrinal_position && (
                   <div className="mt-4 p-4 bg-secondary/20 rounded-lg">
-                    <h3 className="font-semibold text-lg mb-2">SDA Position</h3>
+                    <div className="flex items-center justify-between mb-2">
+                      <h3 className="font-semibold text-lg">SDA Position</h3>
+                      <QuickAudioButton text={article.adventist_doctrinal_position} variant="ghost" size="sm" />
+                    </div>
                     <p className="text-sm">{article.adventist_doctrinal_position}</p>
                   </div>
                 )}
@@ -313,9 +328,12 @@ export default function EncyclopediaArticle() {
 
                   {jeevesResponse && (
                     <div className="mt-6 p-6 bg-gradient-to-br from-primary/5 to-accent/5 rounded-lg border border-primary/20">
-                      <div className="flex items-center gap-2 mb-4">
-                        <Sparkles className="h-5 w-5 text-primary" />
-                        <h4 className="font-semibold text-lg">Jeeves Says:</h4>
+                      <div className="flex items-center justify-between gap-2 mb-4">
+                        <div className="flex items-center gap-2">
+                          <Sparkles className="h-5 w-5 text-primary" />
+                          <h4 className="font-semibold text-lg">Jeeves Says:</h4>
+                        </div>
+                        <QuickAudioButton text={jeevesResponse} variant="ghost" size="sm" />
                       </div>
                       <div className="space-y-4 text-foreground">
                         {formatJeevesResponse(jeevesResponse)}
