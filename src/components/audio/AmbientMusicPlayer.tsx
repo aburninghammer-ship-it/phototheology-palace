@@ -26,48 +26,52 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
-// Ambient tracks - using free ambient audio sources
-// These are royalty-free ambient soundscapes
+// Epic cinematic orchestral tracks - Hans Zimmer style
+// Royalty-free from Pixabay - no syncopation, sweeping orchestral
 const AMBIENT_TRACKS = [
   {
     id: "devotion",
     name: "Devotion",
-    description: "Soft piano for quiet reflection",
+    description: "Inspiring cinematic ambient for reflection",
     category: "devotion",
-    // Using a free ambient piano loop
-    url: "https://cdn.pixabay.com/audio/2024/11/06/audio_af94d46eb3.mp3",
+    // Inspiring Cinematic Ambient - soft orchestral
+    url: "https://cdn.pixabay.com/audio/2022/08/02/audio_884fe92c21.mp3",
     bpm: 65,
   },
   {
     id: "deep-study",
     name: "Deep Study",
-    description: "Atmospheric pads for focused learning",
+    description: "Epic orchestral for focused learning",
     category: "study",
-    url: "https://cdn.pixabay.com/audio/2022/10/25/audio_052f9c213a.mp3",
+    // Documentary style cinematic
+    url: "https://cdn.pixabay.com/audio/2022/03/15/audio_115b9b74b7.mp3",
     bpm: 70,
   },
   {
     id: "sanctuary",
     name: "Sanctuary",
-    description: "Reverent ambient soundscape",
+    description: "Reverent orchestral soundscape",
     category: "sanctuary",
+    // Cinematic ambient - the one user liked
     url: "https://cdn.pixabay.com/audio/2022/08/02/audio_884fe92c21.mp3",
     bpm: 60,
   },
   {
     id: "memorization",
     name: "Memorization",
-    description: "Calm tempo for memory retention",
+    description: "Calm cinematic for memory retention",
     category: "memory",
-    url: "https://cdn.pixabay.com/audio/2022/05/27/audio_1808fbf07a.mp3",
+    // Soft epic strings
+    url: "https://cdn.pixabay.com/audio/2022/01/18/audio_d0a13f69d2.mp3",
     bpm: 62,
   },
   {
     id: "prophecy",
     name: "Prophecy",
-    description: "Atmospheric tones for prophetic study",
+    description: "Epic atmospheric for prophetic study",
     category: "prophecy",
-    url: "https://cdn.pixabay.com/audio/2023/07/30/audio_e0c6b56cdf.mp3",
+    // Dramatic cinematic orchestral
+    url: "https://cdn.pixabay.com/audio/2022/10/28/audio_99189bca5f.mp3",
     bpm: 55,
   },
 ];
