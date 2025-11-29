@@ -57,7 +57,7 @@ export const useBibleAudio = (verses: Verse[], options?: UseBibleAudioOptions) =
     speechSynthesis.cancel();
     
     const verse = verses[verseIndex];
-    const text = `Verse ${verse.verse}. ${verse.text}`;
+    const text = verse.text;
     
     const utterance = new SpeechSynthesisUtterance(text);
     utterance.rate = playbackRate;
