@@ -72,7 +72,7 @@ const PALACE_PRINCIPLES = [
   { code: "GR", name: "Gems Room", description: "Striking insight that shines - treasury point", category: "1st Floor" },
   
   // Floor 2 - Investigation (Width)
-  { code: "OR", name: "Observation Room", description: "Log forensic details - fingerprints of meaning", category: "2nd Floor" },
+  { code: "OR", name: "Observation Room", description: "Log forensic details—characters, numbers, objects, actions, grammar, repetitions, contrasts", category: "2nd Floor" },
   { code: "DC", name: "Def-Com", description: "Greek/Hebrew + historical/cultural context", category: "2nd Floor" },
   { code: "ST", name: "Symbols/Types", description: "God's universal language - shadows of Christ", category: "2nd Floor" },
   { code: "QR", name: "Questions Room", description: "75 questions: intra/inter/phototheological", category: "2nd Floor" },
@@ -379,7 +379,7 @@ Identify: 📖Gospel, ⚖️Law, 📜History, 🎵Poetry, 🔮Prophecy, or ✉�
 
 **Gems Room (GR)**: A striking, quotable insight. Example: "David took 5 stones because Goliath had 4 brothers (2 Sam 21:22)."
 
-**Observation Room (OR)**: Forensic details. "Note the word 'yet' in line 3... the repetition of 'behold'... the chiastic structure..."
+**Observation Room (OR)**: Forensic details—BOTH narrative content (characters, numbers, objects, actions) AND literary features. "Note there are 10 virgins... 5 wise, 5 foolish... all have lamps... only 5 have extra oil... the word 'yet' in line 3... the repetition of 'behold'... the chiastic structure..."
 
 **Def-Com (DC)**: Greek/Hebrew + cultural context. Example: "agapao vs phileo distinction in John 21."
 

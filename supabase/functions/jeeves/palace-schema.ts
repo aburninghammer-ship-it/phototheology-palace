@@ -816,10 +816,12 @@ export const PALACE_SCHEMA = `
 ## FLOOR 2: INVESTIGATION (Detective Work)
 
 ### OR - Observation Room
-**Purpose:** Gather raw data without interpretation
-**Core Question:** What is there—exactly?
-**METHOD:** 20–50 bullet observations (grammar, repetition, setting, contrasts).
-**Floor Context:** This is the detective's notebook. The Observation Room is not yet interpretation; it is about noticing. A detective doesn't start with theories — he starts with fingerprints, footprints, witness statements. You log details without rushing to meaning.
+**Purpose:** Gather raw data without interpretation—BOTH narrative content AND literary features
+**Core Question:** What is there—exactly? What is happening? Who is involved? What numbers, objects, details appear?
+**METHOD:** 20–50 bullet observations covering:
+  - NARRATIVE CONTENT: Characters (who/how many), Numbers (exact counts—10 virgins, 5 wise, 5 foolish), Objects (oil, lamps, bread, fish), Actions (what happens in sequence), Dialogue (exact words), Time/Place markers
+  - LITERARY FEATURES: Grammar, repetition, contrasts, structure, omissions, emphasis
+**Floor Context:** This is the detective's notebook. The Observation Room is not yet interpretation; it is about noticing. A detective doesn't start with theories — he starts with fingerprints, footprints, witness statements. You log details without rushing to meaning. COUNT the numbers. NAME the objects. LIST the characters. SEQUENCE the actions.
 
 ### DC - Def-Com Room
 **Purpose:** Nail lexical/cultural meaning; consult witnesses (commentaries)

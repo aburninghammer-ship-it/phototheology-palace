@@ -228,29 +228,32 @@ export const palaceFloors: Floor[] = [
         name: "Observation Room",
         tag: "OR",
         icon: "Search",
-        purpose: "Become a biblical detective. Gather raw data before interpretation—see what's actually on the page.",
-        action: "Make 20-50 bullet-point observations about grammar, repetition, contrasts, verbs, and structure.",
-        output: "Observation sheet with 20-50 numbered bullet points listing only what you directly see.",
-        coreQuestion: "As a detective, observe as much as you can about the text. Aim for at least 8 observations.",
+        purpose: "Become a biblical detective. Gather raw data before interpretation—see what's actually on the page, including every narrative detail.",
+        action: "Make 20-50 bullet-point observations about: (1) NARRATIVE CONTENT—what is happening, who is involved, numbers, objects, actions; (2) GRAMMAR—verbs, tenses, pronouns; (3) REPETITION, CONTRASTS, STRUCTURE.",
+        output: "Observation sheet with 20-50 numbered bullet points listing only what you directly see—narrative details AND literary features.",
+        coreQuestion: "As a detective, observe EVERYTHING in the text: What is happening? Who is involved? What numbers, objects, or details are mentioned? What patterns appear? Aim for at least 8 observations.",
         estimatedTime: "standard",
         quickMode: [
           "Read passage 2-3 times without writing",
-          "List observations using categories: grammar, repetition, contrasts, setting, verbs",
+          "First: List WHAT IS HAPPENING—characters, actions, numbers, objects, dialogue",
+          "Then: List HOW it's written—grammar, repetition, contrasts, structure",
           "Write ONLY what you see—no interpretation yet",
           "Aim for 20+ observations minimum"
         ],
-        method: "🔍 STEP-BY-STEP METHODOLOGY:\n\n1️⃣ Read the passage 2-3 times WITHOUT writing anything—just look\n\n2️⃣ Begin listing observations in bullet form (goal: 20-50 observations minimum)\n\n3️⃣ Use these observation categories:\n   • 📝 GRAMMAR: verb tenses, pronouns, conjunctions ('but,' 'therefore')\n   • 🔁 REPETITION: words, phrases, or patterns that appear multiple times\n   • ⚖️ CONTRASTS: opposites, conflicts, before/after comparisons\n   • 📍 SETTING: time, place, cultural details, who's present\n   • ⚡ VERBS: actions, especially unusual or forceful ones\n   • 🏗️ STRUCTURE: chiasms, parallel lines, turning points\n   • ❓ OMISSIONS: what's surprisingly NOT mentioned\n   • ⭐ EMPHASIS: words in unusual positions, lengthy descriptions\n\n4️⃣ Write ONLY what you see—no 'what it means' allowed yet\n\n5️⃣ Number your observations (helps you hit 20+ quota)\n\n6️⃣ When you think you're done, read once more and find 5 more observations\n\n🎯 KEY PRINCIPLES:\n• 🚫 If you interpret before observing, you'll miss crucial data\n• ✅ Obvious observations count—don't skip them because they seem trivial\n• 📊 Quantity reveals quality—the 23rd observation often unlocks the passage\n• ❓ Ask: 'What's on the page?' not 'What does it mean?'\n• 💪 Observation is a skill—you get better with practice",
+        method: "🔍 STEP-BY-STEP METHODOLOGY:\n\n1️⃣ Read the passage 2-3 times WITHOUT writing anything—just look\n\n2️⃣ Begin listing observations in bullet form (goal: 20-50 observations minimum)\n\n3️⃣ Use these observation categories:\n\n   📖 NARRATIVE CONTENT (What is happening?):\n   • 👥 CHARACTERS: Who is present? How many? Names, titles, roles?\n   • 🔢 NUMBERS: Exact counts (10 virgins, 5 wise, 5 foolish, 2 fish, 5 loaves)\n   • 📦 OBJECTS: What items are mentioned? (oil, lamps, talents, coins, bread)\n   • 🎬 ACTIONS: What exactly happens? In what sequence?\n   • 💬 DIALOGUE: Who speaks? What exact words are used?\n   • ⏰ TIME: When does this happen? Duration? Sequence markers?\n   • 📍 PLACE: Where does this occur? Indoor/outdoor? City/wilderness?\n\n   ✍️ LITERARY FEATURES (How is it written?):\n   • 📝 GRAMMAR: verb tenses, pronouns, conjunctions ('but,' 'therefore')\n   • 🔁 REPETITION: words, phrases, or patterns that appear multiple times\n   • ⚖️ CONTRASTS: opposites, conflicts, before/after comparisons\n   • 🏗️ STRUCTURE: chiasms, parallel lines, turning points\n   • ❓ OMISSIONS: what's surprisingly NOT mentioned\n   • ⭐ EMPHASIS: words in unusual positions, lengthy descriptions\n\n4️⃣ Write ONLY what you see—no 'what it means' allowed yet\n\n5️⃣ Number your observations (helps you hit 20+ quota)\n\n6️⃣ When you think you're done, read once more and find 5 more observations\n\n🎯 KEY PRINCIPLES:\n• 🚫 If you interpret before observing, you'll miss crucial data\n• ✅ Obvious observations count—don't skip them because they seem trivial\n• 📊 Quantity reveals quality—the 23rd observation often unlocks the passage\n• ❓ Ask: 'What's on the page?' not 'What does it mean?'\n• 💪 Observation is a skill—you get better with practice",
         examples: [
+          "Matthew 25:1-13 (Ten Virgins): 1) There are exactly 10 virgins, 2) They are divided into two groups of 5, 3) 5 are called 'wise,' 5 are called 'foolish,' 4) All 10 have lamps, 5) Only 5 have oil in vessels, 6) The foolish have lamps but NO extra oil, 7) They go out to MEET a bridegroom, 8) The bridegroom DELAYS—'tarried,' 9) ALL 10 fall asleep—wise and foolish, 10) Cry comes at MIDNIGHT, 11) All rise and TRIM lamps, 12) Foolish ask wise for oil, 13) Wise refuse—'not enough for us and you,' 14) Foolish go to BUY oil, 15) Bridegroom comes WHILE they're gone, 16) Door is SHUT, 17) Foolish return saying 'Lord, Lord,' 18) Response: 'I know you not,' 19) Command: 'Watch therefore'",
           "Luke 15:20 observations: 1) Father SAW son while 'still a long way off' (watching), 2) Father RAN (unusual for elderly Middle Eastern patriarch), 3) Father KISSED son BEFORE son finishes confession, 4) No mention of anger or lecture, 5) Verbs are rapid-fire (saw-ran-threw-kissed), suggesting urgency, 6) Son's prepared speech gets interrupted",
-          "Genesis 1 observations: 1) 'And God said' appears 10 times, 2) 'Let there be' formula repeated, 3) Each day ends with 'evening and morning,' 4) Day 7 is different—no 'evening and morning,' 5) Only humans get 'image and likeness' language, 6) Repetition of 'good' (7x), 7) Command to 'be fruitful' appears with fish, birds, and humans but not land animals"
+          "Feeding of 5000: 1) Exactly 5 loaves mentioned, 2) Exactly 2 fish, 3) 5000 MEN (not counting women and children), 4) Seated in groups of 50 and 100, 5) Jesus LOOKED UP to heaven, 6) Jesus BLESSED the food, 7) Jesus BROKE the bread, 8) Disciples DISTRIBUTED, 9) All ate and were FILLED, 10) 12 baskets of fragments left over, 11) Fragment collection emphasized"
         ],
         pitfalls: [
           "Slipping into interpretation ('this means God is gracious') instead of observation ('father ran before son confessed')",
+          "Skipping narrative details—COUNT the numbers, NAME the objects, LIST the characters",
           "Stopping too early—fewer than 20 observations means you're not done",
-          "Only observing 'theological' details—notice everything (grammar, setting, etc.)",
+          "Only observing 'theological' details—notice everything (numbers, objects, sequence, etc.)",
           "Skipping 'obvious' observations—they're often the foundation for insight"
         ],
-        deliverable: "Observation sheet with 20-50 numbered bullet points listing only what you directly see in the text",
+        deliverable: "Observation sheet with 20-50 numbered bullet points listing only what you directly see in the text—both narrative content AND literary features",
         prerequisites: [{ floor: 1, room: "sr" }]
       },
       {

@@ -84,7 +84,7 @@ const Games = () => {
     {
       id: "observation_room",
       name: "Observation Detective",
-      description: "Spot hidden details in Scripture passages. Train your investigative eye like a detective!",
+      description: "Spot hidden details in Scripture passages—characters, numbers, objects, actions, and literary patterns!",
       icon: "🔍",
       floor: 2,
       timed: false,

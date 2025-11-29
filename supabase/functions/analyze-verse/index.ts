@@ -43,7 +43,7 @@ FLOOR 1: FURNISHING (Memory & Visualization)
 ═══════════════════════════════════════════════════════════════
 FLOOR 2: INVESTIGATION (Detective Work)
 ═══════════════════════════════════════════════════════════════
-🔹 OR (Observation Room): What grammar, repetitions, contrasts are present?
+🔹 OR (Observation Room): What is happening? Who/how many characters? What numbers (exact counts)? What objects? What grammar, repetitions, contrasts?
 🔹 DC (Def-Com Room): What key terms need lexical/cultural definition?
    • MUST include Hebrew/Greek word studies with Strong's numbers
    • MUST cite standard commentaries (Gill, Clarke, Matthew Henry, Barnes, etc.)
