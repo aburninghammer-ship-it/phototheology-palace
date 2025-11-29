@@ -4,9 +4,11 @@ import { Navigation } from "@/components/Navigation";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
-import { ArrowLeft, Heart, Skull } from "lucide-react";
+import { ArrowLeft, Heart, Skull, Trophy } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/useAuth";
+import { GameLeaderboard } from "@/components/GameLeaderboard";
 import {
   Tooltip,
   TooltipContent,
@@ -43,6 +45,7 @@ const CARD_EXPLANATIONS: Record<string, string> = {
 
 export default function EscapeTheDragon() {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [lives, setLives] = useState(3);
   const [round, setRound] = useState(1);
   const [currentAttack, setCurrentAttack] = useState("");
@@ -50,6 +53,27 @@ export default function EscapeTheDragon() {
   const [selectedCards, setSelectedCards] = useState<string[]>([]);
   const [defense, setDefense] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [scoreSaved, setScoreSaved] = useState(false);
+
+  // Save score when game ends
+  useEffect(() => {
+    const saveScore = async () => {
+      if ((lives <= 0 || round > 10) && user && !scoreSaved) {
+        try {
+          await supabase.from("game_scores").insert({
+            user_id: user.id,
+            game_type: "escape_dragon",
+            score: round - 1,
+            mode: "solo",
+          });
+          setScoreSaved(true);
+        } catch (error) {
+          console.error("Error saving score:", error);
+        }
+      }
+    };
+    saveScore();
+  }, [lives, round, user, scoreSaved]);
 
   useEffect(() => {
     startRound();
@@ -135,48 +159,82 @@ export default function EscapeTheDragon() {
 
   if (lives <= 0) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-red-950 via-orange-900 to-slate-950 flex items-center justify-center">
-        <Card className="max-w-md bg-black/40 border-red-500/50">
-          <CardHeader>
-            <CardTitle className="text-center text-3xl text-red-400">
-              💀 DRAGON VICTORY
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="text-center space-y-4">
-            <p className="text-red-100/80">
-              You survived {round - 1} rounds before falling
-            </p>
-            <Button onClick={() => {
-              setLives(3);
-              setRound(1);
-              startRound();
-            }} className="w-full">
-              Try Again
-            </Button>
-          </CardContent>
-        </Card>
+      <div className="min-h-screen bg-gradient-to-br from-red-950 via-orange-900 to-slate-950">
+        <Navigation />
+        <div className="container mx-auto px-4 py-8">
+          <div className="grid md:grid-cols-2 gap-6">
+            <Card className="bg-black/40 border-red-500/50 text-center">
+              <CardHeader>
+                <Skull className="h-16 w-16 mx-auto text-red-400 mb-4" />
+                <CardTitle className="text-3xl text-red-400">
+                  💀 DRAGON VICTORY
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="text-4xl font-bold text-red-400">{round - 1} Rounds</div>
+                <p className="text-red-100/80">
+                  You survived {round - 1} rounds before falling
+                </p>
+                <div className="flex gap-4 justify-center">
+                  <Button onClick={() => navigate("/games")}>
+                    <ArrowLeft className="mr-2 h-4 w-4" />
+                    Back to Games
+                  </Button>
+                  <Button onClick={() => {
+                    setLives(3);
+                    setRound(1);
+                    setScoreSaved(false);
+                    startRound();
+                  }} variant="outline">
+                    Try Again
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+            <GameLeaderboard gameType="escape_dragon" currentScore={round - 1} />
+          </div>
+        </div>
       </div>
     );
   }
 
   if (round > 10) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-green-950 via-emerald-900 to-slate-950 flex items-center justify-center">
-        <Card className="max-w-md bg-black/40 border-emerald-500/50">
-          <CardHeader>
-            <CardTitle className="text-center text-3xl text-emerald-400">
-              🏆 REMNANT VICTORY!
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="text-center space-y-4">
-            <p className="text-emerald-100/80">
-              You survived all 10 dragon attacks!
-            </p>
-            <Button onClick={() => navigate("/games")} className="w-full">
-              Back to Games
-            </Button>
-          </CardContent>
-        </Card>
+      <div className="min-h-screen bg-gradient-to-br from-green-950 via-emerald-900 to-slate-950">
+        <Navigation />
+        <div className="container mx-auto px-4 py-8">
+          <div className="grid md:grid-cols-2 gap-6">
+            <Card className="bg-black/40 border-emerald-500/50 text-center">
+              <CardHeader>
+                <Trophy className="h-16 w-16 mx-auto text-yellow-500 mb-4" />
+                <CardTitle className="text-3xl text-emerald-400">
+                  🏆 REMNANT VICTORY!
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="text-4xl font-bold text-emerald-400">10 Rounds</div>
+                <p className="text-emerald-100/80">
+                  You survived all 10 dragon attacks!
+                </p>
+                <div className="flex gap-4 justify-center">
+                  <Button onClick={() => navigate("/games")}>
+                    <ArrowLeft className="mr-2 h-4 w-4" />
+                    Back to Games
+                  </Button>
+                  <Button onClick={() => {
+                    setLives(3);
+                    setRound(1);
+                    setScoreSaved(false);
+                    startRound();
+                  }} variant="outline">
+                    Play Again
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+            <GameLeaderboard gameType="escape_dragon" currentScore={10} />
+          </div>
+        </div>
       </div>
     );
   }

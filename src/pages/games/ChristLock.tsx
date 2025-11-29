@@ -1,12 +1,14 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Navigation } from "@/components/Navigation";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
-import { ArrowLeft, Crown, Timer } from "lucide-react";
+import { ArrowLeft, Crown, Timer, Trophy } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/useAuth";
+import { GameLeaderboard } from "@/components/GameLeaderboard";
 
 const CHRIST_CARDS = [
   { code: "2D", name: "Christ Dimension" },
@@ -39,12 +41,33 @@ const RANDOM_VERSES = [
 
 export default function ChristLock() {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [currentCard, setCurrentCard] = useState<typeof CHRIST_CARDS[0] | null>(null);
   const [currentVerse, setCurrentVerse] = useState("");
   const [answer, setAnswer] = useState("");
   const [score, setScore] = useState(0);
   const [targetScore] = useState(3);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [gameWon, setGameWon] = useState(false);
+
+  // Save score when game is won
+  useEffect(() => {
+    const saveScore = async () => {
+      if (gameWon && user) {
+        try {
+          await supabase.from("game_scores").insert({
+            user_id: user.id,
+            game_type: "christ_lock",
+            score: score,
+            mode: "solo",
+          });
+        } catch (error) {
+          console.error("Error saving score:", error);
+        }
+      }
+    };
+    saveScore();
+  }, [gameWon, user, score]);
 
   const startRound = () => {
     const randomCard = CHRIST_CARDS[Math.floor(Math.random() * CHRIST_CARDS.length)];
@@ -77,10 +100,12 @@ export default function ChristLock() {
       const { hitChrist, feedback } = data;
 
       if (hitChrist) {
-        setScore(prev => prev + 1);
+        const newScore = score + 1;
+        setScore(newScore);
         toast.success(`Christ revealed! ${feedback}`);
         
-        if (score + 1 >= targetScore) {
+        if (newScore >= targetScore) {
+          setGameWon(true);
           toast.success("🏆 You've collected all Christ-focus cards!");
         } else {
           startRound();
@@ -95,6 +120,38 @@ export default function ChristLock() {
       setIsSubmitting(false);
     }
   };
+
+  if (gameWon) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-yellow-950 via-amber-900 to-slate-950">
+        <Navigation />
+        <div className="container mx-auto px-4 py-8">
+          <div className="grid md:grid-cols-2 gap-6">
+            <Card className="bg-black/40 border-amber-500/50 text-center">
+              <CardHeader>
+                <Trophy className="h-16 w-16 mx-auto text-yellow-500 mb-4" />
+                <CardTitle className="text-3xl text-amber-300">Christ Lock Complete!</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="text-4xl font-bold text-amber-400">{score} / {targetScore}</div>
+                <p className="text-amber-200/80">You've mastered seeing Christ in every text!</p>
+                <div className="flex gap-4 justify-center">
+                  <Button onClick={() => navigate("/games")}>
+                    <ArrowLeft className="mr-2 h-4 w-4" />
+                    Back to Games
+                  </Button>
+                  <Button onClick={() => window.location.reload()} variant="outline">
+                    Play Again
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+            <GameLeaderboard gameType="christ_lock" currentScore={score} />
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   if (!currentCard) {
     return (

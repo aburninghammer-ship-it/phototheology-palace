@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Navigation } from "@/components/Navigation";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -7,6 +7,9 @@ import { Badge } from "@/components/ui/badge";
 import { Trophy, ArrowLeft, Church } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Progress } from "@/components/ui/progress";
+import { useAuth } from "@/hooks/useAuth";
+import { supabase } from "@/integrations/supabase/client";
+import { GameLeaderboard } from "@/components/GameLeaderboard";
 
 const sanctuaryItems = [
   {
@@ -56,7 +59,9 @@ type QuizQuestion = {
 export default function BlueRoomGame() {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { user } = useAuth();
   const [currentQuestion, setCurrentQuestion] = useState(0);
+  const [scoreSaved, setScoreSaved] = useState(false);
   const [score, setScore] = useState(0);
   const [selectedAnswer, setSelectedAnswer] = useState<string>("");
   const [revealed, setRevealed] = useState(false);
@@ -121,37 +126,60 @@ export default function BlueRoomGame() {
 
   const isComplete = currentQuestion === quizQuestions.length - 1 && revealed;
 
+  // Save score when game completes
+  useEffect(() => {
+    const saveScore = async () => {
+      if (isComplete && user && !scoreSaved) {
+        try {
+          await supabase.from("game_scores").insert({
+            user_id: user.id,
+            game_type: "blue_room",
+            score: score,
+            mode: "solo",
+          });
+          setScoreSaved(true);
+        } catch (error) {
+          console.error("Error saving score:", error);
+        }
+      }
+    };
+    saveScore();
+  }, [isComplete, user, score, scoreSaved]);
+
   if (isComplete) {
     return (
       <div className="min-h-screen bg-background">
         <Navigation />
-        <main className="container mx-auto px-4 py-8 max-w-4xl">
-          <Card className="text-center">
-            <CardHeader>
-              <Trophy className="h-16 w-16 mx-auto text-yellow-500 mb-4" />
-              <CardTitle className="text-3xl">Blue Room Mastered!</CardTitle>
-              <CardDescription>
-                You know the sanctuary blueprint!
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="text-4xl font-bold text-primary">
-                {score} / {quizQuestions.length}
-              </div>
-              <p className="text-muted-foreground">
-                "Make all things according to the pattern" - Hebrews 8:5
-              </p>
-              <div className="flex gap-4 justify-center">
-                <Button onClick={() => navigate("/games")}>
-                  <ArrowLeft className="mr-2 h-4 w-4" />
-                  Back to Games
-                </Button>
-                <Button onClick={() => window.location.reload()} variant="outline">
-                  Play Again
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
+        <main className="container mx-auto px-4 py-8 max-w-6xl">
+          <div className="grid md:grid-cols-2 gap-6">
+            <Card className="text-center">
+              <CardHeader>
+                <Trophy className="h-16 w-16 mx-auto text-yellow-500 mb-4" />
+                <CardTitle className="text-3xl">Blue Room Mastered!</CardTitle>
+                <CardDescription>
+                  You know the sanctuary blueprint!
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="text-4xl font-bold text-primary">
+                  {score} / {quizQuestions.length}
+                </div>
+                <p className="text-muted-foreground">
+                  "Make all things according to the pattern" - Hebrews 8:5
+                </p>
+                <div className="flex gap-4 justify-center">
+                  <Button onClick={() => navigate("/games")}>
+                    <ArrowLeft className="mr-2 h-4 w-4" />
+                    Back to Games
+                  </Button>
+                  <Button onClick={() => window.location.reload()} variant="outline">
+                    Play Again
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+            <GameLeaderboard gameType="blue_room" currentScore={score} />
+          </div>
         </main>
       </div>
     );

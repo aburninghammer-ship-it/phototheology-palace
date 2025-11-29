@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Navigation } from "@/components/Navigation";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -8,6 +8,9 @@ import { Badge } from "@/components/ui/badge";
 import { Trophy, ArrowLeft, Sparkles } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Progress } from "@/components/ui/progress";
+import { useAuth } from "@/hooks/useAuth";
+import { supabase } from "@/integrations/supabase/client";
+import { GameLeaderboard } from "@/components/GameLeaderboard";
 
 const passages = [
   {
@@ -48,11 +51,13 @@ const passages = [
 export default function DimensionsRoom() {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { user } = useAuth();
   const [currentPassage, setCurrentPassage] = useState(0);
   const [currentDimension, setCurrentDimension] = useState<keyof typeof passages[0]['dimensions']>("literal");
   const [userAnswer, setUserAnswer] = useState("");
   const [completedDimensions, setCompletedDimensions] = useState<Set<string>>(new Set());
   const [score, setScore] = useState(0);
+  const [scoreSaved, setScoreSaved] = useState(false);
 
   const passage = passages[currentPassage];
   const dimensions: Array<keyof typeof passage.dimensions> = ["literal", "christ", "me", "church", "heaven"];
@@ -100,37 +105,60 @@ export default function DimensionsRoom() {
 
   const progress = (completedDimensions.size / (passages.length * dimensions.length)) * 100;
 
+  // Save score when game completes
+  useEffect(() => {
+    const saveScore = async () => {
+      if (isComplete && user && !scoreSaved) {
+        try {
+          await supabase.from("game_scores").insert({
+            user_id: user.id,
+            game_type: "dimensions_room",
+            score: score,
+            mode: "solo",
+          });
+          setScoreSaved(true);
+        } catch (error) {
+          console.error("Error saving score:", error);
+        }
+      }
+    };
+    saveScore();
+  }, [isComplete, user, score, scoreSaved]);
+
   if (isComplete) {
     return (
       <div className="min-h-screen bg-background">
         <Navigation />
-        <main className="container mx-auto px-4 py-8 max-w-4xl">
-          <Card className="text-center">
-            <CardHeader>
-              <Trophy className="h-16 w-16 mx-auto text-yellow-500 mb-4" />
-              <CardTitle className="text-3xl">Dimensions Room Mastered!</CardTitle>
-              <CardDescription>
-                You're seeing Scripture from every angle!
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="text-4xl font-bold text-primary">
-                5 Dimensions × {passages.length} Passages
-              </div>
-              <p className="text-muted-foreground">
-                Like viewing a diamond under five different lights!
-              </p>
-              <div className="flex gap-4 justify-center">
-                <Button onClick={() => navigate("/games")}>
-                  <ArrowLeft className="mr-2 h-4 w-4" />
-                  Back to Games
-                </Button>
-                <Button onClick={() => window.location.reload()} variant="outline">
-                  Play Again
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
+        <main className="container mx-auto px-4 py-8 max-w-6xl">
+          <div className="grid md:grid-cols-2 gap-6">
+            <Card className="text-center">
+              <CardHeader>
+                <Trophy className="h-16 w-16 mx-auto text-yellow-500 mb-4" />
+                <CardTitle className="text-3xl">Dimensions Room Mastered!</CardTitle>
+                <CardDescription>
+                  You're seeing Scripture from every angle!
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="text-4xl font-bold text-primary">
+                  5 Dimensions × {passages.length} Passages
+                </div>
+                <p className="text-muted-foreground">
+                  Like viewing a diamond under five different lights!
+                </p>
+                <div className="flex gap-4 justify-center">
+                  <Button onClick={() => navigate("/games")}>
+                    <ArrowLeft className="mr-2 h-4 w-4" />
+                    Back to Games
+                  </Button>
+                  <Button onClick={() => window.location.reload()} variant="outline">
+                    Play Again
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+            <GameLeaderboard gameType="dimensions_room" currentScore={score} />
+          </div>
         </main>
       </div>
     );

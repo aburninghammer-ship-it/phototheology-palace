@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Navigation } from "@/components/Navigation";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -8,6 +8,9 @@ import { Badge } from "@/components/ui/badge";
 import { Trophy, ArrowLeft, Eye } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Progress } from "@/components/ui/progress";
+import { useAuth } from "@/hooks/useAuth";
+import { supabase } from "@/integrations/supabase/client";
+import { GameLeaderboard } from "@/components/GameLeaderboard";
 
 const passages = [
   {
@@ -95,11 +98,13 @@ const passages = [
 export default function ObservationGame() {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { user } = useAuth();
   const [currentPassage, setCurrentPassage] = useState(0);
   const [observations, setObservations] = useState("");
   const [score, setScore] = useState(0);
   const [revealed, setRevealed] = useState(false);
   const [completed, setCompleted] = useState<number[]>([]);
+  const [scoreSaved, setScoreSaved] = useState(false);
 
   const passage = passages[currentPassage];
   const progress = ((currentPassage + 1) / passages.length) * 100;
@@ -141,37 +146,60 @@ export default function ObservationGame() {
 
   const isGameComplete = currentPassage === passages.length - 1 && revealed;
 
+  // Save score when game completes
+  useEffect(() => {
+    const saveScore = async () => {
+      if (isGameComplete && user && !scoreSaved) {
+        try {
+          await supabase.from("game_scores").insert({
+            user_id: user.id,
+            game_type: "observation_room",
+            score: score,
+            mode: "solo",
+          });
+          setScoreSaved(true);
+        } catch (error) {
+          console.error("Error saving score:", error);
+        }
+      }
+    };
+    saveScore();
+  }, [isGameComplete, user, score, scoreSaved]);
+
   if (isGameComplete) {
     return (
       <div className="min-h-screen bg-background">
         <Navigation />
-        <main className="container mx-auto px-4 py-8 max-w-4xl">
-          <Card className="text-center">
-            <CardHeader>
-              <Trophy className="h-16 w-16 mx-auto text-yellow-500 mb-4" />
-              <CardTitle className="text-3xl">Observation Room Mastered!</CardTitle>
-              <CardDescription>
-                You've trained your detective eye!
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="text-4xl font-bold text-primary">
-                {score} Total Observations
-              </div>
-              <p className="text-muted-foreground">
-                You're seeing what others miss!
-              </p>
-              <div className="flex gap-4 justify-center">
-                <Button onClick={() => navigate("/games")}>
-                  <ArrowLeft className="mr-2 h-4 w-4" />
-                  Back to Games
-                </Button>
-                <Button onClick={() => window.location.reload()} variant="outline">
-                  Play Again
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
+        <main className="container mx-auto px-4 py-8 max-w-6xl">
+          <div className="grid md:grid-cols-2 gap-6">
+            <Card className="text-center">
+              <CardHeader>
+                <Trophy className="h-16 w-16 mx-auto text-yellow-500 mb-4" />
+                <CardTitle className="text-3xl">Observation Room Mastered!</CardTitle>
+                <CardDescription>
+                  You've trained your detective eye!
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="text-4xl font-bold text-primary">
+                  {score} Total Observations
+                </div>
+                <p className="text-muted-foreground">
+                  You're seeing what others miss!
+                </p>
+                <div className="flex gap-4 justify-center">
+                  <Button onClick={() => navigate("/games")}>
+                    <ArrowLeft className="mr-2 h-4 w-4" />
+                    Back to Games
+                  </Button>
+                  <Button onClick={() => window.location.reload()} variant="outline">
+                    Play Again
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+            <GameLeaderboard gameType="observation_room" currentScore={score} />
+          </div>
         </main>
       </div>
     );
