@@ -8,6 +8,8 @@ import { ArrowLeft, Trophy, Link as LinkIcon, Send } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { palaceFloors } from "@/data/palaceData";
+import { useAuth } from "@/hooks/useAuth";
+import { GameLeaderboard } from "@/components/GameLeaderboard";
 
 const PT_SYMBOLS = [
   { code: "1D", name: "Literal Dimension" },
@@ -33,12 +35,34 @@ interface PlayerHand {
 
 export default function ChainWar() {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [hand, setHand] = useState<typeof PT_SYMBOLS>([]);
   const [selectedCards, setSelectedCards] = useState<string[]>([]);
   const [verse, setVerse] = useState("");
   const [explanation, setExplanation] = useState("");
   const [score, setScore] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [gameWon, setGameWon] = useState(false);
+  const targetScore = 15;
+
+  // Save score when game is won
+  useEffect(() => {
+    const saveScore = async () => {
+      if (gameWon && user) {
+        try {
+          await supabase.from("game_scores").insert({
+            user_id: user.id,
+            game_type: "chain_war",
+            score: score,
+            mode: "solo",
+          });
+        } catch (error) {
+          console.error("Error saving score:", error);
+        }
+      }
+    };
+    saveScore();
+  }, [gameWon, user, score]);
 
   useEffect(() => {
     dealHand();
@@ -87,8 +111,14 @@ export default function ChainWar() {
       const { isValid, feedback, points } = data;
 
       if (isValid) {
-        setScore(prev => prev + points);
+        const newScore = score + points;
+        setScore(newScore);
         toast.success(`Valid chain! +${points} points. ${feedback}`);
+        
+        if (newScore >= targetScore) {
+          setGameWon(true);
+          toast.success("🏆 You won Chain War!");
+        }
         
         // Remove used cards from hand and draw new ones
         const remaining = hand.filter(s => !selectedCards.includes(s.code));
@@ -112,6 +142,38 @@ export default function ChainWar() {
     }
   };
 
+  if (gameWon) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-indigo-950 via-purple-900 to-slate-950">
+        <Navigation />
+        <div className="container mx-auto px-4 py-8">
+          <div className="grid md:grid-cols-2 gap-6">
+            <Card className="bg-black/40 border-amber-500/50 text-center">
+              <CardHeader>
+                <Trophy className="h-16 w-16 mx-auto text-yellow-500 mb-4" />
+                <CardTitle className="text-3xl text-amber-300">Chain War Victory!</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="text-4xl font-bold text-amber-400">{score} Points</div>
+                <p className="text-amber-200/80">You've mastered biblical chain building!</p>
+                <div className="flex gap-4 justify-center">
+                  <Button onClick={() => navigate("/games")}>
+                    <ArrowLeft className="mr-2 h-4 w-4" />
+                    Back to Games
+                  </Button>
+                  <Button onClick={() => window.location.reload()} variant="outline">
+                    Play Again
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+            <GameLeaderboard gameType="chain_war" currentScore={score} />
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-950 via-purple-900 to-slate-950">
       <Navigation />
@@ -128,7 +190,7 @@ export default function ChainWar() {
             <p className="text-amber-200/80">Build the strongest biblical chain</p>
           </div>
           <div className="text-right">
-            <div className="text-amber-400 text-3xl font-bold">{score}</div>
+            <div className="text-amber-400 text-3xl font-bold">{score} / {targetScore}</div>
             <div className="text-amber-200/60 text-sm">POINTS</div>
           </div>
         </div>

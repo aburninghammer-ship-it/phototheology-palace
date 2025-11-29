@@ -1,12 +1,14 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Navigation } from "@/components/Navigation";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
-import { ArrowLeft, Flame, Droplets, Utensils, Lamp, Wind, Crown } from "lucide-react";
+import { ArrowLeft, Flame, Droplets, Utensils, Lamp, Wind, Crown, Trophy } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/useAuth";
+import { GameLeaderboard } from "@/components/GameLeaderboard";
 
 const SANCTUARY_ITEMS = [
   { name: "ALTAR", icon: Flame, meaning: "Sacrifice / Cross", color: "text-red-500" },
@@ -19,10 +21,32 @@ const SANCTUARY_ITEMS = [
 
 export default function SanctuaryRun() {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [currentItems, setCurrentItems] = useState<typeof SANCTUARY_ITEMS>([]);
   const [narrative, setNarrative] = useState("");
   const [score, setScore] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const targetScore = 5;
+  const [gameWon, setGameWon] = useState(false);
+
+  // Save score when game is won
+  useEffect(() => {
+    const saveScore = async () => {
+      if (gameWon && user) {
+        try {
+          await supabase.from("game_scores").insert({
+            user_id: user.id,
+            game_type: "sanctuary_run",
+            score: score,
+            mode: "solo",
+          });
+        } catch (error) {
+          console.error("Error saving score:", error);
+        }
+      }
+    };
+    saveScore();
+  }, [gameWon, user, score]);
 
   const startRound = () => {
     const shuffled = [...SANCTUARY_ITEMS].sort(() => Math.random() - 0.5);
@@ -52,9 +76,15 @@ export default function SanctuaryRun() {
       const { isCoherent, feedback, points } = data;
 
       if (isCoherent) {
-        setScore(prev => prev + points);
+        const newScore = score + points;
+        setScore(newScore);
         toast.success(`Coherent gospel flow! +${points} points`);
-        startRound();
+        if (newScore >= targetScore) {
+          setGameWon(true);
+          toast.success("🏆 You've mastered the Sanctuary Run!");
+        } else {
+          startRound();
+        }
       } else {
         toast.error(`Narrative needs work: ${feedback}`);
       }
@@ -65,6 +95,38 @@ export default function SanctuaryRun() {
       setIsSubmitting(false);
     }
   };
+
+  if (gameWon) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-purple-950 via-indigo-900 to-slate-950">
+        <Navigation />
+        <div className="container mx-auto px-4 py-8">
+          <div className="grid md:grid-cols-2 gap-6">
+            <Card className="bg-black/40 border-purple-500/50 text-center">
+              <CardHeader>
+                <Trophy className="h-16 w-16 mx-auto text-yellow-500 mb-4" />
+                <CardTitle className="text-3xl text-purple-300">Sanctuary Run Complete!</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="text-4xl font-bold text-purple-400">{score} Rounds Won</div>
+                <p className="text-purple-200/80">You've mastered narrating the gospel through the sanctuary!</p>
+                <div className="flex gap-4 justify-center">
+                  <Button onClick={() => navigate("/games")}>
+                    <ArrowLeft className="mr-2 h-4 w-4" />
+                    Back to Games
+                  </Button>
+                  <Button onClick={() => window.location.reload()} variant="outline">
+                    Play Again
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+            <GameLeaderboard gameType="sanctuary_run" currentScore={score} />
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   if (currentItems.length === 0) {
     return (

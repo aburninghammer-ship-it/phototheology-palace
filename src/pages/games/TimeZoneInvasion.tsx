@@ -1,12 +1,14 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Navigation } from "@/components/Navigation";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
-import { ArrowLeft, Clock, Globe, Cloud } from "lucide-react";
+import { ArrowLeft, Clock, Globe, Cloud, Trophy } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/useAuth";
+import { GameLeaderboard } from "@/components/GameLeaderboard";
 
 const TIME_ZONES = [
   { code: "Hpa", name: "Heaven Past", icon: Cloud },
@@ -29,12 +31,34 @@ const CHALLENGE_VERSES = [
 
 export default function TimeZoneInvasion() {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [verse, setVerse] = useState("");
   const [selectedZones, setSelectedZones] = useState<string[]>([]);
   const [explanation, setExplanation] = useState("");
   const [score, setScore] = useState(0);
   const [opponentScore, setOpponentScore] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const targetScore = 10;
+  const [gameWon, setGameWon] = useState(false);
+
+  // Save score when game is won
+  useEffect(() => {
+    const saveScore = async () => {
+      if (gameWon && user) {
+        try {
+          await supabase.from("game_scores").insert({
+            user_id: user.id,
+            game_type: "time_zone_invasion",
+            score: score,
+            mode: "solo",
+          });
+        } catch (error) {
+          console.error("Error saving score:", error);
+        }
+      }
+    };
+    saveScore();
+  }, [gameWon, user, score]);
 
   const startRound = () => {
     const randomVerse = CHALLENGE_VERSES[Math.floor(Math.random() * CHALLENGE_VERSES.length)];
@@ -78,11 +102,19 @@ export default function TimeZoneInvasion() {
       const { quality, feedback, points } = data;
 
       if (quality === "excellent") {
-        setScore(prev => prev + 2);
+        const newScore = score + 2;
+        setScore(newScore);
         toast.success(`Excellent framing! +2 points. ${feedback}`);
+        if (newScore >= targetScore) {
+          setGameWon(true);
+        }
       } else if (quality === "good") {
-        setScore(prev => prev + 1);
+        const newScore = score + 1;
+        setScore(newScore);
         toast.success(`Good explanation! +1 point. ${feedback}`);
+        if (newScore >= targetScore) {
+          setGameWon(true);
+        }
       } else {
         toast.error(`Needs work: ${feedback}`);
       }
@@ -95,6 +127,38 @@ export default function TimeZoneInvasion() {
       setIsSubmitting(false);
     }
   };
+
+  if (gameWon) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-blue-950 via-cyan-900 to-slate-950">
+        <Navigation />
+        <div className="container mx-auto px-4 py-8">
+          <div className="grid md:grid-cols-2 gap-6">
+            <Card className="bg-black/40 border-cyan-500/50 text-center">
+              <CardHeader>
+                <Trophy className="h-16 w-16 mx-auto text-yellow-500 mb-4" />
+                <CardTitle className="text-3xl text-cyan-300">Time Zone Master!</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="text-4xl font-bold text-cyan-400">{score} Points</div>
+                <p className="text-cyan-200/80">You've mastered prophetic time framing!</p>
+                <div className="flex gap-4 justify-center">
+                  <Button onClick={() => navigate("/games")}>
+                    <ArrowLeft className="mr-2 h-4 w-4" />
+                    Back to Games
+                  </Button>
+                  <Button onClick={() => window.location.reload()} variant="outline">
+                    Play Again
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+            <GameLeaderboard gameType="time_zone_invasion" currentScore={score} />
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   if (!verse) {
     return (
