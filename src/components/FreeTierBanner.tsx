@@ -8,12 +8,12 @@ export const FreeTierBanner = () => {
   const { user } = useAuth();
 
   const freeFeatures = [
-    "Palace Floors 1-2 (Foundation)",
+    "Palace Floor 1 (6 Rooms)",
     "Daily Devotionals",
-    "Basic Jeeves AI Chat",
-    "Daily Challenge",
+    "Jeeves AI (10/day)",
+    "Challenges (3/week)",
     "Bible Reader",
-    "Community Access"
+    "Community (View Only)"
   ];
 
   return (
