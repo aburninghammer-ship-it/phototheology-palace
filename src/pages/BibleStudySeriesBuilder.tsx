@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import { motion } from "framer-motion";
 import { Navigation } from "@/components/Navigation";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -145,25 +146,43 @@ const BibleStudySeriesBuilder = () => {
     const isOwner = selectedSeries.user_id === user?.id;
 
     return (
-      <div className="min-h-screen bg-background">
+      <div className="min-h-screen bg-background relative overflow-hidden">
+        {/* Animated Background */}
+        <div className="fixed inset-0 pointer-events-none">
+          <div className="absolute top-20 left-10 w-72 h-72 bg-primary/20 rounded-full blur-3xl animate-pulse" />
+          <div className="absolute bottom-20 right-10 w-96 h-96 bg-accent/15 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }} />
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-primary/5 rounded-full blur-3xl" />
+        </div>
+
         <Navigation />
-        <main className="container mx-auto px-4 py-8">
+        <main className="container mx-auto px-4 py-8 relative z-10">
           <div className="max-w-6xl mx-auto space-y-6">
-            <div className="flex items-center gap-4">
-              <Button variant="ghost" onClick={() => navigate('/bible-study-series')}>
+            <motion.div 
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              className="flex items-center gap-4"
+            >
+              <Button variant="ghost" onClick={() => navigate('/bible-study-series')} className="backdrop-blur-sm bg-background/50">
                 <ArrowLeft className="h-4 w-4 mr-2" />
                 Back to Series
               </Button>
-            </div>
+            </motion.div>
 
-            <div className="flex items-start justify-between">
+            <motion.div 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.1 }}
+              className="flex items-start justify-between"
+            >
               <div>
-                <h1 className="text-3xl font-bold">{selectedSeries.title}</h1>
+                <h1 className="text-3xl font-bold bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent">
+                  {selectedSeries.title}
+                </h1>
                 <p className="text-muted-foreground mt-1">{selectedSeries.description}</p>
                 <div className="flex flex-wrap gap-2 mt-3">
-                  <Badge>{selectedSeries.lesson_count} lessons</Badge>
-                  <Badge variant="outline">{selectedSeries.audience_type}</Badge>
-                  <Badge variant="outline">{selectedSeries.context}</Badge>
+                  <Badge className="bg-primary/20 text-primary border-primary/30">{selectedSeries.lesson_count} lessons</Badge>
+                  <Badge variant="outline" className="backdrop-blur-sm">{selectedSeries.audience_type}</Badge>
+                  <Badge variant="outline" className="backdrop-blur-sm">{selectedSeries.context}</Badge>
                   <Badge variant={selectedSeries.status === 'published' ? 'default' : 'secondary'}>
                     {selectedSeries.status}
                   </Badge>
@@ -178,65 +197,83 @@ const BibleStudySeriesBuilder = () => {
                     shareToken={selectedSeries.share_token}
                     onUpdate={() => loadSeriesDetail(selectedSeries.id)}
                   />
-                  <Button onClick={() => navigate(`/series/${selectedSeries.id}/present`)}>
+                  <Button onClick={() => navigate(`/series/${selectedSeries.id}/present`)} className="gradient-palace">
                     <Presentation className="h-4 w-4 mr-2" />
                     Present
                   </Button>
                 </div>
               )}
-            </div>
+            </motion.div>
 
             <div className="grid lg:grid-cols-3 gap-6">
               {/* Lessons List */}
-              <div className="lg:col-span-2 space-y-4">
+              <motion.div 
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.2 }}
+                className="lg:col-span-2 space-y-4"
+              >
                 <h2 className="text-xl font-bold">Lessons</h2>
                 {lessons.length === 0 ? (
-                  <Card>
+                  <Card variant="glass">
                     <CardContent className="py-8 text-center">
                       <p className="text-muted-foreground">No lessons yet</p>
                     </CardContent>
                   </Card>
                 ) : (
                   <div className="space-y-3">
-                    {lessons.map((lesson) => (
-                      <Card key={lesson.id} className="hover:shadow-md transition-shadow">
-                        <CardContent className="py-4">
-                          <div className="flex items-center justify-between">
-                            <div className="flex-1">
-                              <div className="flex items-center gap-2">
-                                <Badge variant="outline" className="text-xs">
-                                  Lesson {lesson.lesson_number}
-                                </Badge>
-                                <span className="font-medium">{lesson.title}</span>
+                    {lessons.map((lesson, index) => (
+                      <motion.div
+                        key={lesson.id}
+                        initial={{ opacity: 0, x: -20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: 0.1 * index }}
+                      >
+                        <Card variant="glass" className="hover:shadow-elegant transition-all duration-300 hover:-translate-y-1">
+                          <CardContent className="py-4">
+                            <div className="flex items-center justify-between">
+                              <div className="flex-1">
+                                <div className="flex items-center gap-2">
+                                  <Badge variant="outline" className="text-xs bg-primary/10 border-primary/30">
+                                    Lesson {lesson.lesson_number}
+                                  </Badge>
+                                  <span className="font-medium">{lesson.title}</span>
+                                </div>
+                                {lesson.big_idea && (
+                                  <p className="text-sm text-muted-foreground mt-1 line-clamp-1">
+                                    {lesson.big_idea}
+                                  </p>
+                                )}
+                                {lesson.key_passages && (
+                                  <p className="text-xs text-primary mt-1">{lesson.key_passages}</p>
+                                )}
                               </div>
-                              {lesson.big_idea && (
-                                <p className="text-sm text-muted-foreground mt-1 line-clamp-1">
-                                  {lesson.big_idea}
-                                </p>
-                              )}
-                              {lesson.key_passages && (
-                                <p className="text-xs text-primary mt-1">{lesson.key_passages}</p>
+                              {isOwner && (
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={() => navigate(`/series/${selectedSeries.id}/lesson/${lesson.lesson_number}`)}
+                                  className="hover:bg-primary/10"
+                                >
+                                  <Edit className="h-4 w-4" />
+                                </Button>
                               )}
                             </div>
-                            {isOwner && (
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={() => navigate(`/series/${selectedSeries.id}/lesson/${lesson.lesson_number}`)}
-                              >
-                                <Edit className="h-4 w-4" />
-                              </Button>
-                            )}
-                          </div>
-                        </CardContent>
-                      </Card>
+                          </CardContent>
+                        </Card>
+                      </motion.div>
                     ))}
                   </div>
                 )}
-              </div>
+              </motion.div>
 
               {/* Progress Sidebar */}
-              <div className="space-y-4">
+              <motion.div 
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.3 }}
+                className="space-y-4"
+              >
                 <SeriesProgressTracker
                   seriesId={selectedSeries.id}
                   lessonCount={selectedSeries.lesson_count}
@@ -246,7 +283,7 @@ const BibleStudySeriesBuilder = () => {
                     }
                   }}
                 />
-              </div>
+              </motion.div>
             </div>
           </div>
         </main>
@@ -256,41 +293,69 @@ const BibleStudySeriesBuilder = () => {
 
   // Main List View
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background relative overflow-hidden">
+      {/* Animated Background */}
+      <div className="fixed inset-0 pointer-events-none">
+        <div className="absolute top-20 left-10 w-72 h-72 bg-primary/20 rounded-full blur-3xl animate-pulse" />
+        <div className="absolute bottom-20 right-10 w-96 h-96 bg-accent/15 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }} />
+        <div className="absolute top-1/2 left-1/3 w-80 h-80 bg-primary/10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '2s' }} />
+      </div>
+
       <Navigation />
-      <main className="container mx-auto px-4 py-8">
+      <main className="container mx-auto px-4 py-8 relative z-10">
         <div className="max-w-6xl mx-auto space-y-8">
           {/* Hero Section */}
-          <div className="text-center space-y-4">
-            <div className="inline-flex items-center justify-center p-3 bg-primary/10 rounded-full mb-4">
-              <BookOpen className="h-8 w-8 text-primary" />
-            </div>
-            <h1 className="text-4xl md:text-5xl font-bold">
+          <motion.div 
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            className="text-center space-y-4"
+          >
+            <motion.div 
+              initial={{ scale: 0 }}
+              animate={{ scale: 1 }}
+              transition={{ type: "spring", stiffness: 200, delay: 0.2 }}
+              className="inline-flex items-center justify-center p-4 bg-primary/10 rounded-full mb-4 backdrop-blur-sm border border-primary/20 shadow-glow"
+            >
+              <BookOpen className="h-10 w-10 text-primary" />
+            </motion.div>
+            <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent">
               Build a Bible Study Series with the Palace
             </h1>
             <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
               Create ready-to-teach studies that walk people through Scripture visually—floor by floor, room by room.
             </p>
-          </div>
+          </motion.div>
 
           {loading ? (
             <div className="flex justify-center py-12">
               <Loader2 className="h-8 w-8 animate-spin text-primary" />
             </div>
           ) : userSeries.length === 0 && enrolledSeries.length === 0 ? (
-            <SeriesOnboarding
-              onCreateNew={() => setShowWizard(true)}
-              onStartFromTemplate={() => setShowTemplates(true)}
-              onBrowsePublic={() => navigate('/bible-study-series/discover')}
-            />
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.3 }}
+            >
+              <SeriesOnboarding
+                onCreateNew={() => setShowWizard(true)}
+                onStartFromTemplate={() => setShowTemplates(true)}
+                onBrowsePublic={() => navigate('/bible-study-series/discover')}
+              />
+            </motion.div>
           ) : (
             <>
               {/* Action Buttons */}
-              <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <motion.div 
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.3 }}
+                className="flex flex-col sm:flex-row gap-4 justify-center"
+              >
                 <Button 
                   size="lg" 
                   onClick={() => setShowWizard(true)}
-                  className="gap-2"
+                  className="gap-2 gradient-palace shadow-elegant hover:shadow-glow transition-all duration-300"
                 >
                   <Plus className="h-5 w-5" />
                   Create New Series
@@ -299,7 +364,7 @@ const BibleStudySeriesBuilder = () => {
                   size="lg" 
                   variant="outline"
                   onClick={() => setShowTemplates(true)}
-                  className="gap-2"
+                  className="gap-2 backdrop-blur-sm bg-background/50 hover:bg-primary/10 transition-all duration-300"
                 >
                   <FileText className="h-5 w-5" />
                   Start from a Template
@@ -308,42 +373,63 @@ const BibleStudySeriesBuilder = () => {
                   size="lg" 
                   variant="outline"
                   onClick={() => navigate('/bible-study-series/discover')}
-                  className="gap-2"
+                  className="gap-2 backdrop-blur-sm bg-background/50 hover:bg-primary/10 transition-all duration-300"
                 >
                   <BookOpen className="h-5 w-5" />
                   Discover Public Series
                 </Button>
-              </div>
+              </motion.div>
 
               {/* User's Series */}
               {userSeries.length > 0 && (
-                <div className="space-y-4">
+                <motion.div 
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.4 }}
+                  className="space-y-4"
+                >
                   <h2 className="text-2xl font-bold">Your Series</h2>
                   <SeriesList series={userSeries} onUpdate={loadUserSeries} />
-                </div>
+                </motion.div>
               )}
 
               {/* Enrolled Series */}
               {enrolledSeries.length > 0 && (
-                <div className="space-y-4">
+                <motion.div 
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.5 }}
+                  className="space-y-4"
+                >
                   <h2 className="text-2xl font-bold">Enrolled Series</h2>
                   <div className="grid md:grid-cols-2 gap-4">
-                    {enrolledSeries.map((s) => (
-                      <Card key={s.id} className="hover:shadow-md transition-shadow cursor-pointer" onClick={() => navigate(`/series/${s.id}`)}>
-                        <CardHeader>
-                          <CardTitle className="text-lg">{s.title}</CardTitle>
-                          <CardDescription className="line-clamp-2">{s.description}</CardDescription>
-                        </CardHeader>
-                        <CardContent>
-                          <div className="flex gap-2">
-                            <Badge variant="outline">{s.lesson_count} lessons</Badge>
-                            <Badge variant="secondary">Enrolled</Badge>
-                          </div>
-                        </CardContent>
-                      </Card>
+                    {enrolledSeries.map((s, index) => (
+                      <motion.div
+                        key={s.id}
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.1 * index }}
+                      >
+                        <Card 
+                          variant="glass" 
+                          className="hover:shadow-elegant transition-all duration-300 cursor-pointer hover:-translate-y-1" 
+                          onClick={() => navigate(`/series/${s.id}`)}
+                        >
+                          <CardHeader>
+                            <CardTitle className="text-lg">{s.title}</CardTitle>
+                            <CardDescription className="line-clamp-2">{s.description}</CardDescription>
+                          </CardHeader>
+                          <CardContent>
+                            <div className="flex gap-2">
+                              <Badge variant="outline" className="bg-primary/10 border-primary/30">{s.lesson_count} lessons</Badge>
+                              <Badge variant="secondary">Enrolled</Badge>
+                            </div>
+                          </CardContent>
+                        </Card>
+                      </motion.div>
                     ))}
                   </div>
-                </div>
+                </motion.div>
               )}
             </>
           )}
