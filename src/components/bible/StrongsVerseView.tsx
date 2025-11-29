@@ -133,12 +133,12 @@ export const StrongsVerseView = ({
       <div
         className={`group cursor-pointer transition-all duration-300 p-3 rounded-lg ${
           isAudioPlaying
-            ? "bg-emerald-500/20 border-2 border-emerald-500 shadow-lg ring-2 ring-emerald-500/30"
+            ? "bg-emerald-500/20 border-2 border-emerald-500 shadow-lg ring-2 ring-emerald-500/30 backdrop-blur-md"
             : isSelected
-            ? "bg-primary/10 border-2 border-primary shadow-lg"
+            ? "bg-white/10 backdrop-blur-md border border-white/20 shadow-lg"
             : isHighlighted
             ? "bg-accent/20 border-2 border-accent shadow-md animate-pulse-glow"
-            : "hover:bg-muted/50 border-2 border-transparent"
+            : "hover:bg-white/5 border-2 border-transparent"
         }`}
         onClick={onSelect}
       >
