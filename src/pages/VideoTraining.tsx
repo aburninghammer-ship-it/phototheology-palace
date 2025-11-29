@@ -396,7 +396,7 @@ const VideoTraining = () => {
 
       {/* Video Player Dialog */}
       <Dialog open={!!selectedVideo} onOpenChange={() => setSelectedVideo(null)}>
-        <DialogContent className="max-w-4xl">
+        <DialogContent className="max-w-4xl bg-background/80 backdrop-blur-xl border-border/50">
           <DialogHeader>
             <DialogTitle className="flex items-center justify-between">
               <span>{selectedVideo?.title}</span>
@@ -417,14 +417,14 @@ const VideoTraining = () => {
                 <video
                   src={selectedVideo.video_url}
                   controls
-                  className="w-full h-full rounded-lg"
+                  className="w-full h-full rounded-lg bg-black"
                   autoPlay
                 />
               </AspectRatio>
               {selectedVideo.description && (
                 <p className="text-muted-foreground">{selectedVideo.description}</p>
               )}
-              <div className="flex items-center gap-2 pt-2 border-t">
+              <div className="flex items-center gap-2 pt-2 border-t border-border/50">
                 <SocialShareButton
                   title={selectedVideo.title}
                   description={selectedVideo.description || "Watch this Phototheology training video"}
