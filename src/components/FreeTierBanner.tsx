@@ -23,7 +23,7 @@ export const FreeTierBanner = () => {
           Start Free. <span className="text-primary">No Credit Card.</span>
         </h2>
         <p className="text-lg text-muted-foreground mb-8">
-          Explore the basics free forever. Upgrade to unlock the full palace.
+          Explore the basics at no cost. Upgrade to unlock the full palace.
         </p>
 
         <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-4 mb-8">
