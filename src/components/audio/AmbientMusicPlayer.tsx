@@ -61,8 +61,8 @@ const AMBIENT_TRACKS = [
     name: "Memorization",
     description: "Hypnotic ambient for memory retention",
     category: "memory",
-    // Ethereal ambient soundscape - mesmerizing
-    url: "https://cdn.pixabay.com/audio/2022/08/23/audio_d16737dc28.mp3",
+    // Pure ambient pads - no percussion
+    url: "https://cdn.pixabay.com/audio/2022/10/14/audio_6d793a1a51.mp3",
     bpm: 62,
   },
   {
