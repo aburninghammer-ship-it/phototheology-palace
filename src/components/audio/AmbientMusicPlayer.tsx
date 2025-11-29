@@ -26,93 +26,147 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
-// Epic cinematic orchestral tracks - Hans Zimmer style
-// Using reliable CDN sources for ambient music
+// Phototheology Sacred Cinematic Music
+// BPM 55-70, no lyrics, reverent tone, Christ-centered
 const AMBIENT_TRACKS = [
+  // Floor 1 - Story Floor: warm, welcoming, narrative
   {
-    id: "devotion",
-    name: "Devotion",
-    description: "Sweeping emotional strings for reflection",
-    category: "devotion",
-    // Chosic free ambient
+    id: "story-warmth",
+    name: "Story Warmth",
+    description: "Gentle felt piano for narrative immersion",
+    category: "floor-1",
+    floor: 1,
+    mood: "warm, human, welcoming",
     url: "https://files.freemusicarchive.org/storage-freemusicarchive-org/music/ccCommunity/Chad_Crouch/Arps/Chad_Crouch_-_Shipping_Lanes.mp3",
+    bpm: 60,
+  },
+  // Floor 2 - Pattern Floor: structured, rhythmic, reflective
+  {
+    id: "patterns-kingdom",
+    name: "Patterns of the Kingdom",
+    description: "Measured, thoughtful light pulses",
+    category: "floor-2",
+    floor: 2,
+    mood: "structured, reflective",
+    url: "https://files.freemusicarchive.org/storage-freemusicarchive-org/music/no_curator/Kai_Engel/Satin/Kai_Engel_-_04_-_Moonlight_Reprise.mp3",
     bpm: 65,
   },
+  // Floor 3 - Sanctuary Floor: holy, reverent, awe-inducing
   {
-    id: "deep-study",
-    name: "Deep Study",
-    description: "Majestic orchestral for focused learning",
-    category: "study",
-    url: "https://files.freemusicarchive.org/storage-freemusicarchive-org/music/no_curator/Kai_Engel/Satin/Kai_Engel_-_04_-_Moonlight_Reprise.mp3",
-    bpm: 70,
+    id: "sanctuary-stillness",
+    name: "Sanctuary Stillness",
+    description: "Sacred stillness with soft harp and wind",
+    category: "floor-3",
+    floor: 3,
+    mood: "holy, reverent, awe",
+    url: "https://files.freemusicarchive.org/storage-freemusicarchive-org/music/ccCommunity/Kai_Engel/Satin/Kai_Engel_-_07_-_Interception.mp3",
+    bpm: 58,
   },
+  // Floor 4 - Christ Floor: bright, hopeful, radiant
   {
-    id: "sanctuary",
-    name: "Sanctuary",
-    description: "Reverent cinematic soundscape",
-    category: "sanctuary",
+    id: "christ-the-center",
+    name: "Christ the Center",
+    description: "Gentle hope and radiant glory",
+    category: "floor-4",
+    floor: 4,
+    mood: "bright, hopeful, radiant",
+    url: "https://files.freemusicarchive.org/storage-freemusicarchive-org/music/ccCommunity/Chad_Crouch/Arps/Chad_Crouch_-_Algorithms.mp3",
+    bpm: 65,
+  },
+  // Floor 5 - Prophecy Floor: cinematic, atmospheric tension
+  {
+    id: "prophecy-watch",
+    name: "Prophecy Watch",
+    description: "Atmospheric tension with reverent undertones",
+    category: "floor-5",
+    floor: 5,
+    mood: "cinematic, tense, respectful",
+    url: "https://files.freemusicarchive.org/storage-freemusicarchive-org/music/ccCommunity/Chad_Crouch/Arps/Chad_Crouch_-_Drifting.mp3",
+    bpm: 60,
+  },
+  // Floor 6 - Freestyle Floor: natural, open, reflective
+  {
+    id: "wisdom-quiet",
+    name: "Wisdom in Quiet Places",
+    description: "Freedom, nature, clarity with soft pads",
+    category: "floor-6",
+    floor: 6,
+    mood: "open, natural, free",
+    url: "https://files.freemusicarchive.org/storage-freemusicarchive-org/music/ccCommunity/Chad_Crouch/Arps/Chad_Crouch_-_Shipping_Lanes.mp3",
+    bpm: 58,
+  },
+  // Floor 7 - Wisdom Floor: solemn, calm, ancient
+  {
+    id: "chamber-light",
+    name: "Chamber of Light",
+    description: "Deep reflection with ancient textures",
+    category: "floor-7",
+    floor: 7,
+    mood: "solemn, calm, ancient",
     url: "https://files.freemusicarchive.org/storage-freemusicarchive-org/music/ccCommunity/Kai_Engel/Satin/Kai_Engel_-_07_-_Interception.mp3",
     bpm: 60,
   },
+  // Special: Blue Room - Typology
   {
-    id: "memorization",
-    name: "Memorization",
-    description: "Gentle cinematic waves for memory",
-    category: "memory",
-    url: "https://files.freemusicarchive.org/storage-freemusicarchive-org/music/ccCommunity/Chad_Crouch/Arps/Chad_Crouch_-_Algorithms.mp3",
-    bpm: 62,
-  },
-  {
-    id: "prophecy",
-    name: "Prophecy",
-    description: "Grand orchestral for prophetic study",
-    category: "prophecy",
-    url: "https://files.freemusicarchive.org/storage-freemusicarchive-org/music/ccCommunity/Chad_Crouch/Arps/Chad_Crouch_-_Drifting.mp3",
+    id: "blue-room-ambient",
+    name: "Blue Room - Typology",
+    description: "Deep reverent ambience with slow drones",
+    category: "blue-room",
+    floor: 3,
+    mood: "reverent, typological",
+    url: "https://files.freemusicarchive.org/storage-freemusicarchive-org/music/no_curator/Kai_Engel/Satin/Kai_Engel_-_04_-_Moonlight_Reprise.mp3",
     bpm: 55,
   },
 ];
 
-// Room to track mapping
+// Room to track mapping based on Phototheology floors
 const ROOM_TRACK_MAP: Record<string, string> = {
-  // Floor 1 - Furnishing
-  "story-room": "devotion",
-  "imagination-room": "sanctuary",
-  "24fps-room": "deep-study",
-  "bible-rendered": "deep-study",
-  "translation-room": "memorization",
-  "gems-room": "devotion",
+  // Floor 1 - Story Floor (Furnishing): warm, welcoming, narrative
+  "story-room": "story-warmth",
+  "imagination-room": "story-warmth",
+  "24fps-room": "patterns-kingdom", // cinematic storytelling
+  "bible-rendered": "story-warmth",
+  "translation-room": "story-warmth",
+  "gems-room": "story-warmth",
   
-  // Floor 2 - Investigation
-  "observation-room": "deep-study",
-  "def-com-room": "deep-study",
-  "symbols-types": "sanctuary",
-  "questions-room": "memorization",
-  "qa-chains": "memorization",
+  // Floor 2 - Pattern Floor (Investigation): structured, rhythmic
+  "observation-room": "patterns-kingdom",
+  "def-com-room": "patterns-kingdom",
+  "symbols-types": "blue-room-ambient", // typology connection
+  "questions-room": "patterns-kingdom",
+  "qa-chains": "patterns-kingdom",
   
-  // Floor 3 - Freestyle
-  "nature-freestyle": "sanctuary",
-  "personal-freestyle": "devotion",
-  "bible-freestyle": "deep-study",
-  "history-freestyle": "prophecy",
-  "listening-room": "devotion",
+  // Floor 3 - Sanctuary Floor: holy, reverent
+  "blue-room": "blue-room-ambient",
+  "sanctuary-room": "sanctuary-stillness",
   
-  // Floor 4 - Next Level
-  "concentration-room": "memorization",
-  "dimensions-room": "deep-study",
-  "connect-6": "deep-study",
-  "theme-room": "sanctuary",
-  "time-zone": "prophecy",
-  "patterns-room": "deep-study",
-  "parallels-room": "deep-study",
-  "fruit-room": "devotion",
+  // Floor 4 - Christ Floor (Next Level): bright, hopeful
+  "concentration-room": "christ-the-center",
+  "dimensions-room": "christ-the-center",
+  "connect-6": "patterns-kingdom",
+  "theme-room": "christ-the-center",
+  "time-zone": "prophecy-watch",
+  "patterns-room": "patterns-kingdom",
+  "parallels-room": "patterns-kingdom",
+  "fruit-room": "christ-the-center",
   
-  // Floor 5 - Vision
-  "blue-room": "sanctuary",
-  "prophecy-room": "prophecy",
-  "three-angels": "prophecy",
+  // Floor 5 - Prophecy Floor (Vision): cinematic, atmospheric
+  "prophecy-room": "prophecy-watch",
+  "three-angels": "prophecy-watch",
+  
+  // Floor 6 - Freestyle Floor: natural, open
+  "nature-freestyle": "wisdom-quiet",
+  "personal-freestyle": "wisdom-quiet",
+  "bible-freestyle": "wisdom-quiet",
+  "history-freestyle": "prophecy-watch",
+  "listening-room": "wisdom-quiet",
+  
+  // Floor 7 - Wisdom Floor: solemn, calm, ancient
+  "wisdom-room": "chamber-light",
+  "meditation-room": "chamber-light",
   
   // Default
-  "default": "devotion",
+  "default": "story-warmth",
 };
 
 interface AmbientMusicPlayerProps {

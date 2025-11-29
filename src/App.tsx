@@ -194,6 +194,7 @@ const DevotionalView = lazy(() => import("./pages/DevotionalView"));
 const DevotionalProfileDetail = lazy(() => import("./pages/DevotionalProfileDetail"));
 const PublicDevotionalView = lazy(() => import("./pages/PublicDevotionalView"));
 const WhyPhototheology = lazy(() => import("./pages/WhyPhototheology"));
+const MusicCategories = lazy(() => import("./pages/MusicCategories"));
 
 const queryClient = new QueryClient();
 
@@ -285,6 +286,7 @@ function App() {
             <Route path="/encyclopedia/:slug" element={<ProtectedRoute><EncyclopediaArticle /></ProtectedRoute>} />
             <Route path="/video-training" element={<ProtectedRoute><VideoTraining /></ProtectedRoute>} />
             <Route path="/video_admin" element={<ProtectedRoute><VideoTraining /></ProtectedRoute>} />
+            <Route path="/music" element={<ProtectedRoute><MusicCategories /></ProtectedRoute>} />
             <Route path="/daily-reading" element={<ProtectedRoute><DailyReading /></ProtectedRoute>} />
             <Route path="/memorization-verses" element={<ProtectedRoute><MemorizationVerses /></ProtectedRoute>} />
             <Route path="/verse-memory-hall" element={<ProtectedRoute><VerseMemoryHall /></ProtectedRoute>} />
