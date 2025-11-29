@@ -55,11 +55,21 @@ export const AudioControls = ({ verses, onVerseHighlight, className }: AudioCont
   const selectedVoiceRef = useRef(selectedVoice);
   const playVerseAtIndexRef = useRef<((index: number) => Promise<void>) | null>(null);
   const audioUnlockedRef = useRef(false);
+  
+  // Prefetch cache for smoother playback
+  const prefetchCacheRef = useRef<Map<number, string>>(new Map());
+  const prefetchingRef = useRef<Set<number>>(new Set());
 
   // Keep refs in sync
   versesRef.current = verses;
   playbackRateRef.current = playbackRate;
   selectedVoiceRef.current = selectedVoice;
+
+  // Clear prefetch cache when voice changes
+  useEffect(() => {
+    prefetchCacheRef.current.forEach(url => URL.revokeObjectURL(url));
+    prefetchCacheRef.current.clear();
+  }, [selectedVoice]);
 
   const playbackRates = [0.5, 0.75, 1, 1.25, 1.5, 2];
 
@@ -106,6 +116,9 @@ export const AudioControls = ({ verses, onVerseHighlight, className }: AudioCont
       if (audioUrlRef.current) {
         URL.revokeObjectURL(audioUrlRef.current);
       }
+      // Clear prefetch cache on unmount
+      prefetchCacheRef.current.forEach(url => URL.revokeObjectURL(url));
+      prefetchCacheRef.current.clear();
     };
   }, []);
 
@@ -127,9 +140,8 @@ export const AudioControls = ({ verses, onVerseHighlight, className }: AudioCont
     }
   }, []);
 
-  const generateTTS = useCallback(async (text: string, voice: VoiceId) => {
+  const generateTTS = useCallback(async (text: string, voice: VoiceId): Promise<string | null> => {
     try {
-      console.log("[TTS] Requesting audio for:", text.substring(0, 50));
       const { data, error } = await supabase.functions.invoke("text-to-speech", {
         body: { text, voice },
       });
@@ -143,8 +155,6 @@ export const AudioControls = ({ verses, onVerseHighlight, className }: AudioCont
         console.error("[TTS] No audio content in response:", data);
         return null;
       }
-
-      console.log("[TTS] Received audio, length:", data.audioContent.length);
       
       // Decode base64 in chunks to avoid stack overflow on large audio
       const binaryString = atob(data.audioContent);
@@ -155,14 +165,29 @@ export const AudioControls = ({ verses, onVerseHighlight, className }: AudioCont
       }
       
       const blob = new Blob([bytes], { type: "audio/mpeg" });
-      const url = URL.createObjectURL(blob);
-      console.log("[TTS] Created blob URL:", url);
-      return url;
+      return URL.createObjectURL(blob);
     } catch (e) {
       console.error("[TTS] Error generating TTS:", e);
       return null;
     }
   }, []);
+
+  // Prefetch audio for a verse index
+  const prefetchVerse = useCallback(async (verseIndex: number) => {
+    const currentVerses = versesRef.current;
+    if (verseIndex < 0 || verseIndex >= currentVerses.length) return;
+    if (prefetchCacheRef.current.has(verseIndex)) return;
+    if (prefetchingRef.current.has(verseIndex)) return;
+    
+    prefetchingRef.current.add(verseIndex);
+    const verse = currentVerses[verseIndex];
+    const url = await generateTTS(verse.text, selectedVoiceRef.current);
+    prefetchingRef.current.delete(verseIndex);
+    
+    if (url) {
+      prefetchCacheRef.current.set(verseIndex, url);
+    }
+  }, [generateTTS]);
 
   const playVerseAtIndex = useCallback(async (verseIndex: number) => {
     const currentVerses = versesRef.current;
@@ -179,9 +204,17 @@ export const AudioControls = ({ verses, onVerseHighlight, className }: AudioCont
     setCurrentVerse(verse.verse);
     onVerseHighlight?.(verse.verse);
     
-    setIsLoading(true);
-    const url = await generateTTS(verse.text, selectedVoiceRef.current);
-    setIsLoading(false);
+    // Check if we have prefetched audio
+    let url = prefetchCacheRef.current.get(verseIndex);
+    
+    if (!url) {
+      setIsLoading(true);
+      url = await generateTTS(verse.text, selectedVoiceRef.current);
+      setIsLoading(false);
+    } else {
+      // Remove from cache since we're using it
+      prefetchCacheRef.current.delete(verseIndex);
+    }
 
     if (!url) {
       toast.error("Failed to generate audio");
@@ -189,6 +222,10 @@ export const AudioControls = ({ verses, onVerseHighlight, className }: AudioCont
       isPlayingRef.current = false;
       return;
     }
+
+    // Prefetch next 2 verses in the background for smooth playback
+    prefetchVerse(verseIndex + 1);
+    prefetchVerse(verseIndex + 2);
 
     // Revoke old URL
     if (audioUrlRef.current) {
@@ -208,7 +245,7 @@ export const AudioControls = ({ verses, onVerseHighlight, className }: AudioCont
       setIsPlaying(false);
       isPlayingRef.current = false;
     }
-  }, [generateTTS, onVerseHighlight]);
+  }, [generateTTS, onVerseHighlight, prefetchVerse]);
 
   // Keep the ref updated
   playVerseAtIndexRef.current = playVerseAtIndex;
@@ -221,6 +258,12 @@ export const AudioControls = ({ verses, onVerseHighlight, className }: AudioCont
       URL.revokeObjectURL(audioUrlRef.current);
       audioUrlRef.current = null;
     }
+  }, []);
+
+  // Clear prefetch cache when voice changes
+  const clearPrefetchCache = useCallback(() => {
+    prefetchCacheRef.current.forEach(url => URL.revokeObjectURL(url));
+    prefetchCacheRef.current.clear();
   }, []);
 
   const play = useCallback(async (startVerseIndex?: number) => {
@@ -243,11 +286,12 @@ export const AudioControls = ({ verses, onVerseHighlight, className }: AudioCont
 
   const stop = useCallback(() => {
     cleanupAudio();
+    clearPrefetchCache();
     setIsPlaying(false);
     isPlayingRef.current = false;
     setCurrentVerse(1);
     onVerseHighlight?.(1);
-  }, [cleanupAudio, onVerseHighlight]);
+  }, [cleanupAudio, clearPrefetchCache, onVerseHighlight]);
 
   const nextVerse = useCallback(() => {
     const currentIndex = verses.findIndex(v => v.verse === currentVerse);
