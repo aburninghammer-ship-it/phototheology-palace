@@ -60,7 +60,7 @@ const AMBIENT_TRACKS = [
     category: "floor-3",
     floor: 3,
     mood: "holy, reverent, awe",
-    url: "https://www.bensound.com/bensound-music/bensound-adaytoremember.mp3",
+    url: "https://www.bensound.com/bensound-music/bensound-birthofahero.mp3",
     bpm: 58,
   },
   // Floor 4 - Christ Floor: bright, hopeful orchestra
