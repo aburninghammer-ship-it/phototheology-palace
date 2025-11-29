@@ -20,40 +20,42 @@ const Bible = () => {
       
       <div className="pt-24 pb-16 px-3 sm:px-4 md:px-6">
         <div className="container mx-auto max-w-7xl">
-          {/* Header */}
-          <div className="mb-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-            <div>
-              <h1 className="font-serif text-3xl sm:text-4xl md:text-5xl font-bold mb-2 bg-gradient-palace bg-clip-text text-transparent">
-                Phototheology Study Bible (PSB)
-              </h1>
-              <p className="text-base sm:text-lg text-muted-foreground">
-                Scripture through principle lenses
-              </p>
-            </div>
-            <div className="flex gap-2 flex-wrap">
-              <Button 
-                variant="outline" 
-                className="border-accent/20 whitespace-nowrap"
-                onClick={() => setDemoOpen(true)}
-              >
-                <HelpCircle className="h-4 w-4 mr-2" />
-                <span className="hidden sm:inline">How to Use</span>
-                <span className="sm:hidden">Help</span>
-              </Button>
-              <Button asChild variant="outline" className="gradient-palace border-primary/20 whitespace-nowrap">
-                <Link to="/read-me-the-bible">
-                  <Headphones className="h-4 w-4 mr-2" />
-                  <span className="hidden sm:inline">Read Me the Bible</span>
-                  <span className="sm:hidden">Listen</span>
-                </Link>
-              </Button>
-              <Button asChild variant="outline" className="gradient-dreamy border-primary/20 whitespace-nowrap">
-                <Link to="/memorization-verses">
-                  <BookMarked className="h-4 w-4 mr-2" />
-                  <span className="hidden sm:inline">My Memorization Verses</span>
-                  <span className="sm:hidden">Memorization</span>
-                </Link>
-              </Button>
+          {/* Header - Glass Card */}
+          <div className="glass-card mb-8 p-6 rounded-2xl">
+            <div className="relative z-10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+              <div>
+                <h1 className="font-serif text-3xl sm:text-4xl md:text-5xl font-bold mb-2 bg-gradient-palace bg-clip-text text-transparent">
+                  Phototheology Study Bible (PSB)
+                </h1>
+                <p className="text-base sm:text-lg text-muted-foreground">
+                  Scripture through principle lenses
+                </p>
+              </div>
+              <div className="flex gap-2 flex-wrap">
+                <Button 
+                  variant="outline" 
+                  className="bg-white/10 backdrop-blur-md border-white/20 hover:bg-white/20 whitespace-nowrap"
+                  onClick={() => setDemoOpen(true)}
+                >
+                  <HelpCircle className="h-4 w-4 mr-2" />
+                  <span className="hidden sm:inline">How to Use</span>
+                  <span className="sm:hidden">Help</span>
+                </Button>
+                <Button asChild variant="outline" className="bg-white/10 backdrop-blur-md border-white/20 hover:bg-white/20 whitespace-nowrap">
+                  <Link to="/read-me-the-bible">
+                    <Headphones className="h-4 w-4 mr-2" />
+                    <span className="hidden sm:inline">Read Me the Bible</span>
+                    <span className="sm:hidden">Listen</span>
+                  </Link>
+                </Button>
+                <Button asChild variant="outline" className="bg-white/10 backdrop-blur-md border-white/20 hover:bg-white/20 whitespace-nowrap">
+                  <Link to="/memorization-verses">
+                    <BookMarked className="h-4 w-4 mr-2" />
+                    <span className="hidden sm:inline">My Memorization Verses</span>
+                    <span className="sm:hidden">Memorization</span>
+                  </Link>
+                </Button>
+              </div>
             </div>
           </div>
 
