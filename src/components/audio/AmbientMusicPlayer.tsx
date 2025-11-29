@@ -59,10 +59,10 @@ const AMBIENT_TRACKS = [
   {
     id: "memorization",
     name: "Memorization",
-    description: "Calm cinematic for memory retention",
+    description: "Hypnotic ambient for memory retention",
     category: "memory",
-    // Soft epic strings
-    url: "https://cdn.pixabay.com/audio/2022/01/18/audio_d0a13f69d2.mp3",
+    // Ethereal ambient soundscape - mesmerizing
+    url: "https://cdn.pixabay.com/audio/2022/08/23/audio_d16737dc28.mp3",
     bpm: 62,
   },
   {
