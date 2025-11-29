@@ -44,7 +44,7 @@ export const StudyDeckExamples = () => {
   ];
 
   return (
-    <Card className="border-2 border-primary/30 bg-gradient-to-br from-background to-primary/5">
+    <Card variant="glass" className="border-2 border-primary/30">
       <CardHeader>
         <div className="flex items-center gap-3 mb-2">
           <div className="text-4xl">📚</div>

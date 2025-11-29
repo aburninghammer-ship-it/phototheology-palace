@@ -71,7 +71,7 @@ export function JeevesCommentaryDialog({ card, open, onOpenChange }: Props) {
   
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl max-h-[80vh]">
+      <DialogContent variant="glass" className="max-w-2xl max-h-[80vh]">
         <DialogHeader>
           <div className="flex items-center gap-3 mb-2">
             <div className="flex items-center justify-center w-12 h-12 rounded-full bg-primary/10">

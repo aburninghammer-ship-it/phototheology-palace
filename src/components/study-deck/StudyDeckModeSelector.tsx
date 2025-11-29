@@ -131,7 +131,7 @@ export function StudyDeckModeSelector({ onSelectMode }: Props) {
       </motion.div>
 
       {/* Quick Guide */}
-      <Card className="bg-primary/5 border-primary/20">
+      <Card variant="glass" className="border-2 border-primary/20">
         <CardContent className="pt-6">
           <div className="grid md:grid-cols-2 gap-4 text-sm">
             <div className="space-y-2">

@@ -71,7 +71,7 @@ const FLOOR_INFO = [
 
 export function CardCategoryFilters({ selectedFloor, onFloorSelect, cardCounts }: Props) {
   return (
-    <Card className="border-2 border-primary/20">
+    <Card variant="glass" className="border-2 border-primary/20">
       <CardContent className="pt-6">
         <div className="space-y-4">
           <div className="flex items-center justify-between">

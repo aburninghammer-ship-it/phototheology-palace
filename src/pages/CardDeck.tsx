@@ -1255,7 +1255,7 @@ export default function CardDeck() {
             
             {/* Show current mode badge if selected */}
             {studyMode && (
-              <Card className="border-2 border-primary/30 bg-gradient-to-r from-primary/10 to-background">
+              <Card variant="glass" className="border-2 border-primary/30">
                 <CardContent className="pt-4 pb-4">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
@@ -1291,7 +1291,7 @@ export default function CardDeck() {
             {/* Multiplayer mode temporarily disabled */}
 
             {/* Collaboration Controls */}
-            <Card className="border-2 border-primary/30">
+            <Card variant="glass" className="border-2 border-primary/30">
               <CardContent className="pt-6">
                 {!isInSession ? (
                   <div className="flex flex-col sm:flex-row gap-3 items-center justify-center">
@@ -1354,7 +1354,7 @@ export default function CardDeck() {
           </div>
 
           {/* Text Selection and Input Section */}
-          <Card className="border-2">
+          <Card variant="glass" className="border-2 border-primary/20">
             <CardHeader>
               <CardTitle>Choose Your Study Text</CardTitle>
               <CardDescription>
@@ -1399,7 +1399,7 @@ export default function CardDeck() {
 
           {/* Display Selected Text */}
           {displayText && (
-            <Card className="border-2 border-primary/50 bg-primary/5">
+            <Card variant="glass" className="border-2 border-primary/50">
               <CardContent className="pt-6">
                 <div className="text-sm text-muted-foreground mb-2">
                   {textType === "verse" ? "Selected Verse:" : "Selected Story:"}
@@ -1413,7 +1413,7 @@ export default function CardDeck() {
 
           {/* Pick Card Section */}
           {displayText && (
-            <Card className="border-2">
+            <Card variant="glass" className="border-2 border-primary/20">
               <CardContent className="pt-6 space-y-4">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
@@ -1595,7 +1595,7 @@ export default function CardDeck() {
 
               {/* Feedback Section */}
               {feedback && (
-                <Card className="border-primary/50">
+                <Card variant="glass" className="border-2 border-primary/50">
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2">
                       <Sparkles className="h-5 w-5 text-primary" />
@@ -1625,7 +1625,7 @@ export default function CardDeck() {
               )}
 
               {conversationHistory.length > 0 && (
-                <Card className="border-primary/20">
+                <Card variant="glass" className="border-2 border-primary/20">
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2">
                       <MessageCircle className="h-5 w-5 text-primary" />
@@ -1684,7 +1684,7 @@ export default function CardDeck() {
                 }, {} as Record<number, number>)}
               />
               
-              <Card>
+              <Card variant="glass" className="border-2 border-primary/20">
                 <CardHeader>
                   <CardTitle>All Palace Principle Cards</CardTitle>
                   <CardDescription>
@@ -1811,7 +1811,7 @@ export default function CardDeck() {
 
       {/* Word Analysis Dialog */}
       <Dialog open={wordDialogOpen} onOpenChange={setWordDialogOpen}>
-        <DialogContent className="max-w-2xl max-h-[80vh]">
+        <DialogContent variant="glass" className="max-w-2xl max-h-[80vh]">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <BookOpen className="h-5 w-5 text-primary" />
@@ -1840,7 +1840,7 @@ export default function CardDeck() {
       
       {/* Save Study Dialog */}
       <Dialog open={saveDialogOpen} onOpenChange={setSaveDialogOpen}>
-        <DialogContent className="sm:max-w-md">
+        <DialogContent variant="glass" className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle>Save Your Study</DialogTitle>
             <DialogDescription>
@@ -1901,7 +1901,7 @@ export default function CardDeck() {
       
       {/* Card Picker Dialog */}
       <Dialog open={cardPickerOpen} onOpenChange={setCardPickerOpen}>
-        <DialogContent className="sm:max-w-4xl max-h-[80vh]">
+        <DialogContent variant="glass" className="sm:max-w-4xl max-h-[80vh]">
           <DialogHeader>
             <DialogTitle>Choose a Card to Study</DialogTitle>
             <DialogDescription>
