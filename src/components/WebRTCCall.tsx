@@ -99,18 +99,31 @@ export function WebRTCCall({ roomId, userId, userName }: WebRTCCallProps) {
       channel
         .on("presence", { event: "sync" }, () => {
           const state = channel.presenceState();
-          console.log("Presence sync:", state);
+          console.log("Presence sync - raw state:", JSON.stringify(state));
           const users = Object.keys(state);
           const otherUsers = users.filter((u) => u !== userId);
-          setParticipants(otherUsers);
+          console.log("Presence sync - other users:", otherUsers);
           
-          // Create peer connections for existing users
-          otherUsers.forEach((remoteUserId) => {
-            if (!peerConnectionsRef.current[remoteUserId]) {
-              console.log("Creating peer connection for existing user:", remoteUserId);
-              createPeerConnection(remoteUserId);
-            }
-          });
+          // Only update participants if we have other users, don't clear existing ones
+          if (otherUsers.length > 0) {
+            setParticipants(prev => {
+              // Merge existing participants with new ones from sync
+              const merged = [...new Set([...prev, ...otherUsers])];
+              console.log("Participants after sync merge:", merged);
+              return merged;
+            });
+            
+            // Create peer connections for existing users
+            otherUsers.forEach((remoteUserId) => {
+              if (!peerConnectionsRef.current[remoteUserId]) {
+                // Only the user with the lower ID initiates
+                if (userId < remoteUserId) {
+                  console.log("Creating peer connection for existing user (sync):", remoteUserId);
+                  createPeerConnection(remoteUserId);
+                }
+              }
+            });
+          }
         })
         .on("presence", { event: "join" }, ({ key }) => {
           console.log("User joined:", key);
