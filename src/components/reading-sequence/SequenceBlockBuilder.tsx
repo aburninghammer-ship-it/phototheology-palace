@@ -81,7 +81,7 @@ export const SequenceBlockBuilder = ({ block, onChange, onRemove }: SequenceBloc
   };
 
   return (
-    <Card className={`border-2 transition-all ${block.enabled ? "border-primary/30" : "border-muted opacity-60"}`}>
+    <Card className={`glass-card border-2 transition-all backdrop-blur-xl ${block.enabled ? "border-primary/30 bg-card/50" : "border-muted/30 opacity-60 bg-muted/20"}`}>
       <Collapsible open={isExpanded} onOpenChange={setIsExpanded}>
         <CardHeader className="pb-2">
           <div className="flex items-center justify-between">

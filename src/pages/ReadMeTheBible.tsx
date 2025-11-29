@@ -149,36 +149,45 @@ export default function ReadMeTheBible() {
       <div className="min-h-screen bg-gradient-subtle">
         <Navigation />
         <div className="container mx-auto px-4 py-8 max-w-4xl">
-          <Button variant="ghost" onClick={() => setIsPlaying(false)} className="mb-6">
+          <Button variant="ghost" onClick={() => setIsPlaying(false)} className="mb-6 glass-card">
             <ArrowLeft className="mr-2 h-4 w-4" />
             Back to Builder
           </Button>
-          <SequencePlayer sequences={sequences} onClose={() => setIsPlaying(false)} />
+          <div className="glass-card p-6 rounded-xl">
+            <SequencePlayer sequences={sequences} onClose={() => setIsPlaying(false)} />
+          </div>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-subtle">
+    <div className="min-h-screen bg-gradient-subtle relative">
+      {/* Background effects */}
+      <div className="fixed inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-20 left-10 w-72 h-72 bg-primary/10 rounded-full blur-3xl animate-float" />
+        <div className="absolute bottom-20 right-10 w-96 h-96 bg-accent/10 rounded-full blur-3xl animate-float-delayed" />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-palace-purple/5 rounded-full blur-3xl" />
+      </div>
+      
       <Navigation />
-      <div className="container mx-auto px-4 py-8">
+      <div className="container mx-auto px-4 py-8 relative z-10">
         {/* Header */}
         <div className="mb-8">
           <div className="flex items-center gap-2 mb-2">
             <Link to="/bible">
-              <Button variant="ghost" size="sm">
+              <Button variant="ghost" size="sm" className="glass-card">
                 <ArrowLeft className="mr-2 h-4 w-4" />
                 Bible
               </Button>
             </Link>
           </div>
-          <div className="flex items-center gap-4">
-            <div className="p-3 rounded-xl bg-gradient-palace shadow-lg">
-              <Headphones className="h-8 w-8 text-white" />
+          <div className="glass-card p-6 rounded-2xl flex items-center gap-4">
+            <div className="p-4 rounded-xl bg-gradient-palace shadow-lg shadow-primary/20">
+              <Headphones className="h-10 w-10 text-white" />
             </div>
             <div>
-              <h1 className="text-4xl font-serif font-bold">Read Me the Bible</h1>
+              <h1 className="text-4xl font-serif font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">Read Me the Bible</h1>
               <p className="text-muted-foreground">
                 Create custom audio reading sequences with ElevenLabs voices
               </p>
@@ -187,12 +196,12 @@ export default function ReadMeTheBible() {
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <TabsList className="grid w-full max-w-md grid-cols-2">
-            <TabsTrigger value="create" className="gap-2">
+          <TabsList className="glass-card grid w-full max-w-md grid-cols-2 p-1 bg-background/50 backdrop-blur-xl border border-white/10">
+            <TabsTrigger value="create" className="gap-2 data-[state=active]:bg-primary/20 data-[state=active]:text-primary">
               <Plus className="h-4 w-4" />
               {editingId ? "Edit Sequence" : "Create Sequence"}
             </TabsTrigger>
-            <TabsTrigger value="saved" className="gap-2">
+            <TabsTrigger value="saved" className="gap-2 data-[state=active]:bg-primary/20 data-[state=active]:text-primary">
               <ListMusic className="h-4 w-4" />
               My Sequences
               {savedSequences.length > 0 && (
@@ -205,10 +214,12 @@ export default function ReadMeTheBible() {
 
           <TabsContent value="create" className="space-y-6">
             {/* Presets */}
-            <PresetSequences onSelect={handlePresetSelect} />
+            <div className="glass-card p-4 rounded-xl">
+              <PresetSequences onSelect={handlePresetSelect} />
+            </div>
 
             {/* Sequence Info */}
-            <Card>
+            <Card className="glass-card border-white/10 bg-card/50 backdrop-blur-xl">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <BookOpen className="h-5 w-5 text-primary" />
@@ -223,6 +234,7 @@ export default function ReadMeTheBible() {
                       placeholder="e.g., Morning Prophecy Study"
                       value={sequenceName}
                       onChange={(e) => setSequenceName(e.target.value)}
+                      className="bg-background/50 border-white/10"
                     />
                   </div>
                   <div>
@@ -231,7 +243,7 @@ export default function ReadMeTheBible() {
                       placeholder="What's this sequence about?"
                       value={sequenceDescription}
                       onChange={(e) => setSequenceDescription(e.target.value)}
-                      className="h-[38px] min-h-[38px] resize-none"
+                      className="h-[38px] min-h-[38px] resize-none bg-background/50 border-white/10"
                     />
                   </div>
                 </div>
@@ -243,7 +255,7 @@ export default function ReadMeTheBible() {
                       <Badge
                         key={tag.value}
                         variant={selectedTags.includes(tag.value) ? "default" : "outline"}
-                        className="cursor-pointer transition-all hover:scale-105"
+                        className="cursor-pointer transition-all hover:scale-105 backdrop-blur-sm"
                         onClick={() => toggleTag(tag.value)}
                       >
                         {tag.label}
@@ -256,16 +268,16 @@ export default function ReadMeTheBible() {
 
             {/* Sequence Blocks */}
             <div className="space-y-4">
-              <div className="flex items-center justify-between">
+              <div className="glass-card p-4 rounded-xl flex items-center justify-between">
                 <h3 className="text-lg font-semibold flex items-center gap-2">
                   <Sparkles className="h-5 w-5 text-amber-500" />
                   Reading Sequences
                   {totalChapters > 0 && (
-                    <Badge variant="secondary">{totalChapters} chapters total</Badge>
+                    <Badge variant="secondary" className="backdrop-blur-sm">{totalChapters} chapters total</Badge>
                   )}
                 </h3>
                 {sequences.length < 5 && (
-                  <Button variant="outline" size="sm" onClick={addSequenceBlock}>
+                  <Button variant="outline" size="sm" onClick={addSequenceBlock} className="backdrop-blur-sm">
                     <Plus className="h-4 w-4 mr-1" />
                     Add Sequence Block
                   </Button>
@@ -283,17 +295,18 @@ export default function ReadMeTheBible() {
             </div>
 
             {/* Actions */}
-            <div className="flex flex-wrap gap-3 justify-end pt-4 border-t">
+            <div className="glass-card p-4 rounded-xl flex flex-wrap gap-3 justify-end">
               <Button
                 variant="outline"
                 onClick={() => handlePlay()}
                 disabled={totalChapters === 0}
+                className="backdrop-blur-sm"
               >
                 <Play className="h-4 w-4 mr-2" />
                 Preview
               </Button>
               {user ? (
-                <Button onClick={handleSave} disabled={isSaving || !sequenceName.trim()}>
+                <Button onClick={handleSave} disabled={isSaving || !sequenceName.trim()} className="bg-gradient-palace hover:opacity-90 shadow-lg shadow-primary/20">
                   <Save className="h-4 w-4 mr-2" />
                   {isSaving ? "Saving..." : editingId ? "Update Sequence" : "Save Sequence"}
                 </Button>
@@ -307,14 +320,16 @@ export default function ReadMeTheBible() {
           </TabsContent>
 
           <TabsContent value="saved">
-            <SavedSequencesList
+            <div className="glass-card p-4 rounded-xl">
+              <SavedSequencesList
               sequences={savedSequences}
               isLoading={isLoading}
               onPlay={handlePlay}
               onEdit={handleEdit}
               onDelete={deleteSequence}
-              onDuplicate={handleDuplicate}
-            />
+                onDuplicate={handleDuplicate}
+              />
+            </div>
           </TabsContent>
         </Tabs>
       </div>

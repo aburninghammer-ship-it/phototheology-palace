@@ -217,6 +217,30 @@ const Index = () => {
         </div>
       </section>
 
+      {/* Why Phototheology - Comparison Section */}
+      <section className="py-16 px-4 sm:px-6 lg:px-8 bg-gradient-to-r from-palace-purple/10 via-background to-palace-teal/10">
+        <div className="max-w-4xl mx-auto text-center">
+          <Badge className="mb-4 bg-primary/10 text-primary border-primary/20">See The Difference</Badge>
+          <h2 className="text-3xl md:text-4xl font-bold mb-4">
+            Not Just Another Bible App
+          </h2>
+          <p className="text-lg text-muted-foreground mb-8 max-w-2xl mx-auto">
+            Compare Phototheology to YouVersion, Logos, Olive Tree, and others. 
+            See why our memory palace approach changes everything.
+          </p>
+          <Button 
+            size="lg"
+            variant="outline"
+            onClick={() => navigate("/why-phototheology")}
+            className="group border-primary/30 hover:bg-primary/10"
+          >
+            <Target className="mr-2 h-5 w-5" />
+            See Full Comparison
+            <ChevronRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
+          </Button>
+        </div>
+      </section>
+
       {/* Live AI Demo */}
       <section className="py-16 px-4 sm:px-6 lg:px-8 bg-muted/30">
         <div className="max-w-4xl mx-auto">

@@ -276,7 +276,7 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
 
   if (activeSequences.length === 0) {
     return (
-      <Card className="border-dashed">
+      <Card className="border-dashed glass-card bg-card/30 backdrop-blur-xl">
         <CardContent className="py-8 text-center text-muted-foreground">
           <ListMusic className="h-12 w-12 mx-auto mb-4 opacity-50" />
           <p>No chapters added to your sequence yet.</p>
@@ -291,7 +291,7 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
     : 0;
 
   return (
-    <Card className="overflow-hidden">
+    <Card className="overflow-hidden glass-card border-white/10 bg-card/50 backdrop-blur-xl">
       <div className="h-1 bg-gradient-to-r from-primary via-accent to-primary" />
       <CardHeader className="pb-2">
         <div className="flex items-center justify-between">
