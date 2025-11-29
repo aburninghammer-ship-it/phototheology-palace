@@ -15,6 +15,7 @@ import { SermonPDFExport } from "@/components/sermon/SermonPDFExport";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { motion } from "framer-motion";
 
 const STEPS = [
   { num: 1, title: "Setup", icon: BookOpen },
@@ -272,9 +273,13 @@ export default function SermonBuilder() {
 
   if (loading && editId) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-purple-900 via-purple-800 to-indigo-900">
+      <div className="min-h-screen bg-gradient-to-br from-purple-900 via-purple-800 to-indigo-900 relative overflow-hidden">
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          <div className="absolute top-1/4 -left-32 w-96 h-96 bg-purple-500/30 rounded-full blur-3xl animate-pulse" />
+          <div className="absolute bottom-1/4 -right-32 w-96 h-96 bg-indigo-500/30 rounded-full blur-3xl animate-pulse" style={{ animationDelay: "1s" }} />
+        </div>
         <Navigation />
-        <div className="flex items-center justify-center h-[60vh]">
+        <div className="flex items-center justify-center h-[60vh] relative z-10">
           <Loader2 className="w-8 h-8 text-white animate-spin" />
         </div>
       </div>
@@ -282,14 +287,47 @@ export default function SermonBuilder() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-900 via-purple-800 to-indigo-900">
+    <div className="min-h-screen bg-gradient-to-br from-purple-900 via-purple-800 to-indigo-900 relative overflow-hidden">
+      {/* Animated Background Orbs */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <motion.div
+          animate={{ 
+            scale: [1, 1.2, 1],
+            opacity: [0.2, 0.35, 0.2],
+          }}
+          transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
+          className="absolute -top-32 -left-32 w-96 h-96 bg-purple-500/40 rounded-full blur-3xl"
+        />
+        <motion.div
+          animate={{ 
+            scale: [1.2, 1, 1.2],
+            opacity: [0.25, 0.4, 0.25],
+          }}
+          transition={{ duration: 10, repeat: Infinity, ease: "easeInOut", delay: 1 }}
+          className="absolute top-1/3 -right-32 w-80 h-80 bg-indigo-500/40 rounded-full blur-3xl"
+        />
+        <motion.div
+          animate={{ 
+            scale: [1, 1.3, 1],
+            opacity: [0.15, 0.3, 0.15],
+          }}
+          transition={{ duration: 12, repeat: Infinity, ease: "easeInOut", delay: 2 }}
+          className="absolute -bottom-32 left-1/4 w-72 h-72 bg-fuchsia-500/30 rounded-full blur-3xl"
+        />
+      </div>
       <Navigation />
       {/* Header */}
-      <div className="bg-gradient-to-r from-purple-900/90 to-indigo-900/90 backdrop-blur-sm border-b border-white/10 py-8 px-6">
+      <div className="relative z-10 bg-white/5 backdrop-blur-xl border-b border-white/10 py-8 px-6">
         <div className="max-w-7xl mx-auto">
-          <div className="flex items-center justify-between">
+          <motion.div 
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="flex items-center justify-between flex-wrap gap-4"
+          >
             <div className="flex items-center gap-4">
-              <Film className="w-12 h-12 text-white" />
+              <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-purple-500 to-fuchsia-600 flex items-center justify-center shadow-lg shadow-purple-500/30">
+                <Film className="w-8 h-8 text-white" />
+              </div>
               <div>
                 <h1 className="text-4xl font-bold text-white">Sermon Builder</h1>
                 <p className="text-purple-200 text-lg">Movie-Model Approach with 5 Smooth Stones</p>
@@ -298,39 +336,50 @@ export default function SermonBuilder() {
             <Button 
               variant="outline" 
               onClick={() => navigate("/sermon-archive")}
-              className="bg-white/10 border-white/20 text-white hover:bg-white/20"
+              className="bg-white/10 border-white/20 text-white hover:bg-white/20 backdrop-blur-sm"
             >
               <Archive className="w-4 h-4 mr-2" />
               My Sermons
             </Button>
-          </div>
+          </motion.div>
         </div>
       </div>
 
       {/* Progress Steps */}
-      <div className="max-w-7xl mx-auto px-6 py-8">
-        <div className="flex gap-4 mb-8 overflow-x-auto">
-          {STEPS.map((step) => (
-            <Button
+      <div className="max-w-7xl mx-auto px-6 py-8 relative z-10">
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.1 }}
+          className="flex gap-4 mb-8 overflow-x-auto pb-2"
+        >
+          {STEPS.map((step, index) => (
+            <motion.div
               key={step.num}
-              variant={currentStep === step.num ? "default" : "outline"}
-              className={`flex-1 min-w-[150px] ${
-                currentStep === step.num
-                  ? "bg-white text-purple-900"
-                  : currentStep > step.num
-                  ? "bg-white/20 text-white border-white/40"
-                  : "bg-transparent text-white/60 border-white/20"
-              }`}
-              onClick={() => setCurrentStep(step.num)}
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: index * 0.1 }}
             >
-              {step.num}. {step.title}
-            </Button>
+              <Button
+                variant={currentStep === step.num ? "default" : "outline"}
+                className={`min-w-[150px] ${
+                  currentStep === step.num
+                    ? "bg-white text-purple-900 shadow-lg shadow-white/20"
+                    : currentStep > step.num
+                    ? "bg-white/20 text-white border-white/40 backdrop-blur-sm"
+                    : "bg-white/5 text-white/60 border-white/20 backdrop-blur-sm"
+                }`}
+                onClick={() => setCurrentStep(step.num)}
+              >
+                {step.num}. {step.title}
+              </Button>
+            </motion.div>
           ))}
-        </div>
+        </motion.div>
 
         <div className="grid lg:grid-cols-2 gap-6">
           {/* Main Content */}
-          <Card className="bg-white/95 backdrop-blur-sm">
+          <Card variant="glass" className="bg-white/90 dark:bg-white/10 backdrop-blur-xl border-white/20">
             <CardHeader>
               <CardTitle className="text-2xl">
                 {currentStep === 1 && "Start New Sermon"}
@@ -672,29 +721,36 @@ export default function SermonBuilder() {
           </Card>
 
           {/* Info Panel */}
-          <div className="space-y-6">
-            <Card className="bg-blue-50/90 border-blue-200">
+          <motion.div 
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.3 }}
+            className="space-y-6"
+          >
+            <Card variant="glass" className="bg-gradient-to-br from-blue-500/20 to-cyan-500/20 border-blue-400/30 backdrop-blur-xl">
               <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-blue-900">
-                  <BookOpen className="w-6 h-6" />
+                <CardTitle className="flex items-center gap-2 text-white">
+                  <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center">
+                    <BookOpen className="w-5 h-5 text-white" />
+                  </div>
                   The 5 Smooth Stones Approach
                 </CardTitle>
               </CardHeader>
-              <CardContent className="space-y-3 text-blue-900">
+              <CardContent className="space-y-3 text-white/90">
                 <p>
                   Like David selecting 5 smooth stones to face Goliath, you'll gather 5 powerful AHA moments that will captivate your audience.
                 </p>
                 <div className="space-y-2">
                   <div className="flex gap-2 items-start">
-                    <TrendingUp className="w-5 h-5 flex-shrink-0 mt-0.5" />
+                    <TrendingUp className="w-5 h-5 flex-shrink-0 mt-0.5 text-blue-300" />
                     <p className="text-sm">Each stone is a mind-blowing Phototheology insight</p>
                   </div>
                   <div className="flex gap-2 items-start">
-                    <ArrowRight className="w-5 h-5 flex-shrink-0 mt-0.5" />
+                    <ArrowRight className="w-5 h-5 flex-shrink-0 mt-0.5 text-cyan-300" />
                     <p className="text-sm">Bridges connect stones into a flowing narrative</p>
                   </div>
                   <div className="flex gap-2 items-start">
-                    <Film className="w-5 h-5 flex-shrink-0 mt-0.5" />
+                    <Film className="w-5 h-5 flex-shrink-0 mt-0.5 text-purple-300" />
                     <p className="text-sm">Structure it like a movie with climax and resolution</p>
                   </div>
                 </div>
@@ -703,18 +759,23 @@ export default function SermonBuilder() {
 
             {/* AI Help Display */}
             {aiHelp && (
-              <Card className="bg-purple-50/90 border-purple-200">
-                <CardHeader>
-                  <CardTitle className="text-purple-900">Jeeves&apos; Guidance</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="prose prose-sm max-w-none text-foreground whitespace-pre-wrap">
-                    {aiHelp}
-                  </div>
-                </CardContent>
-              </Card>
+              <motion.div
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+              >
+                <Card variant="glass" className="bg-gradient-to-br from-purple-500/20 to-fuchsia-500/20 border-purple-400/30 backdrop-blur-xl">
+                  <CardHeader>
+                    <CardTitle className="text-white">Jeeves&apos; Guidance</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="prose prose-sm max-w-none text-white/90 whitespace-pre-wrap">
+                      {aiHelp}
+                    </div>
+                  </CardContent>
+                </Card>
+              </motion.div>
             )}
-          </div>
+          </motion.div>
         </div>
       </div>
     </div>
