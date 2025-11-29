@@ -8,7 +8,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
-import { Flame, BookOpen, ChefHat, Calculator } from "lucide-react";
+import { Flame, BookOpen, ChefHat, Calculator, Brain, Target, Lightbulb, Zap } from "lucide-react";
+import { HowItWorksDialog } from "@/components/HowItWorksDialog";
 import { EnhancedSocialShare } from "@/components/EnhancedSocialShare";
 import { VoiceChatWidget } from "@/components/voice/VoiceChatWidget";
 import { DimensionDrillChallenge } from "@/components/challenges/DimensionDrillChallenge";
@@ -169,10 +170,53 @@ const DailyChallenges = () => {
 
   if (!user) return null;
 
+  const challengeSteps = [
+    {
+      title: "Complete Daily Challenges",
+      description: "Each day brings a new Phototheology challenge designed to sharpen your Bible study skills and deepen your understanding of Scripture.",
+      highlights: [
+        "30-day rotating challenge system",
+        "Dimension drills, chef recipes, and equation decoding",
+        "Progress tracked in your Growth Journal"
+      ],
+      icon: Flame
+    },
+    {
+      title: "Choose Your Challenge Type",
+      description: "Switch between Daily Challenges, Chef Challenges, and Equations to train different aspects of Phototheology thinking.",
+      highlights: [
+        "Daily challenges for reflexive training",
+        "Chef challenges to create biblical recipes",
+        "Equations to decode symbolic meanings"
+      ],
+      icon: Target
+    },
+    {
+      title: "Learn the Principles",
+      description: "Each challenge focuses on specific Phototheology principles like the 5 Dimensions, Connect 6, or Sanctuary mapping.",
+      highlights: [
+        "70 Questions methodology",
+        "Christ-chapter discoveries",
+        "Fruit check evaluations"
+      ],
+      icon: Lightbulb
+    },
+    {
+      title: "Track Your Growth",
+      description: "Completed challenges are saved to your Growth Journal where you can review your insights and track your spiritual development.",
+      highlights: [
+        "View past submissions and AI feedback",
+        "Share your insights with the community",
+        "Build a record of your spiritual journey"
+      ],
+      icon: Zap
+    }
+  ];
+
   return (
     <div className="min-h-screen bg-background">
       <Navigation />
-      <main className="container mx-auto px-4 pt-24 pb-8">
+      <main className="container mx-auto px-4 pt-36 pb-8">
         <div className="max-w-6xl mx-auto space-y-6">
           <div className="flex items-center justify-between flex-wrap gap-4">
             <h1 className="text-4xl font-bold flex items-center gap-2">
@@ -180,6 +224,11 @@ const DailyChallenges = () => {
               Challenges
             </h1>
             <div className="flex gap-2">
+              <HowItWorksDialog 
+                title="How to Use Daily Challenges" 
+                steps={challengeSteps}
+                gradient="from-orange-500 via-amber-500 to-yellow-500"
+              />
               <Button onClick={() => navigate("/growth-journal")} variant="outline" className="gap-2">
                 <BookOpen className="h-4 w-4" />
                 Growth Journal
