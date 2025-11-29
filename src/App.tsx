@@ -22,6 +22,8 @@ import { AnnouncementBanner } from "@/components/AnnouncementBanner";
 import { VoiceChatInviteNotification } from "@/components/voice/VoiceChatInviteNotification";
 import { PageTracker } from "@/components/PageTracker";
 import { DailyVerseNotification } from "@/components/notifications/DailyVerseNotification";
+import { InstallPrompt } from "@/components/pwa/InstallPrompt";
+import { ExitIntentPopup } from "@/components/conversion/ExitIntentPopup";
 
 // Critical pages - load immediately
 import Index from "./pages/Index";
@@ -222,6 +224,8 @@ function App() {
                         <AnnouncementBanner />
                         <VoiceChatInviteNotification />
                         <DailyVerseNotification />
+                        <InstallPrompt />
+                        <ExitIntentPopup />
                         <div className="flex flex-1 w-full">
                           <MessagingSidebar />
                           <main className="flex-1 w-full overflow-x-hidden">

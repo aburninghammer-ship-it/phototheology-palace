@@ -26,8 +26,10 @@ import {
   Users,
   Star,
   Sparkles,
-  ChevronRight
+  ChevronRight,
+  BarChart3
 } from "lucide-react";
+import { XPSystem, BadgeSystem, WeeklyLeaderboard } from "@/components/gamification";
 
 interface DashboardStats {
   dailyStreak: number;
@@ -323,13 +325,26 @@ export default function Dashboard() {
           </div>
         </div>
 
+        {/* Gamification Section */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+          <XPSystem />
+          <BadgeSystem />
+          <WeeklyLeaderboard />
+        </div>
+
         {/* Recent Reading */}
         <Card>
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <History className="h-5 w-5" />
-              Recent Reading
-            </CardTitle>
+            <div className="flex items-center justify-between">
+              <CardTitle className="flex items-center gap-2">
+                <History className="h-5 w-5" />
+                Recent Reading
+              </CardTitle>
+              <Button variant="ghost" size="sm" onClick={() => navigate("/my-progress")}>
+                <BarChart3 className="h-4 w-4 mr-1" />
+                View Analytics
+              </Button>
+            </div>
           </CardHeader>
           <CardContent>
             {recentReading.length > 0 ? (
