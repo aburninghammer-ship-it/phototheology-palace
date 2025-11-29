@@ -11,6 +11,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Loader2, BookOpen, Users, Calendar, Download, FileText, ExternalLink } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Footer } from "@/components/Footer";
+import { QuickAudioButton } from "@/components/audio";
 
 interface BibleStudySession {
   sessionNumber: number;
@@ -373,7 +374,10 @@ const BibleStudyLeader = () => {
                 <ScrollArea className="h-[600px] pr-4">
                   <div className="space-y-6">
                     <div>
-                      <h3 className="text-2xl font-bold mb-2">{generatedStudy.seriesTitle}</h3>
+                      <div className="flex items-center justify-between mb-2">
+                        <h3 className="text-2xl font-bold">{generatedStudy.seriesTitle}</h3>
+                        <QuickAudioButton text={generatedStudy.overview} variant="outline" size="sm" />
+                      </div>
                       <p className="text-muted-foreground">{generatedStudy.overview}</p>
                     </div>
 
@@ -399,7 +403,10 @@ const BibleStudyLeader = () => {
                           </div>
                           
                           <div>
-                            <p className="font-semibold text-primary mb-1">Main Teaching:</p>
+                            <div className="flex items-center justify-between mb-1">
+                              <p className="font-semibold text-primary">Main Teaching:</p>
+                              <QuickAudioButton text={session.mainTeaching} variant="ghost" size="icon" className="h-6 w-6" />
+                            </div>
                             <p className="text-muted-foreground whitespace-pre-wrap">{session.mainTeaching}</p>
                           </div>
                           

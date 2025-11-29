@@ -17,6 +17,7 @@ import {
   Maximize,
   Minimize
 } from "lucide-react";
+import { QuickAudioButton } from "@/components/audio";
 
 export default function SeriesPresentationMode() {
   const { seriesId } = useParams();
@@ -255,6 +256,9 @@ export default function SeriesPresentationMode() {
             <div className="flex items-center gap-3">
               <Target className="h-8 w-8 text-primary" />
               <h2 className="text-3xl font-bold">{slide.content.title}</h2>
+              {slide.content.text && (
+                <QuickAudioButton text={slide.content.text} variant="outline" size="sm" />
+              )}
             </div>
             <p className="text-2xl leading-relaxed">{slide.content.text}</p>
           </div>
@@ -281,6 +285,9 @@ export default function SeriesPresentationMode() {
             <div className="flex items-center gap-3">
               <BookOpen className="h-8 w-8 text-primary" />
               <h2 className="text-3xl font-bold">{slide.content.title}</h2>
+              {slide.content.text && (
+                <QuickAudioButton text={slide.content.text} variant="outline" size="sm" />
+              )}
             </div>
             <p className="text-2xl leading-relaxed">{slide.content.text}</p>
           </div>
@@ -308,7 +315,12 @@ export default function SeriesPresentationMode() {
       case 'challenge':
         return (
           <div className="space-y-6">
-            <h2 className="text-3xl font-bold">{slide.content.title}</h2>
+            <div className="flex items-center gap-3">
+              <h2 className="text-3xl font-bold">{slide.content.title}</h2>
+              {slide.content.text && (
+                <QuickAudioButton text={slide.content.text} variant="outline" size="sm" />
+              )}
+            </div>
             <p className="text-2xl leading-relaxed">{slide.content.text}</p>
           </div>
         );

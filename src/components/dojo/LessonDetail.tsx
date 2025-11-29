@@ -9,6 +9,7 @@ import { ArrowLeft, BookOpen, Target, HelpCircle, CheckCircle2 } from "lucide-re
 import { DojoLesson } from "@/data/artOfWarLessons";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { QuickAudioButton } from "@/components/audio";
 
 interface LessonDetailProps {
   lesson: DojoLesson;
@@ -74,12 +75,18 @@ export const LessonDetail = ({ lesson, onBack, onComplete, isCompleted, existing
 
             <TabsContent value="overview" className="space-y-6 mt-6">
               <div>
-                <h3 className="text-lg font-semibold mb-3">Lesson Overview</h3>
+                <div className="flex items-center justify-between mb-3">
+                  <h3 className="text-lg font-semibold">Lesson Overview</h3>
+                  <QuickAudioButton text={lesson.description} variant="ghost" size="sm" />
+                </div>
                 <p className="text-muted-foreground leading-relaxed">{lesson.description}</p>
               </div>
 
               <div>
-                <h3 className="text-lg font-semibold mb-3">Key Points</h3>
+                <div className="flex items-center justify-between mb-3">
+                  <h3 className="text-lg font-semibold">Key Points</h3>
+                  <QuickAudioButton text={lesson.keyPoints.join('. ')} variant="ghost" size="sm" />
+                </div>
                 <div className="space-y-3">
                   {lesson.keyPoints.map((point, idx) => (
                     <div key={idx} className="flex gap-3 items-start">
@@ -134,7 +141,10 @@ export const LessonDetail = ({ lesson, onBack, onComplete, isCompleted, existing
 
             <TabsContent value="practice" className="space-y-4 mt-6">
               <div>
-                <h3 className="text-lg font-semibold mb-3">Practical Application</h3>
+                <div className="flex items-center justify-between mb-3">
+                  <h3 className="text-lg font-semibold">Practical Application</h3>
+                  <QuickAudioButton text={lesson.practicalApplication} variant="ghost" size="sm" />
+                </div>
                 <Card className="border-primary/20 bg-primary/5">
                   <CardContent className="pt-6">
                     <p className="leading-relaxed">{lesson.practicalApplication}</p>

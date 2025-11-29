@@ -40,6 +40,7 @@ import { JeevesMasterProgram } from "@/components/mastery/JeevesMasterProgram";
 import { VoiceChatWidget } from "@/components/voice/VoiceChatWidget";
 import { RoomTour } from "@/components/onboarding/RoomTour";
 import { useRoomTour } from "@/hooks/useRoomTour";
+import { QuickAudioButton } from "@/components/audio";
 
 // Room IDs that have quick start guides
 const QUICK_START_ROOMS = new Set([
@@ -360,7 +361,10 @@ export default function RoomDetail() {
                   </CardHeader>
                   <CardContent className="relative z-10">
                     <div className="p-6 bg-gradient-to-br from-primary/5 via-accent/5 to-secondary/5 rounded-xl border-2 border-primary/20">
-                      <p className="text-xl font-bold text-foreground leading-relaxed">{room.coreQuestion}</p>
+                      <div className="flex items-start justify-between gap-4">
+                        <p className="text-xl font-bold text-foreground leading-relaxed">{room.coreQuestion}</p>
+                        <QuickAudioButton text={room.coreQuestion} variant="ghost" size="sm" />
+                      </div>
                     </div>
                   </CardContent>
                 </Card>
@@ -376,7 +380,10 @@ export default function RoomDetail() {
                             </div>
                             <CardTitle className="text-2xl font-bold group-hover:text-accent transition-colors">🎯 Full Methodology</CardTitle>
                           </div>
-                          <ChevronDown className={`h-6 w-6 transition-transform duration-300 ${methodExpanded ? 'rotate-180 text-accent' : 'text-muted-foreground'}`} />
+                          <div className="flex items-center gap-2">
+                            {methodExpanded && <QuickAudioButton text={room.method} variant="ghost" size="sm" />}
+                            <ChevronDown className={`h-6 w-6 transition-transform duration-300 ${methodExpanded ? 'rotate-180 text-accent' : 'text-muted-foreground'}`} />
+                          </div>
                         </div>
                       </CollapsibleTrigger>
                       {!methodExpanded && (

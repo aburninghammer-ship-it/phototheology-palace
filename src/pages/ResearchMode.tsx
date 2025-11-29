@@ -10,6 +10,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Search, Sparkles, Plus, Target, Lightbulb } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Badge } from "@/components/ui/badge";
+import { QuickAudioButton } from "@/components/audio";
 
 interface ResearchNote {
   id: string;
@@ -236,9 +237,12 @@ const ResearchMode = () => {
               {research && (
                 <Card>
                   <CardContent className="p-8">
-                    <div className="flex items-center gap-2 mb-6">
-                      <Search className="h-6 w-6 text-primary" />
-                      <h3 className="text-3xl font-bold">{query}</h3>
+                    <div className="flex items-center justify-between mb-6">
+                      <div className="flex items-center gap-2">
+                        <Search className="h-6 w-6 text-primary" />
+                        <h3 className="text-3xl font-bold">{query}</h3>
+                      </div>
+                      <QuickAudioButton text={research} variant="outline" size="sm" />
                     </div>
                     <ScrollArea className="h-[700px] pr-4">
                       <div className="prose prose-lg dark:prose-invert max-w-none space-y-6">
