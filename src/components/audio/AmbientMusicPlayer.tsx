@@ -49,7 +49,7 @@ const AMBIENT_TRACKS = [
     category: "floor-2",
     floor: 2,
     mood: "structured, reflective",
-    url: "https://www.bensound.com/bensound-music/bensound-thejazzpiano.mp3",
+    url: "https://www.bensound.com/bensound-music/bensound-tenderness.mp3",
     bpm: 65,
   },
   // Floor 3 - Sanctuary Floor: reverent strings, harp
