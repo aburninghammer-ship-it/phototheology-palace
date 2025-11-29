@@ -1,5 +1,7 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Quote } from "lucide-react";
+import { useState, useEffect } from "react";
+import { cn } from "@/lib/utils";
 
 const testimonials = [
   {
@@ -17,9 +19,41 @@ const testimonials = [
     author: "Renee",
     role: "Bible Student",
   },
+  {
+    quote: "This is the type of joy and excitement I've always yearned for when studying the Word. These workshops are so fire!",
+    author: "Jessica",
+    role: "Student",
+  },
+  {
+    quote: "The system of Phototheology is literally mind blowing! It has helped me see and understand Jesus more clearly.",
+    author: "Theo",
+    role: "Bible Student",
+  },
+  {
+    quote: "Photo-Theology has been a game changer in my personal Bible studies and sermon preparations.",
+    author: "Teddy",
+    role: "Pastor",
+  },
 ];
 
 export const StreamlinedTestimonials = () => {
+  const [currentIndex, setCurrentIndex] = useState(0);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentIndex((prev) => (prev + 1) % testimonials.length);
+    }, 5000);
+    return () => clearInterval(interval);
+  }, []);
+
+  const getVisibleTestimonials = () => {
+    const indices = [];
+    for (let i = 0; i < 3; i++) {
+      indices.push((currentIndex + i) % testimonials.length);
+    }
+    return indices;
+  };
+
   return (
     <section className="py-20 px-4 sm:px-6 lg:px-8 bg-muted/20">
       <div className="max-w-6xl mx-auto">
@@ -31,19 +65,42 @@ export const StreamlinedTestimonials = () => {
         </p>
         
         <div className="grid md:grid-cols-3 gap-6">
-          {testimonials.map((testimonial, index) => (
-            <Card key={index} className="border-2">
+          {getVisibleTestimonials().map((index, position) => (
+            <Card 
+              key={`${index}-${position}`} 
+              className={cn(
+                "border-2 transition-all duration-500 ease-in-out",
+                "animate-fade-in"
+              )}
+            >
               <CardContent className="pt-6">
                 <Quote className="h-8 w-8 text-primary mb-4" />
                 <p className="text-muted-foreground italic mb-6">
-                  "{testimonial.quote}"
+                  "{testimonials[index].quote}"
                 </p>
                 <div>
-                  <p className="font-semibold">{testimonial.author}</p>
-                  <p className="text-sm text-muted-foreground">{testimonial.role}</p>
+                  <p className="font-semibold">{testimonials[index].author}</p>
+                  <p className="text-sm text-muted-foreground">{testimonials[index].role}</p>
                 </div>
               </CardContent>
             </Card>
+          ))}
+        </div>
+
+        {/* Dots indicator */}
+        <div className="flex justify-center gap-2 mt-8">
+          {testimonials.map((_, index) => (
+            <button
+              key={index}
+              onClick={() => setCurrentIndex(index)}
+              className={cn(
+                "w-2 h-2 rounded-full transition-all duration-300",
+                currentIndex === index 
+                  ? "bg-primary w-6" 
+                  : "bg-muted-foreground/30 hover:bg-muted-foreground/50"
+              )}
+              aria-label={`Go to testimonial ${index + 1}`}
+            />
           ))}
         </div>
       </div>
