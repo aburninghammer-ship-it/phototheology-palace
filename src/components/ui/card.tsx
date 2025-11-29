@@ -19,17 +19,28 @@ const cardVariants = cva(
   }
 );
 
+const GlassBubbles = () => (
+  <div className="glass-card-bubbles">
+    <span /><span /><span /><span /><span /><span /><span /><span />
+  </div>
+);
+
 export interface CardProps
   extends React.HTMLAttributes<HTMLDivElement>,
-    VariantProps<typeof cardVariants> {}
+    VariantProps<typeof cardVariants> {
+  showBubbles?: boolean;
+}
 
 const Card = React.forwardRef<HTMLDivElement, CardProps>(
-  ({ className, variant, ...props }, ref) => (
+  ({ className, variant, showBubbles = true, children, ...props }, ref) => (
     <div
       ref={ref}
       className={cn(cardVariants({ variant, className }))}
       {...props}
-    />
+    >
+      {variant === "glass" && showBubbles && <GlassBubbles />}
+      {children}
+    </div>
   )
 );
 Card.displayName = "Card";

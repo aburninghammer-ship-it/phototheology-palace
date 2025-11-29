@@ -336,6 +336,53 @@ All colors MUST be HSL.
     animation: glow-pulse 3s ease-in-out infinite;
   }
   
+  /* Floating bubbles/particles effect */
+  .glass-card-bubbles {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    pointer-events: none;
+    z-index: 0;
+    border-radius: inherit;
+  }
+  
+  .glass-card-bubbles span {
+    position: absolute;
+    bottom: -20px;
+    width: 6px;
+    height: 6px;
+    background: hsl(var(--palace-orange) / 0.6);
+    border-radius: 50%;
+    animation: bubble-float 8s ease-in infinite;
+    box-shadow: 0 0 10px 2px hsl(var(--palace-orange) / 0.4);
+  }
+  
+  .glass-card-bubbles span:nth-child(1) { left: 10%; animation-delay: 0s; animation-duration: 7s; width: 4px; height: 4px; }
+  .glass-card-bubbles span:nth-child(2) { left: 20%; animation-delay: 1s; animation-duration: 9s; width: 8px; height: 8px; background: hsl(var(--accent) / 0.5); box-shadow: 0 0 10px 2px hsl(var(--accent) / 0.4); }
+  .glass-card-bubbles span:nth-child(3) { left: 35%; animation-delay: 2s; animation-duration: 6s; width: 5px; height: 5px; background: hsl(var(--palace-teal) / 0.5); box-shadow: 0 0 10px 2px hsl(var(--palace-teal) / 0.4); }
+  .glass-card-bubbles span:nth-child(4) { left: 50%; animation-delay: 0.5s; animation-duration: 8s; width: 7px; height: 7px; }
+  .glass-card-bubbles span:nth-child(5) { left: 65%; animation-delay: 3s; animation-duration: 10s; width: 4px; height: 4px; background: hsl(var(--palace-pink) / 0.5); box-shadow: 0 0 10px 2px hsl(var(--palace-pink) / 0.4); }
+  .glass-card-bubbles span:nth-child(6) { left: 75%; animation-delay: 1.5s; animation-duration: 7s; width: 6px; height: 6px; background: hsl(var(--accent) / 0.6); box-shadow: 0 0 10px 2px hsl(var(--accent) / 0.4); }
+  .glass-card-bubbles span:nth-child(7) { left: 85%; animation-delay: 2.5s; animation-duration: 9s; width: 5px; height: 5px; background: hsl(var(--palace-purple) / 0.5); box-shadow: 0 0 10px 2px hsl(var(--palace-purple) / 0.4); }
+  .glass-card-bubbles span:nth-child(8) { left: 90%; animation-delay: 4s; animation-duration: 6s; width: 8px; height: 8px; }
+  
+  @keyframes bubble-float {
+    0% {
+      transform: translateY(0) scale(1);
+      opacity: 0;
+    }
+    10% {
+      opacity: 1;
+    }
+    90% {
+      opacity: 1;
+    }
+    100% {
+      transform: translateY(-400px) scale(0.5);
+      opacity: 0;
+    }
+  }
+  
   @keyframes glow-rotate {
     0% { --glow-angle: 0deg; }
     100% { --glow-angle: 360deg; }

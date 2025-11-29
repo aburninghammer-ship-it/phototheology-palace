@@ -43,14 +43,22 @@ const dialogContentVariants = cva(
   }
 );
 
+const GlassBubbles = () => (
+  <div className="glass-card-bubbles">
+    <span /><span /><span /><span /><span /><span /><span /><span />
+  </div>
+);
+
 export interface DialogContentProps
   extends React.ComponentPropsWithoutRef<typeof DialogPrimitive.Content>,
-    VariantProps<typeof dialogContentVariants> {}
+    VariantProps<typeof dialogContentVariants> {
+  showBubbles?: boolean;
+}
 
 const DialogContent = React.forwardRef<
   React.ElementRef<typeof DialogPrimitive.Content>,
   DialogContentProps
->(({ className, variant, children, ...props }, ref) => (
+>(({ className, variant, showBubbles = true, children, ...props }, ref) => (
   <DialogPortal>
     <DialogOverlay />
     <DialogPrimitive.Content
@@ -58,6 +66,7 @@ const DialogContent = React.forwardRef<
       className={cn(dialogContentVariants({ variant, className }))}
       {...props}
     >
+      {variant === "glass" && showBubbles && <GlassBubbles />}
       {children}
       <DialogPrimitive.Close className="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity data-[state=open]:bg-accent data-[state=open]:text-muted-foreground hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none">
         <X className="h-4 w-4" />
