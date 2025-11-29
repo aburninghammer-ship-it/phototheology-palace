@@ -11,7 +11,8 @@ import {
   SkipForward,
   Settings,
   X,
-  Repeat
+  Repeat,
+  Repeat1
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
@@ -380,9 +381,10 @@ export function AmbientMusicPlayer({
     return saved === "true";
   });
   const [showControls, setShowControls] = useState(false);
-  const [isLooping, setIsLooping] = useState(() => {
-    const saved = localStorage.getItem("pt-ambient-loop");
-    return saved !== "false"; // default to true
+  // Loop mode: "none" | "one" | "all"
+  const [loopMode, setLoopMode] = useState<"none" | "one" | "all">(() => {
+    const saved = localStorage.getItem("pt-ambient-loop-mode");
+    return (saved as "none" | "one" | "all") || "all";
   });
 
   const currentTrack = AMBIENT_TRACKS.find(t => t.id === currentTrackId) || AMBIENT_TRACKS[0];
@@ -401,16 +403,30 @@ export function AmbientMusicPlayer({
   useEffect(() => {
     if (!audioRef.current) {
       audioRef.current = new Audio();
-      audioRef.current.loop = isLooping;
+      audioRef.current.loop = loopMode === "one";
+      
+      // Handle track ended for "all" loop mode
+      audioRef.current.onended = () => {
+        if (loopMode === "all") {
+          nextTrack();
+          // Auto-play next track
+          setTimeout(() => {
+            audioRef.current?.play().catch(console.error);
+          }, 100);
+        } else if (loopMode === "none") {
+          setIsPlaying(false);
+        }
+      };
     }
     
     return () => {
       if (audioRef.current) {
         audioRef.current.pause();
+        audioRef.current.onended = null;
         audioRef.current = null;
       }
     };
-  }, []);
+  }, [loopMode]);
 
   // Update audio source when track changes
   useEffect(() => {
@@ -443,10 +459,30 @@ export function AmbientMusicPlayer({
   // Update loop setting
   useEffect(() => {
     if (audioRef.current) {
-      audioRef.current.loop = isLooping;
+      audioRef.current.loop = loopMode === "one";
+      
+      // Update onended handler
+      audioRef.current.onended = () => {
+        if (loopMode === "all") {
+          nextTrack();
+          setTimeout(() => {
+            audioRef.current?.play().catch(console.error);
+          }, 100);
+        } else if (loopMode === "none") {
+          setIsPlaying(false);
+        }
+      };
     }
-    localStorage.setItem("pt-ambient-loop", isLooping.toString());
-  }, [isLooping]);
+    localStorage.setItem("pt-ambient-loop-mode", loopMode);
+  }, [loopMode]);
+
+  const cycleLoopMode = () => {
+    setLoopMode(prev => {
+      if (prev === "none") return "one";
+      if (prev === "one") return "all";
+      return "none";
+    });
+  };
 
   const togglePlay = async () => {
     if (!audioRef.current) {
@@ -573,11 +609,15 @@ export function AmbientMusicPlayer({
               <Button
                 variant="ghost"
                 size="icon"
-                onClick={() => setIsLooping(!isLooping)}
-                className={cn("h-8 w-8", isLooping && "text-primary")}
-                title={isLooping ? "Loop on" : "Loop off"}
+                onClick={cycleLoopMode}
+                className={cn("h-8 w-8", loopMode !== "none" && "text-primary")}
+                title={loopMode === "none" ? "Loop off" : loopMode === "one" ? "Loop one" : "Loop all"}
               >
-                <Repeat className="h-4 w-4" />
+                {loopMode === "one" ? (
+                  <Repeat1 className="h-4 w-4" />
+                ) : (
+                  <Repeat className="h-4 w-4" />
+                )}
               </Button>
               
               <Button
@@ -657,11 +697,15 @@ export function AmbientMusicPlayer({
           <Button
             variant="ghost"
             size="icon"
-            onClick={() => setIsLooping(!isLooping)}
-            className={cn("h-8 w-8 shrink-0", isLooping && "text-primary")}
-            title={isLooping ? "Loop on" : "Loop off"}
+            onClick={cycleLoopMode}
+            className={cn("h-8 w-8 shrink-0", loopMode !== "none" && "text-primary")}
+            title={loopMode === "none" ? "Loop off" : loopMode === "one" ? "Loop one" : "Loop all"}
           >
-            <Repeat className="h-4 w-4" />
+            {loopMode === "one" ? (
+              <Repeat1 className="h-4 w-4" />
+            ) : (
+              <Repeat className="h-4 w-4" />
+            )}
           </Button>
 
           {/* Volume */}
