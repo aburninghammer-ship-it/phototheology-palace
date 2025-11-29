@@ -32,10 +32,10 @@ const AMBIENT_TRACKS = [
   {
     id: "devotion",
     name: "Devotion",
-    description: "Inspiring cinematic ambient for reflection",
+    description: "Gentle epic orchestral for reflection",
     category: "devotion",
-    // Inspiring Cinematic Ambient - soft orchestral
-    url: "https://cdn.pixabay.com/audio/2022/08/02/audio_884fe92c21.mp3",
+    // Cinematic documentary - soft strings and brass
+    url: "https://cdn.pixabay.com/audio/2022/03/10/audio_bc61e79a05.mp3",
     bpm: 65,
   },
   {
