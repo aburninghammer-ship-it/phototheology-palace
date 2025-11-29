@@ -32,19 +32,19 @@ const AMBIENT_TRACKS = [
   {
     id: "devotion",
     name: "Devotion",
-    description: "Gentle epic orchestral for reflection",
+    description: "Gentle orchestral for reflection",
     category: "devotion",
-    // Cinematic documentary - soft strings and brass
-    url: "https://cdn.pixabay.com/audio/2022/03/10/audio_bc61e79a05.mp3",
+    // Emotional cinematic piano
+    url: "https://cdn.pixabay.com/audio/2022/01/18/audio_d0a13f69d2.mp3",
     bpm: 65,
   },
   {
     id: "deep-study",
     name: "Deep Study",
-    description: "Epic orchestral for focused learning",
+    description: "Calm orchestral for focused learning",
     category: "study",
-    // Documentary style cinematic
-    url: "https://cdn.pixabay.com/audio/2022/03/15/audio_115b9b74b7.mp3",
+    // Documentary ambient
+    url: "https://cdn.pixabay.com/audio/2022/02/22/audio_d1718ab41b.mp3",
     bpm: 70,
   },
   {
@@ -52,7 +52,7 @@ const AMBIENT_TRACKS = [
     name: "Sanctuary",
     description: "Reverent orchestral soundscape",
     category: "sanctuary",
-    // Cinematic ambient - the one user liked
+    // Cinematic ambient - verified working
     url: "https://cdn.pixabay.com/audio/2022/08/02/audio_884fe92c21.mp3",
     bpm: 60,
   },
@@ -61,8 +61,8 @@ const AMBIENT_TRACKS = [
     name: "Memorization",
     description: "Serene ambient for memory retention",
     category: "memory",
-    // Soft cinematic strings - different from Sanctuary
-    url: "https://cdn.pixabay.com/audio/2022/05/16/audio_35b21f91d5.mp3",
+    // Soft ambient strings
+    url: "https://cdn.pixabay.com/audio/2022/01/20/audio_d2f7a89c8f.mp3",
     bpm: 62,
   },
   {
@@ -70,8 +70,8 @@ const AMBIENT_TRACKS = [
     name: "Prophecy",
     description: "Epic atmospheric for prophetic study",
     category: "prophecy",
-    // Dramatic cinematic orchestral
-    url: "https://cdn.pixabay.com/audio/2022/10/28/audio_99189bca5f.mp3",
+    // Dramatic cinematic
+    url: "https://cdn.pixabay.com/audio/2022/03/09/audio_c8a7e0adfc.mp3",
     bpm: 55,
   },
 ];
