@@ -217,7 +217,7 @@ const AMBIENT_TRACKS = [
     category: "hymn-cinematic",
     floor: 3,
     mood: "awe, majesty, worship",
-    url: "https://www.bensound.com/bensound-music/bensound-moose.mp3",
+    url: "https://www.bensound.com/bensound-music/bensound-birthofahero.mp3",
     bpm: 62,
   },
   {
