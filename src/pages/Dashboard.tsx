@@ -219,7 +219,7 @@ export default function Dashboard() {
 
         {/* Main Stats Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          <Card>
+          <Card variant="glass">
             <CardHeader className="flex flex-row items-center justify-between pb-2">
               <CardTitle className="text-sm font-medium">Daily Streak</CardTitle>
               <Flame className="h-4 w-4 text-orange-500" />
@@ -230,7 +230,7 @@ export default function Dashboard() {
             </CardContent>
           </Card>
 
-          <Card>
+          <Card variant="glass">
             <CardHeader className="flex flex-row items-center justify-between pb-2">
               <CardTitle className="text-sm font-medium">Total Points</CardTitle>
               <Trophy className="h-4 w-4 text-yellow-500" />
@@ -241,7 +241,7 @@ export default function Dashboard() {
             </CardContent>
           </Card>
 
-          <Card>
+          <Card variant="glass">
             <CardHeader className="flex flex-row items-center justify-between pb-2">
               <CardTitle className="text-sm font-medium">Current Level</CardTitle>
               <Award className="h-4 w-4 text-purple-500" />
@@ -252,7 +252,7 @@ export default function Dashboard() {
             </CardContent>
           </Card>
 
-          <Card>
+          <Card variant="glass">
             <CardHeader className="flex flex-row items-center justify-between pb-2">
               <CardTitle className="text-sm font-medium">Chess Streak</CardTitle>
               <Target className="h-4 w-4 text-blue-500" />
@@ -269,7 +269,7 @@ export default function Dashboard() {
           <PalaceProgressDashboard />
           
           <div className="space-y-6">
-            <Card>
+            <Card variant="glass">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Play className="h-5 w-5" />
@@ -333,7 +333,7 @@ export default function Dashboard() {
         </div>
 
         {/* Recent Reading */}
-        <Card>
+        <Card variant="glass">
           <CardHeader>
             <div className="flex items-center justify-between">
               <CardTitle className="flex items-center gap-2">

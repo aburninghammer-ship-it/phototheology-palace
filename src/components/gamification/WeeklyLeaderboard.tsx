@@ -84,7 +84,7 @@ export const WeeklyLeaderboard = () => {
   };
 
   return (
-    <Card className="overflow-hidden">
+    <Card variant="glass" className="overflow-hidden">
       <div className="h-1 bg-gradient-to-r from-yellow-500 via-amber-500 to-orange-500" />
       <CardHeader className="pb-2">
         <CardTitle className="text-lg flex items-center gap-2">
