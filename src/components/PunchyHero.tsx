@@ -80,7 +80,7 @@ export const PunchyHero = () => {
             <ChevronRight className="ml-2 h-6 w-6" />
           </Button>
           <p className="text-sm text-muted-foreground">
-            Join 10,000+ Christians who finally understand what they study
+            Join 1000's of Christians who finally understand what they study
           </p>
         </motion.div>
 
