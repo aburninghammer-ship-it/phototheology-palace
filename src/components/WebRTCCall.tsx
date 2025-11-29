@@ -114,13 +114,24 @@ export function WebRTCCall({ roomId, userId, userName }: WebRTCCallProps) {
         })
         .on("presence", { event: "join" }, ({ key }) => {
           console.log("User joined:", key);
-          if (key !== userId && !peerConnectionsRef.current[key]) {
-            // Only the user with the lower ID initiates the connection to avoid dual offers
-            if (userId < key) {
-              console.log("We initiate connection to:", key);
-              createPeerConnection(key);
-            } else {
-              console.log("Waiting for connection from:", key);
+          if (key !== userId) {
+            // Add to participants list immediately
+            setParticipants(prev => {
+              if (!prev.includes(key)) {
+                console.log("Adding participant to list:", key);
+                return [...prev, key];
+              }
+              return prev;
+            });
+            
+            if (!peerConnectionsRef.current[key]) {
+              // Only the user with the lower ID initiates the connection to avoid dual offers
+              if (userId < key) {
+                console.log("We initiate connection to:", key);
+                createPeerConnection(key);
+              } else {
+                console.log("Waiting for connection from:", key);
+              }
             }
           }
         })
@@ -149,12 +160,12 @@ export function WebRTCCall({ roomId, userId, userName }: WebRTCCallProps) {
         .subscribe(async (status) => {
           console.log("Channel subscription status:", status);
           if (status === "SUBSCRIBED") {
-            setConnectionStatus("Connected - waiting for participants...");
             await channel.track({
               user_id: userId,
               user_name: userName,
               online_at: new Date().toISOString(),
             });
+            setConnectionStatus("In call - establishing connection...");
           }
         });
 
@@ -493,8 +504,17 @@ export function WebRTCCall({ roomId, userId, userName }: WebRTCCallProps) {
         ) : (
           <>
             {connectionStatus && (
-              <div className="text-center text-sm text-muted-foreground mb-2">
+              <div className={`text-center text-sm mb-2 ${
+                connectionStatus.includes("Connected!") 
+                  ? "text-green-500 font-medium" 
+                  : connectionStatus.includes("failed") 
+                    ? "text-destructive"
+                    : "text-muted-foreground"
+              }`}>
                 Status: {connectionStatus}
+                {participants.length > 0 && !connectionStatus.includes("Connected!") && (
+                  <span className="ml-2">• {participants.length} participant(s) in call</span>
+                )}
               </div>
             )}
             
@@ -549,9 +569,17 @@ export function WebRTCCall({ roomId, userId, userName }: WebRTCCallProps) {
               
               {participants.length === 0 && (
                 <div className="relative aspect-video bg-muted rounded-lg overflow-hidden flex items-center justify-center">
-                  <p className="text-muted-foreground text-sm text-center px-4">
-                    Waiting for others to join...
-                  </p>
+                  <div className="text-center px-4">
+                    <div className="animate-pulse mb-2">
+                      <Phone className="h-8 w-8 text-muted-foreground mx-auto" />
+                    </div>
+                    <p className="text-muted-foreground text-sm">
+                      Waiting for others to join...
+                    </p>
+                    <p className="text-xs text-muted-foreground mt-1">
+                      Share this room link with others
+                    </p>
+                  </div>
                 </div>
               )}
             </div>
