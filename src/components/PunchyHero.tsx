@@ -25,7 +25,7 @@ export const PunchyHero = () => {
         >
           <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 text-sm font-medium text-primary mb-8">
             <Sparkles className="h-4 w-4" />
-            Free forever • No credit card required
+            Teaches Bible 5x faster • Never forget a verse again
           </span>
         </motion.div>
 

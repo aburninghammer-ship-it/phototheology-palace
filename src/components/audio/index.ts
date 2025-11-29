@@ -1,2 +1,3 @@
 export { AudioNarrator } from "./AudioNarrator";
-export { PTAudioMode, QuickAudioButton } from "./PTAudioMode";
+export { PTAudioMode } from "./PTAudioMode";
+export { QuickAudioButton } from "./QuickAudioButton";

@@ -88,6 +88,13 @@ const KidsGames = () => {
             <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
               Fun games to learn about the Bible and the Memory Palace! Choose your age group to get started. 🎮
             </p>
+            <Button 
+              onClick={() => navigate("/pt-kids-games")}
+              className="bg-gradient-to-r from-pink-500 to-purple-500 hover:from-pink-600 hover:to-purple-600"
+              size="lg"
+            >
+              ✨ Try PT Kids Zone - Visual Palace Games! ✨
+            </Button>
           </div>
 
           <Tabs defaultValue="6-9" className="w-full">

@@ -3,11 +3,12 @@ import { useNavigate } from "react-router-dom";
 import { CheckCircle2 } from "lucide-react";
 
 const benefits = [
-  "A palace that organizes Scripture",
-  "Rooms and floors that hold themes in place",
-  "Visual pathways that always bring you back to Jesus",
-  "AI-guided training that reinforces memory",
+  "Learn Bible 5x faster with visual memory techniques",
+  "Never forget a verse again with the Palace method",
+  "See Christ in every chapter through proven patterns",
+  "AI-guided training that reinforces long-term memory",
   "Prophecy clarity through structure, not guesswork",
+  "Join 1000's who finally understand what they study",
 ];
 
 export const WhyPeopleSwitching = () => {
