@@ -31,7 +31,7 @@ export const HowItWorksModal = ({
           {triggerText}
         </Button>
       </DialogTrigger>
-      <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+      <DialogContent variant="glass" className="max-w-2xl max-h-[80vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="text-2xl">{title}</DialogTitle>
           <DialogDescription className="text-base">{description}</DialogDescription>

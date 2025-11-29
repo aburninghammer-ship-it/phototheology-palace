@@ -294,7 +294,7 @@ export function RoomTour({ room, floorNumber, floorName, onComplete, onSkip }: R
           transition={{ duration: 0.4, ease: "easeOut" }}
           className="w-full max-w-lg relative"
         >
-          <Card className={`border-2 border-white/10 ${colors.glow} bg-card/95 backdrop-blur-xl`}>
+          <Card variant="glass">
             <CardContent className="p-6">
               {/* Header */}
               <div className="flex items-start justify-between mb-4">

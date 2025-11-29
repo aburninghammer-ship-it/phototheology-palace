@@ -91,7 +91,7 @@ export function MemoryHowItWorks() {
   const StepIcon = step.icon;
 
   return (
-    <Card className="relative overflow-hidden border-2 border-white/20 bg-card/90 backdrop-blur-xl shadow-[0_0_60px_-20px] shadow-primary/20">
+    <Card variant="glass">
       {/* Gradient top border */}
       <div className={`h-1.5 bg-gradient-to-r ${step.gradient}`} />
       
