@@ -83,14 +83,14 @@ export default function Pricing() {
   const plans = [
     {
       id: "free",
-      name: "Free Forever",
+      name: "Free Tier",
       icon: Sparkles,
       iconColor: "text-green-600",
       monthlyPrice: "$0",
       annualPrice: "$0",
-      period: "forever",
-      description: "Start learning today - no strings attached",
-      badge: "No Credit Card Ever",
+      period: "always",
+      description: "Start learning today - explore the basics",
+      badge: "No Credit Card",
       badgeVariant: "secondary" as const,
       ctaText: "Start Free",
       ctaVariant: "default" as const,
@@ -228,7 +228,7 @@ export default function Pricing() {
             Choose Your Plan
           </h1>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-            Start free forever, or try Premium with a 7-day trial
+            Start free with limited features, or try Premium with a 7-day trial
           </p>
           
           {/* Billing Period Toggle - Enhanced */}

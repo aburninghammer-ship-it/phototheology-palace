@@ -20,10 +20,10 @@ export const FreeTierBanner = () => {
     <section className="py-16 px-4 bg-gradient-to-br from-primary/5 via-background to-accent/5">
       <div className="max-w-4xl mx-auto text-center">
         <h2 className="text-3xl md:text-4xl font-bold mb-4">
-          Free Forever. <span className="text-primary">Really.</span>
+          Start Free. <span className="text-primary">No Credit Card.</span>
         </h2>
         <p className="text-lg text-muted-foreground mb-8">
-          No credit card. No trial expiring. Just start learning.
+          Explore the basics free forever. Upgrade to unlock the full palace.
         </p>
 
         <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-4 mb-8">

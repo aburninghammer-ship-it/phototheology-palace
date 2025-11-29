@@ -310,10 +310,10 @@ const Index = () => {
       <section className="py-20 px-4 sm:px-6 lg:px-8 bg-muted/30">
         <div className="max-w-5xl mx-auto text-center">
           <h2 className="text-4xl md:text-5xl font-bold mb-6">
-            Free Forever. Upgrade When Ready.
+            Start Free. Upgrade When Ready.
           </h2>
           <p className="text-xl text-muted-foreground mb-8">
-            Start learning today. No credit card. No trial expiring.
+            Explore the basics at no cost. No credit card required.
           </p>
 
           <div className="grid md:grid-cols-2 gap-6 max-w-4xl mx-auto">
@@ -321,7 +321,7 @@ const Index = () => {
             <Card variant="glass">
               <CardHeader className="relative z-10">
                 <div className="text-center">
-                  <Badge className="mb-2">Forever Free</Badge>
+                  <Badge className="mb-2">Free Tier</Badge>
                   <h3 className="text-3xl font-bold mb-2">$0</h3>
                   <p className="text-muted-foreground">Get started now</p>
                 </div>
