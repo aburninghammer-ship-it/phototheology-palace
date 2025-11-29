@@ -354,18 +354,15 @@ All colors MUST be HSL.
     height: 8px;
     background: hsl(var(--palace-orange) / 0.9);
     border-radius: 50%;
-    animation: bubble-float 8s ease-in infinite;
+    animation: bubble-float 6s ease-out forwards;
     box-shadow: 0 0 15px 4px hsl(var(--palace-orange) / 0.6);
+    display: none;
   }
   
-  .glass-card-bubbles span:nth-child(1) { left: 10%; animation-delay: 0s; animation-duration: 7s; width: 5px; height: 5px; }
-  .glass-card-bubbles span:nth-child(2) { left: 20%; animation-delay: 1s; animation-duration: 9s; width: 10px; height: 10px; background: hsl(var(--accent) / 0.8); box-shadow: 0 0 15px 5px hsl(var(--accent) / 0.6); }
-  .glass-card-bubbles span:nth-child(3) { left: 35%; animation-delay: 2s; animation-duration: 6s; width: 6px; height: 6px; background: hsl(var(--palace-teal) / 0.8); box-shadow: 0 0 15px 4px hsl(var(--palace-teal) / 0.6); }
-  .glass-card-bubbles span:nth-child(4) { left: 50%; animation-delay: 0.5s; animation-duration: 8s; width: 9px; height: 9px; }
-  .glass-card-bubbles span:nth-child(5) { left: 65%; animation-delay: 3s; animation-duration: 10s; width: 5px; height: 5px; background: hsl(var(--palace-pink) / 0.8); box-shadow: 0 0 15px 4px hsl(var(--palace-pink) / 0.6); }
-  .glass-card-bubbles span:nth-child(6) { left: 75%; animation-delay: 1.5s; animation-duration: 7s; width: 8px; height: 8px; background: hsl(var(--accent) / 0.9); box-shadow: 0 0 15px 5px hsl(var(--accent) / 0.6); }
-  .glass-card-bubbles span:nth-child(7) { left: 85%; animation-delay: 2.5s; animation-duration: 9s; width: 6px; height: 6px; background: hsl(var(--palace-purple) / 0.8); box-shadow: 0 0 15px 4px hsl(var(--palace-purple) / 0.6); }
-  .glass-card-bubbles span:nth-child(8) { left: 90%; animation-delay: 4s; animation-duration: 6s; width: 10px; height: 10px; }
+  /* Only show first 3 bubbles */
+  .glass-card-bubbles span:nth-child(1) { display: block; left: 25%; animation-delay: 0.5s; width: 6px; height: 6px; }
+  .glass-card-bubbles span:nth-child(2) { display: block; left: 50%; animation-delay: 1.5s; width: 8px; height: 8px; background: hsl(var(--accent) / 0.8); box-shadow: 0 0 15px 5px hsl(var(--accent) / 0.6); }
+  .glass-card-bubbles span:nth-child(3) { display: block; left: 75%; animation-delay: 2.5s; width: 5px; height: 5px; background: hsl(var(--palace-teal) / 0.8); box-shadow: 0 0 15px 4px hsl(var(--palace-teal) / 0.6); }
   
   @keyframes bubble-float {
     0% {
@@ -376,10 +373,10 @@ All colors MUST be HSL.
       opacity: 1;
     }
     90% {
-      opacity: 1;
+      opacity: 0.8;
     }
     100% {
-      transform: translateY(-400px) scale(0.5);
+      transform: translateY(-300px) scale(0.3);
       opacity: 0;
     }
   }
