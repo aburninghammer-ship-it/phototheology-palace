@@ -175,7 +175,7 @@ const AppTour = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
         >
-          <Card className="mb-12 border-2 border-white/20 bg-card/90 backdrop-blur-xl shadow-[0_0_60px_-20px] shadow-primary/20 overflow-hidden">
+          <Card variant="glass" className="mb-12">
             {/* Gradient top border */}
             <div className="h-1.5 bg-gradient-to-r from-violet-500 via-amber-500 to-emerald-500" />
             
@@ -328,7 +328,7 @@ const AppTour = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.8 }}
         >
-          <Card className="mt-12 border-2 border-white/20 bg-card/90 backdrop-blur-xl shadow-[0_0_40px_-15px] shadow-amber-500/20 overflow-hidden">
+          <Card variant="glass" className="mt-12">
             {/* Gradient top border */}
             <div className="h-1.5 bg-gradient-to-r from-amber-500 via-orange-500 to-red-500" />
             

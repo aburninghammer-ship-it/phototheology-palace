@@ -164,7 +164,7 @@ export const StudyBibleDemoDialog = ({ open, onOpenChange }: StudyBibleDemoDialo
 
   return (
     <Dialog open={open} onOpenChange={(isOpen) => { onOpenChange(isOpen); if (!isOpen) setCurrentStep(0); }}>
-      <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto bg-card/95 backdrop-blur-xl border-2 border-white/20 shadow-[0_0_80px_-20px] shadow-primary/30 p-0">
+      <DialogContent variant="glass" className="max-w-3xl max-h-[90vh] overflow-y-auto p-0">
         {/* Gradient top border */}
         <div className={`h-1.5 bg-gradient-to-r ${stepGradient}`} />
         

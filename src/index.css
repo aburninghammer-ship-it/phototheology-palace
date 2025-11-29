@@ -293,6 +293,73 @@ All colors MUST be HSL.
     @apply transition-all duration-300 hover:shadow-glow;
   }
   
+  /* Glass card with animated rotating glow border */
+  .glass-card {
+    @apply relative bg-card/90 backdrop-blur-xl border border-white/20 rounded-xl overflow-hidden;
+  }
+  
+  .glass-card::before {
+    content: '';
+    position: absolute;
+    inset: -2px;
+    border-radius: inherit;
+    padding: 2px;
+    background: conic-gradient(
+      from var(--glow-angle, 0deg),
+      hsl(var(--primary) / 0.8),
+      hsl(var(--palace-teal) / 0.6),
+      hsl(var(--primary) / 0.3),
+      hsl(var(--palace-orange) / 0.6),
+      hsl(var(--primary) / 0.8)
+    );
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    animation: glow-rotate 4s linear infinite;
+    z-index: -1;
+  }
+  
+  .glass-card::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    box-shadow: 
+      0 0 30px 5px hsl(var(--primary) / 0.3),
+      0 0 60px 10px hsl(var(--primary) / 0.15),
+      inset 0 0 30px 5px hsl(var(--primary) / 0.05);
+    animation: glow-pulse 3s ease-in-out infinite;
+    pointer-events: none;
+    z-index: -1;
+  }
+  
+  @keyframes glow-rotate {
+    0% { --glow-angle: 0deg; }
+    100% { --glow-angle: 360deg; }
+  }
+  
+  @keyframes glow-pulse {
+    0%, 100% { opacity: 0.6; }
+    50% { opacity: 1; }
+  }
+  
+  @property --glow-angle {
+    syntax: '<angle>';
+    initial-value: 0deg;
+    inherits: false;
+  }
+  
+  /* Subtle glass variant for smaller elements */
+  .glass-card-subtle {
+    @apply relative bg-card/80 backdrop-blur-lg border border-white/10 rounded-lg overflow-hidden;
+    box-shadow: 0 0 20px 2px hsl(var(--primary) / 0.15);
+  }
+  
+  .glass-card-subtle:hover {
+    box-shadow: 0 0 30px 5px hsl(var(--primary) / 0.25);
+  }
+  
   .scrollbar-hide {
     -ms-overflow-style: none;
     scrollbar-width: none;

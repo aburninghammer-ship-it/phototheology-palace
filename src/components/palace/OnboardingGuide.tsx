@@ -171,7 +171,7 @@ export const OnboardingGuide = ({ roomId, roomName, onComplete }: OnboardingGuid
           transition={{ duration: 0.5, ease: "easeOut" }}
           className="w-full max-w-2xl relative"
         >
-          <Card className="border-2 border-white/20 shadow-[0_0_80px_-20px] shadow-current bg-card/90 backdrop-blur-xl overflow-hidden">
+          <Card variant="glass">
             {/* Gradient top border */}
             <div className={`h-1.5 bg-gradient-to-r ${stepGradient}`} />
             

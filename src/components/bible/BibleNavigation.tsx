@@ -43,12 +43,7 @@ export const BibleNavigation = () => {
   };
 
   return (
-    <Card className="relative p-4 sm:p-6 bg-card/90 backdrop-blur-xl border-2 border-white/20 shadow-elegant overflow-hidden">
-      {/* Animated background orbs */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute -top-20 -right-20 w-40 h-40 bg-primary/10 rounded-full blur-3xl animate-pulse" />
-        <div className="absolute -bottom-20 -left-20 w-40 h-40 bg-accent/10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }} />
-      </div>
+    <Card variant="glass" className="p-4 sm:p-6">
       
       <div className="relative z-10 space-y-4">
         <div className="flex items-center gap-2 mb-2">

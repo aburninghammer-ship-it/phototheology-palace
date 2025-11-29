@@ -55,7 +55,7 @@ export const HowItWorksDialog = ({ title, steps, gradient }: HowItWorksDialogPro
           How to Use
         </Button>
       </DialogTrigger>
-      <DialogContent className="max-w-2xl bg-card/95 backdrop-blur-xl border-2 border-white/20 shadow-[0_0_80px_-20px] shadow-primary/30 overflow-hidden p-0">
+      <DialogContent variant="glass" className="max-w-2xl glass-card p-0">
         {/* Gradient top border */}
         <div className={`h-1.5 bg-gradient-to-r ${stepGradient}`} />
         
