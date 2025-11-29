@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { motion } from "framer-motion";
 import { Navigation } from "@/components/Navigation";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -342,8 +343,13 @@ const Games = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="text-center">
+      <div className="min-h-screen bg-background flex items-center justify-center relative overflow-hidden">
+        {/* Animated Background */}
+        <div className="fixed inset-0 pointer-events-none">
+          <div className="absolute top-20 left-10 w-72 h-72 bg-primary/20 rounded-full blur-3xl animate-pulse" />
+          <div className="absolute bottom-20 right-10 w-96 h-96 bg-accent/15 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }} />
+        </div>
+        <div className="text-center relative z-10">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
           <p className="text-muted-foreground">Loading games...</p>
         </div>
@@ -354,31 +360,50 @@ const Games = () => {
   if (!user) return null;
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background relative overflow-hidden">
+      {/* Animated Background */}
+      <div className="fixed inset-0 pointer-events-none">
+        <div className="absolute top-20 left-10 w-72 h-72 bg-primary/20 rounded-full blur-3xl animate-pulse" />
+        <div className="absolute bottom-20 right-10 w-96 h-96 bg-accent/15 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }} />
+        <div className="absolute top-1/2 left-1/3 w-80 h-80 bg-primary/10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '2s' }} />
+        <div className="absolute top-1/3 right-1/4 w-64 h-64 bg-accent/10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '3s' }} />
+      </div>
+
       <Navigation />
-      <main className="container mx-auto px-4 py-8 max-w-7xl">
+      <main className="container mx-auto px-4 py-8 max-w-7xl relative z-10">
         {/* Header with How to Use */}
-        <div className="flex justify-between items-center mb-6">
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="flex justify-between items-center mb-6"
+        >
           <div>
-            <h1 className="text-3xl font-bold">Games</h1>
+            <h1 className="text-3xl font-bold bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent">
+              Games
+            </h1>
             <p className="text-muted-foreground">Learn through play with Phototheology games</p>
           </div>
           <HowItWorksDialog title="How to Use Games" steps={gamesSteps} />
-        </div>
+        </motion.div>
         
         {/* Search and Filter Header */}
-        <div className="flex flex-col md:flex-row gap-4 mb-6">
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.1 }}
+          className="flex flex-col md:flex-row gap-4 mb-6"
+        >
           <div className="relative flex-1">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
             <Input
               placeholder="Search games..."
-              className="pl-10 h-12 text-base"
+              className="pl-10 h-12 text-base backdrop-blur-sm bg-background/50 border-border/50"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />
           </div>
           <Select value={floorFilter} onValueChange={setFloorFilter}>
-            <SelectTrigger className="w-full md:w-[200px] h-12 text-base">
+            <SelectTrigger className="w-full md:w-[200px] h-12 text-base backdrop-blur-sm bg-background/50 border-border/50">
               <SelectValue placeholder="All Floors" />
             </SelectTrigger>
             <SelectContent>
@@ -393,21 +418,32 @@ const Games = () => {
               <SelectItem value="8">Floor 8</SelectItem>
             </SelectContent>
           </Select>
-        </div>
+        </motion.div>
 
         {user && (
-          <VoiceChatWidget
-            roomType="games"
-            roomId="lobby"
-            className="mb-6"
-          />
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.15 }}
+          >
+            <VoiceChatWidget
+              roomType="games"
+              roomId="lobby"
+              className="mb-6"
+            />
+          </motion.div>
         )}
 
         {/* View Mode Tabs */}
-        <div className="grid grid-cols-3 gap-4 mb-8">
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2 }}
+          className="grid grid-cols-3 gap-4 mb-8"
+        >
           <Button
             variant={viewMode === "all" ? "default" : "outline"}
-            className="h-14 text-base"
+            className={`h-14 text-base transition-all duration-300 ${viewMode === "all" ? "gradient-palace shadow-elegant" : "backdrop-blur-sm bg-background/50 hover:bg-primary/10"}`}
             onClick={() => setViewMode("all")}
           >
             <Gamepad2 className="mr-2 h-5 w-5" />
@@ -415,7 +451,7 @@ const Games = () => {
           </Button>
           <Button
             variant={viewMode === "floor" ? "default" : "outline"}
-            className="h-14 text-base"
+            className={`h-14 text-base transition-all duration-300 ${viewMode === "floor" ? "gradient-palace shadow-elegant" : "backdrop-blur-sm bg-background/50 hover:bg-primary/10"}`}
             onClick={() => setViewMode("floor")}
           >
             <MapPin className="mr-2 h-5 w-5" />
@@ -423,91 +459,107 @@ const Games = () => {
           </Button>
           <Button
             variant={viewMode === "mode" ? "default" : "outline"}
-            className="h-14 text-base"
+            className={`h-14 text-base transition-all duration-300 ${viewMode === "mode" ? "gradient-palace shadow-elegant" : "backdrop-blur-sm bg-background/50 hover:bg-primary/10"}`}
             onClick={() => setViewMode("mode")}
           >
             <UsersRound className="mr-2 h-5 w-5" />
             By Mode
           </Button>
-        </div>
+        </motion.div>
 
         {/* Leaderboards Section */}
-        <div className="grid md:grid-cols-3 gap-6 mb-8">
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.25 }}
+          className="grid md:grid-cols-3 gap-6 mb-8"
+        >
           <UnifiedGameRankings />
           <ChainChessLeaderboard />
           <GroupEscapeRoom />
-        </div>
+        </motion.div>
 
         {/* Games Grid */}
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredGames.map((game) => (
-            <Card
+          {filteredGames.map((game, index) => (
+            <motion.div
               key={game.id}
-              className="hover:shadow-lg transition-all cursor-pointer group overflow-hidden"
-              onClick={() => navigate(game.route)}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.05 * index }}
             >
-              <CardContent className="p-6">
-                {/* Top Row: Icon and Badges */}
-                <div className="flex items-start justify-between mb-4">
-                  <div className="text-5xl">{game.icon}</div>
-                  <div className="flex flex-col items-end gap-2">
-                    <Badge variant="secondary" className="bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400">
-                      Floor {game.floor}
-                    </Badge>
-                    {game.timed && (
-                      <Badge variant="outline" className="border-orange-500 text-orange-600 dark:border-orange-400 dark:text-orange-400">
-                        ⏱️ Timed
+              <Card
+                variant="glass"
+                className="hover:shadow-elegant transition-all duration-300 cursor-pointer group overflow-hidden hover:-translate-y-1"
+                onClick={() => navigate(game.route)}
+              >
+                <CardContent className="p-6">
+                  {/* Top Row: Icon and Badges */}
+                  <div className="flex items-start justify-between mb-4">
+                    <div className="text-5xl group-hover:scale-110 transition-transform duration-300">{game.icon}</div>
+                    <div className="flex flex-col items-end gap-2">
+                      <Badge variant="secondary" className="bg-primary/20 text-primary border-primary/30">
+                        Floor {game.floor}
                       </Badge>
-                    )}
+                      {game.timed && (
+                        <Badge variant="outline" className="border-orange-500/50 text-orange-600 dark:border-orange-400/50 dark:text-orange-400 bg-orange-500/10">
+                          ⏱️ Timed
+                        </Badge>
+                      )}
+                    </div>
                   </div>
-                </div>
 
-                {/* Title and Description */}
-                <h3 className="text-xl font-bold mb-2 group-hover:text-primary transition-colors">
-                  {game.name}
-                </h3>
-                <p className="text-sm text-muted-foreground mb-4 line-clamp-2">
-                  {game.description}
-                </p>
+                  {/* Title and Description */}
+                  <h3 className="text-xl font-bold mb-2 group-hover:text-primary transition-colors">
+                    {game.name}
+                  </h3>
+                  <p className="text-sm text-muted-foreground mb-4 line-clamp-2">
+                    {game.description}
+                  </p>
 
-                {/* Room Codes */}
-                <div className="flex flex-wrap gap-2 mb-3">
-                  {game.rooms.map((room) => (
-                    <Badge key={room} variant="secondary" className="text-xs font-mono">
-                      {room}
-                    </Badge>
-                  ))}
-                </div>
+                  {/* Room Codes */}
+                  <div className="flex flex-wrap gap-2 mb-3">
+                    {game.rooms.map((room) => (
+                      <Badge key={room} variant="secondary" className="text-xs font-mono bg-accent/20 border-accent/30">
+                        {room}
+                      </Badge>
+                    ))}
+                  </div>
 
-                {/* Game Modes */}
-                <div className="flex flex-wrap gap-2 mb-3">
-                  {game.modes.map((mode) => (
-                    <Badge key={mode} variant="outline" className="text-xs">
-                      {getModeIcon(mode)}
-                    </Badge>
-                  ))}
-                </div>
+                  {/* Game Modes */}
+                  <div className="flex flex-wrap gap-2 mb-3">
+                    {game.modes.map((mode) => (
+                      <Badge key={mode} variant="outline" className="text-xs backdrop-blur-sm">
+                        {getModeIcon(mode)}
+                      </Badge>
+                    ))}
+                  </div>
 
-                {/* Difficulty Tags */}
-                <div className="flex flex-wrap gap-2">
-                  {game.difficulties.map((difficulty) => (
-                    <Badge
-                      key={difficulty}
-                      className={`text-xs ${getDifficultyColor(difficulty)}`}
-                    >
-                      {difficulty}
-                    </Badge>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
+                  {/* Difficulty Tags */}
+                  <div className="flex flex-wrap gap-2">
+                    {game.difficulties.map((difficulty) => (
+                      <Badge
+                        key={difficulty}
+                        className={`text-xs ${getDifficultyColor(difficulty)}`}
+                      >
+                        {difficulty}
+                      </Badge>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            </motion.div>
           ))}
         </div>
 
         {filteredGames.length === 0 && (
-          <div className="text-center py-12">
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="text-center py-12"
+          >
             <p className="text-muted-foreground text-lg">No games found matching your filters.</p>
-          </div>
+          </motion.div>
         )}
       </main>
     </div>
