@@ -156,7 +156,7 @@ const AMBIENT_TRACKS = [
     category: "meditation",
     floor: 7,
     mood: "deep, mysterious, peaceful",
-    url: "https://www.bensound.com/bensound-music/bensound-deepblue.mp3",
+    url: "https://www.bensound.com/bensound-music/bensound-relaxing.mp3",
     bpm: 55,
   },
   {
