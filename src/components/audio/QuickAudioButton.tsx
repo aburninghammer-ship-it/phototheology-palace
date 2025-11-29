@@ -37,7 +37,7 @@ export function QuickAudioButton({
 
     try {
       const { data, error } = await supabase.functions.invoke("text-to-speech", {
-        body: { text, voice: "alloy" }
+        body: { text, voice: "daniel" }
       });
 
       if (error) throw error;
