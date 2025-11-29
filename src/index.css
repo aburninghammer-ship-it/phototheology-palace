@@ -295,15 +295,15 @@ All colors MUST be HSL.
   
   /* Glass card with animated rotating glow border */
   .glass-card {
-    @apply relative bg-card/90 backdrop-blur-xl border border-white/20 rounded-xl overflow-hidden;
+    @apply relative bg-card/90 backdrop-blur-xl rounded-xl;
+    isolation: isolate;
   }
   
   .glass-card::before {
     content: '';
     position: absolute;
     inset: -3px;
-    border-radius: inherit;
-    padding: 3px;
+    border-radius: calc(var(--radius) + 3px);
     background: conic-gradient(
       from var(--glow-angle, 0deg),
       hsl(var(--palace-orange) / 1),
@@ -315,26 +315,25 @@ All colors MUST be HSL.
       hsl(var(--accent) / 0.7),
       hsl(var(--palace-orange) / 1)
     );
-    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-    -webkit-mask-composite: xor;
-    mask-composite: exclude;
     animation: glow-rotate 4s linear infinite;
-    z-index: -1;
+    z-index: -2;
   }
   
   .glass-card::after {
     content: '';
     position: absolute;
-    inset: 0;
-    border-radius: inherit;
-    box-shadow: 
-      0 0 40px 8px hsl(var(--palace-orange) / 0.4),
-      0 0 80px 16px hsl(var(--accent) / 0.2),
-      inset 0 0 40px 8px hsl(var(--palace-orange) / 0.08);
-    animation: glow-pulse 3s ease-in-out infinite;
-    pointer-events: none;
+    inset: 2px;
+    border-radius: calc(var(--radius) - 2px);
+    background: hsl(var(--card) / 0.95);
     z-index: -1;
+  }
+  
+  /* Outer glow effect */
+  .glass-card {
+    box-shadow: 
+      0 0 40px 8px hsl(var(--palace-orange) / 0.35),
+      0 0 80px 16px hsl(var(--accent) / 0.15);
+    animation: glow-pulse 3s ease-in-out infinite;
   }
   
   @keyframes glow-rotate {
