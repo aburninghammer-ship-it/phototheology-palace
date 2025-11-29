@@ -19,23 +19,24 @@ import {
   Lightbulb
 } from "lucide-react";
 
-// Floor-based music categories following Phototheology guideline
+// Floor-based music categories - Rich orchestral, movie soundtrack style
+// The Chosen, Hans Zimmer, Bryan Tyler - No synthesizers, pure orchestra
 const MUSIC_FLOORS = [
   {
     floor: 1,
     name: "Story Floor",
     subtitle: "Furnishing",
     icon: BookOpen,
-    mood: "Warm, welcoming, narrative focus",
+    mood: "Warm strings, gentle narrative",
     color: "from-amber-500/20 to-orange-500/20",
     borderColor: "border-amber-500/30",
     tracks: [
       {
         id: "story-warmth",
         name: "Story Warmth",
-        description: "Gentle felt piano for narrative immersion",
+        description: "Warm strings and gentle cello for narrative immersion",
         bpm: 60,
-        url: "https://files.freemusicarchive.org/storage-freemusicarchive-org/music/ccCommunity/Chad_Crouch/Arps/Chad_Crouch_-_Shipping_Lanes.mp3",
+        url: "https://incompetech.com/music/royalty-free/mp3-royaltyfree/Touching%20Moment.mp3",
       }
     ]
   },
@@ -44,16 +45,16 @@ const MUSIC_FLOORS = [
     name: "Pattern Floor",
     subtitle: "Investigation",
     icon: Sparkles,
-    mood: "Structured, rhythmic, reflective",
+    mood: "Structured strings, reflective",
     color: "from-blue-500/20 to-cyan-500/20",
     borderColor: "border-blue-500/30",
     tracks: [
       {
         id: "patterns-kingdom",
         name: "Patterns of the Kingdom",
-        description: "Measured, thoughtful light pulses",
+        description: "Measured orchestral strings with thoughtful progression",
         bpm: 65,
-        url: "https://files.freemusicarchive.org/storage-freemusicarchive-org/music/no_curator/Kai_Engel/Satin/Kai_Engel_-_04_-_Moonlight_Reprise.mp3",
+        url: "https://incompetech.com/music/royalty-free/mp3-royaltyfree/Eternal%20Hope.mp3",
       }
     ]
   },
@@ -62,23 +63,23 @@ const MUSIC_FLOORS = [
     name: "Sanctuary Floor",
     subtitle: "Holy Space",
     icon: Building2,
-    mood: "Holy, reverent, awe-inducing",
+    mood: "Reverent strings, harp",
     color: "from-purple-500/20 to-violet-500/20",
     borderColor: "border-purple-500/30",
     tracks: [
       {
         id: "sanctuary-stillness",
         name: "Sanctuary Stillness",
-        description: "Sacred stillness with soft harp and wind",
+        description: "Sacred strings with soft harp and gentle brass",
         bpm: 58,
-        url: "https://files.freemusicarchive.org/storage-freemusicarchive-org/music/ccCommunity/Kai_Engel/Satin/Kai_Engel_-_07_-_Interception.mp3",
+        url: "https://incompetech.com/music/royalty-free/mp3-royaltyfree/Meditation%20Impromptu.mp3",
       },
       {
         id: "blue-room-ambient",
         name: "Blue Room - Typology",
-        description: "Deep reverent ambience with slow drones",
+        description: "Reverent orchestral ambience with deep strings",
         bpm: 55,
-        url: "https://files.freemusicarchive.org/storage-freemusicarchive-org/music/no_curator/Kai_Engel/Satin/Kai_Engel_-_04_-_Moonlight_Reprise.mp3",
+        url: "https://incompetech.com/music/royalty-free/mp3-royaltyfree/Peaceful%20Desolation.mp3",
       }
     ]
   },
@@ -87,16 +88,16 @@ const MUSIC_FLOORS = [
     name: "Christ Floor",
     subtitle: "Next Level",
     icon: Cross,
-    mood: "Bright, hopeful, radiant",
+    mood: "Bright, hopeful orchestra",
     color: "from-yellow-500/20 to-amber-500/20",
     borderColor: "border-yellow-500/30",
     tracks: [
       {
         id: "christ-the-center",
         name: "Christ the Center",
-        description: "Gentle hope and radiant glory",
+        description: "Hopeful strings with radiant orchestral swells",
         bpm: 65,
-        url: "https://files.freemusicarchive.org/storage-freemusicarchive-org/music/ccCommunity/Chad_Crouch/Arps/Chad_Crouch_-_Algorithms.mp3",
+        url: "https://incompetech.com/music/royalty-free/mp3-royaltyfree/Amazing%20Grace.mp3",
       }
     ]
   },
@@ -105,16 +106,16 @@ const MUSIC_FLOORS = [
     name: "Prophecy Floor",
     subtitle: "Vision",
     icon: Eye,
-    mood: "Cinematic, atmospheric tension",
+    mood: "Cinematic tension, deep strings",
     color: "from-red-500/20 to-rose-500/20",
     borderColor: "border-red-500/30",
     tracks: [
       {
         id: "prophecy-watch",
         name: "Prophecy Watch",
-        description: "Atmospheric tension with reverent undertones",
+        description: "Cinematic strings with reverent tension",
         bpm: 60,
-        url: "https://files.freemusicarchive.org/storage-freemusicarchive-org/music/ccCommunity/Chad_Crouch/Arps/Chad_Crouch_-_Drifting.mp3",
+        url: "https://incompetech.com/music/royalty-free/mp3-royaltyfree/Dark%20Times.mp3",
       }
     ]
   },
@@ -123,16 +124,16 @@ const MUSIC_FLOORS = [
     name: "Freestyle Floor",
     subtitle: "Creative Space",
     icon: Wind,
-    mood: "Natural, open, reflective",
+    mood: "Flowing strings, woodwinds",
     color: "from-green-500/20 to-emerald-500/20",
     borderColor: "border-green-500/30",
     tracks: [
       {
         id: "wisdom-quiet",
         name: "Wisdom in Quiet Places",
-        description: "Freedom, nature, clarity with soft pads",
+        description: "Flowing strings with gentle woodwinds",
         bpm: 58,
-        url: "https://files.freemusicarchive.org/storage-freemusicarchive-org/music/ccCommunity/Chad_Crouch/Arps/Chad_Crouch_-_Shipping_Lanes.mp3",
+        url: "https://incompetech.com/music/royalty-free/mp3-royaltyfree/Meditation%20Aquatic.mp3",
       }
     ]
   },
@@ -141,16 +142,16 @@ const MUSIC_FLOORS = [
     name: "Wisdom Floor",
     subtitle: "Mastery",
     icon: Lightbulb,
-    mood: "Solemn, calm, ancient",
+    mood: "Solemn cello, ancient feel",
     color: "from-indigo-500/20 to-purple-500/20",
     borderColor: "border-indigo-500/30",
     tracks: [
       {
         id: "chamber-light",
         name: "Chamber of Light",
-        description: "Deep reflection with ancient textures",
+        description: "Deep cello with ancient orchestral textures",
         bpm: 60,
-        url: "https://files.freemusicarchive.org/storage-freemusicarchive-org/music/ccCommunity/Kai_Engel/Satin/Kai_Engel_-_07_-_Interception.mp3",
+        url: "https://incompetech.com/music/royalty-free/mp3-royaltyfree/Perspectives.mp3",
       }
     ]
   }
@@ -210,9 +211,9 @@ export default function MusicCategories() {
             <h1 className="text-3xl font-bold">Phototheology Music</h1>
           </div>
           <p className="text-muted-foreground max-w-2xl mx-auto">
-            Sacred, cinematic instrumental tracks designed for focused Bible study. 
-            Each floor has its own atmosphere—warm narrative tones, reverent sanctuary ambience, 
-            or prophetic tension. BPM 55-70 for optimal memory and reflection.
+            Rich orchestral soundscapes for focused Bible study. Inspired by The Chosen, 
+            Hans Zimmer, and Bryan Tyler. Pure strings, cello, harp, and gentle brass—no synthesizers. 
+            BPM 55-70 for optimal memory and reflection.
           </p>
         </div>
 
@@ -312,9 +313,9 @@ export default function MusicCategories() {
           <CardContent className="p-6 text-center space-y-3">
             <h3 className="font-semibold">Music Guidelines</h3>
             <p className="text-sm text-muted-foreground">
-              All tracks follow the Phototheology Music Standard: no lyrics, sacred cinematic tone, 
-              55-70 BPM for memory optimization, warm pads, soft strings, gentle harp, and 
-              reverent atmospheres. Designed to support Scripture study without distraction.
+              Rich orchestral soundscapes inspired by The Chosen, Hans Zimmer, and Bryan Tyler. 
+              Pure orchestra: warm strings, cello, harp, gentle brass, woodwinds. 
+              No synthesizers. BPM 55-70 for optimal focus and memory retention.
             </p>
           </CardContent>
         </Card>
