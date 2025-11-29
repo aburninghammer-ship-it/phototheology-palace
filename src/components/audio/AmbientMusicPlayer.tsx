@@ -202,7 +202,7 @@ const AMBIENT_TRACKS = [
   // Cinematic Instrumental Hymn Remixes - Epic Orchestral Style
   {
     id: "hymn-amazing-grace",
-    name: "Amazing Grace (Cinematic)",
+    name: "Redeemer's Hope",
     description: "Sweeping orchestral arrangement with soaring strings and brass",
     category: "hymn-cinematic",
     floor: 4,
