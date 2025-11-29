@@ -32,46 +32,46 @@ const AMBIENT_TRACKS = [
   {
     id: "devotion",
     name: "Devotion",
-    description: "Gentle orchestral for reflection",
+    description: "Sweeping emotional strings for reflection",
     category: "devotion",
-    // Emotional cinematic piano
-    url: "https://cdn.pixabay.com/audio/2022/01/18/audio_d0a13f69d2.mp3",
+    // Epic emotional cinematic - Interstellar style
+    url: "https://cdn.pixabay.com/audio/2022/08/02/audio_884fe92c21.mp3",
     bpm: 65,
   },
   {
     id: "deep-study",
     name: "Deep Study",
-    description: "Calm orchestral for focused learning",
+    description: "Majestic orchestral for focused learning",
     category: "study",
-    // Documentary ambient
-    url: "https://cdn.pixabay.com/audio/2022/02/22/audio_d1718ab41b.mp3",
+    // Cinematic epic documentary
+    url: "https://cdn.pixabay.com/audio/2023/07/30/audio_e85b5e56c0.mp3",
     bpm: 70,
   },
   {
     id: "sanctuary",
     name: "Sanctuary",
-    description: "Reverent orchestral soundscape",
+    description: "Reverent cinematic soundscape",
     category: "sanctuary",
-    // Cinematic ambient - verified working
-    url: "https://cdn.pixabay.com/audio/2022/08/02/audio_884fe92c21.mp3",
+    // Epic ambient orchestra
+    url: "https://cdn.pixabay.com/audio/2023/09/04/audio_7715f84c31.mp3",
     bpm: 60,
   },
   {
     id: "memorization",
     name: "Memorization",
-    description: "Serene ambient for memory retention",
+    description: "Gentle cinematic waves for memory",
     category: "memory",
-    // Soft ambient strings
-    url: "https://cdn.pixabay.com/audio/2022/01/20/audio_d2f7a89c8f.mp3",
+    // Soft epic strings - Time style
+    url: "https://cdn.pixabay.com/audio/2022/10/25/audio_552508db73.mp3",
     bpm: 62,
   },
   {
     id: "prophecy",
     name: "Prophecy",
-    description: "Epic atmospheric for prophetic study",
+    description: "Grand orchestral for prophetic study",
     category: "prophecy",
-    // Dramatic cinematic
-    url: "https://cdn.pixabay.com/audio/2022/03/09/audio_c8a7e0adfc.mp3",
+    // Epic dramatic cinematic - Inception style
+    url: "https://cdn.pixabay.com/audio/2023/05/16/audio_14a0a0b4a2.mp3",
     bpm: 55,
   },
 ];
