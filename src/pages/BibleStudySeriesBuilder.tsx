@@ -5,7 +5,8 @@ import { Navigation } from "@/components/Navigation";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { BookOpen, Plus, FileText, Loader2, Edit, Presentation, ArrowLeft } from "lucide-react";
+import { BookOpen, Plus, FileText, Loader2, Edit, Presentation, ArrowLeft, Volume2 } from "lucide-react";
+import { QuickAudioButton } from "@/components/audio";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -248,16 +249,25 @@ const BibleStudySeriesBuilder = () => {
                                   <p className="text-xs text-primary mt-1">{lesson.key_passages}</p>
                                 )}
                               </div>
-                              {isOwner && (
-                                <Button
-                                  variant="ghost"
-                                  size="sm"
-                                  onClick={() => navigate(`/series/${selectedSeries.id}/lesson/${lesson.lesson_number}`)}
-                                  className="hover:bg-primary/10"
-                                >
-                                  <Edit className="h-4 w-4" />
-                                </Button>
-                              )}
+                              <div className="flex items-center gap-1">
+                                {lesson.big_idea && (
+                                  <QuickAudioButton 
+                                    text={`${lesson.title}. ${lesson.big_idea}`} 
+                                    variant="ghost" 
+                                    size="icon" 
+                                  />
+                                )}
+                                {isOwner && (
+                                  <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={() => navigate(`/series/${selectedSeries.id}/lesson/${lesson.lesson_number}`)}
+                                    className="hover:bg-primary/10"
+                                  >
+                                    <Edit className="h-4 w-4" />
+                                  </Button>
+                                )}
+                              </div>
                             </div>
                           </CardContent>
                         </Card>

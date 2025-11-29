@@ -11,8 +11,10 @@ import {
   Star,
   X,
   Loader2,
-  Download
+  Download,
+  Volume2
 } from "lucide-react";
+import { QuickAudioButton } from "@/components/audio";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -474,10 +476,19 @@ const StudyEditor = () => {
 
               {/* Content Tabs - Edit vs Formatted View */}
               <Tabs defaultValue="formatted" className="w-full">
-                <TabsList className="grid w-full grid-cols-2 mb-4">
-                  <TabsTrigger value="formatted">📖 Formatted View</TabsTrigger>
-                  <TabsTrigger value="edit">✏️ Edit Mode</TabsTrigger>
-                </TabsList>
+                <div className="flex items-center justify-between mb-4">
+                  <TabsList className="grid w-fit grid-cols-2">
+                    <TabsTrigger value="formatted">📖 Formatted View</TabsTrigger>
+                    <TabsTrigger value="edit">✏️ Edit Mode</TabsTrigger>
+                  </TabsList>
+                  {content && (
+                    <QuickAudioButton 
+                      text={`${title}. ${content}`} 
+                      variant="outline" 
+                      size="sm" 
+                    />
+                  )}
+                </div>
                 
                 <TabsContent value="formatted" className="mt-0">
                   <FormattedStudyView content={content} />
