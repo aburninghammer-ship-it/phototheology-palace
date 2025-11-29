@@ -2,7 +2,6 @@ import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Textarea } from "@/components/ui/textarea";
 import { CheckCircle, Sparkles, Copy, Check } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
@@ -15,7 +14,6 @@ export const QuickStartGuide = ({ roomId, roomName }: QuickStartGuideProps) => {
   const { toast } = useToast();
   const [completedSteps, setCompletedSteps] = useState<number[]>([]);
   const [copiedIndex, setCopiedIndex] = useState<number | null>(null);
-  const [userResponses, setUserResponses] = useState<Record<number, string>>({});
 
   const quickStarts: Record<string, {
     title: string;
@@ -625,7 +623,7 @@ export const QuickStartGuide = ({ roomId, roomName }: QuickStartGuideProps) => {
                   <span>{index + 1}</span>
                 )}
               </div>
-              <div className="flex-1 space-y-3">
+              <div className="flex-1 space-y-2">
                 <h4 className="font-semibold text-lg">{step.action}</h4>
                 <div className="bg-muted/50 p-3 rounded border border-border relative group">
                   <p className="text-sm font-mono pr-8">{step.example}</p>
@@ -645,33 +643,14 @@ export const QuickStartGuide = ({ roomId, roomName }: QuickStartGuideProps) => {
                 <p className="text-sm text-muted-foreground italic">
                   💡 {step.tip}
                 </p>
-                {/* User Input Field */}
-                <div className="space-y-2">
-                  <label className="text-sm font-medium text-muted-foreground">
-                    Your response:
-                  </label>
-                  <Textarea
-                    placeholder={`Try it yourself... ${step.action.toLowerCase()}`}
-                    value={userResponses[index] || ""}
-                    onChange={(e) => setUserResponses(prev => ({ ...prev, [index]: e.target.value }))}
-                    className="min-h-[100px] text-sm"
-                    disabled={completedSteps.includes(index)}
-                  />
-                </div>
                 {!completedSteps.includes(index) && (
                   <Button
                     size="sm"
                     onClick={() => handleStepComplete(index)}
                     className="mt-2"
-                    disabled={!userResponses[index]?.trim()}
                   >
                     Mark Complete
                   </Button>
-                )}
-                {completedSteps.includes(index) && userResponses[index] && (
-                  <div className="text-sm text-primary/80 bg-primary/5 p-2 rounded">
-                    ✓ Your response saved
-                  </div>
                 )}
               </div>
             </div>

@@ -12,9 +12,9 @@ export const StudyDeckExamples = () => {
       floor: "Floor 2",
       passage: "Genesis 1:1-3",
       passageText: "In the beginning God created the heaven and the earth... And God said, Let there be light: and there was light.",
-      question: "What do you observe in this passage? List specific details—both WHAT IS HAPPENING and HOW IT'S WRITTEN—without interpretation yet.",
-      answer: "• NARRATIVE: God is the subject—1 actor mentioned\n• NARRATIVE: 2 things created: heaven AND earth\n• NARRATIVE: Earth described with 3 conditions: formless, empty, dark\n• NARRATIVE: Spirit of God was hovering (active, present)\n• NARRATIVE: God SPEAKS—creation happens by spoken word\n• NARRATIVE: Light appears on Day 1 (sun created Day 4)\n• LITERARY: 'And God said' repeated multiple times\n• LITERARY: Pattern of 'Let there be... and it was so'\n• LITERARY: Evening and morning structure repeated\n• LITERARY: Separation as recurring action (light/darkness)",
-      feedback: "Excellent observation work! You captured both narrative details (who, what, sequence) AND literary features (repetition, patterns). These observations set the foundation for deeper study in other rooms.",
+      question: "What do you observe in this passage? List specific details without interpretation yet.",
+      answer: "• God is the subject — He initiates creation\n• Heaven and earth are created (not eternal)\n• The earth was formless, empty, and dark\n• The Spirit of God was hovering (active presence)\n• God speaks — creation happens by His word\n• Light appears before the sun (Day 4)\n• Light and darkness are separated",
+      feedback: "Excellent observation work! You noticed key details: God's initiative, creation by word, pre-solar light, and the Spirit's presence. These observations set the foundation for deeper study in other rooms.",
       color: "from-blue-500 to-cyan-500"
     },
     {

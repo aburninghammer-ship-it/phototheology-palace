@@ -243,7 +243,7 @@ export default function ObservationGame() {
           <CardContent className="pt-6">
             <h4 className="font-semibold mb-2">💡 Observation Room Tip:</h4>
             <p className="text-sm text-muted-foreground">
-              Like a detective at a crime scene, log EVERYTHING before theorizing. Notice: <strong>NARRATIVE</strong> (characters, numbers, objects, actions, dialogue, time, place) AND <strong>LITERARY</strong> (grammar, repetitions, contrasts, structure, what's NOT said). Count the numbers—"10 virgins, 5 wise, 5 foolish." Name the objects—"lamps, oil, vessels." List the sequence of events.
+              Like a detective at a crime scene, log details before theorizing. Notice: word choices, repetitions, sequence of events, who speaks first, emotional words, cultural details, and what's NOT said.
             </p>
           </CardContent>
         </Card>

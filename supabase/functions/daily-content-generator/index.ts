@@ -101,7 +101,7 @@ FLOOR 1 - FURNISHING (Memory & Width):
 - GR (Gems Room): "What powerful insight sparkles here?" → Insight collection
 
 FLOOR 2 - INVESTIGATION (Detective Work):
-- OR (Observation Room): "What 30 details can I observe—characters, numbers, objects, actions, grammar, repetitions?" → Narrative + Literary observation
+- OR (Observation Room): "What 30 fingerprints/footprints can I log?" → Detail noticing
 - DC (Def-Com Room): "What does this word mean (Greek/Hebrew/context)?" → Word study
 - ST (Symbols/Types Room): "What does this symbol/type point to?" → Typology
 - QR (Questions Room): "What intra/inter/PT questions reveal depth?" → Interrogation
