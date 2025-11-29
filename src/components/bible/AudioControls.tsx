@@ -34,6 +34,9 @@ interface AudioControlsProps {
   className?: string;
 }
 
+// Tiny silent WAV as data URI to unlock iOS audio
+const SILENT_AUDIO = "data:audio/wav;base64,UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA";
+
 export const AudioControls = ({ verses, onVerseHighlight, className }: AudioControlsProps) => {
   const [showSettings, setShowSettings] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -51,6 +54,7 @@ export const AudioControls = ({ verses, onVerseHighlight, className }: AudioCont
   const playbackRateRef = useRef(playbackRate);
   const selectedVoiceRef = useRef(selectedVoice);
   const playVerseAtIndexRef = useRef<((index: number) => Promise<void>) | null>(null);
+  const audioUnlockedRef = useRef(false);
 
   // Keep refs in sync
   versesRef.current = verses;
@@ -76,11 +80,14 @@ export const AudioControls = ({ verses, onVerseHighlight, className }: AudioCont
         }
       };
       
-      audio.onerror = () => {
-        console.error("Audio playback error");
-        toast.error("Audio playback failed");
-        setIsPlaying(false);
-        isPlayingRef.current = false;
+      audio.onerror = (e) => {
+        console.error("Audio playback error:", e);
+        // Don't show error for silent audio unlock
+        if (audio.src !== SILENT_AUDIO) {
+          toast.error("Audio playback failed");
+          setIsPlaying(false);
+          isPlayingRef.current = false;
+        }
       };
       
       audioRef.current = audio;
@@ -95,6 +102,24 @@ export const AudioControls = ({ verses, onVerseHighlight, className }: AudioCont
         URL.revokeObjectURL(audioUrlRef.current);
       }
     };
+  }, []);
+
+  // Unlock audio on iOS by playing silent audio on first user interaction
+  const unlockAudio = useCallback(async () => {
+    if (audioUnlockedRef.current || !audioRef.current) return;
+    
+    try {
+      const audio = audioRef.current;
+      audio.src = SILENT_AUDIO;
+      audio.volume = 0;
+      await audio.play();
+      audio.pause();
+      audio.volume = 1;
+      audioUnlockedRef.current = true;
+      console.log("Audio unlocked for iOS");
+    } catch (e) {
+      console.log("Audio unlock attempt:", e);
+    }
   }, []);
 
   const generateTTS = useCallback(async (text: string, voice: VoiceId) => {
@@ -169,7 +194,6 @@ export const AudioControls = ({ verses, onVerseHighlight, className }: AudioCont
   }, [generateTTS, onVerseHighlight]);
 
   // Keep the ref updated
-  // Keep the ref updated
   playVerseAtIndexRef.current = playVerseAtIndex;
 
   const cleanupAudio = useCallback(() => {
@@ -182,12 +206,15 @@ export const AudioControls = ({ verses, onVerseHighlight, className }: AudioCont
     }
   }, []);
 
-  const play = useCallback((startVerseIndex?: number) => {
+  const play = useCallback(async (startVerseIndex?: number) => {
+    // Unlock audio on iOS first
+    await unlockAudio();
+    
     const index = startVerseIndex ?? verses.findIndex(v => v.verse === currentVerse);
     setIsPlaying(true);
     isPlayingRef.current = true;
     playVerseAtIndex(index >= 0 ? index : 0);
-  }, [currentVerse, verses, playVerseAtIndex]);
+  }, [currentVerse, verses, playVerseAtIndex, unlockAudio]);
 
   const pause = useCallback(() => {
     if (audioRef.current) {
