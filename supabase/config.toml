@@ -121,3 +121,6 @@ verify_jwt = false
 
 [functions.text-to-speech]
 verify_jwt = false
+
+[functions.bible-api]
+verify_jwt = false
