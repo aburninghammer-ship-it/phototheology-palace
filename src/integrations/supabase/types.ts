@@ -6773,6 +6773,54 @@ export type Database = {
         }
         Relationships: []
       }
+      user_music: {
+        Row: {
+          category: string | null
+          created_at: string | null
+          description: string | null
+          duration_seconds: number | null
+          file_path: string
+          file_url: string
+          id: string
+          is_favorite: boolean | null
+          mood: string | null
+          name: string
+          play_count: number | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          category?: string | null
+          created_at?: string | null
+          description?: string | null
+          duration_seconds?: number | null
+          file_path: string
+          file_url: string
+          id?: string
+          is_favorite?: boolean | null
+          mood?: string | null
+          name: string
+          play_count?: number | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          category?: string | null
+          created_at?: string | null
+          description?: string | null
+          duration_seconds?: number | null
+          file_path?: string
+          file_url?: string
+          id?: string
+          is_favorite?: boolean | null
+          mood?: string | null
+          name?: string
+          play_count?: number | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_preferences: {
         Row: {
           bible_font_size: string | null

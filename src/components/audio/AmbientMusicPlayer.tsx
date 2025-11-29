@@ -12,7 +12,11 @@ import {
   Settings,
   X,
   Repeat,
-  Repeat1
+  Repeat1,
+  Upload,
+  Trash2,
+  Heart,
+  Loader2
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
@@ -27,6 +31,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { useUserMusic, UserTrack } from "@/hooks/useUserMusic";
+import { useAuth } from "@/hooks/useAuth";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 // Phototheology Sacred Orchestral Music
 // Rich orchestral, movie soundtrack style (The Chosen, Zimmer, Tyler)
@@ -366,6 +375,10 @@ export function AmbientMusicPlayer({
   minimal = false 
 }: AmbientMusicPlayerProps) {
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const { user } = useAuth();
+  const { userTracks, uploading, uploadMusic, deleteMusic, toggleFavorite } = useUserMusic();
+  
   const [isPlaying, setIsPlaying] = useState(false);
   const [volume, setVolume] = useState(() => {
     const saved = localStorage.getItem("pt-ambient-volume");
@@ -381,13 +394,33 @@ export function AmbientMusicPlayer({
     return saved === "true";
   });
   const [showControls, setShowControls] = useState(false);
+  const [showUpload, setShowUpload] = useState(false);
+  const [uploadName, setUploadName] = useState("");
+  const [uploadFile, setUploadFile] = useState<File | null>(null);
   // Loop mode: "none" | "one" | "all"
   const [loopMode, setLoopMode] = useState<"none" | "one" | "all">(() => {
     const saved = localStorage.getItem("pt-ambient-loop-mode");
     return (saved as "none" | "one" | "all") || "all";
   });
 
-  const currentTrack = AMBIENT_TRACKS.find(t => t.id === currentTrackId) || AMBIENT_TRACKS[0];
+  // Combine preset and user tracks
+  const allTracks = [
+    ...AMBIENT_TRACKS.map(t => ({ ...t, isUser: false })),
+    ...userTracks.map(t => ({ 
+      id: `user-${t.id}`, 
+      name: t.name, 
+      description: t.mood || "Your uploaded track",
+      url: t.file_url,
+      category: "custom",
+      floor: 0,
+      mood: t.mood || "custom",
+      bpm: 60,
+      isUser: true,
+      userTrackData: t
+    }))
+  ];
+
+  const currentTrack = allTracks.find(t => t.id === currentTrackId) || allTracks[0];
 
   // Auto-select track based on room
   useEffect(() => {
@@ -509,11 +542,11 @@ export function AmbientMusicPlayer({
       } catch (error) {
         console.error("Audio playback failed:", error);
         // Try loading a different track if this one fails
-        const currentIndex = AMBIENT_TRACKS.findIndex(t => t.id === currentTrackId);
-        const nextIndex = (currentIndex + 1) % AMBIENT_TRACKS.length;
+        const currentIndex = allTracks.findIndex(t => t.id === currentTrackId);
+        const nextIndex = (currentIndex + 1) % allTracks.length;
         if (nextIndex !== currentIndex) {
           console.log("Trying next track...");
-          setCurrentTrackId(AMBIENT_TRACKS[nextIndex].id);
+          setCurrentTrackId(allTracks[nextIndex].id);
         }
       }
     }
@@ -528,15 +561,46 @@ export function AmbientMusicPlayer({
   };
 
   const nextTrack = () => {
-    const currentIndex = AMBIENT_TRACKS.findIndex(t => t.id === currentTrackId);
-    const nextIndex = (currentIndex + 1) % AMBIENT_TRACKS.length;
-    setCurrentTrackId(AMBIENT_TRACKS[nextIndex].id);
+    const currentIndex = allTracks.findIndex(t => t.id === currentTrackId);
+    const nextIndex = (currentIndex + 1) % allTracks.length;
+    setCurrentTrackId(allTracks[nextIndex].id);
   };
 
   const handleVolumeChange = (value: number[]) => {
     setVolume(value[0]);
     if (value[0] > 0 && isMuted) {
       setIsMuted(false);
+    }
+  };
+
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setUploadFile(file);
+      setUploadName(file.name.replace(/\.[^/.]+$/, ""));
+      setShowUpload(true);
+    }
+  };
+
+  const handleUpload = async () => {
+    if (!uploadFile) return;
+    const result = await uploadMusic(uploadFile, uploadName);
+    if (result) {
+      setShowUpload(false);
+      setUploadFile(null);
+      setUploadName("");
+      // Switch to the new track
+      setCurrentTrackId(`user-${result.id}`);
+    }
+  };
+
+  const handleDeleteTrack = (track: any) => {
+    if (track.isUser && track.userTrackData) {
+      deleteMusic(track.userTrackData);
+      // If currently playing this track, switch to first preset
+      if (currentTrackId === track.id) {
+        setCurrentTrackId(AMBIENT_TRACKS[0].id);
+      }
     }
   };
 
@@ -560,25 +624,83 @@ export function AmbientMusicPlayer({
             )}
           </Button>
         </PopoverTrigger>
-        <PopoverContent className="w-72" align="end">
+        <PopoverContent className="w-80" align="end">
           <div className="space-y-4">
             <div className="flex items-center justify-between">
               <h4 className="font-medium text-sm">Study Music</h4>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="h-6 w-6"
-                onClick={() => setShowControls(false)}
-              >
-                <X className="h-4 w-4" />
-              </Button>
+              <div className="flex items-center gap-1">
+                {user && (
+                  <>
+                    <input
+                      type="file"
+                      ref={fileInputRef}
+                      onChange={handleFileSelect}
+                      accept="audio/*"
+                      className="hidden"
+                    />
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-6 w-6"
+                      onClick={() => fileInputRef.current?.click()}
+                      disabled={uploading}
+                      title="Upload your music"
+                    >
+                      {uploading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />}
+                    </Button>
+                  </>
+                )}
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-6 w-6"
+                  onClick={() => setShowControls(false)}
+                >
+                  <X className="h-4 w-4" />
+                </Button>
+              </div>
             </div>
+
+            {showUpload && uploadFile && (
+              <div className="space-y-2 p-2 border rounded-md bg-muted/50">
+                <Label className="text-xs">Track Name</Label>
+                <Input 
+                  value={uploadName} 
+                  onChange={(e) => setUploadName(e.target.value)}
+                  placeholder="Enter track name"
+                  className="h-8 text-sm"
+                />
+                <div className="flex gap-2">
+                  <Button size="sm" onClick={handleUpload} disabled={uploading} className="flex-1">
+                    {uploading ? <Loader2 className="h-3 w-3 animate-spin mr-1" /> : null}
+                    Upload
+                  </Button>
+                  <Button size="sm" variant="ghost" onClick={() => { setShowUpload(false); setUploadFile(null); }}>
+                    Cancel
+                  </Button>
+                </div>
+              </div>
+            )}
             
             <Select value={currentTrackId} onValueChange={setCurrentTrackId}>
               <SelectTrigger className="w-full">
                 <SelectValue />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className="max-h-60">
+                {userTracks.length > 0 && (
+                  <>
+                    <div className="px-2 py-1 text-xs font-medium text-muted-foreground">Your Music</div>
+                    {allTracks.filter(t => t.isUser).map(track => (
+                      <SelectItem key={track.id} value={track.id}>
+                        <div className="flex items-center gap-2">
+                          <Heart className="h-3 w-3 text-primary" />
+                          <span>{track.name}</span>
+                        </div>
+                      </SelectItem>
+                    ))}
+                    <div className="px-2 py-1 text-xs font-medium text-muted-foreground mt-1">Preset Tracks</div>
+                  </>
+                )}
                 {AMBIENT_TRACKS.map(track => (
                   <SelectItem key={track.id} value={track.id}>
                     <div className="flex flex-col">
