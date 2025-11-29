@@ -27,15 +27,15 @@ import {
 } from "@/components/ui/select";
 
 // Epic cinematic orchestral tracks - Hans Zimmer style
-// Royalty-free from Pixabay - no syncopation, sweeping orchestral
+// Using reliable CDN sources for ambient music
 const AMBIENT_TRACKS = [
   {
     id: "devotion",
     name: "Devotion",
     description: "Sweeping emotional strings for reflection",
     category: "devotion",
-    // Verified working - Internet Archive cinematic ambient
-    url: "https://ia800905.us.archive.org/19/items/FREE_background_music_dridge/Kevin_MacLeod_-_Lasting_Hope.mp3",
+    // Chosic free ambient
+    url: "https://files.freemusicarchive.org/storage-freemusicarchive-org/music/ccCommunity/Chad_Crouch/Arps/Chad_Crouch_-_Shipping_Lanes.mp3",
     bpm: 65,
   },
   {
@@ -43,8 +43,7 @@ const AMBIENT_TRACKS = [
     name: "Deep Study",
     description: "Majestic orchestral for focused learning",
     category: "study",
-    // Verified working - Kevin MacLeod cinematic
-    url: "https://ia800905.us.archive.org/19/items/FREE_background_music_dridge/Kevin_MacLeod_-_Decisions.mp3",
+    url: "https://files.freemusicarchive.org/storage-freemusicarchive-org/music/no_curator/Kai_Engel/Satin/Kai_Engel_-_04_-_Moonlight_Reprise.mp3",
     bpm: 70,
   },
   {
@@ -52,8 +51,7 @@ const AMBIENT_TRACKS = [
     name: "Sanctuary",
     description: "Reverent cinematic soundscape",
     category: "sanctuary",
-    // Verified working - Epic cinematic
-    url: "https://ia800905.us.archive.org/19/items/FREE_background_music_dridge/Kevin_MacLeod_-_Ascending.mp3",
+    url: "https://files.freemusicarchive.org/storage-freemusicarchive-org/music/ccCommunity/Kai_Engel/Satin/Kai_Engel_-_07_-_Interception.mp3",
     bpm: 60,
   },
   {
@@ -61,8 +59,7 @@ const AMBIENT_TRACKS = [
     name: "Memorization",
     description: "Gentle cinematic waves for memory",
     category: "memory",
-    // Verified working - Soft ambient
-    url: "https://ia800905.us.archive.org/19/items/FREE_background_music_dridge/Kevin_MacLeod_-_Meditation_Impromptu.mp3",
+    url: "https://files.freemusicarchive.org/storage-freemusicarchive-org/music/no_curator/Kai_Engel/Satin/Kai_Engel_-_01_-_Contention.mp3",
     bpm: 62,
   },
   {
@@ -70,8 +67,7 @@ const AMBIENT_TRACKS = [
     name: "Prophecy",
     description: "Grand orchestral for prophetic study",
     category: "prophecy",
-    // Verified working - Epic dramatic
-    url: "https://ia800905.us.archive.org/19/items/FREE_background_music_dridge/Kevin_MacLeod_-_Impact_Prelude.mp3",
+    url: "https://files.freemusicarchive.org/storage-freemusicarchive-org/music/ccCommunity/Kai_Engel/Satin/Kai_Engel_-_09_-_Anxiety.mp3",
     bpm: 55,
   },
 ];
@@ -203,18 +199,36 @@ export function AmbientMusicPlayer({
   }, [isEnabled]);
 
   const togglePlay = async () => {
-    if (!audioRef.current) return;
+    if (!audioRef.current) {
+      console.error("Audio element not initialized");
+      return;
+    }
 
     if (isPlaying) {
       audioRef.current.pause();
       setIsPlaying(false);
     } else {
       try {
+        // Ensure source is set
+        if (!audioRef.current.src || audioRef.current.src === "") {
+          audioRef.current.src = currentTrack.url;
+        }
+        audioRef.current.volume = isMuted ? 0 : volume;
+        
+        console.log("Attempting to play:", currentTrack.url);
         await audioRef.current.play();
+        console.log("Audio playing successfully");
         setIsPlaying(true);
         setIsEnabled(true);
       } catch (error) {
         console.error("Audio playback failed:", error);
+        // Try loading a different track if this one fails
+        const currentIndex = AMBIENT_TRACKS.findIndex(t => t.id === currentTrackId);
+        const nextIndex = (currentIndex + 1) % AMBIENT_TRACKS.length;
+        if (nextIndex !== currentIndex) {
+          console.log("Trying next track...");
+          setCurrentTrackId(AMBIENT_TRACKS[nextIndex].id);
+        }
       }
     }
   };
