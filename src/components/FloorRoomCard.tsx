@@ -38,7 +38,7 @@ export const FloorRoomCard = ({ room, floorNumber, gradient }: FloorRoomCardProp
         whileHover={showLocked ? {} : { scale: 1.02, y: -4 }}
         transition={{ type: "spring", stiffness: 300, damping: 20 }}
       >
-        <Card className={`group h-full cursor-pointer transition-all duration-500 relative overflow-hidden border-2 hover:border-primary/50 ${showLocked ? 'opacity-60' : 'hover:shadow-glow'}`}>
+        <Card variant="glass" className={`group h-full cursor-pointer transition-all duration-500 relative ${showLocked ? 'opacity-60' : ''}`}>
           {/* Animated gradient background overlay */}
           {!showLocked && (
             <div className={`absolute inset-0 ${gradient} opacity-0 group-hover:opacity-10 transition-opacity duration-500`} />

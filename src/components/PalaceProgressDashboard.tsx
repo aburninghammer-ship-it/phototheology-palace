@@ -265,7 +265,7 @@ export function PalaceProgressDashboard() {
   return (
     <div className="space-y-6">
       {/* Progress Overview */}
-      <Card>
+      <Card variant="glass">
         <CardHeader>
           <div className="flex items-center justify-between">
             <div>
@@ -312,7 +312,7 @@ export function PalaceProgressDashboard() {
       </Card>
 
       {/* Recommended Next Steps */}
-      <Card>
+      <Card variant="glass">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <ArrowRight className="h-5 w-5" />
@@ -361,7 +361,7 @@ export function PalaceProgressDashboard() {
       </Card>
 
       {/* Floor Progress Breakdown */}
-      <Card>
+      <Card variant="glass">
         <CardHeader>
           <CardTitle>Progress by Floor</CardTitle>
           <CardDescription>See how you're advancing through each level</CardDescription>

@@ -102,7 +102,7 @@ export const BadgeSystem = () => {
   const displayBadges = BADGES.slice(0, 6);
 
   return (
-    <Card className="overflow-hidden">
+    <Card variant="glass" className="overflow-hidden">
       <div className="h-1 bg-gradient-to-r from-amber-500 via-yellow-500 to-orange-500" />
       <CardHeader className="pb-2">
         <CardTitle className="text-lg flex items-center justify-between">

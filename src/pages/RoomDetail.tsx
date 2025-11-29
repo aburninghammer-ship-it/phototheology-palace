@@ -334,10 +334,7 @@ export default function RoomDetail() {
                 {showQuickStart && <ValueProposition roomId={room.id} />}
                 {showQuickStart && <QuickStartGuide roomId={room.id} roomName={room.name} />}
 
-                <Card className="relative overflow-hidden border-2 border-primary/30 hover:border-primary shadow-lg hover:shadow-glow transition-all duration-500">
-                  {/* Glowing corner accent */}
-                  <div className="absolute top-0 right-0 w-32 h-32 bg-primary/10 rounded-full blur-3xl animate-pulse" />
-                  
+                <Card variant="glass" className="relative">
                   <CardHeader className="relative z-10">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-3">
@@ -367,10 +364,7 @@ export default function RoomDetail() {
                 </Card>
 
                 <Collapsible open={methodExpanded} onOpenChange={setMethodExpanded}>
-                  <Card className="relative overflow-hidden border-2 border-accent/30 hover:border-accent shadow-lg hover:shadow-glow transition-all duration-500">
-                    {/* Animated gradient orb */}
-                    <div className="absolute -left-10 top-1/2 w-40 h-40 bg-accent/20 rounded-full blur-3xl animate-pulse" />
-                    
+                  <Card variant="glass" className="relative">
                     <CardHeader className="relative z-10">
                       <CollapsibleTrigger asChild>
                         <div className="flex items-center justify-between cursor-pointer group">
@@ -400,11 +394,7 @@ export default function RoomDetail() {
                 </Collapsible>
 
                 <Collapsible open={examplesExpanded} onOpenChange={setExamplesExpanded}>
-                  <Card className="relative overflow-hidden border-2 border-secondary/30 hover:border-secondary shadow-lg hover:shadow-glow transition-all duration-500">
-                    {/* Sparkle pattern */}
-                    <div className="absolute top-5 right-5 text-4xl opacity-10">✨</div>
-                    <div className="absolute bottom-5 left-5 text-4xl opacity-10">💫</div>
-                    
+                  <Card variant="glass" className="relative">
                     <CardHeader className="relative z-10">
                       <CollapsibleTrigger asChild>
                         <div className="flex items-center justify-between cursor-pointer group">
