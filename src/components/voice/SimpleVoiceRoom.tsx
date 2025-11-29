@@ -1,10 +1,11 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Mic, MicOff, PhoneOff, Phone, Users, Volume2 } from "lucide-react";
+import { Mic, MicOff, PhoneOff, Phone, Users, Volume2, UserPlus } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
+import { VoiceChatInviteDialog } from "./VoiceChatInviteDialog";
 
 interface Participant {
   id: string;
@@ -17,10 +18,11 @@ interface SimpleVoiceRoomProps {
   roomId: string;
   userId: string;
   userName: string;
+  roomName?: string;
   className?: string;
 }
 
-export function SimpleVoiceRoom({ roomId, userId, userName, className }: SimpleVoiceRoomProps) {
+export function SimpleVoiceRoom({ roomId, userId, userName, roomName, className }: SimpleVoiceRoomProps) {
   const [isInRoom, setIsInRoom] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
   const [participants, setParticipants] = useState<Participant[]>([]);
@@ -338,6 +340,7 @@ export function SimpleVoiceRoom({ roomId, userId, userName, className }: SimpleV
             {isMuted ? <MicOff className="h-4 w-4 mr-2" /> : <Mic className="h-4 w-4 mr-2" />}
             {isMuted ? "Unmute" : "Mute"}
           </Button>
+          <VoiceChatInviteDialog roomId={roomId} roomName={roomName || roomId} />
           <Button onClick={leaveRoom} variant="outline" size="sm">
             <PhoneOff className="h-4 w-4" />
           </Button>
