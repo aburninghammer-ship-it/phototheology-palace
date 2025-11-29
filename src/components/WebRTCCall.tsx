@@ -64,7 +64,11 @@ export function WebRTCCall({ roomId, userId, userName }: WebRTCCallProps) {
 
   const startCall = async () => {
     try {
-      console.log("Starting call for user:", userId, "in room:", roomId);
+      const channelName = `webrtc_${roomId}`;
+      console.log("=== STARTING CALL ===");
+      console.log("User ID:", userId);
+      console.log("Room ID:", roomId);
+      console.log("Channel name:", channelName);
       setConnectionStatus("Getting media...");
       
       // Get user media
@@ -125,15 +129,21 @@ export function WebRTCCall({ roomId, userId, userName }: WebRTCCallProps) {
             });
           }
         })
-        .on("presence", { event: "join" }, ({ key }) => {
-          console.log("User joined:", key);
+        .on("presence", { event: "join" }, ({ key, newPresences }) => {
+          console.log("=== USER JOINED ===");
+          console.log("Join key:", key);
+          console.log("New presences:", JSON.stringify(newPresences));
+          console.log("Current userId:", userId);
+          console.log("Is other user:", key !== userId);
+          
           if (key !== userId) {
             // Add to participants list immediately
             setParticipants(prev => {
               if (!prev.includes(key)) {
-                console.log("Adding participant to list:", key);
+                console.log("✅ Adding participant to list:", key);
                 return [...prev, key];
               }
+              console.log("⚠️ Participant already in list:", key);
               return prev;
             });
             
