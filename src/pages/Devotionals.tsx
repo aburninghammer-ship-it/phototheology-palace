@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Book, Plus, Sparkles, Clock, Calendar, ChevronRight, Trash2, Gift, Heart, Star, Zap, Users, UserPlus, GraduationCap, Home, HeartHandshake } from "lucide-react";
+import { VoiceChatWidget } from "@/components/voice/VoiceChatWidget";
+import { useAuth } from "@/hooks/useAuth";
 import { Navigation } from "@/components/Navigation";
 import { SimplifiedNav } from "@/components/SimplifiedNav";
 import { useUserPreferences } from "@/hooks/useUserPreferences";
@@ -35,6 +37,7 @@ const formatLabels: Record<string, { label: string; color: string; gradient: str
 };
 
 export default function Devotionals() {
+  const { user } = useAuth();
   const { preferences } = useUserPreferences();
   const navigate = useNavigate();
   const { plans, plansLoading, deletePlan } = useDevotionals();
@@ -148,6 +151,15 @@ export default function Devotionals() {
 
       {/* Content */}
       <div className="max-w-6xl mx-auto px-4 py-8 space-y-8">
+        {/* Voice Chat Widget */}
+        {user && (
+          <VoiceChatWidget
+            roomType="study"
+            roomId="devotionals"
+            roomName="Devotionals Voice Chat"
+            className="mb-4"
+          />
+        )}
         {/* Active Devotionals */}
         {activePlans.length > 0 && (
           <section>
