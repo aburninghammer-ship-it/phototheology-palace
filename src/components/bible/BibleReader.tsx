@@ -4,7 +4,8 @@ import { fetchChapter, Translation } from "@/services/bibleApi";
 import { Chapter } from "@/types/bible";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ChevronLeft, ChevronRight, BookOpen, Loader2, Link2, MessageSquare, Bot, Bookmark, Sparkles, Upload, Volume2 } from "lucide-react";
+import { ChevronLeft, ChevronRight, BookOpen, Loader2, Link2, MessageSquare, Bot, Bookmark, Sparkles, Upload, Volume2, Headphones } from "lucide-react";
+import { QuickAudioButton } from "@/components/audio";
 import { AudioControls } from "./AudioControls";
 import { VerseView } from "./VerseView";
 import { StrongsVerseView } from "./StrongsVerseView";
@@ -247,7 +248,7 @@ export const BibleReader = () => {
       <PTCodeSearch />
 
       {/* Audio Controls */}
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-2 flex-wrap">
         <Button
           variant={showAudioControls ? "default" : "outline"}
           size="sm"
@@ -255,8 +256,14 @@ export const BibleReader = () => {
           className={showAudioControls ? "bg-gradient-to-r from-emerald-600 to-teal-600 text-white" : ""}
         >
           <Volume2 className="h-4 w-4 mr-2" />
-          Listen
+          Listen (Browser)
         </Button>
+        <QuickAudioButton 
+          text={chapterData.verses.map(v => `Verse ${v.verse}. ${v.text}`).join(' ')} 
+          variant="outline" 
+          size="sm" 
+          className="gap-2"
+        />
         {showAudioControls && (
           <AudioControls
             verses={chapterData.verses}
