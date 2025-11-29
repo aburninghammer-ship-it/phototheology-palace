@@ -5203,6 +5203,42 @@ export type Database = {
         }
         Relationships: []
       }
+      reading_sequences: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          is_public: boolean | null
+          name: string
+          play_count: number | null
+          room_tags: string[] | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_public?: boolean | null
+          name: string
+          play_count?: number | null
+          room_tags?: string[] | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_public?: boolean | null
+          name?: string
+          play_count?: number | null
+          room_tags?: string[] | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       reading_streaks: {
         Row: {
           created_at: string
@@ -5568,6 +5604,59 @@ export type Database = {
           xp_requirement?: number
         }
         Relationships: []
+      }
+      sequence_items: {
+        Row: {
+          book: string
+          chapter: number
+          created_at: string
+          end_verse: number | null
+          id: string
+          include_jeeves_commentary: boolean | null
+          item_order: number
+          playback_speed: number | null
+          sequence_id: string
+          sequence_number: number
+          start_verse: number | null
+          voice: string | null
+        }
+        Insert: {
+          book: string
+          chapter: number
+          created_at?: string
+          end_verse?: number | null
+          id?: string
+          include_jeeves_commentary?: boolean | null
+          item_order?: number
+          playback_speed?: number | null
+          sequence_id: string
+          sequence_number?: number
+          start_verse?: number | null
+          voice?: string | null
+        }
+        Update: {
+          book?: string
+          chapter?: number
+          created_at?: string
+          end_verse?: number | null
+          id?: string
+          include_jeeves_commentary?: boolean | null
+          item_order?: number
+          playback_speed?: number | null
+          sequence_id?: string
+          sequence_number?: number
+          start_verse?: number | null
+          voice?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sequence_items_sequence_id_fkey"
+            columns: ["sequence_id"]
+            isOneToOne: false
+            referencedRelation: "reading_sequences"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       sermon_titles: {
         Row: {

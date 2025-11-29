@@ -3,7 +3,7 @@ import { Navigation } from "@/components/Navigation";
 import { BibleReader } from "@/components/bible/BibleReader";
 import { BibleNavigation } from "@/components/bible/BibleNavigation";
 import { Button } from "@/components/ui/button";
-import { BookMarked, HelpCircle } from "lucide-react";
+import { BookMarked, HelpCircle, Headphones } from "lucide-react";
 import { Link } from "react-router-dom";
 import { StudyBibleDemoDialog } from "@/components/bible/StudyBibleDemoDialog";
 import { VoiceChatWidget } from "@/components/voice/VoiceChatWidget";
@@ -39,6 +39,13 @@ const Bible = () => {
                 <HelpCircle className="h-4 w-4 mr-2" />
                 <span className="hidden sm:inline">How to Use</span>
                 <span className="sm:hidden">Help</span>
+              </Button>
+              <Button asChild variant="outline" className="gradient-palace border-primary/20 whitespace-nowrap">
+                <Link to="/read-me-the-bible">
+                  <Headphones className="h-4 w-4 mr-2" />
+                  <span className="hidden sm:inline">Read Me the Bible</span>
+                  <span className="sm:hidden">Listen</span>
+                </Link>
               </Button>
               <Button asChild variant="outline" className="gradient-dreamy border-primary/20 whitespace-nowrap">
                 <Link to="/memorization-verses">
