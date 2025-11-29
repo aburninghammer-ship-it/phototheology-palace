@@ -41,8 +41,8 @@ export const InsideThePalace = () => {
           {features.map((feature, index) => {
             const Icon = feature.icon;
             return (
-              <Card key={index} className="border-2 hover:border-primary/50 transition-colors">
-                <CardContent className="pt-6">
+              <Card key={index} variant="glass" className="hover:scale-[1.02] transition-transform">
+                <CardContent className="pt-6 relative z-10">
                   <Icon className="h-12 w-12 text-primary mb-4" />
                   <h3 className="font-bold text-xl mb-3">{feature.title}</h3>
                   <p className="text-muted-foreground">{feature.description}</p>
