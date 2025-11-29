@@ -24,6 +24,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { ELEVENLABS_VOICES, VoiceId } from "@/hooks/useTextToSpeech";
+import { notifyTTSStarted, notifyTTSStopped } from "@/hooks/useAudioDucking";
 
 interface AudioNarratorProps {
   text: string;
@@ -118,6 +119,7 @@ export const AudioNarrator = ({
         audio.onended = () => {
           setIsPlaying(false);
           setProgress(0);
+          notifyTTSStopped();
         };
 
         audio.volume = volume / 100;
@@ -125,6 +127,7 @@ export const AudioNarrator = ({
         // Auto-play after generation
         audio.play();
         setIsPlaying(true);
+        notifyTTSStarted();
       }
     } catch (error) {
       console.error("Error generating audio:", error);
@@ -138,6 +141,7 @@ export const AudioNarrator = ({
     if (audioRef.current) {
       audioRef.current.play();
       setIsPlaying(true);
+      notifyTTSStarted();
     }
   };
 
@@ -145,6 +149,7 @@ export const AudioNarrator = ({
     if (audioRef.current) {
       audioRef.current.pause();
       setIsPlaying(false);
+      notifyTTSStopped();
     }
   };
 

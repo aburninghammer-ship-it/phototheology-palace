@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
 import { Card, CardContent } from "@/components/ui/card";
@@ -36,6 +36,7 @@ import { Label } from "@/components/ui/label";
 import { useUserMusic, UserTrack } from "@/hooks/useUserMusic";
 import { useAuth } from "@/hooks/useAuth";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useAudioDucking } from "@/hooks/useAudioDucking";
 
 // Phototheology Sacred Orchestral Music
 // Rich orchestral, movie soundtrack style (The Chosen, Zimmer, Tyler)
@@ -402,6 +403,19 @@ export function AmbientMusicPlayer({
     const saved = localStorage.getItem("pt-ambient-loop-mode");
     return (saved as "none" | "one" | "all") || "all";
   });
+  const [duckMultiplier, setDuckMultiplier] = useState(1);
+
+  // Audio ducking - reduce volume when TTS is playing
+  const handleDuckChange = useCallback((ducked: boolean, duckRatio: number) => {
+    setDuckMultiplier(duckRatio);
+    if (audioRef.current) {
+      const effectiveVolume = isMuted ? 0 : volume * duckRatio;
+      audioRef.current.volume = effectiveVolume;
+      console.log(`[AmbientMusic] ${ducked ? 'Ducking' : 'Restoring'} volume to ${effectiveVolume}`);
+    }
+  }, [volume, isMuted]);
+
+  useAudioDucking(handleDuckChange);
 
   // Combine preset and user tracks
   const allTracks = [
@@ -466,7 +480,7 @@ export function AmbientMusicPlayer({
     if (audioRef.current && currentTrack) {
       const wasPlaying = isPlaying;
       audioRef.current.src = currentTrack.url;
-      audioRef.current.volume = isMuted ? 0 : volume;
+      audioRef.current.volume = isMuted ? 0 : volume * duckMultiplier;
       
       if (wasPlaying && isEnabled) {
         audioRef.current.play().catch(console.error);
@@ -479,10 +493,10 @@ export function AmbientMusicPlayer({
   // Update volume
   useEffect(() => {
     if (audioRef.current) {
-      audioRef.current.volume = isMuted ? 0 : volume;
+      audioRef.current.volume = isMuted ? 0 : volume * duckMultiplier;
       localStorage.setItem("pt-ambient-volume", volume.toString());
     }
-  }, [volume, isMuted]);
+  }, [volume, isMuted, duckMultiplier]);
 
   // Save enabled state
   useEffect(() => {
@@ -532,7 +546,7 @@ export function AmbientMusicPlayer({
         if (!audioRef.current.src || audioRef.current.src === "") {
           audioRef.current.src = currentTrack.url;
         }
-        audioRef.current.volume = isMuted ? 0 : volume;
+        audioRef.current.volume = isMuted ? 0 : volume * duckMultiplier;
         
         console.log("Attempting to play:", currentTrack.url);
         await audioRef.current.play();
@@ -556,7 +570,7 @@ export function AmbientMusicPlayer({
     const newMuted = !isMuted;
     setIsMuted(newMuted);
     if (audioRef.current) {
-      audioRef.current.volume = newMuted ? 0 : volume;
+      audioRef.current.volume = newMuted ? 0 : volume * duckMultiplier;
     }
   };
 
