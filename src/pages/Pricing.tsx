@@ -1,19 +1,32 @@
 import { Navigation } from "@/components/Navigation";
 import { Footer } from "@/components/Footer";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Check, Sparkles, Star, Crown, Zap, GraduationCap, Building2, ArrowRight } from "lucide-react";
+import { Check, Sparkles, Star, Crown, Zap, GraduationCap, Building2, ArrowRight, CreditCard } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 export default function Pricing() {
   const { user } = useAuth();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const [billingPeriod, setBillingPeriod] = useState<'monthly' | 'annual'>('monthly');
+  const [isStartingTrial, setIsStartingTrial] = useState(false);
+
+  // Handle trial success/cancelled from Stripe redirect
+  useEffect(() => {
+    const trialStatus = searchParams.get('trial');
+    if (trialStatus === 'success') {
+      toast.success("🎉 Your 7-day trial has started! Enjoy full Premium access.");
+      navigate('/palace', { replace: true });
+    } else if (trialStatus === 'cancelled') {
+      toast.info("Trial checkout was cancelled. No worries, you can try again anytime!");
+    }
+  }, [searchParams, navigate]);
 
   const startFreeAccount = () => {
     if (!user) {
@@ -24,16 +37,17 @@ export default function Pricing() {
     navigate("/palace");
   };
 
-  const startFreeTrial = async () => {
+  const startTrialWithCard = async (plan: 'essential' | 'premium') => {
     if (!user) {
       navigate("/auth");
       return;
     }
 
+    setIsStartingTrial(true);
     try {
       const { data: profile } = await supabase
         .from("profiles")
-        .select("trial_started_at, trial_ends_at, subscription_status, is_student")
+        .select("subscription_status, is_student")
         .eq("id", user.id)
         .single();
 
@@ -49,34 +63,20 @@ export default function Pricing() {
         return;
       }
 
-      if (profile?.trial_started_at && profile?.trial_ends_at) {
-        const trialEnd = new Date(profile.trial_ends_at);
-        if (trialEnd > new Date()) {
-          toast.success("Your free trial is already active!");
-          navigate("/palace");
-          return;
-        }
-      }
-
-      const trialStartDate = new Date();
-      const trialEndDate = new Date();
-      trialEndDate.setDate(trialEndDate.getDate() + 7);
-
-      const { error } = await supabase
-        .from("profiles")
-        .update({
-          trial_started_at: trialStartDate.toISOString(),
-          trial_ends_at: trialEndDate.toISOString(),
-        })
-        .eq("id", user.id);
+      // Call edge function to create Stripe checkout with trial
+      const { data, error } = await supabase.functions.invoke('create-trial-checkout', {
+        body: { plan, billing: billingPeriod },
+      });
 
       if (error) throw error;
-
-      toast.success("🎉 7-day Premium trial activated!");
-      navigate("/palace");
+      if (data?.url) {
+        window.location.href = data.url;
+      }
     } catch (error: any) {
       console.error("Error starting trial:", error);
       toast.error("Failed to start trial. Please try again.");
+    } finally {
+      setIsStartingTrial(false);
     }
   };
 
@@ -221,14 +221,14 @@ export default function Pricing() {
         {/* Hero Section */}
         <div className="text-center mb-12">
           <Badge className="mb-4 gradient-palace text-white border-0">
-            <Zap className="h-3 w-3 mr-1" />
-            7-Day Free Trial • No Credit Card Required
+            <CreditCard className="h-3 w-3 mr-1" />
+            7-Day Free Trial • Credit Card Required
           </Badge>
           <h1 className="text-5xl md:text-6xl font-bold bg-gradient-palace bg-clip-text text-transparent mb-4">
             Choose Your Plan
           </h1>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-            Start with a free trial, upgrade anytime to unlock more features
+            Start free forever, or try Premium with a 7-day trial
           </p>
           
           {/* Billing Period Toggle - Enhanced */}
@@ -269,14 +269,21 @@ export default function Pricing() {
           <CardContent className="p-6 text-center">
             <Badge className="mb-3 gradient-palace text-white border-0">
               <Zap className="h-3 w-3 mr-1" />
-              Try Everything Free
+              7-Day Free Trial
             </Badge>
             <h3 className="text-xl font-bold mb-2">Not sure which plan? Try Premium for 7 days.</h3>
             <p className="text-muted-foreground mb-4">
-              Get full access to all 8 floors, every AI feature, and premium tools. No credit card required.
+              Get full access to all 8 floors, every AI feature, and premium tools. 
+              <span className="flex items-center justify-center gap-1 mt-1 text-sm">
+                <CreditCard className="h-3 w-3" /> Credit card required • Cancel anytime
+              </span>
             </p>
-            <Button onClick={startFreeTrial} className="gradient-palace">
-              Start 7-Day Premium Trial
+            <Button 
+              onClick={() => startTrialWithCard('premium')} 
+              className="gradient-palace"
+              disabled={isStartingTrial}
+            >
+              {isStartingTrial ? "Starting..." : "Start 7-Day Premium Trial"}
               <ArrowRight className="ml-2 h-4 w-4" />
             </Button>
           </CardContent>

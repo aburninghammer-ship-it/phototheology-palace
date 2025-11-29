@@ -82,7 +82,8 @@ const DATING_STAGES = [
   { value: "long_distance", label: "Long Distance", emoji: "✈️" },
 ];
 
-const STRUGGLES = [
+// Base struggles - shown for "individual" category
+const BASE_STRUGGLES = [
   { value: "anxiety", label: "Anxiety", emoji: "😰" },
   { value: "depression", label: "Depression", emoji: "😢" },
   { value: "grief", label: "Grief", emoji: "💔" },
@@ -96,6 +97,72 @@ const STRUGGLES = [
   { value: "relationships", label: "Relationship Issues", emoji: "💬" },
   { value: "purity", label: "Purity", emoji: "🕊️" },
 ];
+
+// Category-specific struggles
+const CATEGORY_STRUGGLES: Record<string, typeof BASE_STRUGGLES> = {
+  dating: [
+    { value: "boundaries", label: "Boundaries", emoji: "🚧" },
+    { value: "purity", label: "Physical Purity", emoji: "🕊️" },
+    { value: "communication", label: "Communication", emoji: "💬" },
+    { value: "trust_issues", label: "Trust Issues", emoji: "🔐" },
+    { value: "different_values", label: "Different Values", emoji: "⚖️" },
+    { value: "spiritual_alignment", label: "Spiritual Alignment", emoji: "🙏" },
+    { value: "past_relationships", label: "Past Relationships", emoji: "📦" },
+    { value: "future_uncertainty", label: "Future Uncertainty", emoji: "❓" },
+    { value: "family_approval", label: "Family Approval", emoji: "👨‍👩‍👧" },
+    { value: "jealousy", label: "Jealousy", emoji: "💚" },
+    { value: "long_distance", label: "Long Distance", emoji: "✈️" },
+    { value: "commitment_fear", label: "Fear of Commitment", emoji: "😰" },
+  ],
+  spousal: [
+    { value: "communication", label: "Communication", emoji: "💬" },
+    { value: "intimacy", label: "Intimacy Issues", emoji: "💑" },
+    { value: "trust_broken", label: "Broken Trust", emoji: "💔" },
+    { value: "conflict", label: "Constant Conflict", emoji: "⚔️" },
+    { value: "finances", label: "Financial Stress", emoji: "💰" },
+    { value: "parenting_differences", label: "Parenting Differences", emoji: "👶" },
+    { value: "in_laws", label: "In-Law Issues", emoji: "🏠" },
+    { value: "emotional_distance", label: "Emotional Distance", emoji: "🧊" },
+    { value: "spiritual_disconnect", label: "Spiritual Disconnect", emoji: "⛪" },
+    { value: "unforgiveness", label: "Unforgiveness", emoji: "🤝" },
+    { value: "infidelity_recovery", label: "Infidelity Recovery", emoji: "🩹" },
+    { value: "rekindling", label: "Rekindling Love", emoji: "🔥" },
+  ],
+  family: [
+    { value: "sibling_conflict", label: "Sibling Conflict", emoji: "👫" },
+    { value: "discipline", label: "Discipline Challenges", emoji: "📏" },
+    { value: "screen_time", label: "Screen Time Wars", emoji: "📱" },
+    { value: "spiritual_apathy", label: "Spiritual Apathy", emoji: "😴" },
+    { value: "peer_pressure", label: "Peer Pressure", emoji: "👥" },
+    { value: "busyness", label: "Too Busy", emoji: "⏰" },
+    { value: "quality_time", label: "Quality Time", emoji: "❤️" },
+    { value: "blended_family", label: "Blended Family", emoji: "🏡" },
+    { value: "generational_gaps", label: "Generational Gaps", emoji: "👴" },
+    { value: "prodigal_child", label: "Prodigal Child", emoji: "🚪" },
+    { value: "grief_loss", label: "Family Grief/Loss", emoji: "💔" },
+    { value: "moving_changes", label: "Moving/Changes", emoji: "📦" },
+  ],
+  classroom: [
+    { value: "attention", label: "Attention Issues", emoji: "🎯" },
+    { value: "behavior", label: "Behavior Problems", emoji: "🚨" },
+    { value: "bullying", label: "Bullying", emoji: "😢" },
+    { value: "academic_pressure", label: "Academic Pressure", emoji: "📚" },
+    { value: "faith_questions", label: "Faith Questions", emoji: "❓" },
+    { value: "social_anxiety", label: "Social Anxiety", emoji: "😰" },
+    { value: "identity_formation", label: "Identity Formation", emoji: "🪞" },
+    { value: "technology", label: "Technology Issues", emoji: "💻" },
+    { value: "respect_authority", label: "Respecting Authority", emoji: "👨‍🏫" },
+    { value: "peer_relationships", label: "Peer Relationships", emoji: "🤝" },
+    { value: "family_struggles", label: "Home Life Struggles", emoji: "🏠" },
+    { value: "worldly_influences", label: "Worldly Influences", emoji: "🌍" },
+  ],
+  individual: BASE_STRUGGLES,
+};
+
+// Get struggles based on category
+const getStrugglesForCategory = (category: string) => {
+  return CATEGORY_STRUGGLES[category] || BASE_STRUGGLES;
+};
 
 const TONES = [
   { value: "comforting", label: "Comforting", description: "Gentle, reassuring approach" },
@@ -562,11 +629,11 @@ export function CreateProfileWizard({ onClose, onProfileCreated }: CreateProfile
                 </p>
               </div>
 
-              {/* Additional Struggles */}
+              {/* Additional Struggles - Contextual based on category */}
               <div>
-                <Label>Additional Struggles (optional)</Label>
+                <Label>Additional Struggles (optional) - {DEVOTIONAL_CATEGORIES.find(c => c.value === formData.category)?.label} Related</Label>
                 <div className="flex flex-wrap gap-2 mt-3">
-                  {STRUGGLES.map((struggle) => (
+                  {getStrugglesForCategory(formData.category).map((struggle) => (
                     <Badge
                       key={struggle.value}
                       variant={formData.struggles.includes(struggle.value) ? "default" : "outline"}
@@ -677,7 +744,7 @@ export function CreateProfileWizard({ onClose, onProfileCreated }: CreateProfile
                 <div className="flex flex-wrap gap-1">
                   {formData.struggles.map((s) => (
                     <Badge key={s} variant="secondary" className="text-xs">
-                      {STRUGGLES.find((st) => st.value === s)?.label || s}
+                      {getStrugglesForCategory(formData.category).find((st) => st.value === s)?.label || s}
                     </Badge>
                   ))}
                 </div>
