@@ -2,7 +2,7 @@ import { useParams, Link, useNavigate } from "react-router-dom";
 import { palaceFloors } from "@/data/palaceData";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { ArrowLeft, Target, HelpCircle, BookOpen, AlertCircle, CheckCircle, Trophy, Lock, Dumbbell, Brain, ChevronDown, Swords, Crown, FileText, Star, Award, Sparkles } from "lucide-react";
+import { ArrowLeft, Target, HelpCircle, BookOpen, AlertCircle, CheckCircle, Trophy, Lock, Dumbbell, Brain, ChevronDown, Swords, Crown, FileText, Star, Award, Sparkles, Info } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { JeevesAssistant } from "@/components/JeevesAssistant";
@@ -37,6 +37,8 @@ import { useRoomCurriculum } from "@/hooks/useRoomCurriculum";
 import { MasteryProgramEnrollment } from "@/components/mastery/MasteryProgramEnrollment";
 import { JeevesMasterProgram } from "@/components/mastery/JeevesMasterProgram";
 import { VoiceChatWidget } from "@/components/voice/VoiceChatWidget";
+import { RoomTour } from "@/components/onboarding/RoomTour";
+import { useRoomTour } from "@/hooks/useRoomTour";
 
 // Room IDs that have quick start guides
 const QUICK_START_ROOMS = new Set([
@@ -90,6 +92,9 @@ export default function RoomDetail() {
   const { mastery, isLoading: masteryLoading, awardXp, isAwarding } = useMastery(roomId || "", Number(floorNumber));
   const { addItem } = useSpacedRepetition();
   const { focusedRoom, isFocused, setFocusedRoom, clearFocusedRoom, isSettingFocus } = useFocusedRoom();
+  
+  // Room tour for first-time visitors
+  const { showTour: showRoomTour, completeTour: completeRoomTour, skipTour: skipRoomTour, resetTour: resetRoomTour } = useRoomTour(roomId || "", Number(floorNumber));
   
   // Training curriculum system
   const {
@@ -166,6 +171,17 @@ export default function RoomDetail() {
 
   return (
     <div className="min-h-screen bg-gradient-subtle">
+      {/* Room Tour for first-time visitors */}
+      {showRoomTour && room && floor && (
+        <RoomTour
+          room={room}
+          floorNumber={floor.number}
+          floorName={floor.name}
+          onComplete={completeRoomTour}
+          onSkip={skipRoomTour}
+        />
+      )}
+      
       {/* Show onboarding guide for first room visit */}
       {isFirstRoomVisit && showOnboardingGuide && room && (
         <OnboardingGuide
@@ -255,6 +271,15 @@ export default function RoomDetail() {
                   ✅ Completed
                 </Badge>
               )}
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={resetRoomTour}
+                className="text-white/70 hover:text-white hover:bg-white/10"
+              >
+                <Info className="h-4 w-4 mr-1" />
+                Room Tour
+              </Button>
             </div>
             
             <div className="flex items-center gap-4 mb-4">
