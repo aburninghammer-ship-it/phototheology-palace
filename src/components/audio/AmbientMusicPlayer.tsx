@@ -237,7 +237,7 @@ const AMBIENT_TRACKS = [
     category: "hymn-cinematic",
     floor: 7,
     mood: "peace, surrender, triumph",
-    url: "https://www.bensound.com/bensound-music/bensound-solitude.mp3",
+    url: "https://www.bensound.com/bensound-music/bensound-slowmotion.mp3",
     bpm: 55,
   },
   {
