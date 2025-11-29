@@ -61,7 +61,7 @@ const AMBIENT_TRACKS = [
     category: "floor-3",
     floor: 3,
     mood: "holy, reverent, awe",
-    url: "https://cdn.pixabay.com/audio/2022/01/18/audio_d0a13f69d2.mp3",
+    url: "https://cdn.pixabay.com/audio/2022/09/07/audio_d9b1a44ff5.mp3",
     bpm: 58,
   },
   // Floor 4 - Christ Floor: bright, hopeful orchestra
