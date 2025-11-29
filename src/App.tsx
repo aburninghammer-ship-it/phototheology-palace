@@ -24,6 +24,7 @@ import { PageTracker } from "@/components/PageTracker";
 import { DailyVerseNotification } from "@/components/notifications/DailyVerseNotification";
 import { InstallPrompt } from "@/components/pwa/InstallPrompt";
 import { ExitIntentPopup } from "@/components/conversion/ExitIntentPopup";
+import { AmbientMusicPlayer } from "@/components/audio/AmbientMusicPlayer";
 
 // Critical pages - load immediately
 import Index from "./pages/Index";
@@ -227,6 +228,10 @@ function App() {
                         <DailyVerseNotification />
                         <InstallPrompt />
                         <ExitIntentPopup />
+                        {/* Floating Ambient Music Player */}
+                        <div className="fixed bottom-20 right-4 z-40">
+                          <AmbientMusicPlayer minimal />
+                        </div>
                         <div className="flex flex-1 w-full">
                           <MessagingSidebar />
                           <main className="flex-1 w-full overflow-x-hidden">
