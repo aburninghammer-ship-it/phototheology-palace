@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Navigation } from "@/components/Navigation";
@@ -45,6 +45,11 @@ export default function EncyclopediaArticle() {
   const [jeevesLoading, setJeevesLoading] = useState(false);
   const [explanationLevel, setExplanationLevel] = useState<string>("2");
   const [floorFocus, setFloorFocus] = useState<string>("");
+  const tabsRef = useRef<HTMLDivElement>(null);
+
+  const scrollToTabs = () => {
+    tabsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  };
 
   useEffect(() => {
     fetchArticle();
@@ -161,9 +166,9 @@ export default function EncyclopediaArticle() {
         )}
 
         {/* Main Content Tabs */}
-        <Card className="mb-6">
+        <Card className="mb-6 scroll-mt-32" ref={tabsRef}>
           <CardContent className="pt-6">
-            <Tabs defaultValue="floors" className="w-full">
+            <Tabs defaultValue="floors" className="w-full" onValueChange={scrollToTabs}>
               <TabsList className="grid w-full grid-cols-4 mb-4">
                 <TabsTrigger value="floors">Floors</TabsTrigger>
                 <TabsTrigger value="chains">Chains</TabsTrigger>
