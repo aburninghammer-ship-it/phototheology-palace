@@ -96,16 +96,21 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
         body: { book, chapter, chapterText, depth },
       });
 
-      if (error) throw error;
+      if (error) {
+        console.error("[Commentary] Edge function error:", error);
+        throw error;
+      }
+      console.log("[Commentary] Generated commentary length:", data?.commentary?.length || 0);
       return data?.commentary as string | null;
     } catch (e) {
-      console.error("Error generating commentary:", e);
+      console.error("[Commentary] Error generating commentary:", e);
       return null;
     }
   }, []);
 
   // Move to next chapter
   const moveToNextChapter = useCallback(() => {
+    console.log("[Audio] moveToNextChapter called");
     shouldPlayNextRef.current = true;
     setCurrentItemIdx((prev) => {
       const nextIdx = prev + 1;
@@ -116,9 +121,12 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
         toast.success("Reading sequence complete!");
         return prev;
       }
-      console.log("[Audio] Moving to chapter:", nextIdx + 1);
+      console.log("[Audio] Moving to chapter:", nextIdx + 1, "of", totalItems);
       setCurrentVerseIdx(0);
+      // Clear chapter content to trigger reload
       setChapterContent(null);
+      // Reset lastFetchedRef so the new chapter can load
+      lastFetchedRef.current = "";
       return nextIdx;
     });
   }, [totalItems]);
@@ -407,29 +415,40 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
         });
         
         const includeCommentary = currentSeq?.includeJeevesCommentary || false;
+        console.log("[Audio] Commentary enabled:", includeCommentary, "| Voice:", currentSeq?.commentaryVoice);
         
         if (includeCommentary && content && continuePlayingRef.current) {
           // Generate and play commentary before moving to next chapter
           const commentaryVoice = currentSeq?.commentaryVoice || "daniel";
           const commentaryDepth = currentSeq?.commentaryDepth || "surface";
-          console.log("[Commentary] Generating", commentaryDepth, "commentary for completed chapter...");
+          console.log("[Commentary] Generating", commentaryDepth, "commentary with voice:", commentaryVoice);
           setIsLoading(true);
           const chapterText = content.verses.map(v => `${v.verse}. ${v.text}`).join(" ");
           
-          generateCommentary(content.book, content.chapter, chapterText, commentaryDepth).then(commentary => {
-            if (commentary && continuePlayingRef.current) {
-              playCommentary(commentary, commentaryVoice, () => {
+          // Generate commentary and play it
+          generateCommentary(content.book, content.chapter, chapterText, commentaryDepth)
+            .then(commentary => {
+              console.log("[Commentary] Result:", commentary ? `${commentary.length} chars` : "null");
+              if (commentary && continuePlayingRef.current) {
+                console.log("[Commentary] Starting playback...");
+                playCommentary(commentary, commentaryVoice, () => {
+                  console.log("[Commentary] Playback complete, moving to next chapter");
+                  moveToNextChapter();
+                });
+              } else {
+                console.log("[Commentary] No commentary or stopped, moving on");
+                setIsLoading(false);
                 moveToNextChapter();
-              });
-            } else {
+              }
+            })
+            .catch((err) => {
+              console.error("[Commentary] Error:", err);
               setIsLoading(false);
               moveToNextChapter();
-            }
-          }).catch(() => {
-            setIsLoading(false);
-            moveToNextChapter();
-          });
+            });
         } else {
+          // No commentary - move to next chapter immediately
+          console.log("[Audio] No commentary, moving to next chapter immediately");
           moveToNextChapter();
         }
       }
