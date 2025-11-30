@@ -478,15 +478,18 @@ export function AmbientMusicPlayer({
     };
   }, [loopMode]);
 
-  // Update audio source when track changes
+  // Update audio source when track changes - only reset src if URL actually changed
   useEffect(() => {
     if (audioRef.current && currentTrack) {
-      const wasPlaying = isPlaying;
-      audioRef.current.src = currentTrack.url;
-      audioRef.current.volume = isMuted ? 0 : volume * duckMultiplier;
-      
-      if (wasPlaying && isEnabled) {
-        audioRef.current.play().catch(console.error);
+      // Only change src if it's actually different to prevent restart
+      if (audioRef.current.src !== currentTrack.url) {
+        const wasPlaying = isPlaying;
+        audioRef.current.src = currentTrack.url;
+        audioRef.current.volume = isMuted ? 0 : volume * duckMultiplier;
+        
+        if (wasPlaying && isEnabled) {
+          audioRef.current.play().catch(console.error);
+        }
       }
       
       localStorage.setItem("pt-ambient-track", currentTrackId);
