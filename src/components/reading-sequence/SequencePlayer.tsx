@@ -50,7 +50,9 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
   const isGeneratingRef = useRef(false); // Prevent concurrent TTS requests
   const isFetchingChapterRef = useRef(false); // Prevent concurrent chapter fetches
   const lastFetchedRef = useRef<string | null>(null); // Track last fetched chapter
-  const shouldPlayNextRef = useRef(false); // Signal to play next verse
+  const shouldPlayNextRef = useRef(false); // Signal to play next chapter
+  const continuePlayingRef = useRef(false); // Signal to continue playing verses
+  const pendingVerseRef = useRef<{ verseIdx: number; content: ChapterContent; voice: string } | null>(null);
   
   const activeSequences = sequences.filter((s) => s.enabled && s.items.length > 0);
 
@@ -69,6 +71,8 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
     lastFetchedRef.current = null;
     isGeneratingRef.current = false;
     shouldPlayNextRef.current = false;
+    continuePlayingRef.current = false;
+    pendingVerseRef.current = null;
     console.log("SequencePlayer mounted, refs reset. Active sequences:", activeSequences.length, "Total items:", totalItems);
   }, []);
 
@@ -127,9 +131,6 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
     }
   }, []);
 
-  // Ref to hold play function for recursive calls
-  const playVerseRef = useRef<((verseIdx: number, content: ChapterContent, voice: string) => Promise<void>) | null>(null);
-
   // Play a specific verse by index
   const playVerseAtIndex = useCallback(async (verseIdx: number, content: ChapterContent, voice: string) => {
     if (isGeneratingRef.current) {
@@ -141,6 +142,8 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
     isGeneratingRef.current = true;
     const verse = content.verses[verseIdx];
 
+    console.log("Playing verse:", verseIdx + 1, "of", content.verses.length);
+
     setIsLoading(true);
     const url = await generateTTS(verse.text, voice);
     setIsLoading(false);
@@ -148,6 +151,7 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
 
     if (!url) {
       toast.error("Failed to generate audio");
+      continuePlayingRef.current = false;
       return;
     }
 
@@ -158,33 +162,52 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
     audio.volume = isMuted ? 0 : volume / 100;
     audioRef.current = audio;
 
-    audio.onplay = () => notifyTTSStarted();
+    audio.onplay = () => {
+      console.log("Audio started playing verse:", verseIdx + 1);
+      notifyTTSStarted();
+    };
+    
     audio.onended = () => {
+      console.log("Audio ended for verse:", verseIdx + 1, "continuePlayingRef:", continuePlayingRef.current);
       notifyTTSStopped();
       audioRef.current = null;
+      
+      if (!continuePlayingRef.current) {
+        console.log("Stopping - continuePlayingRef is false");
+        return;
+      }
       
       const nextVerseIdx = verseIdx + 1;
       
       // Move to next verse
       if (nextVerseIdx < content.verses.length) {
+        console.log("Queuing next verse:", nextVerseIdx + 1);
         setCurrentVerseIdx(nextVerseIdx);
-        // Use ref to call latest version of play function
-        setTimeout(() => {
-          playVerseRef.current?.(nextVerseIdx, content, voice);
-        }, 100);
+        // Queue the next verse to play
+        pendingVerseRef.current = { verseIdx: nextVerseIdx, content, voice };
       } else {
         // Move to next chapter/item
         if (currentItemIdx < totalItems - 1) {
+          console.log("Moving to next chapter");
           shouldPlayNextRef.current = true;
           setCurrentItemIdx((prev) => prev + 1);
           setCurrentVerseIdx(0);
           setChapterContent(null);
         } else {
           // Finished all
+          console.log("Finished all chapters");
           setIsPlaying(false);
+          continuePlayingRef.current = false;
           toast.success("Reading sequence complete!");
         }
       }
+    };
+
+    audio.onerror = (e) => {
+      console.error("Audio error:", e);
+      notifyTTSStopped();
+      audioRef.current = null;
+      continuePlayingRef.current = false;
     };
 
     audio.play();
@@ -192,15 +215,21 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
     setIsPaused(false);
   }, [audioUrl, volume, isMuted, currentItemIdx, totalItems, generateTTS]);
 
-  // Keep ref updated with latest function
+  // Effect to play pending verse (triggered when a verse ends and queues next)
   useEffect(() => {
-    playVerseRef.current = playVerseAtIndex;
-  }, [playVerseAtIndex]);
+    const pending = pendingVerseRef.current;
+    if (pending && continuePlayingRef.current && !isGeneratingRef.current && !audioRef.current) {
+      console.log("Playing pending verse:", pending.verseIdx + 1);
+      pendingVerseRef.current = null;
+      playVerseAtIndex(pending.verseIdx, pending.content, pending.voice);
+    }
+  });
 
   // Play current verse (wrapper for playVerseAtIndex)
   const playCurrentVerse = useCallback(() => {
     if (!chapterContent) return;
     const voice = currentSequence?.voice || "daniel";
+    continuePlayingRef.current = true;
     playVerseAtIndex(currentVerseIdx, chapterContent, voice);
   }, [chapterContent, currentVerseIdx, currentSequence, playVerseAtIndex]);
 
@@ -283,6 +312,7 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
 
   const handlePlay = () => {
     if (isPaused && audioRef.current) {
+      continuePlayingRef.current = true;
       audioRef.current.play();
       setIsPaused(false);
       notifyTTSStarted();
@@ -294,6 +324,7 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
 
   const handlePause = () => {
     if (audioRef.current) {
+      continuePlayingRef.current = false;
       audioRef.current.pause();
       setIsPaused(true);
       notifyTTSStopped();
@@ -301,6 +332,8 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
   };
 
   const handleStop = () => {
+    continuePlayingRef.current = false;
+    pendingVerseRef.current = null;
     if (audioRef.current) {
       audioRef.current.pause();
       audioRef.current = null;
@@ -316,13 +349,14 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
   };
 
   const handleSkipNext = () => {
+    pendingVerseRef.current = null;
     if (audioRef.current) {
       audioRef.current.pause();
       audioRef.current = null;
     }
     notifyTTSStopped();
     if (currentItemIdx < totalItems - 1) {
-      shouldPlayNextRef.current = isPlaying;
+      shouldPlayNextRef.current = isPlaying && continuePlayingRef.current;
       setCurrentItemIdx((prev) => prev + 1);
       setCurrentVerseIdx(0);
       setChapterContent(null);
@@ -331,19 +365,20 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
   };
 
   const handleSkipPrev = () => {
+    pendingVerseRef.current = null;
     if (audioRef.current) {
       audioRef.current.pause();
       audioRef.current = null;
     }
     notifyTTSStopped();
     if (currentItemIdx > 0) {
-      shouldPlayNextRef.current = isPlaying;
+      shouldPlayNextRef.current = isPlaying && continuePlayingRef.current;
       setCurrentItemIdx((prev) => prev - 1);
       setCurrentVerseIdx(0);
       setChapterContent(null);
       lastFetchedRef.current = null;
     } else {
-      shouldPlayNextRef.current = isPlaying;
+      shouldPlayNextRef.current = isPlaying && continuePlayingRef.current;
       setCurrentVerseIdx(0);
     }
   };
