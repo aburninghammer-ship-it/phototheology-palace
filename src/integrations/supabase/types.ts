@@ -4571,6 +4571,7 @@ export type Database = {
           longest_equations_streak: number | null
           longest_gem_streak: number | null
           longest_study_streak: number | null
+          looking_for_partner: boolean | null
           master_title: string | null
           onboarding_completed: boolean | null
           onboarding_step: number | null
@@ -4623,6 +4624,7 @@ export type Database = {
           longest_equations_streak?: number | null
           longest_gem_streak?: number | null
           longest_study_streak?: number | null
+          looking_for_partner?: boolean | null
           master_title?: string | null
           onboarding_completed?: boolean | null
           onboarding_step?: number | null
@@ -4675,6 +4677,7 @@ export type Database = {
           longest_equations_streak?: number | null
           longest_gem_streak?: number | null
           longest_study_streak?: number | null
+          looking_for_partner?: boolean | null
           master_title?: string | null
           onboarding_completed?: boolean | null
           onboarding_step?: number | null
