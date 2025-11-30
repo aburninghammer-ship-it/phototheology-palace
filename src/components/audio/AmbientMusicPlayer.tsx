@@ -16,7 +16,9 @@ import {
   Upload,
   Trash2,
   Heart,
-  Loader2
+  Loader2,
+  Check,
+  Square
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
@@ -404,6 +406,18 @@ export function AmbientMusicPlayer({
     return (saved as "none" | "one" | "all") || "all";
   });
   const [duckMultiplier, setDuckMultiplier] = useState(1);
+  // Selected tracks for playlist
+  const [selectedTracks, setSelectedTracks] = useState<Set<string>>(() => {
+    const saved = localStorage.getItem("pt-ambient-selected-tracks");
+    if (saved) {
+      try {
+        return new Set(JSON.parse(saved));
+      } catch {
+        return new Set(AMBIENT_TRACKS.map(t => t.id));
+      }
+    }
+    return new Set(AMBIENT_TRACKS.map(t => t.id)); // All tracks selected by default
+  });
 
   // Audio ducking - reduce volume when TTS is playing
   const handleDuckChange = useCallback((ducked: boolean, duckRatio: number) => {
@@ -581,9 +595,29 @@ export function AmbientMusicPlayer({
   };
 
   const nextTrack = () => {
-    const currentIndex = allTracks.findIndex(t => t.id === currentTrackId);
-    const nextIndex = (currentIndex + 1) % allTracks.length;
-    setCurrentTrackId(allTracks[nextIndex].id);
+    // Filter to only selected tracks
+    const playableTracks = allTracks.filter(t => selectedTracks.has(t.id));
+    if (playableTracks.length === 0) return;
+    
+    const currentIndex = playableTracks.findIndex(t => t.id === currentTrackId);
+    const nextIndex = (currentIndex + 1) % playableTracks.length;
+    setCurrentTrackId(playableTracks[nextIndex].id);
+  };
+
+  const toggleTrackSelection = (trackId: string) => {
+    setSelectedTracks(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(trackId)) {
+        // Don't allow deselecting the last track
+        if (newSet.size > 1) {
+          newSet.delete(trackId);
+        }
+      } else {
+        newSet.add(trackId);
+      }
+      localStorage.setItem("pt-ambient-selected-tracks", JSON.stringify([...newSet]));
+      return newSet;
+    });
   };
 
   const handleVolumeChange = (value: number[]) => {
@@ -713,6 +747,20 @@ export function AmbientMusicPlayer({
                     {allTracks.filter(t => t.isUser).map(track => (
                       <SelectItem key={track.id} value={track.id}>
                         <div className="flex items-center gap-2">
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              toggleTrackSelection(track.id);
+                            }}
+                            className="flex-shrink-0"
+                          >
+                            {selectedTracks.has(track.id) ? (
+                              <Check className="h-4 w-4 text-primary" />
+                            ) : (
+                              <Square className="h-4 w-4 text-muted-foreground" />
+                            )}
+                          </button>
                           <Heart className="h-3 w-3 text-primary" />
                           <span>{track.name}</span>
                         </div>
@@ -723,16 +771,36 @@ export function AmbientMusicPlayer({
                 )}
                 {AMBIENT_TRACKS.map(track => (
                   <SelectItem key={track.id} value={track.id}>
-                    <div className="flex flex-col">
-                      <span>{track.name}</span>
-                      <span className="text-xs text-muted-foreground">
-                        {track.description}
-                      </span>
+                    <div className="flex items-center gap-2">
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          toggleTrackSelection(track.id);
+                        }}
+                        className="flex-shrink-0"
+                      >
+                        {selectedTracks.has(track.id) ? (
+                          <Check className="h-4 w-4 text-primary" />
+                        ) : (
+                          <Square className="h-4 w-4 text-muted-foreground" />
+                        )}
+                      </button>
+                      <div className="flex flex-col">
+                        <span>{track.name}</span>
+                        <span className="text-xs text-muted-foreground">
+                          {track.description}
+                        </span>
+                      </div>
                     </div>
                   </SelectItem>
                 ))}
               </SelectContent>
             </Select>
+
+            <div className="text-xs text-muted-foreground text-center">
+              {selectedTracks.size} of {AMBIENT_TRACKS.length + userTracks.length} tracks in playlist
+            </div>
 
             <div className="flex items-center gap-2">
               <Button
