@@ -17,10 +17,77 @@ interface Feature {
   biblegateway: "yes" | "no" | "partial";
 }
 
-const features: Feature[] = [
+const standardFeatures: Feature[] = [
   {
-    name: "Visual Bible Memory System",
-    description: "Full 8-Floor Memory Palace — store Scripture as vivid mental architecture",
+    name: "Multiple Bible Translations",
+    phototheology: "yes",
+    youversion: "yes",
+    blueletter: "yes",
+    logos: "yes",
+    biblegateway: "yes",
+  },
+  {
+    name: "Audio Bible",
+    phototheology: "yes",
+    youversion: "yes",
+    blueletter: "yes",
+    logos: "yes",
+    biblegateway: "yes",
+  },
+  {
+    name: "Reading Plans",
+    phototheology: "yes",
+    youversion: "yes",
+    blueletter: "partial",
+    logos: "yes",
+    biblegateway: "yes",
+  },
+  {
+    name: "Commentary Access",
+    phototheology: "yes",
+    youversion: "partial",
+    blueletter: "yes",
+    logos: "yes",
+    biblegateway: "yes",
+  },
+  {
+    name: "Cross-References",
+    phototheology: "yes",
+    youversion: "partial",
+    blueletter: "yes",
+    logos: "yes",
+    biblegateway: "yes",
+  },
+  {
+    name: "Greek/Hebrew Tools",
+    phototheology: "partial",
+    youversion: "no",
+    blueletter: "yes",
+    logos: "yes",
+    biblegateway: "partial",
+  },
+  {
+    name: "Note Taking & Highlights",
+    phototheology: "yes",
+    youversion: "yes",
+    blueletter: "yes",
+    logos: "yes",
+    biblegateway: "yes",
+  },
+  {
+    name: "Search Functionality",
+    phototheology: "yes",
+    youversion: "yes",
+    blueletter: "yes",
+    logos: "yes",
+    biblegateway: "yes",
+  },
+];
+
+const uniqueFeatures: Feature[] = [
+  {
+    name: "Visual Memory Palace System",
+    description: "8-Floor Memory Palace — store Scripture as vivid mental architecture you can walk through",
     phototheology: "yes",
     youversion: "no",
     blueletter: "no",
@@ -28,8 +95,8 @@ const features: Feature[] = [
     biblegateway: "no",
   },
   {
-    name: "24FPS Full-Book Memorization",
-    description: "Turn entire books into mental film strips with one image per chapter",
+    name: "24FPS Book Memorization",
+    description: "Turn entire books into mental film strips with one symbolic image per chapter",
     phototheology: "yes",
     youversion: "no",
     blueletter: "no",
@@ -37,8 +104,17 @@ const features: Feature[] = [
     biblegateway: "no",
   },
   {
-    name: "Story → Theme → Prophecy Connections",
-    description: "Unified architecture linking narrative, doctrine, and end-time prophecy",
+    name: "AI Study Partner (Jeeves)",
+    description: "Phototheology-trained AI that guides you through the Palace method and answers questions",
+    phototheology: "yes",
+    youversion: "no",
+    blueletter: "no",
+    logos: "partial",
+    biblegateway: "no",
+  },
+  {
+    name: "Christ-in-Every-Chapter Mode",
+    description: "Guided discovery of Jesus in every chapter — the Concentration Room applied systematically",
     phototheology: "yes",
     youversion: "no",
     blueletter: "no",
@@ -47,7 +123,7 @@ const features: Feature[] = [
   },
   {
     name: "Gamified Scripture Learning",
-    description: "Escape rooms, challenges, and mastery games to make learning stick",
+    description: "Escape rooms, challenges, drills, and mastery games that make learning stick",
     phototheology: "yes",
     youversion: "partial",
     blueletter: "no",
@@ -55,89 +131,35 @@ const features: Feature[] = [
     biblegateway: "no",
   },
   {
-    name: "AI Study Partner (Jeeves)",
-    description: "Phototheology-trained AI that guides you through the Palace method",
+    name: "Prophecy & Sanctuary Integration",
+    description: "Daniel, Revelation, and Sanctuary woven into every study path as unified architecture",
     phototheology: "yes",
     youversion: "no",
-    blueletter: "no",
-    logos: "no",
-    biblegateway: "no",
-  },
-  {
-    name: "See-Jesus Mode",
-    description: "Find Christ in every chapter — the Concentration Room applied everywhere",
-    phototheology: "yes",
-    youversion: "no",
-    blueletter: "no",
-    logos: "no",
-    biblegateway: "no",
-  },
-  {
-    name: "Memory Floors & Room Mastery",
-    description: "Track progress through 8 floors of Bible study methodology",
-    phototheology: "yes",
-    youversion: "no",
-    blueletter: "no",
-    logos: "no",
-    biblegateway: "no",
-  },
-  {
-    name: "Prophecy Integration",
-    description: "Daniel, Revelation, and Sanctuary woven into every study path",
-    phototheology: "yes",
-    youversion: "no",
-    blueletter: "no",
+    blueletter: "partial",
     logos: "partial",
     biblegateway: "no",
   },
   {
-    name: "AI-Powered Bible Encyclopedia",
-    description: "PT Engine connecting topics to rooms, floors, and Christ-centered insights",
+    name: "Room & Floor Mastery System",
+    description: "Track your progress through 8 floors of methodology with XP, drills, and certifications",
     phototheology: "yes",
     youversion: "no",
     blueletter: "no",
-    logos: "partial",
+    logos: "no",
     biblegateway: "no",
   },
   {
-    name: "Personal Devotional Profiles",
-    description: "Issue-specific devotionals tailored to your spiritual journey",
+    name: "Personalized Devotional Profiles",
+    description: "AI-generated devotionals tailored to specific spiritual needs and struggles",
     phototheology: "yes",
     youversion: "partial",
-    blueletter: "no",
-    logos: "partial",
-    biblegateway: "no",
-  },
-  {
-    name: "Interactive Sanctuary Study",
-    description: "Walk through the sanctuary blueprint as a map of salvation",
-    phototheology: "yes",
-    youversion: "no",
-    blueletter: "no",
-    logos: "partial",
-    biblegateway: "no",
-  },
-  {
-    name: "Kid Mode",
-    description: "Age-appropriate memory games and palace training for children",
-    phototheology: "yes",
-    youversion: "partial",
-    blueletter: "no",
-    logos: "no",
-    biblegateway: "no",
-  },
-  {
-    name: "Live Study Drills & Mastery Tests",
-    description: "Active recall exercises that cement Scripture in memory",
-    phototheology: "yes",
-    youversion: "no",
     blueletter: "no",
     logos: "partial",
     biblegateway: "no",
   },
   {
     name: "Multiplayer Bible Study",
-    description: "Team challenges and collaborative learning modes",
+    description: "Team challenges, church campaigns, and collaborative learning modes",
     phototheology: "yes",
     youversion: "no",
     blueletter: "no",
@@ -145,31 +167,13 @@ const features: Feature[] = [
     biblegateway: "no",
   },
   {
-    name: "Reading Plans",
-    description: "Structured daily reading schedules",
-    phototheology: "yes",
-    youversion: "yes",
-    blueletter: "no",
-    logos: "yes",
-    biblegateway: "yes",
-  },
-  {
-    name: "Audio Bible",
-    description: "Listen to Scripture read aloud",
-    phototheology: "yes",
-    youversion: "yes",
-    blueletter: "yes",
-    logos: "yes",
-    biblegateway: "yes",
-  },
-  {
-    name: "Commentary Access",
-    description: "In-depth verse-by-verse explanations",
+    name: "Kid-Friendly Mode",
+    description: "Age-appropriate memory games and palace training designed for children",
     phototheology: "yes",
     youversion: "partial",
-    blueletter: "yes",
-    logos: "yes",
-    biblegateway: "partial",
+    blueletter: "no",
+    logos: "no",
+    biblegateway: "no",
   },
 ];
 
@@ -203,6 +207,71 @@ const FeatureWithTooltip = ({ name, description }: { name: string; description?:
   );
 };
 
+const TableHeader = () => (
+  <tr className="border-b border-white/10">
+    <th className="text-left py-4 px-4 md:px-6 font-semibold text-foreground min-w-[200px]">
+      Feature
+    </th>
+    <th className="py-4 px-2 md:px-3 text-center min-w-[80px]">
+      <div className="flex flex-col items-center gap-1">
+        <span className="text-xs md:text-sm font-bold text-primary">PT App</span>
+        <Badge variant="outline" className="text-[10px] bg-primary/10 border-primary/30">OURS</Badge>
+      </div>
+    </th>
+    <th className="py-4 px-2 md:px-3 text-center min-w-[70px]">
+      <span className="text-xs md:text-sm font-medium text-muted-foreground">YouVersion</span>
+    </th>
+    <th className="py-4 px-2 md:px-3 text-center min-w-[70px]">
+      <span className="text-xs md:text-sm font-medium text-muted-foreground">Blue Letter</span>
+    </th>
+    <th className="py-4 px-2 md:px-3 text-center min-w-[70px]">
+      <span className="text-xs md:text-sm font-medium text-muted-foreground">Logos</span>
+    </th>
+    <th className="py-4 px-2 md:px-3 text-center min-w-[70px]">
+      <span className="text-xs md:text-sm font-medium text-muted-foreground">Bible Gateway</span>
+    </th>
+  </tr>
+);
+
+const FeatureRow = ({ feature, index }: { feature: Feature; index: number }) => (
+  <tr 
+    className={`border-b border-white/5 transition-colors hover:bg-white/5 ${
+      index % 2 === 0 ? "bg-white/[0.02]" : ""
+    }`}
+  >
+    <td className="py-3 px-4 md:px-6 text-sm font-medium text-foreground">
+      <FeatureWithTooltip name={feature.name} description={feature.description} />
+    </td>
+    <td className="py-3 px-2 md:px-3 text-center">
+      <div className="flex justify-center">
+        <div className="p-1.5 rounded-full bg-primary/10">
+          <StatusIcon status={feature.phototheology} />
+        </div>
+      </div>
+    </td>
+    <td className="py-3 px-2 md:px-3 text-center">
+      <div className="flex justify-center">
+        <StatusIcon status={feature.youversion} />
+      </div>
+    </td>
+    <td className="py-3 px-2 md:px-3 text-center">
+      <div className="flex justify-center">
+        <StatusIcon status={feature.blueletter} />
+      </div>
+    </td>
+    <td className="py-3 px-2 md:px-3 text-center">
+      <div className="flex justify-center">
+        <StatusIcon status={feature.logos} />
+      </div>
+    </td>
+    <td className="py-3 px-2 md:px-3 text-center">
+      <div className="flex justify-center">
+        <StatusIcon status={feature.biblegateway} />
+      </div>
+    </td>
+  </tr>
+);
+
 export function ComparisonChart() {
   return (
     <section className="py-16 px-4 sm:px-6 lg:px-8">
@@ -212,10 +281,10 @@ export function ComparisonChart() {
             App Comparison
           </Badge>
           <h2 className="text-3xl md:text-4xl font-bold mb-4">
-            The Only Bible App That Helps You <span className="text-primary">Actually Remember</span>
+            Everything They Have, <span className="text-primary">Plus Everything They Don't</span>
           </h2>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Other apps help you read. Phototheology helps you <em>retain</em>.
+            Great Bible apps help you read. Phototheology helps you <em>remember and master</em>.
           </p>
         </div>
 
@@ -232,69 +301,31 @@ export function ComparisonChart() {
           <div className="relative z-10 overflow-x-auto">
             <table className="w-full">
               <thead>
-                <tr className="border-b border-white/10">
-                  <th className="text-left py-4 px-4 md:px-6 font-semibold text-foreground min-w-[200px]">
-                    Feature
-                  </th>
-                  <th className="py-4 px-2 md:px-3 text-center min-w-[90px]">
-                    <div className="flex flex-col items-center gap-1">
-                      <span className="text-xs md:text-sm font-bold text-primary">Phototheology</span>
-                      <Badge variant="outline" className="text-[10px] bg-primary/10 border-primary/30">OURS</Badge>
-                    </div>
-                  </th>
-                  <th className="py-4 px-2 md:px-3 text-center min-w-[70px]">
-                    <span className="text-xs md:text-sm font-medium text-muted-foreground">YouVersion</span>
-                  </th>
-                  <th className="py-4 px-2 md:px-3 text-center min-w-[70px]">
-                    <span className="text-xs md:text-sm font-medium text-muted-foreground">Blue Letter</span>
-                  </th>
-                  <th className="py-4 px-2 md:px-3 text-center min-w-[70px]">
-                    <span className="text-xs md:text-sm font-medium text-muted-foreground">Logos</span>
-                  </th>
-                  <th className="py-4 px-2 md:px-3 text-center min-w-[70px]">
-                    <span className="text-xs md:text-sm font-medium text-muted-foreground">Bible Gateway</span>
-                  </th>
-                </tr>
+                <TableHeader />
               </thead>
               <tbody>
-                {features.map((feature, index) => (
-                  <tr 
-                    key={feature.name} 
-                    className={`border-b border-white/5 transition-colors hover:bg-white/5 ${
-                      index % 2 === 0 ? "bg-white/[0.02]" : ""
-                    }`}
-                  >
-                    <td className="py-3 px-4 md:px-6 text-sm font-medium text-foreground">
-                      <FeatureWithTooltip name={feature.name} description={feature.description} />
-                    </td>
-                    <td className="py-3 px-2 md:px-3 text-center">
-                      <div className="flex justify-center">
-                        <div className="p-1.5 rounded-full bg-primary/10">
-                          <StatusIcon status={feature.phototheology} />
-                        </div>
-                      </div>
-                    </td>
-                    <td className="py-3 px-2 md:px-3 text-center">
-                      <div className="flex justify-center">
-                        <StatusIcon status={feature.youversion} />
-                      </div>
-                    </td>
-                    <td className="py-3 px-2 md:px-3 text-center">
-                      <div className="flex justify-center">
-                        <StatusIcon status={feature.blueletter} />
-                      </div>
-                    </td>
-                    <td className="py-3 px-2 md:px-3 text-center">
-                      <div className="flex justify-center">
-                        <StatusIcon status={feature.logos} />
-                      </div>
-                    </td>
-                    <td className="py-3 px-2 md:px-3 text-center">
-                      <div className="flex justify-center">
-                        <StatusIcon status={feature.biblegateway} />
-                      </div>
-                    </td>
-                  </tr>
+                {/* Standard Features Section */}
+                <tr>
+                  <td colSpan={6} className="py-3 px-4 md:px-6 bg-muted/30">
+                    <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                      Standard Bible App Features
+                    </span>
+                  </td>
+                </tr>
+                {standardFeatures.map((feature, index) => (
+                  <FeatureRow key={feature.name} feature={feature} index={index} />
+                ))}
+                
+                {/* Unique Features Section */}
+                <tr>
+                  <td colSpan={6} className="py-3 px-4 md:px-6 bg-primary/10">
+                    <span className="text-xs font-semibold uppercase tracking-wider text-primary">
+                      Unique to Phototheology
+                    </span>
+                  </td>
+                </tr>
+                {uniqueFeatures.map((feature, index) => (
+                  <FeatureRow key={feature.name} feature={feature} index={index} />
                 ))}
               </tbody>
             </table>
@@ -319,7 +350,7 @@ export function ComparisonChart() {
 
         {/* Bottom tagline */}
         <p className="text-center text-muted-foreground mt-6 text-sm">
-          Hover over features to learn what makes them unique to Phototheology
+          Hover over unique features to learn what makes them special
         </p>
       </div>
     </section>
