@@ -99,6 +99,13 @@ const MUSIC_FLOORS = [
         description: "Hopeful strings with radiant orchestral swells",
         bpm: 65,
         url: "https://incompetech.com/music/royalty-free/mp3-royaltyfree/Amazing%20Grace.mp3",
+      },
+      {
+        id: "eternal-grace",
+        name: "Eternal Grace",
+        description: "Cinematic orchestral christian music - sweeping and reverent",
+        bpm: 68,
+        url: "https://cdn1.suno.ai/cfda5aef-dc1c-4ac8-876f-ce80ea0eb791.mp3",
       }
     ]
   },
