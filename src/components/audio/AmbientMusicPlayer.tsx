@@ -15,12 +15,14 @@ import {
   X,
   Repeat,
   Repeat1,
+  Shuffle,
   Upload,
   Trash2,
   Heart,
   Loader2,
   ChevronDown,
-  Smartphone
+  Smartphone,
+  ListMusic
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
@@ -429,6 +431,10 @@ export function AmbientMusicPlayer({
     const saved = localStorage.getItem("pt-ambient-loop-mode");
     return (saved as "none" | "one" | "all") || "all";
   });
+  const [shuffleMode, setShuffleMode] = useState(() => {
+    const saved = localStorage.getItem("pt-ambient-shuffle");
+    return saved === "true";
+  });
   const [duckMultiplier, setDuckMultiplier] = useState(1);
   // Selected tracks for playlist
   const [selectedTracks, setSelectedTracks] = useState<Set<string>>(() => {
@@ -442,6 +448,7 @@ export function AmbientMusicPlayer({
     }
     return new Set(AMBIENT_TRACKS.map(t => t.id)); // All tracks selected by default
   });
+  const [showPlaylist, setShowPlaylist] = useState(false);
 
   // Audio ducking - reduce volume when TTS is playing (desktop only)
   // On mobile, both audio streams play together at system volume
@@ -630,9 +637,26 @@ export function AmbientMusicPlayer({
     const playableTracks = allTracks.filter(t => selectedTracks.has(t.id));
     if (playableTracks.length === 0) return;
     
-    const currentIndex = playableTracks.findIndex(t => t.id === currentTrackId);
-    const nextIndex = (currentIndex + 1) % playableTracks.length;
-    setCurrentTrackId(playableTracks[nextIndex].id);
+    if (shuffleMode) {
+      // Random track (different from current)
+      const otherTracks = playableTracks.filter(t => t.id !== currentTrackId);
+      if (otherTracks.length > 0) {
+        const randomIndex = Math.floor(Math.random() * otherTracks.length);
+        setCurrentTrackId(otherTracks[randomIndex].id);
+      }
+    } else {
+      const currentIndex = playableTracks.findIndex(t => t.id === currentTrackId);
+      const nextIndex = (currentIndex + 1) % playableTracks.length;
+      setCurrentTrackId(playableTracks[nextIndex].id);
+    }
+  };
+
+  const toggleShuffle = () => {
+    setShuffleMode(prev => {
+      const newVal = !prev;
+      localStorage.setItem("pt-ambient-shuffle", newVal.toString());
+      return newVal;
+    });
   };
 
   const toggleTrackSelection = (trackId: string) => {
@@ -800,41 +824,67 @@ export function AmbientMusicPlayer({
               </SelectContent>
             </Select>
 
-            <Collapsible>
-              <CollapsibleTrigger asChild>
-                <Button variant="ghost" size="sm" className="w-full justify-between text-xs">
-                  <span>Playlist ({selectedTracks.size}/{AMBIENT_TRACKS.length + userTracks.length} selected)</span>
-                  <ChevronDown className="h-3 w-3" />
-                </Button>
-              </CollapsibleTrigger>
-              <CollapsibleContent className="space-y-1 mt-2 max-h-40 overflow-y-auto">
-                {userTracks.length > 0 && (
-                  <>
-                    <div className="text-xs font-medium text-muted-foreground px-1">Your Music</div>
-                    {allTracks.filter(t => t.isUser).map(track => (
-                      <label key={track.id} className="flex items-center gap-2 px-1 py-1 hover:bg-muted/50 rounded cursor-pointer">
-                        <Checkbox
-                          checked={selectedTracks.has(track.id)}
-                          onCheckedChange={() => toggleTrackSelection(track.id)}
-                        />
-                        <Heart className="h-3 w-3 text-primary" />
-                        <span className="text-xs truncate">{track.name}</span>
-                      </label>
-                    ))}
-                  </>
-                )}
-                <div className="text-xs font-medium text-muted-foreground px-1">Preset Tracks</div>
-                {AMBIENT_TRACKS.map(track => (
-                  <label key={track.id} className="flex items-center gap-2 px-1 py-1 hover:bg-muted/50 rounded cursor-pointer">
-                    <Checkbox
-                      checked={selectedTracks.has(track.id)}
-                      onCheckedChange={() => toggleTrackSelection(track.id)}
-                    />
-                    <span className="text-xs truncate">{track.name}</span>
-                  </label>
-                ))}
-              </CollapsibleContent>
-            </Collapsible>
+            {/* Playlist Selection - More Prominent */}
+            <div className="border rounded-md p-2 bg-muted/30">
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                className="w-full justify-between text-xs mb-2"
+                onClick={() => setShowPlaylist(!showPlaylist)}
+              >
+                <span className="flex items-center gap-2">
+                  <ListMusic className="h-4 w-4 text-primary" />
+                  <span className="font-medium">Playlist</span>
+                  <span className="text-muted-foreground">({selectedTracks.size} songs)</span>
+                </span>
+                <ChevronDown className={cn("h-3 w-3 transition-transform", showPlaylist && "rotate-180")} />
+              </Button>
+              
+              {showPlaylist && (
+                <div className="space-y-1 max-h-48 overflow-y-auto border-t pt-2">
+                  <div className="flex items-center justify-between px-1 pb-1">
+                    <span className="text-xs text-muted-foreground">Select songs to include:</span>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="h-6 text-xs"
+                      onClick={() => {
+                        const allIds = new Set(allTracks.map(t => t.id));
+                        setSelectedTracks(allIds);
+                        localStorage.setItem("pt-ambient-selected-tracks", JSON.stringify([...allIds]));
+                      }}
+                    >
+                      Select All
+                    </Button>
+                  </div>
+                  {userTracks.length > 0 && (
+                    <>
+                      <div className="text-xs font-medium text-primary px-1">Your Music</div>
+                      {allTracks.filter(t => t.isUser).map(track => (
+                        <label key={track.id} className="flex items-center gap-2 px-2 py-1.5 hover:bg-muted/50 rounded cursor-pointer">
+                          <Checkbox
+                            checked={selectedTracks.has(track.id)}
+                            onCheckedChange={() => toggleTrackSelection(track.id)}
+                          />
+                          <Heart className="h-3 w-3 text-primary" />
+                          <span className="text-xs truncate flex-1">{track.name}</span>
+                        </label>
+                      ))}
+                    </>
+                  )}
+                  <div className="text-xs font-medium text-muted-foreground px-1 pt-1">Preset Tracks</div>
+                  {AMBIENT_TRACKS.map(track => (
+                    <label key={track.id} className="flex items-center gap-2 px-2 py-1.5 hover:bg-muted/50 rounded cursor-pointer">
+                      <Checkbox
+                        checked={selectedTracks.has(track.id)}
+                        onCheckedChange={() => toggleTrackSelection(track.id)}
+                      />
+                      <span className="text-xs truncate flex-1">{track.name}</span>
+                    </label>
+                  ))}
+                </div>
+              )}
+            </div>
 
             <div className="flex items-center gap-2">
               <Button
@@ -849,6 +899,31 @@ export function AmbientMusicPlayer({
                   <Play className="h-4 w-4" />
                 )}
               </Button>
+              
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={nextTrack}
+                className="h-8 w-8"
+                title="Next track"
+              >
+                <SkipForward className="h-4 w-4" />
+              </Button>
+              
+              <div className="flex flex-col items-center">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={toggleShuffle}
+                  className={cn("h-8 w-8", shuffleMode && "text-primary")}
+                  title={shuffleMode ? "Shuffle on" : "Shuffle off"}
+                >
+                  <Shuffle className="h-4 w-4" />
+                </Button>
+                <span className="text-[10px] text-muted-foreground">
+                  {shuffleMode ? "On" : "Off"}
+                </span>
+              </div>
               
               <div className="flex flex-col items-center">
                 <Button
@@ -888,7 +963,7 @@ export function AmbientMusicPlayer({
                 max={1}
                 step={0.01}
                 onValueChange={handleVolumeChange}
-                className="w-24"
+                className="w-20"
               />
             </div>
           </div>
@@ -940,6 +1015,17 @@ export function AmbientMusicPlayer({
             className="h-8 w-8 shrink-0"
           >
             <SkipForward className="h-4 w-4" />
+          </Button>
+
+          {/* Shuffle Toggle */}
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={toggleShuffle}
+            className={cn("h-8 w-8 shrink-0", shuffleMode && "text-primary")}
+            title={shuffleMode ? "Shuffle on" : "Shuffle off"}
+          >
+            <Shuffle className="h-4 w-4" />
           </Button>
 
           {/* Loop Toggle */}
