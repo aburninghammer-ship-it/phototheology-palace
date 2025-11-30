@@ -113,6 +113,13 @@ const MUSIC_FLOORS = [
         description: "Instrumental orchestral - cinematic and reverent",
         bpm: 65,
         url: "https://cdn1.suno.ai/5a7d94e9-13f6-4dae-9c16-b3dd559849b3.mp3",
+      },
+      {
+        id: "echoes-of-eternity",
+        name: "Echoes of Eternity",
+        description: "Instrumental cinematic orchestral christian music",
+        bpm: 62,
+        url: "https://cdn1.suno.ai/87b87bf9-3f8f-4e49-ab69-1834e0db7119.mp3",
       }
     ]
   },
