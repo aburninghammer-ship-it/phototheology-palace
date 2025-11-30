@@ -240,12 +240,12 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
 
     audio.onplay = () => {
       console.log("[Audio] >>> Playing verse:", verseIdx + 1);
-      notifyTTSStarted();
+      // Don't call notifyTTSStarted here - we do it when sequence starts
     };
     
     audio.onended = () => {
       console.log("[Audio] <<< Ended verse:", verseIdx + 1, "| continue:", continuePlayingRef.current);
-      notifyTTSStopped();
+      // Don't call notifyTTSStopped here - keep music ducked between verses
       
       // Clear the audio ref immediately
       audioRef.current = null;
@@ -293,7 +293,7 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
         message: error?.message,
         verseIdx: verseIdx + 1
       });
-      notifyTTSStopped();
+      // Don't call notifyTTSStopped here - keep music ducked during errors
       audioRef.current = null;
       isGeneratingRef.current = false;
       continuePlayingRef.current = false;
@@ -456,7 +456,7 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
       audioRef.current.play();
       setIsPaused(false);
       setIsPlaying(true);
-      notifyTTSStarted();
+      notifyTTSStarted(); // Duck music when resuming
     } else if (chapterContent) {
       // Start fresh playback
       console.log("Starting fresh playback from verse:", currentVerseIdx + 1);
@@ -472,7 +472,7 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
       continuePlayingRef.current = false;
       audioRef.current.pause();
       setIsPaused(true);
-      notifyTTSStopped();
+      notifyTTSStopped(); // Restore music when paused
     }
   };
 
@@ -490,7 +490,7 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
     setChapterContent(null);
     lastFetchedRef.current = null;
     shouldPlayNextRef.current = false;
-    notifyTTSStopped();
+    notifyTTSStopped(); // Restore music when stopped
   };
 
   const handleSkipNext = () => {
@@ -499,7 +499,7 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
       audioRef.current.pause();
       audioRef.current = null;
     }
-    notifyTTSStopped();
+    // Don't call notifyTTSStopped - keep music ducked while navigating
     if (currentItemIdx < totalItems - 1) {
       shouldPlayNextRef.current = isPlaying && continuePlayingRef.current;
       setCurrentItemIdx((prev) => prev + 1);
@@ -515,7 +515,7 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
       audioRef.current.pause();
       audioRef.current = null;
     }
-    notifyTTSStopped();
+    // Don't call notifyTTSStopped - keep music ducked while navigating
     if (currentItemIdx > 0) {
       shouldPlayNextRef.current = isPlaying && continuePlayingRef.current;
       setCurrentItemIdx((prev) => prev - 1);
@@ -561,7 +561,7 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
         audioRef.current.pause();
         audioRef.current = null;
       }
-      notifyTTSStopped();
+      notifyTTSStopped(); // Restore music on unmount
     };
   }, []);
 
