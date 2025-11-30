@@ -120,10 +120,18 @@ export const SequenceBlockBuilder = ({ block, onChange, onRemove }: SequenceBloc
   };
 
   const addBookRange = () => {
-    if (!newBook || !endBook) return;
+    console.log("addBookRange called:", { newBook, endBook });
+    if (!newBook || !endBook) {
+      console.log("Missing book selection", { newBook, endBook });
+      return;
+    }
     const startIdx = BIBLE_BOOKS.indexOf(newBook);
     const endIdx = BIBLE_BOOKS.indexOf(endBook);
-    if (startIdx === -1 || endIdx === -1 || endIdx < startIdx) return;
+    console.log("Book indices:", { startIdx, endIdx });
+    if (startIdx === -1 || endIdx === -1 || endIdx < startIdx) {
+      console.log("Invalid book range");
+      return;
+    }
 
     const newItems: SequenceItem[] = [];
     for (let bookIdx = startIdx; bookIdx <= endIdx; bookIdx++) {
@@ -138,6 +146,7 @@ export const SequenceBlockBuilder = ({ block, onChange, onRemove }: SequenceBloc
         });
       }
     }
+    console.log("Adding book range items:", newItems.length);
     onChange({
       ...block,
       items: [...block.items, ...newItems],
@@ -145,6 +154,7 @@ export const SequenceBlockBuilder = ({ block, onChange, onRemove }: SequenceBloc
   };
 
   const handleAdd = () => {
+    console.log("handleAdd called, selectionMode:", selectionMode);
     switch (selectionMode) {
       case "single":
         addSingleChapter();
@@ -492,7 +502,7 @@ export const SequenceBlockBuilder = ({ block, onChange, onRemove }: SequenceBloc
                       </SelectContent>
                     </Select>
                   </div>
-                  <Button onClick={handleAdd} disabled={!newBook || !endBook} size="sm">
+                  <Button type="button" onClick={handleAdd} disabled={!newBook || !endBook} size="sm">
                     <Plus className="h-4 w-4 mr-1" />
                     Add Books
                   </Button>
