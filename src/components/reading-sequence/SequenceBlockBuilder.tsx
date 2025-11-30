@@ -7,7 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Badge } from "@/components/ui/badge";
 import { GripVertical, Plus, Trash2, BookOpen, ChevronDown, ChevronUp, Mic, Volume2 } from "lucide-react";
 import { BIBLE_BOOKS } from "@/types/bible";
-import { ReadingSequenceBlock, SequenceItem, CommentaryDepth } from "@/types/readingSequence";
+import { ReadingSequenceBlock, SequenceItem, CommentaryDepth, CommentaryMode } from "@/types/readingSequence";
 import { ELEVENLABS_VOICES, VoiceId } from "@/hooks/useTextToSpeech";
 import { Input } from "@/components/ui/input";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
@@ -568,7 +568,7 @@ export const SequenceBlockBuilder = ({ block, onChange, onRemove }: SequenceBloc
               <div className="flex items-center justify-between">
                 <Label className="text-sm flex items-center gap-2">
                   🎩 Jeeves Commentary Mode
-                  <span className="text-xs text-muted-foreground">(insert commentary between chapters)</span>
+                  <span className="text-xs text-muted-foreground">(insert commentary during reading)</span>
                 </Label>
                 <Switch
                   checked={block.includeJeevesCommentary}
@@ -578,54 +578,85 @@ export const SequenceBlockBuilder = ({ block, onChange, onRemove }: SequenceBloc
               
               {/* Commentary Options - shown when enabled */}
               {block.includeJeevesCommentary && (
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 p-3 bg-muted/30 rounded-lg">
+                <div className="space-y-3 p-3 bg-muted/30 rounded-lg">
+                  {/* Commentary Mode Selection */}
                   <div>
-                    <Label className="text-xs text-muted-foreground flex items-center gap-1">
-                      <Mic className="h-3 w-3" /> Commentary Voice
+                    <Label className="text-xs text-muted-foreground flex items-center gap-1 mb-2">
+                      📖 Commentary Style
                     </Label>
-                    <Select
-                      value={block.commentaryVoice || "daniel"}
-                      onValueChange={(v) => onChange({ ...block, commentaryVoice: v as VoiceId })}
-                    >
-                      <SelectTrigger className="h-9">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent className="max-h-[250px] bg-popover">
-                        {ELEVENLABS_VOICES.map((voice) => (
-                          <SelectItem key={voice.id} value={voice.id}>
-                            <span className="font-medium">{voice.name}</span>
-                            <span className="text-xs text-muted-foreground ml-2">{voice.description}</span>
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                    <div className="grid grid-cols-2 gap-2">
+                      <Button
+                        type="button"
+                        variant={block.commentaryMode !== "verse" ? "default" : "outline"}
+                        size="sm"
+                        className="h-auto py-2 flex flex-col items-start"
+                        onClick={() => onChange({ ...block, commentaryMode: "chapter" })}
+                      >
+                        <span className="font-medium">Chapter-by-Chapter</span>
+                        <span className="text-xs opacity-70 font-normal">Commentary after each chapter</span>
+                      </Button>
+                      <Button
+                        type="button"
+                        variant={block.commentaryMode === "verse" ? "default" : "outline"}
+                        size="sm"
+                        className="h-auto py-2 flex flex-col items-start"
+                        onClick={() => onChange({ ...block, commentaryMode: "verse" })}
+                      >
+                        <span className="font-medium">Verse-by-Verse</span>
+                        <span className="text-xs opacity-70 font-normal">Commentary after each verse</span>
+                      </Button>
+                    </div>
                   </div>
-                  <div>
-                    <Label className="text-xs text-muted-foreground flex items-center gap-1">
-                      📊 Commentary Depth
-                    </Label>
-                    <Select
-                      value={block.commentaryDepth || "surface"}
-                      onValueChange={(v) => onChange({ ...block, commentaryDepth: v as CommentaryDepth })}
-                    >
-                      <SelectTrigger className="h-9">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent className="bg-popover">
-                        <SelectItem value="surface">
-                          <span className="font-medium">Surface</span>
-                          <span className="text-xs text-muted-foreground ml-2">Brief overview</span>
-                        </SelectItem>
-                        <SelectItem value="intermediate">
-                          <span className="font-medium">Intermediate</span>
-                          <span className="text-xs text-muted-foreground ml-2">Thorough analysis</span>
-                        </SelectItem>
-                        <SelectItem value="depth">
-                          <span className="font-medium">Scholarly</span>
-                          <span className="text-xs text-muted-foreground ml-2">Verse-by-verse</span>
-                        </SelectItem>
-                      </SelectContent>
-                    </Select>
+                  
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                      <Label className="text-xs text-muted-foreground flex items-center gap-1">
+                        <Mic className="h-3 w-3" /> Commentary Voice
+                      </Label>
+                      <Select
+                        value={block.commentaryVoice || "daniel"}
+                        onValueChange={(v) => onChange({ ...block, commentaryVoice: v as VoiceId })}
+                      >
+                        <SelectTrigger className="h-9">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent className="max-h-[250px] bg-popover">
+                          {ELEVENLABS_VOICES.map((voice) => (
+                            <SelectItem key={voice.id} value={voice.id}>
+                              <span className="font-medium">{voice.name}</span>
+                              <span className="text-xs text-muted-foreground ml-2">{voice.description}</span>
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div>
+                      <Label className="text-xs text-muted-foreground flex items-center gap-1">
+                        📊 Commentary Depth
+                      </Label>
+                      <Select
+                        value={block.commentaryDepth || "surface"}
+                        onValueChange={(v) => onChange({ ...block, commentaryDepth: v as CommentaryDepth })}
+                      >
+                        <SelectTrigger className="h-9">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent className="bg-popover">
+                          <SelectItem value="surface">
+                            <span className="font-medium">Surface</span>
+                            <span className="text-xs text-muted-foreground ml-2">Brief overview</span>
+                          </SelectItem>
+                          <SelectItem value="intermediate">
+                            <span className="font-medium">Intermediate</span>
+                            <span className="text-xs text-muted-foreground ml-2">Thorough analysis</span>
+                          </SelectItem>
+                          <SelectItem value="depth">
+                            <span className="font-medium">Scholarly</span>
+                            <span className="text-xs text-muted-foreground ml-2">Deep study</span>
+                          </SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
                   </div>
                 </div>
               )}

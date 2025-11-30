@@ -10,6 +10,7 @@ export interface SequenceItem {
 }
 
 export type CommentaryDepth = "surface" | "intermediate" | "depth";
+export type CommentaryMode = "chapter" | "verse";
 
 export interface ReadingSequenceBlock {
   sequenceNumber: number; // 1-5
@@ -21,6 +22,7 @@ export interface ReadingSequenceBlock {
   includeJeevesCommentary: boolean;
   commentaryVoice?: VoiceId;
   commentaryDepth?: CommentaryDepth;
+  commentaryMode?: CommentaryMode;
 }
 
 export interface SavedReadingSequence {

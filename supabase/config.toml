@@ -127,3 +127,6 @@ verify_jwt = false
 
 [functions.generate-chapter-commentary]
 verify_jwt = false
+
+[functions.generate-verse-commentary]
+verify_jwt = false

@@ -95,7 +95,7 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
   // Generate chapter commentary using Jeeves
   const generateCommentary = useCallback(async (book: string, chapter: number, chapterText?: string, depth: string = "surface") => {
     try {
-      console.log("[Commentary] Generating", depth, "commentary for", book, chapter);
+      console.log("[Commentary] Generating", depth, "chapter commentary for", book, chapter);
       const { data, error } = await supabase.functions.invoke("generate-chapter-commentary", {
         body: { book, chapter, chapterText, depth },
       });
@@ -104,10 +104,30 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
         console.error("[Commentary] Edge function error:", error);
         throw error;
       }
-      console.log("[Commentary] Generated commentary length:", data?.commentary?.length || 0);
+      console.log("[Commentary] Generated chapter commentary length:", data?.commentary?.length || 0);
       return data?.commentary as string | null;
     } catch (e) {
-      console.error("[Commentary] Error generating commentary:", e);
+      console.error("[Commentary] Error generating chapter commentary:", e);
+      return null;
+    }
+  }, []);
+
+  // Generate verse commentary using Jeeves
+  const generateVerseCommentary = useCallback(async (book: string, chapter: number, verse: number, verseText: string, depth: string = "surface") => {
+    try {
+      console.log("[Verse Commentary] Generating", depth, "commentary for", book, chapter + ":" + verse);
+      const { data, error } = await supabase.functions.invoke("generate-verse-commentary", {
+        body: { book, chapter, verse, verseText, depth },
+      });
+
+      if (error) {
+        console.error("[Verse Commentary] Edge function error:", error);
+        throw error;
+      }
+      console.log("[Verse Commentary] Generated length:", data?.commentary?.length || 0);
+      return data?.commentary as string | null;
+    } catch (e) {
+      console.error("[Verse Commentary] Error:", e);
       return null;
     }
   }, []);
@@ -400,53 +420,92 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
         return;
       }
       
-      const nextVerseIdx = verseIdx + 1;
+      // Find current sequence to check commentary settings
+      const currentSeq = activeSequences.find((seq, idx) => {
+        const itemsBefore = activeSequences.slice(0, idx).reduce((acc, s) => acc + s.items.length, 0);
+        return currentItemIdx >= itemsBefore && currentItemIdx < itemsBefore + seq.items.length;
+      });
       
-      if (nextVerseIdx < content.verses.length) {
+      const includeCommentary = currentSeq?.includeJeevesCommentary || false;
+      const commentaryMode = currentSeq?.commentaryMode || "chapter";
+      const commentaryVoice = currentSeq?.commentaryVoice || "daniel";
+      const commentaryDepth = currentSeq?.commentaryDepth || "surface";
+      
+      const nextVerseIdx = verseIdx + 1;
+      const isLastVerse = nextVerseIdx >= content.verses.length;
+      
+      // Handle verse-by-verse commentary mode
+      if (includeCommentary && commentaryMode === "verse" && content && continuePlayingRef.current) {
+        const currentVerse = content.verses[verseIdx];
+        console.log("[Verse Commentary] Generating for verse", verseIdx + 1, "with voice:", commentaryVoice);
+        setIsLoading(true);
+        
+        generateVerseCommentary(content.book, content.chapter, currentVerse.verse, currentVerse.text, commentaryDepth)
+          .then(commentary => {
+            console.log("[Verse Commentary] Result:", commentary ? `${commentary.length} chars` : "null");
+            if (commentary && continuePlayingRef.current) {
+              playCommentary(commentary, commentaryVoice, () => {
+                console.log("[Verse Commentary] Playback complete");
+                if (isLastVerse) {
+                  console.log("[Audio] Chapter complete, moving to next");
+                  moveToNextChapter();
+                } else if (continuePlayingRef.current) {
+                  playVerseAtIndex(nextVerseIdx, content, voice);
+                }
+              });
+            } else {
+              setIsLoading(false);
+              if (isLastVerse) {
+                moveToNextChapter();
+              } else if (continuePlayingRef.current) {
+                playVerseAtIndex(nextVerseIdx, content, voice);
+              }
+            }
+          })
+          .catch((err) => {
+            console.error("[Verse Commentary] Error:", err);
+            setIsLoading(false);
+            if (isLastVerse) {
+              moveToNextChapter();
+            } else if (continuePlayingRef.current) {
+              playVerseAtIndex(nextVerseIdx, content, voice);
+            }
+          });
+        return;
+      }
+      
+      // Handle chapter-by-chapter commentary mode (default)
+      if (!isLastVerse) {
         console.log("[Audio] Playing next verse:", nextVerseIdx + 1);
-        // Immediate transition - no delay needed since next verse should be prefetched
         if (continuePlayingRef.current) {
           playVerseAtIndex(nextVerseIdx, content, voice);
         }
       } else {
-        // Chapter complete - check for commentary before moving on
-        console.log("[Audio] Chapter complete, checking for commentary...");
+        // Chapter complete - check for chapter commentary before moving on
+        console.log("[Audio] Chapter complete, checking for chapter commentary...");
         
-        // Find current sequence to check if commentary is enabled
-        const currentSeq = activeSequences.find((seq, idx) => {
-          const itemsBefore = activeSequences.slice(0, idx).reduce((acc, s) => acc + s.items.length, 0);
-          return currentItemIdx >= itemsBefore && currentItemIdx < itemsBefore + seq.items.length;
-        });
-        
-        const includeCommentary = currentSeq?.includeJeevesCommentary || false;
-        console.log("[Audio] Commentary enabled:", includeCommentary, "| Voice:", currentSeq?.commentaryVoice);
-        
-        if (includeCommentary && content && continuePlayingRef.current) {
-          // Generate and play commentary before moving to next chapter
-          const commentaryVoice = currentSeq?.commentaryVoice || "daniel";
-          const commentaryDepth = currentSeq?.commentaryDepth || "surface";
-          console.log("[Commentary] Generating", commentaryDepth, "commentary with voice:", commentaryVoice);
+        if (includeCommentary && commentaryMode === "chapter" && content && continuePlayingRef.current) {
+          console.log("[Chapter Commentary] Generating", commentaryDepth, "commentary with voice:", commentaryVoice);
           setIsLoading(true);
           const chapterText = content.verses.map(v => `${v.verse}. ${v.text}`).join(" ");
           
-          // Generate commentary and play it
           generateCommentary(content.book, content.chapter, chapterText, commentaryDepth)
             .then(commentary => {
-              console.log("[Commentary] Result:", commentary ? `${commentary.length} chars` : "null");
+              console.log("[Chapter Commentary] Result:", commentary ? `${commentary.length} chars` : "null");
               if (commentary && continuePlayingRef.current) {
-                console.log("[Commentary] Starting playback...");
+                console.log("[Chapter Commentary] Starting playback...");
                 playCommentary(commentary, commentaryVoice, () => {
-                  console.log("[Commentary] Playback complete, moving to next chapter");
+                  console.log("[Chapter Commentary] Playback complete, moving to next chapter");
                   moveToNextChapter();
                 });
               } else {
-                console.log("[Commentary] No commentary or stopped, moving on");
+                console.log("[Chapter Commentary] No commentary or stopped, moving on");
                 setIsLoading(false);
                 moveToNextChapter();
               }
             })
             .catch((err) => {
-              console.error("[Commentary] Error:", err);
+              console.error("[Chapter Commentary] Error:", err);
               setIsLoading(false);
               moveToNextChapter();
             });
