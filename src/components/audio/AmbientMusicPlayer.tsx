@@ -324,6 +324,16 @@ const AMBIENT_TRACKS = [
     url: "https://cdn1.suno.ai/87b87bf9-3f8f-4e49-ab69-1834e0db7119.mp3",
     bpm: 60,
   },
+  {
+    id: "eternal-grace",
+    name: "Eternal Grace",
+    description: "Christian orchestral cinematic instrumental with graceful themes",
+    category: "hymn-cinematic",
+    floor: 4,
+    mood: "christian, orchestral, cinematic, grace",
+    url: "https://cdn1.suno.ai/5a7d94e9-13f6-4dae-9c16-b3dd559849b3.mp3",
+    bpm: 60,
+  },
 ];
 
 // Room to track mapping based on Phototheology floors
