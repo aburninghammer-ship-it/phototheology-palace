@@ -652,6 +652,39 @@ export type Database = {
         }
         Relationships: []
       }
+      chapter_commentary_cache: {
+        Row: {
+          audio_storage_path: string | null
+          book: string
+          chapter: number
+          commentary_text: string
+          created_at: string
+          id: string
+          updated_at: string
+          voice_id: string | null
+        }
+        Insert: {
+          audio_storage_path?: string | null
+          book: string
+          chapter: number
+          commentary_text: string
+          created_at?: string
+          id?: string
+          updated_at?: string
+          voice_id?: string | null
+        }
+        Update: {
+          audio_storage_path?: string | null
+          book?: string
+          chapter?: number
+          commentary_text?: string
+          created_at?: string
+          id?: string
+          updated_at?: string
+          voice_id?: string | null
+        }
+        Relationships: []
+      }
       christ_chapter_findings: {
         Row: {
           book: string
