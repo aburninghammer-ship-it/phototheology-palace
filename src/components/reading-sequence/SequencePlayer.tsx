@@ -48,6 +48,9 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
 
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const isGeneratingRef = useRef(false); // Prevent concurrent TTS requests
+  const isFetchingChapterRef = useRef(false); // Prevent concurrent chapter fetches
+  const lastFetchedRef = useRef<string | null>(null); // Track last fetched chapter
+  
   const activeSequences = sequences.filter((s) => s.enabled && s.items.length > 0);
 
   // Flatten all items across sequences for navigation
@@ -59,18 +62,32 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
   const currentSequence = activeSequences[currentSeqIdx];
   const totalItems = allItems.length;
 
-  // Fetch chapter content
+  // Fetch chapter content with deduplication
   const fetchChapter = useCallback(async (book: string, chapter: number) => {
+    const cacheKey = `${book}-${chapter}`;
+    
+    // Prevent duplicate fetches
+    if (isFetchingChapterRef.current || lastFetchedRef.current === cacheKey) {
+      console.log("Skipping duplicate fetch for:", cacheKey);
+      return null;
+    }
+    
+    isFetchingChapterRef.current = true;
+    
     try {
+      console.log("Fetching chapter:", cacheKey);
       const { data, error } = await supabase.functions.invoke("bible-api", {
         body: { book, chapter, version: "kjv" },
       });
 
       if (error) throw error;
+      lastFetchedRef.current = cacheKey;
       return data.verses as { verse: number; text: string }[];
     } catch (e) {
       console.error("Error fetching chapter:", e);
       return null;
+    } finally {
+      isFetchingChapterRef.current = false;
     }
   }, []);
 
@@ -158,6 +175,19 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
   // Load chapter when item changes
   useEffect(() => {
     if (!currentItem) return;
+    
+    const cacheKey = `${currentItem.book}-${currentItem.chapter}`;
+    
+    // Skip if already fetching or already have this content
+    if (isFetchingChapterRef.current) {
+      console.log("Already fetching, skipping load for:", cacheKey);
+      return;
+    }
+    
+    if (chapterContent && chapterContent.book === currentItem.book && chapterContent.chapter === currentItem.chapter) {
+      console.log("Already have content for:", cacheKey);
+      return;
+    }
 
     const loadChapter = async () => {
       setIsLoading(true);
@@ -182,7 +212,7 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
     };
 
     loadChapter();
-  }, [currentItem, fetchChapter]);
+  }, [currentItem?.book, currentItem?.chapter, currentItem?.startVerse, currentItem?.endVerse, fetchChapter]);
 
   // Auto-play next verse when content loads and playing
   useEffect(() => {
@@ -228,6 +258,7 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
     setCurrentItemIdx(0);
     setCurrentVerseIdx(0);
     setChapterContent(null);
+    lastFetchedRef.current = null; // Reset to allow fresh fetch
     notifyTTSStopped();
   };
 
@@ -240,6 +271,7 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
       setCurrentItemIdx((prev) => prev + 1);
       setCurrentVerseIdx(0);
       setChapterContent(null);
+      lastFetchedRef.current = null; // Reset to allow fresh fetch
     }
   };
 
@@ -252,6 +284,7 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
       setCurrentItemIdx((prev) => prev - 1);
       setCurrentVerseIdx(0);
       setChapterContent(null);
+      lastFetchedRef.current = null; // Reset to allow fresh fetch
     } else {
       setCurrentVerseIdx(0);
     }
