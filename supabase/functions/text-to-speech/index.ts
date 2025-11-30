@@ -29,6 +29,69 @@ const VOICES: Record<string, string> = {
   bill: 'pqHfZKP75CvOlQylNhV4',
 };
 
+// Helper function to delay execution
+const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+
+// Call ElevenLabs API with retry logic for rate limiting
+async function callElevenLabsWithRetry(
+  text: string,
+  voiceId: string,
+  apiKey: string,
+  maxRetries = 3
+): Promise<Response> {
+  let lastError: Error | null = null;
+  
+  for (let attempt = 0; attempt < maxRetries; attempt++) {
+    if (attempt > 0) {
+      // Exponential backoff: 2s, 4s, 8s
+      const waitTime = Math.pow(2, attempt) * 1000;
+      console.log(`Rate limited. Waiting ${waitTime}ms before retry ${attempt + 1}/${maxRetries}`);
+      await delay(waitTime);
+    }
+
+    const response = await fetch(
+      `https://api.elevenlabs.io/v1/text-to-speech/${voiceId}`,
+      {
+        method: 'POST',
+        headers: {
+          'Accept': 'audio/mpeg',
+          'Content-Type': 'application/json',
+          'xi-api-key': apiKey,
+        },
+        body: JSON.stringify({
+          text,
+          model_id: 'eleven_multilingual_v2',
+          voice_settings: {
+            stability: 0.5,
+            similarity_boost: 0.75,
+            style: 0.0,
+            use_speaker_boost: true,
+          },
+        }),
+      }
+    );
+
+    if (response.ok) {
+      return response;
+    }
+
+    // Check if it's a rate limit error (429)
+    if (response.status === 429) {
+      const errorText = await response.text();
+      console.error(`ElevenLabs API error: ${response.status}`, errorText);
+      lastError = new Error(`Rate limited: ${response.status}`);
+      continue; // Retry
+    }
+
+    // For other errors, don't retry
+    const errorText = await response.text();
+    console.error(`ElevenLabs API error: ${response.status}`, errorText);
+    throw new Error(`ElevenLabs API error: ${response.status}`);
+  }
+
+  throw lastError || new Error('Max retries exceeded');
+}
+
 serve(async (req) => {
   // Handle CORS preflight requests
   if (req.method === "OPTIONS") {
@@ -52,34 +115,8 @@ serve(async (req) => {
 
     console.log(`Generating TTS for ${text.length} characters with voice: ${voice} (${voiceId})`);
 
-    // Call ElevenLabs API
-    const response = await fetch(
-      `https://api.elevenlabs.io/v1/text-to-speech/${voiceId}`,
-      {
-        method: 'POST',
-        headers: {
-          'Accept': 'audio/mpeg',
-          'Content-Type': 'application/json',
-          'xi-api-key': ELEVENLABS_API_KEY,
-        },
-        body: JSON.stringify({
-          text,
-          model_id: 'eleven_multilingual_v2',
-          voice_settings: {
-            stability: 0.5,
-            similarity_boost: 0.75,
-            style: 0.0,
-            use_speaker_boost: true,
-          },
-        }),
-      }
-    );
-
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error("ElevenLabs API error:", response.status, errorText);
-      throw new Error(`ElevenLabs API error: ${response.status}`);
-    }
+    // Call ElevenLabs API with retry logic
+    const response = await callElevenLabsWithRetry(text, voiceId, ELEVENLABS_API_KEY);
 
     // Convert audio buffer to base64 using chunked approach to avoid stack overflow
     const arrayBuffer = await response.arrayBuffer();
