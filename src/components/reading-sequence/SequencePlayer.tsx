@@ -127,18 +127,16 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
     }
   }, []);
 
-  // Play current verse
-  const playCurrentVerse = useCallback(async () => {
-    // Prevent concurrent TTS requests
+  // Play a specific verse by index
+  const playVerseAtIndex = useCallback(async (verseIdx: number, content: ChapterContent, voice: string) => {
     if (isGeneratingRef.current) {
       console.log("Already generating TTS, skipping...");
       return;
     }
-    if (!chapterContent || currentVerseIdx >= chapterContent.verses.length) return;
+    if (!content || verseIdx >= content.verses.length) return;
 
     isGeneratingRef.current = true;
-    const verse = chapterContent.verses[currentVerseIdx];
-    const voice = currentSequence?.voice || "daniel";
+    const verse = content.verses[verseIdx];
 
     setIsLoading(true);
     const url = await generateTTS(verse.text, voice);
@@ -162,10 +160,15 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
       notifyTTSStopped();
       audioRef.current = null;
       
+      const nextVerseIdx = verseIdx + 1;
+      
       // Move to next verse
-      if (currentVerseIdx < chapterContent.verses.length - 1) {
-        shouldPlayNextRef.current = true;
-        setCurrentVerseIdx((prev) => prev + 1);
+      if (nextVerseIdx < content.verses.length) {
+        setCurrentVerseIdx(nextVerseIdx);
+        // Directly play next verse
+        setTimeout(() => {
+          playVerseAtIndex(nextVerseIdx, content, voice);
+        }, 100);
       } else {
         // Move to next chapter/item
         if (currentItemIdx < totalItems - 1) {
@@ -184,7 +187,14 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
     audio.play();
     setIsPlaying(true);
     setIsPaused(false);
-  }, [chapterContent, currentVerseIdx, currentSequence, audioUrl, volume, isMuted, currentItemIdx, totalItems, generateTTS]);
+  }, [audioUrl, volume, isMuted, currentItemIdx, totalItems, generateTTS]);
+
+  // Play current verse (wrapper for playVerseAtIndex)
+  const playCurrentVerse = useCallback(() => {
+    if (!chapterContent) return;
+    const voice = currentSequence?.voice || "daniel";
+    playVerseAtIndex(currentVerseIdx, chapterContent, voice);
+  }, [chapterContent, currentVerseIdx, currentSequence, playVerseAtIndex]);
 
   // Load chapter when item changes
   useEffect(() => {
@@ -246,14 +256,14 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
     loadChapter();
   }, [currentItem?.book, currentItem?.chapter, currentItem?.startVerse, currentItem?.endVerse, fetchChapter, chapterContent]);
 
-  // Auto-play next verse when content loads and playing, or when verse index changes
+  // Auto-play when new chapter content loads (for chapter transitions)
   useEffect(() => {
     if (isPlaying && !isPaused && chapterContent && !isLoading && !isGeneratingRef.current && !audioRef.current && shouldPlayNextRef.current) {
       shouldPlayNextRef.current = false;
       playCurrentVerse();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [chapterContent, isPlaying, isPaused, isLoading, currentVerseIdx]);
+  }, [chapterContent, isPlaying, isPaused, isLoading]);
 
   // Auto-start (only once)
   useEffect(() => {
@@ -270,7 +280,6 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
       notifyTTSStarted();
     } else {
       setIsPlaying(true);
-      shouldPlayNextRef.current = true;
       playCurrentVerse();
     }
   };
