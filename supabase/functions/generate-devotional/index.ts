@@ -312,33 +312,48 @@ ${SANCTUARY_STATIONS.join("\n")}
 
 ${formatInstructions}${personalizationNote}${cadeSection}
 
-CONTENT LENGTH REQUIREMENTS:
-- scripture_text: Include the FULL passage (3-8 verses minimum), not just one verse
-- visual_imagery: 3-5 sentences with vivid sensory details (sight, sound, touch, smell). Include ONE memorable metaphor.
-- memory_hook: A memorable phrase PLUS explanation of the mnemonic connection (2-3 sentences). Make it QUOTABLE.
-- application: 4-6 sentences with SPECIFIC, practical steps. Address the person's situation directly but naturally.
-- prayer: A heartfelt, 5-8 sentence prayer that feels personal, not generic${primaryIssue ? ". Speak directly to their struggle with compassion" : ""}
-- challenge: 2-3 specific actions with explanation of WHY and HOW to do them
-- journal_prompt: 3-4 deep reflection questions that encourage genuine self-examination
-- christ_connection: 4-6 sentences showing EXACTLY how this passage reveals Christ. Include a theological gem that makes readers think deeper${primaryIssue ? " - connect to how Christ specifically meets them in their struggle" : ""}
+VARIETY & FRESHNESS - CRITICAL:
+- DO NOT use the same format/structure for every day
+- Vary the palace principle emphasis each day (Imagination Room one day, Observation the next, Patterns another, etc.)
+- Some days use vivid imagery, other days detective-style questions, others historical parallels
+- Mix up the presentation style to keep it fresh and engaging
 
-OUTPUT FORMAT - Return a JSON array of ${duration} days with this exact structure for each day:
+CONTENT GUIDELINES (adapt based on the day's approach):
+- scripture_text: Include the FULL passage (3-8 verses minimum)
+- visual_imagery: OPTIONAL - use when passage naturally lends itself to mental pictures. Not every day needs this.
+- memory_hook: OPTIONAL - a key insight, quotable truth, or memorable phrase. Vary the label/approach.
+- application: 4-6 sentences with SPECIFIC, practical steps
+- prayer: Heartfelt, 5-8 sentences - vary style (praise, lament, petition)
+- challenge: 2-3 DOABLE actions
+- journal_prompt: 2-4 reflection questions
+- christ_connection: 4-6 sentences showing how this reveals Christ with theological depth
+
+PALACE APPROACH VARIETY (rotate through these, don't repeat same approach daily):
+- Imagination Room: Paint vivid mental picture, immerse in the scene
+- Observation Room: Detective-style, notice specific details in the text
+- Questions Room: Lead with thought-provoking questions about the passage
+- Patterns Room: Show how this connects to recurring biblical patterns
+- Symbols/Types Room: Unpack the symbolic meaning and typology
+- Sanctuary approach: Connect to the sanctuary furniture/services
+- Freestyle approach: Connect the passage to everyday life, nature, or current events
+
+OUTPUT FORMAT - Return a JSON array of \${duration} days:
 {
   "day_number": number,
-  "title": "string",
+  "title": "string - creative, varied titles (not formulaic)",
   "scripture_reference": "Book Chapter:Verses (KJV)",
-  "scripture_text": "The FULL passage text - include multiple verses for context",
-  "room_assignment": "Room code from list above",
+  "scripture_text": "The FULL passage text",
+  "room_assignment": "Primary room code used",
   "floor_number": number,
-  "visual_imagery": "An extensive, vivid mental picture with sensory details",
-  "memory_hook": "A memorable phrase or image connection with explanation",
+  "visual_imagery": "string or null - include ONLY when using Imagination/Story approach",
+  "memory_hook": "string or null - a key insight, quotable truth, or memorable phrase",
   "cross_references": ["verse1", "verse2", "verse3", "verse4"],
-  "application": "Detailed, practical steps for applying this truth TODAY",
-  "prayer": "An extensive, heartfelt prayer incorporating scripture and themes",
-  "challenge": "Specific actions to take with clear instructions",
-  "journal_prompt": "Multiple deep reflection questions",
-  "sanctuary_station": "Which sanctuary station this connects to (if applicable)",
-  "christ_connection": "Extensive explanation of how this passage points to Jesus Christ"
+  "application": "Practical steps for TODAY",
+  "prayer": "Heartfelt prayer - varied in style",
+  "challenge": "Specific doable actions",
+  "journal_prompt": "Reflection questions",
+  "sanctuary_station": "string or null - include only when relevant",
+  "christ_connection": "How this points to Jesus with theological depth"
 }`;
 
     const forPersonNote = capitalizedName ? `\nThis devotional is specifically for: ${capitalizedName}. Use their name naturally and sparingly (1-2 times per section). Always capitalize their name properly.` : "";
