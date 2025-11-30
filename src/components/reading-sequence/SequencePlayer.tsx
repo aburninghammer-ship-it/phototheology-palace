@@ -24,6 +24,7 @@ import { toast } from "sonner";
 import { ReadingSequenceBlock, SequenceItem } from "@/types/readingSequence";
 import { notifyTTSStarted, notifyTTSStopped } from "@/hooks/useAudioDucking";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { setGlobalMusicVolume, getGlobalMusicVolume } from "@/hooks/useMusicVolumeControl";
 import { formatJeevesResponse } from "@/lib/formatJeevesResponse";
 import { DownloadSequenceDialog } from "./DownloadSequenceDialog";
 
@@ -48,6 +49,7 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
   const [currentVerseIdx, setCurrentVerseIdx] = useState(0);
   const [volume, setVolume] = useState(80);
   const [isMuted, setIsMuted] = useState(false);
+  const [musicVolume, setMusicVolume] = useState(() => getGlobalMusicVolume());
   const [chapterContent, setChapterContent] = useState<ChapterContent | null>(null);
   const [audioUrl, setAudioUrl] = useState<string | null>(null);
   const [hasStarted, setHasStarted] = useState(false);
@@ -1136,7 +1138,7 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
           </Button>
         </div>
 
-        {/* Volume - hidden on mobile since programmatic volume doesn't work */}
+        {/* Volume Controls */}
         {!isMobile ? (
           <div className="flex items-center gap-3 px-4">
             <Button variant="ghost" size="icon" onClick={toggleMute}>
@@ -1155,9 +1157,27 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
             />
           </div>
         ) : (
-          <div className="flex items-center justify-center gap-2 px-4 py-2 text-sm text-muted-foreground">
-            <Smartphone className="h-4 w-4" />
-            <span>Use device volume buttons</span>
+          <div className="space-y-3 px-4">
+            {/* Music Volume Slider - works on mobile! */}
+            <div className="flex items-center gap-3">
+              <ListMusic className="h-4 w-4 text-muted-foreground" />
+              <span className="text-xs text-muted-foreground w-12">Music</span>
+              <Slider
+                value={[musicVolume]}
+                max={100}
+                step={5}
+                onValueChange={(v) => {
+                  setMusicVolume(v[0]);
+                  setGlobalMusicVolume(v[0]);
+                }}
+                className="flex-1"
+              />
+              <span className="text-xs text-muted-foreground w-8">{musicVolume}%</span>
+            </div>
+            <div className="flex items-center justify-center gap-2 py-1 text-xs text-muted-foreground">
+              <Smartphone className="h-3 w-3" />
+              <span>Use device volume for reader</span>
+            </div>
           </div>
         )}
 

@@ -44,6 +44,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useAudioDucking } from "@/hooks/useAudioDucking";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { subscribeToMusicVolume } from "@/hooks/useMusicVolumeControl";
 
 // Phototheology Sacred Orchestral Music
 // Rich orchestral, movie soundtrack style (The Chosen, Zimmer, Tyler)
@@ -560,6 +561,18 @@ export function AmbientMusicPlayer({
   useEffect(() => {
     localStorage.setItem("pt-ambient-enabled", isEnabled.toString());
   }, [isEnabled]);
+
+  // Listen for global volume control changes (allows other components like SequencePlayer to control music volume)
+  useEffect(() => {
+    const unsubscribe = subscribeToMusicVolume((newVolume) => {
+      // Only update if significantly different to avoid loops
+      const normalizedVolume = newVolume / 100; // Convert from 0-100 to 0-1
+      if (Math.abs(normalizedVolume - volume) > 0.01) {
+        setVolume(normalizedVolume);
+      }
+    });
+    return unsubscribe;
+  }, []);
 
   // Update loop setting
   useEffect(() => {
