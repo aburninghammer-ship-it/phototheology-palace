@@ -49,7 +49,7 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
   const [currentVerseIdx, setCurrentVerseIdx] = useState(0);
   const [volume, setVolume] = useState(100);
   const [isMuted, setIsMuted] = useState(false);
-  const [musicVolume, setMusicVolume] = useState(() => getGlobalMusicVolume());
+  const [musicVolume, setMusicVolume] = useState(() => Math.min(getGlobalMusicVolume(), 5));
   const [chapterContent, setChapterContent] = useState<ChapterContent | null>(null);
   const [audioUrl, setAudioUrl] = useState<string | null>(null);
   const [hasStarted, setHasStarted] = useState(false);
@@ -95,6 +95,13 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
     prefetchingRef.current.clear();
     commentaryCache.current.clear();
     prefetchingCommentaryRef.current.clear();
+    
+    // Force music volume down on mount - cap at 5%
+    const cappedVolume = Math.min(getGlobalMusicVolume(), 5);
+    setMusicVolume(cappedVolume);
+    setGlobalMusicVolume(cappedVolume);
+    console.log("[SequencePlayer] FORCED music volume to:", cappedVolume);
+    
     console.log("SequencePlayer mounted, refs reset. Active sequences:", activeSequences.length, "Total items:", totalItems);
   }, []);
 
@@ -1164,8 +1171,8 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
               <span className="text-xs text-muted-foreground w-12">Music</span>
               <Slider
                 value={[musicVolume]}
-                max={100}
-                step={5}
+                max={15}
+                step={1}
                 onValueChange={(v) => {
                   setMusicVolume(v[0]);
                   setGlobalMusicVolume(v[0]);
