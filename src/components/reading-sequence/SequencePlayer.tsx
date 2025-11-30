@@ -316,20 +316,42 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
     }
   }, [chapterContent, isLoading, currentSequence, playVerseAtIndex]);
 
-  // Auto-start on mount (only once)
+  // Auto-start on mount - runs once when autoPlay is true
   useEffect(() => {
-    if (autoPlay && chapterContent && !hasStarted && !isLoading && !isGeneratingRef.current) {
-      console.log("Auto-starting playback on mount, verses:", chapterContent.verses.length);
-      setHasStarted(true);
-      // Use timeout to ensure state is settled
-      setTimeout(() => {
+    if (!autoPlay || hasStarted) return;
+    
+    // Wait for content to be ready, then start
+    const checkAndStart = () => {
+      if (chapterContent && !isLoading && !isGeneratingRef.current && !audioRef.current) {
+        console.log("Auto-starting playback, verses:", chapterContent.verses.length);
+        setHasStarted(true);
         const voice = currentSequence?.voice || "daniel";
         continuePlayingRef.current = true;
         setIsPlaying(true);
         playVerseAtIndex(0, chapterContent, voice);
-      }, 100);
-    }
-  }, [autoPlay, chapterContent, hasStarted, isLoading, currentSequence, playVerseAtIndex]);
+        return true;
+      }
+      return false;
+    };
+    
+    // Try immediately
+    if (checkAndStart()) return;
+    
+    // If not ready, poll briefly
+    const interval = setInterval(() => {
+      if (checkAndStart()) {
+        clearInterval(interval);
+      }
+    }, 200);
+    
+    // Clean up after 5 seconds
+    const timeout = setTimeout(() => clearInterval(interval), 5000);
+    
+    return () => {
+      clearInterval(interval);
+      clearTimeout(timeout);
+    };
+  }, [autoPlay, hasStarted, chapterContent, isLoading, currentSequence, playVerseAtIndex]);
 
   const handlePlay = () => {
     console.log("handlePlay called - isPaused:", isPaused, "hasAudio:", !!audioRef.current);
