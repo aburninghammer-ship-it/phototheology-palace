@@ -2,13 +2,19 @@
 // This works independently of device volume, perfect for mobile where you can't control TTS volume separately
 
 let volumeListeners = new Set<(volume: number) => void>();
-let currentVolume = 30; // default 30%
+let currentVolume = 18; // default 18%
 
-// Initialize from localStorage if available
+// Initialize from localStorage if available, but cap at new max of 18%
 if (typeof window !== 'undefined') {
   const stored = localStorage.getItem('pt-ambient-volume');
   if (stored) {
-    currentVolume = parseInt(stored, 10);
+    const storedValue = parseInt(stored, 10);
+    // Cap old higher values to new default
+    currentVolume = Math.min(storedValue, 18);
+    // Update localStorage if we capped it
+    if (storedValue > 18) {
+      localStorage.setItem('pt-ambient-volume', '18');
+    }
   }
 }
 
