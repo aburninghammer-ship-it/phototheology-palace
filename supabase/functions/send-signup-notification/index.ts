@@ -12,6 +12,7 @@ interface SignupNotificationRequest {
   userEmail: string;
   displayName?: string;
   userId: string;
+  subscriptionTier?: string; // 'free', 'essential', 'premium', 'student'
 }
 
 const handler = async (req: Request): Promise<Response> => {
@@ -20,18 +21,27 @@ const handler = async (req: Request): Promise<Response> => {
   }
 
   try {
-    const { userEmail, displayName, userId }: SignupNotificationRequest = await req.json();
+    const { userEmail, displayName, userId, subscriptionTier }: SignupNotificationRequest = await req.json();
 
-    console.log("Sending signup notification for:", { userEmail, userId });
+    console.log("Sending signup notification for:", { userEmail, userId, subscriptionTier });
+
+    // Determine tier label and emoji for subject
+    const tier = subscriptionTier || 'free';
+    const tierLabel = tier.charAt(0).toUpperCase() + tier.slice(1).toLowerCase();
+    const tierEmoji = tier === 'premium' ? '👑' 
+      : tier === 'essential' ? '⭐' 
+      : tier === 'student' ? '🎓'
+      : '🆓'; // Free
 
     const emailResponse = await resend.emails.send({
       from: "Phototheology Notifications <onboarding@resend.dev>",
       to: ["aburninghammer@gmail.com"],
-      subject: `🎉 New User Sign-Up: ${displayName || userEmail}`,
+      subject: `${tierEmoji} New ${tierLabel} Sign-Up: ${displayName || userEmail}`,
       html: `
         <h2>New User Registration</h2>
         <p><strong>Email:</strong> ${userEmail}</p>
         <p><strong>Name:</strong> ${displayName || 'Not provided'}</p>
+        <p><strong>Tier:</strong> ${tierLabel}</p>
         <p><strong>User ID:</strong> ${userId}</p>
         <hr>
         <p style="color: #666; font-size: 12px;">Signed up at: ${new Date().toLocaleString()}</p>

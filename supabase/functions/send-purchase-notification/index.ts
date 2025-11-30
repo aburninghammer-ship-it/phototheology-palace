@@ -39,10 +39,20 @@ const handler = async (req: Request): Promise<Response> => {
       currency: currency.toUpperCase(),
     }).format(amount / 100);
 
+    // Determine tier label for subject
+    const tierLabel = subscriptionTier 
+      ? subscriptionTier.charAt(0).toUpperCase() + subscriptionTier.slice(1).toLowerCase()
+      : 'Unknown';
+    
+    const tierEmoji = subscriptionTier === 'premium' ? '👑' 
+      : subscriptionTier === 'essential' ? '⭐' 
+      : subscriptionTier === 'student' ? '🎓'
+      : '💰';
+
     const emailResponse = await resend.emails.send({
       from: "Phototheology Notifications <onboarding@resend.dev>",
       to: ["aburninghammer@gmail.com"],
-      subject: `💰 New Purchase: ${formattedAmount}`,
+      subject: `${tierEmoji} New ${tierLabel} Subscription: ${formattedAmount}`,
       html: `
         <h2>New Purchase Notification</h2>
         <p><strong>Customer Email:</strong> ${userEmail}</p>
