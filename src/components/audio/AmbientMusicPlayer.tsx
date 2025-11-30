@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
 import { Card, CardContent } from "@/components/ui/card";
@@ -417,8 +417,8 @@ export function AmbientMusicPlayer({
 
   useAudioDucking(handleDuckChange);
 
-  // Combine preset and user tracks
-  const allTracks = [
+  // Combine preset and user tracks - memoized to prevent unnecessary re-renders
+  const allTracks = useMemo(() => [
     ...AMBIENT_TRACKS.map(t => ({ ...t, isUser: false })),
     ...userTracks.map(t => ({ 
       id: `user-${t.id}`, 
@@ -432,9 +432,12 @@ export function AmbientMusicPlayer({
       isUser: true,
       userTrackData: t
     }))
-  ];
+  ], [userTracks]);
 
-  const currentTrack = allTracks.find(t => t.id === currentTrackId) || allTracks[0];
+  const currentTrack = useMemo(() => 
+    allTracks.find(t => t.id === currentTrackId) || allTracks[0],
+    [allTracks, currentTrackId]
+  );
 
   // Auto-select track based on room
   useEffect(() => {
