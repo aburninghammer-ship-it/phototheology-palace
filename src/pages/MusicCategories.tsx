@@ -188,7 +188,7 @@ const MUSIC_FLOORS = [
 export default function MusicCategories() {
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const [playingTrackId, setPlayingTrackId] = useState<string | null>(null);
-  const [volume, setVolume] = useState(0.18);
+  const [volume, setVolume] = useState(0.10);
   const [isMuted, setIsMuted] = useState(false);
   const [duckMultiplier, setDuckMultiplier] = useState(1);
 

@@ -402,7 +402,9 @@ export function AmbientMusicPlayer({
   const [isPlaying, setIsPlaying] = useState(false);
   const [volume, setVolume] = useState(() => {
     const saved = localStorage.getItem("pt-ambient-volume");
-    return saved ? parseFloat(saved) : 0.18;
+    const val = saved ? parseFloat(saved) : 0.10;
+    // Cap at new max of 0.10 (10%)
+    return Math.min(val, 0.10);
   });
   const [isMuted, setIsMuted] = useState(false);
   const [currentTrackId, setCurrentTrackId] = useState(() => {

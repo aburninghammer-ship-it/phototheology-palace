@@ -47,7 +47,7 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
   const [currentSeqIdx, setCurrentSeqIdx] = useState(0);
   const [currentItemIdx, setCurrentItemIdx] = useState(0);
   const [currentVerseIdx, setCurrentVerseIdx] = useState(0);
-  const [volume, setVolume] = useState(95);
+  const [volume, setVolume] = useState(100);
   const [isMuted, setIsMuted] = useState(false);
   const [musicVolume, setMusicVolume] = useState(() => getGlobalMusicVolume());
   const [chapterContent, setChapterContent] = useState<ChapterContent | null>(null);
