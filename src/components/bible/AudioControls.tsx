@@ -27,6 +27,7 @@ import { ELEVENLABS_VOICES, VoiceId } from "@/hooks/useTextToSpeech";
 import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
+import { notifyTTSStarted, notifyTTSStopped } from "@/hooks/useAudioDucking";
 
 interface AudioControlsProps {
   verses: Verse[];
@@ -86,6 +87,7 @@ export const AudioControls = ({ verses, onVerseHighlight, className }: AudioCont
         } else {
           setIsPlaying(false);
           isPlayingRef.current = false;
+          notifyTTSStopped();
           toast.success("Finished reading chapter");
         }
       };
@@ -239,11 +241,13 @@ export const AudioControls = ({ verses, onVerseHighlight, className }: AudioCont
     
     try {
       await audio.play();
+      notifyTTSStarted();
     } catch (err) {
       console.error("Play error:", err);
       toast.error("Could not play audio. Please try again.");
       setIsPlaying(false);
       isPlayingRef.current = false;
+      notifyTTSStopped();
     }
   }, [generateTTS, onVerseHighlight, prefetchVerse]);
 
@@ -282,6 +286,7 @@ export const AudioControls = ({ verses, onVerseHighlight, className }: AudioCont
     }
     setIsPlaying(false);
     isPlayingRef.current = false;
+    notifyTTSStopped();
   }, []);
 
   const stop = useCallback(() => {
@@ -289,6 +294,7 @@ export const AudioControls = ({ verses, onVerseHighlight, className }: AudioCont
     clearPrefetchCache();
     setIsPlaying(false);
     isPlayingRef.current = false;
+    notifyTTSStopped();
     setCurrentVerse(1);
     onVerseHighlight?.(1);
   }, [cleanupAudio, clearPrefetchCache, onVerseHighlight]);

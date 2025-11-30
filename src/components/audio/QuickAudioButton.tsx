@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Volume2, VolumeX, Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { notifyTTSStarted, notifyTTSStopped } from "@/hooks/useAudioDucking";
 
 interface QuickAudioButtonProps {
   text: string;
@@ -25,6 +26,7 @@ export function QuickAudioButton({
     if (isPlaying && audio) {
       audio.pause();
       setIsPlaying(false);
+      notifyTTSStopped();
       return;
     }
 
@@ -49,26 +51,33 @@ export function QuickAudioButton({
         newAudio.onended = () => {
           setIsPlaying(false);
           setAudio(null);
+          notifyTTSStopped();
         };
 
         newAudio.onerror = () => {
           setIsPlaying(false);
           setAudio(null);
+          notifyTTSStopped();
           toast.error("Audio playback failed");
         };
 
         setAudio(newAudio);
         newAudio.play();
         setIsPlaying(true);
+        notifyTTSStarted();
       }
     } catch (err) {
       console.error("TTS error:", err);
       // Fallback to browser TTS
       if ('speechSynthesis' in window) {
         const utterance = new SpeechSynthesisUtterance(text);
-        utterance.onend = () => setIsPlaying(false);
+        utterance.onend = () => {
+          setIsPlaying(false);
+          notifyTTSStopped();
+        };
         speechSynthesis.speak(utterance);
         setIsPlaying(true);
+        notifyTTSStarted();
       } else {
         toast.error("Audio not available");
       }
