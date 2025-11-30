@@ -2,6 +2,8 @@ import { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
 import { Card, CardContent } from "@/components/ui/card";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { 
   Music, 
   Play, 
@@ -17,8 +19,7 @@ import {
   Trash2,
   Heart,
   Loader2,
-  Check,
-  Square
+  ChevronDown
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
@@ -767,20 +768,6 @@ export function AmbientMusicPlayer({
                     {allTracks.filter(t => t.isUser).map(track => (
                       <SelectItem key={track.id} value={track.id}>
                         <div className="flex items-center gap-2">
-                          <button
-                            type="button"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              toggleTrackSelection(track.id);
-                            }}
-                            className="flex-shrink-0"
-                          >
-                            {selectedTracks.has(track.id) ? (
-                              <Check className="h-4 w-4 text-primary" />
-                            ) : (
-                              <Square className="h-4 w-4 text-muted-foreground" />
-                            )}
-                          </button>
                           <Heart className="h-3 w-3 text-primary" />
                           <span>{track.name}</span>
                         </div>
@@ -791,36 +778,52 @@ export function AmbientMusicPlayer({
                 )}
                 {AMBIENT_TRACKS.map(track => (
                   <SelectItem key={track.id} value={track.id}>
-                    <div className="flex items-center gap-2">
-                      <button
-                        type="button"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          toggleTrackSelection(track.id);
-                        }}
-                        className="flex-shrink-0"
-                      >
-                        {selectedTracks.has(track.id) ? (
-                          <Check className="h-4 w-4 text-primary" />
-                        ) : (
-                          <Square className="h-4 w-4 text-muted-foreground" />
-                        )}
-                      </button>
-                      <div className="flex flex-col">
-                        <span>{track.name}</span>
-                        <span className="text-xs text-muted-foreground">
-                          {track.description}
-                        </span>
-                      </div>
+                    <div className="flex flex-col">
+                      <span>{track.name}</span>
+                      <span className="text-xs text-muted-foreground">
+                        {track.description}
+                      </span>
                     </div>
                   </SelectItem>
                 ))}
               </SelectContent>
             </Select>
 
-            <div className="text-xs text-muted-foreground text-center">
-              {selectedTracks.size} of {AMBIENT_TRACKS.length + userTracks.length} tracks in playlist
-            </div>
+            <Collapsible>
+              <CollapsibleTrigger asChild>
+                <Button variant="ghost" size="sm" className="w-full justify-between text-xs">
+                  <span>Playlist ({selectedTracks.size}/{AMBIENT_TRACKS.length + userTracks.length} selected)</span>
+                  <ChevronDown className="h-3 w-3" />
+                </Button>
+              </CollapsibleTrigger>
+              <CollapsibleContent className="space-y-1 mt-2 max-h-40 overflow-y-auto">
+                {userTracks.length > 0 && (
+                  <>
+                    <div className="text-xs font-medium text-muted-foreground px-1">Your Music</div>
+                    {allTracks.filter(t => t.isUser).map(track => (
+                      <label key={track.id} className="flex items-center gap-2 px-1 py-1 hover:bg-muted/50 rounded cursor-pointer">
+                        <Checkbox
+                          checked={selectedTracks.has(track.id)}
+                          onCheckedChange={() => toggleTrackSelection(track.id)}
+                        />
+                        <Heart className="h-3 w-3 text-primary" />
+                        <span className="text-xs truncate">{track.name}</span>
+                      </label>
+                    ))}
+                  </>
+                )}
+                <div className="text-xs font-medium text-muted-foreground px-1">Preset Tracks</div>
+                {AMBIENT_TRACKS.map(track => (
+                  <label key={track.id} className="flex items-center gap-2 px-1 py-1 hover:bg-muted/50 rounded cursor-pointer">
+                    <Checkbox
+                      checked={selectedTracks.has(track.id)}
+                      onCheckedChange={() => toggleTrackSelection(track.id)}
+                    />
+                    <span className="text-xs truncate">{track.name}</span>
+                  </label>
+                ))}
+              </CollapsibleContent>
+            </Collapsible>
 
             <div className="flex items-center gap-2">
               <Button
