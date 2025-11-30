@@ -158,6 +158,8 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
     audio.onplay = () => notifyTTSStarted();
     audio.onended = () => {
       notifyTTSStopped();
+      audioRef.current = null; // Clear ref so next verse can play
+      
       // Move to next verse
       if (currentVerseIdx < chapterContent.verses.length - 1) {
         setCurrentVerseIdx((prev) => prev + 1);
@@ -242,10 +244,11 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
 
   // Auto-play next verse when content loads and playing, or when verse index changes
   useEffect(() => {
-    if (isPlaying && !isPaused && chapterContent && !isLoading && !isGeneratingRef.current) {
+    if (isPlaying && !isPaused && chapterContent && !isLoading && !isGeneratingRef.current && !audioRef.current) {
       playCurrentVerse();
     }
-  }, [chapterContent, isPlaying, isPaused, isLoading, currentVerseIdx, playCurrentVerse]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [chapterContent, isPlaying, isPaused, isLoading, currentVerseIdx]);
 
   // Auto-start (only once)
   useEffect(() => {
