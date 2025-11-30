@@ -291,22 +291,49 @@ serve(async (req) => {
       // Books to heavily limit (mostly procedural/ceremonial details)
       const LOW_CONTEXT_BOOKS = ['Leviticus', '2 Chronicles'];
       
-      // Fetch recently used verse references to avoid repetition
+      // Fetch recently used verse references AND books to avoid repetition
       const thirtyDaysAgo = new Date();
       thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+      const sevenDaysAgo = new Date();
+      sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+      
       const { data: recentDailyVerses } = await supabase
         .from('daily_verses')
-        .select('verse_reference')
+        .select('verse_reference, date')
         .gte('date', thirtyDaysAgo.toISOString().split('T')[0]);
       
       const recentVerseRefs = new Set(recentDailyVerses?.map(v => v.verse_reference) || []);
       
+      // Extract recently used books (last 7 days) to enforce book diversity
+      const recentBooks = new Set<string>();
+      const recentChapters = new Set<string>();
+      recentDailyVerses?.forEach(v => {
+        if (new Date(v.date) >= sevenDaysAgo) {
+          const bookMatch = v.verse_reference.match(/^(.+?)\s+\d/);
+          if (bookMatch) {
+            recentBooks.add(bookMatch[1]);
+            // Also track book+chapter to avoid same chapter
+            const chapterMatch = v.verse_reference.match(/^(.+?\s+\d+):/);
+            if (chapterMatch) {
+              recentChapters.add(chapterMatch[1]);
+            }
+          }
+        }
+      });
+      
+      console.log('Recently used books (last 7 days):', Array.from(recentBooks));
+      console.log('Recently used chapters (last 7 days):', Array.from(recentChapters));
+      
       // Filter out recently used verses AND low-context verses
       const availableVerses = verses.filter(v => {
         const ref = `${v.book} ${v.chapter}:${v.verse_num}`;
+        const bookChapter = `${v.book} ${v.chapter}`;
         
-        // Skip recently used
+        // Skip recently used verses
         if (recentVerseRefs.has(ref)) return false;
+        
+        // Skip recently used chapters (last 7 days) to ensure variety
+        if (recentChapters.has(bookChapter)) return false;
         
         // Skip excluded chapters
         const excludedChapters = EXCLUDED_CHAPTERS[v.book];
@@ -316,10 +343,9 @@ serve(async (req) => {
         
         // Limit low-context books to select meaningful chapters
         if (LOW_CONTEXT_BOOKS.includes(v.book)) {
-          // Only allow a few theologically rich chapters from these books
           const allowedChapters: Record<string, number[]> = {
-            'Leviticus': [16, 19, 23, 25, 26], // Day of Atonement, holiness code, feasts
-            '2 Chronicles': [5, 6, 7, 20, 34, 36], // Temple dedication, Jehoshaphat's prayer, Josiah
+            'Leviticus': [16, 19, 23, 25, 26],
+            '2 Chronicles': [5, 6, 7, 20, 34, 36],
           };
           const allowed = allowedChapters[v.book];
           if (allowed && !allowed.includes(v.chapter)) {
@@ -330,13 +356,21 @@ serve(async (req) => {
         return true;
       });
       
-      // Use truly random selection from available verses
-      const versesToChooseFrom = availableVerses.length > 0 ? availableVerses : verses;
-      const randomIndex = Math.floor(Math.random() * versesToChooseFrom.length);
+      // BOOK DIVERSITY: Prefer verses from books NOT used in last 7 days
+      const freshBookVerses = availableVerses.filter(v => !recentBooks.has(v.book));
+      
+      // Use fresh book verses if available, otherwise fall back to all available
+      let versesToChooseFrom = freshBookVerses.length > 100 ? freshBookVerses : availableVerses;
+      if (versesToChooseFrom.length === 0) versesToChooseFrom = verses;
+      
+      // Use crypto-grade randomness for better distribution
+      const randomBytes = new Uint32Array(1);
+      crypto.getRandomValues(randomBytes);
+      const randomIndex = randomBytes[0] % versesToChooseFrom.length;
       const selectedVerse = versesToChooseFrom[randomIndex];
       
       verseReference = `${selectedVerse.book} ${selectedVerse.chapter}:${selectedVerse.verse_num}`;
-      console.log(`Randomly selected verse: ${verseReference} from ${versesToChooseFrom.length} available (filtered) verses`);
+      console.log(`Selected verse: ${verseReference} from ${versesToChooseFrom.length} verses (${freshBookVerses.length} fresh book options)`);
       
       // Fetch actual KJV text from Bible API
       try {
