@@ -401,10 +401,13 @@ export function AmbientMusicPlayer({
   
   const [isPlaying, setIsPlaying] = useState(false);
   const [volume, setVolume] = useState(() => {
+    // Force music volume to 5% max regardless of saved value
     const saved = localStorage.getItem("pt-ambient-volume");
-    const val = saved ? parseFloat(saved) : 0.10;
-    // Cap at new max of 0.10 (10%)
-    return Math.min(val, 0.10);
+    const val = saved ? parseFloat(saved) : 0.05;
+    const capped = Math.min(val, 0.05);
+    // Immediately update localStorage with capped value
+    localStorage.setItem("pt-ambient-volume", capped.toString());
+    return capped;
   });
   const [isMuted, setIsMuted] = useState(false);
   const [currentTrackId, setCurrentTrackId] = useState(() => {
@@ -524,7 +527,7 @@ export function AmbientMusicPlayer({
       if (audioRef.current.src !== currentTrack.url) {
         const wasPlaying = isPlaying;
         audioRef.current.src = currentTrack.url;
-        audioRef.current.volume = isMuted ? 0 : volume * duckMultiplier;
+      audioRef.current.volume = isMuted ? 0 : Math.min(volume, 0.05) * duckMultiplier;
         
         if (wasPlaying && isEnabled) {
           audioRef.current.play().catch(console.error);
@@ -535,13 +538,15 @@ export function AmbientMusicPlayer({
     }
   }, [currentTrackId, currentTrack]);
 
-  // Update volume
+  // Update volume - force 5% cap
   useEffect(() => {
     if (audioRef.current) {
-      const newVolume = isMuted ? 0 : volume * duckMultiplier;
+      // Force cap at 5% max
+      const cappedVolume = Math.min(volume, 0.05);
+      const newVolume = isMuted ? 0 : cappedVolume * duckMultiplier;
       audioRef.current.volume = newVolume;
-      localStorage.setItem("pt-ambient-volume", volume.toString());
-      console.log('[AmbientMusic] Volume set to:', newVolume, 'audioRef exists:', !!audioRef.current);
+      localStorage.setItem("pt-ambient-volume", cappedVolume.toString());
+      console.log('[AmbientMusic] Volume FORCED to:', newVolume, '(base:', cappedVolume, 'duck:', duckMultiplier, ')');
     } else {
       console.log('[AmbientMusic] Volume change ignored - no audio element');
     }
