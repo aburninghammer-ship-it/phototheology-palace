@@ -46,12 +46,12 @@ const AMBIENT_TRACKS = [
   {
     id: "story-warmth",
     name: "Story Warmth",
-    description: "Warm strings and gentle cello for narrative immersion",
+    description: "Gentle meditative piano for peaceful narrative immersion",
     category: "floor-1",
     floor: 1,
-    mood: "warm, human, welcoming",
-    url: "https://www.bensound.com/bensound-music/bensound-slowmotion.mp3",
-    bpm: 60,
+    mood: "warm, meditative, peaceful",
+    url: "https://www.bensound.com/bensound-music/bensound-relaxing.mp3",
+    bpm: 55,
   },
   // Floor 2 - Pattern Floor: structured strings, reflective
   {
