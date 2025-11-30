@@ -1,5 +1,7 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 import { useAudioDucking } from "@/hooks/useAudioDucking";
+import { useUserMusic } from "@/hooks/useUserMusic";
+import { useAuth } from "@/hooks/useAuth";
 import { Navigation } from "@/components/Navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -17,7 +19,11 @@ import {
   Cross,
   Eye,
   Wind,
-  Lightbulb
+  Lightbulb,
+  Heart,
+  Trash2,
+  Upload,
+  Loader2
 } from "lucide-react";
 
 // Floor-based music categories - Rich orchestral, movie soundtrack style
@@ -186,6 +192,9 @@ export default function MusicCategories() {
   const [isMuted, setIsMuted] = useState(false);
   const [duckMultiplier, setDuckMultiplier] = useState(1);
 
+  const { user } = useAuth();
+  const { userTracks, isLoading: loadingTracks, uploading, uploadMusic, deleteMusic, toggleFavorite } = useUserMusic();
+
   // Listen for audio ducking events (when TTS is playing)
   useAudioDucking(useCallback((ducked: boolean, duckRatio: number) => {
     setDuckMultiplier(ducked ? duckRatio : 1);
@@ -337,6 +346,102 @@ export default function MusicCategories() {
             );
           })}
         </div>
+
+        {/* My Music Section */}
+        {user && (
+          <Card variant="glass" className="border border-primary/30">
+            <CardHeader>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 rounded-lg bg-primary/10">
+                    <Upload className="h-5 w-5 text-primary" />
+                  </div>
+                  <div>
+                    <CardTitle className="text-lg">My Music</CardTitle>
+                    <p className="text-sm text-muted-foreground">Your uploaded tracks</p>
+                  </div>
+                </div>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    const input = document.createElement('input');
+                    input.type = 'file';
+                    input.accept = 'audio/*';
+                    input.onchange = async (e) => {
+                      const file = (e.target as HTMLInputElement).files?.[0];
+                      if (file) {
+                        await uploadMusic(file, file.name.replace(/\.[^/.]+$/, ""));
+                      }
+                    };
+                    input.click();
+                  }}
+                  disabled={uploading}
+                >
+                  {uploading ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Upload className="h-4 w-4 mr-2" />}
+                  Upload
+                </Button>
+              </div>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              {loadingTracks ? (
+                <div className="flex items-center justify-center py-8">
+                  <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+                </div>
+              ) : userTracks.length === 0 ? (
+                <div className="text-center py-8 text-muted-foreground">
+                  <Music className="h-8 w-8 mx-auto mb-2 opacity-50" />
+                  <p>No uploaded tracks yet</p>
+                  <p className="text-sm">Upload your own music for Bible study</p>
+                </div>
+              ) : (
+                userTracks.map((track) => (
+                  <div 
+                    key={track.id}
+                    className="flex items-center gap-3 p-3 rounded-lg bg-background/50 hover:bg-background/70 transition-colors"
+                  >
+                    <Button
+                      variant={playingTrackId === track.id ? "default" : "outline"}
+                      size="icon"
+                      className="h-10 w-10 rounded-full shrink-0"
+                      onClick={() => playTrack(track.id, track.file_url)}
+                    >
+                      {playingTrackId === track.id ? (
+                        <Pause className="h-4 w-4" />
+                      ) : (
+                        <Play className="h-4 w-4 ml-0.5" />
+                      )}
+                    </Button>
+                    <div className="flex-1 min-w-0">
+                      <p className="font-medium text-sm truncate">{track.name}</p>
+                      <p className="text-xs text-muted-foreground truncate">
+                        {track.mood || "Custom track"}
+                      </p>
+                    </div>
+                    <div className="flex items-center gap-1">
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-8 w-8"
+                        onClick={() => toggleFavorite(track)}
+                      >
+                        <Heart className={`h-4 w-4 ${track.is_favorite ? "fill-red-500 text-red-500" : ""}`} />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-8 w-8 text-destructive hover:text-destructive"
+                        onClick={() => deleteMusic(track)}
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </div>
+                ))
+              )}
+            </CardContent>
+          </Card>
+        )}
 
         {/* Guidelines Info */}
         <Card variant="glass" className="max-w-2xl mx-auto">
