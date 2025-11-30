@@ -451,18 +451,16 @@ export function AmbientMusicPlayer({
   });
   const [showPlaylist, setShowPlaylist] = useState(false);
 
-  // Audio ducking - reduce volume when TTS is playing (desktop only)
-  // On mobile, both audio streams play together at system volume
+  // Audio ducking - reduce volume when TTS is playing
+  // Works on both desktop and mobile to ensure voice reader is dominant (70/30 ratio)
   const handleDuckChange = useCallback((ducked: boolean, duckRatio: number) => {
     setDuckMultiplier(duckRatio);
-    if (audioRef.current && !isMobile) {
-      // Desktop: duck the volume so TTS is clearer
+    if (audioRef.current) {
       const effectiveVolume = isMuted ? 0 : volume * duckRatio;
       audioRef.current.volume = effectiveVolume;
       console.log(`[AmbientMusic] ${ducked ? 'Ducking' : 'Restoring'} volume to ${effectiveVolume}`);
     }
-    // Mobile: both play together, user controls system volume
-  }, [volume, isMuted, isMobile]);
+  }, [volume, isMuted]);
 
   useAudioDucking(handleDuckChange);
 
@@ -1093,21 +1091,135 @@ export function AmbientMusicPlayer({
                 <Settings className="h-4 w-4" />
               </Button>
             </PopoverTrigger>
-            <PopoverContent className="w-64" align="end">
+            <PopoverContent className="w-72" align="end" side="top" sideOffset={8} collisionPadding={16}>
               <div className="space-y-3">
-                <h4 className="font-medium text-sm">Select Track</h4>
+                <h4 className="font-medium text-sm">Music Settings</h4>
+                
+                {/* Track Selection */}
                 <Select value={currentTrackId} onValueChange={setCurrentTrackId}>
                   <SelectTrigger>
                     <SelectValue />
                   </SelectTrigger>
-                  <SelectContent>
+                  <SelectContent className="max-h-60">
+                    {userTracks.length > 0 && (
+                      <>
+                        <div className="px-2 py-1 text-xs font-medium text-muted-foreground">Your Music</div>
+                        {allTracks.filter(t => t.isUser).map(track => (
+                          <SelectItem key={track.id} value={track.id}>
+                            <div className="flex items-center gap-2">
+                              <Heart className="h-3 w-3 text-primary" />
+                              <span>{track.name}</span>
+                            </div>
+                          </SelectItem>
+                        ))}
+                        <div className="px-2 py-1 text-xs font-medium text-muted-foreground mt-1">Preset Tracks</div>
+                      </>
+                    )}
                     {AMBIENT_TRACKS.map(track => (
                       <SelectItem key={track.id} value={track.id}>
-                        {track.name}
+                        <div className="flex flex-col">
+                          <span>{track.name}</span>
+                          <span className="text-xs text-muted-foreground">
+                            {track.description}
+                          </span>
+                        </div>
                       </SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
+                
+                {/* Playlist Selection */}
+                <div className="border rounded-md p-2 bg-muted/30">
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    className="w-full justify-between text-xs mb-2"
+                    onClick={() => setShowPlaylist(!showPlaylist)}
+                  >
+                    <span className="flex items-center gap-2">
+                      <ListMusic className="h-4 w-4 text-primary" />
+                      <span className="font-medium">Playlist</span>
+                      <span className="text-muted-foreground">({selectedTracks.size} songs)</span>
+                    </span>
+                    <ChevronDown className={cn("h-3 w-3 transition-transform", showPlaylist && "rotate-180")} />
+                  </Button>
+                  
+                  {showPlaylist && (
+                    <div className="space-y-1 max-h-40 overflow-y-auto border-t pt-2">
+                      <div className="flex items-center justify-between px-1 pb-1">
+                        <span className="text-xs text-muted-foreground">Select songs:</span>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="h-6 text-xs"
+                          onClick={() => {
+                            const allIds = new Set(allTracks.map(t => t.id));
+                            setSelectedTracks(allIds);
+                            localStorage.setItem("pt-ambient-selected-tracks", JSON.stringify([...allIds]));
+                          }}
+                        >
+                          Select All
+                        </Button>
+                      </div>
+                      {userTracks.length > 0 && (
+                        <>
+                          <div className="text-xs font-medium text-primary px-1">Your Music</div>
+                          {allTracks.filter(t => t.isUser).map(track => (
+                            <label key={track.id} className="flex items-center gap-2 px-2 py-1.5 hover:bg-muted/50 rounded cursor-pointer">
+                              <Checkbox
+                                checked={selectedTracks.has(track.id)}
+                                onCheckedChange={() => toggleTrackSelection(track.id)}
+                              />
+                              <Heart className="h-3 w-3 text-primary" />
+                              <span className="text-xs truncate flex-1">{track.name}</span>
+                            </label>
+                          ))}
+                        </>
+                      )}
+                      <div className="text-xs font-medium text-muted-foreground px-1 pt-1">Preset Tracks</div>
+                      {AMBIENT_TRACKS.map(track => (
+                        <label key={track.id} className="flex items-center gap-2 px-2 py-1.5 hover:bg-muted/50 rounded cursor-pointer">
+                          <Checkbox
+                            checked={selectedTracks.has(track.id)}
+                            onCheckedChange={() => toggleTrackSelection(track.id)}
+                          />
+                          <span className="text-xs truncate flex-1">{track.name}</span>
+                        </label>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                {/* Shuffle and Loop Controls for Mobile */}
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={toggleShuffle}
+                      className={cn("h-8", shuffleMode && "text-primary bg-primary/10")}
+                    >
+                      <Shuffle className="h-4 w-4 mr-1" />
+                      <span className="text-xs">{shuffleMode ? "On" : "Off"}</span>
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={cycleLoopMode}
+                      className={cn("h-8", loopMode !== "none" && "text-primary bg-primary/10")}
+                    >
+                      {loopMode === "one" ? (
+                        <Repeat1 className="h-4 w-4 mr-1" />
+                      ) : (
+                        <Repeat className="h-4 w-4 mr-1" />
+                      )}
+                      <span className="text-xs">
+                        {loopMode === "none" ? "Off" : loopMode === "one" ? "Song" : "All"}
+                      </span>
+                    </Button>
+                  </div>
+                </div>
+                
                 <p className="text-xs text-muted-foreground">
                   {currentTrack.bpm} BPM • {currentTrack.category}
                 </p>
