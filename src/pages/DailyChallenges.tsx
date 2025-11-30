@@ -304,34 +304,69 @@ const DailyChallenges = () => {
               )}
             </TabsContent>
 
-            <TabsContent value="chef">
-              <Card>
-                <CardContent className="py-8 text-center space-y-4">
-                  <ChefHat className="w-16 h-16 mx-auto text-orange-600" />
-                  <h3 className="text-2xl font-bold">Chef Challenge</h3>
-                  <p className="text-muted-foreground max-w-md mx-auto">
-                    Create "biblical recipes" – coherent mini-sermons using only Bible verse references
-                  </p>
-                  <Button onClick={() => navigate("/games/chef-challenge")} size="lg">
-                    Start Chef Challenge
-                  </Button>
-                </CardContent>
-              </Card>
+            <TabsContent value="chef" className="space-y-6">
+              <div className="bg-gradient-to-r from-orange-500/10 to-amber-500/5 p-4 rounded-lg border border-orange-500/20">
+                <h2 className="font-semibold mb-2 flex items-center gap-2">
+                  <ChefHat className="h-5 w-5 text-orange-600" />
+                  About Chef Challenges
+                </h2>
+                <p className="text-sm text-muted-foreground">
+                  Create "biblical recipes" – coherent mini-sermons using only Bible verse references.
+                  Chain verses together to build theological meals that nourish the soul.
+                </p>
+              </div>
+              <ChefRecipeChallenge 
+                challenge={{
+                  title: "Chef Challenge",
+                  description: "Create a biblical recipe by connecting verses that build a complete theological thought.",
+                  verses: [],
+                  ui_config: {
+                    theme: "Faith Journey",
+                    ingredient_slots: 5,
+                    suggested_topics: ["Grace", "Redemption", "Hope", "Love", "Salvation"]
+                  }
+                }}
+                onSubmit={handleChallengeSubmit}
+                hasSubmitted={false}
+              />
+              <div className="text-center">
+                <Button variant="outline" onClick={() => navigate("/games/chef-challenge")} className="gap-2">
+                  <ChefHat className="h-4 w-4" />
+                  View Full Chef Challenge Mode
+                </Button>
+              </div>
             </TabsContent>
 
-            <TabsContent value="equations">
-              <Card>
-                <CardContent className="py-8 text-center space-y-4">
-                  <Calculator className="w-16 h-16 mx-auto text-primary" />
-                  <h3 className="text-2xl font-bold">Equations Challenge</h3>
-                  <p className="text-muted-foreground max-w-md mx-auto">
-                    Decode biblical equations using palace principles and symbols
-                  </p>
-                  <Button onClick={() => navigate("/equations-challenge")} size="lg">
-                    Start Equations Challenge
-                  </Button>
-                </CardContent>
-              </Card>
+            <TabsContent value="equations" className="space-y-6">
+              <div className="bg-gradient-to-r from-primary/10 to-indigo-500/5 p-4 rounded-lg border border-primary/20">
+                <h2 className="font-semibold mb-2 flex items-center gap-2">
+                  <Calculator className="h-5 w-5 text-primary" />
+                  About Equation Challenges
+                </h2>
+                <p className="text-sm text-muted-foreground">
+                  Decode biblical equations using palace principles and symbols.
+                  Discover how Scripture speaks in symbolic language that points to Christ.
+                </p>
+              </div>
+              <EquationDecodeChallenge 
+                challenge={{
+                  title: "Equation Challenge",
+                  description: "Decode this biblical equation to discover its deeper meaning.",
+                  verses: ["John 3:16"],
+                  ui_config: {
+                    equation: "🌍 + ❤️ + 🎁 = ∞",
+                    verse_context: "For God so loved the world, that he gave his only begotten Son, that whosoever believeth in him should not perish, but have everlasting life."
+                  }
+                }}
+                onSubmit={handleChallengeSubmit}
+                hasSubmitted={false}
+              />
+              <div className="text-center">
+                <Button variant="outline" onClick={() => navigate("/equations-challenge")} className="gap-2">
+                  <Calculator className="h-4 w-4" />
+                  View Full Equations Challenge Mode
+                </Button>
+              </div>
             </TabsContent>
           </Tabs>
         </div>
