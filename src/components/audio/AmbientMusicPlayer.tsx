@@ -568,18 +568,21 @@ export function AmbientMusicPlayer({
 
   // Listen for global volume control changes (allows other components like SequencePlayer to control music volume)
   // SequencePlayer sends 0-30 scale, so we convert to 0-1 by dividing by 100
+  const isInitialMount = useRef(true);
   useEffect(() => {
     const unsubscribe = subscribeToMusicVolume((newVolume) => {
+      // Skip the immediate callback on initial subscription
+      if (isInitialMount.current) {
+        isInitialMount.current = false;
+        return;
+      }
       // Convert from 0-30 scale to 0-0.30 (capped at 30%)
       const normalizedVolume = Math.min(newVolume, 30) / 100;
-      // Only update if significantly different to avoid loops
-      if (Math.abs(normalizedVolume - volume) > 0.01) {
-        console.log('[AmbientMusic] Global volume update:', newVolume, '-> normalized:', normalizedVolume);
-        setVolume(normalizedVolume);
-      }
+      console.log('[AmbientMusic] Global volume update:', newVolume, '-> normalized:', normalizedVolume);
+      setVolume(normalizedVolume);
     });
     return unsubscribe;
-  }, [volume]);
+  }, []);
 
   // Update loop setting
   useEffect(() => {
