@@ -10,6 +10,7 @@ import {
 interface Feature {
   name: string;
   description?: string;
+  isEnhanced?: boolean;
   phototheology: "yes" | "no" | "partial";
   youversion: "yes" | "no" | "partial";
   blueletter: "yes" | "no" | "partial";
@@ -37,6 +38,7 @@ const standardFeatures: Feature[] = [
   {
     name: "Reading Plans",
     description: "PT plans are Palace-integrated — each day maps to rooms, floors, and memory hooks, not just chapters to check off",
+    isEnhanced: true,
     phototheology: "yes",
     youversion: "yes",
     blueletter: "partial",
@@ -46,6 +48,7 @@ const standardFeatures: Feature[] = [
   {
     name: "Commentary Access",
     description: "PT commentary connects every verse to Christ, sanctuary, prophecy, and memory rooms — not just historical notes",
+    isEnhanced: true,
     phototheology: "yes",
     youversion: "partial",
     blueletter: "yes",
@@ -55,6 +58,7 @@ const standardFeatures: Feature[] = [
   {
     name: "Cross-References",
     description: "PT cross-refs follow typology, cycles, and thematic walls — showing how verses connect across the 8 cycles of redemption",
+    isEnhanced: true,
     phototheology: "yes",
     youversion: "partial",
     blueletter: "yes",
@@ -64,6 +68,7 @@ const standardFeatures: Feature[] = [
   {
     name: "Greek/Hebrew Tools",
     description: "PT includes lexical data in the Def-Com Room with biblical context and Christ-centered application",
+    isEnhanced: true,
     phototheology: "yes",
     youversion: "no",
     blueletter: "yes",
@@ -191,20 +196,28 @@ const StatusIcon = ({ status }: { status: "yes" | "no" | "partial" }) => {
   return <X className="h-5 w-5 text-red-400" />;
 };
 
-const FeatureWithTooltip = ({ name, description }: { name: string; description?: string }) => {
+const FeatureWithTooltip = ({ name, description, isEnhanced }: { name: string; description?: string; isEnhanced?: boolean }) => {
   if (!description) return <span>{name}</span>;
   
   return (
     <TooltipProvider>
       <Tooltip>
         <TooltipTrigger asChild>
-          <span className="flex items-center gap-1.5 cursor-help">
-            {name}
-            <HelpCircle className="h-3.5 w-3.5 text-muted-foreground/60" />
+          <span className="flex items-center gap-2 cursor-help">
+            <span className="flex items-center gap-1.5">
+              {name}
+              <HelpCircle className="h-3.5 w-3.5 text-primary/70" />
+            </span>
+            {isEnhanced && (
+              <Badge variant="outline" className="text-[9px] px-1.5 py-0 h-4 bg-primary/10 border-primary/30 text-primary font-medium">
+                PT Enhanced
+              </Badge>
+            )}
           </span>
         </TooltipTrigger>
-        <TooltipContent side="right" className="max-w-[250px] text-xs">
-          {description}
+        <TooltipContent side="right" className="max-w-[280px] text-xs bg-card border-primary/20">
+          <p className="font-medium text-primary mb-1">How PT is different:</p>
+          <p className="text-muted-foreground">{description}</p>
         </TooltipContent>
       </Tooltip>
     </TooltipProvider>
@@ -244,7 +257,7 @@ const FeatureRow = ({ feature, index }: { feature: Feature; index: number }) => 
     }`}
   >
     <td className="py-3 px-4 md:px-6 text-sm font-medium text-foreground">
-      <FeatureWithTooltip name={feature.name} description={feature.description} />
+      <FeatureWithTooltip name={feature.name} description={feature.description} isEnhanced={feature.isEnhanced} />
     </td>
     <td className="py-3 px-2 md:px-3 text-center">
       <div className="flex justify-center">
