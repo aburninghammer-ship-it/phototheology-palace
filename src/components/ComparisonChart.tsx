@@ -225,14 +225,14 @@ const FeatureWithTooltip = ({ name, description, isEnhanced }: { name: string; d
 };
 
 const TableHeader = () => (
-  <tr className="border-b border-white/20 bg-gradient-to-r from-white/10 via-white/5 to-white/10">
+  <tr className="border-b border-border">
     <th className="text-left py-4 px-4 md:px-6 font-semibold text-foreground min-w-[200px]">
       Feature
     </th>
     <th className="py-4 px-2 md:px-3 text-center min-w-[80px]">
       <div className="flex flex-col items-center gap-1">
-        <span className="text-xs md:text-sm font-bold text-primary drop-shadow-sm">PT App</span>
-        <Badge variant="outline" className="text-[10px] bg-primary/20 border-primary/40 text-primary shadow-sm">OURS</Badge>
+        <span className="text-xs md:text-sm font-bold text-primary">PT App</span>
+        <Badge variant="outline" className="text-[10px] bg-primary/10 border-primary/30">OURS</Badge>
       </div>
     </th>
     <th className="py-4 px-2 md:px-3 text-center min-w-[70px]">
@@ -252,8 +252,8 @@ const TableHeader = () => (
 
 const FeatureRow = ({ feature, index }: { feature: Feature; index: number }) => (
   <tr 
-    className={`border-b border-white/10 transition-all duration-200 hover:bg-white/10 ${
-      index % 2 === 0 ? "bg-white/[0.03]" : "bg-white/[0.01]"
+    className={`border-b border-border/50 transition-colors hover:bg-muted/50 ${
+      index % 2 === 0 ? "bg-muted/20" : ""
     }`}
   >
     <td className="py-3 px-4 md:px-6 text-sm font-medium text-foreground">
@@ -306,22 +306,12 @@ export function ComparisonChart() {
         </div>
 
         {/* Glass Container */}
-        <div className="relative rounded-3xl overflow-hidden shadow-2xl">
-          {/* Outer glow ring */}
-          <div className="absolute -inset-[1px] bg-gradient-to-br from-primary/40 via-white/20 to-accent/40 rounded-3xl blur-sm" />
-          
-          {/* Glass background layers */}
-          <div className="absolute inset-0 bg-gradient-to-br from-white/15 via-white/5 to-white/10 backdrop-blur-2xl rounded-3xl" />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-white/10 rounded-3xl" />
-          <div className="absolute inset-[1px] border border-white/30 rounded-3xl pointer-events-none" />
-          
-          {/* Inner glass highlight */}
-          <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/50 to-transparent" />
-          
-          {/* Glow orbs */}
-          <div className="absolute -top-32 -left-32 w-64 h-64 bg-primary/25 rounded-full blur-[100px]" />
-          <div className="absolute -bottom-32 -right-32 w-64 h-64 bg-accent/25 rounded-full blur-[100px]" />
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-primary/10 rounded-full blur-[120px]" />
+        <div className="relative rounded-2xl overflow-hidden">
+          {/* Glass border effect */}
+          <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-white/20 via-white/10 to-white/5 p-[1px]">
+            <div className="absolute inset-0 rounded-2xl backdrop-blur-xl bg-card/80" />
+          </div>
+          <div className="absolute inset-0 rounded-2xl border border-white/20" />
 
           {/* Table Content */}
           <div className="relative z-10 overflow-x-auto">
@@ -332,7 +322,7 @@ export function ComparisonChart() {
               <tbody>
                 {/* Standard Features Section */}
                 <tr>
-                  <td colSpan={6} className="py-3 px-4 md:px-6 bg-gradient-to-r from-white/10 via-white/5 to-white/10 backdrop-blur-sm border-y border-white/10">
+                  <td colSpan={6} className="py-3 px-4 md:px-6 bg-muted/50">
                     <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
                       Standard Bible App Features
                     </span>
@@ -344,8 +334,8 @@ export function ComparisonChart() {
                 
                 {/* Unique Features Section */}
                 <tr>
-                  <td colSpan={6} className="py-3 px-4 md:px-6 bg-gradient-to-r from-primary/20 via-primary/10 to-primary/20 backdrop-blur-sm border-y border-primary/20">
-                    <span className="text-xs font-semibold uppercase tracking-wider text-primary drop-shadow-sm">
+                  <td colSpan={6} className="py-3 px-4 md:px-6 bg-primary/10">
+                    <span className="text-xs font-semibold uppercase tracking-wider text-primary">
                       ✨ Unique to Phototheology
                     </span>
                   </td>
@@ -358,18 +348,18 @@ export function ComparisonChart() {
           </div>
 
           {/* Legend */}
-          <div className="relative z-10 flex flex-wrap justify-center gap-4 md:gap-6 py-4 px-4 bg-gradient-to-r from-white/5 via-white/10 to-white/5 border-t border-white/20">
-            <div className="flex items-center gap-2 text-xs md:text-sm px-3 py-1.5 rounded-full bg-white/10 backdrop-blur-sm border border-white/10">
+          <div className="relative z-10 flex flex-wrap justify-center gap-4 md:gap-6 py-4 px-4 border-t border-border">
+            <div className="flex items-center gap-2 text-xs md:text-sm">
               <Check className="h-4 w-4 text-green-500" />
-              <span className="text-foreground/80">Full Support</span>
+              <span className="text-muted-foreground">Full Support</span>
             </div>
-            <div className="flex items-center gap-2 text-xs md:text-sm px-3 py-1.5 rounded-full bg-white/10 backdrop-blur-sm border border-white/10">
+            <div className="flex items-center gap-2 text-xs md:text-sm">
               <Minus className="h-4 w-4 text-yellow-500" />
-              <span className="text-foreground/80">Partial / Limited</span>
+              <span className="text-muted-foreground">Partial / Limited</span>
             </div>
-            <div className="flex items-center gap-2 text-xs md:text-sm px-3 py-1.5 rounded-full bg-white/10 backdrop-blur-sm border border-white/10">
+            <div className="flex items-center gap-2 text-xs md:text-sm">
               <X className="h-4 w-4 text-red-400" />
-              <span className="text-foreground/80">Not Available</span>
+              <span className="text-muted-foreground">Not Available</span>
             </div>
           </div>
         </div>
