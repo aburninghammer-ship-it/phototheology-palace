@@ -401,13 +401,12 @@ export function AmbientMusicPlayer({
   
   const [isPlaying, setIsPlaying] = useState(false);
   const [volume, setVolume] = useState(() => {
-    // Force music volume to 5% max regardless of saved value
-    const saved = localStorage.getItem("pt-ambient-volume");
-    const val = saved ? parseFloat(saved) : 0.05;
-    const capped = Math.min(val, 0.05);
-    // Immediately update localStorage with capped value
-    localStorage.setItem("pt-ambient-volume", capped.toString());
-    return capped;
+    // Read from new key (0-100 scale) and convert to 0-1
+    const saved = localStorage.getItem("pt-music-volume-pct");
+    if (saved) {
+      return Math.min(parseInt(saved, 10), 30) / 100;
+    }
+    return 0.08; // Default 8%
   });
   const [isMuted, setIsMuted] = useState(false);
   const [currentTrackId, setCurrentTrackId] = useState(() => {
@@ -496,8 +495,8 @@ export function AmbientMusicPlayer({
     if (!audioRef.current) {
       audioRef.current = new Audio();
       audioRef.current.loop = loopMode === "one";
-      // FORCE initial volume to 5%
-      audioRef.current.volume = 0.05;
+      // Set initial volume
+      audioRef.current.volume = isMuted ? 0 : Math.min(volume, 0.30);
       
       // Handle track ended for "all" loop mode
       audioRef.current.onended = () => {
@@ -511,21 +510,22 @@ export function AmbientMusicPlayer({
           setIsPlaying(false);
         }
       };
+      
+      // Re-apply volume after audio can play (browsers reset volume on load)
+      audioRef.current.oncanplay = () => {
+        if (audioRef.current) {
+          const targetVol = isMuted ? 0 : Math.min(volume, 0.30) * duckMultiplier;
+          audioRef.current.volume = targetVol;
+          console.log('[AmbientMusic] oncanplay - volume set to:', targetVol);
+        }
+      };
     }
     
-    // FORCE volume cap every 500ms as a failsafe
-    const enforceVolume = setInterval(() => {
-      if (audioRef.current && audioRef.current.volume > 0.05) {
-        console.log('[AmbientMusic] ENFORCING volume cap from', audioRef.current.volume, 'to 0.05');
-        audioRef.current.volume = 0.05;
-      }
-    }, 500);
-    
     return () => {
-      clearInterval(enforceVolume);
       if (audioRef.current) {
         audioRef.current.pause();
         audioRef.current.onended = null;
+        audioRef.current.oncanplay = null;
         audioRef.current = null;
       }
     };
@@ -538,7 +538,7 @@ export function AmbientMusicPlayer({
       if (audioRef.current.src !== currentTrack.url) {
         const wasPlaying = isPlaying;
         audioRef.current.src = currentTrack.url;
-      audioRef.current.volume = isMuted ? 0 : Math.min(volume, 0.05) * duckMultiplier;
+      audioRef.current.volume = isMuted ? 0 : Math.min(volume, 0.30) * duckMultiplier;
         
         if (wasPlaying && isEnabled) {
           audioRef.current.play().catch(console.error);
@@ -549,17 +549,15 @@ export function AmbientMusicPlayer({
     }
   }, [currentTrackId, currentTrack]);
 
-  // Update volume - force 5% cap
+  // Update volume - cap at 30% max for background music
   useEffect(() => {
     if (audioRef.current) {
-      // Force cap at 5% max
-      const cappedVolume = Math.min(volume, 0.05);
+      const cappedVolume = Math.min(volume, 0.30);
       const newVolume = isMuted ? 0 : cappedVolume * duckMultiplier;
       audioRef.current.volume = newVolume;
-      localStorage.setItem("pt-ambient-volume", cappedVolume.toString());
-      console.log('[AmbientMusic] Volume FORCED to:', newVolume, '(base:', cappedVolume, 'duck:', duckMultiplier, ')');
-    } else {
-      console.log('[AmbientMusic] Volume change ignored - no audio element');
+      // Save as percentage
+      localStorage.setItem("pt-music-volume-pct", Math.round(cappedVolume * 100).toString());
+      console.log('[AmbientMusic] Volume set to:', newVolume, '(base:', cappedVolume, 'duck:', duckMultiplier, ')');
     }
   }, [volume, isMuted, duckMultiplier]);
 
