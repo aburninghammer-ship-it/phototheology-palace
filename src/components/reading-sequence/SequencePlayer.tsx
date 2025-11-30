@@ -44,8 +44,10 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
   const [isMuted, setIsMuted] = useState(false);
   const [chapterContent, setChapterContent] = useState<ChapterContent | null>(null);
   const [audioUrl, setAudioUrl] = useState<string | null>(null);
+  const [hasStarted, setHasStarted] = useState(false);
 
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  const isGeneratingRef = useRef(false); // Prevent concurrent TTS requests
   const activeSequences = sequences.filter((s) => s.enabled && s.items.length > 0);
 
   // Flatten all items across sequences for navigation
@@ -100,14 +102,21 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
 
   // Play current verse
   const playCurrentVerse = useCallback(async () => {
+    // Prevent concurrent TTS requests
+    if (isGeneratingRef.current) {
+      console.log("Already generating TTS, skipping...");
+      return;
+    }
     if (!chapterContent || currentVerseIdx >= chapterContent.verses.length) return;
 
+    isGeneratingRef.current = true;
     const verse = chapterContent.verses[currentVerseIdx];
     const voice = currentSequence?.voice || "daniel";
 
     setIsLoading(true);
     const url = await generateTTS(verse.text, voice);
     setIsLoading(false);
+    isGeneratingRef.current = false;
 
     if (!url) {
       toast.error("Failed to generate audio");
@@ -177,17 +186,18 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
 
   // Auto-play next verse when content loads and playing
   useEffect(() => {
-    if (isPlaying && !isPaused && chapterContent && !isLoading) {
+    if (isPlaying && !isPaused && chapterContent && !isLoading && !isGeneratingRef.current) {
       playCurrentVerse();
     }
   }, [chapterContent, isPlaying, isPaused, isLoading]);
 
-  // Auto-start
+  // Auto-start (only once)
   useEffect(() => {
-    if (autoPlay && chapterContent && !isPlaying) {
+    if (autoPlay && chapterContent && !hasStarted) {
+      setHasStarted(true);
       handlePlay();
     }
-  }, [autoPlay, chapterContent]);
+  }, [autoPlay, chapterContent, hasStarted]);
 
   const handlePlay = () => {
     if (isPaused && audioRef.current) {
