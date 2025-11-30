@@ -124,3 +124,6 @@ verify_jwt = false
 
 [functions.bible-api]
 verify_jwt = false
+
+[functions.generate-chapter-commentary]
+verify_jwt = false
