@@ -29,8 +29,65 @@ const VOICES: Record<string, string> = {
   bill: 'pqHfZKP75CvOlQylNhV4',
 };
 
+const MAX_CHARS = 9500; // Stay under ElevenLabs 10,000 limit
+
 // Helper function to delay execution
 const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+
+// Split text into chunks at sentence boundaries
+function splitTextIntoChunks(text: string, maxChars: number): string[] {
+  if (text.length <= maxChars) {
+    return [text];
+  }
+
+  const chunks: string[] = [];
+  let remaining = text;
+
+  while (remaining.length > 0) {
+    if (remaining.length <= maxChars) {
+      chunks.push(remaining);
+      break;
+    }
+
+    // Find a good break point (sentence end) within the limit
+    let breakPoint = maxChars;
+    
+    // Look for sentence endings (.!?) followed by space or end
+    const searchText = remaining.substring(0, maxChars);
+    const sentenceEndings = ['. ', '! ', '? ', '.\n', '!\n', '?\n'];
+    let lastSentenceEnd = -1;
+    
+    for (const ending of sentenceEndings) {
+      const idx = searchText.lastIndexOf(ending);
+      if (idx > lastSentenceEnd) {
+        lastSentenceEnd = idx + 1; // Include the punctuation
+      }
+    }
+
+    // If we found a sentence break, use it; otherwise try paragraph break
+    if (lastSentenceEnd > maxChars * 0.5) {
+      breakPoint = lastSentenceEnd;
+    } else {
+      // Try paragraph break
+      const paragraphBreak = searchText.lastIndexOf('\n\n');
+      if (paragraphBreak > maxChars * 0.3) {
+        breakPoint = paragraphBreak + 1;
+      } else {
+        // Fall back to any newline
+        const newlineBreak = searchText.lastIndexOf('\n');
+        if (newlineBreak > maxChars * 0.3) {
+          breakPoint = newlineBreak + 1;
+        }
+        // Otherwise just cut at maxChars
+      }
+    }
+
+    chunks.push(remaining.substring(0, breakPoint).trim());
+    remaining = remaining.substring(breakPoint).trim();
+  }
+
+  return chunks.filter(chunk => chunk.length > 0);
+}
 
 // Call ElevenLabs API with retry logic for rate limiting
 async function callElevenLabsWithRetry(
@@ -92,6 +149,18 @@ async function callElevenLabsWithRetry(
   throw lastError || new Error('Max retries exceeded');
 }
 
+// Convert array buffer to base64 in chunks to avoid stack overflow
+function arrayBufferToBase64(buffer: ArrayBuffer): string {
+  const bytes = new Uint8Array(buffer);
+  let base64 = '';
+  const chunkSize = 32768;
+  for (let i = 0; i < bytes.length; i += chunkSize) {
+    const chunk = bytes.subarray(i, Math.min(i + chunkSize, bytes.length));
+    base64 += String.fromCharCode(...chunk);
+  }
+  return btoa(base64);
+}
+
 serve(async (req) => {
   // Handle CORS preflight requests
   if (req.method === "OPTIONS") {
@@ -115,21 +184,40 @@ serve(async (req) => {
 
     console.log(`Generating TTS for ${text.length} characters with voice: ${voice} (${voiceId})`);
 
-    // Call ElevenLabs API with retry logic
-    const response = await callElevenLabsWithRetry(text, voiceId, ELEVENLABS_API_KEY);
+    // Split text into chunks if needed
+    const chunks = splitTextIntoChunks(text, MAX_CHARS);
+    console.log(`Split into ${chunks.length} chunks`);
 
-    // Convert audio buffer to base64 using chunked approach to avoid stack overflow
-    const arrayBuffer = await response.arrayBuffer();
-    const bytes = new Uint8Array(arrayBuffer);
-    let base64Audio = '';
-    const chunkSize = 32768;
-    for (let i = 0; i < bytes.length; i += chunkSize) {
-      const chunk = bytes.subarray(i, Math.min(i + chunkSize, bytes.length));
-      base64Audio += String.fromCharCode(...chunk);
+    // Generate TTS for each chunk and collect audio buffers
+    const audioBuffers: ArrayBuffer[] = [];
+    
+    for (let i = 0; i < chunks.length; i++) {
+      const chunk = chunks[i];
+      console.log(`Processing chunk ${i + 1}/${chunks.length} (${chunk.length} chars)`);
+      
+      const response = await callElevenLabsWithRetry(chunk, voiceId, ELEVENLABS_API_KEY);
+      const buffer = await response.arrayBuffer();
+      audioBuffers.push(buffer);
+      
+      // Small delay between chunks to avoid rate limiting
+      if (i < chunks.length - 1) {
+        await delay(100);
+      }
     }
-    base64Audio = btoa(base64Audio);
 
-    console.log("TTS audio generated successfully, size:", arrayBuffer.byteLength);
+    // Concatenate all audio buffers
+    const totalLength = audioBuffers.reduce((sum, buf) => sum + buf.byteLength, 0);
+    const combined = new Uint8Array(totalLength);
+    let offset = 0;
+    for (const buffer of audioBuffers) {
+      combined.set(new Uint8Array(buffer), offset);
+      offset += buffer.byteLength;
+    }
+
+    // Convert to base64
+    const base64Audio = arrayBufferToBase64(combined.buffer);
+
+    console.log(`TTS audio generated successfully, total size: ${totalLength} bytes from ${chunks.length} chunks`);
 
     return new Response(
       JSON.stringify({ 
@@ -137,7 +225,8 @@ serve(async (req) => {
         audioContent: base64Audio,
         contentType: 'audio/mpeg',
         textLength: text.length,
-        voice: voice
+        voice: voice,
+        chunks: chunks.length
       }),
       {
         headers: { ...corsHeaders, "Content-Type": "application/json" },

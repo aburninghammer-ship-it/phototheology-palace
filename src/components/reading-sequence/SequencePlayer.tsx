@@ -60,6 +60,7 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
   const ttsCache = useRef<Map<string, string>>(new Map()); // Cache for prefetched TTS URLs
   const prefetchingRef = useRef<Set<string>>(new Set()); // Track verses being prefetched
   const playingCommentaryRef = useRef(false); // Track if we're in commentary playback
+  const chapterCache = useRef<Map<string, { verse: number; text: string }[]>>(new Map()); // Cache for prefetched chapters
   
   const isMobile = useIsMobile();
   const activeSequences = sequences.filter((s) => s.enabled && s.items.length > 0);
@@ -122,23 +123,46 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
     });
   }, [totalItems]);
 
-  // Fetch chapter content
+  // Fetch chapter content (with caching)
   const fetchChapter = useCallback(async (book: string, chapter: number) => {
     const cacheKey = `${book}-${chapter}`;
     
+    // Check cache first
+    if (chapterCache.current.has(cacheKey)) {
+      console.log("[Chapter] Using cached:", cacheKey);
+      return chapterCache.current.get(cacheKey)!;
+    }
+    
     try {
-      console.log("Fetching chapter:", cacheKey);
+      console.log("[Chapter] Fetching:", cacheKey);
       const { data, error } = await supabase.functions.invoke("bible-api", {
         body: { book, chapter, version: "kjv" },
       });
 
       if (error) throw error;
-      return data.verses as { verse: number; text: string }[];
+      const verses = data.verses as { verse: number; text: string }[];
+      chapterCache.current.set(cacheKey, verses);
+      return verses;
     } catch (e) {
       console.error("Error fetching chapter:", e);
       return null;
     }
   }, []);
+
+  // Prefetch next chapter in background
+  const prefetchNextChapter = useCallback((currentIdx: number) => {
+    const nextIdx = currentIdx + 1;
+    if (nextIdx >= allItems.length) return;
+    
+    const nextItem = allItems[nextIdx];
+    if (!nextItem) return;
+    
+    const cacheKey = `${nextItem.book}-${nextItem.chapter}`;
+    if (chapterCache.current.has(cacheKey)) return;
+    
+    console.log("[Prefetch] Starting chapter prefetch:", cacheKey);
+    fetchChapter(nextItem.book, nextItem.chapter);
+  }, [allItems, fetchChapter]);
 
   // Generate TTS for text
   const generateTTS = useCallback(async (text: string, voice: string) => {
@@ -309,6 +333,11 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
         prefetchVerse(nextIdx, content, voice);
       }
     }
+    
+    // Prefetch next chapter when we're past halfway through current chapter
+    if (verseIdx > content.verses.length / 2) {
+      prefetchNextChapter(currentItemIdx);
+    }
 
     // Stop any existing audio BEFORE setting up new one
     if (audioRef.current) {
@@ -363,12 +392,10 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
       
       if (nextVerseIdx < content.verses.length) {
         console.log("[Audio] Playing next verse:", nextVerseIdx + 1);
-        // Minimal delay since next verse should be prefetched
-        setTimeout(() => {
-          if (continuePlayingRef.current) {
-            playVerseAtIndex(nextVerseIdx, content, voice);
-          }
-        }, 10);
+        // Immediate transition - no delay needed since next verse should be prefetched
+        if (continuePlayingRef.current) {
+          playVerseAtIndex(nextVerseIdx, content, voice);
+        }
       } else {
         // Chapter complete - check for commentary before moving on
         console.log("[Audio] Chapter complete, checking for commentary...");
@@ -437,7 +464,7 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
       setIsPlaying(false);
       toast.error("Failed to play audio - try clicking play manually");
     }
-  }, [volume, isMuted, totalItems, generateTTS, prefetchVerse, activeSequences, currentItemIdx, generateCommentary, playCommentary, moveToNextChapter]);
+  }, [volume, isMuted, totalItems, generateTTS, prefetchVerse, activeSequences, currentItemIdx, generateCommentary, playCommentary, moveToNextChapter, prefetchNextChapter]);
 
   // Play current verse (wrapper for playVerseAtIndex)
   const playCurrentVerse = useCallback(() => {
