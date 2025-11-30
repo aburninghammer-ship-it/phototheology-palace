@@ -429,11 +429,17 @@ const Community = () => {
             <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 rounded-full blur-3xl pointer-events-none" />
             <div className="relative z-10">
               <div className="flex items-center justify-between">
-                <div>
-                  <h1 className="text-5xl font-bold flex items-center gap-3 mb-2">
-                    <Sparkles className="h-10 w-10 text-primary" />
-                    Community Hub
-                  </h1>
+                <div className="flex items-center gap-4">
+                  <img 
+                    src="/pwa-192x192.png" 
+                    alt="Phototheology" 
+                    className="h-14 w-14 rounded-xl shadow-lg shadow-primary/20"
+                  />
+                  <div>
+                    <h1 className="text-5xl font-bold flex items-center gap-3 mb-2">
+                      <Sparkles className="h-10 w-10 text-primary" />
+                      Community Hub
+                    </h1>
                   <p className="text-muted-foreground text-lg">
                     Connect, share insights, and grow together in faith
                   </p>
@@ -448,6 +454,7 @@ const Community = () => {
                       <Users className="h-3 w-3" />
                       {activeCount} active now
                     </Badge>
+                  </div>
                   </div>
                 </div>
                 <div className="flex items-center gap-2">

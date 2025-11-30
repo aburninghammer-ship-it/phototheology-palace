@@ -77,6 +77,11 @@ const Palace = () => {
           
           {/* Hero Header */}
           <div className="text-center mb-8">
+            <img 
+              src="/pwa-192x192.png" 
+              alt="Phototheology" 
+              className="h-20 w-20 rounded-2xl shadow-lg shadow-primary/20 mx-auto mb-4"
+            />
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full gradient-palace border border-white/20 mb-4 shadow-lg">
               <Building2 className="h-5 w-5 text-white" />
               <span className="text-sm font-semibold text-white">The Master System</span>

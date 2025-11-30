@@ -178,9 +178,16 @@ export default function Dashboard() {
     <div className="min-h-screen gradient-dreamy">
       {preferences.navigation_style === "simplified" ? <SimplifiedNav /> : <Navigation />}
       <div className="container mx-auto px-4 py-8 max-w-7xl">
-        <div className="mb-8">
-          <h1 className="text-4xl font-bold mb-2">Welcome back! 👋</h1>
-          <p className="text-foreground/80">Here's your learning progress</p>
+        <div className="mb-8 flex items-center gap-4">
+          <img 
+            src="/pwa-192x192.png" 
+            alt="Phototheology" 
+            className="h-14 w-14 rounded-xl shadow-lg shadow-primary/20"
+          />
+          <div>
+            <h1 className="text-4xl font-bold mb-2">Welcome back! 👋</h1>
+            <p className="text-foreground/80">Here's your learning progress</p>
+          </div>
         </div>
 
         {/* Featured Today */}

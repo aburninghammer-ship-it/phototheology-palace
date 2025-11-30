@@ -377,11 +377,18 @@ const Games = () => {
           animate={{ opacity: 1, y: 0 }}
           className="flex justify-between items-center mb-6"
         >
-          <div>
-            <h1 className="text-3xl font-bold bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent">
-              Games
-            </h1>
-            <p className="text-muted-foreground">Learn through play with Phototheology games</p>
+          <div className="flex items-center gap-4">
+            <img 
+              src="/pwa-192x192.png" 
+              alt="Phototheology" 
+              className="h-12 w-12 rounded-xl shadow-lg shadow-primary/20"
+            />
+            <div>
+              <h1 className="text-3xl font-bold bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent">
+                Games
+              </h1>
+              <p className="text-muted-foreground">Learn through play with Phototheology games</p>
+            </div>
           </div>
           <HowItWorksDialog title="How to Use Games" steps={gamesSteps} />
         </motion.div>

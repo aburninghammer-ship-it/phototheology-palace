@@ -23,13 +23,20 @@ const Bible = () => {
           {/* Header - Glass Card */}
           <div className="glass-card mb-8 p-6 rounded-2xl">
             <div className="relative z-10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-              <div>
-                <h1 className="font-serif text-3xl sm:text-4xl md:text-5xl font-bold mb-2 bg-gradient-palace bg-clip-text text-transparent">
-                  Phototheology Study Bible (PSB)
-                </h1>
-                <p className="text-base sm:text-lg text-muted-foreground">
-                  Scripture through principle lenses
-                </p>
+              <div className="flex items-center gap-4">
+                <img 
+                  src="/pwa-192x192.png" 
+                  alt="Phototheology" 
+                  className="h-14 w-14 rounded-xl shadow-lg shadow-primary/20"
+                />
+                <div>
+                  <h1 className="font-serif text-3xl sm:text-4xl md:text-5xl font-bold mb-2 bg-gradient-palace bg-clip-text text-transparent">
+                    Phototheology Study Bible (PSB)
+                  </h1>
+                  <p className="text-base sm:text-lg text-muted-foreground">
+                    Scripture through principle lenses
+                  </p>
+                </div>
               </div>
               <div className="flex gap-2 flex-wrap">
                 <Button 
