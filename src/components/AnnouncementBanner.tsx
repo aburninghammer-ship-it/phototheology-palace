@@ -44,7 +44,7 @@ export function AnnouncementBanner() {
         animate={{ opacity: 1, y: 0 }}
         exit={{ opacity: 0, y: -10 }}
         transition={{ duration: 0.3 }}
-        className={`fixed top-16 left-0 right-0 z-30 border-b backdrop-blur-xl ${config.bgClass}`}
+        className={`fixed top-[7rem] left-0 right-0 z-30 border-b backdrop-blur-xl ${config.bgClass}`}
       >
         <div className="container mx-auto px-4 py-3">
           <div className="flex items-start justify-between gap-4">
