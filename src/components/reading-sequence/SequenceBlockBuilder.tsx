@@ -47,6 +47,9 @@ export const SequenceBlockBuilder = ({ block, onChange, onRemove }: SequenceBloc
   const [endChapter, setEndChapter] = useState<number>(1);
   const [endBook, setEndBook] = useState<string>("");
 
+  // Debug: Log when block changes
+  console.log("SequenceBlockBuilder render, items:", block.items.length);
+
   const addSingleChapter = () => {
     console.log("addSingleChapter called:", { newBook, newChapter });
     if (!newBook) {

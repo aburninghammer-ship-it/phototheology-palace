@@ -66,9 +66,13 @@ export default function ReadMeTheBible() {
   };
 
   const updateSequenceBlock = (index: number, block: ReadingSequenceBlock) => {
-    const updated = [...sequences];
-    updated[index] = block;
-    setSequences(updated);
+    console.log("updateSequenceBlock called:", { index, itemCount: block.items.length });
+    setSequences(prev => {
+      const updated = [...prev];
+      updated[index] = block;
+      console.log("Setting sequences, total items:", updated.reduce((sum, s) => sum + s.items.length, 0));
+      return updated;
+    });
   };
 
   const removeSequenceBlock = (index: number) => {
