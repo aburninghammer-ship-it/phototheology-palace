@@ -50,6 +50,7 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
   const isGeneratingRef = useRef(false); // Prevent concurrent TTS requests
   const isFetchingChapterRef = useRef(false); // Prevent concurrent chapter fetches
   const lastFetchedRef = useRef<string | null>(null); // Track last fetched chapter
+  const shouldPlayNextRef = useRef(false); // Signal to play next verse
   
   const activeSequences = sequences.filter((s) => s.enabled && s.items.length > 0);
 
@@ -67,6 +68,7 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
     isFetchingChapterRef.current = false;
     lastFetchedRef.current = null;
     isGeneratingRef.current = false;
+    shouldPlayNextRef.current = false;
     console.log("SequencePlayer mounted, refs reset. Active sequences:", activeSequences.length, "Total items:", totalItems);
   }, []);
 
@@ -158,14 +160,16 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
     audio.onplay = () => notifyTTSStarted();
     audio.onended = () => {
       notifyTTSStopped();
-      audioRef.current = null; // Clear ref so next verse can play
+      audioRef.current = null;
       
       // Move to next verse
       if (currentVerseIdx < chapterContent.verses.length - 1) {
+        shouldPlayNextRef.current = true;
         setCurrentVerseIdx((prev) => prev + 1);
       } else {
         // Move to next chapter/item
         if (currentItemIdx < totalItems - 1) {
+          shouldPlayNextRef.current = true;
           setCurrentItemIdx((prev) => prev + 1);
           setCurrentVerseIdx(0);
           setChapterContent(null);
@@ -244,7 +248,8 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
 
   // Auto-play next verse when content loads and playing, or when verse index changes
   useEffect(() => {
-    if (isPlaying && !isPaused && chapterContent && !isLoading && !isGeneratingRef.current && !audioRef.current) {
+    if (isPlaying && !isPaused && chapterContent && !isLoading && !isGeneratingRef.current && !audioRef.current && shouldPlayNextRef.current) {
+      shouldPlayNextRef.current = false;
       playCurrentVerse();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -265,6 +270,7 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
       notifyTTSStarted();
     } else {
       setIsPlaying(true);
+      shouldPlayNextRef.current = true;
       playCurrentVerse();
     }
   };
@@ -287,7 +293,8 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
     setCurrentItemIdx(0);
     setCurrentVerseIdx(0);
     setChapterContent(null);
-    lastFetchedRef.current = null; // Reset to allow fresh fetch
+    lastFetchedRef.current = null;
+    shouldPlayNextRef.current = false;
     notifyTTSStopped();
   };
 
@@ -296,11 +303,13 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
       audioRef.current.pause();
       audioRef.current = null;
     }
+    notifyTTSStopped();
     if (currentItemIdx < totalItems - 1) {
+      shouldPlayNextRef.current = isPlaying;
       setCurrentItemIdx((prev) => prev + 1);
       setCurrentVerseIdx(0);
       setChapterContent(null);
-      lastFetchedRef.current = null; // Reset to allow fresh fetch
+      lastFetchedRef.current = null;
     }
   };
 
@@ -309,12 +318,15 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
       audioRef.current.pause();
       audioRef.current = null;
     }
+    notifyTTSStopped();
     if (currentItemIdx > 0) {
+      shouldPlayNextRef.current = isPlaying;
       setCurrentItemIdx((prev) => prev - 1);
       setCurrentVerseIdx(0);
       setChapterContent(null);
-      lastFetchedRef.current = null; // Reset to allow fresh fetch
+      lastFetchedRef.current = null;
     } else {
+      shouldPlayNextRef.current = isPlaying;
       setCurrentVerseIdx(0);
     }
   };
