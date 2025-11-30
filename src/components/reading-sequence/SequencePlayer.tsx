@@ -17,6 +17,7 @@ import {
   BookOpen,
   ListMusic,
   Smartphone,
+  Download,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -24,6 +25,7 @@ import { ReadingSequenceBlock, SequenceItem } from "@/types/readingSequence";
 import { notifyTTSStarted, notifyTTSStopped } from "@/hooks/useAudioDucking";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { formatJeevesResponse } from "@/lib/formatJeevesResponse";
+import { DownloadSequenceDialog } from "./DownloadSequenceDialog";
 
 interface SequencePlayerProps {
   sequences: ReadingSequenceBlock[];
@@ -760,9 +762,19 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
             <BookOpen className="h-5 w-5 text-primary" />
             Now Playing
           </CardTitle>
-          <Badge variant="outline">
-            {currentItemIdx + 1} / {totalItems} chapters
-          </Badge>
+          <div className="flex items-center gap-2">
+            <DownloadSequenceDialog 
+              sequences={sequences}
+              trigger={
+                <Button variant="ghost" size="icon" title="Download Audio">
+                  <Download className="h-4 w-4" />
+                </Button>
+              }
+            />
+            <Badge variant="outline">
+              {currentItemIdx + 1} / {totalItems} chapters
+            </Badge>
+          </div>
         </div>
       </CardHeader>
       <CardContent className="space-y-4">
