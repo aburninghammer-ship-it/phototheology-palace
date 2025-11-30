@@ -112,64 +112,74 @@ export const SequenceBlockBuilder = ({ block, onChange, onRemove }: SequenceBloc
           <CardContent className="space-y-4">
             {/* Chapter List */}
             {block.items.length > 0 && (
-              <div className="space-y-2 p-3 bg-muted/30 rounded-lg">
+              <div className="space-y-3 p-3 bg-muted/30 rounded-lg">
                 {block.items.map((item, idx) => (
                   <div
                     key={item.id}
-                    className="flex items-center gap-2 p-2 bg-background rounded-md border"
+                    className="p-3 bg-background rounded-md border space-y-2"
                   >
-                    <GripVertical className="h-4 w-4 text-muted-foreground cursor-grab" />
-                    <span className="text-sm font-medium flex-1">
-                      {item.book} {item.chapter}
-                      {item.startVerse && `:${item.startVerse}`}
-                      {item.endVerse && `-${item.endVerse}`}
-                    </span>
-                    <div className="flex items-center gap-1">
-                      <Input
-                        type="number"
-                        placeholder="Start"
-                        className="w-16 h-7 text-xs"
-                        value={item.startVerse || ""}
-                        onChange={(e) => updateItemVerses(item.id, e.target.value ? parseInt(e.target.value) : undefined, item.endVerse)}
-                        min={1}
-                      />
-                      <span className="text-xs text-muted-foreground">-</span>
-                      <Input
-                        type="number"
-                        placeholder="End"
-                        className="w-16 h-7 text-xs"
-                        value={item.endVerse || ""}
-                        onChange={(e) => updateItemVerses(item.id, item.startVerse, e.target.value ? parseInt(e.target.value) : undefined)}
-                        min={item.startVerse || 1}
-                      />
+                    <div className="flex items-center gap-2">
+                      <GripVertical className="h-4 w-4 text-muted-foreground cursor-grab" />
+                      <span className="text-sm font-semibold flex-1">
+                        {item.book} {item.chapter}
+                        {(item.startVerse || item.endVerse) && (
+                          <span className="text-primary ml-1">
+                            :{item.startVerse || 1}-{item.endVerse || "end"}
+                          </span>
+                        )}
+                      </span>
+                      <div className="flex gap-1">
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-7 w-7"
+                          onClick={() => moveItem(idx, "up")}
+                          disabled={idx === 0}
+                        >
+                          <ChevronUp className="h-3 w-3" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-7 w-7"
+                          onClick={() => moveItem(idx, "down")}
+                          disabled={idx === block.items.length - 1}
+                        >
+                          <ChevronDown className="h-3 w-3" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-7 w-7 text-destructive hover:text-destructive"
+                          onClick={() => removeItem(item.id)}
+                        >
+                          <Trash2 className="h-3 w-3" />
+                        </Button>
+                      </div>
                     </div>
-                    <div className="flex gap-1">
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="h-7 w-7"
-                        onClick={() => moveItem(idx, "up")}
-                        disabled={idx === 0}
-                      >
-                        <ChevronUp className="h-3 w-3" />
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="h-7 w-7"
-                        onClick={() => moveItem(idx, "down")}
-                        disabled={idx === block.items.length - 1}
-                      >
-                        <ChevronDown className="h-3 w-3" />
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="h-7 w-7 text-destructive hover:text-destructive"
-                        onClick={() => removeItem(item.id)}
-                      >
-                        <Trash2 className="h-3 w-3" />
-                      </Button>
+                    {/* Verse Range Selection */}
+                    <div className="flex items-center gap-2 pl-6 pt-1 border-t border-dashed">
+                      <span className="text-xs text-muted-foreground">Verses:</span>
+                      <div className="flex items-center gap-1">
+                        <Input
+                          type="number"
+                          placeholder="Start (1)"
+                          className="w-20 h-8 text-xs"
+                          value={item.startVerse || ""}
+                          onChange={(e) => updateItemVerses(item.id, e.target.value ? parseInt(e.target.value) : undefined, item.endVerse)}
+                          min={1}
+                        />
+                        <span className="text-muted-foreground font-bold">→</span>
+                        <Input
+                          type="number"
+                          placeholder="End (all)"
+                          className="w-20 h-8 text-xs"
+                          value={item.endVerse || ""}
+                          onChange={(e) => updateItemVerses(item.id, item.startVerse, e.target.value ? parseInt(e.target.value) : undefined)}
+                          min={item.startVerse || 1}
+                        />
+                      </div>
+                      <span className="text-xs text-muted-foreground italic">(leave blank for full chapter)</span>
                     </div>
                   </div>
                 ))}
