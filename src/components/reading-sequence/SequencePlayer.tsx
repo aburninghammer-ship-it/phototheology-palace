@@ -62,6 +62,14 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
   const currentSequence = activeSequences[currentSeqIdx];
   const totalItems = allItems.length;
 
+  // Reset refs on mount to ensure fresh start
+  useEffect(() => {
+    isFetchingChapterRef.current = false;
+    lastFetchedRef.current = null;
+    isGeneratingRef.current = false;
+    console.log("SequencePlayer mounted, refs reset. Active sequences:", activeSequences.length, "Total items:", totalItems);
+  }, []);
+
   // Fetch chapter content with deduplication
   const fetchChapter = useCallback(async (book: string, chapter: number) => {
     const cacheKey = `${book}-${chapter}`;
@@ -174,24 +182,38 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
 
   // Load chapter when item changes
   useEffect(() => {
-    if (!currentItem) return;
+    if (!currentItem) {
+      console.log("No current item, skipping chapter load");
+      return;
+    }
     
     const cacheKey = `${currentItem.book}-${currentItem.chapter}`;
+    console.log("Chapter load effect triggered for:", cacheKey);
     
-    // Skip if already fetching or already have this content
+    // Skip if already fetching
     if (isFetchingChapterRef.current) {
       console.log("Already fetching, skipping load for:", cacheKey);
       return;
     }
     
+    // Skip if we already have this exact content
     if (chapterContent && chapterContent.book === currentItem.book && chapterContent.chapter === currentItem.chapter) {
       console.log("Already have content for:", cacheKey);
       return;
     }
 
     const loadChapter = async () => {
+      console.log("Starting chapter load for:", cacheKey);
       setIsLoading(true);
+      
+      // Reset lastFetchedRef to allow this fetch
+      if (lastFetchedRef.current !== cacheKey) {
+        lastFetchedRef.current = null;
+      }
+      
       const verses = await fetchChapter(currentItem.book, currentItem.chapter);
+      console.log("Fetch result:", verses ? `${verses.length} verses` : "null");
+      
       if (verses) {
         // Filter verses if start/end specified
         let filteredVerses = verses;
@@ -207,12 +229,16 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
           chapter: currentItem.chapter,
           verses: filteredVerses,
         });
+        console.log("Chapter content set:", filteredVerses.length, "verses");
+      } else {
+        console.error("Failed to load chapter:", cacheKey);
+        toast.error("Failed to load chapter. Please try again.");
       }
       setIsLoading(false);
     };
 
     loadChapter();
-  }, [currentItem?.book, currentItem?.chapter, currentItem?.startVerse, currentItem?.endVerse, fetchChapter]);
+  }, [currentItem?.book, currentItem?.chapter, currentItem?.startVerse, currentItem?.endVerse, fetchChapter, chapterContent]);
 
   // Auto-play next verse when content loads and playing
   useEffect(() => {
