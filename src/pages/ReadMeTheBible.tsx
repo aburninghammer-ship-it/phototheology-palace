@@ -154,7 +154,7 @@ export default function ReadMeTheBible() {
             Back to Builder
           </Button>
           <div className="glass-card p-6 rounded-xl">
-            <SequencePlayer sequences={sequences} onClose={() => setIsPlaying(false)} />
+            <SequencePlayer sequences={sequences} onClose={() => setIsPlaying(false)} autoPlay />
           </div>
         </div>
       </div>
