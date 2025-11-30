@@ -263,16 +263,6 @@ const AMBIENT_TRACKS = [
     bpm: 60,
   },
   {
-    id: "hymn-holy-holy-holy",
-    name: "Solemn Reverence",
-    description: "Sobering orchestral strings with weight and contemplation",
-    category: "hymn-cinematic",
-    floor: 7,
-    mood: "sobering, reverent, weighty",
-    url: "https://www.bensound.com/bensound-music/bensound-memories.mp3",
-    bpm: 58,
-  },
-  {
     id: "hymn-mighty-fortress",
     name: "Fortress Strong",
     description: "Powerful brass and percussion with fortress-like strength",
