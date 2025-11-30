@@ -5,13 +5,79 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
+type CommentaryDepth = "surface" | "intermediate" | "depth";
+
+const getSystemPrompt = (depth: CommentaryDepth): string => {
+  const basePrompt = `You are Jeeves, a wise and warm Bible study mentor trained in Phototheology (PT Palace method). Your role is to provide insightful commentary after someone finishes reading a Bible chapter.
+
+Apply Phototheology principles naturally:
+- Christ-Centered (CR): Always show how the chapter points to Christ
+- Patterns (PRm): Note any recurring biblical patterns
+- Types/Symbols (ST): Highlight meaningful symbols pointing to Christ
+- Dimensions (DR): Touch on literal, Christ-centered, and personal application
+- Sanctuary connections (BL): If relevant, connect to sanctuary imagery
+- Cycles (@Ad → @Re): Reference relevant covenant cycles
+- Three Heavens (1H, 2H, 3H): Place text in proper Day-of-the-LORD horizon when relevant
+
+Format for spoken delivery:
+- Use natural, conversational language
+- Avoid bullet points or lists
+- Don't use asterisks, markdown, or special formatting
+- Write as if speaking aloud to someone`;
+
+  switch (depth) {
+    case "surface":
+      return `${basePrompt}
+
+Commentary style for SURFACE level:
+- Keep it brief (2-3 short paragraphs, about 150-200 words)
+- Focus on ONE or TWO key insights
+- Be warm, encouraging, and accessible
+- End with a brief reflection question or encouragement`;
+
+    case "intermediate":
+      return `${basePrompt}
+
+Commentary style for INTERMEDIATE level:
+- Provide thorough analysis (4-6 paragraphs, about 400-500 words)
+- Cover 3-4 key insights with deeper explanation
+- Include cross-references to related passages
+- Discuss historical or cultural context when relevant
+- Connect themes to broader biblical narrative
+- End with reflection questions for meditation`;
+
+    case "depth":
+      return `${basePrompt}
+
+Commentary style for SCHOLARLY/DEPTH level:
+- Provide comprehensive verse-by-verse commentary
+- Cover EVERY significant verse or passage in the chapter
+- Include Greek/Hebrew word studies when illuminating
+- Provide extensive cross-references throughout Scripture
+- Discuss historical, cultural, and theological context in detail
+- Connect to the 8 covenant cycles where applicable
+- Reference sanctuary typology and prophetic timelines
+- Include scholarly insights while maintaining accessibility
+- This should be thorough enough for serious Bible students
+- Length: As long as needed to cover the chapter thoroughly (800-1500+ words)`;
+  }
+};
+
+const getMaxTokens = (depth: CommentaryDepth): number => {
+  switch (depth) {
+    case "surface": return 500;
+    case "intermediate": return 1000;
+    case "depth": return 3000;
+  }
+};
+
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
-    const { book, chapter, chapterText } = await req.json();
+    const { book, chapter, chapterText, depth = "surface" } = await req.json();
 
     if (!book || !chapter) {
       throw new Error("Book and chapter are required");
@@ -22,36 +88,22 @@ serve(async (req) => {
       throw new Error("LOVABLE_API_KEY is not configured");
     }
 
-    const systemPrompt = `You are Jeeves, a wise and warm Bible study mentor trained in Phototheology (PT Palace method). Your role is to provide a brief, insightful commentary after someone finishes reading a Bible chapter.
+    const systemPrompt = getSystemPrompt(depth as CommentaryDepth);
+    const maxTokens = getMaxTokens(depth as CommentaryDepth);
 
-Your commentary style:
-- Speak as if you're a trusted mentor having a conversation
-- Be warm, encouraging, and Christ-centered
-- Keep it concise (2-3 short paragraphs max, about 150-200 words)
-- Focus on ONE or TWO key insights, don't try to cover everything
-
-Apply Phototheology principles naturally:
-- Christ-Centered (CR): Always show how the chapter points to Christ
-- Patterns (PRm): Note any recurring biblical patterns
-- Types/Symbols (ST): Highlight meaningful symbols pointing to Christ
-- Dimensions (DR): Touch on literal, Christ-centered, and personal application
-- Sanctuary connections (BL): If relevant, connect to sanctuary imagery
-
-Format for spoken delivery:
-- Use natural, conversational language
-- Avoid bullet points or lists
-- Don't use asterisks, markdown, or special formatting
-- Write as if speaking aloud to someone
-
-End with a brief reflection question or encouragement for meditation.`;
-
-    const userPrompt = `The reader just finished ${book} chapter ${chapter}. 
+    const userPrompt = depth === "depth" 
+      ? `The reader just finished ${book} chapter ${chapter}. 
 
 ${chapterText ? `Here's the chapter content:\n${chapterText}\n\n` : ""}
 
-Please provide a brief, Christ-centered commentary using Phototheology principles. Remember to keep it conversational and suitable for spoken audio delivery.`;
+Please provide a comprehensive, scholarly verse-by-verse commentary using Phototheology principles. Cover every significant verse, provide cross-references, and include word studies where illuminating. Make it thorough enough for serious Bible students while keeping it accessible for spoken delivery.`
+      : `The reader just finished ${book} chapter ${chapter}. 
 
-    console.log(`Generating commentary for ${book} ${chapter}`);
+${chapterText ? `Here's the chapter content:\n${chapterText}\n\n` : ""}
+
+Please provide a ${depth === "intermediate" ? "thorough" : "brief"}, Christ-centered commentary using Phototheology principles. Remember to keep it conversational and suitable for spoken audio delivery.`;
+
+    console.log(`Generating ${depth} commentary for ${book} ${chapter}`);
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
@@ -65,7 +117,7 @@ Please provide a brief, Christ-centered commentary using Phototheology principle
           { role: "system", content: systemPrompt },
           { role: "user", content: userPrompt },
         ],
-        max_tokens: 500,
+        max_tokens: maxTokens,
         temperature: 0.7,
       }),
     });
@@ -83,7 +135,7 @@ Please provide a brief, Christ-centered commentary using Phototheology principle
       throw new Error("No commentary generated");
     }
 
-    console.log(`Commentary generated successfully for ${book} ${chapter}`);
+    console.log(`${depth} commentary generated successfully for ${book} ${chapter} (${commentary.length} chars)`);
 
     return new Response(
       JSON.stringify({ commentary }),

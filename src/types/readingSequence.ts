@@ -9,6 +9,8 @@ export interface SequenceItem {
   order: number;
 }
 
+export type CommentaryDepth = "surface" | "intermediate" | "depth";
+
 export interface ReadingSequenceBlock {
   sequenceNumber: number; // 1-5
   enabled: boolean;
@@ -17,6 +19,8 @@ export interface ReadingSequenceBlock {
   playbackSpeed: number;
   playOrder: "listed" | "reverse" | "shuffle";
   includeJeevesCommentary: boolean;
+  commentaryVoice?: VoiceId;
+  commentaryDepth?: CommentaryDepth;
 }
 
 export interface SavedReadingSequence {

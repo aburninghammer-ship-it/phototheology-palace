@@ -85,11 +85,11 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
   }, []);
 
   // Generate chapter commentary using Jeeves
-  const generateCommentary = useCallback(async (book: string, chapter: number, chapterText?: string) => {
+  const generateCommentary = useCallback(async (book: string, chapter: number, chapterText?: string, depth: string = "surface") => {
     try {
-      console.log("[Commentary] Generating for", book, chapter);
+      console.log("[Commentary] Generating", depth, "commentary for", book, chapter);
       const { data, error } = await supabase.functions.invoke("generate-chapter-commentary", {
-        body: { book, chapter, chapterText },
+        body: { book, chapter, chapterText, depth },
       });
 
       if (error) throw error;
@@ -380,13 +380,15 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
         
         if (includeCommentary && content && continuePlayingRef.current) {
           // Generate and play commentary before moving to next chapter
-          console.log("[Commentary] Generating for completed chapter...");
+          const commentaryVoice = currentSeq?.commentaryVoice || "daniel";
+          const commentaryDepth = currentSeq?.commentaryDepth || "surface";
+          console.log("[Commentary] Generating", commentaryDepth, "commentary for completed chapter...");
           setIsLoading(true);
           const chapterText = content.verses.map(v => `${v.verse}. ${v.text}`).join(" ");
           
-          generateCommentary(content.book, content.chapter, chapterText).then(commentary => {
+          generateCommentary(content.book, content.chapter, chapterText, commentaryDepth).then(commentary => {
             if (commentary && continuePlayingRef.current) {
-              playCommentary(commentary, voice, () => {
+              playCommentary(commentary, commentaryVoice, () => {
                 moveToNextChapter();
               });
             } else {
