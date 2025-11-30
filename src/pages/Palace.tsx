@@ -95,8 +95,8 @@ const Palace = () => {
             </div>
 
             {user && !loading && (
-              <Card className="max-w-md mx-auto mb-6">
-                <CardContent className="pt-6">
+              <Card variant="glass" className="max-w-md mx-auto mb-6">
+                <CardContent className="pt-6 relative z-10">
                   <div className="flex items-center justify-between mb-2">
                     <div className="flex items-center gap-2">
                       <TrendingUp className="h-4 w-4 text-primary" />
@@ -141,7 +141,7 @@ const Palace = () => {
           </div>
 
           {/* Palace Metaphor */}
-          <div className="mb-8 p-6 rounded-lg bg-card border border-border shadow-elegant">
+          <Card variant="glassSubtle" className="mb-8 p-6">
             <h2 className="font-serif text-2xl font-semibold mb-4 text-center">
               The Palace Metaphor
             </h2>
@@ -175,7 +175,7 @@ const Palace = () => {
                 </Link>
               </div>
             </div>
-          </div>
+          </Card>
 
           {/* Mode Tabs */}
           <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as "explore" | "progress")} className="mb-6">
@@ -223,8 +223,8 @@ const Palace = () => {
 
             <TabsContent value="progress" className="space-y-6">
               {/* Progress Overview */}
-              <Card>
-                <CardContent className="pt-6 space-y-6">
+              <Card variant="glass">
+                <CardContent className="pt-6 space-y-6 relative z-10">
                   <div className="text-center">
                     <h3 className="text-2xl font-bold mb-2">Your Journey Through the Palace</h3>
                     <p className="text-muted-foreground">Track your progress as you master each room</p>
