@@ -106,6 +106,13 @@ const MUSIC_FLOORS = [
         description: "Cinematic orchestral christian music - sweeping and reverent",
         bpm: 68,
         url: "https://cdn1.suno.ai/cfda5aef-dc1c-4ac8-876f-ce80ea0eb791.mp3",
+      },
+      {
+        id: "eternal-grace-ii",
+        name: "Eternal Grace II",
+        description: "Instrumental orchestral - cinematic and reverent",
+        bpm: 65,
+        url: "https://cdn1.suno.ai/5a7d94e9-13f6-4dae-9c16-b3dd559849b3.mp3",
       }
     ]
   },
