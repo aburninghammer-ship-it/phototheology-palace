@@ -12,6 +12,7 @@ import { ELEVENLABS_VOICES, VoiceId } from "@/hooks/useTextToSpeech";
 import { Input } from "@/components/ui/input";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { toast } from "sonner";
 
 interface SequenceBlockBuilderProps {
   block: ReadingSequenceBlock;
@@ -67,6 +68,7 @@ export const SequenceBlockBuilder = ({ block, onChange, onRemove }: SequenceBloc
       ...block,
       items: [...block.items, newItem],
     });
+    toast.success(`Added ${newBook} ${newChapter}`);
     // Keep book selected, just increment chapter for convenience
     const maxCh = CHAPTER_COUNTS[newBook] || 1;
     if (newChapter < maxCh) {
@@ -98,6 +100,7 @@ export const SequenceBlockBuilder = ({ block, onChange, onRemove }: SequenceBloc
       ...block,
       items: [...block.items, ...newItems],
     });
+    toast.success(`Added ${newItems.length} chapters from ${newBook}`);
     // Keep the book selected but reset chapters for next selection
     const maxCh = CHAPTER_COUNTS[newBook] || 1;
     setNewChapter(1);
@@ -120,6 +123,7 @@ export const SequenceBlockBuilder = ({ block, onChange, onRemove }: SequenceBloc
       ...block,
       items: [...block.items, ...newItems],
     });
+    toast.success(`Added all ${chapterCount} chapters of ${newBook}`);
   };
 
   const addBookRange = () => {
@@ -154,6 +158,8 @@ export const SequenceBlockBuilder = ({ block, onChange, onRemove }: SequenceBloc
       ...block,
       items: [...block.items, ...newItems],
     });
+    const bookCount = endIdx - startIdx + 1;
+    toast.success(`Added ${newItems.length} chapters from ${bookCount} books (${newBook} to ${endBook})`);
   };
 
   const handleAdd = () => {
