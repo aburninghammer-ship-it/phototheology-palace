@@ -48,22 +48,39 @@ export const SequenceBlockBuilder = ({ block, onChange, onRemove }: SequenceBloc
   const [endBook, setEndBook] = useState<string>("");
 
   const addSingleChapter = () => {
-    if (!newBook) return;
+    console.log("addSingleChapter called:", { newBook, newChapter });
+    if (!newBook) {
+      console.log("No book selected");
+      return;
+    }
     const newItem: SequenceItem = {
       id: crypto.randomUUID(),
       book: newBook,
       chapter: newChapter,
       order: block.items.length,
     };
+    console.log("Adding item:", newItem);
     onChange({
       ...block,
       items: [...block.items, newItem],
     });
-    setNewChapter(1);
+    // Keep book selected, just increment chapter for convenience
+    const maxCh = CHAPTER_COUNTS[newBook] || 1;
+    if (newChapter < maxCh) {
+      setNewChapter(newChapter + 1);
+    }
   };
 
   const addChapterRange = () => {
-    if (!newBook || endChapter < newChapter) return;
+    console.log("addChapterRange called:", { newBook, newChapter, endChapter });
+    if (!newBook) {
+      console.log("No book selected");
+      return;
+    }
+    if (endChapter < newChapter) {
+      console.log("End chapter less than start");
+      return;
+    }
     const newItems: SequenceItem[] = [];
     for (let ch = newChapter; ch <= endChapter; ch++) {
       newItems.push({
@@ -73,12 +90,15 @@ export const SequenceBlockBuilder = ({ block, onChange, onRemove }: SequenceBloc
         order: block.items.length + newItems.length,
       });
     }
+    console.log("Adding items:", newItems.length);
     onChange({
       ...block,
       items: [...block.items, ...newItems],
     });
+    // Keep the book selected but reset chapters for next selection
+    const maxCh = CHAPTER_COUNTS[newBook] || 1;
     setNewChapter(1);
-    setEndChapter(1);
+    setEndChapter(maxCh);
   };
 
   const addWholeBook = () => {
