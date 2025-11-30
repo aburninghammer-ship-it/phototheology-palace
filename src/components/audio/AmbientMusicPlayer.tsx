@@ -251,16 +251,6 @@ const AMBIENT_TRACKS = [
     bpm: 55,
   },
   {
-    id: "hymn-it-is-well",
-    name: "Peace Beyond Storm",
-    description: "Peaceful strings building to triumphant resolution",
-    category: "hymn-cinematic",
-    floor: 7,
-    mood: "peace, surrender, triumph",
-    url: "https://www.bensound.com/bensound-music/bensound-slowmotion.mp3",
-    bpm: 55,
-  },
-  {
     id: "hymn-great-is-thy-faithfulness",
     name: "Faithful Dawn",
     description: "Dawn-breaking orchestration with hopeful brass fanfare",
