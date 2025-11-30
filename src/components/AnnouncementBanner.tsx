@@ -40,11 +40,11 @@ export function AnnouncementBanner() {
     <AnimatePresence mode="wait">
       <motion.div
         key={announcement.id}
-        initial={{ height: 0, opacity: 0 }}
-        animate={{ height: "auto", opacity: 1 }}
-        exit={{ height: 0, opacity: 0 }}
+        initial={{ opacity: 0, y: -10 }}
+        animate={{ opacity: 1, y: 0 }}
+        exit={{ opacity: 0, y: -10 }}
         transition={{ duration: 0.3 }}
-        className={`border-b ${config.bgClass}`}
+        className={`fixed top-16 left-0 right-0 z-30 border-b ${config.bgClass}`}
       >
         <div className="container mx-auto px-4 py-3">
           <div className="flex items-start justify-between gap-4">
