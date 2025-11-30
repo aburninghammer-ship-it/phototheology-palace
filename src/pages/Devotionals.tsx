@@ -91,7 +91,7 @@ export default function Devotionals() {
         <div className="absolute top-0 right-0 w-96 h-96 bg-gradient-to-br from-amber-400/30 to-pink-400/30 rounded-full blur-3xl pointer-events-none" />
         <div className="absolute bottom-0 left-0 w-80 h-80 bg-gradient-to-tr from-cyan-400/30 to-purple-400/30 rounded-full blur-3xl pointer-events-none" />
         
-        <div className="relative max-w-6xl mx-auto">
+        <div className="relative z-10 max-w-6xl mx-auto">
           <div className="flex items-center gap-4 mb-6">
             <div className="p-4 rounded-2xl bg-white/20 backdrop-blur-sm shadow-xl">
               <Book className="h-10 w-10 text-white" />

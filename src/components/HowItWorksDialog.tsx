@@ -58,7 +58,7 @@ export const HowItWorksDialog = ({ title, steps, gradient }: HowItWorksDialogPro
   return (
     <Dialog open={open} onOpenChange={(isOpen) => { setOpen(isOpen); if (!isOpen) setCurrentStep(0); }}>
       <DialogTrigger asChild>
-        <Button variant="outline" size="sm" className="gap-2 border-white/20 hover:bg-white/10">
+        <Button variant="outline" size="sm" className="gap-2 border-white/20 hover:bg-white/10 relative z-10">
           <HelpCircle className="h-4 w-4" />
           How to Use
         </Button>
