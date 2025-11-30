@@ -496,6 +496,8 @@ export function AmbientMusicPlayer({
     if (!audioRef.current) {
       audioRef.current = new Audio();
       audioRef.current.loop = loopMode === "one";
+      // FORCE initial volume to 5%
+      audioRef.current.volume = 0.05;
       
       // Handle track ended for "all" loop mode
       audioRef.current.onended = () => {
@@ -511,7 +513,16 @@ export function AmbientMusicPlayer({
       };
     }
     
+    // FORCE volume cap every 500ms as a failsafe
+    const enforceVolume = setInterval(() => {
+      if (audioRef.current && audioRef.current.volume > 0.05) {
+        console.log('[AmbientMusic] ENFORCING volume cap from', audioRef.current.volume, 'to 0.05');
+        audioRef.current.volume = 0.05;
+      }
+    }, 500);
+    
     return () => {
+      clearInterval(enforceVolume);
       if (audioRef.current) {
         audioRef.current.pause();
         audioRef.current.onended = null;
