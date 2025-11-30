@@ -156,19 +156,29 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
       return;
     }
 
+    // Stop any existing audio BEFORE setting up new one
+    if (audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current.onended = null;
+      audioRef.current.onerror = null;
+      audioRef.current = null;
+    }
+    
     // Clean up previous audio URL
     if (audioUrl) {
       URL.revokeObjectURL(audioUrl);
     }
-    setAudioUrl(url);
 
-    // Create and configure audio element
+    // Create and configure audio element FIRST
     console.log("[PlayVerse] Creating Audio element with volume:", isMuted ? 0 : volume / 100);
     const audio = new Audio(url);
     audio.volume = isMuted ? 0 : volume / 100;
     
-    // Store reference before setting handlers
+    // Store reference BEFORE any async operations
     audioRef.current = audio;
+    
+    // Set URL state AFTER audio is ready (don't trigger cleanup re-render during setup)
+    setAudioUrl(url);
 
     audio.onloadstart = () => {
       console.log("[Audio] Load started for verse:", verseIdx + 1);
@@ -482,18 +492,17 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
     }
   };
 
-  // Cleanup
+  // Cleanup on unmount only - not on audioUrl change (that was causing the race condition)
   useEffect(() => {
     return () => {
+      continuePlayingRef.current = false;
       if (audioRef.current) {
         audioRef.current.pause();
-      }
-      if (audioUrl) {
-        URL.revokeObjectURL(audioUrl);
+        audioRef.current = null;
       }
       notifyTTSStopped();
     };
-  }, [audioUrl]);
+  }, []);
 
   if (activeSequences.length === 0) {
     return (
