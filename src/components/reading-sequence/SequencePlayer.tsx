@@ -49,7 +49,7 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
   const [currentVerseIdx, setCurrentVerseIdx] = useState(0);
   const [volume, setVolume] = useState(100);
   const [isMuted, setIsMuted] = useState(false);
-  const [musicVolume, setMusicVolume] = useState(() => Math.min(getGlobalMusicVolume(), 5));
+  const [musicVolume, setMusicVolume] = useState(() => Math.min(getGlobalMusicVolume(), 15));
   const [chapterContent, setChapterContent] = useState<ChapterContent | null>(null);
   const [audioUrl, setAudioUrl] = useState<string | null>(null);
   const [hasStarted, setHasStarted] = useState(false);
@@ -96,11 +96,11 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
     commentaryCache.current.clear();
     prefetchingCommentaryRef.current.clear();
     
-    // Force music volume down on mount - cap at 5%
-    const cappedVolume = Math.min(getGlobalMusicVolume(), 5);
-    setMusicVolume(cappedVolume);
-    setGlobalMusicVolume(cappedVolume);
-    console.log("[SequencePlayer] FORCED music volume to:", cappedVolume);
+    // Set music volume to reasonable default on mount
+    const defaultMusic = Math.min(getGlobalMusicVolume(), 15);
+    setMusicVolume(defaultMusic);
+    setGlobalMusicVolume(defaultMusic);
+    console.log("[SequencePlayer] Music volume initialized to:", defaultMusic);
     
     console.log("SequencePlayer mounted, refs reset. Active sequences:", activeSequences.length, "Total items:", totalItems);
   }, []);
@@ -1165,13 +1165,13 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
           </div>
         ) : (
           <div className="space-y-3 px-4">
-            {/* Music Volume Slider - works on mobile! */}
+            {/* Music Volume Slider */}
             <div className="flex items-center gap-3">
               <ListMusic className="h-4 w-4 text-muted-foreground" />
               <span className="text-xs text-muted-foreground w-12">Music</span>
               <Slider
                 value={[musicVolume]}
-                max={15}
+                max={30}
                 step={1}
                 onValueChange={(v) => {
                   setMusicVolume(v[0]);
