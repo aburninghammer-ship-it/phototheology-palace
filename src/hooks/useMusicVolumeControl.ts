@@ -9,12 +9,12 @@ let currentVolume = 8; // default 8%
 if (typeof window !== 'undefined') {
   const stored = localStorage.getItem('pt-music-volume-pct');
   if (stored) {
-    currentVolume = Math.min(parseInt(stored, 10), 30); // Cap at 30%
+    currentVolume = parseInt(stored, 10);
   }
 }
 
 export const setGlobalMusicVolume = (volume: number) => {
-  currentVolume = Math.min(volume, 30); // Cap at 30%
+  currentVolume = volume;
   localStorage.setItem('pt-music-volume-pct', currentVolume.toString());
   volumeListeners.forEach(listener => listener(currentVolume));
   console.log('[MusicVolumeControl] Set volume to:', currentVolume, '%');
