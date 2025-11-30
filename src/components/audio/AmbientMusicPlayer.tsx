@@ -444,14 +444,34 @@ export function AmbientMusicPlayer({
   });
 
   // Audio ducking - reduce volume when TTS is playing
+  // On mobile, pause/resume instead of ducking (since programmatic volume doesn't work)
+  const wasPlayingBeforeDuckRef = useRef(false);
+  
   const handleDuckChange = useCallback((ducked: boolean, duckRatio: number) => {
     setDuckMultiplier(duckRatio);
     if (audioRef.current) {
-      const effectiveVolume = isMuted ? 0 : volume * duckRatio;
-      audioRef.current.volume = effectiveVolume;
-      console.log(`[AmbientMusic] ${ducked ? 'Ducking' : 'Restoring'} volume to ${effectiveVolume}`);
+      if (isMobile) {
+        // On mobile: pause music during TTS, resume after
+        if (ducked) {
+          wasPlayingBeforeDuckRef.current = isPlaying;
+          if (isPlaying) {
+            audioRef.current.pause();
+            console.log('[AmbientMusic] Mobile: Pausing music for TTS');
+          }
+        } else {
+          if (wasPlayingBeforeDuckRef.current) {
+            audioRef.current.play().catch(console.error);
+            console.log('[AmbientMusic] Mobile: Resuming music after TTS');
+          }
+        }
+      } else {
+        // On desktop: duck the volume
+        const effectiveVolume = isMuted ? 0 : volume * duckRatio;
+        audioRef.current.volume = effectiveVolume;
+        console.log(`[AmbientMusic] ${ducked ? 'Ducking' : 'Restoring'} volume to ${effectiveVolume}`);
+      }
     }
-  }, [volume, isMuted]);
+  }, [volume, isMuted, isMobile, isPlaying]);
 
   useAudioDucking(handleDuckChange);
 
