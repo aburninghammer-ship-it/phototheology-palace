@@ -131,75 +131,95 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
     }
   }, []);
 
-  // Play a specific verse by index
+  // Play a specific verse by index - using a stable ref to avoid stale closures
   const playVerseAtIndex = useCallback(async (verseIdx: number, content: ChapterContent, voice: string) => {
     if (isGeneratingRef.current) {
-      console.log("Already generating TTS, skipping...");
+      console.log("Already generating TTS, skipping verse:", verseIdx + 1);
       return;
     }
-    if (!content || verseIdx >= content.verses.length) return;
+    if (!content || verseIdx >= content.verses.length) {
+      console.log("Invalid verse index or content");
+      return;
+    }
 
     isGeneratingRef.current = true;
     const verse = content.verses[verseIdx];
 
-    console.log("Playing verse:", verseIdx + 1, "of", content.verses.length);
+    console.log("=== Starting TTS for verse:", verseIdx + 1, "of", content.verses.length);
 
     setIsLoading(true);
+    setCurrentVerseIdx(verseIdx);
+    
     const url = await generateTTS(verse.text, voice);
-    setIsLoading(false);
+    
     isGeneratingRef.current = false;
+    setIsLoading(false);
 
     if (!url) {
+      console.error("Failed to generate TTS URL");
       toast.error("Failed to generate audio");
       continuePlayingRef.current = false;
       return;
     }
 
-    if (audioUrl) URL.revokeObjectURL(audioUrl);
+    // Clean up previous audio URL
+    if (audioUrl) {
+      URL.revokeObjectURL(audioUrl);
+    }
     setAudioUrl(url);
 
+    // Create and configure audio element
     const audio = new Audio(url);
     audio.volume = isMuted ? 0 : volume / 100;
+    
+    // Store reference before setting handlers
     audioRef.current = audio;
 
     audio.onplay = () => {
-      console.log("Audio started playing verse:", verseIdx + 1);
+      console.log(">>> Audio playing verse:", verseIdx + 1);
       notifyTTSStarted();
     };
     
     audio.onended = () => {
-      console.log("Audio ended for verse:", verseIdx + 1, "continuePlayingRef:", continuePlayingRef.current);
+      console.log("<<< Audio ended verse:", verseIdx + 1, "| continue:", continuePlayingRef.current);
       notifyTTSStopped();
+      
+      // Clear the audio ref immediately
       audioRef.current = null;
       
       if (!continuePlayingRef.current) {
-        console.log("Stopping - continuePlayingRef is false");
+        console.log("Not continuing - flag is false");
         return;
       }
       
       const nextVerseIdx = verseIdx + 1;
       
-      // Move to next verse
       if (nextVerseIdx < content.verses.length) {
-        console.log("Queuing next verse:", nextVerseIdx + 1);
-        setCurrentVerseIdx(nextVerseIdx);
-        // Queue the next verse to play
-        pendingVerseRef.current = { verseIdx: nextVerseIdx, content, voice };
+        console.log("Scheduling next verse:", nextVerseIdx + 1);
+        // Use setTimeout to ensure clean state transition
+        setTimeout(() => {
+          if (continuePlayingRef.current) {
+            playVerseAtIndex(nextVerseIdx, content, voice);
+          }
+        }, 100);
       } else {
-        // Move to next chapter/item
-        if (currentItemIdx < totalItems - 1) {
-          console.log("Moving to next chapter");
-          shouldPlayNextRef.current = true;
-          setCurrentItemIdx((prev) => prev + 1);
+        // Move to next chapter
+        console.log("Chapter complete, checking for next...");
+        shouldPlayNextRef.current = true;
+        setCurrentItemIdx((prev) => {
+          const nextIdx = prev + 1;
+          if (nextIdx >= totalItems) {
+            console.log("All chapters complete!");
+            setIsPlaying(false);
+            continuePlayingRef.current = false;
+            toast.success("Reading sequence complete!");
+            return prev;
+          }
+          console.log("Moving to chapter:", nextIdx + 1);
           setCurrentVerseIdx(0);
           setChapterContent(null);
-        } else {
-          // Finished all
-          console.log("Finished all chapters");
-          setIsPlaying(false);
-          continuePlayingRef.current = false;
-          toast.success("Reading sequence complete!");
-        }
+          return nextIdx;
+        });
       }
     };
 
@@ -207,23 +227,22 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
       console.error("Audio error:", e);
       notifyTTSStopped();
       audioRef.current = null;
+      isGeneratingRef.current = false;
       continuePlayingRef.current = false;
     };
 
-    audio.play();
-    setIsPlaying(true);
-    setIsPaused(false);
-  }, [audioUrl, volume, isMuted, currentItemIdx, totalItems, generateTTS]);
-
-  // Effect to play pending verse (triggered when a verse ends and queues next)
-  useEffect(() => {
-    const pending = pendingVerseRef.current;
-    if (pending && continuePlayingRef.current && !isGeneratingRef.current && !audioRef.current) {
-      console.log("Playing pending verse:", pending.verseIdx + 1);
-      pendingVerseRef.current = null;
-      playVerseAtIndex(pending.verseIdx, pending.content, pending.voice);
+    // Start playback
+    try {
+      await audio.play();
+      console.log("Audio play() called successfully");
+      setIsPlaying(true);
+      setIsPaused(false);
+    } catch (e) {
+      console.error("Failed to play audio:", e);
+      audioRef.current = null;
+      isGeneratingRef.current = false;
     }
-  });
+  }, [audioUrl, volume, isMuted, totalItems, generateTTS]);
 
   // Play current verse (wrapper for playVerseAtIndex)
   const playCurrentVerse = useCallback(() => {
@@ -295,30 +314,43 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
 
   // Auto-play when new chapter content loads (for chapter transitions)
   useEffect(() => {
-    if (isPlaying && !isPaused && chapterContent && !isLoading && !isGeneratingRef.current && !audioRef.current && shouldPlayNextRef.current) {
+    if (shouldPlayNextRef.current && chapterContent && !isLoading && !isGeneratingRef.current && !audioRef.current) {
+      console.log("Auto-playing next chapter after transition");
       shouldPlayNextRef.current = false;
-      playCurrentVerse();
+      const voice = currentSequence?.voice || "daniel";
+      continuePlayingRef.current = true;
+      playVerseAtIndex(0, chapterContent, voice);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [chapterContent, isPlaying, isPaused, isLoading]);
+  }, [chapterContent, isLoading, currentSequence, playVerseAtIndex]);
 
-  // Auto-start (only once)
+  // Auto-start on mount (only once)
   useEffect(() => {
-    if (autoPlay && chapterContent && !hasStarted) {
+    if (autoPlay && chapterContent && !hasStarted && !isLoading) {
+      console.log("Auto-starting playback on mount");
       setHasStarted(true);
-      handlePlay();
+      const voice = currentSequence?.voice || "daniel";
+      continuePlayingRef.current = true;
+      setIsPlaying(true);
+      playVerseAtIndex(0, chapterContent, voice);
     }
-  }, [autoPlay, chapterContent, hasStarted]);
+  }, [autoPlay, chapterContent, hasStarted, isLoading, currentSequence, playVerseAtIndex]);
 
   const handlePlay = () => {
+    console.log("handlePlay called - isPaused:", isPaused, "hasAudio:", !!audioRef.current);
     if (isPaused && audioRef.current) {
+      // Resume paused audio
       continuePlayingRef.current = true;
       audioRef.current.play();
       setIsPaused(false);
-      notifyTTSStarted();
-    } else {
       setIsPlaying(true);
-      playCurrentVerse();
+      notifyTTSStarted();
+    } else if (chapterContent) {
+      // Start fresh playback
+      console.log("Starting fresh playback from verse:", currentVerseIdx + 1);
+      const voice = currentSequence?.voice || "daniel";
+      continuePlayingRef.current = true;
+      setIsPlaying(true);
+      playVerseAtIndex(currentVerseIdx, chapterContent, voice);
     }
   };
 
