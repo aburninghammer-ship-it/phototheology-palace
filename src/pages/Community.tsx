@@ -426,7 +426,7 @@ const Community = () => {
         <div className="max-w-5xl mx-auto space-y-6">
           {/* Header */}
           <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-primary/10 via-accent/10 to-background p-8 border">
-            <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 rounded-full blur-3xl" />
+            <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 rounded-full blur-3xl pointer-events-none" />
             <div className="relative z-10">
               <div className="flex items-center justify-between">
                 <div>

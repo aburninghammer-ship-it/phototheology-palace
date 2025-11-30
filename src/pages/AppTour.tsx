@@ -181,7 +181,7 @@ const AppTour = () => {
             
             <CardHeader className="relative">
               {/* Corner glow */}
-              <div className="absolute -top-20 -right-20 w-64 h-64 bg-gradient-to-br from-violet-500/20 to-purple-600/20 rounded-full blur-3xl" />
+              <div className="absolute -top-20 -right-20 w-64 h-64 bg-gradient-to-br from-violet-500/20 to-purple-600/20 rounded-full blur-3xl pointer-events-none" />
               
               <CardTitle className="flex items-center gap-2 text-2xl relative z-10">
                 <motion.div 
@@ -248,7 +248,7 @@ const AppTour = () => {
                   
                   <CardHeader className="relative">
                     {/* Corner glow */}
-                    <div className={`absolute -top-20 -right-20 w-64 h-64 bg-gradient-to-br ${section.gradient} opacity-10 rounded-full blur-3xl`} />
+                    <div className={`absolute -top-20 -right-20 w-64 h-64 bg-gradient-to-br ${section.gradient} opacity-10 rounded-full blur-3xl pointer-events-none`} />
                     
                     <div className="flex items-start justify-between relative z-10">
                       <div className="flex items-center gap-3">
@@ -333,7 +333,7 @@ const AppTour = () => {
             <div className="h-1.5 bg-gradient-to-r from-amber-500 via-orange-500 to-red-500" />
             
             <CardHeader className="relative">
-              <div className="absolute -top-20 -right-20 w-64 h-64 bg-gradient-to-br from-amber-500/20 to-orange-600/20 rounded-full blur-3xl" />
+              <div className="absolute -top-20 -right-20 w-64 h-64 bg-gradient-to-br from-amber-500/20 to-orange-600/20 rounded-full blur-3xl pointer-events-none" />
               
               <CardTitle className="text-2xl flex items-center gap-2 relative z-10">
                 <motion.div 
@@ -416,7 +416,7 @@ const AppTour = () => {
               opacity: [0.2, 0.4, 0.2],
             }}
             transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
-            className="absolute top-0 left-1/4 w-64 h-64 rounded-full bg-white/20 blur-3xl"
+            className="absolute top-0 left-1/4 w-64 h-64 rounded-full bg-white/20 blur-3xl pointer-events-none"
           />
           
           <div className="relative z-10 p-8 text-center">
