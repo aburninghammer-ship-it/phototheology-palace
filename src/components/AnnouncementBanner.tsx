@@ -6,22 +6,22 @@ import { motion, AnimatePresence } from "framer-motion";
 const typeConfig = {
   info: {
     icon: Megaphone,
-    bgClass: "bg-primary/10 border-primary/20",
+    bgClass: "bg-card border-primary/30",
     iconClass: "text-primary"
   },
   warning: {
     icon: AlertTriangle,
-    bgClass: "bg-yellow-500/10 border-yellow-500/20",
+    bgClass: "bg-card border-yellow-500/30",
     iconClass: "text-yellow-500"
   },
   success: {
     icon: CheckCircle,
-    bgClass: "bg-green-500/10 border-green-500/20",
+    bgClass: "bg-card border-green-500/30",
     iconClass: "text-green-500"
   },
   update: {
     icon: Sparkles,
-    bgClass: "bg-purple-500/10 border-purple-500/20",
+    bgClass: "bg-card border-purple-500/30",
     iconClass: "text-purple-500"
   }
 };
@@ -44,7 +44,7 @@ export function AnnouncementBanner() {
         animate={{ opacity: 1, y: 0 }}
         exit={{ opacity: 0, y: -10 }}
         transition={{ duration: 0.3 }}
-        className={`fixed top-16 left-0 right-0 z-30 border-b ${config.bgClass}`}
+        className={`fixed top-16 left-0 right-0 z-30 border-b backdrop-blur-xl ${config.bgClass}`}
       >
         <div className="container mx-auto px-4 py-3">
           <div className="flex items-start justify-between gap-4">
