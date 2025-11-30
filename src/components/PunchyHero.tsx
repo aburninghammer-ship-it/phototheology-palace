@@ -76,7 +76,7 @@ export const PunchyHero = () => {
             onClick={() => navigate(user ? "/palace" : "/auth")}
             className="text-xl px-10 py-7 gradient-palace shadow-2xl hover:shadow-primary/30 hover:scale-105 transition-all duration-300"
           >
-            Start Free — Forever
+            Start Free Trial
             <ChevronRight className="ml-2 h-6 w-6" />
           </Button>
           <p className="text-sm text-muted-foreground">
