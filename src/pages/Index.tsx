@@ -34,6 +34,7 @@ import { MagicEyeEasterEgg } from "@/components/MagicEyeEasterEgg";
 import { ExplainerVideo } from "@/components/ExplainerVideo";
 import { WhatPhototheologyDoes } from "@/components/WhatPhototheologyDoes";
 import { InsideThePalace } from "@/components/InsideThePalace";
+import { ComparisonChart } from "@/components/ComparisonChart";
 
 const Index = () => {
   const navigate = useNavigate();
@@ -95,6 +96,9 @@ const Index = () => {
 
       {/* Explainer Video */}
       <ExplainerVideo />
+
+      {/* Comparison Chart */}
+      <ComparisonChart />
 
       {/* What Phototheology Does - 3 Frame Slider */}
       <WhatPhototheologyDoes />
