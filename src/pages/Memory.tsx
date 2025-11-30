@@ -4,7 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Brain, Plus, Users, Trophy, Book, Sparkles, Gamepad2, Play, ArrowRight, Target } from "lucide-react";
+import { Brain, Plus, Users, Trophy, Book, Sparkles, Gamepad2, Play, ArrowRight, Target, ArrowLeft } from "lucide-react";
 import { HowItWorksDialog } from "@/components/HowItWorksDialog";
 import { memoryPalaceSteps } from "@/config/howItWorksSteps";
 import { toast } from "sonner";
@@ -52,7 +52,16 @@ export default function Memory() {
 
       <div className="container mx-auto px-4 py-8 max-w-7xl relative">
         {/* Header */}
-        <div className="mb-8 text-center">
+        <div className="mb-8 text-center relative">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => navigate("/dashboard")}
+            className="absolute left-0 top-0 gap-2"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            Back
+          </Button>
           <div className="flex items-center justify-center gap-3 mb-4">
             <div className="relative">
               <Brain className="h-12 w-12 text-primary relative z-10" />
