@@ -63,12 +63,12 @@ export const HowItWorksDialog = ({ title, steps, gradient }: HowItWorksDialogPro
           How to Use
         </Button>
       </DialogTrigger>
-      <DialogContent variant="glass" className="max-w-2xl p-0 overflow-visible">
+      <DialogContent variant="default" className="max-w-2xl p-0 overflow-hidden border-0 bg-card/95 backdrop-blur-xl">
         {/* Gradient top border */}
         <div className={`h-1.5 bg-gradient-to-r ${stepGradient}`} />
         
         {/* Animated background orbs */}
-        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
           <motion.div
             key={`orb-${safeCurrentStep}`}
             animate={{ 
