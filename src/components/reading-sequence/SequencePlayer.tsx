@@ -106,6 +106,14 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
     console.log("SequencePlayer mounted, refs reset. Active sequences:", activeSequences.length, "Total items:", totalItems);
   }, []);
 
+  // Callback ref for music audio - ensures volume is set when element mounts
+  const setMusicAudioRef = useCallback((node: HTMLAudioElement | null) => {
+    if (node) {
+      node.volume = musicVolume / 100;
+      musicAudioRef.current = node;
+    }
+  }, []);
+
   // Update music volume directly on ref
   useEffect(() => {
     if (musicAudioRef.current) {
@@ -1007,10 +1015,14 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
     <>
       {/* Hidden background music audio element */}
       <audio
-        ref={musicAudioRef}
+        ref={setMusicAudioRef}
         src="https://cdn.pixabay.com/download/audio/2022/02/22/audio_d1718ab41b.mp3"
         loop
         preload="auto"
+        onLoadedData={(e) => {
+          const audio = e.currentTarget;
+          audio.volume = musicVolume / 100;
+        }}
       />
       <Card className="overflow-hidden glass-card border-white/10 bg-card/50 backdrop-blur-xl">
       <div className="h-1 bg-gradient-to-r from-primary via-accent to-primary" />
