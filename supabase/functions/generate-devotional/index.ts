@@ -315,8 +315,9 @@ Generate all ${duration} days as a JSON array. Each day should progressively bui
     console.log("Calling AI to generate devotional...");
     console.log("CADE enabled:", !!primaryIssue);
 
-    // For large devotionals (40+ days), use batching to avoid timeouts
-    const batchSize = duration > 21 ? 14 : duration; // Generate in batches of 14 days max
+    // For large devotionals, use batching to avoid timeouts
+    // Use smaller batches for faster generation
+    const batchSize = duration > 14 ? 7 : duration; // Generate in batches of 7 days max
     const batches = Math.ceil(duration / batchSize);
     let allDays: any[] = [];
     
@@ -337,9 +338,9 @@ Generate ${daysInBatch} days (starting from day_number ${startDay}) as a JSON ar
 IMPORTANT: Start numbering from day_number: ${startDay}`
         : userPrompt;
       
-      // Create AbortController with 120 second timeout for each batch
+      // Create AbortController with 90 second timeout for each batch
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 120000);
+      const timeoutId = setTimeout(() => controller.abort(), 90000);
       
       try {
         const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
@@ -349,12 +350,11 @@ IMPORTANT: Start numbering from day_number: ${startDay}`
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            model: "google/gemini-2.5-flash",
+            model: "google/gemini-2.5-flash-lite", // Use faster model for devotionals
             messages: [
               { role: "system", content: systemPrompt },
               { role: "user", content: batchUserPrompt },
             ],
-            temperature: 0.7,
           }),
           signal: controller.signal,
         });

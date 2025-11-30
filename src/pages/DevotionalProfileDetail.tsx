@@ -69,7 +69,7 @@ export default function DevotionalProfileDetail() {
         studyStyle: profile.preferred_tone || "gentle",
       });
 
-      // Generate content
+      // Generate content - include CADE fields from profile
       await generateDevotional.mutateAsync({
         planId: newPlan.id,
         theme,
@@ -77,6 +77,10 @@ export default function DevotionalProfileDetail() {
         duration: 7,
         studyStyle: profile.preferred_tone || "gentle",
         profileName: profile.name,
+        // CADE context fields
+        primaryIssue: profile.primary_issue || (profile.struggles?.[0] || undefined),
+        issueDescription: profile.issue_description || profile.current_situation || undefined,
+        issueSeverity: profile.issue_severity || "moderate",
       });
 
       // Update the profile with the active plan
@@ -92,11 +96,12 @@ export default function DevotionalProfileDetail() {
         title: "Devotional Plan Created!",
         description: `A 7-day plan has been generated for ${profile.name}.`,
       });
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error generating plan:", error);
+      const errorMessage = error?.message || "Could not generate the devotional plan. Please try again.";
       toast({
         title: "Generation Failed",
-        description: "Could not generate the devotional plan. Please try again.",
+        description: errorMessage,
         variant: "destructive",
       });
     }
