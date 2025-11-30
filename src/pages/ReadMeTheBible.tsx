@@ -198,9 +198,11 @@ export default function ReadMeTheBible() {
             </Link>
           </div>
           <div className="glass-card p-6 rounded-2xl flex items-center gap-4">
-            <div className="p-4 rounded-xl bg-gradient-palace shadow-lg shadow-primary/20">
-              <Headphones className="h-10 w-10 text-white" />
-            </div>
+            <img 
+              src="/pwa-192x192.png" 
+              alt="Phototheology" 
+              className="h-16 w-16 rounded-xl shadow-lg shadow-primary/20"
+            />
             <div>
               <h1 className="text-4xl font-serif font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">Read Me the Bible</h1>
               <p className="text-muted-foreground">
