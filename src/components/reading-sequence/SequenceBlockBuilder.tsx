@@ -11,6 +11,7 @@ import { ReadingSequenceBlock, SequenceItem } from "@/types/readingSequence";
 import { ELEVENLABS_VOICES, VoiceId } from "@/hooks/useTextToSpeech";
 import { Input } from "@/components/ui/input";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 interface SequenceBlockBuilderProps {
   block: ReadingSequenceBlock;
@@ -36,12 +37,17 @@ const CHAPTER_COUNTS: Record<string, number> = {
   "1 John": 5, "2 John": 1, "3 John": 1, Jude: 1, Revelation: 22,
 };
 
+type SelectionMode = "single" | "chapters" | "book" | "books";
+
 export const SequenceBlockBuilder = ({ block, onChange, onRemove }: SequenceBlockBuilderProps) => {
   const [isExpanded, setIsExpanded] = useState(true);
+  const [selectionMode, setSelectionMode] = useState<SelectionMode>("single");
   const [newBook, setNewBook] = useState<string>("");
   const [newChapter, setNewChapter] = useState<number>(1);
+  const [endChapter, setEndChapter] = useState<number>(1);
+  const [endBook, setEndBook] = useState<string>("");
 
-  const addItem = () => {
+  const addSingleChapter = () => {
     if (!newBook) return;
     const newItem: SequenceItem = {
       id: crypto.randomUUID(),
@@ -54,6 +60,85 @@ export const SequenceBlockBuilder = ({ block, onChange, onRemove }: SequenceBloc
       items: [...block.items, newItem],
     });
     setNewChapter(1);
+  };
+
+  const addChapterRange = () => {
+    if (!newBook || endChapter < newChapter) return;
+    const newItems: SequenceItem[] = [];
+    for (let ch = newChapter; ch <= endChapter; ch++) {
+      newItems.push({
+        id: crypto.randomUUID(),
+        book: newBook,
+        chapter: ch,
+        order: block.items.length + newItems.length,
+      });
+    }
+    onChange({
+      ...block,
+      items: [...block.items, ...newItems],
+    });
+    setNewChapter(1);
+    setEndChapter(1);
+  };
+
+  const addWholeBook = () => {
+    if (!newBook) return;
+    const chapterCount = CHAPTER_COUNTS[newBook] || 1;
+    const newItems: SequenceItem[] = [];
+    for (let ch = 1; ch <= chapterCount; ch++) {
+      newItems.push({
+        id: crypto.randomUUID(),
+        book: newBook,
+        chapter: ch,
+        order: block.items.length + newItems.length,
+      });
+    }
+    onChange({
+      ...block,
+      items: [...block.items, ...newItems],
+    });
+  };
+
+  const addBookRange = () => {
+    if (!newBook || !endBook) return;
+    const startIdx = BIBLE_BOOKS.indexOf(newBook);
+    const endIdx = BIBLE_BOOKS.indexOf(endBook);
+    if (startIdx === -1 || endIdx === -1 || endIdx < startIdx) return;
+
+    const newItems: SequenceItem[] = [];
+    for (let bookIdx = startIdx; bookIdx <= endIdx; bookIdx++) {
+      const bookName = BIBLE_BOOKS[bookIdx];
+      const chapterCount = CHAPTER_COUNTS[bookName] || 1;
+      for (let ch = 1; ch <= chapterCount; ch++) {
+        newItems.push({
+          id: crypto.randomUUID(),
+          book: bookName,
+          chapter: ch,
+          order: block.items.length + newItems.length,
+        });
+      }
+    }
+    onChange({
+      ...block,
+      items: [...block.items, ...newItems],
+    });
+  };
+
+  const handleAdd = () => {
+    switch (selectionMode) {
+      case "single":
+        addSingleChapter();
+        break;
+      case "chapters":
+        addChapterRange();
+        break;
+      case "book":
+        addWholeBook();
+        break;
+      case "books":
+        addBookRange();
+        break;
+    }
   };
 
   const removeItem = (id: string) => {
@@ -80,6 +165,23 @@ export const SequenceBlockBuilder = ({ block, onChange, onRemove }: SequenceBloc
     });
   };
 
+  // Get count summary for display
+  const getItemsSummary = () => {
+    const bookCounts: Record<string, number> = {};
+    block.items.forEach(item => {
+      bookCounts[item.book] = (bookCounts[item.book] || 0) + 1;
+    });
+    const books = Object.keys(bookCounts);
+    if (books.length === 0) return null;
+    if (books.length === 1) {
+      const count = bookCounts[books[0]];
+      const total = CHAPTER_COUNTS[books[0]] || 1;
+      if (count === total) return `${books[0]} (whole book)`;
+      return `${count} chapter${count !== 1 ? "s" : ""} from ${books[0]}`;
+    }
+    return `${block.items.length} chapters from ${books.length} books`;
+  };
+
   return (
     <Card className={`glass-card border-2 transition-all backdrop-blur-xl ${block.enabled ? "border-primary/30 bg-card/50" : "border-muted/30 opacity-60 bg-muted/20"}`}>
       <Collapsible open={isExpanded} onOpenChange={setIsExpanded}>
@@ -95,7 +197,7 @@ export const SequenceBlockBuilder = ({ block, onChange, onRemove }: SequenceBloc
                 Sequence {block.sequenceNumber}
                 {block.items.length > 0 && (
                   <Badge variant="secondary" className="ml-2">
-                    {block.items.length} chapter{block.items.length !== 1 ? "s" : ""}
+                    {getItemsSummary()}
                   </Badge>
                 )}
               </CardTitle>
@@ -112,7 +214,7 @@ export const SequenceBlockBuilder = ({ block, onChange, onRemove }: SequenceBloc
           <CardContent className="space-y-4">
             {/* Chapter List */}
             {block.items.length > 0 && (
-              <div className="space-y-3 p-3 bg-muted/30 rounded-lg">
+              <div className="space-y-3 p-3 bg-muted/30 rounded-lg max-h-[300px] overflow-y-auto">
                 {block.items.map((item, idx) => (
                   <div
                     key={item.id}
@@ -186,46 +288,196 @@ export const SequenceBlockBuilder = ({ block, onChange, onRemove }: SequenceBloc
               </div>
             )}
 
-            {/* Add Chapter */}
-            <div className="flex gap-2 items-end">
-              <div className="flex-1">
-                <Label className="text-xs text-muted-foreground">Book</Label>
-                <Select value={newBook} onValueChange={setNewBook}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select book" />
-                  </SelectTrigger>
-                  <SelectContent className="max-h-[300px]">
-                    {BIBLE_BOOKS.map((book) => (
-                      <SelectItem key={book} value={book}>
-                        {book}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-              <div className="w-24">
-                <Label className="text-xs text-muted-foreground">Chapter</Label>
-                <Select
-                  value={String(newChapter)}
-                  onValueChange={(v) => setNewChapter(parseInt(v))}
-                  disabled={!newBook}
-                >
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent className="max-h-[200px]">
-                    {Array.from({ length: CHAPTER_COUNTS[newBook] || 1 }, (_, i) => i + 1).map((ch) => (
-                      <SelectItem key={ch} value={String(ch)}>
-                        {ch}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-              <Button onClick={addItem} disabled={!newBook} size="sm">
-                <Plus className="h-4 w-4 mr-1" />
-                Add
-              </Button>
+            {/* Selection Mode Tabs */}
+            <div className="space-y-3">
+              <Tabs value={selectionMode} onValueChange={(v) => setSelectionMode(v as SelectionMode)}>
+                <TabsList className="grid w-full grid-cols-4 h-9">
+                  <TabsTrigger value="single" className="text-xs">Single Chapter</TabsTrigger>
+                  <TabsTrigger value="chapters" className="text-xs">Chapter Range</TabsTrigger>
+                  <TabsTrigger value="book" className="text-xs">Whole Book</TabsTrigger>
+                  <TabsTrigger value="books" className="text-xs">Book Range</TabsTrigger>
+                </TabsList>
+              </Tabs>
+
+              {/* Single Chapter */}
+              {selectionMode === "single" && (
+                <div className="flex gap-2 items-end">
+                  <div className="flex-1">
+                    <Label className="text-xs text-muted-foreground">Book</Label>
+                    <Select value={newBook} onValueChange={setNewBook}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select book" />
+                      </SelectTrigger>
+                      <SelectContent className="max-h-[300px] bg-popover">
+                        {BIBLE_BOOKS.map((book) => (
+                          <SelectItem key={book} value={book}>
+                            {book}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="w-24">
+                    <Label className="text-xs text-muted-foreground">Chapter</Label>
+                    <Select
+                      value={String(newChapter)}
+                      onValueChange={(v) => setNewChapter(parseInt(v))}
+                      disabled={!newBook}
+                    >
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent className="max-h-[200px] bg-popover">
+                        {Array.from({ length: CHAPTER_COUNTS[newBook] || 1 }, (_, i) => i + 1).map((ch) => (
+                          <SelectItem key={ch} value={String(ch)}>
+                            {ch}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <Button onClick={handleAdd} disabled={!newBook} size="sm">
+                    <Plus className="h-4 w-4 mr-1" />
+                    Add
+                  </Button>
+                </div>
+              )}
+
+              {/* Chapter Range */}
+              {selectionMode === "chapters" && (
+                <div className="flex gap-2 items-end flex-wrap">
+                  <div className="flex-1 min-w-[150px]">
+                    <Label className="text-xs text-muted-foreground">Book</Label>
+                    <Select value={newBook} onValueChange={(v) => {
+                      setNewBook(v);
+                      setNewChapter(1);
+                      setEndChapter(CHAPTER_COUNTS[v] || 1);
+                    }}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select book" />
+                      </SelectTrigger>
+                      <SelectContent className="max-h-[300px] bg-popover">
+                        {BIBLE_BOOKS.map((book) => (
+                          <SelectItem key={book} value={book}>
+                            {book}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="w-20">
+                    <Label className="text-xs text-muted-foreground">From Ch.</Label>
+                    <Select
+                      value={String(newChapter)}
+                      onValueChange={(v) => setNewChapter(parseInt(v))}
+                      disabled={!newBook}
+                    >
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent className="max-h-[200px] bg-popover">
+                        {Array.from({ length: CHAPTER_COUNTS[newBook] || 1 }, (_, i) => i + 1).map((ch) => (
+                          <SelectItem key={ch} value={String(ch)}>
+                            {ch}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="w-20">
+                    <Label className="text-xs text-muted-foreground">To Ch.</Label>
+                    <Select
+                      value={String(endChapter)}
+                      onValueChange={(v) => setEndChapter(parseInt(v))}
+                      disabled={!newBook}
+                    >
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent className="max-h-[200px] bg-popover">
+                        {Array.from({ length: CHAPTER_COUNTS[newBook] || 1 }, (_, i) => i + 1)
+                          .filter(ch => ch >= newChapter)
+                          .map((ch) => (
+                            <SelectItem key={ch} value={String(ch)}>
+                              {ch}
+                            </SelectItem>
+                          ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <Button onClick={handleAdd} disabled={!newBook || endChapter < newChapter} size="sm">
+                    <Plus className="h-4 w-4 mr-1" />
+                    Add {endChapter - newChapter + 1} Chapters
+                  </Button>
+                </div>
+              )}
+
+              {/* Whole Book */}
+              {selectionMode === "book" && (
+                <div className="flex gap-2 items-end">
+                  <div className="flex-1">
+                    <Label className="text-xs text-muted-foreground">Book</Label>
+                    <Select value={newBook} onValueChange={setNewBook}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select book" />
+                      </SelectTrigger>
+                      <SelectContent className="max-h-[300px] bg-popover">
+                        {BIBLE_BOOKS.map((book) => (
+                          <SelectItem key={book} value={book}>
+                            {book} ({CHAPTER_COUNTS[book]} chapters)
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <Button onClick={handleAdd} disabled={!newBook} size="sm">
+                    <Plus className="h-4 w-4 mr-1" />
+                    Add {newBook ? `${CHAPTER_COUNTS[newBook]} Chapters` : "Book"}
+                  </Button>
+                </div>
+              )}
+
+              {/* Book Range */}
+              {selectionMode === "books" && (
+                <div className="flex gap-2 items-end flex-wrap">
+                  <div className="flex-1 min-w-[150px]">
+                    <Label className="text-xs text-muted-foreground">From Book</Label>
+                    <Select value={newBook} onValueChange={setNewBook}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select start book" />
+                      </SelectTrigger>
+                      <SelectContent className="max-h-[300px] bg-popover">
+                        {BIBLE_BOOKS.map((book) => (
+                          <SelectItem key={book} value={book}>
+                            {book}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="flex-1 min-w-[150px]">
+                    <Label className="text-xs text-muted-foreground">To Book</Label>
+                    <Select value={endBook} onValueChange={setEndBook} disabled={!newBook}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select end book" />
+                      </SelectTrigger>
+                      <SelectContent className="max-h-[300px] bg-popover">
+                        {BIBLE_BOOKS
+                          .filter((_, idx) => idx >= BIBLE_BOOKS.indexOf(newBook))
+                          .map((book) => (
+                            <SelectItem key={book} value={book}>
+                              {book}
+                            </SelectItem>
+                          ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <Button onClick={handleAdd} disabled={!newBook || !endBook} size="sm">
+                    <Plus className="h-4 w-4 mr-1" />
+                    Add Books
+                  </Button>
+                </div>
+              )}
             </div>
 
             {/* Voice & Speed Settings */}
@@ -241,7 +493,7 @@ export const SequenceBlockBuilder = ({ block, onChange, onRemove }: SequenceBloc
                   <SelectTrigger className="h-9">
                     <SelectValue />
                   </SelectTrigger>
-                  <SelectContent className="max-h-[250px]">
+                  <SelectContent className="max-h-[250px] bg-popover">
                     {ELEVENLABS_VOICES.map((voice) => (
                       <SelectItem key={voice.id} value={voice.id}>
                         <span className="font-medium">{voice.name}</span>
@@ -262,7 +514,7 @@ export const SequenceBlockBuilder = ({ block, onChange, onRemove }: SequenceBloc
                   <SelectTrigger className="h-9">
                     <SelectValue />
                   </SelectTrigger>
-                  <SelectContent>
+                  <SelectContent className="bg-popover">
                     <SelectItem value="0.75">0.75x (Slow)</SelectItem>
                     <SelectItem value="1">1x (Normal)</SelectItem>
                     <SelectItem value="1.25">1.25x (Fast)</SelectItem>
