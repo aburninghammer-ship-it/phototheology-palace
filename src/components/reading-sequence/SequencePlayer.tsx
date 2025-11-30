@@ -240,12 +240,12 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
     loadChapter();
   }, [currentItem?.book, currentItem?.chapter, currentItem?.startVerse, currentItem?.endVerse, fetchChapter, chapterContent]);
 
-  // Auto-play next verse when content loads and playing
+  // Auto-play next verse when content loads and playing, or when verse index changes
   useEffect(() => {
     if (isPlaying && !isPaused && chapterContent && !isLoading && !isGeneratingRef.current) {
       playCurrentVerse();
     }
-  }, [chapterContent, isPlaying, isPaused, isLoading]);
+  }, [chapterContent, isPlaying, isPaused, isLoading, currentVerseIdx, playCurrentVerse]);
 
   // Auto-start (only once)
   useEffect(() => {
