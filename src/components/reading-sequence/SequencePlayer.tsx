@@ -57,6 +57,7 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
   const [commentaryText, setCommentaryText] = useState<string | null>(null);
 
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  const musicAudioRef = useRef<HTMLAudioElement | null>(null); // Background music audio
   const isGeneratingRef = useRef(false); // Prevent concurrent TTS requests
   const isFetchingChapterRef = useRef(false); // Prevent concurrent chapter fetches
   const lastFetchedRef = useRef<string | null>(null); // Track last fetched chapter
@@ -104,6 +105,44 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
     
     console.log("SequencePlayer mounted, refs reset. Active sequences:", activeSequences.length, "Total items:", totalItems);
   }, []);
+
+  // Initialize background music audio
+  useEffect(() => {
+    // Create music audio element
+    const musicAudio = new Audio("https://www.bensound.com/bensound-music/bensound-relaxing.mp3");
+    musicAudio.loop = true;
+    musicAudio.volume = musicVolume / 100; // Convert 0-30 to 0-0.30
+    musicAudioRef.current = musicAudio;
+    
+    console.log("[SequencePlayer] Music audio initialized, volume:", musicVolume / 100);
+    
+    return () => {
+      if (musicAudioRef.current) {
+        musicAudioRef.current.pause();
+        musicAudioRef.current = null;
+      }
+    };
+  }, []);
+
+  // Update music volume when slider changes
+  useEffect(() => {
+    if (musicAudioRef.current) {
+      const vol = musicVolume / 100; // 0-30 -> 0-0.30
+      musicAudioRef.current.volume = vol;
+      console.log("[SequencePlayer] Music volume updated to:", vol);
+    }
+  }, [musicVolume]);
+
+  // Start/stop music when playback state changes
+  useEffect(() => {
+    if (musicAudioRef.current) {
+      if (isPlaying && !isPaused && musicVolume > 0) {
+        musicAudioRef.current.play().catch(e => console.log("[SequencePlayer] Music autoplay blocked:", e));
+      } else if (!isPlaying || isPaused) {
+        // Keep music playing even when paused for ambiance
+      }
+    }
+  }, [isPlaying, isPaused, musicVolume]);
 
   // Generate chapter commentary using Jeeves
   const generateCommentary = useCallback(async (book: string, chapter: number, chapterText?: string, depth: string = "surface") => {

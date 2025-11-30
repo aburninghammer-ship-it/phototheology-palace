@@ -27,7 +27,6 @@ import { useAuth } from "@/hooks/useAuth";
 import { ReadingSequenceBlock, ROOM_TAG_OPTIONS, SavedReadingSequence, SequenceItem } from "@/types/readingSequence";
 import { VoiceId } from "@/hooks/useTextToSpeech";
 import { toast } from "sonner";
-import { AmbientMusicPlayer } from "@/components/audio/AmbientMusicPlayer";
 
 const createEmptyBlock = (sequenceNumber: number): ReadingSequenceBlock => ({
   sequenceNumber,
@@ -164,8 +163,6 @@ export default function ReadMeTheBible() {
     return (
       <div className="min-h-screen bg-gradient-subtle">
         <Navigation />
-        {/* Ambient Music Player - renders music that responds to the volume slider */}
-        <AmbientMusicPlayer minimal className="fixed bottom-4 right-4 z-50" />
         <div className="container mx-auto px-4 py-8 max-w-4xl">
           <Button variant="ghost" onClick={() => setIsPlaying(false)} className="mb-6 glass-card">
             <ArrowLeft className="mr-2 h-4 w-4" />
