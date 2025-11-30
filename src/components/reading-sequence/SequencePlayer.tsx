@@ -108,13 +108,20 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
 
   // Initialize background music audio
   useEffect(() => {
-    // Create music audio element
-    const musicAudio = new Audio("https://www.bensound.com/bensound-music/bensound-relaxing.mp3");
+    // Create music audio element - using a reliable royalty-free ambient track
+    const musicAudio = new Audio("https://cdn.pixabay.com/download/audio/2022/02/22/audio_d1718ab41b.mp3");
     musicAudio.loop = true;
-    musicAudio.volume = musicVolume / 100; // Convert 0-30 to 0-0.30
+    musicAudio.crossOrigin = "anonymous";
+    const vol = musicVolume / 100; // Convert 0-30 to 0-0.30
+    musicAudio.volume = vol;
     musicAudioRef.current = musicAudio;
     
-    console.log("[SequencePlayer] Music audio initialized, volume:", musicVolume / 100);
+    console.log("[SequencePlayer] Music audio initialized, volume:", vol);
+    
+    // Add event listeners for debugging
+    musicAudio.addEventListener('canplay', () => console.log("[SequencePlayer] Music can play"));
+    musicAudio.addEventListener('error', (e) => console.error("[SequencePlayer] Music error:", e));
+    musicAudio.addEventListener('playing', () => console.log("[SequencePlayer] Music started playing"));
     
     return () => {
       if (musicAudioRef.current) {
@@ -129,18 +136,17 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
     if (musicAudioRef.current) {
       const vol = musicVolume / 100; // 0-30 -> 0-0.30
       musicAudioRef.current.volume = vol;
-      console.log("[SequencePlayer] Music volume updated to:", vol);
+      console.log("[SequencePlayer] Music volume updated to:", vol, "from slider value:", musicVolume);
     }
   }, [musicVolume]);
 
-  // Start/stop music when playback state changes
+  // Start music when playback state changes
   useEffect(() => {
-    if (musicAudioRef.current) {
-      if (isPlaying && !isPaused && musicVolume > 0) {
-        musicAudioRef.current.play().catch(e => console.log("[SequencePlayer] Music autoplay blocked:", e));
-      } else if (!isPlaying || isPaused) {
-        // Keep music playing even when paused for ambiance
-      }
+    if (musicAudioRef.current && isPlaying && !isPaused && musicVolume > 0) {
+      console.log("[SequencePlayer] Attempting to play music...");
+      musicAudioRef.current.play()
+        .then(() => console.log("[SequencePlayer] Music playing successfully"))
+        .catch(e => console.log("[SequencePlayer] Music autoplay blocked:", e.message));
     }
   }, [isPlaying, isPaused, musicVolume]);
 
@@ -1185,47 +1191,53 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
         </div>
 
         {/* Volume Controls */}
-        {!isMobile ? (
-          <div className="flex items-center gap-3 px-4">
-            <Button variant="ghost" size="icon" onClick={toggleMute}>
-              {isMuted || volume === 0 ? (
-                <VolumeX className="h-4 w-4" />
-              ) : (
-                <Volume2 className="h-4 w-4" />
-              )}
-            </Button>
-            <Slider
-              value={[isMuted ? 0 : volume]}
-              max={100}
-              step={1}
-              onValueChange={handleVolumeChange}
-              className="flex-1"
-            />
-          </div>
-        ) : (
-          <div className="space-y-3 px-4">
-            {/* Music Volume Slider */}
+        <div className="space-y-3 px-4">
+          {/* TTS Volume (Desktop only) */}
+          {!isMobile && (
             <div className="flex items-center gap-3">
-              <ListMusic className="h-4 w-4 text-muted-foreground" />
-              <span className="text-xs text-muted-foreground w-12">Music</span>
+              <Button variant="ghost" size="icon" onClick={toggleMute} className="h-8 w-8">
+                {isMuted || volume === 0 ? (
+                  <VolumeX className="h-4 w-4" />
+                ) : (
+                  <Volume2 className="h-4 w-4" />
+                )}
+              </Button>
+              <span className="text-xs text-muted-foreground w-12">Reader</span>
               <Slider
-                value={[musicVolume]}
-                max={30}
+                value={[isMuted ? 0 : volume]}
+                max={100}
                 step={1}
-                onValueChange={(v) => {
-                  setMusicVolume(v[0]);
-                  setGlobalMusicVolume(v[0]);
-                }}
+                onValueChange={handleVolumeChange}
                 className="flex-1"
               />
-              <span className="text-xs text-muted-foreground w-8">{musicVolume}%</span>
             </div>
+          )}
+          
+          {/* Music Volume Slider - Always visible */}
+          <div className="flex items-center gap-3">
+            <ListMusic className="h-4 w-4 text-muted-foreground" />
+            <span className="text-xs text-muted-foreground w-12">Music</span>
+            <Slider
+              value={[musicVolume]}
+              max={30}
+              step={1}
+              onValueChange={(v) => {
+                console.log("[SequencePlayer] Music slider changed to:", v[0]);
+                setMusicVolume(v[0]);
+                setGlobalMusicVolume(v[0]);
+              }}
+              className="flex-1"
+            />
+            <span className="text-xs text-muted-foreground w-8">{musicVolume}%</span>
+          </div>
+          
+          {isMobile && (
             <div className="flex items-center justify-center gap-2 py-1 text-xs text-muted-foreground">
               <Smartphone className="h-3 w-3" />
               <span>Use device volume for reader</span>
             </div>
-          </div>
-        )}
+          )}
+        </div>
 
         {/* Sequence Overview */}
         <div className="pt-4 border-t">
