@@ -1,4 +1,5 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -71,6 +72,11 @@ const getMaxTokens = (depth: CommentaryDepth): number => {
   }
 };
 
+// Normalize book name for consistent caching
+const normalizeBookName = (book: string): string => {
+  return book.toLowerCase().replace(/\s+/g, '_').replace(/[^a-z0-9_]/g, '');
+};
+
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
@@ -81,6 +87,34 @@ serve(async (req) => {
 
     if (!book || !chapter) {
       throw new Error("Book and chapter are required");
+    }
+
+    // Initialize Supabase client for caching
+    const supabaseUrl = Deno.env.get("SUPABASE_URL");
+    const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
+    
+    const normalizedBook = normalizeBookName(book);
+    const chapterNum = parseInt(chapter);
+    
+    // Check cache first (only for depth commentary which is most expensive)
+    if (supabaseUrl && supabaseServiceKey && depth === "depth") {
+      const supabase = createClient(supabaseUrl, supabaseServiceKey);
+      
+      const { data: cached, error: cacheError } = await supabase
+        .from("chapter_commentary_cache")
+        .select("commentary_text")
+        .eq("book", normalizedBook)
+        .eq("chapter", chapterNum)
+        .single();
+
+      if (!cacheError && cached?.commentary_text) {
+        console.log(`Cache HIT for ${book} ${chapter} (depth commentary)`);
+        return new Response(
+          JSON.stringify({ commentary: cached.commentary_text, cached: true }),
+          { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
+      console.log(`Cache MISS for ${book} ${chapter} (depth commentary) - generating...`);
     }
 
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
@@ -137,8 +171,27 @@ Please provide a ${depth === "intermediate" ? "thorough" : "brief"}, Christ-cent
 
     console.log(`${depth} commentary generated successfully for ${book} ${chapter} (${commentary.length} chars)`);
 
+    // Cache depth commentary for future use
+    if (supabaseUrl && supabaseServiceKey && depth === "depth") {
+      const supabase = createClient(supabaseUrl, supabaseServiceKey);
+      
+      const { error: insertError } = await supabase
+        .from("chapter_commentary_cache")
+        .upsert({
+          book: normalizedBook,
+          chapter: chapterNum,
+          commentary_text: commentary,
+        }, { onConflict: "book,chapter" });
+
+      if (insertError) {
+        console.error("Failed to cache commentary:", insertError);
+      } else {
+        console.log(`Cached commentary for ${book} ${chapter}`);
+      }
+    }
+
     return new Response(
-      JSON.stringify({ commentary }),
+      JSON.stringify({ commentary, cached: false }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   } catch (error) {
