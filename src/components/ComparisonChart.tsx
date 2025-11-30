@@ -36,6 +36,7 @@ const standardFeatures: Feature[] = [
   },
   {
     name: "Reading Plans",
+    description: "PT plans are Palace-integrated — each day maps to rooms, floors, and memory hooks, not just chapters to check off",
     phototheology: "yes",
     youversion: "yes",
     blueletter: "partial",
@@ -44,6 +45,7 @@ const standardFeatures: Feature[] = [
   },
   {
     name: "Commentary Access",
+    description: "PT commentary connects every verse to Christ, sanctuary, prophecy, and memory rooms — not just historical notes",
     phototheology: "yes",
     youversion: "partial",
     blueletter: "yes",
@@ -52,6 +54,7 @@ const standardFeatures: Feature[] = [
   },
   {
     name: "Cross-References",
+    description: "PT cross-refs follow typology, cycles, and thematic walls — showing how verses connect across the 8 cycles of redemption",
     phototheology: "yes",
     youversion: "partial",
     blueletter: "yes",
@@ -60,7 +63,8 @@ const standardFeatures: Feature[] = [
   },
   {
     name: "Greek/Hebrew Tools",
-    phototheology: "partial",
+    description: "PT includes lexical data in the Def-Com Room with biblical context and Christ-centered application",
+    phototheology: "yes",
     youversion: "no",
     blueletter: "yes",
     logos: "yes",
