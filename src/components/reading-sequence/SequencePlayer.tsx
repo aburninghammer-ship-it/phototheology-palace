@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 import { Slider } from "@/components/ui/slider";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import {
   Play,
   Pause,
@@ -22,6 +23,7 @@ import { toast } from "sonner";
 import { ReadingSequenceBlock, SequenceItem } from "@/types/readingSequence";
 import { notifyTTSStarted, notifyTTSStopped } from "@/hooks/useAudioDucking";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { formatJeevesResponse } from "@/lib/formatJeevesResponse";
 
 interface SequencePlayerProps {
   sequences: ReadingSequenceBlock[];
@@ -766,15 +768,26 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
       <CardContent className="space-y-4">
         {/* Commentary Display - shown when Jeeves is commenting */}
         {isPlayingCommentary && commentaryText && (
-          <div className="p-4 bg-gradient-to-br from-amber-500/10 to-orange-500/10 rounded-lg border border-amber-500/20">
-            <div className="flex items-center gap-2 mb-3">
-              <span className="text-2xl">🎩</span>
-              <span className="font-semibold text-amber-600 dark:text-amber-400">Jeeves Commentary</span>
-              <Badge variant="secondary" className="ml-auto animate-pulse">Speaking</Badge>
+          <div className="rounded-xl border-2 border-amber-500/30 overflow-hidden bg-gradient-to-br from-amber-500/10 via-orange-500/5 to-amber-500/10 shadow-lg shadow-amber-500/10">
+            {/* Header */}
+            <div className="px-4 py-3 bg-gradient-to-r from-amber-600/20 to-orange-600/20 border-b border-amber-500/20 flex items-center gap-3">
+              <div className="h-10 w-10 rounded-full bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center shadow-lg shadow-amber-500/30">
+                <span className="text-xl">🎩</span>
+              </div>
+              <div className="flex-1">
+                <h3 className="font-bold text-amber-600 dark:text-amber-400">Jeeves Commentary</h3>
+                <p className="text-xs text-muted-foreground">Phototheological Insights</p>
+              </div>
+              <Badge variant="secondary" className="animate-pulse bg-amber-500/20 text-amber-600 dark:text-amber-400 border-amber-500/30">
+                <span className="mr-1">🔊</span> Speaking
+              </Badge>
             </div>
-            <p className="text-sm leading-relaxed text-muted-foreground italic">
-              {commentaryText}
-            </p>
+            {/* Commentary Content */}
+            <ScrollArea className="max-h-[350px]">
+              <div className="p-5 prose prose-sm dark:prose-invert max-w-none">
+                {formatJeevesResponse(commentaryText)}
+              </div>
+            </ScrollArea>
           </div>
         )}
 
