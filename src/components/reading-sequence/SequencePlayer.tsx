@@ -53,6 +53,8 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
   const shouldPlayNextRef = useRef(false); // Signal to play next chapter
   const continuePlayingRef = useRef(false); // Signal to continue playing verses
   const pendingVerseRef = useRef<{ verseIdx: number; content: ChapterContent; voice: string } | null>(null);
+  const ttsCache = useRef<Map<string, string>>(new Map()); // Cache for prefetched TTS URLs
+  const prefetchingRef = useRef<Set<string>>(new Set()); // Track verses being prefetched
   
   const activeSequences = sequences.filter((s) => s.enabled && s.items.length > 0);
 
@@ -73,6 +75,8 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
     shouldPlayNextRef.current = false;
     continuePlayingRef.current = false;
     pendingVerseRef.current = null;
+    ttsCache.current.clear();
+    prefetchingRef.current.clear();
     console.log("SequencePlayer mounted, refs reset. Active sequences:", activeSequences.length, "Total items:", totalItems);
   }, []);
 
@@ -120,6 +124,31 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
     }
   }, []);
 
+  // Prefetch TTS for upcoming verses
+  const prefetchVerse = useCallback(async (verseIdx: number, content: ChapterContent, voice: string) => {
+    if (!content?.verses || verseIdx >= content.verses.length) return;
+    
+    const cacheKey = `${content.book}-${content.chapter}-${verseIdx}-${voice}`;
+    
+    // Skip if already cached or being prefetched
+    if (ttsCache.current.has(cacheKey) || prefetchingRef.current.has(cacheKey)) {
+      return;
+    }
+    
+    prefetchingRef.current.add(cacheKey);
+    console.log("[Prefetch] Starting for verse:", verseIdx + 1);
+    
+    const verse = content.verses[verseIdx];
+    const url = await generateTTS(verse.text, voice);
+    
+    prefetchingRef.current.delete(cacheKey);
+    
+    if (url) {
+      ttsCache.current.set(cacheKey, url);
+      console.log("[Prefetch] Cached verse:", verseIdx + 1);
+    }
+  }, [generateTTS]);
+
   // Play a specific verse by index - using a stable ref to avoid stale closures
   const playVerseAtIndex = useCallback(async (verseIdx: number, content: ChapterContent, voice: string) => {
     console.log("[PlayVerse] Called with:", { verseIdx, versesCount: content?.verses?.length, voice });
@@ -133,20 +162,33 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
       return;
     }
 
-    isGeneratingRef.current = true;
     const verse = content.verses[verseIdx];
-
-    console.log("[PlayVerse] Starting TTS for verse:", verseIdx + 1, "of", content.verses.length, "text:", verse.text.substring(0, 50));
-
-    setIsLoading(true);
+    const cacheKey = `${content.book}-${content.chapter}-${verseIdx}-${voice}`;
+    
     setCurrentVerseIdx(verseIdx);
     
-    const url = await generateTTS(verse.text, voice);
+    // Check cache first
+    let url = ttsCache.current.get(cacheKey);
     
-    console.log("[PlayVerse] TTS result:", url ? "URL generated" : "FAILED");
+    if (url) {
+      console.log("[PlayVerse] Using cached TTS for verse:", verseIdx + 1);
+    } else {
+      // Generate TTS
+      isGeneratingRef.current = true;
+      console.log("[PlayVerse] Generating TTS for verse:", verseIdx + 1, "text:", verse.text.substring(0, 50));
+      setIsLoading(true);
+      
+      url = await generateTTS(verse.text, voice);
+      
+      isGeneratingRef.current = false;
+      setIsLoading(false);
+      
+      if (url) {
+        ttsCache.current.set(cacheKey, url);
+      }
+    }
     
-    isGeneratingRef.current = false;
-    setIsLoading(false);
+    console.log("[PlayVerse] TTS result:", url ? "URL ready" : "FAILED");
 
     if (!url) {
       console.error("[PlayVerse] Failed to generate TTS URL");
@@ -154,6 +196,14 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
       continuePlayingRef.current = false;
       setIsPlaying(false);
       return;
+    }
+
+    // Prefetch next 2 verses while this one plays
+    for (let i = 1; i <= 2; i++) {
+      const nextIdx = verseIdx + i;
+      if (nextIdx < content.verses.length) {
+        prefetchVerse(nextIdx, content, voice);
+      }
     }
 
     // Stop any existing audio BEFORE setting up new one
@@ -164,8 +214,8 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
       audioRef.current = null;
     }
     
-    // Clean up previous audio URL
-    if (audioUrl) {
+    // Clean up previous audio URL (but not if it's cached)
+    if (audioUrl && !Array.from(ttsCache.current.values()).includes(audioUrl)) {
       URL.revokeObjectURL(audioUrl);
     }
 
@@ -208,13 +258,13 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
       const nextVerseIdx = verseIdx + 1;
       
       if (nextVerseIdx < content.verses.length) {
-        console.log("[Audio] Scheduling next verse:", nextVerseIdx + 1);
-        // Use setTimeout to ensure clean state transition
+        console.log("[Audio] Playing next verse:", nextVerseIdx + 1);
+        // Minimal delay since next verse should be prefetched
         setTimeout(() => {
           if (continuePlayingRef.current) {
             playVerseAtIndex(nextVerseIdx, content, voice);
           }
-        }, 100);
+        }, 10);
       } else {
         // Move to next chapter
         console.log("[Audio] Chapter complete, checking for next...");
@@ -265,7 +315,7 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
       setIsPlaying(false);
       toast.error("Failed to play audio - try clicking play manually");
     }
-  }, [volume, isMuted, totalItems, generateTTS]);
+  }, [volume, isMuted, totalItems, generateTTS, prefetchVerse]);
 
   // Play current verse (wrapper for playVerseAtIndex)
   const playCurrentVerse = useCallback(() => {
