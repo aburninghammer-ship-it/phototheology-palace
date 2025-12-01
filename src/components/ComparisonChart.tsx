@@ -198,19 +198,22 @@ const StatusIcon = ({ status }: { status: "yes" | "no" | "partial" }) => {
 
 const FeatureWithTooltip = ({ name, description, isEnhanced }: { name: string; description?: string; isEnhanced?: boolean }) => {
   if (!description) return <span>{name}</span>;
-  
+
   return (
     <TooltipProvider>
       <Tooltip>
         <TooltipTrigger asChild>
-          <span className="flex items-center gap-2 cursor-help">
+          <span className="flex items-center gap-2 cursor-help flex-wrap">
             <span className="flex items-center gap-1.5">
               {name}
-              <HelpCircle className="h-3.5 w-3.5 text-primary/70" />
+              <HelpCircle className="h-3.5 w-3.5 text-primary/70 flex-shrink-0" />
             </span>
             {isEnhanced && (
-              <Badge variant="outline" className="text-[9px] px-1.5 py-0 h-4 bg-primary/10 border-primary/30 text-primary font-medium">
-                PT Enhanced
+              <Badge
+                variant="outline"
+                className="text-[10px] sm:text-xs px-2 py-0.5 h-auto whitespace-nowrap bg-primary/10 border-primary/30 text-primary font-medium flex-shrink-0"
+              >
+                Enhanced
               </Badge>
             )}
           </span>
@@ -226,37 +229,37 @@ const FeatureWithTooltip = ({ name, description, isEnhanced }: { name: string; d
 
 const TableHeader = () => (
   <tr className="border-b border-border">
-    <th className="text-left py-4 px-4 md:px-6 font-semibold text-foreground min-w-[200px]">
-      Feature
+    <th className="text-left py-3 sm:py-4 px-3 sm:px-4 md:px-6 font-semibold text-foreground min-w-[160px] sm:min-w-[200px]">
+      <span className="text-xs sm:text-sm">Feature</span>
     </th>
-    <th className="py-4 px-2 md:px-3 text-center min-w-[80px]">
+    <th className="py-3 sm:py-4 px-1.5 sm:px-2 md:px-3 text-center min-w-[60px] sm:min-w-[80px]">
       <div className="flex flex-col items-center gap-1">
-        <span className="text-xs md:text-sm font-bold text-primary">PT App</span>
-        <Badge variant="outline" className="text-[10px] bg-primary/10 border-primary/30">OURS</Badge>
+        <span className="text-[10px] sm:text-xs md:text-sm font-bold text-primary whitespace-nowrap">PT App</span>
+        <Badge variant="outline" className="text-[9px] sm:text-[10px] px-1 sm:px-1.5 py-0 h-auto bg-primary/10 border-primary/30 whitespace-nowrap">OURS</Badge>
       </div>
     </th>
-    <th className="py-4 px-2 md:px-3 text-center min-w-[70px]">
-      <span className="text-xs md:text-sm font-medium text-muted-foreground">YouVersion</span>
+    <th className="py-3 sm:py-4 px-1 sm:px-2 md:px-3 text-center min-w-[55px] sm:min-w-[70px]">
+      <span className="text-[10px] sm:text-xs md:text-sm font-medium text-muted-foreground">YouVer</span>
     </th>
-    <th className="py-4 px-2 md:px-3 text-center min-w-[70px]">
-      <span className="text-xs md:text-sm font-medium text-muted-foreground">Blue Letter</span>
+    <th className="py-3 sm:py-4 px-1 sm:px-2 md:px-3 text-center min-w-[55px] sm:min-w-[70px]">
+      <span className="text-[10px] sm:text-xs md:text-sm font-medium text-muted-foreground">BlueLtr</span>
     </th>
-    <th className="py-4 px-2 md:px-3 text-center min-w-[70px]">
-      <span className="text-xs md:text-sm font-medium text-muted-foreground">Logos</span>
+    <th className="py-3 sm:py-4 px-1 sm:px-2 md:px-3 text-center min-w-[50px] sm:min-w-[70px]">
+      <span className="text-[10px] sm:text-xs md:text-sm font-medium text-muted-foreground">Logos</span>
     </th>
-    <th className="py-4 px-2 md:px-3 text-center min-w-[70px]">
-      <span className="text-xs md:text-sm font-medium text-muted-foreground">Bible Gateway</span>
+    <th className="py-3 sm:py-4 px-1 sm:px-2 md:px-3 text-center min-w-[55px] sm:min-w-[70px]">
+      <span className="text-[10px] sm:text-xs md:text-sm font-medium text-muted-foreground">BGway</span>
     </th>
   </tr>
 );
 
 const FeatureRow = ({ feature, index }: { feature: Feature; index: number }) => (
-  <tr 
+  <tr
     className={`border-b border-border/50 transition-colors hover:bg-muted/50 ${
       index % 2 === 0 ? "bg-muted/20" : ""
     }`}
   >
-    <td className="py-3 px-4 md:px-6 text-sm font-medium text-foreground">
+    <td className="py-3 px-3 sm:px-4 md:px-6 text-xs sm:text-sm font-medium text-foreground">
       <FeatureWithTooltip name={feature.name} description={feature.description} isEnhanced={feature.isEnhanced} />
     </td>
     <td className="py-3 px-2 md:px-3 text-center">
@@ -313,8 +316,8 @@ export function ComparisonChart() {
           </div>
           <div className="absolute inset-0 rounded-2xl border border-white/20" />
 
-          {/* Table Content */}
-          <div className="relative z-10 overflow-x-auto">
+          {/* Table Content - Scrollable on mobile */}
+          <div className="relative z-10 overflow-x-auto touch-pan-x -webkit-overflow-scrolling-touch">
             <table className="w-full">
               <thead>
                 <TableHeader />
