@@ -751,7 +751,7 @@ export function AmbientMusicPlayer({
               <Slider
                 value={[isMuted ? 0 : volume]}
                 min={0}
-                max={1}
+                max={0.3}
                 step={0.01}
                 onValueChange={handleVolumeChange}
                 className="w-20"
