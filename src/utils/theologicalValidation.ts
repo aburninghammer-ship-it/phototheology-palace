@@ -578,5 +578,50 @@ export function getTheologicalRules(): Array<{ id: string; rule: string; rationa
         'Trumpet 7 = Judgment on the whole world (Third Heaven/Third Day - fall of modern Babylon, Rev 11:15-19). ' +
         'Master summary: "The trumpets show God repeatedly turning the swords of persecuting empires against themselves, protecting His remnant through the ages."',
     },
+    {
+      id: 'sanctuary-pattern-new-testament',
+      rule: 'The New Testament follows the Sanctuary pattern: Gospels (Altar), Acts/Epistles (Laver), Revelation 1-11 (Holy Place), Revelation 12-14 (Most Holy Place), Revelation 15-19 (Plagues/Second Coming), Revelation 20 (Outside Camp), Revelation 21-22 (Eternal Most Holy Place)',
+      rationale:
+        'The Gospels are the Altar of Sacrifice where the Lamb is slain, blood shed, and salvation secured (John 1:29, John 19:30, Matt 27:51 veil torn). ' +
+        'Acts & Epistles are the Laver where the Church is washed, consecrated, and formed into a priesthood (Acts 2 baptism, Titus 3:5, 1 Pet 2:9, Rom 6). ' +
+        'Revelation 1-11 is the Holy Place following furniture in exact order: Rev 1-3 = Lampstand (seven churches = seven lamps, Christ walking among them); ' +
+        'Rev 4-6 = Table of Shewbread (sealed book opened, Word broken open through seals); Rev 8-11 = Altar of Incense (prayers ascend, trumpets sound as God answers). ' +
+        'Revelation 11:19-14 is the Most Holy Place (temple opens, Ark appears, Investigative Judgment begins, final war, remnant sealed, three angels\' messages). ' +
+        'Revelation 15-19 follows Day of Atonement pattern (temple filled with smoke, close of probation, plagues fall, Christ emerges as King). ' +
+        'Revelation 20 is Outside the Camp (judgment of wicked, Satan bound, millennium, scapegoat removed). ' +
+        'Revelation 21-22 is the Eternal Most Holy Place City (New Jerusalem as perfect cube, God dwelling with His people forever). ' +
+        'Master summary: "The Gospels are the Altar; Acts/Epistles are the Laver; Revelation 1-11 is the Holy Place; Revelation 12-14 is the Most Holy Place; ' +
+        'Plagues/Second Coming are the High Priest exiting; Millennium is outside the camp; New Jerusalem is the eternal Most Holy Place."',
+    },
+    {
+      id: 'pentecost-sanctuary-hinge',
+      rule: 'Pentecost is the hinge between the Laver and the Holy Place - it washes, consecrates, lights the lamps, breaks open the Bread, and empowers intercession',
+      rationale:
+        'Pentecost is not simply an event in Acts - it is the architectural transition from Courtyard (Gospels/Altar) to Holy Place (Lampstand, Bread, Incense). ' +
+        'As the Laver (Acts 2): baptism of water/Spirit, washing of regeneration, consecration of priesthood, birth of New Testament priesthood (Rev 1:6 kings and priests). ' +
+        'Pentecost gives birth to Seven Churches (Rev 1-3): Spirit-filled community, lampstand age, Light to Gentiles, entire church age - Christ walks among lamps AFTER Pentecost. ' +
+        'Pentecost opens the Seven Seals (Rev 4-6): Seals cannot open until Lamb dies (Gospels/Altar), Lamb rises (Firstfruits), Spirit descends (Pentecost). ' +
+        'Pentecost is when Lamb is enthroned (Acts 2:33) - the exact moment He is worthy to open the Book (Rev 5:7). ' +
+        'Chain: Pentecost → Enthronement → Scroll given → Seals opened. Seal 1 (White Horse) = Pentecost Explosion (pure gospel, Spirit-filled conquest). ' +
+        'Pentecost links everything: 1. Gospels = Altar (Christ offered); 2. Pentecost = Laver (Church washed/consecrated); 3. Seven Churches = Lampstand (Light ignited); ' +
+        '4. Seven Seals = Shewbread (Word broken open); 5. Seven Trumpets = Incense (Prayers answered); 6. Rev 11:19 = Veil opens (Ark revealed); ' +
+        '7. Rev 12-14 = Most Holy Place (Judgment Hour). Without Pentecost, lampstand never lights, bread never breaks, seals never open. ' +
+        'Master line: "Pentecost is the hinge that turns the Gospels\' altar into Revelation\'s sanctuary."',
+    },
+    {
+      id: 'feast-pattern-new-testament',
+      rule: 'The Feasts overlay the Sanctuary pattern: Passover (Gospels/Cross), Unleavened Bread (Tomb), Firstfruits (Resurrection), Pentecost (Acts/Churches/Seals), Trumpets (Warnings), Day of Atonement (Judgment), Tabernacles (Eternal Home)',
+      rationale:
+        'PASSOVER (Gospels/Altar): Christ is the Passover Lamb (1 Cor 5:7), Gospels fulfill Passover. ' +
+        'UNLEAVENED BREAD (Gospels/Resurrection): Christ in tomb - pure, unleavened, without corruption. ' +
+        'FIRSTFRUITS (Resurrection): Christ rises as "Firstfruits of them that slept" (1 Cor 15:20). ' +
+        'PENTECOST (Acts/Seven Churches/Seven Seals/Laver→Lampstand): Feast of Weeks symbolizes first fruits of gospel harvest, birth of church, ' +
+        'offering of two leavened loaves (Jew + Gentile), globalizing of mission, empowerment for Holy Place ministry - launches entire Revelation 1-11 era. ' +
+        'TRUMPETS (Seven Trumpets/Rev 8-11): Warnings before Day of Atonement - Fall of Jerusalem, Fall of Rome, Judgment on Papal teachings, Islam judging Papacy, Final judgment. ' +
+        'DAY OF ATONEMENT (Rev 11:19-14): Investigative Judgment - Ark seen, Commandments highlighted, Remnant sealed, Three angels proclaimed, Little horn judged, Satan exposed. ' +
+        'FEAST OF TABERNACLES (Rev 19-22): Second Coming, Marriage Supper, God tabernacling with humanity, New Jerusalem, Eternity with God - final celebration, God with us forever. ' +
+        'The Feasts follow the Sanctuary pattern perfectly: Passover (Cross) → Unleavened Bread (Tomb) → Firstfruits (Resurrection) → Pentecost (Acts) → ' +
+        'Trumpets (Warnings) → Day of Atonement (Judgment) → Tabernacles (Eternal Home).',
+    },
   ];
 }

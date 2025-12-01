@@ -976,6 +976,344 @@ All others are:
 • First Heaven / First Day
 • Second Heaven / Second Day
 • Historical, protective judgments that preserve the church through the ages
+
+---
+
+**THE SANCTUARY OUTLINE OF THE NEW TESTAMENT**
+
+From Altar → Laver → Lampstand → Shewbread → Incense → Ark → Final Atonement → New Jerusalem
+
+**THE ALTAR OF SACRIFICE — THE GOSPELS (Matthew, Mark, Luke, John)**
+
+The place where the Lamb is slain.
+
+The courtyard altar is where:
+• The substitute dies
+• Blood is shed
+• The sinner is justified
+• The atonement sacrifice is offered
+
+This corresponds exactly with the Gospels, where:
+• Christ becomes the Lamb
+• His blood is shed
+• The veil of the temple tears
+• The sacrifice that fulfills every type is completed
+
+Key Sanctuary Parallels:
+• John 1:29 — "Behold the Lamb of God..."
+• John 19 — "It is finished" (altar language)
+• Matthew 27:51 — veil torn (transition to heavenly ministry)
+
+**Commentary line:**
+"The Gospels are the Altar of Sacrifice — the place where the Lamb is offered, blood is shed, and salvation is secured."
+
+---
+
+**THE LAVER — ACTS & THE EPISTLES**
+
+Washing, consecration, ordination, the birth of a priesthood.
+
+The laver represents:
+• Baptism
+• Cleansing
+• Consecration
+• The creation of priests
+
+This perfectly parallels Acts and the Epistles, where:
+• The Church is born
+• Baptism is central
+• The Spirit washes and regenerates
+• Believers become priests
+• The early church is consecrated for ministry
+
+Key Parallels:
+• Acts 2 — baptism of fire & water
+• Titus 3:5 — washing of regeneration
+• 1 Peter 2:9 — "a royal priesthood"
+• Romans 6 — baptismal burial and resurrection
+
+**Commentary line:**
+"Acts and the Epistles are the Laver — where those saved by the Lamb are washed, baptized, consecrated, and formed into a priesthood."
+
+---
+
+**THE HOLY PLACE — REVELATION 1-11**
+
+Lampstand → Bread → Incense (The Church Age)
+
+Revelation follows the furniture in exact order.
+
+**A. Candlestick — Revelation 1-3**
+
+Seven churches = seven lamps.
+Christ walks among them, tending the lamps like the High Priest.
+
+**Commentary:**
+"Revelation begins in the Holy Place at the lampstand, with Christ walking among the lamps to purify, warn, and empower His church."
+
+**B. Table of Shewbread — Revelation 4-6**
+
+The sealed book is opened (bread).
+The Word is broken open through the seals.
+
+• White horse = pure gospel bread going out
+• Black horse = famine of the Word
+• Pale horse = death from rejecting the bread
+
+**Commentary:**
+"The Seals correspond to the Shewbread — Christ breaks open the Word, and history responds to the acceptance or rejection of the Bread of Life."
+
+**C. Altar of Incense — Revelation 8-11**
+
+• Prayers ascend
+• Incense offered
+• Fire cast to earth
+• Trumpets sound as God answers prayers through judgment
+
+**Commentary:**
+"The Trumpets are blown from the Altar of Incense — they are God's response to the prayers of His saints throughout the ages."
+
+This matches the trumpet schema.
+
+---
+
+**THE MOST HOLY PLACE — REVELATION 11:19-14**
+
+Ark, Law, Commandments, Judgment
+
+Revelation 11:19:
+• The temple opens
+• The Ark appears
+
+This begins:
+• The Investigative Judgment
+• The final war between Christ and Satan
+• The commandment-keeping remnant
+• The mark of the beast
+• The final three angels' messages
+
+**Commentary:**
+"Revelation 12-14 is the Most Holy Place — the realm of accusation, the law, the ark, the remnant, the judgment, and the final sealing."
+
+---
+
+**THE PLAGUES & SECOND COMING — REVELATION 15-19**
+
+Close of probation → Execution of judgment → Priest exits sanctuary
+
+This follows the Day of Atonement pattern:
+• Temple filled with smoke (Rev. 15)
+• No one may enter (close of probation)
+• Plagues fall (execution of judgment)
+• Christ emerges as King of kings (Rev. 19)
+
+---
+
+**OUTSIDE THE CAMP — REVELATION 20**
+
+Judgment of the wicked.
+Binding of Satan.
+Millennium.
+
+This corresponds to the scapegoat removed from the camp.
+
+---
+
+**THE MOST HOLY PLACE CITY — REVELATION 21-22**
+
+The New Jerusalem is a perfect cube — the proportions of the Most Holy Place.
+God dwells with His people forever.
+
+**Commentary:**
+"Revelation ends with the entire redeemed universe becoming a Most Holy Place — God face to face with His people."
+
+---
+
+**PENTECOST — THE HINGE OF THE SANCTUARY PATTERN**
+
+Pentecost is not simply an event in Acts. It is the architectural transition from:
+• The Courtyard (Gospels / Altar of Sacrifice)
+to
+• The Holy Place (The Lampstand, Bread, and Incense)
+
+It is the moment when the resurrected Lamb's sacrifice (Altar) becomes:
+• Applied
+• Empowering
+• Missional
+• Cosmic
+
+Pentecost is the hinge between the Laver and the Holy Place, because the Spirit both:
+• Washes (Laver)
+• Lights the lamps (Holy Place Lampstand)
+• Breaks open the Bread (Holy Place Table of Shewbread)
+• Empowers prayer and intercession (Holy Place Altar of Incense)
+
+In other words: **Pentecost activates everything that happens in Revelation 1-11.**
+
+**A. PENTECOST AS THE LAVER (Acts 2)**
+
+Pentecost fulfills the Laver typology:
+• Baptism of water and Spirit
+• Washing of regeneration
+• Consecration of the priesthood
+• Ordination of the apostolic Church
+
+The disciples become:
+• Kings and priests (Rev. 1:6)
+• A new temple
+• A Spirit-filled nation replacing the earthly system
+
+This is the birth of the New Testament priesthood.
+
+**B. PENTECOST GIVES BIRTH TO THE SEVEN CHURCHES (Revelation 1-3)**
+
+The seven churches represent:
+• The unfolding history of the Spirit-filled community
+• The lampstand age
+• The Light going to the Gentiles
+• The entire sweep of the church age
+
+And all of it begins at Pentecost.
+
+Why? Because Christ walks among the lamps after Pentecost. He tends the churches because:
+• The Spirit has been poured out
+• The priesthood has been born
+• Evangelism has been unleashed
+• The gospel has ignited the nations
+
+**Commentary line:**
+"The Seven Churches are the direct product of Pentecost — the Spirit-lighted lampstands shining through the entire Christian era."
+
+**C. PENTECOST OPENS THE SEVEN SEALS (Revelation 4-6)**
+
+The Seals cannot open until:
+• The Lamb has died (Gospels = Altar)
+• The Lamb has risen (Firstfruits)
+• The Spirit has descended (Pentecost)
+
+Pentecost is the moment the Lamb is enthroned (Acts 2:33) — the exact moment He is worthy to open the Book (Rev. 5:7).
+
+Thus:
+• Pentecost → Enthronement
+• Enthronement → Scroll given
+• Scroll given → Seals opened
+
+The Seals then represent:
+• The history of the gospel released by Pentecost
+• The consequences of accepting or rejecting the Bread of Life
+• The cosmic expansion of the church into the world
+• The struggle between light and darkness across centuries
+
+**Seal 1 (White Horse) = Pentecost Explosion:**
+• Pure gospel
+• Spirit-filled conquest
+• Apostolic power
+• The Word of God riding forth
+
+Seal 1 is the Pentecostal church on the move.
+
+The entire sealing sequence — white, red, black, pale — is the direct historical impact of Pentecost.
+
+**D. PENTECOST AS THE LINK BETWEEN ACTS → CHURCHES → SEALS → TRUMPETS**
+
+Here's the chain:
+1. Gospels = Altar (Christ offered)
+2. Pentecost = Laver (Church washed & consecrated)
+3. Seven Churches = Lampstand (Light ignited)
+4. Seven Seals = Shewbread (Word broken open)
+5. Seven Trumpets = Incense (Prayers answered)
+6. Revelation 11:19 = Veil opens (Ark revealed)
+7. Revelation 12-14 = Most Holy Place (Judgment Hour)
+
+Pentecost is what turns on the entire sanctuary machinery in Revelation.
+
+**Without Pentecost, the lampstand never lights, the bread never breaks, and the seals never open.**
+
+**E. HOW PENTECOST FITS THE FEAST-DAY PATTERN**
+
+The Feast of Weeks (Pentecost) symbolizes:
+• The first fruits of the gospel harvest
+• The birth of the church
+• The offering of two leavened loaves (Jew + Gentile)
+• The globalizing of the mission
+• The empowerment for Holy Place ministry
+
+**MASTER AUDIO-LINE FOR PENTECOST:**
+
+"Pentecost is the Laver of the New Testament — the washing, consecration, and Spirit-filling of the priesthood. But Pentecost also ignites the lampstands of the Seven Churches, empowers the opening of the Seven Seals, and launches the entire Holy Place era of Revelation. Without Pentecost, the lamps would not burn, the Bread would not open, and the prayers of the saints would not ascend. Pentecost is the hinge that turns the Gospels' altar into Revelation's sanctuary."
+
+---
+
+**THE FEAST-DAY OUTLINE OF THE NEW TESTAMENT**
+
+Overlay this directly onto the Sanctuary pattern.
+
+**1. PASSOVER — The Gospels (Altar of Sacrifice)**
+
+Christ is the Passover Lamb (1 Cor. 5:7).
+The Gospels = fulfillment of Passover.
+
+**2. UNLEAVENED BREAD — The Gospels/Resurrection**
+
+Christ in the tomb:
+• Pure
+• Unleavened
+• Without corruption
+
+This is the unleavened experience.
+
+**3. FIRSTFRUITS — The Resurrection (End of the Gospels)**
+
+Christ rises as: "Firstfruits of them that slept" (1 Cor. 15:20).
+
+**4. PENTECOST — Acts, the Seven Churches, and the Seven Seals**
+
+The Laver → The Outpouring of the Spirit → The Birth of the Priestly Community → The Launch of the Church Age
+
+(See detailed Pentecost section above)
+
+**5. TRUMPETS — The Seven Trumpets (Revelation 8-11)**
+
+Trumpets = warnings before the Day of Atonement.
+
+The schema:
+• Fall of Jerusalem
+• Fall of Rome
+• Trumpets 3 & 4: Judgment on Papal teachings
+• Trumpets 5 & 6: Islam judging the Papacy
+• Trumpet 7: Final judgment
+
+**6. DAY OF ATONEMENT — Revelation 11:19-14**
+
+This is the Investigative Judgment.
+
+• Ark seen
+• Commandments highlighted
+• Remnant sealed
+• Three angels proclaimed
+• Little horn judged
+• Satan exposed
+
+This is the full Day of Atonement experience.
+
+**7. FEAST OF TABERNACLES — Revelation 19-22**
+
+This is:
+• The Second Coming
+• The Marriage Supper
+• God tabernacling with humanity
+• The New Jerusalem
+• Eternity with God
+
+Final celebration — God with us forever.
+
+---
+
+**MASTER SUMMARY FOR SANCTUARY & FEAST PATTERN**
+
+"The Gospels are the Altar of Sacrifice; Acts and the Epistles are the Laver; Revelation 1-11 is the Holy Place (Lamp, Bread, Incense); Revelation 12-14 is the Most Holy Place; the Plagues and Second Coming are the High Priest exiting the sanctuary; the Millennium is outside the camp; and the New Jerusalem is the eternal Most Holy Place.
+
+The Feasts follow the same pattern: Passover (Cross), Unleavened Bread (Tomb), Firstfruits (Resurrection), Pentecost (Acts), Trumpets (Warnings), Day of Atonement (Judgment), and Tabernacles (Eternal Home)."
 `;
 
 // ============================================================
