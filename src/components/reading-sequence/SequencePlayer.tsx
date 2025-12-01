@@ -58,7 +58,7 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
   const [currentVerseIdx, setCurrentVerseIdx] = useState(0);
   const [volume, setVolume] = useState(100);
   const [isMuted, setIsMuted] = useState(false);
-  const [musicVolume, setMusicVolume] = useState(() => Math.min(getGlobalMusicVolume(), 15));
+  const [musicVolume, setMusicVolume] = useState(() => Math.min(getGlobalMusicVolume(), 30));
   const [chapterContent, setChapterContent] = useState<ChapterContent | null>(null);
   const [audioUrl, setAudioUrl] = useState<string | null>(null);
   const [hasStarted, setHasStarted] = useState(false);
@@ -122,15 +122,19 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
   // Callback ref for music audio - ensures volume is set when element mounts
   const setMusicAudioRef = useCallback((node: HTMLAudioElement | null) => {
     if (node) {
-      node.volume = musicVolume / 100;
       musicAudioRef.current = node;
+      // Apply current volume immediately
+      node.volume = musicVolume / 100;
+      console.log('[SequencePlayer] Music audio ref set, volume:', musicVolume / 100);
     }
-  }, []);
+  }, [musicVolume]);
 
-  // Update music volume directly on ref
+  // Update music volume directly on ref - critical for mobile
   useEffect(() => {
     if (musicAudioRef.current) {
-      musicAudioRef.current.volume = musicVolume / 100;
+      const vol = musicVolume / 100;
+      musicAudioRef.current.volume = vol;
+      console.log('[SequencePlayer] Music volume effect applied:', vol);
     }
   }, [musicVolume]);
 
@@ -1441,22 +1445,38 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
             </div>
           )}
           
-          {/* Music Volume Slider - Always visible */}
-          <div className="flex items-center gap-3">
-            <ListMusic className="h-4 w-4 text-muted-foreground" />
-            <span className="text-xs text-muted-foreground w-12">Music</span>
+          {/* Music Volume Slider - Always visible, touch-optimized for mobile */}
+          <div className="flex items-center gap-3 touch-none">
+            <ListMusic className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+            <span className="text-xs text-muted-foreground w-12 flex-shrink-0">Music</span>
             <Slider
               value={[musicVolume]}
+              min={0}
               max={30}
               step={1}
               onValueChange={(v) => {
-                console.log("[SequencePlayer] Music slider changed to:", v[0]);
-                setMusicVolume(v[0]);
-                setGlobalMusicVolume(v[0]);
+                const newVolume = v[0];
+                console.log("[SequencePlayer] Music slider changed to:", newVolume);
+                setMusicVolume(newVolume);
+                setGlobalMusicVolume(newVolume);
+                // Direct apply for mobile responsiveness
+                if (musicAudioRef.current) {
+                  musicAudioRef.current.volume = newVolume / 100;
+                }
               }}
-              className="flex-1"
+              onValueCommit={(v) => {
+                // Ensure final value is committed on touch release
+                const newVolume = v[0];
+                console.log("[SequencePlayer] Music slider committed:", newVolume);
+                setMusicVolume(newVolume);
+                setGlobalMusicVolume(newVolume);
+                if (musicAudioRef.current) {
+                  musicAudioRef.current.volume = newVolume / 100;
+                }
+              }}
+              className="flex-1 min-w-[100px]"
             />
-            <span className="text-xs text-muted-foreground w-8">{musicVolume}%</span>
+            <span className="text-xs text-muted-foreground w-8 flex-shrink-0">{musicVolume}%</span>
           </div>
           
           {isMobile && (
