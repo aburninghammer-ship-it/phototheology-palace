@@ -8,7 +8,10 @@
       "Bash(powershell -Command:*)",
       "Bash(npx cap:*)",
       "Bash(npm audit fix:*)",
-      "Bash(git add:*)"
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git push:*)",
+      "Bash(npm run dev:*)"
     ],
     "deny": [],
     "ask": []

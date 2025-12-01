@@ -555,10 +555,46 @@ All colors MUST be HSL.
     input, select, textarea, button {
       min-height: 44px;
     }
-    
+
     /* Ensure readable text on mobile */
     body {
       font-size: 16px; /* Prevents zoom on iOS */
+    }
+  }
+
+  /* Prevent horizontal overflow on all screen sizes */
+  html, body {
+    overflow-x: hidden;
+    width: 100%;
+    position: relative;
+  }
+
+  /* Ensure images and media respect viewport width */
+  img, svg, video {
+    max-width: 100%;
+    height: auto;
+  }
+
+  /* Prevent whitespace-nowrap from causing horizontal scroll on mobile */
+  @media (max-width: 640px) {
+    .whitespace-nowrap {
+      white-space: normal !important;
+    }
+  }
+
+  /* Fix for mobile viewport height on iOS/Android */
+  @supports (-webkit-touch-callout: none) {
+    .min-h-screen {
+      min-height: -webkit-fill-available;
+    }
+  }
+
+  /* Ensure text wraps properly on mobile */
+  @media (max-width: 640px) {
+    h1, h2, h3, h4, h5, h6, p, span, div {
+      word-wrap: break-word;
+      overflow-wrap: break-word;
+      hyphens: auto;
     }
   }
 }
