@@ -151,15 +151,7 @@ const MUSIC_FLOORS = [
     mood: "Solemn cello, ancient feel",
     color: "from-indigo-500/20 to-purple-500/20",
     borderColor: "border-indigo-500/30",
-    tracks: [
-      {
-        id: "chamber-light",
-        name: "Chamber of Light",
-        description: "Deep cello with ancient orchestral textures",
-        bpm: 60,
-        url: "https://incompetech.com/music/royalty-free/mp3-royaltyfree/Perspectives.mp3",
-      }
-    ]
+    tracks: []
   }
 ];
 
