@@ -99,6 +99,26 @@ const AMBIENT_TRACKS: Array<{
     url: "https://cdn1.suno.ai/37b77ba0-4272-4220-a392-16645e9aa9b2.mp3",
     bpm: 60,
   },
+  {
+    id: "fire",
+    name: "Fire",
+    description: "Choir harmonies, uplifting crescendo, ethereal",
+    category: "floor-2",
+    floor: 2,
+    mood: "uplifting, choral, ethereal",
+    url: "https://cdn1.suno.ai/37b77ba0-4272-4220-a392-16645e9aa9b2.mp3",
+    bpm: 60,
+  },
+  {
+    id: "whispers-inner-mind",
+    name: "Whispers of the Inner Mind",
+    description: "Ambient instrumental meditation - peaceful and meditative",
+    category: "floor-2",
+    floor: 2,
+    mood: "ambient, peaceful, meditative",
+    url: "https://cdn1.suno.ai/E8qISnskB0iJ5bnz.mp3",
+    bpm: 55,
+  },
 ];
 
 // Room to track mapping based on Phototheology floors
@@ -1057,36 +1077,6 @@ export function AmbientMusicPlayer({
                   </SelectContent>
                 </Select>
                 
-                {/* Custom Music Upload Section */}
-                {user && (
-                  <div className="border rounded-md p-3 bg-primary/5 space-y-2">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        <Upload className="h-4 w-4 text-primary" />
-                        <span className="text-sm font-medium">Your Music</span>
-                      </div>
-                      <Button
-                        variant="default"
-                        size="sm"
-                        onClick={() => fileInputRef.current?.click()}
-                        disabled={uploading}
-                        className="h-7"
-                      >
-                        {uploading ? <Loader2 className="h-3 w-3 animate-spin mr-1" /> : <Upload className="h-3 w-3 mr-1" />}
-                        Upload Song
-                      </Button>
-                    </div>
-                    {userTracks.length === 0 ? (
-                      <p className="text-xs text-muted-foreground">
-                        📁 No custom songs uploaded yet. Click "Upload Song" to add your own music!
-                      </p>
-                    ) : (
-                      <p className="text-xs text-muted-foreground">
-                        {userTracks.length} custom {userTracks.length === 1 ? 'song' : 'songs'} uploaded
-                      </p>
-                    )}
-                  </div>
-                )}
 
                 {/* Playlist Selection */}
                 <div className="border rounded-md p-2 bg-muted/30">
