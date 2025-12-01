@@ -96,6 +96,39 @@ const getSystemPrompt = (depth: CommentaryDepth): string => {
   * Third Heaven (DoL³/NE³): Final cosmic judgment → Literal New Heaven and Earth (Rev 21-22)
 - Juice Room: Squeeze every drop from a book using all PT principles
 
+### THE SANCTUARY OUTLINE OF THE NEW TESTAMENT:
+The New Testament follows the sanctuary pattern from Altar → Laver → Lampstand → Shewbread → Incense → Ark → Final Atonement → New Jerusalem:
+
+**THE GOSPELS = THE ALTAR OF SACRIFICE**: Where the Lamb is slain, blood is shed, and salvation is secured. Christ becomes the Lamb (John 1:29), His blood is shed, the temple veil tears (Matthew 27:51), and the sacrifice fulfilling every type is completed. "It is finished" is altar language (John 19:30).
+
+**ACTS & EPISTLES = THE LAVER**: Washing, consecration, ordination, the birth of a priesthood. Where the Church is born, baptism is central (Acts 2), the Spirit washes and regenerates (Titus 3:5), believers become priests (1 Peter 2:9), and the early church is consecrated for ministry (Romans 6).
+
+**REVELATION 1-11 = THE HOLY PLACE**: Following furniture in exact order:
+- Rev 1-3 = Lampstand (seven churches = seven lamps, Christ walking among them like the High Priest)
+- Rev 4-6 = Table of Shewbread (sealed book opened, Word broken through seals: white horse = pure gospel bread, black horse = famine of Word, pale horse = death from rejecting bread)
+- Rev 8-11 = Altar of Incense (prayers ascend, incense offered, fire cast to earth, trumpets sound as God answers prayers through judgment)
+
+**PENTECOST - THE HINGE**: Pentecost is the architectural transition from Courtyard (Gospels/Altar) to Holy Place. The Spirit both washes (Laver) and lights the lamps (Holy Place). Pentecost gives birth to the Seven Churches (Rev 1-3), opens the Seven Seals (Rev 4-6) when the Lamb is enthroned (Acts 2:33 = Rev 5:7), and launches the entire Holy Place era. Seal 1 White Horse = Pentecost Explosion (pure gospel, Spirit-filled conquest). Without Pentecost, the lampstand never lights, the bread never breaks, and the seals never open.
+
+**REVELATION 11:19-14 = THE MOST HOLY PLACE**: Temple opens, Ark appears (Rev 11:19). This begins the Investigative Judgment, final war between Christ and Satan, commandment-keeping remnant, mark of the beast, three angels' messages. This is the realm of accusation, the law, the ark, the remnant, the judgment, and final sealing.
+
+**REVELATION 15-19 = PLAGUES & SECOND COMING**: Day of Atonement pattern - temple filled with smoke (close of probation), plagues fall (execution of judgment), Christ emerges as King of kings. The High Priest exits the sanctuary.
+
+**REVELATION 20 = OUTSIDE THE CAMP**: Judgment of wicked, binding of Satan, millennium. The scapegoat removed from the camp.
+
+**REVELATION 21-22 = THE ETERNAL MOST HOLY PLACE CITY**: New Jerusalem is a perfect cube (proportions of the Most Holy Place). God dwells with His people forever. The entire redeemed universe becomes a Most Holy Place.
+
+### THE FEAST-DAY OUTLINE OF THE NEW TESTAMENT:
+The Feasts overlay directly onto the Sanctuary pattern:
+
+**PASSOVER** (Gospels/Altar): Christ is the Passover Lamb (1 Cor 5:7)
+**UNLEAVENED BREAD** (Gospels/Tomb): Christ in tomb—pure, unleavened, without corruption
+**FIRSTFRUITS** (Resurrection): Christ rises as "Firstfruits of them that slept" (1 Cor 15:20)
+**PENTECOST** (Acts/Churches/Seals): Birth of church, offering of two leavened loaves (Jew + Gentile), empowerment for Holy Place ministry, launches entire Revelation 1-11 era
+**TRUMPETS** (Rev 8-11): Warnings before Day of Atonement—Fall of Jerusalem (AD 70), Fall of Rome, Judgment on Papal teachings, Islam judging Papacy, Final judgment
+**DAY OF ATONEMENT** (Rev 11:19-14): Investigative Judgment—Ark seen, Commandments highlighted, Remnant sealed, Three angels proclaimed
+**TABERNACLES** (Rev 19-22): Second Coming, Marriage Supper, God tabernacling with humanity, New Jerusalem, Eternity with God
+
 **7th Floor - Spiritual & Emotional (Height):**
 - Fire Room: Feel the emotional weight—conviction, awe, trembling, comfort, love
 - Meditation Room: Slow marination in truth—pause, pray, rest in the Word
