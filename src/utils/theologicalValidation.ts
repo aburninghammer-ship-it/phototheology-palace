@@ -285,6 +285,87 @@ export function validateTheologicalContent(content: string): ValidationResult {
     }
   }
 
+  // Rule 12: Daniel 11:23 must identify the Papacy's entrance
+  if (lowerContent.includes('daniel 11') && lowerContent.includes('23')) {
+    const hasLeagueExplanation = lowerContent.includes('league') || lowerContent.includes('covenant');
+    const hasPapalIdentification = lowerContent.includes('papal') || lowerContent.includes('papacy');
+    const hasSmallPeopleExplanation = lowerContent.includes('small people') || lowerContent.includes('diplomacy');
+    
+    if (hasLeagueExplanation && !hasPapalIdentification && content.length > 150) {
+      warnings.push(
+        'WARNING: Daniel 11:23 "after the league made with him" is the Papacy\'s entrance into the chapter. ' +
+        'The league = formal alliance between the Papacy and civil powers (Clovis & the Franks AD 496-508, Justinian\'s decree AD 533). ' +
+        'This is the same moment that uproots three horns, begins the Papal phase of the little horn, and launches the 1260 years. ' +
+        'Daniel 11:23 parallels Daniel 7 little horn, Daniel 8 little horn, and Revelation 13 beast from the sea.'
+      );
+    }
+    
+    if (hasSmallPeopleExplanation && !hasPapalIdentification && content.length > 150) {
+      warnings.push(
+        'WARNING: "Shall become strong with a small people" (Dan 11:23) describes how Papal Rome rose—not by military conquest or large armies, ' +
+        'but through diplomacy, alliances, religious influence, political manipulation, and support of a small but powerful minority. ' +
+        'This is uniquely Papal—not Islam, Greece, or any other power. The Papacy came to power through others, not through itself.'
+      );
+    }
+  }
+
+  // Rule 13: Daniel 11:23-30 = Papal military phase; 11:31-39 = Papal spiritual phase
+  if (lowerContent.includes('daniel 11') && 
+      (lowerContent.includes('daily') || lowerContent.includes('abomination') || lowerContent.includes('sanctuary'))) {
+    const hasTwoPhaseExplanation = (lowerContent.includes('military') || lowerContent.includes('iron')) &&
+                                   (lowerContent.includes('spiritual') || lowerContent.includes('clay'));
+    
+    if (!hasTwoPhaseExplanation && content.length > 200) {
+      warnings.push(
+        'WARNING: Daniel 11 divides the Papal period into two phases: ' +
+        'Verses 23-30 = military/political conquests (iron phase): wars, crusades, territorial manipulation, crowns placed by Papacy. ' +
+        'Verses 31-39 = spiritual conquests (clay phase): pollute sanctuary, take away daily, place abomination, corrupt with flatteries, ' +
+        'exalt above every god, replace Christ\'s ministry. Military dominance + spiritual dominance = complete Papal supremacy 1260 years.'
+      );
+    }
+  }
+
+  // Rule 14: Shushan in Daniel 8 must be connected to Esther's judgment typology
+  if ((lowerContent.includes('daniel 8') && lowerContent.includes('shushan')) ||
+      (lowerContent.includes('palace') && lowerContent.includes('daniel 8'))) {
+    const hasEstherConnection = lowerContent.includes('esther') || lowerContent.includes('judgment');
+    
+    if (!hasEstherConnection && content.length > 150) {
+      warnings.push(
+        'WARNING: Daniel 8:2 places Daniel "at Shushan in the palace" for a reason. Shushan is the location of Esther\'s book, ' +
+        'which is a courtroom/judgment narrative: decree of death, accusations, records searched, king reviewing evidence, Mordecai vindicated, ' +
+        'Haman condemned, deliverance granted. This mirrors Daniel 7\'s heavenly courtroom, Daniel 8\'s sanctuary cleansing (v.14), ' +
+        'and the Investigative Judgment. Esther foreshadows the judgment scene that Daniel 8:14 describes. Shushan anchors prophecy in judgment typology.'
+      );
+    }
+  }
+
+  // Rule 15: 2300 days must be interpreted as symbolic years
+  if (lowerContent.includes('2300') && lowerContent.includes('daniel')) {
+    const hasLiteralDaysError = /2300.*literal.*days/i.test(content) || 
+                                /literal.*2300.*days/i.test(content);
+    const hasSymbolicExplanation = lowerContent.includes('symbolic') || 
+                                   lowerContent.includes('year') ||
+                                   lowerContent.includes('1844');
+    
+    if (hasLiteralDaysError) {
+      errors.push(
+        'CRITICAL VIOLATION: The 2300 days CANNOT be literal days. 2300 literal days = 6.3 years, but the prophecy spans: ' +
+        'Medo-Persia (ram), Greece (goat), Greco-Roman transition, Pagan Rome, Papal Rome, and the time of the end. ' +
+        'Six years cannot cover 600+ years of Medo-Persia/Greece, much less Papal Rome\'s 1260-year phase. ' +
+        'Daniel 7 & 9 establish day-year principle (70 weeks = 490 years; time/times/half = 1260 years). ' +
+        'Gabriel links 2300 to 490 years in Daniel 9. Jesus places fulfillment in Christian era (Matt 24:15), not 165 BC Antiochus. ' +
+        'Daniel 8 explicitly reaches "time of the end" (v.17,19). Only symbolic year-day interpretation fits: 457 BC to AD 1844.'
+      );
+    } else if (!hasSymbolicExplanation && content.length > 200) {
+      warnings.push(
+        'WARNING: When discussing the 2300 days (Daniel 8:14), clarify they are symbolic years using the day-year principle. ' +
+        'The prophecy covers Medo-Persia, Greece, Pagan Rome, Papal Rome (1260 years), reaching to "the time of the end" (v.17,19). ' +
+        'Literal days cannot span this timeline. The 2300 years = 457 BC (Artaxerxes\' decree) to AD 1844 (Investigative Judgment begins).'
+      );
+    }
+  }
+
   return {
     valid: errors.length === 0,
     errors,
@@ -320,6 +401,49 @@ export function getTheologicalRules(): Array<{ id: string; rule: string; rationa
         'The remaining seven evolved into modern Western powers and each produced a unique distortion of Christianity: ' +
         'Franks → Church Supremacy; Anglo-Saxons → Persecuting Protestantism & America; Alemanni → Atheistic Rationalism; ' +
         'Visigoths → The Inquisition; Suevi → Global Slavery; Lombards → Papal Territorial Power; Burgundians → Doctrinal Fragmentation.',
+    },
+    {
+      id: 'daniel-11-23-papacy-entrance',
+      rule: 'Daniel 11:23 marks the Papacy\'s entrance through "the league" with civil powers',
+      rationale:
+        '"After the league made with him he shall work deceitfully: for he shall come up, and shall become strong with a small people" (Dan 11:23). ' +
+        'The league = formal alliance between the Papacy and civil powers (Clovis & Franks AD 496-508; Justinian\'s decree AD 533 recognizing Papacy as head over all churches). ' +
+        'This is the exact moment that: uproots three horns (Heruli, Vandals, Ostrogoths), begins the Papal phase of the little horn, launches 1260 years of supremacy. ' +
+        'Daniel 11:23 parallels Daniel 7 little horn, Daniel 8 little horn, Revelation 13 beast. "Small people" = Papacy rose not by military conquest but through diplomacy, ' +
+        'alliances, religious influence, political manipulation—uniquely Papal. The Papacy came to power through others, not through itself.',
+    },
+    {
+      id: 'daniel-11-two-phase-papal-dominion',
+      rule: 'Daniel 11:23-30 = Papal military phase (iron); Daniel 11:31-39 = Papal spiritual phase (clay)',
+      rationale:
+        'Daniel 11 divides Papal Rome into two phases matching Daniel 2 iron/clay feet. ' +
+        'Verses 23-30 (military/iron): "stir up power," wars, crusades, political alliances, territorial manipulation, armies controlled by Papacy, crowns placed/removed by Papacy. ' +
+        'Verses 31-39 (spiritual/clay): "pollute sanctuary," "take away the daily," "place abomination of desolation," "corrupt with flatteries," "exalt above every god"—' +
+        'changing times/laws (Dan 7:25), replacing Christ\'s heavenly ministry, introducing priesthoods/confessions/masses, counterfeit sanctuary system, ' +
+        'elevating human authority above Scripture, universal church-state religious empire. Military dominance + spiritual dominance = complete Papal supremacy AD 538-1798.',
+    },
+    {
+      id: 'shushan-esther-judgment-typology',
+      rule: 'Palace of Shushan in Daniel 8 connects to Esther\'s judgment typology and Investigative Judgment',
+      rationale:
+        'Daniel 8:2: "I saw in a vision... I was at Shushan in the palace." Shushan is the location of Esther\'s book, which is a courtroom/judgment narrative: ' +
+        'decree of death, accusations, records searched, king reviewing evidence, Mordecai vindicated, Haman condemned, deliverance granted, sentence executed. ' +
+        'This mirrors: Daniel 7 heavenly courtroom, Daniel 8:14 sanctuary cleansing, Daniel 9 Messiah cut off, Daniel 11 end-time persecution, Revelation 14 judgment hour. ' +
+        'Esther is sanctuary-coded judgment story. The Persian king judging = type of heavenly judgment, God reviewing record books, deliverance of God\'s people, ' +
+        'destruction of accusers. Daniel 8:14 cleansing parallels: reversal of Haman\'s decree, vindication of saints, exposure of enemy, deliverance, new kingdom decree. ' +
+        'Shushan anchors the prophecy in judgment typology, foreshadowing the Investigative Judgment that Daniel 8:14 describes.',
+    },
+    {
+      id: '2300-days-symbolic-years',
+      rule: 'The 2300 days of Daniel 8:14 MUST be interpreted as symbolic years (day-year principle), not literal days',
+      rationale:
+        '2300 literal days = 6.3 years, but prophecy spans: Medo-Persia (ram), Greece (goat), Greco-Roman transition, Pagan Rome, Papal Rome, time of the end. ' +
+        'Six years cannot cover 600+ years of Medo-Persia/Greece, much less Papal Rome\'s 1260-year phase. ' +
+        'Daniel 7 & 9 establish day-year principle: 70 weeks = 490 years (Dan 9:24-27); time/times/half = 1260 years (Dan 7:25). ' +
+        'Gabriel links 2300 to 490 in Daniel 9 (70 weeks "cut off"/chathak from longer period). Both use symbolic time, both reach Messiah and judgment. ' +
+        'Jesus places fulfillment in Christian era (Matt 24:15), not 165 BC Antiochus. Daniel 8 explicitly reaches "time of the end" (v.17,19). ' +
+        'Literal days cannot reach: fall of Pagan Rome, rise of Papal Rome, Middle Ages, Reformation, end-time judgment, appearing of Satan (Dan 11:40). ' +
+        'Only symbolic interpretation fits: 2300 years = 457 BC (Artaxerxes\' decree to restore Jerusalem) to AD 1844 (Investigative Judgment begins in heavenly sanctuary).',
     },
     {
       id: 'scapegoat-never-christ',
