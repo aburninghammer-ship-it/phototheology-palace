@@ -17,15 +17,16 @@ export const PunchyHero = () => {
       </div>
 
       <div className="relative z-10 max-w-5xl mx-auto px-4 text-center">
-        {/* Badge */}
+        {/* Scripture Badge - Daniel 12:4 */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
+          className="mb-8"
         >
-          <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 text-sm font-medium text-primary mb-8">
-            <Sparkles className="h-4 w-4" />
-            Teaches Bible 5x faster • Never forget a verse again
+          <span className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-primary/10 border border-primary/20 text-base font-medium">
+            <span className="text-primary italic font-serif">"Knowledge shall be increased"</span>
+            <span className="text-muted-foreground text-sm">— Daniel 12:4</span>
           </span>
         </motion.div>
 
