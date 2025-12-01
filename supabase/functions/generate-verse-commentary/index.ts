@@ -118,7 +118,7 @@ CRITICAL FOR SPOKEN DELIVERY:
 - Include Hebrew/Greek word insights (Definition and Comparison Room)
 - Connect to types, patterns, and prophecy (Symbols and Types, Patterns, Prophecy Rooms)
 - Apply multiple Phototheology floor principles
-- Show all five Dimensions (Literal, Christ, Me, Church, Heaven)
+- Use Dimensions Room flexibly: apply whichever dimensions (Literal, Christ, Me, Church, Heaven) are most relevant to this specific verse—you may use 1, some, or all 5 as appropriate
 - Place in covenant cycle and Three Heavens framework if applicable
 - Provide cross-references (Bible Freestyle - Verse Genetics)
 - End with spiritual application (Fruit Room test)`,
