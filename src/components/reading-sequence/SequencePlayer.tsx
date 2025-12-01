@@ -390,6 +390,9 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
 
     const audio = new Audio(url);
     audio.volume = isMuted ? 0 : volume / 100;
+    // Apply playback speed from current sequence
+    const playbackSpeed = currentSequence?.playbackSpeed || 1;
+    audio.playbackRate = playbackSpeed;
     audioRef.current = audio;
     setAudioUrl(url);
 
@@ -450,6 +453,9 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
         
         const audio = new Audio(cached.audioUrl);
         audio.volume = isMuted ? 0 : volume / 100;
+        // Apply playback speed from sequence
+        const playbackSpeed = currentSeq?.playbackSpeed || 1;
+        audio.playbackRate = playbackSpeed;
         audioRef.current = audio;
         
         audio.onended = () => {
@@ -830,6 +836,11 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
     const audio = new Audio(url);
     audio.volume = isMuted ? 0 : volume / 100;
     
+    // Apply playback speed from sequence settings
+    const playbackSpeed = currentSeq?.playbackSpeed || 1;
+    audio.playbackRate = playbackSpeed;
+    console.log("[PlayVerse] Setting playback rate to:", playbackSpeed);
+    
     // Store reference BEFORE any async operations
     audioRef.current = audio;
     
@@ -899,6 +910,9 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
           
           const audio = new Audio(cached.audioUrl);
           audio.volume = isMuted ? 0 : volume / 100;
+          // Apply playback speed from sequence
+          const playbackSpeed = currentSeq?.playbackSpeed || 1;
+          audio.playbackRate = playbackSpeed;
           audioRef.current = audio;
           
           audio.onended = () => {
@@ -974,6 +988,9 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
             
             const audio = new Audio(cached.audioUrl);
             audio.volume = isMuted ? 0 : volume / 100;
+            // Apply playback speed from sequence
+            const playbackSpeed = currentSeq?.playbackSpeed || 1;
+            audio.playbackRate = playbackSpeed;
             audioRef.current = audio;
             
             audio.onended = () => {
