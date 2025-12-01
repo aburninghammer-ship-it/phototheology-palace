@@ -239,6 +239,7 @@ export function AmbientMusicPlayer({
     return saved === "true";
   });
   const [duckMultiplier, setDuckMultiplier] = useState(1);
+  const effectiveVolumeRef = useRef(0.08); // Ref to track current effective volume for callbacks
   // Selected tracks for playlist
   const [selectedTracks, setSelectedTracks] = useState<Set<string>>(() => {
     const saved = localStorage.getItem("pt-ambient-selected-tracks");
@@ -254,17 +255,23 @@ export function AmbientMusicPlayer({
   const [showPlaylist, setShowPlaylist] = useState(false);
 
   // Audio ducking - reduce volume when TTS is playing
-  // Works on both desktop and mobile to ensure voice reader is dominant (70/30 ratio)
+  // Works on both desktop and mobile to ensure voice reader is dominant
   const handleDuckChange = useCallback((ducked: boolean, duckRatio: number) => {
+    console.log(`[AmbientMusic] Duck event: ducked=${ducked}, ratio=${duckRatio}`);
     setDuckMultiplier(duckRatio);
-    if (audioRef.current) {
-      const effectiveVolume = isMuted ? 0 : volume * duckRatio;
-      audioRef.current.volume = effectiveVolume;
-      console.log(`[AmbientMusic] ${ducked ? 'Ducking' : 'Restoring'} volume to ${effectiveVolume}`);
-    }
-  }, [volume, isMuted]);
+  }, []);
 
   useAudioDucking(handleDuckChange);
+
+  // Single effect to manage volume - responds to volume, mute, AND duck changes
+  useEffect(() => {
+    const effectiveVolume = isMuted ? 0 : volume * duckMultiplier;
+    effectiveVolumeRef.current = effectiveVolume;
+    if (audioRef.current) {
+      audioRef.current.volume = effectiveVolume;
+      console.log(`[AmbientMusic] Volume updated: base=${volume}, duck=${duckMultiplier}, effective=${effectiveVolume}`);
+    }
+  }, [volume, isMuted, duckMultiplier]);
 
   // Combine preset and user tracks - memoized to prevent unnecessary re-renders
   const allTracks = useMemo(() => [
@@ -303,8 +310,8 @@ export function AmbientMusicPlayer({
     if (!audioRef.current) {
       audioRef.current = new Audio();
       audioRef.current.loop = loopMode === "one";
-      // Set initial volume
-      audioRef.current.volume = isMuted ? 0 : Math.min(volume, 0.30);
+      // Set initial volume from ref (which tracks current effective volume)
+      audioRef.current.volume = effectiveVolumeRef.current;
       
       // Handle track ended for "all" loop mode
       audioRef.current.onended = () => {
@@ -322,9 +329,8 @@ export function AmbientMusicPlayer({
       // Re-apply volume after audio can play (browsers reset volume on load)
       audioRef.current.oncanplay = () => {
         if (audioRef.current) {
-          const targetVol = isMuted ? 0 : volume * duckMultiplier;
-          audioRef.current.volume = targetVol;
-          console.log('[AmbientMusic] oncanplay - volume set to:', targetVol);
+          audioRef.current.volume = effectiveVolumeRef.current;
+          console.log('[AmbientMusic] oncanplay - volume set to:', effectiveVolumeRef.current);
         }
       };
     }
@@ -357,16 +363,10 @@ export function AmbientMusicPlayer({
     }
   }, [currentTrackId, currentTrack]);
 
-  // Update volume
+  // Save volume to localStorage when it changes
   useEffect(() => {
-    if (audioRef.current) {
-      const newVolume = isMuted ? 0 : volume * duckMultiplier;
-      audioRef.current.volume = newVolume;
-      // Save as percentage
-      localStorage.setItem("pt-music-volume-pct", Math.round(volume * 100).toString());
-      console.log('[AmbientMusic] Volume set to:', newVolume, '(base:', volume, 'duck:', duckMultiplier, ')');
-    }
-  }, [volume, isMuted, duckMultiplier]);
+    localStorage.setItem("pt-music-volume-pct", Math.round(volume * 100).toString());
+  }, [volume]);
 
   // Save enabled state
   useEffect(() => {
