@@ -50,28 +50,6 @@ import { subscribeToMusicVolume } from "@/hooks/useMusicVolumeControl";
 // Rich orchestral, movie soundtrack style (The Chosen, Zimmer, Tyler)
 // BPM 55-70, no lyrics, no synthesizers, pure orchestra
 const AMBIENT_TRACKS = [
-  // Floor 1 - Story Floor: warm strings, gentle narrative
-  {
-    id: "story-warmth",
-    name: "Story Warmth",
-    description: "Gentle meditative piano for peaceful narrative immersion",
-    category: "floor-1",
-    floor: 1,
-    mood: "warm, meditative, peaceful",
-    url: "https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf07a.mp3",
-    bpm: 55,
-  },
-  // Floor 2 - Pattern Floor: structured strings, reflective
-  {
-    id: "patterns-kingdom",
-    name: "Patterns of the Kingdom",
-    description: "Measured orchestral strings with thoughtful progression",
-    category: "floor-2",
-    floor: 2,
-    mood: "structured, reflective",
-    url: "https://cdn.pixabay.com/download/audio/2022/02/22/audio_d1718ab41b.mp3",
-    bpm: 65,
-  },
   // Floor 3 - Sanctuary Floor: reverent strings, harp
   {
     id: "sanctuary-stillness",
