@@ -105,6 +105,7 @@ const DailyReading = lazy(() => import("./pages/DailyReading"));
 const TreasureHunt = lazy(() => import("./pages/TreasureHunt"));
 const TreasureHuntPlay = lazy(() => import("./pages/TreasureHuntPlay"));
 const TrainingDrills = lazy(() => import("./pages/TrainingDrills"));
+const DrillDrill = lazy(() => import("./pages/DrillDrill"));
 const EscapeRoom = lazy(() => import("./pages/EscapeRoom"));
 const EscapeRoomPlay = lazy(() => import("./pages/EscapeRoomPlay"));
 const Profile = lazy(() => import("./pages/Profile"));
@@ -343,6 +344,7 @@ function App() {
             <Route path="/escape-room" element={<ProtectedRoute><EscapeRoom /></ProtectedRoute>} />
             <Route path="/escape-room/play/:roomId" element={<ProtectedRoute><EscapeRoomPlay /></ProtectedRoute>} />
             <Route path="/training-drills" element={<ProtectedRoute><TrainingDrills /></ProtectedRoute>} />
+            <Route path="/drill-drill" element={<ProtectedRoute><DrillDrill /></ProtectedRoute>} />
             <Route path="/live-study" element={<ProtectedRoute><LiveStudy /></ProtectedRoute>} />
             <Route path="/live-study/:roomId" element={<ProtectedRoute><LiveStudyRoom /></ProtectedRoute>} />
             <Route path="/community" element={<ProtectedRoute><Community /></ProtectedRoute>} />

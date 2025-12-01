@@ -1980,6 +1980,45 @@ export type Database = {
         }
         Relationships: []
       }
+      drill_sessions: {
+        Row: {
+          completed_at: string | null
+          created_at: string
+          drill_data: Json | null
+          id: string
+          mode: string
+          name: string | null
+          updated_at: string
+          user_id: string
+          verse_reference: string
+          verse_text: string | null
+        }
+        Insert: {
+          completed_at?: string | null
+          created_at?: string
+          drill_data?: Json | null
+          id?: string
+          mode: string
+          name?: string | null
+          updated_at?: string
+          user_id: string
+          verse_reference: string
+          verse_text?: string | null
+        }
+        Update: {
+          completed_at?: string | null
+          created_at?: string
+          drill_data?: Json | null
+          id?: string
+          mode?: string
+          name?: string | null
+          updated_at?: string
+          user_id?: string
+          verse_reference?: string
+          verse_text?: string | null
+        }
+        Relationships: []
+      }
       email_campaigns: {
         Row: {
           created_at: string | null

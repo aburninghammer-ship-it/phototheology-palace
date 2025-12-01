@@ -161,7 +161,7 @@ const DrillDrill = () => {
     if (!user || !session) return;
 
     try {
-      const { error } = await supabase.from("drill_sessions").insert({
+      const { error } = await supabase.from("drill_sessions" as any).insert({
         user_id: user.id,
         verse_reference: session.verse,
         verse_text: session.verseText,
