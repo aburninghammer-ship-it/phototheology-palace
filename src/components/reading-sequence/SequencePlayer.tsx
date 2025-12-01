@@ -19,6 +19,7 @@ import {
   Smartphone,
   Download,
   WifiOff,
+  RotateCcw,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -1371,8 +1372,28 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
             size="icon"
             onClick={handleSkipPrev}
             disabled={isLoading}
+            title="Previous verse"
           >
             <SkipBack className="h-5 w-5" />
+          </Button>
+
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => {
+              // Rewind 10 seconds in current audio
+              if (audioRef.current && audioRef.current.currentTime > 0) {
+                audioRef.current.currentTime = Math.max(0, audioRef.current.currentTime - 10);
+                console.log('[SequencePlayer] Rewound 10 seconds');
+              } else if (window.speechSynthesis?.speaking) {
+                // For browser TTS, skip to previous verse instead
+                handleSkipPrev();
+              }
+            }}
+            disabled={isLoading || (!isPlaying && !isPaused)}
+            title="Rewind 10 seconds"
+          >
+            <RotateCcw className="h-4 w-4" />
           </Button>
 
           {isPlaying && !isPaused ? (
