@@ -170,18 +170,34 @@ Commentary style for SCHOLARLY/DEPTH level:
 - Provide comprehensive verse-by-verse commentary
 - Start explicitly with verses 1-3 and then move sequentially through the chapter (verse 1, verse 2, verse 3, etc.)
 - Do NOT skip or ignore any verse; every verse in the chapter must be addressed either individually or in clearly labeled grouped sections (e.g., "verses 1-3", "verses 4-5")
-- Apply the full Phototheology framework across multiple floors
-- Include Greek/Hebrew word studies (Definition and Comparison Room)
-- Provide extensive cross-references (Bible Freestyle / Verse Genetics)
-- Discuss historical, cultural, and theological context in detail
-- Connect to the 8 covenant cycles where applicable
-- Place in Three Heavens framework when relevant
-- Reference sanctuary typology (Blue Room) and prophetic timelines
-- Show all five Dimensions where applicable
-- Identify patterns, types, and parallels
-- Include scholarly insights while maintaining accessibility
+
+CRITICAL - APPLY THE COMPLETE PHOTOTHEOLOGY PALACE:
+You MUST engage with ALL 8 floors throughout the commentary. Don't just mention them—actively use them:
+
+**Floor 1 (Furnishing):** Create vivid mental images (Translation Room), highlight striking insights (Gems Room), help readers remember the narrative flow (Story Room)
+
+**Floor 2 (Investigation):** Make detailed observations, provide Hebrew/Greek word studies (Definition and Comparison Room), identify symbols and types pointing to Christ, ask probing questions
+
+**Floor 3 (Freestyle):** Connect to nature illustrations, personal life applications, show verse genetics (biblical cross-references), draw from historical parallels
+
+**Floor 4 (Next Level - MANDATORY):**
+- Concentration Room: Show Christ EXPLICITLY in every passage
+- Dimensions Room: Apply all five dimensions (Literal, Christ, Me, Church, Heaven)
+- Theme Room: Connect to Sanctuary Wall, Life of Christ Wall, Great Controversy Wall, Time Prophecy Wall, Gospel Floor, Heaven Ceiling
+- Patterns Room: Identify recurring biblical motifs (40 days, 3 days, 7s, 12s, deliverer stories)
+- Parallels Room: Show mirrored actions across Scripture (e.g., Babel/Pentecost)
+- Fruit Room: Ensure interpretation produces Christlike character
+
+**Floor 5 (Vision):** Connect to sanctuary typology (Blue Room - altar, laver, lampstand, showbread, incense, ark, veil, gate), place in prophetic timelines (Prophecy Room), relate to Three Angels' Messages when relevant, connect to biblical feasts (Feasts Room)
+
+**Floor 6 (Cycles & Heavens):** Place chapter in one of the 8 covenant cycles (Adamic, Noahic, Abrahamic, Mosaic, Cyrusic, Cyrus-Christ, Spirit, Remnant) and identify which Day-of-the-LORD horizon (1H: Babylon→Restoration, 2H: 70AD→New Covenant, 3H: Final→New Creation)
+
+**Floor 7 (Spiritual/Emotional):** Engage the heart—show the emotional weight and spiritual fire of the passage, not just intellectual analysis
+
+Don't just list these—weave them naturally into your verse-by-verse exposition. A thorough depth commentary should touch on principles from ALL 8 floors, showing the full richness of the Phototheology method.
+
 - This should be thorough enough for serious Bible students
-- Length: As long as needed to cover the chapter thoroughly (800-1500+ words)`;
+- Length: As long as needed to cover the chapter thoroughly (1000-2000+ words)`;
    }
 };
 
