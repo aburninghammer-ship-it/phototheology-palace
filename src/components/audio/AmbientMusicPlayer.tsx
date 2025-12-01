@@ -474,6 +474,37 @@ export function AmbientMusicPlayer({
     }
   };
 
+  // Direct volume preset function - bypasses React state for immediate effect
+  const setVolumePreset = (preset: 'off' | 'low' | 'med' | 'high') => {
+    const presetValues = {
+      off: 0,
+      low: 0.05,
+      med: 0.15,
+      high: 0.30
+    };
+    const newVolume = presetValues[preset];
+    console.log('[AmbientMusic] setVolumePreset:', preset, newVolume);
+    
+    // Immediately apply to audio element
+    if (audioRef.current) {
+      audioRef.current.volume = newVolume * duckMultiplier;
+      console.log('[AmbientMusic] Direct volume set to:', audioRef.current.volume);
+    }
+    
+    // Then update state
+    setVolume(newVolume);
+    setIsMuted(newVolume === 0);
+    localStorage.setItem("pt-music-volume-pct", Math.round(newVolume * 100).toString());
+  };
+
+  // Get current preset level
+  const getCurrentPreset = (): 'off' | 'low' | 'med' | 'high' => {
+    if (isMuted || volume === 0) return 'off';
+    if (volume <= 0.08) return 'low';
+    if (volume <= 0.20) return 'med';
+    return 'high';
+  };
+
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
@@ -735,27 +766,41 @@ export function AmbientMusicPlayer({
                 </span>
               </div>
               
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={toggleMute}
-                className="h-8 w-8"
-              >
-                {isMuted ? (
-                  <VolumeX className="h-4 w-4" />
-                ) : (
-                  <Volume2 className="h-4 w-4" />
-                )}
-              </Button>
-              
-              <Slider
-                value={[isMuted ? 0 : volume]}
-                min={0}
-                max={0.3}
-                step={0.01}
-                onValueChange={handleVolumeChange}
-                className="w-20"
-              />
+              {/* Volume Preset Buttons - More reliable on mobile */}
+              <div className="flex items-center gap-1 border rounded-lg p-1 bg-muted/30">
+                <Button
+                  variant={getCurrentPreset() === 'off' ? 'default' : 'ghost'}
+                  size="sm"
+                  onClick={() => setVolumePreset('off')}
+                  className="h-7 px-2 text-xs"
+                >
+                  <VolumeX className="h-3 w-3" />
+                </Button>
+                <Button
+                  variant={getCurrentPreset() === 'low' ? 'default' : 'ghost'}
+                  size="sm"
+                  onClick={() => setVolumePreset('low')}
+                  className="h-7 px-2 text-xs"
+                >
+                  5%
+                </Button>
+                <Button
+                  variant={getCurrentPreset() === 'med' ? 'default' : 'ghost'}
+                  size="sm"
+                  onClick={() => setVolumePreset('med')}
+                  className="h-7 px-2 text-xs"
+                >
+                  15%
+                </Button>
+                <Button
+                  variant={getCurrentPreset() === 'high' ? 'default' : 'ghost'}
+                  size="sm"
+                  onClick={() => setVolumePreset('high')}
+                  className="h-7 px-2 text-xs"
+                >
+                  30%
+                </Button>
+              </div>
             </div>
           </div>
         </PopoverContent>
@@ -997,7 +1042,7 @@ export function AmbientMusicPlayer({
                   </div>
                 </div>
 
-                {/* Mobile Volume Control */}
+                {/* Mobile Volume Control - Preset Buttons */}
                 <div className="space-y-2">
                   <div className="flex items-center justify-between">
                     <span className="text-xs font-medium flex items-center gap-2">
@@ -1008,27 +1053,40 @@ export function AmbientMusicPlayer({
                       {Math.round(volume * 100)}%
                     </span>
                   </div>
-                  <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-1">
                     <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={toggleMute}
-                      className="h-8 w-8 shrink-0"
+                      variant={getCurrentPreset() === 'off' ? 'default' : 'outline'}
+                      size="sm"
+                      onClick={() => setVolumePreset('off')}
+                      className="h-8 flex-1 text-xs"
                     >
-                      {isMuted ? (
-                        <VolumeX className="h-4 w-4" />
-                      ) : (
-                        <Volume2 className="h-4 w-4" />
-                      )}
+                      <VolumeX className="h-3 w-3 mr-1" />
+                      Off
                     </Button>
-                    <Slider
-                      value={[isMuted ? 0 : volume]}
-                      min={0}
-                      max={0.3}
-                      step={0.01}
-                      onValueChange={handleVolumeChange}
-                      className="flex-1"
-                    />
+                    <Button
+                      variant={getCurrentPreset() === 'low' ? 'default' : 'outline'}
+                      size="sm"
+                      onClick={() => setVolumePreset('low')}
+                      className="h-8 flex-1 text-xs"
+                    >
+                      5%
+                    </Button>
+                    <Button
+                      variant={getCurrentPreset() === 'med' ? 'default' : 'outline'}
+                      size="sm"
+                      onClick={() => setVolumePreset('med')}
+                      className="h-8 flex-1 text-xs"
+                    >
+                      15%
+                    </Button>
+                    <Button
+                      variant={getCurrentPreset() === 'high' ? 'default' : 'outline'}
+                      size="sm"
+                      onClick={() => setVolumePreset('high')}
+                      className="h-8 flex-1 text-xs"
+                    >
+                      30%
+                    </Button>
                   </div>
                 </div>
                 
