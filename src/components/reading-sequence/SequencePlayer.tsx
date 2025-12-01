@@ -251,6 +251,7 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
     });
   }, [totalItems]);
 
+
   // Fetch chapter content (with caching)
   const fetchChapter = useCallback(async (book: string, chapter: number) => {
     const cacheKey = `${book}-${chapter}`;
@@ -422,6 +423,86 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
     }
   }, [generateTTS, isMuted, volume]);
 
+  // Handle chapter completion with commentary check (for browser TTS and fallback paths)
+  const handleChapterCompleteWithCommentary = useCallback((content: ChapterContent) => {
+    // Find current sequence to check commentary settings
+    const currentSeq = activeSequences.find((seq, idx) => {
+      const itemsBefore = activeSequences.slice(0, idx).reduce((acc, s) => acc + s.items.length, 0);
+      return currentItemIdx >= itemsBefore && currentItemIdx < itemsBefore + seq.items.length;
+    });
+    
+    const includeCommentary = currentSeq?.includeJeevesCommentary || false;
+    const commentaryMode = currentSeq?.commentaryMode || "chapter";
+    const commentaryVoice = currentSeq?.commentaryVoice || "daniel";
+    const commentaryDepth = currentSeq?.commentaryDepth || "surface";
+    
+    console.log("[ChapterComplete] Commentary settings:", { includeCommentary, commentaryMode });
+    
+    if (includeCommentary && commentaryMode === "chapter" && content && continuePlayingRef.current) {
+      const cacheKey = `chapter-${content.book}-${content.chapter}-${commentaryVoice}`;
+      const cached = commentaryCache.current.get(cacheKey);
+      
+      if (cached?.audioUrl) {
+        console.log("[ChapterComplete] Using cached chapter commentary audio");
+        setCommentaryText(cached.text);
+        setIsPlayingCommentary(true);
+        playingCommentaryRef.current = true;
+        
+        const audio = new Audio(cached.audioUrl);
+        audio.volume = isMuted ? 0 : volume / 100;
+        audioRef.current = audio;
+        
+        audio.onended = () => {
+          audioRef.current = null;
+          setIsPlayingCommentary(false);
+          playingCommentaryRef.current = false;
+          setCommentaryText(null);
+          moveToNextChapter();
+        };
+        
+        audio.onerror = () => {
+          audioRef.current = null;
+          setIsPlayingCommentary(false);
+          playingCommentaryRef.current = false;
+          setCommentaryText(null);
+          moveToNextChapter();
+        };
+        
+        audio.play().catch(() => {
+          setIsPlayingCommentary(false);
+          playingCommentaryRef.current = false;
+          setCommentaryText(null);
+          moveToNextChapter();
+        });
+      } else if (cached?.text) {
+        console.log("[ChapterComplete] Using cached chapter commentary text");
+        playCommentary(cached.text, commentaryVoice, moveToNextChapter);
+      } else {
+        // Generate commentary
+        console.log("[ChapterComplete] Generating chapter commentary");
+        setIsLoading(true);
+        const chapterText = content.verses.map(v => `${v.verse}. ${v.text}`).join(" ");
+        
+        generateCommentary(content.book, content.chapter, chapterText, commentaryDepth)
+          .then(commentary => {
+            if (commentary && continuePlayingRef.current) {
+              playCommentary(commentary, commentaryVoice, moveToNextChapter);
+            } else {
+              setIsLoading(false);
+              moveToNextChapter();
+            }
+          })
+          .catch(() => {
+            setIsLoading(false);
+            moveToNextChapter();
+          });
+      }
+    } else {
+      console.log("[ChapterComplete] No commentary, moving to next chapter");
+      moveToNextChapter();
+    }
+  }, [activeSequences, currentItemIdx, isMuted, volume, generateCommentary, playCommentary, moveToNextChapter]);
+
   // Prefetch TTS for upcoming verses
   const prefetchVerse = useCallback(async (verseIdx: number, content: ChapterContent, voice: string) => {
     if (!content?.verses || verseIdx >= content.verses.length) return;
@@ -569,7 +650,7 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
           }, 300);
         } else if (verseIdx >= content.verses.length - 1) {
           notifyTTSStopped();
-          moveToNextChapter();
+          handleChapterCompleteWithCommentary(content);
         }
       });
       return;
@@ -584,7 +665,7 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
         if (continuePlayingRef.current && verseIdx < content.verses.length - 1) {
           setTimeout(() => playVerseAtIndex(verseIdx + 1, content, voice), 300);
         } else if (verseIdx >= content.verses.length - 1) {
-          moveToNextChapter();
+          handleChapterCompleteWithCommentary(content);
         }
       });
       return;
@@ -871,7 +952,7 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
           if (continuePlayingRef.current && verseIdx < content.verses.length - 1) {
             setTimeout(() => playVerseAtIndex(verseIdx + 1, content, voice), 300);
           } else if (verseIdx >= content.verses.length - 1) {
-            moveToNextChapter();
+            handleChapterCompleteWithCommentary(content);
           }
         });
       } else {
@@ -901,14 +982,14 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
           if (continuePlayingRef.current && verseIdx < content.verses.length - 1) {
             setTimeout(() => playVerseAtIndex(verseIdx + 1, content, voice), 300);
           } else if (verseIdx >= content.verses.length - 1) {
-            moveToNextChapter();
+            handleChapterCompleteWithCommentary(content);
           }
         });
       } else {
         setIsPlaying(false);
       }
     }
-  }, [volume, isMuted, totalItems, generateTTS, prefetchVerse, activeSequences, currentItemIdx, generateCommentary, playCommentary, moveToNextChapter, prefetchNextChapter, offlineMode, speakWithBrowserTTS]);
+  }, [volume, isMuted, totalItems, generateTTS, prefetchVerse, activeSequences, currentItemIdx, generateCommentary, playCommentary, moveToNextChapter, handleChapterCompleteWithCommentary, prefetchNextChapter, offlineMode, speakWithBrowserTTS]);
 
   // Play current verse (wrapper for playVerseAtIndex)
   const playCurrentVerse = useCallback(() => {

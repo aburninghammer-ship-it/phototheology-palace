@@ -5684,6 +5684,9 @@ export type Database = {
         Row: {
           book: string
           chapter: number
+          commentary_depth: string | null
+          commentary_mode: string | null
+          commentary_voice: string | null
           created_at: string
           end_verse: number | null
           id: string
@@ -5698,6 +5701,9 @@ export type Database = {
         Insert: {
           book: string
           chapter: number
+          commentary_depth?: string | null
+          commentary_mode?: string | null
+          commentary_voice?: string | null
           created_at?: string
           end_verse?: number | null
           id?: string
@@ -5712,6 +5718,9 @@ export type Database = {
         Update: {
           book?: string
           chapter?: number
+          commentary_depth?: string | null
+          commentary_mode?: string | null
+          commentary_voice?: string | null
           created_at?: string
           end_verse?: number | null
           id?: string
