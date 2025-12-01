@@ -91,12 +91,8 @@ export function ReadingModeToggle({
         <TabsContent value="audio" className="mt-0">
           <AudioNarratorEnhanced
             text={text}
-            book={book}
-            chapter={chapter}
-            verse={verse}
-            onPlaybackEnd={onComplete}
+            title={`${book} ${chapter}:${verse}`}
             showVoiceSelector={showVoiceSelector}
-            compact={compact}
             className="w-full"
           />
         </TabsContent>

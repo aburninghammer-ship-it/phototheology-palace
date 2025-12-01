@@ -11,7 +11,7 @@ interface CommunityPost {
   user_id: string;
   created_at: string;
   updated_at: string;
-  likes_count: number;
+  likes: number;
   profiles: {
     username: string;
     display_name: string | null;
@@ -48,7 +48,8 @@ export const useCommunityPosts = (options: UseCommunityPostsOptions = {}) => {
       const from = pageNumber * pageSize;
       const to = from + pageSize - 1;
 
-      let query = supabase
+      // Build query with type assertion to prevent deep type inference
+      let query: any = supabase
         .from('community_posts')
         .select(`
           *,
@@ -72,15 +73,13 @@ export const useCommunityPosts = (options: UseCommunityPostsOptions = {}) => {
       }
 
       // Apply sorting
-      switch (sortBy) {
-        case 'most_commented':
-          query = query.order('comment_count', { ascending: false });
-          break;
-        case 'needs_feedback':
-          query = query.eq('needs_feedback', true).order('created_at', { ascending: false });
-          break;
-        default:
-          query = query.order('created_at', { ascending: false });
+      if (sortBy === 'most_commented') {
+        query = query.order('comment_count', { ascending: false });
+      } else if (sortBy === 'needs_feedback') {
+        query = query.eq('needs_feedback', true);
+        query = query.order('created_at', { ascending: false });
+      } else {
+        query = query.order('created_at', { ascending: false });
       }
 
       const { data, error, count } = await query;
