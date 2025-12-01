@@ -51,7 +51,15 @@ const MUSIC_FLOORS = [
     mood: "Reverent strings, harp",
     color: "from-purple-500/20 to-violet-500/20",
     borderColor: "border-purple-500/30",
-    tracks: []
+    tracks: [
+      {
+        id: "whispers-of-eternity",
+        name: "Whispers of Eternity",
+        description: "Orchestral with lush strings, epic meditative",
+        url: "https://cdn1.suno.ai/37b77ba0-4272-4220-a392-16645e9aa9b2.mp3",
+        bpm: 60
+      }
+    ]
   },
   {
     floor: 4,
