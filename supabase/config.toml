@@ -130,3 +130,6 @@ verify_jwt = false
 
 [functions.generate-verse-commentary]
 verify_jwt = false
+
+[functions.drill-drill]
+verify_jwt = false

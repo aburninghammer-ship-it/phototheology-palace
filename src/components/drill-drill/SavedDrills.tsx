@@ -37,13 +37,13 @@ export const SavedDrills = () => {
   const fetchDrills = async () => {
     try {
       const { data, error } = await supabase
-        .from("drill_sessions")
+        .from("drill_sessions" as any)
         .select("*")
         .eq("user_id", user?.id)
         .order("created_at", { ascending: false });
 
       if (error) throw error;
-      setDrills(data || []);
+      setDrills((data || []) as unknown as SavedDrill[]);
     } catch (error) {
       console.error("Error fetching drills:", error);
       toast.error("Failed to load saved drills");
@@ -55,7 +55,7 @@ export const SavedDrills = () => {
   const deleteDrill = async (id: string) => {
     try {
       const { error } = await supabase
-        .from("drill_sessions")
+        .from("drill_sessions" as any)
         .delete()
         .eq("id", id);
 
