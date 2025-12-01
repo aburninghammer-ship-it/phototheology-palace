@@ -113,8 +113,11 @@ export const Footer = () => {
           </div>
         </div>
 
-        {/* Copyright */}
-        <div className="mt-8 pt-6 border-t border-border text-center text-sm text-muted-foreground">
+        {/* Scripture & Copyright */}
+        <div className="mt-8 pt-6 border-t border-border text-center text-sm text-muted-foreground space-y-2">
+          <p className="italic font-serif text-foreground/60">
+            "Knowledge shall be increased" — Daniel 12:4
+          </p>
           <p>© {new Date().getFullYear()} Phototheology. All rights reserved.</p>
         </div>
       </div>
