@@ -69,6 +69,16 @@ const AMBIENT_TRACKS: Array<{
     url: "https://cdn1.suno.ai/ea711d82-cd6a-4ebd-a960-b73cb72c39f0.mp3",
     bpm: 65,
   },
+  {
+    id: "amazing-grace-epic",
+    name: "Amazing Grace (Epic Meditative Remix)",
+    description: "Cinematic christian music - epic meditative instrumental",
+    category: "floor-7",
+    floor: 7,
+    mood: "cinematic, epic, meditative",
+    url: "https://cdn1.suno.ai/a362b171-5a6f-4264-8946-ae76b09a6aa7.mp3",
+    bpm: 70,
+  },
 ];
 
 // Room to track mapping based on Phototheology floors
