@@ -18,10 +18,13 @@ import {
   Gamepad2,
   Image as ImageIcon,
   FileText,
-  Wifi
+  Wifi,
+  Music,
+  Volume2
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { motion } from "framer-motion";
+import { getAudioCacheSize, clearAudioCache, getCachedMusicTracks } from "@/services/offlineAudioCache";
 
 interface CacheStats {
   totalSize: number;
@@ -30,6 +33,8 @@ interface CacheStats {
   courses: string[];
   images: number;
   offlineFeatures: string[];
+  audioCacheSize: { music: number; tts: number };
+  cachedMusicTracks: number;
 }
 
 export default function OfflineContent() {
@@ -40,7 +45,9 @@ export default function OfflineContent() {
     bibleChapters: [],
     courses: [],
     images: 0,
-    offlineFeatures: []
+    offlineFeatures: [],
+    audioCacheSize: { music: 0, tts: 0 },
+    cachedMusicTracks: 0
   });
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
@@ -105,6 +112,8 @@ export default function OfflineContent() {
       // List offline-capable features
       const offlineFeatures = [
         'Bible Reader (cached chapters)',
+        'Read Me The Bible (offline voice)',
+        'Background Music (when cached)',
         'Palace Structure & Room Details',
         'Flashcards (saved sets)',
         'Growth Journal (entries)',
@@ -114,13 +123,19 @@ export default function OfflineContent() {
         'Offline Games'
       ];
 
+      // Get audio cache stats
+      const audioCacheSize = await getAudioCacheSize();
+      const cachedMusicTracks = (await getCachedMusicTracks()).length;
+
       setCacheStats({
-        totalSize: localStorageSize,
+        totalSize: localStorageSize + audioCacheSize.music + audioCacheSize.tts,
         itemCount: bibleKeys.length + courseKeys.length,
         bibleChapters: cachedChapters,
         courses: courseKeys.map(key => key.replace('course_progress_', '').replace(/_/g, ' ')),
         images: imageCount,
-        offlineFeatures
+        offlineFeatures,
+        audioCacheSize,
+        cachedMusicTracks
       });
     } catch (error) {
       console.error('Error analyzing cache:', error);
@@ -157,6 +172,9 @@ export default function OfflineContent() {
         const cacheNames = await caches.keys();
         await Promise.all(cacheNames.map(name => caches.delete(name)));
       }
+      
+      // Clear audio caches
+      await clearAudioCache();
 
       toast({
         title: "Cache Cleared",
@@ -262,10 +280,10 @@ export default function OfflineContent() {
                   <div className="text-xs text-muted-foreground">Courses</div>
                 </div>
                 
-                <div className="text-center p-4 bg-secondary/20 rounded-lg border border-secondary/30">
-                  <ImageIcon className="w-6 h-6 mx-auto mb-2 text-secondary-foreground" />
-                  <div className="text-2xl font-bold">{cacheStats.images}</div>
-                  <div className="text-xs text-muted-foreground">Images</div>
+                <div className="text-center p-4 bg-amber-500/10 rounded-lg border border-amber-500/20">
+                  <Music className="w-6 h-6 mx-auto mb-2 text-amber-500" />
+                  <div className="text-2xl font-bold">{cacheStats.cachedMusicTracks}</div>
+                  <div className="text-xs text-muted-foreground">Music Tracks</div>
                 </div>
                 
                 <div className="text-center p-4 bg-muted/50 rounded-lg border border-border">
@@ -274,6 +292,20 @@ export default function OfflineContent() {
                   <div className="text-xs text-muted-foreground">Features</div>
                 </div>
               </div>
+              
+              {/* Audio Cache Info */}
+              {(cacheStats.audioCacheSize.music > 0 || cacheStats.audioCacheSize.tts > 0) && (
+                <div className="mt-4 p-3 bg-amber-500/10 rounded-lg border border-amber-500/20">
+                  <div className="flex items-center gap-2 mb-2">
+                    <Volume2 className="w-4 h-4 text-amber-500" />
+                    <span className="text-sm font-medium">Offline Audio</span>
+                  </div>
+                  <div className="grid grid-cols-2 gap-2 text-xs text-muted-foreground">
+                    <div>Music: {formatBytes(cacheStats.audioCacheSize.music)}</div>
+                    <div>TTS: {formatBytes(cacheStats.audioCacheSize.tts)}</div>
+                  </div>
+                </div>
+              )}
 
               <Button
                 variant="destructive"

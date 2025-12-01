@@ -18,6 +18,7 @@ import {
   ListMusic,
   Smartphone,
   Download,
+  WifiOff,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -27,6 +28,8 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import { setGlobalMusicVolume, getGlobalMusicVolume } from "@/hooks/useMusicVolumeControl";
 import { formatJeevesResponse } from "@/lib/formatJeevesResponse";
 import { DownloadSequenceDialog } from "./DownloadSequenceDialog";
+import { OfflineModeToggle } from "./OfflineModeToggle";
+import { isOnline, getCachedMusicTrack } from "@/services/offlineAudioCache";
 
 interface SequencePlayerProps {
   sequences: ReadingSequenceBlock[];
@@ -54,6 +57,7 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
   const [audioUrl, setAudioUrl] = useState<string | null>(null);
   const [hasStarted, setHasStarted] = useState(false);
   const [isPlayingCommentary, setIsPlayingCommentary] = useState(false);
+  const [offlineMode, setOfflineMode] = useState(!isOnline());
   const [commentaryText, setCommentaryText] = useState<string | null>(null);
 
   const audioRef = useRef<HTMLAudioElement | null>(null);
@@ -232,8 +236,14 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
     fetchChapter(nextItem.book, nextItem.chapter);
   }, [allItems, fetchChapter]);
 
-  // Generate TTS for text
-  const generateTTS = useCallback(async (text: string, voice: string) => {
+  // Generate TTS for text - with offline fallback
+  const generateTTS = useCallback(async (text: string, voice: string): Promise<string | null> => {
+    // If offline mode, use browser speech synthesis
+    if (offlineMode || !isOnline()) {
+      console.log("[TTS] Using offline browser speech synthesis");
+      return null; // Signal to use speech synthesis
+    }
+    
     try {
       const { data, error } = await supabase.functions.invoke("text-to-speech", {
         body: { text, voice },
@@ -254,8 +264,33 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
       return null;
     } catch (e) {
       console.error("Error generating TTS:", e);
+      // Fallback to offline mode if API fails
       return null;
     }
+  }, [offlineMode]);
+
+  // Browser speech synthesis for offline mode
+  const speakWithBrowserTTS = useCallback((text: string, onEnd: () => void): void => {
+    speechSynthesis.cancel();
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.rate = 1;
+    utterance.pitch = 1;
+    
+    // Try to use a good English voice
+    const voices = speechSynthesis.getVoices();
+    const englishVoice = voices.find(v => 
+      v.lang.startsWith('en') && 
+      (v.name.includes('Google') || v.name.includes('Microsoft') || v.name.includes('Daniel'))
+    ) || voices.find(v => v.lang.startsWith('en'));
+    
+    if (englishVoice) {
+      utterance.voice = englishVoice;
+    }
+    
+    utterance.onend = onEnd;
+    utterance.onerror = () => onEnd();
+    
+    speechSynthesis.speak(utterance);
   }, []);
 
   // Play commentary audio
@@ -415,7 +450,7 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
 
   // Play a specific verse by index - using a stable ref to avoid stale closures
   const playVerseAtIndex = useCallback(async (verseIdx: number, content: ChapterContent, voice: string) => {
-    console.log("[PlayVerse] Called with:", { verseIdx, versesCount: content?.verses?.length, voice });
+    console.log("[PlayVerse] Called with:", { verseIdx, versesCount: content?.verses?.length, voice, offlineMode });
     
     if (isGeneratingRef.current) {
       console.log("[PlayVerse] Already generating TTS, skipping verse:", verseIdx + 1);
@@ -431,13 +466,13 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
     
     setCurrentVerseIdx(verseIdx);
     
-    // Check cache first
-    let url = ttsCache.current.get(cacheKey);
+    // Check cache first (only for online mode)
+    let url = !offlineMode ? ttsCache.current.get(cacheKey) : null;
     
     if (url) {
       console.log("[PlayVerse] Using cached TTS for verse:", verseIdx + 1);
-    } else {
-      // Generate TTS
+    } else if (!offlineMode && isOnline()) {
+      // Generate TTS via API (online mode)
       isGeneratingRef.current = true;
       console.log("[PlayVerse] Generating TTS for verse:", verseIdx + 1, "text:", verse.text.substring(0, 50));
       setIsLoading(true);
@@ -452,13 +487,39 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
       }
     }
     
+    // OFFLINE MODE: Use browser speech synthesis
+    if (!url && (offlineMode || !isOnline())) {
+      console.log("[PlayVerse] Using browser speech synthesis (offline mode)");
+      notifyTTSStarted();
+      
+      speakWithBrowserTTS(verse.text, () => {
+        // On speech end, continue to next verse or chapter
+        if (continuePlayingRef.current && verseIdx < content.verses.length - 1) {
+          setTimeout(() => {
+            if (continuePlayingRef.current) {
+              playVerseAtIndex(verseIdx + 1, content, voice);
+            }
+          }, 300);
+        } else if (verseIdx >= content.verses.length - 1) {
+          notifyTTSStopped();
+          moveToNextChapter();
+        }
+      });
+      return;
+    }
+    
     console.log("[PlayVerse] TTS result:", url ? "URL ready" : "FAILED");
 
     if (!url) {
-      console.error("[PlayVerse] Failed to generate TTS URL");
-      toast.error("Failed to generate audio");
-      continuePlayingRef.current = false;
-      setIsPlaying(false);
+      console.error("[PlayVerse] Failed to generate TTS URL - falling back to browser TTS");
+      // Fallback to browser TTS even if online mode failed
+      speakWithBrowserTTS(verse.text, () => {
+        if (continuePlayingRef.current && verseIdx < content.verses.length - 1) {
+          setTimeout(() => playVerseAtIndex(verseIdx + 1, content, voice), 300);
+        } else if (verseIdx >= content.verses.length - 1) {
+          moveToNextChapter();
+        }
+      });
       return;
     }
 
@@ -745,7 +806,7 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
       setIsPlaying(false);
       toast.error("Failed to play audio - try clicking play manually");
     }
-  }, [volume, isMuted, totalItems, generateTTS, prefetchVerse, activeSequences, currentItemIdx, generateCommentary, playCommentary, moveToNextChapter, prefetchNextChapter]);
+  }, [volume, isMuted, totalItems, generateTTS, prefetchVerse, activeSequences, currentItemIdx, generateCommentary, playCommentary, moveToNextChapter, prefetchNextChapter, offlineMode, speakWithBrowserTTS]);
 
   // Play current verse (wrapper for playVerseAtIndex)
   const playCurrentVerse = useCallback(() => {
@@ -1011,12 +1072,31 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
     ? ((currentVerseIdx + 1) / chapterContent.verses.length) * 100
     : 0;
 
+  // Music URL - use cached version when offline
+  const [musicUrl, setMusicUrl] = useState("https://cdn.pixabay.com/download/audio/2022/02/22/audio_d1718ab41b.mp3");
+  
+  useEffect(() => {
+    const loadMusicUrl = async () => {
+      const defaultUrl = "https://cdn.pixabay.com/download/audio/2022/02/22/audio_d1718ab41b.mp3";
+      if (offlineMode || !isOnline()) {
+        const cached = await getCachedMusicTrack(defaultUrl);
+        if (cached) {
+          console.log("[Music] Using cached music track");
+          setMusicUrl(cached);
+        }
+      } else {
+        setMusicUrl(defaultUrl);
+      }
+    };
+    loadMusicUrl();
+  }, [offlineMode]);
+
   return (
     <>
       {/* Hidden background music audio element */}
       <audio
         ref={setMusicAudioRef}
-        src="https://cdn.pixabay.com/download/audio/2022/02/22/audio_d1718ab41b.mp3"
+        src={musicUrl}
         loop
         preload="auto"
         onLoadedData={(e) => {
@@ -1073,9 +1153,17 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
           </div>
         )}
 
+        {/* Offline Mode Toggle */}
+        <OfflineModeToggle
+          offlineMode={offlineMode}
+          onOfflineModeChange={setOfflineMode}
+          className="mb-2"
+        />
+
         {/* Current Chapter Display */}
         <div className="text-center py-4 bg-muted/30 rounded-lg">
-          <p className="text-2xl font-bold">
+          <p className="text-2xl font-bold flex items-center justify-center gap-2">
+            {offlineMode && <WifiOff className="h-4 w-4 text-amber-500" />}
             {currentItem?.book} {currentItem?.chapter}
           </p>
           {currentItem?.startVerse && (
