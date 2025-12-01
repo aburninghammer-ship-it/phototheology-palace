@@ -25,6 +25,7 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import { motion } from "framer-motion";
 import { getAudioCacheSize, clearAudioCache, getCachedMusicTracks } from "@/services/offlineAudioCache";
+import { getCommentaryCacheStats, clearCommentaryCache } from "@/services/offlineCommentaryCache";
 
 interface CacheStats {
   totalSize: number;
@@ -35,6 +36,7 @@ interface CacheStats {
   offlineFeatures: string[];
   audioCacheSize: { music: number; tts: number };
   cachedMusicTracks: number;
+  commentaryCache: { chapters: number; verses: number };
 }
 
 export default function OfflineContent() {
@@ -47,7 +49,8 @@ export default function OfflineContent() {
     images: 0,
     offlineFeatures: [],
     audioCacheSize: { music: 0, tts: 0 },
-    cachedMusicTracks: 0
+    cachedMusicTracks: 0,
+    commentaryCache: { chapters: 0, verses: 0 }
   });
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
@@ -113,6 +116,7 @@ export default function OfflineContent() {
       const offlineFeatures = [
         'Bible Reader (cached chapters)',
         'Read Me The Bible (offline voice)',
+        'Commentary (when cached)',
         'Background Music (when cached)',
         'Palace Structure & Room Details',
         'Flashcards (saved sets)',
@@ -126,6 +130,9 @@ export default function OfflineContent() {
       // Get audio cache stats
       const audioCacheSize = await getAudioCacheSize();
       const cachedMusicTracks = (await getCachedMusicTracks()).length;
+      
+      // Get commentary cache stats
+      const commentaryCache = getCommentaryCacheStats();
 
       setCacheStats({
         totalSize: localStorageSize + audioCacheSize.music + audioCacheSize.tts,
@@ -135,7 +142,8 @@ export default function OfflineContent() {
         images: imageCount,
         offlineFeatures,
         audioCacheSize,
-        cachedMusicTracks
+        cachedMusicTracks,
+        commentaryCache
       });
     } catch (error) {
       console.error('Error analyzing cache:', error);
@@ -175,6 +183,9 @@ export default function OfflineContent() {
       
       // Clear audio caches
       await clearAudioCache();
+      
+      // Clear commentary cache
+      clearCommentaryCache();
 
       toast({
         title: "Cache Cleared",

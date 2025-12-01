@@ -30,6 +30,12 @@ import { formatJeevesResponse } from "@/lib/formatJeevesResponse";
 import { DownloadSequenceDialog } from "./DownloadSequenceDialog";
 import { OfflineModeToggle } from "./OfflineModeToggle";
 import { isOnline, getCachedMusicTrack } from "@/services/offlineAudioCache";
+import { 
+  getCachedChapterCommentary, 
+  cacheChapterCommentary,
+  getCachedVerseCommentary,
+  cacheVerseCommentary 
+} from "@/services/offlineCommentaryCache";
 
 interface SequencePlayerProps {
   sequences: ReadingSequenceBlock[];
@@ -132,9 +138,22 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
     }
   }, [isPlaying, isPaused, musicVolume]);
 
-  // Generate chapter commentary using Jeeves
+  // Generate chapter commentary using Jeeves (with offline cache)
   const generateCommentary = useCallback(async (book: string, chapter: number, chapterText?: string, depth: string = "surface") => {
     try {
+      // Check offline cache first
+      const cached = getCachedChapterCommentary(book, chapter, depth);
+      if (cached) {
+        console.log("[Commentary] Using cached chapter commentary for", book, chapter);
+        return cached;
+      }
+
+      // If offline and no cache, return null
+      if (!isOnline()) {
+        console.log("[Commentary] Offline and no cache for", book, chapter);
+        return null;
+      }
+
       console.log("[Commentary] Generating", depth, "chapter commentary for", book, chapter);
       const { data, error } = await supabase.functions.invoke("generate-chapter-commentary", {
         body: { book, chapter, chapterText, depth },
@@ -144,17 +163,38 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
         console.error("[Commentary] Edge function error:", error);
         throw error;
       }
-      console.log("[Commentary] Generated chapter commentary length:", data?.commentary?.length || 0);
-      return data?.commentary as string | null;
+      
+      const commentary = data?.commentary as string | null;
+      
+      // Cache the commentary for offline use
+      if (commentary) {
+        cacheChapterCommentary(book, chapter, depth, commentary);
+      }
+      
+      console.log("[Commentary] Generated chapter commentary length:", commentary?.length || 0);
+      return commentary;
     } catch (e) {
       console.error("[Commentary] Error generating chapter commentary:", e);
       return null;
     }
   }, []);
 
-  // Generate verse commentary using Jeeves
+  // Generate verse commentary using Jeeves (with offline cache)
   const generateVerseCommentary = useCallback(async (book: string, chapter: number, verse: number, verseText: string, depth: string = "surface") => {
     try {
+      // Check offline cache first
+      const cached = getCachedVerseCommentary(book, chapter, verse, depth);
+      if (cached) {
+        console.log("[Verse Commentary] Using cached commentary for", book, chapter + ":" + verse);
+        return cached;
+      }
+
+      // If offline and no cache, return null
+      if (!isOnline()) {
+        console.log("[Verse Commentary] Offline and no cache for", book, chapter + ":" + verse);
+        return null;
+      }
+
       console.log("[Verse Commentary] Generating", depth, "commentary for", book, chapter + ":" + verse);
       const { data, error } = await supabase.functions.invoke("generate-verse-commentary", {
         body: { book, chapter, verse, verseText, depth },
@@ -164,8 +204,16 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
         console.error("[Verse Commentary] Edge function error:", error);
         throw error;
       }
-      console.log("[Verse Commentary] Generated length:", data?.commentary?.length || 0);
-      return data?.commentary as string | null;
+      
+      const commentary = data?.commentary as string | null;
+      
+      // Cache the commentary for offline use
+      if (commentary) {
+        cacheVerseCommentary(book, chapter, verse, depth, commentary);
+      }
+      
+      console.log("[Verse Commentary] Generated length:", commentary?.length || 0);
+      return commentary;
     } catch (e) {
       console.error("[Verse Commentary] Error:", e);
       return null;

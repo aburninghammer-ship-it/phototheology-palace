@@ -280,11 +280,34 @@ Please provide a ${depth === "intermediate" ? "thorough" : "brief"}, Christ-cent
     }
 
     const data = await response.json();
-    const commentary = data.choices?.[0]?.message?.content;
+    let commentary = data.choices?.[0]?.message?.content;
 
     if (!commentary) {
       throw new Error("No commentary generated");
     }
+
+    // Clean commentary for TTS - remove symbols that sound awkward when read aloud
+    commentary = commentary
+      .replace(/\*\*/g, '')           // Bold markers
+      .replace(/\*/g, '')             // Italics/asterisks
+      .replace(/__/g, '')             // Underline
+      .replace(/_([^_]+)_/g, '$1')    // Underscore emphasis
+      .replace(/#+\s*/g, '')          // Headers
+      .replace(/`/g, '')              // Code ticks
+      .replace(/\([^)]*\)/g, '')      // Remove (parentheses)
+      .replace(/\[[^\]]*\]/g, '')     // Remove [brackets]
+      .replace(/—/g, ', ')            // Em dash to comma
+      .replace(/–/g, ', ')            // En dash to comma
+      .replace(/\.\.\./g, '.')        // Ellipsis
+      .replace(/…/g, '.')             // Unicode ellipsis
+      .replace(/"/g, '').replace(/"/g, '') // Curly quotes
+      .replace(/'/g, "'").replace(/'/g, "'") // Normalize apostrophes
+      .replace(/\s+/g, ' ')           // Multiple spaces
+      .replace(/\s+\./g, '.')
+      .replace(/\s+,/g, ',')
+      .replace(/,\s*,/g, ',')
+      .replace(/\.\s*\./g, '.')
+      .trim();
 
     console.log(`${depth} commentary generated successfully for ${book} ${chapter} (${commentary.length} chars)`);
 
