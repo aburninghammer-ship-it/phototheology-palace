@@ -834,21 +834,22 @@ export function AmbientMusicPlayer({
             )}
           </Button>
 
-          {/* Volume - hidden on mobile */}
-          {!isMobile ? (
-            <div className="flex items-center gap-2 shrink-0">
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={toggleMute}
-                className="h-8 w-8"
-              >
-                {isMuted ? (
-                  <VolumeX className="h-4 w-4" />
-                ) : (
-                  <Volume2 className="h-4 w-4" />
-                )}
-              </Button>
+          {/* Volume Control - always shown */}
+          <div className="flex items-center gap-2 shrink-0">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={toggleMute}
+              className="h-8 w-8"
+            >
+              {isMuted ? (
+                <VolumeX className="h-4 w-4" />
+              ) : (
+                <Volume2 className="h-4 w-4" />
+              )}
+            </Button>
+            {/* Show inline slider on desktop, mobile gets it in popover */}
+            {!isMobile && (
               <Slider
                 value={[isMuted ? 0 : volume]}
                 min={0}
@@ -857,12 +858,8 @@ export function AmbientMusicPlayer({
                 onValueChange={handleVolumeChange}
                 className="w-20"
               />
-            </div>
-          ) : (
-            <div className="flex items-center gap-1 text-xs text-muted-foreground shrink-0">
-              <Smartphone className="h-3 w-3" />
-            </div>
-          )}
+            )}
+          </div>
 
           {/* Settings */}
           <Popover>
@@ -997,6 +994,41 @@ export function AmbientMusicPlayer({
                         {loopMode === "none" ? "Off" : loopMode === "one" ? "Song" : "All"}
                       </span>
                     </Button>
+                  </div>
+                </div>
+
+                {/* Mobile Volume Control */}
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-medium flex items-center gap-2">
+                      <Volume2 className="h-4 w-4" />
+                      Volume
+                    </span>
+                    <span className="text-xs text-muted-foreground">
+                      {Math.round(volume * 100)}%
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={toggleMute}
+                      className="h-8 w-8 shrink-0"
+                    >
+                      {isMuted ? (
+                        <VolumeX className="h-4 w-4" />
+                      ) : (
+                        <Volume2 className="h-4 w-4" />
+                      )}
+                    </Button>
+                    <Slider
+                      value={[isMuted ? 0 : volume]}
+                      min={0}
+                      max={0.3}
+                      step={0.01}
+                      onValueChange={handleVolumeChange}
+                      className="flex-1"
+                    />
                   </div>
                 </div>
                 
