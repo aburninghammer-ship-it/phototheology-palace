@@ -3997,7 +3997,24 @@ Style: Professional prophetic chart, clear typography, organized layout, spiritu
       console.log("Raw AI response:", content);
       
       try {
-        const parsed = JSON.parse(content);
+        // Clean control characters that can break JSON parsing
+        let cleanedContent = content.replace(/[\x00-\x1F\x7F-\x9F]/g, '');
+        
+        // Extract JSON from markdown code blocks if present
+        const jsonBlockMatch = cleanedContent.match(/```(?:json)?\s*([\s\S]*?)```/);
+        if (jsonBlockMatch) {
+          cleanedContent = jsonBlockMatch[1].trim();
+        }
+        
+        // Try to extract JSON object if there's extra text
+        const jsonObjectMatch = cleanedContent.match(/\{[\s\S]*\}/);
+        if (jsonObjectMatch) {
+          cleanedContent = jsonObjectMatch[0];
+        }
+        
+        console.log("Cleaned content for parsing:", cleanedContent.substring(0, 500));
+        
+        const parsed = JSON.parse(cleanedContent);
         console.log("Parsed response:", parsed);
         
         // Ensure all required fields are present
