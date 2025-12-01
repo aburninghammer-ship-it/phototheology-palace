@@ -48,6 +48,15 @@ export default function StoryRoomGame() {
   const navigate = useNavigate();
   const { toast } = useToast();
   const { user } = useAuth();
+  // Shuffle quiz order once on mount so stories appear in random order
+  const [shuffledQuizzes] = useState(() => {
+    const quizzes = [...storyQuizzes];
+    for (let i = quizzes.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [quizzes[i], quizzes[j]] = [quizzes[j], quizzes[i]];
+    }
+    return quizzes;
+  });
   const [currentQuiz, setCurrentQuiz] = useState(0);
   const [userSequence, setUserSequence] = useState<string[]>([]);
   const [availableScenes, setAvailableScenes] = useState<string[]>([]);
@@ -57,11 +66,11 @@ export default function StoryRoomGame() {
 
   useEffect(() => {
     // Shuffle the scenes for the current quiz
-    const scenes = [...storyQuizzes[currentQuiz].sequence];
+    const scenes = [...shuffledQuizzes[currentQuiz].sequence];
     setAvailableScenes(shuffleArray(scenes));
     setUserSequence([]);
     setFeedback("");
-  }, [currentQuiz]);
+  }, [currentQuiz, shuffledQuizzes]);
 
   // Save score when game completes
   useEffect(() => {
@@ -80,7 +89,7 @@ export default function StoryRoomGame() {
         score: score,
         mode: "solo",
         metadata: {
-          total_questions: storyQuizzes.length,
+          total_questions: shuffledQuizzes.length,
           completed_at: new Date().toISOString(),
         },
       });
@@ -110,7 +119,7 @@ export default function StoryRoomGame() {
   };
 
   const checkAnswer = () => {
-    const quiz = storyQuizzes[currentQuiz];
+    const quiz = shuffledQuizzes[currentQuiz];
     const isCorrect = JSON.stringify(userSequence) === JSON.stringify(quiz.correct);
 
     if (isCorrect) {
@@ -122,7 +131,7 @@ export default function StoryRoomGame() {
       });
 
       setTimeout(() => {
-        if (currentQuiz < storyQuizzes.length - 1) {
+        if (currentQuiz < shuffledQuizzes.length - 1) {
           setCurrentQuiz(currentQuiz + 1);
         } else {
           setIsComplete(true);
@@ -138,8 +147,8 @@ export default function StoryRoomGame() {
     }
   };
 
-  const quiz = storyQuizzes[currentQuiz];
-  const progress = ((currentQuiz + 1) / storyQuizzes.length) * 100;
+  const quiz = shuffledQuizzes[currentQuiz];
+  const progress = ((currentQuiz + 1) / shuffledQuizzes.length) * 100;
 
   if (isComplete) {
     return (
@@ -157,7 +166,7 @@ export default function StoryRoomGame() {
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="text-4xl font-bold text-primary">
-                  {score} / {storyQuizzes.length}
+                  {score} / {shuffledQuizzes.length}
                 </div>
                 <p className="text-muted-foreground">
                   Stories memorized as vivid mental movies
@@ -285,7 +294,7 @@ export default function StoryRoomGame() {
             {/* Submit Button */}
             <Button
               onClick={checkAnswer}
-              disabled={userSequence.length !== quiz.sequence.length}
+              disabled={userSequence.length !== shuffledQuizzes[currentQuiz].sequence.length}
               className="w-full"
               size="lg"
             >

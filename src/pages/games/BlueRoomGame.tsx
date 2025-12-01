@@ -66,12 +66,14 @@ export default function BlueRoomGame() {
   const [selectedAnswer, setSelectedAnswer] = useState<string>("");
   const [revealed, setRevealed] = useState(false);
   const [quizQuestions] = useState<QuizQuestion[]>(() => {
-    // Generate matching questions
-    return sanctuaryItems.map(item => ({
+    // Generate matching questions with shuffled order AND shuffled options
+    const questions = sanctuaryItems.map(item => ({
       item: item.name,
       options: shuffleArray([...sanctuaryItems.map(i => i.meaning)]),
       correct: item.meaning
     }));
+    // Shuffle the question order so they're not always in the same sequence
+    return shuffleArray(questions);
   });
 
   function shuffleArray<T>(array: T[]): T[] {

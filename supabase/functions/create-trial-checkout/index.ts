@@ -12,12 +12,20 @@ const logStep = (step: string, details?: any) => {
   console.log(`[CREATE-TRIAL-CHECKOUT] ${step}${detailsStr}`);
 };
 
-// Price IDs for trial subscriptions
+// Price IDs for trial subscriptions - UPDATED with correct Stripe prices
 const PLAN_PRICES = {
-  essential_monthly: "price_1STVXrFGDAd3RU8Ia2NbKJWo", // Essential monthly
-  essential_annual: "price_1STVXrFGDAd3RU8Ia2NbKJWo", // Essential annual (update with actual)
-  premium_monthly: "price_1STVXrFGDAd3RU8Ia2NbKJWo", // Premium monthly (update with actual)
-  premium_annual: "price_1STVXrFGDAd3RU8Ia2NbKJWo", // Premium annual (update with actual)
+  essential_monthly: "price_1SZNyCFGDAd3RU8IPwPJVesp", // Essential $9/month
+  essential_annual: "price_1SZNyVFGDAd3RU8IPgRPqKXH",  // Essential $90/year
+  premium_monthly: "price_1SZNyiFGDAd3RU8I4JHYEsEi",   // Premium $15/month
+  premium_annual: "price_1SZNyuFGDAd3RU8IjeGIvPEb",    // Premium $150/year
+};
+
+// Map plan to tier for profile update
+const PLAN_TIERS = {
+  essential_monthly: "essential",
+  essential_annual: "essential",
+  premium_monthly: "premium",
+  premium_annual: "premium",
 };
 
 serve(async (req) => {
@@ -50,12 +58,13 @@ serve(async (req) => {
     const { plan, billing } = await req.json();
     const planKey = `${plan}_${billing}` as keyof typeof PLAN_PRICES;
     const priceId = PLAN_PRICES[planKey];
+    const tier = PLAN_TIERS[planKey];
     
     if (!priceId) {
-      throw new Error(`Invalid plan configuration: ${planKey}`);
+      throw new Error(`Invalid plan configuration: ${planKey}. Available: ${Object.keys(PLAN_PRICES).join(', ')}`);
     }
 
-    logStep("Plan selected", { plan, billing, priceId });
+    logStep("Plan selected", { plan, billing, planKey, priceId, tier });
 
     const stripe = new Stripe(stripeKey, { apiVersion: "2025-08-27.basil" });
 
@@ -87,6 +96,7 @@ serve(async (req) => {
           user_id: user.id,
           plan: plan,
           billing: billing,
+          tier: tier,
         },
       },
       success_url: `${origin}/pricing?trial=success`,
@@ -95,11 +105,12 @@ serve(async (req) => {
         user_id: user.id,
         plan: plan,
         billing: billing,
+        tier: tier,
         is_trial: "true",
       },
     });
 
-    logStep("Checkout session created", { sessionId: session.id, url: session.url });
+    logStep("Checkout session created", { sessionId: session.id, url: session.url, priceId, tier });
 
     return new Response(JSON.stringify({ url: session.url }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },

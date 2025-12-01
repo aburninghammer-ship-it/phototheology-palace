@@ -8,15 +8,45 @@ const corsHeaders = {
 // Helper function to delay execution
 const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
-// Primary API: bible-api.com
-async function fetchFromBibleApi(book: string, chapter: number, version: string): Promise<Response> {
-  const url = `https://bible-api.com/${encodeURIComponent(book)}+${chapter}?translation=${version}`;
-  return fetch(url);
+// Normalize book names for API compatibility
+function normalizeBookName(book: string): string {
+  const bookMap: Record<string, string> = {
+    'genesis': 'Genesis', 'exodus': 'Exodus', 'leviticus': 'Leviticus', 'numbers': 'Numbers',
+    'deuteronomy': 'Deuteronomy', 'joshua': 'Joshua', 'judges': 'Judges', 'ruth': 'Ruth',
+    '1 samuel': '1 Samuel', '2 samuel': '2 Samuel', '1 kings': '1 Kings', '2 kings': '2 Kings',
+    '1 chronicles': '1 Chronicles', '2 chronicles': '2 Chronicles', 'ezra': 'Ezra', 'nehemiah': 'Nehemiah',
+    'esther': 'Esther', 'job': 'Job', 'psalms': 'Psalms', 'psalm': 'Psalms', 'proverbs': 'Proverbs',
+    'ecclesiastes': 'Ecclesiastes', 'song of solomon': 'Song of Solomon', 'songs': 'Song of Solomon',
+    'isaiah': 'Isaiah', 'jeremiah': 'Jeremiah', 'lamentations': 'Lamentations', 'ezekiel': 'Ezekiel',
+    'daniel': 'Daniel', 'hosea': 'Hosea', 'joel': 'Joel', 'amos': 'Amos', 'obadiah': 'Obadiah',
+    'jonah': 'Jonah', 'micah': 'Micah', 'nahum': 'Nahum', 'habakkuk': 'Habakkuk', 'zephaniah': 'Zephaniah',
+    'haggai': 'Haggai', 'zechariah': 'Zechariah', 'malachi': 'Malachi',
+    'matthew': 'Matthew', 'mark': 'Mark', 'luke': 'Luke', 'john': 'John', 'acts': 'Acts',
+    'romans': 'Romans', '1 corinthians': '1 Corinthians', '2 corinthians': '2 Corinthians',
+    'galatians': 'Galatians', 'ephesians': 'Ephesians', 'philippians': 'Philippians',
+    'colossians': 'Colossians', '1 thessalonians': '1 Thessalonians', '2 thessalonians': '2 Thessalonians',
+    '1 timothy': '1 Timothy', '2 timothy': '2 Timothy', 'titus': 'Titus', 'philemon': 'Philemon',
+    'hebrews': 'Hebrews', 'james': 'James', '1 peter': '1 Peter', '2 peter': '2 Peter',
+    '1 john': '1 John', '2 john': '2 John', '3 john': '3 John', 'jude': 'Jude', 'revelation': 'Revelation',
+    'revelations': 'Revelation'
+  };
+  
+  const normalized = book.toLowerCase().trim();
+  return bookMap[normalized] || book;
 }
 
-// Fallback API: labs.bible.org (NET Bible)
+// Primary API: bible-api.com
+async function fetchFromBibleApi(book: string, chapter: number, version: string): Promise<Response> {
+  const normalizedBook = normalizeBookName(book);
+  const url = `https://bible-api.com/${encodeURIComponent(normalizedBook)}+${chapter}?translation=${version}`;
+  console.log(`[Primary API] Fetching: ${url}`);
+  return fetch(url, {
+    headers: { 'Accept': 'application/json' }
+  });
+}
+
+// Fallback API 1: labs.bible.org (NET Bible)
 async function fetchFromBibleOrg(book: string, chapter: number): Promise<any> {
-  // Map common book names to bible.org format
   const bookMap: Record<string, string> = {
     'genesis': 'Gen', 'exodus': 'Exod', 'leviticus': 'Lev', 'numbers': 'Num',
     'deuteronomy': 'Deut', 'joshua': 'Josh', 'judges': 'Judg', 'ruth': 'Ruth',
@@ -41,7 +71,7 @@ async function fetchFromBibleOrg(book: string, chapter: number): Promise<any> {
   const bibleOrgBook = bookMap[normalizedBook] || book;
   
   const url = `https://labs.bible.org/api/?passage=${encodeURIComponent(bibleOrgBook)}+${chapter}&type=json`;
-  console.log(`[Fallback API] Fetching: ${url}`);
+  console.log(`[Fallback API 1] Fetching: ${url}`);
   
   const response = await fetch(url);
   if (!response.ok) {
@@ -64,15 +94,41 @@ async function fetchFromBibleOrg(book: string, chapter: number): Promise<any> {
   };
 }
 
-// Fetch with retry logic and fallback
-async function fetchWithRetry(book: string, chapter: number, version: string, maxRetries = 5): Promise<any> {
+// Fallback API 2: getbible.net
+async function fetchFromGetBible(book: string, chapter: number): Promise<any> {
+  const normalizedBook = normalizeBookName(book);
+  const url = `https://getbible.net/v2/kjv/${encodeURIComponent(normalizedBook.toLowerCase())}/${chapter}.json`;
+  console.log(`[Fallback API 2] Fetching: ${url}`);
+  
+  const response = await fetch(url);
+  if (!response.ok) {
+    throw new Error(`GetBible API returned ${response.status}`);
+  }
+  
+  const data = await response.json();
+  if (!data.verses || data.verses.length === 0) {
+    throw new Error('No verses from GetBible API');
+  }
+  
+  return {
+    verses: data.verses.map((v: any) => ({
+      book: normalizedBook,
+      chapter: chapter,
+      verse: v.verse,
+      text: v.text
+    }))
+  };
+}
+
+// Fetch with retry logic and multiple fallbacks
+async function fetchWithRetry(book: string, chapter: number, version: string, maxRetries = 4): Promise<any> {
   let lastError: Error | null = null;
   
   // Try primary API with retries
   for (let attempt = 0; attempt < maxRetries; attempt++) {
     if (attempt > 0) {
-      // Exponential backoff: 1s, 2s, 4s, 8s, 16s
-      const waitTime = Math.pow(2, attempt) * 500;
+      // Exponential backoff: 500ms, 1s, 2s, 4s
+      const waitTime = Math.pow(2, attempt) * 250;
       console.log(`[Primary API] Retry ${attempt + 1}/${maxRetries} after ${waitTime}ms`);
       await delay(waitTime);
     }
@@ -81,7 +137,11 @@ async function fetchWithRetry(book: string, chapter: number, version: string, ma
       const response = await fetchFromBibleApi(book, chapter, version);
 
       if (response.ok) {
-        return await response.json();
+        const data = await response.json();
+        if (data.verses && data.verses.length > 0) {
+          console.log(`[Primary API] Success! Got ${data.verses.length} verses`);
+          return data;
+        }
       }
 
       // Check if it's a rate limit error (429)
@@ -93,7 +153,7 @@ async function fetchWithRetry(book: string, chapter: number, version: string, ma
 
       // For 404 or other client errors, try fallback immediately
       if (response.status >= 400 && response.status < 500) {
-        console.warn(`[Primary API] Client error ${response.status}, trying fallback`);
+        console.warn(`[Primary API] Client error ${response.status}, trying fallbacks`);
         break;
       }
 
@@ -104,17 +164,31 @@ async function fetchWithRetry(book: string, chapter: number, version: string, ma
     }
   }
 
-  // Try fallback API
-  console.log(`[Fallback] Primary API failed, trying fallback for ${book} ${chapter}`);
+  // Try fallback API 1: labs.bible.org
+  console.log(`[Fallback 1] Primary API failed, trying labs.bible.org for ${book} ${chapter}`);
   try {
     const fallbackData = await fetchFromBibleOrg(book, chapter);
-    console.log(`[Fallback] Success! Got ${fallbackData.verses?.length} verses`);
-    return fallbackData;
+    if (fallbackData.verses && fallbackData.verses.length > 0) {
+      console.log(`[Fallback 1] Success! Got ${fallbackData.verses.length} verses`);
+      return fallbackData;
+    }
   } catch (fallbackErr) {
-    console.error(`[Fallback] Also failed:`, fallbackErr);
+    console.error(`[Fallback 1] Failed:`, fallbackErr);
   }
 
-  throw lastError || new Error('All Bible API sources failed');
+  // Try fallback API 2: getbible.net
+  console.log(`[Fallback 2] Trying getbible.net for ${book} ${chapter}`);
+  try {
+    const fallbackData = await fetchFromGetBible(book, chapter);
+    if (fallbackData.verses && fallbackData.verses.length > 0) {
+      console.log(`[Fallback 2] Success! Got ${fallbackData.verses.length} verses`);
+      return fallbackData;
+    }
+  } catch (fallbackErr) {
+    console.error(`[Fallback 2] Failed:`, fallbackErr);
+  }
+
+  throw lastError || new Error('All Bible API sources failed. Please try again in a moment.');
 }
 
 serve(async (req) => {
@@ -135,16 +209,19 @@ serve(async (req) => {
     const data = await fetchWithRetry(book, chapter, version);
     
     if (!data.verses || data.verses.length === 0) {
-      throw new Error('No verses found');
+      throw new Error('No verses found for this chapter');
     }
 
     // Format verses consistently (handle both primary and fallback API formats)
+    const normalizedBook = normalizeBookName(book);
     const verses = data.verses.map((v: any) => ({
-      book: v.book || (data.reference ? data.reference.split(' ')[0] : book),
-      chapter: v.chapter || (data.reference ? data.reference.split(' ')[1]?.split(':')[0] : chapter),
+      book: v.book || normalizedBook,
+      chapter: v.chapter || chapter,
       verse: v.verse,
       text: v.text
     }));
+
+    console.log(`[Bible API] Returning ${verses.length} verses`);
 
     return new Response(
       JSON.stringify({ verses }),
@@ -155,7 +232,10 @@ serve(async (req) => {
     console.error('Error in bible-api function:', error);
     const errorMessage = error instanceof Error ? error.message : 'Failed to fetch Bible text';
     return new Response(
-      JSON.stringify({ error: errorMessage }),
+      JSON.stringify({ 
+        error: errorMessage,
+        suggestion: 'Please try refreshing the page or selecting a different chapter.'
+      }),
       { 
         status: 500,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' }
