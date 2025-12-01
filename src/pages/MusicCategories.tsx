@@ -55,6 +55,13 @@ const MUSIC_FLOORS = [
         description: "Choir harmonies, uplifting crescendo, ethereal synths",
         url: "https://cdn1.suno.ai/37b77ba0-4272-4220-a392-16645e9aa9b2.mp3",
         bpm: 60
+      },
+      {
+        id: "whispers-inner-mind",
+        name: "Whispers of the Inner Mind",
+        description: "Ambient instrumental meditation - peaceful and meditative",
+        url: "https://cdn1.suno.ai/E8qISnskB0iJ5bnz.mp3",
+        bpm: 55
       }
     ]
   },
