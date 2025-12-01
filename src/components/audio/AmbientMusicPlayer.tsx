@@ -90,14 +90,14 @@ const AMBIENT_TRACKS: Array<{
     bpm: 68,
   },
   {
-    id: "heavens-embrace",
-    name: "Heaven's Embrace",
-    description: "Cinematic meditative christian music - instrumental",
+    id: "whispers-of-eternity",
+    name: "Whispers of Eternity",
+    description: "Orchestral with lush strings, epic meditative",
     category: "floor-3",
     floor: 3,
-    mood: "cinematic, meditative, reverent",
-    url: "https://cdn1.suno.ai/30c1ab00-5069-4b44-a4b9-9c7bab500a30.mp3",
-    bpm: 62,
+    mood: "orchestral, epic, meditative",
+    url: "https://cdn1.suno.ai/37b77ba0-4272-4220-a392-16645e9aa9b2.mp3",
+    bpm: 60,
   },
 ];
 
