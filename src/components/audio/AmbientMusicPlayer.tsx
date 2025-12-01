@@ -360,9 +360,18 @@ export function AmbientMusicPlayer({
         }
       }
       
+      // Update Media Session metadata when track changes
+      if ('mediaSession' in navigator && isPlaying) {
+        navigator.mediaSession.metadata = new MediaMetadata({
+          title: currentTrack.name,
+          artist: 'Phototheology Palace',
+          album: 'Sacred Ambient Music',
+        });
+      }
+      
       localStorage.setItem("pt-ambient-track", currentTrackId);
     }
-  }, [currentTrackId, currentTrack]);
+  }, [currentTrackId, currentTrack, isPlaying]);
 
   // Save volume to localStorage when it changes
   useEffect(() => {
@@ -454,6 +463,34 @@ export function AmbientMusicPlayer({
         await audioRef.current.play();
         console.log("Audio playing successfully");
         setIsPlaying(true);
+        
+        // Setup Media Session for lock screen controls and background playback
+        if ('mediaSession' in navigator) {
+          navigator.mediaSession.metadata = new MediaMetadata({
+            title: currentTrack.name,
+            artist: 'Phototheology Palace',
+            album: 'Sacred Ambient Music',
+          });
+          
+          navigator.mediaSession.setActionHandler('play', () => {
+            audioRef.current?.play();
+            setIsPlaying(true);
+          });
+          navigator.mediaSession.setActionHandler('pause', () => {
+            audioRef.current?.pause();
+            setIsPlaying(false);
+          });
+          navigator.mediaSession.setActionHandler('nexttrack', () => {
+            nextTrack();
+          });
+          navigator.mediaSession.setActionHandler('previoustrack', () => {
+            // Go to previous track
+            const playableTracks = allTracks.filter(t => selectedTracks.has(t.id));
+            const currentIndex = playableTracks.findIndex(t => t.id === currentTrackId);
+            const prevIndex = currentIndex > 0 ? currentIndex - 1 : playableTracks.length - 1;
+            setCurrentTrackId(playableTracks[prevIndex].id);
+          });
+        }
         setIsEnabled(true);
       } catch (error) {
         console.error("Audio playback failed:", error);
