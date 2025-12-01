@@ -58,7 +58,18 @@ const AMBIENT_TRACKS: Array<{
   mood: string;
   url: string;
   bpm: number;
-}> = [];
+}> = [
+  {
+    id: "eternal-echoes",
+    name: "Eternal Echoes",
+    description: "Cinematic orchestral christian music - instrumental",
+    category: "floor-4",
+    floor: 4,
+    mood: "cinematic, orchestral, reverent",
+    url: "https://cdn1.suno.ai/ea711d82-cd6a-4ebd-a960-b73cb72c39f0.mp3",
+    bpm: 65,
+  },
+];
 
 // Room to track mapping based on Phototheology floors
 const ROOM_TRACK_MAP: Record<string, string> = {
