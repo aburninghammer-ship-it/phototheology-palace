@@ -72,14 +72,18 @@ export const UserPreferencesProvider = ({
             reading_mode: (data.reading_mode as any) ?? defaultPreferences.reading_mode,
             theme_preference: (data.theme_preference as any) ?? defaultPreferences.theme_preference,
             navigation_style: (data.navigation_style as any) || "full",
-            preferred_reading_experience: (data.preferred_reading_experience as any) ?? defaultPreferences.preferred_reading_experience,
-            read_along_speed: data.read_along_speed ?? defaultPreferences.read_along_speed,
+            preferred_reading_experience: defaultPreferences.preferred_reading_experience,
+            read_along_speed: defaultPreferences.read_along_speed,
           });
         } else {
           // Create default preferences in the backend and use local defaults
           await supabase.from("user_preferences").insert({
             user_id: user.id,
-            ...defaultPreferences,
+            bible_font_size: defaultPreferences.bible_font_size,
+            bible_translation: defaultPreferences.bible_translation,
+            reading_mode: defaultPreferences.reading_mode,
+            theme_preference: defaultPreferences.theme_preference,
+            navigation_style: defaultPreferences.navigation_style,
           });
           setPreferences(defaultPreferences);
         }

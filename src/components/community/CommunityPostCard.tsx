@@ -67,7 +67,6 @@ export const CommunityPostCard = ({
             <div>
               <div className="flex items-center gap-2">
                 <p className="font-semibold">{displayName}</p>
-                <UserMasterySword userId={post.user_id} size="sm" />
               </div>
               <p className="text-xs text-muted-foreground">
                 @{username} · {formatDistanceToNow(new Date(post.created_at), { addSuffix: true })}
