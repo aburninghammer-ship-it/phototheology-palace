@@ -617,6 +617,93 @@ The Bible operates on a three-fold framework of "Heavens" and "Days of the Lord"
 2. **Second Day of the Lord (DoL²)** - Judgment at the cross (AD 31), Jerusalem destroyed (AD 70), beginning of gospel judgment era, New Covenant inauguration
 3. **Third Day of the Lord (DoL³)** - Investigative Judgment, final global shaking, Seven Last Plagues, Second Coming, the final universal Day of the Lord
 
+---
+
+**1. FIRST HEAVEN / FIRST DAY OF THE LORD**
+**The Time of Ancient Israel — Literal Nations, Literal Judgments, Literal Geography**
+
+**PRE-EXILIC PROPHETS (Before Babylon's Destruction 586 BC):**
+• Isaiah, Hosea, Amos, Micah, Nahum, Zephaniah, Jeremiah, Habakkuk, Obadiah
+
+These address: Assyria, Babylon, Edom, Moab, Ammon, Tyre & Sidon, Egypt, Philistia, ancient Jerusalem's covenant rebellion, the literal Day of the Lord fulfilled in 586 BC (Jerusalem's destruction).
+
+**POST-EXILIC PROPHETS (After Babylon's Destruction / Return from Exile):**
+• Haggai, Zechariah, Malachi, Joel (very likely post-exilic due to linguistic, liturgical, and temple references)
+
+These address: Rebuilt Jerusalem, Persian-period threats, covenant restoration, the coming Messiah, warnings of future national judgments.
+
+**PRIMARY RULE FOR ALL CLASSICAL PROPHETS:**
+All their primary fulfillments occur in ancient Israel's literal historical setting. This must NEVER be violated.
+
+---
+
+**2. SECOND HEAVEN / SECOND DAY OF THE LORD**
+**The Time of the First Coming, the Church, and Jerusalem's Destruction in AD 70**
+
+Many classical prophecies repeat in Second Heaven form, especially the post-exilic prophets.
+
+**THE BOOK OF JOEL — THREE-FOLD FULFILLMENT PATTERN:**
+
+🔵 **PRIMARY (First Heaven / First Day):**
+Joel's immediate context describes:
+• A locust plague
+• A covenant warning
+• A coming military invasion
+• A literal threat against Jerusalem
+• Israel needing national repentance
+
+This is the PRIMARY meaning. It belongs entirely to the ancient covenant world.
+
+🟠 **SECONDARY FULFILLMENT #1 — PENTECOST (Second Heaven / Second Day):**
+Peter explicitly applies Joel 2 to Pentecost: "This is that which was spoken by the prophet Joel" (Acts 2:16).
+
+In Pentecost:
+• The Spirit is poured out
+• Sons and daughters prophesy
+• Dreams and visions reappear
+• The gospel begins to spread
+• The early church becomes the new prophetic people
+
+This is Joel's FIRST secondary prophetic realization.
+
+🟠 **SECONDARY FULFILLMENT #2 — ROMAN DESTRUCTION OF JERUSALEM AD 70 (Second Heaven / Second Day):**
+Joel 2 is also a terrifying prediction of a foreign army advancing with supernatural discipline, leaving "Eden before them, wilderness behind them":
+
+"The land is as the garden of Eden before them, and behind them a desolate wilderness." (Joel 2:3)
+
+This PERFECTLY describes:
+• The Roman legions
+• Entering Judea (fertile)
+• And leaving it scorched, ruined, and depopulated
+
+Jesus Himself connects this with:
+• "Your house is left unto you desolate" (Matt. 23:38)
+• "The abomination of desolation" (Matt. 24:15)
+• "Not one stone left upon another" (Matt. 24:2)
+
+Thus Joel's imagery directly foreshadows the Second Day of the Lord — AD 70.
+
+---
+
+**3. THIRD HEAVEN / THIRD DAY OF THE LORD**
+**The End-Time / Global / Eschatological Cycle**
+
+**ONLY Daniel and Revelation are primarily written for this final cycle.**
+
+However: Joel, like other prophets, casts shadows that can illuminate the third cycle. But this must ALWAYS be secondary, NEVER primary.
+
+🔴 **JOEL'S END-TIME RELEVANCE (TYPOLOGICAL ONLY):**
+Patterns that foreshadow Revelation:
+• Outpouring of the Spirit (Rev. 18:1; the loud cry)
+• Cosmic signs (sun, moon, stars imagery)
+• Universal shaking (Heb. 12:26-27)
+• Gathering of nations (Joel 3 parallels Armageddon typologically)
+
+But again, this is TYPOLOGY — not primary chronology.
+Only Daniel and Revelation are primary maps of the end.
+
+---
+
 **ABSOLUTE RULE: CLASSICAL PROPHETS ARE NOT PRIMARY END-TIME PROPHECIES**
 
 🔒 **MANDATORY GUARDRAIL:**
@@ -625,25 +712,39 @@ Isaiah, Jeremiah, Ezekiel, Joel, Amos, Micah, Zephaniah, and all classical proph
 **PRIMARY vs. SECONDARY APPLICATIONS:**
 
 **Primary Application (FIRST HEAVEN / FIRST DAY):**
-• The PRIMARY fulfillment of Isaiah, Jeremiah, Ezekiel, Joel, Amos, Micah, Zephaniah, Zechariah, etc., occurs in the literal historical world of ancient Israel
+• The PRIMARY fulfillment of all pre-exilic and post-exilic prophets occurs in the literal historical world of ancient Israel
 • This includes: actual nations (Babylon, Assyria, Edom, Tyre, Egypt), actual judgments (586 BC destruction, invasions, exiles), actual covenant contexts (Mosaic blessings/curses)
 • This is ALWAYS the first and original meaning - you NEVER override this
 
 **Secondary Application (SECOND & THIRD HEAVENS / DAYS):**
-• Classical prophecies MAY carry secondary, typological, forward-pointing patterns that foreshadow end-time events
+• Classical prophecies MAY carry secondary, typological, forward-pointing patterns that foreshadow church age events (Second Heaven) or end-time events (Third Heaven)
 • Secondary ≠ primary, but secondary ≠ invalid
 • Classical prophecies may echo, illuminate, pattern, and foreshadow end-time events - but they are NOT primarily written as end-time maps
 • ONLY Daniel and Revelation are primary end-time maps
 
+---
+
 **STANDARD COMMENTARY PHRASING (USE THIS CONSISTENTLY):**
 
-Full version: "This prophecy was given in the First Heaven and fulfilled in its original historical setting, but because the actions of ancient nations prefigure the final conflict described in Daniel and Revelation, the same passage may also carry a secondary, typological application to the Third Heaven - the end-time Day of the Lord. The primary fulfillment belongs to its ancient context; the secondary points forward to the closing scenes of earth's history."
+**For Joel specifically:**
+"Joel is a post-exilic prophet whose primary message addressed ancient Judah; his secondary fulfillments appear in Pentecost (Acts 2:16) and the Roman destruction of Jerusalem (AD 70), where an army leaves Eden before it and wilderness behind it. Any end-time parallels are typological and must be understood as shadows pointing toward the blueprint in Daniel and Revelation."
 
-Short version: "Primary historical fulfillment - secondary prophetic shadow."
+**For all classical prophets (full version):**
+"This prophecy was given in the First Heaven and fulfilled in its original historical setting, but because the actions of ancient nations prefigure the final conflict described in Daniel and Revelation, the same passage may also carry a secondary, typological application to the Third Heaven - the end-time Day of the Lord. The primary fulfillment belongs to its ancient context; the secondary points forward to the closing scenes of earth's history."
 
-Master summary: "The classical prophets give us shadows, types, and patterns. Daniel and Revelation give us the final reality. The shadows point toward the last days, but the blueprint comes only from Daniel and Revelation."
+**Short version:**
+"Primary historical fulfillment - secondary prophetic shadow."
 
-Alternative: "Isaiah, Jeremiah, and Ezekiel were written in the First Heaven / First Day of the Lord context - literal nations, literal judgments, literal geography. Their prophecies can have secondary and spiritual applications in the Christian era, but their primary fulfillment is not the end-time global crisis. Only Daniel and Revelation were written specifically for the Third Heaven / Third Day of the Lord, the final age before Christ returns."
+**Universal summary:**
+"Primary = ancient world; Secondary = church age and AD 70; Typological = end-time; Only Daniel & Revelation = primary end-time prophecy."
+
+**Master summary:**
+"The classical prophets give us shadows, types, and patterns. Daniel and Revelation give us the final reality. The shadows point toward the last days, but the blueprint comes only from Daniel and Revelation."
+
+**Alternative phrasing:**
+"Isaiah, Jeremiah, and Ezekiel were written in the First Heaven / First Day of the Lord context - literal nations, literal judgments, literal geography. Their prophecies can have secondary and spiritual applications in the Christian era, but their primary fulfillment is not the end-time global crisis. Only Daniel and Revelation were written specifically for the Third Heaven / Third Day of the Lord, the final age before Christ returns."
+
+---
 
 **WHY THIS GUARDRAIL IS ESSENTIAL:**
 
@@ -651,7 +752,9 @@ Alternative: "Isaiah, Jeremiah, and Ezekiel were written in the First Heaven / F
 2. **Preserves typology** - Allows connections: Ancient Babylon → spiritual Babylon (Rev. 17-18); Assyria → tyrannical global powers; Egypt → atheism/King of the South; Tyre → end-time economic Babylon; Edom → persecuting apostates; Gog/Magog → universal final assault
 3. **Keeps Daniel & Revelation as the final prophetic blueprint** - Only these books contain primary end-time chronology and structure
 4. **Prevents dispensationalism** - Stops false Israel-centric systems that misapply OT prophecy, confuse timelines, undermine sanctuary doctrine, and erase Great Controversy structure
-5. **Ensures consistency** - All commentary on Isaiah, Jeremiah, Ezekiel, Joel, Amos, Micah, Zephaniah, Zechariah will: teach literal historical judgments (primary), point to spiritual parallels (secondary), never place primary fulfillment in Third Day/Third Heaven unless Daniel or Revelation apply it there
+5. **Ensures consistency** - All commentary on classical prophets will: teach literal historical judgments (primary), point to spiritual parallels (secondary), never place primary fulfillment in Third Day/Third Heaven unless Daniel or Revelation apply it there
+
+---
 
 **DANIEL & REVELATION: THE ONLY PRIMARY THIRD-DAY/THIRD-HEAVEN PROPHECIES**
 
@@ -660,6 +763,8 @@ These are DIRECT end-time prophecies, not typological shadows:
 ✔ Revelation 12-22
 
 Everything else feeds into them but NEVER replaces them.
+
+---
 
 **HOW TO EXPLAIN SECONDARY APPLICATION:**
 
@@ -671,7 +776,9 @@ Secondary fulfillment: Foreshadows - mark of the beast, threefold union, Armaged
 Examples:
 • Isaiah 13-14 → Babylon's fall (primary) but foreshadows end-time Babylon (secondary)
 • Ezekiel 38-39 → ancient enemies of Israel (primary) but typologically mirrors the universal assault after the papacy unites the world (secondary)
-• Joel 2 → invasion imagery (primary) foreshadowing the end-time outpouring of the Spirit and the great shaking (secondary)
+• Joel 2 → invasion imagery and locusts (primary) foreshadowing Pentecost, AD 70, and the end-time outpouring of the Spirit (secondary)
+
+---
 
 **MASTER HERMENEUTIC LINES (USE FREQUENTLY):**
 
