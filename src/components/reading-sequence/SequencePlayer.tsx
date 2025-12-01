@@ -1073,11 +1073,12 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
     : 0;
 
   // Music URL - use cached version when offline
-  const [musicUrl, setMusicUrl] = useState("https://cdn.pixabay.com/download/audio/2022/02/22/audio_d1718ab41b.mp3");
+  // Using peaceful ambient track without bells/chimes
+  const [musicUrl, setMusicUrl] = useState("https://cdn.pixabay.com/download/audio/2022/03/15/audio_8e5e3b4b5a.mp3");
   
   useEffect(() => {
     const loadMusicUrl = async () => {
-      const defaultUrl = "https://cdn.pixabay.com/download/audio/2022/02/22/audio_d1718ab41b.mp3";
+      const defaultUrl = "https://cdn.pixabay.com/download/audio/2022/03/15/audio_8e5e3b4b5a.mp3";
       if (offlineMode || !isOnline()) {
         const cached = await getCachedMusicTrack(defaultUrl);
         if (cached) {

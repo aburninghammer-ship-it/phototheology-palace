@@ -16,7 +16,7 @@ import { toast } from "sonner";
 // Default music tracks to cache
 const DEFAULT_MUSIC_TRACKS = [
   "https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf07a.mp3",
-  "https://cdn.pixabay.com/download/audio/2022/02/22/audio_d1718ab41b.mp3",
+  "https://cdn.pixabay.com/download/audio/2022/03/15/audio_8e5e3b4b5a.mp3",
   "https://cdn.pixabay.com/download/audio/2021/11/25/audio_cb5c4e5fb9.mp3",
 ];
 
