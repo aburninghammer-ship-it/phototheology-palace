@@ -209,6 +209,42 @@ export function validateTheologicalContent(content: string): ValidationResult {
     }
   }
 
+  // Rule 11: Ten horns must be identified correctly and shown as continuing forward
+  if ((lowerContent.includes('ten horns') || lowerContent.includes('10 horns')) &&
+      (lowerContent.includes('daniel 7') || lowerContent.includes('revelation'))) {
+    const hasHornNames = lowerContent.includes('franks') || 
+                        lowerContent.includes('anglo') ||
+                        lowerContent.includes('alemanni') ||
+                        lowerContent.includes('visigoth') ||
+                        lowerContent.includes('lombard') ||
+                        lowerContent.includes('burgund') ||
+                        lowerContent.includes('heruli') ||
+                        lowerContent.includes('vandal') ||
+                        lowerContent.includes('ostrogoth');
+    
+    const hasModernConnection = lowerContent.includes('modern') ||
+                                lowerContent.includes('continue') ||
+                                lowerContent.includes('evolve') ||
+                                lowerContent.includes('america') ||
+                                lowerContent.includes('europe');
+    
+    if (!hasHornNames && content.length > 200) {
+      warnings.push(
+        'WARNING: When discussing the ten horns, name the specific tribes: Heruli, Vandals, Ostrogoths (uprooted), ' +
+        'Franks, Anglo-Saxons, Alemanni, Visigoths, Suevi, Lombards, Burgundians (surviving). ' +
+        'Each produced a unique distortion of Christianity leading to the final crisis.'
+      );
+    }
+    
+    if (!hasModernConnection && content.length > 200) {
+      warnings.push(
+        'WARNING: The ten horns are not frozen in the 5th century. They grow forward into modern nations. ' +
+        'The Anglo-Saxon line produces England and America. The Alemanni become Germany (rationalism). ' +
+        'All surviving horns contribute to the end-time image of the beast.'
+      );
+    }
+  }
+
   return {
     valid: errors.length === 0,
     errors,
@@ -235,6 +271,16 @@ export function validateOrThrow(content: string, context: string = 'Content'): v
  */
 export function getTheologicalRules(): Array<{ id: string; rule: string; rationale: string }> {
   return [
+    {
+      id: 'ten-horns-continue-forward',
+      rule: 'The ten horns of Daniel 7 are not frozen in the 5th century—they continue into the last days',
+      rationale:
+        'The ten horns = post-Roman nations (Heruli, Vandals, Ostrogoths, Franks, Anglo-Saxons, Alemanni, Visigoths, Suevi, Lombards, Burgundians). ' +
+        'Three were uprooted (Heruli, Vandals, Ostrogoths) to make way for Papal Rome. ' +
+        'The remaining seven evolved into modern Western powers and each produced a unique distortion of Christianity: ' +
+        'Franks → Church Supremacy; Anglo-Saxons → Persecuting Protestantism & America; Alemanni → Atheistic Rationalism; ' +
+        'Visigoths → The Inquisition; Suevi → Global Slavery; Lombards → Papal Territorial Power; Burgundians → Doctrinal Fragmentation.',
+    },
     {
       id: 'scapegoat-never-christ',
       rule: 'The scapegoat is NEVER Jesus Christ',
