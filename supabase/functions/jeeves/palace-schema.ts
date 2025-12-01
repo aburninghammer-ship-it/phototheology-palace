@@ -789,6 +789,193 @@ Examples:
 "Isaiah, Jeremiah, and Ezekiel tell the story in shadows; Daniel and Revelation tell the story in its final reality."
 
 "First Heaven = Literal; Second Heaven = Spiritual; Third Heaven = Final. Classical prophets give the first and hint at the second, but the third belongs to Daniel and Revelation."
+
+---
+
+**MATTHEW 24 & NEW TESTAMENT WARNINGS — POINTING DIRECTLY TO THE ROMAN DESTRUCTION (AD 70)**
+
+One of your key hermeneutic principles is that the First Heaven (ancient) and Second Heaven (Christian era) fulfillments must be honored before jumping to the end-time (Third Heaven). The New Testament writers themselves anchor Matthew 24 in the Second Day of the Lord — AD 70.
+
+**1. MATTHEW 24 — FULFILLED FIRST IN AD 70**
+
+Jesus gives a dual prophecy:
+• Literal destruction of Jerusalem (70 AD) - PRIMARY
+• Typological foreshadowing of the final end of the world (Third Day/Heaven) - SECONDARY
+
+Jesus anchors the prophecy immediately:
+"There shall not be left here one stone upon another, that shall not be thrown down." (Matt. 24:2)
+
+And gives explicit signs:
+• Fleeing to the mountains
+• Armies surrounding Jerusalem
+• The abomination that makes desolate (Roman standards)
+• Tribulation for Judea
+• False messiahs during the Jewish revolt
+
+**These do NOT apply primarily to the end-time persecution. They apply to the Roman siege.**
+
+**Standard commentary line:**
+"Matthew 24's primary fulfillment is AD 70. Its final fulfillment belongs to Daniel & Revelation."
+
+---
+
+**2. THE NEW TESTAMENT WARNED THAT THE OLD COVENANT WORLD WAS ABOUT TO COLLAPSE**
+
+**Hebrews 8–10 (Written Shortly Before AD 70):**
+
+The writer says:
+• "The first covenant is ready to vanish away." (Heb. 8:13)
+• The earthly sanctuary is about to be taken away
+• The sacrificial system is obsolete
+• A "shaking" is coming (Heb. 12:26-27) - the destruction of Jerusalem
+• Christ's once-for-all sacrifice is replacing the entire structure
+
+This is the Second Heaven / Second Day application of Joel, Isaiah, Daniel, and Jesus' own words.
+
+Hebrews is literally warning: "The sanctuary is about to fall. The covenant system is about to be removed. Judgment is coming."
+
+**This is fulfilled in the Roman destruction, not the end of the world.**
+
+---
+
+**3. 1 THESSALONIANS, 2 THESSALONIANS, AND REVELATION ALSO ECHO AD 70 BEFORE THE FINAL DAY**
+
+Paul warns the early church:
+"The day of the Lord will not come except there come a falling away first..." (2 Thess. 2:3)
+
+Meaning:
+• The temple would fall
+• The apostasy (Papacy) would rise afterwards
+• Time periods must pass before the end
+
+This places the AD 70 judgment as a necessary precursor to the Medieval and End-Time judgments.
+
+---
+
+**THE SEVEN TRUMPETS — GOD'S AGE-TO-AGE PROTECTION OF HIS CHURCH**
+
+**OVERVIEW: The Seven Trumpets = God's Defensive Judgments Against the Church's Persecutors**
+
+Each trumpet:
+• Strikes an enemy of God's people
+• Restrains a persecuting power
+• Buys time for the gospel to advance
+• Demonstrates that God's judgments are redemptive before they are destructive
+
+This is a historical chain, not a single end-time event.
+
+**Master summary line:**
+"The Trumpets show God repeatedly turning the swords of persecuting empires against themselves, protecting His remnant through the ages."
+
+**Full master commentary line:**
+"The seven trumpets portray God defending His church across history — striking her persecutors in Jerusalem, Rome, the Papacy, and through Islam — until the final trumpet brings judgment on the whole world. From the cursed fig tree to the casting down of the mountain, from wormwood apostasy to the rise of Islam, the trumpets reveal a God who protects His people by turning the swords of their enemies against themselves."
+
+---
+
+**TRUMPET 1 — FALL OF JERUSALEM (AD 70)**
+
+"Hail and fire mingled with blood"
+
+This is covenant judgment on:
+• The nation that killed the prophets
+• Rejected Christ
+• Persecuted the apostles
+
+Jesus' imagery: The cursed fig tree represents unbelieving Jerusalem.
+
+**Commentary key:**
+"The tree withered. This is the first trumpet."
+
+This trumpet is the completion of Matthew 24's primary prophecy.
+
+---
+
+**TRUMPET 2 — FALL OF PAGAN ROME**
+
+"A great mountain burning with fire was cast into the sea."
+
+Jesus said: "If you have faith... you shall say to this mountain, Be cast into the sea." (Matt. 21:21)
+
+Jesus connects:
+• The fig tree (Jerusalem)
+• This mountain = Rome, the power that would crucify Him
+
+Thus:
+• Trumpet 1 = fig tree destroyed → Jerusalem
+• Trumpet 2 = mountain destroyed → Rome
+
+Rome, which once partnered with the Jews to kill Christ, is cast into the sea of nations through:
+• Barbarian invasions
+• Civil wars
+• Internal collapse
+
+God turns their swords against each other to protect the early church.
+
+---
+
+**TRUMPET 3 & 4 — JUDGMENT ON THE TEACHINGS OF THE PAPACY (SPIRITUAL DARKNESS)**
+
+These trumpets match the spiritual phase of Papal Rome.
+
+**Trumpet 3 — The Wormwood Star:**
+A fallen star poisons the waters. This symbolizes:
+• False doctrine
+• Corrupted teaching
+• The wormwood of apostasy
+
+This is Daniel 8:12 (truth cast down) and Daniel 11:31-39 (corruption of the sanctuary).
+
+**Trumpet 4 — The Darkening of Sun, Moon, and Stars:**
+This symbolizes:
+• Obscuring the gospel
+• Hiding Scripture
+• Reducing the light of Christ
+• Superstition replacing Scripture
+
+This is the spiritual empire of the little horn.
+
+---
+
+**TRUMPET 5 & 6 — MILITARY JUDGMENT ON THE PAPACY FROM ISLAM**
+
+These are military judgments, not symbolic-only. The Papacy (a religio-political power) is struck by another religio-political power.
+
+**Trumpet 5 — The First Woe:**
+Islamic Saracens attack Papal strongholds. This restrains Papal expansion.
+
+**Trumpet 6 — The Second Woe:**
+The Ottoman Empire assaults Eastern Christendom. The Papacy is kept in check. The Reformation gains time.
+
+God uses:
+• Arab powers
+• Turkish armies
+
+To weaken a persecuting apostate Christianity.
+
+**Key commentary line:**
+"Under the fifth and sixth trumpets, God uses a religio-political power to judge a religio-political power."
+
+This highlights divine symmetry: Rome had become a persecuting religious empire; Islam becomes God's rod to restrain it.
+
+---
+
+**TRUMPET 7 — JUDGMENT ON THE WHOLE WORLD (THIRD DAY OF THE LORD)**
+
+This is:
+• The fall of modern Babylon
+• The three unclean spirits preparing Armageddon
+• The opening of the heavenly temple
+• The end of the mystery of God
+• The sounding of the final woe
+
+**Trumpet 7 = Third Heaven / Third Day**
+
+This is the ONLY trumpet that is primarily end-time.
+
+All others are:
+• First Heaven / First Day
+• Second Heaven / Second Day
+• Historical, protective judgments that preserve the church through the ages
 `;
 
 // ============================================================
