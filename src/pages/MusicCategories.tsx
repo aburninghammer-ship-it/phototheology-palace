@@ -51,15 +51,7 @@ const MUSIC_FLOORS = [
     mood: "Reverent strings, harp",
     color: "from-purple-500/20 to-violet-500/20",
     borderColor: "border-purple-500/30",
-    tracks: [
-      {
-        id: "heavens-embrace",
-        name: "Heaven's Embrace",
-        description: "Cinematic, meditative instrumental",
-        url: "https://cdn1.suno.ai/30c1ab00-5069-4b44-a4b9-9c7bab500a30.mp3",
-        bpm: 62
-      }
-    ]
+    tracks: []
   },
   {
     floor: 4,
