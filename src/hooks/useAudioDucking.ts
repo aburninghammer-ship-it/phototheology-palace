@@ -6,8 +6,8 @@ let isDucked = false;
 let duckListeners: Set<(ducked: boolean) => void> = new Set();
 
 // Duck ratio - music volume is reduced to this percentage when TTS plays
-// 0 = completely mute music during voice reading for total clarity
-const DUCK_RATIO = 0;
+// 0.2 = music plays at 20% volume during voice reading for pleasant background ambience
+const DUCK_RATIO = 0.2;
 
 export const notifyTTSStarted = () => {
   if (!isDucked) {
