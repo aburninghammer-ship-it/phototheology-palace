@@ -604,7 +604,10 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
     setIsLoading(true);
     setIsPlaying(true);
     setIsPaused(false);
-    notifyTTSStarted();
+    // Don't duck music in commentary-only mode - let it play alongside
+    if (!sequence.commentaryOnly) {
+      notifyTTSStarted();
+    }
     
     const commentaryMode = sequence.commentaryMode || "chapter";
     const commentaryVoice = sequence.commentaryVoice || "daniel";
@@ -1224,7 +1227,10 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
       });
       setIsPaused(false);
       setIsPlaying(true);
-      notifyTTSStarted();
+      // Don't duck music in commentary-only mode
+      if (!currentSequence?.commentaryOnly) {
+        notifyTTSStarted();
+      }
       return;
     }
     
@@ -1234,7 +1240,10 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
       speechSynthesis.resume();
       setIsPaused(false);
       setIsPlaying(true);
-      notifyTTSStarted();
+      // Don't duck music in commentary-only mode
+      if (!currentSequence?.commentaryOnly) {
+        notifyTTSStarted();
+      }
       return;
     }
     
@@ -1263,14 +1272,20 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
     if (audioRef.current) {
       audioRef.current.pause();
       setIsPaused(true);
-      notifyTTSStopped();
+      // Don't stop music ducking in commentary-only mode (music should keep playing)
+      if (!currentSequence?.commentaryOnly) {
+        notifyTTSStopped();
+      }
     }
     
     // Handle browser speech synthesis pause
     if (speechSynthesis.speaking) {
       speechSynthesis.pause();
       setIsPaused(true);
-      notifyTTSStopped();
+      // Don't stop music ducking in commentary-only mode (music should keep playing)
+      if (!currentSequence?.commentaryOnly) {
+        notifyTTSStopped();
+      }
     }
     
     // Store current position for resume
@@ -1303,6 +1318,7 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
     lastFetchedRef.current = null;
     shouldPlayNextRef.current = false;
     retryCountRef.current = 0;
+    // Always stop music ducking when stopping playback
     notifyTTSStopped();
   };
 
