@@ -7,7 +7,8 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Target, Sparkles, BookOpen, Loader2, Save, Download, ChevronRight, Check, Brain, Zap, Bot } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Target, Sparkles, BookOpen, Loader2, Save, Download, ChevronRight, Check, Brain, Zap, Bot, HelpCircle } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { toast } from "sonner";
@@ -190,25 +191,68 @@ const DrillDrill = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5">
       <Navigation />
       <main className="container mx-auto px-4 py-8 pt-24">
         <div className="max-w-6xl mx-auto space-y-6">
           {/* Header */}
-          <div className="text-center space-y-2">
+          <div className="text-center space-y-3">
             <div className="flex items-center justify-center gap-2">
               <Target className="h-8 w-8 text-primary" />
               <h1 className="text-3xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
                 Gather the Fragments
               </h1>
             </div>
-            <p className="text-sm italic text-primary/80 mb-2">
+            <p className="text-lg font-semibold text-primary">
+              1 Verse, Numberless Options
+            </p>
+            <p className="text-sm italic text-muted-foreground">
               "Gather up the fragments that remain, that nothing be lost." — John 6:12
             </p>
             <p className="text-muted-foreground max-w-2xl mx-auto">
               Extract every insight from a single verse. Jeeves walks you through the entire Palace—dimensions, 
               patterns, sanctuary connections, typology—so that nothing of value is lost.
             </p>
+            
+            {/* How to Use Button */}
+            <Dialog>
+              <DialogTrigger asChild>
+                <Button variant="outline" size="sm" className="mt-2 gap-2 backdrop-blur-sm bg-background/50 border-primary/20">
+                  <HelpCircle className="h-4 w-4" />
+                  How to Use
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="max-w-lg backdrop-blur-md bg-background/95">
+                <DialogHeader>
+                  <DialogTitle className="flex items-center gap-2">
+                    <Target className="h-5 w-5 text-primary" />
+                    How to Gather Fragments
+                  </DialogTitle>
+                </DialogHeader>
+                <div className="space-y-4 text-sm">
+                  <div className="space-y-2">
+                    <h4 className="font-semibold text-primary">1. Choose Your Verse</h4>
+                    <p className="text-muted-foreground">Enter any Bible verse reference (e.g., "John 3:16"). The full verse text will be displayed automatically.</p>
+                  </div>
+                  <div className="space-y-2">
+                    <h4 className="font-semibold text-primary">2. Select Your Mode</h4>
+                    <ul className="text-muted-foreground space-y-1 ml-4">
+                      <li><strong>Guided:</strong> Jeeves teaches each principle step-by-step</li>
+                      <li><strong>Self-Drill:</strong> Test yourself; Jeeves grades your answers</li>
+                      <li><strong>Auto:</strong> Quick comprehensive analysis of all rooms</li>
+                    </ul>
+                  </div>
+                  <div className="space-y-2">
+                    <h4 className="font-semibold text-primary">3. Explore Every Room</h4>
+                    <p className="text-muted-foreground">Walk through all 7 floors of the Phototheology Palace, extracting insights from each room's unique perspective.</p>
+                  </div>
+                  <div className="space-y-2">
+                    <h4 className="font-semibold text-primary">4. Save Your Fragments</h4>
+                    <p className="text-muted-foreground">Save your completed drill for future reference, review, or export.</p>
+                  </div>
+                </div>
+              </DialogContent>
+            </Dialog>
           </div>
 
           <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
@@ -227,10 +271,10 @@ const DrillDrill = () => {
               {!session ? (
                 <>
                   {/* Verse Input */}
-                  <Card>
+                  <Card className="backdrop-blur-sm bg-card/80 border-primary/10">
                     <CardHeader>
                       <CardTitle className="flex items-center gap-2">
-                        <BookOpen className="h-5 w-5" />
+                        <BookOpen className="h-5 w-5 text-primary" />
                         Choose Your Verse
                       </CardTitle>
                       <CardDescription>
@@ -238,33 +282,40 @@ const DrillDrill = () => {
                       </CardDescription>
                     </CardHeader>
                     <CardContent className="space-y-4">
-                      <div className="grid gap-4 md:grid-cols-2">
+                      <div className="space-y-4">
                         <div className="space-y-2">
                           <label className="text-sm font-medium">Verse Reference</label>
                           <Input
                             placeholder="e.g., John 3:16, Romans 8:28"
                             value={verse}
                             onChange={(e) => setVerse(e.target.value)}
+                            className="bg-background/50"
                           />
                         </div>
                         <div className="space-y-2">
-                          <label className="text-sm font-medium">Verse Text (optional)</label>
+                          <label className="text-sm font-medium">Verse Text <span className="text-muted-foreground">(optional - will auto-fetch if left blank)</span></label>
                           <Textarea
-                            placeholder="Paste the verse text or leave blank to auto-fetch"
+                            placeholder="Paste the verse text here, or leave blank to auto-fetch when you start"
                             value={verseText}
                             onChange={(e) => setVerseText(e.target.value)}
-                            className="h-[38px] min-h-[38px]"
+                            className="min-h-[80px] bg-background/50"
                           />
                         </div>
+                        {verseText && (
+                          <div className="p-4 rounded-lg bg-primary/5 border border-primary/20">
+                            <p className="text-sm font-medium text-primary mb-1">{verse || "Selected Verse"}</p>
+                            <p className="text-muted-foreground italic">"{verseText}"</p>
+                          </div>
+                        )}
                       </div>
                     </CardContent>
                   </Card>
 
                   {/* Mode Selection */}
-                  <Card>
+                  <Card className="backdrop-blur-sm bg-card/80 border-primary/10">
                     <CardHeader>
                       <CardTitle className="flex items-center gap-2">
-                        <Sparkles className="h-5 w-5" />
+                        <Sparkles className="h-5 w-5 text-primary" />
                         Choose Your Mode
                       </CardTitle>
                     </CardHeader>
@@ -335,7 +386,7 @@ const DrillDrill = () => {
                   </Card>
 
                   {/* What You'll Cover */}
-                  <Card>
+                  <Card className="backdrop-blur-sm bg-card/80 border-primary/10">
                     <CardHeader>
                       <CardTitle>What the Drill Covers</CardTitle>
                       <CardDescription>
@@ -366,13 +417,15 @@ const DrillDrill = () => {
                 /* Active Drill Session */
                 <div className="space-y-6">
                   {/* Session Header */}
-                  <Card>
+                  <Card className="backdrop-blur-sm bg-card/80 border-primary/10">
                     <CardContent className="pt-6">
                       <div className="flex items-center justify-between flex-wrap gap-4">
-                        <div>
-                          <h2 className="text-xl font-bold">{session.verse}</h2>
+                        <div className="flex-1">
+                          <h2 className="text-xl font-bold text-primary">{session.verse}</h2>
                           {session.verseText && (
-                            <p className="text-muted-foreground italic mt-1">"{session.verseText}"</p>
+                            <div className="mt-2 p-3 rounded-lg bg-primary/5 border border-primary/20">
+                              <p className="text-foreground italic">"{session.verseText}"</p>
+                            </div>
                           )}
                         </div>
                         <div className="flex items-center gap-2">
