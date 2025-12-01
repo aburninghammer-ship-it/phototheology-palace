@@ -79,6 +79,16 @@ const AMBIENT_TRACKS: Array<{
     url: "https://cdn1.suno.ai/a362b171-5a6f-4264-8946-ae76b09a6aa7.mp3",
     bpm: 70,
   },
+  {
+    id: "when-he-cometh",
+    name: "When He Cometh Reimagined",
+    description: "Orchestral choral ambient - instrumental",
+    category: "floor-7",
+    floor: 7,
+    mood: "orchestral, choral, ambient",
+    url: "https://cdn1.suno.ai/617f1da9-1bfb-4a93-8485-08f432623d2e.mp3",
+    bpm: 68,
+  },
 ];
 
 // Room to track mapping based on Phototheology floors
