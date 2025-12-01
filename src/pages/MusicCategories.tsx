@@ -51,22 +51,7 @@ const MUSIC_FLOORS = [
     mood: "Reverent strings, harp",
     color: "from-purple-500/20 to-violet-500/20",
     borderColor: "border-purple-500/30",
-    tracks: [
-      {
-        id: "sanctuary-stillness",
-        name: "Sanctuary Stillness",
-        description: "Sacred strings with soft harp and gentle brass",
-        bpm: 58,
-        url: "https://incompetech.com/music/royalty-free/mp3-royaltyfree/Meditation%20Impromptu.mp3",
-      },
-      {
-        id: "blue-room-ambient",
-        name: "Blue Room - Typology",
-        description: "Reverent orchestral ambience with deep strings",
-        bpm: 55,
-        url: "https://incompetech.com/music/royalty-free/mp3-royaltyfree/Peaceful%20Desolation.mp3",
-      }
-    ]
+    tracks: []
   },
   {
     floor: 4,
@@ -76,36 +61,7 @@ const MUSIC_FLOORS = [
     mood: "Bright, hopeful orchestra",
     color: "from-yellow-500/20 to-amber-500/20",
     borderColor: "border-yellow-500/30",
-    tracks: [
-      {
-        id: "christ-the-center",
-        name: "Christ the Center",
-        description: "Hopeful strings with radiant orchestral swells",
-        bpm: 65,
-        url: "https://incompetech.com/music/royalty-free/mp3-royaltyfree/Amazing%20Grace.mp3",
-      },
-      {
-        id: "eternal-grace",
-        name: "Eternal Grace",
-        description: "Cinematic orchestral christian music - sweeping and reverent",
-        bpm: 68,
-        url: "https://cdn1.suno.ai/cfda5aef-dc1c-4ac8-876f-ce80ea0eb791.mp3",
-      },
-      {
-        id: "eternal-grace-ii",
-        name: "Eternal Grace II",
-        description: "Instrumental orchestral - cinematic and reverent",
-        bpm: 65,
-        url: "https://cdn1.suno.ai/5a7d94e9-13f6-4dae-9c16-b3dd559849b3.mp3",
-      },
-      {
-        id: "echoes-of-eternity",
-        name: "Echoes of Eternity",
-        description: "Instrumental cinematic orchestral christian music",
-        bpm: 62,
-        url: "https://cdn1.suno.ai/87b87bf9-3f8f-4e49-ab69-1834e0db7119.mp3",
-      }
-    ]
+    tracks: []
   },
   {
     floor: 5,
@@ -115,15 +71,7 @@ const MUSIC_FLOORS = [
     mood: "Cinematic tension, deep strings",
     color: "from-red-500/20 to-rose-500/20",
     borderColor: "border-red-500/30",
-    tracks: [
-      {
-        id: "prophecy-watch",
-        name: "Prophecy Watch",
-        description: "Cinematic strings with reverent tension",
-        bpm: 60,
-        url: "https://incompetech.com/music/royalty-free/mp3-royaltyfree/Dark%20Times.mp3",
-      }
-    ]
+    tracks: []
   },
   {
     floor: 6,
@@ -133,15 +81,7 @@ const MUSIC_FLOORS = [
     mood: "Flowing strings, woodwinds",
     color: "from-green-500/20 to-emerald-500/20",
     borderColor: "border-green-500/30",
-    tracks: [
-      {
-        id: "wisdom-quiet",
-        name: "Wisdom in Quiet Places",
-        description: "Flowing strings with gentle woodwinds",
-        bpm: 58,
-        url: "https://incompetech.com/music/royalty-free/mp3-royaltyfree/Meditation%20Aquatic.mp3",
-      }
-    ]
+    tracks: []
   },
   {
     floor: 7,
