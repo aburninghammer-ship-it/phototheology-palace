@@ -6,14 +6,16 @@ import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
-import { Save, Download, ChevronDown, ChevronRight, BookOpen, Eye, Sparkles, Search, Target, Telescope, Globe, Flame } from "lucide-react";
+import { Save, Download, ChevronDown, ChevronRight, BookOpen, Eye, Sparkles, Search, Target, Telescope, Globe, Flame, Book, Loader2, RefreshCw } from "lucide-react";
 import { DrillSession } from "@/pages/DrillDrill";
 import { toast } from "sonner";
 import ReactMarkdown from "react-markdown";
+import { supabase } from "@/integrations/supabase/client";
 
 interface DrillMindMapProps {
   session: DrillSession;
   onSave: (name: string) => void;
+  onRefresh?: () => void;
 }
 
 const FLOOR_ICONS: Record<number, any> = {
@@ -36,10 +38,11 @@ const FLOOR_COLORS: Record<number, string> = {
   7: "from-red-500/20 to-orange-500/20 border-red-500/30"
 };
 
-export const DrillMindMap = ({ session, onSave }: DrillMindMapProps) => {
+export const DrillMindMap = ({ session, onSave, onRefresh }: DrillMindMapProps) => {
   const [saveDialogOpen, setSaveDialogOpen] = useState(false);
   const [drillName, setDrillName] = useState("");
   const [expandedFloors, setExpandedFloors] = useState<number[]>([1, 2, 3, 4, 5, 6, 7]);
+  const [expoundingRoomId, setExpoundingRoomId] = useState<string | null>(null);
 
   // Group responses by floor
   const responsesByFloor = session.responses.reduce((acc, resp) => {
@@ -65,6 +68,39 @@ export const DrillMindMap = ({ session, onSave }: DrillMindMapProps) => {
     onSave(drillName);
     setSaveDialogOpen(false);
     setDrillName("");
+  };
+
+  const handleExpound = async (roomId: string, roomTag: string, roomName: string, floorNumber: number, previousResponse: string) => {
+    setExpoundingRoomId(roomId);
+    try {
+      const { data, error } = await supabase.functions.invoke("drill-drill", {
+        body: {
+          action: "expound",
+          verse: session.verse,
+          verseText: session.verseText,
+          difficulty: session.difficulty,
+          room: {
+            id: roomId,
+            tag: roomTag,
+            name: roomName,
+            floorNumber,
+            previousResponse
+          }
+        }
+      });
+
+      if (error) throw error;
+      toast.success("Response expounded!");
+      
+      // Note: In a real implementation, you'd update the session state
+      // For now, we'll show the expounded text in the toast
+      // You may want to add state management to store expanded responses
+    } catch (error) {
+      console.error("Expound error:", error);
+      toast.error("Failed to expound");
+    } finally {
+      setExpoundingRoomId(null);
+    }
   };
 
   const exportToText = () => {
@@ -136,6 +172,12 @@ export const DrillMindMap = ({ session, onSave }: DrillMindMapProps) => {
                 <Download className="h-4 w-4 mr-2" />
                 Export
               </Button>
+              {onRefresh && (
+                <Button variant="outline" onClick={onRefresh}>
+                  <RefreshCw className="h-4 w-4 mr-2" />
+                  New Combination
+                </Button>
+              )}
             </div>
           </div>
         </CardContent>
@@ -171,9 +213,31 @@ export const DrillMindMap = ({ session, onSave }: DrillMindMapProps) => {
                     <div className="space-y-4 pl-4 border-l-2 border-border/50">
                       {responses.map(resp => (
                         <div key={resp.roomId} className="space-y-2">
-                          <div className="flex items-center gap-2">
-                            <Badge variant="secondary">{resp.roomTag}</Badge>
-                            <span className="font-medium">{resp.roomName}</span>
+                          <div className="flex items-center justify-between gap-2">
+                            <div className="flex items-center gap-2">
+                              <Badge variant="secondary">{resp.roomTag}</Badge>
+                              <span className="font-medium">{resp.roomName}</span>
+                            </div>
+                            {resp.jeevesResponse && resp.jeevesResponse !== "Skipped" && (
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => handleExpound(resp.roomId, resp.roomTag, resp.roomName, resp.floorNumber, resp.jeevesResponse!)}
+                                disabled={expoundingRoomId === resp.roomId}
+                              >
+                                {expoundingRoomId === resp.roomId ? (
+                                  <>
+                                    <Loader2 className="h-3 w-3 mr-1 animate-spin" />
+                                    Expounding...
+                                  </>
+                                ) : (
+                                  <>
+                                    <Book className="h-3 w-3 mr-1" />
+                                    Expound
+                                  </>
+                                )}
+                              </Button>
+                            )}
                           </div>
                           {resp.jeevesResponse && resp.jeevesResponse !== "Skipped" && (
                             <div className="bg-background/50 rounded-lg p-4 text-sm">

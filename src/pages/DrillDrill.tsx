@@ -303,10 +303,10 @@ const DrillDrill = () => {
                         <div className="space-y-2">
                           <label className="text-sm font-medium">Verse Text <span className="text-muted-foreground">(optional - will auto-fetch if left blank)</span></label>
                           <Textarea
-                            placeholder="Paste the verse text here, or leave blank to auto-fetch when you start"
+                            placeholder="Enter verse reference (e.g., John 3:16) or paste full verse text..."
                             value={verseText}
                             onChange={(e) => setVerseText(e.target.value)}
-                            className="min-h-[80px] bg-background/50"
+                            className="min-h-[120px] bg-background/50"
                           />
                         </div>
                         {verseText && (
@@ -500,7 +500,11 @@ const DrillDrill = () => {
                       </CardContent>
                     </Card>
                   ) : session.mode === "auto" && session.completedAt ? (
-                    <DrillMindMap session={session} onSave={saveDrill} />
+                    <DrillMindMap 
+                      session={session} 
+                      onSave={saveDrill}
+                      onRefresh={() => runAutoDrill(session)}
+                    />
                   ) : (
                     <DrillChat 
                       session={session} 

@@ -301,9 +301,10 @@ export const DrillChat = ({ session, setSession, allRooms, onSave }: DrillChatPr
                   variant="outline"
                   size="sm"
                   onClick={refreshRoom}
-                  title="Try different principle"
+                  title="Try different approach"
                 >
-                  <RefreshCw className="h-3 w-3" />
+                  <RefreshCw className="h-3 w-3 mr-1" />
+                  New Combination
                 </Button>
               </div>
             </div>

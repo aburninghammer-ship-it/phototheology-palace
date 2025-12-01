@@ -129,7 +129,16 @@ CRITICAL: Create a UNIFIED STUDY where each principle naturally flows from and b
 
     if (mode === "auto" && rooms) {
       // Auto-drill: analyze verse through all rooms
-      systemPrompt += `\n\nYou are running an AUTO-DRILL. Analyze the verse through EVERY room provided. Use ONLY ONE principle per room. Each response should build upon and reference previous discoveries, creating a complete and unified study. For each room, give a focused 2-4 sentence response that applies that room's specific methodology to the verse.
+      systemPrompt += `\n\nYou are running an AUTO-DRILL. Analyze the verse through the rooms provided. 
+
+CRITICAL INSTRUCTIONS:
+- Use ONLY ONE principle per room - select the most impactful one
+- You are NOT locked into using rooms in order - start from any floor, room, or cycle that best illuminates this verse
+- Build sequence strategically: whatever room you use first should prepare the way for the next room
+- You may reuse principles across different "New Combinations" - the same principle can yield totally different insights
+- A "New Combination" means exploring different pathways, not necessarily using entirely new principles
+- Always create a unified study where each response builds upon and references previous discoveries
+- Give focused 2-4 sentence responses that connect naturally to what came before
 
 SPECIAL INSTRUCTION FOR QUESTIONS ROOM (QR):
 When you reach the Questions Room (QR), generate EXACTLY 15 questions:
@@ -165,7 +174,14 @@ Return JSON format:
         ? `\n\nPREVIOUS DISCOVERIES IN THIS STUDY:\n${previousResponses.map((r: any) => `${r.roomTag}: ${r.jeevesResponse}`).join('\n\n')}\n\nBuild upon these insights as you teach.`
         : '';
       
-      systemPrompt += `\n\nYou are in GUIDED mode. The user wants to learn. Teach them how to apply the ${room.name} (${room.tag}) to this verse. Show them the methodology in action with specific examples from the verse.${contextFromPrevious}
+      systemPrompt += `\n\nYou are in GUIDED mode. The user wants to learn. Teach them how to apply the ${room.name} (${room.tag}) to this verse.${contextFromPrevious}
+
+CRITICAL INSTRUCTIONS:
+- You are NOT locked into room order - choose rooms strategically based on what best illuminates the verse
+- Whatever room you use first should prepare the way for the next room
+- Build a natural sequence where each principle flows from the previous one
+- The same principle can yield different insights - principles can be reused across different study paths
+- Show the methodology in action with specific examples from the verse
 
 SPECIAL INSTRUCTION FOR QUESTIONS ROOM (QR):
 If this is the Questions Room, generate EXACTLY 15 questions:
