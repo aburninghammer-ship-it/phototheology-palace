@@ -316,13 +316,13 @@ export default function DailyVerse() {
             <div>
               <h4 className="font-semibold mb-2 text-sm">Principle Revealed (Verse Category)</h4>
               <Badge variant="secondary" className="text-lg px-4 py-2">
-                {todayVerse.breakdown.verse_genre}
+                {todayVerse.breakdown?.verse_genre || 'Loading...'}
               </Badge>
             </div>
             <div>
               <h4 className="font-semibold mb-2 text-sm">7 Principles Applied</h4>
               <div className="flex flex-wrap gap-2">
-                {todayVerse.breakdown.breakdown.map((item, idx) => (
+                {todayVerse.breakdown?.breakdown?.map((item, idx) => (
                   <Badge key={`applied-${idx}`} variant="outline">
                     {item.principle_applied}
                   </Badge>
@@ -334,8 +334,8 @@ export default function DailyVerse() {
 
         {/* Breakdown */}
         <div className="space-y-4">
-          {todayVerse.breakdown.breakdown
-            .sort((a, b) => {
+          {todayVerse.breakdown?.breakdown
+            ?.sort((a, b) => {
               const floorA = parseInt(a.floor?.match(/\d+/)?.[0] || '0');
               const floorB = parseInt(b.floor?.match(/\d+/)?.[0] || '0');
               return floorA - floorB;
