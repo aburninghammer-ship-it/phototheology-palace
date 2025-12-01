@@ -230,34 +230,121 @@ const DrillDrill = () => {
                   How to Use
                 </Button>
               </DialogTrigger>
-              <DialogContent className="max-w-lg backdrop-blur-md bg-background/95">
+              <DialogContent className="max-w-3xl backdrop-blur-md bg-background/95 max-h-[90vh] overflow-y-auto">
                 <DialogHeader>
-                  <DialogTitle className="flex items-center gap-2">
-                    <Target className="h-5 w-5 text-primary" />
+                  <DialogTitle className="flex items-center gap-2 text-2xl">
+                    <Target className="h-6 w-6 text-primary" />
                     How to Gather Fragments
                   </DialogTitle>
                 </DialogHeader>
-                <div className="space-y-4 text-sm">
-                  <div className="space-y-2">
-                    <h4 className="font-semibold text-primary">1. Choose Your Verse</h4>
-                    <p className="text-muted-foreground">Enter any Bible verse reference (e.g., "John 3:16"). The full verse text will be displayed automatically.</p>
+                
+                <div className="grid md:grid-cols-2 gap-6 mt-4">
+                  {/* Getting Started Steps */}
+                  <div>
+                    <h4 className="font-semibold text-sm uppercase tracking-wide text-muted-foreground mb-3">
+                      Getting Started
+                    </h4>
+                    <ol className="space-y-3">
+                      <li className="flex gap-3">
+                        <div className="flex-shrink-0 w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center text-xs font-bold text-primary">
+                          1
+                        </div>
+                        <div>
+                          <p className="font-medium mb-1">Enter Your Verse</p>
+                          <p className="text-sm text-muted-foreground">
+                            Type a Bible verse reference (e.g., "John 3:16") or paste the full verse text
+                          </p>
+                        </div>
+                      </li>
+                      <li className="flex gap-3">
+                        <div className="flex-shrink-0 w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center text-xs font-bold text-primary">
+                          2
+                        </div>
+                        <div>
+                          <p className="font-medium mb-1">Select Difficulty Level</p>
+                          <p className="text-sm text-muted-foreground">
+                            Choose Simple (step-by-step), Intermediate (balanced), or Scholar (advanced depth)
+                          </p>
+                        </div>
+                      </li>
+                      <li className="flex gap-3">
+                        <div className="flex-shrink-0 w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center text-xs font-bold text-primary">
+                          3
+                        </div>
+                        <div>
+                          <p className="font-medium mb-1">Pick Your Study Mode</p>
+                          <p className="text-sm text-muted-foreground">
+                            Guided (Jeeves teaches), Self-Drill (test yourself), or Auto (instant analysis)
+                          </p>
+                        </div>
+                      </li>
+                      <li className="flex gap-3">
+                        <div className="flex-shrink-0 w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center text-xs font-bold text-primary">
+                          4
+                        </div>
+                        <div>
+                          <p className="font-medium mb-1">Explore All Rooms</p>
+                          <p className="text-sm text-muted-foreground">
+                            Walk through 7 floors, extracting insights from each room's unique perspective
+                          </p>
+                        </div>
+                      </li>
+                    </ol>
                   </div>
-                  <div className="space-y-2">
-                    <h4 className="font-semibold text-primary">2. Select Your Mode</h4>
-                    <ul className="text-muted-foreground space-y-1 ml-4">
-                      <li><strong>Guided:</strong> Jeeves teaches each principle step-by-step</li>
-                      <li><strong>Self-Drill:</strong> Test yourself; Jeeves grades your answers</li>
-                      <li><strong>Auto:</strong> Quick comprehensive analysis of all rooms</li>
-                    </ul>
+                  
+                  {/* Key Features */}
+                  <div>
+                    <h4 className="font-semibold text-sm uppercase tracking-wide text-muted-foreground mb-3">
+                      Key Features
+                    </h4>
+                    <div className="space-y-3">
+                      <div className="flex items-start gap-2 p-3 rounded-xl bg-gradient-to-r from-muted/50 to-muted/30 border border-white/10">
+                        <span className="h-2 w-2 rounded-full bg-primary mt-1.5 flex-shrink-0" />
+                        <div>
+                          <div className="font-medium text-sm">Expound Any Response</div>
+                          <div className="text-xs text-muted-foreground">
+                            Click "Expound" on any room to get deeper elaboration from Jeeves
+                          </div>
+                        </div>
+                      </div>
+                      
+                      <div className="flex items-start gap-2 p-3 rounded-xl bg-gradient-to-r from-muted/50 to-muted/30 border border-white/10">
+                        <span className="h-2 w-2 rounded-full bg-primary mt-1.5 flex-shrink-0" />
+                        <div>
+                          <div className="font-medium text-sm">New Combinations</div>
+                          <div className="text-xs text-muted-foreground">
+                            Try different principle pathways on the same verse for fresh insights
+                          </div>
+                        </div>
+                      </div>
+                      
+                      <div className="flex items-start gap-2 p-3 rounded-xl bg-gradient-to-r from-muted/50 to-muted/30 border border-white/10">
+                        <span className="h-2 w-2 rounded-full bg-primary mt-1.5 flex-shrink-0" />
+                        <div>
+                          <div className="font-medium text-sm">Unified Study Flow</div>
+                          <div className="text-xs text-muted-foreground">
+                            Each principle builds on previous discoveries for cohesive insights
+                          </div>
+                        </div>
+                      </div>
+                      
+                      <div className="flex items-start gap-2 p-3 rounded-xl bg-gradient-to-r from-muted/50 to-muted/30 border border-white/10">
+                        <span className="h-2 w-2 rounded-full bg-primary mt-1.5 flex-shrink-0" />
+                        <div>
+                          <div className="font-medium text-sm">Save & Export</div>
+                          <div className="text-xs text-muted-foreground">
+                            Save completed drills for review or export to Markdown format
+                          </div>
+                        </div>
+                      </div>
+                    </div>
                   </div>
-                  <div className="space-y-2">
-                    <h4 className="font-semibold text-primary">3. Explore Every Room</h4>
-                    <p className="text-muted-foreground">Walk through all 7 floors of the Phototheology Palace, extracting insights from each room's unique perspective.</p>
-                  </div>
-                  <div className="space-y-2">
-                    <h4 className="font-semibold text-primary">4. Save Your Fragments</h4>
-                    <p className="text-muted-foreground">Save your completed drill for future reference, review, or export.</p>
-                  </div>
+                </div>
+                
+                <div className="mt-6 p-4 rounded-lg bg-primary/5 border border-primary/20">
+                  <p className="text-sm text-center text-muted-foreground italic">
+                    "Gather up the fragments that remain, that nothing be lost." — John 6:12
+                  </p>
                 </div>
               </DialogContent>
             </Dialog>
