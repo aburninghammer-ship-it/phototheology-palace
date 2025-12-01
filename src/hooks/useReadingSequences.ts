@@ -62,6 +62,9 @@ export const useReadingSequences = () => {
               playbackSpeed: Number(blockItems[0]?.playback_speed) || 1,
               playOrder: "listed",
               includeJeevesCommentary: blockItems[0]?.include_jeeves_commentary || false,
+              commentaryVoice: (blockItems[0]?.commentary_voice || "daniel") as VoiceId,
+              commentaryDepth: (blockItems[0]?.commentary_depth || "surface") as "surface" | "intermediate" | "depth",
+              commentaryMode: (blockItems[0]?.commentary_mode || "chapter") as "chapter" | "verse",
             });
           }
         }
@@ -157,6 +160,9 @@ export const useReadingSequences = () => {
             voice: seq.voice,
             playback_speed: seq.playbackSpeed,
             include_jeeves_commentary: seq.includeJeevesCommentary,
+            commentary_voice: seq.commentaryVoice || "daniel",
+            commentary_depth: seq.commentaryDepth || "surface",
+            commentary_mode: seq.commentaryMode || "chapter",
           }))
         );
 
