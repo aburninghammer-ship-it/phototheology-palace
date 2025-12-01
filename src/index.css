@@ -334,7 +334,6 @@ All colors MUST be HSL.
       0 0 60px 12px hsl(var(--palace-orange) / 0.5),
       0 0 100px 24px hsl(var(--accent) / 0.3),
       0 0 140px 40px hsl(var(--palace-orange) / 0.15);
-    animation: glow-pulse 3s ease-in-out infinite;
   }
   
   /* Floating bubbles/particles effect */
