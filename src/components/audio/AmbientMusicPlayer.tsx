@@ -694,7 +694,11 @@ export function AmbientMusicPlayer({
             </div>
 
             {showUpload && uploadFile && (
-              <div className="space-y-2 p-2 border rounded-md bg-muted/50">
+              <div className="space-y-2 p-3 border rounded-md bg-primary/10">
+                <div className="flex items-center gap-2 pb-1">
+                  <Upload className="h-4 w-4 text-primary" />
+                  <span className="text-sm font-medium">Upload Your Music</span>
+                </div>
                 <Label className="text-xs">Track Name</Label>
                 <Input 
                   value={uploadName} 
@@ -702,10 +706,13 @@ export function AmbientMusicPlayer({
                   placeholder="Enter track name"
                   className="h-8 text-sm"
                 />
+                <p className="text-xs text-muted-foreground">
+                  💡 This will add "{uploadName}" to your custom music collection
+                </p>
                 <div className="flex gap-2">
                   <Button size="sm" onClick={handleUpload} disabled={uploading} className="flex-1">
-                    {uploading ? <Loader2 className="h-3 w-3 animate-spin mr-1" /> : null}
-                    Upload
+                    {uploading ? <Loader2 className="h-3 w-3 animate-spin mr-1" /> : <Upload className="h-3 w-3 mr-1" />}
+                    Upload Now
                   </Button>
                   <Button size="sm" variant="ghost" onClick={() => { setShowUpload(false); setUploadFile(null); }}>
                     Cancel
@@ -1050,6 +1057,37 @@ export function AmbientMusicPlayer({
                   </SelectContent>
                 </Select>
                 
+                {/* Custom Music Upload Section */}
+                {user && (
+                  <div className="border rounded-md p-3 bg-primary/5 space-y-2">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <Upload className="h-4 w-4 text-primary" />
+                        <span className="text-sm font-medium">Your Music</span>
+                      </div>
+                      <Button
+                        variant="default"
+                        size="sm"
+                        onClick={() => fileInputRef.current?.click()}
+                        disabled={uploading}
+                        className="h-7"
+                      >
+                        {uploading ? <Loader2 className="h-3 w-3 animate-spin mr-1" /> : <Upload className="h-3 w-3 mr-1" />}
+                        Upload Song
+                      </Button>
+                    </div>
+                    {userTracks.length === 0 ? (
+                      <p className="text-xs text-muted-foreground">
+                        📁 No custom songs uploaded yet. Click "Upload Song" to add your own music!
+                      </p>
+                    ) : (
+                      <p className="text-xs text-muted-foreground">
+                        {userTracks.length} custom {userTracks.length === 1 ? 'song' : 'songs'} uploaded
+                      </p>
+                    )}
+                  </div>
+                )}
+
                 {/* Playlist Selection */}
                 <div className="border rounded-md p-2 bg-muted/30">
                   <Button 
@@ -1060,8 +1098,8 @@ export function AmbientMusicPlayer({
                   >
                     <span className="flex items-center gap-2">
                       <ListMusic className="h-4 w-4 text-primary" />
-                      <span className="font-medium">Playlist</span>
-                      <span className="text-muted-foreground">({selectedTracks.size} songs)</span>
+                      <span className="font-medium">Preset Tracks</span>
+                      <span className="text-muted-foreground">({selectedTracks.size} selected)</span>
                     </span>
                     <ChevronDown className={cn("h-3 w-3 transition-transform", showPlaylist && "rotate-180")} />
                   </Button>
@@ -1069,7 +1107,7 @@ export function AmbientMusicPlayer({
                   {showPlaylist && (
                     <div className="space-y-1 max-h-40 overflow-y-auto border-t pt-2">
                       <div className="flex items-center justify-between px-1 pb-1">
-                        <span className="text-xs text-muted-foreground">Select songs:</span>
+                        <span className="text-xs text-muted-foreground">Select preset tracks:</span>
                         <Button
                           variant="ghost"
                           size="sm"
