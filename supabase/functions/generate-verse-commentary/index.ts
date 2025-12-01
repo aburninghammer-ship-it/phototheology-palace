@@ -89,7 +89,12 @@ const getSystemPrompt = (depth: CommentaryDepth) => {
 - Depth: Christ-centered structure, prophecy, sanctuary, cycles (Floors 4-6)
 - Height: Transformation and mastery (Floors 7-8)
 
-IMPORTANT: Always speak room names in full (e.g., "Concentration Room" not "CR"). Always point to Christ. Never use PT abbreviations in spoken/written output.`;
+IMPORTANT: Always speak room names in full (e.g., "Concentration Room" not "CR"). Always point to Christ. Never use PT abbreviations in spoken/written output.
+
+CRITICAL FOR SPOKEN DELIVERY:
+- ALWAYS complete your thoughts fully. Never end mid-sentence or mid-thought
+- Every response MUST end with a complete sentence
+- Write naturally as if speaking aloud to someone`;
 
   const depthInstructions = {
     surface: `

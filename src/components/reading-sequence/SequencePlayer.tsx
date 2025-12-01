@@ -80,6 +80,9 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
   const chapterCache = useRef<Map<string, { verse: number; text: string }[]>>(new Map()); // Cache for prefetched chapters
   const commentaryCache = useRef<Map<string, { text: string; audioUrl?: string }>>(new Map()); // Cache for pre-generated commentary
   const prefetchingCommentaryRef = useRef<Set<string>>(new Set()); // Track commentary being prefetched
+  const browserUtteranceRef = useRef<SpeechSynthesisUtterance | null>(null); // For pause/resume with browser TTS
+  const retryCountRef = useRef(0); // Track retry attempts for resilience
+  const pausedVerseRef = useRef<{ verseIdx: number; content: ChapterContent; voice: string } | null>(null); // Track paused position
   
   const isMobile = useIsMobile();
   const activeSequences = sequences.filter((s) => s.enabled && s.items.length > 0);
@@ -317,7 +320,7 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
     }
   }, [offlineMode]);
 
-  // Browser speech synthesis for offline mode
+  // Browser speech synthesis for offline mode - with pause/resume support
   const speakWithBrowserTTS = useCallback((text: string, onEnd: () => void): void => {
     speechSynthesis.cancel();
     const utterance = new SpeechSynthesisUtterance(text);
@@ -335,9 +338,20 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
       utterance.voice = englishVoice;
     }
     
-    utterance.onend = onEnd;
-    utterance.onerror = () => onEnd();
+    utterance.onend = () => {
+      browserUtteranceRef.current = null;
+      onEnd();
+    };
+    utterance.onerror = (e) => {
+      console.error("[BrowserTTS] Error:", e);
+      browserUtteranceRef.current = null;
+      // Don't call onEnd on error if it was just interrupted for pause
+      if (e.error !== 'interrupted') {
+        onEnd();
+      }
+    };
     
+    browserUtteranceRef.current = utterance;
     speechSynthesis.speak(utterance);
   }, []);
 
@@ -832,11 +846,32 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
         message: error?.message,
         verseIdx: verseIdx + 1
       });
-      // Don't call notifyTTSStopped here - keep music ducked during errors
       audioRef.current = null;
       isGeneratingRef.current = false;
-      continuePlayingRef.current = false;
-      setIsPlaying(false);
+      
+      // Retry logic - try up to 2 times, then fall back to browser TTS
+      if (retryCountRef.current < 2 && continuePlayingRef.current) {
+        retryCountRef.current++;
+        console.log(`[Audio] Retrying verse ${verseIdx + 1} (attempt ${retryCountRef.current})`);
+        setTimeout(() => {
+          if (continuePlayingRef.current) {
+            playVerseAtIndex(verseIdx, content, voice);
+          }
+        }, 500);
+      } else if (continuePlayingRef.current) {
+        // Fall back to browser TTS after retries exhausted
+        console.log("[Audio] Falling back to browser TTS after errors");
+        retryCountRef.current = 0;
+        speakWithBrowserTTS(verse.text, () => {
+          if (continuePlayingRef.current && verseIdx < content.verses.length - 1) {
+            setTimeout(() => playVerseAtIndex(verseIdx + 1, content, voice), 300);
+          } else if (verseIdx >= content.verses.length - 1) {
+            moveToNextChapter();
+          }
+        });
+      } else {
+        setIsPlaying(false);
+      }
     };
 
     // Start playback
@@ -844,15 +879,29 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
       console.log("[Audio] Calling play()...");
       await audio.play();
       console.log("[Audio] play() succeeded for verse:", verseIdx + 1);
+      retryCountRef.current = 0; // Reset retry count on success
       setIsPlaying(true);
       setIsPaused(false);
+      // Store current position for potential resume
+      pausedVerseRef.current = { verseIdx, content, voice };
     } catch (e) {
       console.error("[Audio] play() failed:", e);
       audioRef.current = null;
       isGeneratingRef.current = false;
-      continuePlayingRef.current = false;
-      setIsPlaying(false);
-      toast.error("Failed to play audio - try clicking play manually");
+      
+      // Try browser TTS fallback instead of giving up
+      if (continuePlayingRef.current) {
+        console.log("[Audio] play() failed, falling back to browser TTS");
+        speakWithBrowserTTS(verse.text, () => {
+          if (continuePlayingRef.current && verseIdx < content.verses.length - 1) {
+            setTimeout(() => playVerseAtIndex(verseIdx + 1, content, voice), 300);
+          } else if (verseIdx >= content.verses.length - 1) {
+            moveToNextChapter();
+          }
+        });
+      } else {
+        setIsPlaying(false);
+      }
     }
   }, [volume, isMuted, totalItems, generateTTS, prefetchVerse, activeSequences, currentItemIdx, generateCommentary, playCommentary, moveToNextChapter, prefetchNextChapter, offlineMode, speakWithBrowserTTS]);
 
@@ -988,40 +1037,84 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
   }, [autoPlay, hasStarted, chapterContent, isLoading, currentSequence, playVerseAtIndex]);
 
   const handlePlay = () => {
-    console.log("handlePlay called - isPaused:", isPaused, "hasAudio:", !!audioRef.current);
+    console.log("handlePlay called - isPaused:", isPaused, "hasAudio:", !!audioRef.current, "speechPaused:", speechSynthesis.paused);
+    
+    // Resume paused HTML Audio
     if (isPaused && audioRef.current) {
-      // Resume paused audio
       continuePlayingRef.current = true;
-      audioRef.current.play();
+      audioRef.current.play().catch((e) => {
+        console.error("[Resume] Audio play failed:", e);
+        // If resume fails, restart from current verse
+        if (pausedVerseRef.current) {
+          playVerseAtIndex(pausedVerseRef.current.verseIdx, pausedVerseRef.current.content, pausedVerseRef.current.voice);
+        }
+      });
       setIsPaused(false);
       setIsPlaying(true);
-      notifyTTSStarted(); // Duck music when resuming
-    } else if (chapterContent) {
-      // Start fresh playback
-      console.log("Starting fresh playback from verse:", currentVerseIdx + 1);
+      notifyTTSStarted();
+      return;
+    }
+    
+    // Resume paused browser speech synthesis
+    if (isPaused && speechSynthesis.paused) {
+      continuePlayingRef.current = true;
+      speechSynthesis.resume();
+      setIsPaused(false);
+      setIsPlaying(true);
+      notifyTTSStarted();
+      return;
+    }
+    
+    // Start fresh playback (or resume from stored position)
+    if (chapterContent) {
+      console.log("Starting playback from verse:", currentVerseIdx + 1);
       const voice = currentSequence?.voice || "daniel";
       continuePlayingRef.current = true;
       setIsPlaying(true);
+      setIsPaused(false);
       playVerseAtIndex(currentVerseIdx, chapterContent, voice);
     }
   };
 
   const handlePause = () => {
+    continuePlayingRef.current = false;
+    
+    // Handle HTML Audio element pause
     if (audioRef.current) {
-      continuePlayingRef.current = false;
       audioRef.current.pause();
       setIsPaused(true);
-      notifyTTSStopped(); // Restore music when paused
+      notifyTTSStopped();
+    }
+    
+    // Handle browser speech synthesis pause
+    if (speechSynthesis.speaking) {
+      speechSynthesis.pause();
+      setIsPaused(true);
+      notifyTTSStopped();
+    }
+    
+    // Store current position for resume
+    if (chapterContent) {
+      const voice = currentSequence?.voice || "daniel";
+      pausedVerseRef.current = { verseIdx: currentVerseIdx, content: chapterContent, voice };
     }
   };
 
   const handleStop = () => {
     continuePlayingRef.current = false;
     pendingVerseRef.current = null;
+    pausedVerseRef.current = null;
+    
+    // Stop HTML Audio
     if (audioRef.current) {
       audioRef.current.pause();
       audioRef.current = null;
     }
+    
+    // Stop browser speech synthesis
+    speechSynthesis.cancel();
+    browserUtteranceRef.current = null;
+    
     setIsPlaying(false);
     setIsPaused(false);
     setCurrentItemIdx(0);
@@ -1029,7 +1122,8 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
     setChapterContent(null);
     lastFetchedRef.current = null;
     shouldPlayNextRef.current = false;
-    notifyTTSStopped(); // Restore music when stopped
+    retryCountRef.current = 0;
+    notifyTTSStopped();
   };
 
   const handleSkipNext = () => {
@@ -1038,7 +1132,9 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
       audioRef.current.pause();
       audioRef.current = null;
     }
-    // Don't call notifyTTSStopped - keep music ducked while navigating
+    speechSynthesis.cancel();
+    browserUtteranceRef.current = null;
+    
     if (currentItemIdx < totalItems - 1) {
       shouldPlayNextRef.current = isPlaying && continuePlayingRef.current;
       setCurrentItemIdx((prev) => prev + 1);
@@ -1054,7 +1150,9 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
       audioRef.current.pause();
       audioRef.current = null;
     }
-    // Don't call notifyTTSStopped - keep music ducked while navigating
+    speechSynthesis.cancel();
+    browserUtteranceRef.current = null;
+    
     if (currentItemIdx > 0) {
       shouldPlayNextRef.current = isPlaying && continuePlayingRef.current;
       setCurrentItemIdx((prev) => prev - 1);
@@ -1100,7 +1198,10 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
         audioRef.current.pause();
         audioRef.current = null;
       }
-      notifyTTSStopped(); // Restore music on unmount
+      // Cancel browser speech synthesis on unmount
+      speechSynthesis.cancel();
+      browserUtteranceRef.current = null;
+      notifyTTSStopped();
     };
   }, []);
 

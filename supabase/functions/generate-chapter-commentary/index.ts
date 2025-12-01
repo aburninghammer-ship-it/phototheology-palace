@@ -134,7 +134,10 @@ FORMATTING FOR SPOKEN DELIVERY:
 - Avoid bullet points or lists in output
 - Don't use asterisks, markdown, or special formatting
 - Write as if speaking aloud to someone
-- NEVER use abbreviations like @Ad, @Mo, CR, BL, PRm, ST, DR—always speak full names`;
+- NEVER use abbreviations like @Ad, @Mo, CR, BL, PRm, ST, DR—always speak full names
+- CRITICAL: ALWAYS complete your thoughts fully. Never end mid-sentence or mid-thought
+- Every paragraph and the overall commentary MUST end with a complete sentence
+- If approaching a length limit, wrap up gracefully with a closing thought rather than cutting off`;
 
   switch (depth) {
     case "surface":
