@@ -551,5 +551,32 @@ export function getTheologicalRules(): Array<{ id: string; rule: string; rationa
         'The ten horns of Daniel 7 = post-Roman nations that continue into modern times. Three were uprooted (Heruli, Vandals, Ostrogoths). ' +
         'The remaining seven (Franks, Anglo-Saxons, Alemanni, Visigoths, Suevi, Lombards, Burgundians) evolved into modern Western powers.',
     },
+    {
+      id: 'matthew-24-primary-ad-70',
+      rule: 'Matthew 24\'s primary fulfillment is AD 70, not the end of the world',
+      rationale:
+        'Matthew 24 is a dual prophecy: PRIMARY fulfillment in the Roman destruction of Jerusalem (AD 70), SECONDARY typological foreshadowing of the final end. ' +
+        'Jesus anchors it immediately: "There shall not be left here one stone upon another" (Matt 24:2). ' +
+        'Signs given - fleeing to mountains, armies surrounding Jerusalem, abomination (Roman standards), tribulation for Judea, false messiahs during Jewish revolt - ' +
+        'apply to the Roman siege, NOT primarily to end-time persecution. ' +
+        'Hebrews 8:13 warned "the first covenant is ready to vanish away" - written shortly before AD 70. ' +
+        'Hebrews 12:26-27 warned of "shaking" - the destruction of Jerusalem and the sanctuary system. ' +
+        'This is Second Heaven/Second Day of the Lord. The final fulfillment belongs to Daniel & Revelation (Third Heaven/Third Day).',
+    },
+    {
+      id: 'seven-trumpets-church-protection',
+      rule: 'The Seven Trumpets show God defending His church through history by judging her persecutors',
+      rationale:
+        'Each trumpet strikes an enemy of God\'s people, restrains a persecuting power, and buys time for the gospel to advance. ' +
+        'This is a historical chain of defensive judgments, not a single end-time event. ' +
+        'Trumpet 1 = Fall of Jerusalem AD 70 (cursed fig tree withered, Matt 24 primary fulfillment). ' +
+        'Trumpet 2 = Fall of Pagan Rome (the mountain cast into sea, Matt 21:21 - Rome that crucified Christ). ' +
+        'Trumpet 3 = Wormwood star (false doctrine of Papal Rome, Dan 8:12 truth cast down). ' +
+        'Trumpet 4 = Darkening of lights (spiritual darkness, hiding Scripture under Papacy). ' +
+        'Trumpet 5 = First Woe (Islamic Saracens restrain Papal expansion). ' +
+        'Trumpet 6 = Second Woe (Ottoman Empire keeps Papacy in check, giving Reformation time). ' +
+        'Trumpet 7 = Judgment on the whole world (Third Heaven/Third Day - fall of modern Babylon, Rev 11:15-19). ' +
+        'Master summary: "The trumpets show God repeatedly turning the swords of persecuting empires against themselves, protecting His remnant through the ages."',
+    },
   ];
 }
