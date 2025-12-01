@@ -121,19 +121,19 @@ const AMBIENT_TRACKS = [
 // Room to track mapping based on Phototheology floors
 const ROOM_TRACK_MAP: Record<string, string> = {
   // Floor 1 - Story Floor (Furnishing): warm, welcoming, narrative
-  "story-room": "story-warmth",
-  "imagination-room": "story-warmth",
-  "24fps-room": "patterns-kingdom", // cinematic storytelling
-  "bible-rendered": "story-warmth",
-  "translation-room": "story-warmth",
-  "gems-room": "story-warmth",
+  "story-room": "sanctuary-stillness",
+  "imagination-room": "sanctuary-stillness",
+  "24fps-room": "chamber-light", // cinematic storytelling
+  "bible-rendered": "sanctuary-stillness",
+  "translation-room": "sanctuary-stillness",
+  "gems-room": "sanctuary-stillness",
   
   // Floor 2 - Pattern Floor (Investigation): structured, rhythmic
-  "observation-room": "patterns-kingdom",
-  "def-com-room": "patterns-kingdom",
+  "observation-room": "chamber-light",
+  "def-com-room": "chamber-light",
   "symbols-types": "blue-room-ambient", // typology connection
-  "questions-room": "patterns-kingdom",
-  "qa-chains": "patterns-kingdom",
+  "questions-room": "chamber-light",
+  "qa-chains": "chamber-light",
   
   // Floor 3 - Sanctuary Floor: holy, reverent
   "blue-room": "blue-room-ambient",
@@ -142,11 +142,11 @@ const ROOM_TRACK_MAP: Record<string, string> = {
   // Floor 4 - Christ Floor (Next Level): bright, hopeful
   "concentration-room": "christ-the-center",
   "dimensions-room": "christ-the-center",
-  "connect-6": "patterns-kingdom",
+  "connect-6": "chamber-light",
   "theme-room": "christ-the-center",
   "time-zone": "prophecy-watch",
-  "patterns-room": "patterns-kingdom",
-  "parallels-room": "patterns-kingdom",
+  "patterns-room": "chamber-light",
+  "parallels-room": "chamber-light",
   "fruit-room": "christ-the-center",
   
   // Floor 5 - Prophecy Floor (Vision): cinematic, atmospheric
