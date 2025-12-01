@@ -204,7 +204,7 @@ const DrillDrill = () => {
               </h1>
             </div>
             <p className="text-lg font-semibold text-primary">
-              1 Verse, Numberless Options
+              One Verse, A Thousand Combinations
             </p>
             <p className="text-sm italic text-muted-foreground">
               "Gather up the fragments that remain, that nothing be lost." — John 6:12
