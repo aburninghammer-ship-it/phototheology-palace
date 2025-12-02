@@ -1823,27 +1823,27 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
           {isPlaying && !isPaused ? (
             <Button
               size="lg"
-              className="h-14 w-14 rounded-full gradient-palace"
+              className="h-14 w-14 rounded-full gradient-palace shadow-lg"
               onClick={handlePause}
               disabled={isLoading}
             >
               {isLoading ? (
                 <Loader2 className="h-6 w-6 animate-spin text-white" />
               ) : (
-                <Pause className="h-6 w-6 text-white fill-white" />
+                <Pause className="h-6 w-6 text-white stroke-2" fill="white" />
               )}
             </Button>
           ) : (
             <Button
               size="lg"
-              className="h-14 w-14 rounded-full gradient-palace"
+              className="h-14 w-14 rounded-full gradient-palace shadow-lg"
               onClick={handlePlay}
               disabled={isLoading}
             >
               {isLoading ? (
                 <Loader2 className="h-6 w-6 animate-spin text-white" />
               ) : (
-                <Play className="h-6 w-6 ml-1 text-white fill-white" />
+                <Play className="h-6 w-6 ml-1 text-white stroke-2" fill="white" />
               )}
             </Button>
           )}
