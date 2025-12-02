@@ -3,9 +3,28 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { isOnline } from '@/services/offlineAudioCache';
 
-// Available ElevenLabs voices - Daniel only, use OpenAI voices for other options
+// Available ElevenLabs voices
 export const ELEVENLABS_VOICES = [
-  { id: 'daniel', name: 'Daniel', description: 'British narrator voice (ElevenLabs)' },
+  { id: 'aria', name: 'Aria', description: 'Warm and expressive female voice' },
+  { id: 'roger', name: 'Roger', description: 'Deep and authoritative male voice' },
+  { id: 'sarah', name: 'Sarah', description: 'Clear and professional female voice' },
+  { id: 'laura', name: 'Laura', description: 'Gentle and soothing female voice' },
+  { id: 'charlie', name: 'Charlie', description: 'Friendly and casual male voice' },
+  { id: 'george', name: 'George', description: 'Distinguished British male voice' },
+  { id: 'callum', name: 'Callum', description: 'Young and energetic male voice' },
+  { id: 'river', name: 'River', description: 'Calm and meditative voice' },
+  { id: 'liam', name: 'Liam', description: 'Strong and confident male voice' },
+  { id: 'charlotte', name: 'Charlotte', description: 'Elegant and refined female voice' },
+  { id: 'alice', name: 'Alice', description: 'Bright and cheerful female voice' },
+  { id: 'matilda', name: 'Matilda', description: 'Warm Australian female voice' },
+  { id: 'will', name: 'Will', description: 'Casual American male voice' },
+  { id: 'jessica', name: 'Jessica', description: 'Articulate and clear female voice' },
+  { id: 'eric', name: 'Eric', description: 'Mature and wise male voice' },
+  { id: 'chris', name: 'Chris', description: 'Versatile and natural male voice' },
+  { id: 'brian', name: 'Brian', description: 'Deep and resonant male voice' },
+  { id: 'daniel', name: 'Daniel', description: 'British narrator voice' },
+  { id: 'lily', name: 'Lily', description: 'Sweet and youthful female voice' },
+  { id: 'bill', name: 'Bill', description: 'Gravelly and distinctive male voice' },
 ] as const;
 
 export type VoiceId = typeof ELEVENLABS_VOICES[number]['id'];

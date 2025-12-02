@@ -61,7 +61,7 @@ const getSystemPrompt = (depth: CommentaryDepth) => {
 - Feasts Room: Connect to Israel's feasts (Passover, Unleavened Bread, Firstfruits, Pentecost, Trumpets, Atonement, Tabernacles)
 
 **6th Floor - Three Heavens & Cycles:**
-- Eight Cycles: Adamic Cycle → Noahic Cycle → Abrahamic Cycle → Mosaic Cycle → Cyrusic Cycle → Cyrus-Christ Cycle → Spirit Cycle → Remnant Cycle
+- Eight Cycles: @Adamic → @Noahic → @Abrahamic → @Mosaic → @Cyrusic → @Cyrus-Christ → @Spirit → @Remnant
 - Each cycle: Fall → Covenant → Sanctuary → Enemy → Restoration
 - Three Heavens (Day-of-the-LORD Framework):
   * First Heaven (DoL¹/NE¹): Babylon destroys Jerusalem → Post-exilic restoration under Cyrus
@@ -155,22 +155,22 @@ CRITICAL FOR SPOKEN DELIVERY:
 - Show Christ-centered meaning through types, shadows, or direct fulfillment`,
     depth: `
 ### COMMENTARY STYLE: Scholarly Depth
-- Provide concise yet meaningful analysis (3-5 sentences MAXIMUM)
-- **CRITICAL: SELECT ONLY 3-4 MOST IMPACTFUL PRINCIPLES** - Quality over quantity
-- MUST focus on THE 3-4 MOST SIGNIFICANT connections (STRICT MAXIMUM 4):
+- Provide comprehensive verse analysis (4-7 sentences)
+- **CRITICAL: MAXIMIZE DIVERSITY** - Use a RICH MIX of PT principles from across all floors
+- MUST weave together connections from AT LEAST 4-5 different categories:
   * Sanctuary typology (Blue Room): Connect to specific furniture/services
   * Feast Calendar (Feasts Room): Show feast-day fulfillment or foreshadowing
   * Prophecy Room: Link to Daniel/Revelation timelines, historicist interpretation
   * Parallels Room: Identify mirrored actions across Scripture (e.g., Babel/Pentecost, first/second exodus)
   * Time Zone Room: Place in 6-zone framework (past/present/future × heaven/earth)
   * Patterns Room: Note recurring motifs (40 days, 3 days, deliverer patterns)
-  * Covenant Cycles: Identify which cycle (Adamic Cycle through Remnant Cycle) and stage (Fall/Covenant/Sanctuary/Enemy/Restoration)
+  * Covenant Cycles: Identify which cycle (@Adamic → @Remnant) and stage (Fall/Covenant/Sanctuary/Enemy/Restoration)
   * Three Heavens: Specify DoL¹/NE¹ (Babylon-Restoration), DoL²/NE² (70 AD-New Covenant), or DoL³/NE³ (Final Judgment)
   * Parables: If narrative verse, connect to parable themes
   * Verse Genetics (Bible Freestyle): Show how this verse has "siblings" and "cousins" across Scripture
-  * Hebrew/Greek Analysis (Definition and Comparison Room): Word meanings when significant
-  * Dimensions Room: Show Literal plus ONE dimension (Christ, Me, Church, or Heaven)
-- Be selective: Choose the connections that add the MOST insight, not all available options
+- Include Hebrew/Greek word analysis (Definition and Comparison Room)
+- Use Dimensions Room: Literal dimension plus ONE most relevant (Christ, Me, Church, or Heaven)
+- Provide meaningful cross-references that show the verse's "family tree"
 - End with spiritual application that passes the Fruit Room test`,
   };
 

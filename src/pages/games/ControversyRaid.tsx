@@ -6,7 +6,6 @@ import { Textarea } from "@/components/ui/textarea";
 import { ArrowLeft, Swords, Shield } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
-import { useProcessTracking } from "@/contexts/ProcessTrackingContext";
 
 const WARFARE_CARDS = [
   { code: "|GC", name: "Great Controversy Wall" },
@@ -28,7 +27,6 @@ const TARGET_ISSUES = [
 
 export default function ControversyRaid() {
   const navigate = useNavigate();
-  const { trackProcess } = useProcessTracking();
   const [hand, setHand] = useState<typeof WARFARE_CARDS>([]);
   const [currentIssue, setCurrentIssue] = useState("");
   const [selectedCard, setSelectedCard] = useState("");
@@ -42,21 +40,11 @@ export default function ControversyRaid() {
 
   const startRound = () => {
     const shuffled = [...WARFARE_CARDS].sort(() => Math.random() - 0.5);
-    const newHand = shuffled.slice(0, 3);
-    setHand(newHand);
+    setHand(shuffled.slice(0, 3));
     const randomIssue = TARGET_ISSUES[Math.floor(Math.random() * TARGET_ISSUES.length)];
     setCurrentIssue(randomIssue);
     setSelectedCard("");
     setDiagnosis("");
-    
-    // Track process
-    trackProcess({
-      process: "Controversy Raid",
-      totalSteps: 1,
-      step: 0,
-      taskType: "game",
-      notes: `Issue: ${randomIssue}`,
-    });
   };
 
   const handleSubmit = async () => {

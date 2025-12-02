@@ -16,8 +16,6 @@ import { palaceFloors } from "@/data/palaceData";
 import { DrillMindMap } from "@/components/drill-drill/DrillMindMap";
 import { DrillChat } from "@/components/drill-drill/DrillChat";
 import { SavedDrills } from "@/components/drill-drill/SavedDrills";
-import { useProcessTracking } from "@/contexts/ProcessTrackingContext";
-import { JeevesContinuityPrompt } from "@/components/continuity/JeevesContinuityPrompt";
 
 export type DrillMode = "guided" | "self" | "auto";
 export type DifficultyLevel = "beginner" | "intermediate" | "pro";
@@ -49,7 +47,6 @@ export interface DrillSession {
 
 const DrillDrill = () => {
   const { user } = useAuth();
-  const { trackProcess, clearProcess } = useProcessTracking();
   const [verse, setVerse] = useState("");
   const [verseText, setVerseText] = useState("");
   const [mode, setMode] = useState<DrillMode | null>(null);
@@ -109,15 +106,6 @@ const DrillDrill = () => {
       };
 
       setSession(newSession);
-
-      // Track process
-      trackProcess({
-        process: `Drill: ${verse}`,
-        totalSteps: responses.length,
-        step: 1,
-        taskType: "drill",
-        notes: `${mode} mode drill on ${verse}`,
-      });
 
       // If auto mode, run full analysis
       if (mode === "auto") {
@@ -203,7 +191,6 @@ const DrillDrill = () => {
   };
 
   const resetDrill = () => {
-    clearProcess();
     setSession(null);
     setMode(null);
     setDifficulty("intermediate");
@@ -216,25 +203,6 @@ const DrillDrill = () => {
       <Navigation />
       <main className="container mx-auto px-4 py-8 pt-24">
         <div className="max-w-6xl mx-auto space-y-6">
-          {/* Continuity Prompt */}
-          {user && (
-            <JeevesContinuityPrompt
-              feature="drill"
-              onResume={() => {
-                // Resume logic handled by state restoration
-                toast.info("Resuming your last drill session");
-              }}
-              onRestart={() => {
-                resetDrill();
-                toast.info("Starting fresh");
-              }}
-              onStartNew={() => {
-                clearProcess();
-                toast.info("Ready for a new drill");
-              }}
-              onSkip={() => clearProcess()}
-            />
-          )}
           {/* Header */}
           <div className="text-center space-y-3">
             <div className="flex items-center justify-center gap-2">

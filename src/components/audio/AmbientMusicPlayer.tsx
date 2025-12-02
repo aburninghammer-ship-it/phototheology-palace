@@ -42,9 +42,9 @@ import { Label } from "@/components/ui/label";
 import { useUserMusic, UserTrack } from "@/hooks/useUserMusic";
 import { useAuth } from "@/hooks/useAuth";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { useAudioDucking, getDuckedVolume } from "@/hooks/useAudioDucking";
+import { useAudioDucking } from "@/hooks/useAudioDucking";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { subscribeToMusicVolume, subscribeToMusicPlayback } from "@/hooks/useMusicVolumeControl";
+import { subscribeToMusicVolume } from "@/hooks/useMusicVolumeControl";
 
 // Phototheology Sacred Orchestral Music
 // Rich orchestral, movie soundtrack style (The Chosen, Zimmer, Tyler)
@@ -230,34 +230,12 @@ export function AmbientMusicPlayer({
 
   // Audio ducking - reduce volume when TTS is playing
   // Works on both desktop and mobile to ensure voice reader is dominant
-  // IMPORTANT: When TTS starts, if music is enabled but not playing, auto-start it (ducked)
   const handleDuckChange = useCallback((ducked: boolean, duckRatio: number) => {
     console.log(`[AmbientMusic] Duck event: ducked=${ducked}, ratio=${duckRatio}`);
     setDuckMultiplier(duckRatio);
-    
-    // Auto-start music when TTS begins (if enabled but not playing)
-    if (ducked && isEnabled && !isPlaying && audioRef.current) {
-      console.log('[AmbientMusic] Auto-starting music for TTS ducking');
-      audioRef.current.play().catch(err => {
-        console.error('[AmbientMusic] Auto-start failed:', err);
-      });
-      setIsPlaying(true);
-    }
-  }, [isEnabled, isPlaying]);
+  }, []);
 
   useAudioDucking(handleDuckChange);
-
-  // Listen to global playback control (e.g., when SequencePlayer wants exclusive control)
-  useEffect(() => {
-    const unsubscribe = subscribeToMusicPlayback((shouldPlay) => {
-      if (!shouldPlay && isPlaying && audioRef.current) {
-        console.log('[AmbientMusic] Pausing due to global playback control');
-        audioRef.current.pause();
-        setIsPlaying(false);
-      }
-    });
-    return unsubscribe;
-  }, [isPlaying]);
 
   // Single effect to manage volume - uses GainNode for iOS compatibility
   useEffect(() => {

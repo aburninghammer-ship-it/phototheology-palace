@@ -133,12 +133,3 @@ verify_jwt = false
 
 [functions.drill-drill]
 verify_jwt = false
-
-[functions.generate-elevenlabs-audio]
-verify_jwt = false
-
-[functions.pregenerate-commentary]
-verify_jwt = false
-
-[functions.analyze-verse-pt]
-verify_jwt = false

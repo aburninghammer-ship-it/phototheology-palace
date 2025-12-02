@@ -6,9 +6,6 @@ import { GlassBubbles } from "@/components/ui/glass-bubbles";
 import { useReadingPlans } from "@/hooks/useReadingPlans";
 import { useNavigate } from "react-router-dom";
 import { Book, Building2, BookOpen, Plus, Play } from "lucide-react";
-import { useProcessTracking } from "@/contexts/ProcessTrackingContext";
-import { JeevesContinuityPrompt } from "@/components/continuity/JeevesContinuityPrompt";
-import { toast } from "sonner";
 import { HowItWorksDialog } from "@/components/HowItWorksDialog";
 import { readingPlansSteps } from "@/config/howItWorksSteps";
 import { useAuth } from "@/hooks/useAuth";
@@ -27,7 +24,6 @@ import { Calendar, Target, Layers } from "lucide-react";
 export default function ReadingPlans() {
   const { plans, userProgress, allProgress, loading, startPlan, refetch, refetchProgress } = useReadingPlans();
   const { user } = useAuth();
-  const { trackProcess, clearProcess } = useProcessTracking();
   const navigate = useNavigate();
   const activePlan = userProgress ? plans.find((p) => p.id === userProgress.plan_id) : null;
   const [selectedPlanId, setSelectedPlanId] = useState<string | null>(null);
@@ -42,21 +38,8 @@ export default function ReadingPlans() {
 
   const handleStartPlan = async () => {
     if (!selectedPlanId) return;
-    const plan = plans.find(p => p.id === selectedPlanId);
     await startPlan(selectedPlanId, selectedTranslation);
     await refetchProgress();
-    
-    // Track process
-    if (plan) {
-      trackProcess({
-        process: plan.name,
-        totalSteps: plan.duration_days,
-        step: 1,
-        taskType: "reading_plan",
-        notes: `${plan.name} - ${selectedTranslation}`,
-      });
-    }
-    
     setShowTranslationDialog(false);
     navigate("/daily-reading");
   };
@@ -104,23 +87,6 @@ export default function ReadingPlans() {
       <Navigation />
       
       <div className="container mx-auto px-4 py-8 max-w-6xl">
-        {/* Continuity Prompt */}
-        {user && (
-          <JeevesContinuityPrompt
-            feature="reading plan"
-            onResume={() => navigate("/daily-reading")}
-            onRestart={() => {
-              clearProcess();
-              toast.info("Choose a new plan to restart");
-            }}
-            onStartNew={() => {
-              clearProcess();
-              toast.info("Select a new reading plan below");
-            }}
-            onSkip={() => clearProcess()}
-          />
-        )}
-        
         {/* Header */}
         <div className="text-center mb-12">
           <Building2 className="h-16 w-16 text-primary mx-auto mb-4" />

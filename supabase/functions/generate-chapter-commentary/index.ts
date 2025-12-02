@@ -82,7 +82,7 @@ const getSystemPrompt = (depth: CommentaryDepth): string => {
 
 **6th Floor - Three Heavens & Eight Cycles:**
 - Eight Covenant Cycles (each follows Fall → Covenant → Sanctuary → Enemy → Restoration):
-  * Adamic Cycle: Eden to promise of the Seed (Genesis 3:15)
+  * Adamic Cycle: Eden to promise of the Seed (Gen 3:15)
   * Noahic Cycle: Flood, ark as sanctuary, rainbow covenant
   * Abrahamic Cycle: Call, altars, Moriah, covenant people
   * Mosaic Cycle: Exodus, Sinai, tabernacle, conquest
@@ -223,7 +223,7 @@ You MUST engage with ALL 8 floors throughout the commentary. Don't just mention 
 
 **Floor 5 (Vision):** Connect to sanctuary typology (Blue Room - altar, laver, lampstand, showbread, incense, ark, veil, gate), place in prophetic timelines (Prophecy Room), relate to Three Angels' Messages when relevant, connect to biblical feasts (Feasts Room)
 
-**Floor 6 (Cycles & Heavens):** Place chapter in one of the 8 covenant cycles (Adamic Cycle, Noahic Cycle, Abrahamic Cycle, Mosaic Cycle, Cyrusic Cycle, Cyrus-Christ Cycle, Spirit Cycle, Remnant Cycle) and identify which Day-of-the-LORD horizon (First Heaven: Babylon→Restoration, Second Heaven: 70 AD→New Covenant, Third Heaven: Final→New Creation)
+**Floor 6 (Cycles & Heavens):** Place chapter in one of the 8 covenant cycles (Adamic, Noahic, Abrahamic, Mosaic, Cyrusic, Cyrus-Christ, Spirit, Remnant) and identify which Day-of-the-LORD horizon (1H: Babylon→Restoration, 2H: 70AD→New Covenant, 3H: Final→New Creation)
 
 **Floor 7 (Spiritual/Emotional):** Engage the heart—show the emotional weight and spiritual fire of the passage, not just intellectual analysis
 

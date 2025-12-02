@@ -15,7 +15,6 @@ import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { MessageCircle, Users as UsersIcon, X, BellRing } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
-import { MessageReactions } from '@/components/messages/MessageReactions';
 import {
   Tooltip,
   TooltipContent,
@@ -416,10 +415,6 @@ export const MessagingSidebar = () => {
                                 <span className="text-[10px] opacity-70">• Read</span>
                               )}
                             </div>
-                            <MessageReactions 
-                              messageId={message.id} 
-                              reactions={message.reactions || []} 
-                            />
                           </div>
                         </div>
                       );
