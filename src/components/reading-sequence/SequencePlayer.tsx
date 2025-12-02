@@ -47,6 +47,8 @@ import {
   getCachedVerseCommentary,
   cacheVerseCommentary 
 } from "@/services/offlineCommentaryCache";
+import { useElevenLabsAudio } from "@/hooks/useElevenLabsAudio";
+import { useBrowserSpeech } from "@/hooks/useBrowserSpeech";
 
 interface SequencePlayerProps {
   sequences: ReadingSequenceBlock[];
@@ -107,6 +109,8 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
   
   const isMobile = useIsMobile();
   const activeSequences = sequences.filter((s) => s.enabled && s.items.length > 0);
+  const { getCommentaryAudio } = useElevenLabsAudio();
+  const { speak: speakVerse, stop: stopVerse } = useBrowserSpeech();
 
   // Keep speech synthesis alive on mobile browsers
   useEffect(() => {
@@ -505,100 +509,82 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
     speakChunk();
   }, []);
 
-  // Play commentary audio
-  const playCommentary = useCallback(async (text: string, voice: string, onComplete: () => void) => {
-    console.log("[Commentary] Playing commentary, length:", text.length);
+  // Play commentary audio with ElevenLabs
+  const playCommentary = useCallback(async (
+    text: string, 
+    book: string,
+    chapter: number,
+    verse: number,
+    onComplete: () => void
+  ) => {
+    console.log("[Commentary] Playing ElevenLabs commentary");
     setIsPlayingCommentary(true);
     setCommentaryText(text);
     playingCommentaryRef.current = true;
     setIsLoading(true);
 
-    // Add timeout to TTS generation - longer for commentary
-    const timeoutMs = 60000; // 60 seconds for long chapter commentary
-    const timeoutPromise = new Promise<string | null>((_, reject) => 
-      setTimeout(() => reject(new Error('TTS generation timeout')), timeoutMs)
-    );
-
-    let url: string | null = null;
-    
     try {
-      url = await Promise.race([
-        generateTTS(text, voice),
-        timeoutPromise
-      ]);
-    } catch (error) {
-      console.error("[Commentary] TTS generation failed or timed out, falling back to browser TTS:", error);
-      setIsLoading(false);
+      // Get or generate ElevenLabs audio
+      const audioUrl = await getCommentaryAudio(text, book, chapter, verse);
       
-      // Fallback to browser TTS for commentary
+      setIsLoading(false);
+
+      if (!audioUrl) {
+        console.log("[Commentary] No audio URL, using browser TTS fallback");
+        const playbackSpeed = currentSequence?.playbackSpeed || 1;
+        speakWithBrowserTTS(text, playbackSpeed, () => {
+          setIsPlayingCommentary(false);
+          playingCommentaryRef.current = false;
+          setCommentaryText(null);
+          onComplete();
+        });
+        return;
+      }
+
+      // Stop any existing audio
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current.onended = null;
+        audioRef.current = null;
+      }
+
+      const audio = new Audio(audioUrl);
+      audio.volume = isMuted ? 0 : volume / 100;
       const playbackSpeed = currentSequence?.playbackSpeed || 1;
-      speakWithBrowserTTS(text, playbackSpeed, () => {
+      audio.playbackRate = playbackSpeed;
+      audioRef.current = audio;
+      setAudioUrl(audioUrl);
+
+      audio.onended = () => {
+        console.log("[Commentary] Finished playing");
+        audioRef.current = null;
         setIsPlayingCommentary(false);
         playingCommentaryRef.current = false;
         setCommentaryText(null);
         onComplete();
-      });
-      return;
-    }
-    
-    setIsLoading(false);
+      };
 
-    if (!url) {
-      console.error("[Commentary] Failed to generate TTS");
-      setIsPlayingCommentary(false);
-      playingCommentaryRef.current = false;
-      setCommentaryText(null);
-      toast.error("Commentary audio unavailable, continuing", { duration: 2000 });
-      onComplete();
-      return;
-    }
+      audio.onerror = (e) => {
+        console.error("[Commentary] Audio error:", e);
+        audioRef.current = null;
+        setIsPlayingCommentary(false);
+        playingCommentaryRef.current = false;
+        setCommentaryText(null);
+        toast.error("Commentary playback error, continuing", { duration: 2000 });
+        onComplete();
+      };
 
-    // Stop any existing audio
-    if (audioRef.current) {
-      audioRef.current.pause();
-      audioRef.current.onended = null;
-      audioRef.current = null;
-    }
-
-    const audio = new Audio(url);
-    audio.volume = isMuted ? 0 : volume / 100;
-    // Apply playback speed from current sequence
-    const playbackSpeed = currentSequence?.playbackSpeed || 1;
-    audio.playbackRate = playbackSpeed;
-    audioRef.current = audio;
-    setAudioUrl(url);
-
-    audio.onended = () => {
-      console.log("[Commentary] Finished playing");
-      audioRef.current = null;
-      setIsPlayingCommentary(false);
-      playingCommentaryRef.current = false;
-      setCommentaryText(null);
-      URL.revokeObjectURL(url);
-      onComplete();
-    };
-
-    audio.onerror = (e) => {
-      console.error("[Commentary] Audio error:", e);
-      audioRef.current = null;
-      setIsPlayingCommentary(false);
-      playingCommentaryRef.current = false;
-      setCommentaryText(null);
-      toast.error("Commentary playback error, continuing", { duration: 2000 });
-      onComplete();
-    };
-
-    try {
       await audio.play();
     } catch (e) {
-      console.error("[Commentary] Play failed:", e);
+      console.error("[Commentary] Failed:", e);
+      setIsLoading(false);
       setIsPlayingCommentary(false);
       playingCommentaryRef.current = false;
       setCommentaryText(null);
-      toast.error("Commentary playback failed, continuing", { duration: 2000 });
+      toast.error("Commentary unavailable, continuing", { duration: 2000 });
       onComplete();
     }
-  }, [generateTTS, isMuted, volume, currentSequence]);
+  }, [getCommentaryAudio, isMuted, volume, currentSequence, speakWithBrowserTTS]);
 
   // Handle chapter completion with commentary check (for browser TTS and fallback paths)
   const handleChapterCompleteWithCommentary = useCallback((content: ChapterContent) => {
@@ -656,7 +642,7 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
         });
       } else if (cached?.text) {
         console.log("[ChapterComplete] Using cached chapter commentary text");
-        playCommentary(cached.text, commentaryVoice, moveToNextChapter);
+        playCommentary(cached.text, content.book, content.chapter, 0, moveToNextChapter);
       } else {
         // Generate commentary
         console.log("[ChapterComplete] Generating chapter commentary");
@@ -666,7 +652,7 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
         generateCommentary(content.book, content.chapter, chapterText, commentaryDepth)
           .then(commentary => {
             if (commentary && continuePlayingRef.current) {
-              playCommentary(commentary, commentaryVoice, moveToNextChapter);
+              playCommentary(commentary, content.book, content.chapter, 0, moveToNextChapter);
             } else {
               setIsLoading(false);
               moveToNextChapter();
@@ -802,7 +788,7 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
         setIsLoading(false);
         
         if (commentary && continuePlayingRef.current) {
-          playCommentary(commentary, commentaryVoice, () => {
+          playCommentary(commentary, content.book, content.chapter, 0, () => {
             // Move to next chapter after commentary
             if (continuePlayingRef.current) {
               moveToNextChapter();
@@ -854,7 +840,7 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
       const commentary = await generateVerseCommentary(content.book, content.chapter, verse.verse, verse.text, commentaryDepth);
       
       if (commentary && continuePlayingRef.current) {
-        playCommentary(commentary, commentaryVoice, () => {
+        playCommentary(commentary, content.book, content.chapter, verse.verse, () => {
           // Move to next verse commentary
           if (continuePlayingRef.current) {
             playCommentaryOnlyVerse(verseIdx + 1, content, sequence);
@@ -1140,7 +1126,7 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
         } else if (cached?.text) {
           // Have text but no audio - generate TTS only
           console.log("[Verse Commentary] Using cached text, generating audio");
-          playCommentary(cached.text, commentaryVoice, proceedAfterCommentary);
+          playCommentary(cached.text, content.book, content.chapter, currentVerse.verse, proceedAfterCommentary);
           return;
         }
         
@@ -1162,7 +1148,7 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
             setIsLoading(false);
             if (commentary && continuePlayingRef.current) {
               console.log("[Verse Commentary] Generated successfully, playing");
-              playCommentary(commentary as string, commentaryVoice, proceedAfterCommentary);
+              playCommentary(commentary as string, content.book, content.chapter, currentVerse.verse, proceedAfterCommentary);
             } else {
               console.log("[Verse Commentary] No commentary or stopped, proceeding");
               proceedAfterCommentary();
@@ -1231,7 +1217,7 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
           } else if (cached?.text) {
             // Have text but no audio
             console.log("[Chapter Commentary] Using cached text, generating audio");
-            playCommentary(cached.text, commentaryVoice, moveToNextChapter);
+            playCommentary(cached.text, content.book, content.chapter, 0, moveToNextChapter);
           } else {
             // Fallback: generate everything
             console.log("[Chapter Commentary] No cache, generating", commentaryDepth);
@@ -1241,7 +1227,7 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
             generateCommentary(content.book, content.chapter, chapterText, commentaryDepth)
               .then(commentary => {
                 if (commentary && continuePlayingRef.current) {
-                  playCommentary(commentary, commentaryVoice, moveToNextChapter);
+                  playCommentary(commentary, content.book, content.chapter, 0, moveToNextChapter);
                 } else {
                   setIsLoading(false);
                   moveToNextChapter();
@@ -1669,9 +1655,9 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
       }
       
       // Regenerate and continue from current position
-      if (wasPlayingCommentary && commentaryText) {
+      if (wasPlayingCommentary && commentaryText && chapterContent) {
         console.log("[Voice] Re-generating commentary with new voice");
-        playCommentary(commentaryText, newVoice, () => {
+        playCommentary(commentaryText, chapterContent.book, chapterContent.chapter, currentVerseIdx, () => {
           if (continuePlayingRef.current) {
             playVerseAtIndex(currentVerseIdx + 1, chapterContent, newVoice);
           }
