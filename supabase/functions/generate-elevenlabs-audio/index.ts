@@ -50,35 +50,91 @@ serve(async (req) => {
     console.log(`Generating ElevenLabs audio for: ${cacheKey}`);
 
     // Generate audio with ElevenLabs using higher quality model
-    const response = await fetch(
-      'https://api.elevenlabs.io/v1/text-to-speech/onwK4e9ZLuTAKqWW03F9',
-      {
-        method: 'POST',
-        headers: {
-          'xi-api-key': ELEVENLABS_API_KEY,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          text: text,
-          model_id: 'eleven_multilingual_v2', // Higher quality model for natural voice
-          voice_settings: {
-            stability: 0.71,
-            similarity_boost: 0.85,
-            style: 0.35,
-            use_speaker_boost: true,
-          },
-        }),
-      }
-    );
+    // Handle ElevenLabs 10k character limit by splitting long text into chunks
+    const MAX_CHARS = 9500;
+    const textStr = String(text);
+    const chunks: string[] = [];
 
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error('ElevenLabs API error:', response.status, errorText);
-      throw new Error(`ElevenLabs API error: ${response.status}`);
+    if (textStr.length <= MAX_CHARS) {
+      chunks.push(textStr);
+    } else {
+      let remaining = textStr;
+      while (remaining.length > 0) {
+        if (remaining.length <= MAX_CHARS) {
+          chunks.push(remaining);
+          break;
+        }
+
+        // Try to split on a sentence boundary or space near the limit
+        let splitIndex = remaining.lastIndexOf('.', MAX_CHARS);
+        if (splitIndex === -1) {
+          splitIndex = remaining.lastIndexOf('!', MAX_CHARS);
+        }
+        if (splitIndex === -1) {
+          splitIndex = remaining.lastIndexOf('?', MAX_CHARS);
+        }
+        if (splitIndex === -1) {
+          splitIndex = remaining.lastIndexOf(' ', MAX_CHARS);
+        }
+        if (splitIndex === -1 || splitIndex < MAX_CHARS * 0.6) {
+          splitIndex = MAX_CHARS;
+        }
+
+        const chunk = remaining.slice(0, splitIndex + 1).trim();
+        if (chunk.length > 0) {
+          chunks.push(chunk);
+        }
+        remaining = remaining.slice(splitIndex + 1).trim();
+      }
+
+      console.log(
+        `Text length ${textStr.length} split into ${chunks.length} ElevenLabs chunks`
+      );
     }
 
-    const audioBuffer = await response.arrayBuffer();
-    const audioData = new Uint8Array(audioBuffer);
+    const audioChunks: Uint8Array[] = [];
+
+    for (const [index, chunk] of chunks.entries()) {
+      console.log(`Requesting ElevenLabs audio chunk ${index + 1}/${chunks.length}`);
+      const response = await fetch(
+        'https://api.elevenlabs.io/v1/text-to-speech/onwK4e9ZLuTAKqWW03F9',
+        {
+          method: 'POST',
+          headers: {
+            'xi-api-key': ELEVENLABS_API_KEY,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            text: chunk,
+            model_id: 'eleven_multilingual_v2', // Higher quality model for natural voice
+            voice_settings: {
+              stability: 0.71,
+              similarity_boost: 0.85,
+              style: 0.35,
+              use_speaker_boost: true,
+            },
+          }),
+        }
+      );
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('ElevenLabs API error:', response.status, errorText);
+        throw new Error(`ElevenLabs API error: ${response.status}`);
+      }
+
+      const audioBuffer = await response.arrayBuffer();
+      audioChunks.push(new Uint8Array(audioBuffer));
+    }
+
+    // Concatenate all audio chunks into a single Uint8Array
+    const totalLength = audioChunks.reduce((sum, chunk) => sum + chunk.length, 0);
+    const audioData = new Uint8Array(totalLength);
+    let offset = 0;
+    for (const chunk of audioChunks) {
+      audioData.set(chunk, offset);
+      offset += chunk.length;
+    }
 
     // Upload to Supabase storage
     const fileName = `commentary/${book}/${chapter}/${verse}_daniel.mp3`;
