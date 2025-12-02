@@ -38,7 +38,14 @@ export const useElevenLabsAudio = () => {
         body: { text: commentary, book, chapter, verse }
       });
 
-      if (error) throw error;
+      if (error) {
+        // Check if it's a quota error
+        if (error.message?.includes('ELEVENLABS_QUOTA_EXCEEDED')) {
+          console.error('ElevenLabs quota exceeded');
+          throw new Error('ELEVENLABS_QUOTA_EXCEEDED');
+        }
+        throw error;
+      }
 
       if (data?.storage_path) {
         const { data: urlData } = await supabase.storage
@@ -51,6 +58,10 @@ export const useElevenLabsAudio = () => {
       return null;
     } catch (error) {
       console.error('Error getting commentary audio:', error);
+      // Re-throw quota errors so they can be handled upstream
+      if (error instanceof Error && error.message === 'ELEVENLABS_QUOTA_EXCEEDED') {
+        throw error;
+      }
       return null;
     } finally {
       setLoading(false);

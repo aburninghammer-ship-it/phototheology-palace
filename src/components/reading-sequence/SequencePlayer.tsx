@@ -22,6 +22,7 @@ import {
   RotateCcw,
   RefreshCw,
   Mic,
+  MessageSquare,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -577,19 +578,49 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
         onComplete();
       } else {
         // Use ElevenLabs Daniel voice
-        const audioUrl = await getCommentaryAudio(text, book, chapter, verse);
-        
-        setIsLoading(false);
+        try {
+          const audioUrl = await getCommentaryAudio(text, book, chapter, verse);
+          
+          setIsLoading(false);
 
-        if (!audioUrl) {
-          console.log("[Commentary] No audio URL, using browser TTS fallback");
-          const playbackSpeed = currentSequence?.playbackSpeed || 1;
-          speakWithBrowserTTS(text, playbackSpeed, () => {
+          if (!audioUrl) {
+            console.log("[Commentary] No audio URL, falling back to OpenAI");
+            // Fallback to OpenAI instead of browser TTS for better quality
+            await openaiSpeak(text, {
+              voice: 'shimmer',
+              book,
+              chapter,
+              verse,
+              useCache: true
+            });
             setIsPlayingCommentary(false);
             playingCommentaryRef.current = false;
             setCommentaryText(null);
             onComplete();
+            return;
+          }
+        } catch (error) {
+          console.error("[Commentary] ElevenLabs failed:", error);
+          setIsLoading(false);
+          
+          // Check if it's a quota error
+          if (error instanceof Error && error.message === 'ELEVENLABS_QUOTA_EXCEEDED') {
+            toast.error("ElevenLabs quota exceeded. Using OpenAI voice instead.", { duration: 4000 });
+          }
+          
+          // Fallback to OpenAI
+          console.log("[Commentary] Falling back to OpenAI");
+          await openaiSpeak(text, {
+            voice: 'shimmer',
+            book,
+            chapter,
+            verse,
+            useCache: true
           });
+          setIsPlayingCommentary(false);
+          playingCommentaryRef.current = false;
+          setCommentaryText(null);
+          onComplete();
           return;
         }
 
@@ -1683,6 +1714,56 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
   };
 
   // Handle voice change - clear cache and regenerate current audio
+  // Handle on-demand verse commentary request
+  const handleVerseCommentaryRequest = useCallback(async (verseNum: number, verseText: string) => {
+    if (!chapterContent || !currentItem) return;
+    
+    // Pause current playback
+    const wasPlaying = isPlaying && !isPaused;
+    if (wasPlaying) {
+      handlePause();
+    }
+    
+    console.log(`[On-Demand Commentary] Requesting for verse ${verseNum}`);
+    
+    const commentaryDepth = currentSequence?.commentaryDepth || "surface";
+    
+    setIsLoading(true);
+    try {
+      const commentary = await generateVerseCommentary(
+        currentItem.book,
+        currentItem.chapter,
+        verseNum,
+        verseText,
+        commentaryDepth
+      );
+      
+      if (commentary) {
+        // Play the commentary
+        await playCommentary(commentary, currentItem.book, currentItem.chapter, verseNum, () => {
+          setIsLoading(false);
+          // Resume if was playing
+          if (wasPlaying) {
+            handlePlay();
+          }
+        });
+      } else {
+        setIsLoading(false);
+        toast.error("Could not generate commentary", { duration: 2000 });
+        if (wasPlaying) {
+          handlePlay();
+        }
+      }
+    } catch (error) {
+      console.error("[On-Demand Commentary] Error:", error);
+      setIsLoading(false);
+      toast.error("Commentary failed", { duration: 2000 });
+      if (wasPlaying) {
+        handlePlay();
+      }
+    }
+  }, [chapterContent, currentItem, isPlaying, isPaused, currentSequence, generateVerseCommentary, playCommentary, handlePause, handlePlay]);
+
   const handleVoiceChange = useCallback((newVoice: VoiceId) => {
     console.log("[Voice] Changing voice from", currentVoice, "to", newVoice);
     setCurrentVoice(newVoice);
@@ -1904,20 +1985,33 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
           <div className="max-h-[400px] overflow-y-auto rounded-lg border border-border/50 bg-muted/20">
             <div className="p-4 space-y-3">
               {chapterContent.verses.map((verse, idx) => (
-                <p
+                <div
                   key={verse.verse}
                   id={`verse-${verse.verse}`}
-                  className={`text-base leading-relaxed transition-all duration-300 rounded-md p-2 ${
+                  className={`group text-base leading-relaxed transition-all duration-300 rounded-md p-2 ${
                     idx === currentVerseIdx
                       ? "bg-primary/20 border-l-4 border-primary scale-[1.01]"
-                      : "opacity-70 hover:opacity-100"
+                      : "opacity-70 hover:opacity-100 hover:bg-muted/40"
                   }`}
                 >
-                  <span className={`font-bold mr-2 ${idx === currentVerseIdx ? "text-primary" : "text-muted-foreground"}`}>
-                    {verse.verse}
-                  </span>
-                  {verse.text}
-                </p>
+                  <div className="flex items-start justify-between gap-2">
+                    <p className="flex-1">
+                      <span className={`font-bold mr-2 ${idx === currentVerseIdx ? "text-primary" : "text-muted-foreground"}`}>
+                        {verse.verse}
+                      </span>
+                      {verse.text}
+                    </p>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="opacity-0 group-hover:opacity-100 transition-opacity shrink-0 h-8 w-8 p-0"
+                      onClick={() => handleVerseCommentaryRequest(verse.verse, verse.text)}
+                      title="Get commentary for this verse"
+                    >
+                      <MessageSquare className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </div>
               ))}
             </div>
           </div>
