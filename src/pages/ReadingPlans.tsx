@@ -8,6 +8,7 @@ import { useNavigate } from "react-router-dom";
 import { Book, Building2, BookOpen, Plus, Play } from "lucide-react";
 import { useProcessTracking } from "@/contexts/ProcessTrackingContext";
 import { JeevesContinuityPrompt } from "@/components/continuity/JeevesContinuityPrompt";
+import { toast } from "sonner";
 import { HowItWorksDialog } from "@/components/HowItWorksDialog";
 import { readingPlansSteps } from "@/config/howItWorksSteps";
 import { useAuth } from "@/hooks/useAuth";

@@ -6,12 +6,14 @@ import { Textarea } from "@/components/ui/textarea";
 import { ArrowLeft, Film } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { useProcessTracking } from "@/contexts/ProcessTrackingContext";
 
 const FRAMES = ["F01", "F07", "F12", "F24"];
 const WALLS = ["|LC", "|S", "|GC", "|TP"];
 
 export default function FrameSnapshot() {
   const navigate = useNavigate();
+  const { trackProcess } = useProcessTracking();
   const [storyboard, setStoryboard] = useState<string[]>([]);
   const [narrative, setNarrative] = useState("");
   const [score, setScore] = useState(0);
@@ -20,8 +22,18 @@ export default function FrameSnapshot() {
   const dealStoryboard = () => {
     const all = [...FRAMES, ...WALLS];
     const shuffled = all.sort(() => Math.random() - 0.5);
-    setStoryboard(shuffled.slice(0, 4));
+    const newBoard = shuffled.slice(0, 4);
+    setStoryboard(newBoard);
     setNarrative("");
+    
+    // Track process
+    trackProcess({
+      process: "Frame Snapshot",
+      totalSteps: 1,
+      step: 0,
+      taskType: "game",
+      notes: `Cards: ${newBoard.join(", ")}`,
+    });
   };
 
   const handleSubmit = async () => {
