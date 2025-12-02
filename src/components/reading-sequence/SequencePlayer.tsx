@@ -82,8 +82,12 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
   const [isPlayingCommentary, setIsPlayingCommentary] = useState(false);
   const [offlineMode, setOfflineMode] = useState(!isOnline());
   const [commentaryText, setCommentaryText] = useState<string | null>(null);
+  
+  // Get active sequences first
+  const activeSequences = sequences.filter((s) => s.enabled && s.items.length > 0);
+  
   const [currentVoice, setCurrentVoice] = useState<VoiceId>(() => {
-    return (currentSequence?.voice as VoiceId) || 'onyx';
+    return (activeSequences[currentSeqIdx]?.voice as VoiceId) || 'onyx';
   });
 
   const audioRef = useRef<HTMLAudioElement | null>(null);
@@ -106,7 +110,6 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
   const keepAliveIntervalRef = useRef<number | null>(null); // Keep speech alive on mobile
   
   const isMobile = useIsMobile();
-  const activeSequences = sequences.filter((s) => s.enabled && s.items.length > 0);
 
   // Keep speech synthesis alive on mobile browsers
   useEffect(() => {
