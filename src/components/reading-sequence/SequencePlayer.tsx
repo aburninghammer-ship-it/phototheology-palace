@@ -999,15 +999,23 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
     };
     
     audio.onended = () => {
-      console.log("[Audio] <<< Ended verse:", verseIdx + 1, "| continue:", continuePlayingRef.current);
+      console.log("[Audio] <<< Ended verse:", verseIdx + 1, "| continue:", continuePlayingRef.current, "| isPlaying:", isPlaying, "| isPaused:", isPaused);
       // Don't call notifyTTSStopped here - keep music ducked between verses
       
       // Clear the audio ref immediately
       audioRef.current = null;
       
       if (!continuePlayingRef.current) {
-        console.log("[Audio] Not continuing - flag is false");
-        return;
+        console.error("[Audio] ❌ UNEXPECTED STOP - continuePlayingRef is false but audio ended naturally!");
+        console.error("[Audio] State:", { isPlaying, isPaused, currentItemIdx, verseIdx, totalItems });
+        // Try to recover - if we were playing and not paused, continue anyway
+        if (isPlaying && !isPaused) {
+          console.log("[Audio] 🔄 RECOVERING - forcing continue because isPlaying=true and isPaused=false");
+          continuePlayingRef.current = true;
+        } else {
+          console.log("[Audio] Not continuing - confirmed stop");
+          return;
+        }
       }
       
       // Find current sequence to check commentary settings
@@ -1033,8 +1041,14 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
         const proceedAfterCommentary = () => {
           // Always check continuePlayingRef before proceeding
           if (!continuePlayingRef.current) {
-            console.log("[Verse Commentary] Stopped by user, not continuing");
-            return;
+            console.log("[Verse Commentary] ❌ Stopped - continuePlayingRef is false | isPlaying:", isPlaying, "| isPaused:", isPaused);
+            // Try to recover if we're still in playing state
+            if (isPlaying && !isPaused) {
+              console.log("[Verse Commentary] 🔄 RECOVERING - forcing continue");
+              continuePlayingRef.current = true;
+            } else {
+              return;
+            }
           }
           
           if (isLastVerse) {
@@ -1480,6 +1494,7 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
   };
 
   const handlePause = () => {
+    console.log("[Player] ⏸️ PAUSE CALLED - setting continuePlayingRef to false");
     continuePlayingRef.current = false;
     
     // Handle HTML Audio element pause
@@ -1510,6 +1525,7 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
   };
 
   const handleStop = () => {
+    console.log("[Player] ⏹️ STOP CALLED - setting continuePlayingRef to false");
     continuePlayingRef.current = false;
     pendingVerseRef.current = null;
     pausedVerseRef.current = null;
