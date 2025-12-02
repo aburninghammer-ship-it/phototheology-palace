@@ -58,12 +58,14 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
   const [currentSeqIdx, setCurrentSeqIdx] = useState(0);
   const [currentItemIdx, setCurrentItemIdx] = useState(0);
   const [currentVerseIdx, setCurrentVerseIdx] = useState(0);
-  const [volume, setVolume] = useState(100);
+  const [volume, setVolume] = useState(70);
   const [isMuted, setIsMuted] = useState(false);
   const [musicVolume, setMusicVolume] = useState(() => {
     // Check if any sequence has background music enabled
     const hasMusicEnabled = sequences.some(s => s.backgroundMusic);
-    const defaultVolume = hasMusicEnabled ? Math.max(Math.min(getGlobalMusicVolume(), 70), 40) : 0;
+    const stored = getGlobalMusicVolume();
+    const initial = isNaN(stored as any) ? 70 : stored;
+    const defaultVolume = hasMusicEnabled ? initial : 0;
     console.log('[SequencePlayer] Initial music volume:', defaultVolume, 'hasMusicEnabled:', hasMusicEnabled);
     return defaultVolume;
   });
@@ -149,22 +151,23 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
   // Update music volume when sequences change (e.g., when switching to samples)
   useEffect(() => {
     const hasMusicEnabled = sequences.some(s => s.backgroundMusic);
-    const newMusicVolume = hasMusicEnabled ? Math.max(Math.min(getGlobalMusicVolume(), 70), 40) : 0;
-    console.log("[SequencePlayer] Sequences changed, updating music volume:", newMusicVolume, "enabled:", hasMusicEnabled);
-    setMusicVolume(newMusicVolume);
-    if (newMusicVolume > 0) {
-      setGlobalMusicVolume(newMusicVolume);
+
+    if (!hasMusicEnabled) {
+      // No blocks with background music: force music off
+      setMusicVolume(0);
+      setGlobalMusicVolume(0);
+      return;
     }
-    
-    // If music is enabled and we're playing, start the music
-    if (hasMusicEnabled && newMusicVolume > 0 && isPlaying && !isPaused && musicAudioRef.current) {
-      console.log("[Music] Auto-starting music after sequence change");
-      musicAudioRef.current.volume = newMusicVolume / 100;
+
+    // If music is enabled and we're playing, ensure element is using current user volume
+    if (musicAudioRef.current && isPlaying && !isPaused && musicVolume > 0) {
+      console.log("[SequencePlayer] Sequences changed, keeping music volume:", musicVolume, "enabled:", hasMusicEnabled);
+      musicAudioRef.current.volume = musicVolume / 100;
       musicAudioRef.current.play().catch(err => {
         console.error("[Music] Auto-start failed:", err);
       });
     }
-  }, [sequences, isPlaying, isPaused]);
+  }, [sequences, isPlaying, isPaused, musicVolume]);
 
   // Callback ref for music audio - ensures volume is set when element mounts
   const setMusicAudioRef = useCallback((node: HTMLAudioElement | null) => {
@@ -1604,13 +1607,21 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
     }
   };
 
+  const handleMusicVolumeChange = (value: number[]) => {
+    const newVolume = value[0];
+    setMusicVolume(newVolume);
+    setGlobalMusicVolume(newVolume);
+    if (musicAudioRef.current) {
+      musicAudioRef.current.volume = newVolume / 100;
+    }
+  };
+
   const toggleMute = () => {
     setIsMuted(!isMuted);
     if (audioRef.current) {
       audioRef.current.volume = isMuted ? volume / 100 : 0;
     }
   };
-
   // Auto-scroll to current verse
   useEffect(() => {
     if (chapterContent && currentVerseIdx >= 0) {
@@ -1858,29 +1869,55 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
         <div className="space-y-3 px-4">
           {/* TTS Volume (Desktop only) */}
           {!isMobile && (
-            <div className="flex items-center gap-3">
-              <Button variant="ghost" size="icon" onClick={toggleMute} className="h-8 w-8">
-                {isMuted || volume === 0 ? (
-                  <VolumeX className="h-4 w-4" />
-                ) : (
-                  <Volume2 className="h-4 w-4" />
-                )}
-              </Button>
-              <span className="text-xs text-muted-foreground w-12">Reader</span>
-              <Slider
-                value={[isMuted ? 0 : volume]}
-                max={100}
-                step={1}
-                onValueChange={handleVolumeChange}
-                className="flex-1"
-              />
-            </div>
+            <>
+              <div className="flex items-center gap-3">
+                <Button variant="ghost" size="icon" onClick={toggleMute} className="h-8 w-8">
+                  {isMuted || volume === 0 ? (
+                    <VolumeX className="h-4 w-4" />
+                  ) : (
+                    <Volume2 className="h-4 w-4" />
+                  )}
+                </Button>
+                <span className="text-xs text-muted-foreground w-12">Reader</span>
+                <Slider
+                  value={[isMuted ? 0 : volume]}
+                  max={100}
+                  step={1}
+                  onValueChange={handleVolumeChange}
+                  className="flex-1"
+                />
+              </div>
+
+              {/* Music volume slider */}
+              <div className="flex items-center gap-3">
+                <span className="text-xs text-muted-foreground w-12 ml-10">Music</span>
+                <Slider
+                  value={[musicVolume]}
+                  max={100}
+                  step={1}
+                  onValueChange={handleMusicVolumeChange}
+                  className="flex-1"
+                />
+              </div>
+            </>
           )}
           
           {isMobile && (
-            <div className="flex items-center justify-center gap-2 py-1 text-xs text-muted-foreground">
-              <Smartphone className="h-3 w-3" />
-              <span>Use device volume for reader</span>
+            <div className="flex flex-col gap-1 py-1 text-xs text-muted-foreground items-center">
+              <div className="flex items-center gap-2">
+                <Smartphone className="h-3 w-3" />
+                <span>Use device volume for reader</span>
+              </div>
+              <div className="flex items-center gap-2 w-full max-w-xs">
+                <span className="w-12 text-right">Music</span>
+                <Slider
+                  value={[musicVolume]}
+                  max={100}
+                  step={1}
+                  onValueChange={handleMusicVolumeChange}
+                  className="flex-1"
+                />
+              </div>
             </div>
           )}
         </div>
