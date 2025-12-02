@@ -621,19 +621,7 @@ export const SequenceBlockBuilder = ({ block, onChange, onRemove }: SequenceBloc
                     <Switch
                       id="commentary-only"
                       checked={block.commentaryOnly || false}
-                      onCheckedChange={(checked) => {
-                        // When enabling commentary only, limit to 1 chapter max
-                        if (checked && block.items.length > 1) {
-                          onChange({ 
-                            ...block, 
-                            commentaryOnly: checked,
-                            items: block.items.slice(0, 1) // Keep only first chapter
-                          });
-                          toast.info("Commentary Only mode limited to 1 chapter for faster loading");
-                        } else {
-                          onChange({ ...block, commentaryOnly: checked });
-                        }
-                      }}
+                      onCheckedChange={(checked) => onChange({ ...block, commentaryOnly: checked })}
                     />
                   </div>
                   
