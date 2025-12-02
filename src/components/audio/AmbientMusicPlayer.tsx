@@ -188,7 +188,7 @@ export function AmbientMusicPlayer({
     if (saved) {
       return Math.min(parseInt(saved, 10), 100) / 100;
     }
-    return 0.70; // Default 70%
+    return 0.80; // Default 80%
   });
   const [isMuted, setIsMuted] = useState(false);
   const [currentTrackId, setCurrentTrackId] = useState(() => {
@@ -213,7 +213,7 @@ export function AmbientMusicPlayer({
     return saved === "true";
   });
   const [duckMultiplier, setDuckMultiplier] = useState(1);
-  const effectiveVolumeRef = useRef(0.70); // Ref to track current effective volume for callbacks
+  const effectiveVolumeRef = useRef(0.80); // Ref to track current effective volume for callbacks
   // Selected tracks for playlist
   const [selectedTracks, setSelectedTracks] = useState<Set<string>>(() => {
     const saved = localStorage.getItem("pt-ambient-selected-tracks");

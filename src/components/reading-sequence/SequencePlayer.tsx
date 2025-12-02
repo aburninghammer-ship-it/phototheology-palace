@@ -27,7 +27,7 @@ import { toast } from "sonner";
 import { ReadingSequenceBlock, SequenceItem } from "@/types/readingSequence";
 import { notifyTTSStarted, notifyTTSStopped } from "@/hooks/useAudioDucking";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { setGlobalMusicVolume, getGlobalMusicVolume } from "@/hooks/useMusicVolumeControl";
+import { getGlobalMusicVolume } from "@/hooks/useMusicVolumeControl";
 import { formatJeevesResponse } from "@/lib/formatJeevesResponse";
 import { DownloadSequenceDialog } from "./DownloadSequenceDialog";
 import { OfflineModeToggle } from "./OfflineModeToggle";
@@ -61,13 +61,11 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
   const [volume, setVolume] = useState(70);
   const [isMuted, setIsMuted] = useState(false);
   const [musicVolume, setMusicVolume] = useState(() => {
-    // Check if any sequence has background music enabled
-    const hasMusicEnabled = sequences.some(s => s.backgroundMusic);
     const stored = getGlobalMusicVolume();
-    const initial = isNaN(stored as any) ? 70 : stored;
-    const defaultVolume = hasMusicEnabled ? initial : 0;
-    console.log('[SequencePlayer] Initial music volume:', defaultVolume, 'hasMusicEnabled:', hasMusicEnabled);
-    return defaultVolume;
+    const initial = typeof stored === "number" && !Number.isNaN(stored as any) ? (stored as number) : 80;
+    const clamped = Math.max(0, Math.min(initial, 100));
+    console.log('[SequencePlayer] Initial music volume:', clamped);
+    return clamped;
   });
   const [chapterContent, setChapterContent] = useState<ChapterContent | null>(null);
   const [audioUrl, setAudioUrl] = useState<string | null>(null);
@@ -148,26 +146,7 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
     console.log("SequencePlayer mounted, refs reset. Active sequences:", activeSequences.length, "Total items:", totalItems);
   }, []);
 
-  // Update music volume when sequences change (e.g., when switching to samples)
-  useEffect(() => {
-    const hasMusicEnabled = sequences.some(s => s.backgroundMusic);
-
-    if (!hasMusicEnabled) {
-      // No blocks with background music: force music off
-      setMusicVolume(0);
-      setGlobalMusicVolume(0);
-      return;
-    }
-
-    // If music is enabled and we're playing, ensure element is using current user volume
-    if (musicAudioRef.current && isPlaying && !isPaused && musicVolume > 0) {
-      console.log("[SequencePlayer] Sequences changed, keeping music volume:", musicVolume, "enabled:", hasMusicEnabled);
-      musicAudioRef.current.volume = musicVolume / 100;
-      musicAudioRef.current.play().catch(err => {
-        console.error("[Music] Auto-start failed:", err);
-      });
-    }
-  }, [sequences, isPlaying, isPaused, musicVolume]);
+  // Background music is now always available during playback and is controlled solely by the user volume slider.
 
   // Callback ref for music audio - ensures volume is set when element mounts
   const setMusicAudioRef = useCallback((node: HTMLAudioElement | null) => {
@@ -190,16 +169,18 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
 
   // Start/pause music based on playback
   useEffect(() => {
-    const hasMusicEnabled = sequences.some(s => s.backgroundMusic);
-    if (musicAudioRef.current && isPlaying && !isPaused && musicVolume > 0 && hasMusicEnabled) {
+    if (!musicAudioRef.current) return;
+
+    if (isPlaying && !isPaused && musicVolume > 0) {
       console.log("[Music] Starting background music, volume:", musicVolume);
+      musicAudioRef.current.volume = musicVolume / 100;
       musicAudioRef.current.play().catch((err) => {
         console.error("[Music] Failed to start:", err);
       });
-    } else if (musicAudioRef.current && (!isPlaying || isPaused || !hasMusicEnabled)) {
+    } else {
       musicAudioRef.current.pause();
     }
-  }, [isPlaying, isPaused, musicVolume, sequences]);
+  }, [isPlaying, isPaused, musicVolume]);
 
   // Generate chapter commentary using Jeeves (with offline cache)
   const generateCommentary = useCallback(async (book: string, chapter: number, chapterText?: string, depth: string = "surface") => {
@@ -1610,7 +1591,6 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
   const handleMusicVolumeChange = (value: number[]) => {
     const newVolume = value[0];
     setMusicVolume(newVolume);
-    setGlobalMusicVolume(newVolume);
     if (musicAudioRef.current) {
       musicAudioRef.current.volume = newVolume / 100;
     }
