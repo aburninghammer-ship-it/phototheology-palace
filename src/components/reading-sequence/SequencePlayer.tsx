@@ -553,6 +553,17 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
     verse: number,
     onComplete: () => void
   ) => {
+    // Stop any currently playing audio first to prevent overlapping
+    if (playingCommentaryRef.current) {
+      console.log(`[Commentary] Stopping previous commentary before starting new one`);
+      openaiStop();
+      setIsPlayingCommentary(false);
+      playingCommentaryRef.current = false;
+      setCommentaryText(null);
+      // Wait a moment for audio to fully stop
+      await new Promise(resolve => setTimeout(resolve, 100));
+    }
+
     console.log(`[Commentary] Playing OpenAI commentary for ${book} ${chapter}:${verse}`);
     setIsPlayingCommentary(true);
     setCommentaryText(text);
@@ -568,10 +579,14 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
         verse,
         useCache: true
       });
-      setIsPlayingCommentary(false);
-      playingCommentaryRef.current = false;
-      setCommentaryText(null);
-      onComplete();
+      
+      // Only complete if we're still supposed to be playing (not interrupted)
+      if (playingCommentaryRef.current) {
+        setIsPlayingCommentary(false);
+        playingCommentaryRef.current = false;
+        setCommentaryText(null);
+        onComplete();
+      }
     } catch (e) {
       console.error("[Commentary] OpenAI TTS error:", e);
       setIsLoading(false);
@@ -581,7 +596,7 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
       toast.error("Commentary unavailable, continuing", { duration: 2000 });
       onComplete();
     }
-  }, [openaiSpeak]);
+  }, [openaiSpeak, openaiStop]);
 
   // Handle chapter completion with commentary check (for browser TTS and fallback paths)
   const handleChapterCompleteWithCommentary = useCallback((content: ChapterContent) => {
@@ -764,6 +779,12 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
     if (!content || !sequence.includeJeevesCommentary) {
       console.log("[Commentary Only] Skipping - no content or commentary disabled");
       moveToNextChapter();
+      return;
+    }
+
+    // Prevent starting if already playing commentary
+    if (playingCommentaryRef.current) {
+      console.log("[Commentary Only] Already playing commentary, skipping duplicate call");
       return;
     }
     
