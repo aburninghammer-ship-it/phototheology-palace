@@ -1984,10 +1984,15 @@ export type Database = {
         Row: {
           completed_at: string | null
           created_at: string
+          current_step: number | null
           drill_data: Json | null
           id: string
+          is_abandoned: boolean | null
+          last_room: string | null
           mode: string
           name: string | null
+          resume_data: Json | null
+          total_steps: number | null
           updated_at: string
           user_id: string
           verse_reference: string
@@ -1996,10 +2001,15 @@ export type Database = {
         Insert: {
           completed_at?: string | null
           created_at?: string
+          current_step?: number | null
           drill_data?: Json | null
           id?: string
+          is_abandoned?: boolean | null
+          last_room?: string | null
           mode: string
           name?: string | null
+          resume_data?: Json | null
+          total_steps?: number | null
           updated_at?: string
           user_id: string
           verse_reference: string
@@ -2008,10 +2018,15 @@ export type Database = {
         Update: {
           completed_at?: string | null
           created_at?: string
+          current_step?: number | null
           drill_data?: Json | null
           id?: string
+          is_abandoned?: boolean | null
+          last_room?: string | null
           mode?: string
           name?: string | null
+          resume_data?: Json | null
+          total_steps?: number | null
           updated_at?: string
           user_id?: string
           verse_reference?: string
@@ -7062,6 +7077,54 @@ export type Database = {
           reading_mode?: string | null
           theme_preference?: string | null
           updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      user_process_state: {
+        Row: {
+          active_process: string | null
+          created_at: string | null
+          id: string
+          last_drill_session_id: string | null
+          last_location: string | null
+          last_room_mastered: string | null
+          last_timestamp: string | null
+          notes: string | null
+          process_step: number | null
+          process_total_steps: number | null
+          task_type: string | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          active_process?: string | null
+          created_at?: string | null
+          id?: string
+          last_drill_session_id?: string | null
+          last_location?: string | null
+          last_room_mastered?: string | null
+          last_timestamp?: string | null
+          notes?: string | null
+          process_step?: number | null
+          process_total_steps?: number | null
+          task_type?: string | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          active_process?: string | null
+          created_at?: string | null
+          id?: string
+          last_drill_session_id?: string | null
+          last_location?: string | null
+          last_room_mastered?: string | null
+          last_timestamp?: string | null
+          notes?: string | null
+          process_step?: number | null
+          process_total_steps?: number | null
+          task_type?: string | null
+          updated_at?: string | null
           user_id?: string
         }
         Relationships: []
