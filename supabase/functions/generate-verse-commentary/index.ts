@@ -140,21 +140,38 @@ CRITICAL FOR SPOKEN DELIVERY:
     intermediate: `
 ### COMMENTARY STYLE: Intermediate
 - Provide a 2-4 sentence analysis
-- Include key word meanings if significant (Definition and Comparison Room)
-- Connect to sanctuary typology or patterns if relevant
-- Apply 2-3 PT rooms naturally
-- Draw practical application (Dimensions Room - Me level)
-- Show Christ-centered meaning`,
+- **VARY YOUR APPROACH**: Actively rotate through diverse PT principles—don't default to the same patterns
+- MUST include connections from MULTIPLE categories (choose 2-3):
+  * Sanctuary connections (Altar, Laver, Lampstand, Table, Incense, Ark, Veil, Gate)
+  * Feast connections (Passover, Unleavened Bread, Firstfruits, Pentecost, Trumpets, Atonement, Tabernacles)
+  * Prophecy patterns (Daniel/Revelation timelines, repeat-and-enlarge)
+  * Time Zones (past/present/future across heaven/earth)
+  * Parallels Room (mirrored actions: Babel/Pentecost, Exodus/Return, etc.)
+  * Parables connections (if applicable to verse context)
+  * Covenant Cycles (@Adamic → @Remnant)
+  * Three Heavens framework (DoL¹/NE¹, DoL²/NE², DoL³/NE³)
+- Include Hebrew/Greek insights when significant (Definition and Comparison Room)
+- Apply Dimensions Room naturally (Literal, Christ, Me, Church, or Heaven)
+- Show Christ-centered meaning through types, shadows, or direct fulfillment`,
     depth: `
 ### COMMENTARY STYLE: Scholarly Depth
 - Provide comprehensive verse analysis (4-7 sentences)
-- Include Hebrew/Greek word insights (Definition and Comparison Room)
-- Connect to types, patterns, and prophecy (Symbols and Types, Patterns, Prophecy Rooms)
-- Apply multiple Phototheology floor principles
-- Use Dimensions Room: ALWAYS include the literal dimension plus ONE other dimension most relevant to this verse (choose from: Christ, Me [phrased as "how it relates to you individually"], Church, or Heaven) - do NOT use all five dimensions
-- Place in covenant cycle and Three Heavens framework if applicable
-- Provide cross-references (Bible Freestyle - Verse Genetics)
-- End with spiritual application (Fruit Room test)`,
+- **CRITICAL: MAXIMIZE DIVERSITY** - Use a RICH MIX of PT principles from across all floors
+- MUST weave together connections from AT LEAST 4-5 different categories:
+  * Sanctuary typology (Blue Room): Connect to specific furniture/services
+  * Feast Calendar (Feasts Room): Show feast-day fulfillment or foreshadowing
+  * Prophecy Room: Link to Daniel/Revelation timelines, historicist interpretation
+  * Parallels Room: Identify mirrored actions across Scripture (e.g., Babel/Pentecost, first/second exodus)
+  * Time Zone Room: Place in 6-zone framework (past/present/future × heaven/earth)
+  * Patterns Room: Note recurring motifs (40 days, 3 days, deliverer patterns)
+  * Covenant Cycles: Identify which cycle (@Adamic → @Remnant) and stage (Fall/Covenant/Sanctuary/Enemy/Restoration)
+  * Three Heavens: Specify DoL¹/NE¹ (Babylon-Restoration), DoL²/NE² (70 AD-New Covenant), or DoL³/NE³ (Final Judgment)
+  * Parables: If narrative verse, connect to parable themes
+  * Verse Genetics (Bible Freestyle): Show how this verse has "siblings" and "cousins" across Scripture
+- Include Hebrew/Greek word analysis (Definition and Comparison Room)
+- Use Dimensions Room: Literal dimension plus ONE most relevant (Christ, Me, Church, or Heaven)
+- Provide meaningful cross-references that show the verse's "family tree"
+- End with spiritual application that passes the Fruit Room test`,
   };
 
   return basePrompt + depthInstructions[depth];
