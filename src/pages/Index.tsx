@@ -189,7 +189,13 @@ const Index = () => {
                 <p className="text-muted-foreground mb-4">
                   Start on Floor 1 with simple memory rooms. Walk through stories using vivid images and clear patterns.
                 </p>
-                <img src={heroImage} alt="Palace structure" className="rounded border" />
+                <img 
+                  src={heroImage} 
+                  alt="Palace structure" 
+                  className="rounded border" 
+                  loading="lazy"
+                  decoding="async"
+                />
               </CardContent>
             </Card>
             
@@ -204,7 +210,13 @@ const Index = () => {
                 <p className="text-muted-foreground mb-4">
                   As you progress through the floors, you'll build connections: prophecy, typology, Christ-centered threads, and big-picture patterns.
                 </p>
-                <img src={practiceWithAi} alt="AI assistance" className="rounded border" />
+                <img 
+                  src={practiceWithAi} 
+                  alt="AI assistance" 
+                  className="rounded border" 
+                  loading="lazy"
+                  decoding="async"
+                />
               </CardContent>
             </Card>
             
@@ -219,7 +231,13 @@ const Index = () => {
                 <p className="text-muted-foreground mb-4">
                   Jeeves guides you with drills, maps out verses, tests mastery, and helps you build your own Bible studies.
                 </p>
-                <img src={masterDeploy} alt="Mastery and deployment" className="rounded border" />
+                <img 
+                  src={masterDeploy} 
+                  alt="Mastery and deployment" 
+                  className="rounded border" 
+                  loading="lazy"
+                  decoding="async"
+                />
               </CardContent>
             </Card>
           </div>
