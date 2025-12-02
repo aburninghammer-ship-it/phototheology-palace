@@ -650,72 +650,26 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
       playingCommentaryRef.current = true;
       console.log("[ChapterComplete] 🔒 Flag set, starting chapter commentary");
       
-      const cacheKey = `chapter-${content.book}-${content.chapter}-${commentaryVoice}`;
-      const cached = commentaryCache.current.get(cacheKey);
+      // Always generate fresh commentary - no cached audio
+      console.log("[ChapterComplete] Generating chapter commentary");
+      // Reset flag temporarily so playCommentary can control it
+      playingCommentaryRef.current = false;
+      setIsLoading(true);
+      const chapterText = content.verses.map(v => `${v.verse}. ${v.text}`).join(" ");
       
-      if (cached?.audioUrl) {
-        console.log("[ChapterComplete] Using cached chapter commentary audio");
-        
-        // Flag already set above
-        setCommentaryText(cached.text);
-        setIsPlayingCommentary(true);
-        
-        const audio = new Audio(cached.audioUrl);
-        audio.volume = isMuted ? 0 : volume / 100;
-        // Apply playback speed from sequence
-        const playbackSpeed = currentSeq?.playbackSpeed || 1;
-        audio.playbackRate = playbackSpeed;
-        audioRef.current = audio;
-        
-        audio.onended = () => {
-          audioRef.current = null;
-          setIsPlayingCommentary(false);
-          playingCommentaryRef.current = false;
-          setCommentaryText(null);
-          setTimeout(moveToNextChapter, 200);
-        };
-        
-        audio.onerror = () => {
-          audioRef.current = null;
-          setIsPlayingCommentary(false);
-          playingCommentaryRef.current = false;
-          setCommentaryText(null);
-          setTimeout(moveToNextChapter, 200);
-        };
-        
-        audio.play().catch(() => {
-          setIsPlayingCommentary(false);
-          playingCommentaryRef.current = false;
-          setCommentaryText(null);
-          setTimeout(moveToNextChapter, 200);
-        });
-      } else if (cached?.text) {
-        console.log("[ChapterComplete] Using cached chapter commentary text");
-        // Reset flag so playCommentary can set it
-        playingCommentaryRef.current = false;
-        playCommentary(cached.text, content.book, content.chapter, 0, moveToNextChapter);
-      } else {
-        // Generate commentary
-        console.log("[ChapterComplete] Generating chapter commentary");
-        // Reset flag temporarily so playCommentary can control it
-        playingCommentaryRef.current = false;
-        setIsLoading(true);
-        const chapterText = content.verses.map(v => `${v.verse}. ${v.text}`).join(" ");
-        
-        generateCommentary(content.book, content.chapter, chapterText, commentaryDepth)
-          .then(commentary => {
-            if (commentary && continuePlayingRef.current) {
-              playCommentary(commentary, content.book, content.chapter, 0, moveToNextChapter);
-            } else {
-              setIsLoading(false);
-              moveToNextChapter();
-            }
-          })
-          .catch(() => {
+      generateCommentary(content.book, content.chapter, chapterText, commentaryDepth)
+        .then(commentary => {
+          if (commentary && continuePlayingRef.current) {
+            playCommentary(commentary, content.book, content.chapter, 0, moveToNextChapter);
+          } else {
             setIsLoading(false);
             moveToNextChapter();
-          });
-      }
+          }
+        })
+        .catch(() => {
+          setIsLoading(false);
+          moveToNextChapter();
+        });
     } else {
       console.log("[ChapterComplete] No commentary, moving to next chapter");
       moveToNextChapter();
@@ -1173,8 +1127,6 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
         console.log("[Verse Commentary] 🔒 Flag set, starting commentary generation");
         
         const currentVerse = content.verses[verseIdx];
-        const cacheKey = `verse-${content.book}-${content.chapter}-${currentVerse.verse}-${commentaryVoice}`;
-        const cached = commentaryCache.current.get(cacheKey);
         
         const proceedAfterCommentary = () => {
           // Always check continuePlayingRef before proceeding
@@ -1198,59 +1150,8 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
           }
         };
         
-        if (cached?.audioUrl) {
-          // Use cached commentary with pre-generated audio - instant playback!
-          console.log("[Verse Commentary] Using cached audio for verse", verseIdx + 1);
-          
-          // Flag already set above, just update UI
-          setCommentaryText(cached.text);
-          setIsPlayingCommentary(true);
-          
-          const audio = new Audio(cached.audioUrl);
-          audio.volume = isMuted ? 0 : volume / 100;
-          // Apply playback speed from sequence
-          const playbackSpeed = currentSeq?.playbackSpeed || 1;
-          audio.playbackRate = playbackSpeed;
-          audioRef.current = audio;
-          
-          audio.onended = () => {
-            console.log("[Verse Commentary] Cached audio ended");
-            audioRef.current = null;
-            setIsPlayingCommentary(false);
-            playingCommentaryRef.current = false;
-            setCommentaryText(null);
-            // Add small delay before next verse
-            setTimeout(proceedAfterCommentary, 200);
-          };
-          
-          audio.onerror = (e) => {
-            console.error("[Verse Commentary] Cached audio error:", e);
-            audioRef.current = null;
-            setIsPlayingCommentary(false);
-            playingCommentaryRef.current = false;
-            setCommentaryText(null);
-            setTimeout(proceedAfterCommentary, 200);
-          };
-          
-          audio.play().catch((e) => {
-            console.error("[Verse Commentary] Cached audio play failed:", e);
-            setIsPlayingCommentary(false);
-            playingCommentaryRef.current = false;
-            setCommentaryText(null);
-            setTimeout(proceedAfterCommentary, 200);
-          });
-          return;
-        } else if (cached?.text) {
-          // Have text but no audio - generate TTS only
-          // Reset flag so playCommentary can set it
-          playingCommentaryRef.current = false;
-          console.log("[Verse Commentary] Using cached text, generating audio");
-          playCommentary(cached.text, content.book, content.chapter, currentVerse.verse, proceedAfterCommentary);
-          return;
-        }
-        
-        // Fallback: generate everything with timeout protection
-        console.log("[Verse Commentary] No cache, generating for verse", verseIdx + 1);
+        // Always generate fresh commentary - no cached audio
+        console.log("[Verse Commentary] Generating for verse", verseIdx + 1);
         // Reset flag temporarily so playCommentary can control it
         playingCommentaryRef.current = false;
         setIsLoading(true);
