@@ -116,7 +116,21 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
   const isMobile = useIsMobile();
   const activeSequences = sequences.filter((s) => s.enabled && s.items.length > 0);
   const { speak: speakVerse, stop: stopVerse } = useBrowserSpeech();
-  const { speak: openaiSpeak, stop: openaiStop, isPlaying: openaiPlaying, isLoading: openaiLoading } = useTextToSpeech();
+  
+  // Track when audio playback completes
+  const audioCompletionCallbackRef = useRef<(() => void) | null>(null);
+  
+  const { speak: openaiSpeak, stop: openaiStop, isPlaying: openaiPlaying, isLoading: openaiLoading } = useTextToSpeech({
+    onEnd: () => {
+      console.log("[TTS] Audio playback completed");
+      // Call the stored completion callback if exists
+      if (audioCompletionCallbackRef.current) {
+        const callback = audioCompletionCallbackRef.current;
+        audioCompletionCallbackRef.current = null;
+        callback();
+      }
+    }
+  });
 
   // Keep speech synthesis alive on mobile browsers
   useEffect(() => {
@@ -545,7 +559,7 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
     speakChunk();
   }, []);
 
-  // Play commentary audio with OpenAI TTS only
+  // Play commentary audio with OpenAI TTS only - properly waits for completion
   const playCommentary = useCallback(async (
     text: string, 
     book: string,
@@ -560,8 +574,9 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
       setIsPlayingCommentary(false);
       playingCommentaryRef.current = false;
       setCommentaryText(null);
+      audioCompletionCallbackRef.current = null;
       // Wait a moment for audio to fully stop
-      await new Promise(resolve => setTimeout(resolve, 100));
+      await new Promise(resolve => setTimeout(resolve, 200));
     }
 
     console.log(`[Commentary] Playing OpenAI commentary for ${book} ${chapter}:${verse}`);
@@ -572,6 +587,19 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
 
     try {
       setIsLoading(false);
+      
+      // Store the completion callback - will be called by useTextToSpeech's onEnd
+      audioCompletionCallbackRef.current = () => {
+        console.log("[Commentary] Playback completed, calling onComplete");
+        if (playingCommentaryRef.current) {
+          setIsPlayingCommentary(false);
+          playingCommentaryRef.current = false;
+          setCommentaryText(null);
+          onComplete();
+        }
+      };
+      
+      // Start playback - the completion will be handled by the onEnd callback
       await openaiSpeak(text, {
         voice: 'shimmer', // Use shimmer voice for commentary
         book,
@@ -580,19 +608,14 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
         useCache: true
       });
       
-      // Only complete if we're still supposed to be playing (not interrupted)
-      if (playingCommentaryRef.current) {
-        setIsPlayingCommentary(false);
-        playingCommentaryRef.current = false;
-        setCommentaryText(null);
-        onComplete();
-      }
+      console.log("[Commentary] Audio playback started, waiting for completion...");
     } catch (e) {
       console.error("[Commentary] OpenAI TTS error:", e);
       setIsLoading(false);
       setIsPlayingCommentary(false);
       playingCommentaryRef.current = false;
       setCommentaryText(null);
+      audioCompletionCallbackRef.current = null;
       toast.error("Commentary unavailable, continuing", { duration: 2000 });
       onComplete();
     }
@@ -1076,12 +1099,15 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
       // Don't call notifyTTSStarted here - we do it when sequence starts
     };
     
-    audio.onended = () => {
+    audio.onended = async () => {
       console.log("[Audio] <<< Ended verse:", verseIdx + 1, "| continue:", continuePlayingRef.current, "| isPlaying:", isPlaying, "| isPaused:", isPaused);
       // Don't call notifyTTSStopped here - keep music ducked between verses
       
       // Clear the audio ref immediately
       audioRef.current = null;
+      
+      // Add small delay to ensure verse audio is fully complete before starting commentary
+      await new Promise(resolve => setTimeout(resolve, 300));
       
       if (!continuePlayingRef.current) {
         console.error("[Audio] ❌ UNEXPECTED STOP - continuePlayingRef is false but audio ended naturally!");
