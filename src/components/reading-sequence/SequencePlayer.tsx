@@ -27,7 +27,7 @@ import {
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { ReadingSequenceBlock, SequenceItem } from "@/types/readingSequence";
-import { notifyTTSStarted, notifyTTSStopped } from "@/hooks/useAudioDucking";
+import { notifyTTSStarted, notifyTTSStopped, useAudioDucking, getDuckedVolume } from "@/hooks/useAudioDucking";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { getGlobalMusicVolume } from "@/hooks/useMusicVolumeControl";
 import { OPENAI_VOICES, VoiceId } from "@/hooks/useTextToSpeech";
@@ -182,34 +182,47 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
     console.log("SequencePlayer mounted, refs reset. Active sequences:", activeSequences.length, "Total items:", totalItems);
   }, []);
 
-  // Background music is now always available during playback and is controlled solely by the user volume slider.
+  // Subscribe to audio ducking - music lowers when TTS plays
+  useAudioDucking((ducked, duckRatio) => {
+    if (musicAudioRef.current) {
+      const baseVolume = musicVolume / 100;
+      const finalVolume = getDuckedVolume(baseVolume);
+      musicAudioRef.current.volume = finalVolume;
+      console.log('[SequencePlayer] Audio ducking:', ducked ? 'active' : 'inactive', 'volume:', finalVolume);
+    }
+  });
 
   // Callback ref for music audio - ensures volume is set when element mounts
   const setMusicAudioRef = useCallback((node: HTMLAudioElement | null) => {
     if (node) {
       musicAudioRef.current = node;
-      // Apply current volume immediately
-      node.volume = musicVolume / 100;
-      console.log('[SequencePlayer] Music audio ref set, volume:', musicVolume / 100);
+      // Apply current volume with ducking
+      const baseVolume = musicVolume / 100;
+      const finalVolume = getDuckedVolume(baseVolume);
+      node.volume = finalVolume;
+      console.log('[SequencePlayer] Music audio ref set, volume:', finalVolume);
     }
   }, [musicVolume]);
 
-  // Update music volume directly on ref - critical for mobile
+  // Update music volume when user changes it - apply ducking
   useEffect(() => {
     if (musicAudioRef.current) {
-      const vol = musicVolume / 100;
-      musicAudioRef.current.volume = vol;
-      console.log('[SequencePlayer] Music volume effect applied:', vol);
+      const baseVolume = musicVolume / 100;
+      const finalVolume = getDuckedVolume(baseVolume);
+      musicAudioRef.current.volume = finalVolume;
+      console.log('[SequencePlayer] Music volume updated:', finalVolume);
     }
   }, [musicVolume]);
 
-  // Start/pause music based on playback
+  // Start/pause music based on playback - always play at ducked volume
   useEffect(() => {
     if (!musicAudioRef.current) return;
 
     if (isPlaying && !isPaused && musicVolume > 0) {
-      console.log("[Music] Starting background music, volume:", musicVolume);
-      musicAudioRef.current.volume = musicVolume / 100;
+      const baseVolume = musicVolume / 100;
+      const finalVolume = getDuckedVolume(baseVolume);
+      musicAudioRef.current.volume = finalVolume;
+      console.log("[Music] Starting background music, volume:", finalVolume);
       musicAudioRef.current.play().catch((err) => {
         console.error("[Music] Failed to start:", err);
       });
