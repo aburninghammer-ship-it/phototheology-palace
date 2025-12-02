@@ -16,14 +16,18 @@ import {
   Sparkles,
   ArrowLeft,
   ListMusic,
+  Crown,
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { SequenceBlockBuilder } from "@/components/reading-sequence/SequenceBlockBuilder";
 import { SequencePlayer } from "@/components/reading-sequence/SequencePlayer";
 import { SavedSequencesList } from "@/components/reading-sequence/SavedSequencesList";
 import { PresetSequences } from "@/components/reading-sequence/PresetSequences";
+import { SampleAudioLibrary } from "@/components/reading-sequence/SampleAudioLibrary";
 import { useReadingSequences } from "@/hooks/useReadingSequences";
 import { useAuth } from "@/hooks/useAuth";
+import { useSubscription } from "@/hooks/useSubscription";
+import { PremiumBadge } from "@/components/PremiumBadge";
 import { ReadingSequenceBlock, ROOM_TAG_OPTIONS, SavedReadingSequence, SequenceItem } from "@/types/readingSequence";
 import { VoiceId } from "@/hooks/useTextToSpeech";
 import { toast } from "sonner";
@@ -40,6 +44,7 @@ const createEmptyBlock = (sequenceNumber: number): ReadingSequenceBlock => ({
 
 export default function ReadMeTheBible() {
   const { user } = useAuth();
+  const { subscription } = useSubscription();
   const {
     savedSequences,
     isLoading,
@@ -49,13 +54,16 @@ export default function ReadMeTheBible() {
     incrementPlayCount,
   } = useReadingSequences();
 
-  const [activeTab, setActiveTab] = useState("create");
+  const [activeTab, setActiveTab] = useState(subscription.hasAccess ? "create" : "samples");
   const [sequenceName, setSequenceName] = useState("");
   const [sequenceDescription, setSequenceDescription] = useState("");
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [sequences, setSequences] = useState<ReadingSequenceBlock[]>([createEmptyBlock(1)]);
   const [isPlaying, setIsPlaying] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
+  const [sampleSequences, setSampleSequences] = useState<ReadingSequenceBlock[] | null>(null);
+
+  const hasPremiumAccess = subscription.hasAccess;
 
   const addSequenceBlock = () => {
     if (sequences.length >= 5) {
@@ -111,10 +119,19 @@ export default function ReadMeTheBible() {
   };
 
   const handlePlay = (seq?: SavedReadingSequence) => {
+    if (!hasPremiumAccess) {
+      toast.error("Audio reader requires a premium subscription");
+      return;
+    }
     if (seq) {
       setSequences(seq.sequences);
       incrementPlayCount(seq.id);
     }
+    setIsPlaying(true);
+  };
+
+  const handlePlaySample = (sequences: ReadingSequenceBlock[]) => {
+    setSampleSequences(sequences);
     setIsPlaying(true);
   };
 
@@ -160,16 +177,27 @@ export default function ReadMeTheBible() {
   const totalChapters = sequences.reduce((acc, s) => acc + (s.enabled ? s.items.length : 0), 0);
 
   if (isPlaying) {
+    const playingSequences = sampleSequences || sequences;
     return (
       <div className="min-h-screen bg-gradient-subtle">
         <Navigation />
         <div className="container mx-auto px-4 py-8 max-w-4xl">
-          <Button variant="ghost" onClick={() => setIsPlaying(false)} className="mb-6 glass-card">
+          <Button 
+            variant="ghost" 
+            onClick={() => {
+              setIsPlaying(false);
+              setSampleSequences(null);
+            }} 
+            className="mb-6 glass-card"
+          >
             <ArrowLeft className="mr-2 h-4 w-4" />
-            Back to Builder
+            Back to {sampleSequences ? "Samples" : "Builder"}
           </Button>
           <div className="glass-card p-6 rounded-xl">
-            <SequencePlayer sequences={sequences} onClose={() => setIsPlaying(false)} />
+            <SequencePlayer sequences={playingSequences} onClose={() => {
+              setIsPlaying(false);
+              setSampleSequences(null);
+            }} />
           </div>
         </div>
       </div>
@@ -213,15 +241,32 @@ export default function ReadMeTheBible() {
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <TabsList className="glass-card grid w-full max-w-md grid-cols-2 p-1 bg-background/50 backdrop-blur-xl border border-white/10">
-            <TabsTrigger value="create" className="gap-2 data-[state=active]:bg-primary/20 data-[state=active]:text-primary">
-              <Plus className="h-4 w-4" />
-              {editingId ? "Edit Sequence" : "Create Sequence"}
+          <TabsList className="glass-card grid w-full max-w-2xl grid-cols-3 p-1 bg-background/50 backdrop-blur-xl border border-white/10">
+            <TabsTrigger 
+              value="samples" 
+              className="gap-2 data-[state=active]:bg-primary/20 data-[state=active]:text-primary"
+            >
+              <Headphones className="h-4 w-4" />
+              Free Samples
             </TabsTrigger>
-            <TabsTrigger value="saved" className="gap-2 data-[state=active]:bg-primary/20 data-[state=active]:text-primary">
+            <TabsTrigger 
+              value="create" 
+              className="gap-2 data-[state=active]:bg-primary/20 data-[state=active]:text-primary"
+              disabled={!hasPremiumAccess}
+            >
+              <Plus className="h-4 w-4" />
+              {editingId ? "Edit" : "Create"}
+              {!hasPremiumAccess && <Crown className="h-3 w-3 ml-1 text-yellow-600" />}
+            </TabsTrigger>
+            <TabsTrigger 
+              value="saved" 
+              className="gap-2 data-[state=active]:bg-primary/20 data-[state=active]:text-primary"
+              disabled={!hasPremiumAccess}
+            >
               <ListMusic className="h-4 w-4" />
               My Sequences
-              {savedSequences.length > 0 && (
+              {!hasPremiumAccess && <Crown className="h-3 w-3 ml-1 text-yellow-600" />}
+              {savedSequences.length > 0 && hasPremiumAccess && (
                 <Badge variant="secondary" className="ml-1">
                   {savedSequences.length}
                 </Badge>
@@ -229,16 +274,63 @@ export default function ReadMeTheBible() {
             </TabsTrigger>
           </TabsList>
 
+          <TabsContent value="samples">
+            <SampleAudioLibrary onPlaySample={handlePlaySample} />
+            {!hasPremiumAccess && (
+              <div className="glass-card p-6 rounded-xl mt-4 border-2 border-primary/30">
+                <div className="flex items-start gap-4">
+                  <div className="p-3 rounded-lg bg-gradient-to-r from-yellow-500/20 to-amber-500/20">
+                    <Crown className="h-6 w-6 text-yellow-600" />
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="text-xl font-semibold mb-2">Unlock Full Audio Library</h3>
+                    <p className="text-muted-foreground mb-4">
+                      Get unlimited access to all 1,189 chapters with custom sequences, multiple voices, commentary, and background music.
+                    </p>
+                    <Link to="/pricing">
+                      <Button className="bg-gradient-to-r from-yellow-600 to-amber-600 hover:from-yellow-700 hover:to-amber-700">
+                        <Crown className="mr-2 h-4 w-4" />
+                        Upgrade to Premium
+                      </Button>
+                    </Link>
+                  </div>
+                </div>
+              </div>
+            )}
+          </TabsContent>
+
           <TabsContent value="create" className="space-y-6">
+            {!hasPremiumAccess && (
+              <div className="glass-card p-6 rounded-xl border-2 border-primary/30">
+                <div className="flex items-center gap-3 mb-2">
+                  <Crown className="h-5 w-5 text-yellow-600" />
+                  <h3 className="text-lg font-semibold">Premium Feature</h3>
+                  <PremiumBadge inline />
+                </div>
+                <p className="text-muted-foreground mb-4">
+                  Creating custom audio sequences requires a premium subscription. Try our free samples first!
+                </p>
+                <Link to="/pricing">
+                  <Button>
+                    <Crown className="mr-2 h-4 w-4" />
+                    Upgrade to Premium
+                  </Button>
+                </Link>
+              </div>
+            )}
+            
             {/* Presets */}
-            <div className="glass-card p-4 rounded-xl">
-              <PresetSequences 
-                onAddToSequence={handleAddToSequence} 
-                currentSequences={sequences}
-              />
-            </div>
+            {hasPremiumAccess && (
+              <div className="glass-card p-4 rounded-xl">
+                <PresetSequences 
+                  onAddToSequence={handleAddToSequence} 
+                  currentSequences={sequences}
+                />
+              </div>
+            )}
 
             {/* Sequence Info */}
+            {hasPremiumAccess && (
             <Card className="glass-card border-white/10 bg-card/50 backdrop-blur-xl">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
@@ -285,8 +377,10 @@ export default function ReadMeTheBible() {
                 </div>
               </CardContent>
             </Card>
+            )}
 
             {/* Sequence Blocks */}
+            {hasPremiumAccess && (
             <div className="space-y-4">
               <div className="glass-card p-4 rounded-xl flex items-center justify-between">
                 <h3 className="text-lg font-semibold flex items-center gap-2">
@@ -313,8 +407,10 @@ export default function ReadMeTheBible() {
                 />
               ))}
             </div>
+            )}
 
             {/* Actions */}
+            {hasPremiumAccess && (
             <div className="glass-card p-4 rounded-xl flex flex-wrap gap-3 justify-between items-center">
               <Button
                 size="lg"
@@ -339,9 +435,28 @@ export default function ReadMeTheBible() {
                 )}
               </div>
             </div>
+            )}
           </TabsContent>
 
           <TabsContent value="saved">
+            {!hasPremiumAccess ? (
+              <div className="glass-card p-6 rounded-xl border-2 border-primary/30">
+                <div className="flex items-center gap-3 mb-2">
+                  <Crown className="h-5 w-5 text-yellow-600" />
+                  <h3 className="text-lg font-semibold">Premium Feature</h3>
+                  <PremiumBadge inline />
+                </div>
+                <p className="text-muted-foreground mb-4">
+                  Saving and managing custom sequences requires a premium subscription.
+                </p>
+                <Link to="/pricing">
+                  <Button>
+                    <Crown className="mr-2 h-4 w-4" />
+                    Upgrade to Premium
+                  </Button>
+                </Link>
+              </div>
+            ) : (
             <div className="glass-card p-4 rounded-xl">
               <SavedSequencesList
               sequences={savedSequences}
@@ -352,6 +467,7 @@ export default function ReadMeTheBible() {
                 onDuplicate={handleDuplicate}
               />
             </div>
+            )}
           </TabsContent>
         </Tabs>
       </div>
