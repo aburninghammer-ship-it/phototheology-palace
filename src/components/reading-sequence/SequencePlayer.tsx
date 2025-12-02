@@ -1838,25 +1838,85 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
     ? ((currentVerseIdx + 1) / chapterContent.verses.length) * 100
     : 0;
 
-  // Music URL - use cached version when offline
-  // Using peaceful ambient track without bells/chimes
-  const [musicUrl, setMusicUrl] = useState("https://cdn.pixabay.com/download/audio/2022/03/15/audio_8e5e3b4b5a.mp3");
-  
+  // Background music playlist - tracks from AmbientMusicPlayer
+  const AMBIENT_TRACKS = [
+    {
+      id: "eternal-echoes",
+      name: "Eternal Echoes",
+      url: "https://cdn1.suno.ai/ea711d82-cd6a-4ebd-a960-b73cb72c39f0.mp3",
+    },
+    {
+      id: "amazing-grace-epic",
+      name: "Amazing Grace (Epic Meditative Remix)",
+      url: "https://cdn1.suno.ai/a362b171-5a6f-4264-8946-ae76b09a6aa7.mp3",
+    },
+    {
+      id: "when-he-cometh",
+      name: "When He Cometh Reimagined",
+      url: "https://cdn1.suno.ai/617f1da9-1bfb-4a93-8485-08f432623d2e.mp3",
+    },
+    {
+      id: "flight",
+      name: "Flight",
+      url: "https://cdn1.suno.ai/qWAdsQQdcbYPv9kC.mp3",
+    },
+    {
+      id: "whispers-inner-mind",
+      name: "Whispers of the Inner Mind",
+      url: "https://cdn1.suno.ai/E8qISnskB0iJ5bnz.mp3",
+    },
+  ];
+
+  // Selected tracks for playlist (use all by default, stored in localStorage)
+  const [selectedTracks] = useState<Set<string>>(() => {
+    const saved = localStorage.getItem("pt-ambient-selected-tracks");
+    if (saved) {
+      try {
+        return new Set(JSON.parse(saved));
+      } catch {
+        return new Set(AMBIENT_TRACKS.map(t => t.id));
+      }
+    }
+    return new Set(AMBIENT_TRACKS.map(t => t.id)); // All tracks selected by default
+  });
+
+  const [currentTrackId, setCurrentTrackId] = useState<string>(() => {
+    const playableTracks = AMBIENT_TRACKS.filter(t => selectedTracks.has(t.id));
+    return playableTracks.length > 0 ? playableTracks[0].id : AMBIENT_TRACKS[0].id;
+  });
+
+  const currentTrack = AMBIENT_TRACKS.find(t => t.id === currentTrackId) || AMBIENT_TRACKS[0];
+  const [musicUrl, setMusicUrl] = useState(currentTrack.url);
+
+  // Move to next track in playlist
+  const nextMusicTrack = useCallback(() => {
+    const playableTracks = AMBIENT_TRACKS.filter(t => selectedTracks.has(t.id));
+    if (playableTracks.length === 0) return;
+    
+    const currentIndex = playableTracks.findIndex(t => t.id === currentTrackId);
+    const nextIndex = (currentIndex + 1) % playableTracks.length;
+    const nextTrack = playableTracks[nextIndex];
+    
+    console.log("[Music] Moving to next track:", nextTrack.name);
+    setCurrentTrackId(nextTrack.id);
+    setMusicUrl(nextTrack.url);
+  }, [currentTrackId, selectedTracks, AMBIENT_TRACKS]);
+
+  // Load music URL for offline mode
   useEffect(() => {
     const loadMusicUrl = async () => {
-      const defaultUrl = "https://cdn.pixabay.com/download/audio/2022/03/15/audio_8e5e3b4b5a.mp3";
       if (offlineMode || !isOnline()) {
-        const cached = await getCachedMusicTrack(defaultUrl);
+        const cached = await getCachedMusicTrack(currentTrack.url);
         if (cached) {
-          console.log("[Music] Using cached music track");
+          console.log("[Music] Using cached music track:", currentTrack.name);
           setMusicUrl(cached);
         }
       } else {
-        setMusicUrl(defaultUrl);
+        setMusicUrl(currentTrack.url);
       }
     };
     loadMusicUrl();
-  }, [offlineMode]);
+  }, [offlineMode, currentTrack]);
 
   return (
     <>
@@ -1864,11 +1924,20 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
       <audio
         ref={setMusicAudioRef}
         src={musicUrl}
-        loop
         preload="auto"
         onLoadedData={(e) => {
           const audio = e.currentTarget;
           audio.volume = musicVolume / 100;
+        }}
+        onEnded={() => {
+          console.log("[Music] Track ended, playing next");
+          nextMusicTrack();
+          // Auto-play next track after brief delay
+          setTimeout(() => {
+            if (musicAudioRef.current && isPlaying && !isPaused) {
+              musicAudioRef.current.play().catch(console.error);
+            }
+          }, 100);
         }}
       />
       <Card className="overflow-hidden glass-card border-white/10 bg-card/50 backdrop-blur-xl">
