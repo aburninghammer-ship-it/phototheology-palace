@@ -15,7 +15,7 @@ serve(async (req) => {
   try {
     const { text, book, chapter, verse } = await req.json();
     
-    if (!text || !book || !chapter || !verse) {
+    if (!text || !book || chapter === undefined || chapter === null || verse === undefined || verse === null) {
       throw new Error('text, book, chapter, and verse are required');
     }
 
