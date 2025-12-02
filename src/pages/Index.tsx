@@ -36,6 +36,8 @@ import { ExplainerVideo } from "@/components/ExplainerVideo";
 import { WhatPhototheologyDoes } from "@/components/WhatPhototheologyDoes";
 import { InsideThePalace } from "@/components/InsideThePalace";
 import { ComparisonChart } from "@/components/ComparisonChart";
+import { ExitIntentPopup } from "@/components/retention/ExitIntentPopup";
+import { SessionTracker } from "@/components/analytics/SessionTracker";
 
 const Index = () => {
   const navigate = useNavigate();
@@ -67,6 +69,8 @@ const Index = () => {
         description="Master Bible study through the 8-floor Palace method. Store Scripture as images, patterns, and structures with Christ-centered interpretation."
       />
       {preferences.navigation_style === "simplified" ? <SimplifiedNav /> : <Navigation />}
+      <SessionTracker />
+      <ExitIntentPopup />
       
       {/* Install App Banner */}
       {showInstallBanner && (
