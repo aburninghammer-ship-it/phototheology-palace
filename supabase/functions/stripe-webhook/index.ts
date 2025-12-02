@@ -43,8 +43,93 @@ serve(async (req) => {
         const session = receivedEvent.data.object as Stripe.Checkout.Session;
         const metadata = session.metadata;
 
-        if (!metadata || !metadata.user_id || !metadata.tier) {
-          console.error('Missing metadata in session');
+        if (!metadata || !metadata.user_id) {
+          console.error('Missing user_id in session metadata');
+          break;
+        }
+
+        // Check if this is an INDIVIDUAL subscription (not a church)
+        // Individual subscriptions have is_trial or no church_name
+        const isIndividualSubscription = metadata.is_trial === 'true' || !metadata.church_name;
+
+        if (isIndividualSubscription) {
+          // Handle individual premium subscription
+          console.log(`Processing individual subscription for user ${metadata.user_id}`);
+          
+          const tier = metadata.tier || 'premium';
+          const subscription = session.subscription 
+            ? await stripe.subscriptions.retrieve(session.subscription as string)
+            : null;
+          
+          const renewalDate = subscription 
+            ? new Date(subscription.current_period_end * 1000)
+            : null;
+          
+          // Determine if user is in trial
+          const isInTrial = subscription?.status === 'trialing';
+          const trialEnd = subscription?.trial_end 
+            ? new Date(subscription.trial_end * 1000)
+            : null;
+
+          // Update user profile with subscription
+          const updateData: Record<string, any> = {
+            subscription_status: isInTrial ? 'trial' : 'active',
+            subscription_tier: tier,
+            stripe_customer_id: session.customer as string,
+            stripe_subscription_id: subscription?.id || null,
+            payment_source: 'stripe',
+            is_recurring: true,
+          };
+
+          if (renewalDate) {
+            updateData.subscription_renewal_date = renewalDate.toISOString();
+          }
+
+          if (trialEnd) {
+            updateData.trial_ends_at = trialEnd.toISOString();
+          }
+
+          const { error: profileError } = await supabase
+            .from('profiles')
+            .update(updateData)
+            .eq('id', metadata.user_id);
+
+          if (profileError) {
+            console.error('Error updating profile for individual subscription:', profileError);
+          } else {
+            console.log(`Individual subscription activated for user ${metadata.user_id}, tier: ${tier}, status: ${isInTrial ? 'trial' : 'active'}`);
+          }
+
+          // Send purchase notification email
+          try {
+            const { data: profile } = await supabase
+              .from('profiles')
+              .select('display_name, email')
+              .eq('id', metadata.user_id)
+              .single();
+
+            if (profile?.email) {
+              await supabase.functions.invoke('send-purchase-notification', {
+                body: {
+                  userEmail: profile.email,
+                  userName: profile.display_name || 'User',
+                  amount: session.amount_total || 0,
+                  currency: session.currency || 'usd',
+                  product: `${tier.charAt(0).toUpperCase() + tier.slice(1)} Subscription`,
+                  subscriptionTier: tier,
+                }
+              });
+            }
+          } catch (emailError) {
+            console.error('Failed to send purchase notification:', emailError);
+          }
+
+          break;
+        }
+
+        // Handle CHURCH subscription (original logic)
+        if (!metadata.tier || !metadata.church_name) {
+          console.error('Missing tier or church_name in church subscription metadata');
           break;
         }
 
@@ -61,8 +146,8 @@ serve(async (req) => {
         }
 
         // Get subscription details
-        const subscription = await stripe.subscriptions.retrieve(session.subscription as string);
-        const renewalDate = new Date(subscription.current_period_end * 1000);
+        const churchSubscription = await stripe.subscriptions.retrieve(session.subscription as string);
+        const churchRenewalDate = new Date(churchSubscription.current_period_end * 1000);
 
         // Create church
         const { data: church, error: churchError } = await supabase
@@ -75,7 +160,7 @@ serve(async (req) => {
             contact_person: metadata.contact_person || null,
             contact_phone: metadata.contact_phone || null,
             subscription_status: 'active',
-            subscription_ends_at: renewalDate.toISOString(),
+            subscription_ends_at: churchRenewalDate.toISOString(),
             stripe_customer_id: session.customer as string,
           })
           .select()
@@ -97,7 +182,6 @@ serve(async (req) => {
 
         if (memberError) {
           console.error('Error adding admin member:', memberError);
-          // Rollback: delete the church
           await supabase.from('churches').delete().eq('id', church.id);
           break;
         }
@@ -122,32 +206,6 @@ serve(async (req) => {
           });
         } catch (emailError) {
           console.error('Failed to send purchase notification:', emailError);
-          // Don't fail the whole operation if email fails
-        }
-
-        // Get subscription details to set renewal date
-        if (session.subscription) {
-          try {
-            const subscription = await stripe.subscriptions.retrieve(session.subscription as string);
-            if (subscription.current_period_end) {
-              const renewalDate = new Date(subscription.current_period_end * 1000);
-              
-              // Update user profile with renewal date and payment tracking
-              await supabase
-                .from('profiles')
-                .update({
-                  subscription_renewal_date: renewalDate.toISOString(),
-                  payment_source: 'stripe',
-                  stripe_subscription_id: subscription.id,
-                  is_recurring: true
-                })
-                .eq('id', metadata.user_id);
-              
-              console.log(`Set renewal date for user ${metadata.user_id}: ${renewalDate.toISOString()}`);
-            }
-          } catch (subError) {
-            console.error('Error fetching subscription details:', subError);
-          }
         }
 
         console.log(`Church created successfully: ${church.id}`);
@@ -158,20 +216,60 @@ serve(async (req) => {
         const subscription = receivedEvent.data.object as Stripe.Subscription;
         const customerId = subscription.customer as string;
         const renewalDate = new Date(subscription.current_period_end * 1000);
+        const isActive = subscription.status === 'active' || subscription.status === 'trialing';
 
-        // Update church subscription status and renewal date
-        const { error } = await supabase
+        // Try to update church subscription
+        const { data: church } = await supabase
           .from('churches')
-          .update({
-            subscription_status: subscription.status === 'active' ? 'active' : 'cancelled',
-            subscription_ends_at: renewalDate.toISOString(),
-          })
-          .eq('stripe_customer_id', customerId);
+          .select('id')
+          .eq('stripe_customer_id', customerId)
+          .single();
 
-        if (error) {
-          console.error('Error updating subscription:', error);
-        } else {
-          console.log(`Subscription updated for customer ${customerId}: ${subscription.status}, renewal: ${renewalDate.toISOString()}`);
+        if (church) {
+          // Update church subscription
+          const { error } = await supabase
+            .from('churches')
+            .update({
+              subscription_status: subscription.status === 'active' ? 'active' : 'cancelled',
+              subscription_ends_at: renewalDate.toISOString(),
+            })
+            .eq('stripe_customer_id', customerId);
+
+          if (error) {
+            console.error('Error updating church subscription:', error);
+          } else {
+            console.log(`Church subscription updated for customer ${customerId}`);
+          }
+        }
+
+        // Also update individual profile if exists
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('id')
+          .eq('stripe_customer_id', customerId)
+          .single();
+
+        if (profile) {
+          const updateData: Record<string, any> = {
+            subscription_status: subscription.status === 'trialing' ? 'trial' : (isActive ? 'active' : 'cancelled'),
+            subscription_renewal_date: renewalDate.toISOString(),
+          };
+
+          // Update trial_ends_at if in trial
+          if (subscription.trial_end) {
+            updateData.trial_ends_at = new Date(subscription.trial_end * 1000).toISOString();
+          }
+
+          const { error } = await supabase
+            .from('profiles')
+            .update(updateData)
+            .eq('stripe_customer_id', customerId);
+
+          if (error) {
+            console.error('Error updating profile subscription:', error);
+          } else {
+            console.log(`Profile subscription updated for customer ${customerId}: ${subscription.status}`);
+          }
         }
         break;
       }
@@ -194,18 +292,19 @@ serve(async (req) => {
           console.log(`Church subscription cancelled for customer ${customerId}`);
         }
 
-        // Mark user profile with cancellation date for data deletion after 30 days
+        // Mark individual profile subscription as cancelled
         const { error: profileError } = await supabase
           .from('profiles')
           .update({
+            subscription_status: 'cancelled',
             subscription_cancelled_at: new Date().toISOString(),
           })
           .eq('stripe_customer_id', customerId);
 
         if (profileError) {
-          console.error('Error tracking cancellation date:', profileError);
+          console.error('Error cancelling profile subscription:', profileError);
         } else {
-          console.log(`Cancellation tracked for customer ${customerId}, data will be deleted after 30 days`);
+          console.log(`Profile subscription cancelled for customer ${customerId}`);
         }
         break;
       }
@@ -215,17 +314,41 @@ serve(async (req) => {
         const customerId = invoice.customer as string;
 
         // Mark church subscription as past_due
-        const { error } = await supabase
+        await supabase
           .from('churches')
-          .update({
-            subscription_status: 'past_due',
-          })
+          .update({ subscription_status: 'past_due' })
           .eq('stripe_customer_id', customerId);
 
-        if (error) {
-          console.error('Error updating failed payment:', error);
-        } else {
-          console.log(`Payment failed for customer ${customerId}`);
+        // Mark individual profile as past_due
+        await supabase
+          .from('profiles')
+          .update({ subscription_status: 'expired' })
+          .eq('stripe_customer_id', customerId);
+
+        console.log(`Payment failed for customer ${customerId}`);
+        break;
+      }
+
+      case 'invoice.payment_succeeded': {
+        // Handle successful renewal payments
+        const invoice = receivedEvent.data.object as Stripe.Invoice;
+        const customerId = invoice.customer as string;
+
+        if (invoice.subscription) {
+          const subscription = await stripe.subscriptions.retrieve(invoice.subscription as string);
+          const renewalDate = new Date(subscription.current_period_end * 1000);
+          const isActive = subscription.status === 'active' || subscription.status === 'trialing';
+
+          // Update profile with new renewal date
+          await supabase
+            .from('profiles')
+            .update({
+              subscription_status: isActive ? 'active' : subscription.status,
+              subscription_renewal_date: renewalDate.toISOString(),
+            })
+            .eq('stripe_customer_id', customerId);
+
+          console.log(`Payment succeeded, renewal date updated for customer ${customerId}`);
         }
         break;
       }
