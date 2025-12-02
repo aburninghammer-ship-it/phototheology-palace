@@ -327,19 +327,26 @@ export const SequenceBlockBuilder = ({ block, onChange, onRemove }: SequenceBloc
               </div>
             )}
 
-            {/* Selection Mode Tabs */}
+            {/* Selection Mode Tabs - Limited to single chapter when Commentary Only is enabled */}
             <div className="space-y-3">
-              <Tabs value={selectionMode} onValueChange={(v) => setSelectionMode(v as SelectionMode)}>
-                <TabsList className="grid w-full grid-cols-4 h-9">
-                  <TabsTrigger value="single" className="text-xs">Single Chapter</TabsTrigger>
-                  <TabsTrigger value="chapters" className="text-xs">Chapter Range</TabsTrigger>
-                  <TabsTrigger value="book" className="text-xs">Whole Book</TabsTrigger>
-                  <TabsTrigger value="books" className="text-xs">Book Range</TabsTrigger>
-                </TabsList>
-              </Tabs>
+              {block.commentaryOnly ? (
+                <div className="text-sm text-muted-foreground bg-muted/30 p-2 rounded-md flex items-center gap-2">
+                  <span className="text-primary">📖</span>
+                  Commentary Only mode: Limited to single chapter for faster loading
+                </div>
+              ) : (
+                <Tabs value={selectionMode} onValueChange={(v) => setSelectionMode(v as SelectionMode)}>
+                  <TabsList className="grid w-full grid-cols-4 h-9">
+                    <TabsTrigger value="single" className="text-xs">Single Chapter</TabsTrigger>
+                    <TabsTrigger value="chapters" className="text-xs">Chapter Range</TabsTrigger>
+                    <TabsTrigger value="book" className="text-xs">Whole Book</TabsTrigger>
+                    <TabsTrigger value="books" className="text-xs">Book Range</TabsTrigger>
+                  </TabsList>
+                </Tabs>
+              )}
 
-              {/* Single Chapter */}
-              {selectionMode === "single" && (
+              {/* Single Chapter - Always shown when commentaryOnly, otherwise only when selectionMode is single */}
+              {(block.commentaryOnly || selectionMode === "single") && (
                 <div className="flex gap-2 items-end">
                   <div className="flex-1">
                     <Label className="text-xs text-muted-foreground">Book</Label>
@@ -375,15 +382,27 @@ export const SequenceBlockBuilder = ({ block, onChange, onRemove }: SequenceBloc
                       </SelectContent>
                     </Select>
                   </div>
-                  <Button onClick={handleAdd} disabled={!newBook} size="sm">
+                  <Button 
+                    onClick={() => {
+                      // In commentaryOnly mode, clear existing items before adding
+                      if (block.commentaryOnly && block.items.length > 0) {
+                        onChange({ ...block, items: [] });
+                        setTimeout(() => addSingleChapter(), 0);
+                      } else {
+                        addSingleChapter();
+                      }
+                    }} 
+                    disabled={!newBook || (block.commentaryOnly && block.items.length >= 1)} 
+                    size="sm"
+                  >
                     <Plus className="h-4 w-4 mr-1" />
-                    Add
+                    {block.commentaryOnly && block.items.length >= 1 ? "1 Chapter Max" : "Add"}
                   </Button>
                 </div>
               )}
 
-              {/* Chapter Range */}
-              {selectionMode === "chapters" && (
+              {/* Chapter Range - Hidden when commentaryOnly */}
+              {!block.commentaryOnly && selectionMode === "chapters" && (
                 <div className="flex gap-2 items-end flex-wrap">
                   <div className="flex-1 min-w-[150px]">
                     <Label className="text-xs text-muted-foreground">Book</Label>
@@ -451,8 +470,8 @@ export const SequenceBlockBuilder = ({ block, onChange, onRemove }: SequenceBloc
                 </div>
               )}
 
-              {/* Whole Book */}
-              {selectionMode === "book" && (
+              {/* Whole Book - Hidden when commentaryOnly */}
+              {!block.commentaryOnly && selectionMode === "book" && (
                 <div className="flex gap-2 items-end">
                   <div className="flex-1">
                     <Label className="text-xs text-muted-foreground">Book</Label>
@@ -476,8 +495,8 @@ export const SequenceBlockBuilder = ({ block, onChange, onRemove }: SequenceBloc
                 </div>
               )}
 
-              {/* Book Range */}
-              {selectionMode === "books" && (
+              {/* Book Range - Hidden when commentaryOnly */}
+              {!block.commentaryOnly && selectionMode === "books" && (
                 <div className="flex gap-2 items-end flex-wrap">
                   <div className="flex-1 min-w-[150px]">
                     <Label className="text-xs text-muted-foreground">From Book</Label>
@@ -602,7 +621,19 @@ export const SequenceBlockBuilder = ({ block, onChange, onRemove }: SequenceBloc
                     <Switch
                       id="commentary-only"
                       checked={block.commentaryOnly || false}
-                      onCheckedChange={(checked) => onChange({ ...block, commentaryOnly: checked })}
+                      onCheckedChange={(checked) => {
+                        // When enabling commentary only, limit to 1 chapter max
+                        if (checked && block.items.length > 1) {
+                          onChange({ 
+                            ...block, 
+                            commentaryOnly: checked,
+                            items: block.items.slice(0, 1) // Keep only first chapter
+                          });
+                          toast.info("Commentary Only mode limited to 1 chapter for faster loading");
+                        } else {
+                          onChange({ ...block, commentaryOnly: checked });
+                        }
+                      }}
                     />
                   </div>
                   
