@@ -186,9 +186,9 @@ export function AmbientMusicPlayer({
     // Read from new key (0-100 scale) and convert to 0-1
     const saved = localStorage.getItem("pt-music-volume-pct");
     if (saved) {
-      return Math.min(parseInt(saved, 10), 30) / 100;
+      return Math.min(parseInt(saved, 10), 60) / 100;
     }
-    return 0.20; // Default 20%
+    return 0.40; // Default 40%
   });
   const [isMuted, setIsMuted] = useState(false);
   const [currentTrackId, setCurrentTrackId] = useState(() => {
@@ -394,7 +394,7 @@ export function AmbientMusicPlayer({
   }, [isEnabled]);
 
   // Listen for global volume control changes (allows other components like SequencePlayer to control music volume)
-  // SequencePlayer sends 0-30 scale, so we convert to 0-1 by dividing by 100
+  // SequencePlayer sends 0-30 scale, so we convert to 0-0.60 (capped at 60%)
   const isInitialMount = useRef(true);
   useEffect(() => {
     const unsubscribe = subscribeToMusicVolume((newVolume) => {
@@ -403,8 +403,8 @@ export function AmbientMusicPlayer({
         isInitialMount.current = false;
         return;
       }
-      // Convert from 0-30 scale to 0-0.30 (capped at 30%)
-      const normalizedVolume = Math.min(newVolume, 30) / 100;
+      // Convert from 0-60 scale to 0-0.60 (capped at 60%)
+      const normalizedVolume = Math.min(newVolume, 60) / 100;
       console.log('[AmbientMusic] Global volume update:', newVolume, '-> normalized:', normalizedVolume);
       setVolume(normalizedVolume);
     });
@@ -582,9 +582,9 @@ export function AmbientMusicPlayer({
   const setVolumePreset = (preset: 'off' | 'low' | 'med' | 'high') => {
     const presetValues = {
       off: 0,
-      low: 0.05,
-      med: 0.15,
-      high: 0.30
+      low: 0.10,
+      med: 0.30,
+      high: 0.60
     };
     const newVolume = presetValues[preset];
     const effectiveVolume = newVolume * duckMultiplier;
@@ -610,8 +610,8 @@ export function AmbientMusicPlayer({
   // Get current preset level
   const getCurrentPreset = (): 'off' | 'low' | 'med' | 'high' => {
     if (isMuted || volume === 0) return 'off';
-    if (volume <= 0.08) return 'low';
-    if (volume <= 0.20) return 'med';
+    if (volume <= 0.15) return 'low';
+    if (volume <= 0.40) return 'med';
     return 'high';
   };
 
