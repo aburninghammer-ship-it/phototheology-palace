@@ -18,6 +18,7 @@ import { SplashScreen } from "@/components/SplashScreen";
 import { AnimatePresence } from "framer-motion";
 import { ThemeProvider } from "next-themes";
 import { UserPreferencesProvider } from "@/hooks/useUserPreferences";
+import { ProcessTrackingProvider } from "@/contexts/ProcessTrackingContext";
 import { AnnouncementBanner } from "@/components/AnnouncementBanner";
 import { VoiceChatInviteNotification } from "@/components/voice/VoiceChatInviteNotification";
 import { PageTracker } from "@/components/PageTracker";
@@ -223,7 +224,8 @@ function App() {
           {!showSplash && (
             <BrowserRouter>
               <PageTracker />
-              <LiveNotificationsProvider>
+              <ProcessTrackingProvider>
+                <LiveNotificationsProvider>
                 <AchievementProvider>
                   <DirectMessagesProvider>
                     <UserPreferencesProvider>
@@ -474,6 +476,7 @@ function App() {
             </DirectMessagesProvider>
           </AchievementProvider>
         </LiveNotificationsProvider>
+        </ProcessTrackingProvider>
       </BrowserRouter>
           )}
         </TooltipProvider>
