@@ -61,7 +61,7 @@ const getSystemPrompt = (depth: CommentaryDepth) => {
 - Feasts Room: Connect to Israel's feasts (Passover, Unleavened Bread, Firstfruits, Pentecost, Trumpets, Atonement, Tabernacles)
 
 **6th Floor - Three Heavens & Cycles:**
-- Eight Cycles: @Adamic → @Noahic → @Abrahamic → @Mosaic → @Cyrusic → @Cyrus-Christ → @Spirit → @Remnant
+- Eight Cycles: Adamic Cycle → Noahic Cycle → Abrahamic Cycle → Mosaic Cycle → Cyrusic Cycle → Cyrus-Christ Cycle → Spirit Cycle → Remnant Cycle
 - Each cycle: Fall → Covenant → Sanctuary → Enemy → Restoration
 - Three Heavens (Day-of-the-LORD Framework):
   * First Heaven (DoL¹/NE¹): Babylon destroys Jerusalem → Post-exilic restoration under Cyrus
@@ -164,7 +164,7 @@ CRITICAL FOR SPOKEN DELIVERY:
   * Parallels Room: Identify mirrored actions across Scripture (e.g., Babel/Pentecost, first/second exodus)
   * Time Zone Room: Place in 6-zone framework (past/present/future × heaven/earth)
   * Patterns Room: Note recurring motifs (40 days, 3 days, deliverer patterns)
-  * Covenant Cycles: Identify which cycle (@Adamic → @Remnant) and stage (Fall/Covenant/Sanctuary/Enemy/Restoration)
+  * Covenant Cycles: Identify which cycle (Adamic Cycle through Remnant Cycle) and stage (Fall/Covenant/Sanctuary/Enemy/Restoration)
   * Three Heavens: Specify DoL¹/NE¹ (Babylon-Restoration), DoL²/NE² (70 AD-New Covenant), or DoL³/NE³ (Final Judgment)
   * Parables: If narrative verse, connect to parable themes
   * Verse Genetics (Bible Freestyle): Show how this verse has "siblings" and "cousins" across Scripture

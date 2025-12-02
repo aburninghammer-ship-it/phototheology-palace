@@ -105,6 +105,7 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
   const ttsCache = useRef<Map<string, string>>(new Map()); // Cache for prefetched TTS URLs
   const prefetchingRef = useRef<Set<string>>(new Set()); // Track verses being prefetched
   const playingCommentaryRef = useRef(false); // Track if we're in commentary playback
+  const playingVerseRef = useRef<{ book: string; chapter: number; verse: number } | null>(null); // Track currently playing verse to prevent duplicates
   const chapterCache = useRef<Map<string, { verse: number; text: string }[]>>(new Map()); // Cache for prefetched chapters
   const commentaryCache = useRef<Map<string, { text: string; audioUrl?: string }>>(new Map()); // Cache for pre-generated commentary
   const prefetchingCommentaryRef = useRef<Set<string>>(new Set()); // Track commentary being prefetched
@@ -944,6 +945,22 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
     }
 
     const verse = content.verses[verseIdx];
+    
+    // CRITICAL: Prevent duplicate verse playback
+    const verseKey = `${content.book}-${content.chapter}-${verse.verse}`;
+    const currentKey = playingVerseRef.current 
+      ? `${playingVerseRef.current.book}-${playingVerseRef.current.chapter}-${playingVerseRef.current.verse}`
+      : null;
+    
+    if (currentKey === verseKey && audioRef.current && !audioRef.current.paused) {
+      console.log("[PlayVerse] ⚠️ BLOCKED - Already playing this exact verse:", verseKey);
+      return;
+    }
+    
+    // Set the currently playing verse
+    playingVerseRef.current = { book: content.book, chapter: content.chapter, verse: verse.verse };
+    console.log("[PlayVerse] 🎯 Starting verse:", verseIdx + 1, "of", content.verses.length, "| Key:", verseKey);
+    
     const cacheKey = `${content.book}-${content.chapter}-${verseIdx}-${voice}`;
     
     setCurrentVerseIdx(verseIdx);
@@ -1086,6 +1103,8 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
     
     audio.onended = async () => {
       console.log("[Audio] <<< Ended verse:", verseIdx + 1, "| continue:", continuePlayingRef.current, "| isPlaying:", isPlaying, "| isPaused:", isPaused);
+      // Clear the currently playing verse
+      playingVerseRef.current = null;
       // Don't call notifyTTSStopped here - keep music ducked between verses
       
       // Clear the audio ref immediately
@@ -1559,6 +1578,7 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
   const handleStop = () => {
     console.log("[Player] ⏹️ STOP CALLED - setting continuePlayingRef to false");
     continuePlayingRef.current = false;
+    playingVerseRef.current = null;
     pendingVerseRef.current = null;
     pausedVerseRef.current = null;
     
