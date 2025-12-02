@@ -45,10 +45,6 @@ export const AudioControls = ({ verses, onVerseHighlight, className }: AudioCont
   const [currentVerse, setCurrentVerse] = useState(1);
   const [selectedVoice, setSelectedVoice] = useState<VoiceId>("onyx");
   const [playbackRate, setPlaybackRate] = useState(1);
-  const [duckMusic, setDuckMusic] = useState(() => {
-    const stored = localStorage.getItem('pt-duck-music');
-    return stored === null ? true : stored === 'true';
-  });
   
   // Use a persistent audio element to avoid iOS autoplay restrictions
   const audioRef = useRef<HTMLAudioElement | null>(null);
@@ -91,7 +87,7 @@ export const AudioControls = ({ verses, onVerseHighlight, className }: AudioCont
         } else {
           setIsPlaying(false);
           isPlayingRef.current = false;
-          if (duckMusic) notifyTTSStopped();
+          notifyTTSStopped();
           toast.success("Finished reading chapter");
         }
       };
@@ -245,13 +241,13 @@ export const AudioControls = ({ verses, onVerseHighlight, className }: AudioCont
     
     try {
       await audio.play();
-      if (duckMusic) notifyTTSStarted();
+      notifyTTSStarted();
     } catch (err) {
       console.error("Play error:", err);
       toast.error("Could not play audio. Please try again.");
       setIsPlaying(false);
       isPlayingRef.current = false;
-      if (duckMusic) notifyTTSStopped();
+      notifyTTSStopped();
     }
   }, [generateTTS, onVerseHighlight, prefetchVerse]);
 
@@ -290,18 +286,18 @@ export const AudioControls = ({ verses, onVerseHighlight, className }: AudioCont
     }
     setIsPlaying(false);
     isPlayingRef.current = false;
-    if (duckMusic) notifyTTSStopped();
-  }, [duckMusic]);
+    notifyTTSStopped();
+  }, []);
 
   const stop = useCallback(() => {
     cleanupAudio();
     clearPrefetchCache();
     setIsPlaying(false);
     isPlayingRef.current = false;
-    if (duckMusic) notifyTTSStopped();
+    notifyTTSStopped();
     setCurrentVerse(1);
     onVerseHighlight?.(1);
-  }, [cleanupAudio, clearPrefetchCache, onVerseHighlight, duckMusic]);
+  }, [cleanupAudio, clearPrefetchCache, onVerseHighlight]);
 
   const nextVerse = useCallback(() => {
     const currentIndex = verses.findIndex(v => v.verse === currentVerse);
@@ -467,23 +463,6 @@ export const AudioControls = ({ verses, onVerseHighlight, className }: AudioCont
                   ))}
                 </SelectContent>
               </Select>
-            </div>
-
-            <div className="flex items-center justify-between">
-              <label htmlFor="duck-music" className="text-sm font-medium cursor-pointer">
-                Lower music during reading
-              </label>
-              <input
-                id="duck-music"
-                type="checkbox"
-                checked={duckMusic}
-                onChange={(e) => {
-                  const value = e.target.checked;
-                  setDuckMusic(value);
-                  localStorage.setItem('pt-duck-music', value.toString());
-                }}
-                className="h-4 w-4 cursor-pointer"
-              />
             </div>
 
             <div className="text-xs text-muted-foreground">

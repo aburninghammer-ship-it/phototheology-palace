@@ -666,7 +666,7 @@ export function AmbientMusicPlayer({
             )}
           </Button>
         </PopoverTrigger>
-        <PopoverContent className="w-80" align="end" side="top" sideOffset={8} collisionPadding={16}>
+        <PopoverContent className="w-80 bg-background z-50" align="end" side="top" sideOffset={8} collisionPadding={16}>
           <div className="space-y-4">
             <div className="flex items-center justify-between">
               <h4 className="font-medium text-sm">Study Music</h4>
@@ -883,40 +883,34 @@ export function AmbientMusicPlayer({
                 </span>
               </div>
               
-              {/* Volume Preset Buttons - More reliable on mobile */}
-              <div className="flex items-center gap-1 border rounded-lg p-1 bg-muted/30">
+            </div>
+
+            {/* Volume Control */}
+            <div className="space-y-2 pt-2 border-t">
+              <div className="flex items-center justify-between">
+                <Label className="text-xs text-muted-foreground">Volume</Label>
+                <span className="text-xs font-medium">{Math.round(volume * 100)}%</span>
+              </div>
+              <div className="flex items-center gap-3">
                 <Button
-                  variant={getCurrentPreset() === 'off' ? 'default' : 'ghost'}
-                  size="sm"
-                  onClick={() => setVolumePreset('off')}
-                  className="h-7 px-2 text-xs"
+                  variant="ghost"
+                  size="icon"
+                  onClick={toggleMute}
+                  className="h-8 w-8 shrink-0"
                 >
-                  <VolumeX className="h-3 w-3" />
+                  {isMuted || volume === 0 ? (
+                    <VolumeX className="h-4 w-4" />
+                  ) : (
+                    <Volume2 className="h-4 w-4" />
+                  )}
                 </Button>
-                <Button
-                  variant={getCurrentPreset() === 'low' ? 'default' : 'ghost'}
-                  size="sm"
-                  onClick={() => setVolumePreset('low')}
-                  className="h-7 px-2 text-xs"
-                >
-                  5%
-                </Button>
-                <Button
-                  variant={getCurrentPreset() === 'med' ? 'default' : 'ghost'}
-                  size="sm"
-                  onClick={() => setVolumePreset('med')}
-                  className="h-7 px-2 text-xs"
-                >
-                  15%
-                </Button>
-                <Button
-                  variant={getCurrentPreset() === 'high' ? 'default' : 'ghost'}
-                  size="sm"
-                  onClick={() => setVolumePreset('high')}
-                  className="h-7 px-2 text-xs"
-                >
-                  30%
-                </Button>
+                <Slider
+                  value={[volume]}
+                  onValueChange={handleVolumeChange}
+                  max={0.30}
+                  step={0.01}
+                  className="flex-1"
+                />
               </div>
             </div>
           </div>
