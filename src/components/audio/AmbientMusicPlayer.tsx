@@ -42,9 +42,9 @@ import { Label } from "@/components/ui/label";
 import { useUserMusic, UserTrack } from "@/hooks/useUserMusic";
 import { useAuth } from "@/hooks/useAuth";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { useAudioDucking } from "@/hooks/useAudioDucking";
+import { useAudioDucking, getDuckedVolume } from "@/hooks/useAudioDucking";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { subscribeToMusicVolume } from "@/hooks/useMusicVolumeControl";
+import { subscribeToMusicVolume, subscribeToMusicPlayback } from "@/hooks/useMusicVolumeControl";
 
 // Phototheology Sacred Orchestral Music
 // Rich orchestral, movie soundtrack style (The Chosen, Zimmer, Tyler)
@@ -246,6 +246,18 @@ export function AmbientMusicPlayer({
   }, [isEnabled, isPlaying]);
 
   useAudioDucking(handleDuckChange);
+
+  // Listen to global playback control (e.g., when SequencePlayer wants exclusive control)
+  useEffect(() => {
+    const unsubscribe = subscribeToMusicPlayback((shouldPlay) => {
+      if (!shouldPlay && isPlaying && audioRef.current) {
+        console.log('[AmbientMusic] Pausing due to global playback control');
+        audioRef.current.pause();
+        setIsPlaying(false);
+      }
+    });
+    return unsubscribe;
+  }, [isPlaying]);
 
   // Single effect to manage volume - uses GainNode for iOS compatibility
   useEffect(() => {

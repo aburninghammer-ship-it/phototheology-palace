@@ -29,7 +29,7 @@ import { toast } from "sonner";
 import { ReadingSequenceBlock, SequenceItem } from "@/types/readingSequence";
 import { notifyTTSStarted, notifyTTSStopped, useAudioDucking, getDuckedVolume } from "@/hooks/useAudioDucking";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { getGlobalMusicVolume } from "@/hooks/useMusicVolumeControl";
+import { getGlobalMusicVolume, setGlobalMusicPlayback } from "@/hooks/useMusicVolumeControl";
 import { OPENAI_VOICES, VoiceId } from "@/hooks/useTextToSpeech";
 import {
   Select,
@@ -166,7 +166,7 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
   const totalItems = allItems.length;
   const isActive = isPlaying && !isPaused;
 
-  // Reset refs on mount to ensure fresh start
+  // Reset refs on mount to ensure fresh start and stop global ambient music
   useEffect(() => {
     isFetchingChapterRef.current = false;
     lastFetchedRef.current = null;
@@ -180,7 +180,17 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
     commentaryCache.current.clear();
     prefetchingCommentaryRef.current.clear();
     
+    // Stop global ambient music player when SequencePlayer mounts
+    console.log('[SequencePlayer] Stopping global ambient music');
+    setGlobalMusicPlayback(false);
+    
     console.log("SequencePlayer mounted, refs reset. Active sequences:", activeSequences.length, "Total items:", totalItems);
+    
+    // Resume global music when unmounting
+    return () => {
+      console.log('[SequencePlayer] Unmounting, allowing global ambient music to resume');
+      setGlobalMusicPlayback(true);
+    };
   }, []);
 
   // Subscribe to audio ducking - music lowers when TTS plays

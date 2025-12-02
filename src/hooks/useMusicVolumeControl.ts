@@ -3,7 +3,9 @@
 // Uses 0-100 scale internally, converts to 0-1 for audio elements
 
 let volumeListeners = new Set<(volume: number) => void>();
+let playbackListeners = new Set<(shouldPlay: boolean) => void>();
 let currentVolume = 90; // default 90%
+let isPlaying = false;
 
 // Initialize from localStorage if available
 if (typeof window !== 'undefined') {
@@ -28,5 +30,22 @@ export const subscribeToMusicVolume = (listener: (volume: number) => void) => {
   listener(currentVolume);
   return () => {
     volumeListeners.delete(listener);
+  };
+};
+
+// Control global ambient music playback
+export const setGlobalMusicPlayback = (shouldPlay: boolean) => {
+  if (isPlaying === shouldPlay) return;
+  isPlaying = shouldPlay;
+  playbackListeners.forEach(listener => listener(shouldPlay));
+  console.log('[MusicVolumeControl] Set playback to:', shouldPlay);
+};
+
+export const subscribeToMusicPlayback = (listener: (shouldPlay: boolean) => void) => {
+  playbackListeners.add(listener);
+  // Immediately call with current state
+  listener(isPlaying);
+  return () => {
+    playbackListeners.delete(listener);
   };
 };
