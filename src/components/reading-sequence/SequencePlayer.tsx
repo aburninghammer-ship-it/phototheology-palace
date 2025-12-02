@@ -77,7 +77,7 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
   const [isMuted, setIsMuted] = useState(false);
   const [musicVolume, setMusicVolume] = useState(() => {
     const stored = getGlobalMusicVolume();
-    const initial = typeof stored === "number" && !Number.isNaN(stored as any) ? (stored as number) : 80;
+    const initial = typeof stored === "number" && !Number.isNaN(stored as any) ? (stored as number) : 90;
     const clamped = Math.max(0, Math.min(initial, 100));
     console.log('[SequencePlayer] Initial music volume:', clamped);
     return clamped;

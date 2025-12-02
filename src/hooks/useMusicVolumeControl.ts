@@ -3,7 +3,7 @@
 // Uses 0-100 scale internally, converts to 0-1 for audio elements
 
 let volumeListeners = new Set<(volume: number) => void>();
-let currentVolume = 80; // default 80%
+let currentVolume = 90; // default 90%
 
 // Initialize from localStorage if available
 if (typeof window !== 'undefined') {
