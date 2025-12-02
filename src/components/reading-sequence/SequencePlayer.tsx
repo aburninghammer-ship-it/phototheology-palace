@@ -567,22 +567,24 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
     verse: number,
     onComplete: () => void
   ) => {
-    // Stop any currently playing audio first to prevent overlapping
+    // CRITICAL: Prevent multiple commentaries from playing simultaneously
     if (playingCommentaryRef.current) {
-      console.log(`[Commentary] Stopping previous commentary before starting new one`);
+      console.log(`[Commentary] ⚠️ BLOCKED: Already playing commentary, stopping previous first`);
       openaiStop();
       setIsPlayingCommentary(false);
       playingCommentaryRef.current = false;
       setCommentaryText(null);
       audioCompletionCallbackRef.current = null;
-      // Wait a moment for audio to fully stop
-      await new Promise(resolve => setTimeout(resolve, 200));
+      // Wait longer for full cleanup
+      await new Promise(resolve => setTimeout(resolve, 500));
     }
 
-    console.log(`[Commentary] Playing OpenAI commentary for ${book} ${chapter}:${verse}`);
+    console.log(`[Commentary] ✓ Starting NEW commentary for ${book} ${chapter}:${verse}`);
+    
+    // Set flag BEFORE any async operations to block other attempts
+    playingCommentaryRef.current = true;
     setIsPlayingCommentary(true);
     setCommentaryText(text);
-    playingCommentaryRef.current = true;
     setIsLoading(true);
 
     try {
@@ -590,16 +592,22 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
       
       // Store the completion callback - will be called by useTextToSpeech's onEnd
       audioCompletionCallbackRef.current = () => {
-        console.log("[Commentary] Playback completed, calling onComplete");
+        console.log("[Commentary] ✓ Playback completed, calling onComplete");
+        // Only complete if we're still the active commentary
         if (playingCommentaryRef.current) {
           setIsPlayingCommentary(false);
           playingCommentaryRef.current = false;
           setCommentaryText(null);
-          onComplete();
+          audioCompletionCallbackRef.current = null;
+          // Small delay before next action
+          setTimeout(onComplete, 200);
+        } else {
+          console.log("[Commentary] ⚠️ Already cleared, skipping onComplete");
         }
       };
       
       // Start playback - the completion will be handled by the onEnd callback
+      console.log("[Commentary] Calling openaiSpeak...");
       await openaiSpeak(text, {
         voice: 'shimmer', // Use shimmer voice for commentary
         book,
@@ -608,16 +616,16 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
         useCache: true
       });
       
-      console.log("[Commentary] Audio playback started, waiting for completion...");
+      console.log("[Commentary] openaiSpeak returned, audio should be playing...");
     } catch (e) {
-      console.error("[Commentary] OpenAI TTS error:", e);
+      console.error("[Commentary] ❌ OpenAI TTS error:", e);
       setIsLoading(false);
       setIsPlayingCommentary(false);
       playingCommentaryRef.current = false;
       setCommentaryText(null);
       audioCompletionCallbackRef.current = null;
       toast.error("Commentary unavailable, continuing", { duration: 2000 });
-      onComplete();
+      setTimeout(onComplete, 200);
     }
   }, [openaiSpeak, openaiStop]);
 
@@ -637,14 +645,23 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
     console.log("[ChapterComplete] Commentary settings:", { includeCommentary, commentaryMode });
     
     if (includeCommentary && commentaryMode === "chapter" && content && continuePlayingRef.current) {
+      // CRITICAL: Guard against multiple commentaries playing
+      if (playingCommentaryRef.current) {
+        console.log("[ChapterComplete] ⚠️ BLOCKED - Commentary already playing, skipping");
+        moveToNextChapter();
+        return;
+      }
+      
       const cacheKey = `chapter-${content.book}-${content.chapter}-${commentaryVoice}`;
       const cached = commentaryCache.current.get(cacheKey);
       
       if (cached?.audioUrl) {
         console.log("[ChapterComplete] Using cached chapter commentary audio");
+        
+        // Set the flag immediately to prevent other commentaries from starting
+        playingCommentaryRef.current = true;
         setCommentaryText(cached.text);
         setIsPlayingCommentary(true);
-        playingCommentaryRef.current = true;
         
         const audio = new Audio(cached.audioUrl);
         audio.volume = isMuted ? 0 : volume / 100;
@@ -658,7 +675,7 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
           setIsPlayingCommentary(false);
           playingCommentaryRef.current = false;
           setCommentaryText(null);
-          moveToNextChapter();
+          setTimeout(moveToNextChapter, 200);
         };
         
         audio.onerror = () => {
@@ -666,14 +683,14 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
           setIsPlayingCommentary(false);
           playingCommentaryRef.current = false;
           setCommentaryText(null);
-          moveToNextChapter();
+          setTimeout(moveToNextChapter, 200);
         };
         
         audio.play().catch(() => {
           setIsPlayingCommentary(false);
           playingCommentaryRef.current = false;
           setCommentaryText(null);
-          moveToNextChapter();
+          setTimeout(moveToNextChapter, 200);
         });
       } else if (cached?.text) {
         console.log("[ChapterComplete] Using cached chapter commentary text");
@@ -1138,6 +1155,18 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
       
       // Handle verse-by-verse commentary mode
       if (includeCommentary && commentaryMode === "verse" && content && continuePlayingRef.current) {
+        // CRITICAL: Guard against multiple commentaries playing
+        if (playingCommentaryRef.current) {
+          console.log("[Verse Commentary] ⚠️ BLOCKED - Commentary already playing, skipping");
+          // Just move to next verse instead
+          if (!isLastVerse) {
+            playVerseAtIndex(nextVerseIdx, content, voice);
+          } else {
+            moveToNextChapter();
+          }
+          return;
+        }
+        
         const currentVerse = content.verses[verseIdx];
         const cacheKey = `verse-${content.book}-${content.chapter}-${currentVerse.verse}-${commentaryVoice}`;
         const cached = commentaryCache.current.get(cacheKey);
@@ -1167,9 +1196,11 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
         if (cached?.audioUrl) {
           // Use cached commentary with pre-generated audio - instant playback!
           console.log("[Verse Commentary] Using cached audio for verse", verseIdx + 1);
+          
+          // Set the flag immediately to prevent other commentaries from starting
+          playingCommentaryRef.current = true;
           setCommentaryText(cached.text);
           setIsPlayingCommentary(true);
-          playingCommentaryRef.current = true;
           
           const audio = new Audio(cached.audioUrl);
           audio.volume = isMuted ? 0 : volume / 100;
@@ -1184,7 +1215,8 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
             setIsPlayingCommentary(false);
             playingCommentaryRef.current = false;
             setCommentaryText(null);
-            proceedAfterCommentary();
+            // Add small delay before next verse
+            setTimeout(proceedAfterCommentary, 200);
           };
           
           audio.onerror = (e) => {
@@ -1193,7 +1225,7 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
             setIsPlayingCommentary(false);
             playingCommentaryRef.current = false;
             setCommentaryText(null);
-            proceedAfterCommentary();
+            setTimeout(proceedAfterCommentary, 200);
           };
           
           audio.play().catch((e) => {
@@ -1201,7 +1233,7 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
             setIsPlayingCommentary(false);
             playingCommentaryRef.current = false;
             setCommentaryText(null);
-            proceedAfterCommentary();
+            setTimeout(proceedAfterCommentary, 200);
           });
           return;
         } else if (cached?.text) {
@@ -1256,15 +1288,24 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
         console.log("[Audio] Chapter complete, checking for chapter commentary...");
         
         if (includeCommentary && commentaryMode === "chapter" && content && continuePlayingRef.current) {
+          // CRITICAL: Guard against multiple commentaries playing
+          if (playingCommentaryRef.current) {
+            console.log("[Chapter Commentary] ⚠️ BLOCKED - Commentary already playing, skipping");
+            moveToNextChapter();
+            return;
+          }
+          
           const cacheKey = `chapter-${content.book}-${content.chapter}-${commentaryVoice}`;
           const cached = commentaryCache.current.get(cacheKey);
           
           if (cached?.audioUrl) {
             // Use cached chapter commentary with pre-generated audio - instant playback!
             console.log("[Chapter Commentary] Using cached audio");
+            
+            // Set the flag immediately to prevent other commentaries from starting
+            playingCommentaryRef.current = true;
             setCommentaryText(cached.text);
             setIsPlayingCommentary(true);
-            playingCommentaryRef.current = true;
             
             const audio = new Audio(cached.audioUrl);
             audio.volume = isMuted ? 0 : volume / 100;
@@ -1278,7 +1319,8 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
               setIsPlayingCommentary(false);
               playingCommentaryRef.current = false;
               setCommentaryText(null);
-              moveToNextChapter();
+              // Small delay before next chapter
+              setTimeout(moveToNextChapter, 200);
             };
             
             audio.onerror = () => {
@@ -1286,14 +1328,14 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
               setIsPlayingCommentary(false);
               playingCommentaryRef.current = false;
               setCommentaryText(null);
-              moveToNextChapter();
+              setTimeout(moveToNextChapter, 200);
             };
             
             audio.play().catch(() => {
               setIsPlayingCommentary(false);
               playingCommentaryRef.current = false;
               setCommentaryText(null);
-              moveToNextChapter();
+              setTimeout(moveToNextChapter, 200);
             });
           } else if (cached?.text) {
             // Have text but no audio
