@@ -186,9 +186,9 @@ export function AmbientMusicPlayer({
     // Read from new key (0-100 scale) and convert to 0-1
     const saved = localStorage.getItem("pt-music-volume-pct");
     if (saved) {
-      return Math.min(parseInt(saved, 10), 60) / 100;
+      return Math.min(parseInt(saved, 10), 100) / 100;
     }
-    return 0.40; // Default 40%
+    return 0.70; // Default 70%
   });
   const [isMuted, setIsMuted] = useState(false);
   const [currentTrackId, setCurrentTrackId] = useState(() => {
@@ -213,7 +213,7 @@ export function AmbientMusicPlayer({
     return saved === "true";
   });
   const [duckMultiplier, setDuckMultiplier] = useState(1);
-  const effectiveVolumeRef = useRef(0.20); // Ref to track current effective volume for callbacks
+  const effectiveVolumeRef = useRef(0.70); // Ref to track current effective volume for callbacks
   // Selected tracks for playlist
   const [selectedTracks, setSelectedTracks] = useState<Set<string>>(() => {
     const saved = localStorage.getItem("pt-ambient-selected-tracks");
@@ -394,7 +394,7 @@ export function AmbientMusicPlayer({
   }, [isEnabled]);
 
   // Listen for global volume control changes (allows other components like SequencePlayer to control music volume)
-  // SequencePlayer sends 0-30 scale, so we convert to 0-0.60 (capped at 60%)
+  // SequencePlayer sends 0-100 scale, so we convert to 0-1.0 (capped at 100%)
   const isInitialMount = useRef(true);
   useEffect(() => {
     const unsubscribe = subscribeToMusicVolume((newVolume) => {
@@ -403,8 +403,8 @@ export function AmbientMusicPlayer({
         isInitialMount.current = false;
         return;
       }
-      // Convert from 0-60 scale to 0-0.60 (capped at 60%)
-      const normalizedVolume = Math.min(newVolume, 60) / 100;
+      // Convert from 0-100 scale to 0-1.0 (no cap, full range)
+      const normalizedVolume = Math.min(newVolume, 100) / 100;
       console.log('[AmbientMusic] Global volume update:', newVolume, '-> normalized:', normalizedVolume);
       setVolume(normalizedVolume);
     });
@@ -582,9 +582,9 @@ export function AmbientMusicPlayer({
   const setVolumePreset = (preset: 'off' | 'low' | 'med' | 'high') => {
     const presetValues = {
       off: 0,
-      low: 0.10,
-      med: 0.30,
-      high: 0.60
+      low: 0.25,
+      med: 0.50,
+      high: 1.0
     };
     const newVolume = presetValues[preset];
     const effectiveVolume = newVolume * duckMultiplier;
@@ -610,8 +610,8 @@ export function AmbientMusicPlayer({
   // Get current preset level
   const getCurrentPreset = (): 'off' | 'low' | 'med' | 'high' => {
     if (isMuted || volume === 0) return 'off';
-    if (volume <= 0.15) return 'low';
-    if (volume <= 0.40) return 'med';
+    if (volume <= 0.30) return 'low';
+    if (volume <= 0.70) return 'med';
     return 'high';
   };
 

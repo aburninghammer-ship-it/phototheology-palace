@@ -63,7 +63,7 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
   const [musicVolume, setMusicVolume] = useState(() => {
     // Check if any sequence has background music enabled
     const hasMusicEnabled = sequences.some(s => s.backgroundMusic);
-    const defaultVolume = hasMusicEnabled ? Math.max(Math.min(getGlobalMusicVolume(), 25), 15) : 0;
+    const defaultVolume = hasMusicEnabled ? Math.max(Math.min(getGlobalMusicVolume(), 70), 40) : 0;
     console.log('[SequencePlayer] Initial music volume:', defaultVolume, 'hasMusicEnabled:', hasMusicEnabled);
     return defaultVolume;
   });
@@ -149,7 +149,7 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
   // Update music volume when sequences change (e.g., when switching to samples)
   useEffect(() => {
     const hasMusicEnabled = sequences.some(s => s.backgroundMusic);
-    const newMusicVolume = hasMusicEnabled ? Math.max(Math.min(getGlobalMusicVolume(), 25), 15) : 0;
+    const newMusicVolume = hasMusicEnabled ? Math.max(Math.min(getGlobalMusicVolume(), 70), 40) : 0;
     console.log("[SequencePlayer] Sequences changed, updating music volume:", newMusicVolume, "enabled:", hasMusicEnabled);
     setMusicVolume(newMusicVolume);
     if (newMusicVolume > 0) {
