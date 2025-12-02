@@ -1771,10 +1771,10 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
             </div>
           )}
           
-          {/* Music Volume Slider - Always visible, touch-optimized for mobile */}
-          <div className="flex items-center gap-3 touch-none">
-            <ListMusic className="h-4 w-4 text-muted-foreground flex-shrink-0" />
-            <span className="text-xs text-muted-foreground w-12 flex-shrink-0">Music</span>
+          {/* Background Music Volume Slider - Always visible on all devices */}
+          <div className="flex items-center gap-3 touch-none bg-muted/30 p-3 rounded-lg">
+            <ListMusic className="h-5 w-5 text-amber-500 dark:text-amber-400 flex-shrink-0" />
+            <span className="text-sm font-medium text-foreground w-20 flex-shrink-0">Background Music</span>
             <Slider
               value={[musicVolume]}
               min={0}
@@ -1785,13 +1785,13 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
                 console.log("[SequencePlayer] Music slider changed to:", newVolume);
                 setMusicVolume(newVolume);
                 setGlobalMusicVolume(newVolume);
-                // Direct apply for mobile responsiveness
+                // Direct apply for responsive feedback
                 if (musicAudioRef.current) {
                   musicAudioRef.current.volume = newVolume / 100;
                 }
               }}
               onValueCommit={(v) => {
-                // Ensure final value is committed on touch release
+                // Ensure final value is committed on interaction release
                 const newVolume = v[0];
                 console.log("[SequencePlayer] Music slider committed:", newVolume);
                 setMusicVolume(newVolume);
@@ -1802,7 +1802,7 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
               }}
               className="flex-1 min-w-[100px]"
             />
-            <span className="text-xs text-muted-foreground w-8 flex-shrink-0">{musicVolume}%</span>
+            <span className="text-sm font-semibold text-foreground w-10 flex-shrink-0">{musicVolume}%</span>
           </div>
           
           {isMobile && (

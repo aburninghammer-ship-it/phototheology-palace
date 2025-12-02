@@ -66,7 +66,7 @@ export function useSubscription() {
         const studentValid = profile.is_student && profile.student_expires_at && new Date(profile.student_expires_at) > now;
         const promotionalValid = profile.promotional_access_expires_at && new Date(profile.promotional_access_expires_at) > now;
         
-        // Church access overrides individual subscription
+        // All access types: lifetime (including access codes), active subscription, trial, student, promotional
         const hasPersonalAccess = profile.has_lifetime_access || profile.subscription_status === 'active' || trialValid || studentValid || promotionalValid;
         const hasChurchAccess = churchAccess?.has_access || false;
         
