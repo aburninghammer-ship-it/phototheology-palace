@@ -48,7 +48,7 @@ import {
   getCachedVerseCommentary,
   cacheVerseCommentary 
 } from "@/services/offlineCommentaryCache";
-import { useElevenLabsAudio } from "@/hooks/useElevenLabsAudio";
+// ElevenLabs removed - using OpenAI TTS only
 import { useBrowserSpeech } from "@/hooks/useBrowserSpeech";
 import { useTextToSpeech } from "@/hooks/useTextToSpeech";
 import { useProcessTracking } from "@/contexts/ProcessTrackingContext";
@@ -93,7 +93,6 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
     const firstSequence = sequences.filter((s) => s.enabled && s.items.length > 0)[0];
     return (firstSequence?.voice as VoiceId) || 'onyx';
   });
-  const [commentaryProvider, setCommentaryProvider] = useState<'openai' | 'elevenlabs'>('elevenlabs');
 
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const musicAudioRef = useRef<HTMLAudioElement | null>(null); // Background music audio
@@ -116,7 +115,6 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
   
   const isMobile = useIsMobile();
   const activeSequences = sequences.filter((s) => s.enabled && s.items.length > 0);
-  const { getCommentaryAudio } = useElevenLabsAudio();
   const { speak: speakVerse, stop: stopVerse } = useBrowserSpeech();
   const { speak: openaiSpeak, stop: openaiStop, isPlaying: openaiPlaying, isLoading: openaiLoading } = useTextToSpeech();
 
@@ -547,7 +545,7 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
     speakChunk();
   }, []);
 
-  // Play commentary audio with OpenAI or ElevenLabs
+  // Play commentary audio with OpenAI TTS only
   const playCommentary = useCallback(async (
     text: string, 
     book: string,
@@ -555,116 +553,27 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
     verse: number,
     onComplete: () => void
   ) => {
-    console.log(`[Commentary] Playing ${commentaryProvider} commentary`);
+    console.log(`[Commentary] Playing OpenAI commentary for ${book} ${chapter}:${verse}`);
     setIsPlayingCommentary(true);
     setCommentaryText(text);
     playingCommentaryRef.current = true;
     setIsLoading(true);
 
     try {
-      if (commentaryProvider === 'openai') {
-        // Use OpenAI TTS
-        setIsLoading(false);
-        await openaiSpeak(text, {
-          voice: 'shimmer', // Use shimmer voice for commentary
-          book,
-          chapter,
-          verse,
-          useCache: true
-        });
-        setIsPlayingCommentary(false);
-        playingCommentaryRef.current = false;
-        setCommentaryText(null);
-        onComplete();
-      } else {
-        // Use ElevenLabs Daniel voice - with robust fallback
-        let audioUrl: string | null = null;
-        
-        try {
-          audioUrl = await getCommentaryAudio(text, book, chapter, verse);
-        } catch (error) {
-          // Log the error details for debugging
-          console.error("[Commentary] ElevenLabs error:", error);
-          
-          // Check if it's a quota error - surface user-friendly message
-          const isQuotaError = error instanceof Error && error.message === 'ELEVENLABS_QUOTA_EXCEEDED';
-          if (isQuotaError) {
-            toast.info("Using alternative voice service", { duration: 3000 });
-          }
-          
-          // Always fallback to OpenAI on ANY ElevenLabs error
-          console.log("[Commentary] Falling back to OpenAI TTS");
-          setIsLoading(false);
-          await openaiSpeak(text, {
-            voice: 'shimmer',
-            book,
-            chapter,
-            verse,
-            useCache: true
-          });
-          setIsPlayingCommentary(false);
-          playingCommentaryRef.current = false;
-          setCommentaryText(null);
-          onComplete();
-          return;
-        }
-        
-        setIsLoading(false);
-
-        // If no audio URL returned, fallback to OpenAI
-        if (!audioUrl) {
-          console.log("[Commentary] No audio URL returned, falling back to OpenAI");
-          await openaiSpeak(text, {
-            voice: 'shimmer',
-            book,
-            chapter,
-            verse,
-            useCache: true
-          });
-          setIsPlayingCommentary(false);
-          playingCommentaryRef.current = false;
-          setCommentaryText(null);
-          onComplete();
-          return;
-        }
-
-        // Stop any existing audio
-        if (audioRef.current) {
-          audioRef.current.pause();
-          audioRef.current.onended = null;
-          audioRef.current = null;
-        }
-
-        const audio = new Audio(audioUrl);
-        audio.volume = isMuted ? 0 : volume / 100;
-        const playbackSpeed = currentSequence?.playbackSpeed || 1;
-        audio.playbackRate = playbackSpeed;
-        audioRef.current = audio;
-        setAudioUrl(audioUrl);
-
-        audio.onended = () => {
-          console.log("[Commentary] Finished playing");
-          audioRef.current = null;
-          setIsPlayingCommentary(false);
-          playingCommentaryRef.current = false;
-          setCommentaryText(null);
-          onComplete();
-        };
-
-        audio.onerror = (e) => {
-          console.error("[Commentary] Audio error:", e);
-          audioRef.current = null;
-          setIsPlayingCommentary(false);
-          playingCommentaryRef.current = false;
-          setCommentaryText(null);
-          toast.error("Commentary playback error, continuing", { duration: 2000 });
-          onComplete();
-        };
-
-        await audio.play();
-      }
+      setIsLoading(false);
+      await openaiSpeak(text, {
+        voice: 'shimmer', // Use shimmer voice for commentary
+        book,
+        chapter,
+        verse,
+        useCache: true
+      });
+      setIsPlayingCommentary(false);
+      playingCommentaryRef.current = false;
+      setCommentaryText(null);
+      onComplete();
     } catch (e) {
-      console.error("[Commentary] Failed:", e);
+      console.error("[Commentary] OpenAI TTS error:", e);
       setIsLoading(false);
       setIsPlayingCommentary(false);
       playingCommentaryRef.current = false;
@@ -672,7 +581,7 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
       toast.error("Commentary unavailable, continuing", { duration: 2000 });
       onComplete();
     }
-  }, [commentaryProvider, openaiSpeak, getCommentaryAudio, isMuted, volume, currentSequence, speakWithBrowserTTS]);
+  }, [openaiSpeak]);
 
   // Handle chapter completion with commentary check (for browser TTS and fallback paths)
   const handleChapterCompleteWithCommentary = useCallback((content: ChapterContent) => {
@@ -852,9 +761,20 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
 
   // Play commentary only (skip verse reading)
   const playCommentaryOnlyChapter = useCallback(async (content: ChapterContent, sequence: ReadingSequenceBlock) => {
-    if (!content || !sequence.includeJeevesCommentary) return;
+    if (!content || !sequence.includeJeevesCommentary) {
+      console.log("[Commentary Only] Skipping - no content or commentary disabled");
+      moveToNextChapter();
+      return;
+    }
     
-    console.log("[Commentary Only] Starting commentary-only playback");
+    console.log(`[Commentary Only] ===== STARTING CHAPTER ${content.book} ${content.chapter} =====`);
+    console.log(`[Commentary Only] Content has ${content.verses.length} verses`);
+    console.log(`[Commentary Only] Sequence settings:`, {
+      commentaryMode: sequence.commentaryMode,
+      commentaryDepth: sequence.commentaryDepth,
+      includeJeevesCommentary: sequence.includeJeevesCommentary
+    });
+    
     setIsLoading(true);
     setIsPlaying(true);
     setIsPaused(false);
@@ -870,14 +790,33 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
     try {
       if (commentaryMode === "chapter") {
         // Play chapter commentary
+        console.log("[Commentary Only] Generating chapter commentary with depth:", commentaryDepth);
         const chapterText = content.verses.map(v => `${v.verse}. ${v.text}`).join(" ");
+        console.log("[Commentary Only] Chapter text length:", chapterText.length);
+        
         const commentary = await generateCommentary(content.book, content.chapter, chapterText, commentaryDepth);
         
         setIsLoading(false);
         
-        if (commentary && continuePlayingRef.current) {
+        if (!commentary) {
+          console.error(`[Commentary Only] ❌ NO COMMENTARY RETURNED for ${content.book} ${content.chapter}`);
+          toast.error(`No commentary available for ${content.book} ${content.chapter}`, { duration: 3000 });
+          // Move to next chapter after showing error
+          if (continuePlayingRef.current) {
+            console.log("[Commentary Only] Moving to next chapter after empty commentary");
+            moveToNextChapter();
+          } else {
+            setIsPlaying(false);
+          }
+          return;
+        }
+        
+        console.log(`[Commentary Only] ✓ Got commentary (${commentary.length} chars), now playing audio...`);
+        
+        if (continuePlayingRef.current) {
           playCommentary(commentary, content.book, content.chapter, 0, () => {
             // Move to next chapter after commentary
+            console.log(`[Commentary Only] ===== FINISHED ${content.book} ${content.chapter} ===== Moving to next`);
             if (continuePlayingRef.current) {
               moveToNextChapter();
             } else {
@@ -885,23 +824,30 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
             }
           });
         } else {
-          // No commentary available or stopped, clean up and move to next
-          if (continuePlayingRef.current) {
-            moveToNextChapter();
-          } else {
-            setIsPlaying(false);
-          }
+          setIsPlaying(false);
         }
       } else {
         // Play verse-by-verse commentary
+        console.log("[Commentary Only] Starting verse-by-verse mode");
         setIsLoading(false);
         playCommentaryOnlyVerse(0, content, sequence);
       }
     } catch (error) {
-      console.error("[Commentary Only] Error generating commentary:", error);
+      console.error("[Commentary Only] ⚠️ ERROR generating commentary:", error);
+      console.error("[Commentary Only] Error details:", {
+        message: error instanceof Error ? error.message : String(error),
+        book: content.book,
+        chapter: content.chapter
+      });
       setIsLoading(false);
-      setIsPlaying(false);
-      toast.error("Failed to generate commentary");
+      toast.error(`Commentary failed for ${content.book} ${content.chapter}: ${error instanceof Error ? error.message : 'Unknown error'}`, { duration: 4000 });
+      // Try to continue with next chapter
+      if (continuePlayingRef.current) {
+        console.log("[Commentary Only] Moving to next chapter after error");
+        moveToNextChapter();
+      } else {
+        setIsPlaying(false);
+      }
     }
   }, [generateCommentary, playCommentary, moveToNextChapter]);
   
@@ -2094,30 +2040,11 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
           </div>
         </div>
 
-        {/* Commentary Provider Selector */}
+        {/* Commentary Voice Info */}
         <div className="px-4 pb-2">
           <div className="flex items-center gap-3">
             <span className="text-xs text-amber-600 dark:text-amber-400">🎩</span>
-            <span className="text-xs text-muted-foreground w-20">Commentary</span>
-            <Select value={commentaryProvider} onValueChange={(value: 'openai' | 'elevenlabs') => setCommentaryProvider(value)}>
-              <SelectTrigger className="flex-1 h-8 text-xs">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="openai" className="text-xs">
-                  <div className="flex flex-col">
-                    <span className="font-medium">OpenAI (Shimmer)</span>
-                    <span className="text-muted-foreground text-[10px]">Fast, cached</span>
-                  </div>
-                </SelectItem>
-                <SelectItem value="elevenlabs" className="text-xs">
-                  <div className="flex flex-col">
-                    <span className="font-medium">ElevenLabs (Daniel)</span>
-                    <span className="text-muted-foreground text-[10px]">Premium quality</span>
-                  </div>
-                </SelectItem>
-              </SelectContent>
-            </Select>
+            <span className="text-xs text-muted-foreground">Commentary: OpenAI (Shimmer voice)</span>
           </div>
         </div>
 
