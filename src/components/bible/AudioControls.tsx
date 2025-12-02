@@ -23,7 +23,7 @@ import {
   Loader2,
 } from "lucide-react";
 import { Verse } from "@/types/bible";
-import { ELEVENLABS_VOICES, VoiceId } from "@/hooks/useTextToSpeech";
+import { OPENAI_VOICES, VoiceId } from "@/hooks/useTextToSpeech";
 import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
@@ -43,7 +43,7 @@ export const AudioControls = ({ verses, onVerseHighlight, className }: AudioCont
   const [isPlaying, setIsPlaying] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [currentVerse, setCurrentVerse] = useState(1);
-  const [selectedVoice, setSelectedVoice] = useState<VoiceId>("daniel");
+  const [selectedVoice, setSelectedVoice] = useState<VoiceId>("onyx");
   const [playbackRate, setPlaybackRate] = useState(1);
   
   // Use a persistent audio element to avoid iOS autoplay restrictions
@@ -434,7 +434,7 @@ export const AudioControls = ({ verses, onVerseHighlight, className }: AudioCont
                   <SelectValue placeholder="Select voice" />
                 </SelectTrigger>
                 <SelectContent>
-                  {ELEVENLABS_VOICES.map((voice) => (
+                  {OPENAI_VOICES.map((voice) => (
                     <SelectItem key={voice.id} value={voice.id}>
                       {voice.name}
                     </SelectItem>
@@ -442,7 +442,7 @@ export const AudioControls = ({ verses, onVerseHighlight, className }: AudioCont
                 </SelectContent>
               </Select>
               <p className="text-xs text-muted-foreground mt-1">
-                {ELEVENLABS_VOICES.find(v => v.id === selectedVoice)?.description}
+                {OPENAI_VOICES.find(v => v.id === selectedVoice)?.description}
               </p>
             </div>
             

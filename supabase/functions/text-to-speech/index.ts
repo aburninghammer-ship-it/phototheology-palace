@@ -6,32 +6,10 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
-// ElevenLabs voice options
-const VOICES: Record<string, string> = {
-  aria: '9BWtsMINqrJLrRacOk9x',
-  roger: 'CwhRBWXzGAHq8TQ4Fs17',
-  sarah: 'EXAVITQu4vr4xnSDxMaL',
-  laura: 'FGY2WhTYpPnrIDTdsKH5',
-  charlie: 'IKne3meq5aSn9XLyUdCD',
-  george: 'JBFqnCBsd6RMkjVDRZzb',
-  callum: 'N2lVS1w4EtoT3dr4eOWO',
-  river: 'SAz9YHcvj6GT2YYXdXww',
-  liam: 'TX3LPaxmHKxFdv7VOQHJ',
-  charlotte: 'XB0fDUnXU5powFXDhCwa',
-  alice: 'Xb7hH8MSUJpSbSDYk0k2',
-  matilda: 'XrExE9yKIg1WjnnlVkGX',
-  will: 'bIHbv24MWmeRgasZH58o',
-  jessica: 'cgSgspJ2msm6clMCkdW9',
-  eric: 'cjVigY5qzO86Huf0OWal',
-  chris: 'iP95p4xoKVk53GoZ742B',
-  brian: 'nPczCjzI2devNBz1zQrb',
-  daniel: 'onwK4e9ZLuTAKqWW03F9',
-  lily: 'pFZP5JQG7iQjIQuC4Bku',
-  bill: 'pqHfZKP75CvOlQylNhV4',
-};
-
-const MAX_CHARS = 9500;
-const DEFAULT_BIBLE_VOICE = 'daniel';
+// OpenAI TTS voice options
+const VOICES = ['alloy', 'echo', 'fable', 'onyx', 'nova', 'shimmer'];
+const MAX_CHARS = 4096; // OpenAI's limit
+const DEFAULT_BIBLE_VOICE = 'onyx';
 
 const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
@@ -178,10 +156,10 @@ function splitTextIntoChunks(text: string, maxChars: number): string[] {
   return chunks.filter(chunk => chunk.length > 0);
 }
 
-// Call ElevenLabs API with retry logic
-async function callElevenLabsWithRetry(
+// Call OpenAI TTS API with retry logic
+async function callOpenAIWithRetry(
   text: string,
-  voiceId: string,
+  voice: string,
   apiKey: string,
   maxRetries = 3
 ): Promise<Response> {
@@ -195,21 +173,18 @@ async function callElevenLabsWithRetry(
     }
 
     const response = await fetch(
-      `https://api.elevenlabs.io/v1/text-to-speech/${voiceId}`,
+      'https://api.openai.com/v1/audio/speech',
       {
         method: 'POST',
         headers: {
-          'Accept': 'audio/mpeg',
+          'Authorization': `Bearer ${apiKey}`,
           'Content-Type': 'application/json',
-          'xi-api-key': apiKey,
         },
         body: JSON.stringify({
-          text,
-          model_id: 'eleven_turbo_v2',
-          voice_settings: {
-            stability: 0.5,
-            similarity_boost: 0.75,
-          },
+          model: 'tts-1',
+          input: text,
+          voice: voice,
+          response_format: 'mp3',
         }),
       }
     );
@@ -220,14 +195,14 @@ async function callElevenLabsWithRetry(
 
     if (response.status === 429) {
       const errorText = await response.text();
-      console.error(`ElevenLabs rate limit: ${response.status}`, errorText);
+      console.error(`OpenAI rate limit: ${response.status}`, errorText);
       lastError = new Error(`Rate limited: ${response.status}`);
       continue;
     }
 
     const errorText = await response.text();
-    console.error(`ElevenLabs API error: ${response.status}`, errorText);
-    throw new Error(`ElevenLabs API error: ${response.status} - ${errorText}`);
+    console.error(`OpenAI API error: ${response.status}`, errorText);
+    throw new Error(`OpenAI API error: ${response.status} - ${errorText}`);
   }
 
   throw lastError || new Error('Max retries exceeded');
@@ -257,9 +232,9 @@ serve(async (req) => {
       throw new Error("Text is required");
     }
 
-    const ELEVENLABS_API_KEY = Deno.env.get("ELEVENLABS_API_KEY");
-    if (!ELEVENLABS_API_KEY) {
-      throw new Error("ELEVENLABS_API_KEY is not configured");
+    const OPENAI_API_KEY = Deno.env.get("OPENAI_API_KEY");
+    if (!OPENAI_API_KEY) {
+      throw new Error("OPENAI_API_KEY is not configured");
     }
 
     // Initialize Supabase client for caching
@@ -268,7 +243,7 @@ serve(async (req) => {
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
     const voiceName = voice.toLowerCase();
-    const voiceId = VOICES[voiceName] || VOICES[DEFAULT_BIBLE_VOICE];
+    const selectedVoice = VOICES.includes(voiceName) ? voiceName : DEFAULT_BIBLE_VOICE;
 
     // Check cache if verse info provided
     if (useCache && book && chapter !== undefined && verse !== undefined) {
@@ -303,7 +278,7 @@ serve(async (req) => {
       const chunk = chunks[i];
       console.log(`[TTS] Processing chunk ${i + 1}/${chunks.length} (${chunk.length} chars)`);
       
-      const response = await callElevenLabsWithRetry(chunk, voiceId, ELEVENLABS_API_KEY);
+      const response = await callOpenAIWithRetry(chunk, selectedVoice, OPENAI_API_KEY);
       const buffer = await response.arrayBuffer();
       audioBuffers.push(buffer);
       

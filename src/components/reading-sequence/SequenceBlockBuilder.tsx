@@ -8,7 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { GripVertical, Plus, Trash2, BookOpen, ChevronDown, ChevronUp, Mic, Volume2 } from "lucide-react";
 import { BIBLE_BOOKS } from "@/types/bible";
 import { ReadingSequenceBlock, SequenceItem, CommentaryDepth, CommentaryMode } from "@/types/readingSequence";
-import { ELEVENLABS_VOICES, VoiceId } from "@/hooks/useTextToSpeech";
+import { OPENAI_VOICES, VoiceId } from "@/hooks/useTextToSpeech";
 import { Input } from "@/components/ui/input";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -533,7 +533,7 @@ export const SequenceBlockBuilder = ({ block, onChange, onRemove }: SequenceBloc
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent className="max-h-[250px] bg-popover">
-                    {ELEVENLABS_VOICES.map((voice) => (
+                    {OPENAI_VOICES.map((voice) => (
                       <SelectItem key={voice.id} value={voice.id}>
                         <span className="font-medium">{voice.name}</span>
                         <span className="text-xs text-muted-foreground ml-2">{voice.description}</span>
@@ -648,7 +648,7 @@ export const SequenceBlockBuilder = ({ block, onChange, onRemove }: SequenceBloc
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent className="max-h-[250px] bg-popover">
-                          {ELEVENLABS_VOICES.map((voice) => (
+                  {OPENAI_VOICES.map((voice) => (
                             <SelectItem key={voice.id} value={voice.id}>
                               <span className="font-medium">{voice.name}</span>
                               <span className="text-xs text-muted-foreground ml-2">{voice.description}</span>

@@ -24,7 +24,7 @@ import {
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
-import { ELEVENLABS_VOICES, VoiceId } from "@/hooks/useTextToSpeech";
+import { OPENAI_VOICES, VoiceId } from "@/hooks/useTextToSpeech";
 import { notifyTTSStarted, notifyTTSStopped } from "@/hooks/useAudioDucking";
 import { useIsMobile } from "@/hooks/use-mobile";
 
@@ -42,7 +42,7 @@ export const AudioNarrator = ({
   title,
   className,
   autoPlay = false,
-  voice: initialVoice = "daniel",
+  voice: initialVoice = "onyx",
   showVoiceSelector = true
 }: AudioNarratorProps) => {
   const [isPlaying, setIsPlaying] = useState(false);
@@ -207,7 +207,7 @@ export const AudioNarrator = ({
     return `${mins}:${secs.toString().padStart(2, "0")}`;
   };
 
-  const selectedVoiceInfo = ELEVENLABS_VOICES.find(v => v.id === selectedVoice);
+  const selectedVoiceInfo = OPENAI_VOICES.find(v => v.id === selectedVoice);
 
   return (
     <Card className={cn("overflow-hidden", className)}>
@@ -229,7 +229,7 @@ export const AudioNarrator = ({
                   <SelectValue placeholder="Select voice" />
                 </SelectTrigger>
                 <SelectContent className="max-h-[300px]">
-                  {ELEVENLABS_VOICES.map((voice) => (
+                  {OPENAI_VOICES.map((voice) => (
                     <SelectItem key={voice.id} value={voice.id} className="text-xs">
                       <div className="flex flex-col">
                         <span className="font-medium">{voice.name}</span>

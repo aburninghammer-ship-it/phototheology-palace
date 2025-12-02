@@ -2,31 +2,17 @@ import { useState, useRef, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 
-// Available ElevenLabs voices
-export const ELEVENLABS_VOICES = [
-  { id: 'aria', name: 'Aria', description: 'Warm and expressive female voice' },
-  { id: 'roger', name: 'Roger', description: 'Deep and authoritative male voice' },
-  { id: 'sarah', name: 'Sarah', description: 'Clear and professional female voice' },
-  { id: 'laura', name: 'Laura', description: 'Gentle and soothing female voice' },
-  { id: 'charlie', name: 'Charlie', description: 'Friendly and casual male voice' },
-  { id: 'george', name: 'George', description: 'Distinguished British male voice' },
-  { id: 'callum', name: 'Callum', description: 'Young and energetic male voice' },
-  { id: 'river', name: 'River', description: 'Calm and meditative voice' },
-  { id: 'liam', name: 'Liam', description: 'Strong and confident male voice' },
-  { id: 'charlotte', name: 'Charlotte', description: 'Elegant and refined female voice' },
-  { id: 'alice', name: 'Alice', description: 'Bright and cheerful female voice' },
-  { id: 'matilda', name: 'Matilda', description: 'Warm Australian female voice' },
-  { id: 'will', name: 'Will', description: 'Casual American male voice' },
-  { id: 'jessica', name: 'Jessica', description: 'Articulate and clear female voice' },
-  { id: 'eric', name: 'Eric', description: 'Mature and wise male voice' },
-  { id: 'chris', name: 'Chris', description: 'Versatile and natural male voice' },
-  { id: 'brian', name: 'Brian', description: 'Deep and resonant male voice' },
-  { id: 'daniel', name: 'Daniel', description: 'British narrator voice' },
-  { id: 'lily', name: 'Lily', description: 'Sweet and youthful female voice' },
-  { id: 'bill', name: 'Bill', description: 'Gravelly and distinctive male voice' },
+// Available OpenAI voices
+export const OPENAI_VOICES = [
+  { id: 'alloy', name: 'Alloy', description: 'Neutral and balanced voice' },
+  { id: 'echo', name: 'Echo', description: 'Clear and articulate male voice' },
+  { id: 'fable', name: 'Fable', description: 'Warm British male voice' },
+  { id: 'onyx', name: 'Onyx', description: 'Deep and authoritative male voice' },
+  { id: 'nova', name: 'Nova', description: 'Friendly and energetic female voice' },
+  { id: 'shimmer', name: 'Shimmer', description: 'Soft and gentle female voice' },
 ] as const;
 
-export type VoiceId = typeof ELEVENLABS_VOICES[number]['id'];
+export type VoiceId = typeof OPENAI_VOICES[number]['id'];
 
 interface UseTextToSpeechOptions {
   defaultVoice?: VoiceId;
@@ -44,7 +30,7 @@ interface SpeakOptions {
 }
 
 export function useTextToSpeech(options: UseTextToSpeechOptions = {}) {
-  const { defaultVoice = 'daniel', onStart, onEnd, onError } = options;
+  const { defaultVoice = 'onyx', onStart, onEnd, onError } = options;
   
   const [isLoading, setIsLoading] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -157,7 +143,7 @@ export function useTextToSpeech(options: UseTextToSpeechOptions = {}) {
     isPlaying,
     selectedVoice,
     setSelectedVoice,
-    voices: ELEVENLABS_VOICES,
+    voices: OPENAI_VOICES,
     wasCached, // New: indicates if last audio was from cache
   };
 }

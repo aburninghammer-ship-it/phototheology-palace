@@ -6,7 +6,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Headphones, Settings, BookOpen, Film, Sparkles, Volume2 } from "lucide-react";
 import { AudioNarrator } from "./AudioNarrator";
 import { cn } from "@/lib/utils";
-import { ELEVENLABS_VOICES, VoiceId } from "@/hooks/useTextToSpeech";
+import { OPENAI_VOICES, VoiceId } from "@/hooks/useTextToSpeech";
 
 interface PTAudioModeProps {
   content: {
@@ -18,7 +18,7 @@ interface PTAudioModeProps {
 }
 
 export const PTAudioMode = ({ content, className }: PTAudioModeProps) => {
-  const [voice, setVoice] = useState<VoiceId>("daniel");
+  const [voice, setVoice] = useState<VoiceId>("onyx");
   const [autoAdvance, setAutoAdvance] = useState(true);
   const [showSettings, setShowSettings] = useState(false);
 
@@ -73,7 +73,7 @@ export const PTAudioMode = ({ content, className }: PTAudioModeProps) => {
                 <SelectValue />
               </SelectTrigger>
               <SelectContent className="max-h-[300px]">
-                {ELEVENLABS_VOICES.map((v) => (
+                {OPENAI_VOICES.map((v) => (
                   <SelectItem key={v.id} value={v.id}>
                     <div className="flex flex-col">
                       <span>{v.name}</span>
