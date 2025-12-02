@@ -198,24 +198,37 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
       }
 
       console.log("[Commentary] Generating", depth, "chapter commentary for", book, chapter);
-      const { data, error } = await supabase.functions.invoke("generate-chapter-commentary", {
-        body: { book, chapter, chapterText, depth },
-      });
+      
+      // Add timeout to edge function call
+      const timeoutMs = 20000; // 20 second timeout for chapter commentary
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+      
+      try {
+        const { data, error } = await supabase.functions.invoke("generate-chapter-commentary", {
+          body: { book, chapter, chapterText, depth },
+        });
+        
+        clearTimeout(timeoutId);
 
-      if (error) {
-        console.error("[Commentary] Edge function error:", error);
-        throw error;
+        if (error) {
+          console.error("[Commentary] Edge function error:", error);
+          throw error;
+        }
+        
+        const commentary = data?.commentary as string | null;
+        
+        // Cache the commentary for offline use
+        if (commentary) {
+          cacheChapterCommentary(book, chapter, depth, commentary);
+        }
+        
+        console.log("[Commentary] Generated chapter commentary length:", commentary?.length || 0);
+        return commentary;
+      } catch (invokeError) {
+        clearTimeout(timeoutId);
+        throw invokeError;
       }
-      
-      const commentary = data?.commentary as string | null;
-      
-      // Cache the commentary for offline use
-      if (commentary) {
-        cacheChapterCommentary(book, chapter, depth, commentary);
-      }
-      
-      console.log("[Commentary] Generated chapter commentary length:", commentary?.length || 0);
-      return commentary;
     } catch (e) {
       console.error("[Commentary] Error generating chapter commentary:", e);
       return null;
@@ -239,24 +252,37 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
       }
 
       console.log("[Verse Commentary] Generating", depth, "commentary for", book, chapter + ":" + verse);
-      const { data, error } = await supabase.functions.invoke("generate-verse-commentary", {
-        body: { book, chapter, verse, verseText, depth },
-      });
+      
+      // Add timeout to edge function call
+      const timeoutMs = 10000; // 10 second timeout for verse commentary
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+      
+      try {
+        const { data, error } = await supabase.functions.invoke("generate-verse-commentary", {
+          body: { book, chapter, verse, verseText, depth },
+        });
+        
+        clearTimeout(timeoutId);
 
-      if (error) {
-        console.error("[Verse Commentary] Edge function error:", error);
-        throw error;
+        if (error) {
+          console.error("[Verse Commentary] Edge function error:", error);
+          throw error;
+        }
+        
+        const commentary = data?.commentary as string | null;
+        
+        // Cache the commentary for offline use
+        if (commentary) {
+          cacheVerseCommentary(book, chapter, verse, depth, commentary);
+        }
+        
+        console.log("[Verse Commentary] Generated length:", commentary?.length || 0);
+        return commentary;
+      } catch (invokeError) {
+        clearTimeout(timeoutId);
+        throw invokeError;
       }
-      
-      const commentary = data?.commentary as string | null;
-      
-      // Cache the commentary for offline use
-      if (commentary) {
-        cacheVerseCommentary(book, chapter, verse, depth, commentary);
-      }
-      
-      console.log("[Verse Commentary] Generated length:", commentary?.length || 0);
-      return commentary;
     } catch (e) {
       console.error("[Verse Commentary] Error:", e);
       return null;
@@ -439,7 +465,30 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
     playingCommentaryRef.current = true;
     setIsLoading(true);
 
-    const url = await generateTTS(text, voice);
+    // Add timeout to TTS generation
+    const timeoutMs = 30000; // 30 seconds for longer commentary
+    const timeoutPromise = new Promise<string | null>((_, reject) => 
+      setTimeout(() => reject(new Error('TTS generation timeout')), timeoutMs)
+    );
+
+    let url: string | null = null;
+    
+    try {
+      url = await Promise.race([
+        generateTTS(text, voice),
+        timeoutPromise
+      ]);
+    } catch (error) {
+      console.error("[Commentary] TTS generation failed or timed out:", error);
+      setIsLoading(false);
+      setIsPlayingCommentary(false);
+      playingCommentaryRef.current = false;
+      setCommentaryText(null);
+      toast.error("Commentary audio unavailable, continuing", { duration: 2000 });
+      onComplete();
+      return;
+    }
+    
     setIsLoading(false);
 
     if (!url) {
@@ -447,6 +496,7 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
       setIsPlayingCommentary(false);
       playingCommentaryRef.current = false;
       setCommentaryText(null);
+      toast.error("Commentary audio unavailable, continuing", { duration: 2000 });
       onComplete();
       return;
     }
@@ -476,12 +526,13 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
       onComplete();
     };
 
-    audio.onerror = () => {
-      console.error("[Commentary] Audio error");
+    audio.onerror = (e) => {
+      console.error("[Commentary] Audio error:", e);
       audioRef.current = null;
       setIsPlayingCommentary(false);
       playingCommentaryRef.current = false;
       setCommentaryText(null);
+      toast.error("Commentary playback error, continuing", { duration: 2000 });
       onComplete();
     };
 
@@ -492,9 +543,10 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
       setIsPlayingCommentary(false);
       playingCommentaryRef.current = false;
       setCommentaryText(null);
+      toast.error("Commentary playback failed, continuing", { duration: 2000 });
       onComplete();
     }
-  }, [generateTTS, isMuted, volume]);
+  }, [generateTTS, isMuted, volume, currentSequence]);
 
   // Handle chapter completion with commentary check (for browser TTS and fallback paths)
   const handleChapterCompleteWithCommentary = useCallback((content: ChapterContent) => {
@@ -963,10 +1015,17 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
         const cached = commentaryCache.current.get(cacheKey);
         
         const proceedAfterCommentary = () => {
+          // Always check continuePlayingRef before proceeding
+          if (!continuePlayingRef.current) {
+            console.log("[Verse Commentary] Stopped by user, not continuing");
+            return;
+          }
+          
           if (isLastVerse) {
             console.log("[Audio] Chapter complete, moving to next");
             moveToNextChapter();
-          } else if (continuePlayingRef.current) {
+          } else {
+            console.log("[Audio] Playing next verse after commentary:", nextVerseIdx + 1);
             playVerseAtIndex(nextVerseIdx, content, voice);
           }
         };
@@ -986,6 +1045,7 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
           audioRef.current = audio;
           
           audio.onended = () => {
+            console.log("[Verse Commentary] Cached audio ended");
             audioRef.current = null;
             setIsPlayingCommentary(false);
             playingCommentaryRef.current = false;
@@ -993,7 +1053,8 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
             proceedAfterCommentary();
           };
           
-          audio.onerror = () => {
+          audio.onerror = (e) => {
+            console.error("[Verse Commentary] Cached audio error:", e);
             audioRef.current = null;
             setIsPlayingCommentary(false);
             playingCommentaryRef.current = false;
@@ -1001,7 +1062,8 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
             proceedAfterCommentary();
           };
           
-          audio.play().catch(() => {
+          audio.play().catch((e) => {
+            console.error("[Verse Commentary] Cached audio play failed:", e);
             setIsPlayingCommentary(false);
             playingCommentaryRef.current = false;
             setCommentaryText(null);
@@ -1015,21 +1077,35 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
           return;
         }
         
-        // Fallback: generate everything (shouldn't happen often with prefetching)
+        // Fallback: generate everything with timeout protection
         console.log("[Verse Commentary] No cache, generating for verse", verseIdx + 1);
         setIsLoading(true);
         
-        generateVerseCommentary(content.book, content.chapter, currentVerse.verse, currentVerse.text, commentaryDepth)
-          .then(commentary => {
+        // Add timeout to prevent hanging on commentary generation
+        const timeoutMs = 15000; // 15 second timeout
+        const timeoutPromise = new Promise((_, reject) => 
+          setTimeout(() => reject(new Error('Commentary generation timeout')), timeoutMs)
+        );
+        
+        Promise.race([
+          generateVerseCommentary(content.book, content.chapter, currentVerse.verse, currentVerse.text, commentaryDepth),
+          timeoutPromise
+        ])
+          .then((commentary) => {
+            setIsLoading(false);
             if (commentary && continuePlayingRef.current) {
-              playCommentary(commentary, commentaryVoice, proceedAfterCommentary);
+              console.log("[Verse Commentary] Generated successfully, playing");
+              playCommentary(commentary as string, commentaryVoice, proceedAfterCommentary);
             } else {
-              setIsLoading(false);
+              console.log("[Verse Commentary] No commentary or stopped, proceeding");
               proceedAfterCommentary();
             }
           })
-          .catch(() => {
+          .catch((error) => {
+            console.error("[Verse Commentary] Generation failed:", error);
             setIsLoading(false);
+            // Still continue playback even if commentary fails
+            toast.error("Commentary unavailable, continuing playback", { duration: 2000 });
             proceedAfterCommentary();
           });
         return;
