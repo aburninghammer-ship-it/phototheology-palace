@@ -54,6 +54,7 @@ export default function ReadMeTheBible() {
     incrementPlayCount,
   } = useReadingSequences();
 
+  // Default to samples for non-premium, but show create tab for premium users (including access code users)
   const [activeTab, setActiveTab] = useState(subscription.hasAccess ? "create" : "samples");
   const [sequenceName, setSequenceName] = useState("");
   const [sequenceDescription, setSequenceDescription] = useState("");
@@ -63,6 +64,7 @@ export default function ReadMeTheBible() {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [sampleSequences, setSampleSequences] = useState<ReadingSequenceBlock[] | null>(null);
 
+  // Check all access types: subscription, lifetime, promotional, church
   const hasPremiumAccess = subscription.hasAccess;
 
   const addSequenceBlock = () => {
