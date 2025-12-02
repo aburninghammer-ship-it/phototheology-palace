@@ -44,7 +44,7 @@ const createEmptyBlock = (sequenceNumber: number): ReadingSequenceBlock => ({
 
 export default function ReadMeTheBible() {
   const { user } = useAuth();
-  const { subscription } = useSubscription();
+  const { subscription, loading: subscriptionLoading } = useSubscription();
   const {
     savedSequences,
     isLoading,
@@ -55,7 +55,7 @@ export default function ReadMeTheBible() {
   } = useReadingSequences();
 
   // Default to samples for non-premium, but show create tab for premium users (including access code users)
-  const [activeTab, setActiveTab] = useState(subscription.hasAccess ? "create" : "samples");
+  const [activeTab, setActiveTab] = useState("samples");
   const [sequenceName, setSequenceName] = useState("");
   const [sequenceDescription, setSequenceDescription] = useState("");
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
@@ -66,6 +66,13 @@ export default function ReadMeTheBible() {
 
   // Check all access types: subscription, lifetime, promotional, church
   const hasPremiumAccess = subscription.hasAccess;
+
+  // Update active tab when subscription loads
+  useEffect(() => {
+    if (!subscriptionLoading && subscription.hasAccess && activeTab === "samples") {
+      setActiveTab("create");
+    }
+  }, [subscriptionLoading, subscription.hasAccess, activeTab]);
 
   const addSequenceBlock = () => {
     if (sequences.length >= 5) {
@@ -278,7 +285,7 @@ export default function ReadMeTheBible() {
 
           <TabsContent value="samples">
             <SampleAudioLibrary onPlaySample={handlePlaySample} />
-            {!hasPremiumAccess && (
+            {!subscriptionLoading && !hasPremiumAccess && (
               <div className="glass-card p-6 rounded-xl mt-4 border-2 border-primary/30">
                 <div className="flex items-start gap-4">
                   <div className="p-3 rounded-lg bg-gradient-to-r from-yellow-500/20 to-amber-500/20">
@@ -302,7 +309,7 @@ export default function ReadMeTheBible() {
           </TabsContent>
 
           <TabsContent value="create" className="space-y-6">
-            {!hasPremiumAccess && (
+            {!subscriptionLoading && !hasPremiumAccess && (
               <div className="glass-card p-6 rounded-xl border-2 border-primary/30">
                 <div className="flex items-center gap-3 mb-2">
                   <Crown className="h-5 w-5 text-yellow-600" />
@@ -322,7 +329,7 @@ export default function ReadMeTheBible() {
             )}
             
             {/* Presets */}
-            {hasPremiumAccess && (
+            {!subscriptionLoading && hasPremiumAccess && (
               <div className="glass-card p-4 rounded-xl">
                 <PresetSequences 
                   onAddToSequence={handleAddToSequence} 
