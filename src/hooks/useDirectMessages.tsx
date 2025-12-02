@@ -5,6 +5,14 @@ import { useToast } from '@/components/ui/use-toast';
 import { ToastAction } from '@/components/ui/toast';
 import { playMessageNotification } from '@/utils/notificationSound';
 
+export interface MessageReaction {
+  id: string;
+  message_id: string;
+  user_id: string;
+  reaction_type: string;
+  created_at: string;
+}
+
 export interface Message {
   id: string;
   conversation_id: string;
@@ -14,6 +22,7 @@ export interface Message {
   is_deleted: boolean;
   images?: string[];
   read_by?: string[];
+  reactions?: MessageReaction[];
 }
 
 export interface Conversation {
@@ -157,7 +166,8 @@ export const useDirectMessages = () => {
         .from('messages')
         .select(`
           *,
-          read_status:message_read_status(user_id)
+          read_status:message_read_status(user_id),
+          reactions:message_reactions(*)
         `)
         .eq('conversation_id', conversationId)
         .order('created_at', { ascending: true });
@@ -166,7 +176,8 @@ export const useDirectMessages = () => {
 
       const messagesWithReadStatus = (data || []).map(msg => ({
         ...msg,
-        read_by: msg.read_status?.map((r: any) => r.user_id) || []
+        read_by: msg.read_status?.map((r: any) => r.user_id) || [],
+        reactions: msg.reactions || []
       }));
 
       setMessages(messagesWithReadStatus);
@@ -483,6 +494,25 @@ export const useDirectMessages = () => {
         },
         () => {
           // Refresh messages to update read status
+          if (activeConversationId) {
+            fetchMessages(activeConversationId);
+          }
+        }
+      )
+      .subscribe();
+
+    // Subscribe to message reactions
+    const reactionsChannel = supabase
+      .channel('reactions-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'message_reactions'
+        },
+        () => {
+          // Refresh messages to update reactions
           if (activeConversationId) {
             fetchMessages(activeConversationId);
           }
