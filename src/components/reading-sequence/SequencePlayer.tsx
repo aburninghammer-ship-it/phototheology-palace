@@ -28,7 +28,7 @@ import { toast } from "sonner";
 import { ReadingSequenceBlock, SequenceItem } from "@/types/readingSequence";
 import { notifyTTSStarted, notifyTTSStopped } from "@/hooks/useAudioDucking";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { getGlobalMusicVolume } from "@/hooks/useMusicVolumeControl";
+import { getGlobalMusicVolume, setGlobalMusicVolume } from "@/hooks/useMusicVolumeControl";
 import { OPENAI_VOICES, VoiceId } from "@/hooks/useTextToSpeech";
 import {
   Select,
@@ -1642,9 +1642,12 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
   const handleMusicVolumeChange = (value: number[]) => {
     const newVolume = value[0];
     setMusicVolume(newVolume);
+    // Update internal music player
     if (musicAudioRef.current) {
       musicAudioRef.current.volume = newVolume / 100;
     }
+    // Also update the global ambient music player
+    setGlobalMusicVolume(newVolume);
   };
 
   // Handle voice change - clear cache and regenerate current audio
