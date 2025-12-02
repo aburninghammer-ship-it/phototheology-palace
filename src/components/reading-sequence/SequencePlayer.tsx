@@ -607,8 +607,8 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
           playingCommentaryRef.current = false;
           setCommentaryText(null);
           audioCompletionCallbackRef.current = null;
-          // Small delay before next action
-          setTimeout(onComplete, 200);
+          // Minimal delay for smooth transition
+          setTimeout(onComplete, 50);
         } else {
           console.log("[Commentary] ⚠️ Already cleared, skipping onComplete");
         }
@@ -633,7 +633,7 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
       setCommentaryText(null);
       audioCompletionCallbackRef.current = null;
       toast.error("Commentary unavailable, continuing", { duration: 2000 });
-      setTimeout(onComplete, 200);
+      setTimeout(onComplete, 50);
     }
   }, [openaiSpeak, openaiStop]);
 
@@ -1110,8 +1110,8 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
       // Clear the audio ref immediately
       audioRef.current = null;
       
-      // Add small delay to ensure verse audio is fully complete before starting commentary
-      await new Promise(resolve => setTimeout(resolve, 300));
+      // Minimal delay to ensure verse audio cleanup (reduced for smoother transitions)
+      await new Promise(resolve => setTimeout(resolve, 50));
       
       if (!continuePlayingRef.current) {
         console.error("[Audio] ❌ UNEXPECTED STOP - continuePlayingRef is false but audio ended naturally!");
