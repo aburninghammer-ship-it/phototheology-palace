@@ -23,27 +23,22 @@ export const VerseCommentarySelector = ({
   const generateCommentary = async (): Promise<string | null> => {
     setLoading(true);
     try {
-      // Try to fetch from cache using RPC or simplified query
-      const cachedResult = await supabase
-        .rpc('get_verse_commentary', { 
-          p_verse_reference: verseReference,
-          p_depth: 'intermediate'
-        })
-        .single();
+      // Check cache first (avoiding type complexity)
+      const cacheQuery = await supabase
+        .from("verse_commentary_cache" as any)
+        .select("commentary_text")
+        .eq("verse_reference", verseReference)
+        .limit(1) as any;
 
-      if (cachedResult.data && !cachedResult.error) {
-        const commentaryText = (cachedResult.data as any).commentary_text;
+      if (cacheQuery.data?.[0]?.commentary_text) {
+        const commentaryText = cacheQuery.data[0].commentary_text as string;
         setCommentary(commentaryText);
         return commentaryText;
       }
 
-      // Generate new commentary
-      const { data, error } = await supabase.functions.invoke('generate-verse-commentary', {
-        body: {
-          verseReference,
-          verseText,
-          depth: 'intermediate'
-        }
+      // Generate new commentary via edge function
+      const { data, error } = await supabase.functions.invoke("generate-verse-commentary", {
+        body: { verseReference, verseText, depth: "intermediate" },
       });
 
       if (error) throw error;
