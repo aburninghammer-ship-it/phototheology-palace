@@ -1890,40 +1890,6 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
             </div>
           )}
           
-          {/* Background Music Volume Slider - Always visible on all devices */}
-          <div className="flex items-center gap-3 touch-none bg-muted/30 p-3 rounded-lg">
-            <ListMusic className="h-5 w-5 text-amber-500 dark:text-amber-400 flex-shrink-0" />
-            <span className="text-sm font-medium text-foreground w-20 flex-shrink-0">Background Music</span>
-            <Slider
-              value={[musicVolume]}
-              min={0}
-              max={30}
-              step={1}
-              onValueChange={(v) => {
-                const newVolume = v[0];
-                console.log("[SequencePlayer] Music slider changed to:", newVolume);
-                setMusicVolume(newVolume);
-                setGlobalMusicVolume(newVolume);
-                // Direct apply for responsive feedback
-                if (musicAudioRef.current) {
-                  musicAudioRef.current.volume = newVolume / 100;
-                }
-              }}
-              onValueCommit={(v) => {
-                // Ensure final value is committed on interaction release
-                const newVolume = v[0];
-                console.log("[SequencePlayer] Music slider committed:", newVolume);
-                setMusicVolume(newVolume);
-                setGlobalMusicVolume(newVolume);
-                if (musicAudioRef.current) {
-                  musicAudioRef.current.volume = newVolume / 100;
-                }
-              }}
-              className="flex-1 min-w-[100px]"
-            />
-            <span className="text-sm font-semibold text-foreground w-10 flex-shrink-0">{musicVolume}%</span>
-          </div>
-          
           {isMobile && (
             <div className="flex items-center justify-center gap-2 py-1 text-xs text-muted-foreground">
               <Smartphone className="h-3 w-3" />
