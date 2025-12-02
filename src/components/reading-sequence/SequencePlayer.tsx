@@ -49,6 +49,7 @@ import {
 } from "@/services/offlineCommentaryCache";
 import { useElevenLabsAudio } from "@/hooks/useElevenLabsAudio";
 import { useBrowserSpeech } from "@/hooks/useBrowserSpeech";
+import { useTextToSpeech } from "@/hooks/useTextToSpeech";
 
 interface SequencePlayerProps {
   sequences: ReadingSequenceBlock[];
@@ -87,6 +88,7 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
   const [currentVoice, setCurrentVoice] = useState<VoiceId>(() => {
     return (currentSequence?.voice as VoiceId) || 'onyx';
   });
+  const [commentaryProvider, setCommentaryProvider] = useState<'openai' | 'elevenlabs'>('elevenlabs');
 
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const musicAudioRef = useRef<HTMLAudioElement | null>(null); // Background music audio
@@ -111,6 +113,7 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
   const activeSequences = sequences.filter((s) => s.enabled && s.items.length > 0);
   const { getCommentaryAudio } = useElevenLabsAudio();
   const { speak: speakVerse, stop: stopVerse } = useBrowserSpeech();
+  const { speak: openaiSpeak, stop: openaiStop, isPlaying: openaiPlaying, isLoading: openaiLoading } = useTextToSpeech();
 
   // Keep speech synthesis alive on mobile browsers
   useEffect(() => {
@@ -406,8 +409,8 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
     fetchChapter(nextItem.book, nextItem.chapter);
   }, [allItems, fetchChapter]);
 
-  // Generate TTS for text - with offline fallback
-  const generateTTS = useCallback(async (text: string, voice: string): Promise<string | null> => {
+  // Generate TTS for text using OpenAI
+  const generateTTS = useCallback(async (text: string, voice: string, book?: string, chapter?: number, verse?: number): Promise<string | null> => {
     // If offline mode, use browser speech synthesis
     if (offlineMode || !isOnline()) {
       console.log("[TTS] Using offline browser speech synthesis");
@@ -416,12 +419,25 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
     
     try {
       const { data, error } = await supabase.functions.invoke("text-to-speech", {
-        body: { text, voice },
+        body: { 
+          text, 
+          voice: voice as VoiceId,
+          book,
+          chapter,
+          verse,
+          useCache: true
+        },
       });
 
       if (error) throw error;
 
-      if (data?.audioContent) {
+      // Check if we got a cached URL or need to decode base64
+      if (data?.audioUrl) {
+        // Cached audio - use URL directly
+        console.log(`[TTS] Using ${data.cached ? 'cached' : 'newly cached'} audio`);
+        return data.audioUrl;
+      } else if (data?.audioContent) {
+        // Base64 audio - create blob URL
         const byteCharacters = atob(data.audioContent);
         const byteNumbers = new Array(byteCharacters.length);
         for (let i = 0; i < byteCharacters.length; i++) {
@@ -509,7 +525,7 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
     speakChunk();
   }, []);
 
-  // Play commentary audio with ElevenLabs
+  // Play commentary audio with OpenAI or ElevenLabs
   const playCommentary = useCallback(async (
     text: string, 
     book: string,
@@ -517,64 +533,80 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
     verse: number,
     onComplete: () => void
   ) => {
-    console.log("[Commentary] Playing ElevenLabs commentary");
+    console.log(`[Commentary] Playing ${commentaryProvider} commentary`);
     setIsPlayingCommentary(true);
     setCommentaryText(text);
     playingCommentaryRef.current = true;
     setIsLoading(true);
 
     try {
-      // Get or generate ElevenLabs audio
-      const audioUrl = await getCommentaryAudio(text, book, chapter, verse);
-      
-      setIsLoading(false);
+      if (commentaryProvider === 'openai') {
+        // Use OpenAI TTS
+        setIsLoading(false);
+        await openaiSpeak(text, {
+          voice: 'shimmer', // Use shimmer voice for commentary
+          book,
+          chapter,
+          verse,
+          useCache: true
+        });
+        setIsPlayingCommentary(false);
+        playingCommentaryRef.current = false;
+        setCommentaryText(null);
+        onComplete();
+      } else {
+        // Use ElevenLabs Daniel voice
+        const audioUrl = await getCommentaryAudio(text, book, chapter, verse);
+        
+        setIsLoading(false);
 
-      if (!audioUrl) {
-        console.log("[Commentary] No audio URL, using browser TTS fallback");
+        if (!audioUrl) {
+          console.log("[Commentary] No audio URL, using browser TTS fallback");
+          const playbackSpeed = currentSequence?.playbackSpeed || 1;
+          speakWithBrowserTTS(text, playbackSpeed, () => {
+            setIsPlayingCommentary(false);
+            playingCommentaryRef.current = false;
+            setCommentaryText(null);
+            onComplete();
+          });
+          return;
+        }
+
+        // Stop any existing audio
+        if (audioRef.current) {
+          audioRef.current.pause();
+          audioRef.current.onended = null;
+          audioRef.current = null;
+        }
+
+        const audio = new Audio(audioUrl);
+        audio.volume = isMuted ? 0 : volume / 100;
         const playbackSpeed = currentSequence?.playbackSpeed || 1;
-        speakWithBrowserTTS(text, playbackSpeed, () => {
+        audio.playbackRate = playbackSpeed;
+        audioRef.current = audio;
+        setAudioUrl(audioUrl);
+
+        audio.onended = () => {
+          console.log("[Commentary] Finished playing");
+          audioRef.current = null;
           setIsPlayingCommentary(false);
           playingCommentaryRef.current = false;
           setCommentaryText(null);
           onComplete();
-        });
-        return;
+        };
+
+        audio.onerror = (e) => {
+          console.error("[Commentary] Audio error:", e);
+          audioRef.current = null;
+          setIsPlayingCommentary(false);
+          playingCommentaryRef.current = false;
+          setCommentaryText(null);
+          toast.error("Commentary playback error, continuing", { duration: 2000 });
+          onComplete();
+        };
+
+        await audio.play();
       }
-
-      // Stop any existing audio
-      if (audioRef.current) {
-        audioRef.current.pause();
-        audioRef.current.onended = null;
-        audioRef.current = null;
-      }
-
-      const audio = new Audio(audioUrl);
-      audio.volume = isMuted ? 0 : volume / 100;
-      const playbackSpeed = currentSequence?.playbackSpeed || 1;
-      audio.playbackRate = playbackSpeed;
-      audioRef.current = audio;
-      setAudioUrl(audioUrl);
-
-      audio.onended = () => {
-        console.log("[Commentary] Finished playing");
-        audioRef.current = null;
-        setIsPlayingCommentary(false);
-        playingCommentaryRef.current = false;
-        setCommentaryText(null);
-        onComplete();
-      };
-
-      audio.onerror = (e) => {
-        console.error("[Commentary] Audio error:", e);
-        audioRef.current = null;
-        setIsPlayingCommentary(false);
-        playingCommentaryRef.current = false;
-        setCommentaryText(null);
-        toast.error("Commentary playback error, continuing", { duration: 2000 });
-        onComplete();
-      };
-
-      await audio.play();
     } catch (e) {
       console.error("[Commentary] Failed:", e);
       setIsLoading(false);
@@ -584,7 +616,7 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
       toast.error("Commentary unavailable, continuing", { duration: 2000 });
       onComplete();
     }
-  }, [getCommentaryAudio, isMuted, volume, currentSequence, speakWithBrowserTTS]);
+  }, [commentaryProvider, openaiSpeak, getCommentaryAudio, isMuted, volume, currentSequence, speakWithBrowserTTS]);
 
   // Handle chapter completion with commentary check (for browser TTS and fallback paths)
   const handleChapterCompleteWithCommentary = useCallback((content: ChapterContent) => {
@@ -903,7 +935,7 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
       console.log("[PlayVerse] Generating TTS for verse:", verseIdx + 1, "text:", verse.text.substring(0, 50));
       setIsLoading(true);
       
-      url = await generateTTS(verse.text, voice);
+      url = await generateTTS(verse.text, voice, content.book, content.chapter, verse.verse);
       
       isGeneratingRef.current = false;
       setIsLoading(false);
@@ -1938,6 +1970,33 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
                     </div>
                   </SelectItem>
                 ))}
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
+
+        {/* Commentary Provider Selector */}
+        <div className="px-4 pb-2">
+          <div className="flex items-center gap-3">
+            <span className="text-xs text-amber-600 dark:text-amber-400">🎩</span>
+            <span className="text-xs text-muted-foreground w-20">Commentary</span>
+            <Select value={commentaryProvider} onValueChange={(value: 'openai' | 'elevenlabs') => setCommentaryProvider(value)}>
+              <SelectTrigger className="flex-1 h-8 text-xs">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="openai" className="text-xs">
+                  <div className="flex flex-col">
+                    <span className="font-medium">OpenAI (Shimmer)</span>
+                    <span className="text-muted-foreground text-[10px]">Fast, cached</span>
+                  </div>
+                </SelectItem>
+                <SelectItem value="elevenlabs" className="text-xs">
+                  <div className="flex flex-col">
+                    <span className="font-medium">ElevenLabs (Daniel)</span>
+                    <span className="text-muted-foreground text-[10px]">Premium quality</span>
+                  </div>
+                </SelectItem>
               </SelectContent>
             </Select>
           </div>
