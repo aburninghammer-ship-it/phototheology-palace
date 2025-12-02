@@ -1,7 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Headphones, Music, MessageSquare, BookOpen } from "lucide-react";
+import { Headphones, Music, BookOpen } from "lucide-react";
 import { ReadingSequenceBlock, SequenceItem } from "@/types/readingSequence";
 import { VoiceId } from "@/hooks/useTextToSpeech";
 
@@ -127,32 +127,6 @@ export const SampleAudioLibrary = ({ onPlaySample }: SampleAudioLibraryProps) =>
                         onClick={() => handlePlaySample(sample.book, sample.chapter, "chapter", true)}
                       >
                         <Music className="h-4 w-4" />
-                        With Music
-                      </Button>
-                    </div>
-                  </div>
-
-                  {/* Commentary Only */}
-                  <div className="space-y-2 md:col-span-2">
-                    <p className="text-xs font-semibold text-muted-foreground uppercase">Commentary Only (Daniel Voice)</p>
-                    <div className="flex gap-2">
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        className="flex-1 gap-2"
-                        onClick={() => handlePlaySample(sample.book, sample.chapter, "commentary-only", false)}
-                      >
-                        <MessageSquare className="h-3 w-3" />
-                        No Music
-                      </Button>
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        className="flex-1 gap-2"
-                        onClick={() => handlePlaySample(sample.book, sample.chapter, "commentary-only", true)}
-                      >
-                        <Music className="h-4 w-4" />
-                        <MessageSquare className="h-4 w-4" />
                         With Music
                       </Button>
                     </div>
