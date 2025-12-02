@@ -1418,14 +1418,35 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
     loadChapter();
   }, [currentItem?.book, currentItem?.chapter, currentItem?.startVerse, currentItem?.endVerse, fetchChapter]);
 
-  // Auto-play when new chapter content loads (for chapter transitions)
+  // Auto-play when new chapter content loads (initial chapter + transitions)
   useEffect(() => {
-    if (shouldPlayNextRef.current && chapterContent && !isLoading && !isGeneratingRef.current && !audioRef.current) {
-      console.log("Auto-playing next chapter after transition");
+    const canAutoPlayFirst =
+      autoPlay &&
+      !hasStarted &&
+      !!chapterContent &&
+      !!chapterContent.verses &&
+      chapterContent.verses.length > 0;
+
+    if (
+      (shouldPlayNextRef.current || canAutoPlayFirst) &&
+      chapterContent &&
+      !isLoading &&
+      !isGeneratingRef.current &&
+      !audioRef.current
+    ) {
+      if (canAutoPlayFirst) {
+        console.log("[AutoStart] Starting playback with", chapterContent.verses.length, "verses");
+        setHasStarted(true);
+      } else {
+        console.log("Auto-playing next chapter after transition");
+      }
+
+      // Always clear the flag once we act on it
       shouldPlayNextRef.current = false;
+
       const voice = currentSequence?.voice || "daniel";
       continuePlayingRef.current = true;
-      
+
       // Check for commentary-only mode
       if (currentSequence?.commentaryOnly && currentSequence?.includeJeevesCommentary) {
         console.log("[Commentary Only] Skipping verse reading, playing commentary only");
@@ -1436,64 +1457,7 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
         playVerseAtIndex(0, chapterContent, voice);
       }
     }
-  }, [chapterContent, isLoading, currentSequence, playVerseAtIndex]);
-
-  // Auto-start on mount - runs once when autoPlay is true
-  useEffect(() => {
-    if (!autoPlay || hasStarted) return;
-    
-    // Wait for content to be ready, then start
-    const checkAndStart = () => {
-      console.log("[AutoStart] Checking:", {
-        hasContent: !!chapterContent,
-        versesCount: chapterContent?.verses?.length,
-        isLoading,
-        isGenerating: isGeneratingRef.current,
-        hasAudio: !!audioRef.current
-      });
-      
-      if (chapterContent && chapterContent.verses && chapterContent.verses.length > 0 && !isLoading && !isGeneratingRef.current && !audioRef.current) {
-        console.log("[AutoStart] Starting playback with", chapterContent.verses.length, "verses");
-        setHasStarted(true);
-        const voice = currentSequence?.voice || "daniel";
-        continuePlayingRef.current = true;
-        
-        // Check for commentary-only mode
-        if (currentSequence?.commentaryOnly && currentSequence?.includeJeevesCommentary) {
-          console.log("[Commentary Only] Auto-starting with commentary only");
-          playCommentaryOnlyChapter(chapterContent, currentSequence);
-        } else {
-          // Notify music ducking for regular Bible reading
-          notifyTTSStarted();
-          // Don't set isPlaying here - let playVerseAtIndex do it after audio actually starts
-          playVerseAtIndex(0, chapterContent, voice);
-        }
-        return true;
-      }
-      return false;
-    };
-    
-    // Try immediately
-    if (checkAndStart()) return;
-    
-    // If not ready, poll briefly
-    const interval = setInterval(() => {
-      if (checkAndStart()) {
-        clearInterval(interval);
-      }
-    }, 300);
-    
-    // Clean up after 10 seconds
-    const timeout = setTimeout(() => {
-      clearInterval(interval);
-      console.log("[AutoStart] Timeout - content never became ready");
-    }, 10000);
-    
-    return () => {
-      clearInterval(interval);
-      clearTimeout(timeout);
-    };
-  }, [autoPlay, hasStarted, chapterContent, isLoading, currentSequence, playVerseAtIndex]);
+  }, [autoPlay, hasStarted, chapterContent, isLoading, currentSequence, playVerseAtIndex, playCommentaryOnlyChapter]);
 
   const handlePlay = () => {
     console.log("handlePlay called - isPaused:", isPaused, "hasAudio:", !!audioRef.current, "speechPaused:", speechSynthesis.paused);
