@@ -33,6 +33,8 @@ import { ReadingSequenceBlock, ROOM_TAG_OPTIONS, SavedReadingSequence, SequenceI
 import { VoiceId } from "@/hooks/useTextToSpeech";
 import { toast } from "sonner";
 import { usePregenerateCommentary } from "@/hooks/usePregenerateCommentary";
+import { useProcessTracking } from "@/contexts/ProcessTrackingContext";
+import { JeevesContinuityPrompt } from "@/components/continuity/JeevesContinuityPrompt";
 
 const createEmptyBlock = (sequenceNumber: number): ReadingSequenceBlock => ({
   sequenceNumber,
@@ -48,6 +50,7 @@ const createEmptyBlock = (sequenceNumber: number): ReadingSequenceBlock => ({
 export default function ReadMeTheBible() {
   const { user } = useAuth();
   const { subscription, loading: subscriptionLoading } = useSubscription();
+  const { trackProcess, clearProcess } = useProcessTracking();
   const {
     savedSequences,
     isLoading,
@@ -151,6 +154,16 @@ export default function ReadMeTheBible() {
     if (seq) {
       setSequences(seq.sequences);
       incrementPlayCount(seq.id);
+      
+      // Track process
+      const totalChapters = seq.sequences.reduce((acc, s) => acc + s.items.length, 0);
+      trackProcess({
+        process: seq.name,
+        totalSteps: totalChapters,
+        step: 1,
+        taskType: "audio_reading",
+        notes: `Reading ${seq.name}`,
+      });
     }
     setIsPlaying(true);
   };
@@ -260,6 +273,24 @@ export default function ReadMeTheBible() {
       
       <Navigation />
       <div className="container mx-auto px-4 py-8 relative z-10">
+        {/* Continuity Prompt */}
+        {user && (
+          <JeevesContinuityPrompt
+            feature="audio reading"
+            onResume={() => setIsPlaying(true)}
+            onRestart={() => {
+              clearProcess();
+              setSequences([createEmptyBlock(1)]);
+              setActiveTab("create");
+            }}
+            onStartNew={() => {
+              clearProcess();
+              setActiveTab("samples");
+            }}
+            onSkip={() => clearProcess()}
+          />
+        )}
+        
         {/* Header */}
         <div className="mb-8">
           <div className="flex items-center gap-2 mb-2">

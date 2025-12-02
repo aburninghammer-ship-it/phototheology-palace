@@ -50,6 +50,7 @@ import {
 import { useElevenLabsAudio } from "@/hooks/useElevenLabsAudio";
 import { useBrowserSpeech } from "@/hooks/useBrowserSpeech";
 import { useTextToSpeech } from "@/hooks/useTextToSpeech";
+import { useProcessTracking } from "@/contexts/ProcessTrackingContext";
 
 interface SequencePlayerProps {
   sequences: ReadingSequenceBlock[];
@@ -64,6 +65,7 @@ interface ChapterContent {
 }
 
 export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: SequencePlayerProps) => {
+  const { trackProcess } = useProcessTracking();
   const [isPlaying, setIsPlaying] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -355,6 +357,13 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
         setIsPlaying(false);
         continuePlayingRef.current = false;
         toast.success("Reading sequence complete!");
+        trackProcess({
+          process: "Audio Reading Complete",
+          step: totalItems,
+          totalSteps: totalItems,
+          taskType: "audio_reading",
+          notes: "Completed reading sequence",
+        });
         return prev;
       }
       console.log("[Audio] Moving to chapter:", nextIdx + 1, "of", totalItems);
@@ -363,9 +372,19 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
       setChapterContent(null);
       // Reset lastFetchedRef so the new chapter can load
       lastFetchedRef.current = "";
+      
+      // Track progress
+      trackProcess({
+        process: "Audio Reading",
+        step: nextIdx + 1,
+        totalSteps: totalItems,
+        taskType: "audio_reading",
+        notes: `Reading chapter ${nextIdx + 1} of ${totalItems}`,
+      });
+      
       return nextIdx;
     });
-  }, [totalItems]);
+  }, [totalItems, trackProcess]);
 
 
   // Fetch chapter content (with caching)
