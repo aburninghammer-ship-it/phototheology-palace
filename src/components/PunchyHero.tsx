@@ -30,11 +30,26 @@ export const PunchyHero = () => {
           </span>
         </motion.div>
 
+        {/* Scripture Reference */}
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.1 }}
+          className="mb-6 sm:mb-8"
+        >
+          <p className="text-sm sm:text-base md:text-lg text-muted-foreground italic max-w-2xl mx-auto px-4">
+            "many shall run to and fro, and knowledge shall be increased"
+          </p>
+          <p className="text-xs sm:text-sm text-muted-foreground/70 mt-1">
+            — Daniel 12:4
+          </p>
+        </motion.div>
+
         {/* Main Headline */}
         <motion.h1
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.1 }}
+          transition={{ duration: 0.6, delay: 0.2 }}
           className="text-3xl sm:text-4xl md:text-6xl lg:text-7xl xl:text-8xl font-bold mb-4 sm:mb-6 leading-tight sm:leading-[1.1] px-2"
         >
           The Bible,{" "}
@@ -47,7 +62,7 @@ export const PunchyHero = () => {
         <motion.p
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.2 }}
+          transition={{ duration: 0.6, delay: 0.3 }}
           className="text-base sm:text-lg md:text-xl lg:text-2xl text-muted-foreground max-w-3xl mx-auto mb-3 sm:mb-4 px-4"
         >
           Most people read Scripture and forget it by lunch.
@@ -56,7 +71,7 @@ export const PunchyHero = () => {
         <motion.p
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.3 }}
+          transition={{ duration: 0.6, delay: 0.4 }}
           className="text-base sm:text-lg md:text-xl lg:text-2xl font-medium max-w-3xl mx-auto mb-8 sm:mb-10 px-4"
         >
           Phototheology turns the Bible into a{" "}
@@ -69,7 +84,7 @@ export const PunchyHero = () => {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.4 }}
+          transition={{ duration: 0.6, delay: 0.5 }}
           className="flex flex-col items-center gap-3 sm:gap-4 px-4"
         >
           <Button
@@ -89,7 +104,7 @@ export const PunchyHero = () => {
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ duration: 0.6, delay: 0.6 }}
+          transition={{ duration: 0.6, delay: 0.7 }}
           className="grid grid-cols-3 gap-4 sm:gap-6 md:gap-8 max-w-2xl mx-auto mt-10 sm:mt-12 md:mt-16 pt-6 sm:pt-8 border-t border-border/50 px-4"
         >
           <div className="text-center">
