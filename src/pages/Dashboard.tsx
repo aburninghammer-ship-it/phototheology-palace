@@ -12,6 +12,7 @@ import { SpacedRepetitionReview } from "@/components/SpacedRepetitionReview";
 import { DashboardSkeleton } from "@/components/SkeletonLoader";
 import { PalaceProgressDashboard } from "@/components/PalaceProgressDashboard";
 import { useUserPreferences } from "@/hooks/useUserPreferences";
+import { JeevesWelcomeModal } from "@/components/retention/JeevesWelcomeModal";
 import { Brain, Building2 } from "lucide-react";
 import { 
   BookOpen, 
@@ -177,6 +178,7 @@ export default function Dashboard() {
   return (
     <div className="min-h-screen gradient-dreamy">
       {preferences.navigation_style === "simplified" ? <SimplifiedNav /> : <Navigation />}
+      <JeevesWelcomeModal />
       <div className="container mx-auto px-4 py-8 max-w-7xl">
         <div className="mb-8 flex items-center gap-4">
           <img 

@@ -2478,6 +2478,74 @@ export type Database = {
         }
         Relationships: []
       }
+      experiment_assignments: {
+        Row: {
+          assigned_at: string | null
+          converted_at: string | null
+          experiment_id: string | null
+          id: string
+          user_id: string | null
+          variant: string
+        }
+        Insert: {
+          assigned_at?: string | null
+          converted_at?: string | null
+          experiment_id?: string | null
+          id?: string
+          user_id?: string | null
+          variant: string
+        }
+        Update: {
+          assigned_at?: string | null
+          converted_at?: string | null
+          experiment_id?: string | null
+          id?: string
+          user_id?: string | null
+          variant?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "experiment_assignments_experiment_id_fkey"
+            columns: ["experiment_id"]
+            isOneToOne: false
+            referencedRelation: "experiments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      experiments: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          ended_at: string | null
+          id: string
+          is_active: boolean | null
+          name: string
+          traffic_percentage: number | null
+          variants: Json
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          ended_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          name: string
+          traffic_percentage?: number | null
+          variants?: Json
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          ended_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          name?: string
+          traffic_percentage?: number | null
+          variants?: Json
+        }
+        Relationships: []
+      }
       feedback: {
         Row: {
           category: string | null
@@ -4021,6 +4089,9 @@ export type Database = {
           page_path: string
           page_title: string | null
           referrer: string | null
+          scroll_depth: number | null
+          session_duration_ms: number | null
+          session_id: string | null
           user_agent: string | null
           user_id: string | null
         }
@@ -4030,6 +4101,9 @@ export type Database = {
           page_path: string
           page_title?: string | null
           referrer?: string | null
+          scroll_depth?: number | null
+          session_duration_ms?: number | null
+          session_id?: string | null
           user_agent?: string | null
           user_id?: string | null
         }
@@ -4039,6 +4113,9 @@ export type Database = {
           page_path?: string
           page_title?: string | null
           referrer?: string | null
+          scroll_depth?: number | null
+          session_duration_ms?: number | null
+          session_id?: string | null
           user_agent?: string | null
           user_id?: string | null
         }
@@ -4633,11 +4710,13 @@ export type Database = {
           avatar_url: string | null
           bio: string | null
           chain_chess_streak: number | null
+          cohort_date: string | null
           created_at: string | null
           current_floor: number | null
           daily_study_streak: number | null
           display_name: string | null
           equations_streak: number | null
+          first_meaningful_action_at: string | null
           focused_room_floor: number | null
           focused_room_id: string | null
           focused_room_set_at: string | null
@@ -4660,6 +4739,7 @@ export type Database = {
           looking_for_partner: boolean | null
           master_title: string | null
           onboarding_completed: boolean | null
+          onboarding_completed_at: string | null
           onboarding_step: number | null
           payment_source: string | null
           points: number | null
@@ -4686,11 +4766,13 @@ export type Database = {
           avatar_url?: string | null
           bio?: string | null
           chain_chess_streak?: number | null
+          cohort_date?: string | null
           created_at?: string | null
           current_floor?: number | null
           daily_study_streak?: number | null
           display_name?: string | null
           equations_streak?: number | null
+          first_meaningful_action_at?: string | null
           focused_room_floor?: number | null
           focused_room_id?: string | null
           focused_room_set_at?: string | null
@@ -4713,6 +4795,7 @@ export type Database = {
           looking_for_partner?: boolean | null
           master_title?: string | null
           onboarding_completed?: boolean | null
+          onboarding_completed_at?: string | null
           onboarding_step?: number | null
           payment_source?: string | null
           points?: number | null
@@ -4739,11 +4822,13 @@ export type Database = {
           avatar_url?: string | null
           bio?: string | null
           chain_chess_streak?: number | null
+          cohort_date?: string | null
           created_at?: string | null
           current_floor?: number | null
           daily_study_streak?: number | null
           display_name?: string | null
           equations_streak?: number | null
+          first_meaningful_action_at?: string | null
           focused_room_floor?: number | null
           focused_room_id?: string | null
           focused_room_set_at?: string | null
@@ -4766,6 +4851,7 @@ export type Database = {
           looking_for_partner?: boolean | null
           master_title?: string | null
           onboarding_completed?: boolean | null
+          onboarding_completed_at?: string | null
           onboarding_step?: number | null
           payment_source?: string | null
           points?: number | null
@@ -6860,6 +6946,36 @@ export type Database = {
           login_streak?: number | null
           total_sessions?: number | null
           updated_at?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      user_events: {
+        Row: {
+          created_at: string | null
+          event_data: Json | null
+          event_type: string
+          id: string
+          page_path: string | null
+          session_id: string | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          event_data?: Json | null
+          event_type: string
+          id?: string
+          page_path?: string | null
+          session_id?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          event_data?: Json | null
+          event_type?: string
+          id?: string
+          page_path?: string | null
+          session_id?: string | null
           user_id?: string | null
         }
         Relationships: []

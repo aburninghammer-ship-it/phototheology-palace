@@ -11,6 +11,9 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Building2, Sparkles, Mail, Lock, User, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { z } from "zod";
+import { GoogleSignInButton } from "@/components/auth/GoogleSignInButton";
+import { AuthSocialProof } from "@/components/auth/AuthSocialProof";
+import { useEventTracking } from "@/hooks/useEventTracking";
 
 const emailSchema = z.string().email("Please enter a valid email address").max(255, "Email is too long");
 const passwordSchema = z.string().min(6, "Password must be at least 6 characters").max(128, "Password is too long");
@@ -350,6 +353,20 @@ export default function Auth() {
                     </CardDescription>
                   </CardHeader>
                   <CardContent className="space-y-4">
+                    {/* Google Sign In - Primary CTA */}
+                    <GoogleSignInButton />
+                    
+                    <div className="relative">
+                      <div className="absolute inset-0 flex items-center">
+                        <span className="w-full border-t" />
+                      </div>
+                      <div className="relative flex justify-center text-xs uppercase">
+                        <span className="bg-card px-2 text-muted-foreground">
+                          Or continue with email
+                        </span>
+                      </div>
+                    </div>
+
                     {error && (
                       <Alert variant="destructive">
                         <AlertDescription>{error}</AlertDescription>
@@ -443,6 +460,20 @@ export default function Auth() {
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
+                  {/* Google Sign In - Primary CTA */}
+                  <GoogleSignInButton />
+                  
+                  <div className="relative">
+                    <div className="absolute inset-0 flex items-center">
+                      <span className="w-full border-t" />
+                    </div>
+                    <div className="relative flex justify-center text-xs uppercase">
+                      <span className="bg-card px-2 text-muted-foreground">
+                        Or sign up with email
+                      </span>
+                    </div>
+                  </div>
+
                   {error && (
                     <Alert variant="destructive">
                       <AlertDescription>{error}</AlertDescription>
@@ -463,9 +494,6 @@ export default function Auth() {
                       disabled={loading}
                       maxLength={50}
                     />
-                    <p className="text-xs text-muted-foreground">
-                      2-50 characters. Letters, numbers, spaces, hyphens, and underscores only.
-                    </p>
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="signup-email">
@@ -510,7 +538,7 @@ export default function Auth() {
                     </Alert>
                   )}
                 </CardContent>
-                <CardFooter>
+                <CardFooter className="flex flex-col gap-4">
                   <Button 
                     type="submit" 
                     className="w-full gradient-palace" 
@@ -525,12 +553,23 @@ export default function Auth() {
                       "Create Account"
                     )}
                   </Button>
+                  <AuthSocialProof />
                 </CardFooter>
               </form>
             </TabsContent>
           </Tabs>
         </Card>
 
+        {/* Try Demo Link */}
+        <div className="text-center mt-4">
+          <Button
+            variant="link"
+            onClick={() => navigate("/interactive-demo")}
+            className="text-muted-foreground hover:text-primary"
+          >
+            Want to try first? Explore the free demo →
+          </Button>
+        </div>
       </div>
     </div>
   );
