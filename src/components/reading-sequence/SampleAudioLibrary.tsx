@@ -29,6 +29,8 @@ export const SampleAudioLibrary = ({ onPlaySample }: SampleAudioLibraryProps) =>
       order: 0,
     };
 
+    console.log('[SampleAudioLibrary] Creating sample:', { book, chapter, mode, withMusic });
+
     return [{
       sequenceNumber: 1,
       enabled: true,
@@ -36,7 +38,7 @@ export const SampleAudioLibrary = ({ onPlaySample }: SampleAudioLibraryProps) =>
       voice: "daniel" as VoiceId,
       playbackSpeed: 1,
       playOrder: "listed",
-      includeJeevesCommentary: mode !== "verse-by-verse" && mode !== "chapter",
+      includeJeevesCommentary: mode !== "commentary-only",
       commentaryOnly: mode === "commentary-only",
       commentaryVoice: "daniel" as VoiceId,
       commentaryDepth: "surface" as const,
@@ -46,7 +48,9 @@ export const SampleAudioLibrary = ({ onPlaySample }: SampleAudioLibraryProps) =>
   };
 
   const handlePlaySample = (book: string, chapter: number, mode: "verse-by-verse" | "chapter" | "commentary-only", withMusic: boolean) => {
+    console.log('[SampleAudioLibrary] Button clicked:', { book, chapter, mode, withMusic });
     const sequences = createSampleSequence(book, chapter, mode, withMusic);
+    console.log('[SampleAudioLibrary] Calling onPlaySample with:', sequences);
     onPlaySample(sequences);
   };
 

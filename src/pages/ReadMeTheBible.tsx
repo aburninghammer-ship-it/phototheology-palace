@@ -141,6 +141,7 @@ export default function ReadMeTheBible() {
   };
 
   const handlePlaySample = (sequences: ReadingSequenceBlock[]) => {
+    console.log('[ReadMeTheBible] handlePlaySample called with:', sequences);
     setSampleSequences(sequences);
     setIsPlaying(true);
   };
@@ -204,10 +205,14 @@ export default function ReadMeTheBible() {
             Back to {sampleSequences ? "Samples" : "Builder"}
           </Button>
           <div className="glass-card p-6 rounded-xl">
-            <SequencePlayer sequences={playingSequences} onClose={() => {
-              setIsPlaying(false);
-              setSampleSequences(null);
-            }} />
+            <SequencePlayer 
+              sequences={playingSequences} 
+              onClose={() => {
+                setIsPlaying(false);
+                setSampleSequences(null);
+              }}
+              autoPlay={true}
+            />
           </div>
         </div>
       </div>

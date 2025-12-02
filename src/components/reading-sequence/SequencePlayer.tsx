@@ -139,15 +139,19 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
     commentaryCache.current.clear();
     prefetchingCommentaryRef.current.clear();
     
-    // Set music volume based on whether music is enabled in sequences
-    const hasMusicEnabled = sequences.some(s => s.backgroundMusic);
-    const defaultMusic = hasMusicEnabled ? Math.min(getGlobalMusicVolume(), 25) : 0;
-    setMusicVolume(defaultMusic);
-    setGlobalMusicVolume(defaultMusic);
-    console.log("[SequencePlayer] Music volume initialized to:", defaultMusic, "enabled:", hasMusicEnabled);
-    
     console.log("SequencePlayer mounted, refs reset. Active sequences:", activeSequences.length, "Total items:", totalItems);
   }, []);
+
+  // Update music volume when sequences change (e.g., when switching to samples)
+  useEffect(() => {
+    const hasMusicEnabled = sequences.some(s => s.backgroundMusic);
+    const newMusicVolume = hasMusicEnabled ? Math.min(getGlobalMusicVolume(), 25) : 0;
+    console.log("[SequencePlayer] Sequences changed, updating music volume:", newMusicVolume, "enabled:", hasMusicEnabled);
+    setMusicVolume(newMusicVolume);
+    if (newMusicVolume > 0) {
+      setGlobalMusicVolume(newMusicVolume);
+    }
+  }, [sequences]);
 
   // Callback ref for music audio - ensures volume is set when element mounts
   const setMusicAudioRef = useCallback((node: HTMLAudioElement | null) => {
