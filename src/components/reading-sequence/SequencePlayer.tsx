@@ -567,22 +567,16 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
     verse: number,
     onComplete: () => void
   ) => {
-    // CRITICAL: Prevent multiple commentaries from playing simultaneously
+    // DOUBLE CHECK: Exit immediately if commentary is playing
     if (playingCommentaryRef.current) {
-      console.log(`[Commentary] ⚠️ BLOCKED: Already playing commentary, stopping previous first`);
-      openaiStop();
-      setIsPlayingCommentary(false);
-      playingCommentaryRef.current = false;
-      setCommentaryText(null);
-      audioCompletionCallbackRef.current = null;
-      // Wait longer for full cleanup
-      await new Promise(resolve => setTimeout(resolve, 500));
+      console.log(`[Commentary] ⚠️ REJECTED: Already playing, calling onComplete immediately`);
+      setTimeout(onComplete, 100);
+      return;
     }
 
-    console.log(`[Commentary] ✓ Starting NEW commentary for ${book} ${chapter}:${verse}`);
-    
-    // Set flag BEFORE any async operations to block other attempts
+    // Set flag IMMEDIATELY to block concurrent attempts
     playingCommentaryRef.current = true;
+    console.log(`[Commentary] ✓ Starting NEW commentary for ${book} ${chapter}:${verse}`);
     setIsPlayingCommentary(true);
     setCommentaryText(text);
     setIsLoading(true);
@@ -645,12 +639,16 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
     console.log("[ChapterComplete] Commentary settings:", { includeCommentary, commentaryMode });
     
     if (includeCommentary && commentaryMode === "chapter" && content && continuePlayingRef.current) {
-      // CRITICAL: Guard against multiple commentaries playing
+      // DOUBLE GUARD: Exit early if commentary is active
       if (playingCommentaryRef.current) {
-        console.log("[ChapterComplete] ⚠️ BLOCKED - Commentary already playing, skipping");
-        moveToNextChapter();
+        console.log("[ChapterComplete] ⚠️ BLOCKED - Commentary active, moving to next chapter");
+        setTimeout(moveToNextChapter, 100);
         return;
       }
+      
+      // Set flag immediately
+      playingCommentaryRef.current = true;
+      console.log("[ChapterComplete] 🔒 Flag set, starting chapter commentary");
       
       const cacheKey = `chapter-${content.book}-${content.chapter}-${commentaryVoice}`;
       const cached = commentaryCache.current.get(cacheKey);
@@ -658,8 +656,7 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
       if (cached?.audioUrl) {
         console.log("[ChapterComplete] Using cached chapter commentary audio");
         
-        // Set the flag immediately to prevent other commentaries from starting
-        playingCommentaryRef.current = true;
+        // Flag already set above
         setCommentaryText(cached.text);
         setIsPlayingCommentary(true);
         
@@ -694,10 +691,14 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
         });
       } else if (cached?.text) {
         console.log("[ChapterComplete] Using cached chapter commentary text");
+        // Reset flag so playCommentary can set it
+        playingCommentaryRef.current = false;
         playCommentary(cached.text, content.book, content.chapter, 0, moveToNextChapter);
       } else {
         // Generate commentary
         console.log("[ChapterComplete] Generating chapter commentary");
+        // Reset flag temporarily so playCommentary can control it
+        playingCommentaryRef.current = false;
         setIsLoading(true);
         const chapterText = content.verses.map(v => `${v.verse}. ${v.text}`).join(" ");
         
@@ -1155,17 +1156,21 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
       
       // Handle verse-by-verse commentary mode
       if (includeCommentary && commentaryMode === "verse" && content && continuePlayingRef.current) {
-        // CRITICAL: Guard against multiple commentaries playing
+        // DOUBLE GUARD: Exit early if commentary is already active
         if (playingCommentaryRef.current) {
-          console.log("[Verse Commentary] ⚠️ BLOCKED - Commentary already playing, skipping");
-          // Just move to next verse instead
+          console.log("[Verse Commentary] ⚠️ BLOCKED - Commentary active, moving to next");
+          // Skip commentary and proceed
           if (!isLastVerse) {
-            playVerseAtIndex(nextVerseIdx, content, voice);
+            setTimeout(() => playVerseAtIndex(nextVerseIdx, content, voice), 100);
           } else {
-            moveToNextChapter();
+            setTimeout(moveToNextChapter, 100);
           }
           return;
         }
+        
+        // Set flag immediately to prevent race conditions
+        playingCommentaryRef.current = true;
+        console.log("[Verse Commentary] 🔒 Flag set, starting commentary generation");
         
         const currentVerse = content.verses[verseIdx];
         const cacheKey = `verse-${content.book}-${content.chapter}-${currentVerse.verse}-${commentaryVoice}`;
@@ -1197,8 +1202,7 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
           // Use cached commentary with pre-generated audio - instant playback!
           console.log("[Verse Commentary] Using cached audio for verse", verseIdx + 1);
           
-          // Set the flag immediately to prevent other commentaries from starting
-          playingCommentaryRef.current = true;
+          // Flag already set above, just update UI
           setCommentaryText(cached.text);
           setIsPlayingCommentary(true);
           
@@ -1238,6 +1242,8 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
           return;
         } else if (cached?.text) {
           // Have text but no audio - generate TTS only
+          // Reset flag so playCommentary can set it
+          playingCommentaryRef.current = false;
           console.log("[Verse Commentary] Using cached text, generating audio");
           playCommentary(cached.text, content.book, content.chapter, currentVerse.verse, proceedAfterCommentary);
           return;
@@ -1245,6 +1251,8 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
         
         // Fallback: generate everything with timeout protection
         console.log("[Verse Commentary] No cache, generating for verse", verseIdx + 1);
+        // Reset flag temporarily so playCommentary can control it
+        playingCommentaryRef.current = false;
         setIsLoading(true);
         
         // Add timeout to prevent hanging on commentary generation

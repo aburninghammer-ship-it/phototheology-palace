@@ -155,9 +155,9 @@ CRITICAL FOR SPOKEN DELIVERY:
 - Show Christ-centered meaning through types, shadows, or direct fulfillment`,
     depth: `
 ### COMMENTARY STYLE: Scholarly Depth
-- Provide comprehensive verse analysis (4-7 sentences)
-- **CRITICAL: SELECT 4-6 MOST RELEVANT PRINCIPLES** - Choose quality over quantity
-- MUST focus on THE MOST SIGNIFICANT connections from 4-6 categories (MAXIMUM 6):
+- Provide concise yet meaningful analysis (3-5 sentences MAXIMUM)
+- **CRITICAL: SELECT ONLY 3-4 MOST IMPACTFUL PRINCIPLES** - Quality over quantity
+- MUST focus on THE 3-4 MOST SIGNIFICANT connections (STRICT MAXIMUM 4):
   * Sanctuary typology (Blue Room): Connect to specific furniture/services
   * Feast Calendar (Feasts Room): Show feast-day fulfillment or foreshadowing
   * Prophecy Room: Link to Daniel/Revelation timelines, historicist interpretation
