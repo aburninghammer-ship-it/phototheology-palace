@@ -2025,40 +2025,41 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
 
         {/* Volume Controls */}
         <div className="space-y-3 px-4">
-          {/* TTS Volume (Desktop only) */}
+          {/* TTS Volume (Desktop only - mobile can't control TTS volume) */}
           {!isMobile && (
-            <>
-              <div className="flex items-center gap-3">
-                <Button variant="ghost" size="icon" onClick={toggleMute} className="h-8 w-8">
-                  {isMuted || volume === 0 ? (
-                    <VolumeX className="h-4 w-4" />
-                  ) : (
-                    <Volume2 className="h-4 w-4" />
-                  )}
-                </Button>
-                <span className="text-xs text-muted-foreground w-12">Reader</span>
-                <Slider
-                  value={[isMuted ? 0 : volume]}
-                  max={100}
-                  step={1}
-                  onValueChange={handleVolumeChange}
-                  className="flex-1"
-                />
-              </div>
-
-              {/* Music volume slider */}
-              <div className="flex items-center gap-3">
-                <span className="text-xs text-muted-foreground w-12 ml-10">Music</span>
-                <Slider
-                  value={[musicVolume]}
-                  max={100}
-                  step={1}
-                  onValueChange={handleMusicVolumeChange}
-                  className="flex-1"
-                />
-              </div>
-            </>
+            <div className="flex items-center gap-3">
+              <Button variant="ghost" size="icon" onClick={toggleMute} className="h-8 w-8">
+                {isMuted || volume === 0 ? (
+                  <VolumeX className="h-4 w-4" />
+                ) : (
+                  <Volume2 className="h-4 w-4" />
+                )}
+              </Button>
+              <span className="text-xs text-muted-foreground w-16">Reader</span>
+              <Slider
+                value={[isMuted ? 0 : volume]}
+                max={100}
+                step={1}
+                onValueChange={handleVolumeChange}
+                className="flex-1"
+              />
+              <span className="text-xs text-muted-foreground w-8">{isMuted ? 0 : volume}%</span>
+            </div>
           )}
+
+          {/* Music volume slider - ALWAYS SHOWN on all devices */}
+          <div className="flex items-center gap-3">
+            <Volume2 className="h-4 w-4 text-muted-foreground" />
+            <span className="text-xs text-muted-foreground w-16">Music</span>
+            <Slider
+              value={[musicVolume]}
+              max={100}
+              step={1}
+              onValueChange={handleMusicVolumeChange}
+              className="flex-1"
+            />
+            <span className="text-xs text-muted-foreground w-8">{musicVolume}%</span>
+          </div>
           
           {isMobile && (
             <div className="flex flex-col gap-1 py-1 text-xs text-muted-foreground items-center">
