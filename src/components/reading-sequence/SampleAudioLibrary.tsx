@@ -96,7 +96,7 @@ export const SampleAudioLibrary = ({ onPlaySample }: SampleAudioLibraryProps) =>
                         className="flex-1 gap-2"
                         onClick={() => handlePlaySample(sample.book, sample.chapter, "verse-by-verse", true)}
                       >
-                        <Music className="h-3 w-3" />
+                        <Music className="h-4 w-4" />
                         With Music
                       </Button>
                     </div>
@@ -121,7 +121,7 @@ export const SampleAudioLibrary = ({ onPlaySample }: SampleAudioLibraryProps) =>
                         className="flex-1 gap-2"
                         onClick={() => handlePlaySample(sample.book, sample.chapter, "chapter", true)}
                       >
-                        <Music className="h-3 w-3" />
+                        <Music className="h-4 w-4" />
                         With Music
                       </Button>
                     </div>
@@ -146,8 +146,8 @@ export const SampleAudioLibrary = ({ onPlaySample }: SampleAudioLibraryProps) =>
                         className="flex-1 gap-2"
                         onClick={() => handlePlaySample(sample.book, sample.chapter, "commentary-only", true)}
                       >
-                        <Music className="h-3 w-3" />
-                        <MessageSquare className="h-3 w-3" />
+                        <Music className="h-4 w-4" />
+                        <MessageSquare className="h-4 w-4" />
                         With Music
                       </Button>
                     </div>
