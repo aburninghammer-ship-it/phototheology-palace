@@ -944,6 +944,16 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
       return;
     }
 
+    // Ensure no commentary audio is running before starting a verse
+    if (playingCommentaryRef.current || openaiPlaying) {
+      console.log("[PlayVerse] Stopping active commentary before starting verse");
+      playingCommentaryRef.current = false;
+      setIsPlayingCommentary(false);
+      setCommentaryText(null);
+      audioCompletionCallbackRef.current = null;
+      openaiStop();
+    }
+
     const verse = content.verses[verseIdx];
     
     // CRITICAL: Prevent duplicate verse playback
@@ -1374,7 +1384,7 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
         setIsPlaying(false);
       }
     }
-  }, [volume, isMuted, totalItems, generateTTS, prefetchVerse, activeSequences, currentItemIdx, generateCommentary, playCommentary, moveToNextChapter, handleChapterCompleteWithCommentary, prefetchNextChapter, offlineMode, speakWithBrowserTTS]);
+  }, [volume, isMuted, totalItems, generateTTS, prefetchVerse, activeSequences, currentItemIdx, generateCommentary, playCommentary, moveToNextChapter, handleChapterCompleteWithCommentary, prefetchNextChapter, offlineMode, speakWithBrowserTTS, openaiPlaying, openaiStop]);
 
   // Play current verse (wrapper for playVerseAtIndex)
   const playCurrentVerse = useCallback(() => {
@@ -1592,6 +1602,15 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
     speechSynthesis.cancel();
     browserUtteranceRef.current = null;
     
+    // Stop any active OpenAI TTS commentary
+    if (openaiPlaying) {
+      audioCompletionCallbackRef.current = null; // prevent stale callbacks from firing
+      openaiStop();
+    }
+    playingCommentaryRef.current = false;
+    setIsPlayingCommentary(false);
+    setCommentaryText(null);
+    
     setIsPlaying(false);
     setIsPaused(false);
     setCurrentItemIdx(0);
@@ -1612,6 +1631,15 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
     }
     speechSynthesis.cancel();
     browserUtteranceRef.current = null;
+
+    // Stop any active OpenAI TTS commentary when skipping
+    if (openaiPlaying) {
+      audioCompletionCallbackRef.current = null;
+      openaiStop();
+    }
+    playingCommentaryRef.current = false;
+    setIsPlayingCommentary(false);
+    setCommentaryText(null);
     
     if (currentItemIdx < totalItems - 1) {
       shouldPlayNextRef.current = isPlaying && continuePlayingRef.current;
@@ -1630,6 +1658,15 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
     }
     speechSynthesis.cancel();
     browserUtteranceRef.current = null;
+
+    // Stop any active OpenAI TTS commentary when skipping
+    if (openaiPlaying) {
+      audioCompletionCallbackRef.current = null;
+      openaiStop();
+    }
+    playingCommentaryRef.current = false;
+    setIsPlayingCommentary(false);
+    setCommentaryText(null);
     
     if (currentItemIdx > 0) {
       shouldPlayNextRef.current = isPlaying && continuePlayingRef.current;
