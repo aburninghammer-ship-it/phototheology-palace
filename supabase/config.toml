@@ -133,3 +133,9 @@ verify_jwt = false
 
 [functions.drill-drill]
 verify_jwt = false
+
+[functions.sync-stripe-subscriptions]
+verify_jwt = false
+
+[functions.stripe-webhook]
+verify_jwt = false

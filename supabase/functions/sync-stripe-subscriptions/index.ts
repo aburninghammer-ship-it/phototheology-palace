@@ -22,182 +22,169 @@ serve(async (req) => {
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") || ""
     );
 
-    // Check for admin auth (optional - you can remove this for one-time use)
-    const authHeader = req.headers.get("Authorization");
-    if (!authHeader) {
-      return new Response(JSON.stringify({ error: "Unauthorized" }), {
-        status: 401,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
-    }
+    console.log("Starting Stripe subscription sync...");
 
     const results: any[] = [];
-    let hasMore = true;
-    let startingAfter: string | undefined;
 
-    // Fetch all active subscriptions from Stripe
-    while (hasMore) {
-      const subscriptions = await stripe.subscriptions.list({
-        status: "active",
-        limit: 100,
-        starting_after: startingAfter,
-        expand: ["data.customer"],
+    // Get all users from auth
+    const { data: authData, error: authError } = await supabase.auth.admin.listUsers({
+      perPage: 1000,
+    });
+
+    if (authError) {
+      console.error("Error listing users:", authError);
+      throw new Error("Failed to list users: " + authError.message);
+    }
+
+    const users = authData?.users || [];
+    console.log(`Found ${users.length} users to check`);
+
+    // For each user, check if they have a Stripe subscription
+    for (const user of users) {
+      if (!user.email) continue;
+
+      // Search for Stripe customer by email
+      const customers = await stripe.customers.list({
+        email: user.email,
+        limit: 1,
       });
 
-      for (const sub of subscriptions.data) {
-        const customer = sub.customer as Stripe.Customer;
-        if (!customer.email) continue;
+      if (customers.data.length === 0) continue;
 
-        const email = customer.email;
-        const customerId = customer.id;
-        const renewalDate = new Date(sub.current_period_end * 1000);
-        const isTrialing = sub.status === "trialing";
-        const trialEnd = sub.trial_end ? new Date(sub.trial_end * 1000) : null;
+      const customer = customers.data[0];
+      
+      // Check for active subscription
+      const subscriptions = await stripe.subscriptions.list({
+        customer: customer.id,
+        status: "active",
+        limit: 1,
+      });
 
-        // Find user by email in auth.users via profiles
-        // First get user_id from auth.users
-        const { data: authUser } = await supabase.auth.admin.listUsers();
-        const user = authUser?.users?.find(u => u.email?.toLowerCase() === email.toLowerCase());
+      // Also check trialing
+      const trialingSubscriptions = await stripe.subscriptions.list({
+        customer: customer.id,
+        status: "trialing",
+        limit: 1,
+      });
 
-        if (!user) {
-          results.push({
-            email,
-            status: "skipped",
-            reason: "No matching user found",
-          });
-          continue;
-        }
+      const activeSub = subscriptions.data[0] || trialingSubscriptions.data[0];
 
-        // Check current profile
+      if (!activeSub) {
+        // Check if profile already has this customer ID without active sub
         const { data: profile } = await supabase
           .from("profiles")
           .select("subscription_status, stripe_customer_id")
           .eq("id", user.id)
           .single();
 
-        // Skip if already properly synced
-        if (profile?.stripe_customer_id === customerId && profile?.subscription_status === "active") {
+        if (profile?.stripe_customer_id === customer.id && profile?.subscription_status !== "active") {
           results.push({
-            email,
-            status: "already_synced",
-          });
-          continue;
-        }
-
-        // Determine tier from price
-        const priceId = sub.items.data[0]?.price?.id;
-        let tier = "premium"; // default
-        if (priceId?.includes("essential") || priceId === "price_1SZNyCFGDAd3RU8IPwPJVesp" || priceId === "price_1SZNyVFGDAd3RU8IPgRPqKXH") {
-          tier = "essential";
-        }
-
-        // Update profile
-        const updateData: Record<string, any> = {
-          subscription_status: isTrialing ? "trial" : "active",
-          subscription_tier: tier,
-          stripe_customer_id: customerId,
-          stripe_subscription_id: sub.id,
-          subscription_renewal_date: renewalDate.toISOString(),
-          payment_source: "stripe",
-          is_recurring: true,
-        };
-
-        if (trialEnd) {
-          updateData.trial_ends_at = trialEnd.toISOString();
-        }
-
-        const { error: updateError } = await supabase
-          .from("profiles")
-          .update(updateData)
-          .eq("id", user.id);
-
-        if (updateError) {
-          results.push({
-            email,
-            status: "error",
-            error: updateError.message,
-          });
-        } else {
-          results.push({
-            email,
-            status: "updated",
-            tier,
-            subscription_status: isTrialing ? "trial" : "active",
+            email: user.email,
+            status: "no_active_subscription",
           });
         }
+        continue;
       }
 
-      hasMore = subscriptions.has_more;
-      if (hasMore && subscriptions.data.length > 0) {
-        startingAfter = subscriptions.data[subscriptions.data.length - 1].id;
-      }
-    }
-
-    // Also check for trialing subscriptions
-    const trialingSubscriptions = await stripe.subscriptions.list({
-      status: "trialing",
-      limit: 100,
-      expand: ["data.customer"],
-    });
-
-    for (const sub of trialingSubscriptions.data) {
-      const customer = sub.customer as Stripe.Customer;
-      if (!customer.email) continue;
-
-      const email = customer.email;
-      const { data: authUser } = await supabase.auth.admin.listUsers();
-      const user = authUser?.users?.find(u => u.email?.toLowerCase() === email.toLowerCase());
-
-      if (!user) continue;
-
+      // Get current profile
       const { data: profile } = await supabase
         .from("profiles")
-        .select("subscription_status, stripe_customer_id")
+        .select("subscription_status, subscription_tier, stripe_customer_id")
         .eq("id", user.id)
         .single();
 
-      if (profile?.stripe_customer_id === customer.id) continue;
+      // Skip if already synced correctly
+      if (profile?.stripe_customer_id === customer.id && 
+          (profile?.subscription_status === "active" || profile?.subscription_status === "trial")) {
+        results.push({
+          email: user.email,
+          status: "already_synced",
+          current_status: profile.subscription_status,
+        });
+        continue;
+      }
 
-      const trialEnd = sub.trial_end ? new Date(sub.trial_end * 1000) : null;
+      // Determine tier from price
+      const priceId = activeSub.items.data[0]?.price?.id;
+      let tier = "premium"; // default
+      
+      // Essential tier price IDs
+      const essentialPrices = [
+        "price_1SZNyCFGDAd3RU8IPwPJVesp", // Essential monthly
+        "price_1SZNyVFGDAd3RU8IPgRPqKXH", // Essential annual
+      ];
+      if (essentialPrices.includes(priceId || "")) {
+        tier = "essential";
+      }
+
+      const isTrialing = activeSub.status === "trialing";
+      const renewalDate = new Date(activeSub.current_period_end * 1000);
+      const trialEnd = activeSub.trial_end ? new Date(activeSub.trial_end * 1000) : null;
+
+      // Update profile
+      const updateData: Record<string, any> = {
+        subscription_status: isTrialing ? "trial" : "active",
+        subscription_tier: tier,
+        stripe_customer_id: customer.id,
+        stripe_subscription_id: activeSub.id,
+        subscription_renewal_date: renewalDate.toISOString(),
+        payment_source: "stripe",
+        is_recurring: true,
+      };
+
+      if (trialEnd) {
+        updateData.trial_ends_at = trialEnd.toISOString();
+      }
 
       const { error: updateError } = await supabase
         .from("profiles")
-        .update({
-          subscription_status: "trial",
-          subscription_tier: "premium",
-          stripe_customer_id: customer.id,
-          stripe_subscription_id: sub.id,
-          trial_ends_at: trialEnd?.toISOString(),
-          payment_source: "stripe",
-          is_recurring: true,
-        })
+        .update(updateData)
         .eq("id", user.id);
 
-      results.push({
-        email,
-        status: updateError ? "error" : "updated_trial",
-        error: updateError?.message,
-      });
+      if (updateError) {
+        results.push({
+          email: user.email,
+          status: "error",
+          error: updateError.message,
+        });
+        console.error(`Error updating ${user.email}:`, updateError);
+      } else {
+        results.push({
+          email: user.email,
+          status: "updated",
+          tier,
+          subscription_status: isTrialing ? "trial" : "active",
+          previous_status: profile?.subscription_status || "none",
+        });
+        console.log(`Updated ${user.email}: ${tier} (${isTrialing ? "trial" : "active"})`);
+      }
     }
 
     const summary = {
-      total: results.length,
-      updated: results.filter(r => r.status === "updated" || r.status === "updated_trial").length,
+      total_users_checked: users.length,
+      updated: results.filter(r => r.status === "updated").length,
       already_synced: results.filter(r => r.status === "already_synced").length,
-      skipped: results.filter(r => r.status === "skipped").length,
+      no_subscription: results.filter(r => r.status === "no_active_subscription").length,
       errors: results.filter(r => r.status === "error").length,
     };
 
     console.log("Sync completed:", summary);
-    console.log("Details:", results);
 
-    return new Response(JSON.stringify({ summary, results }), {
+    return new Response(JSON.stringify({ 
+      success: true,
+      summary, 
+      updated_users: results.filter(r => r.status === "updated"),
+      errors: results.filter(r => r.status === "error"),
+    }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
 
   } catch (error) {
     console.error("Sync error:", error);
-    return new Response(JSON.stringify({ error: error instanceof Error ? error.message : "Unknown error" }), {
+    return new Response(JSON.stringify({ 
+      success: false,
+      error: error instanceof Error ? error.message : "Unknown error" 
+    }), {
       status: 500,
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
