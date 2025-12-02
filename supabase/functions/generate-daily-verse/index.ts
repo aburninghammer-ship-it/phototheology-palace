@@ -288,6 +288,11 @@ serve(async (req) => {
         'Luke': [3],                               // Genealogy section
       };
       
+      // Books we want to completely skip for random daily selection
+      // User feedback shows 1 Chronicles and 1 Corinthians were over-represented,
+      // so we exclude them from the random pool (they can still be used via force/override).
+      const EXCLUDED_BOOKS = ['1 Chronicles', '1 Corinthians'];
+      
       // Books to heavily limit (mostly procedural/ceremonial details)
       const LOW_CONTEXT_BOOKS = ['Leviticus', '2 Chronicles'];
       
@@ -328,6 +333,9 @@ serve(async (req) => {
       const availableVerses = verses.filter(v => {
         const ref = `${v.book} ${v.chapter}:${v.verse_num}`;
         const bookChapter = `${v.book} ${v.chapter}`;
+        
+        // Skip books we have explicitly excluded from random rotation
+        if (EXCLUDED_BOOKS.includes(v.book)) return false;
         
         // Skip recently used verses
         if (recentVerseRefs.has(ref)) return false;
