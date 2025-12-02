@@ -49,7 +49,7 @@ serve(async (req) => {
 
     console.log(`Generating ElevenLabs audio for: ${cacheKey}`);
 
-    // Generate audio with ElevenLabs Turbo (cost-efficient)
+    // Generate audio with ElevenLabs using higher quality model
     const response = await fetch(
       'https://api.elevenlabs.io/v1/text-to-speech/onwK4e9ZLuTAKqWW03F9',
       {
@@ -60,11 +60,11 @@ serve(async (req) => {
         },
         body: JSON.stringify({
           text: text,
-          model_id: 'eleven_turbo_v2', // Cost-efficient model
+          model_id: 'eleven_multilingual_v2', // Higher quality model for natural voice
           voice_settings: {
-            stability: 0.5,
-            similarity_boost: 0.75,
-            style: 0.0,
+            stability: 0.71,
+            similarity_boost: 0.85,
+            style: 0.35,
             use_speaker_boost: true,
           },
         }),
