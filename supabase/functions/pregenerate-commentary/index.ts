@@ -82,7 +82,23 @@ serve(async (req) => {
 
         if (insertError) throw insertError;
 
-        console.log(`Generated and cached: ${book} ${chapter}:${verseNum}`);
+        console.log(`Generated and cached commentary: ${book} ${chapter}:${verseNum}`);
+
+        // Generate ElevenLabs audio in background (don't await, don't block)
+        fetch(`${supabaseUrl}/functions/v1/generate-elevenlabs-audio`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${supabaseKey}`,
+          },
+          body: JSON.stringify({
+            text: commentary,
+            book,
+            chapter,
+            verse: verseNum,
+          }),
+        }).catch(err => console.error(`Background audio generation error for ${book} ${chapter}:${verseNum}:`, err));
+
         results.push({ verse: `${book} ${chapter}:${verseNum}`, status: 'generated' });
       } catch (error) {
         console.error(`Error generating commentary for ${book} ${chapter}:${verseNum}:`, error);
