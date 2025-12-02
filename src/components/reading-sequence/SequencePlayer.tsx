@@ -126,6 +126,7 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
   const currentItem = allItems[currentItemIdx] || null;
   const currentSequence = activeSequences[currentSeqIdx];
   const totalItems = allItems.length;
+  const isActive = isPlaying && !isPaused;
 
   // Reset refs on mount to ensure fresh start
   useEffect(() => {
@@ -1802,51 +1803,20 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
           </Button>
 
           <Button
-            variant="ghost"
             size="icon"
-            onClick={() => {
-              // Rewind 10 seconds in current audio
-              if (audioRef.current && audioRef.current.currentTime > 0) {
-                audioRef.current.currentTime = Math.max(0, audioRef.current.currentTime - 10);
-                console.log('[SequencePlayer] Rewound 10 seconds');
-              } else if (window.speechSynthesis?.speaking) {
-                // For browser TTS, skip to previous verse instead
-                handleSkipPrev();
-              }
-            }}
-            disabled={isLoading || (!isPlaying && !isPaused)}
-            title="Rewind 10 seconds"
+            aria-label={isActive ? "Pause" : "Play"}
+            className="h-12 w-12 rounded-full gradient-palace shadow-lg relative z-50 pointer-events-auto flex items-center justify-center"
+            onClick={isActive ? handlePause : handlePlay}
+            disabled={isLoading}
           >
-            <RotateCcw className="h-4 w-4" />
+            {isLoading ? (
+              <Loader2 className="h-6 w-6 animate-spin text-white" />
+            ) : isActive ? (
+              <Pause className="h-6 w-6 text-white" />
+            ) : (
+              <Play className="h-6 w-6 ml-0.5 text-white" />
+            )}
           </Button>
-
-          {isPlaying && !isPaused ? (
-            <Button
-              size="lg"
-              className="h-14 w-14 rounded-full gradient-palace shadow-lg relative z-20 pointer-events-auto"
-              onClick={handlePause}
-              disabled={isLoading}
-            >
-              {isLoading ? (
-                <Loader2 className="h-6 w-6 animate-spin text-white" />
-              ) : (
-                <Pause className="h-6 w-6 text-white stroke-2" fill="white" />
-              )}
-            </Button>
-          ) : (
-            <Button
-              size="lg"
-              className="h-14 w-14 rounded-full gradient-palace shadow-lg relative z-20 pointer-events-auto"
-              onClick={handlePlay}
-              disabled={isLoading}
-            >
-              {isLoading ? (
-                <Loader2 className="h-6 w-6 animate-spin text-white" />
-              ) : (
-                <Play className="h-6 w-6 ml-1 text-white stroke-2" fill="white" />
-              )}
-            </Button>
-          )}
 
           <Button
             variant="ghost"
