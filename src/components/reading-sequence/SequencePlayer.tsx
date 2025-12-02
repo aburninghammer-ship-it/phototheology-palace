@@ -88,7 +88,9 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
   const [offlineMode, setOfflineMode] = useState(!isOnline());
   const [commentaryText, setCommentaryText] = useState<string | null>(null);
   const [currentVoice, setCurrentVoice] = useState<VoiceId>(() => {
-    return (currentSequence?.voice as VoiceId) || 'onyx';
+    // Safely get voice from first active sequence without referencing undeclared currentSequence
+    const firstSequence = sequences.filter((s) => s.enabled && s.items.length > 0)[0];
+    return (firstSequence?.voice as VoiceId) || 'onyx';
   });
   const [commentaryProvider, setCommentaryProvider] = useState<'openai' | 'elevenlabs'>('elevenlabs');
 
