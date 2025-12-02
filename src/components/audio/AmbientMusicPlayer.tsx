@@ -230,10 +230,20 @@ export function AmbientMusicPlayer({
 
   // Audio ducking - reduce volume when TTS is playing
   // Works on both desktop and mobile to ensure voice reader is dominant
+  // IMPORTANT: When TTS starts, if music is enabled but not playing, auto-start it (ducked)
   const handleDuckChange = useCallback((ducked: boolean, duckRatio: number) => {
     console.log(`[AmbientMusic] Duck event: ducked=${ducked}, ratio=${duckRatio}`);
     setDuckMultiplier(duckRatio);
-  }, []);
+    
+    // Auto-start music when TTS begins (if enabled but not playing)
+    if (ducked && isEnabled && !isPlaying && audioRef.current) {
+      console.log('[AmbientMusic] Auto-starting music for TTS ducking');
+      audioRef.current.play().catch(err => {
+        console.error('[AmbientMusic] Auto-start failed:', err);
+      });
+      setIsPlaying(true);
+    }
+  }, [isEnabled, isPlaying]);
 
   useAudioDucking(handleDuckChange);
 

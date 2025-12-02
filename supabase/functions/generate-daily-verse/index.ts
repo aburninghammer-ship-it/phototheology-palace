@@ -293,6 +293,8 @@ serve(async (req) => {
       // so we exclude them from the random pool (they can still be used via force/override).
       const EXCLUDED_BOOKS = ['1 Chronicles', '1 Corinthians'];
       
+      console.log('EXCLUDED_BOOKS list:', EXCLUDED_BOOKS);
+      
       // Books to heavily limit (mostly procedural/ceremonial details)
       const LOW_CONTEXT_BOOKS = ['Leviticus', '2 Chronicles'];
       
@@ -335,7 +337,10 @@ serve(async (req) => {
         const bookChapter = `${v.book} ${v.chapter}`;
         
         // Skip books we have explicitly excluded from random rotation
-        if (EXCLUDED_BOOKS.includes(v.book)) return false;
+        if (EXCLUDED_BOOKS.includes(v.book)) {
+          console.log(`Excluding book: ${v.book} from verse ${ref}`);
+          return false;
+        }
         
         // Skip recently used verses
         if (recentVerseRefs.has(ref)) return false;
@@ -364,12 +369,20 @@ serve(async (req) => {
         return true;
       });
       
+      console.log(`After filtering: availableVerses=${availableVerses.length}, contains 1 Chronicles? ${availableVerses.some(v => v.book === '1 Chronicles')}`);
+      
       // BOOK DIVERSITY: Prefer verses from books NOT used in last 7 days
       const freshBookVerses = availableVerses.filter(v => !recentBooks.has(v.book));
       
       // Use fresh book verses if available, otherwise fall back to all available
       let versesToChooseFrom = freshBookVerses.length > 100 ? freshBookVerses : availableVerses;
-      if (versesToChooseFrom.length === 0) versesToChooseFrom = verses;
+      
+      // CRITICAL: Never fall back to unfiltered verses - this would bypass EXCLUDED_BOOKS
+      if (versesToChooseFrom.length === 0) {
+        throw new Error('No available verses after filtering - database may need more diverse content');
+      }
+      
+      console.log(`Choosing from ${versesToChooseFrom.length} verses (${freshBookVerses.length} from fresh books)`);
       
       // Use crypto-grade randomness for better distribution
       const randomBytes = new Uint32Array(1);
