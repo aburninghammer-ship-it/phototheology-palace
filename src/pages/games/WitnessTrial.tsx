@@ -6,6 +6,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { ArrowLeft, Scale } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { useProcessTracking } from "@/contexts/ProcessTrackingContext";
 
 const STREET_OBJECTIONS = [
   "Why should I care about Jesus?",
@@ -19,6 +20,7 @@ const STREET_OBJECTIONS = [
 
 export default function WitnessTrial() {
   const navigate = useNavigate();
+  const { trackProcess } = useProcessTracking();
   const [drawnCards, setDrawnCards] = useState<string[]>([]);
   const [objection, setObjection] = useState("");
   const [defense, setDefense] = useState("");
@@ -27,10 +29,20 @@ export default function WitnessTrial() {
 
   const startTrial = () => {
     const cards = ["Ep", "|S", "⚖"].sort(() => Math.random() - 0.5);
-    setDrawnCards(cards.slice(0, 3));
+    const drawnCards = cards.slice(0, 3);
+    setDrawnCards(drawnCards);
     const obj = STREET_OBJECTIONS[Math.floor(Math.random() * STREET_OBJECTIONS.length)];
     setObjection(obj);
     setDefense("");
+    
+    // Track process
+    trackProcess({
+      process: "Witness Trial",
+      totalSteps: 1,
+      step: 0,
+      taskType: "game",
+      notes: `Objection: ${obj}`,
+    });
   };
 
   const handleSubmit = async () => {

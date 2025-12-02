@@ -8,6 +8,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { ArrowLeft, BookOpen } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { useProcessTracking } from "@/contexts/ProcessTrackingContext";
 
 const GENRES = [
   { code: "Pr", name: "Prophecy" },
@@ -20,6 +21,7 @@ const GENRES = [
 
 export default function Connect6Draft() {
   const navigate = useNavigate();
+  const { trackProcess } = useProcessTracking();
   const [hand, setHand] = useState<typeof GENRES>([]);
   const [selectedGenres, setSelectedGenres] = useState<string[]>([]);
   const [doctrine, setDoctrine] = useState("");
@@ -33,10 +35,20 @@ export default function Connect6Draft() {
 
   const dealHand = () => {
     const shuffled = [...GENRES].sort(() => Math.random() - 0.5);
-    setHand(shuffled.slice(0, 4));
+    const newHand = shuffled.slice(0, 4);
+    setHand(newHand);
     setSelectedGenres([]);
     setDoctrine("");
     setVerseExplanations({});
+    
+    // Track process
+    trackProcess({
+      process: "Connect-6 Draft",
+      totalSteps: 1,
+      step: 0,
+      taskType: "game",
+      notes: `Hand: ${newHand.map(g => g.code).join(", ")}`,
+    });
   };
 
   const toggleGenre = (code: string) => {
