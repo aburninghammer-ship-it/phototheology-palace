@@ -138,6 +138,35 @@ export function useUserMusic() {
     },
   });
 
+  const addExternalMusic = useMutation({
+    mutationFn: async ({ url, name, mood }: { url: string; name: string; mood?: string }) => {
+      if (!user) throw new Error("Must be signed in");
+
+      const { data, error } = await supabase
+        .from("user_music")
+        .insert({
+          user_id: user.id,
+          name,
+          file_url: url,
+          file_path: `external/${Date.now()}`,
+          mood,
+          category: "external",
+        })
+        .select()
+        .single();
+
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["user-music"] });
+      toast.success("Track added to playlist!");
+    },
+    onError: () => {
+      toast.error("Failed to add track");
+    },
+  });
+
   return {
     userTracks,
     isLoading,
@@ -145,5 +174,6 @@ export function useUserMusic() {
     uploadMusic,
     deleteMusic: deleteMusic.mutate,
     toggleFavorite: toggleFavorite.mutate,
+    addExternalMusic: addExternalMusic.mutate,
   };
 }
