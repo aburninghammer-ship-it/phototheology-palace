@@ -194,6 +194,18 @@ serve(async (req) => {
   } catch (error) {
     console.error('Error in generate-elevenlabs-audio:', error);
     const errorMsg = error instanceof Error ? error.message : 'Unknown error';
+
+    // Treat ElevenLabs quota errors as a handled 402 so clients can gracefully fall back
+    if (errorMsg === 'ELEVENLABS_QUOTA_EXCEEDED') {
+      return new Response(
+        JSON.stringify({ error: errorMsg }),
+        {
+          status: 402,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        },
+      );
+    }
+
     return new Response(
       JSON.stringify({ error: errorMsg }),
       { 
