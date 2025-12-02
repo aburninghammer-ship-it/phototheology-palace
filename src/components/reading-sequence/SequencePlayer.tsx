@@ -20,6 +20,7 @@ import {
   Download,
   WifiOff,
   RotateCcw,
+  RefreshCw,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -1693,6 +1694,18 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
             Now Playing
           </CardTitle>
           <div className="flex items-center gap-2">
+            {onClose && (
+              <Button 
+                variant="outline" 
+                size="sm"
+                onClick={onClose}
+                title="Start over with new selections"
+                className="glass-card-subtle"
+              >
+                <RefreshCw className="h-3.5 w-3.5 mr-1.5" />
+                <span className="hidden sm:inline">Start Over</span>
+              </Button>
+            )}
             <DownloadSequenceDialog 
               sequences={sequences}
               trigger={

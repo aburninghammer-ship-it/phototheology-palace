@@ -17,6 +17,7 @@ import {
   ArrowLeft,
   ListMusic,
   Crown,
+  RefreshCw,
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { SequenceBlockBuilder } from "@/components/reading-sequence/SequenceBlockBuilder";
@@ -193,17 +194,32 @@ export default function ReadMeTheBible() {
       <div className="min-h-screen bg-gradient-subtle">
         <Navigation />
         <div className="container mx-auto px-4 py-8 max-w-4xl">
-          <Button 
-            variant="ghost" 
-            onClick={() => {
-              setIsPlaying(false);
-              setSampleSequences(null);
-            }} 
-            className="mb-6 glass-card"
-          >
-            <ArrowLeft className="mr-2 h-4 w-4" />
-            Back to {sampleSequences ? "Samples" : "Builder"}
-          </Button>
+          <div className="flex gap-3 mb-6">
+            <Button 
+              variant="ghost" 
+              onClick={() => {
+                setIsPlaying(false);
+                setSampleSequences(null);
+              }} 
+              className="glass-card"
+            >
+              <ArrowLeft className="mr-2 h-4 w-4" />
+              Back to {sampleSequences ? "Samples" : "Builder"}
+            </Button>
+            
+            <Button 
+              onClick={() => {
+                setIsPlaying(false);
+                setSampleSequences(null);
+                setSequences([createEmptyBlock(1)]);
+                setActiveTab("samples");
+              }} 
+              className="gradient-palace text-white"
+            >
+              <RefreshCw className="mr-2 h-4 w-4" />
+              Start Over
+            </Button>
+          </div>
           <div className="glass-card p-6 rounded-xl">
             <SequencePlayer 
               sequences={playingSequences} 
