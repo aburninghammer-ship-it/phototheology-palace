@@ -74,7 +74,7 @@ serve(async (req) => {
         success: true, 
         code: data.code,
         expiresAt: data.expires_at,
-        link: `${origin}/access-code?code=${data.code}`
+        link: `${origin}/access?code=${data.code}`
       }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );

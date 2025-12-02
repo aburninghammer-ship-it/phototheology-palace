@@ -81,7 +81,8 @@ serve(async (req) => {
     if (codeError) throw codeError;
 
     // Send invitation email
-    const accessLink = `${Deno.env.get('VITE_SUPABASE_URL')?.replace('/functions/v1', '')}/access?code=${code}`;
+    const origin = req.headers.get('origin') || 'https://phototheology.lovable.app';
+    const accessLink = `${origin}/access?code=${code}`;
     
     const emailHtml = `
       <!DOCTYPE html>
