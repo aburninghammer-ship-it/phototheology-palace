@@ -248,14 +248,31 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
     }
   }, []);
 
-  // Generate verse commentary using Jeeves (with offline cache)
+  // Generate verse commentary using Jeeves (with offline cache AND database cache)
   const generateVerseCommentary = useCallback(async (book: string, chapter: number, verse: number, verseText: string, depth: string = "surface") => {
     try {
       // Check offline cache first
-      const cached = getCachedVerseCommentary(book, chapter, verse, depth);
-      if (cached) {
-        console.log("[Verse Commentary] Using cached commentary for", book, chapter + ":" + verse);
-        return cached;
+      const offlineCached = getCachedVerseCommentary(book, chapter, verse, depth);
+      if (offlineCached) {
+        console.log("[Verse Commentary] Using offline cached commentary for", book, chapter + ":" + verse);
+        return offlineCached;
+      }
+
+      // Check database cache (pre-generated)
+      const { data: dbCached, error: cacheError } = await supabase
+        .from('verse_commentary_cache')
+        .select('commentary_text')
+        .eq('book', book)
+        .eq('chapter', chapter)
+        .eq('verse', verse)
+        .eq('depth', depth)
+        .maybeSingle();
+
+      if (!cacheError && dbCached?.commentary_text) {
+        console.log("[Verse Commentary] Using pre-generated database cache for", book, chapter + ":" + verse);
+        // Also cache offline for next time
+        cacheVerseCommentary(book, chapter, verse, depth, dbCached.commentary_text);
+        return dbCached.commentary_text;
       }
 
       // If offline and no cache, return null
@@ -288,6 +305,24 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
         // Cache the commentary for offline use
         if (commentary) {
           cacheVerseCommentary(book, chapter, verse, depth, commentary);
+          
+          // Also cache in database for future use (fire and forget)
+          (async () => {
+            try {
+              await supabase
+                .from('verse_commentary_cache')
+                .insert({
+                  book,
+                  chapter,
+                  verse,
+                  commentary_text: commentary,
+                  depth,
+                });
+              console.log("[Verse Commentary] Cached in database");
+            } catch (err) {
+              console.error("[Verse Commentary] Failed to cache in DB:", err);
+            }
+          })();
         }
         
         console.log("[Verse Commentary] Generated length:", commentary?.length || 0);

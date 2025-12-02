@@ -32,6 +32,7 @@ import { PremiumBadge } from "@/components/PremiumBadge";
 import { ReadingSequenceBlock, ROOM_TAG_OPTIONS, SavedReadingSequence, SequenceItem } from "@/types/readingSequence";
 import { VoiceId } from "@/hooks/useTextToSpeech";
 import { toast } from "sonner";
+import { usePregenerateCommentary } from "@/hooks/usePregenerateCommentary";
 
 const createEmptyBlock = (sequenceNumber: number): ReadingSequenceBlock => ({
   sequenceNumber,
@@ -65,6 +66,19 @@ export default function ReadMeTheBible() {
   const [isPlaying, setIsPlaying] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [sampleSequences, setSampleSequences] = useState<ReadingSequenceBlock[] | null>(null);
+
+  // Pre-generate commentary for current sequences in background
+  const allVerses = sequences.flatMap(seq => 
+    seq.enabled ? seq.items.flatMap(item => 
+      Array.from({ length: item.endVerse - item.startVerse + 1 }, (_, i) => ({
+        book: item.book,
+        chapter: item.chapter,
+        verse: item.startVerse + i,
+        text: "", // Text will be fetched by edge function
+      }))
+    ) : []
+  );
+  usePregenerateCommentary(allVerses);
 
   // Check all access types: subscription, lifetime, promotional, church
   const hasPremiumAccess = subscription.hasAccess;

@@ -7331,6 +7331,45 @@ export type Database = {
           },
         ]
       }
+      verse_commentary_cache: {
+        Row: {
+          audio_storage_path: string | null
+          book: string
+          chapter: number
+          commentary_text: string
+          created_at: string | null
+          depth: string | null
+          id: string
+          updated_at: string | null
+          verse: number
+          voice_id: string | null
+        }
+        Insert: {
+          audio_storage_path?: string | null
+          book: string
+          chapter: number
+          commentary_text: string
+          created_at?: string | null
+          depth?: string | null
+          id?: string
+          updated_at?: string | null
+          verse: number
+          voice_id?: string | null
+        }
+        Update: {
+          audio_storage_path?: string | null
+          book?: string
+          chapter?: number
+          commentary_text?: string
+          created_at?: string | null
+          depth?: string | null
+          id?: string
+          updated_at?: string | null
+          verse?: number
+          voice_id?: string | null
+        }
+        Relationships: []
+      }
       verse_highlights: {
         Row: {
           book: string
