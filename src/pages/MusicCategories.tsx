@@ -50,11 +50,11 @@ const MUSIC_FLOORS = [
         bpm: 60
       },
       {
-        id: "fire-study",
-        name: "Fire",
-        description: "Choir harmonies, uplifting crescendo, ethereal synths",
-        url: "https://cdn1.suno.ai/37b77ba0-4272-4220-a392-16645e9aa9b2.mp3",
-        bpm: 60
+        id: "flight-study",
+        name: "Flight",
+        description: "Soaring orchestral, uplifting, ethereal",
+        url: "https://cdn1.suno.ai/qWAdsQQdcbYPv9kC.mp3",
+        bpm: 65
       },
       {
         id: "whispers-inner-mind",
