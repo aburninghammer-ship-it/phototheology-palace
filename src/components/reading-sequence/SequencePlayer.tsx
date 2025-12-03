@@ -89,6 +89,11 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
   const [currentVoice, setCurrentVoice] = useState<VoiceId>(() => {
     return (activeSequences[currentSeqIdx]?.voice as VoiceId) || 'onyx';
   });
+  
+  // Commentary depth can be changed mid-session
+  const [currentCommentaryDepth, setCurrentCommentaryDepth] = useState<"surface" | "intermediate" | "depth">(() => {
+    return (activeSequences[currentSeqIdx]?.commentaryDepth as "surface" | "intermediate" | "depth") || 'surface';
+  });
 
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const musicAudioRef = useRef<HTMLAudioElement | null>(null); // Background music audio
@@ -614,7 +619,8 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
     const includeCommentary = currentSeq?.includeJeevesCommentary || false;
     const commentaryMode = currentSeq?.commentaryMode || "chapter";
     const commentaryVoice = currentSeq?.commentaryVoice || "daniel";
-    const commentaryDepth = currentSeq?.commentaryDepth || "surface";
+    // Use the session-level commentary depth (can be changed mid-session)
+    const commentaryDepth = currentCommentaryDepth;
     
     console.log("[ChapterComplete] Commentary settings:", { includeCommentary, commentaryMode });
     
@@ -794,7 +800,8 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
     
     const verse = content.verses[verseIdx];
     const commentaryVoice = sequence.commentaryVoice || "daniel";
-    const commentaryDepth = sequence.commentaryDepth || "surface";
+    // Use the session-level commentary depth (can be changed mid-session)
+    const commentaryDepth = currentCommentaryDepth;
     
     console.log("[Commentary Only] Playing verse", verseIdx + 1, "commentary");
     setCurrentVerseIdx(verseIdx);
@@ -845,7 +852,8 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
     
     const commentaryMode = sequence.commentaryMode || "chapter";
     const commentaryVoice = sequence.commentaryVoice || "daniel";
-    const commentaryDepth = sequence.commentaryDepth || "surface";
+    // Use the session-level commentary depth (can be changed mid-session)
+    const commentaryDepth = currentCommentaryDepth;
     
     try {
       if (commentaryMode === "chapter") {
@@ -984,7 +992,8 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
     const includeCommentary = currentSeq?.includeJeevesCommentary || false;
     const commentaryMode = currentSeq?.commentaryMode || "chapter";
     const commentaryVoice = currentSeq?.commentaryVoice || "daniel";
-    const commentaryDepth = currentSeq?.commentaryDepth || "surface";
+    // Use the session-level commentary depth (can be changed mid-session)
+    const commentaryDepth = currentCommentaryDepth;
     
     // Prefetch commentary while verse plays
     if (includeCommentary) {
@@ -1068,7 +1077,8 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
       const includeCommentary = currentSeq?.includeJeevesCommentary || false;
       const commentaryMode = currentSeq?.commentaryMode || "chapter";
       const commentaryVoice = currentSeq?.commentaryVoice || "daniel";
-      const commentaryDepth = currentSeq?.commentaryDepth || "surface";
+      // Use the session-level commentary depth (can be changed mid-session)
+      const commentaryDepth = currentCommentaryDepth;
       
       const nextVerseIdx = verseIdx + 1;
       const isLastVerse = nextVerseIdx >= content.verses.length;
@@ -1692,6 +1702,19 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
     toast.success(`Voice changed to ${OPENAI_VOICES.find(v => v.id === newVoice)?.name}`);
   }, [currentVoice, isPlaying, isPaused, chapterContent, currentItem, isPlayingCommentary, commentaryText, currentVerseIdx]);
 
+  // Handle commentary depth change - clear commentary cache
+  const handleCommentaryDepthChange = useCallback((newDepth: "surface" | "intermediate" | "depth") => {
+    console.log("[Commentary] Changing depth from", currentCommentaryDepth, "to", newDepth);
+    setCurrentCommentaryDepth(newDepth);
+    
+    // Clear commentary cache to force regeneration with new depth
+    commentaryCache.current.clear();
+    prefetchingCommentaryRef.current.clear();
+    
+    const depthLabels = { surface: "Surface", intermediate: "Intermediate", depth: "Scholarly" };
+    toast.success(`Commentary depth changed to ${depthLabels[newDepth]}`);
+  }, [currentCommentaryDepth]);
+
   const toggleMute = () => {
     setIsMuted(!isMuted);
     if (audioRef.current) {
@@ -1959,6 +1982,39 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
                     </div>
                   </SelectItem>
                 ))}
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
+
+        {/* Commentary Depth Selector */}
+        <div className="px-4 pb-2">
+          <div className="flex items-center gap-3">
+            <BookOpen className="h-4 w-4 text-muted-foreground" />
+            <span className="text-xs text-muted-foreground w-12">Depth</span>
+            <Select value={currentCommentaryDepth} onValueChange={handleCommentaryDepthChange}>
+              <SelectTrigger className="flex-1 h-8 text-xs">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="surface" className="text-xs">
+                  <div className="flex flex-col">
+                    <span className="font-medium">Surface</span>
+                    <span className="text-muted-foreground text-[10px]">Brief overview</span>
+                  </div>
+                </SelectItem>
+                <SelectItem value="intermediate" className="text-xs">
+                  <div className="flex flex-col">
+                    <span className="font-medium">Intermediate</span>
+                    <span className="text-muted-foreground text-[10px]">Thorough analysis</span>
+                  </div>
+                </SelectItem>
+                <SelectItem value="depth" className="text-xs">
+                  <div className="flex flex-col">
+                    <span className="font-medium">Scholarly</span>
+                    <span className="text-muted-foreground text-[10px]">Deep study</span>
+                  </div>
+                </SelectItem>
               </SelectContent>
             </Select>
           </div>
