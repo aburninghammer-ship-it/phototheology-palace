@@ -1846,7 +1846,17 @@ CRITICAL RULE: Every drill that references a Bible verse MUST include the FULL T
 Never say "Read John 10:9" alone. Always say:
 "Read John 10:9: 'I am the door: by me if any man enter in, he shall be saved, and shall go in and out, and find pasture.' (KJV)"
 
-This is essential because users need the verse text right in front of them to complete the drill.`;
+This is essential because users need the verse text right in front of them to complete the drill.
+
+SPECIAL ROOM RULES:
+===================
+**TRANSLATION ROOM (#TR) DRILLS:**
+- NEVER give away or suggest the visual/image in the prompt!
+- The user must CREATE their own visual translation from scratch using their imagination
+- WRONG: "Translate 'Thy word is a lamp' into a visual. Draw or describe: glowing scroll lighting a dark path"
+- RIGHT: "Read Psalm 119:105: 'Thy word is a lamp unto my feet, and a light unto my path.' Translate this verse into a concrete visual image using YOUR imagination. What do you see? Describe or sketch your mental image."
+- The drill tests the user's ability to visualize, NOT to copy a given answer
+- Ask them to "describe", "sketch", "visualize", or "draw" WITHOUT telling them WHAT to see`;
 
       userPrompt = `Create 10 training drills for the ${roomName} (${roomTag}) room.
 Use random seed ${randomSeed} to ensure unique drill generation each time.
@@ -1864,6 +1874,12 @@ CRITICAL: When referencing any Bible verse in the prompt, you MUST include:
 - The verse reference (e.g., "John 3:16")
 - The COMPLETE verse text in quotes
 - Example format: "Read Genesis 1:1: 'In the beginning God created the heaven and the earth.' Now identify..."
+
+**IF THIS IS THE TRANSLATION ROOM (#TR):**
+- DO NOT give away the visual in any drill prompt
+- The user must translate the verse into their OWN mental image
+- Ask them to visualize, describe, or draw WITHOUT telling them WHAT to visualize
+- Example: "Read [verse]. Now close your eyes and translate this into a single concrete image. What do you see? Describe YOUR visual."
 
 Make drills progressively harder (1-3 beginner, 4-7 intermediate, 8-10 advanced).
 Use a VARIETY of Bible books and passages - do NOT repeat verses from previous generations.
