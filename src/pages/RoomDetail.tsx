@@ -40,6 +40,7 @@ import { JeevesMasterProgram } from "@/components/mastery/JeevesMasterProgram";
 import { VoiceChatWidget } from "@/components/voice/VoiceChatWidget";
 import { RoomTour } from "@/components/onboarding/RoomTour";
 import { useRoomTour } from "@/hooks/useRoomTour";
+import { PathRoomExercises, ReturnToPathBanner } from "@/components/path";
 
 // Room IDs that have quick start guides
 const QUICK_START_ROOMS = new Set([
