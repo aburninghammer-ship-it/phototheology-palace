@@ -278,19 +278,31 @@ export function AmbientMusicPlayer({
           
           if (nextTrackToPlay && audioRef.current) {
             console.log('[AmbientMusic] Auto-playing next track:', nextTrackToPlay.name, nextTrackToPlay.url);
-            // Directly set src and play - don't rely on React state update timing
-            audioRef.current.src = nextTrackToPlay.url;
-            audioRef.current.load(); // Explicitly load the new source
-            audioRef.current.play()
-              .then(() => {
-                console.log('[AmbientMusic] Next track started successfully');
-                setIsPlaying(true); // Ensure playing state is updated
-              })
-              .catch((err) => {
-                console.error('[AmbientMusic] Failed to play next track:', err);
-                setIsPlaying(false);
-              });
             setCurrentTrackId(nextTrackToPlay.id);
+            
+            // Wait for audio to be ready before playing to avoid AbortError
+            const audio = audioRef.current;
+            audio.src = nextTrackToPlay.url;
+            
+            const playWhenReady = () => {
+              audio.play()
+                .then(() => {
+                  console.log('[AmbientMusic] Next track started successfully');
+                  setIsPlaying(true);
+                })
+                .catch((err) => {
+                  console.error('[AmbientMusic] Failed to play next track:', err);
+                  setIsPlaying(false);
+                });
+            };
+            
+            // Use canplaythrough event to know when audio is ready
+            audio.oncanplaythrough = () => {
+              audio.oncanplaythrough = null; // Remove listener after use
+              playWhenReady();
+            };
+            
+            audio.load();
           }
         } else if (state.loopMode === "none") {
           console.log('[AmbientMusic] Loop mode none, stopping');
