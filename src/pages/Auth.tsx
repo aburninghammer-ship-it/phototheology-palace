@@ -33,7 +33,7 @@ export default function Auth() {
   // Redirect if already logged in
   useEffect(() => {
     if (user) {
-      navigate("/");
+      navigate("/dashboard");
     }
   }, [user, navigate]);
   
@@ -130,7 +130,7 @@ export default function Auth() {
       localStorage.removeItem('rememberedPassword');
 
       toast.success("Welcome back!");
-      navigate("/");
+      navigate("/dashboard");
     } catch (err) {
       setError("An unexpected error occurred. Please try again.");
       console.error("Login error:", err);

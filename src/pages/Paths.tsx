@@ -5,6 +5,7 @@ import { PATH_INFO, PathType } from "@/hooks/usePath";
 import { useNavigate } from "react-router-dom";
 import { ArrowRight, Clock, Target, Trophy, Sparkles, ChevronLeft } from "lucide-react";
 import { motion } from "framer-motion";
+import { useAuth } from "@/hooks/useAuth";
 
 const pathOrder: PathType[] = ["visual", "analytical", "devotional", "warrior"];
 
@@ -37,6 +38,7 @@ const pathDetails: Record<PathType, {
 
 export default function Paths() {
   const navigate = useNavigate();
+  const { user } = useAuth();
 
   return (
     <div className="min-h-screen bg-background">
@@ -148,15 +150,24 @@ export default function Paths() {
         <div className="max-w-2xl mx-auto text-center">
           <h2 className="text-3xl font-bold mb-4">Ready to Begin?</h2>
           <p className="text-muted-foreground mb-8">
-            Start your free trial and choose your path. You'll have 30 days to explore before committing to your 2-year journey.
+            {user 
+              ? "Choose your path and start your 2-year journey to biblical mastery."
+              : "Start your free trial and choose your path. You'll have 30 days to explore before committing to your 2-year journey."
+            }
           </p>
-          <Button size="lg" onClick={() => navigate("/auth")} className="group">
-            Start Free Trial
+          <Button 
+            size="lg" 
+            onClick={() => navigate(user ? "/dashboard" : "/auth")} 
+            className="group"
+          >
+            {user ? "Go to Dashboard" : "Start Free Trial"}
             <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
           </Button>
-          <p className="text-sm text-muted-foreground mt-4">
-            Already have an account? <Button variant="link" className="p-0 h-auto" onClick={() => navigate("/auth")}>Sign in</Button>
-          </p>
+          {!user && (
+            <p className="text-sm text-muted-foreground mt-4">
+              Already have an account? <Button variant="link" className="p-0 h-auto" onClick={() => navigate("/auth")}>Sign in</Button>
+            </p>
+          )}
         </div>
       </section>
     </div>
