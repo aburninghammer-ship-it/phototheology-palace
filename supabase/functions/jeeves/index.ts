@@ -1896,6 +1896,55 @@ Return JSON format:
   ]
 }`;
 
+    } else if (mode === "grade-drill-answer") {
+      // Grade a user's drill answer and provide feedback
+      const { drillPrompt, drillTitle, userAnswer, roomTag: drillRoomTag, roomName: drillRoomName, drillNumber } = requestBody;
+      
+      systemPrompt = `You are Jeeves, a wise and encouraging Bible study mentor grading drill answers.
+Your role is to evaluate the student's response and provide constructive feedback.
+
+GRADING CRITERIA:
+- Score 1-3: Incomplete or incorrect - missing key elements
+- Score 4-5: Partial understanding - some good points but gaps
+- Score 6-7: Good response - demonstrates understanding with minor improvements possible
+- Score 8-9: Excellent response - thorough, insightful, well-reasoned
+- Score 10: Outstanding - exceptional insight, creative connections, mastery level
+
+FEEDBACK STYLE:
+- Be encouraging but honest
+- Point out specific strengths first
+- Suggest specific improvements
+- Keep feedback concise (2-4 sentences)
+- Never be harsh or discouraging
+- Use the student's name if provided, otherwise say "friend"
+
+ROOM-SPECIFIC GRADING:
+- Story Room (SR): Look for accurate recall, vivid details, emotional engagement
+- Imagination Room (IR): Look for sensory details, personal engagement, creative visualization
+- Translation Room (#TR): Look for original/unique imagery (NOT copying suggested visuals), concrete details
+- Observation Room (OR): Look for specific details noticed, thoroughness
+- Questions Room (?): Look for thoughtful, probing questions that dig deeper
+- Concentration Room (CR): Look for Christ-centered connections
+- Patterns Room (PRm): Look for recognizing recurring themes and structures`;
+
+      userPrompt = `Grade this drill response:
+
+DRILL: ${drillTitle} (${drillRoomName} - ${drillRoomTag})
+DRILL PROMPT: ${drillPrompt}
+
+STUDENT'S ANSWER:
+${userAnswer}
+
+Provide your evaluation in this exact JSON format:
+{
+  "score": [number 1-10],
+  "feedback": "[Your encouraging feedback with specific praise and improvement suggestions]",
+  "strengths": ["[strength 1]", "[strength 2]"],
+  "improvements": ["[suggestion 1]"],
+  "mastery_insight": "[One sentence about what this response shows about their growing mastery]"
+}`;
+
+
     } else if (mode === "generate-chart") {
       systemPrompt = `You are Jeeves, a data visualization expert for Bible study.
 Generate simple, clear chart data in JSON format for visualizing biblical concepts.`;
@@ -3908,6 +3957,31 @@ Style: Professional prophetic chart, clear typography, organized layout, spiritu
       } catch {
         return new Response(
           JSON.stringify({ drills: [] }),
+          { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
+    }
+
+    // For grade-drill-answer mode, parse JSON
+    if (mode === "grade-drill-answer") {
+      try {
+        const parsed = JSON.parse(content);
+        return new Response(
+          JSON.stringify(parsed),
+          { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      } catch {
+        // Try to extract score from text if JSON parsing fails
+        const scoreMatch = content.match(/score["\s:]+(\d+)/i);
+        const score = scoreMatch ? parseInt(scoreMatch[1]) : 5;
+        return new Response(
+          JSON.stringify({ 
+            score, 
+            feedback: content,
+            strengths: [],
+            improvements: [],
+            mastery_insight: "Keep practicing to develop your skills!"
+          }),
           { headers: { ...corsHeaders, "Content-Type": "application/json" } }
         );
       }

@@ -10,8 +10,22 @@ import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { palaceFloors } from "@/data/palaceData";
-import { Dumbbell, CheckCircle2, Loader2, ArrowLeft, RefreshCw, Timer, Trophy, Target, Flame, Clock } from "lucide-react";
+import { useMastery } from "@/hooks/useMastery";
+import { useDrills } from "@/hooks/useDrills";
+import { calculateXpReward } from "@/utils/masteryCalculations";
+import { 
+  Dumbbell, CheckCircle2, Loader2, ArrowLeft, RefreshCw, Timer, Trophy, Target, 
+  Flame, Clock, Star, MessageSquare, TrendingUp, Sparkles, Award
+} from "lucide-react";
 import { Progress } from "@/components/ui/progress";
+
+interface GradeResult {
+  score: number;
+  feedback: string;
+  strengths: string[];
+  improvements: string[];
+  mastery_insight: string;
+}
 
 const TrainingDrills = () => {
   const { user } = useAuth();
@@ -24,11 +38,22 @@ const TrainingDrills = () => {
   const [response, setResponse] = useState("");
   const [loading, setLoading] = useState(false);
   const [generating, setGenerating] = useState(false);
+  const [grading, setGrading] = useState(false);
+  const [gradeResult, setGradeResult] = useState<GradeResult | null>(null);
   
   // Timer state
   const [elapsedTime, setElapsedTime] = useState(0);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
   const startTimeRef = useRef<number | null>(null);
+
+  // Get floor number from selected room
+  const getFloorNumber = () => {
+    const floorMatch = selectedFloor.match(/floor-(\d+)/);
+    return floorMatch ? parseInt(floorMatch[1]) : 1;
+  };
+
+  // Mastery hooks
+  const { awardXp, isAwarding } = useMastery(selectedRoom || "", getFloorNumber());
 
   useEffect(() => {
     if (user) {
@@ -44,7 +69,7 @@ const TrainingDrills = () => {
 
   // Timer effect
   useEffect(() => {
-    if (activeDrill) {
+    if (activeDrill && !gradeResult) {
       startTimeRef.current = Date.now();
       setElapsedTime(0);
       timerRef.current = setInterval(() => {
@@ -57,8 +82,6 @@ const TrainingDrills = () => {
         clearInterval(timerRef.current);
         timerRef.current = null;
       }
-      startTimeRef.current = null;
-      setElapsedTime(0);
     }
 
     return () => {
@@ -66,7 +89,7 @@ const TrainingDrills = () => {
         clearInterval(timerRef.current);
       }
     };
-  }, [activeDrill]);
+  }, [activeDrill, gradeResult]);
 
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
@@ -199,6 +222,8 @@ const TrainingDrills = () => {
   const startDrill = (drill: any) => {
     setActiveDrill(drill);
     setResponse("");
+    setGradeResult(null);
+    startTimeRef.current = Date.now();
   };
 
   const submitDrill = async () => {
@@ -211,45 +236,151 @@ const TrainingDrills = () => {
       return;
     }
 
-    setLoading(true);
+    setGrading(true);
 
-    const { error } = await supabase
-      .from('user_drill_completions')
-      .insert({
-        user_id: user?.id,
-        drill_id: activeDrill.id,
-        response: response,
-        time_seconds: elapsedTime,
+    try {
+      const room = getRoomByTag(selectedRoom || "");
+      
+      // Get grade from Jeeves
+      const { data: gradeData, error: gradeError } = await supabase.functions.invoke('jeeves', {
+        body: {
+          mode: 'grade-drill-answer',
+          drillPrompt: activeDrill.prompt,
+          drillTitle: activeDrill.title,
+          userAnswer: response,
+          roomTag: selectedRoom,
+          roomName: room?.name || "Unknown Room",
+          drillNumber: activeDrill.drill_number,
+        },
       });
 
-    if (error && error.code !== '23505') {
+      if (gradeError) throw gradeError;
+
+      const grade: GradeResult = gradeData || {
+        score: 5,
+        feedback: "Good effort! Keep practicing.",
+        strengths: [],
+        improvements: [],
+        mastery_insight: "Continue developing your skills."
+      };
+
+      setGradeResult(grade);
+
+      // Save completion with grade
+      const { error: completionError } = await supabase
+        .from('user_drill_completions')
+        .upsert({
+          user_id: user?.id,
+          drill_id: activeDrill.id,
+          response: response,
+          time_seconds: elapsedTime,
+          score: grade.score,
+          feedback: grade.feedback,
+        }, {
+          onConflict: 'user_id,drill_id'
+        });
+
+      if (completionError && completionError.code !== '23505') {
+        console.error('Error saving completion:', completionError);
+      }
+
+      // Save to drill_results for leaderboard
+      const { error: resultError } = await supabase
+        .from('drill_results')
+        .insert({
+          user_id: user?.id,
+          floor_number: getFloorNumber(),
+          room_id: selectedRoom,
+          drill_type: 'training_drill',
+          score: grade.score,
+          max_score: 10,
+          time_seconds: elapsedTime,
+          drill_data: {
+            drill_id: activeDrill.id,
+            drill_title: activeDrill.title,
+            feedback: grade.feedback,
+            strengths: grade.strengths,
+            improvements: grade.improvements,
+          }
+        });
+
+      if (resultError) {
+        console.error('Error saving drill result:', resultError);
+      }
+
+      // Award XP based on score
+      const isPerfect = grade.score === 10;
+      const xpAmount = calculateXpReward({
+        drillCompleted: true,
+        perfectScore: isPerfect,
+        drillScore: grade.score * 10, // Convert to percentage
+        timeBonus: elapsedTime < 120, // Bonus for completing in under 2 minutes
+      });
+
+      if (selectedRoom) {
+        awardXp({
+          xpAmount,
+          drillCompleted: true,
+          perfectScore: isPerfect,
+        });
+      }
+
+      setCompletions(new Set([...completions, activeDrill.id]));
+
+      toast({
+        title: `Score: ${grade.score}/10`,
+        description: isPerfect ? "Perfect score! Outstanding work!" : grade.mastery_insight,
+      });
+
+    } catch (error) {
+      console.error('Error grading drill:', error);
       toast({
         title: "Error",
-        description: "Failed to save completion",
+        description: "Failed to grade your response. Please try again.",
         variant: "destructive",
       });
-    } else {
-      toast({
-        title: "Drill Complete!",
-        description: `Great work! Completed in ${formatTime(elapsedTime)}`,
-      });
-      
-      setCompletions(new Set([...completions, activeDrill.id]));
-      setActiveDrill(null);
-      setResponse("");
+    } finally {
+      setGrading(false);
     }
-
-    setLoading(false);
   };
 
   const handleBackToRooms = () => {
     setSelectedRoom(null);
     setDrills([]);
     setActiveDrill(null);
+    setGradeResult(null);
+  };
+
+  const handleNextDrill = () => {
+    const currentIndex = drills.findIndex(d => d.id === activeDrill.id);
+    if (currentIndex < drills.length - 1) {
+      startDrill(drills[currentIndex + 1]);
+    } else {
+      setActiveDrill(null);
+      setGradeResult(null);
+      toast({
+        title: "All Drills Complete!",
+        description: "You've finished all drills in this room. Try refreshing for new challenges!",
+      });
+    }
   };
 
   const getRoomByTag = (tag: string) => {
     return palaceFloors.flatMap(f => f.rooms).find(r => r.tag === tag);
+  };
+
+  const getScoreColor = (score: number) => {
+    if (score >= 9) return "text-green-500";
+    if (score >= 7) return "text-emerald-500";
+    if (score >= 5) return "text-amber-500";
+    return "text-orange-500";
+  };
+
+  const getScoreBg = (score: number) => {
+    if (score >= 9) return "bg-green-500/20 border-green-500/50";
+    if (score >= 7) return "bg-emerald-500/20 border-emerald-500/50";
+    if (score >= 5) return "bg-amber-500/20 border-amber-500/50";
+    return "bg-orange-500/20 border-orange-500/50";
   };
 
   const completedCount = drills.filter(d => completions.has(d.id)).length;
@@ -275,8 +406,8 @@ const TrainingDrills = () => {
                 Palace Training Drills
               </h1>
               <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-                Master every room with AI-generated drills. 10 dynamic exercises per room, 
-                always fresh, always challenging.
+                Master every room with AI-generated drills. Jeeves grades every answer 
+                and tracks your progress toward mastery.
               </p>
               
               {/* Quick Stats */}
@@ -290,15 +421,15 @@ const TrainingDrills = () => {
                   <span className="text-sm font-medium">{completions.size} Completed</span>
                 </div>
                 <div className="glass-card px-4 py-2 rounded-full flex items-center gap-2">
-                  <Flame className="h-4 w-4 text-orange-500" />
-                  <span className="text-sm font-medium">Dynamic Generation</span>
+                  <Star className="h-4 w-4 text-yellow-500" />
+                  <span className="text-sm font-medium">XP Rewards</span>
                 </div>
               </div>
             </div>
           </div>
 
           {activeDrill ? (
-            /* Active Drill View with Timer */
+            /* Active Drill View with Timer or Feedback */
             <div className="glass-card backdrop-blur-xl bg-background/80 border border-border/50 rounded-2xl overflow-hidden">
               {/* Timer Header */}
               <div className="bg-gradient-to-r from-primary/20 via-primary/10 to-transparent p-4 border-b border-border/50">
@@ -328,50 +459,166 @@ const TrainingDrills = () => {
                   <p className="leading-relaxed text-lg whitespace-pre-wrap">{activeDrill.prompt}</p>
                 </div>
 
-                <div className="space-y-3">
-                  <label className="text-sm font-semibold flex items-center gap-2">
-                    <Clock className="h-4 w-4" />
-                    Your Response
-                  </label>
-                  <Textarea
-                    value={response}
-                    onChange={(e) => setResponse(e.target.value)}
-                    placeholder="Type your answer here... Take your time and think through your response."
-                    rows={8}
-                    disabled={loading}
-                    className="glass-card bg-background/50 border-border/50 text-base"
-                  />
-                </div>
+                {gradeResult ? (
+                  /* Feedback Display */
+                  <div className="space-y-6">
+                    {/* Score Card */}
+                    <div className={`p-6 rounded-xl border-2 ${getScoreBg(gradeResult.score)}`}>
+                      <div className="flex items-center justify-between mb-4">
+                        <div className="flex items-center gap-3">
+                          <div className={`p-3 rounded-xl ${getScoreBg(gradeResult.score)}`}>
+                            <Award className={`h-8 w-8 ${getScoreColor(gradeResult.score)}`} />
+                          </div>
+                          <div>
+                            <p className="text-sm text-muted-foreground">Your Score</p>
+                            <p className={`text-4xl font-bold ${getScoreColor(gradeResult.score)}`}>
+                              {gradeResult.score}/10
+                            </p>
+                          </div>
+                        </div>
+                        {gradeResult.score === 10 && (
+                          <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-green-500/20">
+                            <Sparkles className="h-5 w-5 text-green-500" />
+                            <span className="font-semibold text-green-500">Perfect!</span>
+                          </div>
+                        )}
+                      </div>
+                    </div>
 
-                <div className="flex gap-3 pt-4">
-                  <Button
-                    onClick={submitDrill}
-                    disabled={loading || !response.trim()}
-                    className="flex-1 h-12 text-lg"
-                    size="lg"
-                  >
-                    {loading ? (
-                      <>
-                        <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                        Submitting...
-                      </>
-                    ) : (
-                      <>
-                        <CheckCircle2 className="mr-2 h-5 w-5" />
-                        Complete Drill
-                      </>
-                    )}
-                  </Button>
-                  <Button
-                    onClick={() => setActiveDrill(null)}
-                    variant="outline"
-                    disabled={loading}
-                    size="lg"
-                    className="h-12"
-                  >
-                    Cancel
-                  </Button>
-                </div>
+                    {/* Jeeves Feedback */}
+                    <div className="glass-card p-6 rounded-xl border border-primary/30 bg-primary/5">
+                      <div className="flex items-start gap-3 mb-4">
+                        <MessageSquare className="h-5 w-5 text-primary mt-1" />
+                        <div>
+                          <h3 className="font-semibold text-primary mb-2">Jeeves' Feedback</h3>
+                          <p className="text-foreground leading-relaxed">{gradeResult.feedback}</p>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Strengths & Improvements */}
+                    <div className="grid md:grid-cols-2 gap-4">
+                      {gradeResult.strengths.length > 0 && (
+                        <div className="glass-card p-4 rounded-xl border border-green-500/30 bg-green-500/5">
+                          <h4 className="font-semibold text-green-500 mb-3 flex items-center gap-2">
+                            <CheckCircle2 className="h-4 w-4" />
+                            Strengths
+                          </h4>
+                          <ul className="space-y-2">
+                            {gradeResult.strengths.map((strength, i) => (
+                              <li key={i} className="text-sm text-muted-foreground flex items-start gap-2">
+                                <span className="text-green-500 mt-1">•</span>
+                                {strength}
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      )}
+                      {gradeResult.improvements.length > 0 && (
+                        <div className="glass-card p-4 rounded-xl border border-amber-500/30 bg-amber-500/5">
+                          <h4 className="font-semibold text-amber-500 mb-3 flex items-center gap-2">
+                            <TrendingUp className="h-4 w-4" />
+                            Areas to Grow
+                          </h4>
+                          <ul className="space-y-2">
+                            {gradeResult.improvements.map((improvement, i) => (
+                              <li key={i} className="text-sm text-muted-foreground flex items-start gap-2">
+                                <span className="text-amber-500 mt-1">•</span>
+                                {improvement}
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Mastery Insight */}
+                    <div className="glass-card p-4 rounded-xl border border-purple-500/30 bg-purple-500/5">
+                      <p className="text-sm text-purple-400 italic flex items-center gap-2">
+                        <Star className="h-4 w-4" />
+                        {gradeResult.mastery_insight}
+                      </p>
+                    </div>
+
+                    {/* Your Answer (collapsed) */}
+                    <details className="glass-card rounded-xl border border-border/30">
+                      <summary className="p-4 cursor-pointer font-medium text-muted-foreground hover:text-foreground">
+                        View Your Answer
+                      </summary>
+                      <div className="px-4 pb-4">
+                        <p className="text-sm whitespace-pre-wrap bg-muted/30 p-4 rounded-lg">{response}</p>
+                      </div>
+                    </details>
+
+                    {/* Action Buttons */}
+                    <div className="flex gap-3 pt-4">
+                      <Button
+                        onClick={handleNextDrill}
+                        className="flex-1 h-12 text-lg"
+                        size="lg"
+                      >
+                        <Dumbbell className="mr-2 h-5 w-5" />
+                        Next Drill
+                      </Button>
+                      <Button
+                        onClick={() => setActiveDrill(null)}
+                        variant="outline"
+                        size="lg"
+                        className="h-12"
+                      >
+                        Back to List
+                      </Button>
+                    </div>
+                  </div>
+                ) : (
+                  /* Answer Input */
+                  <>
+                    <div className="space-y-3">
+                      <label className="text-sm font-semibold flex items-center gap-2">
+                        <Clock className="h-4 w-4" />
+                        Your Response
+                      </label>
+                      <Textarea
+                        value={response}
+                        onChange={(e) => setResponse(e.target.value)}
+                        placeholder="Type your answer here... Take your time and think through your response."
+                        rows={8}
+                        disabled={loading || grading}
+                        className="glass-card bg-background/50 border-border/50 text-base"
+                      />
+                    </div>
+
+                    <div className="flex gap-3 pt-4">
+                      <Button
+                        onClick={submitDrill}
+                        disabled={loading || grading || !response.trim()}
+                        className="flex-1 h-12 text-lg"
+                        size="lg"
+                      >
+                        {grading ? (
+                          <>
+                            <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                            Jeeves is Grading...
+                          </>
+                        ) : (
+                          <>
+                            <CheckCircle2 className="mr-2 h-5 w-5" />
+                            Submit for Grading
+                          </>
+                        )}
+                      </Button>
+                      <Button
+                        onClick={() => setActiveDrill(null)}
+                        variant="outline"
+                        disabled={loading || grading}
+                        size="lg"
+                        className="h-12"
+                      >
+                        Cancel
+                      </Button>
+                    </div>
+                  </>
+                )}
               </div>
             </div>
           ) : selectedRoom ? (
@@ -389,7 +636,7 @@ const TrainingDrills = () => {
                         {getRoomByTag(selectedRoom)?.name}
                         <Badge variant="outline">{selectedRoom}</Badge>
                       </h2>
-                      <p className="text-muted-foreground">Complete these drills to master this room</p>
+                      <p className="text-muted-foreground">Complete drills and earn XP toward mastery</p>
                     </div>
                   </div>
                   {drills.length > 0 && !generating && (
@@ -522,7 +769,7 @@ const TrainingDrills = () => {
                             {room.purpose.substring(0, 100)}...
                           </p>
                           <div className="flex items-center justify-between">
-                            <span className="text-xs text-muted-foreground">10 drills available</span>
+                            <span className="text-xs text-muted-foreground">10 drills • XP rewards</span>
                             <Button size="sm" variant="ghost" className="gap-1 group-hover:bg-primary/10">
                               <Dumbbell className="h-3 w-3" />
                               Train
