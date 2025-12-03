@@ -260,6 +260,8 @@ interface ActivityItemProps {
 }
 
 function ActivityItem({ activity, index, isCompleted, onToggle, onNavigate }: ActivityItemProps) {
+  const [showInstructions, setShowInstructions] = useState(false);
+  
   const typeColors: Record<string, string> = {
     reading: "bg-blue-500/10 text-blue-600 dark:text-blue-400",
     drill: "bg-orange-500/10 text-orange-600 dark:text-orange-400",
@@ -268,57 +270,133 @@ function ActivityItem({ activity, index, isCompleted, onToggle, onNavigate }: Ac
     challenge: "bg-red-500/10 text-red-600 dark:text-red-400",
   };
 
+  // Parse instructions into bullet points
+  const parseInstructions = (instructions: string | undefined): string[] => {
+    if (!instructions) return [];
+    // Split by numbered items or newlines
+    return instructions
+      .split(/\n/)
+      .map(line => line.trim())
+      .filter(line => line.length > 0)
+      .map(line => line.replace(/^\d+\.\s*/, '')); // Remove leading numbers
+  };
+
+  const instructionSteps = parseInstructions(activity.detailedInstructions);
+
   return (
     <div
-      className={`p-4 rounded-lg border transition-all ${
+      className={`rounded-lg border transition-all ${
         isCompleted
           ? "bg-primary/5 border-primary/20"
           : "bg-card hover:bg-accent/50"
       }`}
     >
-      <div className="flex items-start gap-3">
-        <Checkbox
-          checked={isCompleted}
-          onCheckedChange={onToggle}
-          className="mt-1"
-        />
-        <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2 flex-wrap">
-            <span className="text-lg">{activity.icon}</span>
-            <span className={`font-medium ${isCompleted ? "line-through text-muted-foreground" : ""}`}>
-              {activity.title}
-            </span>
-            <Badge variant="outline" className={typeColors[activity.type]}>
-              {activity.type}
-            </Badge>
-            {activity.roomCode && (
-              <Badge variant="secondary" className="text-xs">
-                {activity.roomCode}
+      <div className="p-4">
+        <div className="flex items-start gap-3">
+          <Checkbox
+            checked={isCompleted}
+            onCheckedChange={onToggle}
+            className="mt-1"
+          />
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-2 flex-wrap">
+              <span className="text-lg">{activity.icon}</span>
+              <span className={`font-medium ${isCompleted ? "line-through text-muted-foreground" : ""}`}>
+                {activity.title}
+              </span>
+              <Badge variant="outline" className={typeColors[activity.type]}>
+                {activity.type}
               </Badge>
-            )}
-          </div>
-          <p className="text-sm text-muted-foreground mt-1">
-            {activity.description}
-          </p>
-          <div className="flex items-center gap-4 mt-2">
-            <span className="text-xs text-muted-foreground flex items-center gap-1">
-              <Clock className="h-3 w-3" />
-              {activity.duration}
-            </span>
-            {activity.link && (
-              <Button
-                variant="ghost"
-                size="sm"
-                className="h-6 px-2 text-xs"
-                onClick={onNavigate}
-              >
-                Go to activity
-                <ArrowRight className="ml-1 h-3 w-3" />
-              </Button>
-            )}
+              {activity.roomCode && (
+                <Badge variant="secondary" className="text-xs">
+                  {activity.roomCode}
+                </Badge>
+              )}
+            </div>
+            <p className="text-sm text-muted-foreground mt-1">
+              {activity.description}
+            </p>
+            <div className="flex items-center gap-4 mt-2 flex-wrap">
+              <span className="text-xs text-muted-foreground flex items-center gap-1">
+                <Clock className="h-3 w-3" />
+                {activity.duration}
+              </span>
+              {instructionSteps.length > 0 && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="h-6 px-2 text-xs border-primary/30 text-primary hover:bg-primary/10"
+                  onClick={() => setShowInstructions(!showInstructions)}
+                >
+                  <BookOpen className="mr-1 h-3 w-3" />
+                  {showInstructions ? "Hide" : "Show"} Instructions
+                </Button>
+              )}
+              {activity.link && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-6 px-2 text-xs"
+                  onClick={onNavigate}
+                >
+                  Go to activity
+                  <ArrowRight className="ml-1 h-3 w-3" />
+                </Button>
+              )}
+            </div>
           </div>
         </div>
       </div>
+
+      {/* Expandable Instructions Panel */}
+      {showInstructions && instructionSteps.length > 0 && (
+        <div className="px-4 pb-4">
+          <div className="ml-8 p-4 rounded-lg bg-primary/5 border border-primary/20 space-y-3">
+            <div className="flex items-center gap-2 text-sm font-semibold text-primary">
+              <Sparkles className="h-4 w-4" />
+              Step-by-Step Instructions
+            </div>
+            <ol className="space-y-2">
+              {instructionSteps.map((step, idx) => (
+                <li key={idx} className="flex gap-3 text-sm">
+                  <span className="flex-shrink-0 w-6 h-6 rounded-full bg-primary/20 text-primary flex items-center justify-center text-xs font-bold">
+                    {idx + 1}
+                  </span>
+                  <span className="text-muted-foreground pt-0.5">{step}</span>
+                </li>
+              ))}
+            </ol>
+            
+            {/* Look For section */}
+            {activity.lookFor && activity.lookFor.length > 0 && (
+              <div className="mt-4 pt-3 border-t border-primary/20">
+                <p className="text-xs font-semibold text-amber-600 dark:text-amber-400 mb-2 flex items-center gap-1">
+                  <Target className="h-3 w-3" />
+                  What to Look For:
+                </p>
+                <ul className="space-y-1">
+                  {activity.lookFor.map((item, idx) => (
+                    <li key={idx} className="text-xs text-muted-foreground flex items-start gap-2">
+                      <span className="text-amber-500">•</span>
+                      {item}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+
+            {/* Specific Verse reference */}
+            {activity.specificVerse && (
+              <div className="mt-3 pt-3 border-t border-primary/20">
+                <p className="text-xs font-semibold text-blue-600 dark:text-blue-400 flex items-center gap-1">
+                  <BookOpen className="h-3 w-3" />
+                  Key Passage: {activity.specificVerse}
+                </p>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
