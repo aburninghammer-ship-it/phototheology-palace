@@ -37,6 +37,11 @@ import {
   disciplePathMonth8,
   warriorPathMonth8
 } from "./pathCurriculumMonths7to12";
+import {
+  explorerPathMonth13,
+  disciplePathMonth13,
+  warriorPathMonth13
+} from "./pathCurriculumMonths13to24";
 
 // Activity interface for month curriculum files
 export interface MonthActivity {
