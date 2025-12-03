@@ -147,13 +147,13 @@ export function PalaceTour({ onComplete, onSkip }: PalaceTourProps) {
           animate={{ opacity: 1, y: 0, scale: 1 }}
           exit={{ opacity: 0, y: -40, scale: 0.9 }}
           transition={{ duration: 0.5, ease: "easeOut" }}
-          className="w-full max-w-2xl relative"
+          className="w-full max-w-2xl relative max-h-[90vh] flex flex-col"
         >
-          <Card variant="glass">
+          <Card variant="glass" className="flex flex-col max-h-full overflow-hidden">
             {/* Gradient top border */}
-            <div className={`h-1.5 bg-gradient-to-r ${step.gradient}`} />
+            <div className={`h-1.5 bg-gradient-to-r ${step.gradient} flex-shrink-0`} />
             
-            <CardContent className="p-8 relative">
+            <CardContent className="p-6 md:p-8 relative flex-1 overflow-y-auto">
               {/* Corner glow */}
               <div className={`absolute -top-20 -right-20 w-64 h-64 ${step.bgGlow} rounded-full blur-3xl`} />
               
@@ -328,41 +328,41 @@ export function PalaceTour({ onComplete, onSkip }: PalaceTourProps) {
                   </motion.div>
                 )}
               </div>
-
-              {/* Navigation */}
-              <div className="flex justify-between mt-8 pt-6 border-t border-border relative z-10">
-                <Button
-                  variant="ghost"
-                  onClick={handleBack}
-                  disabled={currentStep === 0}
-                  className="gap-2"
-                >
-                  <ChevronLeft className="h-4 w-4" />
-                  Back
-                </Button>
-                <div className="flex gap-3">
-                  <Button variant="outline" onClick={onSkip}>
-                    Skip Tour
-                  </Button>
-                  <Button 
-                    onClick={handleNext}
-                    className={`bg-gradient-to-r ${step.gradient} hover:opacity-90 text-white border-0 gap-2 shadow-lg`}
-                  >
-                    {isLastStep ? (
-                      <>
-                        {step.cta || "Enter the Palace"}
-                        <Sparkles className="h-4 w-4" />
-                      </>
-                    ) : (
-                      <>
-                        Next
-                        <ChevronRight className="h-4 w-4" />
-                      </>
-                    )}
-                  </Button>
-                </div>
-              </div>
             </CardContent>
+
+            {/* Navigation - Fixed at bottom */}
+            <div className="flex justify-between p-6 md:p-8 pt-4 border-t border-border relative z-10 bg-card flex-shrink-0">
+              <Button
+                variant="ghost"
+                onClick={handleBack}
+                disabled={currentStep === 0}
+                className="gap-2"
+              >
+                <ChevronLeft className="h-4 w-4" />
+                Back
+              </Button>
+              <div className="flex gap-3">
+                <Button variant="outline" onClick={onSkip}>
+                  Skip Tour
+                </Button>
+                <Button 
+                  onClick={handleNext}
+                  className={`bg-gradient-to-r ${step.gradient} hover:opacity-90 text-white border-0 gap-2 shadow-lg`}
+                >
+                  {isLastStep ? (
+                    <>
+                      {step.cta || "Enter the Palace"}
+                      <Sparkles className="h-4 w-4" />
+                    </>
+                  ) : (
+                    <>
+                      Next
+                      <ChevronRight className="h-4 w-4" />
+                    </>
+                  )}
+                </Button>
+              </div>
+            </div>
           </Card>
         </motion.div>
       </AnimatePresence>
