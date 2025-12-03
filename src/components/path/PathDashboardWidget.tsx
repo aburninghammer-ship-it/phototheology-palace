@@ -5,13 +5,14 @@ import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { usePath, PATH_INFO, PathType } from "@/hooks/usePath";
 import { 
-  Route, Trophy, Clock, ChevronRight, Lock, Unlock, 
-  Target, Calendar, Sparkles, Award
+  Route, Trophy, Clock, ChevronRight, Lock, 
+  Target, Calendar, Sparkles, BookOpen
 } from "lucide-react";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { PathSelectionWizard } from "./PathSelectionWizard";
 import { MonthlyGateAssessment } from "./MonthlyGateAssessment";
 import { useNavigate } from "react-router-dom";
+import { getCurrentWeekInMonth, getPathCurriculum } from "@/data/pathCurriculum";
 
 export function PathDashboardWidget() {
   const navigate = useNavigate();
@@ -112,30 +113,41 @@ export function PathDashboardWidget() {
           </div>
         </CardHeader>
         <CardContent className="space-y-4">
+          {/* Current Week - NEW */}
+          {(() => {
+            const currentWeek = getCurrentWeekInMonth(activePath.started_at);
+            const monthCurriculum = getPathCurriculum(pathType, activePath.current_month);
+            const weekOutline = monthCurriculum?.weeks.find(w => w.weekNumber === currentWeek);
+            
+            return weekOutline ? (
+              <div 
+                className="p-3 rounded-lg bg-primary/10 border border-primary/20 cursor-pointer hover:bg-primary/15 transition-colors"
+                onClick={() => navigate("/path/week")}
+              >
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <BookOpen className="h-4 w-4 text-primary" />
+                    <span className="font-medium text-sm">Week {currentWeek}: {weekOutline.title}</span>
+                  </div>
+                  <ChevronRight className="h-4 w-4 text-muted-foreground" />
+                </div>
+                <p className="text-xs text-muted-foreground mt-1">{weekOutline.focus}</p>
+              </div>
+            ) : null;
+          })()}
+
           {/* Progress */}
           <div className="space-y-2">
             <div className="flex justify-between text-sm">
               <span className="flex items-center gap-1">
                 <Calendar className="h-3 w-3" />
-                Year {activePath.current_year} • Q{activePath.current_quarter} • Month {activePath.current_month}
+                Year {activePath.current_year} • Month {activePath.current_month}
               </span>
               <span className="text-muted-foreground">
                 {progress.percentage.toFixed(0)}%
               </span>
             </div>
             <Progress value={progress.percentage} className="h-2" />
-          </div>
-
-          {/* Monthly Gate Status */}
-          <div className="flex items-center justify-between p-3 rounded-lg bg-background/50">
-            <div className="flex items-center gap-2">
-              <Lock className="h-4 w-4 text-amber-500" />
-              <span className="text-sm">Month {activePath.current_month} Gate</span>
-            </div>
-            <Button size="sm" variant="outline" onClick={() => setShowAssessment(true)}>
-              <Target className="mr-1 h-3 w-3" />
-              Take Assessment
-            </Button>
           </div>
 
           {/* Trial Notice */}
@@ -148,12 +160,12 @@ export function PathDashboardWidget() {
 
           {/* Quick Action */}
           <Button 
-            variant="secondary" 
+            variant="default" 
             className="w-full"
-            onClick={() => navigate("/palace")}
+            onClick={() => navigate("/path/week")}
           >
             <Sparkles className="mr-2 h-4 w-4" />
-            Continue Learning
+            View Week Outline
           </Button>
         </CardContent>
       </Card>

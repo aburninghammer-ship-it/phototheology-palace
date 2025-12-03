@@ -201,6 +201,7 @@ const PublicDevotionalView = lazy(() => import("./pages/PublicDevotionalView"));
 const WhyPhototheology = lazy(() => import("./pages/WhyPhototheology"));
 const MusicCategories = lazy(() => import("./pages/MusicCategories"));
 const Paths = lazy(() => import("./pages/Paths"));
+const PathWeek = lazy(() => import("./pages/PathWeek"));
 
 const queryClient = new QueryClient();
 
@@ -261,6 +262,7 @@ function App() {
             } />
             <Route path="/pricing" element={<Pricing />} />
             <Route path="/paths" element={<Paths />} />
+            <Route path="/path/week" element={<ProtectedRoute><PathWeek /></ProtectedRoute>} />
             <Route path="/why-phototheology" element={<WhyPhototheology />} />
             <Route path="/app-tour" element={<AppTour />} />
             <Route path="/access" element={
