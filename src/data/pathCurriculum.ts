@@ -268,11 +268,11 @@ const visualPathCurriculum: MonthCurriculum[] = [
           { 
             id: "v1-w1-a15", 
             title: "Create Study: Genesis 1-3 Visual Map", 
-            description: "Build a comprehensive visual map in My Study Room",
-            detailedInstructions: "1. Go to My Study Room\n2. Click 'New Study'\n3. Title: 'Genesis 1-3: Creation to Fall Visual Map'\n4. Structure:\n   - Section 1: My 7 Creation paintings\n   - Section 2: My Eden map\n   - Section 3: My 5-act Fall movie\n5. Include actual images if possible\n6. This becomes your visual reference",
+            description: "Build a comprehensive visual map in My Studies",
+            detailedInstructions: "1. Go to My Studies\n2. Click 'New Study'\n3. Title: 'Genesis 1-3: Creation to Fall Visual Map'\n4. Structure:\n   - Section 1: My 7 Creation paintings\n   - Section 2: My Eden map\n   - Section 3: My 5-act Fall movie\n5. Include actual images if possible\n6. This becomes your visual reference",
             type: "exercise", 
             duration: "30 min", 
-            link: "/my-study-room", 
+            link: "/my-studies",
             icon: "📝"
           },
           { 
@@ -495,10 +495,10 @@ const visualPathCurriculum: MonthCurriculum[] = [
             id: "v1-w2-a15", 
             title: "Create Study: Genesis 22 Immersion Guide", 
             description: "Build a complete sensory immersion guide for Genesis 22",
-            detailedInstructions: "1. Go to My Study Room\n2. Create: 'Genesis 22: Immersion Guide'\n3. Structure:\n   - Section 1: The Journey (v1-8) - all 5 senses\n   - Section 2: The Mountain (v9-10) - all 5 senses\n   - Section 3: The Ram (v11-14) - all 5 senses\n   - Section 4: Emotional journey map\n   - Section 5: Christ connections (preview of cross)\n4. This becomes a model for future immersion studies",
+            detailedInstructions: "1. Go to My Studies\n2. Create: 'Genesis 22: Immersion Guide'\n3. Structure:\n   - Section 1: The Journey (v1-8) - all 5 senses\n   - Section 2: The Mountain (v9-10) - all 5 senses\n   - Section 3: The Ram (v11-14) - all 5 senses\n   - Section 4: Emotional journey map\n   - Section 5: Christ connections (preview of cross)\n4. This becomes a model for future immersion studies",
             type: "exercise", 
             duration: "30 min", 
-            link: "/my-study-room", 
+            link: "/my-studies",
             icon: "📝"
           },
           { 
@@ -710,11 +710,11 @@ const visualPathCurriculum: MonthCurriculum[] = [
           { 
             id: "v1-w3-a15", 
             title: "Create Study: Genesis 24-Frame Gallery", 
-            description: "Document all 24 frames in your study room",
-            detailedInstructions: "1. Go to My Study Room\n2. Create: 'Genesis 1-24: My 24 Frames'\n3. List all 24 images with:\n   - Chapter number\n   - Image description\n   - Brief content summary\n4. This is your visual index of Genesis\n5. You can share or reference it anytime",
+            description: "Document all 24 frames in My Studies",
+            detailedInstructions: "1. Go to My Studies\n2. Create: 'Genesis 1-24: My 24 Frames'\n3. List all 24 images with:\n   - Chapter number\n   - Image description\n   - Brief content summary\n4. This is your visual index of Genesis\n5. You can share or reference it anytime",
             type: "exercise", 
             duration: "30 min", 
-            link: "/my-study-room", 
+            link: "/my-studies",
             icon: "📝"
           },
           { 
@@ -936,10 +936,10 @@ const visualPathCurriculum: MonthCurriculum[] = [
             id: "v1-w4-a15", 
             title: "Create Study: Psalm 23 Visual Commentary", 
             description: "Build a complete visual study of Psalm 23",
-            detailedInstructions: "1. Go to My Study Room\n2. Create: 'Psalm 23: Visual Commentary'\n3. Structure:\n   - 6 sections (one per verse)\n   - Each section: verse text, your image, John 10 cross-reference, Christ connection\n   - Final section: How the journey from pasture to heaven maps to the Christian life\n4. This is your model for future psalm studies",
+            detailedInstructions: "1. Go to My Studies\n2. Create: 'Psalm 23: Visual Commentary'\n3. Structure:\n   - 6 sections (one per verse)\n   - Each section: verse text, your image, John 10 cross-reference, Christ connection\n   - Final section: How the journey from pasture to heaven maps to the Christian life\n4. This is your model for future psalm studies",
             type: "exercise", 
             duration: "30 min", 
-            link: "/my-study-room", 
+            link: "/my-studies",
             icon: "📝"
           },
           { 
@@ -1175,10 +1175,10 @@ const analyticalPathCurriculum: MonthCurriculum[] = [
             id: "a1-w1-a15", 
             title: "Create Study: Luke 15 Detective File", 
             description: "Build a comprehensive observation study",
-            detailedInstructions: "1. Go to My Study Room\n2. Create: 'Luke 15:11-32 Detective File'\n3. Sections:\n   - Evidence Log (50 observations)\n   - Character Profiles\n   - Structural Outline\n   - Context File (Luke 15:1-10)\n   - Questions for Further Investigation\n4. This is your model analytical study",
+            detailedInstructions: "1. Go to My Studies\n2. Create: 'Luke 15:11-32 Detective File'\n3. Sections:\n   - Evidence Log (50 observations)\n   - Character Profiles\n   - Structural Outline\n   - Context File (Luke 15:1-10)\n   - Questions for Further Investigation\n4. This is your model analytical study",
             type: "exercise", 
             duration: "30 min", 
-            link: "/my-study-room", 
+            link: "/my-studies",
             icon: "📝"
           },
           { 
@@ -1395,10 +1395,10 @@ const analyticalPathCurriculum: MonthCurriculum[] = [
             id: "a1-w2-a15", 
             title: "Create Study: John 3 Analytical File", 
             description: "Build a comprehensive definition/context study",
-            detailedInstructions: "1. Go to My Study Room\n2. Create: 'John 3 Analytical Deep Dive'\n3. Sections:\n   - Observation Log (25+ observations)\n   - Key Word Definitions (Greek terms)\n   - Historical Context (Nicodemus, Pharisees)\n   - Cross-Reference: Numbers 21\n   - Dialogue Flow Chart\n4. This is your analytical model",
+            detailedInstructions: "1. Go to My Studies\n2. Create: 'John 3 Analytical Deep Dive'\n3. Sections:\n   - Observation Log (25+ observations)\n   - Key Word Definitions (Greek terms)\n   - Historical Context (Nicodemus, Pharisees)\n   - Cross-Reference: Numbers 21\n   - Dialogue Flow Chart\n4. This is your analytical model",
             type: "exercise", 
             duration: "30 min", 
-            link: "/my-study-room", 
+            link: "/my-studies",
             icon: "📝"
           },
           { 
@@ -1604,7 +1604,7 @@ function generateAnalyticalWeek3Activities(): WeekActivity[] {
     { id: "a1-w3-a12", title: "Trace Additional Types", description: "Identify 3 other OT types and their NT fulfillment", detailedInstructions: "Research 3 types:\n1. Passover Lamb (Exodus 12) → Christ our Passover (1 Cor 5:7)\n2. Manna (Exodus 16) → Bread of Life (John 6:35)\n3. High Priest (Leviticus) → Christ our High Priest (Hebrews 4:14)\n\nFor each, note:\n- OT context\n- NT fulfillment\n- How Christ is greater than the type", type: "drill", duration: "25 min", icon: "🔍" },
     { id: "a1-w3-a13", title: "Flashcards: Type/Antitype Pairs", description: "Create flashcards for major biblical types", detailedInstructions: "1. Go to Flashcards\n2. Create deck: 'Biblical Types'\n3. Create cards:\n   - Front: 'Bronze Serpent' / Back: 'Type of Christ on the cross (John 3:14)'\n   - Front: 'Passover Lamb' / Back: 'Type of Christ's sacrifice (1 Cor 5:7)'\n4. Include 10+ types\n5. Master the pattern library", type: "drill", duration: "20 min", link: "/flashcards", icon: "📇" },
     { id: "a1-w3-a14", title: "Prophetic Foreshadowing Analysis", description: "Analyze how the serpent type contains prophetic detail", detailedInstructions: "Deep analysis of Numbers 21:\n1. WHY a serpent? (Sin's symbol becomes salvation's symbol - mystery of cross)\n2. WHY bronze? (Judgment metal - Christ bore our judgment)\n3. WHY lifted up? (Visible, public, substitutionary)\n4. WHY just look? (Faith alone, not works)\n\nThe details prophesy the cross!", type: "drill", duration: "20 min", icon: "🔮" },
-    { id: "a1-w3-a15", title: "Create Study: Numbers 21 - John 3 Analysis", description: "Build a comprehensive type study", detailedInstructions: "1. Go to My Study Room\n2. Create: 'Bronze Serpent Type Analysis'\n3. Sections:\n   - Numbers 21 Observations\n   - John 3:14-15 Analysis\n   - Type/Antitype Comparison Chart\n   - Theological Implications\n   - Additional Cross-References (2 Cor 5:21, Gal 3:13)\n4. This is your model type study", type: "exercise", duration: "30 min", link: "/my-study-room", icon: "📝" },
+    { id: "a1-w3-a15", title: "Create Study: Numbers 21 - John 3 Analysis", description: "Build a comprehensive type study", detailedInstructions: "1. Go to My Studies\n2. Create: 'Bronze Serpent Type Analysis'\n3. Sections:\n   - Numbers 21 Observations\n   - John 3:14-15 Analysis\n   - Type/Antitype Comparison Chart\n   - Theological Implications\n   - Additional Cross-References (2 Cor 5:21, Gal 3:13)\n4. This is your model type study", type: "exercise", duration: "30 min", link: "/my-studies", icon: "📝" },
     { id: "a1-w3-a16", title: "Questions Room Application", description: "Generate questions from your type analysis", detailedInstructions: "1. Go to Palace > Floor 2 > Questions Room\n2. Generate 10 questions from your study:\n   - Why did God choose a serpent, not another animal?\n   - How does looking at bronze serpent parallel believing in Christ?\n   - What does 'lifted up' prophesy about the cross?\n   - How is Jesus 'made sin' like the serpent?\n3. Questions drive deeper understanding", type: "exercise", duration: "20 min", roomCode: "QR", link: "/palace/floor/2/room/qr", icon: "❓" },
     { id: "a1-w3-a17", title: "Write a Type Analysis Summary", description: "Write a summary explaining the bronze serpent type", detailedInstructions: "1. Write a 2-3 paragraph explanation:\n   - Paragraph 1: The OT context and problem\n   - Paragraph 2: The type-antitype parallel\n   - Paragraph 3: The theological significance\n2. This is analytical communication\n3. Could you teach this to someone else?", type: "exercise", duration: "25 min", icon: "✍️" },
     { id: "a1-w3-a18", title: "Community Share: Type Discovery", description: "Share your type analysis with the community", detailedInstructions: "1. Go to Community\n2. Post: 'Bronze Serpent Type Analysis'\n3. Share:\n   - Your comparison chart\n   - One insight that surprised you\n   - How this changes your view of John 3:14\n4. Comment on 2 other posts\n5. Analytical thinkers sharpen each other", type: "exercise", duration: "15 min", link: "/community", icon: "👥" },
