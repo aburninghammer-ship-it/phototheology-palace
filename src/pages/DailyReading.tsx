@@ -81,6 +81,8 @@ export default function DailyReading() {
   const [todaysPassages, setTodaysPassages] = useState<any[]>([]);
   const [showPTPrompt, setShowPTPrompt] = useState(false);
   const [completedDayNumber, setCompletedDayNumber] = useState(0);
+  const [passagesLoading, setPassagesLoading] = useState(false);
+  const [passagesError, setPassagesError] = useState<string | null>(null);
 
   useEffect(() => {
     if (userProgress) {
@@ -90,6 +92,9 @@ export default function DailyReading() {
 
   const loadPlanAndExercises = async () => {
     if (!userProgress) return;
+    
+    setPassagesLoading(true);
+    setPassagesError(null);
 
     try {
       // Fetch the plan details
@@ -101,22 +106,25 @@ export default function DailyReading() {
 
       if (planError || !planData) {
         console.error('Error loading plan:', planError);
+        setPassagesError("Failed to load reading plan");
         toast({
           title: "Error",
           description: "Failed to load reading plan",
           variant: "destructive",
         });
+        setPassagesLoading(false);
         return;
       }
 
       setPlan(planData);
+      console.log('Plan loaded:', planData.name, 'Type:', planData.plan_type);
 
       // Extract today's passages from the plan's daily_schedule
       const schedule = planData.daily_schedule as any;
       const dayIndex = userProgress.current_day - 1;
       
       console.log('Plan schedule structure:', schedule);
-      console.log('Current day index:', dayIndex);
+      console.log('Current day:', userProgress.current_day, 'Index:', dayIndex);
       
       // Parse passages based on schedule structure
       let passages: any[] = [];
@@ -156,6 +164,7 @@ export default function DailyReading() {
 
       // If we still don't have passages, derive them based on plan type
       if (passages.length === 0 && planData.plan_type) {
+        console.log('Using fallback passage generation for plan type:', planData.plan_type);
         passages = generateSequentialPassagesForPlan(
           planData.plan_type,
           planData.name,
@@ -164,21 +173,24 @@ export default function DailyReading() {
         );
       }
 
-      console.log('Loaded passages for day', userProgress.current_day, ':', passages);
+      console.log('Generated passages for day', userProgress.current_day, ':', passages);
       
       if (passages.length === 0) {
         console.warn('No passages found for current day. Schedule:', schedule);
+        setPassagesError("Unable to determine today's reading passages");
         toast({
-          title: "No Passages",
-          description: "Unable to determine today's reading. Please check your plan.",
+          title: "No Passages Found",
+          description: "Unable to determine today's reading. Please check your plan settings.",
           variant: "destructive",
         });
         setTodaysPassages([]);
         setExercises([]);
+        setPassagesLoading(false);
         return;
       }
 
       setTodaysPassages(passages);
+      setPassagesLoading(false);
 
       // Only generate exercises if we have passages
       const result = await generateExercisesWithPassages(passages, planData.depth_mode, false);
@@ -187,11 +199,13 @@ export default function DailyReading() {
       }
     } catch (error) {
       console.error('Error in loadPlanAndExercises:', error);
+      setPassagesError("Failed to load today's reading");
       toast({
         title: "Error",
         description: "Failed to load today's reading",
         variant: "destructive",
       });
+      setPassagesLoading(false);
     }
   };
 
@@ -399,7 +413,23 @@ export default function DailyReading() {
             <Book className="h-5 w-5 mr-2 text-primary" />
             Today's Passages
           </h3>
-          {todaysPassages.length > 0 ? (
+          {passagesLoading ? (
+            <div className="text-center py-4 text-muted-foreground">
+              <Book className="h-8 w-8 mx-auto mb-2 opacity-50 animate-pulse" />
+              <p>Loading today's passages...</p>
+            </div>
+          ) : passagesError ? (
+            <div className="text-center py-4 text-muted-foreground">
+              <Book className="h-8 w-8 mx-auto mb-2 opacity-50" />
+              <p className="text-destructive">{passagesError}</p>
+              <Button variant="outline" size="sm" className="mt-2" onClick={() => {
+                setPassagesError(null);
+                loadPlanAndExercises();
+              }}>
+                Try Again
+              </Button>
+            </div>
+          ) : todaysPassages.length > 0 ? (
             <div className="space-y-3">
               {todaysPassages.map((passage, idx) => (
                 <div 
@@ -429,7 +459,10 @@ export default function DailyReading() {
           ) : (
             <div className="text-center py-4 text-muted-foreground">
               <Book className="h-8 w-8 mx-auto mb-2 opacity-50" />
-              <p>Loading today's passages...</p>
+              <p>No passages found for today</p>
+              <Button variant="outline" size="sm" className="mt-2" onClick={() => loadPlanAndExercises()}>
+                Reload
+              </Button>
             </div>
           )}
         </Card>
