@@ -32,6 +32,12 @@ export function NotificationPreferences() {
     renewal_reminders: true,
     video_tutorials: true,
     daily_verse: true,
+    // Granular study reminders
+    reading_plan_reminders: true,
+    devotional_reminders: true,
+    palace_practice_reminders: true,
+    memory_challenge_reminders: true,
+    streak_protection_alerts: true,
   });
 
   useEffect(() => {
@@ -93,6 +99,11 @@ export function NotificationPreferences() {
           renewal_reminders: data.renewal_reminders ?? true,
           video_tutorials: data.video_tutorials ?? true,
           daily_verse: data.daily_verse ?? true,
+          reading_plan_reminders: data.reading_plan_reminders ?? true,
+          devotional_reminders: data.devotional_reminders ?? true,
+          palace_practice_reminders: data.palace_practice_reminders ?? true,
+          memory_challenge_reminders: data.memory_challenge_reminders ?? true,
+          streak_protection_alerts: data.streak_protection_alerts ?? true,
         });
       }
     } catch (error) {
@@ -278,17 +289,80 @@ export function NotificationPreferences() {
           />
         </div>
 
+        <div className="border-t pt-4 mt-4">
+          <h3 className="font-semibold mb-2">📚 Daily Study Reminders (8 AM)</h3>
+          <p className="text-sm text-muted-foreground mb-4">
+            Get morning reminders for activities you haven't completed yet
+          </p>
+        </div>
+
         <div className="flex items-center justify-between">
           <div className="space-y-0.5">
-            <Label htmlFor="study-reminders">Study Reminders</Label>
+            <Label htmlFor="reading-plan-reminders">📖 Reading Plan Reminders</Label>
             <p className="text-sm text-muted-foreground">
-              Receive reminders for daily challenges and streaks
+              Remind me if I haven't completed today's reading
             </p>
           </div>
           <Switch
-            id="study-reminders"
-            checked={preferences.study_reminders}
-            onCheckedChange={(checked) => updatePreference('study_reminders', checked)}
+            id="reading-plan-reminders"
+            checked={preferences.reading_plan_reminders}
+            onCheckedChange={(checked) => updatePreference('reading_plan_reminders', checked)}
+          />
+        </div>
+
+        <div className="flex items-center justify-between">
+          <div className="space-y-0.5">
+            <Label htmlFor="devotional-reminders">🙏 Devotional Reminders</Label>
+            <p className="text-sm text-muted-foreground">
+              Remind me if I haven't done today's devotional
+            </p>
+          </div>
+          <Switch
+            id="devotional-reminders"
+            checked={preferences.devotional_reminders}
+            onCheckedChange={(checked) => updatePreference('devotional_reminders', checked)}
+          />
+        </div>
+
+        <div className="flex items-center justify-between">
+          <div className="space-y-0.5">
+            <Label htmlFor="palace-practice-reminders">🏛️ Palace Practice Reminders</Label>
+            <p className="text-sm text-muted-foreground">
+              Remind me to practice my PT rooms daily
+            </p>
+          </div>
+          <Switch
+            id="palace-practice-reminders"
+            checked={preferences.palace_practice_reminders}
+            onCheckedChange={(checked) => updatePreference('palace_practice_reminders', checked)}
+          />
+        </div>
+
+        <div className="flex items-center justify-between">
+          <div className="space-y-0.5">
+            <Label htmlFor="memory-challenge-reminders">🧠 Memory Challenge Reminders</Label>
+            <p className="text-sm text-muted-foreground">
+              Remind me to complete memory challenges
+            </p>
+          </div>
+          <Switch
+            id="memory-challenge-reminders"
+            checked={preferences.memory_challenge_reminders}
+            onCheckedChange={(checked) => updatePreference('memory_challenge_reminders', checked)}
+          />
+        </div>
+
+        <div className="flex items-center justify-between">
+          <div className="space-y-0.5">
+            <Label htmlFor="streak-protection-alerts">🔥 Streak Protection Alerts</Label>
+            <p className="text-sm text-muted-foreground">
+              Alert me if my streak is at risk (3+ days)
+            </p>
+          </div>
+          <Switch
+            id="streak-protection-alerts"
+            checked={preferences.streak_protection_alerts}
+            onCheckedChange={(checked) => updatePreference('streak_protection_alerts', checked)}
           />
         </div>
 

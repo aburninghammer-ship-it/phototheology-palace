@@ -4047,12 +4047,17 @@ export type Database = {
           connect6_challenges: boolean
           created_at: string
           daily_verse: boolean | null
+          devotional_reminders: boolean | null
           dimension_challenges: boolean
           equation_challenges: boolean
           fruit_check_challenges: boolean
           id: string
+          memory_challenge_reminders: boolean | null
+          palace_practice_reminders: boolean | null
+          reading_plan_reminders: boolean | null
           renewal_reminders: boolean
           sanctuary_challenges: boolean
+          streak_protection_alerts: boolean | null
           study_reminders: boolean
           updated_at: string
           user_id: string
@@ -4064,12 +4069,17 @@ export type Database = {
           connect6_challenges?: boolean
           created_at?: string
           daily_verse?: boolean | null
+          devotional_reminders?: boolean | null
           dimension_challenges?: boolean
           equation_challenges?: boolean
           fruit_check_challenges?: boolean
           id?: string
+          memory_challenge_reminders?: boolean | null
+          palace_practice_reminders?: boolean | null
+          reading_plan_reminders?: boolean | null
           renewal_reminders?: boolean
           sanctuary_challenges?: boolean
+          streak_protection_alerts?: boolean | null
           study_reminders?: boolean
           updated_at?: string
           user_id: string
@@ -4081,12 +4091,17 @@ export type Database = {
           connect6_challenges?: boolean
           created_at?: string
           daily_verse?: boolean | null
+          devotional_reminders?: boolean | null
           dimension_challenges?: boolean
           equation_challenges?: boolean
           fruit_check_challenges?: boolean
           id?: string
+          memory_challenge_reminders?: boolean | null
+          palace_practice_reminders?: boolean | null
+          reading_plan_reminders?: boolean | null
           renewal_reminders?: boolean
           sanctuary_challenges?: boolean
+          streak_protection_alerts?: boolean | null
           study_reminders?: boolean
           updated_at?: string
           user_id?: string
