@@ -4,14 +4,15 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { usePath, PATH_INFO, PathType } from "@/hooks/usePath";
+import { usePathAccess } from "@/hooks/usePathAccess";
 import { 
   Route, Trophy, Clock, ChevronRight, Lock, 
-  Target, Calendar, Sparkles, BookOpen
+  Target, Calendar, Sparkles, BookOpen, Crown
 } from "lucide-react";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { PathSelectionWizard } from "./PathSelectionWizard";
 import { MonthlyGateAssessment } from "./MonthlyGateAssessment";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { getCurrentWeekInMonth, getPathCurriculum } from "@/data/pathCurriculum";
 
 export function PathDashboardWidget() {
@@ -24,6 +25,7 @@ export function PathDashboardWidget() {
     getMasterLevel,
     completions 
   } = usePath();
+  const { currentWeekStatus, needsPremiumForNextWeek } = usePathAccess();
   const [showWizard, setShowWizard] = useState(false);
   const [showAssessment, setShowAssessment] = useState(false);
 
@@ -150,8 +152,39 @@ export function PathDashboardWidget() {
             <Progress value={progress.percentage} className="h-2" />
           </div>
 
+          {/* Week Progress Status */}
+          {currentWeekStatus && (
+            <div className="flex items-center justify-between text-xs">
+              <span className="text-muted-foreground">
+                Week Progress: {currentWeekStatus.activitiesCompleted}/{currentWeekStatus.totalActivities} activities
+              </span>
+              {currentWeekStatus.isComplete && (
+                <Badge variant="secondary" className="bg-green-500/20 text-green-700 dark:text-green-300">
+                  Complete!
+                </Badge>
+              )}
+            </div>
+          )}
+
+          {/* Premium Upsell for Week 2+ */}
+          {needsPremiumForNextWeek && currentWeekStatus?.isComplete && (
+            <div className="p-3 rounded-lg bg-gradient-to-r from-yellow-500/10 to-amber-500/10 border border-yellow-500/20">
+              <div className="flex items-center gap-2 text-sm">
+                <Crown className="h-4 w-4 text-yellow-600" />
+                <span className="font-medium text-yellow-700 dark:text-yellow-300">
+                  Week 2+ requires Premium
+                </span>
+              </div>
+              <Button asChild variant="outline" size="sm" className="w-full mt-2 border-yellow-500/30">
+                <Link to="/pricing">
+                  Upgrade to Continue
+                </Link>
+              </Button>
+            </div>
+          )}
+
           {/* Trial Notice */}
-          {trialDays !== null && trialDays > 0 && (
+          {trialDays !== null && trialDays > 0 && !needsPremiumForNextWeek && (
             <div className="flex items-center gap-2 text-xs text-amber-600 dark:text-amber-400">
               <Clock className="h-3 w-3" />
               <span>{trialDays} days left in trial period</span>

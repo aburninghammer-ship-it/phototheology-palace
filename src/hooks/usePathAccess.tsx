@@ -2,7 +2,7 @@ import { useState, useEffect, useMemo } from "react";
 import { useAuth } from "./useAuth";
 import { useSubscription } from "./useSubscription";
 import { usePath } from "./usePath";
-import { getCurrentWeekInMonth, getPathCurriculum, getAllWeeksForPath } from "@/data/pathCurriculum";
+import { getCurrentWeekInMonth, getPathCurriculum } from "@/data/pathCurriculum";
 import { supabase } from "@/integrations/supabase/client";
 
 interface WeekAccessStatus {
@@ -23,6 +23,7 @@ interface PathAccessState {
   currentWeekStatus: WeekAccessStatus | null;
   needsPremiumForNextWeek: boolean;
   completedActivities: string[];
+  weekStartDates: Record<string, string>;
   refreshAccess: () => void;
 }
 
@@ -56,18 +57,19 @@ export function usePathAccess(): PathAccessState {
     try {
       // Try to load from database first if user is logged in
       if (user) {
-        const { data: dbProgress } = await supabase
+        // Use type assertion since types may not be regenerated yet
+        const { data: dbProgress } = await (supabase as any)
           .from('path_activity_completions')
           .select('activity_id, completed_at')
           .eq('user_id', user.id)
           .eq('path_id', activePath.id);
 
         if (dbProgress && dbProgress.length > 0) {
-          setCompletedActivities(dbProgress.map(p => p.activity_id));
+          setCompletedActivities(dbProgress.map((p: any) => p.activity_id));
           
           // Build week start dates from first activity completion per week
           const weekStarts: Record<string, string> = {};
-          dbProgress.forEach(p => {
+          dbProgress.forEach((p: any) => {
             const weekKey = getWeekKeyFromActivityId(p.activity_id);
             if (weekKey && (!weekStarts[weekKey] || new Date(p.completed_at) < new Date(weekStarts[weekKey]))) {
               weekStarts[weekKey] = p.completed_at;
@@ -181,7 +183,8 @@ export function usePathAccess(): PathAccessState {
 
     // Check time lock (7 days must pass since starting previous week)
     if (globalWeek > 1) {
-      const prevWeekKey = `${pathType.charAt(0)}${prevMonth}-w${prevWeek}`;
+      const pathPrefix = pathType.charAt(0);
+      const prevWeekKey = `${pathPrefix}${prevMonth}-w${prevWeek}`;
       const prevWeekStart = weekStartDates[prevWeekKey];
       
       if (prevWeekStart) {
@@ -239,6 +242,7 @@ export function usePathAccess(): PathAccessState {
     currentWeekStatus,
     needsPremiumForNextWeek,
     completedActivities,
+    weekStartDates,
     refreshAccess: loadProgress
   };
 }
@@ -254,8 +258,8 @@ export function useSavePathActivity() {
     const now = new Date().toISOString();
 
     if (user) {
-      // Save to database
-      await supabase
+      // Save to database using type assertion
+      await (supabase as any)
         .from('path_activity_completions')
         .upsert({
           user_id: user.id,
@@ -275,11 +279,11 @@ export function useSavePathActivity() {
     }
 
     // Track week start
-    const weekKey = activityId.match(/^([a-z])(\d+)-w(\d+)/);
-    if (weekKey) {
-      const key = `${weekKey[1]}${weekKey[2]}-w${weekKey[3]}`;
-      if (!data.weekStarts[key]) {
-        data.weekStarts[key] = now;
+    const weekMatch = activityId.match(/^([a-z])(\d+)-w(\d+)/);
+    if (weekMatch) {
+      const weekKey = `${weekMatch[1]}${weekMatch[2]}-w${weekMatch[3]}`;
+      if (!data.weekStarts[weekKey]) {
+        data.weekStarts[weekKey] = now;
       }
     }
 
@@ -290,7 +294,7 @@ export function useSavePathActivity() {
     if (!activePath) return;
 
     if (user) {
-      await supabase
+      await (supabase as any)
         .from('path_activity_completions')
         .delete()
         .eq('user_id', user.id)
