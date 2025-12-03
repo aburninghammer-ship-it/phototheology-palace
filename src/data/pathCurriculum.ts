@@ -2119,9 +2119,26 @@ export const getCurrentWeekInMonth = (startDate: string): number => {
   return Math.min(weekNumber, 4);
 };
 
+// Filter out video training activities until videos are uploaded
+// TODO: Remove this filter when videos are ready
+const filterVideoActivities = (activities: WeekActivity[]): WeekActivity[] => {
+  return activities.filter(activity => activity.link !== "/video-training");
+};
+
+const filterWeekActivities = (week: WeekOutline): WeekOutline => ({
+  ...week,
+  activities: filterVideoActivities(week.activities)
+});
+
 export const getPathCurriculum = (pathType: PathType, month: number): MonthCurriculum | null => {
   const curriculum = pathCurricula[pathType];
-  return curriculum.find((m) => m.month === month) || null;
+  const monthCurr = curriculum.find((m) => m.month === month);
+  if (!monthCurr) return null;
+  
+  return {
+    ...monthCurr,
+    weeks: monthCurr.weeks.map(filterWeekActivities)
+  };
 };
 
 export const getCurrentWeekOutline = (
@@ -2140,7 +2157,7 @@ export const getAllWeeksForPath = (pathType: PathType): { month: number; week: W
   
   curriculum.forEach((monthCurr) => {
     monthCurr.weeks.forEach((week) => {
-      allWeeks.push({ month: monthCurr.month, week });
+      allWeeks.push({ month: monthCurr.month, week: filterWeekActivities(week) });
     });
   });
   
