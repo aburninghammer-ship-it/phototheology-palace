@@ -570,13 +570,13 @@ export function AmbientMusicPlayer({
     }
   };
 
-  // Direct volume preset function
+  // Direct volume preset function - values match displayed labels (5%, 15%, 30%)
   const setVolumePreset = (preset: 'off' | 'low' | 'med' | 'high') => {
     const presetValues = {
       off: 0,
-      low: 0.25,
-      med: 0.50,
-      high: 1.0
+      low: 0.05,   // 5%
+      med: 0.15,   // 15%
+      high: 0.30   // 30%
     };
     const newVolume = presetValues[preset];
     const effectiveVolume = newVolume * duckMultiplier;
@@ -592,12 +592,12 @@ export function AmbientMusicPlayer({
     localStorage.setItem("pt-music-volume-pct", Math.round(newVolume * 100).toString());
   };
 
-  // Get current preset level
+  // Get current preset level - match to displayed labels
   const getCurrentPreset = (): 'off' | 'low' | 'med' | 'high' => {
     if (isMuted || volume === 0) return 'off';
-    if (volume <= 0.30) return 'low';
-    if (volume <= 0.70) return 'med';
-    return 'high';
+    if (volume <= 0.08) return 'low';    // ~5%
+    if (volume <= 0.20) return 'med';    // ~15%
+    return 'high';                        // ~30%+
   };
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {

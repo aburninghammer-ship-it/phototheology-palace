@@ -621,7 +621,12 @@ export const SequenceBlockBuilder = ({ block, onChange, onRemove }: SequenceBloc
                     <Switch
                       id="commentary-only"
                       checked={block.commentaryOnly || false}
-                      onCheckedChange={(checked) => onChange({ ...block, commentaryOnly: checked })}
+                      onCheckedChange={(checked) => onChange({ 
+                        ...block, 
+                        commentaryOnly: checked,
+                        // Commentary-only mode REQUIRES Jeeves commentary to be enabled
+                        includeJeevesCommentary: checked ? true : block.includeJeevesCommentary
+                      })}
                     />
                   </div>
                   
