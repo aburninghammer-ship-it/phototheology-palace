@@ -1,4 +1,10 @@
 import { PathType } from "@/hooks/usePath";
+import { 
+  visualPathMonth2, 
+  analyticalPathMonth2, 
+  devotionalPathMonth2, 
+  warriorPathMonth2 
+} from "./pathCurriculumMonth2";
 
 export interface WeekActivity {
   id: string;
