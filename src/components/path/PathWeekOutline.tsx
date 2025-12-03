@@ -351,32 +351,32 @@ function ActivityItem({ activity, index, isCompleted, onToggle, onNavigate }: Ac
       {/* Expandable Instructions Panel */}
       {showInstructions && instructionSteps.length > 0 && (
         <div className="px-4 pb-4">
-          <div className="ml-8 p-4 rounded-lg bg-primary/5 border border-primary/20 space-y-3">
-            <div className="flex items-center gap-2 text-sm font-semibold text-primary">
-              <Sparkles className="h-4 w-4" />
+          <div className="ml-8 p-4 rounded-xl glass-card backdrop-blur-md bg-background/80 border border-border/50 shadow-lg space-y-3">
+            <div className="flex items-center gap-2 text-sm font-semibold text-foreground">
+              <Sparkles className="h-4 w-4 text-primary" />
               Step-by-Step Instructions
             </div>
             <ol className="space-y-2">
               {instructionSteps.map((step, idx) => (
                 <li key={idx} className="flex gap-3 text-sm">
-                  <span className="flex-shrink-0 w-6 h-6 rounded-full bg-primary/20 text-primary flex items-center justify-center text-xs font-bold">
+                  <span className="flex-shrink-0 w-6 h-6 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-xs font-bold shadow-sm">
                     {idx + 1}
                   </span>
-                  <span className="text-muted-foreground pt-0.5">{step}</span>
+                  <span className="text-foreground/90 pt-0.5">{step}</span>
                 </li>
               ))}
             </ol>
             
             {/* Look For section */}
             {activity.lookFor && activity.lookFor.length > 0 && (
-              <div className="mt-4 pt-3 border-t border-primary/20">
+              <div className="mt-4 pt-3 border-t border-border/50">
                 <p className="text-xs font-semibold text-amber-600 dark:text-amber-400 mb-2 flex items-center gap-1">
                   <Target className="h-3 w-3" />
                   What to Look For:
                 </p>
                 <ul className="space-y-1">
                   {activity.lookFor.map((item, idx) => (
-                    <li key={idx} className="text-xs text-muted-foreground flex items-start gap-2">
+                    <li key={idx} className="text-xs text-foreground/80 flex items-start gap-2">
                       <span className="text-amber-500">•</span>
                       {item}
                     </li>
@@ -387,7 +387,7 @@ function ActivityItem({ activity, index, isCompleted, onToggle, onNavigate }: Ac
 
             {/* Specific Verse reference */}
             {activity.specificVerse && (
-              <div className="mt-3 pt-3 border-t border-primary/20">
+              <div className="mt-3 pt-3 border-t border-border/50">
                 <p className="text-xs font-semibold text-blue-600 dark:text-blue-400 flex items-center gap-1">
                   <BookOpen className="h-3 w-3" />
                   Key Passage: {activity.specificVerse}
