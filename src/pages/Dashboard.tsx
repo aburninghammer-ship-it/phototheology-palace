@@ -13,7 +13,7 @@ import { DashboardSkeleton } from "@/components/SkeletonLoader";
 import { PalaceProgressDashboard } from "@/components/PalaceProgressDashboard";
 import { useUserPreferences } from "@/hooks/useUserPreferences";
 import { JeevesWelcomeModal } from "@/components/retention/JeevesWelcomeModal";
-import { PathBanner } from "@/components/path/PathBanner";
+import { PathBanner, PathDashboardWidget } from "@/components/path";
 import { Brain, Building2 } from "lucide-react";
 import { 
   BookOpen, 
@@ -195,6 +195,11 @@ export default function Dashboard() {
 
         {/* Path Selection Banner (opt-in for existing users) */}
         <PathBanner />
+
+        {/* Path Dashboard Widget */}
+        <div className="mb-8">
+          <PathDashboardWidget />
+        </div>
 
         {/* Featured Today */}
         <Card className={`mb-8 ${featured.gradient} border-0 text-white overflow-hidden relative`}>

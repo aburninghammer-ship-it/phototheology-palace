@@ -18,12 +18,14 @@ import { SubscriptionRenewal } from "@/components/SubscriptionRenewal";
 import { AnnouncementManager } from "@/components/admin/AnnouncementManager";
 import { useFreeTier } from "@/hooks/useFreeTier";
 import { Crown, Zap, User as UserIcon } from "lucide-react";
-import { PathProfileSection } from "@/components/path/PathProfileSection";
+import { PathProfileSection, PathCertificatesGallery } from "@/components/path";
+import { usePath } from "@/hooks/usePath";
 
 
 export default function Profile() {
   const { user } = useAuth();
   const { tier } = useFreeTier();
+  const { completions } = usePath();
   const [profile, setProfile] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [uploading, setUploading] = useState(false);
@@ -339,6 +341,25 @@ export default function Profile() {
 
           {/* Subscription & Renewal */}
           <SubscriptionRenewal />
+
+          {/* Path Certificates */}
+          {completions && completions.length > 0 && (
+            <Card className="glass-card">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Trophy className="h-5 w-5 text-yellow-500" />
+                  Path Certificates
+                </CardTitle>
+                <CardDescription>Your completed learning paths</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <PathCertificatesGallery 
+                  completions={completions} 
+                  userName={profile?.display_name || "Scholar"} 
+                />
+              </CardContent>
+            </Card>
+          )}
 
           {/* Notification Preferences */}
           <NotificationPreferences />

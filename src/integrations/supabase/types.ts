@@ -4003,6 +4003,8 @@ export type Database = {
           passed: boolean | null
           passed_at: string | null
           path_type: string
+          score: number | null
+          time_spent_seconds: number | null
           user_id: string
           year: number
         }
@@ -4016,6 +4018,8 @@ export type Database = {
           passed?: boolean | null
           passed_at?: string | null
           path_type: string
+          score?: number | null
+          time_spent_seconds?: number | null
           user_id: string
           year: number
         }
@@ -4029,6 +4033,8 @@ export type Database = {
           passed?: boolean | null
           passed_at?: string | null
           path_type?: string
+          score?: number | null
+          time_spent_seconds?: number | null
           user_id?: string
           year?: number
         }
