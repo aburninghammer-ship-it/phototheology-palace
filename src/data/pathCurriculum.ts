@@ -44,10 +44,10 @@ const visualPathCurriculum: MonthCurriculum[] = [
         focus: "Learn the Memory Palace technique and Story Room (SR)",
         scripture: "Genesis 1-3",
         activities: [
-          { id: "v1-w1-a1", title: "Watch: Memory Palace Introduction", description: "Learn the ancient art of the Memory Palace for Bible study", type: "reading", duration: "10 min", roomCode: "SR", link: "/palace/floor/1/room/story", icon: "📺" },
+          { id: "v1-w1-a1", title: "Watch: Memory Palace Introduction", description: "Learn the ancient art of the Memory Palace for Bible study", type: "reading", duration: "10 min", roomCode: "SR", link: "/palace/floor/1/room/sr", icon: "📺" },
           { id: "v1-w1-a2", title: "Read Genesis 1-3", description: "Read slowly, noting vivid images: light bursting forth, the Garden, the serpent", type: "reading", duration: "20 min", link: "/bible/Genesis/1", icon: "📖" },
-          { id: "v1-w1-a3", title: "Create Your First Room", description: "Pick a room in your home as your 'Creation Room' - place 7 objects for 7 days", type: "exercise", duration: "15 min", roomCode: "IR", link: "/palace/floor/1/room/imagination", icon: "🏠" },
-          { id: "v1-w1-a4", title: "Story Visualization Drill", description: "Complete the Genesis story visualization exercise", type: "drill", duration: "10 min", roomCode: "SR", link: "/palace/floor/1/room/story", icon: "🎯" },
+          { id: "v1-w1-a3", title: "Create Your First Room", description: "Pick a room in your home as your 'Creation Room' - place 7 objects for 7 days", type: "exercise", duration: "15 min", roomCode: "IR", link: "/palace/floor/1/room/ir", icon: "🏠" },
+          { id: "v1-w1-a4", title: "Story Visualization Drill", description: "Complete the Genesis story visualization exercise", type: "drill", duration: "10 min", roomCode: "SR", link: "/palace/floor/1/room/sr", icon: "🎯" },
           { id: "v1-w1-a5", title: "Daily Review", description: "Walk through your Creation Room mentally before bed each night", type: "reflection", duration: "5 min daily", icon: "🌙" },
         ],
         milestone: "Can recall the 7 days of Creation using your memory palace",
@@ -58,7 +58,7 @@ const visualPathCurriculum: MonthCurriculum[] = [
         focus: "Step inside Bible stories through sanctified imagination",
         scripture: "Genesis 22 (Abraham and Isaac)",
         activities: [
-          { id: "v1-w2-a1", title: "Learn: Imagination Room Principles", description: "Understanding how to immerse yourself in Scripture scenes", type: "reading", duration: "10 min", roomCode: "IR", link: "/palace/floor/1/room/imagination", icon: "📚" },
+          { id: "v1-w2-a1", title: "Learn: Imagination Room Principles", description: "Understanding how to immerse yourself in Scripture scenes", type: "reading", duration: "10 min", roomCode: "IR", link: "/palace/floor/1/room/ir", icon: "📚" },
           { id: "v1-w2-a2", title: "Read Genesis 22", description: "Read the binding of Isaac, noting sensory details", type: "reading", duration: "15 min", link: "/bible/Genesis/22", icon: "📖" },
           { id: "v1-w2-a3", title: "Immersive Experience", description: "Close your eyes. Walk up Mount Moriah with Abraham. Feel the weight. See the ram.", type: "exercise", duration: "20 min", roomCode: "IR", icon: "👁️" },
           { id: "v1-w2-a4", title: "Draw the Scene", description: "Sketch three key moments from Genesis 22 (stick figures are fine!)", type: "exercise", duration: "15 min", icon: "✏️" },
@@ -86,9 +86,9 @@ const visualPathCurriculum: MonthCurriculum[] = [
         focus: "Converting verses into images and collecting insights",
         scripture: "Psalm 23",
         activities: [
-          { id: "v1-w4-a1", title: "Learn: Translation Room", description: "How to turn abstract words into concrete images", type: "reading", duration: "10 min", roomCode: "TR", link: "/palace/floor/1/room/translation", icon: "📚" },
+          { id: "v1-w4-a1", title: "Learn: Translation Room", description: "How to turn abstract words into concrete images", type: "reading", duration: "10 min", roomCode: "TR", link: "/palace/floor/1/room/tr", icon: "📚" },
           { id: "v1-w4-a2", title: "Translate Psalm 23", description: "Create one vivid image for each verse of Psalm 23", type: "exercise", duration: "20 min", roomCode: "TR", icon: "🎨" },
-          { id: "v1-w4-a3", title: "Gems Room Introduction", description: "Start your gem collection - record 3 insights from this month", type: "exercise", duration: "15 min", roomCode: "GR", link: "/palace/floor/1/room/gems", icon: "💎" },
+          { id: "v1-w4-a3", title: "Gems Room Introduction", description: "Start your gem collection - record 3 insights from this month", type: "exercise", duration: "15 min", roomCode: "GR", link: "/palace/floor/1/room/gr", icon: "💎" },
           { id: "v1-w4-a4", title: "Month 1 Review", description: "Walk through all your memory locations from this month", type: "drill", duration: "20 min", icon: "🔄" },
           { id: "v1-w4-a5", title: "Monthly Gate Preparation", description: "Prepare for your Month 1 assessment", type: "reflection", duration: "15 min", link: "/dashboard", icon: "🚪" },
         ],
@@ -108,7 +108,7 @@ const visualPathCurriculum: MonthCurriculum[] = [
         focus: "Training your eye to see what others miss",
         scripture: "Luke 15:11-32 (Prodigal Son)",
         activities: [
-          { id: "v2-w1-a1", title: "Learn: Visual Observation", description: "How to notice details that paint the picture", type: "reading", duration: "10 min", roomCode: "OR", link: "/palace/floor/2/room/observation", icon: "🔍" },
+          { id: "v2-w1-a1", title: "Learn: Visual Observation", description: "How to notice details that paint the picture", type: "reading", duration: "10 min", roomCode: "OR", link: "/palace/floor/2/room/or", icon: "🔍" },
           { id: "v2-w1-a2", title: "Read Luke 15:11-32", description: "Read 3 times, creating mental images for each scene", type: "reading", duration: "25 min", link: "/bible/Luke/15", icon: "📖" },
           { id: "v2-w1-a3", title: "Scene Mapping", description: "Draw a simple map of the prodigal's journey with images at each stop", type: "exercise", duration: "20 min", icon: "🗺️" },
           { id: "v2-w1-a4", title: "Color the Scene", description: "Assign colors to emotions in the story - what color is shame? Joy? Jealousy?", type: "exercise", duration: "15 min", icon: "🎨" },
@@ -122,7 +122,7 @@ const visualPathCurriculum: MonthCurriculum[] = [
         focus: "Seeing Christ through symbols",
         scripture: "Exodus 12 (Passover)",
         activities: [
-          { id: "v2-w2-a1", title: "Learn: Symbol Visualization", description: "How to picture biblical symbols and types", type: "reading", duration: "10 min", roomCode: "ST", link: "/palace/floor/2/room/symbols", icon: "🎭" },
+          { id: "v2-w2-a1", title: "Learn: Symbol Visualization", description: "How to picture biblical symbols and types", type: "reading", duration: "10 min", roomCode: "ST", link: "/palace/floor/2/room/st", icon: "🎭" },
           { id: "v2-w2-a2", title: "Read Exodus 12", description: "Visualize every element: lamb, blood, doorposts, death angel", type: "reading", duration: "20 min", link: "/bible/Exodus/12", icon: "📖" },
           { id: "v2-w2-a3", title: "Create Symbol Cards", description: "Make visual flashcards for 10 Passover symbols", type: "exercise", duration: "25 min", icon: "🃏" },
           { id: "v2-w2-a4", title: "Overlay Exercise", description: "Picture Passover lamb, then overlay Christ on the cross - same pose", type: "exercise", duration: "15 min", roomCode: "CR", icon: "✝️" },
@@ -172,7 +172,7 @@ const visualPathCurriculum: MonthCurriculum[] = [
         focus: "Finding Scripture in creation",
         scripture: "Psalm 19, Romans 1:20",
         activities: [
-          { id: "v3-w1-a1", title: "Learn: Nature Freestyle", description: "How to connect nature to Scripture visually", type: "reading", duration: "10 min", roomCode: "NF", link: "/palace/floor/3/room/nature-freestyle", icon: "🌿" },
+          { id: "v3-w1-a1", title: "Learn: Nature Freestyle", description: "How to connect nature to Scripture visually", type: "reading", duration: "10 min", roomCode: "NF", link: "/palace/floor/3/room/nf", icon: "🌿" },
           { id: "v3-w1-a2", title: "Nature Walk", description: "Take a 20-minute walk, capturing 5 nature-Scripture connections", type: "exercise", duration: "30 min", icon: "🚶" },
           { id: "v3-w1-a3", title: "Sunrise Meditation", description: "Watch a sunrise and connect it to Malachi 4:2", type: "reflection", duration: "20 min", icon: "🌅" },
           { id: "v3-w1-a4", title: "Tree Study", description: "Study a tree and find 5 Scripture connections (Ps 1, John 15, etc.)", type: "exercise", duration: "15 min", icon: "🌳" },
@@ -246,7 +246,7 @@ const analyticalPathCurriculum: MonthCurriculum[] = [
         focus: "Learning to see what others miss",
         scripture: "Luke 15:11-32 (Prodigal Son)",
         activities: [
-          { id: "a1-w1-a1", title: "Learn: Observation Room", description: "The detective's notebook method", type: "reading", duration: "10 min", roomCode: "OR", link: "/palace/floor/2/room/observation", icon: "🔍" },
+          { id: "a1-w1-a1", title: "Learn: Observation Room", description: "The detective's notebook method", type: "reading", duration: "10 min", roomCode: "OR", link: "/palace/floor/2/room/or", icon: "🔍" },
           { id: "a1-w1-a2", title: "Read Luke 15:11-32", description: "Read 3 times, noting every detail", type: "reading", duration: "20 min", link: "/bible/Luke/15", icon: "📖" },
           { id: "a1-w1-a3", title: "50 Observations", description: "List 50 observations from the Prodigal Son (no interpretation yet)", type: "exercise", duration: "30 min", roomCode: "OR", icon: "📝" },
           { id: "a1-w1-a4", title: "Pattern Hunt", description: "Find 5 patterns or repeated elements in the passage", type: "drill", duration: "15 min", icon: "🧩" },
@@ -260,7 +260,7 @@ const analyticalPathCurriculum: MonthCurriculum[] = [
         focus: "Using the Def-Com Room for deeper study",
         scripture: "John 3:1-21",
         activities: [
-          { id: "a1-w2-a1", title: "Learn: Def-Com Room", description: "Definitions and commentary research methods", type: "reading", duration: "10 min", roomCode: "DC", link: "/palace/floor/2/room/defcom", icon: "📚" },
+          { id: "a1-w2-a1", title: "Learn: Def-Com Room", description: "Definitions and commentary research methods", type: "reading", duration: "10 min", roomCode: "DC", link: "/palace/floor/2/room/dc", icon: "📚" },
           { id: "a1-w2-a2", title: "Word Study: 'Born Again'", description: "Research Greek behind 'born again' (gennao anothen)", type: "exercise", duration: "25 min", icon: "🔬" },
           { id: "a1-w2-a3", title: "Historical Context", description: "Research Nicodemus, Pharisees, and nighttime visits", type: "exercise", duration: "20 min", icon: "📜" },
           { id: "a1-w2-a4", title: "Cross-Reference Chain", description: "Build a chain from John 3:16 to 5 related verses", type: "drill", duration: "15 min", icon: "🔗" },
@@ -274,7 +274,7 @@ const analyticalPathCurriculum: MonthCurriculum[] = [
         focus: "Recognizing God's symbolic language",
         scripture: "Exodus 12 (Passover)",
         activities: [
-          { id: "a1-w3-a1", title: "Learn: Symbols/Types Room", description: "Understanding biblical symbolism and typology", type: "reading", duration: "10 min", roomCode: "ST", link: "/palace/floor/2/room/symbols", icon: "🎭" },
+          { id: "a1-w3-a1", title: "Learn: Symbols/Types Room", description: "Understanding biblical symbolism and typology", type: "reading", duration: "10 min", roomCode: "ST", link: "/palace/floor/2/room/st", icon: "🎭" },
           { id: "a1-w3-a2", title: "Read Exodus 12", description: "Identify every symbolic element in the Passover", type: "reading", duration: "20 min", link: "/bible/Exodus/12", icon: "📖" },
           { id: "a1-w3-a3", title: "Type Mapping", description: "Create a chart: Passover element → Christ fulfillment", type: "exercise", duration: "25 min", icon: "🗺️" },
           { id: "a1-w3-a4", title: "Symbol Dictionary", description: "Start a personal symbol reference list (lamb, blood, etc.)", type: "exercise", duration: "20 min", icon: "📓" },
@@ -288,7 +288,7 @@ const analyticalPathCurriculum: MonthCurriculum[] = [
         focus: "The art of asking the right questions",
         scripture: "Review month passages",
         activities: [
-          { id: "a1-w4-a1", title: "Learn: Questions Room", description: "Intratextual, intertextual, and phototheological questions", type: "reading", duration: "10 min", roomCode: "QR", link: "/palace/floor/2/room/questions", icon: "❓" },
+          { id: "a1-w4-a1", title: "Learn: Questions Room", description: "Intratextual, intertextual, and phototheological questions", type: "reading", duration: "10 min", roomCode: "QR", link: "/palace/floor/2/room/qr", icon: "❓" },
           { id: "a1-w4-a2", title: "75 Questions Challenge", description: "Generate 25 questions each: intra, inter, PT", type: "exercise", duration: "40 min", icon: "🧠" },
           { id: "a1-w4-a3", title: "Q&A Chains", description: "Use Scripture to answer Scripture - build 5 chains", type: "drill", duration: "20 min", roomCode: "QA", icon: "🔗" },
           { id: "a1-w4-a4", title: "Month Review", description: "Review all Month 1 detective findings", type: "drill", duration: "20 min", icon: "🔄" },
@@ -374,7 +374,7 @@ const analyticalPathCurriculum: MonthCurriculum[] = [
         focus: "Every text points to Christ",
         scripture: "Luke 24:13-35 (Emmaus Road)",
         activities: [
-          { id: "a3-w1-a1", title: "Learn: Concentration Room", description: "How to find Christ in every passage", type: "reading", duration: "10 min", roomCode: "CR", link: "/palace/floor/4/room/concentration", icon: "🎯" },
+          { id: "a3-w1-a1", title: "Learn: Concentration Room", description: "How to find Christ in every passage", type: "reading", duration: "10 min", roomCode: "CR", link: "/palace/floor/4/room/cr", icon: "🎯" },
           { id: "a3-w1-a2", title: "Emmaus Study", description: "Study how Jesus revealed Himself from Moses and Prophets", type: "exercise", duration: "25 min", link: "/bible/Luke/24", icon: "📖" },
           { id: "a3-w1-a3", title: "Genesis Christ-Hunt", description: "Find Christ in Genesis 1-3 (hints: Word, Light, Seed)", type: "exercise", duration: "20 min", icon: "🔍" },
           { id: "a3-w1-a4", title: "Psalms Christ-Hunt", description: "Identify Messianic themes in Psalms 2, 22, 110", type: "drill", duration: "20 min", icon: "🔍" },
@@ -388,7 +388,7 @@ const analyticalPathCurriculum: MonthCurriculum[] = [
         focus: "Multi-layered interpretation",
         scripture: "Exodus 12 revisited",
         activities: [
-          { id: "a3-w2-a1", title: "Learn: Dimensions Room", description: "Literal, Christ, Personal, Church, Eternal dimensions", type: "reading", duration: "10 min", roomCode: "DR", link: "/palace/floor/4/room/dimensions", icon: "📐" },
+          { id: "a3-w2-a1", title: "Learn: Dimensions Room", description: "Literal, Christ, Personal, Church, Eternal dimensions", type: "reading", duration: "10 min", roomCode: "DR", link: "/palace/floor/4/room/dr", icon: "📐" },
           { id: "a3-w2-a2", title: "Exodus 12: All 5 Dimensions", description: "Apply all 5 dimensions to Passover", type: "exercise", duration: "30 min", icon: "🔬" },
           { id: "a3-w2-a3", title: "Psalm 23: 5 Dimensions", description: "Apply the 5 dimensions to Psalm 23", type: "exercise", duration: "25 min", icon: "📊" },
           { id: "a3-w2-a4", title: "Dimension Drill", description: "Quick 5-dimension analysis of 3 short passages", type: "drill", duration: "20 min", icon: "⚡" },
@@ -402,7 +402,7 @@ const analyticalPathCurriculum: MonthCurriculum[] = [
         focus: "Reading each genre correctly",
         scripture: "Multi-genre survey",
         activities: [
-          { id: "a3-w3-a1", title: "Learn: Connect 6 Room", description: "The 6 major genres and their rules", type: "reading", duration: "15 min", roomCode: "C6", link: "/palace/floor/4/room/connect6", icon: "📚" },
+          { id: "a3-w3-a1", title: "Learn: Connect 6 Room", description: "The 6 major genres and their rules", type: "reading", duration: "15 min", roomCode: "C6", link: "/palace/floor/4/room/c6", icon: "📚" },
           { id: "a3-w3-a2", title: "Poetry Analysis", description: "Analyze Psalm 139 using poetry rules", type: "exercise", duration: "20 min", icon: "📝" },
           { id: "a3-w3-a3", title: "Prophecy Analysis", description: "Analyze Isaiah 53 using prophecy rules", type: "exercise", duration: "20 min", icon: "🔮" },
           { id: "a3-w3-a4", title: "Parable Analysis", description: "Analyze Matthew 13 parables using parable rules", type: "exercise", duration: "20 min", icon: "🌾" },
@@ -489,7 +489,7 @@ const devotionalPathCurriculum: MonthCurriculum[] = [
         scripture: "Isaiah 53",
         activities: [
           { id: "d1-w4-a1", title: "Read Isaiah 53", description: "Read slowly, letting each verse sink in", type: "reading", duration: "20 min", link: "/bible/Isaiah/53", icon: "📖" },
-          { id: "d1-w4-a2", title: "Fire Room Experience", description: "Which verse pierces your heart? Stay there.", type: "exercise", duration: "30 min", roomCode: "FRm", link: "/palace/floor/7/room/fire", icon: "🔥" },
+          { id: "d1-w4-a2", title: "Fire Room Experience", description: "Which verse pierces your heart? Stay there.", type: "exercise", duration: "30 min", roomCode: "FRm", link: "/palace/floor/7/room/frm", icon: "🔥" },
           { id: "d1-w4-a3", title: "Response Writing", description: "Write your response to the Suffering Servant", type: "reflection", duration: "20 min", icon: "✍️" },
           { id: "d1-w4-a4", title: "Month Review", description: "Review your journal entries from Month 1", type: "reflection", duration: "15 min", icon: "🔄" },
           { id: "d1-w4-a5", title: "Gate Preparation", description: "Prepare to share your devotional journey", type: "reflection", duration: "15 min", icon: "🚪" },
@@ -510,7 +510,7 @@ const devotionalPathCurriculum: MonthCurriculum[] = [
         focus: "Marinating in Scripture",
         scripture: "Psalm 119:9-16",
         activities: [
-          { id: "d2-w1-a1", title: "Learn: Meditation Room", description: "Biblical meditation vs. empty meditation", type: "reading", duration: "10 min", roomCode: "MR", link: "/palace/floor/7/room/meditation", icon: "🧘" },
+          { id: "d2-w1-a1", title: "Learn: Meditation Room", description: "Biblical meditation vs. empty meditation", type: "reading", duration: "10 min", roomCode: "MR", link: "/palace/floor/7/room/mr", icon: "🧘" },
           { id: "d2-w1-a2", title: "Psalm 119:9-16 Meditation", description: "Spend 20 minutes on just these 8 verses", type: "exercise", duration: "25 min", icon: "📖" },
           { id: "d2-w1-a3", title: "Word-by-Word", description: "Take v.11 word by word: 'Thy...word...have I...'", type: "exercise", duration: "20 min", icon: "🔤" },
           { id: "d2-w1-a4", title: "Memorize Psalm 119:11", description: "Commit this verse to memory through meditation", type: "drill", duration: "15 min", icon: "🧠" },
@@ -646,7 +646,7 @@ const warriorPathCurriculum: MonthCurriculum[] = [
         focus: "Rapid recall basics",
         scripture: "Ephesians 6:10-18 (Armor of God)",
         activities: [
-          { id: "w1-w1-a1", title: "Learn: Speed Room", description: "Rapid-fire study techniques for warriors", type: "reading", duration: "10 min", roomCode: "SRm", link: "/palace/floor/7/room/speed", icon: "⚡" },
+          { id: "w1-w1-a1", title: "Learn: Speed Room", description: "Rapid-fire study techniques for warriors", type: "reading", duration: "10 min", roomCode: "SRm", link: "/palace/floor/7/room/srm", icon: "⚡" },
           { id: "w1-w1-a2", title: "Memorize Ephesians 6:10-18", description: "Goal: Recite in under 90 seconds by week end", type: "drill", duration: "20 min daily", icon: "⚔️" },
           { id: "w1-w1-a3", title: "Speed Drill: Armor", description: "Name all 6 armor pieces in under 10 seconds", type: "drill", duration: "10 min", icon: "🛡️" },
           { id: "w1-w1-a4", title: "Verse Sprint", description: "How many armor verses can you quote in 2 minutes?", type: "challenge", duration: "15 min", icon: "🏃" },
