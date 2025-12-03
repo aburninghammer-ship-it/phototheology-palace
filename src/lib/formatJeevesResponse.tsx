@@ -302,57 +302,63 @@ const formatInlineText = (text: string): React.ReactNode => {
   const parts: React.ReactNode[] = [];
   let remaining = text;
   let keyCounter = 0;
+  let lastCharWasLetter = false; // Track if previous char was a letter
 
   while (remaining.length > 0) {
-    // Handle PT room codes with specific variants (e.g., C6-Gospel, DR-Christ, TRm-Sanctuary)
-    const roomCodeVariantMatch = remaining.match(/^(SR|IR|24F|BR|TR|GR|OR|DC|ST|QR|QA|NF|PF|BF|HF|LR|CR|DR|C6|TRm|TZ|PRm|FRt|BL|PR|3A|JR|FRm|MR|SRm|∞|@Ad|@No|@Ab|@Mo|@Cy|@CyC|@Sp|@Re|1H|2H|3H|[1-5]D)[-:]?\s*(Gospel|Law|History|Poetry|Prophecy|Epistle|Literal|Christ|Me|Church|Heaven|Sanctuary|Great Controversy|Time Prophecy|Life of Christ|Love|Joy|Peace|Patience|Kindness|Goodness|Faithfulness|Gentleness|Self-Control|Earth-Past|Earth-Now|Earth-Future|Heaven-Past|Heaven-Now|Heaven-Future)?(?![a-z])/i);
-    if (roomCodeVariantMatch) {
-      const code = roomCodeVariantMatch[1];
-      const variant = roomCodeVariantMatch[2] || '';
-      const roomColor = getRoomColor(code);
-      
-      parts.push(
-        <span 
-          key={`room-${keyCounter++}`} 
-          className="inline-flex items-center gap-1 mx-1"
-        >
+    // Only match room codes if NOT preceded by a letter (word boundary)
+    if (!lastCharWasLetter) {
+      // Handle PT room codes with specific variants (e.g., C6-Gospel, DR-Christ, TRm-Sanctuary)
+      const roomCodeVariantMatch = remaining.match(/^(SR|IR|24F|BR|TR|GR|OR|DC|ST|QR|QA|NF|PF|BF|HF|LR|CR|DR|C6|TRm|TZ|PRm|FRt|BL|PR|3A|JR|FRm|MR|SRm|∞|@Ad|@No|@Ab|@Mo|@Cy|@CyC|@Sp|@Re|1H|2H|3H|[1-5]D)[-:]?\s*(Gospel|Law|History|Poetry|Prophecy|Epistle|Literal|Christ|Me|Church|Heaven|Sanctuary|Great Controversy|Time Prophecy|Life of Christ|Love|Joy|Peace|Patience|Kindness|Goodness|Faithfulness|Gentleness|Self-Control|Earth-Past|Earth-Now|Earth-Future|Heaven-Past|Heaven-Now|Heaven-Future)?(?![a-zA-Z])/i);
+      if (roomCodeVariantMatch) {
+        const code = roomCodeVariantMatch[1];
+        const variant = roomCodeVariantMatch[2] || '';
+        const roomColor = getRoomColor(code);
+        
+        parts.push(
           <span 
-            className={`px-2 py-1 rounded-md font-bold text-xs ${roomColor} border shadow-sm`}
+            key={`room-${keyCounter++}`} 
+            className="inline-flex items-center gap-1 mx-1"
           >
-            {code}{variant ? `: ${variant}` : ''}
-          </span>
-        </span>
-      );
-      remaining = remaining.slice(roomCodeVariantMatch[0].length);
-      continue;
-    }
-
-    // Handle basic PT room codes (without variants)
-    const roomCodeMatch = remaining.match(/^(SR|IR|24F|BR|TR|GR|OR|DC|ST|QR|QA|NF|PF|BF|HF|LR|CR|DR|C6|TRm|TZ|PRm|FRt|BL|PR|3A|JR|FRm|MR|SRm|∞|@Ad|@No|@Ab|@Mo|@Cy|@CyC|@Sp|@Re|1H|2H|3H|[1-5]D)(?![a-z])(\s*\([^)]+\))?/);
-    if (roomCodeMatch) {
-      const code = roomCodeMatch[1];
-      const description = roomCodeMatch[2] || '';
-      const roomColor = getRoomColor(code);
-      
-      parts.push(
-        <span 
-          key={`room-${keyCounter++}`} 
-          className="inline-flex items-center gap-1 mx-1"
-        >
-          <span 
-            className={`px-2 py-1 rounded-md font-bold text-xs ${roomColor} border shadow-sm`}
-          >
-            {code}
-          </span>
-          {description && (
-            <span className="text-sm text-muted-foreground italic">
-              {description}
+            <span 
+              className={`px-2 py-1 rounded-md font-bold text-xs ${roomColor} border shadow-sm`}
+            >
+              {code}{variant ? `: ${variant}` : ''}
             </span>
-          )}
-        </span>
-      );
-      remaining = remaining.slice(roomCodeMatch[0].length);
-      continue;
+          </span>
+        );
+        remaining = remaining.slice(roomCodeVariantMatch[0].length);
+        lastCharWasLetter = false;
+        continue;
+      }
+
+      // Handle basic PT room codes (without variants)
+      const roomCodeMatch = remaining.match(/^(SR|IR|24F|BR|TR|GR|OR|DC|ST|QR|QA|NF|PF|BF|HF|LR|CR|DR|C6|TRm|TZ|PRm|FRt|BL|PR|3A|JR|FRm|MR|SRm|∞|@Ad|@No|@Ab|@Mo|@Cy|@CyC|@Sp|@Re|1H|2H|3H|[1-5]D)(?![a-zA-Z])(\s*\([^)]+\))?/);
+      if (roomCodeMatch) {
+        const code = roomCodeMatch[1];
+        const description = roomCodeMatch[2] || '';
+        const roomColor = getRoomColor(code);
+        
+        parts.push(
+          <span 
+            key={`room-${keyCounter++}`} 
+            className="inline-flex items-center gap-1 mx-1"
+          >
+            <span 
+              className={`px-2 py-1 rounded-md font-bold text-xs ${roomColor} border shadow-sm`}
+            >
+              {code}
+            </span>
+            {description && (
+              <span className="text-sm text-muted-foreground italic">
+                {description}
+              </span>
+            )}
+          </span>
+        );
+        remaining = remaining.slice(roomCodeMatch[0].length);
+        lastCharWasLetter = false;
+        continue;
+      }
     }
 
     // Handle bold text (**text** or __text__)
@@ -365,6 +371,7 @@ const formatInlineText = (text: string): React.ReactNode => {
         </strong>
       );
       remaining = remaining.slice(boldMatch[0].length);
+      lastCharWasLetter = /[a-zA-Z]$/.test(boldText);
       continue;
     }
 
@@ -378,6 +385,7 @@ const formatInlineText = (text: string): React.ReactNode => {
         </em>
       );
       remaining = remaining.slice(italicMatch[0].length);
+      lastCharWasLetter = /[a-zA-Z]$/.test(italicText);
       continue;
     }
 
@@ -394,6 +402,7 @@ const formatInlineText = (text: string): React.ReactNode => {
         </code>
       );
       remaining = remaining.slice(codeMatch[0].length);
+      lastCharWasLetter = false;
       continue;
     }
 
@@ -411,6 +420,7 @@ const formatInlineText = (text: string): React.ReactNode => {
         </span>
       );
       remaining = remaining.slice(verseMatch[0].length);
+      lastCharWasLetter = false;
       continue;
     }
 
@@ -430,11 +440,14 @@ const formatInlineText = (text: string): React.ReactNode => {
         </a>
       );
       remaining = remaining.slice(urlMatch[0].length);
+      lastCharWasLetter = false;
       continue;
     }
 
-    // Regular character
-    parts.push(remaining[0]);
+    // Regular character - track if it's a letter
+    const char = remaining[0];
+    lastCharWasLetter = /[a-zA-Z]/.test(char);
+    parts.push(char);
     remaining = remaining.slice(1);
   }
 
