@@ -40,6 +40,7 @@ import {
 import { formatJeevesResponse } from "@/lib/formatJeevesResponse";
 import { DownloadSequenceDialog } from "./DownloadSequenceDialog";
 import { OfflineModeToggle } from "./OfflineModeToggle";
+import { CommentaryPDFExport } from "./CommentaryPDFExport";
 import { isOnline, getCachedMusicTrack } from "@/services/offlineAudioCache";
 import { 
   getCachedChapterCommentary, 
@@ -1847,9 +1848,17 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
                 <h3 className="font-bold text-amber-600 dark:text-amber-400">Jeeves Commentary</h3>
                 <p className="text-xs text-muted-foreground">Phototheological Insights</p>
               </div>
-              <Badge variant="secondary" className="animate-pulse bg-amber-500/20 text-amber-600 dark:text-amber-400 border-amber-500/30">
-                <span className="mr-1">🔊</span> Speaking
-              </Badge>
+              <div className="flex items-center gap-2">
+                <CommentaryPDFExport
+                  commentary={commentaryText}
+                  book={currentItem?.book || ""}
+                  chapter={currentItem?.chapter || 1}
+                  depth={currentCommentaryDepth}
+                />
+                <Badge variant="secondary" className="animate-pulse bg-amber-500/20 text-amber-600 dark:text-amber-400 border-amber-500/30">
+                  <span className="mr-1">🔊</span> Speaking
+                </Badge>
+              </div>
             </div>
             {/* Commentary Content */}
             <ScrollArea className="max-h-[350px]">
