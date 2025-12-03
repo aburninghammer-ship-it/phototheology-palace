@@ -46,120 +46,80 @@ import { useAudioDucking } from "@/hooks/useAudioDucking";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { subscribeToMusicVolume } from "@/hooks/useMusicVolumeControl";
 
-// Phototheology Sacred Orchestral Music
-// Rich orchestral, movie soundtrack style (The Chosen, Zimmer, Tyler)
-// BPM 55-70, no lyrics, no synthesizers, pure orchestra
+// Study Music Playlist - 8 tracks for Bible study and meditation
 const AMBIENT_TRACKS: Array<{
   id: string;
   name: string;
   description: string;
   category: string;
-  floor: number;
   mood: string;
   url: string;
-  bpm: number;
 }> = [
   {
     id: "eternal-echoes",
     name: "Eternal Echoes",
-    description: "Cinematic orchestral christian music - instrumental",
-    category: "floor-4",
-    floor: 4,
+    description: "Cinematic orchestral - reverent",
+    category: "study-music",
     mood: "cinematic, orchestral, reverent",
     url: "https://cdn1.suno.ai/ea711d82-cd6a-4ebd-a960-b73cb72c39f0.mp3",
-    bpm: 65,
   },
   {
     id: "amazing-grace-epic",
-    name: "Amazing Grace (Epic Meditative Remix)",
-    description: "Cinematic christian music - epic meditative instrumental",
-    category: "floor-7",
-    floor: 7,
+    name: "Amazing Grace (Epic Remix)",
+    description: "Epic meditative instrumental",
+    category: "study-music",
     mood: "cinematic, epic, meditative",
     url: "https://cdn1.suno.ai/a362b171-5a6f-4264-8946-ae76b09a6aa7.mp3",
-    bpm: 70,
   },
   {
     id: "when-he-cometh",
-    name: "When He Cometh Reimagined",
-    description: "Orchestral choral ambient - instrumental",
-    category: "floor-7",
-    floor: 7,
+    name: "When He Cometh",
+    description: "Orchestral choral ambient",
+    category: "study-music",
     mood: "orchestral, choral, ambient",
     url: "https://cdn1.suno.ai/617f1da9-1bfb-4a93-8485-08f432623d2e.mp3",
-    bpm: 68,
   },
   {
-    id: "flight",
-    name: "Flight",
-    description: "Soaring orchestral, uplifting, ethereal",
-    category: "floor-2",
-    floor: 2,
-    mood: "soaring, orchestral, uplifting",
-    url: "https://cdn1.suno.ai/qWAdsQQdcbYPv9kC.mp3",
-    bpm: 65,
+    id: "peaceful-waters",
+    name: "Peaceful Waters",
+    description: "Calm piano and strings",
+    category: "study-music",
+    mood: "peaceful, calm, reflective",
+    url: "https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf07a.mp3",
   },
   {
-    id: "whispers-inner-mind",
-    name: "Whispers of the Inner Mind",
-    description: "Ambient instrumental meditation - peaceful and meditative",
-    category: "floor-2",
-    floor: 2,
-    mood: "ambient, peaceful, meditative",
-    url: "https://cdn1.suno.ai/E8qISnskB0iJ5bnz.mp3",
-    bpm: 55,
+    id: "morning-light",
+    name: "Morning Light",
+    description: "Gentle ambient meditation",
+    category: "study-music",
+    mood: "gentle, ambient, hopeful",
+    url: "https://cdn.pixabay.com/download/audio/2022/03/15/audio_8e5e3b4b5a.mp3",
+  },
+  {
+    id: "sanctuary-peace",
+    name: "Sanctuary Peace",
+    description: "Soft orchestral atmosphere",
+    category: "study-music",
+    mood: "soft, orchestral, peaceful",
+    url: "https://cdn.pixabay.com/download/audio/2021/11/25/audio_cb4fe5bfed.mp3",
+  },
+  {
+    id: "quiet-reflection",
+    name: "Quiet Reflection",
+    description: "Ambient piano meditation",
+    category: "study-music",
+    mood: "quiet, reflective, piano",
+    url: "https://cdn.pixabay.com/download/audio/2022/01/18/audio_d0a13f69d2.mp3",
+  },
+  {
+    id: "heavenly-strings",
+    name: "Heavenly Strings",
+    description: "Beautiful string arrangement",
+    category: "study-music",
+    mood: "beautiful, strings, uplifting",
+    url: "https://cdn.pixabay.com/download/audio/2022/10/25/audio_946cc8ad49.mp3",
   },
 ];
-
-// Room to track mapping based on Phototheology floors
-const ROOM_TRACK_MAP: Record<string, string> = {
-  // Floor 1 - Story Floor (Furnishing): warm, welcoming, narrative
-  "story-room": "sanctuary-stillness",
-  "imagination-room": "sanctuary-stillness",
-  "24fps-room": "chamber-light", // cinematic storytelling
-  "bible-rendered": "sanctuary-stillness",
-  "translation-room": "sanctuary-stillness",
-  "gems-room": "sanctuary-stillness",
-  
-  // Floor 2 - Pattern Floor (Investigation): structured, rhythmic
-  "observation-room": "chamber-light",
-  "def-com-room": "chamber-light",
-  "symbols-types": "blue-room-ambient", // typology connection
-  "questions-room": "chamber-light",
-  "qa-chains": "chamber-light",
-  
-  // Floor 3 - Sanctuary Floor: holy, reverent
-  "blue-room": "blue-room-ambient",
-  "sanctuary-room": "sanctuary-stillness",
-  
-  // Floor 4 - Christ Floor (Next Level): bright, hopeful
-  "concentration-room": "christ-the-center",
-  "dimensions-room": "christ-the-center",
-  "connect-6": "chamber-light",
-  "theme-room": "christ-the-center",
-  "time-zone": "prophecy-watch",
-  "patterns-room": "chamber-light",
-  "parallels-room": "chamber-light",
-  "fruit-room": "christ-the-center",
-  
-  // Floor 5 - Prophecy Floor (Vision): cinematic, atmospheric
-  "prophecy-room": "prophecy-watch",
-  "three-angels": "prophecy-watch",
-  
-  // Floor 6 - Freestyle Floor: natural, open
-  "nature-freestyle": "wisdom-quiet",
-  "personal-freestyle": "wisdom-quiet",
-  "bible-freestyle": "wisdom-quiet",
-  "history-freestyle": "prophecy-watch",
-  "listening-room": "wisdom-quiet",
-  
-  // Floor 7 - Wisdom Floor: solemn, calm, ancient
-  "wisdom-room": "chamber-light",
-  "meditation-room": "chamber-light",
-  
-  // Default
-  "default": "story-warmth",
-};
 
 interface AmbientMusicPlayerProps {
   roomId?: string;
@@ -304,16 +264,6 @@ export function AmbientMusicPlayer({
       loopMode
     };
   }, [allTracks, selectedTracks, currentTrackId, shuffleMode, loopMode]);
-
-  // Auto-select track based on room
-  useEffect(() => {
-    if (roomId && ROOM_TRACK_MAP[roomId]) {
-      const suggestedTrack = ROOM_TRACK_MAP[roomId];
-      if (suggestedTrack !== currentTrackId) {
-        setCurrentTrackId(suggestedTrack);
-      }
-    }
-  }, [roomId]);
 
   // Initialize audio element once - simple HTML5 audio for independence
   useEffect(() => {
@@ -1267,7 +1217,7 @@ export function AmbientMusicPlayer({
                 </div>
                 
                 <p className="text-xs text-muted-foreground">
-                  {currentTrack.bpm} BPM • {currentTrack.category}
+                  Study Music • {currentTrack.mood}
                 </p>
               </div>
             </PopoverContent>
