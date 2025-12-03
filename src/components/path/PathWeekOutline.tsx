@@ -4,6 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Checkbox } from "@/components/ui/checkbox";
 import { usePath, PATH_INFO, PathType } from "@/hooks/usePath";
+import { usePathAccess, useSavePathActivity } from "@/hooks/usePathAccess";
 import { 
   getCurrentWeekInMonth, 
   getPathCurriculum, 
@@ -12,10 +13,11 @@ import {
 } from "@/data/pathCurriculum";
 import { 
   Calendar, BookOpen, Target, Clock, ChevronRight, 
-  Sparkles, Trophy, ArrowRight, CheckCircle2
+  Sparkles, Trophy, ArrowRight, CheckCircle2, Lock, Crown
 } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { useState, useEffect } from "react";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
 interface PathWeekOutlineProps {
   compact?: boolean;
@@ -24,30 +26,25 @@ interface PathWeekOutlineProps {
 export function PathWeekOutline({ compact = false }: PathWeekOutlineProps) {
   const navigate = useNavigate();
   const { activePath, isLoading } = usePath();
-  const [completedActivities, setCompletedActivities] = useState<string[]>([]);
-
-  // Load completed activities from localStorage
-  useEffect(() => {
-    if (activePath) {
-      const key = `path-activities-${activePath.id}-${activePath.current_month}`;
-      const saved = localStorage.getItem(key);
-      if (saved) {
-        setCompletedActivities(JSON.parse(saved));
-      }
-    }
-  }, [activePath]);
+  const { 
+    completedActivities, 
+    getWeekStatus, 
+    currentWeekStatus,
+    needsPremiumForNextWeek,
+    refreshAccess 
+  } = usePathAccess();
+  const { saveActivity, removeActivity } = useSavePathActivity();
 
   // Save completed activities
-  const toggleActivity = (activityId: string) => {
+  const toggleActivity = async (activityId: string) => {
     if (!activePath) return;
     
-    const key = `path-activities-${activePath.id}-${activePath.current_month}`;
-    const newCompleted = completedActivities.includes(activityId)
-      ? completedActivities.filter(id => id !== activityId)
-      : [...completedActivities, activityId];
-    
-    setCompletedActivities(newCompleted);
-    localStorage.setItem(key, JSON.stringify(newCompleted));
+    if (completedActivities.includes(activityId)) {
+      await removeActivity(activityId);
+    } else {
+      await saveActivity(activityId);
+    }
+    refreshAccess();
   };
 
   if (isLoading) {
@@ -104,11 +101,24 @@ export function PathWeekOutline({ compact = false }: PathWeekOutlineProps) {
               <span>{pathData.icon}</span>
               Week {currentWeek}: {weekOutline.title}
             </CardTitle>
-            <Badge variant="secondary">
-              {completedCount}/{weekOutline.activities.length}
-            </Badge>
+            <div className="flex items-center gap-2">
+              <Badge variant="secondary">
+                {completedCount}/{weekOutline.activities.length}
+              </Badge>
+              {currentWeekStatus?.isComplete && (
+                <Badge variant="secondary" className="bg-green-500/20 text-green-700 dark:text-green-300">
+                  ✓
+                </Badge>
+              )}
+            </div>
           </div>
           <Progress value={progressPercent} className="h-2" />
+          {needsPremiumForNextWeek && currentWeekStatus?.isComplete && (
+            <div className="flex items-center gap-1 mt-2 text-xs text-yellow-600 dark:text-yellow-400">
+              <Crown className="h-3 w-3" />
+              <span>Premium needed for Week 2+</span>
+            </div>
+          )}
         </CardHeader>
         <CardContent>
           <Button 
@@ -209,6 +219,55 @@ export function PathWeekOutline({ compact = false }: PathWeekOutlineProps) {
         </CardContent>
       </Card>
 
+      {/* Week Completion Celebration */}
+      {currentWeekStatus?.isComplete && (
+        <Alert className="bg-gradient-to-r from-green-500/20 to-emerald-500/20 border-green-500/30">
+          <Trophy className="h-4 w-4 text-green-600" />
+          <AlertDescription className="flex items-center justify-between">
+            <span className="text-green-700 dark:text-green-300 font-medium">
+              🎉 Congratulations! You've completed Week {currentWeek}!
+            </span>
+            {(() => {
+              const nextWeek = currentWeek < 4 ? currentWeek + 1 : 1;
+              const nextMonth = currentWeek < 4 ? activePath.current_month : activePath.current_month + 1;
+              const nextStatus = getWeekStatus(nextMonth, nextWeek);
+              
+              if (nextStatus?.reason === 'time_locked') {
+                return (
+                  <span className="text-sm text-muted-foreground">
+                    Week {nextWeek} unlocks in {nextStatus.daysUntilUnlock} day{nextStatus.daysUntilUnlock !== 1 ? 's' : ''}
+                  </span>
+                );
+              }
+              return null;
+            })()}
+          </AlertDescription>
+        </Alert>
+      )}
+
+      {/* Premium Upsell Banner */}
+      {needsPremiumForNextWeek && currentWeekStatus?.isComplete && (
+        <Alert className="bg-gradient-to-r from-yellow-500/20 to-amber-500/20 border-yellow-500/30">
+          <Crown className="h-4 w-4 text-yellow-600" />
+          <AlertDescription className="flex items-center justify-between">
+            <div>
+              <span className="text-yellow-700 dark:text-yellow-300 font-medium">
+                Ready for Week 2 and beyond?
+              </span>
+              <p className="text-sm text-muted-foreground mt-1">
+                Upgrade to Premium to continue your path journey with all 24 months of curriculum.
+              </p>
+            </div>
+            <Button asChild variant="default" size="sm" className="ml-4">
+              <Link to="/pricing">
+                <Crown className="mr-1 h-4 w-4" />
+                Upgrade
+              </Link>
+            </Button>
+          </AlertDescription>
+        </Alert>
+      )}
+
       {/* Month Overview */}
       <Card className="glass-card">
         <CardHeader>
@@ -217,24 +276,46 @@ export function PathWeekOutline({ compact = false }: PathWeekOutlineProps) {
         </CardHeader>
         <CardContent>
           <div className="flex gap-2">
-            {monthCurriculum.weeks.map((week) => (
-              <div
-                key={week.weekNumber}
-                className={`flex-1 p-3 rounded-lg text-center transition-colors ${
-                  week.weekNumber === currentWeek
-                    ? `${pathData.bgColor} border ${pathData.borderColor}`
-                    : week.weekNumber < currentWeek
-                    ? "bg-primary/10"
-                    : "bg-muted/50"
-                }`}
-              >
-                <p className="text-xs text-muted-foreground">Week {week.weekNumber}</p>
-                <p className="text-sm font-medium truncate">{week.title}</p>
-                {week.weekNumber < currentWeek && (
-                  <CheckCircle2 className="h-4 w-4 mx-auto mt-1 text-primary" />
-                )}
-              </div>
-            ))}
+            {monthCurriculum.weeks.map((week) => {
+              const weekStatus = getWeekStatus(activePath.current_month, week.weekNumber);
+              const isLocked = weekStatus && !weekStatus.isUnlocked;
+              
+              return (
+                <div
+                  key={week.weekNumber}
+                  className={`flex-1 p-3 rounded-lg text-center transition-colors relative ${
+                    week.weekNumber === currentWeek
+                      ? `${pathData.bgColor} border ${pathData.borderColor}`
+                      : weekStatus?.isComplete
+                      ? "bg-primary/10"
+                      : isLocked
+                      ? "bg-muted/30 opacity-60"
+                      : "bg-muted/50"
+                  }`}
+                >
+                  <p className="text-xs text-muted-foreground">Week {week.weekNumber}</p>
+                  <p className="text-sm font-medium truncate">{week.title}</p>
+                  
+                  {weekStatus?.isComplete && (
+                    <CheckCircle2 className="h-4 w-4 mx-auto mt-1 text-primary" />
+                  )}
+                  
+                  {isLocked && (
+                    <div className="mt-1">
+                      {weekStatus.reason === 'premium_required' ? (
+                        <Crown className="h-4 w-4 mx-auto text-yellow-600" />
+                      ) : weekStatus.reason === 'time_locked' ? (
+                        <div className="text-xs text-muted-foreground">
+                          {weekStatus.daysUntilUnlock}d
+                        </div>
+                      ) : (
+                        <Lock className="h-4 w-4 mx-auto text-muted-foreground" />
+                      )}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
           </div>
 
           {/* Gate Assessment Preview */}

@@ -4269,6 +4269,33 @@ export type Database = {
           },
         ]
       }
+      path_activity_completions: {
+        Row: {
+          activity_id: string
+          completed_at: string
+          created_at: string
+          id: string
+          path_id: string
+          user_id: string
+        }
+        Insert: {
+          activity_id: string
+          completed_at?: string
+          created_at?: string
+          id?: string
+          path_id: string
+          user_id: string
+        }
+        Update: {
+          activity_id?: string
+          completed_at?: string
+          created_at?: string
+          id?: string
+          path_id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       path_completions: {
         Row: {
           certificate_url: string | null
