@@ -169,13 +169,13 @@ export const OnboardingGuide = ({ roomId, roomName, onComplete }: OnboardingGuid
           animate={{ opacity: 1, y: 0, scale: 1 }}
           exit={{ opacity: 0, y: -40, scale: 0.9 }}
           transition={{ duration: 0.5, ease: "easeOut" }}
-          className="w-full max-w-2xl relative"
+          className="w-full max-w-2xl relative max-h-[90vh] flex flex-col"
         >
-          <Card variant="glass">
+          <Card variant="glass" className="flex flex-col max-h-full overflow-hidden">
             {/* Gradient top border */}
-            <div className={`h-1.5 bg-gradient-to-r ${stepGradient}`} />
+            <div className={`h-1.5 bg-gradient-to-r ${stepGradient} flex-shrink-0`} />
             
-            <CardContent className="p-8 relative">
+            <CardContent className="p-6 md:p-8 relative flex-1 overflow-y-auto">
               {/* Corner glow */}
               <div className={`absolute -top-20 -right-20 w-64 h-64 bg-gradient-to-br ${stepGradient} opacity-20 rounded-full blur-3xl`} />
               
@@ -236,32 +236,32 @@ export const OnboardingGuide = ({ roomId, roomName, onComplete }: OnboardingGuid
                 <p className="text-muted-foreground">{currentStepData.description}</p>
                 {currentStepData.content}
               </div>
-
-              {/* Navigation */}
-              <div className="flex justify-between mt-8 pt-6 border-t border-border relative z-10">
-                <Button
-                  variant="ghost"
-                  onClick={handleBack}
-                  disabled={currentStep === 0}
-                  className="gap-2"
-                >
-                  <ChevronLeft className="h-4 w-4" />
-                  Back
-                </Button>
-                <div className="flex gap-3">
-                  <Button variant="outline" onClick={handleClose}>
-                    Skip Guide
-                  </Button>
-                  <Button 
-                    onClick={handleNext}
-                    className={`bg-gradient-to-r ${stepGradient} hover:opacity-90 text-white border-0 gap-2 shadow-lg`}
-                  >
-                    {currentStep === steps.length - 1 ? "Start Practicing" : "Next"}
-                    <ChevronRight className="h-4 w-4" />
-                  </Button>
-                </div>
-              </div>
             </CardContent>
+
+            {/* Navigation - Fixed at bottom */}
+            <div className="flex justify-between p-6 md:p-8 pt-4 border-t border-border relative z-10 bg-card flex-shrink-0">
+              <Button
+                variant="ghost"
+                onClick={handleBack}
+                disabled={currentStep === 0}
+                className="gap-2"
+              >
+                <ChevronLeft className="h-4 w-4" />
+                Back
+              </Button>
+              <div className="flex gap-3">
+                <Button variant="outline" onClick={handleClose}>
+                  Skip Guide
+                </Button>
+                <Button 
+                  onClick={handleNext}
+                  className={`bg-gradient-to-r ${stepGradient} hover:opacity-90 text-white border-0 gap-2 shadow-lg`}
+                >
+                  {currentStep === steps.length - 1 ? "Start Practicing" : "Next"}
+                  <ChevronRight className="h-4 w-4" />
+                </Button>
+              </div>
+            </div>
           </Card>
         </motion.div>
       </AnimatePresence>

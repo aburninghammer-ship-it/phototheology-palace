@@ -167,9 +167,9 @@ export const StudyBibleDemoDialog = ({ open, onOpenChange }: StudyBibleDemoDialo
 
   return (
     <Dialog open={open} onOpenChange={(isOpen) => { onOpenChange(isOpen); if (!isOpen) setCurrentStep(0); }}>
-      <DialogContent variant="default" className="max-w-3xl max-h-[90vh] overflow-y-auto p-0 bg-card/95 backdrop-blur-xl">
+      <DialogContent variant="default" className="max-w-3xl max-h-[90vh] flex flex-col p-0 bg-card/95 backdrop-blur-xl overflow-hidden">
         {/* Gradient top border */}
-        <div className={`h-1.5 bg-gradient-to-r ${stepGradient}`} />
+        <div className={`h-1.5 bg-gradient-to-r ${stepGradient} flex-shrink-0`} />
         
         {/* Animated background orb */}
         <motion.div
@@ -182,7 +182,7 @@ export const StudyBibleDemoDialog = ({ open, onOpenChange }: StudyBibleDemoDialo
           className={`absolute -top-20 -right-20 w-64 h-64 rounded-full bg-gradient-to-br ${stepGradient} blur-3xl pointer-events-none`}
         />
 
-        <div className="p-6 relative z-10">
+        <div className="p-6 relative z-10 flex-1 overflow-y-auto">
           <DialogHeader className="mb-4">
             <div className="flex items-center justify-between">
               <DialogTitle className="text-2xl bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text">
@@ -322,28 +322,28 @@ export const StudyBibleDemoDialog = ({ open, onOpenChange }: StudyBibleDemoDialo
                 </div>
               </motion.div>
             </AnimatePresence>
-
-            {/* Navigation */}
-            <div className="flex items-center justify-between pt-4 border-t border-border">
-              <Button
-                variant="ghost"
-                onClick={prevStep}
-                disabled={safeCurrentStep === 0}
-                className="gap-2"
-              >
-                <ChevronLeft className="h-4 w-4" />
-                Previous
-              </Button>
-
-              <Button
-                onClick={nextStep}
-                className={`gap-2 bg-gradient-to-r ${stepGradient} hover:opacity-90 text-white border-0`}
-              >
-                {safeCurrentStep === demoSteps.length - 1 ? "Done" : "Next"}
-                <ChevronRight className="h-4 w-4" />
-              </Button>
-            </div>
           </div>
+        </div>
+
+        {/* Navigation - Fixed at bottom */}
+        <div className="flex items-center justify-between p-6 pt-4 border-t border-border bg-card flex-shrink-0">
+          <Button
+            variant="ghost"
+            onClick={prevStep}
+            disabled={safeCurrentStep === 0}
+            className="gap-2"
+          >
+            <ChevronLeft className="h-4 w-4" />
+            Previous
+          </Button>
+
+          <Button
+            onClick={nextStep}
+            className={`gap-2 bg-gradient-to-r ${stepGradient} hover:opacity-90 text-white border-0`}
+          >
+            {safeCurrentStep === demoSteps.length - 1 ? "Done" : "Next"}
+            <ChevronRight className="h-4 w-4" />
+          </Button>
         </div>
       </DialogContent>
     </Dialog>
