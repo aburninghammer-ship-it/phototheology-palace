@@ -3992,6 +3992,48 @@ export type Database = {
         }
         Relationships: []
       }
+      monthly_gates: {
+        Row: {
+          attempts: number | null
+          created_at: string | null
+          flagged_for_review: boolean | null
+          id: string
+          last_attempt_at: string | null
+          month: number
+          passed: boolean | null
+          passed_at: string | null
+          path_type: string
+          user_id: string
+          year: number
+        }
+        Insert: {
+          attempts?: number | null
+          created_at?: string | null
+          flagged_for_review?: boolean | null
+          id?: string
+          last_attempt_at?: string | null
+          month: number
+          passed?: boolean | null
+          passed_at?: string | null
+          path_type: string
+          user_id: string
+          year: number
+        }
+        Update: {
+          attempts?: number | null
+          created_at?: string | null
+          flagged_for_review?: boolean | null
+          id?: string
+          last_attempt_at?: string | null
+          month?: number
+          passed?: boolean | null
+          passed_at?: string | null
+          path_type?: string
+          user_id?: string
+          year?: number
+        }
+        Relationships: []
+      }
       notification_preferences: {
         Row: {
           christ_chapter_challenges: boolean
@@ -4205,6 +4247,39 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      path_completions: {
+        Row: {
+          certificate_url: string | null
+          completed_at: string | null
+          created_at: string | null
+          id: string
+          master_level: number
+          path_type: string
+          started_at: string
+          user_id: string
+        }
+        Insert: {
+          certificate_url?: string | null
+          completed_at?: string | null
+          created_at?: string | null
+          id?: string
+          master_level: number
+          path_type: string
+          started_at: string
+          user_id: string
+        }
+        Update: {
+          certificate_url?: string | null
+          completed_at?: string | null
+          created_at?: string | null
+          id?: string
+          master_level?: number
+          path_type?: string
+          started_at?: string
+          user_id?: string
+        }
+        Relationships: []
       }
       personalized_drills: {
         Row: {
@@ -4741,12 +4816,14 @@ export type Database = {
           onboarding_completed: boolean | null
           onboarding_completed_at: string | null
           onboarding_step: number | null
+          path_master_level: number | null
           payment_source: string | null
           points: number | null
           preferred_features: string[] | null
           primary_role: string | null
           promotional_access_expires_at: string | null
           referral_code: string | null
+          selected_path: string | null
           stripe_customer_id: string | null
           stripe_subscription_id: string | null
           student_expires_at: string | null
@@ -4797,12 +4874,14 @@ export type Database = {
           onboarding_completed?: boolean | null
           onboarding_completed_at?: string | null
           onboarding_step?: number | null
+          path_master_level?: number | null
           payment_source?: string | null
           points?: number | null
           preferred_features?: string[] | null
           primary_role?: string | null
           promotional_access_expires_at?: string | null
           referral_code?: string | null
+          selected_path?: string | null
           stripe_customer_id?: string | null
           stripe_subscription_id?: string | null
           student_expires_at?: string | null
@@ -4853,12 +4932,14 @@ export type Database = {
           onboarding_completed?: boolean | null
           onboarding_completed_at?: string | null
           onboarding_step?: number | null
+          path_master_level?: number | null
           payment_source?: string | null
           points?: number | null
           preferred_features?: string[] | null
           primary_role?: string | null
           promotional_access_expires_at?: string | null
           referral_code?: string | null
+          selected_path?: string | null
           stripe_customer_id?: string | null
           stripe_subscription_id?: string | null
           student_expires_at?: string | null
@@ -7191,6 +7272,54 @@ export type Database = {
           mood?: string | null
           name?: string
           play_count?: number | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      user_paths: {
+        Row: {
+          completed_at: string | null
+          created_at: string | null
+          current_month: number | null
+          current_quarter: number | null
+          current_year: number | null
+          id: string
+          is_active: boolean | null
+          path_switches_used: number | null
+          path_type: string
+          started_at: string | null
+          trial_ends_at: string | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          completed_at?: string | null
+          created_at?: string | null
+          current_month?: number | null
+          current_quarter?: number | null
+          current_year?: number | null
+          id?: string
+          is_active?: boolean | null
+          path_switches_used?: number | null
+          path_type: string
+          started_at?: string | null
+          trial_ends_at?: string | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          completed_at?: string | null
+          created_at?: string | null
+          current_month?: number | null
+          current_quarter?: number | null
+          current_year?: number | null
+          id?: string
+          is_active?: boolean | null
+          path_switches_used?: number | null
+          path_type?: string
+          started_at?: string | null
+          trial_ends_at?: string | null
           updated_at?: string | null
           user_id?: string
         }
