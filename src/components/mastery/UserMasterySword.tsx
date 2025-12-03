@@ -5,9 +5,22 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 interface UserMasterySwordProps {
   masterTitle?: string | null;
   currentFloor?: number;
+  roomsMastered?: number;
   size?: "sm" | "md" | "lg";
   isOwner?: boolean;
 }
+
+// Color tier levels (higher = better)
+const COLOR_TIERS = {
+  "none": 0,
+  "blue": 1,
+  "red": 2,
+  "gold": 3,
+  "purple": 4,
+  "white": 5,
+  "black_candidate": 6,
+  "black": 7,
+} as const;
 
 const MASTERY_COLORS: Record<string, { color: string; label: string; glow: string }> = {
   "none": { 
@@ -58,16 +71,47 @@ const SIZE_CLASSES = {
   lg: "h-6 w-6",
 };
 
+// Get color tier from floor progression
+const getFloorColorKey = (floor: number): string => {
+  if (floor >= 7) return "black_candidate";
+  if (floor >= 5) return "white";
+  if (floor >= 4) return "purple";
+  if (floor >= 3) return "gold";
+  if (floor >= 2) return "red";
+  if (floor >= 1) return "blue";
+  return "none";
+};
+
+// Get color tier from rooms mastered (aligned with GLOBAL_TITLES)
+const getRoomsColorKey = (rooms: number): string => {
+  if (rooms >= 38) return "black";
+  if (rooms >= 28) return "white";
+  if (rooms >= 19) return "purple";
+  if (rooms >= 10) return "gold";
+  if (rooms >= 4) return "red";
+  if (rooms >= 1) return "blue";
+  return "none";
+};
+
 export const UserMasterySword: React.FC<UserMasterySwordProps> = ({ 
   masterTitle, 
   currentFloor = 0,
+  roomsMastered = 0,
   size = "md",
   isOwner = false
 }) => {
-  // Determine sword color based on master title or current floor
-  let swordConfig = MASTERY_COLORS["none"]; // Default green for apprentices
+  // Hybrid approach: use whichever system grants a higher tier color
+  const floorColorKey = getFloorColorKey(currentFloor);
+  const roomsColorKey = getRoomsColorKey(roomsMastered);
   
-  // Palace Owner gets special treatment with golden glow
+  const floorTier = COLOR_TIERS[floorColorKey as keyof typeof COLOR_TIERS];
+  const roomsTier = COLOR_TIERS[roomsColorKey as keyof typeof COLOR_TIERS];
+  
+  // Pick the higher tier
+  let colorKey = floorTier >= roomsTier ? floorColorKey : roomsColorKey;
+  let swordConfig = MASTERY_COLORS[colorKey];
+  
+  // Special overrides
   if (isOwner) {
     swordConfig = { 
       ...MASTERY_COLORS["black"], 
@@ -76,18 +120,6 @@ export const UserMasterySword: React.FC<UserMasterySwordProps> = ({
     };
   } else if (masterTitle === "black") {
     swordConfig = MASTERY_COLORS["black"];
-  } else if (currentFloor >= 7) {
-    swordConfig = MASTERY_COLORS["black_candidate"];
-  } else if (currentFloor >= 5) {
-    swordConfig = MASTERY_COLORS["white"];
-  } else if (currentFloor >= 4) {
-    swordConfig = MASTERY_COLORS["purple"];
-  } else if (currentFloor >= 3) {
-    swordConfig = MASTERY_COLORS["gold"];
-  } else if (currentFloor >= 2) {
-    swordConfig = MASTERY_COLORS["red"];
-  } else if (currentFloor >= 1) {
-    swordConfig = MASTERY_COLORS["blue"];
   }
 
   return (
