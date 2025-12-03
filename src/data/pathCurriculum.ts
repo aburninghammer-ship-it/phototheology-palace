@@ -5,6 +5,38 @@ import {
   devotionalPathMonth2, 
   warriorPathMonth2 
 } from "./pathCurriculumMonth2";
+import {
+  visualMonth3,
+  analyticalMonth3,
+  devotionalMonth3,
+  warriorMonth3
+} from "./pathCurriculumMonth3";
+import {
+  visualMonth4,
+  analyticalMonth4,
+  devotionalMonth4,
+  warriorMonth4
+} from "./pathCurriculumMonth4";
+import {
+  visualMonth5,
+  analyticalMonth5,
+  devotionalMonth5,
+  warriorMonth5
+} from "./pathCurriculumMonth5";
+import {
+  visualMonth6,
+  analyticalMonth6,
+  devotionalMonth6,
+  warriorMonth6
+} from "./pathCurriculumMonth6";
+import {
+  explorerPathMonth7,
+  disciplePathMonth7,
+  warriorPathMonth7,
+  explorerPathMonth8,
+  disciplePathMonth8,
+  warriorPathMonth8
+} from "./pathCurriculumMonths7to12";
 
 // Activity interface for month curriculum files
 export interface MonthActivity {
