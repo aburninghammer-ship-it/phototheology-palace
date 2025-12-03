@@ -46,7 +46,7 @@ import { useAudioDucking } from "@/hooks/useAudioDucking";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { subscribeToMusicVolume } from "@/hooks/useMusicVolumeControl";
 
-// Study Music Playlist - 8 tracks for Bible study and meditation
+// Study Music Playlist - 5 tracks for Bible study and meditation
 const AMBIENT_TRACKS: Array<{
   id: string;
   name: string;
@@ -80,44 +80,20 @@ const AMBIENT_TRACKS: Array<{
     url: "https://cdn1.suno.ai/617f1da9-1bfb-4a93-8485-08f432623d2e.mp3",
   },
   {
-    id: "peaceful-waters",
-    name: "Peaceful Waters",
-    description: "Calm piano and strings",
+    id: "flight",
+    name: "Flight",
+    description: "Uplifting ambient journey",
     category: "study-music",
-    mood: "peaceful, calm, reflective",
-    url: "https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf07a.mp3",
+    mood: "uplifting, ambient, peaceful",
+    url: "/audio/flight.mp3",
   },
   {
-    id: "morning-light",
-    name: "Morning Light",
-    description: "Gentle ambient meditation",
+    id: "wings-of-stillness",
+    name: "Wings of Stillness",
+    description: "Gentle meditative atmosphere",
     category: "study-music",
-    mood: "gentle, ambient, hopeful",
-    url: "https://cdn.pixabay.com/download/audio/2022/03/15/audio_8e5e3b4b5a.mp3",
-  },
-  {
-    id: "sanctuary-peace",
-    name: "Sanctuary Peace",
-    description: "Soft orchestral atmosphere",
-    category: "study-music",
-    mood: "soft, orchestral, peaceful",
-    url: "https://cdn.pixabay.com/download/audio/2021/11/25/audio_cb4fe5bfed.mp3",
-  },
-  {
-    id: "quiet-reflection",
-    name: "Quiet Reflection",
-    description: "Ambient piano meditation",
-    category: "study-music",
-    mood: "quiet, reflective, piano",
-    url: "https://cdn.pixabay.com/download/audio/2022/01/18/audio_d0a13f69d2.mp3",
-  },
-  {
-    id: "heavenly-strings",
-    name: "Heavenly Strings",
-    description: "Beautiful string arrangement",
-    category: "study-music",
-    mood: "beautiful, strings, uplifting",
-    url: "https://cdn.pixabay.com/download/audio/2022/10/25/audio_946cc8ad49.mp3",
+    mood: "gentle, meditative, still",
+    url: "/audio/wings-of-stillness.mp3",
   },
 ];
 
