@@ -18,6 +18,7 @@ import { SubscriptionRenewal } from "@/components/SubscriptionRenewal";
 import { AnnouncementManager } from "@/components/admin/AnnouncementManager";
 import { useFreeTier } from "@/hooks/useFreeTier";
 import { Crown, Zap, User as UserIcon } from "lucide-react";
+import { PathProfileSection } from "@/components/path/PathProfileSection";
 
 
 export default function Profile() {
@@ -198,6 +199,9 @@ export default function Profile() {
         <div className="grid gap-6">
           {/* Subscription Banner */}
           <SubscriptionBanner />
+
+          {/* Learning Path */}
+          <PathProfileSection />
 
           {/* Profile Info Card */}
           <Card className="glass-card">

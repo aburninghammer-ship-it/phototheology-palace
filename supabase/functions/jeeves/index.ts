@@ -106,6 +106,7 @@ serve(async (req) => {
     const authHeader = req.headers.get('authorization');
     let userId: string | null = null;
     let userFirstName: string | null = null;
+    let userPathType: string | null = null;
     
     if (authHeader) {
       const token = authHeader.replace('Bearer ', '');
@@ -113,15 +114,18 @@ serve(async (req) => {
       if (!authError && user) {
         userId = user.id;
         
-        // Fetch user's first name from profiles
+        // Fetch user's first name and selected path from profiles
         const { data: profile } = await supabase
           .from('profiles')
-          .select('first_name')
+          .select('first_name, selected_path')
           .eq('id', user.id)
           .single();
         
         if (profile?.first_name) {
           userFirstName = profile.first_name;
+        }
+        if (profile?.selected_path) {
+          userPathType = profile.selected_path;
         }
         
         // Enforce rate limiting
@@ -499,6 +503,56 @@ Return as JSON array with objects containing: verse, text, connection, principle
     // Priority: userName from request body, then fetched userFirstName, then generic "friend"
     const greeting = userName || userFirstName || "friend";
 
+    // Path-aware teaching style adaptation
+    const getPathTeachingStyle = (pathType: string | null) => {
+      switch (pathType) {
+        case 'visual':
+          return `
+**LEARNING PATH: Visual Learner**
+This user learns best through imagery and mental pictures. Adapt your teaching:
+- Lead with vivid imagery: "Picture this..." "Imagine..." "See in your mind's eye..."
+- Use spatial metaphors and scene descriptions
+- Create mental walkthroughs of biblical scenes
+- Describe colors, textures, positions, and movements
+- Build memory palaces with visual anchors
+- Use diagrams described in words when helpful`;
+        case 'analytical':
+          return `
+**LEARNING PATH: Analytical Learner**
+This user learns best through logic, patterns, and structure. Adapt your teaching:
+- Lead with patterns: "Notice the pattern..." "The structure reveals..."
+- Use logic trees and systematic breakdowns
+- Provide cross-references and verse comparisons
+- Number your points and create clear outlines
+- Show cause-and-effect relationships
+- Build structured frameworks for understanding`;
+        case 'devotional':
+          return `
+**LEARNING PATH: Devotional Learner**
+This user learns best through prayer, meditation, and heart reflection. Adapt your teaching:
+- Lead with contemplation: "Let's sit with this..." "Ponder this truth..."
+- Use Lectio Divina approaches (read, meditate, pray, contemplate)
+- Include journaling prompts and heart questions
+- Connect to personal spiritual growth
+- Offer prayers based on the text
+- Focus on transformation over information`;
+        case 'warrior':
+          return `
+**LEARNING PATH: Warrior Learner**
+This user learns best through challenges, speed, and competition. Adapt your teaching:
+- Lead with challenge: "Prove it..." "Can you..." "Test yourself..."
+- Use timed drill formats and battle scenarios
+- Create ranked challenges with clear goals
+- Emphasize speed recall and quick application
+- Frame learning as conquering territory
+- Celebrate victories and progress`;
+        default:
+          return '';
+      }
+    };
+
+    const pathTeachingStyle = getPathTeachingStyle(userPathType);
+
     // Handle simple demo/message mode
     if (requestContext === "demo" || (message && !mode)) {
       systemPrompt = `You are Jeeves, ${greeting}'s friendly AI study partner who helps people understand the Bible using Phototheology principles. 
@@ -514,6 +568,7 @@ You're warm, personable, and genuinely excited about studying Scripture together
 - Use phrases like "Hey ${greeting}", "${greeting}, this is fascinating", "I love where you're going with this, ${greeting}"
 - NEVER use overly formal phrases like "My dear student", "My dear Sir", "Ah sir", or similar formal salutations
 - Keep your tone friendly, warm, and relatable
+${pathTeachingStyle}
 
       ${THEOLOGICAL_REASONING}
 
@@ -582,6 +637,7 @@ List at least 4 books of the Bible that connect to this ${textTypeLabel}, with s
         };
         
         systemPrompt = `You are Jeeves, a warm and encouraging study guide helping students apply Phototheology principles to biblical texts.
+${pathTeachingStyle}
 
 **TASK:** Provide helpful guidance for applying ${roomTag} (${roomName}) to the student's ${textTypeLabel}.
 
