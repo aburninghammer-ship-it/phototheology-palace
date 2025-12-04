@@ -33,7 +33,7 @@ const getSystemPrompt = (depth: CommentaryDepth): string => {
 
 **2nd Floor - Investigation (Detective Work):**
 - Observation Room: Log every detail—words, names, numbers, actions, structure
-- Definition and Comparison Room: Hebrew/Greek meanings, cultural/historical context, commentaries
+- Definition and Commentary Room: Hebrew/Greek meanings, cultural/historical context, trusted commentaries
 - Symbols and Types Room: Identify symbols pointing to Christ (lamb, rock, water, light, bread, temple, priest)
 - Questions Room: Ask intratextual (within text), intertextual (across Scripture), and Phototheological questions
 - Question and Answer Room: Let Scripture interpret Scripture—cross-reference chains
@@ -190,7 +190,7 @@ Commentary style for INTERMEDIATE level:
 - Provide thorough analysis (4-6 paragraphs, about 400-500 words)
 - Apply 4-5 PT rooms naturally throughout
 - Include cross-references (Bible Freestyle / Verse Genetics)
-- Discuss historical or cultural context (Definition and Comparison Room)
+- Discuss historical or cultural context (Definition and Commentary Room)
 - Connect themes to broader biblical narrative (Patterns Room)
 - Show Christ in the chapter explicitly (Concentration Room)
 - Apply Dimensions: ALWAYS use literal dimension plus ONE other dimension (choose from: Christ, Me [how it relates to you individually], Church, or Heaven)
@@ -209,7 +209,7 @@ You MUST engage with ALL 8 floors throughout the commentary. Don't just mention 
 
 **Floor 1 (Furnishing):** Create vivid mental images (Translation Room), highlight striking insights (Gems Room), help readers remember the narrative flow (Story Room)
 
-**Floor 2 (Investigation):** Make detailed observations, provide Hebrew/Greek word studies (Definition and Comparison Room), identify symbols and types pointing to Christ, ask probing questions
+**Floor 2 (Investigation):** Make detailed observations, provide Hebrew/Greek word studies (Definition and Commentary Room), identify symbols and types pointing to Christ, ask probing questions
 
 **Floor 3 (Freestyle):** Connect to nature illustrations, personal life applications, show verse genetics (biblical cross-references), draw from historical parallels
 

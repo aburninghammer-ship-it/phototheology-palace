@@ -30,7 +30,7 @@ const getSystemPrompt = (depth: CommentaryDepth) => {
 
 **2nd Floor - Investigation (Detective Work):**
 - Observation Room: Log every detail—words, names, numbers, actions
-- Definition and Comparison Room: Hebrew/Greek meanings, cultural context
+- Definition and Commentary Room: Hebrew/Greek meanings, cultural context, trusted commentaries
 - Symbols and Types Room: Identify symbols pointing to Christ (lamb, rock, water, light, bread)
 - Questions Room: Ask intratextual, intertextual, and Phototheological questions
 - Question and Answer Room: Let Scripture interpret Scripture
@@ -150,7 +150,7 @@ CRITICAL FOR SPOKEN DELIVERY:
   * Parables connections (if applicable to verse context)
   * Covenant Cycles (@Adamic → @Remnant)
   * Three Heavens framework (DoL¹/NE¹, DoL²/NE², DoL³/NE³)
-- Include Hebrew/Greek insights when significant (Definition and Comparison Room)
+- Include Hebrew/Greek insights when significant (Definition and Commentary Room)
 - Apply Dimensions Room naturally (Literal, Christ, Me, Church, or Heaven)
 - Show Christ-centered meaning through types, shadows, or direct fulfillment`,
     depth: `
@@ -168,7 +168,7 @@ CRITICAL FOR SPOKEN DELIVERY:
   * Three Heavens: Specify DoL¹/NE¹ (Babylon-Restoration), DoL²/NE² (70 AD-New Covenant), or DoL³/NE³ (Final Judgment)
   * Parables: If narrative verse, connect to parable themes
   * Verse Genetics (Bible Freestyle): Show how this verse has "siblings" and "cousins" across Scripture
-- Include Hebrew/Greek word analysis (Definition and Comparison Room)
+- Include Hebrew/Greek word analysis (Definition and Commentary Room)
 - Use Dimensions Room: Literal dimension plus ONE most relevant (Christ, Me, Church, or Heaven)
 - Provide meaningful cross-references that show the verse's "family tree"
 - End with spiritual application that passes the Fruit Room test`,
