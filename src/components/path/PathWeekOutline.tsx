@@ -3,8 +3,10 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Textarea } from "@/components/ui/textarea";
 import { usePath, PATH_INFO, PathType } from "@/hooks/usePath";
 import { usePathAccess, useSavePathActivity } from "@/hooks/usePathAccess";
+import { usePathActivityResponses } from "@/hooks/usePathActivityResponses";
 import { 
   getCurrentWeekInMonth, 
   getPathCurriculum, 
@@ -13,7 +15,8 @@ import {
 } from "@/data/pathCurriculum";
 import { 
   Calendar, BookOpen, Target, Clock, ChevronRight, 
-  Sparkles, Trophy, ArrowRight, CheckCircle2, Lock, Crown
+  Sparkles, Trophy, ArrowRight, CheckCircle2, Lock, Crown,
+  Save, FileText, Loader2
 } from "lucide-react";
 import { useNavigate, Link } from "react-router-dom";
 import { useState, useEffect } from "react";
@@ -195,35 +198,12 @@ export function PathWeekOutline({ compact = false }: PathWeekOutlineProps) {
       </Card>
 
       {/* Activities List */}
-      <Card className="glass-card">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Target className="h-5 w-5 text-primary" />
-            This Week's Activities
-          </CardTitle>
-          <CardDescription>
-            Complete each activity to progress through your path
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-3">
-          {weekOutline.activities.map((activity, index) => (
-            <ActivityItem
-              key={activity.id}
-              activity={activity}
-              index={index + 1}
-              isCompleted={completedActivities.includes(activity.id)}
-              onToggle={() => toggleActivity(activity.id)}
-              onNavigate={() => {
-                if (activity.link) {
-                  // Append pathActivityId for automatic tracking on completion
-                  const separator = activity.link.includes('?') ? '&' : '?';
-                  navigate(`${activity.link}${separator}pathActivityId=${encodeURIComponent(activity.id)}`);
-                }
-              }}
-            />
-          ))}
-        </CardContent>
-      </Card>
+      <ActivitiesList 
+        activities={weekOutline.activities}
+        completedActivities={completedActivities}
+        onToggle={toggleActivity}
+        pathType={pathType}
+      />
 
       {/* Week Completion Celebration */}
       {currentWeekStatus?.isComplete && (
@@ -337,6 +317,54 @@ export function PathWeekOutline({ compact = false }: PathWeekOutlineProps) {
   );
 }
 
+// Activities List Component with responses support
+interface ActivitiesListProps {
+  activities: WeekActivity[];
+  completedActivities: string[];
+  onToggle: (activityId: string) => void;
+  pathType: PathType;
+}
+
+function ActivitiesList({ activities, completedActivities, onToggle, pathType }: ActivitiesListProps) {
+  const navigate = useNavigate();
+  const { getResponse, saveResponse, isSaving, hasResponse } = usePathActivityResponses();
+
+  return (
+    <Card className="glass-card">
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2">
+          <Target className="h-5 w-5 text-primary" />
+          This Week's Activities
+        </CardTitle>
+        <CardDescription>
+          Complete each activity to progress through your path
+        </CardDescription>
+      </CardHeader>
+      <CardContent className="space-y-3">
+        {activities.map((activity, index) => (
+          <ActivityItem
+            key={activity.id}
+            activity={activity}
+            index={index + 1}
+            isCompleted={completedActivities.includes(activity.id)}
+            onToggle={() => onToggle(activity.id)}
+            onNavigate={() => {
+              if (activity.link) {
+                const separator = activity.link.includes('?') ? '&' : '?';
+                navigate(`${activity.link}${separator}pathActivityId=${encodeURIComponent(activity.id)}`);
+              }
+            }}
+            savedResponse={getResponse(activity.id)}
+            onSaveResponse={(text) => saveResponse(activity.id, text)}
+            isSaving={isSaving === activity.id}
+            hasResponse={hasResponse(activity.id)}
+          />
+        ))}
+      </CardContent>
+    </Card>
+  );
+}
+
 // Activity Item Component
 interface ActivityItemProps {
   activity: WeekActivity;
@@ -344,10 +372,31 @@ interface ActivityItemProps {
   isCompleted: boolean;
   onToggle: () => void;
   onNavigate: () => void;
+  savedResponse: string;
+  onSaveResponse: (text: string) => void;
+  isSaving: boolean;
+  hasResponse: boolean;
 }
 
-function ActivityItem({ activity, index, isCompleted, onToggle, onNavigate }: ActivityItemProps) {
+function ActivityItem({ 
+  activity, 
+  index, 
+  isCompleted, 
+  onToggle, 
+  onNavigate,
+  savedResponse,
+  onSaveResponse,
+  isSaving,
+  hasResponse
+}: ActivityItemProps) {
   const [showInstructions, setShowInstructions] = useState(false);
+  const [showResponseArea, setShowResponseArea] = useState(false);
+  const [responseText, setResponseText] = useState(savedResponse);
+
+  // Update local state when savedResponse changes
+  useEffect(() => {
+    setResponseText(savedResponse);
+  }, [savedResponse]);
   
   const typeColors: Record<string, string> = {
     reading: "bg-blue-500/10 text-blue-600 dark:text-blue-400",
@@ -360,15 +409,20 @@ function ActivityItem({ activity, index, isCompleted, onToggle, onNavigate }: Ac
   // Parse instructions into bullet points
   const parseInstructions = (instructions: string | undefined): string[] => {
     if (!instructions) return [];
-    // Split by numbered items or newlines
     return instructions
       .split(/\n/)
       .map(line => line.trim())
       .filter(line => line.length > 0)
-      .map(line => line.replace(/^\d+\.\s*/, '')); // Remove leading numbers
+      .map(line => line.replace(/^\d+\.\s*/, ''));
   };
 
   const instructionSteps = parseInstructions(activity.detailedInstructions);
+
+  const handleSaveResponse = () => {
+    if (responseText.trim()) {
+      onSaveResponse(responseText.trim());
+    }
+  };
 
   return (
     <div
@@ -399,6 +453,12 @@ function ActivityItem({ activity, index, isCompleted, onToggle, onNavigate }: Ac
                   {activity.roomCode}
                 </Badge>
               )}
+              {hasResponse && (
+                <Badge variant="secondary" className="text-xs bg-green-500/10 text-green-600">
+                  <FileText className="h-3 w-3 mr-1" />
+                  Response saved
+                </Badge>
+              )}
             </div>
             <p className="text-sm text-muted-foreground mt-1">
               {activity.description}
@@ -419,6 +479,15 @@ function ActivityItem({ activity, index, isCompleted, onToggle, onNavigate }: Ac
                   {showInstructions ? "Hide" : "Show"} Instructions
                 </Button>
               )}
+              <Button
+                variant="outline"
+                size="sm"
+                className={`h-6 px-2 text-xs ${hasResponse ? 'border-green-500/30 text-green-600' : 'border-amber-500/30 text-amber-600'}`}
+                onClick={() => setShowResponseArea(!showResponseArea)}
+              >
+                <FileText className="mr-1 h-3 w-3" />
+                {showResponseArea ? "Hide" : hasResponse ? "Edit" : "Write"} Response
+              </Button>
               {activity.link && (
                 <Button
                   variant="ghost"
@@ -434,6 +503,41 @@ function ActivityItem({ activity, index, isCompleted, onToggle, onNavigate }: Ac
           </div>
         </div>
       </div>
+
+      {/* Response Input Area */}
+      {showResponseArea && (
+        <div className="px-4 pb-4">
+          <div className="ml-8 p-4 rounded-xl glass-card backdrop-blur-md bg-background/80 border border-border/50 shadow-lg space-y-3">
+            <div className="flex items-center gap-2 text-sm font-semibold text-foreground">
+              <FileText className="h-4 w-4 text-amber-500" />
+              Your Response
+            </div>
+            <Textarea
+              placeholder="Write down your thoughts, observations, and insights from this activity..."
+              value={responseText}
+              onChange={(e) => setResponseText(e.target.value)}
+              className="min-h-[120px] bg-background/50"
+            />
+            <div className="flex items-center justify-between">
+              <p className="text-xs text-muted-foreground">
+                Your response helps track your progress and understanding.
+              </p>
+              <Button
+                size="sm"
+                onClick={handleSaveResponse}
+                disabled={isSaving || !responseText.trim()}
+              >
+                {isSaving ? (
+                  <Loader2 className="h-4 w-4 mr-1 animate-spin" />
+                ) : (
+                  <Save className="h-4 w-4 mr-1" />
+                )}
+                Save Response
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Expandable Instructions Panel */}
       {showInstructions && instructionSteps.length > 0 && (

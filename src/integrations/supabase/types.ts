@@ -4296,6 +4296,36 @@ export type Database = {
         }
         Relationships: []
       }
+      path_activity_responses: {
+        Row: {
+          activity_id: string
+          created_at: string
+          id: string
+          path_type: string
+          response_text: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          activity_id: string
+          created_at?: string
+          id?: string
+          path_type: string
+          response_text: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          activity_id?: string
+          created_at?: string
+          id?: string
+          path_type?: string
+          response_text?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       path_completions: {
         Row: {
           certificate_url: string | null
