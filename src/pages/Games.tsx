@@ -15,6 +15,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { VoiceChatWidget } from "@/components/voice/VoiceChatWidget";
 import { ChainChessLeaderboard, GroupEscapeRoom } from "@/components/social";
 import { UnifiedGameRankings } from "@/components/games/UnifiedGameRankings";
+import { ActiveGameSessions } from "@/components/games/ActiveGameSessions";
 
 const Games = () => {
   const { user, loading } = useAuth();
@@ -440,6 +441,9 @@ const Games = () => {
             />
           </motion.div>
         )}
+
+        {/* Continue Playing Section */}
+        {user && <ActiveGameSessions />}
 
         {/* View Mode Tabs */}
         <motion.div 

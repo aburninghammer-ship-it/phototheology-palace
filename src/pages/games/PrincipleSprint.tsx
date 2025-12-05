@@ -4,11 +4,12 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
-import { ArrowLeft, Zap, Trophy } from "lucide-react";
+import { ArrowLeft, Zap, Trophy, Play, RotateCcw } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { usePathActivityTracking } from "@/hooks/usePathActivityTracking";
+import { useGameSession } from "@/hooks/useGameSession";
 
 interface Question {
   verse: string;
@@ -38,12 +39,46 @@ const SAMPLE_QUESTIONS: Question[] = [
   }
 ];
 
+interface GameState {
+  currentQuestion: number;
+  score: number;
+  combo: number;
+  selectedPrinciples: string[];
+  gameStarted: boolean;
+  gameOver: boolean;
+}
+
+const initialGameState: GameState = {
+  currentQuestion: 0,
+  score: 0,
+  combo: 0,
+  selectedPrinciples: [],
+  gameStarted: false,
+  gameOver: false,
+};
+
 export default function PrincipleSprint() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const pathActivityId = searchParams.get('pathActivityId') || undefined;
   const { user } = useAuth();
   const { markPathActivityComplete } = usePathActivityTracking();
+  
+  const {
+    session,
+    isLoading,
+    hasExistingSession,
+    saveSession,
+    startNewGame,
+    resumeGame,
+    completeGame,
+  } = useGameSession<GameState>({
+    gameType: "principle_sprint",
+    initialState: initialGameState,
+    totalSteps: SAMPLE_QUESTIONS.length,
+    autoSaveInterval: 5000,
+  });
+
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [selectedPrinciples, setSelectedPrinciples] = useState<string[]>([]);
   const [score, setScore] = useState(0);
@@ -51,6 +86,32 @@ export default function PrincipleSprint() {
   const [gameStarted, setGameStarted] = useState(false);
   const [gameOver, setGameOver] = useState(false);
   const [combo, setCombo] = useState(0);
+
+  // Sync state when resuming
+  useEffect(() => {
+    if (session && hasExistingSession === false && session.gameState.gameStarted) {
+      setCurrentQuestion(session.gameState.currentQuestion);
+      setScore(session.gameState.score);
+      setCombo(session.gameState.combo);
+      setSelectedPrinciples(session.gameState.selectedPrinciples || []);
+      setGameStarted(session.gameState.gameStarted);
+      setGameOver(session.gameState.gameOver);
+    }
+  }, [session, hasExistingSession]);
+
+  // Save state when it changes
+  useEffect(() => {
+    if (gameStarted && !gameOver && session) {
+      saveSession({
+        currentQuestion,
+        score,
+        combo,
+        selectedPrinciples,
+        gameStarted,
+        gameOver,
+      }, score, currentQuestion);
+    }
+  }, [currentQuestion, score, combo, gameStarted]);
 
   useEffect(() => {
     if (!gameStarted || gameOver) return;
@@ -117,6 +178,8 @@ export default function PrincipleSprint() {
 
   const endGame = async () => {
     setGameOver(true);
+    await completeGame(score);
+    
     if (user) {
       await supabase.from("game_scores").insert({
         user_id: user.id,
@@ -130,7 +193,8 @@ export default function PrincipleSprint() {
     }
   };
 
-  const startGame = () => {
+  const handleStartNewGame = async () => {
+    await startNewGame();
     setGameStarted(true);
     setScore(0);
     setCombo(0);
@@ -139,6 +203,19 @@ export default function PrincipleSprint() {
     setTimeLeft(10);
     setGameOver(false);
   };
+
+  const handleResumeGame = () => {
+    resumeGame();
+    setTimeLeft(10);
+  };
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-b from-background to-secondary/20 p-6 flex items-center justify-center">
+        <div className="animate-pulse text-muted-foreground">Loading...</div>
+      </div>
+    );
+  }
 
   if (!gameStarted) {
     return (
@@ -157,6 +234,28 @@ export default function PrincipleSprint() {
             <p className="text-muted-foreground text-lg">
               Identify Phototheology principles from Bible verses as quickly as possible!
             </p>
+            
+            {hasExistingSession && session && (
+              <Card className="p-4 bg-primary/10 border-primary/20">
+                <p className="text-sm text-muted-foreground mb-2">You have an unfinished game!</p>
+                <div className="flex items-center justify-center gap-4 text-sm mb-3">
+                  <span>Question {session.gameState.currentQuestion + 1}/{SAMPLE_QUESTIONS.length}</span>
+                  <span>•</span>
+                  <span>Score: {session.gameState.score}</span>
+                </div>
+                <div className="flex gap-3">
+                  <Button onClick={handleResumeGame} className="flex-1">
+                    <Play className="mr-2 h-4 w-4" />
+                    Continue
+                  </Button>
+                  <Button variant="outline" onClick={handleStartNewGame} className="flex-1">
+                    <RotateCcw className="mr-2 h-4 w-4" />
+                    Start Fresh
+                  </Button>
+                </div>
+              </Card>
+            )}
+            
             <div className="space-y-2 text-left">
               <h3 className="font-semibold">How to Play:</h3>
               <ul className="list-disc list-inside space-y-1 text-muted-foreground">
@@ -166,9 +265,12 @@ export default function PrincipleSprint() {
                 <li>Time bonus: +10 points per second remaining</li>
               </ul>
             </div>
-            <Button size="lg" onClick={startGame} className="w-full">
-              Start Game
-            </Button>
+            
+            {!hasExistingSession && (
+              <Button size="lg" onClick={handleStartNewGame} className="w-full">
+                Start Game
+              </Button>
+            )}
           </Card>
         </div>
       </div>
@@ -185,7 +287,7 @@ export default function PrincipleSprint() {
             <div className="text-6xl font-bold text-primary">{score}</div>
             <p className="text-muted-foreground">Final Score</p>
             <div className="flex gap-4">
-              <Button onClick={startGame} className="flex-1">
+              <Button onClick={handleStartNewGame} className="flex-1">
                 Play Again
               </Button>
               <Button variant="outline" onClick={() => navigate("/games")} className="flex-1">
