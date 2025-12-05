@@ -241,6 +241,61 @@ export function AmbientMusicPlayer({
     };
   }, [allTracks, selectedTracks, currentTrackId, shuffleMode, loopMode]);
 
+  // Function to play next track - extracted for reuse
+  const playNextTrackFromState = useCallback(() => {
+    const state = playbackStateRef.current;
+    console.log('[AmbientMusic] Playing next track, loopMode:', state.loopMode);
+    
+    const playableTracks = state.allTracks.filter(t => state.selectedTracks.has(t.id));
+    if (playableTracks.length === 0) {
+      console.log('[AmbientMusic] No playable tracks');
+      setIsPlaying(false);
+      return;
+    }
+    
+    let nextTrackToPlay;
+    if (state.shuffleMode) {
+      const otherTracks = playableTracks.filter(t => t.id !== state.currentTrackId);
+      if (otherTracks.length > 0) {
+        const randomIndex = Math.floor(Math.random() * otherTracks.length);
+        nextTrackToPlay = otherTracks[randomIndex];
+      } else {
+        // Only one track, replay it
+        nextTrackToPlay = playableTracks[0];
+      }
+    } else {
+      const currentIndex = playableTracks.findIndex(t => t.id === state.currentTrackId);
+      const nextIndex = (currentIndex + 1) % playableTracks.length;
+      nextTrackToPlay = playableTracks[nextIndex];
+      console.log('[AmbientMusic] Sequential next: currentIdx=', currentIndex, 'nextIdx=', nextIndex, 'track=', nextTrackToPlay?.name);
+    }
+    
+    if (nextTrackToPlay && audioRef.current) {
+      console.log('[AmbientMusic] Auto-playing next track:', nextTrackToPlay.name, nextTrackToPlay.url);
+      setCurrentTrackId(nextTrackToPlay.id);
+      
+      const audio = audioRef.current;
+      audio.src = nextTrackToPlay.url;
+      audio.load();
+      
+      // Play after a short delay to ensure src is set
+      setTimeout(() => {
+        if (audioRef.current) {
+          audioRef.current.play()
+            .then(() => {
+              console.log('[AmbientMusic] Next track started successfully');
+              setIsPlaying(true);
+            })
+            .catch((err) => {
+              console.error('[AmbientMusic] Failed to play next track:', err);
+              // Try again with next track
+              setTimeout(() => playNextTrackFromState(), 500);
+            });
+        }
+      }, 100);
+    }
+  }, []);
+
   // Initialize audio element once - simple HTML5 audio for independence
   useEffect(() => {
     if (!audioRef.current) {
@@ -250,70 +305,27 @@ export function AmbientMusicPlayer({
       // Handle track ended - use ref for latest state to avoid stale closures
       audioRef.current.onended = () => {
         const state = playbackStateRef.current;
-        console.log('[AmbientMusic] Track ended, loopMode:', state.loopMode);
+        console.log('[AmbientMusic] Track ended, loopMode:', state.loopMode, 'audio.loop:', audioRef.current?.loop);
         
+        // If loop is set on the audio element (loopMode === "one"), it will auto-repeat
+        // We only need to handle "all" and "none" modes here
         if (state.loopMode === "all") {
-          // Get next track using latest state from ref
-          const playableTracks = state.allTracks.filter(t => state.selectedTracks.has(t.id));
-          if (playableTracks.length === 0) {
-            console.log('[AmbientMusic] No playable tracks');
-            setIsPlaying(false);
-            return;
-          }
-          
-          let nextTrackToPlay;
-          if (state.shuffleMode) {
-            const otherTracks = playableTracks.filter(t => t.id !== state.currentTrackId);
-            if (otherTracks.length > 0) {
-              const randomIndex = Math.floor(Math.random() * otherTracks.length);
-              nextTrackToPlay = otherTracks[randomIndex];
-            } else {
-              nextTrackToPlay = playableTracks[0];
-            }
-          } else {
-            const currentIndex = playableTracks.findIndex(t => t.id === state.currentTrackId);
-            const nextIndex = (currentIndex + 1) % playableTracks.length;
-            nextTrackToPlay = playableTracks[nextIndex];
-          }
-          
-          if (nextTrackToPlay && audioRef.current) {
-            console.log('[AmbientMusic] Auto-playing next track:', nextTrackToPlay.name, nextTrackToPlay.url);
-            setCurrentTrackId(nextTrackToPlay.id);
-            
-            // Wait for audio to be ready before playing to avoid AbortError
-            const audio = audioRef.current;
-            audio.src = nextTrackToPlay.url;
-            
-            const playWhenReady = () => {
-              audio.play()
-                .then(() => {
-                  console.log('[AmbientMusic] Next track started successfully');
-                  setIsPlaying(true);
-                })
-                .catch((err) => {
-                  console.error('[AmbientMusic] Failed to play next track:', err);
-                  setIsPlaying(false);
-                });
-            };
-            
-            // Use canplaythrough event to know when audio is ready
-            audio.oncanplaythrough = () => {
-              audio.oncanplaythrough = null; // Remove listener after use
-              playWhenReady();
-            };
-            
-            audio.load();
-          }
+          playNextTrackFromState();
         } else if (state.loopMode === "none") {
           console.log('[AmbientMusic] Loop mode none, stopping');
           setIsPlaying(false);
         }
-        // loopMode === "one" is handled by audio.loop = true
+        // loopMode === "one" is handled by audio.loop = true (browser handles it)
       };
       
       // Handle errors
       audioRef.current.onerror = (e) => {
         console.error('[AmbientMusic] Audio error:', e);
+        // On error, try next track if in loop all mode
+        const state = playbackStateRef.current;
+        if (state.loopMode === "all") {
+          setTimeout(() => playNextTrackFromState(), 500);
+        }
       };
     }
     
@@ -326,7 +338,7 @@ export function AmbientMusicPlayer({
         audioRef.current = null;
       }
     };
-  }, []); // Empty deps - only run once on mount
+  }, [playNextTrackFromState]); // Include the callback dependency
 
   // Update audio source when track changes - only reset src if URL actually changed
   useEffect(() => {

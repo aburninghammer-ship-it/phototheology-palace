@@ -83,6 +83,7 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
   const [isPlayingCommentary, setIsPlayingCommentary] = useState(false);
   const [offlineMode, setOfflineMode] = useState(!isOnline());
   const [commentaryText, setCommentaryText] = useState<string | null>(null);
+  const [userName, setUserName] = useState<string | null>(null);
   
   // Get active sequences first
   const activeSequences = sequences.filter((s) => s.enabled && s.items.length > 0);
@@ -98,6 +99,24 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
 
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const musicAudioRef = useRef<HTMLAudioElement | null>(null); // Background music audio
+  
+  // Fetch user's display name for personalized commentary
+  useEffect(() => {
+    const fetchUserName = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('display_name')
+          .eq('id', user.id)
+          .single();
+        if (profile?.display_name) {
+          setUserName(profile.display_name);
+        }
+      }
+    };
+    fetchUserName();
+  }, []);
   const isGeneratingRef = useRef(false); // Prevent concurrent TTS requests
   const isFetchingChapterRef = useRef(false); // Prevent concurrent chapter fetches
   const lastFetchedRef = useRef<string | null>(null); // Track last fetched chapter
@@ -299,7 +318,7 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
       
       try {
         const { data, error } = await supabase.functions.invoke("generate-verse-commentary", {
-          body: { book, chapter, verse, verseText, depth },
+          body: { book, chapter, verse, verseText, depth, userName },
         });
         
         clearTimeout(timeoutId);
