@@ -218,15 +218,36 @@ const GuidedStep = ({ step, title, description, link, time }: GuidedStepProps) =
   </Link>
 );
 
-// Room icons/emojis for visual flair
-const roomIcons: Record<string, string> = {
-  sr: "📖", ir: "👁️", "24fps": "🎬", br: "🗺️", tr: "🎨", gr: "💎",
-  or: "🔍", dc: "🧪", st: "🔗", qr: "❓", qa: "💬",
-  nf: "🌿", pf: "🪞", bf: "🧬", hf: "📜", lr: "👂",
-  cr: "✝️", dr: "💠", c6: "📚", trm: "🏛️", tz: "⏰", prm: "🎵", "p||": "🪞", frt: "🍇", cec: "👑", r66: "📿",
-  bl: "⛪", pr: "🔮", "3a": "👼", fe: "🎊",
-  "123h": "☁️", cycles: "🔄", jr: "🍊", math: "🔢",
-  frm: "🔥", mr: "🙏", srm: "⚡"
+// Import room images
+import storyRoomImg from "@/assets/rooms/story-room.jpg";
+import imaginationRoomImg from "@/assets/rooms/imagination-room.jpg";
+import investigationRoomImg from "@/assets/rooms/investigation-room.jpg";
+import natureRoomImg from "@/assets/rooms/nature-room.jpg";
+import christRoomImg from "@/assets/rooms/christ-room.jpg";
+import sanctuaryRoomImg from "@/assets/rooms/sanctuary-room.jpg";
+import heavensRoomImg from "@/assets/rooms/heavens-room.jpg";
+import fireRoomImg from "@/assets/rooms/fire-room.jpg";
+
+// Room image mappings based on floor/room type
+const getRoomImage = (roomId: string, floorNumber: number): string => {
+  // Floor 1 - Furnishing (Memory)
+  if (floorNumber === 1) return storyRoomImg;
+  // Floor 2 - Investigation
+  if (floorNumber === 2) return investigationRoomImg;
+  // Floor 3 - Freestyle
+  if (floorNumber === 3) return natureRoomImg;
+  // Floor 4 - Next Level (Christ-centered)
+  if (floorNumber === 4) return christRoomImg;
+  // Floor 5 - Vision (Sanctuary/Prophecy)
+  if (floorNumber === 5) return sanctuaryRoomImg;
+  // Floor 6 - Three Heavens
+  if (floorNumber === 6) return heavensRoomImg;
+  // Floor 7 - Spiritual/Emotional
+  if (floorNumber === 7) return fireRoomImg;
+  // Floor 8 - Master
+  if (floorNumber === 8) return imaginationRoomImg;
+  
+  return storyRoomImg;
 };
 
 // Room Card Component
@@ -238,7 +259,7 @@ interface RoomCardProps {
 
 const RoomCard = ({ room, floorNumber, gradient }: RoomCardProps) => {
   const { isUnlocked, loading } = useRoomUnlock(floorNumber, room.id);
-  const roomIcon = roomIcons[room.id] || "⭐";
+  const roomImage = getRoomImage(room.id, floorNumber);
 
   return (
     <Link
@@ -246,35 +267,34 @@ const RoomCard = ({ room, floorNumber, gradient }: RoomCardProps) => {
       className="group relative"
     >
       <div className={cn(
-        "aspect-square rounded-lg p-3 transition-all hover:scale-105 overflow-hidden",
-        `bg-gradient-to-br ${gradient}`,
-        "flex flex-col items-center justify-center text-center relative"
+        "aspect-square rounded-xl transition-all hover:scale-105 overflow-hidden",
+        "flex flex-col items-end justify-end text-center relative shadow-lg"
       )}>
-        {/* Large colorful emoji/icon */}
-        <div className="absolute inset-0 flex items-center justify-center text-5xl pointer-events-none drop-shadow-lg"
-          style={{ filter: 'saturate(1.5) brightness(1.1)' }}>
-          {roomIcon}
-        </div>
+        {/* Background image */}
+        <div 
+          className="absolute inset-0 bg-cover bg-center transition-transform duration-500 group-hover:scale-110"
+          style={{ backgroundImage: `url(${roomImage})` }}
+        />
         
-        {/* Subtle glow effect behind icon */}
-        <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-          <div className="w-16 h-16 rounded-full bg-white/20 blur-xl" />
-        </div>
+        {/* Gradient overlay for text readability */}
+        <div className={cn(
+          "absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent"
+        )} />
         
         {/* Content */}
-        <div className="relative z-10">
-          <span className="font-bold text-white text-sm mb-1 drop-shadow-md">{room.tag}</span>
-          <span className="text-white/90 text-xs leading-tight drop-shadow-sm block">{room.name}</span>
+        <div className="relative z-10 p-3 w-full text-left">
+          <span className="font-bold text-white text-sm drop-shadow-lg block">{room.tag}</span>
+          <span className="text-white/90 text-xs leading-tight drop-shadow-md block">{room.name}</span>
         </div>
         
         {/* Status indicator */}
-        <div className="absolute bottom-2 right-2 z-10">
+        <div className="absolute top-2 right-2 z-10">
           {loading ? (
-            <div className="w-4 h-4 rounded-full bg-gray-500/50 animate-pulse" />
+            <div className="w-5 h-5 rounded-full bg-gray-500/50 animate-pulse" />
           ) : isUnlocked ? (
-            <CheckCircle className="w-4 h-4 text-green-400 drop-shadow-md" />
+            <CheckCircle className="w-5 h-5 text-green-400 drop-shadow-lg" />
           ) : (
-            <Lock className="w-4 h-4 text-white/50" />
+            <Lock className="w-5 h-5 text-white/70 drop-shadow-lg" />
           )}
         </div>
       </div>
