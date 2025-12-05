@@ -283,8 +283,12 @@ const RoomCard = ({ room, floorNumber, gradient }: RoomCardProps) => {
         
         {/* Content */}
         <div className="relative z-10 p-3 w-full text-left">
-          <span className="font-bold text-white text-sm drop-shadow-lg block">{room.tag}</span>
-          <span className="text-white/90 text-xs leading-tight drop-shadow-md block">{room.name}</span>
+          <span className="inline-block px-2 py-0.5 rounded-md bg-gradient-to-r from-amber-500 to-yellow-400 text-black font-bold text-xs uppercase tracking-wide shadow-md mb-1">
+            {room.tag}
+          </span>
+          <span className="text-white font-semibold text-sm leading-tight drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)] block">
+            {room.name}
+          </span>
         </div>
         
         {/* Status indicator */}
