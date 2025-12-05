@@ -1,9 +1,10 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Sparkles, Eye, Search, Zap, BookOpen, Telescope, Globe, Flame, Crown, Lock, CheckCircle } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { palaceFloors } from "@/data/palaceData";
 import { useRoomUnlock } from "@/hooks/useRoomUnlock";
 import { motion } from "framer-motion";
+import { toast } from "sonner";
 
 // Floor-specific icons and theming
 const FLOOR_THEMES = [
@@ -178,11 +179,30 @@ interface RoomDoorProps {
 
 const RoomDoor = ({ room, floorNumber, theme, user, index }: RoomDoorProps) => {
   const { isUnlocked, loading } = useRoomUnlock(floorNumber, room.id);
+  const navigate = useNavigate();
+  
+  const handleClick = (e: React.MouseEvent) => {
+    if (loading) {
+      e.preventDefault();
+      return;
+    }
+    
+    if (!isUnlocked) {
+      e.preventDefault();
+      toast.error("🔒 Room Locked", {
+        description: `Complete the previous floors to unlock Floor ${floorNumber}. Progress through each floor in order to access new rooms.`,
+        duration: 4000,
+      });
+      return;
+    }
+    
+    navigate(`/palace/floor/${floorNumber}/room/${room.id}`);
+  };
   
   return (
-    <Link
-      to={`/palace/floor/${floorNumber}/room/${room.id}`}
-      className="group/door relative"
+    <div
+      onClick={handleClick}
+      className="group/door relative cursor-pointer"
     >
       <motion.div 
         initial={{ opacity: 0, scale: 0.9 }}
@@ -199,6 +219,7 @@ const RoomDoor = ({ room, floorNumber, theme, user, index }: RoomDoorProps) => {
             hover:scale-105 hover:border-white/40 
             shadow-lg hover:shadow-[0_0_30px_-10px] hover:shadow-current
             group-hover/door:bg-card/90
+            ${!isUnlocked && !loading ? 'opacity-60' : ''}
           `}
         >
           {/* Gradient overlay on hover */}
@@ -246,6 +267,6 @@ const RoomDoor = ({ room, floorNumber, theme, user, index }: RoomDoorProps) => {
           <div className="absolute inset-0 opacity-0 group-hover/door:opacity-100 transition-opacity duration-500 bg-gradient-to-br from-white/10 via-transparent to-transparent" />
         </div>
       </motion.div>
-    </Link>
+    </div>
   );
 };

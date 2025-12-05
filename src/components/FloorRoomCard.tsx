@@ -1,10 +1,11 @@
-import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ChevronRight, Lock, Sparkles } from "lucide-react";
 import { useRoomUnlock } from "@/hooks/useRoomUnlock";
 import { Room } from "@/data/palaceData";
 import { motion } from "framer-motion";
+import { toast } from "sonner";
 
 interface FloorRoomCardProps {
   room: Room;
@@ -73,17 +74,29 @@ const roomGradients: Record<string, string> = {
 
 export const FloorRoomCard = ({ room, floorNumber, gradient }: FloorRoomCardProps) => {
   const { isUnlocked, loading } = useRoomUnlock(floorNumber, room.id);
+  const navigate = useNavigate();
   
   const showLocked = loading || !isUnlocked;
   const roomEmoji = roomEmojis[room.id] || "⭐";
   // Use room-specific gradient if available, otherwise fall back to floor gradient
   const roomGradient = roomGradients[room.id] || gradient;
 
+  const handleClick = () => {
+    if (loading) return;
+    
+    if (!isUnlocked) {
+      toast.error("🔒 Room Locked", {
+        description: `Complete the previous floors to unlock Floor ${floorNumber}. Progress through each floor in order to access new rooms.`,
+        duration: 4000,
+      });
+      return;
+    }
+    
+    navigate(`/palace/floor/${floorNumber}/room/${room.id}`);
+  };
+
   return (
-    <Link 
-      to={`/palace/floor/${floorNumber}/room/${room.id}`}
-      className={showLocked ? "pointer-events-none" : ""}
-    >
+    <div onClick={handleClick} className="cursor-pointer">
       <motion.div
         whileHover={showLocked ? {} : { scale: 1.02, y: -4 }}
         transition={{ type: "spring", stiffness: 300, damping: 20 }}
@@ -166,6 +179,6 @@ export const FloorRoomCard = ({ room, floorNumber, gradient }: FloorRoomCardProp
           </CardContent>
         </Card>
       </motion.div>
-    </Link>
+    </div>
   );
 };
