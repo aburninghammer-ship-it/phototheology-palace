@@ -6202,6 +6202,7 @@ export type Database = {
       social_media_connections: {
         Row: {
           access_token: string
+          access_token_encrypted: string | null
           created_at: string | null
           id: string
           is_active: boolean | null
@@ -6209,12 +6210,14 @@ export type Database = {
           platform_user_id: string | null
           platform_username: string | null
           refresh_token: string | null
+          refresh_token_encrypted: string | null
           token_expires_at: string | null
           updated_at: string | null
           user_id: string
         }
         Insert: {
           access_token: string
+          access_token_encrypted?: string | null
           created_at?: string | null
           id?: string
           is_active?: boolean | null
@@ -6222,12 +6225,14 @@ export type Database = {
           platform_user_id?: string | null
           platform_username?: string | null
           refresh_token?: string | null
+          refresh_token_encrypted?: string | null
           token_expires_at?: string | null
           updated_at?: string | null
           user_id: string
         }
         Update: {
           access_token?: string
+          access_token_encrypted?: string | null
           created_at?: string | null
           id?: string
           is_active?: boolean | null
@@ -6235,6 +6240,7 @@ export type Database = {
           platform_user_id?: string | null
           platform_username?: string | null
           refresh_token?: string | null
+          refresh_token_encrypted?: string | null
           token_expires_at?: string | null
           updated_at?: string | null
           user_id?: string
@@ -8083,7 +8089,9 @@ export type Database = {
       }
       cleanup_old_rate_limits: { Args: never; Returns: undefined }
       cleanup_old_typing_indicators: { Args: never; Returns: undefined }
+      decrypt_token: { Args: { encrypted_token: string }; Returns: string }
       delete_cancelled_user_data: { Args: never; Returns: undefined }
+      encrypt_token: { Args: { plain_token: string }; Returns: string }
       generate_challenge_share_code: { Args: never; Returns: string }
       generate_profile_invite_token: { Args: never; Returns: string }
       generate_referral_code: { Args: { user_id: string }; Returns: string }
@@ -8091,6 +8099,17 @@ export type Database = {
       get_or_create_conversation: {
         Args: { other_user_id: string }
         Returns: string
+      }
+      get_public_profile: {
+        Args: { profile_id: string }
+        Returns: {
+          avatar_url: string
+          bio: string
+          created_at: string
+          display_name: string
+          id: string
+          username: string
+        }[]
       }
       has_church_access: {
         Args: { _user_id: string }
