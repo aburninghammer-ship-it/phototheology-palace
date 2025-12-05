@@ -66,8 +66,9 @@ export default function GenesisHighRise() {
   const currentDayProgress = DAILY_GOALS[currentDay - 1];
 
   useEffect(() => {
-    const loadProgress = async () => {
+    const loadOrCreateProgress = async () => {
       if (user) {
+        // First try to find existing progress
         const { data } = await supabase
           .from("genesis_challenge_participants")
           .select("*")
@@ -79,10 +80,26 @@ export default function GenesisHighRise() {
           setCompletedFloors(new Set(data.completed_floors || []));
           setCurrentDay(data.current_day || 1);
           setShowEmailCapture(false);
+        } else {
+          // Auto-enroll logged-in users - no email form needed
+          const { data: newParticipant, error } = await supabase
+            .from("genesis_challenge_participants")
+            .insert({
+              user_id: user.id,
+              email: user.email,
+              name: null,
+            })
+            .select()
+            .single();
+          
+          if (newParticipant && !error) {
+            setParticipantId(newParticipant.id);
+            setShowEmailCapture(false);
+          }
         }
       }
     };
-    loadProgress();
+    loadOrCreateProgress();
   }, [user]);
 
   const handleEmailSubmit = async (e: React.FormEvent) => {
