@@ -218,6 +218,17 @@ const GuidedStep = ({ step, title, description, link, time }: GuidedStepProps) =
   </Link>
 );
 
+// Room icons/emojis for visual flair
+const roomIcons: Record<string, string> = {
+  sr: "📖", ir: "👁️", "24fps": "🎬", br: "🗺️", tr: "🎨", gr: "💎",
+  or: "🔍", dc: "🧪", st: "🔗", qr: "❓", qa: "💬",
+  nf: "🌿", pf: "🪞", bf: "🧬", hf: "📜", lr: "👂",
+  cr: "✝️", dr: "💠", c6: "📚", trm: "🏛️", tz: "⏰", prm: "🎵", "p||": "🪞", frt: "🍇", cec: "👑", r66: "📿",
+  bl: "⛪", pr: "🔮", "3a": "👼", fe: "🎊",
+  "123h": "☁️", cycles: "🔄", jr: "🍊", math: "🔢",
+  frm: "🔥", mr: "🙏", srm: "⚡"
+};
+
 // Room Card Component
 interface RoomCardProps {
   room: any;
@@ -227,6 +238,7 @@ interface RoomCardProps {
 
 const RoomCard = ({ room, floorNumber, gradient }: RoomCardProps) => {
   const { isUnlocked, loading } = useRoomUnlock(floorNumber, room.id);
+  const roomIcon = roomIcons[room.id] || "⭐";
 
   return (
     <Link
@@ -234,19 +246,27 @@ const RoomCard = ({ room, floorNumber, gradient }: RoomCardProps) => {
       className="group relative"
     >
       <div className={cn(
-        "aspect-square rounded-lg p-3 transition-all hover:scale-105",
+        "aspect-square rounded-lg p-3 transition-all hover:scale-105 overflow-hidden",
         `bg-gradient-to-br ${gradient}`,
-        "flex flex-col items-center justify-center text-center"
+        "flex flex-col items-center justify-center text-center relative"
       )}>
-        <span className="font-bold text-white text-xs mb-1">{room.tag}</span>
-        <span className="text-white/90 text-xs leading-tight">{room.name}</span>
+        {/* Large background emoji/icon */}
+        <div className="absolute inset-0 flex items-center justify-center opacity-20 text-6xl pointer-events-none">
+          {roomIcon}
+        </div>
+        
+        {/* Content */}
+        <div className="relative z-10">
+          <span className="font-bold text-white text-sm mb-1 drop-shadow-md">{room.tag}</span>
+          <span className="text-white/90 text-xs leading-tight drop-shadow-sm block">{room.name}</span>
+        </div>
         
         {/* Status indicator */}
-        <div className="absolute bottom-2 right-2">
+        <div className="absolute bottom-2 right-2 z-10">
           {loading ? (
             <div className="w-4 h-4 rounded-full bg-gray-500/50 animate-pulse" />
           ) : isUnlocked ? (
-            <CheckCircle className="w-4 h-4 text-green-400" />
+            <CheckCircle className="w-4 h-4 text-green-400 drop-shadow-md" />
           ) : (
             <Lock className="w-4 h-4 text-white/50" />
           )}
