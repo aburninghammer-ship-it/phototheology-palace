@@ -49,8 +49,9 @@ const DAILY_GOALS = [
 
 export default function GenesisHighRise() {
   const navigate = useNavigate();
-  const { user } = useAuth();
-  const [showEmailCapture, setShowEmailCapture] = useState(!user);
+  const { user, loading: authLoading } = useAuth();
+  const [showEmailCapture, setShowEmailCapture] = useState(false);
+  const [isLoadingProgress, setIsLoadingProgress] = useState(true);
   const [email, setEmail] = useState("");
   const [name, setName] = useState("");
   const [currentFloor, setCurrentFloor] = useState(1);
@@ -66,6 +67,9 @@ export default function GenesisHighRise() {
   const currentDayProgress = DAILY_GOALS[currentDay - 1];
 
   useEffect(() => {
+    // Wait for auth to finish loading before determining what to show
+    if (authLoading) return;
+    
     const loadOrCreateProgress = async () => {
       if (user) {
         // First try to find existing progress
@@ -97,10 +101,14 @@ export default function GenesisHighRise() {
             setShowEmailCapture(false);
           }
         }
+      } else {
+        // No user logged in - show email capture for guests
+        setShowEmailCapture(true);
       }
+      setIsLoadingProgress(false);
     };
     loadOrCreateProgress();
-  }, [user]);
+  }, [user, authLoading]);
 
   const handleEmailSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -273,7 +281,11 @@ export default function GenesisHighRise() {
           </p>
         </div>
 
-        {showEmailCapture ? (
+        {(authLoading || isLoadingProgress) ? (
+          <div className="flex items-center justify-center py-12">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+          </div>
+        ) : showEmailCapture ? (
           <Card className="mb-8 border-2 border-primary/30 shadow-xl max-w-xl mx-auto">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
