@@ -58,18 +58,25 @@ serve(async (req) => {
       throw new Error(`Your ${platform} token has expired. Please reconnect your account.`);
     }
 
+    // Decrypt the access token (using base64 decoding - matches client-side encoding)
+    const encryptedToken = connection.access_token_encrypted;
+    if (!encryptedToken) {
+      throw new Error(`No access token found for ${platform}. Please reconnect your account.`);
+    }
+    const accessToken = atob(encryptedToken);
+
     let response;
     
     // Post to respective platform
     switch (platform) {
       case 'facebook':
-        response = await postToFacebook(content, url, imageUrl, connection.access_token);
+        response = await postToFacebook(content, url, imageUrl, accessToken);
         break;
       case 'twitter':
-        response = await postToTwitter(content, url, imageUrl, connection.access_token);
+        response = await postToTwitter(content, url, imageUrl, accessToken);
         break;
       case 'linkedin':
-        response = await postToLinkedIn(content, url, imageUrl, connection.access_token, connection.platform_user_id);
+        response = await postToLinkedIn(content, url, imageUrl, accessToken, connection.platform_user_id);
         break;
       default:
         throw new Error("Unsupported platform");

@@ -6201,7 +6201,6 @@ export type Database = {
       }
       social_media_connections: {
         Row: {
-          access_token: string
           access_token_encrypted: string | null
           created_at: string | null
           id: string
@@ -6209,14 +6208,12 @@ export type Database = {
           platform: string
           platform_user_id: string | null
           platform_username: string | null
-          refresh_token: string | null
           refresh_token_encrypted: string | null
           token_expires_at: string | null
           updated_at: string | null
           user_id: string
         }
         Insert: {
-          access_token: string
           access_token_encrypted?: string | null
           created_at?: string | null
           id?: string
@@ -6224,14 +6221,12 @@ export type Database = {
           platform: string
           platform_user_id?: string | null
           platform_username?: string | null
-          refresh_token?: string | null
           refresh_token_encrypted?: string | null
           token_expires_at?: string | null
           updated_at?: string | null
           user_id: string
         }
         Update: {
-          access_token?: string
           access_token_encrypted?: string | null
           created_at?: string | null
           id?: string
@@ -6239,7 +6234,6 @@ export type Database = {
           platform?: string
           platform_user_id?: string | null
           platform_username?: string | null
-          refresh_token?: string | null
           refresh_token_encrypted?: string | null
           token_expires_at?: string | null
           updated_at?: string | null
