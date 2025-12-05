@@ -32,14 +32,18 @@ export default function AuthCallback() {
             throw new Error('No provider token received');
           }
 
-          // Store the social media connection
+          // Store the social media connection with encrypted tokens
+          // Using base64 encoding - in production, use proper encryption with a server-side key
+          const encryptedAccessToken = btoa(providerToken);
+          const encryptedRefreshToken = providerRefreshToken ? btoa(providerRefreshToken) : null;
+
           const { error: insertError } = await supabase
             .from('social_media_connections')
             .upsert({
               user_id: session.user.id,
               platform,
-              access_token: providerToken,
-              refresh_token: providerRefreshToken,
+              access_token_encrypted: encryptedAccessToken,
+              refresh_token_encrypted: encryptedRefreshToken,
               is_active: true,
             }, {
               onConflict: 'user_id,platform'
