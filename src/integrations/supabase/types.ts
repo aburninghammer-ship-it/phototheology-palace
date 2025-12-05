@@ -2829,6 +2829,51 @@ export type Database = {
           },
         ]
       }
+      game_sessions: {
+        Row: {
+          completed_at: string | null
+          current_step: number | null
+          game_state: Json
+          game_type: string
+          id: string
+          is_abandoned: boolean | null
+          is_completed: boolean | null
+          score: number | null
+          started_at: string
+          total_steps: number | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          completed_at?: string | null
+          current_step?: number | null
+          game_state?: Json
+          game_type: string
+          id?: string
+          is_abandoned?: boolean | null
+          is_completed?: boolean | null
+          score?: number | null
+          started_at?: string
+          total_steps?: number | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          completed_at?: string | null
+          current_step?: number | null
+          game_state?: Json
+          game_type?: string
+          id?: string
+          is_abandoned?: boolean | null
+          is_completed?: boolean | null
+          score?: number | null
+          started_at?: string
+          total_steps?: number | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       games: {
         Row: {
           age_group: string | null
