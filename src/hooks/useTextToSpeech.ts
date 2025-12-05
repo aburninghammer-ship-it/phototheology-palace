@@ -2,14 +2,19 @@ import { useState, useRef, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 
-// Available OpenAI voices
+// Available OpenAI gpt-4o-mini-tts voices
 export const OPENAI_VOICES = [
   { id: 'alloy', name: 'Alloy', description: 'Neutral and balanced voice' },
+  { id: 'ash', name: 'Ash', description: 'Warm and conversational' },
+  { id: 'ballad', name: 'Ballad', description: 'Soft and melodic storyteller' },
+  { id: 'coral', name: 'Coral', description: 'Clear and professional' },
   { id: 'echo', name: 'Echo', description: 'Clear and articulate male voice' },
   { id: 'fable', name: 'Fable', description: 'Warm British male voice' },
-  { id: 'onyx', name: 'Onyx', description: 'Deep and authoritative male voice' },
   { id: 'nova', name: 'Nova', description: 'Friendly and energetic female voice' },
+  { id: 'onyx', name: 'Onyx', description: 'Deep and authoritative male voice' },
+  { id: 'sage', name: 'Sage', description: 'Wise and thoughtful' },
   { id: 'shimmer', name: 'Shimmer', description: 'Soft and gentle female voice' },
+  { id: 'verse', name: 'Verse', description: 'Expressive and dynamic' },
 ] as const;
 
 export type VoiceId = typeof OPENAI_VOICES[number]['id'];

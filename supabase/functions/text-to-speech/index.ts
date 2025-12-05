@@ -6,10 +6,10 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
-// OpenAI TTS voice options
-const VOICES = ['alloy', 'echo', 'fable', 'onyx', 'nova', 'shimmer'];
+// OpenAI TTS voice options (gpt-4o-mini-tts has additional voices)
+const VOICES = ['alloy', 'ash', 'ballad', 'coral', 'echo', 'fable', 'nova', 'onyx', 'sage', 'shimmer', 'verse'];
 const MAX_CHARS = 4096; // OpenAI's limit
-const DEFAULT_BIBLE_VOICE = 'onyx';
+const DEFAULT_BIBLE_VOICE = 'onyx'; // Deep, authoritative - good for Bible reading
 
 const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
@@ -182,7 +182,7 @@ async function callOpenAIWithRetry(
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          model: 'tts-1',
+          model: 'gpt-4o-mini-tts', // Upgraded from tts-1 - better quality, per-minute pricing
           input: text,
           voice: voice,
           speed: Math.max(0.25, Math.min(4.0, speed)), // Clamp between 0.25 and 4.0
