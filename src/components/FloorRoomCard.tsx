@@ -23,11 +23,61 @@ const roomEmojis: Record<string, string> = {
   frm: "🔥", mr: "🙏", srm: "⚡"
 };
 
+// Unique gradients per room for visual distinction
+const roomGradients: Record<string, string> = {
+  // Floor 1 - Furnishing
+  sr: "bg-gradient-to-br from-blue-500 to-blue-700",
+  ir: "bg-gradient-to-br from-indigo-500 to-purple-600",
+  "24fps": "bg-gradient-to-br from-violet-500 to-fuchsia-600",
+  br: "bg-gradient-to-br from-cyan-500 to-blue-600",
+  tr: "bg-gradient-to-br from-pink-500 to-rose-600",
+  gr: "bg-gradient-to-br from-emerald-400 to-teal-600",
+  // Floor 2 - Investigation
+  or: "bg-gradient-to-br from-amber-500 to-orange-600",
+  dc: "bg-gradient-to-br from-lime-500 to-green-600",
+  st: "bg-gradient-to-br from-teal-500 to-cyan-600",
+  qr: "bg-gradient-to-br from-yellow-500 to-amber-600",
+  qa: "bg-gradient-to-br from-orange-500 to-red-500",
+  // Floor 3 - Freestyle
+  nf: "bg-gradient-to-br from-green-500 to-emerald-600",
+  pf: "bg-gradient-to-br from-slate-500 to-zinc-600",
+  bf: "bg-gradient-to-br from-purple-500 to-violet-600",
+  hf: "bg-gradient-to-br from-stone-500 to-neutral-600",
+  lr: "bg-gradient-to-br from-sky-500 to-blue-600",
+  // Floor 4 - Next Level
+  cr: "bg-gradient-to-br from-rose-500 to-pink-600",
+  dr: "bg-gradient-to-br from-fuchsia-500 to-purple-600",
+  c6: "bg-gradient-to-br from-indigo-600 to-blue-700",
+  trm: "bg-gradient-to-br from-amber-600 to-yellow-700",
+  tz: "bg-gradient-to-br from-cyan-600 to-teal-700",
+  prm: "bg-gradient-to-br from-violet-600 to-indigo-700",
+  "p||": "bg-gradient-to-br from-emerald-600 to-green-700",
+  frt: "bg-gradient-to-br from-purple-500 to-violet-700",
+  cec: "bg-gradient-to-br from-yellow-500 to-orange-600",
+  r66: "bg-gradient-to-br from-red-500 to-rose-600",
+  // Floor 5 - Vision
+  bl: "bg-gradient-to-br from-blue-600 to-indigo-700",
+  pr: "bg-gradient-to-br from-purple-600 to-fuchsia-700",
+  "3a": "bg-gradient-to-br from-sky-600 to-cyan-700",
+  fe: "bg-gradient-to-br from-orange-600 to-amber-700",
+  // Floor 6 - Three Heavens
+  "123h": "bg-gradient-to-br from-slate-600 to-gray-700",
+  cycles: "bg-gradient-to-br from-teal-600 to-emerald-700",
+  jr: "bg-gradient-to-br from-orange-500 to-yellow-600",
+  math: "bg-gradient-to-br from-blue-700 to-indigo-800",
+  // Floor 7 - Spiritual
+  frm: "bg-gradient-to-br from-red-600 to-orange-700",
+  mr: "bg-gradient-to-br from-indigo-700 to-purple-800",
+  srm: "bg-gradient-to-br from-yellow-500 to-lime-600",
+};
+
 export const FloorRoomCard = ({ room, floorNumber, gradient }: FloorRoomCardProps) => {
   const { isUnlocked, loading } = useRoomUnlock(floorNumber, room.id);
   
   const showLocked = loading || !isUnlocked;
   const roomEmoji = roomEmojis[room.id] || "⭐";
+  // Use room-specific gradient if available, otherwise fall back to floor gradient
+  const roomGradient = roomGradients[room.id] || gradient;
 
   return (
     <Link 
@@ -41,11 +91,11 @@ export const FloorRoomCard = ({ room, floorNumber, gradient }: FloorRoomCardProp
         <Card variant="glass" className={`group h-full cursor-pointer transition-all duration-500 relative ${showLocked ? 'opacity-60' : ''}`}>
           {/* Animated gradient background overlay */}
           {!showLocked && (
-            <div className={`absolute inset-0 ${gradient} opacity-0 group-hover:opacity-10 transition-opacity duration-500`} />
+            <div className={`absolute inset-0 ${roomGradient} opacity-0 group-hover:opacity-10 transition-opacity duration-500`} />
           )}
           
           {/* Glowing top bar */}
-          <div className={`h-1 ${gradient} ${!showLocked ? 'group-hover:h-2 group-hover:shadow-glow' : ''} transition-all duration-300`} />
+          <div className={`h-1 ${roomGradient} ${!showLocked ? 'group-hover:h-2 group-hover:shadow-glow' : ''} transition-all duration-300`} />
           
           <CardHeader className="relative">
             <div className="flex items-start justify-between gap-4">
@@ -69,7 +119,7 @@ export const FloorRoomCard = ({ room, floorNumber, gradient }: FloorRoomCardProp
                         </Badge>
                       </div>
                     )}
-                    <Badge className={`${gradient} text-white shadow-lg font-mono tracking-wide`}>
+                    <Badge className={`${roomGradient} text-white shadow-lg font-mono tracking-wide`}>
                       {room.tag}
                     </Badge>
                   </div>
@@ -89,7 +139,7 @@ export const FloorRoomCard = ({ room, floorNumber, gradient }: FloorRoomCardProp
               
               {/* Animated arrow */}
               <motion.div 
-                className={`p-3 rounded-full ${gradient} shadow-lg shrink-0`}
+                className={`p-3 rounded-full ${roomGradient} shadow-lg shrink-0`}
                 whileHover={{ scale: 1.1, rotate: showLocked ? 0 : 15 }}
               >
                 {showLocked ? (
