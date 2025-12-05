@@ -595,6 +595,26 @@ IMPORTANT: Start numbering from day_number: ${startDay}`
     );
   } catch (error) {
     console.error("Error in generate-devotional:", error);
+    
+    // Reset plan status to draft on failure so user can retry
+    try {
+      const SUPABASE_URL = Deno.env.get("SUPABASE_URL");
+      const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
+      if (SUPABASE_URL && SUPABASE_SERVICE_ROLE_KEY) {
+        const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
+        const body = await req.clone().json().catch(() => ({}));
+        if (body.planId) {
+          await supabase
+            .from("devotional_plans")
+            .update({ status: "draft" })
+            .eq("id", body.planId);
+          console.log("Reset plan status to draft for retry");
+        }
+      }
+    } catch (resetError) {
+      console.error("Failed to reset plan status:", resetError);
+    }
+    
     return new Response(
       JSON.stringify({ error: error instanceof Error ? error.message : "Unknown error" }),
       { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
