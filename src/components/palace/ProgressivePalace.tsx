@@ -263,6 +263,8 @@ import mathImg from "@/assets/rooms/math-room.jpg";
 import frmImg from "@/assets/rooms/frm-fire-room.jpg";
 import mrImg from "@/assets/rooms/mr-meditation-room.jpg";
 import srmImg from "@/assets/rooms/srm-speed-room.jpg";
+// Floor 8 - Master
+import infinityImg from "@/assets/rooms/infinity-room.jpg";
 // Fallback
 import storyRoomImg from "@/assets/rooms/story-room.jpg";
 
@@ -283,6 +285,8 @@ const roomImageMap: Record<string, string> = {
   "123h": h123Img, cycles: cyclesImg, jr: jrImg, math: mathImg,
   // Floor 7
   frm: frmImg, mr: mrImg, srm: srmImg,
+  // Floor 8
+  infinity: infinityImg,
 };
 
 // Get unique room image by room ID
