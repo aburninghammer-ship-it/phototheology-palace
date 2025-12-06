@@ -17,7 +17,7 @@ import { toast } from "sonner";
 import { useThoughtAnalysisHistory, SavedAnalysis, DeeperInsight } from "@/hooks/useThoughtAnalysisHistory";
 import { AnimatedScore } from "@/components/analyze/AnimatedScore";
 import { VoiceInput } from "@/components/analyze/VoiceInput";
-import { AnalysisHistorySidebar } from "@/components/analyze/AnalysisHistorySidebar";
+import { SavedAnalysesList } from "@/components/analyze/SavedAnalysesList";
 import { QuickAudioButton } from "@/components/audio";
 
 interface AnalysisResult {
@@ -234,15 +234,6 @@ const AnalyzeThoughts = () => {
       </div>
       
       <Navigation />
-      
-      {/* History Sidebar */}
-      <AnalysisHistorySidebar
-        history={history}
-        isLoading={historyLoading}
-        onSelect={handleSelectFromHistory}
-        onDelete={deleteAnalysis}
-        selectedId={selectedHistoryId}
-      />
 
       <div className="container mx-auto px-4 py-8 max-w-4xl relative z-10">
         {/* Header */}
@@ -614,6 +605,17 @@ const AnalyzeThoughts = () => {
             </motion.div>
           )}
         </AnimatePresence>
+
+        {/* Saved Analyses Section */}
+        <div className="mt-10">
+          <SavedAnalysesList
+            history={history}
+            isLoading={historyLoading}
+            onSelect={handleSelectFromHistory}
+            onDelete={deleteAnalysis}
+            selectedId={selectedHistoryId}
+          />
+        </div>
       </div>
     </div>
   );
