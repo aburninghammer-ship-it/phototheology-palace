@@ -7,8 +7,9 @@ import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { toast } from "sonner";
-import { Gem, Plus, Trash2, Loader2 } from "lucide-react";
+import { Gem, Plus, Trash2, Loader2, FolderOpen } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { ExportToStudyButton } from "@/components/ExportToStudyButton";
 
 interface UserGem {
   id: string;
@@ -268,14 +269,28 @@ export function UserGemsList({ floorNumber, roomId }: UserGemsListProps) {
                           <h4 className="font-semibold text-base">
                             {gem.gem_name}
                           </h4>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => handleDelete(gem.id)}
-                            className="h-8 w-8 p-0 text-destructive hover:text-destructive hover:bg-destructive/10"
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
+                          <div className="flex items-center gap-1">
+                            <ExportToStudyButton
+                              type="gem"
+                              title={gem.gem_name}
+                              content={gem.gem_content}
+                              metadata={{
+                                room: roomId.toUpperCase(),
+                                floor: `Floor ${floorNumber}`,
+                              }}
+                              size="icon"
+                              variant="ghost"
+                              className="h-8 w-8 p-0 text-sky-500 hover:text-sky-400 hover:bg-sky-500/10"
+                            />
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => handleDelete(gem.id)}
+                              className="h-8 w-8 p-0 text-destructive hover:text-destructive hover:bg-destructive/10"
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          </div>
                         </div>
                         <p className="text-sm text-muted-foreground whitespace-pre-wrap">
                           {gem.gem_content}

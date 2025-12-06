@@ -3,7 +3,8 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Badge } from "@/components/ui/badge";
-import { MessageSquare, Send, Loader2, ChevronDown, ChevronUp, X, Image as ImageIcon } from "lucide-react";
+import { MessageSquare, Send, Loader2, ChevronDown, ChevronUp, X, Image as ImageIcon, FolderOpen } from "lucide-react";
+import { ExportToStudyButton } from "@/components/ExportToStudyButton";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { formatJeevesResponse } from "@/lib/formatJeevesResponse";
@@ -161,6 +162,21 @@ export const RoomInsightChat = ({
               <ChevronDown className="h-4 w-4" />
             )}
           </Button>
+          {messages.length > 0 && (
+            <ExportToStudyButton
+              type="room-insight"
+              title={`${roomName} Insight — ${book} ${chapter}:${verse}`}
+              content={`## Verse\n**${book} ${chapter}:${verse}**\n${verseText}\n\n## Room Analysis (${roomCode})\n${roomContent}\n\n## Discussion\n${messages.map(m => `**${m.role === 'user' ? 'You' : 'Jeeves'}:** ${m.content}`).join('\n\n')}`}
+              metadata={{
+                book,
+                chapter,
+                verse: `${verse}`,
+                room: roomName,
+              }}
+              size="sm"
+              variant="ghost"
+            />
+          )}
         </CollapsibleTrigger>
         
         <CollapsibleContent className="mt-3 space-y-3">

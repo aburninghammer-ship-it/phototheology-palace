@@ -18,6 +18,7 @@ import { Users, Copy, Check } from "lucide-react";
 import { RealtimeChannel } from "@supabase/supabase-js";
 import { searchBible } from "@/services/bibleApi";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
+import { ExportToStudyButton } from "@/components/ExportToStudyButton";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import ReactMarkdown from 'react-markdown';
 import jsPDF from 'jspdf';
@@ -1877,7 +1878,17 @@ export default function CardDeck() {
               />
             </div>
           </div>
-          <DialogFooter className="gap-2">
+          <DialogFooter className="gap-2 flex-wrap">
+            <ExportToStudyButton
+              type="card-deck"
+              title={gemTitle || `Card Deck Study — ${displayText.split(':')[0] || "Study"}`}
+              content={`## Verse\n${verseText}\n\n## Cards Used\n${cardsUsed.map(c => `- ${c}`).join('\n')}\n\n## Conversation\n${conversationHistory.map(m => `**${m.role === 'user' ? 'You' : 'Jeeves'}:** ${m.content}`).join('\n\n')}${gemNotes ? `\n\n## Notes\n${gemNotes}` : ''}`}
+              metadata={{
+                verse: displayText.split(':')[0] || undefined,
+              }}
+              variant="outline"
+              className="gap-2"
+            />
             <Button
               variant="outline"
               onClick={() => saveStudy(false)}

@@ -9,8 +9,9 @@ import { motion, AnimatePresence } from "framer-motion";
 import { 
   Lightbulb, Send, BookOpen, Target, TrendingUp, Sparkles, Building2, Link2, Loader2,
   ChevronDown, AlertTriangle, CheckCircle2, BookMarked, Layers, Shield, GraduationCap,
-  Church, Cross, Moon, Scale, Compass, Save, Download, Copy, Gem
+  Church, Cross, Moon, Scale, Compass, Save, Download, Copy, Gem, FolderOpen
 } from "lucide-react";
+import { ExportToStudyButton } from "@/components/ExportToStudyButton";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useThoughtAnalysisHistory, SavedAnalysis, DeeperInsight } from "@/hooks/useThoughtAnalysisHistory";
@@ -341,6 +342,16 @@ const AnalyzeThoughts = () => {
                 <Button onClick={handleSaveToGems} disabled={isSaving} variant="outline" className="bg-emerald-500/10 border-emerald-500/30 text-emerald-400">
                   {isSaving ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Save className="h-4 w-4 mr-2" />}Save to Gems
                 </Button>
+                <ExportToStudyButton
+                  type="thought-analysis"
+                  title={`Thought Analysis — ${new Date().toLocaleDateString()}`}
+                  content={`## My Thought\n${input}\n\n## Summary\n${result.summary || 'N/A'}\n\n## Overall Score: ${result.overallScore}/100\n\n## Strengths\n${result.strengths?.map(s => `- ${s}`).join('\n') || 'N/A'}\n\n## Growth Areas\n${result.growthAreas?.map(a => `- ${a}`).join('\n') || 'N/A'}\n\n## Palace Rooms\n${result.palaceRooms?.map(r => `- ${r}`).join('\n') || 'N/A'}\n\n## Scripture Connections\n${result.scriptureConnections?.map(s => `- ${s}`).join('\n') || 'N/A'}\n\n## Encouragement\n${result.encouragement || 'N/A'}`}
+                  metadata={{
+                    score: result.overallScore,
+                  }}
+                  variant="outline"
+                  className="bg-sky-500/10 border-sky-500/30 text-sky-400"
+                />
                 <Button onClick={handleExport} variant="outline" className="bg-blue-500/10 border-blue-500/30 text-blue-400">
                   <Download className="h-4 w-4 mr-2" />Export
                 </Button>
