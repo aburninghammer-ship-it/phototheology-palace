@@ -41,6 +41,7 @@ import { formatJeevesResponse } from "@/lib/formatJeevesResponse";
 import { DownloadSequenceDialog } from "./DownloadSequenceDialog";
 import { OfflineModeToggle } from "./OfflineModeToggle";
 import { CommentaryPDFExport } from "./CommentaryPDFExport";
+import { ExportToStudyButton } from "@/components/ExportToStudyButton";
 import { isOnline, getCachedMusicTrack } from "@/services/offlineAudioCache";
 import { 
   getCachedChapterCommentary, 
@@ -1868,6 +1869,19 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
                 <p className="text-xs text-muted-foreground">Phototheological Insights</p>
               </div>
               <div className="flex items-center gap-2">
+                <ExportToStudyButton
+                  type="commentary"
+                  title={`${currentItem?.book || "Bible"} ${currentItem?.chapter || 1} Commentary`}
+                  content={commentaryText}
+                  metadata={{
+                    book: currentItem?.book,
+                    chapter: currentItem?.chapter,
+                    depth: currentCommentaryDepth === "depth" ? "Scholarly" : currentCommentaryDepth === "intermediate" ? "Intermediate" : "Surface",
+                  }}
+                  size="sm"
+                  variant="ghost"
+                  className="text-amber-600 hover:text-amber-500"
+                />
                 <CommentaryPDFExport
                   commentary={commentaryText}
                   book={currentItem?.book || ""}
