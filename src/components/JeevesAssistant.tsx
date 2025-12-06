@@ -62,12 +62,23 @@ export const JeevesAssistant = ({
   const fetchJeevesResponse = async (mode: "example" | "exercise") => {
     setLoading(true);
     try {
+      // Get user profile to pass name to Jeeves
+      const { data: { user } } = await supabase.auth.getUser();
+      const { data: profile } = user ? await supabase
+        .from('profiles')
+        .select('display_name')
+        .eq('id', user.id)
+        .single() : { data: null };
+
+      const userName = profile?.display_name || null;
+
       const { data, error } = await supabase.functions.invoke("jeeves", {
         body: {
           roomTag,
           roomName,
           principle,
           mode,
+          userName,
         },
       });
 
@@ -96,6 +107,16 @@ export const JeevesAssistant = ({
     if (!question.trim()) return;
     setLoading(true);
     try {
+      // Get user profile to pass name to Jeeves
+      const { data: { user } } = await supabase.auth.getUser();
+      const { data: profile } = user ? await supabase
+        .from('profiles')
+        .select('display_name')
+        .eq('id', user.id)
+        .single() : { data: null };
+
+      const userName = profile?.display_name || null;
+
       const { data, error } = await supabase.functions.invoke("jeeves", {
         body: {
           mode: "qa",
@@ -103,6 +124,7 @@ export const JeevesAssistant = ({
           roomName,
           principle,
           question,
+          userName,
         },
       });
       if (error) throw error;
@@ -122,6 +144,16 @@ export const JeevesAssistant = ({
     if (!userThoughts.trim()) return;
     setLoading(true);
     try {
+      // Get user profile to pass name to Jeeves
+      const { data: { user } } = await supabase.auth.getUser();
+      const { data: profile } = user ? await supabase
+        .from('profiles')
+        .select('display_name')
+        .eq('id', user.id)
+        .single() : { data: null };
+
+      const userName = profile?.display_name || null;
+
       const { data, error } = await supabase.functions.invoke("jeeves", {
         body: {
           mode: "analyze-thoughts",
@@ -129,6 +161,7 @@ export const JeevesAssistant = ({
           roomName,
           principle,
           userAnswer: userThoughts,
+          userName,
         },
       });
       if (error) throw error;

@@ -38,19 +38,31 @@ export function JeevesMemoryCoach({ verses, technique }: JeevesMemoryCoachProps)
     setLoading(true);
 
     try {
+      // Get user profile to pass name to Jeeves
+      const { data: { user } } = await supabase.auth.getUser();
+      const { data: profile } = user ? await supabase
+        .from('profiles')
+        .select('display_name')
+        .eq('id', user.id)
+        .single() : { data: null };
+
+      const userName = profile?.display_name || "friend";
+
       const systemPrompt = technique === "first-letter"
-        ? `You are Jeeves, a memory coach specializing in the First Letter technique. Help users memorize Bible verses by:
+        ? `You are Jeeves, ${userName}'s memory coach specializing in the First Letter technique. Help ${userName} memorize Bible verses by:
 - Testing them on specific verses (show first letters, have them recall)
 - Explaining how to use first letters effectively
 - Creating custom mnemonics for difficult verses
 - Encouraging and providing tips
+- Use ${userName}'s name naturally 2-3 times per response
 
 Available verses: ${verses.map(v => `${v.verse_reference}: ${v.verse_text}`).join(" | ")}`
-        : `You are Jeeves, a Memory Palace guide. Help users build and practice memory palaces by:
+        : `You are Jeeves, ${userName}'s Memory Palace guide. Help ${userName} build and practice memory palaces by:
 - Suggesting vivid, memorable visualizations for verses
 - Testing their palace walk (describe location, ask for verse)
 - Improving their location associations
 - Teaching Memory Palace principles
+- Use ${userName}'s name naturally 2-3 times per response
 
 Available verses: ${verses.map(v => `${v.verse_reference}: ${v.verse_text}`).join(" | ")}`;
 
