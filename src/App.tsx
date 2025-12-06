@@ -14,6 +14,8 @@ import { MessagingSidebar } from "@/components/MessagingSidebar";
 import { LiveNotificationsProvider } from "@/components/LiveNotificationsProvider";
 import { AchievementProvider } from "@/components/AchievementProvider";
 import { DirectMessagesProvider } from "@/contexts/DirectMessagesContext";
+import { PageStateProvider } from "@/contexts/PageStateContext";
+import { GlobalAudioProvider } from "@/contexts/GlobalAudioContext";
 import { SplashScreen } from "@/components/SplashScreen";
 import { AnimatePresence } from "framer-motion";
 import { ThemeProvider } from "next-themes";
@@ -25,6 +27,7 @@ import { DailyVerseNotification } from "@/components/notifications/DailyVerseNot
 import { InstallPrompt } from "@/components/pwa/InstallPrompt";
 import { ExitIntentPopup } from "@/components/conversion/ExitIntentPopup";
 import { AmbientMusicPlayer } from "@/components/audio/AmbientMusicPlayer";
+import { GlobalMiniPlayer } from "@/components/audio/GlobalMiniPlayer";
 import { MobileBottomNav } from "@/components/MobileBottomNav";
 
 // Critical pages - load immediately (landing + auth only)
@@ -225,6 +228,8 @@ function App() {
           </AnimatePresence>
           {!showSplash && (
             <BrowserRouter>
+              <PageStateProvider>
+              <GlobalAudioProvider>
               <PageTracker />
               <LiveNotificationsProvider>
                 <AchievementProvider>
@@ -237,6 +242,8 @@ function App() {
                         <DailyVerseNotification />
                         <InstallPrompt />
                         <ExitIntentPopup />
+                        {/* Global Mini Player for Bible Reading */}
+                        <GlobalMiniPlayer />
                         {/* Floating Ambient Music Player - higher on mobile to avoid nav */}
                         <div className="fixed bottom-24 sm:bottom-20 right-4 z-40">
                           <AmbientMusicPlayer minimal />
@@ -480,6 +487,8 @@ function App() {
             </DirectMessagesProvider>
           </AchievementProvider>
         </LiveNotificationsProvider>
+        </GlobalAudioProvider>
+        </PageStateProvider>
       </BrowserRouter>
           )}
         </TooltipProvider>

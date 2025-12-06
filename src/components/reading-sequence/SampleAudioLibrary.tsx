@@ -6,7 +6,7 @@ import { ReadingSequenceBlock, SequenceItem } from "@/types/readingSequence";
 import { VoiceId } from "@/hooks/useTextToSpeech";
 
 interface SampleAudioLibraryProps {
-  onPlaySample: (sequences: ReadingSequenceBlock[]) => void;
+  onPlaySample: (sequences: ReadingSequenceBlock[], sampleName?: string) => void;
 }
 
 const SAMPLE_CHAPTERS = [
@@ -47,11 +47,12 @@ export const SampleAudioLibrary = ({ onPlaySample }: SampleAudioLibraryProps) =>
     }];
   };
 
-  const handlePlaySample = (book: string, chapter: number, mode: "verse-by-verse" | "chapter" | "commentary-only", withMusic: boolean) => {
+  const handlePlaySample = (book: string, chapter: number, title: string, mode: "verse-by-verse" | "chapter" | "commentary-only", withMusic: boolean) => {
     console.log('[SampleAudioLibrary] Button clicked:', { book, chapter, mode, withMusic });
     const sequences = createSampleSequence(book, chapter, mode, withMusic);
+    const sampleName = `${title} (${book} ${chapter})`;
     console.log('[SampleAudioLibrary] Calling onPlaySample with:', sequences);
-    onPlaySample(sequences);
+    onPlaySample(sequences, sampleName);
   };
 
   return (
@@ -90,7 +91,7 @@ export const SampleAudioLibrary = ({ onPlaySample }: SampleAudioLibraryProps) =>
                         size="sm"
                         variant="outline"
                         className="flex-1 gap-2"
-                        onClick={() => handlePlaySample(sample.book, sample.chapter, "verse-by-verse", false)}
+                        onClick={() => handlePlaySample(sample.book, sample.chapter, sample.title, "verse-by-verse", false)}
                       >
                         <Headphones className="h-3 w-3" />
                         No Music
@@ -99,7 +100,7 @@ export const SampleAudioLibrary = ({ onPlaySample }: SampleAudioLibraryProps) =>
                         size="sm"
                         variant="outline"
                         className="flex-1 gap-2"
-                        onClick={() => handlePlaySample(sample.book, sample.chapter, "verse-by-verse", true)}
+                        onClick={() => handlePlaySample(sample.book, sample.chapter, sample.title, "verse-by-verse", true)}
                       >
                         <Music className="h-4 w-4" />
                         With Music
@@ -115,7 +116,7 @@ export const SampleAudioLibrary = ({ onPlaySample }: SampleAudioLibraryProps) =>
                         size="sm"
                         variant="outline"
                         className="flex-1 gap-2"
-                        onClick={() => handlePlaySample(sample.book, sample.chapter, "chapter", false)}
+                        onClick={() => handlePlaySample(sample.book, sample.chapter, sample.title, "chapter", false)}
                       >
                         <Headphones className="h-3 w-3" />
                         No Music
@@ -124,7 +125,7 @@ export const SampleAudioLibrary = ({ onPlaySample }: SampleAudioLibraryProps) =>
                         size="sm"
                         variant="outline"
                         className="flex-1 gap-2"
-                        onClick={() => handlePlaySample(sample.book, sample.chapter, "chapter", true)}
+                        onClick={() => handlePlaySample(sample.book, sample.chapter, sample.title, "chapter", true)}
                       >
                         <Music className="h-4 w-4" />
                         With Music

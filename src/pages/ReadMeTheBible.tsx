@@ -28,6 +28,7 @@ import { SampleAudioLibrary } from "@/components/reading-sequence/SampleAudioLib
 import { useReadingSequences } from "@/hooks/useReadingSequences";
 import { useAuth } from "@/hooks/useAuth";
 import { useSubscription } from "@/hooks/useSubscription";
+import { usePreservePage } from "@/hooks/usePreservePage";
 import { PremiumBadge } from "@/components/PremiumBadge";
 import { ReadingSequenceBlock, ROOM_TAG_OPTIONS, SavedReadingSequence, SequenceItem } from "@/types/readingSequence";
 import { VoiceId } from "@/hooks/useTextToSpeech";
@@ -57,15 +58,27 @@ export default function ReadMeTheBible() {
     incrementPlayCount,
   } = useReadingSequences();
 
-  // Default to samples for non-premium, but show create tab for premium users (including access code users)
-  const [activeTab, setActiveTab] = useState("samples");
-  const [sequenceName, setSequenceName] = useState("");
-  const [sequenceDescription, setSequenceDescription] = useState("");
-  const [selectedTags, setSelectedTags] = useState<string[]>([]);
-  const [sequences, setSequences] = useState<ReadingSequenceBlock[]>([createEmptyBlock(1)]);
+  // Preserve page state across navigation
+  const { setCustomState, getCustomState } = usePreservePage();
+
+  // Restore state from context or use defaults
+  const [activeTab, setActiveTab] = useState(() => getCustomState<string>('activeTab') || "samples");
+  const [sequenceName, setSequenceName] = useState(() => getCustomState<string>('sequenceName') || "");
+  const [sequenceDescription, setSequenceDescription] = useState(() => getCustomState<string>('sequenceDescription') || "");
+  const [selectedTags, setSelectedTags] = useState<string[]>(() => getCustomState<string[]>('selectedTags') || []);
+  const [sequences, setSequences] = useState<ReadingSequenceBlock[]>(() => getCustomState<ReadingSequenceBlock[]>('sequences') || [createEmptyBlock(1)]);
   const [isPlaying, setIsPlaying] = useState(false);
-  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editingId, setEditingId] = useState<string | null>(() => getCustomState<string | null>('editingId') || null);
   const [sampleSequences, setSampleSequences] = useState<ReadingSequenceBlock[] | null>(null);
+  const [currentSequenceName, setCurrentSequenceName] = useState<string>("");
+
+  // Save state changes to context
+  useEffect(() => { setCustomState('activeTab', activeTab); }, [activeTab, setCustomState]);
+  useEffect(() => { setCustomState('sequenceName', sequenceName); }, [sequenceName, setCustomState]);
+  useEffect(() => { setCustomState('sequenceDescription', sequenceDescription); }, [sequenceDescription, setCustomState]);
+  useEffect(() => { setCustomState('selectedTags', selectedTags); }, [selectedTags, setCustomState]);
+  useEffect(() => { setCustomState('sequences', sequences); }, [sequences, setCustomState]);
+  useEffect(() => { setCustomState('editingId', editingId); }, [editingId, setCustomState]);
 
   // Pre-generate commentary for current sequences in background
   const allVerses = sequences.flatMap(seq => 
@@ -150,14 +163,18 @@ export default function ReadMeTheBible() {
     }
     if (seq) {
       setSequences(seq.sequences);
+      setCurrentSequenceName(seq.name);
       incrementPlayCount(seq.id);
+    } else {
+      setCurrentSequenceName(sequenceName || "Custom Sequence");
     }
     setIsPlaying(true);
   };
 
-  const handlePlaySample = (sequences: ReadingSequenceBlock[]) => {
+  const handlePlaySample = (sequences: ReadingSequenceBlock[], sampleName?: string) => {
     console.log('[ReadMeTheBible] handlePlaySample called with:', sequences);
     setSampleSequences(sequences);
+    setCurrentSequenceName(sampleName || "Sample Reading");
     setIsPlaying(true);
   };
 
@@ -242,6 +259,7 @@ export default function ReadMeTheBible() {
                 setSampleSequences(null);
               }}
               autoPlay={true}
+              sequenceName={currentSequenceName || sequenceName || "Bible Reading"}
             />
           </div>
         </div>
