@@ -30,6 +30,7 @@ import { notifyTTSStarted, notifyTTSStopped } from "@/hooks/useAudioDucking";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { getGlobalMusicVolume, setGlobalMusicVolume } from "@/hooks/useMusicVolumeControl";
 import { OPENAI_VOICES, VoiceId } from "@/hooks/useTextToSpeech";
+import { useGlobalAudio } from "@/contexts/GlobalAudioContext";
 import {
   Select,
   SelectContent,
@@ -54,6 +55,7 @@ interface SequencePlayerProps {
   sequences: ReadingSequenceBlock[];
   onClose?: () => void;
   autoPlay?: boolean;
+  sequenceName?: string;
 }
 
 interface ChapterContent {
@@ -62,7 +64,8 @@ interface ChapterContent {
   verses: { verse: number; text: string }[];
 }
 
-export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: SequencePlayerProps) => {
+export const SequencePlayer = ({ sequences, onClose, autoPlay = false, sequenceName }: SequencePlayerProps) => {
+  const { setBibleAudioState, updateBibleProgress, setShowMiniPlayer } = useGlobalAudio();
   const [isPlaying, setIsPlaying] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -159,6 +162,29 @@ export const SequencePlayer = ({ sequences, onClose, autoPlay = false }: Sequenc
       }
     };
   }, [isPlaying, isPaused]);
+
+  // Sync playback state with global audio context for mini player
+  useEffect(() => {
+    if (isPlaying || isPaused) {
+      setBibleAudioState({
+        isPlaying,
+        isPaused,
+        sequences,
+        currentSeqIdx,
+        currentItemIdx,
+        currentVerseIdx,
+        sequenceName,
+      });
+      setShowMiniPlayer(true);
+    }
+  }, [isPlaying, isPaused, currentSeqIdx, currentItemIdx, currentVerseIdx, sequences, sequenceName, setBibleAudioState, setShowMiniPlayer]);
+
+  // Update progress in global context
+  useEffect(() => {
+    if (isPlaying) {
+      updateBibleProgress(currentSeqIdx, currentItemIdx, currentVerseIdx);
+    }
+  }, [currentSeqIdx, currentItemIdx, currentVerseIdx, isPlaying, updateBibleProgress]);
 
   // Flatten all items across sequences for navigation
   const allItems = activeSequences.flatMap((seq, seqIdx) =>
