@@ -122,38 +122,72 @@ export const VoiceInput = ({
     };
   }, [onTranscript, isListening, webSpeechSupported]);
 
+  // Get the best supported MIME type for the current browser
+  const getSupportedMimeType = useCallback(() => {
+    const types = [
+      'audio/webm;codecs=opus',
+      'audio/webm',
+      'audio/mp4',
+      'audio/ogg',
+      'audio/wav',
+      ''  // Empty string = browser default
+    ];
+    
+    for (const type of types) {
+      if (type === '' || MediaRecorder.isTypeSupported(type)) {
+        console.log('Using MIME type:', type || 'browser default');
+        return type;
+      }
+    }
+    return '';
+  }, []);
+
   // Start recording for Whisper transcription
   const startWhisperRecording = async () => {
     try {
+      // Simpler audio constraints for better mobile compatibility
       const stream = await navigator.mediaDevices.getUserMedia({ 
         audio: {
-          channelCount: 1,
-          sampleRate: 16000,
           echoCancellation: true,
           noiseSuppression: true,
+          autoGainControl: true,
         } 
       });
       
       streamRef.current = stream;
       audioChunksRef.current = [];
       
-      const mediaRecorder = new MediaRecorder(stream, {
-        mimeType: MediaRecorder.isTypeSupported('audio/webm') ? 'audio/webm' : 'audio/mp4'
-      });
+      const mimeType = getSupportedMimeType();
+      const options: MediaRecorderOptions = mimeType ? { mimeType } : {};
+      
+      const mediaRecorder = new MediaRecorder(stream, options);
       
       mediaRecorder.ondataavailable = (event) => {
+        console.log('Audio chunk received, size:', event.data.size);
         if (event.data.size > 0) {
           audioChunksRef.current.push(event.data);
         }
       };
       
       mediaRecorder.onstop = async () => {
-        const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
-        await transcribeWithWhisper(audioBlob);
+        console.log('MediaRecorder stopped, chunks:', audioChunksRef.current.length);
+        const mimeTypeForBlob = mimeType || 'audio/webm';
+        const audioBlob = new Blob(audioChunksRef.current, { type: mimeTypeForBlob });
+        console.log('Audio blob created, size:', audioBlob.size);
+        if (audioBlob.size > 0) {
+          await transcribeWithWhisper(audioBlob);
+        } else {
+          toast.error("No audio was recorded. Please try again.");
+          setIsTranscribing(false);
+        }
       };
       
       mediaRecorderRef.current = mediaRecorder;
-      mediaRecorder.start(1000); // Collect data every second
+      
+      // Start recording - don't use timeslice on mobile for better compatibility
+      // Instead, we'll collect all data when stop() is called
+      mediaRecorder.start();
+      
       setIsRecording(true);
       setRecordingDuration(0);
       
@@ -165,7 +199,7 @@ export const VoiceInput = ({
       toast.success("Recording started. Speak your thoughts...");
     } catch (error) {
       console.error('Error starting recording:', error);
-      toast.error("Could not access microphone");
+      toast.error("Could not access microphone. Please check permissions.");
     }
   };
 
