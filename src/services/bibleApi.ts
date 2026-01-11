@@ -2,6 +2,8 @@ import { Chapter, Verse } from "@/types/bible";
 import { supabase } from "@/integrations/supabase/client";
 import { BIBLE_BOOKS } from "@/types/bible";
 import { cacheChapter, getCachedChapter, preCacheSurrounding, isOnline } from "./offlineCache";
+import { getVerseCountForChapter } from "@/data/bibleVerseCounts";
+import { BOOK_NAME_TO_CODE } from "@/data/bibleBooks";
 
 // Using Bible API - you can switch to different APIs or local data
 const BIBLE_API_BASE = "https://bible-api.com";
@@ -135,21 +137,16 @@ const fetchChapterFromAPI = async (book: string, chapter: number, translation: T
   } catch (error) {
     console.error("Error fetching chapter:", error);
 
-    // Get the correct verse count from metadata if available
-    const bookMeta = BIBLE_BOOKS.find(b => b === book || b.toLowerCase() === book.toLowerCase());
+    // Get the accurate verse count from our complete data
+    const bookCode = BOOK_NAME_TO_CODE.get(book) || book.toUpperCase().substring(0, 3);
+    let verseCount = getVerseCountForChapter(bookCode, chapter);
+    
+    // Fallback to reasonable default if book code not found
+    if (!verseCount || verseCount === 0) {
+      verseCount = 25; // Reasonable default
+    }
 
-    // Default verse counts for common chapters (approximate)
-    // This provides better fallback than fixed 20 verses
-    let verseCount = 31; // Default
-
-    // Try to estimate based on typical verse counts
-    if (chapter === 1) verseCount = 31;
-    else if (chapter <= 10) verseCount = 35;
-    else if (chapter <= 50) verseCount = 30;
-    else if (chapter <= 100) verseCount = 20;
-    else verseCount = 15; // Psalms have varying lengths
-
-    // Return placeholder verses with estimated count
+    // Return placeholder verses with accurate count
     return {
       book,
       chapter,

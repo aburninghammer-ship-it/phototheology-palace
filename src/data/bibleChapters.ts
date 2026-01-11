@@ -1,4 +1,5 @@
 import { BIBLE_BOOK_METADATA } from './bibleBooks';
+import { BIBLE_VERSE_COUNTS, getVerseCountForChapter } from './bibleVerseCounts';
 
 export interface BibleChapterMetadata {
   book: string;
@@ -7,14 +8,10 @@ export interface BibleChapterMetadata {
   verses: number;
 }
 
-// Generate all 1,189 chapters across all 66 books
-// Note: Verse counts will be populated during import or can be fetched from BibleSDK
+// Generate all 1,189 chapters across all 66 books with accurate verse counts
 const generateAllChapters = (): BibleChapterMetadata[] => {
   const chapters: BibleChapterMetadata[] = [];
   let position = 1;
-
-  // Known verse counts for Genesis (provided)
-  const genesisVerseCounts = [31, 25, 24, 26, 32, 22, 24, 20, 27, 32, 32, 19, 18, 24, 21, 16, 26, 33, 36, 18, 33, 22, 16, 60, 33, 35, 44, 22, 32, 41, 49, 30, 19, 30, 29, 43, 36, 30, 23, 22, 55, 35, 32, 29, 28, 34, 31, 21, 32, 24];
 
   for (const book of BIBLE_BOOK_METADATA) {
     for (let chapter = 1; chapter <= book.chapters; chapter++) {
@@ -22,8 +19,7 @@ const generateAllChapters = (): BibleChapterMetadata[] => {
         book: book.code,
         chapter,
         position,
-        // Use known Genesis verse counts, or 0 as placeholder for other books
-        verses: book.code === 'GEN' ? genesisVerseCounts[chapter - 1] : 0
+        verses: getVerseCountForChapter(book.code, chapter)
       });
       position++;
     }
