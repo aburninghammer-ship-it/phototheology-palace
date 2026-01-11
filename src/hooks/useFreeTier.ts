@@ -147,33 +147,38 @@ export function useFreeTier(): FreeTierAccess {
 
   // Determine user's tier
   const getTier = (): FreeTierAccess["tier"] => {
-    if (!user || !profile) return "free";
+    if (!user) return "free";
+
+    // Church membership grants premium access (even if profile row is missing)
+    if (hasChurchAccess) return "premium";
+
+    // Patreon connection grants access independent of Stripe
+    if (patreonConnection?.is_active_patron) return "patron";
+
+    // If we don't yet have profile data, default to free (UI should respect isLoading)
+    if (!profile) return "free";
 
     if (profile.has_lifetime_access) return "premium";
-    
-    // Church membership grants premium access
-    if (hasChurchAccess) return "premium";
-    
-    // Check Patreon connection first
-    if (patreonConnection?.is_active_patron) return "patron";
-    
+
     // Check if trial is active
     if (profile.trial_ends_at) {
       const trialEnd = new Date(profile.trial_ends_at);
       if (trialEnd > new Date()) return "trial";
     }
-    
+
     // Check promotional access
     if (profile.promotional_access_expires_at) {
       const promoEnd = new Date(profile.promotional_access_expires_at);
       if (promoEnd > new Date()) return "premium";
     }
-    
-    if (profile.subscription_tier === 'patron') return "patron";
-    if (profile.subscription_tier === 'student') return "student";
-    if (profile.subscription_tier === 'premium') return "premium";
-    if (profile.subscription_tier === 'essential') return "essential";
-    if (profile.subscription_status === 'active') return profile.subscription_tier as FreeTierAccess["tier"] || "premium";
+
+    if (profile.subscription_tier === "patron") return "patron";
+    if (profile.subscription_tier === "student") return "student";
+    if (profile.subscription_tier === "premium") return "premium";
+    if (profile.subscription_tier === "essential") return "essential";
+    if (profile.subscription_status === "active") {
+      return (profile.subscription_tier as FreeTierAccess["tier"]) || "premium";
+    }
 
     return "free";
   };
@@ -201,7 +206,8 @@ export function useFreeTier(): FreeTierAccess {
   };
 
   const showUpgradePrompt = (feature: string): boolean => {
-    return tier === "free";
+    if (isLoading) return false;
+    return !isPremium;
   };
 
   return {
