@@ -275,6 +275,29 @@ export default function AdminSubscriptions() {
         </TabsList>
 
         <TabsContent value="overview" className="space-y-6">
+          {/* Total Users Overview */}
+          <div className="grid gap-6 md:grid-cols-2">
+            <Card>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-lg">Total All-Time Users</CardTitle>
+                <CardDescription>All registered accounts</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="text-4xl font-bold">{stats.database.total_users}</div>
+              </CardContent>
+            </Card>
+
+            <Card className="border-primary/50 bg-primary/5">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-lg">Current Paying Users</CardTitle>
+                <CardDescription>Stripe + Patreon + Lifetime</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="text-4xl font-bold text-primary">{stats.summary.total_with_access}</div>
+              </CardContent>
+            </Card>
+          </div>
+
           {/* Summary Cards - REAL STRIPE DATA */}
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-5">
             <Card className="border-green-500/50 bg-green-500/5">
