@@ -47,8 +47,8 @@ export default function BibleProphecyGuide() {
   return (
     <div className="min-h-screen bg-background">
       <SEO
-        title="Genesis in 6 Days | Memorize All 50 Chapters with 24FPS Memory Palace Method"
-        description="Memorize all 50 chapters of Genesis using the 24FPS Memory Palace Method. Visual frames for every chapter. See Christ in creation through the Palace system."
+        title="Genesis in 6 Days | The 24FPS Memory Palace Method - See Every Chapter Clearly"
+        description="Learn Genesis as one continuous story. Turn Genesis into unforgettable images with the 24FPS Memory Palace Method. A structured Genesis study system with visual frames for every chapter."
       />
       <Navigation />
 
@@ -65,7 +65,7 @@ export default function BibleProphecyGuide() {
           >
             <Badge variant="outline" className="text-accent border-accent/30 px-4 py-1.5">
               <BookOpen className="w-4 h-4 mr-2" />
-              24FPS Memory Palace Method
+              The 24FPS Memory Palace Method
             </Badge>
 
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight">
@@ -74,14 +74,13 @@ export default function BibleProphecyGuide() {
               </span>
               <br />
               <span className="text-2xl md:text-3xl lg:text-4xl text-foreground/90">
-                Memorize All 50 Chapters
+                See Every Chapter of Genesis Clearly
               </span>
             </h1>
 
             <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-              <strong className="text-foreground">Visual frames for every chapter</strong> using the 24FPS Memory Palace Method.
-              <br />
-              See Christ in creation through structured, memorable imagery.</p>
+              <strong className="text-foreground">Learn Genesis as one continuous story.</strong> Turn Genesis into unforgettable images using a structured Genesis study system.
+            </p>
 
             <div className="pt-6 flex flex-col items-center gap-4">
               <Button
@@ -145,15 +144,15 @@ export default function BibleProphecyGuide() {
                   <ul className="space-y-3 text-muted-foreground text-sm">
                     <li className="flex items-start gap-2">
                       <Check className="w-4 h-4 text-primary mt-0.5 flex-shrink-0" />
-                      A Christ-centered lens for reading creation
+                      Learn Genesis as one continuous story
                     </li>
                     <li className="flex items-start gap-2">
                       <Check className="w-4 h-4 text-primary mt-0.5 flex-shrink-0" />
-                      Day-by-day mapping of redemptive patterns
+                      Turn Genesis into unforgettable images
                     </li>
                     <li className="flex items-start gap-2">
                       <Check className="w-4 h-4 text-primary mt-0.5 flex-shrink-0" />
-                      Connections that unlock the entire Bible
+                      A structured Genesis study system with Christ-centered connections
                     </li>
                   </ul>
                 </CardContent>
@@ -246,7 +245,7 @@ export default function BibleProphecyGuide() {
                 
                 <h2 className="text-2xl font-bold">Genesis in 6 Days</h2>
                 <p className="text-muted-foreground">
-                  See Christ in creation. Transform how you read the Bible.
+                  See every chapter clearly. Learn Genesis as one continuous story.
                 </p>
 
                 <div className="py-4">
