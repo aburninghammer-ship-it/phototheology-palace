@@ -176,12 +176,19 @@ serve(async (req) => {
         });
         stripeStats.trialing_subscriptions = trialingSubscriptions.data.length;
 
-        // Get canceled subscriptions (for reference)
+        // Get canceled subscriptions - only count ones with our app's price IDs
         const canceledSubscriptions = await stripe.subscriptions.list({
           status: "canceled",
           limit: 100,
+          expand: ['data.items.data.price'],
         });
-        stripeStats.canceled_subscriptions = canceledSubscriptions.data.length;
+        
+        // Filter to only our app's subscriptions (prices we recognize)
+        const appPriceIds = Object.keys(priceToTier);
+        stripeStats.canceled_subscriptions = canceledSubscriptions.data.filter((sub: any) => {
+          const priceId = sub.items.data[0]?.price?.id;
+          return appPriceIds.includes(priceId);
+        }).length;
 
         logStep("Stripe stats fetched", stripeStats);
 
