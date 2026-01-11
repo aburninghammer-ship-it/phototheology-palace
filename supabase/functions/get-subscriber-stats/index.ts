@@ -143,17 +143,25 @@ serve(async (req) => {
         const stripe = new Stripe(stripeKey, { apiVersion: "2025-08-27.basil" });
         logStep("Fetching Stripe subscriptions");
 
-        // Get active subscriptions
+        // Get active subscriptions - filter to only our app's price IDs
+        const appPriceIds = Object.keys(priceToTier);
+        
         const activeSubscriptions = await stripe.subscriptions.list({
           status: "active",
           limit: 100,
           expand: ['data.items.data.price'],
         });
 
-        stripeStats.active_subscriptions = activeSubscriptions.data.length;
+        // Filter to only our app's subscriptions
+        const appActiveSubscriptions = activeSubscriptions.data.filter((sub: any) => {
+          const priceId = sub.items.data[0]?.price?.id;
+          return appPriceIds.includes(priceId);
+        });
 
-        // Count by tier and calculate MRR
-        activeSubscriptions.data.forEach((sub: any) => {
+        stripeStats.active_subscriptions = appActiveSubscriptions.length;
+
+        // Count by tier and calculate MRR (only for app subscriptions)
+        appActiveSubscriptions.forEach((sub: any) => {
           const priceId = sub.items.data[0]?.price?.id;
           const tier = priceToTier[priceId] || 'unknown';
           if (tier in stripeStats.by_tier) {
@@ -169,12 +177,18 @@ serve(async (req) => {
           }
         });
 
-        // Get trialing subscriptions
+        // Get trialing subscriptions - filter to only our app's price IDs
         const trialingSubscriptions = await stripe.subscriptions.list({
           status: "trialing",
           limit: 100,
+          expand: ['data.items.data.price'],
         });
-        stripeStats.trialing_subscriptions = trialingSubscriptions.data.length;
+        
+        const appTrialingSubscriptions = trialingSubscriptions.data.filter((sub: any) => {
+          const priceId = sub.items.data[0]?.price?.id;
+          return appPriceIds.includes(priceId);
+        });
+        stripeStats.trialing_subscriptions = appTrialingSubscriptions.length;
 
         // Get canceled subscriptions - only count ones with our app's price IDs
         const canceledSubscriptions = await stripe.subscriptions.list({
@@ -184,7 +198,6 @@ serve(async (req) => {
         });
         
         // Filter to only our app's subscriptions (prices we recognize)
-        const appPriceIds = Object.keys(priceToTier);
         stripeStats.canceled_subscriptions = canceledSubscriptions.data.filter((sub: any) => {
           const priceId = sub.items.data[0]?.price?.id;
           return appPriceIds.includes(priceId);
