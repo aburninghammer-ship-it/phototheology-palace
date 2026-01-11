@@ -65,6 +65,22 @@ export function useFreeTier(): FreeTierAccess {
     enabled: !!user,
   });
 
+  // Check for church membership access (critical fix!)
+  const { data: churchAccess, isLoading: churchLoading } = useQuery({
+    queryKey: ["church-access", user?.id],
+    queryFn: async () => {
+      if (!user) return null;
+
+      const { data, error } = await supabase.rpc('has_church_access', {
+        _user_id: user.id
+      }).single();
+
+      if (error) return null;
+      return data;
+    },
+    enabled: !!user,
+  });
+
   // Also check for active Patreon connection
   const { data: patreonConnection } = useQuery({
     queryKey: ["patreon-connection", user?.id],
@@ -126,11 +142,17 @@ export function useFreeTier(): FreeTierAccess {
     enabled: !!user,
   });
 
+  // Check if user has church access (grants premium)
+  const hasChurchAccess = churchAccess?.has_access || false;
+
   // Determine user's tier
   const getTier = (): FreeTierAccess["tier"] => {
     if (!user || !profile) return "free";
 
     if (profile.has_lifetime_access) return "premium";
+    
+    // Church membership grants premium access
+    if (hasChurchAccess) return "premium";
     
     // Check Patreon connection first
     if (patreonConnection?.is_active_patron) return "patron";
@@ -157,8 +179,8 @@ export function useFreeTier(): FreeTierAccess {
   };
 
   const tier = getTier();
-  const isPremium = ["premium", "essential", "trial", "student", "patron"].includes(tier);
-  const isLoading = profileLoading;
+  const isPremium = ["premium", "essential", "trial", "student", "patron"].includes(tier) || hasChurchAccess;
+  const isLoading = profileLoading || churchLoading;
   
   // Usage tracking
   const jeevesUsageToday = jeevesUsage || 0;
