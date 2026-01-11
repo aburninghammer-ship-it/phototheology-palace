@@ -74,10 +74,6 @@ const JOHN_3_FALLBACK: Chapter = {
 };
 
 export const fetchChapter = async (book: string, chapter: number, translation: Translation = "kjv"): Promise<Chapter> => {
-  // Use fallback for John 3
-  if (book === "John" && chapter === 3 && translation === "kjv") {
-    return Promise.resolve(JOHN_3_FALLBACK);
-  }
   
   // Check offline cache first
   const cached = getCachedChapter(book, chapter, translation);
