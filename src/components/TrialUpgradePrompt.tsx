@@ -27,9 +27,9 @@ export function TrialUpgradePrompt({ variant = 'banner', onDismiss }: TrialUpgra
       return;
     }
 
-    // Use subscription hook for reliable paid status check
-    if (subscription.hasAccess && subscription.status !== 'trial') {
-      // User has active paid access - don't show trial prompts
+    // If user has any form of paid access, don't show trial prompts
+    // This respects the Stripe fallback check in useSubscription
+    if (subscription.hasAccess) {
       setTrialInfo(null);
       setLoading(false);
       return;
