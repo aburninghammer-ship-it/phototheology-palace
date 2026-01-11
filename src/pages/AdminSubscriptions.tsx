@@ -290,13 +290,16 @@ export default function AdminSubscriptions() {
               </CardContent>
             </Card>
 
-            <Card>
+            <Card className="border-blue-500/50 bg-blue-500/5">
               <CardHeader className="pb-2">
-                <CardTitle className="text-lg">Trialing</CardTitle>
-                <CardDescription>In trial period</CardDescription>
+                <CardTitle className="text-lg flex items-center gap-2">
+                  <span className="text-blue-500">⏳</span>
+                  7-Day Trials
+                </CardTitle>
+                <CardDescription>Currently in trial period</CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="text-4xl font-bold">{stats.stripe.trialing_subscriptions}</div>
+                <div className="text-4xl font-bold text-blue-600">{stats.stripe.trialing_subscriptions}</div>
               </CardContent>
             </Card>
 
