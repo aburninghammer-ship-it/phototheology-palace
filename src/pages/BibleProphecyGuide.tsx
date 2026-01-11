@@ -47,8 +47,8 @@ export default function BibleProphecyGuide() {
   return (
     <div className="min-h-screen bg-background">
       <SEO
-        title="Bible Prophecy Study Guide | Genesis in 6 Days - $9"
-        description="Discover how Genesis 1 reveals Christ's redemptive pattern. A 6-day visual Bible study guide using the Palace method. Instant PDF download."
+        title="Genesis in 6 Days | Memorize All 50 Chapters with 24FPS Memory Palace Method"
+        description="Memorize all 50 chapters of Genesis using the 24FPS Memory Palace Method. Visual frames for every chapter. See Christ in creation through the Palace system."
       />
       <Navigation />
 
@@ -65,22 +65,23 @@ export default function BibleProphecyGuide() {
           >
             <Badge variant="outline" className="text-accent border-accent/30 px-4 py-1.5">
               <BookOpen className="w-4 h-4 mr-2" />
-              Bible Prophecy Study Guide
+              24FPS Memory Palace Method
             </Badge>
 
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight">
-              See Christ in Creation
-              <br />
               <span className="bg-gradient-to-r from-accent via-primary to-accent bg-clip-text text-transparent">
                 Genesis in 6 Days
+              </span>
+              <br />
+              <span className="text-2xl md:text-3xl lg:text-4xl text-foreground/90">
+                Memorize All 50 Chapters
               </span>
             </h1>
 
             <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-              Most Christians read Genesis 1 as history. What if it's also prophecy?
+              <strong className="text-foreground">Visual frames for every chapter</strong> using the 24FPS Memory Palace Method.
               <br />
-              <strong className="text-foreground">This guide shows you how to see both.</strong>
-            </p>
+              See Christ in creation through structured, memorable imagery.</p>
 
             <div className="pt-6 flex flex-col items-center gap-4">
               <Button
