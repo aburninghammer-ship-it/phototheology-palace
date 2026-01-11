@@ -100,9 +100,9 @@ export function TrialUrgencyMessage() {
         return;
       }
 
-      // Use subscription hook for reliable paid status check
-      if (subscription.hasAccess && subscription.status !== 'trial') {
-        // User has active paid access - don't show trial messages
+      // If user has any form of paid access, don't show trial messages
+      // This respects the Stripe fallback check in useSubscription
+      if (subscription.hasAccess) {
         setLoading(false);
         return;
       }
