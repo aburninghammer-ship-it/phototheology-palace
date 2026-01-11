@@ -160,6 +160,18 @@ export function useFreeTier(): FreeTierAccess {
 
     if (profile.has_lifetime_access) return "premium";
 
+    // CRITICAL: Check subscription_status === 'active' FIRST before checking tier values
+    // This catches all paid subscribers regardless of how tier is stored
+    if (profile.subscription_status === "active") {
+      // Map stored tier to our tier type, default to premium if tier is missing
+      const storedTier = profile.subscription_tier?.toLowerCase() as FreeTierAccess["tier"];
+      if (storedTier === "patron") return "patron";
+      if (storedTier === "student") return "student";
+      if (storedTier === "essential") return "essential";
+      // Default active subscribers to premium
+      return "premium";
+    }
+
     // Check if trial is active
     if (profile.trial_ends_at) {
       const trialEnd = new Date(profile.trial_ends_at);
@@ -172,13 +184,11 @@ export function useFreeTier(): FreeTierAccess {
       if (promoEnd > new Date()) return "premium";
     }
 
+    // Fallback tier checks (for edge cases where status isn't 'active' but tier is set)
     if (profile.subscription_tier === "patron") return "patron";
     if (profile.subscription_tier === "student") return "student";
     if (profile.subscription_tier === "premium") return "premium";
     if (profile.subscription_tier === "essential") return "essential";
-    if (profile.subscription_status === "active") {
-      return (profile.subscription_tier as FreeTierAccess["tier"]) || "premium";
-    }
 
     return "free";
   };
