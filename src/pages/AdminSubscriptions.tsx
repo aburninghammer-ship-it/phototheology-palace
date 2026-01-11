@@ -4,23 +4,60 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Loader2, RefreshCw, Send } from "lucide-react";
+import { Loader2, RefreshCw, Send, AlertTriangle, CheckCircle2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { RevenueDashboard } from "@/components/admin/RevenueDashboard";
 import { WinBackCampaign } from "@/components/admin/WinBackCampaign";
 import { SubscriptionMismatches } from "@/components/admin/SubscriptionMismatches";
+import { Badge } from "@/components/ui/badge";
 
-interface SubscriptionStats {
-  totalPaid: number;
-  totalFree: number;
-  byTier: {
+interface StripeStats {
+  active_subscriptions: number;
+  trialing_subscriptions: number;
+  canceled_subscriptions: number;
+  by_tier: {
     essential: number;
     premium: number;
     student: number;
+    unknown: number;
   };
-  totalLifetime: number;
-  totalTrial: number;
+  total_mrr_cents: number;
+  error: string | null;
+}
+
+interface PatreonStats {
+  total_connected: number;
+  active_patrons: number;
+  at_20_or_above: number;
+  below_20: number;
+}
+
+interface DatabaseStats {
+  total_users: number;
+  by_tier: Record<string, number>;
+  by_status: Record<string, number>;
+  by_payment_source: Record<string, number>;
+  lifetime_access: number;
+}
+
+interface SubscriptionStats {
+  summary: {
+    total_paying_stripe: number;
+    total_paying_patreon: number;
+    total_trialing: number;
+    total_lifetime: number;
+    total_with_access: number;
+    monthly_recurring_revenue: string;
+  };
+  stripe: StripeStats;
+  patreon: PatreonStats;
+  database: DatabaseStats;
+  recent_signups_30d: number;
+  generated_at: string;
+}
+
+interface ChurchStats {
   totalChurches: number;
   churchSeats: {
     tier1: number;
@@ -38,6 +75,7 @@ export default function AdminSubscriptions() {
   const [sendingPatreonReminder, setSendingPatreonReminder] = useState(false);
   const [isAdmin, setIsAdmin] = useState<boolean | null>(null);
   const [stats, setStats] = useState<SubscriptionStats | null>(null);
+  const [churchStats, setChurchStats] = useState<ChurchStats | null>(null);
 
   const handleSyncStripeSubscriptions = async () => {
     setSyncing(true);
@@ -89,7 +127,6 @@ export default function AdminSubscriptions() {
   };
 
   useEffect(() => {
-    // Wait for auth to finish loading before making any decisions
     if (authLoading) {
       console.log("[AdminSubscriptions] Auth still loading...");
       return;
@@ -113,7 +150,6 @@ export default function AdminSubscriptions() {
     console.log("[AdminSubscriptions] Checking admin for user:", user.id);
 
     try {
-      // Check if user is admin using the has_role function for security
       const { data: roleData, error: roleError } = await supabase
         .from("user_roles")
         .select("role")
@@ -147,49 +183,24 @@ export default function AdminSubscriptions() {
 
   const loadStats = async () => {
     try {
-      // Get user subscriptions from user_subscriptions table
-      const { data: userSubs, error: subsError } = await supabase
-        .from("user_subscriptions")
-        .select("subscription_status, subscription_tier, has_lifetime_access");
+      // Use the new edge function that queries Stripe directly
+      const { data: statsData, error: statsError } = await supabase.functions.invoke('get-subscriber-stats');
+      
+      if (statsError) {
+        console.error("[AdminSubscriptions] Stats error:", statsError);
+        throw statsError;
+      }
 
-      console.log("[AdminSubscriptions] userSubs query result:", { 
-        count: userSubs?.length, 
-        error: subsError,
-        activeCount: userSubs?.filter(s => s.subscription_status === 'active').length,
-        trialCount: userSubs?.filter(s => s.subscription_status === 'trial').length,
-        sample: userSubs?.slice(0, 3)
-      });
+      if (statsData?.stats) {
+        console.log("[AdminSubscriptions] Got stats from edge function:", statsData.stats);
+        setStats(statsData.stats);
+      }
 
-      // Get church subscriptions
+      // Get church subscriptions separately
       const { data: churches } = await supabase
         .from("churches")
         .select("tier, max_seats, subscription_status")
         .eq("subscription_status", "active");
-
-      let totalPaid = 0;
-      let totalFree = 0;
-      let totalLifetime = 0;
-      let totalTrial = 0;
-      const tierCounts = { essential: 0, premium: 0, student: 0 };
-
-      // Count from user_subscriptions table directly
-      userSubs?.forEach(sub => {
-        if (sub.subscription_status === 'active') {
-          totalPaid++;
-          if (sub.subscription_tier === 'essential') tierCounts.essential++;
-          else if (sub.subscription_tier === 'premium') tierCounts.premium++;
-          else if (sub.subscription_tier === 'student') tierCounts.student++;
-        } else if (sub.subscription_status === 'trial') {
-          totalTrial++;
-        } else if (!sub.subscription_status || sub.subscription_status === 'free' || sub.subscription_tier === 'free' || !sub.subscription_tier) {
-          totalFree++;
-        }
-      });
-
-      // Count lifetime access from user_subscriptions
-      totalLifetime = userSubs?.filter(sub => sub.has_lifetime_access === true).length || 0;
-
-      console.log("[AdminSubscriptions] Counted stats:", { totalPaid, totalTrial, totalLifetime, tierCounts });
 
       const churchSeats = {
         tier1: churches?.filter(c => c.tier === 'tier1').reduce((sum, c) => sum + c.max_seats, 0) || 0,
@@ -197,17 +208,18 @@ export default function AdminSubscriptions() {
         tier3: churches?.filter(c => c.tier === 'tier3').reduce((sum, c) => sum + c.max_seats, 0) || 0,
       };
 
-      setStats({
-        totalPaid,
-        totalFree,
-        byTier: tierCounts,
-        totalLifetime,
-        totalTrial,
+      setChurchStats({
         totalChurches: churches?.length || 0,
         churchSeats,
       });
+
     } catch (error) {
       console.error("Error loading stats:", error);
+      toast({
+        title: "Error Loading Stats",
+        description: "Failed to load subscription analytics",
+        variant: "destructive",
+      });
     } finally {
       setLoading(false);
     }
@@ -223,12 +235,16 @@ export default function AdminSubscriptions() {
 
   if (!stats) return null;
 
+  const dbVsStripeMatch = stats.database.by_payment_source.stripe === stats.stripe.active_subscriptions;
+
   return (
     <div className="container mx-auto p-6 max-w-6xl">
       <div className="mb-6 flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold">Subscription Analytics</h1>
-          <p className="text-muted-foreground">Overview of paid users and church subscriptions</p>
+          <p className="text-muted-foreground">
+            Live data from Stripe • Last updated: {new Date(stats.generated_at).toLocaleTimeString()}
+          </p>
         </div>
         <Button 
           onClick={handleSyncStripeSubscriptions} 
@@ -259,70 +275,129 @@ export default function AdminSubscriptions() {
         </TabsList>
 
         <TabsContent value="overview" className="space-y-6">
-          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-            <Card>
-              <CardHeader>
-                <CardTitle>Total Paid Users</CardTitle>
-                <CardDescription>Active paying subscribers</CardDescription>
+          {/* Summary Cards - REAL STRIPE DATA */}
+          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-5">
+            <Card className="border-green-500/50 bg-green-500/5">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-lg flex items-center gap-2">
+                  <CheckCircle2 className="h-5 w-5 text-green-500" />
+                  Stripe Active
+                </CardTitle>
+                <CardDescription>Paying subscribers (live)</CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="text-4xl font-bold">{stats.totalPaid}</div>
+                <div className="text-4xl font-bold text-green-600">{stats.stripe.active_subscriptions}</div>
               </CardContent>
             </Card>
 
             <Card>
-              <CardHeader>
-                <CardTitle>Free Tier</CardTitle>
-                <CardDescription>Users on free plan</CardDescription>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-lg">Trialing</CardTitle>
+                <CardDescription>In trial period</CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="text-4xl font-bold">{stats.totalFree}</div>
+                <div className="text-4xl font-bold">{stats.stripe.trialing_subscriptions}</div>
               </CardContent>
             </Card>
 
             <Card>
-              <CardHeader>
-                <CardTitle>Trial Users</CardTitle>
-                <CardDescription>Currently in trial period</CardDescription>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-lg">Patreon Active</CardTitle>
+                <CardDescription>Connected patrons</CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="text-4xl font-bold">{stats.totalTrial}</div>
+                <div className="text-4xl font-bold">{stats.patreon.active_patrons}</div>
               </CardContent>
             </Card>
 
             <Card>
-              <CardHeader>
-                <CardTitle>Lifetime Access</CardTitle>
-                <CardDescription>Users with lifetime premium</CardDescription>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-lg">Lifetime</CardTitle>
+                <CardDescription>Permanent access</CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="text-4xl font-bold">{stats.totalLifetime}</div>
+                <div className="text-4xl font-bold">{stats.database.lifetime_access}</div>
+              </CardContent>
+            </Card>
+
+            <Card className="border-primary/50 bg-primary/5">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-lg">MRR</CardTitle>
+                <CardDescription>Monthly recurring</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="text-3xl font-bold text-primary">{stats.summary.monthly_recurring_revenue}</div>
               </CardContent>
             </Card>
           </div>
 
+          {/* Data Sync Status */}
+          <Card className={dbVsStripeMatch ? "border-green-500/30" : "border-yellow-500/50 bg-yellow-500/5"}>
+            <CardHeader className="pb-2">
+              <CardTitle className="text-lg flex items-center gap-2">
+                {dbVsStripeMatch ? (
+                  <CheckCircle2 className="h-5 w-5 text-green-500" />
+                ) : (
+                  <AlertTriangle className="h-5 w-5 text-yellow-500" />
+                )}
+                Database Sync Status
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="flex items-center gap-4">
+                <div>
+                  <span className="text-muted-foreground">Stripe shows:</span>{" "}
+                  <Badge variant="outline" className="text-lg">{stats.stripe.active_subscriptions}</Badge>
+                </div>
+                <div>
+                  <span className="text-muted-foreground">Database shows:</span>{" "}
+                  <Badge variant="outline" className="text-lg">{stats.database.by_payment_source.stripe || 0}</Badge>
+                </div>
+                {!dbVsStripeMatch && (
+                  <Badge variant="destructive">
+                    {stats.stripe.active_subscriptions - (stats.database.by_payment_source.stripe || 0)} users need sync
+                  </Badge>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+
           <div className="grid gap-6 md:grid-cols-2">
+            {/* Stripe Breakdown */}
             <Card>
               <CardHeader>
-                <CardTitle>Individual Subscriptions by Tier</CardTitle>
-                <CardDescription>Breakdown of subscription tiers</CardDescription>
+                <CardTitle>Stripe Subscriptions by Tier</CardTitle>
+                <CardDescription>Live data from Stripe API</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="flex justify-between items-center">
                   <span className="text-muted-foreground">Essential</span>
-                  <span className="text-2xl font-bold">{stats.byTier.essential}</span>
+                  <span className="text-2xl font-bold">{stats.stripe.by_tier.essential}</span>
                 </div>
                 <div className="flex justify-between items-center">
                   <span className="text-muted-foreground">Premium</span>
-                  <span className="text-2xl font-bold">{stats.byTier.premium}</span>
+                  <span className="text-2xl font-bold">{stats.stripe.by_tier.premium}</span>
                 </div>
                 <div className="flex justify-between items-center">
                   <span className="text-muted-foreground">Student</span>
-                  <span className="text-2xl font-bold">{stats.byTier.student}</span>
+                  <span className="text-2xl font-bold">{stats.stripe.by_tier.student}</span>
+                </div>
+                {stats.stripe.by_tier.unknown > 0 && (
+                  <div className="flex justify-between items-center text-yellow-600">
+                    <span>Unknown/Legacy</span>
+                    <span className="text-2xl font-bold">{stats.stripe.by_tier.unknown}</span>
+                  </div>
+                )}
+                <div className="border-t pt-4">
+                  <div className="flex justify-between items-center text-red-600">
+                    <span>Canceled (all time)</span>
+                    <span className="text-xl font-medium">{stats.stripe.canceled_subscriptions}</span>
+                  </div>
                 </div>
               </CardContent>
             </Card>
 
+            {/* Church Subscriptions */}
             <Card>
               <CardHeader>
                 <CardTitle>Church Subscriptions</CardTitle>
@@ -331,25 +406,53 @@ export default function AdminSubscriptions() {
               <CardContent className="space-y-4">
                 <div className="flex justify-between items-center">
                   <span className="text-muted-foreground">Total Churches</span>
-                  <span className="text-2xl font-bold">{stats.totalChurches}</span>
+                  <span className="text-2xl font-bold">{churchStats?.totalChurches || 0}</span>
                 </div>
                 <div className="border-t pt-4 space-y-2">
                   <div className="flex justify-between text-sm">
                     <span className="text-muted-foreground">Tier 1 Seats (30)</span>
-                    <span className="font-medium">{stats.churchSeats.tier1}</span>
+                    <span className="font-medium">{churchStats?.churchSeats.tier1 || 0}</span>
                   </div>
                   <div className="flex justify-between text-sm">
                     <span className="text-muted-foreground">Tier 2 Seats (100)</span>
-                    <span className="font-medium">{stats.churchSeats.tier2}</span>
+                    <span className="font-medium">{churchStats?.churchSeats.tier2 || 0}</span>
                   </div>
                   <div className="flex justify-between text-sm">
                     <span className="text-muted-foreground">Tier 3 Seats (Unlimited)</span>
-                    <span className="font-medium">{stats.churchSeats.tier3}</span>
+                    <span className="font-medium">{churchStats?.churchSeats.tier3 || 0}</span>
                   </div>
                 </div>
               </CardContent>
             </Card>
           </div>
+
+          {/* Database Stats (for reference) */}
+          <Card className="opacity-75">
+            <CardHeader>
+              <CardTitle className="text-lg">Database Reference (profiles table)</CardTitle>
+              <CardDescription>This shows what's stored in your database - may differ from Stripe reality</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+                <div>
+                  <div className="text-muted-foreground">Total Users</div>
+                  <div className="font-medium">{stats.database.total_users}</div>
+                </div>
+                <div>
+                  <div className="text-muted-foreground">Active in DB</div>
+                  <div className="font-medium">{stats.database.by_status.active || 0}</div>
+                </div>
+                <div>
+                  <div className="text-muted-foreground">Trial in DB</div>
+                  <div className="font-medium">{stats.database.by_status.trial || 0}</div>
+                </div>
+                <div>
+                  <div className="text-muted-foreground">30-Day Signups</div>
+                  <div className="font-medium">{stats.recent_signups_30d}</div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
         </TabsContent>
 
         <TabsContent value="mismatches">
@@ -373,6 +476,24 @@ export default function AdminSubscriptions() {
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                <div className="p-4 bg-muted rounded-lg">
+                  <div className="text-2xl font-bold">{stats.patreon.total_connected}</div>
+                  <div className="text-sm text-muted-foreground">Connected</div>
+                </div>
+                <div className="p-4 bg-muted rounded-lg">
+                  <div className="text-2xl font-bold">{stats.patreon.active_patrons}</div>
+                  <div className="text-sm text-muted-foreground">Active Patrons</div>
+                </div>
+                <div className="p-4 bg-muted rounded-lg">
+                  <div className="text-2xl font-bold">{stats.patreon.at_20_or_above}</div>
+                  <div className="text-sm text-muted-foreground">$20+ Tier</div>
+                </div>
+                <div className="p-4 bg-muted rounded-lg">
+                  <div className="text-2xl font-bold">{stats.patreon.below_20}</div>
+                  <div className="text-sm text-muted-foreground">Below $20</div>
+                </div>
+              </div>
               <p className="text-sm text-muted-foreground">
                 This will fetch all active patrons from your Patreon campaign and send reminder emails 
                 to those who haven't connected their Patreon account to Phototheology.

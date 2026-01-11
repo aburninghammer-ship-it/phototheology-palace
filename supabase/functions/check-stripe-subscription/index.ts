@@ -140,9 +140,25 @@ serve(async (req) => {
       .upsert(updateData, { onConflict: 'user_id' });
 
     if (upsertError) {
-      logStep("Warning: Failed to sync subscription to database", { error: upsertError });
+      logStep("Warning: Failed to sync subscription to user_subscriptions", { error: upsertError });
     } else {
-      logStep("Subscription synced to database", { userId: user.id, tier });
+      logStep("Subscription synced to user_subscriptions", { userId: user.id, tier });
+    }
+
+    // ALSO sync to profiles table for accurate analytics
+    const { error: profileError } = await supabaseClient
+      .from('profiles')
+      .update({
+        subscription_status: subscription.status === 'trialing' ? 'trial' : 'active',
+        subscription_tier: tier,
+        payment_source: 'stripe',
+      })
+      .eq('id', user.id);
+
+    if (profileError) {
+      logStep("Warning: Failed to sync subscription to profiles", { error: profileError });
+    } else {
+      logStep("Subscription synced to profiles", { userId: user.id, tier });
     }
 
     return new Response(JSON.stringify({
