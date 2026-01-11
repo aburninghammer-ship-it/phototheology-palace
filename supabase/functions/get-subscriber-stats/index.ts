@@ -71,41 +71,54 @@ serve(async (req) => {
 
     logStep("Admin verified, fetching stats");
 
-    // Get database stats from profiles
-    const { data: profiles, error: profilesError } = await supabase
-      .from("profiles")
-      .select("subscription_tier, subscription_status, payment_source, created_at, has_lifetime_access");
+    // Get database stats from user_subscriptions (the authoritative source)
+    const { data: subscriptions, error: subscriptionsError } = await supabase
+      .from("user_subscriptions")
+      .select("subscription_tier, subscription_status, payment_source, created_at, has_lifetime_access, is_recurring, stripe_subscription_id");
 
-    if (profilesError) {
-      throw profilesError;
+    if (subscriptionsError) {
+      throw subscriptionsError;
     }
+
+    // Also get profile count for total users
+    const { count: profileCount } = await supabase
+      .from("profiles")
+      .select("id", { count: 'exact', head: true });
 
     // Calculate database statistics
     const dbStats = {
-      total_users: profiles.length,
+      total_users: profileCount || 0,
       by_tier: { free: 0, essential: 0, premium: 0, student: 0, patron: 0, null: 0 },
       by_status: { none: 0, trial: 0, active: 0, cancelled: 0, expired: 0, null: 0 },
       by_payment_source: { stripe: 0, patreon: 0, manual: 0, promotional: 0, lifetime: 0, null: 0 },
       lifetime_access: 0,
     };
 
-    profiles.forEach((profile: any) => {
-      const tier = profile.subscription_tier || "null";
+    subscriptions.forEach((sub: any) => {
+      const tier = sub.subscription_tier || "null";
       if (tier in dbStats.by_tier) {
         dbStats.by_tier[tier as keyof typeof dbStats.by_tier]++;
       }
 
-      const status = profile.subscription_status || "null";
+      const status = sub.subscription_status || "null";
       if (status in dbStats.by_status) {
         dbStats.by_status[status as keyof typeof dbStats.by_status]++;
       }
 
-      const source = profile.payment_source || "null";
-      if (source in dbStats.by_payment_source) {
-        dbStats.by_payment_source[source as keyof typeof dbStats.by_payment_source]++;
+      // Count as stripe only if it has a stripe subscription ID and payment_source is stripe
+      if (sub.payment_source === 'stripe' && sub.stripe_subscription_id && sub.is_recurring) {
+        dbStats.by_payment_source.stripe++;
+      } else if (sub.payment_source === 'patreon') {
+        dbStats.by_payment_source.patreon++;
+      } else if (sub.payment_source === 'manual') {
+        dbStats.by_payment_source.manual++;
+      } else if (sub.payment_source === 'promotional') {
+        dbStats.by_payment_source.promotional++;
+      } else if (sub.payment_source === 'lifetime' || sub.has_lifetime_access) {
+        dbStats.by_payment_source.lifetime++;
       }
 
-      if (profile.has_lifetime_access) {
+      if (sub.has_lifetime_access) {
         dbStats.lifetime_access++;
       }
     });
@@ -123,10 +136,10 @@ serve(async (req) => {
       below_20: patreonConnections?.filter((p: any) => p.entitled_cents < 2000 && p.entitled_cents > 0).length || 0,
     };
 
-    // Recent signups
+    // Recent signups from subscriptions
     const thirtyDaysAgo = new Date();
     thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
-    const recentSignups = profiles.filter((p: any) => new Date(p.created_at) > thirtyDaysAgo).length;
+    const recentSignups = subscriptions.filter((s: any) => new Date(s.created_at) > thirtyDaysAgo).length;
 
     // NOW GET REAL STRIPE DATA
     let stripeStats = {
