@@ -109,7 +109,7 @@ export default function Pricing() {
     }
   };
 
-  // SIMPLIFIED: 2 plans only - Free Trial + Premium
+  // 3 plans: Free Trial, Essential, Premium
   const plans = [
     {
       id: "trial",
@@ -132,6 +132,31 @@ export default function Pricing() {
         "All games, courses & tools",
         "Credit card required to start",
         "Cancel anytime",
+      ],
+    },
+    {
+      id: "essential",
+      name: "Essential",
+      icon: Zap,
+      iconColor: "text-blue-600",
+      monthlyPrice: "$9",
+      annualPrice: "$90",
+      monthlySavings: null,
+      annualSavings: "Save $18/year",
+      period: "per month",
+      description: "Core Bible study tools",
+      badge: "Great Value",
+      badgeVariant: "secondary" as const,
+      ctaText: "Get Essential",
+      ctaVariant: "outline" as const,
+      monthlyUrl: "https://buy.stripe.com/9AQ5kD1zJ2f41YI9YE6EU01",
+      annualUrl: "https://buy.stripe.com/bIY14n7Y73jaaqe9YE6EU02",
+      features: [
+        "All 8 Palace Floors + 40+ Rooms",
+        "Bible Reader with Strong's",
+        "Core games & memory tools",
+        "Basic AI conversations",
+        "Email support",
       ],
     },
     {
@@ -288,7 +313,7 @@ export default function Pricing() {
         </Card>
 
         {/* Pricing Cards */}
-        <div className="grid md:grid-cols-2 gap-8 max-w-3xl mx-auto">
+        <div className="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto">
           {plans.map((plan) => (
             <Card
               key={plan.id}
@@ -387,7 +412,7 @@ export default function Pricing() {
             </div>
           </div>
           
-          <Card className="glass-card max-w-3xl mx-auto">
+          <Card className="glass-card max-w-4xl mx-auto">
             <CardContent className="p-0">
               <div className="overflow-x-auto">
                 <table className="w-full">
@@ -395,6 +420,7 @@ export default function Pricing() {
                     <tr className="border-b">
                       <th className="text-left p-4 font-semibold">Feature</th>
                       <th className="text-center p-4 font-semibold">Free Trial</th>
+                      <th className="text-center p-4 font-semibold">Essential</th>
                       <th className="text-center p-4 font-semibold bg-primary/5">Premium</th>
                     </tr>
                   </thead>
@@ -402,51 +428,49 @@ export default function Pricing() {
                     <tr className="border-b">
                       <td className="p-4">The Palace (8 Floors, 40+ Rooms)</td>
                       <td className="text-center p-4"><Check className="h-5 w-5 text-primary mx-auto" /></td>
-                      <td className="text-center p-4 bg-primary/5"><Check className="h-5 w-5 text-primary mx-auto" /></td>
-                    </tr>
-                    <tr className="border-b">
-                      <td className="p-4">Bible Reader with Strong's & Chain References</td>
                       <td className="text-center p-4"><Check className="h-5 w-5 text-primary mx-auto" /></td>
                       <td className="text-center p-4 bg-primary/5"><Check className="h-5 w-5 text-primary mx-auto" /></td>
                     </tr>
                     <tr className="border-b">
-                      <td className="p-4">Core Games (Chain Chess, Verse Match, etc.)</td>
+                      <td className="p-4">Bible Reader with Strong's</td>
+                      <td className="text-center p-4"><Check className="h-5 w-5 text-primary mx-auto" /></td>
                       <td className="text-center p-4"><Check className="h-5 w-5 text-primary mx-auto" /></td>
                       <td className="text-center p-4 bg-primary/5"><Check className="h-5 w-5 text-primary mx-auto" /></td>
                     </tr>
                     <tr className="border-b">
-                      <td className="p-4">20+ Palace-Based Games</td>
+                      <td className="p-4">Core Games & Memory Tools</td>
+                      <td className="text-center p-4"><Check className="h-5 w-5 text-primary mx-auto" /></td>
+                      <td className="text-center p-4"><Check className="h-5 w-5 text-primary mx-auto" /></td>
+                      <td className="text-center p-4 bg-primary/5"><Check className="h-5 w-5 text-primary mx-auto" /></td>
+                    </tr>
+                    <tr className="border-b">
+                      <td className="p-4">Basic AI Conversations</td>
+                      <td className="text-center p-4"><Check className="h-5 w-5 text-primary mx-auto" /></td>
                       <td className="text-center p-4"><Check className="h-5 w-5 text-primary mx-auto" /></td>
                       <td className="text-center p-4 bg-primary/5"><Check className="h-5 w-5 text-primary mx-auto" /></td>
                     </tr>
                     <tr className="border-b bg-yellow-500/5">
-                      <td className="p-4 font-semibold">⚔️ Art of War Dojo - Complete System</td>
+                      <td className="p-4 font-semibold">⚔️ Art of War Dojo (30+ lessons)</td>
                       <td className="text-center p-4"><Check className="h-5 w-5 text-primary mx-auto" /></td>
+                      <td className="text-center p-4 text-muted-foreground">Limited</td>
                       <td className="text-center p-4 bg-primary/5"><Check className="h-5 w-5 text-primary mx-auto" /></td>
                     </tr>
                     <tr className="border-b">
                       <td className="p-4">All 4 Specialized AI GPTs</td>
                       <td className="text-center p-4"><Check className="h-5 w-5 text-primary mx-auto" /></td>
+                      <td className="text-center p-4 text-muted-foreground">Basic</td>
                       <td className="text-center p-4 bg-primary/5"><Check className="h-5 w-5 text-primary mx-auto" /></td>
                     </tr>
                     <tr className="border-b">
                       <td className="p-4">Escape Rooms & Treasure Hunts</td>
                       <td className="text-center p-4"><Check className="h-5 w-5 text-primary mx-auto" /></td>
+                      <td className="text-center p-4 text-muted-foreground">Limited</td>
                       <td className="text-center p-4 bg-primary/5"><Check className="h-5 w-5 text-primary mx-auto" /></td>
                     </tr>
                     <tr className="border-b">
-                      <td className="p-4">All Courses (Daniel, Revelation, Kids)</td>
-                      <td className="text-center p-4"><Check className="h-5 w-5 text-primary mx-auto" /></td>
-                      <td className="text-center p-4 bg-primary/5"><Check className="h-5 w-5 text-primary mx-auto" /></td>
-                    </tr>
-                    <tr className="border-b">
-                      <td className="p-4">Community & Leaderboards</td>
-                      <td className="text-center p-4"><Check className="h-5 w-5 text-primary mx-auto" /></td>
-                      <td className="text-center p-4 bg-primary/5"><Check className="h-5 w-5 text-primary mx-auto" /></td>
-                    </tr>
-                    <tr>
                       <td className="p-4">Priority Support</td>
                       <td className="text-center p-4"><Check className="h-5 w-5 text-primary mx-auto" /></td>
+                      <td className="text-center p-4 text-muted-foreground">Email</td>
                       <td className="text-center p-4 bg-primary/5"><Check className="h-5 w-5 text-primary mx-auto" /></td>
                     </tr>
                   </tbody>
