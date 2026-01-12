@@ -164,7 +164,7 @@ serve(async (req: Request) => {
 
     // Send reminder emails using Resend API directly
     const emailResults: { email: string; success: boolean; error?: string }[] = [];
-    const appUrl = "https://phototheology.com";
+    const appUrl = "https://phototheologybible.com";
 
     for (const patron of unconnectedPatrons) {
       try {
