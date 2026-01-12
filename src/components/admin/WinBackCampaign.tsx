@@ -76,18 +76,22 @@ export function WinBackCampaign() {
   const handleSendCampaign = async () => {
     setIsSending(true);
     try {
-      const { data, error } = await supabase.functions.invoke('send-engagement-email', {
-        body: { campaignType: 're-engagement' }
+      const { data, error } = await supabase.functions.invoke('send-campaign-email', {
+        body: { campaignType: 'winback', testMode: false }
       });
 
       if (error) throw error;
 
-      const results = data?.results || [];
-      const sent = results.filter((r: any) => r.success).length;
-      const failed = results.filter((r: any) => !r.success).length;
+      const sent = Number(data?.sent ?? 0);
+      const failed = Number(data?.failed ?? 0);
 
       setLastResult({ sent, failed });
-      toast.success(`Win-back campaign sent: ${sent} emails delivered`);
+
+      if (sent === 0 && data?.message) {
+        toast.message(data.message);
+      } else {
+        toast.success(`Win-back campaign sent: ${sent} emails delivered`);
+      }
     } catch (error: any) {
       console.error('Error sending campaign:', error);
       toast.error('Failed to send campaign: ' + error.message);
