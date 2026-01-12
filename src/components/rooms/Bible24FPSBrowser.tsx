@@ -237,12 +237,12 @@ export function Bible24FPSBrowser({ onClose }: Bible24FPSBrowserProps) {
                   >
                     <CardContent className="p-0">
                       {/* Image or Symbol */}
-                      <div className="relative aspect-square">
+                      <div className="relative aspect-square bg-white">
                         {imageUrl ? (
                           <img 
                             src={imageUrl}
                             alt={`${chapter.book} ${chapter.chapter}`}
-                            className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
+                            className="w-full h-full object-contain transition-transform duration-300 group-hover:scale-105"
                           />
                         ) : (
                           <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-muted/50 to-muted/30">
@@ -279,11 +279,11 @@ export function Bible24FPSBrowser({ onClose }: Bible24FPSBrowserProps) {
               {(() => {
                 const imageUrl = selectedChapter ? getChapterImage(selectedChapter) : null;
                 return imageUrl ? (
-                  <div className="w-16 h-16 rounded-lg overflow-hidden border-2 border-white/20 shadow-lg">
+                  <div className="w-16 h-16 rounded-lg overflow-hidden border-2 border-white/20 shadow-lg bg-white flex items-center justify-center">
                     <img 
                       src={imageUrl}
                       alt={`${selectedChapter?.book} ${selectedChapter?.chapter}`}
-                      className="w-full h-full object-cover"
+                      className="max-w-full max-h-full object-contain"
                     />
                   </div>
                 ) : (
@@ -308,11 +308,11 @@ export function Bible24FPSBrowser({ onClose }: Bible24FPSBrowserProps) {
             {(() => {
               const imageUrl = selectedChapter ? getChapterImage(selectedChapter) : null;
               return imageUrl && (
-                <div className="rounded-lg overflow-hidden border border-white/20 shadow-lg">
+                <div className="rounded-lg overflow-hidden border border-white/20 shadow-lg bg-white">
                   <img 
                     src={imageUrl}
                     alt={`${selectedChapter?.book} ${selectedChapter?.chapter}`}
-                    className="w-full h-48 object-cover"
+                    className="w-full h-auto max-h-64 object-contain mx-auto"
                   />
                 </div>
               );
