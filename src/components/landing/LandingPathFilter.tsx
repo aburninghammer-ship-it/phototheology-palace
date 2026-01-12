@@ -52,7 +52,13 @@ export function LandingPathFilter() {
     
     // Navigate based on auth state
     if (user) {
-      navigate(intent.authPath);
+      // Check if user has completed PT onboarding
+      const hasCompletedPTOnboarding = localStorage.getItem("pt_onboarding_complete") === "true";
+      if (!hasCompletedPTOnboarding) {
+        navigate("/pt-onboarding");
+      } else {
+        navigate(intent.authPath);
+      }
     } else {
       navigate(intent.path);
     }

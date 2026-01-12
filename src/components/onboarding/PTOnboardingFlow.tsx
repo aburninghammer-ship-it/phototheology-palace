@@ -87,6 +87,7 @@ export const PTOnboardingFlow = () => {
 
   const handleSkip = () => {
     skipOnboarding();
+    localStorage.setItem('pt_onboarding_complete', 'true');
     navigate('/dashboard');
   };
 
@@ -111,6 +112,9 @@ export const PTOnboardingFlow = () => {
 
     // Create study path
     createStudyPath(trackId);
+    
+    // Mark onboarding complete in localStorage
+    localStorage.setItem('pt_onboarding_complete', 'true');
     
     // Navigate to dashboard
     navigate('/study-path');
