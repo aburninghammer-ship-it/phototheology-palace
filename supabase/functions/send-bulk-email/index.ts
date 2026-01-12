@@ -68,12 +68,11 @@ serve(async (req) => {
       emails = [testEmail];
       logStep("Test mode - sending to", { testEmail });
     } else {
-      // Build query based on filter
-      let query = supabaseClient.from("profiles").select("id, email");
+      // Get all users with emails from auth.users using admin API
+      const { data: authUsers, error: authError } = await supabaseClient.auth.admin.listUsers();
+      if (authError) throw authError;
 
-      // Get all user emails first
-      const { data: allProfiles, error: profilesError } = await query;
-      if (profilesError) throw profilesError;
+      logStep("Auth users fetched", { count: authUsers.users?.length });
 
       // Get subscription status for each user
       const { data: subscriptions } = await supabaseClient
@@ -93,19 +92,25 @@ serve(async (req) => {
       const lifetimeUserIds = new Set(lifetimeProfiles?.map(p => p.id) || []);
 
       // Filter based on criteria
-      const filteredProfiles = allProfiles?.filter(profile => {
-        if (!profile.email) return false;
+      const filteredUsers = authUsers.users?.filter(user => {
+        if (!user.email) return false;
 
-        const sub = subscriptionMap.get(profile.id);
-        const hasLifetime = lifetimeUserIds.has(profile.id);
+        const sub = subscriptionMap.get(user.id);
+        const hasLifetime = lifetimeUserIds.has(user.id);
         const isPaid = sub?.status === 'active' || sub?.status === 'trialing' || hasLifetime;
 
         switch (filter) {
           case 'all':
             return true;
           case 'active':
-            // Active = logged in within last 30 days (we don't have this, so use all for now)
-            return true;
+            // Active = logged in within last 30 days
+            if (user.last_sign_in_at) {
+              const lastSignIn = new Date(user.last_sign_in_at);
+              const thirtyDaysAgo = new Date();
+              thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+              return lastSignIn >= thirtyDaysAgo;
+            }
+            return false;
           case 'not_paid':
             return !isPaid;
           case 'paid_only':
@@ -115,7 +120,7 @@ serve(async (req) => {
         }
       }) || [];
 
-      emails = filteredProfiles.map(p => p.email).filter(Boolean) as string[];
+      emails = filteredUsers.map(u => u.email).filter(Boolean) as string[];
       logStep("Emails filtered", { filter, count: emails.length });
     }
 
