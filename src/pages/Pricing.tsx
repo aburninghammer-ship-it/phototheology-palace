@@ -18,11 +18,12 @@ export default function Pricing() {
   const [billingPeriod, setBillingPeriod] = useState<'monthly' | 'annual'>('monthly');
   const [isStartingTrial, setIsStartingTrial] = useState(false);
 
-  // Handle trial success/cancelled from Stripe redirect
+  // Handle trial/subscription success/cancelled from Stripe redirect
   useEffect(() => {
     const trialStatus = searchParams.get('trial');
-    if (trialStatus === 'success') {
-      // Trigger sparkle celebration
+    const subscriptionStatus = searchParams.get('subscription');
+
+    const triggerCelebration = () => {
       const duration = 3000;
       const animationEnd = Date.now() + duration;
       const defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 9999 };
@@ -49,11 +50,16 @@ export default function Pricing() {
           colors: ['#9b87f5', '#7E69AB', '#FFD700', '#FFA500', '#FF6B6B'],
         });
       }, 250);
+    };
 
+    if (trialStatus === 'success') {
+      triggerCelebration();
       toast.success("🎉 Your 7-day free trial has started! Enjoy full Premium access.");
       navigate('/palace', { replace: true });
     } else if (trialStatus === 'cancelled') {
       toast.info("Trial checkout was cancelled. No worries, you can try again anytime!");
+    } else if (subscriptionStatus === 'cancelled') {
+      toast.info("Subscription checkout was cancelled. No worries, you can try again anytime!");
     }
   }, [searchParams, navigate]);
 
@@ -109,6 +115,51 @@ export default function Pricing() {
     }
   };
 
+  const [isSubscribing, setIsSubscribing] = useState(false);
+
+  const startDirectSubscription = async (plan: 'essential' | 'premium') => {
+    if (!user) {
+      navigate("/auth");
+      return;
+    }
+
+    setIsSubscribing(true);
+    try {
+      const { data: profile } = await supabase
+        .from("profiles")
+        .select("subscription_status, is_student")
+        .eq("id", user.id)
+        .single();
+
+      if (profile?.is_student) {
+        toast.success("You already have free student access!");
+        navigate("/palace");
+        return;
+      }
+
+      if (profile?.subscription_status === "active") {
+        toast.success("You already have an active subscription!");
+        navigate("/palace");
+        return;
+      }
+
+      // Call edge function to create Stripe checkout without trial
+      const { data, error } = await supabase.functions.invoke('create-subscription-checkout', {
+        body: { plan, billing: billingPeriod },
+      });
+
+      if (error) throw error;
+      if (data?.url) {
+        window.location.href = data.url;
+      }
+    } catch (error: any) {
+      console.error("Error starting subscription:", error);
+      toast.error("Failed to start subscription. Please try again.");
+    } finally {
+      setIsSubscribing(false);
+    }
+  };
+
   // 3 plans: Free Trial, Essential, Premium
   const plans = [
     {
@@ -148,7 +199,7 @@ export default function Pricing() {
       badge: "Great Value",
       badgeVariant: "secondary" as const,
       ctaText: "Get Essential",
-      ctaVariant: "outline" as const,
+      ctaVariant: "default" as const,
       monthlyUrl: "https://buy.stripe.com/9AQ5kD1zJ2f41YI9YE6EU01",
       annualUrl: "https://buy.stripe.com/bIY14n7Y73jaaqe9YE6EU02",
       features: [
@@ -174,8 +225,6 @@ export default function Pricing() {
       badgeVariant: "default" as const,
       ctaText: "Get Premium",
       ctaVariant: "default" as const,
-      monthlyUrl: "https://buy.stripe.com/aFa3cvemv7zo46Q9YE6EU08",
-      annualUrl: "https://buy.stripe.com/eVq8wPfqz06WcDm7Qw6EU0b",
       popular: true,
       features: [
         "All 8 Palace Floors + 40+ Rooms",
@@ -384,18 +433,13 @@ export default function Pricing() {
                   </Button>
                 ) : (
                   <Button
-                    asChild
+                    onClick={() => startDirectSubscription(plan.id as 'essential' | 'premium')}
                     variant={plan.ctaVariant}
                     className="w-full gradient-palace"
                     size="lg"
+                    disabled={isSubscribing}
                   >
-                    <a
-                      href={billingPeriod === 'monthly' ? plan.monthlyUrl : plan.annualUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      {plan.ctaText} {billingPeriod === 'annual' ? '(Annual)' : '(Monthly)'}
-                    </a>
+                    {isSubscribing ? "Processing..." : `${plan.ctaText} ${billingPeriod === 'annual' ? '(Annual)' : '(Monthly)'}`}
                   </Button>
                 )}
               </CardFooter>

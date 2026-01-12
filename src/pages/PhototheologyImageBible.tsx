@@ -43,6 +43,7 @@ interface FlashcardProps {
 
 function Flashcard({ chapter, isFlipped, onFlip, size = "normal" }: FlashcardProps) {
   const isLarge = size === "large";
+  const hasImage = !!chapter.imageUrl;
 
   return (
     <div
@@ -55,21 +56,45 @@ function Flashcard({ chapter, isFlipped, onFlip, size = "normal" }: FlashcardPro
         transition={{ duration: 0.6, ease: "easeInOut" }}
         style={{ transformStyle: "preserve-3d" }}
       >
-        {/* Front - Visual Icon */}
+        {/* Front - Visual (Image or Icon) */}
         <div
-          className={`absolute inset-0 backface-hidden rounded-2xl bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 p-6 flex flex-col items-center justify-center text-white shadow-2xl`}
+          className={`absolute inset-0 backface-hidden rounded-2xl overflow-hidden shadow-2xl ${
+            hasImage ? "" : "bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500"
+          }`}
           style={{ backfaceVisibility: "hidden" }}
         >
-          <div className={`${isLarge ? "text-9xl" : "text-6xl"} mb-4`}>
-            {chapter.visualIcon}
-          </div>
-          <Badge className="bg-white/20 text-white border-white/30 text-lg px-4 py-1 mb-2">
-            {chapter.book} {chapter.chapter}
-          </Badge>
-          <h3 className={`${isLarge ? "text-3xl" : "text-xl"} font-bold text-center`}>
-            {chapter.theme}
-          </h3>
-          <p className="text-white/70 text-sm mt-2">Tap to see theme</p>
+          {hasImage ? (
+            <div className="relative w-full h-full">
+              <img
+                src={chapter.imageUrl}
+                alt={`${chapter.book} ${chapter.chapter} - ${chapter.theme}`}
+                className="w-full h-full object-cover"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent" />
+              <div className="absolute bottom-0 left-0 right-0 p-6 text-white">
+                <Badge className="bg-white/20 text-white border-white/30 text-lg px-4 py-1 mb-2">
+                  {chapter.book} {chapter.chapter}
+                </Badge>
+                <h3 className={`${isLarge ? "text-3xl" : "text-xl"} font-bold`}>
+                  {chapter.theme}
+                </h3>
+                <p className="text-white/70 text-sm mt-2">Tap to see theme</p>
+              </div>
+            </div>
+          ) : (
+            <div className="w-full h-full p-6 flex flex-col items-center justify-center text-white">
+              <div className={`${isLarge ? "text-9xl" : "text-6xl"} mb-4`}>
+                {chapter.visualIcon}
+              </div>
+              <Badge className="bg-white/20 text-white border-white/30 text-lg px-4 py-1 mb-2">
+                {chapter.book} {chapter.chapter}
+              </Badge>
+              <h3 className={`${isLarge ? "text-3xl" : "text-xl"} font-bold text-center`}>
+                {chapter.theme}
+              </h3>
+              <p className="text-white/70 text-sm mt-2">Tap to see theme</p>
+            </div>
+          )}
         </div>
 
         {/* Back - Theme Summary */}

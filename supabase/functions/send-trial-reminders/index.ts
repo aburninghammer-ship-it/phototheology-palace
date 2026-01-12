@@ -1,8 +1,12 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
 import { Resend } from "https://esm.sh/resend@2.0.0";
+import Stripe from "https://esm.sh/stripe@18.5.0";
 
 const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
+const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY') || '', {
+  apiVersion: '2025-08-27.basil',
+});
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -36,26 +40,31 @@ serve(async (req) => {
     logStep("Checking for trials expiring on dates", { day7Target, day2Target, day0Target });
 
     // Get trials expiring in 7 days (Day 7 reminder - halfway through)
+    // IMPORTANT: Also check that user doesn't have an active paid subscription
+    // This prevents sending trial reminders to users who have already converted
     const { data: day7Trials } = await supabase
       .from('user_subscriptions')
-      .select('user_id, trial_ends_at')
+      .select('user_id, trial_ends_at, stripe_subscription_id')
       .eq('subscription_status', 'trial')
+      .eq('has_lifetime_access', false)
       .gte('trial_ends_at', `${day7Target}T00:00:00`)
       .lt('trial_ends_at', `${day7Target}T23:59:59`);
 
     // Get trials expiring in 2 days (Day 12 reminder - urgent)
     const { data: day2Trials } = await supabase
       .from('user_subscriptions')
-      .select('user_id, trial_ends_at')
+      .select('user_id, trial_ends_at, stripe_subscription_id')
       .eq('subscription_status', 'trial')
+      .eq('has_lifetime_access', false)
       .gte('trial_ends_at', `${day2Target}T00:00:00`)
       .lt('trial_ends_at', `${day2Target}T23:59:59`);
 
     // Get trials expiring today (Day 14 reminder - last chance)
     const { data: day0Trials } = await supabase
       .from('user_subscriptions')
-      .select('user_id, trial_ends_at')
+      .select('user_id, trial_ends_at, stripe_subscription_id')
       .eq('subscription_status', 'trial')
+      .eq('has_lifetime_access', false)
       .gte('trial_ends_at', `${day0Target}T00:00:00`)
       .lt('trial_ends_at', `${day0Target}T23:59:59`);
 
@@ -99,11 +108,40 @@ serve(async (req) => {
         continue;
       }
 
+      // CRITICAL: Verify with Stripe that this user hasn't already paid
+      // This catches cases where webhook failed to update database
+      if (trial.stripe_subscription_id) {
+        try {
+          const subscription = await stripe.subscriptions.retrieve(trial.stripe_subscription_id);
+          // If subscription is active (not trialing), skip sending reminder
+          if (subscription.status === 'active') {
+            logStep("Skipping user - Stripe shows active subscription (not trial)", {
+              email: user.email,
+              stripeStatus: subscription.status
+            });
+
+            // Also fix the database while we're at it
+            await supabase
+              .from('user_subscriptions')
+              .update({ subscription_status: 'active' })
+              .eq('user_id', trial.user_id);
+
+            continue;
+          }
+        } catch (stripeError: any) {
+          // If subscription not found, continue with email (user may have cancelled)
+          logStep("Could not verify Stripe subscription", {
+            subscriptionId: trial.stripe_subscription_id,
+            error: stripeError.message
+          });
+        }
+      }
+
       const displayName = profileMap.get(trial.user_id) || 'there';
-      const expiryDate = new Date(trial.trial_ends_at).toLocaleDateString('en-US', { 
-        weekday: 'long', 
-        month: 'long', 
-        day: 'numeric' 
+      const expiryDate = new Date(trial.trial_ends_at).toLocaleDateString('en-US', {
+        weekday: 'long',
+        month: 'long',
+        day: 'numeric'
       });
 
       let subject: string;

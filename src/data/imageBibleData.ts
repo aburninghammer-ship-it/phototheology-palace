@@ -9,6 +9,7 @@ export interface ChapterCard {
   visualIcon: string; // Emoji combination for visual memory
   keyVerse: string;
   memoryHook: string; // Brief memorable phrase
+  imageUrl?: string; // Optional AI-generated image URL (shared with 24FPS room)
 }
 
 export interface BookData {

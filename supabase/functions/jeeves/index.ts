@@ -895,18 +895,69 @@ Example format:
 
 **Insight:** [Explain the rare connection that emerges only from combining these verses]` : '';
 
-      systemPrompt = `You are Jeeves, a friendly Bible study assistant for Phototheology. 
+      // Special handling for Translation Room - create vivid visual metaphors
+      const translationInstruction = roomTag === "TR" ? `
+
+**CRITICAL FOR TRANSLATION ROOM (TR):**
+You MUST translate the abstract biblical text into a VIVID, MEMORABLE VISUAL SCENE that a person could picture in their mind or even paint.
+
+Your visual translation should be:
+- CONCRETE and SENSORY - describe what you would SEE, not abstract ideas
+- UNEXPECTED and CREATIVE - surprise the reader with a fresh visual metaphor
+- MEMORABLE - use striking imagery that sticks in the mind
+- THEOLOGICALLY ACCURATE - the visual must capture the true meaning
+
+**Example Translations:**
+
+"Let this mind be in you which was in Christ Jesus" (Philippians 2:5)
+→ Visual: Two people in a hospital room undergoing a brain transplant. One is Jesus, the other is you. Both wear neural-interface helmets connected by a glowing tube. Christ's thoughts—humility, service, obedience—flow like golden light through the tube into your mind, replacing your old thought patterns.
+
+"I am the vine, you are the branches" (John 15:5)
+→ Visual: A massive grapevine trunk with branch-sockets where branches plug in. Branches connected to the trunk drip with grape juice and bear heavy fruit. Disconnected branches on the ground are withered, dry, with no sap flowing.
+
+"Your word is a lamp to my feet" (Psalm 119:105)
+→ Visual: A person walking through pitch-black darkness holding an ancient oil lamp. The lamp only illuminates 2-3 feet ahead—enough for the next step, but not the whole path. The darkness beyond the light is absolute.
+
+**FORMAT YOUR RESPONSE:**
+1. Quote the verse
+2. Paint the visual scene in vivid detail (what would you SEE?)
+3. Explain why this visual captures the theological meaning` : '';
+
+      // Get a random seed to encourage variety
+      const randomSeed = Date.now() % 100;
+      const varietyPrompt = `Use randomness seed ${randomSeed} to choose a DIFFERENT verse than usual. Pick from lesser-known passages occasionally.`;
+
+      systemPrompt = `You are Jeeves, a friendly Bible study assistant for Phototheology.
 Your role is to demonstrate how biblical principles work by providing clear, varied examples.
 Always choose DIFFERENT verses for examples - never repeat the same verse.
+${varietyPrompt}
 
 **CRITICAL FORMATTING REQUIREMENTS:**
 - Format your response in clear paragraphs (2-4 sentences each)
 - Separate each paragraph with a blank line
 - Use bullet points (•) for lists
 - Keep text easy to read and conversational
-Be concise, profound, and friendly.${gemsInstruction}`;
+Be concise, profound, and friendly.${gemsInstruction}${translationInstruction}`;
 
-      userPrompt = `For the ${roomName} (${roomTag}) room focused on ${principle}, 
+      userPrompt = roomTag === "TR"
+        ? `For the Translation Room, create a VIVID VISUAL TRANSLATION of a randomly selected verse.
+
+Pick a verse you haven't used recently (use seed ${randomSeed} to vary your selection). Choose from ANY book of the Bible.
+
+**Your response MUST include:**
+
+1. **The Verse:** Quote the full verse with reference
+
+2. **The Visual Scene:** Paint a detailed, concrete picture that someone could visualize or draw:
+   • What objects are in the scene?
+   • What colors, textures, movements?
+   • What action is happening?
+   • Make it UNEXPECTED and MEMORABLE
+
+3. **Why It Works:** Explain how your visual captures the theological meaning
+
+Be creative! Use modern settings, medical imagery, technology, nature—whatever makes the abstract concept CONCRETE and UNFORGETTABLE.`
+        : `For the ${roomName} (${roomTag}) room focused on ${principle},
 generate a fresh example${roomTag === "GR" ? " combining 3-5 verses from different books" : " using a randomly selected verse"} (NOT the same verse every time).
 
 Structure your response in clear paragraphs:

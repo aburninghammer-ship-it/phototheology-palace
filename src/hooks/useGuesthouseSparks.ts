@@ -58,6 +58,9 @@ export function useGuesthouseSparks({ eventId, guestId, guestName }: UseGuesthou
     setLastTriggerTime(now);
 
     try {
+      // Pass recent titles for deduplication
+      const recentTitles = sparks.slice(0, 5).map(s => s.title);
+
       const { data, error } = await supabase.functions.invoke('generate-spark', {
         body: {
           mode: 'generate',
@@ -71,7 +74,8 @@ export function useGuesthouseSparks({ eventId, guestId, guestName }: UseGuesthou
             response: context.response
           },
           triggerType: 'output',
-          outputTitle: `Guesthouse: ${context.promptType || 'Game'}`
+          outputTitle: `Guesthouse: ${context.promptType || 'Game'}`,
+          recentTitles
         }
       });
 

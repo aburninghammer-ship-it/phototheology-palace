@@ -58,7 +58,8 @@ async function generateSpark(
   apiKey: string,
   triggerType?: 'dwell' | 'output',
   outputTitle?: string,
-  userName?: string
+  userName?: string,
+  recentTitles?: string[]
 ): Promise<{
   spark_type: 'connection' | 'pattern' | 'application';
   title: string;
@@ -86,8 +87,13 @@ async function generateSpark(
     : '';
 
   // Personal greeting with user's name
-  const personalGreeting = userName 
+  const personalGreeting = userName
     ? `Address the user warmly by name as "Hey ${userName}" or similar in the recognition line.`
+    : '';
+
+  // Deduplication instruction based on recent sparks
+  const deduplicationInstruction = recentTitles && recentTitles.length > 0
+    ? `\n⚠️ AVOID REPETITION - The user has recently seen these spark titles:\n${recentTitles.map(t => `- "${t}"`).join('\n')}\nGenerate something FRESH and DIFFERENT. Do NOT repeat similar themes, angles, or connections.`
     : '';
 
   const systemPrompt = `You are Jeeves, a Phototheology discovery engine. Your task is to generate ONE high-quality "Discovery Spark" based on the user's study content.
@@ -104,6 +110,7 @@ A Discovery Spark surfaces hidden connections, patterns, or applications that th
 ${modeInstructions[mode]}
 ${outputContext}
 ${personalGreeting}
+${deduplicationInstruction}
 
 RULES:
 - Generate exactly ONE spark
@@ -329,7 +336,8 @@ serve(async (req) => {
       LOVABLE_API_KEY,
       triggerType,
       outputTitle,
-      userName
+      userName,
+      body.recentTitles
     );
 
     if (!generatedSpark) {

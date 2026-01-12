@@ -360,7 +360,7 @@ export const ptRooms: Record<RoomCode, PTRoom> = {
     ],
     examples: [
       "Ex 12 (Passover at twilight) + Jn 19:14 → Jesus died at exact moment Passover lambs were slain",
-      "David picked 5 stones because Goliath had 4 brothers (2 Sam 21:22)",
+      "Rahab's scarlet cord (Josh 2:18) + Passover blood on doorposts (Ex 12:13) → red marks of salvation",
       "Jesus fed 5,000 with 12 baskets left (for Israel) and 4,000 with 7 baskets (for nations)"
     ],
     pitfalls: [

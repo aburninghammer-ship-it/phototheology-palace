@@ -311,7 +311,7 @@ export const gemsLibrary: Gem[] = [
     category: "typology",
     oldTestament: { book: "1 Samuel", chapter: 17, verses: "1-51" },
     newTestament: { book: "Colossians", chapter: 2, verses: "15", text: "Having disarmed principalities and powers, He made a public spectacle of them" },
-    insight: "David (beloved) faced the giant with 5 smooth stones (Goliath had 4 brothers—2 Sam 21:22). Used the enemy's own weapon (sword) to finish him—Christ used death to defeat death. Goliath's head severed = serpent's head crushed (Gen 3:15). Israel (unable to fight) won through their champion.",
+    insight: "David (beloved) faced the giant with 5 smooth stones from the brook. Used the enemy's own weapon (sword) to finish him—Christ used death to defeat death. Goliath's head severed = serpent's head crushed (Gen 3:15). Israel (unable to fight) won through their champion who fought on their behalf.",
     depth: "intermediate",
     tags: ["david", "goliath", "champion", "victory", "giant", "faith"]
   },

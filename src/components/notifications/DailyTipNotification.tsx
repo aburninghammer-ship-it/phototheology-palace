@@ -41,7 +41,7 @@ const DAILY_TIPS: DailyTip[] = [
   { type: "verse", title: "Daily Bread", message: '"For God so loved the world..." — John 3:16. The gospel in one verse.', action: "Explore", link: "/bible/John/3", icon: <BookOpen className="h-5 w-5" /> },
 
   // Did you know
-  { type: "didYouKnow", title: "Did You Know?", message: "David picked 5 stones because Goliath had 4 brothers! (2 Sam 21:22)", action: "Learn More", link: "/encyclopedia", icon: <Lightbulb className="h-5 w-5" /> },
+  { type: "didYouKnow", title: "Did You Know?", message: "The shortest verse in the Bible is 'Jesus wept' (John 11:35) — just two words showing Christ's deep compassion.", action: "Learn More", link: "/bible/John/11", icon: <Lightbulb className="h-5 w-5" /> },
   { type: "didYouKnow", title: "Fun Fact", message: "Jesus fed 5,000 with 12 baskets leftover — one for each tribe of Israel!", action: "Discover", link: "/encyclopedia", icon: <Lightbulb className="h-5 w-5" /> },
   { type: "didYouKnow", title: "Bible Insight", message: "The word 'fear' appears 365 times in the Bible — one for each day!", action: "Explore", link: "/encyclopedia", icon: <Lightbulb className="h-5 w-5" /> },
 
@@ -66,6 +66,7 @@ const DAILY_TIPS: DailyTip[] = [
 
 const STORAGE_KEY = "phototheology_last_daily_tip";
 const SHOWN_TODAY_KEY = "phototheology_tip_shown_today";
+const SEEN_TIPS_KEY = "phototheology_seen_tips";
 
 export const useDailyTipNotification = () => {
   const { user } = useAuth();
@@ -78,7 +79,7 @@ export const useDailyTipNotification = () => {
     // Check if we've already shown a tip today
     const today = new Date().toDateString();
     const shownDate = localStorage.getItem(SHOWN_TODAY_KEY);
-    
+
     if (shownDate === today) {
       setHasShownToday(true);
       return;
@@ -92,10 +93,32 @@ export const useDailyTipNotification = () => {
     return () => clearTimeout(timeout);
   }, [user]);
 
+  const getNextUnseenTip = () => {
+    // Get list of seen tip indices
+    const seenTipsJson = localStorage.getItem(SEEN_TIPS_KEY);
+    let seenTips: number[] = seenTipsJson ? JSON.parse(seenTipsJson) : [];
+
+    // If all tips have been seen, reset the list
+    if (seenTips.length >= DAILY_TIPS.length) {
+      seenTips = [];
+    }
+
+    // Get indices of unseen tips
+    const unseenIndices = DAILY_TIPS.map((_, i) => i).filter(i => !seenTips.includes(i));
+
+    // Pick a random unseen tip
+    const randomIndex = unseenIndices[Math.floor(Math.random() * unseenIndices.length)];
+
+    // Mark this tip as seen
+    seenTips.push(randomIndex);
+    localStorage.setItem(SEEN_TIPS_KEY, JSON.stringify(seenTips));
+
+    return DAILY_TIPS[randomIndex];
+  };
+
   const showDailyTip = () => {
-    // Get a random tip based on the day
-    const dayIndex = new Date().getDate() % DAILY_TIPS.length;
-    const tip = DAILY_TIPS[dayIndex];
+    // Get a truly random unseen tip
+    const tip = getNextUnseenTip();
 
     // Save that we showed a tip today
     localStorage.setItem(SHOWN_TODAY_KEY, new Date().toDateString());

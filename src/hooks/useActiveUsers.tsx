@@ -43,12 +43,12 @@ export const useActiveUsers = () => {
       if (!isSubscribed) return;
 
       try {
-        // Use 1 minute window for truly "live" users
-        const oneMinuteAgo = new Date(Date.now() - 60 * 1000).toISOString();
+        // Use 1 hour window to show more users active
+        const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000).toISOString();
         const { data, count, error } = await supabase
           .from("profiles")
           .select("id, username, display_name, avatar_url, last_seen, current_floor, master_title", { count: "exact" })
-          .gte("last_seen", oneMinuteAgo)
+          .gte("last_seen", oneHourAgo)
           .order("last_seen", { ascending: false });
         
         if (!error && isSubscribed && data) {

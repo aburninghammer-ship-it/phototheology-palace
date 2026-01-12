@@ -140,8 +140,17 @@ export function useSparks({
     
     lastGenerationTime.current = now;
     setGenerating(true);
-    
+
     try {
+      // Gather recent spark data for deduplication
+      const recentHashes = sparks
+        .filter(s => s.content_hash)
+        .map(s => s.content_hash as string);
+
+      const recentTitles = sparks
+        .slice(0, 10)
+        .map(s => s.title);
+
       const { data, error } = await supabase.functions.invoke('generate-spark', {
         body: {
           content,
@@ -149,7 +158,9 @@ export function useSparks({
           surface,
           contextType,
           contextId,
-          mode: preferences.mode
+          mode: preferences.mode,
+          recentHashes,
+          recentTitles
         }
       });
       

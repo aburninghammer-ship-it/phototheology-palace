@@ -18,9 +18,9 @@ import { PalaceRoom3D } from '@/components/3d/PalaceRoom3D';
 const SAMPLE_GEMS = [
   {
     id: 'gem-1',
-    title: 'Five Stones of David',
-    insight: 'David picked up FIVE stones not because he doubted, but because Goliath had FOUR brothers (2 Sam 21:22)',
-    reference: '1 Samuel 17:40',
+    title: 'Passover Lamb Timing',
+    insight: 'Jesus was crucified at the exact hour when Passover lambs were being slain throughout Jerusalem (John 19:14, Exodus 12:6)',
+    reference: 'John 19:14',
     color: '#3b82f6',
     shape: 'diamond'
   },
