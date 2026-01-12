@@ -45,7 +45,7 @@ const WIN_BACK_EMAILS = [
         </p>
         
         <div style="text-align: center; margin-top: 32px;">
-          <a href="https://phototheology.com" style="display: inline-block; background: #f5d742; color: #1a1a2e; padding: 14px 28px; text-decoration: none; font-weight: bold; border-radius: 6px;">
+          <a href="https://phototheologybible.com" style="display: inline-block; background: #f5d742; color: #1a1a2e; padding: 14px 28px; text-decoration: none; font-weight: bold; border-radius: 6px;">
             Return and Begin With the Guided Path
           </a>
         </div>
@@ -90,7 +90,7 @@ const WIN_BACK_EMAILS = [
         </p>
         
         <div style="text-align: center; margin-top: 32px;">
-          <a href="https://phototheology.com/study" style="display: inline-block; background: #f5d742; color: #1a1a2e; padding: 14px 28px; text-decoration: none; font-weight: bold; border-radius: 6px;">
+          <a href="https://phototheologybible.com/study" style="display: inline-block; background: #f5d742; color: #1a1a2e; padding: 14px 28px; text-decoration: none; font-weight: bold; border-radius: 6px;">
             Study With Intention
           </a>
         </div>
@@ -125,7 +125,7 @@ const WIN_BACK_EMAILS = [
         </p>
         
         <div style="text-align: center; margin-top: 32px;">
-          <a href="https://phototheology.com/pricing" style="display: inline-block; background: #f5d742; color: #1a1a2e; padding: 14px 28px; text-decoration: none; font-weight: bold; border-radius: 6px;">
+          <a href="https://phototheologybible.com/pricing" style="display: inline-block; background: #f5d742; color: #1a1a2e; padding: 14px 28px; text-decoration: none; font-weight: bold; border-radius: 6px;">
             Remove the Ceiling When Ready
           </a>
         </div>
@@ -169,7 +169,7 @@ const TRIAL_EMAILS = [
         </p>
         
         <div style="text-align: center; margin-top: 32px;">
-          <a href="https://phototheology.com/dashboard" style="display: inline-block; background: #f5d742; color: #1a1a2e; padding: 14px 28px; text-decoration: none; font-weight: bold; border-radius: 6px;">
+          <a href="https://phototheologybible.com/dashboard" style="display: inline-block; background: #f5d742; color: #1a1a2e; padding: 14px 28px; text-decoration: none; font-weight: bold; border-radius: 6px;">
             Begin Your Orientation
           </a>
         </div>
@@ -205,7 +205,7 @@ const TRIAL_EMAILS = [
         </p>
         
         <div style="text-align: center; margin-top: 32px;">
-          <a href="https://phototheology.com/study" style="display: inline-block; background: #f5d742; color: #1a1a2e; padding: 14px 28px; text-decoration: none; font-weight: bold; border-radius: 6px;">
+          <a href="https://phototheologybible.com/study" style="display: inline-block; background: #f5d742; color: #1a1a2e; padding: 14px 28px; text-decoration: none; font-weight: bold; border-radius: 6px;">
             Continue Your Training
           </a>
         </div>
@@ -241,7 +241,7 @@ const TRIAL_EMAILS = [
         </p>
         
         <div style="text-align: center; margin-top: 32px;">
-          <a href="https://phototheology.com/challenges" style="display: inline-block; background: #f5d742; color: #1a1a2e; padding: 14px 28px; text-decoration: none; font-weight: bold; border-radius: 6px;">
+          <a href="https://phototheologybible.com/challenges" style="display: inline-block; background: #f5d742; color: #1a1a2e; padding: 14px 28px; text-decoration: none; font-weight: bold; border-radius: 6px;">
             Try Today's Challenge
           </a>
         </div>
@@ -281,7 +281,7 @@ const TRIAL_EMAILS = [
         </p>
         
         <div style="text-align: center; margin-top: 32px;">
-          <a href="https://phototheology.com/study" style="display: inline-block; background: #f5d742; color: #1a1a2e; padding: 14px 28px; text-decoration: none; font-weight: bold; border-radius: 6px;">
+          <a href="https://phototheologybible.com/study" style="display: inline-block; background: #f5d742; color: #1a1a2e; padding: 14px 28px; text-decoration: none; font-weight: bold; border-radius: 6px;">
             Stay With the Structure
           </a>
         </div>
@@ -320,7 +320,7 @@ const TRIAL_EMAILS = [
         </p>
         
         <div style="text-align: center; margin-top: 32px;">
-          <a href="https://phototheology.com/pricing" style="display: inline-block; background: #f5d742; color: #1a1a2e; padding: 14px 28px; text-decoration: none; font-weight: bold; border-radius: 6px;">
+          <a href="https://phototheologybible.com/pricing" style="display: inline-block; background: #f5d742; color: #1a1a2e; padding: 14px 28px; text-decoration: none; font-weight: bold; border-radius: 6px;">
             View Subscription Options
           </a>
         </div>
@@ -357,7 +357,7 @@ const TRIAL_EMAILS = [
         </div>
         
         <div style="text-align: center; margin-top: 32px;">
-          <a href="https://phototheology.com/pricing" style="display: inline-block; background: #f5d742; color: #1a1a2e; padding: 14px 28px; text-decoration: none; font-weight: bold; border-radius: 6px;">
+          <a href="https://phototheologybible.com/pricing" style="display: inline-block; background: #f5d742; color: #1a1a2e; padding: 14px 28px; text-decoration: none; font-weight: bold; border-radius: 6px;">
             Extend Your Study
           </a>
         </div>
@@ -397,7 +397,7 @@ const ENGAGEMENT_EMAILS = [
         </div>
         
         <div style="text-align: center; margin-top: 32px;">
-          <a href="https://phototheology.com/study" style="display: inline-block; background: #f5d742; color: #1a1a2e; padding: 14px 28px; text-decoration: none; font-weight: bold; border-radius: 6px;">
+          <a href="https://phototheologybible.com/study" style="display: inline-block; background: #f5d742; color: #1a1a2e; padding: 14px 28px; text-decoration: none; font-weight: bold; border-radius: 6px;">
             Return to the Structure
           </a>
         </div>
@@ -433,7 +433,7 @@ const ENGAGEMENT_EMAILS = [
         </div>
         
         <div style="text-align: center; margin-top: 32px;">
-          <a href="https://phototheology.com/study" style="display: inline-block; background: #f5d742; color: #1a1a2e; padding: 14px 28px; text-decoration: none; font-weight: bold; border-radius: 6px;">
+          <a href="https://phototheologybible.com/study" style="display: inline-block; background: #f5d742; color: #1a1a2e; padding: 14px 28px; text-decoration: none; font-weight: bold; border-radius: 6px;">
             Continue Where You Are
           </a>
         </div>
@@ -469,7 +469,7 @@ const ENGAGEMENT_EMAILS = [
         </div>
         
         <div style="text-align: center; margin-top: 32px;">
-          <a href="https://phototheology.com/dashboard" style="display: inline-block; background: #f5d742; color: #1a1a2e; padding: 14px 28px; text-decoration: none; font-weight: bold; border-radius: 6px;">
+          <a href="https://phototheologybible.com/dashboard" style="display: inline-block; background: #f5d742; color: #1a1a2e; padding: 14px 28px; text-decoration: none; font-weight: bold; border-radius: 6px;">
             Slow Down and Integrate
           </a>
         </div>
@@ -513,7 +513,7 @@ const ENGAGEMENT_EMAILS = [
         </p>
         
         <div style="text-align: center; margin-top: 32px;">
-          <a href="https://phototheology.com/dashboard" style="display: inline-block; background: #f5d742; color: #1a1a2e; padding: 14px 28px; text-decoration: none; font-weight: bold; border-radius: 6px;">
+          <a href="https://phototheologybible.com/dashboard" style="display: inline-block; background: #f5d742; color: #1a1a2e; padding: 14px 28px; text-decoration: none; font-weight: bold; border-radius: 6px;">
             Prepare for Your Next Level
           </a>
         </div>

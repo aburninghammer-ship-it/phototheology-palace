@@ -71,7 +71,7 @@ const handler = async (req: Request): Promise<Response> => {
 
       case "daily-challenge":
         emailConfig = {
-          from: "Phototheology <daily@phototheology.com>",
+          from: "Phototheology <daily@phototheologybible.com>",
           to: data.email,
           subject: `🎯 Your Daily Challenge for ${data.date}`,
           html: `
@@ -90,7 +90,7 @@ const handler = async (req: Request): Promise<Response> => {
 
       case "engagement":
         emailConfig = {
-          from: "Phototheology <hello@phototheology.com>",
+          from: "Phototheology <hello@phototheologybible.com>",
           to: data.email,
           subject: data.subject || "We miss you at Phototheology!",
           html: `
@@ -110,7 +110,7 @@ const handler = async (req: Request): Promise<Response> => {
 
       case "feedback":
         emailConfig = {
-          from: "Phototheology <feedback@phototheology.com>",
+          from: "Phototheology <feedback@phototheologybible.com>",
           to: ["aburninghammer@gmail.com"],
           subject: `💬 New Feedback from ${data.userName}`,
           html: `
@@ -141,7 +141,7 @@ const handler = async (req: Request): Promise<Response> => {
         if (authError || !user) throw new Error('Unauthorized');
 
         emailConfig = {
-          from: "Phototheology <invite@phototheology.com>",
+          from: "Phototheology <invite@phototheologybible.com>",
           to: data.recipientEmail,
           subject: `${data.senderName || 'Someone'} invited you to Phototheology!`,
           html: `
@@ -164,7 +164,7 @@ const handler = async (req: Request): Promise<Response> => {
 
       case "partner-nudge":
         emailConfig = {
-          from: "Phototheology <partners@phototheology.com>",
+          from: "Phototheology <partners@phototheologybible.com>",
           to: data.email,
           subject: `👥 Your study partner ${data.partnerName} is waiting!`,
           html: `
@@ -183,7 +183,7 @@ const handler = async (req: Request): Promise<Response> => {
 
       case "purchase-notification":
         emailConfig = {
-          from: "Phototheology <billing@phototheology.com>",
+          from: "Phototheology <billing@phototheologybible.com>",
           to: ["aburninghammer@gmail.com"],
           subject: `💰 New Purchase: ${data.amount} - ${data.userName}`,
           html: `
@@ -202,7 +202,7 @@ const handler = async (req: Request): Promise<Response> => {
 
       case "renewal-reminder":
         emailConfig = {
-          from: "Phototheology <billing@phototheology.com>",
+          from: "Phototheology <billing@phototheologybible.com>",
           to: data.email,
           subject: `🔔 Your Phototheology subscription ${data.daysUntilRenewal <= 0 ? 'has renewed' : 'renews soon'}`,
           html: `
@@ -221,14 +221,14 @@ const handler = async (req: Request): Promise<Response> => {
               Manage Subscription
             </a>
             <hr>
-            <p style="color: #666; font-size: 12px;">Questions? Contact support@phototheology.com</p>
+            <p style="color: #666; font-size: 12px;">Questions? Contact support@phototheologybible.com</p>
           `,
         };
         break;
 
       case "devotional-ready":
         emailConfig = {
-          from: "Phototheology <devotionals@phototheology.com>",
+          from: "Phototheology <devotionals@phototheologybible.com>",
           to: data.email,
           subject: `🎉 Your Devotional "${data.planTitle}" is Ready!`,
           html: `
@@ -273,7 +273,7 @@ const handler = async (req: Request): Promise<Response> => {
 
       case "signup-notification":
         emailConfig = {
-          from: "Phototheology <welcome@phototheology.com>",
+          from: "Phototheology <welcome@phototheologybible.com>",
           to: data.email,
           subject: "🎉 Welcome to Phototheology!",
           html: `

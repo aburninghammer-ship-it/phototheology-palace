@@ -206,7 +206,7 @@ serve(async (req) => {
                 </p>
 
                 <div style="text-align: center; margin: 30px 0;">
-                  <a href="https://phototheology.com/pricing" style="display: inline-block; background: linear-gradient(135deg, #c9a227 0%, #a78520 100%); color: #0a0a0a; padding: 16px 40px; border-radius: 8px; text-decoration: none; font-weight: bold; font-size: 16px;">
+                  <a href="https://phototheologybible.com/pricing" style="display: inline-block; background: linear-gradient(135deg, #c9a227 0%, #a78520 100%); color: #0a0a0a; padding: 16px 40px; border-radius: 8px; text-decoration: none; font-weight: bold; font-size: 16px;">
                     Upgrade Now →
                   </a>
                 </div>
@@ -214,7 +214,7 @@ serve(async (req) => {
                 <hr style="border: none; border-top: 1px solid #333; margin: 30px 0;">
 
                 <p style="font-size: 14px; color: #666; text-align: center;">
-                  Questions? Reply to this email or visit our <a href="https://phototheology.com/support" style="color: #c9a227;">support page</a>.
+                  Questions? Reply to this email or visit our <a href="https://phototheologybible.com/support" style="color: #c9a227;">support page</a>.
                 </p>
 
               </div>
