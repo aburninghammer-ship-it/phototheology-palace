@@ -79,6 +79,7 @@ import { ThreeHeavensLibrary } from "@/components/three-heavens-room/ThreeHeaven
 import { RoomLibrary, LibraryBanner, hasLibrary } from "@/components/room/RoomLibrary";
 import { Room3DToggle } from "@/components/room/Room3DToggle";
 import { RoomGraphicsDisplay, hasRoomGraphics } from "@/components/room/RoomGraphicsDisplay";
+import { WordPictureTranslator } from "@/components/rooms/WordPictureTranslator";
 
 // Room IDs that have quick start guides
 const QUICK_START_ROOMS = new Set([
@@ -539,6 +540,11 @@ export default function RoomDetail() {
                       <StoryLibrary />
                     </RoomLibrary>
                   </Room3DToggle>
+                )}
+
+                {/* Translation Room - Word Picture Translator */}
+                {room.id === "tr" && (
+                  <WordPictureTranslator />
                 )}
 
                 {/* Imagination Room - 3D Immersive Experience */}

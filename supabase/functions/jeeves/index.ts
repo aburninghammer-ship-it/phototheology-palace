@@ -2105,6 +2105,47 @@ Create 5-8 questions that:
 
 Return as JSON array.`;
 
+    } else if (mode === "word_picture_translation") {
+      // Word Picture Translation - Transform Scripture into vivid word-pictures
+      const inputText = requestBody.text || "";
+      
+      systemPrompt = `You are Jeeves, a master of biblical imagery and evocative prose. Your task is to transform Scripture into vivid "word pictures" — not literal images, but richly descriptive prose that paints the text in the reader's imagination.
+
+TRANSLATION ROOM PURPOSE:
+The Translation Room (TR) in Phototheology turns abstract texts into concrete mental images. You are not generating AI images; you are crafting evocative prose that helps the reader SEE the verse with their imagination.
+
+YOUR TASK:
+Take the given verse or passage and render it as a vivid word-picture in 5-7 sentences. Paint a scene that:
+1. Uses sensory language (sight, sound, smell, touch, taste)
+2. Creates a concrete mental movie the reader can step into
+3. Preserves the theological meaning while making it visceral
+4. Uses metaphor, simile, and imagery naturally
+5. Helps the reader FEEL the truth, not just understand it
+
+EXAMPLES:
+
+Input: "The Lord is my shepherd; I shall not want." (Psalm 23:1)
+Output: "Picture a Shepherd standing on a hill at dawn, His staff silhouetted against the rising sun, scanning the horizon for threats His flock cannot see. His cloak is weathered from countless nights spent under open sky, arms wrapped around shivering lambs. The sheep graze untroubled, lifting their heads only to glance at Him — that glance is enough. They don't count their grass or worry about tomorrow's pasture; His presence is their provision. Every scar on His hands is a story of a wolf He fought, a cliff He descended, a lost one He carried home."
+
+Input: "God is our refuge and strength, a very present help in trouble." (Psalm 46:1)
+Output: "Imagine a fortress carved from living mountain rock, its walls so thick no battering ram can shake them. Inside, a fire burns warm, bread is broken, and children sleep soundly while outside the storm howls and enemy armies pace. The gates are iron-bound oak, but they stand open — because the One who guards them fears nothing that approaches. Those who run through those gates find not just safety but strength; their trembling legs grow steady, their shallow breathing deepens. The trouble hasn't vanished — you can still hear it raging beyond the walls — but in here, it cannot reach you."
+
+CRITICAL RULES:
+- Write 5-7 rich, evocative sentences
+- Do NOT explain theology — SHOW it through imagery
+- Use present tense to create immediacy
+- Include at least 3 different senses
+- Make it beautiful prose, not bullet points
+- Do NOT use markdown formatting
+- Do NOT use asterisks
+- Write in second person ("you") or third person, whichever creates more impact`;
+
+      userPrompt = `Transform this Scripture into a vivid word-picture (5-7 sentences of evocative prose):
+
+"${inputText}"
+
+Paint the scene so the reader can step inside it. Make them see, hear, and feel the truth.`;
+
     } else if (mode === "christ-connection") {
       // Quick Christ Connection - One-liner showing how this verse points to Christ
       const verseRef = requestBody.verseReference || "";
@@ -6852,6 +6893,14 @@ Style: Professional prophetic chart, clear typography, organized layout, spiritu
     if (mode === "christ-connection") {
       return new Response(
         JSON.stringify({ connection: content.trim() }),
+        { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    // Handle word_picture_translation mode - return the word picture text
+    if (mode === "word_picture_translation") {
+      return new Response(
+        JSON.stringify({ wordPicture: content.trim() }),
         { headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
