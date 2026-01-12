@@ -150,6 +150,7 @@ const AccessCode = lazy(() => import("./pages/AccessCode"));
 const AdminAccessCodes = lazy(() => import("./pages/AdminAccessCodes"));
 const AdminSubscriptions = lazy(() => import("./pages/AdminSubscriptions"));
 const Onboarding = lazy(() => import("./pages/Onboarding"));
+const PTOnboarding = lazy(() => import("./pages/PTOnboarding"));
 const BibleRenderedRoom = lazy(() => import("./pages/BibleRenderedRoom"));
 const Dashboard = lazy(() => import("./pages/Dashboard"));
 const Certificates = lazy(() => import("./pages/Certificates"));
@@ -375,6 +376,11 @@ function App() {
             <Route path="/onboarding" element={
               <ProtectedRoute>
                 <Onboarding />
+              </ProtectedRoute>
+            } />
+            <Route path="/pt-onboarding" element={
+              <ProtectedRoute>
+                <PTOnboarding />
               </ProtectedRoute>
             } />
             <Route path="/dashboard" element={

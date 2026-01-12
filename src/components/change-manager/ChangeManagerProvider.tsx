@@ -20,6 +20,7 @@ const EXEMPT_ROUTES = [
   '/privacy',
   '/terms',
   '/welcome',
+  '/pt-onboarding',
 ];
 
 // Routes that ARE part of the guided path (allowed even before orientation complete)
