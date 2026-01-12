@@ -3448,35 +3448,44 @@ export type Database = {
       email_logs: {
         Row: {
           campaign_id: string | null
+          campaign_type: string | null
           created_at: string | null
+          day_number: number | null
           email_address: string
           error_message: string | null
           id: string
           opened_at: string | null
           sent_at: string | null
           status: string
+          subject: string | null
           user_id: string | null
         }
         Insert: {
           campaign_id?: string | null
+          campaign_type?: string | null
           created_at?: string | null
+          day_number?: number | null
           email_address: string
           error_message?: string | null
           id?: string
           opened_at?: string | null
           sent_at?: string | null
           status: string
+          subject?: string | null
           user_id?: string | null
         }
         Update: {
           campaign_id?: string | null
+          campaign_type?: string | null
           created_at?: string | null
+          day_number?: number | null
           email_address?: string
           error_message?: string | null
           id?: string
           opened_at?: string | null
           sent_at?: string | null
           status?: string
+          subject?: string | null
           user_id?: string | null
         }
         Relationships: [
