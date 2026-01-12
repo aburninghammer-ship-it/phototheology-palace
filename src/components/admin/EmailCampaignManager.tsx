@@ -5,7 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { Mail, Users, Send, Clock, CheckCircle, AlertCircle, RefreshCw, UserMinus, UserCheck, Star } from "lucide-react";
+import { Mail, Users, Send, Clock, CheckCircle, AlertCircle, AlertTriangle, RefreshCw, UserMinus, UserCheck, Star } from "lucide-react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -27,6 +27,7 @@ export function EmailCampaignManager() {
   const [testMode, setTestMode] = useState(false);
   const [testEmail, setTestEmail] = useState("");
   const [selectedDay, setSelectedDay] = useState("0");
+  const [forceSendWinback, setForceSendWinback] = useState(false);
   const [lastResults, setLastResults] = useState<Record<CampaignType, { sent: number; failed: number } | null>>({
     winback: null,
     trial: null,
@@ -130,7 +131,8 @@ export function EmailCampaignManager() {
           campaignType,
           testMode,
           testEmail: testMode ? testEmail : undefined,
-          dayOverride: testMode ? parseInt(selectedDay) : undefined
+          dayOverride: testMode ? parseInt(selectedDay) : undefined,
+          forceSend: !testMode && campaignType === 'winback' ? forceSendWinback : undefined,
         }
       });
 
@@ -308,10 +310,30 @@ export function EmailCampaignManager() {
         {/* Email Preview */}
         {renderEmailPreview(campaignType)}
 
+        {/* Winback Force Send Toggle */}
+        {campaignType === 'winback' && !testMode && (
+          <div className="flex items-center justify-between gap-3 p-3 rounded-lg border bg-destructive/10 border-destructive/20">
+            <div className="flex items-center gap-2">
+              <AlertTriangle className="h-4 w-4 text-destructive" />
+              <div>
+                <p className="text-sm font-medium">Force send</p>
+                <p className="text-xs text-muted-foreground">Ignore 30-day cooldown</p>
+              </div>
+            </div>
+            <Switch
+              checked={forceSendWinback}
+              onCheckedChange={setForceSendWinback}
+            />
+          </div>
+        )}
+
         {/* Send Button */}
         <Button 
           onClick={() => handleSendCampaign(campaignType)} 
-          disabled={isSending !== null || (!testMode && (count || 0) === 0)}
+          disabled={
+            isSending !== null ||
+            (!testMode && (count || 0) === 0 && !(campaignType === 'winback' && forceSendWinback))
+          }
           className="w-full"
         >
           {isSending === campaignType ? (
@@ -322,7 +344,11 @@ export function EmailCampaignManager() {
           ) : (
             <>
               <Send className="mr-2 h-4 w-4" />
-              {testMode ? 'Send Test Email' : `Send to ${count || 0} Users`}
+              {testMode
+                ? 'Send Test Email'
+                : campaignType === 'winback' && forceSendWinback
+                  ? 'Force send to expired users'
+                  : `Send to ${count || 0} Users`}
             </>
           )}
         </Button>
