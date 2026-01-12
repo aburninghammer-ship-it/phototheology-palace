@@ -57,39 +57,36 @@ export function PatreonOutreach() {
   const loadStats = async () => {
     setLoading(true);
     try {
-      // Get patreon members
-      const { data: members, error } = await supabase
+      // Get aggregated counts directly to avoid the 1000 row limit
+      const { count: totalCount } = await supabase
         .from("patreon_members")
-        .select("email, patron_status, pledge_cents");
+        .select("*", { count: "exact", head: true });
 
-      if (error) throw error;
+      const { count: activeCount } = await supabase
+        .from("patreon_members")
+        .select("*", { count: "exact", head: true })
+        .eq("patron_status", "active_patron");
+
+      const { count: withEmailCount } = await supabase
+        .from("patreon_members")
+        .select("*", { count: "exact", head: true })
+        .not("email", "is", null);
+
+      const { count: freeCount } = await supabase
+        .from("patreon_members")
+        .select("*", { count: "exact", head: true })
+        .eq("patron_status", "free_member");
 
       // Get app users
       const { data: authData } = await supabase.functions.invoke('get-subscriber-stats');
       const appUserCount = authData?.stats?.database?.total_users || 0;
 
-      // Get list of app user emails via a simpler check
-      const { data: profiles } = await supabase
-        .from("profiles")
-        .select("id");
-
-      const profileIds = new Set(profiles?.map(p => p.id) || []);
-
-      // Calculate stats
-      const activePatrons = members?.filter(m => m.patron_status === 'active_patron') || [];
-      const withEmail = members?.filter(m => m.email) || [];
-      const freeMembers = members?.filter(m => m.patron_status === 'free_member') || [];
-      
-      // For not_signed_up, we need to compare emails - this is approximate
-      // The actual check happens in the edge function
-      const notSignedUpEstimate = activePatrons.length; // Will be refined when synced
-
       setStats({
-        total_members: members?.length || 0,
-        active_patrons: activePatrons.length,
-        with_email: withEmail.length,
-        free_members: freeMembers.length,
-        not_signed_up_count: notSignedUpEstimate,
+        total_members: totalCount || 0,
+        active_patrons: activeCount || 0,
+        with_email: withEmailCount || 0,
+        free_members: freeCount || 0,
+        not_signed_up_count: activeCount || 0,
       });
     } catch (error: any) {
       console.error("Failed to load stats:", error);
