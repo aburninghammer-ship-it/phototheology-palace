@@ -15,30 +15,40 @@ export function WinBackCampaign() {
   const [forceSend, setForceSend] = useState(false);
 
   // Get count of win-back eligible users
+  // Target: Users who created account, explored briefly, but NEVER subscribed
   const { data: eligibleCount, isLoading } = useQuery({
     queryKey: ['winback-eligible-count'],
     queryFn: async () => {
       const thirtyDaysAgo = new Date();
       thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+      const sevenDaysAgo = new Date();
+      sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
 
-      // Get expired/cancelled users
-      const { data: expiredUsers, error } = await supabase
-        .from('user_subscriptions')
-        .select('user_id')
-        .in('subscription_status', ['expired', 'cancelled'])
-        .eq('has_lifetime_access', false);
+      // Get users who never subscribed (from profiles, not user_subscriptions)
+      // Must have: no active subscription, created 7+ days ago, some engagement
+      const { data: neverSubscribedUsers, error } = await supabase
+        .from('profiles')
+        .select('id, onboarding_completed, first_meaningful_action_at')
+        .or('subscription_status.is.null,subscription_status.eq.none,subscription_status.eq.trial_expired,subscription_status.eq.expired,subscription_status.eq.cancelled')
+        .eq('has_lifetime_access', false)
+        .lt('created_at', sevenDaysAgo.toISOString());
 
       if (error) throw error;
 
-      // Filter out those who received email in last 30 days
+      // Filter to those with some engagement
+      const engagedUsers = neverSubscribedUsers?.filter(u => 
+        u.onboarding_completed || u.first_meaningful_action_at
+      ) || [];
+
+      // Filter out those who received winback email in last 30 days
       const { data: recentEmails } = await supabase
         .from('email_logs')
         .select('user_id')
-        .eq('status', 'sent')
+        .eq('campaign_type', 'winback')
         .gte('sent_at', thirtyDaysAgo.toISOString());
 
       const recentUserIds = new Set(recentEmails?.map(e => e.user_id) || []);
-      const eligibleUsers = expiredUsers?.filter(u => !recentUserIds.has(u.user_id)) || [];
+      const eligibleUsers = engagedUsers.filter(u => !recentUserIds.has(u.id));
 
       return eligibleUsers.length;
     }
@@ -111,7 +121,7 @@ export function WinBackCampaign() {
           Win-Back Campaign
         </CardTitle>
         <CardDescription>
-          Re-engage users with expired trials using a guided 7-day Phototheology path
+          Re-engage users who signed up, explored briefly, but never subscribed
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
@@ -122,7 +132,7 @@ export function WinBackCampaign() {
             <div>
               <p className="font-medium">Eligible Users</p>
               <p className="text-sm text-muted-foreground">
-                Users with expired/cancelled trials (not emailed in 30 days)
+                Users who explored but never subscribed (not emailed in 30 days)
               </p>
             </div>
           </div>
