@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { Navigation } from "@/components/Navigation";
 import { useSimmerSession } from "@/hooks/useSimmerSession";
@@ -6,11 +6,14 @@ import { SimmerDayPanel } from "@/components/simmer/SimmerDayPanel";
 import { SimmerHeatControls } from "@/components/simmer/SimmerHeatControls";
 import { SimmerSessionList } from "@/components/simmer/SimmerSessionList";
 import { SimmerNewSession } from "@/components/simmer/SimmerNewSession";
+import { SimmerJeevesChat } from "@/components/simmer/SimmerJeevesChat";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Flame, Plus, Archive, Settings } from "lucide-react";
+import { Flame, Plus, Archive, Settings, MessageCircle } from "lucide-react";
 import { motion } from "framer-motion";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 export default function SermonSimmer() {
   const navigate = useNavigate();
@@ -29,6 +32,7 @@ export default function SermonSimmer() {
     updateSettings,
     lockGem,
     deleteSession,
+    refetch,
   } = useSimmerSession(sessionId || undefined);
 
   const handleCreateSession = async (params: {
@@ -133,8 +137,15 @@ export default function SermonSimmer() {
             <Flame className="w-12 h-12 text-orange-400 animate-pulse" />
           </div>
         ) : session ? (
-          <Tabs defaultValue="forge" className="space-y-6">
+          <Tabs defaultValue="chat" className="space-y-6">
             <TabsList className="bg-black/30 border border-orange-500/20">
+              <TabsTrigger 
+                value="chat" 
+                className="data-[state=active]:bg-orange-500 data-[state=active]:text-white text-orange-200"
+              >
+                <MessageCircle className="w-4 h-4 mr-2" />
+                Simmer with Jeeves
+              </TabsTrigger>
               <TabsTrigger 
                 value="forge" 
                 className="data-[state=active]:bg-orange-500 data-[state=active]:text-white text-orange-200"
@@ -157,6 +168,59 @@ export default function SermonSimmer() {
                 All Sessions
               </TabsTrigger>
             </TabsList>
+
+            <TabsContent value="chat">
+              <div className="grid lg:grid-cols-2 gap-6">
+                <SimmerJeevesChat
+                  sessionId={session.id}
+                  theme={session.theme}
+                  themePassage={session.theme_passage}
+                  existingGems={session.gems as any[]}
+                  onGemDiscovered={async (gem) => {
+                    // Add discovered gem to session
+                    const currentGems = (session.gems || []) as any[];
+                    const updatedGems = [...currentGems, gem];
+                    await supabase
+                      .from("sermon_simmer_sessions")
+                      .update({ gems: updatedGems as any })
+                      .eq("id", session.id);
+                    refetch();
+                    toast.success("Gem added to your collection! 💎");
+                  }}
+                />
+                
+                {/* Right side: Quick gems display */}
+                <Card className="bg-black/30 border-orange-500/20 backdrop-blur-xl">
+                  <div className="p-6">
+                    <h3 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
+                      <span className="text-2xl">💎</span> Discovered Gems
+                    </h3>
+                    {(session.gems as any[])?.length > 0 ? (
+                      <div className="space-y-3 max-h-[500px] overflow-y-auto pr-2">
+                        {(session.gems as any[]).map((gem: any, i: number) => (
+                          <motion.div
+                            key={gem.id || i}
+                            initial={{ opacity: 0, x: 20 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            className="p-3 bg-amber-500/10 border border-amber-500/30 rounded-lg"
+                          >
+                            <p className="text-white text-sm">{gem.text}</p>
+                            {gem.verse && (
+                              <p className="text-xs text-amber-200/60 mt-1">{gem.verse}</p>
+                            )}
+                          </motion.div>
+                        ))}
+                      </div>
+                    ) : (
+                      <p className="text-orange-200/60 text-sm">
+                        Chat with Jeeves to discover gems from your sermon idea. 
+                        He'll help you uncover insights you didn't know you had.
+                      </p>
+                    )}
+                  </div>
+                </Card>
+              </div>
+            </TabsContent>
 
             <TabsContent value="forge">
               <SimmerDayPanel

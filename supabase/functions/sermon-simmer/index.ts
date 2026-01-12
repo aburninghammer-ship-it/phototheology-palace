@@ -299,13 +299,48 @@ Return JSON:
 }`
 };
 
+// Chat mode system prompt for conversational development
+const CHAT_SYSTEM_PROMPT = `You are Jeeves, the Phototheology sermon development companion within Simmer Mode.
+
+YOUR ROLE:
+- Help users develop their sermon ideas through conversation
+- Ask probing questions that uncover deeper insights
+- Extract "gems" from their responses - portable, punchy insights
+- Never preach AT them; draw OUT of them
+- Keep responses conversational but purposeful (2-4 paragraphs max)
+
+CONVERSATION STYLE:
+- Warm but intellectually rigorous
+- Ask ONE focused question at a time
+- Celebrate when they hit gold ("That's a gem right there...")
+- Gently redirect when they drift to clichés
+- Use Phototheology framework naturally, don't lecture about it
+
+WHAT TO LISTEN FOR:
+- Tension points (where expectation meets reality)
+- Personal stories that could become illustrations
+- Verses that keep recurring in their mind
+- Metaphors or images they naturally use
+- The question behind the question
+
+WHEN YOU FIND A GEM:
+- Call it out explicitly: "That phrase 'pressure precedes oil' - that's a gem. Let me save that."
+- Tie it to Scripture or PT framework when possible
+- Ask if they want to develop it further
+
+FORMAT YOUR RESPONSES AS:
+- Natural conversation (not bullet points unless organizing gems)
+- One probing question to keep them thinking
+- If gems are found, mark them clearly`;
+
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
-    const { sessionId, day, theme, themePassage, targetStyle, targetDensity, targetPurpose, existingData } = await req.json();
+    const body = await req.json();
+    const { mode, sessionId, day, theme, themePassage, targetStyle, targetDensity, targetPurpose, existingData, userMessage, conversationHistory, existingGems } = body;
 
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
     const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
@@ -317,6 +352,85 @@ serve(async (req) => {
 
     const supabase = createClient(supabaseUrl, supabaseKey);
 
+    // Handle CHAT mode - conversational development
+    if (mode === "chat") {
+      const chatMessages = [
+        { role: "system", content: CHAT_SYSTEM_PROMPT },
+        { 
+          role: "user", 
+          content: `CONTEXT: User is developing a sermon on: "${theme}"${themePassage ? ` (${themePassage})` : ""}
+${existingGems?.length > 0 ? `\nEXISTING GEMS (${existingGems.length}): ${existingGems.map((g: any) => g.text).join("; ")}` : ""}
+
+The user just said: "${userMessage}"
+
+Respond conversationally. If you discover any gems (punchy, portable insights), include them in a JSON block at the END of your response like this:
+\`\`\`gems
+[{"text": "gem text", "verse": "optional verse", "ptCodes": ["optional"]}]
+\`\`\``
+        }
+      ];
+      
+      // Add conversation history
+      if (conversationHistory?.length > 0) {
+        chatMessages.splice(1, 0, ...conversationHistory.slice(-8));
+      }
+      
+      const chatResponse = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${LOVABLE_API_KEY}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          model: "google/gemini-2.5-flash",
+          messages: chatMessages,
+          temperature: 0.7,
+        }),
+      });
+      
+      if (!chatResponse.ok) {
+        const errorText = await chatResponse.text();
+        console.error("Chat AI error:", errorText);
+        throw new Error("Failed to get chat response");
+      }
+      
+      const chatData = await chatResponse.json();
+      const chatContent = chatData.choices?.[0]?.message?.content || "";
+      
+      // Extract gems if found
+      let discoveredGems: any[] = [];
+      let responseText = chatContent;
+      
+      const gemsMatch = chatContent.match(/```gems\n?([\s\S]*?)```/);
+      if (gemsMatch) {
+        try {
+          discoveredGems = JSON.parse(gemsMatch[1]);
+          responseText = chatContent.replace(/```gems\n?[\s\S]*?```/, "").trim();
+        } catch (e) {
+          console.error("Failed to parse gems:", e);
+        }
+      }
+      
+      // Determine response type
+      let responseType = "insight";
+      if (responseText.includes("?")) responseType = "question";
+      if (discoveredGems.length > 0) responseType = "insight";
+      
+      return new Response(
+        JSON.stringify({ 
+          response: responseText, 
+          type: responseType,
+          discoveredGems: discoveredGems.map((g: any) => ({
+            ...g,
+            id: crypto.randomUUID(),
+            status: "raw",
+          }))
+        }),
+        { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    // Original DAY processing mode
     // Build context from existing data
     let contextPrompt = "";
     if (existingData) {
