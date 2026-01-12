@@ -11,6 +11,7 @@ import {
   ArrowLeft,
   BookOpen,
   Eye,
+  EyeOff,
   RotateCcw,
   ChevronLeft,
   ChevronRight,
@@ -39,9 +40,10 @@ interface FlashcardProps {
   isFlipped: boolean;
   onFlip: () => void;
   size?: "normal" | "large";
+  memoryTestMode?: boolean;
 }
 
-function Flashcard({ chapter, isFlipped, onFlip, size = "normal" }: FlashcardProps) {
+function Flashcard({ chapter, isFlipped, onFlip, size = "normal", memoryTestMode = false }: FlashcardProps) {
   const isLarge = size === "large";
   const hasImage = !!chapter.imageUrl;
 
@@ -70,29 +72,47 @@ function Flashcard({ chapter, isFlipped, onFlip, size = "normal" }: FlashcardPro
                 alt={`${chapter.book} ${chapter.chapter} - ${chapter.theme}`}
                 className="w-full h-full object-cover"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent" />
-              <div className="absolute bottom-0 left-0 right-0 p-6 text-white">
-                <Badge className="bg-white/20 text-white border-white/30 text-lg px-4 py-1 mb-2">
-                  {chapter.book} {chapter.chapter}
-                </Badge>
-                <h3 className={`${isLarge ? "text-3xl" : "text-xl"} font-bold`}>
-                  {chapter.theme}
-                </h3>
-                <p className="text-white/70 text-sm mt-2">Tap to see theme</p>
-              </div>
+              {!memoryTestMode && (
+                <>
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent" />
+                  <div className="absolute bottom-0 left-0 right-0 p-6 text-white">
+                    <Badge className="bg-white/20 text-white border-white/30 text-lg px-4 py-1 mb-2">
+                      {chapter.book} {chapter.chapter}
+                    </Badge>
+                    <h3 className={`${isLarge ? "text-3xl" : "text-xl"} font-bold`}>
+                      {chapter.theme}
+                    </h3>
+                    <p className="text-white/70 text-sm mt-2">Tap to see theme</p>
+                  </div>
+                </>
+              )}
+              {memoryTestMode && (
+                <div className="absolute bottom-4 left-0 right-0 text-center">
+                  <p className="text-white/70 text-sm bg-black/50 px-3 py-1 rounded-full inline-block">
+                    What chapter is this? Tap to reveal
+                  </p>
+                </div>
+              )}
             </div>
           ) : (
             <div className="w-full h-full p-6 flex flex-col items-center justify-center text-white">
               <div className={`${isLarge ? "text-9xl" : "text-6xl"} mb-4`}>
                 {chapter.visualIcon}
               </div>
-              <Badge className="bg-white/20 text-white border-white/30 text-lg px-4 py-1 mb-2">
-                {chapter.book} {chapter.chapter}
-              </Badge>
-              <h3 className={`${isLarge ? "text-3xl" : "text-xl"} font-bold text-center`}>
-                {chapter.theme}
-              </h3>
-              <p className="text-white/70 text-sm mt-2">Tap to see theme</p>
+              {!memoryTestMode && (
+                <>
+                  <Badge className="bg-white/20 text-white border-white/30 text-lg px-4 py-1 mb-2">
+                    {chapter.book} {chapter.chapter}
+                  </Badge>
+                  <h3 className={`${isLarge ? "text-3xl" : "text-xl"} font-bold text-center`}>
+                    {chapter.theme}
+                  </h3>
+                  <p className="text-white/70 text-sm mt-2">Tap to see theme</p>
+                </>
+              )}
+              {memoryTestMode && (
+                <p className="text-white/70 text-sm mt-4">What chapter is this? Tap to reveal</p>
+              )}
             </div>
           )}
         </div>
@@ -169,6 +189,7 @@ export default function PhototheologyImageBible() {
   const [viewMode, setViewMode] = useState<"browse" | "study" | "grid">("browse");
   const [searchQuery, setSearchQuery] = useState("");
   const [isFullscreen, setIsFullscreen] = useState(false);
+  const [memoryTestMode, setMemoryTestMode] = useState(false);
 
   const totalChapters = getTotalChapters();
 
@@ -231,8 +252,19 @@ export default function PhototheologyImageBible() {
             <Minimize2 className="h-5 w-5 mr-2" />
             Exit Fullscreen
           </Button>
-          <div className="text-white text-lg font-medium">
-            {currentChapter.book} {currentChapter.chapter} - {currentChapter.theme}
+          <div className="flex items-center gap-4">
+            <div className="text-white text-lg font-medium">
+              {memoryTestMode ? "Memory Test Mode" : `${currentChapter.book} ${currentChapter.chapter} - ${currentChapter.theme}`}
+            </div>
+            <Button
+              variant={memoryTestMode ? "default" : "outline"}
+              size="sm"
+              onClick={() => setMemoryTestMode(!memoryTestMode)}
+              className={memoryTestMode ? "bg-purple-600 hover:bg-purple-700" : "border-white/20 text-white hover:bg-white/10"}
+            >
+              {memoryTestMode ? <Eye className="h-4 w-4 mr-2" /> : <EyeOff className="h-4 w-4 mr-2" />}
+              {memoryTestMode ? "Show Labels" : "Memory Test"}
+            </Button>
           </div>
           <div className="text-white/60">
             {currentChapterIndex + 1} / {currentChapters.length}
@@ -246,6 +278,7 @@ export default function PhototheologyImageBible() {
               isFlipped={isFlipped}
               onFlip={() => setIsFlipped(!isFlipped)}
               size="large"
+              memoryTestMode={memoryTestMode}
             />
           </div>
         </div>
@@ -441,6 +474,14 @@ export default function PhototheologyImageBible() {
                 <Badge>
                   {currentChapterIndex + 1} / {currentChapters.length}
                 </Badge>
+                <Button
+                  variant={memoryTestMode ? "default" : "outline"}
+                  size="sm"
+                  onClick={() => setMemoryTestMode(!memoryTestMode)}
+                >
+                  {memoryTestMode ? <Eye className="h-4 w-4 mr-1" /> : <EyeOff className="h-4 w-4 mr-1" />}
+                  {memoryTestMode ? "Show" : "Test"}
+                </Button>
               </div>
               <Button variant="outline" onClick={() => setIsFullscreen(true)}>
                 <Maximize2 className="h-4 w-4 mr-2" />
@@ -455,6 +496,7 @@ export default function PhototheologyImageBible() {
                 isFlipped={isFlipped}
                 onFlip={() => setIsFlipped(!isFlipped)}
                 size="large"
+                memoryTestMode={memoryTestMode}
               />
             </div>
 
