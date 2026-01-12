@@ -10,6 +10,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { RevenueDashboard } from "@/components/admin/RevenueDashboard";
 import { WinBackCampaign } from "@/components/admin/WinBackCampaign";
 import { SubscriptionMismatches } from "@/components/admin/SubscriptionMismatches";
+import { BulkEmailSender } from "@/components/admin/BulkEmailSender";
 import { Badge } from "@/components/ui/badge";
 
 interface StripeStats {
@@ -266,11 +267,12 @@ export default function AdminSubscriptions() {
       </div>
 
       <Tabs defaultValue="overview" className="space-y-6">
-        <TabsList>
+        <TabsList className="flex-wrap">
           <TabsTrigger value="overview">Overview</TabsTrigger>
           <TabsTrigger value="mismatches">Subscription Health</TabsTrigger>
           <TabsTrigger value="revenue">Revenue & Churn</TabsTrigger>
           <TabsTrigger value="winback">Win-Back Campaign</TabsTrigger>
+          <TabsTrigger value="email">Bulk Email</TabsTrigger>
           <TabsTrigger value="patreon">Patreon</TabsTrigger>
         </TabsList>
 
@@ -491,6 +493,10 @@ export default function AdminSubscriptions() {
 
         <TabsContent value="winback">
           <WinBackCampaign />
+        </TabsContent>
+
+        <TabsContent value="email">
+          <BulkEmailSender />
         </TabsContent>
 
         <TabsContent value="patreon">
