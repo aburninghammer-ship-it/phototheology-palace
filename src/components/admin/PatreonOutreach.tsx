@@ -46,7 +46,7 @@ export function PatreonOutreach() {
 
 <p>Blessings,<br/>The PhotoTheology Team</p>
   `.trim());
-  const [filter, setFilter] = useState<'not_signed_up' | 'all_patrons' | 'active_patrons' | 'free_members'>('not_signed_up');
+  const [filter, setFilter] = useState<'not_signed_up' | 'all_patrons' | 'active_patrons' | 'free_members' | 'former_patrons' | 'trial_conversion'>('not_signed_up');
   const [testMode, setTestMode] = useState(true);
   const [testEmail, setTestEmail] = useState("");
 
@@ -210,6 +210,10 @@ export function PatreonOutreach() {
         return "Currently active paying patrons only";
       case 'free_members':
         return "Free followers who haven't signed up";
+      case 'former_patrons':
+        return "🔄 Winback campaign: People who cancelled their patronage";
+      case 'trial_conversion':
+        return "💰 Convert free followers to paying patrons";
       default:
         return "";
     }
@@ -321,7 +325,9 @@ export function PatreonOutreach() {
                 <SelectItem value="not_signed_up">Patrons Not Signed Up</SelectItem>
                 <SelectItem value="active_patrons">All Active Patrons</SelectItem>
                 <SelectItem value="all_patrons">All Patrons (Active + Past)</SelectItem>
-                <SelectItem value="free_members">Free Followers</SelectItem>
+                <SelectItem value="free_members">Free Followers (Not Signed Up)</SelectItem>
+                <SelectItem value="former_patrons">🔄 Winback: Former Patrons</SelectItem>
+                <SelectItem value="trial_conversion">💰 Trial Conversion: Free → Paid</SelectItem>
               </SelectContent>
             </Select>
             <p className="text-sm text-muted-foreground">{getFilterDescription()}</p>

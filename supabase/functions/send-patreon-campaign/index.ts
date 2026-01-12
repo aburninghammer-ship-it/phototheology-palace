@@ -14,7 +14,7 @@ const logStep = (step: string, details?: any) => {
 interface CampaignRequest {
   subject: string;
   htmlContent: string;
-  filter: 'not_signed_up' | 'all_patrons' | 'active_patrons' | 'free_members';
+  filter: 'not_signed_up' | 'all_patrons' | 'active_patrons' | 'free_members' | 'former_patrons' | 'trial_conversion';
   testMode?: boolean;
   testEmail?: string;
 }
@@ -103,6 +103,12 @@ serve(async (req) => {
           case 'free_members':
             // Free followers only
             return member.patron_status === 'free_member' && !isSignedUp;
+          case 'former_patrons':
+            // Winback: Former patrons who cancelled
+            return member.patron_status === 'former_patron';
+          case 'trial_conversion':
+            // Free followers who haven't converted to paying
+            return member.patron_status === 'free_member';
           default:
             return false;
         }
