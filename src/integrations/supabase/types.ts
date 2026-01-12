@@ -7284,6 +7284,57 @@ export type Database = {
         }
         Relationships: []
       }
+      patreon_members: {
+        Row: {
+          created_at: string | null
+          email: string | null
+          full_name: string | null
+          id: string
+          is_follower: boolean | null
+          joined_at: string | null
+          last_charge_date: string | null
+          last_charge_status: string | null
+          lifetime_support_cents: number | null
+          patreon_id: string
+          patron_status: string | null
+          pledge_cents: number | null
+          synced_at: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          email?: string | null
+          full_name?: string | null
+          id?: string
+          is_follower?: boolean | null
+          joined_at?: string | null
+          last_charge_date?: string | null
+          last_charge_status?: string | null
+          lifetime_support_cents?: number | null
+          patreon_id: string
+          patron_status?: string | null
+          pledge_cents?: number | null
+          synced_at?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          email?: string | null
+          full_name?: string | null
+          id?: string
+          is_follower?: boolean | null
+          joined_at?: string | null
+          last_charge_date?: string | null
+          last_charge_status?: string | null
+          lifetime_support_cents?: number | null
+          patreon_id?: string
+          patron_status?: string | null
+          pledge_cents?: number | null
+          synced_at?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       pending_student_verifications: {
         Row: {
           attempts: number
