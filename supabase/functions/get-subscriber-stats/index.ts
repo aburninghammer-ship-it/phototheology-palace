@@ -74,7 +74,7 @@ serve(async (req) => {
     // Get database stats from user_subscriptions (the authoritative source)
     const { data: subscriptions, error: subscriptionsError } = await supabase
       .from("user_subscriptions")
-      .select("subscription_tier, subscription_status, payment_source, created_at, has_lifetime_access, is_recurring, stripe_subscription_id");
+      .select("subscription_tier, subscription_status, payment_source, created_at, has_lifetime_access, is_recurring, stripe_subscription_id, trial_ends_at");
 
     if (subscriptionsError) {
       throw subscriptionsError;
@@ -85,9 +85,18 @@ serve(async (req) => {
       .from("profiles")
       .select("id", { count: 'exact', head: true });
 
+    // Count active database trials (trial status + trial_ends_at in the future)
+    const now = new Date();
+    const activeDbTrials = subscriptions.filter((sub: any) => 
+      sub.subscription_status === 'trial' && 
+      sub.trial_ends_at && 
+      new Date(sub.trial_ends_at) > now
+    ).length;
+
     // Calculate database statistics
     const dbStats = {
       total_users: profileCount || 0,
+      active_trials: activeDbTrials,
       by_tier: { free: 0, essential: 0, premium: 0, student: 0, patron: 0, null: 0 },
       by_status: { none: 0, trial: 0, active: 0, cancelled: 0, expired: 0, null: 0 },
       by_payment_source: { stripe: 0, patreon: 0, manual: 0, promotional: 0, lifetime: 0, null: 0 },
