@@ -187,11 +187,15 @@ export function EmailCampaignManager() {
   const renderEmailPreview = (campaignType: CampaignType) => {
     const previews = {
       winback: {
-        title: "Win-Back Sequence (3 Emails)",
+        title: "Win-Back Sequence (7 Emails)",
         emails: [
-          { day: "Email 1", subject: "PhotoTheology Isn't What You Think", preview: "Reframe what the system is — not an app, but a method of interpretation" },
-          { day: "Email 2", subject: "How PhotoTheology Is Meant to Be Used", preview: "Explain proper entry: Session 1-3 fundamentals, desktop focus" },
-          { day: "Email 3", subject: "An Invitation to Continue", preview: "Subscription = continuity, not more content" },
+          { day: "Email 1", subject: "See PhotoTheology in Action", preview: "Video intro + overview of improvements" },
+          { day: "Email 2", subject: "The Guided Palace Tour", preview: "New step-by-step introduction to each floor" },
+          { day: "Email 3", subject: "Meet Jeeves", preview: "AI study partner available 24/7" },
+          { day: "Email 4", subject: "Daily Challenges & Reading Plans", preview: "Consistent practice keeps you engaged" },
+          { day: "Email 5", subject: "The Gems Room", preview: "Save your best insights forever" },
+          { day: "Email 6", subject: "Prophecy & Sanctuary", preview: "Vision Floor — prophecy & sanctuary united" },
+          { day: "Email 7", subject: "Your Invitation to Return", preview: "Fresh start with everything improved" },
         ]
       },
       trial: {
