@@ -9903,6 +9903,126 @@ export type Database = {
           },
         ]
       }
+      sermon_simmer_sessions: {
+        Row: {
+          callout_quotes: string[] | null
+          christ_connections: Json | null
+          closing_movement: string | null
+          core_claim: string | null
+          created_at: string
+          current_day: number
+          day_1_completed_at: string | null
+          day_2_completed_at: string | null
+          day_3_completed_at: string | null
+          day_4_completed_at: string | null
+          day_5_completed_at: string | null
+          day_6_completed_at: string | null
+          emotional_arc: string | null
+          final_outline: Json | null
+          final_quote_list: string[] | null
+          final_slide_headers: string[] | null
+          gems: Json | null
+          id: string
+          pressure_verses: string[] | null
+          provisional_outline: Json | null
+          redundant_gems: string[] | null
+          rewritten_weak_connections: Json | null
+          slide_headlines: string[] | null
+          slide_images: Json | null
+          status: string
+          structure: Json | null
+          target_density: string | null
+          target_purpose: string | null
+          target_style: string | null
+          theme: string
+          theme_passage: string | null
+          title: string | null
+          updated_at: string
+          user_id: string
+          visual_metaphors: string[] | null
+          weak_transitions: string[] | null
+          white_space_guidance: string | null
+        }
+        Insert: {
+          callout_quotes?: string[] | null
+          christ_connections?: Json | null
+          closing_movement?: string | null
+          core_claim?: string | null
+          created_at?: string
+          current_day?: number
+          day_1_completed_at?: string | null
+          day_2_completed_at?: string | null
+          day_3_completed_at?: string | null
+          day_4_completed_at?: string | null
+          day_5_completed_at?: string | null
+          day_6_completed_at?: string | null
+          emotional_arc?: string | null
+          final_outline?: Json | null
+          final_quote_list?: string[] | null
+          final_slide_headers?: string[] | null
+          gems?: Json | null
+          id?: string
+          pressure_verses?: string[] | null
+          provisional_outline?: Json | null
+          redundant_gems?: string[] | null
+          rewritten_weak_connections?: Json | null
+          slide_headlines?: string[] | null
+          slide_images?: Json | null
+          status?: string
+          structure?: Json | null
+          target_density?: string | null
+          target_purpose?: string | null
+          target_style?: string | null
+          theme: string
+          theme_passage?: string | null
+          title?: string | null
+          updated_at?: string
+          user_id: string
+          visual_metaphors?: string[] | null
+          weak_transitions?: string[] | null
+          white_space_guidance?: string | null
+        }
+        Update: {
+          callout_quotes?: string[] | null
+          christ_connections?: Json | null
+          closing_movement?: string | null
+          core_claim?: string | null
+          created_at?: string
+          current_day?: number
+          day_1_completed_at?: string | null
+          day_2_completed_at?: string | null
+          day_3_completed_at?: string | null
+          day_4_completed_at?: string | null
+          day_5_completed_at?: string | null
+          day_6_completed_at?: string | null
+          emotional_arc?: string | null
+          final_outline?: Json | null
+          final_quote_list?: string[] | null
+          final_slide_headers?: string[] | null
+          gems?: Json | null
+          id?: string
+          pressure_verses?: string[] | null
+          provisional_outline?: Json | null
+          redundant_gems?: string[] | null
+          rewritten_weak_connections?: Json | null
+          slide_headlines?: string[] | null
+          slide_images?: Json | null
+          status?: string
+          structure?: Json | null
+          target_density?: string | null
+          target_purpose?: string | null
+          target_style?: string | null
+          theme?: string
+          theme_passage?: string | null
+          title?: string | null
+          updated_at?: string
+          user_id?: string
+          visual_metaphors?: string[] | null
+          weak_transitions?: string[] | null
+          white_space_guidance?: string | null
+        }
+        Relationships: []
+      }
       sermon_starters: {
         Row: {
           created_at: string | null
