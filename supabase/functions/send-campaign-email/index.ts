@@ -869,12 +869,25 @@ serve(async (req) => {
           .in('subscription_status', ['expired', 'cancelled', 'trial_expired'])
           .eq('has_lifetime_access', false);
 
-        if (expiredUsers) {
-          // Get emails and filter out recent recipients
-          const { data: profiles } = await supabaseClient
-            .from('profiles')
-            .select('id, email')
-            .in('id', expiredUsers.map(u => u.user_id));
+        if (expiredUsers && expiredUsers.length > 0) {
+          // Get emails from auth.users (using service role key)
+          const userIds = expiredUsers.map(u => u.user_id);
+          
+          const { data: authUsers, error: authError } = await supabaseClient.auth.admin.listUsers();
+          
+          if (authError) {
+            logStep("Error fetching auth users", { error: authError.message });
+          }
+          
+          // Create a map of user_id to email from auth.users
+          const userEmailMap = new Map<string, string>();
+          if (authUsers?.users) {
+            for (const user of authUsers.users) {
+              if (user.email && userIds.includes(user.id)) {
+                userEmailMap.set(user.id, user.email);
+              }
+            }
+          }
 
           const { data: recentEmails } = await supabaseClient
             .from('email_logs')
@@ -884,9 +897,15 @@ serve(async (req) => {
 
           const recentUserIds = new Set(recentEmails?.map(e => e.user_id) || []);
           
-          recipients = (profiles || [])
-            .filter(p => p.email && !recentUserIds.has(p.id))
-            .map(p => ({ email: p.email!, userId: p.id }));
+          recipients = expiredUsers
+            .filter(u => userEmailMap.has(u.user_id) && !recentUserIds.has(u.user_id))
+            .map(u => ({ email: userEmailMap.get(u.user_id)!, userId: u.user_id }));
+          
+          logStep("Winback recipients mapped", { 
+            expiredCount: expiredUsers.length, 
+            emailsFound: userEmailMap.size,
+            afterRecentFilter: recipients.length 
+          });
         }
 
         emailTemplates = [WIN_BACK_EMAILS[0]]; // Start with first email in sequence
@@ -899,8 +918,19 @@ serve(async (req) => {
           .eq('subscription_status', 'trial')
           .not('trial_ends_at', 'is', null);
 
-        if (trialUsers) {
+        if (trialUsers && trialUsers.length > 0) {
           const now = new Date();
+          
+          // Get all auth users to map emails
+          const { data: authUsers } = await supabaseClient.auth.admin.listUsers();
+          const userEmailMap = new Map<string, string>();
+          if (authUsers?.users) {
+            for (const user of authUsers.users) {
+              if (user.email) {
+                userEmailMap.set(user.id, user.email);
+              }
+            }
+          }
           
           for (const user of trialUsers) {
             const trialStart = new Date(user.created_at);
@@ -910,11 +940,7 @@ serve(async (req) => {
             const emailForDay = TRIAL_EMAILS.find(e => e.day === daysSinceStart);
             
             if (emailForDay) {
-              const { data: profile } = await supabaseClient
-                .from('profiles')
-                .select('email')
-                .eq('id', user.user_id)
-                .single();
+              const userEmail = userEmailMap.get(user.user_id);
 
               // Check if already sent this day's email
               const { data: alreadySent } = await supabaseClient
@@ -925,9 +951,9 @@ serve(async (req) => {
                 .eq('day_number', daysSinceStart)
                 .maybeSingle();
 
-              if (profile?.email && !alreadySent) {
+              if (userEmail && !alreadySent) {
                 recipients.push({ 
-                  email: profile.email, 
+                  email: userEmail, 
                   userId: user.user_id,
                   dayNumber: daysSinceStart 
                 });
@@ -944,19 +970,26 @@ serve(async (req) => {
           .eq('subscription_status', 'active')
           .or('subscription_tier.eq.monthly,subscription_tier.eq.yearly,has_lifetime_access.eq.true');
 
-        if (paidUsers) {
+        if (paidUsers && paidUsers.length > 0) {
           // Determine which week of the month
           const weekOfMonth = Math.ceil(new Date().getDate() / 7);
           const emailForWeek = ENGAGEMENT_EMAILS[(weekOfMonth - 1) % ENGAGEMENT_EMAILS.length];
 
-          // Get profiles and filter out recent recipients
+          // Get emails from auth.users
+          const userIds = paidUsers.map(u => u.user_id);
+          const { data: authUsers } = await supabaseClient.auth.admin.listUsers();
+          const userEmailMap = new Map<string, string>();
+          if (authUsers?.users) {
+            for (const user of authUsers.users) {
+              if (user.email && userIds.includes(user.id)) {
+                userEmailMap.set(user.id, user.email);
+              }
+            }
+          }
+
+          // Filter out recent recipients
           const oneWeekAgo = new Date();
           oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
-
-          const { data: profiles } = await supabaseClient
-            .from('profiles')
-            .select('id, email')
-            .in('id', paidUsers.map(u => u.user_id));
 
           const { data: recentEmails } = await supabaseClient
             .from('email_logs')
@@ -966,9 +999,9 @@ serve(async (req) => {
 
           const recentUserIds = new Set(recentEmails?.map(e => e.user_id) || []);
 
-          recipients = (profiles || [])
-            .filter(p => p.email && !recentUserIds.has(p.id))
-            .map(p => ({ email: p.email!, userId: p.id }));
+          recipients = paidUsers
+            .filter(u => userEmailMap.has(u.user_id) && !recentUserIds.has(u.user_id))
+            .map(u => ({ email: userEmailMap.get(u.user_id)!, userId: u.user_id }));
 
           emailTemplates = [emailForWeek];
         }
