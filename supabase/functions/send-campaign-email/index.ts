@@ -727,7 +727,13 @@ serve(async (req) => {
           template = emailTemplates[0];
         }
 
-        if (!template) continue;
+        if (!template) {
+          logStep("No template found", { campaignType, dayNumber: recipient.dayNumber });
+          results.push({ email: recipient.email, success: false, error: "No matching template" });
+          continue;
+        }
+
+        logStep("Sending email", { to: recipient.email, subject: template.subject });
 
         const response = await fetch("https://api.resend.com/emails", {
           method: "POST",
@@ -743,28 +749,29 @@ serve(async (req) => {
           }),
         });
 
+        const responseText = await response.text();
+        logStep("Resend response", { status: response.status, body: responseText });
+
         if (!response.ok) {
-          const errorText = await response.text();
-          results.push({ email: recipient.email, success: false, error: errorText });
+          results.push({ email: recipient.email, success: false, error: responseText });
         } else {
           results.push({ email: recipient.email, success: true });
 
-          // Log the email
-          if (!testMode) {
-            await supabaseClient.from('email_logs').insert({
-              user_id: recipient.userId,
-              campaign_type: campaignType,
-              day_number: recipient.dayNumber || 0,
-              subject: template.subject,
-              status: 'sent',
-              sent_at: new Date().toISOString(),
-            });
-          }
+          // Log the email (even in test mode for debugging)
+          await supabaseClient.from('email_logs').insert({
+            user_id: recipient.userId,
+            campaign_type: testMode ? `test_${campaignType}` : campaignType,
+            day_number: recipient.dayNumber || 0,
+            subject: template.subject,
+            status: 'sent',
+            sent_at: new Date().toISOString(),
+          });
         }
 
         // Rate limiting
         await new Promise(resolve => setTimeout(resolve, 100));
       } catch (err: any) {
+        logStep("Error sending email", { email: recipient.email, error: err.message });
         results.push({ email: recipient.email, success: false, error: err.message });
       }
     }
