@@ -902,19 +902,38 @@ serve(async (req) => {
     } else {
       // Get recipients based on campaign type
       if (campaignType === 'winback') {
-        // Get users who tried but did not subscribe
+        // Get users who created an account, explored briefly, but NEVER subscribed
+        // These are NOT expired/cancelled - they never paid at all
         const thirtyDaysAgo = new Date();
         thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+        const sevenDaysAgo = new Date();
+        sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
 
-        const { data: expiredUsers } = await supabaseClient
-          .from('user_subscriptions')
-          .select('user_id')
-          .in('subscription_status', ['expired', 'cancelled', 'trial_expired'])
-          .eq('has_lifetime_access', false);
+        // Target users from profiles who:
+        // 1. Have no subscription or trial-only status
+        // 2. Created account at least 7 days ago (gave them time to explore)
+        // 3. Don't have lifetime access
+        // 4. Have some activity (onboarding completed or first action)
+        const { data: neverSubscribedUsers } = await supabaseClient
+          .from('profiles')
+          .select('id, created_at, onboarding_completed, first_meaningful_action_at')
+          .or('subscription_status.is.null,subscription_status.eq.none,subscription_status.eq.trial_expired,subscription_status.eq.expired,subscription_status.eq.cancelled')
+          .eq('has_lifetime_access', false)
+          .lt('created_at', sevenDaysAgo.toISOString());
 
-        if (expiredUsers && expiredUsers.length > 0) {
-          // Get emails from auth.users (using service role key)
-          const userIds = expiredUsers.map(u => u.user_id);
+        if (neverSubscribedUsers && neverSubscribedUsers.length > 0) {
+          // Filter to those with some engagement (explored briefly)
+          const engagedUsers = neverSubscribedUsers.filter(u => 
+            u.onboarding_completed || u.first_meaningful_action_at
+          );
+
+          logStep("Winback initial filter", { 
+            totalNeverSubscribed: neverSubscribedUsers.length,
+            withEngagement: engagedUsers.length 
+          });
+
+          // Get emails from auth.users
+          const userIds = engagedUsers.map(u => u.id);
           const userEmailMap = await mapUserIdsToEmails(supabaseClient, userIds);
 
           let recentUserIds = new Set<string>();
@@ -929,12 +948,13 @@ serve(async (req) => {
             recentUserIds = new Set(recentEmails?.map(e => e.user_id) || []);
           }
           
-          recipients = expiredUsers
-            .filter(u => userEmailMap.has(u.user_id) && !recentUserIds.has(u.user_id))
-            .map(u => ({ email: userEmailMap.get(u.user_id)!, userId: u.user_id }));
+          recipients = engagedUsers
+            .filter(u => userEmailMap.has(u.id) && !recentUserIds.has(u.id))
+            .map(u => ({ email: userEmailMap.get(u.id)!, userId: u.id }));
           
           logStep("Winback recipients mapped", { 
-            expiredCount: expiredUsers.length, 
+            neverSubscribedCount: neverSubscribedUsers.length,
+            engagedCount: engagedUsers.length,
             emailsFound: userEmailMap.size,
             afterRecentFilter: recipients.length,
             forceSend: !!forceSend
