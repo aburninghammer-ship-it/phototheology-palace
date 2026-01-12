@@ -11,128 +11,386 @@ const logStep = (step: string, details?: any) => {
   console.log(`[CAMPAIGN-EMAIL] ${step}${detailsStr}`);
 };
 
-// Win-Back Campaign Emails (for users who tried but did not subscribe)
+// Win-Back Campaign Emails (7-email series highlighting improvements)
 const WIN_BACK_EMAILS = [
   {
     day: 0,
-    subject: "PhotoTheology Isn't What You Think — Here's What It Actually Is",
+    subject: "🎬 See PhotoTheology in Action — A New Way to Study Scripture",
     html: `
-      <div style="font-family: Georgia, serif; max-width: 600px; margin: 0 auto; padding: 24px; background: #1a1a2e; color: #e5e5e5;">
-        <h1 style="color: #f5d742; font-size: 24px; margin-bottom: 20px;">A Quiet Word About PhotoTheology</h1>
+      <div style="font-family: Georgia, serif; max-width: 600px; margin: 0 auto; padding: 0; background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);">
+        <!-- Header Banner -->
+        <div style="background: linear-gradient(90deg, #f5d742 0%, #ff6b6b 50%, #4ecdc4 100%); padding: 4px;"></div>
         
-        <p style="line-height: 1.7; margin-bottom: 16px;">
-          When you first explored PhotoTheology, you may have expected a Bible app — something with verses, search bars, and quick devotionals.
-        </p>
-        
-        <p style="line-height: 1.7; margin-bottom: 16px;">
-          But PhotoTheology isn't an app. It's a <strong style="color: #f5d742;">system of interpretation</strong> — a structured method for learning how to study Scripture the way the apostles and reformers did, with Christ as the interpretive center of every text.
-        </p>
-        
-        <p style="line-height: 1.7; margin-bottom: 16px;">
-          Most people who leave early weren't shown how to use it properly. They clicked around, felt overwhelmed, and left without completing even one focused session.
-        </p>
-        
-        <p style="line-height: 1.7; margin-bottom: 16px;">
-          That's not a failure on your part — it's a failure in how we introduced you.
-        </p>
-        
-        <p style="line-height: 1.7; margin-bottom: 24px;">
-          Since then, we've rebuilt the guided path. The first session now takes 15 minutes, works best on a <strong>desktop or laptop</strong>, and teaches you the foundational structure before you explore.
-        </p>
-        
-        <p style="line-height: 1.7; margin-bottom: 16px; color: #a0a0a0; font-style: italic;">
-          If you're willing to try again — slowly, intentionally — we'd like to show you what you missed.
-        </p>
-        
-        <div style="text-align: center; margin-top: 32px;">
-          <a href="https://phototheologybible.com" style="display: inline-block; background: #f5d742; color: #1a1a2e; padding: 14px 28px; text-decoration: none; font-weight: bold; border-radius: 6px;">
-            Return and Begin With the Guided Path
-          </a>
+        <div style="padding: 32px;">
+          <h1 style="color: #f5d742; font-size: 28px; margin-bottom: 8px; text-align: center;">
+            ✨ PhotoTheology Has Evolved ✨
+          </h1>
+          <p style="text-align: center; color: #4ecdc4; font-size: 16px; margin-bottom: 24px;">
+            And we'd love to show you what's new
+          </p>
+          
+          <p style="line-height: 1.8; margin-bottom: 16px; color: #e5e5e5;">
+            Since you last visited, we've been hard at work making PhotoTheology more intuitive, more powerful, and more beautiful than ever.
+          </p>
+          
+          <p style="line-height: 1.8; margin-bottom: 16px; color: #e5e5e5;">
+            Instead of telling you about it, we want to <strong style="color: #f5d742;">show you</strong>. Watch this overview to see the Palace system in action:
+          </p>
+          
+          <!-- YouTube Video Card -->
+          <div style="background: linear-gradient(135deg, #2a2a4e 0%, #1e3a5f 100%); border-radius: 12px; padding: 24px; margin: 24px 0; border: 2px solid #4ecdc4;">
+            <p style="color: #ff6b6b; font-weight: bold; margin: 0 0 12px 0; font-size: 14px;">🎥 FEATURED VIDEO</p>
+            <p style="color: #f5d742; font-size: 18px; font-weight: bold; margin: 0 0 16px 0;">The PhotoTheology Palace System Explained</p>
+            <div style="text-align: center;">
+              <a href="https://www.youtube.com/watch?v=TOhylk-3B58&t=1753s" style="display: inline-block; background: #ff6b6b; color: #fff; padding: 14px 32px; text-decoration: none; font-weight: bold; border-radius: 8px; font-size: 16px;">
+                ▶ Watch Now on YouTube
+              </a>
+            </div>
+          </div>
+          
+          <p style="line-height: 1.8; margin-bottom: 16px; color: #e5e5e5;">
+            PhotoTheology isn't just a Bible app — it's a <strong style="color: #4ecdc4;">complete system of interpretation</strong> that trains you to see Christ in every chapter of Scripture.
+          </p>
+          
+          <p style="line-height: 1.8; color: #a0a0a0; font-style: italic;">
+            Over the next week, we'll share the specific improvements we've made. But first, watch the video above to see what makes this system unique.
+          </p>
+          
+          <div style="text-align: center; margin-top: 32px;">
+            <a href="https://phototheologybible.com" style="display: inline-block; background: linear-gradient(90deg, #f5d742 0%, #ff6b6b 100%); color: #1a1a2e; padding: 16px 36px; text-decoration: none; font-weight: bold; border-radius: 8px; font-size: 16px;">
+              Explore the New PhotoTheology
+            </a>
+          </div>
         </div>
         
-        <p style="margin-top: 32px; font-size: 14px; color: #777;">
-          — The PhotoTheology Team
-        </p>
+        <!-- Footer -->
+        <div style="background: #0d0d1a; padding: 20px 32px; text-align: center;">
+          <p style="margin: 0; font-size: 14px; color: #777;">
+            — The PhotoTheology Team
+          </p>
+        </div>
       </div>
     `
   },
   {
     day: 2,
-    subject: "How PhotoTheology Is Meant to Be Used",
+    subject: "🏰 NEW: The Guided Palace Tour Makes Learning Easy",
     html: `
-      <div style="font-family: Georgia, serif; max-width: 600px; margin: 0 auto; padding: 24px; background: #1a1a2e; color: #e5e5e5;">
-        <h1 style="color: #f5d742; font-size: 24px; margin-bottom: 20px;">The Right Way to Enter</h1>
+      <div style="font-family: Georgia, serif; max-width: 600px; margin: 0 auto; padding: 0; background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);">
+        <div style="background: linear-gradient(90deg, #4ecdc4 0%, #44a08d 100%); padding: 4px;"></div>
         
-        <p style="line-height: 1.7; margin-bottom: 16px;">
-          PhotoTheology was never designed to be sampled. It's meant to be <em>entered</em> — the way you'd enter a library, not scroll through a feed.
-        </p>
-        
-        <p style="line-height: 1.7; margin-bottom: 16px;">
-          Here's how it works when used as intended:
-        </p>
-        
-        <ul style="line-height: 1.9; margin-bottom: 20px; padding-left: 20px;">
-          <li><strong style="color: #f5d742;">Session 1:</strong> The 24FPS Room — Learn how to "frame" chapters in your memory</li>
-          <li><strong style="color: #f5d742;">Session 2:</strong> The Story Room — Practice walking through narrative with visual recall</li>
-          <li><strong style="color: #f5d742;">Session 3:</strong> The Concentration Room — See Christ in every text using structured lenses</li>
-        </ul>
-        
-        <p style="line-height: 1.7; margin-bottom: 16px;">
-          These three sessions — done slowly, on a <strong>desktop or laptop</strong> — are the foundation of everything else.
-        </p>
-        
-        <p style="line-height: 1.7; margin-bottom: 24px;">
-          Rushing past them is why most users felt confused. Completing them is why others now study Scripture with confidence they've never had before.
-        </p>
-        
-        <p style="line-height: 1.7; margin-bottom: 16px; color: #a0a0a0; font-style: italic;">
-          The system works. But only if you work with it.
-        </p>
-        
-        <div style="text-align: center; margin-top: 32px;">
-          <a href="https://phototheologybible.com/study" style="display: inline-block; background: #f5d742; color: #1a1a2e; padding: 14px 28px; text-decoration: none; font-weight: bold; border-radius: 6px;">
-            Study With Intention
-          </a>
+        <div style="padding: 32px;">
+          <p style="color: #4ecdc4; font-size: 14px; font-weight: bold; margin: 0 0 8px 0;">IMPROVEMENT #1</p>
+          <h1 style="color: #f5d742; font-size: 26px; margin-bottom: 24px;">
+            🏰 The New Guided Palace Tour
+          </h1>
+          
+          <p style="line-height: 1.8; margin-bottom: 16px; color: #e5e5e5;">
+            One of the biggest pieces of feedback we received was that the 8-Floor Palace felt overwhelming at first. <strong style="color: #4ecdc4;">We listened.</strong>
+          </p>
+          
+          <!-- Feature Box -->
+          <div style="background: linear-gradient(135deg, #1e3a5f 0%, #2a2a4e 100%); border-radius: 12px; padding: 24px; margin: 24px 0; border-left: 4px solid #4ecdc4;">
+            <p style="color: #f5d742; font-weight: bold; margin: 0 0 16px 0;">✨ What's New:</p>
+            <ul style="margin: 0; padding-left: 20px; color: #e5e5e5; line-height: 2;">
+              <li><strong style="color: #4ecdc4;">Interactive Palace Tour</strong> — A step-by-step introduction to each floor</li>
+              <li><strong style="color: #ff6b6b;">Room-by-Room Guidance</strong> — Clear explanations before you dive in</li>
+              <li><strong style="color: #f5d742;">Progress Tracking</strong> — See exactly where you are in your journey</li>
+              <li><strong style="color: #4ecdc4;">15-Minute First Session</strong> — No more guessing where to start</li>
+            </ul>
+          </div>
+          
+          <p style="line-height: 1.8; margin-bottom: 16px; color: #e5e5e5;">
+            Now when you enter PhotoTheology, you're guided through the <strong style="color: #f5d742;">Story Room</strong>, <strong style="color: #ff6b6b;">24FPS Room</strong>, and <strong style="color: #4ecdc4;">Imagination Room</strong> with clear instructions and practice exercises.
+          </p>
+          
+          <p style="line-height: 1.8; color: #a0a0a0; font-style: italic;">
+            No more feeling lost. The path is now clearly marked.
+          </p>
+          
+          <div style="text-align: center; margin-top: 32px;">
+            <a href="https://phototheologybible.com/palace" style="display: inline-block; background: linear-gradient(90deg, #4ecdc4 0%, #44a08d 100%); color: #1a1a2e; padding: 16px 36px; text-decoration: none; font-weight: bold; border-radius: 8px; font-size: 16px;">
+              Take the Palace Tour
+            </a>
+          </div>
         </div>
         
-        <p style="margin-top: 32px; font-size: 14px; color: #777;">
-          — The PhotoTheology Team
-        </p>
+        <div style="background: #0d0d1a; padding: 20px 32px; text-align: center;">
+          <p style="margin: 0; font-size: 14px; color: #777;">— The PhotoTheology Team</p>
+        </div>
       </div>
     `
   },
   {
-    day: 5,
-    subject: "An Invitation to Continue (When You're Ready)",
+    day: 4,
+    subject: "🤖 Meet Jeeves — Your AI Study Partner",
     html: `
-      <div style="font-family: Georgia, serif; max-width: 600px; margin: 0 auto; padding: 24px; background: #1a1a2e; color: #e5e5e5;">
-        <h1 style="color: #f5d742; font-size: 24px; margin-bottom: 20px;">Continuity, Not Completion</h1>
+      <div style="font-family: Georgia, serif; max-width: 600px; margin: 0 auto; padding: 0; background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);">
+        <div style="background: linear-gradient(90deg, #ff6b6b 0%, #ee5a24 100%); padding: 4px;"></div>
         
-        <p style="line-height: 1.7; margin-bottom: 16px;">
-          PhotoTheology isn't about finishing content. It's about developing a <strong style="color: #f5d742;">method of interpretation</strong> that stays with you for life.
-        </p>
-        
-        <p style="line-height: 1.7; margin-bottom: 16px;">
-          Subscription doesn't unlock more "stuff." It removes the ceiling on your training — giving you full access to the 8-Floor Palace, prophecy integration, Jeeves (your AI study partner), and structured growth paths.
-        </p>
-        
-        <p style="line-height: 1.7; margin-bottom: 16px;">
-          You won't be overwhelmed. The system adapts to your pace.
-        </p>
-        
-        <p style="line-height: 1.7; margin-bottom: 24px;">
-          But if you're not ready, that's fine. We'll be here when you are.
-        </p>
-        
-        <div style="text-align: center; margin-top: 32px;">
-          <a href="https://phototheologybible.com/pricing" style="display: inline-block; background: #f5d742; color: #1a1a2e; padding: 14px 28px; text-decoration: none; font-weight: bold; border-radius: 6px;">
-            Remove the Ceiling When Ready
-          </a>
+        <div style="padding: 32px;">
+          <p style="color: #ff6b6b; font-size: 14px; font-weight: bold; margin: 0 0 8px 0;">IMPROVEMENT #2</p>
+          <h1 style="color: #f5d742; font-size: 26px; margin-bottom: 24px;">
+            🤖 Introducing Jeeves, Your Personal Study Partner
+          </h1>
+          
+          <p style="line-height: 1.8; margin-bottom: 16px; color: #e5e5e5;">
+            Imagine having a knowledgeable Bible scholar available 24/7 to answer your questions, guide your studies, and help you discover insights you'd never find on your own.
+          </p>
+          
+          <!-- AI Feature Box -->
+          <div style="background: linear-gradient(135deg, #2a2a4e 0%, #1e3a5f 100%); border-radius: 12px; padding: 24px; margin: 24px 0; border: 2px solid #ff6b6b;">
+            <p style="color: #f5d742; font-weight: bold; margin: 0 0 16px 0; font-size: 18px;">🎩 What Jeeves Can Do:</p>
+            <div style="display: grid; gap: 12px;">
+              <div style="background: rgba(255, 107, 107, 0.1); padding: 12px; border-radius: 8px;">
+                <span style="color: #ff6b6b;">📖</span> <span style="color: #e5e5e5;">Answer questions about any passage using PhotoTheology principles</span>
+              </div>
+              <div style="background: rgba(78, 205, 196, 0.1); padding: 12px; border-radius: 8px;">
+                <span style="color: #4ecdc4;">🔍</span> <span style="color: #e5e5e5;">Find Christ-connections across the entire Bible</span>
+              </div>
+              <div style="background: rgba(245, 215, 66, 0.1); padding: 12px; border-radius: 8px;">
+                <span style="color: #f5d742;">💡</span> <span style="color: #e5e5e5;">Generate study guides, sermon outlines, and teaching materials</span>
+              </div>
+              <div style="background: rgba(255, 107, 107, 0.1); padding: 12px; border-radius: 8px;">
+                <span style="color: #ff6b6b;">🎯</span> <span style="color: #e5e5e5;">Explain complex prophetic timelines and sanctuary symbolism</span>
+              </div>
+            </div>
+          </div>
+          
+          <p style="line-height: 1.8; margin-bottom: 16px; color: #e5e5e5;">
+            Jeeves isn't just any AI — he's trained on the <strong style="color: #f5d742;">entire PhotoTheology methodology</strong>, including all 8 floors, the cycles of history, and the sanctuary framework.
+          </p>
+          
+          <p style="line-height: 1.8; color: #a0a0a0; font-style: italic;">
+            Ask him anything. He's ready to help.
+          </p>
+          
+          <div style="text-align: center; margin-top: 32px;">
+            <a href="https://phototheologybible.com/chat" style="display: inline-block; background: linear-gradient(90deg, #ff6b6b 0%, #ee5a24 100%); color: #fff; padding: 16px 36px; text-decoration: none; font-weight: bold; border-radius: 8px; font-size: 16px;">
+              Chat with Jeeves Now
+            </a>
+          </div>
         </div>
         
-        <p style="margin-top: 32px; font-size: 14px; color: #777;">
-          — The PhotoTheology Team
-        </p>
+        <div style="background: #0d0d1a; padding: 20px 32px; text-align: center;">
+          <p style="margin: 0; font-size: 14px; color: #777;">— The PhotoTheology Team</p>
+        </div>
+      </div>
+    `
+  },
+  {
+    day: 6,
+    subject: "📚 NEW: Daily Challenges & Reading Plans",
+    html: `
+      <div style="font-family: Georgia, serif; max-width: 600px; margin: 0 auto; padding: 0; background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);">
+        <div style="background: linear-gradient(90deg, #f5d742 0%, #f39c12 100%); padding: 4px;"></div>
+        
+        <div style="padding: 32px;">
+          <p style="color: #f5d742; font-size: 14px; font-weight: bold; margin: 0 0 8px 0;">IMPROVEMENT #3</p>
+          <h1 style="color: #f5d742; font-size: 26px; margin-bottom: 24px;">
+            📚 Daily Challenges & Structured Reading Plans
+          </h1>
+          
+          <p style="line-height: 1.8; margin-bottom: 16px; color: #e5e5e5;">
+            We've added daily practice that keeps you engaged without overwhelming you. Each day brings a new opportunity to apply PhotoTheology principles.
+          </p>
+          
+          <!-- Challenge Types -->
+          <div style="margin: 24px 0;">
+            <div style="background: linear-gradient(135deg, #2a2a4e 0%, #1e3a5f 100%); border-radius: 12px; padding: 20px; margin-bottom: 12px; border-left: 4px solid #f5d742;">
+              <p style="color: #f5d742; font-weight: bold; margin: 0 0 8px 0;">🌅 Daily Challenges</p>
+              <p style="color: #e5e5e5; margin: 0; line-height: 1.6;">Quick 5-10 minute exercises that train your PhotoTheological reflexes. New challenge every day!</p>
+            </div>
+            <div style="background: linear-gradient(135deg, #2a2a4e 0%, #1e3a5f 100%); border-radius: 12px; padding: 20px; margin-bottom: 12px; border-left: 4px solid #4ecdc4;">
+              <p style="color: #4ecdc4; font-weight: bold; margin: 0 0 8px 0;">📖 Reading Plans</p>
+              <p style="color: #e5e5e5; margin: 0; line-height: 1.6;">7-day, 30-day, and custom plans that guide you through Scripture with PhotoTheology lenses.</p>
+            </div>
+            <div style="background: linear-gradient(135deg, #2a2a4e 0%, #1e3a5f 100%); border-radius: 12px; padding: 20px; border-left: 4px solid #ff6b6b;">
+              <p style="color: #ff6b6b; font-weight: bold; margin: 0 0 8px 0;">🏆 Streaks & Progress</p>
+              <p style="color: #e5e5e5; margin: 0; line-height: 1.6;">Track your consistency and watch your understanding deepen over time.</p>
+            </div>
+          </div>
+          
+          <p style="line-height: 1.8; color: #a0a0a0; font-style: italic;">
+            Consistency beats intensity. A little each day changes everything.
+          </p>
+          
+          <div style="text-align: center; margin-top: 32px;">
+            <a href="https://phototheologybible.com/challenges" style="display: inline-block; background: linear-gradient(90deg, #f5d742 0%, #f39c12 100%); color: #1a1a2e; padding: 16px 36px; text-decoration: none; font-weight: bold; border-radius: 8px; font-size: 16px;">
+              Start Today's Challenge
+            </a>
+          </div>
+        </div>
+        
+        <div style="background: #0d0d1a; padding: 20px 32px; text-align: center;">
+          <p style="margin: 0; font-size: 14px; color: #777;">— The PhotoTheology Team</p>
+        </div>
+      </div>
+    `
+  },
+  {
+    day: 8,
+    subject: "💎 The Gems Room — Save Your Best Insights Forever",
+    html: `
+      <div style="font-family: Georgia, serif; max-width: 600px; margin: 0 auto; padding: 0; background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);">
+        <div style="background: linear-gradient(90deg, #9b59b6 0%, #8e44ad 100%); padding: 4px;"></div>
+        
+        <div style="padding: 32px;">
+          <p style="color: #9b59b6; font-size: 14px; font-weight: bold; margin: 0 0 8px 0;">IMPROVEMENT #4</p>
+          <h1 style="color: #f5d742; font-size: 26px; margin-bottom: 24px;">
+            💎 The Enhanced Gems Room
+          </h1>
+          
+          <p style="line-height: 1.8; margin-bottom: 16px; color: #e5e5e5;">
+            Every time you discover something powerful in Scripture — a connection, an insight, a Christ-moment — you can now <strong style="color: #9b59b6;">save it as a Gem</strong> and return to it anytime.
+          </p>
+          
+          <!-- Gems Feature -->
+          <div style="background: linear-gradient(135deg, #2a2a4e 0%, #1e3a5f 100%); border-radius: 12px; padding: 24px; margin: 24px 0; border: 2px solid #9b59b6; text-align: center;">
+            <p style="font-size: 48px; margin: 0;">💎</p>
+            <p style="color: #f5d742; font-weight: bold; margin: 16px 0 8px 0; font-size: 18px;">Your Personal Treasury</p>
+            <p style="color: #e5e5e5; margin: 0; line-height: 1.6;">Save insights • Add notes • Build your collection • Share with others</p>
+          </div>
+          
+          <p style="line-height: 1.8; margin-bottom: 16px; color: #e5e5e5;">
+            The Gems Room is like having a <strong style="color: #4ecdc4;">personal treasure chest</strong> of biblical insights. Over time, it becomes your go-to resource for sermons, teaching, and personal reflection.
+          </p>
+          
+          <div style="background: rgba(155, 89, 182, 0.1); padding: 16px; border-radius: 8px; margin: 20px 0;">
+            <p style="color: #9b59b6; font-weight: bold; margin: 0 0 8px 0;">💡 Pro Tip:</p>
+            <p style="color: #e5e5e5; margin: 0; line-height: 1.6;">After any study session with Jeeves, click "Save as Gem" to preserve your best discoveries!</p>
+          </div>
+          
+          <div style="text-align: center; margin-top: 32px;">
+            <a href="https://phototheologybible.com/study" style="display: inline-block; background: linear-gradient(90deg, #9b59b6 0%, #8e44ad 100%); color: #fff; padding: 16px 36px; text-decoration: none; font-weight: bold; border-radius: 8px; font-size: 16px;">
+              Start Collecting Gems
+            </a>
+          </div>
+        </div>
+        
+        <div style="background: #0d0d1a; padding: 20px 32px; text-align: center;">
+          <p style="margin: 0; font-size: 14px; color: #777;">— The PhotoTheology Team</p>
+        </div>
+      </div>
+    `
+  },
+  {
+    day: 10,
+    subject: "🔮 Prophecy & Sanctuary — The Vision Floor Awaits",
+    html: `
+      <div style="font-family: Georgia, serif; max-width: 600px; margin: 0 auto; padding: 0; background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);">
+        <div style="background: linear-gradient(90deg, #3498db 0%, #2980b9 100%); padding: 4px;"></div>
+        
+        <div style="padding: 32px;">
+          <p style="color: #3498db; font-size: 14px; font-weight: bold; margin: 0 0 8px 0;">IMPROVEMENT #5</p>
+          <h1 style="color: #f5d742; font-size: 26px; margin-bottom: 24px;">
+            🔮 The Vision Floor: Prophecy & Sanctuary United
+          </h1>
+          
+          <p style="line-height: 1.8; margin-bottom: 16px; color: #e5e5e5;">
+            Floor 5 of the Palace is where everything connects. Here, the <strong style="color: #3498db;">sanctuary blueprint</strong> and <strong style="color: #ff6b6b;">prophetic timelines</strong> merge into one coherent vision.
+          </p>
+          
+          <!-- Vision Floor Features -->
+          <div style="margin: 24px 0;">
+            <div style="display: flex; gap: 12px; margin-bottom: 12px;">
+              <div style="flex: 1; background: linear-gradient(135deg, #2a2a4e 0%, #1e3a5f 100%); border-radius: 12px; padding: 16px; text-align: center;">
+                <p style="font-size: 32px; margin: 0;">🏛️</p>
+                <p style="color: #3498db; font-weight: bold; margin: 8px 0 4px 0;">Blue Room</p>
+                <p style="color: #a0a0a0; font-size: 13px; margin: 0;">Sanctuary Blueprint</p>
+              </div>
+              <div style="flex: 1; background: linear-gradient(135deg, #2a2a4e 0%, #1e3a5f 100%); border-radius: 12px; padding: 16px; text-align: center;">
+                <p style="font-size: 32px; margin: 0;">🔭</p>
+                <p style="color: #ff6b6b; font-weight: bold; margin: 8px 0 4px 0;">Prophecy Room</p>
+                <p style="color: #a0a0a0; font-size: 13px; margin: 0;">Daniel & Revelation</p>
+              </div>
+              <div style="flex: 1; background: linear-gradient(135deg, #2a2a4e 0%, #1e3a5f 100%); border-radius: 12px; padding: 16px; text-align: center;">
+                <p style="font-size: 32px; margin: 0;">👼</p>
+                <p style="color: #f5d742; font-weight: bold; margin: 8px 0 4px 0;">Three Angels</p>
+                <p style="color: #a0a0a0; font-size: 13px; margin: 0;">Final Messages</p>
+              </div>
+            </div>
+          </div>
+          
+          <p style="line-height: 1.8; margin-bottom: 16px; color: #e5e5e5;">
+            We've enhanced this floor with <strong style="color: #4ecdc4;">interactive timelines</strong>, <strong style="color: #f5d742;">visual sanctuary tours</strong>, and clear connections between ancient prophecy and present truth.
+          </p>
+          
+          <p style="line-height: 1.8; color: #a0a0a0; font-style: italic;">
+            When you see how the sanctuary explains prophecy, everything clicks into place.
+          </p>
+          
+          <div style="text-align: center; margin-top: 32px;">
+            <a href="https://phototheologybible.com/palace" style="display: inline-block; background: linear-gradient(90deg, #3498db 0%, #2980b9 100%); color: #fff; padding: 16px 36px; text-decoration: none; font-weight: bold; border-radius: 8px; font-size: 16px;">
+              Explore the Vision Floor
+            </a>
+          </div>
+        </div>
+        
+        <div style="background: #0d0d1a; padding: 20px 32px; text-align: center;">
+          <p style="margin: 0; font-size: 14px; color: #777;">— The PhotoTheology Team</p>
+        </div>
+      </div>
+    `
+  },
+  {
+    day: 12,
+    subject: "🌟 Your Invitation to Return — Everything Has Changed",
+    html: `
+      <div style="font-family: Georgia, serif; max-width: 600px; margin: 0 auto; padding: 0; background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);">
+        <div style="background: linear-gradient(90deg, #f5d742 0%, #ff6b6b 50%, #4ecdc4 100%); padding: 4px;"></div>
+        
+        <div style="padding: 32px;">
+          <h1 style="color: #f5d742; font-size: 28px; margin-bottom: 24px; text-align: center;">
+            🌟 A Fresh Start Awaits 🌟
+          </h1>
+          
+          <p style="line-height: 1.8; margin-bottom: 16px; color: #e5e5e5;">
+            Over the past two weeks, we've shared the major improvements we've made to PhotoTheology. Let's recap:
+          </p>
+          
+          <!-- Recap Grid -->
+          <div style="background: linear-gradient(135deg, #2a2a4e 0%, #1e3a5f 100%); border-radius: 12px; padding: 24px; margin: 24px 0;">
+            <div style="margin-bottom: 16px; padding-bottom: 16px; border-bottom: 1px solid rgba(255,255,255,0.1);">
+              <span style="color: #4ecdc4;">✓</span> <strong style="color: #f5d742;">Guided Palace Tour</strong> <span style="color: #a0a0a0;">— Step-by-step introduction</span>
+            </div>
+            <div style="margin-bottom: 16px; padding-bottom: 16px; border-bottom: 1px solid rgba(255,255,255,0.1);">
+              <span style="color: #4ecdc4;">✓</span> <strong style="color: #ff6b6b;">Jeeves AI Partner</strong> <span style="color: #a0a0a0;">— 24/7 study companion</span>
+            </div>
+            <div style="margin-bottom: 16px; padding-bottom: 16px; border-bottom: 1px solid rgba(255,255,255,0.1);">
+              <span style="color: #4ecdc4;">✓</span> <strong style="color: #f5d742;">Daily Challenges</strong> <span style="color: #a0a0a0;">— Consistent practice</span>
+            </div>
+            <div style="margin-bottom: 16px; padding-bottom: 16px; border-bottom: 1px solid rgba(255,255,255,0.1);">
+              <span style="color: #4ecdc4;">✓</span> <strong style="color: #9b59b6;">Enhanced Gems Room</strong> <span style="color: #a0a0a0;">— Save your insights</span>
+            </div>
+            <div>
+              <span style="color: #4ecdc4;">✓</span> <strong style="color: #3498db;">Vision Floor</strong> <span style="color: #a0a0a0;">— Prophecy & sanctuary united</span>
+            </div>
+          </div>
+          
+          <p style="line-height: 1.8; margin-bottom: 16px; color: #e5e5e5;">
+            PhotoTheology is a <strong style="color: #4ecdc4;">system of interpretation</strong> that will change how you read Scripture forever. It's designed for slow, intentional study — best experienced on <strong>desktop or laptop</strong>.
+          </p>
+          
+          <div style="background: rgba(245, 215, 66, 0.1); border: 2px solid #f5d742; border-radius: 12px; padding: 20px; margin: 24px 0; text-align: center;">
+            <p style="color: #f5d742; font-weight: bold; margin: 0 0 8px 0; font-size: 18px;">Ready for a Fresh Start?</p>
+            <p style="color: #e5e5e5; margin: 0;">Your account is waiting. Everything you need has been improved.</p>
+          </div>
+          
+          <div style="text-align: center; margin-top: 32px;">
+            <a href="https://phototheologybible.com" style="display: inline-block; background: linear-gradient(90deg, #f5d742 0%, #ff6b6b 50%, #4ecdc4 100%); color: #1a1a2e; padding: 18px 48px; text-decoration: none; font-weight: bold; border-radius: 8px; font-size: 18px;">
+              Return to PhotoTheology
+            </a>
+          </div>
+          
+          <p style="text-align: center; margin-top: 24px; color: #a0a0a0; font-style: italic;">
+            We're here when you're ready. Take your time.
+          </p>
+        </div>
+        
+        <div style="background: #0d0d1a; padding: 20px 32px; text-align: center;">
+          <p style="margin: 0; font-size: 14px; color: #777;">— The PhotoTheology Team</p>
+        </div>
       </div>
     `
   }
