@@ -12,6 +12,7 @@ import { EmailCampaignManager } from "@/components/admin/EmailCampaignManager";
 import { SubscriptionMismatches } from "@/components/admin/SubscriptionMismatches";
 import { BulkEmailSender } from "@/components/admin/BulkEmailSender";
 import { ImageBibleGenerator } from "@/components/admin/ImageBibleGenerator";
+import { PatreonOutreach } from "@/components/admin/PatreonOutreach";
 import { Badge } from "@/components/ui/badge";
 
 interface StripeStats {
@@ -507,54 +508,7 @@ export default function AdminSubscriptions() {
         </TabsContent>
 
         <TabsContent value="patreon">
-          <Card>
-            <CardHeader>
-              <CardTitle>Patreon Integration</CardTitle>
-              <CardDescription>
-                Send reminder emails to Patreon supporters who haven't connected their accounts yet
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-                <div className="p-4 bg-muted rounded-lg">
-                  <div className="text-2xl font-bold">{stats.patreon.total_connected}</div>
-                  <div className="text-sm text-muted-foreground">Connected</div>
-                </div>
-                <div className="p-4 bg-muted rounded-lg">
-                  <div className="text-2xl font-bold">{stats.patreon.active_patrons}</div>
-                  <div className="text-sm text-muted-foreground">Active Patrons</div>
-                </div>
-                <div className="p-4 bg-muted rounded-lg">
-                  <div className="text-2xl font-bold">{stats.patreon.at_20_or_above}</div>
-                  <div className="text-sm text-muted-foreground">$20+ Tier</div>
-                </div>
-                <div className="p-4 bg-muted rounded-lg">
-                  <div className="text-2xl font-bold">{stats.patreon.below_20}</div>
-                  <div className="text-sm text-muted-foreground">Below $20</div>
-                </div>
-              </div>
-              <p className="text-sm text-muted-foreground">
-                This will fetch all active patrons from your Patreon campaign and send reminder emails 
-                to those who haven't connected their Patreon account to Phototheology.
-              </p>
-              <Button 
-                onClick={handleSendPatreonReminder} 
-                disabled={sendingPatreonReminder}
-              >
-                {sendingPatreonReminder ? (
-                  <>
-                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                    Sending Reminders...
-                  </>
-                ) : (
-                  <>
-                    <Send className="h-4 w-4 mr-2" />
-                    Send Patreon Connection Reminders
-                  </>
-                )}
-              </Button>
-            </CardContent>
-          </Card>
+          <PatreonOutreach />
         </TabsContent>
       </Tabs>
     </div>
