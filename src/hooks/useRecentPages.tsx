@@ -33,6 +33,24 @@ const routeTitles: Record<string, string> = {
   "/escape-room": "Escape Rooms",
   "/treasure-hunt": "Treasure Hunt",
   "/live-study": "Live Study",
+  "/dashboard": "Dashboard",
+  "/admin": "Admin",
+  "/admin/subscriptions": "Subscriptions Admin",
+  "/admin/users": "Users Admin",
+  "/admin/challenges": "Challenges Admin",
+  "/admin/announcements": "Announcements Admin",
+  "/notifications": "Notifications",
+  "/settings": "Settings",
+  "/quick-start": "Quick Start Guide",
+  "/study-suite": "Study Suite",
+  "/bible-prophecy-guide": "Bible Prophecy Guide",
+  "/series": "Bible Study Series",
+  "/devotional-plans": "Devotional Plans",
+  "/reading-plans": "Reading Plans",
+  "/church": "My Church",
+  "/deck-study": "Deck Study",
+  "/jeeves": "Ask Jeeves",
+  "/onboarding": "Onboarding",
 };
 
 const getPageTitle = (path: string): string => {
@@ -60,6 +78,9 @@ const getPageTitle = (path: string): string => {
   if (path.startsWith("/series/") && path.includes("/present")) {
     return "Series Presenter";
   }
+  if (path.startsWith("/series/") && path.length > 8) {
+    return "Bible Study Series";
+  }
   
   // Check for Escape Room and Treasure Hunt dynamic routes
   if (path.startsWith("/escape-room/play/")) {
@@ -72,13 +93,46 @@ const getPageTitle = (path: string): string => {
     return "Live Study";
   }
   
-  // Default to formatted path
-  const lastSegment = path.split("/").pop() || "";
+  // Check for admin paths
+  if (path.startsWith("/admin/")) {
+    const segment = path.split("/")[2] || "";
+    return `Admin: ${segment.charAt(0).toUpperCase() + segment.slice(1).replace(/-/g, " ")}`;
+  }
+  
+  // Check for devotional plan paths
+  if (path.startsWith("/devotional-plans/")) {
+    return "Devotional Plan";
+  }
+  
+  // Check for reading plan paths
+  if (path.startsWith("/reading-plans/")) {
+    return "Reading Plan";
+  }
+  
+  // Check for church paths
+  if (path.startsWith("/church/")) {
+    return "Church";
+  }
+  
+  // Default to formatted path - capitalize and format nicely
+  const lastSegment = path.split("/").filter(Boolean).pop() || "";
+  
   // Check if it looks like a UUID (contains multiple hyphens and hexadecimal characters)
   if (lastSegment.match(/^[a-f0-9-]{36}$/i)) {
-    return "Unknown Page";
+    // Try to get title from parent path
+    const parentPath = "/" + path.split("/").filter(Boolean).slice(0, -1).join("/");
+    if (routeTitles[parentPath]) {
+      return routeTitles[parentPath];
+    }
+    return "Page";
   }
-  return lastSegment.replace(/-/g, " ") || "Unknown Page";
+  
+  // Format the segment nicely
+  return lastSegment
+    .replace(/-/g, " ")
+    .split(" ")
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(" ") || "Home";
 };
 
 export const useRecentPages = () => {
