@@ -44,7 +44,7 @@ export function EmailCampaignManager() {
         .from('user_subscriptions')
         .select('user_id')
         .in('subscription_status', ['expired', 'cancelled', 'trial_expired'])
-        .eq('has_lifetime_access', false);
+        .eq('has_lifetime_access', false) as any;
 
       if (!expiredUsers) return 0;
 
@@ -52,7 +52,7 @@ export function EmailCampaignManager() {
         .from('email_logs')
         .select('user_id')
         .eq('campaign_type', 'winback')
-        .gte('sent_at', thirtyDaysAgo.toISOString());
+        .gte('sent_at', thirtyDaysAgo.toISOString()) as any;
 
       const recentUserIds = new Set(recentEmails?.map(e => e.user_id) || []);
       return expiredUsers.filter(u => !recentUserIds.has(u.user_id)).length;
@@ -95,8 +95,8 @@ export function EmailCampaignManager() {
 
       const { data: logs } = await supabase
         .from('email_logs')
-        .select('campaign_type, status')
-        .gte('sent_at', sevenDaysAgo.toISOString());
+        .select('*')
+        .gte('sent_at', sevenDaysAgo.toISOString()) as any;
 
       const stats: Record<CampaignType, CampaignStats> = {
         winback: { total: 0, sent: 0, failed: 0 },
@@ -104,7 +104,7 @@ export function EmailCampaignManager() {
         engagement: { total: 0, sent: 0, failed: 0 },
       };
 
-      logs?.forEach(log => {
+      (logs as any[] || []).forEach((log: any) => {
         const type = log.campaign_type as CampaignType;
         if (stats[type]) {
           stats[type].total++;

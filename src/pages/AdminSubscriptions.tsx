@@ -8,7 +8,7 @@ import { Loader2, RefreshCw, Send, AlertTriangle, CheckCircle2 } from "lucide-re
 import { useToast } from "@/hooks/use-toast";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { RevenueDashboard } from "@/components/admin/RevenueDashboard";
-import { WinBackCampaign } from "@/components/admin/WinBackCampaign";
+import { EmailCampaignManager } from "@/components/admin/EmailCampaignManager";
 import { SubscriptionMismatches } from "@/components/admin/SubscriptionMismatches";
 import { BulkEmailSender } from "@/components/admin/BulkEmailSender";
 import { ImageBibleGenerator } from "@/components/admin/ImageBibleGenerator";
@@ -272,8 +272,8 @@ export default function AdminSubscriptions() {
           <TabsTrigger value="overview">Overview</TabsTrigger>
           <TabsTrigger value="mismatches">Subscription Health</TabsTrigger>
           <TabsTrigger value="revenue">Revenue & Churn</TabsTrigger>
-          <TabsTrigger value="winback">Win-Back Campaign</TabsTrigger>
-          <TabsTrigger value="email">Bulk Email</TabsTrigger>
+          <TabsTrigger value="campaigns">Email Campaigns</TabsTrigger>
+          <TabsTrigger value="email">Quick Email</TabsTrigger>
           <TabsTrigger value="image-bible">Image Bible</TabsTrigger>
           <TabsTrigger value="patreon">Patreon</TabsTrigger>
         </TabsList>
@@ -493,8 +493,8 @@ export default function AdminSubscriptions() {
           <RevenueDashboard />
         </TabsContent>
 
-        <TabsContent value="winback">
-          <WinBackCampaign />
+        <TabsContent value="campaigns">
+          <EmailCampaignManager />
         </TabsContent>
 
         <TabsContent value="email">
