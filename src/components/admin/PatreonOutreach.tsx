@@ -166,10 +166,28 @@ export function PatreonOutreach() {
 
       if (error) throw error;
 
-      toast({
-        title: testMode ? "Test Email Sent" : "Campaign Sent",
-        description: data?.message || `Sent to ${data?.sent || 0} recipients`,
-      });
+      // Check if there were errors in the response
+      if (data?.errors && data.errors > 0 && data.sent === 0) {
+        // All failed - likely domain verification issue
+        toast({
+          title: "⚠️ Emails Failed to Send",
+          description: "Resend requires domain verification to send to external recipients. Please verify your domain at resend.com/domains",
+          variant: "destructive",
+          duration: 10000,
+        });
+      } else if (data?.sent > 0) {
+        // Success!
+        toast({
+          title: testMode ? "✅ Test Email Sent!" : "🎉 Campaign Sent Successfully!",
+          description: `${data.sent} email${data.sent > 1 ? 's' : ''} sent successfully${data.errors > 0 ? ` (${data.errors} failed)` : ''}`,
+          duration: 8000,
+        });
+      } else {
+        toast({
+          title: testMode ? "Test Email Sent" : "Campaign Sent",
+          description: data?.message || `Sent to ${data?.sent || 0} recipients`,
+        });
+      }
     } catch (error: any) {
       console.error("Send error:", error);
       toast({
