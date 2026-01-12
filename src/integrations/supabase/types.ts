@@ -8667,6 +8667,216 @@ export type Database = {
           },
         ]
       }
+      pt_recalibration_requests: {
+        Row: {
+          approved: boolean | null
+          created_at: string
+          evaluation_result: Json | null
+          id: string
+          new_level: Database["public"]["Enums"]["pt_mastery_level"] | null
+          path_id: string | null
+          processed_at: string | null
+          reason: string | null
+          requested_level:
+            | Database["public"]["Enums"]["pt_mastery_level"]
+            | null
+          user_id: string
+        }
+        Insert: {
+          approved?: boolean | null
+          created_at?: string
+          evaluation_result?: Json | null
+          id?: string
+          new_level?: Database["public"]["Enums"]["pt_mastery_level"] | null
+          path_id?: string | null
+          processed_at?: string | null
+          reason?: string | null
+          requested_level?:
+            | Database["public"]["Enums"]["pt_mastery_level"]
+            | null
+          user_id: string
+        }
+        Update: {
+          approved?: boolean | null
+          created_at?: string
+          evaluation_result?: Json | null
+          id?: string
+          new_level?: Database["public"]["Enums"]["pt_mastery_level"] | null
+          path_id?: string | null
+          processed_at?: string | null
+          reason?: string | null
+          requested_level?:
+            | Database["public"]["Enums"]["pt_mastery_level"]
+            | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pt_recalibration_requests_path_id_fkey"
+            columns: ["path_id"]
+            isOneToOne: false
+            referencedRelation: "user_study_paths"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      pt_scenario_evaluations: {
+        Row: {
+          ai_evaluation: Json | null
+          created_at: string
+          floors_tested: number[] | null
+          id: string
+          passed: boolean | null
+          rooms_tested: string[] | null
+          scenario_prompt: string
+          scenario_type: string
+          score: number | null
+          session_id: string | null
+          user_id: string
+          user_response: string | null
+        }
+        Insert: {
+          ai_evaluation?: Json | null
+          created_at?: string
+          floors_tested?: number[] | null
+          id?: string
+          passed?: boolean | null
+          rooms_tested?: string[] | null
+          scenario_prompt: string
+          scenario_type: string
+          score?: number | null
+          session_id?: string | null
+          user_id: string
+          user_response?: string | null
+        }
+        Update: {
+          ai_evaluation?: Json | null
+          created_at?: string
+          floors_tested?: number[] | null
+          id?: string
+          passed?: boolean | null
+          rooms_tested?: string[] | null
+          scenario_prompt?: string
+          scenario_type?: string
+          score?: number | null
+          session_id?: string | null
+          user_id?: string
+          user_response?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pt_scenario_evaluations_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "pt_sessions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      pt_sessions: {
+        Row: {
+          competency_check_passed: boolean | null
+          competency_feedback: string | null
+          completed_at: string | null
+          completion_score: number | null
+          confidence_targets: string[] | null
+          content: Json
+          created_at: string
+          floor_numbers: number[] | null
+          id: string
+          path_id: string
+          primary_room_codes: string[] | null
+          secondary_room_codes: string[] | null
+          session_number: number
+          session_type: string
+          skill_focus: string | null
+          started_at: string | null
+          time_spent_minutes: number | null
+          title: string
+        }
+        Insert: {
+          competency_check_passed?: boolean | null
+          competency_feedback?: string | null
+          completed_at?: string | null
+          completion_score?: number | null
+          confidence_targets?: string[] | null
+          content?: Json
+          created_at?: string
+          floor_numbers?: number[] | null
+          id?: string
+          path_id: string
+          primary_room_codes?: string[] | null
+          secondary_room_codes?: string[] | null
+          session_number: number
+          session_type: string
+          skill_focus?: string | null
+          started_at?: string | null
+          time_spent_minutes?: number | null
+          title: string
+        }
+        Update: {
+          competency_check_passed?: boolean | null
+          competency_feedback?: string | null
+          completed_at?: string | null
+          completion_score?: number | null
+          confidence_targets?: string[] | null
+          content?: Json
+          created_at?: string
+          floor_numbers?: number[] | null
+          id?: string
+          path_id?: string
+          primary_room_codes?: string[] | null
+          secondary_room_codes?: string[] | null
+          session_number?: number
+          session_type?: string
+          skill_focus?: string | null
+          started_at?: string | null
+          time_spent_minutes?: number | null
+          title?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pt_sessions_path_id_fkey"
+            columns: ["path_id"]
+            isOneToOne: false
+            referencedRelation: "user_study_paths"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      pt_study_tracks: {
+        Row: {
+          burden_alignment: Database["public"]["Enums"]["pt_study_burden"][]
+          created_at: string
+          description: string | null
+          floor_focus: number[] | null
+          id: string
+          min_confidence_level: number
+          name: string
+          room_focus: string[] | null
+        }
+        Insert: {
+          burden_alignment?: Database["public"]["Enums"]["pt_study_burden"][]
+          created_at?: string
+          description?: string | null
+          floor_focus?: number[] | null
+          id?: string
+          min_confidence_level?: number
+          name: string
+          room_focus?: string[] | null
+        }
+        Update: {
+          burden_alignment?: Database["public"]["Enums"]["pt_study_burden"][]
+          created_at?: string
+          description?: string | null
+          floor_focus?: number[] | null
+          id?: string
+          min_confidence_level?: number
+          name?: string
+          room_focus?: string[] | null
+        }
+        Relationships: []
+      }
       rate_limits: {
         Row: {
           created_at: string
@@ -12112,6 +12322,134 @@ export type Database = {
         }
         Relationships: []
       }
+      user_study_paths: {
+        Row: {
+          created_at: string
+          current_session_number: number
+          demonstrated_level: Database["public"]["Enums"]["pt_mastery_level"]
+          id: string
+          integration_tasks_completed: number
+          is_active: boolean
+          last_recalibration_requested: string | null
+          level_earned_at: string | null
+          recalibration_count: number
+          room_completions: Json | null
+          scenario_scores: Json | null
+          sessions_completed: number
+          track_id: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          current_session_number?: number
+          demonstrated_level?: Database["public"]["Enums"]["pt_mastery_level"]
+          id?: string
+          integration_tasks_completed?: number
+          is_active?: boolean
+          last_recalibration_requested?: string | null
+          level_earned_at?: string | null
+          recalibration_count?: number
+          room_completions?: Json | null
+          scenario_scores?: Json | null
+          sessions_completed?: number
+          track_id?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          current_session_number?: number
+          demonstrated_level?: Database["public"]["Enums"]["pt_mastery_level"]
+          id?: string
+          integration_tasks_completed?: number
+          is_active?: boolean
+          last_recalibration_requested?: string | null
+          level_earned_at?: string | null
+          recalibration_count?: number
+          room_completions?: Json | null
+          scenario_scores?: Json | null
+          sessions_completed?: number
+          track_id?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_study_paths_track_id_fkey"
+            columns: ["track_id"]
+            isOneToOne: false
+            referencedRelation: "pt_study_tracks"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_study_profiles: {
+        Row: {
+          available_time_minutes: number
+          confidence_bible_storyline: number
+          confidence_cross_referencing: number
+          confidence_gospel_basics: number
+          confidence_parables_symbols: number
+          confidence_prophecy: number
+          confidence_sanctuary_basics: number
+          confidence_study_consistency: number
+          created_at: string
+          current_level: Database["public"]["Enums"]["pt_mastery_level"]
+          id: string
+          learning_preference: string
+          onboarding_completed: boolean
+          onboarding_skipped: boolean
+          pain_points: Json | null
+          primary_burdens: Database["public"]["Enums"]["pt_study_burden"][]
+          updated_at: string
+          user_id: string
+          user_role: Database["public"]["Enums"]["pt_user_role"]
+        }
+        Insert: {
+          available_time_minutes?: number
+          confidence_bible_storyline?: number
+          confidence_cross_referencing?: number
+          confidence_gospel_basics?: number
+          confidence_parables_symbols?: number
+          confidence_prophecy?: number
+          confidence_sanctuary_basics?: number
+          confidence_study_consistency?: number
+          created_at?: string
+          current_level?: Database["public"]["Enums"]["pt_mastery_level"]
+          id?: string
+          learning_preference?: string
+          onboarding_completed?: boolean
+          onboarding_skipped?: boolean
+          pain_points?: Json | null
+          primary_burdens?: Database["public"]["Enums"]["pt_study_burden"][]
+          updated_at?: string
+          user_id: string
+          user_role?: Database["public"]["Enums"]["pt_user_role"]
+        }
+        Update: {
+          available_time_minutes?: number
+          confidence_bible_storyline?: number
+          confidence_cross_referencing?: number
+          confidence_gospel_basics?: number
+          confidence_parables_symbols?: number
+          confidence_prophecy?: number
+          confidence_sanctuary_basics?: number
+          confidence_study_consistency?: number
+          created_at?: string
+          current_level?: Database["public"]["Enums"]["pt_mastery_level"]
+          id?: string
+          learning_preference?: string
+          onboarding_completed?: boolean
+          onboarding_skipped?: boolean
+          pain_points?: Json | null
+          primary_burdens?: Database["public"]["Enums"]["pt_study_burden"][]
+          updated_at?: string
+          user_id?: string
+          user_role?: Database["public"]["Enums"]["pt_user_role"]
+        }
+        Relationships: []
+      }
       user_subscriptions: {
         Row: {
           created_at: string
@@ -13796,6 +14134,25 @@ export type Database = {
         | "prayer_lead"
         | "sabbath_school_lead"
         | "youth_lead"
+      pt_mastery_level: "beginner" | "intermediate" | "master"
+      pt_pain_point_type: "diagnostic" | "symptomatic"
+      pt_study_burden:
+        | "prophecy"
+        | "sanctuary_gospel"
+        | "study_method"
+        | "parables_symbols"
+        | "sermon_building"
+        | "apologetics"
+        | "christ_centered"
+        | "study_habits"
+      pt_user_role:
+        | "pastor"
+        | "teacher"
+        | "lay_member"
+        | "student"
+        | "new_believer"
+        | "scholar"
+        | "explorer"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -13939,6 +14296,27 @@ export const Constants = {
         "prayer_lead",
         "sabbath_school_lead",
         "youth_lead",
+      ],
+      pt_mastery_level: ["beginner", "intermediate", "master"],
+      pt_pain_point_type: ["diagnostic", "symptomatic"],
+      pt_study_burden: [
+        "prophecy",
+        "sanctuary_gospel",
+        "study_method",
+        "parables_symbols",
+        "sermon_building",
+        "apologetics",
+        "christ_centered",
+        "study_habits",
+      ],
+      pt_user_role: [
+        "pastor",
+        "teacher",
+        "lay_member",
+        "student",
+        "new_believer",
+        "scholar",
+        "explorer",
       ],
     },
   },
