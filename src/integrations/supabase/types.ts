@@ -5330,6 +5330,39 @@ export type Database = {
         }
         Relationships: []
       }
+      image_bible_cache: {
+        Row: {
+          book: string
+          chapter: number
+          generated_at: string | null
+          id: string
+          prompt_used: string | null
+          public_url: string
+          storage_path: string
+          theme: string
+        }
+        Insert: {
+          book: string
+          chapter: number
+          generated_at?: string | null
+          id?: string
+          prompt_used?: string | null
+          public_url: string
+          storage_path: string
+          theme: string
+        }
+        Update: {
+          book?: string
+          chapter?: number
+          generated_at?: string | null
+          id?: string
+          prompt_used?: string | null
+          public_url?: string
+          storage_path?: string
+          theme?: string
+        }
+        Relationships: []
+      }
       interest_study_sessions: {
         Row: {
           bible_worker_id: string
