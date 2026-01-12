@@ -94,6 +94,7 @@ const ProphecyWatch = lazy(() => import("./pages/ProphecyWatch"));
 const ResearchMode = lazy(() => import("./pages/ResearchMode"));
 const BibleImageLibrary = lazy(() => import("./pages/BibleImageLibrary"));
 const SermonBuilder = lazy(() => import("./pages/SermonBuilder"));
+const SermonSimmer = lazy(() => import("./pages/SermonSimmer"));
 const SermonArchive = lazy(() => import("./pages/SermonArchive"));
 const SermonPowerPoint = lazy(() => import("./pages/SermonPowerPoint"));
 const SermonTopicsHub = lazy(() => import("./pages/SermonTopicsHub"));
@@ -530,6 +531,7 @@ function App() {
           <Route path="/research-mode" element={<ProtectedRoute><ResearchMode /></ProtectedRoute>} />
             <Route path="/bible-image-library" element={<ProtectedRoute><BibleImageLibrary /></ProtectedRoute>} />
           <Route path="/sermon-builder" element={<ProtectedRoute><SermonBuilder /></ProtectedRoute>} />
+          <Route path="/sermon-simmer" element={<ProtectedRoute><SermonSimmer /></ProtectedRoute>} />
           <Route path="/sermon-archive" element={<ProtectedRoute><SermonArchive /></ProtectedRoute>} />
           <Route path="/sermon-topics" element={<ProtectedRoute><SermonTopicsHub /></ProtectedRoute>} />
           <Route path="/sermon-topics/:slug" element={<ProtectedRoute><SermonTopicDetail /></ProtectedRoute>} />

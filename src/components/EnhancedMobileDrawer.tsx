@@ -158,6 +158,7 @@ const categoryConfig = {
     icon: Sparkles,
     links: [
       { to: "/sermon-builder", label: "Sermon Builder", icon: "🎤" },
+      { to: "/sermon-simmer", label: "Simmer Mode", icon: "🔥" },
       { to: "/sermon-powerpoint", label: "PowerPoint Generator", icon: "📊" },
       { to: "/sermon-archive", label: "My Sermons", icon: "📁" },
     ],
