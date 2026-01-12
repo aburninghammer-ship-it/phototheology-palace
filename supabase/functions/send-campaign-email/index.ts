@@ -573,6 +573,18 @@ serve(async (req) => {
     const { campaignType, testMode, testEmail, dayOverride }: CampaignRequest = await req.json();
     logStep("Request parsed", { campaignType, testMode });
 
+    // Resend requires a verified sending domain for custom addresses.
+    // Defaulting to resend.dev keeps campaigns working until a custom domain is verified.
+    const defaultFromAddress = "PhotoTheology <onboarding@resend.dev>";
+    const customFromEmail = Deno.env.get("RESEND_FROM_EMAIL");
+    const fromAddress = testMode
+      ? defaultFromAddress
+      : customFromEmail
+        ? `PhotoTheology <${customFromEmail}>`
+        : defaultFromAddress;
+
+    logStep("Using from address", { fromAddress, testMode });
+
     let recipients: { email: string; userId: string; dayNumber?: number }[] = [];
     let emailTemplates: any[] = [];
 
@@ -742,7 +754,7 @@ serve(async (req) => {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            from: "PhotoTheology <support@phototheology.com>",
+            from: fromAddress,
             to: [recipient.email],
             subject: template.subject,
             html: template.html,
@@ -778,16 +790,17 @@ serve(async (req) => {
 
     const sent = results.filter(r => r.success).length;
     const failed = results.filter(r => !r.success).length;
+    const success = failed === 0;
 
     logStep("Campaign complete", { sent, failed });
 
     return new Response(
-      JSON.stringify({ 
-        success: true, 
-        sent, 
+      JSON.stringify({
+        success,
+        sent,
         failed,
         total: recipients.length,
-        results 
+        results,
       }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );

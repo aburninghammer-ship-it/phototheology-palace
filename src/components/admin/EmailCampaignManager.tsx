@@ -126,9 +126,9 @@ export function EmailCampaignManager() {
     setIsSending(campaignType);
     try {
       const { data, error } = await supabase.functions.invoke('send-campaign-email', {
-        body: { 
-          campaignType, 
-          testMode, 
+        body: {
+          campaignType,
+          testMode,
           testEmail: testMode ? testEmail : undefined,
           dayOverride: testMode ? parseInt(selectedDay) : undefined
         }
@@ -136,21 +136,33 @@ export function EmailCampaignManager() {
 
       if (error) throw error;
 
+      const sent = Number((data as any)?.sent ?? 0);
+      const failed = Number((data as any)?.failed ?? 0);
+      const firstError = ((data as any)?.results as any[] | undefined)?.find((r: any) => !r.success)?.error;
+
       setLastResults(prev => ({
         ...prev,
-        [campaignType]: { sent: data.sent, failed: data.failed }
+        [campaignType]: { sent, failed }
       }));
 
-      if (testMode) {
-        toast.success(`Test email sent to ${testEmail}`);
+      if (failed > 0) {
+        toast.error(
+          testMode
+            ? `Test email failed (${failed} failed)${firstError ? `: ${firstError}` : ''}`
+            : `${getCampaignName(campaignType)}: ${sent} sent, ${failed} failed${firstError ? `: ${firstError}` : ''}`
+        );
       } else {
-        toast.success(`${getCampaignName(campaignType)} sent: ${data.sent} emails delivered`);
+        toast.success(
+          testMode
+            ? `Test email sent to ${testEmail}`
+            : `${getCampaignName(campaignType)} sent: ${sent} emails delivered`
+        );
       }
 
       queryClient.invalidateQueries({ queryKey: ['campaign-stats'] });
     } catch (error: any) {
       console.error('Error sending campaign:', error);
-      toast.error('Failed to send campaign: ' + error.message);
+      toast.error('Failed to send campaign: ' + (error?.message || 'Unknown error'));
     } finally {
       setIsSending(null);
     }
