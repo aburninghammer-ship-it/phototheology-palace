@@ -163,13 +163,47 @@ serve(async (req) => {
 
     logStep("Email sending complete", { totalSent, errors: errors.length });
 
+    // Send notification email to admin
+    const adminEmail = userData.user.email;
+    if (adminEmail && !testMode) {
+      try {
+        await fetch("https://api.resend.com/emails", {
+          method: "POST",
+          headers: {
+            "Authorization": `Bearer ${resendApiKey}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            from: "PhotoTheology <support@phototheologybible.com>",
+            to: [adminEmail],
+            subject: `✅ Patreon Campaign Sent: "${subject}"`,
+            html: `
+              <h2>Campaign Sent Successfully!</h2>
+              <p>Your Patreon email campaign has been sent.</p>
+              <table style="border-collapse: collapse; margin: 16px 0;">
+                <tr><td style="padding: 8px; border: 1px solid #ddd;"><strong>Subject:</strong></td><td style="padding: 8px; border: 1px solid #ddd;">${subject}</td></tr>
+                <tr><td style="padding: 8px; border: 1px solid #ddd;"><strong>Filter:</strong></td><td style="padding: 8px; border: 1px solid #ddd;">${filter}</td></tr>
+                <tr><td style="padding: 8px; border: 1px solid #ddd;"><strong>Emails Sent:</strong></td><td style="padding: 8px; border: 1px solid #ddd;">${totalSent} of ${emails.length}</td></tr>
+                ${errors.length > 0 ? `<tr><td style="padding: 8px; border: 1px solid #ddd;"><strong>Errors:</strong></td><td style="padding: 8px; border: 1px solid #ddd;">${errors.length}</td></tr>` : ''}
+              </table>
+              <p style="color: #666; font-size: 12px;">Sent at: ${new Date().toISOString()}</p>
+            `,
+          }),
+        });
+        logStep("Admin notification sent", { adminEmail });
+      } catch (notifyError) {
+        logStep("Failed to send admin notification", { error: notifyError });
+      }
+    }
+
     return new Response(
       JSON.stringify({ 
         success: true, 
         sent: totalSent, 
         total: emails.length,
         errors: errors.length > 0 ? errors : undefined,
-        message: `Successfully sent ${totalSent} of ${emails.length} emails` 
+        message: `Successfully sent ${totalSent} of ${emails.length} emails`,
+        notified: !testMode && !!adminEmail,
       }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
