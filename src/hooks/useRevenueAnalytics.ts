@@ -50,6 +50,7 @@ export function useRevenueAnalytics() {
   const [cohorts, setCohorts] = useState<CohortData[]>([]);
   const [onboardingFunnel, setOnboardingFunnel] = useState<OnboardingFunnel[]>([]);
   const [monthlyTrend, setMonthlyTrend] = useState<{ month: string; mrr: number; subscribers: number }[]>([]);
+  const [stripeMrr, setStripeMrr] = useState<number | null>(null);
 
   useEffect(() => {
     fetchAllMetrics();
@@ -64,9 +65,22 @@ export function useRevenueAnalytics() {
         fetchCohortData(),
         fetchOnboardingFunnel(),
         fetchMonthlyTrend(),
+        fetchStripeMrr(),
       ]);
     } finally {
       setLoading(false);
+    }
+  };
+
+  // Fetch MRR from Stripe via edge function (authoritative source)
+  const fetchStripeMrr = async () => {
+    try {
+      const { data, error } = await supabase.functions.invoke('get-subscriber-stats');
+      if (!error && data?.stats?.stripe?.total_mrr_cents) {
+        setStripeMrr(data.stats.stripe.total_mrr_cents / 100);
+      }
+    } catch (e) {
+      console.debug('[useRevenueAnalytics] Could not fetch Stripe MRR', e);
     }
   };
 
@@ -185,9 +199,12 @@ export function useRevenueAnalytics() {
     const startOfMonthActive = activeSubs.length + churnedThisMonth;
     const churnRate = startOfMonthActive > 0 ? (churnedThisMonth / startOfMonthActive) * 100 : 0;
 
+    // MRR will be overwritten by Stripe data if available (see stripeMrr state)
+    const dbMrr = Math.round(mrr * 100) / 100;
+    
     setMetrics({
-      mrr: Math.round(mrr * 100) / 100,
-      arr: Math.round(mrr * 12 * 100) / 100,
+      mrr: dbMrr,
+      arr: Math.round(dbMrr * 12 * 100) / 100,
       activeSubscribers: activeSubs.length,
       churnedThisMonth,
       churnRate: Math.round(churnRate * 10) / 10,
@@ -312,9 +329,19 @@ export function useRevenueAnalytics() {
     setMonthlyTrend(months);
   };
 
+  // Use Stripe MRR as authoritative source when available
+  const finalMetrics = metrics && stripeMrr !== null ? {
+    ...metrics,
+    mrr: stripeMrr,
+    arr: Math.round(stripeMrr * 12 * 100) / 100,
+    averageRevenuePerUser: metrics.activeSubscribers > 0 
+      ? Math.round((stripeMrr / metrics.activeSubscribers) * 100) / 100 
+      : 0,
+  } : metrics;
+
   return {
     loading,
-    metrics,
+    metrics: finalMetrics,
     trialMetrics,
     cohorts,
     onboardingFunnel,
