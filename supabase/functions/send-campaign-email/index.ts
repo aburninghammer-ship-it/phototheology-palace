@@ -833,6 +833,7 @@ interface CampaignRequest {
   testMode?: boolean;
   testEmail?: string;
   dayOverride?: number;
+  forceSend?: boolean; // Ignore 30-day cooldown
 }
 
 serve(async (req) => {
@@ -870,8 +871,8 @@ serve(async (req) => {
     if (!roleData) throw new Error("Unauthorized - admin access required");
     logStep("Admin verified", { userId: userData.user.id });
 
-    const { campaignType, testMode, testEmail, dayOverride }: CampaignRequest = await req.json();
-    logStep("Request parsed", { campaignType, testMode });
+    const { campaignType, testMode, testEmail, dayOverride, forceSend }: CampaignRequest = await req.json();
+    logStep("Request parsed", { campaignType, testMode, forceSend });
 
     // Resend requires a verified sending domain for custom addresses.
     // Defaulting to resend.dev keeps campaigns working until a custom domain is verified.
@@ -916,13 +917,17 @@ serve(async (req) => {
           const userIds = expiredUsers.map(u => u.user_id);
           const userEmailMap = await mapUserIdsToEmails(supabaseClient, userIds);
 
-          const { data: recentEmails } = await supabaseClient
-            .from('email_logs')
-            .select('user_id')
-            .eq('campaign_type', 'winback')
-            .gte('sent_at', thirtyDaysAgo.toISOString());
+          let recentUserIds = new Set<string>();
+          
+          if (!forceSend) {
+            const { data: recentEmails } = await supabaseClient
+              .from('email_logs')
+              .select('user_id')
+              .eq('campaign_type', 'winback')
+              .gte('sent_at', thirtyDaysAgo.toISOString());
 
-          const recentUserIds = new Set(recentEmails?.map(e => e.user_id) || []);
+            recentUserIds = new Set(recentEmails?.map(e => e.user_id) || []);
+          }
           
           recipients = expiredUsers
             .filter(u => userEmailMap.has(u.user_id) && !recentUserIds.has(u.user_id))
@@ -931,7 +936,8 @@ serve(async (req) => {
           logStep("Winback recipients mapped", { 
             expiredCount: expiredUsers.length, 
             emailsFound: userEmailMap.size,
-            afterRecentFilter: recipients.length 
+            afterRecentFilter: recipients.length,
+            forceSend: !!forceSend
           });
         }
 

@@ -2,14 +2,17 @@ import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { Mail, Users, Send, Clock, CheckCircle, AlertCircle } from "lucide-react";
+import { Mail, Users, Send, Clock, CheckCircle, AlertCircle, AlertTriangle } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 
 export function WinBackCampaign() {
   const [isSending, setIsSending] = useState(false);
   const [lastResult, setLastResult] = useState<{ sent: number; failed: number } | null>(null);
+  const [forceSend, setForceSend] = useState(false);
 
   // Get count of win-back eligible users
   const { data: eligibleCount, isLoading } = useQuery({
@@ -77,7 +80,7 @@ export function WinBackCampaign() {
     setIsSending(true);
     try {
       const { data, error } = await supabase.functions.invoke('send-campaign-email', {
-        body: { campaignType: 'winback', testMode: false }
+        body: { campaignType: 'winback', testMode: false, forceSend }
       });
 
       if (error) throw error;
@@ -172,6 +175,24 @@ export function WinBackCampaign() {
               <li>Day 7: Share a Gem with the community</li>
             </ul>
           </div>
+        </div>
+
+        {/* Force Send Toggle */}
+        <div className="flex items-center justify-between p-4 bg-destructive/10 rounded-lg border border-destructive/20">
+          <div className="flex items-center gap-3">
+            <AlertTriangle className="h-5 w-5 text-destructive" />
+            <div>
+              <Label htmlFor="force-send" className="font-medium">Force Send (Ignore 30-day cooldown)</Label>
+              <p className="text-sm text-muted-foreground">
+                Send to all expired users, even those who received an email recently
+              </p>
+            </div>
+          </div>
+          <Switch
+            id="force-send"
+            checked={forceSend}
+            onCheckedChange={setForceSend}
+          />
         </div>
 
         {/* Send Button */}
