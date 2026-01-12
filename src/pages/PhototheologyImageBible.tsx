@@ -33,6 +33,7 @@ import {
   type BookData,
 } from "@/data/imageBibleData";
 import { motion, AnimatePresence } from "framer-motion";
+import { useImageBibleImages, getChapterImageUrl } from "@/hooks/useImageBibleImages";
 
 // Flashcard Component
 interface FlashcardProps {
@@ -41,11 +42,12 @@ interface FlashcardProps {
   onFlip: () => void;
   size?: "normal" | "large";
   memoryTestMode?: boolean;
+  dynamicImageUrl?: string;
 }
 
-function Flashcard({ chapter, isFlipped, onFlip, size = "normal", memoryTestMode = false }: FlashcardProps) {
+function Flashcard({ chapter, isFlipped, onFlip, size = "normal", memoryTestMode = false, dynamicImageUrl }: FlashcardProps) {
   const isLarge = size === "large";
-  const hasImage = !!chapter.imageUrl;
+  const hasImage = !!(dynamicImageUrl || chapter.imageUrl);
 
   return (
     <div
@@ -68,7 +70,7 @@ function Flashcard({ chapter, isFlipped, onFlip, size = "normal", memoryTestMode
           {hasImage ? (
             <div className="relative w-full h-full">
               <img
-                src={chapter.imageUrl}
+                src={dynamicImageUrl || chapter.imageUrl}
                 alt={`${chapter.book} ${chapter.chapter} - ${chapter.theme}`}
                 className="w-full h-full object-cover"
               />
@@ -191,6 +193,9 @@ export default function PhototheologyImageBible() {
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [memoryTestMode, setMemoryTestMode] = useState(false);
 
+  // Fetch dynamically generated images from storage
+  const { data: imageMap } = useImageBibleImages();
+
   const totalChapters = getTotalChapters();
 
   // Search results
@@ -279,6 +284,7 @@ export default function PhototheologyImageBible() {
               onFlip={() => setIsFlipped(!isFlipped)}
               size="large"
               memoryTestMode={memoryTestMode}
+              dynamicImageUrl={getChapterImageUrl(imageMap, currentChapter.book, currentChapter.chapter)}
             />
           </div>
         </div>
@@ -497,6 +503,7 @@ export default function PhototheologyImageBible() {
                 onFlip={() => setIsFlipped(!isFlipped)}
                 size="large"
                 memoryTestMode={memoryTestMode}
+                dynamicImageUrl={getChapterImageUrl(imageMap, currentChapter.book, currentChapter.chapter)}
               />
             </div>
 
