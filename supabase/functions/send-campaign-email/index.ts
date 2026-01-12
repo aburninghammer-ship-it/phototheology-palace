@@ -11,6 +11,48 @@ const logStep = (step: string, details?: any) => {
   console.log(`[CAMPAIGN-EMAIL] ${step}${detailsStr}`);
 };
 
+const mapUserIdsToEmails = async (
+  supabaseAdmin: any,
+  userIds: string[],
+  perPage = 1000,
+  maxPages = 50,
+) => {
+  const remaining = new Set(userIds.filter(Boolean));
+  const emailMap = new Map<string, string>();
+
+  for (let page = 1; page <= maxPages && remaining.size > 0; page++) {
+    const { data, error } = await supabaseAdmin.auth.admin.listUsers({ page, perPage });
+
+    if (error) {
+      logStep("Error listing auth users", { error: error.message, page, perPage });
+      break;
+    }
+
+    const users = data?.users ?? [];
+    if (users.length === 0) break;
+
+    for (const user of users) {
+      if (user?.email && remaining.has(user.id)) {
+        emailMap.set(user.id, user.email);
+        remaining.delete(user.id);
+      }
+    }
+
+    // No more pages
+    if (users.length < perPage) break;
+  }
+
+  if (remaining.size > 0) {
+    logStep("Auth email lookup incomplete", {
+      requested: userIds.length,
+      found: emailMap.size,
+      missing: remaining.size,
+    });
+  }
+
+  return emailMap;
+};
+
 // Win-Back Campaign Emails (7-email series highlighting improvements)
 const WIN_BACK_EMAILS = [
   {
@@ -872,22 +914,7 @@ serve(async (req) => {
         if (expiredUsers && expiredUsers.length > 0) {
           // Get emails from auth.users (using service role key)
           const userIds = expiredUsers.map(u => u.user_id);
-          
-          const { data: authUsers, error: authError } = await supabaseClient.auth.admin.listUsers();
-          
-          if (authError) {
-            logStep("Error fetching auth users", { error: authError.message });
-          }
-          
-          // Create a map of user_id to email from auth.users
-          const userEmailMap = new Map<string, string>();
-          if (authUsers?.users) {
-            for (const user of authUsers.users) {
-              if (user.email && userIds.includes(user.id)) {
-                userEmailMap.set(user.id, user.email);
-              }
-            }
-          }
+          const userEmailMap = await mapUserIdsToEmails(supabaseClient, userIds);
 
           const { data: recentEmails } = await supabaseClient
             .from('email_logs')
@@ -921,16 +948,8 @@ serve(async (req) => {
         if (trialUsers && trialUsers.length > 0) {
           const now = new Date();
           
-          // Get all auth users to map emails
-          const { data: authUsers } = await supabaseClient.auth.admin.listUsers();
-          const userEmailMap = new Map<string, string>();
-          if (authUsers?.users) {
-            for (const user of authUsers.users) {
-              if (user.email) {
-                userEmailMap.set(user.id, user.email);
-              }
-            }
-          }
+          const userIds = trialUsers.map(u => u.user_id);
+          const userEmailMap = await mapUserIdsToEmails(supabaseClient, userIds);
           
           for (const user of trialUsers) {
             const trialStart = new Date(user.created_at);
@@ -977,15 +996,7 @@ serve(async (req) => {
 
           // Get emails from auth.users
           const userIds = paidUsers.map(u => u.user_id);
-          const { data: authUsers } = await supabaseClient.auth.admin.listUsers();
-          const userEmailMap = new Map<string, string>();
-          if (authUsers?.users) {
-            for (const user of authUsers.users) {
-              if (user.email && userIds.includes(user.id)) {
-                userEmailMap.set(user.id, user.email);
-              }
-            }
-          }
+          const userEmailMap = await mapUserIdsToEmails(supabaseClient, userIds);
 
           // Filter out recent recipients
           const oneWeekAgo = new Date();
