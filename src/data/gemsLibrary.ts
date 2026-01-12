@@ -18,11 +18,11 @@ export const gemsLibrary: Gem[] = [
     id: "passover-lamb",
     title: "Passover Lamb = Christ Crucified",
     category: "typology",
-    oldTestament: { book: "Exodus", chapter: 12, verses: "3-7", text: "Take a lamb... without blemish... kill it in the evening... strike the blood on the doorposts" },
+    oldTestament: { book: "Exodus", chapter: 12, verses: "3-7,13", text: "Take a lamb... without blemish... kill it in the evening... strike the blood on the two side posts and on the upper door post... when I see the blood, I will pass over you" },
     newTestament: { book: "1 Corinthians", chapter: 5, verses: "7", text: "Christ our passover is sacrificed for us" },
-    insight: "The Passover lamb was slain on Nisan 14 at 3pm—the exact day and hour Christ died on the cross. The blood on the doorposts formed a cross pattern. Death 'passed over' those under the blood.",
+    insight: "The Passover lamb was slain on Nisan 14—the same day Christ died on the cross. Blood was applied to the two doorposts and lintel using hyssop (Exodus 12:22). Death 'passed over' those under the blood, pointing to salvation through Christ's sacrifice.",
     depth: "beginner",
-    tags: ["sacrifice", "exodus", "passover", "cross", "blood", "lamb"]
+    tags: ["sacrifice", "exodus", "passover", "blood", "lamb", "deliverance"]
   },
   {
     id: "bronze-serpent",

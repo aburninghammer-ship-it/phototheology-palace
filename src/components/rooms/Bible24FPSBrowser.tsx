@@ -1,25 +1,27 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
-import { ChevronLeft, ChevronRight, Book, Sparkles, X, Layers, ImageIcon } from "lucide-react";
+import { ChevronLeft, ChevronRight, Book, Sparkles, X, Layers, ImageIcon, ImagePlus, Trash2 } from "lucide-react";
 import { allBibleSets, BibleSet, ChapterFrame } from "@/data/bible24fps/allBooks";
 import { genesisImages } from "@/assets/24fps/genesis";
+import { supabase } from "@/integrations/supabase/client";
+import { Create24FPSImageDialog } from "./Create24FPSImageDialog";
+import { useToast } from "@/hooks/use-toast";
 
 interface Bible24FPSBrowserProps {
   onClose?: () => void;
 }
 
-// Get image for a chapter - uses Genesis images for Genesis, falls back to generated placeholder
-const getChapterImage = (chapter: ChapterFrame): string | null => {
-  if (chapter.book === "Genesis" && chapter.chapter >= 1 && chapter.chapter <= 50) {
-    return genesisImages[chapter.chapter - 1];
-  }
-  return chapter.imageUrl || null;
-};
+interface UserChapterImage {
+  id: string;
+  book: string;
+  chapter: number;
+  image_url: string;
+}
 
 // Creative color palettes for sets - rotating through vibrant colors
 const SET_COLORS = [
@@ -47,6 +49,84 @@ export function Bible24FPSBrowser({ onClose }: Bible24FPSBrowserProps) {
   const [selectedSet, setSelectedSet] = useState<BibleSet | null>(null);
   const [selectedChapter, setSelectedChapter] = useState<ChapterFrame | null>(null);
   const [view, setView] = useState<"sets" | "chapters">("sets");
+  const [userImages, setUserImages] = useState<UserChapterImage[]>([]);
+  const [createDialogOpen, setCreateDialogOpen] = useState(false);
+  const [chapterForImage, setChapterForImage] = useState<ChapterFrame | null>(null);
+  const { toast } = useToast();
+
+  // Fetch user's custom images
+  const fetchUserImages = async () => {
+    const { data: userData } = await supabase.auth.getUser();
+    if (!userData.user) return;
+
+    const { data, error } = await supabase
+      .from("bible_images")
+      .select("id, book, chapter, image_url")
+      .eq("user_id", userData.user.id)
+      .eq("room_type", "24fps");
+
+    if (!error && data) {
+      setUserImages(data);
+    }
+  };
+
+  useEffect(() => {
+    fetchUserImages();
+  }, []);
+
+  // Get image for a chapter - prioritizes user images, then Genesis defaults
+  const getChapterImage = (chapter: ChapterFrame): string | null => {
+    // Check for user's custom image first
+    const userImage = userImages.find(
+      img => img.book === chapter.book && img.chapter === chapter.chapter
+    );
+    if (userImage) return userImage.image_url;
+
+    // Fall back to Genesis default images
+    if (chapter.book === "Genesis" && chapter.chapter >= 1 && chapter.chapter <= 50) {
+      return genesisImages[chapter.chapter - 1];
+    }
+    return chapter.imageUrl || null;
+  };
+
+  // Check if chapter has user-created image
+  const hasUserImage = (chapter: ChapterFrame): boolean => {
+    return userImages.some(
+      img => img.book === chapter.book && img.chapter === chapter.chapter
+    );
+  };
+
+  // Delete user image
+  const handleDeleteUserImage = async (chapter: ChapterFrame) => {
+    const userImage = userImages.find(
+      img => img.book === chapter.book && img.chapter === chapter.chapter
+    );
+    if (!userImage) return;
+
+    const { error } = await supabase
+      .from("bible_images")
+      .delete()
+      .eq("id", userImage.id);
+
+    if (error) {
+      toast({
+        title: "Error",
+        description: "Failed to delete image",
+        variant: "destructive",
+      });
+    } else {
+      toast({
+        title: "Deleted",
+        description: "Custom image removed",
+      });
+      fetchUserImages();
+    }
+  };
+
+  const openCreateDialog = (chapter: ChapterFrame) => {
+    setChapterForImage(chapter);
+    setCreateDialogOpen(true);
+  };
   
   const oldTestamentSets = allBibleSets.filter(s => s.testament === 'old');
   const newTestamentSets = allBibleSets.filter(s => s.testament === 'new');
@@ -339,6 +419,29 @@ export function Bible24FPSBrowser({ onClose }: Bible24FPSBrowserProps) {
                 "{selectedChapter?.memoryHook}"
               </p>
             </div>
+
+            {/* Create/Manage Image */}
+            <div className="flex gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                className="flex-1 bg-background/50"
+                onClick={() => selectedChapter && openCreateDialog(selectedChapter)}
+              >
+                <ImagePlus className="h-4 w-4 mr-2" />
+                {hasUserImage(selectedChapter!) ? "Replace Image" : "Create Image"}
+              </Button>
+              {selectedChapter && hasUserImage(selectedChapter) && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="bg-destructive/10 hover:bg-destructive/20 text-destructive"
+                  onClick={() => handleDeleteUserImage(selectedChapter)}
+                >
+                  <Trash2 className="h-4 w-4" />
+                </Button>
+              )}
+            </div>
             
             {/* Navigation */}
             <div className="flex justify-between pt-2">
@@ -366,6 +469,19 @@ export function Bible24FPSBrowser({ onClose }: Bible24FPSBrowserProps) {
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* Create Image Dialog */}
+      {chapterForImage && (
+        <Create24FPSImageDialog
+          open={createDialogOpen}
+          onOpenChange={setCreateDialogOpen}
+          chapter={chapterForImage}
+          onSuccess={() => {
+            fetchUserImages();
+            setSelectedChapter(null);
+          }}
+        />
+      )}
     </div>
   );
 }
