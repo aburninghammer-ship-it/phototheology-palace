@@ -32,8 +32,9 @@ export function WordPictureTranslator() {
 
       if (error) throw error;
 
-      if (data?.wordPicture) {
-        setWordPicture(data.wordPicture);
+      const result = data?.wordPicture || data?.content;
+      if (result) {
+        setWordPicture(result);
         toast.success("Word picture created!");
       } else {
         throw new Error("No word picture returned");
