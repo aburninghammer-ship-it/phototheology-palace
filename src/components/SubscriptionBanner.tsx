@@ -137,8 +137,8 @@ export function SubscriptionBanner() {
     );
   }
 
-  // Trial expired or no subscription
-  if (subscription.status === 'expired' || subscription.status === 'none') {
+  // Trial expired (NOT 'none' - that means new user who hasn't started trial yet)
+  if (subscription.status === 'expired') {
     return (
       <Alert variant="destructive">
         <AlertTriangle className="h-4 w-4" />
@@ -151,6 +151,8 @@ export function SubscriptionBanner() {
       </Alert>
     );
   }
+
+  // New users with status 'none' - don't show any scary banners, they haven't even started yet
 
   return null;
 }
