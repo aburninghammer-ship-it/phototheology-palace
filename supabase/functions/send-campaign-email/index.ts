@@ -874,15 +874,13 @@ serve(async (req) => {
     const { campaignType, testMode, testEmail, dayOverride, forceSend }: CampaignRequest = await req.json();
     logStep("Request parsed", { campaignType, testMode, forceSend });
 
-    // Resend requires a verified sending domain for custom addresses.
-    // Defaulting to resend.dev keeps campaigns working until a custom domain is verified.
-    const defaultFromAddress = "PhotoTheology <onboarding@resend.dev>";
+    // Resend requires a verified sending domain for production sends.
+    // Use a verified domain sender (default: support@phototheologybible.com).
+    const defaultFromAddress = "PhotoTheology <support@phototheologybible.com>";
     const customFromEmail = Deno.env.get("RESEND_FROM_EMAIL");
-    const fromAddress = testMode
-      ? defaultFromAddress
-      : customFromEmail
-        ? `PhotoTheology <${customFromEmail}>`
-        : defaultFromAddress;
+    const fromAddress = customFromEmail
+      ? `PhotoTheology <${customFromEmail}>`
+      : defaultFromAddress;
 
     logStep("Using from address", { fromAddress, testMode });
 
@@ -1054,65 +1052,120 @@ serve(async (req) => {
       );
     }
 
-    // Send emails
+    // Send emails (batched) — Resend is rate-limited (~2 requests/sec).
+    // We group by template and send with the /emails/batch endpoint to avoid 429s.
     const results: { email: string; success: boolean; error?: string }[] = [];
-    
-    for (const recipient of recipients) {
-      try {
-        // Get the right email template
-        let template;
-        if (campaignType === 'trial' && recipient.dayNumber !== undefined) {
-          template = TRIAL_EMAILS.find(e => e.day === recipient.dayNumber);
-        } else if (emailTemplates.length > 0) {
-          template = emailTemplates[0];
-        }
 
-        if (!template) {
-          logStep("No template found", { campaignType, dayNumber: recipient.dayNumber });
-          results.push({ email: recipient.email, success: false, error: "No matching template" });
-          continue;
-        }
+    type Recipient = { email: string; userId: string; dayNumber?: number };
 
-        logStep("Sending email", { to: recipient.email, subject: template.subject });
+    const getTemplateForRecipient = (recipient: Recipient) => {
+      if (campaignType === 'trial' && recipient.dayNumber !== undefined) {
+        return TRIAL_EMAILS.find(e => e.day === recipient.dayNumber);
+      }
+      return emailTemplates[0];
+    };
 
-        const response = await fetch("https://api.resend.com/emails", {
+    const groups = new Map<string, { template: any; recipients: Recipient[] }>();
+
+    for (const recipient of recipients as Recipient[]) {
+      const template = getTemplateForRecipient(recipient);
+
+      if (!template) {
+        logStep("No template found", { campaignType, dayNumber: recipient.dayNumber });
+        results.push({ email: recipient.email, success: false, error: "No matching template" });
+        continue;
+      }
+
+      const key = `${template.subject}`;
+      const existing = groups.get(key);
+      if (existing) existing.recipients.push(recipient);
+      else groups.set(key, { template, recipients: [recipient] });
+    }
+
+    const batchSize = 50;
+    const MIN_DELAY_BETWEEN_REQUESTS_MS = 600; // stay below 2 requests/sec
+
+    for (const [groupKey, group] of groups.entries()) {
+      for (let i = 0; i < group.recipients.length; i += batchSize) {
+        const batchRecipients = group.recipients.slice(i, i + batchSize);
+
+        logStep("Sending batch", {
+          campaignType,
+          group: groupKey,
+          batch: i / batchSize,
+          count: batchRecipients.length,
+        });
+
+        const response = await fetch("https://api.resend.com/emails/batch", {
           method: "POST",
           headers: {
             "Authorization": `Bearer ${resendApiKey}`,
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({
-            from: fromAddress,
-            to: [recipient.email],
-            subject: template.subject,
-            html: template.html,
-          }),
+          body: JSON.stringify(
+            batchRecipients.map((r) => ({
+              from: fromAddress,
+              to: [r.email],
+              subject: group.template.subject,
+              html: group.template.html,
+            }))
+          ),
         });
 
         const responseText = await response.text();
         logStep("Resend response", { status: response.status, body: responseText });
 
         if (!response.ok) {
-          results.push({ email: recipient.email, success: false, error: responseText });
-        } else {
-          results.push({ email: recipient.email, success: true });
+          // If the sender domain isn't verified, stop immediately (otherwise we'll spam failures).
+          if (response.status === 403 && responseText.includes("verify a domain")) {
+            for (const r of batchRecipients) {
+              results.push({ email: r.email, success: false, error: responseText });
+            }
 
-          // Log the email (even in test mode for debugging)
-          await supabaseClient.from('email_logs').insert({
-            user_id: recipient.userId,
-            campaign_type: testMode ? `test_${campaignType}` : campaignType,
-            day_number: recipient.dayNumber || 0,
-            subject: template.subject,
-            status: 'sent',
-            sent_at: new Date().toISOString(),
-          });
+            return new Response(
+              JSON.stringify({
+                success: false,
+                sent: results.filter(r => r.success).length,
+                failed: results.filter(r => !r.success).length,
+                total: recipients.length,
+                error: "Sender domain not verified. Verify your domain and use a verified 'from' address, then retry.",
+                results,
+              }),
+              { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 400 }
+            );
+          }
+
+          for (const r of batchRecipients) {
+            results.push({ email: r.email, success: false, error: responseText });
+          }
+        } else {
+          for (const r of batchRecipients) {
+            results.push({ email: r.email, success: true });
+          }
+
+          // Log successes (best-effort; don't fail the send if logging fails)
+          try {
+            const logRows = batchRecipients
+              .filter(r => r.userId && r.userId !== 'test')
+              .map(r => ({
+                user_id: r.userId,
+                campaign_type: testMode ? `test_${campaignType}` : campaignType,
+                day_number: r.dayNumber || 0,
+                subject: group.template.subject,
+                status: 'sent',
+                sent_at: new Date().toISOString(),
+              }));
+
+            if (logRows.length > 0) {
+              await supabaseClient.from('email_logs').insert(logRows);
+            }
+          } catch (logErr: any) {
+            logStep("Failed to write email_logs for batch", { error: logErr?.message ?? String(logErr) });
+          }
         }
 
-        // Rate limiting
-        await new Promise(resolve => setTimeout(resolve, 100));
-      } catch (err: any) {
-        logStep("Error sending email", { email: recipient.email, error: err.message });
-        results.push({ email: recipient.email, success: false, error: err.message });
+        // small delay between all requests
+        await new Promise(resolve => setTimeout(resolve, MIN_DELAY_BETWEEN_REQUESTS_MS));
       }
     }
 
