@@ -14,17 +14,57 @@ const logStep = (step: string, details?: any) => {
 
 // Price ID to tier mapping
 const priceToTier: Record<string, string> = {
-  // Monthly prices
-  'price_1SKn0VFGDAd3RU8Io19mT9No': 'essential',
-  'price_1SKn12FGDAd3RU8IBpc45ctZ': 'premium',
-  'price_1SZNyiFGDAd3RU8I4JHYEsEi': 'premium',
-  // Legacy prices
-  'price_1ONMQ9FGDAd3RU8IcBaBYmoJ': 'premium',
-  'price_1ONjHsFGDAd3RU8IsHMybTX6': 'premium',
-  // Student prices
+  // Essential tier
+  'price_1SZNyCFGDAd3RU8IPwPJVesp': 'essential', // Essential monthly
+  'price_1SZNyVFGDAd3RU8IPgRPqKXH': 'essential', // Essential annual
+  'price_1SKn0VFGDAd3RU8Io19mT9No': 'essential', // Legacy essential monthly
+  // Premium tier
+  'price_1SZNyiFGDAd3RU8I4JHYEsEi': 'premium', // Premium monthly
+  'price_1SZNyuFGDAd3RU8IjeGIvPEb': 'premium', // Premium annual
+  'price_1SKn12FGDAd3RU8IBpc45ctZ': 'premium', // Legacy premium annual
+  'price_1ONMQ9FGDAd3RU8IcBaBYmoJ': 'premium', // Older premium
+  'price_1ONjHsFGDAd3RU8IsHMybTX6': 'premium', // Legacy premium
+  // Student tier
   'price_1SKWM6FGDAd3RU8IcmNNhmKO': 'student',
   'price_1SKWMLFGDAd3RU8IBXO8pKxd': 'student',
 };
+
+const appPriceIds = Object.keys(priceToTier);
+
+// Helper to fetch all Stripe subscriptions with pagination
+async function fetchAllStripeSubscriptions(
+  stripe: Stripe, 
+  status: 'active' | 'trialing' | 'canceled'
+): Promise<Stripe.Subscription[]> {
+  const allSubscriptions: Stripe.Subscription[] = [];
+  let hasMore = true;
+  let startingAfter: string | undefined;
+
+  while (hasMore) {
+    const params: Stripe.SubscriptionListParams = {
+      status,
+      limit: 100,
+      expand: ['data.items.data.price'],
+    };
+    if (startingAfter) params.starting_after = startingAfter;
+
+    const batch = await stripe.subscriptions.list(params);
+    
+    // Filter to only our app's subscriptions
+    const appSubs = batch.data.filter((sub: any) => {
+      const priceId = sub.items.data[0]?.price?.id;
+      return appPriceIds.includes(priceId);
+    });
+    
+    allSubscriptions.push(...appSubs);
+    hasMore = batch.has_more;
+    if (batch.data.length > 0) {
+      startingAfter = batch.data[batch.data.length - 1].id;
+    }
+  }
+
+  return allSubscriptions;
+}
 
 serve(async (req) => {
   if (req.method === "OPTIONS") {
@@ -101,6 +141,7 @@ serve(async (req) => {
       by_status: { none: 0, trial: 0, active: 0, cancelled: 0, expired: 0, null: 0 },
       by_payment_source: { stripe: 0, patreon: 0, manual: 0, promotional: 0, lifetime: 0, null: 0 },
       lifetime_access: 0,
+      stripe_linked_count: 0,
     };
 
     subscriptions.forEach((sub: any) => {
@@ -117,6 +158,7 @@ serve(async (req) => {
       // Count as stripe only if it has a stripe subscription ID and payment_source is stripe
       if (sub.payment_source === 'stripe' && sub.stripe_subscription_id && sub.is_recurring) {
         dbStats.by_payment_source.stripe++;
+        dbStats.stripe_linked_count++;
       } else if (sub.payment_source === 'patreon') {
         dbStats.by_payment_source.patreon++;
       } else if (sub.payment_source === 'manual') {
@@ -150,7 +192,7 @@ serve(async (req) => {
     thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
     const recentSignups = subscriptions.filter((s: any) => new Date(s.created_at) > thirtyDaysAgo).length;
 
-    // NOW GET REAL STRIPE DATA
+    // NOW GET REAL STRIPE DATA WITH PAGINATION
     let stripeStats = {
       active_subscriptions: 0,
       trialing_subscriptions: 0,
@@ -158,32 +200,20 @@ serve(async (req) => {
       by_tier: { essential: 0, premium: 0, student: 0, unknown: 0 },
       total_mrr_cents: 0,
       error: null as string | null,
+      unlinked_count: 0,
     };
 
     if (stripeKey) {
       try {
         const stripe = new Stripe(stripeKey, { apiVersion: "2025-08-27.basil" });
-        logStep("Fetching Stripe subscriptions");
+        logStep("Fetching Stripe subscriptions with pagination");
 
-        // Get active subscriptions - filter to only our app's price IDs
-        const appPriceIds = Object.keys(priceToTier);
-        
-        const activeSubscriptions = await stripe.subscriptions.list({
-          status: "active",
-          limit: 100,
-          expand: ['data.items.data.price'],
-        });
+        // Get ALL active subscriptions with pagination
+        const activeSubscriptions = await fetchAllStripeSubscriptions(stripe, 'active');
+        stripeStats.active_subscriptions = activeSubscriptions.length;
 
-        // Filter to only our app's subscriptions
-        const appActiveSubscriptions = activeSubscriptions.data.filter((sub: any) => {
-          const priceId = sub.items.data[0]?.price?.id;
-          return appPriceIds.includes(priceId);
-        });
-
-        stripeStats.active_subscriptions = appActiveSubscriptions.length;
-
-        // Count by tier and calculate MRR (only for app subscriptions)
-        appActiveSubscriptions.forEach((sub: any) => {
+        // Count by tier and calculate MRR
+        activeSubscriptions.forEach((sub: any) => {
           const priceId = sub.items.data[0]?.price?.id;
           const tier = priceToTier[priceId] || 'unknown';
           if (tier in stripeStats.by_tier) {
@@ -199,33 +229,19 @@ serve(async (req) => {
           }
         });
 
-        // Get trialing subscriptions - filter to only our app's price IDs
-        const trialingSubscriptions = await stripe.subscriptions.list({
-          status: "trialing",
-          limit: 100,
-          expand: ['data.items.data.price'],
-        });
-        
-        const appTrialingSubscriptions = trialingSubscriptions.data.filter((sub: any) => {
-          const priceId = sub.items.data[0]?.price?.id;
-          return appPriceIds.includes(priceId);
-        });
-        stripeStats.trialing_subscriptions = appTrialingSubscriptions.length;
+        // Get ALL trialing subscriptions with pagination
+        const trialingSubscriptions = await fetchAllStripeSubscriptions(stripe, 'trialing');
+        stripeStats.trialing_subscriptions = trialingSubscriptions.length;
 
-        // Get canceled subscriptions - only count ones with our app's price IDs
-        const canceledSubscriptions = await stripe.subscriptions.list({
-          status: "canceled",
-          limit: 100,
-          expand: ['data.items.data.price'],
-        });
-        
-        // Filter to only our app's subscriptions (prices we recognize)
-        stripeStats.canceled_subscriptions = canceledSubscriptions.data.filter((sub: any) => {
-          const priceId = sub.items.data[0]?.price?.id;
-          return appPriceIds.includes(priceId);
-        }).length;
+        // Get canceled subscriptions with pagination
+        const canceledSubscriptions = await fetchAllStripeSubscriptions(stripe, 'canceled');
+        stripeStats.canceled_subscriptions = canceledSubscriptions.length;
 
-        logStep("Stripe stats fetched", stripeStats);
+        // Calculate unlinked: Stripe active/trialing - DB linked
+        const totalStripeActive = stripeStats.active_subscriptions + stripeStats.trialing_subscriptions;
+        stripeStats.unlinked_count = Math.max(0, totalStripeActive - dbStats.stripe_linked_count);
+
+        logStep("Stripe stats fetched with pagination", stripeStats);
 
       } catch (stripeError: any) {
         logStep("Stripe API error", { error: stripeError.message });
@@ -243,6 +259,7 @@ serve(async (req) => {
       total_lifetime: dbStats.lifetime_access,
       total_with_access: stripeStats.active_subscriptions + patreonStats.active_patrons + dbStats.lifetime_access,
       monthly_recurring_revenue: `$${(stripeStats.total_mrr_cents / 100).toFixed(2)}`,
+      stripe_unlinked_subscriptions: stripeStats.unlinked_count,
     };
 
     return new Response(
