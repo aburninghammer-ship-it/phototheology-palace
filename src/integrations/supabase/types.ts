@@ -3412,6 +3412,42 @@ export type Database = {
         }
         Relationships: []
       }
+      email_campaign_logs: {
+        Row: {
+          campaign_name: string
+          created_at: string
+          email_type: string
+          error_message: string | null
+          id: string
+          recipient_email: string
+          recipient_name: string | null
+          sent_at: string | null
+          status: string | null
+        }
+        Insert: {
+          campaign_name: string
+          created_at?: string
+          email_type: string
+          error_message?: string | null
+          id?: string
+          recipient_email: string
+          recipient_name?: string | null
+          sent_at?: string | null
+          status?: string | null
+        }
+        Update: {
+          campaign_name?: string
+          created_at?: string
+          email_type?: string
+          error_message?: string | null
+          id?: string
+          recipient_email?: string
+          recipient_name?: string | null
+          sent_at?: string | null
+          status?: string | null
+        }
+        Relationships: []
+      }
       email_campaigns: {
         Row: {
           created_at: string | null
@@ -7529,6 +7565,60 @@ export type Database = {
           updated_at?: string
           user_id?: string
           verses_involved?: string[] | null
+        }
+        Relationships: []
+      }
+      pickaxe_connections: {
+        Row: {
+          access_granted_at: string | null
+          created_at: string
+          email_sent_at: string | null
+          id: string
+          is_paid_user: boolean | null
+          pickaxe_active_at: string | null
+          pickaxe_created_at: string | null
+          pickaxe_email: string
+          pickaxe_name: string | null
+          pickaxe_picture: string | null
+          spend_cents: number | null
+          synced_at: string | null
+          total_uses: number | null
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          access_granted_at?: string | null
+          created_at?: string
+          email_sent_at?: string | null
+          id?: string
+          is_paid_user?: boolean | null
+          pickaxe_active_at?: string | null
+          pickaxe_created_at?: string | null
+          pickaxe_email: string
+          pickaxe_name?: string | null
+          pickaxe_picture?: string | null
+          spend_cents?: number | null
+          synced_at?: string | null
+          total_uses?: number | null
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          access_granted_at?: string | null
+          created_at?: string
+          email_sent_at?: string | null
+          id?: string
+          is_paid_user?: boolean | null
+          pickaxe_active_at?: string | null
+          pickaxe_created_at?: string | null
+          pickaxe_email?: string
+          pickaxe_name?: string | null
+          pickaxe_picture?: string | null
+          spend_cents?: number | null
+          synced_at?: string | null
+          total_uses?: number | null
+          updated_at?: string
+          user_id?: string | null
         }
         Relationships: []
       }
