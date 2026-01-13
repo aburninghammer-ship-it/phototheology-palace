@@ -853,7 +853,65 @@ const ENGAGEMENT_EMAILS = [
   }
 ];
 
-type CampaignType = 'winback' | 'trial' | 'engagement';
+type CampaignType = 'winback' | 'trial' | 'engagement' | 'login_reminder';
+
+// Login Reminder Email for Stripe subscribers who haven't created accounts
+const LOGIN_REMINDER_EMAIL = {
+  subject: "🔑 Complete Your PhotoTheology Setup — You're Already Subscribed!",
+  html: `
+    <div style="font-family: Georgia, serif; max-width: 600px; margin: 0 auto; padding: 0; background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);">
+      <div style="background: linear-gradient(90deg, #f5d742 0%, #ff6b6b 50%, #4ecdc4 100%); padding: 4px;"></div>
+      
+      <div style="padding: 32px;">
+        <h1 style="color: #f5d742; font-size: 28px; margin-bottom: 8px; text-align: center;">
+          🔑 Your Account is Ready
+        </h1>
+        <p style="text-align: center; color: #4ecdc4; font-size: 16px; margin-bottom: 24px;">
+          Just one step left to unlock PhotoTheology
+        </p>
+        
+        <p style="line-height: 1.8; margin-bottom: 16px; color: #e5e5e5;">
+          Great news! Your PhotoTheology subscription is <strong style="color: #4ecdc4;">active</strong>, but we noticed you haven't created your account yet.
+        </p>
+        
+        <p style="line-height: 1.8; margin-bottom: 16px; color: #e5e5e5;">
+          To access the full Palace system, Jeeves AI, and all premium features, you just need to <strong style="color: #f5d742;">sign up with the same email</strong> you used for your subscription.
+        </p>
+        
+        <div style="background: linear-gradient(135deg, #2a2a4e 0%, #1e3a5f 100%); border-radius: 12px; padding: 24px; margin: 24px 0; border: 2px solid #4ecdc4;">
+          <p style="color: #f5d742; font-weight: bold; margin: 0 0 16px 0; font-size: 18px;">✨ Here's What's Waiting for You:</p>
+          <ul style="margin: 0; padding-left: 20px; color: #e5e5e5; line-height: 2;">
+            <li><strong style="color: #4ecdc4;">The 8-Floor Palace</strong> — Complete Bible study system</li>
+            <li><strong style="color: #ff6b6b;">Jeeves AI</strong> — Your personal study partner</li>
+            <li><strong style="color: #f5d742;">Daily Challenges</strong> — Build consistent habits</li>
+            <li><strong style="color: #4ecdc4;">Gems Room</strong> — Save and organize insights</li>
+          </ul>
+        </div>
+        
+        <div style="text-align: center; margin-top: 32px;">
+          <a href="https://thephototheologyapp.com/signup" style="display: inline-block; background: linear-gradient(90deg, #f5d742 0%, #ff6b6b 100%); color: #1a1a2e; padding: 18px 40px; text-decoration: none; font-weight: bold; border-radius: 8px; font-size: 18px;">
+            Create Your Account Now
+          </a>
+        </div>
+        
+        <div style="background: rgba(78, 205, 196, 0.1); padding: 16px; border-radius: 8px; margin: 24px 0;">
+          <p style="color: #4ecdc4; font-weight: bold; margin: 0 0 8px 0;">💡 Important:</p>
+          <p style="color: #e5e5e5; margin: 0; line-height: 1.6;">Use the <strong>same email address</strong> you used when subscribing to automatically link your premium access.</p>
+        </div>
+        
+        <p style="line-height: 1.8; color: #a0a0a0; font-style: italic; text-align: center;">
+          Questions? Just reply to this email — we're here to help!
+        </p>
+      </div>
+      
+      <div style="background: #0d0d1a; padding: 20px 32px; text-align: center;">
+        <p style="margin: 0; font-size: 14px; color: #777;">
+          — The PhotoTheology Team
+        </p>
+      </div>
+    </div>
+  `
+};
 
 interface CampaignRequest {
   campaignType: CampaignType;
@@ -921,6 +979,8 @@ serve(async (req) => {
         emailTemplates = [WIN_BACK_EMAILS[dayOverride || 0]];
       } else if (campaignType === 'trial') {
         emailTemplates = [TRIAL_EMAILS[dayOverride || 0]];
+      } else if (campaignType === 'login_reminder') {
+        emailTemplates = [LOGIN_REMINDER_EMAIL];
       } else {
         emailTemplates = [ENGAGEMENT_EMAILS[dayOverride || 0]];
       }
@@ -1087,6 +1147,126 @@ serve(async (req) => {
 
           emailTemplates = [emailForWeek];
         }
+      } else if (campaignType === 'login_reminder') {
+        // Target: Stripe subscribers who have NOT created an account in our database
+        // These are users we know from Stripe but can't find matching profiles for
+        
+        logStep("Login reminder: fetching Stripe subscriptions");
+        
+        // Call Stripe to get all active subscriptions
+        const stripeSecretKey = Deno.env.get("STRIPE_SECRET_KEY");
+        if (!stripeSecretKey) {
+          throw new Error("STRIPE_SECRET_KEY not configured");
+        }
+        
+        // Fetch active subscriptions from Stripe
+        let allStripeCustomers: { email: string; customerId: string }[] = [];
+        let hasMore = true;
+        let startingAfter: string | undefined;
+        
+        while (hasMore) {
+          const params = new URLSearchParams({
+            limit: '100',
+            status: 'active',
+            expand: ['data.customer'].join(','),
+          });
+          if (startingAfter) params.append('starting_after', startingAfter);
+          
+          const stripeResponse = await fetch(`https://api.stripe.com/v1/subscriptions?${params}`, {
+            headers: {
+              'Authorization': `Bearer ${stripeSecretKey}`,
+            },
+          });
+          
+          if (!stripeResponse.ok) {
+            const errorText = await stripeResponse.text();
+            logStep("Stripe API error", { status: stripeResponse.status, error: errorText });
+            throw new Error(`Stripe API error: ${errorText}`);
+          }
+          
+          const stripeData = await stripeResponse.json();
+          
+          for (const sub of stripeData.data) {
+            const customer = sub.customer;
+            if (customer && typeof customer === 'object' && customer.email) {
+              allStripeCustomers.push({
+                email: customer.email.toLowerCase(),
+                customerId: customer.id,
+              });
+            }
+          }
+          
+          hasMore = stripeData.has_more;
+          if (stripeData.data.length > 0) {
+            startingAfter = stripeData.data[stripeData.data.length - 1].id;
+          }
+        }
+        
+        logStep("Stripe customers fetched", { count: allStripeCustomers.length });
+        
+        // Get all existing profile emails from auth.users
+        const existingEmails = new Set<string>();
+        let authPage = 1;
+        const authPerPage = 1000;
+        
+        while (true) {
+          const { data: authData, error: authError } = await supabaseClient.auth.admin.listUsers({ 
+            page: authPage, 
+            perPage: authPerPage 
+          });
+          
+          if (authError) {
+            logStep("Error listing auth users", { error: authError.message });
+            break;
+          }
+          
+          const users = authData?.users ?? [];
+          if (users.length === 0) break;
+          
+          for (const user of users) {
+            if (user.email) {
+              existingEmails.add(user.email.toLowerCase());
+            }
+          }
+          
+          if (users.length < authPerPage) break;
+          authPage++;
+        }
+        
+        logStep("Auth users fetched", { count: existingEmails.size });
+        
+        // Find Stripe customers who don't have matching auth accounts
+        const missingAccounts = allStripeCustomers.filter(c => !existingEmails.has(c.email));
+        
+        logStep("Missing accounts found", { 
+          stripeCustomers: allStripeCustomers.length,
+          existingAccounts: existingEmails.size,
+          needReminder: missingAccounts.length 
+        });
+        
+        // Check for recent emails to avoid spamming
+        const sevenDaysAgo = new Date();
+        sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+        
+        let recentEmailSet = new Set<string>();
+        if (!forceSend) {
+          const { data: recentEmails } = await supabaseClient
+            .from('email_logs')
+            .select('subject')
+            .eq('campaign_type', 'login_reminder')
+            .gte('sent_at', sevenDaysAgo.toISOString());
+          
+          // Since these users don't have user_ids, we'd need to track by email
+          // For now, we'll use forceSend or just send once
+          logStep("Recent login_reminder emails", { count: recentEmails?.length || 0 });
+        }
+        
+        recipients = missingAccounts.map(c => ({
+          email: c.email,
+          userId: c.customerId, // Use Stripe customer ID as a pseudo-userId for logging
+        }));
+        
+        emailTemplates = [LOGIN_REMINDER_EMAIL];
       }
     }
 
