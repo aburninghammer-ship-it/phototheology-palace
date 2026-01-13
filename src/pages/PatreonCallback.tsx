@@ -62,10 +62,14 @@ export default function PatreonCallback() {
 
         if (fnError) throw fnError;
 
-        if (data.hasAccess) {
-          // Active patron at $20/month or higher
+        if (data.hasAccess && data.userLinked) {
+          // Active patron at $20/month or higher AND linked to account
           toast.success(`Welcome, ${data.patreonName}! Your Patron benefits are now active.`);
           navigate("/dashboard");
+        } else if (data.hasAccess && !data.userLinked) {
+          // Active patron but not linked - they need to sign up/login with matching email
+          toast.info(`Great news, ${data.patreonName}! You're an active patron. Please sign up or log in with the email ${data.patreonEmail} to activate your benefits.`, { duration: 8000 });
+          navigate("/auth");
         } else if (data.isActivePatron && !data.meetsMinimumPledge) {
           // Active patron but below $20/month minimum
           const currentPledge = (data.entitledCents / 100).toFixed(2);
