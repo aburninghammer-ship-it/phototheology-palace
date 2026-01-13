@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { Navigation } from "@/components/Navigation";
 import { supabase } from "@/integrations/supabase/client";
@@ -10,13 +10,14 @@ import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { toast } from "sonner";
 import {
-  Brain, BookOpen, Loader2, Send, Save, Trash2,
+  Brain, Loader2, Send, Save, Trash2,
   ChevronLeft, ChevronRight, MessageSquare, StickyNote,
   Book
 } from "lucide-react";
 import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from "@/components/ui/resizable";
 import { BIBLE_BOOK_METADATA } from "@/data/bibleBooks";
 import { motion } from "framer-motion";
+import { fetchChapter } from "@/services/bibleApi";
 import {
   Select,
   SelectContent,
@@ -75,15 +76,8 @@ export default function StudyBuddy() {
   const loadVerses = async () => {
     setLoadingVerses(true);
     try {
-      const { data, error } = await supabase
-        .from("bible_verses_tokenized")
-        .select("verse_num, text_kjv")
-        .eq("book", selectedBook)
-        .eq("chapter", selectedChapter)
-        .order("verse_num", { ascending: true });
-
-      if (error) throw error;
-      setVerses((data || []).map(v => ({ verse: v.verse_num, text: v.text_kjv })));
+      const chapter = await fetchChapter(selectedBook, selectedChapter, "kjv");
+      setVerses(chapter.verses.map(v => ({ verse: v.verse, text: v.text })));
     } catch (error) {
       console.error("Error loading verses:", error);
       setVerses([]);
