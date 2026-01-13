@@ -12,7 +12,7 @@ import { toast } from "sonner";
 import {
   Brain, Loader2, Save, Trash2,
   ChevronLeft, ChevronRight, StickyNote,
-  Book, Flame, Lightbulb, BookOpen, Target, Crosshair, Sparkles, Eye
+  Book, Flame, Lightbulb, BookOpen, Target, Crosshair, Sparkles, Eye, Send
 } from "lucide-react";
 import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from "@/components/ui/resizable";
 import { BIBLE_BOOK_METADATA } from "@/data/bibleBooks";
@@ -189,9 +189,12 @@ export default function StudyBuddy() {
     }
   };
 
-  const analyzeNotes = useCallback(async () => {
+  const analyzeNotes = useCallback(async (forceAnalysis = false) => {
     const trimmedNotes = notes.trim();
     if (trimmedNotes.length < 30 || jeevesLoading) return;
+
+    // Skip if not forced and notes haven't changed much
+    if (!forceAnalysis && trimmedNotes === lastAnalyzedNotes.current) return;
 
     setJeevesLoading(true);
     lastAnalyzedNotes.current = trimmedNotes;
@@ -214,10 +217,20 @@ export default function StudyBuddy() {
       }
     } catch (error: any) {
       console.error("Jeeves analysis error:", error);
+      toast.error("Jeeves couldn't analyze - try again");
     } finally {
       setJeevesLoading(false);
     }
   }, [notes, selectedBook, selectedChapter, verses, analysisHistory, jeevesLoading]);
+
+  // Manual trigger for asking Jeeves
+  const askJeeves = () => {
+    if (notes.trim().length < 10) {
+      toast.error("Write your question in the notes first");
+      return;
+    }
+    analyzeNotes(true);
+  };
 
   const navigateChapter = (direction: 'prev' | 'next') => {
     if (direction === 'prev') {
@@ -488,11 +501,28 @@ export default function StudyBuddy() {
           <ResizablePanel defaultSize={35} minSize={20}>
             <Card className="h-full flex flex-col bg-emerald-950/40 border-emerald-500/20 backdrop-blur-xl rounded-none border-l-0 border-r-0">
               <div className="p-4 border-b border-emerald-500/20 flex-shrink-0">
-                <div className="flex items-center gap-2">
-                  <StickyNote className="w-5 h-5 text-emerald-400" />
-                  <span className="font-bold text-white">Notes</span>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <StickyNote className="w-5 h-5 text-emerald-400" />
+                    <span className="font-bold text-white">Notes</span>
+                  </div>
+                  <Button
+                    size="sm"
+                    onClick={askJeeves}
+                    disabled={jeevesLoading || notes.trim().length < 10}
+                    className="bg-violet-600 hover:bg-violet-700 text-white text-xs h-7 px-2"
+                  >
+                    {jeevesLoading ? (
+                      <Loader2 className="w-3 h-3 animate-spin" />
+                    ) : (
+                      <>
+                        <Send className="w-3 h-3 mr-1" />
+                        Ask Jeeves
+                      </>
+                    )}
+                  </Button>
                 </div>
-                <p className="text-xs text-emerald-200/60 mt-1">Click verses to add them here</p>
+                <p className="text-xs text-emerald-200/60 mt-1">Write notes or questions — click "Ask Jeeves" to get answers</p>
               </div>
               <div className="flex-1 p-4">
                 <Textarea
