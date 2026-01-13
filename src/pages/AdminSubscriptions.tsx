@@ -14,6 +14,7 @@ import { BulkEmailSender } from "@/components/admin/BulkEmailSender";
 import { ImageBibleGenerator } from "@/components/admin/ImageBibleGenerator";
 import { PatreonOutreach } from "@/components/admin/PatreonOutreach";
 import { PickaxeImport } from "@/components/admin/PickaxeImport";
+import { PickaxeEmailCampaign } from "@/components/admin/PickaxeEmailCampaign";
 import { Badge } from "@/components/ui/badge";
 
 interface StripeStats {
@@ -796,6 +797,9 @@ export default function AdminSubscriptions() {
 
           {/* Import Component */}
           <PickaxeImport />
+
+          {/* Email Campaign */}
+          <PickaxeEmailCampaign />
         </TabsContent>
       </Tabs>
     </div>
