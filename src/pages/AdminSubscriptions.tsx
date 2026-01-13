@@ -79,6 +79,7 @@ export default function AdminSubscriptions() {
   const [loading, setLoading] = useState(true);
   const [syncing, setSyncing] = useState(false);
   const [sendingPatreonReminder, setSendingPatreonReminder] = useState(false);
+  const [importingTeachable, setImportingTeachable] = useState(false);
   const [isAdmin, setIsAdmin] = useState<boolean | null>(null);
   const [stats, setStats] = useState<SubscriptionStats | null>(null);
   const [churchStats, setChurchStats] = useState<ChurchStats | null>(null);
@@ -135,6 +136,39 @@ export default function AdminSubscriptions() {
       });
     } finally {
       setSendingPatreonReminder(false);
+    }
+  };
+
+  const handleImportTeachableStudents = async () => {
+    setImportingTeachable(true);
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) throw new Error("Not authenticated");
+
+      const { data, error } = await supabase.functions.invoke('import-teachable-students', {
+        headers: {
+          Authorization: `Bearer ${session.access_token}`,
+        },
+      });
+      
+      if (error) throw error;
+      
+      toast({
+        title: "Teachable Import Complete",
+        description: data?.message || `Imported ${data?.imported || 0} students`,
+      });
+      
+      // Reload stats after import
+      await loadStats();
+    } catch (error: any) {
+      console.error("Teachable import error:", error);
+      toast({
+        title: "Import Failed",
+        description: error.message || "Failed to import Teachable students",
+        variant: "destructive",
+      });
+    } finally {
+      setImportingTeachable(false);
     }
   };
 
@@ -620,6 +654,33 @@ export default function AdminSubscriptions() {
             </Card>
           </div>
 
+          {/* Import Button */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Import from Teachable API</CardTitle>
+              <CardDescription>Fetch all students directly from your Teachable account</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Button 
+                onClick={handleImportTeachableStudents} 
+                disabled={importingTeachable}
+                className="bg-orange-600 hover:bg-orange-700"
+              >
+                {importingTeachable ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Importing from Teachable...
+                  </>
+                ) : (
+                  <>
+                    <RefreshCw className="mr-2 h-4 w-4" />
+                    Import All Students from Teachable
+                  </>
+                )}
+              </Button>
+            </CardContent>
+          </Card>
+
           {/* Teachable Students List */}
           <Card>
             <CardHeader>
@@ -645,7 +706,7 @@ export default function AdminSubscriptions() {
                   </div>
                 ))}
                 {teachableStudents.length === 0 && (
-                  <p className="text-muted-foreground text-center py-4">No Teachable students found</p>
+                  <p className="text-muted-foreground text-center py-4">No Teachable students found. Click "Import All Students" to fetch from Teachable API.</p>
                 )}
               </div>
             </CardContent>
