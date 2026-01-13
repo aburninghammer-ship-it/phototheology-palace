@@ -160,6 +160,10 @@ serve(async (req) => {
       error: null as string | null,
     };
 
+    // Track Stripe customer emails for sync comparison
+    const stripeCustomerEmails: string[] = [];
+    const usersNeedingSync: { email: string; tier: string; status: string }[] = [];
+
     if (stripeKey) {
       try {
         const stripe = new Stripe(stripeKey, { apiVersion: "2025-08-27.basil" });
@@ -171,7 +175,7 @@ serve(async (req) => {
         const activeSubscriptions = await stripe.subscriptions.list({
           status: "active",
           limit: 100,
-          expand: ['data.items.data.price'],
+          expand: ['data.items.data.price', 'data.customer'],
         });
 
         // Filter to only our app's subscriptions
@@ -197,13 +201,19 @@ serve(async (req) => {
           } else {
             stripeStats.total_mrr_cents += amount;
           }
+          
+          // Collect customer email for sync comparison
+          const customer = sub.customer as any;
+          if (customer?.email) {
+            stripeCustomerEmails.push(customer.email.toLowerCase());
+          }
         });
 
         // Get trialing subscriptions - filter to only our app's price IDs
         const trialingSubscriptions = await stripe.subscriptions.list({
           status: "trialing",
           limit: 100,
-          expand: ['data.items.data.price'],
+          expand: ['data.items.data.price', 'data.customer'],
         });
         
         const appTrialingSubscriptions = trialingSubscriptions.data.filter((sub: any) => {
@@ -211,6 +221,14 @@ serve(async (req) => {
           return appPriceIds.includes(priceId);
         });
         stripeStats.trialing_subscriptions = appTrialingSubscriptions.length;
+        
+        // Collect trialing customer emails too
+        appTrialingSubscriptions.forEach((sub: any) => {
+          const customer = sub.customer as any;
+          if (customer?.email) {
+            stripeCustomerEmails.push(customer.email.toLowerCase());
+          }
+        });
 
         // Get canceled subscriptions - only count ones with our app's price IDs
         const canceledSubscriptions = await stripe.subscriptions.list({
@@ -226,6 +244,52 @@ serve(async (req) => {
         }).length;
 
         logStep("Stripe stats fetched", stripeStats);
+
+        // Now compare Stripe emails with database to find users needing sync
+        // Get all users from auth who have active/trialing Stripe subscriptions
+        const uniqueStripeEmails = [...new Set(stripeCustomerEmails)];
+        logStep("Unique Stripe customer emails", { count: uniqueStripeEmails.length });
+
+        // Get users from database who have active stripe subscriptions synced
+        const { data: syncedUsers } = await supabase
+          .from("user_subscriptions")
+          .select("user_id")
+          .eq("subscription_status", "active")
+          .eq("payment_source", "stripe")
+          .not("stripe_subscription_id", "is", null);
+
+        const syncedUserIds = (syncedUsers || []).map((u: any) => u.user_id);
+        
+        // Get emails of synced users from auth
+        const { data: authUsers } = await supabase.auth.admin.listUsers({ perPage: 1000 });
+        const syncedEmails = new Set(
+          authUsers?.users
+            .filter((u: any) => syncedUserIds.includes(u.id))
+            .map((u: any) => u.email?.toLowerCase())
+            .filter(Boolean) || []
+        );
+
+        // Find Stripe customers not in synced database users
+        for (const email of uniqueStripeEmails) {
+          if (!syncedEmails.has(email)) {
+            // Find the subscription details for this email
+            const matchingSub = [...appActiveSubscriptions, ...appTrialingSubscriptions].find((sub: any) => {
+              const customer = sub.customer as any;
+              return customer?.email?.toLowerCase() === email;
+            });
+            
+            if (matchingSub) {
+              const priceId = matchingSub.items.data[0]?.price?.id;
+              usersNeedingSync.push({
+                email,
+                tier: priceToTier[priceId] || 'unknown',
+                status: matchingSub.status,
+              });
+            }
+          }
+        }
+
+        logStep("Users needing sync", { count: usersNeedingSync.length });
 
       } catch (stripeError: any) {
         logStep("Stripe API error", { error: stripeError.message });
@@ -254,6 +318,7 @@ serve(async (req) => {
           patreon: patreonStats,
           database: dbStats,
           recent_signups_30d: recentSignups,
+          users_needing_sync: usersNeedingSync,
           generated_at: new Date().toISOString(),
         },
       }),
