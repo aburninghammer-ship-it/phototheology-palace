@@ -1,6 +1,6 @@
 import { useLayoutEffect, useRef, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { Building2, Sparkles, Users, User, CreditCard, LogOut, MessageCircle, BookOpen, Calendar, Image, Search, Video, Sword, Crown, Shield, Brain, Lightbulb, Zap, Trophy, MessageSquare, Target, StickyNote, Radio, Church, GraduationCap, Award, Gamepad2, BarChart3, Archive, Library, Layers, Flame } from "lucide-react";
+import { Building2, Sparkles, Users, User, CreditCard, LogOut, MessageCircle, BookOpen, Calendar, Image, Search, Video, Sword, Crown, Shield, Brain, Lightbulb, Zap, Trophy, MessageSquare, Target, StickyNote, Radio, Church, GraduationCap, Award, Gamepad2, BarChart3, Archive, Library, Layers } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
 import { useActiveUsers } from "@/hooks/useActiveUsers";
@@ -383,129 +383,417 @@ export const Navigation = () => {
             </div>
           </div>
           
-          {/* Secondary Navigation Tabs - Logged in users only - ALL 20+ colorful tabs */}
+          {/* Horizontal Tab Navigation - Second row, only for authenticated users, hidden on mobile */}
           {user && (
-            <div className="hidden md:flex items-center justify-center gap-1 py-2 border-t border-border/50 overflow-x-auto scrollbar-hide">
-              <Button variant="ghost" asChild size="sm" className={`whitespace-nowrap h-8 text-yellow-500 hover:text-yellow-600 hover:bg-yellow-500/10 ${isActiveTab("/mastery") ? "bg-yellow-500/20" : ""}`}>
-                <Link to="/mastery">
-                  <Crown className="h-3.5 w-3.5 mr-1.5" />
-                  Mastery
-                </Link>
-              </Button>
-              <Button variant="ghost" asChild size="sm" className={`whitespace-nowrap h-8 text-amber-500 hover:text-amber-600 hover:bg-amber-500/10 ${isActiveTab("/bible") ? "bg-amber-500/20" : ""}`}>
-                <Link to="/bible">
-                  <BookOpen className="h-3.5 w-3.5 mr-1.5" />
-                  Study Bible
-                </Link>
-              </Button>
-              <Button variant="ghost" asChild size="sm" className={`whitespace-nowrap h-8 text-orange-500 hover:text-orange-600 hover:bg-orange-500/10 ${isActiveTab("/study-buddy") ? "bg-orange-500/20" : ""}`}>
-                <Link to="/study-buddy">
-                  <Brain className="h-3.5 w-3.5 mr-1.5" />
-                  Study Buddy
-                </Link>
-              </Button>
-              <Button variant="ghost" asChild size="sm" className={`whitespace-nowrap h-8 text-purple-500 hover:text-purple-600 hover:bg-purple-500/10 ${isActiveTab("/palace") ? "bg-purple-500/20" : ""}`}>
-                <Link to="/palace">
-                  <Building2 className="h-3.5 w-3.5 mr-1.5" />
-                  Palace
-                </Link>
-              </Button>
-              <Button variant="ghost" asChild size="sm" className={`whitespace-nowrap h-8 text-pink-500 hover:text-pink-600 hover:bg-pink-500/10 ${isActiveTab("/games") ? "bg-pink-500/20" : ""}`}>
-                <Link to="/games">
-                  <Gamepad2 className="h-3.5 w-3.5 mr-1.5" />
-                  Games
-                </Link>
-              </Button>
-              <Button variant="ghost" asChild size="sm" className={`whitespace-nowrap h-8 text-violet-500 hover:text-violet-600 hover:bg-violet-500/10 ${isActiveTab("/memory") ? "bg-violet-500/20" : ""}`}>
-                <Link to="/memory">
-                  <Brain className="h-3.5 w-3.5 mr-1.5" />
-                  Memory
-                </Link>
-              </Button>
-              <Button variant="ghost" asChild size="sm" className={`whitespace-nowrap h-8 text-indigo-500 hover:text-indigo-600 hover:bg-indigo-500/10 ${isActiveTab("/courses") ? "bg-indigo-500/20" : ""}`}>
-                <Link to="/courses">
-                  <GraduationCap className="h-3.5 w-3.5 mr-1.5" />
-                  Courses
-                </Link>
-              </Button>
-              <Button variant="ghost" asChild size="sm" className={`whitespace-nowrap h-8 text-blue-500 hover:text-blue-600 hover:bg-blue-500/10 ${isActiveTab("/challenges") ? "bg-blue-500/20" : ""}`}>
-                <Link to="/challenges">
-                  <Target className="h-3.5 w-3.5 mr-1.5" />
-                  Challenges
-                </Link>
-              </Button>
-              <Button variant="ghost" asChild size="sm" className={`whitespace-nowrap h-8 text-cyan-500 hover:text-cyan-600 hover:bg-cyan-500/10 ${isActiveTab("/community") ? "bg-cyan-500/20" : ""}`}>
-                <Link to="/community">
-                  <Users className="h-3.5 w-3.5 mr-1.5" />
-                  Community
-                </Link>
-              </Button>
-              <Button variant="ghost" asChild size="sm" className={`whitespace-nowrap h-8 text-teal-500 hover:text-teal-600 hover:bg-teal-500/10 ${isActiveTab("/leaderboard") ? "bg-teal-500/20" : ""}`}>
-                <Link to="/leaderboard">
-                  <Trophy className="h-3.5 w-3.5 mr-1.5" />
-                  Leaderboard
-                </Link>
-              </Button>
-              <Button variant="ghost" asChild size="sm" className={`whitespace-nowrap h-8 text-emerald-500 hover:text-emerald-600 hover:bg-emerald-500/10 ${isActiveTab("/achievements") ? "bg-emerald-500/20" : ""}`}>
-                <Link to="/achievements">
-                  <Award className="h-3.5 w-3.5 mr-1.5" />
-                  Achievements
-                </Link>
-              </Button>
-              <Button variant="ghost" asChild size="sm" className={`whitespace-nowrap h-8 text-green-500 hover:text-green-600 hover:bg-green-500/10 ${isActiveTab("/devotional") ? "bg-green-500/20" : ""}`}>
-                <Link to="/devotional">
-                  <Flame className="h-3.5 w-3.5 mr-1.5" />
-                  Devotional
-                </Link>
-              </Button>
-              <Button variant="ghost" asChild size="sm" className={`whitespace-nowrap h-8 text-lime-500 hover:text-lime-600 hover:bg-lime-500/10 ${isActiveTab("/daily-verse") ? "bg-lime-500/20" : ""}`}>
-                <Link to="/daily-verse">
-                  <Sparkles className="h-3.5 w-3.5 mr-1.5" />
-                  Daily Verse
-                </Link>
-              </Button>
-              <Button variant="ghost" asChild size="sm" className={`whitespace-nowrap h-8 text-rose-500 hover:text-rose-600 hover:bg-rose-500/10 ${isActiveTab("/notes") ? "bg-rose-500/20" : ""}`}>
-                <Link to="/notes">
-                  <StickyNote className="h-3.5 w-3.5 mr-1.5" />
-                  Notes
-                </Link>
-              </Button>
-              <Button variant="ghost" asChild size="sm" className={`whitespace-nowrap h-8 text-red-500 hover:text-red-600 hover:bg-red-500/10 ${isActiveTab("/study-sessions") ? "bg-red-500/20" : ""}`}>
-                <Link to="/study-sessions">
-                  <Archive className="h-3.5 w-3.5 mr-1.5" />
-                  Sessions
-                </Link>
-              </Button>
-              <Button variant="ghost" asChild size="sm" className={`whitespace-nowrap h-8 text-fuchsia-500 hover:text-fuchsia-600 hover:bg-fuchsia-500/10 ${isActiveTab("/library") ? "bg-fuchsia-500/20" : ""}`}>
-                <Link to="/library">
-                  <Library className="h-3.5 w-3.5 mr-1.5" />
-                  Library
-                </Link>
-              </Button>
-              <Button variant="ghost" asChild size="sm" className={`whitespace-nowrap h-8 text-sky-500 hover:text-sky-600 hover:bg-sky-500/10 ${isActiveTab("/analytics") ? "bg-sky-500/20" : ""}`}>
-                <Link to="/analytics">
-                  <BarChart3 className="h-3.5 w-3.5 mr-1.5" />
-                  Analytics
-                </Link>
-              </Button>
-              <Button variant="ghost" asChild size="sm" className={`whitespace-nowrap h-8 text-slate-400 hover:text-slate-500 hover:bg-slate-500/10 ${isActiveTab("/reading-plans") ? "bg-slate-500/20" : ""}`}>
-                <Link to="/reading-plans">
-                  <Calendar className="h-3.5 w-3.5 mr-1.5" />
-                  Reading Plans
-                </Link>
-              </Button>
-              <Button variant="ghost" asChild size="sm" className={`whitespace-nowrap h-8 text-amber-400 hover:text-amber-500 hover:bg-amber-400/10 ${isActiveTab("/images") ? "bg-amber-400/20" : ""}`}>
-                <Link to="/images">
-                  <Image className="h-3.5 w-3.5 mr-1.5" />
-                  Images
-                </Link>
-              </Button>
-              <Button variant="ghost" asChild size="sm" className={`whitespace-nowrap h-8 text-red-400 hover:text-red-500 hover:bg-red-400/10 ${isActiveTab("/video-tools") ? "bg-red-400/20" : ""}`}>
-                <Link to="/video-tools">
-                  <Video className="h-3.5 w-3.5 mr-1.5" />
-                  Video
-                </Link>
-              </Button>
+          <div className="border-t border-border/40 hidden md:block">
+              <div className="max-w-7xl mx-auto overflow-x-auto touch-pan-x [&::-webkit-scrollbar]:h-1.5 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-primary/40 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:hover:bg-primary/60" style={{ scrollbarWidth: 'thin' }}>
+                <div className="flex items-center gap-1 py-2 px-2 flex-nowrap min-w-max">
+                  <Link 
+                    to="/palace" 
+                    className={`px-3 py-1.5 text-sm font-medium rounded-md transition-all whitespace-nowrap flex items-center gap-1 bg-gradient-to-r from-amber-500/10 to-orange-500/10 border border-amber-500/20 hover:from-amber-500/20 hover:to-orange-500/20 ${isActiveTab('/palace') ? 'shadow-[0_0_12px_2px_rgba(245,158,11,0.5)] border-amber-400/60' : ''}`}
+                  >
+                    <Building2 className="h-3.5 w-3.5 text-amber-500" />
+                    <span className="bg-gradient-to-r from-amber-600 to-orange-600 bg-clip-text text-transparent font-semibold">Palace</span>
+                  </Link>
+                  {isChurchMember && churchId && (
+                    <Link 
+                      to={`/living-manna?church=${churchId}`}
+                      className={`px-3 py-1.5 text-sm font-medium rounded-md transition-all whitespace-nowrap flex items-center gap-1 bg-gradient-to-r from-emerald-500/10 to-green-500/10 border border-emerald-500/20 hover:from-emerald-500/20 hover:to-green-500/20 ${isActiveTab('/living-manna') ? 'shadow-[0_0_12px_2px_rgba(16,185,129,0.5)] border-emerald-400/60' : ''}`}
+                    >
+                      <Church className="h-3.5 w-3.5 text-emerald-500" />
+                      <span className="bg-gradient-to-r from-emerald-600 to-green-600 bg-clip-text text-transparent font-semibold">My Church Space</span>
+                    </Link>
+                  )}
+                  <Link
+                    to="/bible"
+                    className={`px-3 py-1.5 text-sm font-medium rounded-md transition-all whitespace-nowrap flex items-center gap-1 bg-gradient-to-r from-blue-500/10 to-cyan-500/10 border border-blue-500/20 hover:from-blue-500/20 hover:to-cyan-500/20 ${isActiveTab('/bible') ? 'shadow-[0_0_12px_2px_rgba(59,130,246,0.5)] border-blue-400/60' : ''}`}
+                  >
+                    <BookOpen className="h-3.5 w-3.5 text-blue-500" />
+                    <span className="bg-gradient-to-r from-blue-600 to-cyan-600 bg-clip-text text-transparent font-semibold">Phototheology Study Bible</span>
+                  </Link>
+                  <Link
+                    to="/study-buddy"
+                    className={`px-3 py-1.5 text-sm font-medium rounded-md transition-all whitespace-nowrap flex items-center gap-1 bg-gradient-to-r from-slate-500/10 to-zinc-500/10 border border-slate-500/20 hover:from-slate-500/20 hover:to-zinc-500/20 ${isActiveTab('/study-buddy') ? 'shadow-[0_0_12px_2px_rgba(100,116,139,0.5)] border-slate-400/60' : ''}`}
+                  >
+                    <Brain className="h-3.5 w-3.5 text-slate-400" />
+                    <span className="bg-gradient-to-r from-slate-500 to-zinc-500 bg-clip-text text-transparent font-semibold">Study Buddy</span>
+                  </Link>
+                  <Link
+                    to="/image-bible"
+                    className={`px-3 py-1.5 text-sm font-medium rounded-md transition-all whitespace-nowrap flex items-center gap-1 bg-gradient-to-r from-amber-500/10 to-orange-500/10 border border-amber-500/20 hover:from-amber-500/20 hover:to-orange-500/20 ${isActiveTab('/image-bible') ? 'shadow-[0_0_12px_2px_rgba(245,158,11,0.5)] border-amber-400/60' : ''}`}
+                  >
+                    <Image className="h-3.5 w-3.5 text-amber-500" />
+                    <span className="bg-gradient-to-r from-amber-600 to-orange-600 bg-clip-text text-transparent font-semibold">PT Image Bible</span>
+                  </Link>
+                  <Link
+                    to="/card-deck" 
+                    className={`px-3 py-1.5 text-sm font-medium rounded-md transition-all whitespace-nowrap flex items-center gap-1 bg-gradient-to-r from-violet-500/10 to-purple-500/10 border border-violet-500/20 hover:from-violet-500/20 hover:to-purple-500/20 ${isActiveTab('/card-deck') ? 'shadow-[0_0_12px_2px_rgba(139,92,246,0.5)] border-violet-400/60' : ''}`}
+                  >
+                    <Sparkles className="h-3.5 w-3.5 text-violet-500" />
+                    <span className="bg-gradient-to-r from-violet-600 to-purple-600 bg-clip-text text-transparent font-semibold">Phototheology Study Deck</span>
+                  </Link>
+                  <Link 
+                    to="/reading-plans" 
+                    className={`px-3 py-1.5 text-sm font-medium rounded-md transition-all whitespace-nowrap flex items-center gap-1 bg-gradient-to-r from-emerald-500/10 to-teal-500/10 border border-emerald-500/20 hover:from-emerald-500/20 hover:to-teal-500/20 ${isActiveTab('/reading-plans') ? 'shadow-[0_0_12px_2px_rgba(16,185,129,0.5)] border-emerald-400/60' : ''}`}
+                  >
+                    <Calendar className="h-3.5 w-3.5 text-emerald-500" />
+                    <span className="bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent font-semibold">Reading Plans</span>
+                  </Link>
+                  <Link 
+                    to="/devotionals" 
+                    className={`px-3 py-1.5 text-sm font-medium rounded-md transition-all whitespace-nowrap flex items-center gap-1 bg-gradient-to-r from-pink-500/10 to-rose-500/10 border border-pink-500/20 hover:from-pink-500/20 hover:to-rose-500/20 ${isActiveTab('/devotionals') ? 'shadow-[0_0_12px_2px_rgba(236,72,153,0.5)] border-pink-400/60' : ''}`}
+                  >
+                    <BookOpen className="h-3.5 w-3.5 text-pink-500" />
+                    <span className="bg-gradient-to-r from-pink-600 to-rose-600 bg-clip-text text-transparent font-semibold">Devotionals</span>
+                  </Link>
+                  <Link 
+                    to="/encyclopedia"
+                    className={`px-3 py-1.5 text-sm font-medium rounded-md transition-all whitespace-nowrap flex items-center gap-1 bg-gradient-to-r from-indigo-500/10 to-blue-500/10 border border-indigo-500/20 hover:from-indigo-500/20 hover:to-blue-500/20 ${isActiveTab('/encyclopedia') ? 'shadow-[0_0_12px_2px_rgba(99,102,241,0.5)] border-indigo-400/60' : ''}`}
+                  >
+                    <Search className="h-3.5 w-3.5 text-indigo-500" />
+                    <span className="bg-gradient-to-r from-indigo-600 to-blue-600 bg-clip-text text-transparent font-semibold">Encyclopedia</span>
+                  </Link>
+                  <Link 
+                    to="/video-training" 
+                    className={`px-3 py-1.5 text-sm font-medium rounded-md transition-all whitespace-nowrap flex items-center gap-1 bg-gradient-to-r from-red-500/10 to-orange-500/10 border border-red-500/20 hover:from-red-500/20 hover:to-orange-500/20 ${isActiveTab('/video-training') ? 'shadow-[0_0_12px_2px_rgba(239,68,68,0.5)] border-red-400/60' : ''}`}
+                  >
+                    <Video className="h-3.5 w-3.5 text-red-500" />
+                    <span className="bg-gradient-to-r from-red-600 to-orange-600 bg-clip-text text-transparent font-semibold">Video Training</span>
+                  </Link>
+                  <Link 
+                    to="/my-studies" 
+                    className={`px-3 py-1.5 text-sm font-medium rounded-md transition-all whitespace-nowrap flex items-center gap-1 bg-gradient-to-r from-sky-500/10 to-blue-500/10 border border-sky-500/20 hover:from-sky-500/20 hover:to-blue-500/20 ${isActiveTab('/my-studies') ? 'shadow-[0_0_12px_2px_rgba(14,165,233,0.5)] border-sky-400/60' : ''}`}
+                  >
+                    <BookOpen className="h-3.5 w-3.5 text-sky-500" />
+                    <span className="bg-gradient-to-r from-sky-600 to-blue-600 bg-clip-text text-transparent font-semibold">My Studies</span>
+                  </Link>
+                  <Link
+                    to="/notes"
+                    className={`px-3 py-1.5 text-sm font-medium rounded-md transition-all whitespace-nowrap flex items-center gap-1 bg-gradient-to-r from-yellow-500/10 to-amber-500/10 border border-yellow-500/20 hover:from-yellow-500/20 hover:to-amber-500/20 ${isActiveTab('/notes') ? 'shadow-[0_0_12px_2px_rgba(234,179,8,0.5)] border-yellow-400/60' : ''}`}
+                  >
+                    <BookOpen className="h-3.5 w-3.5 text-yellow-500" />
+                    <span className="bg-gradient-to-r from-yellow-600 to-amber-600 bg-clip-text text-transparent font-semibold">Notes</span>
+                  </Link>
+                  <Link
+                    to="/libraries"
+                    className={`px-3 py-1.5 text-sm font-medium rounded-md transition-all whitespace-nowrap flex items-center gap-1 bg-gradient-to-r from-indigo-500/10 to-purple-500/10 border border-indigo-500/20 hover:from-indigo-500/20 hover:to-purple-500/20 ${isActiveTab('/libraries') ? 'shadow-[0_0_12px_2px_rgba(99,102,241,0.5)] border-indigo-400/60' : ''}`}
+                  >
+                    <Library className="h-3.5 w-3.5 text-indigo-500" />
+                    <span className="bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent font-semibold">Libraries</span>
+                  </Link>
+                  <Link 
+                    to="/games" 
+                    className={`px-3 py-1.5 text-sm font-medium rounded-md transition-all whitespace-nowrap flex items-center gap-1 bg-gradient-to-r from-fuchsia-500/10 to-pink-500/10 border border-fuchsia-500/20 hover:from-fuchsia-500/20 hover:to-pink-500/20 ${isActiveTab('/games') ? 'shadow-[0_0_12px_2px_rgba(217,70,239,0.5)] border-fuchsia-400/60' : ''}`}
+                  >
+                    <Zap className="h-3.5 w-3.5 text-fuchsia-500" />
+                    <span className="bg-gradient-to-r from-fuchsia-600 to-pink-600 bg-clip-text text-transparent font-semibold">Games</span>
+                  </Link>
+                  <Link
+                    to="/memory"
+                    className={`px-3 py-1.5 text-sm font-medium rounded-md transition-all whitespace-nowrap flex items-center gap-1 bg-gradient-to-r from-cyan-500/10 to-teal-500/10 border border-cyan-500/20 hover:from-cyan-500/20 hover:to-teal-500/20 ${isActiveTab('/memory') ? 'shadow-[0_0_12px_2px_rgba(6,182,212,0.5)] border-cyan-400/60' : ''}`}
+                  >
+                    <Brain className="h-3.5 w-3.5 text-cyan-500" />
+                    <span className="bg-gradient-to-r from-cyan-600 to-teal-600 bg-clip-text text-transparent font-semibold">Memory Palace</span>
+                  </Link>
+
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <button className="px-3 py-1.5 text-sm font-medium rounded-md transition-colors whitespace-nowrap flex items-center gap-1 bg-gradient-to-r from-emerald-500/10 to-teal-500/10 border border-emerald-500/20 hover:from-emerald-500/20 hover:to-teal-500/20">
+                        <Layers className="h-3.5 w-3.5 text-emerald-500" />
+                        <span className="bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent font-semibold">Study Tools</span>
+                      </button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="start" className="w-56 bg-card border-border z-50">
+                      <DropdownMenuItem asChild>
+                        <Link to="/flashcards">
+                          <Layers className="h-4 w-4 mr-2" />
+                          Flashcards
+                        </Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem asChild>
+                        <Link to="/daily-reading">
+                          <Calendar className="h-4 w-4 mr-2" />
+                          Daily Reading
+                        </Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem asChild>
+                        <Link to="/training-drills">
+                          <Target className="h-4 w-4 mr-2" />
+                          Training Drills
+                        </Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem asChild>
+                        <Link to="/study-partners">
+                          <Users className="h-4 w-4 mr-2" />
+                          Study Partners
+                        </Link>
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+
+                  <Link
+                    to="/leaderboard" 
+                    className={`px-3 py-1.5 text-sm font-medium rounded-md transition-all whitespace-nowrap flex items-center gap-1 bg-gradient-to-r from-yellow-500/10 to-amber-500/10 border border-yellow-500/20 hover:from-yellow-500/20 hover:to-amber-500/20 ${isActiveTab('/leaderboard') ? 'shadow-[0_0_12px_2px_rgba(234,179,8,0.5)] border-yellow-400/60' : ''}`}
+                  >
+                    <Trophy className="h-3.5 w-3.5 text-yellow-500" />
+                    <span className="bg-gradient-to-r from-yellow-600 to-amber-600 bg-clip-text text-transparent font-semibold">Leaderboard</span>
+                  </Link>
+                  <Link 
+                    to="/drill-drill"
+                    className={`px-3 py-1.5 text-sm font-medium rounded-md transition-all whitespace-nowrap flex items-center gap-1 bg-gradient-to-r from-orange-500/10 to-red-500/10 border border-orange-500/20 hover:from-orange-500/20 hover:to-red-500/20 ${isActiveTab('/drill-drill') ? 'shadow-[0_0_12px_2px_rgba(249,115,22,0.5)] border-orange-400/60' : ''}`}
+                  >
+                    <Target className="h-3.5 w-3.5 text-orange-500" />
+                    <span className="bg-gradient-to-r from-orange-600 to-red-600 bg-clip-text text-transparent font-semibold">Gather Fragments</span>
+                  </Link>
+                  <Link 
+                    to="/analyze-thoughts"
+                    className={`px-3 py-1.5 text-sm font-medium rounded-md transition-all whitespace-nowrap flex items-center gap-1 bg-gradient-to-r from-yellow-500/10 to-amber-500/10 border border-yellow-500/20 hover:from-yellow-500/20 hover:to-amber-500/20 ${isActiveTab('/analyze-thoughts') ? 'shadow-[0_0_12px_2px_rgba(234,179,8,0.5)] border-yellow-400/60' : ''}`}
+                  >
+                    <Lightbulb className="h-3.5 w-3.5 text-yellow-500" />
+                    <span className="bg-gradient-to-r from-yellow-600 to-amber-600 bg-clip-text text-transparent font-semibold">Analyze My Thoughts</span>
+                  </Link>
+                  <Link 
+                    to="/spiritual-training" 
+                    className={`px-3 py-1.5 text-sm font-medium rounded-md transition-all whitespace-nowrap flex items-center gap-1 bg-gradient-to-r from-red-500/10 to-rose-500/10 border border-red-500/20 hover:from-red-500/20 hover:to-rose-500/20 ${isActiveTab('/spiritual-training') ? 'shadow-[0_0_12px_2px_rgba(239,68,68,0.5)] border-red-400/60' : ''}`}
+                  >
+                    <Sword className="h-3.5 w-3.5 text-red-500" />
+                    <span className="bg-gradient-to-r from-red-600 to-rose-600 bg-clip-text text-transparent font-semibold">Christian Art of War Dojo</span>
+                  </Link>
+                  
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <button className="px-3 py-1.5 text-sm font-medium rounded-md transition-colors whitespace-nowrap flex items-center gap-1 bg-gradient-to-r from-violet-500/10 to-purple-500/10 border border-violet-500/20 hover:from-violet-500/20 hover:to-purple-500/20">
+                        <Sparkles className="h-3.5 w-3.5 text-violet-500" />
+                        <span className="bg-gradient-to-r from-violet-600 to-purple-600 bg-clip-text text-transparent font-semibold">GPTs</span>
+                      </button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="start" className="w-56 bg-card border-border z-50">
+                      <DropdownMenuItem asChild>
+                        <Link to="/phototheologygpt">Phototheology GPT</Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem asChild>
+                        <Link to="/branch-study">BranchStudy</Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem asChild>
+                        <Link to="/kidgpt">Kid GPT</Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem asChild>
+                        <Link to="/daniel-revelation-gpt">Daniel & Revelation GPT</Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem asChild>
+                        <Link to="/apologetics-gpt">Apologetics GPT</Link>
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                  
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <button className="px-3 py-1.5 text-sm font-medium rounded-md transition-colors whitespace-nowrap flex items-center gap-1 bg-gradient-to-r from-blue-500/10 to-indigo-500/10 border border-blue-500/20 hover:from-blue-500/20 hover:to-indigo-500/20">
+                        <Building2 className="h-3.5 w-3.5 text-blue-500" />
+                        <span className="bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent font-semibold">Blueprints</span>
+                      </button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="start" className="w-56 bg-card border-border z-50">
+                      <DropdownMenuItem asChild>
+                        <Link to="/blueprint-marriage">Dating & Marriage</Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem asChild>
+                        <Link to="/blueprint-grief">Grieving</Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem asChild>
+                        <Link to="/blueprint-stronghold">Breaking Strongholds</Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem asChild>
+                        <Link to="/blueprint-weight-loss">Weight Loss</Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem asChild>
+                        <Link to="/blueprint-mental-health">Mental Health</Link>
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                  <Link 
+                    to="/courses" 
+                    className="px-3 py-1.5 text-sm font-medium rounded-md transition-colors whitespace-nowrap flex items-center gap-1 bg-gradient-to-r from-emerald-500/10 to-green-500/10 border border-emerald-500/20 hover:from-emerald-500/20 hover:to-green-500/20"
+                  >
+                    <BookOpen className="h-3.5 w-3.5 text-emerald-500" />
+                    <span className="bg-gradient-to-r from-emerald-600 to-green-600 bg-clip-text text-transparent font-semibold">Courses</span>
+                  </Link>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <button className="px-3 py-1.5 text-sm font-medium rounded-md transition-colors whitespace-nowrap flex items-center gap-1 bg-gradient-to-r from-orange-500/10 to-red-500/10 border border-orange-500/20 hover:from-orange-500/20 hover:to-red-500/20">
+                        <Zap className="h-3.5 w-3.5 text-orange-500" />
+                        <span className="bg-gradient-to-r from-orange-600 to-red-600 bg-clip-text text-transparent font-semibold">Challenges</span>
+                      </button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="start" className="w-56 bg-card border-border z-50">
+                      <DropdownMenuItem asChild>
+                        <Link to="/daily-challenges">Daily Challenges</Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem asChild>
+                        <Link to="/genesis-challenge">Genesis High Rise</Link>
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                  <Link 
+                    to="/achievements" 
+                    className="px-3 py-1.5 text-sm font-medium rounded-md transition-colors whitespace-nowrap flex items-center gap-1 bg-gradient-to-r from-amber-500/10 to-yellow-500/10 border border-amber-500/20 hover:from-amber-500/20 hover:to-yellow-500/20"
+                  >
+                    <Trophy className="h-3.5 w-3.5 text-amber-500" />
+                    <span className="bg-gradient-to-r from-amber-600 to-yellow-600 bg-clip-text text-transparent font-semibold">Achievements</span>
+                  </Link>
+                  <Link 
+                    to="/mastery" 
+                    className="px-3 py-1.5 text-sm font-medium rounded-md transition-colors whitespace-nowrap flex items-center gap-1 bg-gradient-to-r from-rose-500/10 to-pink-500/10 border border-rose-500/20 hover:from-rose-500/20 hover:to-pink-500/20"
+                  >
+                    <Crown className="h-3.5 w-3.5 text-rose-500" />
+                    <span className="bg-gradient-to-r from-rose-600 to-pink-600 bg-clip-text text-transparent font-semibold">Mastery</span>
+                  </Link>
+                  <Link
+                    to="/bible-study-series" 
+                    className="px-3 py-1.5 text-sm font-medium rounded-md transition-colors whitespace-nowrap flex items-center gap-1 bg-gradient-to-r from-sky-500/10 to-blue-500/10 border border-sky-500/20 hover:from-sky-500/20 hover:to-blue-500/20"
+                  >
+                    <BookOpen className="h-3.5 w-3.5 text-sky-500" />
+                    <span className="bg-gradient-to-r from-sky-600 to-blue-600 bg-clip-text text-transparent font-semibold">Series</span>
+                  </Link>
+                  <Link 
+                    to="/sermon-builder" 
+                    className="px-3 py-1.5 text-sm font-medium rounded-md transition-colors whitespace-nowrap flex items-center gap-1 bg-gradient-to-r from-purple-500/10 to-fuchsia-500/10 border border-purple-500/20 hover:from-purple-500/20 hover:to-fuchsia-500/20"
+                  >
+                    <MessageSquare className="h-3.5 w-3.5 text-purple-500" />
+                    <span className="bg-gradient-to-r from-purple-600 to-fuchsia-600 bg-clip-text text-transparent font-semibold">Sermon Builder</span>
+                  </Link>
+                  <Link 
+                    to="/pricing" 
+                    className="px-3 py-1.5 text-sm font-medium rounded-md transition-colors whitespace-nowrap flex items-center gap-1 bg-gradient-to-r from-lime-500/10 to-green-500/10 border border-lime-500/20 hover:from-lime-500/20 hover:to-green-500/20"
+                  >
+                    <CreditCard className="h-3.5 w-3.5 text-lime-500" />
+                    <span className="bg-gradient-to-r from-lime-600 to-green-600 bg-clip-text text-transparent font-semibold">Pricing</span>
+                  </Link>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <button className="px-3 py-1.5 text-sm font-medium rounded-md transition-colors whitespace-nowrap flex items-center gap-1 bg-gradient-to-r from-teal-500/10 to-cyan-500/10 border border-teal-500/20 hover:from-teal-500/20 hover:to-cyan-500/20">
+                        <Users className="h-3.5 w-3.5 text-teal-500" />
+                        <span className="bg-gradient-to-r from-teal-600 to-cyan-600 bg-clip-text text-transparent font-semibold">Community</span>
+                      </button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="start" className="w-56 bg-card border-border z-50">
+                      <DropdownMenuItem asChild>
+                        <Link to="/community">
+                          <Users className="h-4 w-4 mr-2" />
+                          Community Feed
+                        </Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem asChild>
+                        <Link to="/pt-multiplayer">
+                          <Gamepad2 className="h-4 w-4 mr-2" />
+                          PT Multiplayer
+                        </Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem asChild>
+                        <Link to="/guilds">
+                          <Shield className="h-4 w-4 mr-2" />
+                          Guilds
+                        </Link>
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <button className="px-3 py-1.5 text-sm font-medium text-foreground hover:text-primary hover:bg-accent/50 rounded-md transition-colors whitespace-nowrap flex items-center gap-1">
+                        <Search className="h-3.5 w-3.5" />
+                        Research
+                      </button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="start" className="w-56 bg-card border-border z-50">
+                      <DropdownMenuItem asChild>
+                        <Link to="/bible-reference">PT Codebook</Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem asChild>
+                        <Link to="/encyclopedia">Bible Encyclopedia</Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem asChild>
+                        <Link to="/quarterly-study">Lesson Study</Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem asChild>
+                        <Link to="/prophecy-watch">Prophecy Watch</Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem asChild>
+                        <Link to="/culture-controversy">Culture Controversy</Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem asChild>
+                        <Link to="/research-mode">Research Mode</Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem asChild>
+                        <Link to="/sermon-archive">
+                          <Archive className="h-4 w-4 mr-2" />
+                          Sermon Archive
+                        </Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem asChild>
+                        <Link to="/content-library">
+                          <Library className="h-4 w-4 mr-2" />
+                          Content Library
+                        </Link>
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <button className="px-3 py-1.5 text-sm font-medium text-foreground hover:text-primary hover:bg-accent/50 rounded-md transition-colors whitespace-nowrap flex items-center gap-1">
+                        <User className="h-3.5 w-3.5" />
+                        Account
+                      </button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end" className="w-56 bg-card border-border z-50">
+                      <DropdownMenuItem asChild>
+                        <Link to="/profile">
+                          <User className="h-4 w-4 mr-2" />
+                          Profile
+                        </Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem asChild>
+                        <Link to="/my-progress">
+                          <BarChart3 className="h-4 w-4 mr-2" />
+                          My Analytics
+                        </Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem asChild>
+                        <Link to="/certificates">
+                          <Award className="h-4 w-4 mr-2" />
+                          Certificates
+                        </Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem asChild>
+                        <Link to="/sparks">
+                          <Sparkles className="h-4 w-4 mr-2" />
+                          Sparks Library
+                        </Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem asChild>
+                        <Link to="/pricing">
+                          <CreditCard className="h-4 w-4 mr-2" />
+                          Subscription
+                        </Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem asChild>
+                        <Link to="/manage-subscription" className="text-muted-foreground">
+                          <CreditCard className="h-4 w-4 mr-2" />
+                          Cancel Subscription
+                        </Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem onClick={() => signOut()}>
+                        <LogOut className="h-4 w-4 mr-2" />
+                        Sign Out
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </div>
+              </div>
             </div>
           )}
         </div>

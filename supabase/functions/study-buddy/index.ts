@@ -1,4 +1,5 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import Anthropic from "https://esm.sh/@anthropic-ai/sdk@0.39.0";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -102,11 +103,10 @@ GUARDRAILS
 
 interface StudyBuddyRequest {
   notes: string;
-  mode?: 'observation' | 'pattern' | 'sanctuary' | 'christological' | 'application' | 'chat' | null;
+  mode?: 'observation' | 'pattern' | 'sanctuary' | 'christological' | 'application' | null;
   sessionHistory?: string[];
   requestCompression?: boolean;
   userCompression?: string;
-  context?: string;
 }
 
 serve(async (req) => {
@@ -115,23 +115,21 @@ serve(async (req) => {
   }
 
   try {
-    const lovableApiKey = Deno.env.get("LOVABLE_API_KEY");
-    if (!lovableApiKey) {
-      throw new Error("LOVABLE_API_KEY not configured");
+    const anthropicApiKey = Deno.env.get("ANTHROPIC_API_KEY");
+    if (!anthropicApiKey) {
+      throw new Error("ANTHROPIC_API_KEY not configured");
     }
 
-    const { notes, mode, sessionHistory, requestCompression, userCompression, context }: StudyBuddyRequest = await req.json();
+    const { notes, mode, sessionHistory, requestCompression, userCompression }: StudyBuddyRequest = await req.json();
 
     if (!notes || notes.trim().length < 10) {
       throw new Error("Please provide study notes (at least 10 characters)");
     }
 
+    const client = new Anthropic({ apiKey: anthropicApiKey });
+
     // Build the user message
     let userMessage = `STUDY NOTES:\n\`\`\`\n${notes}\n\`\`\``;
-
-    if (context) {
-      userMessage = `CONTEXT:\n${context}\n\n${userMessage}`;
-    }
 
     if (mode) {
       userMessage += `\n\nACTIVE MODE: ${mode.toUpperCase()}\nEnforce this mode strictly. Flag any violations.`;
@@ -151,54 +149,30 @@ serve(async (req) => {
 
     userMessage += `\n\nHelp me study this Phototheologically. Spark connections, suggest PT rooms, source my claims, and help me see Christ. Return valid JSON only.`;
 
-    // Use Lovable AI Gateway
-    const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        "Authorization": `Bearer ${lovableApiKey}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        model: "google/gemini-3-flash-preview",
-        messages: [
-          { role: "system", content: STUDY_BUDDY_SYSTEM_PROMPT },
-          { role: "user", content: userMessage }
-        ],
-        temperature: 0.7,
-      }),
+    const response = await client.messages.create({
+      model: "claude-sonnet-4-20250514",
+      max_tokens: 4096,
+      system: STUDY_BUDDY_SYSTEM_PROMPT,
+      messages: [{ role: "user", content: userMessage }],
     });
 
-    if (!response.ok) {
-      if (response.status === 429) {
-        throw new Error("Rate limit exceeded. Please try again in a moment.");
-      }
-      if (response.status === 402) {
-        throw new Error("AI service requires additional credits.");
-      }
-      const errorText = await response.text();
-      console.error("AI API error:", response.status, errorText);
-      throw new Error("AI service temporarily unavailable");
-    }
-
-    const aiData = await response.json();
-    const content = aiData.choices?.[0]?.message?.content;
-
-    if (!content) {
-      throw new Error("No response from AI service");
+    const content = response.content[0];
+    if (content.type !== "text") {
+      throw new Error("Unexpected response type");
     }
 
     // Parse the JSON response
     let analysis;
     try {
       // Extract JSON from possible markdown code blocks
-      let jsonText = content;
+      let jsonText = content.text;
       const jsonMatch = jsonText.match(/```(?:json)?\s*([\s\S]*?)```/);
       if (jsonMatch) {
         jsonText = jsonMatch[1];
       }
       analysis = JSON.parse(jsonText.trim());
     } catch (parseError) {
-      console.error("Failed to parse Jeeves response:", content);
+      console.error("Failed to parse Jeeves response:", content.text);
       // Return a fallback structure matching new format
       analysis = {
         sparks: [],
@@ -219,7 +193,7 @@ serve(async (req) => {
           focus: "Keep exploring",
           question: "What specific verse or phrase stands out to you most?"
         },
-        overallResponse: content || "I'm here to help you study Phototheologically! Share more of your thoughts about this passage - what are you noticing? What questions are arising? I'll help spark connections, suggest which PT rooms apply, and help you see Christ in the text."
+        overallResponse: "I'm here to help you study Phototheologically! Share more of your thoughts about this passage - what are you noticing? What questions are arising? I'll help spark connections, suggest which PT rooms apply, and help you see Christ in the text."
       };
     }
 
