@@ -112,39 +112,57 @@ serve(async (req) => {
       );
     }
 
-    // Build query based on filter
-    let query = supabase.from("teachable_students").select("teachable_email, user_id, is_active, mrr");
+    // Build query based on filter - fetch ALL rows (no default 1000 limit)
+    let allStudents: Array<{ teachable_email: string | null; user_id: string | null; is_active: boolean | null; mrr: number | null }> = [];
+    let hasMore = true;
+    let offset = 0;
+    const pageSize = 1000;
 
-    switch (filter) {
-      case 'active':
-        query = query.eq("is_active", true);
-        break;
-      case 'inactive':
-        query = query.or("is_active.is.null,is_active.eq.false");
-        break;
-      case 'linked':
-        query = query.not("user_id", "is", null);
-        break;
-      case 'unlinked':
-        query = query.is("user_id", null);
-        break;
-      case 'premium_paying':
-        // Users paying $15 or more per month
-        query = query.gte("mrr", 15);
-        break;
-      case 'not_paying':
-        // Users not paying anything (MRR is 0 or null)
-        query = query.or("mrr.is.null,mrr.eq.0");
-        break;
-      // 'all' - no additional filter
+    while (hasMore) {
+      let query = supabase
+        .from("teachable_students")
+        .select("teachable_email, user_id, is_active, mrr")
+        .range(offset, offset + pageSize - 1);
+
+      switch (filter) {
+        case 'active':
+          query = query.eq("is_active", true);
+          break;
+        case 'inactive':
+          query = query.or("is_active.is.null,is_active.eq.false");
+          break;
+        case 'linked':
+          query = query.not("user_id", "is", null);
+          break;
+        case 'unlinked':
+          query = query.is("user_id", null);
+          break;
+        case 'premium_paying':
+          query = query.gte("mrr", 15);
+          break;
+        case 'not_paying':
+          query = query.or("mrr.is.null,mrr.eq.0");
+          break;
+        // 'all' - no additional filter
+      }
+
+      const { data: pageData, error: pageError } = await query;
+
+      if (pageError) {
+        console.error("Error fetching Teachable students page:", pageError);
+        throw pageError;
+      }
+
+      if (pageData && pageData.length > 0) {
+        allStudents = allStudents.concat(pageData);
+        offset += pageSize;
+        hasMore = pageData.length === pageSize;
+      } else {
+        hasMore = false;
+      }
     }
 
-    const { data: teachableStudents, error: fetchError } = await query;
-
-    if (fetchError) {
-      console.error("Error fetching Teachable students:", fetchError);
-      throw fetchError;
-    }
+    const teachableStudents = allStudents;
 
     if (!teachableStudents || teachableStudents.length === 0) {
       return new Response(
@@ -158,16 +176,20 @@ serve(async (req) => {
       );
     }
 
-    // Get unique emails
-    const emails = [...new Set(teachableStudents.map(s => s.teachable_email).filter(Boolean))];
+    // Get unique emails (filter out nulls and cast to string)
+    const emails = [...new Set(
+      teachableStudents
+        .map(s => s.teachable_email)
+        .filter((e): e is string => e !== null && e !== undefined && e.trim() !== '')
+    )];
     console.log(`Sending to ${emails.length} Teachable students with filter: ${filter}`);
 
     const resend = new Resend(RESEND_API_KEY);
     let sentCount = 0;
     let errorCount = 0;
 
-    // Send emails in batches of 10
-    const batchSize = 10;
+    // Send emails in batches of 50 for better throughput
+    const batchSize = 50;
     for (let i = 0; i < emails.length; i += batchSize) {
       const batch = emails.slice(i, i + batchSize);
       
