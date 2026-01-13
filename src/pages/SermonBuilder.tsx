@@ -692,6 +692,19 @@ export default function SermonBuilder() {
           {/* Simmer Tab */}
           <TabsContent value="simmer" className="mt-6">
             <Card className="bg-white/90 dark:bg-white/10 backdrop-blur-xl border-white/20">
+              <CardHeader className="flex flex-row items-center justify-between border-b border-white/10 pb-4">
+                <CardTitle className="text-white flex items-center gap-2">
+                  <Sparkles className="w-5 h-5" />
+                  Sermon Simmer
+                </CardTitle>
+                <Button
+                  onClick={() => navigate("/sermon-simmer")}
+                  className="bg-gradient-to-r from-red-600 to-orange-500 hover:from-red-700 hover:to-orange-600 text-white shadow-lg shadow-red-500/30"
+                >
+                  <Plus className="w-4 h-4 mr-2" />
+                  New Sermon
+                </Button>
+              </CardHeader>
               <CardContent className="p-0">
                 <SermonPolishTab
                   initialSermonText={sermon.full_sermon}
