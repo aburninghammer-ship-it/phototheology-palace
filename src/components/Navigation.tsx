@@ -1,6 +1,6 @@
 import { useLayoutEffect, useRef, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { Building2, Sparkles, Users, User, CreditCard, LogOut, MessageCircle, BookOpen, Calendar, Image, Search, Video, Sword, Crown, Shield, Brain, Lightbulb, Zap, Trophy, MessageSquare, Target, StickyNote, Radio, Church, GraduationCap, Award, Gamepad2, BarChart3, Archive, Library, Layers } from "lucide-react";
+import { Building2, Sparkles, Users, User, CreditCard, LogOut, MessageCircle, BookOpen, Calendar, Image, Search, Video, Sword, Crown, Shield, Brain, Lightbulb, Zap, Trophy, MessageSquare, Target, StickyNote, Radio, Church, GraduationCap, Award, Gamepad2, BarChart3, Archive, Library, Layers, Flame } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
 import { useActiveUsers } from "@/hooks/useActiveUsers";
@@ -383,49 +383,127 @@ export const Navigation = () => {
             </div>
           </div>
           
-          {/* Secondary Navigation Tabs - Logged in users only */}
+          {/* Secondary Navigation Tabs - Logged in users only - ALL 20+ colorful tabs */}
           {user && (
             <div className="hidden md:flex items-center justify-center gap-1 py-2 border-t border-border/50 overflow-x-auto scrollbar-hide">
-              <Button variant="ghost" asChild size="sm" className={`whitespace-nowrap h-8 ${location.pathname === "/mastery" || location.pathname.startsWith("/mastery") ? "bg-accent" : ""}`}>
+              <Button variant="ghost" asChild size="sm" className={`whitespace-nowrap h-8 text-yellow-500 hover:text-yellow-600 hover:bg-yellow-500/10 ${isActiveTab("/mastery") ? "bg-yellow-500/20" : ""}`}>
                 <Link to="/mastery">
                   <Crown className="h-3.5 w-3.5 mr-1.5" />
                   Mastery
                 </Link>
               </Button>
-              <Button variant="ghost" asChild size="sm" className={`whitespace-nowrap h-8 ${location.pathname === "/bible" || location.pathname.startsWith("/bible") ? "bg-accent" : ""}`}>
+              <Button variant="ghost" asChild size="sm" className={`whitespace-nowrap h-8 text-amber-500 hover:text-amber-600 hover:bg-amber-500/10 ${isActiveTab("/bible") ? "bg-amber-500/20" : ""}`}>
                 <Link to="/bible">
                   <BookOpen className="h-3.5 w-3.5 mr-1.5" />
                   Study Bible
                 </Link>
               </Button>
-              <Button variant="ghost" asChild size="sm" className={`whitespace-nowrap h-8 ${location.pathname === "/study-buddy" ? "bg-accent" : ""}`}>
+              <Button variant="ghost" asChild size="sm" className={`whitespace-nowrap h-8 text-orange-500 hover:text-orange-600 hover:bg-orange-500/10 ${isActiveTab("/study-buddy") ? "bg-orange-500/20" : ""}`}>
                 <Link to="/study-buddy">
                   <Brain className="h-3.5 w-3.5 mr-1.5" />
                   Study Buddy
                 </Link>
               </Button>
-              <Button variant="ghost" asChild size="sm" className={`whitespace-nowrap h-8 ${location.pathname === "/palace" || location.pathname.startsWith("/palace") ? "bg-accent" : ""}`}>
+              <Button variant="ghost" asChild size="sm" className={`whitespace-nowrap h-8 text-purple-500 hover:text-purple-600 hover:bg-purple-500/10 ${isActiveTab("/palace") ? "bg-purple-500/20" : ""}`}>
                 <Link to="/palace">
                   <Building2 className="h-3.5 w-3.5 mr-1.5" />
                   Palace
                 </Link>
               </Button>
-              <Button variant="ghost" asChild size="sm" className={`whitespace-nowrap h-8 ${location.pathname === "/games" || location.pathname.startsWith("/games") ? "bg-accent" : ""}`}>
+              <Button variant="ghost" asChild size="sm" className={`whitespace-nowrap h-8 text-pink-500 hover:text-pink-600 hover:bg-pink-500/10 ${isActiveTab("/games") ? "bg-pink-500/20" : ""}`}>
                 <Link to="/games">
                   <Gamepad2 className="h-3.5 w-3.5 mr-1.5" />
                   Games
                 </Link>
               </Button>
-              <Button variant="ghost" asChild size="sm" className={`whitespace-nowrap h-8 ${location.pathname === "/memory" ? "bg-accent" : ""}`}>
+              <Button variant="ghost" asChild size="sm" className={`whitespace-nowrap h-8 text-violet-500 hover:text-violet-600 hover:bg-violet-500/10 ${isActiveTab("/memory") ? "bg-violet-500/20" : ""}`}>
                 <Link to="/memory">
                   <Brain className="h-3.5 w-3.5 mr-1.5" />
                   Memory
                 </Link>
               </Button>
-              <Button variant="ghost" asChild size="sm" className={`whitespace-nowrap h-8 ${location.pathname === "/courses" || location.pathname.startsWith("/course") ? "bg-accent" : ""}`}>
+              <Button variant="ghost" asChild size="sm" className={`whitespace-nowrap h-8 text-indigo-500 hover:text-indigo-600 hover:bg-indigo-500/10 ${isActiveTab("/courses") ? "bg-indigo-500/20" : ""}`}>
                 <Link to="/courses">
                   <GraduationCap className="h-3.5 w-3.5 mr-1.5" />
                   Courses
+                </Link>
+              </Button>
+              <Button variant="ghost" asChild size="sm" className={`whitespace-nowrap h-8 text-blue-500 hover:text-blue-600 hover:bg-blue-500/10 ${isActiveTab("/challenges") ? "bg-blue-500/20" : ""}`}>
+                <Link to="/challenges">
+                  <Target className="h-3.5 w-3.5 mr-1.5" />
+                  Challenges
+                </Link>
+              </Button>
+              <Button variant="ghost" asChild size="sm" className={`whitespace-nowrap h-8 text-cyan-500 hover:text-cyan-600 hover:bg-cyan-500/10 ${isActiveTab("/community") ? "bg-cyan-500/20" : ""}`}>
+                <Link to="/community">
+                  <Users className="h-3.5 w-3.5 mr-1.5" />
+                  Community
+                </Link>
+              </Button>
+              <Button variant="ghost" asChild size="sm" className={`whitespace-nowrap h-8 text-teal-500 hover:text-teal-600 hover:bg-teal-500/10 ${isActiveTab("/leaderboard") ? "bg-teal-500/20" : ""}`}>
+                <Link to="/leaderboard">
+                  <Trophy className="h-3.5 w-3.5 mr-1.5" />
+                  Leaderboard
+                </Link>
+              </Button>
+              <Button variant="ghost" asChild size="sm" className={`whitespace-nowrap h-8 text-emerald-500 hover:text-emerald-600 hover:bg-emerald-500/10 ${isActiveTab("/achievements") ? "bg-emerald-500/20" : ""}`}>
+                <Link to="/achievements">
+                  <Award className="h-3.5 w-3.5 mr-1.5" />
+                  Achievements
+                </Link>
+              </Button>
+              <Button variant="ghost" asChild size="sm" className={`whitespace-nowrap h-8 text-green-500 hover:text-green-600 hover:bg-green-500/10 ${isActiveTab("/devotional") ? "bg-green-500/20" : ""}`}>
+                <Link to="/devotional">
+                  <Flame className="h-3.5 w-3.5 mr-1.5" />
+                  Devotional
+                </Link>
+              </Button>
+              <Button variant="ghost" asChild size="sm" className={`whitespace-nowrap h-8 text-lime-500 hover:text-lime-600 hover:bg-lime-500/10 ${isActiveTab("/daily-verse") ? "bg-lime-500/20" : ""}`}>
+                <Link to="/daily-verse">
+                  <Sparkles className="h-3.5 w-3.5 mr-1.5" />
+                  Daily Verse
+                </Link>
+              </Button>
+              <Button variant="ghost" asChild size="sm" className={`whitespace-nowrap h-8 text-rose-500 hover:text-rose-600 hover:bg-rose-500/10 ${isActiveTab("/notes") ? "bg-rose-500/20" : ""}`}>
+                <Link to="/notes">
+                  <StickyNote className="h-3.5 w-3.5 mr-1.5" />
+                  Notes
+                </Link>
+              </Button>
+              <Button variant="ghost" asChild size="sm" className={`whitespace-nowrap h-8 text-red-500 hover:text-red-600 hover:bg-red-500/10 ${isActiveTab("/study-sessions") ? "bg-red-500/20" : ""}`}>
+                <Link to="/study-sessions">
+                  <Archive className="h-3.5 w-3.5 mr-1.5" />
+                  Sessions
+                </Link>
+              </Button>
+              <Button variant="ghost" asChild size="sm" className={`whitespace-nowrap h-8 text-fuchsia-500 hover:text-fuchsia-600 hover:bg-fuchsia-500/10 ${isActiveTab("/library") ? "bg-fuchsia-500/20" : ""}`}>
+                <Link to="/library">
+                  <Library className="h-3.5 w-3.5 mr-1.5" />
+                  Library
+                </Link>
+              </Button>
+              <Button variant="ghost" asChild size="sm" className={`whitespace-nowrap h-8 text-sky-500 hover:text-sky-600 hover:bg-sky-500/10 ${isActiveTab("/analytics") ? "bg-sky-500/20" : ""}`}>
+                <Link to="/analytics">
+                  <BarChart3 className="h-3.5 w-3.5 mr-1.5" />
+                  Analytics
+                </Link>
+              </Button>
+              <Button variant="ghost" asChild size="sm" className={`whitespace-nowrap h-8 text-slate-400 hover:text-slate-500 hover:bg-slate-500/10 ${isActiveTab("/reading-plans") ? "bg-slate-500/20" : ""}`}>
+                <Link to="/reading-plans">
+                  <Calendar className="h-3.5 w-3.5 mr-1.5" />
+                  Reading Plans
+                </Link>
+              </Button>
+              <Button variant="ghost" asChild size="sm" className={`whitespace-nowrap h-8 text-amber-400 hover:text-amber-500 hover:bg-amber-400/10 ${isActiveTab("/images") ? "bg-amber-400/20" : ""}`}>
+                <Link to="/images">
+                  <Image className="h-3.5 w-3.5 mr-1.5" />
+                  Images
+                </Link>
+              </Button>
+              <Button variant="ghost" asChild size="sm" className={`whitespace-nowrap h-8 text-red-400 hover:text-red-500 hover:bg-red-400/10 ${isActiveTab("/video-tools") ? "bg-red-400/20" : ""}`}>
+                <Link to="/video-tools">
+                  <Video className="h-3.5 w-3.5 mr-1.5" />
+                  Video
                 </Link>
               </Button>
             </div>
