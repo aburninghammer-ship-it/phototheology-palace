@@ -9,6 +9,7 @@ import { OfflineIndicator } from "@/components/OfflineIndicator";
 import { PWAUpdatePrompt } from "@/components/PWAUpdatePrompt";
 import { LoadingScreen } from "@/components/LoadingScreen";
 import { ProtectedRoute } from "./components/ProtectedRoute";
+import { KeepAliveRoutes } from "@/components/KeepAliveRoutes";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { MessagingSidebar } from "@/components/MessagingSidebar";
 import { LiveNotificationsProvider } from "@/components/LiveNotificationsProvider";
@@ -366,6 +367,7 @@ function App() {
                           <MessagingSidebar />
                           <main className="flex-1 w-full overflow-x-hidden pb-mobile-nav">
                           <Suspense fallback={<LoadingScreen />}>
+                            <KeepAliveRoutes maxCached={20}>
                             <Routes>
             <Route path="/" element={<Gatehouse />} />
             <Route path="/landing" element={<Index />} />
@@ -673,6 +675,7 @@ function App() {
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                 <Route path="*" element={<NotFound />} />
                     </Routes>
+                    </KeepAliveRoutes>
                     </Suspense>
                   </main>
                   </div>
