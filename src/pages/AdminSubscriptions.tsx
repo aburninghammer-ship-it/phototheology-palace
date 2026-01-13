@@ -15,6 +15,7 @@ import { ImageBibleGenerator } from "@/components/admin/ImageBibleGenerator";
 import { PatreonOutreach } from "@/components/admin/PatreonOutreach";
 import { PickaxeImport } from "@/components/admin/PickaxeImport";
 import { PickaxeEmailCampaign } from "@/components/admin/PickaxeEmailCampaign";
+import { TeachableEmailCampaign } from "@/components/admin/TeachableEmailCampaign";
 import { Badge } from "@/components/ui/badge";
 
 interface StripeStats {
@@ -712,6 +713,9 @@ export default function AdminSubscriptions() {
               </div>
             </CardContent>
           </Card>
+
+          {/* Email Campaign */}
+          <TeachableEmailCampaign />
         </TabsContent>
 
         <TabsContent value="pickaxe" className="space-y-6">
