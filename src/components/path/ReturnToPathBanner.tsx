@@ -37,7 +37,7 @@ export function ReturnToPathBanner({ className = "" }: ReturnToPathBannerProps) 
         exit={{ opacity: 0, scale: 0.9 }}
         className={`fixed z-30 pointer-events-auto
           bottom-20 left-1/2 -translate-x-1/2
-          md:bottom-auto md:top-20 md:left-1/2 md:-translate-x-1/2
+          md:bottom-6 md:left-1/2 md:-translate-x-1/2
           ${className}`}
       >
         {/* Compact mobile version */}
