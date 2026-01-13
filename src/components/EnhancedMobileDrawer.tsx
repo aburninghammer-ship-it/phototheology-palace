@@ -45,6 +45,7 @@ const categoryConfig = {
     icon: BookOpen,
     links: [
       { to: "/bible", label: "PT Study Bible", icon: "📖" },
+      { to: "/study-buddy", label: "Study Buddy", icon: "🧠" },
       { to: "/audio-bible", label: "Audio Bible", icon: "🎧" },
       { to: "/bible-image-library", label: "PT Image Bible", icon: "🎨" },
       { to: "/card-deck", label: "PT Study Deck", icon: "🃏" },
