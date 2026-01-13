@@ -85,6 +85,7 @@ export default function AdminSubscriptions() {
   const [loading, setLoading] = useState(true);
   const [syncing, setSyncing] = useState(false);
   const [sendingPatreonReminder, setSendingPatreonReminder] = useState(false);
+  const [sendingSyncReminder, setSendingSyncReminder] = useState(false);
   const [isAdmin, setIsAdmin] = useState<boolean | null>(null);
   const [stats, setStats] = useState<SubscriptionStats | null>(null);
   const [churchStats, setChurchStats] = useState<ChurchStats | null>(null);
@@ -136,6 +137,31 @@ export default function AdminSubscriptions() {
       });
     } finally {
       setSendingPatreonReminder(false);
+    }
+  };
+
+  const handleSendSyncReminder = async () => {
+    setSendingSyncReminder(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('send-sync-reminder');
+      
+      if (error) throw error;
+      
+      toast({
+        title: "Reminder Emails Sent",
+        description: data?.message || `Sent ${data?.sent || 0} reminder emails to unsynced subscribers`,
+      });
+      
+      await loadStats();
+    } catch (error: any) {
+      console.error("Sync reminder error:", error);
+      toast({
+        title: "Failed to Send Reminders",
+        description: error.message || "Failed to send sync reminders",
+        variant: "destructive",
+      });
+    } finally {
+      setSendingSyncReminder(false);
     }
   };
 
@@ -437,10 +463,28 @@ export default function AdminSubscriptions() {
                       </div>
                     ))}
                   </div>
-                  <p className="text-xs text-muted-foreground mt-2">
-                    These users may not have logged in yet, or their subscription wasn't synced properly. 
-                    Use "Sync Stripe Subscriptions" to attempt automatic sync.
-                  </p>
+                  <div className="mt-4 flex items-center gap-3">
+                    <Button 
+                      onClick={handleSendSyncReminder} 
+                      disabled={sendingSyncReminder}
+                      size="sm"
+                    >
+                      {sendingSyncReminder ? (
+                        <>
+                          <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                          Sending...
+                        </>
+                      ) : (
+                        <>
+                          <Send className="h-4 w-4 mr-2" />
+                          Email Reminder to Login
+                        </>
+                      )}
+                    </Button>
+                    <p className="text-xs text-muted-foreground">
+                      Sends reminder to these {stats.users_needing_sync.length} users to sign up/login
+                    </p>
+                  </div>
                 </div>
               )}
             </CardContent>
