@@ -119,8 +119,8 @@ serve(async (req) => {
       0
     );
 
-    // Minimum pledge required for premium access: $20/month = 2000 cents
-    const MINIMUM_PLEDGE_CENTS = 2000;
+    // Minimum pledge required for premium access: $15/month = 1500 cents
+    const MINIMUM_PLEDGE_CENTS = 1500;
     const meetsMinimumPledge = entitledCents >= MINIMUM_PLEDGE_CENTS;
 
     console.log("Final determination - isActivePatron:", isActivePatron, "entitledCents:", entitledCents, "meetsMinimumPledge:", meetsMinimumPledge);
@@ -184,7 +184,7 @@ serve(async (req) => {
             .eq("id", userId);
           console.log("Granted premium access to user:", userId, "- pledge:", entitledCents, "cents");
         } else if (isActivePatron && !meetsMinimumPledge) {
-          console.log("User is patron but below $20/month minimum:", userId, "- pledge:", entitledCents, "cents");
+          console.log("User is patron but below $15/month minimum:", userId, "- pledge:", entitledCents, "cents");
         }
       } else {
         console.log("No userId available - Patreon verified but not linked to app account");
