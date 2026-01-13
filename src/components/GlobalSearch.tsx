@@ -8,8 +8,17 @@ import {
   CommandItem,
   CommandList,
 } from "@/components/ui/command";
-import { Search, BookOpen, Gamepad2, Users, Trophy, BookMarked, Sparkles, Calendar, Image, FileText, Zap } from "lucide-react";
+import { Search, BookOpen, Gamepad2, Users, Trophy, BookMarked, Sparkles, Calendar, Image, FileText, Zap, Star, Gem } from "lucide-react";
 import { Button } from "./ui/button";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/useAuth";
+
+interface SavedItem {
+  id: string;
+  title: string;
+  type: "study" | "deck" | "gem";
+  path: string;
+}
 
 const searchItems = [
   // Study & Bible
@@ -79,7 +88,10 @@ const searchItems = [
 
 export const GlobalSearch = () => {
   const [open, setOpen] = useState(false);
+  const [savedItems, setSavedItems] = useState<SavedItem[]>([]);
+  const [searchQuery, setSearchQuery] = useState("");
   const navigate = useNavigate();
+  const { user } = useAuth();
 
   // Keyboard shortcut
   useEffect(() => {
@@ -94,9 +106,83 @@ export const GlobalSearch = () => {
     return () => document.removeEventListener("keydown", down);
   }, []);
 
+  // Fetch user's saved content when dialog opens
+  useEffect(() => {
+    const fetchSavedItems = async () => {
+      if (!user || !open) return;
+
+      const items: SavedItem[] = [];
+
+      // Fetch user studies
+      const { data: studies } = await supabase
+        .from("user_studies")
+        .select("id, title")
+        .eq("user_id", user.id)
+        .order("updated_at", { ascending: false })
+        .limit(20);
+
+      if (studies) {
+        studies.forEach((study) => {
+          if (study.title) {
+            items.push({
+              id: study.id,
+              title: study.title,
+              type: "study",
+              path: `/my-studies?open=${study.id}`,
+            });
+          }
+        });
+      }
+
+      // Fetch deck studies with gems
+      const { data: deckStudies } = await supabase
+        .from("deck_studies")
+        .select("id, gem_title, verse_reference, is_gem")
+        .eq("user_id", user.id)
+        .eq("is_gem", true)
+        .order("updated_at", { ascending: false })
+        .limit(20);
+
+      if (deckStudies) {
+        deckStudies.forEach((deck) => {
+          const title = deck.gem_title || deck.verse_reference || "Untitled Gem";
+          items.push({
+            id: deck.id,
+            title: title,
+            type: "gem",
+            path: `/branch-study?gem=${deck.id}`,
+          });
+        });
+      }
+
+      setSavedItems(items);
+    };
+
+    fetchSavedItems();
+  }, [user, open]);
+
   const handleSelect = (path: string) => {
     setOpen(false);
+    setSearchQuery("");
     navigate(path);
+  };
+
+  // Filter saved items based on search query
+  const filteredSavedItems = savedItems.filter((item) =>
+    item.title.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  const getTypeIcon = (type: SavedItem["type"]) => {
+    switch (type) {
+      case "study":
+        return FileText;
+      case "gem":
+        return Gem;
+      case "deck":
+        return BookOpen;
+      default:
+        return Star;
+    }
   };
 
   return (
@@ -115,9 +201,36 @@ export const GlobalSearch = () => {
       </Button>
 
       <CommandDialog open={open} onOpenChange={setOpen}>
-        <CommandInput placeholder="Search games, courses, GPTs, and more..." />
+        <CommandInput 
+          placeholder="Search pages, studies, gems, and more..." 
+          value={searchQuery}
+          onValueChange={setSearchQuery}
+        />
         <CommandList>
           <CommandEmpty>No results found.</CommandEmpty>
+          
+          {/* User's Saved Content - Show first if they have items */}
+          {user && filteredSavedItems.length > 0 && (
+            <CommandGroup heading="My Saved Studies & Gems">
+              {filteredSavedItems.map((item) => {
+                const Icon = getTypeIcon(item.type);
+                return (
+                  <CommandItem
+                    key={`saved-${item.id}`}
+                    onSelect={() => handleSelect(item.path)}
+                    className="gap-2"
+                  >
+                    <Icon className="h-4 w-4 text-primary" />
+                    <span className="truncate">{item.title}</span>
+                    <span className="ml-auto text-xs bg-muted text-muted-foreground px-2 py-0.5 rounded capitalize">
+                      {item.type}
+                    </span>
+                  </CommandItem>
+                );
+              })}
+            </CommandGroup>
+          )}
+
           {[
             "Study & Bible", 
             "Courses", 
