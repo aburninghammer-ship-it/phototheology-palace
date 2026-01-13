@@ -14,11 +14,11 @@ import { Badge } from "@/components/ui/badge";
 type TeachableFilter = 'all' | 'active' | 'inactive' | 'linked' | 'unlinked' | 'premium_paying' | 'not_paying';
 
 const FILTER_DESCRIPTIONS: Record<TeachableFilter, string> = {
-  all: "All Teachable students",
+  all: "All 8,600+ Teachable students",
   active: "Only active Teachable students",
   inactive: "Inactive Teachable students",
-  linked: "Current Phototheology students (Premium Access)",
-  unlinked: "Non-students (7-Day Free Trial)",
+  linked: "Students already using the app (have logged in)",
+  unlinked: "Students who haven't connected to the app yet",
   premium_paying: "Students paying $15+ per month (premium access)",
   not_paying: "Students not currently paying anything",
 };
