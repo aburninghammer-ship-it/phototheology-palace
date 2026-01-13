@@ -82,8 +82,11 @@ export default function AdminSubscriptions() {
   const [stats, setStats] = useState<SubscriptionStats | null>(null);
   const [churchStats, setChurchStats] = useState<ChurchStats | null>(null);
   const [teachableCount, setTeachableCount] = useState<number>(0);
+  const [teachableStudents, setTeachableStudents] = useState<any[]>([]);
   const [pickaxeCount, setPickaxeCount] = useState<number>(0);
   const [pickaxeLinkedCount, setPickaxeLinkedCount] = useState<number>(0);
+  const [pickaxePaidCount, setPickaxePaidCount] = useState<number>(0);
+  const [pickaxeMembers, setPickaxeMembers] = useState<any[]>([]);
 
   const handleSyncStripeSubscriptions = async () => {
     setSyncing(true);
@@ -221,20 +224,21 @@ export default function AdminSubscriptions() {
         churchSeats,
       });
 
-      // Get Teachable users count
-      const { count: teachableUsers } = await supabase
-        .from("profiles")
-        .select("*", { count: 'exact', head: true })
-        .eq("payment_source", "teachable");
+      // Get Teachable users count and details
+      const { count: teachableUsers, data: teachableData } = await supabase
+        .from("teachable_students")
+        .select("*", { count: 'exact' });
       
       setTeachableCount(teachableUsers || 0);
+      setTeachableStudents(teachableData || []);
 
-      // Get Pickaxe total members count
-      const { count: totalPickaxe } = await supabase
+      // Get Pickaxe total members count and details
+      const { count: totalPickaxe, data: pickaxeData } = await supabase
         .from("pickaxe_connections" as any)
-        .select("*", { count: 'exact', head: true });
+        .select("*", { count: 'exact' });
       
       setPickaxeCount(totalPickaxe || 0);
+      setPickaxeMembers(pickaxeData || []);
 
       // Get Pickaxe members linked to app
       const { count: linkedPickaxe } = await supabase
@@ -243,6 +247,14 @@ export default function AdminSubscriptions() {
         .not("linked_user_id", "is", null);
       
       setPickaxeLinkedCount(linkedPickaxe || 0);
+
+      // Get Pickaxe paid members count
+      const { count: paidPickaxe } = await supabase
+        .from("pickaxe_connections" as any)
+        .select("*", { count: 'exact', head: true })
+        .eq("status", "paid");
+      
+      setPickaxePaidCount(paidPickaxe || 0);
 
     } catch (error) {
       console.error("Error loading stats:", error);
@@ -305,6 +317,8 @@ export default function AdminSubscriptions() {
           <TabsTrigger value="email">Quick Email</TabsTrigger>
           <TabsTrigger value="image-bible">Image Bible</TabsTrigger>
           <TabsTrigger value="patreon">Patreon</TabsTrigger>
+          <TabsTrigger value="teachable">Teachable</TabsTrigger>
+          <TabsTrigger value="pickaxe">Pickaxe</TabsTrigger>
         </TabsList>
 
         <TabsContent value="overview" className="space-y-6">
@@ -559,6 +573,164 @@ export default function AdminSubscriptions() {
 
         <TabsContent value="patreon">
           <PatreonOutreach />
+        </TabsContent>
+
+        <TabsContent value="teachable" className="space-y-6">
+          {/* Teachable Stats */}
+          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+            <Card className="border-orange-500/50 bg-orange-500/5">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-lg">Total Teachable Students</CardTitle>
+                <CardDescription>Enrolled in courses</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="text-4xl font-bold text-orange-600">{teachableCount}</div>
+              </CardContent>
+            </Card>
+            
+            <Card>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-lg">Active Students</CardTitle>
+                <CardDescription>Currently active</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="text-4xl font-bold">{teachableStudents.filter(s => s.is_active).length}</div>
+              </CardContent>
+            </Card>
+
+            <Card className="border-green-500/50 bg-green-500/5">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-lg">Linked to App</CardTitle>
+                <CardDescription>With user_id</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="text-4xl font-bold text-green-600">{teachableStudents.filter(s => s.user_id).length}</div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-lg">Unlinked</CardTitle>
+                <CardDescription>Not connected to app accounts</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="text-4xl font-bold text-muted-foreground">{teachableStudents.filter(s => !s.user_id).length}</div>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Teachable Students List */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Teachable Students</CardTitle>
+              <CardDescription>All enrolled students with emails</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="max-h-96 overflow-y-auto space-y-2">
+                {teachableStudents.map((student) => (
+                  <div key={student.id} className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
+                    <div>
+                      <div className="font-medium">{student.teachable_email}</div>
+                      <div className="text-sm text-muted-foreground">{student.course_name}</div>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      {student.user_id ? (
+                        <Badge variant="default" className="bg-green-500">Linked</Badge>
+                      ) : (
+                        <Badge variant="outline">Not Linked</Badge>
+                      )}
+                      {student.is_active && <Badge variant="secondary">Active</Badge>}
+                    </div>
+                  </div>
+                ))}
+                {teachableStudents.length === 0 && (
+                  <p className="text-muted-foreground text-center py-4">No Teachable students found</p>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="pickaxe" className="space-y-6">
+          {/* Pickaxe Stats */}
+          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+            <Card className="border-purple-500/50 bg-purple-500/5">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-lg">Total Pickaxe Members</CardTitle>
+                <CardDescription>All members</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="text-4xl font-bold text-purple-600">{pickaxeCount}</div>
+              </CardContent>
+            </Card>
+            
+            <Card className="border-green-500/50 bg-green-500/5">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-lg">Active Paying</CardTitle>
+                <CardDescription>Paid status</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="text-4xl font-bold text-green-600">{pickaxePaidCount}</div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-lg">Linked to App</CardTitle>
+                <CardDescription>Suite subscribers</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="text-4xl font-bold">{pickaxeLinkedCount}</div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-lg">Unlinked</CardTitle>
+                <CardDescription>Not connected to app</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="text-4xl font-bold text-muted-foreground">{pickaxeCount - pickaxeLinkedCount}</div>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Pickaxe Members List */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Pickaxe Members</CardTitle>
+              <CardDescription>All members with emails and status</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="max-h-96 overflow-y-auto space-y-2">
+                {pickaxeMembers.map((member: any) => (
+                  <div key={member.id} className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
+                    <div>
+                      <div className="font-medium">{member.email || member.pickaxe_name || 'Unknown'}</div>
+                      <div className="text-sm text-muted-foreground">
+                        {member.pickaxe_name && `Name: ${member.pickaxe_name}`}
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      {member.status === 'paid' ? (
+                        <Badge variant="default" className="bg-green-500">Paid</Badge>
+                      ) : (
+                        <Badge variant="outline">{member.status || 'Unknown'}</Badge>
+                      )}
+                      {member.linked_user_id ? (
+                        <Badge variant="secondary">Suite Sub</Badge>
+                      ) : (
+                        <Badge variant="outline" className="text-muted-foreground">Not Linked</Badge>
+                      )}
+                    </div>
+                  </div>
+                ))}
+                {pickaxeMembers.length === 0 && (
+                  <p className="text-muted-foreground text-center py-4">No Pickaxe members found</p>
+                )}
+              </div>
+            </CardContent>
+          </Card>
         </TabsContent>
       </Tabs>
     </div>
