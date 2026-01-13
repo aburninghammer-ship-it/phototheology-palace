@@ -43,6 +43,7 @@ interface DatabaseStats {
   by_status: Record<string, number>;
   by_payment_source: Record<string, number>;
   lifetime_access: number;
+  teachable_users?: number;
 }
 
 interface SubscriptionStats {
@@ -80,6 +81,7 @@ export default function AdminSubscriptions() {
   const [isAdmin, setIsAdmin] = useState<boolean | null>(null);
   const [stats, setStats] = useState<SubscriptionStats | null>(null);
   const [churchStats, setChurchStats] = useState<ChurchStats | null>(null);
+  const [teachableCount, setTeachableCount] = useState<number>(0);
 
   const handleSyncStripeSubscriptions = async () => {
     setSyncing(true);
@@ -217,6 +219,14 @@ export default function AdminSubscriptions() {
         churchSeats,
       });
 
+      // Get Teachable users count
+      const { count: teachableUsers } = await supabase
+        .from("profiles")
+        .select("*", { count: 'exact', head: true })
+        .eq("payment_source", "teachable");
+      
+      setTeachableCount(teachableUsers || 0);
+
     } catch (error) {
       console.error("Error loading stats:", error);
       toast({
@@ -352,16 +362,27 @@ export default function AdminSubscriptions() {
               </CardContent>
             </Card>
 
-            <Card className="border-primary/50 bg-primary/5">
+            <Card className="border-orange-500/50 bg-orange-500/5">
               <CardHeader className="pb-2">
-                <CardTitle className="text-lg">MRR</CardTitle>
-                <CardDescription>Monthly recurring</CardDescription>
+                <CardTitle className="text-lg">Teachable</CardTitle>
+                <CardDescription>Course students</CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="text-3xl font-bold text-primary">{stats.summary.monthly_recurring_revenue}</div>
+                <div className="text-4xl font-bold text-orange-600">{teachableCount}</div>
               </CardContent>
             </Card>
           </div>
+
+          {/* MRR Card - Full Width */}
+          <Card className="border-primary/50 bg-primary/5">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-lg">Monthly Recurring Revenue (MRR)</CardTitle>
+              <CardDescription>From Stripe subscriptions</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="text-4xl font-bold text-primary">{stats.summary.monthly_recurring_revenue}</div>
+            </CardContent>
+          </Card>
 
           {/* Data Sync Status */}
           <Card className={dbVsStripeMatch ? "border-green-500/30" : "border-yellow-500/50 bg-yellow-500/5"}>
