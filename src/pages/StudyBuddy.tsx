@@ -13,7 +13,7 @@ import { toast } from "sonner";
 import {
   Brain, Loader2, Save, Trash2,
   ChevronLeft, ChevronRight, StickyNote,
-  Book, Flame, Lightbulb, BookOpen, Target, Crosshair, Sparkles, Eye, Send
+  Book, Flame, Lightbulb, BookOpen, Target, Crosshair, Sparkles, Eye, Send, Search
 } from "lucide-react";
 import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from "@/components/ui/resizable";
 import { BIBLE_BOOK_METADATA } from "@/data/bibleBooks";
@@ -34,6 +34,7 @@ interface Spark {
   insight: string;
   verses?: string[];
   room?: string;
+  explorePrompt?: string;
 }
 
 interface Source {
@@ -41,6 +42,7 @@ interface Source {
   anchor: string;
   strength: 'strong' | 'moderate' | 'needs_work';
   suggestion?: string;
+  explorePrompt?: string;
 }
 
 interface RoomSuggestion {
@@ -49,14 +51,15 @@ interface RoomSuggestion {
   floor: string;
   why: string;
   exercise?: string;
+  explorePrompt?: string;
 }
 
 interface JeevesAnalysis {
   sparks: Spark[];
   sources: Source[];
   roomSuggestions: RoomSuggestion[];
-  christConnection?: { present: boolean; suggestion?: string };
-  cycleAndHeaven?: { cycle?: string; heaven?: string; reasoning?: string };
+  christConnection?: { present: boolean; suggestion?: string; explorePrompt?: string };
+  cycleAndHeaven?: { cycle?: string; heaven?: string; reasoning?: string; explorePrompt?: string };
   nextStep?: { focus: string; question: string };
   overallResponse?: string;
 }
@@ -271,6 +274,12 @@ export default function StudyBuddy() {
     const reference = `${selectedBook} ${selectedChapter}:${verse}`;
     setNotes(prev => prev + (prev ? "\n\n" : "") + `[${reference}] ${text}`);
     toast.success(`Added ${reference} to notes`);
+  };
+
+  // Explore a spark, source, or suggestion by adding its explore prompt to notes
+  const exploreItem = (explorePrompt: string, label: string) => {
+    setNotes(prev => prev + (prev ? "\n\n" : "") + `--- Exploring: ${label} ---\n${explorePrompt}`);
+    toast.success(`Added "${label}" to explore — Jeeves will respond!`);
   };
 
   const saveSession = async () => {
@@ -626,6 +635,17 @@ Jeeves sees your notes and will spark connections, suggest PT rooms, source clai
                                       {spark.verses.join(", ")}
                                     </p>
                                   )}
+                                  {spark.explorePrompt && (
+                                    <Button
+                                      size="sm"
+                                      variant="ghost"
+                                      onClick={() => exploreItem(spark.explorePrompt!, spark.insight.substring(0, 30) + '...')}
+                                      className="mt-2 h-7 text-xs text-amber-300 hover:text-amber-100 hover:bg-amber-500/20 gap-1 px-2"
+                                    >
+                                      <Search className="w-3 h-3" />
+                                      Explore
+                                    </Button>
+                                  )}
                                 </div>
                               </div>
                             </motion.div>
@@ -676,6 +696,17 @@ Jeeves sees your notes and will spark connections, suggest PT rooms, source clai
                                   💡 {source.suggestion}
                                 </p>
                               )}
+                              {source.explorePrompt && (
+                                <Button
+                                  size="sm"
+                                  variant="ghost"
+                                  onClick={() => exploreItem(source.explorePrompt!, source.claim.substring(0, 30) + '...')}
+                                  className="mt-2 h-7 text-xs text-blue-300 hover:text-blue-100 hover:bg-blue-500/20 gap-1 px-2"
+                                >
+                                  <Search className="w-3 h-3" />
+                                  Explore
+                                </Button>
+                              )}
                             </motion.div>
                           ))}
                         </motion.div>
@@ -714,6 +745,17 @@ Jeeves sees your notes and will spark connections, suggest PT rooms, source clai
                                   Try: {room.exercise}
                                 </p>
                               )}
+                              {room.explorePrompt && (
+                                <Button
+                                  size="sm"
+                                  variant="ghost"
+                                  onClick={() => exploreItem(room.explorePrompt!, room.roomName)}
+                                  className="mt-2 h-7 text-xs text-emerald-300 hover:text-emerald-100 hover:bg-emerald-500/20 gap-1 px-2"
+                                >
+                                  <Search className="w-3 h-3" />
+                                  Explore
+                                </Button>
+                              )}
                             </motion.div>
                           ))}
                         </motion.div>
@@ -746,6 +788,17 @@ Jeeves sees your notes and will spark connections, suggest PT rooms, source clai
                           {analysis.christConnection.suggestion && (
                             <p className="text-sm text-rose-100">{analysis.christConnection.suggestion}</p>
                           )}
+                          {analysis.christConnection.explorePrompt && (
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              onClick={() => exploreItem(analysis.christConnection!.explorePrompt!, 'Christ Connection')}
+                              className="mt-2 h-7 text-xs text-rose-300 hover:text-rose-100 hover:bg-rose-500/20 gap-1 px-2"
+                            >
+                              <Search className="w-3 h-3" />
+                              Explore
+                            </Button>
+                          )}
                         </motion.div>
                       )}
 
@@ -776,6 +829,17 @@ Jeeves sees your notes and will spark connections, suggest PT rooms, source clai
                           </div>
                           {analysis.cycleAndHeaven.reasoning && (
                             <p className="text-sm text-purple-100">{analysis.cycleAndHeaven.reasoning}</p>
+                          )}
+                          {analysis.cycleAndHeaven.explorePrompt && (
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              onClick={() => exploreItem(analysis.cycleAndHeaven!.explorePrompt!, 'Cycle & Heaven')}
+                              className="mt-2 h-7 text-xs text-purple-300 hover:text-purple-100 hover:bg-purple-500/20 gap-1 px-2"
+                            >
+                              <Search className="w-3 h-3" />
+                              Explore
+                            </Button>
                           )}
                         </motion.div>
                       )}
