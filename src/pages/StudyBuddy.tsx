@@ -197,16 +197,10 @@ export default function StudyBuddy() {
     lastAnalyzedNotes.current = trimmedNotes;
 
     try {
-      // Build context from notes and current Bible passage
-      const context = `
-Current Bible Passage: ${selectedBook} ${selectedChapter}
-${verses.length > 0 ? `Passage Text:\n${verses.map(v => `${v.verse}. ${v.text}`).join('\n')}` : ''}
-      `.trim();
-
+      // Only analyze what's in the notes - no automatic Bible context
       const { data, error } = await supabase.functions.invoke("study-buddy", {
         body: {
           notes: trimmedNotes,
-          context,
           sessionHistory: analysisHistory.slice(-5), // Last 5 notes for context
         },
       });
