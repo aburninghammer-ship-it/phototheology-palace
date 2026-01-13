@@ -82,6 +82,7 @@ export default function AdminSubscriptions() {
   const [stats, setStats] = useState<SubscriptionStats | null>(null);
   const [churchStats, setChurchStats] = useState<ChurchStats | null>(null);
   const [teachableCount, setTeachableCount] = useState<number>(0);
+  const [pickaxeCount, setPickaxeCount] = useState<number>(0);
 
   const handleSyncStripeSubscriptions = async () => {
     setSyncing(true);
@@ -227,6 +228,14 @@ export default function AdminSubscriptions() {
       
       setTeachableCount(teachableUsers || 0);
 
+      // Get Pickaxe paid users count
+      const { count: pickaxeUsers } = await supabase
+        .from("pickaxe_connections" as any)
+        .select("*", { count: 'exact', head: true })
+        .eq("is_paid", true);
+      
+      setPickaxeCount(pickaxeUsers || 0);
+
     } catch (error) {
       console.error("Error loading stats:", error);
       toast({
@@ -315,7 +324,7 @@ export default function AdminSubscriptions() {
           </div>
 
           {/* Summary Cards - REAL STRIPE DATA */}
-          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-5">
+          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-6">
             <Card className="border-green-500/50 bg-green-500/5">
               <CardHeader className="pb-2">
                 <CardTitle className="text-lg flex items-center gap-2">
@@ -369,6 +378,16 @@ export default function AdminSubscriptions() {
               </CardHeader>
               <CardContent>
                 <div className="text-4xl font-bold text-orange-600">{teachableCount}</div>
+              </CardContent>
+            </Card>
+
+            <Card className="border-purple-500/50 bg-purple-500/5">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-lg">Pickaxe</CardTitle>
+                <CardDescription>Paid suite users</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="text-4xl font-bold text-purple-600">{pickaxeCount}</div>
               </CardContent>
             </Card>
           </div>
