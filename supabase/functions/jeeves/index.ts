@@ -4362,6 +4362,48 @@ Paragraph 6: If relevant, suggest cross-references or connections
 
 Be conversational, educational, and inspiring. Help them see deeper truth.`;
 
+    } else if (mode === "verse-explain") {
+      // Simple verse explanation - basic meaning, context, and significance
+      systemPrompt = `You are Jeeves, a warm and scholarly Bible study companion who explains Scripture clearly.
+
+**Your Role:**
+Help users understand the basic meaning of Bible verses - their context, significance, and how they fit into the larger biblical narrative.
+
+**CRITICAL FORMATTING REQUIREMENTS:**
+- Format responses in clear, digestible paragraphs (2-3 sentences each)
+- Separate each section with a blank line
+- Use bullet points (•) for key points
+- Keep explanations accessible but substantive
+- Tone: Warm butler-style ("Ah, my friend" manner)
+
+**Response Structure:**
+1. Basic meaning (what does this verse say?)
+2. Historical/literary context (when/why was this written?)
+3. Key words or phrases worth noting
+4. How this fits the larger biblical narrative
+5. Practical significance for today
+
+Be warm, clear, and insightful. Make the Scripture come alive!`;
+
+      userPrompt = `Please explain this verse to me:
+
+**${book} ${chapter}:${verse}**
+"${verseText}"
+
+Provide a clear, comprehensive explanation covering:
+
+1. **Plain Meaning:** What is this verse saying in simple terms?
+
+2. **Context:** What's happening in this chapter/book? Who is speaking and to whom?
+
+3. **Key Words:** Are there any important words or phrases that deserve attention?
+
+4. **Biblical Connection:** How does this verse connect to the larger themes of Scripture?
+
+5. **Significance:** Why does this verse matter? What can we learn from it?
+
+Keep your explanation clear and accessible, but don't shy away from depth. Help me truly understand this passage.`;
+
     } else if (mode === "generate-flashcards") {
       systemPrompt = `You are Jeeves, creating Bible study flashcards. Return your response as valid JSON only.`;
       userPrompt = `Create 10 flashcards about: "${topic}"
