@@ -20,7 +20,6 @@ serve(async (req) => {
       throw new Error("Missing required environment variables");
     }
 
-    // Get user from auth header and verify admin
     const authHeader = req.headers.get("Authorization");
     if (!authHeader) {
       return new Response(
@@ -42,7 +41,6 @@ serve(async (req) => {
       );
     }
 
-    // Check if user is admin
     const { data: adminData } = await supabase
       .from("admin_users")
       .select("id")
@@ -63,15 +61,21 @@ serve(async (req) => {
       );
     }
 
-    console.log("Starting Teachable import...");
+    // Get optional startPage parameter for resuming
+    const body = await req.json().catch(() => ({}));
+    const startPage = body.startPage || 1;
+    const maxPagesPerRun = 50; // Process 50 pages per run to avoid timeout
 
-    // Fetch all users from Teachable API with pagination
+    console.log(`Starting Teachable import from page ${startPage}...`);
+
+    // Fetch users from Teachable API with pagination
     let allUsers: any[] = [];
-    let page = 1;
+    let page = startPage;
     let hasMore = true;
+    let pagesProcessed = 0;
 
-    while (hasMore) {
-      console.log(`Fetching Teachable users page ${page}...`);
+    while (hasMore && pagesProcessed < maxPagesPerRun) {
+      console.log(`Fetching page ${page}...`);
       
       const response = await fetch(
         `https://developers.teachable.com/v1/users?page=${page}&per_page=100`,
@@ -97,76 +101,31 @@ serve(async (req) => {
       } else {
         allUsers = [...allUsers, ...users];
         page++;
-        
-        // Safety limit to prevent infinite loops
-        if (page > 100) {
-          hasMore = false;
-        }
+        pagesProcessed++;
       }
     }
 
-    console.log(`Found ${allUsers.length} total Teachable users`);
+    console.log(`Fetched ${allUsers.length} users from ${pagesProcessed} pages`);
 
-    // Process each user and get their enrollments
+    // Prepare students for insert
     const studentsToInsert: any[] = [];
-    let processedCount = 0;
 
     for (const teachableUser of allUsers) {
-      processedCount++;
-      
       if (!teachableUser.email) continue;
-
-      // Get enrollments for this user
-      let courseName = "Phototheology Course";
-      let isActive = true;
-
-      try {
-        const enrollmentsResponse = await fetch(
-          `https://developers.teachable.com/v1/users/${teachableUser.id}/enrollments`,
-          {
-            headers: {
-              "apiKey": TEACHABLE_API_KEY,
-              "Accept": "application/json",
-            },
-          }
-        );
-
-        if (enrollmentsResponse.ok) {
-          const enrollmentsData = await enrollmentsResponse.json();
-          const enrollments = enrollmentsData.enrollments || [];
-          
-          if (enrollments.length > 0) {
-            const activeEnrollment = enrollments.find((e: any) => e.is_active || !e.expired);
-            if (activeEnrollment) {
-              courseName = activeEnrollment.course_name || courseName;
-              isActive = true;
-            } else {
-              isActive = false;
-            }
-          }
-        }
-      } catch (e) {
-        console.error(`Error fetching enrollments for user ${teachableUser.id}:`, e);
-      }
 
       studentsToInsert.push({
         teachable_email: teachableUser.email.toLowerCase(),
         teachable_user_id: String(teachableUser.id),
-        course_name: courseName,
-        is_active: isActive,
+        course_name: "PhotoTheology Course",
+        is_active: true,
         last_verified_at: new Date().toISOString(),
       });
-
-      // Log progress every 50 users
-      if (processedCount % 50 === 0) {
-        console.log(`Processed ${processedCount}/${allUsers.length} users...`);
-      }
     }
 
-    console.log(`Inserting ${studentsToInsert.length} students into database...`);
+    console.log(`Inserting ${studentsToInsert.length} students...`);
 
     // Batch upsert students
-    const batchSize = 100;
+    const batchSize = 500;
     let insertedCount = 0;
     let errorCount = 0;
 
@@ -188,7 +147,10 @@ serve(async (req) => {
       }
     }
 
-    console.log(`Import complete: ${insertedCount} inserted, ${errorCount} errors`);
+    console.log(`Import batch complete: ${insertedCount} inserted, ${errorCount} errors`);
+
+    // Determine if there are more pages to process
+    const needsContinuation = hasMore && pagesProcessed >= maxPagesPerRun;
 
     return new Response(
       JSON.stringify({
@@ -196,7 +158,12 @@ serve(async (req) => {
         totalFound: allUsers.length,
         imported: insertedCount,
         errors: errorCount,
-        message: `Successfully imported ${insertedCount} Teachable students`,
+        pagesProcessed,
+        nextPage: needsContinuation ? page : null,
+        needsContinuation,
+        message: needsContinuation 
+          ? `Imported ${insertedCount} students (pages ${startPage}-${page - 1}). More pages available.`
+          : `Successfully imported ${insertedCount} Teachable students`,
       }),
       { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
