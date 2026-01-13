@@ -23,6 +23,7 @@ import { usePath } from "@/hooks/usePath";
 import { SocialMediaConnect } from "@/components/SocialMediaConnect";
 import { PatreonConnect } from "@/components/PatreonConnect";
 import { LanguageSelector } from "@/components/settings/LanguageSelector";
+import { TeachableVerification } from "@/components/settings/TeachableVerification";
 
 export default function Profile() {
   const { user } = useAuth();
@@ -376,6 +377,9 @@ export default function Profile() {
 
           {/* Patreon Connection */}
           <PatreonConnect />
+
+          {/* Teachable Student Verification */}
+          <TeachableVerification />
 
           {/* Social Media Connections */}
           <div id="social">

@@ -11497,6 +11497,42 @@ export type Database = {
         }
         Relationships: []
       }
+      teachable_students: {
+        Row: {
+          course_name: string | null
+          created_at: string
+          id: string
+          is_active: boolean | null
+          last_verified_at: string | null
+          teachable_email: string
+          teachable_user_id: string | null
+          user_id: string
+          verified_at: string
+        }
+        Insert: {
+          course_name?: string | null
+          created_at?: string
+          id?: string
+          is_active?: boolean | null
+          last_verified_at?: string | null
+          teachable_email: string
+          teachable_user_id?: string | null
+          user_id: string
+          verified_at?: string
+        }
+        Update: {
+          course_name?: string | null
+          created_at?: string
+          id?: string
+          is_active?: boolean | null
+          last_verified_at?: string | null
+          teachable_email?: string
+          teachable_user_id?: string | null
+          user_id?: string
+          verified_at?: string
+        }
+        Relationships: []
+      }
       thought_analyses: {
         Row: {
           alignment_check: Json | null
@@ -14260,6 +14296,7 @@ export type Database = {
         Args: { study_id_param: string; user_id_param: string }
         Returns: boolean
       }
+      has_teachable_access: { Args: { _user_id: string }; Returns: boolean }
       increment_user_points: {
         Args: { points_to_add: number; user_id: string }
         Returns: undefined
