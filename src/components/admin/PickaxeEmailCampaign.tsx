@@ -257,30 +257,69 @@ export function PickaxeEmailCampaign() {
         <CardContent className="space-y-2">
           <Button
             variant="outline"
-            className="w-full justify-start border-purple-500/30 hover:bg-purple-500/10"
+            className="w-full justify-start border-green-500/30 hover:bg-green-500/10"
             onClick={() => {
-              setSubject("⛏️ Welcome to the PhotoTheology Suite!");
-              setContent(`<h1>Welcome Pickaxe Member!</h1>
+              setFilter("paid");
+              setSubject("🎉 You Have Full Access to the PhotoTheology Suite!");
+              setContent(`<h1>Great News — Your Full Access is Confirmed!</h1>
 <p>Hi there,</p>
-<p>Thank you for being part of our Pickaxe community! We're excited to let you know that you now have access to the full PhotoTheology Suite.</p>
-<h2>Here's what you can do:</h2>
+<p>As a <strong>paying Pickaxe member</strong>, you already have <strong>full access</strong> to the entire PhotoTheology Suite!</p>
+<h2>What's Included:</h2>
 <ul>
-  <li>Access all 8 Floors of the Palace</li>
-  <li>Chat with Jeeves, your AI Bible study companion</li>
-  <li>Create and save your own Bible studies</li>
-  <li>Join our community discussions</li>
+  <li>✅ All 8 Floors of the Palace unlocked</li>
+  <li>✅ Unlimited Jeeves AI conversations</li>
+  <li>✅ Create & save unlimited Bible studies</li>
+  <li>✅ Access to all challenges and community features</li>
+  <li>✅ Devotional plan generator</li>
+  <li>✅ Church features and more!</li>
 </ul>
-<p><a href="https://phototheology.app">Click here to get started!</a></p>
+<h2>How to Access:</h2>
+<ol>
+  <li>Go to <a href="https://phototheology.app">phototheology.app</a></li>
+  <li>Sign in or create an account with the same email</li>
+  <li>Navigate to Settings → Pickaxe Verification</li>
+  <li>Click "Verify Pickaxe Account" — your premium access activates instantly!</li>
+</ol>
+<p>Thank you for supporting PhotoTheology. Your investment helps us continue building Christ-centered Bible study tools.</p>
 <p>Blessings,<br/>The PhotoTheology Team</p>`);
             }}
           >
-            🎉 Welcome / Onboarding
+            ✅ Suite Access Confirmation (Paid Members)
+          </Button>
+
+          <Button
+            variant="outline"
+            className="w-full justify-start border-amber-500/30 hover:bg-amber-500/10"
+            onClick={() => {
+              setFilter("unpaid");
+              setSubject("⛏️ Unlock the Full PhotoTheology Suite!");
+              setContent(`<h1>Unlock Premium Access to PhotoTheology!</h1>
+<p>Hi there,</p>
+<p>Thank you for being part of our Pickaxe community! We wanted to let you know about the full PhotoTheology Suite that's available to our subscribers.</p>
+<h2>What You're Missing:</h2>
+<ul>
+  <li>🔒 Access to all 8 Floors of the Palace (currently limited)</li>
+  <li>🔒 Unlimited Jeeves AI conversations (currently 3/day)</li>
+  <li>🔒 Create & save unlimited Bible studies</li>
+  <li>🔒 Advanced challenges and community features</li>
+  <li>🔒 Devotional plan generator</li>
+  <li>🔒 Church features and discipleship tools</li>
+</ul>
+<h2>Upgrade Today:</h2>
+<p>Subscribe to Pickaxe to unlock everything and support the continued development of Christ-centered Bible study tools.</p>
+<p><a href="https://pickaxe.phototheology.app" style="background-color: #9333ea; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; display: inline-block; margin: 16px 0;">Subscribe Now</a></p>
+<p>Thank you for being part of our community!</p>
+<p>Blessings,<br/>The PhotoTheology Team</p>`);
+            }}
+          >
+            🔓 Subscription Encouragement (Unpaid Members)
           </Button>
           
           <Button
             variant="outline"
             className="w-full justify-start border-purple-500/30 hover:bg-purple-500/10"
             onClick={() => {
+              setFilter("unlinked");
               setSubject("⛏️ Connect Your Pickaxe Account to the App!");
               setContent(`<h1>Link Your Account for Full Access!</h1>
 <p>Hi there,</p>
@@ -301,15 +340,16 @@ export function PickaxeEmailCampaign() {
 <p>Blessings,<br/>The PhotoTheology Team</p>`);
             }}
           >
-            🔗 Account Linking Reminder
+            🔗 Account Linking Reminder (Unlinked)
           </Button>
 
           <Button
             variant="outline"
-            className="w-full justify-start border-purple-500/30 hover:bg-purple-500/10"
+            className="w-full justify-start border-blue-500/30 hover:bg-blue-500/10"
             onClick={() => {
+              setFilter("all");
               setSubject("⛏️ New Features Just for Pickaxe Members!");
-              setContent(`<h1>Exclusive Updates for You!</h1>
+              setContent(`<h1>Exciting Updates for You!</h1>
 <p>Hi Pickaxe Member,</p>
 <p>We've been working hard to bring you new features:</p>
 <ul>
@@ -322,28 +362,7 @@ export function PickaxeEmailCampaign() {
 <p>Blessings,<br/>The PhotoTheology Team</p>`);
             }}
           >
-            ✨ New Features Announcement
-          </Button>
-
-          <Button
-            variant="outline"
-            className="w-full justify-start border-purple-500/30 hover:bg-purple-500/10"
-            onClick={() => {
-              setSubject("⛏️ Support PhotoTheology - Upgrade Your Membership!");
-              setContent(`<h1>Support Our Mission!</h1>
-<p>Hi there,</p>
-<p>Thank you for being part of our Pickaxe community! Your support means everything to us.</p>
-<p>If you've been enjoying PhotoTheology, consider upgrading to a paid tier:</p>
-<ul>
-  <li><strong>Paid Membership</strong> - Help us continue developing new features</li>
-  <li><strong>Premium Support</strong> - Get priority help and exclusive content</li>
-</ul>
-<p>Every contribution helps us build better Bible study tools for everyone.</p>
-<p><a href="https://pickaxe.phototheology.app">Upgrade your membership</a></p>
-<p>God bless,<br/>The PhotoTheology Team</p>`);
-            }}
-          >
-            💎 Upgrade Encouragement
+            ✨ New Features Announcement (All)
           </Button>
         </CardContent>
       </Card>
