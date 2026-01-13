@@ -157,29 +157,50 @@ export default function StudyBuddy() {
     autoAnalysisTimeoutRef.current = setTimeout(async () => {
       setAutoAnalyzing(true);
       try {
-        // Build context from notes and current Bible passage
-        const context = `
-Current Bible Passage: ${selectedBook} ${selectedChapter}
-${verses.length > 0 ? `Passage Text:\n${verses.slice(0, 20).map(v => `${v.verse}. ${v.text}`).join('\n')}` : ''}
-
-User's Study Notes:
+        // Build combined notes with Bible passage context
+        const combinedNotes = `
+Studying: ${selectedBook} ${selectedChapter}
+${verses.length > 0 ? `\nPassage:\n${verses.slice(0, 15).map(v => `${v.verse}. ${v.text}`).join('\n')}\n` : ''}
+My Notes:
 ${trimmedNotes}
         `.trim();
 
         const { data, error } = await supabase.functions.invoke("study-buddy", {
           body: {
-            notes: trimmedNotes,
-            context,
-            mode: 'auto-insight',
+            notes: combinedNotes,
             sessionHistory: jeevesMessages.slice(-4).map(m => `${m.role}: ${m.content}`),
           },
         });
 
-        if (error) throw error;
+        if (error) {
+          console.error("Study-buddy error:", error);
+          throw error;
+        }
 
-        const response = data.analysis?.overallResponse ||
-                        data.analysis?.overallAssessment ||
-                        data.response;
+        console.log("Study-buddy response:", data);
+
+        // Extract response from various possible locations
+        let response = null;
+        if (data?.analysis?.overallResponse) {
+          response = data.analysis.overallResponse;
+        } else if (data?.analysis?.nextStep?.focus) {
+          // Build a response from the analysis parts
+          const parts = [];
+          if (data.analysis.sparks?.length > 0) {
+            parts.push(data.analysis.sparks.map((s: any) => `✨ ${s.insight}`).join('\n'));
+          }
+          if (data.analysis.roomSuggestions?.length > 0) {
+            parts.push(`\n🏛️ Try the ${data.analysis.roomSuggestions[0].roomName}: ${data.analysis.roomSuggestions[0].why}`);
+          }
+          if (data.analysis.nextStep?.question) {
+            parts.push(`\n❓ ${data.analysis.nextStep.question}`);
+          }
+          if (parts.length > 0) {
+            response = parts.join('\n');
+          }
+        } else if (data?.response) {
+          response = data.response;
+        }
 
         if (response) {
           const insightMsg: JeevesMessage = {
@@ -193,6 +214,8 @@ ${trimmedNotes}
           if (currentSessionId) {
             await saveMessage(insightMsg, currentSessionId);
           }
+        } else {
+          console.warn("No response found in data:", data);
         }
       } catch (error: any) {
         console.error("Auto-analysis error:", error);
