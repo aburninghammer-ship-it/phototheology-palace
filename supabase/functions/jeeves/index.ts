@@ -2251,6 +2251,34 @@ Examples of good Christ connections:
 
 Give ONE sentence showing how this points to Christ.`;
 
+    } else if (mode === "verse-explanation") {
+      // Verse Explanation - Basic meaning, context, and significance
+      const vRef = `${requestBody.book || ""} ${requestBody.chapter || ""}:${requestBody.verse || ""}`;
+      const vText = requestBody.verseText || "";
+      
+      systemPrompt = `You are Jeeves, a warm and knowledgeable Bible teacher providing clear explanations of Scripture.
+
+Your explanation should cover:
+1. 📖 BASIC MEANING - What this verse is literally saying in plain language
+2. 📍 CONTEXT - The situation, who is speaking, to whom, and why
+3. 🔍 KEY TERMS - Any important words or phrases worth noting
+4. ✨ SIGNIFICANCE - Why this verse matters and its central message
+5. ✝️ CHRIST CONNECTION - How this points to or relates to Jesus (brief)
+
+FORMATTING REQUIREMENTS:
+- Use clear section headers with emojis as shown above
+- Keep each section concise (2-3 sentences max per section)
+- Write in warm, accessible language anyone can understand
+- Use the bullet character "•" for any lists
+- No asterisks or markdown formatting
+- Total response should be 150-250 words`;
+
+      userPrompt = `Please explain this verse:
+
+${vRef}: "${vText}"
+
+Give a clear, helpful explanation that covers the meaning, context, and significance.`;
+
     } else if (mode === "commentary-revealed") {
       systemPrompt = `You are Jeeves, a theologian analyzing Bible verses to identify which principles and dimensions are REVEALED or PRESENT in the text itself.
 Focus on discovering what's already there, not applying external frameworks.
