@@ -368,20 +368,32 @@ export default function SermonBuilder() {
 
   const startNewSermon = () => {
     // Clear all sermon state
-    setSermon({
+    const emptySermon = {
       title: "",
       theme_passage: "",
       sermon_style: SERMON_STYLES[0].value,
-      smooth_stones: [],
-      bridges: [],
+      smooth_stones: [] as string[],
+      bridges: [] as string[],
       movie_structure: {},
       full_sermon: "",
-    });
+    };
+    setSermon(emptySermon);
     setCurrentStep(1);
     setNewStone("");
     setNewBridge("");
     setAiHelp("");
     setScriptureArmory({});
+    
+    // CRITICAL: Clear preserved page state so it doesn't restore old sermon
+    setCustomState('sermon_currentStep', 1);
+    setCustomState('sermon_data', emptySermon);
+    setCustomState('sermon_newStone', "");
+    setCustomState('sermon_newBridge', "");
+    setCustomState('sermon_aiHelp', "");
+    
+    // Reset the hasRestoredState ref so state gets properly saved
+    hasRestoredState.current = true;
+    
     // Clear the edit ID from URL
     navigate("/sermon-builder", { replace: true });
     toast.success("Starting new sermon!");
