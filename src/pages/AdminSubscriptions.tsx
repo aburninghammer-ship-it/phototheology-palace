@@ -30,6 +30,7 @@ interface StripeStats {
   };
   total_mrr_cents: number;
   error: string | null;
+  unlinked_count: number;
 }
 
 interface PatreonStats {
@@ -495,25 +496,31 @@ export default function AdminSubscriptions() {
                 ) : (
                   <AlertTriangle className="h-5 w-5 text-yellow-500" />
                 )}
-                Database Sync Status
+                Stripe ↔ Database Sync
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="flex items-center gap-4">
+              <div className="flex flex-wrap items-center gap-4">
                 <div>
-                  <span className="text-muted-foreground">Stripe shows:</span>{" "}
+                  <span className="text-muted-foreground">Stripe active:</span>{" "}
                   <Badge variant="outline" className="text-lg">{stats.stripe.active_subscriptions}</Badge>
                 </div>
                 <div>
-                  <span className="text-muted-foreground">Database shows:</span>{" "}
+                  <span className="text-muted-foreground">DB linked:</span>{" "}
                   <Badge variant="outline" className="text-lg">{stats.database.by_payment_source.stripe || 0}</Badge>
                 </div>
-                {!dbVsStripeMatch && (
-                  <Badge variant="destructive">
-                    {stats.stripe.active_subscriptions - (stats.database.by_payment_source.stripe || 0)} users need sync
+                {stats.stripe.unlinked_count > 0 && (
+                  <Badge variant="secondary" className="bg-yellow-100 text-yellow-800 border-yellow-300">
+                    {stats.stripe.unlinked_count} Stripe subscriptions not linked to an account
                   </Badge>
                 )}
               </div>
+              {stats.stripe.unlinked_count > 0 && (
+                <p className="text-xs text-muted-foreground mt-2">
+                  These may be users who subscribed but never created an app account, or email mismatches.
+                  Click "Sync Stripe Subscriptions" to match by email.
+                </p>
+              )}
             </CardContent>
           </Card>
 
