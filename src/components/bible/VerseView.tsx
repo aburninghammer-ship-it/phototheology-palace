@@ -2,7 +2,7 @@ import { useState, useMemo } from "react";
 import { Verse } from "@/types/bible";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Sparkles, Loader2, BookOpen, RefreshCw, HelpCircle, Mic } from "lucide-react";
+import { Sparkles, Loader2, BookOpen, RefreshCw, HelpCircle, Mic, Lightbulb } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -120,11 +120,46 @@ export const VerseView = ({
   const [wordLoading, setWordLoading] = useState(false);
   const [regenerateTrigger, setRegenerateTrigger] = useState(0);
   const [sermonDialogOpen, setSermonDialogOpen] = useState(false);
+  const [explainDialogOpen, setExplainDialogOpen] = useState(false);
+  const [verseExplanation, setVerseExplanation] = useState<string>("");
+  const [explainLoading, setExplainLoading] = useState(false);
   const { toast } = useToast();
 
   const handleSermonStarter = (e: React.MouseEvent) => {
     e.stopPropagation();
     setSermonDialogOpen(true);
+  };
+
+  const handleExplainVerse = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setExplainDialogOpen(true);
+    setExplainLoading(true);
+    setVerseExplanation("");
+
+    try {
+      const { data, error } = await supabase.functions.invoke("jeeves", {
+        body: {
+          mode: "verse-explanation",
+          book,
+          chapter,
+          verse: verse.verse,
+          verseText: verse.text,
+        },
+      });
+
+      if (error) throw error;
+      setVerseExplanation(data.content);
+    } catch (error: any) {
+      console.error("Verse explanation error:", error);
+      toast({
+        title: "Error",
+        description: "Failed to generate explanation",
+        variant: "destructive",
+      });
+      setVerseExplanation("Unable to generate explanation at this time.");
+    } finally {
+      setExplainLoading(false);
+    }
   };
 
   // Generate dynamic principles for this verse (regenerates when regenerateTrigger changes)
@@ -300,6 +335,15 @@ export const VerseView = ({
                 variant="ghost"
                 size="sm"
                 className="h-6 w-6 p-0 opacity-0 group-hover:opacity-100 transition-opacity"
+                onClick={handleExplainVerse}
+                title="Explain this verse"
+              >
+                <Lightbulb className="h-3 w-3 text-yellow-500" />
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-6 w-6 p-0 opacity-0 group-hover:opacity-100 transition-opacity"
                 onClick={handleSermonStarter}
                 title="Generate sermon starter from this verse"
               >
@@ -403,6 +447,34 @@ export const VerseView = ({
         verseRef={`${book} ${chapter}:${verse.verse}`}
         verseText={verse.text}
       />
+
+      {/* Verse Explanation Dialog */}
+      <Dialog open={explainDialogOpen} onOpenChange={setExplainDialogOpen}>
+        <DialogContent className="max-w-2xl max-h-[80vh]">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Lightbulb className="h-5 w-5 text-yellow-500" />
+              <span>Verse Explanation</span>
+            </DialogTitle>
+            <DialogDescription>
+              {book} {chapter}:{verse.verse} - "{verse.text.slice(0, 60)}..."
+            </DialogDescription>
+          </DialogHeader>
+          
+          <ScrollArea className="max-h-[60vh]">
+            {explainLoading ? (
+              <div className="flex flex-col items-center justify-center py-12 gap-3">
+                <Loader2 className="h-8 w-8 animate-spin text-yellow-500" />
+                <p className="text-sm text-muted-foreground">Jeeves is studying this verse...</p>
+              </div>
+            ) : (
+              <div className="prose prose-sm max-w-none p-4">
+                {formatJeevesResponse(verseExplanation)}
+              </div>
+            )}
+          </ScrollArea>
+        </DialogContent>
+      </Dialog>
     </>
   );
 };
