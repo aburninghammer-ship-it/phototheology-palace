@@ -113,12 +113,20 @@ serve(async (req) => {
     for (const teachableUser of allUsers) {
       if (!teachableUser.email) continue;
 
+      // Extract MRR (monthly recurring revenue) from Teachable user data
+      // Teachable stores this in the user object
+      const mrr = teachableUser.monthly_recurring_revenue || 
+                  teachableUser.mrr || 
+                  teachableUser.current_monthly_revenue || 
+                  0;
+
       studentsToInsert.push({
         teachable_email: teachableUser.email.toLowerCase(),
         teachable_user_id: String(teachableUser.id),
         course_name: "PhotoTheology Course",
         is_active: true,
         last_verified_at: new Date().toISOString(),
+        mrr: parseFloat(mrr) || 0,
       });
     }
 

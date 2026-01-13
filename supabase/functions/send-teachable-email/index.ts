@@ -10,7 +10,7 @@ const corsHeaders = {
 interface EmailRequest {
   subject: string;
   htmlContent: string;
-  filter: 'all' | 'active' | 'inactive' | 'linked' | 'unlinked';
+  filter: 'all' | 'active' | 'inactive' | 'linked' | 'unlinked' | 'premium_paying' | 'not_paying';
   testMode: boolean;
   testEmail?: string;
 }
@@ -113,7 +113,7 @@ serve(async (req) => {
     }
 
     // Build query based on filter
-    let query = supabase.from("teachable_students").select("teachable_email, user_id, is_active");
+    let query = supabase.from("teachable_students").select("teachable_email, user_id, is_active, mrr");
 
     switch (filter) {
       case 'active':
@@ -127,6 +127,14 @@ serve(async (req) => {
         break;
       case 'unlinked':
         query = query.is("user_id", null);
+        break;
+      case 'premium_paying':
+        // Users paying $15 or more per month
+        query = query.gte("mrr", 15);
+        break;
+      case 'not_paying':
+        // Users not paying anything (MRR is 0 or null)
+        query = query.or("mrr.is.null,mrr.eq.0");
         break;
       // 'all' - no additional filter
     }

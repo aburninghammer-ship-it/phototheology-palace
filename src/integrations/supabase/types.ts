@@ -11635,6 +11635,7 @@ export type Database = {
           id: string
           is_active: boolean | null
           last_verified_at: string | null
+          mrr: number | null
           teachable_email: string
           teachable_user_id: string | null
           user_id: string | null
@@ -11646,6 +11647,7 @@ export type Database = {
           id?: string
           is_active?: boolean | null
           last_verified_at?: string | null
+          mrr?: number | null
           teachable_email: string
           teachable_user_id?: string | null
           user_id?: string | null
@@ -11657,6 +11659,7 @@ export type Database = {
           id?: string
           is_active?: boolean | null
           last_verified_at?: string | null
+          mrr?: number | null
           teachable_email?: string
           teachable_user_id?: string | null
           user_id?: string | null

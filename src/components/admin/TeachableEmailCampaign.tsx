@@ -11,7 +11,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
 
-type TeachableFilter = 'all' | 'active' | 'inactive' | 'linked' | 'unlinked';
+type TeachableFilter = 'all' | 'active' | 'inactive' | 'linked' | 'unlinked' | 'premium_paying' | 'not_paying';
 
 const FILTER_DESCRIPTIONS: Record<TeachableFilter, string> = {
   all: "All Teachable students",
@@ -19,6 +19,8 @@ const FILTER_DESCRIPTIONS: Record<TeachableFilter, string> = {
   inactive: "Inactive Teachable students",
   linked: "Students already linked to app accounts",
   unlinked: "Students NOT yet linked to app accounts",
+  premium_paying: "Students paying $15+ per month (premium access)",
+  not_paying: "Students not currently paying anything",
 };
 
 export function TeachableEmailCampaign() {
@@ -135,6 +137,8 @@ export function TeachableEmailCampaign() {
                 <SelectItem value="inactive">Inactive Students</SelectItem>
                 <SelectItem value="linked">Linked to App</SelectItem>
                 <SelectItem value="unlinked">Not Linked to App</SelectItem>
+                <SelectItem value="premium_paying">💰 Paying $15+/month (Premium)</SelectItem>
+                <SelectItem value="not_paying">🆓 Not Currently Paying</SelectItem>
               </SelectContent>
             </Select>
             <p className="text-sm text-muted-foreground">
@@ -254,13 +258,92 @@ export function TeachableEmailCampaign() {
           <CardTitle>Teachable Templates</CardTitle>
           <CardDescription>Click to use a template</CardDescription>
         </CardHeader>
-        <CardContent className="space-y-2">
-          <Button
-            variant="outline"
-            className="w-full justify-start border-orange-500/30 hover:bg-orange-500/10"
-            onClick={() => {
-              setSubject("🎓 Welcome to the PhotoTheology Suite!");
-              setContent(`<h1>Welcome Teachable Student!</h1>
+        <CardContent className="space-y-4">
+          {/* Payment-Based Campaign Templates */}
+          <div className="space-y-2">
+            <h4 className="text-sm font-semibold text-orange-600 flex items-center gap-2">
+              💰 Payment-Based Campaigns
+            </h4>
+            
+            <Button
+              variant="outline"
+              className="w-full justify-start border-green-500/30 hover:bg-green-500/10"
+              onClick={() => {
+                setFilter("premium_paying");
+                setSubject("🌟 Your Premium Access to the PhotoTheology Suite is Ready!");
+                setContent(`<h1>Congratulations, Premium Member!</h1>
+<p>Hi there,</p>
+<p>As a valued subscriber paying $15+/month, you now have <strong>full premium access</strong> to the PhotoTheology Suite!</p>
+
+<h2>🎁 What You Get:</h2>
+<ul>
+  <li>✅ Unlimited access to all 8 Floors of the Palace</li>
+  <li>✅ Unlimited Jeeves AI conversations</li>
+  <li>✅ All challenge types unlocked</li>
+  <li>✅ Sermon prep tools & study generators</li>
+  <li>✅ Premium community features</li>
+  <li>✅ Priority support</li>
+</ul>
+
+<h2>🚀 Get Started:</h2>
+<p><a href="https://phototheology.app" style="background-color: #f97316; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; display: inline-block;">Access Your Premium Account</a></p>
+
+<p>Simply sign in with the email you use on Teachable, and your premium access will be automatically activated.</p>
+
+<p>Thank you for your support!</p>
+<p>Blessings,<br/><strong>The PhotoTheology Team</strong></p>`);
+              }}
+            >
+              💎 Premium Access Announcement ($15+)
+            </Button>
+
+            <Button
+              variant="outline"
+              className="w-full justify-start border-blue-500/30 hover:bg-blue-500/10"
+              onClick={() => {
+                setFilter("not_paying");
+                setSubject("🎁 Try PhotoTheology Premium FREE for 7 Days!");
+                setContent(`<h1>Start Your Free 7-Day Premium Trial!</h1>
+<p>Hi there,</p>
+<p>We noticed you're part of our Teachable community but haven't experienced the full power of the PhotoTheology Suite yet.</p>
+
+<h2>🆓 Get 7 Days FREE:</h2>
+<p>We'd love to give you a chance to experience premium features with <strong>no commitment</strong>.</p>
+
+<h2>What's Included in Your Trial:</h2>
+<ul>
+  <li>🏰 Full access to all 8 Floors of the Palace</li>
+  <li>🤖 Unlimited AI conversations with Jeeves</li>
+  <li>📖 Sermon prep & Bible study generators</li>
+  <li>🏆 All challenge types</li>
+  <li>👥 Premium community features</li>
+</ul>
+
+<h2>🚀 Start Your Free Trial:</h2>
+<p><a href="https://phototheology.app/pricing" style="background-color: #3b82f6; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; display: inline-block;">Claim Your 7-Day Free Trial</a></p>
+
+<p><em>No credit card required to start. Cancel anytime.</em></p>
+
+<p>Experience the Bible like never before!</p>
+<p>Blessings,<br/><strong>The PhotoTheology Team</strong></p>`);
+              }}
+            >
+              🆓 7-Day Free Trial Offer (Not Paying)
+            </Button>
+          </div>
+
+          <hr className="border-muted" />
+          
+          {/* General Templates */}
+          <div className="space-y-2">
+            <h4 className="text-sm font-semibold text-muted-foreground">General Templates</h4>
+            
+            <Button
+              variant="outline"
+              className="w-full justify-start border-orange-500/30 hover:bg-orange-500/10"
+              onClick={() => {
+                setSubject("🎓 Welcome to the PhotoTheology Suite!");
+                setContent(`<h1>Welcome Teachable Student!</h1>
 <p>Hi there,</p>
 <p>Thank you for enrolling in our Teachable course! We're excited to let you know that you now have access to the full PhotoTheology Suite.</p>
 <h2>Here's what you can do:</h2>
@@ -272,17 +355,17 @@ export function TeachableEmailCampaign() {
 </ul>
 <p><a href="https://phototheology.app">Click here to get started!</a></p>
 <p>Blessings,<br/>The PhotoTheology Team</p>`);
-            }}
-          >
-            🎉 Welcome / Onboarding
-          </Button>
-          
-          <Button
-            variant="outline"
-            className="w-full justify-start border-orange-500/30 hover:bg-orange-500/10"
-            onClick={() => {
-              setSubject("🎓 Connect Your Teachable Account to the App!");
-              setContent(`<h1>Link Your Account for Full Access!</h1>
+              }}
+            >
+              🎉 Welcome / Onboarding
+            </Button>
+            
+            <Button
+              variant="outline"
+              className="w-full justify-start border-orange-500/30 hover:bg-orange-500/10"
+              onClick={() => {
+                setSubject("🎓 Connect Your Teachable Account to the App!");
+                setContent(`<h1>Link Your Account for Full Access!</h1>
 <p>Hi there,</p>
 <p>We noticed you haven't connected your Teachable account to the PhotoTheology app yet.</p>
 <p>Connecting your account gives you:</p>
@@ -299,17 +382,17 @@ export function TeachableEmailCampaign() {
 </ol>
 <p>That's it! Your premium access will be activated automatically.</p>
 <p>Blessings,<br/>The PhotoTheology Team</p>`);
-            }}
-          >
-            🔗 Account Linking Reminder
-          </Button>
+              }}
+            >
+              🔗 Account Linking Reminder
+            </Button>
 
-          <Button
-            variant="outline"
-            className="w-full justify-start border-orange-500/30 hover:bg-orange-500/10"
-            onClick={() => {
-              setSubject("🎓 New Course Content Available!");
-              setContent(`<h1>New Content Just for Students!</h1>
+            <Button
+              variant="outline"
+              className="w-full justify-start border-orange-500/30 hover:bg-orange-500/10"
+              onClick={() => {
+                setSubject("🎓 New Course Content Available!");
+                setContent(`<h1>New Content Just for Students!</h1>
 <p>Hi Teachable Student,</p>
 <p>We've added new lessons and features to your course:</p>
 <ul>
@@ -320,17 +403,17 @@ export function TeachableEmailCampaign() {
 <p>As a Teachable student, you get access to all new content!</p>
 <p><a href="https://phototheology.app">Check them out now</a></p>
 <p>Blessings,<br/>The PhotoTheology Team</p>`);
-            }}
-          >
-            ✨ New Content Announcement
-          </Button>
+              }}
+            >
+              ✨ New Content Announcement
+            </Button>
 
-          <Button
-            variant="outline"
-            className="w-full justify-start border-orange-500/30 hover:bg-orange-500/10"
-            onClick={() => {
-              setSubject("🎓 Continue Your PhotoTheology Journey!");
-              setContent(`<h1>We Miss You!</h1>
+            <Button
+              variant="outline"
+              className="w-full justify-start border-orange-500/30 hover:bg-orange-500/10"
+              onClick={() => {
+                setSubject("🎓 Continue Your PhotoTheology Journey!");
+                setContent(`<h1>We Miss You!</h1>
 <p>Hi there,</p>
 <p>We noticed you haven't been active in the PhotoTheology app recently.</p>
 <p>Don't miss out on your learning journey! Here's what's waiting for you:</p>
@@ -342,10 +425,11 @@ export function TeachableEmailCampaign() {
 <p>Remember, as a Teachable student, you have full premium access!</p>
 <p><a href="https://phototheology.app">Come back and explore!</a></p>
 <p>Blessings,<br/>The PhotoTheology Team</p>`);
-            }}
-          >
-            📚 Re-engagement
-          </Button>
+              }}
+            >
+              📚 Re-engagement
+            </Button>
+          </div>
         </CardContent>
       </Card>
     </div>
