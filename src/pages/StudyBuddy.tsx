@@ -13,7 +13,7 @@ import { toast } from "sonner";
 import {
   Brain, Loader2, Send, Save, Trash2,
   ChevronLeft, ChevronRight, MessageSquare, StickyNote,
-  Book, Flame, History
+  Book, Flame, History, Sparkles
 } from "lucide-react";
 import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from "@/components/ui/resizable";
 import { BIBLE_BOOK_METADATA } from "@/data/bibleBooks";
@@ -60,6 +60,16 @@ export default function StudyBuddy() {
   
   const [jeevesInput, setJeevesInput] = useState("");
   const [jeevesLoading, setJeevesLoading] = useState(false);
+
+  // Auto-analysis state
+  const lastAnalyzedNotesRef = useRef<string>("");
+  const autoAnalysisTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const [autoAnalyzing, setAutoAnalyzing] = useState(false);
+
+  // Constants for auto-analysis
+  const MIN_NOTES_LENGTH = 50;
+  const AUTO_ANALYZE_DELAY_MS = 2000; // 2 seconds after user stops typing
+  const MIN_NEW_CONTENT_LENGTH = 30; // Minimum new characters to trigger re-analysis
 
   // Get chapter count for selected book
   const getChapterCount = () => {
@@ -115,6 +125,89 @@ export default function StudyBuddy() {
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [jeevesMessages]);
+
+  // Auto-analysis: Generate Jeeves insights in real-time as user types notes
+  useEffect(() => {
+    // Clear any existing timeout
+    if (autoAnalysisTimeoutRef.current) {
+      clearTimeout(autoAnalysisTimeoutRef.current);
+    }
+
+    // Check if we have enough content to analyze
+    const trimmedNotes = notes.trim();
+    if (trimmedNotes.length < MIN_NOTES_LENGTH) {
+      return;
+    }
+
+    // Check if the content has meaningfully changed
+    const lastAnalyzed = lastAnalyzedNotesRef.current;
+    const newContentLength = trimmedNotes.length - lastAnalyzed.length;
+    const hasNewContent = !trimmedNotes.startsWith(lastAnalyzed) || newContentLength >= MIN_NEW_CONTENT_LENGTH;
+
+    if (!hasNewContent) {
+      return; // No meaningful change, skip analysis
+    }
+
+    // Don't auto-analyze if already analyzing or manually querying
+    if (autoAnalyzing || jeevesLoading) {
+      return;
+    }
+
+    // Set a timeout to analyze after the user stops typing
+    autoAnalysisTimeoutRef.current = setTimeout(async () => {
+      setAutoAnalyzing(true);
+      try {
+        // Build context from notes and current Bible passage
+        const context = `
+Current Bible Passage: ${selectedBook} ${selectedChapter}
+${verses.length > 0 ? `Passage Text:\n${verses.slice(0, 20).map(v => `${v.verse}. ${v.text}`).join('\n')}` : ''}
+
+User's Study Notes:
+${trimmedNotes}
+        `.trim();
+
+        const { data, error } = await supabase.functions.invoke("study-buddy", {
+          body: {
+            notes: trimmedNotes,
+            context,
+            mode: 'auto-insight',
+            sessionHistory: jeevesMessages.slice(-4).map(m => `${m.role}: ${m.content}`),
+          },
+        });
+
+        if (error) throw error;
+
+        const response = data.analysis?.overallResponse ||
+                        data.analysis?.overallAssessment ||
+                        data.response;
+
+        if (response) {
+          const insightMsg: JeevesMessage = {
+            role: 'assistant',
+            content: response
+          };
+          setJeevesMessages(prev => [...prev, insightMsg]);
+          lastAnalyzedNotesRef.current = trimmedNotes;
+
+          // Save if we have a session
+          if (currentSessionId) {
+            await saveMessage(insightMsg, currentSessionId);
+          }
+        }
+      } catch (error: any) {
+        console.error("Auto-analysis error:", error);
+        // Silently fail for auto-analysis to avoid spamming
+      } finally {
+        setAutoAnalyzing(false);
+      }
+    }, AUTO_ANALYZE_DELAY_MS);
+
+    return () => {
+      if (autoAnalysisTimeoutRef.current) {
+        clearTimeout(autoAnalysisTimeoutRef.current);
+      }
+    };
+  }, [notes, selectedBook, selectedChapter, verses, autoAnalyzing, jeevesLoading]);
 
   const loadVerses = async () => {
     setLoadingVerses(true);
@@ -490,17 +583,45 @@ Jeeves sees your notes and will spark connections, suggest PT rooms, source clai
               {/* Messages */}
               <ScrollArea className="flex-1 p-4">
                 <div className="space-y-3">
-                  {jeevesMessages.length === 0 ? (
+                  {/* Auto-analyzing indicator */}
+                  {autoAnalyzing && (
+                    <motion.div
+                      initial={{ opacity: 0, y: -10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      className="p-3 rounded-lg bg-gradient-to-r from-violet-500/20 to-purple-500/20 border border-violet-500/30"
+                    >
+                      <div className="flex items-center gap-2">
+                        <div className="relative">
+                          <Brain className="w-5 h-5 text-violet-400" />
+                          <Sparkles className="w-3 h-3 text-amber-400 absolute -top-1 -right-1 animate-pulse" />
+                        </div>
+                        <div className="flex-1">
+                          <p className="text-sm text-violet-200">Jeeves is reading your notes...</p>
+                        </div>
+                        <Loader2 className="w-4 h-4 text-violet-400 animate-spin" />
+                      </div>
+                    </motion.div>
+                  )}
+
+                  {jeevesMessages.length === 0 && !autoAnalyzing ? (
                     <div className="text-center py-8">
-                      <Brain className="w-12 h-12 text-violet-500/30 mx-auto mb-3" />
-                      <p className="text-sm text-violet-200/60">
-                        Ask Jeeves about your study passage or notes
+                      <div className="relative inline-block mb-3">
+                        <Brain className="w-12 h-12 text-violet-500/50" />
+                        <Sparkles className="w-4 h-4 text-amber-400 absolute -top-1 -right-1" />
+                      </div>
+                      <p className="text-sm text-violet-200/80 font-medium">
+                        Jeeves is watching your notes
                       </p>
-                      <p className="text-xs text-violet-200/40 mt-2">
-                        He sees your current passage and notes
+                      <p className="text-xs text-violet-200/50 mt-2">
+                        Insights appear automatically as you write
                       </p>
+                      {notes.length > 0 && notes.length < MIN_NOTES_LENGTH && (
+                        <p className="text-xs text-amber-400/80 mt-3">
+                          {MIN_NOTES_LENGTH - notes.length} more characters for auto-analysis
+                        </p>
+                      )}
                     </div>
-                  ) : (
+                  ) : jeevesMessages.length > 0 ? (
                     jeevesMessages.map((msg, idx) => (
                       <motion.div
                         key={idx}
@@ -515,7 +636,7 @@ Jeeves sees your notes and will spark connections, suggest PT rooms, source clai
                         <p className="whitespace-pre-wrap">{msg.content}</p>
                       </motion.div>
                     ))
-                  )}
+                  ) : null}
                   {jeevesLoading && (
                     <div className="flex items-center gap-2 text-violet-200/60 p-3">
                       <Loader2 className="w-4 h-4 animate-spin" />
