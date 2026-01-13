@@ -364,15 +364,15 @@ ${notes || '(No notes yet)'}
 
           <ResizableHandle withHandle className="bg-orange-500/20 hover:bg-orange-500/40 transition-colors" />
 
-          {/* Notes Panel */}
+          {/* Notes Panel - Emerald/Teal Theme */}
           <ResizablePanel defaultSize={35} minSize={20}>
-            <Card className="h-full flex flex-col bg-black/30 border-orange-500/20 backdrop-blur-xl rounded-none border-l-0 border-r-0">
-              <div className="p-4 border-b border-orange-500/20 flex-shrink-0">
+            <Card className="h-full flex flex-col bg-emerald-950/40 border-emerald-500/20 backdrop-blur-xl rounded-none border-l-0 border-r-0">
+              <div className="p-4 border-b border-emerald-500/20 flex-shrink-0">
                 <div className="flex items-center gap-2">
-                  <StickyNote className="w-5 h-5 text-orange-400" />
+                  <StickyNote className="w-5 h-5 text-emerald-400" />
                   <span className="font-bold text-white">Notes</span>
                 </div>
-                <p className="text-xs text-orange-200/60 mt-1">Click verses to add them here</p>
+                <p className="text-xs text-emerald-200/60 mt-1">Click verses to add them here</p>
               </div>
               <div className="flex-1 p-4">
                 <Textarea
@@ -387,23 +387,23 @@ Use markers to structure your thinking:
 • CLAIM: A statement you're making
 • QUESTION: Something to explore
 • GEM: A discovered connection"
-                  className="h-full resize-none border-0 focus-visible:ring-0 text-sm bg-transparent text-orange-100 placeholder:text-orange-200/40"
+                  className="h-full resize-none border-0 focus-visible:ring-0 text-sm bg-transparent text-emerald-100 placeholder:text-emerald-200/40"
                 />
               </div>
             </Card>
           </ResizablePanel>
 
-          <ResizableHandle withHandle className="bg-orange-500/20 hover:bg-orange-500/40 transition-colors" />
+          <ResizableHandle withHandle className="bg-emerald-500/20 hover:bg-emerald-500/40 transition-colors" />
 
-          {/* Jeeves Panel */}
+          {/* Jeeves Panel - Purple/Violet Theme */}
           <ResizablePanel defaultSize={30} minSize={20}>
-            <Card className="h-full flex flex-col bg-black/30 border-orange-500/20 backdrop-blur-xl rounded-none rounded-r-xl border-l-0">
-              <div className="p-4 border-b border-orange-500/20 flex-shrink-0">
+            <Card className="h-full flex flex-col bg-violet-950/40 border-violet-500/20 backdrop-blur-xl rounded-none rounded-r-xl border-l-0">
+              <div className="p-4 border-b border-violet-500/20 flex-shrink-0">
                 <div className="flex items-center gap-2">
-                  <MessageSquare className="w-5 h-5 text-orange-400" />
+                  <MessageSquare className="w-5 h-5 text-violet-400" />
                   <span className="font-bold text-white">Jeeves</span>
                 </div>
-                <p className="text-xs text-orange-200/60 mt-1">Your Phototheology study assistant</p>
+                <p className="text-xs text-violet-200/60 mt-1">Your Phototheology study assistant</p>
               </div>
 
               {/* Messages */}
@@ -411,11 +411,11 @@ Use markers to structure your thinking:
                 <div className="space-y-3">
                   {jeevesMessages.length === 0 ? (
                     <div className="text-center py-8">
-                      <Brain className="w-12 h-12 text-orange-500/30 mx-auto mb-3" />
-                      <p className="text-sm text-orange-200/60">
+                      <Brain className="w-12 h-12 text-violet-500/30 mx-auto mb-3" />
+                      <p className="text-sm text-violet-200/60">
                         Ask Jeeves about your study passage or notes
                       </p>
-                      <p className="text-xs text-orange-200/40 mt-2">
+                      <p className="text-xs text-violet-200/40 mt-2">
                         He sees your current passage and notes
                       </p>
                     </div>
@@ -427,8 +427,8 @@ Use markers to structure your thinking:
                         animate={{ opacity: 1, y: 0 }}
                         className={`p-3 rounded-lg text-sm ${
                           msg.role === 'user'
-                            ? 'bg-orange-500/20 border border-orange-500/30 ml-4 text-orange-100'
-                            : 'bg-black/20 border border-orange-500/10 mr-4 text-orange-100'
+                            ? 'bg-violet-500/20 border border-violet-500/30 ml-4 text-violet-100'
+                            : 'bg-purple-500/10 border border-purple-500/20 mr-4 text-purple-100'
                         }`}
                       >
                         <p className="whitespace-pre-wrap">{msg.content}</p>
@@ -436,7 +436,7 @@ Use markers to structure your thinking:
                     ))
                   )}
                   {jeevesLoading && (
-                    <div className="flex items-center gap-2 text-orange-200/60 p-3">
+                    <div className="flex items-center gap-2 text-violet-200/60 p-3">
                       <Loader2 className="w-4 h-4 animate-spin" />
                       <span className="text-sm">Jeeves is thinking...</span>
                     </div>
@@ -446,20 +446,20 @@ Use markers to structure your thinking:
               </ScrollArea>
 
               {/* Input */}
-              <div className="p-4 border-t border-orange-500/20 flex-shrink-0">
+              <div className="p-4 border-t border-violet-500/20 flex-shrink-0">
                 <div className="flex gap-2">
                   <Input
                     value={jeevesInput}
                     onChange={(e) => setJeevesInput(e.target.value)}
                     onKeyDown={(e) => e.key === 'Enter' && !e.shiftKey && sendToJeeves()}
                     placeholder="Ask Jeeves..."
-                    className="flex-1 bg-black/30 border-orange-500/30 text-white placeholder:text-orange-200/50"
+                    className="flex-1 bg-black/30 border-violet-500/30 text-white placeholder:text-violet-200/50"
                     disabled={jeevesLoading}
                   />
                   <Button
                     onClick={sendToJeeves}
                     disabled={jeevesLoading || !jeevesInput.trim()}
-                    className="bg-orange-500 hover:bg-orange-600 text-white"
+                    className="bg-violet-500 hover:bg-violet-600 text-white"
                   >
                     <Send className="w-4 h-4" />
                   </Button>
