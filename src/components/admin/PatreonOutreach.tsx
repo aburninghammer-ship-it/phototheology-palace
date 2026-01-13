@@ -414,6 +414,155 @@ export function PatreonOutreach() {
           )}
         </CardContent>
       </Card>
+
+      {/* Patreon Email Templates */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Patreon Templates</CardTitle>
+          <CardDescription>Click to use a pre-built template</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-2">
+          <Button
+            variant="outline"
+            className="w-full justify-start border-red-500/30 hover:bg-red-500/10"
+            onClick={() => {
+              setSubject("🎉 You Have Full Access to the PhotoTheology Suite!");
+              setHtmlContent(`<h1>Thank You, Patron!</h1>
+<p>Hi there,</p>
+<p>Thank you so much for your generous support on Patreon! As a patron pledging <strong>$15/month or more</strong>, you have <strong>full access</strong> to the complete PhotoTheology Suite.</p>
+
+<h2>What's Included:</h2>
+<ul>
+  <li>📖 <strong>Jeeves AI</strong> – Your personal Bible study companion</li>
+  <li>🏛️ <strong>All 8 Floors</strong> of the PhotoTheology Palace</li>
+  <li>✨ <strong>Daily Challenges</strong> to sharpen your study skills</li>
+  <li>🎓 <strong>Certificate Programs</strong> and achievements</li>
+  <li>👥 <strong>Community Features</strong> – Share insights and connect</li>
+  <li>📚 <strong>Personal Study Journeys</strong> and Bible study generators</li>
+</ul>
+
+<h2>Getting Started:</h2>
+<ol>
+  <li>Go to <a href="https://phototheologybible.com/auth">phototheologybible.com</a></li>
+  <li>Sign up using the <strong>same email</strong> you use on Patreon</li>
+  <li>Connect your Patreon account when prompted</li>
+  <li>Enjoy your full premium access!</li>
+</ol>
+
+<p style="text-align: center; margin: 24px 0;">
+  <a href="https://phototheologybible.com/auth" style="display: inline-block; background: #8B5CF6; color: white; padding: 14px 32px; text-decoration: none; border-radius: 8px; font-weight: bold;">Access Your Suite Now</a>
+</p>
+
+<p>If you have any questions, just reply to this email!</p>
+
+<p>Blessings,<br/>The PhotoTheology Team</p>`);
+              setFilter('active_patrons');
+            }}
+          >
+            🎉 Suite Access Confirmation (for paying patrons)
+          </Button>
+
+          <Button
+            variant="outline"
+            className="w-full justify-start border-red-500/30 hover:bg-red-500/10"
+            onClick={() => {
+              setSubject("Unlock Phototheology – Your Patron Access Awaits!");
+              setHtmlContent(`<h2>Hey there, Patron!</h2>
+<p>Thank you for supporting Phototheology! As a patron pledging <strong>$15/month or more</strong>, you qualify for <strong>premium access</strong> to the full Phototheology Suite.</p>
+
+<h3>Here's how to claim your access:</h3>
+<ol>
+  <li>Go to <a href="https://phototheologybible.com/auth">phototheologybible.com</a></li>
+  <li>Sign up using the <strong>same email</strong> you use on Patreon</li>
+  <li>Connect your Patreon account when prompted</li>
+  <li>Your premium access will be activated automatically!</li>
+</ol>
+
+<h3>What you'll unlock:</h3>
+<ul>
+  <li>📖 Advanced Bible study tools with AI assistance (Jeeves)</li>
+  <li>🏛️ The Palace Method for Scripture memorization</li>
+  <li>✨ Daily challenges and community features</li>
+  <li>🎓 Certificate programs and achievements</li>
+</ul>
+
+<p><a href="https://phototheologybible.com/auth" style="display: inline-block; background: #8B5CF6; color: white; padding: 12px 24px; text-decoration: none; border-radius: 8px; margin: 16px 0;">Sign Up Now & Connect Patreon</a></p>
+
+<p>If you have any questions, just reply to this email!</p>
+
+<p>Blessings,<br/>The Phototheology Team</p>`);
+              setFilter('not_signed_up');
+            }}
+          >
+            🔗 Patron Not Signed Up (remind to connect)
+          </Button>
+
+          <Button
+            variant="outline"
+            className="w-full justify-start border-red-500/30 hover:bg-red-500/10"
+            onClick={() => {
+              setSubject("💎 Upgrade to Premium – Unlock the Full Suite!");
+              setHtmlContent(`<h1>Unlock the Full PhotoTheology Experience!</h1>
+<p>Hi there,</p>
+<p>Thank you for following us on Patreon! We've noticed you're not yet a paying patron, and we wanted to share what you're missing.</p>
+
+<h2>With a $15/month pledge, you unlock:</h2>
+<ul>
+  <li>📖 <strong>Jeeves AI</strong> – An AI Bible study companion trained in PhotoTheology</li>
+  <li>🏛️ <strong>The Palace Method</strong> – All 8 floors of systematic Bible study</li>
+  <li>✨ <strong>Daily Challenges</strong> – Grow your study skills every day</li>
+  <li>🎓 <strong>Certificate Programs</strong> – Earn recognition for your learning</li>
+  <li>👥 <strong>Community</strong> – Connect with other serious students of the Word</li>
+</ul>
+
+<p>Your support directly funds the development of these tools that are helping believers around the world study Scripture more deeply.</p>
+
+<p style="text-align: center; margin: 24px 0;">
+  <a href="https://www.patreon.com/phototheology" style="display: inline-block; background: #F96854; color: white; padding: 14px 32px; text-decoration: none; border-radius: 8px; font-weight: bold;">Become a Patron Today</a>
+</p>
+
+<p>God bless your study of His Word!</p>
+
+<p>The PhotoTheology Team</p>`);
+              setFilter('free_members');
+            }}
+          >
+            💰 Free to Paid Conversion (upgrade encouragement)
+          </Button>
+
+          <Button
+            variant="outline"
+            className="w-full justify-start border-red-500/30 hover:bg-red-500/10"
+            onClick={() => {
+              setSubject("🔄 We Miss You! Come Back to PhotoTheology");
+              setHtmlContent(`<h1>We Miss You!</h1>
+<p>Hi there,</p>
+<p>We noticed your Patreon pledge is no longer active, and we wanted to reach out.</p>
+
+<h2>A lot has changed since you left!</h2>
+<ul>
+  <li>🆕 <strong>Jeeves AI</strong> – A completely new AI Bible study companion</li>
+  <li>📱 <strong>Improved Mobile Experience</strong> – Study anywhere</li>
+  <li>✨ <strong>New Challenges</strong> – Fresh daily content</li>
+  <li>🎓 <strong>Certificate Programs</strong> – Earn credentials for your learning</li>
+</ul>
+
+<p>We'd love to have you back in the PhotoTheology community. Your support helps us continue building these tools for believers everywhere.</p>
+
+<p style="text-align: center; margin: 24px 0;">
+  <a href="https://www.patreon.com/phototheology" style="display: inline-block; background: #F96854; color: white; padding: 14px 32px; text-decoration: none; border-radius: 8px; font-weight: bold;">Rejoin as a Patron</a>
+</p>
+
+<p>Even if now isn't the right time, we're grateful for your past support.</p>
+
+<p>Blessings,<br/>The PhotoTheology Team</p>`);
+              setFilter('former_patrons');
+            }}
+          >
+            🔄 Winback Campaign (former patrons)
+          </Button>
+        </CardContent>
+      </Card>
     </div>
   );
 }
