@@ -46,12 +46,6 @@ interface DatabaseStats {
   teachable_users?: number;
 }
 
-interface UserNeedingSync {
-  email: string;
-  tier: string;
-  status: string;
-}
-
 interface SubscriptionStats {
   summary: {
     total_paying_stripe: number;
@@ -65,7 +59,6 @@ interface SubscriptionStats {
   patreon: PatreonStats;
   database: DatabaseStats;
   recent_signups_30d: number;
-  users_needing_sync?: UserNeedingSync[];
   generated_at: string;
 }
 
@@ -85,7 +78,6 @@ export default function AdminSubscriptions() {
   const [loading, setLoading] = useState(true);
   const [syncing, setSyncing] = useState(false);
   const [sendingPatreonReminder, setSendingPatreonReminder] = useState(false);
-  const [sendingSyncReminder, setSendingSyncReminder] = useState(false);
   const [isAdmin, setIsAdmin] = useState<boolean | null>(null);
   const [stats, setStats] = useState<SubscriptionStats | null>(null);
   const [churchStats, setChurchStats] = useState<ChurchStats | null>(null);
@@ -137,31 +129,6 @@ export default function AdminSubscriptions() {
       });
     } finally {
       setSendingPatreonReminder(false);
-    }
-  };
-
-  const handleSendSyncReminder = async () => {
-    setSendingSyncReminder(true);
-    try {
-      const { data, error } = await supabase.functions.invoke('send-sync-reminder');
-      
-      if (error) throw error;
-      
-      toast({
-        title: "Reminder Emails Sent",
-        description: data?.message || `Sent ${data?.sent || 0} reminder emails to unsynced subscribers`,
-      });
-      
-      await loadStats();
-    } catch (error: any) {
-      console.error("Sync reminder error:", error);
-      toast({
-        title: "Failed to Send Reminders",
-        description: error.message || "Failed to send sync reminders",
-        variant: "destructive",
-      });
-    } finally {
-      setSendingSyncReminder(false);
     }
   };
 
@@ -445,48 +412,6 @@ export default function AdminSubscriptions() {
                   </Badge>
                 )}
               </div>
-              
-              {/* Show users needing sync */}
-              {stats.users_needing_sync && stats.users_needing_sync.length > 0 && (
-                <div className="mt-4 border-t pt-4">
-                  <div className="text-sm font-medium mb-2">Users with active Stripe subscriptions not synced to database:</div>
-                  <div className="max-h-48 overflow-y-auto space-y-1">
-                    {stats.users_needing_sync.map((user, idx) => (
-                      <div key={idx} className="flex items-center justify-between text-sm bg-muted/50 px-3 py-2 rounded">
-                        <span className="font-mono">{user.email}</span>
-                        <div className="flex gap-2">
-                          <Badge variant="outline" className="capitalize">{user.tier}</Badge>
-                          <Badge variant={user.status === 'active' ? 'default' : 'secondary'} className="capitalize">
-                            {user.status}
-                          </Badge>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                  <div className="mt-4 flex items-center gap-3">
-                    <Button 
-                      onClick={handleSendSyncReminder} 
-                      disabled={sendingSyncReminder}
-                      size="sm"
-                    >
-                      {sendingSyncReminder ? (
-                        <>
-                          <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                          Sending...
-                        </>
-                      ) : (
-                        <>
-                          <Send className="h-4 w-4 mr-2" />
-                          Email Reminder to Login
-                        </>
-                      )}
-                    </Button>
-                    <p className="text-xs text-muted-foreground">
-                      Sends reminder to these {stats.users_needing_sync.length} users to sign up/login
-                    </p>
-                  </div>
-                </div>
-              )}
             </CardContent>
           </Card>
 
