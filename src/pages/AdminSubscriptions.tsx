@@ -13,6 +13,7 @@ import { SubscriptionMismatches } from "@/components/admin/SubscriptionMismatche
 import { BulkEmailSender } from "@/components/admin/BulkEmailSender";
 import { ImageBibleGenerator } from "@/components/admin/ImageBibleGenerator";
 import { PatreonOutreach } from "@/components/admin/PatreonOutreach";
+import { PickaxeImport } from "@/components/admin/PickaxeImport";
 import { Badge } from "@/components/ui/badge";
 
 interface StripeStats {
@@ -244,7 +245,7 @@ export default function AdminSubscriptions() {
       const { count: linkedPickaxe } = await supabase
         .from("pickaxe_connections" as any)
         .select("*", { count: 'exact', head: true })
-        .not("linked_user_id", "is", null);
+        .not("user_id", "is", null);
       
       setPickaxeLinkedCount(linkedPickaxe || 0);
 
@@ -252,7 +253,7 @@ export default function AdminSubscriptions() {
       const { count: paidPickaxe } = await supabase
         .from("pickaxe_connections" as any)
         .select("*", { count: 'exact', head: true })
-        .eq("status", "paid");
+        .eq("is_paid_user", true);
       
       setPickaxePaidCount(paidPickaxe || 0);
 
@@ -706,18 +707,18 @@ export default function AdminSubscriptions() {
                 {pickaxeMembers.map((member: any) => (
                   <div key={member.id} className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
                     <div>
-                      <div className="font-medium">{member.email || member.pickaxe_name || 'Unknown'}</div>
+                      <div className="font-medium">{member.pickaxe_email || member.pickaxe_name || 'Unknown'}</div>
                       <div className="text-sm text-muted-foreground">
                         {member.pickaxe_name && `Name: ${member.pickaxe_name}`}
                       </div>
                     </div>
                     <div className="flex items-center gap-2">
-                      {member.status === 'paid' ? (
+                      {member.is_paid_user ? (
                         <Badge variant="default" className="bg-green-500">Paid</Badge>
                       ) : (
-                        <Badge variant="outline">{member.status || 'Unknown'}</Badge>
+                        <Badge variant="outline">Free</Badge>
                       )}
-                      {member.linked_user_id ? (
+                      {member.user_id ? (
                         <Badge variant="secondary">Suite Sub</Badge>
                       ) : (
                         <Badge variant="outline" className="text-muted-foreground">Not Linked</Badge>
@@ -731,6 +732,9 @@ export default function AdminSubscriptions() {
               </div>
             </CardContent>
           </Card>
+
+          {/* Import Component */}
+          <PickaxeImport />
         </TabsContent>
       </Tabs>
     </div>
