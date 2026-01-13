@@ -56,18 +56,24 @@ serve(async (req) => {
 
     // Parse request body safely
     let testMode = false;
-    let testEmail = '';
+    let testEmail = "";
     try {
-      const body = await req.text();
-      if (body) {
-        const parsed = JSON.parse(body);
-        testMode = parsed.testMode || false;
-        testEmail = parsed.testEmail || '';
+      const rawBody = await req.text();
+      const body = rawBody.trim();
+      logStep("Request body read", { len: rawBody.length, contentType: req.headers.get("content-type") ?? "" });
+
+      if (body.length > 0) {
+        const parsed = JSON.parse(body) as ReminderRequest;
+        testMode = Boolean(parsed.testMode);
+        testEmail = parsed.testEmail ?? "";
       }
-    } catch {
-      // Empty body is fine, use defaults
+    } catch (e: unknown) {
+      // Empty/whitespace body is fine; any invalid JSON should not crash sending.
+      const msg = e instanceof Error ? e.message : String(e);
+      logStep("Request body parse skipped", { reason: msg });
     }
-    logStep("Request parsed", { testMode });
+    logStep("Request parsed", { testMode, hasTestEmail: Boolean(testEmail) });
+
 
     // Get all Stripe customers with active/trialing subscriptions
     const subscriptionsResponse = await fetch(
