@@ -46,6 +46,12 @@ interface DatabaseStats {
   teachable_users?: number;
 }
 
+interface UserNeedingSync {
+  email: string;
+  tier: string;
+  status: string;
+}
+
 interface SubscriptionStats {
   summary: {
     total_paying_stripe: number;
@@ -59,6 +65,7 @@ interface SubscriptionStats {
   patreon: PatreonStats;
   database: DatabaseStats;
   recent_signups_30d: number;
+  users_needing_sync?: UserNeedingSync[];
   generated_at: string;
 }
 
@@ -412,6 +419,30 @@ export default function AdminSubscriptions() {
                   </Badge>
                 )}
               </div>
+              
+              {/* Show users needing sync */}
+              {stats.users_needing_sync && stats.users_needing_sync.length > 0 && (
+                <div className="mt-4 border-t pt-4">
+                  <div className="text-sm font-medium mb-2">Users with active Stripe subscriptions not synced to database:</div>
+                  <div className="max-h-48 overflow-y-auto space-y-1">
+                    {stats.users_needing_sync.map((user, idx) => (
+                      <div key={idx} className="flex items-center justify-between text-sm bg-muted/50 px-3 py-2 rounded">
+                        <span className="font-mono">{user.email}</span>
+                        <div className="flex gap-2">
+                          <Badge variant="outline" className="capitalize">{user.tier}</Badge>
+                          <Badge variant={user.status === 'active' ? 'default' : 'secondary'} className="capitalize">
+                            {user.status}
+                          </Badge>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                  <p className="text-xs text-muted-foreground mt-2">
+                    These users may not have logged in yet, or their subscription wasn't synced properly. 
+                    Use "Sync Stripe Subscriptions" to attempt automatic sync.
+                  </p>
+                </div>
+              )}
             </CardContent>
           </Card>
 
