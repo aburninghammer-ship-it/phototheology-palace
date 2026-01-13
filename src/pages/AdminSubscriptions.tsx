@@ -83,6 +83,7 @@ export default function AdminSubscriptions() {
   const [churchStats, setChurchStats] = useState<ChurchStats | null>(null);
   const [teachableCount, setTeachableCount] = useState<number>(0);
   const [pickaxeCount, setPickaxeCount] = useState<number>(0);
+  const [pickaxeLinkedCount, setPickaxeLinkedCount] = useState<number>(0);
 
   const handleSyncStripeSubscriptions = async () => {
     setSyncing(true);
@@ -228,13 +229,20 @@ export default function AdminSubscriptions() {
       
       setTeachableCount(teachableUsers || 0);
 
-      // Get Pickaxe paid users count
-      const { count: pickaxeUsers } = await supabase
+      // Get Pickaxe total members count
+      const { count: totalPickaxe } = await supabase
+        .from("pickaxe_connections" as any)
+        .select("*", { count: 'exact', head: true });
+      
+      setPickaxeCount(totalPickaxe || 0);
+
+      // Get Pickaxe members linked to app
+      const { count: linkedPickaxe } = await supabase
         .from("pickaxe_connections" as any)
         .select("*", { count: 'exact', head: true })
-        .eq("is_paid", true);
+        .not("linked_user_id", "is", null);
       
-      setPickaxeCount(pickaxeUsers || 0);
+      setPickaxeLinkedCount(linkedPickaxe || 0);
 
     } catch (error) {
       console.error("Error loading stats:", error);
@@ -384,10 +392,12 @@ export default function AdminSubscriptions() {
             <Card className="border-purple-500/50 bg-purple-500/5">
               <CardHeader className="pb-2">
                 <CardTitle className="text-lg">Pickaxe</CardTitle>
-                <CardDescription>Paid suite users</CardDescription>
+                <CardDescription>Total members / Linked to app</CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="text-4xl font-bold text-purple-600">{pickaxeCount}</div>
+                <div className="text-4xl font-bold text-purple-600">
+                  {pickaxeLinkedCount} <span className="text-lg text-muted-foreground">/ {pickaxeCount}</span>
+                </div>
               </CardContent>
             </Card>
           </div>
