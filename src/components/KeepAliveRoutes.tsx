@@ -21,7 +21,7 @@ interface KeepAliveRoutesProps {
 export const KeepAliveRoutes: React.FC<KeepAliveRoutesProps> = ({
   children,
   maxCached = 15,
-  excludePaths = ["/auth", "/", "/gatehouse", "/pricing", "/landing"]
+  excludePaths = ["/auth", "/", "/gatehouse", "/pricing", "/landing", "/sermon-builder", "/sermon-simmer"]
 }) => {
   const location = useLocation();
   const currentPath = location.pathname + location.search;

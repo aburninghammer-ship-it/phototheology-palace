@@ -23,7 +23,7 @@ interface KeepAliveProps {
 export const KeepAlive: React.FC<KeepAliveProps> = ({
   children,
   maxCached = 10,
-  excludePaths = ["/auth", "/", "/gatehouse", "/pricing"]
+  excludePaths = ["/auth", "/", "/gatehouse", "/pricing", "/sermon-builder", "/sermon-simmer"]
 }) => {
   const location = useLocation();
   const [cachedPages, setCachedPages] = useState<CachedPage[]>([]);
