@@ -18,6 +18,7 @@ interface SavedItem {
   title: string;
   type: "study" | "deck" | "gem";
   path: string;
+  content?: string; // For searching within content
 }
 
 const searchItems = [
@@ -113,35 +114,36 @@ export const GlobalSearch = () => {
 
       const items: SavedItem[] = [];
 
-      // Fetch user studies
+      // Fetch user studies with content for deeper search
       const { data: studies } = await supabase
         .from("user_studies")
-        .select("id, title")
+        .select("id, title, content")
         .eq("user_id", user.id)
         .order("updated_at", { ascending: false })
-        .limit(20);
+        .limit(50);
 
       if (studies) {
         studies.forEach((study) => {
-          if (study.title) {
+          if (study.title || study.content) {
             items.push({
               id: study.id,
-              title: study.title,
+              title: study.title || "Untitled Study",
               type: "study",
               path: `/my-studies?open=${study.id}`,
+              content: study.content || "",
             });
           }
         });
       }
 
-      // Fetch deck studies with gems
+      // Fetch deck studies with gems and notes
       const { data: deckStudies } = await supabase
         .from("deck_studies")
-        .select("id, gem_title, verse_reference, is_gem")
+        .select("id, gem_title, gem_notes, verse_reference, verse_text, is_gem")
         .eq("user_id", user.id)
         .eq("is_gem", true)
         .order("updated_at", { ascending: false })
-        .limit(20);
+        .limit(50);
 
       if (deckStudies) {
         deckStudies.forEach((deck) => {
@@ -151,6 +153,7 @@ export const GlobalSearch = () => {
             title: title,
             type: "gem",
             path: `/branch-study?gem=${deck.id}`,
+            content: `${deck.gem_notes || ""} ${deck.verse_text || ""}`,
           });
         });
       }
@@ -167,10 +170,13 @@ export const GlobalSearch = () => {
     navigate(path);
   };
 
-  // Filter saved items based on search query
-  const filteredSavedItems = savedItems.filter((item) =>
-    item.title.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  // Filter saved items based on search query - search both title AND content
+  const filteredSavedItems = savedItems.filter((item) => {
+    const query = searchQuery.toLowerCase();
+    const titleMatch = item.title.toLowerCase().includes(query);
+    const contentMatch = item.content?.toLowerCase().includes(query) || false;
+    return titleMatch || contentMatch;
+  });
 
   const getTypeIcon = (type: SavedItem["type"]) => {
     switch (type) {
