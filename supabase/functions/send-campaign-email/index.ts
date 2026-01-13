@@ -912,12 +912,32 @@ serve(async (req) => {
         // 2. Created account at least 7 days ago (gave them time to explore)
         // 3. Don't have lifetime access
         // 4. Have some activity (onboarding completed or first action)
-        const { data: neverSubscribedUsers } = await supabaseClient
-          .from('profiles')
-          .select('id, created_at, onboarding_completed, first_meaningful_action_at')
-          .or('subscription_status.is.null,subscription_status.eq.none,subscription_status.eq.trial_expired,subscription_status.eq.expired,subscription_status.eq.cancelled')
-          .eq('has_lifetime_access', false)
-          .lt('created_at', sevenDaysAgo.toISOString());
+        // Paginate to get ALL profiles (Supabase default limit is 1000)
+        let allNeverSubscribedUsers: any[] = [];
+        let profilePage = 0;
+        const profilePageSize = 1000;
+        
+        while (true) {
+          const { data: batch, error: batchError } = await supabaseClient
+            .from('profiles')
+            .select('id, created_at, onboarding_completed, first_meaningful_action_at')
+            .or('subscription_status.is.null,subscription_status.eq.none,subscription_status.eq.trial_expired,subscription_status.eq.expired,subscription_status.eq.cancelled')
+            .eq('has_lifetime_access', false)
+            .lt('created_at', sevenDaysAgo.toISOString())
+            .range(profilePage * profilePageSize, (profilePage + 1) * profilePageSize - 1);
+          
+          if (batchError) {
+            logStep("Error fetching profiles batch", { error: batchError.message, page: profilePage });
+            break;
+          }
+          if (!batch || batch.length === 0) break;
+          
+          allNeverSubscribedUsers = [...allNeverSubscribedUsers, ...batch];
+          if (batch.length < profilePageSize) break;
+          profilePage++;
+        }
+        
+        const neverSubscribedUsers = allNeverSubscribedUsers;
 
         if (neverSubscribedUsers && neverSubscribedUsers.length > 0) {
           // Filter to those with some engagement (explored briefly)

@@ -26,14 +26,29 @@ export function WinBackCampaign() {
 
       // Get users who never subscribed (from profiles, not user_subscriptions)
       // Must have: no active subscription, created 7+ days ago, some engagement
-      const { data: neverSubscribedUsers, error } = await supabase
-        .from('profiles')
-        .select('id, onboarding_completed, first_meaningful_action_at')
-        .or('subscription_status.is.null,subscription_status.eq.none,subscription_status.eq.trial_expired,subscription_status.eq.expired,subscription_status.eq.cancelled')
-        .eq('has_lifetime_access', false)
-        .lt('created_at', sevenDaysAgo.toISOString());
-
-      if (error) throw error;
+      // Paginate to get ALL users (Supabase default limit is 1000)
+      let allNeverSubscribedUsers: any[] = [];
+      let page = 0;
+      const pageSize = 1000;
+      
+      while (true) {
+        const { data: batch, error: batchError } = await supabase
+          .from('profiles')
+          .select('id, onboarding_completed, first_meaningful_action_at')
+          .or('subscription_status.is.null,subscription_status.eq.none,subscription_status.eq.trial_expired,subscription_status.eq.expired,subscription_status.eq.cancelled')
+          .eq('has_lifetime_access', false)
+          .lt('created_at', sevenDaysAgo.toISOString())
+          .range(page * pageSize, (page + 1) * pageSize - 1);
+        
+        if (batchError) throw batchError;
+        if (!batch || batch.length === 0) break;
+        
+        allNeverSubscribedUsers = [...allNeverSubscribedUsers, ...batch];
+        if (batch.length < pageSize) break;
+        page++;
+      }
+      
+      const neverSubscribedUsers = allNeverSubscribedUsers;
 
       // Filter to those with some engagement
       const engagedUsers = neverSubscribedUsers?.filter(u => 
