@@ -3,6 +3,7 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import { Navigation } from "@/components/Navigation";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
+import { usePersistedState, usePreservePageState } from "@/contexts/PageStateContext";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
@@ -71,15 +72,18 @@ export default function StudyBuddy() {
     searchParams.get("session") || null
   );
 
-  // Bible panel state
-  const [selectedBook, setSelectedBook] = useState("Genesis");
-  const [selectedChapter, setSelectedChapter] = useState(1);
+  // Preserve scroll position when switching pages
+  usePreservePageState();
+
+  // Bible panel state - persisted so it survives tab switching
+  const [selectedBook, setSelectedBook] = usePersistedState("selectedBook", "Genesis");
+  const [selectedChapter, setSelectedChapter] = usePersistedState("selectedChapter", 1);
   const [verses, setVerses] = useState<{ verse: number; text: string }[]>([]);
   const [loadingVerses, setLoadingVerses] = useState(false);
 
-  // Notes panel state
-  const [notes, setNotes] = useState("");
-  const [sessionTitle, setSessionTitle] = useState("");
+  // Notes panel state - persisted
+  const [notes, setNotes] = usePersistedState("notes", "");
+  const [sessionTitle, setSessionTitle] = usePersistedState("sessionTitle", "");
   const lastAnalyzedNotes = useRef("");
   const analysisTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 

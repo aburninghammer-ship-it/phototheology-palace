@@ -123,6 +123,43 @@ export const usePreservePage = (defaultTab?: string) => {
   return { activeTab: tabState?.[0], setActiveTab: tabState?.[1] };
 };
 
+// Hook for persisting any state value - works like useState but persists to localStorage
+export function usePersistedState<T>(
+  key: string,
+  defaultValue: T
+): [T, React.Dispatch<React.SetStateAction<T>>] {
+  const location = useLocation();
+  const { setCustomState, getCustomState } = usePageState();
+  const storageKey = `${location.pathname}:${key}`;
+
+  // Initialize from stored value or default
+  const [value, setValueInternal] = useState<T>(() => {
+    const stored = getCustomState<T>(storageKey, key);
+    return stored !== undefined ? stored : defaultValue;
+  });
+
+  // Restore on mount (in case context loaded after initial render)
+  useEffect(() => {
+    const stored = getCustomState<T>(storageKey, key);
+    if (stored !== undefined) {
+      setValueInternal(stored);
+    }
+  }, [storageKey, key, getCustomState]);
+
+  // Wrapper that saves to context on every change
+  const setValue: React.Dispatch<React.SetStateAction<T>> = useCallback((action) => {
+    setValueInternal(prev => {
+      const newValue = typeof action === 'function'
+        ? (action as (prev: T) => T)(prev)
+        : action;
+      setCustomState(storageKey, key, newValue);
+      return newValue;
+    });
+  }, [storageKey, key, setCustomState]);
+
+  return [value, setValue];
+}
+
 const STORAGE_KEY = "pt_page_states";
 
 // Serialize Map to JSON-compatible format
