@@ -12,7 +12,7 @@ import { toast } from "sonner";
 import {
   Brain, Loader2, Send, Save, Trash2,
   ChevronLeft, ChevronRight, MessageSquare, StickyNote,
-  Book
+  Book, Flame
 } from "lucide-react";
 import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from "@/components/ui/resizable";
 import { BIBLE_BOOK_METADATA } from "@/data/bibleBooks";
@@ -247,6 +247,14 @@ ${notes || '(No notes yet)'}
             </div>
           </div>
           <div className="flex items-center gap-2">
+            <Button 
+              size="sm" 
+              onClick={() => navigate("/sermon-simmer")}
+              className="bg-gradient-to-r from-red-600 to-orange-500 hover:from-red-700 hover:to-orange-600 text-white shadow-lg shadow-red-500/30"
+            >
+              <Flame className="w-4 h-4 mr-1" />
+              New Sermon
+            </Button>
             <Input
               placeholder="Session title..."
               value={sessionTitle}
