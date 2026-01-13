@@ -44,7 +44,7 @@ const SINGLE_CHAPTER_BOOKS: Record<string, number> = {
   'jude': 25,
 };
 
-// Primary API: bible-api.com
+// Primary API: bible-api.com (with timeout)
 async function fetchFromBibleApi(book: string, chapter: number, version: string): Promise<Response> {
   const normalizedBook = normalizeBookName(book);
   const normalizedLower = book.toLowerCase().trim();
@@ -62,9 +62,22 @@ async function fetchFromBibleApi(book: string, chapter: number, version: string)
 
   const url = `https://bible-api.com/${encodeURIComponent(reference)}?translation=${version}`;
   console.log(`[Primary API] Fetching: ${url}`);
-  return fetch(url, {
-    headers: { 'Accept': 'application/json' }
-  });
+  
+  // Add timeout controller (3 second timeout)
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 3000);
+  
+  try {
+    const response = await fetch(url, {
+      headers: { 'Accept': 'application/json' },
+      signal: controller.signal
+    });
+    clearTimeout(timeoutId);
+    return response;
+  } catch (err) {
+    clearTimeout(timeoutId);
+    throw err;
+  }
 }
 
 // Fallback API 1: labs.bible.org (NET Bible)
@@ -142,8 +155,8 @@ async function fetchFromGetBible(book: string, chapter: number): Promise<any> {
   };
 }
 
-// Fetch with retry logic and multiple fallbacks
-async function fetchWithRetry(book: string, chapter: number, version: string, maxRetries = 4): Promise<any> {
+// Fetch with retry logic and multiple fallbacks - reduced retries for faster response
+async function fetchWithRetry(book: string, chapter: number, version: string, maxRetries = 2): Promise<any> {
   let lastError: Error | null = null;
   
   // Try primary API with retries
