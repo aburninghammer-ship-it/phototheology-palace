@@ -147,7 +147,7 @@ ${notes || '(No notes yet)'}
 
       if (error) throw error;
 
-      const response = data.analysis?.overallAssessment || data.response || "I'm here to help with your Bible study. What would you like to explore?";
+      const response = data.analysis?.overallResponse || data.analysis?.overallAssessment || data.response || "I'm here to help with your Bible study. What would you like to explore?";
       setJeevesMessages(prev => [...prev, { role: 'assistant', content: response }]);
     } catch (error: any) {
       console.error("Jeeves error:", error);
@@ -378,15 +378,9 @@ ${notes || '(No notes yet)'}
                 <Textarea
                   value={notes}
                   onChange={(e) => setNotes(e.target.value)}
-                  placeholder="Start your study notes here...
+                  placeholder="Write freely here. Click verses to add them.
 
-Click on verses in the Bible panel to add them.
-
-Use markers to structure your thinking:
-• OBSERVATION: What you notice
-• CLAIM: A statement you're making
-• QUESTION: Something to explore
-• GEM: A discovered connection"
+Jeeves sees your notes and will spark connections, suggest PT rooms, source claims, and help you think Phototheologically."
                   className="h-full resize-none border-0 focus-visible:ring-0 text-sm bg-transparent text-emerald-100 placeholder:text-emerald-200/40"
                 />
               </div>
