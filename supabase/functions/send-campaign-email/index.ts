@@ -11,6 +11,33 @@ const logStep = (step: string, details?: any) => {
   console.log(`[CAMPAIGN-EMAIL] ${step}${detailsStr}`);
 };
 
+// Admin notification helper using fetch
+const sendAdminNotification = async (
+  resendApiKey: string, 
+  adminEmail: string, 
+  subject: string, 
+  html: string
+) => {
+  try {
+    await fetch("https://api.resend.com/emails", {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${resendApiKey}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        from: "PhotoTheology <support@thephototheologyapp.com>",
+        to: [adminEmail],
+        subject,
+        html,
+      }),
+    });
+    logStep("Admin notification sent", { subject });
+  } catch (err: any) {
+    logStep("Failed to send admin notification", { error: err?.message });
+  }
+};
+
 const mapUserIdsToEmails = async (
   supabaseAdmin: any,
   userIds: string[],
@@ -1075,6 +1102,8 @@ serve(async (req) => {
     // Send emails (batched) — Resend is rate-limited (~2 requests/sec).
     // We group by template and send with the /emails/batch endpoint to avoid 429s.
     const results: { email: string; success: boolean; error?: string }[] = [];
+    const campaignStartTime = new Date();
+    const adminEmail = userData.user.email || "support@thephototheologyapp.com";
 
     type Recipient = { email: string; userId: string; dayNumber?: number };
 
@@ -1104,15 +1133,19 @@ serve(async (req) => {
 
     const batchSize = 50;
     const MIN_DELAY_BETWEEN_REQUESTS_MS = 600; // stay below 2 requests/sec
+    let batchNumber = 0;
+    const totalBatches = Math.ceil(recipients.length / batchSize);
 
     for (const [groupKey, group] of groups.entries()) {
       for (let i = 0; i < group.recipients.length; i += batchSize) {
+        batchNumber++;
         const batchRecipients = group.recipients.slice(i, i + batchSize);
 
         logStep("Sending batch", {
           campaignType,
           group: groupKey,
-          batch: i / batchSize,
+          batch: batchNumber,
+          totalBatches,
           count: batchRecipients.length,
         });
 
@@ -1141,6 +1174,21 @@ serve(async (req) => {
             for (const r of batchRecipients) {
               results.push({ email: r.email, success: false, error: responseText });
             }
+
+            // Notify admin of domain verification failure
+            await sendAdminNotification(
+              resendApiKey,
+              adminEmail,
+              `❌ Campaign Failed - Domain Verification Required`,
+              `
+                <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto;">
+                  <h2 style="color: #ef4444;">Campaign Failed</h2>
+                  <p><strong>Campaign:</strong> ${campaignType}</p>
+                  <p><strong>Error:</strong> Sender domain not verified</p>
+                  <p>Please verify your domain in Resend before retrying.</p>
+                </div>
+              `
+            );
 
             return new Response(
               JSON.stringify({
@@ -1184,6 +1232,36 @@ serve(async (req) => {
           }
         }
 
+        // Send progress notification after each batch
+        const currentSent = results.filter(r => r.success).length;
+        const currentFailed = results.filter(r => !r.success).length;
+        const progress = Math.round((batchNumber / totalBatches) * 100);
+
+        await sendAdminNotification(
+          resendApiKey,
+          adminEmail,
+          `📧 ${campaignType.toUpperCase()} Campaign - Batch ${batchNumber}/${totalBatches} (${progress}%)`,
+          `
+            <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background: #f9f9f9;">
+              <h2 style="color: #3b82f6; margin-bottom: 16px;">📨 Batch ${batchNumber} Complete</h2>
+              
+              <div style="background: white; padding: 16px; border-radius: 8px; margin-bottom: 16px;">
+                <p style="margin: 4px 0;"><strong>Campaign:</strong> ${campaignType}</p>
+                <p style="margin: 4px 0;"><strong>Email Subject:</strong> ${group.template.subject}</p>
+                <p style="margin: 4px 0;"><strong>Batch:</strong> ${batchNumber} of ${totalBatches}</p>
+                <p style="margin: 4px 0;"><strong>Recipients this batch:</strong> ${batchRecipients.length}</p>
+              </div>
+              
+              <div style="background: white; padding: 16px; border-radius: 8px;">
+                <h3 style="margin-top: 0;">Running Totals</h3>
+                <p style="margin: 4px 0; color: #22c55e;">✅ Sent: ${currentSent}</p>
+                <p style="margin: 4px 0; color: #ef4444;">❌ Failed: ${currentFailed}</p>
+                <p style="margin: 4px 0;">📊 Progress: ${progress}%</p>
+              </div>
+            </div>
+          `
+        );
+
         // small delay between all requests
         await new Promise(resolve => setTimeout(resolve, MIN_DELAY_BETWEEN_REQUESTS_MS));
       }
@@ -1192,8 +1270,71 @@ serve(async (req) => {
     const sent = results.filter(r => r.success).length;
     const failed = results.filter(r => !r.success).length;
     const success = failed === 0;
+    const campaignEndTime = new Date();
+    const durationMs = campaignEndTime.getTime() - campaignStartTime.getTime();
+    const durationMinutes = Math.round(durationMs / 60000);
 
     logStep("Campaign complete", { sent, failed });
+
+    // Send final campaign completion summary
+    await sendAdminNotification(
+      resendApiKey,
+      adminEmail,
+      `🎉 ${campaignType.toUpperCase()} Campaign Complete - ${sent} Emails Sent`,
+      `
+        <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);">
+          <h1 style="color: #f5d742; text-align: center; margin-bottom: 24px;">🎉 Campaign Complete!</h1>
+          
+          <div style="background: rgba(255,255,255,0.1); padding: 20px; border-radius: 12px; margin-bottom: 20px;">
+            <h2 style="color: #4ecdc4; margin-top: 0;">Campaign Summary</h2>
+            <table style="width: 100%; color: #e5e5e5;">
+              <tr>
+                <td style="padding: 8px 0;"><strong>Campaign Type:</strong></td>
+                <td style="padding: 8px 0;">${campaignType.toUpperCase()}</td>
+              </tr>
+              <tr>
+                <td style="padding: 8px 0;"><strong>Started:</strong></td>
+                <td style="padding: 8px 0;">${campaignStartTime.toLocaleString()}</td>
+              </tr>
+              <tr>
+                <td style="padding: 8px 0;"><strong>Completed:</strong></td>
+                <td style="padding: 8px 0;">${campaignEndTime.toLocaleString()}</td>
+              </tr>
+              <tr>
+                <td style="padding: 8px 0;"><strong>Duration:</strong></td>
+                <td style="padding: 8px 0;">${durationMinutes > 0 ? durationMinutes + ' minutes' : Math.round(durationMs / 1000) + ' seconds'}</td>
+              </tr>
+            </table>
+          </div>
+          
+          <div style="display: flex; gap: 16px; margin-bottom: 20px;">
+            <div style="flex: 1; background: rgba(34, 197, 94, 0.2); padding: 16px; border-radius: 8px; text-align: center;">
+              <p style="font-size: 36px; font-weight: bold; color: #22c55e; margin: 0;">${sent}</p>
+              <p style="color: #22c55e; margin: 4px 0 0 0;">Emails Sent</p>
+            </div>
+            <div style="flex: 1; background: rgba(239, 68, 68, 0.2); padding: 16px; border-radius: 8px; text-align: center;">
+              <p style="font-size: 36px; font-weight: bold; color: #ef4444; margin: 0;">${failed}</p>
+              <p style="color: #ef4444; margin: 4px 0 0 0;">Failed</p>
+            </div>
+          </div>
+          
+          <div style="background: rgba(255,255,255,0.1); padding: 16px; border-radius: 8px;">
+            <p style="color: #a0a0a0; margin: 0; text-align: center;">
+              ${success ? '✅ All emails sent successfully!' : `⚠️ ${failed} emails failed to send. Check the email logs for details.`}
+            </p>
+          </div>
+          
+          ${failed > 0 ? `
+            <div style="background: rgba(239, 68, 68, 0.1); padding: 16px; border-radius: 8px; margin-top: 16px;">
+              <h3 style="color: #ef4444; margin-top: 0;">Failed Emails (first 10):</h3>
+              <ul style="color: #e5e5e5; margin: 0; padding-left: 20px;">
+                ${results.filter(r => !r.success).slice(0, 10).map(r => `<li>${r.email}: ${r.error || 'Unknown error'}</li>`).join('')}
+              </ul>
+            </div>
+          ` : ''}
+        </div>
+      `
+    );
 
     return new Response(
       JSON.stringify({
