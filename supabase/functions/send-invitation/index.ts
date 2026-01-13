@@ -117,7 +117,7 @@ serve(async (req) => {
             <div class="content">
               <p>Hello${recipientName ? ` ${recipientName}` : ''},</p>
               
-              <p>You've been invited to join <strong>The Phototheology App</strong> with ${isLifetime ? '<span class="highlight">lifetime premium access</span>' : `<span class="highlight">${accessDurationMonths} months of premium access</span>`}!</p>
+              <p>You've been invited to join <strong>Phototheology</strong> with ${isLifetime ? '<span class="highlight">lifetime premium access</span>' : `<span class="highlight">${accessDurationMonths} months of premium access</span>`}!</p>
               
               <p><strong>What is Phototheology?</strong></p>
               <p>Phototheology is a revolutionary Bible study method that helps you memorize, visualize, and understand Scripture through an 8-floor "palace" system. Master stories, timelines, prophecy, and Christ-centered interpretation with powerful memory techniques.</p>
@@ -146,7 +146,7 @@ serve(async (req) => {
               <p>Blessings,<br>The Phototheology Team</p>
             </div>
             <div class="footer">
-              <p>© 2025 Phototheology App. All rights reserved.</p>
+              <p>© 2025 Phototheology. All rights reserved.</p>
               <p>This is an exclusive invitation. Please do not share your access code.</p>
             </div>
           </div>

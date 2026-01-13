@@ -109,7 +109,7 @@ serve(async (req) => {
                 <p>Blessings,<br>The Phototheology Team</p>
               </div>
               <div class="footer">
-                <p>© 2025 Phototheology App. All rights reserved.</p>
+                <p>© 2025 Phototheology. All rights reserved.</p>
               </div>
             </div>
           </body>
