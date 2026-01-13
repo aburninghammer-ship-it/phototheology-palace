@@ -11637,7 +11637,7 @@ export type Database = {
           last_verified_at: string | null
           teachable_email: string
           teachable_user_id: string | null
-          user_id: string
+          user_id: string | null
           verified_at: string
         }
         Insert: {
@@ -11648,7 +11648,7 @@ export type Database = {
           last_verified_at?: string | null
           teachable_email: string
           teachable_user_id?: string | null
-          user_id: string
+          user_id?: string | null
           verified_at?: string
         }
         Update: {
@@ -11659,7 +11659,7 @@ export type Database = {
           last_verified_at?: string | null
           teachable_email?: string
           teachable_user_id?: string | null
-          user_id?: string
+          user_id?: string | null
           verified_at?: string
         }
         Relationships: []
