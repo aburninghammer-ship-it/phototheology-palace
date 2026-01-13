@@ -200,7 +200,7 @@ export function useRevenueAnalytics() {
     const churnRate = startOfMonthActive > 0 ? (churnedThisMonth / startOfMonthActive) * 100 : 0;
 
 // MRR will be overwritten by Stripe data if available (see stripeMrr state)
-    const dbMrr = Math.round(mrr * 100) / 100;
+    const dbMrr = Math.round(stripeMrr * 100) / 100;
 
     setMetrics({
       mrr: dbMrr,

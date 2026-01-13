@@ -15,7 +15,7 @@ import {
   Brain, Zap, BookOpen, Target, AlertTriangle,
   Lightbulb, ArrowRight, ChevronDown, ChevronUp,
   Loader2, Send, Save, Trash2, RotateCcw, Gem,
-  Eye, Repeat, Church, Cross, Heart, Compress,
+  Eye, Repeat, Church, Cross, Heart, Minimize2,
   CheckCircle2, XCircle, AlertCircle, Search
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -443,7 +443,7 @@ QUESTION: What other 'lifting up' imagery exists in John's gospel?"
                     <Dialog open={showCompressionDialog} onOpenChange={setShowCompressionDialog}>
                       <DialogTrigger asChild>
                         <Button variant="outline" className="border-slate-600 text-slate-300">
-                          <Compress className="w-4 h-4 mr-2" />
+                          <Minimize2 className="w-4 h-4 mr-2" />
                           Compress
                         </Button>
                       </DialogTrigger>
@@ -802,7 +802,7 @@ QUESTION: What other 'lifting up' imagery exists in John's gospel?"
                       <Card className="bg-slate-800/50 border-slate-700/50">
                         <CardHeader className="pb-2">
                           <CardTitle className="text-white text-sm flex items-center gap-2">
-                            <Compress className="w-4 h-4 text-cyan-500" />
+                            <Minimize2 className="w-4 h-4 text-cyan-500" />
                             Compression Evaluation
                           </CardTitle>
                         </CardHeader>
