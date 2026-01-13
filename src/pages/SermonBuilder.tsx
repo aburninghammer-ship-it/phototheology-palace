@@ -9,7 +9,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
-import { Film, Mic, BookOpen, TrendingUp, ArrowRight, CheckCircle2, Loader2, Archive, Gem, Info, Swords, PenLine, FileText, Presentation, Lightbulb } from "lucide-react";
+import { Film, Mic, BookOpen, TrendingUp, ArrowRight, CheckCircle2, Loader2, Archive, Gem, Info, Swords, PenLine, FileText, Presentation, Lightbulb, Plus, Sparkles, Calendar, Edit, Trash2, Copy } from "lucide-react";
 import { sermonTitleSchema, sermonThemeSchema, sermonStoneSchema, sermonBridgeSchema } from "@/lib/validationSchemas";
 import { sanitizeText, sanitizeHtml } from "@/lib/sanitize";
 import { SermonRichTextArea } from "@/components/sermon/SermonRichTextArea";
@@ -18,7 +18,21 @@ import { SermonPPTExport } from "@/components/sermon/SermonPPTExport";
 import { ScriptureArmory, ArmoryVerse } from "@/components/sermon/ScriptureArmory";
 import { SermonWritingStep } from "@/components/sermon/SermonWritingStep";
 import { SermonStartersBrowser } from "@/components/sermon/SermonStartersBrowser";
+import { SermonPolishTab } from "@/components/sermon/SermonPolishTab";
 import { StyledMarkdown } from "@/components/ui/styled-markdown";
+import { Badge } from "@/components/ui/badge";
+import { format } from "date-fns";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -81,9 +95,11 @@ export default function SermonBuilder() {
   const hasRestoredState = useRef(false);
   
   const [currentStep, setCurrentStep] = useState(1);
-  const [activeTab, setActiveTab] = useState<"builder" | "starters">("builder");
+  const [activeTab, setActiveTab] = useState<"builder" | "library" | "simmer" | "starters">("builder");
   const [loading, setLoading] = useState(false);
   const [asking, setAsking] = useState(false);
+  const [librarySermons, setLibrarySermons] = useState<any[]>([]);
+  const [loadingLibrary, setLoadingLibrary] = useState(false);
   
   const [sermon, setSermon] = useState({
     title: "",
@@ -350,6 +366,103 @@ export default function SermonBuilder() {
     }
   };
 
+  const startNewSermon = () => {
+    // Clear all sermon state
+    setSermon({
+      title: "",
+      theme_passage: "",
+      sermon_style: SERMON_STYLES[0].value,
+      smooth_stones: [],
+      bridges: [],
+      movie_structure: {},
+      full_sermon: "",
+    });
+    setCurrentStep(1);
+    setNewStone("");
+    setNewBridge("");
+    setAiHelp("");
+    setScriptureArmory({});
+    // Clear the edit ID from URL
+    navigate("/sermon-builder", { replace: true });
+    toast.success("Starting new sermon!");
+  };
+
+  const loadLibrarySermons = async () => {
+    setLoadingLibrary(true);
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      const { data, error } = await supabase
+        .from("sermons")
+        .select("*")
+        .eq("user_id", user.id)
+        .order("updated_at", { ascending: false });
+
+      if (error) throw error;
+      setLibrarySermons(data || []);
+    } catch (error) {
+      console.error("Error loading sermons:", error);
+      toast.error("Failed to load sermons");
+    } finally {
+      setLoadingLibrary(false);
+    }
+  };
+
+  const deleteLibrarySermon = async (id: string) => {
+    try {
+      const { error } = await supabase.from("sermons").delete().eq("id", id);
+      if (error) throw error;
+      setLibrarySermons(librarySermons.filter(s => s.id !== id));
+      // If we deleted the currently edited sermon, start a new one
+      if (editId === id) {
+        startNewSermon();
+      }
+      toast.success("Sermon deleted");
+    } catch (error) {
+      console.error("Error deleting sermon:", error);
+      toast.error("Failed to delete sermon");
+    }
+  };
+
+  const duplicateLibrarySermon = async (sermonToDuplicate: any) => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      const { data, error } = await supabase.from("sermons").insert({
+        user_id: user.id,
+        title: `${sermonToDuplicate.title} (Copy)`,
+        theme_passage: sermonToDuplicate.theme_passage,
+        sermon_style: sermonToDuplicate.sermon_style,
+        smooth_stones: sermonToDuplicate.smooth_stones,
+        bridges: sermonToDuplicate.bridges,
+        movie_structure: sermonToDuplicate.movie_structure,
+        full_sermon: sermonToDuplicate.full_sermon,
+        status: "in_progress",
+        current_step: sermonToDuplicate.current_step,
+      }).select('id').single();
+
+      if (error) throw error;
+      toast.success("Sermon duplicated");
+      loadLibrarySermons();
+      // Open the duplicated sermon
+      if (data?.id) {
+        navigate(`/sermon-builder?id=${data.id}`);
+      }
+    } catch (error) {
+      console.error("Error duplicating sermon:", error);
+      toast.error("Failed to duplicate sermon");
+    }
+  };
+
+  // Load library when tab changes to library
+  useEffect(() => {
+    if (activeTab === "library") {
+      loadLibrarySermons();
+    }
+  }, [activeTab]);
+
   if (loading && editId) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-purple-900 via-purple-800 to-indigo-900 relative overflow-x-hidden">
@@ -414,6 +527,13 @@ export default function SermonBuilder() {
             </div>
             <div className="flex gap-2">
               <Button
+                onClick={startNewSermon}
+                className="bg-white text-purple-900 hover:bg-white/90"
+              >
+                <Plus className="w-4 h-4 mr-2" />
+                New Sermon
+              </Button>
+              <Button
                 variant="outline"
                 onClick={() => {
                   const sermonId = searchParams.get("id");
@@ -424,14 +544,6 @@ export default function SermonBuilder() {
                 <Presentation className="w-4 h-4 mr-2" />
                 PowerPoint
               </Button>
-              <Button
-                variant="outline"
-                onClick={() => navigate("/sermon-archive")}
-                className="bg-white/10 border-white/20 text-white hover:bg-white/20 backdrop-blur-sm"
-              >
-                <Archive className="w-4 h-4 mr-2" />
-                My Sermons
-              </Button>
             </div>
           </motion.div>
         </div>
@@ -439,24 +551,158 @@ export default function SermonBuilder() {
 
       {/* Tab Selector */}
       <div className="max-w-7xl mx-auto px-6 pt-6 relative z-10">
-        <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as "builder" | "starters")}>
+        <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as "builder" | "library" | "simmer" | "starters")}>
           <TabsList className="bg-white/10 border border-white/20">
-            <TabsTrigger 
-              value="builder" 
+            <TabsTrigger
+              value="builder"
               className="data-[state=active]:bg-white data-[state=active]:text-purple-900 text-white"
             >
               <Film className="w-4 h-4 mr-2" />
               Builder
             </TabsTrigger>
-            <TabsTrigger 
-              value="starters" 
+            <TabsTrigger
+              value="library"
+              className="data-[state=active]:bg-white data-[state=active]:text-purple-900 text-white"
+            >
+              <Archive className="w-4 h-4 mr-2" />
+              Library
+            </TabsTrigger>
+            <TabsTrigger
+              value="simmer"
+              className="data-[state=active]:bg-white data-[state=active]:text-purple-900 text-white"
+            >
+              <Sparkles className="w-4 h-4 mr-2" />
+              Simmer
+            </TabsTrigger>
+            <TabsTrigger
+              value="starters"
               className="data-[state=active]:bg-white data-[state=active]:text-purple-900 text-white"
             >
               <Lightbulb className="w-4 h-4 mr-2" />
               Idea Starters
             </TabsTrigger>
           </TabsList>
-          
+
+          {/* Library Tab */}
+          <TabsContent value="library" className="mt-6">
+            <Card className="bg-white/10 backdrop-blur-xl border-white/20">
+              <CardHeader>
+                <CardTitle className="text-white flex items-center gap-2">
+                  <Archive className="w-5 h-5" />
+                  My Sermon Library
+                  <span className="text-sm font-normal text-purple-200">({librarySermons.length} sermons)</span>
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                {loadingLibrary ? (
+                  <div className="flex items-center justify-center py-12">
+                    <Loader2 className="w-8 h-8 text-white animate-spin" />
+                  </div>
+                ) : librarySermons.length === 0 ? (
+                  <div className="text-center py-12 text-white/60">
+                    <Film className="w-12 h-12 mx-auto mb-4 opacity-50" />
+                    <p className="text-lg">No sermons yet</p>
+                    <p className="text-sm">Start building your first sermon!</p>
+                    <Button onClick={startNewSermon} className="mt-4 bg-white text-purple-900 hover:bg-white/90">
+                      <Plus className="w-4 h-4 mr-2" />
+                      New Sermon
+                    </Button>
+                  </div>
+                ) : (
+                  <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                    {librarySermons.map((s) => (
+                      <Card key={s.id} className="bg-white/5 border-white/10 hover:bg-white/10 transition-colors">
+                        <CardContent className="p-4">
+                          <div className="flex items-start justify-between mb-2">
+                            <h3 className="font-semibold text-white line-clamp-1">{s.title || "Untitled Sermon"}</h3>
+                            <Badge variant={s.status === "complete" ? "default" : "secondary"} className="ml-2 shrink-0">
+                              {s.status === "complete" ? (
+                                <><CheckCircle2 className="w-3 h-3 mr-1" />Complete</>
+                              ) : (
+                                <><Clock className="w-3 h-3 mr-1" />In Progress</>
+                              )}
+                            </Badge>
+                          </div>
+                          <p className="text-sm text-white/60 line-clamp-1 mb-2">
+                            {s.theme_passage ? s.theme_passage.replace(/<[^>]*>/g, '') : "No passage set"}
+                          </p>
+                          <div className="flex items-center gap-2 text-xs text-white/40 mb-3">
+                            <Calendar className="w-3 h-3" />
+                            {format(new Date(s.updated_at), "MMM d, yyyy")}
+                          </div>
+                          <div className="flex gap-1">
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              onClick={() => {
+                                navigate(`/sermon-builder?id=${s.id}`);
+                                setActiveTab("builder");
+                              }}
+                              className="flex-1 text-white hover:bg-white/20"
+                            >
+                              <Edit className="w-3 h-3 mr-1" />
+                              Edit
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              onClick={() => duplicateLibrarySermon(s)}
+                              className="text-white hover:bg-white/20"
+                            >
+                              <Copy className="w-3 h-3" />
+                            </Button>
+                            <AlertDialog>
+                              <AlertDialogTrigger asChild>
+                                <Button
+                                  size="sm"
+                                  variant="ghost"
+                                  className="text-red-300 hover:bg-red-500/20 hover:text-red-200"
+                                >
+                                  <Trash2 className="w-3 h-3" />
+                                </Button>
+                              </AlertDialogTrigger>
+                              <AlertDialogContent>
+                                <AlertDialogHeader>
+                                  <AlertDialogTitle>Delete Sermon?</AlertDialogTitle>
+                                  <AlertDialogDescription>
+                                    This will permanently delete "{s.title || "Untitled Sermon"}". This action cannot be undone.
+                                  </AlertDialogDescription>
+                                </AlertDialogHeader>
+                                <AlertDialogFooter>
+                                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                  <AlertDialogAction
+                                    onClick={() => deleteLibrarySermon(s.id)}
+                                    className="bg-red-600 hover:bg-red-700"
+                                  >
+                                    Delete
+                                  </AlertDialogAction>
+                                </AlertDialogFooter>
+                              </AlertDialogContent>
+                            </AlertDialog>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* Simmer Tab */}
+          <TabsContent value="simmer" className="mt-6">
+            <Card className="bg-white/90 dark:bg-white/10 backdrop-blur-xl border-white/20">
+              <CardContent className="p-0">
+                <SermonPolishTab
+                  initialSermonText={sermon.full_sermon}
+                  themePassage={sermon.theme_passage}
+                  sermonId={editId || undefined}
+                />
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* Idea Starters Tab */}
           <TabsContent value="starters" className="mt-6">
             <Card className="bg-white/10 backdrop-blur-xl border-white/20">
               <CardContent className="p-6">
