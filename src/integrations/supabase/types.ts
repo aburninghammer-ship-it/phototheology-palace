@@ -5485,6 +5485,44 @@ export type Database = {
         }
         Relationships: []
       }
+      jeeves_messages: {
+        Row: {
+          content: string
+          created_at: string
+          id: string
+          metadata: Json | null
+          role: string
+          session_id: string | null
+          user_id: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          id?: string
+          metadata?: Json | null
+          role: string
+          session_id?: string | null
+          user_id: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          id?: string
+          metadata?: Json | null
+          role?: string
+          session_id?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "jeeves_messages_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "study_sessions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       leader_certifications: {
         Row: {
           certified_at: string | null
@@ -11428,6 +11466,7 @@ export type Database = {
           ai_summary_generated_at: string | null
           created_at: string
           description: string | null
+          has_jeeves_history: boolean | null
           id: string
           is_active: boolean | null
           is_public: boolean | null
@@ -11452,6 +11491,7 @@ export type Database = {
           ai_summary_generated_at?: string | null
           created_at?: string
           description?: string | null
+          has_jeeves_history?: boolean | null
           id?: string
           is_active?: boolean | null
           is_public?: boolean | null
@@ -11476,6 +11516,7 @@ export type Database = {
           ai_summary_generated_at?: string | null
           created_at?: string
           description?: string | null
+          has_jeeves_history?: boolean | null
           id?: string
           is_active?: boolean | null
           is_public?: boolean | null
