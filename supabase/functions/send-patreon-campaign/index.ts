@@ -14,7 +14,7 @@ const logStep = (step: string, details?: any) => {
 interface CampaignRequest {
   subject: string;
   htmlContent: string;
-  filter: 'not_signed_up' | 'all_patrons' | 'active_patrons' | 'free_members' | 'former_patrons' | 'trial_conversion';
+  filter: 'not_signed_up' | 'not_signed_up_active' | 'all_patrons' | 'active_patrons' | 'free_members' | 'former_patrons' | 'trial_conversion' | 'all_members';
   testMode?: boolean;
   testEmail?: string;
 }
@@ -92,23 +92,29 @@ serve(async (req) => {
 
         switch (filter) {
           case 'not_signed_up':
-            // Patrons who haven't signed up to the app
-            return !isSignedUp && (member.patron_status === 'active_patron' || member.pledge_cents > 0);
+            // ALL Patreon members who haven't signed up to the app (regardless of patron status)
+            return !isSignedUp;
+          case 'not_signed_up_active':
+            // Only active paying patrons who haven't signed up
+            return !isSignedUp && member.patron_status === 'active_patron';
           case 'all_patrons':
-            // All paying patrons
+            // All paying patrons (active or with pledge)
             return member.patron_status === 'active_patron' || member.pledge_cents > 0;
           case 'active_patrons':
             // Currently active patrons only
             return member.patron_status === 'active_patron';
           case 'free_members':
-            // Free followers only
-            return member.patron_status === 'free_member' && !isSignedUp;
+            // Free followers only (null status or free_member)
+            return (!member.patron_status || member.patron_status === 'free_member') && !isSignedUp;
           case 'former_patrons':
             // Winback: Former patrons who cancelled
-            return member.patron_status === 'former_patron';
+            return member.patron_status === 'former_patron' || member.patron_status === 'declined_patron';
           case 'trial_conversion':
             // Free followers who haven't converted to paying
-            return member.patron_status === 'free_member';
+            return !member.patron_status || member.patron_status === 'free_member';
+          case 'all_members':
+            // Every single Patreon member with an email
+            return true;
           default:
             return false;
         }
