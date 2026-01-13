@@ -33,6 +33,19 @@ interface StripeStats {
   unlinked_count: number;
 }
 
+interface StripeSyncSummary {
+  total_stripe_subscriptions: number;
+  updated: number;
+  already_synced: number;
+  errors: number;
+  unmatched_stripe_subscriptions: number;
+}
+
+interface StripeSyncRun {
+  ran_at: string;
+  summary: StripeSyncSummary;
+}
+
 interface PatreonStats {
   total_connected: number;
   active_patrons: number;
@@ -86,6 +99,7 @@ export default function AdminSubscriptions() {
   const [isAdmin, setIsAdmin] = useState<boolean | null>(null);
   const [stats, setStats] = useState<SubscriptionStats | null>(null);
   const [churchStats, setChurchStats] = useState<ChurchStats | null>(null);
+  const [lastStripeSync, setLastStripeSync] = useState<StripeSyncRun | null>(null);
   const [teachableCount, setTeachableCount] = useState<number>(0);
   const [teachableStudents, setTeachableStudents] = useState<any[]>([]);
   const [pickaxeCount, setPickaxeCount] = useState<number>(0);
@@ -97,14 +111,24 @@ export default function AdminSubscriptions() {
     setSyncing(true);
     try {
       const { data, error } = await supabase.functions.invoke('sync-stripe-subscriptions');
-      
+
       if (error) throw error;
-      
+
+      const summary: StripeSyncSummary | undefined = data?.summary;
+      if (summary) {
+        setLastStripeSync({
+          ran_at: new Date().toISOString(),
+          summary,
+        });
+      }
+
       toast({
         title: "Sync Complete",
-        description: `Synced ${data?.synced || 0} subscriptions successfully`,
+        description: summary
+          ? `Updated ${summary.updated} • Already synced ${summary.already_synced} • Unmatched ${summary.unmatched_stripe_subscriptions}${summary.errors ? ` • Errors ${summary.errors}` : ''}`
+          : "Sync completed",
       });
-      
+
       // Reload stats after sync
       await loadStats();
     } catch (error: any) {
@@ -338,7 +362,10 @@ export default function AdminSubscriptions() {
 
   if (!stats) return null;
 
-  const dbVsStripeMatch = stats.database.by_payment_source.stripe === stats.stripe.active_subscriptions;
+  const stripeCurrent = stats.stripe.active_subscriptions + stats.stripe.trialing_subscriptions;
+  const dbLinked = stats.database.by_payment_source.stripe || 0;
+  const unlinked = stats.stripe.unlinked_count || Math.max(0, stripeCurrent - dbLinked);
+  const dbVsStripeMatch = unlinked === 0;
 
   return (
     <div className="container mx-auto p-6 max-w-6xl">
@@ -502,23 +529,30 @@ export default function AdminSubscriptions() {
             <CardContent>
               <div className="flex flex-wrap items-center gap-4">
                 <div>
-                  <span className="text-muted-foreground">Stripe active:</span>{" "}
-                  <Badge variant="outline" className="text-lg">{stats.stripe.active_subscriptions}</Badge>
+                  <span className="text-muted-foreground">Stripe current (active+trial):</span>{" "}
+                  <Badge variant="outline" className="text-lg">{stripeCurrent}</Badge>
                 </div>
                 <div>
                   <span className="text-muted-foreground">DB linked:</span>{" "}
-                  <Badge variant="outline" className="text-lg">{stats.database.by_payment_source.stripe || 0}</Badge>
+                  <Badge variant="outline" className="text-lg">{dbLinked}</Badge>
                 </div>
-                {stats.stripe.unlinked_count > 0 && (
+                {unlinked > 0 && (
                   <Badge variant="secondary" className="bg-yellow-100 text-yellow-800 border-yellow-300">
-                    {stats.stripe.unlinked_count} Stripe subscriptions not linked to an account
+                    {unlinked} not linked to an account
                   </Badge>
                 )}
               </div>
-              {stats.stripe.unlinked_count > 0 && (
+
+              {unlinked > 0 && (
                 <p className="text-xs text-muted-foreground mt-2">
-                  These may be users who subscribed but never created an app account, or email mismatches.
-                  Click "Sync Stripe Subscriptions" to match by email.
+                  The sync can only link subscriptions to existing app accounts (email match). Subscriptions without an account will remain unlinked.
+                </p>
+              )}
+
+              {lastStripeSync && (
+                <p className="text-xs text-muted-foreground mt-2">
+                  Last sync ({new Date(lastStripeSync.ran_at).toLocaleString()}): Updated {lastStripeSync.summary.updated} • Already synced {lastStripeSync.summary.already_synced} • Unmatched {lastStripeSync.summary.unmatched_stripe_subscriptions}
+                  {lastStripeSync.summary.errors ? ` • Errors ${lastStripeSync.summary.errors}` : ""}
                 </p>
               )}
             </CardContent>
