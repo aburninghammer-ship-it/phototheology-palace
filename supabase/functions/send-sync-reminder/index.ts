@@ -54,7 +54,19 @@ serve(async (req) => {
     if (!roleData) throw new Error("Unauthorized - admin access required");
     logStep("Admin verified", { userId: userData.user.id });
 
-    const { testMode, testEmail }: ReminderRequest = await req.json();
+    // Parse request body safely
+    let testMode = false;
+    let testEmail = '';
+    try {
+      const body = await req.text();
+      if (body) {
+        const parsed = JSON.parse(body);
+        testMode = parsed.testMode || false;
+        testEmail = parsed.testEmail || '';
+      }
+    } catch {
+      // Empty body is fine, use defaults
+    }
     logStep("Request parsed", { testMode });
 
     // Get all Stripe customers with active/trialing subscriptions
