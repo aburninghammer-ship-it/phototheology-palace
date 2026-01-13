@@ -4146,11 +4146,27 @@ ${SERMON_KNOWLEDGE_BANK}
 - NEVER return generic sanctuary verses when specific furniture/events are mentioned
 - Be SURGICALLY PRECISE - match the exact topic, not a related topic
 
+⚠️ BIBLE VERSE REFERENCE DETECTION (VERY IMPORTANT):
+When the preacher mentions a SPECIFIC Bible verse reference (e.g., "Genesis 3:15", "John 3:16", "Romans 8:28"):
+1. IDENTIFY the verse reference mentioned
+2. PROVIDE cross-references that illuminate, connect to, or fulfill that specific verse
+3. PRIORITIZE typological connections (OT to NT fulfillment)
+4. INCLUDE verses that quote or allude to the mentioned verse
+
+KEY CROSS-REFERENCE KNOWLEDGE:
+- Genesis 3:15 (Protoevangelium) → Romans 16:20 (crushing Satan), Galatians 4:4 (born of woman), Revelation 12:9 (serpent=Satan), 1 John 3:8 (destroy devil's works), Isaiah 7:14 (virgin seed), Hebrews 2:14-15 (destroy death)
+- Genesis 22 (Isaac sacrifice) → John 3:16 (only begotten son), Romans 8:32 (spare not own Son), Hebrews 11:17-19 (received him back)
+- Exodus 12 (Passover) → 1 Corinthians 5:7 (Christ our Passover), John 1:29 (Lamb of God), 1 Peter 1:18-19 (precious blood)
+- Isaiah 53 → Matthew 8:17, Acts 8:32-35, 1 Peter 2:24-25, Mark 15:28
+- Psalm 22 → Matthew 27:35, 27:46, John 19:24, Hebrews 2:12
+- Daniel 9:24-27 → Luke 3:1-3, Matthew 4:17, Galatians 4:4, Mark 1:15
+
 You are an expert at finding:
 1. PROOF VERSES - verses that DIRECTLY PROVE what the preacher just said
 2. DESCRIPTIVE VERSES - verses that directly describe the exact event, concept, or object being discussed
 3. CONNECTION VERSES - verses that create powerful typological, thematic, or prophetic links
-4. AMPLIFYING VERSES - verses that deepen or add rhetorical power
+4. CROSS-REFERENCES - when a specific verse is mentioned, provide verses that illuminate or fulfill it
+5. AMPLIFYING VERSES - verses that deepen or add rhetorical power
 
 Return your response as valid JSON only.`;
 
@@ -4161,20 +4177,28 @@ Return your response as valid JSON only.`;
 Theme/Passage: ${themePassage || ''}
 Key Points: ${stones || ''}
 
-⚠️ READ CAREFULLY: Identify the SPECIFIC sanctuary furniture, biblical event, or doctrine being discussed in the LAST 2-3 sentences. Your verses MUST match that EXACT topic.
+⚠️ FIRST: Scan for any SPECIFIC Bible verse references (e.g., "Genesis 3:15", "John 3:16"). If found:
+- Provide cross-references that CONNECT TO, FULFILL, or ILLUMINATE that verse
+- Show how other Scriptures relate to, quote, or allude to the mentioned verse
+- Prioritize typological OT→NT connections
+
+⚠️ THEN: Identify the SPECIFIC sanctuary furniture, biblical event, or doctrine being discussed in the LAST 2-3 sentences. Your verses MUST match that EXACT topic.
 
 Examples of precision required:
+- "Genesis 3:15 speaks of the seed" → Return Romans 16:20, Galatians 4:4, Revelation 12:9, 1 John 3:8, Hebrews 2:14-15 (cross-references!)
 - "The priest washed at the laver" → Return Exodus 30:18-21, 38:8, 40:30-32 (LAVER verses ONLY)
 - "The veil separating the holy place" → Return Exodus 26:33 about THAT veil, not Hebrews 10:20 about the Most Holy veil
-- "Blood on the altar of burnt offering" → Return verses about the BRAZEN altar, not incense altar
+- "In Daniel 9:24" → Return Luke 3:1-3, Galatians 4:4, Mark 1:15 (cross-references to fulfillment)
 
 Suggest 5-7 Scripture verses:
 
-1. **PROOF VERSES** (2-3): Verses that PROVE or DIRECTLY SUPPORT the specific claim being made. If the preacher says "the priest had to wash at the laver," give the verse that PROVES this requirement.
+1. **CROSS-REFERENCES** (if a specific verse is mentioned): Verses that connect to, fulfill, or illuminate the mentioned verse. This is TOP PRIORITY when verses are referenced.
 
-2. **DESCRIPTIVE VERSES** (1-2): Verses that describe the exact event, object, or concept mentioned.
+2. **PROOF VERSES** (2-3): Verses that PROVE or DIRECTLY SUPPORT the specific claim being made.
 
-3. **CONNECTION VERSES** (1-2): Typological or prophetic connections that link this SPECIFIC element to Christ or other Scripture.
+3. **DESCRIPTIVE VERSES** (1-2): Verses that describe the exact event, object, or concept mentioned.
+
+4. **CONNECTION VERSES** (1-2): Typological or prophetic connections that link this SPECIFIC element to Christ or other Scripture.
 
 Return ONLY valid JSON in this exact format:
 {
@@ -4183,12 +4207,13 @@ Return ONLY valid JSON in this exact format:
       "reference": "Book Chapter:Verse",
       "text": "The actual verse text (abbreviated if very long)",
       "reason": "Brief explanation of why this verse fits THE SPECIFIC TOPIC",
-      "type": "proof" | "descriptive" | "connection" | "amplifying"
+      "type": "proof" | "descriptive" | "connection" | "cross-reference" | "amplifying"
     }
   ]
 }
 
 Guidelines:
+- WHEN A VERSE IS MENTIONED, prioritize cross-references to that verse!
 - MATCH THE EXACT TOPIC - if they mention laver, give laver verses
 - PROOF verses should PROVE what was just said
 - For connections, explicitly name the typological link
