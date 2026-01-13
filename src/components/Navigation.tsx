@@ -382,8 +382,54 @@ export const Navigation = () => {
               )}
             </div>
           </div>
-          {/* Secondary horizontal tab row removed (was overlapping on some screens) */}
-
+          
+          {/* Secondary Navigation Tabs - Logged in users only */}
+          {user && (
+            <div className="hidden md:flex items-center justify-center gap-1 py-2 border-t border-border/50 overflow-x-auto scrollbar-hide">
+              <Button variant="ghost" asChild size="sm" className={`whitespace-nowrap h-8 ${location.pathname === "/mastery" || location.pathname.startsWith("/mastery") ? "bg-accent" : ""}`}>
+                <Link to="/mastery">
+                  <Crown className="h-3.5 w-3.5 mr-1.5" />
+                  Mastery
+                </Link>
+              </Button>
+              <Button variant="ghost" asChild size="sm" className={`whitespace-nowrap h-8 ${location.pathname === "/bible" || location.pathname.startsWith("/bible") ? "bg-accent" : ""}`}>
+                <Link to="/bible">
+                  <BookOpen className="h-3.5 w-3.5 mr-1.5" />
+                  Study Bible
+                </Link>
+              </Button>
+              <Button variant="ghost" asChild size="sm" className={`whitespace-nowrap h-8 ${location.pathname === "/study-buddy" ? "bg-accent" : ""}`}>
+                <Link to="/study-buddy">
+                  <Brain className="h-3.5 w-3.5 mr-1.5" />
+                  Study Buddy
+                </Link>
+              </Button>
+              <Button variant="ghost" asChild size="sm" className={`whitespace-nowrap h-8 ${location.pathname === "/palace" || location.pathname.startsWith("/palace") ? "bg-accent" : ""}`}>
+                <Link to="/palace">
+                  <Building2 className="h-3.5 w-3.5 mr-1.5" />
+                  Palace
+                </Link>
+              </Button>
+              <Button variant="ghost" asChild size="sm" className={`whitespace-nowrap h-8 ${location.pathname === "/games" || location.pathname.startsWith("/games") ? "bg-accent" : ""}`}>
+                <Link to="/games">
+                  <Gamepad2 className="h-3.5 w-3.5 mr-1.5" />
+                  Games
+                </Link>
+              </Button>
+              <Button variant="ghost" asChild size="sm" className={`whitespace-nowrap h-8 ${location.pathname === "/memory" ? "bg-accent" : ""}`}>
+                <Link to="/memory">
+                  <Brain className="h-3.5 w-3.5 mr-1.5" />
+                  Memory
+                </Link>
+              </Button>
+              <Button variant="ghost" asChild size="sm" className={`whitespace-nowrap h-8 ${location.pathname === "/courses" || location.pathname.startsWith("/course") ? "bg-accent" : ""}`}>
+                <Link to="/courses">
+                  <GraduationCap className="h-3.5 w-3.5 mr-1.5" />
+                  Courses
+                </Link>
+              </Button>
+            </div>
+          )}
         </div>
       </nav>
       
