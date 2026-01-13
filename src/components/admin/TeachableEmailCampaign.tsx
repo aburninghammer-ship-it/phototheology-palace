@@ -259,77 +259,30 @@ export function TeachableEmailCampaign() {
           <CardDescription>Click to use a template</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          {/* Student-Based Campaign Templates */}
+          {/* Main Campaign Template */}
           <div className="space-y-2">
             <h4 className="text-sm font-semibold text-orange-600 flex items-center gap-2">
-              🎓 Student-Based Campaigns
+              🎓 Main Campaign
             </h4>
             
             <Button
               variant="outline"
-              className="w-full justify-start border-green-500/30 hover:bg-green-500/10"
+              className="w-full justify-start border-amber-500/30 hover:bg-amber-500/10"
               onClick={() => {
-                setFilter("linked");
-                setSubject("Your Premium App Access is Ready! 🏰");
+                setFilter("all");
+                setSubject("The Phototheology App is Here — Try It Free for 7 Days 🏰");
                 setContent(`<div style="font-family: Georgia, serif; max-width: 600px; margin: 0 auto; padding: 20px; background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); color: #e8e8e8;">
   <div style="text-align: center; padding: 30px 0; border-bottom: 2px solid #d4af37;">
-    <h1 style="color: #d4af37; font-size: 28px; margin: 0;">Welcome to the Palace</h1>
-    <p style="color: #a0a0a0; font-style: italic; margin-top: 10px;">Your Premium Access Awaits</p>
-  </div>
-  
-  <div style="padding: 30px 20px;">
-    <p style="font-size: 18px; line-height: 1.8; color: #e8e8e8;">Dear Fellow Student of the Word,</p>
-    
-    <p style="font-size: 16px; line-height: 1.8; color: #c0c0c0;">As a current Phototheology student, you've already begun your journey through the Palace of Scripture. Now, we're excited to offer you something extraordinary—<strong style="color: #d4af37;">premium access to the Phototheology App</strong>.</p>
-    
-    <p style="font-size: 16px; line-height: 1.8; color: #c0c0c0;">This isn't just another Bible app. It's the <em>living architecture</em> of Phototheology—the 8 Floors, the Rooms, the Cycles and Heavens—all at your fingertips, designed to help you:</p>
-    
-    <ul style="font-size: 16px; line-height: 2; color: #c0c0c0; padding-left: 20px;">
-      <li>🏛️ Navigate the Palace system with guided exercises</li>
-      <li>📖 Study Scripture with Jeeves, your AI companion trained in PT principles</li>
-      <li>🔥 Build daily streaks and track your mastery journey</li>
-      <li>💎 Store and organize your Gems from every study session</li>
-      <li>👥 Connect with fellow Palace explorers in the community</li>
-    </ul>
-    
-    <div style="text-align: center; padding: 30px 0;">
-      <a href="https://phototheology.app" style="display: inline-block; background: linear-gradient(135deg, #d4af37 0%, #b8860b 100%); color: #1a1a2e; padding: 16px 40px; text-decoration: none; font-weight: bold; font-size: 18px; border-radius: 8px; box-shadow: 0 4px 15px rgba(212, 175, 55, 0.3);">Enter the Palace →</a>
-    </div>
-    
-    <p style="font-size: 16px; line-height: 1.8; color: #c0c0c0;">Simply log in with the same email you use for your Teachable account, and your premium access will be automatically activated.</p>
-    
-    <p style="font-size: 16px; line-height: 1.8; color: #c0c0c0;">The Palace awaits. Every chapter, every verse, every Christ-connection—stored, structured, and ready for discovery.</p>
-    
-    <p style="font-size: 16px; line-height: 1.8; color: #e8e8e8; margin-top: 30px;">In Christ,<br><strong style="color: #d4af37;">The Phototheology Team</strong></p>
-  </div>
-  
-  <div style="text-align: center; padding: 20px; border-top: 1px solid #333; color: #666; font-size: 12px;">
-    <p>You're receiving this because you're enrolled in Phototheology courses.</p>
-  </div>
-</div>`);
-              }}
-            >
-              💎 Premium Access (Current Students)
-            </Button>
-
-            <Button
-              variant="outline"
-              className="w-full justify-start border-blue-500/30 hover:bg-blue-500/10"
-              onClick={() => {
-                setFilter("unlinked");
-                setSubject("Discover the Palace: 7 Days Free 🏰");
-                setContent(`<div style="font-family: Georgia, serif; max-width: 600px; margin: 0 auto; padding: 20px; background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); color: #e8e8e8;">
-  <div style="text-align: center; padding: 30px 0; border-bottom: 2px solid #d4af37;">
-    <h1 style="color: #d4af37; font-size: 28px; margin: 0;">What If You Could See Christ in Every Chapter?</h1>
-    <p style="color: #a0a0a0; font-style: italic; margin-top: 10px;">The Palace Method Awaits</p>
+    <h1 style="color: #d4af37; font-size: 28px; margin: 0;">The Palace is Now Open</h1>
+    <p style="color: #a0a0a0; font-style: italic; margin-top: 10px;">See Christ in Every Chapter</p>
   </div>
   
   <div style="padding: 30px 20px;">
     <p style="font-size: 18px; line-height: 1.8; color: #e8e8e8;">Dear Friend,</p>
     
-    <p style="font-size: 16px; line-height: 1.8; color: #c0c0c0;">You've heard about Phototheology. Maybe you've watched a video or seen a post. But you haven't yet stepped inside the Palace.</p>
+    <p style="font-size: 16px; line-height: 1.8; color: #c0c0c0;">I'm excited to announce the <strong style="color: #d4af37;">Phototheology App</strong> is now available—and I want you to experience it.</p>
     
-    <p style="font-size: 16px; line-height: 1.8; color: #c0c0c0;">The <strong style="color: #d4af37;">Phototheology App</strong> isn't just another devotional tool. It's a complete system for Bible study—8 Floors, dozens of Rooms, and a method that transforms how you read, remember, and live Scripture.</p>
+    <p style="font-size: 16px; line-height: 1.8; color: #c0c0c0;">This isn't just another Bible app. It's the living architecture of the Palace method—8 Floors, dozens of Rooms, and a complete system that transforms how you read, remember, and live Scripture.</p>
     
     <p style="font-size: 16px; line-height: 1.8; color: #c0c0c0;">For the next <strong style="color: #d4af37;">7 days</strong>, you can explore it all—completely free:</p>
     
@@ -342,23 +295,26 @@ export function TeachableEmailCampaign() {
     </ul>
     
     <div style="text-align: center; padding: 30px 0;">
-      <a href="https://phototheology.app" style="display: inline-block; background: linear-gradient(135deg, #d4af37 0%, #b8860b 100%); color: #1a1a2e; padding: 16px 40px; text-decoration: none; font-weight: bold; font-size: 18px; border-radius: 8px; box-shadow: 0 4px 15px rgba(212, 175, 55, 0.3);">Start Your Free Trial →</a>
+      <a href="https://phototheology.app" style="display: inline-block; background: linear-gradient(135deg, #d4af37 0%, #b8860b 100%); color: #1a1a2e; padding: 16px 40px; text-decoration: none; font-weight: bold; font-size: 18px; border-radius: 8px; box-shadow: 0 4px 15px rgba(212, 175, 55, 0.3);">Start Your 7-Day Free Trial →</a>
     </div>
     
-    <p style="font-size: 16px; line-height: 1.8; color: #c0c0c0;">No credit card required. No commitment. Just 7 days to see if the Palace is where you belong.</p>
+    <div style="background: rgba(212, 175, 55, 0.1); border: 1px solid #d4af37; border-radius: 8px; padding: 20px; margin: 20px 0;">
+      <p style="font-size: 16px; line-height: 1.8; color: #d4af37; margin: 0 0 10px 0;"><strong>🎓 Phototheology Master Class Members:</strong></p>
+      <p style="font-size: 15px; line-height: 1.8; color: #c0c0c0; margin: 0;">If you're currently enrolled in my weekly Phototheology Master Class, you get <strong style="color: #d4af37;">FREE access</strong> to the app! Contact me directly, and I'll send you a special access link.</p>
+    </div>
     
-    <p style="font-size: 16px; line-height: 1.8; color: #a0a0a0; font-style: italic;">"The Bible is not only a book of words; it is a book of images, symbols, and living stories."</p>
+    <p style="font-size: 16px; line-height: 1.8; color: #c0c0c0;">The Palace awaits. Every chapter, every verse, every Christ-connection—stored, structured, and ready for discovery.</p>
     
-    <p style="font-size: 16px; line-height: 1.8; color: #e8e8e8; margin-top: 30px;">Ready to begin?<br><strong style="color: #d4af37;">The Phototheology Team</strong></p>
+    <p style="font-size: 16px; line-height: 1.8; color: #e8e8e8; margin-top: 30px;">Blessings,<br><strong style="color: #d4af37;">Pastor Ivor Myers</strong></p>
   </div>
   
   <div style="text-align: center; padding: 20px; border-top: 1px solid #333; color: #666; font-size: 12px;">
-    <p>You're receiving this because you signed up at Phototheology.</p>
+    <p>You're receiving this because you're part of the Phototheology community.</p>
   </div>
 </div>`);
               }}
             >
-              🆓 7-Day Free Trial (Non-Students)
+              📧 7-Day Trial + Master Class Free Access
             </Button>
           </div>
 
