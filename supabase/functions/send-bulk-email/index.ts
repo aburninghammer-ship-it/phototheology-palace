@@ -147,7 +147,7 @@ serve(async (req) => {
             "Content-Type": "application/json",
           },
           body: JSON.stringify(batch.map(email => ({
-            from: "PhotoTheology <support@phototheologybible.com>",
+            from: "PhotoTheology <support@thephototheologyapp.com>",
             to: [email],
             subject: subject,
             html: htmlContent,

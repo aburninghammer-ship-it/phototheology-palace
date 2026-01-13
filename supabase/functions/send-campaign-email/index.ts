@@ -875,8 +875,8 @@ serve(async (req) => {
     logStep("Request parsed", { campaignType, testMode, forceSend });
 
     // Resend requires a verified sending domain for production sends.
-    // Use a verified domain sender (default: support@phototheologybible.com).
-    const defaultFromAddress = "PhotoTheology <support@phototheologybible.com>";
+    // Use a verified domain sender (default: support@thephototheologyapp.com).
+    const defaultFromAddress = "PhotoTheology <support@thephototheologyapp.com>";
     const customFromEmail = Deno.env.get("RESEND_FROM_EMAIL");
     const fromAddress = customFromEmail
       ? `PhotoTheology <${customFromEmail}>`
