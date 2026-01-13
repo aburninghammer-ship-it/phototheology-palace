@@ -217,6 +217,12 @@ serve(async (req) => {
               .single();
 
             if (profile?.email) {
+              // Get billing interval from subscription price
+              let billingInterval = 'month';
+              if (subscription?.items?.data?.[0]?.price?.recurring?.interval) {
+                billingInterval = subscription.items.data[0].price.recurring.interval;
+              }
+
               await supabase.functions.invoke('send-purchase-notification', {
                 body: {
                   userEmail: profile.email,
@@ -225,9 +231,15 @@ serve(async (req) => {
                   currency: session.currency || 'usd',
                   product: `${tier.charAt(0).toUpperCase() + tier.slice(1)} Subscription`,
                   subscriptionTier: tier,
+                  isTrialing: isInTrial,
+                  trialEndsAt: trialEnd?.toISOString() || null,
+                  billingInterval,
+                  stripeCustomerId: customerId,
+                  stripeSubscriptionId: subscription?.id || null,
+                  renewalDate: renewalDate?.toISOString() || null,
                 }
               });
-              logStep('Purchase notification sent', { email: profile.email });
+              logStep('Purchase notification sent', { email: profile.email, tier, isInTrial });
             }
           } catch (emailError) {
             logStep('Failed to send purchase notification', { error: emailError });
