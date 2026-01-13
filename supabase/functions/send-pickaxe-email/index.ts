@@ -113,7 +113,7 @@ serve(async (req) => {
     }
 
     // Build query based on filter
-    let query = supabase.from("pickaxe_connections").select("email");
+    let query = supabase.from("pickaxe_connections").select("pickaxe_email");
 
     switch (filter) {
       case 'paid':
@@ -151,7 +151,7 @@ serve(async (req) => {
     }
 
     // Get unique emails
-    const emails = [...new Set(pickaxeMembers.map(m => m.email).filter(Boolean))];
+    const emails = [...new Set(pickaxeMembers.map(m => m.pickaxe_email).filter(Boolean))];
     console.log(`Sending to ${emails.length} Pickaxe members with filter: ${filter}`);
 
     const resend = new Resend(RESEND_API_KEY);
