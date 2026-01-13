@@ -143,21 +143,43 @@ export default function AdminSubscriptions() {
 
   const handleImportTeachableStudents = async () => {
     setImportingTeachable(true);
+    let totalImported = 0;
+    let currentPage = 1;
+    let hasMore = true;
+    
     try {
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) throw new Error("Not authenticated");
 
-      const { data, error } = await supabase.functions.invoke('import-teachable-students', {
-        headers: {
-          Authorization: `Bearer ${session.access_token}`,
-        },
-      });
-      
-      if (error) throw error;
+      // Loop to handle batched imports
+      while (hasMore) {
+        toast({
+          title: "Importing Teachable Students",
+          description: `Fetching pages starting from ${currentPage}... (${totalImported} imported so far)`,
+        });
+
+        const { data, error } = await supabase.functions.invoke('import-teachable-students', {
+          headers: {
+            Authorization: `Bearer ${session.access_token}`,
+          },
+          body: { startPage: currentPage },
+        });
+        
+        if (error) throw error;
+        
+        totalImported += data?.imported || 0;
+        
+        if (data?.needsContinuation && data?.nextPage) {
+          currentPage = data.nextPage;
+          console.log(`Continuing import from page ${currentPage}...`);
+        } else {
+          hasMore = false;
+        }
+      }
       
       toast({
         title: "Teachable Import Complete",
-        description: data?.message || `Imported ${data?.imported || 0} students`,
+        description: `Successfully imported ${totalImported} students`,
       });
       
       // Reload stats after import
