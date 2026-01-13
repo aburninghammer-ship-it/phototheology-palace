@@ -99,6 +99,21 @@ export function useFreeTier(): FreeTierAccess {
     enabled: !!user,
   });
 
+  // Check for Teachable student access
+  const { data: teachableAccess } = useQuery({
+    queryKey: ["teachable-access", user?.id],
+    queryFn: async () => {
+      if (!user) return false;
+
+      const { data, error } = await supabase.rpc('has_teachable_access', {
+        _user_id: user.id
+      });
+
+      if (error) return false;
+      return data;
+    },
+    enabled: !!user,
+  });
   // Count today's Jeeves usage
   const { data: jeevesUsage } = useQuery({
     queryKey: ["jeeves-daily-usage", user?.id],
@@ -145,12 +160,18 @@ export function useFreeTier(): FreeTierAccess {
   // Check if user has church access (grants premium)
   const hasChurchAccess = churchAccess?.has_access || false;
 
+  // Check if user has Teachable student access
+  const hasTeachableAccess = teachableAccess === true;
+
   // Determine user's tier
   const getTier = (): FreeTierAccess["tier"] => {
     if (!user) return "free";
 
     // Church membership grants premium access (even if profile row is missing)
     if (hasChurchAccess) return "premium";
+
+    // Teachable students get premium access
+    if (hasTeachableAccess) return "student";
 
     // Patreon connection grants access independent of Stripe
     if (patreonConnection?.is_active_patron) return "patron";
