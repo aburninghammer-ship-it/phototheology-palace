@@ -451,7 +451,7 @@ export default function AdminSubscriptions() {
               <CardHeader className="pb-2">
                 <CardTitle className="text-lg flex items-center gap-2">
                   <span className="text-blue-500">⏳</span>
-                  14-Day Trials
+                  7-Day Trials
                 </CardTitle>
                 <CardDescription>Currently in trial period</CardDescription>
               </CardHeader>
