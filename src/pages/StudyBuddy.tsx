@@ -193,12 +193,25 @@ export default function StudyBuddy() {
     }
   };
 
+  // Check if notes contain a question
+  const isQuestion = (text: string): boolean => {
+    const trimmed = text.trim();
+    // Check for question mark or common question starters
+    if (trimmed.includes('?')) return true;
+    const questionStarters = /^(what|who|where|when|why|how|is|are|was|were|do|does|did|can|could|would|should|will|which|list|explain|describe|tell me|show me)/i;
+    return questionStarters.test(trimmed);
+  };
+
   const analyzeNotes = useCallback(async (forceAnalysis = false) => {
     const trimmedNotes = notes.trim();
-    if (trimmedNotes.length < 30 || jeevesLoading) return;
+    if (trimmedNotes.length < 10 || jeevesLoading) return;
 
-    // Skip if not forced and notes haven't changed much
-    if (!forceAnalysis && trimmedNotes === lastAnalyzedNotes.current) return;
+    // Auto-trigger for questions, otherwise need more content
+    const hasQuestion = isQuestion(trimmedNotes);
+    if (!hasQuestion && trimmedNotes.length < 30) return;
+
+    // Skip if not forced and notes haven't changed much (unless it's a question)
+    if (!forceAnalysis && !hasQuestion && trimmedNotes === lastAnalyzedNotes.current) return;
 
     setJeevesLoading(true);
     lastAnalyzedNotes.current = trimmedNotes;
@@ -226,15 +239,6 @@ export default function StudyBuddy() {
       setJeevesLoading(false);
     }
   }, [notes, selectedBook, selectedChapter, verses, analysisHistory, jeevesLoading]);
-
-  // Manual trigger for asking Jeeves
-  const askJeeves = () => {
-    if (notes.trim().length < 10) {
-      toast.error("Write your question in the notes first");
-      return;
-    }
-    analyzeNotes(true);
-  };
 
   const navigateChapter = (direction: 'prev' | 'next') => {
     if (direction === 'prev') {
@@ -510,23 +514,11 @@ export default function StudyBuddy() {
                     <StickyNote className="w-5 h-5 text-emerald-400" />
                     <span className="font-bold text-white">Notes</span>
                   </div>
-                  <Button
-                    size="sm"
-                    onClick={askJeeves}
-                    disabled={jeevesLoading || notes.trim().length < 10}
-                    className="bg-violet-600 hover:bg-violet-700 text-white text-xs h-7 px-2"
-                  >
-                    {jeevesLoading ? (
-                      <Loader2 className="w-3 h-3 animate-spin" />
-                    ) : (
-                      <>
-                        <Send className="w-3 h-3 mr-1" />
-                        Ask Jeeves
-                      </>
-                    )}
-                  </Button>
+                  {jeevesLoading && (
+                    <Loader2 className="w-4 h-4 animate-spin text-violet-400" />
+                  )}
                 </div>
-                <p className="text-xs text-emerald-200/60 mt-1">Write notes or questions — click "Ask Jeeves" to get answers</p>
+                <p className="text-xs text-emerald-200/60 mt-1">Write notes or ask questions — Jeeves will auto-respond</p>
               </div>
               <div className="flex-1 p-4">
                 <Textarea
