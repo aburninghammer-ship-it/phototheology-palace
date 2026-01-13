@@ -1161,13 +1161,25 @@ export default function SermonBuilder() {
               )}
 
               {/* Navigation */}
-              <div className="flex gap-2 pt-4 border-t">
-                <Button onClick={prevStep} disabled={currentStep === 1} variant="outline" className="flex-1">
-                  Previous
-                </Button>
-                <Button onClick={nextStep} disabled={currentStep === 6} className="flex-1">
-                  Next Step
-                </Button>
+              <div className="flex flex-col gap-3 pt-4 border-t">
+                <div className="flex gap-2">
+                  <Button onClick={prevStep} disabled={currentStep === 1} variant="outline" className="flex-1">
+                    Previous
+                  </Button>
+                  <Button onClick={nextStep} disabled={currentStep === 6} className="flex-1">
+                    Next Step
+                  </Button>
+                </div>
+                {currentStep < 5 && (
+                  <Button
+                    onClick={() => setCurrentStep(5)}
+                    variant="ghost"
+                    className="text-sm text-muted-foreground hover:text-foreground"
+                  >
+                    <PenLine className="w-4 h-4 mr-2" />
+                    Skip to Write Sermon →
+                  </Button>
+                )}
               </div>
             </CardContent>
           </Card>
