@@ -89,8 +89,9 @@ interface UserGem {
 
 export default function SermonBuilder() {
   const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
   const editId = searchParams.get("id");
+  const isNewSermon = searchParams.get("new") === "true";
   const { setCustomState, getCustomState } = usePreservePage();
   const hasRestoredState = useRef(false);
   
@@ -132,32 +133,59 @@ export default function SermonBuilder() {
     contextType: 'study',
     contextId: editId || 'new-sermon',
   });
+  // Handle new sermon flag - clear persisted state when starting fresh
   useEffect(() => {
-    if (!editId && !hasRestoredState.current) {
-      const savedStep = getCustomState<number>('sermon_currentStep');
-      const savedSermon = getCustomState<typeof sermon>('sermon_data');
-      const savedNewStone = getCustomState<string>('sermon_newStone');
-      const savedNewBridge = getCustomState<string>('sermon_newBridge');
-      const savedAiHelp = getCustomState<string>('sermon_aiHelp');
-      
-      if (savedStep) setCurrentStep(savedStep);
-      if (savedSermon) {
-        // Merge with default state to ensure all properties exist
-        setSermon(prev => ({
-          ...prev,
-          ...savedSermon,
-          full_sermon: savedSermon.full_sermon || prev.full_sermon || "",
-          smooth_stones: savedSermon.smooth_stones || prev.smooth_stones || [],
-          bridges: savedSermon.bridges || prev.bridges || [],
-        }));
+    if (isNewSermon) {
+      // Clear persisted state directly from localStorage to avoid race conditions
+      try {
+        const stored = localStorage.getItem("pt_page_states");
+        if (stored) {
+          const states = JSON.parse(stored);
+          if (states["/sermon-builder"]) {
+            delete states["/sermon-builder"].customState;
+            localStorage.setItem("pt_page_states", JSON.stringify(states));
+          }
+        }
+      } catch (e) {
+        console.warn("Failed to clear sermon state:", e);
       }
-      if (savedNewStone) setNewStone(savedNewStone);
-      if (savedNewBridge) setNewBridge(savedNewBridge);
-      if (savedAiHelp) setAiHelp(savedAiHelp);
-      
-      hasRestoredState.current = true;
+
+      // Remove the ?new param from URL without causing navigation
+      setSearchParams({}, { replace: true });
+      hasRestoredState.current = true; // Prevent any restoration
     }
-  }, [editId, getCustomState]);
+  }, [isNewSermon, setSearchParams]);
+
+  useEffect(() => {
+    // Skip restoration if this is a new sermon or if already restored
+    if (isNewSermon || editId || hasRestoredState.current) {
+      hasRestoredState.current = true;
+      return;
+    }
+
+    const savedStep = getCustomState<number>('sermon_currentStep');
+    const savedSermon = getCustomState<typeof sermon>('sermon_data');
+    const savedNewStone = getCustomState<string>('sermon_newStone');
+    const savedNewBridge = getCustomState<string>('sermon_newBridge');
+    const savedAiHelp = getCustomState<string>('sermon_aiHelp');
+
+    if (savedStep) setCurrentStep(savedStep);
+    if (savedSermon) {
+      // Merge with default state to ensure all properties exist
+      setSermon(prev => ({
+        ...prev,
+        ...savedSermon,
+        full_sermon: savedSermon.full_sermon || prev.full_sermon || "",
+        smooth_stones: savedSermon.smooth_stones || prev.smooth_stones || [],
+        bridges: savedSermon.bridges || prev.bridges || [],
+      }));
+    }
+    if (savedNewStone) setNewStone(savedNewStone);
+    if (savedNewBridge) setNewBridge(savedNewBridge);
+    if (savedAiHelp) setAiHelp(savedAiHelp);
+
+    hasRestoredState.current = true;
+  }, [editId, isNewSermon, getCustomState]);
 
   // Persist state changes (only for new sermons)
   useEffect(() => {
@@ -379,23 +407,28 @@ export default function SermonBuilder() {
     };
     setSermon(emptySermon);
     setCurrentStep(1);
+    setActiveTab("builder"); // Reset to builder tab
     setNewStone("");
     setNewBridge("");
     setAiHelp("");
     setScriptureArmory({});
-    
-    // CRITICAL: Clear preserved page state so it doesn't restore old sermon
-    setCustomState('sermon_currentStep', 1);
-    setCustomState('sermon_data', emptySermon);
-    setCustomState('sermon_newStone', "");
-    setCustomState('sermon_newBridge', "");
-    setCustomState('sermon_aiHelp', "");
-    
-    // Reset the hasRestoredState ref so state gets properly saved
-    hasRestoredState.current = true;
-    
-    // Clear the edit ID from URL
-    navigate("/sermon-builder", { replace: true });
+
+    // Clear persisted state directly from localStorage to avoid race conditions
+    try {
+      const stored = localStorage.getItem("pt_page_states");
+      if (stored) {
+        const states = JSON.parse(stored);
+        if (states["/sermon-builder"]) {
+          delete states["/sermon-builder"].customState;
+          localStorage.setItem("pt_page_states", JSON.stringify(states));
+        }
+      }
+    } catch (e) {
+      console.warn("Failed to clear sermon state:", e);
+    }
+
+    // Navigate with ?new=true to signal fresh start (prevents state restoration)
+    navigate("/sermon-builder?new=true", { replace: true });
     toast.success("Starting new sermon!");
   };
 
