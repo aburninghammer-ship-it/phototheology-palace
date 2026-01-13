@@ -99,6 +99,7 @@ export default function StudyBuddy() {
   };
 
   useEffect(() => {
+    console.log("[StudyBuddy] Auth state:", { authLoading, user: !!user });
     if (!authLoading && !user) {
       navigate("/auth");
     }
