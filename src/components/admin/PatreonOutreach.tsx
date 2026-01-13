@@ -27,24 +27,32 @@ export function PatreonOutreach() {
   const [stats, setStats] = useState<PatreonStats | null>(null);
   
   // Campaign form
-  const [subject, setSubject] = useState("You're missing out on PhotoTheology!");
+  const [subject, setSubject] = useState("Unlock Phototheology – Your Patron Access Awaits!");
   const [htmlContent, setHtmlContent] = useState(`
 <h2>Hey there, Patron!</h2>
-<p>We noticed you haven't signed up for the PhotoTheology app yet. As a supporter, you get <strong>free premium access</strong> to all our features!</p>
+<p>Thank you for supporting Phototheology! As a patron pledging <strong>$15/month or more</strong>, you qualify for <strong>premium access</strong> to the full Phototheology Suite.</p>
 
-<h3>What you're missing:</h3>
+<h3>Here's how to claim your access:</h3>
+<ol>
+  <li>Go to <a href="https://phototheologybible.com/auth">phototheologybible.com</a></li>
+  <li>Sign up using the <strong>same email</strong> you use on Patreon</li>
+  <li>Connect your Patreon account when prompted</li>
+  <li>Your premium access will be activated automatically!</li>
+</ol>
+
+<h3>What you'll unlock:</h3>
 <ul>
-  <li>📖 Advanced Bible study tools with AI assistance</li>
+  <li>📖 Advanced Bible study tools with AI assistance (Jeeves)</li>
   <li>🏛️ The Palace Method for Scripture memorization</li>
   <li>✨ Daily challenges and community features</li>
   <li>🎓 Certificate programs and achievements</li>
 </ul>
 
-<p><a href="https://phototheologybible.com/auth" style="display: inline-block; background: #8B5CF6; color: white; padding: 12px 24px; text-decoration: none; border-radius: 8px; margin: 16px 0;">Sign Up Now (It's Free for Patrons!)</a></p>
+<p><a href="https://phototheologybible.com/auth" style="display: inline-block; background: #8B5CF6; color: white; padding: 12px 24px; text-decoration: none; border-radius: 8px; margin: 16px 0;">Sign Up Now & Connect Patreon</a></p>
 
-<p>Just use the same email you have on Patreon, and your premium access will be automatically activated.</p>
+<p>If you have any questions, just reply to this email!</p>
 
-<p>Blessings,<br/>The PhotoTheology Team</p>
+<p>Blessings,<br/>The Phototheology Team</p>
   `.trim());
   const [filter, setFilter] = useState<'not_signed_up' | 'all_patrons' | 'active_patrons' | 'free_members' | 'former_patrons' | 'trial_conversion'>('not_signed_up');
   const [testMode, setTestMode] = useState(true);
