@@ -1,8 +1,9 @@
-import { useState, useEffect, useRef } from "react";
-import { useNavigate } from "react-router-dom";
+import { useState, useEffect, useRef, useCallback } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { Navigation } from "@/components/Navigation";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
+import { useJeevesMessages, JeevesMessage } from "@/hooks/useJeevesMessages";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
@@ -12,7 +13,7 @@ import { toast } from "sonner";
 import {
   Brain, Loader2, Send, Save, Trash2,
   ChevronLeft, ChevronRight, MessageSquare, StickyNote,
-  Book, Flame
+  Book, Flame, History
 } from "lucide-react";
 import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from "@/components/ui/resizable";
 import { BIBLE_BOOK_METADATA } from "@/data/bibleBooks";
@@ -26,15 +27,16 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
-interface JeevesMessage {
-  role: 'user' | 'assistant';
-  content: string;
-}
-
 export default function StudyBuddy() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const { user, loading: authLoading } = useAuth();
   const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  // Session state
+  const [currentSessionId, setCurrentSessionId] = useState<string | null>(
+    searchParams.get("session") || null
+  );
 
   // Bible panel state
   const [selectedBook, setSelectedBook] = useState("Genesis");
@@ -46,8 +48,16 @@ export default function StudyBuddy() {
   const [notes, setNotes] = useState("");
   const [sessionTitle, setSessionTitle] = useState("");
 
-  // Jeeves panel state
-  const [jeevesMessages, setJeevesMessages] = useState<JeevesMessage[]>([]);
+  // Jeeves with persistence
+  const {
+    messages: jeevesMessages,
+    setMessages: setJeevesMessages,
+    saveMessage,
+    saveMessages,
+    clearMessages,
+    loading: loadingMessages,
+  } = useJeevesMessages({ sessionId: currentSessionId || undefined, autoLoad: !!currentSessionId });
+  
   const [jeevesInput, setJeevesInput] = useState("");
   const [jeevesLoading, setJeevesLoading] = useState(false);
 
@@ -62,6 +72,39 @@ export default function StudyBuddy() {
       navigate("/auth");
     }
   }, [user, authLoading, navigate]);
+
+  // Load existing session if session ID provided
+  useEffect(() => {
+    const loadExistingSession = async () => {
+      if (!currentSessionId || !user) return;
+      
+      try {
+        const { data, error } = await supabase
+          .from("study_sessions")
+          .select("*")
+          .eq("id", currentSessionId)
+          .eq("user_id", user.id)
+          .single();
+        
+        if (error) throw error;
+        
+        if (data) {
+          setSessionTitle(data.title || "");
+          // Load context from jeeves_context if available
+          const ctx = data.jeeves_context as { book?: string; chapter?: number; notes?: string } | null;
+          if (ctx) {
+            if (ctx.book) setSelectedBook(ctx.book);
+            if (ctx.chapter) setSelectedChapter(ctx.chapter);
+            if (ctx.notes) setNotes(ctx.notes);
+          }
+        }
+      } catch (err) {
+        console.error("Error loading session:", err);
+      }
+    };
+    
+    loadExistingSession();
+  }, [currentSessionId, user]);
 
   // Load verses when book/chapter changes
   useEffect(() => {
@@ -123,7 +166,10 @@ export default function StudyBuddy() {
 
     const userMessage = jeevesInput.trim();
     setJeevesInput("");
-    setJeevesMessages(prev => [...prev, { role: 'user', content: userMessage }]);
+    
+    // Add user message locally first (optimistic update)
+    const userMsg: JeevesMessage = { role: 'user', content: userMessage };
+    setJeevesMessages(prev => [...prev, userMsg]);
     setJeevesLoading(true);
 
     try {
@@ -148,7 +194,13 @@ ${notes || '(No notes yet)'}
       if (error) throw error;
 
       const response = data.analysis?.overallResponse || data.analysis?.overallAssessment || data.response || "I'm here to help with your Bible study. What would you like to explore?";
-      setJeevesMessages(prev => [...prev, { role: 'assistant', content: response }]);
+      const assistantMsg: JeevesMessage = { role: 'assistant', content: response };
+      setJeevesMessages(prev => [...prev, assistantMsg]);
+      
+      // Save both messages if we have a session
+      if (currentSessionId) {
+        await saveMessages([userMsg, assistantMsg], currentSessionId);
+      }
     } catch (error: any) {
       console.error("Jeeves error:", error);
       setJeevesMessages(prev => [...prev, { 
@@ -161,32 +213,59 @@ ${notes || '(No notes yet)'}
   };
 
   const saveSession = async () => {
-    if (!notes.trim()) {
-      toast.error("No notes to save");
+    if (!notes.trim() && jeevesMessages.length === 0) {
+      toast.error("No notes or conversation to save");
       return;
     }
 
     try {
-      const { error } = await supabase.from("study_sessions").insert([{
-        user_id: user?.id!,
-        title: sessionTitle || `${selectedBook} ${selectedChapter} Study - ${new Date().toLocaleDateString()}`,
-        description: notes.substring(0, 200),
-        jeeves_context: JSON.parse(JSON.stringify({ messages: jeevesMessages, book: selectedBook, chapter: selectedChapter, notes })),
-        tabs_data: JSON.parse(JSON.stringify([])),
-      }]);
+      // Create or update session
+      if (currentSessionId) {
+        // Update existing session
+        const { error } = await supabase.from("study_sessions").update({
+          title: sessionTitle || `${selectedBook} ${selectedChapter} Study - ${new Date().toLocaleDateString()}`,
+          description: notes.substring(0, 200),
+          jeeves_context: JSON.parse(JSON.stringify({ book: selectedBook, chapter: selectedChapter, notes })),
+          has_jeeves_history: jeevesMessages.length > 0,
+        }).eq("id", currentSessionId);
 
-      if (error) throw error;
-      toast.success("Session saved!");
+        if (error) throw error;
+        toast.success("Session updated!");
+      } else {
+        // Create new session
+        const { data: newSession, error } = await supabase.from("study_sessions").insert([{
+          user_id: user?.id!,
+          title: sessionTitle || `${selectedBook} ${selectedChapter} Study - ${new Date().toLocaleDateString()}`,
+          description: notes.substring(0, 200),
+          jeeves_context: JSON.parse(JSON.stringify({ book: selectedBook, chapter: selectedChapter, notes })),
+          tabs_data: JSON.parse(JSON.stringify([])),
+          has_jeeves_history: jeevesMessages.length > 0,
+        }]).select().single();
+
+        if (error) throw error;
+        
+        // Save Jeeves messages to new session
+        if (newSession && jeevesMessages.length > 0) {
+          await saveMessages(jeevesMessages, newSession.id);
+        }
+        
+        setCurrentSessionId(newSession?.id || null);
+        toast.success("Session saved!");
+      }
     } catch (error: any) {
       console.error("Save error:", error);
       toast.error(error.message || "Failed to save session");
     }
   };
 
-  const clearSession = () => {
+  const handleClearSession = async () => {
     setNotes("");
     setSessionTitle("");
     setJeevesMessages([]);
+    if (currentSessionId) {
+      await clearMessages(currentSessionId);
+    }
+    setCurrentSessionId(null);
     toast.success("Session cleared");
   };
 
@@ -264,7 +343,7 @@ ${notes || '(No notes yet)'}
             <Button 
               variant="outline" 
               size="sm" 
-              onClick={clearSession}
+              onClick={handleClearSession}
               className="bg-black/20 border-orange-500/30 text-orange-200 hover:bg-orange-500/20"
             >
               <Trash2 className="w-4 h-4" />
