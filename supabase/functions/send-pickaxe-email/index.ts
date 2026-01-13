@@ -93,7 +93,7 @@ serve(async (req) => {
       const resend = new Resend(RESEND_API_KEY);
       
       const emailResponse = await resend.emails.send({
-        from: "PhotoTheology <noreply@phototheology.app>",
+        from: "PhotoTheology <onboarding@resend.dev>",
         to: [testEmail],
         subject: `[TEST] ${subject}`,
         html: htmlContent,
@@ -166,7 +166,7 @@ serve(async (req) => {
       const promises = batch.map(async (email) => {
         try {
           await resend.emails.send({
-            from: "PhotoTheology <noreply@phototheology.app>",
+            from: "PhotoTheology <onboarding@resend.dev>",
             to: [email],
             subject,
             html: htmlContent,
