@@ -3,7 +3,6 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import { Navigation } from "@/components/Navigation";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
-import { useJeevesMessages, JeevesMessage } from "@/hooks/useJeevesMessages";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
@@ -11,13 +10,13 @@ import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { toast } from "sonner";
 import {
-  Brain, Loader2, Send, Save, Trash2,
-  ChevronLeft, ChevronRight, MessageSquare, StickyNote,
-  Book, Flame, History
+  Brain, Loader2, Save, Trash2,
+  ChevronLeft, ChevronRight, StickyNote,
+  Book, Flame, Lightbulb, BookOpen, Target, Crosshair, Sparkles, Eye
 } from "lucide-react";
 import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from "@/components/ui/resizable";
 import { BIBLE_BOOK_METADATA } from "@/data/bibleBooks";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { fetchChapter } from "@/services/bibleApi";
 import {
   Select,
@@ -26,12 +25,46 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Badge } from "@/components/ui/badge";
+
+// Types for Jeeves analysis
+interface Spark {
+  type: string;
+  insight: string;
+  verses?: string[];
+  room?: string;
+}
+
+interface Source {
+  claim: string;
+  anchor: string;
+  strength: 'strong' | 'moderate' | 'needs_work';
+  suggestion?: string;
+}
+
+interface RoomSuggestion {
+  room: string;
+  roomName: string;
+  floor: string;
+  why: string;
+  exercise?: string;
+}
+
+interface JeevesAnalysis {
+  sparks: Spark[];
+  sources: Source[];
+  roomSuggestions: RoomSuggestion[];
+  christConnection?: { present: boolean; suggestion?: string };
+  cycleAndHeaven?: { cycle?: string; heaven?: string; reasoning?: string };
+  nextStep?: { focus: string; question: string };
+  overallResponse?: string;
+}
 
 export default function StudyBuddy() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const { user, loading: authLoading } = useAuth();
-  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const analysisEndRef = useRef<HTMLDivElement>(null);
 
   // Session state
   const [currentSessionId, setCurrentSessionId] = useState<string | null>(
@@ -47,19 +80,13 @@ export default function StudyBuddy() {
   // Notes panel state
   const [notes, setNotes] = useState("");
   const [sessionTitle, setSessionTitle] = useState("");
+  const lastAnalyzedNotes = useRef("");
+  const analysisTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  // Jeeves with persistence
-  const {
-    messages: jeevesMessages,
-    setMessages: setJeevesMessages,
-    saveMessage,
-    saveMessages,
-    clearMessages,
-    loading: loadingMessages,
-  } = useJeevesMessages({ sessionId: currentSessionId || undefined, autoLoad: !!currentSessionId });
-  
-  const [jeevesInput, setJeevesInput] = useState("");
+  // Jeeves real-time analysis state
   const [jeevesLoading, setJeevesLoading] = useState(false);
+  const [analysis, setAnalysis] = useState<JeevesAnalysis | null>(null);
+  const [analysisHistory, setAnalysisHistory] = useState<string[]>([]);
 
   // Get chapter count for selected book
   const getChapterCount = () => {
@@ -111,10 +138,43 @@ export default function StudyBuddy() {
     loadVerses();
   }, [selectedBook, selectedChapter]);
 
-  // Scroll to bottom of messages
+  // Scroll to bottom of analysis
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [jeevesMessages]);
+    analysisEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [analysis]);
+
+  // Real-time analysis as user types - debounced
+  useEffect(() => {
+    // Clear existing timeout
+    if (analysisTimeoutRef.current) {
+      clearTimeout(analysisTimeoutRef.current);
+    }
+
+    // Don't analyze if notes are too short or haven't changed significantly
+    const trimmedNotes = notes.trim();
+    if (trimmedNotes.length < 30) {
+      return;
+    }
+
+    // Check if notes have changed enough to warrant new analysis
+    const significantChange = Math.abs(trimmedNotes.length - lastAnalyzedNotes.current.length) > 20 ||
+      trimmedNotes.slice(-50) !== lastAnalyzedNotes.current.slice(-50);
+
+    if (!significantChange && analysis) {
+      return;
+    }
+
+    // Debounce the analysis call
+    analysisTimeoutRef.current = setTimeout(() => {
+      analyzeNotes();
+    }, 1500); // 1.5 second debounce
+
+    return () => {
+      if (analysisTimeoutRef.current) {
+        clearTimeout(analysisTimeoutRef.current);
+      }
+    };
+  }, [notes, selectedBook, selectedChapter, verses]);
 
   const loadVerses = async () => {
     setLoadingVerses(true);
@@ -128,6 +188,42 @@ export default function StudyBuddy() {
       setLoadingVerses(false);
     }
   };
+
+  const analyzeNotes = useCallback(async () => {
+    const trimmedNotes = notes.trim();
+    if (trimmedNotes.length < 30 || jeevesLoading) return;
+
+    setJeevesLoading(true);
+    lastAnalyzedNotes.current = trimmedNotes;
+
+    try {
+      // Build context from notes and current Bible passage
+      const context = `
+Current Bible Passage: ${selectedBook} ${selectedChapter}
+${verses.length > 0 ? `Passage Text:\n${verses.map(v => `${v.verse}. ${v.text}`).join('\n')}` : ''}
+      `.trim();
+
+      const { data, error } = await supabase.functions.invoke("study-buddy", {
+        body: {
+          notes: trimmedNotes,
+          context,
+          sessionHistory: analysisHistory.slice(-5), // Last 5 notes for context
+        },
+      });
+
+      if (error) throw error;
+
+      if (data.analysis) {
+        setAnalysis(data.analysis);
+        // Add to history for context
+        setAnalysisHistory(prev => [...prev.slice(-10), trimmedNotes]);
+      }
+    } catch (error: any) {
+      console.error("Jeeves analysis error:", error);
+    } finally {
+      setJeevesLoading(false);
+    }
+  }, [notes, selectedBook, selectedChapter, verses, analysisHistory, jeevesLoading]);
 
   const navigateChapter = (direction: 'prev' | 'next') => {
     if (direction === 'prev') {
@@ -161,60 +257,9 @@ export default function StudyBuddy() {
     toast.success(`Added ${reference} to notes`);
   };
 
-  const sendToJeeves = async () => {
-    if (!jeevesInput.trim()) return;
-
-    const userMessage = jeevesInput.trim();
-    setJeevesInput("");
-    
-    // Add user message locally first (optimistic update)
-    const userMsg: JeevesMessage = { role: 'user', content: userMessage };
-    setJeevesMessages(prev => [...prev, userMsg]);
-    setJeevesLoading(true);
-
-    try {
-      // Build context from notes and current Bible passage
-      const context = `
-Current Bible Passage: ${selectedBook} ${selectedChapter}
-${verses.length > 0 ? `Passage Text:\n${verses.map(v => `${v.verse}. ${v.text}`).join('\n')}` : ''}
-
-User's Study Notes:
-${notes || '(No notes yet)'}
-      `.trim();
-
-      const { data, error } = await supabase.functions.invoke("study-buddy", {
-        body: {
-          notes: userMessage,
-          context,
-          mode: 'chat',
-          sessionHistory: jeevesMessages.map(m => `${m.role}: ${m.content}`),
-        },
-      });
-
-      if (error) throw error;
-
-      const response = data.analysis?.overallResponse || data.analysis?.overallAssessment || data.response || "I'm here to help with your Bible study. What would you like to explore?";
-      const assistantMsg: JeevesMessage = { role: 'assistant', content: response };
-      setJeevesMessages(prev => [...prev, assistantMsg]);
-      
-      // Save both messages if we have a session
-      if (currentSessionId) {
-        await saveMessages([userMsg, assistantMsg], currentSessionId);
-      }
-    } catch (error: any) {
-      console.error("Jeeves error:", error);
-      setJeevesMessages(prev => [...prev, { 
-        role: 'assistant', 
-        content: "I apologize, I encountered an error. Please try again." 
-      }]);
-    } finally {
-      setJeevesLoading(false);
-    }
-  };
-
   const saveSession = async () => {
-    if (!notes.trim() && jeevesMessages.length === 0) {
-      toast.error("No notes or conversation to save");
+    if (!notes.trim()) {
+      toast.error("No notes to save");
       return;
     }
 
@@ -225,8 +270,8 @@ ${notes || '(No notes yet)'}
         const { error } = await supabase.from("study_sessions").update({
           title: sessionTitle || `${selectedBook} ${selectedChapter} Study - ${new Date().toLocaleDateString()}`,
           description: notes.substring(0, 200),
-          jeeves_context: JSON.parse(JSON.stringify({ book: selectedBook, chapter: selectedChapter, notes })),
-          has_jeeves_history: jeevesMessages.length > 0,
+          jeeves_context: JSON.parse(JSON.stringify({ book: selectedBook, chapter: selectedChapter, notes, analysis })),
+          has_jeeves_history: !!analysis,
         }).eq("id", currentSessionId);
 
         if (error) throw error;
@@ -237,17 +282,12 @@ ${notes || '(No notes yet)'}
           user_id: user?.id!,
           title: sessionTitle || `${selectedBook} ${selectedChapter} Study - ${new Date().toLocaleDateString()}`,
           description: notes.substring(0, 200),
-          jeeves_context: JSON.parse(JSON.stringify({ book: selectedBook, chapter: selectedChapter, notes })),
+          jeeves_context: JSON.parse(JSON.stringify({ book: selectedBook, chapter: selectedChapter, notes, analysis })),
           tabs_data: JSON.parse(JSON.stringify([])),
-          has_jeeves_history: jeevesMessages.length > 0,
+          has_jeeves_history: !!analysis,
         }]).select().single();
 
         if (error) throw error;
-        
-        // Save Jeeves messages to new session
-        if (newSession && jeevesMessages.length > 0) {
-          await saveMessages(jeevesMessages, newSession.id);
-        }
         
         setCurrentSessionId(newSession?.id || null);
         toast.success("Session saved!");
@@ -261,10 +301,9 @@ ${notes || '(No notes yet)'}
   const handleClearSession = async () => {
     setNotes("");
     setSessionTitle("");
-    setJeevesMessages([]);
-    if (currentSessionId) {
-      await clearMessages(currentSessionId);
-    }
+    setAnalysis(null);
+    setAnalysisHistory([]);
+    lastAnalyzedNotes.current = "";
     setCurrentSessionId(null);
     toast.success("Session cleared");
   };
@@ -476,76 +515,285 @@ Jeeves sees your notes and will spark connections, suggest PT rooms, source clai
 
           <ResizableHandle withHandle className="bg-emerald-500/20 hover:bg-emerald-500/40 transition-colors" />
 
-          {/* Jeeves Panel - Purple/Violet Theme */}
+          {/* Jeeves Panel - Purple/Violet Theme - Real-time Analysis */}
           <ResizablePanel defaultSize={30} minSize={20}>
             <Card className="h-full flex flex-col bg-violet-950/40 border-violet-500/20 backdrop-blur-xl rounded-none rounded-r-xl border-l-0">
               <div className="p-4 border-b border-violet-500/20 flex-shrink-0">
-                <div className="flex items-center gap-2">
-                  <MessageSquare className="w-5 h-5 text-violet-400" />
-                  <span className="font-bold text-white">Jeeves</span>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <Brain className="w-5 h-5 text-violet-400" />
+                    <span className="font-bold text-white">Jeeves</span>
+                  </div>
+                  {jeevesLoading && (
+                    <div className="flex items-center gap-2 text-violet-300">
+                      <Eye className="w-4 h-4 animate-pulse" />
+                      <span className="text-xs">Reading...</span>
+                    </div>
+                  )}
                 </div>
-                <p className="text-xs text-violet-200/60 mt-1">Your Phototheology study assistant</p>
+                <p className="text-xs text-violet-200/60 mt-1">
+                  {notes.trim().length < 30 
+                    ? "Start typing in Notes — Jeeves will respond as you write"
+                    : "Watching your notes and sparking connections..."}
+                </p>
               </div>
 
-              {/* Messages */}
-              <ScrollArea className="flex-1 p-4">
-                <div className="space-y-3">
-                  {jeevesMessages.length === 0 ? (
+              {/* Real-time Analysis Display */}
+              <ScrollArea className="flex-1">
+                <div className="p-4 space-y-4">
+                  {!analysis && !jeevesLoading && notes.trim().length < 30 ? (
                     <div className="text-center py-8">
                       <Brain className="w-12 h-12 text-violet-500/30 mx-auto mb-3" />
                       <p className="text-sm text-violet-200/60">
-                        Ask Jeeves about your study passage or notes
+                        Jeeves is watching your notes
                       </p>
                       <p className="text-xs text-violet-200/40 mt-2">
-                        He sees your current passage and notes
+                        Start typing and he'll spark connections, suggest rooms, and apply PT principles automatically
                       </p>
                     </div>
                   ) : (
-                    jeevesMessages.map((msg, idx) => (
-                      <motion.div
-                        key={idx}
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        className={`p-3 rounded-lg text-sm ${
-                          msg.role === 'user'
-                            ? 'bg-violet-500/20 border border-violet-500/30 ml-4 text-violet-100'
-                            : 'bg-purple-500/10 border border-purple-500/20 mr-4 text-purple-100'
-                        }`}
-                      >
-                        <p className="whitespace-pre-wrap">{msg.content}</p>
-                      </motion.div>
-                    ))
+                    <AnimatePresence mode="wait">
+                      {/* Overall Response */}
+                      {analysis?.overallResponse && (
+                        <motion.div
+                          key="response"
+                          initial={{ opacity: 0, y: 10 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          exit={{ opacity: 0 }}
+                          className="p-3 rounded-lg bg-violet-500/10 border border-violet-500/20 text-sm text-violet-100"
+                        >
+                          <p className="whitespace-pre-wrap">{analysis.overallResponse}</p>
+                        </motion.div>
+                      )}
+
+                      {/* Sparks */}
+                      {analysis?.sparks && analysis.sparks.length > 0 && (
+                        <motion.div
+                          key="sparks"
+                          initial={{ opacity: 0, y: 10 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          className="space-y-2"
+                        >
+                          <div className="flex items-center gap-2 text-amber-400">
+                            <Lightbulb className="w-4 h-4" />
+                            <span className="text-xs font-semibold uppercase tracking-wider">Sparks</span>
+                          </div>
+                          {analysis.sparks.map((spark, idx) => (
+                            <motion.div
+                              key={idx}
+                              initial={{ opacity: 0, x: -10 }}
+                              animate={{ opacity: 1, x: 0 }}
+                              transition={{ delay: idx * 0.1 }}
+                              className="p-3 rounded-lg bg-amber-500/10 border border-amber-500/20"
+                            >
+                              <div className="flex items-start gap-2">
+                                <Sparkles className="w-4 h-4 text-amber-400 mt-0.5 flex-shrink-0" />
+                                <div className="flex-1">
+                                  <div className="flex items-center gap-2 mb-1">
+                                    <Badge variant="outline" className="text-[10px] border-amber-500/30 text-amber-300">
+                                      {spark.type}
+                                    </Badge>
+                                    {spark.room && (
+                                      <Badge variant="outline" className="text-[10px] border-violet-500/30 text-violet-300">
+                                        {spark.room}
+                                      </Badge>
+                                    )}
+                                  </div>
+                                  <p className="text-sm text-amber-100">{spark.insight}</p>
+                                  {spark.verses && spark.verses.length > 0 && (
+                                    <p className="text-xs text-amber-200/60 mt-1">
+                                      {spark.verses.join(", ")}
+                                    </p>
+                                  )}
+                                </div>
+                              </div>
+                            </motion.div>
+                          ))}
+                        </motion.div>
+                      )}
+
+                      {/* Sources */}
+                      {analysis?.sources && analysis.sources.length > 0 && (
+                        <motion.div
+                          key="sources"
+                          initial={{ opacity: 0, y: 10 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          className="space-y-2"
+                        >
+                          <div className="flex items-center gap-2 text-blue-400">
+                            <BookOpen className="w-4 h-4" />
+                            <span className="text-xs font-semibold uppercase tracking-wider">Sources</span>
+                          </div>
+                          {analysis.sources.map((source, idx) => (
+                            <motion.div
+                              key={idx}
+                              initial={{ opacity: 0, x: -10 }}
+                              animate={{ opacity: 1, x: 0 }}
+                              transition={{ delay: idx * 0.1 }}
+                              className="p-3 rounded-lg bg-blue-500/10 border border-blue-500/20"
+                            >
+                              <div className="flex items-center gap-2 mb-1">
+                                <Badge 
+                                  variant="outline" 
+                                  className={`text-[10px] ${
+                                    source.strength === 'strong' 
+                                      ? 'border-green-500/30 text-green-300'
+                                      : source.strength === 'moderate'
+                                      ? 'border-yellow-500/30 text-yellow-300'
+                                      : 'border-red-500/30 text-red-300'
+                                  }`}
+                                >
+                                  {source.strength}
+                                </Badge>
+                              </div>
+                              <p className="text-sm text-blue-100">"{source.claim}"</p>
+                              <p className="text-xs text-blue-200/60 mt-1">
+                                Anchor: {source.anchor}
+                              </p>
+                              {source.suggestion && (
+                                <p className="text-xs text-blue-300 mt-1 italic">
+                                  💡 {source.suggestion}
+                                </p>
+                              )}
+                            </motion.div>
+                          ))}
+                        </motion.div>
+                      )}
+
+                      {/* Room Suggestions */}
+                      {analysis?.roomSuggestions && analysis.roomSuggestions.length > 0 && (
+                        <motion.div
+                          key="rooms"
+                          initial={{ opacity: 0, y: 10 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          className="space-y-2"
+                        >
+                          <div className="flex items-center gap-2 text-emerald-400">
+                            <Target className="w-4 h-4" />
+                            <span className="text-xs font-semibold uppercase tracking-wider">PT Rooms</span>
+                          </div>
+                          {analysis.roomSuggestions.map((room, idx) => (
+                            <motion.div
+                              key={idx}
+                              initial={{ opacity: 0, x: -10 }}
+                              animate={{ opacity: 1, x: 0 }}
+                              transition={{ delay: idx * 0.1 }}
+                              className="p-3 rounded-lg bg-emerald-500/10 border border-emerald-500/20"
+                            >
+                              <div className="flex items-center gap-2 mb-1">
+                                <Badge variant="outline" className="text-[10px] border-emerald-500/30 text-emerald-300">
+                                  {room.room}
+                                </Badge>
+                                <span className="text-xs text-emerald-200/60">{room.floor}</span>
+                              </div>
+                              <p className="text-sm font-medium text-emerald-100">{room.roomName}</p>
+                              <p className="text-xs text-emerald-200/80 mt-1">{room.why}</p>
+                              {room.exercise && (
+                                <p className="text-xs text-emerald-300 mt-2 p-2 bg-emerald-500/10 rounded">
+                                  Try: {room.exercise}
+                                </p>
+                              )}
+                            </motion.div>
+                          ))}
+                        </motion.div>
+                      )}
+
+                      {/* Christ Connection */}
+                      {analysis?.christConnection && (
+                        <motion.div
+                          key="christ"
+                          initial={{ opacity: 0, y: 10 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          className="p-3 rounded-lg bg-rose-500/10 border border-rose-500/20"
+                        >
+                          <div className="flex items-center gap-2 mb-2">
+                            <Crosshair className="w-4 h-4 text-rose-400" />
+                            <span className="text-xs font-semibold uppercase tracking-wider text-rose-400">
+                              Christ Connection
+                            </span>
+                            <Badge 
+                              variant="outline" 
+                              className={`text-[10px] ${
+                                analysis.christConnection.present 
+                                  ? 'border-green-500/30 text-green-300'
+                                  : 'border-orange-500/30 text-orange-300'
+                              }`}
+                            >
+                              {analysis.christConnection.present ? 'Found' : 'Needs Focus'}
+                            </Badge>
+                          </div>
+                          {analysis.christConnection.suggestion && (
+                            <p className="text-sm text-rose-100">{analysis.christConnection.suggestion}</p>
+                          )}
+                        </motion.div>
+                      )}
+
+                      {/* Cycle & Heaven */}
+                      {analysis?.cycleAndHeaven && (analysis.cycleAndHeaven.cycle || analysis.cycleAndHeaven.heaven) && (
+                        <motion.div
+                          key="cycle"
+                          initial={{ opacity: 0, y: 10 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          className="p-3 rounded-lg bg-purple-500/10 border border-purple-500/20"
+                        >
+                          <div className="flex items-center gap-2 mb-2">
+                            <span className="text-xs font-semibold uppercase tracking-wider text-purple-400">
+                              Cycle & Heaven
+                            </span>
+                          </div>
+                          <div className="flex gap-2 mb-2">
+                            {analysis.cycleAndHeaven.cycle && (
+                              <Badge variant="outline" className="text-[10px] border-purple-500/30 text-purple-300">
+                                {analysis.cycleAndHeaven.cycle}
+                              </Badge>
+                            )}
+                            {analysis.cycleAndHeaven.heaven && (
+                              <Badge variant="outline" className="text-[10px] border-indigo-500/30 text-indigo-300">
+                                {analysis.cycleAndHeaven.heaven}
+                              </Badge>
+                            )}
+                          </div>
+                          {analysis.cycleAndHeaven.reasoning && (
+                            <p className="text-sm text-purple-100">{analysis.cycleAndHeaven.reasoning}</p>
+                          )}
+                        </motion.div>
+                      )}
+
+                      {/* Next Step */}
+                      {analysis?.nextStep && (
+                        <motion.div
+                          key="next"
+                          initial={{ opacity: 0, y: 10 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          className="p-3 rounded-lg bg-gradient-to-br from-violet-500/20 to-purple-500/20 border border-violet-500/30"
+                        >
+                          <div className="flex items-center gap-2 mb-2">
+                            <span className="text-xs font-semibold uppercase tracking-wider text-violet-300">
+                              Next Step
+                            </span>
+                          </div>
+                          <p className="text-sm font-medium text-violet-100">{analysis.nextStep.focus}</p>
+                          <p className="text-sm text-violet-200 mt-2 italic">
+                            "{analysis.nextStep.question}"
+                          </p>
+                        </motion.div>
+                      )}
+
+                      {jeevesLoading && (
+                        <motion.div
+                          initial={{ opacity: 0 }}
+                          animate={{ opacity: 1 }}
+                          className="flex items-center gap-2 text-violet-200/60 p-3"
+                        >
+                          <Loader2 className="w-4 h-4 animate-spin" />
+                          <span className="text-sm">Jeeves is analyzing...</span>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
                   )}
-                  {jeevesLoading && (
-                    <div className="flex items-center gap-2 text-violet-200/60 p-3">
-                      <Loader2 className="w-4 h-4 animate-spin" />
-                      <span className="text-sm">Jeeves is thinking...</span>
-                    </div>
-                  )}
-                  <div ref={messagesEndRef} />
+                  <div ref={analysisEndRef} />
                 </div>
               </ScrollArea>
-
-              {/* Input */}
-              <div className="p-4 border-t border-violet-500/20 flex-shrink-0">
-                <div className="flex gap-2">
-                  <Input
-                    value={jeevesInput}
-                    onChange={(e) => setJeevesInput(e.target.value)}
-                    onKeyDown={(e) => e.key === 'Enter' && !e.shiftKey && sendToJeeves()}
-                    placeholder="Ask Jeeves..."
-                    className="flex-1 bg-black/30 border-violet-500/30 text-white placeholder:text-violet-200/50"
-                    disabled={jeevesLoading}
-                  />
-                  <Button
-                    onClick={sendToJeeves}
-                    disabled={jeevesLoading || !jeevesInput.trim()}
-                    className="bg-violet-500 hover:bg-violet-600 text-white"
-                  >
-                    <Send className="w-4 h-4" />
-                  </Button>
-                </div>
-              </div>
             </Card>
           </ResizablePanel>
         </ResizablePanelGroup>

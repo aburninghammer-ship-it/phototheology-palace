@@ -103,6 +103,7 @@ GUARDRAILS
 
 interface StudyBuddyRequest {
   notes: string;
+  context?: string;
   mode?: 'observation' | 'pattern' | 'sanctuary' | 'christological' | 'application' | null;
   sessionHistory?: string[];
   requestCompression?: boolean;
@@ -120,7 +121,7 @@ serve(async (req) => {
       throw new Error("ANTHROPIC_API_KEY not configured");
     }
 
-    const { notes, mode, sessionHistory, requestCompression, userCompression }: StudyBuddyRequest = await req.json();
+    const { notes, context, mode, sessionHistory, requestCompression, userCompression }: StudyBuddyRequest = await req.json();
 
     if (!notes || notes.trim().length < 10) {
       throw new Error("Please provide study notes (at least 10 characters)");
@@ -128,15 +129,21 @@ serve(async (req) => {
 
     const client = new Anthropic({ apiKey: anthropicApiKey });
 
-    // Build the user message
-    let userMessage = `STUDY NOTES:\n\`\`\`\n${notes}\n\`\`\``;
+    // Build the user message with context
+    let userMessage = "";
+    
+    if (context) {
+      userMessage += `BIBLE CONTEXT:\n${context}\n\n`;
+    }
+    
+    userMessage += `USER'S STUDY NOTES:\n\`\`\`\n${notes}\n\`\`\``;
 
     if (mode) {
       userMessage += `\n\nACTIVE MODE: ${mode.toUpperCase()}\nEnforce this mode strictly. Flag any violations.`;
     }
 
     if (sessionHistory && sessionHistory.length > 0) {
-      userMessage += `\n\nSESSION HISTORY (previous notes in this session):\n${sessionHistory.join('\n---\n')}`;
+      userMessage += `\n\nPREVIOUS NOTES IN THIS SESSION (for context):\n${sessionHistory.join('\n---\n')}`;
     }
 
     if (requestCompression) {
@@ -147,7 +154,7 @@ serve(async (req) => {
       userMessage += `\n\nUSER'S COMPRESSION ATTEMPT: "${userCompression}"\nEvaluate this compression for completeness.`;
     }
 
-    userMessage += `\n\nHelp me study this Phototheologically. Spark connections, suggest PT rooms, source my claims, and help me see Christ. Return valid JSON only.`;
+    userMessage += `\n\nAnalyze these notes Phototheologically. SPARK connections they haven't seen. SOURCE their claims with verse anchors. SUGGEST specific PT rooms that apply. APPLY Christ-centered interpretation. Return valid JSON only.`;
 
     const response = await client.messages.create({
       model: "claude-sonnet-4-20250514",
