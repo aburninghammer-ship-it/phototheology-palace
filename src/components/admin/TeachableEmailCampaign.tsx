@@ -17,8 +17,8 @@ const FILTER_DESCRIPTIONS: Record<TeachableFilter, string> = {
   all: "All Teachable students",
   active: "Only active Teachable students",
   inactive: "Inactive Teachable students",
-  linked: "Students already linked to app accounts",
-  unlinked: "Students NOT yet linked to app accounts",
+  linked: "Current Phototheology students (Premium Access)",
+  unlinked: "Non-students (7-Day Free Trial)",
   premium_paying: "Students paying $15+ per month (premium access)",
   not_paying: "Students not currently paying anything",
 };
@@ -259,76 +259,106 @@ export function TeachableEmailCampaign() {
           <CardDescription>Click to use a template</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          {/* Payment-Based Campaign Templates */}
+          {/* Student-Based Campaign Templates */}
           <div className="space-y-2">
             <h4 className="text-sm font-semibold text-orange-600 flex items-center gap-2">
-              💰 Payment-Based Campaigns
+              🎓 Student-Based Campaigns
             </h4>
             
             <Button
               variant="outline"
               className="w-full justify-start border-green-500/30 hover:bg-green-500/10"
               onClick={() => {
-                setFilter("premium_paying");
-                setSubject("🌟 Your Premium Access to the PhotoTheology Suite is Ready!");
-                setContent(`<h1>Congratulations, Premium Member!</h1>
-<p>Hi there,</p>
-<p>As a valued subscriber paying $15+/month, you now have <strong>full premium access</strong> to the PhotoTheology Suite!</p>
-
-<h2>🎁 What You Get:</h2>
-<ul>
-  <li>✅ Unlimited access to all 8 Floors of the Palace</li>
-  <li>✅ Unlimited Jeeves AI conversations</li>
-  <li>✅ All challenge types unlocked</li>
-  <li>✅ Sermon prep tools & study generators</li>
-  <li>✅ Premium community features</li>
-  <li>✅ Priority support</li>
-</ul>
-
-<h2>🚀 Get Started:</h2>
-<p><a href="https://phototheology.app" style="background-color: #f97316; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; display: inline-block;">Access Your Premium Account</a></p>
-
-<p>Simply sign in with the email you use on Teachable, and your premium access will be automatically activated.</p>
-
-<p>Thank you for your support!</p>
-<p>Blessings,<br/><strong>The PhotoTheology Team</strong></p>`);
+                setFilter("linked");
+                setSubject("Your Premium App Access is Ready! 🏰");
+                setContent(`<div style="font-family: Georgia, serif; max-width: 600px; margin: 0 auto; padding: 20px; background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); color: #e8e8e8;">
+  <div style="text-align: center; padding: 30px 0; border-bottom: 2px solid #d4af37;">
+    <h1 style="color: #d4af37; font-size: 28px; margin: 0;">Welcome to the Palace</h1>
+    <p style="color: #a0a0a0; font-style: italic; margin-top: 10px;">Your Premium Access Awaits</p>
+  </div>
+  
+  <div style="padding: 30px 20px;">
+    <p style="font-size: 18px; line-height: 1.8; color: #e8e8e8;">Dear Fellow Student of the Word,</p>
+    
+    <p style="font-size: 16px; line-height: 1.8; color: #c0c0c0;">As a current Phototheology student, you've already begun your journey through the Palace of Scripture. Now, we're excited to offer you something extraordinary—<strong style="color: #d4af37;">premium access to the Phototheology App</strong>.</p>
+    
+    <p style="font-size: 16px; line-height: 1.8; color: #c0c0c0;">This isn't just another Bible app. It's the <em>living architecture</em> of Phototheology—the 8 Floors, the Rooms, the Cycles and Heavens—all at your fingertips, designed to help you:</p>
+    
+    <ul style="font-size: 16px; line-height: 2; color: #c0c0c0; padding-left: 20px;">
+      <li>🏛️ Navigate the Palace system with guided exercises</li>
+      <li>📖 Study Scripture with Jeeves, your AI companion trained in PT principles</li>
+      <li>🔥 Build daily streaks and track your mastery journey</li>
+      <li>💎 Store and organize your Gems from every study session</li>
+      <li>👥 Connect with fellow Palace explorers in the community</li>
+    </ul>
+    
+    <div style="text-align: center; padding: 30px 0;">
+      <a href="https://phototheology.app" style="display: inline-block; background: linear-gradient(135deg, #d4af37 0%, #b8860b 100%); color: #1a1a2e; padding: 16px 40px; text-decoration: none; font-weight: bold; font-size: 18px; border-radius: 8px; box-shadow: 0 4px 15px rgba(212, 175, 55, 0.3);">Enter the Palace →</a>
+    </div>
+    
+    <p style="font-size: 16px; line-height: 1.8; color: #c0c0c0;">Simply log in with the same email you use for your Teachable account, and your premium access will be automatically activated.</p>
+    
+    <p style="font-size: 16px; line-height: 1.8; color: #c0c0c0;">The Palace awaits. Every chapter, every verse, every Christ-connection—stored, structured, and ready for discovery.</p>
+    
+    <p style="font-size: 16px; line-height: 1.8; color: #e8e8e8; margin-top: 30px;">In Christ,<br><strong style="color: #d4af37;">The Phototheology Team</strong></p>
+  </div>
+  
+  <div style="text-align: center; padding: 20px; border-top: 1px solid #333; color: #666; font-size: 12px;">
+    <p>You're receiving this because you're enrolled in Phototheology courses.</p>
+  </div>
+</div>`);
               }}
             >
-              💎 Premium Access Announcement ($15+)
+              💎 Premium Access (Current Students)
             </Button>
 
             <Button
               variant="outline"
               className="w-full justify-start border-blue-500/30 hover:bg-blue-500/10"
               onClick={() => {
-                setFilter("not_paying");
-                setSubject("🎁 Try PhotoTheology Premium FREE for 7 Days!");
-                setContent(`<h1>Start Your Free 7-Day Premium Trial!</h1>
-<p>Hi there,</p>
-<p>We noticed you're part of our Teachable community but haven't experienced the full power of the PhotoTheology Suite yet.</p>
-
-<h2>🆓 Get 7 Days FREE:</h2>
-<p>We'd love to give you a chance to experience premium features with <strong>no commitment</strong>.</p>
-
-<h2>What's Included in Your Trial:</h2>
-<ul>
-  <li>🏰 Full access to all 8 Floors of the Palace</li>
-  <li>🤖 Unlimited AI conversations with Jeeves</li>
-  <li>📖 Sermon prep & Bible study generators</li>
-  <li>🏆 All challenge types</li>
-  <li>👥 Premium community features</li>
-</ul>
-
-<h2>🚀 Start Your Free Trial:</h2>
-<p><a href="https://phototheology.app/pricing" style="background-color: #3b82f6; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; display: inline-block;">Claim Your 7-Day Free Trial</a></p>
-
-<p><em>No credit card required to start. Cancel anytime.</em></p>
-
-<p>Experience the Bible like never before!</p>
-<p>Blessings,<br/><strong>The PhotoTheology Team</strong></p>`);
+                setFilter("unlinked");
+                setSubject("Discover the Palace: 7 Days Free 🏰");
+                setContent(`<div style="font-family: Georgia, serif; max-width: 600px; margin: 0 auto; padding: 20px; background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); color: #e8e8e8;">
+  <div style="text-align: center; padding: 30px 0; border-bottom: 2px solid #d4af37;">
+    <h1 style="color: #d4af37; font-size: 28px; margin: 0;">What If You Could See Christ in Every Chapter?</h1>
+    <p style="color: #a0a0a0; font-style: italic; margin-top: 10px;">The Palace Method Awaits</p>
+  </div>
+  
+  <div style="padding: 30px 20px;">
+    <p style="font-size: 18px; line-height: 1.8; color: #e8e8e8;">Dear Friend,</p>
+    
+    <p style="font-size: 16px; line-height: 1.8; color: #c0c0c0;">You've heard about Phototheology. Maybe you've watched a video or seen a post. But you haven't yet stepped inside the Palace.</p>
+    
+    <p style="font-size: 16px; line-height: 1.8; color: #c0c0c0;">The <strong style="color: #d4af37;">Phototheology App</strong> isn't just another devotional tool. It's a complete system for Bible study—8 Floors, dozens of Rooms, and a method that transforms how you read, remember, and live Scripture.</p>
+    
+    <p style="font-size: 16px; line-height: 1.8; color: #c0c0c0;">For the next <strong style="color: #d4af37;">7 days</strong>, you can explore it all—completely free:</p>
+    
+    <ul style="font-size: 16px; line-height: 2; color: #c0c0c0; padding-left: 20px;">
+      <li>🏛️ Walk through the Palace floors and discover each Room</li>
+      <li>🤖 Meet Jeeves—your AI study companion trained in Phototheology</li>
+      <li>📖 Experience the KJV Bible with built-in commentary and audio</li>
+      <li>🔥 Start building your daily study streak</li>
+      <li>💎 Begin collecting Gems—insights you'll never forget</li>
+    </ul>
+    
+    <div style="text-align: center; padding: 30px 0;">
+      <a href="https://phototheology.app" style="display: inline-block; background: linear-gradient(135deg, #d4af37 0%, #b8860b 100%); color: #1a1a2e; padding: 16px 40px; text-decoration: none; font-weight: bold; font-size: 18px; border-radius: 8px; box-shadow: 0 4px 15px rgba(212, 175, 55, 0.3);">Start Your Free Trial →</a>
+    </div>
+    
+    <p style="font-size: 16px; line-height: 1.8; color: #c0c0c0;">No credit card required. No commitment. Just 7 days to see if the Palace is where you belong.</p>
+    
+    <p style="font-size: 16px; line-height: 1.8; color: #a0a0a0; font-style: italic;">"The Bible is not only a book of words; it is a book of images, symbols, and living stories."</p>
+    
+    <p style="font-size: 16px; line-height: 1.8; color: #e8e8e8; margin-top: 30px;">Ready to begin?<br><strong style="color: #d4af37;">The Phototheology Team</strong></p>
+  </div>
+  
+  <div style="text-align: center; padding: 20px; border-top: 1px solid #333; color: #666; font-size: 12px;">
+    <p>You're receiving this because you signed up at Phototheology.</p>
+  </div>
+</div>`);
               }}
             >
-              🆓 7-Day Free Trial Offer (Not Paying)
+              🆓 7-Day Free Trial (Non-Students)
             </Button>
           </div>
 
