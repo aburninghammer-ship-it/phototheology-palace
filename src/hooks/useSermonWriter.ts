@@ -112,7 +112,10 @@ export function useSermonWriter(sessionId?: string) {
         .eq("id", sessionId)
         .single();
       if (error) throw error;
-      return data as SermonWriterSession;
+      return {
+        ...data,
+        outline_data: data.outline_data as unknown as SermonOutline,
+      } as SermonWriterSession;
     },
     enabled: !!sessionId,
   });
@@ -136,7 +139,10 @@ export function useSermonWriter(sessionId?: string) {
         .eq("user_id", user.id)
         .order("updated_at", { ascending: false });
       if (error) throw error;
-      return data as SermonWriterSession[];
+      return (data || []).map(session => ({
+        ...session,
+        outline_data: session.outline_data as unknown as SermonOutline,
+      })) as SermonWriterSession[];
     },
   });
 
@@ -157,7 +163,13 @@ export function useSermonWriter(sessionId?: string) {
         .eq("session_id", sessionId)
         .order("created_at", { ascending: false });
       if (error) throw error;
-      return data as SermonWriterSpark[];
+      return (data || []).map(spark => ({
+        ...spark,
+        claim_ladder: spark.claim_ladder as unknown as import("@/types/sermonWriter").ClaimLadder | undefined,
+        evidence: spark.evidence as unknown as import("@/types/sermonWriter").EvidenceList | undefined,
+        counterpoints: spark.counterpoints as unknown as import("@/types/sermonWriter").CounterpointList | undefined,
+        pt_mapping: spark.pt_mapping as unknown as import("@/types/sermonWriter").PTMapping | undefined,
+      })) as SermonWriterSpark[];
     },
     enabled: !!sessionId,
   });
@@ -179,7 +191,11 @@ export function useSermonWriter(sessionId?: string) {
         .eq("session_id", sessionId)
         .order("version_number", { ascending: false });
       if (error) throw error;
-      return data as SermonWriterVersion[];
+      return (data || []).map(version => ({
+        ...version,
+        outline_snapshot: version.outline_snapshot as unknown as SermonOutline,
+        sparks_snapshot: version.sparks_snapshot as unknown as SermonWriterSpark[],
+      })) as SermonWriterVersion[];
     },
     enabled: !!sessionId,
   });
@@ -201,7 +217,12 @@ export function useSermonWriter(sessionId?: string) {
         .eq("session_id", sessionId)
         .order("created_at", { ascending: false });
       if (error) throw error;
-      return data as PolishSnapshot[];
+      return (data || []).map(snapshot => ({
+        ...snapshot,
+        outline_before: snapshot.outline_before as unknown as SermonOutline,
+        outline_after: snapshot.outline_after as unknown as SermonOutline | undefined,
+        validation: snapshot.validation as unknown as import("@/types/sermonWriter").PolishValidation,
+      })) as PolishSnapshot[];
     },
     enabled: !!sessionId,
   });
@@ -233,13 +254,16 @@ export function useSermonWriter(sessionId?: string) {
           theme_passage: input.theme_passage,
           title: input.title,
           outline_template: template,
-          outline_data: initialOutline,
+          outline_data: initialOutline as unknown as import("@/integrations/supabase/types").Json,
         })
         .select()
         .single();
 
       if (error) throw error;
-      return data as SermonWriterSession;
+      return {
+        ...data,
+        outline_data: data.outline_data as unknown as SermonOutline,
+      } as SermonWriterSession;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["sermon-writer-sessions"] });
@@ -257,9 +281,15 @@ export function useSermonWriter(sessionId?: string) {
     mutationFn: async (updates: Partial<SermonWriterSession>) => {
       if (!sessionId) throw new Error("No session ID");
 
+      // Convert outline_data to Json type if present
+      const dbUpdates: Record<string, unknown> = { ...updates };
+      if (updates.outline_data) {
+        dbUpdates.outline_data = updates.outline_data as unknown as import("@/integrations/supabase/types").Json;
+      }
+
       const { error } = await supabase
         .from("sermon_writer_sessions")
-        .update(updates)
+        .update(dbUpdates)
         .eq("id", sessionId);
 
       if (error) throw error;
@@ -297,7 +327,7 @@ export function useSermonWriter(sessionId?: string) {
 
     const { error } = await supabase
       .from("sermon_writer_sessions")
-      .update({ outline_data: outline })
+      .update({ outline_data: outline as unknown as import("@/integrations/supabase/types").Json })
       .eq("id", sessionId);
 
     if (error) {
@@ -353,17 +383,30 @@ export function useSermonWriter(sessionId?: string) {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error("Not authenticated");
 
+      // Convert complex types to Json
+      const dbSpark = {
+        ...spark,
+        user_id: user.id,
+        claim_ladder: spark.claim_ladder as unknown as import("@/integrations/supabase/types").Json,
+        evidence: spark.evidence as unknown as import("@/integrations/supabase/types").Json,
+        counterpoints: spark.counterpoints as unknown as import("@/integrations/supabase/types").Json,
+        pt_mapping: spark.pt_mapping as unknown as import("@/integrations/supabase/types").Json,
+      };
+
       const { data, error } = await supabase
         .from("sermon_writer_sparks")
-        .insert({
-          ...spark,
-          user_id: user.id,
-        })
+        .insert(dbSpark)
         .select()
         .single();
 
       if (error) throw error;
-      return data as SermonWriterSpark;
+      return {
+        ...data,
+        claim_ladder: data.claim_ladder as unknown as import("@/types/sermonWriter").ClaimLadder | undefined,
+        evidence: data.evidence as unknown as import("@/types/sermonWriter").EvidenceList | undefined,
+        counterpoints: data.counterpoints as unknown as import("@/types/sermonWriter").CounterpointList | undefined,
+        pt_mapping: data.pt_mapping as unknown as import("@/types/sermonWriter").PTMapping | undefined,
+      } as SermonWriterSpark;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["sermon-writer-sparks", sessionId] });
@@ -378,9 +421,24 @@ export function useSermonWriter(sessionId?: string) {
   // =====================================================
   const updateSpark = useMutation({
     mutationFn: async ({ sparkId, updates }: { sparkId: string; updates: Partial<SermonWriterSpark> }) => {
+      // Convert complex types to Json
+      const dbUpdates: Record<string, unknown> = { ...updates };
+      if (updates.claim_ladder) {
+        dbUpdates.claim_ladder = updates.claim_ladder as unknown as import("@/integrations/supabase/types").Json;
+      }
+      if (updates.evidence) {
+        dbUpdates.evidence = updates.evidence as unknown as import("@/integrations/supabase/types").Json;
+      }
+      if (updates.counterpoints) {
+        dbUpdates.counterpoints = updates.counterpoints as unknown as import("@/integrations/supabase/types").Json;
+      }
+      if (updates.pt_mapping) {
+        dbUpdates.pt_mapping = updates.pt_mapping as unknown as import("@/integrations/supabase/types").Json;
+      }
+
       const { error } = await supabase
         .from("sermon_writer_sparks")
-        .update(updates)
+        .update(dbUpdates)
         .eq("id", sparkId);
 
       if (error) throw error;
@@ -478,8 +536,8 @@ export function useSermonWriter(sessionId?: string) {
           session_id: session.id,
           user_id: user.id,
           version_number: currentMaxVersion + 1,
-          outline_snapshot: session.outline_data,
-          sparks_snapshot: sparks || [],
+          outline_snapshot: session.outline_data as unknown as import("@/integrations/supabase/types").Json,
+          sparks_snapshot: (sparks || []) as unknown as import("@/integrations/supabase/types").Json,
           content_snapshot: session.content,
           change_type: changeType,
           change_description: changeDescription,
@@ -496,7 +554,11 @@ export function useSermonWriter(sessionId?: string) {
         .update({ current_version_id: data.id })
         .eq("id", session.id);
 
-      return data as SermonWriterVersion;
+      return {
+        ...data,
+        outline_snapshot: data.outline_snapshot as unknown as SermonOutline,
+        sparks_snapshot: data.sparks_snapshot as unknown as SermonWriterSpark[],
+      } as SermonWriterVersion;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["sermon-writer-versions", sessionId] });
@@ -516,7 +578,7 @@ export function useSermonWriter(sessionId?: string) {
       const { error } = await supabase
         .from("sermon_writer_sessions")
         .update({
-          outline_data: version.outline_snapshot,
+          outline_data: version.outline_snapshot as unknown as import("@/integrations/supabase/types").Json,
           content: version.content_snapshot,
           current_version_id: versionId,
         })
@@ -623,7 +685,7 @@ export function useSermonWriter(sessionId?: string) {
         .from("sermon_writer_sessions")
         .update({
           content: snapshot.content_before,
-          outline_data: snapshot.outline_before,
+          outline_data: snapshot.outline_before as unknown as import("@/integrations/supabase/types").Json,
         })
         .eq("id", sessionId);
 

@@ -298,7 +298,7 @@ export default function SermonWriter() {
       try {
         await createSpark.mutateAsync({
           session_id: session.id,
-          spark_type: spark.spark_type || 'insight',
+          spark_type: spark.spark_type || 'connection',
           kind: spark.kind || 'insight',
           title: spark.title || 'Untitled Spark',
           summary: spark.summary || '',
@@ -309,6 +309,7 @@ export default function SermonWriter() {
           claim_ladder: spark.claim_ladder,
           evidence: spark.evidence,
           counterpoints: spark.counterpoints,
+          status: 'active',
         });
       } catch (error) {
         console.error("Failed to create spark:", error);

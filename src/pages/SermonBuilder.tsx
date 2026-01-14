@@ -120,7 +120,9 @@ export default function SermonBuilder() {
   const [gemsDialogOpen, setGemsDialogOpen] = useState(false);
   const [scriptureArmory, setScriptureArmory] = useState<Record<number, ArmoryVerse[]>>({});
 
-  // Sparks for sermon building insights
+  // Sparks for sermon building insights - use unique context per session
+  // Generate a stable unique ID for new sermons based on timestamp to prevent gem mixing
+  const [newSermonContextId] = useState(() => `new-sermon-${Date.now()}`);
   const {
     sparks,
     generateSpark,
@@ -131,7 +133,7 @@ export default function SermonBuilder() {
   } = useSparks({
     surface: 'study',
     contextType: 'study',
-    contextId: editId || 'new-sermon',
+    contextId: editId || newSermonContextId,
   });
   // Handle new sermon flag - clear persisted state when starting fresh
   useEffect(() => {
