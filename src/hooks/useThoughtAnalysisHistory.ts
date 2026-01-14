@@ -19,6 +19,7 @@ export interface SavedAnalysis {
   id: string;
   input_text: string;
   summary: string | null;
+  narrative_analysis: string | null;
   overall_score: number | null;
   categories: Record<string, number> | null;
   strengths: string[] | null;
@@ -88,6 +89,7 @@ export const useThoughtAnalysisHistory = () => {
           user_id: user.id,
           input_text: inputText,
           summary: analysis.summary,
+          narrative_analysis: analysis.narrativeAnalysis || null,
           overall_score: analysis.overallScore,
           categories: analysis.categories,
           strengths: analysis.strengths,
