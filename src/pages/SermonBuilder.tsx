@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { usePreservePage } from "@/hooks/usePreservePage";
 import { Navigation } from "@/components/Navigation";
@@ -120,6 +120,12 @@ export default function SermonBuilder() {
   const [loadingGems, setLoadingGems] = useState(false);
   const [gemsDialogOpen, setGemsDialogOpen] = useState(false);
   const [scriptureArmory, setScriptureArmory] = useState<Record<number, ArmoryVerse[]>>({});
+  
+  // Auto-save to database state
+  const [isAutoSaving, setIsAutoSaving] = useState(false);
+  const [lastAutoSave, setLastAutoSave] = useState<Date | null>(null);
+  const autoSaveTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const [currentSermonId, setCurrentSermonId] = useState<string | null>(editId);
 
   // Sparks for sermon building insights - use unique context per session
   // Generate a stable unique ID for new sermons based on timestamp to prevent gem mixing
@@ -217,8 +223,84 @@ export default function SermonBuilder() {
     checkAuth();
     if (editId) {
       loadSermon(editId);
+      setCurrentSermonId(editId);
     }
   }, [editId]);
+
+  // Auto-save to database every 15 seconds when there's content
+  const performAutoSave = useCallback(async () => {
+    // Only auto-save if we have meaningful content (title or theme)
+    if (!sermon.title && !sermon.theme_passage) return;
+    
+    setIsAutoSaving(true);
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      const sermonData = {
+        user_id: user.id,
+        title: sermon.title || "Untitled Sermon",
+        theme_passage: sermon.theme_passage,
+        sermon_style: sermon.sermon_style,
+        smooth_stones: sermon.smooth_stones,
+        bridges: sermon.bridges,
+        movie_structure: sermon.movie_structure,
+        full_sermon: sermon.full_sermon,
+        current_step: currentStep,
+        status: currentStep >= 5 ? "complete" : "in_progress",
+      };
+
+      if (currentSermonId) {
+        // Update existing sermon
+        const { error } = await supabase
+          .from("sermons")
+          .update(sermonData)
+          .eq("id", currentSermonId);
+        if (error) throw error;
+      } else {
+        // Create new sermon and store the ID
+        const { data, error } = await supabase
+          .from("sermons")
+          .insert(sermonData)
+          .select('id')
+          .single();
+        if (error) throw error;
+        if (data?.id) {
+          setCurrentSermonId(data.id);
+          // Update URL without full navigation to preserve state
+          window.history.replaceState({}, '', `/sermon-builder?id=${data.id}`);
+        }
+      }
+
+      setLastAutoSave(new Date());
+    } catch (error) {
+      console.error("Auto-save failed:", error);
+      // Don't show error toast for auto-save to avoid spam
+    } finally {
+      setIsAutoSaving(false);
+    }
+  }, [sermon, currentStep, currentSermonId]);
+
+  // Set up auto-save timer
+  useEffect(() => {
+    // Clear existing timer
+    if (autoSaveTimerRef.current) {
+      clearInterval(autoSaveTimerRef.current);
+    }
+
+    // Only start auto-save if there's content
+    if (sermon.title || sermon.theme_passage || sermon.smooth_stones.length > 0 || sermon.full_sermon) {
+      autoSaveTimerRef.current = setInterval(() => {
+        performAutoSave();
+      }, 15000); // 15 seconds
+    }
+
+    return () => {
+      if (autoSaveTimerRef.current) {
+        clearInterval(autoSaveTimerRef.current);
+      }
+    };
+  }, [performAutoSave, sermon.title, sermon.theme_passage, sermon.smooth_stones.length, sermon.full_sermon]);
 
   const checkAuth = async () => {
     const { data: { session } } = await supabase.auth.getSession();
@@ -400,6 +482,11 @@ export default function SermonBuilder() {
   };
 
   const startNewSermon = () => {
+    // Clear auto-save timer
+    if (autoSaveTimerRef.current) {
+      clearInterval(autoSaveTimerRef.current);
+    }
+    
     // Clear all sermon state
     const emptySermon = {
       title: "",
@@ -417,6 +504,8 @@ export default function SermonBuilder() {
     setNewBridge("");
     setAiHelp("");
     setScriptureArmory({});
+    setCurrentSermonId(null); // Reset sermon ID for new sermon
+    setLastAutoSave(null);
 
     // Clear persisted state directly from localStorage to avoid race conditions
     try {
@@ -574,7 +663,20 @@ export default function SermonBuilder() {
               </div>
               <div>
                 <h1 className="text-4xl font-bold text-white">Sermon Builder</h1>
-                <p className="text-purple-200 text-lg">Movie-Model Approach with 5 Smooth Stones</p>
+                <div className="flex items-center gap-3">
+                  <p className="text-purple-200 text-lg">Movie-Model Approach with 5 Smooth Stones</p>
+                  {isAutoSaving && (
+                    <span className="text-xs text-emerald-400 flex items-center gap-1 animate-pulse">
+                      <Loader2 className="w-3 h-3 animate-spin" />
+                      Saving...
+                    </span>
+                  )}
+                  {!isAutoSaving && lastAutoSave && (
+                    <span className="text-xs text-purple-300">
+                      Saved {lastAutoSave.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                    </span>
+                  )}
+                </div>
               </div>
             </div>
             <div className="flex gap-2">
