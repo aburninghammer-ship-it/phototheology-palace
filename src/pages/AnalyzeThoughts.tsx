@@ -655,13 +655,20 @@ const AnalyzeThoughts = () => {
       
       <Navigation />
 
-      {/* Sparks Container - Prominent floating panel */}
+      {/* Sparks Container - Prominent floating panel at bottom for mobile accessibility */}
       {sparks.length > 0 && (
-        <div className="fixed top-20 right-4 z-50 bg-gradient-to-br from-amber-500/20 to-orange-500/20 backdrop-blur-md rounded-2xl p-3 border border-amber-400/30 shadow-lg shadow-amber-500/20">
-          <div className="flex items-center gap-2 mb-2 px-1">
-            <Sparkles className="w-4 h-4 text-amber-400" />
-            <span className="text-xs font-medium text-amber-200">New Insights</span>
-            <Badge variant="secondary" className="text-[10px] px-1.5 py-0 bg-amber-500/30 text-amber-100">
+        <div className="fixed bottom-24 left-4 right-4 md:left-auto md:right-4 md:bottom-auto md:top-20 md:max-w-xs z-50 bg-gradient-to-br from-amber-500/30 to-orange-500/30 backdrop-blur-lg rounded-2xl p-4 border-2 border-amber-400/50 shadow-xl shadow-amber-500/30">
+          <div className="flex items-center justify-between gap-3 mb-3">
+            <div className="flex items-center gap-2">
+              <div className="p-1.5 bg-amber-500/30 rounded-lg">
+                <Sparkles className="w-5 h-5 text-amber-300" />
+              </div>
+              <div>
+                <span className="text-sm font-semibold text-amber-100">✨ New Insights!</span>
+                <p className="text-xs text-amber-200/70">Tap to explore</p>
+              </div>
+            </div>
+            <Badge variant="secondary" className="text-sm px-2.5 py-1 bg-amber-500/40 text-amber-50 font-bold">
               {sparks.length}
             </Badge>
           </div>
@@ -672,6 +679,7 @@ const AnalyzeThoughts = () => {
             onDismiss={dismissSpark}
             onExplore={exploreSpark}
             position="floating"
+            maxDisplay={5}
           />
         </div>
       )}
