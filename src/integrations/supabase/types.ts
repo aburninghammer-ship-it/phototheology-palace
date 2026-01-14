@@ -1760,6 +1760,51 @@ export type Database = {
         }
         Relationships: []
       }
+      claim_ladders: {
+        Row: {
+          claim: string
+          created_at: string
+          historical_anchor: Json | null
+          id: string
+          logical_move: string | null
+          risk_counterpoint: Json | null
+          status: Database["public"]["Enums"]["claim_ladder_status"] | null
+          textual_basis: Json | null
+          theological_implication: string | null
+          updated_at: string | null
+          user_id: string
+          validation_notes: string | null
+        }
+        Insert: {
+          claim: string
+          created_at?: string
+          historical_anchor?: Json | null
+          id?: string
+          logical_move?: string | null
+          risk_counterpoint?: Json | null
+          status?: Database["public"]["Enums"]["claim_ladder_status"] | null
+          textual_basis?: Json | null
+          theological_implication?: string | null
+          updated_at?: string | null
+          user_id: string
+          validation_notes?: string | null
+        }
+        Update: {
+          claim?: string
+          created_at?: string
+          historical_anchor?: Json | null
+          id?: string
+          logical_move?: string | null
+          risk_counterpoint?: Json | null
+          status?: Database["public"]["Enums"]["claim_ladder_status"] | null
+          textual_basis?: Json | null
+          theological_implication?: string | null
+          updated_at?: string | null
+          user_id?: string
+          validation_notes?: string | null
+        }
+        Relationships: []
+      }
       cohort_attendance: {
         Row: {
           attendance_status: string
@@ -10963,6 +11008,125 @@ export type Database = {
         }
         Relationships: []
       }
+      source_excerpts: {
+        Row: {
+          added_by: string | null
+          created_at: string
+          excerpt: string
+          id: string
+          location: string | null
+          rights_checked: boolean | null
+          source_id: string
+        }
+        Insert: {
+          added_by?: string | null
+          created_at?: string
+          excerpt: string
+          id?: string
+          location?: string | null
+          rights_checked?: boolean | null
+          source_id: string
+        }
+        Update: {
+          added_by?: string | null
+          created_at?: string
+          excerpt?: string
+          id?: string
+          location?: string | null
+          rights_checked?: boolean | null
+          source_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "source_excerpts_source_id_fkey"
+            columns: ["source_id"]
+            isOneToOne: false
+            referencedRelation: "sources"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      sources: {
+        Row: {
+          accessed_at: string | null
+          author: string | null
+          bible_translation: string | null
+          created_at: string
+          credibility: Database["public"]["Enums"]["credibility_tier"] | null
+          id: string
+          keywords: string[] | null
+          library_id: string | null
+          max_excerpt_chars: number | null
+          publication_year: number | null
+          publisher: string | null
+          quote_text: string | null
+          rights: Database["public"]["Enums"]["rights_flag"] | null
+          scripture_ref: string | null
+          scripture_text: string | null
+          sop_ref: string | null
+          sop_work: string | null
+          source_type: Database["public"]["Enums"]["source_type"]
+          stance: Database["public"]["Enums"]["source_stance"] | null
+          summary: string | null
+          title: string
+          updated_at: string | null
+          url: string | null
+          user_id: string | null
+        }
+        Insert: {
+          accessed_at?: string | null
+          author?: string | null
+          bible_translation?: string | null
+          created_at?: string
+          credibility?: Database["public"]["Enums"]["credibility_tier"] | null
+          id?: string
+          keywords?: string[] | null
+          library_id?: string | null
+          max_excerpt_chars?: number | null
+          publication_year?: number | null
+          publisher?: string | null
+          quote_text?: string | null
+          rights?: Database["public"]["Enums"]["rights_flag"] | null
+          scripture_ref?: string | null
+          scripture_text?: string | null
+          sop_ref?: string | null
+          sop_work?: string | null
+          source_type: Database["public"]["Enums"]["source_type"]
+          stance?: Database["public"]["Enums"]["source_stance"] | null
+          summary?: string | null
+          title: string
+          updated_at?: string | null
+          url?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          accessed_at?: string | null
+          author?: string | null
+          bible_translation?: string | null
+          created_at?: string
+          credibility?: Database["public"]["Enums"]["credibility_tier"] | null
+          id?: string
+          keywords?: string[] | null
+          library_id?: string | null
+          max_excerpt_chars?: number | null
+          publication_year?: number | null
+          publisher?: string | null
+          quote_text?: string | null
+          rights?: Database["public"]["Enums"]["rights_flag"] | null
+          scripture_ref?: string | null
+          scripture_text?: string | null
+          sop_ref?: string | null
+          sop_work?: string | null
+          source_type?: Database["public"]["Enums"]["source_type"]
+          stance?: Database["public"]["Enums"]["source_stance"] | null
+          summary?: string | null
+          title?: string
+          updated_at?: string | null
+          url?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       spaced_repetition_items: {
         Row: {
           content: Json
@@ -11004,6 +11168,51 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      spark_claim_ladders: {
+        Row: {
+          claim_ladder_id: string
+          created_at: string
+          id: string
+          relationship:
+            | Database["public"]["Enums"]["spark_ladder_relationship"]
+            | null
+          spark_id: string
+        }
+        Insert: {
+          claim_ladder_id: string
+          created_at?: string
+          id?: string
+          relationship?:
+            | Database["public"]["Enums"]["spark_ladder_relationship"]
+            | null
+          spark_id: string
+        }
+        Update: {
+          claim_ladder_id?: string
+          created_at?: string
+          id?: string
+          relationship?:
+            | Database["public"]["Enums"]["spark_ladder_relationship"]
+            | null
+          spark_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "spark_claim_ladders_claim_ladder_id_fkey"
+            columns: ["claim_ladder_id"]
+            isOneToOne: false
+            referencedRelation: "claim_ladders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "spark_claim_ladders_spark_id_fkey"
+            columns: ["spark_id"]
+            isOneToOne: false
+            referencedRelation: "sparks"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       spark_events: {
         Row: {
@@ -11073,63 +11282,208 @@ export type Database = {
         }
         Relationships: []
       }
+      spark_rooms: {
+        Row: {
+          cognitive_move: string | null
+          created_at: string
+          id: string
+          room_code: string
+          spark_id: string
+          suggested_next_step: string | null
+          trigger_reason: string | null
+        }
+        Insert: {
+          cognitive_move?: string | null
+          created_at?: string
+          id?: string
+          room_code: string
+          spark_id: string
+          suggested_next_step?: string | null
+          trigger_reason?: string | null
+        }
+        Update: {
+          cognitive_move?: string | null
+          created_at?: string
+          id?: string
+          room_code?: string
+          spark_id?: string
+          suggested_next_step?: string | null
+          trigger_reason?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "spark_rooms_spark_id_fkey"
+            columns: ["spark_id"]
+            isOneToOne: false
+            referencedRelation: "sparks"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      spark_sources: {
+        Row: {
+          created_at: string
+          excerpt: string | null
+          id: string
+          notes: string | null
+          relevance: number | null
+          role: Database["public"]["Enums"]["source_role"] | null
+          source_id: string
+          spark_id: string
+        }
+        Insert: {
+          created_at?: string
+          excerpt?: string | null
+          id?: string
+          notes?: string | null
+          relevance?: number | null
+          role?: Database["public"]["Enums"]["source_role"] | null
+          source_id: string
+          spark_id: string
+        }
+        Update: {
+          created_at?: string
+          excerpt?: string | null
+          id?: string
+          notes?: string | null
+          relevance?: number | null
+          role?: Database["public"]["Enums"]["source_role"] | null
+          source_id?: string
+          spark_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "spark_sources_source_id_fkey"
+            columns: ["source_id"]
+            isOneToOne: false
+            referencedRelation: "sources"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "spark_sources_spark_id_fkey"
+            columns: ["spark_id"]
+            isOneToOne: false
+            referencedRelation: "sparks"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       sparks: {
         Row: {
+          anchors: Json | null
+          assumptions: Json | null
+          claim_text: string | null
           confidence: number | null
+          confidence_lvl: Database["public"]["Enums"]["confidence_level"] | null
+          confidence_notes: string | null
           content_hash: string | null
           context_id: string
           context_type: string
+          counterpoints: Json | null
           created_at: string
           dismissed_at: string | null
           explore_action: Json | null
           id: string
           insight: string
+          kind: Database["public"]["Enums"]["spark_kind"] | null
+          lens: Database["public"]["Enums"]["interpretive_lens"] | null
+          mode: Database["public"]["Enums"]["jeeves_mode"] | null
+          needs: Json | null
+          next_actions: Json | null
           novelty_score: number | null
           opened_at: string | null
           recognition: string
           saved_at: string | null
+          session_id: string | null
           spark_type: string
+          status: Database["public"]["Enums"]["spark_status"] | null
+          summary: string | null
           surface: string
+          tags: string[] | null
           title: string
+          updated_at: string | null
           user_id: string
+          verification: Database["public"]["Enums"]["verification_state"] | null
         }
         Insert: {
+          anchors?: Json | null
+          assumptions?: Json | null
+          claim_text?: string | null
           confidence?: number | null
+          confidence_lvl?:
+            | Database["public"]["Enums"]["confidence_level"]
+            | null
+          confidence_notes?: string | null
           content_hash?: string | null
           context_id: string
           context_type: string
+          counterpoints?: Json | null
           created_at?: string
           dismissed_at?: string | null
           explore_action?: Json | null
           id?: string
           insight: string
+          kind?: Database["public"]["Enums"]["spark_kind"] | null
+          lens?: Database["public"]["Enums"]["interpretive_lens"] | null
+          mode?: Database["public"]["Enums"]["jeeves_mode"] | null
+          needs?: Json | null
+          next_actions?: Json | null
           novelty_score?: number | null
           opened_at?: string | null
           recognition: string
           saved_at?: string | null
+          session_id?: string | null
           spark_type: string
+          status?: Database["public"]["Enums"]["spark_status"] | null
+          summary?: string | null
           surface: string
+          tags?: string[] | null
           title: string
+          updated_at?: string | null
           user_id: string
+          verification?:
+            | Database["public"]["Enums"]["verification_state"]
+            | null
         }
         Update: {
+          anchors?: Json | null
+          assumptions?: Json | null
+          claim_text?: string | null
           confidence?: number | null
+          confidence_lvl?:
+            | Database["public"]["Enums"]["confidence_level"]
+            | null
+          confidence_notes?: string | null
           content_hash?: string | null
           context_id?: string
           context_type?: string
+          counterpoints?: Json | null
           created_at?: string
           dismissed_at?: string | null
           explore_action?: Json | null
           id?: string
           insight?: string
+          kind?: Database["public"]["Enums"]["spark_kind"] | null
+          lens?: Database["public"]["Enums"]["interpretive_lens"] | null
+          mode?: Database["public"]["Enums"]["jeeves_mode"] | null
+          needs?: Json | null
+          next_actions?: Json | null
           novelty_score?: number | null
           opened_at?: string | null
           recognition?: string
           saved_at?: string | null
+          session_id?: string | null
           spark_type?: string
+          status?: Database["public"]["Enums"]["spark_status"] | null
+          summary?: string | null
           surface?: string
+          tags?: string[] | null
           title?: string
+          updated_at?: string | null
           user_id?: string
+          verification?:
+            | Database["public"]["Enums"]["verification_state"]
+            | null
         }
         Relationships: []
       }
@@ -14511,6 +14865,11 @@ export type Database = {
         | "bible_worker"
         | "guest"
       church_tier: "tier1" | "tier2" | "tier3"
+      claim_ladder_status: "draft" | "saved" | "validated"
+      confidence_level: "speculative" | "tentative" | "moderate" | "strong"
+      credibility_tier: "A" | "B" | "C" | "D"
+      interpretive_lens: "sda" | "neutral_historical" | "comparative"
+      jeeves_mode: "explorer" | "auditor" | "architect"
       ministry_role:
         | "site_admin"
         | "small_group_leader"
@@ -14537,6 +14896,39 @@ export type Database = {
         | "new_believer"
         | "scholar"
         | "explorer"
+      rights_flag: "ok_store_fulltext" | "store_excerpt_only" | "reference_only"
+      source_role: "supports" | "context" | "counter" | "method"
+      source_stance:
+        | "supports_sda_standard"
+        | "neutral"
+        | "critiques_sda_standard"
+        | "mixed"
+      source_type:
+        | "scripture"
+        | "sop"
+        | "historical_primary"
+        | "historical_secondary"
+        | "theology_reference"
+        | "dictionary_encyclopedia"
+        | "user_note"
+        | "web_article"
+        | "video_transcript"
+      spark_kind:
+        | "hypothesis"
+        | "pattern"
+        | "parallel"
+        | "warning"
+        | "application"
+        | "question"
+      spark_ladder_relationship: "originated_from" | "expanded_into"
+      spark_status: "draft" | "saved" | "promoted" | "archived"
+      verification_state:
+        | "unverified"
+        | "textually_supported"
+        | "historically_supported"
+        | "logic_checked"
+        | "counterpoints_added"
+        | "validated"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -14673,6 +15065,11 @@ export const Constants = {
         "guest",
       ],
       church_tier: ["tier1", "tier2", "tier3"],
+      claim_ladder_status: ["draft", "saved", "validated"],
+      confidence_level: ["speculative", "tentative", "moderate", "strong"],
+      credibility_tier: ["A", "B", "C", "D"],
+      interpretive_lens: ["sda", "neutral_historical", "comparative"],
+      jeeves_mode: ["explorer", "auditor", "architect"],
       ministry_role: [
         "site_admin",
         "small_group_leader",
@@ -14701,6 +15098,47 @@ export const Constants = {
         "new_believer",
         "scholar",
         "explorer",
+      ],
+      rights_flag: [
+        "ok_store_fulltext",
+        "store_excerpt_only",
+        "reference_only",
+      ],
+      source_role: ["supports", "context", "counter", "method"],
+      source_stance: [
+        "supports_sda_standard",
+        "neutral",
+        "critiques_sda_standard",
+        "mixed",
+      ],
+      source_type: [
+        "scripture",
+        "sop",
+        "historical_primary",
+        "historical_secondary",
+        "theology_reference",
+        "dictionary_encyclopedia",
+        "user_note",
+        "web_article",
+        "video_transcript",
+      ],
+      spark_kind: [
+        "hypothesis",
+        "pattern",
+        "parallel",
+        "warning",
+        "application",
+        "question",
+      ],
+      spark_ladder_relationship: ["originated_from", "expanded_into"],
+      spark_status: ["draft", "saved", "promoted", "archived"],
+      verification_state: [
+        "unverified",
+        "textually_supported",
+        "historically_supported",
+        "logic_checked",
+        "counterpoints_added",
+        "validated",
       ],
     },
   },
