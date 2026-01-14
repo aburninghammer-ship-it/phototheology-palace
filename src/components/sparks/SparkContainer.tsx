@@ -80,7 +80,7 @@ export function SparkContainer({
                 pulse={!spark.opened_at}
                 onClick={() => handleIconClick(spark.id)}
                 size="md"
-                colorVariant={spark.id.charCodeAt(0) + index}
+                colorVariant={spark.spark_type === 'connection' ? 0 : spark.spark_type === 'pattern' ? 1 : 2}
               />
             </motion.div>
           ))}
