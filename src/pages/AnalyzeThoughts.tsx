@@ -655,9 +655,16 @@ const AnalyzeThoughts = () => {
       
       <Navigation />
 
-      {/* Sparks Container */}
+      {/* Sparks Container - Prominent floating panel */}
       {sparks.length > 0 && (
-        <div className="fixed top-20 right-4 z-50">
+        <div className="fixed top-20 right-4 z-50 bg-gradient-to-br from-amber-500/20 to-orange-500/20 backdrop-blur-md rounded-2xl p-3 border border-amber-400/30 shadow-lg shadow-amber-500/20">
+          <div className="flex items-center gap-2 mb-2 px-1">
+            <Sparkles className="w-4 h-4 text-amber-400" />
+            <span className="text-xs font-medium text-amber-200">New Insights</span>
+            <Badge variant="secondary" className="text-[10px] px-1.5 py-0 bg-amber-500/30 text-amber-100">
+              {sparks.length}
+            </Badge>
+          </div>
           <SparkContainer
             sparks={sparks}
             onOpen={openSpark}
