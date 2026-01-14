@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { Navigation } from "@/components/Navigation";
 import { Button } from "@/components/ui/button";
@@ -29,6 +29,7 @@ import {
   GraduationCap,
   PanelRightOpen,
   PanelRightClose,
+  Save,
 } from "lucide-react";
 import {
   PPT_THEMES,
@@ -46,6 +47,7 @@ import { extractScriptureReferencesFromSermon } from "@/lib/extractScriptureRefe
 import { SlideEditor } from "@/components/sermon/SlideEditor";
 import { StudyContentBuilder, type StudyContentBlock } from "@/components/ppt/StudyContentBuilder";
 import { PPTJeevesPanel } from "@/components/ppt/PPTJeevesPanel";
+import { usePPTAutoSave } from "@/hooks/usePPTAutoSave";
 
 // ============================================================================
 // THEME PREVIEW COMPONENT
@@ -143,6 +145,32 @@ export default function SermonPowerPoint() {
   const [gammaApiKey, setGammaApiKey] = useState("");
   const [gammaKeyLoading, setGammaKeyLoading] = useState(false);
   const [gammaKeySaved, setGammaKeySaved] = useState(false);
+
+  // Auto-save data - memoize to prevent unnecessary re-renders
+  const autoSaveData = useMemo(() => ({
+    activeTab,
+    sermonTitle,
+    sermonContent,
+    versesInput,
+    studyTitle,
+    studyBlocks,
+    settings,
+    generatedDeck,
+  }), [activeTab, sermonTitle, sermonContent, versesInput, studyTitle, studyBlocks, settings, generatedDeck]);
+
+  const autoSaveSetters = useMemo(() => ({
+    setActiveTab,
+    setSermonTitle,
+    setSermonContent,
+    setVersesInput,
+    setStudyTitle,
+    setStudyBlocks,
+    setSettings,
+    setGeneratedDeck,
+  }), []);
+
+  // Auto-save hook - saves every 15 seconds
+  const { lastSavedTime, saveNow, clearSavedData } = usePPTAutoSave(autoSaveData, autoSaveSetters);
 
   // Load user's saved Gamma API key
   useEffect(() => {
@@ -462,23 +490,37 @@ export default function SermonPowerPoint() {
           <motion.div
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="flex items-center gap-4"
+            className="flex items-center justify-between"
           >
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => navigate(-1)}
-              className="text-white/70 hover:text-white hover:bg-white/10"
-            >
-              <ArrowLeft className="w-5 h-5" />
-            </Button>
-            <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-purple-500 to-fuchsia-600 flex items-center justify-center shadow-lg shadow-purple-500/30">
-              <Presentation className="w-8 h-8 text-white" />
+            <div className="flex items-center gap-4">
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => navigate(-1)}
+                className="text-white/70 hover:text-white hover:bg-white/10"
+              >
+                <ArrowLeft className="w-5 h-5" />
+              </Button>
+              <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-purple-500 to-fuchsia-600 flex items-center justify-center shadow-lg shadow-purple-500/30">
+                <Presentation className="w-8 h-8 text-white" />
+              </div>
+              <div>
+                <h1 className="text-3xl font-bold text-white">PowerPoint Generator</h1>
+                <p className="text-purple-200">Transform your sermon into professional slides</p>
+              </div>
             </div>
-            <div>
-              <h1 className="text-3xl font-bold text-white">PowerPoint Generator</h1>
-              <p className="text-purple-200">Transform your sermon into professional slides</p>
-            </div>
+            
+            {/* Auto-save indicator */}
+            {lastSavedTime && (
+              <motion.div
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/10 text-white/70 text-sm"
+              >
+                <Save className="w-3.5 h-3.5" />
+                <span>Saved {lastSavedTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+              </motion.div>
+            )}
           </motion.div>
         </div>
       </div>
