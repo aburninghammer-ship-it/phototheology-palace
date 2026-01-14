@@ -160,6 +160,52 @@ export async function generateCommentary(options: CommentaryOptions): Promise<Co
 }
 
 /**
+ * Chapter commentary options
+ */
+interface ChapterCommentaryOptions {
+  book: string;
+  chapter: number;
+  chapterText?: string;
+  depth?: "surface" | "intermediate" | "depth";
+  generateAudio?: boolean;
+  voice?: OpenAIVoice;
+}
+
+/**
+ * Generate chapter-level commentary (summary for entire chapter)
+ */
+export async function generateChapterCommentary(options: ChapterCommentaryOptions): Promise<CommentaryResult | null> {
+  const { book, chapter, chapterText, depth = "surface", generateAudio = true, voice = "onyx" } = options;
+
+  try {
+    const { data, error } = await supabase.functions.invoke("generate-chapter-commentary", {
+      body: { 
+        book, 
+        chapter, 
+        chapterText, 
+        depth,
+        generateAudio,
+        voice
+      },
+    });
+
+    if (error) {
+      console.error("[Chapter Commentary] Error:", error);
+      return null;
+    }
+
+    return {
+      commentary: data?.commentary || "",
+      audioUrl: data?.audioUrl || null,
+      cached: data?.cached || false,
+    };
+  } catch (error) {
+    console.error("[Chapter Commentary] Error:", error);
+    return null;
+  }
+}
+
+/**
  * Get cached commentary from Supabase database
  * Note: bible_commentaries table may not exist yet - commentary is generated on-demand
  */

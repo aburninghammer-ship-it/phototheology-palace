@@ -1361,7 +1361,7 @@ export default function SermonBuilder() {
 
       {/* Sparks Container */}
       {sparks.length > 0 && (
-        <div className="fixed top-20 right-4 z-50">
+        <div className="fixed bottom-24 right-4 md:bottom-auto md:top-20 z-50">
           <SparkContainer
             sparks={sparks}
             onOpen={openSpark}

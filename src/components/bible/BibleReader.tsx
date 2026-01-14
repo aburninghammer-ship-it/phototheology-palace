@@ -307,7 +307,7 @@ export const BibleReader = () => {
 
           {/* Spark Container */}
           {sparks.length > 0 && (
-            <div className="absolute top-20 right-4 z-20">
+            <div className="fixed bottom-24 right-4 md:bottom-auto md:top-20 z-50">
               <SparkContainer
                 sparks={sparks}
                 onOpen={openSpark}
