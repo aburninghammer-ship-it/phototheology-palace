@@ -10129,12 +10129,15 @@ export type Database = {
       }
       sermon_simmer_sessions: {
         Row: {
+          artifact_hashes: string[] | null
+          artifacts: Json | null
           callout_quotes: string[] | null
           christ_connections: Json | null
           closing_movement: string | null
           core_claim: string | null
           created_at: string
           current_day: number
+          current_lane: string | null
           day_1_completed_at: string | null
           day_2_completed_at: string | null
           day_3_completed_at: string | null
@@ -10146,11 +10149,21 @@ export type Database = {
           final_quote_list: string[] | null
           final_slide_headers: string[] | null
           gems: Json | null
+          human_approved_artifacts: string[] | null
           id: string
+          is_paused: boolean | null
+          lane_schedule: Json | null
+          locked_thesis: boolean | null
+          parking_artifacts: Json | null
+          pass_count: number | null
+          pass_history: Json | null
           pressure_verses: string[] | null
+          project_summary: string | null
           provisional_outline: Json | null
           redundant_gems: string[] | null
           rewritten_weak_connections: Json | null
+          simmer_duration: string | null
+          simmer_mode: string | null
           slide_headlines: string[] | null
           slide_images: Json | null
           status: string
@@ -10163,17 +10176,21 @@ export type Database = {
           title: string | null
           updated_at: string
           user_id: string
+          validation_errors: Json | null
           visual_metaphors: string[] | null
           weak_transitions: string[] | null
           white_space_guidance: string | null
         }
         Insert: {
+          artifact_hashes?: string[] | null
+          artifacts?: Json | null
           callout_quotes?: string[] | null
           christ_connections?: Json | null
           closing_movement?: string | null
           core_claim?: string | null
           created_at?: string
           current_day?: number
+          current_lane?: string | null
           day_1_completed_at?: string | null
           day_2_completed_at?: string | null
           day_3_completed_at?: string | null
@@ -10185,11 +10202,21 @@ export type Database = {
           final_quote_list?: string[] | null
           final_slide_headers?: string[] | null
           gems?: Json | null
+          human_approved_artifacts?: string[] | null
           id?: string
+          is_paused?: boolean | null
+          lane_schedule?: Json | null
+          locked_thesis?: boolean | null
+          parking_artifacts?: Json | null
+          pass_count?: number | null
+          pass_history?: Json | null
           pressure_verses?: string[] | null
+          project_summary?: string | null
           provisional_outline?: Json | null
           redundant_gems?: string[] | null
           rewritten_weak_connections?: Json | null
+          simmer_duration?: string | null
+          simmer_mode?: string | null
           slide_headlines?: string[] | null
           slide_images?: Json | null
           status?: string
@@ -10202,17 +10229,21 @@ export type Database = {
           title?: string | null
           updated_at?: string
           user_id: string
+          validation_errors?: Json | null
           visual_metaphors?: string[] | null
           weak_transitions?: string[] | null
           white_space_guidance?: string | null
         }
         Update: {
+          artifact_hashes?: string[] | null
+          artifacts?: Json | null
           callout_quotes?: string[] | null
           christ_connections?: Json | null
           closing_movement?: string | null
           core_claim?: string | null
           created_at?: string
           current_day?: number
+          current_lane?: string | null
           day_1_completed_at?: string | null
           day_2_completed_at?: string | null
           day_3_completed_at?: string | null
@@ -10224,11 +10255,21 @@ export type Database = {
           final_quote_list?: string[] | null
           final_slide_headers?: string[] | null
           gems?: Json | null
+          human_approved_artifacts?: string[] | null
           id?: string
+          is_paused?: boolean | null
+          lane_schedule?: Json | null
+          locked_thesis?: boolean | null
+          parking_artifacts?: Json | null
+          pass_count?: number | null
+          pass_history?: Json | null
           pressure_verses?: string[] | null
+          project_summary?: string | null
           provisional_outline?: Json | null
           redundant_gems?: string[] | null
           rewritten_weak_connections?: Json | null
+          simmer_duration?: string | null
+          simmer_mode?: string | null
           slide_headlines?: string[] | null
           slide_images?: Json | null
           status?: string
@@ -10241,6 +10282,7 @@ export type Database = {
           title?: string | null
           updated_at?: string
           user_id?: string
+          validation_errors?: Json | null
           visual_metaphors?: string[] | null
           weak_transitions?: string[] | null
           white_space_guidance?: string | null
