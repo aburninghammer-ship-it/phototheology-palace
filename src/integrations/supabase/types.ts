@@ -12310,6 +12310,7 @@ export type Database = {
           growth_areas: string[] | null
           id: string
           input_text: string
+          narrative_analysis: string | null
           overall_score: number | null
           palace_rooms: Json | null
           potential_misinterpretations: string[] | null
@@ -12330,6 +12331,7 @@ export type Database = {
           growth_areas?: string[] | null
           id?: string
           input_text: string
+          narrative_analysis?: string | null
           overall_score?: number | null
           palace_rooms?: Json | null
           potential_misinterpretations?: string[] | null
@@ -12350,6 +12352,7 @@ export type Database = {
           growth_areas?: string[] | null
           id?: string
           input_text?: string
+          narrative_analysis?: string | null
           overall_score?: number | null
           palace_rooms?: Json | null
           potential_misinterpretations?: string[] | null

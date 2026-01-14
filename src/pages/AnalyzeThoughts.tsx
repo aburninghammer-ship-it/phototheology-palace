@@ -481,6 +481,7 @@ const AnalyzeThoughts = () => {
     // Reconstruct result from saved analysis
     setResult({
       summary: analysis.summary || "",
+      narrativeAnalysis: analysis.narrative_analysis || undefined,
       overallScore: analysis.overall_score || 0,
       categories: (analysis.categories as AnalysisResult['categories']) || {
         biblicalAccuracy: 0, theologicalDepth: 0, christCenteredness: 0,
