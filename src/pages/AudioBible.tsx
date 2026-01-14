@@ -86,6 +86,8 @@ export default function AudioBible() {
     setCommentaryTier,
     includeCommentary,
     setIncludeCommentary,
+    commentaryMode,
+    setCommentaryMode,
     unlock,
     playChapter,
     pause,
@@ -107,7 +109,7 @@ export default function AudioBible() {
   const [selectedBook, setSelectedBook] = useState("Genesis");
   const [selectedChapter, setSelectedChapter] = useState(1);
   const [selectionMode, setSelectionMode] = useState<SelectionMode>("chapter");
-  const [commentaryMode, setCommentaryMode] = useState<CommentaryMode>("verse");
+  // commentaryMode now comes from useAudioBible hook
   const [customChapters, setCustomChapters] = useState<ChapterSelection[]>([]);
   const [customBook, setCustomBook] = useState("Genesis");
   const [customChapter, setCustomChapter] = useState(1);

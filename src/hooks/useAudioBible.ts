@@ -8,6 +8,7 @@ import { audioEngine, AudioState } from "@/lib/AudioEngine";
 import {
   generateTTSAudio,
   generateCommentary,
+  generateChapterCommentary,
   prefetchUpcomingCommentary,
   CommentaryTier,
   OpenAIVoice,
@@ -55,6 +56,7 @@ export function useAudioBible(options: UseAudioBibleOptions = {}) {
   const [commentaryTier, setCommentaryTier] = useState<CommentaryTier>(defaultTier);
   const [includeCommentary, setIncludeCommentary] = useState(true);
   const [commentaryOnly, setCommentaryOnly] = useState(false);
+  const [commentaryMode, setCommentaryMode] = useState<"verse" | "chapter">("verse");
 
   // Playback tracking
   const [currentBook, setCurrentBook] = useState<string>("");
@@ -79,6 +81,7 @@ export function useAudioBible(options: UseAudioBibleOptions = {}) {
   const includeCommentaryRef = useRef(includeCommentary);
   const commentaryOnlyRef = useRef(commentaryOnly);
   const commentaryTierRef = useRef(commentaryTier);
+  const commentaryModeRef = useRef(commentaryMode);
   const voiceRef = useRef(voice);
   const commentaryVoiceRef = useRef(commentaryVoice);
   const onChapterCompleteRef = useRef(onChapterComplete);
@@ -90,6 +93,7 @@ export function useAudioBible(options: UseAudioBibleOptions = {}) {
   useEffect(() => { includeCommentaryRef.current = includeCommentary; }, [includeCommentary]);
   useEffect(() => { commentaryOnlyRef.current = commentaryOnly; }, [commentaryOnly]);
   useEffect(() => { commentaryTierRef.current = commentaryTier; }, [commentaryTier]);
+  useEffect(() => { commentaryModeRef.current = commentaryMode; }, [commentaryMode]);
   useEffect(() => { voiceRef.current = voice; }, [voice]);
   useEffect(() => { commentaryVoiceRef.current = commentaryVoice; }, [commentaryVoice]);
   useEffect(() => { onChapterCompleteRef.current = onChapterComplete; }, [onChapterComplete]);
@@ -270,6 +274,86 @@ export function useAudioBible(options: UseAudioBibleOptions = {}) {
   }, []);
 
   /**
+   * Play chapter-level commentary (summary for entire chapter)
+   */
+  const playChapterCommentary = useCallback(async () => {
+    const item = currentItemRef.current;
+    if (!item || isStoppedRef.current) return;
+
+    setIsPlayingCommentary(true);
+    loadingRef.current = true;
+
+    try {
+      console.log(`[useAudioBible] Playing chapter commentary for ${item.book} ${item.chapter}`);
+
+      // Build chapter text from all verses
+      const chapterText = item.verses.map(v => `${v.verse}. ${v.text}`).join('\n');
+
+      // Map tier to depth parameter
+      const depthMap: Record<CommentaryTier, "surface" | "intermediate" | "depth"> = {
+        surface: "surface",
+        intermediate: "intermediate", 
+        scholarly: "depth"
+      };
+
+      const timeoutPromise = new Promise<null>((_, reject) => {
+        setTimeout(() => reject(new Error("Chapter commentary generation timed out")), 60000);
+      });
+
+      const commentaryPromise = generateChapterCommentary({
+        book: item.book,
+        chapter: item.chapter,
+        chapterText,
+        depth: depthMap[commentaryTierRef.current],
+        generateAudio: true,
+        voice: commentaryVoiceRef.current,
+      });
+
+      const result = await Promise.race([commentaryPromise, timeoutPromise]);
+
+      if (isStoppedRef.current || !result) {
+        console.log("[useAudioBible] Stopped or no chapter commentary result");
+        loadingRef.current = false;
+        setIsPlayingCommentary(false);
+        return;
+      }
+
+      console.log(`[useAudioBible] Chapter commentary received: ${result.commentary?.substring(0, 100)}...`);
+      setCurrentCommentary(result.commentary);
+
+      if (result.audioUrl) {
+        console.log("[useAudioBible] Playing chapter commentary audio URL");
+        await audioEngine.play(result.audioUrl);
+      } else if (result.commentary) {
+        // Generate TTS for chapter commentary text
+        console.log("[useAudioBible] Generating TTS for chapter commentary");
+        const audioUrl = await generateTTSAudio({ text: result.commentary, voice: commentaryVoiceRef.current });
+        if (audioUrl && !isStoppedRef.current) {
+          await audioEngine.play(audioUrl);
+        } else {
+          // If TTS fails, just show text and auto-advance after delay
+          console.log("[useAudioBible] TTS failed, showing chapter commentary text only");
+          await new Promise(resolve => setTimeout(resolve, 10000));
+          if (!isStoppedRef.current) {
+            audioEngine.stop(); // Trigger "ended" event
+          }
+        }
+      }
+    } catch (error) {
+      console.error("[useAudioBible] Chapter commentary error:", error);
+      setCurrentCommentary("Chapter commentary unavailable.");
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      if (!isStoppedRef.current) {
+        setIsPlayingCommentary(false);
+        setCurrentCommentary("");
+        audioEngine.stop(); // Trigger "ended" event to continue
+      }
+    } finally {
+      loadingRef.current = false;
+    }
+  }, []);
+
+  /**
    * Play a specific verse
    */
   const playVerseAtIndex = useCallback(async (item: PlaybackItem, index: number) => {
@@ -351,11 +435,12 @@ export function useAudioBible(options: UseAudioBibleOptions = {}) {
     const item = currentItemRef.current;
     if (!item) return;
 
-    console.log(`[useAudioBible] Playback ended. isPlayingCommentary: ${isPlayingCommentaryRef.current}, includeCommentary: ${includeCommentaryRef.current}`);
+    console.log(`[useAudioBible] Playback ended. isPlayingCommentary: ${isPlayingCommentaryRef.current}, includeCommentary: ${includeCommentaryRef.current}, commentaryMode: ${commentaryModeRef.current}`);
 
-    // If we just played a verse and commentary is enabled, play commentary next
-    if (!isPlayingCommentaryRef.current && includeCommentaryRef.current && !commentaryOnlyRef.current) {
-      console.log("[useAudioBible] Starting commentary playback");
+    // If we just played a verse and verse-by-verse commentary is enabled, play verse commentary next
+    // Skip this if commentaryMode is "chapter" - we'll play chapter summary at the end instead
+    if (!isPlayingCommentaryRef.current && includeCommentaryRef.current && !commentaryOnlyRef.current && commentaryModeRef.current === "verse") {
+      console.log("[useAudioBible] Starting verse commentary playback");
       playCurrentVerseCommentary();
       return;
     }
@@ -384,7 +469,13 @@ export function useAudioBible(options: UseAudioBibleOptions = {}) {
 
       playVerseAtIndex(item, nextIndex);
     } else {
-      // Chapter complete
+      // Chapter complete - check if we need to play chapter summary commentary
+      if (includeCommentaryRef.current && commentaryModeRef.current === "chapter" && !isPlayingCommentaryRef.current) {
+        console.log("[useAudioBible] Playing chapter summary commentary");
+        playChapterCommentary();
+        return;
+      }
+      
       onChapterCompleteRef.current?.(item.book, item.chapter);
 
       // Check for more items in queue
@@ -559,6 +650,8 @@ export function useAudioBible(options: UseAudioBibleOptions = {}) {
     setIncludeCommentary,
     commentaryOnly,
     setCommentaryOnly,
+    commentaryMode,
+    setCommentaryMode,
 
     // Actions
     unlock,
