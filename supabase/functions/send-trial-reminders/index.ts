@@ -39,6 +39,38 @@ serve(async (req) => {
 
     logStep("Checking for trials expiring on dates", { day7Target, day2Target, day0Target });
 
+    // First, get users who should be EXCLUDED from trial reminders:
+    // 1. Users with lifetime access in profiles
+    // 2. Users with active Patreon connections ($15+/month)
+    // 3. Users with payment_source = 'patreon' and active status in profiles
+
+    const { data: lifetimeUsers } = await supabase
+      .from('profiles')
+      .select('id')
+      .eq('has_lifetime_access', true);
+    const lifetimeUserIds = new Set((lifetimeUsers || []).map(u => u.id));
+    logStep("Users with lifetime access", { count: lifetimeUserIds.size });
+
+    const { data: patreonUsers } = await supabase
+      .from('patreon_connections')
+      .select('user_id')
+      .eq('is_active_patron', true)
+      .gte('entitled_cents', 1500); // $15/month minimum
+    const patreonUserIds = new Set((patreonUsers || []).map(u => u.user_id));
+    logStep("Users with active Patreon", { count: patreonUserIds.size });
+
+    const { data: patreonProfileUsers } = await supabase
+      .from('profiles')
+      .select('id')
+      .eq('payment_source', 'patreon')
+      .eq('subscription_status', 'active');
+    const patreonProfileUserIds = new Set((patreonProfileUsers || []).map(u => u.id));
+    logStep("Users with Patreon in profile", { count: patreonProfileUserIds.size });
+
+    // Combine all excluded users
+    const excludedUserIds = new Set([...lifetimeUserIds, ...patreonUserIds, ...patreonProfileUserIds]);
+    logStep("Total excluded users", { count: excludedUserIds.size });
+
     // Get trials expiring in 7 days (Day 7 reminder - halfway through)
     // IMPORTANT: Also check that user doesn't have an active paid subscription
     // This prevents sending trial reminders to users who have already converted
@@ -68,16 +100,22 @@ serve(async (req) => {
       .gte('trial_ends_at', `${day0Target}T00:00:00`)
       .lt('trial_ends_at', `${day0Target}T23:59:59`);
 
-    const allTrials = [
+    // Filter out excluded users (lifetime, Patreon, etc.)
+    const allTrialsRaw = [
       ...(day7Trials || []).map(t => ({ ...t, reminderType: 'day7' })),
       ...(day2Trials || []).map(t => ({ ...t, reminderType: 'day2' })),
       ...(day0Trials || []).map(t => ({ ...t, reminderType: 'day0' })),
     ];
 
-    logStep("Found trials to remind", { 
-      day7: day7Trials?.length || 0, 
-      day2: day2Trials?.length || 0, 
-      day0: day0Trials?.length || 0 
+    const allTrials = allTrialsRaw.filter(t => !excludedUserIds.has(t.user_id));
+
+    logStep("Found trials to remind", {
+      day7Raw: day7Trials?.length || 0,
+      day2Raw: day2Trials?.length || 0,
+      day0Raw: day0Trials?.length || 0,
+      totalRaw: allTrialsRaw.length,
+      afterExclusions: allTrials.length,
+      excluded: allTrialsRaw.length - allTrials.length
     });
 
     if (allTrials.length === 0) {
