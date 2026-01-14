@@ -35,8 +35,52 @@ export function TrialUpgradePrompt({ variant = 'banner', onDismiss }: TrialUpgra
       return;
     }
 
+    // CRITICAL: Double-check subscription status is actually 'trial' 
+    // If status is 'active', 'patron', or user has church access, skip trial prompts
+    if (subscription.status === 'active' || subscription.tier === 'patron' || subscription.church.hasChurchAccess) {
+      setTrialInfo(null);
+      setLoading(false);
+      return;
+    }
+
     const checkTrial = async () => {
-      // Check for trial end date
+      // First, check the profile for any indicators of paid access
+      const { data: profileData } = await supabase
+        .from('profiles')
+        .select('has_lifetime_access, subscription_status, subscription_tier, payment_source, stripe_subscription_id')
+        .eq('id', user.id)
+        .maybeSingle();
+
+      // CRITICAL: Check ALL indicators of paid access from the profile
+      if (profileData?.has_lifetime_access) {
+        console.log('[TrialUpgradePrompt] User has lifetime access, hiding trial prompt');
+        setTrialInfo(null);
+        setLoading(false);
+        return;
+      }
+
+      if (profileData?.subscription_status === 'active' && profileData?.subscription_tier && profileData.subscription_tier !== 'free') {
+        console.log('[TrialUpgradePrompt] User has active subscription in profile, hiding trial prompt');
+        setTrialInfo(null);
+        setLoading(false);
+        return;
+      }
+
+      if (profileData?.stripe_subscription_id) {
+        console.log('[TrialUpgradePrompt] User has Stripe subscription ID, hiding trial prompt');
+        setTrialInfo(null);
+        setLoading(false);
+        return;
+      }
+
+      if (profileData?.payment_source && !['trial', 'none', ''].includes(profileData.payment_source)) {
+        console.log('[TrialUpgradePrompt] User has paid payment_source:', profileData.payment_source);
+        setTrialInfo(null);
+        setLoading(false);
+        return;
+      }
+
+      // Now check for trial end date
       const { data } = await supabase
         .from('user_subscriptions')
         .select('subscription_status, trial_ends_at')
