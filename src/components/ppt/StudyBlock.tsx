@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { Button } from "@/components/ui/button";
@@ -19,9 +19,11 @@ import {
   HelpCircle,
   Quote,
   Sparkles,
+  Loader2,
 } from "lucide-react";
 import { motion } from "framer-motion";
 import type { StudyContentBlock } from "./StudyContentBuilder";
+import { useAutoScriptureFetch } from "@/hooks/useAutoScriptureFetch";
 
 export type StudyBlockType = 
   | 'scripture'
@@ -102,6 +104,11 @@ export function StudyBlock({
   const [isEditing, setIsEditing] = useState(!block.content);
   const [editContent, setEditContent] = useState(block.content);
   const [editScriptureRef, setEditScriptureRef] = useState(block.scriptureRef || '');
+  const [isFetchingScripture, setIsFetchingScripture] = useState(false);
+  
+  const { detectAndFetchScripture } = useAutoScriptureFetch();
+  const debounceRef = useRef<NodeJS.Timeout | null>(null);
+  const lastFetchedRef = useRef<string>("");
 
   const {
     attributes,
@@ -119,10 +126,75 @@ export function StudyBlock({
 
   const config = blockTypeConfig[block.type];
 
+  // Auto-detect and fetch scripture when user types a verse reference
+  const handleContentChange = useCallback((value: string) => {
+    setEditContent(value);
+    
+    // Clear any pending debounce
+    if (debounceRef.current) {
+      clearTimeout(debounceRef.current);
+    }
+    
+    // Don't auto-fetch for scripture blocks (they have dedicated ref field)
+    if (block.type === 'scripture') return;
+    
+    // Debounce the scripture detection
+    debounceRef.current = setTimeout(async () => {
+      // Skip if we already fetched for similar content
+      if (value === lastFetchedRef.current) return;
+      
+      setIsFetchingScripture(true);
+      const result = await detectAndFetchScripture(value);
+      setIsFetchingScripture(false);
+      
+      if (result) {
+        lastFetchedRef.current = value;
+        // Auto-add a scripture block after this one by updating with scripture reference
+        onUpdate({
+          content: editContent,
+          scriptureRef: result.scriptureRef
+        });
+      }
+    }, 1000);
+  }, [block.type, detectAndFetchScripture, editContent, onUpdate]);
+
+  // Auto-fetch scripture when scripture reference field changes
+  const handleScriptureRefChange = useCallback(async (value: string) => {
+    setEditScriptureRef(value);
+    
+    // Clear any pending debounce
+    if (debounceRef.current) {
+      clearTimeout(debounceRef.current);
+    }
+    
+    // Debounce the fetch
+    debounceRef.current = setTimeout(async () => {
+      if (!value || value === lastFetchedRef.current) return;
+      
+      setIsFetchingScripture(true);
+      const result = await detectAndFetchScripture(value);
+      setIsFetchingScripture(false);
+      
+      if (result) {
+        lastFetchedRef.current = value;
+        setEditContent(result.verseText);
+      }
+    }, 800);
+  }, [detectAndFetchScripture]);
+
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      if (debounceRef.current) {
+        clearTimeout(debounceRef.current);
+      }
+    };
+  }, []);
+
   const handleSave = () => {
     onUpdate({ 
       content: editContent, 
-      scriptureRef: block.type === 'scripture' ? editScriptureRef : undefined 
+      scriptureRef: block.type === 'scripture' ? editScriptureRef : block.scriptureRef 
     });
     setIsEditing(false);
   };
@@ -167,25 +239,38 @@ export function StudyBlock({
           <div className="flex-1 min-w-0">
             {isEditing ? (
               <div className="space-y-2">
-                <Badge variant="outline" className={`text-[10px] ${config.color} border-current/30`}>
-                  {config.icon}
-                  <span className="ml-1">{config.label}</span>
-                </Badge>
+                <div className="flex items-center gap-2">
+                  <Badge variant="outline" className={`text-[10px] ${config.color} border-current/30`}>
+                    {config.icon}
+                    <span className="ml-1">{config.label}</span>
+                  </Badge>
+                  {isFetchingScripture && (
+                    <span className="flex items-center gap-1 text-xs text-blue-400">
+                      <Loader2 className="w-3 h-3 animate-spin" />
+                      Fetching verse...
+                    </span>
+                  )}
+                </div>
                 
                 {block.type === 'scripture' && (
-                  <Input
-                    value={editScriptureRef}
-                    onChange={(e) => setEditScriptureRef(e.target.value)}
-                    className="bg-slate-700 border-slate-600 text-white text-sm h-8"
-                    placeholder="Scripture reference (e.g., John 3:16)"
-                  />
+                  <div className="relative">
+                    <Input
+                      value={editScriptureRef}
+                      onChange={(e) => handleScriptureRefChange(e.target.value)}
+                      className="bg-slate-700 border-slate-600 text-white text-sm h-8"
+                      placeholder="Scripture reference (e.g., John 3:16) - auto-fetches text"
+                    />
+                    {isFetchingScripture && (
+                      <Loader2 className="absolute right-2 top-1/2 -translate-y-1/2 w-4 h-4 text-blue-400 animate-spin" />
+                    )}
+                  </div>
                 )}
                 
                 <Textarea
                   value={editContent}
-                  onChange={(e) => setEditContent(e.target.value)}
+                  onChange={(e) => handleContentChange(e.target.value)}
                   className="bg-slate-700 border-slate-600 text-white text-sm min-h-[80px]"
-                  placeholder={config.placeholder}
+                  placeholder={block.type === 'scripture' ? 'Verse text will auto-populate, or paste manually...' : config.placeholder}
                   autoFocus
                 />
                 
