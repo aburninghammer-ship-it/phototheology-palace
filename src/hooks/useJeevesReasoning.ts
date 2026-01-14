@@ -1,5 +1,7 @@
 import { useState, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/hooks/useAuth';
+import { toast } from 'sonner';
 
 // ============================================================
 // TYPES FOR JEEVES REASONING ENGINE
@@ -106,6 +108,7 @@ interface UseJeevesReasoningOptions {
 // ============================================================
 
 export function useJeevesReasoning(options: UseJeevesReasoningOptions = {}) {
+  const { user } = useAuth();
   const [messages, setMessages] = useState<JeevesMessage[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [currentMode, setCurrentMode] = useState<JeevesMode>(options.mode || 'explorer');
@@ -113,6 +116,7 @@ export function useJeevesReasoning(options: UseJeevesReasoningOptions = {}) {
   const [activeSparks, setActiveSparks] = useState<Spark[]>([]);
   const [activeClaimLadder, setActiveClaimLadder] = useState<ClaimLadder | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [savedSparkIds, setSavedSparkIds] = useState<Set<string>>(new Set());
 
   const sendMessage = useCallback(async (
     message: string,
@@ -236,6 +240,66 @@ export function useJeevesReasoning(options: UseJeevesReasoningOptions = {}) {
     setActiveSparks(prev => prev.filter(s => s.id !== sparkId));
   }, []);
 
+  // Save a Jeeves spark to the main Sparks Library
+  const saveSparkToLibrary = useCallback(async (spark: Spark): Promise<boolean> => {
+    if (!user?.id) {
+      toast.error('Please sign in to save sparks');
+      return false;
+    }
+
+    try {
+      // Map Jeeves spark kind to library spark type
+      const sparkTypeMap: Record<SparkKind, 'connection' | 'pattern' | 'application'> = {
+        hypothesis: 'connection',
+        pattern: 'pattern',
+        parallel: 'connection',
+        warning: 'application',
+        application: 'application',
+        question: 'connection'
+      };
+
+      // Insert into the main sparks table
+      const { error: insertError } = await supabase
+        .from('sparks')
+        .insert({
+          user_id: user.id,
+          surface: 'other',
+          surface_type: 'jeeves_reasoning',
+          context_type: 'study',
+          context_id: `jeeves-${Date.now()}`,
+          spark_type: sparkTypeMap[spark.spark_kind] || 'connection',
+          title: spark.title,
+          recognition: spark.claim_text || spark.summary,
+          insight: spark.summary + (spark.confidence_notes ? `\n\n${spark.confidence_notes}` : ''),
+          explore_action: {
+            label: spark.next_actions[0] || 'Explore further',
+            targets: spark.anchors.map(a => a.ref),
+            mode: 'trace'
+          },
+          confidence: spark.confidence_level === 'strong' ? 0.9 : 
+                     spark.confidence_level === 'moderate' ? 0.7 : 
+                     spark.confidence_level === 'tentative' ? 0.5 : 0.3,
+          saved_at: new Date().toISOString()
+        });
+
+      if (insertError) throw insertError;
+
+      // Mark as saved in local state
+      setSavedSparkIds(prev => new Set([...prev, spark.id]));
+      toast.success('Spark saved to your library!');
+      return true;
+
+    } catch (err) {
+      console.error('Error saving spark to library:', err);
+      toast.error('Failed to save spark');
+      return false;
+    }
+  }, [user?.id]);
+
+  const isSparkSaved = useCallback((sparkId: string) => {
+    return savedSparkIds.has(sparkId);
+  }, [savedSparkIds]);
+
   return {
     // State
     messages,
@@ -254,7 +318,9 @@ export function useJeevesReasoning(options: UseJeevesReasoningOptions = {}) {
     auditClaim,
     clearSession,
     removeSpark,
-    setActiveClaimLadder
+    setActiveClaimLadder,
+    saveSparkToLibrary,
+    isSparkSaved
   };
 }
 

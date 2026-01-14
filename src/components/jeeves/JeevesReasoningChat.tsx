@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Send, Loader2, Brain, Shield, Building, Eye, Sparkles, AlertTriangle, HelpCircle, Lightbulb, ArrowUpRight, Trash2 } from 'lucide-react';
+import { Send, Loader2, Brain, Shield, Building, Eye, Sparkles, AlertTriangle, HelpCircle, Lightbulb, ArrowUpRight, Trash2, BookmarkCheck, ExternalLink } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Textarea } from '@/components/ui/textarea';
@@ -9,6 +9,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { useJeevesReasoning, JeevesMode, JeevesLens, Spark, ClaimLadder } from '@/hooks/useJeevesReasoning';
 import { cn } from '@/lib/utils';
+import { useNavigate } from 'react-router-dom';
 
 const MODE_CONFIG = {
   explorer: {
@@ -55,9 +56,11 @@ interface SparkCardProps {
   onPromote: (spark: Spark) => void;
   onAudit: (spark: Spark) => void;
   onRemove: (sparkId: string) => void;
+  onSave: (spark: Spark) => void;
+  isSaved: boolean;
 }
 
-function SparkCard({ spark, onPromote, onAudit, onRemove }: SparkCardProps) {
+function SparkCard({ spark, onPromote, onAudit, onRemove, onSave, isSaved }: SparkCardProps) {
   const Icon = SPARK_KIND_ICONS[spark.spark_kind] || Sparkles;
   
   return (
@@ -73,6 +76,7 @@ function SparkCard({ spark, onPromote, onAudit, onRemove }: SparkCardProps) {
               {spark.spark_kind}
             </Badge>
             <div className={cn("w-2 h-2 rounded-full", CONFIDENCE_COLORS[spark.confidence_level])} />
+            {isSaved && <BookmarkCheck className="h-4 w-4 text-amber-500" />}
           </div>
         </div>
         
@@ -96,10 +100,16 @@ function SparkCard({ spark, onPromote, onAudit, onRemove }: SparkCardProps) {
           </div>
         )}
         
-        <div className="flex gap-2 pt-2">
+        <div className="flex gap-2 pt-2 flex-wrap">
+          {!isSaved && (
+            <Button size="sm" variant="default" onClick={() => onSave(spark)}>
+              <BookmarkCheck className="h-3 w-3 mr-1" />
+              Save
+            </Button>
+          )}
           <Button size="sm" variant="outline" onClick={() => onPromote(spark)}>
             <Building className="h-3 w-3 mr-1" />
-            Claim Ladder
+            Ladder
           </Button>
           <Button size="sm" variant="outline" onClick={() => onAudit(spark)}>
             <Shield className="h-3 w-3 mr-1" />
@@ -193,8 +203,12 @@ export function JeevesReasoningChat() {
     promoteSpark,
     auditClaim,
     clearSession,
-    removeSpark
+    removeSpark,
+    saveSparkToLibrary,
+    isSparkSaved
   } = useJeevesReasoning();
+  
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (scrollRef.current) {
@@ -299,6 +313,8 @@ export function JeevesReasoningChat() {
                           onPromote={promoteSpark}
                           onAudit={(s) => auditClaim(s.claim_text || s.summary)}
                           onRemove={removeSpark}
+                          onSave={saveSparkToLibrary}
+                          isSaved={isSparkSaved(spark.id)}
                         />
                       ))}
                     </div>
@@ -390,9 +406,24 @@ export function JeevesReasoningChat() {
                       onPromote={promoteSpark}
                       onAudit={(s) => auditClaim(s.claim_text || s.summary)}
                       onRemove={removeSpark}
+                      onSave={saveSparkToLibrary}
+                      isSaved={isSparkSaved(spark.id)}
                     />
                   ))
                 )}
+                
+                {/* Link to Sparks Library */}
+                <div className="pt-4 border-t border-border/50">
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    className="w-full gap-2"
+                    onClick={() => navigate('/sparks-library')}
+                  >
+                    <ExternalLink className="h-4 w-4" />
+                    View Full Sparks Library
+                  </Button>
+                </div>
               </div>
             </ScrollArea>
           </TabsContent>
