@@ -10419,6 +10419,283 @@ export type Database = {
         }
         Relationships: []
       }
+      sermon_writer_polish_snapshots: {
+        Row: {
+          ai_explanation: string | null
+          applied_at: string | null
+          content_after: string | null
+          content_before: string
+          created_at: string
+          diff_summary: string | null
+          id: string
+          outline_after: Json | null
+          outline_before: Json
+          polish_mode: string
+          rolled_back_at: string | null
+          session_id: string
+          status: string
+          target_id: string | null
+          target_type: string | null
+          user_id: string
+          validation: Json
+          version_id: string | null
+        }
+        Insert: {
+          ai_explanation?: string | null
+          applied_at?: string | null
+          content_after?: string | null
+          content_before: string
+          created_at?: string
+          diff_summary?: string | null
+          id?: string
+          outline_after?: Json | null
+          outline_before: Json
+          polish_mode: string
+          rolled_back_at?: string | null
+          session_id: string
+          status?: string
+          target_id?: string | null
+          target_type?: string | null
+          user_id: string
+          validation?: Json
+          version_id?: string | null
+        }
+        Update: {
+          ai_explanation?: string | null
+          applied_at?: string | null
+          content_after?: string | null
+          content_before?: string
+          created_at?: string
+          diff_summary?: string | null
+          id?: string
+          outline_after?: Json | null
+          outline_before?: Json
+          polish_mode?: string
+          rolled_back_at?: string | null
+          session_id?: string
+          status?: string
+          target_id?: string | null
+          target_type?: string | null
+          user_id?: string
+          validation?: Json
+          version_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sermon_writer_polish_snapshots_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "sermon_writer_sessions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sermon_writer_polish_snapshots_version_id_fkey"
+            columns: ["version_id"]
+            isOneToOne: false
+            referencedRelation: "sermon_writer_versions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      sermon_writer_sessions: {
+        Row: {
+          content: string | null
+          created_at: string
+          current_version_id: string | null
+          id: string
+          last_jeeves_mode: string | null
+          outline_data: Json
+          outline_template: string
+          status: string
+          theme: string
+          theme_passage: string | null
+          title: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          content?: string | null
+          created_at?: string
+          current_version_id?: string | null
+          id?: string
+          last_jeeves_mode?: string | null
+          outline_data?: Json
+          outline_template?: string
+          status?: string
+          theme: string
+          theme_passage?: string | null
+          title?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          content?: string | null
+          created_at?: string
+          current_version_id?: string | null
+          id?: string
+          last_jeeves_mode?: string | null
+          outline_data?: Json
+          outline_template?: string
+          status?: string
+          theme?: string
+          theme_passage?: string | null
+          title?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fk_current_version"
+            columns: ["current_version_id"]
+            isOneToOne: false
+            referencedRelation: "sermon_writer_versions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      sermon_writer_sparks: {
+        Row: {
+          claim_ladder: Json | null
+          confidence: number | null
+          counterpoints: Json | null
+          created_at: string
+          dismissed_at: string | null
+          evidence: Json | null
+          id: string
+          inserted_at: string | null
+          kind: string
+          novelty_score: number | null
+          outline_node_id: string | null
+          pt_mapping: Json | null
+          saved_at: string | null
+          session_id: string
+          source: string
+          spark_type: string
+          status: string
+          summary: string
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          claim_ladder?: Json | null
+          confidence?: number | null
+          counterpoints?: Json | null
+          created_at?: string
+          dismissed_at?: string | null
+          evidence?: Json | null
+          id?: string
+          inserted_at?: string | null
+          kind?: string
+          novelty_score?: number | null
+          outline_node_id?: string | null
+          pt_mapping?: Json | null
+          saved_at?: string | null
+          session_id: string
+          source?: string
+          spark_type?: string
+          status?: string
+          summary: string
+          title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          claim_ladder?: Json | null
+          confidence?: number | null
+          counterpoints?: Json | null
+          created_at?: string
+          dismissed_at?: string | null
+          evidence?: Json | null
+          id?: string
+          inserted_at?: string | null
+          kind?: string
+          novelty_score?: number | null
+          outline_node_id?: string | null
+          pt_mapping?: Json | null
+          saved_at?: string | null
+          session_id?: string
+          source?: string
+          spark_type?: string
+          status?: string
+          summary?: string
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sermon_writer_sparks_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "sermon_writer_sessions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      sermon_writer_versions: {
+        Row: {
+          change_description: string | null
+          change_type: string
+          changed_by: string | null
+          content_snapshot: string | null
+          created_at: string
+          id: string
+          outline_snapshot: Json
+          parent_version_id: string | null
+          session_id: string
+          sparks_snapshot: Json
+          user_id: string
+          version_name: string | null
+          version_number: number
+        }
+        Insert: {
+          change_description?: string | null
+          change_type: string
+          changed_by?: string | null
+          content_snapshot?: string | null
+          created_at?: string
+          id?: string
+          outline_snapshot: Json
+          parent_version_id?: string | null
+          session_id: string
+          sparks_snapshot?: Json
+          user_id: string
+          version_name?: string | null
+          version_number: number
+        }
+        Update: {
+          change_description?: string | null
+          change_type?: string
+          changed_by?: string | null
+          content_snapshot?: string | null
+          created_at?: string
+          id?: string
+          outline_snapshot?: Json
+          parent_version_id?: string | null
+          session_id?: string
+          sparks_snapshot?: Json
+          user_id?: string
+          version_name?: string | null
+          version_number?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sermon_writer_versions_parent_version_id_fkey"
+            columns: ["parent_version_id"]
+            isOneToOne: false
+            referencedRelation: "sermon_writer_versions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sermon_writer_versions_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "sermon_writer_sessions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       sermons: {
         Row: {
           bridges: Json | null
