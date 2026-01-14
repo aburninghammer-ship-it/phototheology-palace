@@ -1,7 +1,34 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
+// Request browser notification permission on mount
+const requestNotificationPermission = async () => {
+  if ('Notification' in window && Notification.permission === 'default') {
+    await Notification.requestPermission();
+  }
+};
+
+// Send browser notification
+const sendBrowserNotification = (title: string, body: string) => {
+  if ('Notification' in window && Notification.permission === 'granted') {
+    const notification = new Notification(title, {
+      body,
+      icon: '/favicon.ico',
+      badge: '/favicon.ico',
+      tag: 'simmer-complete',
+    });
+    
+    // Auto-close after 5 seconds
+    setTimeout(() => notification.close(), 5000);
+    
+    // Focus window on click
+    notification.onclick = () => {
+      window.focus();
+      notification.close();
+    };
+  }
+};
 export type Lane = "BUILD" | "SHARPEN" | "STRESS" | "DISTILL";
 
 export interface SimmerArtifact {
@@ -72,6 +99,10 @@ export function useSimmerEngine(sessionId: string | undefined) {
   const [isProcessing, setIsProcessing] = useState(false);
   const [engineState, setEngineState] = useState<EngineState | null>(null);
 
+  // Request notification permission when hook mounts
+  useEffect(() => {
+    requestNotificationPermission();
+  }, []);
   // Initialize engine mode for a session
   const initializeEngine = useCallback(async (duration: "1h" | "2h" | "3h" = "1h") => {
     if (!sessionId) {
@@ -116,6 +147,12 @@ export function useSimmerEngine(sessionId: string | undefined) {
 
       if (data.complete) {
         toast.success("🔥 Simmer complete! All passes finished.");
+        
+        // Send browser notification when simmer completes
+        sendBrowserNotification(
+          "🔥 Simmer Complete!",
+          "Your sermon has finished simmering. All passes are complete!"
+        );
       } else {
         toast.success(`Pass ${data.pass_index}: ${data.lane} → ${data.artifacts_added} artifact(s)`);
       }
