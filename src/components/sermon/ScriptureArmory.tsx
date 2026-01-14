@@ -191,7 +191,7 @@ export const ScriptureArmory = ({ stones, themePassage, armory, setArmory }: Scr
                     exit={{ height: 0, opacity: 0 }}
                     transition={{ duration: 0.2 }}
                   >
-                    <ScrollArea className="max-h-[300px] border-t border-amber-100">
+                    <div className="border-t border-amber-100 max-h-[300px] overflow-y-auto">
                       <div className="p-3 space-y-2">
                         {armory[idx].map((verse, vIdx) => (
                           <div 
@@ -222,7 +222,7 @@ export const ScriptureArmory = ({ stones, themePassage, armory, setArmory }: Scr
                           </div>
                         ))}
                       </div>
-                    </ScrollArea>
+                    </div>
                   </motion.div>
                 )}
               </AnimatePresence>
