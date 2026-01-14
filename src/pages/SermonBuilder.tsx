@@ -146,6 +146,8 @@ export default function SermonBuilder() {
             localStorage.setItem("pt_page_states", JSON.stringify(states));
           }
         }
+        // Also clear the sermon autosave content
+        localStorage.removeItem("sermon_autosave_content");
       } catch (e) {
         console.warn("Failed to clear sermon state:", e);
       }
@@ -423,6 +425,8 @@ export default function SermonBuilder() {
           localStorage.setItem("pt_page_states", JSON.stringify(states));
         }
       }
+      // Also clear the sermon autosave content
+      localStorage.removeItem("sermon_autosave_content");
     } catch (e) {
       console.warn("Failed to clear sermon state:", e);
     }
