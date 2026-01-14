@@ -141,79 +141,157 @@ OUTPUT FORMAT (STRICT JSON ONLY)
 
 No commentary outside JSON.`;
 
-// Lane-specific micro-prompts for consistency
+// Lane-specific micro-prompts for consistency (ENHANCED V2)
 const LANE_MICRO_PROMPTS: Record<Lane, string> = {
-  BUILD: `BUILD LANE FOCUS:
-You are in BUILD mode. Your ONE job: ADD genuinely new value.
+  BUILD: `🔨 BUILD LANE — ADD NEW VALUE
 
-What counts:
-✓ New argument nobody else made
-✓ Cross-text connection (OT ↔ NT, type ↔ antitype)
-✓ Fresh illustration that lands
-✓ Theological depth (not surface)
-✓ Historical/cultural context that changes meaning
+YOUR MISSION: Create genuinely new content that doesn't exist yet.
 
-What doesn't count:
-✗ Rewording what exists
-✗ Restructuring (that's SHARPEN)
-✗ Pointing out problems (that's STRESS)
-✗ Making summaries (that's DISTILL)
+ACCEPTABLE ARTIFACT TYPES:
+- Illustration: Fresh metaphor, story, or analogy that illuminates the thesis
+- Argument: New logical support for a claim with Scripture anchoring
+- Connection: Cross-text link (OT↔NT, type↔antitype, parallel↔pattern)
+- HistoricalContext: Cultural/historical insight that reshapes meaning
 
-Produce 1-3 artifacts. Each must ADD something that wasn't there.`,
+QUALITY GATES (each artifact must pass):
+□ Does this add something NOT already in PROJECT_STATE?
+□ Does it directly support the thesis (not just tangentially related)?
+□ Is Christ explicitly visible (not generic "Jesus saves" but specific)?
+□ Is the Scripture reference verifiable (not invented)?
 
-  SHARPEN: `SHARPEN LANE FOCUS:
-You are in SHARPEN mode. Your ONE job: IMPROVE what exists.
+HARD BOUNDARIES:
+✗ Do NOT restructure existing content (→ SHARPEN)
+✗ Do NOT identify problems (→ STRESS)  
+✗ Do NOT extract summaries/quotes (→ DISTILL)
+✗ Do NOT produce more than 3 artifacts
 
-What counts:
-✓ Better structure
-✓ Clearer logic flow
-✓ Tighter transitions
-✓ Compressed wording (remove fat)
-✓ Better ordering
+OUTPUT: 1-3 artifacts, each with type, summary, content, verse, ptCodes, linked_sections.`,
 
-What doesn't count:
-✗ New content (that's BUILD)
-✗ Finding problems (that's STRESS)
-✗ Making summaries (that's DISTILL)
+  SHARPEN: `✨ SHARPEN LANE — IMPROVE WHAT EXISTS
 
-Produce 1-3 artifacts. Each must IMPROVE existing content, not add new.`,
+YOUR MISSION: Make existing content clearer, tighter, better-ordered.
 
-  STRESS: `STRESS LANE FOCUS:
-You are in STRESS mode. Your ONE job: SURFACE problems.
+ACCEPTABLE ARTIFACT TYPES:
+- Structure: Improved outline, reordering, logical flow fix
+- Transition: Better bridge between existing sections
+- Compression: Tightened wording that says same thing in fewer words
+- Clarification: Disambiguated phrase or sharpened logic
 
-What counts:
-✓ Weak arguments
-✓ Potential objections a skeptic would raise
-✓ Ambiguous phrases
-✓ Misread risks
-✓ Doctrinal tensions
-✓ Places where the thesis wobbles
+QUALITY GATES:
+□ Does this improve EXISTING content (not add new)?
+□ Is the improvement substantial (not cosmetic rewording)?
+□ Does the structure still protect the thesis?
+□ Are transitions smooth without adding new arguments?
 
-What doesn't count:
-✗ Fixing the problems (that's SHARPEN)
-✗ Adding new content (that's BUILD)
-✗ Making summaries (that's DISTILL)
+HARD BOUNDARIES:
+✗ Do NOT add new illustrations/arguments (→ BUILD)
+✗ Do NOT identify weaknesses (→ STRESS)
+✗ Do NOT extract usable outputs (→ DISTILL)
+✗ Reference which existing artifact/section you're improving
 
-Produce 1-3 artifacts. Each must SURFACE a specific vulnerability. Be ruthless.`,
+OUTPUT: 1-3 artifacts improving existing content. Include "improves_artifact_id" or "improves_section" field.`,
 
-  DISTILL: `DISTILL LANE FOCUS:
-You are in DISTILL mode. Your ONE job: EXTRACT usable outputs.
+  STRESS: `🔥 STRESS LANE — SURFACE VULNERABILITIES
 
-What counts:
-✓ Slide headlines (5 words max)
-✓ Quotable lines
-✓ Discussion questions
-✓ Bullet summaries
-✓ Teaching aids
-✓ Call-to-action phrases
+YOUR MISSION: Be the ruthless critic. Find every weakness.
 
-What doesn't count:
-✗ New arguments (that's BUILD)
-✗ Restructuring (that's SHARPEN)
-✗ Finding problems (that's STRESS)
+ACCEPTABLE ARTIFACT TYPES:
+- Objection: What a skeptic, theologian, or heckler would say
+- Ambiguity: Phrase that could be misread or misapplied
+- Weakness: Logical gap, unsupported claim, or thin evidence
+- Tension: Doctrinal conflict, apparent contradiction, or controversial implication
 
-Produce 1-3 artifacts. Each must be IMMEDIATELY USABLE for presentation/teaching.`,
+QUALITY GATES:
+□ Is this a REAL vulnerability (not nitpicking)?
+□ Would an intelligent critic actually raise this?
+□ Is the weakness specific (not vague "could be stronger")?
+□ Does it identify WHERE the problem lives (section/artifact)?
+
+HARD BOUNDARIES:
+✗ Do NOT fix the problems you find (→ SHARPEN)
+✗ Do NOT add new content (→ BUILD)
+✗ Do NOT extract usable outputs (→ DISTILL)
+✗ Be specific: quote the problematic phrase/argument
+
+OUTPUT: 1-3 objections/weaknesses. Include severity: "minor", "moderate", "critical".`,
+
+  DISTILL: `💎 DISTILL LANE — EXTRACT USABLES
+
+YOUR MISSION: Pull out presentation-ready, immediately usable outputs.
+
+ACCEPTABLE ARTIFACT TYPES:
+- Quote: Memorable one-liner that captures essence (tweetable)
+- Bullet: Slide-ready point (5-7 words, punchy)
+- Question: Discussion question for small groups
+- Headline: Section title or slide header
+- CallToAction: Specific challenge for audience response
+
+QUALITY GATES:
+□ Can this be used AS-IS in a presentation/study guide?
+□ Is it punchy and memorable (not verbose)?
+□ Does it capture the ESSENCE, not just summarize?
+□ Would a preacher actually put this on a slide?
+
+HARD BOUNDARIES:
+✗ Do NOT add new arguments/illustrations (→ BUILD)
+✗ Do NOT restructure content (→ SHARPEN)
+✗ Do NOT identify problems (→ STRESS)
+✗ Keep quotes under 20 words, bullets under 10
+
+OUTPUT: 1-3 distilled artifacts. Mark intended use: "slide", "handout", "discussion", "social".`,
 };
+
+// Context compression - rolling summary strategy
+function compressContext(artifacts: any[], passHistory: any[], maxArtifacts = 10): { summary: string; recentArtifacts: any[] } {
+  const recentArtifacts = artifacts.slice(-maxArtifacts);
+  
+  // Build compressed summary from older artifacts
+  const olderArtifacts = artifacts.slice(0, -maxArtifacts);
+  
+  if (olderArtifacts.length === 0) {
+    return { summary: "", recentArtifacts };
+  }
+  
+  // Group older artifacts by lane
+  const byLane: Record<Lane, string[]> = { BUILD: [], SHARPEN: [], STRESS: [], DISTILL: [] };
+  olderArtifacts.forEach((a: any) => {
+    if (byLane[a.lane as Lane]) {
+      byLane[a.lane as Lane].push(a.summary);
+    }
+  });
+  
+  // Build compressed summary
+  const summaryParts: string[] = [];
+  
+  if (byLane.BUILD.length > 0) {
+    summaryParts.push(`BUILD (${byLane.BUILD.length}): ${byLane.BUILD.slice(-3).join("; ")}`);
+  }
+  if (byLane.SHARPEN.length > 0) {
+    summaryParts.push(`SHARPEN (${byLane.SHARPEN.length}): ${byLane.SHARPEN.slice(-2).join("; ")}`);
+  }
+  if (byLane.STRESS.length > 0) {
+    summaryParts.push(`STRESS (${byLane.STRESS.length}): ${byLane.STRESS.slice(-2).join("; ")}`);
+  }
+  if (byLane.DISTILL.length > 0) {
+    summaryParts.push(`DISTILL (${byLane.DISTILL.length}): ${byLane.DISTILL.slice(-3).join("; ")}`);
+  }
+  
+  // Add pass history summary
+  const totalPasses = passHistory.length;
+  const flagCounts = {
+    overlap: passHistory.filter((p: any) => p.flags?.possible_overlap).length,
+    drift: passHistory.filter((p: any) => p.flags?.thesis_drift).length,
+    scripture: passHistory.filter((p: any) => p.flags?.scripture_uncertainty).length,
+  };
+  
+  let summary = `[COMPRESSED HISTORY: ${olderArtifacts.length} older artifacts]\n${summaryParts.join("\n")}`;
+  
+  if (flagCounts.overlap > 0 || flagCounts.drift > 0 || flagCounts.scripture > 0) {
+    summary += `\n[FLAGS: ${flagCounts.overlap} overlap, ${flagCounts.drift} drift, ${flagCounts.scripture} scripture warnings]`;
+  }
+  
+  return { summary, recentArtifacts };
+}
 
 // Simple hash function for deduplication
 function simpleHash(str: string): string {
@@ -334,9 +412,12 @@ serve(async (req) => {
       // Determine lane (force override or scheduled)
       const currentLane: Lane = forceLane || laneSchedule[passCount];
 
-      // Build project state for context
+      // Build project state for context WITH COMPRESSION
       const artifacts = session.artifacts as any[] || [];
-      const recentArtifacts = artifacts.slice(-10); // Last 10 artifacts for context
+      const passHistory = session.pass_history as any[] || [];
+      
+      // Apply context compression strategy
+      const { summary: compressedHistory, recentArtifacts } = compressContext(artifacts, passHistory, 10);
 
       const projectState = {
         topic: session.theme,
@@ -345,24 +426,36 @@ serve(async (req) => {
         target_audience: session.target_purpose || "general",
         current_outline: session.provisional_outline || [],
         recent_artifacts: recentArtifacts.map((a: any) => ({
+          id: a.id,
           type: a.type,
           summary: a.summary,
+          lane: a.lane,
+          pass_index: a.pass_index,
         })),
         constraints: {
           style: session.target_style || "balanced",
           density: session.target_density || "teaching",
           locked_thesis: session.locked_thesis || false,
         },
+        compressed_history: compressedHistory || null,
         project_summary: session.project_summary || null,
+        total_artifacts: artifacts.length,
+        total_passes: passCount,
       };
 
-      // Build user prompt
+      // Build user prompt with compression awareness
       const userPrompt = `PROJECT_STATE:
 ${JSON.stringify(projectState, null, 2)}
 
 CURRENT_LANE: ${currentLane}
 
 PASS_INDEX: ${passCount + 1} of ${laneSchedule.length}
+
+${compressedHistory ? `
+📜 CONTEXT COMPRESSION ACTIVE
+${compressedHistory}
+The above is a compressed summary of older artifacts. Focus on recent_artifacts for detail.
+` : ""}
 
 ${LANE_MICRO_PROMPTS[currentLane]}
 
@@ -456,8 +549,8 @@ Generate your pass output now. STRICT JSON ONLY.`;
         timestamp: new Date().toISOString(),
       };
 
-      const passHistory = (session.pass_history as any[] || []);
-      passHistory.push(passRecord);
+      const updatedPassHistory = (session.pass_history as any[] || []);
+      updatedPassHistory.push(passRecord);
 
       // Update parking artifacts
       const parkingArtifacts = session.parking_artifacts as any[] || [];
@@ -474,7 +567,7 @@ Generate your pass output now. STRICT JSON ONLY.`;
         artifacts: [...artifacts, ...newArtifacts],
         artifact_hashes: [...existingHashes, ...newHashes],
         parking_artifacts: parkingArtifacts,
-        pass_history: passHistory,
+        pass_history: updatedPassHistory,
         updated_at: new Date().toISOString(),
       };
 
