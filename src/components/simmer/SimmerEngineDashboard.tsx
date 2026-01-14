@@ -19,7 +19,6 @@ import {
   AlertTriangle,
   Zap,
   RefreshCw,
-  FastForward,
   Eye,
   ThumbsUp,
   ThumbsDown
@@ -48,9 +47,11 @@ export function SimmerEngineDashboard({ session }: SimmerEngineDashboardProps) {
   const {
     engineState,
     isProcessing,
+    isAutoRunning,
+    autoRunProgress,
     initializeEngine,
-    runPass,
-    runPasses,
+    startAutoRun,
+    stopAutoRun,
     runValidation,
     togglePause,
     toggleThesisLock,
@@ -101,14 +102,20 @@ export function SimmerEngineDashboard({ session }: SimmerEngineDashboardProps) {
           </div>
 
           <Button
-            onClick={() => initializeEngine(selectedDuration)}
+            onClick={async () => {
+              const result = await initializeEngine(selectedDuration);
+              if (result) {
+                // Auto-start the simmer after initializing
+                setTimeout(() => startAutoRun(), 500);
+              }
+            }}
             disabled={isProcessing}
             className="w-full bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-700 hover:to-blue-700"
           >
             {isProcessing ? (
               <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Initializing...</>
             ) : (
-              <><Flame className="w-4 h-4 mr-2" /> Initialize Engine</>
+              <><Flame className="w-4 h-4 mr-2" /> Start Simmer ({selectedDuration})</>
             )}
           </Button>
 
@@ -200,42 +207,71 @@ export function SimmerEngineDashboard({ session }: SimmerEngineDashboardProps) {
             ))}
           </div>
 
-          {/* Current Lane Info */}
-          {!engineState.isComplete && engineState.currentLane && (
-            <div className={`p-3 rounded-lg ${LANE_COLORS[engineState.currentLane].bg} flex items-center justify-between`}>
-              <div className="flex items-center gap-2">
-                <span className="text-2xl">{LANE_COLORS[engineState.currentLane].icon}</span>
-                <div>
-                  <p className={`font-bold ${LANE_COLORS[engineState.currentLane].text}`}>
-                    Next: {engineState.currentLane}
-                  </p>
-                  <p className="text-xs text-slate-400">
-                    {LANE_DESCRIPTIONS[engineState.currentLane]}
-                  </p>
+          {/* Current Lane Info / Auto-Run Status */}
+          {!engineState.isComplete && (
+            <div className={`p-4 rounded-lg ${isAutoRunning ? 'bg-gradient-to-r from-cyan-900/60 to-blue-900/60 border border-cyan-500/50' : engineState.currentLane ? LANE_COLORS[engineState.currentLane].bg : 'bg-slate-800'}`}>
+              {isAutoRunning && autoRunProgress ? (
+                // Auto-running state
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <Loader2 className="w-6 h-6 text-cyan-400 animate-spin" />
+                      <div>
+                        <p className="font-bold text-cyan-300">
+                          Simmer in Progress...
+                        </p>
+                        <p className="text-sm text-slate-400">
+                          Pass {autoRunProgress.currentPass} of {autoRunProgress.totalPasses}
+                          {autoRunProgress.currentLane && (
+                            <span className="ml-2">
+                              • {LANE_COLORS[autoRunProgress.currentLane].icon} {autoRunProgress.currentLane}
+                            </span>
+                          )}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-xs text-slate-500">Est. remaining</p>
+                      <p className="text-cyan-300 font-mono">{autoRunProgress.estimatedTimeRemaining}</p>
+                    </div>
+                  </div>
+                  <Progress value={(autoRunProgress.currentPass / autoRunProgress.totalPasses) * 100} className="h-2" />
+                  <Button
+                    onClick={stopAutoRun}
+                    variant="outline"
+                    className="w-full border-amber-500/50 text-amber-300 hover:bg-amber-500/20"
+                  >
+                    <Pause className="w-4 h-4 mr-2" /> Stop Simmer
+                  </Button>
                 </div>
-              </div>
-              
-              <div className="flex gap-2">
-                <Button
-                  onClick={() => runPass()}
-                  disabled={isProcessing || engineState.isPaused}
-                  className="bg-cyan-600 hover:bg-cyan-700"
-                >
-                  {isProcessing ? (
-                    <Loader2 className="w-4 h-4 animate-spin" />
-                  ) : (
-                    <><Play className="w-4 h-4 mr-1" /> Run Pass</>
-                  )}
-                </Button>
-                <Button
-                  onClick={() => runPasses(3)}
-                  disabled={isProcessing || engineState.isPaused}
-                  variant="outline"
-                  className="border-cyan-500/30"
-                >
-                  <FastForward className="w-4 h-4 mr-1" /> Run 3
-                </Button>
-              </div>
+              ) : engineState.currentLane ? (
+                // Ready to start state
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <span className="text-2xl">{LANE_COLORS[engineState.currentLane].icon}</span>
+                    <div>
+                      <p className={`font-bold ${LANE_COLORS[engineState.currentLane].text}`}>
+                        Ready to Continue
+                      </p>
+                      <p className="text-xs text-slate-400">
+                        {engineState.laneSchedule.length - engineState.passCount} passes remaining
+                      </p>
+                    </div>
+                  </div>
+                  
+                  <Button
+                    onClick={startAutoRun}
+                    disabled={isProcessing || engineState.isPaused}
+                    className="bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-700 hover:to-blue-700"
+                  >
+                    {isProcessing ? (
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                    ) : (
+                      <><Play className="w-4 h-4 mr-2" /> Continue Simmer</>
+                    )}
+                  </Button>
+                </div>
+              ) : null}
             </div>
           )}
         </CardContent>
