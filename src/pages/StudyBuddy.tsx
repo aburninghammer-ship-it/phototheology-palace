@@ -9,6 +9,7 @@ import { Card } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
 import {
   Brain, Loader2, Save, Trash2,
@@ -27,6 +28,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
+import { StudySimmerWrapper } from "@/components/simmer/StudySimmerWrapper";
 
 // Types for Jeeves analysis
 interface Spark {
@@ -94,6 +96,9 @@ export default function StudyBuddy() {
   const [jeevesLoading, setJeevesLoading] = useState(false);
   const [analysis, setAnalysis] = useState<JeevesAnalysis | null>(null);
   const [analysisHistory, setAnalysisHistory] = useState<string[]>([]);
+
+  // Tab state for Study vs Simmer
+  const [activeTab, setActiveTab] = useState<"study" | "simmer">("study");
 
   // Get chapter count for selected book
   const getChapterCount = () => {
@@ -424,8 +429,30 @@ export default function StudyBuddy() {
         </motion.div>
       </div>
 
-      {/* Three Panel Layout */}
-      <div className="flex-1 overflow-hidden relative z-10 p-4">
+      {/* Tab Navigation */}
+      <div className="relative z-10 px-6">
+        <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as "study" | "simmer")} className="w-full">
+          <TabsList className="bg-black/30 border border-orange-500/20 p-1">
+            <TabsTrigger 
+              value="study" 
+              className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-orange-500 data-[state=active]:to-amber-500 data-[state=active]:text-white text-orange-200"
+            >
+              <Brain className="w-4 h-4 mr-2" />
+              Study
+            </TabsTrigger>
+            <TabsTrigger 
+              value="simmer" 
+              className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-red-600 data-[state=active]:to-orange-500 data-[state=active]:text-white text-orange-200"
+            >
+              <Flame className="w-4 h-4 mr-2" />
+              Simmer
+            </TabsTrigger>
+          </TabsList>
+
+          {/* Study Tab Content */}
+          <TabsContent value="study" className="mt-0 flex-1">
+            {/* Three Panel Layout */}
+            <div className="flex-1 overflow-hidden relative z-10 py-4" style={{ height: 'calc(100vh - 200px)' }}>
         <ResizablePanelGroup direction="horizontal" className="h-full rounded-xl overflow-hidden">
           {/* Bible Panel */}
           <ResizablePanel defaultSize={35} minSize={20}>
@@ -882,6 +909,22 @@ Jeeves sees your notes and will spark connections, suggest PT rooms, source clai
             </Card>
           </ResizablePanel>
         </ResizablePanelGroup>
+            </div>
+          </TabsContent>
+
+          {/* Simmer Tab Content */}
+          <TabsContent value="simmer" className="mt-0 flex-1">
+            <div className="overflow-auto" style={{ height: 'calc(100vh - 200px)' }}>
+              <StudySimmerWrapper 
+                onExportToNotes={(content) => {
+                  setNotes(prev => prev + (prev ? "\n\n---\n\n" : "") + content);
+                  setActiveTab("study");
+                  toast.success("Exported to Notes!");
+                }}
+              />
+            </div>
+          </TabsContent>
+        </Tabs>
       </div>
     </div>
   );
