@@ -29,6 +29,16 @@ const sendBrowserNotification = (title: string, body: string) => {
     };
   }
 };
+
+// Format time remaining for auto-run progress
+const formatTimeRemaining = (passes: number, avgSecondsPerPass: number = 15): string => {
+  const totalSeconds = passes * avgSecondsPerPass;
+  if (totalSeconds < 60) return `${totalSeconds}s`;
+  const minutes = Math.floor(totalSeconds / 60);
+  const seconds = totalSeconds % 60;
+  return seconds > 0 ? `${minutes}m ${seconds}s` : `${minutes}m`;
+};
+
 export type Lane = "BUILD" | "SHARPEN" | "STRESS" | "DISTILL";
 
 export interface SimmerArtifact {
@@ -96,6 +106,13 @@ interface PassResult {
  * Hook for managing the Simmer Engine V1 - the distributed cognitive system
  */
 export function useSimmerEngine(sessionId: string | undefined) {
+  const [isAutoRunning, setIsAutoRunning] = useState(false);
+  const [autoRunProgress, setAutoRunProgress] = useState<{
+    currentPass: number;
+    totalPasses: number;
+    currentLane: Lane | null;
+    estimatedTimeRemaining: string;
+  } | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
   const [engineState, setEngineState] = useState<EngineState | null>(null);
 
@@ -168,7 +185,7 @@ export function useSimmerEngine(sessionId: string | undefined) {
     }
   }, [sessionId]);
 
-  // Run multiple passes in sequence
+  // Run multiple passes in sequence (manual)
   const runPasses = useCallback(async (count: number): Promise<PassResult[]> => {
     const results: PassResult[] = [];
     
@@ -184,6 +201,135 @@ export function useSimmerEngine(sessionId: string | undefined) {
 
     return results;
   }, [runPass]);
+
+  // Refresh state from DB (moved up for dependency order)
+  const refreshState = useCallback(async () => {
+    if (!sessionId) return;
+
+    try {
+      const { data, error } = await supabase
+        .from("sermon_simmer_sessions")
+        .select("*")
+        .eq("id", sessionId)
+        .single();
+
+      if (error) throw error;
+
+      const laneSchedule = (data.lane_schedule as Lane[]) || [];
+      
+      setEngineState({
+        simmerMode: data.simmer_mode as "classic" | "engine" || "classic",
+        simmerDuration: data.simmer_duration as "1h" | "2h" | "3h" || "1h",
+        passCount: data.pass_count || 0,
+        currentLane: data.current_lane as Lane | null,
+        laneSchedule,
+        artifacts: (data.artifacts as unknown as SimmerArtifact[]) || [],
+        parkingArtifacts: (data.parking_artifacts as unknown as any[]) || [],
+        passHistory: (data.pass_history as unknown as PassRecord[]) || [],
+        validationErrors: (data.validation_errors as any[]) || [],
+        projectSummary: data.project_summary,
+        isPaused: data.is_paused || false,
+        lockedThesis: data.locked_thesis || false,
+        humanApprovedArtifacts: (data.human_approved_artifacts as string[]) || [],
+        isComplete: data.pass_count >= laneSchedule.length,
+      });
+    } catch (error: any) {
+      console.error("Refresh state error:", error);
+    }
+  }, [sessionId]);
+
+  // Auto-run all passes until complete
+  const startAutoRun = useCallback(async (): Promise<void> => {
+    if (!sessionId || !engineState) {
+      toast.error("No session or engine not initialized");
+      return;
+    }
+
+    const totalPasses = engineState.laneSchedule.length;
+    const startPass = engineState.passCount;
+    const remainingPasses = totalPasses - startPass;
+
+    if (remainingPasses <= 0) {
+      toast.info("Simmer already complete!");
+      return;
+    }
+
+    setIsAutoRunning(true);
+    toast.info(`🔥 Starting auto-simmer: ${remainingPasses} passes remaining...`);
+
+    let currentPassNum = startPass;
+    
+    while (currentPassNum < totalPasses) {
+      // Check if we should stop (pause state)
+      const { data: sessionData } = await supabase
+        .from("sermon_simmer_sessions")
+        .select("is_paused")
+        .eq("id", sessionId)
+        .single();
+
+      if (sessionData?.is_paused) {
+        toast.info("⏸️ Simmer paused by user");
+        setIsAutoRunning(false);
+        setAutoRunProgress(null);
+        await refreshState();
+        return;
+      }
+
+      // Update progress
+      const remaining = totalPasses - currentPassNum;
+      setAutoRunProgress({
+        currentPass: currentPassNum + 1,
+        totalPasses,
+        currentLane: engineState.laneSchedule[currentPassNum] || null,
+        estimatedTimeRemaining: formatTimeRemaining(remaining),
+      });
+
+      try {
+        const { data, error } = await supabase.functions.invoke("simmer-engine", {
+          body: { action: "run_pass", sessionId },
+        });
+
+        if (error) throw error;
+
+        currentPassNum = data.pass_index;
+
+        if (data.complete) {
+          toast.success("🔥 Simmer complete! Your sermon is ready.");
+          sendBrowserNotification(
+            "🔥 Simmer Complete!",
+            "Your sermon has finished simmering. All passes are complete!"
+          );
+          break;
+        }
+
+        // Delay between passes to avoid overwhelming the API
+        await new Promise(resolve => setTimeout(resolve, 2000));
+
+      } catch (error: any) {
+        console.error("Auto-run pass error:", error);
+        toast.error("Pass failed: " + error.message);
+        break;
+      }
+    }
+
+    setIsAutoRunning(false);
+    setAutoRunProgress(null);
+    await refreshState();
+  }, [sessionId, engineState, refreshState]);
+
+  // Stop auto-run by pausing
+  const stopAutoRun = useCallback(async () => {
+    if (!sessionId) return;
+    
+    try {
+      await supabase.functions.invoke("simmer-engine", {
+        body: { action: "pause", sessionId },
+      });
+      toast.info("⏸️ Stopping simmer...");
+    } catch (error: any) {
+      toast.error("Failed to stop: " + error.message);
+    }
+  }, [sessionId]);
 
   // Run validation
   const runValidation = useCallback(async (artifactIds?: string[]) => {
@@ -282,48 +428,16 @@ export function useSimmerEngine(sessionId: string | undefined) {
     }
   }, [sessionId]);
 
-  // Refresh state from DB
-  const refreshState = useCallback(async () => {
-    if (!sessionId) return;
-
-    try {
-      const { data, error } = await supabase
-        .from("sermon_simmer_sessions")
-        .select("*")
-        .eq("id", sessionId)
-        .single();
-
-      if (error) throw error;
-
-      const laneSchedule = (data.lane_schedule as Lane[]) || [];
-      
-      setEngineState({
-        simmerMode: data.simmer_mode as "classic" | "engine" || "classic",
-        simmerDuration: data.simmer_duration as "1h" | "2h" | "3h" || "1h",
-        passCount: data.pass_count || 0,
-        currentLane: data.current_lane as Lane | null,
-        laneSchedule,
-        artifacts: (data.artifacts as unknown as SimmerArtifact[]) || [],
-        parkingArtifacts: (data.parking_artifacts as unknown as any[]) || [],
-        passHistory: (data.pass_history as unknown as PassRecord[]) || [],
-        validationErrors: (data.validation_errors as any[]) || [],
-        projectSummary: data.project_summary,
-        isPaused: data.is_paused || false,
-        lockedThesis: data.locked_thesis || false,
-        humanApprovedArtifacts: (data.human_approved_artifacts as string[]) || [],
-        isComplete: data.pass_count >= laneSchedule.length,
-      });
-    } catch (error: any) {
-      console.error("Refresh state error:", error);
-    }
-  }, [sessionId]);
-
   return {
     engineState,
     isProcessing,
+    isAutoRunning,
+    autoRunProgress,
     initializeEngine,
     runPass,
     runPasses,
+    startAutoRun,
+    stopAutoRun,
     runValidation,
     togglePause,
     toggleThesisLock,
