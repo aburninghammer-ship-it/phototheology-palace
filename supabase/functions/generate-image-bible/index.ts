@@ -85,15 +85,28 @@ serve(async (req) => {
 
         logStep(`Generating image for ${key}`);
 
-        // Create detailed prompt for Bible scene
-        const prompt = `Create a beautiful, reverent artistic illustration for the Bible chapter "${book} ${chapter}". 
-Theme: ${theme}
-Summary: ${summary}
-Visual elements to include: ${visualIcon}
+        // Create a simple mnemonic image prompt - 24FPS Room style
+        // The chapter number should be visibly integrated into the image
+        const chapterNumDisplay = chapter.toString();
+        const bookAbbrev = book.substring(0, 1).toUpperCase(); // e.g. "G" for Genesis
+        
+        const prompt = `Create a SIMPLE mnemonic memory image for ${book} chapter ${chapter}.
 
-Style: Digital painting, biblical art style, warm golden lighting, spiritual and reverent atmosphere. 
-The image should be suitable for a Bible study app and evoke the key theme of this chapter.
-No text or words in the image. Landscape orientation, 16:9 aspect ratio.`;
+CRITICAL REQUIREMENTS:
+1. The number "${chapterNumDisplay}" must be prominently displayed IN the image - either:
+   - On an object (like "${chapterNumDisplay}" carved on a stone, written on a scroll, on a shield, on pottery)
+   - As part of the scene (${chapterNumDisplay} items shown, ${chapterNumDisplay} fingers held up)
+   - On a marker/sign showing "${bookAbbrev}${chapter}" 
+   
+2. SIMPLE DESIGN - show only ONE key visual symbol/object that represents this chapter:
+   - ${visualIcon}
+   
+3. Style: Clean cartoon/illustration style, simple shapes, bold colors, WHITE or light cream background. Think "emoji meets children's Bible illustration" - memorable and iconic, not detailed or realistic.
+
+4. The image should be a SINGLE memorable symbol that helps someone remember: "${theme}"
+
+DO NOT: Add complex backgrounds, multiple scenes, detailed landscapes, or realistic photo styles.
+DO: Create a simple, bold, iconic image with the chapter number visible.`;
 
         // Call Lovable AI image generation
         const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
