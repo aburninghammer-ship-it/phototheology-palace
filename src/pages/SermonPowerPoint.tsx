@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { Navigation } from "@/components/Navigation";
 import { Button } from "@/components/ui/button";
@@ -11,7 +11,7 @@ import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { toast } from "sonner";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { supabase } from "@/integrations/supabase/client";
 import {
   Presentation,
@@ -26,6 +26,9 @@ import {
   Check,
   Wand2,
   ExternalLink,
+  GraduationCap,
+  PanelRightOpen,
+  PanelRightClose,
 } from "lucide-react";
 import {
   PPT_THEMES,
@@ -41,6 +44,8 @@ import {
 import { downloadSermonPPT } from "@/lib/sermonPPTRenderer";
 import { extractScriptureReferencesFromSermon } from "@/lib/extractScriptureReferences";
 import { SlideEditor } from "@/components/sermon/SlideEditor";
+import { StudyContentBuilder, type StudyContentBlock } from "@/components/ppt/StudyContentBuilder";
+import { PPTJeevesPanel } from "@/components/ppt/PPTJeevesPanel";
 
 // ============================================================================
 // THEME PREVIEW COMPONENT
@@ -104,15 +109,20 @@ export default function SermonPowerPoint() {
   const [searchParams] = useSearchParams();
   const sermonId = searchParams.get("id");
   
-  const [activeTab, setActiveTab] = useState<"full" | "verses">("full");
+  const [activeTab, setActiveTab] = useState<"full" | "verses" | "study">("full");
   const [generating, setGenerating] = useState(false);
   const [loading, setLoading] = useState(false);
   const [step, setStep] = useState<"input" | "settings" | "edit" | "preview">("input");
+  const [showJeeves, setShowJeeves] = useState(false);
 
   // Input state
   const [sermonTitle, setSermonTitle] = useState("");
   const [sermonContent, setSermonContent] = useState("");
   const [versesInput, setVersesInput] = useState("");
+  
+  // Study state
+  const [studyTitle, setStudyTitle] = useState("");
+  const [studyBlocks, setStudyBlocks] = useState<StudyContentBlock[]>([]);
 
   // Settings state
   const [settings, setSettings] = useState<PPTExportSettings>(DEFAULT_EXPORT_SETTINGS);
@@ -268,16 +278,41 @@ export default function SermonPowerPoint() {
   // Check if input is valid
   const isInputValid = activeTab === "verses"
     ? versesInput.trim().length > 0
+    : activeTab === "study"
+    ? studyTitle.trim().length > 0 && studyBlocks.length > 0
     : sermonContent.trim().length > 50;
+
+  // Convert study blocks to content for generation
+  const getStudyContentForGeneration = useCallback(() => {
+    return studyBlocks.map(block => {
+      const prefix = block.type === 'scripture' && block.scriptureRef ? `[${block.scriptureRef}] ` : '';
+      return `[${block.type.toUpperCase()}] ${prefix}${block.content}`;
+    }).join('\n\n');
+  }, [studyBlocks]);
+
+  // Handle Jeeves insert
+  const handleJeevesInsert = useCallback((content: string, type: 'scripture' | 'insight' | 'teaching') => {
+    const newBlock: StudyContentBlock = {
+      id: `block-${Date.now()}`,
+      type,
+      content,
+      order: studyBlocks.length,
+    };
+    setStudyBlocks([...studyBlocks, newBlock]);
+  }, [studyBlocks]);
 
   // Generate presentation structure from AI
   const generatePresentation = async () => {
     setGenerating(true);
     try {
       const isVersesMode = activeTab === "verses";
+      const isStudyMode = activeTab === "study";
       const verses = isVersesMode
         ? versesInput.split("\n").filter((v) => v.trim())
         : undefined;
+      
+      const contentForGeneration = isStudyMode ? getStudyContentForGeneration() : sermonContent;
+      const titleForGeneration = isStudyMode ? studyTitle : sermonTitle;
 
       if (useGamma) {
         // Validate API key is saved
@@ -291,15 +326,15 @@ export default function SermonPowerPoint() {
         const { data, error } = await supabase.functions.invoke("gamma-generate", {
           body: {
             apiKey: gammaApiKey,
-            mode: isVersesMode ? "verses-only" : "full-sermon",
+            mode: isVersesMode ? "verses-only" : isStudyMode ? "study" : "full-sermon",
             sermonData: !isVersesMode ? {
-              title: sermonTitle || "Untitled Sermon",
+              title: titleForGeneration || "Untitled",
               themePassage: "",
-              sermonStyle: "expository",
+              sermonStyle: isStudyMode ? "teaching" : "expository",
               smoothStones: [],
               bridges: [],
               movieStructure: null,
-              fullSermon: sermonContent,
+              fullSermon: contentForGeneration,
             } : undefined,
             verses: isVersesMode ? verses : undefined,
             settings: {
@@ -324,16 +359,16 @@ export default function SermonPowerPoint() {
         // Generate with built-in renderer
         const { data, error } = await supabase.functions.invoke("sermon-to-ppt", {
           body: {
-            mode: isVersesMode ? "verses-only" : "full-sermon",
+            mode: isVersesMode ? "verses-only" : isStudyMode ? "study" : "full-sermon",
             verses: isVersesMode ? verses : undefined,
             sermonData: !isVersesMode ? {
-              title: sermonTitle || "Untitled Sermon",
+              title: titleForGeneration || "Untitled",
               themePassage: "",
-              sermonStyle: "expository",
+              sermonStyle: isStudyMode ? "teaching" : "expository",
               smoothStones: [],
               bridges: [],
               movieStructure: null,
-              fullSermon: sermonContent,
+              fullSermon: contentForGeneration,
             } : undefined,
             settings: {
               slideCount: settings.slide_count,
@@ -509,8 +544,8 @@ export default function SermonPowerPoint() {
               </CardHeader>
               <CardContent className="space-y-6">
                 {/* Input Mode Tabs */}
-                <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as "full" | "verses")}>
-                  <TabsList className="grid w-full grid-cols-2">
+                <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as "full" | "verses" | "study")}>
+                  <TabsList className="grid w-full grid-cols-3">
                     <TabsTrigger value="full" className="gap-2">
                       <Sparkles className="w-4 h-4" />
                       Full Sermon
@@ -518,6 +553,10 @@ export default function SermonPowerPoint() {
                     <TabsTrigger value="verses" className="gap-2">
                       <BookOpen className="w-4 h-4" />
                       Verses Only
+                    </TabsTrigger>
+                    <TabsTrigger value="study" className="gap-2">
+                      <GraduationCap className="w-4 h-4" />
+                      Build Study
                     </TabsTrigger>
                   </TabsList>
 
@@ -595,6 +634,55 @@ John 3:16 - "For God so loved the world..."`}
                         onChange={(e) => setVersesInput(e.target.value)}
                         className="min-h-[250px] font-mono text-sm"
                       />
+                    </div>
+                  </TabsContent>
+
+                  <TabsContent value="study" className="mt-4">
+                    <div className="flex gap-4">
+                      <div className="flex-1">
+                        <div className="p-4 bg-emerald-50 dark:bg-emerald-950/30 rounded-lg border border-emerald-200 dark:border-emerald-800 mb-4">
+                          <p className="text-sm text-emerald-700 dark:text-emerald-300">
+                            Build your study with movable blocks. Add scripture, teaching points, 
+                            discussion questions, and more. Use Jeeves to help research and find verses.
+                          </p>
+                        </div>
+                        <StudyContentBuilder
+                          title={studyTitle}
+                          blocks={studyBlocks}
+                          onTitleChange={setStudyTitle}
+                          onBlocksChange={setStudyBlocks}
+                          onAskJeeves={() => setShowJeeves(true)}
+                          className="min-h-[400px]"
+                        />
+                      </div>
+                      <AnimatePresence>
+                        {showJeeves && (
+                          <motion.div
+                            initial={{ width: 0, opacity: 0 }}
+                            animate={{ width: 380, opacity: 1 }}
+                            exit={{ width: 0, opacity: 0 }}
+                            className="overflow-hidden"
+                          >
+                            <PPTJeevesPanel
+                              studyTitle={studyTitle}
+                              studyContent={studyBlocks.map(b => b.content).join('\n')}
+                              onInsertContent={handleJeevesInsert}
+                              className="h-[500px]"
+                            />
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
+                    </div>
+                    <div className="mt-4 flex justify-end">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setShowJeeves(!showJeeves)}
+                        className="gap-2"
+                      >
+                        {showJeeves ? <PanelRightClose className="w-4 h-4" /> : <PanelRightOpen className="w-4 h-4" />}
+                        {showJeeves ? "Hide Jeeves" : "Show Jeeves Assistant"}
+                      </Button>
                     </div>
                   </TabsContent>
                 </Tabs>
