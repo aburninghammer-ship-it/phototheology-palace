@@ -107,16 +107,45 @@ export function TrialUrgencyMessage() {
         return;
       }
 
+      // CRITICAL: Double-check subscription status is actually 'trial' 
+      // If status is 'active', 'patron', or user has church access, skip trial messages
+      if (subscription.status === 'active' || subscription.tier === 'patron' || subscription.church.hasChurchAccess) {
+        setLoading(false);
+        return;
+      }
+
       try {
-        // Check profile for trial info
+        // Check profile for trial info AND paid status
         const { data } = await supabase
           .from("profiles")
-          .select("trial_ends_at, created_at, has_lifetime_access")
+          .select("trial_ends_at, created_at, has_lifetime_access, subscription_status, subscription_tier, payment_source, stripe_subscription_id")
           .eq("id", user.id)
           .maybeSingle();
 
-        // Additional check for lifetime access from profile
+        // CRITICAL: Check ALL indicators of paid access from the profile
         if (data?.has_lifetime_access) {
+          console.log('[TrialUrgencyMessage] User has lifetime access, hiding trial message');
+          setLoading(false);
+          return;
+        }
+
+        // Check if user has active subscription status in profile
+        if (data?.subscription_status === 'active' && data?.subscription_tier && data.subscription_tier !== 'free') {
+          console.log('[TrialUrgencyMessage] User has active subscription in profile, hiding trial message');
+          setLoading(false);
+          return;
+        }
+
+        // Check if user has Stripe subscription ID (they've paid)
+        if (data?.stripe_subscription_id) {
+          console.log('[TrialUrgencyMessage] User has Stripe subscription ID, hiding trial message');
+          setLoading(false);
+          return;
+        }
+
+        // Check if user has payment_source that isn't trial/none
+        if (data?.payment_source && !['trial', 'none', ''].includes(data.payment_source)) {
+          console.log('[TrialUrgencyMessage] User has paid payment_source:', data.payment_source);
           setLoading(false);
           return;
         }
