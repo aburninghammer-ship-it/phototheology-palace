@@ -123,6 +123,7 @@ const RevelationCourse = lazy(() => import("./pages/RevelationCourse"));
 const RevelationCourseKids = lazy(() => import("./pages/RevelationCourseKids"));
 const KidGPT = lazy(() => import("./pages/KidGPT"));
 const PhototheologyGPT = lazy(() => import("./pages/PhototheologyGPT"));
+const JeevesReasoning = lazy(() => import("./pages/JeevesReasoning"));
 const DanielRevelationGPT = lazy(() => import("./pages/DanielRevelationGPT"));
 const ApologeticsGPT = lazy(() => import("./pages/ApologeticsGPT"));
 const QuarterlyStudy = lazy(() => import("./pages/QuarterlyStudy"));
@@ -565,6 +566,8 @@ function App() {
           <Route path="/pt-kids-game/:gameId" element={<ProtectedRoute><PTKidsGamePlay /></ProtectedRoute>} />
           <Route path="/phototheologygpt" element={<ProtectedRoute><PhototheologyGPT /></ProtectedRoute>} />
           <Route path="/jeeves" element={<ProtectedRoute><PhototheologyGPT /></ProtectedRoute>} />
+          <Route path="/jeeves-reasoning" element={<ProtectedRoute><JeevesReasoning /></ProtectedRoute>} />
+          <Route path="/daniel-revelation-gpt" element={<ProtectedRoute><DanielRevelationGPT /></ProtectedRoute>} />
           <Route path="/daniel-revelation-gpt" element={<ProtectedRoute><DanielRevelationGPT /></ProtectedRoute>} />
           <Route path="/apologetics-gpt" element={<ProtectedRoute><ApologeticsGPT /></ProtectedRoute>} />
           <Route path="/quarterly-study" element={<ProtectedRoute><QuarterlyStudy /></ProtectedRoute>} />
