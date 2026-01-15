@@ -207,8 +207,30 @@ export function SimmerEngineDashboard({ session }: SimmerEngineDashboardProps) {
             ))}
           </div>
 
-          {/* Current Lane Info / Auto-Run Status */}
-          {!engineState.isComplete && (
+          {/* Current Lane Info / Auto-Run Status / Completion */}
+          {engineState.isComplete ? (
+            // Completion celebration state
+            <div className="p-6 rounded-lg bg-gradient-to-r from-green-900/40 to-emerald-900/40 border border-green-500/50">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-4">
+                  <div className="text-4xl">🔥</div>
+                  <div>
+                    <p className="font-bold text-green-300 text-lg">
+                      Simmer Complete!
+                    </p>
+                    <p className="text-sm text-slate-400">
+                      All {engineState.laneSchedule.length} passes finished • {engineState.artifacts.length} artifacts generated
+                    </p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Badge className="bg-green-500/20 text-green-300 text-sm py-1 px-3">
+                    ✓ Ready for Review
+                  </Badge>
+                </div>
+              </div>
+            </div>
+          ) : (
             <div className={`p-4 rounded-lg ${isAutoRunning ? 'bg-gradient-to-r from-cyan-900/60 to-blue-900/60 border border-cyan-500/50' : engineState.currentLane ? LANE_COLORS[engineState.currentLane].bg : 'bg-slate-800'}`}>
               {isAutoRunning && autoRunProgress ? (
                 // Auto-running state
@@ -254,7 +276,7 @@ export function SimmerEngineDashboard({ session }: SimmerEngineDashboardProps) {
                         Ready to Continue
                       </p>
                       <p className="text-xs text-slate-400">
-                        {engineState.laneSchedule.length - engineState.passCount} passes remaining
+                        {engineState.laneSchedule.length - engineState.passCount} pass{engineState.laneSchedule.length - engineState.passCount !== 1 ? 'es' : ''} remaining
                       </p>
                     </div>
                   </div>
