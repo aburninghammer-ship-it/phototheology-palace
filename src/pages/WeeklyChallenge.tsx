@@ -7,6 +7,8 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { useSparks } from "@/hooks/useSparks";
+import { SparkContainer, SparkSettings } from "@/components/sparks";
 import {
   Trophy,
   Clock,
@@ -104,6 +106,23 @@ export default function WeeklyChallengePage() {
   const [submissionCount, setSubmissionCount] = useState(0);
   const [shareDialogOpen, setShareDialogOpen] = useState(false);
   const [activeTab, setActiveTab] = useState("challenge");
+
+  // Sparks integration
+  const {
+    sparks,
+    preferences: sparkPreferences,
+    openSpark,
+    saveSpark,
+    dismissSpark,
+    exploreSpark,
+    updatePreferences: updateSparkPreferences
+  } = useSparks({
+    surface: 'study',
+    contextType: 'study',
+    contextId: challenge?.id || 'weekly-challenge',
+    maxSparks: 3,
+    debounceMs: 90000
+  });
 
   useEffect(() => {
     loadChallenge();
@@ -281,7 +300,30 @@ export default function WeeklyChallengePage() {
   const hasSubmitted = !!userSubmission;
 
   return (
-    <div className="container max-w-6xl mx-auto px-4 py-8 space-y-6">
+    <>
+      {/* Sparks Container */}
+      {sparks.length > 0 && (
+        <div className="fixed bottom-24 right-4 md:bottom-auto md:top-20 z-50">
+          <SparkContainer
+            sparks={sparks}
+            onOpen={openSpark}
+            onSave={saveSpark}
+            onDismiss={dismissSpark}
+            onExplore={exploreSpark}
+            position="floating"
+          />
+        </div>
+      )}
+
+      {/* Spark Settings */}
+      <div className="fixed bottom-24 md:bottom-4 right-4 z-40">
+        <SparkSettings
+          preferences={sparkPreferences}
+          onUpdate={updateSparkPreferences}
+        />
+      </div>
+
+      <div className="container max-w-6xl mx-auto px-4 py-8 space-y-6">
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
@@ -708,6 +750,7 @@ export default function WeeklyChallengePage() {
         onOpenChange={setShareDialogOpen}
         challenge={challenge}
       />
-    </div>
+      </div>
+    </>
   );
 }

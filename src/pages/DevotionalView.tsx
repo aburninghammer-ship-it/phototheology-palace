@@ -16,6 +16,8 @@ import { ShareDevotionalDialog } from "@/components/devotionals/ShareDevotionalD
 import { FreeAudioButton } from "@/components/audio/FreeAudioButton";
 import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
+import { useSparks } from "@/hooks/useSparks";
+import { SparkContainer, SparkSettings } from "@/components/sparks";
 
 import {
   Tooltip,
@@ -60,6 +62,23 @@ export default function DevotionalView() {
   const [rating, setRating] = useState(0);
   const [hasInitializedDay, setHasInitializedDay] = useState(false);
   const [isRegeneratingDay, setIsRegeneratingDay] = useState(false);
+
+  // Sparks integration
+  const {
+    sparks,
+    preferences: sparkPreferences,
+    openSpark,
+    saveSpark,
+    dismissSpark,
+    exploreSpark,
+    updatePreferences: updateSparkPreferences
+  } = useSparks({
+    surface: 'study',
+    contextType: 'study',
+    contextId: planId || 'devotional',
+    maxSparks: 3,
+    debounceMs: 90000
+  });
 
   // Auto-select the current unlocked day ONLY on initial load
   useEffect(() => {
@@ -286,6 +305,28 @@ export default function DevotionalView() {
 
   return (
     <div className="min-h-screen bg-background">
+      {/* Sparks Container */}
+      {sparks.length > 0 && (
+        <div className="fixed bottom-24 right-4 md:bottom-auto md:top-20 z-50">
+          <SparkContainer
+            sparks={sparks}
+            onOpen={openSpark}
+            onSave={saveSpark}
+            onDismiss={dismissSpark}
+            onExplore={exploreSpark}
+            position="floating"
+          />
+        </div>
+      )}
+
+      {/* Spark Settings */}
+      <div className="fixed bottom-24 md:bottom-4 right-4 z-40">
+        <SparkSettings
+          preferences={sparkPreferences}
+          onUpdate={updateSparkPreferences}
+        />
+      </div>
+
       {/* Navigation */}
       {preferences.navigation_style === "simplified" ? <SimplifiedNav /> : <Navigation />}
 
