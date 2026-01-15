@@ -517,18 +517,18 @@ export default function StudyBuddy() {
 
           {/* Notes Panel - Emerald/Teal Theme */}
           <ResizablePanel defaultSize={35} minSize={20}>
-            <Card className="h-full flex flex-col bg-emerald-950/40 border-emerald-500/20 backdrop-blur-xl rounded-none border-l-0 border-r-0">
+            <Card className="h-full flex flex-col bg-emerald-50 dark:bg-emerald-950/40 border-emerald-500/20 backdrop-blur-xl rounded-none border-l-0 border-r-0">
               <div className="p-4 border-b border-emerald-500/20 flex-shrink-0">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <StickyNote className="w-5 h-5 text-emerald-400" />
-                    <span className="font-bold text-white">Notes</span>
+                    <StickyNote className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
+                    <span className="font-bold text-emerald-900 dark:text-white">Notes</span>
                   </div>
                   {jeevesLoading && (
                     <Loader2 className="w-4 h-4 animate-spin text-violet-400" />
                   )}
                 </div>
-                <p className="text-xs text-emerald-200/60 mt-1">Write notes or ask questions — Jeeves will auto-respond</p>
+                <p className="text-xs text-emerald-700 dark:text-emerald-200/60 mt-1">Write notes or ask questions — Jeeves will auto-respond</p>
               </div>
               <div className="flex-1 p-4">
                 <Textarea
@@ -537,7 +537,7 @@ export default function StudyBuddy() {
                   placeholder="Write freely here. Click verses to add them.
 
 Jeeves sees your notes and will spark connections, suggest PT rooms, source claims, and help you think Phototheologically."
-                  className="h-full resize-none border-0 focus-visible:ring-0 text-sm bg-transparent text-emerald-100 placeholder:text-emerald-200/40"
+                  className="h-full resize-none border-0 focus-visible:ring-0 text-sm bg-transparent text-emerald-900 dark:text-emerald-100 placeholder:text-emerald-600/60 dark:placeholder:text-emerald-200/40"
                 />
               </div>
             </Card>
