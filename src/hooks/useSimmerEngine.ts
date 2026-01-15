@@ -255,7 +255,12 @@ export function useSimmerEngine(sessionId: string | undefined) {
     }
 
     setIsAutoRunning(true);
-    toast.info(`🔥 Starting auto-simmer: ${remainingPasses} passes remaining...`);
+    
+    if (remainingPasses === 1) {
+      toast.info(`🔥 Final pass running... almost done!`);
+    } else {
+      toast.info(`🔥 Starting auto-simmer: ${remainingPasses} passes remaining...`);
+    }
 
     let currentPassNum = startPass;
     
