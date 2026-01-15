@@ -424,15 +424,26 @@ export default function PhototheologyImageBible() {
                   <CardContent>
                     {/* Preview of first 6 chapters */}
                     <div className="grid grid-cols-6 gap-2 mb-4">
-                      {book.chapters.slice(0, 6).map((chapter) => (
-                        <div
-                          key={chapter.chapter}
-                          className="aspect-square bg-gradient-to-br from-purple-100 to-pink-100 dark:from-purple-900/30 dark:to-pink-900/30 rounded-lg flex items-center justify-center text-2xl"
-                          title={`${chapter.book} ${chapter.chapter}: ${chapter.theme}`}
-                        >
-                          {chapter.visualIcon.split("")[0]}
-                        </div>
-                      ))}
+                      {book.chapters.slice(0, 6).map((chapter) => {
+                        const imageUrl = getChapterImageUrl(imageMap, chapter.book, chapter.chapter);
+                        return (
+                          <div
+                            key={chapter.chapter}
+                            className="aspect-square bg-gradient-to-br from-purple-100 to-pink-100 dark:from-purple-900/30 dark:to-pink-900/30 rounded-lg flex items-center justify-center text-2xl overflow-hidden"
+                            title={`${chapter.book} ${chapter.chapter}: ${chapter.theme}`}
+                          >
+                            {imageUrl ? (
+                              <img
+                                src={imageUrl}
+                                alt={`${chapter.book} ${chapter.chapter}`}
+                                className="w-full h-full object-cover"
+                              />
+                            ) : (
+                              <span className="text-lg">{chapter.visualIcon.split("")[0]}</span>
+                            )}
+                          </div>
+                        );
+                      })}
                     </div>
                     <Button className="w-full" variant="outline">
                       <Eye className="h-4 w-4 mr-2" />
