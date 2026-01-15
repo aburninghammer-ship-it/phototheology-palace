@@ -1,7 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { Button } from "@/components/ui/button";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Highlighter, X, Trash2 } from "lucide-react";
+import { Highlighter, X } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { toast } from "sonner";
@@ -55,14 +54,14 @@ export const DevotionalTextHighlighter = ({
     if (!user) return;
 
     try {
-      const { data, error } = await supabase
-        .from("devotional_text_highlights")
+      const { data, error } = await (supabase
+        .from("devotional_text_highlights" as any)
         .select("*")
         .eq("user_id", user.id)
-        .eq("devotional_day_id", devotionalDayId);
+        .eq("devotional_day_id", devotionalDayId) as any);
 
       if (error) throw error;
-      setHighlights(data || []);
+      setHighlights((data || []) as TextHighlight[]);
     } catch (error) {
       console.error("Error fetching devotional highlights:", error);
     }
@@ -132,8 +131,8 @@ export const DevotionalTextHighlighter = ({
     }
 
     try {
-      const { data, error } = await supabase
-        .from("devotional_text_highlights")
+      const { data, error } = await (supabase
+        .from("devotional_text_highlights" as any)
         .insert({
           user_id: user.id,
           devotional_day_id: devotionalDayId,
@@ -143,11 +142,11 @@ export const DevotionalTextHighlighter = ({
           text_content: selection.text,
         })
         .select()
-        .single();
+        .single() as any);
 
       if (error) throw error;
 
-      setHighlights(prev => [...prev, data]);
+      setHighlights(prev => [...prev, data as TextHighlight]);
       toast.success("Text highlighted!");
       setShowPopover(false);
       setSelection(null);
@@ -162,10 +161,10 @@ export const DevotionalTextHighlighter = ({
     if (!user) return;
 
     try {
-      const { error } = await supabase
-        .from("devotional_text_highlights")
+      const { error } = await (supabase
+        .from("devotional_text_highlights" as any)
         .delete()
-        .eq("id", highlightId);
+        .eq("id", highlightId) as any);
 
       if (error) throw error;
 
@@ -205,7 +204,7 @@ export const DevotionalTextHighlighter = ({
         <span
           key={`highlight-${highlight.id}`}
           className={cn(
-            "relative group cursor-pointer rounded px-0.5",
+            "relative group cursor-pointer rounded px-0.5 transition-all",
             colorConfig.bg,
             colorConfig.text
           )}
