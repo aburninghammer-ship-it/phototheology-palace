@@ -151,7 +151,7 @@ export function useRevenueAnalytics() {
     const now = new Date();
     const monthStart = startOfMonth(now);
 
-    // Fetch real MRR from Stripe via edge function
+    // Fetch real MRR from Stripe via edge function - this is the authoritative source
     let stripeMrr = 0;
     let stripeActiveCount = 0;
 
@@ -161,6 +161,7 @@ export function useRevenueAnalytics() {
       if (!stripeError && stripeStats?.stats?.stripe) {
         // Convert cents to dollars
         stripeMrr = (stripeStats.stats.stripe.total_mrr_cents || 0) / 100;
+        // Use Stripe active count as the authoritative source (matches Overview tab)
         stripeActiveCount = stripeStats.stats.stripe.active_subscriptions || 0;
       }
     } catch (err) {
@@ -195,22 +196,24 @@ export function useRevenueAnalytics() {
     const totalTrials = trialSubs.length + activeSubs.length;
     const conversionRate = totalTrials > 0 ? (activeSubs.length / totalTrials) * 100 : 0;
 
-    // Churn rate
-    const startOfMonthActive = activeSubs.length + churnedThisMonth;
+    // Churn rate - use Stripe count as authoritative
+    const effectiveActiveCount = stripeActiveCount > 0 ? stripeActiveCount : activeSubs.length;
+    const startOfMonthActive = effectiveActiveCount + churnedThisMonth;
     const churnRate = startOfMonthActive > 0 ? (churnedThisMonth / startOfMonthActive) * 100 : 0;
 
-// MRR will be overwritten by Stripe data if available (see stripeMrr state)
-    const dbMrr = Math.round(stripeMrr * 100) / 100;
+    // MRR from Stripe (authoritative)
+    const finalMrr = Math.round(stripeMrr * 100) / 100;
 
     setMetrics({
-      mrr: dbMrr,
-      arr: Math.round(dbMrr * 12 * 100) / 100,
-      activeSubscribers: activeSubs.length,
+      mrr: finalMrr,
+      arr: Math.round(finalMrr * 12 * 100) / 100,
+      // Use Stripe active count to match Overview tab (authoritative source)
+      activeSubscribers: stripeActiveCount > 0 ? stripeActiveCount : activeSubs.length,
       churnedThisMonth,
       churnRate: Math.round(churnRate * 10) / 10,
       newSubscribersThisMonth: newThisMonth,
       conversionRate: Math.round(conversionRate * 10) / 10,
-      averageRevenuePerUser: activeSubs.length > 0 ? Math.round((dbMrr / activeSubs.length) * 100) / 100 : 0,
+      averageRevenuePerUser: effectiveActiveCount > 0 ? Math.round((finalMrr / effectiveActiveCount) * 100) / 100 : 0,
     });
   };
 
