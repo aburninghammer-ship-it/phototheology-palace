@@ -11,6 +11,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { useAutoScriptureFetch } from "@/hooks/useAutoScriptureFetch";
 
 const AUTOSAVE_KEY = "sermon_autosave_content";
 
@@ -46,6 +47,11 @@ export function SermonWritingStep({ sermon, setSermon, themePassage, sermonId }:
   const autoSaveRef = useRef<NodeJS.Timeout | null>(null);
   const lastContentRef = useRef<string>("");
   const lastSavedContentRef = useRef<string>(sermon.full_sermon);
+  
+  // Auto scripture fetch hook
+  const { detectAndFetchScripture } = useAutoScriptureFetch();
+  const [isFetchingScripture, setIsFetchingScripture] = useState(false);
+  const scriptureFetchDebounceRef = useRef<NodeJS.Timeout | null>(null);
   
   // Cursor context for verse suggestions
   const [cursorContext, setCursorContext] = useState<{ before: string; after: string; paragraph: string } | null>(null);
@@ -437,6 +443,36 @@ Return ONLY the JSON, no other text.`
     }, 800); // Faster response when cursor moves
   }, [sermon.full_sermon, fetchVerseSuggestions]);
 
+  // Auto-detect and fetch scripture references
+  const autoFetchScriptureFromContent = useCallback(async (content: string) => {
+    if (isFetchingScripture) return;
+    
+    setIsFetchingScripture(true);
+    try {
+      const result = await detectAndFetchScripture(content);
+      if (result) {
+        // Add to suggested verses for easy insertion
+        const newVerse: SuggestedVerse = {
+          reference: result.scriptureRef,
+          text: result.verseText,
+          reason: "Detected from your writing",
+          type: 'proof'
+        };
+        
+        // Add to beginning of suggestions, avoiding duplicates
+        setSuggestedVerses(prev => {
+          const exists = prev.some(v => v.reference.toLowerCase() === result.scriptureRef.toLowerCase());
+          if (exists) return prev;
+          return [newVerse, ...prev].slice(0, 5);
+        });
+      }
+    } catch (error) {
+      console.error("Error auto-fetching scripture:", error);
+    } finally {
+      setIsFetchingScripture(false);
+    }
+  }, [detectAndFetchScripture, isFetchingScripture]);
+
   // Handle content change with debounce
   const handleContentChange = (content: string) => {
     setSermon({ ...sermon, full_sermon: content });
@@ -453,6 +489,14 @@ Return ONLY the JSON, no other text.`
         checkForPartialVerses(content);
       }
     }, 2000); // 2 second debounce
+    
+    // Separate faster debounce for auto-scripture detection
+    if (scriptureFetchDebounceRef.current) {
+      clearTimeout(scriptureFetchDebounceRef.current);
+    }
+    scriptureFetchDebounceRef.current = setTimeout(() => {
+      autoFetchScriptureFromContent(content);
+    }, 1000); // 1 second debounce for scripture detection
   };
 
   // Cleanup debounce on unmount
@@ -460,6 +504,9 @@ Return ONLY the JSON, no other text.`
     return () => {
       if (debounceRef.current) {
         clearTimeout(debounceRef.current);
+      }
+      if (scriptureFetchDebounceRef.current) {
+        clearTimeout(scriptureFetchDebounceRef.current);
       }
     };
   }, []);
