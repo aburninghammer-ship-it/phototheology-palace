@@ -118,7 +118,7 @@ RULES:
 - Title should be evocative and memorable (3-6 words)
 - Recognition should ${userName ? `start with a warm greeting using "${userName}" and then ` : ''}acknowledge what the user ${triggerType === 'output' ? 'just completed' : 'is studying'} (1 line)
 - Insight should be substantive but focused (3-6 sentences)
-- Include 2-4 related Scripture targets for exploration
+- ALWAYS include 3-5 related Scripture references in the explore.targets array - this is REQUIRED
 - Be Christ-centered when natural
 - IMPORTANT: If you mention Scripture wording, it MUST be KJV and exact. If you are not 100% sure of the exact KJV wording, do NOT quote it—only cite the reference.
 - No markdown formatting
