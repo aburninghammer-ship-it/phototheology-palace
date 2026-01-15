@@ -351,7 +351,9 @@ Return ONLY the JSON, no other text.`
 
   // Debounced function to get verse suggestions based on cursor context
   const fetchVerseSuggestions = useCallback(async (content: string, contextOverride?: { before: string; paragraph: string }) => {
-    if (!content || content.length < 50) {
+    // Require either 50+ chars in content OR a valid context paragraph
+    const hasValidContext = contextOverride?.paragraph && contextOverride.paragraph.length > 15;
+    if (!hasValidContext && (!content || content.length < 50)) {
       setSuggestedVerses([]);
       return;
     }
@@ -375,9 +377,9 @@ Return ONLY the JSON, no other text.`
       console.log("[VerseSuggestions] Fallback to end of content:", focusedContent.slice(-100));
     }
 
-    // Only fetch if content has meaningfully changed
-    if (focusedContent === lastContentRef.current) {
-      console.log("[VerseSuggestions] Content unchanged, skipping");
+    // Only fetch if content has meaningfully changed OR if we have no verses yet
+    if (focusedContent === lastContentRef.current && suggestedVerses.length > 0) {
+      console.log("[VerseSuggestions] Content unchanged and verses exist, skipping");
       return;
     }
     lastContentRef.current = focusedContent;
@@ -421,7 +423,7 @@ Return ONLY the JSON, no other text.`
     } finally {
       setLoadingVerses(false);
     }
-  }, [themePassage, sermon.smooth_stones]);
+  }, [themePassage, sermon.smooth_stones, suggestedVerses.length]);
 
   // Handle cursor context changes from editor
   const handleCursorContext = useCallback((context: { before: string; after: string; paragraph: string }) => {
