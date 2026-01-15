@@ -12,23 +12,38 @@ const logStep = (step: string, details?: any) => {
   console.log(`[SUBSCRIBER-STATS] ${step}${detailsStr}`);
 };
 
-// Price ID to tier and product name mapping
-const priceToInfo: Record<string, { tier: string; name: string }> = {
-  // Essential tier - NEW (Jan 2025+)
-  'price_1SZNyCFGDAd3RU8IPwPJVesp': { tier: 'essential', name: 'Essential Monthly (new)' },
-  'price_1SZNyVFGDAd3RU8IPgRPqKXH': { tier: 'essential', name: 'Essential Annual (new)' },
-  // Essential tier - LEGACY
-  'price_1SKn0VFGDAd3RU8Io19mT9No': { tier: 'essential', name: 'Essential Monthly (legacy)' },
-  // Premium tier - NEW (Jan 2025+)
-  'price_1SZNyiFGDAd3RU8I4JHYEsEi': { tier: 'premium', name: 'Premium Monthly (new)' },
-  'price_1SZNyuFGDAd3RU8IjeGIvPEb': { tier: 'premium', name: 'Premium Annual (new)' },
-  // Premium tier - LEGACY
-  'price_1SKn12FGDAd3RU8IBpc45ctZ': { tier: 'premium', name: 'Premium Annual (legacy)' },
-  'price_1ONMQ9FGDAd3RU8IcBaBYmoJ': { tier: 'premium', name: 'Premium Monthly (Jan 2024)' },
-  'price_1ONjHsFGDAd3RU8IsHMybTX6': { tier: 'premium', name: 'Premium Annual (Jan 2024)' },
-  // Student tier
-  'price_1SKWM6FGDAd3RU8IcmNNhmKO': { tier: 'student', name: 'Student Monthly' },
-  'price_1SKWMLFGDAd3RU8IBXO8pKxd': { tier: 'student', name: 'Student Annual' },
+// Price ID to tier and product name mapping - COMPLETE LIST
+const priceToInfo: Record<string, { tier: string; name: string; price: number }> = {
+  // ========== NEW SUBSCRIPTION PRODUCTS (Jan 2025+) ==========
+  'price_1SZNyCFGDAd3RU8IPwPJVesp': { tier: 'essential', name: 'Essential Monthly', price: 9 },
+  'price_1SZNyVFGDAd3RU8IPgRPqKXH': { tier: 'essential', name: 'Essential Annual', price: 90 },
+  'price_1SZNyiFGDAd3RU8I4JHYEsEi': { tier: 'premium', name: 'Premium Monthly', price: 15 },
+  'price_1SZNyuFGDAd3RU8IjeGIvPEb': { tier: 'premium', name: 'Premium Annual', price: 150 },
+  
+  // ========== STUDENT ==========
+  'price_1STVXrFGDAd3RU8Ia2NbKJWo': { tier: 'student', name: 'Student Discount ($4.99/mo)', price: 4.99 },
+  
+  // ========== LEGACY INDIVIDUAL SUBSCRIPTIONS ==========
+  // Phototheology App - $15/month (Oct 2024)
+  'price_1SKn0VFGDAd3RU8Io19mT9No': { tier: 'premium', name: 'Phototheology App ($15/mo)', price: 15 },
+  // Phototheology App Lite - $9/month (Oct 2024)
+  'price_1SKn12FGDAd3RU8IBpc45ctZ': { tier: 'essential', name: 'Phototheology App Lite ($9/mo)', price: 9 },
+  // Phototheology Bible Study Palace App - $15/month (Oct 2024)
+  'price_1SJJhAFGDAd3RU8IH8B7ejdt': { tier: 'premium', name: 'PT Bible Study Palace App ($15/mo)', price: 15 },
+  // GPT Lite - $8.99/month
+  'price_1SJJslFGDAd3RU8I6YeUkQgD': { tier: 'essential', name: 'Phototheology GPT Lite ($8.99/mo)', price: 8.99 },
+  // Kids GPT - $7.99/month
+  'price_1SJJqtFGDAd3RU8IlHOUx8nw': { tier: 'essential', name: 'PhotoTheology KidsGPT ($7.99/mo)', price: 7.99 },
+  
+  // ========== OLDER LEGACY (2024) ==========
+  'price_1ONMQ9FGDAd3RU8IcBaBYmoJ': { tier: 'premium', name: 'PT Level 1 ($10/mo)', price: 10 },
+  'price_1O96CqFGDAd3RU8IZjtr5d5w': { tier: 'premium', name: 'PT Level 1 ($32/mo)', price: 32 },
+  'price_1ONjHsFGDAd3RU8IsHMybTX6': { tier: 'premium', name: 'Prophecy Pass Annual ($99/yr)', price: 99 },
+  
+  // ========== CHURCH TIERS ==========
+  'price_1SNEzoFGDAd3RU8Iwa8PSyLw': { tier: 'church', name: 'Small Church 10-50 ($199/mo)', price: 199 },
+  'price_1SNFDxFGDAd3RU8IrvW3c5eS': { tier: 'church', name: 'Tier 1: 50 Seats ($399/mo)', price: 399 },
+  'price_1SNFFMFGDAd3RU8IoasLs7ag': { tier: 'church', name: 'Tier 2: 150 Seats ($899/mo)', price: 899 },
 };
 
 // For backward compatibility
@@ -204,7 +219,7 @@ serve(async (req) => {
       active_subscriptions: 0,
       trialing_subscriptions: 0,
       canceled_subscriptions: 0,
-      by_tier: { essential: 0, premium: 0, student: 0, unknown: 0 },
+      by_tier: { essential: 0, premium: 0, student: 0, church: 0, unknown: 0 },
       by_product: {} as Record<string, { active: number; trialing: number }>,
       total_mrr_cents: 0,
       error: null as string | null,
