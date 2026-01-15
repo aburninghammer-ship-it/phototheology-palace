@@ -15,6 +15,8 @@ import { RefreshCw } from "lucide-react";
 import { BIBLE_BOOK_METADATA } from "@/data/bibleBooks";
 import { BIBLE_TRANSLATIONS } from "@/services/bibleApi";
 import { PTIntegrationPrompt } from "@/components/reading-plans/PTIntegrationPrompt";
+import { useSparks } from "@/hooks/useSparks";
+import { SparkContainer, SparkSettings } from "@/components/sparks";
 
 type ChapterRef = { book: string; chapter: number };
 
@@ -83,6 +85,23 @@ export default function DailyReading() {
   const [completedDayNumber, setCompletedDayNumber] = useState(0);
   const [passagesLoading, setPassagesLoading] = useState(false);
   const [passagesError, setPassagesError] = useState<string | null>(null);
+
+  // Sparks integration
+  const {
+    sparks,
+    preferences: sparkPreferences,
+    openSpark,
+    saveSpark,
+    dismissSpark,
+    exploreSpark,
+    updatePreferences: updateSparkPreferences
+  } = useSparks({
+    surface: 'study',
+    contextType: 'study',
+    contextId: userProgress?.id || 'daily-reading',
+    maxSparks: 3,
+    debounceMs: 90000
+  });
 
   useEffect(() => {
     if (userProgress) {
@@ -371,6 +390,28 @@ export default function DailyReading() {
 
   return (
     <div className="min-h-screen bg-background">
+      {/* Sparks Container */}
+      {sparks.length > 0 && (
+        <div className="fixed bottom-24 right-4 md:bottom-auto md:top-20 z-50">
+          <SparkContainer
+            sparks={sparks}
+            onOpen={openSpark}
+            onSave={saveSpark}
+            onDismiss={dismissSpark}
+            onExplore={exploreSpark}
+            position="floating"
+          />
+        </div>
+      )}
+
+      {/* Spark Settings */}
+      <div className="fixed bottom-24 md:bottom-4 right-4 z-40">
+        <SparkSettings
+          preferences={sparkPreferences}
+          onUpdate={updateSparkPreferences}
+        />
+      </div>
+
       <Navigation />
       
       <div className="container mx-auto px-4 py-8 max-w-4xl">
