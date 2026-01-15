@@ -252,13 +252,26 @@ serve(async (req) => {
           }
           stripeStats.by_product[productName].active++;
           
-          // Calculate MRR
-          const amount = sub.items.data[0]?.price?.unit_amount || 0;
+          // Calculate MRR - only for ACTIVE subscriptions (not trialing)
+          // Use the mapped price if available, otherwise fall back to Stripe's unit_amount
+          const mappedInfo = priceToInfo[priceId];
           const interval = sub.items.data[0]?.price?.recurring?.interval;
-          if (interval === 'year') {
-            stripeStats.total_mrr_cents += Math.round(amount / 12);
+          
+          if (mappedInfo) {
+            // Use our mapped price (already in dollars)
+            if (interval === 'year') {
+              stripeStats.total_mrr_cents += Math.round((mappedInfo.price * 100) / 12);
+            } else {
+              stripeStats.total_mrr_cents += Math.round(mappedInfo.price * 100);
+            }
           } else {
-            stripeStats.total_mrr_cents += amount;
+            // Fallback to Stripe's unit_amount
+            const amount = sub.items.data[0]?.price?.unit_amount || 0;
+            if (interval === 'year') {
+              stripeStats.total_mrr_cents += Math.round(amount / 12);
+            } else {
+              stripeStats.total_mrr_cents += amount;
+            }
           }
         });
 
