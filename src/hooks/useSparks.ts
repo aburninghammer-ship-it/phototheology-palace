@@ -142,13 +142,19 @@ export function useSparks({
     setGenerating(true);
 
     try {
-      // Gather recent spark data for deduplication
-      const recentHashes = sparks
+      // Gather recent spark data for deduplication - include all sparks for better deduplication
+      const { data: allRecentSparks } = await supabase
+        .from('sparks')
+        .select('content_hash, title')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false })
+        .limit(20);
+
+      const recentHashes = (allRecentSparks || [])
         .filter(s => s.content_hash)
         .map(s => s.content_hash as string);
 
-      const recentTitles = sparks
-        .slice(0, 10)
+      const recentTitles = (allRecentSparks || [])
         .map(s => s.title);
 
       const { data, error } = await supabase.functions.invoke('generate-spark', {
@@ -236,31 +242,42 @@ export function useSparks({
   };
 
   // Save spark - removes from active view (goes to library)
-  const saveSpark = async (sparkId: string) => {
-    await supabase
-      .from('sparks')
-      .update({ saved_at: new Date().toISOString() })
-      .eq('id', sparkId);
-    
-    await trackSparkEvent(sparkId, 'saved');
+  const saveSpark = useCallback(async (sparkId: string) => {
+    // Immediately update local state for instant UI feedback
+    setSparks(prev => prev.filter(s => s.id !== sparkId));
     toast.success('Spark saved to your library');
     
-    // Remove from active sparks view (it's now in the library)
-    setSparks(prev => prev.filter(s => s.id !== sparkId));
-  };
+    // Then update database in background
+    try {
+      await supabase
+        .from('sparks')
+        .update({ saved_at: new Date().toISOString() })
+        .eq('id', sparkId);
+      
+      await trackSparkEvent(sparkId, 'saved');
+    } catch (err) {
+      console.error('Error saving spark:', err);
+    }
+  }, [user?.id]);
 
   // Dismiss spark
-  const dismissSpark = async (sparkId: string) => {
-    await supabase
-      .from('sparks')
-      .update({ dismissed_at: new Date().toISOString() })
-      .eq('id', sparkId);
-    
-    await trackSparkEvent(sparkId, 'dismissed');
+  const dismissSpark = useCallback(async (sparkId: string) => {
+    // Immediately update local state for instant UI feedback
+    setSparks(prev => prev.filter(s => s.id !== sparkId));
     dismissedCount.current += 1;
     
-    setSparks(prev => prev.filter(s => s.id !== sparkId));
-  };
+    // Then update database in background
+    try {
+      await supabase
+        .from('sparks')
+        .update({ dismissed_at: new Date().toISOString() })
+        .eq('id', sparkId);
+      
+      await trackSparkEvent(sparkId, 'dismissed');
+    } catch (err) {
+      console.error('Error dismissing spark:', err);
+    }
+  }, [user?.id]);
 
   // Explore spark
   const exploreSpark = async (sparkId: string) => {
