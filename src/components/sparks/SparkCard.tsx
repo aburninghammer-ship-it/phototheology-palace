@@ -1,8 +1,9 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Bookmark, Search, Flame, Sparkles, Lightbulb, ChevronDown, ChevronUp } from 'lucide-react';
+import { X, Bookmark, Search, Flame, Sparkles, Lightbulb, ChevronDown, ChevronUp, BookOpen } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 import type { Spark } from '@/hooks/useSparks';
 
@@ -196,6 +197,29 @@ export function SparkCard({
                     </button>
                   )}
                 </div>
+                
+                {/* Scripture References */}
+                {spark.explore_action?.targets && spark.explore_action.targets.length > 0 && (
+                  <div className="pt-2 border-t border-white/10">
+                    <div className="flex items-center gap-1.5 mb-2">
+                      <BookOpen size={12} className="text-muted-foreground" />
+                      <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+                        Related Scriptures
+                      </span>
+                    </div>
+                    <div className="flex flex-wrap gap-1.5">
+                      {spark.explore_action.targets.map((verse, idx) => (
+                        <Badge 
+                          key={idx} 
+                          variant="secondary" 
+                          className="text-xs bg-background/50 border border-white/20 backdrop-blur-sm"
+                        >
+                          {verse}
+                        </Badge>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
             </ScrollArea>
             
