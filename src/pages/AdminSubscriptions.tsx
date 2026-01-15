@@ -29,6 +29,7 @@ interface StripeStats {
     student: number;
     unknown: number;
   };
+  by_product?: Record<string, { active: number; trialing: number }>;
   total_mrr_cents: number;
   error: string | null;
   unlinked_count: number;
@@ -610,6 +611,37 @@ export default function AdminSubscriptions() {
                 </div>
               </CardContent>
             </Card>
+
+            {/* Stripe Breakdown by Product */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Breakdown by Product</CardTitle>
+                <CardDescription>Active + Trialing per price (shows new vs legacy)</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-2 max-h-64 overflow-y-auto">
+                {stats.stripe.by_product && Object.entries(stats.stripe.by_product)
+                  .sort(([, a], [, b]) => (b.active + b.trialing) - (a.active + a.trialing))
+                  .map(([name, counts]) => (
+                    <div key={name} className="flex justify-between items-center text-sm">
+                      <span className="text-muted-foreground truncate max-w-[200px]" title={name}>
+                        {name}
+                      </span>
+                      <div className="flex gap-2">
+                        <Badge variant="default" className="bg-green-600">{counts.active}</Badge>
+                        {counts.trialing > 0 && (
+                          <Badge variant="secondary" className="bg-blue-100 text-blue-800">{counts.trialing} trial</Badge>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                {(!stats.stripe.by_product || Object.keys(stats.stripe.by_product).length === 0) && (
+                  <p className="text-sm text-muted-foreground">No product breakdown available</p>
+                )}
+              </CardContent>
+            </Card>
+          </div>
+
+          <div className="grid gap-6 md:grid-cols-2">
 
             {/* Church Subscriptions */}
             <Card>
