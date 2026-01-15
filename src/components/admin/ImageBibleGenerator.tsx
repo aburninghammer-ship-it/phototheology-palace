@@ -51,13 +51,19 @@ export function ImageBibleGenerator() {
     }
   };
 
-  // Get chapters to generate based on selection
-  const getChaptersToGenerate = (): ChapterCard[] => {
+  // Get all chapters based on selection
+  const getAllChaptersForSelection = (): ChapterCard[] => {
     if (selectedBook === "all") {
       return imageBibleBooks.flatMap(book => book.chapters);
     }
     const book = imageBibleBooks.find(b => b.name === selectedBook);
     return book?.chapters || [];
+  };
+
+  // Get only missing chapters (not in cache)
+  const getMissingChaptersToGenerate = (): ChapterCard[] => {
+    const allChapters = getAllChaptersForSelection();
+    return allChapters.filter(c => !cachedImages.has(`${c.book}-${c.chapter}`));
   };
 
   // Get stats
@@ -67,13 +73,13 @@ export function ImageBibleGenerator() {
   const missingCount = totalChapters - generatedCount;
 
   const handleGenerate = async (skipExisting = true) => {
-    const chapters = getChaptersToGenerate();
+    // Only send chapters that are actually missing - much more efficient
+    const chapters = skipExisting ? getMissingChaptersToGenerate() : getAllChaptersForSelection();
     
     if (chapters.length === 0) {
       toast({
-        title: "No chapters",
-        description: "No chapters found to generate",
-        variant: "destructive",
+        title: "All images generated!",
+        description: "No missing chapters to generate",
       });
       return;
     }
