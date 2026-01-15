@@ -237,6 +237,18 @@ export default function AdminSubscriptions() {
     checkAdminAndLoadStats();
   }, [user, authLoading, navigate]);
 
+  // Auto-refresh stats every 60 seconds when admin
+  useEffect(() => {
+    if (!isAdmin) return;
+    
+    const interval = setInterval(() => {
+      console.log("[AdminSubscriptions] Auto-refreshing stats...");
+      loadStats();
+    }, 60000); // 60 seconds
+    
+    return () => clearInterval(interval);
+  }, [isAdmin]);
+
   const checkAdminAndLoadStats = async () => {
     if (!user) {
       setLoading(false);
