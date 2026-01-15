@@ -1,4 +1,4 @@
-import { Home, BookOpen, Building2, Gamepad2, Headphones } from "lucide-react";
+import { Home, BookOpen, Building2, Lightbulb, Headphones } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/hooks/useAuth";
@@ -6,7 +6,7 @@ import { useAuth } from "@/hooks/useAuth";
 const navItems = [
   { icon: Home, label: "Home", path: "/dashboard" },
   { icon: BookOpen, label: "Bible", path: "/bible" },
-  { icon: Gamepad2, label: "Games", path: "/games" },
+  { icon: Lightbulb, label: "Thoughts", path: "/analyze-thoughts" },
   { icon: Headphones, label: "Listen", path: "/audio-bible" },
   { icon: Building2, label: "Palace", path: "/palace" },
 ];
