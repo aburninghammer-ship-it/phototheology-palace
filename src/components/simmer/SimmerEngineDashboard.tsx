@@ -29,6 +29,16 @@ interface SimmerEngineDashboardProps {
   session: SimmerSession;
 }
 
+// Strip UUIDs from text for cleaner display
+const stripUUIDs = (text: string | undefined): string => {
+  if (!text) return '';
+  return text
+    .replace(/\([a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}\)/gi, '')
+    .replace(/\b[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}\b/gi, '')
+    .replace(/\s+/g, ' ')
+    .trim();
+};
+
 const LANE_COLORS: Record<Lane, { bg: string; text: string; icon: string }> = {
   BUILD: { bg: "bg-blue-500/20", text: "text-blue-400", icon: "🔨" },
   SHARPEN: { bg: "bg-amber-500/20", text: "text-amber-400", icon: "✨" },
@@ -356,10 +366,10 @@ export function SimmerEngineDashboard({ session }: SimmerEngineDashboardProps) {
                                 )}
                               </div>
                               
-                              <p className="text-white font-medium text-sm">{artifact.summary}</p>
+                              <p className="text-white font-medium text-sm">{stripUUIDs(artifact.summary)}</p>
                               
                               <p className="text-slate-300 text-sm mt-1 line-clamp-2">
-                                {artifact.content}
+                                {stripUUIDs(artifact.content)}
                               </p>
                               
                               {artifact.verse && (

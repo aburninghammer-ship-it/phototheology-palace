@@ -72,7 +72,13 @@ OUTPUT FORMAT (STRICT JSON):
 }
 
 PASSING THRESHOLD: overall_score >= 70
-Only artifacts with passed=true should be committed.`;
+Only artifacts with passed=true should be committed.
+
+CRITICAL FORMATTING RULES:
+- NEVER include raw artifact UUIDs in your issue descriptions or recommendations
+- Refer to artifacts by their summary/type, not by ID
+- Keep issue descriptions focused on the actual problem, not referencing internal IDs
+- Use human-readable references like "the illustration about..." or "the argument for..."`;
 
 serve(async (req) => {
   if (req.method === "OPTIONS") {
