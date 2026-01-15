@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Loader2, ImageIcon, Check, X, RefreshCw, Sparkles } from "lucide-react";
+import { Loader2, ImageIcon, Check, X, RefreshCw, Sparkles, Clock } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { imageBibleBooks, type ChapterCard } from "@/data/imageBibleData";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -14,11 +14,15 @@ interface CachedImage {
   book: string;
   chapter: number;
   public_url: string;
+  generated_at: string;
 }
+
+// Cutoff date for "old style" images - images generated before this date use the old prompt
+const OLD_STYLE_CUTOFF_DATE = new Date("2026-01-14T00:00:00Z");
 
 export function ImageBibleGenerator() {
   const { toast } = useToast();
-  const [cachedImages, setCachedImages] = useState<Map<string, string>>(new Map());
+  const [cachedImages, setCachedImages] = useState<Map<string, { url: string; generatedAt: Date }>>(new Map());
   const [loading, setLoading] = useState(true);
   const [generating, setGenerating] = useState(false);
   const [selectedBook, setSelectedBook] = useState<string>("all");
@@ -34,7 +38,7 @@ export function ImageBibleGenerator() {
     setLoading(true);
     try {
       // Note: backend enforces a 1000-row limit per request, so we page through.
-      const cache = new Map<string, string>();
+      const cache = new Map<string, { url: string; generatedAt: Date }>();
       const pageSize = 1000;
       let from = 0;
 
@@ -42,7 +46,7 @@ export function ImageBibleGenerator() {
         const to = from + pageSize - 1;
         const { data, error } = await supabase
           .from("image_bible_cache")
-          .select("book, chapter, public_url")
+          .select("book, chapter, public_url, generated_at")
           .order("book", { ascending: true })
           .order("chapter", { ascending: true })
           .range(from, to);
@@ -51,7 +55,10 @@ export function ImageBibleGenerator() {
 
         const rows = (data as CachedImage[]) ?? [];
         rows.forEach((item) => {
-          cache.set(`${item.book}-${item.chapter}`, item.public_url);
+          cache.set(`${item.book}-${item.chapter}`, {
+            url: item.public_url,
+            generatedAt: new Date(item.generated_at),
+          });
         });
 
         if (rows.length < pageSize) break;
@@ -81,11 +88,25 @@ export function ImageBibleGenerator() {
     return allChapters.filter(c => !cachedImages.has(`${c.book}-${c.chapter}`));
   };
 
+  // Get old-style chapters (generated before cutoff date)
+  const getOldStyleChapters = (): ChapterCard[] => {
+    const allChapters = getAllChaptersForSelection();
+    return allChapters.filter(c => {
+      const cached = cachedImages.get(`${c.book}-${c.chapter}`);
+      return cached && cached.generatedAt < OLD_STYLE_CUTOFF_DATE;
+    });
+  };
+
   // Get stats
   const allChapters = imageBibleBooks.flatMap(book => book.chapters);
   const totalChapters = allChapters.length;
   const generatedCount = cachedImages.size;
   const missingCount = totalChapters - generatedCount;
+  
+  // Count old-style images
+  const oldStyleCount = Array.from(cachedImages.values()).filter(
+    img => img.generatedAt < OLD_STYLE_CUTOFF_DATE
+  ).length;
 
   const handleGenerate = async (skipExisting = true) => {
     // Only send chapters that are actually missing - much more efficient
@@ -161,6 +182,80 @@ export function ImageBibleGenerator() {
     });
   };
 
+  const handleRegenerateOldStyle = async () => {
+    const oldStyleChapters = getOldStyleChapters();
+    
+    if (oldStyleChapters.length === 0) {
+      toast({
+        title: "All images up to date!",
+        description: "No old-style images to regenerate",
+      });
+      return;
+    }
+
+    setGenerating(true);
+    setResults([]);
+    setProgress({ current: 0, total: oldStyleChapters.length });
+
+    // Process in batches of 5
+    const batchSize = 5;
+    const allResults: typeof results = [];
+
+    for (let i = 0; i < oldStyleChapters.length; i += batchSize) {
+      const batch = oldStyleChapters.slice(i, i + batchSize).map(c => ({
+        book: c.book,
+        chapter: c.chapter,
+        theme: c.theme,
+        summary: c.summary,
+        visualIcon: c.visualIcon,
+      }));
+
+      try {
+        // skipExisting = false to force regeneration
+        const { data, error } = await supabase.functions.invoke("generate-image-bible", {
+          body: { chapters: batch, skipExisting: false },
+        });
+
+        if (error) throw error;
+
+        if (data?.results) {
+          allResults.push(...data.results);
+          setResults([...allResults]);
+        }
+
+        setProgress({ current: Math.min(i + batchSize, oldStyleChapters.length), total: oldStyleChapters.length });
+
+        // Check for credit exhaustion
+        if (data?.results?.some((r: any) => r.error === "Credits exhausted")) {
+          toast({
+            title: "Credits Exhausted",
+            description: "Add more credits to continue generating",
+            variant: "destructive",
+          });
+          break;
+        }
+      } catch (err: unknown) {
+        const errorMsg = err instanceof Error ? err.message : "Generation failed";
+        toast({
+          title: "Error",
+          description: errorMsg,
+          variant: "destructive",
+        });
+        break;
+      }
+    }
+
+    // Reload cache
+    await loadCachedImages();
+    setGenerating(false);
+
+    const successCount = allResults.filter(r => r.success).length;
+    toast({
+      title: "Old Style Update Complete",
+      description: `Regenerated ${successCount} of ${oldStyleChapters.length} images`,
+    });
+  };
+
   if (loading) {
     return (
       <Card>
@@ -174,7 +269,7 @@ export function ImageBibleGenerator() {
   return (
     <div className="space-y-6">
       {/* Stats Overview */}
-      <div className="grid md:grid-cols-3 gap-4">
+      <div className="grid md:grid-cols-4 gap-4">
         <Card>
           <CardHeader className="pb-2">
             <CardTitle className="text-lg">Total Chapters</CardTitle>
@@ -205,6 +300,23 @@ export function ImageBibleGenerator() {
           </CardHeader>
           <CardContent>
             <div className="text-4xl font-bold text-amber-600">{missingCount}</div>
+          </CardContent>
+        </Card>
+
+        <Card className={oldStyleCount > 0 ? "border-orange-500/50 bg-orange-500/5" : "border-green-500/50 bg-green-500/5"}>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-lg flex items-center gap-2">
+              <Clock className="h-5 w-5 text-orange-500" />
+              Old Style
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className={`text-4xl font-bold ${oldStyleCount > 0 ? "text-orange-600" : "text-green-600"}`}>
+              {oldStyleCount}
+            </div>
+            <p className="text-xs text-muted-foreground mt-1">
+              Before {OLD_STYLE_CUTOFF_DATE.toLocaleDateString()}
+            </p>
           </CardContent>
         </Card>
       </div>
@@ -255,18 +367,18 @@ export function ImageBibleGenerator() {
               ) : (
                 <>
                   <Sparkles className="h-4 w-4 mr-2" />
-                  Generate Missing
+                  Generate Missing ({missingCount})
                 </>
               )}
             </Button>
 
             <Button
-              variant="destructive"
-              onClick={() => handleGenerate(false)}
-              disabled={generating}
+              variant="secondary"
+              onClick={handleRegenerateOldStyle}
+              disabled={generating || oldStyleCount === 0}
             >
-              <RefreshCw className="h-4 w-4 mr-2" />
-              Regenerate All (Updates Old Style)
+              <Clock className="h-4 w-4 mr-2" />
+              Update Old Style ({oldStyleCount})
             </Button>
 
             <Button
@@ -328,21 +440,37 @@ export function ImageBibleGenerator() {
               const cached = book.chapters.filter(c => 
                 cachedImages.has(`${c.book}-${c.chapter}`)
               ).length;
+              const oldStyle = book.chapters.filter(c => {
+                const img = cachedImages.get(`${c.book}-${c.chapter}`);
+                return img && img.generatedAt < OLD_STYLE_CUTOFF_DATE;
+              }).length;
               const percent = (cached / book.totalChapters) * 100;
               const isComplete = cached === book.totalChapters;
+              const hasOldStyle = oldStyle > 0;
 
               return (
                 <div
                   key={book.name}
                   className={`p-3 rounded-lg border ${
-                    isComplete ? "bg-green-500/10 border-green-500/30" : "bg-muted/50"
+                    isComplete && !hasOldStyle 
+                      ? "bg-green-500/10 border-green-500/30" 
+                      : hasOldStyle 
+                        ? "bg-orange-500/10 border-orange-500/30"
+                        : "bg-muted/50"
                   }`}
                 >
                   <div className="flex items-center justify-between mb-2">
                     <span className="font-medium text-sm truncate">{book.name}</span>
-                    <Badge variant={isComplete ? "default" : "outline"} className="text-xs">
-                      {cached}/{book.totalChapters}
-                    </Badge>
+                    <div className="flex items-center gap-1">
+                      {hasOldStyle && (
+                        <Badge variant="outline" className="text-xs bg-orange-500/20 text-orange-700 border-orange-500/30">
+                          {oldStyle} old
+                        </Badge>
+                      )}
+                      <Badge variant={isComplete ? "default" : "outline"} className="text-xs">
+                        {cached}/{book.totalChapters}
+                      </Badge>
+                    </div>
                   </div>
                   <Progress value={percent} className="h-2" />
                 </div>
