@@ -33,16 +33,31 @@ export function ImageBibleGenerator() {
   const loadCachedImages = async () => {
     setLoading(true);
     try {
-      const { data, error } = await supabase
-        .from("image_bible_cache")
-        .select("book, chapter, public_url");
-
-      if (error) throw error;
-
+      // Note: backend enforces a 1000-row limit per request, so we page through.
       const cache = new Map<string, string>();
-      (data as CachedImage[])?.forEach((item) => {
-        cache.set(`${item.book}-${item.chapter}`, item.public_url);
-      });
+      const pageSize = 1000;
+      let from = 0;
+
+      while (true) {
+        const to = from + pageSize - 1;
+        const { data, error } = await supabase
+          .from("image_bible_cache")
+          .select("book, chapter, public_url")
+          .order("book", { ascending: true })
+          .order("chapter", { ascending: true })
+          .range(from, to);
+
+        if (error) throw error;
+
+        const rows = (data as CachedImage[]) ?? [];
+        rows.forEach((item) => {
+          cache.set(`${item.book}-${item.chapter}`, item.public_url);
+        });
+
+        if (rows.length < pageSize) break;
+        from += pageSize;
+      }
+
       setCachedImages(cache);
     } catch (err) {
       console.error("Error loading cached images:", err);
