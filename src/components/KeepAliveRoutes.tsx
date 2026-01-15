@@ -20,8 +20,15 @@ interface KeepAliveRoutesProps {
  */
 export const KeepAliveRoutes: React.FC<KeepAliveRoutesProps> = ({
   children,
-  maxCached = 15,
-  excludePaths = ["/auth", "/", "/gatehouse", "/pricing", "/landing", "/sermon-builder", "/sermon-simmer"]
+  maxCached = 10,
+  excludePaths = [
+    "/auth", "/", "/gatehouse", "/pricing", "/landing",
+    "/sermon-builder", "/sermon-simmer",
+    // Exclude 3D pages to prevent memory buildup
+    "/palace/floor/", "/memory/palace-3d/", "/games/story-room-3d",
+    "/games/escape-room-3d", "/games/speed-verse-3d", "/games/24fps-room",
+    "/palace/explorer"
+  ]
 }) => {
   const location = useLocation();
   const currentPath = location.pathname + location.search;
@@ -29,11 +36,11 @@ export const KeepAliveRoutes: React.FC<KeepAliveRoutesProps> = ({
   const scrollPositions = useRef<Map<string, number>>(new Map());
   const isInitialMount = useRef(true);
 
-  // Check if path should be excluded
+  // Check if path should be excluded (supports both exact match and prefix match)
   const shouldExclude = useMemo(() => {
     return excludePaths.some(path =>
       location.pathname === path ||
-      location.pathname.startsWith("/auth")
+      location.pathname.startsWith(path)
     );
   }, [location.pathname, excludePaths]);
 

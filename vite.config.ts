@@ -96,9 +96,40 @@ export default defineConfig(({ mode }) => ({
         chunkFileNames: 'assets/js/[name]-[hash].js',
         entryFileNames: 'assets/js/[name]-[hash].js',
         assetFileNames: 'assets/[name]-[hash][extname]',
-        manualChunks: {
-          'vendor': ['react', 'react-dom', 'react-router-dom'],
-          'ui': ['@radix-ui/react-dialog', '@radix-ui/react-dropdown-menu', '@radix-ui/react-tabs'],
+        manualChunks(id) {
+          // Vendor chunks
+          if (id.includes('node_modules/react-dom') || id.includes('node_modules/react-router-dom')) {
+            return 'vendor';
+          }
+          if (id.includes('node_modules/react/')) {
+            return 'vendor';
+          }
+          // UI component library
+          if (id.includes('node_modules/@radix-ui')) {
+            return 'ui';
+          }
+          // Three.js and 3D libraries
+          if (id.includes('node_modules/three') || id.includes('node_modules/@react-three')) {
+            return 'three';
+          }
+          // PDF library
+          if (id.includes('node_modules/pdfjs-dist')) {
+            return 'pdf';
+          }
+          // Charts library
+          if (id.includes('node_modules/recharts')) {
+            return 'charts';
+          }
+          // Large data files - separate chunk for each
+          if (id.includes('/data/palaceData')) {
+            return 'data-palace';
+          }
+          if (id.includes('/data/imageBibleData')) {
+            return 'data-image-bible';
+          }
+          if (id.includes('/data/escapeRoomData')) {
+            return 'data-escape-room';
+          }
         }
       },
     },
