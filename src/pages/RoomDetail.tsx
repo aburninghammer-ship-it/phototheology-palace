@@ -80,6 +80,7 @@ import { RoomLibrary, LibraryBanner, hasLibrary } from "@/components/room/RoomLi
 import { Room3DToggle } from "@/components/room/Room3DToggle";
 import { RoomGraphicsDisplay, hasRoomGraphics } from "@/components/room/RoomGraphicsDisplay";
 import { WordPictureTranslator } from "@/components/rooms/WordPictureTranslator";
+import { MobileOrientationTip } from "@/components/MobileOrientationTip";
 
 // Room IDs that have quick start guides
 const QUICK_START_ROOMS = new Set([
@@ -391,6 +392,9 @@ export default function RoomDetail() {
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <div className="lg:col-span-2">
+            {/* Mobile orientation tip */}
+            <MobileOrientationTip className="mb-4" />
+            
             <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
               <TabsList className="grid w-full grid-cols-4 p-1 bg-muted/50 backdrop-blur-sm">
                 <TabsTrigger value="learn" className="data-[state=active]:shadow-glow transition-all duration-300">
