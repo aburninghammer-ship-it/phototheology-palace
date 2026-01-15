@@ -489,7 +489,8 @@ export default function DevotionalView() {
                     <DevotionalTextHighlighter
                       key={idx}
                       text={paragraph}
-                      devotionalDayId={`${currentDay.id}-p${idx}`}
+                      devotionalDayId={currentDay.id}
+                      sectionKey={`p${idx}`}
                       className="mb-6 last:mb-0"
                       textClassName="text-lg leading-relaxed text-slate-800 dark:text-slate-200 font-serif"
                     />
@@ -523,7 +524,8 @@ export default function DevotionalView() {
                 <CardContent className="bg-gradient-to-br from-indigo-50 to-purple-50 dark:from-indigo-950/50 dark:to-purple-950/50 pt-0">
                   <DevotionalTextHighlighter
                     text={currentDay.scripture_text || ''}
-                    devotionalDayId={`${currentDay.id}-scripture`}
+                    devotionalDayId={currentDay.id}
+                    sectionKey="scripture"
                     textClassName="text-xl italic leading-relaxed text-indigo-900 dark:text-indigo-100 font-serif"
                   />
                 </CardContent>

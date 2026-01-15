@@ -2910,9 +2910,10 @@ export type Database = {
         Row: {
           color: string
           created_at: string
-          devotional_day_id: string
+          devotional_day_id: string | null
           end_offset: number
           id: string
+          section_key: string | null
           start_offset: number
           text_content: string
           user_id: string
@@ -2920,9 +2921,10 @@ export type Database = {
         Insert: {
           color?: string
           created_at?: string
-          devotional_day_id: string
+          devotional_day_id?: string | null
           end_offset: number
           id?: string
+          section_key?: string | null
           start_offset: number
           text_content: string
           user_id: string
@@ -2930,9 +2932,10 @@ export type Database = {
         Update: {
           color?: string
           created_at?: string
-          devotional_day_id?: string
+          devotional_day_id?: string | null
           end_offset?: number
           id?: string
+          section_key?: string | null
           start_offset?: number
           text_content?: string
           user_id?: string

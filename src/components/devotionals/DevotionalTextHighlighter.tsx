@@ -12,11 +12,13 @@ interface TextHighlight {
   end_offset: number;
   color: string;
   text_content: string;
+  section_key?: string;
 }
 
 interface DevotionalTextHighlighterProps {
   text: string;
-  devotionalDayId: string;
+  devotionalDayId: string; // UUID of the devotional day
+  sectionKey?: string; // Optional key to identify paragraph/section (e.g., "p0", "scripture")
   className?: string;
   textClassName?: string;
 }
@@ -33,6 +35,7 @@ const HIGHLIGHT_COLORS = [
 export const DevotionalTextHighlighter = ({
   text,
   devotionalDayId,
+  sectionKey = "main",
   className,
   textClassName,
 }: DevotionalTextHighlighterProps) => {
@@ -58,7 +61,8 @@ export const DevotionalTextHighlighter = ({
         .from("devotional_text_highlights" as any)
         .select("*")
         .eq("user_id", user.id)
-        .eq("devotional_day_id", devotionalDayId) as any);
+        .eq("devotional_day_id", devotionalDayId)
+        .eq("section_key", sectionKey) as any);
 
       if (error) throw error;
       setHighlights((data || []) as TextHighlight[]);
@@ -136,6 +140,7 @@ export const DevotionalTextHighlighter = ({
         .insert({
           user_id: user.id,
           devotional_day_id: devotionalDayId,
+          section_key: sectionKey,
           start_offset: selection.start,
           end_offset: selection.end,
           color,
