@@ -387,6 +387,10 @@ export default function AdminSubscriptions() {
           <h1 className="text-3xl font-bold">Subscription Analytics</h1>
           <p className="text-muted-foreground">
             Live data from Stripe • Last updated: {new Date(stats.generated_at).toLocaleTimeString()}
+            <span className="text-xs ml-2">(auto-refreshes every 60s)</span>
+          </p>
+          <p className="text-xs text-amber-600 mt-1">
+            ⚠️ Note: New Stripe subscriptions sync when users log in or when you click "Sync Stripe Subscriptions"
           </p>
         </div>
         <Button 
