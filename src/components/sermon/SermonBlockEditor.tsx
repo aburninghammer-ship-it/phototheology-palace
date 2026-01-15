@@ -20,8 +20,12 @@ import {
 import { CSS } from '@dnd-kit/utilities';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { GripVertical, Quote, Type, Trash2, Check, X, CheckSquare, Square, Layers } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { GripVertical, Quote, Type, Trash2, Check, X, CheckSquare, Square, Layers, Plus, Loader2, BookOpen } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { fetchChapter } from '@/services/bibleApi';
+import { toast } from 'sonner';
 
 interface ContentBlock {
   id: string;
@@ -34,6 +38,22 @@ interface SermonBlockEditorProps {
   content: string;
   onChange: (content: string) => void;
   onClose: () => void;
+}
+
+// Parse a verse reference like "John 3:16" or "1 Samuel 15:28-30"
+function parseVerseReference(ref: string): { book: string; chapter: number; startVerse: number; endVerse: number } | null {
+  // Pattern for Bible references
+  const pattern = /^(\d?\s*[A-Za-z]+(?:\s+[A-Za-z]+)?)\s+(\d+):(\d+)(?:-(\d+))?$/i;
+  const match = ref.trim().match(pattern);
+  
+  if (!match) return null;
+  
+  const book = match[1].trim();
+  const chapter = parseInt(match[2], 10);
+  const startVerse = parseInt(match[3], 10);
+  const endVerse = match[4] ? parseInt(match[4], 10) : startVerse;
+  
+  return { book, chapter, startVerse, endVerse };
 }
 
 // Parse HTML content into blocks
@@ -139,6 +159,215 @@ function blocksToHtml(blocks: ContentBlock[]): string {
     }
     return `<p>${block.content}</p>`;
   }).join('\n');
+}
+
+// Insert block form component
+function InsertBlockForm({
+  insertIndex,
+  onInsert,
+  onCancel,
+}: {
+  insertIndex: number;
+  onInsert: (block: ContentBlock) => void;
+  onCancel: () => void;
+}) {
+  const [blockType, setBlockType] = useState<'verse' | 'paragraph'>('verse');
+  const [reference, setReference] = useState('');
+  const [content, setContent] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handleFetchVerse = async () => {
+    if (!reference.trim()) {
+      toast.error('Please enter a verse reference');
+      return;
+    }
+
+    const parsed = parseVerseReference(reference);
+    if (!parsed) {
+      toast.error('Invalid verse format. Use format like "John 3:16" or "1 Samuel 15:28-30"');
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      const chapter = await fetchChapter(parsed.book, parsed.chapter, 'kjv');
+      
+      // Get verse(s) text
+      const verses = chapter.verses.filter(
+        v => v.verse >= parsed.startVerse && v.verse <= parsed.endVerse
+      );
+      
+      if (verses.length === 0) {
+        toast.error('Verse not found');
+        setIsLoading(false);
+        return;
+      }
+
+      const verseText = verses.map(v => v.text).join(' ');
+      setContent(verseText);
+      toast.success('Verse text loaded!');
+    } catch (error) {
+      console.error('Error fetching verse:', error);
+      toast.error('Failed to fetch verse. Please check the reference.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleInsert = () => {
+    if (!content.trim()) {
+      toast.error('Please enter content');
+      return;
+    }
+
+    const newBlock: ContentBlock = {
+      id: `block-new-${Date.now()}`,
+      type: blockType,
+      content: content.trim(),
+      ...(blockType === 'verse' && reference.trim() ? { reference: reference.trim() } : {}),
+    };
+
+    onInsert(newBlock);
+  };
+
+  return (
+    <div className="my-2 p-4 rounded-xl bg-gradient-to-br from-green-500/20 via-emerald-500/15 to-teal-500/20 border border-green-400/40 backdrop-blur-xl shadow-lg animate-in slide-in-from-top-2 duration-300">
+      <div className="flex items-center gap-2 mb-3">
+        <Plus className="h-4 w-4 text-green-400" />
+        <span className="text-sm font-medium text-green-300">Insert New Block</span>
+      </div>
+      
+      {/* Block type toggle */}
+      <div className="flex gap-2 mb-3">
+        <Button
+          variant={blockType === 'verse' ? 'default' : 'outline'}
+          size="sm"
+          onClick={() => setBlockType('verse')}
+          className={cn(
+            'text-xs',
+            blockType === 'verse' 
+              ? 'bg-amber-500/80 hover:bg-amber-500 text-white' 
+              : 'border-amber-400/50 text-amber-300 hover:bg-amber-500/20'
+          )}
+        >
+          <Quote className="h-3 w-3 mr-1" />
+          Verse
+        </Button>
+        <Button
+          variant={blockType === 'paragraph' ? 'default' : 'outline'}
+          size="sm"
+          onClick={() => setBlockType('paragraph')}
+          className={cn(
+            'text-xs',
+            blockType === 'paragraph' 
+              ? 'bg-purple-500/80 hover:bg-purple-500 text-white' 
+              : 'border-purple-400/50 text-purple-300 hover:bg-purple-500/20'
+          )}
+        >
+          <Type className="h-3 w-3 mr-1" />
+          Paragraph
+        </Button>
+      </div>
+
+      {/* Verse reference input with auto-fetch */}
+      {blockType === 'verse' && (
+        <div className="mb-3">
+          <label className="text-xs text-muted-foreground mb-1 block">
+            Verse Reference (e.g., John 3:16 or 1 Samuel 15:28-30)
+          </label>
+          <div className="flex gap-2">
+            <Input
+              value={reference}
+              onChange={(e) => setReference(e.target.value)}
+              placeholder="Enter verse reference..."
+              className="flex-1 bg-background/50 border-white/20 text-sm"
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  e.preventDefault();
+                  handleFetchVerse();
+                }
+              }}
+            />
+            <Button
+              size="sm"
+              onClick={handleFetchVerse}
+              disabled={isLoading || !reference.trim()}
+              className="bg-amber-500/80 hover:bg-amber-500 text-white"
+            >
+              {isLoading ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <>
+                  <BookOpen className="h-4 w-4 mr-1" />
+                  Fetch
+                </>
+              )}
+            </Button>
+          </div>
+        </div>
+      )}
+
+      {/* Content input */}
+      <div className="mb-3">
+        <label className="text-xs text-muted-foreground mb-1 block">
+          {blockType === 'verse' ? 'Verse Text' : 'Paragraph Content'}
+        </label>
+        <Textarea
+          value={content}
+          onChange={(e) => setContent(e.target.value)}
+          placeholder={blockType === 'verse' ? 'Verse text will appear here...' : 'Enter your paragraph...'}
+          className="bg-background/50 border-white/20 text-sm min-h-[80px]"
+        />
+      </div>
+
+      {/* Action buttons */}
+      <div className="flex justify-end gap-2">
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={onCancel}
+          className="text-muted-foreground hover:text-foreground"
+        >
+          Cancel
+        </Button>
+        <Button
+          size="sm"
+          onClick={handleInsert}
+          disabled={!content.trim()}
+          className="bg-green-500/80 hover:bg-green-500 text-white"
+        >
+          <Plus className="h-4 w-4 mr-1" />
+          Insert Block
+        </Button>
+      </div>
+    </div>
+  );
+}
+
+// Insert point between blocks
+function InsertPoint({
+  index,
+  onStartInsert,
+}: {
+  index: number;
+  onStartInsert: (index: number) => void;
+}) {
+  return (
+    <div className="relative h-3 group -my-1 z-10">
+      <div className="absolute inset-x-0 top-1/2 -translate-y-1/2 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+        <div className="h-0.5 flex-1 bg-green-400/30" />
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={() => onStartInsert(index)}
+          className="h-6 w-6 rounded-full bg-green-500/80 hover:bg-green-500 text-white mx-2 shadow-lg"
+        >
+          <Plus className="h-3 w-3" />
+        </Button>
+        <div className="h-0.5 flex-1 bg-green-400/30" />
+      </div>
+    </div>
+  );
 }
 
 // Sortable block component
@@ -375,6 +604,7 @@ export function SermonBlockEditor({ content, onChange, onClose }: SermonBlockEdi
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [activeId, setActiveId] = useState<string | null>(null);
   const [lastSelectedId, setLastSelectedId] = useState<string | null>(null);
+  const [insertingAtIndex, setInsertingAtIndex] = useState<number | null>(null);
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -503,6 +733,16 @@ export function SermonBlockEditor({ content, onChange, onClose }: SermonBlockEdi
     }
   };
 
+  const handleInsertBlock = (index: number, block: ContentBlock) => {
+    setBlocks(prev => {
+      const newBlocks = [...prev];
+      newBlocks.splice(index, 0, block);
+      return newBlocks;
+    });
+    setInsertingAtIndex(null);
+    toast.success('Block inserted!');
+  };
+
   const handleSave = () => {
     const newHtml = blocksToHtml(blocks);
     onChange(newHtml);
@@ -555,7 +795,7 @@ export function SermonBlockEditor({ content, onChange, onClose }: SermonBlockEdi
           <div className="flex items-center gap-2 text-xs text-blue-300">
             <GripVertical className="h-4 w-4" />
             <span>
-              Click to select blocks, Shift+click for range. Drag selected blocks together.
+              Click to select, Shift+click for range. Hover between blocks to insert.
             </span>
           </div>
           <div className="flex items-center gap-2">
@@ -595,7 +835,24 @@ export function SermonBlockEditor({ content, onChange, onClose }: SermonBlockEdi
                 <Type className="h-10 w-10 text-purple-300" />
               </div>
               <p className="text-sm text-foreground/80">No content blocks found.</p>
-              <p className="text-xs mt-2 text-muted-foreground max-w-xs">Write some content first, then use block mode to rearrange your sermon structure.</p>
+              <p className="text-xs mt-2 text-muted-foreground max-w-xs mb-4">Write some content first, or insert a new block below.</p>
+              
+              {insertingAtIndex === 0 ? (
+                <InsertBlockForm
+                  insertIndex={0}
+                  onInsert={(block) => handleInsertBlock(0, block)}
+                  onCancel={() => setInsertingAtIndex(null)}
+                />
+              ) : (
+                <Button
+                  size="sm"
+                  onClick={() => setInsertingAtIndex(0)}
+                  className="bg-green-500/80 hover:bg-green-500 text-white"
+                >
+                  <Plus className="h-4 w-4 mr-1" />
+                  Add First Block
+                </Button>
+              )}
             </div>
           </div>
         ) : (
@@ -606,16 +863,39 @@ export function SermonBlockEditor({ content, onChange, onClose }: SermonBlockEdi
             onDragEnd={handleDragEnd}
           >
             <SortableContext items={blockIds} strategy={verticalListSortingStrategy}>
-              <div className="space-y-3">
-                {blocks.map((block) => (
-                  <SortableBlock
-                    key={block.id}
-                    block={block}
-                    onDelete={handleDelete}
-                    isSelected={selectedIds.has(block.id)}
-                    onToggleSelect={handleToggleSelect}
-                    selectedCount={selectedIds.size}
+              <div className="space-y-1">
+                {/* Insert point at top */}
+                {insertingAtIndex === 0 ? (
+                  <InsertBlockForm
+                    insertIndex={0}
+                    onInsert={(block) => handleInsertBlock(0, block)}
+                    onCancel={() => setInsertingAtIndex(null)}
                   />
+                ) : (
+                  <InsertPoint index={0} onStartInsert={setInsertingAtIndex} />
+                )}
+
+                {blocks.map((block, index) => (
+                  <div key={block.id}>
+                    <SortableBlock
+                      block={block}
+                      onDelete={handleDelete}
+                      isSelected={selectedIds.has(block.id)}
+                      onToggleSelect={handleToggleSelect}
+                      selectedCount={selectedIds.size}
+                    />
+                    
+                    {/* Insert point after each block */}
+                    {insertingAtIndex === index + 1 ? (
+                      <InsertBlockForm
+                        insertIndex={index + 1}
+                        onInsert={(block) => handleInsertBlock(index + 1, block)}
+                        onCancel={() => setInsertingAtIndex(null)}
+                      />
+                    ) : (
+                      <InsertPoint index={index + 1} onStartInsert={setInsertingAtIndex} />
+                    )}
+                  </div>
                 ))}
               </div>
             </SortableContext>
