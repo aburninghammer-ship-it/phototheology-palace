@@ -16,6 +16,7 @@ import { PatreonOutreach } from "@/components/admin/PatreonOutreach";
 import { PickaxeImport } from "@/components/admin/PickaxeImport";
 import { PickaxeEmailCampaign } from "@/components/admin/PickaxeEmailCampaign";
 import { TeachableEmailCampaign } from "@/components/admin/TeachableEmailCampaign";
+import { AdminPasswordReset } from "@/components/admin/AdminPasswordReset";
 import { Badge } from "@/components/ui/badge";
 
 interface StripeStats {
@@ -406,6 +407,7 @@ export default function AdminSubscriptions() {
           <TabsTrigger value="patreon">Patreon</TabsTrigger>
           <TabsTrigger value="teachable">Teachable</TabsTrigger>
           <TabsTrigger value="pickaxe">Pickaxe</TabsTrigger>
+          <TabsTrigger value="users">User Tools</TabsTrigger>
         </TabsList>
 
         <TabsContent value="overview" className="space-y-6">
@@ -867,6 +869,11 @@ export default function AdminSubscriptions() {
 
           {/* Email Campaign */}
           <PickaxeEmailCampaign />
+        </TabsContent>
+
+        {/* User Tools Tab */}
+        <TabsContent value="users" className="space-y-6">
+          <AdminPasswordReset />
         </TabsContent>
       </Tabs>
     </div>
