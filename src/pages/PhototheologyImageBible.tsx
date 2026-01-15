@@ -60,34 +60,32 @@ function Flashcard({ chapter, isFlipped, onFlip, size = "normal", memoryTestMode
         transition={{ duration: 0.6, ease: "easeInOut" }}
         style={{ transformStyle: "preserve-3d" }}
       >
-        {/* Front - Visual (Image or Icon) */}
+        {/* Front - Image Only (no title/summary) */}
         <div
           className={`absolute inset-0 backface-hidden rounded-2xl overflow-hidden shadow-2xl ${
-            hasImage ? "" : "bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500"
+            hasImage ? "bg-white dark:bg-slate-800" : "bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500"
           }`}
           style={{ backfaceVisibility: "hidden" }}
         >
           {hasImage ? (
-            <div className="relative w-full h-full">
+            <div className="relative w-full h-full flex items-center justify-center bg-gradient-to-br from-slate-100 to-slate-200 dark:from-slate-800 dark:to-slate-900">
               <img
                 src={dynamicImageUrl || chapter.imageUrl}
                 alt={`${chapter.book} ${chapter.chapter} - ${chapter.theme}`}
-                className="w-full h-full object-cover"
+                className="w-full h-full object-contain"
               />
-              {!memoryTestMode && (
-                <>
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent" />
-                  <div className="absolute bottom-0 left-0 right-0 p-6 text-white">
-                    <Badge className="bg-white/20 text-white border-white/30 text-lg px-4 py-1 mb-2">
-                      {chapter.book} {chapter.chapter}
-                    </Badge>
-                    <h3 className={`${isLarge ? "text-3xl" : "text-xl"} font-bold`}>
-                      {chapter.theme}
-                    </h3>
-                    <p className="text-white/70 text-sm mt-2">Tap to see theme</p>
-                  </div>
-                </>
-              )}
+              {/* Minimal badge in corner */}
+              <div className="absolute bottom-4 left-4">
+                <Badge className="bg-black/60 text-white border-transparent text-sm px-3 py-1">
+                  {chapter.book} {chapter.chapter}
+                </Badge>
+              </div>
+              {/* Tap hint */}
+              <div className="absolute bottom-4 right-4">
+                <span className="text-xs text-muted-foreground bg-white/80 dark:bg-black/60 dark:text-white/70 px-2 py-1 rounded">
+                  Tap to see theme
+                </span>
+              </div>
               {memoryTestMode && (
                 <div className="absolute bottom-4 left-0 right-0 text-center">
                   <p className="text-white/70 text-sm bg-black/50 px-3 py-1 rounded-full inline-block">
@@ -101,17 +99,10 @@ function Flashcard({ chapter, isFlipped, onFlip, size = "normal", memoryTestMode
               <div className={`${isLarge ? "text-9xl" : "text-6xl"} mb-4`}>
                 {chapter.visualIcon}
               </div>
-              {!memoryTestMode && (
-                <>
-                  <Badge className="bg-white/20 text-white border-white/30 text-lg px-4 py-1 mb-2">
-                    {chapter.book} {chapter.chapter}
-                  </Badge>
-                  <h3 className={`${isLarge ? "text-3xl" : "text-xl"} font-bold text-center`}>
-                    {chapter.theme}
-                  </h3>
-                  <p className="text-white/70 text-sm mt-2">Tap to see theme</p>
-                </>
-              )}
+              <Badge className="bg-white/20 text-white border-white/30 text-lg px-4 py-1 mb-2">
+                {chapter.book} {chapter.chapter}
+              </Badge>
+              <p className="text-white/70 text-sm mt-2">Tap to see theme</p>
               {memoryTestMode && (
                 <p className="text-white/70 text-sm mt-4">What chapter is this? Tap to reveal</p>
               )}
@@ -119,28 +110,31 @@ function Flashcard({ chapter, isFlipped, onFlip, size = "normal", memoryTestMode
           )}
         </div>
 
-        {/* Back - Theme Summary */}
+        {/* Back - Title, Summary, and Image Connection */}
         <div
           className={`absolute inset-0 backface-hidden rounded-2xl bg-gradient-to-br from-amber-500 via-orange-500 to-red-500 p-6 flex flex-col text-white shadow-2xl`}
           style={{ backfaceVisibility: "hidden", transform: "rotateY(180deg)" }}
         >
-          <div className="flex items-center justify-between mb-4">
+          {/* Header with just the chapter badge - NO emoji icon */}
+          <div className="mb-4">
             <Badge className="bg-white/20 text-white border-white/30">
               {chapter.book} {chapter.chapter}
             </Badge>
-            <span className="text-2xl">{chapter.visualIcon}</span>
           </div>
 
+          {/* Title */}
           <h3 className={`${isLarge ? "text-2xl" : "text-lg"} font-bold mb-3`}>
             {chapter.theme}
           </h3>
 
+          {/* Summary - explains the image and chapter connection */}
           <ScrollArea className="flex-1">
             <p className={`${isLarge ? "text-base" : "text-sm"} leading-relaxed opacity-90`}>
               {chapter.summary}
             </p>
           </ScrollArea>
 
+          {/* Key verse and memory hook */}
           <div className="mt-4 pt-4 border-t border-white/20">
             <div className="flex items-center gap-2 text-sm opacity-80 mb-2">
               <BookMarked className="h-4 w-4" />

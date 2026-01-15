@@ -246,6 +246,15 @@ export function ImageBibleGenerator() {
             </Button>
 
             <Button
+              variant="destructive"
+              onClick={() => handleGenerate(false)}
+              disabled={generating}
+            >
+              <RefreshCw className="h-4 w-4 mr-2" />
+              Regenerate All (Updates Old Style)
+            </Button>
+
+            <Button
               variant="outline"
               onClick={loadCachedImages}
               disabled={generating}
