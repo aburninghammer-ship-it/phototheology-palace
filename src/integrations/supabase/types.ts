@@ -13143,6 +13143,7 @@ export type Database = {
           id: string
           navigation_style: string | null
           reading_mode: string | null
+          study_buddy_theme: string | null
           theme_preference: string | null
           updated_at: string
           user_id: string
@@ -13153,6 +13154,7 @@ export type Database = {
           id?: string
           navigation_style?: string | null
           reading_mode?: string | null
+          study_buddy_theme?: string | null
           theme_preference?: string | null
           updated_at?: string
           user_id: string
@@ -13163,6 +13165,7 @@ export type Database = {
           id?: string
           navigation_style?: string | null
           reading_mode?: string | null
+          study_buddy_theme?: string | null
           theme_preference?: string | null
           updated_at?: string
           user_id?: string

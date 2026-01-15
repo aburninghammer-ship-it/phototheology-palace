@@ -3,6 +3,7 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import { Navigation } from "@/components/Navigation";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
+import { useUserPreferences } from "@/hooks/useUserPreferences";
 import { usePersistedState, usePreservePageState } from "@/contexts/PageStateContext";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -14,7 +15,7 @@ import { toast } from "sonner";
 import {
   Brain, Loader2, Save, Trash2,
   ChevronLeft, ChevronRight, StickyNote,
-  Book, Flame, Lightbulb, BookOpen, Target, Crosshair, Sparkles, Eye, Send, Search
+  Book, Flame, Lightbulb, BookOpen, Target, Crosshair, Sparkles, Eye, Send, Search, Sun, Moon
 } from "lucide-react";
 import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from "@/components/ui/resizable";
 import { BIBLE_BOOK_METADATA } from "@/data/bibleBooks";
@@ -70,7 +71,11 @@ export default function StudyBuddy() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const { user, loading: authLoading } = useAuth();
+  const { preferences, updatePreference } = useUserPreferences();
   const analysisEndRef = useRef<HTMLDivElement>(null);
+
+  // Theme state
+  const isLightTheme = preferences.study_buddy_theme === "light";
 
   // Session state
   const [currentSessionId, setCurrentSessionId] = useState<string | null>(
@@ -340,65 +345,105 @@ export default function StudyBuddy() {
 
   if (authLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-orange-950 via-amber-900 to-red-950 flex items-center justify-center">
-        <Loader2 className="w-8 h-8 text-orange-400 animate-spin" />
+      <div className={`min-h-screen flex items-center justify-center ${
+        isLightTheme 
+          ? "bg-gradient-to-br from-amber-50 via-orange-50 to-yellow-50" 
+          : "bg-gradient-to-br from-orange-950 via-amber-900 to-red-950"
+      }`}>
+        <Loader2 className={`w-8 h-8 animate-spin ${isLightTheme ? "text-orange-600" : "text-orange-400"}`} />
       </div>
     );
   }
 
+  const toggleTheme = () => {
+    updatePreference("study_buddy_theme", isLightTheme ? "dark" : "light");
+  };
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-orange-950 via-amber-900 to-red-950 relative overflow-hidden flex flex-col">
-      {/* Animated Fire Background */}
+    <div className={`min-h-screen relative overflow-hidden flex flex-col ${
+      isLightTheme 
+        ? "bg-gradient-to-br from-amber-50 via-orange-50 to-yellow-50" 
+        : "bg-gradient-to-br from-orange-950 via-amber-900 to-red-950"
+    }`}>
+      {/* Animated Background */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <motion.div
           animate={{ 
             scale: [1, 1.3, 1],
-            opacity: [0.3, 0.5, 0.3],
+            opacity: isLightTheme ? [0.1, 0.2, 0.1] : [0.3, 0.5, 0.3],
           }}
           transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-          className="absolute -top-32 -left-32 w-96 h-96 bg-orange-500/40 rounded-full blur-3xl"
+          className={`absolute -top-32 -left-32 w-96 h-96 rounded-full blur-3xl ${
+            isLightTheme ? "bg-orange-300/30" : "bg-orange-500/40"
+          }`}
         />
         <motion.div
           animate={{ 
             scale: [1.2, 1, 1.2],
-            opacity: [0.4, 0.6, 0.4],
+            opacity: isLightTheme ? [0.15, 0.25, 0.15] : [0.4, 0.6, 0.4],
           }}
           transition={{ duration: 5, repeat: Infinity, ease: "easeInOut", delay: 1 }}
-          className="absolute top-1/2 -right-32 w-80 h-80 bg-red-500/40 rounded-full blur-3xl"
+          className={`absolute top-1/2 -right-32 w-80 h-80 rounded-full blur-3xl ${
+            isLightTheme ? "bg-amber-300/30" : "bg-red-500/40"
+          }`}
         />
         <motion.div
           animate={{ 
             scale: [1, 1.4, 1],
-            opacity: [0.2, 0.4, 0.2],
+            opacity: isLightTheme ? [0.1, 0.2, 0.1] : [0.2, 0.4, 0.2],
           }}
           transition={{ duration: 6, repeat: Infinity, ease: "easeInOut", delay: 2 }}
-          className="absolute -bottom-32 left-1/3 w-72 h-72 bg-amber-500/30 rounded-full blur-3xl"
+          className={`absolute -bottom-32 left-1/3 w-72 h-72 rounded-full blur-3xl ${
+            isLightTheme ? "bg-yellow-300/30" : "bg-amber-500/30"
+          }`}
         />
       </div>
 
       <Navigation />
 
       {/* Header */}
-      <div className="relative z-10 bg-black/20 backdrop-blur-xl border-b border-orange-500/20 py-4 px-6 flex-shrink-0">
+      <div className={`relative z-10 backdrop-blur-xl border-b py-4 px-6 flex-shrink-0 ${
+        isLightTheme 
+          ? "bg-white/60 border-orange-200" 
+          : "bg-black/20 border-orange-500/20"
+      }`}>
         <motion.div 
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           className="flex items-center justify-between flex-wrap gap-4"
         >
           <div className="flex items-center gap-4">
-            <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-orange-500 to-red-600 flex items-center justify-center shadow-lg shadow-orange-500/30">
+            <div className={`w-12 h-12 rounded-2xl bg-gradient-to-br from-orange-500 to-red-600 flex items-center justify-center shadow-lg ${
+              isLightTheme ? "shadow-orange-300/50" : "shadow-orange-500/30"
+            }`}>
               <Brain className="w-6 h-6 text-white" />
             </div>
             <div>
-              <h1 className="text-2xl font-bold text-white">Study Buddy</h1>
-              <p className="text-orange-200 text-sm">Bible · Notes · Jeeves</p>
+              <h1 className={`text-2xl font-bold ${isLightTheme ? "text-gray-900" : "text-white"}`}>Study Buddy</h1>
+              <p className={`text-sm ${isLightTheme ? "text-orange-700" : "text-orange-200"}`}>Bible · Notes · Jeeves</p>
             </div>
           </div>
           <div className="flex items-center gap-2">
+            {/* Theme Toggle */}
+            <Button 
+              variant="outline" 
+              size="sm" 
+              onClick={toggleTheme}
+              className={`${
+                isLightTheme 
+                  ? "bg-white/80 border-orange-300 text-orange-700 hover:bg-orange-100" 
+                  : "bg-black/20 border-orange-500/30 text-orange-200 hover:bg-orange-500/20"
+              }`}
+              title={isLightTheme ? "Switch to dark mode" : "Switch to light mode"}
+            >
+              {isLightTheme ? <Moon className="w-4 h-4" /> : <Sun className="w-4 h-4" />}
+            </Button>
             <Button 
               size="sm" 
               onClick={() => navigate("/sermon-simmer")}
-              className="bg-gradient-to-r from-red-600 to-orange-500 hover:from-red-700 hover:to-orange-600 text-white shadow-lg shadow-red-500/30"
+              className={`bg-gradient-to-r from-red-600 to-orange-500 hover:from-red-700 hover:to-orange-600 text-white shadow-lg ${
+                isLightTheme ? "shadow-red-300/50" : "shadow-red-500/30"
+              }`}
             >
               <Flame className="w-4 h-4 mr-1" />
               New Sermon
@@ -407,13 +452,21 @@ export default function StudyBuddy() {
               placeholder="Session title..."
               value={sessionTitle}
               onChange={(e) => setSessionTitle(e.target.value)}
-              className="w-40 h-9 text-sm bg-black/30 border-orange-500/30 text-white placeholder:text-orange-200/50"
+              className={`w-40 h-9 text-sm ${
+                isLightTheme 
+                  ? "bg-white/80 border-orange-300 text-gray-900 placeholder:text-orange-400" 
+                  : "bg-black/30 border-orange-500/30 text-white placeholder:text-orange-200/50"
+              }`}
             />
             <Button 
               variant="outline" 
               size="sm" 
               onClick={handleClearSession}
-              className="bg-black/20 border-orange-500/30 text-orange-200 hover:bg-orange-500/20"
+              className={`${
+                isLightTheme 
+                  ? "bg-white/80 border-orange-300 text-orange-700 hover:bg-orange-100" 
+                  : "bg-black/20 border-orange-500/30 text-orange-200 hover:bg-orange-500/20"
+              }`}
             >
               <Trash2 className="w-4 h-4" />
             </Button>
@@ -432,17 +485,25 @@ export default function StudyBuddy() {
       {/* Tab Navigation */}
       <div className="relative z-10 px-6">
         <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as "study" | "simmer")} className="w-full">
-          <TabsList className="bg-black/30 border border-orange-500/20 p-1">
+          <TabsList className={`p-1 ${
+            isLightTheme 
+              ? "bg-white/70 border border-orange-200" 
+              : "bg-black/30 border border-orange-500/20"
+          }`}>
             <TabsTrigger 
               value="study" 
-              className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-orange-500 data-[state=active]:to-amber-500 data-[state=active]:text-white text-orange-200"
+              className={`data-[state=active]:bg-gradient-to-r data-[state=active]:from-orange-500 data-[state=active]:to-amber-500 data-[state=active]:text-white ${
+                isLightTheme ? "text-orange-700" : "text-orange-200"
+              }`}
             >
               <Brain className="w-4 h-4 mr-2" />
               Study
             </TabsTrigger>
             <TabsTrigger 
               value="simmer" 
-              className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-red-600 data-[state=active]:to-orange-500 data-[state=active]:text-white text-orange-200"
+              className={`data-[state=active]:bg-gradient-to-r data-[state=active]:from-red-600 data-[state=active]:to-orange-500 data-[state=active]:text-white ${
+                isLightTheme ? "text-orange-700" : "text-orange-200"
+              }`}
             >
               <Flame className="w-4 h-4 mr-2" />
               Simmer
@@ -456,31 +517,61 @@ export default function StudyBuddy() {
         <ResizablePanelGroup direction="horizontal" className="h-full rounded-xl overflow-hidden">
           {/* Bible Panel */}
           <ResizablePanel defaultSize={35} minSize={20}>
-            <Card className="h-full flex flex-col bg-black/30 border-orange-500/20 backdrop-blur-xl rounded-none rounded-l-xl">
+            <Card className={`h-full flex flex-col backdrop-blur-xl rounded-none rounded-l-xl ${
+              isLightTheme 
+                ? "bg-white/70 border-orange-200" 
+                : "bg-black/30 border-orange-500/20"
+            }`}>
               {/* Bible Navigation */}
-              <div className="p-4 border-b border-orange-500/20 flex-shrink-0">
+              <div className={`p-4 border-b flex-shrink-0 ${
+                isLightTheme ? "border-orange-200" : "border-orange-500/20"
+              }`}>
                 <div className="flex items-center gap-2 mb-3">
-                  <Book className="w-5 h-5 text-orange-400" />
-                  <span className="font-bold text-white">Bible</span>
+                  <Book className={`w-5 h-5 ${isLightTheme ? "text-orange-600" : "text-orange-400"}`} />
+                  <span className={`font-bold ${isLightTheme ? "text-gray-900" : "text-white"}`}>Bible</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <Select value={selectedBook} onValueChange={(v) => { setSelectedBook(v); setSelectedChapter(1); }}>
-                    <SelectTrigger className="flex-1 h-9 text-sm bg-black/30 border-orange-500/30 text-white">
+                    <SelectTrigger className={`flex-1 h-9 text-sm ${
+                      isLightTheme 
+                        ? "bg-white border-orange-300 text-gray-900" 
+                        : "bg-black/30 border-orange-500/30 text-white"
+                    }`}>
                       <SelectValue />
                     </SelectTrigger>
-                    <SelectContent className="max-h-60 bg-amber-950 border-orange-500/30">
+                    <SelectContent className={`max-h-60 ${
+                      isLightTheme 
+                        ? "bg-white border-orange-200" 
+                        : "bg-amber-950 border-orange-500/30"
+                    }`}>
                       {BIBLE_BOOK_METADATA.map(book => (
-                        <SelectItem key={book.name} value={book.name} className="text-white hover:bg-orange-500/20">{book.name}</SelectItem>
+                        <SelectItem key={book.name} value={book.name} className={
+                          isLightTheme 
+                            ? "text-gray-900 hover:bg-orange-100" 
+                            : "text-white hover:bg-orange-500/20"
+                        }>{book.name}</SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
                   <Select value={selectedChapter.toString()} onValueChange={(v) => setSelectedChapter(parseInt(v))}>
-                    <SelectTrigger className="w-20 h-9 text-sm bg-black/30 border-orange-500/30 text-white">
+                    <SelectTrigger className={`w-20 h-9 text-sm ${
+                      isLightTheme 
+                        ? "bg-white border-orange-300 text-gray-900" 
+                        : "bg-black/30 border-orange-500/30 text-white"
+                    }`}>
                       <SelectValue />
                     </SelectTrigger>
-                    <SelectContent className="max-h-60 bg-amber-950 border-orange-500/30">
+                    <SelectContent className={`max-h-60 ${
+                      isLightTheme 
+                        ? "bg-white border-orange-200" 
+                        : "bg-amber-950 border-orange-500/30"
+                    }`}>
                       {Array.from({ length: getChapterCount() }, (_, i) => (
-                        <SelectItem key={i + 1} value={(i + 1).toString()} className="text-white hover:bg-orange-500/20">{i + 1}</SelectItem>
+                        <SelectItem key={i + 1} value={(i + 1).toString()} className={
+                          isLightTheme 
+                            ? "text-gray-900 hover:bg-orange-100" 
+                            : "text-white hover:bg-orange-500/20"
+                        }>{i + 1}</SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
@@ -490,17 +581,23 @@ export default function StudyBuddy() {
                     variant="ghost" 
                     size="sm" 
                     onClick={() => navigateChapter('prev')}
-                    className="text-orange-200 hover:bg-orange-500/20 hover:text-white"
+                    className={isLightTheme 
+                      ? "text-orange-700 hover:bg-orange-100 hover:text-orange-900" 
+                      : "text-orange-200 hover:bg-orange-500/20 hover:text-white"
+                    }
                   >
                     <ChevronLeft className="w-4 h-4" />
                     Prev
                   </Button>
-                  <span className="text-sm text-orange-200">{selectedBook} {selectedChapter}</span>
+                  <span className={`text-sm ${isLightTheme ? "text-orange-700" : "text-orange-200"}`}>{selectedBook} {selectedChapter}</span>
                   <Button 
                     variant="ghost" 
                     size="sm" 
                     onClick={() => navigateChapter('next')}
-                    className="text-orange-200 hover:bg-orange-500/20 hover:text-white"
+                    className={isLightTheme 
+                      ? "text-orange-700 hover:bg-orange-100 hover:text-orange-900" 
+                      : "text-orange-200 hover:bg-orange-500/20 hover:text-white"
+                    }
                   >
                     Next
                     <ChevronRight className="w-4 h-4" />
@@ -513,10 +610,10 @@ export default function StudyBuddy() {
                 <div className="p-4 space-y-2">
                   {loadingVerses ? (
                     <div className="flex justify-center py-8">
-                      <Loader2 className="w-6 h-6 animate-spin text-orange-400" />
+                      <Loader2 className={`w-6 h-6 animate-spin ${isLightTheme ? "text-orange-600" : "text-orange-400"}`} />
                     </div>
                   ) : verses.length === 0 ? (
-                    <p className="text-center text-orange-200/60 text-sm py-8">
+                    <p className={`text-center text-sm py-8 ${isLightTheme ? "text-orange-600/60" : "text-orange-200/60"}`}>
                       No verses found
                     </p>
                   ) : (
@@ -525,11 +622,17 @@ export default function StudyBuddy() {
                         key={v.verse}
                         whileHover={{ scale: 1.01 }}
                         onClick={() => addVerseToNotes(v.verse, v.text)}
-                        className="p-3 rounded-lg bg-amber-500/5 hover:bg-amber-500/15 border border-transparent hover:border-amber-500/30 cursor-pointer transition-all group"
+                        className={`p-3 rounded-lg border border-transparent cursor-pointer transition-all group ${
+                          isLightTheme 
+                            ? "bg-orange-50 hover:bg-orange-100 hover:border-orange-300" 
+                            : "bg-amber-500/5 hover:bg-amber-500/15 hover:border-amber-500/30"
+                        }`}
                       >
-                        <span className="text-orange-400 font-bold text-sm mr-2">{v.verse}</span>
-                        <span className="text-sm text-orange-100 leading-relaxed">{v.text}</span>
-                        <span className="text-xs text-orange-200/50 opacity-0 group-hover:opacity-100 ml-2 transition-opacity">
+                        <span className={`font-bold text-sm mr-2 ${isLightTheme ? "text-orange-600" : "text-orange-400"}`}>{v.verse}</span>
+                        <span className={`text-sm leading-relaxed ${isLightTheme ? "text-gray-800" : "text-orange-100"}`}>{v.text}</span>
+                        <span className={`text-xs ml-2 opacity-0 group-hover:opacity-100 transition-opacity ${
+                          isLightTheme ? "text-orange-500" : "text-orange-200/50"
+                        }`}>
                           (click to add)
                         </span>
                       </motion.div>
@@ -540,12 +643,21 @@ export default function StudyBuddy() {
             </Card>
           </ResizablePanel>
 
-          <ResizableHandle withHandle className="bg-orange-500/20 hover:bg-orange-500/40 transition-colors" />
+          <ResizableHandle withHandle className={isLightTheme 
+            ? "bg-orange-200 hover:bg-orange-300 transition-colors" 
+            : "bg-orange-500/20 hover:bg-orange-500/40 transition-colors"
+          } />
 
           {/* Notes Panel - Emerald/Teal Theme */}
           <ResizablePanel defaultSize={35} minSize={20}>
-            <Card className="h-full flex flex-col bg-emerald-950/40 border-emerald-500/20 backdrop-blur-xl rounded-none border-l-0 border-r-0">
-              <div className="p-4 border-b border-emerald-500/20 flex-shrink-0">
+            <Card className={`h-full flex flex-col backdrop-blur-xl rounded-none border-l-0 border-r-0 ${
+              isLightTheme 
+                ? "bg-emerald-50/70 border-emerald-200" 
+                : "bg-emerald-950/40 border-emerald-500/20"
+            }`}>
+              <div className={`p-4 border-b flex-shrink-0 ${
+                isLightTheme ? "border-emerald-200" : "border-emerald-500/20"
+              }`}>
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <StickyNote className="w-5 h-5 text-emerald-400" />
