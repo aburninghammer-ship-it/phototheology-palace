@@ -2906,6 +2906,39 @@ export type Database = {
           },
         ]
       }
+      devotional_text_highlights: {
+        Row: {
+          color: string
+          created_at: string
+          devotional_day_id: string
+          end_offset: number
+          id: string
+          start_offset: number
+          text_content: string
+          user_id: string
+        }
+        Insert: {
+          color?: string
+          created_at?: string
+          devotional_day_id: string
+          end_offset: number
+          id?: string
+          start_offset: number
+          text_content: string
+          user_id: string
+        }
+        Update: {
+          color?: string
+          created_at?: string
+          devotional_day_id?: string
+          end_offset?: number
+          id?: string
+          start_offset?: number
+          text_content?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       disciple_training_enrollments: {
         Row: {
           cohort_id: string | null

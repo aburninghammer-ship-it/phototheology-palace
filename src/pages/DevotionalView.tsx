@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useQueryClient } from "@tanstack/react-query";
-import { ArrowLeft, Check, ChevronLeft, ChevronRight, BookOpen, Sparkles, Heart, MessageSquare, Star, Loader2, Share2, Wand2, ExternalLink, Lock, AlertCircle, RefreshCw } from "lucide-react";
+import { ArrowLeft, Check, ChevronLeft, ChevronRight, BookOpen, Sparkles, Heart, MessageSquare, Star, Loader2, Share2, Wand2, ExternalLink, Lock, AlertCircle, RefreshCw, Highlighter } from "lucide-react";
 import { Navigation } from "@/components/Navigation";
 import { SimplifiedNav } from "@/components/SimplifiedNav";
 import { useUserPreferences } from "@/hooks/useUserPreferences";
@@ -14,6 +14,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useDevotionalPlan, useDevotionals } from "@/hooks/useDevotionals";
 import { ShareDevotionalDialog } from "@/components/devotionals/ShareDevotionalDialog";
 import { FreeAudioButton } from "@/components/audio/FreeAudioButton";
+import { DevotionalTextHighlighter } from "@/components/devotionals/DevotionalTextHighlighter";
 import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
 import { useSparks } from "@/hooks/useSparks";
@@ -462,7 +463,7 @@ export default function DevotionalView() {
 
           {/* Essay-style Devotional Content */}
           {currentDay.devotional_text ? (
-            // New essay-style format - flowing paragraphs
+            // New essay-style format - flowing paragraphs with highlighting
             <Card className="border-0 shadow-xl overflow-hidden">
               <div className={`h-2 bg-gradient-to-r ${gradient}`} />
               <CardHeader className="bg-gradient-to-br from-slate-50 to-purple-50/30 dark:from-slate-950/50 dark:to-purple-950/30 pb-2">
@@ -470,6 +471,10 @@ export default function DevotionalView() {
                   <div className="flex items-center gap-2">
                     <BookOpen className="h-5 w-5" />
                     Today's Reading
+                    <Badge variant="outline" className="text-xs font-normal gap-1">
+                      <Highlighter className="h-3 w-3" />
+                      Select to highlight
+                    </Badge>
                   </div>
                   <FreeAudioButton 
                     text={currentDay.devotional_text || ''}
@@ -481,15 +486,19 @@ export default function DevotionalView() {
               <CardContent className="pt-6 pb-8">
                 <div className="prose prose-lg dark:prose-invert max-w-none">
                   {currentDay.devotional_text.split('\n\n').map((paragraph, idx) => (
-                    <p key={idx} className="text-lg leading-relaxed text-slate-800 dark:text-slate-200 mb-6 last:mb-0 font-serif">
-                      {paragraph}
-                    </p>
+                    <DevotionalTextHighlighter
+                      key={idx}
+                      text={paragraph}
+                      devotionalDayId={`${currentDay.id}-p${idx}`}
+                      className="mb-6 last:mb-0"
+                      textClassName="text-lg leading-relaxed text-slate-800 dark:text-slate-200 font-serif"
+                    />
                   ))}
                 </div>
               </CardContent>
             </Card>
           ) : (
-            // Legacy format - fragmented sections
+            // Legacy format - fragmented sections with highlighting
             <>
               {/* Scripture Card */}
               <Card className="overflow-hidden border-0 shadow-xl">
@@ -499,6 +508,10 @@ export default function DevotionalView() {
                     <div className="flex items-center gap-2">
                       <BookOpen className="h-5 w-5" />
                       {currentDay.scripture_reference}
+                      <Badge variant="outline" className="text-xs font-normal gap-1 border-indigo-300">
+                        <Highlighter className="h-3 w-3" />
+                        Select to highlight
+                      </Badge>
                     </div>
                     <FreeAudioButton 
                       text={`${currentDay.scripture_reference}. ${currentDay.scripture_text || ''}`}
@@ -508,9 +521,11 @@ export default function DevotionalView() {
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="bg-gradient-to-br from-indigo-50 to-purple-50 dark:from-indigo-950/50 dark:to-purple-950/50 pt-0">
-                  <p className="text-xl italic leading-relaxed text-indigo-900 dark:text-indigo-100 font-serif">
-                    "{currentDay.scripture_text}"
-                  </p>
+                  <DevotionalTextHighlighter
+                    text={currentDay.scripture_text || ''}
+                    devotionalDayId={`${currentDay.id}-scripture`}
+                    textClassName="text-xl italic leading-relaxed text-indigo-900 dark:text-indigo-100 font-serif"
+                  />
                 </CardContent>
               </Card>
 
