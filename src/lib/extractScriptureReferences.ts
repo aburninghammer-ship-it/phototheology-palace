@@ -71,8 +71,8 @@ const BOOK_ALIASES: Record<string, string> = {
   'rev': 'Revelation', 'revelation': 'Revelation'
 };
 
-// Pattern to match scripture references
-const SCRIPTURE_PATTERN = /\b((?:\d\s*)?(?:Genesis|Exodus|Leviticus|Numbers|Deuteronomy|Joshua|Judges|Ruth|Samuel|Kings|Chronicles|Ezra|Nehemiah|Esther|Job|Psalms?|Proverbs|Ecclesiastes|Song\s*(?:of\s*Solomon)?|Isaiah|Jeremiah|Lamentations|Ezekiel|Daniel|Hosea|Joel|Amos|Obadiah|Jonah|Micah|Nahum|Habakkuk|Zephaniah|Haggai|Zechariah|Malachi|Matthew|Mark|Luke|John|Acts|Romans|Corinthians|Galatians|Ephesians|Philippians|Colossians|Thessalonians|Timothy|Titus|Philemon|Hebrews|James|Peter|Jude|Revelation|Gen|Exod?|Lev|Num|Deut|Josh|Judg|Sam|Kgs|Chr|Neh|Esth?|Psa?|Prov|Eccl|Song|Isa|Jer|Lam|Ezek|Dan|Hos|Amos|Obad|Mic|Nah|Hab|Zeph|Hag|Zech|Mal|Matt?|Mt|Mk|Lk|Jn|Rom|Cor|Gal|Eph|Phil|Col|Thess|Tim|Philem|Heb|Jas|Pet|Rev))\s*(\d{1,3})(?:\s*:\s*(\d{1,3})(?:\s*[-–—]\s*(\d{1,3}))?)?/gi;
+// Pattern to match scripture references (supports "Rev 6", "Rev.6", "Rev. 6", etc.)
+const SCRIPTURE_PATTERN = /\b((?:\d\s*)?(?:Genesis|Exodus|Leviticus|Numbers|Deuteronomy|Joshua|Judges|Ruth|Samuel|Kings|Chronicles|Ezra|Nehemiah|Esther|Job|Psalms?|Proverbs|Ecclesiastes|Song\s*(?:of\s*Solomon)?|Isaiah|Jeremiah|Lamentations|Ezekiel|Daniel|Hosea|Joel|Amos|Obadiah|Jonah|Micah|Nahum|Habakkuk|Zephaniah|Haggai|Zechariah|Malachi|Matthew|Mark|Luke|John|Acts|Romans|Corinthians|Galatians|Ephesians|Philippians|Colossians|Thessalonians|Timothy|Titus|Philemon|Hebrews|James|Peter|Jude|Revelation|Gen|Exod?|Lev|Num|Deut|Josh|Judg|Sam|Kgs|Chr|Neh|Esth?|Psa?|Prov|Eccl|Song|Isa|Jer|Lam|Ezek|Dan|Hos|Amos|Obad|Mic|Nah|Hab|Zeph|Hag|Zech|Mal|Matt?|Mt|Mk|Lk|Jn|Rom|Cor|Gal|Eph|Phil|Col|Thess|Tim|Philem|Heb|Jas|Pet|Rev))[\s.]*(\d{1,3})(?:[\s.:]*(\d{1,3})(?:\s*[-–—]\s*(\d{1,3}))?)?/gi;
 
 export function extractScriptureReferencesFromSermon(text: string): string[] {
   if (!text) return [];
