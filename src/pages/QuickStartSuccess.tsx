@@ -20,12 +20,41 @@ import { Link } from "react-router-dom";
 
 export default function QuickStartSuccess() {
   const [isDownloading, setIsDownloading] = useState(false);
+  const [emailSent, setEmailSent] = useState(false);
   const { trackPurchaseCompleted } = useEventTracking();
 
-  // Track purchase on page load
+  // Track purchase and send email on page load
   useEffect(() => {
     trackPurchaseCompleted("quick-start-guide", 17);
-  }, [trackPurchaseCompleted]);
+    
+    // Send product email
+    const sendProductEmail = async () => {
+      const urlParams = new URLSearchParams(window.location.search);
+      const customerEmail = urlParams.get('email');
+      const customerName = urlParams.get('name');
+      
+      if (customerEmail && !emailSent) {
+        try {
+          const { error } = await supabase.functions.invoke('send-product-email', {
+            body: { 
+              email: customerEmail,
+              name: customerName || undefined,
+              product: 'quick-start-guide'
+            }
+          });
+          
+          if (!error) {
+            setEmailSent(true);
+            console.log('Product email sent successfully');
+          }
+        } catch (err) {
+          console.error('Failed to send product email:', err);
+        }
+      }
+    };
+    
+    sendProductEmail();
+  }, [trackPurchaseCompleted, emailSent]);
 
   const handleDownload = async () => {
     setIsDownloading(true);
