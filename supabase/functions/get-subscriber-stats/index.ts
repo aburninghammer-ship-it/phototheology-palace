@@ -12,24 +12,31 @@ const logStep = (step: string, details?: any) => {
   console.log(`[SUBSCRIBER-STATS] ${step}${detailsStr}`);
 };
 
-// Price ID to tier mapping
-const priceToTier: Record<string, string> = {
-  // Essential tier
-  'price_1SZNyCFGDAd3RU8IPwPJVesp': 'essential', // Essential monthly
-  'price_1SZNyVFGDAd3RU8IPgRPqKXH': 'essential', // Essential annual
-  'price_1SKn0VFGDAd3RU8Io19mT9No': 'essential', // Legacy essential monthly
-  // Premium tier
-  'price_1SZNyiFGDAd3RU8I4JHYEsEi': 'premium', // Premium monthly
-  'price_1SZNyuFGDAd3RU8IjeGIvPEb': 'premium', // Premium annual
-  'price_1SKn12FGDAd3RU8IBpc45ctZ': 'premium', // Legacy premium annual
-  'price_1ONMQ9FGDAd3RU8IcBaBYmoJ': 'premium', // Older premium
-  'price_1ONjHsFGDAd3RU8IsHMybTX6': 'premium', // Legacy premium
+// Price ID to tier and product name mapping
+const priceToInfo: Record<string, { tier: string; name: string }> = {
+  // Essential tier - NEW (Jan 2025+)
+  'price_1SZNyCFGDAd3RU8IPwPJVesp': { tier: 'essential', name: 'Essential Monthly (new)' },
+  'price_1SZNyVFGDAd3RU8IPgRPqKXH': { tier: 'essential', name: 'Essential Annual (new)' },
+  // Essential tier - LEGACY
+  'price_1SKn0VFGDAd3RU8Io19mT9No': { tier: 'essential', name: 'Essential Monthly (legacy)' },
+  // Premium tier - NEW (Jan 2025+)
+  'price_1SZNyiFGDAd3RU8I4JHYEsEi': { tier: 'premium', name: 'Premium Monthly (new)' },
+  'price_1SZNyuFGDAd3RU8IjeGIvPEb': { tier: 'premium', name: 'Premium Annual (new)' },
+  // Premium tier - LEGACY
+  'price_1SKn12FGDAd3RU8IBpc45ctZ': { tier: 'premium', name: 'Premium Annual (legacy)' },
+  'price_1ONMQ9FGDAd3RU8IcBaBYmoJ': { tier: 'premium', name: 'Premium Monthly (Jan 2024)' },
+  'price_1ONjHsFGDAd3RU8IsHMybTX6': { tier: 'premium', name: 'Premium Annual (Jan 2024)' },
   // Student tier
-  'price_1SKWM6FGDAd3RU8IcmNNhmKO': 'student',
-  'price_1SKWMLFGDAd3RU8IBXO8pKxd': 'student',
+  'price_1SKWM6FGDAd3RU8IcmNNhmKO': { tier: 'student', name: 'Student Monthly' },
+  'price_1SKWMLFGDAd3RU8IBXO8pKxd': { tier: 'student', name: 'Student Annual' },
 };
 
-const appPriceIds = Object.keys(priceToTier);
+// For backward compatibility
+const priceToTier: Record<string, string> = Object.fromEntries(
+  Object.entries(priceToInfo).map(([id, info]) => [id, info.tier])
+);
+
+const appPriceIds = Object.keys(priceToInfo);
 
 // Helper to fetch all Stripe subscriptions with pagination
 async function fetchAllStripeSubscriptions(
@@ -198,6 +205,7 @@ serve(async (req) => {
       trialing_subscriptions: 0,
       canceled_subscriptions: 0,
       by_tier: { essential: 0, premium: 0, student: 0, unknown: 0 },
+      by_product: {} as Record<string, { active: number; trialing: number }>,
       total_mrr_cents: 0,
       error: null as string | null,
       unlinked_count: 0,
@@ -212,13 +220,23 @@ serve(async (req) => {
         const activeSubscriptions = await fetchAllStripeSubscriptions(stripe, 'active');
         stripeStats.active_subscriptions = activeSubscriptions.length;
 
-        // Count by tier and calculate MRR
+        // Count by tier, by product name, and calculate MRR
         activeSubscriptions.forEach((sub: any) => {
           const priceId = sub.items.data[0]?.price?.id;
-          const tier = priceToTier[priceId] || 'unknown';
+          const info = priceToInfo[priceId];
+          const tier = info?.tier || 'unknown';
+          const productName = info?.name || `Unknown (${priceId?.slice(-8) || 'no-id'})`;
+          
           if (tier in stripeStats.by_tier) {
             stripeStats.by_tier[tier as keyof typeof stripeStats.by_tier]++;
           }
+          
+          // Track by product name
+          if (!stripeStats.by_product[productName]) {
+            stripeStats.by_product[productName] = { active: 0, trialing: 0 };
+          }
+          stripeStats.by_product[productName].active++;
+          
           // Calculate MRR
           const amount = sub.items.data[0]?.price?.unit_amount || 0;
           const interval = sub.items.data[0]?.price?.recurring?.interval;
@@ -232,6 +250,18 @@ serve(async (req) => {
         // Get ALL trialing subscriptions with pagination
         const trialingSubscriptions = await fetchAllStripeSubscriptions(stripe, 'trialing');
         stripeStats.trialing_subscriptions = trialingSubscriptions.length;
+        
+        // Count trialing by product name
+        trialingSubscriptions.forEach((sub: any) => {
+          const priceId = sub.items.data[0]?.price?.id;
+          const info = priceToInfo[priceId];
+          const productName = info?.name || `Unknown (${priceId?.slice(-8) || 'no-id'})`;
+          
+          if (!stripeStats.by_product[productName]) {
+            stripeStats.by_product[productName] = { active: 0, trialing: 0 };
+          }
+          stripeStats.by_product[productName].trialing++;
+        });
 
         // Get canceled subscriptions with pagination
         const canceledSubscriptions = await fetchAllStripeSubscriptions(stripe, 'canceled');
