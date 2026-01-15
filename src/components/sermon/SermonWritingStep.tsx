@@ -464,10 +464,12 @@ Return ONLY the JSON, no other text.`
     };
   }, []);
 
-  // Insert verse into sermon
+  // Insert verse into sermon and remove from suggestions
   const insertVerse = (verse: SuggestedVerse) => {
     const verseHtml = `<blockquote><strong>${verse.reference}</strong>: "${verse.text}"</blockquote>\n`;
     setSermon({ ...sermon, full_sermon: sermon.full_sermon + verseHtml });
+    // Remove the inserted verse from suggestions
+    setSuggestedVerses(prev => prev.filter(v => v.reference !== verse.reference));
     toast.success(`${verse.reference} added to sermon`);
   };
 
