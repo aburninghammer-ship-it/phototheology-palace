@@ -660,14 +660,14 @@ export default function StudyBuddy() {
               }`}>
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <StickyNote className="w-5 h-5 text-emerald-400" />
-                    <span className="font-bold text-white">Notes</span>
+                    <StickyNote className={`w-5 h-5 ${isLightTheme ? "text-emerald-600" : "text-emerald-400"}`} />
+                    <span className={`font-bold ${isLightTheme ? "text-gray-900" : "text-white"}`}>Notes</span>
                   </div>
                   {jeevesLoading && (
                     <Loader2 className="w-4 h-4 animate-spin text-violet-400" />
                   )}
                 </div>
-                <p className="text-xs text-emerald-200/60 mt-1">Write notes or ask questions — Jeeves will auto-respond</p>
+                <p className={`text-xs mt-1 ${isLightTheme ? "text-emerald-700/70" : "text-emerald-200/60"}`}>Write notes or ask questions — Jeeves will auto-respond</p>
               </div>
               <div className="flex-1 p-4">
                 <Textarea
@@ -676,7 +676,11 @@ export default function StudyBuddy() {
                   placeholder="Write freely here. Click verses to add them.
 
 Jeeves sees your notes and will spark connections, suggest PT rooms, source claims, and help you think Phototheologically."
-                  className="h-full resize-none border-0 focus-visible:ring-0 text-sm bg-transparent text-emerald-100 placeholder:text-emerald-200/40"
+                  className={`h-full resize-none border-0 focus-visible:ring-0 text-sm bg-transparent ${
+                    isLightTheme 
+                      ? "text-gray-900 placeholder:text-emerald-600/50" 
+                      : "text-emerald-100 placeholder:text-emerald-200/40"
+                  }`}
                 />
               </div>
             </Card>
@@ -686,21 +690,27 @@ Jeeves sees your notes and will spark connections, suggest PT rooms, source clai
 
           {/* Jeeves Panel - Purple/Violet Theme - Real-time Analysis */}
           <ResizablePanel defaultSize={30} minSize={20}>
-            <Card className="h-full flex flex-col bg-violet-950/40 border-violet-500/20 backdrop-blur-xl rounded-none rounded-r-xl border-l-0">
-              <div className="p-4 border-b border-violet-500/20 flex-shrink-0">
+            <Card className={`h-full flex flex-col backdrop-blur-xl rounded-none rounded-r-xl border-l-0 ${
+              isLightTheme 
+                ? "bg-violet-50/70 border-violet-200" 
+                : "bg-violet-950/40 border-violet-500/20"
+            }`}>
+              <div className={`p-4 border-b flex-shrink-0 ${
+                isLightTheme ? "border-violet-200" : "border-violet-500/20"
+              }`}>
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <Brain className="w-5 h-5 text-violet-400" />
-                    <span className="font-bold text-white">Jeeves</span>
+                    <Brain className={`w-5 h-5 ${isLightTheme ? "text-violet-600" : "text-violet-400"}`} />
+                    <span className={`font-bold ${isLightTheme ? "text-gray-900" : "text-white"}`}>Jeeves</span>
                   </div>
                   {jeevesLoading && (
-                    <div className="flex items-center gap-2 text-violet-300">
+                    <div className={`flex items-center gap-2 ${isLightTheme ? "text-violet-600" : "text-violet-300"}`}>
                       <Eye className="w-4 h-4 animate-pulse" />
                       <span className="text-xs">Reading...</span>
                     </div>
                   )}
                 </div>
-                <p className="text-xs text-violet-200/60 mt-1">
+                <p className={`text-xs mt-1 ${isLightTheme ? "text-violet-700/70" : "text-violet-200/60"}`}>
                   {notes.trim().length < 30 
                     ? "Start typing in Notes — Jeeves will respond as you write"
                     : "Watching your notes and sparking connections..."}
@@ -712,11 +722,11 @@ Jeeves sees your notes and will spark connections, suggest PT rooms, source clai
                 <div className="p-4 space-y-4">
                   {!analysis && !jeevesLoading && notes.trim().length < 30 ? (
                     <div className="text-center py-8">
-                      <Brain className="w-12 h-12 text-violet-500/30 mx-auto mb-3" />
-                      <p className="text-sm text-violet-200/60">
+                      <Brain className={`w-12 h-12 mx-auto mb-3 ${isLightTheme ? "text-violet-400/50" : "text-violet-500/30"}`} />
+                      <p className={`text-sm ${isLightTheme ? "text-violet-700/70" : "text-violet-200/60"}`}>
                         Jeeves is watching your notes
                       </p>
-                      <p className="text-xs text-violet-200/40 mt-2">
+                      <p className={`text-xs mt-2 ${isLightTheme ? "text-violet-600/60" : "text-violet-200/40"}`}>
                         Start typing and he'll spark connections, suggest rooms, and apply PT principles automatically
                       </p>
                     </div>
@@ -729,7 +739,11 @@ Jeeves sees your notes and will spark connections, suggest PT rooms, source clai
                           initial={{ opacity: 0, y: 10 }}
                           animate={{ opacity: 1, y: 0 }}
                           exit={{ opacity: 0 }}
-                          className="p-3 rounded-lg bg-violet-500/10 border border-violet-500/20 text-sm text-violet-100"
+                          className={`p-3 rounded-lg text-sm ${
+                            isLightTheme 
+                              ? "bg-violet-100 border border-violet-200 text-gray-900" 
+                              : "bg-violet-500/10 border border-violet-500/20 text-violet-100"
+                          }`}
                         >
                           <p className="whitespace-pre-wrap">{analysis.overallResponse}</p>
                         </motion.div>
