@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { useQueryClient } from "@tanstack/react-query";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
@@ -22,6 +23,7 @@ const OLD_STYLE_CUTOFF_DATE = new Date("2026-01-14T00:00:00Z");
 
 export function ImageBibleGenerator() {
   const { toast } = useToast();
+  const queryClient = useQueryClient();
   const [cachedImages, setCachedImages] = useState<Map<string, { url: string; generatedAt: Date }>>(new Map());
   const [loading, setLoading] = useState(true);
   const [generating, setGenerating] = useState(false);
@@ -171,8 +173,9 @@ export function ImageBibleGenerator() {
       }
     }
 
-    // Reload cache
+    // Reload cache and invalidate Image Bible query to refresh thumbnails
     await loadCachedImages();
+    queryClient.invalidateQueries({ queryKey: ['image-bible-storage-images'] });
     setGenerating(false);
 
     const successCount = allResults.filter(r => r.success).length;
@@ -245,8 +248,9 @@ export function ImageBibleGenerator() {
       }
     }
 
-    // Reload cache
+    // Reload cache and invalidate Image Bible query to refresh thumbnails
     await loadCachedImages();
+    queryClient.invalidateQueries({ queryKey: ['image-bible-storage-images'] });
     setGenerating(false);
 
     const successCount = allResults.filter(r => r.success).length;
