@@ -106,6 +106,7 @@ export default function AdminSubscriptions() {
   const [pickaxeLinkedCount, setPickaxeLinkedCount] = useState<number>(0);
   const [pickaxePaidCount, setPickaxePaidCount] = useState<number>(0);
   const [pickaxeMembers, setPickaxeMembers] = useState<any[]>([]);
+  const [lastRefresh, setLastRefresh] = useState<Date>(new Date());
 
   const handleSyncStripeSubscriptions = async () => {
     setSyncing(true);
@@ -226,15 +227,27 @@ export default function AdminSubscriptions() {
       console.log("[AdminSubscriptions] Auth still loading...");
       return;
     }
-    
+
     if (!user) {
       console.log("[AdminSubscriptions] No user, redirecting to auth");
       navigate("/auth");
       return;
     }
-    
+
     checkAdminAndLoadStats();
   }, [user, authLoading, navigate]);
+
+  // Auto-refresh stats every 60 seconds
+  useEffect(() => {
+    if (!isAdmin || loading) return;
+
+    const refreshInterval = setInterval(() => {
+      console.log("[AdminSubscriptions] Auto-refreshing stats...");
+      loadStats();
+    }, 60000); // 60 seconds
+
+    return () => clearInterval(refreshInterval);
+  }, [isAdmin, loading]);
 
   const checkAdminAndLoadStats = async () => {
     if (!user) {
@@ -289,6 +302,7 @@ export default function AdminSubscriptions() {
       if (statsData?.stats) {
         console.log("[AdminSubscriptions] Got stats from edge function:", statsData.stats);
         setStats(statsData.stats);
+        setLastRefresh(new Date());
       }
 
       // Get church subscriptions separately
@@ -373,7 +387,12 @@ export default function AdminSubscriptions() {
         <div>
           <h1 className="text-3xl font-bold">Subscription Analytics</h1>
           <p className="text-muted-foreground">
-            Live data from Stripe • Last updated: {new Date(stats.generated_at).toLocaleTimeString()}
+            Live data from Stripe • Last updated: {lastRefresh.toLocaleTimeString()}{" "}
+            <span className="text-xs opacity-70">(auto-refreshes every 60s)</span>
+          </p>
+          <p className="text-xs text-yellow-500 flex items-center gap-1">
+            <AlertTriangle className="h-3 w-3" />
+            Note: New Stripe subscriptions sync when users log in or when you click "Sync Stripe Subscriptions"
           </p>
         </div>
         <Button 
