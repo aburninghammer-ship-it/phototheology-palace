@@ -10,6 +10,7 @@ interface UserPreferences {
   navigation_style: "simplified" | "full";
   preferred_reading_experience: "audio" | "read-along" | "auto";
   read_along_speed: number; // Words per minute
+  study_buddy_theme: "dark" | "light"; // Study Buddy page theme
 }
 
 const defaultPreferences: UserPreferences = {
@@ -20,6 +21,7 @@ const defaultPreferences: UserPreferences = {
   navigation_style: "full",
   preferred_reading_experience: "audio",
   read_along_speed: 200,
+  study_buddy_theme: "dark",
 };
 
 interface UserPreferencesContextValue {
@@ -74,6 +76,7 @@ export const UserPreferencesProvider = ({
             navigation_style: (data.navigation_style as any) || "full",
             preferred_reading_experience: defaultPreferences.preferred_reading_experience,
             read_along_speed: defaultPreferences.read_along_speed,
+            study_buddy_theme: ((data as any).study_buddy_theme as any) ?? defaultPreferences.study_buddy_theme,
           });
         } else {
           // Create default preferences in the backend and use local defaults
