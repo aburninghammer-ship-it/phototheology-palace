@@ -8,7 +8,7 @@ import {
   CommandItem,
   CommandList,
 } from "@/components/ui/command";
-import { Search, BookOpen, Gamepad2, Users, Trophy, BookMarked, Sparkles, Calendar, Image, FileText, Zap, Star, Gem } from "lucide-react";
+import { Search, BookOpen, Gamepad2, Users, Trophy, BookMarked, Sparkles, Calendar, Image, FileText, Zap, Star, Gem, Scroll, MessageSquare } from "lucide-react";
 import { Button } from "./ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
@@ -16,9 +16,10 @@ import { useAuth } from "@/hooks/useAuth";
 interface SavedItem {
   id: string;
   title: string;
-  type: "study" | "deck" | "gem";
+  type: "study" | "deck" | "gem" | "sermon" | "session" | "thought";
   path: string;
   content?: string; // For searching within content
+  subtitle?: string; // Additional context
 }
 
 const searchItems = [
@@ -91,6 +92,7 @@ export const GlobalSearch = () => {
   const [open, setOpen] = useState(false);
   const [savedItems, setSavedItems] = useState<SavedItem[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
   const { user } = useAuth();
 
@@ -112,53 +114,140 @@ export const GlobalSearch = () => {
     const fetchSavedItems = async () => {
       if (!user || !open) return;
 
+      setIsLoading(true);
       const items: SavedItem[] = [];
 
-      // Fetch user studies with content for deeper search
-      const { data: studies } = await supabase
-        .from("user_studies")
-        .select("id, title, content")
-        .eq("user_id", user.id)
-        .order("updated_at", { ascending: false })
-        .limit(50);
+      try {
+        // Fetch all data sources in parallel
+        const [
+          studiesResult,
+          deckStudiesResult,
+          studySessionsResult,
+          sermonSessionsResult,
+          thoughtAnalysesResult
+        ] = await Promise.all([
+          // User studies
+          supabase
+            .from("user_studies")
+            .select("id, title, content")
+            .eq("user_id", user.id)
+            .order("updated_at", { ascending: false })
+            .limit(30),
+          
+          // Deck studies (gems)
+          supabase
+            .from("deck_studies")
+            .select("id, gem_title, gem_notes, verse_reference, verse_text, is_gem")
+            .eq("user_id", user.id)
+            .order("updated_at", { ascending: false })
+            .limit(30),
+          
+          // Study sessions (Study Buddy)
+          supabase
+            .from("study_sessions")
+            .select("id, title, description, ai_summary, tags")
+            .eq("user_id", user.id)
+            .order("updated_at", { ascending: false })
+            .limit(30),
+          
+          // Sermon writer sessions
+          supabase
+            .from("sermon_writer_sessions")
+            .select("id, title, theme, theme_passage, content, status")
+            .eq("user_id", user.id)
+            .order("updated_at", { ascending: false })
+            .limit(30),
+          
+          // Thought analyses
+          supabase
+            .from("thought_analyses")
+            .select("id, summary, categories, deeper_insights")
+            .eq("user_id", user.id)
+            .order("created_at", { ascending: false })
+            .limit(20)
+        ]);
 
-      if (studies) {
-        studies.forEach((study) => {
-          if (study.title || study.content) {
-            items.push({
-              id: study.id,
-              title: study.title || "Untitled Study",
-              type: "study",
-              path: `/my-studies?open=${study.id}`,
-              content: study.content || "",
-            });
-          }
-        });
-      }
-
-      // Fetch deck studies with gems and notes
-      const { data: deckStudies } = await supabase
-        .from("deck_studies")
-        .select("id, gem_title, gem_notes, verse_reference, verse_text, is_gem")
-        .eq("user_id", user.id)
-        .eq("is_gem", true)
-        .order("updated_at", { ascending: false })
-        .limit(50);
-
-      if (deckStudies) {
-        deckStudies.forEach((deck) => {
-          const title = deck.gem_title || deck.verse_reference || "Untitled Gem";
-          items.push({
-            id: deck.id,
-            title: title,
-            type: "gem",
-            path: `/branch-study?gem=${deck.id}`,
-            content: `${deck.gem_notes || ""} ${deck.verse_text || ""}`,
+        // Process user studies
+        if (studiesResult.data) {
+          studiesResult.data.forEach((study) => {
+            if (study.title || study.content) {
+              items.push({
+                id: study.id,
+                title: study.title || "Untitled Study",
+                type: "study",
+                path: `/my-studies?open=${study.id}`,
+                content: study.content || "",
+              });
+            }
           });
-        });
-      }
+        }
 
-      setSavedItems(items);
+        // Process deck studies (gems)
+        if (deckStudiesResult.data) {
+          deckStudiesResult.data.forEach((deck) => {
+            const title = deck.gem_title || deck.verse_reference || "Untitled Gem";
+            items.push({
+              id: deck.id,
+              title: title,
+              type: deck.is_gem ? "gem" : "deck",
+              path: `/branch-study?gem=${deck.id}`,
+              content: `${deck.gem_notes || ""} ${deck.verse_text || ""}`,
+              subtitle: deck.verse_reference || undefined,
+            });
+          });
+        }
+
+        // Process study sessions (Study Buddy)
+        if (studySessionsResult.data) {
+          studySessionsResult.data.forEach((session) => {
+            items.push({
+              id: session.id,
+              title: session.title || "Untitled Session",
+              type: "session",
+              path: `/my-studies?session=${session.id}`,
+              content: `${session.description || ""} ${session.ai_summary || ""} ${(session.tags || []).join(" ")}`,
+              subtitle: session.description || undefined,
+            });
+          });
+        }
+
+        // Process sermon writer sessions
+        if (sermonSessionsResult.data) {
+          sermonSessionsResult.data.forEach((sermon) => {
+            const title = sermon.title || sermon.theme || "Untitled Sermon";
+            items.push({
+              id: sermon.id,
+              title: title,
+              type: "sermon",
+              path: `/sermon-builder?session=${sermon.id}`,
+              content: `${sermon.theme || ""} ${sermon.theme_passage || ""} ${sermon.content || ""}`,
+              subtitle: sermon.theme_passage || sermon.status || undefined,
+            });
+          });
+        }
+
+        // Process thought analyses
+        if (thoughtAnalysesResult.data) {
+          thoughtAnalysesResult.data.forEach((analysis) => {
+            const summary = analysis.summary || "";
+            const categories = Array.isArray(analysis.categories) ? analysis.categories.join(", ") : "";
+            items.push({
+              id: analysis.id,
+              title: summary.slice(0, 60) + (summary.length > 60 ? "..." : "") || "Thought Analysis",
+              type: "thought",
+              path: `/thought-analysis?id=${analysis.id}`,
+              content: `${summary} ${categories}`,
+              subtitle: categories || undefined,
+            });
+          });
+        }
+
+        setSavedItems(items);
+      } catch (error) {
+        console.error("Error fetching saved items:", error);
+      } finally {
+        setIsLoading(false);
+      }
     };
 
     fetchSavedItems();
@@ -173,21 +262,56 @@ export const GlobalSearch = () => {
   // Filter saved items based on search query - search both title AND content
   const filteredSavedItems = savedItems.filter((item) => {
     const query = searchQuery.toLowerCase();
+    if (!query) return true; // Show all when no query
     const titleMatch = item.title.toLowerCase().includes(query);
     const contentMatch = item.content?.toLowerCase().includes(query) || false;
-    return titleMatch || contentMatch;
+    const subtitleMatch = item.subtitle?.toLowerCase().includes(query) || false;
+    return titleMatch || contentMatch || subtitleMatch;
   });
+
+  // Group saved items by type
+  const groupedItems = {
+    sermons: filteredSavedItems.filter(item => item.type === "sermon"),
+    sessions: filteredSavedItems.filter(item => item.type === "session"),
+    studies: filteredSavedItems.filter(item => item.type === "study"),
+    gems: filteredSavedItems.filter(item => item.type === "gem" || item.type === "deck"),
+    thoughts: filteredSavedItems.filter(item => item.type === "thought"),
+  };
 
   const getTypeIcon = (type: SavedItem["type"]) => {
     switch (type) {
       case "study":
         return FileText;
       case "gem":
-        return Gem;
       case "deck":
-        return BookOpen;
+        return Gem;
+      case "sermon":
+        return Scroll;
+      case "session":
+        return MessageSquare;
+      case "thought":
+        return Sparkles;
       default:
         return Star;
+    }
+  };
+
+  const getTypeLabel = (type: SavedItem["type"]) => {
+    switch (type) {
+      case "study":
+        return "Study";
+      case "gem":
+        return "Gem";
+      case "deck":
+        return "Deck";
+      case "sermon":
+        return "Sermon";
+      case "session":
+        return "Session";
+      case "thought":
+        return "Thought";
+      default:
+        return type;
     }
   };
 
@@ -208,28 +332,35 @@ export const GlobalSearch = () => {
 
       <CommandDialog open={open} onOpenChange={setOpen}>
         <CommandInput 
-          placeholder="Search pages, studies, gems, and more..." 
+          placeholder="Search pages, sermons, studies, gems..." 
           value={searchQuery}
           onValueChange={setSearchQuery}
         />
         <CommandList>
-          <CommandEmpty>No results found.</CommandEmpty>
+          <CommandEmpty>
+            {isLoading ? "Loading your content..." : "No results found."}
+          </CommandEmpty>
           
-          {/* User's Saved Content - Show first if they have items */}
-          {user && filteredSavedItems.length > 0 && (
-            <CommandGroup heading="My Saved Studies & Gems">
-              {filteredSavedItems.map((item) => {
+          {/* Saved Sermons */}
+          {user && groupedItems.sermons.length > 0 && (
+            <CommandGroup heading="My Sermons">
+              {groupedItems.sermons.slice(0, 5).map((item) => {
                 const Icon = getTypeIcon(item.type);
                 return (
                   <CommandItem
-                    key={`saved-${item.id}`}
+                    key={`sermon-${item.id}`}
                     onSelect={() => handleSelect(item.path)}
                     className="gap-2"
                   >
                     <Icon className="h-4 w-4 text-primary" />
-                    <span className="truncate">{item.title}</span>
-                    <span className="ml-auto text-xs bg-muted text-muted-foreground px-2 py-0.5 rounded capitalize">
-                      {item.type}
+                    <div className="flex flex-col flex-1 min-w-0">
+                      <span className="truncate">{item.title}</span>
+                      {item.subtitle && (
+                        <span className="text-xs text-muted-foreground truncate">{item.subtitle}</span>
+                      )}
+                    </div>
+                    <span className="ml-auto text-xs bg-muted text-muted-foreground px-2 py-0.5 rounded">
+                      {getTypeLabel(item.type)}
                     </span>
                   </CommandItem>
                 );
@@ -237,6 +368,110 @@ export const GlobalSearch = () => {
             </CommandGroup>
           )}
 
+          {/* Study Sessions */}
+          {user && groupedItems.sessions.length > 0 && (
+            <CommandGroup heading="Study Sessions">
+              {groupedItems.sessions.slice(0, 5).map((item) => {
+                const Icon = getTypeIcon(item.type);
+                return (
+                  <CommandItem
+                    key={`session-${item.id}`}
+                    onSelect={() => handleSelect(item.path)}
+                    className="gap-2"
+                  >
+                    <Icon className="h-4 w-4 text-blue-500" />
+                    <div className="flex flex-col flex-1 min-w-0">
+                      <span className="truncate">{item.title}</span>
+                      {item.subtitle && (
+                        <span className="text-xs text-muted-foreground truncate">{item.subtitle}</span>
+                      )}
+                    </div>
+                    <span className="ml-auto text-xs bg-muted text-muted-foreground px-2 py-0.5 rounded">
+                      {getTypeLabel(item.type)}
+                    </span>
+                  </CommandItem>
+                );
+              })}
+            </CommandGroup>
+          )}
+
+          {/* Saved Studies */}
+          {user && groupedItems.studies.length > 0 && (
+            <CommandGroup heading="Saved Studies">
+              {groupedItems.studies.slice(0, 5).map((item) => {
+                const Icon = getTypeIcon(item.type);
+                return (
+                  <CommandItem
+                    key={`study-${item.id}`}
+                    onSelect={() => handleSelect(item.path)}
+                    className="gap-2"
+                  >
+                    <Icon className="h-4 w-4 text-green-500" />
+                    <span className="truncate">{item.title}</span>
+                    <span className="ml-auto text-xs bg-muted text-muted-foreground px-2 py-0.5 rounded">
+                      {getTypeLabel(item.type)}
+                    </span>
+                  </CommandItem>
+                );
+              })}
+            </CommandGroup>
+          )}
+
+          {/* Gems */}
+          {user && groupedItems.gems.length > 0 && (
+            <CommandGroup heading="My Gems">
+              {groupedItems.gems.slice(0, 5).map((item) => {
+                const Icon = getTypeIcon(item.type);
+                return (
+                  <CommandItem
+                    key={`gem-${item.id}`}
+                    onSelect={() => handleSelect(item.path)}
+                    className="gap-2"
+                  >
+                    <Icon className="h-4 w-4 text-amber-500" />
+                    <div className="flex flex-col flex-1 min-w-0">
+                      <span className="truncate">{item.title}</span>
+                      {item.subtitle && (
+                        <span className="text-xs text-muted-foreground truncate">{item.subtitle}</span>
+                      )}
+                    </div>
+                    <span className="ml-auto text-xs bg-muted text-muted-foreground px-2 py-0.5 rounded">
+                      {getTypeLabel(item.type)}
+                    </span>
+                  </CommandItem>
+                );
+              })}
+            </CommandGroup>
+          )}
+
+          {/* Thought Analyses */}
+          {user && groupedItems.thoughts.length > 0 && (
+            <CommandGroup heading="Thought Analyses">
+              {groupedItems.thoughts.slice(0, 3).map((item) => {
+                const Icon = getTypeIcon(item.type);
+                return (
+                  <CommandItem
+                    key={`thought-${item.id}`}
+                    onSelect={() => handleSelect(item.path)}
+                    className="gap-2"
+                  >
+                    <Icon className="h-4 w-4 text-purple-500" />
+                    <div className="flex flex-col flex-1 min-w-0">
+                      <span className="truncate">{item.title}</span>
+                      {item.subtitle && (
+                        <span className="text-xs text-muted-foreground truncate">{item.subtitle}</span>
+                      )}
+                    </div>
+                    <span className="ml-auto text-xs bg-muted text-muted-foreground px-2 py-0.5 rounded">
+                      {getTypeLabel(item.type)}
+                    </span>
+                  </CommandItem>
+                );
+              })}
+            </CommandGroup>
+          )}
+
+          {/* App Pages */}
           {[
             "Study & Bible", 
             "Courses", 
