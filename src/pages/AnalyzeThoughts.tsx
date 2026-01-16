@@ -229,6 +229,17 @@ const AnalyzeThoughts = () => {
       );
     }
   }, [result]);
+
+  // Also generate sparks while typing (debounced) - so users get sparks as they study
+  useEffect(() => {
+    if (input.length > 200 && !isAnalyzing) {
+      const timer = setTimeout(() => {
+        console.log('[AnalyzeThoughts] Generating spark from typing content');
+        generateSpark(input.slice(-500), undefined);
+      }, 45000); // 45 seconds after typing stops
+      return () => clearTimeout(timer);
+    }
+  }, [input, isAnalyzing, generateSpark]);
   
   // Auto-save input to localStorage every 15 seconds
   useEffect(() => {

@@ -125,15 +125,40 @@ export function useSparks({
 
   // Generate spark based on content
   const generateSpark = useCallback(async (content: string, verseReference?: string) => {
-    if (!user?.id || preferences.intensity === 'off') return null;
-    if (sparks.length >= maxSparks) return null;
-    
+    console.log('[useSparks] generateSpark called', {
+      hasUser: !!user?.id,
+      intensity: preferences.intensity,
+      sparksCount: sparks.length,
+      maxSparks,
+      contentLength: content?.length
+    });
+
+    if (!user?.id) {
+      console.log('[useSparks] Skipped: no user');
+      return null;
+    }
+    if (preferences.intensity === 'off') {
+      console.log('[useSparks] Skipped: intensity is off');
+      return null;
+    }
+    if (sparks.length >= maxSparks) {
+      console.log('[useSparks] Skipped: at max sparks');
+      return null;
+    }
+
     // Rate limiting
     const now = Date.now();
-    if (now - lastGenerationTime.current < debounceMs) return null;
+    const timeSinceLastGen = now - lastGenerationTime.current;
+    if (timeSinceLastGen < debounceMs) {
+      console.log('[useSparks] Skipped: rate limited, wait', Math.round((debounceMs - timeSinceLastGen) / 1000), 'more seconds');
+      return null;
+    }
     
-    // Suppress if user dismissed 2+ sparks this session
-    if (dismissedCount.current >= 2) return null;
+    // Suppress if user dismissed 5+ sparks this session (be less aggressive)
+    if (dismissedCount.current >= 5) {
+      console.log('[useSparks] Suppressed: dismissed too many sparks this session');
+      return null;
+    }
     
     // Content length check for notes
     if (surface === 'notes' && content.length < 280) return null;
@@ -142,6 +167,8 @@ export function useSparks({
     setGenerating(true);
 
     try {
+      console.log('[useSparks] Calling generate-spark edge function...');
+
       // Gather recent spark data for deduplication
       const recentHashes = sparks
         .filter(s => s.content_hash)
@@ -163,9 +190,11 @@ export function useSparks({
           recentTitles
         }
       });
-      
+
+      console.log('[useSparks] Edge function response:', { data, error });
+
       if (error) throw error;
-      
+
       if (data?.spark) {
         // Save to database
         const { data: savedSpark, error: saveError } = await supabase
