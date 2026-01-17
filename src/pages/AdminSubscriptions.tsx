@@ -229,109 +229,9 @@ export default function AdminSubscriptions() {
     }
   };
 
-  useEffect(() => {
-    if (authLoading) {
-      console.log("[AdminSubscriptions] Auth still loading...");
-      return;
-    }
-    
-    if (!user) {
-      console.log("[AdminSubscriptions] No user, redirecting to auth");
-      navigate("/auth");
-      return;
-    }
-    
-    checkAdminAndLoadStats();
-  }, [user, authLoading, navigate]);
+  
 
-  // Auto-refresh stats every 60 seconds when admin
-  useEffect(() => {
-    if (!isAdmin) return;
-
-    const interval = setInterval(() => {
-      console.log("[AdminSubscriptions] Auto-refreshing stats...");
-      loadStats({ reason: "interval" });
-    }, 60000); // 60 seconds
-
-    return () => clearInterval(interval);
-  }, [isAdmin, loadStats]);
-
-  // Refresh when the tab regains focus / becomes visible (intervals can be throttled)
-  useEffect(() => {
-    if (!isAdmin) return;
-
-    const handleVisible = () => {
-      if (document.visibilityState === "visible") {
-        console.log("[AdminSubscriptions] Tab focused/visible, refreshing stats...");
-        loadStats({ reason: "focus" });
-      }
-    };
-
-    window.addEventListener("focus", handleVisible);
-    document.addEventListener("visibilitychange", handleVisible);
-
-    return () => {
-      window.removeEventListener("focus", handleVisible);
-      document.removeEventListener("visibilitychange", handleVisible);
-    };
-  }, [isAdmin, loadStats]);
-
-  // Lightweight UI timer so the page doesn't feel static
-  useEffect(() => {
-    if (!lastRefreshedAt) {
-      setSecondsSinceRefresh(null);
-      return;
-    }
-
-    const update = () => {
-      setSecondsSinceRefresh(Math.floor((Date.now() - lastRefreshedAt.getTime()) / 1000));
-    };
-
-    update();
-    const interval = setInterval(update, 1000);
-    return () => clearInterval(interval);
-  }, [lastRefreshedAt]);
-
-  const checkAdminAndLoadStats = async () => {
-    if (!user) {
-      setLoading(false);
-      return;
-    }
-
-    console.log("[AdminSubscriptions] Checking admin for user:", user.id);
-
-    try {
-      const { data: roleData, error: roleError } = await supabase
-        .from("user_roles")
-        .select("role")
-        .eq("user_id", user.id)
-        .eq("role", "admin")
-        .maybeSingle();
-
-      console.log("[AdminSubscriptions] Role check result:", { roleData, roleError });
-
-      if (roleError) {
-        console.error("[AdminSubscriptions] Error checking role:", roleError);
-        setLoading(false);
-        return;
-      }
-
-      if (!roleData) {
-        console.log("[AdminSubscriptions] No admin role found, redirecting to dashboard");
-        setIsAdmin(false);
-        setLoading(false);
-        navigate("/dashboard");
-        return;
-      }
-
-      setIsAdmin(true);
-      await loadStats();
-    } catch (error) {
-      console.error("[AdminSubscriptions] Error in checkAdminAndLoadStats:", error);
-      setLoading(false);
-    }
-  };
-
+  // loadStats defined BEFORE the effects that use it
   const loadStats = useCallback(
     async (opts?: { reason?: "interval" | "manual" | "focus" | "init"; silent?: boolean }) => {
       if (refreshInFlightRef.current) return;
@@ -428,6 +328,110 @@ export default function AdminSubscriptions() {
     },
     [toast]
   );
+
+  // checkAdminAndLoadStats defined after loadStats so it can use it
+  const checkAdminAndLoadStats = useCallback(async () => {
+    if (!user) {
+      setLoading(false);
+      return;
+    }
+
+    console.log("[AdminSubscriptions] Checking admin for user:", user.id);
+
+    try {
+      const { data: roleData, error: roleError } = await supabase
+        .from("user_roles")
+        .select("role")
+        .eq("user_id", user.id)
+        .eq("role", "admin")
+        .maybeSingle();
+
+      console.log("[AdminSubscriptions] Role check result:", { roleData, roleError });
+
+      if (roleError) {
+        console.error("[AdminSubscriptions] Error checking role:", roleError);
+        setLoading(false);
+        return;
+      }
+
+      if (!roleData) {
+        console.log("[AdminSubscriptions] No admin role found, redirecting to dashboard");
+        setIsAdmin(false);
+        setLoading(false);
+        navigate("/dashboard");
+        return;
+      }
+
+      setIsAdmin(true);
+      await loadStats();
+    } catch (error) {
+      console.error("[AdminSubscriptions] Error in checkAdminAndLoadStats:", error);
+      setLoading(false);
+    }
+  }, [user, navigate, loadStats]);
+
+  // Initial load when auth is ready
+  useEffect(() => {
+    if (authLoading) {
+      console.log("[AdminSubscriptions] Auth still loading...");
+      return;
+    }
+    
+    if (!user) {
+      console.log("[AdminSubscriptions] No user, redirecting to auth");
+      navigate("/auth");
+      return;
+    }
+    
+    checkAdminAndLoadStats();
+  }, [user, authLoading, navigate, checkAdminAndLoadStats]);
+
+  useEffect(() => {
+    if (!isAdmin) return;
+
+    const interval = setInterval(() => {
+      console.log("[AdminSubscriptions] Auto-refreshing stats...");
+      loadStats({ reason: "interval" });
+    }, 60000); // 60 seconds
+
+    return () => clearInterval(interval);
+  }, [isAdmin, loadStats]);
+
+  // Refresh when the tab regains focus / becomes visible (intervals can be throttled)
+  useEffect(() => {
+    if (!isAdmin) return;
+
+    const handleVisible = () => {
+      if (document.visibilityState === "visible") {
+        console.log("[AdminSubscriptions] Tab focused/visible, refreshing stats...");
+        loadStats({ reason: "focus" });
+      }
+    };
+
+    window.addEventListener("focus", handleVisible);
+    document.addEventListener("visibilitychange", handleVisible);
+
+    return () => {
+      window.removeEventListener("focus", handleVisible);
+      document.removeEventListener("visibilitychange", handleVisible);
+    };
+  }, [isAdmin, loadStats]);
+
+  // Lightweight UI timer so the page doesn't feel static
+  useEffect(() => {
+    if (!lastRefreshedAt) {
+      setSecondsSinceRefresh(null);
+      return;
+    }
+
+    const update = () => {
+      setSecondsSinceRefresh(Math.floor((Date.now() - lastRefreshedAt.getTime()) / 1000));
+    };
+
+    update();
+    const interval = setInterval(update, 1000);
+    return () => clearInterval(interval);
+  }, [lastRefreshedAt]);
 
   if (loading) {
     return (
