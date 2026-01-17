@@ -46,7 +46,10 @@
     "noResults": "No results found",
     "language": "Language",
     "english": "English",
-    "spanish": "Spanish"
+    "spanish": "Spanish",
+    "french": "French",
+    "german": "German",
+    "korean": "Korean"
   },
   "nav": {
     "dashboard": "Dashboard",

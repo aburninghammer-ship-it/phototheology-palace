@@ -105,6 +105,12 @@ const ROOM_LIBRARIES: Record<string, {
     icon: "🔄",
     gradient: "from-indigo-500 to-purple-600"
   },
+  r66: {
+    title: "Room 66 Library",
+    description: "Track themes through all 66 books of the Bible",
+    icon: "📿",
+    gradient: "from-red-500 to-rose-600"
+  },
   math: {
     title: "Mathematics Library",
     description: "6 time prophecies with 6×6 Scripture Connection Grid",

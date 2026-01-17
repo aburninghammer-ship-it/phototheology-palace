@@ -76,6 +76,7 @@ import { ProphecyLibrary } from "@/components/prophecy-room/ProphecyLibrary";
 import { ThemesLibrary } from "@/components/themes-room/ThemesLibrary";
 import { PatternsLibrary } from "@/components/patterns-room/PatternsLibrary";
 import { ThreeHeavensLibrary } from "@/components/three-heavens-room/ThreeHeavensLibrary";
+import { Room66Library } from "@/components/room66/Room66Library";
 import { RoomLibrary, LibraryBanner, hasLibrary } from "@/components/room/RoomLibrary";
 import { Room3DToggle } from "@/components/room/Room3DToggle";
 import { RoomGraphicsDisplay, hasRoomGraphics } from "@/components/room/RoomGraphicsDisplay";
@@ -730,6 +731,13 @@ export default function RoomDetail() {
                 {room.id === "prm" && (
                   <RoomLibrary roomId="prm">
                     <PatternsLibrary />
+                  </RoomLibrary>
+                )}
+
+                {/* Room 66 - Track Themes Through All 66 Books */}
+                {room.id === "r66" && (
+                  <RoomLibrary roomId="r66">
+                    <Room66Library />
                   </RoomLibrary>
                 )}
 

@@ -407,13 +407,23 @@ const formatInlineText = (text: string): React.ReactNode => {
       continue;
     }
 
-    // Handle verse references (e.g., John 3:16, Genesis 1:1-5, 1 Corinthians 13:4)
-    const verseMatch = remaining.match(/^([1-3]?\s*[A-Z][a-z]+\s+\d+:\d+(-\d+)?)/);
+    // Handle verse references (e.g., John 3:16, Genesis 1:1-5, 1 Corinthians 13:4, 2 Samuel 7:12-16)
+    // Also handles parentheses around verses: (Luke 1:32-33), (2 Samuel 7:12-16)
+    // And multi-word books: Song of Solomon 1:1
+    const verseMatch = remaining.match(/^(\(?\s*)((?:[1-3]\s+)?[A-Z][a-z]+(?:\s+[oO]f\s+[A-Z][a-z]+)?)\s+(\d+:\d+(?:-\d+)?)(\s*\)?)/);
     if (verseMatch) {
-      const verseText = verseMatch[1];
+      const hasOpenParen = verseMatch[1].includes('(');
+      const bookName = verseMatch[2].trim();
+      const verseRef = verseMatch[3];
+      const hasCloseParen = verseMatch[4].includes(')');
+      const fullRef = `${bookName} ${verseRef}`;
+
+      if (hasOpenParen) parts.push('(');
       parts.push(
-        <VersePopover key={`verse-${keyCounter++}`} reference={verseText} />
+        <VersePopover key={`verse-${keyCounter++}`} reference={fullRef} />
       );
+      if (hasCloseParen) parts.push(')');
+
       remaining = remaining.slice(verseMatch[0].length);
       lastCharWasLetter = false;
       continue;

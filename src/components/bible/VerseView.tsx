@@ -2,7 +2,7 @@ import { useState, useMemo } from "react";
 import { Verse } from "@/types/bible";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Sparkles, Loader2, BookOpen, RefreshCw, HelpCircle, Mic, Lightbulb } from "lucide-react";
+import { Sparkles, Loader2, BookOpen, RefreshCw, HelpCircle, Mic, Lightbulb, Copy, Check } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -123,7 +123,30 @@ export const VerseView = ({
   const [explainDialogOpen, setExplainDialogOpen] = useState(false);
   const [verseExplanation, setVerseExplanation] = useState<string>("");
   const [explainLoading, setExplainLoading] = useState(false);
+  const [copied, setCopied] = useState(false);
   const { toast } = useToast();
+
+  const handleCopyVerse = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    const verseRef = book && chapter ? `${book} ${chapter}:${verse.verse}` : `Verse ${verse.verse}`;
+    const textToCopy = `"${verse.text}" - ${verseRef}`;
+
+    try {
+      await navigator.clipboard.writeText(textToCopy);
+      setCopied(true);
+      toast({
+        title: "Copied!",
+        description: `${verseRef} copied to clipboard`,
+      });
+      setTimeout(() => setCopied(false), 2000);
+    } catch (error) {
+      toast({
+        title: "Failed to copy",
+        description: "Please try again",
+        variant: "destructive",
+      });
+    }
+  };
 
   const handleSermonStarter = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -317,6 +340,19 @@ export const VerseView = ({
                   onDelete={onDeleteNote}
                 />
               )}
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-6 w-6 p-0 opacity-0 group-hover:opacity-100 transition-opacity"
+                onClick={handleCopyVerse}
+                title="Copy verse"
+              >
+                {copied ? (
+                  <Check className="h-3 w-3 text-green-500" />
+                ) : (
+                  <Copy className="h-3 w-3 text-blue-500" />
+                )}
+              </Button>
               {onAskJeeves && (
                 <Button
                   variant="ghost"

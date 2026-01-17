@@ -19,7 +19,7 @@ import {
   Clock, Trash2, Eye, Star, Filter, ExternalLink, LayoutGrid, List,
   Book, Film, Layers, MessageCircleQuestion, TreeDeciduous, History,
   Compass, Target, GitCompare, Crown, CalendarDays, Scroll, Mountain,
-  Scale, Zap, Calculator, Mic2, Edit, Copy, Presentation, CheckCircle2
+Scale, Zap, Calculator, Mic2, Edit, Copy, Presentation, CheckCircle2, Grid3X3
 } from "lucide-react";
 import { format } from "date-fns";
 
@@ -43,7 +43,8 @@ const REFERENCE_LIBRARIES = [
   { id: "prm", name: "Patterns Library", tag: "PRm", floor: 4, icon: Target, color: "bg-cyan-500", description: "Recurring biblical patterns", path: "/palace/floor/4/room/prm", hasLibrary: true },
   { id: "p||", name: "Parallels Library", tag: "P‖", floor: 4, icon: GitCompare, color: "bg-violet-500", description: "Mirrored actions across Scripture", path: "/palace/floor/4/room/p%7C%7C", hasLibrary: true },
   { id: "cec", name: "Christ Every Chapter", tag: "CEC", floor: 4, icon: Crown, color: "bg-yellow-500", description: "Christ types and shadows", path: "/palace/floor/4/room/cec", hasLibrary: true },
-  
+  { id: "r66", name: "Room 66 Library", tag: "R66", floor: 4, icon: Grid3X3, color: "bg-red-500", description: "Track themes through all 66 books", path: "/palace/floor/4/room/r66", hasLibrary: true },
+
   // Floor 5 - Vision
   { id: "fe", name: "Feasts Library", tag: "FE", floor: 5, icon: CalendarDays, color: "bg-rose-500", description: "Feasts of Israel and their meaning", path: "/palace/floor/5/room/fe", hasLibrary: true },
   { id: "bl", name: "Sanctuary Library", tag: "BL", floor: 5, icon: Mountain, color: "bg-sky-500", description: "Sanctuary furniture and services", path: "/palace/floor/5/room/bl", hasLibrary: true },
