@@ -1203,6 +1203,13 @@ export type Database = {
             referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "church_community_comments_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles_public_info"
+            referencedColumns: ["id"]
+          },
         ]
       }
       church_community_posts: {
@@ -1259,6 +1266,13 @@ export type Database = {
             columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "church_community_posts_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles_public_info"
             referencedColumns: ["id"]
           },
         ]
@@ -1990,6 +2004,13 @@ export type Database = {
             referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "community_comments_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles_public_info"
+            referencedColumns: ["id"]
+          },
         ]
       }
       community_post_notifications: {
@@ -2083,6 +2104,13 @@ export type Database = {
             columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "community_posts_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles_public_info"
             referencedColumns: ["id"]
           },
         ]
@@ -4573,6 +4601,13 @@ export type Database = {
             columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fk_game_scores_profiles"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles_public_info"
             referencedColumns: ["id"]
           },
         ]
@@ -14974,6 +15009,33 @@ export type Database = {
           max_seats?: number | null
           name?: string | null
           tier?: Database["public"]["Enums"]["church_tier"] | null
+        }
+        Relationships: []
+      }
+      profiles_public_info: {
+        Row: {
+          avatar_url: string | null
+          display_name: string | null
+          id: string | null
+          level: number | null
+          points: number | null
+          username: string | null
+        }
+        Insert: {
+          avatar_url?: string | null
+          display_name?: string | null
+          id?: string | null
+          level?: number | null
+          points?: number | null
+          username?: string | null
+        }
+        Update: {
+          avatar_url?: string | null
+          display_name?: string | null
+          id?: string | null
+          level?: number | null
+          points?: number | null
+          username?: string | null
         }
         Relationships: []
       }
