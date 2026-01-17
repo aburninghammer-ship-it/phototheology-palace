@@ -2,12 +2,14 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { useRevenueAnalytics } from "@/hooks/useRevenueAnalytics";
-import { Loader2, TrendingUp, TrendingDown, DollarSign, Users, RefreshCw, ArrowDownRight, Target, Percent, Clock, AlertTriangle, Calendar } from "lucide-react";
+import { Loader2, TrendingUp, TrendingDown, DollarSign, Users, RefreshCw, ArrowDownRight, Target, Percent, Clock, AlertTriangle, Calendar, FileText, Mail } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, LineChart, Line, CartesianGrid } from 'recharts';
+import { format } from "date-fns";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 
 export function RevenueDashboard() {
-  const { loading, metrics, trialMetrics, cohorts, onboardingFunnel, refetch } = useRevenueAnalytics();
+  const { loading, metrics, trialMetrics, pdfMetrics, cohorts, onboardingFunnel, refetch } = useRevenueAnalytics();
 
   if (loading) {
     return (
@@ -196,6 +198,83 @@ export function RevenueDashboard() {
             </CardContent>
           </Card>
         </>
+      )}
+
+      {/* PDF Purchases Section */}
+      {pdfMetrics && (
+        <Card className="border-purple-500/20 bg-purple-500/5">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <FileText className="h-5 w-5 text-purple-500" />
+              PDF Purchases
+            </CardTitle>
+            <CardDescription>
+              One-time product sales (Genesis in 6 Days, Quick-Start Guide, Study Suite)
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="grid gap-4 md:grid-cols-2 mb-6">
+              <div className="p-4 rounded-lg bg-background border">
+                <div className="text-3xl font-bold text-purple-600">{pdfMetrics.totalPurchases}</div>
+                <p className="text-sm text-muted-foreground">Total PDF Sales</p>
+              </div>
+              <div className="p-4 rounded-lg bg-background border">
+                <div className="text-3xl font-bold text-green-600">${pdfMetrics.totalRevenue.toFixed(2)}</div>
+                <p className="text-sm text-muted-foreground">Total PDF Revenue</p>
+              </div>
+            </div>
+
+            {pdfMetrics.purchases.length > 0 && (
+              <div className="rounded-md border">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Date</TableHead>
+                      <TableHead>Product</TableHead>
+                      <TableHead>Customer</TableHead>
+                      <TableHead className="text-right">Amount</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {pdfMetrics.purchases.slice(0, 20).map((purchase) => (
+                      <TableRow key={purchase.id}>
+                        <TableCell className="font-mono text-sm">
+                          {format(new Date(purchase.date), 'MMM d, yyyy h:mm a')}
+                        </TableCell>
+                        <TableCell>
+                          <Badge variant="outline" className="text-purple-600 border-purple-300">
+                            {purchase.product}
+                          </Badge>
+                        </TableCell>
+                        <TableCell>
+                          <div className="flex flex-col">
+                            {purchase.name && <span className="font-medium">{purchase.name}</span>}
+                            {purchase.email ? (
+                              <span className="text-sm text-muted-foreground flex items-center gap-1">
+                                <Mail className="h-3 w-3" />
+                                {purchase.email}
+                              </span>
+                            ) : (
+                              <span className="text-sm text-muted-foreground italic">Email in Stripe Dashboard</span>
+                            )}
+                          </div>
+                        </TableCell>
+                        <TableCell className="text-right font-mono font-medium text-green-600">
+                          ${purchase.amount.toFixed(2)}
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+                {pdfMetrics.purchases.length > 20 && (
+                  <div className="p-2 text-center text-sm text-muted-foreground border-t">
+                    Showing 20 of {pdfMetrics.purchases.length} purchases
+                  </div>
+                )}
+              </div>
+            )}
+          </CardContent>
+        </Card>
       )}
 
       {/* Cohort Analysis */}
