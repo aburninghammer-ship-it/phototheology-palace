@@ -156,7 +156,7 @@ export const palaceFloors: Floor[] = [
           "Changing your glyph system midstream—commit to your symbols",
           "Trying to capture EVERYTHING in the glyph—it's a trigger, not an encyclopedia"
         ],
-        deliverable: "51-frame legend (Block range → Glyph → Brief explanation). Example: 'Gen 1-24 = / → Divisions emerge throughout creation and early history'"
+        deliverable: "A 51-symbol legend — one symbol per 24-chapter block, with a 1-2 sentence explanation of why that symbol fits"
       },
       {
         id: "tr",
@@ -213,7 +213,7 @@ export const palaceFloors: Floor[] = [
           "Gen 3:15 (seed of woman) + Gal 4:4 (born of woman) + Rev 12:5 (male child) → Virgin birth thread across redemptive history"
         ],
         pitfalls: ["Forced connections", "Trivia instead of theology", "Gem without clear text anchors"],
-        deliverable: "Gem card: Combined texts + rare truth + use-case"
+        deliverable: "A 'Gem Card' showing: the verses you combined, the insight you discovered, and how you'd use it in teaching"
       }
     ]
   },
@@ -315,7 +315,7 @@ export const palaceFloors: Floor[] = [
           "Allegorizing everything—not every detail is symbolic (sometimes a door is just a door)",
           "Creating symbols that contradict Scripture's own interpretation"
         ],
-        deliverable: "Symbol cards (reusable)—each card shows: Symbol → Scope (5-10 texts) → Sign (1-sentence meaning) → Christ-locus (fulfillment note)",
+        deliverable: "Reusable symbol cards showing: the symbol name, 5-10 verses where it appears, what it means (one sentence), and how Christ fulfills it",
         prerequisites: [{ floor: 1, room: "sr" }, { floor: 1, room: "tr" }]
       },
       {
@@ -349,7 +349,7 @@ export const palaceFloors: Floor[] = [
           "Treating questions as assignments instead of genuine inquiry",
           "Only asking INTRA questions—make sure to include INTER and PALACE questions too"
         ],
-        deliverable: "Question map with three columns: INTRA (inside passage) | INTER (across Scripture) | PALACE (PT framework). Target 50-100 total questions. Beginners: start with 15-20 total and work up.",
+        deliverable: "A three-column question list:\n• INTRA — questions about what's happening inside this passage\n• INTER — questions connecting to other Scripture\n• PALACE — questions using Phototheology concepts\nAim for 50-100 total (beginners: start with 15-20)",
         prerequisites: [{ floor: 1, room: "sr" }]
       },
       {
@@ -382,7 +382,7 @@ export const palaceFloors: Floor[] = [
           "IGNORING CONTEXT: Pulling a verse that seems relevant but means something different in its passage",
           "SKIPPING HARD QUESTIONS: Only answering easy questions—tackle the difficult ones too"
         ],
-        deliverable: "Answer chains document: For each selected question, provide: Question → Ref 1 (+ brief quote/note) → Ref 2 → Ref 3 → Ref 4 (if needed) → Synthesis (1-3 sentences). Aim for 5-10 fully developed answer chains per study session.",
+        deliverable: "Answer chains — pick your best questions and answer each with:\n• 3-4 cross-referenced verses (with brief notes)\n• A 1-3 sentence synthesis explaining how Scripture answers the question\nAim for 5-10 complete answer chains per session",
         prerequisites: [{ floor: 1, room: "sr" }, { floor: 2, room: "qr" }]
       }
     ]
@@ -586,7 +586,7 @@ export const palaceFloors: Floor[] = [
           "Ignoring the horizon—failing to note if this is already accomplished or awaiting fulfillment",
           "Mixing offices carelessly without recognizing which is primary in the passage"
         ],
-        deliverable: "4-line CR note: Office → Title → Act → Benefit (with optional Horizon note)"
+        deliverable: "A 4-part note:\n• Office — Prophet, Priest, or King?\n• Title — What is Christ called here?\n• Act — What does He do?\n• Benefit — How does this help believers?"
       },
       {
         id: "dr",
@@ -607,7 +607,7 @@ export const palaceFloors: Floor[] = [
           "IGNORING DIMENSION 2 (Christ)—every text must connect to the gospel somehow",
           "MAKING DIMENSION 3 (personal) into moralism ('try harder') instead of grace-based response"
         ],
-        deliverable: "DR sheet with 5 dimensions: LITERAL (1-2 sentences) • CHRIST (1-2 sentences) • PERSONAL (1-2 sentences) • CHURCH (1-2 sentences) • HEAVEN (1-2 sentences)"
+        deliverable: "A 5-dimension worksheet (1-2 sentences each):\n• LITERAL — What actually happened?\n• CHRIST — How does this reveal Jesus?\n• PERSONAL — How does this apply to me?\n• CHURCH — How does this apply to the body of believers?\n• HEAVEN — How does this point to eternity?"
       },
       {
         id: "c6",
@@ -631,7 +631,7 @@ export const palaceFloors: Floor[] = [
           "NEGLECTING CHRIST: The ultimate point of Connect-6 is showing how all genres testify to Jesus—don't make it just a trivia exercise",
           "SHALLOW CONNECTIONS: Saying 'both mention love' isn't enough—explain HOW the genres complement each other"
         ],
-        deliverable: "MODE 1: Anchor text + six cross-genre connections (one per genre) + synthesis paragraph. MODE 2: Theme statement + six verses (one per genre) + woven explanation showing convergence + Christ-centered climax"
+        deliverable: "Either:\n• **Single-Text Mode**: One passage connected to all 6 genres (Prophecy, Parable, Epistle, History, Gospel, Poetry) + a synthesis paragraph\n• **Multi-Text Mode**: One theme + one verse from each genre + explanation of how they converge in Christ"
       },
       {
         id: "trm",
@@ -658,7 +658,7 @@ export const palaceFloors: Floor[] = [
           "FORCING TIME-PROPHECY: Not every prophetic text is about TIMELINES—some prophecy is thematic, not chronological",
           "NEGLECTING CONNECTIONS: Once you've placed a text on a span, compare it with OTHER texts on that same span to build integrated theology"
         ],
-        deliverable: "Span tag (Sanctuary Wall / Life of Christ Wall / Great Controversy Wall / Time-Prophecy Wall / Gospel Floor / Heaven Ceiling) + 1-2 sentence rationale + optional secondary span"
+        deliverable: "Name the primary theological category (Sanctuary, Life of Christ, Great Controversy, Time-Prophecy, Gospel, or Heaven) + 1-2 sentences explaining why it fits"
       },
       {
         id: "tz",
@@ -681,7 +681,7 @@ export const palaceFloors: Floor[] = [
           "MIXING UP WITH PROPHECY ROOM: PR is about prophetic timelines; TZ is about interpretive lenses across time-space",
           "VAGUE APPLICATION: 'This applies to us today' isn't enough—explain HOW the text speaks within that specific zone"
         ],
-        deliverable: "TZ note: [Specific zone chosen] + 2-3 sentences explaining how the text speaks within that zone's context. Optional: Additional zones explored with brief explanations."
+        deliverable: "A brief note stating which time zone you're applying (e.g., Heaven-Past, Earth-Present) + 2-3 sentences explaining how the text speaks in that context"
       },
       {
         id: "prm",
@@ -705,7 +705,7 @@ export const palaceFloors: Floor[] = [
           "MAKING PATTERNS MECHANICAL: God is free to break His patterns—they reveal tendencies, not laws",
           "VAGUE LABELING: 'God works' is too broad—patterns need specific, memorable names"
         ],
-        deliverable: "Pattern Card: Pattern Name → Structure (1-2 sentences) → 3+ Examples with references → Theological Insight (what this reveals about God)"
+        deliverable: "A Pattern Card with:\n• Pattern name (e.g., 'Wilderness Testing')\n• Structure — what repeats (1-2 sentences)\n• 3+ examples with Bible references\n• Theological insight — what this reveals about God"
       },
       {
         id: "p||",
@@ -731,7 +731,7 @@ export const palaceFloors: Floor[] = [
           "IGNORING CONTEXT: Ripping events from their narratives to force a parallel",
           "CALLING EVERY SIMILARITY A PARALLEL: Coincidental similarities aren't parallels—there must be interpretive intent"
         ],
-        deliverable: "Parallel note: Event A (OT ref) ↔ Event B (NT ref) → What Echoes (structural similarities) → What Escalates (how NT surpasses) → Lesson (1-2 sentences)"
+        deliverable: "A parallel comparison showing:\n• Event A (OT reference) ↔ Event B (NT reference)\n• What echoes — structural similarities\n• What escalates — how the NT event surpasses the OT\n• Lesson — 1-2 sentences"
       },
       {
         id: "frt",
@@ -755,7 +755,7 @@ export const palaceFloors: Floor[] = [
           "FRUIT WITHOUT EXEGESIS: Letting desired fruit dictate interpretation instead of letting text produce fruit",
           "SOLO FRUIT CHECKS: Not inviting others to assess the fruit your interpretation produces"
         ],
-        deliverable: "Fruit Check: State interpretation → Name fruit produced (good/bad) → If bad, revise interpretation and recheck fruit → Final fruit verification (1-2 sentences)"
+        deliverable: "A fruit check:\n• Your interpretation (1-2 sentences)\n• What fruit it produces (good or bad?)\n• If bad fruit, revise and re-check\n• Final verdict (1-2 sentences)"
       }
     ]
   },
@@ -851,7 +851,7 @@ export const palaceFloors: Floor[] = [
           "SKIPPING THE OT RITUAL: You can't understand fulfillment without knowing the original feast practice",
           "LITERALIZING FUTURE FEASTS: Fall feasts are fulfilled SPIRITUALLY/COSMICALLY, not by literal animal sacrifices in millennium"
         ],
-        deliverable: "FE tag: Feast Name → OT Ritual (brief) → Christ's Fulfillment (1 sentence) → Timeline (Fulfilled/In Progress/Awaiting) → Application"
+        deliverable: "A feast note showing:\n• Feast name\n• The original OT ritual (brief description)\n• How Christ fulfills it (1 sentence)\n• Timeline status: Fulfilled, In Progress, or Awaiting\n• Personal application"
       },
       {
         id: "cec",
@@ -883,7 +883,7 @@ export const palaceFloors: Floor[] = [
           "NO NT CROSSLINK: Failing to confirm your Christ-reading with New Testament validation—always crosslink",
           "FORCING ONE METHOD: If Method 2 (types) doesn't fit, try Method 1 (promises) or Method 4 (God's character)—let the text guide which method(s) to use"
         ],
-        deliverable: "CEC Note using 'Finding Waldo' Framework:\n\n1️⃣ METHODS APPLIED: List which of the 5 methods you used (1-Promise, 2-Type, 3-Trail, 4-Heart, 5-Unfinished)\n\n2️⃣ NAME: Christ's title/role in this chapter (e.g., Lamb, King, Shepherd, Deliverer, Prophet, Priest)\n\n3️⃣ ACT: What Christ does/accomplishes in or through this chapter (e.g., atones, delivers, fulfills, reveals, judges, restores)\n\n4️⃣ CROSSLINK: 1-2 NT texts confirming the Christ-connection\n\nExample Format:\n'Genesis 3 | METHODS: 1,3,5 | NAME: Seed of Woman/Last Adam | ACT: Promises to crush serpent, inaugurates redemption | CROSSLINK: Rom 5:17-19, Rom 16:20, Rev 12:9'"
+        deliverable: "A 'CEC Note' with four parts:\n\n1. **Methods Used** — Which of the 5 'Finding Waldo' methods helped (Promise, Type, Trail, Heart, Unfinished)\n\n2. **Christ's Name/Role** — What title does He have in this chapter? (e.g., Lamb, King, Shepherd)\n\n3. **Christ's Action** — What does He do here? (e.g., atones, delivers, reveals)\n\n4. **NT Crosslink** — 1-2 New Testament verses confirming the connection"
       },
       {
         id: "r66",
@@ -939,7 +939,7 @@ export const palaceFloors: Floor[] = [
           "LITERALIZING APOCALYPTIC LANGUAGE: Assuming 'stars fall' always means 3H when it can be metaphor for 1H-2H political collapse",
           "FORCING SINGLE HORIZON: Refusing to see dual/triple horizons when text warrants multiple fulfillments"
         ],
-        deliverable: "Horizon Tag (1H, 2H, 3H, or combinations like 1H+3H) + Defense (2-3 sentences explaining why, with historical/textual evidence) + Fulfillment Status (fulfilled/ongoing/future)"
+        deliverable: "A horizon note with:\n• Which heaven (1H, 2H, 3H, or a combination)\n• 2-3 sentences explaining why with historical/textual evidence\n• Fulfillment status: already fulfilled, ongoing, or still future"
       },
       {
         id: "cycles",
@@ -960,7 +960,7 @@ export const palaceFloors: Floor[] = [
           "Forcing every text into a cycle when some passages are timeless wisdom literature",
           "Comparing cycles superficially without showing theological development"
         ],
-        deliverable: "Cycle tag (@Ad, @No, etc.) + 5-beat arc identified + one comparison with parallel element from a different cycle"
+        deliverable: "A cycle note showing:\n• Which cycle (e.g., @Mo, @CyC, @Sp)\n• The 5-beat arc: Fall → Covenant → Sanctuary → Enemy → Restoration\n• One comparison with a similar element from a different cycle"
       },
       {
         id: "jr",
@@ -981,7 +981,7 @@ export const palaceFloors: Floor[] = [
           "CHECKLIST FEEL: Writing 'Story: X. Christ: Y. Genre: Z.' instead of a flowing narrative synthesis",
           "IGNORING GENRE: Treating apocalyptic prophecy like historical narrative, or poetry like epistle"
         ],
-        deliverable: "Juice Summary (≤150 words synthesizing book through Palace lenses: story, Christ, genre, cycle, horizon) + Final Tag Line (one punchy sentence capturing the book's essence)"
+        deliverable: "Two parts:\n\n1. **Juice Summary** (150 words or less) — A flowing narrative synthesizing the book through story, Christ, genre, cycle, and horizon\n\n2. **Final Tag Line** — One punchy sentence capturing the book's essence"
       },
       {
         id: "math",
@@ -1003,7 +1003,7 @@ export const palaceFloors: Floor[] = [
           "SKIPPING EXPLANATION: Every mapping requires a WHY, not just a claim",
           "VIBES-BASED MAPPING: Feelings are not evidence—point to textual markers"
         ],
-        deliverable: "MATH tag: Prophecy Code (@120/@400/@70y/@490/@1260/@2300) → Core Meaning → Textual Connection → Boundary/Limitation → Theological Lesson"
+        deliverable: "A time-prophecy note:\n• Which prophecy code applies (e.g., @490, @1260, @2300)\n• Core meaning of that timeline\n• How the text connects to it\n• Any boundaries or limitations\n• The theological lesson"
       }
     ]
   },
@@ -1034,7 +1034,7 @@ export const palaceFloors: Floor[] = [
           "VAGUE CONFESSIONS: 'I'm a sinner' without naming specific sins or idols the text exposes",
           "IGNORING CHRIST: Wallowing in guilt without running to the gospel remedy"
         ],
-        deliverable: "Fire Record (2-3 sentences): Name the Wound OR Hope the text stirs → Brief prayer response (confession/thanksgiving) → One sentence capturing the encounter"
+        deliverable: "A 2-3 sentence 'Fire Record':\n• Name the wound (conviction) OR hope (comfort) the text stirs\n• Your brief prayer response\n• One sentence capturing the encounter"
       },
       {
         id: "mr",
@@ -1057,7 +1057,7 @@ export const palaceFloors: Floor[] = [
           "SKIPPING REPETITION: Reading once and moving on—repetition is the POINT",
           "NO FOLLOW-THROUGH: Meditating in the morning, then never returning to the verse throughout the day"
         ],
-        deliverable: "Meditation Line (1-2 sentences): The verse/phrase meditated on → The ONE distilled truth you'll carry today → Plan for returning to it throughout the day"
+        deliverable: "A 'Meditation Line' (1-2 sentences):\n• The verse or phrase you meditated on\n• The ONE truth you'll carry today\n• How you'll return to it throughout the day"
       },
       {
         id: "srm",
@@ -1080,7 +1080,7 @@ export const palaceFloors: Floor[] = [
           "NEVER REVIEWING MISTAKES: Finishing the sprint and moving on without correcting errors",
           "OVERLOADING: Trying to sprint through topics you haven't studied yet—Speed Room comes AFTER foundational work"
         ],
-        deliverable: "Sprint Sheet: Sprint type → Target (e.g., '10 answers in 2 min') → Your attempt → Score (accuracy + time) → Weak spots identified"
+        deliverable: "A sprint report:\n• What type of sprint you did\n• Your target (e.g., '10 answers in 2 min')\n• Your results and score\n• Weak spots to drill later"
       }
     ]
   },
@@ -1109,7 +1109,7 @@ export const palaceFloors: Floor[] = [
           "NEVER AUDITING: Teaching naturally but never checking if you're actually using the Palace comprehensively",
           "STOP LEARNING: Mastery isn't the END—it's a new BEGINNING of deeper exploration"
         ],
-        deliverable: "Recording/Outline of natural teaching + Post-Hoc Tag Audit (list which rooms you used unconsciously) + Gap Analysis (which rooms did you skip, and why?)"
+        deliverable: "Three parts:\n\n1. **Recording or Outline** — Your natural teaching (without using Palace terminology)\n\n2. **Post-Audit** — List which rooms you used unconsciously\n\n3. **Gap Analysis** — Which rooms did you skip? Why?"
       },
       {
         id: "freestyle",
@@ -1130,7 +1130,7 @@ export const palaceFloors: Floor[] = [
           "LONE WOLF STUDY: Not engaging the thinking partner dynamic",
           "CONFUSING FREESTYLE WITH RECKLESSNESS: Creative exploration still honors Scripture's authority"
         ],
-        deliverable: "Exploratory conversation + Stabilized gems (crystallized insights) + Room identifications (which Palace principles were at work)"
+        deliverable: "Three parts:\n\n1. **Exploration** — Your thinking-out-loud conversation\n\n2. **Gems** — Any insights worth crystallizing\n\n3. **Room Tags** — Which Palace principles were at work"
       }
     ]
   }
