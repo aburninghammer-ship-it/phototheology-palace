@@ -35,6 +35,21 @@ interface OnboardingFunnel {
   dropoff: number;
 }
 
+export interface PdfPurchase {
+  id: string;
+  product: string;
+  amount: number;
+  email: string | null;
+  name: string | null;
+  date: string;
+}
+
+export interface PdfMetrics {
+  totalPurchases: number;
+  totalRevenue: number;
+  purchases: PdfPurchase[];
+}
+
 // Stripe MRR will be fetched from the edge function for accuracy
 
 export function useRevenueAnalytics() {
@@ -45,6 +60,7 @@ export function useRevenueAnalytics() {
   const [onboardingFunnel, setOnboardingFunnel] = useState<OnboardingFunnel[]>([]);
   const [monthlyTrend, setMonthlyTrend] = useState<{ month: string; mrr: number; subscribers: number }[]>([]);
   const [stripeMrr, setStripeMrr] = useState<number | null>(null);
+  const [pdfMetrics, setPdfMetrics] = useState<PdfMetrics | null>(null);
 
   useEffect(() => {
     fetchAllMetrics();
@@ -60,9 +76,26 @@ export function useRevenueAnalytics() {
         fetchOnboardingFunnel(),
         fetchMonthlyTrend(),
         fetchStripeMrr(),
+        fetchPdfPurchases(),
       ]);
     } finally {
       setLoading(false);
+    }
+  };
+
+  // Fetch PDF purchases from Stripe via edge function
+  const fetchPdfPurchases = async () => {
+    try {
+      const { data, error } = await supabase.functions.invoke('get-pdf-purchases');
+      if (!error && data?.purchases) {
+        setPdfMetrics({
+          totalPurchases: data.purchases.length,
+          totalRevenue: data.purchases.reduce((sum: number, p: any) => sum + (p.amount || 0), 0),
+          purchases: data.purchases,
+        });
+      }
+    } catch (e) {
+      console.debug('[useRevenueAnalytics] Could not fetch PDF purchases', e);
     }
   };
 
@@ -346,6 +379,7 @@ export function useRevenueAnalytics() {
     loading,
     metrics: finalMetrics,
     trialMetrics,
+    pdfMetrics,
     cohorts,
     onboardingFunnel,
     monthlyTrend,
