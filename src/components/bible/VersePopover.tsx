@@ -13,11 +13,12 @@ interface VersePopoverProps {
   children?: React.ReactNode;
 }
 
-// Parse reference like "John 3:16" or "Genesis 1:1-5" or "1 Corinthians 13:4"
+// Parse reference like "John 3:16" or "Genesis 1:1-5" or "1 Corinthians 13:4" or "2 Samuel 7:12-16" or "Song of Solomon 1:1"
 const parseReference = (ref: string): { book: string; chapter: number; verse: number; endVerse?: number } | null => {
-  const match = ref.match(/^([1-3]?\s*[A-Za-z]+)\s+(\d+):(\d+)(?:-(\d+))?/);
+  // Handle numbered books (1/2/3 John, 1/2 Samuel, etc.) and "of" constructs (Song of Solomon)
+  const match = ref.match(/^((?:[1-3]\s+)?[A-Za-z]+(?:\s+[oO]f\s+[A-Za-z]+)?)\s+(\d+):(\d+)(?:-(\d+))?/);
   if (!match) return null;
-  
+
   return {
     book: match[1].trim(),
     chapter: parseInt(match[2]),
