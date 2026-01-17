@@ -9995,6 +9995,45 @@ export type Database = {
           },
         ]
       }
+      saved_powerpoints: {
+        Row: {
+          content_type: string
+          created_at: string
+          id: string
+          sermon_id: string | null
+          settings: Json | null
+          slide_data: Json | null
+          theme_id: string | null
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          content_type?: string
+          created_at?: string
+          id?: string
+          sermon_id?: string | null
+          settings?: Json | null
+          slide_data?: Json | null
+          theme_id?: string | null
+          title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          content_type?: string
+          created_at?: string
+          id?: string
+          sermon_id?: string | null
+          settings?: Json | null
+          slide_data?: Json | null
+          theme_id?: string | null
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       sequence_items: {
         Row: {
           book: string

@@ -66,6 +66,16 @@ interface LibraryStats {
   notes: number;
   images: number;
   sermons: number;
+  powerpoints: number;
+}
+
+interface PowerPointItem {
+  id: string;
+  title: string;
+  content_type: string;
+  theme_id: string | null;
+  created_at: string;
+  updated_at: string;
 }
 
 interface SermonItem {
@@ -151,7 +161,7 @@ export default function Libraries() {
   const [activeTab, setActiveTab] = useState("reference");
   const [searchQuery, setSearchQuery] = useState("");
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
-  const [stats, setStats] = useState<LibraryStats>({ sparks: 0, gems: 0, bookmarks: 0, highlights: 0, notes: 0, images: 0, sermons: 0 });
+  const [stats, setStats] = useState<LibraryStats>({ sparks: 0, gems: 0, bookmarks: 0, highlights: 0, notes: 0, images: 0, sermons: 0, powerpoints: 0 });
   const [loading, setLoading] = useState(true);
 
   // Data states
@@ -161,6 +171,7 @@ export default function Libraries() {
   const [highlights, setHighlights] = useState<HighlightItem[]>([]);
   const [notes, setNotes] = useState<NoteItem[]>([]);
   const [sermons, setSermons] = useState<SermonItem[]>([]);
+  const [powerpoints, setPowerpoints] = useState<PowerPointItem[]>([]);
 
   // Fetch all library data
   useEffect(() => {
@@ -218,6 +229,14 @@ export default function Libraries() {
           .order('updated_at', { ascending: false })
           .limit(50);
 
+        // Fetch powerpoints
+        const { data: powerpointsData } = await supabase
+          .from('saved_powerpoints')
+          .select('id, title, content_type, theme_id, created_at, updated_at')
+          .eq('user_id', user.id)
+          .order('updated_at', { ascending: false })
+          .limit(50);
+
         // Set data
         setSparks((sparksData as unknown as SparkItem[]) || []);
         setGems((gemsData as GemItem[]) || []);
@@ -225,6 +244,7 @@ export default function Libraries() {
         setHighlights((highlightsData as HighlightItem[]) || []);
         setNotes((notesData as NoteItem[]) || []);
         setSermons((sermonsData as SermonItem[]) || []);
+        setPowerpoints((powerpointsData as PowerPointItem[]) || []);
 
         // Set stats
         setStats({
@@ -235,6 +255,7 @@ export default function Libraries() {
           notes: notesData?.length || 0,
           images: 0, // TODO: Add images count
           sermons: sermonsData?.length || 0,
+          powerpoints: powerpointsData?.length || 0,
         });
       } catch (err) {
         console.error('Error fetching libraries:', err);
@@ -272,8 +293,14 @@ export default function Libraries() {
     s.theme_passage.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
+  const filteredPowerpoints = powerpoints.filter(p =>
+    p.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    p.content_type.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
   const libraryTabs = [
     { id: 'reference', label: 'PT Libraries', icon: Library, count: REFERENCE_LIBRARIES.length, color: 'text-indigo-500' },
+    { id: 'powerpoints', label: 'PowerPoints', icon: Presentation, count: stats.powerpoints, color: 'text-fuchsia-500' },
     { id: 'sermons', label: 'Sermons', icon: Mic2, count: stats.sermons, color: 'text-rose-500' },
     { id: 'sparks', label: 'Sparks', icon: Flame, count: stats.sparks, color: 'text-orange-500' },
     { id: 'gems', label: 'Gems', icon: Gem, count: stats.gems, color: 'text-emerald-500' },
@@ -314,7 +341,7 @@ export default function Libraries() {
           </div>
 
           {/* Quick Stats */}
-          <div className="grid grid-cols-4 md:grid-cols-7 gap-2 md:gap-3 mt-6">
+          <div className="grid grid-cols-4 md:grid-cols-8 gap-2 md:gap-3 mt-6">
             {libraryTabs.map(tab => (
               <Card
                 key={tab.id}
@@ -493,6 +520,73 @@ export default function Libraries() {
                 </div>
               </div>
             )}
+          </TabsContent>
+
+          {/* PowerPoints Tab */}
+          <TabsContent value="powerpoints">
+            {loading ? (
+              <LoadingGrid />
+            ) : filteredPowerpoints.length === 0 ? (
+              <EmptyState
+                icon={Presentation}
+                title="No Saved PowerPoints"
+                description="Generate and save presentations to access them here"
+                action={{ label: "Create PowerPoint", path: "/sermon-powerpoint" }}
+              />
+            ) : (
+              <div className={cn(
+                viewMode === 'grid'
+                  ? "grid md:grid-cols-2 lg:grid-cols-3 gap-4"
+                  : "space-y-3"
+              )}>
+                {filteredPowerpoints.map(ppt => (
+                  <Card
+                    key={ppt.id}
+                    className="cursor-pointer hover:shadow-lg transition-all group hover:border-fuchsia-500/50"
+                    onClick={() => navigate(`/sermon-powerpoint?savedId=${ppt.id}`)}
+                  >
+                    <CardHeader className="pb-2">
+                      <div className="flex items-start justify-between">
+                        <CardTitle className="text-base line-clamp-1 flex items-center gap-2">
+                          <Presentation className="h-4 w-4 text-fuchsia-500" />
+                          {ppt.title}
+                        </CardTitle>
+                      </div>
+                      <CardDescription className="text-xs">
+                        {format(new Date(ppt.created_at), 'MMM d, yyyy')}
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent className="pt-0">
+                      <div className="flex items-center justify-between text-xs text-muted-foreground">
+                        <Badge variant="outline" className="text-xs capitalize">
+                          {ppt.content_type}
+                        </Badge>
+                        {ppt.theme_id && (
+                          <span className="text-xs text-muted-foreground">
+                            {ppt.theme_id}
+                          </span>
+                        )}
+                      </div>
+                      <div className="flex gap-2 mt-3">
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          className="flex-1 text-xs"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            navigate(`/sermon-powerpoint?savedId=${ppt.id}`);
+                          }}
+                        >
+                          <Presentation className="h-3 w-3 mr-1" />
+                          Open
+                        </Button>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            )}
+            <ViewAllButton path="/sermon-powerpoint" label="Create New PowerPoint" />
           </TabsContent>
 
           {/* Sermons Tab */}

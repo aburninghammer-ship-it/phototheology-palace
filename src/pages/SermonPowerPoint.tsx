@@ -30,6 +30,8 @@ import {
   PanelRightOpen,
   PanelRightClose,
   Save,
+  FolderOpen,
+  Check as CheckIcon,
 } from "lucide-react";
 import {
   PPT_THEMES,
@@ -425,6 +427,47 @@ export default function SermonPowerPoint() {
       }
     } finally {
       setGenerating(false);
+    }
+  };
+
+  // Save PowerPoint to library
+  const [saving, setSaving] = useState(false);
+  const [savedToLibrary, setSavedToLibrary] = useState(false);
+
+  const savePPTToLibrary = async () => {
+    if (!generatedDeck) return;
+
+    setSaving(true);
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        toast.error("Please sign in to save to library");
+        return;
+      }
+
+      const title = activeTab === 'study' ? studyTitle : sermonTitle || generatedDeck.metadata.sermonTitle || 'Untitled Presentation';
+
+      const { error } = await supabase
+        .from('saved_powerpoints')
+        .insert([{
+          user_id: user.id,
+          title,
+          content_type: activeTab,
+          sermon_id: sermonId || null,
+          settings: JSON.parse(JSON.stringify(settings)),
+          slide_data: JSON.parse(JSON.stringify(generatedDeck)),
+          theme_id: settings.theme_id,
+        }]);
+
+      if (error) throw error;
+
+      setSavedToLibrary(true);
+      toast.success("PowerPoint saved to library!");
+    } catch (error) {
+      console.error("Error saving to library:", error);
+      toast.error("Failed to save to library");
+    } finally {
+      setSaving(false);
     }
   };
 
@@ -1198,6 +1241,29 @@ John 3:16 - "For God so loved the world..."`}
                   >
                     <Wand2 className="w-4 h-4 mr-2" />
                     Edit Slides
+                  </Button>
+                  <Button
+                    variant="outline"
+                    onClick={savePPTToLibrary}
+                    disabled={saving || savedToLibrary}
+                    className="flex-1"
+                  >
+                    {saving ? (
+                      <>
+                        <Loader2 className="w-4 h-4 animate-spin mr-2" />
+                        Saving...
+                      </>
+                    ) : savedToLibrary ? (
+                      <>
+                        <CheckIcon className="w-4 h-4 mr-2 text-green-500" />
+                        Saved to Library
+                      </>
+                    ) : (
+                      <>
+                        <FolderOpen className="w-4 h-4 mr-2" />
+                        Save to Library
+                      </>
+                    )}
                   </Button>
                   <Button
                     onClick={downloadPPT}
