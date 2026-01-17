@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
@@ -96,6 +96,7 @@ export default function AdminSubscriptions() {
   const { toast } = useToast();
   const [loading, setLoading] = useState(true);
   const [syncing, setSyncing] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
   const [sendingPatreonReminder, setSendingPatreonReminder] = useState(false);
   const [importingTeachable, setImportingTeachable] = useState(false);
   const [isAdmin, setIsAdmin] = useState<boolean | null>(null);
@@ -108,6 +109,11 @@ export default function AdminSubscriptions() {
   const [pickaxeLinkedCount, setPickaxeLinkedCount] = useState<number>(0);
   const [pickaxePaidCount, setPickaxePaidCount] = useState<number>(0);
   const [pickaxeMembers, setPickaxeMembers] = useState<any[]>([]);
+
+  // Make refresh activity visible and avoid overlapping refresh requests.
+  const [lastRefreshedAt, setLastRefreshedAt] = useState<Date | null>(null);
+  const [secondsSinceRefresh, setSecondsSinceRefresh] = useState<number | null>(null);
+  const refreshInFlightRef = useRef(false);
 
   const handleSyncStripeSubscriptions = async () => {
     setSyncing(true);
@@ -241,14 +247,50 @@ export default function AdminSubscriptions() {
   // Auto-refresh stats every 60 seconds when admin
   useEffect(() => {
     if (!isAdmin) return;
-    
+
     const interval = setInterval(() => {
       console.log("[AdminSubscriptions] Auto-refreshing stats...");
-      loadStats();
+      loadStats({ reason: "interval" });
     }, 60000); // 60 seconds
-    
+
     return () => clearInterval(interval);
-  }, [isAdmin]);
+  }, [isAdmin, loadStats]);
+
+  // Refresh when the tab regains focus / becomes visible (intervals can be throttled)
+  useEffect(() => {
+    if (!isAdmin) return;
+
+    const handleVisible = () => {
+      if (document.visibilityState === "visible") {
+        console.log("[AdminSubscriptions] Tab focused/visible, refreshing stats...");
+        loadStats({ reason: "focus" });
+      }
+    };
+
+    window.addEventListener("focus", handleVisible);
+    document.addEventListener("visibilitychange", handleVisible);
+
+    return () => {
+      window.removeEventListener("focus", handleVisible);
+      document.removeEventListener("visibilitychange", handleVisible);
+    };
+  }, [isAdmin, loadStats]);
+
+  // Lightweight UI timer so the page doesn't feel static
+  useEffect(() => {
+    if (!lastRefreshedAt) {
+      setSecondsSinceRefresh(null);
+      return;
+    }
+
+    const update = () => {
+      setSecondsSinceRefresh(Math.floor((Date.now() - lastRefreshedAt.getTime()) / 1000));
+    };
+
+    update();
+    const interval = setInterval(update, 1000);
+    return () => clearInterval(interval);
+  }, [lastRefreshedAt]);
 
   const checkAdminAndLoadStats = async () => {
     if (!user) {
@@ -290,81 +332,102 @@ export default function AdminSubscriptions() {
     }
   };
 
-  const loadStats = async () => {
-    try {
-      // Use the new edge function that queries Stripe directly
-      const { data: statsData, error: statsError } = await supabase.functions.invoke('get-subscriber-stats');
-      
-      if (statsError) {
-        console.error("[AdminSubscriptions] Stats error:", statsError);
-        throw statsError;
+  const loadStats = useCallback(
+    async (opts?: { reason?: "interval" | "manual" | "focus" | "init"; silent?: boolean }) => {
+      if (refreshInFlightRef.current) return;
+
+      refreshInFlightRef.current = true;
+      setRefreshing(true);
+
+      try {
+        // Use the edge function that queries Stripe directly
+        const { data: statsData, error: statsError } = await supabase.functions.invoke(
+          "get-subscriber-stats"
+        );
+
+        if (statsError) {
+          console.error("[AdminSubscriptions] Stats error:", statsError);
+          throw statsError;
+        }
+
+        if (statsData?.stats) {
+          console.log("[AdminSubscriptions] Got stats from edge function:", statsData.stats);
+          setStats(statsData.stats);
+          setLastRefreshedAt(new Date());
+        }
+
+        // Get church subscriptions separately
+        const { data: churches } = await supabase
+          .from("churches")
+          .select("tier, max_seats, subscription_status")
+          .eq("subscription_status", "active");
+
+        const churchSeats = {
+          tier1:
+            churches?.filter((c) => c.tier === "tier1").reduce((sum, c) => sum + c.max_seats, 0) ||
+            0,
+          tier2:
+            churches?.filter((c) => c.tier === "tier2").reduce((sum, c) => sum + c.max_seats, 0) ||
+            0,
+          tier3:
+            churches?.filter((c) => c.tier === "tier3").reduce((sum, c) => sum + c.max_seats, 0) ||
+            0,
+        };
+
+        setChurchStats({
+          totalChurches: churches?.length || 0,
+          churchSeats,
+        });
+
+        // Get Teachable users count and details
+        const { count: teachableUsers, data: teachableData } = await supabase
+          .from("teachable_students")
+          .select("*", { count: "exact" });
+
+        setTeachableCount(teachableUsers || 0);
+        setTeachableStudents(teachableData || []);
+
+        // Get Pickaxe total members count and details
+        const { count: totalPickaxe, data: pickaxeData } = await supabase
+          .from("pickaxe_connections" as any)
+          .select("*", { count: "exact" });
+
+        setPickaxeCount(totalPickaxe || 0);
+        setPickaxeMembers(pickaxeData || []);
+
+        // Get Pickaxe members linked to app
+        const { count: linkedPickaxe } = await supabase
+          .from("pickaxe_connections" as any)
+          .select("*", { count: "exact", head: true })
+          .not("user_id", "is", null);
+
+        setPickaxeLinkedCount(linkedPickaxe || 0);
+
+        // Get Pickaxe paid members count
+        const { count: paidPickaxe } = await supabase
+          .from("pickaxe_connections" as any)
+          .select("*", { count: "exact", head: true })
+          .eq("is_paid_user", true);
+
+        setPickaxePaidCount(paidPickaxe || 0);
+      } catch (error: any) {
+        console.error("Error loading stats:", error);
+
+        if (!opts?.silent) {
+          toast({
+            title: "Error Loading Stats",
+            description: error?.message || "Failed to load subscription analytics",
+            variant: "destructive",
+          });
+        }
+      } finally {
+        refreshInFlightRef.current = false;
+        setRefreshing(false);
+        setLoading(false);
       }
-
-      if (statsData?.stats) {
-        console.log("[AdminSubscriptions] Got stats from edge function:", statsData.stats);
-        setStats(statsData.stats);
-      }
-
-      // Get church subscriptions separately
-      const { data: churches } = await supabase
-        .from("churches")
-        .select("tier, max_seats, subscription_status")
-        .eq("subscription_status", "active");
-
-      const churchSeats = {
-        tier1: churches?.filter(c => c.tier === 'tier1').reduce((sum, c) => sum + c.max_seats, 0) || 0,
-        tier2: churches?.filter(c => c.tier === 'tier2').reduce((sum, c) => sum + c.max_seats, 0) || 0,
-        tier3: churches?.filter(c => c.tier === 'tier3').reduce((sum, c) => sum + c.max_seats, 0) || 0,
-      };
-
-      setChurchStats({
-        totalChurches: churches?.length || 0,
-        churchSeats,
-      });
-
-      // Get Teachable users count and details
-      const { count: teachableUsers, data: teachableData } = await supabase
-        .from("teachable_students")
-        .select("*", { count: 'exact' });
-      
-      setTeachableCount(teachableUsers || 0);
-      setTeachableStudents(teachableData || []);
-
-      // Get Pickaxe total members count and details
-      const { count: totalPickaxe, data: pickaxeData } = await supabase
-        .from("pickaxe_connections" as any)
-        .select("*", { count: 'exact' });
-      
-      setPickaxeCount(totalPickaxe || 0);
-      setPickaxeMembers(pickaxeData || []);
-
-      // Get Pickaxe members linked to app
-      const { count: linkedPickaxe } = await supabase
-        .from("pickaxe_connections" as any)
-        .select("*", { count: 'exact', head: true })
-        .not("user_id", "is", null);
-      
-      setPickaxeLinkedCount(linkedPickaxe || 0);
-
-      // Get Pickaxe paid members count
-      const { count: paidPickaxe } = await supabase
-        .from("pickaxe_connections" as any)
-        .select("*", { count: 'exact', head: true })
-        .eq("is_paid_user", true);
-      
-      setPickaxePaidCount(paidPickaxe || 0);
-
-    } catch (error) {
-      console.error("Error loading stats:", error);
-      toast({
-        title: "Error Loading Stats",
-        description: "Failed to load subscription analytics",
-        variant: "destructive",
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
+    },
+    [toast]
+  );
 
   if (loading) {
     return (
@@ -383,34 +446,54 @@ export default function AdminSubscriptions() {
 
   return (
     <div className="container mx-auto p-6 max-w-6xl">
-      <div className="mb-6 flex items-center justify-between">
+      <div className="mb-6 flex items-center justify-between gap-3">
         <div>
           <h1 className="text-3xl font-bold">Subscription Analytics</h1>
           <p className="text-muted-foreground">
-            Live data from Stripe • Last updated: {new Date(stats.generated_at).toLocaleTimeString()}
+            Live data • Last updated: {new Date(stats.generated_at).toLocaleTimeString()}
             <span className="text-xs ml-2">(auto-refreshes every 60s)</span>
+            {secondsSinceRefresh !== null && (
+              <span className="text-xs ml-2">• Refreshed {secondsSinceRefresh}s ago</span>
+            )}
           </p>
           <p className="text-xs text-amber-600 mt-1">
             ⚠️ Note: New Stripe subscriptions sync when users log in or when you click "Sync Stripe Subscriptions"
           </p>
         </div>
-        <Button 
-          onClick={handleSyncStripeSubscriptions} 
-          disabled={syncing}
-          variant="outline"
-        >
-          {syncing ? (
-            <>
-              <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-              Syncing...
-            </>
-          ) : (
-            <>
-              <RefreshCw className="h-4 w-4 mr-2" />
-              Sync Stripe Subscriptions
-            </>
-          )}
-        </Button>
+
+        <div className="flex items-center gap-2">
+          <Button
+            onClick={() => loadStats({ reason: "manual" })}
+            disabled={refreshing}
+            variant="outline"
+          >
+            {refreshing ? (
+              <>
+                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                Refreshing...
+              </>
+            ) : (
+              <>
+                <RefreshCw className="h-4 w-4 mr-2" />
+                Refresh Stats
+              </>
+            )}
+          </Button>
+
+          <Button onClick={handleSyncStripeSubscriptions} disabled={syncing} variant="outline">
+            {syncing ? (
+              <>
+                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                Syncing...
+              </>
+            ) : (
+              <>
+                <RefreshCw className="h-4 w-4 mr-2" />
+                Sync Stripe Subscriptions
+              </>
+            )}
+          </Button>
+        </div>
       </div>
 
       <Tabs defaultValue="overview" className="space-y-6">
