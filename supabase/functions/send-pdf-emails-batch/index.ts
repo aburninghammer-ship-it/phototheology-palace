@@ -29,15 +29,18 @@ serve(async (req) => {
     logStep("Function started");
 
     // Verify admin access
-    const supabaseClient = createClient(
-      Deno.env.get("SUPABASE_URL") ?? "",
-      Deno.env.get("SUPABASE_ANON_KEY") ?? ""
-    );
+    const supabaseUrl = Deno.env.get("SUPABASE_URL") ?? "";
+    const supabaseAnonKey = Deno.env.get("SUPABASE_ANON_KEY") ?? "";
 
     const authHeader = req.headers.get("Authorization");
     if (!authHeader) {
       throw new Error("No authorization header provided");
     }
+
+    // Create a client scoped to the current user (so PostgREST/RPC runs as authenticated)
+    const supabaseClient = createClient(supabaseUrl, supabaseAnonKey, {
+      global: { headers: { Authorization: authHeader } },
+    });
 
     const token = authHeader.replace("Bearer ", "");
     const { data: userData, error: userError } = await supabaseClient.auth.getUser(token);
@@ -45,14 +48,20 @@ serve(async (req) => {
       throw new Error("Authentication failed");
     }
 
-    // Check if user is admin
-    const { data: adminData } = await supabaseClient
-      .from('admin_users')
-      .select('id')
-      .eq('user_id', userData.user.id)
-      .maybeSingle();
+    // Check if user is admin using role function (avoids RLS issues)
+    const { data: isAdmin, error: roleError } = await supabaseClient.rpc("has_role", {
+      _user_id: userData.user.id,
+      _role: "admin",
+    });
 
-    if (!adminData) {
+    logStep("Admin check", { userId: userData.user.id, isAdmin });
+
+    if (roleError) {
+      logStep("Admin role check error", { message: roleError.message });
+      throw new Error("Admin access required");
+    }
+
+    if (!isAdmin) {
       throw new Error("Admin access required");
     }
 
@@ -76,7 +85,6 @@ serve(async (req) => {
     const stripe = new Stripe(stripeKey, { apiVersion: "2025-08-27.basil" });
 
     // Create Supabase client for storage access
-    const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
     const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
