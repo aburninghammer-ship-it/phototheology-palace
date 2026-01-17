@@ -438,6 +438,17 @@ export default function StudyBuddy() {
             >
               {isLightTheme ? <Moon className="w-4 h-4" /> : <Sun className="w-4 h-4" />}
             </Button>
+            {/* New Session Button */}
+            <Button 
+              size="sm" 
+              onClick={handleClearSession}
+              className={`bg-gradient-to-r from-emerald-600 to-teal-500 hover:from-emerald-700 hover:to-teal-600 text-white shadow-lg ${
+                isLightTheme ? "shadow-emerald-300/50" : "shadow-emerald-500/30"
+              }`}
+            >
+              <Sparkles className="w-4 h-4 mr-1" />
+              New Session
+            </Button>
             <Button 
               size="sm" 
               onClick={() => navigate("/sermon-simmer")}
