@@ -6147,6 +6147,79 @@ Return as JSON:
 }`;
 
       userPrompt = `Grade this submission: "${submission}"`;
+    } else if (mode === "room_66_generate") {
+      // Room 66: Generate 66-book theme tracking
+      const BIBLE_BOOKS = [
+        'Genesis', 'Exodus', 'Leviticus', 'Numbers', 'Deuteronomy',
+        'Joshua', 'Judges', 'Ruth', '1 Samuel', '2 Samuel',
+        '1 Kings', '2 Kings', '1 Chronicles', '2 Chronicles', 'Ezra',
+        'Nehemiah', 'Esther', 'Job', 'Psalms', 'Proverbs',
+        'Ecclesiastes', 'Song of Solomon', 'Isaiah', 'Jeremiah', 'Lamentations',
+        'Ezekiel', 'Daniel', 'Hosea', 'Joel', 'Amos',
+        'Obadiah', 'Jonah', 'Micah', 'Nahum', 'Habakkuk',
+        'Zephaniah', 'Haggai', 'Zechariah', 'Malachi',
+        'Matthew', 'Mark', 'Luke', 'John', 'Acts',
+        'Romans', '1 Corinthians', '2 Corinthians', 'Galatians', 'Ephesians',
+        'Philippians', 'Colossians', '1 Thessalonians', '2 Thessalonians', '1 Timothy',
+        '2 Timothy', 'Titus', 'Philemon', 'Hebrews', 'James',
+        '1 Peter', '2 Peter', '1 John', '2 John', '3 John',
+        'Jude', 'Revelation'
+      ];
+
+      systemPrompt = `You are Jeeves, a biblical scholar specializing in tracing themes through all 66 books of the Bible. Your task is to generate a Room 66 (R66) analysis.
+
+IMPORTANT: You MUST provide an entry for ALL 66 books of the Bible. No exceptions.
+
+For the given theme/topic/idea/text, you will:
+1. Create a description of the theme (1-2 sentences)
+2. Write a "Constellation" - a 100-120 word synthesis showing how the theme develops from OT to NT
+3. For EACH of the 66 books, provide:
+   - claim: A ≤14 word statement about how this theme appears in that book
+   - proofText: A specific verse reference (e.g., "Genesis 3:15")
+   - ptTags: 1-3 relevant PT room codes (e.g., ["SR", "ST", "CEC"])
+
+PT Room codes reference:
+- SR: Story Room (narrative/story elements)
+- IR: Imagination Room (vivid imagery)
+- 24: 24FPS Room (chapter themes)
+- TR: Translation Room (word meanings)
+- GR: Gems Room (rare truths)
+- ST: Symbols/Types Room (symbolism)
+- QA: Q&A Room (questions answered)
+- NF: Nature Freestyle (nature parallels)
+- BF: Bible Freestyle (cross-references)
+- HF: Historical Freestyle (historical context)
+- CR: Concentration Room (Christ-focused)
+- CEC: Christ Every Chapter (Christological)
+- TRm: Theme Room (thematic)
+- PRm: Patterns Room (patterns)
+- P||: Parallels Room (OT/NT parallels)
+- PR: Prophecy Room (prophetic)
+- FE: Feasts Room (feasts/festivals)
+- 123H: Three Heavens (eschatological horizons)
+
+Respond ONLY with valid JSON in this exact format:
+{
+  "theme": "Theme Title",
+  "description": "Brief description of the theme",
+  "constellation": "100-120 word OT→NT synthesis...",
+  "difficulty": "beginner|intermediate|advanced",
+  "books": [
+    {
+      "book": "Genesis",
+      "claim": "≤14 word claim about theme in this book",
+      "proofText": "Genesis X:Y",
+      "ptTags": ["SR", "CEC"]
+    }
+  ]
+}`;
+
+      userPrompt = `Generate a complete R66 analysis for this theme/topic/idea/text: "${theme}"
+
+Remember: You MUST include an entry for ALL 66 books. The books in order are:
+${BIBLE_BOOKS.join(', ')}
+
+Return ONLY valid JSON.`;
     }
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
@@ -6435,6 +6508,42 @@ Style: Professional prophetic chart, clear typography, organized layout, spiritu
             flashcards: []
           }),
           { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
+    }
+
+    // For room_66_generate mode, parse JSON theme
+    if (mode === "room_66_generate") {
+      try {
+        // Clean the content of any markdown code blocks
+        let cleanContent = content.trim();
+        if (cleanContent.startsWith('```json')) {
+          cleanContent = cleanContent.slice(7);
+        } else if (cleanContent.startsWith('```')) {
+          cleanContent = cleanContent.slice(3);
+        }
+        if (cleanContent.endsWith('```')) {
+          cleanContent = cleanContent.slice(0, -3);
+        }
+        cleanContent = cleanContent.trim();
+
+        // Try to extract JSON from the response
+        const jsonMatch = cleanContent.match(/\{[\s\S]*\}/);
+        if (jsonMatch) {
+          const themeData = JSON.parse(jsonMatch[0]);
+          // Add an ID to the theme
+          themeData.id = `generated-${Date.now()}`;
+          return new Response(
+            JSON.stringify({ theme: themeData }),
+            { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+          );
+        }
+        throw new Error("No JSON found in response");
+      } catch (parseError) {
+        console.error("Error parsing room_66_generate response:", parseError);
+        return new Response(
+          JSON.stringify({ error: "Failed to parse R66 analysis" }),
+          { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
         );
       }
     }
