@@ -12,15 +12,23 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 export function RevenueDashboard() {
   const [sendingEmails, setSendingEmails] = useState(false);
-  const [emailResults, setEmailResults] = useState<{ mode: string; successCount?: number; failCount?: number; purchases?: any[] } | null>(null);
+  const [selectedProduct, setSelectedProduct] = useState<string | null>(null); // null = all products
+  const [emailResults, setEmailResults] = useState<{ mode: string; successCount?: number; failCount?: number; purchases?: any[]; byProduct?: Record<string, number> } | null>(null);
   const { loading, metrics, trialMetrics, pdfMetrics, cohorts, onboardingFunnel, refetch } = useRevenueAnalytics();
+
+  const productOptions = [
+    { key: null, label: "All Products" },
+    { key: "genesis-6-days", label: "Genesis in 6 Days ($9)" },
+    { key: "study-suite", label: "Study Suite ($97)" },
+    { key: "quick-start-guide", label: "Quick-Start Guide ($12)" },
+  ];
 
   const handleSendPdfEmails = async (dryRun: boolean) => {
     setSendingEmails(true);
     setEmailResults(null);
     try {
       const { data, error } = await supabase.functions.invoke('send-pdf-emails-batch', {
-        body: { dryRun }
+        body: { dryRun, product: selectedProduct }
       });
       
       if (error) throw error;
@@ -28,7 +36,8 @@ export function RevenueDashboard() {
       setEmailResults(data);
       
       if (dryRun) {
-        toast.info(`Found ${data.totalCount} purchasers to email`);
+        const productLabel = selectedProduct ? productOptions.find(p => p.key === selectedProduct)?.label : 'all products';
+        toast.info(`Found ${data.totalCount} purchasers for ${productLabel}`);
       } else {
         toast.success(`Sent ${data.successCount} emails successfully${data.failCount > 0 ? `, ${data.failCount} failed` : ''}`);
       }
@@ -241,7 +250,18 @@ export function RevenueDashboard() {
               <CardDescription>
                 One-time product sales (Genesis in 6 Days, Quick-Start Guide, Study Suite)
               </CardDescription>
-              <div className="flex gap-2">
+              <div className="flex items-center gap-2 flex-wrap">
+                <select
+                  className="h-9 rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ring"
+                  value={selectedProduct || ""}
+                  onChange={(e) => setSelectedProduct(e.target.value || null)}
+                >
+                  {productOptions.map((opt) => (
+                    <option key={opt.key || "all"} value={opt.key || ""}>
+                      {opt.label}
+                    </option>
+                  ))}
+                </select>
                 <Button
                   variant="outline"
                   size="sm"
@@ -272,10 +292,21 @@ export function RevenueDashboard() {
                     <p className="font-medium text-orange-600 mb-2">
                       📋 Preview: {emailResults.purchases?.length || 0} purchasers will receive emails
                     </p>
+                    {emailResults.byProduct && Object.keys(emailResults.byProduct).length > 0 && (
+                      <div className="text-sm text-muted-foreground mb-2">
+                        {Object.entries(emailResults.byProduct).map(([product, count]) => (
+                          <div key={product}>• {product}: {count as number} purchasers</div>
+                        ))}
+                      </div>
+                    )}
                     {emailResults.purchases && emailResults.purchases.length > 0 && (
-                      <div className="text-sm text-muted-foreground max-h-32 overflow-y-auto">
+                      <div className="text-sm text-muted-foreground max-h-32 overflow-y-auto border-t pt-2 mt-2">
                         {emailResults.purchases.map((p: any, i: number) => (
-                          <div key={i}>{p.email} - {p.name || 'No name'}</div>
+                          <div key={i} className="flex gap-2">
+                            <span className="text-purple-600">[{p.productName}]</span>
+                            <span>{p.email}</span>
+                            <span className="text-muted-foreground">- {p.name || 'No name'}</span>
+                          </div>
                         ))}
                       </div>
                     )}
