@@ -6,11 +6,11 @@ import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { motion, AnimatePresence } from "framer-motion";
-import { 
+import {
   Lightbulb, Send, BookOpen, Target, TrendingUp, Sparkles, Building2, Link2, Loader2,
   ChevronDown, AlertTriangle, CheckCircle2, BookMarked, Layers, Shield, GraduationCap,
   Church, Cross, Moon, Scale, Compass, Save, Download, Copy, Gem, FolderOpen, MessageSquare,
-  Zap, ArrowRight, FileText, Brain, Clock, Star, RefreshCw, CalendarDays, Box, Focus, MessageCircle
+  Zap, ArrowRight, FileText, Brain, Clock, Star, RefreshCw, CalendarDays, Box, Focus, MessageCircle, X
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { ExportToStudyButton } from "@/components/ExportToStudyButton";
@@ -197,6 +197,7 @@ const AnalyzeThoughts = () => {
   const [isAutoSaving, setIsAutoSaving] = useState(false);
   const [lastAutoSaved, setLastAutoSaved] = useState<Date | null>(null);
   const [scholarMode, setScholarMode] = useState(false);
+  const [sparksExpanded, setSparksExpanded] = useState(false);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const autoSaveTimerRef = useRef<NodeJS.Timeout | null>(null);
   const { isAdmin } = useIsAdmin();
@@ -666,32 +667,52 @@ const AnalyzeThoughts = () => {
       
       <Navigation />
 
-      {/* Sparks Container - Prominent floating panel at bottom for mobile accessibility */}
+      {/* Sparks Container - Small non-blocking badge that expands on click */}
       {sparks.length > 0 && (
-        <div className="fixed bottom-24 left-4 right-4 md:left-auto md:right-4 md:bottom-auto md:top-20 md:max-w-xs z-50 bg-gradient-to-br from-amber-500/30 to-orange-500/30 backdrop-blur-lg rounded-2xl p-4 border-2 border-amber-400/50 shadow-xl shadow-amber-500/30">
-          <div className="flex items-center justify-between gap-3 mb-3">
-            <div className="flex items-center gap-2">
-              <div className="p-1.5 bg-amber-500/30 rounded-lg">
-                <Sparkles className="w-5 h-5 text-amber-300" />
+        <div className="fixed bottom-24 right-4 md:top-20 md:bottom-auto z-50">
+          {sparksExpanded ? (
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              className="bg-gradient-to-br from-amber-500/30 to-orange-500/30 backdrop-blur-lg rounded-2xl p-4 border-2 border-amber-400/50 shadow-xl shadow-amber-500/30 max-w-xs"
+            >
+              <div className="flex items-center justify-between gap-3 mb-3">
+                <div className="flex items-center gap-2">
+                  <Sparkles className="w-5 h-5 text-amber-300" />
+                  <span className="text-sm font-semibold text-amber-100">Insights</span>
+                </div>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-6 w-6 p-0 text-amber-200 hover:text-white hover:bg-amber-500/30"
+                  onClick={() => setSparksExpanded(false)}
+                >
+                  <X className="h-4 w-4" />
+                </Button>
               </div>
-              <div>
-                <span className="text-sm font-semibold text-amber-100">✨ New Insights!</span>
-                <p className="text-xs text-amber-200/70">Tap to explore</p>
-              </div>
-            </div>
-            <Badge variant="secondary" className="text-sm px-2.5 py-1 bg-amber-500/40 text-amber-50 font-bold">
-              {sparks.length}
-            </Badge>
-          </div>
-          <SparkContainer
-            sparks={sparks}
-            onOpen={openSpark}
-            onSave={saveSpark}
-            onDismiss={dismissSpark}
-            onExplore={exploreSpark}
-            position="floating"
-            maxDisplay={5}
-          />
+              <SparkContainer
+                sparks={sparks}
+                onOpen={openSpark}
+                onSave={saveSpark}
+                onDismiss={dismissSpark}
+                onExplore={exploreSpark}
+                position="floating"
+                maxDisplay={5}
+              />
+            </motion.div>
+          ) : (
+            <motion.button
+              initial={{ scale: 0 }}
+              animate={{ scale: 1 }}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={() => setSparksExpanded(true)}
+              className="flex items-center gap-2 px-3 py-2 bg-gradient-to-r from-amber-500/80 to-orange-500/80 backdrop-blur-lg rounded-full border border-amber-400/50 shadow-lg shadow-amber-500/30 text-white hover:from-amber-500 hover:to-orange-500 transition-all"
+            >
+              <Sparkles className="w-4 h-4" />
+              <span className="text-sm font-semibold">{sparks.length}</span>
+            </motion.button>
+          )}
         </div>
       )}
 
