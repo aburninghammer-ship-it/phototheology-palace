@@ -89,6 +89,52 @@ serve(async (req) => {
           break;
         }
 
+        // Handle one-time product purchases (like Genesis in 6 Days, Quick-Start Guide, Study Suite)
+        if (session.mode === 'payment' && !session.submit_type) {
+          // This is a one-time product purchase
+          const productName = metadata.product || 'Product';
+          
+          logStep('Processing one-time product purchase', { 
+            amount: session.amount_total, 
+            email: customerEmail,
+            product: productName 
+          });
+
+          // Send admin notification about the purchase
+          try {
+            await supabase.functions.invoke('send-purchase-notification', {
+              body: {
+                userEmail: customerEmail || 'unknown',
+                userName: session.customer_details?.name || 'Customer',
+                amount: session.amount_total || 0,
+                currency: session.currency || 'usd',
+                product: productName,
+                subscriptionTier: 'one-time',
+              }
+            });
+            logStep('Product purchase notification sent', { email: customerEmail, product: productName });
+          } catch (emailError) {
+            logStep('Failed to send product purchase notification', { error: emailError });
+          }
+
+          // Also send the product email to the customer
+          if (customerEmail && metadata.product_id) {
+            try {
+              await supabase.functions.invoke('send-product-email', {
+                body: {
+                  email: customerEmail,
+                  name: session.customer_details?.name || undefined,
+                  product: metadata.product_id
+                }
+              });
+              logStep('Product delivery email sent', { email: customerEmail, product: metadata.product_id });
+            } catch (emailError) {
+              logStep('Failed to send product delivery email', { error: emailError });
+            }
+          }
+          break;
+        }
+
         // Check if we have user_id in metadata
         if (!metadata.user_id) {
           // Try to find user by email if user_id not in metadata
