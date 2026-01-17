@@ -122,6 +122,12 @@ const ROOM_LIBRARIES: Record<string, {
     description: "50 memorization sets covering every chapter",
     icon: "🎬",
     gradient: "from-violet-500 to-fuchsia-600"
+  },
+  r66: {
+    title: "Room 66 Library",
+    description: "Trace themes through all 66 books of Scripture",
+    icon: "📿",
+    gradient: "from-indigo-500 to-violet-600"
   }
 };
 
