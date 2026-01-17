@@ -42,14 +42,11 @@ serve(async (req) => {
       throw new Error("Authentication failed");
     }
 
-    // Check if user is admin
-    const { data: adminData } = await supabaseClient
-      .from('admin_users')
-      .select('id')
-      .eq('user_id', userData.user.id)
-      .maybeSingle();
+    // Check if user is admin using user_roles table
+    const { data: isAdmin } = await supabaseClient
+      .rpc('has_role', { _user_id: userData.user.id, _role: 'admin' });
 
-    if (!adminData) {
+    if (!isAdmin) {
       throw new Error("Admin access required");
     }
 
