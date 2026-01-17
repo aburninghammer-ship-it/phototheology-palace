@@ -19,7 +19,7 @@ import {
   Clock, Trash2, Eye, Star, Filter, ExternalLink, LayoutGrid, List,
   Book, Film, Layers, MessageCircleQuestion, TreeDeciduous, History,
   Compass, Target, GitCompare, Crown, CalendarDays, Scroll, Mountain,
-  Scale, Zap, Calculator
+  Scale, Zap, Calculator, Mic2, Edit, Copy, Presentation, CheckCircle2
 } from "lucide-react";
 import { format } from "date-fns";
 
@@ -65,6 +65,18 @@ interface LibraryStats {
   highlights: number;
   notes: number;
   images: number;
+  sermons: number;
+}
+
+interface SermonItem {
+  id: string;
+  title: string;
+  theme_passage: string;
+  sermon_style: string;
+  status: string;
+  current_step: number;
+  created_at: string;
+  updated_at: string;
 }
 
 interface GemItem {
@@ -139,7 +151,7 @@ export default function Libraries() {
   const [activeTab, setActiveTab] = useState("reference");
   const [searchQuery, setSearchQuery] = useState("");
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
-  const [stats, setStats] = useState<LibraryStats>({ sparks: 0, gems: 0, bookmarks: 0, highlights: 0, notes: 0, images: 0 });
+  const [stats, setStats] = useState<LibraryStats>({ sparks: 0, gems: 0, bookmarks: 0, highlights: 0, notes: 0, images: 0, sermons: 0 });
   const [loading, setLoading] = useState(true);
 
   // Data states
@@ -148,6 +160,7 @@ export default function Libraries() {
   const [bookmarks, setBookmarks] = useState<BookmarkItem[]>([]);
   const [highlights, setHighlights] = useState<HighlightItem[]>([]);
   const [notes, setNotes] = useState<NoteItem[]>([]);
+  const [sermons, setSermons] = useState<SermonItem[]>([]);
 
   // Fetch all library data
   useEffect(() => {
@@ -197,12 +210,21 @@ export default function Libraries() {
           .order('created_at', { ascending: false })
           .limit(50);
 
+        // Fetch sermons
+        const { data: sermonsData } = await supabase
+          .from('sermons')
+          .select('id, title, theme_passage, sermon_style, status, current_step, created_at, updated_at')
+          .eq('user_id', user.id)
+          .order('updated_at', { ascending: false })
+          .limit(50);
+
         // Set data
         setSparks((sparksData as unknown as SparkItem[]) || []);
         setGems((gemsData as GemItem[]) || []);
         setBookmarks((bookmarksData as BookmarkItem[]) || []);
         setHighlights((highlightsData as HighlightItem[]) || []);
         setNotes((notesData as NoteItem[]) || []);
+        setSermons((sermonsData as SermonItem[]) || []);
 
         // Set stats
         setStats({
@@ -212,6 +234,7 @@ export default function Libraries() {
           highlights: highlightsData?.length || 0,
           notes: notesData?.length || 0,
           images: 0, // TODO: Add images count
+          sermons: sermonsData?.length || 0,
         });
       } catch (err) {
         console.error('Error fetching libraries:', err);
@@ -244,8 +267,14 @@ export default function Libraries() {
     `${n.book} ${n.chapter}:${n.verse}`.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
+  const filteredSermons = sermons.filter(s =>
+    s.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    s.theme_passage.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
   const libraryTabs = [
     { id: 'reference', label: 'PT Libraries', icon: Library, count: REFERENCE_LIBRARIES.length, color: 'text-indigo-500' },
+    { id: 'sermons', label: 'Sermons', icon: Mic2, count: stats.sermons, color: 'text-rose-500' },
     { id: 'sparks', label: 'Sparks', icon: Flame, count: stats.sparks, color: 'text-orange-500' },
     { id: 'gems', label: 'Gems', icon: Gem, count: stats.gems, color: 'text-emerald-500' },
     { id: 'bookmarks', label: 'Bookmarks', icon: Bookmark, count: stats.bookmarks, color: 'text-blue-500' },
@@ -285,7 +314,7 @@ export default function Libraries() {
           </div>
 
           {/* Quick Stats */}
-          <div className="grid grid-cols-5 gap-3 mt-6">
+          <div className="grid grid-cols-4 md:grid-cols-7 gap-2 md:gap-3 mt-6">
             {libraryTabs.map(tab => (
               <Card
                 key={tab.id}
@@ -339,7 +368,7 @@ export default function Libraries() {
 
         {/* Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="grid w-full max-w-3xl grid-cols-6 mb-6">
+          <TabsList className="grid w-full max-w-4xl grid-cols-7 mb-6">
             {libraryTabs.map(tab => (
               <TabsTrigger key={tab.id} value={tab.id} className="gap-1 text-xs sm:text-sm px-2">
                 <tab.icon className={cn("h-4 w-4", tab.color)} />
@@ -464,6 +493,86 @@ export default function Libraries() {
                 </div>
               </div>
             )}
+          </TabsContent>
+
+          {/* Sermons Tab */}
+          <TabsContent value="sermons">
+            {loading ? (
+              <LoadingGrid />
+            ) : filteredSermons.length === 0 ? (
+              <EmptyState
+                icon={Mic2}
+                title="No Sermons Yet"
+                description="Create sermons using the Sermon Builder"
+                action={{ label: "Build a Sermon", path: "/sermon-builder" }}
+              />
+            ) : (
+              <div className={cn(
+                viewMode === 'grid'
+                  ? "grid md:grid-cols-2 lg:grid-cols-3 gap-4"
+                  : "space-y-3"
+              )}>
+                {filteredSermons.map(sermon => (
+                  <Card
+                    key={sermon.id}
+                    className="cursor-pointer hover:shadow-lg transition-all border-2 border-rose-200 dark:border-rose-800 group"
+                    onClick={() => navigate(`/sermon-builder?id=${sermon.id}`)}
+                  >
+                    <CardHeader className="pb-2">
+                      <div className="flex items-start justify-between">
+                        <CardTitle className="text-base line-clamp-2 group-hover:text-rose-600 transition-colors">
+                          {sermon.title}
+                        </CardTitle>
+                        {sermon.status === 'complete' ? (
+                          <CheckCircle2 className="h-4 w-4 text-green-500 shrink-0" />
+                        ) : (
+                          <Clock className="h-4 w-4 text-muted-foreground shrink-0" />
+                        )}
+                      </div>
+                      <CardDescription className="text-xs line-clamp-2">
+                        {sermon.theme_passage}
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent className="pt-0">
+                      <div className="flex items-center justify-between text-xs text-muted-foreground">
+                        <Badge variant="outline" className="text-xs">
+                          {sermon.sermon_style}
+                        </Badge>
+                        <span>
+                          {sermon.status === 'complete' ? 'Complete' : `Step ${sermon.current_step}/5`}
+                        </span>
+                      </div>
+                      <div className="flex gap-2 mt-3">
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          className="flex-1 text-xs"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            navigate(`/sermon-builder?id=${sermon.id}`);
+                          }}
+                        >
+                          <Edit className="h-3 w-3 mr-1" />
+                          Edit
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          className="text-xs"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            navigate(`/sermon-powerpoint?id=${sermon.id}`);
+                          }}
+                        >
+                          <Presentation className="h-3 w-3" />
+                        </Button>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            )}
+            <ViewAllButton path="/sermon-archive" label="View All Sermons" />
           </TabsContent>
 
           {/* Sparks Tab */}
