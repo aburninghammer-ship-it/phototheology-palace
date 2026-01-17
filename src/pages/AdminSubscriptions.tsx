@@ -90,6 +90,12 @@ interface ChurchStats {
   };
 }
 
+interface PdfStats {
+  byProduct: Record<string, { count: number; revenue: number }>;
+  totalRevenue: number;
+  totalCount: number;
+}
+
 export default function AdminSubscriptions() {
   const { user, loading: authLoading } = useAuth();
   const navigate = useNavigate();
@@ -102,6 +108,7 @@ export default function AdminSubscriptions() {
   const [isAdmin, setIsAdmin] = useState<boolean | null>(null);
   const [stats, setStats] = useState<SubscriptionStats | null>(null);
   const [churchStats, setChurchStats] = useState<ChurchStats | null>(null);
+  const [pdfStats, setPdfStats] = useState<PdfStats | null>(null);
   const [lastStripeSync, setLastStripeSync] = useState<StripeSyncRun | null>(null);
   const [teachableCount, setTeachableCount] = useState<number>(0);
   const [teachableStudents, setTeachableStudents] = useState<any[]>([]);
@@ -310,6 +317,20 @@ export default function AdminSubscriptions() {
           .eq("is_paid_user", true);
 
         setPickaxePaidCount(paidPickaxe || 0);
+
+        // Get PDF purchases stats
+        try {
+          const { data: pdfData, error: pdfError } = await supabase.functions.invoke("get-pdf-purchases");
+          if (!pdfError && pdfData) {
+            setPdfStats({
+              byProduct: pdfData.byProduct || {},
+              totalRevenue: pdfData.totalRevenue || 0,
+              totalCount: pdfData.totalCount || 0,
+            });
+          }
+        } catch (pdfErr) {
+          console.log("[AdminSubscriptions] PDF stats fetch failed (optional):", pdfErr);
+        }
       } catch (error: any) {
         console.error("Error loading stats:", error);
 
@@ -703,7 +724,7 @@ export default function AdminSubscriptions() {
             <Card>
               <CardHeader>
                 <CardTitle>Breakdown by Product</CardTitle>
-                <CardDescription>Active + Trialing per price (shows new vs legacy)</CardDescription>
+                <CardDescription>Active + Trialing subscriptions</CardDescription>
               </CardHeader>
               <CardContent className="space-y-2 max-h-64 overflow-y-auto">
                 {stats.stripe.by_product && Object.entries(stats.stripe.by_product)
@@ -723,6 +744,26 @@ export default function AdminSubscriptions() {
                   ))}
                 {(!stats.stripe.by_product || Object.keys(stats.stripe.by_product).length === 0) && (
                   <p className="text-sm text-muted-foreground">No product breakdown available</p>
+                )}
+
+                {/* PDF Sales Section */}
+                {pdfStats && Object.keys(pdfStats.byProduct).length > 0 && (
+                  <>
+                    <div className="border-t pt-3 mt-3">
+                      <div className="text-xs text-muted-foreground mb-2 font-medium">PDF Sales (One-time)</div>
+                      {Object.entries(pdfStats.byProduct).map(([name, data]) => (
+                        <div key={name} className="flex justify-between items-center text-sm">
+                          <span className="text-muted-foreground truncate max-w-[200px]" title={name}>
+                            {name}
+                          </span>
+                          <div className="flex gap-2">
+                            <Badge variant="outline" className="border-purple-500 text-purple-600">{data.count} sold</Badge>
+                            <Badge variant="secondary" className="bg-purple-100 text-purple-800">${data.revenue}</Badge>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </>
                 )}
               </CardContent>
             </Card>
