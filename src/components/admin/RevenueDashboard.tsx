@@ -1,15 +1,44 @@
+import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { useRevenueAnalytics } from "@/hooks/useRevenueAnalytics";
-import { Loader2, TrendingUp, TrendingDown, DollarSign, Users, RefreshCw, ArrowDownRight, Target, Percent, Clock, AlertTriangle, Calendar, FileText, Mail } from "lucide-react";
+import { Loader2, TrendingUp, TrendingDown, DollarSign, Users, RefreshCw, ArrowDownRight, Target, Percent, Clock, AlertTriangle, Calendar, FileText, Mail, Send } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, LineChart, Line, CartesianGrid } from 'recharts';
 import { format } from "date-fns";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 export function RevenueDashboard() {
+  const [sendingEmails, setSendingEmails] = useState(false);
+  const [emailResults, setEmailResults] = useState<{ mode: string; successCount?: number; failCount?: number; purchases?: any[] } | null>(null);
   const { loading, metrics, trialMetrics, pdfMetrics, cohorts, onboardingFunnel, refetch } = useRevenueAnalytics();
+
+  const handleSendPdfEmails = async (dryRun: boolean) => {
+    setSendingEmails(true);
+    setEmailResults(null);
+    try {
+      const { data, error } = await supabase.functions.invoke('send-pdf-emails-batch', {
+        body: { dryRun }
+      });
+      
+      if (error) throw error;
+      
+      setEmailResults(data);
+      
+      if (dryRun) {
+        toast.info(`Found ${data.totalCount} purchasers to email`);
+      } else {
+        toast.success(`Sent ${data.successCount} emails successfully${data.failCount > 0 ? `, ${data.failCount} failed` : ''}`);
+      }
+    } catch (error: any) {
+      console.error('Error sending PDF emails:', error);
+      toast.error(error.message || 'Failed to send emails');
+    } finally {
+      setSendingEmails(false);
+    }
+  };
 
   if (loading) {
     return (
@@ -204,15 +233,71 @@ export function RevenueDashboard() {
       {pdfMetrics && (
         <Card className="border-purple-500/20 bg-purple-500/5">
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
+          <CardTitle className="flex items-center gap-2">
               <FileText className="h-5 w-5 text-purple-500" />
               PDF Purchases
             </CardTitle>
-            <CardDescription>
-              One-time product sales (Genesis in 6 Days, Quick-Start Guide, Study Suite)
-            </CardDescription>
+            <div className="flex items-center justify-between">
+              <CardDescription>
+                One-time product sales (Genesis in 6 Days, Quick-Start Guide, Study Suite)
+              </CardDescription>
+              <div className="flex gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => handleSendPdfEmails(true)}
+                  disabled={sendingEmails}
+                >
+                  {sendingEmails ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
+                  Preview Emails
+                </Button>
+                <Button
+                  size="sm"
+                  onClick={() => handleSendPdfEmails(false)}
+                  disabled={sendingEmails}
+                  className="bg-purple-600 hover:bg-purple-700"
+                >
+                  {sendingEmails ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Send className="h-4 w-4 mr-2" />}
+                  Send PDF Emails
+                </Button>
+              </div>
+            </div>
           </CardHeader>
           <CardContent>
+            {/* Email Results */}
+            {emailResults && (
+              <div className="mb-4 p-4 rounded-lg border bg-muted/50">
+                {emailResults.mode === 'dry-run' ? (
+                  <div>
+                    <p className="font-medium text-orange-600 mb-2">
+                      📋 Preview: {emailResults.purchases?.length || 0} purchasers will receive emails
+                    </p>
+                    {emailResults.purchases && emailResults.purchases.length > 0 && (
+                      <div className="text-sm text-muted-foreground max-h-32 overflow-y-auto">
+                        {emailResults.purchases.map((p: any, i: number) => (
+                          <div key={i}>{p.email} - {p.name || 'No name'}</div>
+                        ))}
+                      </div>
+                    )}
+                    <p className="text-sm text-muted-foreground mt-2">
+                      Click "Send PDF Emails" to send download links to all purchasers.
+                    </p>
+                  </div>
+                ) : (
+                  <div className="flex items-center gap-4">
+                    <div className="text-green-600">
+                      ✅ {emailResults.successCount} emails sent successfully
+                    </div>
+                    {emailResults.failCount && emailResults.failCount > 0 && (
+                      <div className="text-red-600">
+                        ❌ {emailResults.failCount} failed
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+            )}
+
             <div className="grid gap-4 md:grid-cols-2 mb-6">
               <div className="p-4 rounded-lg bg-background border">
                 <div className="text-3xl font-bold text-purple-600">{pdfMetrics.totalPurchases}</div>
