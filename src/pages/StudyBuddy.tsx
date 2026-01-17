@@ -362,7 +362,7 @@ export default function StudyBuddy() {
   return (
     <div className={`min-h-screen relative overflow-hidden flex flex-col ${
       isLightTheme 
-        ? "bg-gradient-to-br from-amber-50 via-orange-50 to-yellow-50" 
+        ? "bg-gradient-to-br from-stone-100 via-amber-50/80 to-orange-50/60" 
         : "bg-gradient-to-br from-orange-950 via-amber-900 to-red-950"
     }`}>
       {/* Animated Background */}
@@ -404,7 +404,7 @@ export default function StudyBuddy() {
       {/* Header */}
       <div className={`relative z-10 backdrop-blur-xl border-b py-4 px-6 flex-shrink-0 ${
         isLightTheme 
-          ? "bg-white/60 border-orange-200" 
+          ? "bg-stone-50/90 border-amber-200/60" 
           : "bg-black/20 border-orange-500/20"
       }`}>
         <motion.div 
@@ -487,7 +487,7 @@ export default function StudyBuddy() {
         <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as "study" | "simmer")} className="w-full">
           <TabsList className={`p-1 ${
             isLightTheme 
-              ? "bg-white/70 border border-orange-200" 
+              ? "bg-stone-100/90 border border-amber-200/60" 
               : "bg-black/30 border border-orange-500/20"
           }`}>
             <TabsTrigger 
@@ -519,7 +519,7 @@ export default function StudyBuddy() {
           <ResizablePanel defaultSize={35} minSize={20}>
             <Card className={`h-full flex flex-col backdrop-blur-xl rounded-none rounded-l-xl ${
               isLightTheme 
-                ? "bg-white/70 border-orange-200" 
+                ? "bg-amber-50/90 border-amber-200/60" 
                 : "bg-black/30 border-orange-500/20"
             }`}>
               {/* Bible Navigation */}
@@ -624,7 +624,7 @@ export default function StudyBuddy() {
                         onClick={() => addVerseToNotes(v.verse, v.text)}
                         className={`p-3 rounded-lg border border-transparent cursor-pointer transition-all group ${
                           isLightTheme 
-                            ? "bg-orange-50 hover:bg-orange-100 hover:border-orange-300" 
+                            ? "bg-amber-100/60 hover:bg-amber-100 hover:border-amber-300/60" 
                             : "bg-amber-500/5 hover:bg-amber-500/15 hover:border-amber-500/30"
                         }`}
                       >
@@ -652,22 +652,22 @@ export default function StudyBuddy() {
           <ResizablePanel defaultSize={35} minSize={20}>
             <Card className={`h-full flex flex-col backdrop-blur-xl rounded-none border-l-0 border-r-0 ${
               isLightTheme 
-                ? "bg-emerald-50/70 border-emerald-200" 
+                ? "bg-teal-50/80 border-teal-200/60" 
                 : "bg-emerald-950/40 border-emerald-500/20"
             }`}>
               <div className={`p-4 border-b flex-shrink-0 ${
-                isLightTheme ? "border-emerald-200" : "border-emerald-500/20"
+                isLightTheme ? "border-teal-200/60" : "border-emerald-500/20"
               }`}>
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <StickyNote className={`w-5 h-5 ${isLightTheme ? "text-emerald-600" : "text-emerald-400"}`} />
+                    <StickyNote className={`w-5 h-5 ${isLightTheme ? "text-teal-600" : "text-emerald-400"}`} />
                     <span className={`font-bold ${isLightTheme ? "text-gray-900" : "text-white"}`}>Notes</span>
                   </div>
                   {jeevesLoading && (
                     <Loader2 className="w-4 h-4 animate-spin text-violet-400" />
                   )}
                 </div>
-                <p className={`text-xs mt-1 ${isLightTheme ? "text-emerald-700/70" : "text-emerald-200/60"}`}>Write notes or ask questions — Jeeves will auto-respond</p>
+                <p className={`text-xs mt-1 ${isLightTheme ? "text-teal-700/70" : "text-emerald-200/60"}`}>Write notes or ask questions — Jeeves will auto-respond</p>
               </div>
               <div className="flex-1 p-4">
                 <Textarea
@@ -678,7 +678,7 @@ export default function StudyBuddy() {
 Jeeves sees your notes and will spark connections, suggest PT rooms, source claims, and help you think Phototheologically."
                   className={`h-full resize-none border-0 focus-visible:ring-0 text-sm bg-transparent ${
                     isLightTheme 
-                      ? "text-gray-900 placeholder:text-emerald-600/50" 
+                      ? "text-gray-800 placeholder:text-teal-600/50" 
                       : "text-emerald-100 placeholder:text-emerald-200/40"
                   }`}
                 />
@@ -692,15 +692,15 @@ Jeeves sees your notes and will spark connections, suggest PT rooms, source clai
           <ResizablePanel defaultSize={30} minSize={20}>
             <Card className={`h-full flex flex-col backdrop-blur-xl rounded-none rounded-r-xl border-l-0 ${
               isLightTheme 
-                ? "bg-violet-50/70 border-violet-200" 
+                ? "bg-purple-50/80 border-purple-200/60" 
                 : "bg-violet-950/40 border-violet-500/20"
             }`}>
               <div className={`p-4 border-b flex-shrink-0 ${
-                isLightTheme ? "border-violet-200" : "border-violet-500/20"
+                isLightTheme ? "border-purple-200/60" : "border-violet-500/20"
               }`}>
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <Brain className={`w-5 h-5 ${isLightTheme ? "text-violet-600" : "text-violet-400"}`} />
+                    <Brain className={`w-5 h-5 ${isLightTheme ? "text-purple-600" : "text-violet-400"}`} />
                     <span className={`font-bold ${isLightTheme ? "text-gray-900" : "text-white"}`}>Jeeves</span>
                   </div>
                   {jeevesLoading && (
@@ -710,7 +710,7 @@ Jeeves sees your notes and will spark connections, suggest PT rooms, source clai
                     </div>
                   )}
                 </div>
-                <p className={`text-xs mt-1 ${isLightTheme ? "text-violet-700/70" : "text-violet-200/60"}`}>
+                <p className={`text-xs mt-1 ${isLightTheme ? "text-purple-700/70" : "text-violet-200/60"}`}>
                   {notes.trim().length < 30 
                     ? "Start typing in Notes — Jeeves will respond as you write"
                     : "Watching your notes and sparking connections..."}
@@ -722,11 +722,11 @@ Jeeves sees your notes and will spark connections, suggest PT rooms, source clai
                 <div className="p-4 space-y-4">
                   {!analysis && !jeevesLoading && notes.trim().length < 30 ? (
                     <div className="text-center py-8">
-                      <Brain className={`w-12 h-12 mx-auto mb-3 ${isLightTheme ? "text-violet-400/50" : "text-violet-500/30"}`} />
-                      <p className={`text-sm ${isLightTheme ? "text-violet-700/70" : "text-violet-200/60"}`}>
+                      <Brain className={`w-12 h-12 mx-auto mb-3 ${isLightTheme ? "text-purple-400/50" : "text-violet-500/30"}`} />
+                      <p className={`text-sm ${isLightTheme ? "text-purple-700/70" : "text-violet-200/60"}`}>
                         Jeeves is watching your notes
                       </p>
-                      <p className={`text-xs mt-2 ${isLightTheme ? "text-violet-600/60" : "text-violet-200/40"}`}>
+                      <p className={`text-xs mt-2 ${isLightTheme ? "text-purple-600/60" : "text-violet-200/40"}`}>
                         Start typing and he'll spark connections, suggest rooms, and apply PT principles automatically
                       </p>
                     </div>
@@ -741,7 +741,7 @@ Jeeves sees your notes and will spark connections, suggest PT rooms, source clai
                           exit={{ opacity: 0 }}
                           className={`p-3 rounded-lg text-sm ${
                             isLightTheme 
-                              ? "bg-violet-100 border border-violet-200 text-gray-900" 
+                              ? "bg-purple-100/80 border border-purple-200/60 text-gray-800" 
                               : "bg-violet-500/10 border border-violet-500/20 text-violet-100"
                           }`}
                         >
