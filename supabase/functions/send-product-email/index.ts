@@ -27,7 +27,7 @@ const PRODUCT_CONFIG: Record<string, {
   },
   "study-suite": {
     name: "Phototheology Study Suite",
-    files: ["study-suite-2.pdf", "study-suite-4.pdf", "study-suite-6.pdf"],
+    files: ["FLOOR-2.pdf", "FLOOR-4-The-Next-Level-Floor.pdf", "FLOOR-6.pdf"],
     description: "The complete Phototheology Study Suite collection"
   },
 };
