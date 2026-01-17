@@ -15,10 +15,33 @@ const logStep = (step: string, details?: any) => {
   console.log(`[BATCH-SEND-PDF-EMAILS] ${step}${detailsStr}`);
 };
 
-// Product configuration
-const GENESIS_PDF_PRICE_ID = "price_1SnQAcFGDAd3RU8IRqoiIPsh";
-const GENESIS_PDF_PRODUCT_ID = "prod_Tkw2inXRI6c6Ow";
-const GENESIS_PDF_AMOUNT = 900;
+// Product configurations with Stripe IDs and storage file mappings
+const PRODUCT_CONFIG = {
+  "genesis-6-days": {
+    name: "Genesis in 6 Days",
+    priceId: "price_1SnQAcFGDAd3RU8IRqoiIPsh",
+    productId: "prod_Tkw2inXRI6c6Ow",
+    amount: 900, // $9.00
+    files: ["GENESIS-IN-6-DAYS.pdf"],
+    description: "Master Genesis using the Phototheology method in just 6 days"
+  },
+  "study-suite": {
+    name: "Phototheology Study Suite",
+    priceId: "price_1SnNoGFGDAd3RU8I4ALn4b0N",
+    productId: "prod_TktboSZYb6oAQt",
+    amount: 9700, // $97.00
+    files: ["FLOOR-2.pdf", "FLOOR-4-The-Next-Level-Floor.pdf", "FLOOR-6.pdf"],
+    description: "The complete Phototheology Study Suite collection"
+  },
+  "quick-start-guide": {
+    name: "Phototheology Quick-Start Guide",
+    priceId: "price_1SnPPvFGDAd3RU8ID1mGI7TR",
+    productId: "prod_TktbhIk7zIQ28w",
+    amount: 1200, // $12.00
+    files: ["THE-PHOTOTHEOLOGY-QUICK-START-GUIDE.pdf"],
+    description: "Your fast-track introduction to the Phototheology Bible Learning Suite"
+  }
+};
 
 serve(async (req) => {
   if (req.method === "OPTIONS") {
@@ -67,16 +90,18 @@ serve(async (req) => {
 
     logStep("Admin verified", { userId: userData.user.id });
 
-    // Parse request for dry run mode
+    // Parse request for dry run mode and product filter
     let dryRun = true;
+    let productFilter: string | null = null; // null = all products
     try {
       const body = await req.json();
       dryRun = body.dryRun !== false;
+      productFilter = body.product || null;
     } catch {
       // Default to dry run if no body
     }
 
-    logStep("Mode", { dryRun });
+    logStep("Mode", { dryRun, productFilter });
 
     // Initialize Stripe
     const stripeKey = Deno.env.get("STRIPE_SECRET_KEY");
@@ -98,56 +123,73 @@ serve(async (req) => {
 
     logStep("Got checkout sessions", { count: sessions.data.length });
 
-    // Find Genesis PDF purchases
+    // Find PDF purchases grouped by product
     const pdfPurchases: Array<{
       email: string;
       name: string | null;
       sessionId: string;
       date: string;
+      productKey: string;
+      productName: string;
     }> = [];
 
     for (const session of sessions.data) {
       if (session.mode !== 'payment') continue;
       if (session.payment_status !== 'paid') continue;
-      if (session.amount_total !== GENESIS_PDF_AMOUNT) continue;
       if (!session.customer_details?.email) continue;
 
-      // Check if this is the Genesis PDF
-      let isGenesisPdf = false;
-      if (session.line_items?.data) {
-        for (const item of session.line_items.data) {
-          if (item.price?.id === GENESIS_PDF_PRICE_ID || 
-              item.price?.product === GENESIS_PDF_PRODUCT_ID) {
-            isGenesisPdf = true;
-            break;
+      // Check against each product
+      for (const [productKey, config] of Object.entries(PRODUCT_CONFIG)) {
+        // Skip if filtering by product and this isn't it
+        if (productFilter && productFilter !== productKey) continue;
+
+        let isMatch = false;
+
+        // Check by line items first
+        if (session.line_items?.data) {
+          for (const item of session.line_items.data) {
+            if (item.price?.id === config.priceId || 
+                item.price?.product === config.productId) {
+              isMatch = true;
+              break;
+            }
           }
         }
-      }
 
-      // If amount matches, include it
-      if (session.amount_total === GENESIS_PDF_AMOUNT) {
-        isGenesisPdf = true;
-      }
+        // Fallback: check by amount
+        if (!isMatch && session.amount_total === config.amount) {
+          isMatch = true;
+        }
 
-      if (isGenesisPdf) {
-        pdfPurchases.push({
-          email: session.customer_details.email,
-          name: session.customer_details.name,
-          sessionId: session.id,
-          date: new Date((session.created || 0) * 1000).toISOString(),
-        });
+        if (isMatch) {
+          pdfPurchases.push({
+            email: session.customer_details.email,
+            name: session.customer_details.name,
+            sessionId: session.id,
+            date: new Date((session.created || 0) * 1000).toISOString(),
+            productKey,
+            productName: config.name,
+          });
+          break; // Don't double-count
+        }
       }
     }
 
     logStep("Found PDF purchases with emails", { count: pdfPurchases.length });
 
     if (dryRun) {
-      // Just return the list without sending
+      // Group by product for summary
+      const byProduct: Record<string, number> = {};
+      for (const p of pdfPurchases) {
+        byProduct[p.productName] = (byProduct[p.productName] || 0) + 1;
+      }
+
       return new Response(
         JSON.stringify({
           mode: "dry-run",
           message: "Set dryRun: false to actually send emails",
           purchases: pdfPurchases,
+          byProduct,
           totalCount: pdfPurchases.length,
         }),
         {
@@ -157,33 +199,72 @@ serve(async (req) => {
       );
     }
 
-    // Generate signed URL for the PDF
-    const { data: signedUrlData, error: signedUrlError } = await supabase.storage
-      .from("products")
-      .createSignedUrl("GENESIS-IN-6-DAYS.pdf", 604800); // 7 days
-
-    if (signedUrlError || !signedUrlData) {
-      throw new Error("Failed to generate download link");
-    }
-
-    const downloadUrl = signedUrlData.signedUrl;
-    logStep("Generated signed URL for PDF");
-
-    // Send emails to all purchasers
+    // Generate signed URLs for each product's files and send emails
     const results: Array<{
       email: string;
+      product: string;
       success: boolean;
       error?: string;
     }> = [];
 
+    // Cache signed URLs by product to avoid regenerating
+    const signedUrlCache: Record<string, { name: string; url: string }[]> = {};
+
     for (const purchase of pdfPurchases) {
       try {
+        const config = PRODUCT_CONFIG[purchase.productKey as keyof typeof PRODUCT_CONFIG];
+        
+        // Get or generate signed URLs for this product
+        if (!signedUrlCache[purchase.productKey]) {
+          const downloadLinks: { name: string; url: string }[] = [];
+          
+          for (const fileName of config.files) {
+            const { data, error } = await supabase.storage
+              .from("products")
+              .createSignedUrl(fileName, 604800); // 7 days
+
+            if (error) {
+              logStep(`Failed to generate URL for ${fileName}`, { error: error.message });
+              continue;
+            }
+
+            const displayName = fileName
+              .replace('.pdf', '')
+              .replace(/-/g, ' ')
+              .split(' ')
+              .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+              .join(' ');
+
+            downloadLinks.push({ name: displayName, url: data.signedUrl });
+          }
+
+          signedUrlCache[purchase.productKey] = downloadLinks;
+        }
+
+        const downloadLinks = signedUrlCache[purchase.productKey];
+        if (downloadLinks.length === 0) {
+          throw new Error("No download links generated");
+        }
+
         const customerName = purchase.name || purchase.email.split('@')[0];
+
+        // Build download links HTML
+        const downloadLinksHtml = downloadLinks.map(link => `
+          <tr>
+            <td style="padding: 8px 0;">
+              <a href="${link.url}" 
+                 style="display: inline-block; background: linear-gradient(135deg, #f5d742, #c9a800); color: #1a1a2e; 
+                        padding: 14px 24px; border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 16px;">
+                📥 Download ${link.name}
+              </a>
+            </td>
+          </tr>
+        `).join('');
 
         const emailResponse = await resend.emails.send({
           from: "Phototheology <noreply@thephototheologyapp.com>",
           to: [purchase.email],
-          subject: `Your Genesis in 6 Days PDF is Ready! 📖`,
+          subject: `Your ${config.name} is Ready! 📖`,
           html: `
             <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto; background: #ffffff;">
               <div style="background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); padding: 32px; text-align: center; border-radius: 12px 12px 0 0;">
@@ -191,7 +272,7 @@ serve(async (req) => {
                   Your PDF is Ready! 📥
                 </h1>
                 <p style="color: #adb5bd; margin-top: 8px; font-size: 16px;">
-                  Genesis in 6 Days
+                  ${config.name}
                 </p>
               </div>
               
@@ -201,18 +282,19 @@ serve(async (req) => {
                 </p>
                 
                 <p style="color: #495057; font-size: 16px; line-height: 1.6;">
-                  Thank you for purchasing <strong>Genesis in 6 Days</strong>! 
-                  Here's your download link:
+                  Thank you for purchasing <strong>${config.name}</strong>! 
+                  ${config.description}.
                 </p>
 
                 <div style="margin: 32px 0; padding: 24px; background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); border-radius: 12px; text-align: center;">
-                  <a href="${downloadUrl}" 
-                     style="display: inline-block; background: linear-gradient(135deg, #f5d742, #c9a800); color: #1a1a2e; 
-                            padding: 16px 32px; border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 18px;">
-                    📥 Download Genesis in 6 Days PDF
-                  </a>
+                  <h2 style="color: #f5d742; margin: 0 0 16px 0; font-size: 20px;">
+                    📥 Your Download${downloadLinks.length > 1 ? 's' : ''}
+                  </h2>
+                  <table style="width: 100%; border-collapse: collapse;">
+                    ${downloadLinksHtml}
+                  </table>
                   <p style="color: #adb5bd; font-size: 12px; margin-top: 16px;">
-                    Link expires in 7 days. Having trouble? Reply to this email.
+                    Links expire in 7 days. Having trouble? Reply to this email.
                   </p>
                 </div>
 
@@ -239,10 +321,11 @@ serve(async (req) => {
 
         results.push({
           email: purchase.email,
+          product: config.name,
           success: true,
         });
 
-        logStep("Email sent", { email: purchase.email });
+        logStep("Email sent", { email: purchase.email, product: config.name });
 
         // Small delay to avoid rate limiting
         await new Promise(resolve => setTimeout(resolve, 100));
@@ -250,6 +333,7 @@ serve(async (req) => {
         const errorMessage = error instanceof Error ? error.message : String(error);
         results.push({
           email: purchase.email,
+          product: purchase.productName,
           success: false,
           error: errorMessage,
         });

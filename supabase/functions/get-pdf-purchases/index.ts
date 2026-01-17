@@ -12,10 +12,27 @@ const logStep = (step: string, details?: any) => {
   console.log(`[GET-PDF-PURCHASES] ${step}${detailsStr}`);
 };
 
-// Product ID for Genesis in 6 Days PDF
-const GENESIS_PDF_PRODUCT_ID = "prod_Tkw2inXRI6c6Ow";
-const GENESIS_PDF_PRICE_ID = "price_1SnQAcFGDAd3RU8IRqoiIPsh";
-const GENESIS_PDF_AMOUNT = 900; // $9.00 in cents
+// Product configurations matching send-pdf-emails-batch
+const PRODUCT_CONFIG = {
+  "genesis-6-days": {
+    name: "Genesis in 6 Days",
+    priceId: "price_1SnQAcFGDAd3RU8IRqoiIPsh",
+    productId: "prod_Tkw2inXRI6c6Ow",
+    amount: 900, // $9.00
+  },
+  "study-suite": {
+    name: "Phototheology Study Suite",
+    priceId: "price_1SnNoGFGDAd3RU8I4ALn4b0N",
+    productId: "prod_TktboSZYb6oAQt",
+    amount: 9700, // $97.00
+  },
+  "quick-start-guide": {
+    name: "Phototheology Quick-Start Guide",
+    priceId: "price_1SnPPvFGDAd3RU8ID1mGI7TR",
+    productId: "prod_TktbhIk7zIQ28w",
+    amount: 1200, // $12.00
+  }
+};
 
 serve(async (req) => {
   if (req.method === "OPTIONS") {
@@ -26,15 +43,17 @@ serve(async (req) => {
     logStep("Function started");
 
     // Verify admin access
-    const supabaseClient = createClient(
-      Deno.env.get("SUPABASE_URL") ?? "",
-      Deno.env.get("SUPABASE_ANON_KEY") ?? ""
-    );
+    const supabaseUrl = Deno.env.get("SUPABASE_URL") ?? "";
+    const supabaseAnonKey = Deno.env.get("SUPABASE_ANON_KEY") ?? "";
 
     const authHeader = req.headers.get("Authorization");
     if (!authHeader) {
       throw new Error("No authorization header provided");
     }
+
+    const supabaseClient = createClient(supabaseUrl, supabaseAnonKey, {
+      global: { headers: { Authorization: authHeader } },
+    });
 
     const token = authHeader.replace("Bearer ", "");
     const { data: userData, error: userError } = await supabaseClient.auth.getUser(token);
@@ -43,10 +62,10 @@ serve(async (req) => {
     }
 
     // Check if user is admin using user_roles table
-    const { data: isAdmin } = await supabaseClient
+    const { data: isAdmin, error: roleError } = await supabaseClient
       .rpc('has_role', { _user_id: userData.user.id, _role: 'admin' });
 
-    if (!isAdmin) {
+    if (roleError || !isAdmin) {
       throw new Error("Admin access required");
     }
 
@@ -58,10 +77,9 @@ serve(async (req) => {
 
     const stripe = new Stripe(stripeKey, { apiVersion: "2025-08-27.basil" });
 
-    logStep("Fetching payment intents for PDF products");
+    logStep("Fetching checkout sessions for PDF products");
 
     // Fetch recent checkout sessions that are completed one-time payments
-    // We'll look for sessions where the amount matches the PDF price
     const sessions = await stripe.checkout.sessions.list({
       limit: 100,
       expand: ['data.line_items'],
@@ -69,40 +87,45 @@ serve(async (req) => {
 
     logStep("Got checkout sessions", { count: sessions.data.length });
 
-    // Filter for Genesis PDF purchases (one-time payments of $9.00)
+    // Find all PDF purchases
     const pdfPurchases: any[] = [];
 
     for (const session of sessions.data) {
       if (session.mode !== 'payment') continue;
       if (session.payment_status !== 'paid') continue;
-      if (session.amount_total !== GENESIS_PDF_AMOUNT) continue;
 
-      // Check if this is the Genesis PDF by line items
-      let isGenesisPdf = false;
-      if (session.line_items?.data) {
-        for (const item of session.line_items.data) {
-          if (item.price?.id === GENESIS_PDF_PRICE_ID || 
-              item.price?.product === GENESIS_PDF_PRODUCT_ID) {
-            isGenesisPdf = true;
-            break;
+      // Check against each product
+      for (const [productKey, config] of Object.entries(PRODUCT_CONFIG)) {
+        let isMatch = false;
+
+        // Check by line items first
+        if (session.line_items?.data) {
+          for (const item of session.line_items.data) {
+            if (item.price?.id === config.priceId || 
+                item.price?.product === config.productId) {
+              isMatch = true;
+              break;
+            }
           }
         }
-      }
 
-      // If no line items but amount matches, still include it
-      if (!session.line_items?.data?.length && session.amount_total === GENESIS_PDF_AMOUNT) {
-        isGenesisPdf = true;
-      }
+        // Fallback: check by amount
+        if (!isMatch && session.amount_total === config.amount) {
+          isMatch = true;
+        }
 
-      if (isGenesisPdf) {
-        pdfPurchases.push({
-          id: session.id,
-          product: "Genesis in 6 Days PDF",
-          amount: (session.amount_total || 0) / 100,
-          email: session.customer_details?.email || null,
-          name: session.customer_details?.name || null,
-          date: new Date((session.created || 0) * 1000).toISOString(),
-        });
+        if (isMatch) {
+          pdfPurchases.push({
+            id: session.id,
+            product: config.name,
+            productKey,
+            amount: (session.amount_total || 0) / 100,
+            email: session.customer_details?.email || null,
+            name: session.customer_details?.name || null,
+            date: new Date((session.created || 0) * 1000).toISOString(),
+          });
+          break; // Don't double-count
+        }
       }
     }
 
@@ -111,9 +134,20 @@ serve(async (req) => {
     // Sort by date descending
     pdfPurchases.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
 
+    // Group by product for summary
+    const byProduct: Record<string, { count: number; revenue: number }> = {};
+    for (const p of pdfPurchases) {
+      if (!byProduct[p.product]) {
+        byProduct[p.product] = { count: 0, revenue: 0 };
+      }
+      byProduct[p.product].count++;
+      byProduct[p.product].revenue += p.amount;
+    }
+
     return new Response(
       JSON.stringify({
         purchases: pdfPurchases,
+        byProduct,
         totalRevenue: pdfPurchases.reduce((sum, p) => sum + p.amount, 0),
         totalCount: pdfPurchases.length,
       }),
