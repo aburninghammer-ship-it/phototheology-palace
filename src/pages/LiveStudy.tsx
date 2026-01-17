@@ -45,11 +45,11 @@ const LiveStudy = () => {
       const roomsWithProfiles = await Promise.all(
         roomsData.map(async (room) => {
           const { data: profile } = await supabase
-            .from("profiles")
+            .from("profiles_public_info")
             .select("username")
             .eq("id", room.host_id)
-            .single();
-          
+            .maybeSingle();
+
           return { ...room, profiles: profile || { username: "Unknown" } };
         })
       );

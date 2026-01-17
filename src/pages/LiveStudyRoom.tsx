@@ -9,7 +9,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
-import { Video, Users, Send, ArrowLeft, Share2, Copy } from "lucide-react";
+import { Video, Users, Send, ArrowLeft, Share2, Copy, Loader2 } from "lucide-react";
 import { SimpleVoiceRoom } from "@/components/voice";
 
 interface ChatMessage {
@@ -45,6 +45,8 @@ const LiveStudyRoom = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const [room, setRoom] = useState<Room | null>(null);
+  const [roomLoading, setRoomLoading] = useState(true);
+  const [roomError, setRoomError] = useState<string | null>(null);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [newMessage, setNewMessage] = useState("");
   const [participants, setParticipants] = useState<any[]>([]);
@@ -142,21 +144,30 @@ const LiveStudyRoom = () => {
   };
 
   const fetchRoomDetails = async () => {
-    const { data } = await supabase
+    setRoomLoading(true);
+    setRoomError(null);
+
+    const { data, error } = await supabase
       .from("study_rooms")
       .select("*")
       .eq("id", roomId)
       .single();
-    
-    if (data) {
-      const { data: profile } = await supabase
-        .from("profiles")
-        .select("username")
-        .eq("id", data.host_id)
-        .single();
-      
-      setRoom({ ...data, profiles: profile || { username: "Unknown" } });
+
+    if (error || !data) {
+      setRoom(null);
+      setRoomError("Room not found or you don't have access.");
+      setRoomLoading(false);
+      return;
     }
+
+    const { data: profile } = await supabase
+      .from("profiles_public_info")
+      .select("username")
+      .eq("id", data.host_id)
+      .maybeSingle();
+
+    setRoom({ ...data, profiles: profile || { username: "Unknown" } });
+    setRoomLoading(false);
   };
 
   const joinRoom = async () => {
@@ -184,10 +195,10 @@ const LiveStudyRoom = () => {
       const messagesWithProfiles = await Promise.all(
         chatData.map(async (msg) => {
           const { data: profile } = await supabase
-            .from("profiles")
+            .from("profiles_public_info")
             .select("username")
             .eq("id", msg.user_id)
-            .single();
+            .maybeSingle();
           
           return { ...msg, profiles: profile || { username: "Unknown" } };
         })
@@ -206,10 +217,10 @@ const LiveStudyRoom = () => {
       const participantsWithProfiles = await Promise.all(
         participantsData.map(async (participant) => {
           const { data: profile } = await supabase
-            .from("profiles")
+            .from("profiles_public_info")
             .select("username")
             .eq("id", participant.user_id)
-            .single();
+            .maybeSingle();
           
           return { ...participant, profiles: profile || { username: "Unknown" } };
         })
@@ -302,6 +313,36 @@ const LiveStudyRoom = () => {
     };
     return pathMap[path] || path.split("/").pop() || "Unknown";
   };
+
+  if (roomLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <div className="text-center">
+          <Loader2 className="h-10 w-10 animate-spin text-primary mx-auto mb-3" />
+          <p className="text-muted-foreground">Loading room…</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (roomError) {
+    return (
+      <div className="min-h-screen bg-background">
+        <Navigation />
+        <main className="container mx-auto px-4 pt-24 pb-8">
+          <Card className="max-w-xl mx-auto">
+            <CardHeader>
+              <CardTitle>Unable to load this room</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <p className="text-muted-foreground">{roomError}</p>
+              <Button onClick={() => navigate("/live-study")}>Back to Live Study</Button>
+            </CardContent>
+          </Card>
+        </main>
+      </div>
+    );
+  }
 
   if (!room) return null;
 
