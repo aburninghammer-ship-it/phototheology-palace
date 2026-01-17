@@ -427,27 +427,32 @@ export function Room66Library({ onClose }: Room66LibraryProps) {
           </TabsContent>
 
           <TabsContent value="generate" className="space-y-4 mt-4">
-            {/* Mode Toggle */}
-            <div className="flex gap-2 p-1 bg-muted rounded-lg">
-              <Button
-                variant={generateMode === "ai" ? "default" : "ghost"}
-                size="sm"
-                className="flex-1"
-                onClick={() => setGenerateMode("ai")}
-              >
-                <Wand2 className="h-4 w-4 mr-2" />
-                AI Generate
-              </Button>
-              <Button
-                variant={generateMode === "manual" ? "default" : "ghost"}
-                size="sm"
-                className="flex-1"
-                onClick={() => setGenerateMode("manual")}
-              >
-                <BookMarked className="h-4 w-4 mr-2" />
-                Write Your Own
-              </Button>
-            </div>
+            {/* Mode Toggle - Prominent */}
+            <Card className="bg-muted/50 border-2">
+              <CardContent className="p-3">
+                <p className="text-xs text-muted-foreground mb-2 text-center">Choose your creation method:</p>
+                <div className="flex gap-2">
+                  <Button
+                    variant={generateMode === "ai" ? "default" : "outline"}
+                    size="sm"
+                    className={`flex-1 ${generateMode === "ai" ? "bg-purple-600 hover:bg-purple-700" : ""}`}
+                    onClick={() => setGenerateMode("ai")}
+                  >
+                    <Wand2 className="h-4 w-4 mr-2" />
+                    AI Generate
+                  </Button>
+                  <Button
+                    variant={generateMode === "manual" ? "default" : "outline"}
+                    size="sm"
+                    className={`flex-1 ${generateMode === "manual" ? "bg-emerald-600 hover:bg-emerald-700" : ""}`}
+                    onClick={() => setGenerateMode("manual")}
+                  >
+                    <BookMarked className="h-4 w-4 mr-2" />
+                    Write Your Own (Text)
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
 
             {generateMode === "ai" ? (
               <>
