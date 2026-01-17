@@ -41,6 +41,14 @@ export function Room66Library({ onClose }: Room66LibraryProps) {
   const [themeInput, setThemeInput] = useState("");
   const [generating, setGenerating] = useState(false);
   const [generatedTheme, setGeneratedTheme] = useState<Room66Theme | null>(null);
+  const [generateMode, setGenerateMode] = useState<"ai" | "manual">("ai");
+  
+  // Manual entry state
+  const [manualThemeName, setManualThemeName] = useState("");
+  const [manualDescription, setManualDescription] = useState("");
+  const [manualConstellation, setManualConstellation] = useState("");
+  const [manualText, setManualText] = useState("");
+  const [parsing, setParsing] = useState(false);
 
   const filteredThemes = searchQuery.length >= 2
     ? searchRoom66Themes(searchQuery)
@@ -76,6 +84,58 @@ export function Room66Library({ onClose }: Room66LibraryProps) {
       toast.error("Failed to generate theme. Please try again.");
     } finally {
       setGenerating(false);
+    }
+  };
+
+  const handleManualParse = () => {
+    if (!manualThemeName.trim() || !manualText.trim()) {
+      toast.error("Please enter a theme name and your analysis text");
+      return;
+    }
+
+    setParsing(true);
+    try {
+      // Parse the manual text - expecting format like "Genesis: claim here (Gen 1:1)"
+      const lines = manualText.split('\n').filter(l => l.trim());
+      const books: Book66Entry[] = [];
+      
+      for (const line of lines) {
+        // Try to match patterns like "Genesis: The blood covenant begins (Gen 3:21)"
+        const match = line.match(/^([^:]+):\s*(.+?)(?:\s*\(([^)]+)\))?$/);
+        if (match) {
+          const [, bookName, claim, proofText] = match;
+          const cleanBook = bookName.trim();
+          books.push({
+            book: cleanBook,
+            claim: claim.trim().slice(0, 100), // Limit claim length
+            proofText: proofText?.trim() || `${cleanBook} 1:1`,
+            ptTags: ["CR"] // Default tag
+          });
+        }
+      }
+
+      if (books.length === 0) {
+        toast.error("Could not parse any books. Use format: 'Genesis: Your claim here (Gen 1:1)'");
+        return;
+      }
+
+      // Create the theme object
+      const manualTheme: Room66Theme = {
+        id: `manual-${Date.now()}`,
+        theme: manualThemeName.trim(),
+        description: manualDescription.trim() || `A personal study tracing ${manualThemeName} through Scripture`,
+        constellation: manualConstellation.trim() || `This theme of ${manualThemeName} weaves through Scripture from Genesis to Revelation, revealing God's consistent character and redemptive plan.`,
+        difficulty: "intermediate",
+        books: books
+      };
+
+      setGeneratedTheme(manualTheme);
+      toast.success(`Parsed ${books.length} books! Review your analysis.`);
+    } catch (error) {
+      console.error("Parse error:", error);
+      toast.error("Failed to parse text. Check the format.");
+    } finally {
+      setParsing(false);
     }
   };
 
@@ -367,67 +427,168 @@ export function Room66Library({ onClose }: Room66LibraryProps) {
           </TabsContent>
 
           <TabsContent value="generate" className="space-y-4 mt-4">
-            <Card className="bg-gradient-to-br from-purple-500/10 to-violet-500/10 border-purple-500/20">
-              <CardContent className="pt-4">
-                <h4 className="font-semibold mb-2 flex items-center gap-2">
-                  <Wand2 className="h-4 w-4 text-purple-500" />
-                  Generate Your Own R66 Analysis
-                </h4>
-                <p className="text-sm text-muted-foreground mb-4">
-                  Enter any biblical theme, concept, or idea. Jeeves will trace it through all 66 books of the Bible,
-                  showing how it develops from Genesis to Revelation.
-                </p>
+            {/* Mode Toggle */}
+            <div className="flex gap-2 p-1 bg-muted rounded-lg">
+              <Button
+                variant={generateMode === "ai" ? "default" : "ghost"}
+                size="sm"
+                className="flex-1"
+                onClick={() => setGenerateMode("ai")}
+              >
+                <Wand2 className="h-4 w-4 mr-2" />
+                AI Generate
+              </Button>
+              <Button
+                variant={generateMode === "manual" ? "default" : "ghost"}
+                size="sm"
+                className="flex-1"
+                onClick={() => setGenerateMode("manual")}
+              >
+                <BookMarked className="h-4 w-4 mr-2" />
+                Write Your Own
+              </Button>
+            </div>
 
-                <div className="space-y-4">
+            {generateMode === "ai" ? (
+              <>
+                <Card className="bg-gradient-to-br from-purple-500/10 to-violet-500/10 border-purple-500/20">
+                  <CardContent className="pt-4">
+                    <h4 className="font-semibold mb-2 flex items-center gap-2">
+                      <Wand2 className="h-4 w-4 text-purple-500" />
+                      AI-Generated R66 Analysis
+                    </h4>
+                    <p className="text-sm text-muted-foreground mb-4">
+                      Enter any biblical theme. Jeeves will trace it through all 66 books of the Bible.
+                    </p>
+
+                    <div className="space-y-4">
+                      <div>
+                        <label className="text-sm font-medium mb-2 block">
+                          Theme / Topic / Idea
+                        </label>
+                        <Textarea
+                          placeholder="E.g., 'The concept of grace', 'Fire imagery', 'God's faithfulness'..."
+                          value={themeInput}
+                          onChange={(e) => setThemeInput(e.target.value)}
+                          className="min-h-[80px]"
+                        />
+                      </div>
+
+                      <Button
+                        onClick={handleGenerate}
+                        disabled={generating || !themeInput.trim()}
+                        className="w-full bg-gradient-to-r from-purple-500 to-violet-600 hover:from-purple-600 hover:to-violet-700"
+                      >
+                        {generating ? (
+                          <>
+                            <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                            Generating 66-Book Analysis...
+                          </>
+                        ) : (
+                          <>
+                            <Sparkles className="h-4 w-4 mr-2" />
+                            Generate R66 Analysis
+                          </>
+                        )}
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                {/* Example themes */}
+                <div>
+                  <h4 className="text-sm font-medium mb-2">Quick Themes:</h4>
+                  <div className="flex flex-wrap gap-2">
+                    {["Fire", "Bread", "Garden", "Covenant", "Exile", "Worship", "Angels", "Names of God"].map((theme) => (
+                      <Badge
+                        key={theme}
+                        variant="outline"
+                        className="cursor-pointer hover:bg-accent"
+                        onClick={() => setThemeInput(theme)}
+                      >
+                        {theme}
+                      </Badge>
+                    ))}
+                  </div>
+                </div>
+              </>
+            ) : (
+              <Card className="bg-gradient-to-br from-amber-500/10 to-orange-500/10 border-amber-500/20">
+                <CardContent className="pt-4 space-y-4">
                   <div>
-                    <label className="text-sm font-medium mb-2 block">
-                      Theme / Topic / Idea
-                    </label>
+                    <h4 className="font-semibold mb-2 flex items-center gap-2">
+                      <BookMarked className="h-4 w-4 text-amber-500" />
+                      Write Your Own R66 Analysis
+                    </h4>
+                    <p className="text-sm text-muted-foreground">
+                      Paste or type your own theme analysis. Use the format below.
+                    </p>
+                  </div>
+
+                  <div>
+                    <label className="text-sm font-medium mb-1 block">Theme Name *</label>
+                    <Input
+                      placeholder="E.g., 'The Shepherd Motif'"
+                      value={manualThemeName}
+                      onChange={(e) => setManualThemeName(e.target.value)}
+                    />
+                  </div>
+
+                  <div>
+                    <label className="text-sm font-medium mb-1 block">Description (optional)</label>
+                    <Input
+                      placeholder="One sentence describing this theme..."
+                      value={manualDescription}
+                      onChange={(e) => setManualDescription(e.target.value)}
+                    />
+                  </div>
+
+                  <div>
+                    <label className="text-sm font-medium mb-1 block">Constellation / Synthesis (optional)</label>
                     <Textarea
-                      placeholder="E.g., 'The concept of grace', 'Fire imagery', 'God's faithfulness', 'The serpent/dragon motif'..."
-                      value={themeInput}
-                      onChange={(e) => setThemeInput(e.target.value)}
-                      className="min-h-[100px]"
+                      placeholder="How does this theme develop from OT to NT? (100-120 words)"
+                      value={manualConstellation}
+                      onChange={(e) => setManualConstellation(e.target.value)}
+                      className="min-h-[60px]"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="text-sm font-medium mb-1 block">66-Book Analysis *</label>
+                    <p className="text-xs text-muted-foreground mb-2">
+                      Format: <code className="bg-muted px-1 rounded">Book: Your claim here (Verse reference)</code>
+                    </p>
+                    <Textarea
+                      placeholder={`Genesis: God as shepherd provides for Adam (Gen 2:8)
+Exodus: Moses shepherds Israel out of Egypt (Exod 3:1)
+Leviticus: Offerings picture the Good Shepherd (Lev 1:10)
+...continue for all 66 books...`}
+                      value={manualText}
+                      onChange={(e) => setManualText(e.target.value)}
+                      className="min-h-[200px] font-mono text-sm"
                     />
                   </div>
 
                   <Button
-                    onClick={handleGenerate}
-                    disabled={generating || !themeInput.trim()}
-                    className="w-full bg-gradient-to-r from-purple-500 to-violet-600 hover:from-purple-600 hover:to-violet-700"
+                    onClick={handleManualParse}
+                    disabled={parsing || !manualThemeName.trim() || !manualText.trim()}
+                    className="w-full bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700"
                   >
-                    {generating ? (
+                    {parsing ? (
                       <>
                         <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                        Generating 66-Book Analysis...
+                        Parsing...
                       </>
                     ) : (
                       <>
-                        <Sparkles className="h-4 w-4 mr-2" />
-                        Generate R66 Analysis
+                        <Save className="h-4 w-4 mr-2" />
+                        Create R66 Analysis
                       </>
                     )}
                   </Button>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Example themes */}
-            <div>
-              <h4 className="text-sm font-medium mb-2">Example Themes to Try:</h4>
-              <div className="flex flex-wrap gap-2">
-                {["Fire", "Bread", "Garden", "Covenant", "Exile", "Worship", "Angels", "Names of God"].map((theme) => (
-                  <Badge
-                    key={theme}
-                    variant="outline"
-                    className="cursor-pointer hover:bg-accent"
-                    onClick={() => setThemeInput(theme)}
-                  >
-                    {theme}
-                  </Badge>
-                ))}
-              </div>
-            </div>
+                </CardContent>
+              </Card>
+            )}
           </TabsContent>
         </Tabs>
       </CardContent>
