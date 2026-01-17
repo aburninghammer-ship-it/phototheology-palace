@@ -904,7 +904,7 @@ export const palaceFloors: Floor[] = [
           "GENERIC CLAIMS: 'God is good in this book' is useless; be specific about HOW your theme develops",
           "NO CONSTELLATION: The grid is data; the Constellation is interpretation—don't skip the synthesis"
         ],
-        deliverable: "R66 Grid (66 rows: Book → Claim [≤14 words] → Proof-Text → PT-Tags) + Constellation (100-120 word OT→NT narrative synthesis showing theme's development)"
+        deliverable: "Two outputs:\n\n1️⃣ **66-Book Grid** — One row per Bible book with:\n   • Book name\n   • Your claim (14 words or less)\n   • Key verse proving the claim\n   • Brief notes\n\n2️⃣ **Constellation Summary** — A 100-120 word narrative showing how your theme develops from Genesis through Revelation"
       }
     ]
   },
