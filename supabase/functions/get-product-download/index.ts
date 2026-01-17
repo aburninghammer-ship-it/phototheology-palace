@@ -12,9 +12,9 @@ const PRODUCT_FILES: Record<string, string | string[]> = {
   "quick-start-guide": "THE-PHOTOTHEOLOGY-QUICK-START-GUIDE.pdf",
   "genesis-6-days": "GENESIS-IN-6-DAYS.pdf",
   "study-suite": [
-    "study-suite-2.pdf",
-    "study-suite-4.pdf", 
-    "study-suite-6.pdf"
+    "FLOOR-2.pdf",
+    "FLOOR-4-The-Next-Level-Floor.pdf", 
+    "FLOOR-6.pdf"
   ],
 };
 
