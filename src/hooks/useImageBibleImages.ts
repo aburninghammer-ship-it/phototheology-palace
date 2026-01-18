@@ -64,6 +64,11 @@ export function useImageBibleImages() {
   });
 }
 
+// Normalize book name to match storage folder format (lowercase, spaces to hyphens)
+function normalizeBookName(bookName: string): string {
+  return bookName.toLowerCase().replace(/\s+/g, '-');
+}
+
 // Helper to get image URL for a specific chapter
 export function getChapterImageUrl(
   imageMap: Map<string, string> | undefined,
@@ -71,6 +76,7 @@ export function getChapterImageUrl(
   chapter: number
 ): string | undefined {
   if (!imageMap) return undefined;
-  const key = `${bookName.toLowerCase()}-${chapter}`;
+  const normalizedBook = normalizeBookName(bookName);
+  const key = `${normalizedBook}-${chapter}`;
   return imageMap.get(key);
 }
