@@ -5,15 +5,34 @@ export function FruitRoomFlowchart() {
   return (
     <svg viewBox="0 0 800 500" className="w-full h-auto" xmlns="http://www.w3.org/2000/svg">
       <defs>
+        <linearGradient id="frt-bg" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stopColor="#ECFDF5" />
+          <stop offset="50%" stopColor="#D1FAE5" />
+          <stop offset="100%" stopColor="#A7F3D0" />
+        </linearGradient>
         <linearGradient id="frt-grad" x1="0%" y1="0%" x2="100%" y2="100%">
           <stop offset="0%" stopColor="#10B981" />
           <stop offset="100%" stopColor="#059669" />
         </linearGradient>
+        <linearGradient id="frt-header" x1="0%" y1="0%" x2="100%" y2="0%">
+          <stop offset="0%" stopColor="#10B981" />
+          <stop offset="100%" stopColor="#065F46" />
+        </linearGradient>
+        <filter id="frt-shadow" x="-20%" y="-20%" width="140%" height="140%">
+          <feDropShadow dx="0" dy="4" stdDeviation="6" floodOpacity="0.1"/>
+        </filter>
+        <filter id="frt-glow" x="-50%" y="-50%" width="200%" height="200%">
+          <feGaussianBlur stdDeviation="3" result="blur"/>
+          <feMerge>
+            <feMergeNode in="blur"/>
+            <feMergeNode in="SourceGraphic"/>
+          </feMerge>
+        </filter>
       </defs>
 
-      <rect width="800" height="500" fill="#ECFDF5" rx="16" />
+      <rect width="800" height="500" fill="url(#frt-bg)" rx="16" />
 
-      <text x="400" y="40" textAnchor="middle" fill="#065F46" fontSize="24" fontWeight="bold">
+      <text x="400" y="40" textAnchor="middle" fill="#065F46" fontSize="24" fontWeight="bold" letterSpacing="0.5">
         Fruit Room: Character Evidence of Truth
       </text>
 

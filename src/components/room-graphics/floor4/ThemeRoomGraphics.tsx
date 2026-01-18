@@ -5,15 +5,34 @@ export function ThemeRoomFlowchart() {
   return (
     <svg viewBox="0 0 800 500" className="w-full h-auto" xmlns="http://www.w3.org/2000/svg">
       <defs>
+        <linearGradient id="trm-bg" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stopColor="#FEFCE8" />
+          <stop offset="50%" stopColor="#FEF9C3" />
+          <stop offset="100%" stopColor="#FEF08A" />
+        </linearGradient>
         <linearGradient id="trm-grad" x1="0%" y1="0%" x2="100%" y2="100%">
           <stop offset="0%" stopColor="#EAB308" />
           <stop offset="100%" stopColor="#CA8A04" />
         </linearGradient>
+        <linearGradient id="trm-header" x1="0%" y1="0%" x2="100%" y2="0%">
+          <stop offset="0%" stopColor="#EAB308" />
+          <stop offset="100%" stopColor="#854D0E" />
+        </linearGradient>
+        <filter id="trm-shadow" x="-20%" y="-20%" width="140%" height="140%">
+          <feDropShadow dx="0" dy="4" stdDeviation="6" floodOpacity="0.1"/>
+        </filter>
+        <filter id="trm-glow" x="-50%" y="-50%" width="200%" height="200%">
+          <feGaussianBlur stdDeviation="3" result="blur"/>
+          <feMerge>
+            <feMergeNode in="blur"/>
+            <feMergeNode in="SourceGraphic"/>
+          </feMerge>
+        </filter>
       </defs>
 
-      <rect width="800" height="500" fill="#FEFCE8" rx="16" />
+      <rect width="800" height="500" fill="url(#trm-bg)" rx="16" />
 
-      <text x="400" y="40" textAnchor="middle" fill="#854D0E" fontSize="24" fontWeight="bold">
+      <text x="400" y="40" textAnchor="middle" fill="#854D0E" fontSize="24" fontWeight="bold" letterSpacing="0.5">
         Theme Room: The 6-Theme Framework
       </text>
 

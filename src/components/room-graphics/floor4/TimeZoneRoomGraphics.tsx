@@ -5,15 +5,34 @@ export function TimeZoneFlowchart() {
   return (
     <svg viewBox="0 0 800 500" className="w-full h-auto" xmlns="http://www.w3.org/2000/svg">
       <defs>
+        <linearGradient id="tz-bg" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stopColor="#F5F3FF" />
+          <stop offset="50%" stopColor="#EDE9FE" />
+          <stop offset="100%" stopColor="#DDD6FE" />
+        </linearGradient>
         <linearGradient id="tz-grad" x1="0%" y1="0%" x2="100%" y2="100%">
           <stop offset="0%" stopColor="#8B5CF6" />
           <stop offset="100%" stopColor="#7C3AED" />
         </linearGradient>
+        <linearGradient id="tz-header" x1="0%" y1="0%" x2="100%" y2="0%">
+          <stop offset="0%" stopColor="#8B5CF6" />
+          <stop offset="100%" stopColor="#5B21B6" />
+        </linearGradient>
+        <filter id="tz-shadow" x="-20%" y="-20%" width="140%" height="140%">
+          <feDropShadow dx="0" dy="4" stdDeviation="6" floodOpacity="0.1"/>
+        </filter>
+        <filter id="tz-glow" x="-50%" y="-50%" width="200%" height="200%">
+          <feGaussianBlur stdDeviation="3" result="blur"/>
+          <feMerge>
+            <feMergeNode in="blur"/>
+            <feMergeNode in="SourceGraphic"/>
+          </feMerge>
+        </filter>
       </defs>
 
-      <rect width="800" height="500" fill="#F5F3FF" rx="16" />
+      <rect width="800" height="500" fill="url(#tz-bg)" rx="16" />
 
-      <text x="400" y="40" textAnchor="middle" fill="#5B21B6" fontSize="24" fontWeight="bold">
+      <text x="400" y="40" textAnchor="middle" fill="#5B21B6" fontSize="24" fontWeight="bold" letterSpacing="0.5">
         Time Zone Room: Biblical Timeline Mastery
       </text>
 

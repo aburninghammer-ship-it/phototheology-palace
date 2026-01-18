@@ -5,15 +5,34 @@ export function PatternsRoomFlowchart() {
   return (
     <svg viewBox="0 0 800 500" className="w-full h-auto" xmlns="http://www.w3.org/2000/svg">
       <defs>
+        <linearGradient id="prm-bg" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stopColor="#FAF5FF" />
+          <stop offset="50%" stopColor="#F3E8FF" />
+          <stop offset="100%" stopColor="#E9D5FF" />
+        </linearGradient>
         <linearGradient id="prm-grad" x1="0%" y1="0%" x2="100%" y2="100%">
           <stop offset="0%" stopColor="#A855F7" />
           <stop offset="100%" stopColor="#9333EA" />
         </linearGradient>
+        <linearGradient id="prm-header" x1="0%" y1="0%" x2="100%" y2="0%">
+          <stop offset="0%" stopColor="#A855F7" />
+          <stop offset="100%" stopColor="#6B21A8" />
+        </linearGradient>
+        <filter id="prm-shadow" x="-20%" y="-20%" width="140%" height="140%">
+          <feDropShadow dx="0" dy="4" stdDeviation="6" floodOpacity="0.1"/>
+        </filter>
+        <filter id="prm-glow" x="-50%" y="-50%" width="200%" height="200%">
+          <feGaussianBlur stdDeviation="3" result="blur"/>
+          <feMerge>
+            <feMergeNode in="blur"/>
+            <feMergeNode in="SourceGraphic"/>
+          </feMerge>
+        </filter>
       </defs>
 
-      <rect width="800" height="500" fill="#FAF5FF" rx="16" />
+      <rect width="800" height="500" fill="url(#prm-bg)" rx="16" />
 
-      <text x="400" y="40" textAnchor="middle" fill="#6B21A8" fontSize="24" fontWeight="bold">
+      <text x="400" y="40" textAnchor="middle" fill="#6B21A8" fontSize="24" fontWeight="bold" letterSpacing="0.5">
         Patterns Room: God's Fingerprints in Scripture
       </text>
 

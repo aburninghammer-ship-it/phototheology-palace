@@ -5,15 +5,34 @@ export function ParallelsRoomFlowchart() {
   return (
     <svg viewBox="0 0 800 500" className="w-full h-auto" xmlns="http://www.w3.org/2000/svg">
       <defs>
+        <linearGradient id="par-bg" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stopColor="#EEF2FF" />
+          <stop offset="50%" stopColor="#E0E7FF" />
+          <stop offset="100%" stopColor="#C7D2FE" />
+        </linearGradient>
         <linearGradient id="par-grad" x1="0%" y1="0%" x2="100%" y2="100%">
           <stop offset="0%" stopColor="#6366F1" />
           <stop offset="100%" stopColor="#4F46E5" />
         </linearGradient>
+        <linearGradient id="par-header" x1="0%" y1="0%" x2="100%" y2="0%">
+          <stop offset="0%" stopColor="#6366F1" />
+          <stop offset="100%" stopColor="#3730A3" />
+        </linearGradient>
+        <filter id="par-shadow" x="-20%" y="-20%" width="140%" height="140%">
+          <feDropShadow dx="0" dy="4" stdDeviation="6" floodOpacity="0.1"/>
+        </filter>
+        <filter id="par-glow" x="-50%" y="-50%" width="200%" height="200%">
+          <feGaussianBlur stdDeviation="3" result="blur"/>
+          <feMerge>
+            <feMergeNode in="blur"/>
+            <feMergeNode in="SourceGraphic"/>
+          </feMerge>
+        </filter>
       </defs>
 
-      <rect width="800" height="500" fill="#EEF2FF" rx="16" />
+      <rect width="800" height="500" fill="url(#par-bg)" rx="16" />
 
-      <text x="400" y="40" textAnchor="middle" fill="#3730A3" fontSize="24" fontWeight="bold">
+      <text x="400" y="40" textAnchor="middle" fill="#3730A3" fontSize="24" fontWeight="bold" letterSpacing="0.5">
         Parallels Room: OT/NT Mirror Connections
       </text>
 
