@@ -221,31 +221,59 @@ const ResearchMode = () => {
     return sections;
   };
 
+  // Color palettes for variety
+  const headingColors = [
+    "from-blue-400 via-cyan-400 to-teal-400",
+    "from-purple-400 via-pink-400 to-rose-400",
+    "from-amber-400 via-orange-400 to-red-400",
+    "from-emerald-400 via-green-400 to-lime-400",
+    "from-indigo-400 via-violet-400 to-purple-400",
+  ];
+
+  const bulletColors = [
+    "from-cyan-400 to-blue-500",
+    "from-pink-400 to-rose-500",
+    "from-amber-400 to-orange-500",
+    "from-emerald-400 to-teal-500",
+    "from-violet-400 to-purple-500",
+    "from-lime-400 to-green-500",
+  ];
+
+  const numberedHeadingStyles = [
+    { bg: "from-blue-500/20 to-cyan-500/20", border: "border-blue-400/30", icon: "text-blue-400" },
+    { bg: "from-purple-500/20 to-pink-500/20", border: "border-purple-400/30", icon: "text-purple-400" },
+    { bg: "from-emerald-500/20 to-teal-500/20", border: "border-emerald-400/30", icon: "text-emerald-400" },
+    { bg: "from-amber-500/20 to-orange-500/20", border: "border-amber-400/30", icon: "text-amber-400" },
+    { bg: "from-rose-500/20 to-pink-500/20", border: "border-rose-400/30", icon: "text-rose-400" },
+  ];
+
   const renderSection = (section: ParsedSection, idx: number) => {
     switch (section.type) {
       case "main-heading":
+        const headingColor = headingColors[idx % headingColors.length];
         return (
           <div key={idx} className="mt-10 mb-6 first:mt-0">
             <div className="flex items-center gap-3">
-              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500/30 to-indigo-500/30 backdrop-blur-sm flex items-center justify-center border border-blue-400/30">
-                <BookOpen className="h-6 w-6 text-blue-400" />
+              <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${headingColor.replace('from-', 'from-').split(' ')[0]}/30 to-${headingColor.split(' ')[2]?.replace('to-', '')}/30 backdrop-blur-sm flex items-center justify-center border border-white/20 shadow-lg`}>
+                <BookOpen className={`h-6 w-6 ${headingColor.split(' ')[0].replace('from-', 'text-')}`} />
               </div>
-              <h2 className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-blue-400 via-indigo-400 to-purple-400 bg-clip-text text-transparent">
+              <h2 className={`text-2xl md:text-3xl font-bold bg-gradient-to-r ${headingColor} bg-clip-text text-transparent drop-shadow-sm`}>
                 {section.content}
               </h2>
             </div>
-            <div className="mt-3 h-1 bg-gradient-to-r from-blue-500/50 via-indigo-500/30 to-transparent rounded-full" />
+            <div className={`mt-3 h-1.5 bg-gradient-to-r ${headingColor} opacity-50 rounded-full shadow-sm`} />
           </div>
         );
 
       case "numbered-heading":
+        const style = numberedHeadingStyles[idx % numberedHeadingStyles.length];
         return (
           <div key={idx} className="mt-8 mb-4">
             <div className="flex items-start gap-3">
-              <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-indigo-500/20 to-purple-500/20 backdrop-blur-sm flex items-center justify-center border border-indigo-400/20 flex-shrink-0">
-                <ListOrdered className="h-5 w-5 text-indigo-400" />
+              <div className={`w-10 h-10 rounded-lg bg-gradient-to-br ${style.bg} backdrop-blur-sm flex items-center justify-center ${style.border} border flex-shrink-0 shadow-md`}>
+                <ListOrdered className={`h-5 w-5 ${style.icon}`} />
               </div>
-              <h3 className="text-xl font-semibold text-foreground pt-1.5">
+              <h3 className={`text-xl font-semibold pt-1.5 bg-gradient-to-r ${style.bg.replace('/20', '-400').replace(' to-', ' to-')} bg-clip-text text-transparent`}>
                 {section.content}
               </h3>
             </div>
@@ -253,35 +281,40 @@ const ResearchMode = () => {
         );
 
       case "subheading":
+        const subColors = ["border-cyan-500/50", "border-pink-500/50", "border-amber-500/50", "border-emerald-500/50", "border-violet-500/50"];
+        const subTextColors = ["text-cyan-400", "text-pink-400", "text-amber-400", "text-emerald-400", "text-violet-400"];
+        const subColor = subColors[idx % subColors.length];
+        const subTextColor = subTextColors[idx % subTextColors.length];
         return (
-          <div key={idx} className="mt-6 mb-3 pl-4 border-l-2 border-indigo-500/30">
+          <div key={idx} className={`mt-6 mb-3 pl-4 border-l-3 ${subColor} bg-gradient-to-r from-white/5 to-transparent rounded-r-lg py-2`}>
             <h4 className="text-lg font-medium text-foreground/90 flex items-center gap-2">
-              <ChevronRight className="h-4 w-4 text-indigo-400" />
-              {section.content}
+              <ChevronRight className={`h-4 w-4 ${subTextColor}`} />
+              <span className={subTextColor}>{section.content}</span>
             </h4>
           </div>
         );
 
       case "bullet":
+        const bulletColor = bulletColors[idx % bulletColors.length];
         return (
-          <div key={idx} className="flex items-start gap-3 ml-4 my-2">
-            <div className="w-2 h-2 rounded-full bg-gradient-to-r from-blue-400 to-indigo-400 mt-2.5 flex-shrink-0" />
-            <p className="text-muted-foreground leading-relaxed">{section.content}</p>
+          <div key={idx} className="flex items-start gap-3 ml-4 my-3 group">
+            <div className={`w-3 h-3 rounded-full bg-gradient-to-r ${bulletColor} mt-2 flex-shrink-0 shadow-sm group-hover:scale-125 transition-transform`} />
+            <p className="text-foreground/80 leading-relaxed group-hover:text-foreground transition-colors">{section.content}</p>
           </div>
         );
 
       case "key-insight":
         return (
-          <div key={idx} className="my-6 p-4 rounded-xl bg-gradient-to-r from-amber-500/10 via-orange-500/10 to-yellow-500/10 border border-amber-500/20 backdrop-blur-sm">
-            <div className="flex items-start gap-3">
-              <div className="w-10 h-10 rounded-lg bg-amber-500/20 flex items-center justify-center flex-shrink-0">
-                <Lightbulb className="h-5 w-5 text-amber-400" />
+          <div key={idx} className="my-6 p-5 rounded-2xl bg-gradient-to-r from-amber-500/15 via-orange-500/15 to-yellow-500/15 border border-amber-400/30 backdrop-blur-sm shadow-lg shadow-amber-500/10">
+            <div className="flex items-start gap-4">
+              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-amber-400/30 to-orange-500/30 flex items-center justify-center flex-shrink-0 shadow-md border border-amber-400/30">
+                <Lightbulb className="h-6 w-6 text-amber-400 drop-shadow-sm" />
               </div>
               <div>
-                <Badge variant="outline" className="mb-2 border-amber-500/30 text-amber-400 bg-amber-500/10">
+                <Badge className="mb-2 bg-gradient-to-r from-amber-500 to-orange-500 text-white border-0 shadow-sm">
                   Key Insight
                 </Badge>
-                <p className="text-foreground/90 font-medium">{section.content.replace(/^(Key|Important|Note|Insight|Takeaway):\s*/i, "")}</p>
+                <p className="text-foreground font-medium leading-relaxed">{section.content.replace(/^(Key|Important|Note|Insight|Takeaway):\s*/i, "")}</p>
               </div>
             </div>
           </div>
@@ -289,22 +322,29 @@ const ResearchMode = () => {
 
       case "scripture":
         return (
-          <div key={idx} className="my-4 p-4 rounded-xl bg-gradient-to-r from-emerald-500/10 via-teal-500/10 to-cyan-500/10 border border-emerald-500/20 backdrop-blur-sm">
-            <div className="flex items-start gap-3">
-              <div className="w-10 h-10 rounded-lg bg-emerald-500/20 flex items-center justify-center flex-shrink-0">
-                <Scroll className="h-5 w-5 text-emerald-400" />
+          <div key={idx} className="my-5 p-5 rounded-2xl bg-gradient-to-r from-emerald-500/15 via-teal-500/15 to-cyan-500/15 border border-emerald-400/30 backdrop-blur-sm shadow-lg shadow-emerald-500/10">
+            <div className="flex items-start gap-4">
+              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-emerald-400/30 to-teal-500/30 flex items-center justify-center flex-shrink-0 shadow-md border border-emerald-400/30">
+                <Scroll className="h-6 w-6 text-emerald-400 drop-shadow-sm" />
               </div>
-              <p className="text-foreground/90 italic leading-relaxed pt-2">{section.content}</p>
+              <div>
+                <Badge className="mb-2 bg-gradient-to-r from-emerald-500 to-teal-500 text-white border-0 shadow-sm">
+                  Scripture
+                </Badge>
+                <p className="text-foreground italic leading-relaxed">{section.content}</p>
+              </div>
             </div>
           </div>
         );
 
       case "quote":
         return (
-          <div key={idx} className="my-4 pl-6 py-3 border-l-4 border-purple-500/40 bg-purple-500/5 rounded-r-lg">
-            <div className="flex items-start gap-2">
-              <Quote className="h-5 w-5 text-purple-400 flex-shrink-0 mt-0.5" />
-              <p className="text-foreground/80 italic leading-relaxed">{section.content}</p>
+          <div key={idx} className="my-5 pl-6 py-4 border-l-4 border-gradient-to-b from-purple-500 to-pink-500 bg-gradient-to-r from-purple-500/10 via-pink-500/10 to-rose-500/10 rounded-r-xl shadow-md">
+            <div className="flex items-start gap-3">
+              <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-purple-400/30 to-pink-500/30 flex items-center justify-center flex-shrink-0 border border-purple-400/30">
+                <Quote className="h-5 w-5 text-purple-400" />
+              </div>
+              <p className="text-foreground/90 italic leading-relaxed text-lg">{section.content}</p>
             </div>
           </div>
         );
@@ -312,7 +352,7 @@ const ResearchMode = () => {
       case "paragraph":
       default:
         return (
-          <p key={idx} className="text-muted-foreground leading-relaxed my-4 text-base">
+          <p key={idx} className="text-foreground/75 leading-relaxed my-4 text-base pl-2 border-l-2 border-white/10 hover:border-blue-400/50 hover:text-foreground/90 transition-all">
             {section.content}
           </p>
         );
