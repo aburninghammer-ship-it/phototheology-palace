@@ -1,14 +1,16 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { PenLine, Sparkles, Loader2, Copy, Check, ArrowRight, BookOpen, Target, Users } from "lucide-react";
+import { PenLine, Sparkles, Loader2, Copy, Check, ArrowRight, BookOpen, Target, Users, Save, History, Star, Trash2 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { useAuth } from "@/hooks/useAuth";
+import type { Json } from "@/integrations/supabase/types";
 
 interface SermonOption {
   title: string;
@@ -25,17 +27,161 @@ interface AnalysisResult {
   insights: string;
 }
 
+interface SavedIdea {
+  id: string;
+  title: string | null;
+  idea: string | null;
+  context: string | null;
+  analysis_result: AnalysisResult | null;
+  is_favorite: boolean;
+  created_at: string;
+}
+
 interface MyIdeaTabProps {
   onSelectIdea?: (option: SermonOption) => void;
 }
 
 export function MyIdeaTab({ onSelectIdea }: MyIdeaTabProps) {
+  const { user } = useAuth();
   const [idea, setIdea] = useState("");
   const [title, setTitle] = useState("");
   const [context, setContext] = useState("");
   const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
   const [result, setResult] = useState<AnalysisResult | null>(null);
   const [copiedIndex, setCopiedIndex] = useState<number | null>(null);
+  const [savedIdeas, setSavedIdeas] = useState<SavedIdea[]>([]);
+  const [showHistory, setShowHistory] = useState(false);
+  const [currentIdeaId, setCurrentIdeaId] = useState<string | null>(null);
+
+  // Load saved ideas
+  useEffect(() => {
+    if (user) {
+      loadSavedIdeas();
+    }
+  }, [user]);
+
+  const loadSavedIdeas = async () => {
+    if (!user) return;
+    
+    const { data, error } = await supabase
+      .from('sermon_ideas')
+      .select('*')
+      .eq('user_id', user.id)
+      .order('created_at', { ascending: false });
+    
+    if (error) {
+      console.error('Error loading ideas:', error);
+      return;
+    }
+    
+    // Map the data to our SavedIdea type
+    const mapped = data.map(item => ({
+      ...item,
+      analysis_result: item.analysis_result as unknown as AnalysisResult | null
+    }));
+    setSavedIdeas(mapped);
+  };
+
+  const saveIdea = async () => {
+    if (!user) {
+      toast.error("Please sign in to save ideas");
+      return;
+    }
+
+    if (!idea.trim() && !title.trim()) {
+      toast.error("Enter an idea or title to save");
+      return;
+    }
+
+    setIsSaving(true);
+    try {
+      if (currentIdeaId) {
+        // Update existing idea
+        const { error } = await supabase
+          .from('sermon_ideas')
+          .update({
+            title: title || null,
+            idea: idea || null,
+            context: context || null,
+            analysis_result: result as unknown as Json,
+          })
+          .eq('id', currentIdeaId);
+
+        if (error) throw error;
+        toast.success("Idea updated!");
+      } else {
+        // Create new idea
+        const { data, error } = await supabase
+          .from('sermon_ideas')
+          .insert([{
+            user_id: user.id,
+            title: title || null,
+            idea: idea || null,
+            context: context || null,
+            analysis_result: result as unknown as Json,
+          }])
+          .select()
+          .single();
+
+        if (error) throw error;
+        setCurrentIdeaId(data.id);
+        toast.success("Idea saved!");
+      }
+      
+      loadSavedIdeas();
+    } catch (error: any) {
+      console.error('Save error:', error);
+      toast.error("Failed to save idea");
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const deleteIdea = async (ideaId: string) => {
+    if (!user) return;
+
+    const { error } = await supabase
+      .from('sermon_ideas')
+      .delete()
+      .eq('id', ideaId);
+
+    if (error) {
+      toast.error("Failed to delete idea");
+      return;
+    }
+
+    toast.success("Idea deleted");
+    if (currentIdeaId === ideaId) {
+      handleClear();
+    }
+    loadSavedIdeas();
+  };
+
+  const toggleFavorite = async (ideaId: string, currentFav: boolean) => {
+    if (!user) return;
+
+    const { error } = await supabase
+      .from('sermon_ideas')
+      .update({ is_favorite: !currentFav })
+      .eq('id', ideaId);
+
+    if (error) {
+      toast.error("Failed to update");
+      return;
+    }
+
+    loadSavedIdeas();
+  };
+
+  const loadIdea = (savedIdea: SavedIdea) => {
+    setTitle(savedIdea.title || "");
+    setIdea(savedIdea.idea || "");
+    setContext(savedIdea.context || "");
+    setResult(savedIdea.analysis_result);
+    setCurrentIdeaId(savedIdea.id);
+    setShowHistory(false);
+  };
 
   const handleAnalyze = async () => {
     if (!idea.trim() && !title.trim()) {
@@ -90,6 +236,7 @@ export function MyIdeaTab({ onSelectIdea }: MyIdeaTabProps) {
     setTitle("");
     setContext("");
     setResult(null);
+    setCurrentIdeaId(null);
   };
 
   return (
@@ -154,6 +301,25 @@ export function MyIdeaTab({ onSelectIdea }: MyIdeaTabProps) {
                 </>
               )}
             </Button>
+            <Button
+              onClick={saveIdea}
+              disabled={isSaving || (!idea.trim() && !title.trim())}
+              variant="outline"
+              className="bg-black/20 border-orange-500/30 text-orange-200 hover:bg-orange-500/20"
+            >
+              {isSaving ? (
+                <Loader2 className="w-4 h-4 animate-spin" />
+              ) : (
+                <Save className="w-4 h-4" />
+              )}
+            </Button>
+            <Button
+              onClick={() => setShowHistory(!showHistory)}
+              variant="outline"
+              className={`bg-black/20 border-orange-500/30 text-orange-200 hover:bg-orange-500/20 ${showHistory ? 'bg-orange-500/20' : ''}`}
+            >
+              <History className="w-4 h-4" />
+            </Button>
             {(idea || title || context) && (
               <Button
                 variant="outline"
@@ -164,6 +330,74 @@ export function MyIdeaTab({ onSelectIdea }: MyIdeaTabProps) {
               </Button>
             )}
           </div>
+
+          {/* Saved Ideas History */}
+          <AnimatePresence>
+            {showHistory && (
+              <motion.div
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: 'auto' }}
+                exit={{ opacity: 0, height: 0 }}
+                className="overflow-hidden"
+              >
+                <div className="border border-orange-500/30 rounded-lg bg-black/20 p-3 mt-2">
+                  <h4 className="text-sm font-medium text-orange-200 mb-2">Saved Ideas</h4>
+                  {savedIdeas.length === 0 ? (
+                    <p className="text-xs text-orange-200/60">No saved ideas yet</p>
+                  ) : (
+                    <ScrollArea className="max-h-[150px]">
+                      <div className="space-y-2">
+                        {savedIdeas.map((saved) => (
+                          <div
+                            key={saved.id}
+                            className={`flex items-center justify-between p-2 rounded-lg cursor-pointer transition-colors ${
+                              currentIdeaId === saved.id 
+                                ? 'bg-orange-500/20 border border-orange-500/40' 
+                                : 'hover:bg-orange-500/10'
+                            }`}
+                            onClick={() => loadIdea(saved)}
+                          >
+                            <div className="flex-1 min-w-0">
+                              <p className="text-sm text-white truncate">
+                                {saved.title || saved.idea?.substring(0, 40) || 'Untitled'}
+                              </p>
+                              <p className="text-xs text-orange-200/60">
+                                {new Date(saved.created_at).toLocaleDateString()}
+                              </p>
+                            </div>
+                            <div className="flex items-center gap-1">
+                              <Button
+                                size="icon"
+                                variant="ghost"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  toggleFavorite(saved.id, saved.is_favorite);
+                                }}
+                                className="h-6 w-6 text-orange-200 hover:text-amber-400"
+                              >
+                                <Star className={`w-3 h-3 ${saved.is_favorite ? 'fill-amber-400 text-amber-400' : ''}`} />
+                              </Button>
+                              <Button
+                                size="icon"
+                                variant="ghost"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  deleteIdea(saved.id);
+                                }}
+                                className="h-6 w-6 text-orange-200 hover:text-red-400"
+                              >
+                                <Trash2 className="w-3 h-3" />
+                              </Button>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </ScrollArea>
+                  )}
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </CardContent>
       </Card>
 
