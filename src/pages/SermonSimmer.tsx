@@ -7,10 +7,11 @@ import { SimmerHeatControls } from "@/components/simmer/SimmerHeatControls";
 import { SimmerSessionList } from "@/components/simmer/SimmerSessionList";
 import { SimmerNewSession } from "@/components/simmer/SimmerNewSession";
 import { SimmerJeevesChat } from "@/components/simmer/SimmerJeevesChat";
+import { IdeaStartersTab } from "@/components/simmer/IdeaStartersTab";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Flame, Plus, Archive, Settings, MessageCircle } from "lucide-react";
+import { Flame, Plus, Archive, Settings, MessageCircle, Lightbulb } from "lucide-react";
 import { motion } from "framer-motion";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -137,8 +138,15 @@ export default function SermonSimmer() {
             <Flame className="w-12 h-12 text-orange-400 animate-pulse" />
           </div>
         ) : session ? (
-          <Tabs defaultValue="chat" className="space-y-6">
+          <Tabs defaultValue="ideas" className="space-y-6">
             <TabsList className="bg-black/30 border border-orange-500/20">
+              <TabsTrigger 
+                value="ideas" 
+                className="data-[state=active]:bg-white data-[state=active]:text-purple-900 text-orange-200"
+              >
+                <Lightbulb className="w-4 h-4 mr-2" />
+                Idea Starters
+              </TabsTrigger>
               <TabsTrigger 
                 value="chat" 
                 className="data-[state=active]:bg-orange-500 data-[state=active]:text-white text-orange-200"
@@ -168,6 +176,10 @@ export default function SermonSimmer() {
                 All Sessions
               </TabsTrigger>
             </TabsList>
+
+            <TabsContent value="ideas">
+              <IdeaStartersTab />
+            </TabsContent>
 
             <TabsContent value="chat">
               <div className="grid lg:grid-cols-2 gap-6">
