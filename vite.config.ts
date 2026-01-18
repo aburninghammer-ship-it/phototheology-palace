@@ -112,7 +112,7 @@ export default defineConfig(({ mode }) => ({
         entryFileNames: 'assets/js/[name]-[hash].js',
         assetFileNames: 'assets/[name]-[hash][extname]',
         manualChunks(id) {
-          // IMPORTANT: Charts and d3 must be bundled together to avoid TDZ errors
+          // IMPORTANT: Charts and d3 must be bundled together to avoid TDZ errors (build trigger v2)
           // Check this FIRST to ensure recharts and all d3 deps stay together
           if (
             id.includes('node_modules/recharts') || 
