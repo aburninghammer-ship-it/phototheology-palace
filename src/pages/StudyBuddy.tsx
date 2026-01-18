@@ -67,6 +67,132 @@ interface JeevesAnalysis {
   overallResponse?: string;
 }
 
+// Book name variants for verse reference detection
+const BOOK_VARIANTS: Record<string, string> = {
+  // Genesis
+  "gen": "Genesis", "genesis": "Genesis", "gn": "Genesis",
+  // Exodus
+  "exo": "Exodus", "exodus": "Exodus", "exod": "Exodus", "ex": "Exodus",
+  // Leviticus
+  "lev": "Leviticus", "leviticus": "Leviticus", "lv": "Leviticus",
+  // Numbers
+  "num": "Numbers", "numbers": "Numbers", "nm": "Numbers", "numb": "Numbers",
+  // Deuteronomy
+  "deu": "Deuteronomy", "deut": "Deuteronomy", "deuteronomy": "Deuteronomy", "dt": "Deuteronomy",
+  // Joshua
+  "jos": "Joshua", "josh": "Joshua", "joshua": "Joshua",
+  // Judges
+  "jdg": "Judges", "judg": "Judges", "judges": "Judges", "jg": "Judges",
+  // Ruth
+  "rut": "Ruth", "ruth": "Ruth", "ru": "Ruth",
+  // Samuel
+  "1sa": "1 Samuel", "1sam": "1 Samuel", "1 sam": "1 Samuel", "1 samuel": "1 Samuel", "1samuel": "1 Samuel", "i samuel": "1 Samuel", "i sam": "1 Samuel",
+  "2sa": "2 Samuel", "2sam": "2 Samuel", "2 sam": "2 Samuel", "2 samuel": "2 Samuel", "2samuel": "2 Samuel", "ii samuel": "2 Samuel", "ii sam": "2 Samuel",
+  // Kings
+  "1ki": "1 Kings", "1kgs": "1 Kings", "1 kings": "1 Kings", "1kings": "1 Kings", "i kings": "1 Kings", "1 kgs": "1 Kings",
+  "2ki": "2 Kings", "2kgs": "2 Kings", "2 kings": "2 Kings", "2kings": "2 Kings", "ii kings": "2 Kings", "2 kgs": "2 Kings",
+  // Chronicles
+  "1ch": "1 Chronicles", "1chr": "1 Chronicles", "1 chronicles": "1 Chronicles", "1chronicles": "1 Chronicles", "i chronicles": "1 Chronicles", "1 chron": "1 Chronicles",
+  "2ch": "2 Chronicles", "2chr": "2 Chronicles", "2 chronicles": "2 Chronicles", "2chronicles": "2 Chronicles", "ii chronicles": "2 Chronicles", "2 chron": "2 Chronicles",
+  // Ezra, Nehemiah, Esther
+  "ezr": "Ezra", "ezra": "Ezra",
+  "neh": "Nehemiah", "nehemiah": "Nehemiah",
+  "est": "Esther", "esth": "Esther", "esther": "Esther",
+  // Job, Psalms, Proverbs
+  "job": "Job",
+  "psa": "Psalms", "psalm": "Psalms", "psalms": "Psalms", "ps": "Psalms",
+  "pro": "Proverbs", "prov": "Proverbs", "proverbs": "Proverbs", "pr": "Proverbs",
+  // Ecclesiastes, Song of Solomon
+  "ecc": "Ecclesiastes", "eccl": "Ecclesiastes", "eccles": "Ecclesiastes", "ecclesiastes": "Ecclesiastes",
+  "sng": "Song of Solomon", "song": "Song of Solomon", "song of solomon": "Song of Solomon", "sos": "Song of Solomon", "ss": "Song of Solomon", "canticles": "Song of Solomon",
+  // Major Prophets
+  "isa": "Isaiah", "isaiah": "Isaiah", "is": "Isaiah",
+  "jer": "Jeremiah", "jeremiah": "Jeremiah",
+  "lam": "Lamentations", "lamentations": "Lamentations",
+  "ezk": "Ezekiel", "ezek": "Ezekiel", "ezekiel": "Ezekiel",
+  "dan": "Daniel", "daniel": "Daniel", "dn": "Daniel",
+  // Minor Prophets
+  "hos": "Hosea", "hosea": "Hosea",
+  "jol": "Joel", "joel": "Joel",
+  "amo": "Amos", "amos": "Amos",
+  "oba": "Obadiah", "obad": "Obadiah", "obadiah": "Obadiah",
+  "jon": "Jonah", "jonah": "Jonah",
+  "mic": "Micah", "micah": "Micah",
+  "nam": "Nahum", "nahum": "Nahum",
+  "hab": "Habakkuk", "habakkuk": "Habakkuk",
+  "zep": "Zephaniah", "zeph": "Zephaniah", "zephaniah": "Zephaniah",
+  "hag": "Haggai", "haggai": "Haggai",
+  "zec": "Zechariah", "zech": "Zechariah", "zechariah": "Zechariah",
+  "mal": "Malachi", "malachi": "Malachi",
+  // Gospels
+  "mat": "Matthew", "matt": "Matthew", "matthew": "Matthew", "mt": "Matthew",
+  "mrk": "Mark", "mark": "Mark", "mk": "Mark",
+  "luk": "Luke", "luke": "Luke", "lk": "Luke",
+  "jhn": "John", "john": "John", "jn": "John",
+  // Acts
+  "act": "Acts", "acts": "Acts",
+  // Paul's Letters
+  "rom": "Romans", "romans": "Romans", "ro": "Romans",
+  "1co": "1 Corinthians", "1cor": "1 Corinthians", "1 cor": "1 Corinthians", "1 corinthians": "1 Corinthians", "1corinthians": "1 Corinthians", "i corinthians": "1 Corinthians",
+  "2co": "2 Corinthians", "2cor": "2 Corinthians", "2 cor": "2 Corinthians", "2 corinthians": "2 Corinthians", "2corinthians": "2 Corinthians", "ii corinthians": "2 Corinthians",
+  "gal": "Galatians", "galatians": "Galatians",
+  "eph": "Ephesians", "ephesians": "Ephesians",
+  "php": "Philippians", "phil": "Philippians", "philippians": "Philippians",
+  "col": "Colossians", "colossians": "Colossians",
+  "1th": "1 Thessalonians", "1thess": "1 Thessalonians", "1 thess": "1 Thessalonians", "1 thessalonians": "1 Thessalonians", "1thessalonians": "1 Thessalonians", "i thessalonians": "1 Thessalonians",
+  "2th": "2 Thessalonians", "2thess": "2 Thessalonians", "2 thess": "2 Thessalonians", "2 thessalonians": "2 Thessalonians", "2thessalonians": "2 Thessalonians", "ii thessalonians": "2 Thessalonians",
+  "1ti": "1 Timothy", "1tim": "1 Timothy", "1 tim": "1 Timothy", "1 timothy": "1 Timothy", "1timothy": "1 Timothy", "i timothy": "1 Timothy",
+  "2ti": "2 Timothy", "2tim": "2 Timothy", "2 tim": "2 Timothy", "2 timothy": "2 Timothy", "2timothy": "2 Timothy", "ii timothy": "2 Timothy",
+  "tit": "Titus", "titus": "Titus",
+  "phm": "Philemon", "philem": "Philemon", "philemon": "Philemon",
+  // General Letters
+  "heb": "Hebrews", "hebrews": "Hebrews",
+  "jas": "James", "james": "James", "jm": "James",
+  "1pe": "1 Peter", "1pet": "1 Peter", "1 pet": "1 Peter", "1 peter": "1 Peter", "1peter": "1 Peter", "i peter": "1 Peter",
+  "2pe": "2 Peter", "2pet": "2 Peter", "2 pet": "2 Peter", "2 peter": "2 Peter", "2peter": "2 Peter", "ii peter": "2 Peter",
+  "1jn": "1 John", "1john": "1 John", "1 john": "1 John", "i john": "1 John",
+  "2jn": "2 John", "2john": "2 John", "2 john": "2 John", "ii john": "2 John",
+  "3jn": "3 John", "3john": "3 John", "3 john": "3 John", "iii john": "3 John",
+  "jud": "Jude", "jude": "Jude",
+  // Revelation
+  "rev": "Revelation", "revelation": "Revelation", "revelations": "Revelation", "rv": "Revelation", "apocalypse": "Revelation"
+};
+
+// Parse a verse reference like "John 3:16" or "Gen 1:1-5"
+interface ParsedReference {
+  book: string;
+  chapter: number;
+  verseStart: number;
+  verseEnd?: number;
+  originalText: string;
+}
+
+function parseVerseReference(text: string): ParsedReference | null {
+  // Pattern: (Book name) (chapter):(verse or verse-range)
+  // Examples: John 3:16, Genesis 1:1-5, 1 Cor 13:4-7, Rev 22:12
+  const pattern = /\b((?:[123]|I{1,3})?\s*[A-Za-z]+(?:\s+of\s+[A-Za-z]+)?)\s+(\d{1,3}):(\d{1,3})(?:-(\d{1,3}))?\b/gi;
+
+  const match = pattern.exec(text);
+  if (!match) return null;
+
+  const [originalText, bookPart, chapterStr, verseStartStr, verseEndStr] = match;
+  const bookKey = bookPart.toLowerCase().trim();
+  const book = BOOK_VARIANTS[bookKey];
+
+  if (!book) return null;
+
+  const chapter = parseInt(chapterStr, 10);
+  const verseStart = parseInt(verseStartStr, 10);
+  const verseEnd = verseEndStr ? parseInt(verseEndStr, 10) : undefined;
+
+  // Basic validation
+  if (chapter < 1 || chapter > 150) return null;
+  if (verseStart < 1 || verseStart > 176) return null;
+  if (verseEnd && (verseEnd < verseStart || verseEnd > 176)) return null;
+
+  return { book, chapter, verseStart, verseEnd, originalText };
+}
+
 export default function StudyBuddy() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
@@ -104,6 +230,92 @@ export default function StudyBuddy() {
 
   // Tab state for Study vs Simmer
   const [activeTab, setActiveTab] = useState<"study" | "simmer">("study");
+
+  // Track processed verse references to avoid duplicates
+  const processedRefsRef = useRef<Set<string>>(new Set());
+  const versePopulateTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Fetch and populate verse text when user types a reference
+  const populateVerseReference = useCallback(async (ref: ParsedReference) => {
+    const refKey = `${ref.book}:${ref.chapter}:${ref.verseStart}${ref.verseEnd ? `-${ref.verseEnd}` : ''}`;
+
+    // Skip if already processed
+    if (processedRefsRef.current.has(refKey)) return;
+    processedRefsRef.current.add(refKey);
+
+    try {
+      const chapter = await fetchChapter(ref.book, ref.chapter, "kjv");
+      const verses = chapter.verses.filter(v =>
+        v.verse >= ref.verseStart && v.verse <= (ref.verseEnd || ref.verseStart)
+      );
+
+      if (verses.length === 0) return;
+
+      // Format verse text
+      const verseText = verses.map(v =>
+        `${v.verse} ${v.text}`
+      ).join(' ');
+
+      const formattedReference = `[${ref.book} ${ref.chapter}:${ref.verseStart}${ref.verseEnd ? `-${ref.verseEnd}` : ''}]`;
+      const formattedVerse = `\n${formattedReference} ${verseText}\n`;
+
+      // Replace the original reference with the expanded version
+      setNotes(prev => {
+        // Check if the verse text is already in the notes
+        if (prev.includes(formattedReference)) return prev;
+
+        // Find and replace the reference with expanded version
+        const escapeRegex = (str: string) => str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        const refPattern = new RegExp(escapeRegex(ref.originalText) + '(?!\\])');
+
+        if (refPattern.test(prev)) {
+          return prev.replace(refPattern, formattedVerse);
+        }
+
+        // If reference not found (maybe already changed), append at cursor or end
+        return prev + formattedVerse;
+      });
+
+      toast.success(`Loaded ${ref.book} ${ref.chapter}:${ref.verseStart}${ref.verseEnd ? `-${ref.verseEnd}` : ''}`);
+    } catch (error) {
+      console.error("Error loading verse:", error);
+      // Remove from processed so user can try again
+      processedRefsRef.current.delete(refKey);
+    }
+  }, [setNotes]);
+
+  // Watch for verse references in notes
+  useEffect(() => {
+    if (versePopulateTimeoutRef.current) {
+      clearTimeout(versePopulateTimeoutRef.current);
+    }
+
+    versePopulateTimeoutRef.current = setTimeout(() => {
+      // Look for verse references that haven't been expanded yet
+      // Skip references that are already in [Book Chapter:Verse] format
+      const lines = notes.split('\n');
+      for (const line of lines) {
+        // Skip lines that are already formatted verse references
+        if (line.trim().startsWith('[') && line.includes(']')) continue;
+
+        const ref = parseVerseReference(line);
+        if (ref) {
+          // Check if this reference is already expanded (has verse text after it)
+          const refKey = `${ref.book}:${ref.chapter}:${ref.verseStart}${ref.verseEnd ? `-${ref.verseEnd}` : ''}`;
+          if (!processedRefsRef.current.has(refKey)) {
+            populateVerseReference(ref);
+            break; // Process one at a time to avoid race conditions
+          }
+        }
+      }
+    }, 800); // Debounce for 800ms
+
+    return () => {
+      if (versePopulateTimeoutRef.current) {
+        clearTimeout(versePopulateTimeoutRef.current);
+      }
+    };
+  }, [notes, populateVerseReference]);
 
   // Get chapter count for selected book
   const getChapterCount = () => {
@@ -339,6 +551,7 @@ export default function StudyBuddy() {
     setAnalysis(null);
     setAnalysisHistory([]);
     lastAnalyzedNotes.current = "";
+    processedRefsRef.current.clear(); // Reset processed verse references
     setCurrentSessionId(null);
     toast.success("Session cleared");
   };
