@@ -111,43 +111,8 @@ export default defineConfig(({ mode }) => ({
         chunkFileNames: 'assets/js/[name]-[hash].js',
         entryFileNames: 'assets/js/[name]-[hash].js',
         assetFileNames: 'assets/[name]-[hash][extname]',
-        manualChunks(id) {
-          // NOTE: recharts and d3 are intentionally NOT manually chunked
-          // to let Rollup handle their dependency graph automatically and avoid TDZ errors
-          
-          // Vendor chunks
-          if (id.includes('node_modules/react-dom') || id.includes('node_modules/react-router-dom')) {
-            return 'vendor';
-          }
-          if (id.includes('node_modules/react-dom') || id.includes('node_modules/react-router-dom')) {
-            return 'vendor';
-          }
-          if (id.includes('node_modules/react/')) {
-            return 'vendor';
-          }
-          // UI component library
-          if (id.includes('node_modules/@radix-ui')) {
-            return 'ui';
-          }
-          // Three.js and 3D libraries
-          if (id.includes('node_modules/three') || id.includes('node_modules/@react-three')) {
-            return 'three';
-          }
-          // PDF library
-          if (id.includes('node_modules/pdfjs-dist')) {
-            return 'pdf';
-          }
-          // Large data files - separate chunk for each
-          if (id.includes('/data/palaceData')) {
-            return 'data-palace';
-          }
-          if (id.includes('/data/imageBibleData')) {
-            return 'data-image-bible';
-          }
-          if (id.includes('/data/escapeRoomData')) {
-            return 'data-escape-room';
-          }
-        }
+        // NOTE: manualChunks intentionally omitted.
+        // We rely on Rollup's default chunking to avoid TDZ issues from cross-chunk init ordering.
       },
     },
     chunkSizeWarningLimit: 1000,
