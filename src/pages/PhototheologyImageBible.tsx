@@ -351,7 +351,7 @@ export default function PhototheologyImageBible() {
               <Layers className="h-4 w-4" />
               Browse
             </TabsTrigger>
-            <TabsTrigger value="study" className="flex items-center gap-2" disabled={!selectedBook}>
+            <TabsTrigger value="study" className="flex items-center gap-2">
               <Eye className="h-4 w-4" />
               Study
             </TabsTrigger>
@@ -439,7 +439,7 @@ export default function PhototheologyImageBible() {
                                 className="w-full h-full object-cover"
                               />
                             ) : (
-                              <span className="text-lg">{chapter.visualIcon.split("")[0]}</span>
+                              <span className="text-lg">{[...chapter.visualIcon][0]}</span>
                             )}
                           </div>
                         );
@@ -467,6 +467,23 @@ export default function PhototheologyImageBible() {
                 </p>
               </CardContent>
             </Card>
+          </div>
+        )}
+
+        {/* Study View - No Book Selected */}
+        {viewMode === "study" && !selectedBook && (
+          <div className="text-center py-20">
+            <div className="w-32 h-32 mx-auto mb-6 rounded-full bg-gradient-to-br from-purple-100 to-pink-100 dark:from-purple-900/30 dark:to-pink-900/30 flex items-center justify-center">
+              <BookOpen className="h-16 w-16 text-purple-400" />
+            </div>
+            <h2 className="text-2xl font-bold mb-3">Select a Book to Study</h2>
+            <p className="text-muted-foreground mb-6 max-w-md mx-auto">
+              Choose a book from the Browse tab, or click any chapter in the At a Glance view to start studying flashcards.
+            </p>
+            <Button onClick={() => setViewMode("browse")} variant="default" size="lg">
+              <Layers className="h-5 w-5 mr-2" />
+              Browse Books
+            </Button>
           </div>
         )}
 
@@ -589,7 +606,7 @@ export default function PhototheologyImageBible() {
                       title={`${chapter.book} ${chapter.chapter}: ${chapter.theme}`}
                     >
                       <span className="text-2xl group-hover:scale-110 transition-transform">
-                        {chapter.visualIcon.split("")[0]}
+                        {[...chapter.visualIcon][0]}
                       </span>
                       <span className="text-xs font-medium mt-1">{chapter.chapter}</span>
 
