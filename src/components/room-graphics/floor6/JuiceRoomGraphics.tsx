@@ -5,11 +5,23 @@ export function JuiceRoomFlowchart() {
   return (
     <svg viewBox="0 0 800 500" className="w-full h-auto" xmlns="http://www.w3.org/2000/svg">
       <defs>
+        <linearGradient id="jr-bg" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stopColor="#FFF7ED" />
+          <stop offset="50%" stopColor="#FFEDD5" />
+          <stop offset="100%" stopColor="#FED7AA" />
+        </linearGradient>
         <linearGradient id="jr-grad" x1="0%" y1="0%" x2="100%" y2="100%">
           <stop offset="0%" stopColor="#F97316" />
           <stop offset="100%" stopColor="#EA580C" />
         </linearGradient>
-        <filter id="jr-glow">
+        <linearGradient id="jr-header" x1="0%" y1="0%" x2="100%" y2="0%">
+          <stop offset="0%" stopColor="#F97316" />
+          <stop offset="100%" stopColor="#C2410C" />
+        </linearGradient>
+        <filter id="jr-shadow" x="-20%" y="-20%" width="140%" height="140%">
+          <feDropShadow dx="0" dy="4" stdDeviation="6" floodOpacity="0.1"/>
+        </filter>
+        <filter id="jr-glow" x="-50%" y="-50%" width="200%" height="200%">
           <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
           <feMerge>
             <feMergeNode in="coloredBlur"/>
@@ -19,11 +31,11 @@ export function JuiceRoomFlowchart() {
       </defs>
 
       {/* Background */}
-      <rect width="800" height="500" fill="#FFF7ED" rx="16" />
+      <rect width="800" height="500" fill="url(#jr-bg)" rx="16" />
 
       {/* Title */}
-      <text x="400" y="35" textAnchor="middle" fill="#C2410C" fontSize="22" fontWeight="bold">
-        🍊 Juice Room: Extract Maximum Meaning
+      <text x="400" y="35" textAnchor="middle" fill="#C2410C" fontSize="22" fontWeight="bold" letterSpacing="0.5">
+        Juice Room: Extract Maximum Meaning
       </text>
       <text x="400" y="55" textAnchor="middle" fill="#EA580C" fontSize="12">
         "Much from little. Little from much."

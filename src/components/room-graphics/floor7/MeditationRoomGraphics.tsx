@@ -5,11 +5,23 @@ export function MeditationRoomFlowchart() {
   return (
     <svg viewBox="0 0 800 500" className="w-full h-auto" xmlns="http://www.w3.org/2000/svg">
       <defs>
+        <linearGradient id="med-bg" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stopColor="#0F172A" />
+          <stop offset="50%" stopColor="#1E293B" />
+          <stop offset="100%" stopColor="#0F172A" />
+        </linearGradient>
         <linearGradient id="med-grad" x1="0%" y1="0%" x2="100%" y2="100%">
           <stop offset="0%" stopColor="#1E40AF" />
           <stop offset="100%" stopColor="#7C3AED" />
         </linearGradient>
-        <filter id="med-glow">
+        <linearGradient id="med-header" x1="0%" y1="0%" x2="100%" y2="0%">
+          <stop offset="0%" stopColor="#1E40AF" />
+          <stop offset="100%" stopColor="#7C3AED" />
+        </linearGradient>
+        <filter id="med-shadow" x="-20%" y="-20%" width="140%" height="140%">
+          <feDropShadow dx="0" dy="4" stdDeviation="6" floodOpacity="0.3"/>
+        </filter>
+        <filter id="med-glow" x="-50%" y="-50%" width="200%" height="200%">
           <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
           <feMerge>
             <feMergeNode in="coloredBlur"/>
@@ -19,11 +31,11 @@ export function MeditationRoomFlowchart() {
       </defs>
 
       {/* Background - calm gradient */}
-      <rect width="800" height="500" fill="#0F172A" rx="16" />
+      <rect width="800" height="500" fill="url(#med-bg)" rx="16" />
 
       {/* Title */}
-      <text x="400" y="35" textAnchor="middle" fill="#A5B4FC" fontSize="20" fontWeight="bold">
-        🧘 Meditation Room: Marinate Until Absorbed
+      <text x="400" y="35" textAnchor="middle" fill="#A5B4FC" fontSize="20" fontWeight="bold" letterSpacing="0.5">
+        Meditation Room: Marinate Until Absorbed
       </text>
       <text x="400" y="55" textAnchor="middle" fill="#818CF8" fontSize="11">
         "His delight is in the law of the LORD, and on His law he meditates day and night" — Psalm 1:2

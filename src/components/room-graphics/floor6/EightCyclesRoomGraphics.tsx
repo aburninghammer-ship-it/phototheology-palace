@@ -5,15 +5,34 @@ export function EightCyclesFlowchart() {
   return (
     <svg viewBox="0 0 800 650" className="w-full h-auto" xmlns="http://www.w3.org/2000/svg">
       <defs>
+        <linearGradient id="cycle-bg" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stopColor="#FDF2F8" />
+          <stop offset="50%" stopColor="#FCE7F3" />
+          <stop offset="100%" stopColor="#FBCFE8" />
+        </linearGradient>
         <linearGradient id="cycle-grad" x1="0%" y1="0%" x2="100%" y2="100%">
           <stop offset="0%" stopColor="#EC4899" />
           <stop offset="100%" stopColor="#BE185D" />
         </linearGradient>
+        <linearGradient id="cycle-header" x1="0%" y1="0%" x2="100%" y2="0%">
+          <stop offset="0%" stopColor="#EC4899" />
+          <stop offset="100%" stopColor="#9D174D" />
+        </linearGradient>
+        <filter id="cycle-shadow" x="-20%" y="-20%" width="140%" height="140%">
+          <feDropShadow dx="0" dy="4" stdDeviation="6" floodOpacity="0.1"/>
+        </filter>
+        <filter id="cycle-glow" x="-50%" y="-50%" width="200%" height="200%">
+          <feGaussianBlur stdDeviation="3" result="blur"/>
+          <feMerge>
+            <feMergeNode in="blur"/>
+            <feMergeNode in="SourceGraphic"/>
+          </feMerge>
+        </filter>
       </defs>
 
-      <rect width="800" height="650" fill="#FDF2F8" rx="16" />
+      <rect width="800" height="650" fill="url(#cycle-bg)" rx="16" />
 
-      <text x="400" y="40" textAnchor="middle" fill="#9D174D" fontSize="24" fontWeight="bold">
+      <text x="400" y="40" textAnchor="middle" fill="#9D174D" fontSize="24" fontWeight="bold" letterSpacing="0.5">
         Eight Cycles: God's Repeating Pattern in History
       </text>
 

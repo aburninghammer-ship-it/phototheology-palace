@@ -5,12 +5,24 @@ export function FireRoomFlowchart() {
   return (
     <svg viewBox="0 0 800 500" className="w-full h-auto" xmlns="http://www.w3.org/2000/svg">
       <defs>
+        <linearGradient id="fire-bg" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stopColor="#1C1917" />
+          <stop offset="50%" stopColor="#292524" />
+          <stop offset="100%" stopColor="#1C1917" />
+        </linearGradient>
         <linearGradient id="fire-grad" x1="0%" y1="100%" x2="0%" y2="0%">
           <stop offset="0%" stopColor="#DC2626" />
           <stop offset="50%" stopColor="#F97316" />
           <stop offset="100%" stopColor="#FBBF24" />
         </linearGradient>
-        <filter id="fire-glow">
+        <linearGradient id="fire-header" x1="0%" y1="0%" x2="100%" y2="0%">
+          <stop offset="0%" stopColor="#DC2626" />
+          <stop offset="100%" stopColor="#F97316" />
+        </linearGradient>
+        <filter id="fire-shadow" x="-20%" y="-20%" width="140%" height="140%">
+          <feDropShadow dx="0" dy="4" stdDeviation="6" floodOpacity="0.3"/>
+        </filter>
+        <filter id="fire-glow" x="-50%" y="-50%" width="200%" height="200%">
           <feGaussianBlur stdDeviation="4" result="coloredBlur"/>
           <feMerge>
             <feMergeNode in="coloredBlur"/>
@@ -20,11 +32,11 @@ export function FireRoomFlowchart() {
       </defs>
 
       {/* Background */}
-      <rect width="800" height="500" fill="#1C1917" rx="16" />
+      <rect width="800" height="500" fill="url(#fire-bg)" rx="16" />
 
       {/* Title */}
-      <text x="400" y="35" textAnchor="middle" fill="#FBBF24" fontSize="22" fontWeight="bold">
-        🔥 Fire Room: From Head to Heart
+      <text x="400" y="35" textAnchor="middle" fill="#FBBF24" fontSize="22" fontWeight="bold" letterSpacing="0.5">
+        Fire Room: From Head to Heart
       </text>
       <text x="400" y="55" textAnchor="middle" fill="#FCD34D" fontSize="11">
         "Is not my word like fire?" — Jeremiah 23:29
