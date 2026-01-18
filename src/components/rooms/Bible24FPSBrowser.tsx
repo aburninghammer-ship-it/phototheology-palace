@@ -89,7 +89,7 @@ export function Bible24FPSBrowser({ onClose }: Bible24FPSBrowserProps) {
     return -1;
   };
 
-  // Get image for a chapter - prioritizes user images, then PT Image Bible for sets 5+, then Genesis defaults for sets 1-4
+  // Get image for a chapter - prioritizes user images, then PT Image Bible for ALL sets
   const getChapterImage = (chapter: ChapterFrame | null | undefined): string | null => {
     if (!chapter || !chapter.book) return null;
 
@@ -99,20 +99,17 @@ export function Bible24FPSBrowser({ onClose }: Bible24FPSBrowserProps) {
     );
     if (userImage) return userImage.image_url;
 
-    // Determine which set this chapter belongs to
-    const setIndex = getSetIndexForChapter(chapter);
+    // Use PT Image Bible from storage for ALL sets (including sets 1-4)
+    const imageBibleUrl = getChapterImageUrl(imageBibleMap, chapter.book, chapter.chapter);
+    if (imageBibleUrl) return imageBibleUrl;
     
-    // For sets 1-4 (index 0-3): Use Genesis default images
+    // Fallback to Genesis default images only if no PT Image Bible image exists
+    const setIndex = getSetIndexForChapter(chapter);
     if (setIndex >= 0 && setIndex < 4) {
       if (chapter.book === "Genesis" && chapter.chapter >= 1 && chapter.chapter <= 50) {
         return genesisImages[chapter.chapter - 1];
       }
-      return chapter.imageUrl || null;
     }
-    
-    // For sets 5-50 (index 4+): Use PT Image Bible from storage
-    const imageBibleUrl = getChapterImageUrl(imageBibleMap, chapter.book, chapter.chapter);
-    if (imageBibleUrl) return imageBibleUrl;
     
     // Fallback to chapter's own imageUrl or null
     return chapter.imageUrl || null;
@@ -194,19 +191,20 @@ export function Bible24FPSBrowser({ onClose }: Bible24FPSBrowserProps) {
   const currentSetIndex = selectedSet ? allBibleSets.indexOf(selectedSet) : 0;
   const currentSetColor = getSetColor(currentSetIndex);
   
-  // Check if a set has images - sets 1-4 have Genesis images, sets 5+ check PT Image Bible
+  // Check if a set has images - check PT Image Bible first for all sets, then Genesis fallback for sets 1-4
   const setHasImages = (set: BibleSet, setIndex: number) => {
-    // Sets 1-4 (index 0-3): have Genesis images
-    if (setIndex < 4) {
-      return set.chapters.some(ch => ch && ch.book === "Genesis");
-    }
-    // Sets 5+ (index 4+): check if any chapter has a PT Image Bible image
+    // First check if any chapter has a PT Image Bible image
     if (imageBibleMap) {
-      return set.chapters.some(ch => {
+      const hasImageBibleImages = set.chapters.some(ch => {
         if (!ch || !ch.book) return false;
         const url = getChapterImageUrl(imageBibleMap, ch.book, ch.chapter);
         return !!url;
       });
+      if (hasImageBibleImages) return true;
+    }
+    // Fallback: sets 1-4 have Genesis images
+    if (setIndex < 4) {
+      return set.chapters.some(ch => ch && ch.book === "Genesis");
     }
     return false;
   };
