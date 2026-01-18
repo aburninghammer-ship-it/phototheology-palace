@@ -90,7 +90,19 @@ export default defineConfig(({ mode }) => ({
     },
   },
   optimizeDeps: {
-    include: ['recharts', 'recharts-scale', 'd3-scale', 'd3-shape', 'd3-path'],
+    include: [
+      'recharts', 
+      'recharts-scale', 
+      'd3-scale', 
+      'd3-shape', 
+      'd3-path',
+      'd3-array',
+      'd3-interpolate',
+      'd3-color',
+      'd3-format',
+      'd3-time',
+      'd3-time-format',
+    ],
   },
   build: {
     cssCodeSplit: true,
@@ -100,6 +112,16 @@ export default defineConfig(({ mode }) => ({
         entryFileNames: 'assets/js/[name]-[hash].js',
         assetFileNames: 'assets/[name]-[hash][extname]',
         manualChunks(id) {
+          // IMPORTANT: Charts and d3 must be bundled together to avoid TDZ errors
+          // Check this FIRST to ensure recharts and all d3 deps stay together
+          if (
+            id.includes('node_modules/recharts') || 
+            id.includes('node_modules/d3-') ||
+            id.includes('node_modules/internmap') ||
+            id.includes('node_modules/victory-vendor')
+          ) {
+            return 'charts';
+          }
           // Vendor chunks
           if (id.includes('node_modules/react-dom') || id.includes('node_modules/react-router-dom')) {
             return 'vendor';
@@ -118,10 +140,6 @@ export default defineConfig(({ mode }) => ({
           // PDF library
           if (id.includes('node_modules/pdfjs-dist')) {
             return 'pdf';
-          }
-          // Charts library - bundle with vendor to avoid initialization errors
-          if (id.includes('node_modules/recharts') || id.includes('node_modules/d3')) {
-            return 'vendor';
           }
           // Large data files - separate chunk for each
           if (id.includes('/data/palaceData')) {
