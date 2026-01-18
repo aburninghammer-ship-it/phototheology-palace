@@ -75,7 +75,9 @@ export function Bible24FPSBrowser({ onClose }: Bible24FPSBrowserProps) {
   }, []);
 
   // Get image for a chapter - prioritizes user images, then Genesis defaults
-  const getChapterImage = (chapter: ChapterFrame): string | null => {
+  const getChapterImage = (chapter: ChapterFrame | null | undefined): string | null => {
+    if (!chapter || !chapter.book) return null;
+
     // Check for user's custom image first
     const userImage = userImages.find(
       img => img.book === chapter.book && img.chapter === chapter.chapter
@@ -90,14 +92,16 @@ export function Bible24FPSBrowser({ onClose }: Bible24FPSBrowserProps) {
   };
 
   // Check if chapter has user-created image
-  const hasUserImage = (chapter: ChapterFrame): boolean => {
+  const hasUserImage = (chapter: ChapterFrame | null | undefined): boolean => {
+    if (!chapter || !chapter.book) return false;
     return userImages.some(
       img => img.book === chapter.book && img.chapter === chapter.chapter
     );
   };
 
   // Delete user image
-  const handleDeleteUserImage = async (chapter: ChapterFrame) => {
+  const handleDeleteUserImage = async (chapter: ChapterFrame | null | undefined) => {
+    if (!chapter || !chapter.book) return;
     const userImage = userImages.find(
       img => img.book === chapter.book && img.chapter === chapter.chapter
     );
@@ -165,7 +169,7 @@ export function Bible24FPSBrowser({ onClose }: Bible24FPSBrowserProps) {
   
   // Check if a set has images (Genesis sets have images)
   const setHasImages = (set: BibleSet) => {
-    return set.chapters.some(ch => ch.book === "Genesis");
+    return set.chapters.some(ch => ch && ch.book === "Genesis");
   };
   
   const renderSetButton = (set: BibleSet, index: number) => {
@@ -173,7 +177,7 @@ export function Bible24FPSBrowser({ onClose }: Bible24FPSBrowserProps) {
     const hasImages = setHasImages(set);
     
     // Get preview images for sets with Genesis chapters
-    const previewChapters = set.chapters.filter(ch => ch.book === "Genesis").slice(0, 3);
+    const previewChapters = set.chapters.filter(ch => ch && ch.book === "Genesis").slice(0, 3);
     
     return (
       <Button
@@ -306,9 +310,10 @@ export function Bible24FPSBrowser({ onClose }: Bible24FPSBrowserProps) {
           {/* Chapter grid - with images when available */}
           <ScrollArea className="h-[400px]">
             <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-3 pr-4">
-              {selectedSet?.chapters.map((chapter, idx) => {
+              {selectedSet?.chapters.filter(ch => ch != null).map((chapter, idx) => {
+                if (!chapter || !chapter.book) return null;
                 const imageUrl = getChapterImage(chapter);
-                
+
                 return (
                   <Card
                     key={`${chapter.book}-${chapter.chapter}`}
