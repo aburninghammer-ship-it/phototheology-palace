@@ -9,7 +9,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
-import { Film, Mic, BookOpen, TrendingUp, ArrowRight, CheckCircle2, Loader2, Archive, Gem, Info, Swords, PenLine, FileText, Presentation, Lightbulb, Plus, Sparkles, Calendar, Edit, Trash2, Copy, Clock } from "lucide-react";
+import { Film, Mic, BookOpen, TrendingUp, ArrowRight, CheckCircle2, Loader2, Archive, Gem, Info, Swords, PenLine, FileText, Presentation, Lightbulb, Plus, Sparkles, Calendar, Edit, Trash2, Copy, Clock, Brain } from "lucide-react";
+import { MyIdeaTab } from "@/components/simmer/MyIdeaTab";
 import { sermonTitleSchema, sermonThemeSchema, sermonStoneSchema, sermonBridgeSchema } from "@/lib/validationSchemas";
 import { sanitizeText, sanitizeHtml } from "@/lib/sanitize";
 import { SermonRichTextArea } from "@/components/sermon/SermonRichTextArea";
@@ -97,7 +98,7 @@ export default function SermonBuilder() {
   const hasRestoredState = useRef(false);
   
   const [currentStep, setCurrentStep] = useState(1);
-  const [activeTab, setActiveTab] = useState<"builder" | "library" | "simmer" | "starters">("builder");
+  const [activeTab, setActiveTab] = useState<"builder" | "library" | "simmer" | "starters" | "myidea">("builder");
   const [loading, setLoading] = useState(false);
   const [asking, setAsking] = useState(false);
   const [librarySermons, setLibrarySermons] = useState<any[]>([]);
@@ -444,15 +445,18 @@ export default function SermonBuilder() {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error("Not authenticated");
 
+      // Generate a default title if empty
+      const defaultTitle = sermon.title || `Sermon Draft - ${new Date().toLocaleDateString()}`;
+
       const sermonData = {
         user_id: user.id,
-        title: sermon.title,
-        theme_passage: sermon.theme_passage,
-        sermon_style: sermon.sermon_style,
-        smooth_stones: sermon.smooth_stones,
-        bridges: sermon.bridges,
-        movie_structure: sermon.movie_structure,
-        full_sermon: sermon.full_sermon,
+        title: defaultTitle,
+        theme_passage: sermon.theme_passage || null,
+        sermon_style: sermon.sermon_style || SERMON_STYLES[0].value,
+        smooth_stones: sermon.smooth_stones || [],
+        bridges: sermon.bridges || [],
+        movie_structure: sermon.movie_structure || {},
+        full_sermon: sermon.full_sermon || "",
         current_step: currentStep,
         status: currentStep >= 5 ? "complete" : "in_progress",
       };
@@ -705,7 +709,7 @@ export default function SermonBuilder() {
 
       {/* Tab Selector */}
       <div className="max-w-7xl mx-auto px-6 pt-6 relative z-10">
-        <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as "builder" | "library" | "simmer" | "starters")}>
+        <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as "builder" | "library" | "simmer" | "starters" | "myidea")}>
           <TabsList className="bg-white/10 border border-white/20">
             <TabsTrigger
               value="builder"
@@ -727,6 +731,13 @@ export default function SermonBuilder() {
             >
               <Sparkles className="w-4 h-4 mr-2" />
               Simmer
+            </TabsTrigger>
+            <TabsTrigger
+              value="myidea"
+              className="data-[state=active]:bg-white data-[state=active]:text-purple-900 text-white"
+            >
+              <Brain className="w-4 h-4 mr-2" />
+              My Idea
             </TabsTrigger>
             <TabsTrigger
               value="starters"
@@ -870,6 +881,11 @@ export default function SermonBuilder() {
                 />
               </CardContent>
             </Card>
+          </TabsContent>
+
+          {/* My Idea Tab */}
+          <TabsContent value="myidea" className="mt-6">
+            <MyIdeaTab />
           </TabsContent>
 
           {/* Idea Starters Tab */}

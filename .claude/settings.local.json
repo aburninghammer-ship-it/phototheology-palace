@@ -53,7 +53,8 @@
       "Bash(curl:*)",
       "Bash(npm ls:*)",
       "Bash(gh run list:*)",
-      "Bash(git fetch:*)"
+      "Bash(git fetch:*)",
+      "Bash(git cherry-pick:*)"
     ],
     "deny": [],
     "ask": []

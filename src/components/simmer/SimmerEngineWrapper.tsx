@@ -7,6 +7,7 @@ import { useSimmerEngine, SimmerArtifact } from "@/hooks/useSimmerEngine";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Badge } from "@/components/ui/badge";
@@ -27,6 +28,7 @@ export function SimmerEngineWrapper({ onExportToSermon, sermonId }: SimmerEngine
   const [newSessionData, setNewSessionData] = useState({
     theme: "",
     themePassage: "",
+    idea: "",
     targetStyle: "balanced",
     targetDensity: "teaching",
     targetPurpose: "evangelistic",
@@ -59,6 +61,7 @@ export function SimmerEngineWrapper({ onExportToSermon, sermonId }: SimmerEngine
         setNewSessionData({
           theme: "",
           themePassage: "",
+          idea: "",
           targetStyle: "balanced",
           targetDensity: "teaching",
           targetPurpose: "evangelistic",
@@ -106,6 +109,17 @@ export function SimmerEngineWrapper({ onExportToSermon, sermonId }: SimmerEngine
                 onChange={(e) => setNewSessionData({ ...newSessionData, themePassage: e.target.value })}
                 className="bg-slate-800 border-slate-700"
               />
+            </div>
+
+            <div>
+              <label className="text-sm text-slate-400 mb-1 block">Your Idea (optional)</label>
+              <Textarea
+                placeholder="Share your sermon idea, angle, or key insight you want to explore..."
+                value={newSessionData.idea}
+                onChange={(e) => setNewSessionData({ ...newSessionData, idea: e.target.value })}
+                className="bg-slate-800 border-slate-700 min-h-[80px]"
+              />
+              <p className="text-xs text-slate-500 mt-1">Any thoughts, angles, or directions you already have in mind.</p>
             </div>
 
             <div className="grid grid-cols-3 gap-3">

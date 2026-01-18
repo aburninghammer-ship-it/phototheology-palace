@@ -12,6 +12,7 @@ interface SimmerNewSessionProps {
   onSubmit: (params: {
     theme: string;
     themePassage?: string;
+    idea?: string;
     targetStyle?: string;
     targetDensity?: string;
     targetPurpose?: string;
@@ -22,6 +23,7 @@ interface SimmerNewSessionProps {
 export function SimmerNewSession({ onSubmit, isLoading }: SimmerNewSessionProps) {
   const [theme, setTheme] = useState("");
   const [themePassage, setThemePassage] = useState("");
+  const [idea, setIdea] = useState("");
   const [targetStyle, setTargetStyle] = useState("balanced");
   const [targetDensity, setTargetDensity] = useState("teaching");
   const [targetPurpose, setTargetPurpose] = useState("evangelistic");
@@ -31,6 +33,7 @@ export function SimmerNewSession({ onSubmit, isLoading }: SimmerNewSessionProps)
     onSubmit({
       theme,
       themePassage: themePassage || undefined,
+      idea: idea || undefined,
       targetStyle,
       targetDensity,
       targetPurpose,
@@ -66,13 +69,26 @@ export function SimmerNewSession({ onSubmit, isLoading }: SimmerNewSessionProps)
           </div>
 
           <div className="space-y-2">
-            <Label className="text-orange-200">Theme Passage (Optional)</Label>
+            <Label className="text-orange-200">Anchor Passage (Optional)</Label>
             <Input
               value={themePassage}
               onChange={(e) => setThemePassage(e.target.value)}
               placeholder="e.g., Psalm 27:14 or John 11:1-44"
               className="bg-black/30 border-orange-500/30 text-white placeholder:text-orange-200/50"
             />
+          </div>
+
+          <div className="space-y-2">
+            <Label className="text-orange-200">Your Idea (Optional)</Label>
+            <Textarea
+              value={idea}
+              onChange={(e) => setIdea(e.target.value)}
+              placeholder="Share your sermon idea, angle, or key insight you want to explore..."
+              className="bg-black/30 border-orange-500/30 text-white placeholder:text-orange-200/50 min-h-[80px]"
+            />
+            <p className="text-xs text-orange-200/60">
+              Any thoughts, angles, or directions you already have in mind.
+            </p>
           </div>
 
           <div className="grid sm:grid-cols-3 gap-4">

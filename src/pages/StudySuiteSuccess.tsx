@@ -34,6 +34,17 @@ export default function StudySuiteSuccess() {
   useEffect(() => {
     trackPurchaseCompleted("study-suite", 97);
     
+    // Track Facebook Pixel Purchase event
+    if (typeof window !== 'undefined' && (window as any).fbq) {
+      (window as any).fbq('track', 'Purchase', {
+        value: 97.00,
+        currency: 'USD',
+        content_name: 'Study Suite',
+        content_type: 'product',
+        content_ids: ['study-suite'],
+      });
+    }
+    
     // Send product email
     const sendProductEmail = async () => {
       const urlParams = new URLSearchParams(window.location.search);

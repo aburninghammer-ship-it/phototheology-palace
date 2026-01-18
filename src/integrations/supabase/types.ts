@@ -10237,6 +10237,42 @@ export type Database = {
           },
         ]
       }
+      sermon_ideas: {
+        Row: {
+          analysis_result: Json | null
+          context: string | null
+          created_at: string
+          id: string
+          idea: string | null
+          is_favorite: boolean | null
+          title: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          analysis_result?: Json | null
+          context?: string | null
+          created_at?: string
+          id?: string
+          idea?: string | null
+          is_favorite?: boolean | null
+          title?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          analysis_result?: Json | null
+          context?: string | null
+          created_at?: string
+          id?: string
+          idea?: string | null
+          is_favorite?: boolean | null
+          title?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       sermon_simmer_sessions: {
         Row: {
           artifact_hashes: string[] | null
@@ -10859,8 +10895,8 @@ export type Database = {
           sermon_style: string
           smooth_stones: Json | null
           status: string
-          theme_passage: string
-          title: string
+          theme_passage: string | null
+          title: string | null
           updated_at: string
           user_id: string
         }
@@ -10874,8 +10910,8 @@ export type Database = {
           sermon_style: string
           smooth_stones?: Json | null
           status?: string
-          theme_passage: string
-          title: string
+          theme_passage?: string | null
+          title?: string | null
           updated_at?: string
           user_id: string
         }
@@ -10889,8 +10925,8 @@ export type Database = {
           sermon_style?: string
           smooth_stones?: Json | null
           status?: string
-          theme_passage?: string
-          title?: string
+          theme_passage?: string | null
+          title?: string | null
           updated_at?: string
           user_id?: string
         }

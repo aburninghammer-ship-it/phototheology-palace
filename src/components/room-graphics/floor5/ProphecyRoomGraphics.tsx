@@ -5,7 +5,6 @@ export function ProphecyRoomFlowchart() {
   return (
     <svg viewBox="0 0 800 580" className="w-full h-auto" xmlns="http://www.w3.org/2000/svg">
       <defs>
-        {/* Professional gradients */}
         <linearGradient id="proph-bg" x1="0%" y1="0%" x2="100%" y2="100%">
           <stop offset="0%" stopColor="#F5F3FF" />
           <stop offset="50%" stopColor="#EDE9FE" />
@@ -23,8 +22,6 @@ export function ProphecyRoomFlowchart() {
           <stop offset="0%" stopColor="#FFFFFF" />
           <stop offset="100%" stopColor="#FAFAFA" />
         </linearGradient>
-
-        {/* Shadows and effects */}
         <filter id="proph-shadow" x="-20%" y="-20%" width="140%" height="140%">
           <feDropShadow dx="0" dy="4" stdDeviation="6" floodOpacity="0.1"/>
         </filter>
@@ -40,10 +37,8 @@ export function ProphecyRoomFlowchart() {
         </filter>
       </defs>
 
-      {/* Background */}
       <rect width="800" height="580" fill="url(#proph-bg)" rx="20" />
 
-      {/* Title */}
       <text x="400" y="45" textAnchor="middle" fill="#5B21B6" fontSize="26" fontWeight="700" letterSpacing="0.5">
         Prophecy Room
       </text>
@@ -51,7 +46,6 @@ export function ProphecyRoomFlowchart() {
         Understanding Biblical Predictions
       </text>
 
-      {/* Prophecy Categories Card */}
       <g transform="translate(40, 90)">
         <rect x="0" y="0" width="720" height="130" rx="16" fill="url(#proph-card)" filter="url(#proph-shadow)" />
         <rect x="0" y="0" width="720" height="40" rx="16" fill="url(#proph-header)" />
@@ -76,7 +70,6 @@ export function ProphecyRoomFlowchart() {
         ))}
       </g>
 
-      {/* Interpretation Method Card */}
       <g transform="translate(40, 235)">
         <rect x="0" y="0" width="720" height="160" rx="16" fill="url(#proph-card)" filter="url(#proph-shadow)" />
         <rect x="0" y="0" width="720" height="40" rx="16" fill="url(#proph-header)" />
@@ -106,9 +99,7 @@ export function ProphecyRoomFlowchart() {
         </text>
       </g>
 
-      {/* Bottom Cards */}
       <g transform="translate(40, 410)">
-        {/* Day-Year Principle */}
         <rect x="0" y="0" width="350" height="100" rx="16" fill="url(#proph-card)" filter="url(#proph-shadow)" />
         <rect x="0" y="0" width="350" height="36" rx="16" fill="#EDE9FE" />
         <rect x="0" y="20" width="350" height="16" fill="#EDE9FE" />
@@ -117,7 +108,6 @@ export function ProphecyRoomFlowchart() {
         <text x="175" y="75" textAnchor="middle" fill="#1E1B4B" fontSize="12" fontWeight="600">"A day for a year"</text>
         <text x="175" y="92" textAnchor="middle" fill="#64748B" fontSize="10">2300 days = 2300 years</text>
 
-        {/* Repeat & Enlarge */}
         <rect x="370" y="0" width="350" height="100" rx="16" fill="url(#proph-card)" filter="url(#proph-shadow)" />
         <rect x="370" y="0" width="350" height="36" rx="16" fill="#EDE9FE" />
         <rect x="370" y="20" width="350" height="16" fill="#EDE9FE" />
@@ -127,7 +117,6 @@ export function ProphecyRoomFlowchart() {
         <text x="545" y="92" textAnchor="middle" fill="#64748B" fontSize="10">Each vision adds new elements</text>
       </g>
 
-      {/* Key Insight Footer */}
       <rect x="40" y="520" width="720" height="50" rx="12" fill="url(#proph-header)" filter="url(#proph-shadow)" />
       <text x="400" y="545" textAnchor="middle" fill="white" fontSize="13" fontWeight="600">
         "Prophecy is history written in advance — study both together"
@@ -139,7 +128,6 @@ export function ProphecyRoomFlowchart() {
   );
 }
 
-// Prophecy Room Concept Infographic - Professional Styling
 export function ProphecyRoomConcept() {
   return (
     <svg viewBox="0 0 800 620" className="w-full h-auto" xmlns="http://www.w3.org/2000/svg">
@@ -166,12 +154,10 @@ export function ProphecyRoomConcept() {
       </defs>
 
       <rect width="800" height="620" fill="url(#proph2-bg)" rx="20" />
-
       <text x="400" y="40" textAnchor="middle" fill="#5B21B6" fontSize="24" fontWeight="700" letterSpacing="0.5">
         Major Prophetic Frameworks
       </text>
 
-      {/* Daniel's Image Card */}
       <g transform="translate(40, 60)">
         <rect x="0" y="0" width="230" height="270" rx="16" fill="url(#proph2-card)" filter="url(#proph2-shadow)" />
         <rect x="0" y="0" width="230" height="42" rx="16" fill="url(#proph2-header)" />
@@ -195,13 +181,11 @@ export function ProphecyRoomConcept() {
         ))}
       </g>
 
-      {/* 70 Weeks Card */}
       <g transform="translate(285, 60)">
         <rect x="0" y="0" width="230" height="270" rx="16" fill="url(#proph2-card)" filter="url(#proph2-shadow)" />
         <rect x="0" y="0" width="230" height="42" rx="16" fill="url(#proph2-header)" />
         <rect x="0" y="26" width="230" height="16" fill="url(#proph2-header)" />
         <text x="115" y="28" textAnchor="middle" fill="white" fontSize="13" fontWeight="600">Daniel 9: 70 Weeks</text>
-
         <text x="115" y="65" textAnchor="middle" fill="#1E1B4B" fontSize="12" fontWeight="700">70 weeks = 490 years</text>
         <text x="115" y="82" textAnchor="middle" fill="#7C3AED" fontSize="10">Start: 457 BC (Ezra 7)</text>
 
@@ -216,31 +200,25 @@ export function ProphecyRoomConcept() {
             <text x="103" y="34" textAnchor="middle" fill="#64748B" fontSize="10">{item.event}</text>
           </g>
         ))}
-
         <text x="115" y="258" textAnchor="middle" fill="#1E1B4B" fontSize="10" fontWeight="600">End: 34 AD (Stephen martyred)</text>
       </g>
 
-      {/* 2300 Days Card */}
       <g transform="translate(530, 60)">
         <rect x="0" y="0" width="230" height="270" rx="16" fill="url(#proph2-card)" filter="url(#proph2-shadow)" />
         <rect x="0" y="0" width="230" height="42" rx="16" fill="url(#proph2-header)" />
         <rect x="0" y="26" width="230" height="16" fill="url(#proph2-header)" />
         <text x="115" y="28" textAnchor="middle" fill="white" fontSize="13" fontWeight="600">Daniel 8: 2300 Days</text>
-
         <text x="115" y="68" textAnchor="middle" fill="#1E1B4B" fontSize="11" fontWeight="600">"2300 days, then sanctuary cleansed"</text>
-
         <rect x="12" y="82" width="206" height="75" rx="10" fill="#F5F3FF" filter="url(#proph2-shadow-sm)" />
         <text x="115" y="105" textAnchor="middle" fill="#1E1B4B" fontSize="11" fontWeight="600">2300 days = 2300 years</text>
         <text x="115" y="124" textAnchor="middle" fill="#7C3AED" fontSize="10">Start: 457 BC</text>
         <text x="115" y="143" textAnchor="middle" fill="#7C3AED" fontSize="10">End: 1844 AD</text>
-
         <rect x="12" y="168" width="206" height="75" rx="10" fill="#EDE9FE" />
         <text x="115" y="190" textAnchor="middle" fill="#6D28D9" fontSize="11" fontWeight="700">Significance:</text>
         <text x="115" y="210" textAnchor="middle" fill="#64748B" fontSize="10">Heavenly sanctuary cleansing</text>
         <text x="115" y="228" textAnchor="middle" fill="#64748B" fontSize="10">Pre-advent judgment begins</text>
       </g>
 
-      {/* Prophetic Symbols Card */}
       <g transform="translate(40, 345)">
         <rect x="0" y="0" width="720" height="130" rx="16" fill="url(#proph2-card)" filter="url(#proph2-shadow)" />
         <rect x="0" y="0" width="720" height="40" rx="16" fill="url(#proph2-header)" />
@@ -266,7 +244,6 @@ export function ProphecyRoomConcept() {
         ))}
       </g>
 
-      {/* Deliverable Card */}
       <g transform="translate(40, 490)">
         <rect x="0" y="0" width="720" height="115" rx="16" fill="#EDE9FE" filter="url(#proph2-shadow)" />
         <text x="360" y="30" textAnchor="middle" fill="#5B21B6" fontSize="15" fontWeight="700">
@@ -286,7 +263,6 @@ export function ProphecyRoomConcept() {
   );
 }
 
-// Prophecy Room Example - Professional Styling
 export function ProphecyRoomExample() {
   return (
     <svg viewBox="0 0 800 570" className="w-full h-auto" xmlns="http://www.w3.org/2000/svg">
@@ -314,12 +290,10 @@ export function ProphecyRoomExample() {
       </defs>
 
       <rect width="800" height="570" fill="url(#proph3-bg)" rx="20" />
-
       <text x="400" y="40" textAnchor="middle" fill="#5B21B6" fontSize="24" fontWeight="700" letterSpacing="0.5">
         Example: Isaiah 53 — Messianic Prophecy
       </text>
 
-      {/* The Prophecy Card */}
       <g transform="translate(40, 60)">
         <rect x="0" y="0" width="350" height="260" rx="16" fill="url(#proph3-card)" filter="url(#proph3-shadow)" />
         <rect x="0" y="0" width="350" height="42" rx="16" fill="url(#proph3-purple-header)" />
@@ -346,7 +320,6 @@ export function ProphecyRoomExample() {
         ))}
       </g>
 
-      {/* The Fulfillment Card */}
       <g transform="translate(410, 60)">
         <rect x="0" y="0" width="350" height="260" rx="16" fill="url(#proph3-card)" filter="url(#proph3-shadow)" />
         <rect x="0" y="0" width="350" height="42" rx="16" fill="url(#proph3-red-header)" />
@@ -373,45 +346,26 @@ export function ProphecyRoomExample() {
         ))}
       </g>
 
-      {/* Arrow connecting the two */}
       <g transform="translate(380, 180)">
         <circle cx="15" cy="0" r="15" fill="#7C3AED" />
         <path d="M 8 0 L 22 0 M 16 -6 L 22 0 L 16 6" stroke="white" strokeWidth="2" fill="none" />
       </g>
 
-      {/* Statistical Analysis Card */}
       <g transform="translate(40, 335)">
         <rect x="0" y="0" width="720" height="105" rx="16" fill="url(#proph3-card)" filter="url(#proph3-shadow)" />
         <rect x="0" y="0" width="720" height="36" rx="16" fill="#EDE9FE" />
         <rect x="0" y="20" width="720" height="16" fill="#EDE9FE" />
-        <text x="360" y="26" textAnchor="middle" fill="#6D28D9" fontSize="14" fontWeight="700">
-          Probability Analysis
-        </text>
-        <text x="360" y="55" textAnchor="middle" fill="#64748B" fontSize="12">
-          Isaiah 53 contains 12+ specific predictions about the Messiah
-        </text>
-        <text x="360" y="75" textAnchor="middle" fill="#64748B" fontSize="12">
-          Probability of one person fulfilling all by chance: 1 in 10¹⁷ (100 quadrillion)
-        </text>
-        <text x="360" y="95" textAnchor="middle" fill="#1E1B4B" fontSize="12" fontWeight="600">
-          Mathematical proof of divine authorship and Jesus as Messiah
-        </text>
+        <text x="360" y="26" textAnchor="middle" fill="#6D28D9" fontSize="14" fontWeight="700">Probability Analysis</text>
+        <text x="360" y="55" textAnchor="middle" fill="#64748B" fontSize="12">Isaiah 53 contains 12+ specific predictions about the Messiah</text>
+        <text x="360" y="75" textAnchor="middle" fill="#64748B" fontSize="12">Probability of one person fulfilling all by chance: 1 in 10¹⁷ (100 quadrillion)</text>
+        <text x="360" y="95" textAnchor="middle" fill="#1E1B4B" fontSize="12" fontWeight="600">Mathematical proof of divine authorship and Jesus as Messiah</text>
       </g>
 
-      {/* Application Footer */}
       <rect x="40" y="455" width="720" height="105" rx="16" fill="url(#proph3-purple-header)" filter="url(#proph3-shadow)" />
-      <text x="400" y="485" textAnchor="middle" fill="white" fontSize="15" fontWeight="700">
-        Prophecy Room Insight
-      </text>
-      <text x="400" y="510" textAnchor="middle" fill="#DDD6FE" fontSize="12">
-        Isaiah 53 was written 700 years before Christ — no human could guess these details
-      </text>
-      <text x="400" y="532" textAnchor="middle" fill="#DDD6FE" fontSize="12">
-        Fulfilled prophecy = God's signature, proving Jesus is the promised Messiah
-      </text>
-      <text x="400" y="554" textAnchor="middle" fill="#C4B5FD" fontSize="11" fontStyle="italic">
-        "Search the scriptures... they testify of me" — John 5:39
-      </text>
+      <text x="400" y="485" textAnchor="middle" fill="white" fontSize="15" fontWeight="700">Prophecy Room Insight</text>
+      <text x="400" y="510" textAnchor="middle" fill="#DDD6FE" fontSize="12">Isaiah 53 was written 700 years before Christ — no human could guess these details</text>
+      <text x="400" y="532" textAnchor="middle" fill="#DDD6FE" fontSize="12">Fulfilled prophecy = God's signature, proving Jesus is the promised Messiah</text>
+      <text x="400" y="554" textAnchor="middle" fill="#C4B5FD" fontSize="11" fontStyle="italic">"Search the scriptures... they testify of me" — John 5:39</text>
     </svg>
   );
 }
