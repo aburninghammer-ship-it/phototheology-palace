@@ -28,11 +28,18 @@ serve(async (req) => {
   }
 
   try {
-    const { theme } = await req.json();
+    const { theme, verse, inputMode } = await req.json();
 
-    if (!theme?.trim()) {
+    // Handle verse input - extract theme from verse
+    let effectiveTheme = theme?.trim();
+    let verseContext = "";
+
+    if (inputMode === "verse" && verse?.trim()) {
+      verseContext = `Based on the verse "${verse}", identify the central theological theme and trace it through Scripture. `;
+      effectiveTheme = verse.trim(); // Will be used in the prompt differently
+    } else if (!effectiveTheme) {
       return new Response(
-        JSON.stringify({ error: "Theme is required" }),
+        JSON.stringify({ error: "Theme or verse is required" }),
         { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
@@ -42,7 +49,11 @@ serve(async (req) => {
       throw new Error("LOVABLE_API_KEY is not configured");
     }
 
-    const systemPrompt = `You are an expert Bible scholar specializing in Phototheology. Your task is to trace the theme "${theme}" through ALL 66 books of the Bible.
+    const themeOrVerseInstruction = inputMode === "verse"
+      ? `First, read and understand the verse "${effectiveTheme}". Identify the CENTRAL theological theme of this verse (e.g., God's love, redemption, faith, covenant, etc.). Then trace that theme through ALL 66 books of the Bible.`
+      : `Your task is to trace the theme "${effectiveTheme}" through ALL 66 books of the Bible.`;
+
+    const systemPrompt = `You are an expert Bible scholar specializing in Phototheology. ${themeOrVerseInstruction}
 
 For each book, provide:
 1. A claim (max 14 words) stating how the theme appears in that book
@@ -56,7 +67,8 @@ Also provide:
 Return ONLY valid JSON in this exact format:
 {
   "id": "theme-slug",
-  "theme": "${theme}",
+  "theme": "The identified theme name",
+  "sourceVerse": "${inputMode === "verse" ? effectiveTheme : ""}",
   "description": "One sentence description",
   "difficulty": "intermediate",
   "constellation": "100-120 word synthesis...",
@@ -65,6 +77,10 @@ Return ONLY valid JSON in this exact format:
     ... (all 66 books)
   ]
 }`;
+
+    const userMessage = inputMode === "verse"
+      ? `Read the verse "${effectiveTheme}" and identify its central theme. Then trace that theme through all 66 books of the Bible. Be thorough and scholarly. Return ONLY the JSON, no markdown.`
+      : `Trace the theme "${effectiveTheme}" through all 66 books of the Bible. Be thorough and scholarly. Return ONLY the JSON, no markdown.`;
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
@@ -76,7 +92,7 @@ Return ONLY valid JSON in this exact format:
         model: "google/gemini-2.5-flash",
         messages: [
           { role: "system", content: systemPrompt },
-          { role: "user", content: `Trace the theme "${theme}" through all 66 books of the Bible. Be thorough and scholarly. Return ONLY the JSON, no markdown.` }
+          { role: "user", content: userMessage }
         ],
         temperature: 0.7,
       }),
@@ -127,11 +143,12 @@ Return ONLY valid JSON in this exact format:
       // Fill in missing books if needed
       if (themeData.books && themeData.books.length < 66) {
         const existingBooks = new Set(themeData.books.map((b: any) => b.book));
+        const themeLabel = themeData.theme || effectiveTheme;
         for (const book of BIBLE_BOOKS) {
           if (!existingBooks.has(book)) {
             themeData.books.push({
               book,
-              claim: `The theme of ${theme} echoes throughout ${book}`,
+              claim: `The theme of ${themeLabel} echoes throughout ${book}`,
               proofText: `${book} 1:1`,
               ptTags: ["CR"]
             });

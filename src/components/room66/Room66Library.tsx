@@ -39,6 +39,8 @@ export function Room66Library({ onClose }: Room66LibraryProps) {
 
   // Generation state
   const [themeInput, setThemeInput] = useState("");
+  const [verseInput, setVerseInput] = useState("");
+  const [inputMode, setInputMode] = useState<"theme" | "verse">("theme");
   const [generating, setGenerating] = useState(false);
   const [generatedTheme, setGeneratedTheme] = useState<Room66Theme | null>(null);
   const [generateMode, setGenerateMode] = useState<"ai" | "manual">("ai");
@@ -57,8 +59,10 @@ export function Room66Library({ onClose }: Room66LibraryProps) {
       : getRoom66ThemesByDifficulty(difficultyFilter);
 
   const handleGenerate = async () => {
-    if (!themeInput.trim()) {
-      toast.error("Please enter a theme to track");
+    const input = inputMode === "theme" ? themeInput.trim() : verseInput.trim();
+
+    if (!input) {
+      toast.error(inputMode === "theme" ? "Please enter a theme to track" : "Please enter a Bible verse");
       return;
     }
 
@@ -66,7 +70,9 @@ export function Room66Library({ onClose }: Room66LibraryProps) {
     try {
       const { data, error } = await supabase.functions.invoke("room-66-generate", {
         body: {
-          theme: themeInput.trim(),
+          theme: inputMode === "theme" ? input : undefined,
+          verse: inputMode === "verse" ? input : undefined,
+          inputMode,
           userId: user?.id
         }
       });
@@ -463,25 +469,66 @@ export function Room66Library({ onClose }: Room66LibraryProps) {
                       AI-Generated R66 Analysis
                     </h4>
                     <p className="text-sm text-muted-foreground mb-4">
-                      Enter any biblical theme. Jeeves will trace it through all 66 books of the Bible.
+                      {inputMode === "theme"
+                        ? "Enter any biblical theme. Jeeves will trace it through all 66 books of the Bible."
+                        : "Enter a Bible verse. Jeeves will extract the theme and trace it through all 66 books."
+                      }
                     </p>
 
                     <div className="space-y-4">
-                      <div>
-                        <label className="text-sm font-medium mb-2 block">
-                          Theme / Topic / Idea
-                        </label>
-                        <Textarea
-                          placeholder="E.g., 'The concept of grace', 'Fire imagery', 'God's faithfulness'..."
-                          value={themeInput}
-                          onChange={(e) => setThemeInput(e.target.value)}
-                          className="min-h-[80px]"
-                        />
+                      {/* Input Mode Toggle */}
+                      <div className="flex gap-2 p-1 bg-muted/50 rounded-lg">
+                        <Button
+                          variant={inputMode === "theme" ? "default" : "ghost"}
+                          size="sm"
+                          className={`flex-1 ${inputMode === "theme" ? "bg-purple-600 hover:bg-purple-700" : ""}`}
+                          onClick={() => setInputMode("theme")}
+                        >
+                          <Sparkles className="h-4 w-4 mr-2" />
+                          Theme / Topic
+                        </Button>
+                        <Button
+                          variant={inputMode === "verse" ? "default" : "ghost"}
+                          size="sm"
+                          className={`flex-1 ${inputMode === "verse" ? "bg-blue-600 hover:bg-blue-700" : ""}`}
+                          onClick={() => setInputMode("verse")}
+                        >
+                          <BookOpen className="h-4 w-4 mr-2" />
+                          Bible Verse
+                        </Button>
                       </div>
+
+                      {inputMode === "theme" ? (
+                        <div>
+                          <label className="text-sm font-medium mb-2 block">
+                            Theme / Topic / Idea
+                          </label>
+                          <Textarea
+                            placeholder="E.g., 'The concept of grace', 'Fire imagery', 'God's faithfulness'..."
+                            value={themeInput}
+                            onChange={(e) => setThemeInput(e.target.value)}
+                            className="min-h-[80px]"
+                          />
+                        </div>
+                      ) : (
+                        <div>
+                          <label className="text-sm font-medium mb-2 block">
+                            Bible Verse Reference
+                          </label>
+                          <Input
+                            placeholder="E.g., 'John 3:16', 'Psalm 23:1', 'Romans 8:28'..."
+                            value={verseInput}
+                            onChange={(e) => setVerseInput(e.target.value)}
+                          />
+                          <p className="text-xs text-muted-foreground mt-2">
+                            Jeeves will read this verse, identify its central theme, and trace it through all 66 books.
+                          </p>
+                        </div>
+                      )}
 
                       <Button
                         onClick={handleGenerate}
-                        disabled={generating || !themeInput.trim()}
+                        disabled={generating || (inputMode === "theme" ? !themeInput.trim() : !verseInput.trim())}
                         className="w-full bg-gradient-to-r from-purple-500 to-violet-600 hover:from-purple-600 hover:to-violet-700"
                       >
                         {generating ? (
@@ -500,20 +547,35 @@ export function Room66Library({ onClose }: Room66LibraryProps) {
                   </CardContent>
                 </Card>
 
-                {/* Example themes */}
+                {/* Quick suggestions based on mode */}
                 <div>
-                  <h4 className="text-sm font-medium mb-2">Quick Themes:</h4>
+                  <h4 className="text-sm font-medium mb-2">
+                    {inputMode === "theme" ? "Quick Themes:" : "Popular Verses:"}
+                  </h4>
                   <div className="flex flex-wrap gap-2">
-                    {["Fire", "Bread", "Garden", "Covenant", "Exile", "Worship", "Angels", "Names of God"].map((theme) => (
-                      <Badge
-                        key={theme}
-                        variant="outline"
-                        className="cursor-pointer hover:bg-accent"
-                        onClick={() => setThemeInput(theme)}
-                      >
-                        {theme}
-                      </Badge>
-                    ))}
+                    {inputMode === "theme" ? (
+                      ["Fire", "Bread", "Garden", "Covenant", "Exile", "Worship", "Angels", "Names of God"].map((theme) => (
+                        <Badge
+                          key={theme}
+                          variant="outline"
+                          className="cursor-pointer hover:bg-accent"
+                          onClick={() => setThemeInput(theme)}
+                        >
+                          {theme}
+                        </Badge>
+                      ))
+                    ) : (
+                      ["John 3:16", "Psalm 23:1", "Romans 8:28", "Jeremiah 29:11", "Philippians 4:13", "Isaiah 40:31", "Proverbs 3:5-6", "Matthew 6:33"].map((verse) => (
+                        <Badge
+                          key={verse}
+                          variant="outline"
+                          className="cursor-pointer hover:bg-accent"
+                          onClick={() => setVerseInput(verse)}
+                        >
+                          {verse}
+                        </Badge>
+                      ))
+                    )}
                   </div>
                 </div>
               </>
