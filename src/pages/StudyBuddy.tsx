@@ -227,9 +227,15 @@ export default function StudyBuddy() {
   const [jeevesLoading, setJeevesLoading] = useState(false);
   const [analysis, setAnalysis] = useState<JeevesAnalysis | null>(null);
   const [analysisHistory, setAnalysisHistory] = useState<string[]>([]);
+  const analysisHistoryRef = useRef<string[]>([]); // Ref to avoid stale closures
 
   // Tab state for Study vs Simmer
   const [activeTab, setActiveTab] = useState<"study" | "simmer">("study");
+
+  // Keep analysisHistoryRef in sync with state (for closures)
+  useEffect(() => {
+    analysisHistoryRef.current = analysisHistory;
+  }, [analysisHistory]);
 
   // Track processed verse references to avoid duplicates
   const processedRefsRef = useRef<Set<string>>(new Set());
@@ -447,7 +453,7 @@ export default function StudyBuddy() {
       const { data, error } = await supabase.functions.invoke("study-buddy", {
         body: {
           notes: trimmedNotes,
-          sessionHistory: analysisHistory.slice(-5), // Last 5 notes for context
+          sessionHistory: analysisHistoryRef.current.slice(-5), // Use ref to avoid stale closures
         },
       });
 
@@ -464,7 +470,7 @@ export default function StudyBuddy() {
     } finally {
       setJeevesLoading(false);
     }
-  }, [notes, selectedBook, selectedChapter, verses, analysisHistory, jeevesLoading]);
+  }, [notes, selectedBook, selectedChapter, verses, jeevesLoading]); // Using analysisHistoryRef instead of analysisHistory
 
   const navigateChapter = (direction: 'prev' | 'next') => {
     if (direction === 'prev') {
@@ -546,10 +552,22 @@ export default function StudyBuddy() {
   };
 
   const handleClearSession = async () => {
+    // CRITICAL: Cancel any pending analysis FIRST to prevent stale closure issues
+    if (analysisTimeoutRef.current) {
+      clearTimeout(analysisTimeoutRef.current);
+      analysisTimeoutRef.current = null;
+    }
+    if (versePopulateTimeoutRef.current) {
+      clearTimeout(versePopulateTimeoutRef.current);
+      versePopulateTimeoutRef.current = null;
+    }
+
+    // Now safely clear all state
     setNotes("");
     setSessionTitle("");
     setAnalysis(null);
     setAnalysisHistory([]);
+    analysisHistoryRef.current = []; // Clear ref immediately (state update is async)
     lastAnalyzedNotes.current = "";
     processedRefsRef.current.clear(); // Reset processed verse references
     setCurrentSessionId(null);
