@@ -133,14 +133,12 @@ const LiveStudyRoom = () => {
 
   const fetchUserProfile = async () => {
     const { data: profile } = await supabase
-      .from("profiles")
+      .from("profiles_public_info")
       .select("display_name, username")
       .eq("id", user!.id)
-      .single();
-    
-    if (profile) {
-      setUserDisplayName(profile.display_name || profile.username || "User");
-    }
+      .maybeSingle();
+
+    setUserDisplayName(profile?.display_name || profile?.username || "User");
   };
 
   const fetchRoomDetails = async () => {
