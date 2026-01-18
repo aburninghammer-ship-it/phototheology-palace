@@ -27,6 +27,17 @@ export default function QuickStartSuccess() {
   useEffect(() => {
     trackPurchaseCompleted("quick-start-guide", 17);
     
+    // Track Facebook Pixel Purchase event
+    if (typeof window !== 'undefined' && (window as any).fbq) {
+      (window as any).fbq('track', 'Purchase', {
+        value: 17.00,
+        currency: 'USD',
+        content_name: 'Quick-Start Guide',
+        content_type: 'product',
+        content_ids: ['quick-start-guide'],
+      });
+    }
+    
     // Send product email
     const sendProductEmail = async () => {
       const urlParams = new URLSearchParams(window.location.search);

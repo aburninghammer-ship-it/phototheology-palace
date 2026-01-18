@@ -31,6 +31,17 @@ export default function BibleProphecyGuideSuccess() {
   useEffect(() => {
     trackPurchaseCompleted("genesis-6-days", 9);
     
+    // Track Facebook Pixel Purchase event
+    if (typeof window !== 'undefined' && (window as any).fbq) {
+      (window as any).fbq('track', 'Purchase', {
+        value: 9.00,
+        currency: 'USD',
+        content_name: 'Genesis in 6 Days',
+        content_type: 'product',
+        content_ids: ['genesis-6-days'],
+      });
+    }
+    
     // Send product email - get email from URL params or skip
     const sendProductEmail = async () => {
       const urlParams = new URLSearchParams(window.location.search);
