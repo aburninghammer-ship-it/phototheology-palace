@@ -2,10 +2,12 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { BookOpen, Home, Info } from "lucide-react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { BookOpen, Home, Info, Brain, Search } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { Footer } from "@/components/Footer";
 import BibleRenderedDrill from "@/components/rooms/BibleRenderedDrill";
+import BibleRenderedBrowser from "@/components/rooms/BibleRenderedBrowser";
 import {
   Accordion,
   AccordionContent,
@@ -51,28 +53,33 @@ const BibleRenderedRoom = () => {
           </CardHeader>
           <CardContent className="space-y-4">
             <p className="text-sm text-muted-foreground">
-              The Bible Rendered system divides Scripture into 50 blocks of approximately 24 chapters each. 
+              The Bible Rendered system divides Scripture into 50 blocks of approximately 24 chapters each.
               Every block is captured by a single symbolic glyph that encodes its major theme:
             </p>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
+            <div className="grid grid-cols-2 md:grid-cols-5 gap-3 text-center">
               <div className="p-3 rounded-lg bg-background border">
-                <div className="text-3xl mb-1">÷</div>
-                <p className="text-xs font-medium">Genesis 1–24</p>
+                <div className="text-2xl mb-1">÷</div>
+                <p className="text-xs font-medium">Gen 1–24</p>
                 <p className="text-xs text-muted-foreground">Division</p>
               </div>
               <div className="p-3 rounded-lg bg-background border">
-                <div className="text-3xl mb-1">×</div>
-                <p className="text-xs font-medium">Genesis 25–50</p>
+                <div className="text-2xl mb-1">×</div>
+                <p className="text-xs font-medium">Gen 25–50</p>
                 <p className="text-xs text-muted-foreground">Multiplication</p>
               </div>
               <div className="p-3 rounded-lg bg-background border">
-                <div className="text-3xl mb-1">➤</div>
-                <p className="text-xs font-medium">Exodus 1–24</p>
+                <div className="text-2xl mb-1">🩸</div>
+                <p className="text-xs font-medium">Ex 1–24</p>
                 <p className="text-xs text-muted-foreground">Deliverance</p>
               </div>
               <div className="p-3 rounded-lg bg-background border">
-                <div className="text-3xl mb-1">🌅</div>
-                <p className="text-xs font-medium">Revelation 20–22</p>
+                <div className="text-2xl mb-1">✝</div>
+                <p className="text-xs font-medium">Luke–John</p>
+                <p className="text-xs text-muted-foreground">The Cross</p>
+              </div>
+              <div className="p-3 rounded-lg bg-background border bg-blue-50/50 dark:bg-blue-950/20">
+                <div className="text-2xl mb-1">🏙✨</div>
+                <p className="text-xs font-medium">Rev 17–22</p>
                 <p className="text-xs text-muted-foreground">Heaven</p>
               </div>
             </div>
@@ -82,8 +89,25 @@ const BibleRenderedRoom = () => {
           </CardContent>
         </Card>
 
-        {/* Main Drill Component */}
-        <BibleRenderedDrill />
+        {/* Main Content Tabs */}
+        <Tabs defaultValue="drill" className="space-y-4">
+          <TabsList className="grid w-full grid-cols-2">
+            <TabsTrigger value="drill" className="flex items-center gap-2">
+              <Brain className="h-4 w-4" />
+              Memorization Drill
+            </TabsTrigger>
+            <TabsTrigger value="browse" className="flex items-center gap-2">
+              <Search className="h-4 w-4" />
+              Browse Sets
+            </TabsTrigger>
+          </TabsList>
+          <TabsContent value="drill">
+            <BibleRenderedDrill />
+          </TabsContent>
+          <TabsContent value="browse">
+            <BibleRenderedBrowser />
+          </TabsContent>
+        </Tabs>
 
         {/* Room Info Accordion */}
         <Accordion type="single" collapsible className="bg-muted/30 rounded-lg">
