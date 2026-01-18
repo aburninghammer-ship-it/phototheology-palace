@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { Navigation } from "@/components/Navigation";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -7,6 +7,8 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Progress } from "@/components/ui/progress";
 import {
   ArrowLeft,
   BookOpen,
@@ -23,6 +25,13 @@ import {
   BookMarked,
   Maximize2,
   Minimize2,
+  Trophy,
+  Target,
+  Shuffle,
+  CheckCircle2,
+  XCircle,
+  Play,
+  BarChart3,
 } from "lucide-react";
 import {
   imageBibleBooks,
@@ -43,9 +52,10 @@ interface FlashcardProps {
   size?: "normal" | "large";
   memoryTestMode?: boolean;
   dynamicImageUrl?: string;
+  hideReference?: boolean;
 }
 
-function Flashcard({ chapter, isFlipped, onFlip, size = "normal", memoryTestMode = false, dynamicImageUrl }: FlashcardProps) {
+function Flashcard({ chapter, isFlipped, onFlip, size = "normal", memoryTestMode = false, dynamicImageUrl, hideReference = false }: FlashcardProps) {
   const isLarge = size === "large";
   const hasImage = !!(dynamicImageUrl || chapter.imageUrl);
 
@@ -60,7 +70,7 @@ function Flashcard({ chapter, isFlipped, onFlip, size = "normal", memoryTestMode
         transition={{ duration: 0.6, ease: "easeInOut" }}
         style={{ transformStyle: "preserve-3d" }}
       >
-        {/* Front - Image Only (no title/summary) */}
+        {/* Front - Image/Icon */}
         <div
           className={`absolute inset-0 backface-hidden rounded-2xl overflow-hidden shadow-2xl ${
             hasImage ? "bg-white dark:bg-slate-800" : "bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500"
@@ -74,67 +84,65 @@ function Flashcard({ chapter, isFlipped, onFlip, size = "normal", memoryTestMode
                 alt={`${chapter.book} ${chapter.chapter} - ${chapter.theme}`}
                 className="w-full h-full object-contain"
               />
-              {/* Minimal badge in corner */}
-              <div className="absolute bottom-4 left-4">
-                <Badge className="bg-black/60 text-white border-transparent text-sm px-3 py-1">
-                  {chapter.book} {chapter.chapter}
-                </Badge>
-              </div>
-              {/* Tap hint */}
+              {!hideReference && (
+                <div className="absolute bottom-4 left-4">
+                  <Badge className="bg-black/60 text-white border-transparent text-sm px-3 py-1">
+                    {chapter.book} {chapter.chapter}
+                  </Badge>
+                </div>
+              )}
               <div className="absolute bottom-4 right-4">
                 <span className="text-xs text-muted-foreground bg-white/80 dark:bg-black/60 dark:text-white/70 px-2 py-1 rounded">
                   Tap to see theme
                 </span>
               </div>
               {memoryTestMode && (
-                <div className="absolute bottom-4 left-0 right-0 text-center">
-                  <p className="text-white/70 text-sm bg-black/50 px-3 py-1 rounded-full inline-block">
-                    What chapter is this? Tap to reveal
+                <div className="absolute top-4 left-0 right-0 text-center">
+                  <p className="text-white text-lg bg-black/70 px-4 py-2 rounded-full inline-block font-semibold">
+                    What chapter is this?
                   </p>
                 </div>
               )}
             </div>
           ) : (
             <div className="w-full h-full p-6 flex flex-col items-center justify-center text-white">
-              <div className={`${isLarge ? "text-9xl" : "text-6xl"} mb-4`}>
+              <div className={`${isLarge ? "text-8xl" : "text-5xl"} mb-4`}>
                 {chapter.visualIcon}
               </div>
-              <Badge className="bg-white/20 text-white border-white/30 text-lg px-4 py-1 mb-2">
-                {chapter.book} {chapter.chapter}
-              </Badge>
+              {!hideReference && (
+                <Badge className="bg-white/20 text-white border-white/30 text-lg px-4 py-1 mb-2">
+                  {chapter.book} {chapter.chapter}
+                </Badge>
+              )}
               <p className="text-white/70 text-sm mt-2">Tap to see theme</p>
               {memoryTestMode && (
-                <p className="text-white/70 text-sm mt-4">What chapter is this? Tap to reveal</p>
+                <p className="text-white text-lg mt-4 font-semibold">What chapter is this?</p>
               )}
             </div>
           )}
         </div>
 
-        {/* Back - Title, Summary, and Image Connection */}
+        {/* Back - Theme and Summary */}
         <div
           className={`absolute inset-0 backface-hidden rounded-2xl bg-gradient-to-br from-amber-500 via-orange-500 to-red-500 p-6 flex flex-col text-white shadow-2xl`}
           style={{ backfaceVisibility: "hidden", transform: "rotateY(180deg)" }}
         >
-          {/* Header with just the chapter badge - NO emoji icon */}
           <div className="mb-4">
             <Badge className="bg-white/20 text-white border-white/30">
               {chapter.book} {chapter.chapter}
             </Badge>
           </div>
 
-          {/* Title */}
           <h3 className={`${isLarge ? "text-2xl" : "text-lg"} font-bold mb-3`}>
             {chapter.theme}
           </h3>
 
-          {/* Summary - explains the image and chapter connection */}
           <ScrollArea className="flex-1">
             <p className={`${isLarge ? "text-base" : "text-sm"} leading-relaxed opacity-90`}>
               {chapter.summary}
             </p>
           </ScrollArea>
 
-          {/* Key verse and memory hook */}
           <div className="mt-4 pt-4 border-t border-white/20">
             <div className="flex items-center gap-2 text-sm opacity-80 mb-2">
               <BookMarked className="h-4 w-4" />
@@ -177,15 +185,32 @@ function MiniCard({ chapter, onClick, isSelected }: MiniCardProps) {
   );
 }
 
+// Test Mode Types
+interface TestSession {
+  chapters: ChapterCard[];
+  currentIndex: number;
+  correct: number;
+  incorrect: number;
+  answers: { chapter: ChapterCard; correct: boolean }[];
+  isComplete: boolean;
+}
+
 export default function PhototheologyImageBible() {
   const navigate = useNavigate();
   const [selectedBook, setSelectedBook] = useState<BookData | null>(null);
   const [currentChapterIndex, setCurrentChapterIndex] = useState(0);
   const [isFlipped, setIsFlipped] = useState(false);
-  const [viewMode, setViewMode] = useState<"browse" | "study" | "grid">("browse");
+  const [viewMode, setViewMode] = useState<"browse" | "study" | "grid" | "test">("browse");
   const [searchQuery, setSearchQuery] = useState("");
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [memoryTestMode, setMemoryTestMode] = useState(false);
+
+  // Test Mode State
+  const [selectedBooksForTest, setSelectedBooksForTest] = useState<string[]>([]);
+  const [chapterRange, setChapterRange] = useState<{ start: number; end: number }>({ start: 1, end: 50 });
+  const [testSession, setTestSession] = useState<TestSession | null>(null);
+  const [testIsFlipped, setTestIsFlipped] = useState(false);
+  const [showTestSetup, setShowTestSetup] = useState(true);
 
   // Fetch dynamically generated images from storage
   const { data: imageMap } = useImageBibleImages();
@@ -241,6 +266,118 @@ export default function PhototheologyImageBible() {
     setCurrentChapterIndex(0);
     setIsFlipped(false);
   };
+
+  // Test Mode Functions
+  const toggleBookForTest = (bookName: string) => {
+    setSelectedBooksForTest(prev =>
+      prev.includes(bookName)
+        ? prev.filter(b => b !== bookName)
+        : [...prev, bookName]
+    );
+  };
+
+  const selectAllBooks = () => {
+    setSelectedBooksForTest(imageBibleBooks.map(b => b.name));
+  };
+
+  const selectOTBooks = () => {
+    setSelectedBooksForTest(imageBibleBooks.filter(b => b.testament === "OT").map(b => b.name));
+  };
+
+  const selectNTBooks = () => {
+    setSelectedBooksForTest(imageBibleBooks.filter(b => b.testament === "NT").map(b => b.name));
+  };
+
+  const clearBookSelection = () => {
+    setSelectedBooksForTest([]);
+  };
+
+  const shuffleArray = <T,>(array: T[]): T[] => {
+    const shuffled = [...array];
+    for (let i = shuffled.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+    }
+    return shuffled;
+  };
+
+  const startTest = (shuffle: boolean = true) => {
+    // Gather chapters from selected books
+    let chapters: ChapterCard[] = [];
+
+    selectedBooksForTest.forEach(bookName => {
+      const book = imageBibleBooks.find(b => b.name === bookName);
+      if (book) {
+        // Apply chapter range filter
+        const filteredChapters = book.chapters.filter(
+          c => c.chapter >= chapterRange.start && c.chapter <= chapterRange.end
+        );
+        chapters = [...chapters, ...filteredChapters];
+      }
+    });
+
+    if (chapters.length === 0) return;
+
+    // Shuffle if requested
+    const testChapters = shuffle ? shuffleArray(chapters) : chapters;
+
+    setTestSession({
+      chapters: testChapters,
+      currentIndex: 0,
+      correct: 0,
+      incorrect: 0,
+      answers: [],
+      isComplete: false,
+    });
+    setTestIsFlipped(false);
+    setShowTestSetup(false);
+  };
+
+  const markTestAnswer = (correct: boolean) => {
+    if (!testSession) return;
+
+    const currentTestChapter = testSession.chapters[testSession.currentIndex];
+    const newAnswers = [...testSession.answers, { chapter: currentTestChapter, correct }];
+    const isLastQuestion = testSession.currentIndex >= testSession.chapters.length - 1;
+
+    setTestSession({
+      ...testSession,
+      correct: correct ? testSession.correct + 1 : testSession.correct,
+      incorrect: correct ? testSession.incorrect : testSession.incorrect + 1,
+      answers: newAnswers,
+      currentIndex: isLastQuestion ? testSession.currentIndex : testSession.currentIndex + 1,
+      isComplete: isLastQuestion,
+    });
+    setTestIsFlipped(false);
+  };
+
+  const nextTestQuestion = () => {
+    if (!testSession || testSession.currentIndex >= testSession.chapters.length - 1) return;
+    setTestSession({
+      ...testSession,
+      currentIndex: testSession.currentIndex + 1,
+    });
+    setTestIsFlipped(false);
+  };
+
+  const resetTest = () => {
+    setTestSession(null);
+    setShowTestSetup(true);
+    setTestIsFlipped(false);
+  };
+
+  const testChaptersCount = useMemo(() => {
+    let count = 0;
+    selectedBooksForTest.forEach(bookName => {
+      const book = imageBibleBooks.find(b => b.name === bookName);
+      if (book) {
+        count += book.chapters.filter(
+          c => c.chapter >= chapterRange.start && c.chapter <= chapterRange.end
+        ).length;
+      }
+    });
+    return count;
+  }, [selectedBooksForTest, chapterRange]);
 
   // Fullscreen study view
   if (viewMode === "study" && isFullscreen && currentChapter) {
@@ -346,7 +483,7 @@ export default function PhototheologyImageBible() {
 
         {/* View Mode Tabs */}
         <Tabs value={viewMode} onValueChange={(v) => setViewMode(v as typeof viewMode)} className="mb-6">
-          <TabsList className="grid w-full max-w-md grid-cols-3">
+          <TabsList className="grid w-full max-w-lg grid-cols-4">
             <TabsTrigger value="browse" className="flex items-center gap-2">
               <Layers className="h-4 w-4" />
               Browse
@@ -358,6 +495,10 @@ export default function PhototheologyImageBible() {
             <TabsTrigger value="grid" className="flex items-center gap-2">
               <Grid3X3 className="h-4 w-4" />
               At a Glance
+            </TabsTrigger>
+            <TabsTrigger value="test" className="flex items-center gap-2">
+              <Target className="h-4 w-4" />
+              Test
             </TabsTrigger>
           </TabsList>
         </Tabs>
@@ -422,14 +563,14 @@ export default function PhototheologyImageBible() {
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
-                    {/* Preview of first 6 chapters */}
+                    {/* Preview of first 6 chapters with FULL emoji icons */}
                     <div className="grid grid-cols-6 gap-2 mb-4">
                       {book.chapters.slice(0, 6).map((chapter) => {
                         const imageUrl = getChapterImageUrl(imageMap, chapter.book, chapter.chapter);
                         return (
                           <div
                             key={chapter.chapter}
-                            className="aspect-square bg-gradient-to-br from-purple-100 to-pink-100 dark:from-purple-900/30 dark:to-pink-900/30 rounded-lg flex items-center justify-center text-2xl overflow-hidden"
+                            className="aspect-square bg-gradient-to-br from-purple-100 to-pink-100 dark:from-purple-900/30 dark:to-pink-900/30 rounded-lg flex items-center justify-center overflow-hidden"
                             title={`${chapter.book} ${chapter.chapter}: ${chapter.theme}`}
                           >
                             {imageUrl ? (
@@ -439,7 +580,7 @@ export default function PhototheologyImageBible() {
                                 className="w-full h-full object-cover"
                               />
                             ) : (
-                              <span className="text-lg">{[...chapter.visualIcon][0]}</span>
+                              <span className="text-xl">{chapter.visualIcon}</span>
                             )}
                           </div>
                         );
@@ -588,7 +729,7 @@ export default function PhototheologyImageBible() {
           </div>
         )}
 
-        {/* Grid View - At a Glance */}
+        {/* Grid View - At a Glance with FULL emoji icons */}
         {viewMode === "grid" && (
           <div className="space-y-8">
             {imageBibleBooks.map((book) => (
@@ -601,14 +742,14 @@ export default function PhototheologyImageBible() {
                   {book.chapters.map((chapter) => (
                     <div
                       key={`${book.name}-${chapter.chapter}`}
-                      className="aspect-square bg-gradient-to-br from-purple-100 to-pink-100 dark:from-purple-900/30 dark:to-pink-900/30 rounded-lg flex flex-col items-center justify-center cursor-pointer hover:scale-110 transition-transform hover:shadow-lg group relative"
+                      className="aspect-square bg-gradient-to-br from-purple-100 to-pink-100 dark:from-purple-900/30 dark:to-pink-900/30 rounded-lg flex flex-col items-center justify-center cursor-pointer hover:scale-110 transition-transform hover:shadow-lg group relative p-1"
                       onClick={() => selectChapter(chapter)}
                       title={`${chapter.book} ${chapter.chapter}: ${chapter.theme}`}
                     >
-                      <span className="text-2xl group-hover:scale-110 transition-transform">
-                        {[...chapter.visualIcon][0]}
+                      <span className="text-xl sm:text-2xl group-hover:scale-110 transition-transform leading-none">
+                        {chapter.visualIcon}
                       </span>
-                      <span className="text-xs font-medium mt-1">{chapter.chapter}</span>
+                      <span className="text-[10px] sm:text-xs font-medium mt-0.5">{chapter.chapter}</span>
 
                       {/* Tooltip on hover */}
                       <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-2 bg-slate-900 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-10 pointer-events-none">
@@ -623,21 +764,311 @@ export default function PhototheologyImageBible() {
           </div>
         )}
 
-        {/* Tips Card */}
-        <Card className="mt-8 bg-blue-50 dark:bg-blue-900/20">
-          <CardContent className="pt-6">
-            <h4 className="font-semibold mb-2 flex items-center gap-2">
-              <Brain className="h-5 w-5 text-blue-500" />
-              Memory Tips
-            </h4>
-            <ul className="text-sm text-muted-foreground space-y-1">
-              <li>Each chapter has a unique visual icon - no two chapters look alike!</li>
-              <li>Study the icon first, then flip to learn the theme and summary</li>
-              <li>Use the "At a Glance" view to quickly scan entire books</li>
-              <li>The memory hook gives you a quick phrase to recall the chapter</li>
-            </ul>
-          </CardContent>
-        </Card>
+        {/* Test Mode */}
+        {viewMode === "test" && (
+          <div className="space-y-6">
+            {showTestSetup && !testSession && (
+              <>
+                {/* Test Setup */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="text-2xl flex items-center gap-3">
+                      <Target className="h-7 w-7 text-primary" />
+                      Test Your Memory
+                    </CardTitle>
+                    <CardDescription>
+                      Select books and chapters to create a custom flashcard test. See the image or icon, then recall the chapter!
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-6">
+                    {/* Quick Selection Buttons */}
+                    <div className="flex flex-wrap gap-2">
+                      <Button variant="outline" size="sm" onClick={selectAllBooks}>
+                        Select All
+                      </Button>
+                      <Button variant="outline" size="sm" onClick={selectOTBooks}>
+                        Old Testament
+                      </Button>
+                      <Button variant="outline" size="sm" onClick={selectNTBooks}>
+                        New Testament
+                      </Button>
+                      <Button variant="outline" size="sm" onClick={clearBookSelection}>
+                        Clear All
+                      </Button>
+                    </div>
+
+                    {/* Book Selection Grid */}
+                    <div>
+                      <h4 className="font-semibold mb-3">Select Books:</h4>
+                      <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-2">
+                        {imageBibleBooks.map((book) => (
+                          <div
+                            key={book.name}
+                            className={`p-2 rounded-lg border cursor-pointer transition-all text-center ${
+                              selectedBooksForTest.includes(book.name)
+                                ? "bg-primary/10 border-primary"
+                                : "bg-background hover:bg-muted"
+                            }`}
+                            onClick={() => toggleBookForTest(book.name)}
+                          >
+                            <div className="flex items-center justify-center gap-1 mb-1">
+                              <Checkbox
+                                checked={selectedBooksForTest.includes(book.name)}
+                                className="pointer-events-none"
+                              />
+                            </div>
+                            <div className="text-xs font-medium truncate">{book.name}</div>
+                            <div className="text-[10px] text-muted-foreground">{book.totalChapters} ch</div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Chapter Range */}
+                    <div>
+                      <h4 className="font-semibold mb-3">Chapter Range (optional):</h4>
+                      <div className="flex items-center gap-4">
+                        <div className="flex items-center gap-2">
+                          <span className="text-sm text-muted-foreground">From:</span>
+                          <Input
+                            type="number"
+                            min={1}
+                            max={150}
+                            value={chapterRange.start}
+                            onChange={(e) => setChapterRange({ ...chapterRange, start: parseInt(e.target.value) || 1 })}
+                            className="w-20"
+                          />
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <span className="text-sm text-muted-foreground">To:</span>
+                          <Input
+                            type="number"
+                            min={1}
+                            max={150}
+                            value={chapterRange.end}
+                            onChange={(e) => setChapterRange({ ...chapterRange, end: parseInt(e.target.value) || 150 })}
+                            className="w-20"
+                          />
+                        </div>
+                      </div>
+                      <p className="text-xs text-muted-foreground mt-2">
+                        Limits which chapter numbers are included from each selected book.
+                      </p>
+                    </div>
+
+                    {/* Test Info */}
+                    <div className="p-4 rounded-lg bg-muted/50">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="font-medium">Test Summary</p>
+                          <p className="text-sm text-muted-foreground">
+                            {selectedBooksForTest.length} books selected • {testChaptersCount} total chapters
+                          </p>
+                        </div>
+                        <div className="flex gap-2">
+                          <Button
+                            onClick={() => startTest(true)}
+                            disabled={testChaptersCount === 0}
+                            className="gap-2"
+                          >
+                            <Shuffle className="h-4 w-4" />
+                            Start Shuffled
+                          </Button>
+                          <Button
+                            onClick={() => startTest(false)}
+                            disabled={testChaptersCount === 0}
+                            variant="outline"
+                            className="gap-2"
+                          >
+                            <Play className="h-4 w-4" />
+                            Start In Order
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                {/* Test Tips */}
+                <Card className="bg-amber-50 dark:bg-amber-900/20">
+                  <CardContent className="pt-6">
+                    <h4 className="font-semibold mb-2 flex items-center gap-2">
+                      <Brain className="h-5 w-5 text-amber-600" />
+                      Test Tips
+                    </h4>
+                    <ul className="text-sm text-muted-foreground space-y-1">
+                      <li>Look at the image/icons and try to recall the book and chapter</li>
+                      <li>Tap the card to reveal the answer</li>
+                      <li>Mark yourself correct or incorrect to track your progress</li>
+                      <li>Review your results at the end to see areas for improvement</li>
+                    </ul>
+                  </CardContent>
+                </Card>
+              </>
+            )}
+
+            {/* Active Test */}
+            {testSession && !testSession.isComplete && (
+              <div className="space-y-6">
+                {/* Progress Header */}
+                <Card>
+                  <CardContent className="py-4">
+                    <div className="flex items-center justify-between mb-2">
+                      <div className="flex items-center gap-4">
+                        <Badge variant="outline" className="text-lg px-3 py-1">
+                          {testSession.currentIndex + 1} / {testSession.chapters.length}
+                        </Badge>
+                        <div className="flex items-center gap-2 text-sm">
+                          <CheckCircle2 className="h-4 w-4 text-green-500" />
+                          <span className="text-green-600 font-medium">{testSession.correct}</span>
+                          <XCircle className="h-4 w-4 text-red-500 ml-2" />
+                          <span className="text-red-600 font-medium">{testSession.incorrect}</span>
+                        </div>
+                      </div>
+                      <Button variant="outline" size="sm" onClick={resetTest}>
+                        End Test
+                      </Button>
+                    </div>
+                    <Progress
+                      value={(testSession.currentIndex / testSession.chapters.length) * 100}
+                      className="h-2"
+                    />
+                  </CardContent>
+                </Card>
+
+                {/* Test Flashcard */}
+                <div className="max-w-lg mx-auto">
+                  <Flashcard
+                    chapter={testSession.chapters[testSession.currentIndex]}
+                    isFlipped={testIsFlipped}
+                    onFlip={() => setTestIsFlipped(!testIsFlipped)}
+                    size="large"
+                    memoryTestMode={!testIsFlipped}
+                    hideReference={!testIsFlipped}
+                    dynamicImageUrl={getChapterImageUrl(
+                      imageMap,
+                      testSession.chapters[testSession.currentIndex].book,
+                      testSession.chapters[testSession.currentIndex].chapter
+                    )}
+                  />
+                </div>
+
+                {/* Test Controls */}
+                <div className="flex items-center justify-center gap-4">
+                  {!testIsFlipped ? (
+                    <Button onClick={() => setTestIsFlipped(true)} size="lg" className="px-8">
+                      <RotateCcw className="h-5 w-5 mr-2" />
+                      Reveal Answer
+                    </Button>
+                  ) : (
+                    <>
+                      <Button
+                        onClick={() => markTestAnswer(false)}
+                        variant="outline"
+                        size="lg"
+                        className="border-red-300 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20"
+                      >
+                        <XCircle className="h-5 w-5 mr-2" />
+                        Incorrect
+                      </Button>
+                      <Button
+                        onClick={() => markTestAnswer(true)}
+                        size="lg"
+                        className="bg-green-600 hover:bg-green-700"
+                      >
+                        <CheckCircle2 className="h-5 w-5 mr-2" />
+                        Correct
+                      </Button>
+                    </>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {/* Test Results */}
+            {testSession?.isComplete && (
+              <div className="space-y-6">
+                <Card className="bg-gradient-to-br from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20">
+                  <CardContent className="py-8 text-center">
+                    <Trophy className="h-16 w-16 mx-auto mb-4 text-amber-500" />
+                    <h2 className="text-3xl font-bold mb-2">Test Complete!</h2>
+                    <div className="flex items-center justify-center gap-6 mt-4">
+                      <div className="text-center">
+                        <div className="text-4xl font-bold text-green-600">{testSession.correct}</div>
+                        <div className="text-sm text-muted-foreground">Correct</div>
+                      </div>
+                      <div className="text-center">
+                        <div className="text-4xl font-bold text-red-600">{testSession.incorrect}</div>
+                        <div className="text-sm text-muted-foreground">Incorrect</div>
+                      </div>
+                      <div className="text-center">
+                        <div className="text-4xl font-bold text-primary">
+                          {Math.round((testSession.correct / testSession.chapters.length) * 100)}%
+                        </div>
+                        <div className="text-sm text-muted-foreground">Score</div>
+                      </div>
+                    </div>
+                    <div className="flex items-center justify-center gap-4 mt-6">
+                      <Button onClick={resetTest} variant="outline" size="lg">
+                        New Test
+                      </Button>
+                      <Button onClick={() => startTest(true)} size="lg">
+                        <RotateCcw className="h-4 w-4 mr-2" />
+                        Retry Same Test
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                {/* Missed Questions */}
+                {testSession.answers.filter(a => !a.correct).length > 0 && (
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="flex items-center gap-2">
+                        <BarChart3 className="h-5 w-5" />
+                        Review Missed Questions
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3">
+                        {testSession.answers
+                          .filter(a => !a.correct)
+                          .map((answer, idx) => (
+                            <div
+                              key={idx}
+                              className="p-3 rounded-lg bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-center"
+                            >
+                              <div className="text-3xl mb-2">{answer.chapter.visualIcon}</div>
+                              <div className="text-sm font-medium">{answer.chapter.book} {answer.chapter.chapter}</div>
+                              <div className="text-xs text-muted-foreground truncate">{answer.chapter.theme}</div>
+                            </div>
+                          ))}
+                      </div>
+                    </CardContent>
+                  </Card>
+                )}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Tips Card (not shown in test mode) */}
+        {viewMode !== "test" && (
+          <Card className="mt-8 bg-blue-50 dark:bg-blue-900/20">
+            <CardContent className="pt-6">
+              <h4 className="font-semibold mb-2 flex items-center gap-2">
+                <Brain className="h-5 w-5 text-blue-500" />
+                Memory Tips
+              </h4>
+              <ul className="text-sm text-muted-foreground space-y-1">
+                <li>Each chapter has a unique visual icon - no two chapters look alike!</li>
+                <li>Study the icon first, then flip to learn the theme and summary</li>
+                <li>Use the "At a Glance" view to quickly scan entire books</li>
+                <li>Use "Test" mode to quiz yourself on chapter recognition</li>
+              </ul>
+            </CardContent>
+          </Card>
+        )}
       </main>
     </div>
   );
