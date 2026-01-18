@@ -112,17 +112,13 @@ export default defineConfig(({ mode }) => ({
         entryFileNames: 'assets/js/[name]-[hash].js',
         assetFileNames: 'assets/[name]-[hash][extname]',
         manualChunks(id) {
-          // IMPORTANT: Charts and d3 must be bundled together to avoid TDZ errors (build trigger v2)
-          // Check this FIRST to ensure recharts and all d3 deps stay together
-          if (
-            id.includes('node_modules/recharts') || 
-            id.includes('node_modules/d3-') ||
-            id.includes('node_modules/internmap') ||
-            id.includes('node_modules/victory-vendor')
-          ) {
-            return 'charts';
-          }
+          // NOTE: recharts and d3 are intentionally NOT manually chunked
+          // to let Rollup handle their dependency graph automatically and avoid TDZ errors
+          
           // Vendor chunks
+          if (id.includes('node_modules/react-dom') || id.includes('node_modules/react-router-dom')) {
+            return 'vendor';
+          }
           if (id.includes('node_modules/react-dom') || id.includes('node_modules/react-router-dom')) {
             return 'vendor';
           }
@@ -155,7 +151,8 @@ export default defineConfig(({ mode }) => ({
       },
     },
     chunkSizeWarningLimit: 1000,
-    // Using esbuild minification avoids rare TDZ issues seen with terser + recharts/d3 bundling
+    // FIX: Removed manual chunking for recharts/d3 to let Rollup handle dependency order
+    // This avoids TDZ (Cannot access 'e' before initialization) errors
     minify: 'esbuild',
     esbuild: {
       drop: ['console', 'debugger'],
