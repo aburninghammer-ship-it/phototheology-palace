@@ -8,10 +8,11 @@ import { SimmerSessionList } from "@/components/simmer/SimmerSessionList";
 import { SimmerNewSession } from "@/components/simmer/SimmerNewSession";
 import { SimmerJeevesChat } from "@/components/simmer/SimmerJeevesChat";
 import { IdeaStartersTab } from "@/components/simmer/IdeaStartersTab";
+import { MyIdeaTab } from "@/components/simmer/MyIdeaTab";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Flame, Plus, Archive, Settings, MessageCircle, Lightbulb } from "lucide-react";
+import { Flame, Plus, Archive, Settings, MessageCircle, Lightbulb, PenLine } from "lucide-react";
 import { motion } from "framer-motion";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -138,11 +139,18 @@ export default function SermonSimmer() {
             <Flame className="w-12 h-12 text-orange-400 animate-pulse" />
           </div>
         ) : session ? (
-          <Tabs defaultValue="ideas" className="space-y-6">
+          <Tabs defaultValue="myidea" className="space-y-6">
             <TabsList className="bg-black/30 border border-orange-500/20">
               <TabsTrigger 
-                value="ideas" 
+                value="myidea" 
                 className="data-[state=active]:bg-white data-[state=active]:text-purple-900 text-orange-200"
+              >
+                <PenLine className="w-4 h-4 mr-2" />
+                My Idea
+              </TabsTrigger>
+              <TabsTrigger 
+                value="ideas" 
+                className="data-[state=active]:bg-orange-500 data-[state=active]:text-white text-orange-200"
               >
                 <Lightbulb className="w-4 h-4 mr-2" />
                 Idea Starters
@@ -176,6 +184,10 @@ export default function SermonSimmer() {
                 All Sessions
               </TabsTrigger>
             </TabsList>
+
+            <TabsContent value="myidea">
+              <MyIdeaTab />
+            </TabsContent>
 
             <TabsContent value="ideas">
               <IdeaStartersTab />
