@@ -89,6 +89,9 @@ export default defineConfig(({ mode }) => ({
       "@": path.resolve(__dirname, "./src"),
     },
   },
+  optimizeDeps: {
+    include: ['recharts', 'recharts-scale', 'd3-scale', 'd3-shape', 'd3-path'],
+  },
   build: {
     cssCodeSplit: true,
     rollupOptions: {
@@ -116,9 +119,9 @@ export default defineConfig(({ mode }) => ({
           if (id.includes('node_modules/pdfjs-dist')) {
             return 'pdf';
           }
-          // Charts library
-          if (id.includes('node_modules/recharts')) {
-            return 'charts';
+          // Charts library - bundle with vendor to avoid initialization errors
+          if (id.includes('node_modules/recharts') || id.includes('node_modules/d3')) {
+            return 'vendor';
           }
           // Large data files - separate chunk for each
           if (id.includes('/data/palaceData')) {
