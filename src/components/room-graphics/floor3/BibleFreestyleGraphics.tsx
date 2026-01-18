@@ -5,86 +5,113 @@ export function BibleFreestyleFlowchart() {
   return (
     <svg viewBox="0 0 800 500" className="w-full h-auto" xmlns="http://www.w3.org/2000/svg">
       <defs>
+        <linearGradient id="bf-bg" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stopColor="#EFF6FF" />
+          <stop offset="50%" stopColor="#DBEAFE" />
+          <stop offset="100%" stopColor="#BFDBFE" />
+        </linearGradient>
         <linearGradient id="bf-grad" x1="0%" y1="0%" x2="100%" y2="100%">
           <stop offset="0%" stopColor="#3B82F6" />
           <stop offset="100%" stopColor="#2563EB" />
         </linearGradient>
+        <linearGradient id="bf-header" x1="0%" y1="0%" x2="100%" y2="0%">
+          <stop offset="0%" stopColor="#3B82F6" />
+          <stop offset="100%" stopColor="#1E40AF" />
+        </linearGradient>
+        <filter id="bf-shadow" x="-20%" y="-20%" width="140%" height="140%">
+          <feDropShadow dx="0" dy="4" stdDeviation="6" floodOpacity="0.1"/>
+        </filter>
+        <filter id="bf-glow" x="-50%" y="-50%" width="200%" height="200%">
+          <feGaussianBlur stdDeviation="3" result="blur"/>
+          <feMerge>
+            <feMergeNode in="blur"/>
+            <feMergeNode in="SourceGraphic"/>
+          </feMerge>
+        </filter>
+        <marker id="arrow-bf" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+          <path d="M0,0 L0,6 L9,3 z" fill="#3B82F6" />
+        </marker>
       </defs>
 
-      <rect width="800" height="500" fill="#EFF6FF" rx="16" />
+      <rect width="800" height="500" fill="url(#bf-bg)" rx="16" />
 
-      <text x="400" y="40" textAnchor="middle" fill="#1E40AF" fontSize="24" fontWeight="bold">
+      <text x="400" y="40" textAnchor="middle" fill="#1E40AF" fontSize="24" fontWeight="bold" letterSpacing="0.5">
         Bible Freestyle: Spontaneous Scripture Connection
       </text>
 
       {/* Flow: Verse → Meditation → Expansion */}
       <g transform="translate(50, 70)">
         {/* Starting Verse */}
-        <circle cx="120" cy="100" r="80" fill="url(#bf-grad)" />
-        <text x="120" y="85" textAnchor="middle" fill="white" fontSize="36">📖</text>
-        <text x="120" y="115" textAnchor="middle" fill="white" fontSize="14" fontWeight="bold">ANY VERSE</text>
-        <text x="120" y="135" textAnchor="middle" fill="#BFDBFE" fontSize="11">Start Point</text>
+        <g filter="url(#bf-glow)">
+          <circle cx="120" cy="100" r="80" fill="url(#bf-grad)" />
+          <text x="120" y="85" textAnchor="middle" fill="white" fontSize="36">📖</text>
+          <text x="120" y="115" textAnchor="middle" fill="white" fontSize="14" fontWeight="bold">ANY VERSE</text>
+          <text x="120" y="135" textAnchor="middle" fill="#BFDBFE" fontSize="11">Start Point</text>
+        </g>
 
         {/* Arrow */}
         <path d="M210 100 L290 100" stroke="#3B82F6" strokeWidth="4" fill="none" markerEnd="url(#arrow-bf)" />
-        <defs>
-          <marker id="arrow-bf" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
-            <path d="M0,0 L0,6 L9,3 z" fill="#3B82F6" />
-          </marker>
-        </defs>
 
         {/* Free Association */}
-        <circle cx="380" cy="100" r="80" fill="#A855F7" />
-        <text x="380" y="85" textAnchor="middle" fill="white" fontSize="36">💭</text>
-        <text x="380" y="115" textAnchor="middle" fill="white" fontSize="14" fontWeight="bold">FREE FLOW</text>
-        <text x="380" y="135" textAnchor="middle" fill="#E9D5FF" fontSize="11">Associations</text>
+        <g filter="url(#bf-glow)">
+          <circle cx="380" cy="100" r="80" fill="#A855F7" />
+          <text x="380" y="85" textAnchor="middle" fill="white" fontSize="36">💭</text>
+          <text x="380" y="115" textAnchor="middle" fill="white" fontSize="14" fontWeight="bold">FREE FLOW</text>
+          <text x="380" y="135" textAnchor="middle" fill="#E9D5FF" fontSize="11">Associations</text>
+        </g>
 
         {/* Arrow */}
         <path d="M470 100 L550 100" stroke="#3B82F6" strokeWidth="4" fill="none" markerEnd="url(#arrow-bf)" />
 
         {/* Connected Insights */}
-        <circle cx="640" cy="100" r="80" fill="#10B981" />
-        <text x="640" y="85" textAnchor="middle" fill="white" fontSize="36">✨</text>
-        <text x="640" y="115" textAnchor="middle" fill="white" fontSize="14" fontWeight="bold">INSIGHT</text>
-        <text x="640" y="135" textAnchor="middle" fill="#A7F3D0" fontSize="11">New Truth</text>
+        <g filter="url(#bf-glow)">
+          <circle cx="640" cy="100" r="80" fill="#10B981" />
+          <text x="640" y="85" textAnchor="middle" fill="white" fontSize="36">✨</text>
+          <text x="640" y="115" textAnchor="middle" fill="white" fontSize="14" fontWeight="bold">INSIGHT</text>
+          <text x="640" y="135" textAnchor="middle" fill="#A7F3D0" fontSize="11">New Truth</text>
+        </g>
       </g>
 
       {/* Method Steps */}
-      <rect x="50" y="220" width="700" height="130" rx="12" fill="white" stroke="#3B82F6" strokeWidth="2" />
-      <text x="400" y="250" textAnchor="middle" fill="#1E40AF" fontSize="16" fontWeight="bold">
-        The Bible Freestyle Method
-      </text>
+      <g filter="url(#bf-shadow)">
+        <rect x="50" y="220" width="700" height="130" rx="12" fill="white" fillOpacity="0.95" stroke="#3B82F6" strokeWidth="2" />
+        <text x="400" y="250" textAnchor="middle" fill="#1E40AF" fontSize="16" fontWeight="bold">
+          The Bible Freestyle Method
+        </text>
 
-      <g transform="translate(70, 270)">
-        {[
-          { step: '1', text: 'Land: Pick any verse as starting point', icon: '🎯' },
-          { step: '2', text: 'Launch: What word, phrase, or idea jumps out?', icon: '🚀' },
-          { step: '3', text: 'Link: Where else does this appear in Scripture?', icon: '🔗' },
-          { step: '4', text: 'Land: What new insight emerges?', icon: '💡' },
-        ].map((item, i) => (
-          <g key={i} transform={`translate(${i * 165}, 0)`}>
-            <circle cx="20" cy="25" r="20" fill="#3B82F6" />
-            <text x="20" y="30" textAnchor="middle" fill="white" fontSize="14" fontWeight="bold">{item.step}</text>
-            <text x="20" y="55" textAnchor="middle" fontSize="18">{item.icon}</text>
-            <text x="20" y="75" textAnchor="middle" fill="#1E40AF" fontSize="9">{item.text}</text>
-          </g>
-        ))}
+        <g transform="translate(70, 270)">
+          {[
+            { step: '1', text: 'Land: Pick any verse as starting point', icon: '🎯' },
+            { step: '2', text: 'Launch: What word, phrase, or idea jumps out?', icon: '🚀' },
+            { step: '3', text: 'Link: Where else does this appear in Scripture?', icon: '🔗' },
+            { step: '4', text: 'Land: What new insight emerges?', icon: '💡' },
+          ].map((item, i) => (
+            <g key={i} transform={`translate(${i * 165}, 0)`}>
+              <circle cx="20" cy="25" r="20" fill="url(#bf-grad)" filter="url(#bf-glow)" />
+              <text x="20" y="30" textAnchor="middle" fill="white" fontSize="14" fontWeight="bold">{item.step}</text>
+              <text x="20" y="55" textAnchor="middle" fontSize="18">{item.icon}</text>
+              <text x="20" y="75" textAnchor="middle" fill="#1E40AF" fontSize="9">{item.text}</text>
+            </g>
+          ))}
+        </g>
       </g>
 
       {/* Key Principle */}
-      <rect x="50" y="370" width="700" height="110" rx="12" fill="#DBEAFE" stroke="#3B82F6" strokeWidth="2" />
-      <text x="400" y="400" textAnchor="middle" fill="#1E40AF" fontSize="16" fontWeight="bold">
-        The Meditation Principle
-      </text>
-      <text x="400" y="425" textAnchor="middle" fill="#1D4ED8" fontSize="13">
-        "His delight is in the law of the LORD; and in his law doth he meditate day and night" (Ps 1:2)
-      </text>
-      <text x="400" y="450" textAnchor="middle" fill="#2563EB" fontSize="12">
-        Meditation = chewing, turning over, following threads wherever they lead
-      </text>
-      <text x="400" y="470" textAnchor="middle" fill="#1E40AF" fontSize="11" fontStyle="italic">
-        Bible Freestyle is structured spontaneity — free but fruitful exploration
-      </text>
+      <g filter="url(#bf-shadow)">
+        <rect x="50" y="370" width="700" height="110" rx="12" fill="#DBEAFE" fillOpacity="0.9" stroke="#3B82F6" strokeWidth="2" />
+        <text x="400" y="400" textAnchor="middle" fill="#1E40AF" fontSize="16" fontWeight="bold">
+          The Meditation Principle
+        </text>
+        <text x="400" y="425" textAnchor="middle" fill="#1D4ED8" fontSize="13">
+          "His delight is in the law of the LORD; and in his law doth he meditate day and night" (Ps 1:2)
+        </text>
+        <text x="400" y="450" textAnchor="middle" fill="#2563EB" fontSize="12">
+          Meditation = chewing, turning over, following threads wherever they lead
+        </text>
+        <text x="400" y="470" textAnchor="middle" fill="#1E40AF" fontSize="11" fontStyle="italic">
+          Bible Freestyle is structured spontaneity — free but fruitful exploration
+        </text>
+      </g>
     </svg>
   );
 }
@@ -93,9 +120,24 @@ export function BibleFreestyleFlowchart() {
 export function BibleFreestyleConcept() {
   return (
     <svg viewBox="0 0 800 550" className="w-full h-auto" xmlns="http://www.w3.org/2000/svg">
-      <rect width="800" height="550" fill="#EFF6FF" rx="16" />
+      <defs>
+        <linearGradient id="bf2-bg" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stopColor="#EFF6FF" />
+          <stop offset="50%" stopColor="#DBEAFE" />
+          <stop offset="100%" stopColor="#BFDBFE" />
+        </linearGradient>
+        <linearGradient id="bf2-header" x1="0%" y1="0%" x2="100%" y2="0%">
+          <stop offset="0%" stopColor="#3B82F6" />
+          <stop offset="100%" stopColor="#1E40AF" />
+        </linearGradient>
+        <filter id="bf2-shadow" x="-20%" y="-20%" width="140%" height="140%">
+          <feDropShadow dx="0" dy="4" stdDeviation="6" floodOpacity="0.1"/>
+        </filter>
+      </defs>
 
-      <text x="400" y="35" textAnchor="middle" fill="#1E40AF" fontSize="22" fontWeight="bold">
+      <rect width="800" height="550" fill="url(#bf2-bg)" rx="16" />
+
+      <text x="400" y="35" textAnchor="middle" fill="#1E40AF" fontSize="22" fontWeight="bold" letterSpacing="0.5">
         Freestyle Connection Types
       </text>
 
@@ -109,8 +151,8 @@ export function BibleFreestyleConcept() {
           { type: 'Emotion Link', icon: '❤️', desc: 'Same feeling/experience', example: 'David\'s fear → My fear → God\'s faithfulness' },
           { type: 'Number Link', icon: '🔢', desc: 'Significant numbers connect', example: '40 days: Noah, Moses, Elijah, Jesus' },
         ].map((item, i) => (
-          <g key={i} transform={`translate(${(i % 3) * 235}, ${Math.floor(i / 3) * 120})`}>
-            <rect x="0" y="0" width="220" height="110" rx="12" fill="white" stroke="#3B82F6" strokeWidth="2" />
+          <g key={i} transform={`translate(${(i % 3) * 235}, ${Math.floor(i / 3) * 120})`} filter="url(#bf2-shadow)">
+            <rect x="0" y="0" width="220" height="110" rx="12" fill="white" fillOpacity="0.95" stroke="#3B82F6" strokeWidth="2" />
             <text x="110" y="30" textAnchor="middle" fontSize="24">{item.icon}</text>
             <text x="110" y="50" textAnchor="middle" fill="#1E40AF" fontSize="12" fontWeight="bold">{item.type}</text>
             <text x="110" y="68" textAnchor="middle" fill="#2563EB" fontSize="9">{item.desc}</text>
@@ -120,31 +162,35 @@ export function BibleFreestyleConcept() {
       </g>
 
       {/* Freestyle Rules */}
-      <rect x="50" y="310" width="700" height="120" rx="12" fill="#FEF3C7" stroke="#F59E0B" strokeWidth="2" />
-      <text x="400" y="340" textAnchor="middle" fill="#92400E" fontSize="16" fontWeight="bold">
-        Freestyle Guardrails
-      </text>
+      <g filter="url(#bf2-shadow)">
+        <rect x="50" y="310" width="700" height="120" rx="12" fill="#FEF3C7" fillOpacity="0.95" stroke="#F59E0B" strokeWidth="2" />
+        <text x="400" y="340" textAnchor="middle" fill="#92400E" fontSize="16" fontWeight="bold">
+          Freestyle Guardrails
+        </text>
 
-      <g transform="translate(70, 355)">
-        <text x="0" y="0" fill="#78350F" fontSize="11">✓ Follow connections that make sense contextually</text>
-        <text x="0" y="18" fill="#78350F" fontSize="11">✓ Check cross-references to validate links</text>
-        <text x="0" y="36" fill="#78350F" fontSize="11">✓ Let Scripture interpret Scripture — don't force meaning</text>
-        <text x="350" y="0" fill="#78350F" fontSize="11">✗ Don't invent connections that aren't there</text>
-        <text x="350" y="18" fill="#78350F" fontSize="11">✗ Don't ignore context for clever links</text>
-        <text x="350" y="36" fill="#78350F" fontSize="11">✗ Don't chase rabbit trails endlessly</text>
+        <g transform="translate(70, 355)">
+          <text x="0" y="0" fill="#78350F" fontSize="11">✓ Follow connections that make sense contextually</text>
+          <text x="0" y="18" fill="#78350F" fontSize="11">✓ Check cross-references to validate links</text>
+          <text x="0" y="36" fill="#78350F" fontSize="11">✓ Let Scripture interpret Scripture — don't force meaning</text>
+          <text x="350" y="0" fill="#78350F" fontSize="11">✗ Don't invent connections that aren't there</text>
+          <text x="350" y="18" fill="#78350F" fontSize="11">✗ Don't ignore context for clever links</text>
+          <text x="350" y="36" fill="#78350F" fontSize="11">✗ Don't chase rabbit trails endlessly</text>
+        </g>
       </g>
 
       {/* Deliverable */}
-      <rect x="50" y="450" width="700" height="80" rx="12" fill="#3B82F6" />
-      <text x="400" y="480" textAnchor="middle" fill="white" fontSize="16" fontWeight="bold">
-        Deliverable: Freestyle Chain Document
-      </text>
-      <text x="400" y="505" textAnchor="middle" fill="#BFDBFE" fontSize="13">
-        Starting Verse → Connection Type → Linked Verses → Final Insight
-      </text>
-      <text x="400" y="525" textAnchor="middle" fill="#BFDBFE" fontSize="11">
-        Record chains for future teaching and personal reference
-      </text>
+      <g filter="url(#bf2-shadow)">
+        <rect x="50" y="450" width="700" height="80" rx="12" fill="url(#bf2-header)" />
+        <text x="400" y="480" textAnchor="middle" fill="white" fontSize="16" fontWeight="bold">
+          Deliverable: Freestyle Chain Document
+        </text>
+        <text x="400" y="505" textAnchor="middle" fill="#BFDBFE" fontSize="13">
+          Starting Verse → Connection Type → Linked Verses → Final Insight
+        </text>
+        <text x="400" y="525" textAnchor="middle" fill="#BFDBFE" fontSize="11">
+          Record chains for future teaching and personal reference
+        </text>
+      </g>
     </svg>
   );
 }
@@ -153,16 +199,31 @@ export function BibleFreestyleConcept() {
 export function BibleFreestyleExample() {
   return (
     <svg viewBox="0 0 800 600" className="w-full h-auto" xmlns="http://www.w3.org/2000/svg">
-      <rect width="800" height="600" fill="#EFF6FF" rx="16" />
+      <defs>
+        <linearGradient id="bf3-bg" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stopColor="#EFF6FF" />
+          <stop offset="50%" stopColor="#DBEAFE" />
+          <stop offset="100%" stopColor="#BFDBFE" />
+        </linearGradient>
+        <linearGradient id="bf3-header" x1="0%" y1="0%" x2="100%" y2="0%">
+          <stop offset="0%" stopColor="#3B82F6" />
+          <stop offset="100%" stopColor="#1E40AF" />
+        </linearGradient>
+        <filter id="bf3-shadow" x="-20%" y="-20%" width="140%" height="140%">
+          <feDropShadow dx="0" dy="4" stdDeviation="6" floodOpacity="0.1"/>
+        </filter>
+      </defs>
 
-      <text x="400" y="35" textAnchor="middle" fill="#1E40AF" fontSize="22" fontWeight="bold">
+      <rect width="800" height="600" fill="url(#bf3-bg)" rx="16" />
+
+      <text x="400" y="35" textAnchor="middle" fill="#1E40AF" fontSize="22" fontWeight="bold" letterSpacing="0.5">
         Example: "Bread" Freestyle Chain
       </text>
 
       {/* Starting Point */}
-      <g transform="translate(50, 55)">
-        <rect x="0" y="0" width="700" height="80" rx="12" fill="white" stroke="#3B82F6" strokeWidth="2" />
-        <rect x="0" y="0" width="700" height="35" rx="12 12 0 0" fill="#3B82F6" />
+      <g transform="translate(50, 55)" filter="url(#bf3-shadow)">
+        <rect x="0" y="0" width="700" height="80" rx="12" fill="white" fillOpacity="0.95" stroke="#3B82F6" strokeWidth="2" />
+        <rect x="0" y="0" width="700" height="35" rx="12" fill="url(#bf3-header)" />
         <text x="350" y="24" textAnchor="middle" fill="white" fontSize="14" fontWeight="bold">
           Starting Point: John 6:35
         </text>
@@ -176,9 +237,9 @@ export function BibleFreestyleExample() {
       </g>
 
       {/* Chain Links */}
-      <g transform="translate(50, 145)">
-        <rect x="0" y="0" width="700" height="280" rx="12" fill="white" stroke="#3B82F6" strokeWidth="2" />
-        <rect x="0" y="0" width="700" height="35" rx="12 12 0 0" fill="#A855F7" />
+      <g transform="translate(50, 145)" filter="url(#bf3-shadow)">
+        <rect x="0" y="0" width="700" height="280" rx="12" fill="white" fillOpacity="0.95" stroke="#3B82F6" strokeWidth="2" />
+        <rect x="0" y="0" width="700" height="35" rx="12" fill="#A855F7" />
         <text x="350" y="24" textAnchor="middle" fill="white" fontSize="14" fontWeight="bold">
           Freestyle Chain: Following "Bread"
         </text>
@@ -203,9 +264,9 @@ export function BibleFreestyleExample() {
       </g>
 
       {/* Final Insight */}
-      <g transform="translate(50, 435)">
-        <rect x="0" y="0" width="700" height="100" rx="12" fill="#D1FAE5" stroke="#10B981" strokeWidth="2" />
-        <rect x="0" y="0" width="700" height="35" rx="12 12 0 0" fill="#10B981" />
+      <g transform="translate(50, 435)" filter="url(#bf3-shadow)">
+        <rect x="0" y="0" width="700" height="100" rx="12" fill="#D1FAE5" fillOpacity="0.95" stroke="#10B981" strokeWidth="2" />
+        <rect x="0" y="0" width="700" height="35" rx="12" fill="#10B981" />
         <text x="350" y="24" textAnchor="middle" fill="white" fontSize="14" fontWeight="bold">
           Final Landing: The Bread Thread
         </text>
@@ -222,7 +283,7 @@ export function BibleFreestyleExample() {
       </g>
 
       {/* Summary */}
-      <rect x="50" y="545" width="700" height="40" rx="8" fill="#3B82F6" />
+      <rect x="50" y="545" width="700" height="40" rx="8" fill="url(#bf3-header)" filter="url(#bf3-shadow)" />
       <text x="400" y="570" textAnchor="middle" fill="white" fontSize="12" fontWeight="bold">
         One word ("bread") → 6 passages → 1 unified teaching = Bible Freestyle success
       </text>

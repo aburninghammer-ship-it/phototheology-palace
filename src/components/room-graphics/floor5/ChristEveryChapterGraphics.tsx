@@ -5,31 +5,53 @@ export function ChristEveryChapterFlowchart() {
   return (
     <svg viewBox="0 0 800 550" className="w-full h-auto" xmlns="http://www.w3.org/2000/svg">
       <defs>
+        <linearGradient id="cec-bg" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stopColor="#FEF2F2" />
+          <stop offset="50%" stopColor="#FEE2E2" />
+          <stop offset="100%" stopColor="#FECACA" />
+        </linearGradient>
         <linearGradient id="cec-grad" x1="0%" y1="0%" x2="100%" y2="100%">
           <stop offset="0%" stopColor="#DC2626" />
           <stop offset="100%" stopColor="#B91C1C" />
         </linearGradient>
+        <linearGradient id="cec-header" x1="0%" y1="0%" x2="100%" y2="0%">
+          <stop offset="0%" stopColor="#DC2626" />
+          <stop offset="100%" stopColor="#991B1B" />
+        </linearGradient>
+        <filter id="cec-shadow" x="-20%" y="-20%" width="140%" height="140%">
+          <feDropShadow dx="0" dy="4" stdDeviation="6" floodOpacity="0.1"/>
+        </filter>
+        <filter id="cec-glow" x="-50%" y="-50%" width="200%" height="200%">
+          <feGaussianBlur stdDeviation="2" result="blur"/>
+          <feMerge>
+            <feMergeNode in="blur"/>
+            <feMergeNode in="SourceGraphic"/>
+          </feMerge>
+        </filter>
       </defs>
 
-      <rect width="800" height="550" fill="#FEF2F2" rx="16" />
+      <rect width="800" height="550" fill="url(#cec-bg)" rx="16" />
 
-      <text x="400" y="40" textAnchor="middle" fill="#991B1B" fontSize="24" fontWeight="bold">
+      <text x="400" y="40" textAnchor="middle" fill="#991B1B" fontSize="24" fontWeight="bold" letterSpacing="0.5">
         Christ Every Chapter: Finding Jesus in All Scripture
       </text>
 
       {/* Central Image */}
-      <g transform="translate(300, 70)">
-        <circle cx="100" cy="80" r="70" fill="url(#cec-grad)" />
+      <g transform="translate(300, 70)" filter="url(#cec-shadow)">
+        <circle cx="100" cy="80" r="70" fill="url(#cec-grad)" filter="url(#cec-glow)" />
         <text x="100" y="70" textAnchor="middle" fill="white" fontSize="32" fontWeight="bold">✝️</text>
         <text x="100" y="100" textAnchor="middle" fill="white" fontSize="12" fontWeight="bold">CHRIST</text>
         <text x="100" y="115" textAnchor="middle" fill="#FECACA" fontSize="10">Center of All</text>
       </g>
 
       {/* Ways Christ Appears */}
-      <rect x="50" y="180" width="700" height="150" rx="12" fill="white" stroke="#DC2626" strokeWidth="2" />
-      <text x="400" y="205" textAnchor="middle" fill="#991B1B" fontSize="14" fontWeight="bold">
-        7 Ways Christ Appears in Every Chapter
-      </text>
+      <g filter="url(#cec-shadow)">
+        <rect x="50" y="180" width="700" height="150" rx="12" fill="white" fillOpacity="0.95" stroke="#DC2626" strokeWidth="2" />
+        <rect x="50" y="180" width="700" height="30" rx="12" fill="url(#cec-header)" />
+        <text x="400" y="200" textAnchor="middle" fill="white" fontSize="13" fontWeight="bold" letterSpacing="0.5">
+          7 WAYS CHRIST APPEARS IN EVERY CHAPTER
+        </text>
+      </g>
 
       <g transform="translate(60, 220)">
         {[
@@ -42,7 +64,7 @@ export function ChristEveryChapterFlowchart() {
           { way: 'Contrast', desc: 'Failure pointing to need', example: 'Adam failed → Christ succeeded' },
         ].map((item, i) => (
           <g key={i} transform={`translate(${(i % 4) * 170}, ${Math.floor(i / 4) * 55})`}>
-            <rect x="0" y="0" width="160" height="48" rx="6" fill="#FEE2E2" />
+            <rect x="0" y="0" width="160" height="48" rx="8" fill={i % 2 === 0 ? '#FEE2E2' : '#FEF2F2'} stroke="#FECACA" strokeWidth="1" />
             <text x="80" y="15" textAnchor="middle" fill="#991B1B" fontSize="10" fontWeight="bold">{item.way}</text>
             <text x="80" y="30" textAnchor="middle" fill="#B91C1C" fontSize="8">{item.desc}</text>
             <text x="80" y="42" textAnchor="middle" fill="#DC2626" fontSize="7" fontStyle="italic">{item.example}</text>
@@ -51,10 +73,12 @@ export function ChristEveryChapterFlowchart() {
       </g>
 
       {/* The Method */}
-      <rect x="50" y="350" width="700" height="90" rx="12" fill="#FEE2E2" stroke="#DC2626" strokeWidth="2" />
-      <text x="400" y="375" textAnchor="middle" fill="#991B1B" fontSize="14" fontWeight="bold">
-        The Christ Every Chapter Method
-      </text>
+      <g filter="url(#cec-shadow)">
+        <rect x="50" y="350" width="700" height="90" rx="12" fill="#FEE2E2" fillOpacity="0.9" stroke="#DC2626" strokeWidth="2" />
+        <text x="400" y="375" textAnchor="middle" fill="#991B1B" fontSize="14" fontWeight="bold">
+          The Christ Every Chapter Method
+        </text>
+      </g>
 
       <g transform="translate(80, 390)">
         {[
@@ -65,7 +89,7 @@ export function ChristEveryChapterFlowchart() {
           { step: '5', text: 'Apply to life' },
         ].map((item, i) => (
           <g key={i} transform={`translate(${i * 130}, 0)`}>
-            <circle cx="15" cy="15" r="14" fill="#DC2626" />
+            <circle cx="15" cy="15" r="14" fill="url(#cec-grad)" filter="url(#cec-glow)" />
             <text x="15" y="19" textAnchor="middle" fill="white" fontSize="11" fontWeight="bold">{item.step}</text>
             <text x="75" y="19" textAnchor="middle" fill="#991B1B" fontSize="9">{item.text}</text>
           </g>
@@ -73,13 +97,15 @@ export function ChristEveryChapterFlowchart() {
       </g>
 
       {/* Biblical Basis */}
-      <rect x="50" y="460" width="700" height="75" rx="12" fill="url(#cec-grad)" />
-      <text x="400" y="490" textAnchor="middle" fill="white" fontSize="14" fontWeight="bold">
-        "Search the scriptures... they are they which testify of me" — John 5:39
-      </text>
-      <text x="400" y="515" textAnchor="middle" fill="#FECACA" fontSize="11">
-        Jesus said ALL Scripture points to Him — every chapter has a Christ connection
-      </text>
+      <g filter="url(#cec-shadow)">
+        <rect x="50" y="460" width="700" height="75" rx="12" fill="url(#cec-grad)" />
+        <text x="400" y="490" textAnchor="middle" fill="white" fontSize="14" fontWeight="bold">
+          "Search the scriptures... they are they which testify of me" — John 5:39
+        </text>
+        <text x="400" y="515" textAnchor="middle" fill="#FECACA" fontSize="11">
+          Jesus said ALL Scripture points to Him — every chapter has a Christ connection
+        </text>
+      </g>
     </svg>
   );
 }
@@ -88,17 +114,32 @@ export function ChristEveryChapterFlowchart() {
 export function ChristEveryChapterConcept() {
   return (
     <svg viewBox="0 0 800 600" className="w-full h-auto" xmlns="http://www.w3.org/2000/svg">
-      <rect width="800" height="600" fill="#FEF2F2" rx="16" />
+      <defs>
+        <linearGradient id="cec2-bg" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stopColor="#FEF2F2" />
+          <stop offset="50%" stopColor="#FEE2E2" />
+          <stop offset="100%" stopColor="#FECACA" />
+        </linearGradient>
+        <linearGradient id="cec2-header" x1="0%" y1="0%" x2="100%" y2="0%">
+          <stop offset="0%" stopColor="#DC2626" />
+          <stop offset="100%" stopColor="#991B1B" />
+        </linearGradient>
+        <filter id="cec2-shadow" x="-20%" y="-20%" width="140%" height="140%">
+          <feDropShadow dx="0" dy="4" stdDeviation="6" floodOpacity="0.1"/>
+        </filter>
+      </defs>
 
-      <text x="400" y="35" textAnchor="middle" fill="#991B1B" fontSize="22" fontWeight="bold">
+      <rect width="800" height="600" fill="url(#cec2-bg)" rx="16" />
+
+      <text x="400" y="35" textAnchor="middle" fill="#991B1B" fontSize="22" fontWeight="bold" letterSpacing="0.5">
         Christ in Every Book of the Bible
       </text>
 
       {/* OT Books */}
-      <g transform="translate(50, 55)">
-        <rect x="0" y="0" width="340" height="380" rx="12" fill="white" stroke="#DC2626" strokeWidth="2" />
-        <rect x="0" y="0" width="340" height="30" rx="12 12 0 0" fill="#DC2626" />
-        <text x="170" y="21" textAnchor="middle" fill="white" fontSize="12" fontWeight="bold">OLD TESTAMENT</text>
+      <g transform="translate(50, 55)" filter="url(#cec2-shadow)">
+        <rect x="0" y="0" width="340" height="380" rx="12" fill="white" fillOpacity="0.95" stroke="#DC2626" strokeWidth="2" />
+        <rect x="0" y="0" width="340" height="30" rx="12" fill="url(#cec2-header)" />
+        <text x="170" y="21" textAnchor="middle" fill="white" fontSize="12" fontWeight="bold" letterSpacing="0.5">OLD TESTAMENT</text>
 
         {[
           { book: 'Genesis', christ: 'Seed of the Woman (3:15)' },
@@ -115,6 +156,7 @@ export function ChristEveryChapterConcept() {
           { book: 'Zechariah', christ: 'Pierced One (12:10)' },
         ].map((item, i) => (
           <g key={i} transform={`translate(10, ${40 + i * 28})`}>
+            <rect x="-5" y="-12" width="330" height="24" rx="4" fill={i % 2 === 0 ? '#FEF2F2' : 'transparent'} />
             <text x="0" y="0" fill="#991B1B" fontSize="9" fontWeight="bold">{item.book}:</text>
             <text x="80" y="0" fill="#B91C1C" fontSize="9">{item.christ}</text>
           </g>
@@ -122,10 +164,10 @@ export function ChristEveryChapterConcept() {
       </g>
 
       {/* NT Books */}
-      <g transform="translate(410, 55)">
-        <rect x="0" y="0" width="340" height="380" rx="12" fill="white" stroke="#DC2626" strokeWidth="2" />
-        <rect x="0" y="0" width="340" height="30" rx="12 12 0 0" fill="#DC2626" />
-        <text x="170" y="21" textAnchor="middle" fill="white" fontSize="12" fontWeight="bold">NEW TESTAMENT</text>
+      <g transform="translate(410, 55)" filter="url(#cec2-shadow)">
+        <rect x="0" y="0" width="340" height="380" rx="12" fill="white" fillOpacity="0.95" stroke="#DC2626" strokeWidth="2" />
+        <rect x="0" y="0" width="340" height="30" rx="12" fill="url(#cec2-header)" />
+        <text x="170" y="21" textAnchor="middle" fill="white" fontSize="12" fontWeight="bold" letterSpacing="0.5">NEW TESTAMENT</text>
 
         {[
           { book: 'Matthew', christ: 'King of the Jews' },
@@ -142,6 +184,7 @@ export function ChristEveryChapterConcept() {
           { book: 'All Epistles', christ: 'Head of the Church' },
         ].map((item, i) => (
           <g key={i} transform={`translate(10, ${40 + i * 28})`}>
+            <rect x="-5" y="-12" width="330" height="24" rx="4" fill={i % 2 === 0 ? '#FEF2F2' : 'transparent'} />
             <text x="0" y="0" fill="#991B1B" fontSize="9" fontWeight="bold">{item.book}:</text>
             <text x="90" y="0" fill="#B91C1C" fontSize="9">{item.christ}</text>
           </g>
@@ -149,22 +192,26 @@ export function ChristEveryChapterConcept() {
       </g>
 
       {/* Road to Emmaus */}
-      <rect x="50" y="450" width="700" height="70" rx="12" fill="#FEE2E2" stroke="#DC2626" strokeWidth="2" />
-      <text x="400" y="475" textAnchor="middle" fill="#991B1B" fontSize="12" fontWeight="bold">
-        The Emmaus Road Principle (Luke 24:27)
-      </text>
-      <text x="400" y="495" textAnchor="middle" fill="#B91C1C" fontSize="11">
-        "Beginning at Moses and all the prophets, He expounded unto them
-      </text>
-      <text x="400" y="512" textAnchor="middle" fill="#B91C1C" fontSize="11" fontWeight="bold">
-        in ALL the scriptures the things concerning Himself"
-      </text>
+      <g filter="url(#cec2-shadow)">
+        <rect x="50" y="450" width="700" height="70" rx="12" fill="white" fillOpacity="0.9" stroke="#DC2626" strokeWidth="2" />
+        <text x="400" y="475" textAnchor="middle" fill="#991B1B" fontSize="12" fontWeight="bold">
+          The Emmaus Road Principle (Luke 24:27)
+        </text>
+        <text x="400" y="495" textAnchor="middle" fill="#B91C1C" fontSize="11">
+          "Beginning at Moses and all the prophets, He expounded unto them
+        </text>
+        <text x="400" y="512" textAnchor="middle" fill="#B91C1C" fontSize="11" fontWeight="bold">
+          in ALL the scriptures the things concerning Himself"
+        </text>
+      </g>
 
       {/* Deliverable */}
-      <rect x="50" y="535" width="700" height="50" rx="12" fill="#DC2626" />
-      <text x="400" y="565" textAnchor="middle" fill="white" fontSize="14" fontWeight="bold">
-        Deliverable: Journal every chapter's Christ connection as you read through the Bible
-      </text>
+      <g filter="url(#cec2-shadow)">
+        <rect x="50" y="535" width="700" height="50" rx="12" fill="url(#cec2-header)" />
+        <text x="400" y="565" textAnchor="middle" fill="white" fontSize="14" fontWeight="bold">
+          Deliverable: Journal every chapter's Christ connection as you read through the Bible
+        </text>
+      </g>
     </svg>
   );
 }
@@ -173,26 +220,44 @@ export function ChristEveryChapterConcept() {
 export function ChristEveryChapterExample() {
   return (
     <svg viewBox="0 0 800 550" className="w-full h-auto" xmlns="http://www.w3.org/2000/svg">
-      <rect width="800" height="550" fill="#FEF2F2" rx="16" />
+      <defs>
+        <linearGradient id="cec3-bg" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stopColor="#FEF2F2" />
+          <stop offset="50%" stopColor="#FEE2E2" />
+          <stop offset="100%" stopColor="#FECACA" />
+        </linearGradient>
+        <linearGradient id="cec3-header" x1="0%" y1="0%" x2="100%" y2="0%">
+          <stop offset="0%" stopColor="#DC2626" />
+          <stop offset="100%" stopColor="#991B1B" />
+        </linearGradient>
+        <filter id="cec3-shadow" x="-20%" y="-20%" width="140%" height="140%">
+          <feDropShadow dx="0" dy="4" stdDeviation="6" floodOpacity="0.1"/>
+        </filter>
+      </defs>
 
-      <text x="400" y="35" textAnchor="middle" fill="#991B1B" fontSize="22" fontWeight="bold">
+      <rect width="800" height="550" fill="url(#cec3-bg)" rx="16" />
+
+      <text x="400" y="35" textAnchor="middle" fill="#991B1B" fontSize="22" fontWeight="bold" letterSpacing="0.5">
         Example: Finding Christ in Genesis 22
       </text>
 
       {/* The Chapter */}
-      <rect x="50" y="55" width="700" height="60" rx="12" fill="white" stroke="#DC2626" strokeWidth="2" />
-      <text x="400" y="80" textAnchor="middle" fill="#991B1B" fontSize="12" fontWeight="bold">
-        Genesis 22: The Binding of Isaac (Akedah)
-      </text>
-      <text x="400" y="100" textAnchor="middle" fill="#B91C1C" fontSize="10" fontStyle="italic">
-        "Take now thy son, thine only son Isaac, whom thou lovest... offer him for a burnt offering"
-      </text>
+      <g filter="url(#cec3-shadow)">
+        <rect x="50" y="55" width="700" height="60" rx="12" fill="white" fillOpacity="0.95" stroke="#DC2626" strokeWidth="2" />
+        <text x="400" y="80" textAnchor="middle" fill="#991B1B" fontSize="12" fontWeight="bold">
+          Genesis 22: The Binding of Isaac (Akedah)
+        </text>
+        <text x="400" y="100" textAnchor="middle" fill="#B91C1C" fontSize="10" fontStyle="italic">
+          "Take now thy son, thine only son Isaac, whom thou lovest... offer him for a burnt offering"
+        </text>
+      </g>
 
       {/* Christ Connections */}
-      <g transform="translate(50, 130)">
-        <rect x="0" y="0" width="700" height="250" rx="12" fill="white" stroke="#DC2626" strokeWidth="2" />
-        <text x="350" y="25" textAnchor="middle" fill="#991B1B" fontSize="14" fontWeight="bold">
-          Christ Connections Found
+      <g transform="translate(50, 130)" filter="url(#cec3-shadow)">
+        <rect x="0" y="0" width="700" height="250" rx="12" fill="white" fillOpacity="0.95" stroke="#DC2626" strokeWidth="2" />
+        <rect x="0" y="0" width="700" height="30" rx="12" fill="url(#cec3-header)" />
+        <text x="350" y="21" textAnchor="middle" fill="white" fontSize="13" fontWeight="bold" letterSpacing="0.5">
+          CHRIST CONNECTIONS FOUND
         </text>
 
         {[
@@ -206,7 +271,8 @@ export function ChristEveryChapterExample() {
           { element: 'Mount Moriah = Jerusalem', christ: 'Where Jesus was crucified!', type: 'PLACE' },
         ].map((item, i) => (
           <g key={i} transform={`translate(15, ${45 + i * 25})`}>
-            <rect x="0" y="-12" width="50" height="18" rx="4" fill="#DC2626" />
+            <rect x="-5" y="-14" width="680" height="22" rx="4" fill={i % 2 === 0 ? '#FEF2F2' : 'transparent'} />
+            <rect x="0" y="-12" width="50" height="18" rx="6" fill="url(#cec3-header)" />
             <text x="25" y="1" textAnchor="middle" fill="white" fontSize="7" fontWeight="bold">{item.type}</text>
             <text x="60" y="2" fill="#991B1B" fontSize="9">{item.element}</text>
             <text x="330" y="2" fill="#B91C1C" fontSize="9">→ {item.christ}</text>
@@ -215,22 +281,26 @@ export function ChristEveryChapterExample() {
       </g>
 
       {/* Key Insight */}
-      <rect x="50" y="395" width="700" height="60" rx="12" fill="#FEE2E2" stroke="#DC2626" strokeWidth="2" />
-      <text x="400" y="420" textAnchor="middle" fill="#991B1B" fontSize="12" fontWeight="bold">
-        Key Insight: Genesis 22 is a Preview of Calvary
-      </text>
-      <text x="400" y="442" textAnchor="middle" fill="#B91C1C" fontSize="10">
-        Written ~2000 years before Christ, on the same mountain where He would die!
-      </text>
+      <g filter="url(#cec3-shadow)">
+        <rect x="50" y="395" width="700" height="60" rx="12" fill="#FEE2E2" fillOpacity="0.9" stroke="#DC2626" strokeWidth="2" />
+        <text x="400" y="420" textAnchor="middle" fill="#991B1B" fontSize="12" fontWeight="bold">
+          Key Insight: Genesis 22 is a Preview of Calvary
+        </text>
+        <text x="400" y="442" textAnchor="middle" fill="#B91C1C" fontSize="10">
+          Written ~2000 years before Christ, on the same mountain where He would die!
+        </text>
+      </g>
 
       {/* Application */}
-      <rect x="50" y="470" width="700" height="65" rx="12" fill="#DC2626" />
-      <text x="400" y="498" textAnchor="middle" fill="white" fontSize="14" fontWeight="bold">
-        Christ Every Chapter Deliverable for Genesis 22
-      </text>
-      <text x="400" y="520" textAnchor="middle" fill="#FECACA" fontSize="11">
-        8 distinct Christ connections in one chapter — the OT is a Christ-saturated book!
-      </text>
+      <g filter="url(#cec3-shadow)">
+        <rect x="50" y="470" width="700" height="65" rx="12" fill="url(#cec3-header)" />
+        <text x="400" y="498" textAnchor="middle" fill="white" fontSize="14" fontWeight="bold">
+          Christ Every Chapter Deliverable for Genesis 22
+        </text>
+        <text x="400" y="520" textAnchor="middle" fill="#FECACA" fontSize="11">
+          8 distinct Christ connections in one chapter — the OT is a Christ-saturated book!
+        </text>
+      </g>
     </svg>
   );
 }

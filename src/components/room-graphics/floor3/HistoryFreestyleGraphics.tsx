@@ -5,86 +5,113 @@ export function HistoryFreestyleFlowchart() {
   return (
     <svg viewBox="0 0 800 500" className="w-full h-auto" xmlns="http://www.w3.org/2000/svg">
       <defs>
+        <linearGradient id="hf-bg" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stopColor="#FAF5F0" />
+          <stop offset="50%" stopColor="#F5EBE0" />
+          <stop offset="100%" stopColor="#E7E0D6" />
+        </linearGradient>
         <linearGradient id="hf-grad" x1="0%" y1="0%" x2="100%" y2="100%">
           <stop offset="0%" stopColor="#78716C" />
           <stop offset="100%" stopColor="#57534E" />
         </linearGradient>
+        <linearGradient id="hf-header" x1="0%" y1="0%" x2="100%" y2="0%">
+          <stop offset="0%" stopColor="#78716C" />
+          <stop offset="100%" stopColor="#44403C" />
+        </linearGradient>
+        <filter id="hf-shadow" x="-20%" y="-20%" width="140%" height="140%">
+          <feDropShadow dx="0" dy="4" stdDeviation="6" floodOpacity="0.1"/>
+        </filter>
+        <filter id="hf-glow" x="-50%" y="-50%" width="200%" height="200%">
+          <feGaussianBlur stdDeviation="3" result="blur"/>
+          <feMerge>
+            <feMergeNode in="blur"/>
+            <feMergeNode in="SourceGraphic"/>
+          </feMerge>
+        </filter>
+        <marker id="arrow-hf" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+          <path d="M0,0 L0,6 L9,3 z" fill="#78716C" />
+        </marker>
       </defs>
 
-      <rect width="800" height="500" fill="#FAF5F0" rx="16" />
+      <rect width="800" height="500" fill="url(#hf-bg)" rx="16" />
 
-      <text x="400" y="40" textAnchor="middle" fill="#44403C" fontSize="24" fontWeight="bold">
+      <text x="400" y="40" textAnchor="middle" fill="#44403C" fontSize="24" fontWeight="bold" letterSpacing="0.5">
         History Freestyle: His Story in History
       </text>
 
       {/* Flow: History → Principle → Scripture */}
       <g transform="translate(50, 70)">
         {/* Historical Event */}
-        <circle cx="120" cy="100" r="80" fill="url(#hf-grad)" />
-        <text x="120" y="85" textAnchor="middle" fill="white" fontSize="36">📜</text>
-        <text x="120" y="115" textAnchor="middle" fill="white" fontSize="14" fontWeight="bold">HISTORY</text>
-        <text x="120" y="135" textAnchor="middle" fill="#D6D3D1" fontSize="11">An Event/Era</text>
+        <g filter="url(#hf-glow)">
+          <circle cx="120" cy="100" r="80" fill="url(#hf-grad)" />
+          <text x="120" y="85" textAnchor="middle" fill="white" fontSize="36">📜</text>
+          <text x="120" y="115" textAnchor="middle" fill="white" fontSize="14" fontWeight="bold">HISTORY</text>
+          <text x="120" y="135" textAnchor="middle" fill="#D6D3D1" fontSize="11">An Event/Era</text>
+        </g>
 
         {/* Arrow */}
         <path d="M210 100 L290 100" stroke="#78716C" strokeWidth="4" fill="none" markerEnd="url(#arrow-hf)" />
-        <defs>
-          <marker id="arrow-hf" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
-            <path d="M0,0 L0,6 L9,3 z" fill="#78716C" />
-          </marker>
-        </defs>
 
         {/* Principle Circle */}
-        <circle cx="380" cy="100" r="80" fill="#F59E0B" />
-        <text x="380" y="85" textAnchor="middle" fill="white" fontSize="36">⚖️</text>
-        <text x="380" y="115" textAnchor="middle" fill="white" fontSize="14" fontWeight="bold">PRINCIPLE</text>
-        <text x="380" y="135" textAnchor="middle" fill="#FEF3C7" fontSize="11">What Truth?</text>
+        <g filter="url(#hf-glow)">
+          <circle cx="380" cy="100" r="80" fill="#F59E0B" />
+          <text x="380" y="85" textAnchor="middle" fill="white" fontSize="36">⚖️</text>
+          <text x="380" y="115" textAnchor="middle" fill="white" fontSize="14" fontWeight="bold">PRINCIPLE</text>
+          <text x="380" y="135" textAnchor="middle" fill="#FEF3C7" fontSize="11">What Truth?</text>
+        </g>
 
         {/* Arrow */}
         <path d="M470 100 L550 100" stroke="#78716C" strokeWidth="4" fill="none" markerEnd="url(#arrow-hf)" />
 
         {/* Scripture Circle */}
-        <circle cx="640" cy="100" r="80" fill="#3B82F6" />
-        <text x="640" y="85" textAnchor="middle" fill="white" fontSize="36">📖</text>
-        <text x="640" y="115" textAnchor="middle" fill="white" fontSize="14" fontWeight="bold">SCRIPTURE</text>
-        <text x="640" y="135" textAnchor="middle" fill="#BFDBFE" fontSize="11">Bible Parallel</text>
+        <g filter="url(#hf-glow)">
+          <circle cx="640" cy="100" r="80" fill="#3B82F6" />
+          <text x="640" y="85" textAnchor="middle" fill="white" fontSize="36">📖</text>
+          <text x="640" y="115" textAnchor="middle" fill="white" fontSize="14" fontWeight="bold">SCRIPTURE</text>
+          <text x="640" y="135" textAnchor="middle" fill="#BFDBFE" fontSize="11">Bible Parallel</text>
+        </g>
       </g>
 
       {/* Method Steps */}
-      <rect x="50" y="220" width="700" height="130" rx="12" fill="white" stroke="#78716C" strokeWidth="2" />
-      <text x="400" y="250" textAnchor="middle" fill="#44403C" fontSize="16" fontWeight="bold">
-        The History Freestyle Method
-      </text>
+      <g filter="url(#hf-shadow)">
+        <rect x="50" y="220" width="700" height="130" rx="12" fill="white" fillOpacity="0.95" stroke="#78716C" strokeWidth="2" />
+        <text x="400" y="250" textAnchor="middle" fill="#44403C" fontSize="16" fontWeight="bold">
+          The History Freestyle Method
+        </text>
 
-      <g transform="translate(70, 270)">
-        {[
-          { step: '1', text: 'Select: Choose a historical event or era', icon: '🏛️' },
-          { step: '2', text: 'Study: What happened? Why? What resulted?', icon: '🔍' },
-          { step: '3', text: 'Extract: What spiritual principle is illustrated?', icon: '💎' },
-          { step: '4', text: 'Connect: Find Scripture that teaches the same', icon: '🔗' },
-        ].map((item, i) => (
-          <g key={i} transform={`translate(${i * 165}, 0)`}>
-            <circle cx="20" cy="25" r="20" fill="#78716C" />
-            <text x="20" y="30" textAnchor="middle" fill="white" fontSize="14" fontWeight="bold">{item.step}</text>
-            <text x="20" y="55" textAnchor="middle" fontSize="18">{item.icon}</text>
-            <text x="20" y="75" textAnchor="middle" fill="#44403C" fontSize="9">{item.text}</text>
-          </g>
-        ))}
+        <g transform="translate(70, 270)">
+          {[
+            { step: '1', text: 'Select: Choose a historical event or era', icon: '🏛️' },
+            { step: '2', text: 'Study: What happened? Why? What resulted?', icon: '🔍' },
+            { step: '3', text: 'Extract: What spiritual principle is illustrated?', icon: '💎' },
+            { step: '4', text: 'Connect: Find Scripture that teaches the same', icon: '🔗' },
+          ].map((item, i) => (
+            <g key={i} transform={`translate(${i * 165}, 0)`}>
+              <circle cx="20" cy="25" r="20" fill="url(#hf-grad)" filter="url(#hf-glow)" />
+              <text x="20" y="30" textAnchor="middle" fill="white" fontSize="14" fontWeight="bold">{item.step}</text>
+              <text x="20" y="55" textAnchor="middle" fontSize="18">{item.icon}</text>
+              <text x="20" y="75" textAnchor="middle" fill="#44403C" fontSize="9">{item.text}</text>
+            </g>
+          ))}
+        </g>
       </g>
 
       {/* Key Principle */}
-      <rect x="50" y="370" width="700" height="110" rx="12" fill="#F5F5F4" stroke="#78716C" strokeWidth="2" />
-      <text x="400" y="400" textAnchor="middle" fill="#44403C" fontSize="16" fontWeight="bold">
-        The Great Controversy Lens
-      </text>
-      <text x="400" y="425" textAnchor="middle" fill="#57534E" fontSize="13">
-        "These things happened to them as examples and were written for our instruction" (1 Cor 10:11)
-      </text>
-      <text x="400" y="450" textAnchor="middle" fill="#57534E" fontSize="12">
-        History is not random — God is working out His purposes through nations and events.
-      </text>
-      <text x="400" y="470" textAnchor="middle" fill="#44403C" fontSize="11" fontStyle="italic">
-        Every rise and fall of empires illustrates eternal principles.
-      </text>
+      <g filter="url(#hf-shadow)">
+        <rect x="50" y="370" width="700" height="110" rx="12" fill="#F5F5F4" fillOpacity="0.95" stroke="#78716C" strokeWidth="2" />
+        <text x="400" y="400" textAnchor="middle" fill="#44403C" fontSize="16" fontWeight="bold">
+          The Great Controversy Lens
+        </text>
+        <text x="400" y="425" textAnchor="middle" fill="#57534E" fontSize="13">
+          "These things happened to them as examples and were written for our instruction" (1 Cor 10:11)
+        </text>
+        <text x="400" y="450" textAnchor="middle" fill="#57534E" fontSize="12">
+          History is not random — God is working out His purposes through nations and events.
+        </text>
+        <text x="400" y="470" textAnchor="middle" fill="#44403C" fontSize="11" fontStyle="italic">
+          Every rise and fall of empires illustrates eternal principles.
+        </text>
+      </g>
     </svg>
   );
 }
@@ -93,9 +120,24 @@ export function HistoryFreestyleFlowchart() {
 export function HistoryFreestyleConcept() {
   return (
     <svg viewBox="0 0 800 550" className="w-full h-auto" xmlns="http://www.w3.org/2000/svg">
-      <rect width="800" height="550" fill="#FAF5F0" rx="16" />
+      <defs>
+        <linearGradient id="hf2-bg" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stopColor="#FAF5F0" />
+          <stop offset="50%" stopColor="#F5EBE0" />
+          <stop offset="100%" stopColor="#E7E0D6" />
+        </linearGradient>
+        <linearGradient id="hf2-header" x1="0%" y1="0%" x2="100%" y2="0%">
+          <stop offset="0%" stopColor="#78716C" />
+          <stop offset="100%" stopColor="#44403C" />
+        </linearGradient>
+        <filter id="hf2-shadow" x="-20%" y="-20%" width="140%" height="140%">
+          <feDropShadow dx="0" dy="4" stdDeviation="6" floodOpacity="0.1"/>
+        </filter>
+      </defs>
 
-      <text x="400" y="35" textAnchor="middle" fill="#44403C" fontSize="22" fontWeight="bold">
+      <rect width="800" height="550" fill="url(#hf2-bg)" rx="16" />
+
+      <text x="400" y="35" textAnchor="middle" fill="#44403C" fontSize="22" fontWeight="bold" letterSpacing="0.5">
         Historical Categories → Scripture Principles
       </text>
 
@@ -107,10 +149,10 @@ export function HistoryFreestyleConcept() {
           { cat: 'Reformation', icon: '📜', event: 'Luther, Calvin, Wesley', principle: 'Truth will not be silenced (Isa 55:11)' },
           { cat: 'Inventions', icon: '💡', event: 'Printing Press, Radio', principle: 'Gospel to every nation (Matt 24:14)' },
           { cat: 'Wars', icon: '🔥', event: 'World Wars, Crusades', principle: 'Wars and rumors of wars (Matt 24:6)' },
-          { cat: 'Revival', icon: '🔥', event: 'Great Awakening, Welsh', principle: 'If my people pray... (2 Chr 7:14)' },
+          { cat: 'Revival', icon: '🙏', event: 'Great Awakening, Welsh', principle: 'If my people pray... (2 Chr 7:14)' },
         ].map((item, i) => (
-          <g key={i} transform={`translate(${(i % 3) * 235}, ${Math.floor(i / 3) * 120})`}>
-            <rect x="0" y="0" width="220" height="110" rx="12" fill="white" stroke="#78716C" strokeWidth="2" />
+          <g key={i} transform={`translate(${(i % 3) * 235}, ${Math.floor(i / 3) * 120})`} filter="url(#hf2-shadow)">
+            <rect x="0" y="0" width="220" height="110" rx="12" fill="white" fillOpacity="0.95" stroke="#78716C" strokeWidth="2" />
             <text x="110" y="30" textAnchor="middle" fontSize="24">{item.icon}</text>
             <text x="110" y="50" textAnchor="middle" fill="#44403C" fontSize="12" fontWeight="bold">{item.cat}</text>
             <text x="110" y="68" textAnchor="middle" fill="#57534E" fontSize="9">{item.event}</text>
@@ -120,39 +162,43 @@ export function HistoryFreestyleConcept() {
       </g>
 
       {/* Historical Eras */}
-      <rect x="50" y="310" width="700" height="120" rx="12" fill="white" stroke="#78716C" strokeWidth="2" />
-      <text x="400" y="340" textAnchor="middle" fill="#44403C" fontSize="16" fontWeight="bold">
-        Key Historical Eras to Study
-      </text>
+      <g filter="url(#hf2-shadow)">
+        <rect x="50" y="310" width="700" height="120" rx="12" fill="white" fillOpacity="0.95" stroke="#78716C" strokeWidth="2" />
+        <text x="400" y="340" textAnchor="middle" fill="#44403C" fontSize="16" fontWeight="bold">
+          Key Historical Eras to Study
+        </text>
 
-      <g transform="translate(70, 360)">
-        {[
-          { era: 'Early Church', time: '31-313 AD' },
-          { era: 'Dark Ages', time: '538-1798 AD' },
-          { era: 'Reformation', time: '1517+' },
-          { era: 'Great Awakening', time: '1730-1770' },
-          { era: 'Advent Movement', time: '1840s' },
-          { era: 'Modern Era', time: '1900-Now' },
-        ].map((item, i) => (
-          <g key={i} transform={`translate(${i * 110}, 0)`}>
-            <rect x="0" y="0" width="100" height="50" rx="8" fill="#F5F5F4" stroke="#A8A29E" strokeWidth="1" />
-            <text x="50" y="20" textAnchor="middle" fill="#44403C" fontSize="10" fontWeight="bold">{item.era}</text>
-            <text x="50" y="38" textAnchor="middle" fill="#78716C" fontSize="9">{item.time}</text>
-          </g>
-        ))}
+        <g transform="translate(70, 360)">
+          {[
+            { era: 'Early Church', time: '31-313 AD' },
+            { era: 'Dark Ages', time: '538-1798 AD' },
+            { era: 'Reformation', time: '1517+' },
+            { era: 'Great Awakening', time: '1730-1770' },
+            { era: 'Advent Movement', time: '1840s' },
+            { era: 'Modern Era', time: '1900-Now' },
+          ].map((item, i) => (
+            <g key={i} transform={`translate(${i * 110}, 0)`}>
+              <rect x="0" y="0" width="100" height="50" rx="8" fill={i % 2 === 0 ? '#F5F5F4' : '#E7E0D6'} stroke="#A8A29E" strokeWidth="1" />
+              <text x="50" y="20" textAnchor="middle" fill="#44403C" fontSize="10" fontWeight="bold">{item.era}</text>
+              <text x="50" y="38" textAnchor="middle" fill="#78716C" fontSize="9">{item.time}</text>
+            </g>
+          ))}
+        </g>
       </g>
 
       {/* Deliverable */}
-      <rect x="50" y="450" width="700" height="80" rx="12" fill="#78716C" />
-      <text x="400" y="480" textAnchor="middle" fill="white" fontSize="16" fontWeight="bold">
-        Deliverable: History-to-Scripture Connection Card
-      </text>
-      <text x="400" y="505" textAnchor="middle" fill="#D6D3D1" fontSize="13">
-        Historical Event + What Happened + Spiritual Principle + Scripture Parallel
-      </text>
-      <text x="400" y="525" textAnchor="middle" fill="#D6D3D1" fontSize="11">
-        Build a library of historical illustrations for teaching
-      </text>
+      <g filter="url(#hf2-shadow)">
+        <rect x="50" y="450" width="700" height="80" rx="12" fill="url(#hf2-header)" />
+        <text x="400" y="480" textAnchor="middle" fill="white" fontSize="16" fontWeight="bold">
+          Deliverable: History-to-Scripture Connection Card
+        </text>
+        <text x="400" y="505" textAnchor="middle" fill="#D6D3D1" fontSize="13">
+          Historical Event + What Happened + Spiritual Principle + Scripture Parallel
+        </text>
+        <text x="400" y="525" textAnchor="middle" fill="#D6D3D1" fontSize="11">
+          Build a library of historical illustrations for teaching
+        </text>
+      </g>
     </svg>
   );
 }
@@ -161,16 +207,31 @@ export function HistoryFreestyleConcept() {
 export function HistoryFreestyleExample() {
   return (
     <svg viewBox="0 0 800 600" className="w-full h-auto" xmlns="http://www.w3.org/2000/svg">
-      <rect width="800" height="600" fill="#FAF5F0" rx="16" />
+      <defs>
+        <linearGradient id="hf3-bg" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stopColor="#FAF5F0" />
+          <stop offset="50%" stopColor="#F5EBE0" />
+          <stop offset="100%" stopColor="#E7E0D6" />
+        </linearGradient>
+        <linearGradient id="hf3-header" x1="0%" y1="0%" x2="100%" y2="0%">
+          <stop offset="0%" stopColor="#78716C" />
+          <stop offset="100%" stopColor="#44403C" />
+        </linearGradient>
+        <filter id="hf3-shadow" x="-20%" y="-20%" width="140%" height="140%">
+          <feDropShadow dx="0" dy="4" stdDeviation="6" floodOpacity="0.1"/>
+        </filter>
+      </defs>
 
-      <text x="400" y="35" textAnchor="middle" fill="#44403C" fontSize="22" fontWeight="bold">
+      <rect width="800" height="600" fill="url(#hf3-bg)" rx="16" />
+
+      <text x="400" y="35" textAnchor="middle" fill="#44403C" fontSize="22" fontWeight="bold" letterSpacing="0.5">
         Example: The Fall of Rome → Babylon's Fall
       </text>
 
       {/* Historical Event */}
-      <g transform="translate(50, 55)">
-        <rect x="0" y="0" width="700" height="110" rx="12" fill="white" stroke="#78716C" strokeWidth="2" />
-        <rect x="0" y="0" width="700" height="35" rx="12 12 0 0" fill="#78716C" />
+      <g transform="translate(50, 55)" filter="url(#hf3-shadow)">
+        <rect x="0" y="0" width="700" height="110" rx="12" fill="white" fillOpacity="0.95" stroke="#78716C" strokeWidth="2" />
+        <rect x="0" y="0" width="700" height="35" rx="12" fill="url(#hf3-header)" />
         <text x="350" y="24" textAnchor="middle" fill="white" fontSize="14" fontWeight="bold">
           Historical Event: The Fall of Rome (476 AD)
         </text>
@@ -187,9 +248,9 @@ export function HistoryFreestyleExample() {
       </g>
 
       {/* Spiritual Principle */}
-      <g transform="translate(50, 175)">
-        <rect x="0" y="0" width="700" height="80" rx="12" fill="#FEF3C7" stroke="#F59E0B" strokeWidth="2" />
-        <rect x="0" y="0" width="700" height="35" rx="12 12 0 0" fill="#F59E0B" />
+      <g transform="translate(50, 175)" filter="url(#hf3-shadow)">
+        <rect x="0" y="0" width="700" height="80" rx="12" fill="#FEF3C7" fillOpacity="0.95" stroke="#F59E0B" strokeWidth="2" />
+        <rect x="0" y="0" width="700" height="35" rx="12" fill="#F59E0B" />
         <text x="350" y="24" textAnchor="middle" fill="white" fontSize="14" fontWeight="bold">
           Extracted Principle
         </text>
@@ -203,9 +264,9 @@ export function HistoryFreestyleExample() {
       </g>
 
       {/* Scripture Parallel */}
-      <g transform="translate(50, 265)">
-        <rect x="0" y="0" width="700" height="140" rx="12" fill="#EFF6FF" stroke="#3B82F6" strokeWidth="2" />
-        <rect x="0" y="0" width="700" height="35" rx="12 12 0 0" fill="#3B82F6" />
+      <g transform="translate(50, 265)" filter="url(#hf3-shadow)">
+        <rect x="0" y="0" width="700" height="140" rx="12" fill="#EFF6FF" fillOpacity="0.95" stroke="#3B82F6" strokeWidth="2" />
+        <rect x="0" y="0" width="700" height="35" rx="12" fill="#3B82F6" />
         <text x="350" y="24" textAnchor="middle" fill="white" fontSize="14" fontWeight="bold">
           Scripture Parallels
         </text>
@@ -223,9 +284,9 @@ export function HistoryFreestyleExample() {
       </g>
 
       {/* Connection Synthesis */}
-      <g transform="translate(50, 415)">
-        <rect x="0" y="0" width="700" height="100" rx="12" fill="#D1FAE5" stroke="#10B981" strokeWidth="2" />
-        <rect x="0" y="0" width="700" height="35" rx="12 12 0 0" fill="#10B981" />
+      <g transform="translate(50, 415)" filter="url(#hf3-shadow)">
+        <rect x="0" y="0" width="700" height="100" rx="12" fill="#D1FAE5" fillOpacity="0.95" stroke="#10B981" strokeWidth="2" />
+        <rect x="0" y="0" width="700" height="35" rx="12" fill="#10B981" />
         <text x="350" y="24" textAnchor="middle" fill="white" fontSize="14" fontWeight="bold">
           Teaching Connection
         </text>
@@ -242,13 +303,15 @@ export function HistoryFreestyleExample() {
       </g>
 
       {/* Summary */}
-      <rect x="50" y="525" width="700" height="60" rx="12" fill="#78716C" />
-      <text x="400" y="552" textAnchor="middle" fill="white" fontSize="14" fontWeight="bold">
-        History + Principle + Scripture = Powerful Teaching Illustration
-      </text>
-      <text x="400" y="572" textAnchor="middle" fill="#D6D3D1" fontSize="11">
-        "Those who don't learn from history are doomed to repeat it — but Scripture helps us see the pattern."
-      </text>
+      <g filter="url(#hf3-shadow)">
+        <rect x="50" y="525" width="700" height="60" rx="12" fill="url(#hf3-header)" />
+        <text x="400" y="552" textAnchor="middle" fill="white" fontSize="14" fontWeight="bold">
+          History + Principle + Scripture = Powerful Teaching Illustration
+        </text>
+        <text x="400" y="572" textAnchor="middle" fill="#D6D3D1" fontSize="11">
+          "Those who don't learn from history are doomed to repeat it — but Scripture helps us see the pattern."
+        </text>
+      </g>
     </svg>
   );
 }
