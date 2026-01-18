@@ -155,12 +155,10 @@ export default defineConfig(({ mode }) => ({
       },
     },
     chunkSizeWarningLimit: 1000,
-    minify: 'terser',
-    terserOptions: {
-      compress: {
-        drop_console: true,
-        drop_debugger: true,
-      },
+    // Using esbuild minification avoids rare TDZ issues seen with terser + recharts/d3 bundling
+    minify: 'esbuild',
+    esbuild: {
+      drop: ['console', 'debugger'],
     },
   },
 }));
