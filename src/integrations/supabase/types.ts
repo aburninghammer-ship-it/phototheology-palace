@@ -10895,8 +10895,8 @@ export type Database = {
           sermon_style: string
           smooth_stones: Json | null
           status: string
-          theme_passage: string
-          title: string
+          theme_passage: string | null
+          title: string | null
           updated_at: string
           user_id: string
         }
@@ -10910,8 +10910,8 @@ export type Database = {
           sermon_style: string
           smooth_stones?: Json | null
           status?: string
-          theme_passage: string
-          title: string
+          theme_passage?: string | null
+          title?: string | null
           updated_at?: string
           user_id: string
         }
@@ -10925,8 +10925,8 @@ export type Database = {
           sermon_style?: string
           smooth_stones?: Json | null
           status?: string
-          theme_passage?: string
-          title?: string
+          theme_passage?: string | null
+          title?: string | null
           updated_at?: string
           user_id?: string
         }

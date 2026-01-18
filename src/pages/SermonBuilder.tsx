@@ -445,15 +445,18 @@ export default function SermonBuilder() {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error("Not authenticated");
 
+      // Generate a default title if empty
+      const defaultTitle = sermon.title || `Sermon Draft - ${new Date().toLocaleDateString()}`;
+
       const sermonData = {
         user_id: user.id,
-        title: sermon.title,
-        theme_passage: sermon.theme_passage,
-        sermon_style: sermon.sermon_style,
-        smooth_stones: sermon.smooth_stones,
-        bridges: sermon.bridges,
-        movie_structure: sermon.movie_structure,
-        full_sermon: sermon.full_sermon,
+        title: defaultTitle,
+        theme_passage: sermon.theme_passage || null,
+        sermon_style: sermon.sermon_style || SERMON_STYLES[0].value,
+        smooth_stones: sermon.smooth_stones || [],
+        bridges: sermon.bridges || [],
+        movie_structure: sermon.movie_structure || {},
+        full_sermon: sermon.full_sermon || "",
         current_step: currentStep,
         status: currentStep >= 5 ? "complete" : "in_progress",
       };
