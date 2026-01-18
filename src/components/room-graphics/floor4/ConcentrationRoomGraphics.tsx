@@ -5,20 +5,39 @@ export function ConcentrationRoomFlowchart() {
   return (
     <svg viewBox="0 0 800 500" className="w-full h-auto" xmlns="http://www.w3.org/2000/svg">
       <defs>
+        <linearGradient id="cr-bg" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stopColor="#F5F3FF" />
+          <stop offset="50%" stopColor="#EDE9FE" />
+          <stop offset="100%" stopColor="#DDD6FE" />
+        </linearGradient>
         <linearGradient id="cr-grad" x1="0%" y1="0%" x2="100%" y2="100%">
           <stop offset="0%" stopColor="#7C3AED" />
           <stop offset="100%" stopColor="#6D28D9" />
         </linearGradient>
+        <linearGradient id="cr-header" x1="0%" y1="0%" x2="100%" y2="0%">
+          <stop offset="0%" stopColor="#7C3AED" />
+          <stop offset="100%" stopColor="#5B21B6" />
+        </linearGradient>
+        <filter id="cr-shadow" x="-20%" y="-20%" width="140%" height="140%">
+          <feDropShadow dx="0" dy="4" stdDeviation="6" floodOpacity="0.1"/>
+        </filter>
+        <filter id="cr-glow" x="-50%" y="-50%" width="200%" height="200%">
+          <feGaussianBlur stdDeviation="3" result="blur"/>
+          <feMerge>
+            <feMergeNode in="blur"/>
+            <feMergeNode in="SourceGraphic"/>
+          </feMerge>
+        </filter>
       </defs>
 
-      <rect width="800" height="500" fill="#F5F3FF" rx="16" />
+      <rect width="800" height="500" fill="url(#cr-bg)" rx="16" />
 
-      <text x="400" y="40" textAnchor="middle" fill="#5B21B6" fontSize="24" fontWeight="bold">
+      <text x="400" y="40" textAnchor="middle" fill="#5B21B6" fontSize="24" fontWeight="bold" letterSpacing="0.5">
         Concentration Room: The Law of Saturation
       </text>
 
       {/* Target Concept */}
-      <g transform="translate(300, 80)">
+      <g transform="translate(300, 80)" filter="url(#cr-glow)">
         <circle cx="100" cy="100" r="90" fill="url(#cr-grad)" />
         <text x="100" y="90" textAnchor="middle" fill="white" fontSize="48">🎯</text>
         <text x="100" y="125" textAnchor="middle" fill="white" fontSize="14" fontWeight="bold">ONE TOPIC</text>
@@ -48,22 +67,26 @@ export function ConcentrationRoomFlowchart() {
       })}
 
       {/* Method Description */}
-      <rect x="50" y="330" width="700" height="70" rx="12" fill="white" stroke="#7C3AED" strokeWidth="2" />
-      <text x="400" y="360" textAnchor="middle" fill="#5B21B6" fontSize="14" fontWeight="bold">
-        The Method: Study ONE topic exhaustively before moving on
-      </text>
-      <text x="400" y="385" textAnchor="middle" fill="#6D28D9" fontSize="12">
-        Gather every verse, every angle, every cross-reference until the topic is "saturated"
-      </text>
+      <g filter="url(#cr-shadow)">
+        <rect x="50" y="330" width="700" height="70" rx="12" fill="white" fillOpacity="0.95" stroke="#7C3AED" strokeWidth="2" />
+        <text x="400" y="360" textAnchor="middle" fill="#5B21B6" fontSize="14" fontWeight="bold">
+          The Method: Study ONE topic exhaustively before moving on
+        </text>
+        <text x="400" y="385" textAnchor="middle" fill="#6D28D9" fontSize="12">
+          Gather every verse, every angle, every cross-reference until the topic is "saturated"
+        </text>
+      </g>
 
       {/* Key Principle */}
-      <rect x="50" y="420" width="700" height="60" rx="12" fill="#EDE9FE" stroke="#7C3AED" strokeWidth="2" />
-      <text x="400" y="450" textAnchor="middle" fill="#5B21B6" fontSize="14" fontWeight="bold">
-        "An inch wide and a mile deep" — Master one truth before chasing another
-      </text>
-      <text x="400" y="470" textAnchor="middle" fill="#6D28D9" fontSize="11">
-        Better to know one doctrine thoroughly than ten superficially
-      </text>
+      <g filter="url(#cr-shadow)">
+        <rect x="50" y="420" width="700" height="60" rx="12" fill="#EDE9FE" fillOpacity="0.9" stroke="#7C3AED" strokeWidth="2" />
+        <text x="400" y="450" textAnchor="middle" fill="#5B21B6" fontSize="14" fontWeight="bold">
+          "An inch wide and a mile deep" — Master one truth before chasing another
+        </text>
+        <text x="400" y="470" textAnchor="middle" fill="#6D28D9" fontSize="11">
+          Better to know one doctrine thoroughly than ten superficially
+        </text>
+      </g>
     </svg>
   );
 }
@@ -72,9 +95,24 @@ export function ConcentrationRoomFlowchart() {
 export function ConcentrationRoomConcept() {
   return (
     <svg viewBox="0 0 800 500" className="w-full h-auto" xmlns="http://www.w3.org/2000/svg">
-      <rect width="800" height="500" fill="#F5F3FF" rx="16" />
+      <defs>
+        <linearGradient id="cr2-bg" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stopColor="#F5F3FF" />
+          <stop offset="50%" stopColor="#EDE9FE" />
+          <stop offset="100%" stopColor="#DDD6FE" />
+        </linearGradient>
+        <linearGradient id="cr2-header" x1="0%" y1="0%" x2="100%" y2="0%">
+          <stop offset="0%" stopColor="#7C3AED" />
+          <stop offset="100%" stopColor="#5B21B6" />
+        </linearGradient>
+        <filter id="cr2-shadow" x="-20%" y="-20%" width="140%" height="140%">
+          <feDropShadow dx="0" dy="4" stdDeviation="6" floodOpacity="0.1"/>
+        </filter>
+      </defs>
 
-      <text x="400" y="35" textAnchor="middle" fill="#5B21B6" fontSize="22" fontWeight="bold">
+      <rect width="800" height="500" fill="url(#cr2-bg)" rx="16" />
+
+      <text x="400" y="35" textAnchor="middle" fill="#5B21B6" fontSize="22" fontWeight="bold" letterSpacing="0.5">
         Saturation Study Components
       </text>
 
@@ -88,8 +126,8 @@ export function ConcentrationRoomConcept() {
           { comp: 'History', icon: '📜', desc: 'Research historical background and fulfillment', output: 'Timeline' },
           { comp: 'Synthesis', icon: '💡', desc: 'Combine all findings into unified understanding', output: 'Summary doc' },
         ].map((item, i) => (
-          <g key={i} transform={`translate(${(i % 3) * 235}, ${Math.floor(i / 3) * 115})`}>
-            <rect x="0" y="0" width="220" height="105" rx="12" fill="white" stroke="#7C3AED" strokeWidth="2" />
+          <g key={i} transform={`translate(${(i % 3) * 235}, ${Math.floor(i / 3) * 115})`} filter="url(#cr2-shadow)">
+            <rect x="0" y="0" width="220" height="105" rx="12" fill="white" fillOpacity="0.95" stroke="#7C3AED" strokeWidth="2" />
             <text x="110" y="30" textAnchor="middle" fontSize="24">{item.icon}</text>
             <text x="110" y="50" textAnchor="middle" fill="#5B21B6" fontSize="12" fontWeight="bold">{item.comp}</text>
             <text x="110" y="70" textAnchor="middle" fill="#6D28D9" fontSize="9">{item.desc}</text>
@@ -99,28 +137,32 @@ export function ConcentrationRoomConcept() {
       </g>
 
       {/* Concentration vs Scattered */}
-      <rect x="50" y="300" width="700" height="100" rx="12" fill="white" stroke="#7C3AED" strokeWidth="2" />
-      <g transform="translate(75, 320)">
-        <rect x="0" y="0" width="300" height="70" rx="8" fill="#FEE2E2" />
-        <text x="150" y="20" textAnchor="middle" fill="#991B1B" fontSize="12" fontWeight="bold">Scattered Approach</text>
-        <text x="150" y="40" textAnchor="middle" fill="#B91C1C" fontSize="10">Read a verse here, a verse there</text>
-        <text x="150" y="55" textAnchor="middle" fill="#991B1B" fontSize="9">Result: Surface knowledge, confusion</text>
-      </g>
-      <g transform="translate(425, 320)">
-        <rect x="0" y="0" width="300" height="70" rx="8" fill="#D1FAE5" />
-        <text x="150" y="20" textAnchor="middle" fill="#065F46" fontSize="12" fontWeight="bold">Concentration Approach</text>
-        <text x="150" y="40" textAnchor="middle" fill="#047857" fontSize="10">Exhaust EVERY verse on ONE topic</text>
-        <text x="150" y="55" textAnchor="middle" fill="#065F46" fontSize="9">Result: Deep mastery, clarity</text>
+      <g filter="url(#cr2-shadow)">
+        <rect x="50" y="300" width="700" height="100" rx="12" fill="white" fillOpacity="0.95" stroke="#7C3AED" strokeWidth="2" />
+        <g transform="translate(75, 320)">
+          <rect x="0" y="0" width="300" height="70" rx="8" fill="#FEE2E2" />
+          <text x="150" y="20" textAnchor="middle" fill="#991B1B" fontSize="12" fontWeight="bold">Scattered Approach</text>
+          <text x="150" y="40" textAnchor="middle" fill="#B91C1C" fontSize="10">Read a verse here, a verse there</text>
+          <text x="150" y="55" textAnchor="middle" fill="#991B1B" fontSize="9">Result: Surface knowledge, confusion</text>
+        </g>
+        <g transform="translate(425, 320)">
+          <rect x="0" y="0" width="300" height="70" rx="8" fill="#D1FAE5" />
+          <text x="150" y="20" textAnchor="middle" fill="#065F46" fontSize="12" fontWeight="bold">Concentration Approach</text>
+          <text x="150" y="40" textAnchor="middle" fill="#047857" fontSize="10">Exhaust EVERY verse on ONE topic</text>
+          <text x="150" y="55" textAnchor="middle" fill="#065F46" fontSize="9">Result: Deep mastery, clarity</text>
+        </g>
       </g>
 
       {/* Deliverable */}
-      <rect x="50" y="420" width="700" height="60" rx="12" fill="#7C3AED" />
-      <text x="400" y="450" textAnchor="middle" fill="white" fontSize="16" fontWeight="bold">
-        Deliverable: Topic Saturation File
-      </text>
-      <text x="400" y="470" textAnchor="middle" fill="#DDD6FE" fontSize="12">
-        All verses + Word studies + Cross-references + Synthesis = Comprehensive topic mastery
-      </text>
+      <g filter="url(#cr2-shadow)">
+        <rect x="50" y="420" width="700" height="60" rx="12" fill="url(#cr2-header)" />
+        <text x="400" y="450" textAnchor="middle" fill="white" fontSize="16" fontWeight="bold">
+          Deliverable: Topic Saturation File
+        </text>
+        <text x="400" y="470" textAnchor="middle" fill="#DDD6FE" fontSize="12">
+          All verses + Word studies + Cross-references + Synthesis = Comprehensive topic mastery
+        </text>
+      </g>
     </svg>
   );
 }
@@ -129,9 +171,24 @@ export function ConcentrationRoomConcept() {
 export function ConcentrationRoomExample() {
   return (
     <svg viewBox="0 0 800 550" className="w-full h-auto" xmlns="http://www.w3.org/2000/svg">
-      <rect width="800" height="550" fill="#F5F3FF" rx="16" />
+      <defs>
+        <linearGradient id="cr3-bg" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stopColor="#F5F3FF" />
+          <stop offset="50%" stopColor="#EDE9FE" />
+          <stop offset="100%" stopColor="#DDD6FE" />
+        </linearGradient>
+        <linearGradient id="cr3-header" x1="0%" y1="0%" x2="100%" y2="0%">
+          <stop offset="0%" stopColor="#7C3AED" />
+          <stop offset="100%" stopColor="#5B21B6" />
+        </linearGradient>
+        <filter id="cr3-shadow" x="-20%" y="-20%" width="140%" height="140%">
+          <feDropShadow dx="0" dy="4" stdDeviation="6" floodOpacity="0.1"/>
+        </filter>
+      </defs>
 
-      <text x="400" y="35" textAnchor="middle" fill="#5B21B6" fontSize="22" fontWeight="bold">
+      <rect width="800" height="550" fill="url(#cr3-bg)" rx="16" />
+
+      <text x="400" y="35" textAnchor="middle" fill="#5B21B6" fontSize="22" fontWeight="bold" letterSpacing="0.5">
         Example: Saturation Study on "Faith"
       </text>
 
