@@ -17,9 +17,11 @@ import {
 import { Navigation } from "@/components/Navigation";
 import { Footer } from "@/components/Footer";
 import { SEO } from "@/components/SEO";
+import { useTrackedPaymentLinks } from "@/hooks/useTrackedPaymentLinks";
 
 export default function BibleProphecyGuide() {
-  const STRIPE_LINK = "https://buy.stripe.com/bJe14n92b5rgbzieeU6EU0f";
+  const paymentLinks = useTrackedPaymentLinks();
+  const STRIPE_LINK = paymentLinks.genesis6Days;
   
   const whatYouGet = [
     {

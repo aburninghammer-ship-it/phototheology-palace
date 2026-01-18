@@ -25,8 +25,10 @@ import {
 import { Navigation } from "@/components/Navigation";
 import { Footer } from "@/components/Footer";
 import { SEO } from "@/components/SEO";
+import { useTrackedPaymentLinks } from "@/hooks/useTrackedPaymentLinks";
 
 export default function StudySuiteSales() {
+  const paymentLinks = useTrackedPaymentLinks();
   const floors = [
     {
       number: 1,
@@ -245,7 +247,7 @@ export default function StudySuiteSales() {
                 asChild
                 className="text-lg px-8 py-6 h-auto shadow-lg shadow-primary/25 hover:shadow-xl hover:shadow-primary/30 transition-all bg-gradient-to-r from-primary to-accent hover:from-primary/90 hover:to-accent/90"
               >
-                <a href="https://buy.stripe.com/dRm28r6U37zo9ra0o46EU0e" target="_blank" rel="noopener noreferrer">
+                <a href={paymentLinks.studySuite} target="_blank" rel="noopener noreferrer">
                   Get the Complete Study Suite - $97
                   <ArrowRight className="ml-2 w-5 h-5" />
                 </a>
@@ -728,7 +730,7 @@ export default function StudySuiteSales() {
                   asChild
                   className="w-full text-lg py-6 h-auto shadow-lg shadow-primary/25 bg-gradient-to-r from-primary to-accent hover:from-primary/90 hover:to-accent/90"
                 >
-                  <a href="https://buy.stripe.com/dRm28r6U37zo9ra0o46EU0e" target="_blank" rel="noopener noreferrer">
+                  <a href={paymentLinks.studySuite} target="_blank" rel="noopener noreferrer">
                     <Building2 className="w-5 h-5 mr-2" />
                     Get the Complete Study Suite
                   </a>

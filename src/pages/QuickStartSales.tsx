@@ -21,8 +21,10 @@ import {
 import { Navigation } from "@/components/Navigation";
 import { Footer } from "@/components/Footer";
 import { SEO } from "@/components/SEO";
+import { useTrackedPaymentLinks } from "@/hooks/useTrackedPaymentLinks";
 
 export default function QuickStartSales() {
+  const paymentLinks = useTrackedPaymentLinks();
   const outcomes = [
     "Understand the architectural logic of the Phototheology Palace",
     "Identify the purpose of each of the 8 Floors",
@@ -141,7 +143,7 @@ export default function QuickStartSales() {
                 asChild
                 className="text-lg px-8 py-6 h-auto shadow-lg shadow-primary/25 hover:shadow-xl hover:shadow-primary/30 transition-all"
               >
-                <a href="https://buy.stripe.com/7sY4gzdirbPE46Qc6M6EU0d" target="_blank" rel="noopener noreferrer">
+                <a href={paymentLinks.quickStartGuide} target="_blank" rel="noopener noreferrer">
                   Get the Quick-Start Guide - $17
                   <ArrowRight className="ml-2 w-5 h-5" />
                 </a>
@@ -615,7 +617,7 @@ export default function QuickStartSales() {
                   asChild
                   className="w-full text-lg py-6 h-auto shadow-lg shadow-primary/25"
                 >
-                  <a href="https://buy.stripe.com/7sY4gzdirbPE46Qc6M6EU0d" target="_blank" rel="noopener noreferrer">
+                  <a href={paymentLinks.quickStartGuide} target="_blank" rel="noopener noreferrer">
                     <Target className="w-5 h-5 mr-2" />
                     Get the Quick-Start Guide
                   </a>
@@ -708,7 +710,7 @@ export default function QuickStartSales() {
                     asChild
                     className="w-full text-lg py-6 h-auto shadow-lg shadow-accent/25 bg-gradient-to-r from-accent to-primary hover:from-accent/90 hover:to-primary/90"
                   >
-                    <a href="https://buy.stripe.com/bJe14n92b5rgbzieeU6EU0f" target="_blank" rel="noopener noreferrer">
+                    <a href={paymentLinks.genesis6Days} target="_blank" rel="noopener noreferrer">
                       <BookOpen className="w-5 h-5 mr-2" />
                       Get Genesis in 6 Days
                     </a>

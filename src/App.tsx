@@ -41,6 +41,7 @@ import { usePresenceTracker } from "@/hooks/usePresenceTracker";
 import { PresenceTracker } from "@/components/PresenceTracker";
 import { ChangeManagerProvider, GuidedPathChecklist, ChangeSpineUpgradePrompt, IdentityMessage } from "@/components/change-manager";
 import { GuidedPathTracker } from "@/hooks/useGuidedPathTracker";
+import { useUTMCapture } from "@/hooks/useUTMCapture";
 
 // Critical pages - load immediately (landing + auth only)
 import Gatehouse from "./pages/Gatehouse";
@@ -306,6 +307,9 @@ const queryClient = new QueryClient({
 });
 
 function App() {
+  // Capture UTM parameters on app load for ad attribution
+  useUTMCapture();
+  
   // Skip splash for returning users (localStorage check)
   const isReturningUser = typeof window !== 'undefined' && localStorage.getItem('hasVisited') === 'true';
   const [showSplash, setShowSplash] = useState(!isReturningUser);
