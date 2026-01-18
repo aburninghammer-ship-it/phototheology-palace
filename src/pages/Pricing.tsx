@@ -10,6 +10,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useState, useEffect } from "react";
 import confetti from "canvas-confetti";
+import { useTrackedPaymentLinks } from "@/hooks/useTrackedPaymentLinks";
 
 export default function Pricing() {
   const { user } = useAuth();
@@ -17,6 +18,7 @@ export default function Pricing() {
   const [searchParams] = useSearchParams();
   const [billingPeriod, setBillingPeriod] = useState<'monthly' | 'annual'>('monthly');
   const [isStartingTrial, setIsStartingTrial] = useState(false);
+  const paymentLinks = useTrackedPaymentLinks();
 
   // Handle trial/subscription success/cancelled from Stripe redirect
   useEffect(() => {
@@ -200,8 +202,8 @@ export default function Pricing() {
       badgeVariant: "secondary" as const,
       ctaText: "Get Essential",
       ctaVariant: "default" as const,
-      monthlyUrl: "https://buy.stripe.com/9AQ5kD1zJ2f41YI9YE6EU01",
-      annualUrl: "https://buy.stripe.com/bIY14n7Y73jaaqe9YE6EU02",
+      monthlyUrl: paymentLinks.essentialMonthly,
+      annualUrl: paymentLinks.essentialAnnual,
       features: [
         "All 8 Palace Floors + 40+ Rooms",
         "Bible Reader with Strong's",
