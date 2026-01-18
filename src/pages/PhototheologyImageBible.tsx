@@ -99,7 +99,7 @@ function Flashcard({ chapter, isFlipped, onFlip, size = "normal", memoryTestMode
               {memoryTestMode && (
                 <div className="absolute top-4 left-0 right-0 text-center">
                   <p className="text-white text-lg bg-black/70 px-4 py-2 rounded-full inline-block font-semibold">
-                    What chapter is this?
+                    What is happening in this chapter?
                   </p>
                 </div>
               )}
@@ -116,7 +116,7 @@ function Flashcard({ chapter, isFlipped, onFlip, size = "normal", memoryTestMode
               )}
               <p className="text-white/70 text-sm mt-2">Tap to see theme</p>
               {memoryTestMode && (
-                <p className="text-white text-lg mt-4 font-semibold">What chapter is this?</p>
+                <p className="text-white text-lg mt-4 font-semibold">What is happening in this chapter?</p>
               )}
             </div>
           )}
