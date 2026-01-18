@@ -729,7 +729,7 @@ export default function PhototheologyImageBible() {
           </div>
         )}
 
-        {/* Grid View - At a Glance with FULL emoji icons */}
+        {/* Grid View - At a Glance with generated images */}
         {viewMode === "grid" && (
           <div className="space-y-8">
             {imageBibleBooks.map((book) => (
@@ -739,25 +739,43 @@ export default function PhototheologyImageBible() {
                   <Badge variant="outline">{book.totalChapters} chapters</Badge>
                 </div>
                 <div className="grid grid-cols-5 sm:grid-cols-8 md:grid-cols-10 lg:grid-cols-12 gap-2">
-                  {book.chapters.map((chapter) => (
-                    <div
-                      key={`${book.name}-${chapter.chapter}`}
-                      className="aspect-square bg-gradient-to-br from-purple-100 to-pink-100 dark:from-purple-900/30 dark:to-pink-900/30 rounded-lg flex flex-col items-center justify-center cursor-pointer hover:scale-110 transition-transform hover:shadow-lg group relative p-1"
-                      onClick={() => selectChapter(chapter)}
-                      title={`${chapter.book} ${chapter.chapter}: ${chapter.theme}`}
-                    >
-                      <span className="text-xl sm:text-2xl group-hover:scale-110 transition-transform leading-none">
-                        {chapter.visualIcon}
-                      </span>
-                      <span className="text-[10px] sm:text-xs font-medium mt-0.5">{chapter.chapter}</span>
+                  {book.chapters.map((chapter) => {
+                    const imageUrl = getChapterImageUrl(imageMap, chapter.book, chapter.chapter);
+                    return (
+                      <div
+                        key={`${book.name}-${chapter.chapter}`}
+                        className="aspect-square bg-gradient-to-br from-purple-100 to-pink-100 dark:from-purple-900/30 dark:to-pink-900/30 rounded-lg flex flex-col items-center justify-center cursor-pointer hover:scale-110 transition-transform hover:shadow-lg group relative overflow-hidden"
+                        onClick={() => selectChapter(chapter)}
+                        title={`${chapter.book} ${chapter.chapter}: ${chapter.theme}`}
+                      >
+                        {imageUrl ? (
+                          <>
+                            <img
+                              src={imageUrl}
+                              alt={`${chapter.book} ${chapter.chapter}`}
+                              className="w-full h-full object-cover absolute inset-0"
+                            />
+                            <span className="absolute bottom-0.5 right-1 text-[10px] sm:text-xs font-bold text-white bg-black/60 px-1 rounded">
+                              {chapter.chapter}
+                            </span>
+                          </>
+                        ) : (
+                          <>
+                            <span className="text-xl sm:text-2xl group-hover:scale-110 transition-transform leading-none">
+                              {chapter.visualIcon}
+                            </span>
+                            <span className="text-[10px] sm:text-xs font-medium mt-0.5">{chapter.chapter}</span>
+                          </>
+                        )}
 
-                      {/* Tooltip on hover */}
-                      <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-2 bg-slate-900 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-10 pointer-events-none">
-                        {chapter.theme}
-                        <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-slate-900"></div>
+                        {/* Tooltip on hover */}
+                        <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-2 bg-slate-900 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-10 pointer-events-none">
+                          {chapter.theme}
+                          <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-slate-900"></div>
+                        </div>
                       </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               </div>
             ))}
@@ -1033,16 +1051,29 @@ export default function PhototheologyImageBible() {
                       <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3">
                         {testSession.answers
                           .filter(a => !a.correct)
-                          .map((answer, idx) => (
-                            <div
-                              key={idx}
-                              className="p-3 rounded-lg bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-center"
-                            >
-                              <div className="text-3xl mb-2">{answer.chapter.visualIcon}</div>
-                              <div className="text-sm font-medium">{answer.chapter.book} {answer.chapter.chapter}</div>
-                              <div className="text-xs text-muted-foreground truncate">{answer.chapter.theme}</div>
-                            </div>
-                          ))}
+                          .map((answer, idx) => {
+                            const missedImageUrl = getChapterImageUrl(imageMap, answer.chapter.book, answer.chapter.chapter);
+                            return (
+                              <div
+                                key={idx}
+                                className="p-3 rounded-lg bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-center"
+                              >
+                                {missedImageUrl ? (
+                                  <div className="w-16 h-16 mx-auto mb-2 rounded-lg overflow-hidden">
+                                    <img
+                                      src={missedImageUrl}
+                                      alt={`${answer.chapter.book} ${answer.chapter.chapter}`}
+                                      className="w-full h-full object-cover"
+                                    />
+                                  </div>
+                                ) : (
+                                  <div className="text-3xl mb-2">{answer.chapter.visualIcon}</div>
+                                )}
+                                <div className="text-sm font-medium">{answer.chapter.book} {answer.chapter.chapter}</div>
+                                <div className="text-xs text-muted-foreground truncate">{answer.chapter.theme}</div>
+                              </div>
+                            );
+                          })}
                       </div>
                     </CardContent>
                   </Card>
