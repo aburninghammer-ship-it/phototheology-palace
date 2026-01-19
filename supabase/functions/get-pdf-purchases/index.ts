@@ -87,6 +87,25 @@ serve(async (req) => {
 
     logStep("Got checkout sessions", { count: sessions.data.length });
 
+    // Get email logs from database
+    const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
+    const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey || supabaseAnonKey);
+    
+    const { data: emailLogs } = await supabaseAdmin
+      .from("pdf_email_logs")
+      .select("checkout_session_id, email, product_key, sent_at, success");
+    
+    // Create a map for quick lookup
+    const emailLogMap = new Map<string, { sent_at: string; success: boolean }>();
+    emailLogs?.forEach(log => {
+      if (log.checkout_session_id) {
+        emailLogMap.set(log.checkout_session_id, {
+          sent_at: log.sent_at,
+          success: log.success,
+        });
+      }
+    });
+
     // Find all PDF purchases
     const pdfPurchases: any[] = [];
 
@@ -115,6 +134,7 @@ serve(async (req) => {
         }
 
         if (isMatch) {
+          const emailLog = emailLogMap.get(session.id);
           pdfPurchases.push({
             id: session.id,
             product: config.name,
@@ -123,6 +143,8 @@ serve(async (req) => {
             email: session.customer_details?.email || null,
             name: session.customer_details?.name || null,
             date: new Date((session.created || 0) * 1000).toISOString(),
+            pdfSent: emailLog?.success || false,
+            pdfSentAt: emailLog?.sent_at || null,
           });
           break; // Don't double-count
         }
