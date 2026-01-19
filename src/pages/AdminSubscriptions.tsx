@@ -18,6 +18,7 @@ import { PickaxeEmailCampaign } from "@/components/admin/PickaxeEmailCampaign";
 import { TeachableEmailCampaign } from "@/components/admin/TeachableEmailCampaign";
 import { AdminPasswordReset } from "@/components/admin/AdminPasswordReset";
 import { SubscriptionAnalyticsChart } from "@/components/admin/SubscriptionAnalyticsChart";
+import { AdminUserManagement } from "@/components/admin/AdminUserManagement";
 import { Badge } from "@/components/ui/badge";
 
 interface StripeStats {
@@ -1055,6 +1056,7 @@ export default function AdminSubscriptions() {
 
         {/* User Tools Tab */}
         <TabsContent value="users" className="space-y-6">
+          <AdminUserManagement />
           <AdminPasswordReset />
         </TabsContent>
       </Tabs>
