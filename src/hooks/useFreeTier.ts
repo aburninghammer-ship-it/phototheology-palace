@@ -81,7 +81,8 @@ export function useFreeTier(): FreeTierAccess {
     enabled: !!user,
   });
 
-  // Also check for active Patreon connection
+  // Also check for active Patreon connection - require $15/month minimum (1500 cents)
+  const PATREON_MINIMUM_CENTS = 1500;
   const { data: patreonConnection } = useQuery({
     queryKey: ["patreon-connection", user?.id],
     queryFn: async () => {
@@ -98,6 +99,10 @@ export function useFreeTier(): FreeTierAccess {
     },
     enabled: !!user,
   });
+
+  // Patreon grants access only if active AND meets minimum pledge
+  const hasActivePatreon = patreonConnection?.is_active_patron && 
+    (patreonConnection?.entitled_cents || 0) >= PATREON_MINIMUM_CENTS;
 
   // Check for Teachable student access
   const { data: teachableAccess } = useQuery({
@@ -173,8 +178,8 @@ export function useFreeTier(): FreeTierAccess {
     // Teachable students get premium access
     if (hasTeachableAccess) return "student";
 
-    // Patreon connection grants access independent of Stripe
-    if (patreonConnection?.is_active_patron) return "patron";
+    // Patreon connection grants access independent of Stripe (if meets $15 min)
+    if (hasActivePatreon) return "patron";
 
     // If we don't yet have profile data, default to free (UI should respect isLoading)
     if (!profile) return "free";
