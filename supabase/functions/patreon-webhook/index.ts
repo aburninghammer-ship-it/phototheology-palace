@@ -174,7 +174,12 @@ serve(async (req) => {
 
 async function updateUserAccess(supabase: any, userId: string, hasAccess: boolean, pledgeAmount: number) {
   if (hasAccess) {
-    // Grant/maintain premium access
+    // Grant/maintain premium access - clear any pending expiration
+    await supabase.from("patreon_connections").update({
+      pledge_status: "active",
+      access_expires_at: null,
+    }).eq("user_id", userId);
+    
     await supabase.from("profiles").update({
       subscription_tier: "premium",
       subscription_status: "active",
@@ -190,14 +195,40 @@ async function updateUserAccess(supabase: any, userId: string, hasAccess: boolea
       .eq("id", userId)
       .single();
 
+    const { data: connection } = await supabase
+      .from("patreon_connections")
+      .select("access_expires_at, pledge_status")
+      .eq("user_id", userId)
+      .single();
+
     if (profile?.payment_source === "patreon") {
-      // Revoke access - they were on Patreon and no longer qualify
-      await supabase.from("profiles").update({
-        subscription_tier: "free",
-        subscription_status: pledgeAmount > 0 ? "active" : "cancelled",
-        updated_at: new Date().toISOString(),
-      }).eq("id", userId);
-      console.log("Revoked premium access for user:", userId, "- pledge dropped below minimum");
+      // Check if grace period already started
+      if (!connection?.access_expires_at) {
+        // Start 30-day grace period - access continues until billing period ends
+        const gracePeriodEnd = new Date();
+        gracePeriodEnd.setDate(gracePeriodEnd.getDate() + 30);
+
+        await supabase.from("patreon_connections").update({
+          pledge_status: "cancelled",
+          access_expires_at: gracePeriodEnd.toISOString(),
+        }).eq("user_id", userId);
+
+        console.log("Started grace period for user:", userId, "- access until:", gracePeriodEnd.toISOString());
+      } else if (new Date(connection.access_expires_at) < new Date()) {
+        // Grace period has ended - now revoke access
+        await supabase.from("profiles").update({
+          subscription_tier: "free",
+          subscription_status: "cancelled",
+          updated_at: new Date().toISOString(),
+        }).eq("id", userId);
+
+        await supabase.from("patreon_connections").update({
+          pledge_status: "expired",
+        }).eq("user_id", userId);
+
+        console.log("Revoked premium access for user:", userId, "- grace period ended");
+      }
+      // If grace period is active, do nothing - they keep access
     }
   }
 }

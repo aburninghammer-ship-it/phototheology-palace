@@ -7431,6 +7431,7 @@ export type Database = {
       }
       patreon_connections: {
         Row: {
+          access_expires_at: string | null
           access_token: string | null
           connected_at: string | null
           entitled_cents: number | null
@@ -7439,12 +7440,14 @@ export type Database = {
           patreon_email: string | null
           patreon_name: string | null
           patreon_user_id: string
+          pledge_status: string | null
           refresh_token: string | null
           token_expires_at: string | null
           updated_at: string | null
           user_id: string
         }
         Insert: {
+          access_expires_at?: string | null
           access_token?: string | null
           connected_at?: string | null
           entitled_cents?: number | null
@@ -7453,12 +7456,14 @@ export type Database = {
           patreon_email?: string | null
           patreon_name?: string | null
           patreon_user_id: string
+          pledge_status?: string | null
           refresh_token?: string | null
           token_expires_at?: string | null
           updated_at?: string | null
           user_id: string
         }
         Update: {
+          access_expires_at?: string | null
           access_token?: string | null
           connected_at?: string | null
           entitled_cents?: number | null
@@ -7467,6 +7472,7 @@ export type Database = {
           patreon_email?: string | null
           patreon_name?: string | null
           patreon_user_id?: string
+          pledge_status?: string | null
           refresh_token?: string | null
           token_expires_at?: string | null
           updated_at?: string | null
@@ -12536,10 +12542,13 @@ export type Database = {
       }
       teachable_students: {
         Row: {
+          access_expires_at: string | null
           course_name: string | null
           created_at: string
+          enrollment_status: string | null
           id: string
           is_active: boolean | null
+          last_sync_at: string | null
           last_verified_at: string | null
           mrr: number | null
           teachable_email: string
@@ -12548,10 +12557,13 @@ export type Database = {
           verified_at: string
         }
         Insert: {
+          access_expires_at?: string | null
           course_name?: string | null
           created_at?: string
+          enrollment_status?: string | null
           id?: string
           is_active?: boolean | null
+          last_sync_at?: string | null
           last_verified_at?: string | null
           mrr?: number | null
           teachable_email: string
@@ -12560,10 +12572,13 @@ export type Database = {
           verified_at?: string
         }
         Update: {
+          access_expires_at?: string | null
           course_name?: string | null
           created_at?: string
+          enrollment_status?: string | null
           id?: string
           is_active?: boolean | null
+          last_sync_at?: string | null
           last_verified_at?: string | null
           mrr?: number | null
           teachable_email?: string
