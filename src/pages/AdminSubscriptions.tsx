@@ -19,6 +19,7 @@ import { TeachableEmailCampaign } from "@/components/admin/TeachableEmailCampaig
 import { AdminPasswordReset } from "@/components/admin/AdminPasswordReset";
 import { SubscriptionAnalyticsChart } from "@/components/admin/SubscriptionAnalyticsChart";
 import { AdminUserManagement } from "@/components/admin/AdminUserManagement";
+import { EmailCampaignHistory } from "@/components/admin/EmailCampaignHistory";
 import { Badge } from "@/components/ui/badge";
 
 interface StripeStats {
@@ -844,7 +845,8 @@ export default function AdminSubscriptions() {
           <RevenueDashboard />
         </TabsContent>
 
-        <TabsContent value="campaigns">
+        <TabsContent value="campaigns" className="space-y-6">
+          <EmailCampaignHistory />
           <EmailCampaignManager />
         </TabsContent>
 

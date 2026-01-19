@@ -158,6 +158,9 @@ serve(async (req) => {
     let sentCount = 0;
     let errorCount = 0;
 
+    // Create a campaign name for logging
+    const campaignName = `Pickaxe Campaign - ${filter} - ${new Date().toISOString().split('T')[0]}`;
+
     // Send emails in batches of 10
     const batchSize = 10;
     for (let i = 0; i < emails.length; i += batchSize) {
@@ -171,9 +174,29 @@ serve(async (req) => {
             subject,
             html: htmlContent,
           });
+          
+          // Log successful send
+          await supabase.from("email_campaign_logs").insert({
+            campaign_name: campaignName,
+            recipient_email: email,
+            email_type: "pickaxe",
+            status: "sent",
+            sent_at: new Date().toISOString(),
+          });
+          
           sentCount++;
         } catch (err) {
           console.error(`Failed to send to ${email}:`, err);
+          
+          // Log failed send
+          await supabase.from("email_campaign_logs").insert({
+            campaign_name: campaignName,
+            recipient_email: email,
+            email_type: "pickaxe",
+            status: "failed",
+            error_message: err instanceof Error ? err.message : "Unknown error",
+          });
+          
           errorCount++;
         }
       });
