@@ -41,35 +41,33 @@ export function AdminUserManagement() {
   const loadUsers = async () => {
     setLoading(true);
     try {
-      // First get all user emails from auth admin or via edge function
-      const { data: profilesData, error: profilesError } = await supabase
-        .from("profiles")
+      // Use user_subscriptions as the source of truth for subscription data
+      const { data: subscriptionsData, error: subscriptionsError } = await supabase
+        .from("user_subscriptions")
         .select(`
-          id,
-          username,
-          display_name,
-          created_at,
-          last_seen,
+          user_id,
           subscription_status,
           subscription_tier,
           payment_source,
-          has_lifetime_access,
           stripe_customer_id,
-          trial_ends_at
+          trial_ends_at,
+          has_lifetime_access,
+          created_at,
+          updated_at
         `)
         .order("created_at", { ascending: false });
 
-      if (profilesError) throw profilesError;
+      if (subscriptionsError) throw subscriptionsError;
 
-      // Get emails from user_subscriptions which might have more data
-      const { data: subscriptionsData } = await supabase
-        .from("user_subscriptions")
-        .select("user_id, subscription_status, subscription_tier, payment_source, stripe_customer_id, trial_ends_at, has_lifetime_access");
+      // Get profiles for additional metadata (username, display_name, last_seen)
+      const { data: profilesData } = await supabase
+        .from("profiles")
+        .select("id, username, display_name, last_seen, created_at");
 
-      // Create a map of user_id to subscription data
-      const subscriptionMap = new Map();
-      subscriptionsData?.forEach(sub => {
-        subscriptionMap.set(sub.user_id, sub);
+      // Create a map of user_id to profile data
+      const profileMap = new Map();
+      profilesData?.forEach(profile => {
+        profileMap.set(profile.id, profile);
       });
 
       // Get user emails via edge function
@@ -82,22 +80,22 @@ export function AdminUserManagement() {
         });
       }
 
-      // Merge profile data with subscription data and emails
-      const mergedUsers: UserWithSubscription[] = (profilesData || []).map(profile => {
-        const subData = subscriptionMap.get(profile.id);
+      // Build users list from user_subscriptions (source of truth)
+      const mergedUsers: UserWithSubscription[] = (subscriptionsData || []).map(sub => {
+        const profile = profileMap.get(sub.user_id);
         return {
-          id: profile.id,
-          email: emailMap.get(profile.id) || 'N/A',
-          username: profile.username,
-          display_name: profile.display_name,
-          created_at: profile.created_at,
-          last_seen: profile.last_seen,
-          subscription_status: subData?.subscription_status || profile.subscription_status,
-          subscription_tier: subData?.subscription_tier || profile.subscription_tier,
-          payment_source: subData?.payment_source || profile.payment_source,
-          has_lifetime_access: subData?.has_lifetime_access || profile.has_lifetime_access || false,
-          stripe_customer_id: subData?.stripe_customer_id || profile.stripe_customer_id,
-          trial_ends_at: subData?.trial_ends_at || profile.trial_ends_at,
+          id: sub.user_id,
+          email: emailMap.get(sub.user_id) || 'N/A',
+          username: profile?.username || 'N/A',
+          display_name: profile?.display_name,
+          created_at: profile?.created_at || sub.created_at,
+          last_seen: profile?.last_seen,
+          subscription_status: sub.subscription_status,
+          subscription_tier: sub.subscription_tier,
+          payment_source: sub.payment_source,
+          has_lifetime_access: sub.has_lifetime_access || false,
+          stripe_customer_id: sub.stripe_customer_id,
+          trial_ends_at: sub.trial_ends_at,
         };
       });
 
