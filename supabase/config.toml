@@ -258,3 +258,6 @@ verify_jwt = false
 
 [functions.room-66-generate]
 verify_jwt = false
+
+[functions.record-analytics-snapshot]
+verify_jwt = false
