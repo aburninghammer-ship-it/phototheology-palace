@@ -70,6 +70,20 @@ export function AdminUserManagement() {
         profileMap.set(profile.id, profile);
       });
 
+      // Get active Patreon connections to properly identify Patreon users
+      const { data: patreonConnectionsData } = await supabase
+        .from("patreon_connections")
+        .select("user_id, is_active_patron, entitled_cents");
+
+      // Create a map of user_id to Patreon connection status
+      const patreonMap = new Map<string, { isActive: boolean; entitledCents: number }>();
+      patreonConnectionsData?.forEach(conn => {
+        patreonMap.set(conn.user_id, {
+          isActive: conn.is_active_patron || false,
+          entitledCents: conn.entitled_cents || 0
+        });
+      });
+
       // Get user emails via edge function
       const { data: emailsData, error: emailsError } = await supabase.functions.invoke('get-user-emails');
       
@@ -83,6 +97,14 @@ export function AdminUserManagement() {
       // Build users list from user_subscriptions (source of truth)
       const mergedUsers: UserWithSubscription[] = (subscriptionsData || []).map(sub => {
         const profile = profileMap.get(sub.user_id);
+        const patreonConn = patreonMap.get(sub.user_id);
+        
+        // Determine payment source - prioritize Patreon if user has active connection
+        let paymentSource = sub.payment_source;
+        if (patreonConn?.isActive && patreonConn.entitledCents > 0) {
+          paymentSource = 'patreon';
+        }
+        
         return {
           id: sub.user_id,
           email: emailMap.get(sub.user_id) || 'N/A',
@@ -92,7 +114,7 @@ export function AdminUserManagement() {
           last_seen: profile?.last_seen,
           subscription_status: sub.subscription_status,
           subscription_tier: sub.subscription_tier,
-          payment_source: sub.payment_source,
+          payment_source: paymentSource,
           has_lifetime_access: sub.has_lifetime_access || false,
           stripe_customer_id: sub.stripe_customer_id,
           trial_ends_at: sub.trial_ends_at,
