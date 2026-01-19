@@ -12447,6 +12447,60 @@ export type Database = {
         }
         Relationships: []
       }
+      subscription_analytics_snapshots: {
+        Row: {
+          active_patrons: number | null
+          active_subscriptions: number | null
+          canceled_subscriptions: number | null
+          church_count: number | null
+          created_at: string
+          essential_count: number | null
+          id: string
+          lifetime_access: number | null
+          mrr_cents: number | null
+          pickaxe_paid: number | null
+          premium_count: number | null
+          snapshot_date: string
+          student_count: number | null
+          total_users: number | null
+          trialing_subscriptions: number | null
+        }
+        Insert: {
+          active_patrons?: number | null
+          active_subscriptions?: number | null
+          canceled_subscriptions?: number | null
+          church_count?: number | null
+          created_at?: string
+          essential_count?: number | null
+          id?: string
+          lifetime_access?: number | null
+          mrr_cents?: number | null
+          pickaxe_paid?: number | null
+          premium_count?: number | null
+          snapshot_date: string
+          student_count?: number | null
+          total_users?: number | null
+          trialing_subscriptions?: number | null
+        }
+        Update: {
+          active_patrons?: number | null
+          active_subscriptions?: number | null
+          canceled_subscriptions?: number | null
+          church_count?: number | null
+          created_at?: string
+          essential_count?: number | null
+          id?: string
+          lifetime_access?: number | null
+          mrr_cents?: number | null
+          pickaxe_paid?: number | null
+          premium_count?: number | null
+          snapshot_date?: string
+          student_count?: number | null
+          total_users?: number | null
+          trialing_subscriptions?: number | null
+        }
+        Relationships: []
+      }
       teachable_students: {
         Row: {
           course_name: string | null
