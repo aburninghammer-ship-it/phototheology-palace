@@ -22,6 +22,7 @@ import { bibleRenderedSets, BibleRenderedSet, getTotalChapters, getTotalRenders 
 import { getBibleRenderedImage } from "@/assets/bible-rendered";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
+import { SaveDrillButton } from "@/components/drills/SaveDrillButton";
 
 type DrillMode = "learn" | "symbol-to-range" | "range-to-symbol" | "name-to-symbol" | "full-quiz";
 
@@ -283,7 +284,7 @@ const BibleRenderedDrill = () => {
                 <p className="text-sm text-muted-foreground">Accuracy</p>
               </div>
             </div>
-            <div className="flex gap-3 justify-center">
+            <div className="flex gap-3 justify-center flex-wrap">
               <Button onClick={shuffleSets}>
                 <Shuffle className="h-4 w-4 mr-2" />
                 Try Again (Shuffled)
@@ -292,6 +293,25 @@ const BibleRenderedDrill = () => {
                 <RotateCcw className="h-4 w-4 mr-2" />
                 Reset Order
               </Button>
+              <SaveDrillButton
+                drillData={{
+                  verse_reference: `Bible Rendered - ${mode}`,
+                  mode: mode,
+                  drill_type: "bible-rendered",
+                  floor_number: 1,
+                  room_id: "bible-rendered",
+                  drill_data: {
+                    correct: correctCount,
+                    incorrect: results.length - correctCount,
+                    accuracy,
+                    totalSets: results.length,
+                    filterCategory,
+                    results,
+                  },
+                }}
+                defaultName={`Bible Rendered ${mode} - ${accuracy}%`}
+                isCompleted={true}
+              />
             </div>
           </CardContent>
         </Card>
