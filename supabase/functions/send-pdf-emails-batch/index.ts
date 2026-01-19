@@ -319,6 +319,14 @@ serve(async (req) => {
           `,
         });
 
+        // Log successful email to database
+        await supabase.from("pdf_email_logs").insert({
+          email: purchase.email,
+          product_key: purchase.productKey,
+          checkout_session_id: purchase.sessionId,
+          success: true,
+        });
+
         results.push({
           email: purchase.email,
           product: config.name,
@@ -331,6 +339,16 @@ serve(async (req) => {
         await new Promise(resolve => setTimeout(resolve, 100));
       } catch (error) {
         const errorMessage = error instanceof Error ? error.message : String(error);
+        
+        // Log failed email to database
+        await supabase.from("pdf_email_logs").insert({
+          email: purchase.email,
+          product_key: purchase.productKey,
+          checkout_session_id: purchase.sessionId,
+          success: false,
+          error_message: errorMessage,
+        });
+
         results.push({
           email: purchase.email,
           product: purchase.productName,

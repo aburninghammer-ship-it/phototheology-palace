@@ -7525,6 +7525,39 @@ export type Database = {
         }
         Relationships: []
       }
+      pdf_email_logs: {
+        Row: {
+          checkout_session_id: string | null
+          created_at: string
+          email: string
+          error_message: string | null
+          id: string
+          product_key: string
+          sent_at: string
+          success: boolean
+        }
+        Insert: {
+          checkout_session_id?: string | null
+          created_at?: string
+          email: string
+          error_message?: string | null
+          id?: string
+          product_key: string
+          sent_at?: string
+          success?: boolean
+        }
+        Update: {
+          checkout_session_id?: string | null
+          created_at?: string
+          email?: string
+          error_message?: string | null
+          id?: string
+          product_key?: string
+          sent_at?: string
+          success?: boolean
+        }
+        Relationships: []
+      }
       pending_student_verifications: {
         Row: {
           attempts: number

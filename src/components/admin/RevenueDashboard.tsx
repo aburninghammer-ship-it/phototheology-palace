@@ -348,6 +348,7 @@ export function RevenueDashboard() {
                       <TableHead>Date</TableHead>
                       <TableHead>Product</TableHead>
                       <TableHead>Customer</TableHead>
+                      <TableHead className="text-center">PDF Sent</TableHead>
                       <TableHead className="text-right">Amount</TableHead>
                     </TableRow>
                   </TableHeader>
@@ -374,6 +375,17 @@ export function RevenueDashboard() {
                               <span className="text-sm text-muted-foreground italic">Email in Stripe Dashboard</span>
                             )}
                           </div>
+                        </TableCell>
+                        <TableCell className="text-center">
+                          {purchase.pdfSent ? (
+                            <Badge variant="outline" className="bg-green-500/10 text-green-600 border-green-500/30">
+                              ✓ Sent
+                            </Badge>
+                          ) : (
+                            <Badge variant="outline" className="bg-amber-500/10 text-amber-600 border-amber-500/30">
+                              Pending
+                            </Badge>
+                          )}
                         </TableCell>
                         <TableCell className="text-right font-mono font-medium text-green-600">
                           ${purchase.amount.toFixed(2)}
