@@ -187,6 +187,7 @@ serve(async (req) => {
     const resend = new Resend(RESEND_API_KEY);
     let sentCount = 0;
     let errorCount = 0;
+    const campaignName = `Teachable Campaign - ${filter} - ${new Date().toISOString().split('T')[0]}`;
 
     // Send emails in batches of 50 for better throughput
     const batchSize = 50;
@@ -202,9 +203,28 @@ serve(async (req) => {
             html: htmlContent,
           });
           sentCount++;
+          
+          // Log successful send
+          await supabase.from("email_campaign_logs").insert({
+            campaign_name: campaignName,
+            email_type: "teachable",
+            recipient_email: email,
+            status: "sent",
+            sent_at: new Date().toISOString(),
+          });
         } catch (err) {
           console.error(`Failed to send to ${email}:`, err);
           errorCount++;
+          
+          // Log failed send
+          await supabase.from("email_campaign_logs").insert({
+            campaign_name: campaignName,
+            email_type: "teachable",
+            recipient_email: email,
+            status: "failed",
+            error_message: err instanceof Error ? err.message : "Unknown error",
+            sent_at: new Date().toISOString(),
+          });
         }
       });
 
