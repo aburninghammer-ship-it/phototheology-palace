@@ -20,6 +20,7 @@ import { useEffect, useState } from "react";
 import { Footer } from "@/components/Footer";
 import { VoiceChatWidget } from "@/components/voice/VoiceChatWidget";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
 
 const Palace = () => {
   const { user } = useAuth();
@@ -61,6 +62,44 @@ const Palace = () => {
       }
     }
   }, [searchParams]);
+
+  // Handle subscription success redirect from Stripe
+  useEffect(() => {
+    const subscriptionStatus = searchParams.get('subscription');
+    
+    const sendPurchaseNotification = async () => {
+      if (!user) return;
+      try {
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('subscription_tier')
+          .eq('id', user.id)
+          .single();
+        
+        await supabase.functions.invoke('send-purchase-notification', {
+          body: {
+            userEmail: user.email || 'Unknown',
+            userName: user.user_metadata?.full_name || user.email?.split('@')[0] || 'Unknown',
+            amount: 0, // Amount will show in Stripe dashboard
+            currency: 'usd',
+            subscriptionTier: profile?.subscription_tier || 'premium',
+            isTrialing: false,
+            billingInterval: 'month',
+          },
+        });
+        console.log('Purchase notification sent successfully');
+      } catch (error) {
+        console.error('Failed to send purchase notification:', error);
+      }
+    };
+
+    if (subscriptionStatus === 'success') {
+      toast.success("🎉 Welcome to Phototheology! Your subscription is now active.");
+      sendPurchaseNotification();
+      // Clear the URL param
+      navigate('/palace', { replace: true });
+    }
+  }, [searchParams, user, navigate]);
 
   return (
     <div className="min-h-screen bg-gradient-subtle">
