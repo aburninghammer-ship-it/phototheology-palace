@@ -171,14 +171,13 @@ serve(async (req) => {
           throw new Error("Failed to save Patreon connection");
         }
 
-        // Only grant premium access if active patron AND meets $20/month minimum
+        // Only grant premium access if active patron AND meets $15/month minimum
         if (isActivePatron && meetsMinimumPledge) {
           await supabase
             .from("profiles")
             .update({
               subscription_tier: "premium",
               subscription_status: "active",
-              payment_source: "patreon",
               updated_at: new Date().toISOString()
             })
             .eq("id", userId);
