@@ -53,7 +53,8 @@ export const PatreonConnect = () => {
     setConnecting(true);
 
     try {
-      const redirectUri = `${window.location.origin}/patreon-callback`;
+      // Use canonical domain for Patreon OAuth to avoid redirect URI mismatches across domains
+      const redirectUri = "https://phototheology.app/patreon-callback";
 
       const { data, error: fnError } = await supabase.functions.invoke("patreon-auth", {
         body: { redirectUri, userId: user.id },

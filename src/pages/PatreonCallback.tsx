@@ -50,7 +50,8 @@ export default function PatreonCallback() {
       sessionStorage.setItem("patreon_processed_code", code);
 
       try {
-        const redirectUri = `${window.location.origin}/patreon-callback`;
+        // Use canonical domain for Patreon OAuth (must match what was sent in patreon-auth)
+        const redirectUri = "https://phototheology.app/patreon-callback";
         
         const { data, error: fnError } = await supabase.functions.invoke("patreon-callback", {
           body: {
