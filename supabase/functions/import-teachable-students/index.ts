@@ -10,6 +10,28 @@ const corsHeaders = {
 // You may need to update this with the actual course ID from Teachable
 const MASTER_CLASS_COURSE_ID = Deno.env.get("TEACHABLE_MASTER_CLASS_COURSE_ID") || "";
 
+// Helper to send welcome email
+async function sendWelcomeEmail(email: string, name: string) {
+  const SUPABASE_URL = Deno.env.get("SUPABASE_URL");
+  try {
+    const response = await fetch(`${SUPABASE_URL}/functions/v1/send-welcome-email`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email, name, source: "teachable" }),
+    });
+    if (response.ok) {
+      console.log(`[IMPORT-TEACHABLE] Welcome email sent to ${email}`);
+      return true;
+    } else {
+      console.warn(`[IMPORT-TEACHABLE] Failed to send welcome email to ${email}`);
+      return false;
+    }
+  } catch (err) {
+    console.error(`[IMPORT-TEACHABLE] Error sending welcome email:`, err);
+    return false;
+  }
+}
+
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
@@ -113,9 +135,20 @@ serve(async (req) => {
 
     // Process each user to determine their enrollment status
     const studentsToInsert: any[] = [];
+    const newMasterClassEmails: string[] = []; // Track new Master Class students for welcome emails
     let masterClassCount = 0;
     let freeUserCount = 0;
     let processedForEnrollments = 0;
+
+    // First, get existing Master Class students to avoid re-welcoming them
+    const { data: existingStudents } = await supabase
+      .from("teachable_students")
+      .select("teachable_email, is_master_class, is_active")
+      .eq("is_master_class", true);
+    
+    const existingMasterClassEmails = new Set(
+      (existingStudents || []).map(s => s.teachable_email?.toLowerCase())
+    );
 
     for (const teachableUser of allUsers) {
       if (!teachableUser.email) continue;
@@ -179,6 +212,11 @@ serve(async (req) => {
 
       if (isMasterClassStudent) {
         masterClassCount++;
+        // Track NEW active Master Class students for welcome emails
+        const emailLower = teachableUser.email.toLowerCase();
+        if (hasActiveEnrollment && !existingMasterClassEmails.has(emailLower)) {
+          newMasterClassEmails.push(emailLower);
+        }
       } else {
         freeUserCount++;
       }
@@ -196,6 +234,7 @@ serve(async (req) => {
     }
 
     console.log(`Classified users: ${masterClassCount} Master Class students, ${freeUserCount} free users`);
+    console.log(`Found ${newMasterClassEmails.length} NEW Master Class students to welcome`);
     console.log(`Inserting ${studentsToInsert.length} students...`);
 
     // Batch upsert students
@@ -223,6 +262,20 @@ serve(async (req) => {
 
     console.log(`Import batch complete: ${insertedCount} inserted, ${errorCount} errors`);
 
+    // Send welcome emails to NEW Master Class students
+    let welcomeEmailsSent = 0;
+    if (newMasterClassEmails.length > 0) {
+      console.log(`Sending welcome emails to ${newMasterClassEmails.length} new Master Class students...`);
+      for (const email of newMasterClassEmails.slice(0, 20)) { // Limit to 20 per run to avoid timeout
+        const name = email.split("@")[0]; // Use email prefix as name
+        const sent = await sendWelcomeEmail(email, name);
+        if (sent) welcomeEmailsSent++;
+        // Small delay between emails
+        await new Promise(resolve => setTimeout(resolve, 200));
+      }
+      console.log(`Welcome emails sent: ${welcomeEmailsSent}`);
+    }
+
     // Determine if there are more pages to process
     const needsContinuation = hasMore && pagesProcessed >= maxPagesPerRun;
 
@@ -234,12 +287,14 @@ serve(async (req) => {
         errors: errorCount,
         masterClassStudents: masterClassCount,
         freeUsers: freeUserCount,
+        newMasterClassStudents: newMasterClassEmails.length,
+        welcomeEmailsSent,
         pagesProcessed,
         nextPage: needsContinuation ? page : null,
         needsContinuation,
         message: needsContinuation 
-          ? `Imported ${insertedCount} students (${masterClassCount} Master Class, ${freeUserCount} free). More pages available.`
-          : `Successfully imported ${insertedCount} Teachable students (${masterClassCount} Master Class, ${freeUserCount} free users)`,
+          ? `Imported ${insertedCount} students (${masterClassCount} Master Class, ${freeUserCount} free). ${welcomeEmailsSent} welcome emails sent. More pages available.`
+          : `Successfully imported ${insertedCount} Teachable students (${masterClassCount} Master Class, ${freeUserCount} free users). ${welcomeEmailsSent} welcome emails sent.`,
       }),
       { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
