@@ -20,6 +20,7 @@ import { useEffect, useState } from "react";
 import { Footer } from "@/components/Footer";
 import { VoiceChatWidget } from "@/components/voice/VoiceChatWidget";
 import { toast } from "sonner";
+import confetti from "canvas-confetti";
 
 const Palace = () => {
   const { user } = useAuth();
@@ -46,10 +47,10 @@ const Palace = () => {
     const roomParam = searchParams.get('room');
     if (roomParam) {
       // Find which floor this room belongs to
-      const floorNumber = palaceFloors.findIndex(floor => 
+      const floorNumber = palaceFloors.findIndex(floor =>
         floor.rooms.some(room => room.tag === roomParam)
       ) + 1;
-      
+
       if (floorNumber > 0) {
         // Scroll to that floor
         setTimeout(() => {
@@ -61,6 +62,48 @@ const Palace = () => {
       }
     }
   }, [searchParams]);
+
+  // Handle subscription success celebration
+  useEffect(() => {
+    const subscriptionStatus = searchParams.get('subscription');
+
+    if (subscriptionStatus === 'success') {
+      // Trigger celebration confetti
+      const duration = 3000;
+      const animationEnd = Date.now() + duration;
+      const defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 9999 };
+
+      const randomInRange = (min: number, max: number) => Math.random() * (max - min) + min;
+
+      const interval = setInterval(() => {
+        const timeLeft = animationEnd - Date.now();
+        if (timeLeft <= 0) {
+          clearInterval(interval);
+          return;
+        }
+        const particleCount = 50 * (timeLeft / duration);
+        confetti({
+          ...defaults,
+          particleCount,
+          origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 },
+          colors: ['#9b87f5', '#7E69AB', '#FFD700', '#FFA500', '#FF6B6B'],
+        });
+        confetti({
+          ...defaults,
+          particleCount,
+          origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 },
+          colors: ['#9b87f5', '#7E69AB', '#FFD700', '#FFA500', '#FF6B6B'],
+        });
+      }, 250);
+
+      toast.success("Welcome to PhotoTheology!", {
+        description: "Your subscription is active. Enjoy full access to the Palace!",
+      });
+
+      // Clear the URL parameter
+      navigate('/palace', { replace: true });
+    }
+  }, [searchParams, navigate]);
 
   return (
     <div className="min-h-screen bg-gradient-subtle">
