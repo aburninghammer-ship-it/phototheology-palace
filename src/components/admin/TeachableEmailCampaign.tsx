@@ -11,16 +11,17 @@ import { useToast } from "@/hooks/use-toast";
 import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
 
-type TeachableFilter = 'all' | 'active' | 'inactive' | 'linked' | 'unlinked' | 'premium_paying' | 'not_paying';
+type TeachableFilter = 'all' | 'master_class_active' | 'master_class_inactive' | 'free_signup' | 'linked' | 'unlinked' | 'premium_paying' | 'not_paying';
 
 const FILTER_DESCRIPTIONS: Record<TeachableFilter, string> = {
-  all: "All 8,600+ Teachable students",
-  active: "Only active Teachable students",
-  inactive: "Inactive Teachable students",
-  linked: "Students already using the app (have logged in)",
-  unlinked: "Students who haven't connected to the app yet",
+  all: "All Teachable users (free signups + Master Class)",
+  master_class_active: "Paying Master Class students ($20/month, active enrollment)",
+  master_class_inactive: "Former Master Class students (cancelled/expired)",
+  free_signup: "Free signups who never enrolled in Master Class",
+  linked: "Users already using the app (have logged in)",
+  unlinked: "Users who haven't connected to the app yet",
   premium_paying: "Students paying $15+ per month (premium access)",
-  not_paying: "Students not currently paying anything",
+  not_paying: "Users not currently paying anything",
 };
 
 export function TeachableEmailCampaign() {
@@ -132,11 +133,12 @@ export function TeachableEmailCampaign() {
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">All Teachable Students</SelectItem>
-                <SelectItem value="active">Active Students Only</SelectItem>
-                <SelectItem value="inactive">Inactive Students</SelectItem>
-                <SelectItem value="linked">Linked to App</SelectItem>
-                <SelectItem value="unlinked">Not Linked to App</SelectItem>
+                <SelectItem value="all">All Teachable Users</SelectItem>
+                <SelectItem value="master_class_active">🎓 Master Class Students (Active, $20/mo)</SelectItem>
+                <SelectItem value="master_class_inactive">📚 Former Master Class (Cancelled/Expired)</SelectItem>
+                <SelectItem value="free_signup">🆓 Free Signups (Never Enrolled in Master Class)</SelectItem>
+                <SelectItem value="linked">🔗 Linked to App</SelectItem>
+                <SelectItem value="unlinked">❌ Not Linked to App</SelectItem>
                 <SelectItem value="premium_paying">💰 Paying $15+/month (Premium)</SelectItem>
                 <SelectItem value="not_paying">🆓 Not Currently Paying</SelectItem>
               </SelectContent>

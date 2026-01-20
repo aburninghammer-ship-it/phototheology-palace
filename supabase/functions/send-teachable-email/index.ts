@@ -10,7 +10,7 @@ const corsHeaders = {
 interface EmailRequest {
   subject: string;
   htmlContent: string;
-  filter: 'all' | 'active' | 'inactive' | 'linked' | 'unlinked' | 'premium_paying' | 'not_paying';
+  filter: 'all' | 'master_class_active' | 'master_class_inactive' | 'free_signup' | 'linked' | 'unlinked' | 'premium_paying' | 'not_paying';
   testMode: boolean;
   testEmail?: string;
 }
@@ -125,11 +125,14 @@ serve(async (req) => {
         .range(offset, offset + pageSize - 1);
 
       switch (filter) {
-        case 'active':
-          query = query.eq("is_active", true);
+        case 'master_class_active':
+          query = query.eq("is_master_class", true).eq("is_active", true);
           break;
-        case 'inactive':
-          query = query.or("is_active.is.null,is_active.eq.false");
+        case 'master_class_inactive':
+          query = query.eq("is_master_class", true).eq("is_active", false);
+          break;
+        case 'free_signup':
+          query = query.eq("is_master_class", false);
           break;
         case 'linked':
           query = query.not("user_id", "is", null);
