@@ -1,15 +1,19 @@
 import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { MessagesSquare, MessageCircle, Heart } from "lucide-react";
+import { MessagesSquare, MessageCircle, Heart, Hash } from "lucide-react";
 import { ChurchCommunity } from "./ChurchCommunity";
 import { ChurchMessaging } from "./ChurchMessaging";
+import { ChurchChatRooms } from "./ChurchChatRooms";
 import { PrayerMinistryHub } from "./PrayerMinistryHub";
+import { useChurchMembership } from "@/hooks/useChurchMembership";
 
 interface ConnectTabProps {
   churchId: string;
 }
 
 export function ConnectTab({ churchId }: ConnectTabProps) {
+  const { role } = useChurchMembership();
+
   return (
     <div className="space-y-6">
       <Card variant="glass">
@@ -19,7 +23,7 @@ export function ConnectTab({ churchId }: ConnectTabProps) {
             <CardTitle>Connect</CardTitle>
           </div>
           <CardDescription>
-            Fellowship with your church family through posts, messages, and prayer
+            Fellowship with your church family through posts, messages, chat rooms, and prayer
           </CardDescription>
         </CardHeader>
       </Card>
@@ -30,9 +34,13 @@ export function ConnectTab({ churchId }: ConnectTabProps) {
             <MessagesSquare className="h-4 w-4" />
             Community
           </TabsTrigger>
+          <TabsTrigger value="chat" className="gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
+            <Hash className="h-4 w-4" />
+            Chat Rooms
+          </TabsTrigger>
           <TabsTrigger value="messages" className="gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
             <MessageCircle className="h-4 w-4" />
-            Messages
+            DMs
           </TabsTrigger>
           <TabsTrigger value="prayer" className="gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
             <Heart className="h-4 w-4" />
@@ -42,6 +50,10 @@ export function ConnectTab({ churchId }: ConnectTabProps) {
 
         <TabsContent value="community">
           <ChurchCommunity churchId={churchId} />
+        </TabsContent>
+
+        <TabsContent value="chat">
+          <ChurchChatRooms churchId={churchId} userRole={role as 'admin' | 'leader' | 'member' | undefined} />
         </TabsContent>
 
         <TabsContent value="messages">
