@@ -12548,6 +12548,7 @@ export type Database = {
           enrollment_status: string | null
           id: string
           is_active: boolean | null
+          is_master_class: boolean | null
           last_sync_at: string | null
           last_verified_at: string | null
           mrr: number | null
@@ -12563,6 +12564,7 @@ export type Database = {
           enrollment_status?: string | null
           id?: string
           is_active?: boolean | null
+          is_master_class?: boolean | null
           last_sync_at?: string | null
           last_verified_at?: string | null
           mrr?: number | null
@@ -12578,6 +12580,7 @@ export type Database = {
           enrollment_status?: string | null
           id?: string
           is_active?: boolean | null
+          is_master_class?: boolean | null
           last_sync_at?: string | null
           last_verified_at?: string | null
           mrr?: number | null
