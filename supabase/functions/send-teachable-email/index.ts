@@ -7,6 +7,10 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
+// Verified sender domain (Resend)
+const FROM_EMAIL = "Phototheology <noreply@thephototheologyapp.com>";
+
+
 interface EmailRequest {
   subject: string;
   htmlContent: string;
@@ -91,15 +95,20 @@ serve(async (req) => {
       }
 
       const resend = new Resend(RESEND_API_KEY);
-      
-      const emailResponse = await resend.emails.send({
-        from: "PhotoTheology <noreply@phototheology.app>",
+
+      const { data, error } = await resend.emails.send({
+        from: FROM_EMAIL,
         to: [testEmail],
         subject: `[TEST] ${subject}`,
         html: htmlContent,
       });
 
-      console.log("Test email sent:", emailResponse);
+      if (error) {
+        console.error("Resend test email error:", error);
+        throw new Error(error.message);
+      }
+
+      console.log("Test email sent:", data);
 
       return new Response(
         JSON.stringify({
@@ -199,14 +208,19 @@ serve(async (req) => {
       
       const promises = batch.map(async (email) => {
         try {
-          await resend.emails.send({
-            from: "PhotoTheology <noreply@phototheology.app>",
+          const { error } = await resend.emails.send({
+            from: FROM_EMAIL,
             to: [email],
             subject,
             html: htmlContent,
           });
+
+          if (error) {
+            throw new Error(error.message);
+          }
+
           sentCount++;
-          
+
           // Log successful send
           await supabase.from("email_campaign_logs").insert({
             campaign_name: campaignName,
