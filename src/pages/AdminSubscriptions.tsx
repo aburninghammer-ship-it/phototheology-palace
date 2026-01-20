@@ -17,6 +17,7 @@ import { PickaxeImport } from "@/components/admin/PickaxeImport";
 import { PickaxeEmailCampaign } from "@/components/admin/PickaxeEmailCampaign";
 import { TeachableEmailCampaign } from "@/components/admin/TeachableEmailCampaign";
 import { AdminPasswordReset } from "@/components/admin/AdminPasswordReset";
+import { AnalyticsDashboard } from "@/components/admin/AnalyticsDashboard";
 import { Badge } from "@/components/ui/badge";
 
 interface StripeStats {
@@ -524,6 +525,7 @@ export default function AdminSubscriptions() {
       <Tabs defaultValue="overview" className="space-y-6">
         <TabsList className="flex-wrap">
           <TabsTrigger value="overview">Overview</TabsTrigger>
+          <TabsTrigger value="analytics">📊 Analytics</TabsTrigger>
           <TabsTrigger value="mismatches">Subscription Health</TabsTrigger>
           <TabsTrigger value="revenue">Revenue & Churn</TabsTrigger>
           <TabsTrigger value="campaigns">Email Campaigns</TabsTrigger>
@@ -827,6 +829,10 @@ export default function AdminSubscriptions() {
               </div>
             </CardContent>
           </Card>
+        </TabsContent>
+
+        <TabsContent value="analytics">
+          <AnalyticsDashboard />
         </TabsContent>
 
         <TabsContent value="mismatches">
