@@ -7,6 +7,41 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-patreon-signature, x-patreon-event",
 };
 
+// Helper to send welcome email for new patrons
+async function sendWelcomeEmail(email: string, name: string, pledgeAmount: number) {
+  try {
+    const supabaseUrl = Deno.env.get("SUPABASE_URL");
+    const supabaseAnonKey = Deno.env.get("SUPABASE_ANON_KEY");
+    
+    if (!supabaseUrl || !supabaseAnonKey) {
+      console.error("Missing Supabase credentials for welcome email");
+      return;
+    }
+
+    const response = await fetch(`${supabaseUrl}/functions/v1/send-welcome-email`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${supabaseAnonKey}`,
+      },
+      body: JSON.stringify({
+        email,
+        name,
+        source: "patreon",
+        pledgeAmount,
+      }),
+    });
+
+    if (!response.ok) {
+      console.error("Failed to send welcome email:", await response.text());
+    } else {
+      console.log("Welcome email triggered for:", email);
+    }
+  } catch (error) {
+    console.error("Error triggering welcome email:", error);
+  }
+}
+
 // Minimum pledge for premium access: $20/month = 2000 cents
 const MINIMUM_PLEDGE_CENTS = 2000;
 
@@ -78,6 +113,7 @@ serve(async (req) => {
     const userData = included.find((item: any) => item.type === "user");
     const patreonUserId = userData?.id || relationships?.user?.data?.id;
     const patreonEmail = userData?.attributes?.email;
+    const patreonName = userData?.attributes?.full_name || attributes.full_name || "Patron";
 
     console.log("Processing webhook for Patreon user:", patreonUserId, "Event:", eventType);
 
@@ -105,6 +141,13 @@ serve(async (req) => {
       meetsMinimumPledge,
       hasAccess
     });
+
+    // Check if this is a NEW qualifying patron (members:pledge:create event with qualifying amount)
+    const isNewPatronEvent = eventType === "members:pledge:create";
+    if (isNewPatronEvent && hasAccess && patreonEmail) {
+      console.log("New qualifying patron detected! Sending welcome email to:", patreonEmail);
+      await sendWelcomeEmail(patreonEmail, patreonName, pledgeAmount);
+    }
 
     // Find the user in our database by Patreon user ID
     const { data: connection, error: findError } = await supabase

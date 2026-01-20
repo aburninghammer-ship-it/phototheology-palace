@@ -11,6 +11,44 @@ const logStep = (step: string, details?: any) => {
   console.log(`[SYNC-PATREON-MEMBERS] ${step}${detailsStr}`);
 };
 
+// Minimum pledge for access: $15/month = 1500 cents (but we check for $20 for Master Class equivalent)
+const MINIMUM_PLEDGE_CENTS = 2000;
+
+// Helper to send welcome email for new patrons
+async function sendWelcomeEmail(email: string, name: string, pledgeAmount: number) {
+  try {
+    const supabaseUrl = Deno.env.get("SUPABASE_URL");
+    const supabaseAnonKey = Deno.env.get("SUPABASE_ANON_KEY");
+    
+    if (!supabaseUrl || !supabaseAnonKey) {
+      logStep("Missing Supabase credentials for welcome email");
+      return;
+    }
+
+    const response = await fetch(`${supabaseUrl}/functions/v1/send-welcome-email`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${supabaseAnonKey}`,
+      },
+      body: JSON.stringify({
+        email,
+        name,
+        source: "patreon",
+        pledgeAmount,
+      }),
+    });
+
+    if (!response.ok) {
+      logStep("Failed to send welcome email", { error: await response.text() });
+    } else {
+      logStep("Welcome email triggered for new patron", { email });
+    }
+  } catch (error) {
+    logStep("Error triggering welcome email", { error: String(error) });
+  }
+}
+
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
@@ -174,12 +212,38 @@ serve(async (req) => {
 
     logStep("All members fetched", { total: allMembers.length });
 
+    // Get existing members to detect new ones
+    const { data: existingMembers } = await supabaseClient
+      .from("patreon_members")
+      .select("patreon_id, pledge_cents, patron_status");
+    
+    const existingMap = new Map(
+      (existingMembers || []).map(m => [m.patreon_id, m])
+    );
+
     // Upsert all members to database
     let upserted = 0;
+    let newQualifyingPatrons: Array<{ email: string; name: string; pledgeCents: number }> = [];
     const batchSize = 100;
 
     for (let i = 0; i < allMembers.length; i += batchSize) {
       const batch = allMembers.slice(i, i + batchSize);
+      
+      // Check for new qualifying patrons before upserting
+      for (const member of batch) {
+        const existing = existingMap.get(member.patreon_id);
+        const isQualifying = member.patron_status === 'active_patron' && member.pledge_cents >= MINIMUM_PLEDGE_CENTS;
+        const wasQualifying = existing && existing.patron_status === 'active_patron' && existing.pledge_cents >= MINIMUM_PLEDGE_CENTS;
+        
+        // New qualifying patron = either not in DB before OR wasn't qualifying before
+        if (isQualifying && !wasQualifying && member.email) {
+          newQualifyingPatrons.push({
+            email: member.email,
+            name: member.full_name || "Patron",
+            pledgeCents: member.pledge_cents,
+          });
+        }
+      }
       
       const { error: upsertError } = await supabaseClient
         .from("patreon_members")
@@ -195,7 +259,18 @@ serve(async (req) => {
       }
     }
 
-    logStep("Sync complete", { total: allMembers.length, upserted });
+    logStep("Sync complete", { total: allMembers.length, upserted, newQualifyingPatrons: newQualifyingPatrons.length });
+
+    // Send welcome emails to new qualifying patrons (limit to avoid timeout)
+    const emailsToSend = newQualifyingPatrons.slice(0, 10); // Max 10 per sync to avoid timeouts
+    for (const patron of emailsToSend) {
+      await sendWelcomeEmail(patron.email, patron.name, patron.pledgeCents);
+      await new Promise(resolve => setTimeout(resolve, 500)); // Rate limit
+    }
+
+    if (newQualifyingPatrons.length > 0) {
+      logStep("Welcome emails sent", { sent: emailsToSend.length, total: newQualifyingPatrons.length });
+    }
 
     // Get stats for the response
     const { data: stats } = await supabaseClient.rpc('get_patreon_member_stats');
