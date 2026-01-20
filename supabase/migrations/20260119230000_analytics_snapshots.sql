@@ -71,22 +71,31 @@ DECLARE
   v_new_signups_today INTEGER;
   v_active_churches INTEGER;
 BEGIN
-  -- Count active Stripe subscriptions from user_subscriptions
-  SELECT
-    COALESCE(COUNT(*) FILTER (WHERE subscription_status = 'active'), 0),
-    COALESCE(COUNT(*) FILTER (WHERE subscription_status = 'trial'), 0),
-    COALESCE(COUNT(*) FILTER (WHERE subscription_status = 'cancelled'), 0)
-  INTO v_stripe_active, v_stripe_trialing, v_stripe_cancelled
-  FROM public.user_subscriptions
-  WHERE payment_source = 'stripe';
+  -- Count active Stripe subscriptions from profiles (matches Overview)
+  SELECT COALESCE(COUNT(*), 0) INTO v_stripe_active
+  FROM public.profiles
+  WHERE subscription_status = 'active'
+    AND payment_source = 'stripe';
 
-  -- Count by tier
+  -- Count active 7-day trials from profiles (matches Overview "7-Day Trials" card)
+  SELECT COALESCE(COUNT(*), 0) INTO v_stripe_trialing
+  FROM public.profiles
+  WHERE subscription_status = 'trial'
+    AND trial_end_date > now();
+
+  -- Count cancelled (from user_subscriptions for historical tracking)
+  SELECT COALESCE(COUNT(*), 0) INTO v_stripe_cancelled
+  FROM public.user_subscriptions
+  WHERE payment_source = 'stripe'
+    AND subscription_status = 'cancelled';
+
+  -- Count by tier from profiles (matches Overview breakdown)
   SELECT
     COALESCE(COUNT(*) FILTER (WHERE subscription_tier = 'essential' AND subscription_status IN ('active', 'trial')), 0),
     COALESCE(COUNT(*) FILTER (WHERE subscription_tier = 'premium' AND subscription_status IN ('active', 'trial')), 0),
     COALESCE(COUNT(*) FILTER (WHERE subscription_tier = 'student' AND subscription_status IN ('active', 'trial')), 0)
   INTO v_tier_essential, v_tier_premium, v_tier_student
-  FROM public.user_subscriptions;
+  FROM public.profiles;
 
   -- Estimate MRR (simplified: essential $9, premium $15, student $5)
   v_mrr_cents := (v_tier_essential * 900) + (v_tier_premium * 1500) + (v_tier_student * 500);

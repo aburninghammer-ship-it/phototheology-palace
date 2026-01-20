@@ -299,7 +299,7 @@ export function AnalyticsDashboard() {
                   <Line
                     type="monotone"
                     dataKey="trials"
-                    name="Trials"
+                    name="7-Day Trials"
                     stroke="#3b82f6"
                     strokeWidth={2}
                     dot={{ fill: "#3b82f6", r: 4 }}
@@ -561,8 +561,8 @@ export function AnalyticsDashboard() {
                 <thead>
                   <tr className="border-b bg-muted/50">
                     <th className="text-left p-3 font-medium">Date</th>
-                    <th className="text-right p-3 font-medium">Stripe</th>
-                    <th className="text-right p-3 font-medium">Trials</th>
+                    <th className="text-right p-3 font-medium">Stripe Active</th>
+                    <th className="text-right p-3 font-medium">7-Day Trials</th>
                     <th className="text-right p-3 font-medium">Patreon</th>
                     <th className="text-right p-3 font-medium">Lifetime</th>
                     <th className="text-right p-3 font-medium">Total Paying</th>
