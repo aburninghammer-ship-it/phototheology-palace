@@ -97,7 +97,7 @@ serve(async (req) => {
       );
     }
 
-    // Get user's enrollments to verify they have an active course
+    // Get user's enrollments to verify they have an active MASTER CLASS enrollment
     const enrollmentsResponse = await fetch(
       `https://developers.teachable.com/v1/users/${teachableUser.id}/enrollments`,
       {
@@ -109,25 +109,36 @@ serve(async (req) => {
     );
 
     let courseName = "Phototheology Course";
-    let hasActiveEnrollment = true; // Default to true if we found the user
+    let hasActiveMasterClassEnrollment = false;
+    const MASTER_CLASS_COURSE_ID = Deno.env.get("TEACHABLE_MASTER_CLASS_COURSE_ID") || "";
 
     if (enrollmentsResponse.ok) {
       const enrollmentsData = await enrollmentsResponse.json();
-      const activeEnrollments = enrollmentsData.enrollments?.filter(
-        (e: any) => e.is_active || !e.expired
-      );
+      const enrollments = enrollmentsData.enrollments || [];
       
-      if (activeEnrollments && activeEnrollments.length > 0) {
-        courseName = activeEnrollments[0].course_name || courseName;
-        hasActiveEnrollment = true;
+      // Check each enrollment for Master Class specifically
+      for (const enrollment of enrollments) {
+        // Check if this is the Master Class course (by ID or name)
+        const isMasterClass = 
+          (MASTER_CLASS_COURSE_ID && String(enrollment.course_id) === MASTER_CLASS_COURSE_ID) ||
+          enrollment.course_name?.toLowerCase().includes("master class") ||
+          enrollment.course_name?.toLowerCase().includes("phototheology master") ||
+          enrollment.course?.name?.toLowerCase().includes("master class");
+
+        if (isMasterClass && (enrollment.is_active === true || enrollment.expired === false)) {
+          hasActiveMasterClassEnrollment = true;
+          courseName = enrollment.course_name || enrollment.course?.name || "PhotoTheology Master Class";
+          break;
+        }
       }
     }
 
-    if (!hasActiveEnrollment) {
+    if (!hasActiveMasterClassEnrollment) {
       return new Response(
         JSON.stringify({ 
           verified: false, 
-          message: "No active course enrollment found" 
+          message: "No active Master Class enrollment found. Only paying Master Class students ($20/month) have access to the Bible Study Suite. Free signups do not include app access.",
+          upgradeUrl: "https://your-teachable-school-url/master-class"
         }),
         { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
