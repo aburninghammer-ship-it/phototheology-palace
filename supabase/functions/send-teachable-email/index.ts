@@ -201,55 +201,50 @@ serve(async (req) => {
     let errorCount = 0;
     const campaignName = `Teachable Campaign - ${filter} - ${new Date().toISOString().split('T')[0]}`;
 
-    // Send emails in batches of 50 for better throughput
-    const batchSize = 50;
-    for (let i = 0; i < emails.length; i += batchSize) {
-      const batch = emails.slice(i, i + batchSize);
+    // Send emails sequentially with delay to respect Resend rate limit (2/sec)
+    for (let i = 0; i < emails.length; i++) {
+      const email = emails[i];
       
-      const promises = batch.map(async (email) => {
-        try {
-          const { error } = await resend.emails.send({
-            from: FROM_EMAIL,
-            to: [email],
-            subject,
-            html: htmlContent,
-          });
+      try {
+        const { error } = await resend.emails.send({
+          from: FROM_EMAIL,
+          to: [email],
+          subject,
+          html: htmlContent,
+        });
 
-          if (error) {
-            throw new Error(error.message);
-          }
-
-          sentCount++;
-
-          // Log successful send
-          await supabase.from("email_campaign_logs").insert({
-            campaign_name: campaignName,
-            email_type: "teachable",
-            recipient_email: email,
-            status: "sent",
-            sent_at: new Date().toISOString(),
-          });
-        } catch (err) {
-          console.error(`Failed to send to ${email}:`, err);
-          errorCount++;
-          
-          // Log failed send
-          await supabase.from("email_campaign_logs").insert({
-            campaign_name: campaignName,
-            email_type: "teachable",
-            recipient_email: email,
-            status: "failed",
-            error_message: err instanceof Error ? err.message : "Unknown error",
-            sent_at: new Date().toISOString(),
-          });
+        if (error) {
+          throw new Error(error.message);
         }
-      });
 
-      await Promise.all(promises);
-      
-      // Small delay between batches to avoid rate limits
-      if (i + batchSize < emails.length) {
-        await new Promise(resolve => setTimeout(resolve, 100));
+        sentCount++;
+
+        // Log successful send
+        await supabase.from("email_campaign_logs").insert({
+          campaign_name: campaignName,
+          email_type: "teachable",
+          recipient_email: email,
+          status: "sent",
+          sent_at: new Date().toISOString(),
+        });
+      } catch (err) {
+        console.error(`Failed to send to ${email}:`, err);
+        errorCount++;
+        
+        // Log failed send
+        await supabase.from("email_campaign_logs").insert({
+          campaign_name: campaignName,
+          email_type: "teachable",
+          recipient_email: email,
+          status: "failed",
+          error_message: err instanceof Error ? err.message : "Unknown error",
+          sent_at: new Date().toISOString(),
+        });
+      }
+
+      // Delay 600ms between emails to stay under 2 req/sec rate limit
+      if (i < emails.length - 1) {
+        await new Promise(resolve => setTimeout(resolve, 600));
       }
     }
 
