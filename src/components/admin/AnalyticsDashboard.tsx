@@ -47,6 +47,8 @@ export function AnalyticsDashboard() {
     active: s.stripe_active,
     trials: s.stripe_trialing,
     patreon: s.patreon_active,
+    lifetime: s.lifetime_access,
+    totalPaying: s.stripe_active + s.patreon_active + s.lifetime_access,
     total: s.stripe_active + s.stripe_trialing + s.patreon_active + s.lifetime_access,
     mrr: s.mrr_cents / 100,
     users: s.total_users,
@@ -187,11 +189,78 @@ export function AnalyticsDashboard() {
         </div>
       )}
 
+      {/* Secondary Stats Row */}
+      {summary && summary.latestSnapshot && (
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+          <Card className="border-primary/20 bg-primary/5">
+            <CardHeader className="pb-2">
+              <CardDescription>Current Paying Users</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="text-3xl font-bold text-primary">
+                {summary.latestSnapshot.stripe_active + summary.latestSnapshot.patreon_active + summary.latestSnapshot.lifetime_access}
+              </div>
+              <p className="text-sm text-muted-foreground mt-1">
+                Stripe + Patreon + Lifetime
+              </p>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader className="pb-2">
+              <CardDescription className="flex items-center gap-2">
+                <span className="text-orange-500">🎭</span>
+                Patreon Active
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="text-3xl font-bold text-orange-600">
+                {summary.latestSnapshot.patreon_active}
+              </div>
+              <p className="text-sm text-muted-foreground mt-1">
+                Connected patrons
+              </p>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader className="pb-2">
+              <CardDescription className="flex items-center gap-2">
+                <span className="text-purple-500">💎</span>
+                Lifetime
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="text-3xl font-bold text-purple-600">
+                {summary.latestSnapshot.lifetime_access}
+              </div>
+              <p className="text-sm text-muted-foreground mt-1">
+                Permanent access
+              </p>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader className="pb-2">
+              <CardDescription>New Signups Today</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="text-3xl font-bold">
+                {summary.latestSnapshot.new_signups_today}
+              </div>
+              <p className="text-sm text-muted-foreground mt-1">
+                Latest registrations
+              </p>
+            </CardContent>
+          </Card>
+        </div>
+      )}
+
       {/* Subscriptions Over Time Chart */}
       <Card>
         <CardHeader>
           <CardTitle>Subscriptions Over Time</CardTitle>
-          <CardDescription>Active subscriptions, trials, and patron counts</CardDescription>
+          <CardDescription>Active subscriptions, trials, patrons, and lifetime access</CardDescription>
         </CardHeader>
         <CardContent>
           {chartData.length > 0 ? (
@@ -243,6 +312,14 @@ export function AnalyticsDashboard() {
                     strokeWidth={2}
                     dot={{ fill: "#f97316", r: 4 }}
                   />
+                  <Line
+                    type="monotone"
+                    dataKey="lifetime"
+                    name="Lifetime"
+                    stroke="#a855f7"
+                    strokeWidth={2}
+                    dot={{ fill: "#a855f7", r: 4 }}
+                  />
                 </LineChart>
               </ResponsiveContainer>
             </div>
@@ -252,6 +329,57 @@ export function AnalyticsDashboard() {
                 <p className="text-lg">No data yet</p>
                 <p className="text-sm mt-1">Snapshots will be recorded automatically each day</p>
               </div>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
+      {/* Total Paying Users Over Time Chart */}
+      <Card className="border-primary/20">
+        <CardHeader>
+          <CardTitle>Total Paying Users Over Time</CardTitle>
+          <CardDescription>Stripe Active + Patreon + Lifetime combined</CardDescription>
+        </CardHeader>
+        <CardContent>
+          {chartData.length > 0 ? (
+            <div className="h-64">
+              <ResponsiveContainer width="100%" height="100%">
+                <AreaChart data={chartData}>
+                  <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
+                  <XAxis
+                    dataKey="date"
+                    fontSize={12}
+                    tickLine={false}
+                    axisLine={false}
+                  />
+                  <YAxis
+                    fontSize={12}
+                    tickLine={false}
+                    axisLine={false}
+                  />
+                  <Tooltip
+                    contentStyle={{
+                      backgroundColor: "hsl(var(--background))",
+                      borderColor: "hsl(var(--border))",
+                      borderRadius: "8px",
+                    }}
+                    formatter={(value: number) => [value, "Paying Users"]}
+                  />
+                  <Area
+                    type="monotone"
+                    dataKey="totalPaying"
+                    name="Total Paying"
+                    stroke="hsl(var(--primary))"
+                    fill="hsl(var(--primary))"
+                    fillOpacity={0.2}
+                    strokeWidth={3}
+                  />
+                </AreaChart>
+              </ResponsiveContainer>
+            </div>
+          ) : (
+            <div className="h-64 flex items-center justify-center text-muted-foreground">
+              No data yet
             </div>
           )}
         </CardContent>
@@ -433,12 +561,13 @@ export function AnalyticsDashboard() {
                 <thead>
                   <tr className="border-b bg-muted/50">
                     <th className="text-left p-3 font-medium">Date</th>
-                    <th className="text-right p-3 font-medium">Active</th>
+                    <th className="text-right p-3 font-medium">Stripe</th>
                     <th className="text-right p-3 font-medium">Trials</th>
                     <th className="text-right p-3 font-medium">Patreon</th>
+                    <th className="text-right p-3 font-medium">Lifetime</th>
+                    <th className="text-right p-3 font-medium">Total Paying</th>
                     <th className="text-right p-3 font-medium">MRR</th>
                     <th className="text-right p-3 font-medium">Users</th>
-                    <th className="text-right p-3 font-medium">New Today</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -450,9 +579,10 @@ export function AnalyticsDashboard() {
                       <td className="p-3 text-right text-green-600 font-medium">{s.stripe_active}</td>
                       <td className="p-3 text-right text-blue-600">{s.stripe_trialing}</td>
                       <td className="p-3 text-right text-orange-600">{s.patreon_active}</td>
+                      <td className="p-3 text-right text-purple-600">{s.lifetime_access}</td>
+                      <td className="p-3 text-right font-bold text-primary">{s.stripe_active + s.patreon_active + s.lifetime_access}</td>
                       <td className="p-3 text-right font-mono">${(s.mrr_cents / 100).toFixed(2)}</td>
                       <td className="p-3 text-right">{s.total_users}</td>
-                      <td className="p-3 text-right text-muted-foreground">{s.new_signups_today}</td>
                     </tr>
                   ))}
                 </tbody>
