@@ -5,13 +5,59 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
+// Doctrinal red flags to scan for in sermon content
+const OFFSHOOT_INDICATORS = [
+  // Anti-Trinity keywords
+  { pattern: /anti[-\s]?trinit/i, warning: "Potential anti-Trinitarian content detected" },
+  { pattern: /god\s+is\s+(not|isn't)\s+three/i, warning: "Potential anti-Trinitarian content detected" },
+  { pattern: /trinity\s+(is\s+)?(a\s+)?pagan/i, warning: "Anti-Trinity teaching detected" },
+  { pattern: /jesus\s+(is|was)\s+(not|n't)\s+god/i, warning: "Non-SDA Christology detected" },
+  
+  // COVID/conspiracy markers
+  { pattern: /vaccine[sd]?\s+(are|is)\s+(the\s+)?mark/i, warning: "COVID-mark of beast conspiracy detected" },
+  { pattern: /covid[-\s]?(19)?\s+(is\s+)?(the\s+)?mark/i, warning: "COVID conspiracy content detected" },
+  { pattern: /5g\s+(is\s+)?beast/i, warning: "Technology conspiracy content detected" },
+  { pattern: /chip\s+(implant|is\s+the\s+mark)/i, warning: "Microchip mark conspiracy detected" },
+  
+  // Known offshoot movements
+  { pattern: /shepherd'?s?\s+rod/i, warning: "Shepherd's Rod (Davidian) content detected" },
+  { pattern: /branch\s+davidian/i, warning: "Branch Davidian content detected" },
+  { pattern: /1888\s+message/i, warning: "1888 movement content - may need review" },
+  { pattern: /last\s+generation\s+theology/i, warning: "Last Generation Theology - review for balance" },
+  
+  // Date setting
+  { pattern: /(second\s+coming|jesus\s+(will\s+)?return[s]?)\s+(in|on|by)\s+20\d{2}/i, warning: "Date-setting for Second Coming detected" },
+  { pattern: /know\s+the\s+exact\s+(date|day|time)/i, warning: "Potential date-setting content" },
+  
+  // Non-SDA doctrines
+  { pattern: /once\s+saved[,]?\s+always\s+saved/i, warning: "Once Saved Always Saved doctrine (non-SDA)" },
+  { pattern: /secret\s+rapture/i, warning: "Secret rapture teaching (non-SDA)" },
+  { pattern: /pre[-\s]?trib(ulation)?\s+rapture/i, warning: "Pre-tribulation rapture (non-SDA)" },
+  { pattern: /sunday\s+(is|as)\s+(the\s+)?true\s+sabbath/i, warning: "Sunday sacredness teaching detected" },
+  { pattern: /sabbath\s+(was|is)\s+done\s+away/i, warning: "Anti-Sabbath teaching detected" },
+];
+
+function scanForDoctrinalIssues(content: string): string[] {
+  const warnings: string[] = [];
+  
+  for (const indicator of OFFSHOOT_INDICATORS) {
+    if (indicator.pattern.test(content)) {
+      if (!warnings.includes(indicator.warning)) {
+        warnings.push(indicator.warning);
+      }
+    }
+  }
+  
+  return warnings;
+}
+
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
-    const { sermonOutline, sermonTitle, preacher, sermonDate } = await req.json();
+    const { sermonOutline, sermonTitle, preacher, sermonDate, sourceType, isVerifiedChannel } = await req.json();
 
     if (!sermonOutline) {
       return new Response(
@@ -20,10 +66,25 @@ serve(async (req) => {
       );
     }
 
+    // Scan for doctrinal issues
+    const doctrinalWarnings = scanForDoctrinalIssues(sermonOutline);
+    
+    // Log source verification status
+    console.log(`Processing sermon: "${sermonTitle || 'Untitled'}"`);
+    console.log(`Source type: ${sourceType || 'unknown'}, Verified channel: ${isVerifiedChannel || false}`);
+    if (doctrinalWarnings.length > 0) {
+      console.log(`⚠️ Doctrinal warnings detected: ${doctrinalWarnings.join(", ")}`);
+    }
+
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) {
       throw new Error("LOVABLE_API_KEY is not configured");
     }
+
+    // Add extra caution instructions if content is unverified or has warnings
+    const cautionLevel = !isVerifiedChannel || doctrinalWarnings.length > 0 
+      ? "HIGH CAUTION" 
+      : "STANDARD";
 
     const systemPrompt = `You are a biblical scholar and Phototheology expert creating an amplified small group study from a sermon outline.
 
@@ -34,6 +95,11 @@ serve(async (req) => {
 4. DAY OF ATONEMENT = 1844: Christ's death = PASSOVER. Day of Atonement = 1844 judgment. NEVER equate death with Atonement.
 5. FEAST TYPOLOGY: Spring feasts = First Advent (Passover=death, Firstfruits=resurrection). Fall feasts = Second Advent ministry.
 6. HEBREWS CLARITY: Hebrews contrasts earthly vs heavenly sanctuary, NOT Holy vs Most Holy Place.
+
+⚠️ CAUTION LEVEL: ${cautionLevel}
+${doctrinalWarnings.length > 0 ? `\n⚠️ PRE-SCAN DETECTED POTENTIAL ISSUES:\n${doctrinalWarnings.map(w => `- ${w}`).join('\n')}\n\nBe extra vigilant in assessment. Flag any problematic claims as "questionable" with clear reasoning.` : ''}
+
+${!isVerifiedChannel ? `\n⚠️ UNVERIFIED SOURCE: This content was NOT verified as coming from the church's registered YouTube channel. Apply heightened scrutiny.` : ''}
 
 Your task is to:
 
@@ -46,6 +112,7 @@ Your task is to:
 2. ASSESS each theological claim:
    - Mark as SUPPORTED (✔), NEEDS NUANCE (⚠), or QUESTIONABLE (❌)
    - Provide brief reasoning for assessment
+   - BE ESPECIALLY VIGILANT for non-SDA doctrines, conspiracy theories, anti-Trinitarian ideas
 
 3. CREATE discussion questions that:
    - Start with observation (what does the text say?)
@@ -63,10 +130,13 @@ Your task is to:
 
 5. ALL Scripture quotes MUST be KJV (King James Version)
 
+6. If ANY content appears to promote offshoot ideas, conspiracy theories, anti-Trinity views, or non-SDA doctrines, include a "doctrinalWarnings" array in your response listing specific concerns.
+
 Respond ONLY with valid JSON in this exact format:
 {
   "studyTitle": "string",
   "overview": "string (2-3 paragraphs summarizing the study)",
+  "doctrinalWarnings": ["string array of any doctrinal concerns detected - empty if none"],
   "iceBreakers": ["string", "string"],
   "sections": [
     {
@@ -116,11 +186,12 @@ Respond ONLY with valid JSON in this exact format:
 SERMON TITLE: ${sermonTitle || "Untitled Sermon"}
 PREACHER: ${preacher || "Unknown"}
 DATE: ${sermonDate || "Not specified"}
+SOURCE VERIFICATION: ${isVerifiedChannel ? "✓ Verified church channel" : "⚠️ Unverified source"}
 
 SERMON OUTLINE:
 ${sermonOutline}
 
-Generate a comprehensive, Christ-centered study that expands on each point while maintaining theological accuracy. Include Phototheology Palace connections throughout.`;
+Generate a comprehensive, Christ-centered study that expands on each point while maintaining theological accuracy. Include Phototheology Palace connections throughout. If you detect any concerning doctrinal content, flag it in the doctrinalWarnings array.`;
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
@@ -165,15 +236,24 @@ Generate a comprehensive, Christ-centered study that expands on each point while
     }
 
     // Parse JSON from response (handle markdown code blocks)
-    let studyData;
+    let studyData: Record<string, unknown> = {};
     try {
       const jsonMatch = content.match(/```(?:json)?\s*([\s\S]*?)```/) || [null, content];
       const jsonStr = jsonMatch[1]?.trim() || content.trim();
       studyData = JSON.parse(jsonStr);
+      
+      // Merge pre-scan warnings with AI-detected warnings
+      if (doctrinalWarnings.length > 0) {
+        const existingWarnings = Array.isArray(studyData.doctrinalWarnings) ? studyData.doctrinalWarnings : [];
+        studyData.doctrinalWarnings = [
+          ...existingWarnings,
+          ...doctrinalWarnings.filter(w => !existingWarnings.includes(w))
+        ];
+      }
     } catch (parseError) {
       console.error("JSON parse error:", parseError);
       // Return raw content if parsing fails
-      studyData = { rawContent: content, parseError: true };
+      studyData = { rawContent: content, parseError: true, doctrinalWarnings };
     }
 
     return new Response(
