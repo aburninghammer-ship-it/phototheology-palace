@@ -389,6 +389,10 @@ export default function StudyBuddy() {
     // Don't analyze if notes are too short or haven't changed significantly
     const trimmedNotes = notes.trim();
     if (trimmedNotes.length < 30) {
+      // Clear stale analysis when notes are too short/empty (prevents old Jeeves comments from persisting)
+      if (trimmedNotes.length === 0 && analysis) {
+        setAnalysis(null);
+      }
       return;
     }
 
@@ -562,13 +566,19 @@ export default function StudyBuddy() {
       versePopulateTimeoutRef.current = null;
     }
 
-    // Now safely clear all state
-    setNotes("");
-    setSessionTitle("");
+    // Now safely clear all state - ORDER MATTERS to prevent race conditions
+    // Clear analysis FIRST so Jeeves panel shows fresh state immediately
     setAnalysis(null);
+    setJeevesLoading(false); // Reset loading state in case a request was in-flight
+
+    // Clear session history BEFORE clearing notes to prevent stale history being sent to AI
     setAnalysisHistory([]);
     analysisHistoryRef.current = []; // Clear ref immediately (state update is async)
     lastAnalyzedNotes.current = "";
+
+    // Now clear notes and other state
+    setNotes("");
+    setSessionTitle("");
     processedRefsRef.current.clear(); // Reset processed verse references
     setCurrentSessionId(null);
     toast.success("Session cleared");
@@ -962,7 +972,8 @@ Jeeves sees your notes and will spark connections, suggest PT rooms, source clai
               {/* Real-time Analysis Display */}
               <ScrollArea className="flex-1">
                 <div className="p-4 space-y-4">
-                  {!analysis && !jeevesLoading && notes.trim().length < 30 ? (
+                  {/* Show placeholder if: no analysis, not loading, OR notes are empty (defensive check) */}
+                  {(!analysis && !jeevesLoading && notes.trim().length < 30) || notes.trim().length === 0 ? (
                     <div className="text-center py-8">
                       <Brain className={`w-12 h-12 mx-auto mb-3 ${isLightTheme ? "text-purple-400/50" : "text-violet-500/30"}`} />
                       <p className={`text-sm ${isLightTheme ? "text-purple-700/70" : "text-violet-200/60"}`}>
