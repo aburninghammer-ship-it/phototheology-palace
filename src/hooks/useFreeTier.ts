@@ -119,6 +119,25 @@ export function useFreeTier(): FreeTierAccess {
     },
     enabled: !!user,
   });
+
+  // Check for Pickaxe premium access (paying Jeeves users)
+  const { data: pickaxeAccess } = useQuery({
+    queryKey: ["pickaxe-access", user?.id],
+    queryFn: async () => {
+      if (!user) return false;
+
+      const { data, error } = await supabase
+        .from('pickaxe_connections')
+        .select('is_paid_user, user_id')
+        .eq('user_id', user.id)
+        .eq('is_paid_user', true)
+        .maybeSingle();
+
+      if (error) return false;
+      return !!data;
+    },
+    enabled: !!user,
+  });
   // Count today's Jeeves usage
   const { data: jeevesUsage } = useQuery({
     queryKey: ["jeeves-daily-usage", user?.id],
@@ -168,6 +187,9 @@ export function useFreeTier(): FreeTierAccess {
   // Check if user has Teachable student access
   const hasTeachableAccess = teachableAccess === true;
 
+  // Check if user has Pickaxe premium access
+  const hasPickaxeAccess = pickaxeAccess === true;
+
   // Determine user's tier
   const getTier = (): FreeTierAccess["tier"] => {
     if (!user) return "free";
@@ -177,6 +199,9 @@ export function useFreeTier(): FreeTierAccess {
 
     // Teachable students get premium access
     if (hasTeachableAccess) return "student";
+
+    // Pickaxe paying users get premium access (Jeeves subscribers)
+    if (hasPickaxeAccess) return "premium";
 
     // Patreon connection grants access independent of Stripe (if meets $15 min)
     if (hasActivePatreon) return "patron";
