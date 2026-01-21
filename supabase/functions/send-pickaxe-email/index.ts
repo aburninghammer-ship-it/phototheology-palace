@@ -93,7 +93,7 @@ serve(async (req) => {
       const resend = new Resend(RESEND_API_KEY);
       
       const emailResponse = await resend.emails.send({
-        from: "PhotoTheology <onboarding@resend.dev>",
+        from: "PhotoTheology <noreply@thephototheologyapp.com>",
         to: [testEmail],
         subject: `[TEST] ${subject}`,
         html: htmlContent,
@@ -166,10 +166,11 @@ serve(async (req) => {
     for (let i = 0; i < emails.length; i += batchSize) {
       const batch = emails.slice(i, i + batchSize);
       
-      const promises = batch.map(async (email) => {
+      // Send emails sequentially within batch to respect rate limits (2 req/sec)
+      for (const email of batch) {
         try {
           await resend.emails.send({
-            from: "PhotoTheology <onboarding@resend.dev>",
+            from: "PhotoTheology <noreply@thephototheologyapp.com>",
             to: [email],
             subject,
             html: htmlContent,
@@ -184,7 +185,13 @@ serve(async (req) => {
             sent_at: new Date().toISOString(),
           });
           
+          // Update pickaxe_connections with email_sent_at
+          await supabase.from("pickaxe_connections")
+            .update({ email_sent_at: new Date().toISOString() })
+            .eq("pickaxe_email", email);
+          
           sentCount++;
+          console.log(`Sent email ${sentCount} to ${email}`);
         } catch (err) {
           console.error(`Failed to send to ${email}:`, err);
           
@@ -199,13 +206,9 @@ serve(async (req) => {
           
           errorCount++;
         }
-      });
-
-      await Promise.all(promises);
-      
-      // Small delay between batches to avoid rate limits
-      if (i + batchSize < emails.length) {
-        await new Promise(resolve => setTimeout(resolve, 100));
+        
+        // Delay between each email to respect Resend rate limit (2 req/sec = 600ms delay)
+        await new Promise(resolve => setTimeout(resolve, 600));
       }
     }
 
