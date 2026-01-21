@@ -206,26 +206,27 @@ serve(async (req) => {
       const email = emails[i];
       
       try {
-        const { error } = await resend.emails.send({
+        const emailResponse = await resend.emails.send({
           from: FROM_EMAIL,
           to: [email],
           subject,
           html: htmlContent,
         });
 
-        if (error) {
-          throw new Error(error.message);
+        if (emailResponse.error) {
+          throw new Error(emailResponse.error.message);
         }
 
         sentCount++;
 
-        // Log successful send
+        // Log successful send with resend email ID for tracking opens
         await supabase.from("email_campaign_logs").insert({
           campaign_name: campaignName,
           email_type: "teachable",
           recipient_email: email,
           status: "sent",
           sent_at: new Date().toISOString(),
+          resend_email_id: emailResponse.data?.id || null,
         });
       } catch (err) {
         console.error(`Failed to send to ${email}:`, err);
