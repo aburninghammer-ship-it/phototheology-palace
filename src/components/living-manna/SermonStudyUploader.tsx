@@ -8,6 +8,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { 
   Upload, 
   Sparkles, 
@@ -23,7 +24,11 @@ import {
   MessageSquare,
   Target,
   Heart,
-  Lightbulb
+  Lightbulb,
+  Youtube,
+  ClipboardPaste,
+  ShieldAlert,
+  ShieldCheck
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
@@ -72,6 +77,7 @@ interface GeneratedStudy {
   facilitatorNotes: string;
   rawContent?: string;
   parseError?: boolean;
+  doctrinalWarnings?: string[];
 }
 
 interface SavedStudy {
@@ -88,25 +94,45 @@ interface SermonStudyUploaderProps {
   userRole: string;
 }
 
+type InputMode = "youtube" | "paste";
+
 export function SermonStudyUploader({ churchId, userRole }: SermonStudyUploaderProps) {
   const { user } = useAuth();
   const [activeTab, setActiveTab] = useState("upload");
+  const [inputMode, setInputMode] = useState<InputMode>("youtube");
   const [isGenerating, setIsGenerating] = useState(false);
+  const [isExtracting, setIsExtracting] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [sermonTitle, setSermonTitle] = useState("");
   const [preacher, setPreacher] = useState("");
   const [sermonDate, setSermonDate] = useState("");
   const [sermonOutline, setSermonOutline] = useState("");
+  const [youtubeUrl, setYoutubeUrl] = useState("");
   const [generatedStudy, setGeneratedStudy] = useState<GeneratedStudy | null>(null);
   const [savedStudies, setSavedStudies] = useState<SavedStudy[]>([]);
+  const [churchChannelUrl, setChurchChannelUrl] = useState<string | null>(null);
+  const [channelValidationStatus, setChannelValidationStatus] = useState<"none" | "valid" | "invalid">("none");
 
   const canManage = userRole === "admin" || userRole === "leader";
 
   useEffect(() => {
     if (churchId) {
       fetchSavedStudies();
+      fetchChurchChannel();
     }
   }, [churchId]);
+
+  const fetchChurchChannel = async () => {
+    const { data, error } = await supabase
+      .from("churches")
+      .select("youtube_channel_url, youtube_channel_name")
+      .eq("id", churchId)
+      .single();
+
+    if (!error && data?.youtube_channel_url) {
+      setChurchChannelUrl(data.youtube_channel_url);
+    }
+  };
 
   const fetchSavedStudies = async () => {
     const { data, error } = await supabase
@@ -120,10 +146,73 @@ export function SermonStudyUploader({ churchId, userRole }: SermonStudyUploaderP
     }
   };
 
+  const extractTranscriptFromYoutube = async () => {
+    if (!youtubeUrl.trim()) {
+      toast.error("Please enter a YouTube URL");
+      return;
+    }
+
+    if (!churchChannelUrl) {
+      toast.error("Your church hasn't configured a YouTube channel. Please set it up in Church Settings first.");
+      return;
+    }
+
+    setIsExtracting(true);
+    setChannelValidationStatus("none");
+
+    try {
+      const { data, error } = await supabase.functions.invoke("extract-youtube-transcript", {
+        body: {
+          youtubeUrl,
+          churchChannelUrl,
+        },
+      });
+
+      if (error) throw error;
+
+      if (data?.error) {
+        if (data.error.includes("not from your church")) {
+          setChannelValidationStatus("invalid");
+          toast.error("This video is not from your church's YouTube channel");
+          return;
+        }
+        throw new Error(data.error);
+      }
+
+      if (data?.transcript) {
+        setSermonOutline(data.transcript);
+        setChannelValidationStatus("valid");
+        toast.success(`Transcript extracted! (${data.characterCount?.toLocaleString()} characters)`);
+      } else {
+        throw new Error("No transcript returned");
+      }
+    } catch (error: any) {
+      console.error("Transcript extraction error:", error);
+      toast.error(error.message || "Failed to extract transcript");
+    } finally {
+      setIsExtracting(false);
+    }
+  };
+
   const handleGenerate = async () => {
     if (!sermonOutline.trim()) {
-      toast.error("Please enter a sermon outline");
+      toast.error("Please enter a sermon outline or transcript");
       return;
+    }
+
+    // Warn about paste mode (no channel validation)
+    if (inputMode === "paste") {
+      const confirmed = window.confirm(
+        "⚠️ DOCTRINAL SAFETY WARNING\n\n" +
+        "Pasted transcripts cannot be verified as coming from your church's approved channel.\n\n" +
+        "Please ensure this content:\n" +
+        "• Is from an SDA source\n" +
+        "• Does not promote offshoot ideas (anti-Trinity, conspiracy theories, etc.)\n" +
+        "• Aligns with fundamental Adventist beliefs\n\n" +
+        "The AI will flag potential doctrinal concerns, but human review is essential.\n\n" +
+        "Continue with generation?"
+      );
+      if (!confirmed) return;
     }
 
     setIsGenerating(true);
@@ -134,6 +223,8 @@ export function SermonStudyUploader({ churchId, userRole }: SermonStudyUploaderP
           sermonTitle,
           preacher,
           sermonDate,
+          sourceType: inputMode,
+          isVerifiedChannel: channelValidationStatus === "valid",
         },
       });
 
@@ -143,6 +234,11 @@ export function SermonStudyUploader({ churchId, userRole }: SermonStudyUploaderP
         setGeneratedStudy(data.study);
         setActiveTab("preview");
         toast.success("Study generated successfully!");
+        
+        // Check for doctrinal warnings
+        if (data.study.doctrinalWarnings?.length > 0) {
+          toast.warning("⚠️ Some content may need doctrinal review");
+        }
       } else {
         throw new Error("No study data returned");
       }
@@ -220,7 +316,7 @@ export function SermonStudyUploader({ churchId, userRole }: SermonStudyUploaderP
           Sermon Amplified Study Generator
         </CardTitle>
         <CardDescription>
-          Upload a sermon outline to generate a comprehensive small group study
+          Extract from YouTube or paste a transcript to generate a comprehensive small group study
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -241,6 +337,97 @@ export function SermonStudyUploader({ churchId, userRole }: SermonStudyUploaderP
           </TabsList>
 
           <TabsContent value="upload" className="space-y-4 mt-4">
+            {/* Input Mode Selector */}
+            <div className="flex gap-2 p-1 bg-muted rounded-lg w-fit">
+              <Button
+                variant={inputMode === "youtube" ? "default" : "ghost"}
+                size="sm"
+                onClick={() => setInputMode("youtube")}
+                className="gap-2"
+              >
+                <Youtube className="h-4 w-4" />
+                YouTube URL
+                <Badge variant="secondary" className="ml-1 text-xs">Verified</Badge>
+              </Button>
+              <Button
+                variant={inputMode === "paste" ? "default" : "ghost"}
+                size="sm"
+                onClick={() => setInputMode("paste")}
+                className="gap-2"
+              >
+                <ClipboardPaste className="h-4 w-4" />
+                Paste Transcript
+              </Button>
+            </div>
+
+            {/* Channel Verification Notice */}
+            {inputMode === "youtube" && (
+              <Alert variant={churchChannelUrl ? "default" : "destructive"} className="border-blue-500/50 bg-blue-500/5">
+                <ShieldCheck className="h-4 w-4" />
+                <AlertTitle>Channel Verification Active</AlertTitle>
+                <AlertDescription>
+                  {churchChannelUrl ? (
+                    <>Only videos from your church's registered YouTube channel will be accepted. 
+                    This ensures doctrinal safety.</>
+                  ) : (
+                    <>No YouTube channel configured. Please set up your church's YouTube channel in Church Settings first.</>
+                  )}
+                </AlertDescription>
+              </Alert>
+            )}
+
+            {inputMode === "paste" && (
+              <Alert variant="default" className="border-yellow-500/50 bg-yellow-500/5">
+                <ShieldAlert className="h-4 w-4 text-yellow-600" />
+                <AlertTitle>Doctrinal Review Required</AlertTitle>
+                <AlertDescription>
+                  Pasted transcripts bypass channel verification. Please ensure content is from an approved SDA source 
+                  and does not contain offshoot teachings (anti-Trinity, conspiracy theories, COVID misinformation, etc.).
+                </AlertDescription>
+              </Alert>
+            )}
+
+            {/* YouTube URL Input */}
+            {inputMode === "youtube" && (
+              <div className="space-y-2">
+                <Label htmlFor="youtube-url">YouTube Video URL</Label>
+                <div className="flex gap-2">
+                  <Input
+                    id="youtube-url"
+                    placeholder="https://www.youtube.com/watch?v=..."
+                    value={youtubeUrl}
+                    onChange={(e) => {
+                      setYoutubeUrl(e.target.value);
+                      setChannelValidationStatus("none");
+                    }}
+                    className="flex-1"
+                  />
+                  <Button 
+                    onClick={extractTranscriptFromYoutube}
+                    disabled={isExtracting || !youtubeUrl.trim() || !churchChannelUrl}
+                  >
+                    {isExtracting ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                      <>Extract</>
+                    )}
+                  </Button>
+                </div>
+                {channelValidationStatus === "valid" && (
+                  <p className="text-sm text-green-600 flex items-center gap-1">
+                    <CheckCircle2 className="h-4 w-4" />
+                    Video verified from your church's channel
+                  </p>
+                )}
+                {channelValidationStatus === "invalid" && (
+                  <p className="text-sm text-red-600 flex items-center gap-1">
+                    <XCircle className="h-4 w-4" />
+                    This video is not from your church's registered YouTube channel
+                  </p>
+                )}
+              </div>
+            )}
+
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="title">Sermon Title</Label>
@@ -272,14 +459,24 @@ export function SermonStudyUploader({ churchId, userRole }: SermonStudyUploaderP
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="outline">Sermon Outline</Label>
+              <Label htmlFor="outline">
+                {inputMode === "youtube" ? "Extracted Transcript / Sermon Outline" : "Sermon Transcript"}
+              </Label>
               <Textarea
                 id="outline"
-                placeholder="Paste your sermon outline here... Include scripture references, main points, and key teachings."
+                placeholder={inputMode === "youtube" 
+                  ? "Extract transcript from YouTube above, or manually enter your sermon outline here..."
+                  : "Paste your sermon transcript here... Include the full text for best results."
+                }
                 className="min-h-[300px] font-mono text-sm"
                 value={sermonOutline}
                 onChange={(e) => setSermonOutline(e.target.value)}
               />
+              {sermonOutline && (
+                <p className="text-xs text-muted-foreground">
+                  {sermonOutline.length.toLocaleString()} characters
+                </p>
+              )}
             </div>
 
             <Button 
@@ -315,6 +512,21 @@ export function SermonStudyUploader({ churchId, userRole }: SermonStudyUploaderP
                   </div>
                 ) : (
                   <div className="space-y-6">
+                    {/* Doctrinal Warnings */}
+                    {generatedStudy.doctrinalWarnings && generatedStudy.doctrinalWarnings.length > 0 && (
+                      <Alert variant="destructive">
+                        <ShieldAlert className="h-4 w-4" />
+                        <AlertTitle>⚠️ Doctrinal Review Needed</AlertTitle>
+                        <AlertDescription>
+                          <ul className="list-disc list-inside mt-2 space-y-1">
+                            {generatedStudy.doctrinalWarnings.map((warning, i) => (
+                              <li key={i}>{warning}</li>
+                            ))}
+                          </ul>
+                        </AlertDescription>
+                      </Alert>
+                    )}
+
                     {/* Header */}
                     <div className="text-center space-y-2">
                       <h2 className="text-2xl font-bold">{generatedStudy.studyTitle}</h2>
