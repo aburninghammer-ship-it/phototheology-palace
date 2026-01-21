@@ -39,6 +39,7 @@ import { DonationBanner } from "@/components/DonationBanner";
 import { FontSizeControl } from "@/components/FontSizeControl";
 import { usePresenceTracker } from "@/hooks/usePresenceTracker";
 import { PresenceTracker } from "@/components/PresenceTracker";
+import { PickaxeAccountLinker } from "@/components/PickaxeAccountLinker";
 import { ChangeManagerProvider, GuidedPathChecklist, ChangeSpineUpgradePrompt, IdentityMessage } from "@/components/change-manager";
 import { GuidedPathTracker } from "@/hooks/useGuidedPathTracker";
 import { useUTMCapture } from "@/hooks/useUTMCapture";
@@ -341,6 +342,7 @@ function App() {
               <SessionModeProvider>
               <PageTracker />
               <PresenceTracker />
+              <PickaxeAccountLinker />
               <GuidedPathTracker />
               <LiveNotificationsProvider>
                 <AchievementProvider>
