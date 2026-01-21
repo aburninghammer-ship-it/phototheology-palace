@@ -169,20 +169,21 @@ serve(async (req) => {
       // Send emails sequentially within batch to respect rate limits (2 req/sec)
       for (const email of batch) {
         try {
-          await resend.emails.send({
+          const emailResponse = await resend.emails.send({
             from: "PhotoTheology <noreply@thephototheologyapp.com>",
             to: [email],
             subject,
             html: htmlContent,
           });
           
-          // Log successful send
+          // Log successful send with resend email ID for tracking opens
           await supabase.from("email_campaign_logs").insert({
             campaign_name: campaignName,
             recipient_email: email,
             email_type: "pickaxe",
             status: "sent",
             sent_at: new Date().toISOString(),
+            resend_email_id: emailResponse.data?.id || null,
           });
           
           // Update pickaxe_connections with email_sent_at

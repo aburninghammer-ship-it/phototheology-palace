@@ -3528,8 +3528,11 @@ export type Database = {
           email_type: string
           error_message: string | null
           id: string
+          open_count: number | null
+          opened_at: string | null
           recipient_email: string
           recipient_name: string | null
+          resend_email_id: string | null
           sent_at: string | null
           status: string | null
         }
@@ -3539,8 +3542,11 @@ export type Database = {
           email_type: string
           error_message?: string | null
           id?: string
+          open_count?: number | null
+          opened_at?: string | null
           recipient_email: string
           recipient_name?: string | null
+          resend_email_id?: string | null
           sent_at?: string | null
           status?: string | null
         }
@@ -3550,8 +3556,11 @@ export type Database = {
           email_type?: string
           error_message?: string | null
           id?: string
+          open_count?: number | null
+          opened_at?: string | null
           recipient_email?: string
           recipient_name?: string | null
+          resend_email_id?: string | null
           sent_at?: string | null
           status?: string | null
         }

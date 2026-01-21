@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { supabase } from "@/integrations/supabase/client";
 import { Badge } from "@/components/ui/badge";
-import { Loader2, Mail, CheckCircle, XCircle, Clock } from "lucide-react";
+import { Loader2, Mail, CheckCircle, XCircle, Clock, Eye, MailOpen } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { format } from "date-fns";
 import {
@@ -23,6 +23,8 @@ interface EmailLog {
   error_message: string | null;
   sent_at: string | null;
   created_at: string;
+  opened_at: string | null;
+  open_count: number | null;
 }
 
 interface CampaignSummary {
@@ -31,6 +33,8 @@ interface CampaignSummary {
   successful: number;
   failed: number;
   pending: number;
+  opened: number;
+  open_rate: number;
   last_sent: string;
 }
 
@@ -68,19 +72,30 @@ export function EmailCampaignHistory() {
           successful: 0,
           failed: 0,
           pending: 0,
+          opened: 0,
+          open_rate: 0,
           last_sent: log.created_at,
         };
 
         existing.total_sent++;
-        if (log.status === "sent") existing.successful++;
-        else if (log.status === "failed") existing.failed++;
+        if (log.status === "sent" || log.status === "delivered") existing.successful++;
+        else if (log.status === "failed" || log.status === "bounced") existing.failed++;
         else existing.pending++;
+        
+        if (log.opened_at) existing.opened++;
 
         if (new Date(log.created_at) > new Date(existing.last_sent)) {
           existing.last_sent = log.created_at;
         }
 
         summaryMap.set(log.campaign_name, existing);
+      }
+
+      // Calculate open rates
+      for (const summary of summaryMap.values()) {
+        if (summary.successful > 0) {
+          summary.open_rate = Math.round((summary.opened / summary.successful) * 100);
+        }
       }
 
       setCampaigns(Array.from(summaryMap.values()).sort((a, b) => 
@@ -101,22 +116,32 @@ export function EmailCampaignHistory() {
 
   const uniqueTypes = [...new Set(logs.map(l => l.email_type).filter(Boolean))];
 
-  const getStatusIcon = (status: string) => {
+  const getStatusIcon = (status: string, opened: boolean) => {
+    if (opened) {
+      return <MailOpen className="h-4 w-4 text-primary" />;
+    }
     switch (status) {
       case "sent":
-        return <CheckCircle className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />;
+      case "delivered":
+        return <CheckCircle className="h-4 w-4 text-primary" />;
       case "failed":
+      case "bounced":
         return <XCircle className="h-4 w-4 text-destructive" />;
       default:
-        return <Clock className="h-4 w-4 text-amber-600 dark:text-amber-400" />;
+        return <Clock className="h-4 w-4 text-muted-foreground" />;
     }
   };
 
-  const getStatusBadge = (status: string) => {
+  const getStatusBadge = (status: string, openedAt: string | null) => {
+    if (openedAt) {
+      return <Badge className="bg-primary/80 hover:bg-primary">Opened</Badge>;
+    }
     switch (status) {
       case "sent":
-        return <Badge className="bg-emerald-600 hover:bg-emerald-700">Sent</Badge>;
+      case "delivered":
+        return <Badge className="bg-primary hover:bg-primary/90">Sent</Badge>;
       case "failed":
+      case "bounced":
         return <Badge variant="destructive">Failed</Badge>;
       default:
         return <Badge variant="secondary">Pending</Badge>;
@@ -161,11 +186,17 @@ export function EmailCampaignHistory() {
                 <Card key={campaign.campaign_name} className="bg-muted/50">
                   <CardContent className="p-4">
                     <h4 className="font-medium truncate mb-2">{campaign.campaign_name}</h4>
-                    <div className="flex items-center gap-2 text-sm">
-                      <span className="text-emerald-600 dark:text-emerald-400">{campaign.successful} sent</span>
+                    <div className="flex flex-wrap items-center gap-2 text-sm">
+                      <span className="text-primary">{campaign.successful} sent</span>
                       {campaign.failed > 0 && (
                         <span className="text-destructive">{campaign.failed} failed</span>
                       )}
+                    </div>
+                    <div className="flex items-center gap-2 mt-2 text-sm">
+                      <MailOpen className="h-3.5 w-3.5 text-muted-foreground" />
+                      <span className="text-muted-foreground">
+                        {campaign.opened} opened ({campaign.open_rate}%)
+                      </span>
                     </div>
                     <p className="text-xs text-muted-foreground mt-1">
                       Last: {format(new Date(campaign.last_sent), "MMM d, yyyy h:mm a")}
@@ -222,11 +253,16 @@ export function EmailCampaignHistory() {
                     className="flex items-center justify-between p-3 rounded-lg border bg-card"
                   >
                     <div className="flex items-center gap-3">
-                      {getStatusIcon(log.status)}
+                      {getStatusIcon(log.status, !!log.opened_at)}
                       <div>
                         <p className="font-medium text-sm">{log.recipient_email}</p>
                         {log.recipient_name && (
                           <p className="text-xs text-muted-foreground">{log.recipient_name}</p>
+                        )}
+                        {log.opened_at && (
+                          <p className="text-xs text-primary">
+                            Opened: {format(new Date(log.opened_at), "MMM d, h:mm a")}
+                          </p>
                         )}
                       </div>
                     </div>
@@ -234,7 +270,7 @@ export function EmailCampaignHistory() {
                       <Badge variant="outline" className="text-xs">
                         {log.email_type || "campaign"}
                       </Badge>
-                      {getStatusBadge(log.status)}
+                      {getStatusBadge(log.status, log.opened_at)}
                       <span className="text-xs text-muted-foreground">
                         {format(new Date(log.created_at), "MMM d, h:mm a")}
                       </span>
