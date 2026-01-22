@@ -238,8 +238,28 @@ Generate a comprehensive, Christ-centered study that expands on each point while
     // Parse JSON from response (handle markdown code blocks)
     let studyData: Record<string, unknown> = {};
     try {
-      const jsonMatch = content.match(/```(?:json)?\s*([\s\S]*?)```/) || [null, content];
-      const jsonStr = jsonMatch[1]?.trim() || content.trim();
+      let jsonStr = content.trim();
+      
+      // Remove markdown code blocks if present
+      if (jsonStr.startsWith("```")) {
+        // Find the first newline after opening backticks
+        const firstNewline = jsonStr.indexOf("\n");
+        if (firstNewline !== -1) {
+          jsonStr = jsonStr.substring(firstNewline + 1);
+        }
+        // Remove closing backticks
+        if (jsonStr.endsWith("```")) {
+          jsonStr = jsonStr.substring(0, jsonStr.length - 3);
+        }
+        jsonStr = jsonStr.trim();
+      }
+      
+      // Try to extract JSON object if still wrapped in other content
+      const jsonObjectMatch = jsonStr.match(/\{[\s\S]*\}/);
+      if (jsonObjectMatch) {
+        jsonStr = jsonObjectMatch[0];
+      }
+      
       studyData = JSON.parse(jsonStr);
       
       // Merge pre-scan warnings with AI-detected warnings
