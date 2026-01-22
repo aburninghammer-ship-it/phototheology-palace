@@ -15,7 +15,8 @@ import { toast } from "sonner";
 import {
   Brain, Loader2, Save, Trash2,
   ChevronLeft, ChevronRight, StickyNote,
-  Book, Flame, Lightbulb, BookOpen, Target, Crosshair, Sparkles, Eye, Send, Search, Sun, Moon
+  Book, Flame, Lightbulb, BookOpen, Target, Crosshair, Sparkles, Eye, Send, Search, Sun, Moon,
+  FolderOpen, Clock, MoreVertical, Play
 } from "lucide-react";
 import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from "@/components/ui/resizable";
 import { BIBLE_BOOK_METADATA } from "@/data/bibleBooks";
@@ -29,7 +30,25 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { StudySimmerWrapper } from "@/components/simmer/StudySimmerWrapper";
+import { formatDistanceToNow, format } from "date-fns";
 
 // Types for Jeeves analysis
 interface Spark {
@@ -57,7 +76,15 @@ interface RoomSuggestion {
   explorePrompt?: string;
 }
 
+interface SupportingVerse {
+  thought: string;
+  verse: string;
+  text: string;
+  connection: string;
+}
+
 interface JeevesAnalysis {
+  supportingVerses?: SupportingVerse[];
   sparks: Spark[];
   sources: Source[];
   roomSuggestions: RoomSuggestion[];
@@ -65,6 +92,16 @@ interface JeevesAnalysis {
   cycleAndHeaven?: { cycle?: string; heaven?: string; reasoning?: string; explorePrompt?: string };
   nextStep?: { focus: string; question: string };
   overallResponse?: string;
+}
+
+interface SavedSession {
+  id: string;
+  title: string;
+  description: string | null;
+  created_at: string;
+  updated_at: string;
+  jeeves_context: unknown;
+  has_jeeves_history: boolean;
 }
 
 // Book name variants for verse reference detection
@@ -232,8 +269,14 @@ export default function StudyBuddy() {
   const [analysisHistory, setAnalysisHistory] = useState<string[]>([]);
   const analysisHistoryRef = useRef<string[]>([]); // Ref to avoid stale closures
 
-  // Tab state for Study vs Simmer
-  const [activeTab, setActiveTab] = useState<"study" | "simmer">("study");
+  // Tab state for Study vs Simmer vs Saved
+  const [activeTab, setActiveTab] = useState<"study" | "simmer" | "saved">("study");
+
+  // Saved sessions state
+  const [savedSessions, setSavedSessions] = useState<SavedSession[]>([]);
+  const [loadingSessions, setLoadingSessions] = useState(false);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [sessionToDelete, setSessionToDelete] = useState<string | null>(null);
 
   // Track processed verse references to avoid duplicates
   const processedRefsRef = useRef<Set<string>>(new Set());
@@ -389,6 +432,71 @@ export default function StudyBuddy() {
     
     loadExistingSession();
   }, [currentSessionId, user]);
+
+  // Load saved sessions when Saved tab is active
+  useEffect(() => {
+    if (activeTab === "saved" && user) {
+      loadSavedSessions();
+    }
+  }, [activeTab, user]);
+
+  const loadSavedSessions = async () => {
+    if (!user) return;
+    setLoadingSessions(true);
+    try {
+      const { data, error } = await supabase
+        .from("study_sessions")
+        .select("id, title, description, created_at, updated_at, jeeves_context, has_jeeves_history")
+        .eq("user_id", user.id)
+        .order("updated_at", { ascending: false });
+
+      if (error) throw error;
+      setSavedSessions((data || []) as SavedSession[]);
+    } catch (err) {
+      console.error("Error loading saved sessions:", err);
+      toast.error("Failed to load saved sessions");
+    } finally {
+      setLoadingSessions(false);
+    }
+  };
+
+  const handleDeleteSession = async () => {
+    if (!sessionToDelete) return;
+    try {
+      const { error } = await supabase
+        .from("study_sessions")
+        .delete()
+        .eq("id", sessionToDelete);
+
+      if (error) throw error;
+      setSavedSessions(prev => prev.filter(s => s.id !== sessionToDelete));
+      toast.success("Session deleted");
+    } catch (err) {
+      console.error("Error deleting session:", err);
+      toast.error("Failed to delete session");
+    } finally {
+      setSessionToDelete(null);
+      setDeleteDialogOpen(false);
+    }
+  };
+
+  const handleResumeSession = (session: SavedSession) => {
+    // Load the session data
+    setCurrentSessionId(session.id);
+    setSessionTitle(session.title || "");
+
+    const ctx = session.jeeves_context as { book?: string; chapter?: number; notes?: string; analysis?: JeevesAnalysis } | null;
+    if (ctx) {
+      if (ctx.book) setSelectedBook(ctx.book);
+      if (ctx.chapter) setSelectedChapter(ctx.chapter);
+      if (ctx.notes) setNotes(ctx.notes);
+      if (ctx.analysis) setAnalysis(ctx.analysis);
+    }
+
+    // Switch to study tab
+    setActiveTab("study");
+    toast.success("Session loaded!");
+  };
 
   // Load verses when book/chapter changes
   useEffect(() => {
@@ -772,14 +880,28 @@ export default function StudyBuddy() {
               <Brain className="w-4 h-4 mr-2" />
               Study
             </TabsTrigger>
-            <TabsTrigger 
-              value="simmer" 
+            <TabsTrigger
+              value="simmer"
               className={`data-[state=active]:bg-gradient-to-r data-[state=active]:from-red-600 data-[state=active]:to-orange-500 data-[state=active]:text-white ${
                 isLightTheme ? "text-orange-700" : "text-orange-200"
               }`}
             >
               <Flame className="w-4 h-4 mr-2" />
               Simmer
+            </TabsTrigger>
+            <TabsTrigger
+              value="saved"
+              className={`data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-indigo-500 data-[state=active]:text-white ${
+                isLightTheme ? "text-orange-700" : "text-orange-200"
+              }`}
+            >
+              <FolderOpen className="w-4 h-4 mr-2" />
+              Saved
+              {savedSessions.length > 0 && (
+                <Badge variant="secondary" className="ml-2 h-5 px-1.5 text-xs">
+                  {savedSessions.length}
+                </Badge>
+              )}
             </TabsTrigger>
           </TabsList>
 
@@ -1014,12 +1136,53 @@ Jeeves sees your notes and will spark connections, suggest PT rooms, source clai
                           animate={{ opacity: 1, y: 0 }}
                           exit={{ opacity: 0 }}
                           className={`p-3 rounded-lg text-sm ${
-                            isLightTheme 
-                              ? "bg-purple-100/80 border border-purple-200/60 text-gray-800" 
+                            isLightTheme
+                              ? "bg-purple-100/80 border border-purple-200/60 text-gray-800"
                               : "bg-violet-500/10 border border-violet-500/20 text-violet-100"
                           }`}
                         >
                           <p className="whitespace-pre-wrap">{analysis.overallResponse}</p>
+                        </motion.div>
+                      )}
+
+                      {/* Supporting Verses - verses that back up user's thoughts */}
+                      {analysis?.supportingVerses && analysis.supportingVerses.length > 0 && (
+                        <motion.div
+                          key="supportingVerses"
+                          initial={{ opacity: 0, y: 10 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          className="space-y-2"
+                        >
+                          <div className={`flex items-center gap-2 ${isLightTheme ? "text-green-600" : "text-green-400"}`}>
+                            <BookOpen className="w-4 h-4" />
+                            <span className="text-xs font-semibold uppercase tracking-wider">Verses That Back You Up</span>
+                          </div>
+                          {analysis.supportingVerses.map((sv, idx) => (
+                            <motion.div
+                              key={idx}
+                              initial={{ opacity: 0, x: -10 }}
+                              animate={{ opacity: 1, x: 0 }}
+                              transition={{ delay: idx * 0.1 }}
+                              className={`p-3 rounded-lg ${
+                                isLightTheme
+                                  ? "bg-green-100/80 border border-green-200/60"
+                                  : "bg-green-500/10 border border-green-500/20"
+                              }`}
+                            >
+                              <div className={`text-xs mb-1 italic ${isLightTheme ? "text-green-700/70" : "text-green-200/60"}`}>
+                                Your thought: "{sv.thought}"
+                              </div>
+                              <div className={`font-semibold text-sm ${isLightTheme ? "text-green-800" : "text-green-300"}`}>
+                                📖 {sv.verse}
+                              </div>
+                              <p className={`text-sm mt-1 ${isLightTheme ? "text-green-900" : "text-green-100"}`}>
+                                "{sv.text}"
+                              </p>
+                              <p className={`text-xs mt-2 ${isLightTheme ? "text-green-700" : "text-green-200/80"}`}>
+                                {sv.connection}
+                              </p>
+                            </motion.div>
+                          ))}
                         </motion.div>
                       )}
 
@@ -1315,7 +1478,7 @@ Jeeves sees your notes and will spark connections, suggest PT rooms, source clai
           {/* Simmer Tab Content */}
           <TabsContent value="simmer" className="mt-0 flex-1">
             <div className="overflow-auto" style={{ height: 'calc(100vh - 200px)' }}>
-              <StudySimmerWrapper 
+              <StudySimmerWrapper
                 onExportToNotes={(content) => {
                   setNotes(prev => prev + (prev ? "\n\n---\n\n" : "") + content);
                   setActiveTab("study");
@@ -1324,7 +1487,165 @@ Jeeves sees your notes and will spark connections, suggest PT rooms, source clai
               />
             </div>
           </TabsContent>
+
+          {/* Saved Sessions Tab Content */}
+          <TabsContent value="saved" className="mt-0 flex-1">
+            <div className="py-4 overflow-auto" style={{ height: 'calc(100vh - 200px)' }}>
+              {loadingSessions ? (
+                <div className="flex items-center justify-center py-12">
+                  <Loader2 className={`w-8 h-8 animate-spin ${isLightTheme ? "text-blue-600" : "text-blue-400"}`} />
+                </div>
+              ) : savedSessions.length === 0 ? (
+                <Card className={`backdrop-blur-xl ${
+                  isLightTheme
+                    ? "bg-blue-50/80 border-blue-200/60"
+                    : "bg-blue-950/30 border-blue-500/20"
+                }`}>
+                  <div className="flex flex-col items-center justify-center py-12 text-center">
+                    <FolderOpen className={`w-12 h-12 mb-4 ${isLightTheme ? "text-blue-400" : "text-blue-500/50"}`} />
+                    <h3 className={`text-lg font-medium mb-2 ${isLightTheme ? "text-gray-900" : "text-white"}`}>
+                      No saved sessions
+                    </h3>
+                    <p className={`max-w-sm ${isLightTheme ? "text-blue-700/70" : "text-blue-200/60"}`}>
+                      Write notes in the Study tab and click Save to see your sessions here.
+                    </p>
+                  </div>
+                </Card>
+              ) : (
+                <ScrollArea className="h-full">
+                  <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 pr-4">
+                    {savedSessions.map((session) => {
+                      const ctx = session.jeeves_context as { book?: string; chapter?: number; notes?: string } | null;
+                      return (
+                        <Card
+                          key={session.id}
+                          className={`cursor-pointer transition-all hover:shadow-lg ${
+                            isLightTheme
+                              ? "bg-white/90 border-blue-200/60 hover:border-blue-400"
+                              : "bg-blue-950/40 border-blue-500/20 hover:border-blue-400/50"
+                          }`}
+                        >
+                          <div className="p-4">
+                            <div className="flex items-start justify-between mb-2">
+                              <div className="flex-1 min-w-0">
+                                <div className="flex items-center gap-2 mb-1">
+                                  <Brain className={`w-4 h-4 ${isLightTheme ? "text-blue-600" : "text-blue-400"}`} />
+                                  <Badge variant="outline" className={`text-[10px] ${
+                                    isLightTheme
+                                      ? "bg-blue-100 text-blue-700 border-blue-300"
+                                      : "bg-blue-500/10 text-blue-300 border-blue-500/30"
+                                  }`}>
+                                    Study Buddy
+                                  </Badge>
+                                </div>
+                                <h3 className={`font-semibold truncate ${isLightTheme ? "text-gray-900" : "text-white"}`}>
+                                  {session.title || "Untitled Session"}
+                                </h3>
+                                <div className={`flex items-center gap-1 mt-1 text-xs ${
+                                  isLightTheme ? "text-blue-700/70" : "text-blue-200/60"
+                                }`}>
+                                  <Clock className="w-3 h-3" />
+                                  {format(new Date(session.updated_at), "MMM d, yyyy")}
+                                </div>
+                              </div>
+                              <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                  <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                                    <MoreVertical className="w-4 h-4" />
+                                  </Button>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent align="end" className={
+                                  isLightTheme ? "bg-white" : "bg-slate-900 border-slate-700"
+                                }>
+                                  <DropdownMenuItem onClick={() => handleResumeSession(session)}>
+                                    <Play className="w-4 h-4 mr-2" />
+                                    Resume
+                                  </DropdownMenuItem>
+                                  <DropdownMenuSeparator />
+                                  <DropdownMenuItem
+                                    onClick={() => {
+                                      setSessionToDelete(session.id);
+                                      setDeleteDialogOpen(true);
+                                    }}
+                                    className="text-destructive focus:text-destructive"
+                                  >
+                                    <Trash2 className="w-4 h-4 mr-2" />
+                                    Delete
+                                  </DropdownMenuItem>
+                                </DropdownMenuContent>
+                              </DropdownMenu>
+                            </div>
+
+                            {session.description && (
+                              <p className={`text-sm mb-3 line-clamp-2 ${
+                                isLightTheme ? "text-gray-600" : "text-blue-100/80"
+                              }`}>
+                                {session.description}
+                              </p>
+                            )}
+
+                            {ctx?.book && (
+                              <div className="flex items-center gap-2 mb-3">
+                                <Badge variant="outline" className={`text-xs ${
+                                  isLightTheme
+                                    ? "bg-orange-100 text-orange-700 border-orange-300"
+                                    : "bg-orange-500/10 text-orange-300 border-orange-500/30"
+                                }`}>
+                                  {ctx.book} {ctx.chapter}
+                                </Badge>
+                                {session.has_jeeves_history && (
+                                  <Badge variant="outline" className={`text-xs ${
+                                    isLightTheme
+                                      ? "bg-purple-100 text-purple-700 border-purple-300"
+                                      : "bg-purple-500/10 text-purple-300 border-purple-500/30"
+                                  }`}>
+                                    Jeeves
+                                  </Badge>
+                                )}
+                              </div>
+                            )}
+
+                            <Button
+                              size="sm"
+                              onClick={() => handleResumeSession(session)}
+                              className="w-full bg-gradient-to-r from-blue-600 to-indigo-500 hover:from-blue-700 hover:to-indigo-600 text-white"
+                            >
+                              <Play className="w-4 h-4 mr-1" />
+                              Resume Session
+                            </Button>
+                          </div>
+                        </Card>
+                      );
+                    })}
+                  </div>
+                </ScrollArea>
+              )}
+            </div>
+          </TabsContent>
         </Tabs>
+
+        {/* Delete Confirmation Dialog */}
+        <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+          <AlertDialogContent className={isLightTheme ? "" : "bg-slate-900 border-slate-700"}>
+            <AlertDialogHeader>
+              <AlertDialogTitle className={isLightTheme ? "" : "text-white"}>Delete Session</AlertDialogTitle>
+              <AlertDialogDescription>
+                Are you sure you want to delete this session? This action cannot be undone.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel className={isLightTheme ? "" : "bg-slate-800 border-slate-700 text-white hover:bg-slate-700"}>
+                Cancel
+              </AlertDialogCancel>
+              <AlertDialogAction
+                onClick={handleDeleteSession}
+                className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              >
+                Delete
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       </div>
     </div>
   );
