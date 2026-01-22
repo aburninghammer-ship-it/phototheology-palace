@@ -28,7 +28,6 @@ import { TrialUrgencyMessage } from "@/components/TrialUrgencyMessage";
 import { VoiceChatInviteNotification } from "@/components/voice/VoiceChatInviteNotification";
 import { PageTracker } from "@/components/PageTracker";
 import { LiveDemoNotification } from "@/components/live/LiveDemoNotification";
-import { DailyTipNotificationProvider } from "@/components/notifications/DailyTipNotification";
 import { InstallPrompt } from "@/components/pwa/InstallPrompt";
 import { ExitIntentPopup } from "@/components/conversion/ExitIntentPopup";
 import { AmbientMusicPlayer } from "@/components/audio/AmbientMusicPlayer";
@@ -356,7 +355,6 @@ function App() {
                         <TrialUrgencyMessage />
                         <VoiceChatInviteNotification />
                         <LiveDemoNotification />
-                        <DailyTipNotificationProvider />
                         <InstallPrompt />
                         <ExitIntentPopup />
                         {/* Session Mode Prompt Dialog */}
