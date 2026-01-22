@@ -240,24 +240,40 @@ Generate a comprehensive, Christ-centered study that expands on each point while
     try {
       let jsonStr = content.trim();
       
-      // Step 1: Remove markdown code blocks (```json ... ```)
-      const codeBlockMatch = jsonStr.match(/```(?:json)?\s*([\s\S]*?)```/);
-      if (codeBlockMatch) {
-        jsonStr = codeBlockMatch[1].trim();
+      console.log("Raw AI response length:", jsonStr.length);
+      console.log("Starts with ```:", jsonStr.startsWith("```"));
+      
+      // Step 1: Multiple approaches to strip markdown code blocks
+      // Approach 1a: Handle ```json\n at start and ``` at end
+      if (jsonStr.startsWith("```json")) {
+        jsonStr = jsonStr.replace(/^```json\s*/, "");
+        jsonStr = jsonStr.replace(/```\s*$/, "");
+      } else if (jsonStr.startsWith("```")) {
+        jsonStr = jsonStr.replace(/^```\s*/, "");
+        jsonStr = jsonStr.replace(/```\s*$/, "");
       }
       
-      // Step 2: If no code block found, try to extract JSON object directly
-      if (!codeBlockMatch) {
-        // Find the first { and last } to extract JSON
-        const firstBrace = jsonStr.indexOf('{');
-        const lastBrace = jsonStr.lastIndexOf('}');
-        if (firstBrace !== -1 && lastBrace !== -1 && lastBrace > firstBrace) {
-          jsonStr = jsonStr.substring(firstBrace, lastBrace + 1);
+      // Approach 1b: Use greedy regex as fallback (handles all ``` blocks)
+      if (jsonStr.includes("```")) {
+        // Find content between first ``` and last ```
+        const parts = jsonStr.split("```");
+        if (parts.length >= 3) {
+          // Content is typically in parts[1] (between first and second ```)
+          jsonStr = parts[1].replace(/^json\s*/i, "").trim();
         }
+      }
+      
+      // Step 2: Find the JSON object boundaries
+      const firstBrace = jsonStr.indexOf('{');
+      const lastBrace = jsonStr.lastIndexOf('}');
+      if (firstBrace !== -1 && lastBrace !== -1 && lastBrace > firstBrace) {
+        jsonStr = jsonStr.substring(firstBrace, lastBrace + 1);
       }
       
       // Step 3: Clean up any remaining issues
       jsonStr = jsonStr.trim();
+      
+      console.log("Cleaned JSON starts with:", jsonStr.substring(0, 50));
       
       // Step 4: Parse the JSON
       studyData = JSON.parse(jsonStr);
