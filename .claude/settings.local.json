@@ -63,7 +63,9 @@
       "Bash(SUPABASE_ACCESS_TOKEN=\"sbp_fe32d3be189beab600f50a27caea50a09e6ef260\" npx supabase functions deploy send-teachable-email --project-ref tdjtumtdkjicnhlpqqzd)",
       "Bash(SUPABASE_ACCESS_TOKEN=\"sbp_fe32d3be189beab600f50a27caea50a09e6ef260\" npx supabase db push --project-ref tdjtumtdkjicnhlpqqzd)",
       "Bash(SUPABASE_ACCESS_TOKEN=\"sbp_fe32d3be189beab600f50a27caea50a09e6ef260\" npx supabase db execute --project-ref tdjtumtdkjicnhlpqqzd --file supabase/migrations/20260119230000_analytics_snapshots.sql)",
-      "Bash(SUPABASE_ACCESS_TOKEN=\"sbp_fe32d3be189beab600f50a27caea50a09e6ef260\" npx supabase link --project-ref tdjtumtdkjicnhlpqqzd)"
+      "Bash(SUPABASE_ACCESS_TOKEN=\"sbp_fe32d3be189beab600f50a27caea50a09e6ef260\" npx supabase link --project-ref tdjtumtdkjicnhlpqqzd)",
+      "Bash(export SUPABASE_ACCESS_TOKEN=\"sbp_fe32d3be189beab600f50a27caea50a09e6ef260\")",
+      "WebFetch(domain:clonevoice.ai)"
     ],
     "deny": [],
     "ask": []
