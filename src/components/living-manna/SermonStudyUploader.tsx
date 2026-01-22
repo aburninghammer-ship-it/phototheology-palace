@@ -229,15 +229,8 @@ export function SermonStudyUploader({ churchId, userRole }: SermonStudyUploaderP
     }
   };
 
-  if (!canManage) {
-    return (
-      <Card>
-        <CardContent className="py-8 text-center text-muted-foreground">
-          Only church admins and leaders can upload sermon outlines.
-        </CardContent>
-      </Card>
-    );
-  }
+  // All members can use the generator for personal study
+  // Only admins/leaders can save to church
 
   return (
     <Card className="w-full">
@@ -559,26 +552,34 @@ export function SermonStudyUploader({ churchId, userRole }: SermonStudyUploaderP
                       </Card>
                     )}
 
-                    {/* Save Buttons */}
-                    <div className="flex gap-4 pt-4">
-                      <Button
-                        variant="outline"
-                        onClick={() => handleSave("draft")}
-                        disabled={isSaving}
-                        className="flex-1"
-                      >
-                        {isSaving ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Save className="h-4 w-4 mr-2" />}
-                        Save as Draft
-                      </Button>
-                      <Button
-                        onClick={() => handleSave("published")}
-                        disabled={isSaving}
-                        className="flex-1"
-                      >
-                        {isSaving ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <CheckCircle2 className="h-4 w-4 mr-2" />}
-                        Publish Study
-                      </Button>
-                    </div>
+                    {/* Save Buttons - Only for admins/leaders */}
+                    {canManage ? (
+                      <div className="flex gap-4 pt-4">
+                        <Button
+                          variant="outline"
+                          onClick={() => handleSave("draft")}
+                          disabled={isSaving}
+                          className="flex-1"
+                        >
+                          {isSaving ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Save className="h-4 w-4 mr-2" />}
+                          Save as Draft
+                        </Button>
+                        <Button
+                          onClick={() => handleSave("published")}
+                          disabled={isSaving}
+                          className="flex-1"
+                        >
+                          {isSaving ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <CheckCircle2 className="h-4 w-4 mr-2" />}
+                          Publish Study
+                        </Button>
+                      </div>
+                    ) : (
+                      <div className="pt-4 p-4 rounded-lg bg-muted/50 border border-border/50 text-center">
+                        <p className="text-sm text-muted-foreground">
+                          ✨ Study generated for your personal use. Contact a church leader to publish it for the congregation.
+                        </p>
+                      </div>
+                    )}
                   </div>
                 )}
               </ScrollArea>

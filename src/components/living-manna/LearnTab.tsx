@@ -51,12 +51,10 @@ export function LearnTab({ churchId }: LearnTabProps) {
             <Flame className="h-4 w-4" />
             Truth Series
           </TabsTrigger>
-          {canManageSermonStudies && (
-            <TabsTrigger value="sermon-study" className="gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
-              <Mic className="h-4 w-4" />
-              Sermon Study
-            </TabsTrigger>
-          )}
+          <TabsTrigger value="sermon-study" className="gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
+            <Mic className="h-4 w-4" />
+            Sermon Study
+          </TabsTrigger>
         </TabsList>
 
         <TabsContent value="weekly-study">
@@ -75,11 +73,9 @@ export function LearnTab({ churchId }: LearnTabProps) {
           <TruthSeries churchId={churchId} />
         </TabsContent>
 
-        {canManageSermonStudies && (
-          <TabsContent value="sermon-study">
-            <SermonStudyUploader churchId={churchId} userRole={effectiveRole || "member"} />
-          </TabsContent>
-        )}
+        <TabsContent value="sermon-study">
+          <SermonStudyUploader churchId={churchId} userRole={effectiveRole || "member"} />
+        </TabsContent>
       </Tabs>
     </div>
   );
