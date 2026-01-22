@@ -208,6 +208,9 @@ export default function StudyBuddy() {
     searchParams.get("session") || null
   );
 
+  // Track if this is a fresh navigation (not tab switch)
+  const isInitialMount = useRef(true);
+
   // Preserve scroll position when switching pages
   usePreservePageState();
 
@@ -232,14 +235,32 @@ export default function StudyBuddy() {
   // Tab state for Study vs Simmer
   const [activeTab, setActiveTab] = useState<"study" | "simmer">("study");
 
+  // Track processed verse references to avoid duplicates
+  const processedRefsRef = useRef<Set<string>>(new Set());
+  const versePopulateTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
   // Keep analysisHistoryRef in sync with state (for closures)
   useEffect(() => {
     analysisHistoryRef.current = analysisHistory;
   }, [analysisHistory]);
 
-  // Track processed verse references to avoid duplicates
-  const processedRefsRef = useRef<Set<string>>(new Set());
-  const versePopulateTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  // Clear persisted state on fresh navigation (no session ID)
+  // This ensures Study Buddy starts fresh when clicked from navigation
+  useEffect(() => {
+    if (isInitialMount.current && !searchParams.get("session")) {
+      // Clear all persisted state for a fresh start
+      setNotes("");
+      setSessionTitle("");
+      setSelectedBook("Genesis");
+      setSelectedChapter(1);
+      setAnalysis(null);
+      setAnalysisHistory([]);
+      analysisHistoryRef.current = [];
+      lastAnalyzedNotes.current = "";
+      processedRefsRef.current.clear();
+    }
+    isInitialMount.current = false;
+  }, []); // Empty deps - only run on mount
 
   // Fetch and populate verse text when user types a reference
   const populateVerseReference = useCallback(async (ref: ParsedReference) => {
