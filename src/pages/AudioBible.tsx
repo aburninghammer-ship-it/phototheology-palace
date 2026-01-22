@@ -360,7 +360,7 @@ export default function AudioBible() {
                   </Button>
                   <Button
                     size="lg"
-                    className="rounded-full h-16 w-16 shadow-lg"
+                    className="rounded-full h-16 w-16 shadow-lg [&_svg]:!size-7"
                     onClick={handlePlayPause}
                     disabled={isLoading}
                   >
@@ -369,7 +369,7 @@ export default function AudioBible() {
                     ) : isPlaying ? (
                       <Pause className="h-7 w-7" />
                     ) : (
-                      <Play className="h-7 w-7 ml-1" />
+                      <Play className="h-7 w-7 ml-1 fill-current" />
                     )}
                   </Button>
                   <Button variant="outline" size="icon" onClick={skipNext} className="h-12 w-12 rounded-full">
