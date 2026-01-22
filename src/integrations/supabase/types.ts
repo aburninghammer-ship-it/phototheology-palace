@@ -302,6 +302,42 @@ export type Database = {
         }
         Relationships: []
       }
+      bible_commentaries: {
+        Row: {
+          audio_url: string | null
+          book: string
+          chapter: number
+          commentary_text: string
+          created_at: string
+          id: string
+          tier: string
+          updated_at: string
+          verse: number
+        }
+        Insert: {
+          audio_url?: string | null
+          book: string
+          chapter: number
+          commentary_text: string
+          created_at?: string
+          id?: string
+          tier?: string
+          updated_at?: string
+          verse: number
+        }
+        Update: {
+          audio_url?: string | null
+          book?: string
+          chapter?: number
+          commentary_text?: string
+          created_at?: string
+          id?: string
+          tier?: string
+          updated_at?: string
+          verse?: number
+        }
+        Relationships: []
+      }
       bible_images: {
         Row: {
           book: string | null
