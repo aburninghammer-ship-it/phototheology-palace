@@ -32,3 +32,7 @@ export { NotificationAlerts } from "./NotificationAlerts";
 export { PublicAnnouncementsBoard } from "./PublicAnnouncementsBoard";
 export { PersonalDevotionalDiary } from "./PersonalDevotionalDiary";
 export { MobileNavHeader } from "./MobileNavHeader";
+export { ChurchEvents } from "./ChurchEvents";
+export { ChurchSurveys } from "./ChurchSurveys";
+export { PushNotificationSettings } from "./PushNotificationSettings";
+export { StudyEngagementAnalytics } from "./StudyEngagementAnalytics";
