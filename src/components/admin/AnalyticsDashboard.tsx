@@ -1,11 +1,13 @@
+import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useAnalyticsSnapshots, TimeRange } from "@/hooks/useAnalyticsSnapshots";
-import { Loader2, TrendingUp, TrendingDown, Calendar, Users, DollarSign, RefreshCw, CheckCircle } from "lucide-react";
+import { Loader2, TrendingUp, TrendingDown, Calendar, Users, DollarSign, RefreshCw, CheckCircle, Camera, AlertCircle } from "lucide-react";
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, Legend, AreaChart, Area } from "recharts";
-import { format } from "date-fns";
+import { format, subDays, eachDayOfInterval } from "date-fns";
+import { toast } from "sonner";
 
 export function AnalyticsDashboard() {
   const {
@@ -15,8 +17,46 @@ export function AnalyticsDashboard() {
     timeRange,
     setTimeRange,
     refetch,
+    recordSnapshot,
     summary,
   } = useAnalyticsSnapshots("30d");
+
+  const [isRecording, setIsRecording] = useState(false);
+
+  // Check for missing days in the data
+  const getMissingDays = () => {
+    if (snapshots.length < 2) return [];
+
+    const dates = snapshots.map(s => new Date(s.snapshot_date));
+    const firstDate = dates[0];
+    const lastDate = dates[dates.length - 1];
+
+    const allDays = eachDayOfInterval({ start: firstDate, end: lastDate });
+    const snapshotDates = new Set(snapshots.map(s => s.snapshot_date));
+
+    return allDays.filter(day => {
+      const dateStr = format(day, "yyyy-MM-dd");
+      return !snapshotDates.has(dateStr);
+    });
+  };
+
+  const missingDays = getMissingDays();
+
+  const handleRecordSnapshot = async () => {
+    setIsRecording(true);
+    try {
+      const result = await recordSnapshot();
+      if (result.success) {
+        toast.success("Snapshot recorded successfully!");
+      } else {
+        toast.error(result.error || "Failed to record snapshot");
+      }
+    } catch (err) {
+      toast.error("Failed to record snapshot");
+    } finally {
+      setIsRecording(false);
+    }
+  };
 
   if (loading) {
     return (
@@ -106,13 +146,59 @@ export function AnalyticsDashboard() {
 
       {/* Auto-recording status */}
       <Card className="border-green-500/30 bg-green-500/5">
-        <CardContent className="py-3 px-4 flex items-center gap-3">
-          <CheckCircle className="h-5 w-5 text-green-500" />
-          <span className="text-sm">
-            <strong>Automatic tracking enabled.</strong> Snapshots are recorded daily at midnight UTC.
-          </span>
+        <CardContent className="py-3 px-4 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <CheckCircle className="h-5 w-5 text-green-500" />
+            <span className="text-sm">
+              <strong>Automatic tracking enabled.</strong> Snapshots are recorded daily at midnight UTC.
+            </span>
+          </div>
+          <Button
+            onClick={handleRecordSnapshot}
+            disabled={isRecording}
+            size="sm"
+            variant="outline"
+            className="gap-2"
+          >
+            {isRecording ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : (
+              <Camera className="h-4 w-4" />
+            )}
+            Record Now
+          </Button>
         </CardContent>
       </Card>
+
+      {/* Warning if missing days */}
+      {missingDays.length > 0 && (
+        <Card className="border-amber-500/30 bg-amber-500/5">
+          <CardContent className="py-3 px-4 flex items-center gap-3">
+            <AlertCircle className="h-5 w-5 text-amber-500" />
+            <span className="text-sm">
+              <strong>Missing {missingDays.length} day(s) of data.</strong> The cron job may not have run. Click "Record Now" to capture today's snapshot.
+              {missingDays.length <= 5 && (
+                <span className="text-muted-foreground ml-1">
+                  Missing: {missingDays.map(d => format(d, "MMM d")).join(", ")}
+                </span>
+              )}
+            </span>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Warning if very few data points */}
+      {snapshots.length > 0 && snapshots.length < 3 && (
+        <Card className="border-blue-500/30 bg-blue-500/5">
+          <CardContent className="py-3 px-4 flex items-center gap-3">
+            <Calendar className="h-5 w-5 text-blue-500" />
+            <span className="text-sm">
+              <strong>Limited historical data.</strong> Only {snapshots.length} day(s) recorded so far.
+              Charts will become more useful as more days are collected.
+            </span>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Growth Summary Cards */}
       {summary && summary.latestSnapshot && (
@@ -291,7 +377,7 @@ export function AnalyticsDashboard() {
                   <Line
                     type="monotone"
                     dataKey="active"
-                    name="Active Paid"
+                    name="Active Stripe"
                     stroke="#22c55e"
                     strokeWidth={2}
                     dot={{ fill: "#22c55e", r: 4 }}
@@ -299,7 +385,7 @@ export function AnalyticsDashboard() {
                   <Line
                     type="monotone"
                     dataKey="trials"
-                    name="7-Day Trials"
+                    name="Trialing"
                     stroke="#3b82f6"
                     strokeWidth={2}
                     dot={{ fill: "#3b82f6", r: 4 }}
@@ -307,7 +393,7 @@ export function AnalyticsDashboard() {
                   <Line
                     type="monotone"
                     dataKey="patreon"
-                    name="Patreon"
+                    name="Patrons"
                     stroke="#f97316"
                     strokeWidth={2}
                     dot={{ fill: "#f97316", r: 4 }}
