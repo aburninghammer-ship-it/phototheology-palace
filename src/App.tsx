@@ -27,7 +27,6 @@ import { TrialUpgradePrompt } from "@/components/TrialUpgradePrompt";
 import { TrialUrgencyMessage } from "@/components/TrialUrgencyMessage";
 import { VoiceChatInviteNotification } from "@/components/voice/VoiceChatInviteNotification";
 import { PageTracker } from "@/components/PageTracker";
-import { DailyVerseNotification } from "@/components/notifications/DailyVerseNotification";
 import { LiveDemoNotification } from "@/components/live/LiveDemoNotification";
 import { DailyTipNotificationProvider } from "@/components/notifications/DailyTipNotification";
 import { InstallPrompt } from "@/components/pwa/InstallPrompt";
@@ -356,7 +355,6 @@ function App() {
                         <ChangeSpineUpgradePrompt />
                         <TrialUrgencyMessage />
                         <VoiceChatInviteNotification />
-                        <DailyVerseNotification />
                         <LiveDemoNotification />
                         <DailyTipNotificationProvider />
                         <InstallPrompt />
