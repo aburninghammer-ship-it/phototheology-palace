@@ -235,31 +235,31 @@ Generate a comprehensive, Christ-centered study that expands on each point while
       throw new Error("No content in AI response");
     }
 
-    // Parse JSON from response (handle markdown code blocks)
+    // Parse JSON from response with robust extraction
     let studyData: Record<string, unknown> = {};
     try {
       let jsonStr = content.trim();
       
-      // Remove markdown code blocks if present
-      if (jsonStr.startsWith("```")) {
-        // Find the first newline after opening backticks
-        const firstNewline = jsonStr.indexOf("\n");
-        if (firstNewline !== -1) {
-          jsonStr = jsonStr.substring(firstNewline + 1);
-        }
-        // Remove closing backticks
-        if (jsonStr.endsWith("```")) {
-          jsonStr = jsonStr.substring(0, jsonStr.length - 3);
-        }
-        jsonStr = jsonStr.trim();
+      // Step 1: Remove markdown code blocks (```json ... ```)
+      const codeBlockMatch = jsonStr.match(/```(?:json)?\s*([\s\S]*?)```/);
+      if (codeBlockMatch) {
+        jsonStr = codeBlockMatch[1].trim();
       }
       
-      // Try to extract JSON object if still wrapped in other content
-      const jsonObjectMatch = jsonStr.match(/\{[\s\S]*\}/);
-      if (jsonObjectMatch) {
-        jsonStr = jsonObjectMatch[0];
+      // Step 2: If no code block found, try to extract JSON object directly
+      if (!codeBlockMatch) {
+        // Find the first { and last } to extract JSON
+        const firstBrace = jsonStr.indexOf('{');
+        const lastBrace = jsonStr.lastIndexOf('}');
+        if (firstBrace !== -1 && lastBrace !== -1 && lastBrace > firstBrace) {
+          jsonStr = jsonStr.substring(firstBrace, lastBrace + 1);
+        }
       }
       
+      // Step 3: Clean up any remaining issues
+      jsonStr = jsonStr.trim();
+      
+      // Step 4: Parse the JSON
       studyData = JSON.parse(jsonStr);
       
       // Merge pre-scan warnings with AI-detected warnings
@@ -270,10 +270,20 @@ Generate a comprehensive, Christ-centered study that expands on each point while
           ...doctrinalWarnings.filter(w => !existingWarnings.includes(w))
         ];
       }
+      
+      console.log("Successfully parsed study with", Object.keys(studyData).length, "fields");
     } catch (parseError) {
       console.error("JSON parse error:", parseError);
-      // Return raw content if parsing fails
-      studyData = { rawContent: content, parseError: true, doctrinalWarnings };
+      console.log("Raw content length:", content.length);
+      console.log("First 500 chars:", content.substring(0, 500));
+      // Return raw content if parsing fails - frontend can still display it
+      studyData = { 
+        rawContent: content, 
+        parseError: true, 
+        doctrinalWarnings,
+        studyTitle: "Generated Study (Parsing Error)",
+        overview: "The AI generated content but it couldn't be automatically formatted. The raw content is shown below."
+      };
     }
 
     return new Response(
