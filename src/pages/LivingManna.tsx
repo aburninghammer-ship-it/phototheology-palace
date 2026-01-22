@@ -211,7 +211,7 @@ export default function LivingManna() {
                     onClick={() => navigate('/dashboard')}
                   >
                     <ArrowLeft className="h-4 w-4 mr-2" />
-                    Return to App
+                    Return to Suite
                   </Button>
                   {isChurchAdmin && (
                     <Button 

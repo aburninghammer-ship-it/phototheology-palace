@@ -1,10 +1,11 @@
 import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { MessagesSquare, MessageCircle, Heart, Hash } from "lucide-react";
+import { MessagesSquare, MessageCircle, Heart, Hash, ClipboardList } from "lucide-react";
 import { ChurchCommunity } from "./ChurchCommunity";
 import { ChurchMessaging } from "./ChurchMessaging";
 import { ChurchChatRooms } from "./ChurchChatRooms";
 import { PrayerMinistryHub } from "./PrayerMinistryHub";
+import { ChurchSurveys } from "./ChurchSurveys";
 import { useChurchMembership } from "@/hooks/useChurchMembership";
 
 interface ConnectTabProps {
@@ -46,6 +47,10 @@ export function ConnectTab({ churchId }: ConnectTabProps) {
             <Heart className="h-4 w-4" />
             Prayer Wall
           </TabsTrigger>
+          <TabsTrigger value="surveys" className="gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
+            <ClipboardList className="h-4 w-4" />
+            Surveys
+          </TabsTrigger>
         </TabsList>
 
         <TabsContent value="community">
@@ -62,6 +67,10 @@ export function ConnectTab({ churchId }: ConnectTabProps) {
 
         <TabsContent value="prayer">
           <PrayerMinistryHub churchId={churchId} />
+        </TabsContent>
+
+        <TabsContent value="surveys">
+          <ChurchSurveys churchId={churchId} />
         </TabsContent>
       </Tabs>
     </div>

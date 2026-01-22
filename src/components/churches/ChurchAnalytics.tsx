@@ -1,6 +1,7 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Users, Target, Star, BookOpen, TrendingUp, UserCheck } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
+import { StudyEngagementAnalytics } from "@/components/living-manna/StudyEngagementAnalytics";
 
 interface ChurchAnalyticsProps {
   churchId: string;
@@ -140,37 +141,8 @@ export function ChurchAnalytics({ churchId, hasTier3Access }: ChurchAnalyticsPro
         </div>
       </div>
 
-      {/* Study Completion */}
-      <div className="space-y-3">
-        <h3 className="text-lg font-semibold flex items-center gap-2">
-          <BookOpen className="h-5 w-5" />
-          Study Completion Statistics
-        </h3>
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-          <MetricCard
-            title="Studies Started"
-            description="Total studies initiated"
-            icon={<BookOpen className="h-4 w-4" />}
-            value="--"
-            subValue="No data yet"
-          />
-          <MetricCard
-            title="Completion Rate"
-            description="Studies completed vs started"
-            icon={<TrendingUp className="h-4 w-4" />}
-            value="--"
-            subValue="No data yet"
-            progress={0}
-          />
-          <MetricCard
-            title="Avg. Study Time"
-            description="Minutes per session"
-            icon={<Target className="h-4 w-4" />}
-            value="--"
-            subValue="No data yet"
-          />
-        </div>
-      </div>
+      {/* Study Engagement Analytics */}
+      <StudyEngagementAnalytics churchId={churchId} />
 
       {/* Ministry Readiness - Tier 3 only */}
       {hasTier3Access && (

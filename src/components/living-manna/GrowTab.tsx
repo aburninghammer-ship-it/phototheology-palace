@@ -1,8 +1,9 @@
 import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Sprout, Shield, Video } from "lucide-react";
+import { Sprout, Shield, Video, Settings } from "lucide-react";
 import { LeaderOnboarding } from "./LeaderOnboarding";
 import { SermonHub } from "./SermonHub";
+import { PushNotificationSettings } from "./PushNotificationSettings";
 
 interface GrowTabProps {
   churchId: string;
@@ -33,6 +34,10 @@ export function GrowTab({ churchId }: GrowTabProps) {
             <Shield className="h-4 w-4" />
             Leader Training
           </TabsTrigger>
+          <TabsTrigger value="settings" className="gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
+            <Settings className="h-4 w-4" />
+            Settings
+          </TabsTrigger>
         </TabsList>
 
         <TabsContent value="sermons">
@@ -41,6 +46,12 @@ export function GrowTab({ churchId }: GrowTabProps) {
 
         <TabsContent value="leader-training">
           <LeaderOnboarding churchId={churchId} />
+        </TabsContent>
+
+        <TabsContent value="settings">
+          <div className="space-y-6">
+            <PushNotificationSettings />
+          </div>
         </TabsContent>
       </Tabs>
     </div>

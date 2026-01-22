@@ -1,4 +1,4 @@
-import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { serve } from "https://deno.land/std@0.224.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const corsHeaders = {
@@ -6,14 +6,69 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
-interface PushPayload {
-  user_ids: string[];
+interface PushNotificationRequest {
+  userIds: string[];
   title: string;
   body: string;
   data?: Record<string, string>;
+  // Optional: filter by notification type preference
+  notificationType?: 'events' | 'messages' | 'announcements' | 'study_reminders' | 'prayer_requests';
 }
 
-serve(async (req) => {
+interface NotificationPreferences {
+  enabled: boolean;
+  events: boolean;
+  messages: boolean;
+  announcements: boolean;
+  study_reminders: boolean;
+  prayer_requests: boolean;
+}
+
+// Send push notification via Firebase Cloud Messaging
+async function sendFCMNotification(token: string, title: string, body: string, data?: Record<string, string>) {
+  const fcmServerKey = Deno.env.get("FCM_SERVER_KEY");
+
+  if (!fcmServerKey) {
+    console.error("FCM_SERVER_KEY not configured");
+    return { success: false, error: "FCM not configured" };
+  }
+
+  try {
+    const response = await fetch("https://fcm.googleapis.com/fcm/send", {
+      method: "POST",
+      headers: {
+        "Authorization": `key=${fcmServerKey}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        to: token,
+        notification: {
+          title,
+          body,
+          sound: "default",
+          badge: "1",
+        },
+        data: data || {},
+        priority: "high",
+        content_available: true,
+      }),
+    });
+
+    const result = await response.json();
+
+    if (result.success === 1) {
+      return { success: true };
+    } else {
+      console.error("FCM send failed:", result);
+      return { success: false, error: result.results?.[0]?.error || "Unknown error" };
+    }
+  } catch (error: any) {
+    console.error("FCM request error:", error);
+    return { success: false, error: error.message };
+  }
+}
+
+const handler = async (req: Request): Promise<Response> => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
@@ -23,144 +78,102 @@ serve(async (req) => {
     const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
-    const { user_ids, title, body, data }: PushPayload = await req.json();
+    const { userIds, title, body, data, notificationType }: PushNotificationRequest = await req.json();
 
-    if (!user_ids || user_ids.length === 0) {
+    console.log("Sending push notifications:", { userIds: userIds.length, title, notificationType });
+
+    if (!userIds || userIds.length === 0) {
       return new Response(
-        JSON.stringify({ error: "No user_ids provided" }),
-        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        JSON.stringify({ error: "No user IDs provided" }),
+        { status: 400, headers: { "Content-Type": "application/json", ...corsHeaders } }
       );
     }
 
-    // Get active push tokens for these users
-    const { data: tokens, error: tokensError } = await supabase
-      .from("push_tokens")
-      .select("token, platform, user_id")
-      .in("user_id", user_ids)
-      .eq("is_active", true);
+    // Fetch push tokens and notification preferences for users
+    const { data: profiles, error: profilesError } = await supabase
+      .from("profiles")
+      .select("id, push_token, notification_preferences")
+      .in("id", userIds)
+      .not("push_token", "is", null);
 
-    if (tokensError) {
-      console.error("Error fetching tokens:", tokensError);
-      throw tokensError;
+    if (profilesError) {
+      console.error("Error fetching profiles:", profilesError);
+      throw profilesError;
     }
 
-    if (!tokens || tokens.length === 0) {
-      console.log("No active push tokens found for users");
+    if (!profiles || profiles.length === 0) {
+      console.log("No users with push tokens found");
       return new Response(
-        JSON.stringify({ success: true, sent: 0, message: "No active tokens" }),
-        { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        JSON.stringify({ success: true, sent: 0, message: "No users with push tokens" }),
+        { status: 200, headers: { "Content-Type": "application/json", ...corsHeaders } }
       );
     }
 
-    // Group tokens by platform
-    const iosTokens = tokens.filter(t => t.platform === "ios").map(t => t.token);
-    const androidTokens = tokens.filter(t => t.platform === "android").map(t => t.token);
+    // Filter users based on notification preferences
+    const eligibleProfiles = profiles.filter(profile => {
+      const prefs = profile.notification_preferences as NotificationPreferences | null;
 
-    let sentCount = 0;
-    const errors: string[] = [];
+      // If no preferences set, assume all enabled
+      if (!prefs) return true;
 
-    // Send to iOS via APNs (simplified - in production use a service like OneSignal or Firebase)
-    // For now, we'll use Firebase Cloud Messaging which handles both iOS and Android
+      // Check if notifications are globally enabled
+      if (!prefs.enabled) return false;
 
-    const fcmServerKey = Deno.env.get("FCM_SERVER_KEY");
+      // If no specific type, allow if globally enabled
+      if (!notificationType) return true;
 
-    if (fcmServerKey && (iosTokens.length > 0 || androidTokens.length > 0)) {
-      const allTokens = [...iosTokens, ...androidTokens];
+      // Check specific notification type preference
+      return prefs[notificationType] !== false;
+    });
 
-      // Send in batches of 500 (FCM limit)
-      for (let i = 0; i < allTokens.length; i += 500) {
-        const batch = allTokens.slice(i, i + 500);
+    console.log(`Sending to ${eligibleProfiles.length} eligible users out of ${profiles.length}`);
 
-        const fcmPayload = {
-          registration_ids: batch,
-          notification: {
-            title,
-            body,
-            sound: "default",
-            badge: 1,
-          },
-          data: data || {},
-          priority: "high",
-          content_available: true,
-        };
+    // Send notifications to all eligible users
+    const results = await Promise.allSettled(
+      eligibleProfiles.map(profile =>
+        sendFCMNotification(profile.push_token, title, body, data)
+      )
+    );
 
-        try {
-          const fcmResponse = await fetch("https://fcm.googleapis.com/fcm/send", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              "Authorization": `key=${fcmServerKey}`,
-            },
-            body: JSON.stringify(fcmPayload),
-          });
+    const successful = results.filter(r => r.status === "fulfilled" && (r.value as any).success).length;
+    const failed = results.length - successful;
 
-          const fcmResult = await fcmResponse.json();
-
-          if (fcmResult.success) {
-            sentCount += fcmResult.success;
-          }
-
-          if (fcmResult.failure > 0 && fcmResult.results) {
-            // Handle invalid tokens
-            fcmResult.results.forEach((result: any, index: number) => {
-              if (result.error === "NotRegistered" || result.error === "InvalidRegistration") {
-                // Deactivate invalid token
-                const invalidToken = batch[index];
-                supabase
-                  .from("push_tokens")
-                  .update({ is_active: false })
-                  .eq("token", invalidToken)
-                  .then(() => {});
-              }
-              if (result.error) {
-                errors.push(`Token ${index}: ${result.error}`);
-              }
-            });
-          }
-        } catch (fcmError) {
-          console.error("FCM error:", fcmError);
-          errors.push(`FCM batch error: ${fcmError}`);
-        }
+    // Log any failed sends
+    results.forEach((result, index) => {
+      if (result.status === "rejected" || !(result.value as any).success) {
+        console.error(`Failed to send to user ${eligibleProfiles[index].id}:`,
+          result.status === "rejected" ? result.reason : (result.value as any).error
+        );
       }
-    } else if (!fcmServerKey) {
-      console.log("FCM_SERVER_KEY not configured, skipping push notifications");
+    });
 
-      // Fallback: Create in-app notifications instead
-      const notifications = user_ids.map(userId => ({
-        user_id: userId,
-        type: data?.type || "message",
-        title,
-        message: body,
-        link: data?.link || null,
-        metadata: data || {},
-      }));
-
-      const { error: notifError } = await supabase
-        .from("notifications")
-        .insert(notifications);
-
-      if (notifError) {
-        console.error("Error creating in-app notifications:", notifError);
-      } else {
-        sentCount = user_ids.length;
-      }
-    }
-
-    console.log(`[send-push-notification] Sent ${sentCount} notifications`);
+    // Log notification to database for tracking
+    await supabase.from("push_notification_logs").insert({
+      user_ids: userIds,
+      title,
+      body,
+      data,
+      notification_type: notificationType,
+      sent_count: successful,
+      failed_count: failed,
+    }).catch(err => console.log("Could not log notification:", err));
 
     return new Response(
       JSON.stringify({
         success: true,
-        sent: sentCount,
-        errors: errors.length > 0 ? errors : undefined,
+        sent: successful,
+        failed,
+        total: eligibleProfiles.length
       }),
-      { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      { status: 200, headers: { "Content-Type": "application/json", ...corsHeaders } }
     );
-  } catch (error) {
-    console.error("[send-push-notification] Error:", error);
+  } catch (error: any) {
+    console.error("Error sending push notifications:", error);
     return new Response(
-      JSON.stringify({ error: error instanceof Error ? error.message : "Unknown error" }),
-      { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      JSON.stringify({ error: error.message }),
+      { status: 500, headers: { "Content-Type": "application/json", ...corsHeaders } }
     );
   }
-});
+};
+
+serve(handler);
