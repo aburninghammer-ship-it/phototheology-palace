@@ -268,16 +268,6 @@ export function SermonStudyUploader({ churchId, userRole }: SermonStudyUploaderP
           </TabsList>
 
           <TabsContent value="upload" className="space-y-4 mt-4">
-            {/* Doctrinal Review Notice */}
-            <Alert variant="default" className="border-yellow-500/50 bg-yellow-500/5">
-              <ShieldAlert className="h-4 w-4 text-yellow-600" />
-              <AlertTitle>Doctrinal Review Required</AlertTitle>
-              <AlertDescription>
-                Please ensure content is from an approved SDA source 
-                and does not contain offshoot teachings (anti-Trinity, conspiracy theories, COVID misinformation, etc.).
-              </AlertDescription>
-            </Alert>
-
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="title">Sermon Title</Label>
