@@ -330,13 +330,50 @@ export function SermonStudyUploader({ churchId, userRole }: SermonStudyUploaderP
             {generatedStudy && (
               <ScrollArea className="h-[600px] pr-4">
                 {generatedStudy.parseError ? (
-                  <div className="prose prose-sm max-w-none">
-                    <p className="text-muted-foreground mb-2">
-                      Study generated but couldn't be parsed. Raw content:
-                    </p>
-                    <pre className="whitespace-pre-wrap text-xs bg-muted p-4 rounded">
-                      {generatedStudy.rawContent}
-                    </pre>
+                  <div className="space-y-4">
+                    <Alert>
+                      <AlertCircle className="h-4 w-4" />
+                      <AlertTitle>Study Generated - Manual Review Needed</AlertTitle>
+                      <AlertDescription>
+                        The AI generated your study, but automatic formatting couldn't be applied. 
+                        You can still review and save the content below.
+                      </AlertDescription>
+                    </Alert>
+                    
+                    <div className="prose prose-sm max-w-none">
+                      <pre className="whitespace-pre-wrap text-xs bg-muted p-4 rounded overflow-x-auto">
+                        {generatedStudy.rawContent}
+                      </pre>
+                    </div>
+
+                    {/* Save buttons for raw content too */}
+                    {canManage ? (
+                      <div className="flex gap-4 pt-4">
+                        <Button
+                          variant="outline"
+                          onClick={() => handleSave("draft")}
+                          disabled={isSaving}
+                          className="flex-1"
+                        >
+                          {isSaving ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Save className="h-4 w-4 mr-2" />}
+                          Save as Draft
+                        </Button>
+                        <Button
+                          onClick={() => handleSave("published")}
+                          disabled={isSaving}
+                          className="flex-1"
+                        >
+                          {isSaving ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <CheckCircle2 className="h-4 w-4 mr-2" />}
+                          Publish Study
+                        </Button>
+                      </div>
+                    ) : (
+                      <div className="pt-4 p-4 rounded-lg bg-muted/50 border border-border/50 text-center">
+                        <p className="text-sm text-muted-foreground">
+                          ✨ Study generated for your personal use. Contact a church leader to publish it.
+                        </p>
+                      </div>
+                    )}
                   </div>
                 ) : (
                   <div className="space-y-6">
