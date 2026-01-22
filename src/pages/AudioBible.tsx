@@ -114,6 +114,13 @@ export default function AudioBible() {
   const [customBook, setCustomBook] = useState("Genesis");
   const [customChapter, setCustomChapter] = useState(1);
   const [themes, setThemes] = useState<Theme[]>([]);
+  
+  // Custom playlist add mode state
+  const [customAddMode, setCustomAddMode] = useState<"single" | "chapter-range" | "book-range">("single");
+  const [rangeStartChapter, setRangeStartChapter] = useState(1);
+  const [rangeEndChapter, setRangeEndChapter] = useState(5);
+  const [rangeStartBook, setRangeStartBook] = useState("Genesis");
+  const [rangeEndBook, setRangeEndBook] = useState("Genesis");
 
   // Load themes on mount
   useEffect(() => {
@@ -179,6 +186,58 @@ export default function AudioBible() {
     if (!exists) {
       setCustomChapters([...customChapters, { book: customBook, chapter: customChapter }]);
     }
+  };
+
+  // Add chapter range to custom list
+  const addChapterRange = () => {
+    const newChapters: ChapterSelection[] = [];
+    for (let ch = rangeStartChapter; ch <= rangeEndChapter; ch++) {
+      const exists = customChapters.some(
+        (c) => c.book === customBook && c.chapter === ch
+      );
+      if (!exists) {
+        newChapters.push({ book: customBook, chapter: ch });
+      }
+    }
+    setCustomChapters([...customChapters, ...newChapters]);
+  };
+
+  // Add book range to custom list
+  const addBookRange = () => {
+    const startIdx = BIBLE_BOOK_METADATA.findIndex(b => b.name === rangeStartBook);
+    const endIdx = BIBLE_BOOK_METADATA.findIndex(b => b.name === rangeEndBook);
+    const newChapters: ChapterSelection[] = [];
+    
+    for (let bookIdx = startIdx; bookIdx <= endIdx; bookIdx++) {
+      const book = BIBLE_BOOK_METADATA[bookIdx];
+      for (let ch = 1; ch <= book.chapters; ch++) {
+        const exists = customChapters.some(
+          (c) => c.book === book.name && c.chapter === ch
+        );
+        if (!exists) {
+          newChapters.push({ book: book.name, chapter: ch });
+        }
+      }
+    }
+    setCustomChapters([...customChapters, ...newChapters]);
+  };
+
+  // Get book range chapter count
+  const getBookRangeChapterCount = () => {
+    const startIdx = BIBLE_BOOK_METADATA.findIndex(b => b.name === rangeStartBook);
+    const endIdx = BIBLE_BOOK_METADATA.findIndex(b => b.name === rangeEndBook);
+    let count = 0;
+    for (let i = startIdx; i <= endIdx; i++) {
+      count += BIBLE_BOOK_METADATA[i].chapters;
+    }
+    return count;
+  };
+
+  // Get book range book count
+  const getBookRangeBookCount = () => {
+    const startIdx = BIBLE_BOOK_METADATA.findIndex(b => b.name === rangeStartBook);
+    const endIdx = BIBLE_BOOK_METADATA.findIndex(b => b.name === rangeEndBook);
+    return endIdx - startIdx + 1;
   };
 
   // Remove chapter from custom list
@@ -445,64 +504,229 @@ export default function AudioBible() {
                     {/* Custom Selection */}
                     <TabsContent value="custom" className="space-y-4">
                       <p className="text-sm text-muted-foreground">
-                        Build a custom playlist of chapters (e.g., Genesis 3, Isaiah 6, John 3)
+                        Build a custom playlist: single chapters, chapter ranges, or book ranges
                       </p>
-                      <div className="flex gap-2">
-                        <Select value={customBook} onValueChange={setCustomBook}>
-                          <SelectTrigger className="flex-1">
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <ScrollArea className="h-64">
-                              {BIBLE_BOOK_METADATA.map((book) => (
-                                <SelectItem key={book.name} value={book.name}>
-                                  {book.name}
-                                </SelectItem>
-                              ))}
-                            </ScrollArea>
-                          </SelectContent>
-                        </Select>
-                        <Select
-                          value={customChapter.toString()}
-                          onValueChange={(v) => setCustomChapter(parseInt(v, 10))}
-                        >
-                          <SelectTrigger className="w-24">
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <ScrollArea className="h-64">
-                              {Array.from({ length: getChapterCount(customBook) }, (_, i) => i + 1).map((ch) => (
-                                <SelectItem key={ch} value={ch.toString()}>
-                                  {ch}
-                                </SelectItem>
-                              ))}
-                            </ScrollArea>
-                          </SelectContent>
-                        </Select>
-                        <Button variant="outline" size="icon" onClick={addCustomChapter}>
-                          <Plus className="h-4 w-4" />
-                        </Button>
-                      </div>
+                      
+                      {/* Add Mode Selector */}
+                      <Tabs value={customAddMode} onValueChange={(v) => setCustomAddMode(v as "single" | "chapter-range" | "book-range")} className="w-full">
+                        <TabsList className="grid w-full grid-cols-3 h-auto">
+                          <TabsTrigger value="single" className="text-xs py-2">
+                            Single Chapter
+                          </TabsTrigger>
+                          <TabsTrigger value="chapter-range" className="text-xs py-2">
+                            Chapter Range
+                          </TabsTrigger>
+                          <TabsTrigger value="book-range" className="text-xs py-2">
+                            Book Range
+                          </TabsTrigger>
+                        </TabsList>
+                        
+                        {/* Single Chapter Mode */}
+                        <TabsContent value="single" className="mt-3">
+                          <div className="flex gap-2">
+                            <Select value={customBook} onValueChange={setCustomBook}>
+                              <SelectTrigger className="flex-1">
+                                <SelectValue />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <ScrollArea className="h-64">
+                                  {BIBLE_BOOK_METADATA.map((book) => (
+                                    <SelectItem key={book.name} value={book.name}>
+                                      {book.name}
+                                    </SelectItem>
+                                  ))}
+                                </ScrollArea>
+                              </SelectContent>
+                            </Select>
+                            <Select
+                              value={customChapter.toString()}
+                              onValueChange={(v) => setCustomChapter(parseInt(v, 10))}
+                            >
+                              <SelectTrigger className="w-24">
+                                <SelectValue />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <ScrollArea className="h-64">
+                                  {Array.from({ length: getChapterCount(customBook) }, (_, i) => i + 1).map((ch) => (
+                                    <SelectItem key={ch} value={ch.toString()}>
+                                      {ch}
+                                    </SelectItem>
+                                  ))}
+                                </ScrollArea>
+                              </SelectContent>
+                            </Select>
+                            <Button variant="outline" size="icon" onClick={addCustomChapter}>
+                              <Plus className="h-4 w-4" />
+                            </Button>
+                          </div>
+                        </TabsContent>
+
+                        {/* Chapter Range Mode */}
+                        <TabsContent value="chapter-range" className="mt-3 space-y-2">
+                          <Select value={customBook} onValueChange={(v) => {
+                            setCustomBook(v);
+                            setRangeStartChapter(1);
+                            const maxCh = BIBLE_BOOK_METADATA.find(b => b.name === v)?.chapters || 1;
+                            setRangeEndChapter(Math.min(5, maxCh));
+                          }}>
+                            <SelectTrigger>
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <ScrollArea className="h-64">
+                                {BIBLE_BOOK_METADATA.map((book) => (
+                                  <SelectItem key={book.name} value={book.name}>
+                                    {book.name} ({book.chapters} ch)
+                                  </SelectItem>
+                                ))}
+                              </ScrollArea>
+                            </SelectContent>
+                          </Select>
+                          <div className="flex gap-2 items-center">
+                            <div className="flex-1">
+                              <Label className="text-xs text-muted-foreground">From Chapter</Label>
+                              <Select
+                                value={rangeStartChapter.toString()}
+                                onValueChange={(v) => {
+                                  const start = parseInt(v, 10);
+                                  setRangeStartChapter(start);
+                                  if (rangeEndChapter < start) setRangeEndChapter(start);
+                                }}
+                              >
+                                <SelectTrigger>
+                                  <SelectValue />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <ScrollArea className="h-48">
+                                    {Array.from({ length: getChapterCount(customBook) }, (_, i) => i + 1).map((ch) => (
+                                      <SelectItem key={ch} value={ch.toString()}>
+                                        {ch}
+                                      </SelectItem>
+                                    ))}
+                                  </ScrollArea>
+                                </SelectContent>
+                              </Select>
+                            </div>
+                            <span className="mt-5 text-muted-foreground">→</span>
+                            <div className="flex-1">
+                              <Label className="text-xs text-muted-foreground">To Chapter</Label>
+                              <Select
+                                value={rangeEndChapter.toString()}
+                                onValueChange={(v) => setRangeEndChapter(parseInt(v, 10))}
+                              >
+                                <SelectTrigger>
+                                  <SelectValue />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <ScrollArea className="h-48">
+                                    {Array.from({ length: getChapterCount(customBook) - rangeStartChapter + 1 }, (_, i) => i + rangeStartChapter).map((ch) => (
+                                      <SelectItem key={ch} value={ch.toString()}>
+                                        {ch}
+                                      </SelectItem>
+                                    ))}
+                                  </ScrollArea>
+                                </SelectContent>
+                              </Select>
+                            </div>
+                            <Button variant="outline" size="icon" className="mt-5" onClick={addChapterRange}>
+                              <Plus className="h-4 w-4" />
+                            </Button>
+                          </div>
+                          <p className="text-xs text-muted-foreground">
+                            {rangeEndChapter - rangeStartChapter + 1} chapters will be added
+                          </p>
+                        </TabsContent>
+
+                        {/* Book Range Mode */}
+                        <TabsContent value="book-range" className="mt-3 space-y-2">
+                          <div className="flex gap-2 items-center">
+                            <div className="flex-1">
+                              <Label className="text-xs text-muted-foreground">From Book</Label>
+                              <Select
+                                value={rangeStartBook}
+                                onValueChange={(v) => {
+                                  setRangeStartBook(v);
+                                  const startIdx = BIBLE_BOOK_METADATA.findIndex(b => b.name === v);
+                                  const endIdx = BIBLE_BOOK_METADATA.findIndex(b => b.name === rangeEndBook);
+                                  if (endIdx < startIdx) setRangeEndBook(v);
+                                }}
+                              >
+                                <SelectTrigger>
+                                  <SelectValue />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <ScrollArea className="h-64">
+                                    {BIBLE_BOOK_METADATA.map((book) => (
+                                      <SelectItem key={book.name} value={book.name}>
+                                        {book.name}
+                                      </SelectItem>
+                                    ))}
+                                  </ScrollArea>
+                                </SelectContent>
+                              </Select>
+                            </div>
+                            <span className="mt-5 text-muted-foreground">→</span>
+                            <div className="flex-1">
+                              <Label className="text-xs text-muted-foreground">To Book</Label>
+                              <Select
+                                value={rangeEndBook}
+                                onValueChange={(v) => setRangeEndBook(v)}
+                              >
+                                <SelectTrigger>
+                                  <SelectValue />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <ScrollArea className="h-64">
+                                    {BIBLE_BOOK_METADATA.filter((_, idx) => idx >= BIBLE_BOOK_METADATA.findIndex(b => b.name === rangeStartBook)).map((book) => (
+                                      <SelectItem key={book.name} value={book.name}>
+                                        {book.name}
+                                      </SelectItem>
+                                    ))}
+                                  </ScrollArea>
+                                </SelectContent>
+                              </Select>
+                            </div>
+                            <Button variant="outline" size="icon" className="mt-5" onClick={addBookRange}>
+                              <Plus className="h-4 w-4" />
+                            </Button>
+                          </div>
+                          <p className="text-xs text-muted-foreground">
+                            {getBookRangeChapterCount()} chapters across {getBookRangeBookCount()} books
+                          </p>
+                        </TabsContent>
+                      </Tabs>
 
                       {/* Custom chapters list */}
                       {customChapters.length > 0 && (
-                        <div className="space-y-2">
-                          <Label>Your Playlist ({customChapters.length} chapters)</Label>
-                          <div className="flex flex-wrap gap-2">
-                            {customChapters.map((ch, i) => (
-                              <Badge key={i} variant="secondary" className="pr-1">
-                                {ch.book} {ch.chapter}
-                                <Button
-                                  variant="ghost"
-                                  size="sm"
-                                  className="h-4 w-4 p-0 ml-1 hover:bg-destructive/20"
-                                  onClick={() => removeCustomChapter(i)}
-                                >
-                                  <X className="h-3 w-3" />
-                                </Button>
-                              </Badge>
-                            ))}
+                        <div className="space-y-2 pt-2 border-t">
+                          <div className="flex items-center justify-between">
+                            <Label>Your Playlist ({customChapters.length} chapters)</Label>
+                            <Button 
+                              variant="ghost" 
+                              size="sm" 
+                              className="text-xs text-muted-foreground h-6"
+                              onClick={() => setCustomChapters([])}
+                            >
+                              Clear All
+                            </Button>
                           </div>
+                          <ScrollArea className="max-h-32">
+                            <div className="flex flex-wrap gap-1.5">
+                              {customChapters.map((ch, i) => (
+                                <Badge key={i} variant="secondary" className="pr-1 text-xs">
+                                  {ch.book} {ch.chapter}
+                                  <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    className="h-3 w-3 p-0 ml-1 hover:bg-destructive/20"
+                                    onClick={() => removeCustomChapter(i)}
+                                  >
+                                    <X className="h-2 w-2" />
+                                  </Button>
+                                </Badge>
+                              ))}
+                            </div>
+                          </ScrollArea>
                         </div>
                       )}
 
