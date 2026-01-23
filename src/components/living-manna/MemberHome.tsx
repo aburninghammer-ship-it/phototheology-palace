@@ -16,8 +16,9 @@ import { NotificationAlerts } from "./NotificationAlerts";
 import { PublicAnnouncementsBoard } from "./PublicAnnouncementsBoard";
 import { PersonalDevotionalDiary } from "./PersonalDevotionalDiary";
 import {
-  BookOpen, ArrowRight, Flame, Users, Star, ExternalLink
+  BookOpen, ArrowRight, Flame, Users, Star, ExternalLink, UserSearch
 } from "lucide-react";
+import { MemberDirectory } from "./MemberDirectory";
 
 interface MemberHomeProps {
   churchId: string;
@@ -185,6 +186,9 @@ export function MemberHome({ churchId, churchName = "Living Manna" }: MemberHome
           </CardContent>
         </Card>
       )}
+
+      {/* Member Directory - Browse your church family */}
+      <MemberDirectory churchId={churchId} />
 
       {/* Featured Sermon */}
       <FeaturedSermon churchId={churchId} />
