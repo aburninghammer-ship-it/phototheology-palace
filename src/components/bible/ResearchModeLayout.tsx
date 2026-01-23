@@ -103,16 +103,18 @@ export const ResearchModeLayout = ({ onExitResearchMode }: ResearchModeLayoutPro
   const isNotesTab = rightTab === "notes";
 
   return (
-    <div className="h-screen flex flex-col bg-gradient-to-br from-background via-background/95 to-palace-purple/10 overflow-hidden">
-      {/* Ambient background glow */}
+    <div className="h-screen flex flex-col bg-[hsl(225,40%,8%)] overflow-hidden">
+      {/* Warm amber ambient background glow */}
       <div className="fixed inset-0 pointer-events-none overflow-hidden -z-10">
-        <div className="absolute -top-40 -right-40 w-96 h-96 bg-palace-purple/20 rounded-full blur-3xl animate-pulse-subtle" />
-        <div className="absolute top-1/2 -left-40 w-80 h-80 bg-palace-teal/15 rounded-full blur-3xl animate-pulse-subtle" style={{ animationDelay: '1s' }} />
-        <div className="absolute -bottom-40 right-1/3 w-72 h-72 bg-palace-orange/10 rounded-full blur-3xl animate-pulse-subtle" style={{ animationDelay: '2s' }} />
+        <div className="absolute inset-0 bg-gradient-to-br from-[hsl(225,40%,10%)] via-[hsl(30,30%,12%)] to-[hsl(35,35%,10%)]" />
+        <div className="absolute -top-40 -right-40 w-[500px] h-[500px] bg-[hsl(32,80%,40%)/0.15] rounded-full blur-[100px]" />
+        <div className="absolute top-1/3 -left-40 w-[400px] h-[400px] bg-[hsl(32,70%,35%)/0.1] rounded-full blur-[80px]" />
+        <div className="absolute -bottom-40 right-1/4 w-[350px] h-[350px] bg-[hsl(38,75%,45%)/0.12] rounded-full blur-[90px]" />
+        <div className="absolute bottom-1/3 left-1/3 w-[300px] h-[300px] bg-[hsl(180,50%,30%)/0.08] rounded-full blur-[70px]" />
       </div>
 
-      {/* Top Toolbar - Enhanced Glass */}
-      <div className="h-14 border-b border-white/20 bg-gradient-to-r from-card/80 via-card/60 to-card/80 backdrop-blur-xl flex items-center justify-between px-4 shrink-0 shadow-lg shadow-palace-purple/10">
+      {/* Top Toolbar - Deep navy with amber accents */}
+      <div className="h-14 border-b border-[hsl(32,70%,45%)/0.3] bg-[hsl(230,35%,12%)/0.95] backdrop-blur-xl flex items-center justify-between px-4 shrink-0 shadow-lg shadow-[hsl(32,80%,40%)/0.15]">
         <div className="flex items-center gap-3">
           <Button 
             variant="ghost" 
@@ -123,27 +125,27 @@ export const ResearchModeLayout = ({ onExitResearchMode }: ResearchModeLayoutPro
             <X className="h-4 w-4 mr-2" />
             Exit
           </Button>
-          <div className="h-6 w-px bg-gradient-to-b from-transparent via-palace-purple/40 to-transparent" />
+          <div className="h-6 w-px bg-gradient-to-b from-transparent via-[hsl(32,70%,50%)/0.5] to-transparent" />
           <div className="flex items-center gap-2">
-            <div className="p-1.5 rounded-lg bg-gradient-palace shadow-lg shadow-palace-purple/30">
+            <div className="p-1.5 rounded-lg bg-gradient-to-br from-[hsl(32,80%,50%)] to-[hsl(45,90%,50%)] shadow-lg shadow-[hsl(32,80%,50%)/0.4]">
               <BookOpen className="h-4 w-4 text-white" />
             </div>
-            <span className="font-serif text-xl font-semibold bg-gradient-palace bg-clip-text text-transparent drop-shadow-sm">
+            <span className="font-serif text-xl font-semibold text-[hsl(45,80%,70%)] drop-shadow-sm">
               {book} {chapter}
             </span>
           </div>
-          <Badge className="text-xs bg-palace-teal/20 border-palace-teal/40 text-palace-teal">
+          <Badge className="text-xs bg-[hsl(180,50%,40%)/0.2] border-[hsl(180,50%,40%)/0.4] text-[hsl(180,60%,60%)]">
             {chapterData?.verses.length || 0} verses
           </Badge>
           
           {/* Center View Toggle */}
-          <div className="h-6 w-px bg-gradient-to-b from-transparent via-palace-purple/40 to-transparent ml-2" />
-          <div className="flex gap-1 p-1 rounded-lg bg-white/5 border border-white/10">
+          <div className="h-6 w-px bg-gradient-to-b from-transparent via-[hsl(32,70%,50%)/0.4] to-transparent ml-2" />
+          <div className="flex gap-1 p-1 rounded-lg bg-[hsl(230,30%,15%)/0.8] border border-[hsl(32,60%,40%)/0.2]">
             <Button
               variant={centerView === "single" ? "default" : "ghost"}
               size="sm"
               onClick={() => setCenterView("single")}
-              className={cn("h-7 text-xs transition-all", centerView === "single" ? "bg-gradient-palace shadow-md shadow-palace-purple/30" : "hover:bg-white/10")}
+              className={cn("h-7 text-xs transition-all", centerView === "single" ? "bg-gradient-to-r from-[hsl(32,80%,50%)] to-[hsl(45,90%,50%)] shadow-md shadow-[hsl(32,80%,50%)/0.3] text-white" : "hover:bg-[hsl(32,50%,30%)/0.3] text-[hsl(45,60%,70%)]")}
             >
               <BookOpen className="h-3 w-3 mr-1" />
               Single
@@ -152,7 +154,7 @@ export const ResearchModeLayout = ({ onExitResearchMode }: ResearchModeLayoutPro
               variant={centerView === "parallel" ? "default" : "ghost"}
               size="sm"
               onClick={() => setCenterView("parallel")}
-              className={cn("h-7 text-xs transition-all", centerView === "parallel" ? "bg-gradient-ocean shadow-md shadow-palace-blue/30" : "hover:bg-white/10")}
+              className={cn("h-7 text-xs transition-all", centerView === "parallel" ? "bg-gradient-to-r from-[hsl(200,70%,45%)] to-[hsl(180,60%,45%)] shadow-md shadow-[hsl(200,70%,45%)/0.3] text-white" : "hover:bg-[hsl(200,40%,30%)/0.3] text-[hsl(200,50%,70%)]")}
             >
               <Columns className="h-3 w-3 mr-1" />
               Parallel
@@ -166,7 +168,7 @@ export const ResearchModeLayout = ({ onExitResearchMode }: ResearchModeLayoutPro
             size="sm"
             onClick={() => navigateChapter("prev")}
             disabled={chapter <= 1}
-            className="bg-palace-purple/10 hover:bg-palace-purple/20 border border-palace-purple/30 hover:border-palace-purple/50 disabled:opacity-30"
+            className="bg-[hsl(32,50%,30%)/0.2] hover:bg-[hsl(32,50%,40%)/0.3] border border-[hsl(32,60%,50%)/0.3] hover:border-[hsl(32,70%,55%)/0.5] text-[hsl(45,70%,70%)] disabled:opacity-30"
           >
             <ChevronLeft className="h-4 w-4" />
           </Button>
@@ -174,7 +176,7 @@ export const ResearchModeLayout = ({ onExitResearchMode }: ResearchModeLayoutPro
             variant="ghost"
             size="sm"
             onClick={() => navigateChapter("next")}
-            className="bg-palace-purple/10 hover:bg-palace-purple/20 border border-palace-purple/30 hover:border-palace-purple/50"
+            className="bg-[hsl(32,50%,30%)/0.2] hover:bg-[hsl(32,50%,40%)/0.3] border border-[hsl(32,60%,50%)/0.3] hover:border-[hsl(32,70%,55%)/0.5] text-[hsl(45,70%,70%)]"
           >
             <ChevronRight className="h-4 w-4" />
           </Button>
@@ -183,21 +185,22 @@ export const ResearchModeLayout = ({ onExitResearchMode }: ResearchModeLayoutPro
 
       {/* Main Content - 3 Column Layout */}
       <div className="flex-1 flex overflow-hidden p-3 gap-3">
-        {/* Left Panel - Bible Books */}
+        {/* Left Panel - Bible Books - Amber glow outline */}
         <div 
           className={cn(
-            "rounded-2xl bg-gradient-to-b from-card/90 to-card/70 backdrop-blur-xl border border-palace-purple/20 transition-all duration-300 shrink-0 shadow-xl shadow-palace-purple/10 overflow-hidden",
+            "rounded-2xl bg-[hsl(230,35%,12%)/0.95] backdrop-blur-xl border-2 border-[hsl(32,70%,45%)/0.5] transition-all duration-300 shrink-0 overflow-hidden",
+            "shadow-[0_0_30px_-5px_hsl(32,80%,50%/0.4),inset_0_1px_0_hsl(32,70%,60%/0.1)]",
             expandedPanel === "books" ? "w-72" : "w-44"
           )}
         >
-          <div className="h-10 border-b border-palace-purple/20 bg-gradient-to-r from-palace-purple/10 to-palace-teal/10 flex items-center justify-between px-3">
+          <div className="h-10 border-b border-[hsl(32,60%,40%)/0.3] bg-gradient-to-r from-[hsl(32,50%,20%)/0.3] to-[hsl(180,40%,20%)/0.2] flex items-center justify-between px-3">
             <span className="text-sm font-medium flex items-center gap-2">
-              <div className="p-1 rounded-md bg-palace-green/20">
-                <Book className="h-3.5 w-3.5 text-palace-green" />
+              <div className="p-1 rounded-md bg-[hsl(142,50%,35%)/0.3]">
+                <Book className="h-3.5 w-3.5 text-[hsl(142,60%,55%)]" />
               </div>
-              <span className="bg-gradient-forest bg-clip-text text-transparent font-semibold">Books</span>
+              <span className="text-[hsl(142,50%,60%)] font-semibold">Books</span>
             </span>
-            <Button variant="ghost" size="icon" className="h-6 w-6 hover:bg-palace-purple/20" onClick={() => toggleExpand("books")}>
+            <Button variant="ghost" size="icon" className="h-6 w-6 hover:bg-[hsl(32,50%,40%)/0.2] text-[hsl(45,60%,70%)]" onClick={() => toggleExpand("books")}>
               {expandedPanel === "books" ? <Minimize2 className="h-3 w-3" /> : <Maximize2 className="h-3 w-3" />}
             </Button>
           </div>
@@ -213,37 +216,38 @@ export const ResearchModeLayout = ({ onExitResearchMode }: ResearchModeLayoutPro
 
         {/* Center Panel - Bible Text & Dictionaries */}
         <div className="flex-1 flex flex-col min-w-0 overflow-hidden gap-3">
-          {/* Bible Text - Top */}
+          {/* Bible Text - Top - Amber glow outline */}
           <div className={cn(
-            "rounded-2xl bg-gradient-to-b from-card/90 to-card/70 backdrop-blur-xl border border-palace-blue/20 transition-all duration-300 shadow-xl shadow-palace-blue/10 overflow-hidden",
+            "rounded-2xl bg-[hsl(230,35%,12%)/0.95] backdrop-blur-xl border-2 border-[hsl(32,70%,45%)/0.5] transition-all duration-300 overflow-hidden",
+            "shadow-[0_0_30px_-5px_hsl(32,80%,50%/0.4),inset_0_1px_0_hsl(32,70%,60%/0.1)]",
             expandedPanel === "text" ? "flex-1" : "h-1/2"
           )}>
-            <div className="h-10 border-b border-palace-blue/20 bg-gradient-to-r from-palace-blue/10 via-palace-purple/5 to-palace-teal/10 flex items-center justify-between px-3">
+            <div className="h-10 border-b border-[hsl(32,60%,40%)/0.3] bg-gradient-to-r from-[hsl(200,40%,18%)/0.4] via-[hsl(32,30%,15%)/0.2] to-[hsl(180,30%,18%)/0.3] flex items-center justify-between px-3">
               <div className="flex items-center gap-2">
-                <div className="p-1 rounded-md bg-palace-blue/20">
-                  <BookOpen className="h-3.5 w-3.5 text-palace-blue" />
+                <div className="p-1 rounded-md bg-[hsl(200,60%,40%)/0.3]">
+                  <BookOpen className="h-3.5 w-3.5 text-[hsl(200,70%,60%)]" />
                 </div>
-                <span className="text-sm font-semibold bg-gradient-ocean bg-clip-text text-transparent">Scripture</span>
+                <span className="text-sm font-semibold text-[hsl(200,60%,65%)]">Scripture</span>
                 {centerView === "single" && (
                   <Tabs value={translation} onValueChange={(v) => setTranslation(v as Translation)} className="h-8">
-                    <TabsList className="h-7 bg-palace-purple/10 border border-palace-purple/20 flex-wrap">
-                      <TabsTrigger value="kjv" className="text-[10px] h-5 px-1.5 data-[state=active]:bg-gradient-palace data-[state=active]:text-white data-[state=active]:shadow-md">KJV</TabsTrigger>
-                      <TabsTrigger value="nkjv" className="text-[10px] h-5 px-1.5 data-[state=active]:bg-gradient-palace data-[state=active]:text-white data-[state=active]:shadow-md">NKJV</TabsTrigger>
-                      <TabsTrigger value="asv" className="text-[10px] h-5 px-1.5 data-[state=active]:bg-gradient-palace data-[state=active]:text-white data-[state=active]:shadow-md">ASV</TabsTrigger>
-                      <TabsTrigger value="web" className="text-[10px] h-5 px-1.5 data-[state=active]:bg-gradient-palace data-[state=active]:text-white data-[state=active]:shadow-md">WEB</TabsTrigger>
-                      <TabsTrigger value="ylt" className="text-[10px] h-5 px-1.5 data-[state=active]:bg-gradient-palace data-[state=active]:text-white data-[state=active]:shadow-md">YLT</TabsTrigger>
-                      <TabsTrigger value="darby" className="text-[10px] h-5 px-1.5 data-[state=active]:bg-gradient-palace data-[state=active]:text-white data-[state=active]:shadow-md">Darby</TabsTrigger>
-                      <TabsTrigger value="bbe" className="text-[10px] h-5 px-1.5 data-[state=active]:bg-gradient-palace data-[state=active]:text-white data-[state=active]:shadow-md">BBE</TabsTrigger>
-                      <TabsTrigger value="niv" className="text-[10px] h-5 px-1.5 data-[state=active]:bg-gradient-palace data-[state=active]:text-white data-[state=active]:shadow-md">NIV</TabsTrigger>
-                      <TabsTrigger value="esv" className="text-[10px] h-5 px-1.5 data-[state=active]:bg-gradient-palace data-[state=active]:text-white data-[state=active]:shadow-md">ESV</TabsTrigger>
-                      <TabsTrigger value="nasb" className="text-[10px] h-5 px-1.5 data-[state=active]:bg-gradient-palace data-[state=active]:text-white data-[state=active]:shadow-md">NASB</TabsTrigger>
-                      <TabsTrigger value="nlt" className="text-[10px] h-5 px-1.5 data-[state=active]:bg-gradient-palace data-[state=active]:text-white data-[state=active]:shadow-md">NLT</TabsTrigger>
-                      <TabsTrigger value="rves" className="text-[10px] h-5 px-1.5 data-[state=active]:bg-gradient-palace data-[state=active]:text-white data-[state=active]:shadow-md">RVE</TabsTrigger>
+                    <TabsList className="h-7 bg-[hsl(230,30%,15%)/0.8] border border-[hsl(32,50%,40%)/0.3] flex-wrap">
+                      <TabsTrigger value="kjv" className="text-[10px] h-5 px-1.5 text-[hsl(45,50%,65%)] data-[state=active]:bg-gradient-to-r data-[state=active]:from-[hsl(32,80%,50%)] data-[state=active]:to-[hsl(45,90%,50%)] data-[state=active]:text-white data-[state=active]:shadow-md">KJV</TabsTrigger>
+                      <TabsTrigger value="nkjv" className="text-[10px] h-5 px-1.5 text-[hsl(45,50%,65%)] data-[state=active]:bg-gradient-to-r data-[state=active]:from-[hsl(32,80%,50%)] data-[state=active]:to-[hsl(45,90%,50%)] data-[state=active]:text-white data-[state=active]:shadow-md">NKJV</TabsTrigger>
+                      <TabsTrigger value="asv" className="text-[10px] h-5 px-1.5 text-[hsl(45,50%,65%)] data-[state=active]:bg-gradient-to-r data-[state=active]:from-[hsl(32,80%,50%)] data-[state=active]:to-[hsl(45,90%,50%)] data-[state=active]:text-white data-[state=active]:shadow-md">ASV</TabsTrigger>
+                      <TabsTrigger value="web" className="text-[10px] h-5 px-1.5 text-[hsl(45,50%,65%)] data-[state=active]:bg-gradient-to-r data-[state=active]:from-[hsl(32,80%,50%)] data-[state=active]:to-[hsl(45,90%,50%)] data-[state=active]:text-white data-[state=active]:shadow-md">WEB</TabsTrigger>
+                      <TabsTrigger value="ylt" className="text-[10px] h-5 px-1.5 text-[hsl(45,50%,65%)] data-[state=active]:bg-gradient-to-r data-[state=active]:from-[hsl(32,80%,50%)] data-[state=active]:to-[hsl(45,90%,50%)] data-[state=active]:text-white data-[state=active]:shadow-md">YLT</TabsTrigger>
+                      <TabsTrigger value="darby" className="text-[10px] h-5 px-1.5 text-[hsl(45,50%,65%)] data-[state=active]:bg-gradient-to-r data-[state=active]:from-[hsl(32,80%,50%)] data-[state=active]:to-[hsl(45,90%,50%)] data-[state=active]:text-white data-[state=active]:shadow-md">Darby</TabsTrigger>
+                      <TabsTrigger value="bbe" className="text-[10px] h-5 px-1.5 text-[hsl(45,50%,65%)] data-[state=active]:bg-gradient-to-r data-[state=active]:from-[hsl(32,80%,50%)] data-[state=active]:to-[hsl(45,90%,50%)] data-[state=active]:text-white data-[state=active]:shadow-md">BBE</TabsTrigger>
+                      <TabsTrigger value="niv" className="text-[10px] h-5 px-1.5 text-[hsl(45,50%,65%)] data-[state=active]:bg-gradient-to-r data-[state=active]:from-[hsl(32,80%,50%)] data-[state=active]:to-[hsl(45,90%,50%)] data-[state=active]:text-white data-[state=active]:shadow-md">NIV</TabsTrigger>
+                      <TabsTrigger value="esv" className="text-[10px] h-5 px-1.5 text-[hsl(45,50%,65%)] data-[state=active]:bg-gradient-to-r data-[state=active]:from-[hsl(32,80%,50%)] data-[state=active]:to-[hsl(45,90%,50%)] data-[state=active]:text-white data-[state=active]:shadow-md">ESV</TabsTrigger>
+                      <TabsTrigger value="nasb" className="text-[10px] h-5 px-1.5 text-[hsl(45,50%,65%)] data-[state=active]:bg-gradient-to-r data-[state=active]:from-[hsl(32,80%,50%)] data-[state=active]:to-[hsl(45,90%,50%)] data-[state=active]:text-white data-[state=active]:shadow-md">NASB</TabsTrigger>
+                      <TabsTrigger value="nlt" className="text-[10px] h-5 px-1.5 text-[hsl(45,50%,65%)] data-[state=active]:bg-gradient-to-r data-[state=active]:from-[hsl(32,80%,50%)] data-[state=active]:to-[hsl(45,90%,50%)] data-[state=active]:text-white data-[state=active]:shadow-md">NLT</TabsTrigger>
+                      <TabsTrigger value="rves" className="text-[10px] h-5 px-1.5 text-[hsl(45,50%,65%)] data-[state=active]:bg-gradient-to-r data-[state=active]:from-[hsl(32,80%,50%)] data-[state=active]:to-[hsl(45,90%,50%)] data-[state=active]:text-white data-[state=active]:shadow-md">RVE</TabsTrigger>
                     </TabsList>
                   </Tabs>
                 )}
               </div>
-              <Button variant="ghost" size="icon" className="h-6 w-6 hover:bg-palace-blue/20" onClick={() => toggleExpand("text")}>
+              <Button variant="ghost" size="icon" className="h-6 w-6 hover:bg-[hsl(32,50%,40%)/0.2] text-[hsl(45,60%,70%)]" onClick={() => toggleExpand("text")}>
                 {expandedPanel === "text" ? <Minimize2 className="h-3 w-3" /> : <Maximize2 className="h-3 w-3" />}
               </Button>
             </div>
@@ -267,24 +271,24 @@ export const ResearchModeLayout = ({ onExitResearchMode }: ResearchModeLayoutPro
             )}
           </div>
 
-          {/* Dictionary Panel - Bottom */}
+          {/* Dictionary Panel - Bottom - Amber glow outline */}
           {expandedPanel !== "text" && (
-            <div className="flex-1 min-h-0 rounded-2xl bg-gradient-to-b from-card/90 to-card/70 backdrop-blur-xl border border-palace-orange/20 shadow-xl shadow-palace-orange/10 overflow-hidden">
-              <div className="h-10 border-b border-palace-orange/20 bg-gradient-to-r from-palace-orange/10 to-palace-yellow/10 flex items-center justify-between px-3">
+            <div className="flex-1 min-h-0 rounded-2xl bg-[hsl(230,35%,12%)/0.95] backdrop-blur-xl border-2 border-[hsl(32,70%,45%)/0.5] shadow-[0_0_30px_-5px_hsl(32,80%,50%/0.4),inset_0_1px_0_hsl(32,70%,60%/0.1)] overflow-hidden">
+              <div className="h-10 border-b border-[hsl(32,60%,40%)/0.3] bg-gradient-to-r from-[hsl(32,50%,25%)/0.3] to-[hsl(45,45%,22%)/0.2] flex items-center justify-between px-3">
                 <div className="flex items-center gap-2">
-                  <div className="p-1 rounded-md bg-palace-orange/20">
-                    <Languages className="h-3.5 w-3.5 text-palace-orange" />
+                  <div className="p-1 rounded-md bg-[hsl(32,70%,45%)/0.3]">
+                    <Languages className="h-3.5 w-3.5 text-[hsl(32,80%,60%)]" />
                   </div>
-                  <span className="text-sm font-semibold bg-gradient-warmth bg-clip-text text-transparent">Dictionary</span>
+                  <span className="text-sm font-semibold text-[hsl(45,70%,65%)]">Dictionary</span>
                   <Tabs value={activeDictionary} onValueChange={setActiveDictionary} className="h-8">
-                    <TabsList className="h-7 bg-palace-orange/10 border border-palace-orange/20">
-                      <TabsTrigger value="strongs" className="text-xs h-6 px-2 data-[state=active]:bg-gradient-warmth data-[state=active]:text-white data-[state=active]:shadow-md">Strong's</TabsTrigger>
-                      <TabsTrigger value="thayers" className="text-xs h-6 px-2 data-[state=active]:bg-gradient-warmth data-[state=active]:text-white data-[state=active]:shadow-md">Thayer's</TabsTrigger>
-                      <TabsTrigger value="bdb" className="text-xs h-6 px-2 data-[state=active]:bg-gradient-warmth data-[state=active]:text-white data-[state=active]:shadow-md">BDB</TabsTrigger>
+                    <TabsList className="h-7 bg-[hsl(230,30%,15%)/0.8] border border-[hsl(32,50%,40%)/0.3]">
+                      <TabsTrigger value="strongs" className="text-xs h-6 px-2 text-[hsl(45,50%,65%)] data-[state=active]:bg-gradient-to-r data-[state=active]:from-[hsl(32,80%,50%)] data-[state=active]:to-[hsl(45,90%,50%)] data-[state=active]:text-white data-[state=active]:shadow-md">Strong's</TabsTrigger>
+                      <TabsTrigger value="thayers" className="text-xs h-6 px-2 text-[hsl(45,50%,65%)] data-[state=active]:bg-gradient-to-r data-[state=active]:from-[hsl(32,80%,50%)] data-[state=active]:to-[hsl(45,90%,50%)] data-[state=active]:text-white data-[state=active]:shadow-md">Thayer's</TabsTrigger>
+                      <TabsTrigger value="bdb" className="text-xs h-6 px-2 text-[hsl(45,50%,65%)] data-[state=active]:bg-gradient-to-r data-[state=active]:from-[hsl(32,80%,50%)] data-[state=active]:to-[hsl(45,90%,50%)] data-[state=active]:text-white data-[state=active]:shadow-md">BDB</TabsTrigger>
                     </TabsList>
                   </Tabs>
                 </div>
-                <Button variant="ghost" size="icon" className="h-6 w-6 hover:bg-palace-orange/20" onClick={() => toggleExpand("dictionary")}>
+                <Button variant="ghost" size="icon" className="h-6 w-6 hover:bg-[hsl(32,50%,40%)/0.2] text-[hsl(45,60%,70%)]" onClick={() => toggleExpand("dictionary")}>
                   {expandedPanel === "dictionary" ? <Minimize2 className="h-3 w-3" /> : <Maximize2 className="h-3 w-3" />}
                 </Button>
               </div>
@@ -301,22 +305,23 @@ export const ResearchModeLayout = ({ onExitResearchMode }: ResearchModeLayoutPro
           )}
         </div>
 
-        {/* Right Panel - PT Tools & Commentary */}
+        {/* Right Panel - PT Tools & Commentary - Amber glow outline */}
         <div 
           className={cn(
-            "rounded-2xl bg-gradient-to-b from-card/90 to-card/70 backdrop-blur-xl border border-palace-pink/20 transition-all duration-300 shrink-0 shadow-xl shadow-palace-pink/10 overflow-hidden flex flex-col",
+            "rounded-2xl bg-[hsl(230,35%,12%)/0.95] backdrop-blur-xl border-2 border-[hsl(32,70%,45%)/0.5] transition-all duration-300 shrink-0 overflow-hidden flex flex-col",
+            "shadow-[0_0_30px_-5px_hsl(32,80%,50%/0.4),inset_0_1px_0_hsl(32,70%,60%/0.1)]",
             expandedPanel === "commentary" ? "w-[500px]" : "w-80"
           )}
         >
           {/* Tab Categories */}
-          <div className="border-b border-palace-pink/20 bg-gradient-to-r from-palace-purple/10 via-palace-pink/10 to-palace-teal/10 p-2">
+          <div className="border-b border-[hsl(32,60%,40%)/0.3] bg-gradient-to-r from-[hsl(210,40%,18%)/0.3] via-[hsl(32,35%,18%)/0.2] to-[hsl(180,35%,18%)/0.3] p-2">
             <div className="flex flex-wrap gap-1">
               {/* AI & Commentary */}
               <Button
                 size="sm"
                 variant={rightTab === "jeeves" ? "default" : "ghost"}
                 onClick={() => setRightTab("jeeves")}
-                className={cn("h-6 text-[10px] px-2 transition-all", rightTab === "jeeves" ? "bg-gradient-palace shadow-md shadow-palace-purple/30 text-white" : "hover:bg-palace-purple/20")}
+                className={cn("h-6 text-[10px] px-2 transition-all", rightTab === "jeeves" ? "bg-gradient-to-r from-[hsl(210,70%,50%)] to-[hsl(190,60%,45%)] shadow-md shadow-[hsl(210,70%,50%)/0.3] text-white" : "hover:bg-[hsl(210,40%,30%)/0.3] text-[hsl(210,50%,70%)]")}
               >
                 <Bot className="h-3 w-3 mr-1" />
                 Jeeves
@@ -325,7 +330,7 @@ export const ResearchModeLayout = ({ onExitResearchMode }: ResearchModeLayoutPro
                 size="sm"
                 variant={rightTab === "crossref" ? "default" : "ghost"}
                 onClick={() => setRightTab("crossref")}
-                className={cn("h-6 text-[10px] px-2 transition-all", rightTab === "crossref" ? "bg-gradient-ocean shadow-md shadow-palace-blue/30 text-white" : "hover:bg-palace-blue/20")}
+                className={cn("h-6 text-[10px] px-2 transition-all", rightTab === "crossref" ? "bg-gradient-to-r from-[hsl(200,70%,45%)] to-[hsl(180,60%,45%)] shadow-md shadow-[hsl(200,70%,45%)/0.3] text-white" : "hover:bg-[hsl(200,40%,30%)/0.3] text-[hsl(200,50%,70%)]")}
               >
                 <Link2 className="h-3 w-3 mr-1" />
                 Links
@@ -334,7 +339,7 @@ export const ResearchModeLayout = ({ onExitResearchMode }: ResearchModeLayoutPro
                 size="sm"
                 variant={rightTab === "genetics" ? "default" : "ghost"}
                 onClick={() => setRightTab("genetics")}
-                className={cn("h-6 text-[10px] px-2 transition-all", rightTab === "genetics" ? "bg-gradient-forest shadow-md shadow-palace-green/30 text-white" : "hover:bg-palace-green/20")}
+                className={cn("h-6 text-[10px] px-2 transition-all", rightTab === "genetics" ? "bg-gradient-to-r from-[hsl(180,60%,40%)] to-[hsl(142,55%,40%)] shadow-md shadow-[hsl(142,55%,40%)/0.3] text-white" : "hover:bg-[hsl(142,35%,25%)/0.3] text-[hsl(142,45%,60%)]")}
               >
                 <GitBranch className="h-3 w-3 mr-1" />
                 Genetics
@@ -343,20 +348,20 @@ export const ResearchModeLayout = ({ onExitResearchMode }: ResearchModeLayoutPro
                 size="sm"
                 variant={rightTab === "notes" ? "default" : "ghost"}
                 onClick={() => setRightTab("notes")}
-                className={cn("h-6 text-[10px] px-2 transition-all", rightTab === "notes" ? "bg-gradient-warmth shadow-md shadow-palace-orange/30 text-white" : "hover:bg-palace-orange/20")}
+                className={cn("h-6 text-[10px] px-2 transition-all", rightTab === "notes" ? "bg-gradient-to-r from-[hsl(32,80%,50%)] to-[hsl(45,90%,50%)] shadow-md shadow-[hsl(32,80%,50%)/0.3] text-white" : "hover:bg-[hsl(32,50%,30%)/0.3] text-[hsl(45,60%,70%)]")}
               >
                 <StickyNote className="h-3 w-3 mr-1" />
                 Notes
               </Button>
               
-              <div className="w-px h-4 bg-gradient-to-b from-transparent via-palace-purple/40 to-transparent mx-1 self-center" />
+              <div className="w-px h-4 bg-gradient-to-b from-transparent via-[hsl(32,70%,50%)/0.4] to-transparent mx-1 self-center" />
               
               {/* PT Tools */}
               <Button
                 size="sm"
                 variant={rightTab === "palace" ? "default" : "ghost"}
                 onClick={() => setRightTab("palace")}
-                className={cn("h-6 text-[10px] px-2 transition-all", rightTab === "palace" ? "bg-gradient-royal shadow-md shadow-palace-purple/30 text-white" : "hover:bg-palace-purple/20")}
+                className={cn("h-6 text-[10px] px-2 transition-all", rightTab === "palace" ? "bg-gradient-to-r from-[hsl(270,60%,50%)] to-[hsl(210,70%,50%)] shadow-md shadow-[hsl(270,60%,50%)/0.3] text-white" : "hover:bg-[hsl(270,40%,30%)/0.3] text-[hsl(270,50%,70%)]")}
               >
                 <Building2 className="h-3 w-3 mr-1" />
                 Palace
@@ -365,7 +370,7 @@ export const ResearchModeLayout = ({ onExitResearchMode }: ResearchModeLayoutPro
                 size="sm"
                 variant={rightTab === "cycles" ? "default" : "ghost"}
                 onClick={() => setRightTab("cycles")}
-                className={cn("h-6 text-[10px] px-2 transition-all", rightTab === "cycles" ? "bg-gradient-ocean shadow-md shadow-palace-teal/30 text-white" : "hover:bg-palace-teal/20")}
+                className={cn("h-6 text-[10px] px-2 transition-all", rightTab === "cycles" ? "bg-gradient-to-r from-[hsl(200,70%,45%)] to-[hsl(180,60%,45%)] shadow-md shadow-[hsl(180,60%,45%)/0.3] text-white" : "hover:bg-[hsl(180,40%,28%)/0.3] text-[hsl(180,50%,65%)]")}
               >
                 <RotateCcw className="h-3 w-3 mr-1" />
                 Cycles
@@ -374,7 +379,7 @@ export const ResearchModeLayout = ({ onExitResearchMode }: ResearchModeLayoutPro
                 size="sm"
                 variant={rightTab === "heavens" ? "default" : "ghost"}
                 onClick={() => setRightTab("heavens")}
-                className={cn("h-6 text-[10px] px-2 transition-all", rightTab === "heavens" ? "bg-gradient-to-r from-palace-blue to-palace-purple shadow-md shadow-palace-blue/30 text-white" : "hover:bg-palace-blue/20")}
+                className={cn("h-6 text-[10px] px-2 transition-all", rightTab === "heavens" ? "bg-gradient-to-r from-[hsl(210,70%,50%)] to-[hsl(270,60%,50%)] shadow-md shadow-[hsl(210,70%,50%)/0.3] text-white" : "hover:bg-[hsl(210,40%,30%)/0.3] text-[hsl(210,50%,70%)]")}
               >
                 <Layers className="h-3 w-3 mr-1" />
                 3H
@@ -383,7 +388,7 @@ export const ResearchModeLayout = ({ onExitResearchMode }: ResearchModeLayoutPro
                 size="sm"
                 variant={rightTab === "sanctuary" ? "default" : "ghost"}
                 onClick={() => setRightTab("sanctuary")}
-                className={cn("h-6 text-[10px] px-2 transition-all", rightTab === "sanctuary" ? "bg-gradient-warmth shadow-md shadow-palace-yellow/30 text-white" : "hover:bg-palace-yellow/20")}
+                className={cn("h-6 text-[10px] px-2 transition-all", rightTab === "sanctuary" ? "bg-gradient-to-r from-[hsl(32,80%,50%)] to-[hsl(45,90%,50%)] shadow-md shadow-[hsl(45,90%,50%)/0.3] text-white" : "hover:bg-[hsl(45,50%,30%)/0.3] text-[hsl(45,60%,65%)]")}
               >
                 <Landmark className="h-3 w-3 mr-1" />
                 Sanct.
@@ -392,7 +397,7 @@ export const ResearchModeLayout = ({ onExitResearchMode }: ResearchModeLayoutPro
                 size="sm"
                 variant={rightTab === "ascensions" ? "default" : "ghost"}
                 onClick={() => setRightTab("ascensions")}
-                className={cn("h-6 text-[10px] px-2 transition-all", rightTab === "ascensions" ? "bg-gradient-forest shadow-md shadow-palace-green/30 text-white" : "hover:bg-palace-green/20")}
+                className={cn("h-6 text-[10px] px-2 transition-all", rightTab === "ascensions" ? "bg-gradient-to-r from-[hsl(180,60%,40%)] to-[hsl(142,55%,40%)] shadow-md shadow-[hsl(142,55%,40%)/0.3] text-white" : "hover:bg-[hsl(142,35%,25%)/0.3] text-[hsl(142,45%,60%)]")}
               >
                 <ArrowUpRight className="h-3 w-3 mr-1" />
                 5Asc
@@ -401,12 +406,12 @@ export const ResearchModeLayout = ({ onExitResearchMode }: ResearchModeLayoutPro
           </div>
 
           {/* Panel Header */}
-          <div className="h-10 border-b border-palace-pink/20 bg-gradient-to-r from-palace-purple/5 to-palace-pink/5 flex items-center justify-between px-3">
+          <div className="h-10 border-b border-[hsl(32,60%,40%)/0.3] bg-gradient-to-r from-[hsl(210,35%,15%)/0.3] to-[hsl(32,30%,15%)/0.2] flex items-center justify-between px-3">
             <div className="flex items-center gap-2">
-              <div className="p-1 rounded-md bg-palace-purple/20">
-                <MessageSquare className="h-3.5 w-3.5 text-palace-purple" />
+              <div className="p-1 rounded-md bg-[hsl(32,60%,45%)/0.3]">
+                <MessageSquare className="h-3.5 w-3.5 text-[hsl(32,70%,60%)]" />
               </div>
-              <span className="text-sm font-semibold bg-gradient-palace bg-clip-text text-transparent">
+              <span className="text-sm font-semibold text-[hsl(45,70%,70%)]">
                 {rightTab === "jeeves" && "Jeeves AI Commentary"}
                 {rightTab === "crossref" && "Cross References"}
                 {rightTab === "genetics" && "Verse Genetics"}
@@ -418,7 +423,7 @@ export const ResearchModeLayout = ({ onExitResearchMode }: ResearchModeLayoutPro
                 {rightTab === "ascensions" && "Five Ascensions"}
               </span>
             </div>
-            <Button variant="ghost" size="icon" className="h-6 w-6 hover:bg-palace-purple/20" onClick={() => toggleExpand("commentary")}>
+            <Button variant="ghost" size="icon" className="h-6 w-6 hover:bg-[hsl(32,50%,40%)/0.2] text-[hsl(45,60%,70%)]" onClick={() => toggleExpand("commentary")}>
               {expandedPanel === "commentary" ? <Minimize2 className="h-3 w-3" /> : <Maximize2 className="h-3 w-3" />}
             </Button>
           </div>

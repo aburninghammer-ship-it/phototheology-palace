@@ -190,6 +190,8 @@ All colors MUST be HSL.
     --palace-orange: 25 95% 53%;
     --palace-yellow: 45 100% 51%;
     --palace-green: 142 76% 36%;
+    --palace-amber: 32 95% 50%;
+    --palace-gold: 45 93% 47%;
     
     --gradient-palace: linear-gradient(135deg, hsl(210 85% 50%) 0%, hsl(190 70% 50%) 100%);
     --gradient-royal: linear-gradient(135deg, hsl(210 85% 50%) 0%, hsl(180 77% 44%) 100%);
@@ -197,6 +199,8 @@ All colors MUST be HSL.
     --gradient-ocean: linear-gradient(135deg, hsl(210 100% 56%) 0%, hsl(180 77% 44%) 100%);
     --gradient-forest: linear-gradient(135deg, hsl(180 77% 44%) 0%, hsl(142 76% 36%) 100%);
     --gradient-subtle: linear-gradient(180deg, hsl(240 30% 8%) 0%, hsl(240 25% 12%) 100%);
+    --gradient-amber-glow: linear-gradient(135deg, hsl(32 95% 50%) 0%, hsl(45 93% 47%) 100%);
+    --gradient-deep-navy: linear-gradient(180deg, hsl(230 35% 12%) 0%, hsl(225 40% 8%) 100%);
     
     --sidebar-background: 240 25% 10%;
     --sidebar-foreground: 250 100% 98%;
