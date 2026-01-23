@@ -3,12 +3,17 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
+import { useChurchMembership } from "@/hooks/useChurchMembership";
 import { toast } from "sonner";
 import { 
   Users, Search, Calendar, Clock, MapPin, 
-  Flame, UserPlus, MessageSquare, Video
+  Flame, UserPlus, MessageSquare, Video, Plus
 } from "lucide-react";
 
 interface SmallGroupsHubProps {
@@ -33,10 +38,24 @@ interface SmallGroup {
 
 export function SmallGroupsHub({ churchId }: SmallGroupsHubProps) {
   const { user } = useAuth();
+  const { role: memberRole } = useChurchMembership();
   const [groups, setGroups] = useState<SmallGroup[]>([]);
   const [myGroups, setMyGroups] = useState<SmallGroup[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
+  const [showCreateDialog, setShowCreateDialog] = useState(false);
+  const [creating, setCreating] = useState(false);
+  const [newGroup, setNewGroup] = useState({
+    name: "",
+    description: "",
+    meeting_day: "",
+    meeting_time: "",
+    meeting_type: "hybrid" as 'in-person' | 'online' | 'hybrid',
+    location: "",
+    max_members: 12
+  });
+
+  const canCreateGroup = memberRole === 'admin' || memberRole === 'leader';
 
   useEffect(() => {
     loadGroups();
@@ -116,6 +135,52 @@ export function SmallGroupsHub({ churchId }: SmallGroupsHubProps) {
     } catch (error: any) {
       console.error('Error joining group:', error);
       toast.error(error.message || "Failed to join group");
+    }
+  };
+
+  const handleCreateGroup = async () => {
+    if (!user || !newGroup.name.trim()) {
+      toast.error("Please provide a group name");
+      return;
+    }
+
+    setCreating(true);
+    try {
+      const { error } = await (supabase
+        .from('small_groups' as any)
+        .insert({
+          church_id: churchId,
+          name: newGroup.name.trim(),
+          description: newGroup.description.trim() || null,
+          leader_id: user.id,
+          meeting_day: newGroup.meeting_day || null,
+          meeting_time: newGroup.meeting_time || null,
+          meeting_type: newGroup.meeting_type,
+          location: newGroup.location.trim() || null,
+          max_members: newGroup.max_members,
+          is_open: true,
+          is_active: true
+        }) as any);
+
+      if (error) throw error;
+
+      toast.success("House Fire created successfully!");
+      setShowCreateDialog(false);
+      setNewGroup({
+        name: "",
+        description: "",
+        meeting_day: "",
+        meeting_time: "",
+        meeting_type: "hybrid",
+        location: "",
+        max_members: 12
+      });
+      loadGroups();
+    } catch (error: any) {
+      console.error('Error creating group:', error);
+      toast.error(error.message || "Failed to create group");
+    } finally {
+      setCreating(false);
     }
   };
 
@@ -220,7 +285,7 @@ export function SmallGroupsHub({ churchId }: SmallGroupsHubProps) {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between flex-wrap gap-4">
         <div>
           <h2 className="text-2xl font-bold flex items-center gap-2">
             <Flame className="h-6 w-6 text-primary" />
@@ -230,6 +295,133 @@ export function SmallGroupsHub({ churchId }: SmallGroupsHubProps) {
             Connect with a community for fellowship, study, and growth
           </p>
         </div>
+        
+        {canCreateGroup && (
+          <Dialog open={showCreateDialog} onOpenChange={setShowCreateDialog}>
+            <DialogTrigger asChild>
+              <Button>
+                <Plus className="h-4 w-4 mr-2" />
+                Start a House Fire
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="max-w-md">
+              <DialogHeader>
+                <DialogTitle className="flex items-center gap-2">
+                  <Flame className="h-5 w-5 text-primary" />
+                  Start a New House Fire
+                </DialogTitle>
+                <DialogDescription>
+                  Create a small group for fellowship and Bible study
+                </DialogDescription>
+              </DialogHeader>
+              
+              <div className="space-y-4 mt-4">
+                <div className="space-y-2">
+                  <Label htmlFor="group-name">Group Name *</Label>
+                  <Input
+                    id="group-name"
+                    placeholder="e.g., Young Adults, Family Fire, etc."
+                    value={newGroup.name}
+                    onChange={(e) => setNewGroup({ ...newGroup, name: e.target.value })}
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="group-description">Description</Label>
+                  <Textarea
+                    id="group-description"
+                    placeholder="What is this group about?"
+                    value={newGroup.description}
+                    onChange={(e) => setNewGroup({ ...newGroup, description: e.target.value })}
+                    rows={3}
+                  />
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="meeting-day">Meeting Day</Label>
+                    <Select
+                      value={newGroup.meeting_day}
+                      onValueChange={(value) => setNewGroup({ ...newGroup, meeting_day: value })}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select day" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="Sunday">Sunday</SelectItem>
+                        <SelectItem value="Monday">Monday</SelectItem>
+                        <SelectItem value="Tuesday">Tuesday</SelectItem>
+                        <SelectItem value="Wednesday">Wednesday</SelectItem>
+                        <SelectItem value="Thursday">Thursday</SelectItem>
+                        <SelectItem value="Friday">Friday</SelectItem>
+                        <SelectItem value="Saturday">Saturday</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="meeting-time">Meeting Time</Label>
+                    <Input
+                      id="meeting-time"
+                      type="time"
+                      value={newGroup.meeting_time}
+                      onChange={(e) => setNewGroup({ ...newGroup, meeting_time: e.target.value })}
+                    />
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="meeting-type">Meeting Type</Label>
+                  <Select
+                    value={newGroup.meeting_type}
+                    onValueChange={(value: 'in-person' | 'online' | 'hybrid') => setNewGroup({ ...newGroup, meeting_type: value })}
+                  >
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="in-person">In-Person</SelectItem>
+                      <SelectItem value="online">Online</SelectItem>
+                      <SelectItem value="hybrid">Hybrid</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {(newGroup.meeting_type === 'in-person' || newGroup.meeting_type === 'hybrid') && (
+                  <div className="space-y-2">
+                    <Label htmlFor="location">Location</Label>
+                    <Input
+                      id="location"
+                      placeholder="Where will you meet?"
+                      value={newGroup.location}
+                      onChange={(e) => setNewGroup({ ...newGroup, location: e.target.value })}
+                    />
+                  </div>
+                )}
+
+                <div className="space-y-2">
+                  <Label htmlFor="max-members">Maximum Members</Label>
+                  <Input
+                    id="max-members"
+                    type="number"
+                    min={2}
+                    max={50}
+                    value={newGroup.max_members}
+                    onChange={(e) => setNewGroup({ ...newGroup, max_members: parseInt(e.target.value) || 12 })}
+                  />
+                </div>
+
+                <Button 
+                  className="w-full" 
+                  onClick={handleCreateGroup}
+                  disabled={creating || !newGroup.name.trim()}
+                >
+                  {creating ? "Creating..." : "Create House Fire"}
+                </Button>
+              </div>
+            </DialogContent>
+          </Dialog>
+        )}
       </div>
 
       {/* My Groups */}
