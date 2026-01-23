@@ -7,7 +7,7 @@ import { useChurchMembership } from "@/hooks/useChurchMembership";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Loader2, Home, Users, BookOpen, Heart, Flame, ArrowRight, MessagesSquare, Sprout, Sun, Moon, Sparkles, ArrowLeft, BookMarked, Zap } from "lucide-react";
+import { Loader2, Home, Users, BookOpen, Heart, Flame, ArrowRight, MessagesSquare, Sprout, Sun, Moon, Sparkles, ArrowLeft, BookMarked, Zap, Settings } from "lucide-react";
 import { useTheme } from "next-themes";
 import { SmallGroupsHub } from "@/components/living-manna/SmallGroupsHub";
 import { MemberHome } from "@/components/living-manna/MemberHome";
@@ -17,6 +17,7 @@ import { GrowTab } from "@/components/living-manna/GrowTab";
 import { YouthSpace } from "@/components/living-manna/YouthSpace";
 import { PersonalDevotionalDiary } from "@/components/living-manna/PersonalDevotionalDiary";
 import { ExploitsHub } from "@/components/living-manna/ExploitsHub";
+import { ChurchAdminTab } from "@/components/living-manna/ChurchAdminTab";
 import { DirectMessagesProvider } from "@/contexts/DirectMessagesContext";
 import { useIsMobile } from "@/hooks/use-mobile";
 export default function LivingManna() {
@@ -273,6 +274,12 @@ export default function LivingManna() {
                     <Sprout className="h-4 w-4" />
                     <span className="text-xs sm:text-sm">Grow</span>
                   </TabsTrigger>
+                  {(isChurchAdmin || memberRole === 'leader') && (
+                    <TabsTrigger value="admin" className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 py-2 px-3 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground min-w-[60px]">
+                      <Settings className="h-4 w-4" />
+                      <span className="text-xs sm:text-sm">Admin</span>
+                    </TabsTrigger>
+                  )}
                 </TabsList>
               </div>
 
@@ -307,6 +314,12 @@ export default function LivingManna() {
               <TabsContent value="grow">
                 <GrowTab churchId={effectiveChurchId!} />
               </TabsContent>
+
+              {(isChurchAdmin || memberRole === 'leader') && (
+                <TabsContent value="admin">
+                  <ChurchAdminTab churchId={effectiveChurchId!} />
+                </TabsContent>
+              )}
             </Tabs>
           </Card>
         </div>

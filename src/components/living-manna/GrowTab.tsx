@@ -1,11 +1,12 @@
 import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Sprout, Shield, Video, Calendar, Bell, BarChart3 } from "lucide-react";
+import { Sprout, Shield, Video, Calendar, Bell, BarChart3, TrendingUp } from "lucide-react";
 import { LeaderOnboarding } from "./LeaderOnboarding";
 import { SermonHub } from "./SermonHub";
 import { ChurchEvents } from "./ChurchEvents";
 import { PushNotificationSettings } from "./PushNotificationSettings";
 import { StudyEngagementAnalytics } from "./StudyEngagementAnalytics";
+import { ContentPerformanceAnalytics } from "./ContentPerformanceAnalytics";
 
 interface GrowTabProps {
   churchId: string;
@@ -44,6 +45,10 @@ export function GrowTab({ churchId }: GrowTabProps) {
             <BarChart3 className="h-4 w-4" />
             Analytics
           </TabsTrigger>
+          <TabsTrigger value="content-analytics" className="gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
+            <TrendingUp className="h-4 w-4" />
+            Content Performance
+          </TabsTrigger>
           <TabsTrigger value="notifications" className="gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
             <Bell className="h-4 w-4" />
             Notifications
@@ -64,6 +69,10 @@ export function GrowTab({ churchId }: GrowTabProps) {
 
         <TabsContent value="analytics">
           <StudyEngagementAnalytics churchId={churchId} />
+        </TabsContent>
+
+        <TabsContent value="content-analytics">
+          <ContentPerformanceAnalytics churchId={churchId} />
         </TabsContent>
 
         <TabsContent value="notifications">

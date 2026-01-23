@@ -44,3 +44,4 @@ export { ChurchEvents } from "./ChurchEvents";
 export { ChurchSurveys } from "./ChurchSurveys";
 export { PushNotificationSettings } from "./PushNotificationSettings";
 export { StudyEngagementAnalytics } from "./StudyEngagementAnalytics";
+export { ChurchAdminTab } from "./ChurchAdminTab";

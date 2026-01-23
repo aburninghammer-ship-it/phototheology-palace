@@ -1,10 +1,12 @@
 import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { MessagesSquare, MessageCircle, Heart, ClipboardList } from "lucide-react";
+import { MessagesSquare, MessageCircle, Heart, ClipboardList, Users, Calendar } from "lucide-react";
 import { ChurchCommunity } from "./ChurchCommunity";
 import { ChurchMessaging } from "./ChurchMessaging";
 import { PrayerMinistryHub } from "./PrayerMinistryHub";
 import { ChurchSurveys } from "./ChurchSurveys";
+import { MemberDirectory } from "./MemberDirectory";
+import { CalendarSyncSettings } from "./CalendarSyncSettings";
 
 interface ConnectTabProps {
   churchId: string;
@@ -31,6 +33,10 @@ export function ConnectTab({ churchId }: ConnectTabProps) {
             <MessagesSquare className="h-4 w-4" />
             Community
           </TabsTrigger>
+          <TabsTrigger value="members" className="gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
+            <Users className="h-4 w-4" />
+            Members
+          </TabsTrigger>
           <TabsTrigger value="messages" className="gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
             <MessageCircle className="h-4 w-4" />
             Messages
@@ -43,10 +49,18 @@ export function ConnectTab({ churchId }: ConnectTabProps) {
             <ClipboardList className="h-4 w-4" />
             Surveys
           </TabsTrigger>
+          <TabsTrigger value="calendar-sync" className="gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
+            <Calendar className="h-4 w-4" />
+            Calendar Sync
+          </TabsTrigger>
         </TabsList>
 
         <TabsContent value="community">
           <ChurchCommunity churchId={churchId} />
+        </TabsContent>
+
+        <TabsContent value="members">
+          <MemberDirectory churchId={churchId} />
         </TabsContent>
 
         <TabsContent value="messages">
@@ -59,6 +73,10 @@ export function ConnectTab({ churchId }: ConnectTabProps) {
 
         <TabsContent value="surveys">
           <ChurchSurveys churchId={churchId} />
+        </TabsContent>
+
+        <TabsContent value="calendar-sync">
+          <CalendarSyncSettings />
         </TabsContent>
       </Tabs>
     </div>
