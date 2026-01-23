@@ -1,4 +1,12 @@
 export { LeaderDashboard } from "./LeaderDashboard";
+export { MemberDirectory } from "./MemberDirectory";
+export { EnhancedProfileEditor } from "./EnhancedProfileEditor";
+export { ChurchBrandingSettings } from "./ChurchBrandingSettings";
+export { LivestreamManager } from "./LivestreamManager";
+export { CourseDiscussionBoard } from "./CourseDiscussionBoard";
+export { ContentPerformanceAnalytics } from "./ContentPerformanceAnalytics";
+export { RolePermissionsManager } from "./RolePermissionsManager";
+export { CalendarSyncSettings } from "./CalendarSyncSettings";
 export { CohortManagement } from "./CohortManagement";
 export { AttendanceTracker } from "./AttendanceTracker";
 export { EscalationPanel } from "./EscalationPanel";
