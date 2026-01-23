@@ -226,12 +226,19 @@ export const ResearchModeLayout = ({ onExitResearchMode }: ResearchModeLayoutPro
                 <span className="text-sm font-semibold bg-gradient-ocean bg-clip-text text-transparent">Scripture</span>
                 {centerView === "single" && (
                   <Tabs value={translation} onValueChange={(v) => setTranslation(v as Translation)} className="h-8">
-                    <TabsList className="h-7 bg-palace-purple/10 border border-palace-purple/20">
-                      <TabsTrigger value="kjv" className="text-xs h-6 px-2 data-[state=active]:bg-gradient-palace data-[state=active]:text-white data-[state=active]:shadow-md">KJV</TabsTrigger>
-                      <TabsTrigger value="asv" className="text-xs h-6 px-2 data-[state=active]:bg-gradient-palace data-[state=active]:text-white data-[state=active]:shadow-md">ASV</TabsTrigger>
-                      <TabsTrigger value="web" className="text-xs h-6 px-2 data-[state=active]:bg-gradient-palace data-[state=active]:text-white data-[state=active]:shadow-md">WEB</TabsTrigger>
-                      <TabsTrigger value="ylt" className="text-xs h-6 px-2 data-[state=active]:bg-gradient-palace data-[state=active]:text-white data-[state=active]:shadow-md">YLT</TabsTrigger>
-                      <TabsTrigger value="darby" className="text-xs h-6 px-2 data-[state=active]:bg-gradient-palace data-[state=active]:text-white data-[state=active]:shadow-md">Darby</TabsTrigger>
+                    <TabsList className="h-7 bg-palace-purple/10 border border-palace-purple/20 flex-wrap">
+                      <TabsTrigger value="kjv" className="text-[10px] h-5 px-1.5 data-[state=active]:bg-gradient-palace data-[state=active]:text-white data-[state=active]:shadow-md">KJV</TabsTrigger>
+                      <TabsTrigger value="nkjv" className="text-[10px] h-5 px-1.5 data-[state=active]:bg-gradient-palace data-[state=active]:text-white data-[state=active]:shadow-md">NKJV</TabsTrigger>
+                      <TabsTrigger value="asv" className="text-[10px] h-5 px-1.5 data-[state=active]:bg-gradient-palace data-[state=active]:text-white data-[state=active]:shadow-md">ASV</TabsTrigger>
+                      <TabsTrigger value="web" className="text-[10px] h-5 px-1.5 data-[state=active]:bg-gradient-palace data-[state=active]:text-white data-[state=active]:shadow-md">WEB</TabsTrigger>
+                      <TabsTrigger value="ylt" className="text-[10px] h-5 px-1.5 data-[state=active]:bg-gradient-palace data-[state=active]:text-white data-[state=active]:shadow-md">YLT</TabsTrigger>
+                      <TabsTrigger value="darby" className="text-[10px] h-5 px-1.5 data-[state=active]:bg-gradient-palace data-[state=active]:text-white data-[state=active]:shadow-md">Darby</TabsTrigger>
+                      <TabsTrigger value="bbe" className="text-[10px] h-5 px-1.5 data-[state=active]:bg-gradient-palace data-[state=active]:text-white data-[state=active]:shadow-md">BBE</TabsTrigger>
+                      <TabsTrigger value="niv" className="text-[10px] h-5 px-1.5 data-[state=active]:bg-gradient-palace data-[state=active]:text-white data-[state=active]:shadow-md">NIV</TabsTrigger>
+                      <TabsTrigger value="esv" className="text-[10px] h-5 px-1.5 data-[state=active]:bg-gradient-palace data-[state=active]:text-white data-[state=active]:shadow-md">ESV</TabsTrigger>
+                      <TabsTrigger value="nasb" className="text-[10px] h-5 px-1.5 data-[state=active]:bg-gradient-palace data-[state=active]:text-white data-[state=active]:shadow-md">NASB</TabsTrigger>
+                      <TabsTrigger value="nlt" className="text-[10px] h-5 px-1.5 data-[state=active]:bg-gradient-palace data-[state=active]:text-white data-[state=active]:shadow-md">NLT</TabsTrigger>
+                      <TabsTrigger value="rves" className="text-[10px] h-5 px-1.5 data-[state=active]:bg-gradient-palace data-[state=active]:text-white data-[state=active]:shadow-md">RVE</TabsTrigger>
                     </TabsList>
                   </Tabs>
                 )}
