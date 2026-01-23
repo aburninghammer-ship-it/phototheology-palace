@@ -42,28 +42,39 @@ export function MemberDirectory({ churchId }: MemberDirectoryProps) {
 
   const loadMembers = async () => {
     try {
-      const { data, error } = await supabase
+      // First get church members
+      const { data: membersData, error: membersError } = await supabase
         .from("church_members")
-        .select(`
-          id,
-          user_id,
-          role,
-          joined_at,
-          profiles:user_id (
-            id,
-            username,
-            display_name,
-            avatar_url,
-            bio,
-            ministry_tags,
-            location
-          )
-        `)
+        .select("id, user_id, role, joined_at")
         .eq("church_id", churchId)
         .order("joined_at", { ascending: false });
 
-      if (error) throw error;
-      setMembers((data as any) || []);
+      if (membersError) throw membersError;
+
+      if (!membersData || membersData.length === 0) {
+        setMembers([]);
+        return;
+      }
+
+      // Get user IDs to fetch profiles
+      const userIds = membersData.map(m => m.user_id);
+
+      // Fetch profiles separately
+      const { data: profilesData, error: profilesError } = await supabase
+        .from("profiles")
+        .select("id, username, display_name, avatar_url, bio, ministry_tags, location")
+        .in("id", userIds);
+
+      if (profilesError) throw profilesError;
+
+      // Merge members with their profiles
+      const profilesMap = new Map(profilesData?.map(p => [p.id, p]) || []);
+      const mergedMembers = membersData.map(member => ({
+        ...member,
+        profiles: profilesMap.get(member.user_id) || null
+      }));
+
+      setMembers(mergedMembers as any);
     } catch (error: any) {
       toast({
         title: "Error loading members",
