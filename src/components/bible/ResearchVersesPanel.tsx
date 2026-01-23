@@ -37,7 +37,7 @@ export const ResearchVersesPanel = ({
   }
 
   return (
-    <div className="p-3 space-y-1">
+    <div className="p-3 space-y-1.5">
       {verses.map((verse) => {
         const isSelected = selectedVerse === verse.verse;
         
@@ -45,24 +45,26 @@ export const ResearchVersesPanel = ({
           <div
             key={verse.verse}
             className={cn(
-              "flex gap-2 p-2 rounded-md cursor-pointer transition-colors text-sm leading-relaxed",
+              "group flex gap-3 p-3 rounded-xl cursor-pointer transition-all duration-200 text-sm leading-relaxed",
               isSelected 
-                ? "bg-primary/15 border border-primary/30" 
-                : "hover:bg-muted/50"
+                ? "bg-gradient-to-r from-palace-blue/20 via-palace-purple/15 to-palace-teal/20 border border-palace-blue/40 shadow-md shadow-palace-blue/10" 
+                : "hover:bg-palace-purple/10 hover:border-palace-purple/20 border border-transparent"
             )}
             onClick={() => onVerseSelect(verse.verse)}
           >
             <span 
               className={cn(
-                "font-semibold shrink-0 w-8 text-right",
-                isSelected ? "text-primary" : "text-primary/70"
+                "font-bold shrink-0 w-8 text-right font-serif",
+                isSelected 
+                  ? "bg-gradient-palace bg-clip-text text-transparent" 
+                  : "text-palace-purple/70 group-hover:text-palace-purple"
               )}
             >
               {verse.verse}
             </span>
             <span className={cn(
-              "flex-1",
-              isSelected && "font-medium"
+              "flex-1 font-serif",
+              isSelected && "font-medium text-foreground"
             )}>
               {verse.text}
             </span>

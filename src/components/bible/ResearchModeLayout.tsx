@@ -103,38 +103,47 @@ export const ResearchModeLayout = ({ onExitResearchMode }: ResearchModeLayoutPro
   const isNotesTab = rightTab === "notes";
 
   return (
-    <div className="h-screen flex flex-col bg-gradient-to-br from-background via-background to-primary/5 overflow-hidden">
-      {/* Top Toolbar - Glass */}
-      <div className="h-14 border-b border-white/10 bg-white/5 backdrop-blur-xl flex items-center justify-between px-4 shrink-0 shadow-lg shadow-black/5">
+    <div className="h-screen flex flex-col bg-gradient-to-br from-background via-background/95 to-palace-purple/10 overflow-hidden">
+      {/* Ambient background glow */}
+      <div className="fixed inset-0 pointer-events-none overflow-hidden -z-10">
+        <div className="absolute -top-40 -right-40 w-96 h-96 bg-palace-purple/20 rounded-full blur-3xl animate-pulse-subtle" />
+        <div className="absolute top-1/2 -left-40 w-80 h-80 bg-palace-teal/15 rounded-full blur-3xl animate-pulse-subtle" style={{ animationDelay: '1s' }} />
+        <div className="absolute -bottom-40 right-1/3 w-72 h-72 bg-palace-orange/10 rounded-full blur-3xl animate-pulse-subtle" style={{ animationDelay: '2s' }} />
+      </div>
+
+      {/* Top Toolbar - Enhanced Glass */}
+      <div className="h-14 border-b border-white/20 bg-gradient-to-r from-card/80 via-card/60 to-card/80 backdrop-blur-xl flex items-center justify-between px-4 shrink-0 shadow-lg shadow-palace-purple/10">
         <div className="flex items-center gap-3">
           <Button 
             variant="ghost" 
             size="sm" 
             onClick={onExitResearchMode}
-            className="bg-white/10 hover:bg-white/20 border border-white/10"
+            className="bg-destructive/10 hover:bg-destructive/20 border border-destructive/30 text-destructive hover:text-destructive"
           >
             <X className="h-4 w-4 mr-2" />
             Exit
           </Button>
-          <div className="h-6 w-px bg-white/20" />
+          <div className="h-6 w-px bg-gradient-to-b from-transparent via-palace-purple/40 to-transparent" />
           <div className="flex items-center gap-2">
-            <BookOpen className="h-5 w-5 text-primary" />
-            <span className="font-serif text-xl font-semibold bg-gradient-palace bg-clip-text text-transparent">
+            <div className="p-1.5 rounded-lg bg-gradient-palace shadow-lg shadow-palace-purple/30">
+              <BookOpen className="h-4 w-4 text-white" />
+            </div>
+            <span className="font-serif text-xl font-semibold bg-gradient-palace bg-clip-text text-transparent drop-shadow-sm">
               {book} {chapter}
             </span>
           </div>
-          <Badge variant="outline" className="text-xs bg-white/10 border-white/20">
+          <Badge className="text-xs bg-palace-teal/20 border-palace-teal/40 text-palace-teal">
             {chapterData?.verses.length || 0} verses
           </Badge>
           
           {/* Center View Toggle */}
-          <div className="h-6 w-px bg-white/20 ml-2" />
-          <div className="flex gap-1">
+          <div className="h-6 w-px bg-gradient-to-b from-transparent via-palace-purple/40 to-transparent ml-2" />
+          <div className="flex gap-1 p-1 rounded-lg bg-white/5 border border-white/10">
             <Button
               variant={centerView === "single" ? "default" : "ghost"}
               size="sm"
               onClick={() => setCenterView("single")}
-              className={cn("h-7 text-xs", centerView === "single" && "bg-primary/80")}
+              className={cn("h-7 text-xs transition-all", centerView === "single" ? "bg-gradient-palace shadow-md shadow-palace-purple/30" : "hover:bg-white/10")}
             >
               <BookOpen className="h-3 w-3 mr-1" />
               Single
@@ -143,7 +152,7 @@ export const ResearchModeLayout = ({ onExitResearchMode }: ResearchModeLayoutPro
               variant={centerView === "parallel" ? "default" : "ghost"}
               size="sm"
               onClick={() => setCenterView("parallel")}
-              className={cn("h-7 text-xs", centerView === "parallel" && "bg-primary/80")}
+              className={cn("h-7 text-xs transition-all", centerView === "parallel" ? "bg-gradient-ocean shadow-md shadow-palace-blue/30" : "hover:bg-white/10")}
             >
               <Columns className="h-3 w-3 mr-1" />
               Parallel
@@ -157,7 +166,7 @@ export const ResearchModeLayout = ({ onExitResearchMode }: ResearchModeLayoutPro
             size="sm"
             onClick={() => navigateChapter("prev")}
             disabled={chapter <= 1}
-            className="bg-white/10 hover:bg-white/20 border border-white/10"
+            className="bg-palace-purple/10 hover:bg-palace-purple/20 border border-palace-purple/30 hover:border-palace-purple/50 disabled:opacity-30"
           >
             <ChevronLeft className="h-4 w-4" />
           </Button>
@@ -165,7 +174,7 @@ export const ResearchModeLayout = ({ onExitResearchMode }: ResearchModeLayoutPro
             variant="ghost"
             size="sm"
             onClick={() => navigateChapter("next")}
-            className="bg-white/10 hover:bg-white/20 border border-white/10"
+            className="bg-palace-purple/10 hover:bg-palace-purple/20 border border-palace-purple/30 hover:border-palace-purple/50"
           >
             <ChevronRight className="h-4 w-4" />
           </Button>
@@ -173,20 +182,22 @@ export const ResearchModeLayout = ({ onExitResearchMode }: ResearchModeLayoutPro
       </div>
 
       {/* Main Content - 3 Column Layout */}
-      <div className="flex-1 flex overflow-hidden p-2 gap-2">
+      <div className="flex-1 flex overflow-hidden p-3 gap-3">
         {/* Left Panel - Bible Books */}
         <div 
           className={cn(
-            "rounded-xl bg-white/5 backdrop-blur-md border border-white/10 transition-all duration-300 shrink-0 shadow-xl shadow-black/10 overflow-hidden",
+            "rounded-2xl bg-gradient-to-b from-card/90 to-card/70 backdrop-blur-xl border border-palace-purple/20 transition-all duration-300 shrink-0 shadow-xl shadow-palace-purple/10 overflow-hidden",
             expandedPanel === "books" ? "w-72" : "w-44"
           )}
         >
-          <div className="h-10 border-b border-white/10 bg-white/5 flex items-center justify-between px-3">
+          <div className="h-10 border-b border-palace-purple/20 bg-gradient-to-r from-palace-purple/10 to-palace-teal/10 flex items-center justify-between px-3">
             <span className="text-sm font-medium flex items-center gap-2">
-              <Book className="h-4 w-4 text-primary" />
-              Books
+              <div className="p-1 rounded-md bg-palace-green/20">
+                <Book className="h-3.5 w-3.5 text-palace-green" />
+              </div>
+              <span className="bg-gradient-forest bg-clip-text text-transparent font-semibold">Books</span>
             </span>
-            <Button variant="ghost" size="icon" className="h-6 w-6 hover:bg-white/10" onClick={() => toggleExpand("books")}>
+            <Button variant="ghost" size="icon" className="h-6 w-6 hover:bg-palace-purple/20" onClick={() => toggleExpand("books")}>
               {expandedPanel === "books" ? <Minimize2 className="h-3 w-3" /> : <Maximize2 className="h-3 w-3" />}
             </Button>
           </div>
@@ -201,29 +212,31 @@ export const ResearchModeLayout = ({ onExitResearchMode }: ResearchModeLayoutPro
         </div>
 
         {/* Center Panel - Bible Text & Dictionaries */}
-        <div className="flex-1 flex flex-col min-w-0 overflow-hidden gap-2">
+        <div className="flex-1 flex flex-col min-w-0 overflow-hidden gap-3">
           {/* Bible Text - Top */}
           <div className={cn(
-            "rounded-xl bg-white/5 backdrop-blur-md border border-white/10 transition-all duration-300 shadow-xl shadow-black/10 overflow-hidden",
+            "rounded-2xl bg-gradient-to-b from-card/90 to-card/70 backdrop-blur-xl border border-palace-blue/20 transition-all duration-300 shadow-xl shadow-palace-blue/10 overflow-hidden",
             expandedPanel === "text" ? "flex-1" : "h-1/2"
           )}>
-            <div className="h-10 border-b border-white/10 bg-white/5 flex items-center justify-between px-3">
+            <div className="h-10 border-b border-palace-blue/20 bg-gradient-to-r from-palace-blue/10 via-palace-purple/5 to-palace-teal/10 flex items-center justify-between px-3">
               <div className="flex items-center gap-2">
-                <BookOpen className="h-4 w-4 text-primary" />
-                <span className="text-sm font-medium">Scripture</span>
+                <div className="p-1 rounded-md bg-palace-blue/20">
+                  <BookOpen className="h-3.5 w-3.5 text-palace-blue" />
+                </div>
+                <span className="text-sm font-semibold bg-gradient-ocean bg-clip-text text-transparent">Scripture</span>
                 {centerView === "single" && (
                   <Tabs value={translation} onValueChange={(v) => setTranslation(v as Translation)} className="h-8">
-                    <TabsList className="h-7 bg-white/10 border border-white/10">
-                      <TabsTrigger value="kjv" className="text-xs h-6 px-2 data-[state=active]:bg-primary/30">KJV</TabsTrigger>
-                      <TabsTrigger value="asv" className="text-xs h-6 px-2 data-[state=active]:bg-primary/30">ASV</TabsTrigger>
-                      <TabsTrigger value="web" className="text-xs h-6 px-2 data-[state=active]:bg-primary/30">WEB</TabsTrigger>
-                      <TabsTrigger value="ylt" className="text-xs h-6 px-2 data-[state=active]:bg-primary/30">YLT</TabsTrigger>
-                      <TabsTrigger value="darby" className="text-xs h-6 px-2 data-[state=active]:bg-primary/30">Darby</TabsTrigger>
+                    <TabsList className="h-7 bg-palace-purple/10 border border-palace-purple/20">
+                      <TabsTrigger value="kjv" className="text-xs h-6 px-2 data-[state=active]:bg-gradient-palace data-[state=active]:text-white data-[state=active]:shadow-md">KJV</TabsTrigger>
+                      <TabsTrigger value="asv" className="text-xs h-6 px-2 data-[state=active]:bg-gradient-palace data-[state=active]:text-white data-[state=active]:shadow-md">ASV</TabsTrigger>
+                      <TabsTrigger value="web" className="text-xs h-6 px-2 data-[state=active]:bg-gradient-palace data-[state=active]:text-white data-[state=active]:shadow-md">WEB</TabsTrigger>
+                      <TabsTrigger value="ylt" className="text-xs h-6 px-2 data-[state=active]:bg-gradient-palace data-[state=active]:text-white data-[state=active]:shadow-md">YLT</TabsTrigger>
+                      <TabsTrigger value="darby" className="text-xs h-6 px-2 data-[state=active]:bg-gradient-palace data-[state=active]:text-white data-[state=active]:shadow-md">Darby</TabsTrigger>
                     </TabsList>
                   </Tabs>
                 )}
               </div>
-              <Button variant="ghost" size="icon" className="h-6 w-6 hover:bg-white/10" onClick={() => toggleExpand("text")}>
+              <Button variant="ghost" size="icon" className="h-6 w-6 hover:bg-palace-blue/20" onClick={() => toggleExpand("text")}>
                 {expandedPanel === "text" ? <Minimize2 className="h-3 w-3" /> : <Maximize2 className="h-3 w-3" />}
               </Button>
             </div>
@@ -249,20 +262,22 @@ export const ResearchModeLayout = ({ onExitResearchMode }: ResearchModeLayoutPro
 
           {/* Dictionary Panel - Bottom */}
           {expandedPanel !== "text" && (
-            <div className="flex-1 min-h-0 rounded-xl bg-white/5 backdrop-blur-md border border-white/10 shadow-xl shadow-black/10 overflow-hidden">
-              <div className="h-10 border-b border-white/10 bg-white/5 flex items-center justify-between px-3">
+            <div className="flex-1 min-h-0 rounded-2xl bg-gradient-to-b from-card/90 to-card/70 backdrop-blur-xl border border-palace-orange/20 shadow-xl shadow-palace-orange/10 overflow-hidden">
+              <div className="h-10 border-b border-palace-orange/20 bg-gradient-to-r from-palace-orange/10 to-palace-yellow/10 flex items-center justify-between px-3">
                 <div className="flex items-center gap-2">
-                  <Languages className="h-4 w-4 text-primary" />
-                  <span className="text-sm font-medium">Dictionary</span>
+                  <div className="p-1 rounded-md bg-palace-orange/20">
+                    <Languages className="h-3.5 w-3.5 text-palace-orange" />
+                  </div>
+                  <span className="text-sm font-semibold bg-gradient-warmth bg-clip-text text-transparent">Dictionary</span>
                   <Tabs value={activeDictionary} onValueChange={setActiveDictionary} className="h-8">
-                    <TabsList className="h-7 bg-white/10 border border-white/10">
-                      <TabsTrigger value="strongs" className="text-xs h-6 px-2 data-[state=active]:bg-primary/30">Strong's</TabsTrigger>
-                      <TabsTrigger value="thayers" className="text-xs h-6 px-2 data-[state=active]:bg-primary/30">Thayer's</TabsTrigger>
-                      <TabsTrigger value="bdb" className="text-xs h-6 px-2 data-[state=active]:bg-primary/30">BDB</TabsTrigger>
+                    <TabsList className="h-7 bg-palace-orange/10 border border-palace-orange/20">
+                      <TabsTrigger value="strongs" className="text-xs h-6 px-2 data-[state=active]:bg-gradient-warmth data-[state=active]:text-white data-[state=active]:shadow-md">Strong's</TabsTrigger>
+                      <TabsTrigger value="thayers" className="text-xs h-6 px-2 data-[state=active]:bg-gradient-warmth data-[state=active]:text-white data-[state=active]:shadow-md">Thayer's</TabsTrigger>
+                      <TabsTrigger value="bdb" className="text-xs h-6 px-2 data-[state=active]:bg-gradient-warmth data-[state=active]:text-white data-[state=active]:shadow-md">BDB</TabsTrigger>
                     </TabsList>
                   </Tabs>
                 </div>
-                <Button variant="ghost" size="icon" className="h-6 w-6 hover:bg-white/10" onClick={() => toggleExpand("dictionary")}>
+                <Button variant="ghost" size="icon" className="h-6 w-6 hover:bg-palace-orange/20" onClick={() => toggleExpand("dictionary")}>
                   {expandedPanel === "dictionary" ? <Minimize2 className="h-3 w-3" /> : <Maximize2 className="h-3 w-3" />}
                 </Button>
               </div>
@@ -282,19 +297,19 @@ export const ResearchModeLayout = ({ onExitResearchMode }: ResearchModeLayoutPro
         {/* Right Panel - PT Tools & Commentary */}
         <div 
           className={cn(
-            "rounded-xl bg-white/5 backdrop-blur-md border border-white/10 transition-all duration-300 shrink-0 shadow-xl shadow-black/10 overflow-hidden flex flex-col",
+            "rounded-2xl bg-gradient-to-b from-card/90 to-card/70 backdrop-blur-xl border border-palace-pink/20 transition-all duration-300 shrink-0 shadow-xl shadow-palace-pink/10 overflow-hidden flex flex-col",
             expandedPanel === "commentary" ? "w-[500px]" : "w-80"
           )}
         >
           {/* Tab Categories */}
-          <div className="border-b border-white/10 bg-white/5 p-2">
+          <div className="border-b border-palace-pink/20 bg-gradient-to-r from-palace-purple/10 via-palace-pink/10 to-palace-teal/10 p-2">
             <div className="flex flex-wrap gap-1">
               {/* AI & Commentary */}
               <Button
                 size="sm"
                 variant={rightTab === "jeeves" ? "default" : "ghost"}
                 onClick={() => setRightTab("jeeves")}
-                className={cn("h-6 text-[10px] px-2", rightTab === "jeeves" && "bg-primary/80")}
+                className={cn("h-6 text-[10px] px-2 transition-all", rightTab === "jeeves" ? "bg-gradient-palace shadow-md shadow-palace-purple/30 text-white" : "hover:bg-palace-purple/20")}
               >
                 <Bot className="h-3 w-3 mr-1" />
                 Jeeves
@@ -303,7 +318,7 @@ export const ResearchModeLayout = ({ onExitResearchMode }: ResearchModeLayoutPro
                 size="sm"
                 variant={rightTab === "crossref" ? "default" : "ghost"}
                 onClick={() => setRightTab("crossref")}
-                className={cn("h-6 text-[10px] px-2", rightTab === "crossref" && "bg-primary/80")}
+                className={cn("h-6 text-[10px] px-2 transition-all", rightTab === "crossref" ? "bg-gradient-ocean shadow-md shadow-palace-blue/30 text-white" : "hover:bg-palace-blue/20")}
               >
                 <Link2 className="h-3 w-3 mr-1" />
                 Links
@@ -312,7 +327,7 @@ export const ResearchModeLayout = ({ onExitResearchMode }: ResearchModeLayoutPro
                 size="sm"
                 variant={rightTab === "genetics" ? "default" : "ghost"}
                 onClick={() => setRightTab("genetics")}
-                className={cn("h-6 text-[10px] px-2", rightTab === "genetics" && "bg-primary/80")}
+                className={cn("h-6 text-[10px] px-2 transition-all", rightTab === "genetics" ? "bg-gradient-forest shadow-md shadow-palace-green/30 text-white" : "hover:bg-palace-green/20")}
               >
                 <GitBranch className="h-3 w-3 mr-1" />
                 Genetics
@@ -321,20 +336,20 @@ export const ResearchModeLayout = ({ onExitResearchMode }: ResearchModeLayoutPro
                 size="sm"
                 variant={rightTab === "notes" ? "default" : "ghost"}
                 onClick={() => setRightTab("notes")}
-                className={cn("h-6 text-[10px] px-2", rightTab === "notes" && "bg-amber-600/80")}
+                className={cn("h-6 text-[10px] px-2 transition-all", rightTab === "notes" ? "bg-gradient-warmth shadow-md shadow-palace-orange/30 text-white" : "hover:bg-palace-orange/20")}
               >
                 <StickyNote className="h-3 w-3 mr-1" />
                 Notes
               </Button>
               
-              <div className="w-px h-4 bg-white/20 mx-1 self-center" />
+              <div className="w-px h-4 bg-gradient-to-b from-transparent via-palace-purple/40 to-transparent mx-1 self-center" />
               
               {/* PT Tools */}
               <Button
                 size="sm"
                 variant={rightTab === "palace" ? "default" : "ghost"}
                 onClick={() => setRightTab("palace")}
-                className={cn("h-6 text-[10px] px-2", rightTab === "palace" && "bg-primary/80")}
+                className={cn("h-6 text-[10px] px-2 transition-all", rightTab === "palace" ? "bg-gradient-royal shadow-md shadow-palace-purple/30 text-white" : "hover:bg-palace-purple/20")}
               >
                 <Building2 className="h-3 w-3 mr-1" />
                 Palace
@@ -343,7 +358,7 @@ export const ResearchModeLayout = ({ onExitResearchMode }: ResearchModeLayoutPro
                 size="sm"
                 variant={rightTab === "cycles" ? "default" : "ghost"}
                 onClick={() => setRightTab("cycles")}
-                className={cn("h-6 text-[10px] px-2", rightTab === "cycles" && "bg-primary/80")}
+                className={cn("h-6 text-[10px] px-2 transition-all", rightTab === "cycles" ? "bg-gradient-ocean shadow-md shadow-palace-teal/30 text-white" : "hover:bg-palace-teal/20")}
               >
                 <RotateCcw className="h-3 w-3 mr-1" />
                 Cycles
@@ -352,7 +367,7 @@ export const ResearchModeLayout = ({ onExitResearchMode }: ResearchModeLayoutPro
                 size="sm"
                 variant={rightTab === "heavens" ? "default" : "ghost"}
                 onClick={() => setRightTab("heavens")}
-                className={cn("h-6 text-[10px] px-2", rightTab === "heavens" && "bg-primary/80")}
+                className={cn("h-6 text-[10px] px-2 transition-all", rightTab === "heavens" ? "bg-gradient-to-r from-palace-blue to-palace-purple shadow-md shadow-palace-blue/30 text-white" : "hover:bg-palace-blue/20")}
               >
                 <Layers className="h-3 w-3 mr-1" />
                 3H
@@ -361,7 +376,7 @@ export const ResearchModeLayout = ({ onExitResearchMode }: ResearchModeLayoutPro
                 size="sm"
                 variant={rightTab === "sanctuary" ? "default" : "ghost"}
                 onClick={() => setRightTab("sanctuary")}
-                className={cn("h-6 text-[10px] px-2", rightTab === "sanctuary" && "bg-primary/80")}
+                className={cn("h-6 text-[10px] px-2 transition-all", rightTab === "sanctuary" ? "bg-gradient-warmth shadow-md shadow-palace-yellow/30 text-white" : "hover:bg-palace-yellow/20")}
               >
                 <Landmark className="h-3 w-3 mr-1" />
                 Sanct.
@@ -370,7 +385,7 @@ export const ResearchModeLayout = ({ onExitResearchMode }: ResearchModeLayoutPro
                 size="sm"
                 variant={rightTab === "ascensions" ? "default" : "ghost"}
                 onClick={() => setRightTab("ascensions")}
-                className={cn("h-6 text-[10px] px-2", rightTab === "ascensions" && "bg-primary/80")}
+                className={cn("h-6 text-[10px] px-2 transition-all", rightTab === "ascensions" ? "bg-gradient-forest shadow-md shadow-palace-green/30 text-white" : "hover:bg-palace-green/20")}
               >
                 <ArrowUpRight className="h-3 w-3 mr-1" />
                 5Asc
@@ -379,10 +394,12 @@ export const ResearchModeLayout = ({ onExitResearchMode }: ResearchModeLayoutPro
           </div>
 
           {/* Panel Header */}
-          <div className="h-10 border-b border-white/10 bg-white/5 flex items-center justify-between px-3">
+          <div className="h-10 border-b border-palace-pink/20 bg-gradient-to-r from-palace-purple/5 to-palace-pink/5 flex items-center justify-between px-3">
             <div className="flex items-center gap-2">
-              <MessageSquare className="h-4 w-4 text-primary" />
-              <span className="text-sm font-medium">
+              <div className="p-1 rounded-md bg-palace-purple/20">
+                <MessageSquare className="h-3.5 w-3.5 text-palace-purple" />
+              </div>
+              <span className="text-sm font-semibold bg-gradient-palace bg-clip-text text-transparent">
                 {rightTab === "jeeves" && "Jeeves AI Commentary"}
                 {rightTab === "crossref" && "Cross References"}
                 {rightTab === "genetics" && "Verse Genetics"}
@@ -394,7 +411,7 @@ export const ResearchModeLayout = ({ onExitResearchMode }: ResearchModeLayoutPro
                 {rightTab === "ascensions" && "Five Ascensions"}
               </span>
             </div>
-            <Button variant="ghost" size="icon" className="h-6 w-6 hover:bg-white/10" onClick={() => toggleExpand("commentary")}>
+            <Button variant="ghost" size="icon" className="h-6 w-6 hover:bg-palace-purple/20" onClick={() => toggleExpand("commentary")}>
               {expandedPanel === "commentary" ? <Minimize2 className="h-3 w-3" /> : <Maximize2 className="h-3 w-3" />}
             </Button>
           </div>
