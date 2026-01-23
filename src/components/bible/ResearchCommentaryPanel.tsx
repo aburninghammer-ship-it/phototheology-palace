@@ -94,61 +94,6 @@ export const ResearchCommentaryPanel = ({
 
   return (
     <div className="p-3 space-y-3">
-      {/* Tab Navigation - Glassy */}
-      <div className="bg-background/40 backdrop-blur-xl rounded-xl border border-white/10 p-2 shadow-lg shadow-palace-purple/5">
-        <div className="grid grid-cols-3 gap-1">
-          {TABS.slice(0, 3).map((tab) => (
-            <button
-              key={tab.id}
-              onClick={() => setActiveTab(tab.id)}
-              className={cn(
-                "flex items-center justify-center gap-1.5 px-2 py-1.5 rounded-lg text-xs font-medium transition-all",
-                activeTab === tab.id
-                  ? "bg-primary text-primary-foreground shadow-md shadow-primary/30"
-                  : "text-muted-foreground hover:text-foreground hover:bg-white/5"
-              )}
-            >
-              <tab.icon className="h-3.5 w-3.5" />
-              {tab.label}
-            </button>
-          ))}
-        </div>
-        <div className="grid grid-cols-3 gap-1 mt-1">
-          {TABS.slice(3, 6).map((tab) => (
-            <button
-              key={tab.id}
-              onClick={() => setActiveTab(tab.id)}
-              className={cn(
-                "flex items-center justify-center gap-1.5 px-2 py-1.5 rounded-lg text-xs font-medium transition-all",
-                activeTab === tab.id
-                  ? "bg-primary text-primary-foreground shadow-md shadow-primary/30"
-                  : "text-muted-foreground hover:text-foreground hover:bg-white/5"
-              )}
-            >
-              <tab.icon className="h-3.5 w-3.5" />
-              {tab.label}
-            </button>
-          ))}
-        </div>
-        <div className="grid grid-cols-3 gap-1 mt-1">
-          {TABS.slice(6, 9).map((tab) => (
-            <button
-              key={tab.id}
-              onClick={() => setActiveTab(tab.id)}
-              className={cn(
-                "flex items-center justify-center gap-1.5 px-2 py-1.5 rounded-lg text-xs font-medium transition-all",
-                activeTab === tab.id
-                  ? "bg-primary text-primary-foreground shadow-md shadow-primary/30"
-                  : "text-muted-foreground hover:text-foreground hover:bg-white/5"
-              )}
-            >
-              <tab.icon className="h-3.5 w-3.5" />
-              {tab.label}
-            </button>
-          ))}
-        </div>
-      </div>
-
       {/* Verse Reference - Glassy */}
       <div className="bg-background/30 backdrop-blur-xl rounded-xl border border-white/10 p-3 shadow-lg shadow-palace-blue/5">
         <div className="flex items-center justify-between mb-2">
