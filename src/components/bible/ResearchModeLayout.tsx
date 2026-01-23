@@ -63,13 +63,13 @@ export const ResearchModeLayout = ({ onExitResearchMode }: ResearchModeLayoutPro
   const navigateChapter = (direction: "prev" | "next") => {
     const newChapter = direction === "prev" ? chapter - 1 : chapter + 1;
     if (newChapter > 0) {
-      navigate(`/bible/${book}/${newChapter}`);
+      navigate(`/bible/${book}/${newChapter}?mode=research`);
       setSelectedVerse(null);
     }
   };
 
   const handleBookSelect = (selectedBook: string, selectedChapter: number) => {
-    navigate(`/bible/${selectedBook}/${selectedChapter}`);
+    navigate(`/bible/${selectedBook}/${selectedChapter}?mode=research`);
     setSelectedVerse(null);
   };
 
@@ -82,19 +82,27 @@ export const ResearchModeLayout = ({ onExitResearchMode }: ResearchModeLayoutPro
     : "";
 
   return (
-    <div className="h-screen flex flex-col bg-background overflow-hidden">
-      {/* Top Toolbar */}
-      <div className="h-12 border-b bg-card/50 backdrop-blur-sm flex items-center justify-between px-4 shrink-0">
+    <div className="h-screen flex flex-col bg-gradient-to-br from-background via-background to-primary/5 overflow-hidden">
+      {/* Top Toolbar - Glass */}
+      <div className="h-14 border-b border-white/10 bg-white/5 backdrop-blur-xl flex items-center justify-between px-4 shrink-0 shadow-lg shadow-black/5">
         <div className="flex items-center gap-3">
-          <Button variant="ghost" size="sm" onClick={onExitResearchMode}>
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            onClick={onExitResearchMode}
+            className="bg-white/10 hover:bg-white/20 border border-white/10"
+          >
             <X className="h-4 w-4 mr-2" />
             Exit Research Mode
           </Button>
-          <div className="h-4 w-px bg-border" />
-          <span className="font-serif text-lg font-semibold bg-gradient-palace bg-clip-text text-transparent">
-            {book} {chapter}
-          </span>
-          <Badge variant="outline" className="text-xs">
+          <div className="h-6 w-px bg-white/20" />
+          <div className="flex items-center gap-2">
+            <BookOpen className="h-5 w-5 text-primary" />
+            <span className="font-serif text-xl font-semibold bg-gradient-palace bg-clip-text text-transparent">
+              {book} {chapter}
+            </span>
+          </div>
+          <Badge variant="outline" className="text-xs bg-white/10 border-white/20">
             {chapterData?.verses.length || 0} verses
           </Badge>
         </div>
@@ -105,6 +113,7 @@ export const ResearchModeLayout = ({ onExitResearchMode }: ResearchModeLayoutPro
             size="sm"
             onClick={() => navigateChapter("prev")}
             disabled={chapter <= 1}
+            className="bg-white/10 hover:bg-white/20 border border-white/10"
           >
             <ChevronLeft className="h-4 w-4" />
           </Button>
@@ -112,6 +121,7 @@ export const ResearchModeLayout = ({ onExitResearchMode }: ResearchModeLayoutPro
             variant="ghost"
             size="sm"
             onClick={() => navigateChapter("next")}
+            className="bg-white/10 hover:bg-white/20 border border-white/10"
           >
             <ChevronRight className="h-4 w-4" />
           </Button>
@@ -119,20 +129,20 @@ export const ResearchModeLayout = ({ onExitResearchMode }: ResearchModeLayoutPro
       </div>
 
       {/* Main Content - 3 Column Layout */}
-      <div className="flex-1 flex overflow-hidden">
-        {/* Left Panel - Bible Books */}
+      <div className="flex-1 flex overflow-hidden p-2 gap-2">
+        {/* Left Panel - Bible Books - Glass */}
         <div 
           className={cn(
-            "border-r bg-card/30 transition-all duration-300 shrink-0",
-            expandedPanel === "books" ? "w-80" : "w-48"
+            "rounded-xl bg-white/5 backdrop-blur-md border border-white/10 transition-all duration-300 shrink-0 shadow-xl shadow-black/10 overflow-hidden",
+            expandedPanel === "books" ? "w-80" : "w-52"
           )}
         >
-          <div className="h-10 border-b bg-muted/30 flex items-center justify-between px-3">
+          <div className="h-10 border-b border-white/10 bg-white/5 flex items-center justify-between px-3">
             <span className="text-sm font-medium flex items-center gap-2">
-              <Book className="h-4 w-4" />
+              <Book className="h-4 w-4 text-primary" />
               Bible Books
             </span>
-            <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => toggleExpand("books")}>
+            <Button variant="ghost" size="icon" className="h-6 w-6 hover:bg-white/10" onClick={() => toggleExpand("books")}>
               {expandedPanel === "books" ? <Minimize2 className="h-3 w-3" /> : <Maximize2 className="h-3 w-3" />}
             </Button>
           </div>
@@ -146,25 +156,26 @@ export const ResearchModeLayout = ({ onExitResearchMode }: ResearchModeLayoutPro
           </ScrollArea>
         </div>
 
-        {/* Center Panel - Bible Text & Dictionaries */}
-        <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
+        {/* Center Panel - Bible Text & Dictionaries - Glass */}
+        <div className="flex-1 flex flex-col min-w-0 overflow-hidden gap-2">
           {/* Bible Text - Top */}
           <div className={cn(
-            "border-b transition-all duration-300",
+            "rounded-xl bg-white/5 backdrop-blur-md border border-white/10 transition-all duration-300 shadow-xl shadow-black/10 overflow-hidden",
             expandedPanel === "text" ? "flex-1" : "h-1/2"
           )}>
-            <div className="h-10 border-b bg-muted/30 flex items-center justify-between px-3">
+            <div className="h-10 border-b border-white/10 bg-white/5 flex items-center justify-between px-3">
               <div className="flex items-center gap-2">
-                <span className="text-sm font-medium">Bibles</span>
+                <BookOpen className="h-4 w-4 text-primary" />
+                <span className="text-sm font-medium">Scripture</span>
                 <Tabs value={translation} onValueChange={(v) => setTranslation(v as Translation)} className="h-8">
-                  <TabsList className="h-7">
-                    <TabsTrigger value="kjv" className="text-xs h-6 px-2">KJV</TabsTrigger>
-                    <TabsTrigger value="asv" className="text-xs h-6 px-2">ASV</TabsTrigger>
-                    <TabsTrigger value="web" className="text-xs h-6 px-2">WEB</TabsTrigger>
+                  <TabsList className="h-7 bg-white/10 border border-white/10">
+                    <TabsTrigger value="kjv" className="text-xs h-6 px-2 data-[state=active]:bg-primary/30">KJV</TabsTrigger>
+                    <TabsTrigger value="asv" className="text-xs h-6 px-2 data-[state=active]:bg-primary/30">ASV</TabsTrigger>
+                    <TabsTrigger value="web" className="text-xs h-6 px-2 data-[state=active]:bg-primary/30">WEB</TabsTrigger>
                   </TabsList>
                 </Tabs>
               </div>
-              <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => toggleExpand("text")}>
+              <Button variant="ghost" size="icon" className="h-6 w-6 hover:bg-white/10" onClick={() => toggleExpand("text")}>
                 {expandedPanel === "text" ? <Minimize2 className="h-3 w-3" /> : <Maximize2 className="h-3 w-3" />}
               </Button>
             </div>
@@ -180,20 +191,20 @@ export const ResearchModeLayout = ({ onExitResearchMode }: ResearchModeLayoutPro
 
           {/* Dictionary Panel - Bottom */}
           {expandedPanel !== "text" && (
-            <div className="flex-1 min-h-0">
-              <div className="h-10 border-b bg-muted/30 flex items-center justify-between px-3">
+            <div className="flex-1 min-h-0 rounded-xl bg-white/5 backdrop-blur-md border border-white/10 shadow-xl shadow-black/10 overflow-hidden">
+              <div className="h-10 border-b border-white/10 bg-white/5 flex items-center justify-between px-3">
                 <div className="flex items-center gap-2">
-                  <Languages className="h-4 w-4" />
+                  <Languages className="h-4 w-4 text-primary" />
                   <span className="text-sm font-medium">Dictionaries</span>
                   <Tabs value={activeDictionary} onValueChange={setActiveDictionary} className="h-8">
-                    <TabsList className="h-7">
-                      <TabsTrigger value="strongs" className="text-xs h-6 px-2">Strong's</TabsTrigger>
-                      <TabsTrigger value="thayers" className="text-xs h-6 px-2">Thayer's</TabsTrigger>
-                      <TabsTrigger value="bdb" className="text-xs h-6 px-2">BDB</TabsTrigger>
+                    <TabsList className="h-7 bg-white/10 border border-white/10">
+                      <TabsTrigger value="strongs" className="text-xs h-6 px-2 data-[state=active]:bg-primary/30">Strong's</TabsTrigger>
+                      <TabsTrigger value="thayers" className="text-xs h-6 px-2 data-[state=active]:bg-primary/30">Thayer's</TabsTrigger>
+                      <TabsTrigger value="bdb" className="text-xs h-6 px-2 data-[state=active]:bg-primary/30">BDB</TabsTrigger>
                     </TabsList>
                   </Tabs>
                 </div>
-                <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => toggleExpand("dictionary")}>
+                <Button variant="ghost" size="icon" className="h-6 w-6 hover:bg-white/10" onClick={() => toggleExpand("dictionary")}>
                   {expandedPanel === "dictionary" ? <Minimize2 className="h-3 w-3" /> : <Maximize2 className="h-3 w-3" />}
                 </Button>
               </div>
@@ -210,35 +221,35 @@ export const ResearchModeLayout = ({ onExitResearchMode }: ResearchModeLayoutPro
           )}
         </div>
 
-        {/* Right Panel - Commentaries */}
+        {/* Right Panel - Commentaries - Glass */}
         <div 
           className={cn(
-            "border-l bg-card/30 transition-all duration-300 shrink-0",
+            "rounded-xl bg-white/5 backdrop-blur-md border border-white/10 transition-all duration-300 shrink-0 shadow-xl shadow-black/10 overflow-hidden",
             expandedPanel === "commentary" ? "w-[500px]" : "w-80"
           )}
         >
-          <div className="h-10 border-b bg-muted/30 flex items-center justify-between px-3">
+          <div className="h-10 border-b border-white/10 bg-white/5 flex items-center justify-between px-3">
             <div className="flex items-center gap-2">
-              <MessageSquare className="h-4 w-4" />
-              <span className="text-sm font-medium">Commentaries</span>
+              <MessageSquare className="h-4 w-4 text-primary" />
+              <span className="text-sm font-medium">Commentary</span>
               <Tabs value={activeCommentary} onValueChange={setActiveCommentary} className="h-8">
-                <TabsList className="h-7">
-                  <TabsTrigger value="jeeves" className="text-xs h-6 px-2">
+                <TabsList className="h-7 bg-white/10 border border-white/10">
+                  <TabsTrigger value="jeeves" className="text-xs h-6 px-2 data-[state=active]:bg-primary/30">
                     <Bot className="h-3 w-3 mr-1" />
                     Jeeves
                   </TabsTrigger>
-                  <TabsTrigger value="principles" className="text-xs h-6 px-2">
+                  <TabsTrigger value="principles" className="text-xs h-6 px-2 data-[state=active]:bg-primary/30">
                     <Sparkles className="h-3 w-3 mr-1" />
                     PT
                   </TabsTrigger>
-                  <TabsTrigger value="crossref" className="text-xs h-6 px-2">
+                  <TabsTrigger value="crossref" className="text-xs h-6 px-2 data-[state=active]:bg-primary/30">
                     <Link2 className="h-3 w-3 mr-1" />
                     Links
                   </TabsTrigger>
                 </TabsList>
               </Tabs>
             </div>
-            <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => toggleExpand("commentary")}>
+            <Button variant="ghost" size="icon" className="h-6 w-6 hover:bg-white/10" onClick={() => toggleExpand("commentary")}>
               {expandedPanel === "commentary" ? <Minimize2 className="h-3 w-3" /> : <Maximize2 className="h-3 w-3" />}
             </Button>
           </div>

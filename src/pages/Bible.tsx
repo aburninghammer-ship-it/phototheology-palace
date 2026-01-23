@@ -1,10 +1,10 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Navigation } from "@/components/Navigation";
 import { BibleReader } from "@/components/bible/BibleReader";
 import { BibleNavigation } from "@/components/bible/BibleNavigation";
 import { Button } from "@/components/ui/button";
 import { BookMarked, HelpCircle, Headphones, FlaskConical } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import { StudyBibleDemoDialog } from "@/components/bible/StudyBibleDemoDialog";
 import { VoiceChatWidget } from "@/components/voice/VoiceChatWidget";
 import { useAuth } from "@/hooks/useAuth";
@@ -15,7 +15,16 @@ import { ResearchModeLayout } from "@/components/bible/ResearchModeLayout";
 const Bible = () => {
   const { user } = useAuth();
   const [demoOpen, setDemoOpen] = useState(false);
-  const [researchMode, setResearchMode] = useState(false);
+  const [searchParams, setSearchParams] = useSearchParams();
+  const researchMode = searchParams.get("mode") === "research";
+
+  const setResearchMode = (enabled: boolean) => {
+    if (enabled) {
+      setSearchParams({ mode: "research" });
+    } else {
+      setSearchParams({});
+    }
+  };
   
   // Enable scroll position preservation for this page
   usePreservePage();
