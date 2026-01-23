@@ -1018,6 +1018,63 @@ export type Database = {
           },
         ]
       }
+      church_branding: {
+        Row: {
+          accent_color: string | null
+          banner_url: string | null
+          church_id: string
+          created_at: string | null
+          custom_css: string | null
+          id: string
+          logo_url: string | null
+          primary_color: string | null
+          secondary_color: string | null
+          tagline: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          accent_color?: string | null
+          banner_url?: string | null
+          church_id: string
+          created_at?: string | null
+          custom_css?: string | null
+          id?: string
+          logo_url?: string | null
+          primary_color?: string | null
+          secondary_color?: string | null
+          tagline?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          accent_color?: string | null
+          banner_url?: string | null
+          church_id?: string
+          created_at?: string | null
+          custom_css?: string | null
+          id?: string
+          logo_url?: string | null
+          primary_color?: string | null
+          secondary_color?: string | null
+          tagline?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "church_branding_church_id_fkey"
+            columns: ["church_id"]
+            isOneToOne: true
+            referencedRelation: "churches"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "church_branding_church_id_fkey"
+            columns: ["church_id"]
+            isOneToOne: true
+            referencedRelation: "churches_public_info"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       church_campaign_participation: {
         Row: {
           campaign_id: string
@@ -1612,8 +1669,12 @@ export type Database = {
           end_date: string | null
           event_date: string
           id: string
+          is_recurring: boolean | null
           location: string | null
           max_attendees: number | null
+          parent_event_id: string | null
+          recurrence_end_date: string | null
+          recurrence_rule: string | null
           title: string
           updated_at: string | null
         }
@@ -1626,8 +1687,12 @@ export type Database = {
           end_date?: string | null
           event_date: string
           id?: string
+          is_recurring?: boolean | null
           location?: string | null
           max_attendees?: number | null
+          parent_event_id?: string | null
+          recurrence_end_date?: string | null
+          recurrence_rule?: string | null
           title: string
           updated_at?: string | null
         }
@@ -1640,8 +1705,12 @@ export type Database = {
           end_date?: string | null
           event_date?: string
           id?: string
+          is_recurring?: boolean | null
           location?: string | null
           max_attendees?: number | null
+          parent_event_id?: string | null
+          recurrence_end_date?: string | null
+          recurrence_rule?: string | null
           title?: string
           updated_at?: string | null
         }
@@ -1658,6 +1727,13 @@ export type Database = {
             columns: ["church_id"]
             isOneToOne: false
             referencedRelation: "churches_public_info"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "church_events_parent_event_id_fkey"
+            columns: ["parent_event_id"]
+            isOneToOne: false
+            referencedRelation: "church_events"
             referencedColumns: ["id"]
           },
         ]
@@ -1773,6 +1849,63 @@ export type Database = {
           },
         ]
       }
+      church_livestreams: {
+        Row: {
+          church_id: string
+          created_at: string | null
+          created_by: string | null
+          embed_url: string
+          ended_at: string | null
+          id: string
+          is_live: boolean | null
+          platform: string
+          scheduled_at: string | null
+          title: string
+          updated_at: string | null
+        }
+        Insert: {
+          church_id: string
+          created_at?: string | null
+          created_by?: string | null
+          embed_url: string
+          ended_at?: string | null
+          id?: string
+          is_live?: boolean | null
+          platform: string
+          scheduled_at?: string | null
+          title: string
+          updated_at?: string | null
+        }
+        Update: {
+          church_id?: string
+          created_at?: string | null
+          created_by?: string | null
+          embed_url?: string
+          ended_at?: string | null
+          id?: string
+          is_live?: boolean | null
+          platform?: string
+          scheduled_at?: string | null
+          title?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "church_livestreams_church_id_fkey"
+            columns: ["church_id"]
+            isOneToOne: false
+            referencedRelation: "churches"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "church_livestreams_church_id_fkey"
+            columns: ["church_id"]
+            isOneToOne: false
+            referencedRelation: "churches_public_info"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       church_members: {
         Row: {
           church_id: string
@@ -1808,6 +1941,45 @@ export type Database = {
           },
           {
             foreignKeyName: "church_members_church_id_fkey"
+            columns: ["church_id"]
+            isOneToOne: false
+            referencedRelation: "churches_public_info"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      church_permissions: {
+        Row: {
+          church_id: string
+          created_at: string | null
+          id: string
+          permission: string
+          role: string
+        }
+        Insert: {
+          church_id: string
+          created_at?: string | null
+          id?: string
+          permission: string
+          role: string
+        }
+        Update: {
+          church_id?: string
+          created_at?: string | null
+          id?: string
+          permission?: string
+          role?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "church_permissions_church_id_fkey"
+            columns: ["church_id"]
+            isOneToOne: false
+            referencedRelation: "churches"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "church_permissions_church_id_fkey"
             columns: ["church_id"]
             isOneToOne: false
             referencedRelation: "churches_public_info"
@@ -2504,6 +2676,63 @@ export type Database = {
           },
         ]
       }
+      content_analytics: {
+        Row: {
+          avg_time_spent: number | null
+          church_id: string
+          completions: number | null
+          content_id: string
+          content_type: string
+          created_at: string | null
+          date: string
+          id: string
+          shares: number | null
+          unique_views: number | null
+          views: number | null
+        }
+        Insert: {
+          avg_time_spent?: number | null
+          church_id: string
+          completions?: number | null
+          content_id: string
+          content_type: string
+          created_at?: string | null
+          date?: string
+          id?: string
+          shares?: number | null
+          unique_views?: number | null
+          views?: number | null
+        }
+        Update: {
+          avg_time_spent?: number | null
+          church_id?: string
+          completions?: number | null
+          content_id?: string
+          content_type?: string
+          created_at?: string | null
+          date?: string
+          id?: string
+          shares?: number | null
+          unique_views?: number | null
+          views?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "content_analytics_church_id_fkey"
+            columns: ["church_id"]
+            isOneToOne: false
+            referencedRelation: "churches"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "content_analytics_church_id_fkey"
+            columns: ["church_id"]
+            isOneToOne: false
+            referencedRelation: "churches_public_info"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       conversations: {
         Row: {
           created_at: string
@@ -2527,6 +2756,105 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      course_discussion_replies: {
+        Row: {
+          content: string
+          created_at: string | null
+          discussion_id: string
+          id: string
+          parent_reply_id: string | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          content: string
+          created_at?: string | null
+          discussion_id: string
+          id?: string
+          parent_reply_id?: string | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          content?: string
+          created_at?: string | null
+          discussion_id?: string
+          id?: string
+          parent_reply_id?: string | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "course_discussion_replies_discussion_id_fkey"
+            columns: ["discussion_id"]
+            isOneToOne: false
+            referencedRelation: "course_discussions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "course_discussion_replies_parent_reply_id_fkey"
+            columns: ["parent_reply_id"]
+            isOneToOne: false
+            referencedRelation: "course_discussion_replies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      course_discussions: {
+        Row: {
+          church_id: string | null
+          content: string
+          course_id: string
+          course_type: string
+          created_at: string | null
+          id: string
+          is_pinned: boolean | null
+          title: string
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          church_id?: string | null
+          content: string
+          course_id: string
+          course_type: string
+          created_at?: string | null
+          id?: string
+          is_pinned?: boolean | null
+          title: string
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          church_id?: string | null
+          content?: string
+          course_id?: string
+          course_type?: string
+          created_at?: string | null
+          id?: string
+          is_pinned?: boolean | null
+          title?: string
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "course_discussions_church_id_fkey"
+            columns: ["church_id"]
+            isOneToOne: false
+            referencedRelation: "churches"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "course_discussions_church_id_fkey"
+            columns: ["church_id"]
+            isOneToOne: false
+            referencedRelation: "churches_public_info"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       course_progress: {
         Row: {
@@ -8715,6 +9043,7 @@ export type Database = {
           chain_chess_streak: number | null
           change_phase: string | null
           cohort_date: string | null
+          cover_photo_url: string | null
           created_at: string | null
           current_floor: number | null
           daily_study_streak: number | null
@@ -8737,7 +9066,9 @@ export type Database = {
           has_lifetime_access: boolean
           has_seen_community_guidelines: boolean | null
           id: string
+          interests: string[] | null
           is_kid_mode: boolean | null
+          is_profile_public: boolean | null
           is_recurring: boolean | null
           is_student: boolean | null
           last_activity_date: string | null
@@ -8752,6 +9083,7 @@ export type Database = {
           longest_study_streak: number | null
           looking_for_partner: boolean | null
           master_title: string | null
+          ministry_tags: string[] | null
           onboarding_completed: boolean | null
           onboarding_completed_at: string | null
           onboarding_step: number | null
@@ -8765,6 +9097,7 @@ export type Database = {
           promotional_access_expires_at: string | null
           referral_code: string | null
           selected_path: string | null
+          social_links: Json | null
           stripe_customer_id: string | null
           stripe_subscription_id: string | null
           student_expires_at: string | null
@@ -8790,6 +9123,7 @@ export type Database = {
           chain_chess_streak?: number | null
           change_phase?: string | null
           cohort_date?: string | null
+          cover_photo_url?: string | null
           created_at?: string | null
           current_floor?: number | null
           daily_study_streak?: number | null
@@ -8812,7 +9146,9 @@ export type Database = {
           has_lifetime_access?: boolean
           has_seen_community_guidelines?: boolean | null
           id: string
+          interests?: string[] | null
           is_kid_mode?: boolean | null
+          is_profile_public?: boolean | null
           is_recurring?: boolean | null
           is_student?: boolean | null
           last_activity_date?: string | null
@@ -8827,6 +9163,7 @@ export type Database = {
           longest_study_streak?: number | null
           looking_for_partner?: boolean | null
           master_title?: string | null
+          ministry_tags?: string[] | null
           onboarding_completed?: boolean | null
           onboarding_completed_at?: string | null
           onboarding_step?: number | null
@@ -8840,6 +9177,7 @@ export type Database = {
           promotional_access_expires_at?: string | null
           referral_code?: string | null
           selected_path?: string | null
+          social_links?: Json | null
           stripe_customer_id?: string | null
           stripe_subscription_id?: string | null
           student_expires_at?: string | null
@@ -8865,6 +9203,7 @@ export type Database = {
           chain_chess_streak?: number | null
           change_phase?: string | null
           cohort_date?: string | null
+          cover_photo_url?: string | null
           created_at?: string | null
           current_floor?: number | null
           daily_study_streak?: number | null
@@ -8887,7 +9226,9 @@ export type Database = {
           has_lifetime_access?: boolean
           has_seen_community_guidelines?: boolean | null
           id?: string
+          interests?: string[] | null
           is_kid_mode?: boolean | null
+          is_profile_public?: boolean | null
           is_recurring?: boolean | null
           is_student?: boolean | null
           last_activity_date?: string | null
@@ -8902,6 +9243,7 @@ export type Database = {
           longest_study_streak?: number | null
           looking_for_partner?: boolean | null
           master_title?: string | null
+          ministry_tags?: string[] | null
           onboarding_completed?: boolean | null
           onboarding_completed_at?: string | null
           onboarding_step?: number | null
@@ -8915,6 +9257,7 @@ export type Database = {
           promotional_access_expires_at?: string | null
           referral_code?: string | null
           selected_path?: string | null
+          social_links?: Json | null
           stripe_customer_id?: string | null
           stripe_subscription_id?: string | null
           student_expires_at?: string | null
@@ -13503,6 +13846,48 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      user_calendar_sync: {
+        Row: {
+          access_token: string | null
+          calendar_id: string | null
+          created_at: string | null
+          id: string
+          last_synced_at: string | null
+          provider: string
+          refresh_token: string | null
+          sync_enabled: boolean | null
+          token_expires_at: string | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          access_token?: string | null
+          calendar_id?: string | null
+          created_at?: string | null
+          id?: string
+          last_synced_at?: string | null
+          provider: string
+          refresh_token?: string | null
+          sync_enabled?: boolean | null
+          token_expires_at?: string | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          access_token?: string | null
+          calendar_id?: string | null
+          created_at?: string | null
+          id?: string
+          last_synced_at?: string | null
+          provider?: string
+          refresh_token?: string | null
+          sync_enabled?: boolean | null
+          token_expires_at?: string | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
       }
       user_drill_completions: {
         Row: {
