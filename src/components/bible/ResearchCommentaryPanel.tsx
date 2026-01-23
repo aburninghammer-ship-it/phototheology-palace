@@ -223,31 +223,38 @@ export const ResearchCommentaryPanel = ({
         )}
 
         {activeTab === "palace" && (
-          <div className="space-y-3">
-            <p className="text-xs text-muted-foreground mb-2">Palace Rooms & Floors</p>
-            <div className="space-y-2 max-h-[300px] overflow-y-auto">
+          <div className="space-y-2">
+            <p className="text-xs text-muted-foreground">All 8 Floors · 37 Rooms</p>
+            <div className="space-y-2 max-h-[350px] overflow-y-auto pr-1">
               {palaceFloors?.map((floor) => (
-                <div key={floor.number} className="bg-background/40 rounded-lg p-2 border border-white/5">
-                  <div className="flex items-center gap-2 mb-1.5">
-                    <Badge variant="outline" className="text-[10px] bg-palace-purple/20 border-palace-purple/30">
-                      Floor {floor.number}
+                <div key={floor.number} className="bg-background/40 rounded-lg p-2.5 border border-white/10 hover:border-palace-purple/30 transition-colors">
+                  <div className="flex items-center gap-2 mb-2">
+                    <Badge className="text-[10px] bg-gradient-palace text-white border-0 shadow-sm">
+                      F{floor.number}
                     </Badge>
-                    <span className="text-xs font-medium">{floor.name}</span>
+                    <span className="text-xs font-semibold text-foreground">{floor.name}</span>
+                    <span className="text-[10px] text-muted-foreground">· {floor.subtitle}</span>
                   </div>
-                  <div className="flex flex-wrap gap-1">
+                  <div className="grid grid-cols-2 gap-1">
                     {floor.rooms.map((room) => (
-                      <Badge 
+                      <div 
                         key={room.id} 
-                        variant="secondary" 
-                        className="text-[10px] cursor-pointer hover:bg-primary/20 transition-colors"
+                        className="flex items-center gap-1.5 p-1.5 rounded-md bg-background/50 hover:bg-primary/10 cursor-pointer transition-colors border border-white/5 hover:border-primary/20"
                       >
-                        {room.tag} - {room.name}
-                      </Badge>
+                        <Badge variant="outline" className="text-[9px] px-1 py-0 bg-palace-blue/10 border-palace-blue/20 font-mono">
+                          {room.tag}
+                        </Badge>
+                        <span className="text-[10px] text-foreground truncate">{room.name}</span>
+                      </div>
                     ))}
                   </div>
                 </div>
               ))}
             </div>
+            <Button variant="outline" size="sm" className="w-full mt-2">
+              <Building2 className="h-3.5 w-3.5 mr-2" />
+              Analyze with Palace Principles
+            </Button>
           </div>
         )}
 
