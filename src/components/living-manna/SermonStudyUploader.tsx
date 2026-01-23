@@ -25,7 +25,8 @@ import {
   Target,
   Heart,
   Lightbulb,
-  ShieldAlert
+  ShieldAlert,
+  BookmarkPlus
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
@@ -99,6 +100,7 @@ export function SermonStudyUploader({ churchId, userRole }: SermonStudyUploaderP
   const [inputMode] = useState<InputMode>("paste");
   const [isGenerating, setIsGenerating] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const [isSavingPersonal, setIsSavingPersonal] = useState(false);
   const [sermonTitle, setSermonTitle] = useState("");
   const [preacher, setPreacher] = useState("");
   const [sermonDate, setSermonDate] = useState("");
@@ -213,6 +215,81 @@ export function SermonStudyUploader({ churchId, userRole }: SermonStudyUploaderP
       toast.error(error.message || "Failed to save study");
     } finally {
       setIsSaving(false);
+    }
+  };
+
+  const handleSaveToMyStudies = async () => {
+    if (!generatedStudy || !user) {
+      toast.error("Please sign in to save to My Studies");
+      return;
+    }
+
+    setIsSavingPersonal(true);
+    try {
+      const date = new Date().toLocaleDateString('en-US', { 
+        weekday: 'long', 
+        year: 'numeric', 
+        month: 'long', 
+        day: 'numeric' 
+      });
+
+      const studyTitle = sermonTitle || generatedStudy.studyTitle || "Sermon Amplified Study";
+
+      // Build formatted content
+      let content = `# ${studyTitle}\n\n`;
+      content += `**Date Saved:** ${date}\n`;
+      if (preacher) content += `**Preacher:** ${preacher}\n`;
+      if (sermonDate) content += `**Sermon Date:** ${sermonDate}\n`;
+      content += `\n---\n\n`;
+      
+      content += `## Overview\n\n${generatedStudy.overview || ''}\n\n`;
+
+      // Add sections
+      if (generatedStudy.sections?.length) {
+        content += `## Study Sections\n\n`;
+        generatedStudy.sections.forEach((section, idx) => {
+          content += `### ${idx + 1}. ${section.title}\n\n`;
+          content += `**Original Point:** ${section.originalPoint || ''}\n\n`;
+          content += `**Analysis:** ${section.analysis || ''}\n\n`;
+          if (section.biblicalBasis?.primaryTexts?.length) {
+            content += `**Key Texts:** ${section.biblicalBasis.primaryTexts.join(', ')}\n\n`;
+          }
+        });
+      }
+
+      if (generatedStudy.christSynthesis) {
+        content += `## Christ-Centered Synthesis\n\n${generatedStudy.christSynthesis}\n\n`;
+      }
+
+      if (generatedStudy.actionChallenge) {
+        content += `## Action Challenge\n\n${generatedStudy.actionChallenge}\n\n`;
+      }
+
+      if (generatedStudy.prayerFocus) {
+        content += `## Prayer Focus\n\n${generatedStudy.prayerFocus}\n\n`;
+      }
+
+      // Extract tags
+      const tags: string[] = ["sermon-study", "sermon-amplified"];
+      if (preacher) tags.push(preacher.toLowerCase().replace(/\s+/g, '-'));
+
+      const { error } = await supabase
+        .from("user_studies")
+        .insert({
+          user_id: user.id,
+          title: studyTitle,
+          content,
+          tags: [...new Set(tags)],
+        });
+
+      if (error) throw error;
+
+      toast.success("Saved to My Studies!");
+    } catch (error: any) {
+      console.error("Error saving to My Studies:", error);
+      toast.error(error.message || "Failed to save to My Studies");
+    } finally {
+      setIsSavingPersonal(false);
     }
   };
 
@@ -347,33 +424,49 @@ export function SermonStudyUploader({ churchId, userRole }: SermonStudyUploaderP
                     </div>
 
                     {/* Save buttons for raw content too */}
-                    {canManage ? (
-                      <div className="flex gap-4 pt-4">
-                        <Button
-                          variant="outline"
-                          onClick={() => handleSave("draft")}
-                          disabled={isSaving}
-                          className="flex-1"
-                        >
-                          {isSaving ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Save className="h-4 w-4 mr-2" />}
-                          Save as Draft
-                        </Button>
-                        <Button
-                          onClick={() => handleSave("published")}
-                          disabled={isSaving}
-                          className="flex-1"
-                        >
-                          {isSaving ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <CheckCircle2 className="h-4 w-4 mr-2" />}
-                          Publish Study
-                        </Button>
-                      </div>
-                    ) : (
-                      <div className="pt-4 p-4 rounded-lg bg-muted/50 border border-border/50 text-center">
-                        <p className="text-sm text-muted-foreground">
-                          ✨ Study generated for your personal use. Contact a church leader to publish it.
+                    <div className="space-y-4 pt-4">
+                      {/* Personal Save - Available to all members */}
+                      <Button
+                        variant="outline"
+                        onClick={handleSaveToMyStudies}
+                        disabled={isSavingPersonal}
+                        className="w-full"
+                      >
+                        {isSavingPersonal ? (
+                          <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                        ) : (
+                          <BookmarkPlus className="h-4 w-4 mr-2" />
+                        )}
+                        Save to My Studies
+                      </Button>
+
+                      {/* Admin/Leader church publish options */}
+                      {canManage ? (
+                        <div className="flex gap-4">
+                          <Button
+                            variant="outline"
+                            onClick={() => handleSave("draft")}
+                            disabled={isSaving}
+                            className="flex-1"
+                          >
+                            {isSaving ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Save className="h-4 w-4 mr-2" />}
+                            Save as Church Draft
+                          </Button>
+                          <Button
+                            onClick={() => handleSave("published")}
+                            disabled={isSaving}
+                            className="flex-1"
+                          >
+                            {isSaving ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <CheckCircle2 className="h-4 w-4 mr-2" />}
+                            Publish to Church
+                          </Button>
+                        </div>
+                      ) : (
+                        <p className="text-xs text-center text-muted-foreground">
+                          Contact a church leader to publish this study for the congregation.
                         </p>
-                      </div>
-                    )}
+                      )}
+                    </div>
                   </div>
                 ) : (
                   <div className="space-y-6">
@@ -589,34 +682,50 @@ export function SermonStudyUploader({ churchId, userRole }: SermonStudyUploaderP
                       </Card>
                     )}
 
-                    {/* Save Buttons - Only for admins/leaders */}
-                    {canManage ? (
-                      <div className="flex gap-4 pt-4">
-                        <Button
-                          variant="outline"
-                          onClick={() => handleSave("draft")}
-                          disabled={isSaving}
-                          className="flex-1"
-                        >
-                          {isSaving ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Save className="h-4 w-4 mr-2" />}
-                          Save as Draft
-                        </Button>
-                        <Button
-                          onClick={() => handleSave("published")}
-                          disabled={isSaving}
-                          className="flex-1"
-                        >
-                          {isSaving ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <CheckCircle2 className="h-4 w-4 mr-2" />}
-                          Publish Study
-                        </Button>
-                      </div>
-                    ) : (
-                      <div className="pt-4 p-4 rounded-lg bg-muted/50 border border-border/50 text-center">
-                        <p className="text-sm text-muted-foreground">
-                          ✨ Study generated for your personal use. Contact a church leader to publish it for the congregation.
+                    {/* Save Buttons */}
+                    <div className="space-y-4 pt-4">
+                      {/* Personal Save - Available to all members */}
+                      <Button
+                        variant="outline"
+                        onClick={handleSaveToMyStudies}
+                        disabled={isSavingPersonal}
+                        className="w-full"
+                      >
+                        {isSavingPersonal ? (
+                          <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                        ) : (
+                          <BookmarkPlus className="h-4 w-4 mr-2" />
+                        )}
+                        Save to My Studies
+                      </Button>
+
+                      {/* Admin/Leader church publish options */}
+                      {canManage ? (
+                        <div className="flex gap-4">
+                          <Button
+                            variant="outline"
+                            onClick={() => handleSave("draft")}
+                            disabled={isSaving}
+                            className="flex-1"
+                          >
+                            {isSaving ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Save className="h-4 w-4 mr-2" />}
+                            Save as Church Draft
+                          </Button>
+                          <Button
+                            onClick={() => handleSave("published")}
+                            disabled={isSaving}
+                            className="flex-1"
+                          >
+                            {isSaving ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <CheckCircle2 className="h-4 w-4 mr-2" />}
+                            Publish to Church
+                          </Button>
+                        </div>
+                      ) : (
+                        <p className="text-xs text-center text-muted-foreground">
+                          Contact a church leader to publish this study for the congregation.
                         </p>
-                      </div>
-                    )}
+                      )}
+                    </div>
                   </div>
                 )}
               </ScrollArea>
