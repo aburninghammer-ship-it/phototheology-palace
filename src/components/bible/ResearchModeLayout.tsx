@@ -25,7 +25,8 @@ import {
   RotateCcw,
   Layers,
   Landmark,
-  ArrowUpRight
+  ArrowUpRight,
+  StickyNote
 } from "lucide-react";
 import { ResearchBooksPanel } from "./ResearchBooksPanel";
 import { ResearchVersesPanel } from "./ResearchVersesPanel";
@@ -34,6 +35,7 @@ import { ResearchDictionaryPanel } from "./ResearchDictionaryPanel";
 import { ResearchParallelPanel } from "./research/ResearchParallelPanel";
 import { ResearchPTToolsPanel } from "./research/ResearchPTToolsPanel";
 import { ResearchVerseGeneticsPanel } from "./research/ResearchVerseGeneticsPanel";
+import { ResearchUserNotesPanel } from "./research/ResearchUserNotesPanel";
 import { cn } from "@/lib/utils";
 
 interface ResearchModeLayoutProps {
@@ -41,7 +43,7 @@ interface ResearchModeLayoutProps {
 }
 
 type CenterView = "single" | "parallel";
-type RightTab = "jeeves" | "principles" | "crossref" | "palace" | "cycles" | "heavens" | "sanctuary" | "ascensions" | "genetics";
+type RightTab = "jeeves" | "principles" | "crossref" | "notes" | "palace" | "cycles" | "heavens" | "sanctuary" | "ascensions" | "genetics";
 
 export const ResearchModeLayout = ({ onExitResearchMode }: ResearchModeLayoutProps) => {
   const { book = "John", chapter: chapterParam = "3" } = useParams();
@@ -98,6 +100,7 @@ export const ResearchModeLayout = ({ onExitResearchMode }: ResearchModeLayoutPro
   const isCommentaryTab = ["jeeves", "principles", "crossref"].includes(rightTab);
   const isPTToolTab = ["palace", "cycles", "heavens", "sanctuary", "ascensions"].includes(rightTab);
   const isGeneticsTab = rightTab === "genetics";
+  const isNotesTab = rightTab === "notes";
 
   return (
     <div className="h-screen flex flex-col bg-gradient-to-br from-background via-background to-primary/5 overflow-hidden">
@@ -314,6 +317,15 @@ export const ResearchModeLayout = ({ onExitResearchMode }: ResearchModeLayoutPro
                 <GitBranch className="h-3 w-3 mr-1" />
                 Genetics
               </Button>
+              <Button
+                size="sm"
+                variant={rightTab === "notes" ? "default" : "ghost"}
+                onClick={() => setRightTab("notes")}
+                className={cn("h-6 text-[10px] px-2", rightTab === "notes" && "bg-amber-600/80")}
+              >
+                <StickyNote className="h-3 w-3 mr-1" />
+                Notes
+              </Button>
               
               <div className="w-px h-4 bg-white/20 mx-1 self-center" />
               
@@ -374,6 +386,7 @@ export const ResearchModeLayout = ({ onExitResearchMode }: ResearchModeLayoutPro
                 {rightTab === "jeeves" && "Jeeves AI Commentary"}
                 {rightTab === "crossref" && "Cross References"}
                 {rightTab === "genetics" && "Verse Genetics"}
+                {rightTab === "notes" && "My Study Notes"}
                 {rightTab === "palace" && "Palace Floors & Rooms"}
                 {rightTab === "cycles" && "8 Covenant Cycles"}
                 {rightTab === "heavens" && "Three Heavens"}
@@ -408,6 +421,14 @@ export const ResearchModeLayout = ({ onExitResearchMode }: ResearchModeLayoutPro
             )}
             {isGeneticsTab && (
               <ResearchVerseGeneticsPanel
+                book={book}
+                chapter={chapter}
+                verse={selectedVerse}
+                verseText={selectedVerseText}
+              />
+            )}
+            {isNotesTab && (
+              <ResearchUserNotesPanel
                 book={book}
                 chapter={chapter}
                 verse={selectedVerse}
