@@ -241,39 +241,34 @@ Generate a comprehensive, Christ-centered study that expands on each point while
       let jsonStr = content.trim();
       
       console.log("Raw AI response length:", jsonStr.length);
-      console.log("Starts with ```:", jsonStr.startsWith("```"));
+      console.log("First 100 chars:", jsonStr.substring(0, 100));
       
-      // Step 1: Multiple approaches to strip markdown code blocks
-      // Approach 1a: Handle ```json\n at start and ``` at end
-      if (jsonStr.startsWith("```json")) {
-        jsonStr = jsonStr.replace(/^```json\s*/, "");
-        jsonStr = jsonStr.replace(/```\s*$/, "");
-      } else if (jsonStr.startsWith("```")) {
-        jsonStr = jsonStr.replace(/^```\s*/, "");
-        jsonStr = jsonStr.replace(/```\s*$/, "");
+      // Step 1: Remove markdown code blocks with multiple approaches
+      // Handle ```json ... ``` pattern
+      const codeBlockMatch = jsonStr.match(/```(?:json)?\s*([\s\S]*?)```/);
+      if (codeBlockMatch) {
+        jsonStr = codeBlockMatch[1].trim();
+        console.log("Extracted from code block, length:", jsonStr.length);
+      } else {
+        // No code block found, try to strip any leading/trailing backticks
+        jsonStr = jsonStr.replace(/^```(?:json)?\s*/i, "").replace(/\s*```$/i, "").trim();
       }
       
-      // Approach 1b: Use greedy regex as fallback (handles all ``` blocks)
-      if (jsonStr.includes("```")) {
-        // Find content between first ``` and last ```
-        const parts = jsonStr.split("```");
-        if (parts.length >= 3) {
-          // Content is typically in parts[1] (between first and second ```)
-          jsonStr = parts[1].replace(/^json\s*/i, "").trim();
-        }
-      }
-      
-      // Step 2: Find the JSON object boundaries
+      // Step 2: Find the JSON object boundaries (first { to last })
       const firstBrace = jsonStr.indexOf('{');
       const lastBrace = jsonStr.lastIndexOf('}');
       if (firstBrace !== -1 && lastBrace !== -1 && lastBrace > firstBrace) {
         jsonStr = jsonStr.substring(firstBrace, lastBrace + 1);
+        console.log("Extracted JSON object, length:", jsonStr.length);
       }
       
-      // Step 3: Clean up any remaining issues
-      jsonStr = jsonStr.trim();
+      // Step 3: Clean up common JSON issues
+      // Remove trailing commas before } or ]
+      jsonStr = jsonStr.replace(/,(\s*[}\]])/g, '$1');
+      // Remove any control characters
+      jsonStr = jsonStr.replace(/[\x00-\x1F\x7F]/g, ' ');
       
-      console.log("Cleaned JSON starts with:", jsonStr.substring(0, 50));
+      console.log("Cleaned JSON starts with:", jsonStr.substring(0, 80));
       
       // Step 4: Parse the JSON
       studyData = JSON.parse(jsonStr);
@@ -288,18 +283,45 @@ Generate a comprehensive, Christ-centered study that expands on each point while
       }
       
       console.log("Successfully parsed study with", Object.keys(studyData).length, "fields");
+      console.log("Study has sections:", Array.isArray(studyData.sections) ? studyData.sections.length : 0);
     } catch (parseError) {
       console.error("JSON parse error:", parseError);
-      console.log("Raw content length:", content.length);
-      console.log("First 500 chars:", content.substring(0, 500));
-      // Return raw content if parsing fails - frontend can still display it
-      studyData = { 
-        rawContent: content, 
-        parseError: true, 
-        doctrinalWarnings,
-        studyTitle: "Generated Study (Parsing Error)",
-        overview: "The AI generated content but it couldn't be automatically formatted. The raw content is shown below."
-      };
+      console.log("Raw content first 1000 chars:", content.substring(0, 1000));
+      console.log("Raw content last 500 chars:", content.substring(content.length - 500));
+      
+      // Attempt a more aggressive extraction
+      try {
+        // Find JSON by looking for studyTitle pattern
+        const studyTitleMatch = content.match(/\{\s*"studyTitle"\s*:\s*"[^"]+"/);
+        if (studyTitleMatch) {
+          const startIndex = content.indexOf(studyTitleMatch[0]);
+          let braceCount = 0;
+          let endIndex = startIndex;
+          for (let i = startIndex; i < content.length; i++) {
+            if (content[i] === '{') braceCount++;
+            if (content[i] === '}') braceCount--;
+            if (braceCount === 0 && content[i] === '}') {
+              endIndex = i + 1;
+              break;
+            }
+          }
+          if (endIndex > startIndex) {
+            const extractedJson = content.substring(startIndex, endIndex);
+            studyData = JSON.parse(extractedJson);
+            console.log("Recovery successful! Parsed study with", Object.keys(studyData).length, "fields");
+          }
+        }
+      } catch (recoveryError) {
+        console.error("Recovery parse also failed:", recoveryError);
+        // Return raw content if parsing fails - frontend can still display it
+        studyData = { 
+          rawContent: content, 
+          parseError: true, 
+          doctrinalWarnings,
+          studyTitle: "Generated Study (Parsing Error)",
+          overview: "The AI generated content but it couldn't be automatically formatted. The raw content is shown below."
+        };
+      }
     }
 
     return new Response(
