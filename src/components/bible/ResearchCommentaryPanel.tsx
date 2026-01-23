@@ -2,11 +2,14 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { Loader2, Send, BookOpen, Sparkles, Link2, Bot, FileText, Building2, RefreshCw, Layers, Landmark, ArrowUpRight, Dna, Maximize2 } from "lucide-react";
+import { Loader2, Send, BookOpen, Sparkles, Link2, Bot, FileText, Building2, RefreshCw, Layers, Landmark, ArrowUpRight, Dna, Maximize2, Check } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { usePalaceData } from "@/hooks/usePalaceData";
 import { cn } from "@/lib/utils";
+
+// Glowing box class helper
+const glowBox = "bg-background/30 backdrop-blur-xl rounded-xl border border-white/10 shadow-lg shadow-palace-purple/10 ring-1 ring-inset ring-white/5 ring-offset-1 ring-offset-palace-blue/5 hover:shadow-palace-blue/20 hover:border-palace-blue/30 transition-all duration-300";
 
 interface ResearchCommentaryPanelProps {
   book: string;
@@ -40,6 +43,44 @@ export const ResearchCommentaryPanel = ({
   const [chatHistory, setChatHistory] = useState<Array<{ role: string; content: string }>>([]);
   const [activeTab, setActiveTab] = useState("jeeves");
   const { palaceFloors } = usePalaceData();
+  
+  // Palace room analysis state
+  const [selectedRooms, setSelectedRooms] = useState<string[]>([]);
+  const [palaceAnalysis, setPalaceAnalysis] = useState<string>("");
+  const [palaceLoading, setPalaceLoading] = useState(false);
+
+  const toggleRoom = (roomTag: string) => {
+    setSelectedRooms(prev => 
+      prev.includes(roomTag) 
+        ? prev.filter(r => r !== roomTag)
+        : [...prev, roomTag]
+    );
+  };
+
+  const analyzePalaceRooms = async () => {
+    if (selectedRooms.length === 0) {
+      toast.error("Select at least one room");
+      return;
+    }
+    setPalaceLoading(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("pt-verse-analysis", {
+        body: { 
+          book, chapter, verse, verseText, 
+          rooms: selectedRooms, 
+          analysisType: "palace" 
+        }
+      });
+      if (error) throw error;
+      setPalaceAnalysis(data.analysis || "No analysis available.");
+      toast.success("Analysis complete");
+    } catch (error) {
+      console.error("Palace analysis error:", error);
+      toast.error("Failed to analyze");
+    } finally {
+      setPalaceLoading(false);
+    }
+  };
 
   const fetchCommentary = async () => {
     if (!verse) return;
@@ -94,13 +135,13 @@ export const ResearchCommentaryPanel = ({
 
   return (
     <div className="p-3 space-y-3">
-      {/* Verse Reference - Glassy */}
-      <div className="bg-background/30 backdrop-blur-xl rounded-xl border border-white/10 p-3 shadow-lg shadow-palace-blue/5">
+      {/* Verse Reference - Glowing Box */}
+      <div className={cn(glowBox, "p-3")}>
         <div className="flex items-center justify-between mb-2">
-          <Badge variant="secondary" className="text-xs bg-primary/20 text-primary border-primary/30">
+          <Badge variant="secondary" className="text-xs bg-gradient-palace text-white border-0 shadow-md shadow-palace-purple/20">
             {book} {chapter}:{verse}
           </Badge>
-          <Button variant="ghost" size="icon" className="h-6 w-6">
+          <Button variant="ghost" size="icon" className="h-6 w-6 hover:bg-palace-blue/20">
             <Maximize2 className="h-3.5 w-3.5" />
           </Button>
         </div>
@@ -109,8 +150,8 @@ export const ResearchCommentaryPanel = ({
         </p>
       </div>
 
-      {/* Content Area - Glassy with Glow */}
-      <div className="bg-background/30 backdrop-blur-xl rounded-xl border border-white/10 p-3 shadow-lg shadow-palace-purple/10 ring-1 ring-inset ring-white/5">
+      {/* Content Area - Glowing Box */}
+      <div className={cn(glowBox, "p-3")}>
         {activeTab === "jeeves" && (
           <div className="space-y-3">
             {chatHistory.length > 0 && (
@@ -168,37 +209,70 @@ export const ResearchCommentaryPanel = ({
         )}
 
         {activeTab === "palace" && (
-          <div className="space-y-2">
-            <p className="text-xs text-muted-foreground">All 8 Floors · 37 Rooms</p>
-            <div className="space-y-2 max-h-[350px] overflow-y-auto pr-1">
+          <div className="space-y-3">
+            <div className="flex items-center justify-between">
+              <p className="text-xs text-muted-foreground">Select rooms to analyze · {selectedRooms.length} selected</p>
+              {selectedRooms.length > 0 && (
+                <button onClick={() => setSelectedRooms([])} className="text-[10px] text-palace-teal hover:underline">Clear</button>
+              )}
+            </div>
+            
+            {/* Palace Analysis Result */}
+            {palaceAnalysis && (
+              <div className={cn(glowBox, "p-3 max-h-[200px] overflow-y-auto")}>
+                <p className="text-xs font-semibold text-primary mb-1.5">Analysis Result</p>
+                <p className="text-xs text-foreground whitespace-pre-wrap leading-relaxed">{palaceAnalysis}</p>
+              </div>
+            )}
+            
+            <div className="space-y-2 max-h-[280px] overflow-y-auto pr-1">
               {palaceFloors?.map((floor) => (
-                <div key={floor.number} className="bg-background/40 rounded-lg p-2.5 border border-white/10 hover:border-palace-purple/30 transition-colors">
+                <div key={floor.number} className={cn(glowBox, "p-2.5")}>
                   <div className="flex items-center gap-2 mb-2">
-                    <Badge className="text-[10px] bg-gradient-palace text-white border-0 shadow-sm">
+                    <Badge className="text-[10px] bg-gradient-palace text-white border-0 shadow-sm shadow-palace-purple/30">
                       F{floor.number}
                     </Badge>
                     <span className="text-xs font-semibold text-foreground">{floor.name}</span>
                     <span className="text-[10px] text-muted-foreground">· {floor.subtitle}</span>
                   </div>
                   <div className="grid grid-cols-2 gap-1">
-                    {floor.rooms.map((room) => (
-                      <div 
-                        key={room.id} 
-                        className="flex items-center gap-1.5 p-1.5 rounded-md bg-background/50 hover:bg-primary/10 cursor-pointer transition-colors border border-white/5 hover:border-primary/20"
-                      >
-                        <Badge variant="outline" className="text-[9px] px-1 py-0 bg-palace-blue/10 border-palace-blue/20 font-mono">
-                          {room.tag}
-                        </Badge>
-                        <span className="text-[10px] text-foreground truncate">{room.name}</span>
-                      </div>
-                    ))}
+                    {floor.rooms.map((room) => {
+                      const isSelected = selectedRooms.includes(room.tag);
+                      return (
+                        <button 
+                          key={room.id} 
+                          onClick={() => toggleRoom(room.tag)}
+                          className={cn(
+                            "flex items-center gap-1.5 p-1.5 rounded-md cursor-pointer transition-all duration-200 border text-left",
+                            isSelected 
+                              ? "bg-palace-blue/20 border-palace-blue/40 shadow-sm shadow-palace-blue/20 ring-1 ring-palace-blue/30" 
+                              : "bg-background/50 border-white/5 hover:bg-primary/10 hover:border-primary/20"
+                          )}
+                        >
+                          {isSelected && <Check className="h-3 w-3 text-palace-teal shrink-0" />}
+                          <Badge variant="outline" className={cn(
+                            "text-[9px] px-1 py-0 font-mono",
+                            isSelected ? "bg-palace-blue/30 border-palace-blue/50" : "bg-palace-blue/10 border-palace-blue/20"
+                          )}>
+                            {room.tag}
+                          </Badge>
+                          <span className="text-[10px] text-foreground truncate">{room.name}</span>
+                        </button>
+                      );
+                    })}
                   </div>
                 </div>
               ))}
             </div>
-            <Button variant="outline" size="sm" className="w-full mt-2">
-              <Building2 className="h-3.5 w-3.5 mr-2" />
-              Analyze with Palace Principles
+            <Button 
+              variant="outline" 
+              size="sm" 
+              className="w-full mt-2 bg-gradient-palace text-white border-0 hover:opacity-90 shadow-md shadow-palace-purple/30"
+              onClick={analyzePalaceRooms}
+              disabled={palaceLoading || selectedRooms.length === 0}
+            >
+              {palaceLoading ? <Loader2 className="h-3.5 w-3.5 mr-2 animate-spin" /> : <Building2 className="h-3.5 w-3.5 mr-2" />}
+              Analyze {selectedRooms.length > 0 ? `${selectedRooms.length} Rooms` : "with Palace Principles"}
             </Button>
           </div>
         )}
@@ -206,12 +280,14 @@ export const ResearchCommentaryPanel = ({
         {activeTab === "cycles" && (
           <div className="space-y-2">
             <p className="text-xs text-muted-foreground">8 Redemptive Cycles</p>
-            {["@Ad (Adamic)", "@No (Noahic)", "@Ab (Abrahamic)", "@Mo (Mosaic)", "@Cy (Cyrusic)", "@CyC (Cyrus-Christ)", "@Sp (Spirit)", "@Re (Remnant)"].map((cycle) => (
-              <Badge key={cycle} variant="outline" className="mr-1 mb-1 text-xs bg-palace-teal/10 border-palace-teal/30">
-                {cycle}
-              </Badge>
-            ))}
-            <Button variant="outline" size="sm" className="w-full mt-2">
+            <div className="flex flex-wrap gap-1.5">
+              {["@Ad (Adamic)", "@No (Noahic)", "@Ab (Abrahamic)", "@Mo (Mosaic)", "@Cy (Cyrusic)", "@CyC (Cyrus-Christ)", "@Sp (Spirit)", "@Re (Remnant)"].map((cycle) => (
+                <Badge key={cycle} variant="outline" className="text-xs bg-palace-teal/15 border-palace-teal/40 shadow-sm shadow-palace-teal/20 hover:bg-palace-teal/25 cursor-pointer transition-colors">
+                  {cycle}
+                </Badge>
+              ))}
+            </div>
+            <Button variant="outline" size="sm" className="w-full mt-2 shadow-sm shadow-palace-teal/20 hover:shadow-palace-teal/40 border-palace-teal/30">
               <RefreshCw className="h-3.5 w-3.5 mr-2" />
               Map to Cycles
             </Button>
@@ -223,12 +299,12 @@ export const ResearchCommentaryPanel = ({
             <p className="text-xs text-muted-foreground">Three Heavens Framework</p>
             <div className="space-y-1.5">
               {[
-                { label: "1H (DoL¹/NE¹)", desc: "Babylonian → Cyrusic Restoration" },
-                { label: "2H (DoL²/NE²)", desc: "70 AD → New-Covenant Order" },
-                { label: "3H (DoL³/NE³)", desc: "Final → Literal New Creation" },
+                { label: "1H (DoL¹/NE¹)", desc: "Babylonian → Cyrusic Restoration", color: "palace-purple" },
+                { label: "2H (DoL²/NE²)", desc: "70 AD → New-Covenant Order", color: "palace-blue" },
+                { label: "3H (DoL³/NE³)", desc: "Final → Literal New Creation", color: "palace-teal" },
               ].map((heaven) => (
-                <div key={heaven.label} className="bg-background/40 rounded-lg p-2 border border-white/5">
-                  <Badge variant="secondary" className="text-[10px] bg-palace-blue/20">{heaven.label}</Badge>
+                <div key={heaven.label} className={cn(glowBox, "p-2.5 cursor-pointer")}>
+                  <Badge variant="secondary" className="text-[10px] bg-gradient-palace text-white border-0">{heaven.label}</Badge>
                   <p className="text-[10px] text-muted-foreground mt-1">{heaven.desc}</p>
                 </div>
               ))}
@@ -239,12 +315,14 @@ export const ResearchCommentaryPanel = ({
         {activeTab === "sanct" && (
           <div className="space-y-2">
             <p className="text-xs text-muted-foreground">Sanctuary Blueprint</p>
-            {["Altar", "Laver", "Table", "Lampstand", "Incense", "Ark", "Veil", "Gate"].map((item) => (
-              <Badge key={item} variant="outline" className="mr-1 mb-1 text-xs bg-palace-orange/10 border-palace-orange/30">
-                {item}
-              </Badge>
-            ))}
-            <Button variant="outline" size="sm" className="w-full mt-2">
+            <div className="flex flex-wrap gap-1.5">
+              {["Altar", "Laver", "Table", "Lampstand", "Incense", "Ark", "Veil", "Gate"].map((item) => (
+                <Badge key={item} variant="outline" className="text-xs bg-palace-orange/15 border-palace-orange/40 shadow-sm shadow-palace-orange/20 hover:bg-palace-orange/25 cursor-pointer transition-colors">
+                  {item}
+                </Badge>
+              ))}
+            </div>
+            <Button variant="outline" size="sm" className="w-full mt-2 shadow-sm shadow-palace-orange/20 hover:shadow-palace-orange/40 border-palace-orange/30">
               <Landmark className="h-3.5 w-3.5 mr-2" />
               Analyze Sanctuary Connection
             </Button>
@@ -254,11 +332,19 @@ export const ResearchCommentaryPanel = ({
         {activeTab === "5asc" && (
           <div className="space-y-2">
             <p className="text-xs text-muted-foreground">Five Ascensions</p>
-            {["Asc-1: Text", "Asc-2: Chapter", "Asc-3: Book", "Asc-4: Cycle", "Asc-5: Heaven"].map((asc) => (
-              <div key={asc} className="bg-background/40 rounded-lg p-2 border border-white/5">
-                <span className="text-xs">{asc}</span>
-              </div>
-            ))}
+            <div className="space-y-1.5">
+              {[
+                { asc: "Asc-1: Text", color: "purple" },
+                { asc: "Asc-2: Chapter", color: "blue" },
+                { asc: "Asc-3: Book", color: "teal" },
+                { asc: "Asc-4: Cycle", color: "orange" },
+                { asc: "Asc-5: Heaven", color: "pink" },
+              ].map((item) => (
+                <div key={item.asc} className={cn(glowBox, "p-2.5 cursor-pointer")}>
+                  <span className="text-xs font-medium">{item.asc}</span>
+                </div>
+              ))}
+            </div>
           </div>
         )}
 
