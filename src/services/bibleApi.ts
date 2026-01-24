@@ -12,6 +12,7 @@ const BIBLE_API_BASE = "https://bible-api.com";
 export const BIBLE_TRANSLATIONS = [
   // Popular English translations
   { value: "kjv", label: "King James Version (KJV)" },
+  { value: "kjvs", label: "KJV + Strong's (Interactive)" },
   { value: "niv", label: "New International Version (NIV)" },
   { value: "esv", label: "English Standard Version (ESV)" },
   { value: "nkjv", label: "New King James Version (NKJV)" },
