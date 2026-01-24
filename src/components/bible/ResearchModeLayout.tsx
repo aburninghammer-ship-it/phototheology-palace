@@ -140,12 +140,12 @@ export const ResearchModeLayout = ({ onExitResearchMode }: ResearchModeLayoutPro
           
           {/* Center View Toggle */}
           <div className="h-6 w-px bg-gradient-to-b from-transparent via-[hsl(32,70%,50%)/0.4] to-transparent ml-2" />
-          <div className="flex gap-1 p-1 rounded-lg bg-[hsl(230,30%,15%)/0.8] border border-[hsl(32,60%,40%)/0.2]">
+          <div className="flex gap-1 p-1 rounded-lg bg-[hsl(230,30%,15%)/0.8] border border-[hsl(32,60%,50%)/0.5] shadow-[0_0_15px_-3px_hsl(32,80%,50%/0.4)]">
             <Button
               variant={centerView === "single" ? "default" : "ghost"}
               size="sm"
               onClick={() => setCenterView("single")}
-              className={cn("h-7 text-xs transition-all", centerView === "single" ? "bg-gradient-to-r from-[hsl(32,80%,50%)] to-[hsl(45,90%,50%)] shadow-md shadow-[hsl(32,80%,50%)/0.3] text-white" : "hover:bg-[hsl(32,50%,30%)/0.3] text-[hsl(45,60%,70%)]")}
+              className={cn("h-7 text-xs transition-all", centerView === "single" ? "bg-gradient-to-r from-[hsl(32,80%,50%)] to-[hsl(45,90%,50%)] shadow-[0_0_12px_hsl(32,80%,50%/0.5)] text-white" : "hover:bg-[hsl(32,50%,30%)/0.3] text-[hsl(45,60%,70%)]")}
             >
               <BookOpen className="h-3 w-3 mr-1" />
               Single
@@ -154,7 +154,7 @@ export const ResearchModeLayout = ({ onExitResearchMode }: ResearchModeLayoutPro
               variant={centerView === "parallel" ? "default" : "ghost"}
               size="sm"
               onClick={() => setCenterView("parallel")}
-              className={cn("h-7 text-xs transition-all", centerView === "parallel" ? "bg-gradient-to-r from-[hsl(200,70%,45%)] to-[hsl(180,60%,45%)] shadow-md shadow-[hsl(200,70%,45%)/0.3] text-white" : "hover:bg-[hsl(200,40%,30%)/0.3] text-[hsl(200,50%,70%)]")}
+              className={cn("h-7 text-xs transition-all", centerView === "parallel" ? "bg-gradient-to-r from-[hsl(200,70%,45%)] to-[hsl(180,60%,45%)] shadow-[0_0_12px_hsl(200,70%,45%/0.5)] text-white" : "hover:bg-[hsl(200,40%,30%)/0.3] text-[hsl(200,50%,70%)]")}
             >
               <Columns className="h-3 w-3 mr-1" />
               Parallel
@@ -230,19 +230,19 @@ export const ResearchModeLayout = ({ onExitResearchMode }: ResearchModeLayoutPro
                 <span className="text-sm font-semibold text-[hsl(200,60%,65%)]">Scripture</span>
                 {centerView === "single" && (
                   <Tabs value={translation} onValueChange={(v) => setTranslation(v as Translation)} className="h-8">
-                    <TabsList className="h-7 bg-[hsl(230,30%,15%)/0.8] border border-[hsl(32,50%,40%)/0.3] flex-wrap">
-                      <TabsTrigger value="kjv" className="text-[10px] h-5 px-1.5 text-[hsl(45,50%,65%)] data-[state=active]:bg-gradient-to-r data-[state=active]:from-[hsl(32,80%,50%)] data-[state=active]:to-[hsl(45,90%,50%)] data-[state=active]:text-white data-[state=active]:shadow-md">KJV</TabsTrigger>
-                      <TabsTrigger value="nkjv" className="text-[10px] h-5 px-1.5 text-[hsl(45,50%,65%)] data-[state=active]:bg-gradient-to-r data-[state=active]:from-[hsl(32,80%,50%)] data-[state=active]:to-[hsl(45,90%,50%)] data-[state=active]:text-white data-[state=active]:shadow-md">NKJV</TabsTrigger>
-                      <TabsTrigger value="asv" className="text-[10px] h-5 px-1.5 text-[hsl(45,50%,65%)] data-[state=active]:bg-gradient-to-r data-[state=active]:from-[hsl(32,80%,50%)] data-[state=active]:to-[hsl(45,90%,50%)] data-[state=active]:text-white data-[state=active]:shadow-md">ASV</TabsTrigger>
-                      <TabsTrigger value="web" className="text-[10px] h-5 px-1.5 text-[hsl(45,50%,65%)] data-[state=active]:bg-gradient-to-r data-[state=active]:from-[hsl(32,80%,50%)] data-[state=active]:to-[hsl(45,90%,50%)] data-[state=active]:text-white data-[state=active]:shadow-md">WEB</TabsTrigger>
-                      <TabsTrigger value="ylt" className="text-[10px] h-5 px-1.5 text-[hsl(45,50%,65%)] data-[state=active]:bg-gradient-to-r data-[state=active]:from-[hsl(32,80%,50%)] data-[state=active]:to-[hsl(45,90%,50%)] data-[state=active]:text-white data-[state=active]:shadow-md">YLT</TabsTrigger>
-                      <TabsTrigger value="darby" className="text-[10px] h-5 px-1.5 text-[hsl(45,50%,65%)] data-[state=active]:bg-gradient-to-r data-[state=active]:from-[hsl(32,80%,50%)] data-[state=active]:to-[hsl(45,90%,50%)] data-[state=active]:text-white data-[state=active]:shadow-md">Darby</TabsTrigger>
-                      <TabsTrigger value="bbe" className="text-[10px] h-5 px-1.5 text-[hsl(45,50%,65%)] data-[state=active]:bg-gradient-to-r data-[state=active]:from-[hsl(32,80%,50%)] data-[state=active]:to-[hsl(45,90%,50%)] data-[state=active]:text-white data-[state=active]:shadow-md">BBE</TabsTrigger>
-                      <TabsTrigger value="niv" className="text-[10px] h-5 px-1.5 text-[hsl(45,50%,65%)] data-[state=active]:bg-gradient-to-r data-[state=active]:from-[hsl(32,80%,50%)] data-[state=active]:to-[hsl(45,90%,50%)] data-[state=active]:text-white data-[state=active]:shadow-md">NIV</TabsTrigger>
-                      <TabsTrigger value="esv" className="text-[10px] h-5 px-1.5 text-[hsl(45,50%,65%)] data-[state=active]:bg-gradient-to-r data-[state=active]:from-[hsl(32,80%,50%)] data-[state=active]:to-[hsl(45,90%,50%)] data-[state=active]:text-white data-[state=active]:shadow-md">ESV</TabsTrigger>
-                      <TabsTrigger value="nasb" className="text-[10px] h-5 px-1.5 text-[hsl(45,50%,65%)] data-[state=active]:bg-gradient-to-r data-[state=active]:from-[hsl(32,80%,50%)] data-[state=active]:to-[hsl(45,90%,50%)] data-[state=active]:text-white data-[state=active]:shadow-md">NASB</TabsTrigger>
-                      <TabsTrigger value="nlt" className="text-[10px] h-5 px-1.5 text-[hsl(45,50%,65%)] data-[state=active]:bg-gradient-to-r data-[state=active]:from-[hsl(32,80%,50%)] data-[state=active]:to-[hsl(45,90%,50%)] data-[state=active]:text-white data-[state=active]:shadow-md">NLT</TabsTrigger>
-                      <TabsTrigger value="rves" className="text-[10px] h-5 px-1.5 text-[hsl(45,50%,65%)] data-[state=active]:bg-gradient-to-r data-[state=active]:from-[hsl(32,80%,50%)] data-[state=active]:to-[hsl(45,90%,50%)] data-[state=active]:text-white data-[state=active]:shadow-md">RVE</TabsTrigger>
+                    <TabsList className="h-7 bg-[hsl(230,30%,15%)/0.8] border border-[hsl(32,60%,50%)/0.5] shadow-[0_0_15px_-3px_hsl(32,80%,50%/0.4)] flex-wrap">
+                      <TabsTrigger value="kjv" className="text-[10px] h-5 px-1.5 text-[hsl(45,50%,65%)] data-[state=active]:bg-gradient-to-r data-[state=active]:from-[hsl(32,80%,50%)] data-[state=active]:to-[hsl(45,90%,50%)] data-[state=active]:text-white data-[state=active]:shadow-[0_0_10px_hsl(32,80%,50%/0.5)]">KJV</TabsTrigger>
+                      <TabsTrigger value="nkjv" className="text-[10px] h-5 px-1.5 text-[hsl(45,50%,65%)] data-[state=active]:bg-gradient-to-r data-[state=active]:from-[hsl(32,80%,50%)] data-[state=active]:to-[hsl(45,90%,50%)] data-[state=active]:text-white data-[state=active]:shadow-[0_0_10px_hsl(32,80%,50%/0.5)]">NKJV</TabsTrigger>
+                      <TabsTrigger value="asv" className="text-[10px] h-5 px-1.5 text-[hsl(45,50%,65%)] data-[state=active]:bg-gradient-to-r data-[state=active]:from-[hsl(32,80%,50%)] data-[state=active]:to-[hsl(45,90%,50%)] data-[state=active]:text-white data-[state=active]:shadow-[0_0_10px_hsl(32,80%,50%/0.5)]">ASV</TabsTrigger>
+                      <TabsTrigger value="web" className="text-[10px] h-5 px-1.5 text-[hsl(45,50%,65%)] data-[state=active]:bg-gradient-to-r data-[state=active]:from-[hsl(32,80%,50%)] data-[state=active]:to-[hsl(45,90%,50%)] data-[state=active]:text-white data-[state=active]:shadow-[0_0_10px_hsl(32,80%,50%/0.5)]">WEB</TabsTrigger>
+                      <TabsTrigger value="ylt" className="text-[10px] h-5 px-1.5 text-[hsl(45,50%,65%)] data-[state=active]:bg-gradient-to-r data-[state=active]:from-[hsl(32,80%,50%)] data-[state=active]:to-[hsl(45,90%,50%)] data-[state=active]:text-white data-[state=active]:shadow-[0_0_10px_hsl(32,80%,50%/0.5)]">YLT</TabsTrigger>
+                      <TabsTrigger value="darby" className="text-[10px] h-5 px-1.5 text-[hsl(45,50%,65%)] data-[state=active]:bg-gradient-to-r data-[state=active]:from-[hsl(32,80%,50%)] data-[state=active]:to-[hsl(45,90%,50%)] data-[state=active]:text-white data-[state=active]:shadow-[0_0_10px_hsl(32,80%,50%/0.5)]">Darby</TabsTrigger>
+                      <TabsTrigger value="bbe" className="text-[10px] h-5 px-1.5 text-[hsl(45,50%,65%)] data-[state=active]:bg-gradient-to-r data-[state=active]:from-[hsl(32,80%,50%)] data-[state=active]:to-[hsl(45,90%,50%)] data-[state=active]:text-white data-[state=active]:shadow-[0_0_10px_hsl(32,80%,50%/0.5)]">BBE</TabsTrigger>
+                      <TabsTrigger value="niv" className="text-[10px] h-5 px-1.5 text-[hsl(45,50%,65%)] data-[state=active]:bg-gradient-to-r data-[state=active]:from-[hsl(32,80%,50%)] data-[state=active]:to-[hsl(45,90%,50%)] data-[state=active]:text-white data-[state=active]:shadow-[0_0_10px_hsl(32,80%,50%/0.5)]">NIV</TabsTrigger>
+                      <TabsTrigger value="esv" className="text-[10px] h-5 px-1.5 text-[hsl(45,50%,65%)] data-[state=active]:bg-gradient-to-r data-[state=active]:from-[hsl(32,80%,50%)] data-[state=active]:to-[hsl(45,90%,50%)] data-[state=active]:text-white data-[state=active]:shadow-[0_0_10px_hsl(32,80%,50%/0.5)]">ESV</TabsTrigger>
+                      <TabsTrigger value="nasb" className="text-[10px] h-5 px-1.5 text-[hsl(45,50%,65%)] data-[state=active]:bg-gradient-to-r data-[state=active]:from-[hsl(32,80%,50%)] data-[state=active]:to-[hsl(45,90%,50%)] data-[state=active]:text-white data-[state=active]:shadow-[0_0_10px_hsl(32,80%,50%/0.5)]">NASB</TabsTrigger>
+                      <TabsTrigger value="nlt" className="text-[10px] h-5 px-1.5 text-[hsl(45,50%,65%)] data-[state=active]:bg-gradient-to-r data-[state=active]:from-[hsl(32,80%,50%)] data-[state=active]:to-[hsl(45,90%,50%)] data-[state=active]:text-white data-[state=active]:shadow-[0_0_10px_hsl(32,80%,50%/0.5)]">NLT</TabsTrigger>
+                      <TabsTrigger value="rves" className="text-[10px] h-5 px-1.5 text-[hsl(45,50%,65%)] data-[state=active]:bg-gradient-to-r data-[state=active]:from-[hsl(32,80%,50%)] data-[state=active]:to-[hsl(45,90%,50%)] data-[state=active]:text-white data-[state=active]:shadow-[0_0_10px_hsl(32,80%,50%/0.5)]">RVE</TabsTrigger>
                     </TabsList>
                   </Tabs>
                 )}
@@ -281,10 +281,10 @@ export const ResearchModeLayout = ({ onExitResearchMode }: ResearchModeLayoutPro
                   </div>
                   <span className="text-sm font-semibold text-[hsl(45,70%,65%)]">Dictionary</span>
                   <Tabs value={activeDictionary} onValueChange={setActiveDictionary} className="h-8">
-                    <TabsList className="h-7 bg-[hsl(230,30%,15%)/0.8] border border-[hsl(32,50%,40%)/0.3]">
-                      <TabsTrigger value="strongs" className="text-xs h-6 px-2 text-[hsl(45,50%,65%)] data-[state=active]:bg-gradient-to-r data-[state=active]:from-[hsl(32,80%,50%)] data-[state=active]:to-[hsl(45,90%,50%)] data-[state=active]:text-white data-[state=active]:shadow-md">Strong's</TabsTrigger>
-                      <TabsTrigger value="thayers" className="text-xs h-6 px-2 text-[hsl(45,50%,65%)] data-[state=active]:bg-gradient-to-r data-[state=active]:from-[hsl(32,80%,50%)] data-[state=active]:to-[hsl(45,90%,50%)] data-[state=active]:text-white data-[state=active]:shadow-md">Thayer's</TabsTrigger>
-                      <TabsTrigger value="bdb" className="text-xs h-6 px-2 text-[hsl(45,50%,65%)] data-[state=active]:bg-gradient-to-r data-[state=active]:from-[hsl(32,80%,50%)] data-[state=active]:to-[hsl(45,90%,50%)] data-[state=active]:text-white data-[state=active]:shadow-md">BDB</TabsTrigger>
+                    <TabsList className="h-7 bg-[hsl(230,30%,15%)/0.8] border border-[hsl(32,60%,50%)/0.5] shadow-[0_0_15px_-3px_hsl(32,80%,50%/0.4)]">
+                      <TabsTrigger value="strongs" className="text-xs h-6 px-2 text-[hsl(45,50%,65%)] data-[state=active]:bg-gradient-to-r data-[state=active]:from-[hsl(32,80%,50%)] data-[state=active]:to-[hsl(45,90%,50%)] data-[state=active]:text-white data-[state=active]:shadow-[0_0_10px_hsl(32,80%,50%/0.5)]">Strong's</TabsTrigger>
+                      <TabsTrigger value="thayers" className="text-xs h-6 px-2 text-[hsl(45,50%,65%)] data-[state=active]:bg-gradient-to-r data-[state=active]:from-[hsl(32,80%,50%)] data-[state=active]:to-[hsl(45,90%,50%)] data-[state=active]:text-white data-[state=active]:shadow-[0_0_10px_hsl(32,80%,50%/0.5)]">Thayer's</TabsTrigger>
+                      <TabsTrigger value="bdb" className="text-xs h-6 px-2 text-[hsl(45,50%,65%)] data-[state=active]:bg-gradient-to-r data-[state=active]:from-[hsl(32,80%,50%)] data-[state=active]:to-[hsl(45,90%,50%)] data-[state=active]:text-white data-[state=active]:shadow-[0_0_10px_hsl(32,80%,50%/0.5)]">BDB</TabsTrigger>
                     </TabsList>
                   </Tabs>
                 </div>
@@ -315,7 +315,7 @@ export const ResearchModeLayout = ({ onExitResearchMode }: ResearchModeLayoutPro
         >
           {/* Tab Categories */}
           <div className="border-b border-[hsl(32,60%,40%)/0.3] bg-gradient-to-r from-[hsl(210,40%,18%)/0.3] via-[hsl(32,35%,18%)/0.2] to-[hsl(180,35%,18%)/0.3] p-2">
-            <div className="flex flex-wrap gap-1">
+            <div className="flex flex-wrap gap-1 p-1.5 rounded-xl bg-[hsl(230,30%,12%)/0.6] border border-[hsl(32,60%,50%)/0.4] shadow-[0_0_20px_-5px_hsl(32,80%,50%/0.35),inset_0_1px_0_hsl(32,70%,60%/0.08)]">
               {/* AI & Commentary */}
               <Button
                 size="sm"
