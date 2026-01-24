@@ -355,6 +355,197 @@ Return ONLY the JSON, no other text.`
     }
   }, [sermon, setSermon, themePassage]);
 
+  // Detect unquoted biblical phrases and identify source + related verses
+  const detectBiblicalPhrases = useCallback(async (content: string) => {
+    if (processingRequest) return;
+
+    const plainContent = content.replace(/<[^>]*>/g, '').trim();
+    if (plainContent.length < 50) return;
+
+    // Get the last 500 characters (most recent writing)
+    const recentContent = plainContent.slice(-500);
+
+    // Skip if already analyzed this content
+    const contentKey = `phrase:${recentContent.slice(-100)}`;
+    if (processedRequestsRef.current.has(contentKey)) return;
+
+    // Biblical phrase patterns (unquoted) - look for distinctive biblical language
+    const biblicalPhrasePatterns = [
+      // Pronouns + Father/God patterns (like "I and my father will make our abode")
+      /\b(I|we|he|they)\s+and\s+(my|the|our)\s+(father|Father|God|Lord)\b/i,
+      // "Make our/your/their abode" or "dwell with"
+      /\b(make|made)\s+(our|my|his|their|your)\s+abode\b/i,
+      /\b(dwell|abide|remain)\s+(with|in)\s+(him|me|us|them|you)\b/i,
+      // Classic phrases
+      /\bthe\s+Lord\s+is\s+my\s+shepherd\b/i,
+      /\bfor\s+God\s+so\s+loved\b/i,
+      /\bin\s+the\s+beginning\b/i,
+      /\bfear\s+not\b/i,
+      /\bbe\s+still\s+and\s+know\b/i,
+      /\bI\s+am\s+the\s+(way|truth|light|resurrection|bread|vine|door|good\s+shepherd)\b/i,
+      /\bcome\s+unto\s+me\b/i,
+      /\btake\s+up\s+(his|your|my)\s+cross\b/i,
+      /\blove\s+(one\s+another|your\s+enemies|thy\s+neighbor)\b/i,
+      /\bblessed\s+are\s+the\b/i,
+      /\bask\s+(and\s+you|,\s+and\s+it)\s+(shall|will)\b/i,
+      /\bseek\s+and\s+you\s+shall\s+find\b/i,
+      /\bknock\s+and\s+it\s+shall\s+be\s+opened\b/i,
+      /\bthe\s+truth\s+shall\s+(set|make)\s+you\s+free\b/i,
+      /\bgreater\s+love\s+hath\s+no\s+man\b/i,
+      /\bby\s+grace\s+(are\s+ye|you\s+are)\s+saved\b/i,
+      /\bfaith\s+without\s+works\b/i,
+      /\ball\s+things\s+work\s+together\s+for\s+good\b/i,
+      /\bI\s+can\s+do\s+all\s+things\s+through\b/i,
+      /\bthe\s+wages\s+of\s+sin\b/i,
+      /\bbe\s+ye\s+transformed\b/i,
+      /\bwalk\s+by\s+faith\b/i,
+    ];
+
+    let foundPhrase: { text: string; start: number; end: number } | null = null;
+
+    for (const pattern of biblicalPhrasePatterns) {
+      const match = recentContent.match(pattern);
+      if (match && match.index !== undefined) {
+        // Extract a larger context around the match (up to 80 chars)
+        const start = Math.max(0, match.index - 20);
+        const end = Math.min(recentContent.length, match.index + match[0].length + 40);
+        let phrase = recentContent.slice(start, end).trim();
+
+        // Clean up to get a natural sentence boundary
+        const sentenceStart = phrase.lastIndexOf('. ');
+        if (sentenceStart > 0 && sentenceStart < 15) {
+          phrase = phrase.slice(sentenceStart + 2);
+        }
+        const sentenceEnd = phrase.indexOf('. ');
+        if (sentenceEnd > 20) {
+          phrase = phrase.slice(0, sentenceEnd);
+        }
+
+        // Skip if this phrase is inside an existing blockquote
+        if (content.includes(`"${phrase}"`) || content.includes(`>${phrase}<`)) {
+          continue;
+        }
+
+        foundPhrase = { text: phrase.trim(), start, end };
+        break;
+      }
+    }
+
+    if (!foundPhrase) return;
+
+    // Mark as being processed
+    processedRequestsRef.current.add(contentKey);
+    setProcessingRequest(true);
+
+    try {
+      console.log("[BiblicalPhrase] Detected potential quote:", foundPhrase.text);
+
+      const { data, error } = await supabase.functions.invoke("jeeves", {
+        body: {
+          mode: "sermon-assistant",
+          sermon_title: sermon.title,
+          themePassage: themePassage,
+          chatMessages: [{
+            role: "user",
+            content: `I wrote this phrase in my sermon: "${foundPhrase.text}"
+
+This appears to be a quote or paraphrase from Scripture. Please:
+1. Identify the EXACT source verse
+2. Provide the COMPLETE verse text
+3. Suggest 3-4 related verses that share this theme
+
+IMPORTANT: Respond in this exact JSON format only:
+{
+  "isMatch": true,
+  "source": {
+    "reference": "Book Chapter:Verse(s)",
+    "scripture": "The complete verse text from KJV or standard translation"
+  },
+  "theme": "Brief description of the theme (2-5 words)",
+  "relatedVerses": [
+    { "reference": "Book Chapter:Verse", "text": "Verse text", "reason": "Why it relates" },
+    { "reference": "Book Chapter:Verse", "text": "Verse text", "reason": "Why it relates" },
+    { "reference": "Book Chapter:Verse", "text": "Verse text", "reason": "Why it relates" }
+  ]
+}
+
+If this is NOT a biblical quote or paraphrase, respond with:
+{
+  "isMatch": false
+}
+
+Return ONLY valid JSON, no other text.`
+          }]
+        },
+      });
+
+      if (error) throw error;
+
+      let responseText = data?.content || data?.response || (typeof data === 'string' ? data : '');
+      let cleanResponse = responseText.trim();
+      if (cleanResponse.startsWith('```json')) cleanResponse = cleanResponse.slice(7);
+      if (cleanResponse.startsWith('```')) cleanResponse = cleanResponse.slice(3);
+      if (cleanResponse.endsWith('```')) cleanResponse = cleanResponse.slice(0, -3);
+
+      const parsed = JSON.parse(cleanResponse.trim());
+
+      if (parsed?.isMatch && parsed?.source?.scripture && parsed?.source?.reference) {
+        // Replace the phrase with the full verse in a blockquote
+        const scriptureHtml = `<blockquote><strong>${parsed.source.reference}</strong>: "${parsed.source.scripture}"</blockquote>`;
+
+        // Find and replace the phrase in original content
+        // Be careful to only replace if not already in a blockquote
+        const currentContent = sermon.full_sermon || '';
+        if (!currentContent.includes(parsed.source.scripture)) {
+          // Find the phrase in the HTML content (accounting for possible tags)
+          const escapedPhrase = foundPhrase.text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+          const phraseRegex = new RegExp(`(?<!>)${escapedPhrase}(?!<)`, 'i');
+
+          if (phraseRegex.test(currentContent)) {
+            const newContent = currentContent.replace(phraseRegex, scriptureHtml);
+            setSermon({ ...sermon, full_sermon: newContent });
+            toast.success(`Identified source: ${parsed.source.reference}`);
+          }
+        }
+
+        // Add related verses to suggestions for the Verses tab
+        if (parsed.relatedVerses && Array.isArray(parsed.relatedVerses)) {
+          const relatedSuggestions: SuggestedVerse[] = parsed.relatedVerses.map((v: any) => ({
+            reference: v.reference,
+            text: v.text,
+            reason: v.reason || `Related to "${parsed.theme || 'this theme'}"`,
+            type: 'connection' as const
+          }));
+
+          // Add source verse first, then related verses
+          const sourceVerse: SuggestedVerse = {
+            reference: parsed.source.reference,
+            text: parsed.source.scripture,
+            reason: `Source of your quote: "${foundPhrase.text.slice(0, 40)}..."`,
+            type: 'proof' as const
+          };
+
+          setSuggestedVerses(prev => {
+            // Remove duplicates
+            const newVerses = [sourceVerse, ...relatedSuggestions].filter(
+              nv => !prev.some(pv => pv.reference.toLowerCase() === nv.reference.toLowerCase())
+            );
+            return [...newVerses, ...prev].slice(0, 8);
+          });
+
+          if (parsed.theme) {
+            toast.info(`Found ${relatedSuggestions.length} related verses on "${parsed.theme}"`);
+          }
+        }
+      }
+    } catch (error) {
+      console.error("Error detecting biblical phrase:", error);
+      // Silently fail
+    } finally {
+      setProcessingRequest(false);
+    }
+  }, [sermon, setSermon, themePassage, processingRequest]);
+
   // Debounced function to get verse suggestions based on cursor context
   const fetchVerseSuggestions = useCallback(async (content: string, contextOverride?: { before: string; paragraph: string }) => {
     // Require either 50+ chars in content OR a valid context paragraph
@@ -485,10 +676,11 @@ Return ONLY the JSON, no other text.`
     }
     debounceRef.current = setTimeout(() => {
       fetchVerseSuggestions(content);
-      // Check for parentheses-based scripture requests and partial verses
+      // Check for parentheses-based scripture requests, partial verses, and biblical phrases
       if (!processingRequest) {
         checkForScriptureRequests(content);
         checkForPartialVerses(content);
+        detectBiblicalPhrases(content);
       }
     }, 2000); // 2 second debounce
     
