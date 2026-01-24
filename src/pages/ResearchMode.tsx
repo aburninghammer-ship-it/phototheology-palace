@@ -360,19 +360,19 @@ const ResearchMode = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background relative overflow-hidden">
-      {/* Animated background elements */}
+    <div className="min-h-screen gradient-dreamy relative overflow-hidden">
+      {/* Animated background glow elements */}
       <div className="fixed inset-0 pointer-events-none overflow-hidden">
         <div
-          className="absolute top-1/4 -left-32 w-96 h-96 bg-blue-500/20 rounded-full blur-3xl animate-pulse"
+          className="absolute top-1/4 -left-32 w-96 h-96 bg-white/10 rounded-full blur-3xl animate-pulse"
           style={{ animationDuration: '4s' }}
         />
         <div
-          className="absolute top-1/2 -right-32 w-80 h-80 bg-indigo-500/20 rounded-full blur-3xl animate-pulse"
+          className="absolute top-1/2 -right-32 w-80 h-80 bg-white/10 rounded-full blur-3xl animate-pulse"
           style={{ animationDuration: '5s', animationDelay: '1s' }}
         />
         <div
-          className="absolute -bottom-32 left-1/3 w-72 h-72 bg-purple-500/15 rounded-full blur-3xl animate-pulse"
+          className="absolute -bottom-32 left-1/3 w-72 h-72 bg-white/5 rounded-full blur-3xl animate-pulse"
           style={{ animationDuration: '6s', animationDelay: '2s' }}
         />
       </div>
@@ -382,8 +382,7 @@ const ResearchMode = () => {
       <main className="pt-16 relative z-10">
         {/* Hero Section with glass effect */}
         <div className="relative overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-br from-blue-600/90 via-indigo-600/90 to-purple-700/90" />
-          <div className="absolute inset-0 backdrop-blur-sm" />
+          <div className="absolute inset-0 bg-black/20 backdrop-blur-sm" />
 
           {/* Decorative elements */}
           <div className="absolute top-0 right-0 w-96 h-96 bg-white/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
