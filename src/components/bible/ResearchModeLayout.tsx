@@ -104,13 +104,20 @@ export const ResearchModeLayout = ({ onExitResearchMode }: ResearchModeLayoutPro
 
   return (
     <div className="h-screen flex flex-col bg-[hsl(225,40%,8%)] overflow-hidden">
-      {/* Warm amber ambient background glow */}
+      {/* Warm amber ambient background glow - matching reference image */}
       <div className="fixed inset-0 pointer-events-none overflow-hidden -z-10">
+        {/* Base dark gradient */}
         <div className="absolute inset-0 bg-gradient-to-br from-[hsl(225,40%,10%)] via-[hsl(30,30%,12%)] to-[hsl(35,35%,10%)]" />
-        <div className="absolute -top-40 -right-40 w-[500px] h-[500px] bg-[hsl(32,80%,40%)/0.15] rounded-full blur-[100px]" />
-        <div className="absolute top-1/3 -left-40 w-[400px] h-[400px] bg-[hsl(32,70%,35%)/0.1] rounded-full blur-[80px]" />
-        <div className="absolute -bottom-40 right-1/4 w-[350px] h-[350px] bg-[hsl(38,75%,45%)/0.12] rounded-full blur-[90px]" />
-        <div className="absolute bottom-1/3 left-1/3 w-[300px] h-[300px] bg-[hsl(180,50%,30%)/0.08] rounded-full blur-[70px]" />
+        
+        {/* Strong orange glow on edges - like reference image */}
+        <div className="absolute -top-20 -right-20 w-[600px] h-[600px] bg-[hsl(32,90%,50%)/0.25] rounded-full blur-[120px]" />
+        <div className="absolute top-1/4 -left-40 w-[500px] h-[500px] bg-[hsl(32,85%,45%)/0.2] rounded-full blur-[100px]" />
+        <div className="absolute -bottom-40 -left-20 w-[450px] h-[450px] bg-[hsl(35,90%,50%)/0.22] rounded-full blur-[110px]" />
+        <div className="absolute -bottom-20 right-1/4 w-[400px] h-[400px] bg-[hsl(38,85%,48%)/0.18] rounded-full blur-[95px]" />
+        <div className="absolute top-1/2 right-0 w-[350px] h-[350px] bg-[hsl(28,88%,45%)/0.15] rounded-full blur-[85px]" />
+        
+        {/* Subtle teal accent for contrast */}
+        <div className="absolute bottom-1/3 left-1/3 w-[250px] h-[250px] bg-[hsl(180,50%,30%)/0.06] rounded-full blur-[70px]" />
       </div>
 
       {/* Top Toolbar - Deep navy with amber accents */}
