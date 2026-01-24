@@ -109,30 +109,31 @@ serve(async (req) => {
       analysisPrompt = `Provide a brief Phototheology analysis focusing on Christ-centered interpretation.`;
     }
 
-    // Use AI to generate the analysis
-    const response = await fetch("https://api.anthropic.com/v1/messages", {
+    // Use Lovable AI gateway (no API key required)
+    const response = await fetch("https://ai.gateway.lovable.dev/chat/completions", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "x-api-key": Deno.env.get("ANTHROPIC_API_KEY") || "",
-        "anthropic-version": "2023-06-01",
+        "Authorization": `Bearer ${Deno.env.get("LOVABLE_API_KEY")}`,
       },
       body: JSON.stringify({
-        model: "claude-sonnet-4-20250514",
-        max_tokens: 1000,
-        system: systemContext + "Keep responses focused and practical. Use Phototheology terminology appropriately.",
+        model: "google/gemini-2.5-flash",
         messages: [
+          { role: "system", content: systemContext + "Keep responses focused and practical. Use Phototheology terminology appropriately." },
           { role: "user", content: analysisPrompt }
         ],
+        max_tokens: 1000,
       }),
     });
 
     if (!response.ok) {
+      const errorText = await response.text();
+      console.error("AI API error response:", errorText);
       throw new Error(`AI API error: ${response.status}`);
     }
 
     const aiData = await response.json();
-    const analysis = aiData.content?.[0]?.text || "Analysis unavailable.";
+    const analysis = aiData.choices?.[0]?.message?.content || "Analysis unavailable.";
 
     return new Response(
       JSON.stringify({ 
