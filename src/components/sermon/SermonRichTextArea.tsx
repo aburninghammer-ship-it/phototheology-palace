@@ -2,7 +2,7 @@ import { useEditor, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import Link from '@tiptap/extension-link';
 import Placeholder from '@tiptap/extension-placeholder';
-import { useEffect, useRef, useCallback } from 'react';
+import { useEffect, useRef, useCallback, useImperativeHandle, forwardRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Bold, Italic, List, ListOrdered, Quote, Undo, Redo } from 'lucide-react';
 import { ScriptureLookup } from './ScriptureLookup';
@@ -12,6 +12,10 @@ import { PalaceConnectionsOverlay } from './PalaceConnectionsOverlay';
 import { usePalaceConnections } from '@/hooks/usePalaceConnections';
 import { fetchChapter } from '@/services/bibleApi';
 import { toast } from 'sonner';
+
+export interface SermonRichTextAreaHandle {
+  insertAtCursor: (text: string) => void;
+}
 
 interface SermonRichTextAreaProps {
   content: string;
@@ -42,15 +46,15 @@ function parseVerseReference(ref: string): { book: string; chapter: number; vers
   };
 }
 
-export function SermonRichTextArea({ 
-  content, 
-  onChange, 
+export const SermonRichTextArea = forwardRef<SermonRichTextAreaHandle, SermonRichTextAreaProps>(({
+  content,
+  onChange,
   placeholder = "Start writing...",
   minHeight = "120px",
   showTools = true,
   themePassage,
   onCursorContext
-}: SermonRichTextAreaProps) {
+}, ref) => {
   const lastProcessedRef = useRef<Set<string>>(new Set());
   const verseContentMapRef = useRef<Map<string, string>>(new Map()); // Track ref -> verse text
   const processingRef = useRef(false);
@@ -416,6 +420,16 @@ export function SermonRichTextArea({
     }
   };
 
+  // Expose insertAtCursor method to parent via ref
+  useImperativeHandle(ref, () => ({
+    insertAtCursor: (text: string) => {
+      if (editor) {
+        // Insert at current cursor position with a newline before and after
+        editor.chain().focus().insertContent('\n' + text + '\n').run();
+      }
+    }
+  }), [editor]);
+
   if (!editor) return null;
 
   return (
@@ -502,4 +516,4 @@ export function SermonRichTextArea({
       <PalaceConnectionsOverlay connections={connections} isAnalyzing={isAnalyzing} />
     </div>
   );
-}
+});

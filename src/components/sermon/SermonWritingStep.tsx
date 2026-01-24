@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from "react";
-import { SermonRichTextArea } from "./SermonRichTextArea";
+import { SermonRichTextArea, SermonRichTextAreaHandle } from "./SermonRichTextArea";
 import { SermonSidePanel } from "./SermonSidePanel";
 import { SermonPolishTab } from "./SermonPolishTab";
 import { SermonBlockEditor } from "./SermonBlockEditor";
@@ -56,6 +56,9 @@ export function SermonWritingStep({ sermon, setSermon, themePassage, sermonId }:
   // Cursor context for verse suggestions
   const [cursorContext, setCursorContext] = useState<{ before: string; after: string; paragraph: string } | null>(null);
   const cursorContextRef = useRef<{ before: string; after: string; paragraph: string } | null>(null);
+
+  // Ref for the rich text editor to insert at cursor position
+  const editorRef = useRef<SermonRichTextAreaHandle>(null);
 
   // Parentheses-based scripture lookup state
   const [processingRequest, setProcessingRequest] = useState(false);
@@ -705,13 +708,22 @@ Return ONLY valid JSON, no other text.`
     };
   }, []);
 
-  // Insert verse into sermon and remove from suggestions
+  // Insert verse into sermon at cursor position and remove from suggestions
   const insertVerse = (verse: SuggestedVerse) => {
-    const verseHtml = `<blockquote><strong>${verse.reference}</strong>: "${verse.text}"</blockquote>\n`;
-    setSermon({ ...sermon, full_sermon: sermon.full_sermon + verseHtml });
+    const verseHtml = `<blockquote><strong>${verse.reference}</strong>: "${verse.text}"</blockquote>`;
+
+    // Try to insert at cursor position via editor ref
+    if (editorRef.current) {
+      editorRef.current.insertAtCursor(verseHtml);
+      toast.success(`${verse.reference} added at cursor`);
+    } else {
+      // Fallback: append to end if ref not available
+      setSermon({ ...sermon, full_sermon: sermon.full_sermon + '\n' + verseHtml + '\n' });
+      toast.success(`${verse.reference} added to sermon`);
+    }
+
     // Remove the inserted verse from suggestions
     setSuggestedVerses(prev => prev.filter(v => v.reference !== verse.reference));
-    toast.success(`${verse.reference} added to sermon`);
   };
 
   const [activeTab, setActiveTab] = useState<"write" | "polish">("write");
@@ -855,6 +867,7 @@ Return ONLY valid JSON, no other text.`
               {/* Left: Writing area - full half */}
               <div className="h-full flex flex-col min-h-0">
                 <SermonRichTextArea
+                  ref={editorRef}
                   content={sermon.full_sermon}
                   onChange={handleContentChange}
                   placeholder="Begin writing your sermon here. Type (find verse about...) in parentheses to auto-insert scripture. Start with your opening hook, weave through your smooth stones, build bridges between ideas, lead to your climax, and close with a powerful call to action..."
