@@ -153,8 +153,12 @@ export default function Auth() {
       }
 
       // Verify session was created
-      const { data: sessionCheck } = await supabase.auth.getSession();
-      console.log("[Auth] Post-login session check:", sessionCheck?.session?.user?.email ?? "NO SESSION");
+      try {
+        const { data: sessionCheck } = await supabase.auth.getSession();
+        console.log("[Auth] Post-login session check:", sessionCheck?.session?.user?.email ?? "NO SESSION");
+      } catch (sessionErr) {
+        console.warn("[Auth] Session check failed (non-critical):", sessionErr);
+      }
 
       // Save email only if remember me is checked (never store passwords)
       if (rememberMe) {
@@ -169,9 +173,10 @@ export default function Auth() {
       toast.success("Welcome back!");
       // Don't navigate here; once auth state updates, the effect above will route
       // to either the requested redirect target or the normal Gatehouse/Dashboard flow.
-    } catch (err) {
-      setError("An unexpected error occurred. Please try again.");
+    } catch (err: any) {
       console.error("[Auth] Login error:", err);
+      const errorMessage = err?.message || err?.toString() || "Unknown error";
+      setError(`Login failed: ${errorMessage}`);
     } finally {
       setLoading(false);
     }
