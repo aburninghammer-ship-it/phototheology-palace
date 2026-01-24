@@ -185,22 +185,22 @@ export const ResearchModeLayout = ({ onExitResearchMode }: ResearchModeLayoutPro
 
       {/* Main Content - 3 Column Layout */}
       <div className="flex-1 flex overflow-hidden p-3 gap-3">
-        {/* Left Panel - Bible Books - Amber glow outline */}
+        {/* Left Panel - Bible Books - Emerald glow outline */}
         <div 
           className={cn(
-            "rounded-2xl bg-[hsl(230,35%,12%)/0.95] backdrop-blur-xl border-2 border-[hsl(32,70%,45%)/0.5] transition-all duration-300 shrink-0 overflow-hidden",
-            "shadow-[0_0_30px_-5px_hsl(32,80%,50%/0.4),inset_0_1px_0_hsl(32,70%,60%/0.1)]",
+            "rounded-2xl bg-[hsl(230,35%,12%)/0.95] backdrop-blur-xl border-2 border-[hsl(142,60%,40%)/0.5] transition-all duration-300 shrink-0 overflow-hidden",
+            "shadow-[0_0_30px_-5px_hsl(142,70%,45%/0.4),inset_0_1px_0_hsl(142,60%,55%/0.1)]",
             expandedPanel === "books" ? "w-72" : "w-44"
           )}
         >
-          <div className="h-10 border-b border-[hsl(32,60%,40%)/0.3] bg-gradient-to-r from-[hsl(32,50%,20%)/0.3] to-[hsl(180,40%,20%)/0.2] flex items-center justify-between px-3">
+          <div className="h-10 border-b border-[hsl(142,50%,35%)/0.3] bg-gradient-to-r from-[hsl(142,45%,18%)/0.3] to-[hsl(160,40%,18%)/0.2] flex items-center justify-between px-3">
             <span className="text-sm font-medium flex items-center gap-2">
               <div className="p-1 rounded-md bg-[hsl(142,50%,35%)/0.3]">
                 <Book className="h-3.5 w-3.5 text-[hsl(142,60%,55%)]" />
               </div>
               <span className="text-[hsl(142,50%,60%)] font-semibold">Books</span>
             </span>
-            <Button variant="ghost" size="icon" className="h-6 w-6 hover:bg-[hsl(32,50%,40%)/0.2] text-[hsl(45,60%,70%)]" onClick={() => toggleExpand("books")}>
+            <Button variant="ghost" size="icon" className="h-6 w-6 hover:bg-[hsl(142,45%,35%)/0.2] text-[hsl(142,55%,65%)]" onClick={() => toggleExpand("books")}>
               {expandedPanel === "books" ? <Minimize2 className="h-3 w-3" /> : <Maximize2 className="h-3 w-3" />}
             </Button>
           </div>
@@ -216,13 +216,13 @@ export const ResearchModeLayout = ({ onExitResearchMode }: ResearchModeLayoutPro
 
         {/* Center Panel - Bible Text & Dictionaries */}
         <div className="flex-1 flex flex-col min-w-0 overflow-hidden gap-3">
-          {/* Bible Text - Top - Amber glow outline */}
+          {/* Bible Text - Top - Cyan glow outline */}
           <div className={cn(
-            "rounded-2xl bg-[hsl(230,35%,12%)/0.95] backdrop-blur-xl border-2 border-[hsl(32,70%,45%)/0.5] transition-all duration-300 overflow-hidden",
-            "shadow-[0_0_30px_-5px_hsl(32,80%,50%/0.4),inset_0_1px_0_hsl(32,70%,60%/0.1)]",
+            "rounded-2xl bg-[hsl(230,35%,12%)/0.95] backdrop-blur-xl border-2 border-[hsl(200,70%,45%)/0.5] transition-all duration-300 overflow-hidden",
+            "shadow-[0_0_30px_-5px_hsl(200,80%,50%/0.4),inset_0_1px_0_hsl(200,70%,60%/0.1)]",
             expandedPanel === "text" ? "flex-1" : "h-1/2"
           )}>
-            <div className="h-10 border-b border-[hsl(32,60%,40%)/0.3] bg-gradient-to-r from-[hsl(200,40%,18%)/0.4] via-[hsl(32,30%,15%)/0.2] to-[hsl(180,30%,18%)/0.3] flex items-center justify-between px-3">
+            <div className="h-10 border-b border-[hsl(200,60%,40%)/0.3] bg-gradient-to-r from-[hsl(200,50%,18%)/0.4] via-[hsl(210,40%,16%)/0.3] to-[hsl(190,45%,18%)/0.3] flex items-center justify-between px-3">
               <div className="flex items-center gap-2">
                 <div className="p-1 rounded-md bg-[hsl(200,60%,40%)/0.3]">
                   <BookOpen className="h-3.5 w-3.5 text-[hsl(200,70%,60%)]" />
@@ -271,13 +271,13 @@ export const ResearchModeLayout = ({ onExitResearchMode }: ResearchModeLayoutPro
             )}
           </div>
 
-          {/* Dictionary Panel - Bottom - Amber glow outline */}
+          {/* Dictionary Panel - Bottom - Amber/Gold glow outline */}
           {expandedPanel !== "text" && (
-            <div className="flex-1 min-h-0 rounded-2xl bg-[hsl(230,35%,12%)/0.95] backdrop-blur-xl border-2 border-[hsl(32,70%,45%)/0.5] shadow-[0_0_30px_-5px_hsl(32,80%,50%/0.4),inset_0_1px_0_hsl(32,70%,60%/0.1)] overflow-hidden">
-              <div className="h-10 border-b border-[hsl(32,60%,40%)/0.3] bg-gradient-to-r from-[hsl(32,50%,25%)/0.3] to-[hsl(45,45%,22%)/0.2] flex items-center justify-between px-3">
+            <div className="flex-1 min-h-0 rounded-2xl bg-[hsl(230,35%,12%)/0.95] backdrop-blur-xl border-2 border-[hsl(38,75%,50%)/0.5] shadow-[0_0_30px_-5px_hsl(38,85%,55%/0.4),inset_0_1px_0_hsl(38,75%,60%/0.1)] overflow-hidden">
+              <div className="h-10 border-b border-[hsl(38,65%,45%)/0.3] bg-gradient-to-r from-[hsl(38,55%,22%)/0.3] to-[hsl(45,50%,20%)/0.2] flex items-center justify-between px-3">
                 <div className="flex items-center gap-2">
-                  <div className="p-1 rounded-md bg-[hsl(32,70%,45%)/0.3]">
-                    <Languages className="h-3.5 w-3.5 text-[hsl(32,80%,60%)]" />
+                  <div className="p-1 rounded-md bg-[hsl(38,70%,45%)/0.3]">
+                    <Languages className="h-3.5 w-3.5 text-[hsl(38,80%,60%)]" />
                   </div>
                   <span className="text-sm font-semibold text-[hsl(45,70%,65%)]">Dictionary</span>
                   <Tabs value={activeDictionary} onValueChange={setActiveDictionary} className="h-8">
@@ -305,17 +305,17 @@ export const ResearchModeLayout = ({ onExitResearchMode }: ResearchModeLayoutPro
           )}
         </div>
 
-        {/* Right Panel - PT Tools & Commentary - Amber glow outline */}
+        {/* Right Panel - PT Tools & Commentary - Purple glow outline */}
         <div 
           className={cn(
-            "rounded-2xl bg-[hsl(230,35%,12%)/0.95] backdrop-blur-xl border-2 border-[hsl(32,70%,45%)/0.5] transition-all duration-300 shrink-0 overflow-hidden flex flex-col",
-            "shadow-[0_0_30px_-5px_hsl(32,80%,50%/0.4),inset_0_1px_0_hsl(32,70%,60%/0.1)]",
+            "rounded-2xl bg-[hsl(230,35%,12%)/0.95] backdrop-blur-xl border-2 border-[hsl(270,60%,50%)/0.5] transition-all duration-300 shrink-0 overflow-hidden flex flex-col",
+            "shadow-[0_0_30px_-5px_hsl(270,70%,55%/0.4),inset_0_1px_0_hsl(270,60%,60%/0.1)]",
             expandedPanel === "commentary" ? "w-[500px]" : "w-80"
           )}
         >
           {/* Tab Categories */}
-          <div className="border-b border-[hsl(32,60%,40%)/0.3] bg-gradient-to-r from-[hsl(210,40%,18%)/0.3] via-[hsl(32,35%,18%)/0.2] to-[hsl(180,35%,18%)/0.3] p-2">
-            <div className="flex flex-wrap gap-1 p-1.5 rounded-xl bg-[hsl(230,30%,12%)/0.6] border border-[hsl(32,60%,50%)/0.4] shadow-[0_0_20px_-5px_hsl(32,80%,50%/0.35),inset_0_1px_0_hsl(32,70%,60%/0.08)]">
+          <div className="border-b border-[hsl(270,50%,45%)/0.3] bg-gradient-to-r from-[hsl(270,40%,18%)/0.3] via-[hsl(280,35%,16%)/0.2] to-[hsl(260,35%,18%)/0.3] p-2">
+            <div className="flex flex-wrap gap-1 p-1.5 rounded-xl bg-[hsl(230,30%,12%)/0.6] border border-[hsl(270,55%,50%)/0.4] shadow-[0_0_20px_-5px_hsl(270,70%,55%/0.35),inset_0_1px_0_hsl(270,60%,60%/0.08)]">
               {/* AI & Commentary */}
               <Button
                 size="sm"
@@ -406,12 +406,12 @@ export const ResearchModeLayout = ({ onExitResearchMode }: ResearchModeLayoutPro
           </div>
 
           {/* Panel Header */}
-          <div className="h-10 border-b border-[hsl(32,60%,40%)/0.3] bg-gradient-to-r from-[hsl(210,35%,15%)/0.3] to-[hsl(32,30%,15%)/0.2] flex items-center justify-between px-3">
+          <div className="h-10 border-b border-[hsl(270,50%,45%)/0.3] bg-gradient-to-r from-[hsl(270,40%,18%)/0.3] to-[hsl(280,35%,16%)/0.2] flex items-center justify-between px-3">
             <div className="flex items-center gap-2">
-              <div className="p-1 rounded-md bg-[hsl(32,60%,45%)/0.3]">
-                <MessageSquare className="h-3.5 w-3.5 text-[hsl(32,70%,60%)]" />
+              <div className="p-1 rounded-md bg-[hsl(270,55%,45%)/0.3]">
+                <MessageSquare className="h-3.5 w-3.5 text-[hsl(270,65%,65%)]" />
               </div>
-              <span className="text-sm font-semibold text-[hsl(45,70%,70%)]">
+              <span className="text-sm font-semibold text-[hsl(270,55%,70%)]">
                 {rightTab === "jeeves" && "Jeeves AI Commentary"}
                 {rightTab === "crossref" && "Cross References"}
                 {rightTab === "genetics" && "Verse Genetics"}
@@ -423,7 +423,7 @@ export const ResearchModeLayout = ({ onExitResearchMode }: ResearchModeLayoutPro
                 {rightTab === "ascensions" && "Five Ascensions"}
               </span>
             </div>
-            <Button variant="ghost" size="icon" className="h-6 w-6 hover:bg-[hsl(32,50%,40%)/0.2] text-[hsl(45,60%,70%)]" onClick={() => toggleExpand("commentary")}>
+            <Button variant="ghost" size="icon" className="h-6 w-6 hover:bg-[hsl(270,45%,40%)/0.2] text-[hsl(270,55%,70%)]" onClick={() => toggleExpand("commentary")}>
               {expandedPanel === "commentary" ? <Minimize2 className="h-3 w-3" /> : <Maximize2 className="h-3 w-3" />}
             </Button>
           </div>
