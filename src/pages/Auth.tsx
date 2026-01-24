@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate, Link, useSearchParams } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
-import { useGatehouseStatus } from "@/hooks/useGatehouseStatus";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -28,7 +27,6 @@ const referralCodeSchema = z.string().trim().max(20).regex(/^[A-Z0-9]*$/).option
 
 export default function Auth() {
   const { user } = useAuth();
-  const { hasEnteredPalace, isLoading: gatehouseLoading } = useGatehouseStatus();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const [loading, setLoading] = useState(false);
@@ -44,22 +42,41 @@ export default function Auth() {
     : null;
 
   // Redirect if already logged in (but NOT if in Patreon mode - let them connect)
+  // We defer the gatehouse check to avoid Supabase deadlocks during auth state changes
   useEffect(() => {
-    if (user && !isPatreonMode && !gatehouseLoading) {
-      // If we have an explicit redirect target, honor it first
-      if (safeRedirect) {
-        navigate(safeRedirect, { replace: true });
-        return;
-      }
+    if (!user || isPatreonMode) return;
 
-      // Otherwise, use the normal Gatehouse/Dashboard decision
-      if (!hasEnteredPalace) {
-        navigate("/gatehouse");
-      } else {
-        navigate("/dashboard");
-      }
+    // If we have an explicit redirect target, honor it immediately
+    if (safeRedirect) {
+      navigate(safeRedirect, { replace: true });
+      return;
     }
-  }, [user, navigate, isPatreonMode, hasEnteredPalace, gatehouseLoading, safeRedirect]);
+
+    // Defer profile fetch to avoid potential deadlock with onAuthStateChange
+    const checkGatehouseAndRedirect = async () => {
+      try {
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('has_entered_palace')
+          .eq('id', user.id)
+          .single();
+
+        if (profile?.has_entered_palace) {
+          navigate("/dashboard", { replace: true });
+        } else {
+          navigate("/gatehouse", { replace: true });
+        }
+      } catch (err) {
+        console.error("Error checking gatehouse status:", err);
+        // Default to gatehouse on error
+        navigate("/gatehouse", { replace: true });
+      }
+    };
+
+    // Small timeout to ensure we're outside the auth state change callback
+    const timer = setTimeout(checkGatehouseAndRedirect, 50);
+    return () => clearTimeout(timer);
+  }, [user, navigate, isPatreonMode, safeRedirect]);
   
   // Login form
   const [loginEmail, setLoginEmail] = useState("");
