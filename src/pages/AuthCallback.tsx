@@ -12,8 +12,23 @@ export default function AuthCallback() {
   useEffect(() => {
     const handleOAuthCallback = async () => {
       try {
+        // Optional post-auth redirect target (must be a safe relative path)
+        const redirectParam = searchParams.get("redirect");
+        const safeRedirect =
+          redirectParam && redirectParam.startsWith("/") && !redirectParam.startsWith("//")
+            ? redirectParam
+            : null;
+
         // Get the platform from query params
         const platform = searchParams.get('platform') as 'facebook' | 'twitter' | 'linkedin' | null;
+
+        // If this callback arrived with an auth code (PKCE flow), exchange it for a session.
+        // Without this, `getSession()` can be null and users bounce back to /auth.
+        const code = searchParams.get("code");
+        if (code) {
+          const { error: exchangeError } = await supabase.auth.exchangeCodeForSession(code);
+          if (exchangeError) throw exchangeError;
+        }
         
         // Handle the OAuth callback
         const { data: { session }, error: sessionError } = await supabase.auth.getSession();
@@ -73,7 +88,8 @@ export default function AuthCallback() {
           } else if (profile && !profile.has_entered_palace) {
             navigate('/gatehouse', { replace: true });
           } else {
-            navigate('/dashboard', { replace: true });
+            // Honor an explicit redirect target when provided
+            navigate(safeRedirect ?? '/dashboard', { replace: true });
           }
         }
       } catch (error: any) {
