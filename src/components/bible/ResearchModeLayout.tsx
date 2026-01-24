@@ -1,11 +1,12 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { fetchChapter, Translation } from "@/services/bibleApi";
-import { Chapter } from "@/types/bible";
+import { fetchChapter, Translation, searchBibleByWord } from "@/services/bibleApi";
+import { Chapter, Verse } from "@/types/bible";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
 import { useTheme } from "next-themes";
 import {
   ChevronLeft,
@@ -29,7 +30,9 @@ import {
   ArrowUpRight,
   StickyNote,
   Sun,
-  Moon
+  Moon,
+  Search,
+  Loader2
 } from "lucide-react";
 import { ResearchBooksPanel } from "./ResearchBooksPanel";
 import { ResearchVersesPanel } from "./ResearchVersesPanel";
@@ -63,7 +66,95 @@ export const ResearchModeLayout = ({ onExitResearchMode }: ResearchModeLayoutPro
   const [rightTab, setRightTab] = useState<RightTab>("jeeves");
   const [activeDictionary, setActiveDictionary] = useState("strongs");
 
+  // Search state
+  const [searchQuery, setSearchQuery] = useState("");
+  const [searchResults, setSearchResults] = useState<Verse[]>([]);
+  const [searchLoading, setSearchLoading] = useState(false);
+  const [showSearchResults, setShowSearchResults] = useState(false);
+  const searchRef = useRef<HTMLDivElement>(null);
+  const searchDebounceRef = useRef<NodeJS.Timeout | null>(null);
+
   const isDark = theme === "dark";
+
+  // Parse verse reference from search query (e.g., "John 3:16", "1 Cor 13:4")
+  const parseVerseReference = (query: string): { book: string; chapter: number; verse?: number } | null => {
+    // Pattern: Book Chapter:Verse or Book Chapter
+    const pattern = /^([1-3]?\s?[A-Za-z]+(?:\s+[A-Za-z]+)?)\s+(\d+)(?::(\d+))?$/i;
+    const match = query.trim().match(pattern);
+    if (match) {
+      return {
+        book: match[1].trim(),
+        chapter: parseInt(match[2]),
+        verse: match[3] ? parseInt(match[3]) : undefined
+      };
+    }
+    return null;
+  };
+
+  // Handle search
+  const handleSearch = useCallback(async (query: string) => {
+    if (!query.trim()) {
+      setSearchResults([]);
+      setShowSearchResults(false);
+      return;
+    }
+
+    // First check if it's a verse reference
+    const verseRef = parseVerseReference(query);
+    if (verseRef) {
+      // Navigate directly to the verse
+      navigate(`/bible/${verseRef.book}/${verseRef.chapter}?mode=research`);
+      if (verseRef.verse) {
+        setSelectedVerse(verseRef.verse);
+      }
+      setSearchQuery("");
+      setShowSearchResults(false);
+      return;
+    }
+
+    // Otherwise, search for the word
+    setSearchLoading(true);
+    setShowSearchResults(true);
+    try {
+      const { verses } = await searchBibleByWord(query, "all", 1, 20);
+      setSearchResults(verses);
+    } catch (error) {
+      console.error("Search error:", error);
+      setSearchResults([]);
+    } finally {
+      setSearchLoading(false);
+    }
+  }, [navigate]);
+
+  // Debounced search
+  const handleSearchInput = (value: string) => {
+    setSearchQuery(value);
+    if (searchDebounceRef.current) {
+      clearTimeout(searchDebounceRef.current);
+    }
+    searchDebounceRef.current = setTimeout(() => {
+      handleSearch(value);
+    }, 500);
+  };
+
+  // Handle search result click
+  const handleResultClick = (verse: Verse) => {
+    navigate(`/bible/${verse.book}/${verse.chapter}?mode=research`);
+    setSelectedVerse(verse.verse);
+    setSearchQuery("");
+    setShowSearchResults(false);
+  };
+
+  // Close search results when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (searchRef.current && !searchRef.current.contains(event.target as Node)) {
+        setShowSearchResults(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   useEffect(() => {
     loadChapter();
@@ -222,7 +313,90 @@ export const ResearchModeLayout = ({ onExitResearchMode }: ResearchModeLayoutPro
           )}>
             {chapterData?.verses.length || 0} verses
           </Badge>
-          
+
+          {/* Search Bar */}
+          <div ref={searchRef} className="relative ml-2">
+            <div className={cn(
+              "flex items-center gap-2 rounded-lg border px-2 py-1",
+              isDark
+                ? "bg-slate-800/50 border-amber-500/30 focus-within:border-amber-400"
+                : "bg-white border-amber-200 focus-within:border-amber-400 shadow-sm"
+            )}>
+              <Search className={cn("h-4 w-4", isDark ? "text-amber-400/70" : "text-amber-500")} />
+              <Input
+                type="text"
+                placeholder="Search verses or type 'John 3:16'..."
+                value={searchQuery}
+                onChange={(e) => handleSearchInput(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    handleSearch(searchQuery);
+                  }
+                }}
+                className={cn(
+                  "h-6 w-48 border-0 bg-transparent p-0 text-sm focus-visible:ring-0 placeholder:text-muted-foreground/60",
+                  isDark ? "text-amber-100" : "text-amber-900"
+                )}
+              />
+              {searchLoading && <Loader2 className="h-4 w-4 animate-spin text-amber-500" />}
+            </div>
+
+            {/* Search Results Dropdown */}
+            {showSearchResults && searchResults.length > 0 && (
+              <div className={cn(
+                "absolute top-full left-0 mt-1 w-[400px] max-h-[400px] overflow-y-auto rounded-lg border shadow-xl z-50",
+                isDark
+                  ? "bg-slate-900/95 border-amber-500/30 backdrop-blur-xl"
+                  : "bg-white border-amber-200"
+              )}>
+                <div className={cn(
+                  "px-3 py-2 border-b text-xs font-medium",
+                  isDark ? "border-amber-500/20 text-amber-400" : "border-amber-100 text-amber-700"
+                )}>
+                  {searchResults.length} results for "{searchQuery}"
+                </div>
+                {searchResults.map((verse, idx) => (
+                  <button
+                    key={`${verse.book}-${verse.chapter}-${verse.verse}-${idx}`}
+                    onClick={() => handleResultClick(verse)}
+                    className={cn(
+                      "w-full px-3 py-2 text-left border-b last:border-0 transition-colors",
+                      isDark
+                        ? "border-slate-700/50 hover:bg-amber-500/10"
+                        : "border-amber-50 hover:bg-amber-50"
+                    )}
+                  >
+                    <div className={cn(
+                      "font-semibold text-sm",
+                      isDark ? "text-amber-400" : "text-amber-700"
+                    )}>
+                      {verse.book} {verse.chapter}:{verse.verse}
+                    </div>
+                    <div className={cn(
+                      "text-xs line-clamp-2 mt-0.5",
+                      isDark ? "text-slate-300" : "text-slate-600"
+                    )}>
+                      {verse.text}
+                    </div>
+                  </button>
+                ))}
+              </div>
+            )}
+
+            {/* No results message */}
+            {showSearchResults && searchQuery && !searchLoading && searchResults.length === 0 && (
+              <div className={cn(
+                "absolute top-full left-0 mt-1 w-[300px] rounded-lg border p-4 text-center shadow-xl z-50",
+                isDark
+                  ? "bg-slate-900/95 border-amber-500/30 text-slate-400"
+                  : "bg-white border-amber-200 text-slate-500"
+              )}>
+                <p className="text-sm">No results found for "{searchQuery}"</p>
+                <p className="text-xs mt-1 opacity-70">Try a verse reference like "John 3:16"</p>
+              </div>
+            )}
+          </div>
+
           {/* Center View Toggle */}
           <div className={cn(
             "h-6 w-px bg-gradient-to-b from-transparent via-current to-transparent ml-2",
