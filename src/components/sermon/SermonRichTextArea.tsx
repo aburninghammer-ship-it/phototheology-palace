@@ -167,30 +167,58 @@ export function SermonRichTextArea({
     },
   });
 
-  // Fetch verse text for a given reference
-  const fetchVerseText = useCallback(async (parsed: { book: string; chapter: number; verseStart: number; verseEnd?: number }): Promise<string | null> => {
+  // Fetch verse text for a given reference with retry logic
+  const fetchVerseText = useCallback(async (parsed: { book: string; chapter: number; verseStart: number; verseEnd?: number }, retryCount = 0): Promise<string | null> => {
+    const maxRetries = 2;
+
     try {
+      console.log(`[Verse Fetch] Fetching ${parsed.book} ${parsed.chapter}:${parsed.verseStart}${parsed.verseEnd ? `-${parsed.verseEnd}` : ''}`);
       const chapterData = await fetchChapter(parsed.book, parsed.chapter);
+
       // Check for error or empty verses
       if (!chapterData?.verses?.length || (chapterData as any).error) {
-        console.warn(`No verses available for ${parsed.book} ${parsed.chapter}`);
+        console.warn(`[Verse Fetch] No verses available for ${parsed.book} ${parsed.chapter}`);
+
+        // Retry if we haven't exceeded max retries
+        if (retryCount < maxRetries) {
+          console.log(`[Verse Fetch] Retrying... (attempt ${retryCount + 2}/${maxRetries + 1})`);
+          await new Promise(resolve => setTimeout(resolve, 1000 * (retryCount + 1)));
+          return fetchVerseText(parsed, retryCount + 1);
+        }
+
+        toast.error(`Could not fetch ${parsed.book} ${parsed.chapter}:${parsed.verseStart}. Please check your connection.`);
         return null;
       }
+
       const verseEnd = parsed.verseEnd || parsed.verseStart;
       const verses = chapterData.verses.filter(
         v => v.verse >= parsed.verseStart && v.verse <= verseEnd
       );
+
       if (verses.length > 0) {
         // Filter out any verses that contain error messages
-        const validVerses = verses.filter(v => !v.text.includes('temporarily unavailable'));
+        const validVerses = verses.filter(v => v.text && !v.text.includes('temporarily unavailable'));
         if (validVerses.length > 0) {
+          console.log(`[Verse Fetch] Success! Found ${validVerses.length} verses`);
           return validVerses.map(v => v.text).join(' ');
         }
       }
+
+      console.warn(`[Verse Fetch] Verses ${parsed.verseStart}-${verseEnd} not found in chapter`);
+      return null;
     } catch (error) {
-      console.error('Error fetching verse:', error);
+      console.error('[Verse Fetch] Error:', error);
+
+      // Retry on error
+      if (retryCount < maxRetries) {
+        console.log(`[Verse Fetch] Retrying after error... (attempt ${retryCount + 2}/${maxRetries + 1})`);
+        await new Promise(resolve => setTimeout(resolve, 1000 * (retryCount + 1)));
+        return fetchVerseText(parsed, retryCount + 1);
+      }
+
+      toast.error(`Error fetching ${parsed.book} ${parsed.chapter}. Please try again.`);
+      return null;
     }
-    return null;
   }, []);
 
   // Auto-detect and expand verse references + detect edits to existing blockquotes
@@ -238,23 +266,24 @@ export function SermonRichTextArea({
       if (!parsed) continue;
       
       processingRef.current = true;
-      
+      console.log(`[Verse Detect] Processing reference: ${fullRef}`);
+
       try {
         const verseText = await fetchVerseText(parsed);
-        
+
         if (verseText) {
           // Find and replace the reference with the full verse
           const currentHtml = editor.getHTML();
-          
+
           // Only replace if it's a standalone reference (not already in a blockquote)
           const refPattern = new RegExp(`(?<!<strong>)${fullRef.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}(?!</strong>)`, 'g');
-          
+
           if (refPattern.test(currentHtml) && !currentHtml.includes(`"${verseText}"`)) {
             const newHtml = currentHtml.replace(
               refPattern,
               `<blockquote><strong>${fullRef}</strong>: "${verseText}"</blockquote>`
             );
-            
+
             editor.commands.setContent(newHtml);
             lastProcessedRef.current.add(fullRef);
             verseContentMapRef.current.set(fullRef, verseText);
@@ -262,9 +291,15 @@ export function SermonRichTextArea({
           } else {
             lastProcessedRef.current.add(fullRef);
           }
+        } else {
+          // Mark as processed even if fetch failed to avoid infinite retries
+          lastProcessedRef.current.add(fullRef);
+          console.warn(`[Verse Detect] Could not fetch verse text for ${fullRef}`);
         }
       } catch (error) {
-        console.error('Error fetching verse:', error);
+        console.error('[Verse Detect] Error fetching verse:', error);
+        // Mark as processed to prevent infinite loop
+        lastProcessedRef.current.add(fullRef);
       } finally {
         processingRef.current = false;
       }
