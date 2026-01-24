@@ -112,7 +112,7 @@ const fetchChapterFromAPI = async (book: string, chapter: number, translation: T
 
     if (error) throw error;
     if (!data?.verses || !Array.isArray(data.verses) || data.verses.length === 0) {
-      throw new Error("No verses returned");
+      throw new Error("No verses returned from edge function");
     }
 
     const verses: Verse[] = data.verses.map((v: any) => ({
@@ -135,19 +135,45 @@ const fetchChapterFromAPI = async (book: string, chapter: number, translation: T
     preCacheSurrounding(book, chapter, translation, fetchChapterFromAPI);
 
     return chapterData;
-  } catch (error) {
-    console.error("Error fetching chapter:", error);
+  } catch (edgeFunctionError) {
+    console.warn("Edge function failed, trying direct API:", edgeFunctionError);
 
-    // Get the accurate verse count from our complete data
-    const bookCode = BOOK_NAME_TO_CODE.get(book) || book.toUpperCase().substring(0, 3);
-    let verseCount = getVerseCountForChapter(bookCode, chapter);
-    
-    // Fallback to reasonable default if book code not found
-    if (!verseCount || verseCount === 0) {
-      verseCount = 25; // Reasonable default
+    // Fallback: Try direct public API
+    try {
+      const directResponse = await fetch(
+        `${BIBLE_API_BASE}/${encodeURIComponent(book)}%20${chapter}?translation=${translation}`,
+        { signal: AbortSignal.timeout(10000) }
+      );
+
+      if (directResponse.ok) {
+        const directData = await directResponse.json();
+        if (directData.verses && Array.isArray(directData.verses) && directData.verses.length > 0) {
+          const verses: Verse[] = directData.verses.map((v: any) => ({
+            book: v.book_name ?? book,
+            chapter: v.chapter ?? chapter,
+            verse: v.verse,
+            text: v.text?.replace(/\n/g, ' ').trim(),
+          }));
+
+          const chapterData: Chapter = {
+            book: verses[0]?.book ?? book,
+            chapter,
+            verses,
+          };
+
+          // Cache the fetched chapter
+          cacheChapter(book, chapter, translation, chapterData);
+
+          console.log(`Direct API fallback successful: ${book} ${chapter} with ${verses.length} verses`);
+          return chapterData;
+        }
+      }
+    } catch (directError) {
+      console.error("Direct API fallback also failed:", directError);
     }
 
-    // Return empty chapter with error flag - UI should handle this gracefully
+    // Both failed - return empty chapter with error flag
+    console.error("All fetch methods failed for:", book, chapter);
     return {
       book,
       chapter,
