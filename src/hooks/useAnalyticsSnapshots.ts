@@ -34,7 +34,7 @@ export function useAnalyticsSnapshots(initialRange: TimeRange = "30d") {
     setError(null);
 
     try {
-      let query = supabase
+      let query = (supabase as any)
         .from("analytics_snapshots")
         .select("*")
         .order("snapshot_date", { ascending: true });
@@ -65,7 +65,7 @@ export function useAnalyticsSnapshots(initialRange: TimeRange = "30d") {
   // Record a new snapshot (triggers the DB function)
   const recordSnapshot = useCallback(async () => {
     try {
-      const { error: rpcError } = await supabase.rpc("record_analytics_snapshot");
+      const { error: rpcError } = await (supabase as any).rpc("record_analytics_snapshot");
       if (rpcError) throw rpcError;
       await fetchSnapshots();
       return { success: true };
