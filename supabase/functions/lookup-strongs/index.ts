@@ -160,10 +160,11 @@ No markdown, no explanation, just the JSON object.`
       );
     }
 
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error in lookup-strongs:', error);
+    const message = error instanceof Error ? error.message : 'Unknown error';
     return new Response(
-      JSON.stringify({ result: null, error: error.message }),
+      JSON.stringify({ result: null, error: message }),
       { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
   }
