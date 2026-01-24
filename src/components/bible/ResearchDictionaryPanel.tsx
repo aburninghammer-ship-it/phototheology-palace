@@ -24,6 +24,14 @@ interface StrongsWord {
   pronunciation?: string;
 }
 
+interface LookupResult {
+  strongsNumber: string;
+  originalWord: string;
+  transliteration: string;
+  definition: string;
+  language: 'Hebrew' | 'Greek';
+}
+
 export const ResearchDictionaryPanel = ({
   book,
   chapter,
@@ -32,15 +40,76 @@ export const ResearchDictionaryPanel = ({
   activeDictionary
 }: ResearchDictionaryPanelProps) => {
   const [loading, setLoading] = useState(false);
+  const [searchLoading, setSearchLoading] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [words, setWords] = useState<StrongsWord[]>([]);
   const [source, setSource] = useState<string>("");
+  const [lookupResult, setLookupResult] = useState<LookupResult | null>(null);
 
   // Reset words when verse or dictionary changes
   useEffect(() => {
     setWords([]);
     setSource("");
   }, [verse, activeDictionary]);
+
+  // Lookup specific Strong's number
+  const lookupStrongsNumber = async () => {
+    const trimmed = searchTerm.trim().toUpperCase();
+    if (!trimmed) {
+      toast.error("Enter a Strong's number (e.g., H430, G2316)");
+      return;
+    }
+
+    // Validate format
+    if (!/^[HG]\d{1,5}$/.test(trimmed)) {
+      toast.error("Invalid format. Use H#### for Hebrew or G#### for Greek");
+      return;
+    }
+
+    setSearchLoading(true);
+    setLookupResult(null);
+
+    try {
+      const { data, error } = await supabase.functions.invoke("lookup-strongs", {
+        body: {
+          strongsNumber: trimmed,
+          dictionary: activeDictionary
+        }
+      });
+
+      if (error) throw error;
+
+      if (data.result) {
+        setLookupResult(data.result);
+        toast.success(`Found ${trimmed}`);
+      } else {
+        toast.info(`No definition found for ${trimmed}`);
+      }
+    } catch (error) {
+      console.error("Failed to lookup Strong's number:", error);
+      toast.error("Failed to lookup - using AI fallback");
+
+      // Fallback to AI lookup
+      try {
+        const { data, error: aiError } = await supabase.functions.invoke("jeeves", {
+          body: {
+            mode: "strongs-lookup",
+            strongsNumber: trimmed,
+            dictionary: activeDictionary
+          }
+        });
+
+        if (!aiError && data?.result) {
+          setLookupResult(data.result);
+          toast.success(`Found ${trimmed} via AI`);
+        }
+      } catch (aiErr) {
+        toast.error("Lookup failed. Please try again.");
+      }
+    } finally {
+      setSearchLoading(false);
+    }
+  };
 
   const analyzeVerse = async () => {
     if (!verse || !verseText) return;
@@ -98,15 +167,70 @@ export const ResearchDictionaryPanel = ({
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
             value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            placeholder="Search Strong's (H1234, G5678)"
-            className="pl-9 text-sm bg-background/50 border-palace-orange/30 focus:border-palace-orange/60"
+            onChange={(e) => setSearchTerm(e.target.value.toUpperCase())}
+            onKeyDown={(e) => e.key === "Enter" && lookupStrongsNumber()}
+            placeholder="Enter Strong's # (H430, G2316)"
+            className="pl-9 text-sm bg-background/50 border-palace-orange/30 focus:border-palace-orange/60 font-mono"
           />
         </div>
-        <Button size="icon" variant="outline" className="border-palace-orange/30 hover:bg-palace-orange/20 hover:border-palace-orange/50">
-          <Search className="h-4 w-4" />
+        <Button
+          size="icon"
+          variant="outline"
+          onClick={lookupStrongsNumber}
+          disabled={searchLoading}
+          className="border-palace-orange/30 hover:bg-palace-orange/20 hover:border-palace-orange/50"
+        >
+          {searchLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Search className="h-4 w-4" />}
         </Button>
       </div>
+
+      {/* Lookup Result Card */}
+      {lookupResult && (
+        <div className={cn(
+          "rounded-xl p-4 space-y-2 border backdrop-blur-xl",
+          lookupResult.language === 'Hebrew'
+            ? "bg-gradient-to-br from-palace-purple/20 to-palace-blue/10 border-palace-purple/30 shadow-lg shadow-palace-purple/20"
+            : "bg-gradient-to-br from-palace-teal/20 to-palace-green/10 border-palace-teal/30 shadow-lg shadow-palace-teal/20"
+        )}>
+          <div className="flex items-center justify-between">
+            <Badge
+              className={cn(
+                "text-sm font-mono border-0 shadow-sm",
+                lookupResult.language === 'Hebrew'
+                  ? "bg-gradient-palace text-white"
+                  : "bg-gradient-ocean text-white"
+              )}
+            >
+              {lookupResult.strongsNumber}
+            </Badge>
+            <Badge variant="outline" className={cn(
+              "text-xs",
+              lookupResult.language === 'Hebrew'
+                ? "border-palace-purple/50 text-palace-purple"
+                : "border-palace-teal/50 text-palace-teal"
+            )}>
+              {lookupResult.language}
+            </Badge>
+          </div>
+          <p className="text-2xl font-serif text-foreground text-center py-2">
+            {lookupResult.originalWord}
+          </p>
+          <p className="text-sm text-center text-muted-foreground italic">
+            {lookupResult.transliteration}
+          </p>
+          <div className="pt-2 border-t border-white/10">
+            <p className="text-sm text-foreground/90 leading-relaxed">{lookupResult.definition}</p>
+          </div>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => setLookupResult(null)}
+            className="w-full text-xs hover:bg-white/10"
+          >
+            Clear Result
+          </Button>
+        </div>
+      )}
 
       {/* Verse Reference - Glassy with Glow */}
       <div className="bg-gradient-to-br from-palace-orange/10 to-palace-yellow/10 backdrop-blur-xl rounded-xl p-3 border border-palace-orange/20 shadow-lg shadow-palace-orange/10">

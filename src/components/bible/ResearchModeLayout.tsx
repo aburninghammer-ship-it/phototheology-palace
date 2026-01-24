@@ -193,10 +193,10 @@ export const ResearchModeLayout = ({ onExitResearchMode }: ResearchModeLayoutPro
       {/* Main Content - 3 Column Layout */}
       <div className="flex-1 flex overflow-hidden p-3 gap-3">
         {/* Left Panel - Bible Books - Emerald glow outline */}
-        <div 
+        <div
           className={cn(
-            "rounded-2xl bg-[hsl(230,35%,12%)/0.95] backdrop-blur-xl border-2 border-[hsl(142,60%,40%)/0.5] transition-all duration-300 shrink-0 overflow-hidden",
-            "shadow-[0_0_30px_-5px_hsl(142,70%,45%/0.4),inset_0_1px_0_hsl(142,60%,55%/0.1)]",
+            "rounded-2xl bg-[hsl(230,35%,12%)/0.95] backdrop-blur-xl border-2 border-[hsl(142,70%,50%)/0.6] transition-all duration-300 shrink-0 overflow-hidden",
+            "shadow-[0_0_40px_-5px_hsl(142,70%,50%/0.5),0_0_80px_-10px_hsl(142,60%,45%/0.3),inset_0_1px_0_hsl(142,60%,55%/0.15)]",
             expandedPanel === "books" ? "w-72" : "w-44"
           )}
         >
@@ -225,8 +225,8 @@ export const ResearchModeLayout = ({ onExitResearchMode }: ResearchModeLayoutPro
         <div className="flex-1 flex flex-col min-w-0 overflow-hidden gap-3">
           {/* Bible Text - Top - Cyan glow outline */}
           <div className={cn(
-            "rounded-2xl bg-[hsl(230,35%,12%)/0.95] backdrop-blur-xl border-2 border-[hsl(200,70%,45%)/0.5] transition-all duration-300 overflow-hidden",
-            "shadow-[0_0_30px_-5px_hsl(200,80%,50%/0.4),inset_0_1px_0_hsl(200,70%,60%/0.1)]",
+            "rounded-2xl bg-[hsl(230,35%,12%)/0.95] backdrop-blur-xl border-2 border-[hsl(200,80%,55%)/0.6] transition-all duration-300 overflow-hidden",
+            "shadow-[0_0_40px_-5px_hsl(200,80%,55%/0.5),0_0_80px_-10px_hsl(200,70%,50%/0.3),inset_0_1px_0_hsl(200,70%,60%/0.15)]",
             expandedPanel === "text" ? "flex-1" : "h-1/2"
           )}>
             <div className="h-10 border-b border-[hsl(200,60%,40%)/0.3] bg-gradient-to-r from-[hsl(200,50%,18%)/0.4] via-[hsl(210,40%,16%)/0.3] to-[hsl(190,45%,18%)/0.3] flex items-center justify-between px-3">
@@ -280,7 +280,7 @@ export const ResearchModeLayout = ({ onExitResearchMode }: ResearchModeLayoutPro
 
           {/* Dictionary Panel - Bottom - Amber/Gold glow outline */}
           {expandedPanel !== "text" && (
-            <div className="flex-1 min-h-0 rounded-2xl bg-[hsl(230,35%,12%)/0.95] backdrop-blur-xl border-2 border-[hsl(38,75%,50%)/0.5] shadow-[0_0_30px_-5px_hsl(38,85%,55%/0.4),inset_0_1px_0_hsl(38,75%,60%/0.1)] overflow-hidden">
+            <div className="flex-1 min-h-0 rounded-2xl bg-[hsl(230,35%,12%)/0.95] backdrop-blur-xl border-2 border-[hsl(38,85%,55%)/0.6] shadow-[0_0_40px_-5px_hsl(38,85%,55%/0.5),0_0_80px_-10px_hsl(38,75%,50%/0.3),inset_0_1px_0_hsl(38,75%,60%/0.15)] overflow-hidden">
               <div className="h-10 border-b border-[hsl(38,65%,45%)/0.3] bg-gradient-to-r from-[hsl(38,55%,22%)/0.3] to-[hsl(45,50%,20%)/0.2] flex items-center justify-between px-3">
                 <div className="flex items-center gap-2">
                   <div className="p-1 rounded-md bg-[hsl(38,70%,45%)/0.3]">
@@ -313,10 +313,10 @@ export const ResearchModeLayout = ({ onExitResearchMode }: ResearchModeLayoutPro
         </div>
 
         {/* Right Panel - PT Tools & Commentary - Purple glow outline */}
-        <div 
+        <div
           className={cn(
-            "rounded-2xl bg-[hsl(230,35%,12%)/0.95] backdrop-blur-xl border-2 border-[hsl(270,60%,50%)/0.5] transition-all duration-300 shrink-0 overflow-hidden flex flex-col",
-            "shadow-[0_0_30px_-5px_hsl(270,70%,55%/0.4),inset_0_1px_0_hsl(270,60%,60%/0.1)]",
+            "rounded-2xl bg-[hsl(230,35%,12%)/0.95] backdrop-blur-xl border-2 border-[hsl(270,70%,55%)/0.6] transition-all duration-300 shrink-0 overflow-hidden flex flex-col",
+            "shadow-[0_0_40px_-5px_hsl(270,70%,55%/0.5),0_0_80px_-10px_hsl(270,60%,50%/0.3),inset_0_1px_0_hsl(270,60%,60%/0.15)]",
             expandedPanel === "commentary" ? "w-[500px]" : "w-80"
           )}
         >
