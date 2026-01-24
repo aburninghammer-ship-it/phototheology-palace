@@ -90,33 +90,35 @@ export function SermonSidePanel({
     staleTime: 30000, // Cache for 30 seconds
   });
 
-  // Initialize sparks for sermon context - unlimited sparks in sermon mode
+  // Initialize sparks for sermon context - real-time sparks in sermon mode
   const {
     sparks: activeSparks,
     generateSpark,
     openSpark,
     saveSpark,
     dismissSpark,
-    exploreSpark
+    exploreSpark,
+    generating: sparkGenerating
   } = useSparks({
     surface: 'study',
     contextType: 'study',
     contextId: sermonTitle || 'sermon-writing',
-    maxSparks: 50, // Allow many sparks in sermon writing mode
-    debounceMs: 45000 // Generate sparks more frequently (45s instead of 90s)
+    maxSparks: 20, // Allow many sparks in sermon writing mode
+    debounceMs: 15000 // Generate sparks every 15 seconds for real-time feel
   });
 
-  // Generate sparks based on sermon content changes
+  // Generate sparks based on sermon content changes - more aggressive for real-time
   useEffect(() => {
     if (!sermonContent || typeof sermonContent !== 'string') return;
     const plainText = sermonContent.replace(/<[^>]*>/g, '').trim();
-    if (plainText.length > 200) {
+    // Lower threshold - trigger sparks after just 100 characters
+    if (plainText.length > 100) {
       const timer = setTimeout(() => {
         generateSpark(plainText, themePassage);
-      }, 5000);
+      }, 2000); // Reduced from 5s to 2s for more real-time feel
       return () => clearTimeout(timer);
     }
-  }, [sermonContent, generateSpark]);
+  }, [sermonContent, generateSpark, themePassage]);
 
   useEffect(() => {
     if (scrollRef.current) {
@@ -227,13 +229,34 @@ export function SermonSidePanel({
                   <p className="text-xs text-muted-foreground mt-2">
                     Click on a spark to explore connections and insights for your sermon.
                   </p>
+                  {sparkGenerating && (
+                    <div className="flex items-center gap-2 text-xs text-primary">
+                      <Loader2 className="w-3 h-3 animate-spin" />
+                      <span>Generating new spark...</span>
+                    </div>
+                  )}
                 </div>
               ) : (
                 <div className="flex flex-col items-center justify-center h-full text-center p-4 text-muted-foreground">
-                  <Sparkles className="w-8 h-8 mb-2 opacity-30" />
-                  <p className="text-sm">
-                    Keep writing! Jeeves will spark ideas as your sermon develops.
-                  </p>
+                  {sparkGenerating ? (
+                    <>
+                      <Loader2 className="w-8 h-8 mb-2 animate-spin text-primary" />
+                      <p className="text-sm font-medium text-primary">
+                        Generating your first spark...
+                      </p>
+                      <p className="text-xs mt-1">Analyzing your sermon for insights</p>
+                    </>
+                  ) : (
+                    <>
+                      <Sparkles className="w-8 h-8 mb-2 opacity-30" />
+                      <p className="text-sm">
+                        Keep writing! Sparks appear automatically as you develop your sermon.
+                      </p>
+                      <p className="text-xs mt-1 text-muted-foreground/70">
+                        (Sparks generate every ~15 seconds while writing)
+                      </p>
+                    </>
+                  )}
                 </div>
               )}
             </div>
