@@ -2,10 +2,12 @@ import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { Loader2, Search, BookOpen, Sparkles, Languages } from "lucide-react";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Loader2, Search, BookOpen, Sparkles, Languages, Volume2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
+import { getStrongsEntry } from "@/services/strongsApi";
 
 interface ResearchDictionaryPanelProps {
   book: string;
@@ -46,11 +48,46 @@ export const ResearchDictionaryPanel = ({
   const [source, setSource] = useState<string>("");
   const [lookupResult, setLookupResult] = useState<LookupResult | null>(null);
 
-  // Reset words when verse or dictionary changes
+  // Auto-analyze when verse changes
   useEffect(() => {
     setWords([]);
     setSource("");
+    setLookupResult(null);
+
+    // Auto-analyze the verse when selected
+    if (verse && verseText) {
+      const timer = setTimeout(() => {
+        analyzeVerseAuto();
+      }, 300);
+      return () => clearTimeout(timer);
+    }
   }, [verse, activeDictionary]);
+
+  // Auto-analyze function (doesn't require button click)
+  const analyzeVerseAuto = async () => {
+    if (!verse || !verseText) return;
+
+    setLoading(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("analyze-strongs", {
+        body: {
+          book,
+          chapter,
+          verse,
+          text: verseText,
+          dictionary: activeDictionary
+        }
+      });
+
+      if (error) throw error;
+      setWords(data.words || []);
+      setSource(data.source || 'unknown');
+    } catch (error) {
+      console.error("Failed to auto-analyze verse:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   // Lookup specific Strong's number
   const lookupStrongsNumber = async () => {
@@ -249,62 +286,117 @@ export const ResearchDictionaryPanel = ({
         </p>
       </div>
 
-      {/* Analyze Button - Gradient */}
-      {words.length === 0 && (
+      {/* Loading State */}
+      {loading && words.length === 0 && (
+        <div className="flex items-center justify-center py-6">
+          <div className="text-center">
+            <Loader2 className="h-8 w-8 animate-spin text-palace-orange mx-auto mb-2" />
+            <p className="text-sm text-muted-foreground">
+              Analyzing {activeDictionary === 'strongs' ? "Strong's" : activeDictionary === 'thayers' ? "Thayer's" : "BDB"} data...
+            </p>
+          </div>
+        </div>
+      )}
+
+      {/* Re-analyze Button (shown when analysis failed or user wants to refresh) */}
+      {!loading && words.length === 0 && (
         <Button
           onClick={analyzeVerse}
           disabled={loading}
           className="w-full bg-gradient-warmth hover:opacity-90 text-white shadow-lg shadow-palace-orange/30"
         >
-          {loading ? (
-            <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-          ) : (
-            <Languages className="h-4 w-4 mr-2" />
-          )}
+          <Languages className="h-4 w-4 mr-2" />
           {activeDictionary === 'strongs' && "Analyze with Strong's Concordance"}
           {activeDictionary === 'thayers' && "Analyze with Thayer's Lexicon"}
           {activeDictionary === 'bdb' && "Analyze with BDB Lexicon"}
         </Button>
       )}
 
-      {/* Words List - Colorful Cards */}
+      {/* Words List - Clickable Cards with Popovers */}
       {words.length > 0 && (
         <div className="space-y-2 max-h-[300px] overflow-y-auto pr-1">
+          <p className="text-xs text-muted-foreground mb-2 px-1">
+            Click any word for detailed definition
+          </p>
           {words.map((word, idx) => (
-            <div 
-              key={idx} 
-              className={cn(
-                "rounded-xl p-3 space-y-1.5 border backdrop-blur-xl transition-all hover:scale-[1.02]",
-                isHebrew(word.strongsNumber) 
-                  ? "bg-gradient-to-br from-palace-purple/20 to-palace-blue/10 border-palace-purple/30 shadow-md shadow-palace-purple/10" 
-                  : "bg-gradient-to-br from-palace-teal/20 to-palace-green/10 border-palace-teal/30 shadow-md shadow-palace-teal/10"
-              )}
-            >
-              <div className="flex items-center justify-between">
-                <span className="font-semibold text-sm">{word.word}</span>
-                <Badge 
+            <Popover key={idx}>
+              <PopoverTrigger asChild>
+                <button
                   className={cn(
-                    "text-xs font-mono border-0 shadow-sm",
-                    isHebrew(word.strongsNumber) 
-                      ? "bg-gradient-palace text-white" 
-                      : "bg-gradient-ocean text-white"
+                    "w-full text-left rounded-xl p-3 space-y-1.5 border backdrop-blur-xl transition-all hover:scale-[1.02] cursor-pointer",
+                    isHebrew(word.strongsNumber)
+                      ? "bg-gradient-to-br from-palace-purple/20 to-palace-blue/10 border-palace-purple/30 shadow-md shadow-palace-purple/10 hover:border-palace-purple/50"
+                      : "bg-gradient-to-br from-palace-teal/20 to-palace-green/10 border-palace-teal/30 shadow-md shadow-palace-teal/10 hover:border-palace-teal/50"
                   )}
                 >
-                  {word.strongsNumber}
-                </Badge>
-              </div>
-              {word.originalWord && (
-                <p className="text-lg font-serif text-foreground">
-                  {word.originalWord}
-                </p>
-              )}
-              {word.transliteration && (
-                <p className="text-xs text-muted-foreground italic">
-                  {word.transliteration} {word.pronunciation && `(${word.pronunciation})`}
-                </p>
-              )}
-              <p className="text-sm text-foreground/90">{word.definition}</p>
-            </div>
+                  <div className="flex items-center justify-between">
+                    <span className="font-semibold text-sm">{word.word}</span>
+                    <Badge
+                      className={cn(
+                        "text-xs font-mono border-0 shadow-sm",
+                        isHebrew(word.strongsNumber)
+                          ? "bg-gradient-palace text-white"
+                          : "bg-gradient-ocean text-white"
+                      )}
+                    >
+                      {word.strongsNumber}
+                    </Badge>
+                  </div>
+                  {word.originalWord && (
+                    <p className="text-lg font-serif text-foreground">
+                      {word.originalWord}
+                    </p>
+                  )}
+                  {word.transliteration && (
+                    <p className="text-xs text-muted-foreground italic">
+                      {word.transliteration} {word.pronunciation && `(${word.pronunciation})`}
+                    </p>
+                  )}
+                  <p className="text-sm text-foreground/90 line-clamp-2">{word.definition}</p>
+                </button>
+              </PopoverTrigger>
+              <PopoverContent
+                className={cn(
+                  "w-96 p-4 border-2 backdrop-blur-xl",
+                  isHebrew(word.strongsNumber)
+                    ? "bg-purple-950/95 border-purple-500/50 shadow-lg shadow-purple-500/20"
+                    : "bg-teal-950/95 border-teal-500/50 shadow-lg shadow-teal-500/20"
+                )}
+                side="left"
+              >
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <Badge className={cn(
+                      "font-mono text-sm",
+                      isHebrew(word.strongsNumber) ? "bg-purple-500 text-white" : "bg-teal-500 text-white"
+                    )}>
+                      {word.strongsNumber}
+                    </Badge>
+                    <Badge variant="outline" className={cn(
+                      "text-xs",
+                      isHebrew(word.strongsNumber) ? "border-purple-400 text-purple-300" : "border-teal-400 text-teal-300"
+                    )}>
+                      {isHebrew(word.strongsNumber) ? "Hebrew" : "Greek"}
+                    </Badge>
+                  </div>
+                  <div className="text-center py-3 border-y border-white/10">
+                    <p className="text-4xl font-serif mb-2">{word.originalWord}</p>
+                    <p className="text-sm text-muted-foreground italic">
+                      {word.transliteration} {word.pronunciation && `• ${word.pronunciation}`}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-xs font-semibold text-muted-foreground mb-1 uppercase tracking-wide">Definition</p>
+                    <p className="text-sm text-foreground leading-relaxed">{word.definition}</p>
+                  </div>
+                  <div className="pt-2 border-t border-white/10">
+                    <p className="text-xs text-muted-foreground">
+                      English: <span className="text-foreground font-medium">{word.word}</span>
+                    </p>
+                  </div>
+                </div>
+              </PopoverContent>
+            </Popover>
           ))}
         </div>
       )}
