@@ -129,12 +129,15 @@ export default function Auth() {
     const email = normalizeEmail(loginEmail);
 
     setLoading(true);
+    console.log("[Auth] Attempting login for:", email);
 
     try {
-      const { error } = await supabase.auth.signInWithPassword({
+      const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password: loginPassword,
       });
+
+      console.log("[Auth] Login response - User:", data?.user?.email ?? "none", "Session:", data?.session ? "exists" : "none", "Error:", error?.message ?? "none");
 
       if (error) {
         if (error.message.includes("Invalid login credentials")) {
@@ -148,6 +151,10 @@ export default function Auth() {
         }
         return;
       }
+
+      // Verify session was created
+      const { data: sessionCheck } = await supabase.auth.getSession();
+      console.log("[Auth] Post-login session check:", sessionCheck?.session?.user?.email ?? "NO SESSION");
 
       // Save email only if remember me is checked (never store passwords)
       if (rememberMe) {
@@ -164,7 +171,7 @@ export default function Auth() {
       // to either the requested redirect target or the normal Gatehouse/Dashboard flow.
     } catch (err) {
       setError("An unexpected error occurred. Please try again.");
-      console.error("Login error:", err);
+      console.error("[Auth] Login error:", err);
     } finally {
       setLoading(false);
     }

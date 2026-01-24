@@ -13,10 +13,12 @@ export const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
   const location = useLocation();
 
   useEffect(() => {
+    console.log("[ProtectedRoute] Check - Path:", location.pathname, "Loading:", loading, "User:", user?.email ?? "none");
+
     // Only redirect if we're done loading AND there's no user
     if (!loading && !user) {
       const redirect = encodeURIComponent(`${location.pathname}${location.search}`);
-      console.log("ProtectedRoute: Redirecting to /auth (no user found)", { redirect });
+      console.log("[ProtectedRoute] Redirecting to /auth (no user found)", { redirect });
       navigate(`/auth?redirect=${redirect}`, { replace: true });
     }
   }, [user, loading, navigate, location.pathname, location.search]);

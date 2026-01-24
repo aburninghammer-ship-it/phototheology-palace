@@ -13,6 +13,7 @@ export const useAuth = () => {
     // Set up auth state listener
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, session) => {
+        console.log("[Auth] State change event:", event, "User:", session?.user?.email ?? "none");
         setSession(session);
         setUser(session?.user ?? null);
         setLoading(false);
@@ -20,7 +21,11 @@ export const useAuth = () => {
     );
 
     // Check for existing session
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    supabase.auth.getSession().then(({ data: { session }, error }) => {
+      if (error) {
+        console.error("[Auth] Error getting session:", error);
+      }
+      console.log("[Auth] Initial session check:", session?.user?.email ?? "no session", "Expires:", session?.expires_at ? new Date(session.expires_at * 1000).toISOString() : "n/a");
       setSession(session);
       setUser(session?.user ?? null);
       setLoading(false);
