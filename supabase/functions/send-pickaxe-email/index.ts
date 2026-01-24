@@ -93,7 +93,7 @@ serve(async (req) => {
       const resend = new Resend(RESEND_API_KEY);
       
       const emailResponse = await resend.emails.send({
-        from: "PhotoTheology <onboarding@resend.dev>",
+        from: "PhotoTheology <noreply@thephototheologyapp.com>",
         to: [testEmail],
         subject: `[TEST] ${subject}`,
         html: htmlContent,
@@ -158,31 +158,58 @@ serve(async (req) => {
     let sentCount = 0;
     let errorCount = 0;
 
+    // Create a campaign name for logging
+    const campaignName = `Pickaxe Campaign - ${filter} - ${new Date().toISOString().split('T')[0]}`;
+
     // Send emails in batches of 10
     const batchSize = 10;
     for (let i = 0; i < emails.length; i += batchSize) {
       const batch = emails.slice(i, i + batchSize);
       
-      const promises = batch.map(async (email) => {
+      // Send emails sequentially within batch to respect rate limits (2 req/sec)
+      for (const email of batch) {
         try {
-          await resend.emails.send({
-            from: "PhotoTheology <onboarding@resend.dev>",
+          const emailResponse = await resend.emails.send({
+            from: "PhotoTheology <noreply@thephototheologyapp.com>",
             to: [email],
             subject,
             html: htmlContent,
           });
+          
+          // Log successful send with resend email ID for tracking opens
+          await supabase.from("email_campaign_logs").insert({
+            campaign_name: campaignName,
+            recipient_email: email,
+            email_type: "pickaxe",
+            status: "sent",
+            sent_at: new Date().toISOString(),
+            resend_email_id: emailResponse.data?.id || null,
+          });
+          
+          // Update pickaxe_connections with email_sent_at
+          await supabase.from("pickaxe_connections")
+            .update({ email_sent_at: new Date().toISOString() })
+            .eq("pickaxe_email", email);
+          
           sentCount++;
+          console.log(`Sent email ${sentCount} to ${email}`);
         } catch (err) {
           console.error(`Failed to send to ${email}:`, err);
+          
+          // Log failed send
+          await supabase.from("email_campaign_logs").insert({
+            campaign_name: campaignName,
+            recipient_email: email,
+            email_type: "pickaxe",
+            status: "failed",
+            error_message: err instanceof Error ? err.message : "Unknown error",
+          });
+          
           errorCount++;
         }
-      });
-
-      await Promise.all(promises);
-      
-      // Small delay between batches to avoid rate limits
-      if (i + batchSize < emails.length) {
-        await new Promise(resolve => setTimeout(resolve, 100));
+        
+        // Delay between each email to respect Resend rate limit (2 req/sec = 600ms delay)
+        await new Promise(resolve => setTimeout(resolve, 600));
       }
     }
 

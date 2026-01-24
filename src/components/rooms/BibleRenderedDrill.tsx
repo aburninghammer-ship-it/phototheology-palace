@@ -19,8 +19,10 @@ import {
   Zap
 } from "lucide-react";
 import { bibleRenderedSets, BibleRenderedSet, getTotalChapters, getTotalRenders } from "@/data/bibleRenderedSets";
+import { getBibleRenderedImage } from "@/assets/bible-rendered";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
+import { SaveDrillButton } from "@/components/drills/SaveDrillButton";
 
 type DrillMode = "learn" | "symbol-to-range" | "range-to-symbol" | "name-to-symbol" | "full-quiz";
 
@@ -180,7 +182,15 @@ const BibleRenderedDrill = () => {
                   exit={{ rotateY: -90 }}
                   className="text-center space-y-6"
                 >
-                  <div className="text-8xl">{currentSet.symbol}</div>
+                  {getBibleRenderedImage(currentSet.number) ? (
+                    <img
+                      src={getBibleRenderedImage(currentSet.number)}
+                      alt={`Set ${currentSet.number}`}
+                      className="w-48 h-48 mx-auto rounded-xl object-cover shadow-lg"
+                    />
+                  ) : (
+                    <div className="text-8xl">{currentSet.symbol}</div>
+                  )}
                   <div className="text-sm text-muted-foreground flex items-center gap-2 justify-center">
                     <Eye className="h-4 w-4" />
                     Tap to reveal
@@ -274,7 +284,7 @@ const BibleRenderedDrill = () => {
                 <p className="text-sm text-muted-foreground">Accuracy</p>
               </div>
             </div>
-            <div className="flex gap-3 justify-center">
+            <div className="flex gap-3 justify-center flex-wrap">
               <Button onClick={shuffleSets}>
                 <Shuffle className="h-4 w-4 mr-2" />
                 Try Again (Shuffled)
@@ -283,6 +293,25 @@ const BibleRenderedDrill = () => {
                 <RotateCcw className="h-4 w-4 mr-2" />
                 Reset Order
               </Button>
+              <SaveDrillButton
+                drillData={{
+                  verse_reference: `Bible Rendered - ${mode}`,
+                  mode: mode,
+                  drill_type: "bible-rendered",
+                  floor_number: 1,
+                  room_id: "bible-rendered",
+                  drill_data: {
+                    correct: correctCount,
+                    incorrect: results.length - correctCount,
+                    accuracy,
+                    totalSets: results.length,
+                    filterCategory,
+                    results,
+                  },
+                }}
+                defaultName={`Bible Rendered ${mode} - ${accuracy}%`}
+                isCompleted={true}
+              />
             </div>
           </CardContent>
         </Card>
@@ -308,7 +337,15 @@ const BibleRenderedDrill = () => {
       switch (mode) {
         case "symbol-to-range":
         case "full-quiz":
-          return <div className="text-8xl">{currentSet.symbol}</div>;
+          return getBibleRenderedImage(currentSet.number) ? (
+            <img
+              src={getBibleRenderedImage(currentSet.number)}
+              alt={`Set ${currentSet.number}`}
+              className="w-40 h-40 mx-auto rounded-xl object-cover shadow-lg"
+            />
+          ) : (
+            <div className="text-8xl">{currentSet.symbol}</div>
+          );
         case "range-to-symbol":
           return (
             <div className="text-center">
@@ -339,7 +376,15 @@ const BibleRenderedDrill = () => {
           );
         case "range-to-symbol":
         case "name-to-symbol":
-          return <div className="text-4xl">{set.symbol}</div>;
+          return getBibleRenderedImage(set.number) ? (
+            <img
+              src={getBibleRenderedImage(set.number)}
+              alt={`Set ${set.number}`}
+              className="w-12 h-12 mx-auto rounded-lg object-cover"
+            />
+          ) : (
+            <div className="text-4xl">{set.symbol}</div>
+          );
         default:
           return null;
       }

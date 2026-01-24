@@ -4,13 +4,32 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ArrowLeft, Building2, Lightbulb } from "lucide-react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useSearchParams } from "react-router-dom";
 import { Footer } from "@/components/Footer";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { ResearchModeLayout } from "@/components/bible/ResearchModeLayout";
 
 const BibleChapter = () => {
   const location = useLocation();
+  const [searchParams, setSearchParams] = useSearchParams();
   const { exercises, fromReadingPlan, planName, dayNumber } = location.state || {};
+
+  // Check for research mode
+  const researchMode = searchParams.get("mode") === "research";
+  
+  const setResearchMode = (enabled: boolean) => {
+    if (enabled) {
+      searchParams.set("mode", "research");
+    } else {
+      searchParams.delete("mode");
+    }
+    setSearchParams(searchParams);
+  };
+
+  // If in research mode, render the research layout
+  if (researchMode) {
+    return <ResearchModeLayout onExitResearchMode={() => setResearchMode(false)} />;
+  }
 
   return (
     <div className="min-h-screen gradient-subtle">

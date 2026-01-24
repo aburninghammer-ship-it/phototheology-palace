@@ -42,6 +42,8 @@ export interface PdfPurchase {
   email: string | null;
   name: string | null;
   date: string;
+  pdfSent: boolean;
+  pdfSentAt: string | null;
 }
 
 export interface PdfMetrics {

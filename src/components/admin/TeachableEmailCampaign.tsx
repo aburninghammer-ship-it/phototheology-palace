@@ -11,16 +11,17 @@ import { useToast } from "@/hooks/use-toast";
 import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
 
-type TeachableFilter = 'all' | 'active' | 'inactive' | 'linked' | 'unlinked' | 'premium_paying' | 'not_paying';
+type TeachableFilter = 'all' | 'master_class_active' | 'master_class_inactive' | 'free_signup' | 'linked' | 'unlinked' | 'premium_paying' | 'not_paying';
 
 const FILTER_DESCRIPTIONS: Record<TeachableFilter, string> = {
-  all: "All 8,600+ Teachable students",
-  active: "Only active Teachable students",
-  inactive: "Inactive Teachable students",
-  linked: "Students already using the app (have logged in)",
-  unlinked: "Students who haven't connected to the app yet",
+  all: "All Teachable users (free signups + Master Class)",
+  master_class_active: "Paying Master Class students ($20/month, active enrollment)",
+  master_class_inactive: "Former Master Class students (cancelled/expired)",
+  free_signup: "Free signups who never enrolled in Master Class",
+  linked: "Users already using the app (have logged in)",
+  unlinked: "Users who haven't connected to the app yet",
   premium_paying: "Students paying $15+ per month (premium access)",
-  not_paying: "Students not currently paying anything",
+  not_paying: "Users not currently paying anything",
 };
 
 export function TeachableEmailCampaign() {
@@ -132,11 +133,12 @@ export function TeachableEmailCampaign() {
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">All Teachable Students</SelectItem>
-                <SelectItem value="active">Active Students Only</SelectItem>
-                <SelectItem value="inactive">Inactive Students</SelectItem>
-                <SelectItem value="linked">Linked to App</SelectItem>
-                <SelectItem value="unlinked">Not Linked to App</SelectItem>
+                <SelectItem value="all">All Teachable Users</SelectItem>
+                <SelectItem value="master_class_active">🎓 Master Class Students (Active, $20/mo)</SelectItem>
+                <SelectItem value="master_class_inactive">📚 Former Master Class (Cancelled/Expired)</SelectItem>
+                <SelectItem value="free_signup">🆓 Free Signups (Never Enrolled in Master Class)</SelectItem>
+                <SelectItem value="linked">🔗 Linked to App</SelectItem>
+                <SelectItem value="unlinked">❌ Not Linked to App</SelectItem>
                 <SelectItem value="premium_paying">💰 Paying $15+/month (Premium)</SelectItem>
                 <SelectItem value="not_paying">🆓 Not Currently Paying</SelectItem>
               </SelectContent>
@@ -414,6 +416,127 @@ export function TeachableEmailCampaign() {
               }}
             >
               📚 Re-engagement
+            </Button>
+          </div>
+
+          <hr className="border-muted" />
+
+          {/* Upsell Templates for Free Users */}
+          <div className="space-y-2">
+            <h4 className="text-sm font-semibold text-green-600">💰 Upsell Templates (Free → Master Class)</h4>
+            
+            <Button
+              variant="outline"
+              className="w-full justify-start border-green-500/30 hover:bg-green-500/10"
+              onClick={() => {
+                setFilter("free_signup");
+                setSubject("📖 Unlock the Bible Study Suite — Master Class Now Includes Full App Access!");
+                setContent(`<div style="font-family: Georgia, serif; max-width: 600px; margin: 0 auto; padding: 20px; background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); color: #e8e8e8;">
+  <div style="text-align: center; padding: 30px 0; border-bottom: 2px solid #d4af37;">
+    <h1 style="color: #d4af37; font-size: 28px; margin: 0;">The Full Palace Awaits</h1>
+    <p style="color: #a0a0a0; font-style: italic; margin-top: 10px;">Master Class Students Get Full App Access</p>
+  </div>
+  
+  <div style="padding: 30px 20px;">
+    <p style="font-size: 18px; line-height: 1.8; color: #e8e8e8;">Hi there,</p>
+    
+    <p style="font-size: 16px; line-height: 1.8; color: #c0c0c0;">You signed up for our free Teachable content — and we're so glad you did!</p>
+    
+    <p style="font-size: 16px; line-height: 1.8; color: #c0c0c0;">But did you know there's a <strong style="color: #d4af37;">whole world</strong> you haven't seen yet?</p>
+    
+    <div style="background: rgba(212, 175, 55, 0.1); border: 1px solid #d4af37; border-radius: 8px; padding: 20px; margin: 25px 0;">
+      <h3 style="color: #d4af37; margin: 0 0 15px 0;">🏰 The Bible Study Suite</h3>
+      <p style="color: #c0c0c0; margin: 0 0 15px 0;">Our premium app brings Phototheology to life with:</p>
+      <ul style="font-size: 15px; line-height: 2; color: #c0c0c0; padding-left: 20px; margin: 0;">
+        <li>🤖 <strong>Jeeves</strong> — Your AI study companion trained in the Palace method</li>
+        <li>🏛️ <strong>8 Floors of the Palace</strong> — Interactive study rooms</li>
+        <li>📖 <strong>Full KJV Bible</strong> — With commentary and audio</li>
+        <li>🔥 <strong>Daily Challenges</strong> — Build your study streak</li>
+        <li>💎 <strong>Gem Collection</strong> — Never lose an insight again</li>
+        <li>👥 <strong>Community</strong> — Study alongside fellow Palace explorers</li>
+      </ul>
+    </div>
+    
+    <p style="font-size: 16px; line-height: 1.8; color: #c0c0c0;">Here's the best part: <strong style="color: #d4af37;">Phototheology Master Class students get full app access included!</strong></p>
+    
+    <p style="font-size: 16px; line-height: 1.8; color: #c0c0c0;">For just <strong style="color: #d4af37;">$20/month</strong>, you get:</p>
+    <ul style="font-size: 15px; line-height: 2; color: #c0c0c0; padding-left: 20px;">
+      <li>✅ Weekly live Master Class sessions with Pastor Ivor</li>
+      <li>✅ Full access to the Bible Study Suite app</li>
+      <li>✅ All course materials and replays</li>
+      <li>✅ Direct Q&A opportunities</li>
+    </ul>
+    
+    <div style="text-align: center; padding: 30px 0;">
+      <a href="https://phototheology.teachable.com/p/phototheology-master-class" style="display: inline-block; background: linear-gradient(135deg, #d4af37 0%, #b8860b 100%); color: #1a1a2e; padding: 16px 40px; text-decoration: none; font-weight: bold; font-size: 18px; border-radius: 8px; box-shadow: 0 4px 15px rgba(212, 175, 55, 0.3);">Join the Master Class →</a>
+    </div>
+    
+    <p style="font-size: 16px; line-height: 1.8; color: #c0c0c0;">The Palace has so much more to offer. Will you step inside?</p>
+    
+    <p style="font-size: 16px; line-height: 1.8; color: #e8e8e8; margin-top: 30px;">Blessings,<br><strong style="color: #d4af37;">Pastor Ivor Myers</strong></p>
+  </div>
+  
+  <div style="text-align: center; padding: 20px; border-top: 1px solid #333; color: #666; font-size: 12px;">
+    <p>You're receiving this because you signed up for Phototheology on Teachable.</p>
+  </div>
+</div>`);
+              }}
+            >
+              🚀 Master Class Upsell (Free Users → $20/mo)
+            </Button>
+
+            <Button
+              variant="outline"
+              className="w-full justify-start border-green-500/30 hover:bg-green-500/10"
+              onClick={() => {
+                setFilter("not_paying");
+                setSubject("🆕 Big Update: Bible Study Suite Now Included with Master Class!");
+                setContent(`<div style="font-family: Georgia, serif; max-width: 600px; margin: 0 auto; padding: 20px; background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); color: #e8e8e8;">
+  <div style="text-align: center; padding: 30px 0; border-bottom: 2px solid #d4af37;">
+    <h1 style="color: #d4af37; font-size: 26px; margin: 0;">🆕 New Benefit Announcement</h1>
+    <p style="color: #a0a0a0; font-style: italic; margin-top: 10px;">Master Class Just Got Better</p>
+  </div>
+  
+  <div style="padding: 30px 20px;">
+    <p style="font-size: 18px; line-height: 1.8; color: #e8e8e8;">Hi there,</p>
+    
+    <p style="font-size: 16px; line-height: 1.8; color: #c0c0c0;">I'm excited to share some news...</p>
+    
+    <p style="font-size: 16px; line-height: 1.8; color: #c0c0c0;">We've built something special: <strong style="color: #d4af37;">The Bible Study Suite</strong> — a full app dedicated to studying Scripture through the Phototheology method.</p>
+    
+    <p style="font-size: 16px; line-height: 1.8; color: #c0c0c0;">And starting now, <strong style="color: #d4af37;">all Phototheology Master Class members get full access — included with their subscription!</strong></p>
+    
+    <div style="background: rgba(212, 175, 55, 0.1); border: 1px solid #d4af37; border-radius: 8px; padding: 20px; margin: 25px 0;">
+      <h3 style="color: #d4af37; margin: 0 0 15px 0;">What's in the Bible Study Suite?</h3>
+      <ul style="font-size: 15px; line-height: 2; color: #c0c0c0; padding-left: 20px; margin: 0;">
+        <li>🤖 Jeeves — AI trained in the Palace method</li>
+        <li>🏛️ All 8 Palace Floors — interactive study</li>
+        <li>📖 Full KJV Bible with commentary</li>
+        <li>🔊 Audio narration</li>
+        <li>💎 Save insights as "Gems"</li>
+        <li>📊 Track your study streaks</li>
+        <li>👥 Community discussions</li>
+      </ul>
+    </div>
+    
+    <p style="font-size: 16px; line-height: 1.8; color: #c0c0c0;">This is the study tool I wish I'd had years ago. And now you can have it too.</p>
+    
+    <div style="text-align: center; padding: 30px 0;">
+      <a href="https://phototheology.teachable.com/p/phototheology-master-class" style="display: inline-block; background: linear-gradient(135deg, #d4af37 0%, #b8860b 100%); color: #1a1a2e; padding: 16px 40px; text-decoration: none; font-weight: bold; font-size: 18px; border-radius: 8px; box-shadow: 0 4px 15px rgba(212, 175, 55, 0.3);">Join Master Class — $20/month →</a>
+    </div>
+    
+    <p style="font-size: 14px; line-height: 1.8; color: #888; text-align: center;">Weekly live classes + Full app access + All course materials</p>
+    
+    <p style="font-size: 16px; line-height: 1.8; color: #e8e8e8; margin-top: 30px;">Ready to go deeper?<br><strong style="color: #d4af37;">Pastor Ivor Myers</strong></p>
+  </div>
+  
+  <div style="text-align: center; padding: 20px; border-top: 1px solid #333; color: #666; font-size: 12px;">
+    <p>You're receiving this because you signed up for Phototheology on Teachable.</p>
+  </div>
+</div>`);
+              }}
+            >
+              📢 New Benefit Announcement
             </Button>
           </div>
         </CardContent>

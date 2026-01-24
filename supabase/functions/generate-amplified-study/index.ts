@@ -5,166 +5,51 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
-const PT_ROOMS = [
-  "CR - Concentration Room (Christ-centered focus)",
-  "OR - Observation Room (Key details to notice)",
-  "ST - Symbols/Types (Symbolic connections)",
-  "DR - Dimensions (Literal, Christ, Me, Church, Heaven)",
-  "BL - Blue Room/Sanctuary (Sanctuary connections)",
-  "PRm - Patterns (Biblical patterns)",
-  "P‖ - Parallels (Scripture parallels)",
-  "VG - Verse Genetics (Word origins through Scripture)",
-  "SR - Story Room (Narrative visualization)",
-  "GR - Gems Room (Treasure insights)",
-  "FR - Fire Room (Emotional/spiritual weight)",
-  "TR - Theme Room (Track themes)",
-  "QR - Questions Room (Probing questions)",
+// Doctrinal red flags to scan for in sermon content
+const OFFSHOOT_INDICATORS = [
+  // Anti-Trinity keywords
+  { pattern: /anti[-\s]?trinit/i, warning: "Potential anti-Trinitarian content detected" },
+  { pattern: /god\s+is\s+(not|isn't)\s+three/i, warning: "Potential anti-Trinitarian content detected" },
+  { pattern: /trinity\s+(is\s+)?(a\s+)?pagan/i, warning: "Anti-Trinity teaching detected" },
+  { pattern: /jesus\s+(is|was)\s+(not|n't)\s+god/i, warning: "Non-SDA Christology detected" },
+  
+  // COVID/conspiracy markers
+  { pattern: /vaccine[sd]?\s+(are|is)\s+(the\s+)?mark/i, warning: "COVID-mark of beast conspiracy detected" },
+  { pattern: /covid[-\s]?(19)?\s+(is\s+)?(the\s+)?mark/i, warning: "COVID conspiracy content detected" },
+  { pattern: /5g\s+(is\s+)?beast/i, warning: "Technology conspiracy content detected" },
+  { pattern: /chip\s+(implant|is\s+the\s+mark)/i, warning: "Microchip mark conspiracy detected" },
+  
+  // Known offshoot movements
+  { pattern: /shepherd'?s?\s+rod/i, warning: "Shepherd's Rod (Davidian) content detected" },
+  { pattern: /branch\s+davidian/i, warning: "Branch Davidian content detected" },
+  { pattern: /1888\s+message/i, warning: "1888 movement content - may need review" },
+  { pattern: /last\s+generation\s+theology/i, warning: "Last Generation Theology - review for balance" },
+  
+  // Date setting
+  { pattern: /(second\s+coming|jesus\s+(will\s+)?return[s]?)\s+(in|on|by)\s+20\d{2}/i, warning: "Date-setting for Second Coming detected" },
+  { pattern: /know\s+the\s+exact\s+(date|day|time)/i, warning: "Potential date-setting content" },
+  
+  // Non-SDA doctrines
+  { pattern: /once\s+saved[,]?\s+always\s+saved/i, warning: "Once Saved Always Saved doctrine (non-SDA)" },
+  { pattern: /secret\s+rapture/i, warning: "Secret rapture teaching (non-SDA)" },
+  { pattern: /pre[-\s]?trib(ulation)?\s+rapture/i, warning: "Pre-tribulation rapture (non-SDA)" },
+  { pattern: /sunday\s+(is|as)\s+(the\s+)?true\s+sabbath/i, warning: "Sunday sacredness teaching detected" },
+  { pattern: /sabbath\s+(was|is)\s+done\s+away/i, warning: "Anti-Sabbath teaching detected" },
 ];
 
-const THEOLOGICAL_GUARDRAILS = `
-⚠️ CRITICAL THEOLOGICAL GUARDRAILS (NON-NEGOTIABLE):
-1. AZAZEL = SATAN, NOT CHRIST: In Leviticus 16, Azazel (scapegoat) represents SATAN. NEVER identify it as Jesus.
-2. LITTLE HORN = ROME/PAPACY, NOT ANTIOCHUS: Daniel 7 & 8 little horn = Rome/Papal power. NEVER say Antiochus Epiphanes.
-3. TWO-PHASE SANCTUARY: Christ entered HOLY PLACE at ascension (31 AD); MOST HOLY PLACE in 1844. NEVER say Most Holy at ascension.
-4. DAY OF ATONEMENT = 1844: Christ's death = PASSOVER. Day of Atonement = 1844 judgment. NEVER equate death with Atonement.
-5. FEAST TYPOLOGY: Spring feasts = First Advent (Passover=death, Firstfruits=resurrection). Fall feasts = Second Advent ministry.
-6. HEBREWS CLARITY: Hebrews contrasts earthly vs heavenly sanctuary, NOT Holy vs Most Holy Place.
-`;
-
-const SINGLE_SESSION_SYSTEM_PROMPT = `You are a biblical scholar and Phototheology expert creating an amplified small group study from a sermon.
-
-${THEOLOGICAL_GUARDRAILS}
-
-PHOTOTHEOLOGY PALACE ROOMS (use these codes):
-${PT_ROOMS.join("\n")}
-
-Your task is to:
-
-1. EXPAND each sermon point with:
-   - Deep biblical analysis and cross-references
-   - Hebrew/Greek word studies where relevant
-   - Historical and cultural context
-   - Scholarly support from trusted SDA sources
-
-2. ASSESS each theological claim:
-   - Mark as "supported", "needs-nuance", or "questionable"
-   - Provide brief reasoning for assessment
-
-3. CREATE discussion questions that:
-   - Start with observation (what does the text say?)
-   - Move to interpretation (what does it mean?)
-   - End with application (how do we live this?)
-
-4. APPLY Phototheology Palace methodology throughout
-
-5. ALL Scripture quotes MUST be KJV (King James Version)
-
-Respond ONLY with valid JSON in this exact format:
-{
-  "studyTitle": "string",
-  "overview": "string (2-3 paragraphs summarizing the study)",
-  "doctrinalWarnings": ["any doctrinal concerns or notes"],
-  "iceBreakers": ["string", "string"],
-  "sections": [
-    {
-      "sectionNumber": 1,
-      "title": "string",
-      "originalPoint": "string (from sermon)",
-      "biblicalBasis": {
-        "primaryTexts": ["verse reference: KJV text"],
-        "supportingTexts": ["verse reference: KJV text"]
-      },
-      "analysis": "string (detailed biblical analysis)",
-      "scholarlySupport": "string (scholarly insights from SDA sources)",
-      "assessment": {
-        "rating": "supported|needs-nuance|questionable",
-        "reasoning": "string"
-      },
-      "ptConnections": {
-        "rooms": ["CR", "OR", etc.],
-        "insights": "string explaining how each room applies"
-      },
-      "discussionQuestions": [
-        {
-          "question": "string",
-          "type": "observation|interpretation|application",
-          "ptRoom": "room code"
-        }
-      ]
+function scanForDoctrinalIssues(content: string): string[] {
+  const warnings: string[] = [];
+  
+  for (const indicator of OFFSHOOT_INDICATORS) {
+    if (indicator.pattern.test(content)) {
+      if (!warnings.includes(indicator.warning)) {
+        warnings.push(indicator.warning);
+      }
     }
-  ],
-  "christSynthesis": "string (how all points unite in Christ)",
-  "sanctuaryConnection": "string (Blue Room/Sanctuary connection)",
-  "actionChallenge": "string (practical weekly challenge)",
-  "prayerFocus": "string (guided prayer themes)",
-  "furtherStudy": ["additional resources/passages"],
-  "facilitatorNotes": "string (tips for group leaders)"
-}`;
-
-const SEVEN_DAY_SYSTEM_PROMPT = `You are a biblical scholar and Phototheology expert creating a 7-day devotional study from a sermon.
-
-${THEOLOGICAL_GUARDRAILS}
-
-PHOTOTHEOLOGY PALACE ROOMS (use these codes - assign one per day):
-${PT_ROOMS.join("\n")}
-
-Create a week-long devotional journey that:
-1. Day 1: Introduction and overview (use OR - Observation Room)
-2. Days 2-5: Deep dive into main points (vary rooms: CR, ST, DR, PRm)
-3. Day 6: Sanctuary connection (use BL - Blue Room)
-4. Day 7: Synthesis and commitment (use CR - Concentration Room)
-
-Each day includes:
-- A specific PT room exercise
-- Focused scripture passage
-- Devotional content (300-400 words)
-- 3 reflection questions
-- Prayer prompt
-- Application challenge
-
-ALL Scripture quotes MUST be KJV (King James Version)
-
-Respond ONLY with valid JSON in this exact format:
-{
-  "studyTitle": "string",
-  "overview": "string (brief overview of the 7-day journey)",
-  "doctrinalWarnings": ["any doctrinal concerns or notes"],
-  "sevenDayStudy": [
-    {
-      "day": 1,
-      "title": "Day title",
-      "theme": "Brief theme description",
-      "scripture": "Main scripture passage (KJV)",
-      "devotionalContent": "300-400 word devotional reflection",
-      "ptRoom": "OR",
-      "ptExercise": "Specific Palace exercise for this room",
-      "reflectionQuestions": ["question 1", "question 2", "question 3"],
-      "prayerPrompt": "Guided prayer prompt",
-      "applicationChallenge": "Practical challenge for the day"
-    }
-  ],
-  "christSynthesis": "string (how the week unites in Christ)",
-  "sanctuaryConnection": "string (overall sanctuary connection)",
-  "actionChallenge": "string (week-long challenge)",
-  "prayerFocus": "string (overarching prayer theme)"
-}`;
-
-const INDIVIDUAL_MODIFIER = `
-STUDY TYPE: Individual Personal Study
-- Use personal language ("you", "your walk with God")
-- Include journaling prompts
-- Focus on personal reflection and transformation
-- Add contemplative elements for quiet time
-`;
-
-const SMALL_GROUP_MODIFIER = `
-STUDY TYPE: Small Group Discussion
-- Include group discussion dynamics
-- Add ice breakers for group connection
-- Include facilitator notes and tips
-- Create questions that encourage group dialogue
-- Add sharing prompts for testimonies
-`;
+  }
+  
+  return warnings;
+}
 
 serve(async (req) => {
   if (req.method === "OPTIONS") {
@@ -172,7 +57,7 @@ serve(async (req) => {
   }
 
   try {
-    const { sermonOutline, sermonTitle, preacher, sermonDate, studyFormat, studyType } = await req.json();
+    const { sermonOutline, sermonTitle, preacher, sermonDate, sourceType, isVerifiedChannel } = await req.json();
 
     if (!sermonOutline) {
       return new Response(
@@ -181,46 +66,132 @@ serve(async (req) => {
       );
     }
 
+    // Scan for doctrinal issues
+    const doctrinalWarnings = scanForDoctrinalIssues(sermonOutline);
+    
+    // Log source verification status
+    console.log(`Processing sermon: "${sermonTitle || 'Untitled'}"`);
+    console.log(`Source type: ${sourceType || 'unknown'}, Verified channel: ${isVerifiedChannel || false}`);
+    if (doctrinalWarnings.length > 0) {
+      console.log(`⚠️ Doctrinal warnings detected: ${doctrinalWarnings.join(", ")}`);
+    }
+
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) {
       throw new Error("LOVABLE_API_KEY is not configured");
     }
 
-    // Select system prompt based on format
-    const baseSystemPrompt = studyFormat === "7day"
-      ? SEVEN_DAY_SYSTEM_PROMPT
-      : SINGLE_SESSION_SYSTEM_PROMPT;
+    // Add extra caution instructions if content is unverified or has warnings
+    const cautionLevel = !isVerifiedChannel || doctrinalWarnings.length > 0 
+      ? "HIGH CAUTION" 
+      : "STANDARD";
 
-    // Add study type modifier
-    const studyTypeModifier = studyType === "individual"
-      ? INDIVIDUAL_MODIFIER
-      : SMALL_GROUP_MODIFIER;
+    const systemPrompt = `You are a biblical scholar and Phototheology expert creating an amplified small group study from a sermon outline.
 
-    const systemPrompt = baseSystemPrompt + "\n\n" + studyTypeModifier;
+⚠️ CRITICAL THEOLOGICAL GUARDRAILS (NON-NEGOTIABLE):
+1. AZAZEL = SATAN, NOT CHRIST: In Leviticus 16, Azazel (scapegoat) represents SATAN. NEVER identify it as Jesus.
+2. LITTLE HORN = ROME/PAPACY, NOT ANTIOCHUS: Daniel 7 & 8 little horn = Rome/Papal power. NEVER say Antiochus Epiphanes.
+3. TWO-PHASE SANCTUARY: Christ entered HOLY PLACE at ascension (31 AD); MOST HOLY PLACE in 1844. NEVER say Most Holy at ascension.
+4. DAY OF ATONEMENT = 1844: Christ's death = PASSOVER. Day of Atonement = 1844 judgment. NEVER equate death with Atonement.
+5. FEAST TYPOLOGY: Spring feasts = First Advent (Passover=death, Firstfruits=resurrection). Fall feasts = Second Advent ministry.
+6. HEBREWS CLARITY: Hebrews contrasts earthly vs heavenly sanctuary, NOT Holy vs Most Holy Place.
 
-    const formatDescription = studyFormat === "7day"
-      ? "7-day devotional journey with daily Palace exercises"
-      : "comprehensive small group study";
+⚠️ CAUTION LEVEL: ${cautionLevel}
+${doctrinalWarnings.length > 0 ? `\n⚠️ PRE-SCAN DETECTED POTENTIAL ISSUES:\n${doctrinalWarnings.map(w => `- ${w}`).join('\n')}\n\nBe extra vigilant in assessment. Flag any problematic claims as "questionable" with clear reasoning.` : ''}
 
-    const userPrompt = `Create a ${formatDescription} from this sermon:
+${!isVerifiedChannel ? `\n⚠️ UNVERIFIED SOURCE: This content was NOT verified as coming from the church's registered YouTube channel. Apply heightened scrutiny.` : ''}
+
+Your task is to:
+
+1. EXPAND each sermon point with:
+   - Deep biblical analysis and cross-references
+   - Hebrew/Greek word studies where relevant
+   - Historical and cultural context
+   - Scholarly support from trusted sources
+
+2. ASSESS each theological claim:
+   - Mark as SUPPORTED (✔), NEEDS NUANCE (⚠), or QUESTIONABLE (❌)
+   - Provide brief reasoning for assessment
+   - BE ESPECIALLY VIGILANT for non-SDA doctrines, conspiracy theories, anti-Trinitarian ideas
+
+3. CREATE discussion questions that:
+   - Start with observation (what does the text say?)
+   - Move to interpretation (what does it mean?)
+   - End with application (how do we live this?)
+
+4. APPLY Phototheology Palace methodology:
+   - CR (Concentration Room): Christ-centered focus
+   - OR (Observation Room): Key details to notice
+   - ST (Symbols/Types): Symbolic connections
+   - DR (Dimensions): Literal, Christ, Me, Church, Heaven
+   - BL (Blue Room/Sanctuary): Sanctuary connections
+   - PRm (Patterns): Biblical patterns
+   - P‖ (Parallels): Scripture parallels
+
+5. ALL Scripture quotes MUST be KJV (King James Version)
+
+6. If ANY content appears to promote offshoot ideas, conspiracy theories, anti-Trinity views, or non-SDA doctrines, include a "doctrinalWarnings" array in your response listing specific concerns.
+
+Respond ONLY with valid JSON in this exact format:
+{
+  "studyTitle": "string",
+  "overview": "string (2-3 paragraphs summarizing the study)",
+  "doctrinalWarnings": ["string array of any doctrinal concerns detected - empty if none"],
+  "iceBreakers": ["string", "string"],
+  "sections": [
+    {
+      "sectionNumber": 1,
+      "title": "string",
+      "originalPoint": "string (from sermon)",
+      "biblicalBasis": {
+        "primaryTexts": ["verse reference - KJV text"],
+        "supportingTexts": ["verse reference - KJV text"]
+      },
+      "analysis": "string (detailed biblical analysis)",
+      "scholarlySupport": "string (scholarly insights)",
+      "assessment": {
+        "rating": "supported|needs-nuance|questionable",
+        "reasoning": "string"
+      },
+      "ptConnections": {
+        "rooms": ["CR", "OR", etc.],
+        "insights": "string"
+      },
+      "discussionQuestions": [
+        {
+          "question": "string",
+          "type": "observation|interpretation|application",
+          "ptRoom": "string"
+        }
+      ]
+    }
+  ],
+  "christSynthesis": "string (how all points unite in Christ)",
+  "sanctuaryConnection": "string (Blue Room connection)",
+  "discussionQuestions": [
+    {
+      "question": "string",
+      "type": "observation|interpretation|application",
+      "ptRoom": "string"
+    }
+  ],
+  "actionChallenge": "string (practical weekly challenge)",
+  "prayerFocus": "string (guided prayer themes)",
+  "furtherStudy": ["string (additional resources/passages)"],
+  "facilitatorNotes": "string (tips for group leaders)"
+}`;
+
+    const userPrompt = `Create an amplified small group study from this sermon outline:
 
 SERMON TITLE: ${sermonTitle || "Untitled Sermon"}
 PREACHER: ${preacher || "Unknown"}
 DATE: ${sermonDate || "Not specified"}
+SOURCE VERIFICATION: ${isVerifiedChannel ? "✓ Verified church channel" : "⚠️ Unverified source"}
 
-SERMON CONTENT:
+SERMON OUTLINE:
 ${sermonOutline}
 
-Generate a ${studyType === "individual" ? "personal" : "group"} study that:
-1. Expands on each sermon point with deep biblical analysis
-2. Applies Phototheology Palace methodology throughout
-3. Maintains theological accuracy per the guardrails
-4. Creates engaging ${studyType === "individual" ? "reflection prompts" : "discussion questions"}
-5. Connects everything to Christ and the sanctuary
-
-${studyFormat === "7day" ? "Ensure each of the 7 days has a unique PT room focus and builds progressively through the sermon themes." : ""}`;
-
-    console.log(`Generating ${studyFormat} ${studyType} study for: ${sermonTitle}`);
+Generate a comprehensive, Christ-centered study that expands on each point while maintaining theological accuracy. Include Phototheology Palace connections throughout. If you detect any concerning doctrinal content, flag it in the doctrinalWarnings array.`;
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
@@ -235,7 +206,7 @@ ${studyFormat === "7day" ? "Ensure each of the 7 days has a unique PT room focus
           { role: "user", content: userPrompt },
         ],
         temperature: 0.7,
-        max_tokens: 12000,
+        max_tokens: 8000,
       }),
     });
 
@@ -264,25 +235,94 @@ ${studyFormat === "7day" ? "Ensure each of the 7 days has a unique PT room focus
       throw new Error("No content in AI response");
     }
 
-    // Parse JSON from response (handle markdown code blocks)
-    let studyData;
+    // Parse JSON from response with robust extraction
+    let studyData: Record<string, unknown> = {};
     try {
-      const jsonMatch = content.match(/```(?:json)?\s*([\s\S]*?)```/) || [null, content];
-      const jsonStr = jsonMatch[1]?.trim() || content.trim();
+      let jsonStr = content.trim();
+      
+      console.log("Raw AI response length:", jsonStr.length);
+      console.log("First 100 chars:", jsonStr.substring(0, 100));
+      
+      // Step 1: Remove markdown code blocks with multiple approaches
+      // Handle ```json ... ``` pattern
+      const codeBlockMatch = jsonStr.match(/```(?:json)?\s*([\s\S]*?)```/);
+      if (codeBlockMatch) {
+        jsonStr = codeBlockMatch[1].trim();
+        console.log("Extracted from code block, length:", jsonStr.length);
+      } else {
+        // No code block found, try to strip any leading/trailing backticks
+        jsonStr = jsonStr.replace(/^```(?:json)?\s*/i, "").replace(/\s*```$/i, "").trim();
+      }
+      
+      // Step 2: Find the JSON object boundaries (first { to last })
+      const firstBrace = jsonStr.indexOf('{');
+      const lastBrace = jsonStr.lastIndexOf('}');
+      if (firstBrace !== -1 && lastBrace !== -1 && lastBrace > firstBrace) {
+        jsonStr = jsonStr.substring(firstBrace, lastBrace + 1);
+        console.log("Extracted JSON object, length:", jsonStr.length);
+      }
+      
+      // Step 3: Clean up common JSON issues
+      // Remove trailing commas before } or ]
+      jsonStr = jsonStr.replace(/,(\s*[}\]])/g, '$1');
+      // Remove any control characters
+      jsonStr = jsonStr.replace(/[\x00-\x1F\x7F]/g, ' ');
+      
+      console.log("Cleaned JSON starts with:", jsonStr.substring(0, 80));
+      
+      // Step 4: Parse the JSON
       studyData = JSON.parse(jsonStr);
+      
+      // Merge pre-scan warnings with AI-detected warnings
+      if (doctrinalWarnings.length > 0) {
+        const existingWarnings = Array.isArray(studyData.doctrinalWarnings) ? studyData.doctrinalWarnings : [];
+        studyData.doctrinalWarnings = [
+          ...existingWarnings,
+          ...doctrinalWarnings.filter(w => !existingWarnings.includes(w))
+        ];
+      }
+      
+      console.log("Successfully parsed study with", Object.keys(studyData).length, "fields");
+      console.log("Study has sections:", Array.isArray(studyData.sections) ? studyData.sections.length : 0);
     } catch (parseError) {
       console.error("JSON parse error:", parseError);
-      // Return raw content if parsing fails
-      studyData = {
-        rawContent: content,
-        parseError: true,
-        studyTitle: sermonTitle || "Study",
-        overview: "The study was generated but couldn't be parsed. See raw content below.",
-        sections: []
-      };
+      console.log("Raw content first 1000 chars:", content.substring(0, 1000));
+      console.log("Raw content last 500 chars:", content.substring(content.length - 500));
+      
+      // Attempt a more aggressive extraction
+      try {
+        // Find JSON by looking for studyTitle pattern
+        const studyTitleMatch = content.match(/\{\s*"studyTitle"\s*:\s*"[^"]+"/);
+        if (studyTitleMatch) {
+          const startIndex = content.indexOf(studyTitleMatch[0]);
+          let braceCount = 0;
+          let endIndex = startIndex;
+          for (let i = startIndex; i < content.length; i++) {
+            if (content[i] === '{') braceCount++;
+            if (content[i] === '}') braceCount--;
+            if (braceCount === 0 && content[i] === '}') {
+              endIndex = i + 1;
+              break;
+            }
+          }
+          if (endIndex > startIndex) {
+            const extractedJson = content.substring(startIndex, endIndex);
+            studyData = JSON.parse(extractedJson);
+            console.log("Recovery successful! Parsed study with", Object.keys(studyData).length, "fields");
+          }
+        }
+      } catch (recoveryError) {
+        console.error("Recovery parse also failed:", recoveryError);
+        // Return raw content if parsing fails - frontend can still display it
+        studyData = { 
+          rawContent: content, 
+          parseError: true, 
+          doctrinalWarnings,
+          studyTitle: "Generated Study (Parsing Error)",
+          overview: "The AI generated content but it couldn't be automatically formatted. The raw content is shown below."
+        };
+      }
     }
-
-    console.log(`Successfully generated ${studyFormat} study`);
 
     return new Response(
       JSON.stringify({ success: true, study: studyData }),

@@ -1,410 +1,236 @@
-import { useState } from "react";
-import { motion } from "framer-motion";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { useStudyEngagementAnalytics } from "@/hooks/useStudyEngagement";
-import {
-  BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, Legend,
-  LineChart, Line, PieChart, Pie, Cell, AreaChart, Area
-} from "recharts";
-import { format } from "date-fns";
-import {
-  Loader2, RefreshCw, BookOpen, Users, Clock, Trophy,
-  TrendingUp, BookMarked, Brain, Target, Video, Heart
-} from "lucide-react";
+import { BarChart3, Clock, BookOpen, Users, TrendingUp } from "lucide-react";
+import { format, subDays, startOfDay, endOfDay } from "date-fns";
 
 interface StudyEngagementAnalyticsProps {
-  churchId?: string;
+  churchId: string;
 }
 
-const CONTENT_TYPE_COLORS = {
-  central_study: "#6366f1",
-  devotional: "#f59e0b",
-  bible_reading: "#22c55e",
-  memory_practice: "#a855f7",
-  challenge: "#ef4444",
-  sermon: "#3b82f6",
-};
+interface EngagementStats {
+  totalSessions: number;
+  totalTimeMinutes: number;
+  completionRate: number;
+  uniqueUsers: number;
+  topContentTypes: { type: string; count: number }[];
+  dailyActivity: { date: string; sessions: number; minutes: number }[];
+}
 
 export function StudyEngagementAnalytics({ churchId }: StudyEngagementAnalyticsProps) {
-  const [timeRange, setTimeRange] = useState<number>(30);
-  const { data, loading, error, refetch, summary } = useStudyEngagementAnalytics(churchId, timeRange);
+  const { data: stats, isLoading } = useQuery({
+    queryKey: ["study-engagement-analytics", churchId],
+    queryFn: async (): Promise<EngagementStats> => {
+      const thirtyDaysAgo = subDays(new Date(), 30);
 
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center p-12">
-        <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
-      </div>
-    );
-  }
+      // Fetch all sessions for the church in the last 30 days
+      const { data: sessions, error } = await (supabase as any)
+        .from("study_engagement_sessions")
+        .select("*")
+        .eq("church_id", churchId)
+        .gte("created_at", thirtyDaysAgo.toISOString());
 
-  if (error) {
+      if (error) throw error;
+
+      if (!sessions || sessions.length === 0) {
+        return {
+          totalSessions: 0,
+          totalTimeMinutes: 0,
+          completionRate: 0,
+          uniqueUsers: 0,
+          topContentTypes: [],
+          dailyActivity: [],
+        };
+      }
+
+      // Calculate stats
+      const totalSessions = sessions.length;
+      const totalSeconds = sessions.reduce((sum, s) => sum + (s.duration_seconds || 0), 0);
+      const totalTimeMinutes = Math.round(totalSeconds / 60);
+      const completedSessions = sessions.filter((s) => s.completed).length;
+      const completionRate = Math.round((completedSessions / totalSessions) * 100);
+      const uniqueUsers = new Set(sessions.map((s) => s.user_id)).size;
+
+      // Content type distribution
+      const contentTypeCounts: Record<string, number> = {};
+      sessions.forEach((s) => {
+        const type = s.content_type || "other";
+        contentTypeCounts[type] = (contentTypeCounts[type] || 0) + 1;
+      });
+      const topContentTypes = Object.entries(contentTypeCounts)
+        .map(([type, count]) => ({ type, count }))
+        .sort((a, b) => b.count - a.count)
+        .slice(0, 5);
+
+      // Daily activity for the last 7 days
+      const dailyActivity: { date: string; sessions: number; minutes: number }[] = [];
+      for (let i = 6; i >= 0; i--) {
+        const date = subDays(new Date(), i);
+        const dayStart = startOfDay(date);
+        const dayEnd = endOfDay(date);
+        
+        const daySessions = sessions.filter((s) => {
+          const sessionDate = new Date(s.created_at);
+          return sessionDate >= dayStart && sessionDate <= dayEnd;
+        });
+
+        const dayMinutes = Math.round(
+          daySessions.reduce((sum, s) => sum + (s.duration_seconds || 0), 0) / 60
+        );
+
+        dailyActivity.push({
+          date: format(date, "EEE"),
+          sessions: daySessions.length,
+          minutes: dayMinutes,
+        });
+      }
+
+      return {
+        totalSessions,
+        totalTimeMinutes,
+        completionRate,
+        uniqueUsers,
+        topContentTypes,
+        dailyActivity,
+      };
+    },
+    enabled: !!churchId,
+  });
+
+  if (isLoading) {
     return (
-      <Card className="border-red-500/50">
-        <CardContent className="p-6">
-          <p className="text-red-500">Error loading analytics: {error}</p>
-          <Button onClick={refetch} variant="outline" className="mt-4">
-            <RefreshCw className="h-4 w-4 mr-2" />
-            Retry
-          </Button>
+      <Card variant="glass">
+        <CardContent className="py-8 text-center">
+          <div className="animate-pulse">Loading analytics...</div>
         </CardContent>
       </Card>
     );
   }
 
-  const chartData = data.map((d) => ({
-    date: format(new Date(d.summary_date), "MMM d"),
-    fullDate: d.summary_date,
-    sessions: d.total_sessions,
-    users: d.unique_users,
-    completions: d.total_completions,
-    minutes: d.total_duration_minutes,
-    bibleStudy: d.central_study_sessions,
-    devotional: d.devotional_sessions,
-    reading: d.bible_reading_sessions,
-    memory: d.memory_practice_sessions,
-    challenges: d.challenge_sessions,
-    sermons: d.sermon_sessions,
-  }));
+  if (!stats) return null;
 
-  const pieData = summary ? [
-    { name: 'Bible Study', value: data.reduce((sum, d) => sum + d.central_study_sessions, 0), color: CONTENT_TYPE_COLORS.central_study },
-    { name: 'Devotional', value: data.reduce((sum, d) => sum + d.devotional_sessions, 0), color: CONTENT_TYPE_COLORS.devotional },
-    { name: 'Bible Reading', value: data.reduce((sum, d) => sum + d.bible_reading_sessions, 0), color: CONTENT_TYPE_COLORS.bible_reading },
-    { name: 'Memory', value: data.reduce((sum, d) => sum + d.memory_practice_sessions, 0), color: CONTENT_TYPE_COLORS.memory_practice },
-    { name: 'Challenges', value: data.reduce((sum, d) => sum + d.challenge_sessions, 0), color: CONTENT_TYPE_COLORS.challenge },
-    { name: 'Sermons', value: data.reduce((sum, d) => sum + d.sermon_sessions, 0), color: CONTENT_TYPE_COLORS.sermon },
-  ].filter(d => d.value > 0) : [];
-
-  const formatStudyTime = (minutes: number) => {
-    if (minutes >= 60) {
-      const hours = Math.floor(minutes / 60);
-      const mins = minutes % 60;
-      return hours + "h " + mins + "m";
-    }
-    return minutes + "m";
-  };
+  const statCards = [
+    {
+      title: "Total Sessions",
+      value: stats.totalSessions.toLocaleString(),
+      description: "Last 30 days",
+      icon: BarChart3,
+    },
+    {
+      title: "Study Time",
+      value: `${stats.totalTimeMinutes.toLocaleString()} min`,
+      description: "Total engagement",
+      icon: Clock,
+    },
+    {
+      title: "Completion Rate",
+      value: `${stats.completionRate}%`,
+      description: "Studies finished",
+      icon: TrendingUp,
+    },
+    {
+      title: "Active Members",
+      value: stats.uniqueUsers.toString(),
+      description: "Unique participants",
+      icon: Users,
+    },
+  ];
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between flex-wrap gap-4">
-        <div>
-          <h2 className="text-2xl font-bold flex items-center gap-2">
-            <BookOpen className="h-6 w-6 text-primary" />
-            Study Engagement Analytics
-          </h2>
-          <p className="text-muted-foreground">
-            Track how your community engages with Bible studies and content
-          </p>
-        </div>
+      <Card variant="glass">
+        <CardHeader>
+          <div className="flex items-center gap-2">
+            <BarChart3 className="h-5 w-5 text-primary" />
+            <CardTitle>Study Engagement</CardTitle>
+          </div>
+          <CardDescription>Track how your church engages with study content</CardDescription>
+        </CardHeader>
+      </Card>
 
-        <div className="flex items-center gap-3">
-          <Select value={timeRange.toString()} onValueChange={(v) => setTimeRange(parseInt(v))}>
-            <SelectTrigger className="w-[140px]">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="7">Last 7 Days</SelectItem>
-              <SelectItem value="30">Last 30 Days</SelectItem>
-              <SelectItem value="90">Last 90 Days</SelectItem>
-            </SelectContent>
-          </Select>
-          <Badge variant="outline" className="text-sm">
-            {data.length} days of data
-          </Badge>
-          <Button variant="outline" size="sm" onClick={refetch}>
-            <RefreshCw className="h-4 w-4 mr-2" />
-            Refresh
-          </Button>
-        </div>
+      {/* Stats Grid */}
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+        {statCards.map((stat) => {
+          const Icon = stat.icon;
+          return (
+            <Card key={stat.title} variant="glass">
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm text-muted-foreground">{stat.title}</p>
+                    <p className="text-2xl font-bold">{stat.value}</p>
+                    <p className="text-xs text-muted-foreground">{stat.description}</p>
+                  </div>
+                  <div className="p-3 rounded-full bg-primary/10">
+                    <Icon className="h-5 w-5 text-primary" />
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          );
+        })}
       </div>
 
-      {summary && (
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1 }}
-          >
-            <Card className="backdrop-blur-xl bg-white/10 border-white/20">
-              <CardHeader className="pb-2">
-                <CardDescription className="flex items-center gap-2">
-                  <BookOpen className="h-4 w-4 text-primary" />
-                  Total Study Sessions
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="text-3xl font-bold">{summary.totalSessions}</div>
-                <p className="text-sm text-muted-foreground mt-1">
-                  {summary.avgDailySessions} avg/day
-                </p>
-              </CardContent>
-            </Card>
-          </motion.div>
+      {/* Weekly Activity Chart */}
+      <Card variant="glass">
+        <CardHeader>
+          <CardTitle className="text-lg">Weekly Activity</CardTitle>
+          <CardDescription>Sessions and study time over the last 7 days</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="flex items-end justify-between h-40 gap-2">
+            {stats.dailyActivity.map((day) => {
+              const maxSessions = Math.max(...stats.dailyActivity.map((d) => d.sessions), 1);
+              const height = (day.sessions / maxSessions) * 100;
 
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 }}
-          >
-            <Card className="backdrop-blur-xl bg-white/10 border-white/20">
-              <CardHeader className="pb-2">
-                <CardDescription className="flex items-center gap-2">
-                  <Trophy className="h-4 w-4 text-green-500" />
-                  Completions
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="text-3xl font-bold text-green-500">{summary.totalCompletions}</div>
-                <p className="text-sm text-muted-foreground mt-1">
-                  {summary.avgCompletionRate}% avg completion
-                </p>
-              </CardContent>
-            </Card>
-          </motion.div>
-
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3 }}
-          >
-            <Card className="backdrop-blur-xl bg-white/10 border-white/20">
-              <CardHeader className="pb-2">
-                <CardDescription className="flex items-center gap-2">
-                  <Clock className="h-4 w-4 text-blue-500" />
-                  Total Study Time
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="text-3xl font-bold text-blue-500">
-                  {formatStudyTime(summary.totalStudyMinutes)}
+              return (
+                <div key={day.date} className="flex flex-col items-center flex-1">
+                  <div className="w-full flex flex-col items-center">
+                    <span className="text-xs text-muted-foreground mb-1">
+                      {day.sessions}
+                    </span>
+                    <div
+                      className="w-full bg-primary/80 rounded-t-sm transition-all duration-300"
+                      style={{ height: `${Math.max(height, 4)}%` }}
+                    />
+                  </div>
+                  <span className="text-xs text-muted-foreground mt-2">{day.date}</span>
                 </div>
-                <p className="text-sm text-muted-foreground mt-1">
-                  {summary.avgSessionMinutes}m avg session
-                </p>
-              </CardContent>
-            </Card>
-          </motion.div>
+              );
+            })}
+          </div>
+        </CardContent>
+      </Card>
 
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.4 }}
-          >
-            <Card className="backdrop-blur-xl bg-white/10 border-white/20">
-              <CardHeader className="pb-2">
-                <CardDescription className="flex items-center gap-2">
-                  <Heart className="h-4 w-4 text-pink-500" />
-                  Most Popular
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold text-pink-500">{summary.mostPopularContent}</div>
-                <p className="text-sm text-muted-foreground mt-1">
-                  Top content type
-                </p>
-              </CardContent>
-            </Card>
-          </motion.div>
-        </div>
-      )}
-
-      {data.length === 0 && (
-        <Card className="backdrop-blur-xl bg-white/10 border-white/20">
-          <CardContent className="py-12 text-center">
-            <BookOpen className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-            <h3 className="text-lg font-semibold mb-2">No engagement data yet</h3>
-            <p className="text-muted-foreground max-w-md mx-auto">
-              Study engagement analytics will appear here as your community uses Bible studies, 
-              devotionals, and other learning content.
-            </p>
+      {/* Content Types */}
+      {stats.topContentTypes.length > 0 && (
+        <Card variant="glass">
+          <CardHeader>
+            <CardTitle className="text-lg">Content Distribution</CardTitle>
+            <CardDescription>Most engaged content types</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-3">
+              {stats.topContentTypes.map((item) => {
+                const percentage = Math.round((item.count / stats.totalSessions) * 100);
+                return (
+                  <div key={item.type} className="space-y-1">
+                    <div className="flex justify-between text-sm">
+                      <span className="capitalize">{item.type.replace(/_/g, " ")}</span>
+                      <span className="text-muted-foreground">{item.count} sessions</span>
+                    </div>
+                    <div className="h-2 bg-muted rounded-full overflow-hidden">
+                      <div
+                        className="h-full bg-primary rounded-full transition-all duration-300"
+                        style={{ width: `${percentage}%` }}
+                      />
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
           </CardContent>
         </Card>
-      )}
-
-      {data.length > 0 && (
-        <>
-          <Card className="backdrop-blur-xl bg-white/10 border-white/20">
-            <CardHeader>
-              <CardTitle>Study Sessions Over Time</CardTitle>
-              <CardDescription>Daily study sessions and unique users</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="h-72">
-                <ResponsiveContainer width="100%" height="100%">
-                  <AreaChart data={chartData}>
-                    <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
-                    <XAxis dataKey="date" fontSize={12} tickLine={false} axisLine={false} />
-                    <YAxis fontSize={12} tickLine={false} axisLine={false} />
-                    <Tooltip
-                      contentStyle={{
-                        backgroundColor: "hsl(var(--background))",
-                        borderColor: "hsl(var(--border))",
-                        borderRadius: "8px",
-                      }}
-                    />
-                    <Legend />
-                    <Area
-                      type="monotone"
-                      dataKey="sessions"
-                      name="Sessions"
-                      stroke="#6366f1"
-                      fill="#6366f1"
-                      fillOpacity={0.3}
-                      strokeWidth={2}
-                    />
-                    <Area
-                      type="monotone"
-                      dataKey="users"
-                      name="Unique Users"
-                      stroke="#22c55e"
-                      fill="#22c55e"
-                      fillOpacity={0.3}
-                      strokeWidth={2}
-                    />
-                  </AreaChart>
-                </ResponsiveContainer>
-              </div>
-            </CardContent>
-          </Card>
-
-          <div className="grid gap-6 lg:grid-cols-2">
-            <Card className="backdrop-blur-xl bg-white/10 border-white/20">
-              <CardHeader>
-                <CardTitle>Content Distribution</CardTitle>
-                <CardDescription>Breakdown by content type</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="h-64">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <PieChart>
-                      <Pie
-                        data={pieData}
-                        cx="50%"
-                        cy="50%"
-                        outerRadius={80}
-                        dataKey="value"
-                        label={({ name, percent }) => name + " " + Math.round(percent * 100) + "%"}
-                        labelLine={false}
-                      >
-                        {pieData.map((entry, index) => (
-                          <Cell key={"cell-" + index} fill={entry.color} />
-                        ))}
-                      </Pie>
-                      <Tooltip />
-                    </PieChart>
-                  </ResponsiveContainer>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card className="backdrop-blur-xl bg-white/10 border-white/20">
-              <CardHeader>
-                <CardTitle>Content Types Over Time</CardTitle>
-                <CardDescription>Daily breakdown by type</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="h-64">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <BarChart data={chartData}>
-                      <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
-                      <XAxis dataKey="date" fontSize={12} tickLine={false} axisLine={false} />
-                      <YAxis fontSize={12} tickLine={false} axisLine={false} />
-                      <Tooltip
-                        contentStyle={{
-                          backgroundColor: "hsl(var(--background))",
-                          borderColor: "hsl(var(--border))",
-                          borderRadius: "8px",
-                        }}
-                      />
-                      <Legend />
-                      <Bar dataKey="bibleStudy" name="Bible Study" stackId="a" fill={CONTENT_TYPE_COLORS.central_study} />
-                      <Bar dataKey="devotional" name="Devotional" stackId="a" fill={CONTENT_TYPE_COLORS.devotional} />
-                      <Bar dataKey="reading" name="Reading" stackId="a" fill={CONTENT_TYPE_COLORS.bible_reading} />
-                      <Bar dataKey="memory" name="Memory" stackId="a" fill={CONTENT_TYPE_COLORS.memory_practice} />
-                      <Bar dataKey="challenges" name="Challenges" stackId="a" fill={CONTENT_TYPE_COLORS.challenge} />
-                    </BarChart>
-                  </ResponsiveContainer>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-
-          <Card className="backdrop-blur-xl bg-white/10 border-white/20">
-            <CardHeader>
-              <CardTitle>Total Study Time</CardTitle>
-              <CardDescription>Minutes spent in study sessions</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="h-64">
-                <ResponsiveContainer width="100%" height="100%">
-                  <LineChart data={chartData}>
-                    <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
-                    <XAxis dataKey="date" fontSize={12} tickLine={false} axisLine={false} />
-                    <YAxis
-                      fontSize={12}
-                      tickLine={false}
-                      axisLine={false}
-                      tickFormatter={(value) => value + "m"}
-                    />
-                    <Tooltip
-                      contentStyle={{
-                        backgroundColor: "hsl(var(--background))",
-                        borderColor: "hsl(var(--border))",
-                        borderRadius: "8px",
-                      }}
-                      formatter={(value: number) => [value + " min", "Study Time"]}
-                    />
-                    <Line
-                      type="monotone"
-                      dataKey="minutes"
-                      name="Minutes"
-                      stroke="#3b82f6"
-                      strokeWidth={2}
-                      dot={{ fill: "#3b82f6", r: 4 }}
-                    />
-                  </LineChart>
-                </ResponsiveContainer>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="backdrop-blur-xl bg-white/10 border-white/20">
-            <CardHeader>
-              <CardTitle>Completions Over Time</CardTitle>
-              <CardDescription>Studies and content completed</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="h-64">
-                <ResponsiveContainer width="100%" height="100%">
-                  <AreaChart data={chartData}>
-                    <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
-                    <XAxis dataKey="date" fontSize={12} tickLine={false} axisLine={false} />
-                    <YAxis fontSize={12} tickLine={false} axisLine={false} />
-                    <Tooltip
-                      contentStyle={{
-                        backgroundColor: "hsl(var(--background))",
-                        borderColor: "hsl(var(--border))",
-                        borderRadius: "8px",
-                      }}
-                    />
-                    <Area
-                      type="monotone"
-                      dataKey="completions"
-                      name="Completions"
-                      stroke="#22c55e"
-                      fill="#22c55e"
-                      fillOpacity={0.3}
-                      strokeWidth={2}
-                    />
-                  </AreaChart>
-                </ResponsiveContainer>
-              </div>
-            </CardContent>
-          </Card>
-        </>
       )}
     </div>
   );

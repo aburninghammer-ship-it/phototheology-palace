@@ -1,269 +1,241 @@
 import { useState, useEffect, useCallback } from "react";
-import { Capacitor } from "@capacitor/core";
-import { PushNotifications, Token, PushNotificationSchema, ActionPerformed } from "@capacitor/push-notifications";
 import { supabase } from "@/integrations/supabase/client";
-import { useAuth } from "@/hooks/useAuth";
-import { toast } from "sonner";
+import { useAuth } from "./useAuth";
+import { useToast } from "./use-toast";
 
-export interface NotificationPreferences {
-  enabled: boolean;
-  events: boolean;
-  messages: boolean;
-  announcements: boolean;
-  study_reminders: boolean;
-  prayer_requests: boolean;
+// Capacitor imports for native push notifications
+let PushNotifications: any = null;
+let Capacitor: any = null;
+
+// Dynamic import for Capacitor (only available on native platforms)
+try {
+  const capacitorCore = require("@capacitor/core");
+  Capacitor = capacitorCore.Capacitor;
+  
+  if (Capacitor?.isNativePlatform?.()) {
+    const capacitorPush = require("@capacitor/push-notifications");
+    PushNotifications = capacitorPush.PushNotifications;
+  }
+} catch (e) {
+  // Capacitor not available (web platform)
 }
 
-const DEFAULT_PREFERENCES: NotificationPreferences = {
-  enabled: true,
-  events: true,
-  messages: true,
-  announcements: true,
-  study_reminders: true,
-  prayer_requests: true,
+interface PushNotificationPreferences {
+  events_enabled: boolean;
+  messages_enabled: boolean;
+  announcements_enabled: boolean;
+  study_reminders_enabled: boolean;
+  prayer_requests_enabled: boolean;
+}
+
+const DEFAULT_PREFERENCES: PushNotificationPreferences = {
+  events_enabled: true,
+  messages_enabled: true,
+  announcements_enabled: true,
+  study_reminders_enabled: true,
+  prayer_requests_enabled: true,
 };
 
 export function usePushNotifications() {
   const { user } = useAuth();
-  const [isSupported, setIsSupported] = useState(false);
-  const [isRegistered, setIsRegistered] = useState(false);
+  const { toast } = useToast();
+  const [isNative, setIsNative] = useState(false);
+  const [permissionStatus, setPermissionStatus] = useState<"granted" | "denied" | "prompt">("prompt");
   const [token, setToken] = useState<string | null>(null);
-  const [preferences, setPreferences] = useState<NotificationPreferences>(DEFAULT_PREFERENCES);
-  const [loading, setLoading] = useState(true);
+  const [preferences, setPreferences] = useState<PushNotificationPreferences>(DEFAULT_PREFERENCES);
+  const [isLoading, setIsLoading] = useState(true);
 
-  // Check if push notifications are supported (native only)
+  // Check if running on native platform
   useEffect(() => {
-    const platform = Capacitor.getPlatform();
-    setIsSupported(platform === "ios" || platform === "android");
+    const native = Capacitor?.isNativePlatform?.() ?? false;
+    setIsNative(native);
   }, []);
 
-  // Load user's notification preferences
+  // Fetch user preferences
   useEffect(() => {
-    if (user) {
-      loadPreferences();
+    if (!user) {
+      setIsLoading(false);
+      return;
     }
+
+    const fetchPreferences = async () => {
+      try {
+        const { data, error } = await (supabase as any)
+          .from("push_notification_preferences")
+          .select("*")
+          .eq("user_id", user.id)
+          .maybeSingle();
+
+        if (error) throw error;
+
+        if (data) {
+          setPreferences({
+            events_enabled: data.events_enabled ?? true,
+            messages_enabled: data.messages_enabled ?? true,
+            announcements_enabled: data.announcements_enabled ?? true,
+            study_reminders_enabled: data.study_reminders_enabled ?? true,
+            prayer_requests_enabled: data.prayer_requests_enabled ?? true,
+          });
+        }
+      } catch (error) {
+        console.error("Error fetching push preferences:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchPreferences();
   }, [user]);
 
-  const loadPreferences = async () => {
+  // Initialize push notifications on native platforms
+  useEffect(() => {
+    if (!isNative || !PushNotifications || !user) return;
+
+    const initializePush = async () => {
+      try {
+        // Check current permission status
+        const result = await PushNotifications.checkPermissions();
+        setPermissionStatus(result.receive);
+
+        if (result.receive === "granted") {
+          await registerForPush();
+        }
+      } catch (error) {
+        console.error("Push notification init error:", error);
+      }
+    };
+
+    const registerForPush = async () => {
+      try {
+        await PushNotifications.register();
+
+        // Listen for registration success
+        PushNotifications.addListener("registration", async (tokenData: { value: string }) => {
+          setToken(tokenData.value);
+          await saveToken(tokenData.value);
+        });
+
+        // Listen for registration errors
+        PushNotifications.addListener("registrationError", (error: any) => {
+          console.error("Push registration error:", error);
+        });
+
+        // Listen for push notifications received
+        PushNotifications.addListener("pushNotificationReceived", (notification: any) => {
+          toast({
+            title: notification.title || "Notification",
+            description: notification.body,
+          });
+        });
+
+        // Listen for notification action performed
+        PushNotifications.addListener("pushNotificationActionPerformed", (action: any) => {
+          console.log("Push action performed:", action);
+          // Handle navigation based on notification data
+        });
+      } catch (error) {
+        console.error("Push registration error:", error);
+      }
+    };
+
+    initializePush();
+
+    return () => {
+      if (PushNotifications) {
+        PushNotifications.removeAllListeners();
+      }
+    };
+  }, [isNative, user]);
+
+  const saveToken = async (pushToken: string) => {
     if (!user) return;
 
     try {
-      const { data, error } = await supabase
-        .from("profiles")
-        .select("notification_preferences, push_token")
-        .eq("id", user.id)
-        .single();
+      const platform = Capacitor?.getPlatform?.() ?? "web";
 
-      if (error) throw error;
-
-      if (data) {
-        if (data.notification_preferences) {
-          setPreferences({ ...DEFAULT_PREFERENCES, ...(data.notification_preferences as NotificationPreferences) });
-        }
-        if (data.push_token) {
-          setToken(data.push_token);
-          setIsRegistered(true);
-        }
-      }
+      await (supabase as any).from("push_notification_tokens").upsert(
+        {
+          user_id: user.id,
+          token: pushToken,
+          platform,
+        },
+        { onConflict: "user_id,token" }
+      );
     } catch (error) {
-      console.error("Error loading notification preferences:", error);
-    } finally {
-      setLoading(false);
+      console.error("Error saving push token:", error);
     }
   };
 
-  // Register for push notifications
-  const register = useCallback(async () => {
-    if (!isSupported) {
-      console.log("Push notifications not supported on this platform");
-      return { success: false, error: "Not supported" };
+  const requestPermission = useCallback(async () => {
+    if (!isNative || !PushNotifications) {
+      toast({
+        title: "Not Available",
+        description: "Push notifications are only available on mobile devices.",
+        variant: "destructive",
+      });
+      return false;
     }
 
     try {
-      // Request permission
-      const permStatus = await PushNotifications.requestPermissions();
+      const result = await PushNotifications.requestPermissions();
+      setPermissionStatus(result.receive);
 
-      if (permStatus.receive !== "granted") {
-        toast.error("Push notification permission denied");
-        return { success: false, error: "Permission denied" };
-      }
-
-      // Register with APNs/FCM
-      await PushNotifications.register();
-
-      // Listen for registration success
-      PushNotifications.addListener("registration", async (token: Token) => {
-        console.log("Push registration success, token:", token.value);
-        setToken(token.value);
-        setIsRegistered(true);
-
-        // Save token to database
-        if (user) {
-          await supabase
-            .from("profiles")
-            .update({ push_token: token.value })
-            .eq("id", user.id);
-        }
-
-        toast.success("Push notifications enabled!");
-      });
-
-      // Listen for registration errors
-      PushNotifications.addListener("registrationError", (error) => {
-        console.error("Push registration error:", error);
-        toast.error("Failed to enable push notifications");
-      });
-
-      // Listen for incoming notifications
-      PushNotifications.addListener("pushNotificationReceived", (notification: PushNotificationSchema) => {
-        console.log("Push notification received:", notification);
-        // Show in-app notification if app is open
-        toast(notification.title || "New Notification", {
-          description: notification.body,
+      if (result.receive === "granted") {
+        await PushNotifications.register();
+        return true;
+      } else {
+        toast({
+          title: "Permission Denied",
+          description: "Please enable notifications in your device settings.",
+          variant: "destructive",
         });
-      });
-
-      // Listen for notification actions (when user taps)
-      PushNotifications.addListener("pushNotificationActionPerformed", (action: ActionPerformed) => {
-        console.log("Push notification action:", action);
-        // Handle navigation based on notification data
-        handleNotificationAction(action.notification);
-      });
-
-      return { success: true };
-    } catch (error: any) {
-      console.error("Push notification registration error:", error);
-      return { success: false, error: error.message };
-    }
-  }, [isSupported, user]);
-
-  // Unregister from push notifications
-  const unregister = useCallback(async () => {
-    try {
-      await PushNotifications.removeAllListeners();
-
-      if (user) {
-        await supabase
-          .from("profiles")
-          .update({ push_token: null })
-          .eq("id", user.id);
+        return false;
       }
-
-      setToken(null);
-      setIsRegistered(false);
-      toast.success("Push notifications disabled");
-
-      return { success: true };
-    } catch (error: any) {
-      console.error("Push notification unregister error:", error);
-      return { success: false, error: error.message };
-    }
-  }, [user]);
-
-  // Update notification preferences
-  const updatePreferences = useCallback(async (newPrefs: Partial<NotificationPreferences>) => {
-    if (!user) return { success: false };
-
-    const updated = { ...preferences, ...newPrefs };
-    setPreferences(updated);
-
-    try {
-      const { error } = await supabase
-        .from("profiles")
-        .update({ notification_preferences: updated })
-        .eq("id", user.id);
-
-      if (error) throw error;
-
-      toast.success("Notification preferences saved");
-      return { success: true };
-    } catch (error: any) {
-      console.error("Error updating preferences:", error);
-      toast.error("Failed to save preferences");
-      return { success: false, error: error.message };
-    }
-  }, [user, preferences]);
-
-  // Handle notification tap
-  const handleNotificationAction = (notification: PushNotificationSchema) => {
-    const data = notification.data as Record<string, string> | undefined;
-    if (!data) return;
-
-    // Navigate based on notification type
-    switch (data.type) {
-      case "event":
-        // Navigate to event
-        window.location.href = `/living-manna?tab=events&event=${data.event_id}`;
-        break;
-      case "message":
-        // Navigate to chat
-        window.location.href = `/living-manna?tab=connect&chat=${data.room_id}`;
-        break;
-      case "announcement":
-        // Navigate to announcements
-        window.location.href = `/living-manna?tab=home`;
-        break;
-      case "study":
-        // Navigate to study
-        window.location.href = `/living-manna?tab=learn&study=${data.study_id}`;
-        break;
-      default:
-        // Default to home
-        window.location.href = "/living-manna";
-    }
-  };
-
-  // Get badge count (for iOS)
-  const getBadgeCount = useCallback(async () => {
-    if (!isSupported) return 0;
-    try {
-      const result = await PushNotifications.getDeliveredNotifications();
-      return result.notifications.length;
-    } catch {
-      return 0;
-    }
-  }, [isSupported]);
-
-  // Clear all delivered notifications
-  const clearNotifications = useCallback(async () => {
-    if (!isSupported) return;
-    try {
-      await PushNotifications.removeAllDeliveredNotifications();
     } catch (error) {
-      console.error("Error clearing notifications:", error);
+      console.error("Permission request error:", error);
+      return false;
     }
-  }, [isSupported]);
+  }, [isNative, toast]);
+
+  const updatePreferences = useCallback(
+    async (newPreferences: Partial<PushNotificationPreferences>) => {
+      if (!user) return;
+
+      const updated = { ...preferences, ...newPreferences };
+      setPreferences(updated);
+
+      try {
+        await (supabase as any).from("push_notification_preferences").upsert(
+          {
+            user_id: user.id,
+            ...updated,
+          },
+          { onConflict: "user_id" }
+        );
+
+        toast({
+          title: "Preferences Updated",
+          description: "Your notification settings have been saved.",
+        });
+      } catch (error) {
+        console.error("Error updating preferences:", error);
+        toast({
+          title: "Error",
+          description: "Failed to update preferences.",
+          variant: "destructive",
+        });
+      }
+    },
+    [user, preferences, toast]
+  );
 
   return {
-    isSupported,
-    isRegistered,
+    isNative,
+    permissionStatus,
     token,
     preferences,
-    loading,
-    register,
-    unregister,
+    isLoading,
+    requestPermission,
     updatePreferences,
-    getBadgeCount,
-    clearNotifications,
   };
-}
-
-// Utility function to send push notification via edge function
-export async function sendPushNotification(params: {
-  userIds: string[];
-  title: string;
-  body: string;
-  data?: Record<string, string>;
-}) {
-  try {
-    const { error } = await supabase.functions.invoke("send-push-notification", {
-      body: params,
-    });
-
-    if (error) throw error;
-    return { success: true };
-  } catch (error: any) {
-    console.error("Error sending push notification:", error);
-    return { success: false, error: error.message };
-  }
 }

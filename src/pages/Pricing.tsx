@@ -54,16 +54,37 @@ export default function Pricing() {
       }, 250);
     };
 
+    const sendPurchaseNotification = async (isTrialing: boolean, tier: string) => {
+      try {
+        await supabase.functions.invoke('send-purchase-notification', {
+          body: {
+            userEmail: user?.email || 'Unknown',
+            userName: user?.user_metadata?.full_name || user?.email?.split('@')[0] || 'Unknown',
+            amount: 0, // Will be populated from Stripe on backend if needed
+            currency: 'usd',
+            subscriptionTier: tier,
+            isTrialing,
+            billingInterval: billingPeriod === 'annual' ? 'year' : 'month',
+          },
+        });
+        console.log('Purchase notification sent successfully');
+      } catch (error) {
+        console.error('Failed to send purchase notification:', error);
+      }
+    };
+
     if (trialStatus === 'success') {
       triggerCelebration();
       toast.success("🎉 Your 7-day free trial has started! Enjoy full Premium access.");
+      // Send notification for trial start
+      sendPurchaseNotification(true, 'premium');
       navigate('/palace', { replace: true });
     } else if (trialStatus === 'cancelled') {
       toast.info("Trial checkout was cancelled. No worries, you can try again anytime!");
     } else if (subscriptionStatus === 'cancelled') {
       toast.info("Subscription checkout was cancelled. No worries, you can try again anytime!");
     }
-  }, [searchParams, navigate]);
+  }, [searchParams, navigate, user, billingPeriod]);
 
   const startTrialNow = () => {
     if (!user) {

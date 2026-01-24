@@ -11,6 +11,7 @@ import { genesisImages } from "@/assets/24fps/genesis";
 import { supabase } from "@/integrations/supabase/client";
 import { Create24FPSImageDialog } from "./Create24FPSImageDialog";
 import { useToast } from "@/hooks/use-toast";
+import { useImageBibleImages, getChapterImageUrl } from "@/hooks/useImageBibleImages";
 
 interface Bible24FPSBrowserProps {
   onClose?: () => void;
@@ -53,6 +54,9 @@ export function Bible24FPSBrowser({ onClose }: Bible24FPSBrowserProps) {
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
   const [chapterForImage, setChapterForImage] = useState<ChapterFrame | null>(null);
   const { toast } = useToast();
+  
+  // Fetch PT Image Bible images from Supabase storage
+  const { data: imageBibleMap, isLoading: imageBibleLoading } = useImageBibleImages();
 
   // Fetch user's custom images
   const fetchUserImages = async () => {
@@ -74,7 +78,18 @@ export function Bible24FPSBrowser({ onClose }: Bible24FPSBrowserProps) {
     fetchUserImages();
   }, []);
 
-  // Get image for a chapter - prioritizes user images, then Genesis defaults
+  // Helper to get set index for a chapter (0-indexed)
+  const getSetIndexForChapter = (chapter: ChapterFrame): number => {
+    for (let i = 0; i < allBibleSets.length; i++) {
+      const found = allBibleSets[i].chapters.some(
+        c => c.book === chapter.book && c.chapter === chapter.chapter
+      );
+      if (found) return i;
+    }
+    return -1;
+  };
+
+  // Get image for a chapter - prioritizes user images, then PT Image Bible for ALL sets
   const getChapterImage = (chapter: ChapterFrame | null | undefined): string | null => {
     if (!chapter || !chapter.book) return null;
 
@@ -84,10 +99,19 @@ export function Bible24FPSBrowser({ onClose }: Bible24FPSBrowserProps) {
     );
     if (userImage) return userImage.image_url;
 
-    // Fall back to Genesis default images
-    if (chapter.book === "Genesis" && chapter.chapter >= 1 && chapter.chapter <= 50) {
-      return genesisImages[chapter.chapter - 1];
+    // Use PT Image Bible from storage for ALL sets (including sets 1-4)
+    const imageBibleUrl = getChapterImageUrl(imageBibleMap, chapter.book, chapter.chapter);
+    if (imageBibleUrl) return imageBibleUrl;
+    
+    // Fallback to Genesis default images only if no PT Image Bible image exists
+    const setIndex = getSetIndexForChapter(chapter);
+    if (setIndex >= 0 && setIndex < 4) {
+      if (chapter.book === "Genesis" && chapter.chapter >= 1 && chapter.chapter <= 50) {
+        return genesisImages[chapter.chapter - 1];
+      }
     }
+    
+    // Fallback to chapter's own imageUrl or null
     return chapter.imageUrl || null;
   };
 
@@ -167,17 +191,34 @@ export function Bible24FPSBrowser({ onClose }: Bible24FPSBrowserProps) {
   const currentSetIndex = selectedSet ? allBibleSets.indexOf(selectedSet) : 0;
   const currentSetColor = getSetColor(currentSetIndex);
   
-  // Check if a set has images (Genesis sets have images)
-  const setHasImages = (set: BibleSet) => {
-    return set.chapters.some(ch => ch && ch.book === "Genesis");
+  // Check if a set has images - check PT Image Bible first for all sets, then Genesis fallback for sets 1-4
+  const setHasImages = (set: BibleSet, setIndex: number) => {
+    // First check if any chapter has a PT Image Bible image
+    if (imageBibleMap) {
+      const hasImageBibleImages = set.chapters.some(ch => {
+        if (!ch || !ch.book) return false;
+        const url = getChapterImageUrl(imageBibleMap, ch.book, ch.chapter);
+        return !!url;
+      });
+      if (hasImageBibleImages) return true;
+    }
+    // Fallback: sets 1-4 have Genesis images
+    if (setIndex < 4) {
+      return set.chapters.some(ch => ch && ch.book === "Genesis");
+    }
+    return false;
   };
   
   const renderSetButton = (set: BibleSet, index: number) => {
     const colors = getSetColor(index);
-    const hasImages = setHasImages(set);
+    const hasImages = setHasImages(set, index);
     
-    // Get preview images for sets with Genesis chapters
-    const previewChapters = set.chapters.filter(ch => ch && ch.book === "Genesis").slice(0, 3);
+    // Get preview chapters with images
+    const previewChapters = set.chapters.filter(ch => {
+      if (!ch || !ch.book) return false;
+      const img = getChapterImage(ch);
+      return !!img;
+    }).slice(0, 3);
     
     return (
       <Button

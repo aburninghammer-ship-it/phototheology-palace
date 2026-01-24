@@ -225,10 +225,41 @@ export function useAudioBible(options: UseAudioBibleOptions = {}) {
         result = await Promise.race([commentaryPromise, timeoutPromise]);
       }
 
-      if (isStoppedRef.current || !result) {
-        console.log("[useAudioBible] Stopped or no result");
+      if (isStoppedRef.current) {
+        console.log("[useAudioBible] Stopped");
         loadingRef.current = false;
         setIsPlayingCommentary(false);
+        return;
+      }
+
+      // If no result (commentary failed to generate), skip to next verse
+      if (!result || !result.commentary) {
+        console.log("[useAudioBible] No commentary result - skipping to next verse");
+        loadingRef.current = false;
+        setIsPlayingCommentary(false);
+        setCurrentCommentary("");
+        
+        // Trigger move to next verse by simulating playback end
+        const nextIndex = currentVerseIndexRef.current + 1;
+        if (nextIndex < item.verses.length) {
+          setCurrentVerseIndex(nextIndex);
+          playVerseAtIndexRef.current?.(item, nextIndex);
+        } else {
+          // Chapter complete
+          onChapterCompleteRef.current?.(item.book, item.chapter);
+          if (playbackQueueRef.current.length > 0) {
+            const nextItem = playbackQueueRef.current.shift()!;
+            currentItemRef.current = nextItem;
+            setCurrentBook(nextItem.book);
+            setCurrentChapter(nextItem.chapter);
+            setCurrentVerseIndex(0);
+            setTotalVerses(nextItem.verses.length);
+            playVerseAtIndexRef.current?.(nextItem, 0);
+          } else {
+            currentItemRef.current = null;
+            setAudioState("idle");
+          }
+        }
         return;
       }
 

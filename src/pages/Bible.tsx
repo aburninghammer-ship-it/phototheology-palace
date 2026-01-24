@@ -1,22 +1,38 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Navigation } from "@/components/Navigation";
 import { BibleReader } from "@/components/bible/BibleReader";
 import { BibleNavigation } from "@/components/bible/BibleNavigation";
 import { Button } from "@/components/ui/button";
-import { BookMarked, HelpCircle, Headphones } from "lucide-react";
-import { Link } from "react-router-dom";
+import { BookMarked, HelpCircle, Headphones, FlaskConical } from "lucide-react";
+import { Link, useSearchParams } from "react-router-dom";
 import { StudyBibleDemoDialog } from "@/components/bible/StudyBibleDemoDialog";
 import { VoiceChatWidget } from "@/components/voice/VoiceChatWidget";
 import { useAuth } from "@/hooks/useAuth";
 import { OfflineIndicator } from "@/components/bible/OfflineIndicator";
 import { usePreservePage } from "@/hooks/usePreservePage";
+import { ResearchModeLayout } from "@/components/bible/ResearchModeLayout";
 
 const Bible = () => {
   const { user } = useAuth();
   const [demoOpen, setDemoOpen] = useState(false);
+  const [searchParams, setSearchParams] = useSearchParams();
+  const researchMode = searchParams.get("mode") === "research";
+
+  const setResearchMode = (enabled: boolean) => {
+    if (enabled) {
+      setSearchParams({ mode: "research" });
+    } else {
+      setSearchParams({});
+    }
+  };
   
   // Enable scroll position preservation for this page
   usePreservePage();
+
+  // Research Mode - Full screen multi-panel layout
+  if (researchMode) {
+    return <ResearchModeLayout onExitResearchMode={() => setResearchMode(false)} />;
+  }
 
   return (
     <div className="min-h-screen gradient-subtle">
@@ -43,6 +59,15 @@ const Bible = () => {
                 </div>
               </div>
               <div className="flex gap-2 flex-wrap">
+                <Button
+                  variant="outline"
+                  className="bg-white/10 backdrop-blur-md border-white/20 hover:bg-white/20 whitespace-nowrap"
+                  onClick={() => setResearchMode(true)}
+                >
+                  <FlaskConical className="h-4 w-4 mr-2" />
+                  <span className="hidden sm:inline">Research Mode</span>
+                  <span className="sm:hidden">Research</span>
+                </Button>
                 <Button
                   variant="outline"
                   className="bg-white/10 backdrop-blur-md border-white/20 hover:bg-white/20 whitespace-nowrap"

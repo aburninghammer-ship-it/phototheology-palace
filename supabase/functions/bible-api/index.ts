@@ -63,9 +63,9 @@ async function fetchFromBibleApi(book: string, chapter: number, version: string)
   const url = `https://bible-api.com/${encodeURIComponent(reference)}?translation=${version}`;
   console.log(`[Primary API] Fetching: ${url}`);
   
-  // Add timeout controller (3 second timeout)
+  // Add timeout controller (8 second timeout for reliability)
   const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), 3000);
+  const timeoutId = setTimeout(() => controller.abort(), 8000);
   
   try {
     const response = await fetch(url, {
@@ -76,6 +76,9 @@ async function fetchFromBibleApi(book: string, chapter: number, version: string)
     return response;
   } catch (err) {
     clearTimeout(timeoutId);
+    if (err instanceof Error && err.name === 'AbortError') {
+      throw new Error('Primary API timeout');
+    }
     throw err;
   }
 }
@@ -108,25 +111,33 @@ async function fetchFromBibleOrg(book: string, chapter: number): Promise<any> {
   const url = `https://labs.bible.org/api/?passage=${encodeURIComponent(bibleOrgBook)}+${chapter}&type=json`;
   console.log(`[Fallback API 1] Fetching: ${url}`);
   
-  const response = await fetch(url);
-  if (!response.ok) {
-    throw new Error(`Fallback API returned ${response.status}`);
-  }
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 10000);
   
-  const data = await response.json();
-  if (!Array.isArray(data) || data.length === 0) {
-    throw new Error('No verses from fallback API');
+  try {
+    const response = await fetch(url, { signal: controller.signal });
+    clearTimeout(timeoutId);
+    
+    if (!response.ok) {
+      throw new Error(`Fallback API returned ${response.status}`);
+    }
+    
+    const data = await response.json();
+    if (!Array.isArray(data) || data.length === 0) {
+      throw new Error('No verses from fallback API');
+    }
+    return {
+      verses: data.map((v: any) => ({
+        book: v.bookname || book,
+        chapter: v.chapter || chapter,
+        verse: parseInt(v.verse),
+        text: v.text?.replace(/<[^>]*>/g, '') || ''
+      }))
+    };
+  } catch (err) {
+    clearTimeout(timeoutId);
+    throw err;
   }
-  
-  // Transform to standard format
-  return {
-    verses: data.map((v: any) => ({
-      book: v.bookname || book,
-      chapter: v.chapter || chapter,
-      verse: parseInt(v.verse),
-      text: v.text?.replace(/<[^>]*>/g, '') || '' // Strip HTML tags
-    }))
-  };
 }
 
 // Fallback API 2: getbible.net

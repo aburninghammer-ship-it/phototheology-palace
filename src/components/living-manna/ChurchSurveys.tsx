@@ -1,26 +1,21 @@
-import { useState, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { useState } from "react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/useAuth";
+import { useChurchMembership } from "@/hooks/useChurchMembership";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Badge } from "@/components/ui/badge";
 import { Label } from "@/components/ui/label";
+import { Badge } from "@/components/ui/badge";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Slider } from "@/components/ui/slider";
-import { Progress } from "@/components/ui/progress";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { supabase } from "@/integrations/supabase/client";
-import { useAuth } from "@/hooks/useAuth";
-import { useChurchMembership } from "@/hooks/useChurchMembership";
-import { toast } from "sonner";
-import { format, isPast, isFuture } from "date-fns";
-import {
-  Loader2, Plus, ClipboardList, CheckCircle, Clock, BarChart3,
-  ThumbsUp, ThumbsDown, MessageSquare, ChevronRight, Users, X
-} from "lucide-react";
+import { ClipboardList, Plus, CheckCircle2, BarChart3, Star } from "lucide-react";
+import { format, parseISO, isFuture, isPast } from "date-fns";
+import { useToast } from "@/hooks/use-toast";
 
 interface ChurchSurveysProps {
   churchId: string;
@@ -31,513 +26,483 @@ interface Survey {
   title: string;
   description: string | null;
   survey_type: string;
-  target_audience: string;
-  is_anonymous: boolean;
-  show_results_to_all: boolean;
-  starts_at: string;
-  ends_at: string | null;
   status: string;
+  starts_at: string | null;
+  ends_at: string | null;
+  is_anonymous: boolean;
+  created_by: string | null;
   created_at: string;
 }
 
-interface Question {
+interface SurveyQuestion {
   id: string;
   survey_id: string;
   question_text: string;
   question_type: string;
-  options: string[];
+  options: string[] | null;
   is_required: boolean;
-  display_order: number;
-  min_value: number;
-  max_value: number;
-  min_label: string | null;
-  max_label: string | null;
+  sort_order: number;
 }
 
-interface Answer {
-  question_id: string;
-  answer_text?: string;
-  answer_option?: string;
-  answer_options?: string[];
-  answer_number?: number;
-}
+const QUESTION_TYPES = [
+  { value: "multiple_choice", label: "Multiple Choice" },
+  { value: "checkbox", label: "Checkbox (Multiple)" },
+  { value: "rating", label: "Rating Scale (1-5)" },
+  { value: "text", label: "Text Response" },
+  { value: "yes_no", label: "Yes / No" },
+];
 
 export function ChurchSurveys({ churchId }: ChurchSurveysProps) {
   const { user } = useAuth();
   const { role } = useChurchMembership();
-  const [surveys, setSurveys] = useState<Survey[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
+  const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [selectedSurvey, setSelectedSurvey] = useState<Survey | null>(null);
-  const [questions, setQuestions] = useState<Question[]>([]);
-  const [answers, setAnswers] = useState<Answer[]>([]);
-  const [submitting, setSubmitting] = useState(false);
-  const [hasResponded, setHasResponded] = useState(false);
-  const [showResults, setShowResults] = useState(false);
-  const [results, setResults] = useState<any[]>([]);
+  const [responses, setResponses] = useState<Record<string, string | string[]>>({});
 
-  const isLeader = role === 'admin' || role === 'leader' || role === 'pastor';
+  const canManage = role === "admin" || role === "leader";
 
-  useEffect(() => {
-    loadSurveys();
-  }, [churchId]);
-
-  const loadSurveys = async () => {
-    try {
-      const { data, error } = await (supabase
-        .from('church_surveys')
-        .select('*')
-        .eq('church_id', churchId)
-        .eq('status', 'active')
-        .order('created_at', { ascending: false }) as any);
+  // Fetch surveys
+  const { data: surveys = [], isLoading } = useQuery({
+    queryKey: ["church-surveys", churchId],
+    queryFn: async () => {
+      const { data, error } = await (supabase as any)
+        .from("church_surveys")
+        .select("*")
+        .eq("church_id", churchId)
+        .order("created_at", { ascending: false });
 
       if (error) throw error;
-      setSurveys(data || []);
-    } catch (error) {
-      console.error('Error loading surveys:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
+      return data as Survey[];
+    },
+    enabled: !!churchId,
+  });
 
-  const loadSurveyQuestions = async (surveyId: string) => {
-    try {
-      const { data, error } = await (supabase
-        .from('survey_questions')
-        .select('*')
-        .eq('survey_id', surveyId)
-        .order('display_order', { ascending: true }) as any);
-
-      if (error) throw error;
-      setQuestions(data || []);
-
-      // Check if user has already responded
-      if (user) {
-        const { data: existing } = await (supabase
-          .from('survey_responses')
-          .select('id')
-          .eq('survey_id', surveyId)
-          .eq('user_id', user.id)
-          .single() as any);
-        
-        setHasResponded(!!existing);
-      }
-
-      // Initialize answers
-      setAnswers((data || []).map((q: Question) => ({
-        question_id: q.id,
-      })));
-    } catch (error) {
-      console.error('Error loading questions:', error);
-    }
-  };
-
-  const loadResults = async (surveyId: string) => {
-    try {
-      const { data, error } = await (supabase.rpc as any)('get_survey_results', {
-        p_survey_id: surveyId
-      });
+  // Fetch questions for selected survey
+  const { data: questions = [] } = useQuery({
+    queryKey: ["survey-questions", selectedSurvey?.id],
+    queryFn: async () => {
+      if (!selectedSurvey) return [];
+      const { data, error } = await (supabase as any)
+        .from("church_survey_questions")
+        .select("*")
+        .eq("survey_id", selectedSurvey.id)
+        .order("sort_order", { ascending: true });
 
       if (error) throw error;
-      setResults(data || []);
-      setShowResults(true);
-    } catch (error) {
-      console.error('Error loading results:', error);
-      toast.error('Failed to load results');
-    }
-  };
+      return data as SurveyQuestion[];
+    },
+    enabled: !!selectedSurvey,
+  });
 
-  const handleSelectSurvey = async (survey: Survey) => {
-    setSelectedSurvey(survey);
-    setShowResults(false);
-    await loadSurveyQuestions(survey.id);
-  };
-
-  const updateAnswer = (questionId: string, update: Partial<Answer>) => {
-    setAnswers(prev => prev.map(a => 
-      a.question_id === questionId ? { ...a, ...update } : a
-    ));
-  };
-
-  const submitResponse = async () => {
-    if (!selectedSurvey || !user) return;
-
-    setSubmitting(true);
-    try {
-      // Create response
-      const { data: response, error: responseError } = await (supabase
-        .from('survey_responses')
+  // Create survey mutation
+  const createSurvey = useMutation({
+    mutationFn: async (data: {
+      title: string;
+      description: string;
+      survey_type: string;
+      is_anonymous: boolean;
+      ends_at?: string;
+      questions: { text: string; type: string; options?: string[] }[];
+    }) => {
+      // Create survey
+      const { data: survey, error: surveyError } = await (supabase as any)
+        .from("church_surveys")
         .insert({
-          survey_id: selectedSurvey.id,
-          user_id: selectedSurvey.is_anonymous ? null : user.id,
+          church_id: churchId,
+          title: data.title,
+          description: data.description,
+          survey_type: data.survey_type,
+          is_anonymous: data.is_anonymous,
+          ends_at: data.ends_at || null,
+          status: "active",
+          created_by: user?.id,
         })
         .select()
-        .single() as any);
+        .single();
 
-      if (responseError) throw responseError;
+      if (surveyError) throw surveyError;
 
-      // Insert answers
-      const answersToInsert = answers.filter(a => 
-        a.answer_text || a.answer_option || a.answer_options?.length || a.answer_number
-      ).map(a => ({
-        response_id: response.id,
-        question_id: a.question_id,
-        answer_text: a.answer_text || null,
-        answer_option: a.answer_option || null,
-        answer_options: a.answer_options || null,
-        answer_number: a.answer_number || null,
+      // Create questions
+      if (data.questions.length > 0) {
+        const { error: questionsError } = await (supabase as any)
+          .from("church_survey_questions")
+          .insert(
+            data.questions.map((q, i) => ({
+              survey_id: survey.id,
+              question_text: q.text,
+              question_type: q.type,
+              options: q.options || null,
+              sort_order: i,
+            }))
+          );
+
+        if (questionsError) throw questionsError;
+      }
+
+      return survey;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["church-surveys", churchId] });
+      setIsCreateOpen(false);
+      toast({ title: "Survey Created", description: "Your survey is now active." });
+    },
+    onError: (error) => {
+      toast({ title: "Error", description: "Failed to create survey.", variant: "destructive" });
+      console.error(error);
+    },
+  });
+
+  // Submit response mutation
+  const submitResponses = useMutation({
+    mutationFn: async () => {
+      if (!selectedSurvey || !user) throw new Error("No survey selected");
+
+      const responseData = Object.entries(responses).map(([questionId, value]) => ({
+        survey_id: selectedSurvey.id,
+        question_id: questionId,
+        user_id: selectedSurvey.is_anonymous ? null : user.id,
+        response_value: Array.isArray(value) ? value.join(",") : value,
+        response_data: { value },
       }));
 
-      if (answersToInsert.length > 0) {
-        const { error: answersError } = await (supabase
-          .from('survey_answers')
-          .insert(answersToInsert) as any);
+      const { error } = await (supabase as any)
+        .from("church_survey_responses")
+        .insert(responseData);
 
-        if (answersError) throw answersError;
-      }
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      setSelectedSurvey(null);
+      setResponses({});
+      toast({ title: "Response Submitted", description: "Thank you for your feedback!" });
+    },
+    onError: (error) => {
+      toast({ title: "Error", description: "Failed to submit response.", variant: "destructive" });
+      console.error(error);
+    },
+  });
 
-      toast.success('Response submitted!');
-      setHasResponded(true);
-
-      if (selectedSurvey.show_results_to_all) {
-        await loadResults(selectedSurvey.id);
-      }
-    } catch (error: any) {
-      console.error('Error submitting response:', error);
-      toast.error(error.message || 'Failed to submit response');
-    } finally {
-      setSubmitting(false);
+  const handleCreateSurvey = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const formData = new FormData(e.currentTarget);
+    
+    // Parse questions from form
+    const questionsData: { text: string; type: string; options?: string[] }[] = [];
+    let i = 0;
+    while (formData.get(`question_${i}_text`)) {
+      const text = formData.get(`question_${i}_text`) as string;
+      const type = formData.get(`question_${i}_type`) as string;
+      const optionsStr = formData.get(`question_${i}_options`) as string;
+      
+      questionsData.push({
+        text,
+        type,
+        options: optionsStr ? optionsStr.split(",").map(o => o.trim()) : undefined,
+      });
+      i++;
     }
+
+    createSurvey.mutate({
+      title: formData.get("title") as string,
+      description: formData.get("description") as string,
+      survey_type: formData.get("survey_type") as string,
+      is_anonymous: formData.get("is_anonymous") === "true",
+      ends_at: formData.get("ends_at") as string || undefined,
+      questions: questionsData,
+    });
   };
 
-  if (loading) {
+  const activeSurveys = surveys.filter(s => s.status === "active");
+  const closedSurveys = surveys.filter(s => s.status === "closed");
+
+  if (isLoading) {
     return (
-      <div className="flex items-center justify-center p-12">
-        <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+      <Card variant="glass">
+        <CardContent className="py-8 text-center">
+          <div className="animate-pulse">Loading surveys...</div>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  // Survey response view
+  if (selectedSurvey) {
+    return (
+      <div className="space-y-6">
+        <Card variant="glass">
+          <CardHeader>
+            <div className="flex items-center justify-between">
+              <div>
+                <CardTitle>{selectedSurvey.title}</CardTitle>
+                {selectedSurvey.description && (
+                  <CardDescription>{selectedSurvey.description}</CardDescription>
+                )}
+              </div>
+              <Button variant="outline" onClick={() => setSelectedSurvey(null)}>
+                Back to Surveys
+              </Button>
+            </div>
+            {selectedSurvey.is_anonymous && (
+              <Badge variant="secondary">Anonymous Survey</Badge>
+            )}
+          </CardHeader>
+        </Card>
+
+        <form onSubmit={(e) => { e.preventDefault(); submitResponses.mutate(); }}>
+          <div className="space-y-4">
+            {questions.map((question, index) => (
+              <Card key={question.id} variant="glass">
+                <CardContent className="pt-6">
+                  <Label className="text-base font-medium">
+                    {index + 1}. {question.question_text}
+                    {question.is_required && <span className="text-destructive ml-1">*</span>}
+                  </Label>
+
+                  <div className="mt-4">
+                    {question.question_type === "multiple_choice" && question.options && (
+                      <RadioGroup
+                        value={responses[question.id] as string || ""}
+                        onValueChange={(value) =>
+                          setResponses(prev => ({ ...prev, [question.id]: value }))
+                        }
+                      >
+                        {question.options.map((option, i) => (
+                          <div key={i} className="flex items-center space-x-2">
+                            <RadioGroupItem value={option} id={`${question.id}-${i}`} />
+                            <Label htmlFor={`${question.id}-${i}`}>{option}</Label>
+                          </div>
+                        ))}
+                      </RadioGroup>
+                    )}
+
+                    {question.question_type === "checkbox" && question.options && (
+                      <div className="space-y-2">
+                        {question.options.map((option, i) => {
+                          const currentValues = (responses[question.id] as string[]) || [];
+                          return (
+                            <div key={i} className="flex items-center space-x-2">
+                              <Checkbox
+                                id={`${question.id}-${i}`}
+                                checked={currentValues.includes(option)}
+                                onCheckedChange={(checked) => {
+                                  const newValues = checked
+                                    ? [...currentValues, option]
+                                    : currentValues.filter(v => v !== option);
+                                  setResponses(prev => ({ ...prev, [question.id]: newValues }));
+                                }}
+                              />
+                              <Label htmlFor={`${question.id}-${i}`}>{option}</Label>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    )}
+
+                    {question.question_type === "rating" && (
+                      <div className="flex gap-2">
+                        {[1, 2, 3, 4, 5].map((rating) => (
+                          <Button
+                            key={rating}
+                            type="button"
+                            variant={responses[question.id] === rating.toString() ? "default" : "outline"}
+                            size="lg"
+                            className="w-12 h-12"
+                            onClick={() =>
+                              setResponses(prev => ({ ...prev, [question.id]: rating.toString() }))
+                            }
+                          >
+                            {rating}
+                          </Button>
+                        ))}
+                      </div>
+                    )}
+
+                    {question.question_type === "yes_no" && (
+                      <RadioGroup
+                        value={responses[question.id] as string || ""}
+                        onValueChange={(value) =>
+                          setResponses(prev => ({ ...prev, [question.id]: value }))
+                        }
+                      >
+                        <div className="flex items-center space-x-2">
+                          <RadioGroupItem value="yes" id={`${question.id}-yes`} />
+                          <Label htmlFor={`${question.id}-yes`}>Yes</Label>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <RadioGroupItem value="no" id={`${question.id}-no`} />
+                          <Label htmlFor={`${question.id}-no`}>No</Label>
+                        </div>
+                      </RadioGroup>
+                    )}
+
+                    {question.question_type === "text" && (
+                      <Textarea
+                        value={responses[question.id] as string || ""}
+                        onChange={(e) =>
+                          setResponses(prev => ({ ...prev, [question.id]: e.target.value }))
+                        }
+                        placeholder="Enter your response..."
+                      />
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+
+          <div className="mt-6">
+            <Button type="submit" className="w-full" disabled={submitResponses.isPending}>
+              {submitResponses.isPending ? "Submitting..." : "Submit Response"}
+            </Button>
+          </div>
+        </form>
       </div>
     );
   }
 
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h2 className="text-2xl font-bold flex items-center gap-2">
-            <ClipboardList className="h-6 w-6 text-primary" />
-            Surveys & Polls
-          </h2>
-          <p className="text-muted-foreground">
-            Share your feedback and participate in church decisions
-          </p>
-        </div>
-      </div>
-
-      {/* Survey Detail View */}
-      <AnimatePresence mode="wait">
-        {selectedSurvey ? (
-          <motion.div
-            key="survey-detail"
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -20 }}
-            className="space-y-6"
-          >
-            {/* Back Button */}
-            <Button
-              variant="ghost"
-              onClick={() => {
-                setSelectedSurvey(null);
-                setShowResults(false);
-              }}
-              className="mb-4"
-            >
-              <X className="h-4 w-4 mr-2" />
-              Back to Surveys
-            </Button>
-
-            <Card className="backdrop-blur-xl bg-white/10 border-white/20">
-              <CardHeader>
-                <div className="flex items-start justify-between">
-                  <div>
-                    <CardTitle>{selectedSurvey.title}</CardTitle>
-                    {selectedSurvey.description && (
-                      <CardDescription className="mt-2">
-                        {selectedSurvey.description}
-                      </CardDescription>
-                    )}
-                  </div>
-                  <div className="flex gap-2">
-                    {selectedSurvey.is_anonymous && (
-                      <Badge variant="secondary">Anonymous</Badge>
-                    )}
-                    <Badge>
-                      {selectedSurvey.survey_type === 'poll' ? 'Poll' : 'Survey'}
-                    </Badge>
-                  </div>
-                </div>
-              </CardHeader>
-              <CardContent>
-                {/* Show Results */}
-                {showResults ? (
-                  <div className="space-y-6">
-                    <div className="flex items-center gap-2 text-green-500">
-                      <CheckCircle className="h-5 w-5" />
-                      <span className="font-medium">Thank you for your response!</span>
+      <Card variant="glass">
+        <CardHeader>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <ClipboardList className="h-5 w-5 text-primary" />
+              <CardTitle>Surveys & Polls</CardTitle>
+            </div>
+            {canManage && (
+              <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
+                <DialogTrigger asChild>
+                  <Button size="sm" className="gap-2">
+                    <Plus className="h-4 w-4" />
+                    Create Survey
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+                  <DialogHeader>
+                    <DialogTitle>Create New Survey</DialogTitle>
+                  </DialogHeader>
+                  <form onSubmit={handleCreateSurvey} className="space-y-4">
+                    <div>
+                      <Label htmlFor="title">Survey Title</Label>
+                      <Input id="title" name="title" required placeholder="e.g., Church Service Feedback" />
+                    </div>
+                    <div>
+                      <Label htmlFor="description">Description</Label>
+                      <Textarea id="description" name="description" placeholder="Brief description..." />
+                    </div>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <Label htmlFor="survey_type">Type</Label>
+                        <Select name="survey_type" defaultValue="survey">
+                          <SelectTrigger>
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="survey">Survey</SelectItem>
+                            <SelectItem value="poll">Quick Poll</SelectItem>
+                            <SelectItem value="feedback">Feedback Form</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div>
+                        <Label htmlFor="ends_at">End Date (optional)</Label>
+                        <Input id="ends_at" name="ends_at" type="date" />
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Checkbox id="is_anonymous" name="is_anonymous" value="true" />
+                      <Label htmlFor="is_anonymous">Anonymous responses</Label>
                     </div>
 
-                    <h3 className="text-lg font-semibold flex items-center gap-2">
-                      <BarChart3 className="h-5 w-5" />
-                      Results
-                    </h3>
+                    <div className="border-t pt-4">
+                      <Label className="text-base font-medium">Questions</Label>
+                      <p className="text-sm text-muted-foreground mb-4">Add at least one question</p>
 
-                    {results.map((result, idx) => (
-                      <div key={idx} className="space-y-3 p-4 rounded-lg bg-white/5">
-                        <p className="font-medium">{result.question_text}</p>
-                        <p className="text-sm text-muted-foreground">
-                          {result.total_responses} response(s)
-                        </p>
-
-                        {result.question_type === 'multiple_choice' || result.question_type === 'yes_no' ? (
-                          <div className="space-y-2">
-                            {result.results?.map((opt: any, i: number) => (
-                              <div key={i} className="space-y-1">
-                                <div className="flex justify-between text-sm">
-                                  <span>{opt.option}</span>
-                                  <span>{opt.count} vote(s)</span>
-                                </div>
-                                <Progress 
-                                  value={result.total_responses > 0 
-                                    ? (opt.count / result.total_responses) * 100 
-                                    : 0
-                                  } 
-                                  className="h-2"
-                                />
-                              </div>
-                            ))}
-                          </div>
-                        ) : result.question_type === 'rating' || result.question_type === 'scale' ? (
-                          <div className="text-center">
-                            <div className="text-3xl font-bold text-primary">
-                              {result.results?.average?.toFixed(1) || 'N/A'}
-                            </div>
-                            <p className="text-sm text-muted-foreground">Average Rating</p>
-                          </div>
-                        ) : null}
-                      </div>
-                    ))}
-                  </div>
-                ) : hasResponded ? (
-                  <div className="text-center py-8">
-                    <CheckCircle className="h-12 w-12 text-green-500 mx-auto mb-4" />
-                    <h3 className="text-lg font-semibold mb-2">Already Submitted</h3>
-                    <p className="text-muted-foreground mb-4">
-                      You have already submitted your response to this survey.
-                    </p>
-                    {selectedSurvey.show_results_to_all && (
-                      <Button onClick={() => loadResults(selectedSurvey.id)}>
-                        <BarChart3 className="h-4 w-4 mr-2" />
-                        View Results
-                      </Button>
-                    )}
-                  </div>
-                ) : (
-                  /* Questions Form */
-                  <div className="space-y-6">
-                    {questions.map((question, idx) => (
-                      <div key={question.id} className="space-y-3 p-4 rounded-lg bg-white/5">
-                        <Label className="text-base font-medium">
-                          {idx + 1}. {question.question_text}
-                          {question.is_required && <span className="text-red-500 ml-1">*</span>}
-                        </Label>
-
-                        {question.question_type === 'multiple_choice' && (
-                          <RadioGroup
-                            value={answers.find(a => a.question_id === question.id)?.answer_option || ''}
-                            onValueChange={(value) => updateAnswer(question.id, { answer_option: value })}
-                          >
-                            {question.options.map((option, i) => (
-                              <div key={i} className="flex items-center space-x-2">
-                                <RadioGroupItem value={option} id={question.id + "-" + i} />
-                                <Label htmlFor={question.id + "-" + i}>{option}</Label>
-                              </div>
-                            ))}
-                          </RadioGroup>
-                        )}
-
-                        {question.question_type === 'yes_no' && (
-                          <RadioGroup
-                            value={answers.find(a => a.question_id === question.id)?.answer_option || ''}
-                            onValueChange={(value) => updateAnswer(question.id, { answer_option: value })}
-                          >
-                            <div className="flex items-center space-x-2">
-                              <RadioGroupItem value="Yes" id={question.id + "-yes"} />
-                              <Label htmlFor={question.id + "-yes"}>Yes</Label>
-                            </div>
-                            <div className="flex items-center space-x-2">
-                              <RadioGroupItem value="No" id={question.id + "-no"} />
-                              <Label htmlFor={question.id + "-no"}>No</Label>
-                            </div>
-                            <div className="flex items-center space-x-2">
-                              <RadioGroupItem value="Maybe" id={question.id + "-maybe"} />
-                              <Label htmlFor={question.id + "-maybe"}>Maybe</Label>
-                            </div>
-                          </RadioGroup>
-                        )}
-
-                        {question.question_type === 'checkbox' && (
-                          <div className="space-y-2">
-                            {question.options.map((option, i) => {
-                              const currentOptions = answers.find(a => a.question_id === question.id)?.answer_options || [];
-                              return (
-                                <div key={i} className="flex items-center space-x-2">
-                                  <Checkbox
-                                    id={question.id + "-" + i}
-                                    checked={currentOptions.includes(option)}
-                                    onCheckedChange={(checked) => {
-                                      if (checked) {
-                                        updateAnswer(question.id, { answer_options: [...currentOptions, option] });
-                                      } else {
-                                        updateAnswer(question.id, { answer_options: currentOptions.filter(o => o !== option) });
-                                      }
-                                    }}
-                                  />
-                                  <Label htmlFor={question.id + "-" + i}>{option}</Label>
-                                </div>
-                              );
-                            })}
-                          </div>
-                        )}
-
-                        {(question.question_type === 'rating' || question.question_type === 'scale') && (
-                          <div className="space-y-3">
-                            <div className="flex justify-between text-sm text-muted-foreground">
-                              <span>{question.min_label || question.min_value}</span>
-                              <span>{question.max_label || question.max_value}</span>
-                            </div>
-                            <Slider
-                              min={question.min_value}
-                              max={question.max_value}
-                              step={1}
-                              value={[answers.find(a => a.question_id === question.id)?.answer_number || question.min_value]}
-                              onValueChange={(value) => updateAnswer(question.id, { answer_number: value[0] })}
-                            />
-                            <div className="text-center font-bold text-lg">
-                              {answers.find(a => a.question_id === question.id)?.answer_number || question.min_value}
-                            </div>
-                          </div>
-                        )}
-
-                        {question.question_type === 'text' && (
-                          <Input
-                            placeholder="Your answer..."
-                            value={answers.find(a => a.question_id === question.id)?.answer_text || ''}
-                            onChange={(e) => updateAnswer(question.id, { answer_text: e.target.value })}
+                      <div className="space-y-4">
+                        <div className="p-4 border rounded-lg space-y-3">
+                          <Input name="question_0_text" placeholder="Question text" required />
+                          <Select name="question_0_type" defaultValue="multiple_choice">
+                            <SelectTrigger>
+                              <SelectValue placeholder="Question type" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {QUESTION_TYPES.map(type => (
+                                <SelectItem key={type.value} value={type.value}>
+                                  {type.label}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                          <Input 
+                            name="question_0_options" 
+                            placeholder="Options (comma separated, for multiple choice)"
                           />
-                        )}
-
-                        {question.question_type === 'long_text' && (
-                          <Textarea
-                            placeholder="Your answer..."
-                            rows={4}
-                            value={answers.find(a => a.question_id === question.id)?.answer_text || ''}
-                            onChange={(e) => updateAnswer(question.id, { answer_text: e.target.value })}
-                          />
-                        )}
+                        </div>
                       </div>
-                    ))}
+                    </div>
 
-                    <Button
-                      onClick={submitResponse}
-                      disabled={submitting}
-                      className="w-full"
-                      size="lg"
-                    >
-                      {submitting ? (
-                        <>
-                          <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                          Submitting...
-                        </>
-                      ) : (
-                        <>
-                          <CheckCircle className="h-4 w-4 mr-2" />
-                          Submit Response
-                        </>
-                      )}
+                    <Button type="submit" className="w-full" disabled={createSurvey.isPending}>
+                      {createSurvey.isPending ? "Creating..." : "Create Survey"}
                     </Button>
+                  </form>
+                </DialogContent>
+              </Dialog>
+            )}
+          </div>
+          <CardDescription>Share your thoughts and help shape our church community</CardDescription>
+        </CardHeader>
+      </Card>
+
+      {/* Active Surveys */}
+      {activeSurveys.length > 0 && (
+        <div className="space-y-4">
+          <h3 className="text-lg font-semibold">Active Surveys</h3>
+          <div className="grid gap-4 md:grid-cols-2">
+            {activeSurveys.map(survey => (
+              <Card key={survey.id} variant="glass" className="cursor-pointer hover:border-primary/50 transition-colors"
+                onClick={() => setSelectedSurvey(survey)}>
+                <CardHeader>
+                  <div className="flex items-start justify-between">
+                    <div>
+                      <Badge variant="default" className="mb-2">
+                        {survey.survey_type === "poll" ? "Quick Poll" : "Survey"}
+                      </Badge>
+                      <CardTitle className="text-lg">{survey.title}</CardTitle>
+                      {survey.description && (
+                        <CardDescription className="line-clamp-2">{survey.description}</CardDescription>
+                      )}
+                    </div>
                   </div>
-                )}
-              </CardContent>
-            </Card>
-          </motion.div>
-        ) : (
-          /* Survey List */
-          <motion.div
-            key="survey-list"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="space-y-4"
-          >
-            {surveys.length === 0 ? (
-              <Card className="backdrop-blur-xl bg-white/10 border-white/20">
-                <CardContent className="py-12 text-center">
-                  <ClipboardList className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                  <h3 className="text-lg font-semibold mb-2">No Active Surveys</h3>
-                  <p className="text-muted-foreground">
-                    There are no surveys or polls available right now.
-                    Check back later!
-                  </p>
+                </CardHeader>
+                <CardContent>
+                  <div className="flex items-center justify-between text-sm text-muted-foreground">
+                    <span>
+                      {survey.ends_at && `Closes ${format(parseISO(survey.ends_at), "MMM d")}`}
+                    </span>
+                    {survey.is_anonymous && <Badge variant="outline">Anonymous</Badge>}
+                  </div>
                 </CardContent>
               </Card>
-            ) : (
-              surveys.map((survey) => (
-                <motion.div
-                  key={survey.id}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  whileHover={{ scale: 1.01 }}
-                >
-                  <Card
-                    className="backdrop-blur-xl bg-white/10 border-white/20 cursor-pointer hover:border-primary/50 transition-colors"
-                    onClick={() => handleSelectSurvey(survey)}
-                  >
-                    <CardContent className="p-4">
-                      <div className="flex items-center justify-between">
-                        <div className="flex-1">
-                          <div className="flex items-center gap-2 mb-1">
-                            <h3 className="font-semibold">{survey.title}</h3>
-                            <Badge variant="secondary" className="text-xs">
-                              {survey.survey_type === 'poll' ? 'Poll' : 'Survey'}
-                            </Badge>
-                            {survey.is_anonymous && (
-                              <Badge variant="outline" className="text-xs">Anonymous</Badge>
-                            )}
-                          </div>
-                          {survey.description && (
-                            <p className="text-sm text-muted-foreground line-clamp-1">
-                              {survey.description}
-                            </p>
-                          )}
-                          <div className="flex items-center gap-4 mt-2 text-xs text-muted-foreground">
-                            <span className="flex items-center gap-1">
-                              <Clock className="h-3 w-3" />
-                              {survey.ends_at 
-                                ? "Ends " + format(new Date(survey.ends_at), "MMM d")
-                                : "No deadline"
-                              }
-                            </span>
-                          </div>
-                        </div>
-                        <ChevronRight className="h-5 w-5 text-muted-foreground" />
-                      </div>
-                    </CardContent>
-                  </Card>
-                </motion.div>
-              ))
+            ))}
+          </div>
+        </div>
+      )}
+
+      {surveys.length === 0 && (
+        <Card variant="glass">
+          <CardContent className="py-12 text-center">
+            <ClipboardList className="h-12 w-12 mx-auto text-muted-foreground/50 mb-4" />
+            <p className="text-muted-foreground">No surveys available yet.</p>
+            {canManage && (
+              <Button className="mt-4" onClick={() => setIsCreateOpen(true)}>
+                Create First Survey
+              </Button>
             )}
-          </motion.div>
-        )}
-      </AnimatePresence>
+          </CardContent>
+        </Card>
+      )}
     </div>
   );
 }

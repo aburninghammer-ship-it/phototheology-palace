@@ -17,7 +17,9 @@ import { PickaxeImport } from "@/components/admin/PickaxeImport";
 import { PickaxeEmailCampaign } from "@/components/admin/PickaxeEmailCampaign";
 import { TeachableEmailCampaign } from "@/components/admin/TeachableEmailCampaign";
 import { AdminPasswordReset } from "@/components/admin/AdminPasswordReset";
-import { AnalyticsDashboard } from "@/components/admin/AnalyticsDashboard";
+import { SubscriptionAnalyticsChart } from "@/components/admin/SubscriptionAnalyticsChart";
+import { AdminUserManagement } from "@/components/admin/AdminUserManagement";
+import { EmailCampaignHistory } from "@/components/admin/EmailCampaignHistory";
 import { Badge } from "@/components/ui/badge";
 
 interface StripeStats {
@@ -525,7 +527,7 @@ export default function AdminSubscriptions() {
       <Tabs defaultValue="overview" className="space-y-6">
         <TabsList className="flex-wrap">
           <TabsTrigger value="overview">Overview</TabsTrigger>
-          <TabsTrigger value="analytics">📊 Analytics</TabsTrigger>
+          <TabsTrigger value="analytics">📈 Analytics</TabsTrigger>
           <TabsTrigger value="mismatches">Subscription Health</TabsTrigger>
           <TabsTrigger value="revenue">Revenue & Churn</TabsTrigger>
           <TabsTrigger value="campaigns">Email Campaigns</TabsTrigger>
@@ -832,7 +834,7 @@ export default function AdminSubscriptions() {
         </TabsContent>
 
         <TabsContent value="analytics">
-          <AnalyticsDashboard />
+          <SubscriptionAnalyticsChart />
         </TabsContent>
 
         <TabsContent value="mismatches">
@@ -843,7 +845,8 @@ export default function AdminSubscriptions() {
           <RevenueDashboard />
         </TabsContent>
 
-        <TabsContent value="campaigns">
+        <TabsContent value="campaigns" className="space-y-6">
+          <EmailCampaignHistory />
           <EmailCampaignManager />
         </TabsContent>
 
@@ -1055,6 +1058,7 @@ export default function AdminSubscriptions() {
 
         {/* User Tools Tab */}
         <TabsContent value="users" className="space-y-6">
+          <AdminUserManagement />
           <AdminPasswordReset />
         </TabsContent>
       </Tabs>

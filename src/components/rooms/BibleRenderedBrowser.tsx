@@ -26,6 +26,7 @@ import {
   getTotalChapters,
   getTotalRenders,
 } from "@/data/bibleRenderedSets";
+import { getBibleRenderedImage } from "@/assets/bible-rendered";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
 
@@ -96,7 +97,7 @@ export function BibleRenderedBrowser() {
     >
       <Card
         className={cn(
-          "cursor-pointer transition-all hover:shadow-md hover:border-primary/30",
+          "cursor-pointer transition-all hover:shadow-md hover:border-primary/30 overflow-hidden",
           compact ? "p-2" : "",
           set.testament === "new" && "bg-blue-50/50 dark:bg-blue-950/20"
         )}
@@ -104,14 +105,25 @@ export function BibleRenderedBrowser() {
       >
         <CardContent className={compact ? "p-2" : "p-4"}>
           <div className="flex items-start gap-3">
-            <div
-              className={cn(
-                "flex items-center justify-center rounded-lg bg-primary/10",
-                compact ? "w-10 h-10 text-xl" : "w-14 h-14 text-2xl"
-              )}
-            >
-              {set.symbol}
-            </div>
+            {getBibleRenderedImage(set.number) ? (
+              <img
+                src={getBibleRenderedImage(set.number)}
+                alt={`Set ${set.number}: ${set.name}`}
+                className={cn(
+                  "rounded-lg object-cover",
+                  compact ? "w-10 h-10" : "w-14 h-14"
+                )}
+              />
+            ) : (
+              <div
+                className={cn(
+                  "flex items-center justify-center rounded-lg bg-primary/10",
+                  compact ? "w-10 h-10 text-xl" : "w-14 h-14 text-2xl"
+                )}
+              >
+                {set.symbol}
+              </div>
+            )}
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2 mb-1">
                 <Badge variant="outline" className="text-xs">
@@ -161,9 +173,17 @@ export function BibleRenderedBrowser() {
           <CardHeader className="pb-4">
             <div className="flex items-start justify-between">
               <div className="flex items-center gap-4">
-                <div className="w-20 h-20 rounded-xl bg-primary/10 flex items-center justify-center text-4xl">
-                  {set.symbol}
-                </div>
+                {getBibleRenderedImage(set.number) ? (
+                  <img
+                    src={getBibleRenderedImage(set.number)}
+                    alt={`Set ${set.number}: ${set.name}`}
+                    className="w-20 h-20 rounded-xl object-cover"
+                  />
+                ) : (
+                  <div className="w-20 h-20 rounded-xl bg-primary/10 flex items-center justify-center text-4xl">
+                    {set.symbol}
+                  </div>
+                )}
                 <div>
                   <div className="flex items-center gap-2 mb-2">
                     <Badge>Set #{set.number}</Badge>
@@ -184,6 +204,17 @@ export function BibleRenderedBrowser() {
             </div>
           </CardHeader>
           <CardContent className="space-y-6">
+            {/* Full Image Display */}
+            {getBibleRenderedImage(set.number) && (
+              <div className="flex justify-center">
+                <img
+                  src={getBibleRenderedImage(set.number)}
+                  alt={`Set ${set.number}: ${set.name}`}
+                  className="max-w-full max-h-64 rounded-xl object-contain shadow-lg"
+                />
+              </div>
+            )}
+
             {/* Stats */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               <div className="text-center p-4 rounded-lg bg-muted/50">

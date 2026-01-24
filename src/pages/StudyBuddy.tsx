@@ -4,7 +4,7 @@ import { Navigation } from "@/components/Navigation";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useUserPreferences } from "@/hooks/useUserPreferences";
-import { usePersistedState, usePreservePageState } from "@/contexts/PageStateContext";
+import { usePreservePageState } from "@/contexts/PageStateContext";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
@@ -240,10 +240,9 @@ export default function StudyBuddy() {
   // Theme state
   const isLightTheme = preferences.study_buddy_theme === "light";
 
-  // Session state
-  const [currentSessionId, setCurrentSessionId] = useState<string | null>(
-    searchParams.get("session") || null
-  );
+  // Session state - only load existing session if ID is in URL
+  const sessionIdFromUrl = searchParams.get("session");
+  const [currentSessionId, setCurrentSessionId] = useState<string | null>(sessionIdFromUrl);
 
   // Track if this is a fresh navigation (not tab switch)
   const isInitialMount = useRef(true);
@@ -251,15 +250,15 @@ export default function StudyBuddy() {
   // Preserve scroll position when switching pages
   usePreservePageState();
 
-  // Bible panel state - persisted so it survives tab switching
-  const [selectedBook, setSelectedBook] = usePersistedState("selectedBook", "Genesis");
-  const [selectedChapter, setSelectedChapter] = usePersistedState("selectedChapter", 1);
+  // Bible panel state - only persist if loading a session, otherwise fresh start
+  const [selectedBook, setSelectedBook] = useState("Genesis");
+  const [selectedChapter, setSelectedChapter] = useState(1);
   const [verses, setVerses] = useState<{ verse: number; text: string }[]>([]);
   const [loadingVerses, setLoadingVerses] = useState(false);
 
-  // Notes panel state - persisted
-  const [notes, setNotes] = usePersistedState("notes", "");
-  const [sessionTitle, setSessionTitle] = usePersistedState("sessionTitle", "");
+  // Notes panel state - fresh start unless loading a session
+  const [notes, setNotes] = useState("");
+  const [sessionTitle, setSessionTitle] = useState("");
   const lastAnalyzedNotes = useRef("");
   const analysisTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 

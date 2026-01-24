@@ -1,6 +1,6 @@
-import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
-import Stripe from "https://esm.sh/stripe@18.5.0";
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
+import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import Stripe from "https://esm.sh/stripe@14.21.0";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -75,7 +75,7 @@ serve(async (req) => {
     const stripeKey = Deno.env.get("STRIPE_SECRET_KEY");
     if (!stripeKey) throw new Error("STRIPE_SECRET_KEY is not set");
 
-    const stripe = new Stripe(stripeKey, { apiVersion: "2025-08-27.basil" });
+    const stripe = new Stripe(stripeKey, { apiVersion: "2023-10-16" });
 
     logStep("Fetching checkout sessions for PDF products");
 
@@ -86,6 +86,25 @@ serve(async (req) => {
     });
 
     logStep("Got checkout sessions", { count: sessions.data.length });
+
+    // Get email logs from database
+    const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
+    const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey || supabaseAnonKey);
+    
+    const { data: emailLogs } = await supabaseAdmin
+      .from("pdf_email_logs")
+      .select("checkout_session_id, email, product_key, sent_at, success");
+    
+    // Create a map for quick lookup
+    const emailLogMap = new Map<string, { sent_at: string; success: boolean }>();
+    emailLogs?.forEach(log => {
+      if (log.checkout_session_id) {
+        emailLogMap.set(log.checkout_session_id, {
+          sent_at: log.sent_at,
+          success: log.success,
+        });
+      }
+    });
 
     // Find all PDF purchases
     const pdfPurchases: any[] = [];
@@ -115,6 +134,7 @@ serve(async (req) => {
         }
 
         if (isMatch) {
+          const emailLog = emailLogMap.get(session.id);
           pdfPurchases.push({
             id: session.id,
             product: config.name,
@@ -123,6 +143,8 @@ serve(async (req) => {
             email: session.customer_details?.email || null,
             name: session.customer_details?.name || null,
             date: new Date((session.created || 0) * 1000).toISOString(),
+            pdfSent: emailLog?.success || false,
+            pdfSentAt: emailLog?.sent_at || null,
           });
           break; // Don't double-count
         }

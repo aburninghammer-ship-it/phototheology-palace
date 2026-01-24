@@ -1,18 +1,24 @@
-import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { BookOpen, Calendar, Flame, GraduationCap, Sparkles } from "lucide-react";
+import { BookOpen, Calendar, Flame, GraduationCap, Mic } from "lucide-react";
 import { StudyFeed } from "./StudyFeed";
 import { StudyCycles } from "./StudyCycles";
 import { TruthSeries } from "./TruthSeries";
 import { DiscipleshipPackages } from "./DiscipleshipPackages";
-import { SermonDeepDive } from "./SermonDeepDive";
+import { SermonStudyUploader } from "./SermonStudyUploader";
+import { useChurchMembership } from "@/hooks/useChurchMembership";
+import { useSubscription } from "@/hooks/useSubscription";
 
 interface LearnTabProps {
   churchId: string;
 }
 
 export function LearnTab({ churchId }: LearnTabProps) {
+  const { role: memberRole } = useChurchMembership();
+  const { subscription } = useSubscription();
+  const effectiveRole = memberRole || subscription.church.churchRole;
+  const canManageSermonStudies = effectiveRole === "admin" || effectiveRole === "leader";
+
   return (
     <div className="space-y-6">
       <Card variant="glass">
@@ -33,10 +39,6 @@ export function LearnTab({ churchId }: LearnTabProps) {
             <BookOpen className="h-4 w-4" />
             Weekly Study
           </TabsTrigger>
-          <TabsTrigger value="deep-dive" className="gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
-            <Sparkles className="h-4 w-4" />
-            Sermon Deep Dive
-          </TabsTrigger>
           <TabsTrigger value="cycles" className="gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
             <Calendar className="h-4 w-4" />
             6-Week Cycles
@@ -49,14 +51,14 @@ export function LearnTab({ churchId }: LearnTabProps) {
             <Flame className="h-4 w-4" />
             Truth Series
           </TabsTrigger>
+          <TabsTrigger value="sermon-study" className="gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
+            <Mic className="h-4 w-4" />
+            Sermon Study
+          </TabsTrigger>
         </TabsList>
 
         <TabsContent value="weekly-study">
           <StudyFeed churchId={churchId} />
-        </TabsContent>
-
-        <TabsContent value="deep-dive">
-          <SermonDeepDive churchId={churchId} />
         </TabsContent>
 
         <TabsContent value="cycles">
@@ -69,6 +71,10 @@ export function LearnTab({ churchId }: LearnTabProps) {
 
         <TabsContent value="seekers">
           <TruthSeries churchId={churchId} />
+        </TabsContent>
+
+        <TabsContent value="sermon-study">
+          <SermonStudyUploader churchId={churchId} userRole={effectiveRole || "member"} />
         </TabsContent>
       </Tabs>
     </div>

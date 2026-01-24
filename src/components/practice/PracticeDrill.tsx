@@ -10,6 +10,7 @@ import { DrillQuestion, DrillResult, useDrills } from "@/hooks/useDrills";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { palaceFloors } from "@/data/palaceData";
 import { useNavigate } from "react-router-dom";
+import { SaveDrillButton } from "@/components/drills/SaveDrillButton";
 
 interface PracticeDrillProps {
   floorNumber: number;
@@ -193,10 +194,28 @@ export const PracticeDrill = ({
             ))}
           </div>
 
-          <div className="flex gap-2">
+          <div className="flex gap-2 flex-wrap">
             <Button onClick={restart} variant="outline" className="flex-1">
               Practice Again
             </Button>
+            <SaveDrillButton
+              drillData={{
+                verse_reference: `${roomName} - ${drillType}`,
+                mode: drillType,
+                drill_type: drillType,
+                floor_number: floorNumber,
+                room_id: roomId,
+                drill_data: {
+                  score,
+                  maxScore: questions.length,
+                  percentage,
+                  timeSeconds,
+                  answers,
+                },
+              }}
+              defaultName={`${roomName} - ${percentage}%`}
+              isCompleted={true}
+            />
             {nextRoom && (
               <Button 
                 onClick={() => navigate(`/palace/floor/${nextRoom.floor}/room/${nextRoom.room.id}`)}

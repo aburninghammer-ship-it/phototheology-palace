@@ -7,10 +7,14 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
+// Verified sender domain (Resend)
+const FROM_EMAIL = "Phototheology <noreply@thephototheologyapp.com>";
+
+
 interface EmailRequest {
   subject: string;
   htmlContent: string;
-  filter: 'all' | 'active' | 'inactive' | 'linked' | 'unlinked' | 'premium_paying' | 'not_paying';
+  filter: 'all' | 'master_class_active' | 'master_class_inactive' | 'free_signup' | 'linked' | 'unlinked' | 'premium_paying' | 'not_paying';
   testMode: boolean;
   testEmail?: string;
 }
@@ -91,15 +95,20 @@ serve(async (req) => {
       }
 
       const resend = new Resend(RESEND_API_KEY);
-      
-      const emailResponse = await resend.emails.send({
-        from: "PhotoTheology <noreply@thephototheologyapp.com>",
+
+      const { data, error } = await resend.emails.send({
+        from: FROM_EMAIL,
         to: [testEmail],
         subject: `[TEST] ${subject}`,
         html: htmlContent,
       });
 
-      console.log("Test email sent:", emailResponse);
+      if (error) {
+        console.error("Resend test email error:", error);
+        throw new Error(error.message);
+      }
+
+      console.log("Test email sent:", data);
 
       return new Response(
         JSON.stringify({
@@ -125,11 +134,14 @@ serve(async (req) => {
         .range(offset, offset + pageSize - 1);
 
       switch (filter) {
-        case 'active':
-          query = query.eq("is_active", true);
+        case 'master_class_active':
+          query = query.eq("is_master_class", true).eq("is_active", true);
           break;
-        case 'inactive':
-          query = query.or("is_active.is.null,is_active.eq.false");
+        case 'master_class_inactive':
+          query = query.eq("is_master_class", true).eq("is_active", false);
+          break;
+        case 'free_signup':
+          query = query.eq("is_master_class", false);
           break;
         case 'linked':
           query = query.not("user_id", "is", null);
@@ -187,32 +199,53 @@ serve(async (req) => {
     const resend = new Resend(RESEND_API_KEY);
     let sentCount = 0;
     let errorCount = 0;
+    const campaignName = `Teachable Campaign - ${filter} - ${new Date().toISOString().split('T')[0]}`;
 
-    // Send emails in batches of 50 for better throughput
-    const batchSize = 50;
-    for (let i = 0; i < emails.length; i += batchSize) {
-      const batch = emails.slice(i, i + batchSize);
+    // Send emails sequentially with delay to respect Resend rate limit (2/sec)
+    for (let i = 0; i < emails.length; i++) {
+      const email = emails[i];
       
-      const promises = batch.map(async (email) => {
-        try {
-          await resend.emails.send({
-            from: "PhotoTheology <noreply@thephototheologyapp.com>",
-            to: [email],
-            subject,
-            html: htmlContent,
-          });
-          sentCount++;
-        } catch (err) {
-          console.error(`Failed to send to ${email}:`, err);
-          errorCount++;
+      try {
+        const emailResponse = await resend.emails.send({
+          from: FROM_EMAIL,
+          to: [email],
+          subject,
+          html: htmlContent,
+        });
+
+        if (emailResponse.error) {
+          throw new Error(emailResponse.error.message);
         }
-      });
 
-      await Promise.all(promises);
-      
-      // Small delay between batches to avoid rate limits
-      if (i + batchSize < emails.length) {
-        await new Promise(resolve => setTimeout(resolve, 100));
+        sentCount++;
+
+        // Log successful send with resend email ID for tracking opens
+        await supabase.from("email_campaign_logs").insert({
+          campaign_name: campaignName,
+          email_type: "teachable",
+          recipient_email: email,
+          status: "sent",
+          sent_at: new Date().toISOString(),
+          resend_email_id: emailResponse.data?.id || null,
+        });
+      } catch (err) {
+        console.error(`Failed to send to ${email}:`, err);
+        errorCount++;
+        
+        // Log failed send
+        await supabase.from("email_campaign_logs").insert({
+          campaign_name: campaignName,
+          email_type: "teachable",
+          recipient_email: email,
+          status: "failed",
+          error_message: err instanceof Error ? err.message : "Unknown error",
+          sent_at: new Date().toISOString(),
+        });
+      }
+
+      // Delay 600ms between emails to stay under 2 req/sec rate limit
+      if (i < emails.length - 1) {
+        await new Promise(resolve => setTimeout(resolve, 600));
       }
     }
 
