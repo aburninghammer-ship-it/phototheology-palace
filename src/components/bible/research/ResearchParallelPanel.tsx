@@ -37,24 +37,34 @@ export const ResearchParallelPanel = ({
     { id: "2", translation: "asv", data: null, loading: true },
   ]);
 
+  // Load all translations when book/chapter changes
   useEffect(() => {
+    const loadAllTranslations = async () => {
+      // Set all columns to loading state first
+      setColumns(prev => prev.map(col => ({ ...col, loading: true })));
+      
+      // Get current columns to load
+      setColumns(prev => {
+        // Load each translation in parallel
+        prev.forEach(async (col) => {
+          try {
+            const data = await fetchChapter(book, chapter, col.translation);
+            setColumns(current => current.map(c => 
+              c.id === col.id ? { ...c, data, loading: false } : c
+            ));
+          } catch (error) {
+            console.error(`Failed to load ${col.translation}:`, error);
+            setColumns(current => current.map(c => 
+              c.id === col.id ? { ...c, data: null, loading: false } : c
+            ));
+          }
+        });
+        return prev;
+      });
+    };
+    
     loadAllTranslations();
   }, [book, chapter]);
-
-  const loadAllTranslations = async () => {
-    const updatedColumns = await Promise.all(
-      columns.map(async (col) => {
-        try {
-          const data = await fetchChapter(book, chapter, col.translation);
-          return { ...col, data, loading: false };
-        } catch (error) {
-          console.error(`Failed to load ${col.translation}:`, error);
-          return { ...col, data: null, loading: false };
-        }
-      })
-    );
-    setColumns(updatedColumns);
-  };
 
   const loadTranslation = async (colId: string, translation: Translation) => {
     setColumns(prev => prev.map(col => 
