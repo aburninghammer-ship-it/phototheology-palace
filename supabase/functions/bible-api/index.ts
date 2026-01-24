@@ -44,6 +44,19 @@ const SINGLE_CHAPTER_BOOKS: Record<string, number> = {
   'jude': 25,
 };
 
+// Translations supported by bible-api.com
+const BIBLE_API_SUPPORTED = ['kjv', 'web', 'bbe', 'asv', 'ylt', 'darby', 'clementine', 'almeida', 'rves'];
+
+// Map unsupported translations to closest supported alternative
+const TRANSLATION_FALLBACK: Record<string, string> = {
+  'niv': 'web',      // NIV -> WEB (modern English)
+  'esv': 'asv',      // ESV -> ASV (literal translation)
+  'nkjv': 'kjv',     // NKJV -> KJV (same family)
+  'nasb': 'asv',     // NASB -> ASV (literal translation)
+  'nlt': 'web',      // NLT -> WEB (dynamic equivalence)
+  'rvr': 'rves',     // RVR -> RVES (Spanish)
+};
+
 // Primary API: bible-api.com (with timeout)
 async function fetchFromBibleApi(book: string, chapter: number, version: string): Promise<Response> {
   const normalizedBook = normalizeBookName(book);
@@ -145,17 +158,17 @@ async function fetchFromGetBible(book: string, chapter: number): Promise<any> {
   const normalizedBook = normalizeBookName(book);
   const url = `https://getbible.net/v2/kjv/${encodeURIComponent(normalizedBook.toLowerCase())}/${chapter}.json`;
   console.log(`[Fallback API 2] Fetching: ${url}`);
-  
+
   const response = await fetch(url);
   if (!response.ok) {
     throw new Error(`GetBible API returned ${response.status}`);
   }
-  
+
   const data = await response.json();
   if (!data.verses || data.verses.length === 0) {
     throw new Error('No verses from GetBible API');
   }
-  
+
   return {
     verses: data.verses.map((v: any) => ({
       book: normalizedBook,
@@ -166,11 +179,102 @@ async function fetchFromGetBible(book: string, chapter: number): Promise<any> {
   };
 }
 
+// Fallback API 3: bolls.life (supports many translations including NIV, ESV, NASB)
+async function fetchFromBollsLife(book: string, chapter: number, version: string): Promise<any> {
+  // Map our translation codes to bolls.life translation IDs
+  const translationMap: Record<string, number> = {
+    'kjv': 1,
+    'niv': 111,
+    'esv': 59,
+    'nkjv': 114,
+    'nasb': 100,
+    'nlt': 116,
+    'web': 206,
+    'asv': 12,
+  };
+
+  const bookMap: Record<string, number> = {
+    'genesis': 1, 'exodus': 2, 'leviticus': 3, 'numbers': 4, 'deuteronomy': 5,
+    'joshua': 6, 'judges': 7, 'ruth': 8, '1 samuel': 9, '2 samuel': 10,
+    '1 kings': 11, '2 kings': 12, '1 chronicles': 13, '2 chronicles': 14,
+    'ezra': 15, 'nehemiah': 16, 'esther': 17, 'job': 18, 'psalms': 19, 'psalm': 19,
+    'proverbs': 20, 'ecclesiastes': 21, 'song of solomon': 22, 'isaiah': 23,
+    'jeremiah': 24, 'lamentations': 25, 'ezekiel': 26, 'daniel': 27, 'hosea': 28,
+    'joel': 29, 'amos': 30, 'obadiah': 31, 'jonah': 32, 'micah': 33, 'nahum': 34,
+    'habakkuk': 35, 'zephaniah': 36, 'haggai': 37, 'zechariah': 38, 'malachi': 39,
+    'matthew': 40, 'mark': 41, 'luke': 42, 'john': 43, 'acts': 44, 'romans': 45,
+    '1 corinthians': 46, '2 corinthians': 47, 'galatians': 48, 'ephesians': 49,
+    'philippians': 50, 'colossians': 51, '1 thessalonians': 52, '2 thessalonians': 53,
+    '1 timothy': 54, '2 timothy': 55, 'titus': 56, 'philemon': 57, 'hebrews': 58,
+    'james': 59, '1 peter': 60, '2 peter': 61, '1 john': 62, '2 john': 63,
+    '3 john': 64, 'jude': 65, 'revelation': 66
+  };
+
+  const translationId = translationMap[version.toLowerCase()] || 1; // Default to KJV
+  const bookId = bookMap[book.toLowerCase().trim()];
+
+  if (!bookId) {
+    throw new Error(`Unknown book: ${book}`);
+  }
+
+  const url = `https://bolls.life/get-chapter/${translationId}/${bookId}/${chapter}/`;
+  console.log(`[Fallback API 3 - Bolls.life] Fetching: ${url}`);
+
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 10000);
+
+  try {
+    const response = await fetch(url, { signal: controller.signal });
+    clearTimeout(timeoutId);
+
+    if (!response.ok) {
+      throw new Error(`Bolls.life API returned ${response.status}`);
+    }
+
+    const data = await response.json();
+    if (!Array.isArray(data) || data.length === 0) {
+      throw new Error('No verses from Bolls.life API');
+    }
+
+    const normalizedBook = normalizeBookName(book);
+    return {
+      verses: data.map((v: any) => ({
+        book: normalizedBook,
+        chapter: chapter,
+        verse: v.verse,
+        text: v.text
+      }))
+    };
+  } catch (err) {
+    clearTimeout(timeoutId);
+    throw err;
+  }
+}
+
+// Translations that should use bolls.life API (modern translations not in bible-api.com)
+const BOLLS_LIFE_PREFERRED = ['niv', 'esv', 'nkjv', 'nasb', 'nlt'];
+
 // Fetch with retry logic and multiple fallbacks - reduced retries for faster response
 async function fetchWithRetry(book: string, chapter: number, version: string, maxRetries = 2): Promise<any> {
   let lastError: Error | null = null;
-  
-  // Try primary API with retries
+  const versionLower = version.toLowerCase();
+
+  // For modern translations (NIV, ESV, NKJV, NASB, NLT), try bolls.life first
+  if (BOLLS_LIFE_PREFERRED.includes(versionLower)) {
+    console.log(`[Bolls.life] Trying first for modern translation: ${version}`);
+    try {
+      const bollsData = await fetchFromBollsLife(book, chapter, version);
+      if (bollsData.verses && bollsData.verses.length > 0) {
+        console.log(`[Bolls.life] Success! Got ${bollsData.verses.length} verses`);
+        return bollsData;
+      }
+    } catch (bollsErr) {
+      console.error(`[Bolls.life] Failed:`, bollsErr);
+      lastError = bollsErr instanceof Error ? bollsErr : new Error(String(bollsErr));
+    }
+  }
+
+  // Try primary API (bible-api.com) with retries
   for (let attempt = 0; attempt < maxRetries; attempt++) {
     if (attempt > 0) {
       // Exponential backoff: 500ms, 1s, 2s, 4s
@@ -210,8 +314,22 @@ async function fetchWithRetry(book: string, chapter: number, version: string, ma
     }
   }
 
+  // Try bolls.life as fallback (if we didn't already try it)
+  if (!BOLLS_LIFE_PREFERRED.includes(versionLower)) {
+    console.log(`[Fallback - Bolls.life] Trying for ${book} ${chapter}`);
+    try {
+      const bollsData = await fetchFromBollsLife(book, chapter, version);
+      if (bollsData.verses && bollsData.verses.length > 0) {
+        console.log(`[Fallback - Bolls.life] Success! Got ${bollsData.verses.length} verses`);
+        return bollsData;
+      }
+    } catch (bollsErr) {
+      console.error(`[Fallback - Bolls.life] Failed:`, bollsErr);
+    }
+  }
+
   // Try fallback API 1: labs.bible.org
-  console.log(`[Fallback 1] Primary API failed, trying labs.bible.org for ${book} ${chapter}`);
+  console.log(`[Fallback 1] Trying labs.bible.org for ${book} ${chapter}`);
   try {
     const fallbackData = await fetchFromBibleOrg(book, chapter);
     if (fallbackData.verses && fallbackData.verses.length > 0) {
@@ -244,15 +362,32 @@ serve(async (req) => {
 
   try {
     const { book, chapter, version = 'kjv' } = await req.json();
-    
+
     if (!book || !chapter) {
       throw new Error('Book and chapter are required');
     }
 
-    console.log(`[Bible API] Fetching ${book} ${chapter} (${version})`);
+    // Check if translation is supported, use fallback if not
+    let actualVersion = version.toLowerCase();
+    let usedFallback = false;
+
+    if (!BIBLE_API_SUPPORTED.includes(actualVersion)) {
+      const fallback = TRANSLATION_FALLBACK[actualVersion];
+      if (fallback) {
+        console.log(`[Bible API] Translation '${version}' not supported, using fallback '${fallback}'`);
+        actualVersion = fallback;
+        usedFallback = true;
+      } else {
+        console.log(`[Bible API] Translation '${version}' not supported, defaulting to 'kjv'`);
+        actualVersion = 'kjv';
+        usedFallback = true;
+      }
+    }
+
+    console.log(`[Bible API] Fetching ${book} ${chapter} (${actualVersion})`);
 
     // Fetch with retry and fallback
-    const data = await fetchWithRetry(book, chapter, version);
+    const data = await fetchWithRetry(book, chapter, actualVersion);
     
     if (!data.verses || data.verses.length === 0) {
       throw new Error('No verses found for this chapter');
@@ -270,7 +405,12 @@ serve(async (req) => {
     console.log(`[Bible API] Returning ${verses.length} verses`);
 
     return new Response(
-      JSON.stringify({ verses }),
+      JSON.stringify({
+        verses,
+        translation: actualVersion,
+        requestedTranslation: version,
+        usedFallback
+      }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
 
