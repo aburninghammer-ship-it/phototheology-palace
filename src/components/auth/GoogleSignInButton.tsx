@@ -10,10 +10,21 @@ export function GoogleSignInButton() {
   const handleGoogleSignIn = async () => {
     setLoading(true);
     try {
+      // Preserve any intended post-login redirect (e.g. /auth?redirect=%2Fprofile)
+      const params = new URLSearchParams(window.location.search);
+      const redirectParam = params.get("redirect");
+      const safeRedirect =
+        redirectParam && redirectParam.startsWith("/") && !redirectParam.startsWith("//")
+          ? redirectParam
+          : null;
+
+      const callbackUrl = new URL(`${window.location.origin}/auth/callback`);
+      if (safeRedirect) callbackUrl.searchParams.set("redirect", safeRedirect);
+
       const { error } = await supabase.auth.signInWithOAuth({
         provider: "google",
         options: {
-          redirectTo: `${window.location.origin}/auth/callback`,
+          redirectTo: callbackUrl.toString(),
         },
       });
 
