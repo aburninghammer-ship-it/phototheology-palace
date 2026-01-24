@@ -25,21 +25,25 @@ interface StrongsWord {
 // Component for a clickable word with Strong's popup
 const StrongsWordPopup = ({
   word,
-  isHebrew
+  isHebrew,
+  alwaysClickable = false
 }: {
   word: StrongsWord;
   isHebrew: boolean;
+  alwaysClickable?: boolean;
 }) => {
   const [entry, setEntry] = useState<StrongsEntry | null>(null);
   const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState(false);
 
   const fetchEntry = async () => {
-    if (!word.strongs || entry) return;
+    if (entry) return;
     setLoading(true);
     try {
-      const data = await getStrongsEntry(word.strongs);
-      setEntry(data);
+      if (word.strongs) {
+        const data = await getStrongsEntry(word.strongs);
+        setEntry(data);
+      }
     } catch (error) {
       console.error("Failed to fetch Strong's entry:", error);
     } finally {
@@ -48,25 +52,36 @@ const StrongsWordPopup = ({
   };
 
   useEffect(() => {
-    if (open && word.strongs && !entry) {
+    if (open && !entry) {
       fetchEntry();
     }
   }, [open]);
 
-  if (!word.strongs) {
+  // Skip punctuation-only tokens
+  const isPunctuation = /^[.,;:!?'"()\-–—]+$/.test(word.text.trim());
+  if (isPunctuation) {
+    return <span>{word.text}</span>;
+  }
+
+  // Words without Strong's numbers that aren't always clickable
+  if (!word.strongs && !alwaysClickable) {
     return <span className="mx-0.5">{word.text}</span>;
   }
 
+  // Determine color based on Hebrew (OT) or Greek (NT)
   const colorClass = isHebrew
-    ? "text-purple-400 hover:text-purple-300 hover:bg-purple-500/20"
-    : "text-teal-400 hover:text-teal-300 hover:bg-teal-500/20";
+    ? "text-purple-400 hover:text-purple-300 hover:bg-purple-500/30 border-purple-500/40"
+    : "text-teal-400 hover:text-teal-300 hover:bg-teal-500/30 border-teal-500/40";
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
         <button
           className={cn(
-            "mx-0.5 px-1 py-0.5 rounded-md cursor-pointer transition-all underline decoration-dotted underline-offset-4",
+            "mx-0.5 px-1.5 py-0.5 rounded-md cursor-pointer transition-all",
+            "border border-transparent hover:border-current",
+            "underline decoration-dotted underline-offset-4",
+            "font-medium",
             colorClass
           )}
         >
@@ -75,7 +90,7 @@ const StrongsWordPopup = ({
       </PopoverTrigger>
       <PopoverContent
         className={cn(
-          "w-80 p-4 border-2 backdrop-blur-xl",
+          "w-80 p-4 border-2 backdrop-blur-xl z-50",
           isHebrew
             ? "bg-purple-950/95 border-purple-500/50 shadow-lg shadow-purple-500/20"
             : "bg-teal-950/95 border-teal-500/50 shadow-lg shadow-teal-500/20"
@@ -121,10 +136,16 @@ const StrongsWordPopup = ({
               </div>
             )}
           </div>
-        ) : (
+        ) : word.strongs ? (
           <div className="text-center py-4 text-muted-foreground">
             <p className="font-mono text-lg mb-2">{word.strongs}</p>
             <p className="text-sm">Definition not found</p>
+          </div>
+        ) : (
+          <div className="text-center py-4 text-muted-foreground">
+            <p className="font-medium text-foreground mb-2">"{word.text}"</p>
+            <p className="text-sm">No Strong's number available for this word</p>
+            <p className="text-xs mt-2 opacity-70">This may be a minor word (article, preposition) without a separate Hebrew/Greek entry</p>
           </div>
         )}
       </PopoverContent>
@@ -219,19 +240,24 @@ export const ResearchVersesPanel = ({
       {/* KJVS Mode Info Banner */}
       {isKJVS && (
         <div className={cn(
-          "mb-4 p-3 rounded-xl border text-xs",
+          "mb-4 p-4 rounded-xl border text-sm",
           isHebrew
-            ? "bg-purple-500/10 border-purple-500/30 text-purple-300"
-            : "bg-teal-500/10 border-teal-500/30 text-teal-300"
+            ? "bg-purple-500/15 border-purple-500/40 text-purple-200"
+            : "bg-teal-500/15 border-teal-500/40 text-teal-200"
         )}>
-          <span className="font-semibold">Strong's Mode:</span> Click any{" "}
-          <span className={cn(
-            "underline decoration-dotted",
-            isHebrew ? "text-purple-400" : "text-teal-400"
-          )}>
-            highlighted word
-          </span>{" "}
-          to see its {isHebrew ? "Hebrew" : "Greek"} definition
+          <div className="flex items-center gap-2 mb-1">
+            <span className={cn(
+              "text-lg",
+              isHebrew ? "text-purple-400" : "text-teal-400"
+            )}>✦</span>
+            <span className="font-bold">Strong's Interactive Mode</span>
+          </div>
+          <p className="text-xs opacity-90">
+            Click any <span className={cn(
+              "underline decoration-dotted font-semibold px-1 rounded",
+              isHebrew ? "text-purple-400 bg-purple-500/20" : "text-teal-400 bg-teal-500/20"
+            )}>highlighted word</span> to see its original {isHebrew ? "Hebrew" : "Greek"} meaning and Strong's number
+          </p>
         </div>
       )}
 
@@ -266,12 +292,13 @@ export const ResearchVersesPanel = ({
               isSelected && "font-medium text-foreground"
             )}>
               {isKJVS && words ? (
-                // Render clickable words with Strong's popups
+                // Render clickable words with Strong's popups (has tokenized data)
                 words.map((word, idx) => (
                   <StrongsWordPopup
                     key={idx}
                     word={word}
                     isHebrew={isHebrew}
+                    alwaysClickable={true}
                   />
                 ))
               ) : isKJVS && isLoadingVerse ? (
@@ -280,6 +307,23 @@ export const ResearchVersesPanel = ({
                   <Loader2 className="h-3 w-3 animate-spin" />
                   Loading Strong's data...
                 </span>
+              ) : isKJVS ? (
+                // KJVS mode but no tokenized data - split text into clickable words
+                verse.text.split(/(\s+)/).map((segment, idx) => {
+                  // Keep whitespace as-is
+                  if (/^\s+$/.test(segment)) {
+                    return <span key={idx}>{segment}</span>;
+                  }
+                  // Make each word clickable
+                  return (
+                    <StrongsWordPopup
+                      key={idx}
+                      word={{ text: segment }}
+                      isHebrew={isHebrew}
+                      alwaysClickable={true}
+                    />
+                  );
+                })
               ) : (
                 // Regular text display
                 verse.text
