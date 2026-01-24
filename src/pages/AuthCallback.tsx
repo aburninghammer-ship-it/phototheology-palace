@@ -60,13 +60,17 @@ export default function AuthCallback() {
           navigate('/profile', { replace: true });
         } else {
           // This was a regular auth flow - check gatehouse status
-          const { data: profile } = await supabase
+          const { data: profile, error: profileError } = await supabase
             .from('profiles')
             .select('has_entered_palace')
             .eq('id', session.user.id)
             .single();
           
-          if (profile && !profile.has_entered_palace) {
+          if (profileError) {
+            console.error('Error fetching profile:', profileError);
+            // Profile might not exist yet for new users - send to gatehouse
+            navigate('/gatehouse', { replace: true });
+          } else if (profile && !profile.has_entered_palace) {
             navigate('/gatehouse', { replace: true });
           } else {
             navigate('/dashboard', { replace: true });
