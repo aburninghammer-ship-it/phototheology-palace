@@ -148,15 +148,19 @@ const handler = async (req: Request): Promise<Response> => {
     });
 
     // Log notification to database for tracking
-    await supabase.from("push_notification_logs").insert({
-      user_ids: userIds,
-      title,
-      body,
-      data,
-      notification_type: notificationType,
-      sent_count: successful,
-      failed_count: failed,
-    }).catch(err => console.log("Could not log notification:", err));
+    try {
+      await supabase.from("push_notification_logs").insert({
+        user_ids: userIds,
+        title,
+        body,
+        data,
+        notification_type: notificationType,
+        sent_count: successful,
+        failed_count: failed,
+      });
+    } catch (logErr) {
+      console.log("Could not log notification:", logErr);
+    }
 
     return new Response(
       JSON.stringify({
