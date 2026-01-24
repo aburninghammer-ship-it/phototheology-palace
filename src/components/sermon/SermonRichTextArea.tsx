@@ -171,13 +171,20 @@ export function SermonRichTextArea({
   const fetchVerseText = useCallback(async (parsed: { book: string; chapter: number; verseStart: number; verseEnd?: number }): Promise<string | null> => {
     try {
       const chapterData = await fetchChapter(parsed.book, parsed.chapter);
-      if (chapterData?.verses?.length > 0) {
-        const verseEnd = parsed.verseEnd || parsed.verseStart;
-        const verses = chapterData.verses.filter(
-          v => v.verse >= parsed.verseStart && v.verse <= verseEnd
-        );
-        if (verses.length > 0) {
-          return verses.map(v => v.text).join(' ');
+      // Check for error or empty verses
+      if (!chapterData?.verses?.length || (chapterData as any).error) {
+        console.warn(`No verses available for ${parsed.book} ${parsed.chapter}`);
+        return null;
+      }
+      const verseEnd = parsed.verseEnd || parsed.verseStart;
+      const verses = chapterData.verses.filter(
+        v => v.verse >= parsed.verseStart && v.verse <= verseEnd
+      );
+      if (verses.length > 0) {
+        // Filter out any verses that contain error messages
+        const validVerses = verses.filter(v => !v.text.includes('temporarily unavailable'));
+        if (validVerses.length > 0) {
+          return validVerses.map(v => v.text).join(' ');
         }
       }
     } catch (error) {

@@ -147,16 +147,12 @@ const fetchChapterFromAPI = async (book: string, chapter: number, translation: T
       verseCount = 25; // Reasonable default
     }
 
-    // Return placeholder verses with accurate count
+    // Return empty chapter with error flag - UI should handle this gracefully
     return {
       book,
       chapter,
-      verses: Array.from({ length: verseCount }, (_, i) => ({
-        book,
-        chapter,
-        verse: i + 1,
-        text: `${book} ${chapter}:${i + 1} - Verse text temporarily unavailable. The Bible API service may be experiencing issues. Please try refreshing the page in a moment.`,
-      })),
+      verses: [],
+      error: true
     };
   }
 };
