@@ -4301,48 +4301,36 @@ Theme passage: ${themePassage || 'Not specified'}
 Find and return the exact Scripture they're looking for. If unclear, ask for clarification.`;
 
     } else if (mode === "sermon-assistant") {
-      // Chat mode for sermon writing assistance
+      // Chat mode for sermon writing assistance - OPTIMIZED FOR SPEED
       const sermonTitle = sermon_title || title || '';
       const sermonThemePassage = themePassage || '';
-      const sermonContentText = sermon_content || '';
       const sermonStones = smooth_stones || stones || [];
       const messagesArray = allChatMessages || [];
 
-      systemPrompt = `You are Jeeves, a helpful sermon writing assistant. Help the preacher with WHATEVER they ask.
+      // Simplified, concise system prompt for faster responses
+      systemPrompt = `You are Jeeves, a sermon writing assistant. Be DIRECT and CONCISE.
 
-YOUR JOB: Answer their question directly and helpfully. You can help with:
-- Finding Scripture verses on any topic
-- Explaining biblical concepts
-- Suggesting illustrations or word pictures
-- Identifying types, shadows, and patterns
-- Strengthening sermon structure and flow
-- Cross-references and connections
-- ANY question about the Bible or sermon writing
+RULES:
+- Answer immediately, no greetings
+- Give specific Scripture references
+- Keep responses brief but helpful
+- Include verse text when citing Scripture
 
-STYLE:
-- Be direct - answer immediately without greetings or preamble
-- Give specific, useful answers
-- Include Scripture references when relevant
-- Be concise but thorough
+CONTEXT: ${sermonTitle ? `"${sermonTitle}"` : 'Sermon'}${sermonThemePassage ? ` on ${sermonThemePassage}` : ''}`;
 
-EXAMPLE:
-User: "need verse about washing of the word"
-ANSWER: "Key verses about washing by the word:
-• Ephesians 5:26 - 'That he might sanctify and cleanse it with the washing of water by the word'
-• John 15:3 - 'Now ye are clean through the word which I have spoken unto you'
-• Psalm 119:9 - 'Wherewithal shall a young man cleanse his way? by taking heed thereto according to thy word'
-• John 17:17 - 'Sanctify them through thy truth: thy word is truth'"
+      // Build conversation history for context (last 4 messages max for speed)
+      const recentMessages = messagesArray.slice(-4);
+      const lastUserMessage = recentMessages.filter((msg: any) => msg.role === 'user').pop();
 
-⚠️ THEOLOGICAL GUARDRAILS:
-- AZAZEL = SATAN, NOT CHRIST (Leviticus 16 scapegoat)
-- LITTLE HORN = ROME/PAPACY, NOT ANTIOCHUS (Daniel 7 & 8)
-- DAY OF ATONEMENT = 1844, NOT THE CROSS (Christ's death = Passover)
+      // Include recent conversation context in user prompt
+      let conversationContext = '';
+      if (recentMessages.length > 1) {
+        conversationContext = recentMessages.slice(0, -1).map((m: any) =>
+          `${m.role === 'user' ? 'Q' : 'A'}: ${m.content.slice(0, 200)}`
+        ).join('\n') + '\n\n';
+      }
 
-SERMON CONTEXT (if relevant):
-${sermonTitle ? `Title: ${sermonTitle}` : ''}${sermonThemePassage ? ` | Passage: ${sermonThemePassage}` : ''}${Array.isArray(sermonStones) && sermonStones.length > 0 ? ` | Key points: ${sermonStones.join('; ')}` : ''}`;
-
-      const lastUserMessage = messagesArray.filter((msg: any) => msg.role === 'user').pop();
-      userPrompt = lastUserMessage?.content || 'How can I help with your sermon?';
+      userPrompt = conversationContext + (lastUserMessage?.content || 'How can I help?');
 
     } else if (mode === "sermon-structure") {
       systemPrompt = `You are Jeeves, helping structure sermons like movies.
