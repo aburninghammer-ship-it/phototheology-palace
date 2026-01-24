@@ -22,13 +22,44 @@ export default function AuthCallback() {
         // Get the platform from query params
         const platform = searchParams.get('platform') as 'facebook' | 'twitter' | 'linkedin' | null;
 
-        // If this callback arrived with an auth code (PKCE flow), exchange it for a session.
-        // Without this, `getSession()` can be null and users bounce back to /auth.
+        // Support both OAuth return modes:
+        // - PKCE:     ?code=...
+        // - Implicit: #access_token=...&refresh_token=...
+        // For implicit, we manually parse the URL hash and store the session.
+        const trySetSessionFromHash = async (): Promise<boolean> => {
+          if (typeof window === "undefined") return false;
+          const hash = window.location.hash;
+          if (!hash || !hash.includes("access_token=")) return false;
+
+          const hashParams = new URLSearchParams(hash.startsWith("#") ? hash.slice(1) : hash);
+          const access_token = hashParams.get("access_token") ?? "";
+          const refresh_token = hashParams.get("refresh_token") ?? "";
+
+          if (!access_token || !refresh_token) return false;
+
+          const { data, error } = await supabase.auth.setSession({ access_token, refresh_token });
+          if (error) throw error;
+
+          // Clean up URL (remove tokens from hash)
+          try {
+            window.history.replaceState({}, document.title, window.location.pathname + window.location.search);
+          } catch {
+            // ignore
+          }
+
+          return !!data.session;
+        };
+
+        const hasHashTokens = await trySetSessionFromHash();
+
         const code = searchParams.get("code");
         if (code) {
           const { error: exchangeError } = await supabase.auth.exchangeCodeForSession(code);
           if (exchangeError) throw exchangeError;
         }
+
+        // No further fallback needed; if neither code nor hash created a session,
+        // getSession() below will remain null and we surface a clear error.
         
         // Handle the OAuth callback
         const { data: { session }, error: sessionError } = await supabase.auth.getSession();
