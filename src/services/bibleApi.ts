@@ -147,13 +147,12 @@ const fetchChapterFromAPI = async (book: string, chapter: number, translation: T
       verseCount = 25; // Reasonable default
     }
 
-    // Return empty chapter with error flag - UI should handle this gracefully
+    // Return empty chapter - UI should handle this gracefully
     return {
       book,
       chapter,
-      verses: [],
-      error: true
-    };
+      verses: []
+    } as Chapter;
   }
 };
 

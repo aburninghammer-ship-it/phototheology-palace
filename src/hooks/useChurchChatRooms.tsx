@@ -77,7 +77,7 @@ export const useChurchChatRooms = (churchId: string | null): UseChurchChatRoomsR
 
     try {
       // Get rooms with unread counts
-      const { data: roomsData, error } = await supabase
+      const { data: roomsData, error } = await (supabase as any)
         .from('church_chat_rooms')
         .select('*')
         .eq('church_id', churchId)
@@ -88,12 +88,12 @@ export const useChurchChatRooms = (churchId: string | null): UseChurchChatRoomsR
       if (error) throw error;
 
       // Get read status for unread counts
-      const { data: readStatus } = await supabase
+      const { data: readStatus } = await (supabase as any)
         .from('church_chat_read_status')
         .select('room_id, last_read_at')
         .eq('user_id', user.id);
 
-      const readMap = new Map(readStatus?.map(r => [r.room_id, r.last_read_at]) ?? []);
+      const readMap = new Map((readStatus || []).map((r: any) => [r.room_id, r.last_read_at]));
 
       // Calculate unread counts
       const roomsWithUnread = await Promise.all(
@@ -102,7 +102,7 @@ export const useChurchChatRooms = (churchId: string | null): UseChurchChatRoomsR
           let unreadCount = 0;
 
           if (lastRead) {
-            const { count } = await supabase
+            const { count } = await (supabase as any)
               .from('church_chat_messages')
               .select('*', { count: 'exact', head: true })
               .eq('room_id', room.id)
@@ -113,7 +113,7 @@ export const useChurchChatRooms = (churchId: string | null): UseChurchChatRoomsR
             unreadCount = count ?? 0;
           } else {
             // No read status - count all messages
-            const { count } = await supabase
+            const { count } = await (supabase as any)
               .from('church_chat_messages')
               .select('*', { count: 'exact', head: true })
               .eq('room_id', room.id)
@@ -143,7 +143,7 @@ export const useChurchChatRooms = (churchId: string | null): UseChurchChatRoomsR
     }
 
     try {
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from('church_chat_messages')
         .select(`
           *,
@@ -171,7 +171,7 @@ export const useChurchChatRooms = (churchId: string | null): UseChurchChatRoomsR
     if (!activeRoomId || !user) return;
 
     try {
-      const { data } = await supabase
+      const { data } = await (supabase as any)
         .from('church_chat_typing')
         .select(`
           user_id,
@@ -182,9 +182,9 @@ export const useChurchChatRooms = (churchId: string | null): UseChurchChatRoomsR
         .gt('updated_at', new Date(Date.now() - 10000).toISOString());
 
       setTypingUsers(
-        (data || []).map(d => ({
+        (data || []).map((d: any) => ({
           user_id: d.user_id,
-          display_name: (d.profiles as any)?.display_name || 'Someone',
+          display_name: d.profiles?.display_name || 'Someone',
         }))
       );
     } catch (error) {
@@ -291,7 +291,7 @@ export const useChurchChatRooms = (churchId: string | null): UseChurchChatRoomsR
     if (!activeRoomId || !user || !content.trim()) return;
 
     try {
-      const { error } = await supabase.from('church_chat_messages').insert({
+      const { error } = await (supabase as any).from('church_chat_messages').insert({
         room_id: activeRoomId,
         sender_id: user.id,
         content: content.trim(),
@@ -325,7 +325,7 @@ export const useChurchChatRooms = (churchId: string | null): UseChurchChatRoomsR
 
     if (isTyping) {
       // Upsert typing indicator
-      supabase.from('church_chat_typing').upsert({
+      (supabase as any).from('church_chat_typing').upsert({
         room_id: activeRoomId,
         user_id: user.id,
         updated_at: new Date().toISOString(),
@@ -339,7 +339,7 @@ export const useChurchChatRooms = (churchId: string | null): UseChurchChatRoomsR
       }, 5000);
     } else {
       // Remove typing indicator
-      supabase
+      (supabase as any)
         .from('church_chat_typing')
         .delete()
         .eq('room_id', activeRoomId)
@@ -354,7 +354,7 @@ export const useChurchChatRooms = (churchId: string | null): UseChurchChatRoomsR
 
     try {
       // Get latest message
-      const { data: latestMessage } = await supabase
+      const { data: latestMessage } = await (supabase as any)
         .from('church_chat_messages')
         .select('id')
         .eq('room_id', roomId)
@@ -362,7 +362,7 @@ export const useChurchChatRooms = (churchId: string | null): UseChurchChatRoomsR
         .limit(1)
         .single();
 
-      await supabase.from('church_chat_read_status').upsert({
+      await (supabase as any).from('church_chat_read_status').upsert({
         room_id: roomId,
         user_id: user.id,
         last_read_at: new Date().toISOString(),
@@ -383,7 +383,7 @@ export const useChurchChatRooms = (churchId: string | null): UseChurchChatRoomsR
   // Pin/unpin message (leaders only)
   const pinMessage = useCallback(async (messageId: string, isPinned: boolean) => {
     try {
-      const { error } = await supabase
+      const { error } = await (supabase as any)
         .from('church_chat_messages')
         .update({ is_pinned: isPinned })
         .eq('id', messageId);
@@ -401,7 +401,7 @@ export const useChurchChatRooms = (churchId: string | null): UseChurchChatRoomsR
   // Delete message (soft delete - hide)
   const deleteMessage = useCallback(async (messageId: string) => {
     try {
-      const { error } = await supabase
+      const { error } = await (supabase as any)
         .from('church_chat_messages')
         .update({ is_visible: false })
         .eq('id', messageId);
@@ -424,7 +424,7 @@ export const useChurchChatRooms = (churchId: string | null): UseChurchChatRoomsR
     if (!churchId || !user) return;
 
     try {
-      const { data, error } = await supabase.from('church_chat_rooms').insert({
+      const { data, error } = await (supabase as any).from('church_chat_rooms').insert({
         church_id: churchId,
         name,
         description,

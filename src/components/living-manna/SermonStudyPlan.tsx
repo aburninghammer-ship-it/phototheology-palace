@@ -106,22 +106,22 @@ export function SermonStudyPlan({ data }: SermonStudyPlanProps) {
           {
             day: 1,
             title: "Understanding the Message",
-            focus: beatInsights.slice(0, 3).map(b => b.title || b.content),
-            scriptures: scriptures.slice(0, 5).map(s => s.reference_text),
+            focus: beatInsights.slice(0, 3).map(b => b.content?.substring(0, 50) || b.content),
+            scriptures: scriptures.slice(0, 5).map(s => s.reference),
             questions: questionInsights.slice(0, 2).map(q => q.content),
           },
           {
             day: 2,
             title: "Going Deeper",
-            focus: beatInsights.slice(3, 6).map(b => b.title || b.content),
-            scriptures: scriptures.slice(5, 10).map(s => s.reference_text),
+            focus: beatInsights.slice(3, 6).map(b => b.content?.substring(0, 50) || b.content),
+            scriptures: scriptures.slice(5, 10).map(s => s.reference),
             questions: questionInsights.slice(2, 4).map(q => q.content),
           },
           {
             day: 3,
             title: "Personal Application",
             focus: themeInsights.map(t => t.content),
-            scriptures: scriptures.slice(10, 15).map(s => s.reference_text),
+            scriptures: scriptures.slice(10, 15).map(s => s.reference),
             questions: questionInsights.filter(q => q.insight_type === "question_decision").map(q => q.content),
           },
         ];
@@ -141,9 +141,9 @@ export function SermonStudyPlan({ data }: SermonStudyPlanProps) {
             day: i + 1,
             title: i === 0 ? "Introduction & Context" :
                    i === daysCount - 1 ? "Application & Commitment" :
-                   `Day ${i + 1}: ${dayBeats[0]?.title || "Continued Study"}`,
-            focus: dayBeats.map(b => b.title || b.content),
-            scriptures: dayScriptures.map(s => s.reference_text),
+                   `Day ${i + 1}: ${dayBeats[0]?.content?.substring(0, 30) || "Continued Study"}`,
+            focus: dayBeats.map(b => b.content?.substring(0, 50) || b.content),
+            scriptures: dayScriptures.map(s => s.reference),
             questions: dayQuestions.map(q => q.content),
           });
         }
@@ -154,8 +154,8 @@ export function SermonStudyPlan({ data }: SermonStudyPlanProps) {
           title: sermon.title,
           icebreaker: "What is one thing that stood out to you from Sabbath's sermon?",
           mainPoints: beatInsights.slice(0, 4).map(b => ({
-            point: b.title || b.content,
-            scripture: scriptures.find(s => true)?.reference_text,
+            point: b.content?.substring(0, 50) || b.content,
+            scripture: scriptures[0]?.reference,
           })),
           discussionQuestions: questionInsights
             .filter(q => q.insight_type === "question_discussion")
@@ -181,10 +181,10 @@ export function SermonStudyPlan({ data }: SermonStudyPlanProps) {
 
           plan.days.push({
             week: i + 1,
-            title: weekThemes[0]?.content || `Week ${i + 1}`,
+            title: weekThemes[0]?.content?.substring(0, 40) || `Week ${i + 1}`,
             theme: weekThemes[0]?.content,
-            mainPoints: weekBeats.map(b => b.title || b.content),
-            scriptures: weekScriptures.map(s => s.reference_text),
+            mainPoints: weekBeats.map(b => b.content?.substring(0, 50) || b.content),
+            scriptures: weekScriptures.map(s => s.reference),
             discussionQuestions: weekQuestions.map(q => q.content),
           });
         }
