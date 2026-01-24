@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -36,6 +36,12 @@ export const ResearchDictionaryPanel = ({
   const [words, setWords] = useState<StrongsWord[]>([]);
   const [source, setSource] = useState<string>("");
 
+  // Reset words when verse or dictionary changes
+  useEffect(() => {
+    setWords([]);
+    setSource("");
+  }, [verse, activeDictionary]);
+
   const analyzeVerse = async () => {
     if (!verse || !verseText) return;
     
@@ -46,7 +52,8 @@ export const ResearchDictionaryPanel = ({
           book,
           chapter,
           verse,
-          text: verseText
+          text: verseText,
+          dictionary: activeDictionary // Pass dictionary type
         }
       });
 
@@ -55,13 +62,15 @@ export const ResearchDictionaryPanel = ({
       setSource(data.source || 'unknown');
       
       if (data.words?.length > 0) {
-        toast.success(`Found ${data.words.length} words with Strong's numbers`);
+        const dictName = activeDictionary === 'strongs' ? "Strong's" : 
+                        activeDictionary === 'thayers' ? "Thayer's" : "BDB";
+        toast.success(`Found ${data.words.length} words with ${dictName} data`);
       } else {
-        toast.info("No Strong's data found for this verse");
+        toast.info("No lexicon data found for this verse");
       }
     } catch (error) {
       console.error("Failed to analyze verse:", error);
-      toast.error("Failed to analyze Strong's numbers");
+      toast.error("Failed to analyze verse");
     } finally {
       setLoading(false);
     }
@@ -128,7 +137,9 @@ export const ResearchDictionaryPanel = ({
           ) : (
             <Languages className="h-4 w-4 mr-2" />
           )}
-          Analyze Hebrew/Greek Words
+          {activeDictionary === 'strongs' && "Analyze with Strong's Concordance"}
+          {activeDictionary === 'thayers' && "Analyze with Thayer's Lexicon"}
+          {activeDictionary === 'bdb' && "Analyze with BDB Lexicon"}
         </Button>
       )}
 
