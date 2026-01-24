@@ -49,6 +49,10 @@ export const ResearchCommentaryPanel = ({
   const [palaceAnalysis, setPalaceAnalysis] = useState<string>("");
   const [palaceLoading, setPalaceLoading] = useState(false);
 
+  // Cross-references state
+  const [crossRefs, setCrossRefs] = useState<Array<{ reference: string; text: string; theme: string }>>([]);
+  const [crossRefsLoading, setCrossRefsLoading] = useState(false);
+
   const toggleRoom = (roomTag: string) => {
     setSelectedRooms(prev => 
       prev.includes(roomTag) 
@@ -103,7 +107,7 @@ export const ResearchCommentaryPanel = ({
 
   const askQuestion = async () => {
     if (!question.trim() || !verse) return;
-    
+
     const newHistory = [...chatHistory, { role: "user", content: question }];
     setChatHistory(newHistory);
     setQuestion("");
@@ -122,6 +126,90 @@ export const ResearchCommentaryPanel = ({
     } finally {
       setLoading(false);
     }
+  };
+
+  // Fetch cross-references for current verse
+  const fetchCrossReferences = async () => {
+    if (!verse || !verseText) return;
+
+    setCrossRefsLoading(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("jeeves", {
+        body: {
+          mode: "cross-references",
+          book,
+          chapter,
+          verse,
+          verseText,
+          prompt: `Find 5-8 cross-references for ${book} ${chapter}:${verse}: "${verseText}". Return as JSON array with objects containing: reference (e.g. "Romans 8:28"), text (the verse text), theme (why it connects). Focus on thematic, linguistic, and theological connections.`
+        }
+      });
+
+      if (error) throw error;
+
+      // Parse the response - Jeeves should return JSON
+      let refs = [];
+      if (data?.response) {
+        try {
+          // Try to extract JSON from response
+          const jsonMatch = data.response.match(/\[[\s\S]*\]/);
+          if (jsonMatch) {
+            refs = JSON.parse(jsonMatch[0]);
+          }
+        } catch (parseErr) {
+          // If JSON parsing fails, try to extract references manually
+          console.log("Parsing cross-references from text response");
+          const lines = data.response.split('\n').filter((l: string) => l.includes(':'));
+          refs = lines.slice(0, 8).map((line: string) => {
+            const match = line.match(/([1-3]?\s?[A-Za-z]+\s+\d+:\d+(?:-\d+)?)/);
+            return {
+              reference: match ? match[1] : line.substring(0, 30),
+              text: line,
+              theme: "Related passage"
+            };
+          });
+        }
+      }
+
+      setCrossRefs(refs);
+      if (refs.length > 0) {
+        toast.success(`Found ${refs.length} cross-references`);
+      } else {
+        toast.info("No cross-references found");
+      }
+    } catch (error) {
+      console.error("Failed to fetch cross-references:", error);
+      toast.error("Failed to load cross-references");
+
+      // Fallback - provide some common cross-references based on book
+      const fallbackRefs = getFallbackCrossRefs(book, chapter, verse);
+      setCrossRefs(fallbackRefs);
+    } finally {
+      setCrossRefsLoading(false);
+    }
+  };
+
+  // Fallback cross-references for common verses
+  const getFallbackCrossRefs = (book: string, chapter: number, verse: number) => {
+    const key = `${book.toLowerCase()}-${chapter}-${verse}`;
+    const crossRefData: Record<string, Array<{ reference: string; text: string; theme: string }>> = {
+      "john-3-16": [
+        { reference: "Romans 5:8", text: "But God commendeth his love toward us, in that, while we were yet sinners, Christ died for us.", theme: "God's love demonstrated" },
+        { reference: "1 John 4:9", text: "In this was manifested the love of God toward us...", theme: "God's love manifested" },
+        { reference: "Ephesians 2:4-5", text: "But God, who is rich in mercy, for his great love...", theme: "Rich in mercy" },
+        { reference: "Romans 6:23", text: "For the wages of sin is death; but the gift of God is eternal life...", theme: "Gift of eternal life" },
+      ],
+      "genesis-1-1": [
+        { reference: "John 1:1-3", text: "In the beginning was the Word, and the Word was with God...", theme: "The Word in creation" },
+        { reference: "Colossians 1:16", text: "For by him were all things created...", theme: "Christ as Creator" },
+        { reference: "Hebrews 11:3", text: "Through faith we understand that the worlds were framed by the word of God...", theme: "Creation by faith" },
+        { reference: "Psalm 33:6", text: "By the word of the LORD were the heavens made...", theme: "Creation by God's word" },
+      ],
+    };
+    return crossRefData[key] || [
+      { reference: "2 Timothy 3:16", text: "All scripture is given by inspiration of God...", theme: "Scripture connection" },
+      { reference: "Psalm 119:105", text: "Thy word is a lamp unto my feet, and a light unto my path.", theme: "Word as guide" },
+    ];
   };
 
   if (!verse) {
@@ -349,12 +437,65 @@ export const ResearchCommentaryPanel = ({
         )}
 
         {activeTab === "links" && (
-          <div className="space-y-2">
-            <p className="text-xs text-muted-foreground">Cross-References for {book} {chapter}:{verse}</p>
-            <Button variant="outline" size="sm" className="w-full">
-              <Link2 className="h-3.5 w-3.5 mr-2" />
-              Find Cross-References
-            </Button>
+          <div className="space-y-3">
+            <div className="flex items-center justify-between">
+              <p className="text-xs text-muted-foreground">Cross-References for {book} {chapter}:{verse}</p>
+              {crossRefs.length > 0 && (
+                <Badge variant="outline" className="text-[10px] bg-palace-blue/10 border-palace-blue/30">
+                  {crossRefs.length} found
+                </Badge>
+              )}
+            </div>
+
+            {/* Cross-References List */}
+            {crossRefs.length > 0 && (
+              <div className="space-y-2 max-h-[300px] overflow-y-auto pr-1">
+                {crossRefs.map((ref, idx) => (
+                  <div
+                    key={idx}
+                    className={cn(
+                      glowBox,
+                      "p-3 cursor-pointer hover:border-palace-blue/40 transition-all"
+                    )}
+                    onClick={() => {
+                      // Could navigate to this reference
+                      toast.info(`View ${ref.reference}`);
+                    }}
+                  >
+                    <div className="flex items-center justify-between mb-1">
+                      <Badge className="text-xs bg-gradient-palace text-white border-0 shadow-sm">
+                        {ref.reference}
+                      </Badge>
+                      <span className="text-[10px] text-palace-teal">{ref.theme}</span>
+                    </div>
+                    <p className="text-xs text-foreground/80 italic line-clamp-2 font-serif">
+                      "{ref.text}"
+                    </p>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {/* Loading State */}
+            {crossRefsLoading && (
+              <div className="flex items-center justify-center py-6">
+                <Loader2 className="h-6 w-6 animate-spin text-palace-blue" />
+                <span className="ml-2 text-sm text-muted-foreground">Finding cross-references...</span>
+              </div>
+            )}
+
+            {/* Fetch Button */}
+            {!crossRefsLoading && (
+              <Button
+                variant="outline"
+                size="sm"
+                className="w-full bg-gradient-ocean text-white border-0 hover:opacity-90 shadow-md shadow-palace-blue/30"
+                onClick={fetchCrossReferences}
+              >
+                <Link2 className="h-3.5 w-3.5 mr-2" />
+                {crossRefs.length > 0 ? "Refresh Cross-References" : "Find Cross-References"}
+              </Button>
+            )}
           </div>
         )}
 

@@ -123,21 +123,54 @@ export function useSparks({
     fetchSparks();
   }, [fetchSparks]);
 
+  // Simple hash function for content deduplication
+  const simpleHash = (str: string): string => {
+    let hash = 0;
+    const normalized = str.toLowerCase().replace(/[^a-z0-9]/g, '').slice(0, 200);
+    for (let i = 0; i < normalized.length; i++) {
+      const char = normalized.charCodeAt(i);
+      hash = ((hash << 5) - hash) + char;
+      hash = hash & hash;
+    }
+    return hash.toString(36);
+  };
+
+  // Check if title is too similar to existing sparks
+  const isTitleTooSimilar = (newTitle: string, existingTitles: string[]): boolean => {
+    const normalizedNew = newTitle.toLowerCase().replace(/[^a-z0-9\s]/g, '');
+    return existingTitles.some(existing => {
+      const normalizedExisting = existing.toLowerCase().replace(/[^a-z0-9\s]/g, '');
+      // Check for exact match
+      if (normalizedNew === normalizedExisting) return true;
+      // Check if one contains the other (80%+ overlap)
+      if (normalizedNew.includes(normalizedExisting) || normalizedExisting.includes(normalizedNew)) return true;
+      // Check word overlap
+      const newWords = new Set(normalizedNew.split(/\s+/).filter(w => w.length > 3));
+      const existingWords = new Set(normalizedExisting.split(/\s+/).filter(w => w.length > 3));
+      const overlap = [...newWords].filter(w => existingWords.has(w)).length;
+      const overlapRatio = overlap / Math.max(newWords.size, existingWords.size);
+      return overlapRatio > 0.7;
+    });
+  };
+
   // Generate spark based on content
   const generateSpark = useCallback(async (content: string, verseReference?: string) => {
     if (!user?.id || preferences.intensity === 'off') return null;
     if (sparks.length >= maxSparks) return null;
-    
+
     // Rate limiting
     const now = Date.now();
     if (now - lastGenerationTime.current < debounceMs) return null;
-    
+
     // Suppress if user dismissed 2+ sparks this session
     if (dismissedCount.current >= 2) return null;
-    
+
     // Content length check for notes
     if (surface === 'notes' && content.length < 280) return null;
-    
+
+    // Content length check for study surface
+    if (surface === 'study' && content.length < 100) return null;
+
     lastGenerationTime.current = now;
     setGenerating(true);
 
@@ -145,10 +178,10 @@ export function useSparks({
       // Gather recent spark data for deduplication - include all sparks for better deduplication
       const { data: allRecentSparks } = await supabase
         .from('sparks')
-        .select('content_hash, title')
+        .select('content_hash, title, recognition, insight')
         .eq('user_id', user.id)
         .order('created_at', { ascending: false })
-        .limit(20);
+        .limit(30);
 
       const recentHashes = (allRecentSparks || [])
         .filter(s => s.content_hash)
@@ -156,6 +189,19 @@ export function useSparks({
 
       const recentTitles = (allRecentSparks || [])
         .map(s => s.title);
+
+      // Also include insights and recognitions for deeper deduplication
+      const recentInsights = (allRecentSparks || [])
+        .map(s => s.insight)
+        .filter(Boolean);
+
+      // Generate a content hash to check locally
+      const contentHash = simpleHash(content);
+      if (recentHashes.includes(contentHash)) {
+        console.log('[Sparks] Content hash already exists, skipping generation');
+        setGenerating(false);
+        return null;
+      }
 
       const { data, error } = await supabase.functions.invoke('generate-spark', {
         body: {
@@ -166,13 +212,30 @@ export function useSparks({
           contextId,
           mode: preferences.mode,
           recentHashes,
-          recentTitles
+          recentTitles,
+          recentInsights
         }
       });
-      
+
       if (error) throw error;
-      
+
       if (data?.spark) {
+        // Client-side deduplication check before saving
+        if (isTitleTooSimilar(data.spark.title, recentTitles)) {
+          console.log('[Sparks] Title too similar to existing spark, skipping:', data.spark.title);
+          return null;
+        }
+
+        // Check if insight is too similar
+        if (recentInsights.some((ins: string) => {
+          const similarity = ins.toLowerCase().replace(/[^a-z0-9]/g, '');
+          const newInsight = data.spark.insight.toLowerCase().replace(/[^a-z0-9]/g, '');
+          return similarity === newInsight || similarity.includes(newInsight.slice(0, 50));
+        })) {
+          console.log('[Sparks] Insight too similar to existing spark, skipping');
+          return null;
+        }
+
         // Save to database
         const { data: savedSpark, error: saveError } = await supabase
           .from('sparks')
@@ -188,17 +251,17 @@ export function useSparks({
             explore_action: data.spark.explore,
             confidence: data.spark.confidence || 0.7,
             novelty_score: data.spark.novelty_score || 0.7,
-            content_hash: data.spark.content_hash
+            content_hash: data.spark.content_hash || contentHash
           })
           .select()
           .single();
-        
+
         if (saveError) throw saveError;
-        
+
         // Track generation event
         await trackSparkEvent(savedSpark.id, 'generated');
         await trackSparkEvent(savedSpark.id, 'shown');
-        
+
         setSparks(prev => [savedSpark as unknown as Spark, ...prev.slice(0, maxSparks - 1)]);
         return savedSpark as unknown as Spark;
       }
