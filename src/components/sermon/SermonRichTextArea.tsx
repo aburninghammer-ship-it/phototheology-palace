@@ -114,7 +114,9 @@ export const SermonRichTextArea = forwardRef<SermonRichTextAreaHandle, SermonRic
     
     const currentParagraphBefore = paragraphsBefore[paragraphsBefore.length - 1] || '';
     const currentParagraphAfter = paragraphsAfter[0] || '';
-    const paragraph = (currentParagraphBefore + currentParagraphAfter).trim();
+    // Add space between before and after if both exist and before doesn't end with space
+    const needsSpace = currentParagraphBefore && currentParagraphAfter && !currentParagraphBefore.endsWith(' ') && !currentParagraphAfter.startsWith(' ');
+    const paragraph = (currentParagraphBefore + (needsSpace ? ' ' : '') + currentParagraphAfter).trim();
 
     // For suggestions, prioritize the most recent content near cursor
     // Take last 300 chars before cursor for context
