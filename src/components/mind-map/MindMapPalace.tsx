@@ -5,11 +5,13 @@ import MindMapToolbar, { type GenerationMethod } from './MindMapToolbar';
 import MindMapControls from './MindMapControls';
 import MindMapSidebar from './MindMapSidebar';
 import MindMapMobile from './MindMapMobile';
+import MindMapStudyView from './MindMapStudyView';
 import { useMindMapScaffold } from './hooks/useMindMapScaffold';
 import { useMindMapGeneration, generateMockAnalysis, generateEmptyScaffold } from './hooks/useMindMapGeneration';
 import { useMindMapStorage } from './hooks/useMindMapStorage';
-import type { AnalysisMode, AnyNodeData, MindMapFilters, ExplorationBreadcrumb } from './types';
+import type { AnalysisMode, AnyNodeData, MindMapFilters, ExplorationBreadcrumb, GeneratedStudy } from './types';
 import { toast } from 'sonner';
+import { supabase } from '@/integrations/supabase/client';
 
 interface MindMapPalaceProps {
   initialText?: string;
@@ -42,6 +44,8 @@ export default function MindMapPalace({
   const [breadcrumbs, setBreadcrumbs] = useState<ExplorationBreadcrumb[]>([]);
   const [currentAnalysis, setCurrentAnalysis] = useState<ReturnType<typeof generateMockAnalysis> | null>(null);
   const [studyMethod, setStudyMethod] = useState<GenerationMethod>('jeeves');
+  const [generatedStudy, setGeneratedStudy] = useState<GeneratedStudy | null>(null);
+  const [isGeneratingStudy, setIsGeneratingStudy] = useState(false);
 
   // Hooks
   const { nodes, edges, populateWithAnalysis, reset } = useMindMapScaffold(sourceText, mode);
@@ -53,7 +57,7 @@ export default function MindMapPalace({
     setSourceText(text);
     setMode(selectedMode);
     setStudyMethod(method);
-    reset(text, selectedMode);
+    setGeneratedStudy(null); // Reset study when generating new
 
     // Update breadcrumbs
     const preview = text.length > 30 ? text.substring(0, 30) + '...' : text;
@@ -63,14 +67,67 @@ export default function MindMapPalace({
       { id: crumbId, mapId: crumbId, label: preview, sourcePreview: preview },
     ]);
 
-    if (method === 'manual') {
+    if (method === 'jeeves-study') {
+      // Full study generation mode
+      setIsGeneratingStudy(true);
+      try {
+        const { data, error } = await supabase.functions.invoke('mind-map-study', {
+          body: { text, mode: selectedMode },
+        });
+
+        if (error) throw error;
+
+        setGeneratedStudy(data as GeneratedStudy);
+        toast.success('Jeeves has generated your full study!');
+      } catch (err) {
+        console.error('Study generation error:', err);
+        // Generate a mock study for development
+        const mockStudy: GeneratedStudy = {
+          title: 'Study: ' + preview,
+          introduction: 'This study explores the depths of your seed text through the Phototheology framework.',
+          sections: [
+            {
+              title: 'Key Observations',
+              content: 'The text presents several foundational elements that connect to the Palace framework.',
+              palaceConnections: ['Floor 2: Investigation', 'Observation Room'],
+              scriptures: ['Psalm 119:18'],
+            },
+            {
+              title: 'Christ-Centered Insights',
+              content: 'Every passage points to Christ. This text reveals His redemptive work through...',
+              palaceConnections: ['Floor 4: Next Level', 'Christ Every Chapter'],
+              scriptures: ['Colossians 1:16-17'],
+            },
+            {
+              title: 'Sanctuary Connections',
+              content: 'The sanctuary typology illuminates the deeper meaning...',
+              palaceConnections: ['Sanctuary', 'Altar of Burnt Offering'],
+              scriptures: ['Hebrews 9:11-12'],
+            },
+          ],
+          applicationPoints: [
+            'Meditate on how this passage reveals Christ',
+            'Consider the sanctuary imagery and its fulfillment',
+            'Apply these insights to your daily walk',
+          ],
+          closingPrayer: 'Lord, open our eyes to see the wonders in Your Word. Help us apply these truths to our lives. In Jesus\' name, Amen.',
+          relatedPassages: ['John 5:39', 'Luke 24:27', 'Hebrews 10:1'],
+        };
+        setGeneratedStudy(mockStudy);
+        toast.info('Using preview study (edge function not available)');
+      } finally {
+        setIsGeneratingStudy(false);
+      }
+    } else if (method === 'manual') {
       // Manual study mode - show all rooms as empty scaffold for user to explore
+      reset(text, selectedMode);
       const emptyScaffold = generateEmptyScaffold();
       setCurrentAnalysis(emptyScaffold);
       populateWithAnalysis(emptyScaffold);
       toast.success('Palace scaffold ready! Explore all rooms and add your own insights.');
     } else {
-      // Jeeves AI mode - generate analysis
+      // Jeeves AI mode - generate analysis (map to palace)
+      reset(text, selectedMode);
       const analysis = await generate(text, selectedMode);
 
       if (analysis) {
@@ -134,6 +191,7 @@ export default function MindMapPalace({
   const handleClear = useCallback(() => {
     setSourceText('');
     setCurrentAnalysis(null);
+    setGeneratedStudy(null);
     setBreadcrumbs([]);
     reset('', mode);
     resetGeneration();
@@ -148,7 +206,7 @@ export default function MindMapPalace({
     }
   }, [breadcrumbs]);
 
-  const isGenerating = generationState.status === 'generating';
+  const isGenerating = generationState.status === 'generating' || isGeneratingStudy;
 
   // Mobile view
   if (isMobile) {
@@ -165,11 +223,19 @@ export default function MindMapPalace({
         </div>
 
         <div className="flex-1 overflow-hidden">
-          <MindMapMobile
-            analysis={currentAnalysis}
-            onMakeSeed={handleMakeSeed}
-            isManualMode={studyMethod === 'manual'}
-          />
+          {generatedStudy ? (
+            <MindMapStudyView
+              study={generatedStudy}
+              sourceText={sourceText}
+              onBackToMap={() => setGeneratedStudy(null)}
+            />
+          ) : (
+            <MindMapMobile
+              analysis={currentAnalysis}
+              onMakeSeed={handleMakeSeed}
+              isManualMode={studyMethod === 'manual'}
+            />
+          )}
         </div>
       </div>
     );
@@ -213,7 +279,15 @@ export default function MindMapPalace({
 
       {/* Main canvas */}
       <div className="flex-1 relative">
-        {sourceText ? (
+        {generatedStudy ? (
+          <div className="absolute inset-0 overflow-auto">
+            <MindMapStudyView
+              study={generatedStudy}
+              sourceText={sourceText}
+              onBackToMap={() => setGeneratedStudy(null)}
+            />
+          </div>
+        ) : sourceText ? (
           <MindMapCanvas
             initialNodes={nodes}
             initialEdges={edges}

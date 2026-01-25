@@ -202,3 +202,20 @@ export interface GenerationState {
   message?: string;
   error?: string;
 }
+
+// Generated Study (full devotional study from Jeeves)
+export interface GeneratedStudySection {
+  title: string;
+  content: string;
+  palaceConnections?: string[];
+  scriptures?: string[];
+}
+
+export interface GeneratedStudy {
+  title: string;
+  introduction: string;
+  sections: GeneratedStudySection[];
+  applicationPoints: string[];
+  closingPrayer?: string;
+  relatedPassages?: string[];
+}

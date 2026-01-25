@@ -1,9 +1,9 @@
 import { useState } from 'react';
-import { Sparkles, Loader2, Trash2, FileText, Bot, Building2, User, ArrowRight } from 'lucide-react';
+import { Sparkles, Loader2, Trash2, FileText, Bot, Building2, User, ArrowRight, BookOpen, GraduationCap } from 'lucide-react';
 import MindMapModeSelector from './MindMapModeSelector';
 import type { AnalysisMode } from './types';
 
-export type GenerationMethod = 'jeeves' | 'manual';
+export type GenerationMethod = 'jeeves' | 'manual' | 'jeeves-study';
 
 interface MindMapToolbarProps {
   onGenerate: (text: string, mode: AnalysisMode, method: GenerationMethod) => void;
@@ -87,11 +87,11 @@ export default function MindMapToolbar({
         </button>
       )}
 
-      {/* Actions - Two Options */}
-      <div className="space-y-2">
-        {/* Generation method selection */}
+      {/* Actions - Three Options */}
+      <div className="space-y-3">
+        {/* Primary row: Map to Palace options */}
         <div className="flex items-center gap-2">
-          {/* Ask Jeeves Button */}
+          {/* Ask Jeeves - Map to Palace */}
           <button
             onClick={() => handleGenerate('jeeves')}
             disabled={!text.trim() || isGenerating}
@@ -107,12 +107,12 @@ export default function MindMapToolbar({
             {isGenerating ? (
               <>
                 <Loader2 className="w-4 h-4 animate-spin" />
-                <span>Jeeves analyzing...</span>
+                <span>Analyzing...</span>
               </>
             ) : (
               <>
                 <Bot className="w-4 h-4" />
-                <span>Ask Jeeves</span>
+                <span>Jeeves Map</span>
                 <Sparkles className="w-3 h-3 opacity-70" />
               </>
             )}
@@ -133,7 +133,6 @@ export default function MindMapToolbar({
           >
             <User className="w-4 h-4" />
             <span>My Study</span>
-            <ArrowRight className="w-3 h-3 opacity-70" />
           </button>
 
           {onClear && (
@@ -149,11 +148,34 @@ export default function MindMapToolbar({
           )}
         </div>
 
+        {/* Secondary row: Full Study Generation */}
+        <button
+          onClick={() => handleGenerate('jeeves-study')}
+          disabled={!text.trim() || isGenerating}
+          className={`
+            w-full flex items-center justify-center gap-2 px-4 py-3 rounded-lg
+            font-semibold text-sm transition-all duration-200
+            ${text.trim() && !isGenerating
+              ? 'bg-gradient-to-r from-amber-500/20 to-orange-500/20 border border-amber-500/40 text-amber-200 hover:from-amber-500/30 hover:to-orange-500/30'
+              : 'bg-muted/30 text-muted-foreground border border-white/5 cursor-not-allowed'
+            }
+          `}
+        >
+          <GraduationCap className="w-5 h-5" />
+          <span>Jeeves Generate Full Study</span>
+          <BookOpen className="w-4 h-4 opacity-70" />
+        </button>
+
         {/* Helper text */}
-        <p className="text-xs text-muted-foreground text-center">
-          <span className="text-primary">Ask Jeeves</span> for AI-powered analysis across all 38+ rooms, or
-          <span className="text-foreground"> My Study</span> to explore manually
-        </p>
+        <div className="text-xs text-muted-foreground text-center space-y-1">
+          <p>
+            <span className="text-primary">Jeeves Map</span> analyzes across 38+ Palace rooms |
+            <span className="text-foreground"> My Study</span> for manual exploration
+          </p>
+          <p className="text-amber-400/80">
+            <span className="font-medium">Full Study</span> generates a complete devotional study from your seed text
+          </p>
+        </div>
       </div>
     </div>
   );
