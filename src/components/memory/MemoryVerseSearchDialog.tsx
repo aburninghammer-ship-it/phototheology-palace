@@ -142,13 +142,13 @@ export function MemoryVerseSearchDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-4xl max-h-[85vh] overflow-hidden flex flex-col">
-        <DialogHeader>
+      <DialogContent className="max-w-4xl h-[85vh] flex flex-col">
+        <DialogHeader className="flex-shrink-0">
           <DialogTitle>Add Verses to Memory List</DialogTitle>
         </DialogHeader>
 
-        <Tabs defaultValue="jeeves" className="flex-1 flex flex-col overflow-hidden">
-          <TabsList className="grid w-full grid-cols-2">
+        <Tabs defaultValue="jeeves" className="flex-1 flex flex-col min-h-0">
+          <TabsList className="grid w-full grid-cols-2 flex-shrink-0">
             <TabsTrigger value="jeeves" className="gap-2">
               <Sparkles className="w-4 h-4" />
               Ask Jeeves
@@ -159,8 +159,8 @@ export function MemoryVerseSearchDialog({
             </TabsTrigger>
           </TabsList>
 
-          <TabsContent value="jeeves" className="flex-1 overflow-hidden flex flex-col space-y-4 mt-4">
-            <div className="space-y-3">
+          <TabsContent value="jeeves" className="flex-1 flex flex-col space-y-4 mt-4 min-h-0 overflow-hidden">
+            <div className="space-y-3 flex-shrink-0">
               <p className="text-sm text-muted-foreground">
                 Tell Jeeves what kind of verses you want to memorize. For example:
                 "Find 10 verses about the beasts in Daniel and Revelation" or "Give me verses about the sanctuary"
@@ -191,8 +191,8 @@ export function MemoryVerseSearchDialog({
             </div>
 
             {jeevesVerses.length > 0 && (
-              <div className="flex-1 overflow-hidden flex flex-col">
-                <h3 className="font-semibold mb-2 text-sm">
+              <div className="flex-1 flex flex-col min-h-0">
+                <h3 className="font-semibold mb-2 text-sm flex-shrink-0">
                   Jeeves found {jeevesVerses.length} verses:
                 </h3>
                 <ScrollArea className="flex-1 border rounded-md">
@@ -228,13 +228,13 @@ export function MemoryVerseSearchDialog({
             )}
           </TabsContent>
 
-          <TabsContent value="browse" className="flex-1 overflow-hidden flex flex-col space-y-4 mt-4">
-            <div className="flex gap-2">
+          <TabsContent value="browse" className="flex-1 flex flex-col space-y-4 mt-4 min-h-0 overflow-hidden">
+            <div className="flex gap-2 flex-shrink-0">
               <Input
                 placeholder="Search by reference (e.g., John 3:16) or keyword..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                onKeyPress={(e) => e.key === "Enter" && handleSearch()}
+                onKeyDown={(e) => e.key === "Enter" && handleSearch()}
               />
               <Button onClick={handleSearch} disabled={loading}>
                 {loading ? (
@@ -245,60 +245,28 @@ export function MemoryVerseSearchDialog({
               </Button>
             </div>
 
-            <div className="grid grid-cols-2 gap-4 flex-1 overflow-hidden">
-              <div className="flex flex-col overflow-hidden">
-                <h3 className="font-semibold mb-2 text-sm">Books</h3>
-                <ScrollArea className="flex-1 border rounded-md">
-                  <div className="p-2">
-                    {BIBLE_BOOK_METADATA.map((book) => (
-                      <Button
-                        key={book.code}
-                        variant={selectedBook === book.name ? "secondary" : "ghost"}
-                        className="w-full justify-start mb-1"
-                        onClick={() => setSelectedBook(book.name)}
-                      >
-                        {book.name}
-                      </Button>
-                    ))}
-                  </div>
-                </ScrollArea>
-              </div>
-
-              {selectedBook && (
-                <div className="flex flex-col overflow-hidden">
-                  <h3 className="font-semibold mb-2 text-sm">Chapters</h3>
-                  <ScrollArea className="flex-1 border rounded-md">
-                    <div className="p-2">
-                      {Array.from(
-                        {
-                          length:
-                            BIBLE_BOOK_METADATA.find((b) => b.name === selectedBook)
-                              ?.chapters || 0,
-                        },
-                        (_, i) => i + 1
-                      ).map((chapter) => (
-                        <Button
-                          key={chapter}
-                          variant={
-                            selectedChapter === chapter.toString()
-                              ? "secondary"
-                              : "ghost"
-                          }
-                          className="w-full justify-start mb-1"
-                          onClick={() => handleBookSelect(selectedBook, chapter)}
-                        >
-                          Chapter {chapter}
-                        </Button>
-                      ))}
-                    </div>
-                  </ScrollArea>
+            {/* Show search results if we have them, otherwise show browse UI */}
+            {verses.length > 0 ? (
+              <div className="flex-1 flex flex-col min-h-0">
+                <div className="flex items-center justify-between mb-2 flex-shrink-0">
+                  <h3 className="font-semibold text-sm">
+                    {selectedBook && selectedChapter 
+                      ? `${selectedBook} ${selectedChapter}` 
+                      : `Search Results (${verses.length} verses)`}
+                  </h3>
+                  <Button 
+                    variant="ghost" 
+                    size="sm"
+                    onClick={() => {
+                      setVerses([]);
+                      setSelectedBook("");
+                      setSelectedChapter("");
+                      setSearch("");
+                    }}
+                  >
+                    Clear Results
+                  </Button>
                 </div>
-              )}
-            </div>
-
-            {verses.length > 0 && (
-              <div className="flex-1 overflow-hidden flex flex-col">
-                <h3 className="font-semibold mb-2 text-sm">Select Verses to Add</h3>
                 <ScrollArea className="flex-1 border rounded-md">
                   <div className="p-4 space-y-3">
                     {verses.map((verse, idx) => (
@@ -326,6 +294,59 @@ export function MemoryVerseSearchDialog({
                     ))}
                   </div>
                 </ScrollArea>
+              </div>
+            ) : (
+              <div className="flex-1 grid grid-cols-2 gap-4 min-h-0">
+                <div className="flex flex-col min-h-0">
+                  <h3 className="font-semibold mb-2 text-sm flex-shrink-0">Books</h3>
+                  <ScrollArea className="flex-1 border rounded-md">
+                    <div className="p-2">
+                      {BIBLE_BOOK_METADATA.map((book) => (
+                        <Button
+                          key={book.code}
+                          variant={selectedBook === book.name ? "secondary" : "ghost"}
+                          className="w-full justify-start mb-1 h-8 text-sm"
+                          onClick={() => setSelectedBook(book.name)}
+                        >
+                          {book.name}
+                        </Button>
+                      ))}
+                    </div>
+                  </ScrollArea>
+                </div>
+
+                {selectedBook && (
+                  <div className="flex flex-col min-h-0">
+                    <h3 className="font-semibold mb-2 text-sm flex-shrink-0">
+                      {selectedBook} Chapters
+                    </h3>
+                    <ScrollArea className="flex-1 border rounded-md">
+                      <div className="p-2">
+                        {Array.from(
+                          {
+                            length:
+                              BIBLE_BOOK_METADATA.find((b) => b.name === selectedBook)
+                                ?.chapters || 0,
+                          },
+                          (_, i) => i + 1
+                        ).map((chapter) => (
+                          <Button
+                            key={chapter}
+                            variant={
+                              selectedChapter === chapter.toString()
+                                ? "secondary"
+                                : "ghost"
+                            }
+                            className="w-full justify-start mb-1 h-8 text-sm"
+                            onClick={() => handleBookSelect(selectedBook, chapter)}
+                          >
+                            Chapter {chapter}
+                          </Button>
+                        ))}
+                      </div>
+                    </ScrollArea>
+                  </div>
+                )}
               </div>
             )}
           </TabsContent>

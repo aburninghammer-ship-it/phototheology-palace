@@ -32,14 +32,15 @@ export function RecentSubscribers() {
 
       const { data, error } = await supabase
         .from("profiles")
-        .select("id, email, display_name, subscription_tier, subscription_status, payment_source, created_at")
+        .select("id, display_name, subscription_tier, subscription_status, payment_source, created_at")
         .eq("subscription_status", "active")
         .in("subscription_tier", ["monthly", "annual", "essential", "premium", "student", "lifetime"])
         .gte("created_at", daysAgo.toISOString())
         .order("created_at", { ascending: false });
 
       if (error) throw error;
-      setSubscribers(data || []);
+      // Map data to include email placeholder since profiles table doesn't have email
+      setSubscribers((data || []).map(d => ({ ...d, email: "" })) as RecentSubscriber[]);
     } catch (error) {
       console.error("Error loading recent subscribers:", error);
     } finally {
