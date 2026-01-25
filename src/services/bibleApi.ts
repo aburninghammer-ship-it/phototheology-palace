@@ -175,13 +175,12 @@ const fetchChapterFromAPI = async (book: string, chapter: number, translation: T
     console.error("Edge function also failed:", edgeFunctionError);
   }
 
-  // Both methods failed - return empty chapter with error flag
+  // Both methods failed - return empty chapter
   console.error("All fetch methods failed for:", book, chapter);
   return {
     book,
     chapter,
-    verses: [],
-    error: true
+    verses: []
   };
 };
 
