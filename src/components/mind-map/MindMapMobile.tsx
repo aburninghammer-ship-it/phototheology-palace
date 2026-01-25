@@ -1,8 +1,16 @@
-import { useState } from 'react';
-import { ChevronDown, ChevronRight, Lightbulb, Church, Sprout, Lock, Unlock, Bot, User } from 'lucide-react';
+import { useState, useCallback } from 'react';
+import { ChevronDown, ChevronRight, Lightbulb, Church, Sprout, Lock, Unlock, Bot, User, PenLine, Save, Plus, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import type { AnyNodeData, FloorNodeData, RoomNodeData, SanctuaryZoneNodeData, PrincipleData } from './types';
 import { palaceFloors, sanctuaryZones, sanctuaryElements, FLOOR_THEMES } from './constants';
+
+// User notes storage type
+interface UserNotes {
+  rooms: Record<string, string>; // roomId -> note
+  principles: Record<string, string>; // principleId -> note
+  sanctuaryElements: Record<string, string>; // elementId -> note
+  userPrinciples: Record<string, { content: string; insight: string }[]>; // roomId -> user-added principles
+}
 
 interface MindMapMobileProps {
   analysis: {
@@ -21,6 +29,54 @@ export default function MindMapMobile({ analysis, onMakeSeed, isManualMode = fal
   const [expandedZones, setExpandedZones] = useState<Set<string>>(new Set());
   const [showSanctuary, setShowSanctuary] = useState(false);
   const [showAllRooms, setShowAllRooms] = useState(true); // Show all rooms by default
+
+  // User notes state
+  const [userNotes, setUserNotes] = useState<UserNotes>({
+    rooms: {},
+    principles: {},
+    sanctuaryElements: {},
+    userPrinciples: {},
+  });
+  const [editingNoteId, setEditingNoteId] = useState<string | null>(null);
+  const [noteInput, setNoteInput] = useState('');
+  const [addingPrincipleToRoom, setAddingPrincipleToRoom] = useState<string | null>(null);
+  const [newPrincipleInput, setNewPrincipleInput] = useState({ content: '', insight: '' });
+
+  // Note handlers
+  const saveRoomNote = useCallback((roomId: string) => {
+    setUserNotes(prev => ({
+      ...prev,
+      rooms: { ...prev.rooms, [roomId]: noteInput }
+    }));
+    setEditingNoteId(null);
+    setNoteInput('');
+  }, [noteInput]);
+
+  const savePrincipleNote = useCallback((principleId: string) => {
+    setUserNotes(prev => ({
+      ...prev,
+      principles: { ...prev.principles, [principleId]: noteInput }
+    }));
+    setEditingNoteId(null);
+    setNoteInput('');
+  }, [noteInput]);
+
+  const addUserPrinciple = useCallback((roomId: string) => {
+    if (!newPrincipleInput.content.trim()) return;
+
+    setUserNotes(prev => ({
+      ...prev,
+      userPrinciples: {
+        ...prev.userPrinciples,
+        [roomId]: [
+          ...(prev.userPrinciples[roomId] || []),
+          { content: newPrincipleInput.content, insight: newPrincipleInput.insight }
+        ]
+      }
+    }));
+    setAddingPrincipleToRoom(null);
+    setNewPrincipleInput({ content: '', insight: '' });
+  }, [newPrincipleInput]);
 
   const toggleFloor = (num: number) => {
     const next = new Set(expandedFloors);
@@ -188,45 +244,156 @@ export default function MindMapMobile({ analysis, onMakeSeed, isManualMode = fal
                         </button>
 
                         <AnimatePresence>
-                          {isRoomExpanded && hasInsights && (
+                          {isRoomExpanded && (
                             <motion.div
                               initial={{ height: 0 }}
                               animate={{ height: 'auto' }}
                               exit={{ height: 0 }}
                               className="overflow-hidden"
                             >
-                              <div className="pl-8 pr-3 pb-3 space-y-2">
+                              <div className="pl-8 pr-3 pb-3 space-y-3">
                                 {/* Room description */}
-                                <p className="text-xs text-muted-foreground mb-2 italic">
-                                  {room.coreQuestion}
-                                </p>
-                                {/* Principles */}
-                                {room.analysisData.principles.map((principle, i) => (
-                                  <PrincipleItem
-                                    key={i}
-                                    principle={principle}
-                                    onMakeSeed={onMakeSeed}
-                                  />
-                                ))}
-                              </div>
-                            </motion.div>
-                          )}
-                          {isRoomExpanded && !hasInsights && (
-                            <motion.div
-                              initial={{ height: 0 }}
-                              animate={{ height: 'auto' }}
-                              exit={{ height: 0 }}
-                              className="overflow-hidden"
-                            >
-                              <div className="pl-8 pr-3 pb-3">
                                 <p className="text-xs text-muted-foreground italic">
                                   {room.coreQuestion}
                                 </p>
-                                <p className="text-xs text-muted-foreground/60 mt-1">
-                                  {isJeevesMode
-                                    ? 'Jeeves found no direct connections to this room.'
-                                    : 'Tap to explore how your text connects to this room.'}
-                                </p>
+
+                                {/* AI-generated Principles */}
+                                {hasInsights && room.analysisData.principles.map((principle, i) => (
+                                  <PrincipleItem
+                                    key={principle.id || i}
+                                    principle={principle}
+                                    onMakeSeed={onMakeSeed}
+                                    userNote={userNotes.principles[principle.id || `${room.id}-${i}`]}
+                                    onEditNote={() => {
+                                      setEditingNoteId(`principle-${principle.id || `${room.id}-${i}`}`);
+                                      setNoteInput(userNotes.principles[principle.id || `${room.id}-${i}`] || '');
+                                    }}
+                                    isEditingNote={editingNoteId === `principle-${principle.id || `${room.id}-${i}`}`}
+                                    noteInput={noteInput}
+                                    onNoteChange={setNoteInput}
+                                    onSaveNote={() => savePrincipleNote(principle.id || `${room.id}-${i}`)}
+                                    onCancelEdit={() => { setEditingNoteId(null); setNoteInput(''); }}
+                                  />
+                                ))}
+
+                                {/* User-added principles */}
+                                {userNotes.userPrinciples[room.id]?.map((userPrinciple, i) => (
+                                  <div
+                                    key={`user-${i}`}
+                                    className="p-2 rounded-lg bg-accent/10 border border-accent/30"
+                                  >
+                                    <div className="flex items-start gap-2">
+                                      <User className="w-3 h-3 text-accent mt-1 flex-shrink-0" />
+                                      <div className="flex-1">
+                                        <p className="text-xs text-foreground font-medium">{userPrinciple.content}</p>
+                                        {userPrinciple.insight && (
+                                          <p className="text-xs text-muted-foreground italic mt-1">{userPrinciple.insight}</p>
+                                        )}
+                                      </div>
+                                    </div>
+                                  </div>
+                                ))}
+
+                                {/* Add your own principle */}
+                                {addingPrincipleToRoom === room.id ? (
+                                  <div className="p-3 rounded-lg bg-card border border-white/20 space-y-2">
+                                    <div className="flex items-center gap-2 text-xs font-semibold text-accent">
+                                      <Plus className="w-3 h-3" />
+                                      Add Your Own Insight
+                                    </div>
+                                    <textarea
+                                      value={newPrincipleInput.content}
+                                      onChange={(e) => setNewPrincipleInput(prev => ({ ...prev, content: e.target.value }))}
+                                      placeholder="What pattern or principle do you see?"
+                                      className="w-full p-2 text-xs rounded bg-background/50 border border-white/10 resize-none"
+                                      rows={2}
+                                    />
+                                    <textarea
+                                      value={newPrincipleInput.insight}
+                                      onChange={(e) => setNewPrincipleInput(prev => ({ ...prev, insight: e.target.value }))}
+                                      placeholder="Why does this matter? (optional)"
+                                      className="w-full p-2 text-xs rounded bg-background/50 border border-white/10 resize-none"
+                                      rows={2}
+                                    />
+                                    <div className="flex gap-2">
+                                      <button
+                                        onClick={() => addUserPrinciple(room.id)}
+                                        disabled={!newPrincipleInput.content.trim()}
+                                        className="flex-1 flex items-center justify-center gap-1 px-2 py-1.5 rounded text-xs font-medium bg-accent/20 text-accent hover:bg-accent/30 disabled:opacity-50"
+                                      >
+                                        <Save className="w-3 h-3" />
+                                        Save
+                                      </button>
+                                      <button
+                                        onClick={() => { setAddingPrincipleToRoom(null); setNewPrincipleInput({ content: '', insight: '' }); }}
+                                        className="px-2 py-1.5 rounded text-xs text-muted-foreground hover:text-foreground"
+                                      >
+                                        <X className="w-3 h-3" />
+                                      </button>
+                                    </div>
+                                  </div>
+                                ) : (
+                                  <button
+                                    onClick={() => setAddingPrincipleToRoom(room.id)}
+                                    className="w-full flex items-center justify-center gap-1.5 p-2 rounded-lg border border-dashed border-white/20 text-xs text-muted-foreground hover:text-accent hover:border-accent/50 transition-colors"
+                                  >
+                                    <Plus className="w-3 h-3" />
+                                    Add your own insight
+                                  </button>
+                                )}
+
+                                {/* Room-level notes */}
+                                {editingNoteId === `room-${room.id}` ? (
+                                  <div className="space-y-2">
+                                    <textarea
+                                      value={noteInput}
+                                      onChange={(e) => setNoteInput(e.target.value)}
+                                      placeholder="Your personal notes for this room..."
+                                      className="w-full p-2 text-xs rounded bg-background/50 border border-white/10 resize-none"
+                                      rows={3}
+                                      autoFocus
+                                    />
+                                    <div className="flex gap-2">
+                                      <button
+                                        onClick={() => saveRoomNote(room.id)}
+                                        className="flex-1 flex items-center justify-center gap-1 px-2 py-1.5 rounded text-xs font-medium bg-primary/20 text-primary hover:bg-primary/30"
+                                      >
+                                        <Save className="w-3 h-3" />
+                                        Save Note
+                                      </button>
+                                      <button
+                                        onClick={() => { setEditingNoteId(null); setNoteInput(''); }}
+                                        className="px-2 py-1.5 rounded text-xs text-muted-foreground hover:text-foreground"
+                                      >
+                                        Cancel
+                                      </button>
+                                    </div>
+                                  </div>
+                                ) : userNotes.rooms[room.id] ? (
+                                  <div
+                                    onClick={() => { setEditingNoteId(`room-${room.id}`); setNoteInput(userNotes.rooms[room.id]); }}
+                                    className="p-2 rounded-lg bg-primary/10 border border-primary/20 cursor-pointer hover:bg-primary/15"
+                                  >
+                                    <div className="flex items-start gap-2">
+                                      <PenLine className="w-3 h-3 text-primary mt-0.5" />
+                                      <p className="text-xs text-foreground whitespace-pre-wrap">{userNotes.rooms[room.id]}</p>
+                                    </div>
+                                  </div>
+                                ) : (
+                                  <button
+                                    onClick={() => { setEditingNoteId(`room-${room.id}`); setNoteInput(''); }}
+                                    className="w-full flex items-center justify-center gap-1.5 p-2 rounded-lg border border-dashed border-white/10 text-xs text-muted-foreground hover:text-primary hover:border-primary/30 transition-colors"
+                                  >
+                                    <PenLine className="w-3 h-3" />
+                                    Add personal notes
+                                  </button>
+                                )}
+
+                                {!hasInsights && !isJeevesMode && (
+                                  <p className="text-xs text-muted-foreground/60">
+                                    Tap to explore how your text connects to this room.
+                                  </p>
+                                )}
                               </div>
                             </motion.div>
                           )}
@@ -379,13 +546,29 @@ export default function MindMapMobile({ analysis, onMakeSeed, isManualMode = fal
   );
 }
 
+interface PrincipleItemProps {
+  principle: PrincipleData;
+  onMakeSeed?: (content: string) => void;
+  userNote?: string;
+  onEditNote?: () => void;
+  isEditingNote?: boolean;
+  noteInput?: string;
+  onNoteChange?: (value: string) => void;
+  onSaveNote?: () => void;
+  onCancelEdit?: () => void;
+}
+
 function PrincipleItem({
   principle,
   onMakeSeed,
-}: {
-  principle: PrincipleData;
-  onMakeSeed?: (content: string) => void;
-}) {
+  userNote,
+  onEditNote,
+  isEditingNote,
+  noteInput = '',
+  onNoteChange,
+  onSaveNote,
+  onCancelEdit,
+}: PrincipleItemProps) {
   const [expanded, setExpanded] = useState(false);
 
   return (
@@ -412,9 +595,57 @@ function PrincipleItem({
       </div>
 
       {expanded && (
-        <div className="mt-2 space-y-2">
+        <div className="mt-2 space-y-2" onClick={(e) => e.stopPropagation()}>
           <p className="text-xs text-muted-foreground italic">{principle.insight}</p>
           <p className="text-xs text-amber-400/80 italic">{principle.visualHook}</p>
+
+          {/* User note on this principle */}
+          {isEditingNote ? (
+            <div className="space-y-2 mt-2">
+              <textarea
+                value={noteInput}
+                onChange={(e) => onNoteChange?.(e.target.value)}
+                placeholder="Your thoughts on this insight..."
+                className="w-full p-2 text-xs rounded bg-background/80 border border-white/20 resize-none"
+                rows={2}
+                autoFocus
+                onClick={(e) => e.stopPropagation()}
+              />
+              <div className="flex gap-2">
+                <button
+                  onClick={(e) => { e.stopPropagation(); onSaveNote?.(); }}
+                  className="flex-1 flex items-center justify-center gap-1 px-2 py-1 rounded text-xs font-medium bg-primary/20 text-primary hover:bg-primary/30"
+                >
+                  <Save className="w-3 h-3" />
+                  Save
+                </button>
+                <button
+                  onClick={(e) => { e.stopPropagation(); onCancelEdit?.(); }}
+                  className="px-2 py-1 rounded text-xs text-muted-foreground hover:text-foreground"
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          ) : userNote ? (
+            <div
+              onClick={(e) => { e.stopPropagation(); onEditNote?.(); }}
+              className="p-2 rounded bg-primary/10 border border-primary/20 hover:bg-primary/15"
+            >
+              <div className="flex items-start gap-1.5">
+                <PenLine className="w-3 h-3 text-primary mt-0.5 flex-shrink-0" />
+                <p className="text-xs text-foreground">{userNote}</p>
+              </div>
+            </div>
+          ) : onEditNote && (
+            <button
+              onClick={(e) => { e.stopPropagation(); onEditNote(); }}
+              className="w-full flex items-center justify-center gap-1 py-1.5 rounded border border-dashed border-white/10 text-xs text-muted-foreground hover:text-primary hover:border-primary/30 transition-colors"
+            >
+              <PenLine className="w-3 h-3" />
+              Add your note
+            </button>
+          )}
 
           {onMakeSeed && (
             <button
