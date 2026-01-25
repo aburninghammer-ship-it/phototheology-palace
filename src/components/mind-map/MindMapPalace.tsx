@@ -98,8 +98,8 @@ export default function MindMapPalace({
     if (onMakeSeed) {
       onMakeSeed(content);
     } else {
-      // Re-run with new content
-      handleGenerate(content, mode);
+      // Re-run with new content using current study method
+      handleGenerate(content, mode, studyMethod);
     }
     setSidebarOpen(false);
   }, [mode, handleGenerate, onMakeSeed]);

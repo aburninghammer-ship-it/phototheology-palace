@@ -34,7 +34,7 @@ export default function MindMapToolbar({
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && e.ctrlKey) {
-      handleGenerate();
+      handleGenerate(generationMethod);
     }
   };
 
