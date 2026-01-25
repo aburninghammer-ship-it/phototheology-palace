@@ -166,6 +166,69 @@ export type Database = {
         }
         Relationships: []
       }
+      baptism_candidate_progress: {
+        Row: {
+          candidate_id: string
+          completion_date: string | null
+          confidence: number | null
+          created_at: string
+          id: string
+          last_active_at: string | null
+          last_step: string | null
+          lesson_id: string
+          pastoral_flags: string[]
+          percent_complete: number
+          quiz_best_score: number | null
+          state: string
+          updated_at: string
+        }
+        Insert: {
+          candidate_id: string
+          completion_date?: string | null
+          confidence?: number | null
+          created_at?: string
+          id?: string
+          last_active_at?: string | null
+          last_step?: string | null
+          lesson_id: string
+          pastoral_flags?: string[]
+          percent_complete?: number
+          quiz_best_score?: number | null
+          state?: string
+          updated_at?: string
+        }
+        Update: {
+          candidate_id?: string
+          completion_date?: string | null
+          confidence?: number | null
+          created_at?: string
+          id?: string
+          last_active_at?: string | null
+          last_step?: string | null
+          lesson_id?: string
+          pastoral_flags?: string[]
+          percent_complete?: number
+          quiz_best_score?: number | null
+          state?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "baptism_candidate_progress_candidate_id_fkey"
+            columns: ["candidate_id"]
+            isOneToOne: false
+            referencedRelation: "baptism_candidates"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "baptism_candidate_progress_lesson_id_fkey"
+            columns: ["lesson_id"]
+            isOneToOne: false
+            referencedRelation: "baptism_lessons"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       baptism_candidates: {
         Row: {
           actual_baptism_date: string | null
@@ -262,6 +325,166 @@ export type Database = {
             columns: ["interest_id"]
             isOneToOne: false
             referencedRelation: "evangelism_interests"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      baptism_lesson_attempts: {
+        Row: {
+          candidate_id: string
+          completed_at: string | null
+          created_at: string
+          id: string
+          lesson_id: string
+          mode: string
+          started_at: string
+        }
+        Insert: {
+          candidate_id: string
+          completed_at?: string | null
+          created_at?: string
+          id?: string
+          lesson_id: string
+          mode?: string
+          started_at?: string
+        }
+        Update: {
+          candidate_id?: string
+          completed_at?: string | null
+          created_at?: string
+          id?: string
+          lesson_id?: string
+          mode?: string
+          started_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "baptism_lesson_attempts_candidate_id_fkey"
+            columns: ["candidate_id"]
+            isOneToOne: false
+            referencedRelation: "baptism_candidates"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "baptism_lesson_attempts_lesson_id_fkey"
+            columns: ["lesson_id"]
+            isOneToOne: false
+            referencedRelation: "baptism_lessons"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      baptism_lesson_responses: {
+        Row: {
+          attempt_id: string
+          created_at: string
+          id: string
+          step_id: string
+          tags: string[]
+          user_response: string
+        }
+        Insert: {
+          attempt_id: string
+          created_at?: string
+          id?: string
+          step_id: string
+          tags?: string[]
+          user_response: string
+        }
+        Update: {
+          attempt_id?: string
+          created_at?: string
+          id?: string
+          step_id?: string
+          tags?: string[]
+          user_response?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "baptism_lesson_responses_attempt_id_fkey"
+            columns: ["attempt_id"]
+            isOneToOne: false
+            referencedRelation: "baptism_lesson_attempts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      baptism_lessons: {
+        Row: {
+          created_at: string
+          description: string | null
+          estimated_minutes: number
+          fundamental_number: number
+          id: string
+          prerequisites: string[]
+          pt_map: Json
+          scripture_pack: Json
+          title: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          estimated_minutes?: number
+          fundamental_number: number
+          id?: string
+          prerequisites?: string[]
+          pt_map?: Json
+          scripture_pack?: Json
+          title: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          estimated_minutes?: number
+          fundamental_number?: number
+          id?: string
+          prerequisites?: string[]
+          pt_map?: Json
+          scripture_pack?: Json
+          title?: string
+        }
+        Relationships: []
+      }
+      baptism_readiness_assessments: {
+        Row: {
+          assessed_at: string
+          candidate_id: string
+          created_at: string
+          heart_score: number | null
+          id: string
+          knowledge_score: number | null
+          mentor_notes: string | null
+          practice_score: number | null
+          recommendation: string | null
+        }
+        Insert: {
+          assessed_at?: string
+          candidate_id: string
+          created_at?: string
+          heart_score?: number | null
+          id?: string
+          knowledge_score?: number | null
+          mentor_notes?: string | null
+          practice_score?: number | null
+          recommendation?: string | null
+        }
+        Update: {
+          assessed_at?: string
+          candidate_id?: string
+          created_at?: string
+          heart_score?: number | null
+          id?: string
+          knowledge_score?: number | null
+          mentor_notes?: string | null
+          practice_score?: number | null
+          recommendation?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "baptism_readiness_assessments_candidate_id_fkey"
+            columns: ["candidate_id"]
+            isOneToOne: false
+            referencedRelation: "baptism_candidates"
             referencedColumns: ["id"]
           },
         ]
