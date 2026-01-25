@@ -516,7 +516,7 @@ export default function StudyBuddy() {
 
     // Don't analyze if notes are too short or haven't changed significantly
     const trimmedNotes = notes.trim();
-    if (trimmedNotes.length < 30) {
+    if (trimmedNotes.length < 15) {
       // Clear stale analysis when notes are too short/empty (prevents old Jeeves comments from persisting)
       if (trimmedNotes.length === 0 && analysis) {
         setAnalysis(null);
@@ -572,7 +572,7 @@ export default function StudyBuddy() {
 
     // Auto-trigger for questions, otherwise need more content
     const hasQuestion = isQuestion(trimmedNotes);
-    if (!hasQuestion && trimmedNotes.length < 30) return;
+    if (!hasQuestion && trimmedNotes.length < 15) return;
 
     // Skip if not forced and notes haven't changed much (unless it's a question)
     if (!forceAnalysis && !hasQuestion && trimmedNotes === lastAnalyzedNotes.current) return;
@@ -1105,7 +1105,7 @@ Jeeves sees your notes and will spark connections, suggest PT rooms, source clai
                   )}
                 </div>
                 <p className={`text-xs mt-1 ${isLightTheme ? "text-purple-700/70" : "text-violet-200/60"}`}>
-                  {notes.trim().length < 30 
+                  {notes.trim().length < 15
                     ? "Start typing in Notes — Jeeves will respond as you write"
                     : "Watching your notes and sparking connections..."}
                 </p>
@@ -1115,7 +1115,7 @@ Jeeves sees your notes and will spark connections, suggest PT rooms, source clai
               <ScrollArea className="flex-1">
                 <div className="p-4 space-y-4">
                   {/* Show placeholder if: no analysis, not loading, OR notes are empty (defensive check) */}
-                  {(!analysis && !jeevesLoading && notes.trim().length < 30) || notes.trim().length === 0 ? (
+                  {(!analysis && !jeevesLoading && notes.trim().length < 15) || notes.trim().length === 0 ? (
                     <div className="text-center py-8">
                       <Brain className={`w-12 h-12 mx-auto mb-3 ${isLightTheme ? "text-purple-400/50" : "text-violet-500/30"}`} />
                       <p className={`text-sm ${isLightTheme ? "text-purple-700/70" : "text-violet-200/60"}`}>

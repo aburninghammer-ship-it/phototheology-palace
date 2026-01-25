@@ -5,12 +5,94 @@ import type { Database } from './types';
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
 const SUPABASE_PUBLISHABLE_KEY = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
 
+// Prefixes for cached data that can be safely cleared
+const CLEARABLE_PREFIXES = [
+  'bible_chapter_',
+  'bible_commentary_',
+  'bible_cache_metadata',
+  'offline_notes_',
+  'recent_pages',
+  'page_state_',
+  'guesthouse_sparks_',
+];
+
+/**
+ * Clear cached data to free up space for auth tokens
+ */
+const clearCacheForAuth = (): number => {
+  let cleared = 0;
+  const keysToRemove: string[] = [];
+
+  for (let i = 0; i < localStorage.length; i++) {
+    const key = localStorage.key(i);
+    if (key && CLEARABLE_PREFIXES.some(prefix => key.startsWith(prefix))) {
+      keysToRemove.push(key);
+    }
+  }
+
+  for (const key of keysToRemove) {
+    try {
+      localStorage.removeItem(key);
+      cleared++;
+    } catch {
+      // Ignore removal errors
+    }
+  }
+
+  if (cleared > 0) {
+    console.log(`[Supabase Storage] Cleared ${cleared} cached items to free space`);
+  }
+  return cleared;
+};
+
+/**
+ * Custom storage adapter that handles quota exceeded errors
+ * by clearing non-essential cached data
+ */
+const resilientStorage = {
+  getItem: (key: string): string | null => {
+    try {
+      return localStorage.getItem(key);
+    } catch (e) {
+      console.error('[Supabase Storage] Error reading:', e);
+      return null;
+    }
+  },
+  setItem: (key: string, value: string): void => {
+    try {
+      localStorage.setItem(key, value);
+    } catch (e) {
+      // Handle quota exceeded error
+      if (e instanceof DOMException && (e.name === 'QuotaExceededError' || e.code === 22)) {
+        console.warn('[Supabase Storage] Quota exceeded, clearing cache...');
+        clearCacheForAuth();
+        // Retry after clearing cache
+        try {
+          localStorage.setItem(key, value);
+        } catch (retryError) {
+          console.error('[Supabase Storage] Failed even after clearing cache:', retryError);
+          throw retryError;
+        }
+      } else {
+        throw e;
+      }
+    }
+  },
+  removeItem: (key: string): void => {
+    try {
+      localStorage.removeItem(key);
+    } catch (e) {
+      console.error('[Supabase Storage] Error removing:', e);
+    }
+  },
+};
+
 // Import the supabase client like this:
 // import { supabase } from "@/integrations/supabase/client";
 
 export const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
   auth: {
-    storage: localStorage,
+    storage: resilientStorage,
     persistSession: true,
     autoRefreshToken: true,
   }

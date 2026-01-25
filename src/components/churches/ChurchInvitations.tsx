@@ -6,7 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { Loader2, Mail, Copy, Trash2, UserPlus, Link2 } from "lucide-react";
+import { Loader2, Mail, Copy, Trash2, UserPlus, Link2, RefreshCw } from "lucide-react";
 import {
   Select,
   SelectContent,
@@ -217,6 +217,30 @@ export function ChurchInvitations({ churchId, availableSeats }: ChurchInvitation
     }
   };
 
+  const handleRenewInvitation = async (id: string) => {
+    try {
+      // Set new expiration to 30 days from now
+      const newExpiresAt = new Date();
+      newExpiresAt.setDate(newExpiresAt.getDate() + 30);
+
+      const { error } = await supabase
+        .from('church_invitations')
+        .update({
+          expires_at: newExpiresAt.toISOString(),
+          status: 'pending' // Reset status in case it was changed
+        })
+        .eq('id', id);
+
+      if (error) throw error;
+
+      toast.success("Invitation renewed for 30 days");
+      loadInvitations();
+    } catch (error) {
+      console.error('Error renewing invitation:', error);
+      toast.error("Failed to renew invitation");
+    }
+  };
+
   const handleRoleChange = async (invitationId: string, newRole: 'member' | 'leader') => {
     try {
       const { error } = await supabase
@@ -418,15 +442,28 @@ export function ChurchInvitations({ churchId, availableSeats }: ChurchInvitation
                       {new Date(invitation.expires_at).toLocaleDateString()}
                     </TableCell>
                     <TableCell className="text-right">
-                      {invitation.status === 'pending' && (
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => handleDeleteInvitation(invitation.id)}
-                        >
-                          <Trash2 className="h-4 w-4 text-destructive" />
-                        </Button>
-                      )}
+                      <div className="flex items-center justify-end gap-1">
+                        {invitation.status === 'pending' && new Date(invitation.expires_at) < new Date() && (
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleRenewInvitation(invitation.id)}
+                            title="Renew invitation for 30 days"
+                            className="text-primary hover:text-primary/80"
+                          >
+                            <RefreshCw className="h-4 w-4" />
+                          </Button>
+                        )}
+                        {invitation.status === 'pending' && (
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleDeleteInvitation(invitation.id)}
+                          >
+                            <Trash2 className="h-4 w-4 text-destructive" />
+                          </Button>
+                        )}
+                      </div>
                     </TableCell>
                   </TableRow>
                 ))}

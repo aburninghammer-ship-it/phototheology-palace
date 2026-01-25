@@ -16,6 +16,7 @@ import { z } from "zod";
 import { GoogleSignInButton } from "@/components/auth/GoogleSignInButton";
 import { AuthSocialProof } from "@/components/auth/AuthSocialProof";
 import { useEventTracking } from "@/hooks/useEventTracking";
+import { ensureStorageSpace, isQuotaError, getStorageErrorMessage } from "@/utils/storageManager";
 
 const emailSchema = z.string().email("Please enter a valid email address").max(255, "Email is too long");
 const passwordSchema = z.string().min(6, "Password must be at least 6 characters").max(128, "Password is too long");
@@ -131,6 +132,17 @@ export default function Auth() {
     setLoading(true);
     console.log("[Auth] Attempting login for:", email);
 
+    // Check and clear storage if needed before login
+    const storageCheck = ensureStorageSpace();
+    if (!storageCheck.success) {
+      setError(getStorageErrorMessage());
+      setLoading(false);
+      return;
+    }
+    if (storageCheck.cleared > 0) {
+      console.log(`[Auth] Cleared ${storageCheck.cleared} cached items to free storage`);
+    }
+
     try {
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
@@ -175,8 +187,12 @@ export default function Auth() {
       // to either the requested redirect target or the normal Gatehouse/Dashboard flow.
     } catch (err: any) {
       console.error("[Auth] Login error:", err);
-      const errorMessage = err?.message || err?.toString() || "Unknown error";
-      setError(`Login failed: ${errorMessage}`);
+      if (isQuotaError(err)) {
+        setError(getStorageErrorMessage());
+      } else {
+        const errorMessage = err?.message || err?.toString() || "Unknown error";
+        setError(`Login failed: ${errorMessage}`);
+      }
     } finally {
       setLoading(false);
     }
@@ -249,6 +265,14 @@ export default function Auth() {
 
     setLoading(true);
 
+    // Check and clear storage if needed before signup
+    const storageCheck = ensureStorageSpace();
+    if (!storageCheck.success) {
+      setError(getStorageErrorMessage());
+      setLoading(false);
+      return;
+    }
+
     try {
       const redirectUrl = `${window.location.origin}/`;
 
@@ -317,8 +341,12 @@ export default function Auth() {
         setError("Account creation failed. This email may already be registered. Please try logging in instead.");
       }
     } catch (err) {
-      setError("An unexpected error occurred. Please try again.");
       console.error("Signup error:", err);
+      if (isQuotaError(err)) {
+        setError(getStorageErrorMessage());
+      } else {
+        setError("An unexpected error occurred. Please try again.");
+      }
     } finally {
       setLoading(false);
     }
