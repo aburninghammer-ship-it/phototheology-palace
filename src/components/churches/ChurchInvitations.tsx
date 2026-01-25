@@ -299,68 +299,59 @@ export function ChurchInvitations({ churchId, availableSeats }: ChurchInvitation
                 Create Invitation
               </Button>
             </DialogTrigger>
-            <DialogContent
-              className="glass-card p-0 flex flex-col max-h-[90vh] w-[calc(100vw-1.5rem)] sm:w-full sm:max-w-lg top-auto bottom-4 translate-y-0 sm:top-[50%] sm:bottom-auto sm:translate-y-[-50%]"
-            >
+            <DialogContent className="sm:max-w-md">
+              <DialogHeader>
+                <DialogTitle>Create New Invitation</DialogTitle>
+                <DialogDescription>
+                  Send an invitation to a new member. They will receive an invitation code to join your church.
+                </DialogDescription>
+              </DialogHeader>
+
               <form
-                className="flex flex-col max-h-[90vh]"
                 onSubmit={(e) => {
                   e.preventDefault();
                   handleCreateInvitation();
                 }}
+                className="space-y-4"
               >
-                <DialogHeader className="p-6 pb-3">
-                  <DialogTitle>Create New Invitation</DialogTitle>
-                  <DialogDescription>
-                    Send an invitation to a new member. They will receive an invitation code to join your church.
-                  </DialogDescription>
-                </DialogHeader>
-
-                <div className="px-6 pb-4 flex-1 overflow-y-auto">
-                  <div className="space-y-4">
-                    <div>
-                      <Label htmlFor="invite-email">Email Address</Label>
-                      <Input
-                        id="invite-email"
-                        type="email"
-                        inputMode="email"
-                        autoComplete="email"
-                        placeholder="member@example.com"
-                        value={inviteEmail}
-                        onChange={(e) => setInviteEmail(e.target.value)}
-                        className="bg-background/50"
-                      />
-                    </div>
-                    <div>
-                      <Label htmlFor="invite-role">Role</Label>
-                      <Select value={inviteRole} onValueChange={(value: any) => setInviteRole(value)}>
-                        <SelectTrigger id="invite-role" className="bg-background/50">
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="member">Member</SelectItem>
-                          <SelectItem value="leader">Leader</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                  </div>
+                <div className="space-y-2">
+                  <Label htmlFor="invite-email">Email Address</Label>
+                  <Input
+                    id="invite-email"
+                    type="email"
+                    inputMode="email"
+                    autoComplete="email"
+                    placeholder="member@example.com"
+                    value={inviteEmail}
+                    onChange={(e) => setInviteEmail(e.target.value)}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="invite-role">Role</Label>
+                  <Select value={inviteRole} onValueChange={(value: any) => setInviteRole(value)}>
+                    <SelectTrigger id="invite-role">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="member">Member</SelectItem>
+                      <SelectItem value="leader">Leader</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
 
-                <div className="p-6 pt-4 border-t border-border/50 bg-background/10">
-                  <Button type="submit" disabled={creating} className="w-full">
-                    {creating ? (
-                      <>
-                        <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                        Creating...
-                      </>
-                    ) : (
-                      <>
-                        <Mail className="h-4 w-4 mr-2" />
-                        Create Invitation
-                      </>
-                    )}
-                  </Button>
-                </div>
+                <Button type="submit" disabled={creating} className="w-full">
+                  {creating ? (
+                    <>
+                      <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                      Creating...
+                    </>
+                  ) : (
+                    <>
+                      <Mail className="h-4 w-4 mr-2" />
+                      Create Invitation
+                    </>
+                  )}
+                </Button>
               </form>
             </DialogContent>
           </Dialog>
