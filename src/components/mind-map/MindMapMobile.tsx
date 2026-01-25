@@ -1,23 +1,26 @@
 import { useState } from 'react';
-import { ChevronDown, ChevronRight, Lightbulb, Church, Sprout } from 'lucide-react';
+import { ChevronDown, ChevronRight, Lightbulb, Church, Sprout, Lock, Unlock, Bot, User } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import type { AnyNodeData, FloorNodeData, RoomNodeData, SanctuaryZoneNodeData, PrincipleData } from './types';
 import { palaceFloors, sanctuaryZones, sanctuaryElements, FLOOR_THEMES } from './constants';
 
 interface MindMapMobileProps {
   analysis: {
+    overallTheme?: string;
     relevantFloors: number[];
     roomAnalysis: Record<string, { applicable: boolean; principles: PrincipleData[] }>;
     sanctuaryAnalysis?: Record<string, { applicable: boolean; insights: PrincipleData[] }>;
   } | null;
   onMakeSeed?: (content: string) => void;
+  isManualMode?: boolean;
 }
 
-export default function MindMapMobile({ analysis, onMakeSeed }: MindMapMobileProps) {
-  const [expandedFloors, setExpandedFloors] = useState<Set<number>>(new Set());
+export default function MindMapMobile({ analysis, onMakeSeed, isManualMode = false }: MindMapMobileProps) {
+  const [expandedFloors, setExpandedFloors] = useState<Set<number>>(new Set([1])); // Start with Floor 1 expanded
   const [expandedRooms, setExpandedRooms] = useState<Set<string>>(new Set());
   const [expandedZones, setExpandedZones] = useState<Set<string>>(new Set());
   const [showSanctuary, setShowSanctuary] = useState(false);
+  const [showAllRooms, setShowAllRooms] = useState(true); // Show all rooms by default
 
   const toggleFloor = (num: number) => {
     const next = new Set(expandedFloors);
@@ -43,26 +46,70 @@ export default function MindMapMobile({ analysis, onMakeSeed }: MindMapMobilePro
   if (!analysis) {
     return (
       <div className="p-4 text-center text-muted-foreground">
-        <p>Enter text and click "Map to Palace" to see results</p>
+        <p>Enter text and click "Ask Jeeves" or "My Study" to begin</p>
       </div>
     );
   }
 
+  // Determine if this is Jeeves-generated (has insights) or manual mode (empty rooms)
+  const totalInsights = Object.values(analysis.roomAnalysis).reduce(
+    (sum, r) => sum + (r.principles?.length || 0), 0
+  );
+  const isJeevesMode = totalInsights > 0;
+
   return (
-    <div className="p-4 space-y-3 overflow-y-auto">
-      {/* Palace Floors */}
+    <div className="p-4 space-y-3 overflow-y-auto pb-20">
+      {/* Mode indicator and toggle */}
+      <div className="flex items-center justify-between p-3 rounded-lg bg-card/80 border border-white/10">
+        <div className="flex items-center gap-2">
+          {isJeevesMode ? (
+            <>
+              <Bot className="w-4 h-4 text-primary" />
+              <span className="text-sm font-medium">Jeeves Analysis</span>
+              <span className="text-xs text-green-400">({totalInsights} insights)</span>
+            </>
+          ) : (
+            <>
+              <User className="w-4 h-4 text-accent" />
+              <span className="text-sm font-medium">Manual Study Mode</span>
+            </>
+          )}
+        </div>
+        <button
+          onClick={() => setShowAllRooms(!showAllRooms)}
+          className="flex items-center gap-1.5 px-2 py-1 rounded text-xs bg-white/5 hover:bg-white/10 transition-colors"
+        >
+          {showAllRooms ? <Unlock className="w-3 h-3" /> : <Lock className="w-3 h-3" />}
+          {showAllRooms ? 'All Rooms' : 'Active Only'}
+        </button>
+      </div>
+
+      {/* Overall Theme (if present) */}
+      {analysis.overallTheme && isJeevesMode && (
+        <div className="p-3 rounded-lg bg-gradient-to-r from-primary/10 to-accent/10 border border-primary/20">
+          <p className="text-sm text-foreground italic">{analysis.overallTheme}</p>
+        </div>
+      )}
+
+      {/* Palace Floors - ALL 8 FLOORS */}
       {palaceFloors.map((floor) => {
         const theme = FLOOR_THEMES[floor.number - 1];
-        const isRelevant = analysis.relevantFloors.includes(floor.number);
-        const matchingRooms = floor.rooms.filter(
-          (r) => analysis.roomAnalysis[r.id]?.applicable
-        );
-        const matchCount = matchingRooms.reduce(
-          (sum, r) => sum + (analysis.roomAnalysis[r.id]?.principles.length || 0),
-          0
+
+        // Get all rooms for this floor with their analysis data
+        const allRooms = floor.rooms.map((room) => ({
+          ...room,
+          analysisData: analysis.roomAnalysis[room.id] || { applicable: false, principles: [] },
+        }));
+
+        // Count insights for this floor
+        const insightCount = allRooms.reduce(
+          (sum, r) => sum + (r.analysisData.principles?.length || 0), 0
         );
 
-        if (!isRelevant && matchCount === 0) return null;
+        // Determine which rooms to show
+        const roomsToShow = showAllRooms
+          ? allRooms  // Show all rooms
+          : allRooms.filter(r => r.analysisData.applicable && r.analysisData.principles.length > 0);
 
         const isExpanded = expandedFloors.has(floor.number);
 
@@ -82,11 +129,16 @@ export default function MindMapMobile({ analysis, onMakeSeed }: MindMapMobilePro
                 <div className="text-xs opacity-70">Floor {floor.number}</div>
                 <div className="font-semibold">{floor.name}</div>
               </div>
-              {matchCount > 0 && (
+              <div className="flex items-center gap-2">
                 <span className="px-2 py-0.5 rounded-full bg-white/20 text-xs font-semibold">
-                  {matchCount} insights
+                  {floor.rooms.length} rooms
                 </span>
-              )}
+                {insightCount > 0 && (
+                  <span className="px-2 py-0.5 rounded-full bg-green-500/30 text-xs font-semibold">
+                    {insightCount} insights
+                  </span>
+                )}
+              </div>
             </button>
 
             {/* Rooms */}
@@ -98,30 +150,45 @@ export default function MindMapMobile({ analysis, onMakeSeed }: MindMapMobilePro
                   exit={{ height: 0 }}
                   className="overflow-hidden bg-card"
                 >
-                  {matchingRooms.map((room) => {
-                    const roomData = analysis.roomAnalysis[room.id];
+                  {roomsToShow.map((room) => {
+                    const hasInsights = room.analysisData.principles && room.analysisData.principles.length > 0;
                     const isRoomExpanded = expandedRooms.has(room.id);
 
                     return (
                       <div key={room.id} className="border-t border-white/5">
                         <button
                           onClick={() => toggleRoom(room.id)}
-                          className="w-full flex items-center gap-2 p-3 hover:bg-white/5"
+                          className={`w-full flex items-center gap-2 p-3 hover:bg-white/5 ${
+                            !hasInsights ? 'opacity-60' : ''
+                          }`}
                         >
-                          {isRoomExpanded ? (
-                            <ChevronDown className="w-3 h-3 text-muted-foreground" />
+                          {hasInsights ? (
+                            isRoomExpanded ? (
+                              <ChevronDown className="w-3 h-3 text-green-400" />
+                            ) : (
+                              <ChevronRight className="w-3 h-3 text-green-400" />
+                            )
                           ) : (
-                            <ChevronRight className="w-3 h-3 text-muted-foreground" />
+                            <div className="w-3 h-3 rounded-full border border-muted-foreground/30" />
                           )}
-                          <span className="text-xs font-bold text-primary">{room.tag}</span>
-                          <span className="flex-1 text-left text-sm">{room.name}</span>
-                          <span className="text-xs text-green-400">
-                            {roomData.principles.length} insights
+                          <span className={`text-xs font-bold ${hasInsights ? 'text-primary' : 'text-muted-foreground'}`}>
+                            {room.tag}
                           </span>
+                          <span className="flex-1 text-left text-sm">{room.name}</span>
+                          {hasInsights ? (
+                            <span className="text-xs text-green-400 flex items-center gap-1">
+                              <Lightbulb className="w-3 h-3" />
+                              {room.analysisData.principles.length}
+                            </span>
+                          ) : (
+                            <span className="text-xs text-muted-foreground italic">
+                              {isJeevesMode ? 'No match' : 'Explore'}
+                            </span>
+                          )}
                         </button>
 
                         <AnimatePresence>
-                          {isRoomExpanded && (
+                          {isRoomExpanded && hasInsights && (
                             <motion.div
                               initial={{ height: 0 }}
                               animate={{ height: 'auto' }}
@@ -129,13 +196,37 @@ export default function MindMapMobile({ analysis, onMakeSeed }: MindMapMobilePro
                               className="overflow-hidden"
                             >
                               <div className="pl-8 pr-3 pb-3 space-y-2">
-                                {roomData.principles.map((principle, i) => (
+                                {/* Room description */}
+                                <p className="text-xs text-muted-foreground mb-2 italic">
+                                  {room.coreQuestion}
+                                </p>
+                                {/* Principles */}
+                                {room.analysisData.principles.map((principle, i) => (
                                   <PrincipleItem
                                     key={i}
                                     principle={principle}
                                     onMakeSeed={onMakeSeed}
                                   />
                                 ))}
+                              </div>
+                            </motion.div>
+                          )}
+                          {isRoomExpanded && !hasInsights && (
+                            <motion.div
+                              initial={{ height: 0 }}
+                              animate={{ height: 'auto' }}
+                              exit={{ height: 0 }}
+                              className="overflow-hidden"
+                            >
+                              <div className="pl-8 pr-3 pb-3">
+                                <p className="text-xs text-muted-foreground italic">
+                                  {room.coreQuestion}
+                                </p>
+                                <p className="text-xs text-muted-foreground/60 mt-1">
+                                  {isJeevesMode
+                                    ? 'Jeeves found no direct connections to this room.'
+                                    : 'Tap to explore how your text connects to this room.'}
+                                </p>
                               </div>
                             </motion.div>
                           )}
@@ -150,104 +241,140 @@ export default function MindMapMobile({ analysis, onMakeSeed }: MindMapMobilePro
         );
       })}
 
-      {/* Sanctuary Section */}
-      {analysis.sanctuaryAnalysis && Object.keys(analysis.sanctuaryAnalysis).length > 0 && (
-        <div className="rounded-lg overflow-hidden border border-purple-500/30">
-          <button
-            onClick={() => setShowSanctuary(!showSanctuary)}
-            className="w-full flex items-center gap-3 p-3 bg-gradient-to-r from-purple-600 to-violet-600 text-white"
-          >
-            {showSanctuary ? (
-              <ChevronDown className="w-4 h-4" />
-            ) : (
-              <ChevronRight className="w-4 h-4" />
-            )}
-            <Church className="w-4 h-4" />
-            <div className="flex-1 text-left font-semibold">The Sanctuary</div>
+      {/* Sanctuary Section - Always show */}
+      <div className="rounded-lg overflow-hidden border border-purple-500/30">
+        <button
+          onClick={() => setShowSanctuary(!showSanctuary)}
+          className="w-full flex items-center gap-3 p-3 bg-gradient-to-r from-purple-600 to-violet-600 text-white"
+        >
+          {showSanctuary ? (
+            <ChevronDown className="w-4 h-4" />
+          ) : (
+            <ChevronRight className="w-4 h-4" />
+          )}
+          <Church className="w-4 h-4" />
+          <div className="flex-1 text-left font-semibold">The Sanctuary</div>
+          <div className="flex items-center gap-2">
             <span className="px-2 py-0.5 rounded-full bg-white/20 text-xs font-semibold">
-              {Object.values(analysis.sanctuaryAnalysis).reduce(
-                (sum, z) => sum + z.insights.length,
-                0
-              )} insights
+              {sanctuaryElements.length} elements
             </span>
-          </button>
+            {analysis.sanctuaryAnalysis && (
+              <span className="px-2 py-0.5 rounded-full bg-yellow-500/30 text-xs font-semibold">
+                {Object.values(analysis.sanctuaryAnalysis).reduce(
+                  (sum, z) => sum + (z.insights?.length || 0),
+                  0
+                )} insights
+              </span>
+            )}
+          </div>
+        </button>
 
-          <AnimatePresence>
-            {showSanctuary && (
-              <motion.div
-                initial={{ height: 0 }}
-                animate={{ height: 'auto' }}
-                exit={{ height: 0 }}
-                className="overflow-hidden bg-card"
-              >
-                {sanctuaryZones.map((zone) => {
-                  const zoneElements = sanctuaryElements.filter((e) => e.zone === zone.id);
-                  const zoneInsights = zoneElements.flatMap(
-                    (e) => analysis.sanctuaryAnalysis?.[e.id]?.insights || []
-                  );
+        <AnimatePresence>
+          {showSanctuary && (
+            <motion.div
+              initial={{ height: 0 }}
+              animate={{ height: 'auto' }}
+              exit={{ height: 0 }}
+              className="overflow-hidden bg-card"
+            >
+              {sanctuaryZones.map((zone) => {
+                const zoneElements = sanctuaryElements.filter((e) => e.zone === zone.id);
 
-                  if (zoneInsights.length === 0) return null;
+                // Get insights for all elements in this zone
+                const elementsWithData = zoneElements.map((element) => ({
+                  ...element,
+                  insights: analysis.sanctuaryAnalysis?.[element.id]?.insights || [],
+                }));
 
-                  const isZoneExpanded = expandedZones.has(zone.id);
+                const zoneInsightCount = elementsWithData.reduce(
+                  (sum, e) => sum + e.insights.length, 0
+                );
 
-                  return (
-                    <div key={zone.id} className="border-t border-white/5">
-                      <button
-                        onClick={() => toggleZone(zone.id)}
-                        className="w-full flex items-center gap-2 p-3 hover:bg-white/5"
-                      >
-                        {isZoneExpanded ? (
-                          <ChevronDown className="w-3 h-3 text-muted-foreground" />
-                        ) : (
-                          <ChevronRight className="w-3 h-3 text-muted-foreground" />
-                        )}
-                        <span className="flex-1 text-left text-sm">{zone.name}</span>
+                // Show zone if showAllRooms is true or if it has insights
+                const showZone = showAllRooms || zoneInsightCount > 0;
+                if (!showZone) return null;
+
+                const isZoneExpanded = expandedZones.has(zone.id);
+
+                return (
+                  <div key={zone.id} className="border-t border-white/5">
+                    <button
+                      onClick={() => toggleZone(zone.id)}
+                      className="w-full flex items-center gap-2 p-3 hover:bg-white/5"
+                    >
+                      {isZoneExpanded ? (
+                        <ChevronDown className="w-3 h-3 text-purple-400" />
+                      ) : (
+                        <ChevronRight className="w-3 h-3 text-purple-400" />
+                      )}
+                      <span className="flex-1 text-left text-sm font-medium">{zone.name}</span>
+                      <span className="text-xs text-muted-foreground">
+                        {zoneElements.length} items
+                      </span>
+                      {zoneInsightCount > 0 && (
                         <span className="text-xs text-yellow-400">
-                          {zoneInsights.length} insights
+                          {zoneInsightCount} insights
                         </span>
-                      </button>
+                      )}
+                    </button>
 
-                      <AnimatePresence>
-                        {isZoneExpanded && (
-                          <motion.div
-                            initial={{ height: 0 }}
-                            animate={{ height: 'auto' }}
-                            exit={{ height: 0 }}
-                            className="overflow-hidden"
-                          >
-                            <div className="pl-8 pr-3 pb-3 space-y-2">
-                              {zoneElements.map((element) => {
-                                const elemInsights =
-                                  analysis.sanctuaryAnalysis?.[element.id]?.insights || [];
-                                if (elemInsights.length === 0) return null;
+                    <AnimatePresence>
+                      {isZoneExpanded && (
+                        <motion.div
+                          initial={{ height: 0 }}
+                          animate={{ height: 'auto' }}
+                          exit={{ height: 0 }}
+                          className="overflow-hidden"
+                        >
+                          <div className="pl-8 pr-3 pb-3 space-y-3">
+                            {elementsWithData.map((element) => {
+                              const hasInsights = element.insights.length > 0;
 
-                                return (
-                                  <div key={element.id} className="space-y-2">
-                                    <div className="text-xs font-semibold text-yellow-400">
-                                      {element.name}
-                                    </div>
-                                    {elemInsights.map((insight, i) => (
+                              // Show element if showAllRooms is true or if it has insights
+                              if (!showAllRooms && !hasInsights) return null;
+
+                              return (
+                                <div key={element.id} className="space-y-2">
+                                  <div className={`flex items-center gap-2 ${
+                                    hasInsights ? 'text-yellow-400' : 'text-muted-foreground/60'
+                                  }`}>
+                                    {hasInsights ? (
+                                      <Lightbulb className="w-3 h-3" />
+                                    ) : (
+                                      <div className="w-3 h-3 rounded-full border border-current" />
+                                    )}
+                                    <span className="text-xs font-semibold">{element.name}</span>
+                                    {hasInsights && (
+                                      <span className="text-xs">({element.insights.length})</span>
+                                    )}
+                                  </div>
+                                  {/* Christ connection */}
+                                  <p className="text-xs text-muted-foreground/80 italic ml-5">
+                                    Christ: {element.christConnection}
+                                  </p>
+                                  {/* Insights */}
+                                  {element.insights.map((insight, i) => (
+                                    <div className="ml-5" key={i}>
                                       <PrincipleItem
-                                        key={i}
                                         principle={insight}
                                         onMakeSeed={onMakeSeed}
                                       />
-                                    ))}
-                                  </div>
-                                );
-                              })}
-                            </div>
-                          </motion.div>
-                        )}
-                      </AnimatePresence>
-                    </div>
-                  );
-                })}
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </div>
-      )}
+                                    </div>
+                                  ))}
+                                </div>
+                              );
+                            })}
+                          </div>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </div>
+                );
+              })}
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
     </div>
   );
 }

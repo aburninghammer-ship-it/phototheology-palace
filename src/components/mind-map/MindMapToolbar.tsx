@@ -1,10 +1,12 @@
 import { useState } from 'react';
-import { Sparkles, Loader2, Trash2, FileText } from 'lucide-react';
+import { Sparkles, Loader2, Trash2, FileText, Bot, Building2, User, ArrowRight } from 'lucide-react';
 import MindMapModeSelector from './MindMapModeSelector';
 import type { AnalysisMode } from './types';
 
+export type GenerationMethod = 'jeeves' | 'manual';
+
 interface MindMapToolbarProps {
-  onGenerate: (text: string, mode: AnalysisMode) => void;
+  onGenerate: (text: string, mode: AnalysisMode, method: GenerationMethod) => void;
   isGenerating: boolean;
   onClear?: () => void;
   initialText?: string;
@@ -21,10 +23,11 @@ export default function MindMapToolbar({
   const [text, setText] = useState(initialText);
   const [mode, setMode] = useState<AnalysisMode>(initialMode);
   const [isExpanded, setIsExpanded] = useState(!initialText);
+  const [generationMethod, setGenerationMethod] = useState<GenerationMethod>('jeeves');
 
-  const handleGenerate = () => {
+  const handleGenerate = (method: GenerationMethod) => {
     if (text.trim()) {
-      onGenerate(text.trim(), mode);
+      onGenerate(text.trim(), mode, method);
       setIsExpanded(false);
     }
   };
@@ -40,8 +43,8 @@ export default function MindMapToolbar({
       {/* Header */}
       <div className="flex items-center justify-between mb-3">
         <div className="flex items-center gap-2">
-          <FileText className="w-5 h-5 text-primary" />
-          <h3 className="font-semibold text-foreground">Map to Palace</h3>
+          <Building2 className="w-5 h-5 text-primary" />
+          <h3 className="font-semibold text-foreground">Mind Map Palace</h3>
         </div>
 
         <div className="flex items-center gap-2">
@@ -84,44 +87,73 @@ export default function MindMapToolbar({
         </button>
       )}
 
-      {/* Actions */}
-      <div className="flex items-center gap-2">
-        <button
-          onClick={handleGenerate}
-          disabled={!text.trim() || isGenerating}
-          className={`
-            flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg
-            font-semibold text-sm transition-all duration-200
-            ${text.trim() && !isGenerating
-              ? 'bg-gradient-to-r from-primary to-accent text-white hover:opacity-90 shadow-lg shadow-primary/30'
-              : 'bg-muted text-muted-foreground cursor-not-allowed'
-            }
-          `}
-        >
-          {isGenerating ? (
-            <>
-              <Loader2 className="w-4 h-4 animate-spin" />
-              <span>Analyzing...</span>
-            </>
-          ) : (
-            <>
-              <Sparkles className="w-4 h-4" />
-              <span>Map to Palace</span>
-            </>
-          )}
-        </button>
-
-        {onClear && (
+      {/* Actions - Two Options */}
+      <div className="space-y-2">
+        {/* Generation method selection */}
+        <div className="flex items-center gap-2">
+          {/* Ask Jeeves Button */}
           <button
-            onClick={onClear}
-            disabled={isGenerating}
-            className="p-2.5 rounded-lg border border-white/20 text-muted-foreground
-                       hover:text-red-400 hover:border-red-400/50 transition-colors"
-            title="Clear map"
+            onClick={() => handleGenerate('jeeves')}
+            disabled={!text.trim() || isGenerating}
+            className={`
+              flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg
+              font-semibold text-sm transition-all duration-200
+              ${text.trim() && !isGenerating
+                ? 'bg-gradient-to-r from-primary to-accent text-white hover:opacity-90 shadow-lg shadow-primary/30'
+                : 'bg-muted text-muted-foreground cursor-not-allowed'
+              }
+            `}
           >
-            <Trash2 className="w-4 h-4" />
+            {isGenerating ? (
+              <>
+                <Loader2 className="w-4 h-4 animate-spin" />
+                <span>Jeeves analyzing...</span>
+              </>
+            ) : (
+              <>
+                <Bot className="w-4 h-4" />
+                <span>Ask Jeeves</span>
+                <Sparkles className="w-3 h-3 opacity-70" />
+              </>
+            )}
           </button>
-        )}
+
+          {/* Manual Study Button */}
+          <button
+            onClick={() => handleGenerate('manual')}
+            disabled={!text.trim() || isGenerating}
+            className={`
+              flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg
+              font-semibold text-sm transition-all duration-200 border
+              ${text.trim() && !isGenerating
+                ? 'bg-card border-white/20 text-foreground hover:bg-muted hover:border-white/30'
+                : 'bg-muted/50 text-muted-foreground border-white/10 cursor-not-allowed'
+              }
+            `}
+          >
+            <User className="w-4 h-4" />
+            <span>My Study</span>
+            <ArrowRight className="w-3 h-3 opacity-70" />
+          </button>
+
+          {onClear && (
+            <button
+              onClick={onClear}
+              disabled={isGenerating}
+              className="p-2.5 rounded-lg border border-white/20 text-muted-foreground
+                         hover:text-red-400 hover:border-red-400/50 transition-colors"
+              title="Clear map"
+            >
+              <Trash2 className="w-4 h-4" />
+            </button>
+          )}
+        </div>
+
+        {/* Helper text */}
+        <p className="text-xs text-muted-foreground text-center">
+          <span className="text-primary">Ask Jeeves</span> for AI-powered analysis across all 38+ rooms, or
+          <span className="text-foreground"> My Study</span> to explore manually
+        </p>
       </div>
     </div>
   );

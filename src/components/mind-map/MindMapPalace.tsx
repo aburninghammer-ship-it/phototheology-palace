@@ -1,12 +1,12 @@
 import { useState, useCallback, useEffect } from 'react';
 import { useMediaQuery } from '@/hooks/use-media-query';
 import MindMapCanvas from './MindMapCanvas';
-import MindMapToolbar from './MindMapToolbar';
+import MindMapToolbar, { type GenerationMethod } from './MindMapToolbar';
 import MindMapControls from './MindMapControls';
 import MindMapSidebar from './MindMapSidebar';
 import MindMapMobile from './MindMapMobile';
 import { useMindMapScaffold } from './hooks/useMindMapScaffold';
-import { useMindMapGeneration, generateMockAnalysis } from './hooks/useMindMapGeneration';
+import { useMindMapGeneration, generateMockAnalysis, generateEmptyScaffold } from './hooks/useMindMapGeneration';
 import { useMindMapStorage } from './hooks/useMindMapStorage';
 import type { AnalysisMode, AnyNodeData, MindMapFilters, ExplorationBreadcrumb } from './types';
 import { toast } from 'sonner';
@@ -41,6 +41,7 @@ export default function MindMapPalace({
   });
   const [breadcrumbs, setBreadcrumbs] = useState<ExplorationBreadcrumb[]>([]);
   const [currentAnalysis, setCurrentAnalysis] = useState<ReturnType<typeof generateMockAnalysis> | null>(null);
+  const [studyMethod, setStudyMethod] = useState<GenerationMethod>('jeeves');
 
   // Hooks
   const { nodes, edges, populateWithAnalysis, reset } = useMindMapScaffold(sourceText, mode);
@@ -48,9 +49,10 @@ export default function MindMapPalace({
   const { saveMap, isSaving } = useMindMapStorage();
 
   // Handle text generation
-  const handleGenerate = useCallback(async (text: string, selectedMode: AnalysisMode) => {
+  const handleGenerate = useCallback(async (text: string, selectedMode: AnalysisMode, method: GenerationMethod) => {
     setSourceText(text);
     setMode(selectedMode);
+    setStudyMethod(method);
     reset(text, selectedMode);
 
     // Update breadcrumbs
@@ -61,19 +63,27 @@ export default function MindMapPalace({
       { id: crumbId, mapId: crumbId, label: preview, sourcePreview: preview },
     ]);
 
-    // Generate analysis
-    const analysis = await generate(text, selectedMode);
-
-    if (analysis) {
-      setCurrentAnalysis(analysis);
-      populateWithAnalysis(analysis);
-      toast.success('Mind map generated successfully!');
+    if (method === 'manual') {
+      // Manual study mode - show all rooms as empty scaffold for user to explore
+      const emptyScaffold = generateEmptyScaffold();
+      setCurrentAnalysis(emptyScaffold);
+      populateWithAnalysis(emptyScaffold);
+      toast.success('Palace scaffold ready! Explore all rooms and add your own insights.');
     } else {
-      // Use mock analysis for development
-      const mockAnalysis = generateMockAnalysis(text, selectedMode);
-      setCurrentAnalysis(mockAnalysis);
-      populateWithAnalysis(mockAnalysis);
-      toast.info('Using preview analysis (edge function not available)');
+      // Jeeves AI mode - generate analysis
+      const analysis = await generate(text, selectedMode);
+
+      if (analysis) {
+        setCurrentAnalysis(analysis);
+        populateWithAnalysis(analysis);
+        toast.success('Jeeves has mapped your text to the Palace!');
+      } else {
+        // Use mock analysis for development
+        const mockAnalysis = generateMockAnalysis(text, selectedMode);
+        setCurrentAnalysis(mockAnalysis);
+        populateWithAnalysis(mockAnalysis);
+        toast.info('Using preview analysis (edge function not available)');
+      }
     }
   }, [reset, generate, populateWithAnalysis]);
 
@@ -158,6 +168,7 @@ export default function MindMapPalace({
           <MindMapMobile
             analysis={currentAnalysis}
             onMakeSeed={handleMakeSeed}
+            isManualMode={studyMethod === 'manual'}
           />
         </div>
       </div>

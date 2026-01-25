@@ -1,6 +1,7 @@
 import { useState, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import type { AnalysisMode, AIMapAnalysis, GenerationState, PrincipleData } from '../types';
+import { palaceFloors, sanctuaryElements } from '../constants';
 
 interface UseMindMapGenerationReturn {
   generate: (text: string, mode: AnalysisMode) => Promise<AIMapAnalysis | null>;
@@ -141,5 +142,41 @@ export function generateMockAnalysis(text: string, mode: AnalysisMode): AIMapAna
         description: 'The narrative arc points forward to Christ\'s redemptive work',
       },
     ],
+  };
+}
+
+// Generate empty scaffold showing ALL rooms for manual study
+export function generateEmptyScaffold(): AIMapAnalysis {
+  // Include all 8 floors
+  const relevantFloors = [1, 2, 3, 4, 5, 6, 7, 8];
+
+  // Create empty room analysis for ALL rooms across all floors
+  const roomAnalysis: AIMapAnalysis['roomAnalysis'] = {};
+
+  palaceFloors.forEach((floor) => {
+    floor.rooms.forEach((room) => {
+      roomAnalysis[room.id] = {
+        applicable: true, // Show all rooms as available for exploration
+        principles: [], // Empty - user will add their own insights
+      };
+    });
+  });
+
+  // Create empty sanctuary analysis for ALL elements
+  const sanctuaryAnalysis: AIMapAnalysis['sanctuaryAnalysis'] = {};
+
+  sanctuaryElements.forEach((element) => {
+    sanctuaryAnalysis[element.id] = {
+      applicable: true, // Show all sanctuary elements
+      insights: [], // Empty - user will add their own insights
+    };
+  });
+
+  return {
+    overallTheme: 'Manual study mode - explore all 38+ rooms and add your own insights',
+    relevantFloors,
+    roomAnalysis,
+    sanctuaryAnalysis,
+    crossConnections: [],
   };
 }
