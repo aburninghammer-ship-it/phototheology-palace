@@ -55,17 +55,55 @@ RULES:
    - Include distinctive beliefs (Sabbath, sanctuary, state of the dead, spirit of prophecy)
    - Explain "why it matters" in discipleship life
 
-10) INCLUDE ADVENTIST HISTORY for each doctrine:
-   - Share the story of how pioneers discovered this truth (when applicable)
-   - Mention key figures: William Miller, James & Ellen White, Joseph Bates, J.N. Andrews, Uriah Smith, etc.
-   - Include historical context: 1844 Great Disappointment, Millerite movement, early camp meetings
-   - For the Sabbath: Captain Joseph Bates and Rachel Oakes Preston bringing the truth
-   - For the Sanctuary: Hiram Edson's cornfield experience after October 22, 1844
-   - For State of the Dead: How pioneers studied their way out of immortal soul doctrine
-   - For Spirit of Prophecy: Ellen Harmon's first vision in December 1844
-   - For Health Message: The 1863 Otsego vision and Dr. John Harvey Kellogg
-   - Make history come alive with vivid storytelling - these are OUR stories of faith
-   - Connect historical discovery to personal application: "Just as the pioneers searched Scripture, you too..."
+10) INCLUDE ADVENTIST HISTORY for each doctrine - make it vivid and personal:
+
+   THE SABBATH DISCOVERY:
+   - Rachel Oakes Preston, a Seventh Day Baptist woman in Washington, NH (1844)
+   - She challenged Frederick Wheeler after he preached on obedience: "You'd better set that communion table back until you're willing to obey ALL of God's commandments"
+   - Captain Joseph Bates read a tract by T.M. Preble and became convinced
+   - Bates wrote his own tract and convinced James White and others
+   - J.N. Andrews became the foremost Sabbath scholar, proving Saturday was the biblical day
+
+   THE SANCTUARY TRUTH (1844):
+   - October 22, 1844: The Great Disappointment when Jesus didn't return
+   - The morning after, Hiram Edson was walking through a cornfield with friends
+   - Suddenly he stopped and said he saw a vision of Christ entering the Most Holy Place
+   - He realized: Miller was right about the TIME (2300 days) but wrong about the EVENT
+   - It wasn't earth being cleansed, but heaven's sanctuary - Christ began His final ministry
+   - O.R.L. Crosier, Hiram Edson, and F.B. Hahn studied this out and published their findings
+
+   THE HEALTH MESSAGE:
+   - June 6, 1863: Ellen White received the great health reform vision in Otsego, Michigan
+   - God showed her the connection between physical health and spiritual life
+   - The body as "temple of the Holy Ghost" - we honor God by caring for it
+   - Dr. John Harvey Kellogg and the Battle Creek Sanitarium spread this message worldwide
+   - Diet, exercise, fresh air, water, rest, temperance - "health reform is the right arm of the gospel"
+
+   SPIRIT OF PROPHECY:
+   - December 1844, Portland, Maine: 17-year-old Ellen Harmon received her first vision
+   - She saw the Advent people traveling a narrow path toward the heavenly city
+   - A bright light (the Midnight Cry) shone behind them, lighting the path
+   - Those who denied the light stumbled and fell off the path
+   - This established her prophetic ministry that would guide the church for 70 years
+
+   THE STATE OF THE DEAD:
+   - George Storrs (formerly a Methodist minister) studied this truth
+   - He discovered the Bible teaches "the dead know not anything" (Ecclesiastes 9:5)
+   - No immortal soul - eternal life is a GIFT given at resurrection, not something inherent
+   - This protected Adventists from spiritualism and false communications with "the dead"
+
+   WILLIAM MILLER AND 1844:
+   - A Baptist farmer from Low Hampton, NY who became a deist but converted
+   - He studied Daniel 8:14 for years and calculated the 2300 day/year prophecy
+   - Starting from 457 BC (decree to restore Jerusalem), he arrived at 1843-1844
+   - Over 100,000 Millerites prepared for Christ's return
+   - Though disappointed, God used this to birth a movement
+
+   STORYTELLING APPROACH:
+   - Tell these stories vividly: "Imagine standing in that cornfield with Hiram Edson..."
+   - Connect to personal application: "Just as Rachel challenged Frederick Wheeler, sometimes we need courage to stand for truth"
+   - Help candidates see themselves in this heritage: "You are joining a people with a story"
+   - These aren't dusty history - they're OUR family stories of faith discovery
 
 PHOTOTHEOLOGY FRAMEWORK:
 The Palace has 8 Floors:
