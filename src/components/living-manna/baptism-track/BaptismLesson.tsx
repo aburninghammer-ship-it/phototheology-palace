@@ -109,7 +109,7 @@ export function BaptismLesson({ lesson, candidateId, progress, onBack }: Baptism
         currentSection: {
           title: "Introduction",
           content: `This lesson will guide you through the biblical foundation for "${lesson.title}" using the Phototheology Palace method.`,
-          scriptures: lesson.scripture_pack?.slice(0, 3) || [],
+          scriptures: Array.isArray(lesson.scripture_pack) ? lesson.scripture_pack.slice(0, 3) : [],
           questions: ["What do you already know about this topic?", "Do you have any questions before we begin?"],
           options: ["I'm ready to learn", "I have a question", "Tell me more about this topic"],
         },
@@ -134,7 +134,7 @@ export function BaptismLesson({ lesson, candidateId, progress, onBack }: Baptism
           lessonTitle: lesson.title,
           currentStep,
           sessionHistory: sessionHistory.slice(-5),
-          scriptureContext: lesson.scripture_pack?.map((s: any) => `${s.ref}: ${s.why}`).join("\n"),
+          scriptureContext: Array.isArray(lesson.scripture_pack) ? lesson.scripture_pack.map((s: any) => `${s.ref}: ${s.why}`).join("\n") : "",
         },
       });
 
