@@ -1,14 +1,18 @@
-import { memo } from 'react';
+import { memo, FC } from 'react';
 import { Handle, Position, NodeProps } from 'reactflow';
 import { ChevronDown, ChevronRight, Sprout, Loader2 } from 'lucide-react';
 import * as Icons from 'lucide-react';
 import type { RoomNodeData } from '../types';
 
+type IconType = FC<{ className?: string }>;
+
 const RoomNode = memo(({ data, selected }: NodeProps<RoomNodeData>) => {
   const hasInsights = data.principles && data.principles.length > 0;
 
-  // Dynamic icon lookup
-  const IconComponent = data.icon ? (Icons as Record<string, React.FC<{ className?: string }>>)[data.icon] : null;
+  // Dynamic icon lookup - safely cast the icon component
+  const IconComponent = data.icon && data.icon in Icons
+    ? (Icons[data.icon as keyof typeof Icons] as unknown as IconType)
+    : null;
 
   return (
     <div

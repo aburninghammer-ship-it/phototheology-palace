@@ -34,6 +34,8 @@ export interface FloorNodeData extends MindMapNodeData {
   roomCount: number;
   matchCount?: number;
   relevanceScore?: number;
+  principles?: PrincipleData[];
+  insights?: PrincipleData[];
 }
 
 // Room Node
@@ -85,6 +87,7 @@ export interface PrincipleNodeData extends MindMapNodeData {
   visualHook: string;
   confidence: number;
   scriptures?: string[];
+  relevanceScore?: number;
 }
 
 // Principle Data (used within room/element nodes)
@@ -168,6 +171,7 @@ export interface MindMapData {
 
 // Exploration History (for "Make Seed" feature)
 export interface ExplorationBreadcrumb {
+  id: string;
   mapId: string;
   label: string;
   sourcePreview: string;
