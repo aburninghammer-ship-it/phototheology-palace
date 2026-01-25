@@ -7,42 +7,31 @@ import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Textarea } from "@/components/ui/textarea";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Label } from "@/components/ui/label";
 import {
   Loader2, ArrowLeft, ArrowRight, BookOpen, Brain, Send,
   Sparkles, CheckCircle2, AlertTriangle, ChevronRight,
-  MessageSquare, Target, Lightbulb, History
+  MessageSquare, Target, Lightbulb, History, Award,
+  HelpCircle, BookMarked, Heart, Pencil
 } from "lucide-react";
 import { toast } from "sonner";
 
 // Helper to safely parse JSON fields that might be strings
 const parseJsonField = (field: any): any[] => {
-  console.log('parseJsonField input:', typeof field, field);
-
-  if (!field) {
-    console.log('parseJsonField: field is falsy');
-    return [];
-  }
-  if (Array.isArray(field)) {
-    console.log('parseJsonField: field is already an array with', field.length, 'items');
-    return field;
-  }
+  if (!field) return [];
+  if (Array.isArray(field)) return field;
   if (typeof field === 'string') {
     try {
       const parsed = JSON.parse(field);
-      console.log('parseJsonField: parsed string to', typeof parsed, Array.isArray(parsed) ? parsed.length + ' items' : '');
       return Array.isArray(parsed) ? parsed : [];
-    } catch (e) {
-      console.error('parseJsonField: failed to parse string', e);
+    } catch {
       return [];
     }
   }
-  // Handle case where it might be an object with numeric keys (rare)
   if (typeof field === 'object') {
-    const values = Object.values(field);
-    console.log('parseJsonField: converted object to array with', values.length, 'items');
-    return values;
+    return Object.values(field);
   }
-  console.log('parseJsonField: returning empty array for unknown type');
   return [];
 };
 
@@ -108,20 +97,17 @@ interface JeevesGuidance {
     pastoralFlags: string[];
     nextStep: string;
   };
-  readinessCheck?: {
-    knowledge: string;
-    heart: string;
-    practice: string;
-  };
 }
 
 // Lesson sections for structured flow
-type LessonSection = 'welcome' | 'scripture' | 'teaching' | 'reflection' | 'summary';
+type LessonSection = 'welcome' | 'scripture' | 'teaching' | 'history' | 'quiz' | 'reflection' | 'summary';
 
 const SECTION_LABELS: Record<LessonSection, string> = {
   welcome: 'Welcome',
   scripture: 'Scripture Foundation',
   teaching: 'Teaching & Discussion',
+  history: 'Adventist Heritage',
+  quiz: 'Knowledge Check',
   reflection: 'Personal Reflection',
   summary: 'Summary & Commitment',
 };
@@ -136,17 +122,22 @@ export function BaptismLesson({ lesson, candidateId, progress, onBack }: Baptism
   const [attemptId, setAttemptId] = useState<string | null>(null);
   const [verseTexts, setVerseTexts] = useState<Record<string, string>>({});
   const [loadingVerses, setLoadingVerses] = useState(false);
+  const [quizAnswers, setQuizAnswers] = useState<Record<number, string>>({});
+  const [quizSubmitted, setQuizSubmitted] = useState(false);
+  const [teachingContent, setTeachingContent] = useState<string | null>(null);
+  const [historyContent, setHistoryContent] = useState<string | null>(null);
+  const [loadingContent, setLoadingContent] = useState(false);
 
-  // Parse scripture_pack - memoize to avoid re-parsing on every render
+  // Parse scripture_pack
   const scriptures = useMemo(() => {
     const parsed = parseJsonField(lesson.scripture_pack);
-    console.log('Parsed scriptures:', parsed, 'from:', lesson.scripture_pack);
+    console.log('Parsed scriptures:', parsed);
     return parsed;
   }, [lesson.scripture_pack]);
 
   const ptPath = useMemo(() => parseJsonObject(lesson.pt_map), [lesson.pt_map]);
 
-  const sectionOrder: LessonSection[] = ['welcome', 'scripture', 'teaching', 'reflection', 'summary'];
+  const sectionOrder: LessonSection[] = ['welcome', 'scripture', 'teaching', 'history', 'quiz', 'reflection', 'summary'];
   const currentSectionIndex = sectionOrder.indexOf(currentSection);
   const progressPercent = Math.round(((currentSectionIndex + 1) / sectionOrder.length) * 100);
 
@@ -174,27 +165,27 @@ export function BaptismLesson({ lesson, candidateId, progress, onBack }: Baptism
   useEffect(() => {
     const fetchVerses = async () => {
       if (!scriptures || scriptures.length === 0) {
-        console.log('No scriptures to fetch');
         setLoadingVerses(false);
         return;
       }
 
-      console.log('Fetching verses for:', scriptures.slice(0, 5).map(s => s.ref));
       setLoadingVerses(true);
-
       const texts: Record<string, string> = {};
-      for (const scripture of scriptures.slice(0, 5)) {
-        if (!scripture.ref) continue;
+
+      for (const scripture of scriptures.slice(0, 7)) {
+        const ref = scripture?.ref || scripture?.reference || '';
+        if (!ref) continue;
+
         try {
           const response = await fetch(
-            `https://bible-api.com/${encodeURIComponent(scripture.ref)}?translation=kjv`
+            `https://bible-api.com/${encodeURIComponent(ref)}?translation=kjv`
           );
           if (response.ok) {
             const data = await response.json();
-            texts[scripture.ref] = data.text?.trim() || '';
+            texts[ref] = data.text?.trim() || '';
           }
         } catch (e) {
-          console.error('Error fetching verse:', scripture.ref, e);
+          console.error('Error fetching verse:', ref, e);
         }
       }
       setVerseTexts(texts);
@@ -203,8 +194,70 @@ export function BaptismLesson({ lesson, candidateId, progress, onBack }: Baptism
     fetchVerses();
   }, [scriptures]);
 
+  // Load teaching content from Jeeves when entering teaching section
+  useEffect(() => {
+    if (currentSection === 'teaching' && !teachingContent && !loadingContent) {
+      loadTeachingContent();
+    }
+    if (currentSection === 'history' && !historyContent && !loadingContent) {
+      loadHistoryContent();
+    }
+  }, [currentSection]);
+
+  const loadTeachingContent = async () => {
+    setLoadingContent(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("baptism-track-guide", {
+        body: {
+          notes: `Please teach me about "${lesson.title}" in detail. Give me a comprehensive explanation of this doctrine including: 1) The biblical foundation with key Scripture references explained, 2) What this belief means in practical terms, 3) Why this doctrine matters for salvation and daily Christian living, 4) How this connects to other Adventist beliefs, 5) Common misconceptions and how to address them. Use Scripture extensively (KJV).`,
+          lessonId: lesson.id,
+          lessonTitle: lesson.title,
+          lessonPhase: 'teaching',
+          mode: 'deep_dive',
+          scriptureContext: scriptures.map((s: any) => `${s.ref || s.reference}: ${s.why || s.meaning}`).join("\n"),
+        },
+      });
+
+      if (data?.guidance?.overallResponse) {
+        setTeachingContent(data.guidance.overallResponse);
+        if (data.guidance.memoryAnchors) {
+          setGuidance(prev => ({ ...prev, memoryAnchors: data.guidance.memoryAnchors }));
+        }
+      }
+    } catch (error) {
+      console.error('Error loading teaching content:', error);
+      setTeachingContent(`# ${lesson.title}\n\n${lesson.description}\n\nClick "Ask Jeeves" below to explore this topic with your AI guide.`);
+    } finally {
+      setLoadingContent(false);
+    }
+  };
+
+  const loadHistoryContent = async () => {
+    setLoadingContent(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("baptism-track-guide", {
+        body: {
+          notes: `Tell me the complete Adventist history behind the doctrine of "${lesson.title}". Include: 1) Who were the key people involved in discovering or developing this belief? 2) What were the specific circumstances, dates, and locations? 3) Any visions or significant events? 4) How did this truth spread through the early Adventist movement? 5) What challenges or controversies surrounded this belief? Make it vivid and personal - help me feel like I'm there with the pioneers.`,
+          lessonId: lesson.id,
+          lessonTitle: lesson.title,
+          lessonPhase: 'history',
+          mode: 'deep_dive',
+        },
+      });
+
+      if (data?.guidance?.overallResponse) {
+        setHistoryContent(data.guidance.overallResponse);
+      }
+    } catch (error) {
+      console.error('Error loading history content:', error);
+      setHistoryContent(`The Adventist understanding of "${lesson.title}" developed through careful Bible study and the guidance of the Holy Spirit. Click "Learn More" to explore this history with Jeeves.`);
+    } finally {
+      setLoadingContent(false);
+    }
+  };
+
   // Talk to Jeeves
-  const askJeeves = useCallback(async (message: string, context?: string) => {
+  const askJeeves = useCallback(async (message: string) => {
     if (message.trim().length < 3 || isAnalyzing) return;
 
     setIsAnalyzing(true);
@@ -218,8 +271,9 @@ export function BaptismLesson({ lesson, candidateId, progress, onBack }: Baptism
           lessonTitle: lesson.title,
           lessonPhase: currentSection,
           currentStep: `${currentSection}_${conversationHistory.length}`,
+          mode: 'deep_dive',
           sessionHistory: conversationHistory.slice(-5).map(c => `${c.role}: ${c.content}`),
-          scriptureContext: context || scriptures.map((s: any) => `${s.ref}: ${s.why}`).join("\n"),
+          scriptureContext: scriptures.map((s: any) => `${s.ref || s.reference}: ${s.why || s.meaning}`).join("\n"),
         },
       });
 
@@ -228,11 +282,6 @@ export function BaptismLesson({ lesson, candidateId, progress, onBack }: Baptism
       if (data.guidance) {
         setGuidance(data.guidance);
         setConversationHistory(prev => [...prev, { role: 'jeeves', content: data.guidance.overallResponse }]);
-
-        // Update progress
-        if (data.guidance.progressUpdate) {
-          await updateProgress(data.guidance.progressUpdate);
-        }
       }
     } catch (error: any) {
       console.error("Jeeves error:", error);
@@ -243,28 +292,22 @@ export function BaptismLesson({ lesson, candidateId, progress, onBack }: Baptism
   }, [lesson, currentSection, conversationHistory, isAnalyzing, scriptures]);
 
   // Update progress in database
-  const updateProgress = async (progressData: any) => {
+  const updateProgress = async (percentComplete: number) => {
     const { error } = await supabase
       .from("baptism_candidate_progress")
       .upsert({
         candidate_id: candidateId,
         lesson_id: lesson.id,
-        state: progressData.percentComplete >= 100 ? "completed" : "in_progress",
-        percent_complete: progressData.percentComplete || progressPercent,
+        state: percentComplete >= 100 ? "completed" : "in_progress",
+        percent_complete: percentComplete,
         last_step: currentSection,
-        quiz_best_score: progressData.quiz?.score,
-        confidence: progressData.confidence,
-        pastoral_flags: progressData.pastoralFlags || [],
-        completion_date: progressData.percentComplete >= 100 ? new Date().toISOString() : null,
+        completion_date: percentComplete >= 100 ? new Date().toISOString() : null,
         last_active_at: new Date().toISOString(),
       }, {
         onConflict: "candidate_id,lesson_id",
       });
 
-    if (error) {
-      console.error("Progress update error:", error);
-    }
-
+    if (error) console.error("Progress update error:", error);
     queryClient.invalidateQueries({ queryKey: ["baptism-progress"] });
   };
 
@@ -273,8 +316,7 @@ export function BaptismLesson({ lesson, candidateId, progress, onBack }: Baptism
     const nextIndex = currentSectionIndex + 1;
     if (nextIndex < sectionOrder.length) {
       setCurrentSection(sectionOrder[nextIndex]);
-      setGuidance(null);
-      setConversationHistory([]);
+      updateProgress(progressPercent);
     }
   };
 
@@ -282,8 +324,6 @@ export function BaptismLesson({ lesson, candidateId, progress, onBack }: Baptism
     const prevIndex = currentSectionIndex - 1;
     if (prevIndex >= 0) {
       setCurrentSection(sectionOrder[prevIndex]);
-      setGuidance(null);
-      setConversationHistory([]);
     }
   };
 
@@ -297,12 +337,61 @@ export function BaptismLesson({ lesson, candidateId, progress, onBack }: Baptism
     setUserResponse("");
   };
 
+  // Quiz questions (generated based on lesson)
+  const quizQuestions = useMemo(() => [
+    {
+      question: `What is the main biblical foundation for "${lesson.title}"?`,
+      options: [
+        scriptures[0]?.ref || "Genesis 1:1",
+        "A tradition passed down by the church",
+        "Human reasoning and philosophy",
+        "Cultural customs"
+      ],
+      correct: 0
+    },
+    {
+      question: "Why is this doctrine important for Christians today?",
+      options: [
+        "It's just historical information",
+        "It helps us understand God's character and plan",
+        "It's only for theologians",
+        "It doesn't really matter"
+      ],
+      correct: 1
+    },
+    {
+      question: "How did early Adventists come to understand this truth?",
+      options: [
+        "They copied from other churches",
+        "Through careful Bible study and prayer",
+        "It was revealed in dreams only",
+        "They made it up"
+      ],
+      correct: 1
+    }
+  ], [lesson.title, scriptures]);
+
+  const handleQuizSubmit = () => {
+    setQuizSubmitted(true);
+    const correct = quizQuestions.filter((q, i) => parseInt(quizAnswers[i]) === q.correct).length;
+    const score = Math.round((correct / quizQuestions.length) * 100);
+    if (score >= 70) {
+      toast.success(`Great job! You scored ${score}%`);
+    } else {
+      toast.info(`You scored ${score}%. Review the teaching section to improve.`);
+    }
+  };
+
   // Complete lesson
   const completeLesson = async () => {
-    await updateProgress({ percentComplete: 100 });
+    await updateProgress(100);
     toast.success("Lesson completed! Great work!");
     onBack();
   };
+
+  // Get scripture reference safely
+  const getRef = (s: any) => s?.ref || s?.reference || 'Scripture';
+  const getWhy = (s: any) => s?.why || s?.meaning || s?.explanation || '';
 
   return (
     <div className="space-y-4">
@@ -328,7 +417,7 @@ export function BaptismLesson({ lesson, candidateId, progress, onBack }: Baptism
             </div>
           </div>
           {/* Section Progress */}
-          <div className="flex items-center gap-2 mt-4">
+          <div className="flex items-center gap-1 mt-4">
             {sectionOrder.map((section, idx) => (
               <div
                 key={section}
@@ -347,8 +436,8 @@ export function BaptismLesson({ lesson, candidateId, progress, onBack }: Baptism
         </CardHeader>
       </Card>
 
-      {/* Main Content - Changes based on section */}
-      <Card variant="glass" className="min-h-[500px]">
+      {/* Main Content */}
+      <Card variant="glass" className="min-h-[550px]">
         <CardContent className="p-6">
           {/* WELCOME SECTION */}
           {currentSection === 'welcome' && (
@@ -379,23 +468,27 @@ export function BaptismLesson({ lesson, candidateId, progress, onBack }: Baptism
 
               {/* What You'll Learn */}
               <div className="max-w-lg mx-auto space-y-3">
-                <h3 className="font-medium text-center">In this lesson, you will:</h3>
+                <h3 className="font-medium text-center">In this comprehensive lesson, you will:</h3>
                 <div className="grid gap-2">
                   <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/50">
                     <BookOpen className="h-5 w-5 text-primary" />
-                    <span className="text-sm">Study key Scripture passages</span>
+                    <span className="text-sm">Study 7+ key Scripture passages in depth</span>
                   </div>
                   <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/50">
                     <Lightbulb className="h-5 w-5 text-amber-500" />
-                    <span className="text-sm">Understand the biblical teaching</span>
+                    <span className="text-sm">Receive detailed teaching on this doctrine</span>
                   </div>
                   <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/50">
                     <History className="h-5 w-5 text-blue-500" />
-                    <span className="text-sm">Learn the Adventist heritage</span>
+                    <span className="text-sm">Learn how Adventist pioneers discovered this truth</span>
                   </div>
                   <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/50">
-                    <MessageSquare className="h-5 w-5 text-green-500" />
-                    <span className="text-sm">Reflect and ask questions with Jeeves</span>
+                    <HelpCircle className="h-5 w-5 text-purple-500" />
+                    <span className="text-sm">Test your knowledge with a quiz</span>
+                  </div>
+                  <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/50">
+                    <Heart className="h-5 w-5 text-red-500" />
+                    <span className="text-sm">Apply this truth to your life</span>
                   </div>
                 </div>
               </div>
@@ -412,15 +505,31 @@ export function BaptismLesson({ lesson, candidateId, progress, onBack }: Baptism
           {/* SCRIPTURE SECTION */}
           {currentSection === 'scripture' && (
             <div className="space-y-6">
-              <div className="text-center mb-6">
+              <div className="text-center mb-4">
                 <h2 className="text-xl font-bold flex items-center justify-center gap-2">
                   <BookOpen className="h-5 w-5 text-primary" />
                   Scripture Foundation
                 </h2>
-                <p className="text-muted-foreground">Read these key passages that form the biblical basis for this belief</p>
+                <p className="text-muted-foreground">Read and meditate on these key passages</p>
               </div>
 
-              <ScrollArea className="h-[350px] pr-4">
+              {/* Memory Verse */}
+              {scriptures.length > 0 && (
+                <div className="max-w-2xl mx-auto p-4 rounded-lg bg-primary/10 border border-primary/30 mb-4">
+                  <div className="flex items-center gap-2 text-sm font-medium text-primary mb-2">
+                    <BookMarked className="h-4 w-4" />
+                    Memory Verse
+                  </div>
+                  <p className="font-medium text-lg">{getRef(scriptures[0])}</p>
+                  {verseTexts[getRef(scriptures[0])] && (
+                    <blockquote className="mt-2 text-sm italic border-l-2 border-primary pl-3">
+                      "{verseTexts[getRef(scriptures[0])]}"
+                    </blockquote>
+                  )}
+                </div>
+              )}
+
+              <ScrollArea className="h-[380px] pr-4">
                 <div className="space-y-4">
                   {loadingVerses ? (
                     <div className="flex items-center justify-center py-8">
@@ -431,29 +540,32 @@ export function BaptismLesson({ lesson, candidateId, progress, onBack }: Baptism
                     <div className="text-center py-8 text-muted-foreground">
                       <BookOpen className="h-12 w-12 mx-auto mb-3 opacity-30" />
                       <p>Scripture references are loading...</p>
-                      <p className="text-xs mt-2">If this persists, the lesson data may need to be reloaded.</p>
                     </div>
                   ) : (
-                    scriptures.slice(0, 5).map((scripture: any, idx: number) => (
+                    scriptures.slice(0, 7).map((scripture: any, idx: number) => (
                       <Card key={idx} className="border-l-4 border-l-primary">
                         <CardContent className="p-4">
                           <div className="flex items-start justify-between mb-2">
                             <Badge variant="outline" className="text-primary font-medium">
-                              {scripture.ref}
+                              {getRef(scripture)}
                             </Badge>
                             <span className="text-xs text-muted-foreground">KJV</span>
                           </div>
-                          {verseTexts[scripture.ref] ? (
+                          {verseTexts[getRef(scripture)] ? (
                             <blockquote className="text-sm italic border-l-2 border-muted pl-3 my-2 text-foreground/90">
-                              "{verseTexts[scripture.ref]}"
+                              "{verseTexts[getRef(scripture)]}"
                             </blockquote>
                           ) : (
-                            <p className="text-sm text-muted-foreground italic">Loading verse text...</p>
+                            <p className="text-sm text-muted-foreground italic">
+                              Loading verse text...
+                            </p>
                           )}
-                          <div className="flex items-start gap-2 mt-3 p-2 rounded bg-amber-500/10">
-                            <Lightbulb className="h-4 w-4 text-amber-500 mt-0.5 shrink-0" />
-                            <p className="text-xs text-muted-foreground">{scripture.why}</p>
-                          </div>
+                          {getWhy(scripture) && (
+                            <div className="flex items-start gap-2 mt-3 p-2 rounded bg-amber-500/10">
+                              <Lightbulb className="h-4 w-4 text-amber-500 mt-0.5 shrink-0" />
+                              <p className="text-xs text-muted-foreground">{getWhy(scripture)}</p>
+                            </div>
+                          )}
                         </CardContent>
                       </Card>
                     ))
@@ -474,88 +586,64 @@ export function BaptismLesson({ lesson, candidateId, progress, onBack }: Baptism
             </div>
           )}
 
-          {/* TEACHING SECTION - Interactive with Jeeves */}
+          {/* TEACHING SECTION */}
           {currentSection === 'teaching' && (
-            <div className="grid md:grid-cols-2 gap-6">
-              {/* Left: Chat with Jeeves */}
-              <div className="space-y-4">
-                <div className="flex items-center gap-2">
-                  <Brain className="h-5 w-5 text-violet-500" />
-                  <h3 className="font-medium">Learn with Jeeves</h3>
-                </div>
-                <p className="text-sm text-muted-foreground">
-                  Ask questions, explore the topic, or click a prompt below to dive deeper.
-                </p>
+            <div className="space-y-6">
+              <div className="text-center mb-4">
+                <h2 className="text-xl font-bold flex items-center justify-center gap-2">
+                  <Lightbulb className="h-5 w-5 text-amber-500" />
+                  Understanding {lesson.title}
+                </h2>
+                <p className="text-muted-foreground">Deep dive into this fundamental belief</p>
+              </div>
 
-                {/* Conversation History */}
-                <ScrollArea className="h-[250px] border rounded-lg p-3 bg-muted/30">
-                  {conversationHistory.length === 0 ? (
-                    <div className="text-center py-8 text-muted-foreground text-sm">
-                      Start a conversation with Jeeves about "{lesson.title}"
+              {loadingContent ? (
+                <div className="flex flex-col items-center justify-center py-12">
+                  <Loader2 className="h-8 w-8 animate-spin text-primary mb-4" />
+                  <p className="text-muted-foreground">Preparing your lesson content...</p>
+                </div>
+              ) : (
+                <ScrollArea className="h-[350px] pr-4">
+                  <div className="prose prose-sm max-w-none dark:prose-invert">
+                    <div className="whitespace-pre-wrap text-sm leading-relaxed">
+                      {teachingContent || lesson.description}
                     </div>
-                  ) : (
-                    <div className="space-y-3">
+                  </div>
+                </ScrollArea>
+              )}
+
+              {/* Chat with Jeeves */}
+              <div className="border-t pt-4 mt-4">
+                <div className="flex items-center gap-2 mb-3">
+                  <Brain className="h-5 w-5 text-violet-500" />
+                  <h3 className="font-medium">Ask Jeeves</h3>
+                  <span className="text-xs text-muted-foreground">Have questions? Ask your AI guide.</span>
+                </div>
+
+                {conversationHistory.length > 0 && (
+                  <ScrollArea className="h-[150px] border rounded-lg p-3 bg-muted/30 mb-3">
+                    <div className="space-y-2">
                       {conversationHistory.map((msg, idx) => (
                         <div
                           key={idx}
-                          className={`p-3 rounded-lg text-sm ${
-                            msg.role === 'user'
-                              ? 'bg-primary/10 ml-8'
-                              : 'bg-violet-500/10 mr-8'
+                          className={`p-2 rounded-lg text-sm ${
+                            msg.role === 'user' ? 'bg-primary/10 ml-8' : 'bg-violet-500/10 mr-8'
                           }`}
                         >
-                          <div className="font-medium text-xs mb-1 text-muted-foreground">
-                            {msg.role === 'user' ? 'You' : 'Jeeves'}
-                          </div>
+                          <span className="text-xs text-muted-foreground">{msg.role === 'user' ? 'You' : 'Jeeves'}:</span>
                           <p className="whitespace-pre-wrap">{msg.content}</p>
                         </div>
                       ))}
-                      {isAnalyzing && (
-                        <div className="flex items-center gap-2 p-3 text-sm text-muted-foreground">
-                          <Loader2 className="h-4 w-4 animate-spin" />
-                          Jeeves is thinking...
-                        </div>
-                      )}
                     </div>
-                  )}
-                </ScrollArea>
+                  </ScrollArea>
+                )}
 
-                {/* Quick Prompts */}
-                <div className="flex flex-wrap gap-2">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => askJeeves("Teach me the main points of this doctrine")}
-                    disabled={isAnalyzing}
-                  >
-                    Teach me
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => askJeeves("Tell me the Adventist history behind this belief")}
-                    disabled={isAnalyzing}
-                  >
-                    <History className="h-3 w-3 mr-1" />
-                    History
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => askJeeves("What are common questions or objections about this?")}
-                    disabled={isAnalyzing}
-                  >
-                    Questions
-                  </Button>
-                </div>
-
-                {/* Input */}
                 <div className="flex gap-2">
                   <Textarea
-                    placeholder="Type your question or thought..."
+                    placeholder="Ask a question about this doctrine..."
                     value={userResponse}
                     onChange={(e) => setUserResponse(e.target.value)}
-                    className="min-h-[60px] resize-none"
+                    className="min-h-[50px] resize-none"
                     onKeyDown={(e) => {
                       if (e.key === "Enter" && !e.shiftKey) {
                         e.preventDefault();
@@ -564,83 +652,125 @@ export function BaptismLesson({ lesson, candidateId, progress, onBack }: Baptism
                     }}
                   />
                   <Button onClick={handleSubmit} disabled={isAnalyzing || userResponse.trim().length < 3}>
-                    <Send className="h-4 w-4" />
+                    {isAnalyzing ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
                   </Button>
                 </div>
               </div>
 
-              {/* Right: Key Points & Memory Anchors */}
-              <div className="space-y-4">
-                <div className="p-4 rounded-lg bg-muted/50">
-                  <h4 className="font-medium mb-3 flex items-center gap-2">
-                    <Target className="h-4 w-4 text-primary" />
-                    Key Points to Understand
-                  </h4>
-                  <ul className="space-y-2 text-sm">
-                    <li className="flex items-start gap-2">
-                      <CheckCircle2 className="h-4 w-4 text-green-500 mt-0.5 shrink-0" />
-                      <span>What the Bible teaches about this topic</span>
-                    </li>
-                    <li className="flex items-start gap-2">
-                      <CheckCircle2 className="h-4 w-4 text-green-500 mt-0.5 shrink-0" />
-                      <span>Why this belief matters for your walk with Christ</span>
-                    </li>
-                    <li className="flex items-start gap-2">
-                      <CheckCircle2 className="h-4 w-4 text-green-500 mt-0.5 shrink-0" />
-                      <span>How Adventists came to understand this truth</span>
-                    </li>
-                  </ul>
-                </div>
-
-                {guidance?.memoryAnchors && guidance.memoryAnchors.length > 0 && (
-                  <div className="p-4 rounded-lg bg-amber-500/10 border border-amber-500/20">
-                    <h4 className="font-medium mb-2 flex items-center gap-2 text-amber-700">
-                      <Sparkles className="h-4 w-4" />
-                      Memory Anchors
-                    </h4>
-                    <ul className="space-y-1 text-sm">
-                      {guidance.memoryAnchors.map((anchor, idx) => (
-                        <li key={idx} className="flex items-center gap-2">
-                          <span className="text-amber-500">•</span>
-                          {anchor}
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
-
-                {guidance?.ptPath && (
-                  <div className="p-4 rounded-lg bg-violet-500/10 border border-violet-500/20">
-                    <h4 className="font-medium mb-2 flex items-center gap-2 text-violet-700">
-                      <Sparkles className="h-4 w-4" />
-                      PT Palace Path
-                    </h4>
-                    <div className="text-sm">
-                      <span className="font-medium">{guidance.ptPath.floor}</span>
-                      {guidance.ptPath.rooms && (
-                        <span className="text-muted-foreground"> → {guidance.ptPath.rooms.join(", ")}</span>
-                      )}
-                    </div>
-                    {guidance.ptPath.principle && (
-                      <Badge variant="secondary" className="mt-2 text-xs">
-                        {guidance.ptPath.principle}
-                      </Badge>
-                    )}
-                  </div>
-                )}
-              </div>
-
-              {/* Navigation */}
-              <div className="md:col-span-2 flex justify-between pt-4 border-t">
+              <div className="flex justify-between pt-4">
                 <Button variant="outline" onClick={goToPrevSection}>
                   <ArrowLeft className="h-4 w-4 mr-2" />
                   Back to Scripture
                 </Button>
                 <Button onClick={goToNextSection}>
-                  Continue to Reflection
+                  Continue to History
                   <ArrowRight className="h-4 w-4 ml-2" />
                 </Button>
               </div>
+            </div>
+          )}
+
+          {/* HISTORY SECTION */}
+          {currentSection === 'history' && (
+            <div className="space-y-6">
+              <div className="text-center mb-4">
+                <h2 className="text-xl font-bold flex items-center justify-center gap-2">
+                  <History className="h-5 w-5 text-blue-500" />
+                  Adventist Heritage
+                </h2>
+                <p className="text-muted-foreground">How our pioneers discovered this truth</p>
+              </div>
+
+              {loadingContent ? (
+                <div className="flex flex-col items-center justify-center py-12">
+                  <Loader2 className="h-8 w-8 animate-spin text-primary mb-4" />
+                  <p className="text-muted-foreground">Loading history...</p>
+                </div>
+              ) : (
+                <ScrollArea className="h-[400px] pr-4">
+                  <div className="prose prose-sm max-w-none dark:prose-invert">
+                    <div className="whitespace-pre-wrap text-sm leading-relaxed">
+                      {historyContent || "Click 'Learn More' to explore the Adventist history of this doctrine."}
+                    </div>
+                  </div>
+                </ScrollArea>
+              )}
+
+              <div className="flex justify-between pt-4">
+                <Button variant="outline" onClick={goToPrevSection}>
+                  <ArrowLeft className="h-4 w-4 mr-2" />
+                  Back to Teaching
+                </Button>
+                <Button onClick={goToNextSection}>
+                  Continue to Quiz
+                  <ArrowRight className="h-4 w-4 ml-2" />
+                </Button>
+              </div>
+            </div>
+          )}
+
+          {/* QUIZ SECTION */}
+          {currentSection === 'quiz' && (
+            <div className="space-y-6 max-w-2xl mx-auto">
+              <div className="text-center mb-4">
+                <h2 className="text-xl font-bold flex items-center justify-center gap-2">
+                  <HelpCircle className="h-5 w-5 text-purple-500" />
+                  Knowledge Check
+                </h2>
+                <p className="text-muted-foreground">Test your understanding of "{lesson.title}"</p>
+              </div>
+
+              <div className="space-y-6">
+                {quizQuestions.map((q, idx) => (
+                  <Card key={idx} className={quizSubmitted ? (parseInt(quizAnswers[idx]) === q.correct ? 'border-green-500' : 'border-red-500') : ''}>
+                    <CardContent className="p-4">
+                      <p className="font-medium mb-3">{idx + 1}. {q.question}</p>
+                      <RadioGroup
+                        value={quizAnswers[idx]}
+                        onValueChange={(value) => setQuizAnswers(prev => ({ ...prev, [idx]: value }))}
+                        disabled={quizSubmitted}
+                      >
+                        {q.options.map((option, optIdx) => (
+                          <div key={optIdx} className="flex items-center space-x-2">
+                            <RadioGroupItem value={String(optIdx)} id={`q${idx}-opt${optIdx}`} />
+                            <Label
+                              htmlFor={`q${idx}-opt${optIdx}`}
+                              className={quizSubmitted && optIdx === q.correct ? 'text-green-600 font-medium' : ''}
+                            >
+                              {option}
+                            </Label>
+                          </div>
+                        ))}
+                      </RadioGroup>
+                      {quizSubmitted && parseInt(quizAnswers[idx]) !== q.correct && (
+                        <p className="text-xs text-green-600 mt-2">Correct answer: {q.options[q.correct]}</p>
+                      )}
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+
+              {!quizSubmitted ? (
+                <Button
+                  onClick={handleQuizSubmit}
+                  className="w-full"
+                  disabled={Object.keys(quizAnswers).length < quizQuestions.length}
+                >
+                  <CheckCircle2 className="h-4 w-4 mr-2" />
+                  Submit Answers
+                </Button>
+              ) : (
+                <div className="flex justify-between pt-4">
+                  <Button variant="outline" onClick={goToPrevSection}>
+                    <ArrowLeft className="h-4 w-4 mr-2" />
+                    Review History
+                  </Button>
+                  <Button onClick={goToNextSection}>
+                    Continue to Reflection
+                    <ArrowRight className="h-4 w-4 ml-2" />
+                  </Button>
+                </div>
+              )}
             </div>
           )}
 
@@ -649,55 +779,61 @@ export function BaptismLesson({ lesson, candidateId, progress, onBack }: Baptism
             <div className="max-w-2xl mx-auto space-y-6">
               <div className="text-center">
                 <h2 className="text-xl font-bold flex items-center justify-center gap-2">
-                  <MessageSquare className="h-5 w-5 text-green-500" />
+                  <Heart className="h-5 w-5 text-red-500" />
                   Personal Reflection
                 </h2>
-                <p className="text-muted-foreground">Take a moment to reflect on what you've learned</p>
+                <p className="text-muted-foreground">Apply this truth to your life</p>
               </div>
 
               <div className="space-y-4">
                 <div className="p-4 rounded-lg bg-muted/50">
-                  <h4 className="font-medium mb-3">Consider these questions:</h4>
+                  <h4 className="font-medium mb-3">Reflection Questions:</h4>
                   <ul className="space-y-3 text-sm">
                     <li className="flex items-start gap-2">
                       <Sparkles className="h-4 w-4 text-primary mt-0.5 shrink-0" />
-                      <span>What stood out to you most from the Scripture passages?</span>
+                      <span>What did the Holy Spirit teach you through this study?</span>
                     </li>
                     <li className="flex items-start gap-2">
                       <Sparkles className="h-4 w-4 text-primary mt-0.5 shrink-0" />
-                      <span>How does this belief connect to your relationship with God?</span>
+                      <span>How does this belief change how you see God?</span>
                     </li>
                     <li className="flex items-start gap-2">
                       <Sparkles className="h-4 w-4 text-primary mt-0.5 shrink-0" />
-                      <span>Is there anything you're still unsure about or want to explore further?</span>
+                      <span>What will you do differently because of what you've learned?</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <Sparkles className="h-4 w-4 text-primary mt-0.5 shrink-0" />
+                      <span>Who can you share this truth with?</span>
                     </li>
                   </ul>
                 </div>
 
                 <div>
-                  <label className="text-sm font-medium mb-2 block">
-                    Write your thoughts (optional - share with Jeeves for feedback):
+                  <label className="text-sm font-medium mb-2 block flex items-center gap-2">
+                    <Pencil className="h-4 w-4" />
+                    Write your personal reflection:
                   </label>
                   <Textarea
-                    placeholder="What are your thoughts on this lesson? Any questions or insights?"
+                    placeholder="What has God shown you through this lesson? How will you apply it?"
                     value={userResponse}
                     onChange={(e) => setUserResponse(e.target.value)}
                     className="min-h-[150px]"
                   />
-                  <div className="flex gap-2 mt-3">
+                  {userResponse.length > 10 && (
                     <Button
                       variant="outline"
                       onClick={handleSubmit}
-                      disabled={isAnalyzing || userResponse.trim().length < 3}
+                      disabled={isAnalyzing}
+                      className="mt-3"
                     >
                       {isAnalyzing ? (
                         <Loader2 className="h-4 w-4 mr-2 animate-spin" />
                       ) : (
                         <Brain className="h-4 w-4 mr-2" />
                       )}
-                      Get Jeeves' Feedback
+                      Get Jeeves' Encouragement
                     </Button>
-                  </div>
+                  )}
                 </div>
 
                 {guidance && (
@@ -714,7 +850,7 @@ export function BaptismLesson({ lesson, candidateId, progress, onBack }: Baptism
               <div className="flex justify-between pt-4">
                 <Button variant="outline" onClick={goToPrevSection}>
                   <ArrowLeft className="h-4 w-4 mr-2" />
-                  Back
+                  Back to Quiz
                 </Button>
                 <Button onClick={goToNextSection}>
                   Continue to Summary
@@ -730,26 +866,26 @@ export function BaptismLesson({ lesson, candidateId, progress, onBack }: Baptism
               <div className="text-center">
                 <div className="flex justify-center mb-4">
                   <div className="p-4 rounded-full bg-green-500/10">
-                    <CheckCircle2 className="h-12 w-12 text-green-500" />
+                    <Award className="h-12 w-12 text-green-500" />
                   </div>
                 </div>
                 <h2 className="text-2xl font-bold mb-2">Lesson Complete!</h2>
                 <p className="text-muted-foreground">
-                  You've completed "{lesson.title}"
+                  You've studied "{lesson.title}"
                 </p>
               </div>
 
               <Card className="border-green-500/20 bg-green-500/5">
                 <CardHeader>
-                  <CardTitle className="text-lg">Summary</CardTitle>
+                  <CardTitle className="text-lg">What You Learned</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <p className="text-sm text-muted-foreground mb-4">{lesson.description}</p>
                   <div className="space-y-2">
                     <h4 className="font-medium text-sm">Key Scriptures:</h4>
                     <div className="flex flex-wrap gap-2">
-                      {scriptures.slice(0, 4).map((s: any, idx: number) => (
-                        <Badge key={idx} variant="outline">{s.ref}</Badge>
+                      {scriptures.slice(0, 5).map((s: any, idx: number) => (
+                        <Badge key={idx} variant="outline">{getRef(s)}</Badge>
                       ))}
                     </div>
                   </div>
@@ -757,10 +893,13 @@ export function BaptismLesson({ lesson, candidateId, progress, onBack }: Baptism
               </Card>
 
               <div className="p-4 rounded-lg bg-primary/5 border border-primary/20">
-                <h4 className="font-medium mb-2">My Commitment</h4>
+                <h4 className="font-medium mb-2 flex items-center gap-2">
+                  <Heart className="h-4 w-4 text-red-500" />
+                  My Commitment
+                </h4>
                 <p className="text-sm text-muted-foreground">
                   I have studied and understand the biblical teaching on "{lesson.title}"
-                  and commit to growing in this truth as I prepare for baptism.
+                  and commit to living this truth as I prepare for baptism and beyond.
                 </p>
               </div>
 
