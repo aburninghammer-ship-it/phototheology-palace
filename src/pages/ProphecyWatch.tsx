@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
-import { Telescope, Sparkles, Filter, Search, AlertTriangle, Shield, BookOpen, Scale, ChevronRight, Clock, MapPin, Lightbulb, Quote, FileText, HelpCircle } from "lucide-react";
+import { Telescope, Sparkles, Filter, Search, AlertTriangle, Shield, BookOpen, Scale, ChevronRight, Clock, MapPin, Lightbulb, Quote, FileText, HelpCircle, Link, ExternalLink, Loader2 } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { motion } from "framer-motion";
@@ -60,6 +60,10 @@ const ProphecyWatch = () => {
   const [timeframe, setTimeframe] = useState("past 30 days");
   const [generating, setGenerating] = useState(false);
   const [analysisResult, setAnalysisResult] = useState<string | null>(null);
+  
+  // Link analysis state
+  const [articleUrl, setArticleUrl] = useState("");
+  const [analyzingLink, setAnalyzingLink] = useState(false);
 
   const runProphecyWatch = async () => {
     if (!watchQuery.trim() && focusArea === "all") {
@@ -102,6 +106,61 @@ const ProphecyWatch = () => {
       });
     } finally {
       setGenerating(false);
+    }
+  };
+  
+  const analyzeArticle = async () => {
+    if (!articleUrl.trim()) {
+      toast({
+        title: "Please provide an article URL",
+        description: "Enter a link to a news article or blog post to analyze",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Validate URL
+    try {
+      new URL(articleUrl);
+    } catch {
+      toast({
+        title: "Invalid URL",
+        description: "Please enter a valid article URL",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setAnalyzingLink(true);
+    setAnalysisResult(null);
+
+    try {
+      const { data, error } = await supabase.functions.invoke("jeeves", {
+        body: {
+          mode: "prophecy-watch-article",
+          articleUrl: articleUrl.trim(),
+          focusArea: focusArea !== "all" ? focusArea : undefined,
+        },
+      });
+
+      if (error) throw error;
+      if (!data?.content) throw new Error("No analysis returned");
+
+      setAnalysisResult(data.content);
+
+      toast({
+        title: "Article Analyzed",
+        description: "Jeeves has analyzed the article through a prophetic lens",
+      });
+    } catch (error: any) {
+      console.error("Article analysis error:", error);
+      toast({
+        title: "Error",
+        description: error.message || "Failed to analyze article",
+        variant: "destructive",
+      });
+    } finally {
+      setAnalyzingLink(false);
     }
   };
 
@@ -325,7 +384,7 @@ const ProphecyWatch = () => {
               transition={{ delay: 0.4 }}
               className="text-xl text-white/90 max-w-3xl mx-auto"
             >
-              Evidence-driven watchtower for SDA eschatology. Tracking church-state developments,
+              Evidence-driven watchtower for biblical eschatology. Tracking church-state developments,
               Christian nationalism, and religious liberty trajectories through a disciplined prophetic lens.
             </motion.p>
 
@@ -416,7 +475,7 @@ const ProphecyWatch = () => {
             <div className="mt-4">
               <Button
                 onClick={runProphecyWatch}
-                disabled={generating}
+                disabled={generating || analyzingLink}
                 className="w-full h-14 text-lg bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 shadow-lg hover:shadow-blue-500/25 transition-all duration-300"
               >
                 {generating ? (
@@ -431,6 +490,46 @@ const ProphecyWatch = () => {
                   </>
                 )}
               </Button>
+            </div>
+
+            {/* Article Link Analysis Section */}
+            <div className="mt-6 pt-6 border-t border-white/20">
+              <div className="flex items-center gap-2 mb-3">
+                <Link className="h-5 w-5 text-cyan-400" />
+                <h3 className="text-lg font-semibold text-white">Analyze an Article</h3>
+              </div>
+              <p className="text-sm text-white/60 mb-3">
+                Paste a link to a news article or blog post and let Jeeves analyze it through a prophetic lens.
+              </p>
+              <div className="flex gap-3">
+                <div className="relative flex-1">
+                  <ExternalLink className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-white/50" />
+                  <Input
+                    placeholder="https://example.com/article..."
+                    value={articleUrl}
+                    onChange={(e) => setArticleUrl(e.target.value)}
+                    onKeyDown={(e) => e.key === "Enter" && analyzeArticle()}
+                    className="pl-12 h-12 bg-slate-700/50 backdrop-blur-sm border-slate-600/50 text-white placeholder:text-white/40"
+                  />
+                </div>
+                <Button
+                  onClick={analyzeArticle}
+                  disabled={analyzingLink || generating}
+                  className="h-12 px-6 bg-gradient-to-r from-cyan-600 to-teal-600 hover:from-cyan-700 hover:to-teal-700"
+                >
+                  {analyzingLink ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Analyzing...
+                    </>
+                  ) : (
+                    <>
+                      <Search className="mr-2 h-4 w-4" />
+                      Analyze
+                    </>
+                  )}
+                </Button>
+              </div>
             </div>
           </div>
         </motion.div>
@@ -450,7 +549,7 @@ const ProphecyWatch = () => {
                   </CardTitle>
                   <CardDescription className="text-base leading-relaxed">
                     Prophecy Watch is an evidence-driven watchtower function that scans current events for developments
-                    that plausibly map onto SDA eschatology. It tracks church-state fusion, Christian nationalism infrastructure,
+                    that plausibly map onto biblical eschatology. It tracks church-state fusion, Christian nationalism infrastructure,
                     dominionism, and social conditioning toward coercive religion—all with citation discipline and non-sensational analysis.
                   </CardDescription>
                 </CardHeader>
@@ -520,7 +619,7 @@ const ProphecyWatch = () => {
                 Scanning Current Events...
               </h2>
               <p className="text-muted-foreground">
-                Analyzing developments through the SDA prophetic lens with citation discipline
+                Analyzing developments through a biblical prophetic lens with citation discipline
               </p>
             </motion.div>
           )}

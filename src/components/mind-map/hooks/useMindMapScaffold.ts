@@ -54,8 +54,7 @@ export function useMindMapScaffold(
           data: {
             ...node.data,
             populated: true,
-            relevanceScore: 100,
-          },
+          } as typeof node.data,
         };
       }
     });
@@ -72,8 +71,7 @@ export function useMindMapScaffold(
           data: {
             ...roomNode.data,
             populated: true,
-            principles: roomData.principles,
-          },
+          } as typeof roomNode.data,
         };
 
         // Add principle nodes as children
@@ -131,8 +129,7 @@ export function useMindMapScaffold(
             data: {
               ...elemNode.data,
               populated: true,
-              insights: elemData.insights,
-            },
+            } as typeof elemNode.data,
           };
         }
       });

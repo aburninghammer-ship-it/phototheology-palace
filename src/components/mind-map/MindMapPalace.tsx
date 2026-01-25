@@ -55,9 +55,10 @@ export default function MindMapPalace({
 
     // Update breadcrumbs
     const preview = text.length > 30 ? text.substring(0, 30) + '...' : text;
+    const crumbId = Date.now().toString();
     setBreadcrumbs((prev) => [
       ...prev,
-      { mapId: Date.now().toString(), label: preview, sourcePreview: preview },
+      { id: crumbId, mapId: crumbId, label: preview, sourcePreview: preview },
     ]);
 
     // Generate analysis
