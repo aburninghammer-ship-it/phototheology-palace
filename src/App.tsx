@@ -246,6 +246,7 @@ const AnalyzeThoughts = lazy(() => import("./pages/AnalyzeThoughts"));
 const SparksLibrary = lazy(() => import("./pages/SparksLibrary"));
 const Libraries = lazy(() => import("./pages/Libraries"));
 const PalaceFreestyle = lazy(() => import("./pages/PalaceFreestyle"));
+const MindMapPalace = lazy(() => import("./pages/MindMapPalace"));
 const GraphicsGallery = lazy(() => import("./pages/GraphicsGallery"));
 const Devotionals = lazy(() => import("./pages/Devotionals"));
 const DevotionalView = lazy(() => import("./pages/DevotionalView"));
@@ -439,6 +440,7 @@ function App() {
             <Route path="/libraries" element={<ProtectedRoute><Libraries /></ProtectedRoute>} />
             <Route path="/palace/freestyle" element={<ProtectedRoute><PalaceFreestyle /></ProtectedRoute>} />
             <Route path="/palace/graphics" element={<ProtectedRoute><GraphicsGallery /></ProtectedRoute>} />
+            <Route path="/mind-map" element={<ProtectedRoute><MindMapPalace /></ProtectedRoute>} />
             
             <Route path="/bible" element={<ProtectedRoute><Bible /></ProtectedRoute>} />
             <Route path="/audio-bible" element={<ProtectedRoute><AudioBible /></ProtectedRoute>} />
