@@ -1,6 +1,7 @@
-import { ReactNode, useEffect } from "react";
+import { ReactNode, useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
+import { supabase } from "@/integrations/supabase/client";
 import { Loader2 } from "lucide-react";
 
 interface ProtectedRouteProps {
@@ -11,18 +12,46 @@ export const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
   const { user, loading } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
+  const [verifying, setVerifying] = useState(true);
+  const [verifiedUser, setVerifiedUser] = useState<any>(null);
+
+  // Double-check session on mount to handle race conditions
+  useEffect(() => {
+    const verifySession = async () => {
+      console.log("[ProtectedRoute] Verifying session for path:", location.pathname);
+      const { data: { session }, error } = await supabase.auth.getSession();
+
+      if (error) {
+        console.error("[ProtectedRoute] Session verification error:", error);
+      }
+
+      console.log("[ProtectedRoute] Verified session:", session?.user?.email ?? "none");
+      setVerifiedUser(session?.user ?? null);
+      setVerifying(false);
+    };
+
+    verifySession();
+  }, [location.pathname]);
 
   useEffect(() => {
+    const effectiveUser = verifiedUser || user;
+    const isLoading = loading || verifying;
+
+    console.log("[ProtectedRoute] Check - Path:", location.pathname, "Loading:", isLoading, "User:", effectiveUser?.email ?? "none");
+
     // Only redirect if we're done loading AND there's no user
-    if (!loading && !user) {
+    if (!isLoading && !effectiveUser) {
       const redirect = encodeURIComponent(`${location.pathname}${location.search}`);
-      console.log("ProtectedRoute: Redirecting to /auth (no user found)", { redirect });
+      console.log("[ProtectedRoute] Redirecting to /auth (no user found)", { redirect });
       navigate(`/auth?redirect=${redirect}`, { replace: true });
     }
-  }, [user, loading, navigate, location.pathname, location.search]);
+  }, [user, verifiedUser, loading, verifying, navigate, location.pathname, location.search]);
+
+  const effectiveUser = verifiedUser || user;
+  const isLoading = loading || verifying;
 
   // Show loading while checking auth status
-  if (loading) {
+  if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center gradient-dreamy">
         <div className="text-center">
@@ -34,7 +63,7 @@ export const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
   }
 
   // If still no user after loading, show nothing (redirect will happen in useEffect)
-  if (!user) {
+  if (!effectiveUser) {
     return null;
   }
 

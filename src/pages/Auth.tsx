@@ -15,6 +15,7 @@ import { z } from "zod";
 import { GoogleSignInButton } from "@/components/auth/GoogleSignInButton";
 import { AuthSocialProof } from "@/components/auth/AuthSocialProof";
 import { useEventTracking } from "@/hooks/useEventTracking";
+import { ensureStorageSpace, isQuotaError, getStorageErrorMessage } from "@/utils/storageManager";
 
 const emailSchema = z.string().email("Please enter a valid email address").max(255, "Email is too long");
 const passwordSchema = z.string().min(6, "Password must be at least 6 characters").max(128, "Password is too long");
@@ -146,12 +147,26 @@ export default function Auth() {
     const email = normalizeEmail(loginEmail);
 
     setLoading(true);
+    console.log("[Auth] Attempting login for:", email);
+
+    // Check and clear storage if needed before login
+    const storageCheck = ensureStorageSpace();
+    if (!storageCheck.success) {
+      setError(getStorageErrorMessage());
+      setLoading(false);
+      return;
+    }
+    if (storageCheck.cleared > 0) {
+      console.log(`[Auth] Cleared ${storageCheck.cleared} cached items to free storage`);
+    }
 
     try {
-      const { error } = await supabase.auth.signInWithPassword({
+      const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password: loginPassword,
       });
+
+      console.log("[Auth] Login response - User:", data?.user?.email ?? "none", "Session:", data?.session ? "exists" : "none", "Error:", error?.message ?? "none");
 
       if (error) {
         if (error.message.includes("Invalid login credentials")) {
@@ -164,6 +179,14 @@ export default function Auth() {
           setError(error.message);
         }
         return;
+      }
+
+      // Verify session was created
+      try {
+        const { data: sessionCheck } = await supabase.auth.getSession();
+        console.log("[Auth] Post-login session check:", sessionCheck?.session?.user?.email ?? "NO SESSION");
+      } catch (sessionErr) {
+        console.warn("[Auth] Session check failed (non-critical):", sessionErr);
       }
 
       // Save email only if remember me is checked (never store passwords)
@@ -179,9 +202,14 @@ export default function Auth() {
       toast.success("Welcome back!");
       // Don't navigate here; once auth state updates, the effect above will route
       // to either the requested redirect target or the normal Gatehouse/Dashboard flow.
-    } catch (err) {
-      setError("An unexpected error occurred. Please try again.");
-      console.error("Login error:", err);
+    } catch (err: any) {
+      console.error("[Auth] Login error:", err);
+      if (isQuotaError(err)) {
+        setError(getStorageErrorMessage());
+      } else {
+        const errorMessage = err?.message || err?.toString() || "Unknown error";
+        setError(`Login failed: ${errorMessage}`);
+      }
     } finally {
       setLoading(false);
     }
@@ -254,6 +282,14 @@ export default function Auth() {
 
     setLoading(true);
 
+    // Check and clear storage if needed before signup
+    const storageCheck = ensureStorageSpace();
+    if (!storageCheck.success) {
+      setError(getStorageErrorMessage());
+      setLoading(false);
+      return;
+    }
+
     try {
       const redirectUrl = `${window.location.origin}/`;
 
@@ -322,8 +358,12 @@ export default function Auth() {
         setError("Account creation failed. This email may already be registered. Please try logging in instead.");
       }
     } catch (err) {
-      setError("An unexpected error occurred. Please try again.");
       console.error("Signup error:", err);
+      if (isQuotaError(err)) {
+        setError(getStorageErrorMessage());
+      } else {
+        setError("An unexpected error occurred. Please try again.");
+      }
     } finally {
       setLoading(false);
     }

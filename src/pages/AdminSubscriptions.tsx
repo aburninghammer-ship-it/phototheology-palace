@@ -20,6 +20,7 @@ import { AdminPasswordReset } from "@/components/admin/AdminPasswordReset";
 import { SubscriptionAnalyticsChart } from "@/components/admin/SubscriptionAnalyticsChart";
 import { AdminUserManagement } from "@/components/admin/AdminUserManagement";
 import { EmailCampaignHistory } from "@/components/admin/EmailCampaignHistory";
+import { RecentSubscribers } from "@/components/admin/RecentSubscribers";
 import { Badge } from "@/components/ui/badge";
 
 interface StripeStats {
@@ -644,6 +645,9 @@ export default function AdminSubscriptions() {
               <div className="text-4xl font-bold text-primary">{stats.summary.monthly_recurring_revenue}</div>
             </CardContent>
           </Card>
+
+          {/* Recent Subscribers */}
+          <RecentSubscribers />
 
           {/* Data Sync Status */}
           <Card className={dbVsStripeMatch ? "border-green-500/30" : "border-yellow-500/50 bg-yellow-500/5"}>

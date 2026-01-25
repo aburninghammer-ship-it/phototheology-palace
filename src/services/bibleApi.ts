@@ -104,15 +104,51 @@ export const fetchChapter = async (book: string, chapter: number, translation: T
 };
 
 const fetchChapterFromAPI = async (book: string, chapter: number, translation: Translation = "kjv"): Promise<Chapter> => {
+  // Try direct public API first for speed - it's more reliable
   try {
-    // Use our backend proxy (retries + fallbacks) for reliability
+    const directResponse = await fetch(
+      `${BIBLE_API_BASE}/${encodeURIComponent(book)}%20${chapter}?translation=${translation}`,
+      { signal: AbortSignal.timeout(5000) }
+    );
+
+    if (directResponse.ok) {
+      const directData = await directResponse.json();
+      if (directData.verses && Array.isArray(directData.verses) && directData.verses.length > 0) {
+        const verses: Verse[] = directData.verses.map((v: any) => ({
+          book: v.book_name ?? book,
+          chapter: v.chapter ?? chapter,
+          verse: v.verse,
+          text: v.text?.replace(/\n/g, ' ').trim(),
+        }));
+
+        const chapterData: Chapter = {
+          book: verses[0]?.book ?? book,
+          chapter,
+          verses,
+        };
+
+        // Cache the fetched chapter
+        cacheChapter(book, chapter, translation, chapterData);
+
+        // Pre-cache surrounding chapters in background
+        preCacheSurrounding(book, chapter, translation, fetchChapterFromAPI);
+
+        return chapterData;
+      }
+    }
+  } catch (directError) {
+    console.warn("Direct API failed, trying edge function:", directError);
+  }
+
+  // Fallback to edge function if direct API fails
+  try {
     const { data, error } = await supabase.functions.invoke("bible-api", {
       body: { book, chapter, version: translation },
     });
 
     if (error) throw error;
     if (!data?.verses || !Array.isArray(data.verses) || data.verses.length === 0) {
-      throw new Error("No verses returned");
+      throw new Error("No verses returned from edge function");
     }
 
     const verses: Verse[] = data.verses.map((v: any) => ({
@@ -135,25 +171,18 @@ const fetchChapterFromAPI = async (book: string, chapter: number, translation: T
     preCacheSurrounding(book, chapter, translation, fetchChapterFromAPI);
 
     return chapterData;
-  } catch (error) {
-    console.error("Error fetching chapter:", error);
-
-    // Get the accurate verse count from our complete data
-    const bookCode = BOOK_NAME_TO_CODE.get(book) || book.toUpperCase().substring(0, 3);
-    let verseCount = getVerseCountForChapter(bookCode, chapter);
-    
-    // Fallback to reasonable default if book code not found
-    if (!verseCount || verseCount === 0) {
-      verseCount = 25; // Reasonable default
-    }
-
-    // Return empty chapter - UI should handle this gracefully
-    return {
-      book,
-      chapter,
-      verses: []
-    } as Chapter;
+  } catch (edgeFunctionError) {
+    console.error("Edge function also failed:", edgeFunctionError);
   }
+
+  // Both methods failed - return empty chapter with error flag
+  console.error("All fetch methods failed for:", book, chapter);
+  return {
+    book,
+    chapter,
+    verses: [],
+    error: true
+  };
 };
 
 export const searchBible = async (query: string, translation: Translation = "kjv"): Promise<Verse[]> => {

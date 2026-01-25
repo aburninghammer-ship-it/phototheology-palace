@@ -8,7 +8,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Loader2, Building2, Users, Mail, TrendingUp, Target, Sprout, Sun, Moon, Settings, Radio } from "lucide-react";
+import { Loader2, Building2, Users, Mail, TrendingUp, Target, Sprout, Sun, Moon, Settings, Radio, Droplets } from "lucide-react";
 import { useTheme } from "next-themes";
 import { ChurchOverview } from "@/components/churches/ChurchOverview";
 import { ChurchMembers } from "@/components/churches/ChurchMembers";
@@ -18,6 +18,7 @@ import { ChurchAnalytics } from "@/components/churches/ChurchAnalytics";
 import { ChurchSettings } from "@/components/living-manna/admin/ChurchSettings";
 import { LeaderDashboard } from "@/components/living-manna";
 import { LiveSermonDashboard } from "@/components/church/live-sermon";
+import { BaptismCandidateManager } from "@/components/living-manna/admin/BaptismCandidateManager";
 
 interface Church {
   id: string;
@@ -323,6 +324,10 @@ export default function ChurchAdmin() {
                 <Radio className="h-4 w-4" />
                 <span className="hidden sm:inline">Live Sermon</span>
               </TabsTrigger>
+              <TabsTrigger value="baptism-candidates" className="gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
+                <Droplets className="h-4 w-4" />
+                <span className="hidden sm:inline">Baptism</span>
+              </TabsTrigger>
               {hasTier2Access && (
                 <TabsTrigger value="analytics" className="gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
                   <TrendingUp className="h-4 w-4" />
@@ -370,6 +375,10 @@ export default function ChurchAdmin() {
 
           <TabsContent value="live-sermon">
             <LiveSermonDashboard churchId={church.id} />
+          </TabsContent>
+
+          <TabsContent value="baptism-candidates">
+            <BaptismCandidateManager churchId={church.id} />
           </TabsContent>
 
             {hasTier2Access && (
