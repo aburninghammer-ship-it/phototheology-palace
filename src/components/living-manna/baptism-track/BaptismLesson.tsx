@@ -14,6 +14,35 @@ import {
   ResizablePanelGroup,
 } from "@/components/ui/resizable";
 
+// Helper to safely parse JSON fields that might be strings
+const parseJsonField = (field: any): any[] => {
+  if (!field) return [];
+  if (Array.isArray(field)) return field;
+  if (typeof field === 'string') {
+    try {
+      const parsed = JSON.parse(field);
+      return Array.isArray(parsed) ? parsed : [];
+    } catch {
+      return [];
+    }
+  }
+  return [];
+};
+
+// Helper to safely parse JSON object fields
+const parseJsonObject = (field: any): any => {
+  if (!field) return {};
+  if (typeof field === 'object' && !Array.isArray(field)) return field;
+  if (typeof field === 'string') {
+    try {
+      return JSON.parse(field);
+    } catch {
+      return {};
+    }
+  }
+  return {};
+};
+
 interface BaptismLessonProps {
   lesson: {
     id: string;
@@ -21,7 +50,7 @@ interface BaptismLessonProps {
     title: string;
     description: string | null;
     pt_map: any;
-    scripture_pack: any[];
+    scripture_pack: any;
     estimated_minutes: number;
   };
   candidateId: string;
@@ -109,11 +138,11 @@ export function BaptismLesson({ lesson, candidateId, progress, onBack }: Baptism
         currentSection: {
           title: "Introduction",
           content: `This lesson will guide you through the biblical foundation for "${lesson.title}" using the Phototheology Palace method.`,
-          scriptures: lesson.scripture_pack?.slice(0, 3) || [],
+          scriptures: parseJsonField(lesson.scripture_pack).slice(0, 3),
           questions: ["What do you already know about this topic?", "Do you have any questions before we begin?"],
           options: ["I'm ready to learn", "I have a question", "Tell me more about this topic"],
         },
-        ptPath: lesson.pt_map?.palace_path?.[0] || { floor: "Foundation Floor", rooms: ["Story Room"] },
+        ptPath: parseJsonObject(lesson.pt_map)?.palace_path?.[0] || { floor: "Foundation Floor", rooms: ["Story Room"] },
       });
     }
   }, [lesson, guidance]);
@@ -134,7 +163,7 @@ export function BaptismLesson({ lesson, candidateId, progress, onBack }: Baptism
           lessonTitle: lesson.title,
           currentStep,
           sessionHistory: sessionHistory.slice(-5),
-          scriptureContext: lesson.scripture_pack?.map((s: any) => `${s.ref}: ${s.why}`).join("\n"),
+          scriptureContext: parseJsonField(lesson.scripture_pack).map((s: any) => `${s.ref}: ${s.why}`).join("\n"),
         },
       });
 
@@ -234,7 +263,7 @@ export function BaptismLesson({ lesson, candidateId, progress, onBack }: Baptism
     };
   }, [userResponse, analyzeWithJeeves]);
 
-  const scriptures = lesson.scripture_pack || [];
+  const scriptures = parseJsonField(lesson.scripture_pack);
   const displayScriptures = guidance?.currentSection?.scriptures || scriptures.slice(0, 5);
 
   return (
