@@ -6,8 +6,10 @@ import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Search, Users, MapPin, Mail, UserPlus } from "lucide-react";
+import { Search, Users, MapPin, Mail, UserPlus, Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { useDirectMessagesContext } from "@/contexts/DirectMessagesContext";
+import { useAuth } from "@/hooks/useAuth";
 
 interface Member {
   id: string;
@@ -34,7 +36,33 @@ export function MemberDirectory({ churchId }: MemberDirectoryProps) {
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedRole, setSelectedRole] = useState<string | null>(null);
+  const [messagingUserId, setMessagingUserId] = useState<string | null>(null);
   const { toast } = useToast();
+  const { user } = useAuth();
+  const { startConversation, setActiveConversationId } = useDirectMessagesContext();
+
+  const handleMessage = async (memberId: string) => {
+    if (!memberId || memberId === user?.id) return;
+
+    setMessagingUserId(memberId);
+    try {
+      const conversationId = await startConversation(memberId);
+      setActiveConversationId(conversationId);
+      toast({
+        title: "Chat opened",
+        description: "You can now message this member",
+      });
+    } catch (error: any) {
+      console.error('Error starting conversation:', error);
+      toast({
+        title: "Error",
+        description: "Failed to start conversation",
+        variant: "destructive",
+      });
+    } finally {
+      setMessagingUserId(null);
+    }
+  };
 
   useEffect(() => {
     loadMembers();
@@ -204,9 +232,19 @@ export function MemberDirectory({ churchId }: MemberDirectoryProps) {
                       </div>
                     </div>
                     <div className="flex gap-2 mt-3">
-                      <Button variant="outline" size="sm" className="flex-1 text-xs">
-                        <Mail className="h-3 w-3 mr-1" />
-                        Message
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="flex-1 text-xs"
+                        onClick={() => handleMessage(member.user_id)}
+                        disabled={messagingUserId === member.user_id || member.user_id === user?.id}
+                      >
+                        {messagingUserId === member.user_id ? (
+                          <Loader2 className="h-3 w-3 mr-1 animate-spin" />
+                        ) : (
+                          <Mail className="h-3 w-3 mr-1" />
+                        )}
+                        {member.user_id === user?.id ? "You" : "Message"}
                       </Button>
                       <Button variant="ghost" size="sm" className="text-xs">
                         <UserPlus className="h-3 w-3 mr-1" />
