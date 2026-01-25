@@ -292,13 +292,14 @@ export function ChurchInvitations({ churchId, availableSeats }: ChurchInvitation
               These users have been invited but haven't signed up yet. Share the code with them.
             </CardDescription>
           </div>
+          <Button
+              onClick={() => setShowCreateDialog(true)}
+              disabled={availableSeats <= 0}
+            >
+              <UserPlus className="h-4 w-4 mr-2" />
+              Create Invitation
+            </Button>
           <Dialog open={showCreateDialog} onOpenChange={setShowCreateDialog}>
-            <DialogTrigger asChild>
-              <Button disabled={availableSeats <= 0} className="bg-primary hover:bg-primary/90">
-                <UserPlus className="h-4 w-4 mr-2" />
-                Create Invitation
-              </Button>
-            </DialogTrigger>
             <DialogContent className="sm:max-w-md">
               <DialogHeader>
                 <DialogTitle>Create New Invitation</DialogTitle>
