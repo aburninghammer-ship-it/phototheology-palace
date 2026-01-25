@@ -234,7 +234,7 @@ export function BaptismLesson({ lesson, candidateId, progress, onBack }: Baptism
     };
   }, [userResponse, analyzeWithJeeves]);
 
-  const scriptures = lesson.scripture_pack || [];
+  const scriptures = Array.isArray(lesson.scripture_pack) ? lesson.scripture_pack : [];
   const displayScriptures = guidance?.currentSection?.scriptures || scriptures.slice(0, 5);
 
   return (
