@@ -81,6 +81,10 @@ export function BaptismTrack({ churchId }: BaptismTrackProps) {
         .select("*")
         .order("fundamental_number", { ascending: true });
       if (error) throw error;
+      console.log('Fetched lessons from Supabase:', data);
+      if (data && data.length > 0) {
+        console.log('First lesson scripture_pack:', data[0].scripture_pack);
+      }
       return data as BaptismLessonData[];
     },
   });
@@ -186,6 +190,9 @@ export function BaptismTrack({ churchId }: BaptismTrackProps) {
 
   // If viewing a specific lesson
   if (selectedLesson && candidateId) {
+    console.log('Selected lesson data:', selectedLesson);
+    console.log('Scripture pack:', selectedLesson.scripture_pack);
+    console.log('Scripture pack type:', typeof selectedLesson.scripture_pack);
     return (
       <BaptismLesson
         lesson={selectedLesson}
