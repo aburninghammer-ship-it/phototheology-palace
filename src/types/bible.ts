@@ -9,6 +9,7 @@ export interface Chapter {
   book: string;
   chapter: number;
   verses: Verse[];
+  error?: boolean;
 }
 
 export type PrincipleType = 
