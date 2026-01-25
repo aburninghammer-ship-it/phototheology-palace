@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -16,16 +16,33 @@ import { toast } from "sonner";
 
 // Helper to safely parse JSON fields that might be strings
 const parseJsonField = (field: any): any[] => {
-  if (!field) return [];
-  if (Array.isArray(field)) return field;
+  console.log('parseJsonField input:', typeof field, field);
+
+  if (!field) {
+    console.log('parseJsonField: field is falsy');
+    return [];
+  }
+  if (Array.isArray(field)) {
+    console.log('parseJsonField: field is already an array with', field.length, 'items');
+    return field;
+  }
   if (typeof field === 'string') {
     try {
       const parsed = JSON.parse(field);
+      console.log('parseJsonField: parsed string to', typeof parsed, Array.isArray(parsed) ? parsed.length + ' items' : '');
       return Array.isArray(parsed) ? parsed : [];
-    } catch {
+    } catch (e) {
+      console.error('parseJsonField: failed to parse string', e);
       return [];
     }
   }
+  // Handle case where it might be an object with numeric keys (rare)
+  if (typeof field === 'object') {
+    const values = Object.values(field);
+    console.log('parseJsonField: converted object to array with', values.length, 'items');
+    return values;
+  }
+  console.log('parseJsonField: returning empty array for unknown type');
   return [];
 };
 
@@ -120,8 +137,14 @@ export function BaptismLesson({ lesson, candidateId, progress, onBack }: Baptism
   const [verseTexts, setVerseTexts] = useState<Record<string, string>>({});
   const [loadingVerses, setLoadingVerses] = useState(false);
 
-  const scriptures = parseJsonField(lesson.scripture_pack);
-  const ptPath = parseJsonObject(lesson.pt_map);
+  // Parse scripture_pack - memoize to avoid re-parsing on every render
+  const scriptures = useMemo(() => {
+    const parsed = parseJsonField(lesson.scripture_pack);
+    console.log('Parsed scriptures:', parsed, 'from:', lesson.scripture_pack);
+    return parsed;
+  }, [lesson.scripture_pack]);
+
+  const ptPath = useMemo(() => parseJsonObject(lesson.pt_map), [lesson.pt_map]);
 
   const sectionOrder: LessonSection[] = ['welcome', 'scripture', 'teaching', 'reflection', 'summary'];
   const currentSectionIndex = sectionOrder.indexOf(currentSection);
@@ -147,14 +170,21 @@ export function BaptismLesson({ lesson, candidateId, progress, onBack }: Baptism
     createAttempt();
   }, [candidateId, lesson.id]);
 
-  // Fetch verse texts
+  // Fetch verse texts when scriptures change
   useEffect(() => {
     const fetchVerses = async () => {
-      if (scriptures.length === 0) return;
+      if (!scriptures || scriptures.length === 0) {
+        console.log('No scriptures to fetch');
+        setLoadingVerses(false);
+        return;
+      }
+
+      console.log('Fetching verses for:', scriptures.slice(0, 5).map(s => s.ref));
       setLoadingVerses(true);
 
       const texts: Record<string, string> = {};
       for (const scripture of scriptures.slice(0, 5)) {
+        if (!scripture.ref) continue;
         try {
           const response = await fetch(
             `https://bible-api.com/${encodeURIComponent(scripture.ref)}?translation=kjv`
@@ -396,6 +426,12 @@ export function BaptismLesson({ lesson, candidateId, progress, onBack }: Baptism
                     <div className="flex items-center justify-center py-8">
                       <Loader2 className="h-6 w-6 animate-spin text-primary" />
                       <span className="ml-2 text-muted-foreground">Loading Scripture...</span>
+                    </div>
+                  ) : scriptures.length === 0 ? (
+                    <div className="text-center py-8 text-muted-foreground">
+                      <BookOpen className="h-12 w-12 mx-auto mb-3 opacity-30" />
+                      <p>Scripture references are loading...</p>
+                      <p className="text-xs mt-2">If this persists, the lesson data may need to be reloaded.</p>
                     </div>
                   ) : (
                     scriptures.slice(0, 5).map((scripture: any, idx: number) => (
