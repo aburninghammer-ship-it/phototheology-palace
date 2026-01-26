@@ -414,9 +414,9 @@ function generateGenesis315Study(
 
   return {
     overallTheme: 'Genesis 3:15—the Protoevangelium—reveals God\'s redemptive plan through the promised Seed of the woman who would crush the serpent\'s head while suffering a wound Himself. This prophecy finds its fulfillment in Jesus Christ\'s virgin birth, atoning death, and victorious resurrection.',
-    relevantFloors: [1, 2, 3, 4, 5, 7],
-    roomAnalysis,
-    sanctuaryAnalysis,
+    relevantFloors: [1, 2, 3, 4, 5, 6, 7, 8], // All 8 floors
+    roomAnalysis: ensureAllRoomsIncluded(roomAnalysis),
+    sanctuaryAnalysis: ensureAllSanctuaryElementsIncluded(sanctuaryAnalysis),
     crossConnections: [
       { from: 'sr', to: 'cec', type: 'typological', description: 'The narrative of the Fall points directly to Christ as the promised Seed' },
       { from: 'st', to: 'altar-of-burnt-offering', type: 'typological', description: 'The first sacrifice types forward to the altar and ultimately to Calvary' },
@@ -630,15 +630,58 @@ function generateGenericStudy(
 
   return {
     overallTheme: 'This text reveals patterns of divine redemption and points to Christ through narrative, typology, and prophetic insight. The Phototheology Palace framework helps us explore its riches systematically.',
-    relevantFloors: [1, 2, 3, 4, 5, 7],
-    roomAnalysis,
-    sanctuaryAnalysis,
+    relevantFloors: [1, 2, 3, 4, 5, 6, 7, 8], // All 8 floors
+    roomAnalysis: ensureAllRoomsIncluded(roomAnalysis),
+    sanctuaryAnalysis: ensureAllSanctuaryElementsIncluded(sanctuaryAnalysis),
     crossConnections: [
       { from: 'sr', to: 'cec', type: 'typological', description: 'The narrative structure foreshadows Christ\'s redemptive work' },
       { from: 'st', to: 'srm', type: 'thematic', description: 'Types and symbols connect to sanctuary imagery' },
       { from: 'or', to: 'bf', type: 'thematic', description: 'Observations lead to cross-reference discoveries' },
     ],
   };
+}
+
+// Helper: Ensure ALL rooms are included in the analysis (including "Not Applicable" ones)
+function ensureAllRoomsIncluded(roomAnalysis: AIMapAnalysis['roomAnalysis']): AIMapAnalysis['roomAnalysis'] {
+  const completeAnalysis: AIMapAnalysis['roomAnalysis'] = {};
+
+  // Iterate through all floors and all rooms
+  palaceFloors.forEach((floor) => {
+    floor.rooms.forEach((room) => {
+      if (roomAnalysis[room.id]) {
+        // Room has analysis - keep it
+        completeAnalysis[room.id] = roomAnalysis[room.id];
+      } else {
+        // Room not analyzed - mark as not applicable
+        completeAnalysis[room.id] = {
+          applicable: false,
+          principles: [],
+        };
+      }
+    });
+  });
+
+  return completeAnalysis;
+}
+
+// Helper: Ensure ALL sanctuary elements are included
+function ensureAllSanctuaryElementsIncluded(
+  sanctuaryAnalysis: AIMapAnalysis['sanctuaryAnalysis'] | undefined
+): AIMapAnalysis['sanctuaryAnalysis'] {
+  const completeAnalysis: AIMapAnalysis['sanctuaryAnalysis'] = {};
+
+  sanctuaryElements.forEach((element) => {
+    if (sanctuaryAnalysis && sanctuaryAnalysis[element.id]) {
+      completeAnalysis[element.id] = sanctuaryAnalysis[element.id];
+    } else {
+      completeAnalysis[element.id] = {
+        applicable: false,
+        insights: [],
+      };
+    }
+  });
+
+  return completeAnalysis;
 }
 
 // Generate empty scaffold showing ALL rooms for manual study

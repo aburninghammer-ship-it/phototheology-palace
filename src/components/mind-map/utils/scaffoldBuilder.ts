@@ -188,8 +188,8 @@ function createSanctuaryNodes(): { nodes: Node<AnyNodeData>[]; edges: Edge<MindM
   };
   nodes.push(sanctuaryNode);
 
-  // Zone nodes arranged around sanctuary
-  const zones = ['camp', 'courtyard', 'holy-place', 'most-holy-place'];
+  // Zone nodes arranged around sanctuary (exclude Camp - has no elements)
+  const zones = ['courtyard', 'holy-place', 'most-holy-place'];
   zones.forEach((zoneId, index) => {
     const zoneData = sanctuaryZones.find(z => z.id === zoneId);
     if (!zoneData) return;
