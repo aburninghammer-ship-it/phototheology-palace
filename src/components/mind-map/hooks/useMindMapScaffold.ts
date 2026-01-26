@@ -95,6 +95,7 @@ export function useMindMapScaffold(
                 content: principle.content,
                 evidence: principle.evidence,
                 insight: principle.insight,
+                application: principle.application, // Include application field
                 visualHook: principle.visualHook,
                 confidence: principle.confidence,
                 scriptures: principle.scriptures,
