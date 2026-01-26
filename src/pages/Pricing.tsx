@@ -547,8 +547,76 @@ export default function Pricing() {
           </Card>
         </div>
 
+        {/* Why We Require a Card - Transparency Section */}
+        <Card className="glass-card mt-12 max-w-3xl mx-auto border-2 border-amber-500/20 bg-gradient-to-br from-amber-500/5 to-orange-500/5">
+          <CardHeader>
+            <div className="flex items-center gap-3">
+              <div className="p-2 rounded-lg bg-amber-500/20">
+                <CreditCard className="h-6 w-6 text-amber-600" />
+              </div>
+              <CardTitle>Why We Ask for a Card Upfront</CardTitle>
+            </div>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <p className="text-muted-foreground leading-relaxed">
+              We believe in complete transparency. Here's why we require a credit card to start your free trial:
+            </p>
+
+            <div className="grid gap-4 md:grid-cols-2">
+              <div className="p-4 rounded-lg bg-background/50 border">
+                <h4 className="font-semibold mb-2 flex items-center gap-2">
+                  <Zap className="h-4 w-4 text-primary" />
+                  AI Costs Are Real
+                </h4>
+                <p className="text-sm text-muted-foreground">
+                  Every Jeeves conversation, every Mind Map generation, every AI-powered study costs us real money.
+                  We want to serve serious students, not bots or casual browsers who would drain resources meant for you.
+                </p>
+              </div>
+
+              <div className="p-4 rounded-lg bg-background/50 border">
+                <h4 className="font-semibold mb-2 flex items-center gap-2">
+                  <Building2 className="h-4 w-4 text-primary" />
+                  Ministry Sustainability
+                </h4>
+                <p className="text-sm text-muted-foreground">
+                  "The laborer is worthy of his wages" (Luke 10:7). A sustainable platform serves more people long-term
+                  than a generous one that collapses. Your support enables us to keep building and serving.
+                </p>
+              </div>
+
+              <div className="p-4 rounded-lg bg-background/50 border">
+                <h4 className="font-semibold mb-2 flex items-center gap-2">
+                  <Check className="h-4 w-4 text-green-500" />
+                  You Won't Be Charged
+                </h4>
+                <p className="text-sm text-muted-foreground">
+                  Your card is only charged after 7 days — and only if you don't cancel. We send reminders on Day 3 and Day 6.
+                  Cancel anytime with one click. No tricks, no hidden fees.
+                </p>
+              </div>
+
+              <div className="p-4 rounded-lg bg-background/50 border">
+                <h4 className="font-semibold mb-2 flex items-center gap-2">
+                  <Gift className="h-4 w-4 text-purple-500" />
+                  Ministry Access Available
+                </h4>
+                <p className="text-sm text-muted-foreground">
+                  Are you a missionary, seminary student, or under-resourced ministry?
+                  <Link to="/contact" className="text-primary hover:underline ml-1">Contact us</Link> — we have scholarship options for those who need them.
+                </p>
+              </div>
+            </div>
+
+            <p className="text-sm text-muted-foreground italic text-center pt-4 border-t">
+              "Paul made tents while preaching the gospel (Acts 18:3). We build software while serving the Word.
+              Thank you for understanding — and for being part of this mission."
+            </p>
+          </CardContent>
+        </Card>
+
         {/* FAQ or Additional Info */}
-        <Card className="glass-card mt-12 max-w-3xl mx-auto">
+        <Card className="glass-card mt-8 max-w-3xl mx-auto">
           <CardHeader>
             <CardTitle>Frequently Asked Questions</CardTitle>
           </CardHeader>
@@ -557,6 +625,7 @@ export default function Pricing() {
               <h3 className="font-semibold mb-2">Can I cancel anytime?</h3>
               <p className="text-sm text-muted-foreground">
                 Yes! You can cancel your subscription at any time. Your access continues until the end of your billing period.
+                We'll send you reminders before your trial ends — no surprise charges.
               </p>
             </div>
             <div>
@@ -566,9 +635,19 @@ export default function Pricing() {
               </p>
             </div>
             <div>
-              <h3 className="font-semibold mb-2">Is my free trial really free?</h3>
+              <h3 className="font-semibold mb-2">Why do you require a credit card for the free trial?</h3>
               <p className="text-sm text-muted-foreground">
-                Absolutely! No credit card required. You get full access to all features for 7 days with no commitments.
+                Our AI features have real per-use costs. Requiring a card helps us serve serious Bible students
+                while protecting the platform from abuse. You won't be charged until after your 7-day trial ends,
+                and you can cancel anytime before then.
+              </p>
+            </div>
+            <div>
+              <h3 className="font-semibold mb-2">What if I can't afford the subscription?</h3>
+              <p className="text-sm text-muted-foreground">
+                We believe cost should never prevent someone from studying God's Word deeply. If you're a missionary,
+                seminary student, or part of an under-resourced ministry, <Link to="/contact" className="text-primary hover:underline">reach out to us</Link> about
+                our scholarship program.
               </p>
             </div>
           </CardContent>
