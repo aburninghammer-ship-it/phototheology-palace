@@ -237,11 +237,11 @@ FLOOR 5 - VISION (Prophecy & Christ-Centered):
   * Canonical Unity: How does this fit the whole Bible story?
 
 FLOOR 6 - THREE HEAVENS (Cycles & Horizons):
-- 123h (Three Heavens): Apply the seed to ALL 3 HEAVEN CONTEXTS:
-  * FIRST HEAVEN: How does THIS text connect to the atmospheric realm (sky, clouds, birds, weather)?
-  * SECOND HEAVEN: How does THIS text connect to the cosmic realm (stars, spiritual warfare, angels/demons)?
-  * THIRD HEAVEN: How does THIS text connect to the divine throne room (God's presence, worship, glory)?
-  REQUIRED: Show connections to ALL 3 heavens!
+- 123h (Three Heavens): Apply the seed to ALL 3 HEAVEN CONTEXTS. For EACH heaven, provide a SPECIFIC APPLICATION:
+  * FIRST HEAVEN (1H - DoL¹/NE¹): The Babylonian destruction and post-exilic restoration (586 BC to Cyrus). How does THIS text speak to themes of exile, judgment, temple rebuilding, or covenant renewal? APPLICATION: How should you respond to seasons of loss and restoration?
+  * SECOND HEAVEN (2H - DoL²/NE²): The 70 AD destruction and New Covenant order. How does THIS text apply to the church age, Christ's heavenly ministry, or the transfer from earthly to heavenly temple? APPLICATION: How does this truth shape your participation in Christ's heavenly priesthood today?
+  * THIRD HEAVEN (3H - DoL³/NE³): The final Day of the Lord and literal New Creation (Rev 21-22). How does THIS text point to final judgment, second coming, or eternal dwelling with God? APPLICATION: How should anticipation of NE³ change your priorities and hope today?
+  REQUIRED: Provide 3 SEPARATE principles—one for EACH heaven context. Each MUST include a practical APPLICATION, not just a question!
 
 - cycles (Cycles Room): Connect the seed to ALL 8 REDEMPTIVE CYCLES. You MUST generate EXACTLY 8 separate principles - one for EACH cycle:
   * @Ad (Adamic): How does THIS text echo Creation, Fall, or promised Seed themes? (REQUIRED)
@@ -334,9 +334,17 @@ ANALYSIS REQUIREMENTS (for EACH applicable room):
 1. PRINCIPLE: Identify specific patterns/truths from the text (2-3 per room)
 2. EVIDENCE: Direct quotes or paraphrases supporting the principle
 3. INSIGHT: The "so what" - why this matters theologically
-4. APPLICATION: Practical, actionable takeaway for the reader's life
+4. APPLICATION: ⚠️ MANDATORY - Practical, actionable takeaway for the reader's life. This MUST be a STATEMENT of what to DO, not a question! Example: "Live today with eternity in view" NOT "How should this affect your life?"
 5. VISUAL HOOK: A concrete, memorable image (not abstractions)
 6. CONFIDENCE: 0-100 score based on how clearly text demonstrates this
+
+⚠️ CRITICAL APPLICATION RULE:
+- Applications must be IMPERATIVE STATEMENTS, not questions
+- WRONG: "Which horizon is this prophecy addressing?"
+- RIGHT: "Let this text anchor your faith that God's covenant promises will be fulfilled in their appointed time."
+- WRONG: "How does this apply to you?"
+- RIGHT: "Surrender your anxious thoughts daily at the altar of God's faithfulness."
+Every principle MUST have a concrete, actionable application that tells the reader WHAT TO DO.
 
 ======== CRITICAL DIRECTIVE - READ CAREFULLY ========
 
