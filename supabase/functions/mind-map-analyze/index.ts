@@ -140,14 +140,14 @@ FLOOR 4 - NEXT LEVEL (Christ-Centered Structure):
   * ESCHATOLOGICAL: How does this connect to last-day events?
   Every text has multiple dimensions—explore at least 3!
 
-- c6 (Connect-6 Room): Link across SIX GENRES:
-  * PROPHECY: What prophetic passage connects?
-  * PARABLE: What parable illustrates similar truth?
-  * EPISTLE: What letter teaching reinforces this?
-  * HISTORY: What historical narrative parallels this?
-  * GOSPEL: What Gospel account relates?
-  * POETRY: What Psalm or poetic passage echoes this?
-  Find at least 3 genre connections!
+- c6 (Connect-6 Room): Link the seed text across ALL SIX GENRES. For EACH genre, find a specific passage that illuminates the seed:
+  * PROPHECY: Which prophetic passage speaks to this same truth? (Isaiah, Jeremiah, Daniel, Revelation, etc.) - Give the specific reference and explain the connection.
+  * PARABLE: Which parable of Jesus illustrates a similar principle? (Sower, Prodigal, etc.) - Show how the parable amplifies the seed.
+  * EPISTLE: Which letter teaching (Romans, Corinthians, Hebrews, etc.) reinforces or expands this truth? - Quote or reference the specific verse.
+  * HISTORY: Which OT/NT historical narrative demonstrates this same principle in action? (Abraham, Moses, David, early church, etc.)
+  * GOSPEL: Which event from Jesus' life (miracle, teaching, encounter) embodies this truth?
+  * POETRY: Which Psalm, Proverb, or Song echoes this theme? - Give the specific reference.
+  CRITICAL: You MUST provide connections for at least 4 of these 6 genres. Every truth in Scripture is woven throughout all genres - find those threads!
 
 - trm (Theme Room): Which THEOLOGICAL SPAN does this fit?
   * SANCTUARY: Does it connect to sanctuary themes?
@@ -184,15 +184,22 @@ FLOOR 4 - NEXT LEVEL (Christ-Centered Structure):
   * Relational Fruit: Does this build up the body of Christ?
 
 FLOOR 5 - VISION (Prophecy & Christ-Centered):
-- bl (Blue Room - Sanctuary): Map to SANCTUARY elements:
-  * ALTAR OF BURNT OFFERING: Does this speak of sacrifice/atonement?
-  * BRONZE LAVER: Does this speak of cleansing/washing?
-  * GOLDEN LAMPSTAND: Does this speak of light/Spirit/witness?
-  * TABLE OF SHOWBREAD: Does this speak of provision/Word/fellowship?
-  * ALTAR OF INCENSE: Does this speak of prayer/intercession?
-  * ARK OF THE COVENANT: Does this speak of law/covenant?
-  * MERCY SEAT: Does this speak of grace/propitiation?
-  Every truth has a sanctuary shadow—find it!
+- bl (Blue Room - Sanctuary): APPLY the seed text to EVERY sanctuary element. Do NOT skip any. For EACH element, show HOW the text connects:
+  * ALTAR OF BURNT OFFERING: What must be sacrificed/surrendered according to this text? What "old self" or obstacle is being consumed?
+  * BRONZE LAVER: What cleansing or washing does this text call for? What needs to be purified in the believer?
+  * GOLDEN LAMPSTAND: What light or illumination does this text provide? How does it guide or reveal truth?
+  * TABLE OF SHOWBREAD: What spiritual nourishment or provision does this text offer? What sustains the soul here?
+  * ALTAR OF INCENSE: What prayers or intercession does this text inspire? What rises to God from this passage?
+  * ARK OF THE COVENANT: What covenant promise or law principle is contained here? What commitment does God make or require?
+  * MERCY SEAT: What grace, mercy, or propitiation is revealed? How does this text show God's compassion?
+  CRITICAL: You MUST provide an insight for at least 4-5 of these elements. EVERY text has sanctuary shadows - find them!
+  Example for Isaiah 26:3 ("perfect peace...mind stayed on thee"):
+    - Altar: Sacrificing anxiety and self-reliance on the altar of trust
+    - Laver: Cleansing the mind from worry through focus on God
+    - Lampstand: God's peace illuminating the darkness of fear
+    - Showbread: Feeding on God's faithfulness as daily bread for peace
+    - Incense: Prayers of trust ascending as sweet fragrance
+    - Mercy Seat: Grace that enables weak faith to find perfect peace
 
 - pr (Prophecy Room): Place on DANIEL-REVELATION TIMELINE:
   * Time Period: Where does this fit in prophetic history?
@@ -305,18 +312,28 @@ ANALYSIS REQUIREMENTS (for EACH applicable room):
 5. VISUAL HOOK: A concrete, memorable image (not abstractions)
 6. CONFIDENCE: 0-100 score based on how clearly text demonstrates this
 
-IMPORTANT - DO NOT SKIP ROOMS OR SAY "NOT APPLICABLE":
+CRITICAL - MANDATORY ROOMS MUST ALWAYS HAVE CONTENT:
 - Analyze at least 8-15 rooms for beginner, 15-25 for scholar/research
 - Include rooms from MULTIPLE floors - not just Floor 1-2
-- MANDATORY ROOMS (always analyze these - they apply to EVERY text):
+- MANDATORY ROOMS (you MUST analyze these - they apply to EVERY text without exception):
   * cec (Christ Every Chapter): Christ is in every passage - find Him explicitly or typologically
-  * cycles (Eight Cycles): Every text fits in redemptive history - find at least 2-3 cycles
-  * dr (Dimensions): Every text has multiple dimensions - explore at least 3
-  * frt (Fruit Room): Every interpretation produces fruit - evaluate it
-  * bl (Blue Room/Sanctuary): Every truth has a sanctuary shadow - find the connection
-  * or (Observation Room): Every text has observable facts - list them
-- NEVER say "Not applicable" for these mandatory rooms - dig deeper to find the connection!
-- For other rooms, if a connection exists, include it. Be generous in finding connections.
+  * cycles (Eight Cycles): Every text fits in redemptive history - find at least 2-3 cycles that AMPLIFY the seed
+  * dr (Dimensions): Every text has 5 dimensions - explore at least 3 with SPECIFIC applications
+  * frt (Fruit Room): Every interpretation produces fruit - evaluate what THIS text produces
+  * bl (Blue Room/Sanctuary): EVERY text connects to sanctuary elements - apply the seed to at least 4-5 elements
+  * c6 (Connect-6): EVERY truth appears across all 6 genres - find at least 4 genre connections
+  * or (Observation Room): Every text has observable facts - list at least 5-10 observations from THIS text
+
+ABSOLUTE RULE: The phrase "Not applicable" is FORBIDDEN for mandatory rooms. If you write "Not applicable" for bl, cec, cycles, dr, frt, c6, or or, your response is INVALID. Instead:
+- For bl: Show HOW the seed text connects to Altar, Laver, Lampstand, Showbread, Incense, Ark, and Mercy Seat
+- For c6: Show which PROPHECY, PARABLE, EPISTLE, HISTORY, GOSPEL, and POETRY passages connect to this seed
+- For cec: Show WHERE Christ appears in the text (type, theme, or explicit)
+- For cycles: Show WHICH redemptive cycles amplify the seed (Adam, Noah, Abraham, Moses, David, Cyrus, Spirit, Restoration)
+- For dr: Show WHAT the text means literally, Christologically, personally, ecclesiologically, eschatologically
+- For frt: Show WHAT spiritual fruit this interpretation produces
+- For or: List WHO, WHAT, WHEN, WHERE, HOW from the text
+
+Be generous in finding connections for ALL rooms. The goal is to ILLUMINATE the seed text, not to evaluate whether it "applies".
 
 MANDATORY RULES:
 - Return ONLY valid JSON
