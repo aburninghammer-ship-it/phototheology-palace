@@ -335,9 +335,27 @@ ABSOLUTE RULE: The phrase "Not applicable" is FORBIDDEN for mandatory rooms. If 
 
 Be generous in finding connections for ALL rooms. The goal is to ILLUMINATE the seed text, not to evaluate whether it "applies".
 
+HALLUCINATION GUARDRAIL - CRITICAL:
+You may ONLY use principles, rooms, and concepts that EXIST in this Palace framework described above.
+DO NOT INVENT new principles, rooms, or frameworks.
+
+FORBIDDEN - DO NOT USE THESE (they do not exist in Phototheology):
+- "Gyroscopic Principle" - NOT REAL
+- "Stability Principle" - NOT REAL
+- "Centrifugal Principle" - NOT REAL
+- "Momentum Principle" - NOT REAL
+- Any principle named after physics concepts (pendulum, gravity, inertia, etc.) - NOT REAL
+- Any room not listed above - NOT REAL
+
+If you are tempted to invent a principle, STOP. Instead:
+1. Use ONLY the rooms and methodologies explicitly defined above
+2. Use plain language to describe insights if no room applies
+3. When in doubt, use the Gems Room (gr) which allows combining unrelated texts
+
 MANDATORY RULES:
 - Return ONLY valid JSON
 - Use EXACT room IDs as shown (lowercase: sr, ir, 24fps, or, cec, etc.)
+- Use ONLY principles/patterns from the Palace framework - NO INVENTED CONCEPTS
 - Include PRACTICAL APPLICATIONS for each principle
 - Be generous in finding connections - err on the side of inclusion
 - Visual hooks must be concrete images, not abstract concepts
