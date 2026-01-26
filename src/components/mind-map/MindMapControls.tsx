@@ -12,6 +12,7 @@ interface MindMapControlsProps {
   breadcrumbs?: Array<{ id: string; label: string }>;
   onBreadcrumbClick?: (id: string) => void;
   isSaving?: boolean;
+  compact?: boolean;
 }
 
 export default function MindMapControls({
@@ -25,12 +26,13 @@ export default function MindMapControls({
   breadcrumbs = [],
   onBreadcrumbClick,
   isSaving = false,
+  compact = false,
 }: MindMapControlsProps) {
   return (
-    <div className="flex items-center justify-between gap-4 p-3 bg-card/80 backdrop-blur-md
-                    border border-white/20 rounded-xl">
-      {/* Breadcrumbs */}
-      {breadcrumbs.length > 0 && (
+    <div className={`flex items-center gap-4 ${compact ? 'flex-col p-2' : 'justify-between p-3'} bg-card/80 backdrop-blur-md
+                    border border-white/20 rounded-xl`}>
+      {/* Breadcrumbs - hide in compact mode */}
+      {!compact && breadcrumbs.length > 0 && (
         <div className="flex items-center gap-1 text-sm">
           {breadcrumbs.map((crumb, i) => (
             <div key={crumb.id} className="flex items-center">
@@ -50,11 +52,11 @@ export default function MindMapControls({
         </div>
       )}
 
-      {/* Spacer */}
-      <div className="flex-1" />
+      {/* Spacer - hide in compact mode */}
+      {!compact && <div className="flex-1" />}
 
       {/* Controls */}
-      <div className="flex items-center gap-2">
+      <div className={`flex items-center gap-2 ${compact ? 'flex-wrap justify-center' : ''}`}>
         {/* Confidence filter */}
         <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-background/50 border border-white/10">
           <Filter className="w-4 h-4 text-muted-foreground" />
