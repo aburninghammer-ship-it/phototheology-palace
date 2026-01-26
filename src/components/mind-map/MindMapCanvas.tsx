@@ -73,21 +73,22 @@ function MindMapCanvasInner({
     (_: React.MouseEvent, node: Node<AnyNodeData>) => {
       // Determine zoom level based on node type
       // Lower zoom = see more area (floor needs to show its rooms)
-      let targetZoom = 1.2;
+      // Max zoom is 2, so keep clicked nodes readable (0.8-1.2 range for detail views)
+      let targetZoom = 1.0;
       if (node.data.type === 'principle') {
-        targetZoom = 1.5; // Zoom in for detailed content
+        targetZoom = 1.2; // Zoom in for detailed content (but not too close)
       } else if (node.data.type === 'room') {
-        targetZoom = 1.0; // Show room and its principles
+        targetZoom = 0.8; // Show room and its principles
       } else if (node.data.type === 'floor') {
-        targetZoom = 0.5; // Zoom OUT to show floor + all its rooms
+        targetZoom = 0.45; // Zoom OUT to show floor + all its rooms
       } else if (node.data.type === 'root') {
-        targetZoom = 0.4; // Overview of entire map
+        targetZoom = 0.35; // Overview of entire map
       } else if (node.data.type === 'sanctuary') {
-        targetZoom = 0.5; // Show sanctuary + zones
+        targetZoom = 0.45; // Show sanctuary + zones
       } else if (node.data.type === 'sanctuary-zone') {
-        targetZoom = 0.7; // Show zone + elements
+        targetZoom = 0.6; // Show zone + elements
       } else if (node.data.type === 'sanctuary-element') {
-        targetZoom = 1.2; // Show element details
+        targetZoom = 1.0; // Show element details
       }
 
       // Smooth zoom to the clicked node
@@ -157,9 +158,9 @@ function MindMapCanvasInner({
         onMove={handleMove}
         nodeTypes={nodeTypes}
         fitView
-        fitViewOptions={{ padding: 0.2, duration: 800 }}
-        minZoom={0.05}
-        maxZoom={4}
+        fitViewOptions={{ padding: 0.3, duration: 800 }}
+        minZoom={0.1}
+        maxZoom={2}
         proOptions={proOptions}
         className="bg-background"
         zoomOnScroll={true}
@@ -222,7 +223,7 @@ function MindMapCanvasInner({
               {[1, 2, 3, 4, 5, 6, 7, 8].map((floor) => (
                 <button
                   key={floor}
-                  onClick={() => zoomToNode(`floor-${floor}`, 0.5)}
+                  onClick={() => zoomToNode(`floor-${floor}`, 0.45)}
                   className="w-7 h-7 rounded text-xs font-semibold bg-gradient-to-br from-primary/20 to-accent/20
                              hover:from-primary/40 hover:to-accent/40 text-foreground transition-all duration-200
                              border border-white/10 hover:border-white/30"
@@ -233,7 +234,7 @@ function MindMapCanvasInner({
               ))}
             </div>
             <button
-              onClick={() => zoomToNode('sanctuary', 0.5)}
+              onClick={() => zoomToNode('sanctuary', 0.45)}
               className="w-full mt-1 py-1.5 rounded text-xs font-semibold bg-gradient-to-r from-purple-500/20 to-violet-500/20
                          hover:from-purple-500/40 hover:to-violet-500/40 text-foreground transition-all duration-200
                          border border-purple-500/20 hover:border-purple-500/40"
