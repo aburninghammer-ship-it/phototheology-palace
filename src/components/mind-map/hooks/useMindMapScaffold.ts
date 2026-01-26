@@ -71,6 +71,7 @@ export function useMindMapScaffold(
           data: {
             ...roomNode.data,
             populated: true,
+            principles: roomData.principles, // Add principles to room data for display
           } as typeof roomNode.data,
         };
 
@@ -129,6 +130,7 @@ export function useMindMapScaffold(
             data: {
               ...elemNode.data,
               populated: true,
+              insights: elemData.insights, // Add insights to element data for display
             } as typeof elemNode.data,
           };
         }

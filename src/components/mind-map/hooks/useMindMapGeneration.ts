@@ -65,72 +65,174 @@ export function useMindMapGeneration(): UseMindMapGenerationReturn {
   return { generate, state, reset };
 }
 
-// Mock analysis for development/testing
+// Mock analysis for development/testing - comprehensive fallback
 export function generateMockAnalysis(text: string, mode: AnalysisMode): AIMapAnalysis {
-  const mockPrinciple = (content: string): PrincipleData => ({
+  const textPreview = text.substring(0, 50);
+
+  const mockPrinciple = (content: string, insight: string, visualHook: string, scriptures: string[] = []): PrincipleData => ({
     id: `principle-${Math.random().toString(36).substr(2, 9)}`,
     content,
-    evidence: ['Example evidence from text'],
-    insight: 'This reveals a deeper pattern in Scripture',
-    visualHook: 'Imagine a vivid scene that captures this truth',
+    evidence: [textPreview + '...'],
+    insight,
+    visualHook,
     confidence: Math.floor(70 + Math.random() * 30),
-    scriptures: ['John 3:16', 'Romans 8:28'],
+    scriptures: scriptures.length > 0 ? scriptures : ['Psalm 119:18'],
   });
 
-  // Simple mock based on text content
-  const hasNarrative = text.toLowerCase().includes('story') ||
-                       text.toLowerCase().includes('said') ||
-                       text.toLowerCase().includes('went');
-
-  const hasSanctuary = text.toLowerCase().includes('sanctuary') ||
-                       text.toLowerCase().includes('temple') ||
-                       text.toLowerCase().includes('altar');
-
-  const relevantFloors = [1, 2]; // Always include floors 1-2
-  if (hasNarrative) relevantFloors.push(3);
-  relevantFloors.push(4); // Always include Christ-centered floor
+  // More comprehensive floor coverage
+  const relevantFloors = [1, 2, 3, 4, 5, 7];
 
   const roomAnalysis: AIMapAnalysis['roomAnalysis'] = {};
 
-  // Story Room - always relevant for narrative
-  if (hasNarrative) {
-    roomAnalysis['sr'] = {
-      applicable: true,
-      principles: [
-        mockPrinciple('The narrative follows a 5-beat structure: Setup, Conflict, Crisis, Resolution, Commission'),
-      ],
-    };
-  }
+  // Floor 1: Furnishing
+  roomAnalysis['sr'] = {
+    applicable: true,
+    principles: [
+      mockPrinciple(
+        'The text presents a narrative arc with divine purpose',
+        'Every story in Scripture points to the grand narrative of redemption',
+        'A staircase ascending through clouds toward a throne of light',
+        ['Luke 24:27']
+      ),
+    ],
+  };
 
-  // Observation Room - always relevant
+  roomAnalysis['ir'] = {
+    applicable: true,
+    principles: [
+      mockPrinciple(
+        'Visual imagery emerges from the passage',
+        'Scripture uses concrete images to convey spiritual truths',
+        'A garden scene with hidden treasures beneath the surface',
+        ['Proverbs 25:2']
+      ),
+    ],
+  };
+
+  // Floor 2: Investigation
   roomAnalysis['or'] = {
     applicable: true,
     principles: [
-      mockPrinciple('Key observations: The text contains ' + text.split(' ').length + ' words with significant theological vocabulary'),
+      mockPrinciple(
+        'Key observations reveal theological vocabulary and patterns',
+        'Careful observation is the first step in understanding Scripture',
+        'A magnifying glass hovering over an ancient scroll',
+        ['2 Timothy 2:15']
+      ),
     ],
   };
 
-  // Christ connection
+  roomAnalysis['st'] = {
+    applicable: true,
+    principles: [
+      mockPrinciple(
+        'Types and symbols point to greater realities',
+        'Old Testament types find their fulfillment in Christ',
+        'Shadows giving way to brilliant light',
+        ['Colossians 2:17', 'Hebrews 10:1']
+      ),
+    ],
+  };
+
+  // Floor 3: Freestyle
+  roomAnalysis['bf'] = {
+    applicable: true,
+    principles: [
+      mockPrinciple(
+        'Cross-references illuminate the passage',
+        'Scripture interprets Scripture',
+        'Multiple streams converging into one river',
+        ['Isaiah 28:10']
+      ),
+    ],
+  };
+
+  // Floor 4: Next Level
   roomAnalysis['cec'] = {
     applicable: true,
     principles: [
-      mockPrinciple('Christ is foreshadowed through the central theme of redemption present in this passage'),
+      mockPrinciple(
+        'Christ is revealed in this passage',
+        'Every chapter of Scripture points to Jesus',
+        'A radiant figure standing at the center of a grand tapestry',
+        ['John 5:39', 'Luke 24:44']
+      ),
+      mockPrinciple(
+        'The redemptive purpose shines through',
+        'God\'s plan of salvation is woven throughout Scripture',
+        'Golden threads connecting all parts of a masterpiece',
+        ['Ephesians 1:9-10']
+      ),
     ],
   };
 
+  roomAnalysis['trm'] = {
+    applicable: true,
+    principles: [
+      mockPrinciple(
+        'A central theme emerges from the text',
+        'Every passage contributes to Scripture\'s unified message',
+        'A single thread running through many colored fabrics',
+        ['Romans 15:4']
+      ),
+    ],
+  };
+
+  // Floor 5: Vision
+  roomAnalysis['pr'] = {
+    applicable: true,
+    principles: [
+      mockPrinciple(
+        'Prophetic implications can be discerned',
+        'The prophetic word is a light shining in darkness',
+        'A lantern illuminating a path through the night',
+        ['2 Peter 1:19']
+      ),
+    ],
+  };
+
+  // Floor 7: Spiritual
+  roomAnalysis['srm'] = {
+    applicable: true,
+    principles: [
+      mockPrinciple(
+        'Sanctuary connections emerge from the text',
+        'The earthly sanctuary illustrated heavenly realities',
+        'The temple structure pointing to heaven itself',
+        ['Hebrews 8:5', 'Hebrews 9:23-24']
+      ),
+    ],
+  };
+
+  // Sanctuary analysis
   const sanctuaryAnalysis: AIMapAnalysis['sanctuaryAnalysis'] = {};
 
-  if (hasSanctuary) {
-    sanctuaryAnalysis['altar-of-burnt-offering'] = {
-      applicable: true,
-      insights: [
-        mockPrinciple('The altar imagery connects to Christ\'s complete sacrifice on Calvary'),
-      ],
-    };
-  }
+  sanctuaryAnalysis['altar-of-burnt-offering'] = {
+    applicable: true,
+    insights: [
+      mockPrinciple(
+        'The sacrifice theme connects to Calvary',
+        'Christ\'s complete sacrifice fulfills all offerings',
+        'Flames consuming the offering while smoke ascends heavenward',
+        ['Hebrews 10:10-12']
+      ),
+    ],
+  };
+
+  sanctuaryAnalysis['mercy-seat'] = {
+    applicable: true,
+    insights: [
+      mockPrinciple(
+        'Mercy and grace flow from God\'s throne',
+        'The mercy seat is where God meets with His people',
+        'A golden throne with cherubim overshadowing',
+        ['Hebrews 4:16', 'Romans 3:25']
+      ),
+    ],
+  };
 
   return {
-    overallTheme: 'This text reveals patterns of divine redemption through narrative and symbolic imagery',
+    overallTheme: `This text reveals patterns of divine redemption and points to Christ through narrative, typology, and prophetic insight.`,
     relevantFloors,
     roomAnalysis,
     sanctuaryAnalysis,
@@ -139,7 +241,13 @@ export function generateMockAnalysis(text: string, mode: AnalysisMode): AIMapAna
         from: 'sr',
         to: 'cec',
         type: 'typological',
-        description: 'The narrative arc points forward to Christ\'s redemptive work',
+        description: 'The narrative arc foreshadows Christ\'s redemptive work',
+      },
+      {
+        from: 'st',
+        to: 'srm',
+        type: 'thematic',
+        description: 'Types and symbols connect to sanctuary imagery',
       },
     ],
   };
