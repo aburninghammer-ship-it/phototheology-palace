@@ -11,11 +11,13 @@ import ReactFlow, {
   Edge,
   ReactFlowProvider,
   useReactFlow,
+  useViewport,
 } from 'reactflow';
 import 'reactflow/dist/style.css';
-import { ZoomIn, ZoomOut, Maximize2, Home, Focus, Keyboard } from 'lucide-react';
+import { ZoomIn, ZoomOut, Maximize2, Home, Keyboard, Pencil } from 'lucide-react';
 
 import { nodeTypes } from './nodes';
+import MindMapNoteEditor from './MindMapNoteEditor';
 import type { AnyNodeData, MindMapEdgeData } from './types';
 
 interface MindMapCanvasProps {
@@ -26,6 +28,8 @@ interface MindMapCanvasProps {
   showMinimap?: boolean;
   showControls?: boolean;
   className?: string;
+  nodeNotes?: Record<string, string>;
+  onNotesChange?: (nodeId: string, note: string) => void;
 }
 
 function MindMapCanvasInner({
@@ -35,14 +39,20 @@ function MindMapCanvasInner({
   showMinimap = true,
   showControls = true,
   className = '',
+  nodeNotes = {},
+  onNotesChange,
 }: MindMapCanvasProps) {
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
   const [zoomLevel, setZoomLevel] = useState(1);
   const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null);
   const [showKeyboardHints, setShowKeyboardHints] = useState(false);
+  const [showNoteEditor, setShowNoteEditor] = useState(false);
+  const [noteEditorPosition, setNoteEditorPosition] = useState<{ x: number; y: number } | null>(null);
   const { fitView, zoomIn, zoomOut, setCenter, getZoom, getNode } = useReactFlow();
+  const { x: viewX, y: viewY, zoom } = useViewport();
   const nodesRef = useRef(initialNodes);
+  const containerRef = useRef<HTMLDivElement>(null);
   nodesRef.current = nodes;
 
   // Update nodes and edges when props change (after analysis populates them)
@@ -71,6 +81,37 @@ function MindMapCanvasInner({
       setCenter(x, y, { zoom, duration: 800 });
     }
   }, [getNode, setCenter]);
+
+  // Calculate screen position for note editor
+  const getNodeScreenPosition = useCallback((nodeId: string) => {
+    const node = getNode(nodeId);
+    if (!node || !containerRef.current) return null;
+
+    const containerRect = containerRef.current.getBoundingClientRect();
+
+    // Transform flow coordinates to screen coordinates
+    const screenX = (node.position.x + (node.width || 150) / 2) * zoom + viewX + containerRect.width / 2;
+    const screenY = (node.position.y) * zoom + viewY + containerRect.height / 2;
+
+    return { x: screenX, y: screenY };
+  }, [getNode, zoom, viewX, viewY]);
+
+  // Toggle note editor
+  const toggleNoteEditor = useCallback(() => {
+    if (selectedNodeId) {
+      const pos = getNodeScreenPosition(selectedNodeId);
+      setNoteEditorPosition(pos);
+      setShowNoteEditor((prev) => !prev);
+    }
+  }, [selectedNodeId, getNodeScreenPosition]);
+
+  // Update note editor position when viewport changes
+  useEffect(() => {
+    if (showNoteEditor && selectedNodeId) {
+      const pos = getNodeScreenPosition(selectedNodeId);
+      setNoteEditorPosition(pos);
+    }
+  }, [showNoteEditor, selectedNodeId, getNodeScreenPosition, viewX, viewY, zoom]);
 
   // Handle node click with Prezi-like zoom
   const handleNodeClick = useCallback(
@@ -301,14 +342,25 @@ function MindMapCanvasInner({
         setShowKeyboardHints(prev => !prev);
         return;
       }
+
+      // N: Toggle note editor for selected node
+      if (event.key === 'n' && !event.ctrlKey && !event.metaKey && selectedNodeId) {
+        event.preventDefault();
+        toggleNoteEditor();
+        return;
+      }
     };
 
     document.addEventListener('keydown', handleKeyDown);
     return () => document.removeEventListener('keydown', handleKeyDown);
-  }, [navigateToAdjacentNode, onNodeClick, setCenter, fitView]);
+  }, [navigateToAdjacentNode, onNodeClick, setCenter, fitView, selectedNodeId, toggleNoteEditor]);
+
+  // Get selected node data for note editor
+  const selectedNode = selectedNodeId ? getNode(selectedNodeId) : null;
+  const selectedNodeLabel = selectedNode?.data?.label || 'Node';
 
   return (
-    <div className={`w-full h-full ${className}`}>
+    <div ref={containerRef} className={`w-full h-full ${className}`}>
       <ReactFlow
         nodes={nodes}
         edges={edges}
@@ -418,7 +470,7 @@ function MindMapCanvasInner({
         )}
 
         {/* Keyboard Shortcuts Button & Panel */}
-        <div className="absolute bottom-4 left-4 z-10">
+        <div className="absolute bottom-4 left-4 z-10 flex gap-2">
           <button
             onClick={() => setShowKeyboardHints(prev => !prev)}
             className={`p-2 rounded-lg transition-all ${
@@ -430,6 +482,25 @@ function MindMapCanvasInner({
           >
             <Keyboard className="w-4 h-4" />
           </button>
+
+          {/* Note Editor Toggle */}
+          {selectedNodeId && onNotesChange && (
+            <button
+              onClick={toggleNoteEditor}
+              className={`p-2 rounded-lg transition-all flex items-center gap-1.5 ${
+                showNoteEditor
+                  ? 'bg-green-500/30 text-green-400 border border-green-500/50'
+                  : 'bg-card/90 backdrop-blur-md border border-white/20 text-muted-foreground hover:text-foreground'
+              }`}
+              title="Add note (N)"
+            >
+              <Pencil className="w-4 h-4" />
+              <span className="text-xs font-medium">Note</span>
+              {nodeNotes[selectedNodeId] && (
+                <span className="w-2 h-2 rounded-full bg-green-400" />
+              )}
+            </button>
+          )}
 
           {showKeyboardHints && (
             <div className="absolute bottom-12 left-0 bg-card/95 backdrop-blur-xl border border-white/20 rounded-xl p-4 shadow-2xl w-64">
@@ -460,6 +531,10 @@ function MindMapCanvasInner({
                   <span className="text-foreground font-mono">Esc</span>
                 </div>
                 <div className="flex justify-between">
+                  <span className="text-muted-foreground">Add note</span>
+                  <span className="text-foreground font-mono">N</span>
+                </div>
+                <div className="flex justify-between">
                   <span className="text-muted-foreground">Toggle hints</span>
                   <span className="text-foreground font-mono">?</span>
                 </div>
@@ -467,6 +542,18 @@ function MindMapCanvasInner({
             </div>
           )}
         </div>
+
+        {/* Floating Note Editor */}
+        {showNoteEditor && selectedNodeId && onNotesChange && (
+          <MindMapNoteEditor
+            nodeId={selectedNodeId}
+            nodeLabel={selectedNodeLabel}
+            position={noteEditorPosition}
+            initialNote={nodeNotes[selectedNodeId] || ''}
+            onSave={onNotesChange}
+            onClose={() => setShowNoteEditor(false)}
+          />
+        )}
       </ReactFlow>
     </div>
   );

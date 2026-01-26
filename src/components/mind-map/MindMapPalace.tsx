@@ -402,6 +402,8 @@ export default function MindMapPalace({
               showMinimap={showMinimap}
               showControls={true}
               className="absolute inset-0"
+              nodeNotes={nodeNotes}
+              onNotesChange={(nodeId, notes) => setNodeNotes(prev => ({ ...prev, [nodeId]: notes }))}
             />
           )}
 
