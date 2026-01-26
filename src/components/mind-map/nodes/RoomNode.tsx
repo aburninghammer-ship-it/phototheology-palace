@@ -50,28 +50,24 @@ const RoomNode = memo(({ data, selected }: NodeProps<RoomNodeData>) => {
         transition-all duration-300 hover:scale-105
         min-w-[180px] max-w-[200px]
         ${selected ? 'ring-2 ring-primary ring-offset-2 ring-offset-background' : ''}
-        ${hasInsights ? 'hover:shadow-xl hover:shadow-green-500/20' : 'hover:shadow-lg hover:shadow-primary/10'}
+        hover:shadow-lg hover:shadow-primary/10
       `}
     >
       {/* Glass background - Floor-colored */}
       <div className={`
         absolute inset-0 backdrop-blur-xl bg-gradient-to-br
-        ${hasInsights
-          ? 'from-green-500/20 via-emerald-500/10 to-teal-500/20'
-          : isNotApplicable
-            ? 'from-gray-500/20 via-gray-600/10 to-gray-700/20'
-            : floorColors.bg
+        ${isNotApplicable
+          ? 'from-gray-500/20 via-gray-600/10 to-gray-700/20'
+          : floorColors.bg
         }
       `} />
 
       {/* Glass border - Floor-colored */}
       <div className={`
         absolute inset-0 rounded-xl border
-        ${hasInsights
-          ? 'border-green-400/40'
-          : isNotApplicable
-            ? 'border-gray-500/30'
-            : floorColors.border
+        ${isNotApplicable
+          ? 'border-gray-500/30'
+          : floorColors.border
         }
       `} />
 
@@ -89,10 +85,10 @@ const RoomNode = memo(({ data, selected }: NodeProps<RoomNodeData>) => {
           )}
 
           {IconComponent && (
-            <IconComponent className={`w-4 h-4 ${hasInsights ? 'text-green-400' : floorColors.accent}`} />
+            <IconComponent className={`w-4 h-4 ${floorColors.accent}`} />
           )}
 
-          <span className={`text-xs font-bold tracking-wide ${hasInsights ? 'text-green-400' : floorColors.accent}`}>
+          <span className={`text-xs font-bold tracking-wide ${floorColors.accent}`}>
             {data.roomTag}
           </span>
 
@@ -101,7 +97,7 @@ const RoomNode = memo(({ data, selected }: NodeProps<RoomNodeData>) => {
           )}
 
           {hasInsights && (
-            <Sparkles className="w-3 h-3 text-green-400/60 ml-auto animate-pulse" />
+            <Sparkles className={`w-3 h-3 ${floorColors.accent} opacity-60 ml-auto animate-pulse`} />
           )}
         </div>
 
@@ -120,13 +116,13 @@ const RoomNode = memo(({ data, selected }: NodeProps<RoomNodeData>) => {
         {/* Insights indicator */}
         {hasInsights && (
           <div className="flex items-center justify-between mt-2 pt-2 border-t border-white/10">
-            <span className="text-xs px-2 py-0.5 rounded-full bg-green-500/30 text-green-300 font-medium">
+            <span className={`text-xs px-2 py-0.5 rounded-full bg-white/20 ${floorColors.text} font-medium`}>
               {data.principles.length} insight{data.principles.length !== 1 ? 's' : ''}
             </span>
             {mindMapContext && (
               <button
                 onClick={handleMakeSeed}
-                className="p-1.5 rounded-lg bg-green-500/20 hover:bg-green-500/40 text-green-300 transition-all duration-200 hover:scale-110"
+                className={`p-1.5 rounded-lg bg-white/20 hover:bg-white/30 ${floorColors.text} transition-all duration-200 hover:scale-110`}
                 title="Make this room's insights the seed for a new map"
               >
                 <Sprout className="w-3.5 h-3.5" />
