@@ -71,9 +71,18 @@ FLOOR 5 - VISION (Prophecy & Christ-Centered):
 
 FLOOR 6 - THREE HEAVENS (Cycles & Horizons):
 - 123h (Three Heavens): First/Second/Third heaven contexts
-- cycles (Cycles Room): 8 redemptive cycles (@Ad, @No, @Ab, @Mo, @Cy, @CyC, @Sp, @Re)
-- jr (Juice Room): Concentrated spiritual essence extraction
-- math (Math Room): Biblical numerology patterns (7, 12, 40, etc.)
+- cycles (Cycles Room): Connect the text to the 8 REDEMPTIVE CYCLES of history. For EACH applicable cycle, show how it AMPLIFIES the seed text:
+  * @Ad (Adam): Creation, Fall, promised Seed - Does the text echo Eden themes?
+  * @No (Noah): Judgment, ark of salvation, new beginning - Does the text speak of judgment/deliverance?
+  * @Ab (Abraham): Covenant, faith, promised land/seed - Does the text involve covenant promises?
+  * @Mo (Moses): Exodus, law, tabernacle, redemption from bondage - Does the text involve liberation or law?
+  * @Da (David): Kingdom, throne, Messiah-King - Does the text involve kingship or Messianic reign?
+  * @Cy (Cyrus): Captivity, return, temple rebuilding - Does the text involve restoration after judgment?
+  * @Sp (Spirit): Pentecost, church, gospel to all nations - Does the text involve Spirit empowerment or mission?
+  * @Re (Restoration): Second Coming, new earth, final victory - Does the text point to end-time fulfillment?
+  ALWAYS find at least 2-3 cycles that amplify the text. Every text fits somewhere in redemptive history!
+- jr (Juice Room): Concentrated spiritual essence extraction - What is the CORE "juice" of this text in one sentence?
+- math (Math Room): Biblical numerology patterns (7, 12, 40, etc.) - Any significant numbers in the text?
 
 FLOOR 7 - SPIRITUAL (Transformation):
 - frm (Fire Room): Purification, testing, Holy Spirit fire
@@ -107,8 +116,13 @@ ANALYSIS REQUIREMENTS (for EACH applicable room):
 IMPORTANT - DO NOT SKIP ROOMS:
 - Analyze at least 8-15 rooms for beginner, 15-25 for scholar/research
 - Include rooms from MULTIPLE floors - not just Floor 1-2
-- Always attempt Christ Every Chapter (cec on Floor 5), Dimensions (dr on Floor 4), and Fruit (frt on Floor 4) rooms
-- Always check sanctuary connections (bl on Floor 5)
+- ALWAYS analyze these key rooms (they apply to virtually every text):
+  * cec (Christ Every Chapter) - Where is Christ?
+  * cycles (Eight Cycles) - Which redemptive cycle(s) amplify this text?
+  * dr (Dimensions) - What are the 5 dimensions of meaning?
+  * frt (Fruit Room) - What spiritual fruit does this produce?
+  * bl (Blue Room) - What sanctuary connection exists?
+- For the CYCLES room specifically: Don't say "Not applicable" - EVERY text fits into redemptive history somewhere!
 
 MANDATORY RULES:
 - Return ONLY valid JSON
