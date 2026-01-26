@@ -80,12 +80,14 @@ export function generateMockAnalysis(text: string, mode: AnalysisMode): AIMapAna
     insight: string,
     visualHook: string,
     scriptures: string[],
-    confidence: number = 85
+    confidence: number = 85,
+    application?: string
   ): PrincipleData => ({
     id: `principle-${Math.random().toString(36).substr(2, 9)}`,
     content,
     evidence,
     insight,
+    application,
     visualHook,
     confidence,
     scriptures,
@@ -101,7 +103,7 @@ export function generateMockAnalysis(text: string, mode: AnalysisMode): AIMapAna
 }
 
 function generateGenesis315Study(
-  makePrinciple: (content: string, evidence: string[], insight: string, visualHook: string, scriptures: string[], confidence?: number) => PrincipleData
+  makePrinciple: (content: string, evidence: string[], insight: string, visualHook: string, scriptures: string[], confidence?: number, application?: string) => PrincipleData
 ): AIMapAnalysis {
   const roomAnalysis: AIMapAnalysis['roomAnalysis'] = {};
 
@@ -119,7 +121,8 @@ function generateGenesis315Study(
         'Genesis 3:15 is the first Messianic prophecy in Scripture. Immediately after the Fall, God announces His redemptive plan. This is not an afterthought—it reveals that salvation was prepared "before the foundation of the world" (1 Peter 1:20). The narrative structure shows: 1) Problem (sin enters), 2) Promise (Deliverer announced), 3) Prophecy (method of victory revealed).',
         'A serpent coiled around a tree, while above it a heel descends from heaven, poised to crush its head—yet bearing a wound',
         ['Genesis 3:15', '1 Peter 1:20', 'Revelation 13:8'],
-        95
+        95,
+        'When you face the consequences of sin—yours or others\'—remember that God had the solution before the problem existed. Rest in His sovereign plan and share this hope with others who feel their situation is hopeless.'
       ),
       makePrinciple(
         'The 5-Beat Narrative Arc of Redemption',
@@ -133,7 +136,8 @@ function generateGenesis315Study(
         'The entire Bible narrative is compressed into Genesis 3. Every subsequent story echoes this pattern: paradise, fall, promise, sacrifice, and restoration. This 5-beat structure becomes the template for understanding all of Scripture.',
         'A spiral staircase descending into darkness, then ascending through a doorway of light',
         ['Genesis 3', 'Romans 5:12-21', 'Revelation 21:1-5'],
-        90
+        90,
+        'Use this 5-beat pattern to analyze your own life story: Where did you start? Where did you fall? What promise has God given? What sacrifice has been made? What restoration awaits? Share your testimony using this structure.'
       ),
     ],
   };
@@ -151,7 +155,8 @@ function generateGenesis315Study(
         'The Hebrew word "zera" (seed) carries profound imagery. Plants produce after their kind—but this Seed would be different. Coming from the woman alone, this Seed would be fully human yet not of Adam\'s corrupted line. Paul confirms: "Now to Abraham and his seed were the promises made... which is Christ" (Galatians 3:16).',
         'A single golden seed falling into dark soil, from which grows a tree whose branches reach to heaven',
         ['Galatians 3:16', 'Isaiah 7:14', 'Matthew 1:23'],
-        92
+        92,
+        'Like a seed, God\'s Word planted in your heart will grow. What spiritual seeds are you planting today through your words and actions? Are you nurturing the good seeds or allowing weeds to grow?'
       ),
       makePrinciple(
         'The Bruising Imagery: Wound and Victory',
@@ -163,7 +168,8 @@ function generateGenesis315Study(
         'The imagery is visceral and precise. A heel wound is painful and slows the warrior, but a head wound is fatal. At Calvary, Satan struck Christ\'s heel (death on the cross), but Christ crushed Satan\'s head (destroying death itself). The Resurrection proves whose wound was fatal.',
         'A warrior\'s sandaled foot pressing down on a serpent\'s skull, with blood flowing from the heel but the serpent lifeless',
         ['Hebrews 2:14', 'Colossians 2:15', 'Romans 16:20'],
-        94
+        94,
+        'Your struggles may wound you, but they cannot destroy you if you are in Christ. The enemy\'s attacks are "heel wounds"—painful but temporary. Stand firm knowing the battle is already won.'
       ),
     ],
   };
@@ -274,7 +280,8 @@ function generateGenesis315Study(
         'Jesus Christ is the Seed of Genesis 3:15. His virgin birth fulfills the unusual grammar—He is literally "her seed," not "his seed." Born of Mary, conceived by the Holy Spirit, He entered humanity\'s line without inheriting Adam\'s corrupted nature. He is the Second Adam, succeeding where the first failed.',
         'Mary holding the infant Christ while a defeated serpent writhes beneath the manger',
         ['Matthew 1:18-23', 'Luke 1:35', 'Romans 5:14-19', 'Galatians 4:4'],
-        96
+        96,
+        'Worship Jesus today for who He truly is: fully God and fully man, the promised Deliverer. Let the reality of the incarnation shape how you pray, knowing He understands human weakness yet reigns with divine power.'
       ),
       makePrinciple(
         'Calvary: The Bruising Fulfilled',
@@ -286,7 +293,8 @@ function generateGenesis315Study(
         'At Calvary, both bruisings occurred. Satan struck Christ\'s heel—causing real suffering and death. But in that very act, Christ crushed Satan\'s head—disarming him, triumphing over him, and destroying his power of death. The Resurrection proved which wound was fatal. Jesus rose; Satan remains defeated.',
         'The cross silhouetted against a dark sky, with a serpent crushed beneath its base and light breaking through from an empty tomb beyond',
         ['Isaiah 53:10', 'Colossians 2:15', 'Hebrews 2:14-15', '1 Corinthians 15:55-57'],
-        97
+        97,
+        'Live as a victor, not a victim. When Satan accuses you, remind him of Calvary. When fear grips you, remember the empty tomb. Declare out loud: "The battle is already won!"'
       ),
       makePrinciple(
         'The Second Adam Theology',
@@ -298,7 +306,8 @@ function generateGenesis315Study(
         'Paul calls Christ "the last Adam" (1 Cor 15:45). Where Adam failed the test in a perfect garden, Christ succeeded in a hostile wilderness. Where Adam\'s one act brought death to all, Christ\'s one act brings life to all who believe. Genesis 3:15 promised this reversal—One would come to undo what Adam did.',
         'Two figures: one falling in a garden of plenty, one rising in a garden tomb',
         ['Romans 5:12-21', '1 Corinthians 15:21-22', '1 Corinthians 15:45'],
-        94
+        94,
+        'You are "in Christ"—not "in Adam." Let this identity define you. When tempted, remember that you have a better representative who already passed every test. Draw on His victory.'
       ),
     ],
   };
@@ -429,7 +438,7 @@ function generateGenesis315Study(
 function generateGenericStudy(
   text: string,
   textPreview: string,
-  makePrinciple: (content: string, evidence: string[], insight: string, visualHook: string, scriptures: string[], confidence?: number) => PrincipleData
+  makePrinciple: (content: string, evidence: string[], insight: string, visualHook: string, scriptures: string[], confidence?: number, application?: string) => PrincipleData
 ): AIMapAnalysis {
   const roomAnalysis: AIMapAnalysis['roomAnalysis'] = {};
 

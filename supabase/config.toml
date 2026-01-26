@@ -264,3 +264,9 @@ verify_jwt = false
 
 [functions.send-welcome-email]
 verify_jwt = false
+
+[functions.mind-map-analyze]
+verify_jwt = false
+
+[functions.mind-map-study]
+verify_jwt = false
