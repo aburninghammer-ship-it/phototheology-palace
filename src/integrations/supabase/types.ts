@@ -7725,6 +7725,59 @@ export type Database = {
         }
         Relationships: []
       }
+      mind_maps: {
+        Row: {
+          analysis_summary: string | null
+          created_at: string
+          id: string
+          map_data: Json
+          mode: string
+          name: string
+          parent_map_id: string | null
+          source_reference: string | null
+          source_text: string
+          source_type: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          analysis_summary?: string | null
+          created_at?: string
+          id?: string
+          map_data: Json
+          mode?: string
+          name: string
+          parent_map_id?: string | null
+          source_reference?: string | null
+          source_text: string
+          source_type?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          analysis_summary?: string | null
+          created_at?: string
+          id?: string
+          map_data?: Json
+          mode?: string
+          name?: string
+          parent_map_id?: string | null
+          source_reference?: string | null
+          source_text?: string
+          source_type?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "mind_maps_parent_map_id_fkey"
+            columns: ["parent_map_id"]
+            isOneToOne: false
+            referencedRelation: "mind_maps"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       ministry_launches: {
         Row: {
           actual_budget: number | null
