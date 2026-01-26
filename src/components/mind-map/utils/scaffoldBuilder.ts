@@ -1,5 +1,5 @@
 import { Node, Edge } from 'reactflow';
-import { palaceFloors, sanctuaryZones, sanctuaryElements, FLOOR_THEMES, SANCTUARY_ZONE_COLORS, LAYOUT_CONFIG } from '../constants';
+import { palaceFloors, sanctuaryZones, sanctuaryElements, FLOOR_THEMES } from '../constants';
 import type {
   AnyNodeData,
   RootNodeData,
@@ -24,18 +24,29 @@ const FLOOR_EDGE_COLORS: Record<number, string> = {
   8: '#eab308', // yellow-500
 };
 
-// Layout configuration for hierarchical tree
-const HIERARCHY_CONFIG = {
-  floorWidth: 280,           // Width of floor nodes
-  floorHeight: 120,          // Height of floor nodes
-  floorGapX: 320,            // Horizontal gap between floors
-  floorGapY: 600,            // Vertical gap to rooms
-  roomWidth: 180,            // Width of room nodes
-  roomGapX: 200,             // Horizontal gap between rooms
-  roomGapY: 400,             // Vertical gap to principles
-  principleGapX: 220,        // Horizontal gap between principles
-  floorsPerRow: 4,           // Floors per row (2 rows of 4)
-  rowGap: 1200,              // Gap between floor rows
+// Layout constants for hierarchical tree
+const TREE_LAYOUT = {
+  // Root position
+  rootX: 0,
+  rootY: 0,
+  
+  // Floor row
+  floorY: 200,           // Y position of floor row
+  floorSpacing: 280,     // Horizontal spacing between floors
+  
+  // Room row
+  roomYOffset: 180,      // Y offset from floor to rooms
+  roomSpacing: 200,      // Horizontal spacing between rooms within a floor
+  
+  // Principle row
+  principleYOffset: 160, // Y offset from room to principles
+  principleSpacing: 220, // Horizontal spacing between principles
+  
+  // Sanctuary section
+  sanctuaryY: 800,       // Y position of sanctuary
+  zoneSpacing: 350,      // Horizontal spacing between zones
+  elementYOffset: 150,   // Y offset from zone to elements
+  elementSpacing: 180,   // Horizontal spacing between elements
 };
 
 interface BuildScaffoldOptions {
@@ -50,11 +61,8 @@ interface ScaffoldResult {
 }
 
 /**
- * Build the mind map with a HIERARCHICAL layout:
- * - Root at top center
- * - Floors in 2 rows of 4 below root
- * - Rooms arranged in rows below each floor
- * - Principles positioned below rooms when populated
+ * Build the initial mind map scaffold with hierarchical tree layout:
+ * Root → Floors (horizontal row) → Rooms (below each floor) → Principles (below rooms)
  */
 export function buildScaffold(options: BuildScaffoldOptions): ScaffoldResult {
   const { sourceText, mode, includeSanctuary = true } = options;
@@ -65,44 +73,39 @@ export function buildScaffold(options: BuildScaffoldOptions): ScaffoldResult {
   const rootNode = createRootNode(sourceText, mode);
   nodes.push(rootNode);
 
-  // Calculate total width for centering
-  const floorsPerRow = HIERARCHY_CONFIG.floorsPerRow;
-  const totalFloorRowWidth = floorsPerRow * HIERARCHY_CONFIG.floorGapX;
+  // Calculate total width needed for all floors
+  const totalFloors = palaceFloors.length;
+  const floorsWidth = (totalFloors - 1) * TREE_LAYOUT.floorSpacing;
+  const floorsStartX = -floorsWidth / 2;
 
-  // Create floor nodes in 2 rows of 4
-  palaceFloors.forEach((floor, index) => {
-    const row = Math.floor(index / floorsPerRow);
-    const col = index % floorsPerRow;
+  // Create floor nodes in a horizontal row
+  palaceFloors.forEach((floor, floorIndex) => {
+    const floorX = floorsStartX + floorIndex * TREE_LAYOUT.floorSpacing;
+    const floorY = TREE_LAYOUT.floorY;
 
-    // Center the floors horizontally
-    const startX = -totalFloorRowWidth / 2 + HIERARCHY_CONFIG.floorGapX / 2;
-    const x = startX + col * HIERARCHY_CONFIG.floorGapX;
-    const y = 250 + row * HIERARCHY_CONFIG.rowGap; // Below root
-
-    const floorNode = createFloorNode(floor, index, { x, y });
+    const floorNode = createFloorNode(floor, floorIndex, { x: floorX, y: floorY });
     nodes.push(floorNode);
 
-    const floorColor = FLOOR_EDGE_COLORS[floor.number] || '#6b7280';
-
     // Connect root to floor
+    const floorColor = FLOOR_EDGE_COLORS[floor.number] || '#6b7280';
     edges.push({
       id: `edge-root-floor-${floor.number}`,
       source: 'root',
       target: floorNode.id,
       type: 'smoothstep',
       animated: false,
-      style: { stroke: floorColor, strokeWidth: 3 },
+      style: { stroke: floorColor, strokeWidth: 2 },
       data: { type: 'hierarchy' },
     });
 
-    // Create room nodes in a row below each floor
+    // Create room nodes below each floor
     const roomCount = floor.rooms.length;
-    const roomRowWidth = roomCount * HIERARCHY_CONFIG.roomGapX;
-    const roomStartX = x - roomRowWidth / 2 + HIERARCHY_CONFIG.roomGapX / 2;
+    const roomsWidth = (roomCount - 1) * TREE_LAYOUT.roomSpacing;
+    const roomsStartX = floorX - roomsWidth / 2;
+    const roomY = floorY + TREE_LAYOUT.roomYOffset;
 
     floor.rooms.forEach((room, roomIndex) => {
-      const roomX = roomStartX + roomIndex * HIERARCHY_CONFIG.roomGapX;
-      const roomY = y + HIERARCHY_CONFIG.floorGapY;
+      const roomX = roomsStartX + roomIndex * TREE_LAYOUT.roomSpacing;
 
       const roomNode = createRoomNode(room, floor.number, { x: roomX, y: roomY });
       nodes.push(roomNode);
@@ -114,13 +117,13 @@ export function buildScaffold(options: BuildScaffoldOptions): ScaffoldResult {
         target: roomNode.id,
         type: 'smoothstep',
         animated: false,
-        style: { stroke: floorColor, strokeWidth: 2, opacity: 0.7 },
+        style: { stroke: floorColor, strokeWidth: 1.5, opacity: 0.7 },
         data: { type: 'hierarchy' },
       });
     });
   });
 
-  // Create Sanctuary section (positioned to the right)
+  // Create Sanctuary section below the Palace
   if (includeSanctuary) {
     const sanctuaryResult = createSanctuaryNodes();
     nodes.push(...sanctuaryResult.nodes);
@@ -133,7 +136,7 @@ export function buildScaffold(options: BuildScaffoldOptions): ScaffoldResult {
       target: 'sanctuary',
       type: 'smoothstep',
       animated: false,
-      style: { stroke: '#a855f7', strokeWidth: 3 },
+      style: { stroke: '#a855f7', strokeWidth: 2 },
       data: { type: 'hierarchy' },
     });
   }
@@ -149,7 +152,7 @@ function createRootNode(sourceText: string, mode: AnalysisMode): Node<RootNodeDa
   return {
     id: 'root',
     type: 'rootNode',
-    position: { x: 0, y: 0 },
+    position: { x: TREE_LAYOUT.rootX, y: TREE_LAYOUT.rootY },
     data: {
       type: 'root',
       label: 'Source Text',
@@ -216,15 +219,11 @@ function createSanctuaryNodes(): { nodes: Node<AnyNodeData>[]; edges: Edge<MindM
   const nodes: Node<AnyNodeData>[] = [];
   const edges: Edge<MindMapEdgeData>[] = [];
 
-  // Position sanctuary to the far right
-  const sanctuaryX = 900;
-  const sanctuaryY = 400;
-
-  // Main Sanctuary node
+  // Main Sanctuary node centered below floors
   const sanctuaryNode: Node<SanctuaryNodeData> = {
     id: 'sanctuary',
     type: 'sanctuaryNode',
-    position: { x: sanctuaryX, y: sanctuaryY },
+    position: { x: 0, y: TREE_LAYOUT.sanctuaryY },
     data: {
       type: 'sanctuary',
       label: 'The Sanctuary',
@@ -234,15 +233,17 @@ function createSanctuaryNodes(): { nodes: Node<AnyNodeData>[]; edges: Edge<MindM
   };
   nodes.push(sanctuaryNode);
 
-  // Zone nodes arranged vertically below sanctuary
+  // Zone nodes in a horizontal row below sanctuary (exclude Camp - has no elements)
   const zones = ['courtyard', 'holy-place', 'most-holy-place'];
+  const zonesWidth = (zones.length - 1) * TREE_LAYOUT.zoneSpacing;
+  const zonesStartX = -zonesWidth / 2;
+  const zoneY = TREE_LAYOUT.sanctuaryY + 180;
+
   zones.forEach((zoneId, index) => {
     const zoneData = sanctuaryZones.find(z => z.id === zoneId);
     if (!zoneData) return;
 
-    const zoneX = sanctuaryX + (index - 1) * 300;
-    const zoneY = sanctuaryY + 250;
-
+    const zoneX = zonesStartX + index * TREE_LAYOUT.zoneSpacing;
     const zoneElements = sanctuaryElements.filter(e => e.zone === zoneId);
 
     const zoneNode: Node<SanctuaryZoneNodeData> = {
@@ -268,19 +269,22 @@ function createSanctuaryNodes(): { nodes: Node<AnyNodeData>[]; edges: Edge<MindM
       source: 'sanctuary',
       target: zoneNode.id,
       type: 'smoothstep',
-      style: { stroke: '#a855f7', strokeWidth: 2 },
+      style: { stroke: '#a855f7', strokeWidth: 1.5 },
       data: { type: 'hierarchy' },
     });
 
-    // Element nodes arranged below each zone
+    // Element nodes in a row below each zone
+    const elementsWidth = (zoneElements.length - 1) * TREE_LAYOUT.elementSpacing;
+    const elementsStartX = zoneX - elementsWidth / 2;
+    const elementY = zoneY + TREE_LAYOUT.elementYOffset;
+
     zoneElements.forEach((element, elemIndex) => {
-      const elemX = zoneX + (elemIndex - (zoneElements.length - 1) / 2) * 180;
-      const elemY = zoneY + 200;
+      const elemX = elementsStartX + elemIndex * TREE_LAYOUT.elementSpacing;
 
       const elementNode: Node<SanctuaryElementNodeData> = {
         id: `element-${element.id}`,
         type: 'sanctuaryElementNode',
-        position: { x: elemX, y: elemY },
+        position: { x: elemX, y: elementY },
         data: {
           type: 'sanctuary-element',
           label: element.name,
@@ -301,7 +305,7 @@ function createSanctuaryNodes(): { nodes: Node<AnyNodeData>[]; edges: Edge<MindM
         source: zoneNode.id,
         target: elementNode.id,
         type: 'smoothstep',
-        style: { stroke: '#9ca3af', strokeWidth: 1.5 },
+        style: { stroke: '#9ca3af', strokeWidth: 1 },
         data: { type: 'hierarchy' },
       });
     });
@@ -319,20 +323,25 @@ export function calculatePrinciplePositions(
   principleCount: number
 ): { x: number; y: number }[] {
   const positions: { x: number; y: number }[] = [];
-  const gap = HIERARCHY_CONFIG.principleGapX;
-  const verticalOffset = 150; // Distance below parent room
+  const principleY = parentPosition.y + TREE_LAYOUT.principleYOffset;
 
-  if (principleCount === 0) return positions;
-
-  // Calculate total width and starting position to center
-  const totalWidth = (principleCount - 1) * gap;
-  const startX = parentPosition.x - totalWidth / 2;
-
-  for (let i = 0; i < principleCount; i++) {
+  if (principleCount === 1) {
+    // Single principle: directly below
     positions.push({
-      x: startX + i * gap,
-      y: parentPosition.y + verticalOffset,
+      x: parentPosition.x,
+      y: principleY,
     });
+  } else {
+    // Multiple principles: spread horizontally below
+    const totalWidth = (principleCount - 1) * TREE_LAYOUT.principleSpacing;
+    const startX = parentPosition.x - totalWidth / 2;
+
+    for (let i = 0; i < principleCount; i++) {
+      positions.push({
+        x: startX + i * TREE_LAYOUT.principleSpacing,
+        y: principleY,
+      });
+    }
   }
 
   return positions;
