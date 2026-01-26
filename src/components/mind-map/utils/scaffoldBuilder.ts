@@ -268,21 +268,44 @@ function createSanctuaryNodes(): { nodes: Node<AnyNodeData>[]; edges: Edge<MindM
 
 /**
  * Calculate positions for principle nodes around their parent
+ * Positions are spread out below and to the sides of the parent room
  */
 export function calculatePrinciplePositions(
   parentPosition: { x: number; y: number },
   principleCount: number
 ): { x: number; y: number }[] {
   const positions: { x: number; y: number }[] = [];
-  const radius = 100;
-  const startAngle = Math.PI / 4;
+  const baseRadius = 180; // Distance from parent
+  const verticalOffset = 120; // Push principles below parent
 
-  for (let i = 0; i < principleCount; i++) {
-    const angle = startAngle + (i * Math.PI) / (principleCount + 1);
+  if (principleCount === 1) {
+    // Single principle: directly below
     positions.push({
-      x: parentPosition.x + radius * Math.cos(angle),
-      y: parentPosition.y + radius * Math.sin(angle),
+      x: parentPosition.x,
+      y: parentPosition.y + verticalOffset + 50,
     });
+  } else if (principleCount === 2) {
+    // Two principles: fan out below
+    positions.push({
+      x: parentPosition.x - 120,
+      y: parentPosition.y + verticalOffset,
+    });
+    positions.push({
+      x: parentPosition.x + 120,
+      y: parentPosition.y + verticalOffset,
+    });
+  } else {
+    // Multiple principles: arrange in an arc below
+    const spreadAngle = Math.min(Math.PI * 0.8, principleCount * 0.4); // Max spread
+    const startAngle = Math.PI / 2 - spreadAngle / 2; // Start from bottom-left
+
+    for (let i = 0; i < principleCount; i++) {
+      const angle = startAngle + (i * spreadAngle) / (principleCount - 1);
+      positions.push({
+        x: parentPosition.x + baseRadius * Math.cos(angle),
+        y: parentPosition.y + verticalOffset + baseRadius * Math.sin(angle) * 0.6,
+      });
+    }
   }
 
   return positions;
