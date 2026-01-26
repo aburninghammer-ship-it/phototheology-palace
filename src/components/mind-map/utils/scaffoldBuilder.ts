@@ -69,9 +69,10 @@ export function buildScaffold(options: BuildScaffoldOptions): ScaffoldResult {
       data: { type: 'hierarchy' },
     });
 
-    // Create room nodes for each floor
+    // Create room nodes for each floor - spread out more evenly
     floor.rooms.forEach((room, roomIndex) => {
-      const roomAngle = angle + ((roomIndex - (floor.rooms.length - 1) / 2) * 0.3);
+      // Wider spread angle (0.4 instead of 0.3) for more separation
+      const roomAngle = angle + ((roomIndex - (floor.rooms.length - 1) / 2) * 0.4);
       const roomX = x + LAYOUT_CONFIG.roomRadius * Math.cos(roomAngle);
       const roomY = y + LAYOUT_CONFIG.roomRadius * Math.sin(roomAngle);
 
@@ -240,11 +241,11 @@ function createSanctuaryNodes(): { nodes: Node<AnyNodeData>[]; edges: Edge<MindM
       data: { type: 'hierarchy' },
     });
 
-    // Element nodes for each zone
+    // Element nodes for each zone - increased spacing
     zoneElements.forEach((element, elemIndex) => {
-      const elemAngle = angle + ((elemIndex - (zoneElements.length - 1) / 2) * 0.4);
-      const elemX = x + 140 * Math.cos(elemAngle);
-      const elemY = y + 140 * Math.sin(elemAngle);
+      const elemAngle = angle + ((elemIndex - (zoneElements.length - 1) / 2) * 0.5);  // Wider spread
+      const elemX = x + 200 * Math.cos(elemAngle);  // Increased from 140
+      const elemY = y + 200 * Math.sin(elemAngle);  // Increased from 140
 
       const elementNode: Node<SanctuaryElementNodeData> = {
         id: `element-${element.id}`,
@@ -282,41 +283,58 @@ function createSanctuaryNodes(): { nodes: Node<AnyNodeData>[]; edges: Edge<MindM
 /**
  * Calculate positions for principle nodes around their parent
  * Positions are spread out below and to the sides of the parent room
+ * Now with increased spacing for compact principle nodes
  */
 export function calculatePrinciplePositions(
   parentPosition: { x: number; y: number },
   principleCount: number
 ): { x: number; y: number }[] {
   const positions: { x: number; y: number }[] = [];
-  const baseRadius = 180; // Distance from parent
-  const verticalOffset = 120; // Push principles below parent
+  const baseRadius = 150;     // Distance from parent (reduced since nodes are smaller)
+  const verticalOffset = 80;  // Push principles below parent
+  const horizontalGap = 220;  // Gap between principles horizontally
 
   if (principleCount === 1) {
     // Single principle: directly below
     positions.push({
       x: parentPosition.x,
-      y: parentPosition.y + verticalOffset + 50,
+      y: parentPosition.y + verticalOffset + 40,
     });
   } else if (principleCount === 2) {
-    // Two principles: fan out below
+    // Two principles: side by side below
     positions.push({
-      x: parentPosition.x - 120,
+      x: parentPosition.x - horizontalGap / 2,
       y: parentPosition.y + verticalOffset,
     });
     positions.push({
-      x: parentPosition.x + 120,
+      x: parentPosition.x + horizontalGap / 2,
       y: parentPosition.y + verticalOffset,
     });
-  } else {
-    // Multiple principles: arrange in an arc below
-    const spreadAngle = Math.min(Math.PI * 0.8, principleCount * 0.4); // Max spread
-    const startAngle = Math.PI / 2 - spreadAngle / 2; // Start from bottom-left
+  } else if (principleCount <= 4) {
+    // 3-4 principles: arrange in a row below
+    const totalWidth = (principleCount - 1) * horizontalGap;
+    const startX = parentPosition.x - totalWidth / 2;
 
     for (let i = 0; i < principleCount; i++) {
-      const angle = startAngle + (i * spreadAngle) / (principleCount - 1);
       positions.push({
-        x: parentPosition.x + baseRadius * Math.cos(angle),
-        y: parentPosition.y + verticalOffset + baseRadius * Math.sin(angle) * 0.6,
+        x: startX + i * horizontalGap,
+        y: parentPosition.y + verticalOffset,
+      });
+    }
+  } else {
+    // More than 4: arrange in 2 rows
+    const perRow = Math.ceil(principleCount / 2);
+    const rowWidth = (perRow - 1) * horizontalGap;
+
+    for (let i = 0; i < principleCount; i++) {
+      const row = Math.floor(i / perRow);
+      const col = i % perRow;
+      const itemsInRow = row === 0 ? perRow : principleCount - perRow;
+      const rowStartX = parentPosition.x - ((itemsInRow - 1) * horizontalGap) / 2;
+
+      positions.push({
+        x: rowStartX + col * horizontalGap,
+        y: parentPosition.y + verticalOffset + row * 60,
       });
     }
   }

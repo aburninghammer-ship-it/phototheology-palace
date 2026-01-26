@@ -107,17 +107,17 @@ export const ANALYSIS_MODE_CONFIG = {
   },
 };
 
-// Layout constants
+// Layout constants - Increased spacing to prevent overlap
 export const LAYOUT_CONFIG = {
   rootPosition: { x: 0, y: 0 },
-  floorRadius: 350,
-  roomRadius: 200,
-  sanctuaryOffset: { x: 0, y: 500 },
-  zoneRadius: 180,
+  floorRadius: 550,      // Increased from 350 - more space between root and floors
+  roomRadius: 350,       // Increased from 200 - more space between floors and rooms
+  sanctuaryOffset: { x: 0, y: 800 },  // Moved further down
+  zoneRadius: 250,       // Increased from 180
   nodeSpacing: {
-    floor: 100,
-    room: 80,
-    principle: 60,
+    floor: 150,          // Increased from 100
+    room: 120,           // Increased from 80
+    principle: 100,      // Increased from 60
   },
 };
 
