@@ -29,6 +29,7 @@ import {
   LayoutGrid,
   Heart,
   Headphones,
+  Network,
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { Separator } from "@/components/ui/separator";
@@ -46,6 +47,7 @@ const categoryConfig = {
     links: [
       { to: "/bible", label: "PT Study Bible", icon: "📖" },
       { to: "/study-buddy", label: "Study Buddy", icon: "🧠" },
+      { to: "/mind-map", label: "Mind Map Palace", icon: "🗺️" },
       { to: "/audio-bible", label: "Audio Bible", icon: "🎧" },
       { to: "/bible-image-library", label: "PT Image Bible", icon: "🎨" },
       { to: "/card-deck", label: "PT Study Deck", icon: "🃏" },
@@ -176,6 +178,7 @@ const simplifiedQuickLinks = [
   { to: "/memory", label: "Memory", icon: Brain, color: "from-cyan-500/10 to-teal-500/5", borderColor: "border-cyan-500/20", iconColor: "text-cyan-500" },
   { to: "/leaderboard", label: "Scores", icon: Trophy, color: "from-yellow-500/10 to-amber-500/5", borderColor: "border-yellow-500/20", iconColor: "text-yellow-500" },
   { to: "/phototheologygpt", label: "AI Chat", icon: Sparkles, color: "from-violet-500/10 to-purple-500/5", borderColor: "border-violet-500/20", iconColor: "text-violet-500" },
+  { to: "/mind-map", label: "Mind Map", icon: Network, color: "from-indigo-500/10 to-blue-500/5", borderColor: "border-indigo-500/20", iconColor: "text-indigo-500" },
 ];
 
 export const EnhancedMobileDrawer = () => {

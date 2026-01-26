@@ -7,7 +7,7 @@ import { useChurchMembership } from "@/hooks/useChurchMembership";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Loader2, Home, Users, BookOpen, Heart, Flame, ArrowRight, MessagesSquare, Sprout, Sun, Moon, Sparkles, ArrowLeft, BookMarked, Zap, Settings } from "lucide-react";
+import { Loader2, Home, Users, BookOpen, Heart, Flame, ArrowRight, MessagesSquare, Sprout, Sun, Moon, Sparkles, ArrowLeft, BookMarked, Zap, Settings, Droplets } from "lucide-react";
 import { useTheme } from "next-themes";
 import { SmallGroupsHub } from "@/components/living-manna/SmallGroupsHub";
 import { MemberHome } from "@/components/living-manna/MemberHome";
@@ -18,6 +18,7 @@ import { YouthSpace } from "@/components/living-manna/YouthSpace";
 import { PersonalDevotionalDiary } from "@/components/living-manna/PersonalDevotionalDiary";
 import { ExploitsHub } from "@/components/living-manna/ExploitsHub";
 import { ChurchAdminTab } from "@/components/living-manna/ChurchAdminTab";
+import { BaptismTrack } from "@/components/living-manna/baptism-track/BaptismTrack";
 import { DirectMessagesProvider } from "@/contexts/DirectMessagesContext";
 import { useIsMobile } from "@/hooks/use-mobile";
 export default function LivingManna() {
@@ -266,6 +267,10 @@ export default function LivingManna() {
                     <MessagesSquare className="h-4 w-4" />
                     <span className="text-xs sm:text-sm">Connect</span>
                   </TabsTrigger>
+                  <TabsTrigger value="baptism" className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 py-2 px-3 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground min-w-[60px]">
+                    <Droplets className="h-4 w-4" />
+                    <span className="text-xs sm:text-sm">Baptism</span>
+                  </TabsTrigger>
                   <TabsTrigger value="youth" className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 py-2 px-3 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground min-w-[60px]">
                     <Sparkles className="h-4 w-4" />
                     <span className="text-xs sm:text-sm">Youth</span>
@@ -305,6 +310,10 @@ export default function LivingManna() {
 
               <TabsContent value="connect">
                 <ConnectTab churchId={effectiveChurchId!} />
+              </TabsContent>
+
+              <TabsContent value="baptism">
+                <BaptismTrack churchId={effectiveChurchId!} />
               </TabsContent>
 
               <TabsContent value="youth">

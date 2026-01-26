@@ -69,7 +69,10 @@
       "Bash(SUPABASE_ACCESS_TOKEN=\"sbp_fe32d3be189beab600f50a27caea50a09e6ef260\" npx supabase migration list:*)",
       "Bash(SUPABASE_ACCESS_TOKEN=\"sbp_fe32d3be189beab600f50a27caea50a09e6ef260\" npx supabase migration:*)",
       "Bash(SUPABASE_ACCESS_TOKEN=\"sbp_fe32d3be189beab600f50a27caea50a09e6ef260\" npx supabase link:*)",
-      "Bash(our abode\"\\), the system now:\n- Detects biblical phrases using pattern matching\n- Identifies the source verse via AI \\(John 14:23 in this example\\)\n- Auto-expands the phrase into a blockquote with the full verse text\n- Populates the Verses tab with related thematic verses\n\nSupports 20+ common biblical phrase patterns including:\n- Father/God phrases, abode/dwelling references\n- Classic quotes \\(Lord is my shepherd, For God so loved, etc.\\)\n- Beatitudes, grace passages, faith teachings\n\n🤖 Generated with [Claude Code]\\(https://claude.com/claude-code\\)\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>\nEOF\n\\)\")"
+      "Bash(our abode\"\\), the system now:\n- Detects biblical phrases using pattern matching\n- Identifies the source verse via AI \\(John 14:23 in this example\\)\n- Auto-expands the phrase into a blockquote with the full verse text\n- Populates the Verses tab with related thematic verses\n\nSupports 20+ common biblical phrase patterns including:\n- Father/God phrases, abode/dwelling references\n- Classic quotes \\(Lord is my shepherd, For God so loved, etc.\\)\n- Beatitudes, grace passages, faith teachings\n\n🤖 Generated with [Claude Code]\\(https://claude.com/claude-code\\)\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>\nEOF\n\\)\")",
+      "Bash(open:*)",
+      "Bash(pbcopy:*)",
+      "Bash(SUPABASE_ACCESS_TOKEN=\"sbp_fe32d3be189beab600f50a27caea50a09e6ef260\" npx supabase db push:*)"
     ],
     "deny": [],
     "ask": []
