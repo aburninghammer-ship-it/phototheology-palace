@@ -243,16 +243,16 @@ FLOOR 6 - THREE HEAVENS (Cycles & Horizons):
   * THIRD HEAVEN: How does THIS text connect to the divine throne room (God's presence, worship, glory)?
   REQUIRED: Show connections to ALL 3 heavens!
 
-- cycles (Cycles Room): Connect the seed to ALL 8 REDEMPTIVE CYCLES. Show how EACH cycle AMPLIFIES the seed text:
-  * @Ad (Adam): How does THIS text echo Creation, Fall, or promised Seed themes?
-  * @No (Noah): How does THIS text speak of judgment, ark of salvation, or new beginning?
-  * @Ab (Abraham): How does THIS text involve covenant promises, faith, or promised seed?
-  * @Mo (Moses): How does THIS text involve exodus, law, tabernacle, or redemption from bondage?
-  * @Da (David): How does THIS text involve kingdom, throne, or Messianic reign?
-  * @Cy (Cyrus): How does THIS text involve captivity, return, or temple rebuilding/restoration?
-  * @Sp (Spirit): How does THIS text involve Pentecost, church, or gospel mission?
-  * @Re (Restoration): How does THIS text point to Second Coming, new earth, or final victory?
-  REQUIRED: Connect the seed to at least 5 of the 8 cycles. Every text fits into redemptive history at multiple points!
+- cycles (Cycles Room): Connect the seed to ALL 8 REDEMPTIVE CYCLES. You MUST generate EXACTLY 8 separate principles - one for EACH cycle:
+  * @Ad (Adamic): How does THIS text echo Creation, Fall, or promised Seed themes? (REQUIRED)
+  * @No (Noahic): How does THIS text speak of judgment, ark of salvation, or new beginning? (REQUIRED)
+  * @Ab (Abrahamic): How does THIS text involve covenant promises, faith, or promised seed? (REQUIRED)
+  * @Mo (Mosaic): How does THIS text involve exodus, law, tabernacle, or redemption from bondage? (REQUIRED)
+  * @Cy (Cyrusic): How does THIS text involve captivity, return, or temple rebuilding/restoration? (REQUIRED)
+  * @CyC (Cyrus-Christ): How does THIS text connect typology between Cyrus as deliverer and Christ as ultimate Deliverer? (REQUIRED)
+  * @Sp (Spirit): How does THIS text involve Pentecost, church, or gospel mission? (REQUIRED)
+  * @Re (Remnant): How does THIS text point to Second Coming, new earth, or final victory? (REQUIRED)
+  ⚠️ MANDATORY: You MUST generate EXACTLY 8 principles for the cycles room - one for EACH cycle (@Ad, @No, @Ab, @Mo, @Cy, @CyC, @Sp, @Re). Do NOT skip any cycle. Every text speaks to ALL 8 cycles of redemptive history!
 
 - jr (Juice Room): Extract the CONCENTRATED ESSENCE:
   * The Juice: What is the CORE truth in one sentence?
