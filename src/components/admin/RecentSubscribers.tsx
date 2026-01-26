@@ -30,17 +30,21 @@ export function RecentSubscribers() {
       const daysAgo = new Date();
       daysAgo.setDate(daysAgo.getDate() - parseInt(timeRange));
 
-      const { data, error } = await supabase
+      const { data, error } = await (supabase
         .from("profiles")
         .select("id, display_name, subscription_tier, subscription_status, payment_source, created_at")
         .eq("subscription_status", "active")
         .in("subscription_tier", ["monthly", "annual", "essential", "premium", "student", "lifetime"])
         .gte("created_at", daysAgo.toISOString())
-        .order("created_at", { ascending: false });
+        .order("created_at", { ascending: false }) as any);
 
       if (error) throw error;
-      // Map data to include email placeholder since profiles table doesn't have email
-      setSubscribers((data || []).map(d => ({ ...d, email: "" })) as RecentSubscriber[]);
+      // Map data to expected interface shape (email is not in profiles table)
+      const mappedData = (data || []).map((d: any) => ({
+        ...d,
+        email: d.display_name || 'N/A'
+      }));
+      setSubscribers(mappedData);
     } catch (error) {
       console.error("Error loading recent subscribers:", error);
     } finally {

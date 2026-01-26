@@ -108,18 +108,18 @@ export function BaptismTrack({ churchId }: BaptismTrackProps) {
   const createCandidateMutation = useMutation({
     mutationFn: async () => {
       if (!user?.id) throw new Error("Not authenticated");
-      const { data: profile } = await supabase
+      const { data: profile } = await (supabase
         .from("profiles")
-        .select("display_name")
+        .select("display_name, username")
         .eq("id", user.id)
-        .single() as { data: { display_name?: string } | null };
+        .single() as any);
 
       const { data, error } = await supabase
         .from("baptism_candidates")
         .insert({
           user_id: user.id,
           church_id: churchId,
-          name: profile?.display_name || "Candidate",
+          name: profile?.display_name || profile?.username || "Candidate",
           stage: "interested",
         })
         .select()

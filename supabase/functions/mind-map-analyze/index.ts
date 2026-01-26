@@ -61,15 +61,15 @@ FLOOR 4 - NEXT LEVEL (Christ-Centered Structure):
 - p|| (Parallels Room): Two mirrored events - what echoes and what escalates?
 - frt (Fruit Room): What fruit does this interpretation produce?
 
-FLOOR 5 - VISION (Prophecy & Types):
+FLOOR 5 - VISION (Prophecy & Christ-Centered):
 - bl (Blue Room - Sanctuary): Map to sanctuary articles/services - which element applies?
 - pr (Prophecy Room): Daniel-Revelation historicist timeline placement
 - 3a (Three Angels Room): End-time message connections
 - fe (Feasts Room): Levitical feast typology and fulfillment
-
-FLOOR 6 - THREE HEAVENS (Cycles & Horizons):
 - cec (Christ Every Chapter Room): Where is Christ in this passage? Explicit or typological?
 - r66 (Room 66): Book-level themes across all 66 books
+
+FLOOR 6 - THREE HEAVENS (Cycles & Horizons):
 - 123h (Three Heavens): First/Second/Third heaven contexts
 - cycles (Cycles Room): 8 redemptive cycles (@Ad, @No, @Ab, @Mo, @Cy, @CyC, @Sp, @Re)
 - jr (Juice Room): Concentrated spiritual essence extraction
@@ -107,8 +107,8 @@ ANALYSIS REQUIREMENTS (for EACH applicable room):
 IMPORTANT - DO NOT SKIP ROOMS:
 - Analyze at least 8-15 rooms for beginner, 15-25 for scholar/research
 - Include rooms from MULTIPLE floors - not just Floor 1-2
-- Always attempt Christ Every Chapter (cec), Dimensions (dr), and Fruit (frt) rooms
-- Always check sanctuary connections (bl)
+- Always attempt Christ Every Chapter (cec on Floor 5), Dimensions (dr on Floor 4), and Fruit (frt on Floor 4) rooms
+- Always check sanctuary connections (bl on Floor 5)
 
 MANDATORY RULES:
 - Return ONLY valid JSON

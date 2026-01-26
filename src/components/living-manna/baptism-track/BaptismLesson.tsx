@@ -196,6 +196,23 @@ export function BaptismLesson({ lesson, candidateId, progress, onBack }: Baptism
     createAttempt();
   }, [candidateId, lesson.id]);
 
+  // Set initial guidance on mount
+  useEffect(() => {
+    if (!guidance) {
+      setGuidance({
+        overallResponse: `Welcome to Lesson ${lesson.fundamental_number}: **${lesson.title}**\n\n${lesson.description || ''}\n\nLet's begin by exploring what the Bible says about this fundamental truth. Type your thoughts, questions, or simply "ready" to start.`,
+        currentSection: {
+          title: "Introduction",
+          content: `This lesson will guide you through the biblical foundation for "${lesson.title}" using the Phototheology Palace method.`,
+          scriptures: Array.isArray(lesson.scripture_pack) ? lesson.scripture_pack.slice(0, 3) : [],
+          questions: ["What do you already know about this topic?", "Do you have any questions before we begin?"],
+          options: ["I'm ready to learn", "I have a question", "Tell me more about this topic"],
+        },
+        ptPath: lesson.pt_map?.palace_path?.[0] || { floor: "Foundation Floor", rooms: ["Story Room"] },
+      });
+    }
+  }, [lesson, guidance]);
+
   // Load existing study notes
   useEffect(() => {
     const loadNotes = async () => {
