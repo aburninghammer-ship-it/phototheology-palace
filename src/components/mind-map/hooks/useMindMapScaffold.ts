@@ -266,10 +266,46 @@ export function useMindMapScaffold(
 
     // Update sanctuary elements with insights
     if (populatedAnalysis.sanctuaryAnalysis) {
+      // Normalize sanctuary element IDs - AI may return different formats
+      const normalizeElementId = (id: string): string => {
+        // Convert variations like "altar-of-burnt-offering" to "altar-burnt-offering"
+        const mappings: Record<string, string> = {
+          'altar-of-burnt-offering': 'altar-burnt-offering',
+          'bronze-laver': 'laver',
+          'golden-lampstand': 'lampstand',
+          'table-of-showbread': 'table-showbread',
+          'altar-of-incense': 'altar-incense',
+          'ark-of-the-covenant': 'ark-covenant',
+          'mercy-seat': 'mercy-seat',
+          'cherubim': 'cherubim',
+          'the-veil': 'veil',
+        };
+        return mappings[id] || id;
+      };
+
       Object.entries(populatedAnalysis.sanctuaryAnalysis).forEach(([elementId, elemData]) => {
         if (!elemData.applicable) return;
 
-        const elemIndex = updatedNodes.findIndex((n) => n.id === `element-${elementId}`);
+        // Try both the original ID and normalized versions
+        const normalizedId = normalizeElementId(elementId);
+        let elemIndex = updatedNodes.findIndex((n) => n.id === `element-${normalizedId}`);
+        
+        // If not found with normalized ID, try original
+        if (elemIndex === -1) {
+          elemIndex = updatedNodes.findIndex((n) => n.id === `element-${elementId}`);
+        }
+        
+        // Also try matching by partial ID (in case of format differences)
+        if (elemIndex === -1) {
+          const partialMatch = elementId.replace(/-of-/g, '-').replace(/^the-/, '');
+          elemIndex = updatedNodes.findIndex((n) => {
+            const nodeId = n.id.replace('element-', '');
+            return nodeId === partialMatch || 
+                   nodeId.includes(partialMatch) || 
+                   partialMatch.includes(nodeId);
+          });
+        }
+
         if (elemIndex !== -1) {
           const elemNode = updatedNodes[elemIndex];
           updatedNodes[elemIndex] = {

@@ -299,11 +299,13 @@ FLOOR 8 - MASTER (Integration):
   * Original Insight: What have you discovered that others miss?
   * Master Application: How does this transform life at the deepest level?
 
-SANCTUARY STRUCTURE:
+SANCTUARY STRUCTURE (use EXACT IDs shown for sanctuaryAnalysis keys):
 - Camp (outer world)
-- Courtyard: Altar of Burnt Offering (sacrifice/blood), Bronze Laver (cleansing/washing)
-- Holy Place: Golden Lampstand (light/Spirit), Table of Showbread (provision/Word), Altar of Incense (prayer/intercession)
-- Most Holy Place: Ark of the Covenant (law/covenant), Mercy Seat (grace/propitiation), Cherubim (worship/presence)
+- Courtyard: altar-burnt-offering (sacrifice/blood), laver (cleansing/washing)
+- Holy Place: lampstand (light/Spirit), table-showbread (provision/Word), altar-incense (prayer/intercession)
+- Most Holy Place: ark-covenant (law/covenant), mercy-seat (grace/propitiation)
+
+SANCTUARY ELEMENT IDS TO USE: altar-burnt-offering, laver, lampstand, table-showbread, altar-incense, ark-covenant, mercy-seat
 
 MODE ADJUSTMENTS:
 - BEGINNER: 5-8 rooms, simplified language, clear patterns only
@@ -451,7 +453,7 @@ RESPONSE FORMAT (JSON only, no markdown):
     }
   },
   "sanctuaryAnalysis": {
-    "altar-of-burnt-offering": {
+    "altar-burnt-offering": {
       "applicable": true,
       "insights": [{
         "id": "altar-1",
@@ -462,7 +464,13 @@ RESPONSE FORMAT (JSON only, no markdown):
         "visualHook": "Flames consuming offering on bronze altar",
         "confidence": 90
       }]
-    }
+    },
+    "laver": { "applicable": true, "insights": [] },
+    "lampstand": { "applicable": true, "insights": [] },
+    "table-showbread": { "applicable": true, "insights": [] },
+    "altar-incense": { "applicable": true, "insights": [] },
+    "ark-covenant": { "applicable": true, "insights": [] },
+    "mercy-seat": { "applicable": true, "insights": [] }
   },
   "crossConnections": [{
     "from": "sr",
