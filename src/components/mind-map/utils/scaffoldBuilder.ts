@@ -24,6 +24,20 @@ const FLOOR_EDGE_COLORS: Record<number, string> = {
   8: '#eab308', // yellow-500
 };
 
+// Layout configuration for hierarchical tree
+const HIERARCHY_CONFIG = {
+  floorWidth: 280,           // Width of floor nodes
+  floorHeight: 120,          // Height of floor nodes
+  floorGapX: 320,            // Horizontal gap between floors
+  floorGapY: 600,            // Vertical gap to rooms
+  roomWidth: 180,            // Width of room nodes
+  roomGapX: 200,             // Horizontal gap between rooms
+  roomGapY: 400,             // Vertical gap to principles
+  principleGapX: 220,        // Horizontal gap between principles
+  floorsPerRow: 4,           // Floors per row (2 rows of 4)
+  rowGap: 1200,              // Gap between floor rows
+};
+
 interface BuildScaffoldOptions {
   sourceText: string;
   mode: AnalysisMode;
@@ -36,63 +50,77 @@ interface ScaffoldResult {
 }
 
 /**
- * Build the initial mind map scaffold with all Palace floors, rooms, and Sanctuary
- * Nodes start unpopulated and get filled by AI analysis
+ * Build the mind map with a HIERARCHICAL layout:
+ * - Root at top center
+ * - Floors in 2 rows of 4 below root
+ * - Rooms arranged in rows below each floor
+ * - Principles positioned below rooms when populated
  */
 export function buildScaffold(options: BuildScaffoldOptions): ScaffoldResult {
   const { sourceText, mode, includeSanctuary = true } = options;
   const nodes: Node<AnyNodeData>[] = [];
   const edges: Edge<MindMapEdgeData>[] = [];
 
-  // Create root node
+  // Create root node at top center
   const rootNode = createRootNode(sourceText, mode);
   nodes.push(rootNode);
 
-  // Create floor nodes arranged radially around root
+  // Calculate total width for centering
+  const floorsPerRow = HIERARCHY_CONFIG.floorsPerRow;
+  const totalFloorRowWidth = floorsPerRow * HIERARCHY_CONFIG.floorGapX;
+
+  // Create floor nodes in 2 rows of 4
   palaceFloors.forEach((floor, index) => {
-    const angle = (index * 2 * Math.PI) / palaceFloors.length - Math.PI / 2;
-    const x = LAYOUT_CONFIG.floorRadius * Math.cos(angle);
-    const y = LAYOUT_CONFIG.floorRadius * Math.sin(angle);
+    const row = Math.floor(index / floorsPerRow);
+    const col = index % floorsPerRow;
+
+    // Center the floors horizontally
+    const startX = -totalFloorRowWidth / 2 + HIERARCHY_CONFIG.floorGapX / 2;
+    const x = startX + col * HIERARCHY_CONFIG.floorGapX;
+    const y = 250 + row * HIERARCHY_CONFIG.rowGap; // Below root
 
     const floorNode = createFloorNode(floor, index, { x, y });
     nodes.push(floorNode);
 
-    // Connect root to floor - use floor-specific color
     const floorColor = FLOOR_EDGE_COLORS[floor.number] || '#6b7280';
+
+    // Connect root to floor
     edges.push({
       id: `edge-root-floor-${floor.number}`,
       source: 'root',
       target: floorNode.id,
       type: 'smoothstep',
       animated: false,
-      style: { stroke: floorColor, strokeWidth: 2 },
+      style: { stroke: floorColor, strokeWidth: 3 },
       data: { type: 'hierarchy' },
     });
 
-    // Create room nodes for each floor - spread out more evenly
+    // Create room nodes in a row below each floor
+    const roomCount = floor.rooms.length;
+    const roomRowWidth = roomCount * HIERARCHY_CONFIG.roomGapX;
+    const roomStartX = x - roomRowWidth / 2 + HIERARCHY_CONFIG.roomGapX / 2;
+
     floor.rooms.forEach((room, roomIndex) => {
-      // Wider spread angle (0.4 instead of 0.3) for more separation
-      const roomAngle = angle + ((roomIndex - (floor.rooms.length - 1) / 2) * 0.4);
-      const roomX = x + LAYOUT_CONFIG.roomRadius * Math.cos(roomAngle);
-      const roomY = y + LAYOUT_CONFIG.roomRadius * Math.sin(roomAngle);
+      const roomX = roomStartX + roomIndex * HIERARCHY_CONFIG.roomGapX;
+      const roomY = y + HIERARCHY_CONFIG.floorGapY;
 
       const roomNode = createRoomNode(room, floor.number, { x: roomX, y: roomY });
       nodes.push(roomNode);
 
-      // Connect floor to room - use floor-specific color (lighter)
+      // Connect floor to room
       edges.push({
         id: `edge-floor-${floor.number}-room-${room.id}`,
         source: floorNode.id,
         target: roomNode.id,
         type: 'smoothstep',
         animated: false,
-        style: { stroke: floorColor, strokeWidth: 1.5, opacity: 0.6 },
+        style: { stroke: floorColor, strokeWidth: 2, opacity: 0.7 },
         data: { type: 'hierarchy' },
       });
     });
   });
 
-  // Create Sanctuary section
+  // Create Sanctuary section (positioned to the right)
   if (includeSanctuary) {
     const sanctuaryResult = createSanctuaryNodes();
     nodes.push(...sanctuaryResult.nodes);
@@ -105,7 +133,7 @@ export function buildScaffold(options: BuildScaffoldOptions): ScaffoldResult {
       target: 'sanctuary',
       type: 'smoothstep',
       animated: false,
-      style: { stroke: '#a855f7', strokeWidth: 2 },
+      style: { stroke: '#a855f7', strokeWidth: 3 },
       data: { type: 'hierarchy' },
     });
   }
@@ -121,7 +149,7 @@ function createRootNode(sourceText: string, mode: AnalysisMode): Node<RootNodeDa
   return {
     id: 'root',
     type: 'rootNode',
-    position: LAYOUT_CONFIG.rootPosition,
+    position: { x: 0, y: 0 },
     data: {
       type: 'root',
       label: 'Source Text',
@@ -188,11 +216,15 @@ function createSanctuaryNodes(): { nodes: Node<AnyNodeData>[]; edges: Edge<MindM
   const nodes: Node<AnyNodeData>[] = [];
   const edges: Edge<MindMapEdgeData>[] = [];
 
+  // Position sanctuary to the far right
+  const sanctuaryX = 900;
+  const sanctuaryY = 400;
+
   // Main Sanctuary node
   const sanctuaryNode: Node<SanctuaryNodeData> = {
     id: 'sanctuary',
     type: 'sanctuaryNode',
-    position: LAYOUT_CONFIG.sanctuaryOffset,
+    position: { x: sanctuaryX, y: sanctuaryY },
     data: {
       type: 'sanctuary',
       label: 'The Sanctuary',
@@ -202,22 +234,21 @@ function createSanctuaryNodes(): { nodes: Node<AnyNodeData>[]; edges: Edge<MindM
   };
   nodes.push(sanctuaryNode);
 
-  // Zone nodes arranged around sanctuary (exclude Camp - has no elements)
+  // Zone nodes arranged vertically below sanctuary
   const zones = ['courtyard', 'holy-place', 'most-holy-place'];
   zones.forEach((zoneId, index) => {
     const zoneData = sanctuaryZones.find(z => z.id === zoneId);
     if (!zoneData) return;
 
-    const angle = (index * 2 * Math.PI) / zones.length - Math.PI / 2;
-    const x = LAYOUT_CONFIG.sanctuaryOffset.x + LAYOUT_CONFIG.zoneRadius * Math.cos(angle);
-    const y = LAYOUT_CONFIG.sanctuaryOffset.y + LAYOUT_CONFIG.zoneRadius * Math.sin(angle);
+    const zoneX = sanctuaryX + (index - 1) * 300;
+    const zoneY = sanctuaryY + 250;
 
     const zoneElements = sanctuaryElements.filter(e => e.zone === zoneId);
 
     const zoneNode: Node<SanctuaryZoneNodeData> = {
       id: `zone-${zoneId}`,
       type: 'sanctuaryZoneNode',
-      position: { x, y },
+      position: { x: zoneX, y: zoneY },
       data: {
         type: 'sanctuary-zone',
         label: zoneData.name,
@@ -237,15 +268,14 @@ function createSanctuaryNodes(): { nodes: Node<AnyNodeData>[]; edges: Edge<MindM
       source: 'sanctuary',
       target: zoneNode.id,
       type: 'smoothstep',
-      style: { stroke: '#a855f7', strokeWidth: 1.5 },
+      style: { stroke: '#a855f7', strokeWidth: 2 },
       data: { type: 'hierarchy' },
     });
 
-    // Element nodes for each zone - increased spacing
+    // Element nodes arranged below each zone
     zoneElements.forEach((element, elemIndex) => {
-      const elemAngle = angle + ((elemIndex - (zoneElements.length - 1) / 2) * 0.5);  // Wider spread
-      const elemX = x + 200 * Math.cos(elemAngle);  // Increased from 140
-      const elemY = y + 200 * Math.sin(elemAngle);  // Increased from 140
+      const elemX = zoneX + (elemIndex - (zoneElements.length - 1) / 2) * 180;
+      const elemY = zoneY + 200;
 
       const elementNode: Node<SanctuaryElementNodeData> = {
         id: `element-${element.id}`,
@@ -271,7 +301,7 @@ function createSanctuaryNodes(): { nodes: Node<AnyNodeData>[]; edges: Edge<MindM
         source: zoneNode.id,
         target: elementNode.id,
         type: 'smoothstep',
-        style: { stroke: '#9ca3af', strokeWidth: 1 },
+        style: { stroke: '#9ca3af', strokeWidth: 1.5 },
         data: { type: 'hierarchy' },
       });
     });
@@ -281,62 +311,28 @@ function createSanctuaryNodes(): { nodes: Node<AnyNodeData>[]; edges: Edge<MindM
 }
 
 /**
- * Calculate positions for principle nodes around their parent
- * Positions are spread out below and to the sides of the parent room
- * Now with increased spacing for compact principle nodes
+ * Calculate positions for principle nodes below their parent room
+ * Arranged in a horizontal row
  */
 export function calculatePrinciplePositions(
   parentPosition: { x: number; y: number },
   principleCount: number
 ): { x: number; y: number }[] {
   const positions: { x: number; y: number }[] = [];
-  const baseRadius = 150;     // Distance from parent (reduced since nodes are smaller)
-  const verticalOffset = 80;  // Push principles below parent
-  const horizontalGap = 220;  // Gap between principles horizontally
+  const gap = HIERARCHY_CONFIG.principleGapX;
+  const verticalOffset = 150; // Distance below parent room
 
-  if (principleCount === 1) {
-    // Single principle: directly below
+  if (principleCount === 0) return positions;
+
+  // Calculate total width and starting position to center
+  const totalWidth = (principleCount - 1) * gap;
+  const startX = parentPosition.x - totalWidth / 2;
+
+  for (let i = 0; i < principleCount; i++) {
     positions.push({
-      x: parentPosition.x,
-      y: parentPosition.y + verticalOffset + 40,
-    });
-  } else if (principleCount === 2) {
-    // Two principles: side by side below
-    positions.push({
-      x: parentPosition.x - horizontalGap / 2,
+      x: startX + i * gap,
       y: parentPosition.y + verticalOffset,
     });
-    positions.push({
-      x: parentPosition.x + horizontalGap / 2,
-      y: parentPosition.y + verticalOffset,
-    });
-  } else if (principleCount <= 4) {
-    // 3-4 principles: arrange in a row below
-    const totalWidth = (principleCount - 1) * horizontalGap;
-    const startX = parentPosition.x - totalWidth / 2;
-
-    for (let i = 0; i < principleCount; i++) {
-      positions.push({
-        x: startX + i * horizontalGap,
-        y: parentPosition.y + verticalOffset,
-      });
-    }
-  } else {
-    // More than 4: arrange in 2 rows
-    const perRow = Math.ceil(principleCount / 2);
-    const rowWidth = (perRow - 1) * horizontalGap;
-
-    for (let i = 0; i < principleCount; i++) {
-      const row = Math.floor(i / perRow);
-      const col = i % perRow;
-      const itemsInRow = row === 0 ? perRow : principleCount - perRow;
-      const rowStartX = parentPosition.x - ((itemsInRow - 1) * horizontalGap) / 2;
-
-      positions.push({
-        x: rowStartX + col * horizontalGap,
-        y: parentPosition.y + verticalOffset + row * 60,
-      });
-    }
   }
 
   return positions;
