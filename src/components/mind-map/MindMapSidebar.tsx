@@ -1,4 +1,5 @@
-import { X, BookOpen, Lightbulb, Eye, ChevronRight, Sprout, ExternalLink } from 'lucide-react';
+import { useState } from 'react';
+import { X, BookOpen, Lightbulb, Eye, ChevronRight, Sprout, ExternalLink, StickyNote, Save, MessageCircle } from 'lucide-react';
 import type { AnyNodeData, PrincipleData } from './types';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -7,6 +8,22 @@ interface MindMapSidebarProps {
   onClose: () => void;
   selectedNode: AnyNodeData | null;
   onMakeSeed?: (content: string) => void;
+  nodeNotes?: Record<string, string>;
+  onNotesChange?: (nodeId: string, notes: string) => void;
+}
+
+// Helper to get a unique ID for a node
+function getNodeId(node: AnyNodeData): string {
+  switch (node.type) {
+    case 'root': return 'root';
+    case 'floor': return `floor-${node.floorNumber}`;
+    case 'room': return node.roomId;
+    case 'sanctuary': return 'sanctuary';
+    case 'sanctuary-zone': return node.zoneId;
+    case 'sanctuary-element': return node.elementId;
+    case 'principle': return node.parentId + '-principle';
+    default: return 'unknown';
+  }
 }
 
 export default function MindMapSidebar({
@@ -14,8 +31,15 @@ export default function MindMapSidebar({
   onClose,
   selectedNode,
   onMakeSeed,
+  nodeNotes = {},
+  onNotesChange,
 }: MindMapSidebarProps) {
+  const [activeTab, setActiveTab] = useState<'details' | 'notes'>('details');
+
   if (!selectedNode) return null;
+
+  const nodeId = getNodeId(selectedNode);
+  const currentNotes = nodeNotes[nodeId] || '';
 
   return (
     <AnimatePresence>
@@ -26,7 +50,7 @@ export default function MindMapSidebar({
           exit={{ x: '100%' }}
           transition={{ type: 'spring', damping: 25, stiffness: 200 }}
           className="fixed right-0 top-0 h-full w-80 md:w-96 bg-card/95 backdrop-blur-lg
-                     border-l border-white/20 shadow-2xl z-50 overflow-hidden"
+                     border-l border-white/20 shadow-2xl z-50 overflow-hidden flex flex-col"
         >
           {/* Header */}
           <div className="flex items-center justify-between p-4 border-b border-white/10">
@@ -40,9 +64,66 @@ export default function MindMapSidebar({
             </button>
           </div>
 
+          {/* Tab Switcher */}
+          <div className="flex border-b border-white/10">
+            <button
+              onClick={() => setActiveTab('details')}
+              className={`flex-1 px-4 py-2.5 text-sm font-medium transition-colors flex items-center justify-center gap-2
+                         ${activeTab === 'details'
+                           ? 'text-primary border-b-2 border-primary bg-primary/5'
+                           : 'text-muted-foreground hover:text-foreground hover:bg-white/5'}`}
+            >
+              <BookOpen className="w-4 h-4" />
+              Details
+            </button>
+            <button
+              onClick={() => setActiveTab('notes')}
+              className={`flex-1 px-4 py-2.5 text-sm font-medium transition-colors flex items-center justify-center gap-2
+                         ${activeTab === 'notes'
+                           ? 'text-primary border-b-2 border-primary bg-primary/5'
+                           : 'text-muted-foreground hover:text-foreground hover:bg-white/5'}`}
+            >
+              <StickyNote className="w-4 h-4" />
+              Notes
+              {currentNotes && <span className="w-2 h-2 rounded-full bg-green-400" />}
+            </button>
+          </div>
+
           {/* Content */}
-          <div className="p-4 overflow-y-auto h-[calc(100%-60px)]">
-            {renderNodeContent(selectedNode, onMakeSeed)}
+          <div className="flex-1 overflow-y-auto">
+            {activeTab === 'details' ? (
+              <div className="p-4">
+                {renderNodeContent(selectedNode, onMakeSeed)}
+              </div>
+            ) : (
+              <div className="p-4 h-full flex flex-col">
+                <div className="mb-3">
+                  <h4 className="text-sm font-semibold text-foreground mb-1">Your Notes</h4>
+                  <p className="text-xs text-muted-foreground">
+                    Add personal insights, questions, or reflections about this section.
+                  </p>
+                </div>
+                <textarea
+                  value={currentNotes}
+                  onChange={(e) => onNotesChange?.(nodeId, e.target.value)}
+                  placeholder="Write your notes here...
+
+• What stood out to you?
+• Questions to explore further?
+• Application to your life?"
+                  className="flex-1 w-full p-3 rounded-lg bg-background/50 border border-white/20
+                             text-sm text-foreground placeholder:text-muted-foreground/50
+                             focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary/50
+                             resize-none min-h-[200px]"
+                />
+                {currentNotes && (
+                  <div className="mt-3 flex items-center gap-2 text-xs text-green-400">
+                    <Save className="w-3.5 h-3.5" />
+                    <span>Notes auto-saved</span>
+                  </div>
+                )}
+              </div>
+            )}
           </div>
         </motion.div>
       )}

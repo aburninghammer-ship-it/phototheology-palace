@@ -1,4 +1,5 @@
 import { useState, useCallback, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useMediaQuery } from '@/hooks/use-media-query';
 import MindMapCanvas from './MindMapCanvas';
 import MindMapToolbar, { type GenerationMethod } from './MindMapToolbar';
@@ -6,6 +7,7 @@ import MindMapControls from './MindMapControls';
 import MindMapSidebar from './MindMapSidebar';
 import MindMapMobile from './MindMapMobile';
 import MindMapStudyView from './MindMapStudyView';
+import MindMapJeevesChat from './MindMapJeevesChat';
 import { useMindMapScaffold } from './hooks/useMindMapScaffold';
 import { useMindMapGeneration, generateMockAnalysis, generateEmptyScaffold } from './hooks/useMindMapGeneration';
 import { useMindMapStorage } from './hooks/useMindMapStorage';
@@ -13,7 +15,7 @@ import { MindMapProvider, type MapHistoryEntry } from './MindMapContext';
 import type { AnalysisMode, AnyNodeData, MindMapFilters, ExplorationBreadcrumb, GeneratedStudy, AIMapAnalysis } from './types';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
-import { ArrowLeft, ChevronRight, Home } from 'lucide-react';
+import { ArrowLeft, ChevronRight, Home, MessageCircle } from 'lucide-react';
 
 interface MindMapPalaceProps {
   initialText?: string;
@@ -28,6 +30,7 @@ export default function MindMapPalace({
   onMakeSeed,
   embedded = false,
 }: MindMapPalaceProps) {
+  const navigate = useNavigate();
   const isMobile = useMediaQuery('(max-width: 768px)');
 
   // State
@@ -36,6 +39,7 @@ export default function MindMapPalace({
   const [selectedNodeData, setSelectedNodeData] = useState<AnyNodeData | null>(null);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [showMinimap, setShowMinimap] = useState(true);
+  const [jeevesChatOpen, setJeevesChatOpen] = useState(false);
   const [filters, setFilters] = useState<MindMapFilters>({
     showFloors: [1, 2, 3, 4, 5, 6, 7, 8],
     showSanctuary: true,
@@ -48,10 +52,16 @@ export default function MindMapPalace({
   const [studyMethod, setStudyMethod] = useState<GenerationMethod>('jeeves');
   const [generatedStudy, setGeneratedStudy] = useState<GeneratedStudy | null>(null);
   const [isGeneratingStudy, setIsGeneratingStudy] = useState(false);
+  const [nodeNotes, setNodeNotes] = useState<Record<string, string>>({});
 
   // History stack for nested maps
   const [mapHistory, setMapHistory] = useState<MapHistoryEntry[]>([]);
   const historyRef = useRef<MapHistoryEntry[]>([]);
+
+  // Handle navigation back to previous page
+  const handleNavigateAway = useCallback(() => {
+    navigate(-1);
+  }, [navigate]);
 
   // Hooks
   const { nodes, edges, populateWithAnalysis, reset } = useMindMapScaffold(sourceText, mode);
@@ -476,12 +486,46 @@ export default function MindMapPalace({
             )}
           </div>
 
+          {/* Page Back Button - Top Right */}
+          <div className="absolute top-4 right-4 z-10">
+            <button
+              onClick={handleNavigateAway}
+              className="flex items-center gap-2 px-3 py-2 rounded-lg bg-card/80 backdrop-blur-md border border-white/20
+                         text-muted-foreground hover:text-foreground hover:bg-card/90 transition-all shadow-lg"
+            >
+              <ArrowLeft className="w-4 h-4" />
+              <span className="text-sm font-medium">Exit Mind Map</span>
+            </button>
+          </div>
+
+          {/* Floating Jeeves Chat Button - Bottom Right */}
+          <button
+            onClick={() => setJeevesChatOpen(true)}
+            className="fixed bottom-6 right-6 z-30 flex items-center gap-2 px-4 py-3 rounded-full
+                       bg-gradient-to-r from-primary to-accent shadow-2xl shadow-primary/30
+                       text-white font-semibold transition-all hover:scale-105 hover:shadow-primary/50"
+          >
+            <MessageCircle className="w-5 h-5" />
+            <span>Ask Jeeves</span>
+          </button>
+
           {/* Sidebar */}
           <MindMapSidebar
             isOpen={sidebarOpen}
             onClose={() => setSidebarOpen(false)}
             selectedNode={selectedNodeData}
             onMakeSeed={handleMakeSeed}
+            nodeNotes={nodeNotes}
+            onNotesChange={(nodeId, notes) => setNodeNotes(prev => ({ ...prev, [nodeId]: notes }))}
+          />
+
+          {/* Jeeves Chat Panel */}
+          <MindMapJeevesChat
+            isOpen={jeevesChatOpen}
+            onClose={() => setJeevesChatOpen(false)}
+            sourceText={sourceText}
+            selectedNode={selectedNodeData}
+            currentAnalysis={currentAnalysis}
           />
         </div>
       </MindMapProvider>
@@ -491,6 +535,18 @@ export default function MindMapPalace({
   // Initial state - show intro and toolbar
   return (
     <div className="h-full w-full flex flex-col">
+      {/* Page Navigation Header */}
+      <div className="absolute top-4 left-4 z-20">
+        <button
+          onClick={handleNavigateAway}
+          className="flex items-center gap-2 px-3 py-2 rounded-lg bg-card/80 backdrop-blur-md border border-white/20
+                     text-muted-foreground hover:text-foreground hover:bg-card/90 transition-all shadow-lg"
+        >
+          <ArrowLeft className="w-4 h-4" />
+          <span className="text-sm font-medium">Back</span>
+        </button>
+      </div>
+
       {/* Animated background elements */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute -top-40 -right-40 w-96 h-96 bg-gradient-to-br from-primary/20 to-accent/20 rounded-full blur-3xl animate-pulse" />
