@@ -311,6 +311,23 @@ MODE ADJUSTMENTS:
 - PREACHER: 8-15 rooms, focus on teaching hooks, illustrations, sermon applications
 - RESEARCH: Exhaustive analysis, all applicable rooms, academic rigor
 
+CRITICAL RULE - ROOM APPLICABILITY:
+⚠️ ALL ROOMS MUST BE MARKED AS APPLICABLE (applicable: true) EXCEPT:
+- "24fps" (24FPS Room) - This is a mnemonic tool, only applicable for chapter-by-chapter study
+- "br" (Bible Rendered Room) - This is for 24-chapter block compression, not single texts
+
+For EVERY OTHER ROOM (sr, ir, tr, gr, or, dc, st, qr, qa, nf, pf, bf, hf, lr, cr, dr, c6, trm, tz, prm, p||, frt, bl, pr, 3a, fe, cec, r66, 123h, cycles, jr, math, frm, mr, srm, infinity, freestyle):
+- ALWAYS set "applicable": true
+- ALWAYS provide at least 1 principle with content, evidence, insight, application, and visualHook
+- If a room seems less relevant, still find a connection and provide an insight
+
+For rooms with MULTIPLE SUB-PRINCIPLES (like 3a with 3 angels, c6 with 6 genres, ir with 5 senses):
+- Provide SEPARATE principles for EACH sub-component
+- Example for 3a: Provide 3 distinct principles (first angel, second angel, third angel)
+- Example for c6: Provide insights for each of the 6 genres
+- Example for ir: Provide sensory insights for all 5 senses
+- Example for dr: Provide insights for all 5 dimensions
+
 ANALYSIS REQUIREMENTS (for EACH applicable room):
 1. PRINCIPLE: Identify specific patterns/truths from the text (2-3 per room)
 2. EVIDENCE: Direct quotes or paraphrases supporting the principle
@@ -501,6 +518,9 @@ serve(async (req) => {
       `- sanctuaryAnalysis MUST contain at least 1 sanctuary element (key).`,
       `- For each included room: applicable=true and include 1-3 principles with application + visualHook + KJV cross-refs.`,
       `- Do not return empty objects for roomAnalysis or sanctuaryAnalysis.`,
+      `- CRITICAL: ALL rooms MUST be "applicable": true EXCEPT "24fps" and "br" which can be false.`,
+      `- For multi-principle rooms (3a, c6, ir, dr, trm, tz, frt, bl, fe, cec, 123h, cycles, frm, mr, srm, cr, or):`,
+      `  Provide SEPARATE principles matching each sub-component (e.g., 3 principles for 3a's three angels).`,
     ].join("\n");
 
     const callGateway = async (extraUserInstruction?: string) => {
