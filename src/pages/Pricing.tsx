@@ -596,22 +596,7 @@ export default function Pricing() {
                 </p>
               </div>
 
-              <div className="p-4 rounded-lg bg-background/50 border">
-                <h4 className="font-semibold mb-2 flex items-center gap-2">
-                  <Gift className="h-4 w-4 text-purple-500" />
-                  Ministry Access Available
-                </h4>
-                <p className="text-sm text-muted-foreground">
-                  Are you a missionary, seminary student, or under-resourced ministry?
-                  <Link to="/contact" className="text-primary hover:underline ml-1">Contact us</Link> — we have scholarship options for those who need them.
-                </p>
-              </div>
             </div>
-
-            <p className="text-sm text-muted-foreground italic text-center pt-4 border-t">
-              "Paul made tents while preaching the gospel (Acts 18:3). We build software while serving the Word.
-              Thank you for understanding — and for being part of this mission."
-            </p>
           </CardContent>
         </Card>
 
