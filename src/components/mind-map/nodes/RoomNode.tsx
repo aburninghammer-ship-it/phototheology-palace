@@ -308,22 +308,22 @@ const RoomNode = memo(({ data, selected }: NodeProps<RoomNodeData>) => {
   return (
     <div
       className={`
-        relative rounded-2xl overflow-hidden
-        transition-all duration-300
+        relative rounded-2xl
+        transition-all duration-300 flex flex-col
         ${selected ? 'ring-2 ring-primary ring-offset-2 ring-offset-background' : ''}
-        w-[320px] max-h-[500px] shadow-2xl
+        w-[320px] h-[450px] shadow-2xl
       `}
     >
       {/* Glass background - Floor-colored */}
-      <div className={`absolute inset-0 backdrop-blur-xl bg-gradient-to-br ${floorColors.bg}`} />
+      <div className={`absolute inset-0 backdrop-blur-xl bg-gradient-to-br ${floorColors.bg} rounded-2xl`} />
       <div className={`absolute inset-0 rounded-2xl border ${floorColors.border}`} />
-      <div className="absolute inset-0 bg-gradient-to-br from-white/10 via-transparent to-black/10" />
+      <div className="absolute inset-0 bg-gradient-to-br from-white/10 via-transparent to-black/10 rounded-2xl" />
 
-      {/* Content */}
-      <div className="relative">
-        {/* Header - Sticky */}
+      {/* Content - Flex container */}
+      <div className="relative flex flex-col h-full min-h-0 overflow-hidden rounded-2xl">
+        {/* Header - Fixed height */}
         <div 
-          className="sticky top-0 z-10 px-4 py-3 backdrop-blur-lg bg-black/20 border-b border-white/10 cursor-pointer"
+          className="flex-shrink-0 px-4 py-3 backdrop-blur-lg bg-black/20 border-b border-white/10 cursor-pointer"
           onClick={handleToggleExpand}
         >
           <div className="flex items-center gap-2">
@@ -366,8 +366,14 @@ const RoomNode = memo(({ data, selected }: NodeProps<RoomNodeData>) => {
           )}
         </div>
 
-        {/* Scrollable Principles List */}
-        <div className="max-h-[350px] overflow-y-auto px-3 py-3 space-y-2 scrollbar-thin scrollbar-thumb-white/20 scrollbar-track-transparent">
+        {/* Scrollable Principles List - Takes remaining height */}
+        <div 
+          className="flex-1 min-h-0 overflow-y-auto px-3 py-3 space-y-2"
+          style={{ 
+            scrollbarWidth: 'thin',
+            scrollbarColor: 'rgba(255,255,255,0.2) transparent'
+          }}
+        >
           {hasInsights ? (
             data.principles.map((principle, index) => (
               <PrincipleCard
