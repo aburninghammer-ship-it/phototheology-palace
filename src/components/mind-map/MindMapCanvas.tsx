@@ -84,8 +84,10 @@ function MindMapCanvasInner({
       let targetZoom = 1.0;
       if (node.data.type === 'principle') {
         targetZoom = 1.2; // Zoom in for detailed content (but not too close)
+      } else if (node.data.type === 'sub-principle') {
+        targetZoom = 1.0; // Show sub-principle details
       } else if (node.data.type === 'room') {
-        targetZoom = 0.8; // Show room and its principles
+        targetZoom = 0.7; // Show room and its sub-principles (zoom out a bit more)
       } else if (node.data.type === 'floor') {
         targetZoom = 0.45; // Zoom OUT to show floor + all its rooms
       } else if (node.data.type === 'root') {
@@ -146,6 +148,8 @@ function MindMapCanvasInner({
         return '#6366f1';
       case 'principle':
         return '#22c55e';
+      case 'sub-principle':
+        return '#6ee7b7'; // Lighter green for sub-principles
       default:
         return '#6b7280';
     }

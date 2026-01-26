@@ -208,11 +208,11 @@ FLOOR 5 - VISION (Prophecy & Christ-Centered):
   * Fulfillment Stage: Past, present, or future fulfillment?
   * Prophetic Significance: What does it reveal about God's plan?
 
-- 3a (Three Angels Room): Connect the seed to ALL THREE END-TIME MESSAGES:
-  * First Angel: How does THIS text relate to the everlasting gospel and judgment hour message?
-  * Second Angel: How does THIS text relate to Babylon's fall and the call to come out?
-  * Third Angel: How does THIS text relate to the beast/image warning and seal of God?
-  REQUIRED: Show how the seed connects to ALL 3 angels' messages!
+- 3a (Three Angels Room): APPLY the seed text to ALL THREE END-TIME MESSAGES:
+  * First Angel (Everlasting Gospel): Show how THIS text proclaims the everlasting gospel. What fear-of-God, glory-to-God, or judgment-hour truth does this text reveal?
+  * Second Angel (Babylon Fallen): Show how THIS text exposes false systems. What confusion, compromise, or call-to-come-out theme does this text contain?
+  * Third Angel (Beast Warning): Show how THIS text distinguishes true from false worship. What seal of God, patience of saints, or faithfulness theme appears?
+  REQUIRED: Provide 3 separate principles - one for EACH angel's message! Do NOT ask questions - APPLY the text to each message.
 
 - fe (Feasts Room): Connect the seed to ALL 7 LEVITICAL FEASTS:
   * PASSOVER: How does THIS text speak of redemption/deliverance/the Lamb?
@@ -319,34 +319,39 @@ ANALYSIS REQUIREMENTS (for EACH applicable room):
 5. VISUAL HOOK: A concrete, memorable image (not abstractions)
 6. CONFIDENCE: 0-100 score based on how clearly text demonstrates this
 
-CRITICAL - ALL MULTI-PRINCIPLE ROOMS MUST APPLY THE SEED TO ALL PRINCIPLES:
+======== CRITICAL DIRECTIVE - READ CAREFULLY ========
 
-MANDATORY ROOMS (must ALWAYS have content - "Not applicable" is FORBIDDEN):
+"NOT APPLICABLE" IS ABSOLUTELY FORBIDDEN FOR ANY ROOM.
+
+Every room in the Palace can illuminate EVERY text. Your job is NOT to evaluate whether a room applies - your job is to FIND THE CONNECTION. There is ALWAYS a connection.
+
+If you find yourself thinking "this room doesn't apply," STOP. That thought is WRONG. The room DOES apply - you just haven't found the connection yet. Keep thinking until you find it.
+
+MANDATORY ROOMS (must ALWAYS have full multi-principle content):
   * bl (Blue Room): Apply seed to ALL 7 sanctuary elements
   * c6 (Connect-6): Find connections in ALL 6 genres
   * cec (Christ Every Chapter): Find Christ through ALL 4 lenses
-  * cycles (Eight Cycles): Connect seed to at least 5 of 8 cycles
+  * cycles (Eight Cycles): Connect seed to ALL 8 cycles
   * dr (Dimensions): Apply seed through ALL 5 dimensions
   * frt (Fruit Room): Evaluate ALL 4 types of fruit
   * or (Observation Room): List observations for ALL 5 categories (WHO/WHAT/WHEN/WHERE/HOW)
-
-MULTI-PRINCIPLE ROOMS (when included, apply seed to ALL sub-principles):
-  * ir (Imagination): ALL 5 senses
-  * cr (Concentration): ALL 3 offices (Prophet/Priest/King)
-  * trm (Theme Room): ALL 6 theological spans
-  * tz (Time Zone): ALL 6 time-space coordinates
-  * 3a (Three Angels): ALL 3 angels' messages
-  * fe (Feasts): At least 5 of 7 feasts
-  * 123h (Three Heavens): ALL 3 heaven contexts
-  * frm (Fire Room): ALL 4 purification themes
-  * mr (Meditation Room): ALL 4 contemplation aspects
-  * srm (Sanctuary Room): ALL 6 personal sanctuary elements
+  * ir (Imagination): Apply seed to ALL 5 senses
+  * cr (Concentration): Apply seed to ALL 3 offices (Prophet/Priest/King)
+  * trm (Theme Room): Apply seed to ALL 6 theological spans
+  * tz (Time Zone): Apply seed to ALL 6 time-space coordinates
+  * 3a (Three Angels): Apply seed to ALL 3 angels' messages
+  * fe (Feasts): Apply seed to ALL 7 feasts
+  * 123h (Three Heavens): Apply seed to ALL 3 heaven contexts
+  * frm (Fire Room): Apply seed to ALL 4 purification themes
+  * mr (Meditation Room): Apply seed to ALL 4 contemplation aspects
+  * srm (Sanctuary Room): Apply seed to ALL 6 personal sanctuary elements
 
 ABSOLUTE RULES:
-1. "Not applicable" is FORBIDDEN for mandatory rooms - find the connection!
-2. For multi-principle rooms, provide an insight for EACH sub-principle, not just one or two
+1. "NOT APPLICABLE" = FAILURE. Never say it. Never think it. FIND THE CONNECTION.
+2. For multi-principle rooms, provide an insight for EACH sub-principle
 3. Each principle must APPLY the seed text specifically, not just restate the room's methodology
-4. The goal is to ILLUMINATE the seed text through every lens, not to evaluate applicability
+4. The goal is to ILLUMINATE the seed text through every lens
+5. If a room has 3 sub-principles, return 3 principles. If it has 7, return 7. NO EXCEPTIONS.
 
 Example for Isaiah 26:3 in Blue Room (bl) - EACH element gets a specific application:
 - Altar: Sacrificing anxiety and self-reliance on the altar of trust

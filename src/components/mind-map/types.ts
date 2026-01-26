@@ -4,7 +4,7 @@ import { Node, Edge } from 'reactflow';
 export type AnalysisMode = 'beginner' | 'scholar' | 'preacher' | 'research';
 
 // Node Types
-export type MindMapNodeType = 'root' | 'floor' | 'room' | 'sanctuary' | 'sanctuary-zone' | 'sanctuary-element' | 'principle';
+export type MindMapNodeType = 'root' | 'floor' | 'room' | 'sanctuary' | 'sanctuary-zone' | 'sanctuary-element' | 'principle' | 'sub-principle';
 
 // Base Node Data
 export interface MindMapNodeData {
@@ -91,6 +91,21 @@ export interface PrincipleNodeData extends MindMapNodeData {
   relevanceScore?: number;
 }
 
+// Sub-Principle Node (Room methodology component - e.g., the 6 genres of Connect-6)
+export interface SubPrincipleNodeData extends MindMapNodeData {
+  type: 'sub-principle';
+  subPrincipleId: string;
+  name: string;
+  shortName: string;
+  description: string;
+  icon?: string;
+  floorNumber: number;
+  parentRoomId: string;
+  parentRoomTag: string;
+  hasContent?: boolean;
+  content?: string;
+}
+
 // Principle Data (used within room/element nodes)
 export interface PrincipleData {
   id: string;
@@ -111,7 +126,8 @@ export type AnyNodeData =
   | SanctuaryNodeData
   | SanctuaryZoneNodeData
   | SanctuaryElementNodeData
-  | PrincipleNodeData;
+  | PrincipleNodeData
+  | SubPrincipleNodeData;
 
 // Edge Types
 export type MindMapEdgeType = 'hierarchy' | 'cross-reference' | 'thematic' | 'typological' | 'chronological';

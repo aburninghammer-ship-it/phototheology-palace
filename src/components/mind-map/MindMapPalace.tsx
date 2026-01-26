@@ -65,7 +65,7 @@ export default function MindMapPalace({
   }, [navigate]);
 
   // Hooks
-  const { nodes, edges, populateWithAnalysis, reset } = useMindMapScaffold(sourceText, mode);
+  const { nodes, edges, populateWithAnalysis, reset, toggleRoomExpand, expandedRooms } = useMindMapScaffold(sourceText, mode);
   const { generate, state: generationState, reset: resetGeneration } = useMindMapGeneration();
   const { saveMap, isSaving } = useMindMapStorage();
 
@@ -176,7 +176,13 @@ export default function MindMapPalace({
   const handleNodeClick = useCallback((nodeId: string, nodeData: AnyNodeData) => {
     setSelectedNodeData(nodeData);
     setSidebarOpen(true);
-  }, []);
+
+    // If clicking a room with sub-principles, toggle its expansion
+    if (nodeData.type === 'room') {
+      const roomData = nodeData as import('./types').RoomNodeData;
+      toggleRoomExpand(roomData.roomId);
+    }
+  }, [toggleRoomExpand]);
 
   // Handle make seed - creates a nested map by saving current state to history
   const handleMakeSeed = useCallback((content: string, label?: string) => {
