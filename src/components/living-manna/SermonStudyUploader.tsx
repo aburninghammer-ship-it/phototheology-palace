@@ -26,9 +26,11 @@ import {
   Target,
   Heart,
   Lightbulb,
-  ShieldAlert,
   BookmarkPlus,
-  FileUp
+  FileUp,
+  Layers,
+  GraduationCap,
+  Home
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
@@ -672,64 +674,61 @@ export function SermonStudyUploader({ churchId, userRole }: SermonStudyUploaderP
                     </div>
                   </div>
                 ) : (
-                  <div className="space-y-6">
-                    {/* Doctrinal Warnings */}
-                    {generatedStudy.doctrinalWarnings && generatedStudy.doctrinalWarnings.length > 0 && (
-                      <Alert variant="destructive">
-                        <ShieldAlert className="h-4 w-4" />
-                        <AlertTitle>⚠️ Doctrinal Review Needed</AlertTitle>
-                        <AlertDescription>
-                          <ul className="list-disc list-inside mt-2 space-y-1">
-                            {generatedStudy.doctrinalWarnings.map((warning, i) => (
-                              <li key={i}>{warning}</li>
-                            ))}
-                          </ul>
-                        </AlertDescription>
-                      </Alert>
-                    )}
-
-                    {/* Header */}
-                    <div className="text-center space-y-2">
-                      <h2 className="text-2xl font-bold">{generatedStudy.studyTitle}</h2>
-                      <div className="flex items-center justify-center gap-4 text-sm text-muted-foreground">
+                  <div className="space-y-8">
+                    {/* Beautiful Header */}
+                    <div className="text-center space-y-4 pb-6 border-b border-border/50">
+                      <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/10 text-primary text-sm font-medium">
+                        <Sparkles className="h-4 w-4" />
+                        Sermon Amplified Study
+                      </div>
+                      <h2 className="text-3xl font-bold bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text">{generatedStudy.studyTitle}</h2>
+                      <div className="flex items-center justify-center gap-6 text-sm text-muted-foreground">
                         {preacher && (
-                          <span className="flex items-center gap-1">
-                            <User className="h-4 w-4" />
+                          <span className="flex items-center gap-2 px-3 py-1 rounded-full bg-muted/50">
+                            <User className="h-4 w-4 text-primary" />
                             {preacher}
                           </span>
                         )}
                         {sermonDate && (
-                          <span className="flex items-center gap-1">
-                            <Calendar className="h-4 w-4" />
+                          <span className="flex items-center gap-2 px-3 py-1 rounded-full bg-muted/50">
+                            <Calendar className="h-4 w-4 text-primary" />
                             {sermonDate}
                           </span>
                         )}
                       </div>
                     </div>
 
-                    {/* Overview */}
-                    <Card>
-                      <CardHeader>
-                        <CardTitle className="text-lg">Overview</CardTitle>
+                    {/* Overview Card */}
+                    <Card className="overflow-hidden border-0 shadow-lg bg-gradient-to-br from-card to-card/80">
+                      <CardHeader className="bg-gradient-to-r from-primary/5 to-transparent border-b border-border/30">
+                        <CardTitle className="text-lg flex items-center gap-2">
+                          <BookOpen className="h-5 w-5 text-primary" />
+                          Overview
+                        </CardTitle>
                       </CardHeader>
-                      <CardContent>
-                        <p className="text-muted-foreground">{generatedStudy.overview}</p>
+                      <CardContent className="pt-4">
+                        <p className="text-muted-foreground leading-relaxed">{generatedStudy.overview}</p>
                       </CardContent>
                     </Card>
 
                     {/* Ice Breakers */}
                     {generatedStudy.iceBreakers && generatedStudy.iceBreakers.length > 0 && (
-                      <Card>
-                        <CardHeader>
+                      <Card className="overflow-hidden border-0 shadow-lg">
+                        <CardHeader className="bg-gradient-to-r from-amber-500/10 to-transparent border-b border-border/30">
                           <CardTitle className="text-lg flex items-center gap-2">
-                            <MessageSquare className="h-5 w-5" />
+                            <MessageSquare className="h-5 w-5 text-amber-500" />
                             Ice Breakers
                           </CardTitle>
                         </CardHeader>
-                        <CardContent>
-                          <ul className="list-disc list-inside space-y-2">
+                        <CardContent className="pt-4">
+                          <ul className="space-y-3">
                             {generatedStudy.iceBreakers.map((q, i) => (
-                              <li key={i} className="text-muted-foreground">{q}</li>
+                              <li key={i} className="flex items-start gap-3 text-muted-foreground">
+                                <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-amber-500/10 text-amber-500 text-xs font-semibold shrink-0 mt-0.5">
+                                  {i + 1}
+                                </span>
+                                <span className="leading-relaxed">{q}</span>
+                              </li>
                             ))}
                           </ul>
                         </CardContent>
@@ -737,112 +736,136 @@ export function SermonStudyUploader({ churchId, userRole }: SermonStudyUploaderP
                     )}
 
                     {/* Sections */}
-                    {generatedStudy.sections?.map((section, idx) => (
-                      <Card key={idx} className="border-l-4 border-l-primary">
-                        <CardHeader>
-                          <div className="flex items-start justify-between">
-                            <CardTitle className="text-lg">
-                              {section.sectionNumber}. {section.title}
-                            </CardTitle>
-                            <div className="flex items-center gap-2">
-                              {getAssessmentIcon(section.assessment?.rating)}
-                              <Badge variant="outline" className="capitalize">
-                                {section.assessment?.rating?.replace("-", " ")}
-                              </Badge>
+                    <div className="space-y-6">
+                      <h3 className="text-lg font-semibold flex items-center gap-2 text-foreground/80">
+                        <Layers className="h-5 w-5 text-primary" />
+                        Sermon Analysis
+                      </h3>
+                      {generatedStudy.sections?.map((section, idx) => (
+                        <Card key={idx} className="overflow-hidden border-0 shadow-lg border-l-4 border-l-primary">
+                          <CardHeader className="bg-gradient-to-r from-primary/5 to-transparent">
+                            <div className="flex items-start justify-between gap-4">
+                              <div className="flex items-start gap-3">
+                                <span className="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-primary/10 text-primary font-bold text-sm shrink-0">
+                                  {section.sectionNumber}
+                                </span>
+                                <div>
+                                  <CardTitle className="text-lg leading-tight">{section.title}</CardTitle>
+                                  <CardDescription className="mt-1">{section.originalPoint}</CardDescription>
+                                </div>
+                              </div>
+                              <div className="flex items-center gap-2 shrink-0">
+                                {getAssessmentIcon(section.assessment?.rating)}
+                                <Badge variant="secondary" className="capitalize text-xs">
+                                  {section.assessment?.rating?.replace("-", " ")}
+                                </Badge>
+                              </div>
                             </div>
-                          </div>
-                          <CardDescription>{section.originalPoint}</CardDescription>
-                        </CardHeader>
-                        <CardContent className="space-y-4">
-                          {/* Biblical Basis */}
-                          <div>
-                            <h4 className="font-semibold mb-2">Biblical Basis (KJV)</h4>
-                            <div className="space-y-1 text-sm">
-                              {section.biblicalBasis?.primaryTexts?.map((text, i) => (
-                                <p key={i} className="italic text-muted-foreground">{text}</p>
-                              ))}
-                            </div>
-                          </div>
-
-                          {/* Analysis */}
-                          <div>
-                            <h4 className="font-semibold mb-2">Analysis</h4>
-                            <p className="text-sm text-muted-foreground">{section.analysis}</p>
-                          </div>
-
-                          {/* Scholarly Support */}
-                          {section.scholarlySupport && (
-                            <div>
-                              <h4 className="font-semibold mb-2">Scholarly Support</h4>
-                              <p className="text-sm text-muted-foreground">{section.scholarlySupport}</p>
-                            </div>
-                          )}
-
-                          {/* Assessment Reasoning */}
-                          <div className="bg-muted/50 p-3 rounded">
-                            <h4 className="font-semibold mb-1 text-sm">Theological Assessment</h4>
-                            <p className="text-sm text-muted-foreground">{section.assessment?.reasoning}</p>
-                          </div>
-
-                          {/* PT Connections */}
-                          {section.ptConnections && (
-                            <div>
-                              <h4 className="font-semibold mb-2 flex items-center gap-2">
-                                <Lightbulb className="h-4 w-4" />
-                                Phototheology Connections
+                          </CardHeader>
+                          <CardContent className="space-y-5 pt-4">
+                            {/* Biblical Basis */}
+                            <div className="p-4 rounded-lg bg-muted/30 border border-border/50">
+                              <h4 className="font-semibold mb-3 flex items-center gap-2 text-sm">
+                                <BookOpen className="h-4 w-4 text-primary" />
+                                Biblical Basis (KJV)
                               </h4>
-                              <div className="flex flex-wrap gap-2 mb-2">
-                                {section.ptConnections.rooms?.map((room, i) => (
-                                  <Badge key={i} variant="secondary">{room}</Badge>
+                              <div className="space-y-2">
+                                {section.biblicalBasis?.primaryTexts?.map((text, i) => (
+                                  <p key={i} className="text-sm italic text-muted-foreground pl-4 border-l-2 border-primary/30">{text}</p>
                                 ))}
                               </div>
-                              <p className="text-sm text-muted-foreground">{section.ptConnections.insights}</p>
                             </div>
-                          )}
 
-                          {/* Section Discussion Questions */}
-                          {section.discussionQuestions && section.discussionQuestions.length > 0 && (
+                            {/* Analysis */}
                             <div>
-                              <h4 className="font-semibold mb-2">Discussion Questions</h4>
-                              <ul className="space-y-2">
-                                {section.discussionQuestions.map((q, i) => (
-                                  <li key={i} className="text-sm flex items-start gap-2">
-                                    <Badge variant="outline" className="text-xs capitalize shrink-0">
-                                      {q.type}
-                                    </Badge>
-                                    <span className="text-muted-foreground">{q.question}</span>
-                                  </li>
-                                ))}
-                              </ul>
+                              <h4 className="font-semibold mb-2 text-sm">Analysis</h4>
+                              <p className="text-sm text-muted-foreground leading-relaxed">{section.analysis}</p>
                             </div>
-                          )}
-                        </CardContent>
-                      </Card>
-                    ))}
 
-                    <Separator />
+                            {/* Scholarly Support */}
+                            {section.scholarlySupport && (
+                              <div>
+                                <h4 className="font-semibold mb-2 text-sm flex items-center gap-2">
+                                  <GraduationCap className="h-4 w-4 text-muted-foreground" />
+                                  Scholarly Support
+                                </h4>
+                                <p className="text-sm text-muted-foreground leading-relaxed">{section.scholarlySupport}</p>
+                              </div>
+                            )}
+
+                            {/* Assessment Reasoning */}
+                            <div className="p-4 rounded-lg bg-gradient-to-br from-muted/50 to-muted/20 border border-border/30">
+                              <h4 className="font-semibold mb-2 text-sm flex items-center gap-2">
+                                <CheckCircle2 className="h-4 w-4 text-green-500" />
+                                Theological Assessment
+                              </h4>
+                              <p className="text-sm text-muted-foreground leading-relaxed">{section.assessment?.reasoning}</p>
+                            </div>
+
+                            {/* PT Connections */}
+                            {section.ptConnections && (
+                              <div className="p-4 rounded-lg bg-gradient-to-br from-purple-500/5 to-transparent border border-purple-500/20">
+                                <h4 className="font-semibold mb-3 flex items-center gap-2 text-sm">
+                                  <Lightbulb className="h-4 w-4 text-purple-500" />
+                                  Phototheology Connections
+                                </h4>
+                                <div className="flex flex-wrap gap-2 mb-3">
+                                  {section.ptConnections.rooms?.map((room, i) => (
+                                    <Badge key={i} variant="outline" className="bg-purple-500/10 border-purple-500/30 text-purple-700 dark:text-purple-300">{room}</Badge>
+                                  ))}
+                                </div>
+                                <p className="text-sm text-muted-foreground leading-relaxed">{section.ptConnections.insights}</p>
+                              </div>
+                            )}
+
+                            {/* Section Discussion Questions */}
+                            {section.discussionQuestions && section.discussionQuestions.length > 0 && (
+                              <div>
+                                <h4 className="font-semibold mb-3 text-sm flex items-center gap-2">
+                                  <MessageSquare className="h-4 w-4 text-primary" />
+                                  Discussion Questions
+                                </h4>
+                                <ul className="space-y-2">
+                                  {section.discussionQuestions.map((q, i) => (
+                                    <li key={i} className="text-sm flex items-start gap-3 p-2 rounded-lg hover:bg-muted/30 transition-colors">
+                                      <Badge variant="outline" className="text-xs capitalize shrink-0 mt-0.5">
+                                        {q.type}
+                                      </Badge>
+                                      <span className="text-muted-foreground leading-relaxed">{q.question}</span>
+                                    </li>
+                                  ))}
+                                </ul>
+                              </div>
+                            )}
+                          </CardContent>
+                        </Card>
+                      ))}
+                    </div>
 
                     {/* Christ Synthesis */}
-                    <Card className="bg-primary/5 border-primary/20">
+                    <Card className="overflow-hidden border-0 shadow-lg bg-gradient-to-br from-amber-500/5 via-card to-orange-500/5 border-t-4 border-t-amber-500">
                       <CardHeader>
                         <CardTitle className="text-lg flex items-center gap-2">
-                          <Target className="h-5 w-5" />
+                          <Target className="h-5 w-5 text-amber-500" />
                           Christ-Centered Synthesis
                         </CardTitle>
                       </CardHeader>
                       <CardContent>
-                        <p className="text-muted-foreground">{generatedStudy.christSynthesis}</p>
+                        <p className="text-muted-foreground leading-relaxed">{generatedStudy.christSynthesis}</p>
                       </CardContent>
                     </Card>
 
                     {/* Sanctuary Connection */}
                     {generatedStudy.sanctuaryConnection && (
-                      <Card className="bg-blue-500/5 border-blue-500/20">
+                      <Card className="overflow-hidden border-0 shadow-lg bg-gradient-to-br from-blue-500/5 via-card to-indigo-500/5 border-t-4 border-t-blue-500">
                         <CardHeader>
-                          <CardTitle className="text-lg">Blue Room (Sanctuary) Connection</CardTitle>
+                          <CardTitle className="text-lg flex items-center gap-2">
+                            <Home className="h-5 w-5 text-blue-500" />
+                            Blue Room (Sanctuary) Connection
+                          </CardTitle>
                         </CardHeader>
                         <CardContent>
-                          <p className="text-muted-foreground">{generatedStudy.sanctuaryConnection}</p>
+                          <p className="text-muted-foreground leading-relaxed">{generatedStudy.sanctuaryConnection}</p>
                         </CardContent>
                       </Card>
                     )}
