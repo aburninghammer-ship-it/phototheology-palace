@@ -85,6 +85,7 @@ interface SavedStudy {
   sermon_date: string;
   status: string;
   created_at: string;
+  source: 'church' | 'personal';
 }
 
 interface SermonStudyUploaderProps {
@@ -115,18 +116,56 @@ export function SermonStudyUploader({ churchId, userRole }: SermonStudyUploaderP
     if (churchId) {
       fetchSavedStudies();
     }
-  }, [churchId]);
+  }, [churchId, user?.id]);
 
   const fetchSavedStudies = async () => {
-    const { data, error } = await supabase
+    const allStudies: SavedStudy[] = [];
+    
+    // Fetch church-wide studies
+    const { data: churchStudies, error: churchError } = await supabase
       .from("sermon_amplified_studies")
       .select("id, sermon_title, preacher, sermon_date, status, created_at")
       .eq("church_id", churchId)
       .order("created_at", { ascending: false });
 
-    if (!error && data) {
-      setSavedStudies(data);
+    if (!churchError && churchStudies) {
+      churchStudies.forEach(study => {
+        allStudies.push({ ...study, source: 'church' });
+      });
     }
+
+    // Fetch personal sermon studies from user_studies
+    if (user) {
+      const { data: personalStudies, error: personalError } = await supabase
+        .from("user_studies")
+        .select("id, title, content, tags, created_at")
+        .eq("user_id", user.id)
+        .contains("tags", ["sermon-study"])
+        .order("created_at", { ascending: false })
+        .limit(50);
+
+      if (!personalError && personalStudies) {
+        personalStudies.forEach(study => {
+          // Extract preacher from content if available
+          const preacherMatch = study.content?.match(/\*\*Preacher:\*\*\s*([^\n]+)/);
+          const dateMatch = study.content?.match(/\*\*Sermon Date:\*\*\s*([^\n]+)/);
+          
+          allStudies.push({
+            id: study.id,
+            sermon_title: study.title || "Untitled Study",
+            preacher: preacherMatch?.[1]?.trim() || "",
+            sermon_date: dateMatch?.[1]?.trim() || "",
+            status: "personal",
+            created_at: study.created_at,
+            source: 'personal'
+          });
+        });
+      }
+    }
+
+    // Sort all studies by created_at descending
+    allStudies.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+    setSavedStudies(allStudies);
   };
 
   const handleGenerate = async () => {
@@ -741,7 +780,7 @@ export function SermonStudyUploader({ churchId, userRole }: SermonStudyUploaderP
               ) : (
                 <div className="space-y-3">
                   {savedStudies.map((study) => (
-                    <Card key={study.id} className="cursor-pointer hover:bg-muted/50 transition-colors">
+                    <Card key={`${study.source}-${study.id}`} className="cursor-pointer hover:bg-muted/50 transition-colors">
                       <CardContent className="py-4">
                         <div className="flex items-center justify-between">
                           <div>
@@ -749,11 +788,19 @@ export function SermonStudyUploader({ churchId, userRole }: SermonStudyUploaderP
                             <div className="flex items-center gap-4 text-sm text-muted-foreground">
                               {study.preacher && <span>{study.preacher}</span>}
                               {study.sermon_date && <span>{study.sermon_date}</span>}
+                              <span className="text-xs">
+                                {new Date(study.created_at).toLocaleDateString()}
+                              </span>
                             </div>
                           </div>
-                          <Badge variant={study.status === "published" ? "default" : "secondary"}>
-                            {study.status}
-                          </Badge>
+                          <div className="flex items-center gap-2">
+                            {study.source === 'personal' && (
+                              <Badge variant="outline" className="text-xs">My Study</Badge>
+                            )}
+                            <Badge variant={study.status === "published" ? "default" : "secondary"}>
+                              {study.status === "personal" ? "saved" : study.status}
+                            </Badge>
+                          </div>
                         </div>
                       </CardContent>
                     </Card>
