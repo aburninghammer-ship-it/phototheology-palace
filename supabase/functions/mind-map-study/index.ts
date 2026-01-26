@@ -106,12 +106,13 @@ serve(async (req) => {
       throw new Error("LOVABLE_API_KEY not configured");
     }
 
-    const modeInstruction = {
+    const modeInstructions: Record<string, string> = {
       beginner: "MODE: BEGINNER - Keep the study accessible with simple language and clear explanations.",
       scholar: "MODE: SCHOLAR - Provide deep analysis with scholarly connections and comprehensive cross-references.",
       preacher: "MODE: PREACHER - Focus on teaching hooks, vivid illustrations, and sermon-ready content.",
       research: "MODE: RESEARCH - Exhaustive academic analysis with detailed evidence and extensive connections.",
-    }[mode] || "MODE: SCHOLAR";
+    };
+    const modeInstruction = modeInstructions[mode] || modeInstructions.scholar;
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
@@ -191,10 +192,11 @@ serve(async (req) => {
       { headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
 
-  } catch (error) {
+  } catch (error: unknown) {
     console.error("Mind map study error:", error);
+    const errorMessage = error instanceof Error ? error.message : "Study generation failed";
     return new Response(
-      JSON.stringify({ error: error.message || "Study generation failed" }),
+      JSON.stringify({ error: errorMessage }),
       { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   }
