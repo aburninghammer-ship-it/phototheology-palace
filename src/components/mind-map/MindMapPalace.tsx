@@ -16,6 +16,7 @@ import type { AnalysisMode, AnyNodeData, MindMapFilters, ExplorationBreadcrumb, 
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { ArrowLeft, ChevronRight, Home, MessageCircle } from 'lucide-react';
+import { resolveBibleReference } from './utils/bibleReferenceResolver';
 
 interface MindMapPalaceProps {
   initialText?: string;
@@ -70,13 +71,24 @@ export default function MindMapPalace({
 
   // Handle text generation
   const handleGenerate = useCallback(async (text: string, selectedMode: AnalysisMode, method: GenerationMethod) => {
-    setSourceText(text);
+    // Resolve Bible reference if user just entered a location
+    let resolvedText = text;
+    const { isReference, resolvedText: fetchedText, reference } = await resolveBibleReference(text);
+    
+    if (isReference && fetchedText !== text) {
+      resolvedText = fetchedText;
+      toast.info(`Fetched: ${reference?.book} ${reference?.chapter}:${reference?.verseStart}${reference?.verseEnd ? '-' + reference.verseEnd : ''}`, {
+        icon: '📖',
+      });
+    }
+    
+    setSourceText(resolvedText);
     setMode(selectedMode);
     setStudyMethod(method);
     setGeneratedStudy(null); // Reset study when generating new
 
     // Update breadcrumbs
-    const preview = text.length > 30 ? text.substring(0, 30) + '...' : text;
+    const preview = resolvedText.length > 30 ? resolvedText.substring(0, 30) + '...' : resolvedText;
     const crumbId = Date.now().toString();
     setBreadcrumbs((prev) => [
       ...prev,
@@ -87,8 +99,8 @@ export default function MindMapPalace({
       // Full study generation mode
       setIsGeneratingStudy(true);
       try {
-        const { data, error } = await supabase.functions.invoke('mind-map-study', {
-          body: { text, mode: selectedMode },
+      const { data, error } = await supabase.functions.invoke('mind-map-study', {
+          body: { text: resolvedText, mode: selectedMode },
         });
 
         if (error) throw error;
@@ -136,15 +148,15 @@ export default function MindMapPalace({
       }
     } else if (method === 'manual') {
       // Manual study mode - show all rooms as empty scaffold for user to explore
-      reset(text, selectedMode);
+      reset(resolvedText, selectedMode);
       const emptyScaffold = generateEmptyScaffold();
       setCurrentAnalysis(emptyScaffold);
       populateWithAnalysis(emptyScaffold);
       toast.success('Palace scaffold ready! Explore all rooms and add your own insights.');
     } else {
       // Jeeves AI mode - generate analysis (map to palace)
-      reset(text, selectedMode);
-      const analysis = await generate(text, selectedMode);
+      reset(resolvedText, selectedMode);
+      const analysis = await generate(resolvedText, selectedMode);
 
       if (analysis) {
         setCurrentAnalysis(analysis);
@@ -152,7 +164,7 @@ export default function MindMapPalace({
         toast.success('Jeeves has mapped your text to the Palace!');
       } else {
         // Use mock analysis for development
-        const mockAnalysis = generateMockAnalysis(text, selectedMode);
+        const mockAnalysis = generateMockAnalysis(resolvedText, selectedMode);
         setCurrentAnalysis(mockAnalysis);
         populateWithAnalysis(mockAnalysis);
         toast.info('Using preview analysis (edge function not available)');
