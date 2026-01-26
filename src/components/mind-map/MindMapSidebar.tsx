@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { X, BookOpen, Lightbulb, Eye, ChevronRight, Sprout, ExternalLink, StickyNote, Save, MessageCircle } from 'lucide-react';
+import { X, BookOpen, Lightbulb, Eye, ChevronRight, Sprout, ExternalLink, StickyNote, Save, MessageCircle, Target } from 'lucide-react';
 import type { AnyNodeData, PrincipleData } from './types';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -278,6 +278,7 @@ function renderNodeContent(
               content: node.content,
               evidence: node.evidence,
               insight: node.insight,
+              application: node.application,
               visualHook: node.visualHook,
               confidence: node.confidence,
               scriptures: node.scriptures,
@@ -332,6 +333,19 @@ function PrincipleCard({ principle, onMakeSeed, expanded = false }: PrincipleCar
           {principle.visualHook}
         </p>
       </div>
+
+      {/* Application */}
+      {principle.application && (
+        <div className="flex items-start gap-2 p-2 rounded bg-green-500/10">
+          <Target className="w-4 h-4 text-green-400 mt-0.5 flex-shrink-0" />
+          <div>
+            <span className="text-xs font-semibold text-green-400 block mb-0.5">Apply It:</span>
+            <p className={`text-xs text-green-400/80 ${expanded ? '' : 'line-clamp-2'}`}>
+              {principle.application}
+            </p>
+          </div>
+        </div>
+      )}
 
       {/* Evidence */}
       {expanded && principle.evidence && principle.evidence.length > 0 && (

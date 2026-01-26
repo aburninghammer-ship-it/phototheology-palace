@@ -1,6 +1,6 @@
 import { memo, useCallback } from 'react';
 import { Handle, Position, NodeProps } from 'reactflow';
-import { Sprout, BookOpen, Lightbulb, Eye, Sparkles, Quote } from 'lucide-react';
+import { Sprout, BookOpen, Lightbulb, Eye, Sparkles, Quote, Target } from 'lucide-react';
 import type { PrincipleNodeData } from '../types';
 import { useMindMapContextSafe } from '../MindMapContext';
 
@@ -86,6 +86,21 @@ const PrincipleNode = memo(({ data, selected }: NodeProps<PrincipleNodeData>) =>
             </p>
           </div>
         </div>
+
+        {/* Application */}
+        {data.application && (
+          <div className="mb-3 p-2.5 rounded-xl bg-green-500/20 backdrop-blur-sm border border-green-400/20">
+            <div className="flex items-start gap-2">
+              <Target className="w-4 h-4 text-green-300 mt-0.5 flex-shrink-0" />
+              <div>
+                <span className="text-xs text-green-200 font-semibold block mb-1">Apply It:</span>
+                <p className="text-xs text-green-100/90 leading-relaxed line-clamp-3">
+                  {data.application}
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Visual Hook */}
         <div className="mb-3 p-2.5 rounded-xl bg-amber-500/20 backdrop-blur-sm border border-amber-400/20">

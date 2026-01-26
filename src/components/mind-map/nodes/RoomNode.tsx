@@ -7,6 +7,18 @@ import { useMindMapContextSafe } from '../MindMapContext';
 
 type IconType = FC<{ className?: string }>;
 
+// Floor-specific color schemes for rooms
+const FLOOR_ROOM_COLORS: Record<number, { bg: string; border: string; accent: string; text: string }> = {
+  1: { bg: 'from-violet-600/30 via-purple-600/20 to-fuchsia-600/30', border: 'border-violet-400/50', accent: 'text-violet-300', text: 'text-violet-200' },
+  2: { bg: 'from-blue-600/30 via-blue-500/20 to-indigo-600/30', border: 'border-blue-400/50', accent: 'text-blue-300', text: 'text-blue-200' },
+  3: { bg: 'from-teal-500/30 via-cyan-500/20 to-teal-600/30', border: 'border-teal-400/50', accent: 'text-teal-300', text: 'text-teal-200' },
+  4: { bg: 'from-green-600/30 via-emerald-500/20 to-green-500/30', border: 'border-green-400/50', accent: 'text-green-300', text: 'text-green-200' },
+  5: { bg: 'from-orange-500/30 via-amber-500/20 to-yellow-500/30', border: 'border-orange-400/50', accent: 'text-orange-300', text: 'text-orange-200' },
+  6: { bg: 'from-red-600/30 via-rose-500/20 to-red-500/30', border: 'border-red-400/50', accent: 'text-red-300', text: 'text-red-200' },
+  7: { bg: 'from-pink-600/30 via-fuchsia-500/20 to-pink-500/30', border: 'border-pink-400/50', accent: 'text-pink-300', text: 'text-pink-200' },
+  8: { bg: 'from-yellow-500/30 via-amber-400/20 to-yellow-400/30', border: 'border-yellow-400/50', accent: 'text-yellow-300', text: 'text-yellow-200' },
+};
+
 const RoomNode = memo(({ data, selected }: NodeProps<RoomNodeData>) => {
   const mindMapContext = useMindMapContextSafe();
 
@@ -23,6 +35,9 @@ const RoomNode = memo(({ data, selected }: NodeProps<RoomNodeData>) => {
   const hasInsights = data.principles && data.principles.length > 0;
   const isNotApplicable = !hasInsights && data.populated === false;
 
+  // Get floor-specific colors
+  const floorColors = FLOOR_ROOM_COLORS[data.floorNumber] || FLOOR_ROOM_COLORS[1];
+
   // Dynamic icon lookup - safely cast the icon component
   const IconComponent = data.icon && data.icon in Icons
     ? (Icons[data.icon as keyof typeof Icons] as unknown as IconType)
@@ -38,25 +53,25 @@ const RoomNode = memo(({ data, selected }: NodeProps<RoomNodeData>) => {
         ${hasInsights ? 'hover:shadow-xl hover:shadow-green-500/20' : 'hover:shadow-lg hover:shadow-primary/10'}
       `}
     >
-      {/* Glass background */}
+      {/* Glass background - Floor-colored */}
       <div className={`
-        absolute inset-0 backdrop-blur-xl
+        absolute inset-0 backdrop-blur-xl bg-gradient-to-br
         ${hasInsights
-          ? 'bg-gradient-to-br from-green-500/20 via-emerald-500/10 to-teal-500/20'
+          ? 'from-green-500/20 via-emerald-500/10 to-teal-500/20'
           : isNotApplicable
-            ? 'bg-gradient-to-br from-gray-500/20 via-gray-600/10 to-gray-700/20'
-            : 'bg-gradient-to-br from-primary/20 via-accent/10 to-primary/20'
+            ? 'from-gray-500/20 via-gray-600/10 to-gray-700/20'
+            : floorColors.bg
         }
       `} />
 
-      {/* Glass border */}
+      {/* Glass border - Floor-colored */}
       <div className={`
         absolute inset-0 rounded-xl border
         ${hasInsights
           ? 'border-green-400/40'
           : isNotApplicable
             ? 'border-gray-500/30'
-            : 'border-white/20'
+            : floorColors.border
         }
       `} />
 
@@ -74,10 +89,10 @@ const RoomNode = memo(({ data, selected }: NodeProps<RoomNodeData>) => {
           )}
 
           {IconComponent && (
-            <IconComponent className={`w-4 h-4 ${hasInsights ? 'text-green-400' : 'text-primary'}`} />
+            <IconComponent className={`w-4 h-4 ${hasInsights ? 'text-green-400' : floorColors.accent}`} />
           )}
 
-          <span className={`text-xs font-bold tracking-wide ${hasInsights ? 'text-green-400' : 'text-primary'}`}>
+          <span className={`text-xs font-bold tracking-wide ${hasInsights ? 'text-green-400' : floorColors.accent}`}>
             {data.roomTag}
           </span>
 
@@ -128,16 +143,16 @@ const RoomNode = memo(({ data, selected }: NodeProps<RoomNodeData>) => {
         )}
       </div>
 
-      {/* Handles */}
+      {/* Handles - Use floor color */}
       <Handle
         type="target"
         position={Position.Top}
-        className={`!w-3 !h-3 !border-2 !border-background !rounded-full ${hasInsights ? '!bg-green-400' : '!bg-primary'}`}
+        className="!w-3 !h-3 !border-2 !border-background !rounded-full !bg-white/80"
       />
       <Handle
         type="source"
         position={Position.Bottom}
-        className={`!w-3 !h-3 !border-2 !border-background !rounded-full ${hasInsights ? '!bg-green-400' : '!bg-primary'}`}
+        className="!w-3 !h-3 !border-2 !border-background !rounded-full !bg-white/80"
       />
     </div>
   );

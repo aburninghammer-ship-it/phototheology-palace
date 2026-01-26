@@ -12,6 +12,18 @@ import type {
   AnalysisMode,
 } from '../types';
 
+// Floor-specific edge colors
+const FLOOR_EDGE_COLORS: Record<number, string> = {
+  1: '#8b5cf6', // violet-500
+  2: '#3b82f6', // blue-500
+  3: '#14b8a6', // teal-500
+  4: '#22c55e', // green-500
+  5: '#f97316', // orange-500
+  6: '#ef4444', // red-500
+  7: '#ec4899', // pink-500
+  8: '#eab308', // yellow-500
+};
+
 interface BuildScaffoldOptions {
   sourceText: string;
   mode: AnalysisMode;
@@ -45,14 +57,15 @@ export function buildScaffold(options: BuildScaffoldOptions): ScaffoldResult {
     const floorNode = createFloorNode(floor, index, { x, y });
     nodes.push(floorNode);
 
-    // Connect root to floor
+    // Connect root to floor - use floor-specific color
+    const floorColor = FLOOR_EDGE_COLORS[floor.number] || '#6b7280';
     edges.push({
       id: `edge-root-floor-${floor.number}`,
       source: 'root',
       target: floorNode.id,
       type: 'smoothstep',
       animated: false,
-      style: { stroke: '#6b7280', strokeWidth: 1.5 },
+      style: { stroke: floorColor, strokeWidth: 2 },
       data: { type: 'hierarchy' },
     });
 
@@ -65,14 +78,14 @@ export function buildScaffold(options: BuildScaffoldOptions): ScaffoldResult {
       const roomNode = createRoomNode(room, floor.number, { x: roomX, y: roomY });
       nodes.push(roomNode);
 
-      // Connect floor to room
+      // Connect floor to room - use floor-specific color (lighter)
       edges.push({
         id: `edge-floor-${floor.number}-room-${room.id}`,
         source: floorNode.id,
         target: roomNode.id,
         type: 'smoothstep',
         animated: false,
-        style: { stroke: '#9ca3af', strokeWidth: 1 },
+        style: { stroke: floorColor, strokeWidth: 1.5, opacity: 0.6 },
         data: { type: 'hierarchy' },
       });
     });

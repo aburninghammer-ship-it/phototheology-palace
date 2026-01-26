@@ -7,47 +7,63 @@ export {
   type SanctuaryZone,
 } from '@/data/sanctuaryLibrary';
 
-// Floor themes (from VisualPalace.tsx)
+// Floor themes - Each floor has a distinct color for easy identification
 export const FLOOR_THEMES = [
   {
+    // Floor 1: Furnishing - Purple/Violet (Memory & Visualization)
     gradient: "from-violet-600 via-purple-600 to-fuchsia-600",
     symbol: "eye",
-    tagline: "Build Your Visual Library"
+    tagline: "Build Your Visual Library",
+    primaryColor: "#8b5cf6" // violet-500
   },
   {
-    gradient: "from-blue-600 via-indigo-600 to-blue-700",
+    // Floor 2: Investigation - Blue (Detective Work)
+    gradient: "from-blue-600 via-blue-500 to-indigo-600",
     symbol: "search",
-    tagline: "Investigate Every Detail"
+    tagline: "Investigate Every Detail",
+    primaryColor: "#3b82f6" // blue-500
   },
   {
-    gradient: "from-cyan-600 via-teal-600 to-emerald-600",
+    // Floor 3: Freestyle - Teal/Cyan (Life Integration)
+    gradient: "from-teal-500 via-cyan-500 to-teal-600",
     symbol: "zap",
-    tagline: "Connect Scripture to Life"
+    tagline: "Connect Scripture to Life",
+    primaryColor: "#14b8a6" // teal-500
   },
   {
-    gradient: "from-emerald-600 via-green-600 to-teal-600",
+    // Floor 4: Next Level - Green (Christ-Centered Structure)
+    gradient: "from-green-600 via-emerald-500 to-green-500",
     symbol: "book-open",
-    tagline: "See Christ in Everything"
+    tagline: "See Christ in Everything",
+    primaryColor: "#22c55e" // green-500
   },
   {
-    gradient: "from-amber-600 via-orange-600 to-red-600",
+    // Floor 5: Vision - Orange/Amber (Prophecy & Sanctuary)
+    gradient: "from-orange-500 via-amber-500 to-yellow-500",
     symbol: "telescope",
-    tagline: "Unlock Prophecy & Sanctuary"
+    tagline: "Unlock Prophecy & Sanctuary",
+    primaryColor: "#f97316" // orange-500
   },
   {
-    gradient: "from-rose-600 via-pink-600 to-red-600",
+    // Floor 6: Three Heavens - Red/Rose (Cycles & Horizons)
+    gradient: "from-red-600 via-rose-500 to-red-500",
     symbol: "globe",
-    tagline: "Master Cycles & Horizons"
+    tagline: "Master Cycles & Horizons",
+    primaryColor: "#ef4444" // red-500
   },
   {
-    gradient: "from-violet-600 via-purple-600 to-indigo-600",
+    // Floor 7: Spiritual - Pink/Magenta (Transformation)
+    gradient: "from-pink-600 via-fuchsia-500 to-pink-500",
     symbol: "flame",
-    tagline: "Experience Transformation"
+    tagline: "Experience Transformation",
+    primaryColor: "#ec4899" // pink-500
   },
   {
-    gradient: "from-yellow-600 via-amber-600 to-orange-600",
+    // Floor 8: Master - Gold/Yellow (Integration & Mastery)
+    gradient: "from-yellow-500 via-amber-400 to-yellow-400",
     symbol: "crown",
-    tagline: "Become the Master"
+    tagline: "Become the Master",
+    primaryColor: "#eab308" // yellow-500
   }
 ];
 

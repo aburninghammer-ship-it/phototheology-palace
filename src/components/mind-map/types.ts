@@ -84,6 +84,7 @@ export interface PrincipleNodeData extends MindMapNodeData {
   content: string;
   evidence: string[];
   insight: string;
+  application?: string; // Practical takeaway for the reader's life
   visualHook: string;
   confidence: number;
   scriptures?: string[];
@@ -96,6 +97,7 @@ export interface PrincipleData {
   content: string;
   evidence: string[];
   insight: string;
+  application?: string; // Practical takeaway for the reader's life
   visualHook: string;
   confidence: number;
   scriptures?: string[];
