@@ -1,9 +1,21 @@
-import { memo } from 'react';
+import { memo, useCallback } from 'react';
 import { Handle, Position, NodeProps } from 'reactflow';
 import { Sprout, BookOpen, Lightbulb, Eye, Sparkles, Quote } from 'lucide-react';
 import type { PrincipleNodeData } from '../types';
+import { useMindMapContextSafe } from '../MindMapContext';
 
 const PrincipleNode = memo(({ data, selected }: NodeProps<PrincipleNodeData>) => {
+  const mindMapContext = useMindMapContextSafe();
+
+  const handleMakeSeed = useCallback((e: React.MouseEvent) => {
+    e.stopPropagation(); // Prevent node click event
+    if (mindMapContext?.onMakeSeed) {
+      // Combine content and insight for a rich seed
+      const seedContent = `${data.content}\n\n${data.insight}`;
+      const label = data.content.substring(0, 30) + (data.content.length > 30 ? '...' : '');
+      mindMapContext.onMakeSeed(seedContent, label);
+    }
+  }, [mindMapContext, data.content, data.insight]);
   const confidenceLevel =
     data.confidence >= 80 ? 'high' :
     data.confidence >= 60 ? 'medium' : 'low';
@@ -118,16 +130,19 @@ const PrincipleNode = memo(({ data, selected }: NodeProps<PrincipleNodeData>) =>
         )}
 
         {/* Make New Seed button */}
-        <button
-          className="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-xl
-                     bg-green-500/30 hover:bg-green-500/50 backdrop-blur-sm border border-green-400/30
-                     text-green-200 text-sm font-semibold transition-all duration-200 hover:scale-[1.02]
-                     hover:shadow-lg hover:shadow-green-500/20"
-          title="Make this insight the seed for a new map"
-        >
-          <Sprout className="w-4 h-4" />
-          Make New Seed
-        </button>
+        {mindMapContext && (
+          <button
+            onClick={handleMakeSeed}
+            className="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-xl
+                       bg-green-500/30 hover:bg-green-500/50 backdrop-blur-sm border border-green-400/30
+                       text-green-200 text-sm font-semibold transition-all duration-200 hover:scale-[1.02]
+                       hover:shadow-lg hover:shadow-green-500/20"
+            title="Make this insight the seed for a new map"
+          >
+            <Sprout className="w-4 h-4" />
+            Make New Seed
+          </button>
+        )}
       </div>
 
       {/* Handle */}

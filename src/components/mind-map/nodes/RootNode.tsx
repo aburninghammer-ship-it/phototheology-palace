@@ -1,10 +1,20 @@
-import { memo } from 'react';
+import { memo, useCallback } from 'react';
 import { Handle, Position, NodeProps } from 'reactflow';
 import { FileText, Sprout, Sparkles, BookOpen, Quote } from 'lucide-react';
 import type { RootNodeData } from '../types';
 import { ANALYSIS_MODE_CONFIG } from '../constants';
+import { useMindMapContextSafe } from '../MindMapContext';
 
 const RootNode = memo(({ data, selected }: NodeProps<RootNodeData>) => {
+  const mindMapContext = useMindMapContextSafe();
+
+  const handleMakeSeed = useCallback((e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (mindMapContext?.onMakeSeed) {
+      const label = data.textPreview.substring(0, 30) + (data.textPreview.length > 30 ? '...' : '');
+      mindMapContext.onMakeSeed(data.sourceText, label);
+    }
+  }, [mindMapContext, data.sourceText, data.textPreview]);
   const modeConfig = ANALYSIS_MODE_CONFIG[data.mode];
 
   return (
@@ -65,15 +75,18 @@ const RootNode = memo(({ data, selected }: NodeProps<RootNodeData>) => {
           <span className="text-xs text-white/60 font-medium">
             {data.characterCount.toLocaleString()} characters
           </span>
-          <button
-            className="flex items-center gap-2 px-3 py-1.5 rounded-xl
-                       bg-green-500/30 hover:bg-green-500/50 backdrop-blur-sm border border-green-400/30
-                       text-green-200 text-sm font-semibold transition-all duration-200 hover:scale-105"
-            title="Make this the seed for a new map"
-          >
-            <Sprout className="w-4 h-4" />
-            <span>New Seed</span>
-          </button>
+          {mindMapContext && (
+            <button
+              onClick={handleMakeSeed}
+              className="flex items-center gap-2 px-3 py-1.5 rounded-xl
+                         bg-green-500/30 hover:bg-green-500/50 backdrop-blur-sm border border-green-400/30
+                         text-green-200 text-sm font-semibold transition-all duration-200 hover:scale-105"
+              title="Make this the seed for a new map"
+            >
+              <Sprout className="w-4 h-4" />
+              <span>New Seed</span>
+            </button>
+          )}
         </div>
       </div>
 

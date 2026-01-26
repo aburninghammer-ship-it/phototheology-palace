@@ -1,13 +1,26 @@
-import { memo } from 'react';
+import { memo, useCallback } from 'react';
 import { Handle, Position, NodeProps } from 'reactflow';
 import { ChevronDown, ChevronRight, Loader2, Sprout, Building2 } from 'lucide-react';
 import type { FloorNodeData } from '../types';
+import { useMindMapContextSafe } from '../MindMapContext';
 
 interface FloorNodeProps extends NodeProps<FloorNodeData> {
   onToggleExpand?: (nodeId: string) => void;
 }
 
 const FloorNode = memo(({ data, selected, id }: FloorNodeProps) => {
+  const mindMapContext = useMindMapContextSafe();
+
+  const handleMakeSeed = useCallback((e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (mindMapContext?.onMakeSeed && data.insights && data.insights.length > 0) {
+      // Compile all insights from this floor into a seed
+      const insightsText = data.insights.map(i => `${i.content}\n${i.insight}`).join('\n\n---\n\n');
+      const seedContent = `Floor ${data.floorNumber}: ${data.floorName}\n\n${insightsText}`;
+      const label = `Floor ${data.floorNumber}: ${data.floorName}`;
+      mindMapContext.onMakeSeed(seedContent, label);
+    }
+  }, [mindMapContext, data.floorNumber, data.floorName, data.insights]);
   const hasMatches = data.matchCount && data.matchCount > 0;
   const hasInsights = data.insights && data.insights.length > 0;
 
@@ -75,8 +88,9 @@ const FloorNode = memo(({ data, selected, id }: FloorNodeProps) => {
         </div>
 
         {/* Make Seed button */}
-        {hasInsights && (
+        {hasInsights && mindMapContext && (
           <button
+            onClick={handleMakeSeed}
             className="mt-3 w-full flex items-center justify-center gap-2 px-3 py-1.5 rounded-lg
                        bg-white/20 hover:bg-white/30 backdrop-blur-sm border border-white/20
                        text-white text-xs font-medium transition-all duration-200 hover:scale-[1.02]"

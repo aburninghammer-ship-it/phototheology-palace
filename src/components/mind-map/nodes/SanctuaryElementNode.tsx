@@ -1,10 +1,22 @@
-import { memo } from 'react';
+import { memo, useCallback } from 'react';
 import { Handle, Position, NodeProps } from 'reactflow';
 import { Sprout, Loader2, Sparkles } from 'lucide-react';
 import type { SanctuaryElementNodeData } from '../types';
+import { useMindMapContextSafe } from '../MindMapContext';
 
 const SanctuaryElementNode = memo(({ data, selected }: NodeProps<SanctuaryElementNodeData>) => {
   const hasInsights = data.insights && data.insights.length > 0;
+  const mindMapContext = useMindMapContextSafe();
+
+  const handleMakeSeed = useCallback((e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (mindMapContext?.onMakeSeed && hasInsights) {
+      const insightsText = data.insights.map(i => `${i.content}\n${i.insight}`).join('\n\n---\n\n');
+      const seedContent = `${data.elementName} (${data.zone})\n\nChrist Connection: ${data.christConnection}\n\n${insightsText}`;
+      const label = data.elementName;
+      mindMapContext.onMakeSeed(seedContent, label);
+    }
+  }, [mindMapContext, data.elementName, data.zone, data.christConnection, data.insights, hasInsights]);
 
   return (
     <div
@@ -45,12 +57,15 @@ const SanctuaryElementNode = memo(({ data, selected }: NodeProps<SanctuaryElemen
             <span className="text-xs px-1.5 py-0.5 rounded bg-yellow-500/20 text-yellow-400">
               {data.insights.length} insight{data.insights.length !== 1 ? 's' : ''}
             </span>
-            <button
-              className="p-1 rounded hover:bg-green-500/20 text-green-400 transition-colors"
-              title="Make this element the seed for a new map"
-            >
-              <Sprout className="w-3 h-3" />
-            </button>
+            {mindMapContext && (
+              <button
+                onClick={handleMakeSeed}
+                className="p-1 rounded hover:bg-green-500/20 text-green-400 transition-colors"
+                title="Make this element the seed for a new map"
+              >
+                <Sprout className="w-3 h-3" />
+              </button>
+            )}
           </div>
         )}
 

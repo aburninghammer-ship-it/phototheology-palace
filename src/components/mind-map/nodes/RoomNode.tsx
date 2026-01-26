@@ -1,12 +1,25 @@
-import { memo, FC } from 'react';
+import { memo, FC, useCallback } from 'react';
 import { Handle, Position, NodeProps } from 'reactflow';
 import { ChevronDown, ChevronRight, Sprout, Loader2, Sparkles } from 'lucide-react';
 import * as Icons from 'lucide-react';
 import type { RoomNodeData } from '../types';
+import { useMindMapContextSafe } from '../MindMapContext';
 
 type IconType = FC<{ className?: string }>;
 
 const RoomNode = memo(({ data, selected }: NodeProps<RoomNodeData>) => {
+  const mindMapContext = useMindMapContextSafe();
+
+  const handleMakeSeed = useCallback((e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (mindMapContext?.onMakeSeed && data.principles && data.principles.length > 0) {
+      // Compile all principles from this room into a seed
+      const principlesText = data.principles.map(p => `${p.content}\n${p.insight}`).join('\n\n---\n\n');
+      const seedContent = `${data.roomName} (${data.roomTag})\n\n${principlesText}`;
+      const label = `${data.roomTag}: ${data.roomName}`;
+      mindMapContext.onMakeSeed(seedContent, label);
+    }
+  }, [mindMapContext, data.roomName, data.roomTag, data.principles]);
   const hasInsights = data.principles && data.principles.length > 0;
   const isNotApplicable = !hasInsights && data.populated === false;
 
@@ -95,12 +108,15 @@ const RoomNode = memo(({ data, selected }: NodeProps<RoomNodeData>) => {
             <span className="text-xs px-2 py-0.5 rounded-full bg-green-500/30 text-green-300 font-medium">
               {data.principles.length} insight{data.principles.length !== 1 ? 's' : ''}
             </span>
-            <button
-              className="p-1.5 rounded-lg bg-green-500/20 hover:bg-green-500/40 text-green-300 transition-all duration-200 hover:scale-110"
-              title="Make this room's insights the seed for a new map"
-            >
-              <Sprout className="w-3.5 h-3.5" />
-            </button>
+            {mindMapContext && (
+              <button
+                onClick={handleMakeSeed}
+                className="p-1.5 rounded-lg bg-green-500/20 hover:bg-green-500/40 text-green-300 transition-all duration-200 hover:scale-110"
+                title="Make this room's insights the seed for a new map"
+              >
+                <Sprout className="w-3.5 h-3.5" />
+              </button>
+            )}
           </div>
         )}
 
