@@ -6,6 +6,22 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
+const DEFAULT_MODEL = "google/gemini-3-flash-preview";
+
+const requiredRoomsForMode = (mode: string): number => {
+  switch (mode) {
+    case "beginner":
+      return 8;
+    case "preacher":
+      return 12;
+    case "research":
+      return 20;
+    case "scholar":
+    default:
+      return 15;
+  }
+};
+
 const MIND_MAP_SYSTEM_PROMPT = `
 You are Jeeves, analyzing text through the Phototheology Palace framework for mind map visualization.
 
@@ -195,76 +211,161 @@ serve(async (req) => {
     }
 
     const modeInstructions: Record<string, string> = {
-      beginner: "MODE: BEGINNER - Keep analysis simple with max 5 rooms.",
-      scholar: "MODE: SCHOLAR - Provide comprehensive analysis across all applicable rooms.",
-      preacher: "MODE: PREACHER - Focus on teaching hooks and sermon applications.",
-      research: "MODE: RESEARCH - Exhaustive academic analysis with all confidence scores.",
+      beginner:
+        "MODE: BEGINNER - Use simple language, but still map to at least 8 rooms across multiple floors.",
+      scholar:
+        "MODE: SCHOLAR - Map to at least 15 rooms across multiple floors with solid cross-references.",
+      preacher:
+        "MODE: PREACHER - Map to at least 12 rooms, prioritize hooks/illustrations and clear applications.",
+      research:
+        "MODE: RESEARCH - Map to 20+ rooms with exhaustive, evidence-driven connections.",
     };
-    const modeInstruction = modeInstructions[mode as string] || "MODE: SCHOLAR";
+    const modeInstruction = modeInstructions[String(mode)] || modeInstructions.scholar;
 
-    const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        "Authorization": `Bearer ${LOVABLE_API_KEY}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        model: "google/gemini-2.5-flash",
-        messages: [
-          {
-            role: "system",
-            content: MIND_MAP_SYSTEM_PROMPT + "\n\n" + modeInstruction,
-          },
-          {
-            role: "user",
-            content: `Analyze this text and map it to the Phototheology Palace:\n\n${truncatedText}`,
-          },
-        ],
-        temperature: 0.7,
-        max_tokens: 4096,
-      }),
-    });
+    const requiredRooms = requiredRoomsForMode(String(mode));
+
+    const strictOutputInstruction = [
+      `STRICT OUTPUT RULES:`,
+      `- Return ONLY valid JSON (no markdown).`,
+      `- roomAnalysis MUST contain at least ${requiredRooms} room IDs (keys).`,
+      `- sanctuaryAnalysis MUST contain at least 1 sanctuary element (key).`,
+      `- For each included room: applicable=true and include 1-3 principles with application + visualHook + KJV cross-refs.`,
+      `- Do not return empty objects for roomAnalysis or sanctuaryAnalysis.`,
+    ].join("\n");
+
+    const callGateway = async (extraUserInstruction?: string) => {
+      const userPrompt = [
+        `Analyze this text and map it to the Phototheology Palace.`,
+        extraUserInstruction ? `\n${extraUserInstruction}` : "",
+        `\nTEXT:\n${truncatedText}`,
+      ].join("\n");
+
+      return await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          "Authorization": `Bearer ${LOVABLE_API_KEY}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          model: DEFAULT_MODEL,
+          messages: [
+            {
+              role: "system",
+              content: [MIND_MAP_SYSTEM_PROMPT, modeInstruction, strictOutputInstruction].join("\n\n"),
+            },
+            {
+              role: "user",
+              content: userPrompt,
+            },
+          ],
+          // Some models honor this OpenAI field; harmless if ignored.
+          response_format: { type: "json_object" },
+          temperature: 0.25,
+          max_tokens: 8192,
+        }),
+      });
+    };
+
+    const response = await callGateway();
 
     if (!response.ok) {
+      if (response.status === 429) {
+        return new Response(JSON.stringify({ error: "Rate limit exceeded. Please try again in a moment." }), {
+          status: 429,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+      if (response.status === 402) {
+        return new Response(JSON.stringify({ error: "AI credits are paused. Please add more credits to continue." }), {
+          status: 402,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
       const errorText = await response.text();
       console.error("AI API error:", errorText);
       throw new Error(`AI API error: ${response.status}`);
     }
 
-    const aiResponse = await response.json();
-    const content = aiResponse.choices?.[0]?.message?.content || "";
+    const parseGatewayJson = async (resp: Response) => {
+      const aiResponse = await resp.json();
+      const message = aiResponse.choices?.[0]?.message;
+      const content = message?.content || "";
 
-    // Parse JSON from response (handle potential markdown wrapping)
-    let analysis;
-    try {
-      // Remove markdown code blocks if present
+      // Parse JSON from response (handle potential markdown wrapping)
+      let parsed;
       let jsonStr = content;
       if (jsonStr.includes("```json")) {
         jsonStr = jsonStr.replace(/```json\n?/g, "").replace(/```\n?/g, "");
       } else if (jsonStr.includes("```")) {
         jsonStr = jsonStr.replace(/```\n?/g, "");
       }
-      analysis = JSON.parse(jsonStr.trim());
+      parsed = JSON.parse(jsonStr.trim());
+      return parsed;
+    };
+
+    let analysis: any;
+    try {
+      analysis = await parseGatewayJson(response);
     } catch (parseError) {
-      console.error("JSON parse error:", parseError, "Content:", content);
-      // Return a basic fallback structure
+      console.error("JSON parse error:", parseError);
+      analysis = null;
+    }
+
+    const roomCount = analysis?.roomAnalysis ? Object.keys(analysis.roomAnalysis).length : 0;
+    const sanctuaryCount = analysis?.sanctuaryAnalysis ? Object.keys(analysis.sanctuaryAnalysis).length : 0;
+
+    // One retry if the model returns an incomplete/empty map.
+    if (!analysis || roomCount < requiredRooms || sanctuaryCount < 1) {
+      try {
+        const retry = await callGateway(
+          `Your last output was incomplete. Fix it now: roomAnalysis must have at least ${requiredRooms} room IDs and sanctuaryAnalysis must have at least 1 key. Return ONLY JSON.`
+        );
+        if (retry.ok) {
+          analysis = await parseGatewayJson(retry);
+        }
+      } catch (retryErr) {
+        console.error("Retry parse error:", retryErr);
+      }
+    }
+
+    // Final fallback structure (never crash the client)
+    if (!analysis || !analysis.relevantFloors || !analysis.roomAnalysis) {
       analysis = {
         overallTheme: "Analysis completed but response format was unexpected",
         relevantFloors: [1, 2],
         roomAnalysis: {
           or: {
             applicable: true,
-            principles: [{
-              id: "or-1",
-              content: "The text contains observable elements that merit further study",
-              evidence: [text.substring(0, 100) + "..."],
-              insight: "Careful observation is the first step in understanding Scripture",
-              visualHook: "A magnifying glass hovering over an open scroll",
-              confidence: 70,
-            }],
+            principles: [
+              {
+                id: "or-1",
+                content: "The text contains observable elements that merit further study",
+                evidence: [text.substring(0, 100) + "..."],
+                insight: "Careful observation is the first step in understanding Scripture",
+                application: "Slow down and list what the text actually says before interpreting it.",
+                visualHook: "A magnifying glass hovering over an open scroll",
+                confidence: 70,
+                scriptures: ["Psalm 119:18"],
+              },
+            ],
           },
         },
-        sanctuaryAnalysis: {},
+        sanctuaryAnalysis: {
+          "altar-of-burnt-offering": {
+            applicable: false,
+            insights: [
+              {
+                id: "altar-0",
+                content: "Placeholder sanctuary slot",
+                evidence: ["(placeholder)"],
+                insight: "(placeholder)",
+                application: "(placeholder)",
+                visualHook: "(placeholder)",
+                confidence: 1,
+              },
+            ],
+          },
+        },
         crossConnections: [],
       };
     }
