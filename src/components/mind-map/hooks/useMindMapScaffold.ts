@@ -139,8 +139,12 @@ export function useMindMapScaffold(
     });
 
     // Update room nodes with principles
+    // Rooms that should NOT be marked applicable by default (they require specific context)
+    const EXEMPTED_ROOMS = ['24fps', 'br'];
+
     Object.entries(populatedAnalysis.roomAnalysis).forEach(([roomId, roomData]) => {
-      if (!roomData.applicable) return;
+      // Skip rooms marked not applicable (but only for 24fps and br)
+      if (!roomData.applicable && EXEMPTED_ROOMS.includes(roomId)) return;
 
       const roomIndex = updatedNodes.findIndex((n) => n.id === `room-${roomId}`);
       if (roomIndex !== -1) {

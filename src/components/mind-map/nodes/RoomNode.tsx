@@ -33,7 +33,10 @@ const RoomNode = memo(({ data, selected }: NodeProps<RoomNodeData>) => {
     }
   }, [mindMapContext, data.roomName, data.roomTag, data.principles]);
   const hasInsights = data.principles && data.principles.length > 0;
-  const isNotApplicable = !hasInsights && data.populated === false;
+  
+  // Only show "not applicable" for 24fps and br rooms when they have no content
+  const exemptedRooms = ['24fps', 'br'];
+  const isNotApplicable = !hasInsights && data.populated === false && exemptedRooms.includes(data.roomId);
 
   // Get floor-specific colors
   const floorColors = FLOOR_ROOM_COLORS[data.floorNumber] || FLOOR_ROOM_COLORS[1];
