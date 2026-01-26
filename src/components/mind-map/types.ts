@@ -169,6 +169,7 @@ export interface MindMapData {
   edges: Edge<MindMapEdgeData>[];
   analysis: AIMapAnalysis;
   viewport?: { x: number; y: number; zoom: number };
+  notes?: Record<string, string>; // User notes keyed by node ID
 }
 
 // Exploration History (for "Make Seed" feature)

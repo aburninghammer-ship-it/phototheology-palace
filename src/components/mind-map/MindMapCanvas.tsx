@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useEffect, useState } from 'react';
+import { useCallback, useMemo, useEffect, useState, useRef } from 'react';
 import ReactFlow, {
   Background,
   Controls,
@@ -13,7 +13,7 @@ import ReactFlow, {
   useReactFlow,
 } from 'reactflow';
 import 'reactflow/dist/style.css';
-import { ZoomIn, ZoomOut, Maximize2, Home, Focus } from 'lucide-react';
+import { ZoomIn, ZoomOut, Maximize2, Home, Focus, Keyboard } from 'lucide-react';
 
 import { nodeTypes } from './nodes';
 import type { AnyNodeData, MindMapEdgeData } from './types';
@@ -39,7 +39,11 @@ function MindMapCanvasInner({
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
   const [zoomLevel, setZoomLevel] = useState(1);
+  const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null);
+  const [showKeyboardHints, setShowKeyboardHints] = useState(false);
   const { fitView, zoomIn, zoomOut, setCenter, getZoom, getNode } = useReactFlow();
+  const nodesRef = useRef(initialNodes);
+  nodesRef.current = nodes;
 
   // Update nodes and edges when props change (after analysis populates them)
   useEffect(() => {
@@ -71,6 +75,9 @@ function MindMapCanvasInner({
   // Handle node click with Prezi-like zoom
   const handleNodeClick = useCallback(
     (_: React.MouseEvent, node: Node<AnyNodeData>) => {
+      // Track selected node for keyboard navigation
+      setSelectedNodeId(node.id);
+
       // Determine zoom level based on node type
       // Lower zoom = see more area (floor needs to show its rooms)
       // Max zoom is 2, so keep clicked nodes readable (0.8-1.2 range for detail views)
@@ -145,6 +152,156 @@ function MindMapCanvasInner({
   }, []);
 
   const proOptions = useMemo(() => ({ hideAttribution: true }), []);
+
+  // Keyboard navigation handlers
+  const navigateToAdjacentNode = useCallback((direction: 'up' | 'down' | 'left' | 'right') => {
+    const currentNodes = nodesRef.current;
+
+    if (!selectedNodeId) {
+      // If nothing selected, select the root node
+      const rootNode = currentNodes.find(n => n.data.type === 'root');
+      if (rootNode) {
+        setSelectedNodeId(rootNode.id);
+        onNodeClick?.(rootNode.id, rootNode.data);
+        setCenter(rootNode.position.x, rootNode.position.y, { zoom: getZoom(), duration: 300 });
+      }
+      return;
+    }
+
+    const currentNode = currentNodes.find(n => n.id === selectedNodeId);
+    if (!currentNode) return;
+
+    // Find nodes in the direction
+    const candidates = currentNodes.filter(n => {
+      if (n.id === selectedNodeId) return false;
+
+      const dx = n.position.x - currentNode.position.x;
+      const dy = n.position.y - currentNode.position.y;
+
+      switch (direction) {
+        case 'up':
+          return dy < -50 && Math.abs(dx) < Math.abs(dy) * 2;
+        case 'down':
+          return dy > 50 && Math.abs(dx) < Math.abs(dy) * 2;
+        case 'left':
+          return dx < -50 && Math.abs(dy) < Math.abs(dx) * 2;
+        case 'right':
+          return dx > 50 && Math.abs(dy) < Math.abs(dx) * 2;
+        default:
+          return false;
+      }
+    });
+
+    if (candidates.length === 0) return;
+
+    // Find the closest node in that direction
+    const closest = candidates.reduce((prev, curr) => {
+      const prevDist = Math.hypot(
+        prev.position.x - currentNode.position.x,
+        prev.position.y - currentNode.position.y
+      );
+      const currDist = Math.hypot(
+        curr.position.x - currentNode.position.x,
+        curr.position.y - currentNode.position.y
+      );
+      return currDist < prevDist ? curr : prev;
+    });
+
+    setSelectedNodeId(closest.id);
+    onNodeClick?.(closest.id, closest.data);
+
+    // Determine appropriate zoom level for the target node type
+    let targetZoom = getZoom();
+    if (closest.data.type === 'floor') targetZoom = 0.45;
+    else if (closest.data.type === 'room') targetZoom = 0.8;
+    else if (closest.data.type === 'principle') targetZoom = 1.2;
+
+    setCenter(closest.position.x, closest.position.y, { zoom: targetZoom, duration: 300 });
+  }, [selectedNodeId, onNodeClick, setCenter, getZoom]);
+
+  // Keyboard event handler
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      // Ignore if user is typing in an input
+      if (
+        event.target instanceof HTMLInputElement ||
+        event.target instanceof HTMLTextAreaElement
+      ) {
+        return;
+      }
+
+      // Number keys 1-8: Jump to floors
+      if (event.key >= '1' && event.key <= '8' && !event.ctrlKey && !event.metaKey) {
+        event.preventDefault();
+        const floorNum = parseInt(event.key, 10);
+        const floorNode = nodesRef.current.find(
+          n => n.data.type === 'floor' && (n.data as any).floorNumber === floorNum
+        );
+        if (floorNode) {
+          setSelectedNodeId(floorNode.id);
+          onNodeClick?.(floorNode.id, floorNode.data);
+          setCenter(floorNode.position.x, floorNode.position.y, { zoom: 0.45, duration: 500 });
+        }
+        return;
+      }
+
+      // Escape: Deselect
+      if (event.key === 'Escape') {
+        event.preventDefault();
+        setSelectedNodeId(null);
+        return;
+      }
+
+      // Arrow keys: Navigate between nodes
+      if (event.key.startsWith('Arrow')) {
+        event.preventDefault();
+        const direction = event.key.replace('Arrow', '').toLowerCase() as 'up' | 'down' | 'left' | 'right';
+        navigateToAdjacentNode(direction);
+        return;
+      }
+
+      // Home: Go to root node
+      if (event.key === 'Home') {
+        event.preventDefault();
+        const rootNode = nodesRef.current.find(n => n.data.type === 'root');
+        if (rootNode) {
+          setSelectedNodeId(rootNode.id);
+          onNodeClick?.(rootNode.id, rootNode.data);
+          setCenter(rootNode.position.x, rootNode.position.y, { zoom: 0.35, duration: 500 });
+        }
+        return;
+      }
+
+      // S: Jump to Sanctuary
+      if (event.key === 's' && !event.ctrlKey && !event.metaKey) {
+        event.preventDefault();
+        const sanctuaryNode = nodesRef.current.find(n => n.data.type === 'sanctuary');
+        if (sanctuaryNode) {
+          setSelectedNodeId(sanctuaryNode.id);
+          onNodeClick?.(sanctuaryNode.id, sanctuaryNode.data);
+          setCenter(sanctuaryNode.position.x, sanctuaryNode.position.y, { zoom: 0.45, duration: 500 });
+        }
+        return;
+      }
+
+      // F: Fit view (show all)
+      if (event.key === 'f' && !event.ctrlKey && !event.metaKey) {
+        event.preventDefault();
+        fitView({ padding: 0.2, duration: 500 });
+        return;
+      }
+
+      // ? or /: Toggle keyboard hints
+      if (event.key === '?' || event.key === '/') {
+        event.preventDefault();
+        setShowKeyboardHints(prev => !prev);
+        return;
+      }
+    };
+
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [navigateToAdjacentNode, onNodeClick, setCenter, fitView]);
 
   return (
     <div className={`w-full h-full ${className}`}>
@@ -255,6 +412,57 @@ function MindMapCanvasInner({
             pannable
           />
         )}
+
+        {/* Keyboard Shortcuts Button & Panel */}
+        <div className="absolute bottom-4 left-4 z-10">
+          <button
+            onClick={() => setShowKeyboardHints(prev => !prev)}
+            className={`p-2 rounded-lg transition-all ${
+              showKeyboardHints
+                ? 'bg-primary/30 text-primary border border-primary/50'
+                : 'bg-card/90 backdrop-blur-md border border-white/20 text-muted-foreground hover:text-foreground'
+            }`}
+            title="Keyboard shortcuts (?)"
+          >
+            <Keyboard className="w-4 h-4" />
+          </button>
+
+          {showKeyboardHints && (
+            <div className="absolute bottom-12 left-0 bg-card/95 backdrop-blur-xl border border-white/20 rounded-xl p-4 shadow-2xl w-64">
+              <h4 className="text-sm font-semibold text-foreground mb-3">Keyboard Shortcuts</h4>
+              <div className="space-y-2 text-xs">
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">Navigate</span>
+                  <span className="text-foreground font-mono">← ↑ → ↓</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">Jump to floor</span>
+                  <span className="text-foreground font-mono">1-8</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">Sanctuary</span>
+                  <span className="text-foreground font-mono">S</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">Fit view</span>
+                  <span className="text-foreground font-mono">F</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">Go to root</span>
+                  <span className="text-foreground font-mono">Home</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">Deselect</span>
+                  <span className="text-foreground font-mono">Esc</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">Toggle hints</span>
+                  <span className="text-foreground font-mono">?</span>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
       </ReactFlow>
     </div>
   );

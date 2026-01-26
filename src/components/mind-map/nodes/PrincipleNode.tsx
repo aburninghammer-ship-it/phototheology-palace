@@ -3,6 +3,7 @@ import { Handle, Position, NodeProps } from 'reactflow';
 import { Sprout, BookOpen, Lightbulb, Eye, Sparkles, Quote, Target, ChevronDown, ChevronUp } from 'lucide-react';
 import type { PrincipleNodeData } from '../types';
 import { useMindMapContextSafe } from '../MindMapContext';
+import { ScriptureRef } from '../ScripturePopup';
 
 const PrincipleNode = memo(({ data, selected }: NodeProps<PrincipleNodeData>) => {
   const [isExpanded, setIsExpanded] = useState(false);
@@ -182,16 +183,15 @@ const PrincipleNode = memo(({ data, selected }: NodeProps<PrincipleNodeData>) =>
           </div>
         )}
 
-        {/* Scriptures */}
+        {/* Scriptures - Clickable */}
         {data.scriptures && data.scriptures.length > 0 && (
           <div className="flex flex-wrap gap-1.5 mb-3">
             {data.scriptures.slice(0, 4).map((ref, i) => (
-              <span
+              <ScriptureRef
                 key={i}
-                className="text-xs px-2 py-1 rounded-full bg-blue-500/30 backdrop-blur-sm text-blue-200 font-medium border border-blue-400/30"
-              >
-                {ref}
-              </span>
+                reference={ref}
+                className="px-2 py-1 rounded-full bg-blue-500/30 backdrop-blur-sm text-blue-200 font-medium border border-blue-400/30"
+              />
             ))}
             {data.scriptures.length > 4 && (
               <span className="text-xs text-white/50 px-2 py-1">

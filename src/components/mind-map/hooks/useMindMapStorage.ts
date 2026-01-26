@@ -23,6 +23,7 @@ interface SaveMapParams {
   edges: Edge[];
   analysis: AIMapAnalysis;
   parentMapId?: string;
+  notes?: Record<string, string>; // User notes keyed by node ID
 }
 
 // Type for the database record shape
@@ -75,6 +76,7 @@ export function useMindMapStorage(): UseMindMapStorageReturn {
         nodes: params.nodes,
         edges: params.edges,
         analysis: params.analysis,
+        notes: params.notes || {},
       };
 
       // Use raw query since mind_maps table may not be in generated types yet

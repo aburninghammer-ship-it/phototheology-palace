@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useSparks } from '@/hooks/useSparks';
 import { SparkContainer } from '@/components/sparks';
 import { useAuth } from '@/hooks/useAuth';
+import { ScriptureRef } from './ScripturePopup';
 
 interface MindMapSidebarProps {
   isOpen: boolean;
@@ -430,16 +431,11 @@ function PrincipleCard({ principle, onMakeSeed, expanded = false }: PrincipleCar
         </div>
       )}
 
-      {/* Scriptures */}
+      {/* Scriptures - Clickable to show verse */}
       {principle.scriptures && principle.scriptures.length > 0 && (
         <div className="flex flex-wrap gap-1">
           {principle.scriptures.map((ref, i) => (
-            <span
-              key={i}
-              className="text-xs px-1.5 py-0.5 rounded bg-blue-500/20 text-blue-400"
-            >
-              {ref}
-            </span>
+            <ScriptureRef key={i} reference={ref} />
           ))}
         </div>
       )}

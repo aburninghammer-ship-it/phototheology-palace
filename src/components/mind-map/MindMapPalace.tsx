@@ -285,6 +285,7 @@ export default function MindMapPalace({
       nodes,
       edges,
       analysis: currentAnalysis,
+      notes: nodeNotes,
     });
 
     if (saved) {
