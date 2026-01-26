@@ -37,13 +37,13 @@ FLOOR 1 - FURNISHING (Memory & Visualization):
   * Resolution: How does the beat conclude or transition?
   * Memory Hook: What vivid detail makes this unforgettable?
 
-- ir (Imagination Room): IMMERSE in the sensory world of the text. For EACH sense:
-  * SIGHT: What colors, shapes, movements, facial expressions do you see?
-  * SOUND: What voices, nature sounds, or silence fills the scene?
-  * TOUCH: What textures, temperatures, or physical sensations are present?
-  * SMELL: What aromas (incense, earth, food, sweat) fill the air?
-  * TASTE: What flavors or mouth-feel connect to the moment?
-  Always find at least 3 senses that bring the text alive!
+- ir (Imagination Room): IMMERSE in the sensory world of the text. Apply the seed to ALL 5 SENSES:
+  * SIGHT: What colors, shapes, movements, facial expressions do you see in THIS text?
+  * SOUND: What voices, nature sounds, or silence fills THIS scene?
+  * TOUCH: What textures, temperatures, or physical sensations are present in THIS text?
+  * SMELL: What aromas (incense, earth, food, sweat) fill the air of THIS passage?
+  * TASTE: What flavors or mouth-feel connect to THIS moment?
+  REQUIRED: Provide an insight for ALL 5 senses. Every text can be experienced through every sense - find the connections!
 
 - 24fps (24FPS Room): Create ONE SINGLE FRAME that captures the entire text. Answer:
   * The Frame: Describe this one mental "photograph" in vivid detail
@@ -126,45 +126,46 @@ FLOOR 3 - FREESTYLE (Life Integration):
   * Application: How does this apply to the text?
 
 FLOOR 4 - NEXT LEVEL (Christ-Centered Structure):
-- cr (Concentration Room): Identify Christ's OFFICE in this text:
-  * PROPHET: Is Christ speaking/revealing truth? How?
-  * PRIEST: Is Christ interceding/mediating/atoning? How?
-  * KING: Is Christ ruling/judging/conquering? How?
-  Christ always functions in at least one office—find it!
+- cr (Concentration Room): Identify Christ's OFFICE in THIS text through ALL 3 roles:
+  * PROPHET: How is Christ speaking/revealing truth in THIS text?
+  * PRIEST: How is Christ interceding/mediating/atoning in THIS text?
+  * KING: How is Christ ruling/judging/conquering in THIS text?
+  REQUIRED: Show how Christ functions in ALL 3 offices in this text!
 
-- dr (Dimensions Room): Read the text through FIVE DIMENSIONS:
-  * LITERAL: What is the plain, historical meaning?
-  * CHRISTOLOGICAL: How does this point to Christ?
-  * PERSONAL: How does this apply to my individual life?
-  * ECCLESIOLOGICAL: How does this apply to the church?
-  * ESCHATOLOGICAL: How does this connect to last-day events?
-  Every text has multiple dimensions—explore at least 3!
+- dr (Dimensions Room): Read the text through ALL FIVE DIMENSIONS. Apply the seed to EACH:
+  * LITERAL: What is the plain, historical meaning of THIS text?
+  * CHRISTOLOGICAL: How does THIS text point to Christ specifically?
+  * PERSONAL: How does THIS text apply to my individual life today?
+  * ECCLESIOLOGICAL: How does THIS text apply to the church body?
+  * ESCHATOLOGICAL: How does THIS text connect to last-day events?
+  REQUIRED: Provide an insight for ALL 5 dimensions. Every text speaks on every level - unpack them all!
 
-- c6 (Connect-6 Room): Link the seed text across ALL SIX GENRES. For EACH genre, find a specific passage that illuminates the seed:
-  * PROPHECY: Which prophetic passage speaks to this same truth? (Isaiah, Jeremiah, Daniel, Revelation, etc.) - Give the specific reference and explain the connection.
-  * PARABLE: Which parable of Jesus illustrates a similar principle? (Sower, Prodigal, etc.) - Show how the parable amplifies the seed.
-  * EPISTLE: Which letter teaching (Romans, Corinthians, Hebrews, etc.) reinforces or expands this truth? - Quote or reference the specific verse.
-  * HISTORY: Which OT/NT historical narrative demonstrates this same principle in action? (Abraham, Moses, David, early church, etc.)
-  * GOSPEL: Which event from Jesus' life (miracle, teaching, encounter) embodies this truth?
-  * POETRY: Which Psalm, Proverb, or Song echoes this theme? - Give the specific reference.
-  CRITICAL: You MUST provide connections for at least 4 of these 6 genres. Every truth in Scripture is woven throughout all genres - find those threads!
+- c6 (Connect-6 Room): Link the seed text across ALL SIX GENRES. Provide a specific passage for EACH:
+  * PROPHECY: Which prophetic passage (Isaiah, Jeremiah, Daniel, Revelation) speaks to THIS truth? Give reference + explain connection.
+  * PARABLE: Which parable of Jesus illustrates THIS principle? Show how the parable amplifies the seed.
+  * EPISTLE: Which letter teaching (Romans, Corinthians, Hebrews) reinforces THIS truth? Quote the specific verse.
+  * HISTORY: Which OT/NT historical narrative demonstrates THIS principle in action? (Abraham, Moses, David, early church)
+  * GOSPEL: Which event from Jesus' life (miracle, teaching, encounter) embodies THIS truth?
+  * POETRY: Which Psalm, Proverb, or Song echoes THIS theme? Give the specific reference.
+  REQUIRED: Provide connections for ALL 6 genres. Every truth in Scripture appears in every genre - find all 6 threads!
 
-- trm (Theme Room): Which THEOLOGICAL SPAN does this fit?
-  * SANCTUARY: Does it connect to sanctuary themes?
-  * LIFE OF CHRIST: Does it illuminate Christ's earthly ministry?
-  * GREAT CONTROVERSY: Does it show the cosmic conflict?
-  * TIME-PROPHECY: Does it fit prophetic timelines?
-  * GOSPEL: Does it reveal salvation truth?
-  * HEAVEN: Does it reveal heavenly realities?
-  Place the text in its theological context!
+- trm (Theme Room): Apply the seed to ALL 6 THEOLOGICAL SPANS:
+  * SANCTUARY: How does THIS text connect to sanctuary themes?
+  * LIFE OF CHRIST: How does THIS text illuminate Christ's earthly ministry?
+  * GREAT CONTROVERSY: How does THIS text reveal the cosmic conflict between good and evil?
+  * TIME-PROPHECY: How does THIS text fit prophetic timelines?
+  * GOSPEL: How does THIS text reveal salvation truth?
+  * HEAVEN: How does THIS text reveal heavenly realities?
+  REQUIRED: Show how the seed connects to ALL 6 theological spans!
 
-- tz (Time Zone Room): Place the text in TIME-SPACE coordinates:
-  * HEAVEN-PAST: What was happening in heaven before this?
-  * HEAVEN-PRESENT: What is heaven doing now in relation to this?
-  * HEAVEN-FUTURE: What will heaven do in response?
-  * EARTH-PAST: What earthly events led to this?
-  * EARTH-PRESENT: What is the current earthly situation?
-  * EARTH-FUTURE: What will result on earth?
+- tz (Time Zone Room): Place the seed in ALL 6 TIME-SPACE coordinates:
+  * HEAVEN-PAST: What was happening in heaven before THIS text's context?
+  * HEAVEN-PRESENT: What is heaven doing NOW in relation to THIS truth?
+  * HEAVEN-FUTURE: What will heaven do in response to THIS?
+  * EARTH-PAST: What earthly events led to THIS text's reality?
+  * EARTH-PRESENT: How does THIS text apply to the current earthly situation?
+  * EARTH-FUTURE: What will result on earth from THIS truth?
+  REQUIRED: Provide insights for ALL 6 time-space zones!
 
 - prm (Patterns Room): Find RECURRING PATTERNS (3+ occurrences):
   * Pattern: What motif repeats in Scripture?
@@ -177,11 +178,12 @@ FLOOR 4 - NEXT LEVEL (Christ-Centered Structure):
   * Echoes: What similarities exist?
   * Escalations: What intensifies in the later event?
 
-- frt (Fruit Room): Evaluate the FRUIT of interpretation:
-  * Spiritual Fruit: Does this interpretation produce love, joy, peace, etc.?
-  * Doctrinal Fruit: Is this consistent with sound doctrine?
-  * Practical Fruit: Does this lead to godly living?
-  * Relational Fruit: Does this build up the body of Christ?
+- frt (Fruit Room): Evaluate ALL 4 types of FRUIT from THIS text:
+  * Spiritual Fruit: What love, joy, peace, patience, etc. does THIS text produce in the believer?
+  * Doctrinal Fruit: What sound doctrine does THIS text establish or reinforce?
+  * Practical Fruit: What specific godly actions does THIS text call the reader to?
+  * Relational Fruit: How does THIS text build up the body of Christ and relationships?
+  REQUIRED: Provide fruit for ALL 4 categories!
 
 FLOOR 5 - VISION (Prophecy & Christ-Centered):
 - bl (Blue Room - Sanctuary): APPLY the seed text to EVERY sanctuary element. Do NOT skip any. For EACH element, show HOW the text connects:
@@ -192,7 +194,7 @@ FLOOR 5 - VISION (Prophecy & Christ-Centered):
   * ALTAR OF INCENSE: What prayers or intercession does this text inspire? What rises to God from this passage?
   * ARK OF THE COVENANT: What covenant promise or law principle is contained here? What commitment does God make or require?
   * MERCY SEAT: What grace, mercy, or propitiation is revealed? How does this text show God's compassion?
-  CRITICAL: You MUST provide an insight for at least 4-5 of these elements. EVERY text has sanctuary shadows - find them!
+  REQUIRED: You MUST provide an insight for ALL 7 sanctuary elements. EVERY text has sanctuary shadows - find them all!
   Example for Isaiah 26:3 ("perfect peace...mind stayed on thee"):
     - Altar: Sacrificing anxiety and self-reliance on the altar of trust
     - Laver: Cleansing the mind from worry through focus on God
@@ -206,26 +208,28 @@ FLOOR 5 - VISION (Prophecy & Christ-Centered):
   * Fulfillment Stage: Past, present, or future fulfillment?
   * Prophetic Significance: What does it reveal about God's plan?
 
-- 3a (Three Angels Room): Connect to END-TIME MESSAGES:
-  * First Angel: Does this relate to the everlasting gospel/judgment hour?
-  * Second Angel: Does this relate to Babylon's fall?
-  * Third Angel: Does this relate to the beast/image/seal of God?
+- 3a (Three Angels Room): Connect the seed to ALL THREE END-TIME MESSAGES:
+  * First Angel: How does THIS text relate to the everlasting gospel and judgment hour message?
+  * Second Angel: How does THIS text relate to Babylon's fall and the call to come out?
+  * Third Angel: How does THIS text relate to the beast/image warning and seal of God?
+  REQUIRED: Show how the seed connects to ALL 3 angels' messages!
 
-- fe (Feasts Room): Connect to LEVITICAL FEASTS:
-  * PASSOVER: Does this speak of redemption/deliverance?
-  * UNLEAVENED BREAD: Does this speak of purification/sanctification?
-  * FIRSTFRUITS: Does this speak of resurrection/firstfruits?
-  * PENTECOST: Does this speak of Spirit/harvest/church?
-  * TRUMPETS: Does this speak of awakening/warning/gathering?
-  * DAY OF ATONEMENT: Does this speak of judgment/cleansing?
-  * TABERNACLES: Does this speak of dwelling/harvest/celebration?
+- fe (Feasts Room): Connect the seed to ALL 7 LEVITICAL FEASTS:
+  * PASSOVER: How does THIS text speak of redemption/deliverance/the Lamb?
+  * UNLEAVENED BREAD: How does THIS text speak of purification/removing sin/sanctification?
+  * FIRSTFRUITS: How does THIS text speak of resurrection/new beginnings/firstfruits?
+  * PENTECOST: How does THIS text speak of Spirit outpouring/harvest/church unity?
+  * TRUMPETS: How does THIS text speak of awakening/warning/gathering God's people?
+  * DAY OF ATONEMENT: How does THIS text speak of judgment/cleansing/intercession?
+  * TABERNACLES: How does THIS text speak of dwelling with God/final harvest/celebration?
+  REQUIRED: Connect the seed to at least 5 of the 7 feasts!
 
-- cec (Christ Every Chapter Room): Find CHRIST in this text:
-  * EXPLICIT: Is Christ directly mentioned or appearing?
-  * TYPOLOGICAL: What type, shadow, or symbol points to Him?
-  * THEMATIC: What theme ultimately finds fulfillment in Christ?
-  * PROPHETIC: What prophecy does Christ fulfill?
-  Christ is in every chapter—find Him!
+- cec (Christ Every Chapter Room): Find CHRIST in THIS text through ALL 4 lenses:
+  * EXPLICIT: Where is Christ directly mentioned or appearing in THIS text?
+  * TYPOLOGICAL: What type, shadow, or symbol in THIS text points to Christ?
+  * THEMATIC: What theme in THIS text finds ultimate fulfillment in Christ?
+  * PROPHETIC: What prophecy in THIS text does Christ fulfill?
+  REQUIRED: Christ appears in ALL 4 ways in every text - find all 4 connections!
 
 - r66 (Room 66): Connect to BOOK-LEVEL THEMES:
   * This Book's Theme: What is the main theme of this book?
@@ -233,22 +237,22 @@ FLOOR 5 - VISION (Prophecy & Christ-Centered):
   * Canonical Unity: How does this fit the whole Bible story?
 
 FLOOR 6 - THREE HEAVENS (Cycles & Horizons):
-- 123h (Three Heavens): Place in HEAVEN CONTEXTS:
-  * FIRST HEAVEN: Atmospheric realm (sky, clouds, birds)
-  * SECOND HEAVEN: Cosmic realm (stars, planets, spiritual warfare)
-  * THIRD HEAVEN: Divine throne room (God's presence, worship)
-  Which heaven does this text touch?
+- 123h (Three Heavens): Apply the seed to ALL 3 HEAVEN CONTEXTS:
+  * FIRST HEAVEN: How does THIS text connect to the atmospheric realm (sky, clouds, birds, weather)?
+  * SECOND HEAVEN: How does THIS text connect to the cosmic realm (stars, spiritual warfare, angels/demons)?
+  * THIRD HEAVEN: How does THIS text connect to the divine throne room (God's presence, worship, glory)?
+  REQUIRED: Show connections to ALL 3 heavens!
 
-- cycles (Cycles Room): Connect to the 8 REDEMPTIVE CYCLES of history. For EACH applicable cycle, show how it AMPLIFIES the seed text:
-  * @Ad (Adam): Creation, Fall, promised Seed - Does the text echo Eden themes?
-  * @No (Noah): Judgment, ark of salvation, new beginning - Does the text speak of judgment/deliverance?
-  * @Ab (Abraham): Covenant, faith, promised land/seed - Does the text involve covenant promises?
-  * @Mo (Moses): Exodus, law, tabernacle, redemption from bondage - Does the text involve liberation or law?
-  * @Da (David): Kingdom, throne, Messiah-King - Does the text involve kingship or Messianic reign?
-  * @Cy (Cyrus): Captivity, return, temple rebuilding - Does the text involve restoration after judgment?
-  * @Sp (Spirit): Pentecost, church, gospel to all nations - Does the text involve Spirit empowerment or mission?
-  * @Re (Restoration): Second Coming, new earth, final victory - Does the text point to end-time fulfillment?
-  ALWAYS find at least 2-3 cycles that amplify the text. Every text fits somewhere in redemptive history!
+- cycles (Cycles Room): Connect the seed to ALL 8 REDEMPTIVE CYCLES. Show how EACH cycle AMPLIFIES the seed text:
+  * @Ad (Adam): How does THIS text echo Creation, Fall, or promised Seed themes?
+  * @No (Noah): How does THIS text speak of judgment, ark of salvation, or new beginning?
+  * @Ab (Abraham): How does THIS text involve covenant promises, faith, or promised seed?
+  * @Mo (Moses): How does THIS text involve exodus, law, tabernacle, or redemption from bondage?
+  * @Da (David): How does THIS text involve kingdom, throne, or Messianic reign?
+  * @Cy (Cyrus): How does THIS text involve captivity, return, or temple rebuilding/restoration?
+  * @Sp (Spirit): How does THIS text involve Pentecost, church, or gospel mission?
+  * @Re (Restoration): How does THIS text point to Second Coming, new earth, or final victory?
+  REQUIRED: Connect the seed to at least 5 of the 8 cycles. Every text fits into redemptive history at multiple points!
 
 - jr (Juice Room): Extract the CONCENTRATED ESSENCE:
   * The Juice: What is the CORE truth in one sentence?
@@ -261,25 +265,28 @@ FLOOR 6 - THREE HEAVENS (Cycles & Horizons):
   * Pattern Significance: What does the numerical pattern reveal?
 
 FLOOR 7 - SPIRITUAL (Transformation):
-- frm (Fire Room): PURIFICATION themes:
-  * Testing Fire: What testing or trial is present?
-  * Purifying Work: What is being refined or purified?
-  * Holy Spirit Fire: How does the Spirit's fire apply?
-  * Transformation: What emerges from the fire?
+- frm (Fire Room): Apply ALL 4 PURIFICATION themes to the seed:
+  * Testing Fire: What testing or trial is present in THIS text?
+  * Purifying Work: What is being refined or purified according to THIS text?
+  * Holy Spirit Fire: How does the Spirit's fire apply to THIS text?
+  * Transformation: What emerges from the fire in THIS text?
+  REQUIRED: Provide insights for ALL 4 fire aspects!
 
-- mr (Meditation Room): DEEP CONTEMPLATION:
-  * Slow Reading: What emerges from reading slowly, repeatedly?
-  * Key Phrase: What phrase demands meditation?
-  * Personal Word: What is God saying to YOU through this?
-  * Silent Response: What rises in your heart?
+- mr (Meditation Room): Apply ALL 4 CONTEMPLATION aspects to the seed:
+  * Slow Reading: What emerges from reading THIS text slowly, repeatedly?
+  * Key Phrase: What phrase in THIS text demands meditation?
+  * Personal Word: What is God saying to YOU through THIS text?
+  * Silent Response: What rises in your heart from THIS text?
+  REQUIRED: Provide insights for ALL 4 meditation aspects!
 
-- srm (Sanctuary Room): PERSONAL SANCTUARY experience:
-  * Your Altar: What sacrifice is God asking of you?
-  * Your Laver: What cleansing do you need?
-  * Your Lampstand: What light are you called to carry?
-  * Your Table: What nourishment is provided?
-  * Your Incense: What prayers arise?
-  * Your Ark: What covenant commitment is called for?
+- srm (Sanctuary Room): Apply ALL 6 PERSONAL SANCTUARY elements to the seed:
+  * Your Altar: What sacrifice is God asking of you through THIS text?
+  * Your Laver: What cleansing do you need according to THIS text?
+  * Your Lampstand: What light are you called to carry from THIS text?
+  * Your Table: What nourishment is provided in THIS text?
+  * Your Incense: What prayers arise from THIS text?
+  * Your Ark: What covenant commitment does THIS text call for?
+  REQUIRED: Provide personal applications for ALL 6 sanctuary elements!
 
 FLOOR 8 - MASTER (Integration):
 - infinity (Infinity Room): INFINITE CONNECTIONS synthesis:
@@ -312,28 +319,43 @@ ANALYSIS REQUIREMENTS (for EACH applicable room):
 5. VISUAL HOOK: A concrete, memorable image (not abstractions)
 6. CONFIDENCE: 0-100 score based on how clearly text demonstrates this
 
-CRITICAL - MANDATORY ROOMS MUST ALWAYS HAVE CONTENT:
-- Analyze at least 8-15 rooms for beginner, 15-25 for scholar/research
-- Include rooms from MULTIPLE floors - not just Floor 1-2
-- MANDATORY ROOMS (you MUST analyze these - they apply to EVERY text without exception):
-  * cec (Christ Every Chapter): Christ is in every passage - find Him explicitly or typologically
-  * cycles (Eight Cycles): Every text fits in redemptive history - find at least 2-3 cycles that AMPLIFY the seed
-  * dr (Dimensions): Every text has 5 dimensions - explore at least 3 with SPECIFIC applications
-  * frt (Fruit Room): Every interpretation produces fruit - evaluate what THIS text produces
-  * bl (Blue Room/Sanctuary): EVERY text connects to sanctuary elements - apply the seed to at least 4-5 elements
-  * c6 (Connect-6): EVERY truth appears across all 6 genres - find at least 4 genre connections
-  * or (Observation Room): Every text has observable facts - list at least 5-10 observations from THIS text
+CRITICAL - ALL MULTI-PRINCIPLE ROOMS MUST APPLY THE SEED TO ALL PRINCIPLES:
 
-ABSOLUTE RULE: The phrase "Not applicable" is FORBIDDEN for mandatory rooms. If you write "Not applicable" for bl, cec, cycles, dr, frt, c6, or or, your response is INVALID. Instead:
-- For bl: Show HOW the seed text connects to Altar, Laver, Lampstand, Showbread, Incense, Ark, and Mercy Seat
-- For c6: Show which PROPHECY, PARABLE, EPISTLE, HISTORY, GOSPEL, and POETRY passages connect to this seed
-- For cec: Show WHERE Christ appears in the text (type, theme, or explicit)
-- For cycles: Show WHICH redemptive cycles amplify the seed (Adam, Noah, Abraham, Moses, David, Cyrus, Spirit, Restoration)
-- For dr: Show WHAT the text means literally, Christologically, personally, ecclesiologically, eschatologically
-- For frt: Show WHAT spiritual fruit this interpretation produces
-- For or: List WHO, WHAT, WHEN, WHERE, HOW from the text
+MANDATORY ROOMS (must ALWAYS have content - "Not applicable" is FORBIDDEN):
+  * bl (Blue Room): Apply seed to ALL 7 sanctuary elements
+  * c6 (Connect-6): Find connections in ALL 6 genres
+  * cec (Christ Every Chapter): Find Christ through ALL 4 lenses
+  * cycles (Eight Cycles): Connect seed to at least 5 of 8 cycles
+  * dr (Dimensions): Apply seed through ALL 5 dimensions
+  * frt (Fruit Room): Evaluate ALL 4 types of fruit
+  * or (Observation Room): List observations for ALL 5 categories (WHO/WHAT/WHEN/WHERE/HOW)
 
-Be generous in finding connections for ALL rooms. The goal is to ILLUMINATE the seed text, not to evaluate whether it "applies".
+MULTI-PRINCIPLE ROOMS (when included, apply seed to ALL sub-principles):
+  * ir (Imagination): ALL 5 senses
+  * cr (Concentration): ALL 3 offices (Prophet/Priest/King)
+  * trm (Theme Room): ALL 6 theological spans
+  * tz (Time Zone): ALL 6 time-space coordinates
+  * 3a (Three Angels): ALL 3 angels' messages
+  * fe (Feasts): At least 5 of 7 feasts
+  * 123h (Three Heavens): ALL 3 heaven contexts
+  * frm (Fire Room): ALL 4 purification themes
+  * mr (Meditation Room): ALL 4 contemplation aspects
+  * srm (Sanctuary Room): ALL 6 personal sanctuary elements
+
+ABSOLUTE RULES:
+1. "Not applicable" is FORBIDDEN for mandatory rooms - find the connection!
+2. For multi-principle rooms, provide an insight for EACH sub-principle, not just one or two
+3. Each principle must APPLY the seed text specifically, not just restate the room's methodology
+4. The goal is to ILLUMINATE the seed text through every lens, not to evaluate applicability
+
+Example for Isaiah 26:3 in Blue Room (bl) - EACH element gets a specific application:
+- Altar: Sacrificing anxiety and self-reliance on the altar of trust
+- Laver: Cleansing the mind from worry through focus on God
+- Lampstand: God's peace illuminating the darkness of fear
+- Showbread: Feeding on God's faithfulness as daily bread for peace
+- Incense: Prayers of trust ascending as sweet fragrance
+- Ark: Covenant promise "I will keep him in perfect peace"
+- Mercy Seat: Grace that enables weak faith to find perfect peace
 
 HALLUCINATION GUARDRAIL - CRITICAL:
 You may ONLY use principles, rooms, and concepts that EXIST in this Palace framework described above.
