@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -9,6 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import mammoth from "mammoth";
 import { 
   Upload, 
   Sparkles, 
@@ -26,7 +27,8 @@ import {
   Heart,
   Lightbulb,
   ShieldAlert,
-  BookmarkPlus
+  BookmarkPlus,
+  FileUp
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
@@ -108,9 +110,122 @@ export function SermonStudyUploader({ churchId, userRole }: SermonStudyUploaderP
   const [sermonOutline, setSermonOutline] = useState("");
   const [generatedStudy, setGeneratedStudy] = useState<GeneratedStudy | null>(null);
   const [savedStudies, setSavedStudies] = useState<SavedStudy[]>([]);
-
+  const [isDragOver, setIsDragOver] = useState(false);
+  const [isParsingFile, setIsParsingFile] = useState(false);
 
   const canManage = userRole === "admin" || userRole === "leader";
+
+  // File parsing function
+  const parseFile = useCallback(async (file: File): Promise<string> => {
+    const fileType = file.name.toLowerCase().split('.').pop();
+    
+    if (fileType === 'txt') {
+      return await file.text();
+    }
+    
+    if (fileType === 'docx') {
+      const arrayBuffer = await file.arrayBuffer();
+      const result = await mammoth.extractRawText({ arrayBuffer });
+      return result.value;
+    }
+    
+    if (fileType === 'pdf') {
+      // For PDF, we'll use a simpler text extraction approach
+      const arrayBuffer = await file.arrayBuffer();
+      const pdfjsLib = await import('pdfjs-dist');
+      pdfjsLib.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.js`;
+      
+      const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+      let fullText = '';
+      
+      for (let i = 1; i <= pdf.numPages; i++) {
+        const page = await pdf.getPage(i);
+        const textContent = await page.getTextContent();
+        const pageText = textContent.items
+          .map((item: any) => item.str)
+          .join(' ');
+        fullText += pageText + '\n\n';
+      }
+      
+      return fullText;
+    }
+    
+    throw new Error(`Unsupported file type: .${fileType}`);
+  }, []);
+
+  // Drag and drop handlers
+  const handleDragOver = useCallback((e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragOver(true);
+  }, []);
+
+  const handleDragLeave = useCallback((e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragOver(false);
+  }, []);
+
+  const handleDrop = useCallback(async (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragOver(false);
+
+    const files = Array.from(e.dataTransfer.files);
+    const file = files[0];
+    
+    if (!file) return;
+
+    const validExtensions = ['txt', 'docx', 'pdf'];
+    const ext = file.name.toLowerCase().split('.').pop();
+    
+    if (!ext || !validExtensions.includes(ext)) {
+      toast.error(`Unsupported file type. Please use: ${validExtensions.join(', ')}`);
+      return;
+    }
+
+    setIsParsingFile(true);
+    try {
+      const text = await parseFile(file);
+      setSermonOutline(text);
+      
+      // Try to extract title from filename
+      const fileName = file.name.replace(/\.[^/.]+$/, '');
+      if (!sermonTitle) {
+        setSermonTitle(fileName);
+      }
+      
+      toast.success(`File "${file.name}" loaded successfully!`);
+    } catch (error: any) {
+      console.error("File parsing error:", error);
+      toast.error(error.message || "Failed to parse file");
+    } finally {
+      setIsParsingFile(false);
+    }
+  }, [parseFile, sermonTitle]);
+
+  const handleFileInput = useCallback(async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setIsParsingFile(true);
+    try {
+      const text = await parseFile(file);
+      setSermonOutline(text);
+      
+      if (!sermonTitle) {
+        const fileName = file.name.replace(/\.[^/.]+$/, '');
+        setSermonTitle(fileName);
+      }
+      
+      toast.success(`File "${file.name}" loaded successfully!`);
+    } catch (error: any) {
+      console.error("File parsing error:", error);
+      toast.error(error.message || "Failed to parse file");
+    } finally {
+      setIsParsingFile(false);
+    }
+  }, [parseFile, sermonTitle]);
 
   useEffect(() => {
     if (churchId) {
@@ -377,6 +492,55 @@ export function SermonStudyUploader({ churchId, userRole }: SermonStudyUploaderP
           </TabsList>
 
           <TabsContent value="upload" className="space-y-4 mt-4">
+            {/* Drag and Drop Zone */}
+            <div
+              onDragOver={handleDragOver}
+              onDragLeave={handleDragLeave}
+              onDrop={handleDrop}
+              className={`
+                relative border-2 border-dashed rounded-lg p-6 text-center transition-all duration-200
+                ${isDragOver 
+                  ? 'border-primary bg-primary/10 scale-[1.02]' 
+                  : 'border-border hover:border-primary/50 hover:bg-muted/30'
+                }
+                ${isParsingFile ? 'opacity-50 pointer-events-none' : ''}
+              `}
+            >
+              <input
+                type="file"
+                accept=".txt,.docx,.pdf"
+                onChange={handleFileInput}
+                className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                disabled={isParsingFile}
+              />
+              <div className="flex flex-col items-center gap-3">
+                {isParsingFile ? (
+                  <>
+                    <Loader2 className="h-10 w-10 text-primary animate-spin" />
+                    <p className="text-sm font-medium">Parsing document...</p>
+                  </>
+                ) : (
+                  <>
+                    <FileUp className={`h-10 w-10 ${isDragOver ? 'text-primary' : 'text-muted-foreground'}`} />
+                    <div>
+                      <p className="text-sm font-medium">
+                        {isDragOver ? 'Drop your sermon file here!' : 'Drop sermon file or click to browse'}
+                      </p>
+                      <p className="text-xs text-muted-foreground mt-1">
+                        Supports .txt, .docx, and .pdf files
+                      </p>
+                    </div>
+                  </>
+                )}
+              </div>
+            </div>
+
+            <div className="relative flex items-center gap-4">
+              <div className="flex-1 h-px bg-border" />
+              <span className="text-xs text-muted-foreground">OR PASTE BELOW</span>
+              <div className="flex-1 h-px bg-border" />
+            </div>
+
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="title">Sermon Title</Label>
@@ -412,7 +576,7 @@ export function SermonStudyUploader({ churchId, userRole }: SermonStudyUploaderP
               <Textarea
                 id="outline"
                 placeholder="Paste your sermon transcript here... Include the full text for best results."
-                className="min-h-[300px] font-mono text-sm"
+                className="min-h-[250px] font-mono text-sm"
                 value={sermonOutline}
                 onChange={(e) => setSermonOutline(e.target.value)}
               />
