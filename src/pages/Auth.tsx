@@ -15,6 +15,7 @@ import { z } from "zod";
 import { GoogleSignInButton } from "@/components/auth/GoogleSignInButton";
 import { AuthSocialProof } from "@/components/auth/AuthSocialProof";
 import { useEventTracking } from "@/hooks/useEventTracking";
+import { usePaymentGate } from "@/hooks/usePaymentGate";
 import { ensureStorageSpace, isQuotaError, getStorageErrorMessage } from "@/utils/storageManager";
 
 const emailSchema = z.string().email("Please enter a valid email address").max(255, "Email is too long");
@@ -340,10 +341,12 @@ export default function Auth() {
         });
 
         toast.success("Account created! Welcome to Phototheology!");
+        // New users need to complete checkout (credit card required) unless they have external membership
+        // The pricing page will check for Patreon/Pickaxe/Teachable access
         if (safeRedirect) {
           navigate(safeRedirect, { replace: true });
         } else {
-          navigate("/onboarding");
+          navigate("/pricing?trial=true");
         }
       } else if (data.user && !data.session) {
         // Celebrate with confetti!

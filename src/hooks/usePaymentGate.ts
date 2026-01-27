@@ -1,0 +1,185 @@
+import { useEffect, useState, useRef } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "./useAuth";
+
+/**
+ * This hook checks if a user has valid payment access (Stripe, Patreon, Pickaxe, Teachable, lifetime, etc.)
+ * If not, it redirects them to pricing page to enter a credit card.
+ * 
+ * Flow:
+ * 1. Check profile for lifetime access or active subscription
+ * 2. Check Patreon connections
+ * 3. Check Pickaxe connections
+ * 4. Check Stripe subscription
+ * 5. If none found → redirect to /pricing for trial checkout
+ */
+export function usePaymentGate() {
+  const { user } = useAuth();
+  const navigate = useNavigate();
+  const location = useLocation();
+  const [checking, setChecking] = useState(true);
+  const [hasAccess, setHasAccess] = useState(false);
+  const hasCheckedRef = useRef(false);
+
+  useEffect(() => {
+    if (!user || hasCheckedRef.current) {
+      setChecking(false);
+      return;
+    }
+
+    const checkAccess = async () => {
+      try {
+        console.log("[PaymentGate] Checking access for:", user.email);
+
+        // 1. Check profile for lifetime access, active subscription, or manual grant
+        const { data: profile } = await supabase
+          .from("profiles")
+          .select("has_lifetime_access, subscription_status, subscription_tier, payment_source")
+          .eq("id", user.id)
+          .single();
+
+        if (profile?.has_lifetime_access) {
+          console.log("[PaymentGate] User has lifetime access");
+          setHasAccess(true);
+          hasCheckedRef.current = true;
+          setChecking(false);
+          return;
+        }
+
+        // Active subscription in profile (from Stripe webhooks, Patreon, manual, etc.)
+        if (profile?.subscription_status === "active" && profile?.subscription_tier) {
+          console.log("[PaymentGate] User has active subscription:", profile.subscription_tier);
+          setHasAccess(true);
+          hasCheckedRef.current = true;
+          setChecking(false);
+          return;
+        }
+
+        // 2. Check Patreon connections
+        const { data: patreonConnection } = await supabase
+          .from("patreon_connections")
+          .select("is_active_patron, entitled_cents")
+          .eq("user_id", user.id)
+          .maybeSingle();
+
+        // Minimum Patreon pledge: $15/month = 1500 cents
+        if (patreonConnection?.is_active_patron && patreonConnection.entitled_cents >= 1500) {
+          console.log("[PaymentGate] User has active Patreon access");
+          // Update profile to reflect Patreon access
+          await supabase
+            .from("profiles")
+            .update({
+              subscription_status: "active",
+              subscription_tier: "premium",
+              payment_source: "patreon",
+              updated_at: new Date().toISOString(),
+            })
+            .eq("id", user.id);
+
+          setHasAccess(true);
+          hasCheckedRef.current = true;
+          setChecking(false);
+          return;
+        }
+
+        // 3. Check Pickaxe connections (by email)
+        const { data: pickaxeConnection } = await supabase
+          .from("pickaxe_connections")
+          .select("is_paid_user")
+          .eq("pickaxe_email", user.email?.toLowerCase() || "")
+          .eq("is_paid_user", true)
+          .maybeSingle();
+
+        if (pickaxeConnection?.is_paid_user) {
+          console.log("[PaymentGate] User has Pickaxe premium access");
+          // Update profile to reflect Pickaxe access
+          await supabase
+            .from("profiles")
+            .update({
+              subscription_status: "active",
+              subscription_tier: "premium",
+              payment_source: "pickaxe" as any, // Type assertion for payment_source
+              updated_at: new Date().toISOString(),
+            })
+            .eq("id", user.id);
+
+          setHasAccess(true);
+          hasCheckedRef.current = true;
+          setChecking(false);
+          return;
+        }
+
+        // 4. Check Stripe directly (fallback)
+        try {
+          const { data: stripeCheck, error: stripeError } = await supabase.functions.invoke(
+            "check-stripe-subscription"
+          );
+
+          if (!stripeError && stripeCheck?.subscribed) {
+            console.log("[PaymentGate] User has active Stripe subscription");
+            setHasAccess(true);
+            hasCheckedRef.current = true;
+            setChecking(false);
+            return;
+          }
+        } catch (stripeErr) {
+          console.warn("[PaymentGate] Stripe check failed:", stripeErr);
+        }
+
+        // 5. Check user_subscriptions for active or trialing status
+        const { data: userSub } = await supabase
+          .from("user_subscriptions")
+          .select("subscription_status, trial_ends_at")
+          .eq("user_id", user.id)
+          .maybeSingle();
+
+        if (userSub?.subscription_status === "active") {
+          console.log("[PaymentGate] User has active subscription in DB");
+          setHasAccess(true);
+          hasCheckedRef.current = true;
+          setChecking(false);
+          return;
+        }
+
+        // Check if trial is still valid
+        if (userSub?.subscription_status === "trial" && userSub.trial_ends_at) {
+          const trialEnd = new Date(userSub.trial_ends_at);
+          if (trialEnd > new Date()) {
+            console.log("[PaymentGate] User has valid trial");
+            setHasAccess(true);
+            hasCheckedRef.current = true;
+            setChecking(false);
+            return;
+          }
+        }
+
+        // No valid access found - redirect to pricing
+        console.log("[PaymentGate] No valid access found, redirecting to pricing");
+        hasCheckedRef.current = true;
+        setHasAccess(false);
+        setChecking(false);
+
+        // Only redirect if not already on auth-related pages
+        const excludedPaths = ["/pricing", "/auth", "/patreon-callback", "/stripe-success", "/stripe-cancel"];
+        if (!excludedPaths.some((path) => location.pathname.startsWith(path))) {
+          navigate("/pricing?trial=true", { replace: true });
+        }
+      } catch (error) {
+        console.error("[PaymentGate] Error checking access:", error);
+        setChecking(false);
+        // On error, default to requiring payment
+        setHasAccess(false);
+      }
+    };
+
+    checkAccess();
+  }, [user, navigate, location.pathname]);
+
+  // Reset check flag when user changes
+  useEffect(() => {
+    hasCheckedRef.current = false;
+  }, [user?.id]);
+
+  return { checking, hasAccess };
+}
