@@ -365,6 +365,7 @@ export default function MindMapPalace({
   if (hasContent) {
     return (
       <MindMapProvider
+        initialSeedText={sourceText}
         onMakeSeedExternal={handleMakeSeed}
         onNavigateBack={() => {
           if (mapHistory.length > 0) {
