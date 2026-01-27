@@ -105,9 +105,16 @@ export default function Pricing() {
     try {
       const { data: profile } = await supabase
         .from("profiles")
-        .select("subscription_status, is_student")
+        .select("subscription_status, is_student, has_lifetime_access, payment_source")
         .eq("id", user.id)
         .single();
+
+      // Check if user already has access
+      if (profile?.has_lifetime_access) {
+        toast.success("You have lifetime access!");
+        navigate("/palace");
+        return;
+      }
 
       if (profile?.is_student) {
         toast.success("You already have free student access!");
@@ -121,7 +128,52 @@ export default function Pricing() {
         return;
       }
 
-      // Call edge function to create Stripe checkout with trial
+      // Check for Patreon access
+      const { data: patreonConnection } = await supabase
+        .from("patreon_connections")
+        .select("is_active_patron, entitled_cents")
+        .eq("user_id", user.id)
+        .maybeSingle();
+
+      if (patreonConnection?.is_active_patron && patreonConnection.entitled_cents >= 1500) {
+        await supabase
+          .from("profiles")
+          .update({
+            subscription_status: "active",
+            subscription_tier: "premium",
+            payment_source: "patreon",
+            updated_at: new Date().toISOString(),
+          })
+          .eq("id", user.id);
+        toast.success("Your Patreon membership has been linked! Enjoy premium access.");
+        navigate("/palace");
+        return;
+      }
+
+      // Check for Pickaxe access
+      const { data: pickaxeConnection } = await supabase
+        .from("pickaxe_connections")
+        .select("is_paid_user")
+        .eq("pickaxe_email", user.email?.toLowerCase() || "")
+        .eq("is_paid_user", true)
+        .maybeSingle();
+
+      if (pickaxeConnection?.is_paid_user) {
+        await supabase
+          .from("profiles")
+          .update({
+            subscription_status: "active",
+            subscription_tier: "premium",
+            payment_source: "pickaxe" as any,
+            updated_at: new Date().toISOString(),
+          })
+          .eq("id", user.id);
+        toast.success("Your Pickaxe membership has been linked! Enjoy premium access.");
+        navigate("/palace");
+        return;
+      }
+
+      // No external membership - proceed with Stripe checkout for trial
       const { data, error } = await supabase.functions.invoke('create-trial-checkout', {
         body: { plan, billing: billingPeriod },
       });
