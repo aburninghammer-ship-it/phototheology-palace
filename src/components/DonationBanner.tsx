@@ -1,28 +1,12 @@
 import { useLayoutEffect, useRef, useState } from "react";
-import { Heart, X, ChevronDown } from "lucide-react";
+import { Heart, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Link } from "react-router-dom";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { supabase } from "@/integrations/supabase/client";
-import { useAuth } from "@/hooks/useAuth";
-import { toast } from "sonner";
-
-const PRESET_AMOUNTS = [5, 50, 500];
 
 export const DonationBanner = () => {
   const [isDismissed, setIsDismissed] = useState(() => {
     return sessionStorage.getItem("donation-banner-dismissed") === "true";
   });
-  const [isLoading, setIsLoading] = useState(false);
-  const [selectedAmount, setSelectedAmount] = useState<number | "custom">(5);
-  const [customAmount, setCustomAmount] = useState("");
-  const { user } = useAuth();
 
   const bannerRef = useRef<HTMLDivElement | null>(null);
 
@@ -62,33 +46,6 @@ export const DonationBanner = () => {
     };
   }, [isDismissed]);
 
-  const handleDonate = async () => {
-    const amount = selectedAmount === "custom" ? Number(customAmount) : selectedAmount;
-
-    if (!amount || amount < 1) {
-      toast.error("Please enter a valid amount");
-      return;
-    }
-
-    setIsLoading(true);
-    try {
-      const { data, error } = await supabase.functions.invoke("create-donation", {
-        body: { email: user?.email, amount },
-      });
-
-      if (error) throw error;
-
-      if (data?.url) {
-        window.open(data.url, "_blank");
-      }
-    } catch (error) {
-      console.error("Donation error:", error);
-      toast.error("Failed to start donation. Please try again.");
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
   const handleDismiss = () => {
     setIsDismissed(true);
     sessionStorage.setItem("donation-banner-dismissed", "true");
@@ -117,52 +74,13 @@ export const DonationBanner = () => {
           </p>
         </div>
         <div className="flex items-center gap-1.5 flex-shrink-0">
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="secondary" size="sm" className="whitespace-nowrap h-7 px-2 text-xs">
-                {selectedAmount === "custom"
-                  ? customAmount
-                    ? `$${customAmount}`
-                    : "Custom"
-                  : `$${selectedAmount}`}
-                <ChevronDown className="ml-1 h-3 w-3" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              {PRESET_AMOUNTS.map((amount) => (
-                <DropdownMenuItem
-                  key={amount}
-                  onClick={() => setSelectedAmount(amount)}
-                  className="cursor-pointer"
-                >
-                  ${amount}
-                </DropdownMenuItem>
-              ))}
-              <DropdownMenuItem onClick={() => setSelectedAmount("custom")} className="cursor-pointer">
-                Custom amount
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-
-          {selectedAmount === "custom" && (
-            <Input
-              type="number"
-              placeholder="Amount"
-              value={customAmount}
-              onChange={(e) => setCustomAmount(e.target.value)}
-              className="w-16 h-7 text-xs"
-              min="1"
-            />
-          )}
-
           <Button
-            onClick={handleDonate}
-            disabled={isLoading || (selectedAmount === "custom" && !customAmount)}
+            asChild
             size="sm"
             variant="secondary"
             className="whitespace-nowrap bg-primary-foreground text-primary hover:bg-primary-foreground/90 h-7 px-2 text-xs"
           >
-            {isLoading ? "..." : "Donate"}
+            <Link to="/donate">Donate</Link>
           </Button>
           <Button
             onClick={handleDismiss}
