@@ -14,6 +14,7 @@ export * from './nodes';
 export { useMindMapGeneration, generateMockAnalysis } from './hooks/useMindMapGeneration';
 export { useMindMapStorage } from './hooks/useMindMapStorage';
 export { useMindMapScaffold } from './hooks/useMindMapScaffold';
+export { useExpoundPrinciple } from './hooks/useExpoundPrinciple';
 export { useMindMapKeyboard } from './hooks/useMindMapKeyboard';
 
 // Utils
