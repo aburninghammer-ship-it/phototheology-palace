@@ -205,10 +205,15 @@ const RoomNode = memo(({ data, selected }: NodeProps<RoomNodeData>) => {
   // Get floor-specific colors
   const floorColors = FLOOR_ROOM_COLORS[data.floorNumber] || FLOOR_ROOM_COLORS[1];
 
+  // Check if parent floor is selected - if so, this room should glow
+  const parentFloorSelected = mindMapContext?.selectedFloorNumber === data.floorNumber && 
+    mindMapContext?.selectedNodeId?.startsWith('floor-');
+
   // Dynamic icon lookup - safely cast the icon component
   const IconComponent = data.icon && data.icon in Icons
     ? (Icons[data.icon as keyof typeof Icons] as unknown as IconType)
     : null;
+
 
   // COMPACT VIEW
   if (!isExpanded) {
@@ -220,6 +225,7 @@ const RoomNode = memo(({ data, selected }: NodeProps<RoomNodeData>) => {
           transition-all duration-300 hover:scale-105
           min-w-[180px] max-w-[200px]
           ${selected ? 'ring-2 ring-primary ring-offset-2 ring-offset-background' : ''}
+          ${parentFloorSelected ? 'animate-child-glow' : ''}
           hover:shadow-lg hover:shadow-primary/10
         `}
       >

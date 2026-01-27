@@ -18,7 +18,8 @@ import { ZoomIn, ZoomOut, Maximize2, Home, Keyboard, Pencil } from 'lucide-react
 
 import { nodeTypes } from './nodes';
 import MindMapNoteEditor from './MindMapNoteEditor';
-import type { AnyNodeData, MindMapEdgeData } from './types';
+import type { AnyNodeData, MindMapEdgeData, FloorNodeData, RoomNodeData } from './types';
+import { useMindMapContextSafe } from './MindMapContext';
 
 interface MindMapCanvasProps {
   initialNodes: Node<AnyNodeData>[];
@@ -54,6 +55,9 @@ function MindMapCanvasInner({
   const nodesRef = useRef(initialNodes);
   const containerRef = useRef<HTMLDivElement>(null);
   nodesRef.current = nodes;
+  
+  // Access context for parent-child glow tracking
+  const mindMapContext = useMindMapContextSafe();
 
   // Update nodes and edges when props change (after analysis populates them)
   useEffect(() => {
@@ -119,6 +123,30 @@ function MindMapCanvasInner({
       // Track selected node for keyboard navigation
       setSelectedNodeId(node.id);
 
+      // Update context with selection info for parent-child glow effects
+      let floorNumber: number | null = null;
+      let roomId: string | null = null;
+      
+      if (node.data.type === 'floor') {
+        floorNumber = (node.data as FloorNodeData).floorNumber;
+      } else if (node.data.type === 'room') {
+        floorNumber = (node.data as RoomNodeData).floorNumber;
+        roomId = (node.data as RoomNodeData).roomId;
+      } else if (node.data.type === 'principle') {
+        // Find parent room to get floor number
+        const parentRoomId = (node.data as any).parentId;
+        const parentRoom = nodesRef.current.find(n => n.id === parentRoomId);
+        if (parentRoom && parentRoom.data.type === 'room') {
+          floorNumber = (parentRoom.data as RoomNodeData).floorNumber;
+          roomId = (parentRoom.data as RoomNodeData).roomId;
+        }
+      } else if (node.data.type === 'sub-principle') {
+        floorNumber = (node.data as any).floorNumber;
+        roomId = (node.data as any).parentRoomId;
+      }
+      
+      mindMapContext?.setSelectedNodeInfo(node.id, floorNumber, roomId);
+
       // Determine zoom level based on node type
       // Lower zoom = see more area (floor needs to show its rooms)
       // Max zoom is 2, so keep clicked nodes readable (0.8-1.2 range for detail views)
@@ -147,7 +175,7 @@ function MindMapCanvasInner({
       // Also trigger the external click handler
       onNodeClick?.(node.id, node.data);
     },
-    [onNodeClick, zoomToNode]
+    [onNodeClick, zoomToNode, mindMapContext]
   );
 
   // Track zoom level changes

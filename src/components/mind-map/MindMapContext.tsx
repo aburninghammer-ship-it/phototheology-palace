@@ -29,6 +29,12 @@ interface MindMapContextValue {
   // State management
   pushToHistory: (entry: Omit<MapHistoryEntry, 'id' | 'timestamp'>) => void;
   clearHistory: () => void;
+
+  // Selection tracking for parent-child glow effects
+  selectedNodeId: string | null;
+  selectedFloorNumber: number | null;
+  selectedRoomId: string | null;
+  setSelectedNodeInfo: (nodeId: string | null, floorNumber?: number | null, roomId?: string | null) => void;
 }
 
 const MindMapContext = createContext<MindMapContextValue | null>(null);
@@ -47,6 +53,9 @@ export function MindMapProvider({
   onNavigateToHistory,
 }: MindMapProviderProps) {
   const [history, setHistory] = useState<MapHistoryEntry[]>([]);
+  const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null);
+  const [selectedFloorNumber, setSelectedFloorNumber] = useState<number | null>(null);
+  const [selectedRoomId, setSelectedRoomId] = useState<string | null>(null);
 
   const pushToHistory = useCallback((entry: Omit<MapHistoryEntry, 'id' | 'timestamp'>) => {
     const newEntry: MapHistoryEntry = {
@@ -85,6 +94,12 @@ export function MindMapProvider({
     }
   }, [onMakeSeedExternal]);
 
+  const setSelectedNodeInfo = useCallback((nodeId: string | null, floorNumber?: number | null, roomId?: string | null) => {
+    setSelectedNodeId(nodeId);
+    setSelectedFloorNumber(floorNumber ?? null);
+    setSelectedRoomId(roomId ?? null);
+  }, []);
+
   const value: MindMapContextValue = {
     onMakeSeed,
     history,
@@ -94,6 +109,10 @@ export function MindMapProvider({
     goToHistory,
     pushToHistory,
     clearHistory,
+    selectedNodeId,
+    selectedFloorNumber,
+    selectedRoomId,
+    setSelectedNodeInfo,
   };
 
   return (
