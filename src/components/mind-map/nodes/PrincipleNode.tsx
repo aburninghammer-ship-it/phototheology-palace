@@ -33,6 +33,12 @@ const PrincipleNode = memo(({ data, selected }: NodeProps<PrincipleNodeData>) =>
     low: 'from-orange-500/30 to-red-500/30 border-orange-400/50',
   };
 
+  // Check if parent room is selected - if so, this principle should glow
+  // parentId format is typically "room-{roomId}"
+  const parentRoomId = data.parentId?.replace('room-', '');
+  const parentRoomSelected = mindMapContext?.selectedRoomId === parentRoomId &&
+    mindMapContext?.selectedNodeId?.startsWith('room-');
+
   // COMPACT VIEW - Just title and confidence badge
   if (!isExpanded) {
     return (
@@ -42,6 +48,7 @@ const PrincipleNode = memo(({ data, selected }: NodeProps<PrincipleNodeData>) =>
           relative rounded-xl cursor-pointer overflow-hidden
           transition-all duration-300 hover:scale-105
           ${selected ? 'ring-2 ring-green-400 ring-offset-2 ring-offset-background' : ''}
+          ${parentRoomSelected ? 'animate-child-glow' : ''}
           w-[200px] hover:shadow-lg hover:shadow-green-500/20
         `}
       >

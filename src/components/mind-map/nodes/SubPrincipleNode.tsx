@@ -2,6 +2,7 @@ import { memo, FC } from 'react';
 import { Handle, Position, NodeProps } from 'reactflow';
 import * as Icons from 'lucide-react';
 import { Sparkles, Loader2 } from 'lucide-react';
+import { useMindMapContextSafe } from '../MindMapContext';
 
 type IconType = FC<{ className?: string }>;
 
@@ -36,11 +37,16 @@ const FLOOR_COLORS: Record<number, { bg: string; border: string; accent: string;
 
 const SubPrincipleNode = memo(({ data, selected }: NodeProps<SubPrincipleNodeData>) => {
   const colors = FLOOR_COLORS[data.floorNumber] || FLOOR_COLORS[4];
+  const mindMapContext = useMindMapContextSafe();
 
   // Dynamic icon lookup
   const IconComponent = data.icon && data.icon in Icons
     ? (Icons[data.icon as keyof typeof Icons] as unknown as IconType)
     : null;
+
+  // Check if parent room is selected - if so, this sub-principle should glow
+  const parentRoomSelected = mindMapContext?.selectedRoomId === data.parentRoomId &&
+    mindMapContext?.selectedNodeId?.startsWith('room-');
 
   return (
     <div
@@ -49,6 +55,7 @@ const SubPrincipleNode = memo(({ data, selected }: NodeProps<SubPrincipleNodeDat
         transition-all duration-300 hover:scale-105
         min-w-[140px] max-w-[160px]
         ${selected ? 'ring-2 ring-white ring-offset-2 ring-offset-background' : ''}
+        ${parentRoomSelected ? 'animate-child-glow' : ''}
         hover:shadow-lg hover:shadow-white/10
       `}
     >
