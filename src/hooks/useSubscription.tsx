@@ -10,7 +10,7 @@ interface ChurchAccess {
 }
 
 interface SubscriptionStatus {
-  status: 'none' | 'trial' | 'active' | 'cancelled' | 'expired';
+  status: 'none' | 'trial' | 'active' | 'cancelled' | 'expired' | 'pending';
   tier: 'free' | 'essential' | 'premium' | 'student' | 'patron' | null;
   isStudent: boolean;
   trialEndsAt: string | null;
