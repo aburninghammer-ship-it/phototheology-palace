@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar } from 'recharts';
 import { format } from "date-fns";
+import { DonationStats } from "@/components/admin/DonationStats";
 
 const AdminAnalytics = () => {
   const {
@@ -209,6 +210,9 @@ const AdminAnalytics = () => {
             </CardContent>
           </Card>
         </div>
+
+        {/* Donations */}
+        <DonationStats />
 
         {/* Recent Jeeves Queries */}
         <Card>
