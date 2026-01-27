@@ -21,6 +21,7 @@ import { SubscriptionAnalyticsChart } from "@/components/admin/SubscriptionAnaly
 import { AdminUserManagement } from "@/components/admin/AdminUserManagement";
 import { EmailCampaignHistory } from "@/components/admin/EmailCampaignHistory";
 import { RecentSubscribers } from "@/components/admin/RecentSubscribers";
+import { DonationStats } from "@/components/admin/DonationStats";
 import { Badge } from "@/components/ui/badge";
 
 interface StripeStats {
@@ -645,6 +646,9 @@ export default function AdminSubscriptions() {
               <div className="text-4xl font-bold text-primary">{stats.summary.monthly_recurring_revenue}</div>
             </CardContent>
           </Card>
+
+          {/* Donations Section */}
+          <DonationStats />
 
           {/* Recent Subscribers */}
           <RecentSubscribers />
