@@ -32,6 +32,7 @@ import {
   GraduationCap,
   Home
 } from "lucide-react";
+import { ShareSermonButton } from "./ShareSermonButton";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { toast } from "sonner";
@@ -628,22 +629,28 @@ export function SermonStudyUploader({ churchId, userRole }: SermonStudyUploaderP
                       </pre>
                     </div>
 
-                    {/* Save buttons for raw content too */}
+                    {/* Action buttons for raw content too */}
                     <div className="space-y-4 pt-4">
-                      {/* Personal Save - Available to all members */}
-                      <Button
-                        variant="outline"
-                        onClick={handleSaveToMyStudies}
-                        disabled={isSavingPersonal}
-                        className="w-full"
-                      >
-                        {isSavingPersonal ? (
-                          <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                        ) : (
-                          <BookmarkPlus className="h-4 w-4 mr-2" />
-                        )}
-                        Save to My Studies
-                      </Button>
+                      <div className="flex gap-3">
+                        <ShareSermonButton
+                          title={sermonTitle || "Sermon Study"}
+                          speaker={preacher}
+                          summary={generatedStudy.rawContent?.substring(0, 200)}
+                        />
+                        <Button
+                          variant="outline"
+                          onClick={handleSaveToMyStudies}
+                          disabled={isSavingPersonal}
+                          className="flex-1"
+                        >
+                          {isSavingPersonal ? (
+                            <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                          ) : (
+                            <BookmarkPlus className="h-4 w-4 mr-2" />
+                          )}
+                          Save to My Studies
+                        </Button>
+                      </div>
 
                       {/* Admin/Leader church publish options */}
                       {canManage ? (
@@ -908,22 +915,29 @@ export function SermonStudyUploader({ churchId, userRole }: SermonStudyUploaderP
                       </Card>
                     )}
 
-                    {/* Save Buttons */}
+                    {/* Action Buttons */}
                     <div className="space-y-4 pt-4">
-                      {/* Personal Save - Available to all members */}
-                      <Button
-                        variant="outline"
-                        onClick={handleSaveToMyStudies}
-                        disabled={isSavingPersonal}
-                        className="w-full"
-                      >
-                        {isSavingPersonal ? (
-                          <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                        ) : (
-                          <BookmarkPlus className="h-4 w-4 mr-2" />
-                        )}
-                        Save to My Studies
-                      </Button>
+                      {/* Share & Save Row */}
+                      <div className="flex gap-3">
+                        <ShareSermonButton
+                          title={generatedStudy.studyTitle || sermonTitle}
+                          speaker={preacher}
+                          summary={generatedStudy.overview}
+                        />
+                        <Button
+                          variant="outline"
+                          onClick={handleSaveToMyStudies}
+                          disabled={isSavingPersonal}
+                          className="flex-1"
+                        >
+                          {isSavingPersonal ? (
+                            <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                          ) : (
+                            <BookmarkPlus className="h-4 w-4 mr-2" />
+                          )}
+                          Save to My Studies
+                        </Button>
+                      </div>
 
                       {/* Admin/Leader church publish options */}
                       {canManage ? (
