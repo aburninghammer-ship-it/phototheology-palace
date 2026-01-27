@@ -706,11 +706,11 @@ export function SermonStudyUploader({ churchId, userRole }: SermonStudyUploaderP
                     </div>
 
                     {/* Overview Card */}
-                    <Card className="overflow-hidden border-0 shadow-lg bg-gradient-to-br from-card to-card/80">
-                      <CardHeader className="bg-gradient-to-r from-primary/5 to-transparent border-b border-border/30">
+                    <Card className="overflow-hidden border-0 shadow-xl bg-gradient-to-br from-slate-500/10 via-card to-zinc-500/10 border-l-4 border-l-slate-500">
+                      <CardHeader className="bg-gradient-to-r from-slate-500/10 to-transparent border-b border-slate-500/20">
                         <CardTitle className="text-lg flex items-center gap-2">
-                          <BookOpen className="h-5 w-5 text-primary" />
-                          Overview
+                          <BookOpen className="h-5 w-5 text-slate-500" />
+                          <span className="bg-gradient-to-r from-slate-600 to-zinc-600 dark:from-slate-300 dark:to-zinc-300 bg-clip-text text-transparent">Overview</span>
                         </CardTitle>
                       </CardHeader>
                       <CardContent className="pt-4">
@@ -720,18 +720,18 @@ export function SermonStudyUploader({ churchId, userRole }: SermonStudyUploaderP
 
                     {/* Ice Breakers */}
                     {generatedStudy.iceBreakers && generatedStudy.iceBreakers.length > 0 && (
-                      <Card className="overflow-hidden border-0 shadow-lg">
-                        <CardHeader className="bg-gradient-to-r from-amber-500/10 to-transparent border-b border-border/30">
+                      <Card className="overflow-hidden border-0 shadow-xl bg-gradient-to-br from-amber-500/10 via-card to-orange-500/10 border-l-4 border-l-amber-500">
+                        <CardHeader className="bg-gradient-to-r from-amber-500/15 to-orange-500/5 border-b border-amber-500/20">
                           <CardTitle className="text-lg flex items-center gap-2">
                             <MessageSquare className="h-5 w-5 text-amber-500" />
-                            Ice Breakers
+                            <span className="bg-gradient-to-r from-amber-500 to-orange-500 bg-clip-text text-transparent">Ice Breakers</span>
                           </CardTitle>
                         </CardHeader>
                         <CardContent className="pt-4">
                           <ul className="space-y-3">
                             {generatedStudy.iceBreakers.map((q, i) => (
                               <li key={i} className="flex items-start gap-3 text-muted-foreground">
-                                <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-amber-500/10 text-amber-500 text-xs font-semibold shrink-0 mt-0.5">
+                                <span className="inline-flex items-center justify-center w-7 h-7 rounded-full bg-gradient-to-br from-amber-500 to-orange-500 text-white text-xs font-bold shrink-0 mt-0.5 shadow-md">
                                   {i + 1}
                                 </span>
                                 <span className="leading-relaxed">{q}</span>
@@ -744,117 +744,148 @@ export function SermonStudyUploader({ churchId, userRole }: SermonStudyUploaderP
 
                     {/* Sections */}
                     <div className="space-y-6">
-                      <h3 className="text-lg font-semibold flex items-center gap-2 text-foreground/80">
-                        <Layers className="h-5 w-5 text-primary" />
-                        Sermon Analysis
+                      <h3 className="text-xl font-bold flex items-center gap-2">
+                        <div className="p-2 rounded-lg bg-gradient-to-br from-primary to-purple-600 shadow-lg">
+                          <Layers className="h-5 w-5 text-white" />
+                        </div>
+                        <span className="bg-gradient-to-r from-primary to-purple-600 bg-clip-text text-transparent">Sermon Analysis</span>
                       </h3>
-                      {generatedStudy.sections?.map((section, idx) => (
-                        <Card key={idx} className="overflow-hidden border-0 shadow-lg border-l-4 border-l-primary">
-                          <CardHeader className="bg-gradient-to-r from-primary/5 to-transparent">
-                            <div className="flex items-start justify-between gap-4">
-                              <div className="flex items-start gap-3">
-                                <span className="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-primary/10 text-primary font-bold text-sm shrink-0">
-                                  {section.sectionNumber}
-                                </span>
-                                <div>
-                                  <CardTitle className="text-lg leading-tight">{section.title}</CardTitle>
-                                  <CardDescription className="mt-1">{section.originalPoint}</CardDescription>
+                      {generatedStudy.sections?.map((section, idx) => {
+                        const sectionColors = [
+                          { from: 'from-blue-500/10', to: 'to-cyan-500/10', border: 'border-l-blue-500', header: 'from-blue-500/15 to-cyan-500/5', accent: 'from-blue-500 to-cyan-500', badge: 'bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/30' },
+                          { from: 'from-violet-500/10', to: 'to-purple-500/10', border: 'border-l-violet-500', header: 'from-violet-500/15 to-purple-500/5', accent: 'from-violet-500 to-purple-500', badge: 'bg-violet-500/10 text-violet-600 dark:text-violet-400 border-violet-500/30' },
+                          { from: 'from-emerald-500/10', to: 'to-teal-500/10', border: 'border-l-emerald-500', header: 'from-emerald-500/15 to-teal-500/5', accent: 'from-emerald-500 to-teal-500', badge: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/30' },
+                          { from: 'from-rose-500/10', to: 'to-pink-500/10', border: 'border-l-rose-500', header: 'from-rose-500/15 to-pink-500/5', accent: 'from-rose-500 to-pink-500', badge: 'bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-500/30' },
+                          { from: 'from-orange-500/10', to: 'to-amber-500/10', border: 'border-l-orange-500', header: 'from-orange-500/15 to-amber-500/5', accent: 'from-orange-500 to-amber-500', badge: 'bg-orange-500/10 text-orange-600 dark:text-orange-400 border-orange-500/30' },
+                          { from: 'from-indigo-500/10', to: 'to-blue-500/10', border: 'border-l-indigo-500', header: 'from-indigo-500/15 to-blue-500/5', accent: 'from-indigo-500 to-blue-500', badge: 'bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border-indigo-500/30' },
+                        ];
+                        const colors = sectionColors[idx % sectionColors.length];
+                        
+                        return (
+                          <Card key={idx} className={`overflow-hidden border-0 shadow-xl bg-gradient-to-br ${colors.from} via-card ${colors.to} border-l-4 ${colors.border}`}>
+                            <CardHeader className={`bg-gradient-to-r ${colors.header} border-b border-border/30`}>
+                              <div className="flex items-start justify-between gap-4">
+                                <div className="flex items-start gap-3">
+                                  <span className={`inline-flex items-center justify-center w-10 h-10 rounded-xl bg-gradient-to-br ${colors.accent} text-white font-bold text-lg shrink-0 shadow-lg`}>
+                                    {section.sectionNumber}
+                                  </span>
+                                  <div>
+                                    <CardTitle className={`text-lg leading-tight bg-gradient-to-r ${colors.accent} bg-clip-text text-transparent`}>{section.title}</CardTitle>
+                                    <CardDescription className="mt-1">{section.originalPoint}</CardDescription>
+                                  </div>
+                                </div>
+                                <div className="flex items-center gap-2 shrink-0">
+                                  {getAssessmentIcon(section.assessment?.rating)}
+                                  <Badge variant="outline" className={`capitalize text-xs ${colors.badge}`}>
+                                    {section.assessment?.rating?.replace("-", " ")}
+                                  </Badge>
                                 </div>
                               </div>
-                              <div className="flex items-center gap-2 shrink-0">
-                                {getAssessmentIcon(section.assessment?.rating)}
-                                <Badge variant="secondary" className="capitalize text-xs">
-                                  {section.assessment?.rating?.replace("-", " ")}
-                                </Badge>
-                              </div>
-                            </div>
-                          </CardHeader>
-                          <CardContent className="space-y-5 pt-4">
-                            {/* Biblical Basis */}
-                            <div className="p-4 rounded-lg bg-muted/30 border border-border/50">
-                              <h4 className="font-semibold mb-3 flex items-center gap-2 text-sm">
-                                <BookOpen className="h-4 w-4 text-primary" />
-                                Biblical Basis (KJV)
-                              </h4>
-                              <div className="space-y-2">
-                                {section.biblicalBasis?.primaryTexts?.map((text, i) => (
-                                  <p key={i} className="text-sm italic text-muted-foreground pl-4 border-l-2 border-primary/30">{text}</p>
-                                ))}
-                              </div>
-                            </div>
-
-                            {/* Analysis */}
-                            <div>
-                              <h4 className="font-semibold mb-2 text-sm">Analysis</h4>
-                              <p className="text-sm text-muted-foreground leading-relaxed">{section.analysis}</p>
-                            </div>
-
-                            {/* Scholarly Support */}
-                            {section.scholarlySupport && (
-                              <div>
-                                <h4 className="font-semibold mb-2 text-sm flex items-center gap-2">
-                                  <GraduationCap className="h-4 w-4 text-muted-foreground" />
-                                  Scholarly Support
-                                </h4>
-                                <p className="text-sm text-muted-foreground leading-relaxed">{section.scholarlySupport}</p>
-                              </div>
-                            )}
-
-                            {/* Assessment Reasoning */}
-                            <div className="p-4 rounded-lg bg-gradient-to-br from-muted/50 to-muted/20 border border-border/30">
-                              <h4 className="font-semibold mb-2 text-sm flex items-center gap-2">
-                                <CheckCircle2 className="h-4 w-4 text-green-500" />
-                                Theological Assessment
-                              </h4>
-                              <p className="text-sm text-muted-foreground leading-relaxed">{section.assessment?.reasoning}</p>
-                            </div>
-
-                            {/* PT Connections */}
-                            {section.ptConnections && (
-                              <div className="p-4 rounded-lg bg-gradient-to-br from-purple-500/5 to-transparent border border-purple-500/20">
+                            </CardHeader>
+                            <CardContent className="space-y-5 pt-4">
+                              {/* Biblical Basis */}
+                              <div className="p-4 rounded-xl bg-gradient-to-br from-sky-500/10 to-blue-500/5 border border-sky-500/20">
                                 <h4 className="font-semibold mb-3 flex items-center gap-2 text-sm">
-                                  <Lightbulb className="h-4 w-4 text-purple-500" />
-                                  Phototheology Connections
+                                  <div className="p-1.5 rounded-lg bg-gradient-to-br from-sky-500 to-blue-500 shadow">
+                                    <BookOpen className="h-3.5 w-3.5 text-white" />
+                                  </div>
+                                  <span className="bg-gradient-to-r from-sky-600 to-blue-600 dark:from-sky-400 dark:to-blue-400 bg-clip-text text-transparent font-bold">Biblical Basis (KJV)</span>
                                 </h4>
-                                <div className="flex flex-wrap gap-2 mb-3">
-                                  {section.ptConnections.rooms?.map((room, i) => (
-                                    <Badge key={i} variant="outline" className="bg-purple-500/10 border-purple-500/30 text-purple-700 dark:text-purple-300">{room}</Badge>
+                                <div className="space-y-2">
+                                  {section.biblicalBasis?.primaryTexts?.map((text, i) => (
+                                    <p key={i} className="text-sm italic text-muted-foreground pl-4 border-l-3 border-sky-500/50">{text}</p>
                                   ))}
                                 </div>
-                                <p className="text-sm text-muted-foreground leading-relaxed">{section.ptConnections.insights}</p>
                               </div>
-                            )}
 
-                            {/* Section Discussion Questions */}
-                            {section.discussionQuestions && section.discussionQuestions.length > 0 && (
-                              <div>
-                                <h4 className="font-semibold mb-3 text-sm flex items-center gap-2">
-                                  <MessageSquare className="h-4 w-4 text-primary" />
-                                  Discussion Questions
+                              {/* Analysis */}
+                              <div className="p-4 rounded-xl bg-gradient-to-br from-slate-500/10 to-zinc-500/5 border border-slate-500/20">
+                                <h4 className="font-semibold mb-2 text-sm flex items-center gap-2">
+                                  <div className="p-1.5 rounded-lg bg-gradient-to-br from-slate-500 to-zinc-500 shadow">
+                                    <Layers className="h-3.5 w-3.5 text-white" />
+                                  </div>
+                                  <span className="bg-gradient-to-r from-slate-600 to-zinc-600 dark:from-slate-300 dark:to-zinc-300 bg-clip-text text-transparent font-bold">Analysis</span>
                                 </h4>
-                                <ul className="space-y-2">
-                                  {section.discussionQuestions.map((q, i) => (
-                                    <li key={i} className="text-sm flex items-start gap-3 p-2 rounded-lg hover:bg-muted/30 transition-colors">
-                                      <Badge variant="outline" className="text-xs capitalize shrink-0 mt-0.5">
-                                        {q.type}
-                                      </Badge>
-                                      <span className="text-muted-foreground leading-relaxed">{q.question}</span>
-                                    </li>
-                                  ))}
-                                </ul>
+                                <p className="text-sm text-muted-foreground leading-relaxed">{section.analysis}</p>
                               </div>
-                            )}
-                          </CardContent>
-                        </Card>
-                      ))}
+
+                              {/* Scholarly Support */}
+                              {section.scholarlySupport && (
+                                <div className="p-4 rounded-xl bg-gradient-to-br from-indigo-500/10 to-violet-500/5 border border-indigo-500/20">
+                                  <h4 className="font-semibold mb-2 text-sm flex items-center gap-2">
+                                    <div className="p-1.5 rounded-lg bg-gradient-to-br from-indigo-500 to-violet-500 shadow">
+                                      <GraduationCap className="h-3.5 w-3.5 text-white" />
+                                    </div>
+                                    <span className="bg-gradient-to-r from-indigo-600 to-violet-600 dark:from-indigo-400 dark:to-violet-400 bg-clip-text text-transparent font-bold">Scholarly Support</span>
+                                  </h4>
+                                  <p className="text-sm text-muted-foreground leading-relaxed">{section.scholarlySupport}</p>
+                                </div>
+                              )}
+
+                              {/* Assessment Reasoning */}
+                              <div className="p-4 rounded-xl bg-gradient-to-br from-emerald-500/10 to-green-500/5 border border-emerald-500/20">
+                                <h4 className="font-semibold mb-2 text-sm flex items-center gap-2">
+                                  <div className="p-1.5 rounded-lg bg-gradient-to-br from-emerald-500 to-green-500 shadow">
+                                    <CheckCircle2 className="h-3.5 w-3.5 text-white" />
+                                  </div>
+                                  <span className="bg-gradient-to-r from-emerald-600 to-green-600 dark:from-emerald-400 dark:to-green-400 bg-clip-text text-transparent font-bold">Theological Assessment</span>
+                                </h4>
+                                <p className="text-sm text-muted-foreground leading-relaxed">{section.assessment?.reasoning}</p>
+                              </div>
+
+                              {/* PT Connections */}
+                              {section.ptConnections && (
+                                <div className="p-4 rounded-xl bg-gradient-to-br from-purple-500/10 to-fuchsia-500/5 border border-purple-500/20">
+                                  <h4 className="font-semibold mb-3 flex items-center gap-2 text-sm">
+                                    <div className="p-1.5 rounded-lg bg-gradient-to-br from-purple-500 to-fuchsia-500 shadow">
+                                      <Lightbulb className="h-3.5 w-3.5 text-white" />
+                                    </div>
+                                    <span className="bg-gradient-to-r from-purple-600 to-fuchsia-600 dark:from-purple-400 dark:to-fuchsia-400 bg-clip-text text-transparent font-bold">Phototheology Connections</span>
+                                  </h4>
+                                  <div className="flex flex-wrap gap-2 mb-3">
+                                    {section.ptConnections.rooms?.map((room, i) => (
+                                      <Badge key={i} className="bg-gradient-to-r from-purple-500 to-fuchsia-500 text-white border-0 shadow-md font-semibold">{room}</Badge>
+                                    ))}
+                                  </div>
+                                  <p className="text-sm text-muted-foreground leading-relaxed">{section.ptConnections.insights}</p>
+                                </div>
+                              )}
+
+                              {/* Section Discussion Questions */}
+                              {section.discussionQuestions && section.discussionQuestions.length > 0 && (
+                                <div className="p-4 rounded-xl bg-gradient-to-br from-cyan-500/10 to-teal-500/5 border border-cyan-500/20">
+                                  <h4 className="font-semibold mb-3 text-sm flex items-center gap-2">
+                                    <div className="p-1.5 rounded-lg bg-gradient-to-br from-cyan-500 to-teal-500 shadow">
+                                      <MessageSquare className="h-3.5 w-3.5 text-white" />
+                                    </div>
+                                    <span className="bg-gradient-to-r from-cyan-600 to-teal-600 dark:from-cyan-400 dark:to-teal-400 bg-clip-text text-transparent font-bold">Discussion Questions</span>
+                                  </h4>
+                                  <ul className="space-y-2">
+                                    {section.discussionQuestions.map((q, i) => (
+                                      <li key={i} className="text-sm flex items-start gap-3 p-2 rounded-lg bg-cyan-500/5 hover:bg-cyan-500/10 transition-colors">
+                                        <Badge className="text-xs capitalize shrink-0 mt-0.5 bg-gradient-to-r from-cyan-500 to-teal-500 text-white border-0 shadow">
+                                          {q.type}
+                                        </Badge>
+                                        <span className="text-muted-foreground leading-relaxed">{q.question}</span>
+                                      </li>
+                                    ))}
+                                  </ul>
+                                </div>
+                              )}
+                            </CardContent>
+                          </Card>
+                        );
+                      })}
                     </div>
 
                     {/* Christ Synthesis */}
-                    <Card className="overflow-hidden border-0 shadow-lg bg-gradient-to-br from-amber-500/5 via-card to-orange-500/5 border-t-4 border-t-amber-500">
-                      <CardHeader>
+                    <Card className="overflow-hidden border-0 shadow-xl bg-gradient-to-br from-amber-500/15 via-card to-yellow-500/10 border-t-4 border-t-amber-500">
+                      <CardHeader className="bg-gradient-to-r from-amber-500/15 to-yellow-500/5">
                         <CardTitle className="text-lg flex items-center gap-2">
-                          <Target className="h-5 w-5 text-amber-500" />
-                          Christ-Centered Synthesis
+                          <div className="p-2 rounded-lg bg-gradient-to-br from-amber-500 to-yellow-500 shadow-lg">
+                            <Target className="h-5 w-5 text-white" />
+                          </div>
+                          <span className="bg-gradient-to-r from-amber-500 to-yellow-600 bg-clip-text text-transparent">Christ-Centered Synthesis</span>
                         </CardTitle>
                       </CardHeader>
                       <CardContent>
@@ -864,11 +895,13 @@ export function SermonStudyUploader({ churchId, userRole }: SermonStudyUploaderP
 
                     {/* Sanctuary Connection */}
                     {generatedStudy.sanctuaryConnection && (
-                      <Card className="overflow-hidden border-0 shadow-lg bg-gradient-to-br from-blue-500/5 via-card to-indigo-500/5 border-t-4 border-t-blue-500">
-                        <CardHeader>
+                      <Card className="overflow-hidden border-0 shadow-xl bg-gradient-to-br from-blue-500/15 via-card to-indigo-500/10 border-t-4 border-t-blue-500">
+                        <CardHeader className="bg-gradient-to-r from-blue-500/15 to-indigo-500/5">
                           <CardTitle className="text-lg flex items-center gap-2">
-                            <Home className="h-5 w-5 text-blue-500" />
-                            Blue Room (Sanctuary) Connection
+                            <div className="p-2 rounded-lg bg-gradient-to-br from-blue-500 to-indigo-500 shadow-lg">
+                              <Home className="h-5 w-5 text-white" />
+                            </div>
+                            <span className="bg-gradient-to-r from-blue-500 to-indigo-600 bg-clip-text text-transparent">Blue Room (Sanctuary) Connection</span>
                           </CardTitle>
                         </CardHeader>
                         <CardContent>
@@ -878,39 +911,48 @@ export function SermonStudyUploader({ churchId, userRole }: SermonStudyUploaderP
                     )}
 
                     {/* Action Challenge */}
-                    <Card>
-                      <CardHeader>
+                    <Card className="overflow-hidden border-0 shadow-xl bg-gradient-to-br from-rose-500/15 via-card to-pink-500/10 border-t-4 border-t-rose-500">
+                      <CardHeader className="bg-gradient-to-r from-rose-500/15 to-pink-500/5">
                         <CardTitle className="text-lg flex items-center gap-2">
-                          <Target className="h-5 w-5" />
-                          Action Challenge
+                          <div className="p-2 rounded-lg bg-gradient-to-br from-rose-500 to-pink-500 shadow-lg">
+                            <Target className="h-5 w-5 text-white" />
+                          </div>
+                          <span className="bg-gradient-to-r from-rose-500 to-pink-600 bg-clip-text text-transparent">Action Challenge</span>
                         </CardTitle>
                       </CardHeader>
                       <CardContent>
-                        <p className="text-muted-foreground">{generatedStudy.actionChallenge}</p>
+                        <p className="text-muted-foreground leading-relaxed">{generatedStudy.actionChallenge}</p>
                       </CardContent>
                     </Card>
 
                     {/* Prayer Focus */}
-                    <Card>
-                      <CardHeader>
+                    <Card className="overflow-hidden border-0 shadow-xl bg-gradient-to-br from-violet-500/15 via-card to-purple-500/10 border-t-4 border-t-violet-500">
+                      <CardHeader className="bg-gradient-to-r from-violet-500/15 to-purple-500/5">
                         <CardTitle className="text-lg flex items-center gap-2">
-                          <Heart className="h-5 w-5" />
-                          Prayer Focus
+                          <div className="p-2 rounded-lg bg-gradient-to-br from-violet-500 to-purple-500 shadow-lg">
+                            <Heart className="h-5 w-5 text-white" />
+                          </div>
+                          <span className="bg-gradient-to-r from-violet-500 to-purple-600 bg-clip-text text-transparent">Prayer Focus</span>
                         </CardTitle>
                       </CardHeader>
                       <CardContent>
-                        <p className="text-muted-foreground">{generatedStudy.prayerFocus}</p>
+                        <p className="text-muted-foreground leading-relaxed">{generatedStudy.prayerFocus}</p>
                       </CardContent>
                     </Card>
 
                     {/* Facilitator Notes */}
                     {generatedStudy.facilitatorNotes && (
-                      <Card className="bg-muted/50">
-                        <CardHeader>
-                          <CardTitle className="text-lg">Facilitator Notes</CardTitle>
+                      <Card className="overflow-hidden border-0 shadow-xl bg-gradient-to-br from-teal-500/15 via-card to-cyan-500/10 border-t-4 border-t-teal-500">
+                        <CardHeader className="bg-gradient-to-r from-teal-500/15 to-cyan-500/5">
+                          <CardTitle className="text-lg flex items-center gap-2">
+                            <div className="p-2 rounded-lg bg-gradient-to-br from-teal-500 to-cyan-500 shadow-lg">
+                              <BookOpen className="h-5 w-5 text-white" />
+                            </div>
+                            <span className="bg-gradient-to-r from-teal-500 to-cyan-600 bg-clip-text text-transparent">Facilitator Notes</span>
+                          </CardTitle>
                         </CardHeader>
                         <CardContent>
-                          <p className="text-sm text-muted-foreground">{generatedStudy.facilitatorNotes}</p>
+                          <p className="text-sm text-muted-foreground leading-relaxed">{generatedStudy.facilitatorNotes}</p>
                         </CardContent>
                       </Card>
                     )}
