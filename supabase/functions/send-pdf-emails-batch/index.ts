@@ -123,6 +123,15 @@ serve(async (req) => {
 
     logStep("Got checkout sessions", { count: sessions.data.length });
 
+    // Get existing email logs to skip already-sent emails
+    const { data: existingLogs } = await supabase
+      .from("pdf_email_logs")
+      .select("checkout_session_id, success")
+      .eq("success", true);
+    
+    const sentSessionIds = new Set(existingLogs?.map(log => log.checkout_session_id) || []);
+    logStep("Already sent sessions", { count: sentSessionIds.size });
+
     // Find PDF purchases grouped by product
     const pdfPurchases: Array<{
       email: string;
@@ -137,6 +146,9 @@ serve(async (req) => {
       if (session.mode !== 'payment') continue;
       if (session.payment_status !== 'paid') continue;
       if (!session.customer_details?.email) continue;
+      
+      // Skip if already sent
+      if (sentSessionIds.has(session.id)) continue;
 
       // Check against each product
       for (const [productKey, config] of Object.entries(PRODUCT_CONFIG)) {
@@ -175,7 +187,7 @@ serve(async (req) => {
       }
     }
 
-    logStep("Found PDF purchases with emails", { count: pdfPurchases.length });
+    logStep("Found PDF purchases needing emails", { count: pdfPurchases.length });
 
     if (dryRun) {
       // Group by product for summary
@@ -191,6 +203,7 @@ serve(async (req) => {
           purchases: pdfPurchases,
           byProduct,
           totalCount: pdfPurchases.length,
+          alreadySentCount: sentSessionIds.size,
         }),
         {
           headers: { ...corsHeaders, "Content-Type": "application/json" },
