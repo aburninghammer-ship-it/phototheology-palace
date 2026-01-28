@@ -104,7 +104,7 @@ serve(async (req) => {
 
     // Check if we already have a snapshot for today
     const { data: existingSnapshot } = await supabase
-      .from("subscription_analytics_snapshots")
+      .from("analytics_snapshots")
       .select("id")
       .eq("snapshot_date", today)
       .single();
@@ -132,20 +132,36 @@ serve(async (req) => {
       .select("id", { count: 'exact', head: true })
       .eq("is_paid_user", true);
 
-    let snapshotData = {
+    // Get active churches count
+    const { count: activeChurches } = await supabase
+      .from("churches")
+      .select("id", { count: 'exact', head: true })
+      .eq("subscription_status", "active");
+
+    // Get new signups today
+    const todayStart = new Date();
+    todayStart.setHours(0, 0, 0, 0);
+    const { count: newSignups } = await supabase
+      .from("profiles")
+      .select("id", { count: 'exact', head: true })
+      .gte("created_at", todayStart.toISOString());
+
+    let snapshotData: Record<string, any> = {
       snapshot_date: today,
       total_users: totalUsers || 0,
       lifetime_access: lifetimeAccess || 0,
-      active_patrons: activePatrons || 0,
-      pickaxe_paid: pickaxePaid || 0,
-      active_subscriptions: 0,
-      trialing_subscriptions: 0,
-      canceled_subscriptions: 0,
+      patreon_active: activePatrons || 0,
+      pickaxe_count: pickaxePaid || 0,
+      stripe_active: 0,
+      stripe_trialing: 0,
+      stripe_cancelled: 0,
       mrr_cents: 0,
-      essential_count: 0,
-      premium_count: 0,
-      student_count: 0,
-      church_count: 0,
+      tier_essential: 0,
+      tier_premium: 0,
+      tier_student: 0,
+      tier_church: 0,
+      new_signups_today: newSignups || 0,
+      active_churches: activeChurches || 0,
     };
 
     // Get Stripe data if available
@@ -158,9 +174,9 @@ serve(async (req) => {
         const trialingSubscriptions = await fetchAllStripeSubscriptions(stripe, 'trialing');
         const canceledSubscriptions = await fetchAllStripeSubscriptions(stripe, 'canceled');
 
-        snapshotData.active_subscriptions = activeSubscriptions.length;
-        snapshotData.trialing_subscriptions = trialingSubscriptions.length;
-        snapshotData.canceled_subscriptions = canceledSubscriptions.length;
+        snapshotData.stripe_active = activeSubscriptions.length;
+        snapshotData.stripe_trialing = trialingSubscriptions.length;
+        snapshotData.stripe_cancelled = canceledSubscriptions.length;
 
         // Count by tier and calculate MRR
         activeSubscriptions.forEach((sub: any) => {
@@ -170,10 +186,10 @@ serve(async (req) => {
           const amount = sub.items.data[0]?.price?.unit_amount || 0;
 
           switch (tier) {
-            case 'essential': snapshotData.essential_count++; break;
-            case 'premium': snapshotData.premium_count++; break;
-            case 'student': snapshotData.student_count++; break;
-            case 'church': snapshotData.church_count++; break;
+            case 'essential': snapshotData.tier_essential++; break;
+            case 'premium': snapshotData.tier_premium++; break;
+            case 'student': snapshotData.tier_student++; break;
+            case 'church': snapshotData.tier_church++; break;
           }
 
           // Calculate MRR
@@ -185,8 +201,8 @@ serve(async (req) => {
         });
 
         logStep("Stripe data collected", {
-          active: snapshotData.active_subscriptions,
-          trialing: snapshotData.trialing_subscriptions,
+          active: snapshotData.stripe_active,
+          trialing: snapshotData.stripe_trialing,
           mrr: snapshotData.mrr_cents
         });
 
@@ -197,7 +213,7 @@ serve(async (req) => {
 
     // Upsert the snapshot (update if exists, insert if not)
     const { error: upsertError } = await supabase
-      .from("subscription_analytics_snapshots")
+      .from("analytics_snapshots")
       .upsert(snapshotData, { onConflict: 'snapshot_date' });
 
     if (upsertError) {
