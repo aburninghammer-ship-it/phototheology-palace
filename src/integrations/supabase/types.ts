@@ -71,6 +71,66 @@ export type Database = {
         }
         Relationships: []
       }
+      analytics_snapshots: {
+        Row: {
+          active_churches: number
+          created_at: string
+          id: string
+          lifetime_access: number
+          mrr_cents: number
+          new_signups_today: number
+          patreon_active: number
+          pickaxe_count: number
+          snapshot_date: string
+          stripe_active: number
+          stripe_cancelled: number
+          stripe_trialing: number
+          tier_church: number
+          tier_essential: number
+          tier_premium: number
+          tier_student: number
+          total_users: number
+        }
+        Insert: {
+          active_churches?: number
+          created_at?: string
+          id?: string
+          lifetime_access?: number
+          mrr_cents?: number
+          new_signups_today?: number
+          patreon_active?: number
+          pickaxe_count?: number
+          snapshot_date: string
+          stripe_active?: number
+          stripe_cancelled?: number
+          stripe_trialing?: number
+          tier_church?: number
+          tier_essential?: number
+          tier_premium?: number
+          tier_student?: number
+          total_users?: number
+        }
+        Update: {
+          active_churches?: number
+          created_at?: string
+          id?: string
+          lifetime_access?: number
+          mrr_cents?: number
+          new_signups_today?: number
+          patreon_active?: number
+          pickaxe_count?: number
+          snapshot_date?: string
+          stripe_active?: number
+          stripe_cancelled?: number
+          stripe_trialing?: number
+          tier_church?: number
+          tier_essential?: number
+          tier_premium?: number
+          tier_student?: number
+          total_users?: number
+        }
+        Relationships: []
+      }
       announcement_dismissals: {
         Row: {
           announcement_id: string
