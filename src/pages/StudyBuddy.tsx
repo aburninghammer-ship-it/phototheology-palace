@@ -417,11 +417,12 @@ export default function StudyBuddy() {
         if (data) {
           setSessionTitle(data.title || "");
           // Load context from jeeves_context if available
-          const ctx = data.jeeves_context as { book?: string; chapter?: number; notes?: string } | null;
+          const ctx = data.jeeves_context as { book?: string; chapter?: number; notes?: string; analysis?: JeevesAnalysis } | null;
           if (ctx) {
             if (ctx.book) setSelectedBook(ctx.book);
             if (ctx.chapter) setSelectedChapter(ctx.chapter);
             if (ctx.notes) setNotes(ctx.notes);
+            if (ctx.analysis) setAnalysis(ctx.analysis);
           }
         }
       } catch (err) {
@@ -480,16 +481,36 @@ export default function StudyBuddy() {
   };
 
   const handleResumeSession = (session: SavedSession) => {
+    console.log("[StudyBuddy] Resuming session:", session.id, session.title);
+    
     // Load the session data
     setCurrentSessionId(session.id);
     setSessionTitle(session.title || "");
 
     const ctx = session.jeeves_context as { book?: string; chapter?: number; notes?: string; analysis?: JeevesAnalysis } | null;
+    console.log("[StudyBuddy] Session context:", ctx);
+    
     if (ctx) {
-      if (ctx.book) setSelectedBook(ctx.book);
-      if (ctx.chapter) setSelectedChapter(ctx.chapter);
-      if (ctx.notes) setNotes(ctx.notes);
-      if (ctx.analysis) setAnalysis(ctx.analysis);
+      // Set book and chapter first - this triggers verse loading via useEffect
+      if (ctx.book) {
+        console.log("[StudyBuddy] Setting book:", ctx.book);
+        setSelectedBook(ctx.book);
+      }
+      if (ctx.chapter) {
+        console.log("[StudyBuddy] Setting chapter:", ctx.chapter);
+        setSelectedChapter(ctx.chapter);
+      }
+      // Then set notes and analysis
+      if (ctx.notes) {
+        console.log("[StudyBuddy] Setting notes:", ctx.notes.length, "chars");
+        setNotes(ctx.notes);
+      }
+      if (ctx.analysis) {
+        console.log("[StudyBuddy] Setting analysis");
+        setAnalysis(ctx.analysis);
+      }
+    } else {
+      console.warn("[StudyBuddy] No jeeves_context found in session");
     }
 
     // Switch to study tab
