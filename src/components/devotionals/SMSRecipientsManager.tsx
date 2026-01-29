@@ -75,7 +75,7 @@ export function SMSRecipientsManager({ planId }: SMSRecipientsManagerProps) {
       phone_country_code: newCountryCode,
       timezone: newTimezone,
       preferred_send_hour: newSendHour,
-      plan_id: selectedPlanId || undefined,
+      plan_id: selectedPlanId === "none" ? undefined : selectedPlanId || undefined,
     }, {
       onSuccess: () => {
         setNewName("");
@@ -279,7 +279,7 @@ export function SMSRecipientsManager({ planId }: SMSRecipientsManagerProps) {
                     <SelectValue placeholder="Select a devotional plan..." />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">No plan assigned</SelectItem>
+                    <SelectItem value="none">No plan assigned</SelectItem>
                     {activePlans.map(plan => (
                       <SelectItem key={plan.id} value={plan.id}>
                         {plan.title} ({plan.duration} days)
