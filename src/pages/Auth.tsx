@@ -38,10 +38,20 @@ export default function Auth() {
   const [showSignupPassword, setShowSignupPassword] = useState(false);
   
   const isPatreonMode = searchParams.get('patreon') === 'true';
+  const trialCancelled = searchParams.get('trial') === 'cancelled';
   const redirectParam = searchParams.get('redirect');
   const safeRedirect = redirectParam && redirectParam.startsWith('/') && !redirectParam.startsWith('//')
     ? redirectParam
     : null;
+
+  // Show message if trial checkout was cancelled
+  useEffect(() => {
+    if (trialCancelled) {
+      toast.info("Your trial signup was cancelled. To access the Palace, please complete the signup with your card details.", {
+        duration: 8000,
+      });
+    }
+  }, [trialCancelled]);
 
   // Redirect if already logged in (but NOT if in Patreon mode - let them connect)
   // We defer the gatehouse check to avoid Supabase deadlocks during auth state changes
@@ -340,13 +350,83 @@ export default function Auth() {
           colors: ['#9b87f5', '#7E69AB', '#6E59A5', '#D6BCFA', '#E5DEFF']
         });
 
-        toast.success("Account created! Welcome to Phototheology!");
-        // New users need to complete checkout (credit card required) unless they have external membership
-        // The pricing page will check for Patreon/Pickaxe/Teachable access
-        if (safeRedirect) {
-          navigate(safeRedirect, { replace: true });
-        } else {
-          navigate("/pricing?trial=true");
+        toast.success("Account created! Redirecting to start your free trial...");
+        
+        // UNIFIED SIGNUP + TRIAL FLOW: Immediately redirect to Stripe checkout
+        // Users MUST enter credit card to complete signup - it's one process
+        try {
+          // Check for external membership first (Patreon, Pickaxe, Teachable)
+          const [patreonResult, pickaxeResult, teachableResult] = await Promise.all([
+            supabase.from("patreon_connections")
+              .select("is_active_patron, entitled_cents")
+              .eq("user_id", data.user.id)
+              .maybeSingle(),
+            supabase.from("pickaxe_connections")
+              .select("is_paid_user")
+              .eq("pickaxe_email", email.toLowerCase())
+              .eq("is_paid_user", true)
+              .maybeSingle(),
+            supabase.from("teachable_students")
+              .select("is_active")
+              .eq("user_id", data.user.id)
+              .eq("is_active", true)
+              .maybeSingle(),
+          ]);
+
+          // Grant access if external membership found
+          if (patreonResult.data?.is_active_patron && patreonResult.data.entitled_cents >= 1500) {
+            await supabase.from("profiles").update({
+              subscription_status: "active",
+              subscription_tier: "premium",
+              payment_source: "patreon",
+              updated_at: new Date().toISOString(),
+            }).eq("id", data.user.id);
+            toast.success("Your Patreon membership has been linked!");
+            navigate("/gatehouse", { replace: true });
+            return;
+          }
+
+          if (pickaxeResult.data?.is_paid_user) {
+            await supabase.from("profiles").update({
+              subscription_status: "active",
+              subscription_tier: "premium",
+              payment_source: "pickaxe" as any,
+              updated_at: new Date().toISOString(),
+            }).eq("id", data.user.id);
+            toast.success("Your Pickaxe membership has been linked!");
+            navigate("/gatehouse", { replace: true });
+            return;
+          }
+
+          if (teachableResult.data?.is_active) {
+            await supabase.from("profiles").update({
+              subscription_status: "active",
+              subscription_tier: "student",
+              payment_source: "teachable" as any,
+              updated_at: new Date().toISOString(),
+            }).eq("id", data.user.id);
+            toast.success("Your Teachable membership has been linked!");
+            navigate("/gatehouse", { replace: true });
+            return;
+          }
+
+          // No external membership - redirect to Stripe checkout for 7-day trial
+          const { data: checkoutData, error: checkoutError } = await supabase.functions.invoke('create-trial-checkout', {
+            body: { plan: 'premium', billing: 'monthly' },
+          });
+
+          if (checkoutError) throw checkoutError;
+          
+          if (checkoutData?.url) {
+            // Redirect to Stripe checkout - signup is not complete without payment info
+            window.location.href = checkoutData.url;
+            return;
+          }
+        } catch (checkoutErr) {
+          console.error("Failed to create checkout session:", checkoutErr);
+          // Fallback to pricing page if checkout creation fails
+          toast.error("Could not start trial. Please try again on the pricing page.");
+          navigate("/pricing?trial=true", { replace: true });
         }
       } else if (data.user && !data.session) {
         // Celebrate with confetti!

@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { useNavigate, Link, useSearchParams } from 'react-router-dom';
 import { SEO } from '@/components/SEO';
 import { motion } from 'framer-motion';
 import { BookOpen, Castle, ChevronRight, AlertTriangle, Heart, Brain, Sword, ArrowLeft, X, Layers, Target } from 'lucide-react';
@@ -12,16 +12,58 @@ import { Navigation } from '@/components/Navigation';
 import { Footer } from '@/components/Footer';
 import { UserCountBadge } from '@/components/UserCountBadge';
 import { GiveGemButton } from '@/components/GiveGemButton';
+import { toast } from 'sonner';
+import confetti from 'canvas-confetti';
 
 type ViewState = 'choice' | 'appeal' | 'exit';
 
 const Gatehouse = () => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const { user } = useAuth();
   const { hasEnteredPalace, isLoading } = useGatehouseStatus();
   const { markOrientationComplete, advanceGuidedPath } = useChangeSpine();
   const [selectedPath, setSelectedPath] = useState<'surface' | 'palace' | null>(null);
   const [viewState, setViewState] = useState<ViewState>('choice');
+
+  // Handle trial success redirect from Stripe checkout
+  useEffect(() => {
+    const trialStatus = searchParams.get('trial');
+    if (trialStatus === 'success') {
+      // Celebration animation
+      const duration = 3000;
+      const animationEnd = Date.now() + duration;
+      const defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 9999 };
+
+      const randomInRange = (min: number, max: number) => Math.random() * (max - min) + min;
+
+      const interval = setInterval(() => {
+        const timeLeft = animationEnd - Date.now();
+        if (timeLeft <= 0) {
+          clearInterval(interval);
+          return;
+        }
+        const particleCount = 50 * (timeLeft / duration);
+        confetti({
+          ...defaults,
+          particleCount,
+          origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 },
+          colors: ['#9b87f5', '#7E69AB', '#FFD700', '#FFA500', '#FF6B6B'],
+        });
+        confetti({
+          ...defaults,
+          particleCount,
+          origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 },
+          colors: ['#9b87f5', '#7E69AB', '#FFD700', '#FFA500', '#FF6B6B'],
+        });
+      }, 250);
+
+      toast.success("🎉 Your 7-day free trial has started! Welcome to the Palace.");
+      
+      // Clean up URL
+      navigate('/gatehouse', { replace: true });
+    }
+  }, [searchParams, navigate]);
 
   // Show loading state while checking user status to prevent flash of wrong content
   if (isLoading) {
