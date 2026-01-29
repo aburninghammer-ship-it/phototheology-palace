@@ -257,8 +257,8 @@ export default function Pricing() {
         "All 8 Palace Floors unlocked",
         "Unlimited AI conversations",
         "All games, courses & tools",
-        "Credit card required to start",
-        "Cancel anytime",
+        "7 days completely free",
+        "Cancel anytime — one click",
       ],
     },
     {
@@ -320,15 +320,18 @@ export default function Pricing() {
       <div className="container mx-auto px-4 pt-24 pb-12">
         {/* Hero Section */}
         <div className="text-center mb-12">
-          <Badge className="mb-4 gradient-palace text-white border-0">
+          <Badge className="mb-4 gradient-palace text-white border-0 px-4 py-2 text-sm">
             <Sparkles className="h-3 w-3 mr-1" />
-            7-Day Free Trial • Full Access
+            7-Day Free Trial • Cancel Anytime • No Charge Until Day 8
           </Badge>
           <h1 className="text-5xl md:text-6xl font-bold bg-gradient-palace bg-clip-text text-transparent mb-4">
-            Master Bible Study for Free
+            Try Everything Free for 7 Days
           </h1>
-          <p className="text-xl text-muted-foreground max-w-xl mx-auto">
-            7-day free trial. Full access. $15/mo after.
+          <p className="text-xl text-muted-foreground max-w-xl mx-auto mb-2">
+            Full Premium access. No restrictions. Cancel before day 8 and pay nothing.
+          </p>
+          <p className="text-sm text-muted-foreground">
+            Then just $15/month (or $150/year — save 2 months)
           </p>
           
           {/* Billing Period Toggle - Enhanced */}
@@ -365,27 +368,35 @@ export default function Pricing() {
         </div>
 
         {/* Start Trial CTA - Primary */}
-        <Card className="mb-8 border-2 border-primary/30 bg-gradient-to-r from-primary/5 to-accent/10 max-w-2xl mx-auto">
-          <CardContent className="p-6 text-center">
-            <Badge className="mb-3 gradient-palace text-white border-0">
+        <Card className="mb-8 border-2 border-primary/30 bg-gradient-to-r from-primary/5 to-accent/10 max-w-2xl mx-auto shadow-xl">
+          <CardContent className="p-8 text-center">
+            <Badge className="mb-4 gradient-palace text-white border-0 px-4 py-2">
               <Sparkles className="h-3 w-3 mr-1" />
-              Most Popular Choice
+              🎉 Most Popular Choice
             </Badge>
-            <h3 className="text-xl font-bold mb-2">Start Your 7-Day Free Trial</h3>
-            <p className="text-muted-foreground mb-4">
-              Get instant access to all Premium features — no restrictions.
-              <span className="flex items-center justify-center gap-1 mt-1 text-sm font-medium text-primary">
-                <CreditCard className="h-3 w-3" /> Credit card required • Cancel anytime
-              </span>
+            <h3 className="text-2xl font-bold mb-3">Start Your 7-Day Free Trial</h3>
+            <p className="text-muted-foreground mb-2">
+              Get <span className="font-semibold text-foreground">instant access</span> to all Premium features — no restrictions.
             </p>
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-2 mb-6 text-sm">
+              <span className="flex items-center gap-1 px-3 py-1 rounded-full bg-primary/10 text-primary">
+                <Check className="h-3 w-3" /> No charge for 7 days
+              </span>
+              <span className="flex items-center gap-1 px-3 py-1 rounded-full bg-muted text-muted-foreground">
+                <CreditCard className="h-3 w-3" /> Cancel anytime
+              </span>
+            </div>
             <Button 
               onClick={startTrialNow}
-              className="gradient-palace"
+              className="gradient-palace text-lg px-8 py-6 h-auto"
               disabled={isStartingTrial}
             >
-              {isStartingTrial ? "Starting..." : "Start 7-Day Free Trial"}
-              <ArrowRight className="ml-2 h-4 w-4" />
+              {isStartingTrial ? "Starting..." : "Start Free Trial — No Charge Today"}
+              <ArrowRight className="ml-2 h-5 w-5" />
             </Button>
+            <p className="text-xs text-muted-foreground mt-4">
+              We'll remind you 2 days before your trial ends. Cancel with one click.
+            </p>
           </CardContent>
         </Card>
 
