@@ -1,13 +1,14 @@
 import { useState } from "react";
-import { MessageSquare, Plus, Trash2, Phone, User, ToggleLeft, ToggleRight, Loader2 } from "lucide-react";
+import { MessageSquare, Plus, Trash2, Phone, User, ToggleLeft, ToggleRight, Loader2, CheckCircle2, XCircle, Clock, Send } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useSMSRecipients } from "@/hooks/useSMSRecipients";
 import { useDevotionals } from "@/hooks/useDevotionals";
-import { formatDistanceToNow } from "date-fns";
+import { formatDistanceToNow, format } from "date-fns";
 
 interface SMSRecipientsManagerProps {
   planId?: string;
@@ -31,7 +32,7 @@ export function SMSRecipientsManager({ planId }: SMSRecipientsManagerProps) {
   const [newCountryCode, setNewCountryCode] = useState("+1");
   const [selectedPlanId, setSelectedPlanId] = useState(planId || "");
 
-  const { recipients, isLoading, addRecipient, deleteRecipient, toggleActive, activeCount, totalSent } = useSMSRecipients(planId);
+  const { recipients, isLoading, addRecipient, deleteRecipient, toggleActive, activeCount, totalSent, todaysSends, todayLoading } = useSMSRecipients(planId);
   const { plans } = useDevotionals();
 
   const activePlans = plans?.filter(p => p.status === "active") || [];
@@ -82,10 +83,87 @@ export function SMSRecipientsManager({ planId }: SMSRecipientsManagerProps) {
             <span className="text-muted-foreground">Total Sent: </span>
             <span className="font-medium">{totalSent}</span>
           </div>
+          {todaysSends && todaysSends.length > 0 && (
+            <div className="bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300 px-3 py-1.5 rounded-lg flex items-center gap-1">
+              <CheckCircle2 className="h-3.5 w-3.5" />
+              <span className="font-medium">{todaysSends.length} sent today</span>
+            </div>
+          )}
         </div>
       </CardHeader>
 
       <CardContent className="space-y-4">
+        {/* Today's SMS Status */}
+        {todaysSends && todaysSends.length > 0 && (
+          <div className="border rounded-lg overflow-hidden bg-gradient-to-br from-emerald-50 to-teal-50 dark:from-emerald-950/30 dark:to-teal-950/30 border-emerald-200 dark:border-emerald-800">
+            <div className="px-4 py-3 bg-emerald-100/50 dark:bg-emerald-900/30 border-b border-emerald-200 dark:border-emerald-800">
+              <h4 className="font-medium text-emerald-800 dark:text-emerald-200 flex items-center gap-2">
+                <Send className="h-4 w-4" />
+                Today's SMS Deliveries ({format(new Date(), "MMM d")})
+              </h4>
+            </div>
+            <div className="divide-y divide-emerald-200 dark:divide-emerald-800">
+              {todaysSends.map((send) => {
+                // Find recipient name by matching phone number
+                const recipient = recipients?.find(r =>
+                  send.phone_number.includes(r.phone_number) ||
+                  r.phone_number.includes(send.phone_number.slice(-10))
+                );
+                const displayName = recipient?.name || send.phone_number;
+
+                const statusColor =
+                  send.status === 'delivered' ? 'text-emerald-600 dark:text-emerald-400' :
+                  send.status === 'sent' ? 'text-blue-600 dark:text-blue-400' :
+                  send.status === 'queued' ? 'text-amber-600 dark:text-amber-400' :
+                  send.status === 'failed' || send.status === 'undelivered' ? 'text-red-600 dark:text-red-400' :
+                  'text-muted-foreground';
+
+                const StatusIcon =
+                  send.status === 'delivered' ? CheckCircle2 :
+                  send.status === 'sent' ? CheckCircle2 :
+                  send.status === 'queued' ? Clock :
+                  send.status === 'failed' || send.status === 'undelivered' ? XCircle :
+                  Clock;
+
+                return (
+                  <div key={send.id} className="px-4 py-2 flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className={`${statusColor}`}>
+                        <StatusIcon className="h-4 w-4" />
+                      </div>
+                      <div>
+                        <p className="text-sm font-medium text-emerald-900 dark:text-emerald-100">
+                          {displayName}
+                        </p>
+                        <p className="text-xs text-emerald-600 dark:text-emerald-400">
+                          {format(new Date(send.sent_at), "h:mm a")}
+                          {send.day_number && ` • Day ${send.day_number}`}
+                        </p>
+                      </div>
+                    </div>
+                    <Badge
+                      variant="outline"
+                      className={`text-xs ${
+                        send.status === 'delivered' ? 'border-emerald-300 text-emerald-700 dark:border-emerald-700 dark:text-emerald-300' :
+                        send.status === 'sent' ? 'border-blue-300 text-blue-700 dark:border-blue-700 dark:text-blue-300' :
+                        send.status === 'queued' ? 'border-amber-300 text-amber-700 dark:border-amber-700 dark:text-amber-300' :
+                        send.status === 'failed' ? 'border-red-300 text-red-700 dark:border-red-700 dark:text-red-300' :
+                        ''
+                      }`}
+                    >
+                      {send.status === 'delivered' ? 'Delivered' :
+                       send.status === 'sent' ? 'Sent' :
+                       send.status === 'queued' ? 'Queued' :
+                       send.status === 'failed' ? 'Failed' :
+                       send.status || 'Pending'}
+                    </Badge>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
         {/* Add Form */}
         {showAddForm && (
           <div className="border rounded-lg p-4 space-y-4 bg-muted/30">

@@ -83,6 +83,30 @@ export function useSMSRecipients(planId?: string) {
     enabled: !!user?.id,
   });
 
+  // Fetch today's SMS sends
+  const { data: todaysSends, isLoading: todayLoading } = useQuery({
+    queryKey: ["sms-today-sends", user?.id],
+    queryFn: async () => {
+      // Get start of today in UTC
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const todayISO = today.toISOString();
+
+      const { data, error } = await (supabase as any)
+        .from("sms_send_log")
+        .select("*")
+        .eq("user_id", user?.id)
+        .eq("message_type", "devotional")
+        .gte("sent_at", todayISO)
+        .order("sent_at", { ascending: false });
+
+      if (error) throw error;
+      return data as SMSSendLog[];
+    },
+    enabled: !!user?.id,
+    refetchInterval: 60000, // Refresh every minute
+  });
+
   // Add a new SMS recipient
   const addRecipient = useMutation({
     mutationFn: async (data: {
@@ -208,6 +232,8 @@ export function useSMSRecipients(planId?: string) {
     isLoading,
     sendHistory,
     historyLoading,
+    todaysSends,
+    todayLoading,
     addRecipient,
     updateRecipient,
     deleteRecipient,
