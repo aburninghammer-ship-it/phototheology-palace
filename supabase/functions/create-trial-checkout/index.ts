@@ -233,8 +233,8 @@ serve(async (req) => {
           tier: tier,
         },
       },
-      success_url: `${origin}/pricing?trial=success`,
-      cancel_url: `${origin}/pricing?trial=cancelled`,
+      success_url: `${origin}/gatehouse?trial=success`,
+      cancel_url: `${origin}/auth?trial=cancelled`,
       metadata: {
         user_id: user.id,
         plan: plan,
