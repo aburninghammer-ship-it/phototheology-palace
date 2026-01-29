@@ -16,6 +16,8 @@ export interface SMSRecipient {
   last_sms_sent_at: string | null;
   total_sms_sent: number;
   last_delivery_status: string | null;
+  timezone: string;
+  preferred_send_hour: number;
   created_at: string;
   updated_at: string;
 }
@@ -114,6 +116,8 @@ export function useSMSRecipients(planId?: string) {
       phone_number: string;
       phone_country_code?: string;
       plan_id?: string;
+      timezone?: string;
+      preferred_send_hour?: number;
     }) => {
       // Clean phone number (remove formatting)
       const cleanPhone = data.phone_number.replace(/\D/g, '');
@@ -126,6 +130,8 @@ export function useSMSRecipients(planId?: string) {
           phone_number: cleanPhone,
           phone_country_code: data.phone_country_code || '+1',
           plan_id: data.plan_id || null,
+          timezone: data.timezone || 'America/New_York',
+          preferred_send_hour: data.preferred_send_hour ?? 8,
           is_active: true,
         })
         .select()

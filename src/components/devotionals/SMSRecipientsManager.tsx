@@ -25,11 +25,40 @@ const COUNTRY_CODES = [
   { code: "+63", label: "Philippines (+63)" },
 ];
 
+const TIMEZONES = [
+  { value: "America/New_York", label: "Eastern (ET)" },
+  { value: "America/Chicago", label: "Central (CT)" },
+  { value: "America/Denver", label: "Mountain (MT)" },
+  { value: "America/Los_Angeles", label: "Pacific (PT)" },
+  { value: "America/Anchorage", label: "Alaska (AKT)" },
+  { value: "Pacific/Honolulu", label: "Hawaii (HT)" },
+  { value: "Europe/London", label: "UK (GMT/BST)" },
+  { value: "Europe/Paris", label: "Central Europe (CET)" },
+  { value: "Africa/Lagos", label: "West Africa (WAT)" },
+  { value: "Africa/Nairobi", label: "East Africa (EAT)" },
+  { value: "Asia/Kolkata", label: "India (IST)" },
+  { value: "Asia/Manila", label: "Philippines (PHT)" },
+  { value: "Australia/Sydney", label: "Australia East (AEST)" },
+];
+
+const SEND_HOURS = [
+  { value: 6, label: "6:00 AM" },
+  { value: 7, label: "7:00 AM" },
+  { value: 8, label: "8:00 AM" },
+  { value: 9, label: "9:00 AM" },
+  { value: 10, label: "10:00 AM" },
+  { value: 12, label: "12:00 PM" },
+  { value: 18, label: "6:00 PM" },
+  { value: 20, label: "8:00 PM" },
+];
+
 export function SMSRecipientsManager({ planId }: SMSRecipientsManagerProps) {
   const [showAddForm, setShowAddForm] = useState(false);
   const [newName, setNewName] = useState("");
   const [newPhone, setNewPhone] = useState("");
   const [newCountryCode, setNewCountryCode] = useState("+1");
+  const [newTimezone, setNewTimezone] = useState("America/New_York");
+  const [newSendHour, setNewSendHour] = useState(8);
   const [selectedPlanId, setSelectedPlanId] = useState(planId || "");
 
   const { recipients, isLoading, addRecipient, deleteRecipient, toggleActive, activeCount, totalSent, todaysSends, todayLoading } = useSMSRecipients(planId);
@@ -44,11 +73,15 @@ export function SMSRecipientsManager({ planId }: SMSRecipientsManagerProps) {
       name: newName.trim(),
       phone_number: newPhone.trim(),
       phone_country_code: newCountryCode,
+      timezone: newTimezone,
+      preferred_send_hour: newSendHour,
       plan_id: selectedPlanId || undefined,
     }, {
       onSuccess: () => {
         setNewName("");
         setNewPhone("");
+        setNewTimezone("America/New_York");
+        setNewSendHour(8);
         setShowAddForm(false);
       }
     });
@@ -208,6 +241,36 @@ export function SMSRecipientsManager({ planId }: SMSRecipientsManagerProps) {
               </div>
             </div>
 
+            {/* Timezone and Send Time */}
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label>Timezone</Label>
+                <Select value={newTimezone} onValueChange={setNewTimezone}>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {TIMEZONES.map(tz => (
+                      <SelectItem key={tz.value} value={tz.value}>{tz.label}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-2">
+                <Label>Send Time</Label>
+                <Select value={String(newSendHour)} onValueChange={(v) => setNewSendHour(parseInt(v))}>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {SEND_HOURS.map(h => (
+                      <SelectItem key={h.value} value={String(h.value)}>{h.label}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+
             {!planId && activePlans.length > 0 && (
               <div className="space-y-2">
                 <Label>Assign to Devotional Plan (optional)</Label>
@@ -280,6 +343,9 @@ export function SMSRecipientsManager({ planId }: SMSRecipientsManagerProps) {
                           ({recipient.total_sms_sent} sent)
                         </span>
                       )}
+                    </p>
+                    <p className="text-xs text-muted-foreground">
+                      Sends at {SEND_HOURS.find(h => h.value === recipient.preferred_send_hour)?.label || '8:00 AM'} • {TIMEZONES.find(tz => tz.value === recipient.timezone)?.label || 'Eastern'}
                     </p>
                     {recipient.last_sms_sent_at && (
                       <p className="text-xs text-muted-foreground">

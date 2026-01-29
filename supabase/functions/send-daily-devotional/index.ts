@@ -19,6 +19,28 @@ const twilioClient = twilioAccountSid && twilioAuthToken
   : null;
 
 /**
+ * Check if it's the right hour to send SMS to a recipient based on their timezone
+ * Returns true if the current hour in recipient's timezone matches their preferred send hour
+ */
+function shouldSendNow(timezone: string = 'America/New_York', preferredHour: number = 8): boolean {
+  try {
+    // Get current hour in recipient's timezone
+    const now = new Date();
+    const options: Intl.DateTimeFormatOptions = {
+      hour: 'numeric',
+      hour12: false,
+      timeZone: timezone,
+    };
+    const currentHour = parseInt(new Intl.DateTimeFormat('en-US', options).format(now), 10);
+    return currentHour === preferredHour;
+  } catch (e) {
+    // If timezone is invalid, default to always send (fallback behavior)
+    console.warn(`Invalid timezone "${timezone}", defaulting to send`);
+    return true;
+  }
+}
+
+/**
  * Generate SMS message for a devotional (must fit in ~160 chars)
  */
 function generateSMSMessage(
@@ -471,27 +493,36 @@ serve(async (req) => {
         // Send SMS to opted-in recipients
         if (twilioClient) {
           try {
-            // Get profiles with SMS enabled for this plan
+            // Get profiles with SMS enabled for this plan (include timezone)
             const { data: profilesWithSMS } = await supabase
               .from('devotional_profiles')
-              .select('id, name, phone_number, phone_country_code')
+              .select('id, name, phone_number, phone_country_code, timezone, preferred_send_hour')
               .eq('active_plan_id', plan.id)
               .eq('sms_opt_in', true)
               .not('phone_number', 'is', null);
 
-            // Get standalone SMS recipients for this plan
+            // Get standalone SMS recipients for this plan (include timezone)
             const { data: smsRecipients } = await supabase
               .from('sms_devotional_recipients')
-              .select('id, name, phone_number, phone_country_code')
+              .select('id, name, phone_number, phone_country_code, timezone, preferred_send_hour')
               .eq('plan_id', plan.id)
               .eq('is_active', true)
               .is('opted_out_at', null);
 
-            // Combine all SMS recipients
+            // Combine all SMS recipients and filter by timezone
+            // Only include recipients where it's currently their preferred send hour (default 8am)
             const allSMSRecipients = [
               ...(profilesWithSMS || []).map(p => ({ ...p, recipientType: 'profile' as const })),
               ...(smsRecipients || []).map(r => ({ ...r, recipientType: 'standalone' as const }))
-            ];
+            ].filter(recipient => {
+              const tz = recipient.timezone || 'America/New_York';
+              const hour = recipient.preferred_send_hour ?? 8;
+              const send = shouldSendNow(tz, hour);
+              if (!send) {
+                console.log(`Skipping ${recipient.name} - not ${hour}:00 in ${tz} yet`);
+              }
+              return send;
+            });
 
             console.log(`Found ${allSMSRecipients.length} SMS recipients for plan ${plan.id}`);
 
