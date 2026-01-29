@@ -352,8 +352,9 @@ export default function Devotionals() {
                       <ChevronRight className="h-5 w-5 text-muted-foreground group-hover:text-primary transition-colors" />
                     </div>
                   </CardContent>
-                  <div className="px-6 pb-4 flex gap-2">
+                  <div className="px-6 pb-4 flex gap-2 flex-wrap">
                     <ShareDevotionalDialog plan={plan} />
+                    <ExtendDevotionalDialog plan={plan} />
                     <Button
                       variant="outline"
                       size="sm"
