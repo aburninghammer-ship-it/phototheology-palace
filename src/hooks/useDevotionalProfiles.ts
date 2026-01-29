@@ -32,6 +32,12 @@ export interface DevotionalProfile {
   issue_severity: string | null;
   pastoral_notes: unknown[] | null;
   warning_flags: string[] | null;
+  // SMS fields
+  phone_number: string | null;
+  phone_country_code: string | null;
+  sms_opt_in: boolean;
+  last_sms_sent_at: string | null;
+  total_sms_sent: number;
 }
 
 export interface ProfileNote {
@@ -113,6 +119,10 @@ export function useDevotionalProfiles() {
       primary_issue?: string;
       issue_description?: string;
       issue_severity?: string;
+      // SMS fields
+      phone_number?: string;
+      phone_country_code?: string;
+      sms_opt_in?: boolean;
     }) => {
       // Generate invite token
       const { data: tokenData } = await supabase.rpc("generate_profile_invite_token");

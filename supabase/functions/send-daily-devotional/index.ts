@@ -1,11 +1,41 @@
 import { serve } from "https://deno.land/std@0.224.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.76.0';
 import { Resend } from "https://esm.sh/resend@4.0.0";
+import Twilio from "https://esm.sh/twilio@4.23.0";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
+
+// Twilio configuration
+const twilioAccountSid = Deno.env.get('TWILIO_ACCOUNT_SID');
+const twilioAuthToken = Deno.env.get('TWILIO_AUTH_TOKEN');
+const twilioPhoneNumber = Deno.env.get('TWILIO_PHONE_NUMBER');
+
+// Initialize Twilio client if credentials are available
+const twilioClient = twilioAccountSid && twilioAuthToken
+  ? Twilio(twilioAccountSid, twilioAuthToken)
+  : null;
+
+/**
+ * Generate SMS message for a devotional (must fit in ~160 chars)
+ */
+function generateSMSMessage(
+  dayContent: { title: string; scripture_reference: string },
+  planId: string,
+  dayNumber: number,
+  recipientName?: string
+): string {
+  const name = recipientName ? `${recipientName}: ` : "";
+  const title = dayContent.title.length > 35 ? dayContent.title.substring(0, 32) + "..." : dayContent.title;
+  const scripture = dayContent.scripture_reference.length > 20
+    ? dayContent.scripture_reference.substring(0, 17) + "..."
+    : dayContent.scripture_reference;
+
+  // Format: "Name: Day N - Title | Scripture\nlink"
+  return `${name}Day ${dayNumber}: ${title}\n${scripture}\nphototheology.app/d/${planId}`;
+}
 
 /**
  * Generate a single devotional day on-demand
@@ -254,6 +284,7 @@ serve(async (req) => {
 
     let emailsSent = 0;
     let notificationsCreated = 0;
+    let smsSent = 0;
 
     for (const plan of activePlans || []) {
       try {
@@ -371,16 +402,31 @@ serve(async (req) => {
               ` : ''}
               
               <div style="text-align: center; margin-top: 30px;">
-                <a href="https://phototheology.app/devotionals/${plan.id}" 
+                <a href="https://phototheology.app/devotionals/${plan.id}"
                    style="display: inline-block; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 14px 30px; text-decoration: none; border-radius: 8px; font-weight: bold;">
                   📚 Continue Reading & Journal
                 </a>
               </div>
+
+              <div style="margin-top: 30px; padding: 20px; background: rgba(255,255,255,0.03); border-radius: 8px; border: 1px solid rgba(255,255,255,0.1);">
+                <p style="color: #a78bfa; font-size: 14px; margin: 0 0 12px 0; font-weight: bold;">✨ Explore the Bible Study Suite</p>
+                <p style="color: #a1a1aa; font-size: 13px; margin: 0 0 15px 0; line-height: 1.6;">
+                  Deepen your understanding with visual memory tools, Hebrew/Greek word studies,
+                  commentary insights, and more. Share these devotionals with friends!
+                </p>
+                <a href="https://phototheology.app/bible-study"
+                   style="display: inline-block; background: rgba(139, 92, 246, 0.2); color: #a78bfa; padding: 10px 20px; text-decoration: none; border-radius: 6px; font-size: 13px; border: 1px solid rgba(139, 92, 246, 0.3);">
+                  🔍 Explore Bible Study Suite →
+                </a>
+              </div>
             </div>
-            
+
             <div style="background: rgba(255,255,255,0.05); padding: 20px; text-align: center;">
               <p style="margin: 0; color: #a1a1aa; font-size: 12px;">
                 Phototheology - Master Scripture Through Visual Memory
+              </p>
+              <p style="margin: 8px 0 0 0; color: #71717a; font-size: 11px;">
+                <a href="https://phototheology.app/devotionals" style="color: #71717a;">Send devotionals to a friend</a>
               </p>
             </div>
           </div>
@@ -422,18 +468,113 @@ serve(async (req) => {
           notificationsCreated++;
         }
 
+        // Send SMS to opted-in recipients
+        if (twilioClient) {
+          try {
+            // Get profiles with SMS enabled for this plan
+            const { data: profilesWithSMS } = await supabase
+              .from('devotional_profiles')
+              .select('id, name, phone_number, phone_country_code')
+              .eq('active_plan_id', plan.id)
+              .eq('sms_opt_in', true)
+              .not('phone_number', 'is', null);
+
+            // Get standalone SMS recipients for this plan
+            const { data: smsRecipients } = await supabase
+              .from('sms_devotional_recipients')
+              .select('id, name, phone_number, phone_country_code')
+              .eq('plan_id', plan.id)
+              .eq('is_active', true)
+              .is('opted_out_at', null);
+
+            // Combine all SMS recipients
+            const allSMSRecipients = [
+              ...(profilesWithSMS || []).map(p => ({ ...p, recipientType: 'profile' as const })),
+              ...(smsRecipients || []).map(r => ({ ...r, recipientType: 'standalone' as const }))
+            ];
+
+            console.log(`Found ${allSMSRecipients.length} SMS recipients for plan ${plan.id}`);
+
+            for (const recipient of allSMSRecipients) {
+              try {
+                const fullPhone = `${recipient.phone_country_code || '+1'}${recipient.phone_number.replace(/\D/g, '')}`;
+                const smsBody = generateSMSMessage(dayContent, plan.id, currentDayNumber, recipient.name);
+
+                const message = await twilioClient.messages.create({
+                  body: smsBody,
+                  from: twilioPhoneNumber,
+                  to: fullPhone,
+                });
+
+                // Log successful send
+                await supabase.from('sms_send_log').insert({
+                  user_id: plan.user_id,
+                  recipient_type: recipient.recipientType,
+                  recipient_id: recipient.id,
+                  phone_number: fullPhone,
+                  plan_id: plan.id,
+                  day_number: currentDayNumber,
+                  message_body: smsBody,
+                  twilio_sid: message.sid,
+                  status: message.status,
+                });
+
+                // Update recipient's SMS tracking
+                if (recipient.recipientType === 'profile') {
+                  await supabase
+                    .from('devotional_profiles')
+                    .update({
+                      last_sms_sent_at: new Date().toISOString(),
+                      total_sms_sent: (await supabase.from('devotional_profiles').select('total_sms_sent').eq('id', recipient.id).single()).data?.total_sms_sent + 1 || 1
+                    })
+                    .eq('id', recipient.id);
+                } else {
+                  await supabase
+                    .from('sms_devotional_recipients')
+                    .update({
+                      last_sms_sent_at: new Date().toISOString(),
+                      total_sms_sent: (await supabase.from('sms_devotional_recipients').select('total_sms_sent').eq('id', recipient.id).single()).data?.total_sms_sent + 1 || 1,
+                      last_delivery_status: message.status
+                    })
+                    .eq('id', recipient.id);
+                }
+
+                smsSent++;
+                console.log(`SMS sent to ${recipient.name} at ${fullPhone}`);
+              } catch (smsError: any) {
+                console.error(`SMS error for ${recipient.name}:`, smsError.message);
+
+                // Log failed send
+                await supabase.from('sms_send_log').insert({
+                  user_id: plan.user_id,
+                  recipient_type: recipient.recipientType,
+                  recipient_id: recipient.id,
+                  phone_number: `${recipient.phone_country_code || '+1'}${recipient.phone_number}`,
+                  plan_id: plan.id,
+                  day_number: currentDayNumber,
+                  status: 'failed',
+                  error_message: smsError.message,
+                });
+              }
+            }
+          } catch (smsBlockError: any) {
+            console.error(`Error in SMS block for plan ${plan.id}:`, smsBlockError.message);
+          }
+        }
+
       } catch (planError) {
         console.error(`Error processing plan ${plan.id}:`, planError);
       }
     }
 
-    console.log(`Completed: ${emailsSent} emails sent, ${notificationsCreated} notifications created`);
+    console.log(`Completed: ${emailsSent} emails, ${notificationsCreated} notifications, ${smsSent} SMS sent`);
 
     return new Response(
       JSON.stringify({
         success: true,
         emailsSent,
         notificationsCreated,
+        smsSent,
         plansProcessed: activePlans?.length || 0,
       }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } }

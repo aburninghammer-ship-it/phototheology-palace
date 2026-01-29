@@ -1,13 +1,16 @@
 import { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { ArrowLeft, Send, Calendar, MessageSquare, Sparkles, Plus, Pin, Trash2, Clock, History as HistoryIcon, Lightbulb, Zap } from "lucide-react";
+import { ArrowLeft, Send, Calendar, MessageSquare, Sparkles, Plus, Pin, Trash2, Clock, History as HistoryIcon, Lightbulb, Zap, Phone, ToggleLeft, ToggleRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { useDevotionalProfile } from "@/hooks/useDevotionalProfiles";
+import { Switch } from "@/components/ui/switch";
+import { useDevotionalProfile, useDevotionalProfiles } from "@/hooks/useDevotionalProfiles";
 import { useDevotionalPlan, useDevotionals } from "@/hooks/useDevotionals";
 import { useToast } from "@/hooks/use-toast";
 import { useQueryClient } from "@tanstack/react-query";
@@ -15,6 +18,18 @@ import { supabase } from "@/integrations/supabase/client";
 import { ProfileDevotionGenerator } from "@/components/devotionals/ProfileDevotionGenerator";
 import { format, formatDistanceToNow } from "date-fns";
 import { cn } from "@/lib/utils";
+import { toast as sonnerToast } from "sonner";
+
+const COUNTRY_CODES = [
+  { code: "+1", label: "US/Canada (+1)" },
+  { code: "+44", label: "UK (+44)" },
+  { code: "+61", label: "Australia (+61)" },
+  { code: "+91", label: "India (+91)" },
+  { code: "+234", label: "Nigeria (+234)" },
+  { code: "+254", label: "Kenya (+254)" },
+  { code: "+27", label: "South Africa (+27)" },
+  { code: "+63", label: "Philippines (+63)" },
+];
 
 const NOTE_TYPES = [
   { value: "observation", label: "Observation", icon: "👁️" },
@@ -38,6 +53,131 @@ const STRUGGLE_LABELS: Record<string, { label: string; emoji: string }> = {
   relationships: { label: "Relationships", emoji: "💬" },
   purity: { label: "Purity", emoji: "🕊️" },
 };
+
+// SMS Settings Card Component
+function SMSSettingsCard({ profile, profileId }: { profile: any; profileId: string }) {
+  const { updateProfile } = useDevotionalProfiles();
+  const [phoneNumber, setPhoneNumber] = useState(profile?.phone_number || "");
+  const [countryCode, setCountryCode] = useState(profile?.phone_country_code || "+1");
+  const [smsOptIn, setSmsOptIn] = useState(profile?.sms_opt_in || false);
+  const [isSaving, setIsSaving] = useState(false);
+
+  const handleSave = async () => {
+    setIsSaving(true);
+    try {
+      // Clean phone number
+      const cleanPhone = phoneNumber.replace(/\D/g, '');
+
+      await updateProfile.mutateAsync({
+        id: profileId,
+        phone_number: cleanPhone || null,
+        phone_country_code: countryCode,
+        sms_opt_in: smsOptIn && !!cleanPhone,
+      });
+
+      sonnerToast.success("SMS settings saved");
+    } catch (error) {
+      sonnerToast.error("Failed to save SMS settings");
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const formatPhoneDisplay = (phone: string) => {
+    const cleaned = phone.replace(/\D/g, '');
+    if (cleaned.length === 10) {
+      return `(${cleaned.slice(0, 3)}) ${cleaned.slice(3, 6)}-${cleaned.slice(6)}`;
+    }
+    return phone;
+  };
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2">
+          <Phone className="h-5 w-5" />
+          SMS Devotionals
+        </CardTitle>
+        <CardDescription>
+          Send daily devotionals directly to {profile?.name}'s phone via text message
+        </CardDescription>
+      </CardHeader>
+      <CardContent className="space-y-6">
+        {/* Phone Number Input */}
+        <div className="space-y-2">
+          <Label>Phone Number</Label>
+          <div className="flex gap-2">
+            <Select value={countryCode} onValueChange={setCountryCode}>
+              <SelectTrigger className="w-[160px]">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {COUNTRY_CODES.map(cc => (
+                  <SelectItem key={cc.code} value={cc.code}>{cc.label}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <div className="relative flex-1">
+              <Phone className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input
+                placeholder="555-123-4567"
+                value={phoneNumber}
+                onChange={(e) => setPhoneNumber(e.target.value)}
+                className="pl-9"
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* SMS Opt-in Toggle */}
+        <div className="flex items-center justify-between p-4 rounded-lg border bg-muted/30">
+          <div className="space-y-1">
+            <Label className="text-base">Enable SMS Devotionals</Label>
+            <p className="text-sm text-muted-foreground">
+              {profile?.name} will receive daily devotionals via text message
+            </p>
+          </div>
+          <Switch
+            checked={smsOptIn}
+            onCheckedChange={setSmsOptIn}
+            disabled={!phoneNumber.replace(/\D/g, '')}
+          />
+        </div>
+
+        {/* Stats */}
+        {(profile?.total_sms_sent > 0 || profile?.last_sms_sent_at) && (
+          <div className="flex gap-4 text-sm">
+            {profile.total_sms_sent > 0 && (
+              <div className="bg-primary/10 px-3 py-1.5 rounded-lg">
+                <span className="text-muted-foreground">Total Sent: </span>
+                <span className="font-medium">{profile.total_sms_sent}</span>
+              </div>
+            )}
+            {profile.last_sms_sent_at && (
+              <div className="bg-muted px-3 py-1.5 rounded-lg">
+                <span className="text-muted-foreground">Last Sent: </span>
+                <span className="font-medium">
+                  {formatDistanceToNow(new Date(profile.last_sms_sent_at), { addSuffix: true })}
+                </span>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Save Button */}
+        <Button onClick={handleSave} disabled={isSaving} className="w-full">
+          {isSaving ? "Saving..." : "Save SMS Settings"}
+        </Button>
+
+        {/* Info Text */}
+        <p className="text-xs text-muted-foreground text-center">
+          By enabling SMS, you confirm {profile?.name} has consented to receive text messages.
+          Standard message rates may apply. They can reply STOP to unsubscribe at any time.
+        </p>
+      </CardContent>
+    </Card>
+  );
+}
 
 export default function DevotionalProfileDetail() {
   const { profileId } = useParams<{ profileId: string }>();
@@ -213,12 +353,16 @@ export default function DevotionalProfileDetail() {
 
         {/* Tabs */}
         <Tabs defaultValue="generate" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-5">
+          <TabsList className="grid w-full grid-cols-6">
             <TabsTrigger value="generate" className="flex items-center gap-1">
               <Zap className="h-3 w-3" />
               Generate
             </TabsTrigger>
             <TabsTrigger value="devotionals">Devotionals</TabsTrigger>
+            <TabsTrigger value="sms" className="flex items-center gap-1">
+              <Phone className="h-3 w-3" />
+              SMS
+            </TabsTrigger>
             <TabsTrigger value="notes">Notes</TabsTrigger>
             <TabsTrigger value="history">History</TabsTrigger>
             <TabsTrigger value="insights">Insights</TabsTrigger>
@@ -286,6 +430,11 @@ export default function DevotionalProfileDetail() {
                 </CardContent>
               </Card>
             )}
+          </TabsContent>
+
+          {/* SMS Tab */}
+          <TabsContent value="sms" className="space-y-4">
+            <SMSSettingsCard profile={profile} profileId={profileId || ""} />
           </TabsContent>
 
           {/* Notes Tab */}
