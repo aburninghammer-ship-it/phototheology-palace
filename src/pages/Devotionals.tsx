@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Book, Plus, Sparkles, Clock, Calendar, ChevronRight, Trash2, Gift, Heart, Star, Zap, Users, UserPlus, GraduationCap, Home, HeartHandshake, Sun, Church, GraduationCap as StudyIcon } from "lucide-react";
+import { Book, Plus, Sparkles, Clock, Calendar, ChevronRight, Trash2, Gift, Heart, Star, Zap, Users, UserPlus, GraduationCap, Home, HeartHandshake, Sun, Church, GraduationCap as StudyIcon, MessageSquare } from "lucide-react";
 import { TodaysStudy } from "@/components/studies/TodaysStudy";
 import { HowItWorksDialog } from "@/components/HowItWorksDialog";
 import { devotionalsSteps } from "@/config/howItWorksSteps";
@@ -24,6 +24,7 @@ import { DevotionalProfileCard } from "@/components/devotionals/DevotionalProfil
 import { QuickDevotion } from "@/components/devotionals/QuickDevotion";
 import { ChurchDevotionalWizard } from "@/components/devotionals/ChurchDevotionalWizard";
 import { ChurchDevotionalTab } from "@/components/devotionals/ChurchDevotionalTab";
+import { SMSRecipientsManager } from "@/components/devotionals/SMSRecipientsManager";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -231,7 +232,7 @@ export default function Devotionals() {
 
         {/* Tabs for Personal vs Church vs Study */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full max-w-lg grid-cols-3">
+          <TabsList className="grid w-full max-w-2xl grid-cols-4">
             <TabsTrigger value="personal" className="flex items-center gap-2">
               <Book className="h-4 w-4" />
               Personal
@@ -239,6 +240,10 @@ export default function Devotionals() {
             <TabsTrigger value="church" className="flex items-center gap-2">
               <Church className="h-4 w-4" />
               Church
+            </TabsTrigger>
+            <TabsTrigger value="sms" className="flex items-center gap-2">
+              <MessageSquare className="h-4 w-4" />
+              SMS
             </TabsTrigger>
             <TabsTrigger value="study" className="flex items-center gap-2">
               <Sparkles className="h-4 w-4" />
@@ -248,6 +253,10 @@ export default function Devotionals() {
 
           <TabsContent value="church" className="mt-6">
             <ChurchDevotionalTab onCreateNew={() => setShowChurchWizard(true)} />
+          </TabsContent>
+
+          <TabsContent value="sms" className="mt-6">
+            <SMSRecipientsManager />
           </TabsContent>
 
           <TabsContent value="study" className="mt-6">
