@@ -273,3 +273,6 @@ verify_jwt = false
 
 [functions.sms-webhook]
 verify_jwt = false
+
+[functions.sms-send-devotionals]
+verify_jwt = false
