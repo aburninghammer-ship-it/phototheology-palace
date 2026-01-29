@@ -73,14 +73,16 @@ export function useAIQuota() {
 
     // Fetch current usage without incrementing
     try {
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from('ai_usage_quotas')
         .select('jeeves_calls, image_generations, tts_requests')
         .eq('user_id', user.id)
         .eq('usage_date', new Date().toISOString().split('T')[0])
         .maybeSingle();
+      
+      const usageData = data as { jeeves_calls: number; image_generations: number; tts_requests: number } | null;
 
-      if (error || !data) {
+      if (error || !usageData) {
         return {
           jeeves: { allowed: true, is_premium: false, current_usage: 0, daily_limit: FREE_TIER_LIMITS.jeeves, remaining: FREE_TIER_LIMITS.jeeves },
           image: { allowed: true, is_premium: false, current_usage: 0, daily_limit: FREE_TIER_LIMITS.image, remaining: FREE_TIER_LIMITS.image },
@@ -99,25 +101,25 @@ export function useAIQuota() {
 
       const state: QuotaState = {
         jeeves: {
-          allowed: isPremium || data.jeeves_calls < FREE_TIER_LIMITS.jeeves,
+          allowed: isPremium || usageData.jeeves_calls < FREE_TIER_LIMITS.jeeves,
           is_premium: isPremium,
-          current_usage: data.jeeves_calls,
+          current_usage: usageData.jeeves_calls,
           daily_limit: FREE_TIER_LIMITS.jeeves,
-          remaining: isPremium ? -1 : FREE_TIER_LIMITS.jeeves - data.jeeves_calls,
+          remaining: isPremium ? -1 : FREE_TIER_LIMITS.jeeves - usageData.jeeves_calls,
         },
         image: {
-          allowed: isPremium || data.image_generations < FREE_TIER_LIMITS.image,
+          allowed: isPremium || usageData.image_generations < FREE_TIER_LIMITS.image,
           is_premium: isPremium,
-          current_usage: data.image_generations,
+          current_usage: usageData.image_generations,
           daily_limit: FREE_TIER_LIMITS.image,
-          remaining: isPremium ? -1 : FREE_TIER_LIMITS.image - data.image_generations,
+          remaining: isPremium ? -1 : FREE_TIER_LIMITS.image - usageData.image_generations,
         },
         tts: {
-          allowed: isPremium || data.tts_requests < FREE_TIER_LIMITS.tts,
+          allowed: isPremium || usageData.tts_requests < FREE_TIER_LIMITS.tts,
           is_premium: isPremium,
-          current_usage: data.tts_requests,
+          current_usage: usageData.tts_requests,
           daily_limit: FREE_TIER_LIMITS.tts,
-          remaining: isPremium ? -1 : FREE_TIER_LIMITS.tts - data.tts_requests,
+          remaining: isPremium ? -1 : FREE_TIER_LIMITS.tts - usageData.tts_requests,
         },
       };
 
