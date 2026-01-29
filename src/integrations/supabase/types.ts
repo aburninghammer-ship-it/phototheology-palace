@@ -10393,6 +10393,42 @@ export type Database = {
         }
         Relationships: []
       }
+      quick_devotion_history: {
+        Row: {
+          created_at: string
+          depth_level: string
+          description: string | null
+          devotion_content: string
+          id: string
+          scripture_reference: string | null
+          theme: string
+          user_id: string
+          writing_style: string
+        }
+        Insert: {
+          created_at?: string
+          depth_level: string
+          description?: string | null
+          devotion_content: string
+          id?: string
+          scripture_reference?: string | null
+          theme: string
+          user_id: string
+          writing_style: string
+        }
+        Update: {
+          created_at?: string
+          depth_level?: string
+          description?: string | null
+          devotion_content?: string
+          id?: string
+          scripture_reference?: string | null
+          theme?: string
+          user_id?: string
+          writing_style?: string
+        }
+        Relationships: []
+      }
       rate_limits: {
         Row: {
           created_at: string
