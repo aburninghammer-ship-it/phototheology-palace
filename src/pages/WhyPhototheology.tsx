@@ -1,5 +1,6 @@
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
+import { SEO } from "@/components/SEO";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -136,6 +137,7 @@ export default function WhyPhototheology() {
 
   return (
     <div className="min-h-screen bg-background">
+      <SEO title="Why Phototheology" description="Discover why the Phototheology Palace method transforms Bible study. Compare with traditional apps and see the difference visual, structured learning makes." />
       <Navigation />
 
       {/* Hero Section - The Problem */}

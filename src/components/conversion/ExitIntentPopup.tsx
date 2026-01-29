@@ -5,6 +5,8 @@ import { Input } from "@/components/ui/input";
 import { Gift, BookOpen, Sparkles, X } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
+const STORAGE_KEY = "exitIntentDismissed";
+
 export const ExitIntentPopup = () => {
   const [open, setOpen] = useState(false);
   const [email, setEmail] = useState("");
@@ -12,14 +14,13 @@ export const ExitIntentPopup = () => {
   const [hasShown, setHasShown] = useState(false);
 
   useEffect(() => {
-    // Check if already shown this session
-    if (sessionStorage.getItem("exitIntentShown")) return;
+    // Check if already dismissed permanently (accepted or rejected)
+    if (localStorage.getItem(STORAGE_KEY)) return;
 
     const handleMouseLeave = (e: MouseEvent) => {
       if (e.clientY < 10 && !hasShown) {
         setOpen(true);
         setHasShown(true);
-        sessionStorage.setItem("exitIntentShown", "true");
       }
     };
 
@@ -27,10 +28,22 @@ export const ExitIntentPopup = () => {
     return () => document.removeEventListener("mouseleave", handleMouseLeave);
   }, [hasShown]);
 
+  // Dismiss permanently when closed (whether accepted or rejected)
+  const handleOpenChange = (isOpen: boolean) => {
+    setOpen(isOpen);
+    if (!isOpen) {
+      // User closed the dialog - don't show again
+      localStorage.setItem(STORAGE_KEY, "true");
+    }
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!email.trim()) return;
-    
+
+    // Mark as dismissed permanently
+    localStorage.setItem(STORAGE_KEY, "true");
+
     // Trigger the PDF download
     const link = document.createElement('a');
     link.href = '/guides/phototheology-starter-guide.pdf';
@@ -38,7 +51,7 @@ export const ExitIntentPopup = () => {
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
-    
+
     toast({
       title: "Download Started!",
       description: "Your free Phototheology starter guide is downloading now.",
@@ -47,10 +60,10 @@ export const ExitIntentPopup = () => {
   };
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogContent className="sm:max-w-md">
         <button
-          onClick={() => setOpen(false)}
+          onClick={() => handleOpenChange(false)}
           className="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100"
         >
           <X className="h-4 w-4" />

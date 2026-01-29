@@ -1,5 +1,6 @@
 import { Navigation } from "@/components/Navigation";
 import { Footer } from "@/components/Footer";
+import { SEO } from "@/components/SEO";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -313,6 +314,7 @@ export default function Pricing() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5">
+      <SEO title="Pricing" description="Choose your Phototheology plan. Free, Premium, and Church options for Bible study using the Palace method." />
       <Navigation />
       
       <div className="container mx-auto px-4 pt-24 pb-12">

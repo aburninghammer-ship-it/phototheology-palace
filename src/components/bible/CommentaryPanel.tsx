@@ -157,6 +157,12 @@ const PRINCIPLE_OPTIONS = [
 ];
 
 const COMMENTARY_OPTIONS = [
+  // SDA Commentaries
+  { value: "sop", label: "Spirit of Prophecy (EGW)" },
+  { value: "sdabc", label: "SDA Bible Commentary" },
+  { value: "uriah-smith", label: "Uriah Smith (Daniel & Revelation)" },
+  { value: "jn-andrews", label: "J.N. Andrews (Prophecy)" },
+  // Classic Commentaries
   { value: "clarke", label: "Adam Clarke's Commentary" },
   { value: "barnes", label: "Albert Barnes' Notes" },
   { value: "gill", label: "John Gill's Exposition" },
@@ -168,7 +174,6 @@ const COMMENTARY_OPTIONS = [
   { value: "cambridge", label: "Cambridge Bible for Schools" },
   { value: "ellicott", label: "Ellicott's Commentary" },
   { value: "benson", label: "Benson Commentary" },
-  { value: "sop", label: "Spirit of Prophecy (SOP)" },
 ];
 
 const WORD_LENGTH_OPTIONS = [
@@ -277,7 +282,14 @@ export const CommentaryPanel = ({ book, chapter, verse, verseText, onClose }: Co
         mode = "deep-palace-commentary";
       }
       if (useClassicCommentary) {
-        mode = selectedCommentary === "sop" ? "commentary-sop" : "commentary-classic";
+        // SDA commentaries have their own modes
+        const sdaCommentaryModes: Record<string, string> = {
+          "sop": "commentary-sop",
+          "sdabc": "commentary-sdabc",
+          "uriah-smith": "commentary-uriah-smith",
+          "jn-andrews": "commentary-jn-andrews",
+        };
+        mode = sdaCommentaryModes[selectedCommentary] || "commentary-classic";
       }
 
       const lengthConfig = WORD_LENGTH_OPTIONS.find(l => l.value === deepPalaceLength);
@@ -298,7 +310,7 @@ export const CommentaryPanel = ({ book, chapter, verse, verseText, onClose }: Co
             selectedPrinciples: (analysisMode === "applied" && !refresh && !useClassicCommentary)
               ? selectedPrinciples.map(id => PRINCIPLE_OPTIONS.find(p => p.id === id)?.label)
               : undefined,
-            classicCommentary: useClassicCommentary && selectedCommentary !== "sop" ? selectedCommentary : undefined,
+            classicCommentary: useClassicCommentary && !["sop", "sdabc", "uriah-smith", "jn-andrews"].includes(selectedCommentary) ? selectedCommentary : undefined,
             // Deep Palace specific options
             maxWords: analysisMode === "deep-palace" ? lengthConfig?.maxWords : undefined,
             showHiddenStructure: analysisMode === "deep-palace" ? showHiddenStructure : undefined,

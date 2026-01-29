@@ -2,12 +2,14 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
+import { SEO } from "@/components/SEO";
 
 const TermsOfService = () => {
   const navigate = useNavigate();
 
   return (
     <div className="min-h-screen bg-background">
+      <SEO title="Terms of Service" description="Phototheology terms of service. Review the terms and conditions for using our Bible learning suite." noindex />
       <div className="container max-w-4xl mx-auto px-4 py-8">
         <Button
           variant="ghost"

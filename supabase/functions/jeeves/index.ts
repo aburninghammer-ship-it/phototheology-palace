@@ -2705,13 +2705,303 @@ Ellen G. White does not appear to have written specific commentary on ${book} ${
       const sopContent = sopData.choices?.[0]?.message?.content || "No SOP commentary generated.";
 
       return new Response(
-        JSON.stringify({ 
+        JSON.stringify({
           content: sopContent,
           principlesUsed: ["Spirit of Prophecy (SOP)"]
         }),
         { headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
-    
+
+    } else if (mode === "commentary-sdabc") {
+      // SDA Bible Commentary
+      systemPrompt = `You are Jeeves, a biblical scholar deeply familiar with the Seventh-day Adventist Bible Commentary (SDABC).
+
+**CRITICAL TASK:**
+Provide SDA Bible Commentary-style exposition on ${book} ${chapter}:${verseText.verse}.
+
+**ABOUT THE SDA BIBLE COMMENTARY:**
+The SDABC is a 7-volume verse-by-verse commentary produced by the Seventh-day Adventist Church, known for:
+- Scholarly yet accessible exposition
+- Historical-grammatical interpretation
+- Attention to Hebrew/Greek word meanings
+- Cross-references to other Scripture
+- Connection to the Great Controversy theme
+- Sanctuary typology when relevant
+- Prophetic interpretation aligned with historicist method
+
+**CRITICAL FORMATTING REQUIREMENTS:**
+- Format in clear paragraphs (2-4 sentences each)
+- Separate each paragraph with a blank line
+- Use emojis for visual clarity (📖 💡 ✨ 🔍 ⚓)
+- Include word studies when relevant
+- Reference parallel passages
+- Connect to broader biblical themes
+- Show Christ-centered interpretation
+
+${PALACE_SCHEMA}`;
+
+      userPrompt = `Provide SDA Bible Commentary-style exposition on ${book} ${chapter}:${verseText.verse}
+
+Verse text: "${verseText.text}"
+
+**MANDATORY FORMAT:**
+
+📖 **SDA Bible Commentary**
+
+**Textual Analysis:**
+[2-3 paragraphs analyzing the verse's meaning, including any relevant Hebrew/Greek insights, historical context, and immediate literary context]
+
+**Cross-References:**
+[List 3-5 key parallel passages with brief explanations of their connection]
+
+**Theological Significance:**
+[1-2 paragraphs on the verse's theological importance, including any connection to the Great Controversy theme, sanctuary typology, or prophetic significance]
+
+✨ **Application:**
+[1 paragraph on practical spiritual application]
+
+**CRITICAL RULES:**
+• Write in the scholarly yet accessible style of the SDABC
+• Include word studies where the original language illuminates meaning
+• Connect to the broader narrative of Scripture
+• Maintain SDA theological perspective
+• Do NOT fabricate specific volume/page citations`;
+
+      const sdabcResponse = await fetch(
+        "https://ai.gateway.lovable.dev/v1/chat/completions",
+        {
+          method: "POST",
+          headers: {
+            "Authorization": `Bearer ${LOVABLE_API_KEY}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            model: "google/gemini-2.5-flash",
+            messages: [
+              { role: "system", content: systemPrompt },
+              { role: "user", content: userPrompt },
+            ],
+          }),
+        }
+      );
+
+      if (!sdabcResponse.ok) {
+        const errorText = await sdabcResponse.text();
+        console.error('AI Gateway error:', sdabcResponse.status, errorText);
+        throw new Error(`AI Gateway error: ${sdabcResponse.status}`);
+      }
+
+      const sdabcData = await sdabcResponse.json();
+      const sdabcContent = sdabcData.choices?.[0]?.message?.content || "No SDABC commentary generated.";
+
+      return new Response(
+        JSON.stringify({
+          content: sdabcContent,
+          principlesUsed: ["SDA Bible Commentary"]
+        }),
+        { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+
+    } else if (mode === "commentary-uriah-smith") {
+      // Uriah Smith's Daniel and Revelation
+      const isDanielOrRevelation = book.toLowerCase() === "daniel" || book.toLowerCase() === "revelation";
+
+      systemPrompt = `You are Jeeves, a biblical scholar deeply familiar with Uriah Smith's classic work "Daniel and the Revelation" (1897).
+
+**ABOUT URIAH SMITH:**
+Uriah Smith (1832-1903) was a prominent Seventh-day Adventist theologian and editor. His book "Daniel and the Revelation" is a verse-by-verse exposition of these prophetic books using the historicist method of prophetic interpretation.
+
+**KEY CHARACTERISTICS OF SMITH'S WORK:**
+- Historicist interpretation (prophecies fulfilled through history)
+- Detailed identification of prophetic symbols with historical entities
+- Year-day principle application
+- Connection of Daniel and Revelation's parallel prophecies
+- Focus on end-time events and the Second Coming
+- Clear, systematic exposition
+
+**CRITICAL FORMATTING REQUIREMENTS:**
+- Format in clear paragraphs (2-4 sentences each)
+- Use emojis for visual clarity (📜 🔮 ⚔️ 👑 🕊️)
+- Present Smith's interpretations faithfully
+- Include historical identifications he makes
+- Show prophetic timelines when relevant
+
+${PALACE_SCHEMA}`;
+
+      if (isDanielOrRevelation) {
+        userPrompt = `Provide Uriah Smith's exposition on ${book} ${chapter}:${verseText.verse} from "Daniel and the Revelation"
+
+Verse text: "${verseText.text}"
+
+**MANDATORY FORMAT:**
+
+📜 **Uriah Smith - Daniel and the Revelation**
+
+**Smith's Exposition:**
+[2-3 paragraphs presenting Smith's interpretation of this verse, including his identification of symbols and historical fulfillments]
+
+**Historical Identifications:**
+[List the specific historical entities/events Smith identifies with the prophetic symbols in this passage]
+
+**Prophetic Timeline:**
+[If applicable, show where this fits in Smith's understanding of prophetic chronology]
+
+🔮 **End-Time Significance:**
+[Smith's understanding of how this relates to last-day events]
+
+**CRITICAL RULES:**
+• Present Smith's actual interpretations faithfully
+• Include his historical identifications (beasts = kingdoms, horns = powers, etc.)
+• Show the historicist method in action
+• Connect to parallel prophecies in Daniel/Revelation
+• Note: Smith wrote in the late 1800s, so some historical references reflect that era`;
+      } else {
+        userPrompt = `The user is requesting Uriah Smith's commentary on ${book} ${chapter}:${verseText.verse}.
+
+Note: Uriah Smith's "Daniel and the Revelation" specifically covers only the books of Daniel and Revelation.
+
+**Please respond:**
+
+📜 **Uriah Smith - Daniel and the Revelation**
+
+This commentary specifically covers the prophetic books of **Daniel** and **Revelation** only.
+
+${book} ${chapter}:${verseText.verse} is not within the scope of Smith's work.
+
+💡 **Suggestion:** For this verse, consider using:
+- SDA Bible Commentary (comprehensive verse-by-verse)
+- Spirit of Prophecy (Ellen White's writings)
+- Other classic commentaries available
+
+If you're studying prophetic themes that connect to Daniel or Revelation, Smith's work would be an excellent companion resource for those specific books.`;
+      }
+
+      const smithResponse = await fetch(
+        "https://ai.gateway.lovable.dev/v1/chat/completions",
+        {
+          method: "POST",
+          headers: {
+            "Authorization": `Bearer ${LOVABLE_API_KEY}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            model: "google/gemini-2.5-flash",
+            messages: [
+              { role: "system", content: systemPrompt },
+              { role: "user", content: userPrompt },
+            ],
+          }),
+        }
+      );
+
+      if (!smithResponse.ok) {
+        const errorText = await smithResponse.text();
+        console.error('AI Gateway error:', smithResponse.status, errorText);
+        throw new Error(`AI Gateway error: ${smithResponse.status}`);
+      }
+
+      const smithData = await smithResponse.json();
+      const smithContent = smithData.choices?.[0]?.message?.content || "No Uriah Smith commentary generated.";
+
+      return new Response(
+        JSON.stringify({
+          content: smithContent,
+          principlesUsed: ["Uriah Smith - Daniel and the Revelation"]
+        }),
+        { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+
+    } else if (mode === "commentary-jn-andrews") {
+      // J.N. Andrews Prophecy Commentary
+      systemPrompt = `You are Jeeves, a biblical scholar deeply familiar with the prophetic writings of J.N. Andrews.
+
+**ABOUT J.N. ANDREWS:**
+John Nevins Andrews (1829-1883) was a pioneering Seventh-day Adventist theologian, the first SDA missionary, and a meticulous Bible student. His key works include:
+- "The Sanctuary and the Twenty-Three Hundred Days" (on Daniel 8:14)
+- "The Three Messages of Revelation 14"
+- "History of the Sabbath and First Day of the Week"
+- Various articles on prophetic interpretation
+
+**KEY CHARACTERISTICS OF ANDREWS' WORK:**
+- Precise, scholarly approach
+- Detailed historical research
+- Focus on the sanctuary doctrine
+- Three Angels' Messages exposition
+- Sabbath truth in prophecy
+- Careful textual analysis
+- Historicist prophetic interpretation
+
+**CRITICAL FORMATTING REQUIREMENTS:**
+- Format in clear paragraphs (2-4 sentences each)
+- Use emojis for visual clarity (📚 ⛪ 🕯️ 📖 ✝️)
+- Present Andrews' theological insights
+- Include sanctuary connections when relevant
+- Show prophetic significance
+
+${PALACE_SCHEMA}`;
+
+      userPrompt = `Provide J.N. Andrews-style prophetic exposition on ${book} ${chapter}:${verseText.verse}
+
+Verse text: "${verseText.text}"
+
+**MANDATORY FORMAT:**
+
+📚 **J.N. Andrews - Prophetic Exposition**
+
+**Andrews' Analysis:**
+[2-3 paragraphs presenting how Andrews would interpret this verse, drawing from his theological framework and writing style]
+
+**Sanctuary Connection:**
+[If applicable, how this verse connects to sanctuary typology - a central theme in Andrews' work]
+
+**Prophetic Significance:**
+[Andrews' understanding of prophetic implications, especially relating to the Three Angels' Messages or end-time events]
+
+⛪ **Practical Application:**
+[How Andrews would apply this truth to Christian life and witness]
+
+**CRITICAL RULES:**
+• Write in Andrews' precise, scholarly style
+• Emphasize sanctuary typology where relevant
+• Connect to the Three Angels' Messages when appropriate
+• Show the historicist prophetic framework
+• Focus on themes Andrews emphasized: sanctuary, Sabbath, prophecy, the Advent hope`;
+
+      const andrewsResponse = await fetch(
+        "https://ai.gateway.lovable.dev/v1/chat/completions",
+        {
+          method: "POST",
+          headers: {
+            "Authorization": `Bearer ${LOVABLE_API_KEY}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            model: "google/gemini-2.5-flash",
+            messages: [
+              { role: "system", content: systemPrompt },
+              { role: "user", content: userPrompt },
+            ],
+          }),
+        }
+      );
+
+      if (!andrewsResponse.ok) {
+        const errorText = await andrewsResponse.text();
+        console.error('AI Gateway error:', andrewsResponse.status, errorText);
+        throw new Error(`AI Gateway error: ${andrewsResponse.status}`);
+      }
+
+      const andrewsData = await andrewsResponse.json();
+      const andrewsContent = andrewsData.choices?.[0]?.message?.content || "No J.N. Andrews commentary generated.";
+
+      return new Response(
+        JSON.stringify({
+          content: andrewsContent,
+          principlesUsed: ["J.N. Andrews - Prophetic Exposition"]
+        }),
+        { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+
     } else if (mode === "check-commentary-availability") {
       // Check which classic commentaries have content for this verse
       const commentaryUrls: Record<string, { name: string; searchUrl: string }> = {
@@ -2794,11 +3084,19 @@ Ellen G. White does not appear to have written specific commentary on ${book} ${
         if (result) availableCommentaries.push(result);
       });
 
-      // Always include SOP as available
+      // Always include SDA commentaries as available (AI-generated)
       availableCommentaries.push('sop');
+      availableCommentaries.push('sdabc');
+      availableCommentaries.push('jn-andrews');
+
+      // Uriah Smith only available for Daniel and Revelation
+      const bookLower = book.toLowerCase();
+      if (bookLower === 'daniel' || bookLower === 'revelation') {
+        availableCommentaries.push('uriah-smith');
+      }
 
       return new Response(
-        JSON.stringify({ 
+        JSON.stringify({
           available: availableCommentaries,
           book,
           chapter,
@@ -2809,99 +3107,198 @@ Ellen G. White does not appear to have written specific commentary on ${book} ${
 
     } else if (mode === "commentary-classic") {
       // Map commentators to their StudyLight.org URLs
-      const commentaryUrls: Record<string, { name: string; searchUrl: string }> = {
-        "clarke": { 
+      const commentaryUrls: Record<string, { name: string; searchUrl: string; code: string }> = {
+        "clarke": {
           name: "Adam Clarke's Commentary",
+          code: "acc",
           searchUrl: `https://www.studylight.org/commentaries/eng/acc/${book.toLowerCase().replace(/ /g, '-')}/${chapter}.html`
         },
-        "barnes": { 
+        "barnes": {
           name: "Barnes' Notes on the Bible",
+          code: "bnb",
           searchUrl: `https://www.studylight.org/commentaries/eng/bnb/${book.toLowerCase().replace(/ /g, '-')}/${chapter}.html`
         },
-        "gill": { 
+        "gill": {
           name: "Gill's Exposition of the Bible",
+          code: "geb",
           searchUrl: `https://www.studylight.org/commentaries/eng/geb/${book.toLowerCase().replace(/ /g, '-')}/${chapter}.html`
         },
-        "henry": { 
+        "henry": {
           name: "Matthew Henry's Concise Commentary",
+          code: "mhm",
           searchUrl: `https://www.studylight.org/commentaries/eng/mhm/${book.toLowerCase().replace(/ /g, '-')}/${chapter}.html`
         },
-        "jfb": { 
+        "jfb": {
           name: "Jamieson-Fausset-Brown Bible Commentary",
+          code: "jfb",
           searchUrl: `https://www.studylight.org/commentaries/eng/jfb/${book.toLowerCase().replace(/ /g, '-')}/${chapter}.html`
         },
-        "keil-delitzsch": { 
+        "keil-delitzsch": {
           name: "Keil and Delitzsch Biblical Commentary",
+          code: "kdo",
           searchUrl: `https://www.studylight.org/commentaries/eng/kdo/${book.toLowerCase().replace(/ /g, '-')}/${chapter}.html`
         },
-        "wesley": { 
+        "wesley": {
           name: "Wesley's Explanatory Notes",
+          code: "wen",
           searchUrl: `https://www.studylight.org/commentaries/eng/wen/${book.toLowerCase().replace(/ /g, '-')}/${chapter}.html`
         },
-        "pulpit": { 
+        "pulpit": {
           name: "Pulpit Commentary",
+          code: "tpc",
           searchUrl: `https://www.studylight.org/commentaries/eng/tpc/${book.toLowerCase().replace(/ /g, '-')}/${chapter}.html`
         },
-        "cambridge": { 
+        "cambridge": {
           name: "Cambridge Bible for Schools and Colleges",
+          code: "cbb",
           searchUrl: `https://www.studylight.org/commentaries/eng/cbb/${book.toLowerCase().replace(/ /g, '-')}/${chapter}.html`
         },
-        "ellicott": { 
+        "ellicott": {
           name: "Ellicott's Commentary for English Readers",
+          code: "ebc",
           searchUrl: `https://www.studylight.org/commentaries/eng/ebc/${book.toLowerCase().replace(/ /g, '-')}/${chapter}.html`
         },
-        "benson": { 
+        "benson": {
           name: "Benson Commentary",
+          code: "rbc",
           searchUrl: `https://www.studylight.org/commentaries/eng/rbc/${book.toLowerCase().replace(/ /g, '-')}/${chapter}.html`
         },
-        "sop": { 
+        "sop": {
           name: "Spirit of Prophecy",
+          code: "sop",
           searchUrl: "" // SOP handled separately above
         },
       };
 
       const selectedCommentary = commentaryUrls[classicCommentary] || commentaryUrls["clarke"];
-      
+
+      // Function to extract text from HTML, preserving structure
+      const extractTextFromHtml = (html: string): string => {
+        // Remove script and style tags first
+        let text = html.replace(/<script[^>]*>[\s\S]*?<\/script>/gi, '');
+        text = text.replace(/<style[^>]*>[\s\S]*?<\/style>/gi, '');
+        // Convert <br> to newlines
+        text = text.replace(/<br\s*\/?>/gi, '\n');
+        // Convert </p> and </div> to double newlines for paragraph separation
+        text = text.replace(/<\/p>/gi, '\n\n');
+        text = text.replace(/<\/div>/gi, '\n');
+        // Remove all remaining HTML tags
+        text = text.replace(/<[^>]+>/g, '');
+        // Decode HTML entities
+        text = text.replace(/&nbsp;/g, ' ');
+        text = text.replace(/&amp;/g, '&');
+        text = text.replace(/&lt;/g, '<');
+        text = text.replace(/&gt;/g, '>');
+        text = text.replace(/&quot;/g, '"');
+        text = text.replace(/&#39;/g, "'");
+        text = text.replace(/&mdash;/g, '—');
+        text = text.replace(/&ndash;/g, '–');
+        text = text.replace(/&ldquo;/g, '"');
+        text = text.replace(/&rdquo;/g, '"');
+        text = text.replace(/&lsquo;/g, "'");
+        text = text.replace(/&rsquo;/g, "'");
+        text = text.replace(/&#\d+;/g, (match) => {
+          const code = parseInt(match.replace(/&#|;/g, ''));
+          return String.fromCharCode(code);
+        });
+        // Normalize whitespace
+        text = text.replace(/\n\s*\n\s*\n+/g, '\n\n');
+        text = text.replace(/[ \t]+/g, ' ');
+        return text.trim();
+      };
+
+      // Function to find verse section in StudyLight HTML
+      const findVerseCommentary = (html: string, verseNum: number): string | null => {
+        // StudyLight uses various patterns for verse sections
+        // Pattern 1: Look for anchor links like <a name="verse-17">
+        // Pattern 2: Look for headings like <h3>Verse 17</h3> or <b>Verse 17.</b>
+        // Pattern 3: Look for sections with id like id="verse-17"
+
+        const verseNumStr = String(verseNum);
+
+        // Try to find verse section using various patterns
+        const patterns = [
+          // Pattern: <a name="verse-XX"> to next <a name="verse-YY">
+          new RegExp(`<a[^>]*name=["']verse-${verseNumStr}["'][^>]*>([\\s\\S]*?)(?=<a[^>]*name=["']verse-|$)`, 'i'),
+          // Pattern: id="verse-XX" sections
+          new RegExp(`id=["']verse-${verseNumStr}["'][^>]*>([\\s\\S]*?)(?=id=["']verse-|$)`, 'i'),
+          // Pattern: <h3>Verse XX</h3> or similar headings
+          new RegExp(`<h[1-6][^>]*>\\s*(?:Verse\\s+)?${verseNumStr}[.:]?\\s*</h[1-6]>([\\s\\S]*?)(?=<h[1-6][^>]*>\\s*(?:Verse\\s+)?\\d+|$)`, 'i'),
+          // Pattern: <b>Verse XX.</b> or <strong>XX.</strong>
+          new RegExp(`<(?:b|strong)[^>]*>\\s*(?:Verse\\s+)?${verseNumStr}[.:]?\\s*</(?:b|strong)>([\\s\\S]*?)(?=<(?:b|strong)[^>]*>\\s*(?:Verse\\s+)?\\d+[.:]?\\s*</(?:b|strong)>|$)`, 'i'),
+          // Pattern: entry-body div for specific verse
+          new RegExp(`data-verse=["']${verseNumStr}["'][^>]*>([\\s\\S]*?)</div>`, 'i'),
+          // Pattern: Commentary section with verse number at start (JFB style with verse number in text)
+          new RegExp(`(?:^|[\\n])\\s*${verseNumStr}[.:\\s]+([^\\n]+(?:[\\n](?!\\d+[.:]\\s)[^\\n]*)*)`, 'm'),
+        ];
+
+        for (const pattern of patterns) {
+          const match = html.match(pattern);
+          if (match && match[1]) {
+            const extracted = extractTextFromHtml(match[1]);
+            if (extracted.length > 20) { // Must have substantial content
+              return extracted;
+            }
+          }
+        }
+
+        return null;
+      };
+
       // Fetch the actual webpage
       let webpageContent = "";
+      let extractedCommentary: string | null = null;
+
       try {
         const webResponse = await fetch(selectedCommentary.searchUrl, {
           method: 'GET',
-          headers: { 'User-Agent': 'Mozilla/5.0' }
+          headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36' }
         });
-        
+
         if (webResponse.ok) {
           webpageContent = await webResponse.text();
+          // Try to directly extract the verse commentary
+          extractedCommentary = findVerseCommentary(webpageContent, verseText.verse);
         }
       } catch (error) {
         console.error('Error fetching webpage:', error);
       }
 
-      // Use AI to extract and format the commentary from the web page
-      systemPrompt = `You are a biblical scholar extracting commentary text from a classic Bible commentary webpage.
+      // If we successfully extracted commentary directly, return it
+      if (extractedCommentary && extractedCommentary.length > 50) {
+        return new Response(
+          JSON.stringify({
+            content: extractedCommentary,
+            principlesUsed: [selectedCommentary.name]
+          }),
+          { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
 
-Your task is to:
-1. Find the commentary text for ${book} ${chapter}:${verseText.verse} from the provided webpage content
-2. Extract ONLY the actual words written by the original commentator - do not paraphrase or generate new text
-3. Format it cleanly for reading, preserving the original author's voice and style
+      // Fallback: Use AI to extract, but with STRICT verbatim extraction instructions
+      systemPrompt = `You are a text extraction tool. Your ONLY job is to find and copy text VERBATIM from the provided HTML.
 
-CRITICAL FORMATTING REQUIREMENTS:
-- Do NOT use any markdown formatting (no bold, italics, headings)
-- Do NOT use asterisks (*) anywhere
-- Write in clear paragraphs with blank lines between them
-- Use the bullet character "•" for any lists
-- If the webpage doesn't contain commentary for this specific verse, say "Commentary not available for this verse"
-- ONLY extract and present what the original commentator actually wrote
+CRITICAL RULES:
+1. DO NOT paraphrase, summarize, interpret, or reword anything
+2. DO NOT add your own commentary, analysis, or explanations
+3. COPY THE EXACT TEXT as written by the original commentator
+4. If you cannot find commentary for the specific verse, say ONLY: "Commentary not available for verse ${verseText.verse}"
+5. Preserve the original punctuation, capitalization, and formatting
+6. Include the entire commentary for the verse, not just a summary
 
-Present the actual historical commentary text, preserving the original author's words and perspective.`;
+You are a photocopier, not a writer. Copy the text exactly as it appears.`;
 
-      userPrompt = `Here is the HTML content from ${selectedCommentary.name} for ${book} ${chapter}:
+      userPrompt = `Find and COPY VERBATIM the commentary for ${book} ${chapter}:${verseText.verse} from this ${selectedCommentary.name} HTML:
 
-${webpageContent.slice(0, 50000)}
+${webpageContent.slice(0, 60000)}
 
-Extract the commentary specifically for verse ${verseText.verse}. The verse text is: "${verseText.text}"
+The verse text is: "${verseText.text}"
 
-Find and present the original commentator's words for this specific verse. If you cannot find specific commentary for verse ${verseText.verse}, state clearly that commentary is not available.`;
+INSTRUCTIONS:
+1. Locate the section for verse ${verseText.verse}
+2. Copy the EXACT words from that section - do not rewrite or paraphrase
+3. The output should be a direct quote from the original commentary
+4. If the verse section contains verse numbers or formatting markers, include them as they appear`;
 
       const classicResponse = await fetch(
         "https://ai.gateway.lovable.dev/v1/chat/completions",
@@ -2917,6 +3314,7 @@ Find and present the original commentator's words for this specific verse. If yo
               { role: "system", content: systemPrompt },
               { role: "user", content: userPrompt },
             ],
+            temperature: 0, // Use temperature 0 for more deterministic, literal extraction
           }),
         }
       );
@@ -2928,13 +3326,13 @@ Find and present the original commentator's words for this specific verse. If yo
       }
 
       const classicData = await classicResponse.json();
-      let classicContent = classicData.choices?.[0]?.message?.content || "No commentary generated.";
-      
+      let classicContent = classicData.choices?.[0]?.message?.content || "Commentary not available for this verse.";
+
       // Clean control characters
       classicContent = classicContent.replace(/[\x00-\x1F\x7F-\x9F]/g, '');
 
       return new Response(
-        JSON.stringify({ 
+        JSON.stringify({
           content: classicContent,
           principlesUsed: [selectedCommentary.name]
         }),

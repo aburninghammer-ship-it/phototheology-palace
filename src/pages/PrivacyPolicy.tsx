@@ -2,12 +2,14 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
+import { SEO } from "@/components/SEO";
 
 const PrivacyPolicy = () => {
   const navigate = useNavigate();
 
   return (
     <div className="min-h-screen bg-background">
+      <SEO title="Privacy Policy" description="Phototheology privacy policy. Learn how we collect, use, and protect your personal information." noindex />
       <div className="container max-w-4xl mx-auto px-4 py-8">
         <Button
           variant="ghost"

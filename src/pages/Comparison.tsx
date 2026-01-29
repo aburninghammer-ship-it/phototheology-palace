@@ -1,6 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { Navigation } from "@/components/Navigation";
 import { Footer } from "@/components/Footer";
+import { SEO } from "@/components/SEO";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -228,6 +229,7 @@ export default function Comparison() {
 
   return (
     <div className="min-h-screen bg-background">
+      <SEO title="Compare Bible Apps" description="See how Phototheology compares to Logos, Accordance, ChatGPT, and other Bible study tools. Structured interpretation vs general search." />
       <Navigation />
 
       <main className="container max-w-7xl mx-auto px-4 py-12 md:py-20">

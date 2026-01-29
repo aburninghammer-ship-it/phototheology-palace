@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
+import { SEO } from '@/components/SEO';
 import { motion } from 'framer-motion';
 import { BookOpen, Castle, ChevronRight, AlertTriangle, Heart, Brain, Sword, ArrowLeft, X, Layers, Target } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -419,8 +420,9 @@ const Gatehouse = () => {
 
   return (
     <div className="min-h-screen bg-background">
+      <SEO title="Phototheology Bible Learning Suite" description="Enter the Phototheology Palace. Master Scripture through the 8-floor Palace method — store God's Word as images, patterns, and structures with Christ-centered interpretation." />
       <Navigation />
-      
+
       <main className="container mx-auto px-4 py-12 pt-24 md:pt-28 max-w-4xl">
         {/* The Choice - Header */}
         <motion.div
