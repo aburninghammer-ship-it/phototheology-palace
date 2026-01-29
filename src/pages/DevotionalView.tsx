@@ -13,6 +13,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useDevotionalPlan, useDevotionals } from "@/hooks/useDevotionals";
 import { ShareDevotionalDialog } from "@/components/devotionals/ShareDevotionalDialog";
+import { ExtendDevotionalDialog } from "@/components/devotionals/ExtendDevotionalDialog";
 import { FreeAudioButton } from "@/components/audio/FreeAudioButton";
 import { DevotionalTextHighlighter } from "@/components/devotionals/DevotionalTextHighlighter";
 import { supabase } from "@/integrations/supabase/client";
@@ -689,6 +690,24 @@ export default function DevotionalView() {
                   <ShareDevotionalDialog plan={plan} day={currentDay} />
                 </CardContent>
               </Card>
+
+              {/* Extend this devotional */}
+              {plan?.status === "completed" && (
+                <Card className="border-emerald-200 dark:border-emerald-800 bg-gradient-to-br from-emerald-50 to-teal-50 dark:from-emerald-950/30 dark:to-teal-950/30">
+                  <CardHeader className="pb-2">
+                    <CardTitle className="text-sm flex items-center gap-2 text-emerald-700 dark:text-emerald-300">
+                      <Sparkles className="h-4 w-4" />
+                      Continue Your Journey
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-xs text-muted-foreground mb-2">
+                      Extend this devotional with more days of spiritual growth
+                    </p>
+                    <ExtendDevotionalDialog plan={plan} />
+                  </CardContent>
+                </Card>
+              )}
             </TabsContent>
           </Tabs>
 

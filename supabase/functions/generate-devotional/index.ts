@@ -223,17 +223,21 @@ serve(async (req) => {
       format: body.format 
     }));
     
-    const { 
-      planId, 
-      theme, 
-      format, 
-      duration, 
-      studyStyle, 
+    const {
+      planId,
+      theme,
+      format,
+      duration,
+      studyStyle,
       profileName,
       // CADE fields
       primaryIssue,
       issueDescription,
-      issueSeverity
+      issueSeverity,
+      // Extension fields
+      isExtension = false,
+      startFromDay = 1,
+      existingDuration = 0
     } = body;
 
     capturedPlanId = planId;
@@ -464,9 +468,13 @@ OUTPUT FORMAT - Return a JSON array of devotional days:
       ? `\nPRIMARY STRUGGLE: ${resolvedPrimaryIssue}${resolvedIssueDescription ? ` - ${resolvedIssueDescription}` : ""}`
       : "";
 
-const userPrompt = `Create a ${duration}-day devotional on the theme: "${theme}"
+const extensionNote = isExtension
+      ? `\n\nIMPORTANT: This is an EXTENSION of an existing devotional that had ${existingDuration} days. You are creating days ${startFromDay} through ${startFromDay + duration - 1}. Continue building on the established theme with fresh insights - do not repeat earlier content. Maintain the same spiritual trajectory while exploring new facets of the theme.`
+      : "";
+
+    const userPrompt = `Create a ${duration}-day devotional on the theme: "${theme}"
 Format: ${format}
-Study Style: ${studyStyle}${forPersonNote}${issueNote}${contextNote}
+Study Style: ${studyStyle}${forPersonNote}${issueNote}${contextNote}${extensionNote}
 
 CRITICAL REQUIREMENTS:
 - Use 2-3 Scripture passages that at first appear unrelated, but when placed side by side reveal a coherent and illuminating truth
@@ -683,22 +691,28 @@ Generate as a JSON array with day_number: 1.`;
     
     console.log("Day 1 generated successfully");
 
-    // Clear any existing devotional days for this plan so regeneration doesn't fail
-    console.log("Clearing any existing devotional days for this plan...");
-    const { error: deleteError } = await supabase
-      .from("devotional_days")
-      .delete()
-      .eq("plan_id", planId);
+    // Clear existing days only if NOT extending (extension adds to existing days)
+    if (!isExtension) {
+      console.log("Clearing any existing devotional days for this plan...");
+      const { error: deleteError } = await supabase
+        .from("devotional_days")
+        .delete()
+        .eq("plan_id", planId);
 
-    if (deleteError) {
-      console.error("Delete error while clearing existing days:", deleteError);
-      throw new Error("Failed to reset existing devotional days before regeneration");
+      if (deleteError) {
+        console.error("Delete error while clearing existing days:", deleteError);
+        throw new Error("Failed to reset existing devotional days before regeneration");
+      }
+    } else {
+      console.log("Extension mode: keeping existing days, will append new ones");
     }
 
     console.log("Inserting days into database...");
+    // For extensions, adjust day numbers to continue from existing days
+    const dayOffset = isExtension ? (startFromDay - 1) : 0;
     const daysToInsert = days.map((day: any) => ({
       plan_id: planId,
-      day_number: day.day_number,
+      day_number: day.day_number + dayOffset,
       title: day.title,
       scripture_reference: day.scripture_reference,
       devotional_text: day.devotional_text,
@@ -721,12 +735,27 @@ Generate as a JSON array with day_number: 1.`;
       throw new Error("Failed to save devotional days");
     }
 
-    // Update plan status to active
-    const startedAt = new Date().toISOString();
-    await supabase
-      .from("devotional_plans")
-      .update({ status: "active", started_at: startedAt })
-      .eq("id", planId);
+    // Update plan status
+    if (isExtension) {
+      // For extensions: update duration and ensure status is active
+      const newTotalDuration = existingDuration + duration;
+      console.log(`Extension complete: updating duration from ${existingDuration} to ${newTotalDuration}`);
+      await supabase
+        .from("devotional_plans")
+        .update({
+          status: "active",
+          duration: newTotalDuration,
+          completed_at: null // Clear completed status
+        })
+        .eq("id", planId);
+    } else {
+      // For new plans: set to active with start date
+      const startedAt = new Date().toISOString();
+      await supabase
+        .from("devotional_plans")
+        .update({ status: "active", started_at: startedAt })
+        .eq("id", planId);
+    }
 
     // Get user info for notification
     const { data: planData } = await supabase
@@ -736,23 +765,31 @@ Generate as a JSON array with day_number: 1.`;
       .single();
 
     if (planData) {
-      // Create persistent in-app notification that devotional is ready
+      // Create persistent in-app notification
+      const notificationTitle = isExtension
+        ? "🎉 Devotional Extended!"
+        : "🎉 Your Devotional is Ready!";
+      const notificationMessage = isExtension
+        ? `"${planData.title}" has been extended by ${duration} days. Day ${startFromDay} is now available!`
+        : `"${planData.title}" has been generated. Day 1 is now available!`;
+
       await supabase
         .from("notifications")
         .insert({
           user_id: planData.user_id,
-          type: "devotional_ready",
-          title: "🎉 Your Devotional is Ready!",
-          message: `"${planData.title}" has been generated. Day 1 is now available!`,
+          type: isExtension ? "devotional_extended" : "devotional_ready",
+          title: notificationTitle,
+          message: notificationMessage,
           link: `/devotionals/${planId}`,
           metadata: {
             plan_id: planId,
-            duration: days.length,
+            duration: isExtension ? existingDuration + duration : days.length,
+            extended_by: isExtension ? duration : undefined,
             theme,
           },
         });
-      
-      console.log("Created devotional ready notification for user:", planData.user_id);
+
+      console.log(`Created ${isExtension ? "extension" : "devotional ready"} notification for user:`, planData.user_id);
 
       // Get user email for welcome email
       const { data: userData } = await supabase.auth.admin.getUserById(planData.user_id);

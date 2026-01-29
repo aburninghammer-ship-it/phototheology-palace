@@ -25,6 +25,7 @@ import { QuickDevotion } from "@/components/devotionals/QuickDevotion";
 import { ChurchDevotionalWizard } from "@/components/devotionals/ChurchDevotionalWizard";
 import { ChurchDevotionalTab } from "@/components/devotionals/ChurchDevotionalTab";
 import { SMSRecipientsManager } from "@/components/devotionals/SMSRecipientsManager";
+import { ExtendDevotionalDialog } from "@/components/devotionals/ExtendDevotionalDialog";
 import { useSMSRecipients } from "@/hooks/useSMSRecipients";
 import { Phone } from "lucide-react";
 import {
@@ -625,7 +626,8 @@ export default function Devotionals() {
                       </Badge>
                       <ChevronRight className="h-4 w-4 text-muted-foreground" />
                     </div>
-                    <div className="mt-3 pt-3 border-t">
+                    <div className="mt-3 pt-3 border-t flex gap-2">
+                      <ExtendDevotionalDialog plan={plan} />
                       <ShareDevotionalDialog plan={plan} />
                     </div>
                   </CardContent>

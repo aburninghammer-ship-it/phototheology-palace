@@ -213,13 +213,62 @@ export function useDevotionals() {
     },
   });
 
+  // Extend an existing devotional plan
+  const extendPlan = useMutation({
+    mutationFn: async (params: {
+      planId: string;
+      additionalDays: number;
+      theme: string;
+      format: string;
+      studyStyle: string;
+      existingDuration: number;
+    }) => {
+      const startFromDay = params.existingDuration + 1;
+
+      const { data, error } = await supabase.functions.invoke("generate-devotional", {
+        body: {
+          planId: params.planId,
+          theme: params.theme,
+          format: params.format,
+          duration: params.additionalDays,
+          studyStyle: params.studyStyle,
+          isExtension: true,
+          startFromDay,
+          existingDuration: params.existingDuration,
+        },
+      });
+
+      if (error) throw error;
+      if (data?.error) throw new Error(data.error);
+      return data;
+    },
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: ["devotional-plans"] });
+      queryClient.invalidateQueries({ queryKey: ["devotional-plan", variables.planId] });
+      queryClient.invalidateQueries({ queryKey: ["devotional-days", variables.planId] });
+      toast({
+        title: "Devotional Extended!",
+        description: `Added ${variables.additionalDays} more days to your journey.`,
+      });
+    },
+    onError: (error) => {
+      toast({
+        title: "Extension In Progress",
+        description: error.message || "Your devotional is being extended. Please wait...",
+        variant: "default",
+      });
+    },
+  });
+
   return {
     plans,
     plansLoading,
     createPlan,
     generateDevotional,
+    extendPlan,
     deletePlan,
     isGenerating: generateDevotional.isPending,
+    isExtending: extendPlan.isPending,
   };
 }
 
