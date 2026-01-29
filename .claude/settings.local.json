@@ -74,7 +74,16 @@
       "Bash(pbcopy:*)",
       "Bash(SUPABASE_ACCESS_TOKEN=\"sbp_fe32d3be189beab600f50a27caea50a09e6ef260\" npx supabase db push:*)",
       "Bash(python3 -c:*)",
-      "Bash(node scripts/generate-sitemap.js:*)"
+      "Bash(node scripts/generate-sitemap.js:*)",
+      "Bash(src/hooks/useDevotionalProfiles.ts )",
+      "Bash(src/hooks/useSMSRecipients.ts )",
+      "Bash(src/integrations/supabase/types.ts )",
+      "Bash(src/pages/DevotionalProfileDetail.tsx )",
+      "Bash(src/components/devotionals/SMSRecipientsManager.tsx )",
+      "Bash(supabase/config.toml )",
+      "Bash(supabase/functions/send-daily-devotional/index.ts )",
+      "Bash(supabase/functions/sms-webhook/ )",
+      "Bash(supabase/migrations/20260129200000_sms_devotional_feature.sql)"
     ],
     "deny": [],
     "ask": []

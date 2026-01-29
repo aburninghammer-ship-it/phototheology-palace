@@ -324,6 +324,109 @@ export const ShareDevotionalDialog = ({ plan, day, trigger, isPublicView }: Shar
             </p>
           </div>
 
+          {/* AUTO-SEND SMS - PROMINENT SECTION */}
+          {user && (
+            <div className="p-4 rounded-xl bg-gradient-to-br from-violet-500 to-purple-600 text-white">
+              {!showSMSSetup ? (
+                <div className="text-center">
+                  <div className="flex items-center justify-center gap-2 mb-2">
+                    <Phone className="w-5 h-5" />
+                    <span className="font-bold">Auto-Send Daily Texts</span>
+                  </div>
+                  <p className="text-sm text-violet-100 mb-3">
+                    Automatically send this devotional to someone's phone daily or weekly
+                  </p>
+                  <Button
+                    onClick={() => setShowSMSSetup(true)}
+                    variant="secondary"
+                    className="w-full bg-white text-violet-700 hover:bg-violet-50"
+                  >
+                    <Phone className="w-4 h-4 mr-2" />
+                    Set Up Automated Texts
+                  </Button>
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <Phone className="w-4 h-4" />
+                      <span className="font-medium text-sm">Set Up Auto-Send</span>
+                    </div>
+                    <Button
+                      onClick={() => setShowSMSSetup(false)}
+                      variant="ghost"
+                      size="sm"
+                      className="text-white hover:bg-violet-400/30 h-7 px-2"
+                    >
+                      Cancel
+                    </Button>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label className="text-xs text-violet-100">Recipient Name</Label>
+                    <Input
+                      placeholder="John Smith"
+                      value={smsName}
+                      onChange={(e) => setSmsName(e.target.value)}
+                      className="h-9 bg-white/90 text-gray-900 border-0"
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label className="text-xs text-violet-100">Phone Number</Label>
+                    <div className="flex gap-2">
+                      <Select value={smsCountryCode} onValueChange={setSmsCountryCode}>
+                        <SelectTrigger className="w-24 h-9 bg-white/90 text-gray-900 border-0">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {COUNTRY_CODES.map(cc => (
+                            <SelectItem key={cc.code} value={cc.code}>{cc.label}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <Input
+                        placeholder="555-123-4567"
+                        value={smsPhone}
+                        onChange={(e) => setSmsPhone(e.target.value)}
+                        className="flex-1 h-9 bg-white/90 text-gray-900 border-0"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label className="text-xs text-violet-100">How Often?</Label>
+                    <Select value={smsFrequency} onValueChange={(v) => setSmsFrequency(v as "daily" | "weekly")}>
+                      <SelectTrigger className="h-9 bg-white/90 text-gray-900 border-0">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="daily">Daily - Every day</SelectItem>
+                        <SelectItem value="weekly">Weekly - Once a week</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <Button
+                    onClick={handleSetupAutoSMS}
+                    disabled={isSavingSMS || !smsName.trim() || !smsPhone.trim()}
+                    className="w-full bg-white text-violet-700 hover:bg-violet-50"
+                  >
+                    {isSavingSMS ? (
+                      <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Saving...</>
+                    ) : (
+                      <><Clock className="w-4 h-4 mr-2" /> Start Sending Texts</>
+                    )}
+                  </Button>
+
+                  <p className="text-xs text-violet-200 text-center">
+                    They can reply STOP anytime to unsubscribe
+                  </p>
+                </div>
+              )}
+            </div>
+          )}
+
           {/* Share Link */}
           <div>
             <label className="text-sm font-medium mb-2 block">Share Link</label>
@@ -371,100 +474,6 @@ export const ShareDevotionalDialog = ({ plan, day, trigger, isPublicView }: Shar
             </Button>
           </div>
 
-          {/* Auto-Send SMS Section */}
-          {user && (
-            <div className="pt-4 border-t">
-              {!showSMSSetup ? (
-                <Button
-                  onClick={() => setShowSMSSetup(true)}
-                  variant="outline"
-                  className="w-full gap-2 border-violet-300 hover:bg-violet-50 dark:border-violet-700 dark:hover:bg-violet-950"
-                >
-                  <Phone className="w-4 h-4 text-violet-600" />
-                  <Clock className="w-3 h-3 text-violet-500" />
-                  Set Up Auto-Send SMS
-                </Button>
-              ) : (
-                <div className="space-y-3 p-4 rounded-lg bg-violet-50/50 dark:bg-violet-950/30 border border-violet-200 dark:border-violet-800">
-                  <div className="flex items-center gap-2 mb-2">
-                    <Phone className="w-4 h-4 text-violet-600" />
-                    <span className="font-medium text-sm">Auto-Send to Phone</span>
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label className="text-xs">Recipient Name</Label>
-                    <Input
-                      placeholder="John Smith"
-                      value={smsName}
-                      onChange={(e) => setSmsName(e.target.value)}
-                      className="h-9"
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label className="text-xs">Phone Number</Label>
-                    <div className="flex gap-2">
-                      <Select value={smsCountryCode} onValueChange={setSmsCountryCode}>
-                        <SelectTrigger className="w-24 h-9">
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {COUNTRY_CODES.map(cc => (
-                            <SelectItem key={cc.code} value={cc.code}>{cc.label}</SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      <Input
-                        placeholder="555-123-4567"
-                        value={smsPhone}
-                        onChange={(e) => setSmsPhone(e.target.value)}
-                        className="flex-1 h-9"
-                      />
-                    </div>
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label className="text-xs">Frequency</Label>
-                    <Select value={smsFrequency} onValueChange={(v) => setSmsFrequency(v as "daily" | "weekly")}>
-                      <SelectTrigger className="h-9">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="daily">Daily (every day)</SelectItem>
-                        <SelectItem value="weekly">Weekly (once a week)</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  <div className="flex gap-2 pt-2">
-                    <Button
-                      onClick={handleSetupAutoSMS}
-                      disabled={isSavingSMS || !smsName.trim() || !smsPhone.trim()}
-                      className="flex-1 bg-violet-600 hover:bg-violet-700"
-                      size="sm"
-                    >
-                      {isSavingSMS ? (
-                        <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Saving...</>
-                      ) : (
-                        <><Phone className="w-4 h-4 mr-2" /> Start Auto-Send</>
-                      )}
-                    </Button>
-                    <Button
-                      onClick={() => setShowSMSSetup(false)}
-                      variant="ghost"
-                      size="sm"
-                    >
-                      Cancel
-                    </Button>
-                  </div>
-
-                  <p className="text-xs text-muted-foreground">
-                    They'll receive this devotional via SMS. Reply STOP to unsubscribe.
-                  </p>
-                </div>
-              )}
-            </div>
-          )}
         </div>
       </DialogContent>
     </Dialog>
