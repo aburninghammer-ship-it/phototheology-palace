@@ -16514,6 +16514,7 @@ export type Database = {
       decrypt_token: { Args: { encrypted_token: string }; Returns: string }
       delete_cancelled_user_data: { Args: never; Returns: undefined }
       encrypt_token: { Args: { plain_token: string }; Returns: string }
+      expire_stale_trials: { Args: never; Returns: undefined }
       generate_challenge_share_code: { Args: never; Returns: string }
       generate_guesthouse_access_code: { Args: never; Returns: string }
       generate_profile_invite_token: { Args: never; Returns: string }
