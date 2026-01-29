@@ -3810,11 +3810,6 @@ export type Database = {
           updated_at: string | null
           user_id: string
           warning_flags: string[] | null
-          phone_number: string | null
-          phone_country_code: string | null
-          sms_opt_in: boolean | null
-          last_sms_sent_at: string | null
-          total_sms_sent: number | null
         }
         Insert: {
           active_plan_id?: string | null
@@ -3846,11 +3841,6 @@ export type Database = {
           updated_at?: string | null
           user_id: string
           warning_flags?: string[] | null
-          phone_number?: string | null
-          phone_country_code?: string | null
-          sms_opt_in?: boolean | null
-          last_sms_sent_at?: string | null
-          total_sms_sent?: number | null
         }
         Update: {
           active_plan_id?: string | null
@@ -3882,11 +3872,6 @@ export type Database = {
           updated_at?: string | null
           user_id?: string
           warning_flags?: string[] | null
-          phone_number?: string | null
-          phone_country_code?: string | null
-          sms_opt_in?: boolean | null
-          last_sms_sent_at?: string | null
-          total_sms_sent?: number | null
         }
         Relationships: [
           {
@@ -12625,57 +12610,6 @@ export type Database = {
           },
         ]
       }
-      sms_devotional_recipients: {
-        Row: {
-          id: string
-          user_id: string
-          name: string
-          phone_number: string
-          phone_country_code: string
-          plan_id: string | null
-          is_active: boolean
-          opted_out_at: string | null
-          opt_out_reason: string | null
-          last_sms_sent_at: string | null
-          total_sms_sent: number
-          last_delivery_status: string | null
-          created_at: string
-          updated_at: string
-        }
-        Insert: {
-          id?: string
-          user_id: string
-          name: string
-          phone_number: string
-          phone_country_code?: string
-          plan_id?: string | null
-          is_active?: boolean
-          opted_out_at?: string | null
-          opt_out_reason?: string | null
-          last_sms_sent_at?: string | null
-          total_sms_sent?: number
-          last_delivery_status?: string | null
-          created_at?: string
-          updated_at?: string
-        }
-        Update: {
-          id?: string
-          user_id?: string
-          name?: string
-          phone_number?: string
-          phone_country_code?: string
-          plan_id?: string | null
-          is_active?: boolean
-          opted_out_at?: string | null
-          opt_out_reason?: string | null
-          last_sms_sent_at?: string | null
-          total_sms_sent?: number
-          last_delivery_status?: string | null
-          created_at?: string
-          updated_at?: string
-        }
-        Relationships: []
-      }
       sms_notification_preferences: {
         Row: {
           created_at: string
@@ -12709,69 +12643,6 @@ export type Database = {
           timezone?: string | null
           updated_at?: string
           user_id?: string
-        }
-        Relationships: []
-      }
-      sms_send_log: {
-        Row: {
-          id: string
-          user_id: string | null
-          recipient_type: string
-          recipient_id: string | null
-          phone_number: string
-          plan_id: string | null
-          day_number: number | null
-          message_type: string
-          message_body: string | null
-          twilio_sid: string | null
-          status: string | null
-          error_code: string | null
-          error_message: string | null
-          segments: number
-          price: number | null
-          sent_at: string
-          delivered_at: string | null
-          created_at: string
-        }
-        Insert: {
-          id?: string
-          user_id?: string | null
-          recipient_type: string
-          recipient_id?: string | null
-          phone_number: string
-          plan_id?: string | null
-          day_number?: number | null
-          message_type?: string
-          message_body?: string | null
-          twilio_sid?: string | null
-          status?: string | null
-          error_code?: string | null
-          error_message?: string | null
-          segments?: number
-          price?: number | null
-          sent_at?: string
-          delivered_at?: string | null
-          created_at?: string
-        }
-        Update: {
-          id?: string
-          user_id?: string | null
-          recipient_type?: string
-          recipient_id?: string | null
-          phone_number?: string
-          plan_id?: string | null
-          day_number?: number | null
-          message_type?: string
-          message_body?: string | null
-          twilio_sid?: string | null
-          status?: string | null
-          error_code?: string | null
-          error_message?: string | null
-          segments?: number
-          price?: number | null
-          sent_at?: string
-          delivered_at?: string | null
-          created_at?: string
         }
         Relationships: []
       }
