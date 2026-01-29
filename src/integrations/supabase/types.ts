@@ -3799,11 +3799,14 @@ export type Database = {
           name: string
           pastoral_notes: Json | null
           pastoral_notes_encrypted: string | null
+          phone_country_code: string | null
+          phone_number: string | null
           preferred_rooms: string[] | null
           preferred_themes: string[] | null
           preferred_tone: string | null
           primary_issue: string | null
           relationship: string
+          sms_opt_in: boolean | null
           spiritual_goals: string[] | null
           struggles: string[] | null
           total_devotionals_sent: number | null
@@ -3830,11 +3833,14 @@ export type Database = {
           name: string
           pastoral_notes?: Json | null
           pastoral_notes_encrypted?: string | null
+          phone_country_code?: string | null
+          phone_number?: string | null
           preferred_rooms?: string[] | null
           preferred_themes?: string[] | null
           preferred_tone?: string | null
           primary_issue?: string | null
           relationship: string
+          sms_opt_in?: boolean | null
           spiritual_goals?: string[] | null
           struggles?: string[] | null
           total_devotionals_sent?: number | null
@@ -3861,11 +3867,14 @@ export type Database = {
           name?: string
           pastoral_notes?: Json | null
           pastoral_notes_encrypted?: string | null
+          phone_country_code?: string | null
+          phone_number?: string | null
           preferred_rooms?: string[] | null
           preferred_themes?: string[] | null
           preferred_tone?: string | null
           primary_issue?: string | null
           relationship?: string
+          sms_opt_in?: boolean | null
           spiritual_goals?: string[] | null
           struggles?: string[] | null
           total_devotionals_sent?: number | null
@@ -12610,6 +12619,71 @@ export type Database = {
           },
         ]
       }
+      sms_devotional_recipients: {
+        Row: {
+          created_at: string
+          id: string
+          is_active: boolean
+          last_delivery_status: string | null
+          last_sms_sent_at: string | null
+          name: string
+          opt_out_reason: string | null
+          opted_out_at: string | null
+          phone_country_code: string
+          phone_number: string
+          plan_id: string | null
+          preferred_send_hour: number
+          timezone: string
+          total_sms_sent: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          last_delivery_status?: string | null
+          last_sms_sent_at?: string | null
+          name: string
+          opt_out_reason?: string | null
+          opted_out_at?: string | null
+          phone_country_code?: string
+          phone_number: string
+          plan_id?: string | null
+          preferred_send_hour?: number
+          timezone?: string
+          total_sms_sent?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          last_delivery_status?: string | null
+          last_sms_sent_at?: string | null
+          name?: string
+          opt_out_reason?: string | null
+          opted_out_at?: string | null
+          phone_country_code?: string
+          phone_number?: string
+          plan_id?: string | null
+          preferred_send_hour?: number
+          timezone?: string
+          total_sms_sent?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sms_devotional_recipients_plan_id_fkey"
+            columns: ["plan_id"]
+            isOneToOne: false
+            referencedRelation: "devotional_plans"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       sms_notification_preferences: {
         Row: {
           created_at: string
@@ -12645,6 +12719,77 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      sms_send_log: {
+        Row: {
+          created_at: string
+          day_number: number | null
+          delivered_at: string | null
+          error_code: string | null
+          error_message: string | null
+          id: string
+          message_body: string | null
+          message_type: string
+          phone_number: string
+          plan_id: string | null
+          price: number | null
+          recipient_id: string | null
+          recipient_type: string
+          segments: number
+          sent_at: string
+          status: string | null
+          twilio_sid: string | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          day_number?: number | null
+          delivered_at?: string | null
+          error_code?: string | null
+          error_message?: string | null
+          id?: string
+          message_body?: string | null
+          message_type?: string
+          phone_number: string
+          plan_id?: string | null
+          price?: number | null
+          recipient_id?: string | null
+          recipient_type?: string
+          segments?: number
+          sent_at?: string
+          status?: string | null
+          twilio_sid?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          day_number?: number | null
+          delivered_at?: string | null
+          error_code?: string | null
+          error_message?: string | null
+          id?: string
+          message_body?: string | null
+          message_type?: string
+          phone_number?: string
+          plan_id?: string | null
+          price?: number | null
+          recipient_id?: string | null
+          recipient_type?: string
+          segments?: number
+          sent_at?: string
+          status?: string | null
+          twilio_sid?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sms_send_log_plan_id_fkey"
+            columns: ["plan_id"]
+            isOneToOne: false
+            referencedRelation: "devotional_plans"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       social_media_connections: {
         Row: {
