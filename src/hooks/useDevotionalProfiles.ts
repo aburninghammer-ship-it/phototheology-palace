@@ -97,7 +97,7 @@ export function useDevotionalProfiles() {
         .order("created_at", { ascending: false });
 
       if (error) throw error;
-      return data as DevotionalProfile[];
+      return data as unknown as DevotionalProfile[];
     },
     enabled: !!user?.id,
   });
@@ -138,7 +138,7 @@ export function useDevotionalProfiles() {
         .single();
 
       if (error) throw error;
-      return data as DevotionalProfile;
+      return data as unknown as DevotionalProfile;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["devotional-profiles"] });
@@ -173,7 +173,7 @@ export function useDevotionalProfiles() {
         .single();
 
       if (error) throw error;
-      return data as DevotionalProfile;
+      return data as unknown as DevotionalProfile;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["devotional-profiles"] });
@@ -225,7 +225,7 @@ export function useDevotionalProfile(profileId: string) {
         .single();
 
       if (error) throw error;
-      return data as DevotionalProfile;
+      return data as unknown as DevotionalProfile;
     },
     enabled: !!profileId,
   });

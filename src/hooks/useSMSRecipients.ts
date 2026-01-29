@@ -49,7 +49,7 @@ export function useSMSRecipients(planId?: string) {
   const { data: recipients, isLoading } = useQuery({
     queryKey: ["sms-recipients", user?.id, planId],
     queryFn: async () => {
-      let query = supabase
+      let query = (supabase as any)
         .from("sms_devotional_recipients")
         .select("*")
         .eq("user_id", user?.id)
@@ -70,7 +70,7 @@ export function useSMSRecipients(planId?: string) {
   const { data: sendHistory, isLoading: historyLoading } = useQuery({
     queryKey: ["sms-send-history", user?.id],
     queryFn: async () => {
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from("sms_send_log")
         .select("*")
         .eq("user_id", user?.id)
@@ -94,7 +94,7 @@ export function useSMSRecipients(planId?: string) {
       // Clean phone number (remove formatting)
       const cleanPhone = data.phone_number.replace(/\D/g, '');
 
-      const { data: saved, error } = await supabase
+      const { data: saved, error } = await (supabase as any)
         .from("sms_devotional_recipients")
         .insert({
           user_id: user?.id,
@@ -142,7 +142,7 @@ export function useSMSRecipients(planId?: string) {
         updateData.phone_number = updateData.phone_number.replace(/\D/g, '');
       }
 
-      const { data: updated, error } = await supabase
+      const { data: updated, error } = await (supabase as any)
         .from("sms_devotional_recipients")
         .update(updateData)
         .eq("id", data.id)
@@ -164,7 +164,7 @@ export function useSMSRecipients(planId?: string) {
   // Delete a recipient
   const deleteRecipient = useMutation({
     mutationFn: async (id: string) => {
-      const { error } = await supabase
+      const { error } = await (supabase as any)
         .from("sms_devotional_recipients")
         .delete()
         .eq("id", id);
@@ -183,7 +183,7 @@ export function useSMSRecipients(planId?: string) {
   // Toggle active status
   const toggleActive = useMutation({
     mutationFn: async ({ id, isActive }: { id: string; isActive: boolean }) => {
-      const { error } = await supabase
+      const { error } = await (supabase as any)
         .from("sms_devotional_recipients")
         .update({
           is_active: isActive,

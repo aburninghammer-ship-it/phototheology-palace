@@ -229,7 +229,7 @@ export const ShareDevotionalDialog = ({ plan, day, trigger, isPublicView }: Shar
       const cleanPhone = smsPhone.replace(/\D/g, '');
 
       // Check if this recipient already exists
-      const { data: existing } = await supabase
+      const { data: existing } = await (supabase as any)
         .from("sms_devotional_recipients")
         .select("id")
         .eq("user_id", user.id)
@@ -238,7 +238,7 @@ export const ShareDevotionalDialog = ({ plan, day, trigger, isPublicView }: Shar
 
       if (existing) {
         // Update existing recipient with this plan
-        await supabase
+        await (supabase as any)
           .from("sms_devotional_recipients")
           .update({
             plan_id: plan.id,
@@ -248,7 +248,7 @@ export const ShareDevotionalDialog = ({ plan, day, trigger, isPublicView }: Shar
           .eq("id", existing.id);
       } else {
         // Create new recipient
-        await supabase
+        await (supabase as any)
           .from("sms_devotional_recipients")
           .insert({
             user_id: user.id,
