@@ -8,10 +8,24 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Share2, Copy, Download, Check, Mail, MessageCircle, Gift, Twitter, Facebook } from "lucide-react";
+import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Share2, Copy, Download, Check, Mail, MessageCircle, Gift, Twitter, Facebook, Phone, Clock, Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { DevotionalDay, DevotionalPlan } from "@/hooks/useDevotionals";
 import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/useAuth";
+
+const COUNTRY_CODES = [
+  { code: "+1", label: "US/CA" },
+  { code: "+44", label: "UK" },
+  { code: "+61", label: "AU" },
+  { code: "+91", label: "IN" },
+  { code: "+234", label: "NG" },
+  { code: "+254", label: "KE" },
+  { code: "+27", label: "ZA" },
+  { code: "+63", label: "PH" },
+];
 
 interface ShareDevotionalDialogProps {
   plan: DevotionalPlan;
@@ -25,6 +39,15 @@ export const ShareDevotionalDialog = ({ plan, day, trigger, isPublicView }: Shar
   const [copied, setCopied] = useState(false);
   const [shareToken, setShareToken] = useState(plan.share_token);
   const { toast } = useToast();
+  const { user } = useAuth();
+
+  // SMS Automation state
+  const [showSMSSetup, setShowSMSSetup] = useState(false);
+  const [smsName, setSmsName] = useState("");
+  const [smsPhone, setSmsPhone] = useState("");
+  const [smsCountryCode, setSmsCountryCode] = useState("+1");
+  const [smsFrequency, setSmsFrequency] = useState<"daily" | "weekly">("daily");
+  const [isSavingSMS, setIsSavingSMS] = useState(false);
 
   // Generate share token if it doesn't exist and make plan public
   useEffect(() => {
@@ -191,6 +214,73 @@ export const ShareDevotionalDialog = ({ plan, day, trigger, isPublicView }: Shar
     window.open(`https://api.whatsapp.com/send?text=${text}`, "_blank");
   };
 
+  const handleSetupAutoSMS = async () => {
+    if (!smsName.trim() || !smsPhone.trim() || !user?.id) {
+      toast({
+        title: "Missing Information",
+        description: "Please enter a name and phone number",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsSavingSMS(true);
+    try {
+      const cleanPhone = smsPhone.replace(/\D/g, '');
+
+      // Check if this recipient already exists
+      const { data: existing } = await supabase
+        .from("sms_devotional_recipients")
+        .select("id")
+        .eq("user_id", user.id)
+        .eq("phone_number", cleanPhone)
+        .maybeSingle();
+
+      if (existing) {
+        // Update existing recipient with this plan
+        await supabase
+          .from("sms_devotional_recipients")
+          .update({
+            plan_id: plan.id,
+            is_active: true,
+            opted_out_at: null,
+          })
+          .eq("id", existing.id);
+      } else {
+        // Create new recipient
+        await supabase
+          .from("sms_devotional_recipients")
+          .insert({
+            user_id: user.id,
+            name: smsName.trim(),
+            phone_number: cleanPhone,
+            phone_country_code: smsCountryCode,
+            plan_id: plan.id,
+            is_active: true,
+          });
+      }
+
+      toast({
+        title: "SMS Automation Set Up!",
+        description: `${smsName} will receive ${smsFrequency} devotionals via text`,
+      });
+
+      // Reset form
+      setSmsName("");
+      setSmsPhone("");
+      setShowSMSSetup(false);
+    } catch (error: any) {
+      console.error("Error setting up SMS:", error);
+      toast({
+        title: "Error",
+        description: error.message || "Failed to set up SMS automation",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSavingSMS(false);
+    }
+  };
+
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
@@ -280,6 +370,101 @@ export const ShareDevotionalDialog = ({ plan, day, trigger, isPublicView }: Shar
               Download as Text
             </Button>
           </div>
+
+          {/* Auto-Send SMS Section */}
+          {user && (
+            <div className="pt-4 border-t">
+              {!showSMSSetup ? (
+                <Button
+                  onClick={() => setShowSMSSetup(true)}
+                  variant="outline"
+                  className="w-full gap-2 border-violet-300 hover:bg-violet-50 dark:border-violet-700 dark:hover:bg-violet-950"
+                >
+                  <Phone className="w-4 h-4 text-violet-600" />
+                  <Clock className="w-3 h-3 text-violet-500" />
+                  Set Up Auto-Send SMS
+                </Button>
+              ) : (
+                <div className="space-y-3 p-4 rounded-lg bg-violet-50/50 dark:bg-violet-950/30 border border-violet-200 dark:border-violet-800">
+                  <div className="flex items-center gap-2 mb-2">
+                    <Phone className="w-4 h-4 text-violet-600" />
+                    <span className="font-medium text-sm">Auto-Send to Phone</span>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label className="text-xs">Recipient Name</Label>
+                    <Input
+                      placeholder="John Smith"
+                      value={smsName}
+                      onChange={(e) => setSmsName(e.target.value)}
+                      className="h-9"
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label className="text-xs">Phone Number</Label>
+                    <div className="flex gap-2">
+                      <Select value={smsCountryCode} onValueChange={setSmsCountryCode}>
+                        <SelectTrigger className="w-24 h-9">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {COUNTRY_CODES.map(cc => (
+                            <SelectItem key={cc.code} value={cc.code}>{cc.label}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <Input
+                        placeholder="555-123-4567"
+                        value={smsPhone}
+                        onChange={(e) => setSmsPhone(e.target.value)}
+                        className="flex-1 h-9"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label className="text-xs">Frequency</Label>
+                    <Select value={smsFrequency} onValueChange={(v) => setSmsFrequency(v as "daily" | "weekly")}>
+                      <SelectTrigger className="h-9">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="daily">Daily (every day)</SelectItem>
+                        <SelectItem value="weekly">Weekly (once a week)</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div className="flex gap-2 pt-2">
+                    <Button
+                      onClick={handleSetupAutoSMS}
+                      disabled={isSavingSMS || !smsName.trim() || !smsPhone.trim()}
+                      className="flex-1 bg-violet-600 hover:bg-violet-700"
+                      size="sm"
+                    >
+                      {isSavingSMS ? (
+                        <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Saving...</>
+                      ) : (
+                        <><Phone className="w-4 h-4 mr-2" /> Start Auto-Send</>
+                      )}
+                    </Button>
+                    <Button
+                      onClick={() => setShowSMSSetup(false)}
+                      variant="ghost"
+                      size="sm"
+                    >
+                      Cancel
+                    </Button>
+                  </div>
+
+                  <p className="text-xs text-muted-foreground">
+                    They'll receive this devotional via SMS. Reply STOP to unsubscribe.
+                  </p>
+                </div>
+              )}
+            </div>
+          )}
         </div>
       </DialogContent>
     </Dialog>
