@@ -25,6 +25,8 @@ import { QuickDevotion } from "@/components/devotionals/QuickDevotion";
 import { ChurchDevotionalWizard } from "@/components/devotionals/ChurchDevotionalWizard";
 import { ChurchDevotionalTab } from "@/components/devotionals/ChurchDevotionalTab";
 import { SMSRecipientsManager } from "@/components/devotionals/SMSRecipientsManager";
+import { useSMSRecipients } from "@/hooks/useSMSRecipients";
+import { Phone } from "lucide-react";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -60,6 +62,7 @@ export default function Devotionals() {
   const navigate = useNavigate();
   const { plans, plansLoading, deletePlan } = useDevotionals();
   const { profiles, isLoading: profilesLoading, deleteProfile } = useDevotionalProfiles();
+  const { recipients: smsRecipients } = useSMSRecipients();
   const [showWizard, setShowWizard] = useState(false);
   const [showFriendWizard, setShowFriendWizard] = useState(false);
   const [showProfileWizard, setShowProfileWizard] = useState(false);
@@ -228,6 +231,41 @@ export default function Devotionals() {
             roomName="Devotionals Voice Chat"
             className="mb-4"
           />
+        )}
+
+        {/* SMS Recipients At a Glance */}
+        {user && smsRecipients && smsRecipients.length > 0 && (
+          <Card className="border-violet-200 dark:border-violet-800 bg-gradient-to-r from-violet-50 to-purple-50 dark:from-violet-950/30 dark:to-purple-950/30">
+            <CardContent className="p-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 rounded-full bg-gradient-to-br from-violet-500 to-purple-600">
+                    <Phone className="h-4 w-4 text-white" />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-violet-900 dark:text-violet-100 flex items-center gap-2">
+                      Auto-Text Recipients
+                      <Badge variant="secondary" className="bg-violet-200 text-violet-800 dark:bg-violet-800 dark:text-violet-200">
+                        {smsRecipients.filter(r => r.is_active).length} active
+                      </Badge>
+                    </h3>
+                    <p className="text-sm text-violet-700 dark:text-violet-300">
+                      {smsRecipients.filter(r => r.is_active).slice(0, 3).map(r => r.name).join(", ")}
+                      {smsRecipients.filter(r => r.is_active).length > 3 && ` +${smsRecipients.filter(r => r.is_active).length - 3} more`}
+                    </p>
+                  </div>
+                </div>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setActiveTab("sms")}
+                  className="border-violet-300 text-violet-700 hover:bg-violet-100 dark:border-violet-700 dark:text-violet-300"
+                >
+                  Manage
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
         )}
 
         {/* Tabs for Personal vs Church vs Study */}
