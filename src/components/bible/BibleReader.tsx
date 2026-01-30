@@ -4,7 +4,14 @@ import { fetchChapter, Translation } from "@/services/bibleApi";
 import { Chapter } from "@/types/bible";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ChevronLeft, ChevronRight, BookOpen, Loader2, Link2, MessageSquare, Bot, Bookmark, Sparkles, Upload, Volume2, Headphones, Copy, Check, Flame } from "lucide-react";
+import { ChevronLeft, ChevronRight, BookOpen, Loader2, Link2, MessageSquare, Bot, Bookmark, Sparkles, Upload, Volume2, Headphones, Copy, Check, Flame, MoreHorizontal } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+  DropdownMenuSeparator,
+} from "@/components/ui/dropdown-menu";
 import { toast } from "sonner";
 import { QuickAudioButton } from "@/components/audio";
 import { VerseView } from "./VerseView";
@@ -336,66 +343,24 @@ export const BibleReader = () => {
           )}
         </div>
 
-      {/* Audio Controls */}
+      {/* Compact Toolbar */}
       <div className="flex items-center gap-2 flex-wrap">
+        {/* Study Mode Selector */}
+        <StudyModeSelector activeMode={studyMode} onModeChange={setStudyMode} />
+
+        <div className="h-6 w-px bg-border" />
+
+        {/* Audio */}
         <QuickAudioButton
           text={chapterData.verses.map(v => `Verse ${v.verse}. ${v.text}`).join(' ')}
           variant="outline"
           size="sm"
           className="gap-2"
         />
-      </div>
 
-      {/* Mode Toggles */}
-      <div className="flex gap-2 flex-wrap">
-        <Button
-          variant={strongsMode ? "default" : "outline"}
-          size="sm"
-          onClick={() => {
-            setStrongsMode(!strongsMode);
-            setPrincipleMode(false);
-            setChainReferenceMode(false);
-            setCommentaryMode(false);
-            setJeevesMode(false);
-          }}
-          className={strongsMode ? "bg-gradient-to-r from-amber-600 to-orange-600 text-white shadow-lg" : ""}
-        >
-          <Sparkles className="h-4 w-4 mr-2" />
-          Strong's Numbers
-        </Button>
-        <Button
-          variant={principleMode ? "default" : "outline"}
-          size="sm"
-          onClick={() => {
-            setPrincipleMode(!principleMode);
-            setStrongsMode(false);
-            setChainReferenceMode(false);
-            setCommentaryMode(false);
-            setJeevesMode(false);
-            setSelectedVerses([]);
-            setSelectedVerse(null);
-          }}
-          className={principleMode ? "gradient-palace" : ""}
-        >
-          <BookOpen className="h-4 w-4 mr-2" />
-          Principle Mode {selectedVerses.length > 0 && `(${selectedVerses.length})`}
-        </Button>
-        <Button
-          variant={chainReferenceMode ? "default" : "outline"}
-          size="sm"
-          onClick={() => {
-            setChainReferenceMode(!chainReferenceMode);
-            setStrongsMode(false);
-            setPrincipleMode(false);
-            setCommentaryMode(false);
-            setJeevesMode(false);
-            setHighlightedVerses([]);
-          }}
-          className={chainReferenceMode ? "gradient-palace" : ""}
-        >
-          <Link2 className="h-4 w-4 mr-2" />
-          Links
-        </Button>
+        <div className="h-6 w-px bg-border" />
+
+        {/* Primary Actions */}
         <Button
           variant={commentaryMode ? "default" : "outline"}
           size="sm"
@@ -408,7 +373,7 @@ export const BibleReader = () => {
           className={commentaryMode ? "gradient-ocean" : ""}
         >
           <MessageSquare className="h-4 w-4 mr-2" />
-          Commentary
+          Study
         </Button>
         <Button
           variant={jeevesMode ? "default" : "outline"}
@@ -419,8 +384,7 @@ export const BibleReader = () => {
             setStrongsMode(false);
             setPrincipleMode(false);
             setChainReferenceMode(false);
-            
-            // Scroll to Jeeves section when opening
+
             if (newJeevesMode) {
               setTimeout(() => {
                 jeevesRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -432,35 +396,91 @@ export const BibleReader = () => {
           <Bot className="h-4 w-4 mr-2" />
           Ask Jeeves
         </Button>
-        {selectedVerse && (
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => setImportDialogOpen(true)}
-            className="gradient-palace"
-          >
-            <Upload className="h-4 w-4 mr-2" />
-            Import to Lesson
-          </Button>
-        )}
-        {selectedVerse && (
-          <Button
-            variant={sermonIdeasMode ? "default" : "outline"}
-            size="sm"
-            onClick={() => {
-              setSermonIdeasMode(!sermonIdeasMode);
-              setStrongsMode(false);
-              setPrincipleMode(false);
-              setChainReferenceMode(false);
-              setCommentaryMode(false);
-              setJeevesMode(false);
-            }}
-            className={sermonIdeasMode ? "bg-gradient-to-r from-orange-500 to-red-600 text-white shadow-lg" : ""}
-          >
-            <Flame className="h-4 w-4 mr-2" />
-            Sermon Ideas
-          </Button>
-        )}
+
+        {/* More Tools Dropdown */}
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="outline" size="sm">
+              <MoreHorizontal className="h-4 w-4 mr-2" />
+              More
+              {(strongsMode || principleMode || chainReferenceMode || sermonIdeasMode) && (
+                <span className="ml-1 h-2 w-2 rounded-full bg-primary" />
+              )}
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="w-56">
+            <DropdownMenuItem
+              onClick={() => {
+                setStrongsMode(!strongsMode);
+                setPrincipleMode(false);
+                setChainReferenceMode(false);
+                setCommentaryMode(false);
+                setJeevesMode(false);
+              }}
+              className={strongsMode ? "bg-amber-100 dark:bg-amber-900/30" : ""}
+            >
+              <Sparkles className="h-4 w-4 mr-2" />
+              Strong's Numbers
+              {strongsMode && <Check className="h-4 w-4 ml-auto" />}
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              onClick={() => {
+                setPrincipleMode(!principleMode);
+                setStrongsMode(false);
+                setChainReferenceMode(false);
+                setCommentaryMode(false);
+                setJeevesMode(false);
+                setSelectedVerses([]);
+                setSelectedVerse(null);
+              }}
+              className={principleMode ? "bg-purple-100 dark:bg-purple-900/30" : ""}
+            >
+              <BookOpen className="h-4 w-4 mr-2" />
+              Principle Mode
+              {principleMode && <Check className="h-4 w-4 ml-auto" />}
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              onClick={() => {
+                setChainReferenceMode(!chainReferenceMode);
+                setStrongsMode(false);
+                setPrincipleMode(false);
+                setCommentaryMode(false);
+                setJeevesMode(false);
+                setHighlightedVerses([]);
+              }}
+              className={chainReferenceMode ? "bg-blue-100 dark:bg-blue-900/30" : ""}
+            >
+              <Link2 className="h-4 w-4 mr-2" />
+              Cross References
+              {chainReferenceMode && <Check className="h-4 w-4 ml-auto" />}
+            </DropdownMenuItem>
+
+            {selectedVerse && (
+              <>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={() => setImportDialogOpen(true)}>
+                  <Upload className="h-4 w-4 mr-2" />
+                  Import to Lesson
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  onClick={() => {
+                    setSermonIdeasMode(!sermonIdeasMode);
+                    setStrongsMode(false);
+                    setPrincipleMode(false);
+                    setChainReferenceMode(false);
+                    setCommentaryMode(false);
+                    setJeevesMode(false);
+                  }}
+                  className={sermonIdeasMode ? "bg-orange-100 dark:bg-orange-900/30" : ""}
+                >
+                  <Flame className="h-4 w-4 mr-2" />
+                  Sermon Ideas
+                  {sermonIdeasMode && <Check className="h-4 w-4 ml-auto" />}
+                </DropdownMenuItem>
+              </>
+            )}
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
 
       <ImportPassageDialog
@@ -473,9 +493,6 @@ export const BibleReader = () => {
       <div className="grid lg:grid-cols-3 gap-6">
         {/* Main Reading Pane */}
         <div className="lg:col-span-2 space-y-6">
-          {/* Study Mode */}
-          <StudyModeSelector activeMode={studyMode} onModeChange={setStudyMode} />
-          
           <Card variant="glass" className={`p-6 shadow-elegant hover:shadow-hover transition-smooth ${preferences.reading_mode === 'focus' ? 'max-w-3xl mx-auto' : ''}`}>
             <div className={`space-y-4 ${fontSizeClass}`}>
               {strongsMode ? (

@@ -410,11 +410,9 @@ export const CommentaryPanel = ({ book, chapter, verse, verseText, onClose }: Co
               {book} {chapter}:{verse}
             </CardDescription>
           </div>
-          <div className="flex items-center gap-1">
-            <Button variant="ghost" size="sm" onClick={onClose} className="hover:bg-white/10">
-              <X className="h-4 w-4" />
-            </Button>
-          </div>
+          <Button variant="ghost" size="sm" onClick={onClose} className="hover:bg-white/10">
+            <X className="h-4 w-4" />
+          </Button>
         </div>
       </CardHeader>
 
@@ -682,7 +680,7 @@ export const CommentaryPanel = ({ book, chapter, verse, verseText, onClose }: Co
                   </div>
                 )}
               </div>
-              
+
               <div className="space-y-6">
                 {parseRoomInsights(commentary).map((room, idx) => (
                   <RoomInsightChat
