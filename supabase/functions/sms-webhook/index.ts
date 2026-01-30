@@ -9,11 +9,15 @@ const corsHeaders = {
 /**
  * SMS Webhook Handler
  *
- * Handles incoming SMS messages from Twilio, particularly opt-out keywords.
- * Configure this webhook URL in your Twilio phone number settings.
+ * Handles incoming SMS messages and status callbacks from Twilio.
+ * 
+ * Two webhook types:
+ * 1. Incoming SMS (opt-out keywords: STOP, UNSUBSCRIBE, etc.)
+ * 2. Status callbacks (delivery confirmations/failures)
  *
- * Supported keywords: STOP, UNSUBSCRIBE, CANCEL, QUIT, END
- * Re-subscribe: START, YES, UNSTOP
+ * Configure these webhook URLs in your Twilio phone number settings:
+ * - Messaging webhook: https://[project].supabase.co/functions/v1/sms-webhook
+ * - Status callback: Set in code when sending (or add to number settings)
  */
 
 serve(async (req) => {
@@ -28,11 +32,59 @@ serve(async (req) => {
 
     // Parse Twilio webhook data (form-urlencoded)
     const formData = await req.formData();
+    
+    // Check if this is a status callback or incoming message
+    const messageStatus = formData.get('MessageStatus')?.toString();
+    const messageSid = formData.get('MessageSid')?.toString() || formData.get('SmsSid')?.toString() || '';
+    
+    // STATUS CALLBACK HANDLING
+    if (messageStatus) {
+      console.log(`[SMS Status] SID: ${messageSid}, Status: ${messageStatus}`);
+      
+      const errorCode = formData.get('ErrorCode')?.toString();
+      const errorMessage = formData.get('ErrorMessage')?.toString();
+      
+      // Update the send log with delivery status
+      const updateData: any = {
+        status: messageStatus,
+      };
+      
+      if (messageStatus === 'delivered') {
+        updateData.delivered_at = new Date().toISOString();
+      }
+      
+      if (errorCode) {
+        updateData.error_code = errorCode;
+        updateData.error_message = errorMessage || `Error code: ${errorCode}`;
+        console.log(`[SMS Status] Error: ${errorCode} - ${errorMessage}`);
+      }
+      
+      // Also update recipient's last_delivery_status
+      const { data: logEntry } = await supabase
+        .from('sms_send_log')
+        .update(updateData)
+        .eq('twilio_sid', messageSid)
+        .select('recipient_id, recipient_type')
+        .single();
+      
+      if (logEntry?.recipient_id && logEntry.recipient_type === 'standalone') {
+        await supabase
+          .from('sms_devotional_recipients')
+          .update({ last_delivery_status: messageStatus })
+          .eq('id', logEntry.recipient_id);
+      }
+      
+      // Return empty TwiML (no response needed for status callbacks)
+      return new Response('<?xml version="1.0" encoding="UTF-8"?><Response></Response>', {
+        headers: { ...corsHeaders, "Content-Type": "text/xml" },
+      });
+    }
+
+    // INCOMING MESSAGE HANDLING
     const body = formData.get('Body')?.toString().toUpperCase().trim() || '';
     const from = formData.get('From')?.toString() || '';
-    const messageSid = formData.get('MessageSid')?.toString() || '';
 
-    console.log(`Received SMS from ${from}: "${body}" (SID: ${messageSid})`);
+    console.log(`[SMS Webhook] Received from ${from}: "${body}" (SID: ${messageSid})`);
 
     // Clean phone number (remove country code formatting variations)
     const cleanPhone = from.replace(/^\+/, '').replace(/\D/g, '');
@@ -51,7 +103,7 @@ serve(async (req) => {
 
     if (optOutKeywords.includes(body)) {
       // Opt-out: Update both profile and standalone recipients
-      console.log(`Processing opt-out for ${from}`);
+      console.log(`[SMS Webhook] Processing opt-out for ${from}`);
 
       // Update devotional_profiles
       for (const phoneVariant of phoneVariants) {
@@ -84,12 +136,12 @@ serve(async (req) => {
         status: 'received',
       });
 
-      responseMessage = 'You have been unsubscribed from Phototheology devotionals. Reply START to resubscribe.';
-      console.log(`Opt-out processed for ${from}`);
+      responseMessage = 'You have been unsubscribed. Reply START to resubscribe.';
+      console.log(`[SMS Webhook] Opt-out processed for ${from}`);
 
     } else if (optInKeywords.includes(body)) {
       // Opt-in: Reactivate recipients
-      console.log(`Processing opt-in for ${from}`);
+      console.log(`[SMS Webhook] Processing opt-in for ${from}`);
 
       // Reactivate devotional_profiles
       for (const phoneVariant of phoneVariants) {
@@ -113,13 +165,13 @@ serve(async (req) => {
           .or(`phone_number.eq.${phoneVariant},phone_number.ilike.%${cleanPhone.slice(-10)}`);
       }
 
-      responseMessage = 'Welcome back! You have been resubscribed to Phototheology devotionals. Reply STOP to unsubscribe.';
-      console.log(`Opt-in processed for ${from}`);
+      responseMessage = 'Welcome back! You are resubscribed. Reply STOP to unsubscribe.';
+      console.log(`[SMS Webhook] Opt-in processed for ${from}`);
 
     } else {
       // Unknown message - provide help
-      responseMessage = 'Phototheology Devotionals. Reply STOP to unsubscribe or visit phototheology.app for more.';
-      console.log(`Unknown message from ${from}: ${body}`);
+      responseMessage = 'Reply STOP to unsubscribe or visit phototheology.app';
+      console.log(`[SMS Webhook] Unknown message from ${from}: ${body}`);
     }
 
     // Return TwiML response
@@ -141,7 +193,7 @@ serve(async (req) => {
     // Return error TwiML
     const errorTwiml = `<?xml version="1.0" encoding="UTF-8"?>
 <Response>
-  <Message>Sorry, we encountered an error. Please try again or visit phototheology.app</Message>
+  <Message>Sorry, an error occurred. Visit phototheology.app</Message>
 </Response>`;
 
     return new Response(errorTwiml, {

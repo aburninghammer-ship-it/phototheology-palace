@@ -176,13 +176,13 @@ serve(async (req) => {
           if (dayContent) {
             messageBody = formatDevotionalMessage(recipient.name, dayNumber, dayContent);
           } else {
-            messageBody = `Good morning ${recipient.name}! 📖 Day ${dayNumber} of your devotional journey. May God bless your study today! - Phototheology`;
+            messageBody = `Day ${dayNumber}: Your devotional awaits!\n📖 Open the app to read today's study.\n-PT`;
           }
         }
       }
 
       if (!messageBody) {
-        messageBody = `Good morning ${recipient.name}! 📖 Start your day with God's Word. May He guide your steps today! - Phototheology`;
+        messageBody = `📖 Your daily devotional is ready!\nOpen the app to begin.\n-PT`;
       }
 
       // Send SMS via Twilio
@@ -293,7 +293,7 @@ serve(async (req) => {
       }
 
       if (!messageBody) {
-        messageBody = `Good morning ${profile.name}! 📖 Day ${dayNumber} awaits. May God's Word light your path today! - Phototheology`;
+        messageBody = `Day ${dayNumber}: Your devotional awaits!\n📖 Open the app to read today.\n-PT`;
       }
 
       const phoneNumber = `${profile.phone_country_code || '+1'}${profile.phone_number}`;
@@ -377,26 +377,40 @@ function getHourInTimezone(date: Date, timezone: string): number {
 }
 
 function formatDevotionalMessage(name: string, dayNumber: number, dayContent: any): string {
-  const greeting = getTimeBasedGreeting();
   const scripture = dayContent.scripture_reference || '';
   const theme = dayContent.theme || '';
   
-  // Truncate devotional text to fit SMS (aim for ~300 chars to leave room)
-  let devotionalText = dayContent.devotional_text || '';
-  if (devotionalText.length > 250) {
-    devotionalText = devotionalText.substring(0, 247) + '...';
+  // SHORTENED: Keep under 160 chars (1 segment) to avoid carrier filtering
+  // Format: "Day X: Theme\nScripture\n-PT"
+  let message = `Day ${dayNumber}`;
+  
+  if (theme) {
+    // Truncate theme to ~40 chars
+    const shortTheme = theme.length > 40 ? theme.substring(0, 37) + '...' : theme;
+    message += `: ${shortTheme}`;
   }
-
-  let message = `${greeting} ${name}! 📖\n\nDay ${dayNumber}`;
-  if (theme) message += `: ${theme}`;
-  message += `\n\n`;
-  if (scripture) message += `📜 ${scripture}\n\n`;
-  message += devotionalText;
-  message += `\n\n- Phototheology`;
-
-  // Ensure message fits in reasonable SMS length
-  if (message.length > 450) {
-    message = message.substring(0, 447) + '...';
+  
+  if (scripture) {
+    message += `\n📖 ${scripture}`;
+  }
+  
+  // Add a brief excerpt if space allows (aim for 160 total)
+  let devotionalText = dayContent.devotional_text || '';
+  const remainingChars = 145 - message.length;
+  
+  if (devotionalText && remainingChars > 30) {
+    // Extract first sentence or truncate
+    const firstSentence = devotionalText.split(/[.!?]/)[0];
+    if (firstSentence && firstSentence.length < remainingChars - 5) {
+      message += `\n${firstSentence}.`;
+    }
+  }
+  
+  message += `\n-PT`;
+  
+  // Hard cap at 160 chars (1 SMS segment)
+  if (message.length > 160) {
+    message = message.substring(0, 157) + '...';
   }
 
   return message;
@@ -426,6 +440,10 @@ async function sendTwilioSMS(
   try {
     const url = `https://api.twilio.com/2010-04-01/Accounts/${accountSid}/Messages.json`;
     
+    // Add status callback URL for delivery tracking
+    const supabaseUrl = Deno.env.get('SUPABASE_URL') ?? '';
+    const statusCallbackUrl = `${supabaseUrl}/functions/v1/sms-webhook`;
+    
     const response = await fetch(url, {
       method: 'POST',
       headers: {
@@ -436,6 +454,7 @@ async function sendTwilioSMS(
         To: to,
         From: from,
         Body: body,
+        StatusCallback: statusCallbackUrl,
       }),
     });
 
