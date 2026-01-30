@@ -1,46 +1,193 @@
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useAnalyticsSnapshots, TimeRange } from "@/hooks/useAnalyticsSnapshots";
-import { Loader2, TrendingUp, TrendingDown, Calendar, Users, DollarSign, RefreshCw, CheckCircle, Camera, AlertCircle } from "lucide-react";
-import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, Legend, AreaChart, Area } from "recharts";
-import { format, subDays, eachDayOfInterval } from "date-fns";
+import { supabase } from "@/integrations/supabase/client";
+import {
+  Loader2, TrendingUp, TrendingDown, Calendar, Users, DollarSign, RefreshCw,
+  CheckCircle, Camera, AlertCircle, Eye, MessageSquare, MousePointer,
+  UserPlus, Target, Activity, BarChart3, Clock, Zap
+} from "lucide-react";
+import {
+  LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid,
+  Legend, AreaChart, Area, BarChart, Bar, PieChart, Pie, Cell
+} from "recharts";
+import { format, subDays, parseISO } from "date-fns";
 import { toast } from "sonner";
+
+interface UserEvent {
+  id: string;
+  event_type: string;
+  event_data: Record<string, any> | null;
+  page_path: string | null;
+  created_at: string;
+  user_id: string | null;
+  session_id: string | null;
+}
+
+interface PageViewStat {
+  page_path: string;
+  count: number;
+}
+
+interface EventTypeStat {
+  event_type: string;
+  count: number;
+}
+
+interface DailyEventStat {
+  date: string;
+  count: number;
+}
+
+const CHART_COLORS = [
+  "#8b5cf6", "#3b82f6", "#22c55e", "#f59e0b", "#ef4444",
+  "#ec4899", "#06b6d4", "#84cc16", "#f97316", "#6366f1"
+];
 
 export function AnalyticsDashboard() {
   const {
     snapshots,
-    loading,
-    error,
+    loading: snapshotsLoading,
+    error: snapshotsError,
     timeRange,
     setTimeRange,
-    refetch,
+    refetch: refetchSnapshots,
     recordSnapshot,
     summary,
-  } = useAnalyticsSnapshots("30d");
+  } = useAnalyticsSnapshots("all");
 
   const [isRecording, setIsRecording] = useState(false);
+  const [activeTab, setActiveTab] = useState("overview");
 
-  // Check for missing days in the data
-  const getMissingDays = () => {
-    if (snapshots.length < 2) return [];
+  // User events state
+  const [userEvents, setUserEvents] = useState<UserEvent[]>([]);
+  const [eventTypeStats, setEventTypeStats] = useState<EventTypeStat[]>([]);
+  const [dailyEventStats, setDailyEventStats] = useState<DailyEventStat[]>([]);
+  const [pageViewStats, setPageViewStats] = useState<PageViewStat[]>([]);
+  const [eventsLoading, setEventsLoading] = useState(true);
+  const [totalEvents, setTotalEvents] = useState(0);
+  const [uniqueSessions, setUniqueSessions] = useState(0);
+  const [dateFilter, setDateFilter] = useState<string>("all"); // "all", "7d", "30d", "jan17"
 
-    const dates = snapshots.map(s => new Date(s.snapshot_date));
-    const firstDate = dates[0];
-    const lastDate = dates[dates.length - 1];
+  // Funnel data
+  const [funnelData, setFunnelData] = useState<{step: string; count: number; rate: number}[]>([]);
 
-    const allDays = eachDayOfInterval({ start: firstDate, end: lastDate });
-    const snapshotDates = new Set(snapshots.map(s => s.snapshot_date));
+  // Fetch user events and analytics
+  const fetchUserEvents = useCallback(async () => {
+    setEventsLoading(true);
+    try {
+      // Determine date filter
+      let dateStart: string | null = null;
+      if (dateFilter === "jan17") {
+        dateStart = "2026-01-17";
+      } else if (dateFilter === "7d") {
+        dateStart = format(subDays(new Date(), 7), "yyyy-MM-dd");
+      } else if (dateFilter === "30d") {
+        dateStart = format(subDays(new Date(), 30), "yyyy-MM-dd");
+      }
 
-    return allDays.filter(day => {
-      const dateStr = format(day, "yyyy-MM-dd");
-      return !snapshotDates.has(dateStr);
-    });
-  };
+      // Fetch events
+      let eventsQuery = supabase
+        .from("user_events")
+        .select("*")
+        .order("created_at", { ascending: false })
+        .limit(500);
 
-  const missingDays = getMissingDays();
+      if (dateStart) {
+        eventsQuery = eventsQuery.gte("created_at", dateStart);
+      }
+
+      const { data: events, error: eventsError } = await eventsQuery;
+
+      if (eventsError) throw eventsError;
+      setUserEvents((events as UserEvent[]) || []);
+      setTotalEvents(events?.length || 0);
+
+      // Count unique sessions
+      const sessions = new Set(events?.map(e => e.session_id).filter(Boolean));
+      setUniqueSessions(sessions.size);
+
+      // Calculate event type stats
+      const typeCounts: Record<string, number> = {};
+      events?.forEach(e => {
+        typeCounts[e.event_type] = (typeCounts[e.event_type] || 0) + 1;
+      });
+      const typeStats = Object.entries(typeCounts)
+        .map(([event_type, count]) => ({ event_type, count }))
+        .sort((a, b) => b.count - a.count);
+      setEventTypeStats(typeStats);
+
+      // Calculate daily stats
+      const dailyCounts: Record<string, number> = {};
+      events?.forEach(e => {
+        const date = format(new Date(e.created_at), "yyyy-MM-dd");
+        dailyCounts[date] = (dailyCounts[date] || 0) + 1;
+      });
+      const dailyStats = Object.entries(dailyCounts)
+        .map(([date, count]) => ({ date, count }))
+        .sort((a, b) => a.date.localeCompare(b.date));
+      setDailyEventStats(dailyStats);
+
+      // Fetch page views
+      let pageViewsQuery = supabase
+        .from("page_views")
+        .select("page_path")
+        .order("created_at", { ascending: false })
+        .limit(1000);
+
+      if (dateStart) {
+        pageViewsQuery = pageViewsQuery.gte("created_at", dateStart);
+      }
+
+      const { data: pageViews } = await pageViewsQuery;
+
+      if (pageViews) {
+        const pathCounts: Record<string, number> = {};
+        pageViews.forEach(pv => {
+          pathCounts[pv.page_path] = (pathCounts[pv.page_path] || 0) + 1;
+        });
+        const stats = Object.entries(pathCounts)
+          .map(([page_path, count]) => ({ page_path, count }))
+          .sort((a, b) => b.count - a.count)
+          .slice(0, 20);
+        setPageViewStats(stats);
+      }
+
+      // Calculate funnel data
+      const funnelSteps = [
+        { step: "Signup Started", eventType: "signup_started" },
+        { step: "Signup Completed", eventType: "signup_completed" },
+        { step: "Onboarding Started", eventType: "onboarding_started" },
+        { step: "Tour Started", eventType: "24fps_tour_started" },
+        { step: "Tour Completed", eventType: "24fps_tour_completed" },
+        { step: "First Win", eventType: "first_win_completed" },
+        { step: "Feature Used", eventType: "feature_used" },
+        { step: "Upgrade Clicked", eventType: "upgrade_clicked" },
+        { step: "Purchase Completed", eventType: "purchase_completed" },
+      ];
+
+      const funnel = funnelSteps.map((step, idx) => {
+        const count = typeCounts[step.eventType] || 0;
+        const prevCount = idx > 0 ? (typeCounts[funnelSteps[idx-1].eventType] || 1) : count;
+        const rate = idx === 0 ? 100 : (prevCount > 0 ? Math.round((count / prevCount) * 100) : 0);
+        return { step: step.step, count, rate };
+      });
+      setFunnelData(funnel);
+
+    } catch (err) {
+      console.error("Error fetching user events:", err);
+    } finally {
+      setEventsLoading(false);
+    }
+  }, [dateFilter]);
+
+  useEffect(() => {
+    fetchUserEvents();
+  }, [fetchUserEvents]);
 
   const handleRecordSnapshot = async () => {
     setIsRecording(true);
@@ -58,7 +205,15 @@ export function AnalyticsDashboard() {
     }
   };
 
-  if (loading) {
+  const handleRefresh = () => {
+    refetchSnapshots();
+    fetchUserEvents();
+    toast.success("Analytics refreshed");
+  };
+
+  const loading = snapshotsLoading || eventsLoading;
+
+  if (loading && snapshots.length === 0) {
     return (
       <div className="flex items-center justify-center p-12">
         <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
@@ -66,21 +221,7 @@ export function AnalyticsDashboard() {
     );
   }
 
-  if (error) {
-    return (
-      <Card className="border-red-500/50">
-        <CardContent className="p-6">
-          <p className="text-red-500">Error loading analytics: {error}</p>
-          <Button onClick={refetch} variant="outline" className="mt-4">
-            <RefreshCw className="h-4 w-4 mr-2" />
-            Retry
-          </Button>
-        </CardContent>
-      </Card>
-    );
-  }
-
-  // Format data for charts
+  // Format snapshot data for charts
   const chartData = snapshots.map((s) => ({
     date: format(new Date(s.snapshot_date), "MMM d"),
     fullDate: s.snapshot_date,
@@ -89,7 +230,6 @@ export function AnalyticsDashboard() {
     patreon: s.patreon_active,
     lifetime: s.lifetime_access,
     totalPaying: s.stripe_active + s.patreon_active + s.lifetime_access,
-    total: s.stripe_active + s.stripe_trialing + s.patreon_active + s.lifetime_access,
     mrr: s.mrr_cents / 100,
     users: s.total_users,
     newSignups: s.new_signups_today,
@@ -101,6 +241,13 @@ export function AnalyticsDashboard() {
     { value: "7d", label: "Last 7 Days" },
     { value: "30d", label: "Last 30 Days" },
     { value: "90d", label: "Last 90 Days" },
+    { value: "all", label: "All Time (from Jan 17)" },
+  ];
+
+  const dateFilterOptions = [
+    { value: "jan17", label: "Since Jan 17" },
+    { value: "7d", label: "Last 7 Days" },
+    { value: "30d", label: "Last 30 Days" },
     { value: "all", label: "All Time" },
   ];
 
@@ -110,19 +257,143 @@ export function AnalyticsDashboard() {
       <div className="flex items-center justify-between flex-wrap gap-4">
         <div>
           <h2 className="text-2xl font-bold flex items-center gap-2">
-            <TrendingUp className="h-6 w-6 text-primary" />
-            Analytics Over Time
+            <BarChart3 className="h-6 w-6 text-primary" />
+            Analytics Dashboard
           </h2>
           <p className="text-muted-foreground">
-            Automatic daily snapshots tracking your growth
+            Complete analytics tracking since January 17, 2026
           </p>
         </div>
 
         <div className="flex items-center gap-3">
-          <div className="flex items-center gap-2">
-            <Calendar className="h-4 w-4 text-muted-foreground" />
+          <Badge variant="outline" className="text-sm">
+            {snapshots.length} snapshots | {totalEvents} events
+          </Badge>
+          <Button variant="outline" size="sm" onClick={handleRefresh}>
+            <RefreshCw className="h-4 w-4 mr-2" />
+            Refresh
+          </Button>
+          <Button
+            onClick={handleRecordSnapshot}
+            disabled={isRecording}
+            size="sm"
+            variant="default"
+            className="gap-2"
+          >
+            {isRecording ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : (
+              <Camera className="h-4 w-4" />
+            )}
+            Record Snapshot
+          </Button>
+        </div>
+      </div>
+
+      {/* Quick Stats */}
+      {summary && summary.latestSnapshot && (
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-5">
+          <Card className="border-green-500/20 bg-green-500/5">
+            <CardHeader className="pb-2">
+              <CardDescription className="flex items-center gap-2">
+                <DollarSign className="h-4 w-4" />
+                MRR
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold text-green-600">
+                ${(summary.latestSnapshot.mrr_cents / 100).toFixed(2)}
+              </div>
+              {summary.mrrGrowth !== 0 && (
+                <p className={`text-xs mt-1 flex items-center gap-1 ${summary.mrrGrowth > 0 ? "text-green-600" : "text-red-600"}`}>
+                  {summary.mrrGrowth > 0 ? <TrendingUp className="h-3 w-3" /> : <TrendingDown className="h-3 w-3" />}
+                  {summary.mrrGrowth > 0 ? "+" : ""}${(summary.mrrGrowth / 100).toFixed(2)}
+                </p>
+              )}
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader className="pb-2">
+              <CardDescription className="flex items-center gap-2">
+                <Users className="h-4 w-4" />
+                Active Subs
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{summary.latestSnapshot.stripe_active}</div>
+              {summary.subscriberGrowth !== 0 && (
+                <p className={`text-xs mt-1 ${summary.subscriberGrowth > 0 ? "text-green-600" : "text-red-600"}`}>
+                  {summary.subscriberGrowth > 0 ? "+" : ""}{summary.subscriberGrowth} growth
+                </p>
+              )}
+            </CardContent>
+          </Card>
+
+          <Card className="border-blue-500/20 bg-blue-500/5">
+            <CardHeader className="pb-2">
+              <CardDescription className="flex items-center gap-2">
+                <Clock className="h-4 w-4" />
+                Active Trials
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold text-blue-600">
+                {summary.latestSnapshot.stripe_trialing}
+              </div>
+              <p className="text-xs text-muted-foreground mt-1">Converting</p>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader className="pb-2">
+              <CardDescription className="flex items-center gap-2">
+                <UserPlus className="h-4 w-4" />
+                Total Users
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{summary.latestSnapshot.total_users}</div>
+              {summary.userGrowth !== 0 && (
+                <p className={`text-xs mt-1 ${summary.userGrowth > 0 ? "text-green-600" : "text-red-600"}`}>
+                  {summary.userGrowth > 0 ? "+" : ""}{summary.userGrowth} new
+                </p>
+              )}
+            </CardContent>
+          </Card>
+
+          <Card className="border-purple-500/20 bg-purple-500/5">
+            <CardHeader className="pb-2">
+              <CardDescription className="flex items-center gap-2">
+                <Activity className="h-4 w-4" />
+                Events Tracked
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold text-purple-600">{totalEvents}</div>
+              <p className="text-xs text-muted-foreground mt-1">
+                {uniqueSessions} sessions
+              </p>
+            </CardContent>
+          </Card>
+        </div>
+      )}
+
+      {/* Tabs */}
+      <Tabs value={activeTab} onValueChange={setActiveTab}>
+        <TabsList className="grid w-full grid-cols-5">
+          <TabsTrigger value="overview">Overview</TabsTrigger>
+          <TabsTrigger value="events">User Events</TabsTrigger>
+          <TabsTrigger value="funnel">Funnel</TabsTrigger>
+          <TabsTrigger value="pages">Page Views</TabsTrigger>
+          <TabsTrigger value="snapshots">Raw Data</TabsTrigger>
+        </TabsList>
+
+        {/* Overview Tab */}
+        <TabsContent value="overview" className="space-y-6">
+          <div className="flex justify-end">
             <Select value={timeRange} onValueChange={(v) => setTimeRange(v as TimeRange)}>
-              <SelectTrigger className="w-[140px]">
+              <SelectTrigger className="w-[180px]">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -134,554 +405,367 @@ export function AnalyticsDashboard() {
               </SelectContent>
             </Select>
           </div>
-          <Badge variant="outline" className="text-sm">
-            {snapshots.length} data points
-          </Badge>
-          <Button variant="outline" size="sm" onClick={refetch}>
-            <RefreshCw className="h-4 w-4 mr-2" />
-            Refresh
-          </Button>
-        </div>
-      </div>
 
-      {/* Auto-recording status */}
-      <Card className="border-green-500/30 bg-green-500/5">
-        <CardContent className="py-3 px-4 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <CheckCircle className="h-5 w-5 text-green-500" />
-            <span className="text-sm">
-              <strong>Automatic tracking enabled.</strong> Snapshots are recorded daily at midnight UTC.
-            </span>
-          </div>
-          <Button
-            onClick={handleRecordSnapshot}
-            disabled={isRecording}
-            size="sm"
-            variant="outline"
-            className="gap-2"
-          >
-            {isRecording ? (
-              <Loader2 className="h-4 w-4 animate-spin" />
-            ) : (
-              <Camera className="h-4 w-4" />
-            )}
-            Record Now
-          </Button>
-        </CardContent>
-      </Card>
-
-      {/* Warning if missing days */}
-      {missingDays.length > 0 && (
-        <Card className="border-amber-500/30 bg-amber-500/5">
-          <CardContent className="py-3 px-4 flex items-center gap-3">
-            <AlertCircle className="h-5 w-5 text-amber-500" />
-            <span className="text-sm">
-              <strong>Missing {missingDays.length} day(s) of data.</strong> The cron job may not have run. Click "Record Now" to capture today's snapshot.
-              {missingDays.length <= 5 && (
-                <span className="text-muted-foreground ml-1">
-                  Missing: {missingDays.map(d => format(d, "MMM d")).join(", ")}
-                </span>
-              )}
-            </span>
-          </CardContent>
-        </Card>
-      )}
-
-      {/* Warning if very few data points */}
-      {snapshots.length > 0 && snapshots.length < 3 && (
-        <Card className="border-blue-500/30 bg-blue-500/5">
-          <CardContent className="py-3 px-4 flex items-center gap-3">
-            <Calendar className="h-5 w-5 text-blue-500" />
-            <span className="text-sm">
-              <strong>Limited historical data.</strong> Only {snapshots.length} day(s) recorded so far.
-              Charts will become more useful as more days are collected.
-            </span>
-          </CardContent>
-        </Card>
-      )}
-
-      {/* Growth Summary Cards */}
-      {summary && summary.latestSnapshot && (
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+          {/* Subscriptions Over Time */}
           <Card>
-            <CardHeader className="pb-2">
-              <CardDescription className="flex items-center gap-2">
-                <Users className="h-4 w-4" />
-                Active Subscribers
-              </CardDescription>
+            <CardHeader>
+              <CardTitle>Subscriptions Over Time</CardTitle>
+              <CardDescription>Active subscriptions, trials, and other sources</CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="text-3xl font-bold">{summary.latestSnapshot.stripe_active}</div>
-              {summary.subscriberGrowth !== 0 && (
-                <p className={`text-sm mt-1 flex items-center gap-1 ${summary.subscriberGrowth > 0 ? "text-green-600" : "text-red-600"}`}>
-                  {summary.subscriberGrowth > 0 ? <TrendingUp className="h-3 w-3" /> : <TrendingDown className="h-3 w-3" />}
-                  {summary.subscriberGrowth > 0 ? "+" : ""}{summary.subscriberGrowth} in period
-                </p>
-              )}
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader className="pb-2">
-              <CardDescription className="flex items-center gap-2">
-                <DollarSign className="h-4 w-4" />
-                Monthly Recurring Revenue
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="text-3xl font-bold text-green-600">
-                ${(summary.latestSnapshot.mrr_cents / 100).toFixed(2)}
-              </div>
-              {summary.mrrGrowth !== 0 && (
-                <p className={`text-sm mt-1 flex items-center gap-1 ${summary.mrrGrowth > 0 ? "text-green-600" : "text-red-600"}`}>
-                  {summary.mrrGrowth > 0 ? <TrendingUp className="h-3 w-3" /> : <TrendingDown className="h-3 w-3" />}
-                  {summary.mrrGrowth > 0 ? "+" : ""}${(summary.mrrGrowth / 100).toFixed(2)} in period
-                </p>
-              )}
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader className="pb-2">
-              <CardDescription className="flex items-center gap-2">
-                <Users className="h-4 w-4" />
-                Total Users
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="text-3xl font-bold">{summary.latestSnapshot.total_users}</div>
-              {summary.userGrowth !== 0 && (
-                <p className={`text-sm mt-1 flex items-center gap-1 ${summary.userGrowth > 0 ? "text-green-600" : "text-red-600"}`}>
-                  {summary.userGrowth > 0 ? <TrendingUp className="h-3 w-3" /> : <TrendingDown className="h-3 w-3" />}
-                  {summary.userGrowth > 0 ? "+" : ""}{summary.userGrowth} in period
-                </p>
-              )}
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader className="pb-2">
-              <CardDescription>Active Trials</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="text-3xl font-bold text-blue-600">
-                {summary.latestSnapshot.stripe_trialing}
-              </div>
-              <p className="text-sm text-muted-foreground mt-1">
-                Converting to paid
-              </p>
-            </CardContent>
-          </Card>
-        </div>
-      )}
-
-      {/* Secondary Stats Row */}
-      {summary && summary.latestSnapshot && (
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-          <Card className="border-primary/20 bg-primary/5">
-            <CardHeader className="pb-2">
-              <CardDescription>Current Paying Users</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="text-3xl font-bold text-primary">
-                {summary.latestSnapshot.stripe_active + summary.latestSnapshot.patreon_active + summary.latestSnapshot.lifetime_access}
-              </div>
-              <p className="text-sm text-muted-foreground mt-1">
-                Stripe + Patreon + Lifetime
-              </p>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader className="pb-2">
-              <CardDescription className="flex items-center gap-2">
-                <span className="text-orange-500">🎭</span>
-                Patreon Active
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="text-3xl font-bold text-orange-600">
-                {summary.latestSnapshot.patreon_active}
-              </div>
-              <p className="text-sm text-muted-foreground mt-1">
-                Connected patrons
-              </p>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader className="pb-2">
-              <CardDescription className="flex items-center gap-2">
-                <span className="text-purple-500">💎</span>
-                Lifetime
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="text-3xl font-bold text-purple-600">
-                {summary.latestSnapshot.lifetime_access}
-              </div>
-              <p className="text-sm text-muted-foreground mt-1">
-                Permanent access
-              </p>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader className="pb-2">
-              <CardDescription>New Signups Today</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="text-3xl font-bold">
-                {summary.latestSnapshot.new_signups_today}
-              </div>
-              <p className="text-sm text-muted-foreground mt-1">
-                Latest registrations
-              </p>
-            </CardContent>
-          </Card>
-        </div>
-      )}
-
-      {/* Subscriptions Over Time Chart */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Subscriptions Over Time</CardTitle>
-          <CardDescription>Active subscriptions, trials, patrons, and lifetime access</CardDescription>
-        </CardHeader>
-        <CardContent>
-          {chartData.length > 0 ? (
-            <div className="h-80">
-              <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={chartData}>
-                  <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
-                  <XAxis
-                    dataKey="date"
-                    fontSize={12}
-                    tickLine={false}
-                    axisLine={false}
-                  />
-                  <YAxis
-                    fontSize={12}
-                    tickLine={false}
-                    axisLine={false}
-                  />
-                  <Tooltip
-                    contentStyle={{
-                      backgroundColor: "hsl(var(--background))",
-                      borderColor: "hsl(var(--border))",
-                      borderRadius: "8px",
-                    }}
-                    labelFormatter={(label) => `Date: ${label}`}
-                  />
-                  <Legend />
-                  <Line
-                    type="monotone"
-                    dataKey="active"
-                    name="Active Stripe"
-                    stroke="#22c55e"
-                    strokeWidth={2}
-                    dot={{ fill: "#22c55e", r: 4 }}
-                  />
-                  <Line
-                    type="monotone"
-                    dataKey="trials"
-                    name="Trialing"
-                    stroke="#3b82f6"
-                    strokeWidth={2}
-                    dot={{ fill: "#3b82f6", r: 4 }}
-                  />
-                  <Line
-                    type="monotone"
-                    dataKey="patreon"
-                    name="Patrons"
-                    stroke="#f97316"
-                    strokeWidth={2}
-                    dot={{ fill: "#f97316", r: 4 }}
-                  />
-                  <Line
-                    type="monotone"
-                    dataKey="lifetime"
-                    name="Lifetime"
-                    stroke="#a855f7"
-                    strokeWidth={2}
-                    dot={{ fill: "#a855f7", r: 4 }}
-                  />
-                </LineChart>
-              </ResponsiveContainer>
-            </div>
-          ) : (
-            <div className="h-80 flex items-center justify-center text-muted-foreground">
-              <div className="text-center">
-                <p className="text-lg">No data yet</p>
-                <p className="text-sm mt-1">Snapshots will be recorded automatically each day</p>
-              </div>
-            </div>
-          )}
-        </CardContent>
-      </Card>
-
-      {/* Total Paying Users Over Time Chart */}
-      <Card className="border-primary/20">
-        <CardHeader>
-          <CardTitle>Total Paying Users Over Time</CardTitle>
-          <CardDescription>Stripe Active + Patreon + Lifetime combined</CardDescription>
-        </CardHeader>
-        <CardContent>
-          {chartData.length > 0 ? (
-            <div className="h-64">
-              <ResponsiveContainer width="100%" height="100%">
-                <AreaChart data={chartData}>
-                  <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
-                  <XAxis
-                    dataKey="date"
-                    fontSize={12}
-                    tickLine={false}
-                    axisLine={false}
-                  />
-                  <YAxis
-                    fontSize={12}
-                    tickLine={false}
-                    axisLine={false}
-                  />
-                  <Tooltip
-                    contentStyle={{
-                      backgroundColor: "hsl(var(--background))",
-                      borderColor: "hsl(var(--border))",
-                      borderRadius: "8px",
-                    }}
-                    formatter={(value: number) => [value, "Paying Users"]}
-                  />
-                  <Area
-                    type="monotone"
-                    dataKey="totalPaying"
-                    name="Total Paying"
-                    stroke="hsl(var(--primary))"
-                    fill="hsl(var(--primary))"
-                    fillOpacity={0.2}
-                    strokeWidth={3}
-                  />
-                </AreaChart>
-              </ResponsiveContainer>
-            </div>
-          ) : (
-            <div className="h-64 flex items-center justify-center text-muted-foreground">
-              No data yet
-            </div>
-          )}
-        </CardContent>
-      </Card>
-
-      {/* MRR Over Time Chart */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Monthly Recurring Revenue</CardTitle>
-          <CardDescription>MRR growth over time</CardDescription>
-        </CardHeader>
-        <CardContent>
-          {chartData.length > 0 ? (
-            <div className="h-64">
-              <ResponsiveContainer width="100%" height="100%">
-                <AreaChart data={chartData}>
-                  <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
-                  <XAxis
-                    dataKey="date"
-                    fontSize={12}
-                    tickLine={false}
-                    axisLine={false}
-                  />
-                  <YAxis
-                    fontSize={12}
-                    tickLine={false}
-                    axisLine={false}
-                    tickFormatter={(value) => `$${value}`}
-                  />
-                  <Tooltip
-                    contentStyle={{
-                      backgroundColor: "hsl(var(--background))",
-                      borderColor: "hsl(var(--border))",
-                      borderRadius: "8px",
-                    }}
-                    formatter={(value: number) => [`$${value.toFixed(2)}`, "MRR"]}
-                  />
-                  <Area
-                    type="monotone"
-                    dataKey="mrr"
-                    name="MRR"
-                    stroke="#22c55e"
-                    fill="#22c55e"
-                    fillOpacity={0.2}
-                    strokeWidth={2}
-                  />
-                </AreaChart>
-              </ResponsiveContainer>
-            </div>
-          ) : (
-            <div className="h-64 flex items-center justify-center text-muted-foreground">
-              No data yet
-            </div>
-          )}
-        </CardContent>
-      </Card>
-
-      {/* Tier Breakdown Over Time */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Subscription Tiers</CardTitle>
-          <CardDescription>Essential vs Premium breakdown</CardDescription>
-        </CardHeader>
-        <CardContent>
-          {chartData.length > 0 ? (
-            <div className="h-64">
-              <ResponsiveContainer width="100%" height="100%">
-                <AreaChart data={chartData}>
-                  <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
-                  <XAxis
-                    dataKey="date"
-                    fontSize={12}
-                    tickLine={false}
-                    axisLine={false}
-                  />
-                  <YAxis
-                    fontSize={12}
-                    tickLine={false}
-                    axisLine={false}
-                  />
-                  <Tooltip
-                    contentStyle={{
-                      backgroundColor: "hsl(var(--background))",
-                      borderColor: "hsl(var(--border))",
-                      borderRadius: "8px",
-                    }}
-                  />
-                  <Legend />
-                  <Area
-                    type="monotone"
-                    dataKey="premium"
-                    name="Premium"
-                    stackId="1"
-                    stroke="#9333ea"
-                    fill="#9333ea"
-                    fillOpacity={0.6}
-                  />
-                  <Area
-                    type="monotone"
-                    dataKey="essential"
-                    name="Essential"
-                    stackId="1"
-                    stroke="#3b82f6"
-                    fill="#3b82f6"
-                    fillOpacity={0.6}
-                  />
-                </AreaChart>
-              </ResponsiveContainer>
-            </div>
-          ) : (
-            <div className="h-64 flex items-center justify-center text-muted-foreground">
-              No data yet
-            </div>
-          )}
-        </CardContent>
-      </Card>
-
-      {/* User Growth Over Time */}
-      <Card>
-        <CardHeader>
-          <CardTitle>User Growth</CardTitle>
-          <CardDescription>Total registered users over time</CardDescription>
-        </CardHeader>
-        <CardContent>
-          {chartData.length > 0 ? (
-            <div className="h-64">
-              <ResponsiveContainer width="100%" height="100%">
-                <AreaChart data={chartData}>
-                  <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
-                  <XAxis
-                    dataKey="date"
-                    fontSize={12}
-                    tickLine={false}
-                    axisLine={false}
-                  />
-                  <YAxis
-                    fontSize={12}
-                    tickLine={false}
-                    axisLine={false}
-                  />
-                  <Tooltip
-                    contentStyle={{
-                      backgroundColor: "hsl(var(--background))",
-                      borderColor: "hsl(var(--border))",
-                      borderRadius: "8px",
-                    }}
-                    formatter={(value: number) => [value, "Users"]}
-                  />
-                  <Area
-                    type="monotone"
-                    dataKey="users"
-                    name="Total Users"
-                    stroke="#6366f1"
-                    fill="#6366f1"
-                    fillOpacity={0.2}
-                    strokeWidth={2}
-                  />
-                </AreaChart>
-              </ResponsiveContainer>
-            </div>
-          ) : (
-            <div className="h-64 flex items-center justify-center text-muted-foreground">
-              No data yet
-            </div>
-          )}
-        </CardContent>
-      </Card>
-
-      {/* Raw Data Table */}
-      {snapshots.length > 0 && (
-        <Card>
-          <CardHeader>
-            <CardTitle>Raw Snapshot Data</CardTitle>
-            <CardDescription>All recorded daily snapshots</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="rounded-md border overflow-x-auto">
-              <table className="w-full text-sm">
-                <thead>
-                  <tr className="border-b bg-muted/50">
-                    <th className="text-left p-3 font-medium">Date</th>
-                    <th className="text-right p-3 font-medium">Stripe Active</th>
-                    <th className="text-right p-3 font-medium">7-Day Trials</th>
-                    <th className="text-right p-3 font-medium">Patreon</th>
-                    <th className="text-right p-3 font-medium">Lifetime</th>
-                    <th className="text-right p-3 font-medium">Total Paying</th>
-                    <th className="text-right p-3 font-medium">MRR</th>
-                    <th className="text-right p-3 font-medium">Users</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {snapshots.slice().reverse().slice(0, 30).map((s) => (
-                    <tr key={s.id} className="border-b">
-                      <td className="p-3 font-mono">
-                        {format(new Date(s.snapshot_date), "MMM d, yyyy")}
-                      </td>
-                      <td className="p-3 text-right text-green-600 font-medium">{s.stripe_active}</td>
-                      <td className="p-3 text-right text-blue-600">{s.stripe_trialing}</td>
-                      <td className="p-3 text-right text-orange-600">{s.patreon_active}</td>
-                      <td className="p-3 text-right text-purple-600">{s.lifetime_access}</td>
-                      <td className="p-3 text-right font-bold text-primary">{s.stripe_active + s.patreon_active + s.lifetime_access}</td>
-                      <td className="p-3 text-right font-mono">${(s.mrr_cents / 100).toFixed(2)}</td>
-                      <td className="p-3 text-right">{s.total_users}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-              {snapshots.length > 30 && (
-                <div className="p-2 text-center text-sm text-muted-foreground border-t">
-                  Showing 30 of {snapshots.length} snapshots
+              {chartData.length > 0 ? (
+                <div className="h-80">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <LineChart data={chartData}>
+                      <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
+                      <XAxis dataKey="date" fontSize={12} tickLine={false} axisLine={false} />
+                      <YAxis fontSize={12} tickLine={false} axisLine={false} />
+                      <Tooltip
+                        contentStyle={{
+                          backgroundColor: "hsl(var(--background))",
+                          borderColor: "hsl(var(--border))",
+                          borderRadius: "8px",
+                        }}
+                      />
+                      <Legend />
+                      <Line type="monotone" dataKey="active" name="Active Stripe" stroke="#22c55e" strokeWidth={2} dot={{ fill: "#22c55e", r: 3 }} />
+                      <Line type="monotone" dataKey="trials" name="Trialing" stroke="#3b82f6" strokeWidth={2} dot={{ fill: "#3b82f6", r: 3 }} />
+                      <Line type="monotone" dataKey="patreon" name="Patrons" stroke="#f97316" strokeWidth={2} dot={{ fill: "#f97316", r: 3 }} />
+                      <Line type="monotone" dataKey="lifetime" name="Lifetime" stroke="#a855f7" strokeWidth={2} dot={{ fill: "#a855f7", r: 3 }} />
+                    </LineChart>
+                  </ResponsiveContainer>
+                </div>
+              ) : (
+                <div className="h-80 flex items-center justify-center text-muted-foreground">
+                  No snapshot data available
                 </div>
               )}
-            </div>
-          </CardContent>
-        </Card>
-      )}
+            </CardContent>
+          </Card>
+
+          {/* MRR Chart */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Monthly Recurring Revenue</CardTitle>
+              <CardDescription>MRR growth over time</CardDescription>
+            </CardHeader>
+            <CardContent>
+              {chartData.length > 0 ? (
+                <div className="h-64">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <AreaChart data={chartData}>
+                      <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
+                      <XAxis dataKey="date" fontSize={12} tickLine={false} axisLine={false} />
+                      <YAxis fontSize={12} tickLine={false} axisLine={false} tickFormatter={(value) => `$${value}`} />
+                      <Tooltip
+                        contentStyle={{ backgroundColor: "hsl(var(--background))", borderColor: "hsl(var(--border))", borderRadius: "8px" }}
+                        formatter={(value: number) => [`$${value.toFixed(2)}`, "MRR"]}
+                      />
+                      <Area type="monotone" dataKey="mrr" name="MRR" stroke="#22c55e" fill="#22c55e" fillOpacity={0.2} strokeWidth={2} />
+                    </AreaChart>
+                  </ResponsiveContainer>
+                </div>
+              ) : (
+                <div className="h-64 flex items-center justify-center text-muted-foreground">
+                  No data yet
+                </div>
+              )}
+            </CardContent>
+          </Card>
+
+          {/* User Growth */}
+          <Card>
+            <CardHeader>
+              <CardTitle>User Growth</CardTitle>
+              <CardDescription>Total registered users over time</CardDescription>
+            </CardHeader>
+            <CardContent>
+              {chartData.length > 0 ? (
+                <div className="h-64">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <AreaChart data={chartData}>
+                      <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
+                      <XAxis dataKey="date" fontSize={12} tickLine={false} axisLine={false} />
+                      <YAxis fontSize={12} tickLine={false} axisLine={false} />
+                      <Tooltip
+                        contentStyle={{ backgroundColor: "hsl(var(--background))", borderColor: "hsl(var(--border))", borderRadius: "8px" }}
+                      />
+                      <Area type="monotone" dataKey="users" name="Total Users" stroke="#6366f1" fill="#6366f1" fillOpacity={0.2} strokeWidth={2} />
+                    </AreaChart>
+                  </ResponsiveContainer>
+                </div>
+              ) : (
+                <div className="h-64 flex items-center justify-center text-muted-foreground">
+                  No data yet
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        {/* User Events Tab */}
+        <TabsContent value="events" className="space-y-6">
+          <div className="flex justify-between items-center">
+            <h3 className="text-lg font-semibold">User Event Tracking</h3>
+            <Select value={dateFilter} onValueChange={setDateFilter}>
+              <SelectTrigger className="w-[180px]">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {dateFilterOptions.map((opt) => (
+                  <SelectItem key={opt.value} value={opt.value}>
+                    {opt.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="grid gap-4 md:grid-cols-2">
+            {/* Event Types Distribution */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Zap className="h-5 w-5" />
+                  Event Types
+                </CardTitle>
+                <CardDescription>Distribution of tracked events</CardDescription>
+              </CardHeader>
+              <CardContent>
+                {eventTypeStats.length > 0 ? (
+                  <div className="h-80">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <BarChart data={eventTypeStats.slice(0, 10)} layout="vertical">
+                        <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
+                        <XAxis type="number" fontSize={12} />
+                        <YAxis dataKey="event_type" type="category" width={120} fontSize={11} tickFormatter={(v) => v.replace(/_/g, ' ').slice(0, 15)} />
+                        <Tooltip />
+                        <Bar dataKey="count" fill="#8b5cf6" radius={[0, 4, 4, 0]} />
+                      </BarChart>
+                    </ResponsiveContainer>
+                  </div>
+                ) : (
+                  <div className="h-80 flex items-center justify-center text-muted-foreground">
+                    No events recorded
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+
+            {/* Daily Events */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Calendar className="h-5 w-5" />
+                  Daily Activity
+                </CardTitle>
+                <CardDescription>Events per day</CardDescription>
+              </CardHeader>
+              <CardContent>
+                {dailyEventStats.length > 0 ? (
+                  <div className="h-80">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <AreaChart data={dailyEventStats}>
+                        <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
+                        <XAxis dataKey="date" fontSize={10} tickFormatter={(d) => format(parseISO(d), "M/d")} />
+                        <YAxis fontSize={12} />
+                        <Tooltip labelFormatter={(d) => format(parseISO(d as string), "MMM d, yyyy")} />
+                        <Area type="monotone" dataKey="count" stroke="#3b82f6" fill="#3b82f6" fillOpacity={0.3} />
+                      </AreaChart>
+                    </ResponsiveContainer>
+                  </div>
+                ) : (
+                  <div className="h-80 flex items-center justify-center text-muted-foreground">
+                    No daily data
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Recent Events Table */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Recent Events</CardTitle>
+              <CardDescription>Last 50 tracked events</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="rounded-md border overflow-x-auto max-h-96 overflow-y-auto">
+                <table className="w-full text-sm">
+                  <thead className="sticky top-0 bg-background">
+                    <tr className="border-b bg-muted/50">
+                      <th className="text-left p-3 font-medium">Time</th>
+                      <th className="text-left p-3 font-medium">Event Type</th>
+                      <th className="text-left p-3 font-medium">Page</th>
+                      <th className="text-left p-3 font-medium">Details</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {userEvents.slice(0, 50).map((event) => (
+                      <tr key={event.id} className="border-b hover:bg-muted/50">
+                        <td className="p-3 font-mono text-xs whitespace-nowrap">
+                          {format(new Date(event.created_at), "MMM d, h:mm a")}
+                        </td>
+                        <td className="p-3">
+                          <Badge variant="outline" className="font-mono text-xs">
+                            {event.event_type}
+                          </Badge>
+                        </td>
+                        <td className="p-3 text-muted-foreground text-xs max-w-40 truncate">
+                          {event.page_path || "-"}
+                        </td>
+                        <td className="p-3 text-xs text-muted-foreground max-w-60 truncate">
+                          {event.event_data ? JSON.stringify(event.event_data) : "-"}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        {/* Funnel Tab */}
+        <TabsContent value="funnel" className="space-y-6">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Target className="h-5 w-5" />
+                Conversion Funnel
+              </CardTitle>
+              <CardDescription>User journey from signup to purchase</CardDescription>
+            </CardHeader>
+            <CardContent>
+              {funnelData.length > 0 && funnelData.some(f => f.count > 0) ? (
+                <>
+                  <div className="h-80">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <BarChart data={funnelData} layout="vertical">
+                        <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
+                        <XAxis type="number" fontSize={12} />
+                        <YAxis dataKey="step" type="category" width={140} fontSize={11} />
+                        <Tooltip formatter={(value: number) => [value, 'Users']} />
+                        <Bar dataKey="count" fill="#8b5cf6" radius={[0, 4, 4, 0]}>
+                          {funnelData.map((_, index) => (
+                            <Cell key={`cell-${index}`} fill={CHART_COLORS[index % CHART_COLORS.length]} />
+                          ))}
+                        </Bar>
+                      </BarChart>
+                    </ResponsiveContainer>
+                  </div>
+
+                  <div className="mt-6 grid grid-cols-3 md:grid-cols-5 gap-3">
+                    {funnelData.filter(f => f.count > 0).map((step, i) => (
+                      <div key={step.step} className="p-3 rounded-lg bg-muted/50 text-center">
+                        <div className="text-xl font-bold">{step.count}</div>
+                        <div className="text-xs text-muted-foreground truncate">{step.step}</div>
+                        {i > 0 && step.rate < 100 && (
+                          <Badge variant={step.rate > 50 ? "default" : "destructive"} className="mt-1 text-xs">
+                            {step.rate}% conv
+                          </Badge>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </>
+              ) : (
+                <div className="h-80 flex items-center justify-center text-muted-foreground flex-col gap-2">
+                  <Target className="h-12 w-12 opacity-20" />
+                  <p>No funnel data available yet</p>
+                  <p className="text-xs">Events will appear as users progress through the app</p>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        {/* Page Views Tab */}
+        <TabsContent value="pages" className="space-y-6">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Eye className="h-5 w-5" />
+                Top Pages
+              </CardTitle>
+              <CardDescription>Most visited pages</CardDescription>
+            </CardHeader>
+            <CardContent>
+              {pageViewStats.length > 0 ? (
+                <div className="h-96">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <BarChart data={pageViewStats} layout="vertical">
+                      <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
+                      <XAxis type="number" fontSize={12} />
+                      <YAxis dataKey="page_path" type="category" width={200} fontSize={10} tickFormatter={(v) => v.length > 30 ? v.slice(0, 30) + '...' : v} />
+                      <Tooltip />
+                      <Bar dataKey="count" fill="#22c55e" radius={[0, 4, 4, 0]} />
+                    </BarChart>
+                  </ResponsiveContainer>
+                </div>
+              ) : (
+                <div className="h-96 flex items-center justify-center text-muted-foreground">
+                  No page view data
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        {/* Raw Data Tab */}
+        <TabsContent value="snapshots" className="space-y-6">
+          <Card>
+            <CardHeader>
+              <CardTitle>Raw Snapshot Data</CardTitle>
+              <CardDescription>All recorded daily snapshots since January 17, 2026</CardDescription>
+            </CardHeader>
+            <CardContent>
+              {snapshots.length > 0 ? (
+                <div className="rounded-md border overflow-x-auto max-h-[600px] overflow-y-auto">
+                  <table className="w-full text-sm">
+                    <thead className="sticky top-0 bg-background">
+                      <tr className="border-b bg-muted/50">
+                        <th className="text-left p-3 font-medium">Date</th>
+                        <th className="text-right p-3 font-medium">Stripe Active</th>
+                        <th className="text-right p-3 font-medium">Trials</th>
+                        <th className="text-right p-3 font-medium">Patreon</th>
+                        <th className="text-right p-3 font-medium">Lifetime</th>
+                        <th className="text-right p-3 font-medium">Total Paying</th>
+                        <th className="text-right p-3 font-medium">MRR</th>
+                        <th className="text-right p-3 font-medium">Users</th>
+                        <th className="text-right p-3 font-medium">New Today</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {snapshots.slice().reverse().map((s) => (
+                        <tr key={s.id} className="border-b hover:bg-muted/50">
+                          <td className="p-3 font-mono text-xs">
+                            {format(new Date(s.snapshot_date), "MMM d, yyyy")}
+                          </td>
+                          <td className="p-3 text-right text-green-600 font-medium">{s.stripe_active}</td>
+                          <td className="p-3 text-right text-blue-600">{s.stripe_trialing}</td>
+                          <td className="p-3 text-right text-orange-600">{s.patreon_active}</td>
+                          <td className="p-3 text-right text-purple-600">{s.lifetime_access}</td>
+                          <td className="p-3 text-right font-bold text-primary">{s.stripe_active + s.patreon_active + s.lifetime_access}</td>
+                          <td className="p-3 text-right font-mono text-green-600">${(s.mrr_cents / 100).toFixed(2)}</td>
+                          <td className="p-3 text-right">{s.total_users}</td>
+                          <td className="p-3 text-right text-muted-foreground">{s.new_signups_today}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              ) : (
+                <div className="p-12 text-center text-muted-foreground">
+                  <Calendar className="h-12 w-12 mx-auto mb-4 opacity-20" />
+                  <p>No snapshots recorded yet</p>
+                  <p className="text-sm mt-2">Click "Record Snapshot" to capture today's data</p>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </TabsContent>
+      </Tabs>
     </div>
   );
 }
