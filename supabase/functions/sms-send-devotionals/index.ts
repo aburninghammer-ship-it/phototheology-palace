@@ -79,18 +79,31 @@ serve(async (req) => {
 
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
+    // Parse request body for test mode options
+    const body = await req.json().catch(() => ({}));
+    const forceNow = body.forceNow === true; // Bypass time check
+    const skipDailyCheck = body.skipDailyCheck === true; // Bypass "already sent today" check
+    const testRecipientId = body.recipientId; // Send to specific recipient only
+
     // Get current UTC hour
     const now = new Date();
     const currentUtcHour = now.getUTCHours();
     
-    console.log(`[SMS Send] Starting at UTC hour ${currentUtcHour}`);
+    console.log(`[SMS Send] Starting at UTC hour ${currentUtcHour}${forceNow ? ' (FORCE MODE)' : ''}`);
 
     // Get all active SMS recipients
-    const { data: allRecipients, error: recipientsError } = await supabase
+    let recipientsQuery = supabase
       .from('sms_devotional_recipients')
       .select('*')
       .eq('is_active', true)
       .is('opted_out_at', null);
+
+    // If testing specific recipient, filter by ID
+    if (testRecipientId) {
+      recipientsQuery = recipientsQuery.eq('id', testRecipientId);
+    }
+
+    const { data: allRecipients, error: recipientsError } = await recipientsQuery;
 
     if (recipientsError) {
       console.error('Error fetching recipients:', recipientsError);
@@ -122,31 +135,37 @@ serve(async (req) => {
     for (const recipient of (allRecipients || [])) {
       results.processed++;
       
-      // Check if it's the right time for this recipient's timezone
-      const recipientHour = getHourInTimezone(now, recipient.timezone);
-      
-      if (recipientHour !== recipient.preferred_send_hour) {
-        results.skipped++;
-        console.log(`[SMS Send] Skipping ${recipient.name} - current hour ${recipientHour} != preferred ${recipient.preferred_send_hour} in ${recipient.timezone}`);
-        continue;
+      // Check if it's the right time for this recipient's timezone (skip if forceNow)
+      if (!forceNow) {
+        const recipientHour = getHourInTimezone(now, recipient.timezone);
+        
+        if (recipientHour !== recipient.preferred_send_hour) {
+          results.skipped++;
+          console.log(`[SMS Send] Skipping ${recipient.name} - current hour ${recipientHour} != preferred ${recipient.preferred_send_hour} in ${recipient.timezone}`);
+          continue;
+        }
+      } else {
+        console.log(`[SMS Send] Force sending to ${recipient.name} (bypassing time check)`);
       }
 
-      // Check if already sent today
-      const todayStart = new Date();
-      todayStart.setHours(0, 0, 0, 0);
-      
-      const { data: todaysLog } = await supabase
-        .from('sms_send_log')
-        .select('id')
-        .eq('recipient_id', recipient.id)
-        .eq('recipient_type', 'standalone')
-        .gte('sent_at', todayStart.toISOString())
-        .limit(1);
+      // Check if already sent today (skip if skipDailyCheck)
+      if (!skipDailyCheck) {
+        const todayStart = new Date();
+        todayStart.setHours(0, 0, 0, 0);
+        
+        const { data: todaysLog } = await supabase
+          .from('sms_send_log')
+          .select('id')
+          .eq('recipient_id', recipient.id)
+          .eq('recipient_type', 'standalone')
+          .gte('sent_at', todayStart.toISOString())
+          .limit(1);
 
-      if (todaysLog && todaysLog.length > 0) {
-        results.skipped++;
-        console.log(`[SMS Send] Skipping ${recipient.name} - already sent today`);
-        continue;
+        if (todaysLog && todaysLog.length > 0) {
+          results.skipped++;
+          console.log(`[SMS Send] Skipping ${recipient.name} - already sent today`);
+          continue;
+        }
       }
 
       // Get devotional content
