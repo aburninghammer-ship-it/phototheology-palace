@@ -247,6 +247,7 @@ serve(async (req) => {
       // Commentary properties
       classicCommentary,
       activeDimensions,
+      commentaryDepth,
       // User identification
       userName,
       // Card deck properties
@@ -2309,7 +2310,35 @@ ${vRef}: "${vText}"
 Give a clear, helpful explanation that covers the meaning, context, and significance.`;
 
     } else if (mode === "commentary-revealed") {
+      // Commentary depth instructions
+      const depthInstructions = commentaryDepth === "surface"
+        ? `
+DEPTH LEVEL: SURFACE (Quick Overview)
+- Keep the analysis brief and accessible (150-250 words total)
+- Focus on 1-2 key themes or insights
+- Use simple language anyone can understand
+- Skip technical details like Greek/Hebrew
+- Provide a clear, memorable takeaway`
+        : commentaryDepth === "depth"
+        ? `
+DEPTH LEVEL: DEEP ANALYSIS (Comprehensive Study)
+- Provide thorough, scholarly analysis (500-800 words)
+- Include Greek/Hebrew word studies where relevant
+- Reference multiple cross-references and parallel passages
+- Explore historical and cultural context
+- Discuss theological implications and connections
+- Include relevant typology and symbolism
+- Provide practical application insights`
+        : `
+DEPTH LEVEL: INTERMEDIATE (Balanced Analysis)
+- Provide a balanced analysis (300-450 words)
+- Include key contextual information
+- Reference 2-3 relevant cross-references
+- Mention significant Greek/Hebrew terms when impactful
+- Balance scholarly insight with accessibility`;
+
       systemPrompt = `You are Jeeves, a theologian analyzing Bible verses to identify which principles and dimensions are REVEALED or PRESENT in the text itself.
+${depthInstructions}
 Focus on discovering what's already there, not applying external frameworks.
 
 CRITICAL FORMATTING REQUIREMENTS (FOLLOW ALL OF THESE):
@@ -2379,7 +2408,32 @@ Write one profound insight (2–3 sentences) that ties everything together.
 At the very end, on a new line, append: PRINCIPLES_REVEALED: [list of room codes you used]`;
 
     } else if (mode === "commentary-applied") {
-      systemPrompt = `You are Jeeves, a master Phototheology analyst providing DEEP, SUBSTANTIVE Bible commentary by APPLYING specific analytical lenses to verses.
+      // Commentary depth instructions for applied mode
+      const appliedDepthInstructions = commentaryDepth === "surface"
+        ? `
+DEPTH LEVEL: SURFACE (Quick Overview)
+- Keep each room analysis brief (40-60 words)
+- Focus on the single most important insight from each lens
+- Skip Greek/Hebrew unless essential
+- Total response: 150-300 words`
+        : commentaryDepth === "depth"
+        ? `
+DEPTH LEVEL: DEEP ANALYSIS (Comprehensive Study)
+- Each room analysis should be 120-180 words of substantive content
+- ALWAYS include Greek/Hebrew word studies
+- Provide 3+ cross-references per room
+- Explore typological connections
+- Include historical/cultural context
+- Total response: 600-1000 words`
+        : `
+DEPTH LEVEL: INTERMEDIATE (Balanced Analysis)
+- Each room analysis should be 80-120 words
+- Include key Greek/Hebrew when impactful
+- Provide 1-2 cross-references per room
+- Total response: 350-550 words`;
+
+      systemPrompt = `You are Jeeves, a master Phototheology analyst providing Bible commentary by APPLYING specific analytical lenses to verses.
+${appliedDepthInstructions}
 
 Your analysis must be SCHOLARLY and APPLIED—not surface-level descriptions of what each room does. Instead, you must DEMONSTRATE each room's methodology by actually applying it to the specific verse text.
 
@@ -2388,7 +2442,7 @@ CRITICAL ANALYSIS REQUIREMENTS:
 2. SHOW the room's methodology in action—don't just describe it
 3. EXTRACT insights that are UNIQUE to that lens (what would be missed without it?)
 4. CONNECT to cross-references, Greek/Hebrew, and typology where relevant
-5. Each room analysis should be 80-120 words of substantive content
+5. Adjust depth based on the DEPTH LEVEL instructions above
 
 EXAMPLES OF DEPTH EXPECTED:
 

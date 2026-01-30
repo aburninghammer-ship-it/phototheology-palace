@@ -182,6 +182,30 @@ const WORD_LENGTH_OPTIONS = [
   { value: "long", label: "Long (~650 words)", maxWords: 650 },
 ];
 
+const COMMENTARY_DEPTH_OPTIONS = [
+  {
+    value: "surface",
+    label: "Surface",
+    description: "Quick overview - key themes and basic meaning",
+    icon: "📖",
+    color: "bg-blue-500"
+  },
+  {
+    value: "intermediate",
+    label: "Intermediate",
+    description: "Balanced analysis with context and application",
+    icon: "📚",
+    color: "bg-purple-500"
+  },
+  {
+    value: "depth",
+    label: "Deep Analysis",
+    description: "Comprehensive study with Greek/Hebrew, cross-references, and theological depth",
+    icon: "🔬",
+    color: "bg-amber-500"
+  },
+];
+
 interface CommentaryPanelProps {
   book: string;
   chapter: number;
@@ -203,6 +227,7 @@ export const CommentaryPanel = ({ book, chapter, verse, verseText, onClose }: Co
   const [activeDimensions, setActiveDimensions] = useState<string[]>(["2D"]); // Default to Christ dimension
   const [deepPalaceLength, setDeepPalaceLength] = useState<string>("medium");
   const [showHiddenStructure, setShowHiddenStructure] = useState(false);
+  const [commentaryDepth, setCommentaryDepth] = useState<"surface" | "intermediate" | "depth">("intermediate");
   const { toast } = useToast();
 
   // Check which commentaries are available for this specific verse
@@ -311,6 +336,8 @@ export const CommentaryPanel = ({ book, chapter, verse, verseText, onClose }: Co
               ? selectedPrinciples.map(id => PRINCIPLE_OPTIONS.find(p => p.id === id)?.label)
               : undefined,
             classicCommentary: useClassicCommentary && !["sop", "sdabc", "uriah-smith", "jn-andrews"].includes(selectedCommentary) ? selectedCommentary : undefined,
+            // Commentary depth level
+            commentaryDepth,
             // Deep Palace specific options
             maxWords: analysisMode === "deep-palace" ? lengthConfig?.maxWords : undefined,
             showHiddenStructure: analysisMode === "deep-palace" ? showHiddenStructure : undefined,
@@ -442,11 +469,41 @@ export const CommentaryPanel = ({ book, chapter, verse, verseText, onClose }: Co
               </Button>
             </div>
             <p className="text-xs text-muted-foreground mb-3">
-              {analysisMode === "revealed" 
-                ? "Identify which principles and dimensions are revealed in this text" 
+              {analysisMode === "revealed"
+                ? "Identify which principles and dimensions are revealed in this text"
                 : analysisMode === "applied"
                 ? "Select principles to apply to this verse, or let AI randomly select"
                 : "Full Palace Commentary using 16+ principles (single verse only)"}
+            </p>
+          </div>
+
+          {/* Commentary Depth Level */}
+          <div className="p-3 rounded-lg bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800 border">
+            <h4 className="text-sm font-semibold mb-2 flex items-center gap-2">
+              <Sparkles className="h-4 w-4 text-amber-500" />
+              Commentary Depth
+            </h4>
+            <div className="grid grid-cols-3 gap-2">
+              {COMMENTARY_DEPTH_OPTIONS.map((option) => (
+                <Button
+                  key={option.value}
+                  variant={commentaryDepth === option.value ? "default" : "outline"}
+                  onClick={() => {
+                    setCommentaryDepth(option.value as "surface" | "intermediate" | "depth");
+                    setCommentary(null);
+                  }}
+                  className={`h-auto py-2 flex flex-col items-center gap-1 ${
+                    commentaryDepth === option.value ? option.color + " text-white" : ""
+                  }`}
+                  size="sm"
+                >
+                  <span className="text-lg">{option.icon}</span>
+                  <span className="text-xs font-medium">{option.label}</span>
+                </Button>
+              ))}
+            </div>
+            <p className="text-xs text-muted-foreground mt-2 text-center">
+              {COMMENTARY_DEPTH_OPTIONS.find(o => o.value === commentaryDepth)?.description}
             </p>
           </div>
 
