@@ -31,7 +31,7 @@ serve(async (req) => {
 
   try {
     const body = await req.json().catch(() => ({}));
-    const { planId, maxDaysPerPlan = 5, maxPlans = 10 } = body;
+    const { planId, planIds, maxDaysPerPlan = 5, maxPlans = 10 } = body;
 
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     const SUPABASE_URL = Deno.env.get("SUPABASE_URL");
@@ -52,8 +52,13 @@ serve(async (req) => {
       .not("started_at", "is", null)
       .order("created_at", { ascending: false });
 
-    if (planId) {
+    // Support both planId (single) and planIds (array)
+    if (planIds && Array.isArray(planIds) && planIds.length > 0) {
+      query = query.in("id", planIds);
+      console.log(`Filtering by planIds: ${planIds.join(", ")}`);
+    } else if (planId) {
       query = query.eq("id", planId);
+      console.log(`Filtering by planId: ${planId}`);
     } else {
       query = query.limit(maxPlans);
     }
