@@ -75,10 +75,10 @@ OUTPUT FORMAT (JSON):
 {
   "title": "Short, identity-shaping declarative title (not cute or vague)",
   "anchorScripture": "Full verse reference (e.g., Matthew 18:20)",
-  "scriptureText": "Full text of the scripture verse(s)",
-  "meditation": "2-3 short paragraphs that: 1) Address ${churchName} directly 2) Reframe online/scattered church as biblical, not modern 3) Call to personal holiness without external pressure 4) Link righteousness to mission, not comfort",
-  "communalPractice": "One simple, actionable practice for ${churchName} community engagement (e.g., 'Tag one ${churchName} member and pray for them today')",
-  "closingPrayer": "4-6 lines addressing God on behalf of ${churchName}, always plural (we, not I), focused on: faithfulness, boldness, love, endurance, obedience"
+  "scriptureText": "Full text of the scripture verse(s) - include 2-4 verses if relevant",
+  "meditation": "A substantial, 4-6 paragraph meditation (each paragraph 4-6 sentences) that: 1) Opens by addressing ${churchName} directly with a compelling hook 2) Explores the scripture's original context and meaning 3) Reframes online/scattered church as biblical, not modern 4) Develops the theme with rich theological depth and practical insight 5) Calls to personal holiness without external pressure 6) Links righteousness to mission, not comfort 7) Closes with a Christ-centered synthesis. Write with pastoral warmth and prophetic urgency. Each paragraph should build on the previous one, creating a cohesive spiritual journey through the text.",
+  "communalPractice": "2-3 specific, actionable practices for ${churchName} community engagement throughout the week. Include both digital and in-person options where applicable.",
+  "closingPrayer": "A rich 8-12 line pastoral prayer addressing God on behalf of ${churchName}, always plural (we, not I). Structure: 1) Acknowledge God's character related to today's theme 2) Confess our weakness in this area 3) Ask for specific grace and strength 4) Intercede for the church body 5) Close with a declaration of trust and hope"
 }`;
 
     const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
