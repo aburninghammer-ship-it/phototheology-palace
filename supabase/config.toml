@@ -276,3 +276,6 @@ verify_jwt = false
 
 [functions.sms-send-devotionals]
 verify_jwt = false
+
+[functions.batch-generate-devotional-days]
+verify_jwt = false
