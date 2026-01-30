@@ -16864,6 +16864,7 @@ export type Database = {
         Args: { _room_id: string; _user_id: string }
         Returns: undefined
       }
+      record_analytics_snapshot: { Args: never; Returns: undefined }
       redeem_access_code: { Args: { code_input: string }; Returns: Json }
       search_encyclopedia_articles: {
         Args: { limit_count?: number; search_query: string }
