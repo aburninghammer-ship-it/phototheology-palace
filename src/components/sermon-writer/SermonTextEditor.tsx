@@ -328,7 +328,6 @@ export const SermonTextEditor = ({
       {editor && (
         <BubbleMenu
           editor={editor}
-          tippyOptions={{ duration: 100 }}
           className="flex items-center gap-1 p-1 rounded-lg bg-slate-800 border border-slate-600 shadow-xl"
         >
           <Button
