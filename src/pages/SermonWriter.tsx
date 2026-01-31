@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { Navigation } from "@/components/Navigation";
 import { useSermonWriter, OUTLINE_TEMPLATES } from "@/hooks/useSermonWriter";
@@ -28,7 +28,10 @@ import {
   Building2,
   ChevronLeft,
   Star,
+  Languages,
+  Save,
 } from "lucide-react";
+import { SermonTextEditor } from "@/components/sermon-writer/SermonTextEditor";
 import { motion, AnimatePresence } from "framer-motion";
 import { JeevesChat } from "@/components/sermon-writer/jeeves/JeevesChat";
 import { toast } from "sonner";
@@ -262,8 +265,37 @@ export default function SermonWriter() {
     setJeevesMode: saveJeevesMode,
     createSpark,
     updateOutline,
+    updateContent,
     updateSparkStatus,
   } = useSermonWriter(sessionId || undefined);
+
+  // Auto-save content with debounce
+  const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const [isSaving, setIsSaving] = useState(false);
+  const [localContent, setLocalContent] = useState('');
+
+  // Initialize local content from session
+  useEffect(() => {
+    if (session?.content !== undefined) {
+      setLocalContent(session.content || '');
+    }
+  }, [session?.content]);
+
+  const handleContentChange = useCallback((content: string) => {
+    setLocalContent(content);
+
+    // Clear existing timeout
+    if (saveTimeoutRef.current) {
+      clearTimeout(saveTimeoutRef.current);
+    }
+
+    // Set new timeout for auto-save (2 seconds after typing stops)
+    saveTimeoutRef.current = setTimeout(async () => {
+      setIsSaving(true);
+      await updateContent(content);
+      setIsSaving(false);
+    }, 2000);
+  }, [updateContent]);
 
   // Sync Jeeves mode from session
   useEffect(() => {
@@ -642,13 +674,33 @@ export default function SermonWriter() {
                           initial={{ opacity: 0, y: 20 }}
                           animate={{ opacity: 1, y: 0 }}
                           exit={{ opacity: 0, y: -20 }}
-                          className="text-center text-slate-400 py-16"
+                          className="h-full"
                         >
-                          <PenTool className="w-12 h-12 mx-auto mb-4 opacity-50" />
-                          <h3 className="text-lg font-medium text-white mb-2">Write Your Sermon</h3>
-                          <p className="text-sm max-w-md mx-auto">
-                            The rich text editor will appear here. Write your sermon content with Scripture integration.
-                          </p>
+                          <div className="mb-3 flex items-center justify-between">
+                            <div className="flex items-center gap-2">
+                              <Languages className="w-4 h-4 text-emerald-400" />
+                              <span className="text-sm text-slate-400">
+                                Select any word to look up its Greek/Hebrew meaning
+                              </span>
+                            </div>
+                            {isSaving && (
+                              <div className="flex items-center gap-2 text-slate-400">
+                                <Loader2 className="w-3 h-3 animate-spin" />
+                                <span className="text-xs">Saving...</span>
+                              </div>
+                            )}
+                            {!isSaving && localContent && (
+                              <div className="flex items-center gap-2 text-emerald-400">
+                                <Save className="w-3 h-3" />
+                                <span className="text-xs">Saved</span>
+                              </div>
+                            )}
+                          </div>
+                          <SermonTextEditor
+                            content={localContent}
+                            onChange={handleContentChange}
+                            placeholder="Start writing your sermon here. Select any word to look up its original Greek or Hebrew meaning..."
+                          />
                         </motion.div>
                       )}
 
