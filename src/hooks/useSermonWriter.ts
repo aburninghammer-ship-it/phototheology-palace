@@ -172,6 +172,10 @@ export function useSermonWriter(sessionId?: string) {
       })) as SermonWriterSpark[];
     },
     enabled: !!sessionId,
+    // Prevent showing stale sparks from other sessions
+    staleTime: 0,
+    refetchOnMount: 'always',
+    placeholderData: () => [], // Show empty array while loading new session
   });
 
   // =====================================================

@@ -256,9 +256,10 @@ export default function SermonWriter() {
   const {
     session,
     sessions,
-    sparks,
+    sparks: allSparks,
     loadingSession,
     loadingSessions,
+    loadingSparks,
     isProcessing,
     createSession,
     deleteSession,
@@ -268,6 +269,9 @@ export default function SermonWriter() {
     updateContent,
     updateSparkStatus,
   } = useSermonWriter(sessionId || undefined);
+
+  // Filter sparks to ensure they belong to current session (safeguard against stale cache)
+  const sparks = allSparks?.filter(spark => spark.session_id === sessionId) || [];
 
   // Auto-save content with debounce
   const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
@@ -476,7 +480,11 @@ export default function SermonWriter() {
                 </CardHeader>
                 <CardContent className="flex-1 overflow-hidden p-3">
                   <ScrollArea className="h-full">
-                    {sparks?.length ? (
+                    {loadingSparks ? (
+                      <div className="flex items-center justify-center h-32">
+                        <Loader2 className="w-6 h-6 text-emerald-400 animate-spin" />
+                      </div>
+                    ) : sparks?.length ? (
                       <div className="space-y-2 pr-2">
                         {sparks.map((spark) => {
                           const kindColors: Record<string, string> = {
