@@ -174,8 +174,9 @@ export function useSermonWriter(sessionId?: string) {
     enabled: !!sessionId,
     // Prevent showing stale sparks from other sessions
     staleTime: 0,
+    gcTime: 0, // Don't cache - always fresh data per session
     refetchOnMount: 'always',
-    placeholderData: () => [], // Show empty array while loading new session
+    refetchOnWindowFocus: true,
   });
 
   // =====================================================

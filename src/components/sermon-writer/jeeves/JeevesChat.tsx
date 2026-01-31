@@ -127,6 +127,16 @@ export function JeevesChat({
   const [isProcessing, setIsProcessing] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
   const prevModeRef = useRef<JeevesMode>(currentMode);
+  const prevSessionRef = useRef<string>(sessionId);
+
+  // Clear messages when session changes
+  useEffect(() => {
+    if (prevSessionRef.current !== sessionId) {
+      setMessages([]);
+      setInput("");
+      prevSessionRef.current = sessionId;
+    }
+  }, [sessionId]);
 
   // Initialize or update welcome message when mode changes
   useEffect(() => {
