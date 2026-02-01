@@ -679,12 +679,12 @@ export default function StudyBuddy() {
     setIsSavingSession(true);
 
     try {
-      const contextData = {
+      const contextData = JSON.parse(JSON.stringify({
         book: selectedBook,
         chapter: selectedChapter,
         notes: notes,
         analysis: analysis,
-      };
+      }));
 
       // Create or update session
       if (currentSessionId) {
