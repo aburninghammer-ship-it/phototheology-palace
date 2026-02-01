@@ -12,7 +12,7 @@ const logStep = (step: string, details?: any) => {
   console.log(`[SUBSCRIBER-STATS] ${step}${detailsStr}`);
 };
 
-// Price ID to tier and product name mapping - ALL APP PRODUCTS INCLUDING LEGACY
+// Price ID to tier and product name mapping - PHOTOTHEOLOGY APP ONLY (excludes SamCart/external)
 const priceToInfo: Record<string, { tier: string; name: string; price: number }> = {
   // ========== CURRENT SUBSCRIPTION PRODUCTS ==========
   'price_1SZNyCFGDAd3RU8IPwPJVesp': { tier: 'essential', name: 'Essential Monthly ($9/mo)', price: 9 },
@@ -23,19 +23,9 @@ const priceToInfo: Record<string, { tier: string; name: string; price: number }>
   // ========== STUDENT ==========
   'price_1STVXrFGDAd3RU8Ia2NbKJWo': { tier: 'student', name: 'Student Discount ($4.99/mo)', price: 4.99 },
   
-  // ========== LEGACY SUBSCRIPTIONS (still active in Stripe) ==========
+  // ========== LEGACY PHOTOTHEOLOGY APP SUBSCRIPTIONS ==========
   'price_1SKn0VFGDAd3RU8Io19mT9No': { tier: 'premium', name: 'Phototheology App ($15/mo)', price: 15 },
   'price_1SKn12FGDAd3RU8IBpc45ctZ': { tier: 'essential', name: 'Phototheology App Lite ($9/mo)', price: 9 },
-  'price_1ONMQ9FGDAd3RU8IcBaBYmoJ': { tier: 'premium', name: 'PT Level 1 ($10/mo)', price: 10 },
-  'price_1ONjHsFGDAd3RU8IsHMybTX6': { tier: 'premium', name: 'PT Level 1 Annual ($100/yr)', price: 100 },
-  
-  // ========== SAMCART LEGACY (old system, still billing) ==========
-  'samcart_plan_38058_105485': { tier: 'premium', name: 'SamCart Premium ($10/mo)', price: 10 },
-  'samcart_plan_38058_105486': { tier: 'premium', name: 'SamCart Premium Annual', price: 100 },
-  'samcart_plan_38058_107401': { tier: 'premium', name: 'SamCart PT Monthly ($10/mo)', price: 10 },
-  'samcart_plan_38058_107421': { tier: 'premium', name: 'SamCart PT Annual', price: 100 },
-  'samcart_plan_38058_136697': { tier: 'premium', name: 'SamCart Legacy ($10/mo)', price: 10 },
-  'n_10420777_VwOLwd8': { tier: 'premium', name: 'Legacy Subscription ($10/mo)', price: 10 },
   
   // ========== CHURCH TIERS ==========
   'price_1SNEzoFGDAd3RU8Iwa8PSyLw': { tier: 'church', name: 'Small Church 10-50 ($199/mo)', price: 199 },
