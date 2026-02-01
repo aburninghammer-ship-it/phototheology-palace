@@ -30,6 +30,7 @@ import {
   Heart,
   Headphones,
   Network,
+  Image,
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { Separator } from "@/components/ui/separator";
@@ -37,6 +38,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { useRecentPages } from "@/hooks/useRecentPages";
 import { usePageBookmarks } from "@/hooks/usePageBookmarks";
 import { useUserPreferences } from "@/hooks/useUserPreferences";
+import { SuiteModeToggle } from "@/components/SuiteModeToggle";
 import { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
 
@@ -181,6 +183,16 @@ const simplifiedQuickLinks = [
   { to: "/mind-map", label: "Mind Map", icon: Network, color: "from-indigo-500/10 to-blue-500/5", borderColor: "border-indigo-500/20", iconColor: "text-indigo-500" },
 ];
 
+// Guest House quick links - warm amber theme for the 6 essential tabs
+const guestHouseQuickLinks = [
+  { to: "/palace", label: "Palace", icon: Building2, color: "from-amber-500/20 to-orange-500/10", borderColor: "border-amber-500/30", iconColor: "text-amber-600" },
+  { to: "/image-bible", label: "PT Image Bible", icon: Image, color: "from-amber-500/20 to-orange-500/10", borderColor: "border-amber-500/30", iconColor: "text-amber-600" },
+  { to: "/devotionals", label: "Devotionals", icon: Heart, color: "from-amber-500/20 to-orange-500/10", borderColor: "border-amber-500/30", iconColor: "text-amber-600" },
+  { to: "/study-buddy", label: "Study Buddy", icon: Brain, color: "from-amber-500/20 to-orange-500/10", borderColor: "border-amber-500/30", iconColor: "text-amber-600" },
+  { to: "/games", label: "Games", icon: Gamepad2, color: "from-amber-500/20 to-orange-500/10", borderColor: "border-amber-500/30", iconColor: "text-amber-600" },
+  { to: "/daily-challenges", label: "Challenges", icon: Trophy, color: "from-amber-500/20 to-orange-500/10", borderColor: "border-amber-500/30", iconColor: "text-amber-600" },
+];
+
 export const EnhancedMobileDrawer = () => {
   const { user, signOut } = useAuth();
   const location = useLocation();
@@ -191,6 +203,7 @@ export const EnhancedMobileDrawer = () => {
   const [expandedCategories, setExpandedCategories] = useState<Set<string>>(new Set());
 
   const isSimplified = preferences.navigation_style === "simplified";
+  const isGuestHouseMode = preferences.suite_mode === "guest_house";
 
   const handleLinkClick = () => {
     setOpen(false);
@@ -268,8 +281,33 @@ export const EnhancedMobileDrawer = () => {
                 </div>
               </div>
 
-              {/* Quick Actions Grid - Changes based on navigation style */}
-              {isSimplified ? (
+              {/* Quick Actions Grid - Changes based on navigation style and suite mode */}
+              {isGuestHouseMode ? (
+                /* Guest House Mode - Warm amber theme with 6 essential tabs */
+                <div className="space-y-3">
+                  <div className="flex items-center gap-2 px-1">
+                    <Home className="h-4 w-4 text-amber-600" />
+                    <span className="text-sm font-semibold text-amber-700 dark:text-amber-400">Guest House</span>
+                  </div>
+                  <div className="grid grid-cols-3 gap-3">
+                    {guestHouseQuickLinks.map((link) => (
+                      <Link
+                        key={link.to}
+                        to={link.to}
+                        onClick={handleLinkClick}
+                        className={cn(
+                          "flex flex-col items-center justify-center p-4 rounded-xl bg-gradient-to-br border active:scale-95 transition-transform",
+                          link.color,
+                          link.borderColor
+                        )}
+                      >
+                        <link.icon className={cn("h-6 w-6 mb-1.5", link.iconColor)} />
+                        <span className="text-[11px] font-medium text-center text-amber-800 dark:text-amber-200">{link.label}</span>
+                      </Link>
+                    ))}
+                  </div>
+                </div>
+              ) : isSimplified ? (
                 /* Simplified Navigation - Larger grid with core features */
                 <div className="grid grid-cols-4 gap-3">
                   {simplifiedQuickLinks.map((link) => (
@@ -433,8 +471,8 @@ export const EnhancedMobileDrawer = () => {
                 </>
               )}
 
-              {/* Categorized Navigation - Only show in Full mode */}
-              {!isSimplified && (
+              {/* Categorized Navigation - Only show in Full mode (not simplified, not Guest House) */}
+              {!isSimplified && !isGuestHouseMode && (
               <div className="space-y-2">
                 <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider px-1">Browse All Features</p>
                 {Object.entries(categoryConfig).map(([key, category]) => {
@@ -516,6 +554,10 @@ export const EnhancedMobileDrawer = () => {
                     <User className="h-5 w-5 text-primary" />
                     <span className="font-medium">My Profile</span>
                   </Link>
+                  {/* Suite Mode Toggle */}
+                  <div className="px-4 py-3 border-b border-border/30">
+                    <SuiteModeToggle variant="menu-item" />
+                  </div>
                   <Link
                     to="/pricing"
                     onClick={handleLinkClick}

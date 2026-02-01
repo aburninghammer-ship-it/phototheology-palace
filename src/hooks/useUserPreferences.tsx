@@ -11,6 +11,8 @@ interface UserPreferences {
   preferred_reading_experience: "audio" | "read-along" | "auto";
   read_along_speed: number; // Words per minute
   study_buddy_theme: "dark" | "light"; // Study Buddy page theme
+  suite_mode: "guest_house" | "full_suite"; // Guest House (simplified) or Full Suite
+  has_seen_mode_selector: boolean; // Whether user has seen the mode selection modal
 }
 
 const defaultPreferences: UserPreferences = {
@@ -22,6 +24,8 @@ const defaultPreferences: UserPreferences = {
   preferred_reading_experience: "audio",
   read_along_speed: 200,
   study_buddy_theme: "dark",
+  suite_mode: "full_suite",
+  has_seen_mode_selector: false,
 };
 
 interface UserPreferencesContextValue {
@@ -77,6 +81,8 @@ export const UserPreferencesProvider = ({
             preferred_reading_experience: defaultPreferences.preferred_reading_experience,
             read_along_speed: defaultPreferences.read_along_speed,
             study_buddy_theme: ((data as any).study_buddy_theme as any) ?? defaultPreferences.study_buddy_theme,
+            suite_mode: ((data as any).suite_mode as any) ?? defaultPreferences.suite_mode,
+            has_seen_mode_selector: ((data as any).has_seen_mode_selector as any) ?? defaultPreferences.has_seen_mode_selector,
           });
         } else {
           // Create default preferences in the backend and use local defaults
@@ -118,6 +124,8 @@ export const UserPreferencesProvider = ({
             navigation_style: next.navigation_style,
             preferred_reading_experience: next.preferred_reading_experience,
             read_along_speed: next.read_along_speed,
+            suite_mode: next.suite_mode,
+            has_seen_mode_selector: next.has_seen_mode_selector,
             updated_at: new Date().toISOString(),
           },
           {
