@@ -663,44 +663,80 @@ export default function StudyBuddy() {
     toast.success(`Added "${label}" to explore — Jeeves will respond!`);
   };
 
+  const [isSavingSession, setIsSavingSession] = useState(false);
+
   const saveSession = async () => {
     if (!notes.trim()) {
       toast.error("No notes to save");
       return;
     }
 
+    if (!user?.id) {
+      toast.error("Please sign in to save your session");
+      return;
+    }
+
+    setIsSavingSession(true);
+
     try {
+      const contextData = {
+        book: selectedBook,
+        chapter: selectedChapter,
+        notes: notes,
+        analysis: analysis,
+      };
+
       // Create or update session
       if (currentSessionId) {
         // Update existing session
-        const { error } = await supabase.from("study_sessions").update({
+        const { data, error } = await supabase.from("study_sessions").update({
           title: sessionTitle || `${selectedBook} ${selectedChapter} Study - ${new Date().toLocaleDateString()}`,
           description: notes.substring(0, 200),
-          jeeves_context: JSON.parse(JSON.stringify({ book: selectedBook, chapter: selectedChapter, notes, analysis })),
+          jeeves_context: contextData,
           has_jeeves_history: !!analysis,
-        }).eq("id", currentSessionId);
+          updated_at: new Date().toISOString(),
+        }).eq("id", currentSessionId).eq("user_id", user.id).select().single();
 
-        if (error) throw error;
-        toast.success("Session updated!");
+        if (error) {
+          console.error("Update error:", error);
+          throw error;
+        }
+
+        if (!data) {
+          throw new Error("Session not found or you don't have permission to update it");
+        }
+
+        console.log("[StudyBuddy] Session updated:", data.id, "Notes length:", notes.length);
+        toast.success("Session saved!");
       } else {
         // Create new session
         const { data: newSession, error } = await supabase.from("study_sessions").insert([{
-          user_id: user?.id!,
+          user_id: user.id,
           title: sessionTitle || `${selectedBook} ${selectedChapter} Study - ${new Date().toLocaleDateString()}`,
           description: notes.substring(0, 200),
-          jeeves_context: JSON.parse(JSON.stringify({ book: selectedBook, chapter: selectedChapter, notes, analysis })),
-          tabs_data: JSON.parse(JSON.stringify([])),
+          jeeves_context: contextData,
+          tabs_data: [],
           has_jeeves_history: !!analysis,
         }]).select().single();
 
-        if (error) throw error;
-        
-        setCurrentSessionId(newSession?.id || null);
+        if (error) {
+          console.error("Insert error:", error);
+          throw error;
+        }
+
+        if (!newSession) {
+          throw new Error("Failed to create session");
+        }
+
+        console.log("[StudyBuddy] New session created:", newSession.id, "Notes length:", notes.length);
+        setCurrentSessionId(newSession.id);
         toast.success("Session saved!");
       }
     } catch (error: any) {
       console.error("Save error:", error);
       toast.error(error.message || "Failed to save session");
+    } finally {
+      setIsSavingSession(false);
     }
   };
 
@@ -871,13 +907,23 @@ export default function StudyBuddy() {
             >
               <Trash2 className="w-4 h-4" />
             </Button>
-            <Button 
-              size="sm" 
-              onClick={saveSession} 
-              className="bg-orange-500 hover:bg-orange-600 text-white"
+            <Button
+              size="sm"
+              onClick={saveSession}
+              disabled={isSavingSession || !notes.trim()}
+              className="bg-orange-500 hover:bg-orange-600 text-white disabled:opacity-50"
             >
-              <Save className="w-4 h-4 mr-1" />
-              Save
+              {isSavingSession ? (
+                <>
+                  <Loader2 className="w-4 h-4 mr-1 animate-spin" />
+                  Saving...
+                </>
+              ) : (
+                <>
+                  <Save className="w-4 h-4 mr-1" />
+                  Save
+                </>
+              )}
             </Button>
           </div>
         </motion.div>
