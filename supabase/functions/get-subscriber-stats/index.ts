@@ -40,6 +40,10 @@ const priceToTier: Record<string, string> = Object.fromEntries(
 
 const appPriceIds = Object.keys(priceToInfo);
 
+// Only these tiers count as Phototheology app subscription tiers in the database.
+// (Prevents old/incorrect records synced from unrelated Stripe products from inflating counts.)
+const appStripeTiers = new Set(['essential', 'premium', 'student', 'church']);
+
 // Helper to fetch all Stripe subscriptions with pagination
 async function fetchAllStripeSubscriptions(
   stripe: Stripe, 
@@ -146,7 +150,7 @@ serve(async (req) => {
     const dbStats = {
       total_users: profileCount || 0,
       active_trials: activeDbTrials,
-      by_tier: { free: 0, essential: 0, premium: 0, student: 0, patron: 0, null: 0 },
+      by_tier: { free: 0, essential: 0, premium: 0, student: 0, church: 0, patron: 0, null: 0 },
       by_status: { none: 0, trial: 0, active: 0, cancelled: 0, expired: 0, null: 0 },
       by_payment_source: { stripe: 0, patreon: 0, manual: 0, promotional: 0, lifetime: 0, null: 0 },
       lifetime_access: 0,
@@ -164,8 +168,13 @@ serve(async (req) => {
         dbStats.by_status[status as keyof typeof dbStats.by_status]++;
       }
 
-      // Count as stripe only if it has a stripe subscription ID and payment_source is stripe
-      if (sub.payment_source === 'stripe' && sub.stripe_subscription_id && sub.is_recurring) {
+      // Count as stripe ONLY if it looks like a Phototheology recurring subscription.
+      // (Avoid counting unrelated Stripe products or legacy bad sync rows.)
+      const isStripeRecurring = sub.payment_source === 'stripe' && sub.stripe_subscription_id && sub.is_recurring;
+      const isAppTier = typeof sub.subscription_tier === 'string' && appStripeTiers.has(sub.subscription_tier);
+      const isActiveOrTrial = sub.subscription_status === 'active' || sub.subscription_status === 'trial';
+
+      if (isStripeRecurring && isAppTier && isActiveOrTrial) {
         dbStats.by_payment_source.stripe++;
         dbStats.stripe_linked_count++;
       } else if (sub.payment_source === 'patreon') {
