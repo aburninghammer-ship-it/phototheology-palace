@@ -12,21 +12,21 @@ const logStep = (step: string, details?: any) => {
   console.log(`[FIX-SUBSCRIPTION-MISMATCH] ${step}${detailsStr}`);
 };
 
-// Price ID to tier mapping
+// Price ID to tier mapping - PHOTOTHEOLOGY APP ONLY
 const priceToTier: Record<string, string> = {
-  // Essential tier
+  // Current subscriptions
   'price_1SZNyCFGDAd3RU8IPwPJVesp': 'essential',
   'price_1SZNyVFGDAd3RU8IPgRPqKXH': 'essential',
-  'price_1SKn0VFGDAd3RU8Io19mT9No': 'essential',
-  // Premium tier
   'price_1SZNyiFGDAd3RU8I4JHYEsEi': 'premium',
   'price_1SZNyuFGDAd3RU8IjeGIvPEb': 'premium',
-  'price_1SKn12FGDAd3RU8IBpc45ctZ': 'premium',
-  'price_1ONMQ9FGDAd3RU8IcBaBYmoJ': 'premium',
-  'price_1ONjHsFGDAd3RU8IsHMybTX6': 'premium',
-  // Student tier
-  'price_1SKWM6FGDAd3RU8IcmNNhmKO': 'student',
-  'price_1SKWMLFGDAd3RU8IBXO8pKxd': 'student',
+  'price_1STVXrFGDAd3RU8Ia2NbKJWo': 'student',
+  // Legacy Phototheology App subscriptions
+  'price_1SKn0VFGDAd3RU8Io19mT9No': 'premium',
+  'price_1SKn12FGDAd3RU8IBpc45ctZ': 'essential',
+  // Church tiers
+  'price_1SNEzoFGDAd3RU8Iwa8PSyLw': 'church',
+  'price_1SNFDxFGDAd3RU8IrvW3c5eS': 'church',
+  'price_1SNFFMFGDAd3RU8IoasLs7ag': 'church',
 };
 
 serve(async (req) => {
