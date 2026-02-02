@@ -42,7 +42,7 @@ export function EventCard({ event, index, onJoin }: EventCardProps) {
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: index * 0.1 }}
     >
-      <Card className="group relative overflow-hidden bg-card/80 backdrop-blur-xl border-border/50 hover:border-primary/30 transition-all duration-300 hover:shadow-[var(--shadow-elegant)]">
+      <Card className="group relative overflow-hidden bg-card/95 border-border/50 hover:border-primary/30 transition-all duration-300 hover:shadow-lg">
         {/* Status indicator */}
         {event.status === "live" && (
           <div className="absolute top-3 right-3 z-10">

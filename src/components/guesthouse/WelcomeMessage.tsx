@@ -4,15 +4,10 @@ import { Castle, Users, Gamepad2, Sparkles, Heart } from "lucide-react";
 
 export function WelcomeMessage() {
   return (
-    <Card className="relative overflow-hidden bg-card/80 backdrop-blur-xl border-primary/20 p-8 md:p-10">
+    <Card className="relative overflow-hidden bg-card/90 border-primary/20 p-8 md:p-10">
       {/* Subtle gradient overlay */}
       <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-secondary/5 pointer-events-none" />
-      
-      {/* Rotating border effect */}
-      <div className="absolute inset-0 rounded-lg">
-        <div className="absolute inset-[-2px] rounded-lg bg-gradient-to-r from-primary/40 via-secondary/40 to-accent/40 opacity-50 blur-sm" />
-      </div>
-      
+
       <div className="relative z-10">
         <div className="flex items-center gap-3 mb-6">
           <div className="p-3 rounded-full bg-primary/10">

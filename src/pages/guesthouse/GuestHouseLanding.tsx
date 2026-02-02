@@ -106,32 +106,11 @@ export default function GuestHouseLanding() {
       </Helmet>
 
       <div className="min-h-screen bg-background relative overflow-hidden">
-        {/* Animated background orbs */}
+        {/* Static background gradient - optimized for performance */}
         <div className="fixed inset-0 pointer-events-none overflow-hidden">
-          <motion.div 
-            className="absolute -top-40 -left-40 w-96 h-96 rounded-full bg-primary/10 blur-3xl"
-            animate={{ 
-              scale: [1, 1.2, 1],
-              opacity: [0.3, 0.5, 0.3]
-            }}
-            transition={{ duration: 8, repeat: Infinity }}
-          />
-          <motion.div 
-            className="absolute top-1/2 -right-40 w-80 h-80 rounded-full bg-secondary/10 blur-3xl"
-            animate={{ 
-              scale: [1.2, 1, 1.2],
-              opacity: [0.4, 0.2, 0.4]
-            }}
-            transition={{ duration: 10, repeat: Infinity }}
-          />
-          <motion.div 
-            className="absolute -bottom-20 left-1/3 w-72 h-72 rounded-full bg-accent/10 blur-3xl"
-            animate={{ 
-              scale: [1, 1.3, 1],
-              opacity: [0.2, 0.4, 0.2]
-            }}
-            transition={{ duration: 12, repeat: Infinity }}
-          />
+          <div className="absolute -top-40 -left-40 w-96 h-96 rounded-full bg-primary/10 blur-3xl opacity-40" />
+          <div className="absolute top-1/2 -right-40 w-80 h-80 rounded-full bg-secondary/10 blur-3xl opacity-30" />
+          <div className="absolute -bottom-20 left-1/3 w-72 h-72 rounded-full bg-accent/10 blur-3xl opacity-30" />
         </div>
 
         <div className="relative z-10 container mx-auto px-4 py-8">
@@ -164,7 +143,7 @@ export default function GuestHouseLanding() {
                 animate={{ opacity: 1, scale: 1 }}
                 className="inline-block"
               >
-                <Card className="bg-card/80 backdrop-blur-xl border-primary/20 p-6 shadow-[var(--shadow-glow)]">
+                <Card className="bg-card/95 border-primary/20 p-6 shadow-lg">
                   <div className="flex items-center gap-4">
                     <div className="p-3 rounded-full bg-primary/10">
                       <Clock className="w-6 h-6 text-primary" />
@@ -220,7 +199,7 @@ export default function GuestHouseLanding() {
                 ))}
               </div>
             ) : events.length === 0 ? (
-              <Card className="p-12 text-center bg-card/80 backdrop-blur-xl border-border/50">
+              <Card className="p-12 text-center bg-card/95 border-border/50">
                 <Sparkles className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
                 <h3 className="text-xl font-semibold mb-2">No Events Scheduled Yet</h3>
                 <p className="text-muted-foreground mb-6">
@@ -265,7 +244,7 @@ export default function GuestHouseLanding() {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.7 + i * 0.1 }}
                 >
-                  <Card className="p-6 text-center bg-card/80 backdrop-blur-xl border-border/50 hover:border-primary/30 transition-all hover:shadow-[var(--shadow-elegant)]">
+                  <Card className="p-6 text-center bg-card/95 border-border/50 hover:border-primary/30 transition-all hover:shadow-md">
                     <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4">
                       <step.icon className="w-6 h-6 text-primary" />
                     </div>
