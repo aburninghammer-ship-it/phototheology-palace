@@ -15138,6 +15138,42 @@ export type Database = {
         }
         Relationships: []
       }
+      user_study_path_progress: {
+        Row: {
+          completed_at: string | null
+          completed_cards: string[]
+          created_at: string
+          current_card_index: number
+          id: string
+          is_active: boolean
+          path_id: string
+          started_at: string
+          user_id: string
+        }
+        Insert: {
+          completed_at?: string | null
+          completed_cards?: string[]
+          created_at?: string
+          current_card_index?: number
+          id?: string
+          is_active?: boolean
+          path_id: string
+          started_at?: string
+          user_id: string
+        }
+        Update: {
+          completed_at?: string | null
+          completed_cards?: string[]
+          created_at?: string
+          current_card_index?: number
+          id?: string
+          is_active?: boolean
+          path_id?: string
+          started_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_study_paths: {
         Row: {
           created_at: string
