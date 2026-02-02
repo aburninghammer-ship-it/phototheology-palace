@@ -28,7 +28,7 @@ const GUIDED_PATH_ROUTES = [
   '/gatehouse',
   '/bible',
   '/jeeves',
-  '/gems-room',
+  '/give-me-a-gem',
   '/palace',
 ];
 

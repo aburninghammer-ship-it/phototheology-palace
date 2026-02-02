@@ -173,7 +173,7 @@ export const GuidedPathChecklist = ({ className, minimized = false }: GuidedPath
                 <div className="p-4 pt-0">
                   <Button 
                     className="w-full" 
-                    onClick={() => navigate('/gems-room')}
+                    onClick={() => navigate('/give-me-a-gem')}
                   >
                     <Sparkles className="w-4 h-4 mr-2" />
                     Save Your First Gem

@@ -22,6 +22,7 @@ import {
 Scale, Zap, Calculator, Mic2, Edit, Copy, Presentation, CheckCircle2, Grid3X3
 } from "lucide-react";
 import { format } from "date-fns";
+import { StyledMarkdown } from "@/components/ui/styled-markdown";
 
 // Reference Libraries data - PT Room Libraries from Floors 1-7
 const REFERENCE_LIBRARIES = [
@@ -753,7 +754,9 @@ export default function Libraries() {
                       </CardDescription>
                     </CardHeader>
                     <CardContent>
-                      <p className="text-sm line-clamp-3">{gem.gem_content}</p>
+                      <div className="text-sm line-clamp-4 prose prose-sm dark:prose-invert max-w-none prose-p:my-1 prose-strong:text-emerald-600 dark:prose-strong:text-emerald-400">
+                        <StyledMarkdown content={gem.gem_content?.substring(0, 300) || ""} />
+                      </div>
                     </CardContent>
                   </Card>
                 ))}
