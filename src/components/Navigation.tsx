@@ -1,6 +1,6 @@
 import { useLayoutEffect, useRef, useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { Building2, Sparkles, Users, User, CreditCard, LogOut, MessageCircle, BookOpen, Calendar, Image, Search, Video, Sword, Crown, Shield, Brain, Lightbulb, Zap, Trophy, MessageSquare, Target, StickyNote, Radio, Church, GraduationCap, Award, Gamepad2, BarChart3, Archive, Library, Layers, Network, Home, Heart } from "lucide-react";
+import { Building2, Sparkles, Users, User, CreditCard, LogOut, MessageCircle, BookOpen, Calendar, Image, Search, Video, Sword, Crown, Shield, Brain, Lightbulb, Zap, Trophy, MessageSquare, Target, StickyNote, Radio, Church, GraduationCap, Award, Gamepad2, BarChart3, Archive, Library, Layers, Network, Home, Heart, Gem } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
 import { useActiveUsers } from "@/hooks/useActiveUsers";
@@ -449,6 +449,13 @@ export const Navigation = () => {
                   >
                     <Lightbulb className="h-3.5 w-3.5 text-amber-500" />
                     <span className="bg-gradient-to-r from-amber-600 to-yellow-600 bg-clip-text text-transparent font-semibold">Study Ideas</span>
+                  </Link>
+                  <Link
+                    to="/palace/floor/1/room/gr"
+                    className={`px-3 py-1.5 text-sm font-medium rounded-md transition-all whitespace-nowrap flex items-center gap-1 bg-gradient-to-r from-emerald-500/10 to-teal-500/10 border border-emerald-500/20 hover:from-emerald-500/20 hover:to-teal-500/20 ${isActiveTab('/palace/floor/1/room/gr') ? 'shadow-[0_0_12px_2px_rgba(16,185,129,0.5)] border-emerald-400/60' : ''}`}
+                  >
+                    <Gem className="h-3.5 w-3.5 text-emerald-500" />
+                    <span className="bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent font-semibold">Give Me A Gem</span>
                   </Link>
                   {!isGuestHouseMode && (
                   <Link
