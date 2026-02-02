@@ -31,65 +31,73 @@ export default function GuestHouseGuestLive() {
     }
 
     setGuestId(storedGuestId);
-    fetchGuestAndEvent(storedGuestId);
+    
+    let channel: ReturnType<typeof supabase.channel> | null = null;
+    
+    const init = async () => {
+      try {
+        // Fetch guest info
+        const { data: guest, error: guestError } = await supabase
+          .from("guesthouse_guests")
+          .select("display_name")
+          .eq("id", storedGuestId)
+          .single();
+
+        if (guestError || !guest) {
+          // Guest not found, clear storage and redirect
+          localStorage.removeItem(`guesthouse_guest_${eventId}`);
+          navigate(`/guesthouse/lobby/${eventId}`);
+          return;
+        }
+
+        setGuestName(guest.display_name);
+
+        // Fetch event info
+        const { data: event, error: eventError } = await supabase
+          .from("guesthouse_events")
+          .select("title, status")
+          .eq("id", eventId)
+          .single();
+
+        if (eventError || !event) {
+          setEventStatus("not_found");
+          setLoading(false);
+          return;
+        }
+
+        setEventTitle(event.title);
+        setEventStatus(event.status);
+
+        // Subscribe to event status changes
+        channel = supabase
+          .channel(`event-status-${eventId}`)
+          .on(
+            'postgres_changes',
+            { event: 'UPDATE', schema: 'public', table: 'guesthouse_events', filter: `id=eq.${eventId}` },
+            (payload) => {
+              setEventStatus((payload.new as any).status);
+            }
+          )
+          .subscribe();
+
+        setLoading(false);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+        setEventStatus("error");
+        setLoading(false);
+      }
+    };
+    
+    init();
+    
+    return () => {
+      if (channel) {
+        supabase.removeChannel(channel);
+      }
+    };
   }, [eventId, navigate]);
 
-  const fetchGuestAndEvent = async (guestId: string) => {
-    try {
-      // Fetch guest info
-      const { data: guest, error: guestError } = await supabase
-        .from("guesthouse_guests")
-        .select("display_name")
-        .eq("id", guestId)
-        .single();
-
-      if (guestError || !guest) {
-        // Guest not found, clear storage and redirect
-        localStorage.removeItem(`guesthouse_guest_${eventId}`);
-        navigate(`/guesthouse/lobby/${eventId}`);
-        return;
-      }
-
-      setGuestName(guest.display_name);
-
-      // Fetch event info
-      const { data: event, error: eventError } = await supabase
-        .from("guesthouse_events")
-        .select("title, status")
-        .eq("id", eventId)
-        .single();
-
-      if (eventError || !event) {
-        setEventStatus("not_found");
-        return;
-      }
-
-      setEventTitle(event.title);
-      setEventStatus(event.status);
-
-      // Subscribe to event status changes
-      const channel = supabase
-        .channel(`event-status-${eventId}`)
-        .on(
-          'postgres_changes',
-          { event: 'UPDATE', schema: 'public', table: 'guesthouse_events', filter: `id=eq.${eventId}` },
-          (payload) => {
-            setEventStatus((payload.new as any).status);
-          }
-        )
-        .subscribe();
-
-      setLoading(false);
-
-      return () => {
-        supabase.removeChannel(channel);
-      };
-    } catch (error) {
-      console.error("Error fetching data:", error);
-      setEventStatus("error");
-      setLoading(false);
-    }
-  };
+  // Initialization logic moved to useEffect for proper cleanup
 
   if (loading) {
     return (

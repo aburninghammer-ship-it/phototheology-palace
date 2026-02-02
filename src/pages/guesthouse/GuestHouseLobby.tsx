@@ -46,6 +46,11 @@ export default function GuestHouseLobby() {
   const [guestCount, setGuestCount] = useState(0);
 
   useEffect(() => {
+    if (!eventId) {
+      navigate("/guesthouse");
+      return;
+    }
+    
     const storedGuestId = localStorage.getItem(`guesthouse_guest_${eventId}`);
     if (!storedGuestId) {
       toast.error("Please register first");
@@ -54,8 +59,23 @@ export default function GuestHouseLobby() {
     }
     setGuestId(storedGuestId);
     fetchEventAndGuest(storedGuestId);
-    subscribeToGuests();
-  }, [eventId]);
+    
+    // Subscribe and get cleanup function
+    const channel = supabase
+      .channel(`lobby:${eventId}`)
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "guesthouse_guests", filter: `event_id=eq.${eventId}` },
+        () => fetchGuestCount()
+      )
+      .subscribe();
+
+    fetchGuestCount();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [eventId, navigate]);
 
   useEffect(() => {
     if (!event) return;
@@ -116,22 +136,7 @@ export default function GuestHouseLobby() {
     }
   };
 
-  const subscribeToGuests = () => {
-    const channel = supabase
-      .channel(`lobby:${eventId}`)
-      .on(
-        "postgres_changes",
-        { event: "*", schema: "public", table: "guesthouse_guests", filter: `event_id=eq.${eventId}` },
-        () => fetchGuestCount()
-      )
-      .subscribe();
-
-    fetchGuestCount();
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  };
+  // subscribeToGuests moved inline to useEffect for proper cleanup
 
   const fetchGuestCount = async () => {
     const { count } = await supabase
