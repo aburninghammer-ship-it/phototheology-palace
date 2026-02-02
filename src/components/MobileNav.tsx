@@ -79,9 +79,9 @@ export const MobileNav = () => {
                   📚 Bible Rendered
                 </Button>
               </Link>
-              <Link to="/palace/floor/1/room/gr">
+              <Link to="/give-me-a-gem">
                 <Button variant="ghost" className="w-full justify-start" size="sm">
-                  💎 Produce a Gem
+                  💎 Give Me A Gem
                 </Button>
               </Link>
               <Link to="/verse-memory-hall">
