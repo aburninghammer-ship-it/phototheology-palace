@@ -443,6 +443,13 @@ export const Navigation = () => {
                     <Brain className="h-3.5 w-3.5 text-slate-400" />
                     <span className="bg-gradient-to-r from-slate-500 to-zinc-500 bg-clip-text text-transparent font-semibold">Study Buddy</span>
                   </Link>
+                  <Link
+                    to="/study-ideas"
+                    className={`px-3 py-1.5 text-sm font-medium rounded-md transition-all whitespace-nowrap flex items-center gap-1 bg-gradient-to-r from-amber-500/10 to-yellow-500/10 border border-amber-500/20 hover:from-amber-500/20 hover:to-yellow-500/20 ${isActiveTab('/study-ideas') ? 'shadow-[0_0_12px_2px_rgba(245,158,11,0.5)] border-amber-400/60' : ''}`}
+                  >
+                    <Lightbulb className="h-3.5 w-3.5 text-amber-500" />
+                    <span className="bg-gradient-to-r from-amber-600 to-yellow-600 bg-clip-text text-transparent font-semibold">Study Ideas</span>
+                  </Link>
                   {!isGuestHouseMode && (
                   <Link
                     to="/mind-map"

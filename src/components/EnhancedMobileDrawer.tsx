@@ -31,6 +31,7 @@ import {
   Headphones,
   Network,
   Image,
+  Lightbulb,
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { Separator } from "@/components/ui/separator";
@@ -49,6 +50,7 @@ const categoryConfig = {
     links: [
       { to: "/bible", label: "PT Study Bible", icon: "📖" },
       { to: "/study-buddy", label: "Study Buddy", icon: "🧠" },
+      { to: "/study-ideas", label: "Study Ideas", icon: "💡" },
       { to: "/mind-map", label: "Mind Map Palace", icon: "🗺️" },
       { to: "/audio-bible", label: "Audio Bible", icon: "🎧" },
       { to: "/bible-image-library", label: "PT Image Bible", icon: "🎨" },

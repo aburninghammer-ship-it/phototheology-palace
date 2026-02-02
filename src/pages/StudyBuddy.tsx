@@ -49,6 +49,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { StudySimmerWrapper } from "@/components/simmer/StudySimmerWrapper";
 import { formatDistanceToNow, format } from "date-fns";
+import { getCardById, SparkCard } from "@/data/studyIdeasLibrary";
 
 // Types for Jeeves analysis
 interface Spark {
@@ -303,6 +304,57 @@ export default function StudyBuddy() {
     }
     isInitialMount.current = false;
   }, []); // Empty deps - only run on mount
+
+  // Handle Spark Card or Generated Idea from Study Idea Library
+  useEffect(() => {
+    const sourceType = searchParams.get("source");
+    const cardId = searchParams.get("cardId");
+    const ideaParam = searchParams.get("idea");
+
+    if (sourceType === "spark-card" && cardId) {
+      const card = getCardById(cardId);
+      if (card) {
+        // Pre-fill notes with the card's prompts
+        const promptsText = `## ${card.title}\n\n**Observe:** ${card.prompts.observe}\n\n**Connect:** ${card.prompts.connect}\n\n**Discover:** ${card.prompts.discover}\n\n---\n\n`;
+        setNotes(promptsText);
+        setSessionTitle(card.title);
+
+        // Navigate Bible to first verse anchor
+        if (card.verseAnchors.length > 0) {
+          const ref = parseVerseReference(card.verseAnchors[0]);
+          if (ref) {
+            setSelectedBook(ref.book);
+            setSelectedChapter(ref.chapter);
+          }
+        }
+
+        toast.success(`Loaded "${card.title}" - Start exploring!`);
+      }
+    } else if (sourceType === "generated-idea" && ideaParam) {
+      try {
+        const idea = JSON.parse(decodeURIComponent(ideaParam));
+        if (idea && idea.title) {
+          // Pre-fill notes with the generated idea's prompts
+          const promptsText = `## ${idea.title}\n\n**Observe:** ${idea.observePrompt}\n\n**Connect:** ${idea.connectPrompt}\n\n**Discover:** ${idea.discoverPrompt}\n\n---\n\n`;
+          setNotes(promptsText);
+          setSessionTitle(idea.title);
+
+          // Navigate Bible to first verse
+          if (idea.verses && idea.verses.length > 0) {
+            const ref = parseVerseReference(idea.verses[0]);
+            if (ref) {
+              setSelectedBook(ref.book);
+              setSelectedChapter(ref.chapter);
+            }
+          }
+
+          toast.success(`Loaded "${idea.title}" - Start exploring!`);
+        }
+      } catch (e) {
+        console.error("Failed to parse generated idea:", e);
+      }
+    }
+  }, [searchParams]);
 
   // Fetch and populate verse text when user types a reference
   const populateVerseReference = useCallback(async (ref: ParsedReference) => {
