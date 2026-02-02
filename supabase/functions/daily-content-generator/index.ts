@@ -64,7 +64,11 @@ Format your response as JSON:
     }
 
     const challengeData = await challengeResponse.json();
-    const challengeContent = JSON.parse(challengeData.choices[0].message.content);
+    const rawChallengeContent = challengeData.choices[0].message.content;
+    // Extract JSON from markdown code blocks if present
+    const challengeJsonMatch = rawChallengeContent.match(/```(?:json)?\s*([\s\S]*?)```/);
+    const challengeJsonStr = challengeJsonMatch ? challengeJsonMatch[1].trim() : rawChallengeContent.trim();
+    const challengeContent = JSON.parse(challengeJsonStr);
 
     // Insert challenge
     const { error: challengeError } = await supabase
@@ -215,7 +219,11 @@ Return JSON format:
     }
 
     const huntData = await huntResponse.json();
-    const huntContent = JSON.parse(huntData.choices[0].message.content);
+    const rawHuntContent = huntData.choices[0].message.content;
+    // Extract JSON from markdown code blocks if present
+    const huntJsonMatch = rawHuntContent.match(/```(?:json)?\s*([\s\S]*?)```/);
+    const huntJsonStr = huntJsonMatch ? huntJsonMatch[1].trim() : rawHuntContent.trim();
+    const huntContent = JSON.parse(huntJsonStr);
 
     // Calculate expiration (24 hours from tomorrow start)
     const expiration = new Date(tomorrow.getTime() + 24 * 60 * 60 * 1000);
