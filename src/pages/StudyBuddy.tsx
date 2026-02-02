@@ -324,6 +324,8 @@ export default function StudyBuddy() {
         // Pre-fill notes with the card's prompts
         const promptsText = `## ${card.title}\n\n**Observe:** ${card.prompts.observe}\n\n**Connect:** ${card.prompts.connect}\n\n**Discover:** ${card.prompts.discover}\n\n---\n\n`;
         setNotes(promptsText);
+        // Prevent Jeeves from auto-analyzing preloaded content - wait for user to type
+        lastAnalyzedNotes.current = promptsText;
         setSessionTitle(card.title);
 
         // Navigate Bible to first verse anchor
@@ -344,6 +346,8 @@ export default function StudyBuddy() {
           // Pre-fill notes with the generated idea's prompts
           const promptsText = `## ${idea.title}\n\n**Observe:** ${idea.observePrompt}\n\n**Connect:** ${idea.connectPrompt}\n\n**Discover:** ${idea.discoverPrompt}\n\n---\n\n`;
           setNotes(promptsText);
+          // Prevent Jeeves from auto-analyzing preloaded content - wait for user to type
+          lastAnalyzedNotes.current = promptsText;
           setSessionTitle(idea.title);
 
           // Navigate Bible to first verse

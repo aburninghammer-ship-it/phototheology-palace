@@ -94,11 +94,14 @@ export const usePathProgress = () => {
 
       loadProgress();
       return data as PathProgress;
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error starting path:", error);
+      const errorMsg = error?.message || error?.details || "Failed to start study path";
       toast({
         title: "Error",
-        description: "Failed to start study path",
+        description: errorMsg.includes("does not exist")
+          ? "Study paths feature needs database setup. Please contact support."
+          : errorMsg,
         variant: "destructive",
       });
       return null;

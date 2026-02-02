@@ -226,6 +226,201 @@ export const sparkCards: SparkCard[] = [
     category: "sanctuary",
     tags: ["Eden", "sanctuary", "gate", "entrance", "paradise", "tabernacle"],
   },
+  // ============================================
+  // NEW CARDS (Batch 2 - 12 Additional)
+  // ============================================
+  {
+    id: "seven-days-pattern",
+    title: "Seven Days Creation Pattern",
+    verseAnchors: ["Genesis 1:1-31", "Genesis 2:1-3", "Leviticus 23:3"],
+    palaceRooms: [
+      { id: "st", name: "Numbers", icon: "Hash" },
+      { id: "prm", name: "Cycles", icon: "RefreshCw" },
+    ],
+    prompts: {
+      observe: "What is the structure of creation week? What happens on each day?",
+      connect: "Where else does the seven-day pattern appear (feasts, purification, marches)?",
+      discover: "Why did God choose seven days? What does the Sabbath reveal about completion?",
+    },
+    category: "cycles",
+    tags: ["seven", "creation", "Sabbath", "week", "numbers", "rest"],
+  },
+  {
+    id: "burning-bush",
+    title: "The Burning Bush",
+    verseAnchors: ["Exodus 3:1-6", "Acts 7:30-34"],
+    palaceRooms: [
+      { id: "dr", name: "Presence", icon: "Sparkles" },
+      { id: "st", name: "Fire", icon: "Flame" },
+    ],
+    prompts: {
+      observe: "Why was the bush burning but not consumed? Why 'holy ground'?",
+      connect: "Where else does fire represent God's presence without destroying?",
+      discover: "What does the unconsumed bush reveal about dwelling with a holy God?",
+    },
+    category: "patterns",
+    tags: ["fire", "presence", "Moses", "holy ground", "theophany", "burning"],
+  },
+  {
+    id: "jacobs-ladder",
+    title: "Jacob's Ladder",
+    verseAnchors: ["Genesis 28:10-17", "John 1:51"],
+    palaceRooms: [
+      { id: "dr", name: "Dimensions", icon: "Layers" },
+      { id: "prm", name: "Types", icon: "Copy" },
+    ],
+    prompts: {
+      observe: "What does Jacob see? What is ascending and descending?",
+      connect: "How does Jesus apply this to Himself in John 1?",
+      discover: "How is Christ the connection between heaven and earth?",
+    },
+    category: "types",
+    tags: ["ladder", "angels", "Jacob", "Jesus", "heaven", "connection"],
+  },
+  {
+    id: "serpent-pole",
+    title: "The Serpent on the Pole",
+    verseAnchors: ["Numbers 21:8-9", "John 3:14-15"],
+    palaceRooms: [
+      { id: "prm", name: "Types", icon: "Copy" },
+      { id: "bl", name: "Atonement", icon: "Cross" },
+    ],
+    prompts: {
+      observe: "Why a bronze serpent? Why lifted up on a pole?",
+      connect: "How does Jesus interpret this in John 3?",
+      discover: "Why must looking bring healing? What does 'lifted up' foreshadow?",
+    },
+    category: "types",
+    tags: ["serpent", "pole", "healing", "lifted up", "cross", "Jesus"],
+  },
+  {
+    id: "crossing-jordan",
+    title: "Crossing the Jordan",
+    verseAnchors: ["Joshua 3:14-17", "Joshua 4:19-24", "Matthew 3:13-17"],
+    palaceRooms: [
+      { id: "st", name: "Water", icon: "Droplets" },
+      { id: "prm", name: "Patterns", icon: "Target" },
+    ],
+    prompts: {
+      observe: "How does the Jordan crossing parallel the Red Sea?",
+      connect: "What other 'water crossings' lead to new beginnings in Scripture?",
+      discover: "Why is Jesus baptized in the Jordan? What transition does it mark?",
+    },
+    category: "patterns",
+    tags: ["Jordan", "crossing", "baptism", "promised land", "Red Sea", "water"],
+  },
+  {
+    id: "ravens-provision",
+    title: "Ravens & Unexpected Provision",
+    verseAnchors: ["1 Kings 17:4-6", "Luke 12:24"],
+    palaceRooms: [
+      { id: "st", name: "Nature", icon: "Bird" },
+      { id: "dr", name: "Providence", icon: "Gift" },
+    ],
+    prompts: {
+      observe: "Why ravens—an unclean bird—to feed Elijah?",
+      connect: "Where else does God use unexpected or 'unclean' means to provide?",
+      discover: "What does raven-provision teach about trusting God's methods?",
+    },
+    category: "patterns",
+    tags: ["ravens", "provision", "Elijah", "unclean", "trust", "nature"],
+  },
+  {
+    id: "forty-pattern",
+    title: "The Forty Days/Years Pattern",
+    verseAnchors: ["Genesis 7:12", "Exodus 24:18", "Matthew 4:1-2"],
+    palaceRooms: [
+      { id: "st", name: "Numbers", icon: "Hash" },
+      { id: "prm", name: "Testing", icon: "Scale" },
+    ],
+    prompts: {
+      observe: "List the major 'forty' periods: flood, Sinai, wilderness, temptation.",
+      connect: "What consistently happens during these forty periods?",
+      discover: "Why forty? What does testing and preparation accomplish?",
+    },
+    category: "cycles",
+    tags: ["forty", "testing", "wilderness", "preparation", "numbers", "pattern"],
+  },
+  {
+    id: "two-adams",
+    title: "First & Second Adam",
+    verseAnchors: ["Romans 5:14-19", "1 Corinthians 15:45-49"],
+    palaceRooms: [
+      { id: "prm", name: "Types", icon: "Copy" },
+      { id: "bl", name: "Redemption", icon: "Cross" },
+    ],
+    prompts: {
+      observe: "What does Adam bring? What does Christ bring?",
+      connect: "How do their choices mirror and reverse each other?",
+      discover: "In what ways are all humans 'in Adam' or 'in Christ'?",
+    },
+    category: "types",
+    tags: ["Adam", "Christ", "typology", "death", "life", "Romans"],
+  },
+  {
+    id: "scarlet-cord",
+    title: "The Scarlet Cord",
+    verseAnchors: ["Joshua 2:18-21", "Exodus 12:13", "Hebrews 11:31"],
+    palaceRooms: [
+      { id: "st", name: "Color", icon: "Palette" },
+      { id: "bl", name: "Salvation", icon: "ShieldCheck" },
+    ],
+    prompts: {
+      observe: "What is Rahab told to display? What does it protect?",
+      connect: "How does the scarlet cord parallel the Passover blood?",
+      discover: "Why scarlet? What does Rahab's faith teach about salvation?",
+    },
+    category: "types",
+    tags: ["scarlet", "cord", "Rahab", "blood", "Passover", "salvation"],
+  },
+  {
+    id: "tree-of-life",
+    title: "Tree of Life Reappearances",
+    verseAnchors: ["Genesis 2:9", "Genesis 3:22-24", "Revelation 22:2"],
+    palaceRooms: [
+      { id: "st", name: "Nature", icon: "TreeDeciduous" },
+      { id: "prm", name: "Patterns", icon: "Target" },
+    ],
+    prompts: {
+      observe: "Where is the tree of life at creation? At the end?",
+      connect: "Trace tree/wood imagery: cross, curse, blessing.",
+      discover: "Why does the tree reappear in the New Jerusalem? What changed?",
+    },
+    category: "patterns",
+    tags: ["tree", "life", "Eden", "Revelation", "healing", "paradise"],
+  },
+  {
+    id: "oil-anointing",
+    title: "Oil & Anointing",
+    verseAnchors: ["Exodus 30:22-33", "1 Samuel 16:13", "Luke 4:18"],
+    palaceRooms: [
+      { id: "st", name: "Elements", icon: "Droplet" },
+      { id: "dr", name: "Spirit", icon: "Wind" },
+    ],
+    prompts: {
+      observe: "What was the holy anointing oil made of? Who received it?",
+      connect: "How does oil connect to the Spirit in kings, priests, and Jesus?",
+      discover: "Why is 'Messiah/Christ' literally 'Anointed One'? What does anointing confer?",
+    },
+    category: "elements",
+    tags: ["oil", "anointing", "Spirit", "Messiah", "priest", "king"],
+  },
+  {
+    id: "night-visions",
+    title: "Night Visions & Encounters",
+    verseAnchors: ["Genesis 15:12-17", "Genesis 46:2-4", "1 Kings 3:5-15"],
+    palaceRooms: [
+      { id: "dr", name: "Revelation", icon: "Moon" },
+      { id: "dr", name: "Presence", icon: "Sparkles" },
+    ],
+    prompts: {
+      observe: "What do Abraham, Jacob, and Solomon receive at night?",
+      connect: "Find other night encounters: Jacob wrestling, Jesus praying, etc.",
+      discover: "Why does God often speak in darkness? What does night-revelation teach?",
+    },
+    category: "patterns",
+    tags: ["night", "vision", "dreams", "Abraham", "Jacob", "Solomon", "revelation"],
+  },
 ];
 
 // ============================================
