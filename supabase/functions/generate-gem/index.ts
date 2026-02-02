@@ -46,46 +46,68 @@ serve(async (req) => {
                      req.headers.get('x-real-ip') || 
                      'unknown';
 
-    // Check weekly gem limit (5 per week, resets Sunday)
-    const WEEKLY_LIMIT = 5;
-    
-    // Get the start of the current week (Sunday at midnight UTC)
+    // Gem limits by day: 1/day, 2 on Friday, 0 on Saturday (Sabbath)
     const now = new Date();
-    const startOfWeek = new Date(now);
-    startOfWeek.setUTCDate(now.getUTCDate() - now.getUTCDay());
-    startOfWeek.setUTCHours(0, 0, 0, 0);
-    const weekStartISO = startOfWeek.toISOString();
+    const dayOfWeek = now.getUTCDay(); // 0=Sunday, 5=Friday, 6=Saturday
     
-    let gemsThisWeek = 0;
+    // Get daily limits based on day of week
+    const getDailyLimit = (day: number): number => {
+      if (day === 6) return 0; // Saturday (Sabbath) - no gems
+      if (day === 5) return 2; // Friday - 2 gems
+      return 1; // Sunday-Thursday - 1 gem
+    };
+    
+    const DAILY_LIMIT = getDailyLimit(dayOfWeek);
+    
+    // Check if it's Sabbath
+    if (DAILY_LIMIT === 0) {
+      return new Response(
+        JSON.stringify({ 
+          error: "It's Sabbath! Take time to rest and reflect. Gem discovery resumes tomorrow.",
+          limit_reached: true,
+          is_sabbath: true,
+          gems_today: 0,
+          daily_limit: 0
+        }),
+        { status: 429, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+    
+    // Get the start of today (UTC midnight)
+    const startOfDay = new Date(now);
+    startOfDay.setUTCHours(0, 0, 0, 0);
+    const dayStartISO = startOfDay.toISOString();
+    
+    let gemsToday = 0;
     if (userId) {
-      // Check by user ID
+      // Check by user ID for today
       const { count, error: countError } = await supabase
         .from('generated_gems')
         .select('*', { count: 'exact', head: true })
         .eq('generated_for_user_id', userId)
-        .gte('created_at', weekStartISO);
+        .gte('created_at', dayStartISO);
       
       if (countError) {
-        console.error('Error checking weekly limit:', countError);
+        console.error('Error checking daily limit:', countError);
       } else {
-        gemsThisWeek = count || 0;
+        gemsToday = count || 0;
       }
     } else {
-      // For anonymous users, check total anonymous gems this week
+      // For anonymous users, check total anonymous gems today
       const { count, error: countError } = await supabase
         .from('generated_gems')
         .select('*', { count: 'exact', head: true })
         .is('generated_for_user_id', null)
-        .gte('created_at', weekStartISO);
+        .gte('created_at', dayStartISO);
       
       if (countError) {
-        console.error('Error checking anonymous weekly limit:', countError);
+        console.error('Error checking anonymous daily limit:', countError);
       } else {
-        // Anonymous users share a more generous pool (100 total per week)
-        if ((count || 0) >= 100) {
+        // Anonymous users share a daily pool of 50
+        if ((count || 0) >= 50) {
           return new Response(
             JSON.stringify({ 
-              error: 'Weekly gem limit reached for anonymous users. Sign in for your personal weekly limit.',
+              error: 'Daily gem limit reached for anonymous users. Sign in for your personal daily limit.',
               limit_reached: true
             }),
             { status: 429, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
@@ -94,21 +116,27 @@ serve(async (req) => {
       }
     }
 
-    const gemsRemaining = Math.max(0, WEEKLY_LIMIT - gemsThisWeek);
-    if (userId && gemsThisWeek >= WEEKLY_LIMIT) {
+    const gemsRemaining = Math.max(0, DAILY_LIMIT - gemsToday);
+    const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+    
+    if (userId && gemsToday >= DAILY_LIMIT) {
+      const isFriday = dayOfWeek === 5;
       return new Response(
         JSON.stringify({ 
-          error: `You've discovered ${WEEKLY_LIMIT} gems this week. Your limit resets on Sunday!`,
+          error: isFriday 
+            ? `You've discovered your 2 Friday gems! Tomorrow is Sabbath rest, so come back Sunday for more.`
+            : `You've discovered your gem for ${dayNames[dayOfWeek]}! Return tomorrow for another treasure.`,
           limit_reached: true,
-          gems_this_week: gemsThisWeek,
-          weekly_limit: WEEKLY_LIMIT,
-          gems_remaining: 0
+          gems_today: gemsToday,
+          daily_limit: DAILY_LIMIT,
+          gems_remaining: 0,
+          day_of_week: dayNames[dayOfWeek]
         }),
         { status: 429, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
-    console.log(`User ${userId || 'anonymous'} has generated ${gemsThisWeek}/${WEEKLY_LIMIT} gems this week (${gemsRemaining} remaining)`);
+    console.log(`User ${userId || 'anonymous'} has generated ${gemsToday}/${DAILY_LIMIT} gems today (${dayNames[dayOfWeek]}, ${gemsRemaining} remaining)`);
 
     // Generate a unique seed to ensure variety
     const uniqueSeed = `${Date.now()}-${Math.random().toString(36).substring(2, 15)}-${userId || 'anonymous'}`;
