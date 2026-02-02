@@ -26,7 +26,7 @@ export const usePathProgress = () => {
 
     setLoading(true);
     try {
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from("user_study_path_progress")
         .select("*")
         .eq("user_id", user.id)
@@ -62,7 +62,7 @@ export const usePathProgress = () => {
     if (existing) {
       // Reactivate if needed
       if (!existing.is_active) {
-        await supabase
+        await (supabase as any)
           .from("user_study_path_progress")
           .update({ is_active: true })
           .eq("id", existing.id);
@@ -72,7 +72,7 @@ export const usePathProgress = () => {
     }
 
     try {
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from("user_study_path_progress")
         .insert({
           user_id: user.id,
@@ -125,7 +125,7 @@ export const usePathProgress = () => {
     const isPathComplete = newCompletedCards.length === path.cardSequence.length;
 
     try {
-      const { error } = await supabase
+      const { error } = await (supabase as any)
         .from("user_study_path_progress")
         .update({
           completed_cards: newCompletedCards,
@@ -161,7 +161,7 @@ export const usePathProgress = () => {
     if (!progress) return false;
 
     try {
-      const { error } = await supabase
+      const { error } = await (supabase as any)
         .from("user_study_path_progress")
         .update({ current_card_index: cardIndex })
         .eq("id", progress.id);
@@ -180,7 +180,7 @@ export const usePathProgress = () => {
     if (!progress) return false;
 
     try {
-      const { error } = await supabase
+      const { error } = await (supabase as any)
         .from("user_study_path_progress")
         .update({ is_active: false })
         .eq("id", progress.id);
@@ -205,7 +205,7 @@ export const usePathProgress = () => {
     if (!progress) return false;
 
     try {
-      const { error } = await supabase
+      const { error } = await (supabase as any)
         .from("user_study_path_progress")
         .update({
           current_card_index: 0,

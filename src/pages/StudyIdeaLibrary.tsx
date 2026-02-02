@@ -119,7 +119,7 @@ export default function StudyIdeaLibrary() {
     }
   };
 
-  const useSimplifiedNav = preferences.simplified_nav ?? false;
+  const useSimplifiedNav = preferences.navigation_style === "simplified";
   const NavComponent = useSimplifiedNav ? SimplifiedNav : Navigation;
 
   return (
