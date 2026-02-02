@@ -31,6 +31,155 @@ const priceToTier: Record<string, string> = {
 
 const appPriceIds = Object.keys(priceToTier);
 
+// Helper function to handle backfilling missing dates
+async function handleBackfill(supabase: any, stripeKey: string | undefined, startDate: string) {
+  const today = new Date();
+  const start = new Date(startDate);
+  const results: string[] = [];
+
+  // Get current snapshot data (we'll use this for all backfilled dates)
+  const currentData = await getCurrentSnapshotData(supabase, stripeKey);
+
+  // Get existing snapshot dates
+  const { data: existingSnapshots } = await supabase
+    .from("analytics_snapshots")
+    .select("snapshot_date")
+    .gte("snapshot_date", startDate)
+    .order("snapshot_date", { ascending: true });
+
+  const existingDates = new Set(existingSnapshots?.map((s: any) => s.snapshot_date) || []);
+
+  // Loop through each date from start to today
+  const current = new Date(start);
+  while (current <= today) {
+    const dateStr = current.toISOString().split('T')[0];
+
+    if (!existingDates.has(dateStr)) {
+      // Insert snapshot for this date
+      const snapshotData = {
+        ...currentData,
+        snapshot_date: dateStr,
+        new_signups_today: 0, // Can't know historical signups
+      };
+
+      const { error } = await supabase
+        .from("analytics_snapshots")
+        .upsert(snapshotData, { onConflict: 'snapshot_date' });
+
+      if (!error) {
+        results.push(dateStr);
+      }
+    }
+
+    current.setDate(current.getDate() + 1);
+  }
+
+  logStep("Backfill complete", { filled: results.length, dates: results });
+
+  return new Response(
+    JSON.stringify({
+      success: true,
+      message: `Backfilled ${results.length} missing days`,
+      dates: results,
+    }),
+    { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+  );
+}
+
+// Get current snapshot data
+async function getCurrentSnapshotData(supabase: any, stripeKey: string | undefined) {
+  // Get total users
+  const { count: totalUsers } = await supabase
+    .from("profiles")
+    .select("id", { count: 'exact', head: true });
+
+  // Get lifetime access count
+  const { count: lifetimeAccess } = await supabase
+    .from("user_subscriptions")
+    .select("id", { count: 'exact', head: true })
+    .eq("has_lifetime_access", true);
+
+  // Get active patrons
+  const { count: activePatrons } = await supabase
+    .from("patreon_connections")
+    .select("id", { count: 'exact', head: true })
+    .eq("is_active_patron", true);
+
+  // Get Pickaxe paid users
+  const { count: pickaxePaid } = await supabase
+    .from("pickaxe_connections")
+    .select("id", { count: 'exact', head: true })
+    .eq("is_paid_user", true);
+
+  // Get active churches count
+  const { count: activeChurches } = await supabase
+    .from("churches")
+    .select("id", { count: 'exact', head: true })
+    .eq("subscription_status", "active");
+
+  let snapshotData: Record<string, any> = {
+    total_users: totalUsers || 0,
+    lifetime_access: lifetimeAccess || 0,
+    patreon_active: activePatrons || 0,
+    pickaxe_count: pickaxePaid || 0,
+    stripe_active: 0,
+    stripe_trialing: 0,
+    stripe_cancelled: 0,
+    mrr_cents: 0,
+    tier_essential: 0,
+    tier_premium: 0,
+    tier_student: 0,
+    tier_church: 0,
+    new_signups_today: 0,
+    active_churches: activeChurches || 0,
+  };
+
+  // Get Stripe data if available
+  if (stripeKey) {
+    try {
+      const stripe = new Stripe(stripeKey, { apiVersion: "2025-08-27.basil" });
+
+      const activeSubscriptions = await fetchAllStripeSubscriptions(stripe, 'active');
+      const trialingSubscriptions = await fetchAllStripeSubscriptions(stripe, 'trialing');
+      const canceledSubscriptions = await fetchAllStripeSubscriptions(stripe, 'canceled');
+
+      snapshotData.stripe_active = activeSubscriptions.length;
+      snapshotData.stripe_trialing = trialingSubscriptions.length;
+      snapshotData.stripe_cancelled = canceledSubscriptions.length;
+
+      // Count by tier and calculate MRR (include both active AND trialing since they have cards on file)
+      const allPayingSubs = [...activeSubscriptions, ...trialingSubscriptions];
+      allPayingSubs.forEach((sub: any) => {
+        const priceId = sub.items.data[0]?.price?.id;
+        const tier = priceToTier[priceId] || 'unknown';
+        const interval = sub.items.data[0]?.price?.recurring?.interval;
+        const amount = sub.items.data[0]?.price?.unit_amount || 0;
+
+        // Only count tiers for active subs (trialing counted separately)
+        if (sub.status === 'active') {
+          switch (tier) {
+            case 'essential': snapshotData.tier_essential++; break;
+            case 'premium': snapshotData.tier_premium++; break;
+            case 'student': snapshotData.tier_student++; break;
+            case 'church': snapshotData.tier_church++; break;
+          }
+        }
+
+        // Calculate MRR - include trialing users since they have cards on file
+        if (interval === 'year') {
+          snapshotData.mrr_cents += Math.round(amount / 12);
+        } else {
+          snapshotData.mrr_cents += amount;
+        }
+      });
+    } catch (stripeError: any) {
+      logStep("Stripe API error in backfill", { error: stripeError.message });
+    }
+  }
+
+  return snapshotData;
+}
+
 // Helper to fetch all Stripe subscriptions with pagination
 async function fetchAllStripeSubscriptions(
   stripe: Stripe, 
@@ -80,7 +229,7 @@ serve(async (req) => {
     }
 
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
-    
+
     // Optional: Verify admin if called manually
     const authHeader = req.headers.get("Authorization");
     if (authHeader) {
@@ -98,6 +247,15 @@ serve(async (req) => {
           throw new Error("Admin access required");
         }
       }
+    }
+
+    // Check for backfill mode
+    const url = new URL(req.url);
+    const backfillFrom = url.searchParams.get("backfill_from"); // e.g., "2026-01-17"
+
+    if (backfillFrom) {
+      logStep("Backfill mode activated", { from: backfillFrom });
+      return await handleBackfill(supabase, stripeKey, backfillFrom);
     }
 
     logStep("Starting analytics snapshot");
