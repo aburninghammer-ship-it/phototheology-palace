@@ -180,21 +180,25 @@ serve(async (req) => {
         snapshotData.stripe_trialing = trialingSubscriptions.length;
         snapshotData.stripe_cancelled = canceledSubscriptions.length;
 
-        // Count by tier and calculate MRR
-        activeSubscriptions.forEach((sub: any) => {
+        // Count by tier and calculate MRR (include both active AND trialing since they have cards on file)
+        const allPayingSubs = [...activeSubscriptions, ...trialingSubscriptions];
+        allPayingSubs.forEach((sub: any) => {
           const priceId = sub.items.data[0]?.price?.id;
           const tier = priceToTier[priceId] || 'unknown';
           const interval = sub.items.data[0]?.price?.recurring?.interval;
           const amount = sub.items.data[0]?.price?.unit_amount || 0;
 
-          switch (tier) {
-            case 'essential': snapshotData.tier_essential++; break;
-            case 'premium': snapshotData.tier_premium++; break;
-            case 'student': snapshotData.tier_student++; break;
-            case 'church': snapshotData.tier_church++; break;
+          // Only count tiers for active subs (trialing counted separately)
+          if (sub.status === 'active') {
+            switch (tier) {
+              case 'essential': snapshotData.tier_essential++; break;
+              case 'premium': snapshotData.tier_premium++; break;
+              case 'student': snapshotData.tier_student++; break;
+              case 'church': snapshotData.tier_church++; break;
+            }
           }
 
-          // Calculate MRR
+          // Calculate MRR - include trialing users since they have cards on file
           if (interval === 'year') {
             snapshotData.mrr_cents += Math.round(amount / 12);
           } else {
