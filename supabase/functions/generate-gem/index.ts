@@ -17,6 +17,114 @@ function hashContent(content: string): string {
   return Math.abs(hash).toString(36);
 }
 
+// Gem style configurations
+const GEM_STYLES = {
+  typology: {
+    name: "Typology Gem",
+    focus: "Christ-centered connections between Old Testament types and New Testament antitypes",
+    instructions: `Focus on TYPOLOGY:
+- Find a powerful type/shadow in the OT that points to Christ in the NT
+- Use the 5 Christ Tracers: Innocent Sufferer, Substitute, Deliverer, Covenant Mediator, Restorer/Bridegroom/King
+- Show how the type was fulfilled, often with precise details the original audience couldn't have known
+- Examples: Joseph sold for silver → Christ sold for silver; Passover lamb → Lamb of God; Bronze serpent → Christ lifted up`
+  },
+  hebrew_greek: {
+    name: "Word Study Gem",
+    focus: "Hebrew or Greek word insights revealing deeper meaning",
+    instructions: `Focus on ORIGINAL LANGUAGE INSIGHT:
+- Choose a Hebrew (OT) or Greek (NT) word with rich theological depth
+- Show how the original word reveals meaning lost in translation
+- Connect the word's usage across multiple passages
+- Include etymology, related words, or wordplay when relevant
+- Examples: "Hesed" (covenant love), "Shalom" (wholeness), "Logos" (Word), "Agape" (divine love)`
+  },
+  prophecy: {
+    name: "Prophecy Gem",
+    focus: "Prophetic patterns, fulfillments, and Daniel/Revelation connections",
+    instructions: `Focus on PROPHECY:
+- Connect prophetic texts from Daniel, Revelation, or OT prophets
+- Show prophetic patterns: prediction → fulfillment across time
+- Use the 8 Prophetic Cycles: @Ad, @No, @Ab, @Mo, @Cy, @CyC, @Sp, @Re
+- Apply the 3 Heavens framework when relevant (1H, 2H, 3H)
+- CRITICAL: Day of Atonement = 1844 judgment, NOT the cross (Passover = cross)`
+  },
+  palace: {
+    name: "Palace Gem",
+    focus: "Connection to a specific PhotoTheology Palace room methodology",
+    instructions: `Focus on PALACE METHODOLOGY:
+- Tie the gem to a specific Palace room/floor
+- Reference the room's unique approach:
+  * Story Room (narrative structure)
+  * Observation Room (textual details)
+  * Symbols/Types Room (symbolic meanings)
+  * Dimensions Room (6-dimensional analysis)
+  * Blue/Sanctuary Room (sanctuary connections)
+  * Prophecy Room (prophetic overlay)
+  * Parallels Room (mirrored actions)
+  * Concentration Room (Christ in every verse)
+- Show how the room's method unlocks the insight`
+  },
+  chiasm: {
+    name: "Chiasm Gem",
+    focus: "Literary structures, chiastic patterns, and Hebrew parallelism",
+    instructions: `Focus on LITERARY STRUCTURE:
+- Identify a chiastic structure (ABCBA pattern) or parallel construction
+- Show how the structure emphasizes the central point
+- Reveal meaning hidden in the literary artistry
+- Examples: Genesis 1 structure, Psalm 23 chiasm, John's Gospel inversions
+- Point out how the center of the chiasm reveals the author's main emphasis`
+  },
+  number: {
+    name: "Number Gem",
+    focus: "Biblical numerology and symbolic number patterns",
+    instructions: `Focus on BIBLICAL NUMBERS:
+- Explore the significance of a biblical number pattern
+- Key numbers: 3 (divine), 7 (completion), 12 (governance), 40 (testing), 70 (fullness), 144 (heavenly order)
+- Show how numbers create intentional connections across Scripture
+- Examples: 40 days/years patterns, 7 churches/seals/trumpets, 12 tribes/apostles
+- Avoid arbitrary numerology — focus on clear patterns the text emphasizes`
+  },
+  story: {
+    name: "Story Gem",
+    focus: "Narrative parallels between two Bible stories",
+    instructions: `Focus on STORY PARALLELS:
+- Find two stories from different books that mirror each other
+- Show how one story illuminates the other
+- Use the Christ-Church parallel pattern when applicable
+- Examples: Joseph/Christ, Elijah/John the Baptist, Exodus/Redemption
+- Highlight 3-5 specific parallel elements between the narratives`
+  }
+};
+
+// Depth configurations
+const DEPTH_CONFIGS = {
+  quick: {
+    name: "Quick Gem",
+    instructions: "Keep this gem SHORT and PUNCHY — 2-3 sentences for The Thread, 3-4 sentences for The Gem. Focus on ONE powerful connection. No extensive cross-references.",
+    maxLength: "brief"
+  },
+  study: {
+    name: "Study Gem",
+    instructions: "Provide a MEDIUM-LENGTH gem with fuller exploration. Include 2-3 supporting references. The Thread can be 3-4 sentences, The Gem 5-6 sentences.",
+    maxLength: "moderate"
+  },
+  deep: {
+    name: "Deep Gem",
+    instructions: "Create a COMPREHENSIVE gem with multiple layers. Include extensive cross-references (4-6 verses). Apply multiple PT dimensions. The Thread can be 4-5 sentences, The Gem 6-8 sentences with deeper theological connections.",
+    maxLength: "extensive"
+  }
+};
+
+// Day names for messages
+const DAY_NAMES = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+
+// Get daily limits based on day of week (Sabbath-aware)
+function getDailyLimit(dayOfWeek: number): number {
+  if (dayOfWeek === 6) return 0; // Saturday (Sabbath) - no gems
+  if (dayOfWeek === 5) return 2; // Friday - 2 gems
+  return 1; // Sunday-Thursday - 1 gem
+}
+
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
@@ -32,6 +140,32 @@ serve(async (req) => {
     const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
+    // Parse request body
+    let style = 'random';
+    let depth = 'study';
+    let passage: string | undefined;
+    let mode = 'personal';
+
+    try {
+      const body = await req.json();
+      style = body.style || 'random';
+      depth = body.depth || 'study';
+      passage = body.passage;
+      mode = body.mode || 'personal';
+    } catch {
+      // No body or invalid JSON, use defaults
+    }
+
+    // Handle random style selection
+    const styleKeys = Object.keys(GEM_STYLES);
+    let actualStyle = style;
+    if (style === 'random') {
+      actualStyle = styleKeys[Math.floor(Math.random() * styleKeys.length)];
+    }
+
+    const styleConfig = GEM_STYLES[actualStyle as keyof typeof GEM_STYLES] || GEM_STYLES.typology;
+    const depthConfig = DEPTH_CONFIGS[depth as keyof typeof DEPTH_CONFIGS] || DEPTH_CONFIGS.study;
+
     // Get user ID from auth header if available
     const authHeader = req.headers.get('authorization');
     let userId: string | null = null;
@@ -41,28 +175,42 @@ serve(async (req) => {
       userId = user?.id || null;
     }
 
-    // Get IP for anonymous rate limiting
-    const clientIp = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 
-                     req.headers.get('x-real-ip') || 
-                     'unknown';
-
-    // Gem limits by day: 1/day, 2 on Friday, 0 on Saturday (Sabbath)
+    // Get current time and day info
     const now = new Date();
-    const dayOfWeek = now.getUTCDay(); // 0=Sunday, 5=Friday, 6=Saturday
-    
-    // Get daily limits based on day of week
-    const getDailyLimit = (day: number): number => {
-      if (day === 6) return 0; // Saturday (Sabbath) - no gems
-      if (day === 5) return 2; // Friday - 2 gems
-      return 1; // Sunday-Thursday - 1 gem
-    };
-    
+    const dayOfWeek = now.getUTCDay();
+    const today = now.toISOString().split('T')[0];
+
+    // For Gem of the Day mode, check if one already exists for today
+    if (mode === 'daily') {
+      const { data: existingDailyGem } = await supabase
+        .from('generated_gems')
+        .select('*')
+        .eq('is_gem_of_day', true)
+        .gte('created_at', `${today}T00:00:00.000Z`)
+        .lte('created_at', `${today}T23:59:59.999Z`)
+        .maybeSingle();
+
+      if (existingDailyGem) {
+        console.log('Returning existing Gem of the Day');
+        return new Response(
+          JSON.stringify({
+            gem: existingDailyGem.content,
+            title: existingDailyGem.title,
+            style: existingDailyGem.gem_style || actualStyle,
+            depth: existingDailyGem.gem_depth || depth,
+          }),
+          { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+    }
+
+    // Sabbath-aware gem limits (only for personal mode)
     const DAILY_LIMIT = getDailyLimit(dayOfWeek);
-    
+
     // Check if it's Sabbath
-    if (DAILY_LIMIT === 0) {
+    if (DAILY_LIMIT === 0 && mode === 'personal') {
       return new Response(
-        JSON.stringify({ 
+        JSON.stringify({
           error: "It's Sabbath! Take time to rest and reflect. Gem discovery resumes tomorrow.",
           limit_reached: true,
           is_sabbath: true,
@@ -72,41 +220,42 @@ serve(async (req) => {
         { status: 429, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
-    
+
     // Get the start of today (UTC midnight)
     const startOfDay = new Date(now);
     startOfDay.setUTCHours(0, 0, 0, 0);
     const dayStartISO = startOfDay.toISOString();
-    
+
     let gemsToday = 0;
-    if (userId) {
-      // Check by user ID for today
+    if (userId && mode === 'personal') {
+      // Check by user ID for today (excluding gem of day)
       const { count, error: countError } = await supabase
         .from('generated_gems')
         .select('*', { count: 'exact', head: true })
         .eq('generated_for_user_id', userId)
+        .eq('is_gem_of_day', false)
         .gte('created_at', dayStartISO);
-      
+
       if (countError) {
         console.error('Error checking daily limit:', countError);
       } else {
         gemsToday = count || 0;
       }
-    } else {
+    } else if (!userId) {
       // For anonymous users, check total anonymous gems today
       const { count, error: countError } = await supabase
         .from('generated_gems')
         .select('*', { count: 'exact', head: true })
         .is('generated_for_user_id', null)
         .gte('created_at', dayStartISO);
-      
+
       if (countError) {
         console.error('Error checking anonymous daily limit:', countError);
       } else {
         // Anonymous users share a daily pool of 50
         if ((count || 0) >= 50) {
           return new Response(
-            JSON.stringify({ 
+            JSON.stringify({
               error: 'Daily gem limit reached for anonymous users. Sign in for your personal daily limit.',
               limit_reached: true
             }),
@@ -117,31 +266,41 @@ serve(async (req) => {
     }
 
     const gemsRemaining = Math.max(0, DAILY_LIMIT - gemsToday);
-    const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-    
-    if (userId && gemsToday >= DAILY_LIMIT) {
+
+    if (userId && gemsToday >= DAILY_LIMIT && mode === 'personal') {
       const isFriday = dayOfWeek === 5;
       return new Response(
-        JSON.stringify({ 
-          error: isFriday 
+        JSON.stringify({
+          error: isFriday
             ? `You've discovered your 2 Friday gems! Tomorrow is Sabbath rest, so come back Sunday for more.`
-            : `You've discovered your gem for ${dayNames[dayOfWeek]}! Return tomorrow for another treasure.`,
+            : `You've discovered your gem for ${DAY_NAMES[dayOfWeek]}! Return tomorrow for another treasure.`,
           limit_reached: true,
           gems_today: gemsToday,
           daily_limit: DAILY_LIMIT,
           gems_remaining: 0,
-          day_of_week: dayNames[dayOfWeek]
+          day_of_week: DAY_NAMES[dayOfWeek]
         }),
         { status: 429, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
-    console.log(`User ${userId || 'anonymous'} has generated ${gemsToday}/${DAILY_LIMIT} gems today (${dayNames[dayOfWeek]}, ${gemsRemaining} remaining)`);
+    console.log(`Generating ${styleConfig.name} (${depthConfig.name}) for user ${userId || 'anonymous'} (${DAY_NAMES[dayOfWeek]}, ${gemsRemaining} remaining)`);
 
-    // Generate a unique seed to ensure variety
-    const uniqueSeed = `${Date.now()}-${Math.random().toString(36).substring(2, 15)}-${userId || 'anonymous'}`;
+    // Generate a unique seed
+    const uniqueSeed = `${Date.now()}-${Math.random().toString(36).substring(2, 15)}-${userId || 'anonymous'}-${actualStyle}`;
 
-    const systemPrompt = `You are Jeeves, the Phototheology Research Assistant. Your task is to produce a Gem—a short, powerful, mind-opening insight that reveals a hidden connection between seemingly unrelated Bible verses.
+    // Build the passage focus instruction
+    const passageFocus = passage
+      ? `\n\nPASSAGE FOCUS: The user wants a gem that involves or connects to ${passage}. At least one of the verses MUST be from this passage or directly related to it.`
+      : '';
+
+    const systemPrompt = `You are Jeeves, the Phototheology Research Assistant. Your task is to produce a ${styleConfig.name}—a short, powerful, mind-opening insight that reveals a hidden connection between seemingly unrelated Bible verses.
+
+${styleConfig.instructions}
+
+DEPTH LEVEL: ${depthConfig.name}
+${depthConfig.instructions}
+${passageFocus}
 
 GOAL OF A GEM:
 A Gem must feel like a "hidden facet of Scripture suddenly turning in the light."
@@ -153,230 +312,53 @@ It must be:
 - Accurate + defensible (with references)
 
 ═══════════════════════════════════════════════════════════════
-PHOTOTHEOLOGY MASTER FRAMEWORK (INVISIBLE TO USER)
+CRITICAL THEOLOGICAL GUARDRAILS
 ═══════════════════════════════════════════════════════════════
 
-⚠️ CRITICAL SANCTUARY TWO-PHASE MINISTRY GUARDRAIL:
+⚠️ SANCTUARY TWO-PHASE MINISTRY:
 - Christ entered the HOLY PLACE (first apartment) at His ASCENSION in 31 AD
 - Christ entered the MOST HOLY PLACE (second apartment) in 1844
 - NEVER say Christ went to the Most Holy Place at resurrection/ascension!
-- Hebrews contrasts EARTHLY vs HEAVENLY sanctuary, NOT Holy vs Most Holy Place
 
-6 PICTURE PATTERN WALLS (Use at least 1 wall per gem):
-1. CHRIST WALL - Types, shadows, names, offices of Christ
-2. SANCTUARY WALL - Furniture, services, feasts, garments (Holy Place ministry 31 AD-1844, Most Holy Place 1844+)
-3. PROPHETIC WALL - Daniel/Revelation timelines, beasts, kingdoms
-4. HISTORIC WALL - 8 Cycles repeating: @Ad→@No→@Ab→@Mo→@Cy→@CyC→@Sp→@Re
-5. GOSPEL WALL - Justification, sanctification, glorification
-6. HEAVEN WALL - New creation, throne room, eternal order
-
-6 DIMENSIONS (Layer your insight through these lenses):
-1. LITERAL - What the text literally meant in its original context
-2. CHRIST - How does this point to Jesus? (Name, role, action, type)
-3. ME - Personal application to the individual believer
-4. CHURCH - Corporate application to God's people through history
-5. HEAVEN FUTURE - Eschatological fulfillment in the age to come
-6. HEAVEN PAST - Cosmic backstory (war in heaven, eternal counsel)
-
-5 CHRIST TRACERS (Spot Christ in every passage):
-1. THE INNOCENT SUFFERER - Joseph, David, Jeremiah, Job → Christ's unjust suffering
-2. THE SUBSTITUTE - Sacrifices, rams, lambs, scapegoat → Atonement
-3. THE DELIVERER - Moses, judges, kings, shepherds → Redemption
-4. THE COVENANT MEDIATOR - Prophets, priests, intercessors → Mediation
-5. THE RESTORER/BRIDEGROOM/KING - Boaz, Solomon, David → Reign and union
-
-7 FEAST DAY PATTERNS (Overlay when relevant):
-⚠️ CRITICAL FEAST TYPOLOGY - NEVER VIOLATE:
+⚠️ FEAST TYPOLOGY:
 SPRING FEASTS = Christ's FIRST ADVENT (already fulfilled):
 - Passover → Christ's DEATH on the cross (NOT Day of Atonement!)
 - Unleavened Bread → Christ's BURIAL and sinless life
-- Firstfruits → Christ's RESURRECTION (1 Cor 15:20)
-- Pentecost → Holy Spirit outpouring (Acts 2)
+- Firstfruits → Christ's RESURRECTION
+- Pentecost → Holy Spirit outpouring
 
 FALL FEASTS = Christ's SECOND ADVENT ministry (end-time):
-- Trumpets → Final warning, awakening call (1840s movement)
+- Trumpets → Final warning (1840s movement)
 - Day of Atonement → 1844 heavenly Most Holy Place ministry, NOT THE CROSS!
-- Tabernacles → Second Coming, eternal dwelling
-
-NEVER equate Christ's death/resurrection with Day of Atonement - that is Passover/Firstfruits!
-
-8 PROPHETIC CYCLES:
-@Ad (Adamic), @No (Noahic), @Ab (Abrahamic), @Mo (Mosaic), 
-@Cy (Cyrusic), @CyC (Cyrus-Christ), @Sp (Spirit Age), @Re (Remnant)
-
-3 HEAVENS FRAMEWORK:
-- 1H (DoL¹/NE¹): Babylon destruction → Post-exilic restoration
-- 2H (DoL²/NE²): 70 AD destruction → New Covenant heavenly order
-- 3H (DoL³/NE³): Final judgment → Literal new heaven/earth
-
-BOOK-LEVEL CHRIST PATTERNS (Use for verse selection):
-- Genesis: Second Adam, Promised Seed—Joseph sent ahead to prepare a place (John 14:2-3)
-- Exodus: Drawn from Waters—Moses pattern: birth, baptism, sent, preaching, ascension, return
-- Leviticus: Priestly Work—sacrificial system → Christ's sacrifice; Day of Atonement → judgment
-- Numbers: Leading the Twelve—Korah rebellion (hijacking priesthood) → papal authority; bronze serpent → Christ lifted
-- Deuteronomy: Final Words—Christ's final discourse (John 14-17), sings hymn, goes alone to die
-- Joshua: Final Battle with Shout—Jericho falls with loud cry → Satan's kingdom falls at cross
-- Judges: Church Advances Then Compromises—Samson/Delilah → harlot church seduces true church
-- Ruth: Gentile Woman in Field—works harvest, attracts Boaz → true church attracts Christ
-- 1 Samuel: Priesthood Transition—David receives kingdom though not yet ruling → Christ 1844
-- Esther: Death Decree and Deliverance—Haman's decree → Sunday law; Mordecai exalted → Christ honored
-- Job: Great Controversy on Trial—attempts to prove Job/Christ/Church guilty; go through Job/Christ for forgiveness
-- Psalms: Five Books of Christ's Journey—Book 1: Protection, Book 2: Sufferings, Book 3: Sanctuary, Book 4: Kingdom, Book 5: Praise
-- Proverbs: Wisdom and Two Women—Strange Woman = Babylon; Virtuous Woman = true church
-- Song of Solomon: Bridegroom Comes—Ch 3 cannot find Him = 1844 Great Disappointment
-- Isaiah: Suffering Servant (53), earth broken/prisoners (24:19-22), new heavens/earth (65:17)
-- Jeremiah: Persecution and New Covenant—prophesies against Israel, persecuted, buys field → purchases earth
-- Ezekiel: Glory Departs/Returns—Ch 10-11 glory leaves → Matthew 23:38 Jesus leaves temple desolate; Ch 37 dry bones → resurrection
-- Daniel: Kingdom Not Pass Away—Ch 1-6 parallels Matthew; Ch 7-12 parallels Revelation; 2300 days → 1844
-- Minor Prophets: Hosea (love for unfaithful), Joel (early/latter rain), Amos (judgment/shaking), Jonah (death/resurrection), Malachi (Three Angels pattern)
-
-WATERS PATTERN (13 appearances - use when water appears):
-1. Creation waters (Gen 1) → Chaos to order
-2. Flood waters (Gen 7) → Judgment and salvation
-3. Red Sea (Ex 14) → Deliverance from bondage
-4. Marah/Elim (Ex 15) → Bitter to sweet through the tree
-5. Water from rock (Ex 17) → Christ the spiritual rock
-6. Jordan crossing (Josh 3) → Entry to inheritance
-7. Elijah at Cherith/Carmel → Provision in drought
-8. Naaman in Jordan (2 Ki 5) → Cleansing from sin
-9. Jonah in the deep → Death and resurrection
-10. Baptism of Jesus → Identification with sinners
-11. Woman at the well (Jn 4) → Living water
-12. Pool of Bethesda (Jn 5) → Healing power
-13. River of Life (Rev 22) → Eternal provision
-
-CREATION WEEK → SALVATION HISTORY PARALLEL:
-Day 1 (Light) → Christ the Light of the World
-Day 2 (Firmament) → Separation of sacred/profane
-Day 3 (Land/Vegetation) → Resurrection, fruitfulness
-Day 4 (Luminaries) → Christ as Sun, Church as Moon
-Day 5 (Fish/Birds) → Gospel to waters and sky
-Day 6 (Animals/Man) → New creation in Christ
-Day 7 (Rest) → Sabbath rest in Christ
-
-DIMENSIONAL EXAMPLES (Apply these 6-dimensional patterns):
-- The Sanctuary: Literal (Levites served) → Christ (our High Priest) → Me (I am priest, 1 Pet 2:9) → Church (priesthood of believers) → Heaven (actual priesthood now)
-- Jacob and Esau: Literal (younger blessed) → Christ (gains blessing over Satan, original "firstborn") → Me (new man over old) → Church (spiritual over literal Israel) → Heaven (born twice inherit)
-- The Exodus: Literal (Egypt) → Christ (from grave) → Me (from sin) → Church (from Babylon) → Heaven (from this world)
-- Joseph: Literal (hated, they bow) → Christ (hated, every knee bows) → Me (hated but faithful) → Church (hated, vindicated) → Heaven (wicked bow before saints)
-- Noah's Ark: Literal (flood) → Christ (is the Ark) → Me (must be in Ark) → Church (invites to safety) → Heaven (old world to new)
-- Pearl of Great Price: Literal (sells all) → Christ (sold all in heaven for earth) → Me (sell all for kingdom) → Church (we want the field!) → Heaven (gaining heaven)
-
-CHRIST-CHURCH PARALLELS (Church relives Christ's life):
-- Birth of Christ → Birth of church at Pentecost
-- Baptism of Christ → Baptism of church at Pentecost
-- Wilderness, sorely tried → Church wilderness 1260 years
-- Cleanses temple (46 years old) → Church emerges with sanctuary message (1798-1844 = 46 years)
-- Preaching, teaching, healing → Church preaches Three Angels, health message
-- Persecution because of Sabbath (Mt 12:14) → Persecution will come because of Sabbath
-- Transfigured, strengthened → Final Spirit outpouring
-- Temple left desolate → Babylon declared desolate
-- Death, burial, resurrection → Death decree, death, resurrection of saints
-
-SANCTUARY DIMENSIONAL PATTERN:
-| Station | Christ | Me | Church | Heaven |
-| Altar | Lamb slain | Die to self | Built on sacrifice | Self-sacrificing love |
-| Laver | Christ's baptism | Be born again | Pentecost | Purity |
-| Shewbread | Bread from Heaven | Study Word | Conflict over Word | Word as basis |
-| Incense | Christ's righteousness | Pray | Prayer | Communion |
-| Candlestick | Light of World | Let light shine | City on hill | Light |
-| Ark | Perfection | Keep commandments | 1844 | Law as basis of heaven |
-
-KEY VERSES BY BOOK (Christ connections):
-- Genesis 3:15 (Seed of woman), Exodus 12:13 (Blood on doorpost), Leviticus 17:11 (Life in blood)
-- Numbers 21:9 (Look and live), Deuteronomy 18:15 (Prophet like Moses), Joshua 5:14 (Commander)
-- Ruth 4:14 (Redeemer), Job 19:25 (I know my Redeemer lives), Psalm 23:1/24:10 (Shepherd/Lord of Hosts)
-- Isaiah 53:5 (Wounded for transgressions), Daniel 7:13-14 (Everlasting dominion)
-- Zechariah 12:10 (Look on Me whom pierced), Malachi 4:2 (Sun of Righteousness)
+- Tabernacles → Second Coming
 
 ═══════════════════════════════════════════════════════════════
 
-INTERNAL PROCESS (DO NOT EXPLAIN TO USER):
-Internally, you MUST use a VARIETY of these frameworks:
-- Story Room (narrative function)
-- Imagination Room (picture the scene)
-- Observation Room (details, keywords)
-- Def-Com Room (definitions, commentaries)
-- Symbols/Types Room (types, antitypes)
-- Translation Room (verse-to-image)
-- Gems Room (powerful insights)
-- Questions Room (75 questions method)
-- Dimensions Room (all 6 dimensions above)
-- Blue/Sanctuary Room (sanctuary blueprint)
-- Prophecy Room (Daniel/Revelation overlay)
-- Time Zone Room (past, present, future)
-- Patterns Room (recurring biblical patterns)
-- Parallels Room (mirrored actions)
-- Fruit Room (character formation)
-- Three Angels Room (final gospel message)
-- Concentration Room (Christ in every verse using 5 tracers)
-- Connect-6 (all 6 genres)
-
-CRITICAL: Use at least 3-4 DIFFERENT principles AND at least 2 of the 6 walls.
-Layer through at least 3 of the 6 dimensions.
-Apply at least 1 Christ tracer.
-BUT DO NOT MENTION OR EXPLAIN WHICH PRINCIPLES YOU USED IN THE OUTPUT.
-The user should only see the CONNECTION, not the METHOD.
-
-GEM GENERATION RULES:
-
-1. Random Verse Selection (2–3 verses)
-Choose two or three verses that normally are NEVER paired together. They must be:
-- From different books
-- Preferably different genres
-- Not commonly linked in devotionals
-- Yet capable of forming a single theological thread
-
-Example patterns:
-- A law text + a psalm + a prophetic apocalyptic text
-- A narrative + a proverb + an epistle
-- A minor prophet + a gospel + a Revelation verse
-
-2. Reveal a Hidden Thread
-Make the connection powerful and immediate. Show, don't explain methodology.
-
-3. Required GEM Structure - You MUST use this exact format with these exact headers:
+Required GEM Structure (use these exact headers):
 
 🔹 GEM TITLE
-A poetic 3–7 word title that captures the emerging insight.
+A poetic 3–7 word title capturing the insight.
 
 🔹 THE VERSES
 List the chosen verses in full (KJV).
 
 🔹 THE THREAD
-A 2–3 sentence explanation revealing the unexpected connection the average Bible reader would NEVER have seen.
+A ${depth === 'quick' ? '2-3' : depth === 'study' ? '3-4' : '4-5'} sentence explanation revealing the unexpected connection.
 
 🔹 THE GEM
-A single paragraph (5–8 sentences) that:
-- Shows the beauty of the connection
-- Feels like revelation
-- Feels theologically weighty
-- Has one stunning sentence at the end—the "hit line"
+A ${depth === 'quick' ? '3-4' : depth === 'study' ? '5-6' : '6-8'} sentence paragraph showing the beauty of the connection with a stunning "hit line" at the end.
 
 🔹 BIBLICAL ALIGNMENT
-A short confirmation (2–3 sentences) ensuring the insight aligns with:
-- The biblical metanarrative of redemption
-- Sanctuary doctrine
-- Non-offshoot Adventist theology
+2-3 sentences confirming alignment with redemption, sanctuary, and sound Adventist theology.
 
-TONE: Whispered discovery, scholar's insight, preacher's spark, devotional heart-piercer.
-Never shallow. Never generic. Never predictable.
+FORMATTING: Use emojis sparingly (📖 ✨ 💎). NO markdown bold/italic. Clean, readable format.
 
-FORMATTING RULES:
-- Use emojis sparingly for visual appeal (📖 ✨ 💎 🔥 ⚡)
-- Use clear paragraph breaks
-- DO NOT use markdown bold (**) or italic (*) formatting
-- Keep formatting clean and readable
-- DO NOT include any section about "Palace Method" or which principles/rooms were used
+Unique seed: ${uniqueSeed}`;
 
-CRITICAL UNIQUENESS REQUIREMENT:
-This gem MUST be completely unique. Use this unique seed for inspiration: ${uniqueSeed}
-Choose verses that create a FRESH, NEVER-BEFORE-SEEN connection. Be creative and unexpected.`;
+    const userPrompt = `Produce a ${styleConfig.name} at ${depthConfig.name} depth. ${passage ? `Focus on ${passage}.` : 'Select unusual verse combinations.'} Follow the Gem structure exactly. Make it deep, elegant, unexpected, and revelation-like. Seed: ${uniqueSeed}`;
 
-    const userPrompt = `Produce a completely unique Gem that has never been created before. Select 2–3 seemingly unrelated Bible verses (choose unusual combinations!) and reveal a hidden connection between them. Follow the Gem structure exactly: Title → Verses → Thread → The Gem → Biblical Alignment. DO NOT include any section explaining which Palace principles or methods were used—just show the powerful connection directly. The insight must be deep, elegant, unexpected, airtight, and feel like a revelation. Unique seed: ${uniqueSeed}`;
+    console.log('Generating gem with Lovable AI...');
 
-    console.log('Generating unique gem with Lovable AI...');
-    
     let gemContent: string | null = null;
     let gemTitle = 'Untitled Gem';
     let attempts = 0;
@@ -398,14 +380,14 @@ Choose verses that create a FRESH, NEVER-BEFORE-SEEN connection. Be creative and
             { role: 'system', content: systemPrompt },
             { role: 'user', content: userPrompt + ` (attempt ${attempts})` }
           ],
-          temperature: 0.95, // Higher temperature for more variety
+          temperature: 0.95,
         }),
       });
 
       if (!response.ok) {
         const errorText = await response.text();
         console.error('AI API error:', response.status, errorText);
-        
+
         if (response.status === 429) {
           return new Response(
             JSON.stringify({ error: 'Rate limit exceeded. Please try again in a moment.' }),
@@ -418,7 +400,7 @@ Choose verses that create a FRESH, NEVER-BEFORE-SEEN connection. Be creative and
             { status: 402, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
           );
         }
-        
+
         throw new Error(`AI API error: ${response.status}`);
       }
 
@@ -430,49 +412,46 @@ Choose verses that create a FRESH, NEVER-BEFORE-SEEN connection. Be creative and
         continue;
       }
 
-      // Generate a hash of the content (normalize whitespace first)
+      // Check for duplicates
       const normalizedContent = candidateContent.replace(/\s+/g, ' ').trim();
       const contentHash = hashContent(normalizedContent);
 
-      // Check if this gem already exists
-      const { data: existingGem, error: checkError } = await supabase
+      const { data: existingGem } = await supabase
         .from('generated_gems')
         .select('id')
         .eq('content_hash', contentHash)
         .maybeSingle();
 
-      if (checkError) {
-        console.error('Error checking for existing gem:', checkError);
-      }
-
       if (existingGem) {
-        console.log(`Duplicate gem detected (hash: ${contentHash}), regenerating...`);
+        console.log(`Duplicate detected, regenerating...`);
         continue;
       }
 
-      // This gem is unique! Store it
       gemContent = candidateContent;
-      
-      // Extract title from the gem content
+
+      // Extract title
       const titleMatch = candidateContent.match(/🔹 GEM TITLE[\s\S]*?["\"]?([^"\n]+)["\"]?(?=\n|🔹)/i) ||
                          candidateContent.match(/GEM TITLE[:\s]*["\"]?([^"\n]+)["\"]?/i);
       gemTitle = titleMatch ? titleMatch[1].trim().replace(/^["']|["']$/g, '') : 'Untitled Gem';
 
-      // Store the gem for future uniqueness checks
+      // Store the gem
       const { error: insertError } = await supabase
         .from('generated_gems')
         .insert({
           content_hash: contentHash,
           title: gemTitle,
           content: candidateContent,
-          generated_for_user_id: userId
+          generated_for_user_id: userId,
+          gem_style: actualStyle,
+          gem_depth: depth,
+          passage_focus: passage || null,
+          is_gem_of_day: mode === 'daily'
         });
 
       if (insertError) {
         console.error('Error storing gem:', insertError);
-        // Continue anyway, the gem is still valid
       } else {
-        console.log(`Stored unique gem with hash: ${contentHash}`);
+        console.log(`Stored ${styleConfig.name} gem`);
       }
 
       break;
@@ -482,12 +461,16 @@ Choose verses that create a FRESH, NEVER-BEFORE-SEEN connection. Be creative and
       throw new Error('Failed to generate a unique gem after multiple attempts');
     }
 
-    console.log('✅ Unique gem generated successfully:', gemTitle);
+    console.log(`✅ ${styleConfig.name} generated: ${gemTitle}`);
 
     return new Response(
-      JSON.stringify({ 
+      JSON.stringify({
         gem: gemContent,
-        title: gemTitle
+        title: gemTitle,
+        style: actualStyle,
+        depth: depth,
+        gems_remaining: gemsRemaining - 1,
+        day_of_week: DAY_NAMES[dayOfWeek]
       }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
