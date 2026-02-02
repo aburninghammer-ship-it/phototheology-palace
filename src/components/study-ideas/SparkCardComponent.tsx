@@ -36,6 +36,17 @@ import {
   Crown,
   Zap,
   CalendarDays,
+  RefreshCw,
+  Hash,
+  Moon,
+  Cross,
+  TreeDeciduous,
+  Gift,
+  Copy,
+  Flame,
+  Bird,
+  ShieldCheck,
+  Droplet,
 } from "lucide-react";
 import { SparkCard } from "@/data/studyIdeasLibrary";
 import { cn } from "@/lib/utils";
@@ -62,6 +73,17 @@ const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
   Crown,
   Zap,
   CalendarDays,
+  RefreshCw,
+  Hash,
+  Moon,
+  Cross,
+  TreeDeciduous,
+  Gift,
+  Copy,
+  Flame,
+  Bird,
+  ShieldCheck,
+  Droplet,
 };
 
 interface SparkCardComponentProps {
@@ -71,6 +93,7 @@ interface SparkCardComponentProps {
   onRemove?: (cardId: string) => void;
   showSaveButton?: boolean;
   compact?: boolean;
+  isNew?: boolean;
 }
 
 export const SparkCardComponent = ({
@@ -80,6 +103,7 @@ export const SparkCardComponent = ({
   onRemove,
   showSaveButton = true,
   compact = false,
+  isNew = false,
 }: SparkCardComponentProps) => {
   const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
@@ -134,13 +158,20 @@ export const SparkCardComponent = ({
           )}
         </div>
 
-        {/* Category Badge */}
-        <Badge
-          variant="outline"
-          className={cn("w-fit text-xs", categoryColors[card.category])}
-        >
-          {card.category}
-        </Badge>
+        {/* Category Badge + New Badge */}
+        <div className="flex items-center gap-2">
+          <Badge
+            variant="outline"
+            className={cn("w-fit text-xs", categoryColors[card.category])}
+          >
+            {card.category}
+          </Badge>
+          {isNew && (
+            <Badge className="bg-gradient-to-r from-amber-500 to-orange-500 text-white text-xs animate-pulse">
+              New Today
+            </Badge>
+          )}
+        </div>
       </CardHeader>
 
       <CardContent className={cn("space-y-3", compact && "p-3 pt-0")}>

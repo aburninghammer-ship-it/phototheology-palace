@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { Navigation } from "@/components/Navigation";
 import { SimplifiedNav } from "@/components/SimplifiedNav";
@@ -6,6 +6,7 @@ import { useUserPreferences } from "@/hooks/useUserPreferences";
 import { useAuth } from "@/hooks/useAuth";
 import { useUserShelf } from "@/hooks/useUserShelf";
 import { usePathProgress } from "@/hooks/usePathProgress";
+import { useGeneratedSparkCards, GeneratedSparkCard } from "@/hooks/useGeneratedSparkCards";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -37,8 +38,25 @@ import {
   Search,
   Filter,
   Library,
+  Calendar,
+  Loader2,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+
+// Convert generated card to SparkCard format for display
+function convertGeneratedCard(card: GeneratedSparkCard): SparkCard & { isGenerated: boolean; generatedId: string } {
+  return {
+    id: `generated-${card.id}`,
+    generatedId: card.id,
+    isGenerated: true,
+    title: card.title,
+    verseAnchors: card.verse_anchors,
+    palaceRooms: card.palace_rooms,
+    prompts: card.prompts,
+    category: card.category,
+    tags: card.tags,
+  };
+}
 
 type CategoryFilter = SparkCard["category"] | "all";
 
@@ -53,10 +71,16 @@ export default function StudyIdeaLibrary() {
     resetPath,
     getProgressForPath,
   } = usePathProgress();
+  const {
+    cards: generatedCards,
+    loading: generatedLoading,
+    getTodaysCards,
+  } = useGeneratedSparkCards(30);
 
   const [searchQuery, setSearchQuery] = useState("");
   const [categoryFilter, setCategoryFilter] = useState<CategoryFilter>("all");
   const [activeTab, setActiveTab] = useState("cards");
+  const [showSource, setShowSource] = useState<"all" | "curated" | "daily">("all");
 
   const navigate = useNavigate();
 
@@ -66,8 +90,28 @@ export default function StudyIdeaLibrary() {
     return null;
   }
 
+  // Convert generated cards to SparkCard format
+  const convertedGeneratedCards = useMemo(() =>
+    generatedCards.map(convertGeneratedCard),
+    [generatedCards]
+  );
+
+  // Get today's new cards
+  const todaysCards = useMemo(() =>
+    getTodaysCards().map(convertGeneratedCard),
+    [getTodaysCards, generatedCards]
+  );
+
+  // Combine all cards based on source filter
+  const allCards = useMemo(() => {
+    if (showSource === "curated") return sparkCards;
+    if (showSource === "daily") return convertedGeneratedCards;
+    // Combine with generated cards first (newest)
+    return [...convertedGeneratedCards, ...sparkCards];
+  }, [showSource, convertedGeneratedCards]);
+
   // Filter cards
-  const filteredCards = sparkCards.filter((card) => {
+  const filteredCards = allCards.filter((card) => {
     const matchesSearch =
       searchQuery === "" ||
       card.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -164,6 +208,46 @@ export default function StudyIdeaLibrary() {
 
           {/* Spark Cards Tab */}
           <TabsContent value="cards" className="space-y-4">
+            {/* New Today Banner */}
+            {todaysCards.length > 0 && showSource === "all" && !searchQuery && categoryFilter === "all" && (
+              <div className="bg-gradient-to-r from-amber-100 to-orange-100 dark:from-amber-900/30 dark:to-orange-900/30 rounded-lg p-4 border border-amber-200 dark:border-amber-800">
+                <div className="flex items-center gap-2 mb-2">
+                  <Calendar className="h-5 w-5 text-amber-600 dark:text-amber-400" />
+                  <h3 className="font-semibold text-amber-900 dark:text-amber-100">
+                    New Today!
+                  </h3>
+                  <Badge variant="secondary" className="bg-amber-200 dark:bg-amber-800">
+                    {todaysCards.length} cards
+                  </Badge>
+                </div>
+                <p className="text-sm text-amber-700 dark:text-amber-300 mb-3">
+                  Fresh study ideas generated just for today
+                </p>
+                <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                  {todaysCards.slice(0, 3).map((card) => (
+                    <SparkCardComponent
+                      key={card.id}
+                      card={card}
+                      isSaved={isCardSaved(card.id)}
+                      onSave={handleSaveCard}
+                      onRemove={handleRemoveCard}
+                      isNew
+                    />
+                  ))}
+                </div>
+                {todaysCards.length > 3 && (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="mt-2"
+                    onClick={() => setShowSource("daily")}
+                  >
+                    See all {todaysCards.length} new cards
+                  </Button>
+                )}
+              </div>
+            )}
+
             {/* Filters */}
             <div className="flex flex-col sm:flex-row gap-3">
               <div className="relative flex-1 max-w-md">
@@ -192,20 +276,47 @@ export default function StudyIdeaLibrary() {
                   ))}
                 </SelectContent>
               </Select>
+              <Select
+                value={showSource}
+                onValueChange={(v) => setShowSource(v as "all" | "curated" | "daily")}
+              >
+                <SelectTrigger className="w-full sm:w-[160px]">
+                  <Library className="h-4 w-4 mr-2" />
+                  <SelectValue placeholder="Source" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Cards</SelectItem>
+                  <SelectItem value="curated">Curated Only</SelectItem>
+                  <SelectItem value="daily">Daily Generated</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
 
             {/* Results count */}
             <div className="flex items-center gap-2 text-sm text-muted-foreground">
-              <span>
-                Showing {filteredCards.length} of {sparkCards.length} cards
-              </span>
-              {(searchQuery || categoryFilter !== "all") && (
+              {generatedLoading ? (
+                <span className="flex items-center gap-2">
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  Loading daily cards...
+                </span>
+              ) : (
+                <span>
+                  Showing {filteredCards.length} of {allCards.length} cards
+                  {showSource === "all" && (
+                    <span className="text-xs ml-1">
+                      ({sparkCards.length} curated + {generatedCards.length} daily)
+                    </span>
+                  )}
+                </span>
+              )}
+              {(searchQuery || categoryFilter !== "all" || showSource !== "all") && (
                 <Button
                   variant="ghost"
                   size="sm"
                   onClick={() => {
                     setSearchQuery("");
                     setCategoryFilter("all");
+                    setShowSource("all");
                   }}
                 >
                   Clear filters
@@ -222,6 +333,7 @@ export default function StudyIdeaLibrary() {
                   isSaved={isCardSaved(card.id)}
                   onSave={handleSaveCard}
                   onRemove={handleRemoveCard}
+                  isNew={(card as any).isGenerated && todaysCards.some(t => t.id === card.id)}
                 />
               ))}
             </div>
