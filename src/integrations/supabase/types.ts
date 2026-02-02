@@ -9380,6 +9380,89 @@ export type Database = {
         }
         Relationships: []
       }
+      profile_devotions: {
+        Row: {
+          application: string | null
+          christ_action: string | null
+          christ_name: string | null
+          created_at: string
+          cross_references: string[] | null
+          cycle_placement: string | null
+          devotional_body: string
+          generated_at: string
+          id: string
+          is_shared: boolean
+          memory_hook: string | null
+          prayer: string | null
+          profile_id: string
+          sanctuary_connection: string | null
+          scripture_reference: string
+          scripture_text: string
+          shared_at: string | null
+          strike_line: string | null
+          theme_used: string | null
+          title: string
+          types_and_symbols: string[] | null
+          user_id: string
+        }
+        Insert: {
+          application?: string | null
+          christ_action?: string | null
+          christ_name?: string | null
+          created_at?: string
+          cross_references?: string[] | null
+          cycle_placement?: string | null
+          devotional_body: string
+          generated_at?: string
+          id?: string
+          is_shared?: boolean
+          memory_hook?: string | null
+          prayer?: string | null
+          profile_id: string
+          sanctuary_connection?: string | null
+          scripture_reference: string
+          scripture_text: string
+          shared_at?: string | null
+          strike_line?: string | null
+          theme_used?: string | null
+          title: string
+          types_and_symbols?: string[] | null
+          user_id: string
+        }
+        Update: {
+          application?: string | null
+          christ_action?: string | null
+          christ_name?: string | null
+          created_at?: string
+          cross_references?: string[] | null
+          cycle_placement?: string | null
+          devotional_body?: string
+          generated_at?: string
+          id?: string
+          is_shared?: boolean
+          memory_hook?: string | null
+          prayer?: string | null
+          profile_id?: string
+          sanctuary_connection?: string | null
+          scripture_reference?: string
+          scripture_text?: string
+          shared_at?: string | null
+          strike_line?: string | null
+          theme_used?: string | null
+          title?: string
+          types_and_symbols?: string[] | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "profile_devotions_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "devotional_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           access_code_used: string | null
