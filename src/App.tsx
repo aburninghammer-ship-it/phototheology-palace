@@ -227,6 +227,7 @@ const MyStudies = lazy(() => import("./pages/MyStudies"));
 const StudyEditor = lazy(() => import("./pages/StudyEditor"));
 const StudyBuddy = lazy(() => import("./pages/StudyBuddy"));
 const StudyIdeaLibrary = lazy(() => import("./pages/StudyIdeaLibrary"));
+const GiveMeAGem = lazy(() => import("./pages/GiveMeAGem"));
 const MasteryDashboard = lazy(() => import("./pages/MasteryDashboard"));
 const FloorMastery = lazy(() => import("./pages/FloorMastery"));
 const FloorDetailPage = lazy(() => import("./pages/FloorDetail"));
@@ -580,6 +581,7 @@ function App() {
           <Route path="/quarterly-study" element={<ProtectedRoute><QuarterlyStudy /></ProtectedRoute>} />
           <Route path="/study-buddy" element={<ProtectedRoute><StudyBuddy /></ProtectedRoute>} />
           <Route path="/study-ideas" element={<ProtectedRoute><StudyIdeaLibrary /></ProtectedRoute>} />
+          <Route path="/give-me-a-gem" element={<ProtectedRoute><GiveMeAGem /></ProtectedRoute>} />
            <Route path="/bible-study-series" element={<ProtectedRoute><BibleStudySeriesBuilder /></ProtectedRoute>} />
            <Route path="/devotionals" element={<ProtectedRoute><Devotionals /></ProtectedRoute>} />
            <Route path="/devotionals/:planId" element={<ProtectedRoute><DevotionalView /></ProtectedRoute>} />

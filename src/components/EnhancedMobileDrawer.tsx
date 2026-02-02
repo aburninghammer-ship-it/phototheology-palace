@@ -64,7 +64,7 @@ const categoryConfig = {
       { to: "/notes", label: "Notes", icon: "📒" },
       { to: "/libraries", label: "My Libraries", icon: "📚" },
       { to: "/sessions", label: "Study Sessions", icon: "📋" },
-      { to: "/palace/floor/1/room/gr", label: "Produce a Gem", icon: "💎" },
+      { to: "/give-me-a-gem", label: "Give Me A Gem", icon: "💎" },
       { to: "/memory", label: "Memory Palace", icon: "🧠" },
       { to: "/verse-memory-hall", label: "Verse Memory Hall (Legacy)", icon: "📚" },
       { to: "/quarterly-study", label: "Lesson Study", icon: "📅" },
