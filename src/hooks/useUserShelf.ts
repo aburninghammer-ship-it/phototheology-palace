@@ -34,7 +34,7 @@ export const useUserShelf = () => {
 
     setLoading(true);
     try {
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from("user_spark_card_shelf")
         .select("*")
         .eq("user_id", user.id)
@@ -66,7 +66,7 @@ export const useUserShelf = () => {
     }
 
     try {
-      const { error } = await supabase.from("user_spark_card_shelf").insert({
+      const { error } = await (supabase as any).from("user_spark_card_shelf").insert({
         user_id: user.id,
         card_type: "static",
         static_card_id: cardId,
@@ -113,7 +113,7 @@ export const useUserShelf = () => {
     }
 
     try {
-      const { error } = await supabase.from("user_spark_card_shelf").insert({
+      const { error } = await (supabase as any).from("user_spark_card_shelf").insert({
         user_id: user.id,
         card_type: "generated",
         generated_idea: idea as unknown as Record<string, unknown>,
@@ -141,7 +141,7 @@ export const useUserShelf = () => {
 
   const removeFromShelf = async (itemId: string) => {
     try {
-      const { error } = await supabase
+      const { error } = await (supabase as any)
         .from("user_spark_card_shelf")
         .delete()
         .eq("id", itemId);
@@ -167,7 +167,7 @@ export const useUserShelf = () => {
 
   const updateNotes = async (itemId: string, notes: string) => {
     try {
-      const { error } = await supabase
+      const { error } = await (supabase as any)
         .from("user_spark_card_shelf")
         .update({ notes })
         .eq("id", itemId);
@@ -183,7 +183,7 @@ export const useUserShelf = () => {
 
   const markCompleted = async (itemId: string) => {
     try {
-      const { error } = await supabase
+      const { error } = await (supabase as any)
         .from("user_spark_card_shelf")
         .update({ completed_at: new Date().toISOString() })
         .eq("id", itemId);

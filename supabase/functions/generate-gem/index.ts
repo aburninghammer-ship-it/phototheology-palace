@@ -46,42 +46,46 @@ serve(async (req) => {
                      req.headers.get('x-real-ip') || 
                      'unknown';
 
-    // Check daily gem limit (3 per day)
-    const DAILY_LIMIT = 3;
-    const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
+    // Check weekly gem limit (5 per week, resets Sunday)
+    const WEEKLY_LIMIT = 5;
     
-    let gemsToday = 0;
+    // Get the start of the current week (Sunday at midnight UTC)
+    const now = new Date();
+    const startOfWeek = new Date(now);
+    startOfWeek.setUTCDate(now.getUTCDate() - now.getUTCDay());
+    startOfWeek.setUTCHours(0, 0, 0, 0);
+    const weekStartISO = startOfWeek.toISOString();
+    
+    let gemsThisWeek = 0;
     if (userId) {
       // Check by user ID
       const { count, error: countError } = await supabase
         .from('generated_gems')
         .select('*', { count: 'exact', head: true })
         .eq('generated_for_user_id', userId)
-        .gte('created_at', `${today}T00:00:00.000Z`);
+        .gte('created_at', weekStartISO);
       
       if (countError) {
-        console.error('Error checking daily limit:', countError);
+        console.error('Error checking weekly limit:', countError);
       } else {
-        gemsToday = count || 0;
+        gemsThisWeek = count || 0;
       }
     } else {
-      // For anonymous users, use a simpler approach - check by IP in last 24 hours
-      // We'll store IP in the content field metadata or use a separate tracking mechanism
-      // For now, anonymous users share a pool - we check total anonymous gems today
+      // For anonymous users, check total anonymous gems this week
       const { count, error: countError } = await supabase
         .from('generated_gems')
         .select('*', { count: 'exact', head: true })
         .is('generated_for_user_id', null)
-        .gte('created_at', `${today}T00:00:00.000Z`);
+        .gte('created_at', weekStartISO);
       
       if (countError) {
-        console.error('Error checking anonymous daily limit:', countError);
+        console.error('Error checking anonymous weekly limit:', countError);
       } else {
-        // Anonymous users share a more generous pool (30 total per day)
-        if ((count || 0) >= 30) {
+        // Anonymous users share a more generous pool (100 total per week)
+        if ((count || 0) >= 100) {
           return new Response(
             JSON.stringify({ 
-              error: 'Daily gem limit reached for anonymous users. Sign in for your personal daily limit.',
+              error: 'Weekly gem limit reached for anonymous users. Sign in for your personal weekly limit.',
               limit_reached: true
             }),
             { status: 429, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
@@ -90,19 +94,21 @@ serve(async (req) => {
       }
     }
 
-    if (userId && gemsToday >= DAILY_LIMIT) {
+    const gemsRemaining = Math.max(0, WEEKLY_LIMIT - gemsThisWeek);
+    if (userId && gemsThisWeek >= WEEKLY_LIMIT) {
       return new Response(
         JSON.stringify({ 
-          error: `You've discovered ${DAILY_LIMIT} gems today. Return tomorrow for more treasures!`,
+          error: `You've discovered ${WEEKLY_LIMIT} gems this week. Your limit resets on Sunday!`,
           limit_reached: true,
-          gems_today: gemsToday,
-          daily_limit: DAILY_LIMIT
+          gems_this_week: gemsThisWeek,
+          weekly_limit: WEEKLY_LIMIT,
+          gems_remaining: 0
         }),
         { status: 429, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
-    console.log(`User ${userId || 'anonymous'} has generated ${gemsToday}/${DAILY_LIMIT} gems today`);
+    console.log(`User ${userId || 'anonymous'} has generated ${gemsThisWeek}/${WEEKLY_LIMIT} gems this week (${gemsRemaining} remaining)`);
 
     // Generate a unique seed to ensure variety
     const uniqueSeed = `${Date.now()}-${Math.random().toString(36).substring(2, 15)}-${userId || 'anonymous'}`;

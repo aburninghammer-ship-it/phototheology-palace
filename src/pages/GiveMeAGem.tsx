@@ -196,7 +196,7 @@ export default function GiveMeAGem() {
     "Connect this to Christ",
   ];
 
-  const useSimplifiedNav = preferences.simplified_nav ?? false;
+  const useSimplifiedNav = preferences.navigation_style === "simplified";
   const NavComponent = useSimplifiedNav ? SimplifiedNav : Navigation;
 
   return (
