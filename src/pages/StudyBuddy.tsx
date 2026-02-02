@@ -282,6 +282,13 @@ export default function StudyBuddy() {
   const processedRefsRef = useRef<Set<string>>(new Set());
   const versePopulateTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
+  // Bible search state
+  const [showSearch, setShowSearch] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [searchResults, setSearchResults] = useState<{ book: string; chapter: number; verse: number; text: string }[]>([]);
+  const [isSearching, setIsSearching] = useState(false);
+  const searchTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
   // Keep analysisHistoryRef in sync with state (for closures)
   useEffect(() => {
     analysisHistoryRef.current = analysisHistory;
@@ -628,6 +635,65 @@ export default function StudyBuddy() {
     } finally {
       setLoadingVerses(false);
     }
+  };
+
+  // Bible search function
+  const searchBible = useCallback(async (query: string) => {
+    if (!query.trim() || query.trim().length < 2) {
+      setSearchResults([]);
+      return;
+    }
+
+    setIsSearching(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("search-bible", {
+        body: { query: query.trim(), limit: 50 }
+      });
+
+      if (error) throw error;
+
+      if (data?.results) {
+        setSearchResults(data.results);
+      } else {
+        setSearchResults([]);
+      }
+    } catch (error: any) {
+      console.error("Bible search error:", error);
+      toast.error("Search failed - try again");
+      setSearchResults([]);
+    } finally {
+      setIsSearching(false);
+    }
+  }, []);
+
+  // Debounced search
+  useEffect(() => {
+    if (searchTimeoutRef.current) {
+      clearTimeout(searchTimeoutRef.current);
+    }
+
+    if (searchQuery.trim().length >= 2) {
+      searchTimeoutRef.current = setTimeout(() => {
+        searchBible(searchQuery);
+      }, 500);
+    } else {
+      setSearchResults([]);
+    }
+
+    return () => {
+      if (searchTimeoutRef.current) {
+        clearTimeout(searchTimeoutRef.current);
+      }
+    };
+  }, [searchQuery, searchBible]);
+
+  const navigateToSearchResult = (result: { book: string; chapter: number; verse: number; text: string }) => {
+    setSelectedBook(result.book);
+    setSelectedChapter(result.chapter);
+    setShowSearch(false);
+    setSearchQuery("");
+    setSearchResults([]);
+    toast.success(`Navigated to ${result.book} ${result.chapter}:${result.verse}`);
   };
 
   // Check if notes contain a question
@@ -1039,117 +1105,243 @@ export default function StudyBuddy() {
               <div className={`p-4 border-b flex-shrink-0 ${
                 isLightTheme ? "border-orange-200" : "border-orange-500/20"
               }`}>
-                <div className="flex items-center gap-2 mb-3">
-                  <Book className={`w-5 h-5 ${isLightTheme ? "text-orange-600" : "text-orange-400"}`} />
-                  <span className={`font-bold ${isLightTheme ? "text-gray-900" : "text-white"}`}>Bible</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Select value={selectedBook} onValueChange={(v) => { setSelectedBook(v); setSelectedChapter(1); }}>
-                    <SelectTrigger className={`flex-1 h-9 text-sm ${
-                      isLightTheme 
-                        ? "bg-white border-orange-300 text-gray-900" 
-                        : "bg-black/30 border-orange-500/30 text-white"
-                    }`}>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent className={`max-h-60 ${
-                      isLightTheme 
-                        ? "bg-white border-orange-200" 
-                        : "bg-amber-950 border-orange-500/30"
-                    }`}>
-                      {BIBLE_BOOK_METADATA.map(book => (
-                        <SelectItem key={book.name} value={book.name} className={
-                          isLightTheme 
-                            ? "text-gray-900 hover:bg-orange-100" 
-                            : "text-white hover:bg-orange-500/20"
-                        }>{book.name}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  <Select value={selectedChapter.toString()} onValueChange={(v) => setSelectedChapter(parseInt(v))}>
-                    <SelectTrigger className={`w-20 h-9 text-sm ${
-                      isLightTheme 
-                        ? "bg-white border-orange-300 text-gray-900" 
-                        : "bg-black/30 border-orange-500/30 text-white"
-                    }`}>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent className={`max-h-60 ${
-                      isLightTheme 
-                        ? "bg-white border-orange-200" 
-                        : "bg-amber-950 border-orange-500/30"
-                    }`}>
-                      {Array.from({ length: getChapterCount() }, (_, i) => (
-                        <SelectItem key={i + 1} value={(i + 1).toString()} className={
-                          isLightTheme 
-                            ? "text-gray-900 hover:bg-orange-100" 
-                            : "text-white hover:bg-orange-500/20"
-                        }>{i + 1}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div className="flex items-center justify-between mt-3">
-                  <Button 
-                    variant="ghost" 
-                    size="sm" 
-                    onClick={() => navigateChapter('prev')}
-                    className={isLightTheme 
-                      ? "text-orange-700 hover:bg-orange-100 hover:text-orange-900" 
-                      : "text-orange-200 hover:bg-orange-500/20 hover:text-white"
-                    }
+                <div className="flex items-center justify-between mb-3">
+                  <div className="flex items-center gap-2">
+                    <Book className={`w-5 h-5 ${isLightTheme ? "text-orange-600" : "text-orange-400"}`} />
+                    <span className={`font-bold ${isLightTheme ? "text-gray-900" : "text-white"}`}>Bible</span>
+                  </div>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => {
+                      setShowSearch(!showSearch);
+                      if (showSearch) {
+                        setSearchQuery("");
+                        setSearchResults([]);
+                      }
+                    }}
+                    className={`h-8 px-2 ${
+                      showSearch
+                        ? isLightTheme
+                          ? "bg-orange-200 text-orange-800"
+                          : "bg-orange-500/30 text-orange-200"
+                        : isLightTheme
+                          ? "text-orange-700 hover:bg-orange-100"
+                          : "text-orange-200 hover:bg-orange-500/20"
+                    }`}
                   >
-                    <ChevronLeft className="w-4 h-4" />
-                    Prev
-                  </Button>
-                  <span className={`text-sm ${isLightTheme ? "text-orange-700" : "text-orange-200"}`}>{selectedBook} {selectedChapter}</span>
-                  <Button 
-                    variant="ghost" 
-                    size="sm" 
-                    onClick={() => navigateChapter('next')}
-                    className={isLightTheme 
-                      ? "text-orange-700 hover:bg-orange-100 hover:text-orange-900" 
-                      : "text-orange-200 hover:bg-orange-500/20 hover:text-white"
-                    }
-                  >
-                    Next
-                    <ChevronRight className="w-4 h-4" />
+                    <Search className="w-4 h-4" />
                   </Button>
                 </div>
+
+                {/* Search Input */}
+                <AnimatePresence>
+                  {showSearch && (
+                    <motion.div
+                      initial={{ height: 0, opacity: 0 }}
+                      animate={{ height: "auto", opacity: 1 }}
+                      exit={{ height: 0, opacity: 0 }}
+                      className="overflow-hidden mb-3"
+                    >
+                      <div className="relative">
+                        <Input
+                          placeholder="Search word, phrase, or story..."
+                          value={searchQuery}
+                          onChange={(e) => setSearchQuery(e.target.value)}
+                          className={`pr-8 h-9 text-sm ${
+                            isLightTheme
+                              ? "bg-white border-orange-300 text-gray-900 placeholder:text-orange-400"
+                              : "bg-black/30 border-orange-500/30 text-white placeholder:text-orange-200/50"
+                          }`}
+                        />
+                        {isSearching && (
+                          <Loader2 className={`absolute right-2 top-2 w-4 h-4 animate-spin ${
+                            isLightTheme ? "text-orange-600" : "text-orange-400"
+                          }`} />
+                        )}
+                      </div>
+                      <p className={`text-xs mt-1 ${isLightTheme ? "text-orange-600/60" : "text-orange-200/50"}`}>
+                        Try: "love one another", "burning bush", "prodigal son"
+                      </p>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+
+                {!showSearch && (
+                  <>
+                    <div className="flex items-center gap-2">
+                      <Select value={selectedBook} onValueChange={(v) => { setSelectedBook(v); setSelectedChapter(1); }}>
+                        <SelectTrigger className={`flex-1 h-9 text-sm ${
+                          isLightTheme
+                            ? "bg-white border-orange-300 text-gray-900"
+                            : "bg-black/30 border-orange-500/30 text-white"
+                        }`}>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent className={`max-h-60 ${
+                          isLightTheme
+                            ? "bg-white border-orange-200"
+                            : "bg-amber-950 border-orange-500/30"
+                        }`}>
+                          {BIBLE_BOOK_METADATA.map(book => (
+                            <SelectItem key={book.name} value={book.name} className={
+                              isLightTheme
+                                ? "text-gray-900 hover:bg-orange-100"
+                                : "text-white hover:bg-orange-500/20"
+                            }>{book.name}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <Select value={selectedChapter.toString()} onValueChange={(v) => setSelectedChapter(parseInt(v))}>
+                        <SelectTrigger className={`w-20 h-9 text-sm ${
+                          isLightTheme
+                            ? "bg-white border-orange-300 text-gray-900"
+                            : "bg-black/30 border-orange-500/30 text-white"
+                        }`}>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent className={`max-h-60 ${
+                          isLightTheme
+                            ? "bg-white border-orange-200"
+                            : "bg-amber-950 border-orange-500/30"
+                        }`}>
+                          {Array.from({ length: getChapterCount() }, (_, i) => (
+                            <SelectItem key={i + 1} value={(i + 1).toString()} className={
+                              isLightTheme
+                                ? "text-gray-900 hover:bg-orange-100"
+                                : "text-white hover:bg-orange-500/20"
+                            }>{i + 1}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div className="flex items-center justify-between mt-3">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => navigateChapter('prev')}
+                        className={isLightTheme
+                          ? "text-orange-700 hover:bg-orange-100 hover:text-orange-900"
+                          : "text-orange-200 hover:bg-orange-500/20 hover:text-white"
+                        }
+                      >
+                        <ChevronLeft className="w-4 h-4" />
+                        Prev
+                      </Button>
+                      <span className={`text-sm ${isLightTheme ? "text-orange-700" : "text-orange-200"}`}>{selectedBook} {selectedChapter}</span>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => navigateChapter('next')}
+                        className={isLightTheme
+                          ? "text-orange-700 hover:bg-orange-100 hover:text-orange-900"
+                          : "text-orange-200 hover:bg-orange-500/20 hover:text-white"
+                        }
+                      >
+                        Next
+                        <ChevronRight className="w-4 h-4" />
+                      </Button>
+                    </div>
+                  </>
+                )}
               </div>
 
-              {/* Verses */}
+              {/* Verses / Search Results */}
               <ScrollArea className="flex-1">
                 <div className="p-4 space-y-2">
-                  {loadingVerses ? (
-                    <div className="flex justify-center py-8">
-                      <Loader2 className={`w-6 h-6 animate-spin ${isLightTheme ? "text-orange-600" : "text-orange-400"}`} />
+                  {showSearch && searchQuery.trim().length >= 2 ? (
+                    // Search Results
+                    isSearching ? (
+                      <div className="flex justify-center py-8">
+                        <Loader2 className={`w-6 h-6 animate-spin ${isLightTheme ? "text-orange-600" : "text-orange-400"}`} />
+                      </div>
+                    ) : searchResults.length === 0 ? (
+                      <div className="text-center py-8">
+                        <Search className={`w-8 h-8 mx-auto mb-2 ${isLightTheme ? "text-orange-400/50" : "text-orange-500/30"}`} />
+                        <p className={`text-sm ${isLightTheme ? "text-orange-600/60" : "text-orange-200/60"}`}>
+                          No results for "{searchQuery}"
+                        </p>
+                        <p className={`text-xs mt-1 ${isLightTheme ? "text-orange-500/50" : "text-orange-200/40"}`}>
+                          Try different keywords or phrases
+                        </p>
+                      </div>
+                    ) : (
+                      <>
+                        <p className={`text-xs mb-3 ${isLightTheme ? "text-orange-700" : "text-orange-200/70"}`}>
+                          Found {searchResults.length} result{searchResults.length !== 1 ? 's' : ''}
+                        </p>
+                        {searchResults.map((result, idx) => (
+                          <motion.div
+                            key={`${result.book}-${result.chapter}-${result.verse}-${idx}`}
+                            initial={{ opacity: 0, y: 5 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: idx * 0.03 }}
+                            whileHover={{ scale: 1.01 }}
+                            onClick={() => navigateToSearchResult(result)}
+                            className={`p-3 rounded-lg border border-transparent cursor-pointer transition-all group ${
+                              isLightTheme
+                                ? "bg-amber-100/60 hover:bg-amber-100 hover:border-amber-300/60"
+                                : "bg-amber-500/5 hover:bg-amber-500/15 hover:border-amber-500/30"
+                            }`}
+                          >
+                            <div className={`text-xs font-semibold mb-1 ${isLightTheme ? "text-orange-600" : "text-orange-400"}`}>
+                              {result.book} {result.chapter}:{result.verse}
+                            </div>
+                            <p className={`text-sm leading-relaxed ${isLightTheme ? "text-gray-800" : "text-orange-100"}`}>
+                              {result.text.length > 150 ? result.text.substring(0, 150) + "..." : result.text}
+                            </p>
+                            <span className={`text-xs mt-1 block opacity-0 group-hover:opacity-100 transition-opacity ${
+                              isLightTheme ? "text-orange-500" : "text-orange-200/50"
+                            }`}>
+                              Click to go to this verse
+                            </span>
+                          </motion.div>
+                        ))}
+                      </>
+                    )
+                  ) : showSearch ? (
+                    // Search mode but no query yet
+                    <div className="text-center py-8">
+                      <Search className={`w-8 h-8 mx-auto mb-2 ${isLightTheme ? "text-orange-400/50" : "text-orange-500/30"}`} />
+                      <p className={`text-sm ${isLightTheme ? "text-orange-600/60" : "text-orange-200/60"}`}>
+                        Type to search the Bible
+                      </p>
+                      <p className={`text-xs mt-2 ${isLightTheme ? "text-orange-500/50" : "text-orange-200/40"}`}>
+                        Search for words, phrases, stories, or events
+                      </p>
                     </div>
-                  ) : verses.length === 0 ? (
-                    <p className={`text-center text-sm py-8 ${isLightTheme ? "text-orange-600/60" : "text-orange-200/60"}`}>
-                      No verses found
-                    </p>
                   ) : (
-                    verses.map((v) => (
-                      <motion.div
-                        key={v.verse}
-                        whileHover={{ scale: 1.01 }}
-                        onClick={() => addVerseToNotes(v.verse, v.text)}
-                        className={`p-3 rounded-lg border border-transparent cursor-pointer transition-all group ${
-                          isLightTheme 
-                            ? "bg-amber-100/60 hover:bg-amber-100 hover:border-amber-300/60" 
-                            : "bg-amber-500/5 hover:bg-amber-500/15 hover:border-amber-500/30"
-                        }`}
-                      >
-                        <span className={`font-bold text-sm mr-2 ${isLightTheme ? "text-orange-600" : "text-orange-400"}`}>{v.verse}</span>
-                        <span className={`text-sm leading-relaxed ${isLightTheme ? "text-gray-800" : "text-orange-100"}`}>{v.text}</span>
-                        <span className={`text-xs ml-2 opacity-0 group-hover:opacity-100 transition-opacity ${
-                          isLightTheme ? "text-orange-500" : "text-orange-200/50"
-                        }`}>
-                          (click to add)
-                        </span>
-                      </motion.div>
-                    ))
+                    // Normal verse display
+                    loadingVerses ? (
+                      <div className="flex justify-center py-8">
+                        <Loader2 className={`w-6 h-6 animate-spin ${isLightTheme ? "text-orange-600" : "text-orange-400"}`} />
+                      </div>
+                    ) : verses.length === 0 ? (
+                      <p className={`text-center text-sm py-8 ${isLightTheme ? "text-orange-600/60" : "text-orange-200/60"}`}>
+                        No verses found
+                      </p>
+                    ) : (
+                      verses.map((v) => (
+                        <motion.div
+                          key={v.verse}
+                          whileHover={{ scale: 1.01 }}
+                          onClick={() => addVerseToNotes(v.verse, v.text)}
+                          className={`p-3 rounded-lg border border-transparent cursor-pointer transition-all group ${
+                            isLightTheme
+                              ? "bg-amber-100/60 hover:bg-amber-100 hover:border-amber-300/60"
+                              : "bg-amber-500/5 hover:bg-amber-500/15 hover:border-amber-500/30"
+                          }`}
+                        >
+                          <span className={`font-bold text-sm mr-2 ${isLightTheme ? "text-orange-600" : "text-orange-400"}`}>{v.verse}</span>
+                          <span className={`text-sm leading-relaxed ${isLightTheme ? "text-gray-800" : "text-orange-100"}`}>{v.text}</span>
+                          <span className={`text-xs ml-2 opacity-0 group-hover:opacity-100 transition-opacity ${
+                            isLightTheme ? "text-orange-500" : "text-orange-200/50"
+                          }`}>
+                            (click to add)
+                          </span>
+                        </motion.div>
+                      ))
+                    )
                   )}
                 </div>
               </ScrollArea>
