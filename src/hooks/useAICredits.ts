@@ -63,8 +63,8 @@ export function useAICredits() {
         };
       }
 
-      // Get usage stats
-      const { data: stats, error: statsError } = await supabase.rpc(
+      // Get usage stats (using type cast since table may not exist in schema yet)
+      const { data: stats, error: statsError } = await (supabase as any).rpc(
         "get_ai_usage_stats",
         { user_id_param: user.id }
       );
@@ -110,7 +110,8 @@ export function useAICredits() {
   const { data: packages = [] } = useQuery({
     queryKey: ["credit-packages"],
     queryFn: async (): Promise<CreditPackage[]> => {
-      const { data, error } = await supabase
+      // Using type cast since table may not exist in schema yet
+      const { data, error } = await (supabase as any)
         .from("ai_credit_packages")
         .select("*")
         .eq("is_active", true)
@@ -139,7 +140,8 @@ export function useAICredits() {
         };
       }
 
-      const { data, error } = await supabase.rpc("check_ai_credits", {
+      // Using type cast since function may not exist in schema yet
+      const { data, error } = await (supabase as any).rpc("check_ai_credits", {
         user_id_param: user.id,
         feature_param: feature,
       });
@@ -185,7 +187,8 @@ export function useAICredits() {
     }) => {
       if (!user) throw new Error("Not authenticated");
 
-      const { data, error } = await supabase.rpc("deduct_ai_credits", {
+      // Using type cast since function may not exist in schema yet
+      const { data, error } = await (supabase as any).rpc("deduct_ai_credits", {
         user_id_param: user.id,
         feature_param: feature,
         input_tokens_param: inputTokens,
