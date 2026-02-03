@@ -27,21 +27,21 @@ export const PalaceAIDashboard = () => {
       {/* Hero Section */}
       <Card className="border-2 border-primary/20 bg-gradient-to-br from-primary/5 to-background">
         <CardHeader>
-          <div className="flex items-start justify-between">
+          <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
             <div>
-              <CardTitle className="text-3xl flex items-center gap-2">
-                <Brain className="h-8 w-8 text-primary" />
+              <CardTitle className="text-2xl md:text-3xl flex items-center gap-2">
+                <Brain className="h-6 w-6 md:h-8 md:w-8 text-primary" />
                 Palace AI Engine
               </CardTitle>
-              <CardDescription className="mt-2 text-base">
+              <CardDescription className="mt-2 text-sm md:text-base">
                 Your personal spiritual trainer that adapts to your learning patterns
               </CardDescription>
             </div>
             <Button
               onClick={() => analyzeProfile()}
               disabled={isAnalyzing}
-              size="lg"
-              className="gap-2"
+              size="default"
+              className="gap-2 w-full sm:w-auto"
             >
               <Sparkles className="h-4 w-4" />
               {isAnalyzing ? "Analyzing..." : profile ? "Re-analyze" : "Start Analysis"}
