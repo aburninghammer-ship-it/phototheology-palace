@@ -4,7 +4,7 @@
  */
 
 import type { AIMapAnalysis, PrincipleData, CrossConnection } from '@/components/mind-map/types';
-import { floors } from '@/data/palaceData';
+import { palaceFloors as floors } from '@/data/palaceData';
 
 export interface StudyGuideOptions {
   title?: string;
@@ -75,7 +75,7 @@ export function generateStudyGuide(
   const relevantFloors = analysis.relevantFloors || [];
 
   for (const floorNum of relevantFloors) {
-    const floor = floors.find(f => f.id === floorNum);
+    const floor = floors.find(f => f.number === floorNum);
     if (!floor) continue;
 
     const floorRooms = Object.entries(analysis.roomAnalysis)

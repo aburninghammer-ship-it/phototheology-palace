@@ -46,7 +46,8 @@ export function useSourceLibrary() {
     queryFn: async () => {
       if (!user) return [];
 
-      const { data, error } = await supabase
+      // Using type cast since table may not exist in schema yet
+      const { data, error } = await (supabase as any)
         .from("user_source_documents")
         .select("*")
         .eq("user_id", user.id)
@@ -144,8 +145,8 @@ export function useSourceLibrary() {
           | "pptx"
           | "txt";
 
-        // Create the source document record
-        const { data, error } = await supabase
+        // Create the source document record (using type cast since table may not exist in schema yet)
+        const { data, error } = await (supabase as any)
           .from("user_source_documents")
           .insert({
             user_id: user.id,
@@ -190,7 +191,8 @@ export function useSourceLibrary() {
     mutationFn: async (input: CreateSourceInput) => {
       if (!user) throw new Error("Not authenticated");
 
-      const { data, error } = await supabase
+      // Using type cast since table may not exist in schema yet
+      const { data, error } = await (supabase as any)
         .from("user_source_documents")
         .insert({
           user_id: user.id,
@@ -235,7 +237,8 @@ export function useSourceLibrary() {
     }) => {
       if (!user) throw new Error("Not authenticated");
 
-      const { data, error } = await supabase
+      // Using type cast since table may not exist in schema yet
+      const { data, error } = await (supabase as any)
         .from("user_source_documents")
         .update({
           ...updates,
@@ -266,7 +269,8 @@ export function useSourceLibrary() {
     mutationFn: async (id: string) => {
       if (!user) throw new Error("Not authenticated");
 
-      const { error } = await supabase
+      // Using type cast since table may not exist in schema yet
+      const { error } = await (supabase as any)
         .from("user_source_documents")
         .delete()
         .eq("id", id)
@@ -309,7 +313,8 @@ export function useSourceLibrary() {
     async (query: string): Promise<SourceDocument[]> => {
       if (!user || !query.trim()) return sources;
 
-      const { data, error } = await supabase.rpc("search_source_documents", {
+      // Using type cast since function may not exist in schema yet
+      const { data, error } = await (supabase as any).rpc("search_source_documents", {
         search_query: query,
         user_id_param: user.id,
       });
@@ -323,7 +328,7 @@ export function useSourceLibrary() {
         );
       }
 
-      return data as SourceDocument[];
+      return (data || []) as SourceDocument[];
     },
     [user, sources]
   );
