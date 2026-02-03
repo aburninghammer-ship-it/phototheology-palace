@@ -14861,10 +14861,12 @@ export type Database = {
         Row: {
           bible_font_size: string | null
           bible_translation: string | null
+          has_seen_mode_selector: boolean | null
           id: string
           navigation_style: string | null
           reading_mode: string | null
           study_buddy_theme: string | null
+          suite_mode: string | null
           theme_preference: string | null
           updated_at: string
           user_id: string
@@ -14872,10 +14874,12 @@ export type Database = {
         Insert: {
           bible_font_size?: string | null
           bible_translation?: string | null
+          has_seen_mode_selector?: boolean | null
           id?: string
           navigation_style?: string | null
           reading_mode?: string | null
           study_buddy_theme?: string | null
+          suite_mode?: string | null
           theme_preference?: string | null
           updated_at?: string
           user_id: string
@@ -14883,10 +14887,12 @@ export type Database = {
         Update: {
           bible_font_size?: string | null
           bible_translation?: string | null
+          has_seen_mode_selector?: boolean | null
           id?: string
           navigation_style?: string | null
           reading_mode?: string | null
           study_buddy_theme?: string | null
+          suite_mode?: string | null
           theme_preference?: string | null
           updated_at?: string
           user_id?: string
