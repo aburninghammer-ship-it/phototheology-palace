@@ -190,9 +190,9 @@ const simplifiedQuickLinks = [
 
 // Guest House quick links - warm amber theme for the 6 essential tabs
 const guestHouseQuickLinks = [
-  { to: "/guesthouse", label: "GuestHouse", icon: Users, color: "from-amber-600/20 to-orange-600/10", borderColor: "border-amber-600/40", iconColor: "text-amber-700" },
-  { to: "/palace", label: "Palace", icon: Building2, color: "from-amber-500/20 to-orange-500/10", borderColor: "border-amber-500/30", iconColor: "text-amber-600" },
+  { to: "/palace", label: "Palace", icon: Building2, color: "from-amber-600/20 to-orange-600/10", borderColor: "border-amber-600/40", iconColor: "text-amber-700" },
   { to: "/devotionals", label: "Devotionals", icon: Heart, color: "from-amber-500/20 to-orange-500/10", borderColor: "border-amber-500/30", iconColor: "text-amber-600" },
+  { to: "/bible", label: "Bible", icon: BookOpen, color: "from-amber-500/20 to-orange-500/10", borderColor: "border-amber-500/30", iconColor: "text-amber-600" },
   { to: "/study-buddy", label: "Study Buddy", icon: Brain, color: "from-amber-500/20 to-orange-500/10", borderColor: "border-amber-500/30", iconColor: "text-amber-600" },
   { to: "/games", label: "Games", icon: Gamepad2, color: "from-amber-500/20 to-orange-500/10", borderColor: "border-amber-500/30", iconColor: "text-amber-600" },
   { to: "/daily-challenges", label: "Challenges", icon: Trophy, color: "from-amber-500/20 to-orange-500/10", borderColor: "border-amber-500/30", iconColor: "text-amber-600" },
