@@ -36,7 +36,7 @@ export const Navigation = () => {
   const { activeCount } = useActiveUsers();
   const { isAdmin } = useIsAdmin();
   const { isMember: isChurchMember, churchId, role: churchRole } = useChurchMembership();
-  const { preferences } = useUserPreferences();
+  const { preferences, updatePreference } = useUserPreferences();
   const { toggleSidebar } = useSidebar();
   const { conversations } = useDirectMessagesContext();
   const location = useLocation();
@@ -47,6 +47,16 @@ export const Navigation = () => {
   // Show welcome modal for first-time users who haven't selected a mode
   const shouldShowWelcomeModal = user && !preferences.has_seen_mode_selector;
   const [welcomeModalOpen, setWelcomeModalOpen] = useState(false);
+
+  const handleWelcomeModalOpenChange = (open: boolean) => {
+    setWelcomeModalOpen(open);
+
+    // If the user dismisses the modal (X / ESC / click-outside), mark it as seen so it
+    // doesn't keep re-opening on every navigation (e.g., when opening a devotional).
+    if (!open && user && !preferences.has_seen_mode_selector) {
+      updatePreference("has_seen_mode_selector", true);
+    }
+  };
 
   // Trigger welcome modal when user is authenticated and hasn't seen mode selector
   useLayoutEffect(() => {
@@ -897,7 +907,7 @@ export const Navigation = () => {
       {/* Guest House Welcome Modal - shown for first-time users */}
       <GuestHouseWelcomeModal
         open={welcomeModalOpen}
-        onOpenChange={setWelcomeModalOpen}
+        onOpenChange={handleWelcomeModalOpenChange}
       />
     </>
   );
