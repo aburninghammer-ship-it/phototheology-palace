@@ -50,19 +50,20 @@ export function GuestHouseWelcomeModal({
   };
 
   const handleConfirm = () => {
-    if (!selectedMode) return;
+    if (!selectedMode || isConfirming) return;
 
     setIsConfirming(true);
 
-    // Update preferences
+    // Update both preferences - suite_mode first, then mark as seen
+    // Using a slight delay between updates to prevent race conditions
     updatePreference("suite_mode", selectedMode);
-    updatePreference("has_seen_mode_selector", true);
-
-    // Close modal after brief delay for visual feedback
+    
+    // Small delay to let first update process, then mark as seen and close
     setTimeout(() => {
+      updatePreference("has_seen_mode_selector", true);
       onOpenChange(false);
       setIsConfirming(false);
-    }, 500);
+    }, 300);
   };
 
   const { welcomeMessage } = GUEST_HOUSE_CONFIG;
