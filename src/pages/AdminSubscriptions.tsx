@@ -13,6 +13,7 @@ import { SubscriptionMismatches } from "@/components/admin/SubscriptionMismatche
 import { BulkEmailSender } from "@/components/admin/BulkEmailSender";
 import { ImageBibleGenerator } from "@/components/admin/ImageBibleGenerator";
 import { PatreonOutreach } from "@/components/admin/PatreonOutreach";
+import { PatreonManualLink } from "@/components/admin/PatreonManualLink";
 import { PickaxeImport } from "@/components/admin/PickaxeImport";
 import { PickaxeEmailCampaign } from "@/components/admin/PickaxeEmailCampaign";
 import { TeachableEmailCampaign } from "@/components/admin/TeachableEmailCampaign";
@@ -866,7 +867,8 @@ export default function AdminSubscriptions() {
           <ImageBibleGenerator />
         </TabsContent>
 
-        <TabsContent value="patreon">
+        <TabsContent value="patreon" className="space-y-6">
+          <PatreonManualLink />
           <PatreonOutreach />
         </TabsContent>
 
