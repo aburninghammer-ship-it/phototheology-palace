@@ -21,8 +21,6 @@ import { SessionModeIndicator } from "@/components/session/SessionModeIndicator"
 import { BackButton } from "@/components/BackButton";
 import { SessionStartButton } from "@/components/session/SessionStartButton";
 import { SuiteModeToggle, SuiteModeBadge } from "@/components/SuiteModeToggle";
-import { GuestHouseWelcomeModal } from "@/components/GuestHouseWelcomeModal";
-import { GUEST_HOUSE_CONFIG, isGuestHousePath } from "@/config/guestHouseConfig";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -41,32 +39,6 @@ export const Navigation = () => {
   const { conversations } = useDirectMessagesContext();
   const location = useLocation();
 
-  // Guest House mode check
-  const isGuestHouseMode = preferences.suite_mode === "guest_house";
-
-  // Show welcome modal for first-time users who haven't selected a mode
-  // IMPORTANT: Wait for preferences to load to avoid showing modal when user has already seen it
-  const shouldShowWelcomeModal = user && !preferencesLoading && !preferences.has_seen_mode_selector;
-  const [welcomeModalOpen, setWelcomeModalOpen] = useState(false);
-
-  const handleWelcomeModalOpenChange = (open: boolean) => {
-    setWelcomeModalOpen(open);
-
-    // If the user dismisses the modal (X / ESC / click-outside), mark it as seen so it
-    // doesn't keep re-opening on every navigation (e.g., when opening a devotional).
-    if (!open && user && !preferences.has_seen_mode_selector) {
-      updatePreference("has_seen_mode_selector", true);
-    }
-  };
-
-  // Trigger welcome modal when user is authenticated and hasn't seen mode selector
-  useLayoutEffect(() => {
-    if (shouldShowWelcomeModal) {
-      // Small delay to ensure smooth initial load
-      const timer = setTimeout(() => setWelcomeModalOpen(true), 500);
-      return () => clearTimeout(timer);
-    }
-  }, [shouldShowWelcomeModal]);
 
   const navRef = useRef<HTMLElement | null>(null);
   const [headerHeight, setHeaderHeight] = useState<number>(64);
@@ -419,7 +391,7 @@ export const Navigation = () => {
           
           {/* Horizontal Tab Navigation - Second row, only for authenticated users, hidden on mobile */}
           {user && (
-          <div className={`border-t border-border/40 hidden md:block ${isGuestHouseMode ? 'bg-gradient-to-r from-amber-50/50 to-orange-50/50 dark:from-amber-900/10 dark:to-orange-900/10' : ''}`}>
+          <div className="border-t border-border/40 hidden md:block">
               <div className="max-w-7xl mx-auto overflow-x-auto touch-pan-x [&::-webkit-scrollbar]:h-1.5 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-primary/40 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:hover:bg-primary/60" style={{ scrollbarWidth: 'thin' }}>
                 <div className="flex items-center gap-1 py-2 px-2 flex-nowrap min-w-max">
                   <Link 
@@ -429,7 +401,7 @@ export const Navigation = () => {
                     <Building2 className="h-3.5 w-3.5 text-amber-500" />
                     <span className="bg-gradient-to-r from-amber-600 to-orange-600 bg-clip-text text-transparent font-semibold">Palace</span>
                   </Link>
-                  {!isGuestHouseMode && isChurchMember && churchId && (
+                  {isChurchMember && churchId && (
                     <Link
                       to={`/living-manna?church=${churchId}`}
                       className={`px-3 py-1.5 text-sm font-medium rounded-md transition-all whitespace-nowrap flex items-center gap-1 bg-gradient-to-r from-emerald-500/10 to-green-500/10 border border-emerald-500/20 hover:from-emerald-500/20 hover:to-green-500/20 ${isActiveTab('/living-manna') ? 'shadow-[0_0_12px_2px_rgba(16,185,129,0.5)] border-emerald-400/60' : ''}`}
@@ -438,7 +410,6 @@ export const Navigation = () => {
                       <span className="bg-gradient-to-r from-emerald-600 to-green-600 bg-clip-text text-transparent font-semibold">My Church Space</span>
                     </Link>
                   )}
-                  {!isGuestHouseMode && (
                   <Link
                     to="/bible"
                     className={`px-3 py-1.5 text-sm font-medium rounded-md transition-all whitespace-nowrap flex items-center gap-1 bg-gradient-to-r from-blue-500/10 to-cyan-500/10 border border-blue-500/20 hover:from-blue-500/20 hover:to-cyan-500/20 ${isActiveTab('/bible') ? 'shadow-[0_0_12px_2px_rgba(59,130,246,0.5)] border-blue-400/60' : ''}`}
@@ -446,7 +417,6 @@ export const Navigation = () => {
                     <BookOpen className="h-3.5 w-3.5 text-blue-500" />
                     <span className="bg-gradient-to-r from-blue-600 to-cyan-600 bg-clip-text text-transparent font-semibold">Phototheology Study Bible</span>
                   </Link>
-                  )}
                   <Link
                     to="/study-buddy"
                     className={`px-3 py-1.5 text-sm font-medium rounded-md transition-all whitespace-nowrap flex items-center gap-1 bg-gradient-to-r from-slate-500/10 to-zinc-500/10 border border-slate-500/20 hover:from-slate-500/20 hover:to-zinc-500/20 ${isActiveTab('/study-buddy') ? 'shadow-[0_0_12px_2px_rgba(100,116,139,0.5)] border-slate-400/60' : ''}`}
@@ -468,7 +438,6 @@ export const Navigation = () => {
                     <Gem className="h-3.5 w-3.5 text-emerald-500" />
                     <span className="bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent font-semibold">Give Me A Gem</span>
                   </Link>
-                  {!isGuestHouseMode && (
                   <Link
                     to="/mind-map"
                     className={`px-3 py-1.5 text-sm font-medium rounded-md transition-all whitespace-nowrap flex items-center gap-1 bg-gradient-to-r from-indigo-500/10 to-violet-500/10 border border-indigo-500/20 hover:from-indigo-500/20 hover:to-violet-500/20 ${isActiveTab('/mind-map') ? 'shadow-[0_0_12px_2px_rgba(99,102,241,0.5)] border-indigo-400/60' : ''}`}
@@ -476,7 +445,6 @@ export const Navigation = () => {
                     <Network className="h-3.5 w-3.5 text-indigo-500" />
                     <span className="bg-gradient-to-r from-indigo-600 to-violet-600 bg-clip-text text-transparent font-semibold">Mind Map Palace</span>
                   </Link>
-                  )}
                   <Link
                     to="/image-bible"
                     className={`px-3 py-1.5 text-sm font-medium rounded-md transition-all whitespace-nowrap flex items-center gap-1 bg-gradient-to-r from-amber-500/10 to-orange-500/10 border border-amber-500/20 hover:from-amber-500/20 hover:to-orange-500/20 ${isActiveTab('/image-bible') ? 'shadow-[0_0_12px_2px_rgba(245,158,11,0.5)] border-amber-400/60' : ''}`}
@@ -484,8 +452,6 @@ export const Navigation = () => {
                     <Image className="h-3.5 w-3.5 text-amber-500" />
                     <span className="bg-gradient-to-r from-amber-600 to-orange-600 bg-clip-text text-transparent font-semibold">PT Image Bible</span>
                   </Link>
-                  {!isGuestHouseMode && (
-                  <>
                   <Link
                     to="/card-deck"
                     className={`px-3 py-1.5 text-sm font-medium rounded-md transition-all whitespace-nowrap flex items-center gap-1 bg-gradient-to-r from-violet-500/10 to-purple-500/10 border border-violet-500/20 hover:from-violet-500/20 hover:to-purple-500/20 ${isActiveTab('/card-deck') ? 'shadow-[0_0_12px_2px_rgba(139,92,246,0.5)] border-violet-400/60' : ''}`}
@@ -500,8 +466,6 @@ export const Navigation = () => {
                     <Calendar className="h-3.5 w-3.5 text-emerald-500" />
                     <span className="bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent font-semibold">Reading Plans</span>
                   </Link>
-                  </>
-                  )}
                   <Link
                     to="/devotionals" 
                     className={`px-3 py-1.5 text-sm font-medium rounded-md transition-all whitespace-nowrap flex items-center gap-1 bg-gradient-to-r from-pink-500/10 to-rose-500/10 border border-pink-500/20 hover:from-pink-500/20 hover:to-rose-500/20 ${isActiveTab('/devotionals') ? 'shadow-[0_0_12px_2px_rgba(236,72,153,0.5)] border-pink-400/60' : ''}`}
@@ -509,8 +473,6 @@ export const Navigation = () => {
                     <BookOpen className="h-3.5 w-3.5 text-pink-500" />
                     <span className="bg-gradient-to-r from-pink-600 to-rose-600 bg-clip-text text-transparent font-semibold">Devotionals</span>
                   </Link>
-                  {!isGuestHouseMode && (
-                  <>
                   <Link
                     to="/encyclopedia"
                     className={`px-3 py-1.5 text-sm font-medium rounded-md transition-all whitespace-nowrap flex items-center gap-1 bg-gradient-to-r from-indigo-500/10 to-blue-500/10 border border-indigo-500/20 hover:from-indigo-500/20 hover:to-blue-500/20 ${isActiveTab('/encyclopedia') ? 'shadow-[0_0_12px_2px_rgba(99,102,241,0.5)] border-indigo-400/60' : ''}`}
@@ -546,8 +508,6 @@ export const Navigation = () => {
                     <Library className="h-3.5 w-3.5 text-indigo-500" />
                     <span className="bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent font-semibold">Libraries</span>
                   </Link>
-                  </>
-                  )}
                   <Link
                     to="/games" 
                     className={`px-3 py-1.5 text-sm font-medium rounded-md transition-all whitespace-nowrap flex items-center gap-1 bg-gradient-to-r from-fuchsia-500/10 to-pink-500/10 border border-fuchsia-500/20 hover:from-fuchsia-500/20 hover:to-pink-500/20 ${isActiveTab('/games') ? 'shadow-[0_0_12px_2px_rgba(217,70,239,0.5)] border-fuchsia-400/60' : ''}`}
@@ -555,8 +515,6 @@ export const Navigation = () => {
                     <Zap className="h-3.5 w-3.5 text-fuchsia-500" />
                     <span className="bg-gradient-to-r from-fuchsia-600 to-pink-600 bg-clip-text text-transparent font-semibold">Games</span>
                   </Link>
-                  {!isGuestHouseMode && (
-                  <>
                   <Link
                     to="/memory"
                     className={`px-3 py-1.5 text-sm font-medium rounded-md transition-all whitespace-nowrap flex items-center gap-1 bg-gradient-to-r from-cyan-500/10 to-teal-500/10 border border-cyan-500/20 hover:from-cyan-500/20 hover:to-teal-500/20 ${isActiveTab('/memory') ? 'shadow-[0_0_12px_2px_rgba(6,182,212,0.5)] border-cyan-400/60' : ''}`}
@@ -707,8 +665,6 @@ export const Navigation = () => {
                     <BookOpen className="h-3.5 w-3.5 text-emerald-500" />
                     <span className="bg-gradient-to-r from-emerald-600 to-green-600 bg-clip-text text-transparent font-semibold">Courses</span>
                   </Link>
-                  </>
-                  )}
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                       <button className="px-3 py-1.5 text-sm font-medium rounded-md transition-colors whitespace-nowrap flex items-center gap-1 bg-gradient-to-r from-orange-500/10 to-red-500/10 border border-orange-500/20 hover:from-orange-500/20 hover:to-red-500/20">
@@ -725,8 +681,6 @@ export const Navigation = () => {
                       </DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>
-                  {!isGuestHouseMode && (
-                  <>
                   <Link
                     to="/achievements"
                     className="px-3 py-1.5 text-sm font-medium rounded-md transition-colors whitespace-nowrap flex items-center gap-1 bg-gradient-to-r from-amber-500/10 to-yellow-500/10 border border-amber-500/20 hover:from-amber-500/20 hover:to-yellow-500/20"
@@ -832,8 +786,6 @@ export const Navigation = () => {
                       </DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>
-                  </>
-                  )}
 
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
@@ -904,12 +856,6 @@ export const Navigation = () => {
       
       {/* Spacer div - matches the actual fixed header height */}
       <div aria-hidden style={{ height: headerHeight }} />
-
-      {/* Guest House Welcome Modal - shown for first-time users */}
-      <GuestHouseWelcomeModal
-        open={welcomeModalOpen}
-        onOpenChange={handleWelcomeModalOpenChange}
-      />
     </>
   );
 };
