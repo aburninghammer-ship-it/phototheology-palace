@@ -36,7 +36,7 @@ export const Navigation = () => {
   const { activeCount } = useActiveUsers();
   const { isAdmin } = useIsAdmin();
   const { isMember: isChurchMember, churchId, role: churchRole } = useChurchMembership();
-  const { preferences, updatePreference } = useUserPreferences();
+  const { preferences, loading: preferencesLoading, updatePreference } = useUserPreferences();
   const { toggleSidebar } = useSidebar();
   const { conversations } = useDirectMessagesContext();
   const location = useLocation();
@@ -45,7 +45,8 @@ export const Navigation = () => {
   const isGuestHouseMode = preferences.suite_mode === "guest_house";
 
   // Show welcome modal for first-time users who haven't selected a mode
-  const shouldShowWelcomeModal = user && !preferences.has_seen_mode_selector;
+  // IMPORTANT: Wait for preferences to load to avoid showing modal when user has already seen it
+  const shouldShowWelcomeModal = user && !preferencesLoading && !preferences.has_seen_mode_selector;
   const [welcomeModalOpen, setWelcomeModalOpen] = useState(false);
 
   const handleWelcomeModalOpenChange = (open: boolean) => {
