@@ -1,6 +1,6 @@
 import { useLayoutEffect, useRef, useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { Building2, Sparkles, Users, User, CreditCard, LogOut, MessageCircle, BookOpen, Calendar, Image, Search, Video, Sword, Crown, Shield, Brain, Lightbulb, Zap, Trophy, MessageSquare, Target, StickyNote, Radio, Church, GraduationCap, Award, Gamepad2, BarChart3, Archive, Library, Layers, Network, Home, Heart, Gem } from "lucide-react";
+import { Building2, Sparkles, Users, User, CreditCard, LogOut, MessageCircle, BookOpen, Calendar, Image, Search, Video, Sword, Crown, Shield, Brain, Lightbulb, Zap, Trophy, MessageSquare, Target, StickyNote, Radio, Church, GraduationCap, Award, Gamepad2, BarChart3, Archive, Library, Layers, Network, Home, Heart, Gem, FileImage, FolderOpen } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
 import { useActiveUsers } from "@/hooks/useActiveUsers";
@@ -584,6 +584,26 @@ export const Navigation = () => {
                         <Link to="/study-partners">
                           <Users className="h-4 w-4 mr-2" />
                           Study Partners
+                        </Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem asChild>
+                        <Link to="/sources">
+                          <FolderOpen className="h-4 w-4 mr-2" />
+                          Source Library
+                        </Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem asChild>
+                        <Link to="/infographics">
+                          <FileImage className="h-4 w-4 mr-2" />
+                          Infographic Generator
+                        </Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem asChild>
+                        <Link to="/study-series" className="flex items-center">
+                          <BookOpen className="h-4 w-4 mr-2" />
+                          Study Series
+                          <Badge variant="secondary" className="ml-2 text-[10px] px-1.5 py-0">Premium</Badge>
                         </Link>
                       </DropdownMenuItem>
                     </DropdownMenuContent>

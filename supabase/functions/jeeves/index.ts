@@ -19,7 +19,8 @@ import {
   FORMATTING_REQUIREMENTS,
   CLOSING_BEHAVIOR,
   MASTER_PATTERNS,
-  SERMON_KNOWLEDGE_BANK
+  SERMON_KNOWLEDGE_BANK,
+  SCRIPTURE_CITATION_PROTOCOL
 } from './palace-schema.ts';
 
 const corsHeaders = {
@@ -609,6 +610,8 @@ You're warm, personable, and genuinely excited about studying Scripture together
 - Keep your tone friendly, warm, modern, and relatable
 
 ${pathTeachingStyle}
+
+      ${SCRIPTURE_CITATION_PROTOCOL}
 
       ${THEOLOGICAL_REASONING}
 

@@ -1,4 +1,3 @@
-import { motion } from "framer-motion";
 import { Card } from "@/components/ui/card";
 import { Castle, Users, Gamepad2, Sparkles, Heart } from "lucide-react";
 
@@ -95,16 +94,11 @@ export function WelcomeMessage() {
             If you like what you see—you're welcome to step further into the Palace.
           </p>
           
-          <motion.p 
-            className="text-xl font-bold text-center pt-4"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.5 }}
-          >
+          <p className="text-xl font-bold text-center pt-4">
             <span className="bg-gradient-to-r from-primary via-secondary to-accent bg-clip-text text-transparent">
               But for now? Welcome to the GuestHouse. Let's begin.
             </span>
-          </motion.p>
+          </p>
         </div>
       </div>
     </Card>

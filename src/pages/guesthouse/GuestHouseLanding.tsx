@@ -1,18 +1,17 @@
-import { useState, useEffect } from "react";
-import { motion } from "framer-motion";
+import { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Helmet } from "react-helmet-async";
-import { 
-  Castle, 
-  Users, 
-  Calendar, 
-  Clock, 
-  Sparkles, 
-  Play, 
+import {
+  Castle,
+  Users,
+  Calendar,
+  Clock,
+  Sparkles,
+  Play,
   Video,
   ArrowRight,
   Star
@@ -115,11 +114,7 @@ export default function GuestHouseLanding() {
 
         <div className="relative z-10 container mx-auto px-4 py-8">
           {/* Hero Section */}
-          <motion.div 
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="text-center mb-12"
-          >
+          <div className="text-center mb-12">
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 mb-6">
               <Castle className="w-5 h-5 text-primary" />
               <span className="text-sm font-medium text-primary">The GuestHouse</span>
@@ -138,11 +133,7 @@ export default function GuestHouseLanding() {
 
             {/* Countdown to next event */}
             {nextEvent && (
-              <motion.div
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                className="inline-block"
-              >
+              <div className="inline-block">
                 <Card className="bg-card/95 border-primary/20 p-6 shadow-lg">
                   <div className="flex items-center gap-4">
                     <div className="p-3 rounded-full bg-primary/10">
@@ -160,27 +151,17 @@ export default function GuestHouseLanding() {
                     </Button>
                   </div>
                 </Card>
-              </motion.div>
+              </div>
             )}
-          </motion.div>
+          </div>
 
           {/* Welcome Message */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 }}
-            className="mb-16"
-          >
+          <div className="mb-16">
             <WelcomeMessage />
-          </motion.div>
+          </div>
 
           {/* Upcoming Events */}
-          <motion.section
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.4 }}
-            className="mb-16"
-          >
+          <section className="mb-16">
             <div className="flex items-center justify-between mb-8">
               <h2 className="text-2xl font-bold flex items-center gap-2">
                 <Calendar className="w-6 h-6 text-primary" />
@@ -221,67 +202,46 @@ export default function GuestHouseLanding() {
                 ))}
               </div>
             )}
-          </motion.section>
+          </section>
 
           {/* How It Works */}
-          <motion.section
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.6 }}
-            className="mb-16"
-          >
+          <section className="mb-16">
             <h2 className="text-2xl font-bold text-center mb-8">How It Works</h2>
-            <div className="grid md:grid-cols-4 gap-6">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
               {[
                 { icon: Users, title: "Join", desc: "Enter your name. No account needed." },
                 { icon: Star, title: "Team Up", desc: "Get randomly placed in one of 4 teams." },
                 { icon: Play, title: "Play", desc: "Race through a Scripture-based challenge." },
                 { icon: Sparkles, title: "Reveal", desc: "See how all teams' discoveries connect." }
-              ].map((step, i) => (
-                <motion.div
-                  key={step.title}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.7 + i * 0.1 }}
-                >
-                  <Card className="p-6 text-center bg-card/95 border-border/50 hover:border-primary/30 transition-all hover:shadow-md">
-                    <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4">
-                      <step.icon className="w-6 h-6 text-primary" />
-                    </div>
-                    <h3 className="font-semibold mb-2">{step.title}</h3>
-                    <p className="text-sm text-muted-foreground">{step.desc}</p>
-                  </Card>
-                </motion.div>
+              ].map((step) => (
+                <Card key={step.title} className="p-4 md:p-6 text-center bg-card/95 border-border/50 hover:border-primary/30 transition-all hover:shadow-md">
+                  <div className="w-10 h-10 md:w-12 md:h-12 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-3 md:mb-4">
+                    <step.icon className="w-5 h-5 md:w-6 md:h-6 text-primary" />
+                  </div>
+                  <h3 className="font-semibold mb-1 md:mb-2 text-sm md:text-base">{step.title}</h3>
+                  <p className="text-xs md:text-sm text-muted-foreground">{step.desc}</p>
+                </Card>
               ))}
             </div>
-          </motion.section>
+          </section>
 
           {/* Social Share */}
-          <motion.section
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.8 }}
-          >
+          <section>
             <SocialShareCard />
-          </motion.section>
+          </section>
 
           {/* CTA to explore Palace */}
-          <motion.section
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 1 }}
-            className="text-center mt-16 pb-8"
-          >
-            <Card className="p-8 bg-gradient-to-br from-primary/5 via-secondary/5 to-accent/5 border-primary/20">
-              <h3 className="text-xl font-bold mb-2">Want to Go Deeper?</h3>
-              <p className="text-muted-foreground mb-4">
+          <section className="text-center mt-16 pb-8">
+            <Card className="p-6 md:p-8 bg-gradient-to-br from-primary/5 via-secondary/5 to-accent/5 border-primary/20">
+              <h3 className="text-lg md:text-xl font-bold mb-2">Want to Go Deeper?</h3>
+              <p className="text-sm md:text-base text-muted-foreground mb-4">
                 The GuestHouse is just the beginning. The full Palace awaits.
               </p>
               <Button variant="outline" onClick={() => navigate("/pricing")}>
                 Explore Full Access
               </Button>
             </Card>
-          </motion.section>
+          </section>
         </div>
       </div>
     </>

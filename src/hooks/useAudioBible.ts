@@ -87,8 +87,14 @@ export function useAudioBible(options: UseAudioBibleOptions = {}) {
   const onChapterCompleteRef = useRef(onChapterComplete);
   const onVerseChangeRef = useRef(onVerseChange);
 
-  // Keep refs in sync with state
+  // Keep refs in sync with state - update synchronously for critical playback state
   useEffect(() => { currentVerseIndexRef.current = currentVerseIndex; }, [currentVerseIndex]);
+
+  // Also update ref synchronously when setCurrentVerseIndex is called
+  const setCurrentVerseIndexSync = useCallback((index: number) => {
+    currentVerseIndexRef.current = index; // Sync update
+    setCurrentVerseIndex(index); // Async state update
+  }, []);
   useEffect(() => { isPlayingCommentaryRef.current = isPlayingCommentary; }, [isPlayingCommentary]);
   useEffect(() => { includeCommentaryRef.current = includeCommentary; }, [includeCommentary]);
   useEffect(() => { commentaryOnlyRef.current = commentaryOnly; }, [commentaryOnly]);
@@ -242,7 +248,7 @@ export function useAudioBible(options: UseAudioBibleOptions = {}) {
         // Trigger move to next verse by simulating playback end
         const nextIndex = currentVerseIndexRef.current + 1;
         if (nextIndex < item.verses.length) {
-          setCurrentVerseIndex(nextIndex);
+          setCurrentVerseIndexSync(nextIndex);
           playVerseAtIndexRef.current?.(item, nextIndex);
         } else {
           // Chapter complete
@@ -252,7 +258,7 @@ export function useAudioBible(options: UseAudioBibleOptions = {}) {
             currentItemRef.current = nextItem;
             setCurrentBook(nextItem.book);
             setCurrentChapter(nextItem.chapter);
-            setCurrentVerseIndex(0);
+            setCurrentVerseIndexSync(0);
             setTotalVerses(nextItem.verses.length);
             playVerseAtIndexRef.current?.(nextItem, 0);
           } else {
@@ -295,14 +301,14 @@ export function useAudioBible(options: UseAudioBibleOptions = {}) {
         // Move to next verse
         const nextIndex = currentVerseIndexRef.current + 1;
         if (nextIndex < item.verses.length) {
-          setCurrentVerseIndex(nextIndex);
+          setCurrentVerseIndexSync(nextIndex);
           playVerseAtIndexRef.current?.(item, nextIndex);
         }
       }
     } finally {
       loadingRef.current = false;
     }
-  }, []);
+  }, [setCurrentVerseIndexSync]);
 
   /**
    * Play chapter-level commentary (summary for entire chapter)
@@ -437,7 +443,7 @@ export function useAudioBible(options: UseAudioBibleOptions = {}) {
 
     setCurrentBook(item.book);
     setCurrentChapter(item.chapter);
-    setCurrentVerseIndex(0);
+    setCurrentVerseIndexSync(0); // Use sync version to ensure ref is updated before playback
     setTotalVerses(item.verses.length);
     setIsPlayingCommentary(false);
     setCurrentCommentary("");
@@ -455,7 +461,7 @@ export function useAudioBible(options: UseAudioBibleOptions = {}) {
     }
 
     playVerseAtIndex(item, 0);
-  }, [playVerseAtIndex]);
+  }, [playVerseAtIndex, setCurrentVerseIndexSync]);
 
   /**
    * Handle when current audio ends - uses refs to avoid stale closures
@@ -484,7 +490,7 @@ export function useAudioBible(options: UseAudioBibleOptions = {}) {
     console.log(`[useAudioBible] Moving to verse index ${nextIndex} of ${item.verses.length}`);
 
     if (nextIndex < item.verses.length) {
-      setCurrentVerseIndex(nextIndex);
+      setCurrentVerseIndexSync(nextIndex);
 
       // Prefetch more commentary ahead when advancing verses
       if (includeCommentaryRef.current && nextIndex + 2 < item.verses.length) {
@@ -519,7 +525,7 @@ export function useAudioBible(options: UseAudioBibleOptions = {}) {
         setAudioState("idle");
       }
     }
-  }, [playCurrentVerseCommentary, playVerseAtIndex, startPlayback]);
+  }, [playCurrentVerseCommentary, playVerseAtIndex, startPlayback, setCurrentVerseIndexSync]);
 
   // Subscribe to audio engine events - use ref to always get latest handler
   const handlePlaybackEndedRef = useRef(handlePlaybackEnded);
@@ -619,11 +625,11 @@ export function useAudioBible(options: UseAudioBibleOptions = {}) {
 
     const nextIndex = currentVerseIndexRef.current + 1;
     if (nextIndex < item.verses.length) {
-      setCurrentVerseIndex(nextIndex);
+      setCurrentVerseIndexSync(nextIndex);
       setIsPlayingCommentary(false);
       playVerseAtIndex(item, nextIndex);
     }
-  }, [playVerseAtIndex]);
+  }, [playVerseAtIndex, setCurrentVerseIndexSync]);
 
   /**
    * Skip to previous verse
@@ -635,10 +641,10 @@ export function useAudioBible(options: UseAudioBibleOptions = {}) {
     audioEngine.stop();
 
     const prevIndex = Math.max(0, currentVerseIndexRef.current - 1);
-    setCurrentVerseIndex(prevIndex);
+    setCurrentVerseIndexSync(prevIndex);
     setIsPlayingCommentary(false);
     playVerseAtIndex(item, prevIndex);
-  }, [playVerseAtIndex]);
+  }, [playVerseAtIndex, setCurrentVerseIndexSync]);
 
   // Computed states
   const isPlaying = audioState === "playing";

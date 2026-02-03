@@ -168,6 +168,9 @@ const categoryConfig = {
       { to: "/sermon-simmer", label: "Simmer Mode", icon: "🔥" },
       { to: "/sermon-powerpoint", label: "PowerPoint Generator", icon: "📊" },
       { to: "/sermon-archive", label: "My Sermons", icon: "📁" },
+      { to: "/sources", label: "Source Library", icon: "📂" },
+      { to: "/infographics", label: "Infographic Generator", icon: "🖼️" },
+      { to: "/study-series", label: "Study Series Generator ⭐", icon: "📚" },
     ],
   },
 };
@@ -187,8 +190,8 @@ const simplifiedQuickLinks = [
 
 // Guest House quick links - warm amber theme for the 6 essential tabs
 const guestHouseQuickLinks = [
+  { to: "/guesthouse", label: "GuestHouse", icon: Users, color: "from-amber-600/20 to-orange-600/10", borderColor: "border-amber-600/40", iconColor: "text-amber-700" },
   { to: "/palace", label: "Palace", icon: Building2, color: "from-amber-500/20 to-orange-500/10", borderColor: "border-amber-500/30", iconColor: "text-amber-600" },
-  { to: "/image-bible", label: "PT Image Bible", icon: Image, color: "from-amber-500/20 to-orange-500/10", borderColor: "border-amber-500/30", iconColor: "text-amber-600" },
   { to: "/devotionals", label: "Devotionals", icon: Heart, color: "from-amber-500/20 to-orange-500/10", borderColor: "border-amber-500/30", iconColor: "text-amber-600" },
   { to: "/study-buddy", label: "Study Buddy", icon: Brain, color: "from-amber-500/20 to-orange-500/10", borderColor: "border-amber-500/30", iconColor: "text-amber-600" },
   { to: "/games", label: "Games", icon: Gamepad2, color: "from-amber-500/20 to-orange-500/10", borderColor: "border-amber-500/30", iconColor: "text-amber-600" },

@@ -1,13 +1,12 @@
-import { motion } from "framer-motion";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { 
-  Calendar, 
-  Clock, 
-  Users, 
-  Gamepad2, 
-  Video, 
+import {
+  Calendar,
+  Clock,
+  Users,
+  Gamepad2,
+  Video,
   ArrowRight,
   Zap
 } from "lucide-react";
@@ -37,12 +36,8 @@ export function EventCard({ event, index, onJoin }: EventCardProps) {
   const isStartingSoon = eventDate.getTime() - Date.now() < 1000 * 60 * 30; // 30 mins
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: index * 0.1 }}
-    >
-      <Card className="group relative overflow-hidden bg-card/95 border-border/50 hover:border-primary/30 transition-all duration-300 hover:shadow-lg">
+    <div>
+      <Card className="group relative overflow-hidden bg-card/95 border-border/50 hover:border-primary/30 transition-all duration-300 hover:shadow-lg active:scale-[0.98]">
         {/* Status indicator */}
         {event.status === "live" && (
           <div className="absolute top-3 right-3 z-10">
@@ -129,6 +124,6 @@ export function EventCard({ event, index, onJoin }: EventCardProps) {
           </Button>
         </div>
       </Card>
-    </motion.div>
+    </div>
   );
 }

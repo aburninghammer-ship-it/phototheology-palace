@@ -279,3 +279,9 @@ verify_jwt = false
 
 [functions.batch-generate-devotional-days]
 verify_jwt = false
+
+[functions.generate-infographic]
+verify_jwt = false
+
+[functions.generate-study-series]
+verify_jwt = false
