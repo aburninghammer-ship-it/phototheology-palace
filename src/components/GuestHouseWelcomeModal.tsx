@@ -49,21 +49,19 @@ export function GuestHouseWelcomeModal({
     setSelectedMode(mode);
   };
 
-  const handleConfirm = () => {
+  const handleConfirm = async () => {
     if (!selectedMode || isConfirming) return;
 
     setIsConfirming(true);
 
-    // Update both preferences - suite_mode first, then mark as seen
-    // Using a slight delay between updates to prevent race conditions
+    // Update both preferences atomically by calling updatePreference for each
+    // but close immediately since the state updates instantly (persistence is fire-and-forget)
     updatePreference("suite_mode", selectedMode);
+    updatePreference("has_seen_mode_selector", true);
     
-    // Small delay to let first update process, then mark as seen and close
-    setTimeout(() => {
-      updatePreference("has_seen_mode_selector", true);
-      onOpenChange(false);
-      setIsConfirming(false);
-    }, 300);
+    // Close modal immediately - state is already updated in React
+    onOpenChange(false);
+    setIsConfirming(false);
   };
 
   const { welcomeMessage } = GUEST_HOUSE_CONFIG;
