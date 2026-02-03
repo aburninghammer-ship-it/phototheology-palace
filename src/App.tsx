@@ -278,15 +278,6 @@ const Welcome = lazy(() => import("./pages/Welcome"));
 const Antechamber = lazy(() => import("./pages/Antechamber"));
 const FirstRoom = lazy(() => import("./pages/FirstRoom"));
 
-// GuestHouse pages (public)
-const GuestHouseLanding = lazy(() => import("./pages/guesthouse/GuestHouseLanding"));
-const GuestHouseEvent = lazy(() => import("./pages/guesthouse/GuestHouseEvent"));
-const GuestHouseLobby = lazy(() => import("./pages/guesthouse/GuestHouseLobby"));
-const GuestHousePlay = lazy(() => import("./pages/guesthouse/GuestHousePlay"));
-const GuestHouseAssembly = lazy(() => import("./pages/guesthouse/GuestHouseAssembly"));
-const GuestHouseHost = lazy(() => import("./pages/guesthouse/GuestHouseHost"));
-const GuestHouseHostLive = lazy(() => import("./pages/guesthouse/GuestHouseHostLive"));
-const GuestHouseGuestLive = lazy(() => import("./pages/guesthouse/GuestHouseGuestLive"));
 
 // Simple redirect component for /devotional -> /devotionals
 const DevotionalRedirect = () => {
@@ -679,17 +670,6 @@ function App() {
               </ProtectedRoute>
             } />
             
-            {/* GuestHouse Routes (Public - No Auth Required) */}
-            <Route path="/guesthouse" element={<GuestHouseLanding />} />
-            <Route path="/guesthouse/event/:eventId" element={<GuestHouseEvent />} />
-            <Route path="/guesthouse/lobby/:eventId" element={<GuestHouseLobby />} />
-            <Route path="/guesthouse/play/:eventId" element={<GuestHousePlay />} />
-            <Route path="/guesthouse/live/:eventId" element={<GuestHouseGuestLive />} />
-            <Route path="/guesthouse/assembly/:eventId" element={<GuestHouseAssembly />} />
-            
-            {/* GuestHouse Host Routes (Auth Required) */}
-            <Route path="/guesthouse/host" element={<ProtectedRoute><GuestHouseHost /></ProtectedRoute>} />
-            <Route path="/guesthouse/host/live/:eventId" element={<ProtectedRoute><GuestHouseHostLive /></ProtectedRoute>} />
             
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                 <Route path="*" element={<NotFound />} />
