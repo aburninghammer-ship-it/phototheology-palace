@@ -42,8 +42,8 @@ async function sendWelcomeEmail(email: string, name: string, pledgeAmount: numbe
   }
 }
 
-// Minimum pledge for premium access: $20/month = 2000 cents
-const MINIMUM_PLEDGE_CENTS = 2000;
+// Minimum pledge for premium access: $15/month = 1500 cents
+const MINIMUM_PLEDGE_CENTS = 1500;
 
 serve(async (req) => {
   if (req.method === "OPTIONS") {
@@ -222,7 +222,23 @@ async function updateUserAccess(supabase: any, userId: string, hasAccess: boolea
       pledge_status: "active",
       access_expires_at: null,
     }).eq("user_id", userId);
-    
+
+    // Update user_subscriptions table (where subscription data now lives)
+    const { error: subError } = await supabase
+      .from("user_subscriptions")
+      .upsert({
+        user_id: userId,
+        subscription_tier: "premium",
+        subscription_status: "active",
+        payment_source: "patreon",
+        updated_at: new Date().toISOString()
+      }, { onConflict: "user_id" });
+
+    if (subError) {
+      console.error("Failed to update user_subscriptions:", subError);
+    }
+
+    // Also update profiles for backwards compatibility
     await supabase.from("profiles").update({
       subscription_tier: "premium",
       subscription_status: "active",
@@ -259,6 +275,14 @@ async function updateUserAccess(supabase: any, userId: string, hasAccess: boolea
         console.log("Started grace period for user:", userId, "- access until:", gracePeriodEnd.toISOString());
       } else if (new Date(connection.access_expires_at) < new Date()) {
         // Grace period has ended - now revoke access
+        // Update user_subscriptions table
+        await supabase.from("user_subscriptions").update({
+          subscription_tier: "free",
+          subscription_status: "cancelled",
+          updated_at: new Date().toISOString(),
+        }).eq("user_id", userId);
+
+        // Also update profiles for backwards compatibility
         await supabase.from("profiles").update({
           subscription_tier: "free",
           subscription_status: "cancelled",

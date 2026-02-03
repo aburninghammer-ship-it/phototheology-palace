@@ -188,7 +188,18 @@ export function useSubscription() {
         if (!patreonError && patreonConnection?.is_active_patron && patreonConnection.entitled_cents >= MINIMUM_PLEDGE_CENTS) {
           console.log('[useSubscription] Active Patreon found in connections!', patreonConnection);
 
-          // Update profiles table to fix the sync issue
+          // Update user_subscriptions table (where subscription data now lives)
+          await supabase
+            .from('user_subscriptions')
+            .upsert({
+              user_id: user.id,
+              subscription_tier: 'premium',
+              subscription_status: 'active',
+              payment_source: 'patreon',
+              updated_at: new Date().toISOString()
+            }, { onConflict: 'user_id' });
+
+          // Also update profiles table for backwards compatibility
           await supabase
             .from('profiles')
             .update({
