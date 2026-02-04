@@ -228,7 +228,9 @@ serve(async (req) => {
       canceled_subscriptions: 0,
       by_tier: { essential: 0, premium: 0, student: 0, church: 0, unknown: 0 },
       by_product: {} as Record<string, { active: number; trialing: number }>,
-      total_mrr_cents: 0,
+      active_mrr_cents: 0,      // MRR from active subscriptions only
+      trialing_mrr_cents: 0,    // MRR from trialing subscriptions (card on file)
+      total_mrr_cents: 0,       // Combined (active + trialing)
       error: null as string | null,
       unlinked_count: 0,
     };
@@ -267,15 +269,13 @@ serve(async (req) => {
           }
           stripeStats.by_product[productName].active++;
 
-          // Calculate MRR from Stripe's unit_amount
+          // Calculate MRR from Stripe's unit_amount (active subs)
           const amount = priceObj?.unit_amount || 0;
           const interval = priceObj?.recurring?.interval;
+          const monthlyAmount = interval === 'year' ? Math.round(amount / 12) : amount;
 
-          if (interval === 'year') {
-            stripeStats.total_mrr_cents += Math.round(amount / 12);
-          } else {
-            stripeStats.total_mrr_cents += amount;
-          }
+          stripeStats.active_mrr_cents += monthlyAmount;
+          stripeStats.total_mrr_cents += monthlyAmount;
         });
 
         // Get ALL trialing subscriptions with pagination
@@ -298,15 +298,13 @@ serve(async (req) => {
           }
           stripeStats.by_product[productName].trialing++;
 
-          // Include trialing in MRR since they have cards on file
+          // Calculate trialing MRR (cards on file, will convert after 7 days)
           const amount = priceObj?.unit_amount || 0;
           const interval = priceObj?.recurring?.interval;
+          const monthlyAmount = interval === 'year' ? Math.round(amount / 12) : amount;
 
-          if (interval === 'year') {
-            stripeStats.total_mrr_cents += Math.round(amount / 12);
-          } else {
-            stripeStats.total_mrr_cents += amount;
-          }
+          stripeStats.trialing_mrr_cents += monthlyAmount;
+          stripeStats.total_mrr_cents += monthlyAmount;
         });
 
         // Get canceled subscriptions with pagination
@@ -334,7 +332,17 @@ serve(async (req) => {
       total_trialing: stripeStats.trialing_subscriptions,
       total_lifetime: dbStats.lifetime_access,
       total_with_access: stripeStats.active_subscriptions + patreonStats.active_patrons + dbStats.lifetime_access,
-      monthly_recurring_revenue: `$${(stripeStats.total_mrr_cents / 100).toFixed(2)}`,
+      // Current MRR - from active paying subscriptions only
+      current_mrr: `$${(stripeStats.active_mrr_cents / 100).toFixed(2)}`,
+      current_mrr_cents: stripeStats.active_mrr_cents,
+      // Projected MRR - includes trialing users with cards on file
+      projected_mrr: `$${(stripeStats.total_mrr_cents / 100).toFixed(2)}`,
+      projected_mrr_cents: stripeStats.total_mrr_cents,
+      // Trialing MRR - amount from users in trial period
+      trialing_mrr: `$${(stripeStats.trialing_mrr_cents / 100).toFixed(2)}`,
+      trialing_mrr_cents: stripeStats.trialing_mrr_cents,
+      // Legacy field for backward compatibility
+      monthly_recurring_revenue: `$${(stripeStats.active_mrr_cents / 100).toFixed(2)}`,
       stripe_unlinked_subscriptions: stripeStats.unlinked_count,
     };
 

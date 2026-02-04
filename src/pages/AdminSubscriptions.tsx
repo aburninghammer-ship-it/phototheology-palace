@@ -638,17 +638,19 @@ export default function AdminSubscriptions() {
             </Card>
           </div>
 
-          {/* MRR Cards - Show both Stripe and Projected */}
+          {/* MRR Cards - Current vs Projected */}
           <div className="grid gap-6 md:grid-cols-2">
             <Card className="border-green-500/50 bg-green-500/5">
               <CardHeader className="pb-2">
-                <CardTitle className="text-lg">Stripe MRR</CardTitle>
-                <CardDescription>Active + trialing subscriptions (card verified)</CardDescription>
+                <CardTitle className="text-lg">Current MRR</CardTitle>
+                <CardDescription>From {stats.stripe.active_subscriptions} active paying subscribers</CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="text-4xl font-bold text-green-600">{stats.summary.monthly_recurring_revenue}</div>
+                <div className="text-4xl font-bold text-green-600">
+                  {stats.summary.current_mrr || stats.summary.monthly_recurring_revenue}
+                </div>
                 <p className="text-xs text-muted-foreground mt-1">
-                  {stats.stripe.active_subscriptions} active + {stats.stripe.trialing_subscriptions} trialing
+                  Revenue you're collecting right now
                 </p>
               </CardContent>
             </Card>
@@ -656,24 +658,15 @@ export default function AdminSubscriptions() {
             <Card className="border-blue-500/50 bg-blue-500/5">
               <CardHeader className="pb-2">
                 <CardTitle className="text-lg">Projected MRR</CardTitle>
-                <CardDescription>If all active app trials convert (est. 10%)</CardDescription>
+                <CardDescription>Includes {stats.stripe.trialing_subscriptions} trialing users with cards</CardDescription>
               </CardHeader>
               <CardContent>
-                {(() => {
-                  const stripeMrrCents = stats.stripe.total_mrr_cents || 0;
-                  const appTrials = stats.database.active_trials || 0;
-                  // Assume avg $12.47 (blended Essential/Premium) per converted trial at 10% conversion
-                  const projectedFromTrials = Math.round(appTrials * 0.10 * 12.47 * 100);
-                  const projectedTotal = (stripeMrrCents + projectedFromTrials) / 100;
-                  return (
-                    <>
-                      <div className="text-4xl font-bold text-blue-600">${projectedTotal.toFixed(2)}</div>
-                      <p className="text-xs text-muted-foreground mt-1">
-                        +${(projectedFromTrials / 100).toFixed(2)} from {appTrials} app trials @ 10%
-                      </p>
-                    </>
-                  );
-                })()}
+                <div className="text-4xl font-bold text-blue-600">
+                  {stats.summary.projected_mrr || stats.summary.monthly_recurring_revenue}
+                </div>
+                <p className="text-xs text-muted-foreground mt-1">
+                  +{stats.summary.trialing_mrr || '$0.00'} from trials (cards on file, converts in 7 days)
+                </p>
               </CardContent>
             </Card>
           </div>
