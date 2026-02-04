@@ -275,7 +275,7 @@ serve(async (req) => {
         const trialingSubscriptions = await fetchAllStripeSubscriptions(stripe, 'trialing');
         stripeStats.trialing_subscriptions = trialingSubscriptions.length;
         
-        // Count trialing by product name AND include trialing in MRR (cards on file)
+        // Count trialing by product name (but do NOT include in MRR - only active subs generate revenue)
         trialingSubscriptions.forEach((sub: any) => {
           const priceId = sub.items.data[0]?.price?.id;
           const info = priceToInfo[priceId];
@@ -285,25 +285,7 @@ serve(async (req) => {
             stripeStats.by_product[productName] = { active: 0, trialing: 0 };
           }
           stripeStats.by_product[productName].trialing++;
-
-          // MRR math mirrors the active logic above
-          const mappedInfo = priceToInfo[priceId];
-          const interval = sub.items.data[0]?.price?.recurring?.interval;
-
-          if (mappedInfo) {
-            if (interval === 'year') {
-              stripeStats.total_mrr_cents += Math.round((mappedInfo.price * 100) / 12);
-            } else {
-              stripeStats.total_mrr_cents += Math.round(mappedInfo.price * 100);
-            }
-          } else {
-            const amount = sub.items.data[0]?.price?.unit_amount || 0;
-            if (interval === 'year') {
-              stripeStats.total_mrr_cents += Math.round(amount / 12);
-            } else {
-              stripeStats.total_mrr_cents += amount;
-            }
-          }
+          // Note: Trialing subs are NOT added to MRR since they haven't been charged yet
         });
 
         // Get canceled subscriptions with pagination
