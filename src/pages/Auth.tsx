@@ -329,13 +329,14 @@ export default function Auth() {
 
       // Check if user was created (not just "fake" success for existing email)
       if (data.user && data.session) {
-        // Send signup notification
+        // Send signup notification (pending trial - card not yet verified)
         try {
           await supabase.functions.invoke("send-signup-notification", {
             body: {
               userEmail: email,
               displayName: signupDisplayName,
               userId: data.user.id,
+              subscriptionTier: 'pending', // User created but not yet completed checkout
             },
           });
         } catch (notifError) {
