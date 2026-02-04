@@ -122,12 +122,13 @@ serve(async (req) => {
       throw new Error("Invalid authorization");
     }
 
-    // Check if user is admin
+    // Check if user is admin (using user_roles table)
     const { data: adminCheck } = await supabase
-      .from("admin_users")
-      .select("user_id")
+      .from("user_roles")
+      .select("role")
       .eq("user_id", user.id)
-      .single();
+      .eq("role", "admin")
+      .maybeSingle();
 
     if (!adminCheck) {
       throw new Error("Admin access required");
