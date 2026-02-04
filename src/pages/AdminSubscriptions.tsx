@@ -488,6 +488,17 @@ export default function AdminSubscriptions() {
               <span className="text-xs ml-2">• Refreshed {secondsSinceRefresh}s ago</span>
             )}
           </p>
+          {/* Debug info for Stripe issues */}
+          {stats.stripe?.error && (
+            <p className="text-sm text-red-500 mt-1 font-mono bg-red-500/10 px-2 py-1 rounded">
+              Stripe Error: {stats.stripe.error}
+            </p>
+          )}
+          {(stats as any).debug && (
+            <p className="text-xs text-amber-500 mt-1 font-mono">
+              Debug: hasStripeKey={String((stats as any).debug?.hasStripeKey)} | keyPrefix={(stats as any).debug?.stripeKeyPrefix}
+            </p>
+          )}
           <p className="text-xs text-amber-600 mt-1">
             ⚠️ Note: New Stripe subscriptions sync when users log in or when you click "Sync Stripe Subscriptions"
           </p>
