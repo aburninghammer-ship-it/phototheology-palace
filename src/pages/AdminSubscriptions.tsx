@@ -540,7 +540,6 @@ export default function AdminSubscriptions() {
           <TabsTrigger value="patreon">Patreon</TabsTrigger>
           <TabsTrigger value="teachable">Teachable</TabsTrigger>
           <TabsTrigger value="pickaxe">Pickaxe</TabsTrigger>
-          <TabsTrigger value="database">Database</TabsTrigger>
           <TabsTrigger value="users">User Tools</TabsTrigger>
         </TabsList>
 
@@ -873,8 +872,9 @@ export default function AdminSubscriptions() {
           </Card>
         </TabsContent>
 
-        <TabsContent value="analytics">
+        <TabsContent value="analytics" className="space-y-6">
           <SubscriptionAnalyticsChart />
+          <SubscriptionDatabase />
         </TabsContent>
 
         <TabsContent value="mismatches">
@@ -1095,11 +1095,6 @@ export default function AdminSubscriptions() {
 
           {/* Email Campaign */}
           <PickaxeEmailCampaign />
-        </TabsContent>
-
-        {/* Subscription Database Tab */}
-        <TabsContent value="database">
-          <SubscriptionDatabase />
         </TabsContent>
 
         {/* User Tools Tab */}
