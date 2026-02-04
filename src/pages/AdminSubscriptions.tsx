@@ -80,6 +80,13 @@ interface SubscriptionStats {
     total_lifetime: number;
     total_with_access: number;
     monthly_recurring_revenue: string;
+    current_mrr?: string;
+    current_mrr_cents?: number;
+    projected_mrr?: string;
+    projected_mrr_cents?: number;
+    trialing_mrr?: string;
+    trialing_mrr_cents?: number;
+    stripe_unlinked_subscriptions?: number;
   };
   stripe: StripeStats;
   patreon: PatreonStats;
