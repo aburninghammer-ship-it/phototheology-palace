@@ -26,11 +26,13 @@ const handler = async (req: Request): Promise<Response> => {
     console.log("Sending signup notification for:", { userEmail, userId, subscriptionTier });
 
     // Determine tier label and emoji for subject
-    const tier = subscriptionTier || 'free';
-    const tierLabel = tier.charAt(0).toUpperCase() + tier.slice(1).toLowerCase();
+    const tier = subscriptionTier || 'pending';
+    const tierLabel = tier === 'pending' ? 'Pending Trial' 
+      : tier.charAt(0).toUpperCase() + tier.slice(1).toLowerCase();
     const tierEmoji = tier === 'premium' ? '👑' 
       : tier === 'essential' ? '⭐' 
       : tier === 'student' ? '🎓'
+      : tier === 'pending' ? '⏳'
       : '🆓'; // Free
 
     const emailResponse = await resend.emails.send({
