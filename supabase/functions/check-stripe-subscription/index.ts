@@ -14,19 +14,21 @@ const logStep = (step: string, details?: any) => {
 
 // Price ID to tier mapping - PHOTOTHEOLOGY APP ONLY
 const priceToTier: Record<string, string> = {
-  // Current subscriptions
-  'price_1SZNyCFGDAd3RU8IPwPJVesp': 'essential',
-  'price_1SZNyVFGDAd3RU8IPgRPqKXH': 'essential',
-  'price_1SZNyiFGDAd3RU8I4JHYEsEi': 'premium',
-  'price_1SZNyuFGDAd3RU8IjeGIvPEb': 'premium',
-  'price_1STVXrFGDAd3RU8Ia2NbKJWo': 'student',
+  // Current subscriptions (2026)
+  'price_1SZNyCFGDAd3RU8IPwPJVesp': 'essential',      // Essential Monthly $9
+  'price_1SZNyVFGDAd3RU8IPgRPqKXH': 'essential',      // Essential Annual $90
+  'price_1SZNyiFGDAd3RU8I4JHYEsEi': 'premium',        // Premium Monthly $15
+  'price_1SZNyuFGDAd3RU8IjeGIvPEb': 'premium',        // Premium Annual $150
+  'price_1STVXrFGDAd3RU8Ia2NbKJWo': 'student',        // Student Monthly $4.99
   // Legacy Phototheology App subscriptions
-  'price_1SKn0VFGDAd3RU8Io19mT9No': 'premium',
-  'price_1SKn12FGDAd3RU8IBpc45ctZ': 'essential',
+  'price_1SKn0VFGDAd3RU8Io19mT9No': 'premium',        // Legacy Premium $15/mo
+  'price_1SKn12FGDAd3RU8IBpc45ctZ': 'essential',      // Legacy Essential $9/mo
+  // Even older legacy prices (for full coverage)
+  'price_1SJJhAFGDAd3RU8IH8B7ejdt': 'premium',        // Old Premium $15/mo
   // Church tiers
-  'price_1SNEzoFGDAd3RU8Iwa8PSyLw': 'church',
-  'price_1SNFDxFGDAd3RU8IrvW3c5eS': 'church',
-  'price_1SNFFMFGDAd3RU8IoasLs7ag': 'church',
+  'price_1SNEzoFGDAd3RU8Iwa8PSyLw': 'church',         // Church Basic $199/mo
+  'price_1SNFDxFGDAd3RU8IrvW3c5eS': 'church',         // Church Standard $399/mo
+  'price_1SNFFMFGDAd3RU8IoasLs7ag': 'church',         // Church Premium $899/mo
 };
 
 // Only these price IDs count as Phototheology subscriptions.
