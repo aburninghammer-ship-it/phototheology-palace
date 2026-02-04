@@ -138,20 +138,30 @@ export function SubscriptionDatabase() {
         const sub = subMap.get(profile.id);
         const patreon = patreonMap.get(profile.id);
 
-        // Determine amount
+        // Determine amount and payment source
         let amount = 0;
         let paymentSource = sub?.payment_source || null;
+        const tier = sub?.subscription_tier || profile.subscription_tier;
+        const status = sub?.subscription_status || profile.subscription_status;
+        const isActive = status === "active" || status === "trialing";
 
         if (patreon?.is_active_patron && patreon?.entitled_cents) {
+          // Patreon user
           amount = patreon.entitled_cents / 100;
           if (!paymentSource) paymentSource = "patreon";
-        } else if (sub?.payment_source === "stripe") {
-          // Estimate based on tier
-          const tier = sub?.subscription_tier || profile.subscription_tier;
-          if (tier === "premium") amount = 20;
-          else if (tier === "essential") amount = 10;
+        } else if (paymentSource === "stripe" || (isActive && sub?.stripe_subscription_id)) {
+          // Stripe user - estimate based on tier
+          if (tier === "premium") amount = 15;
+          else if (tier === "essential") amount = 9;
           else if (tier === "student") amount = 5;
           paymentSource = "stripe";
+        } else if (isActive && tier && tier !== "free") {
+          // Active premium/essential user without explicit source - likely Stripe
+          if (tier === "premium") amount = 15;
+          else if (tier === "essential") amount = 9;
+          else if (tier === "student") amount = 5;
+          // Only set source if we can confirm it
+          if (sub?.stripe_customer_id) paymentSource = "stripe";
         }
 
         return {
