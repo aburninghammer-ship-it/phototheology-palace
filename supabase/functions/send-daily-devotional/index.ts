@@ -141,10 +141,20 @@ Write 500-750 words of flowing, contemplative prose that:
 - Moves from observation → tension → illumination → call
 - Ends with stillness or resolve, not hype`;
 
-    const userPrompt = `Create day ${dayNumber} of a ${plan.duration}-day devotional on the theme: "${plan.theme}"
+    // Add date for uniqueness
+    const today = new Date();
+    const dateStr = today.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+
+    const userPrompt = `Create day ${dayNumber} of a ${plan.duration}-day devotional on the theme: "${plan.theme}" for ${dateStr}.
 ${forPersonNote}${issueNote}
 
-Generate ONLY day ${dayNumber} as flowing paragraphs. This day should build on the journey so far while offering fresh insight.`;
+Generate ONLY day ${dayNumber} as flowing paragraphs. This day should build on the journey so far while offering FRESH insight.
+
+CRITICAL REQUIREMENTS:
+- Create a UNIQUE title (not generic like "Walking in Faith" or "Trust and Obey")
+- Include at least ONE specific biblical example, story, or character to illustrate your point
+- Paint vivid scenes from Scripture - don't just quote verses, tell the story
+- The lesson must be DIFFERENT from typical devotional themes - find a fresh angle`;
 
     console.log(`Generating day ${dayNumber} for plan ${planId}...`);
 
@@ -175,7 +185,7 @@ Generate ONLY day ${dayNumber} as flowing paragraphs. This day should build on t
                       type: "object",
                       properties: {
                         day_number: { type: "integer" },
-                        title: { type: "string", description: "Evocative title (3-6 words)" },
+                        title: { type: "string", description: "UNIQUE evocative title (3-6 words) - avoid generic phrases like 'Walking in Faith', 'Trust in Him', etc. Be specific to THIS day's insight" },
                         scripture_reference: { type: "string", description: "Primary passage reference" },
                         devotional_text: { type: "string", description: "3-5 paragraph essay-style devotional (500-750 words). NO headers. NO bullet points." },
                         memory_hook: { type: "string", description: "One-line quotable insight" },

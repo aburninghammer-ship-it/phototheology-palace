@@ -451,7 +451,7 @@ ${formatInstructions}${personalizationNote}${cadeSection}
 OUTPUT FORMAT - Return a JSON array of devotional days:
 {
   "day_number": number,
-  "title": "Evocative, non-generic title (3-6 words)",
+  "title": "UNIQUE evocative title (3-6 words) - specific to THIS day's central insight, avoid generic phrases like 'Walking in Faith', 'Trust His Plan'",
   "scripture_reference": "Primary passage reference (e.g., Exodus 16:22-30)",
   "devotional_text": "The full 3-5 paragraph essay-style devotional (500-750 words). Flowing prose with Scripture woven naturally into the text. NO section headers. NO bullet points. Just continuous, contemplative reading.",
   "memory_hook": "One-line quotable insight or 'strike line' that pierces the heart"
@@ -538,7 +538,7 @@ Generate as a JSON array with day_number: 1.`;
                           type: "object",
                           properties: {
                             day_number: { type: "integer" },
-                            title: { type: "string", description: "Evocative, non-generic title (3-6 words)" },
+                            title: { type: "string", description: "UNIQUE evocative title (3-6 words) - specific to THIS day's insight, avoid generic phrases like 'Walking in Faith', 'Trust His Plan', etc." },
                             scripture_reference: { type: "string", description: "Primary passage reference" },
                             devotional_text: { type: "string", description: "The full 3-5 paragraph essay-style devotional (500-750 words). Flowing prose. NO section headers. NO bullet points." },
                             memory_hook: { type: "string", description: "One-line quotable insight or strike line" },

@@ -285,7 +285,7 @@ Generate ONLY day ${dayNumber} as flowing paragraphs. This day should build on t
                     type: "object",
                     properties: {
                       day_number: { type: "integer" },
-                      title: { type: "string", description: "Evocative title (3-6 words)" },
+                      title: { type: "string", description: "UNIQUE evocative title (3-6 words) - specific to THIS day's insight, avoid generic phrases" },
                       scripture_reference: { type: "string", description: "Primary passage reference" },
                       devotional_text: { type: "string", description: "3-5 paragraph essay-style devotional (500-750 words). NO headers. NO bullet points." },
                       memory_hook: { type: "string", description: "One-line quotable insight" },

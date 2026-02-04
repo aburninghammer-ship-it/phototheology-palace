@@ -42,6 +42,10 @@ const SYSTEM_PROMPT = `You are Jeeves, a compassionate and wise biblical counsel
 - Address common struggles honestly: loneliness, desire for companionship, watching others marry
 - Offer hope without making false promises about future relationships
 - Help them see their current season as valuable, not just a waiting room
+- INCLUDE specific biblical examples, stories, or characters to illustrate points
+- Reference biblical narratives of singles (Paul, Anna, John the Baptist, etc.) or others facing similar struggles
+- Each devotional must offer a FRESH, UNIQUE insight - not the same lessons repeated
+- Paint vivid biblical scenes - don't just quote verses, tell the story
 
 === AVOID ===
 - Cliches like "Jesus is your boyfriend" or "God is writing your love story"
@@ -55,9 +59,16 @@ When referencing any scholar, commentator, or theologian, include proper citatio
 - Full name + life dates + work being referenced
 - Example: "As Charles Spurgeon (1834-1892, Baptist, *Morning and Evening*) wrote..."
 
+=== TITLE REQUIREMENTS ===
+- Each title MUST be UNIQUE and specific to THIS devotional's central insight
+- NEVER use generic titles like "Walking by Faith", "Trust in His Timing", "Finding Joy", "His Perfect Plan"
+- Include a vivid, memorable word or phrase that makes this title stand out
+- The title should make someone curious about what's inside
+- Think of creative, fresh titles - not churchy clichés
+
 === OUTPUT FORMAT (JSON) ===
 {
-  "title": "Compelling 5-10 word title",
+  "title": "UNIQUE 5-10 word title specific to this devotional's insight (no generic phrases)",
   "scriptureReference": "Book Chapter:Verse(s)",
   "scriptureText": "Full KJV text of the verse(s)",
   "openingThought": "1-2 sentences that hook the reader with a relatable scenario or question",
@@ -115,15 +126,20 @@ serve(async (req) => {
         selectedTheme = DAILY_THEMES[dayOfYear % DAILY_THEMES.length];
       }
 
-      userPrompt = `Generate a daily devotional for single Christians.
+      const today = new Date();
+      const dateStr = today.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+
+      userPrompt = `Generate a daily devotional for single Christians for ${dateStr}.
 
 TODAY'S THEME: ${typeof selectedTheme === 'object' ? selectedTheme.focus : selectedTheme}
 
 ${userName ? `The reader's name is ${userName}. You may address them by name occasionally to make it personal.` : ''}
 
-Create a fresh, encouraging devotional that speaks to the hearts of singles navigating faith and life.
+Create a FRESH, encouraging devotional that speaks to the hearts of singles navigating faith and life.
 Choose an appropriate Scripture passage that illuminates this theme.
-Make it practical, biblical, and genuinely helpful for their day.`;
+Make it practical, biblical, and genuinely helpful for their day.
+
+CRITICAL: Create a UNIQUE title - not generic religious phrases. The title should be memorable and specific to the insight you share.`;
 
     } else if (mode === "series" && seriesId) {
       // Generate content for a specific series day

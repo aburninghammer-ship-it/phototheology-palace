@@ -178,7 +178,10 @@ CONTENT DEPTH REQUIREMENTS:
 - Begin with a vivid scene that draws them in with sensory details and emotional weight
 - Reveal a surprising theological angle most readers miss
 - Draw hidden threads and connections across Scripture (Genesis to Revelation, sanctuary patterns)
+- INCLUDE specific biblical examples, stories, or characters to illustrate points
+- Reference specific biblical narratives (not just verses) - tell the story, paint the scene
 - Build to a central "gem" insight about Christ that meets their specific need
+- The lesson/insight must be FRESH and UNIQUE - avoid repeating common devotional themes
 - End with an appeal that transforms the heart, not generic moralism
 - Close with a strike line that lingers for days
 
@@ -192,9 +195,16 @@ EACH OUTPUT FIELD MUST BE SUBSTANTIAL:
 
 The devotional must feel personal and theologically rich while reading like a narrative that unfolds naturally. Never sound formulaic.
 
+TITLE REQUIREMENTS - CRITICAL:
+- Each title MUST be UNIQUE and SPECIFIC to this devotional's central insight
+- NEVER use generic titles like "Walking in Faith", "Trust in God", "His Promises", "Finding Peace"
+- The title should hint at the SPECIFIC gem/revelation in THIS devotional
+- Include a vivid word or phrase that makes it memorable and distinct
+- Think of titles like sermon titles that make you curious what's inside
+
 OUTPUT (JSON):
 {
-  "title": "Evocative, specific title",
+  "title": "Unique, evocative title specific to this devotional's central insight (avoid generic religious phrases)",
   "scripture_reference": "Book Chapter:Verse(s)",
   "scripture_text": "Full KJV text (3-8 verses)",
   "devotional_body": "Complete 5 paragraph devotional. Separate paragraphs with double newlines. Each paragraph 4-6 sentences minimum. 500-750 words total.",
@@ -235,7 +245,12 @@ serve(async (req) => {
 
     console.log(`Generating Phototheology devotion for: ${profile.name}, theme: ${theme || "general"}`);
 
-    const userPrompt = buildPersonalizedPrompt(profile, theme, scripture);
+    // Add date context for variety
+    const today = new Date();
+    const dateContext = `\n\nGENERATION DATE: ${today.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
+Use this date to inspire fresh, timely angles. Create a title and content that would feel unique to THIS day.`;
+
+    const userPrompt = buildPersonalizedPrompt(profile, theme, scripture) + dateContext;
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",

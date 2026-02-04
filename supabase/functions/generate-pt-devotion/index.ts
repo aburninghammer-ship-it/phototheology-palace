@@ -121,19 +121,26 @@ PT ROOM DESCRIPTIONS:
 
 CHURCH: ${churchName}
 
+TITLE REQUIREMENTS - CRITICAL:
+- Each title MUST be UNIQUE and specific to THIS manna gem's central insight
+- NEVER use generic titles like "Daily Bread", "Trust and Rest", "His Provision", "Walking in Faith"
+- The title should capture the SPECIFIC angle of the Scripture chosen
+- Make it memorable, fresh, and distinct from any previous title
+- Think: vivid, surprising, specific - not churchy clichés
+
 ${isFriday ? `
 OUTPUT FORMAT (JSON) - DOUBLE PORTION:
 {
   "type": "double_portion",
   "gem1": {
-    "title": "Short, evocative title for preparation gem",
+    "title": "UNIQUE evocative title for preparation gem (no generic phrases)",
     "anchorScripture": "Book Chapter:Verse",
     "scriptureText": "Full KJV verse text",
     "reflection": "3-5 sentences on preparing the heart - reflection, repentance, alignment"
   },
   "gem2": {
-    "title": "Short, evocative title for anticipation gem",
-    "anchorScripture": "Book Chapter:Verse", 
+    "title": "UNIQUE evocative title for anticipation gem (no generic phrases)",
+    "anchorScripture": "Book Chapter:Verse",
     "scriptureText": "Full KJV verse text",
     "reflection": "3-5 sentences on anticipating rest - trust, worship, release of striving"
   },
@@ -145,7 +152,7 @@ OUTPUT FORMAT (JSON) - DOUBLE PORTION:
 OUTPUT FORMAT (JSON) - SINGLE PORTION:
 {
   "type": "single_portion",
-  "title": "Short, evocative title",
+  "title": "UNIQUE evocative title specific to this gem (no generic phrases)",
   "anchorScripture": "Book Chapter:Verse",
   "scriptureText": "Full KJV verse text",
   "ptRoom": "${ptRoom}",
@@ -155,9 +162,13 @@ OUTPUT FORMAT (JSON) - SINGLE PORTION:
 }
 `}`;
 
-    const userPrompt = isFriday 
-      ? `Generate a Friday double-portion Manna for ${churchName}. Two connected gems: one for heart preparation, one for Sabbath anticipation. Use the ${ptRoom} room methodology. Keep it pastoral and grounded.`
-      : `Generate a ${dayOfWeek} Manna Gem for ${churchName} with the theme "${theme}" using the ${ptRoom} room methodology. One gem only. Brief, weighty, scripture-anchored.`;
+    // Add date for uniqueness
+    const today = new Date();
+    const dateStr = today.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+
+    const userPrompt = isFriday
+      ? `Generate a Friday double-portion Manna for ${churchName} on ${dateStr}. Two connected gems: one for heart preparation, one for Sabbath anticipation. Use the ${ptRoom} room methodology. Keep it pastoral and grounded. Create UNIQUE titles and include a vivid biblical example or story in each reflection.`
+      : `Generate a ${dayOfWeek} Manna Gem for ${churchName} on ${dateStr} with the theme "${theme}" using the ${ptRoom} room methodology. One gem only. Brief, weighty, scripture-anchored. CRITICAL: Create a UNIQUE title (not generic religious phrases) and weave in a specific biblical example, story, or character to illustrate the point.`;
 
     const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
       method: 'POST',
