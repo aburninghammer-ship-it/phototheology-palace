@@ -12,25 +12,40 @@ const logStep = (step: string, details?: any) => {
   console.log(`[SUBSCRIBER-STATS] ${step}${detailsStr}`);
 };
 
-// Price ID to tier and product name mapping - PHOTOTHEOLOGY APP ONLY (excludes SamCart/external)
-const priceToInfo: Record<string, { tier: string; name: string; price: number }> = {
+// Price ID to tier mapping - used for tier classification
+// Product names will be fetched from Stripe directly for accurate display
+const priceToTierMap: Record<string, { tier: string; monthlyPrice: number }> = {
   // ========== CURRENT SUBSCRIPTION PRODUCTS ==========
-  'price_1SZNyCFGDAd3RU8IPwPJVesp': { tier: 'essential', name: 'Essential Monthly ($9/mo)', price: 9 },
-  'price_1SZNyVFGDAd3RU8IPgRPqKXH': { tier: 'essential', name: 'Essential Annual ($90/yr)', price: 90 },
-  'price_1SZNyiFGDAd3RU8I4JHYEsEi': { tier: 'premium', name: 'Premium Monthly ($15/mo)', price: 15 },
-  'price_1SZNyuFGDAd3RU8IjeGIvPEb': { tier: 'premium', name: 'Premium Annual ($150/yr)', price: 150 },
-  
+  'price_1SZNyCFGDAd3RU8IPwPJVesp': { tier: 'essential', monthlyPrice: 9 },
+  'price_1SZNyVFGDAd3RU8IPgRPqKXH': { tier: 'essential', monthlyPrice: 7.5 }, // $90/12
+  'price_1SZNyiFGDAd3RU8I4JHYEsEi': { tier: 'premium', monthlyPrice: 15 },
+  'price_1SZNyuFGDAd3RU8IjeGIvPEb': { tier: 'premium', monthlyPrice: 12.5 }, // $150/12
+
   // ========== STUDENT ==========
-  'price_1STVXrFGDAd3RU8Ia2NbKJWo': { tier: 'student', name: 'Student Discount ($4.99/mo)', price: 4.99 },
-  
+  'price_1STVXrFGDAd3RU8Ia2NbKJWo': { tier: 'student', monthlyPrice: 4.99 },
+
   // ========== LEGACY PHOTOTHEOLOGY APP SUBSCRIPTIONS ==========
-  'price_1SKn0VFGDAd3RU8Io19mT9No': { tier: 'premium', name: 'Phototheology App ($15/mo)', price: 15 },
-  'price_1SKn12FGDAd3RU8IBpc45ctZ': { tier: 'essential', name: 'Phototheology App Lite ($9/mo)', price: 9 },
-  
+  'price_1SKn0VFGDAd3RU8Io19mT9No': { tier: 'premium', monthlyPrice: 15 },
+  'price_1SKn12FGDAd3RU8IBpc45ctZ': { tier: 'essential', monthlyPrice: 9 },
+
   // ========== CHURCH TIERS ==========
-  'price_1SNEzoFGDAd3RU8Iwa8PSyLw': { tier: 'church', name: 'Small Church 10-50 ($199/mo)', price: 199 },
-  'price_1SNFDxFGDAd3RU8IrvW3c5eS': { tier: 'church', name: 'Tier 1: 50 Seats ($399/mo)', price: 399 },
-  'price_1SNFFMFGDAd3RU8IoasLs7ag': { tier: 'church', name: 'Tier 2: 150 Seats ($899/mo)', price: 899 },
+  'price_1SNEzoFGDAd3RU8Iwa8PSyLw': { tier: 'church', monthlyPrice: 199 },
+  'price_1SNFDxFGDAd3RU8IrvW3c5eS': { tier: 'church', monthlyPrice: 399 },
+  'price_1SNFFMFGDAd3RU8IoasLs7ag': { tier: 'church', monthlyPrice: 899 },
+};
+
+// Legacy compatibility object
+const priceToInfo: Record<string, { tier: string; name: string; price: number }> = {
+  'price_1SZNyCFGDAd3RU8IPwPJVesp': { tier: 'essential', name: 'Essential Monthly', price: 9 },
+  'price_1SZNyVFGDAd3RU8IPgRPqKXH': { tier: 'essential', name: 'Essential Annual', price: 90 },
+  'price_1SZNyiFGDAd3RU8I4JHYEsEi': { tier: 'premium', name: 'Premium Monthly', price: 15 },
+  'price_1SZNyuFGDAd3RU8IjeGIvPEb': { tier: 'premium', name: 'Premium Annual', price: 150 },
+  'price_1STVXrFGDAd3RU8Ia2NbKJWo': { tier: 'student', name: 'Student Discount', price: 4.99 },
+  'price_1SKn0VFGDAd3RU8Io19mT9No': { tier: 'premium', name: 'Phototheology App', price: 15 },
+  'price_1SKn12FGDAd3RU8IBpc45ctZ': { tier: 'essential', name: 'Phototheology App Lite', price: 9 },
+  'price_1SNEzoFGDAd3RU8Iwa8PSyLw': { tier: 'church', name: 'Small Church', price: 199 },
+  'price_1SNFDxFGDAd3RU8IrvW3c5eS': { tier: 'church', name: 'Tier 1: 50 Seats', price: 399 },
+  'price_1SNFFMFGDAd3RU8IoasLs7ag': { tier: 'church', name: 'Tier 2: 150 Seats', price: 899 },
 };
 
 // For backward compatibility
@@ -45,8 +60,9 @@ const appPriceIds = Object.keys(priceToInfo);
 const appStripeTiers = new Set(['essential', 'premium', 'student', 'church']);
 
 // Helper to fetch all Stripe subscriptions with pagination
+// Now fetches ALL subscriptions (not filtered by price ID) to show full Stripe picture
 async function fetchAllStripeSubscriptions(
-  stripe: Stripe, 
+  stripe: Stripe,
   status: 'active' | 'trialing' | 'canceled'
 ): Promise<Stripe.Subscription[]> {
   const allSubscriptions: Stripe.Subscription[] = [];
@@ -57,19 +73,14 @@ async function fetchAllStripeSubscriptions(
     const params: Stripe.SubscriptionListParams = {
       status,
       limit: 100,
-      expand: ['data.items.data.price'],
+      expand: ['data.items.data.price', 'data.items.data.price.product'],
     };
     if (startingAfter) params.starting_after = startingAfter;
 
     const batch = await stripe.subscriptions.list(params);
-    
-    // Filter to only our app's subscriptions
-    const appSubs = batch.data.filter((sub: any) => {
-      const priceId = sub.items.data[0]?.price?.id;
-      return appPriceIds.includes(priceId);
-    });
-    
-    allSubscriptions.push(...appSubs);
+
+    // Include ALL subscriptions - no filtering by price ID
+    allSubscriptions.push(...batch.data);
     hasMore = batch.has_more;
     if (batch.data.length > 0) {
       startingAfter = batch.data[batch.data.length - 1].id;
@@ -231,43 +242,39 @@ serve(async (req) => {
         const activeSubscriptions = await fetchAllStripeSubscriptions(stripe, 'active');
         stripeStats.active_subscriptions = activeSubscriptions.length;
 
-        // Count by tier, by product name, and calculate MRR
+        // Count by tier, by product name (from Stripe), and calculate MRR
         activeSubscriptions.forEach((sub: any) => {
           const priceId = sub.items.data[0]?.price?.id;
-          const info = priceToInfo[priceId];
-          const tier = info?.tier || 'unknown';
-          const productName = info?.name || `Unknown (${priceId?.slice(-8) || 'no-id'})`;
-          
+          const priceObj = sub.items.data[0]?.price;
+          const product = priceObj?.product;
+
+          // Get product name directly from Stripe
+          const productName = typeof product === 'object' && product?.name
+            ? product.name
+            : priceToInfo[priceId]?.name || `Unknown`;
+
+          // Get tier from our mapping
+          const tierInfo = priceToTierMap[priceId];
+          const tier = tierInfo?.tier || 'unknown';
+
           if (tier in stripeStats.by_tier) {
             stripeStats.by_tier[tier as keyof typeof stripeStats.by_tier]++;
           }
-          
-          // Track by product name
+
+          // Track by product name (from Stripe)
           if (!stripeStats.by_product[productName]) {
             stripeStats.by_product[productName] = { active: 0, trialing: 0 };
           }
           stripeStats.by_product[productName].active++;
-          
-          // Calculate MRR - active subscriptions
-          // Use the mapped price if available, otherwise fall back to Stripe's unit_amount
-          const mappedInfo = priceToInfo[priceId];
-          const interval = sub.items.data[0]?.price?.recurring?.interval;
-          
-          if (mappedInfo) {
-            // Use our mapped price (already in dollars)
-            if (interval === 'year') {
-              stripeStats.total_mrr_cents += Math.round((mappedInfo.price * 100) / 12);
-            } else {
-              stripeStats.total_mrr_cents += Math.round(mappedInfo.price * 100);
-            }
+
+          // Calculate MRR from Stripe's unit_amount
+          const amount = priceObj?.unit_amount || 0;
+          const interval = priceObj?.recurring?.interval;
+
+          if (interval === 'year') {
+            stripeStats.total_mrr_cents += Math.round(amount / 12);
           } else {
-            // Fallback to Stripe's unit_amount
-            const amount = sub.items.data[0]?.price?.unit_amount || 0;
-            if (interval === 'year') {
-              stripeStats.total_mrr_cents += Math.round(amount / 12);
-            } else {
-              stripeStats.total_mrr_cents += amount;
-            }
+            stripeStats.total_mrr_cents += amount;
           }
         });
 
@@ -278,31 +285,27 @@ serve(async (req) => {
         // Count trialing by product name AND include in MRR (card verified, will convert)
         trialingSubscriptions.forEach((sub: any) => {
           const priceId = sub.items.data[0]?.price?.id;
-          const info = priceToInfo[priceId];
-          const productName = info?.name || `Unknown (${priceId?.slice(-8) || 'no-id'})`;
-          
+          const priceObj = sub.items.data[0]?.price;
+          const product = priceObj?.product;
+
+          // Get product name directly from Stripe
+          const productName = typeof product === 'object' && product?.name
+            ? product.name
+            : priceToInfo[priceId]?.name || `Unknown`;
+
           if (!stripeStats.by_product[productName]) {
             stripeStats.by_product[productName] = { active: 0, trialing: 0 };
           }
           stripeStats.by_product[productName].trialing++;
 
           // Include trialing in MRR since they have cards on file
-          const mappedInfo = priceToInfo[priceId];
-          const interval = sub.items.data[0]?.price?.recurring?.interval;
+          const amount = priceObj?.unit_amount || 0;
+          const interval = priceObj?.recurring?.interval;
 
-          if (mappedInfo) {
-            if (interval === 'year') {
-              stripeStats.total_mrr_cents += Math.round((mappedInfo.price * 100) / 12);
-            } else {
-              stripeStats.total_mrr_cents += Math.round(mappedInfo.price * 100);
-            }
+          if (interval === 'year') {
+            stripeStats.total_mrr_cents += Math.round(amount / 12);
           } else {
-            const amount = sub.items.data[0]?.price?.unit_amount || 0;
-            if (interval === 'year') {
-              stripeStats.total_mrr_cents += Math.round(amount / 12);
-            } else {
-              stripeStats.total_mrr_cents += amount;
-            }
+            stripeStats.total_mrr_cents += amount;
           }
         });
 
