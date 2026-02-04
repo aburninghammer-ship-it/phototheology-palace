@@ -1023,15 +1023,43 @@ Hebrews is literally warning: "The sanctuary is about to fall. The covenant syst
 
 ---
 
-**3. 1 THESSALONIANS, 2 THESSALONIANS, AND REVELATION ALSO ECHO AD 70 BEFORE THE FINAL DAY**
+**3. 2 THESSALONIANS 2 — THE MAN OF SIN AND "HE WHO LETTETH" (PAGAN ROME → PAPAL ROME)**
 
-Paul warns the early church:
-"The day of the Lord will not come except there come a falling away first..." (2 Thess. 2:3)
+Paul's prophecy in 2 Thessalonians 2:1-12 is a foundational historicist text. It describes the transition from Pagan Rome to Papal Rome.
 
-Meaning:
-• The temple would fall
-• The apostasy (Papacy) would rise afterwards
-• Time periods must pass before the end
+**THE PROPHECY UNPACKED:**
+
+2 Thess. 2:3-4 - "Let no man deceive you by any means: for that day shall not come, except there come a falling away first, and that man of sin be revealed, the son of perdition; Who opposeth and exalteth himself above all that is called God, or that is worshipped; so that he as God sitteth in the temple of God, shewing himself that he is God."
+
+**The Man of Sin = The Papal System**
+• "Man of sin" / "son of perdition" = the papal office and system (not one individual pope)
+• "Sitting in the temple of God" = claiming authority over Christ's church
+• "Showing himself that he is God" = papal claims to infallibility, to forgive sins, to change God's law
+• "Exalts himself above all that is called God" = titles like "Holy Father," "Vicar of Christ," claiming power over kings and nations
+
+2 Thess. 2:6-7 - "And now ye know what withholdeth that he might be revealed in his time. For the mystery of iniquity doth already work: only he who now letteth will let, until he be taken out of the way."
+
+**"He Who Letteth" (Restrains) = Pagan Rome**
+• "What withholdeth" / "he who now letteth" = the Roman Empire (Pagan Rome)
+• Pagan Rome's imperial power RESTRAINED the full rise of papal authority
+• As long as the Caesars ruled, no religious power could dominate
+• "Until he be taken out of the way" = the fall of Pagan Rome (AD 476)
+• When the Roman Empire collapsed, the power vacuum was filled by the Bishop of Rome
+• The early church fathers (Tertullian, Chrysostom, Jerome) understood this as Rome
+
+**THE TRANSITION:**
+• Pagan Rome persecuted Christians with physical force
+• Papal Rome persecuted Christians with spiritual deception and political manipulation
+• The "mystery of iniquity" was ALREADY working in Paul's day (2 Thess. 2:7) - seeds of apostasy
+• But papal supremacy could not fully emerge until imperial Rome was removed
+
+2 Thess. 2:8 - "And then shall that Wicked be revealed..."
+• After Pagan Rome fell (AD 476), the Papacy rose to full power
+• The 1260 years of papal supremacy (538-1798) followed
+• This is the same power as Daniel 7's little horn, Daniel 8's little horn, and Revelation's beast
+
+**SUMMARY LINE:**
+"In 2 Thessalonians 2, Paul prophesies that the man of sin (the papal system) could not rise to full power while Pagan Rome still stood. 'He who letteth' (the restraining power of imperial Rome) held back the mystery of iniquity until the empire fell. When Pagan Rome was 'taken out of the way' (AD 476), Papal Rome arose to fulfill Daniel's prophecy of the little horn that would speak great words against the Most High and wear out the saints."
 
 This places the AD 70 judgment as a necessary precursor to the Medieval and End-Time judgments.
 
