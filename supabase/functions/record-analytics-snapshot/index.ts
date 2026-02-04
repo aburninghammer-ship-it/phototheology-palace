@@ -298,13 +298,15 @@ serve(async (req) => {
       .select("id", { count: 'exact', head: true })
       .eq("subscription_status", "active");
 
-    // Get new signups today
-    const todayStart = new Date();
-    todayStart.setHours(0, 0, 0, 0);
+    // Get new signups today (use UTC for consistency with DB timestamps)
+    const todayUTC = new Date().toISOString().split('T')[0]; // e.g., "2026-02-04"
+    const todayStartUTC = `${todayUTC}T00:00:00.000Z`;
     const { count: newSignups } = await supabase
       .from("profiles")
       .select("id", { count: 'exact', head: true })
-      .gte("created_at", todayStart.toISOString());
+      .gte("created_at", todayStartUTC);
+    
+    logStep("Counting new signups", { todayStartUTC, newSignups });
 
     let snapshotData: Record<string, any> = {
       snapshot_date: today,
