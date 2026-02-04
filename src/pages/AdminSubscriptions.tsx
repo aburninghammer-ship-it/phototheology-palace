@@ -637,16 +637,45 @@ export default function AdminSubscriptions() {
             </Card>
           </div>
 
-          {/* MRR Card - Full Width */}
-          <Card className="border-primary/50 bg-primary/5">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-lg">Monthly Recurring Revenue (MRR)</CardTitle>
-              <CardDescription>From Stripe subscriptions</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="text-4xl font-bold text-primary">{stats.summary.monthly_recurring_revenue}</div>
-            </CardContent>
-          </Card>
+          {/* MRR Cards - Show both Stripe and Projected */}
+          <div className="grid gap-6 md:grid-cols-2">
+            <Card className="border-green-500/50 bg-green-500/5">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-lg">Stripe MRR</CardTitle>
+                <CardDescription>Active + trialing subscriptions (card verified)</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="text-4xl font-bold text-green-600">{stats.summary.monthly_recurring_revenue}</div>
+                <p className="text-xs text-muted-foreground mt-1">
+                  {stats.stripe.active_subscriptions} active + {stats.stripe.trialing_subscriptions} trialing
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card className="border-blue-500/50 bg-blue-500/5">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-lg">Projected MRR</CardTitle>
+                <CardDescription>If all active app trials convert (est. 10%)</CardDescription>
+              </CardHeader>
+              <CardContent>
+                {(() => {
+                  const stripeMrrCents = stats.stripe.total_mrr_cents || 0;
+                  const appTrials = stats.database.active_trials || 0;
+                  // Assume avg $12.47 (blended Essential/Premium) per converted trial at 10% conversion
+                  const projectedFromTrials = Math.round(appTrials * 0.10 * 12.47 * 100);
+                  const projectedTotal = (stripeMrrCents + projectedFromTrials) / 100;
+                  return (
+                    <>
+                      <div className="text-4xl font-bold text-blue-600">${projectedTotal.toFixed(2)}</div>
+                      <p className="text-xs text-muted-foreground mt-1">
+                        +${(projectedFromTrials / 100).toFixed(2)} from {appTrials} app trials @ 10%
+                      </p>
+                    </>
+                  );
+                })()}
+              </CardContent>
+            </Card>
+          </div>
 
           {/* Donations Section */}
           <DonationStats />
