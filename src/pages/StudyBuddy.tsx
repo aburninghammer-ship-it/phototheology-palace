@@ -50,6 +50,7 @@ import {
 import { StudySimmerWrapper } from "@/components/simmer/StudySimmerWrapper";
 import { formatDistanceToNow, format } from "date-fns";
 import { getCardById, SparkCard } from "@/data/studyIdeasLibrary";
+import { useGeneratedSparkCards, GeneratedSparkCard } from "@/hooks/useGeneratedSparkCards";
 
 // Types for Jeeves analysis
 interface Spark {
@@ -288,6 +289,10 @@ export default function StudyBuddy() {
   const [searchResults, setSearchResults] = useState<{ book: string; chapter: number; verse: number; text: string }[]>([]);
   const [isSearching, setIsSearching] = useState(false);
   const searchTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Generated Spark Cards
+  const { cards: sparkCards, loading: sparkCardsLoading, getTodaysCards } = useGeneratedSparkCards(7);
+  const [selectedSparkCard, setSelectedSparkCard] = useState<GeneratedSparkCard | null>(null);
 
   // Keep analysisHistoryRef in sync with state (for closures)
   useEffect(() => {
@@ -1425,6 +1430,65 @@ Jeeves sees your notes and will spark connections, suggest PT rooms, source clai
                     : "Watching your notes and sparking connections..."}
                 </p>
               </div>
+
+              {/* Generated Spark Cards - Compact horizontal display */}
+              {sparkCards.length > 0 && (
+                <div className={`px-3 py-2 border-b flex-shrink-0 ${
+                  isLightTheme ? "border-purple-200/60 bg-amber-50/50" : "border-violet-500/20 bg-amber-900/10"
+                }`}>
+                  <div className="flex items-center gap-2 mb-2">
+                    <Flame className={`w-3.5 h-3.5 ${isLightTheme ? "text-amber-600" : "text-amber-400"}`} />
+                    <span className={`text-[10px] font-semibold uppercase tracking-wider ${
+                      isLightTheme ? "text-amber-700" : "text-amber-300"
+                    }`}>
+                      Sparks
+                    </span>
+                  </div>
+                  <div className="flex gap-2 overflow-x-auto pb-1 -mx-1 px-1">
+                    {sparkCards.slice(0, 5).map((card) => (
+                      <button
+                        key={card.id}
+                        onClick={() => {
+                          const promptsText = `## ${card.title}\n\n**Observe:** ${card.prompts.observe}\n\n**Connect:** ${card.prompts.connect}\n\n**Discover:** ${card.prompts.discover}\n\n---\n\n`;
+                          setNotes(promptsText);
+                          lastAnalyzedNotes.current = promptsText;
+                          setSessionTitle(card.title);
+                          if (card.verse_anchors.length > 0) {
+                            const ref = parseVerseReference(card.verse_anchors[0]);
+                            if (ref) {
+                              setSelectedBook(ref.book);
+                              setSelectedChapter(ref.chapter);
+                            }
+                          }
+                          toast.success(`Loaded "${card.title}"`);
+                        }}
+                        className={`flex-shrink-0 px-2.5 py-1.5 rounded-lg text-[11px] font-medium transition-all hover:scale-105 ${
+                          isLightTheme
+                            ? "bg-amber-100 hover:bg-amber-200 text-amber-800 border border-amber-200/80"
+                            : "bg-amber-500/15 hover:bg-amber-500/25 text-amber-200 border border-amber-500/30"
+                        }`}
+                      >
+                        <span className="flex items-center gap-1.5">
+                          <Sparkles className="w-3 h-3" />
+                          <span className="max-w-[120px] truncate">{card.title}</span>
+                        </span>
+                      </button>
+                    ))}
+                    {sparkCards.length > 5 && (
+                      <button
+                        onClick={() => navigate("/study-idea-library")}
+                        className={`flex-shrink-0 px-2 py-1.5 rounded-lg text-[10px] transition-all ${
+                          isLightTheme
+                            ? "text-purple-600 hover:text-purple-800 hover:bg-purple-100"
+                            : "text-violet-300 hover:text-violet-100 hover:bg-violet-500/20"
+                        }`}
+                      >
+                        +{sparkCards.length - 5} more
+                      </button>
+                    )}
+                  </div>
+                </div>
+              )}
 
               {/* Real-time Analysis Display */}
               <ScrollArea className="flex-1">
