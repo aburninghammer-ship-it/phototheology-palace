@@ -609,7 +609,7 @@ export default function AdminSubscriptions() {
                 <CardDescription>Currently in trial period</CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="text-4xl font-bold text-blue-600">{stats.database.active_trials || 0}</div>
+                <div className="text-4xl font-bold text-blue-600">{stats.stripe.trialing_subscriptions || 0}</div>
               </CardContent>
             </Card>
 
