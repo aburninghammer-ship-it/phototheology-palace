@@ -73,7 +73,7 @@ async function fetchAllStripeSubscriptions(
     const params: Stripe.SubscriptionListParams = {
       status,
       limit: 100,
-      expand: ['data.items.data.price', 'data.items.data.price.product'],
+      expand: ['data.items.data.price'],
     };
     if (startingAfter) params.starting_after = startingAfter;
 
@@ -88,6 +88,28 @@ async function fetchAllStripeSubscriptions(
   }
 
   return allSubscriptions;
+}
+
+// Helper to get product name - fetches from Stripe if needed
+async function getProductName(
+  stripe: Stripe,
+  productId: string | Stripe.Product,
+  productCache: Map<string, string>
+): Promise<string> {
+  if (typeof productId === 'object' && productId.name) {
+    return productId.name;
+  }
+  const id = typeof productId === 'string' ? productId : productId.id;
+  if (productCache.has(id)) {
+    return productCache.get(id)!;
+  }
+  try {
+    const product = await stripe.products.retrieve(id);
+    productCache.set(id, product.name);
+    return product.name;
+  } catch {
+    return 'Unknown Product';
+  }
 }
 
 serve(async (req) => {
@@ -243,20 +265,26 @@ serve(async (req) => {
         const stripe = new Stripe(stripeKey, { apiVersion: "2023-10-16" });
         logStep("Fetching Stripe subscriptions with pagination");
 
+        // Product name cache to avoid repeated API calls
+        const productCache = new Map<string, string>();
+
         // Get ALL active subscriptions with pagination
         const activeSubscriptions = await fetchAllStripeSubscriptions(stripe, 'active');
         stripeStats.active_subscriptions = activeSubscriptions.length;
 
         // Count by tier, by product name (from Stripe), and calculate MRR
-        activeSubscriptions.forEach((sub: any) => {
+        for (const sub of activeSubscriptions) {
           const priceId = sub.items.data[0]?.price?.id;
           const priceObj = sub.items.data[0]?.price;
-          const product = priceObj?.product;
+          const productId = priceObj?.product;
 
-          // Get product name directly from Stripe
-          const productName = typeof product === 'object' && product?.name
-            ? product.name
-            : priceToInfo[priceId]?.name || `Unknown`;
+          // Get product name - use cache or fetch from Stripe
+          let productName = 'Unknown';
+          if (productId) {
+            productName = await getProductName(stripe, productId, productCache);
+          } else if (priceToInfo[priceId]) {
+            productName = priceToInfo[priceId].name;
+          }
 
           // Get tier from our mapping
           const tierInfo = priceToTierMap[priceId];
@@ -279,22 +307,25 @@ serve(async (req) => {
 
           stripeStats.active_mrr_cents += monthlyAmount;
           stripeStats.total_mrr_cents += monthlyAmount;
-        });
+        }
 
         // Get ALL trialing subscriptions with pagination
         const trialingSubscriptions = await fetchAllStripeSubscriptions(stripe, 'trialing');
         stripeStats.trialing_subscriptions = trialingSubscriptions.length;
         
         // Count trialing by product name AND include in MRR (card verified, will convert)
-        trialingSubscriptions.forEach((sub: any) => {
+        for (const sub of trialingSubscriptions) {
           const priceId = sub.items.data[0]?.price?.id;
           const priceObj = sub.items.data[0]?.price;
-          const product = priceObj?.product;
+          const productId = priceObj?.product;
 
-          // Get product name directly from Stripe
-          const productName = typeof product === 'object' && product?.name
-            ? product.name
-            : priceToInfo[priceId]?.name || `Unknown`;
+          // Get product name - use cache or fetch from Stripe
+          let productName = 'Unknown';
+          if (productId) {
+            productName = await getProductName(stripe, productId, productCache);
+          } else if (priceToInfo[priceId]) {
+            productName = priceToInfo[priceId].name;
+          }
 
           if (!stripeStats.by_product[productName]) {
             stripeStats.by_product[productName] = { active: 0, trialing: 0 };
@@ -308,7 +339,7 @@ serve(async (req) => {
 
           stripeStats.trialing_mrr_cents += monthlyAmount;
           stripeStats.total_mrr_cents += monthlyAmount;
-        });
+        }
 
         // Get canceled subscriptions with pagination
         const canceledSubscriptions = await fetchAllStripeSubscriptions(stripe, 'canceled');
