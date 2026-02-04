@@ -236,9 +236,11 @@ serve(async (req) => {
       unlinked_count: 0,
     };
 
+    logStep("Stripe key check", { hasKey: !!stripeKey, keyPrefix: stripeKey?.substring(0, 10) });
+
     if (stripeKey) {
       try {
-        const stripe = new Stripe(stripeKey, { apiVersion: "2025-08-27.basil" });
+        const stripe = new Stripe(stripeKey, { apiVersion: "2023-10-16" });
         logStep("Fetching Stripe subscriptions with pagination");
 
         // Get ALL active subscriptions with pagination
@@ -357,6 +359,11 @@ serve(async (req) => {
           database: dbStats,
           recent_signups_30d: recentSignups,
           generated_at: new Date().toISOString(),
+        },
+        debug: {
+          hasStripeKey: !!stripeKey,
+          stripeKeyPrefix: stripeKey ? stripeKey.substring(0, 7) + '...' : 'NOT SET',
+          stripeError: stripeStats.error,
         },
       }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } }
