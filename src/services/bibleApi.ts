@@ -185,7 +185,52 @@ const fetchChapterFromAPI = async (book: string, chapter: number, translation: T
 };
 
 export const searchBible = async (query: string, translation: Translation = "kjv"): Promise<Verse[]> => {
-  // Try direct public API first
+  // Check if this is a chapter range (e.g., "Genesis 1-2", "Daniel 3-6")
+  // bible-api.com doesn't support fetching multiple chapters at once
+  const chapterRangeMatch = query.match(/^([1-3]?\s?[A-Za-z]+)\s+(\d+)-(\d+)$/);
+
+  if (chapterRangeMatch) {
+    const [, book, startChapter, endChapter] = chapterRangeMatch;
+    const start = parseInt(startChapter);
+    const end = parseInt(endChapter);
+
+    // Limit to 5 chapters max to avoid overwhelming the API
+    const maxChapters = Math.min(end - start + 1, 5);
+    const allVerses: Verse[] = [];
+
+    // Fetch each chapter individually
+    for (let ch = start; ch < start + maxChapters; ch++) {
+      try {
+        const chapterData = await fetchChapter(book.trim(), ch, translation);
+        if (chapterData.verses && chapterData.verses.length > 0) {
+          allVerses.push(...chapterData.verses);
+        }
+      } catch (error) {
+        console.warn(`Failed to fetch ${book} chapter ${ch}:`, error);
+      }
+    }
+
+    if (allVerses.length > 0) {
+      return allVerses;
+    }
+  }
+
+  // Check if this is a single chapter (e.g., "Daniel 3", "Acts 2")
+  const singleChapterMatch = query.match(/^([1-3]?\s?[A-Za-z]+)\s+(\d+)$/);
+
+  if (singleChapterMatch) {
+    const [, book, chapter] = singleChapterMatch;
+    try {
+      const chapterData = await fetchChapter(book.trim(), parseInt(chapter), translation);
+      if (chapterData.verses && chapterData.verses.length > 0) {
+        return chapterData.verses;
+      }
+    } catch (error) {
+      console.warn(`Failed to fetch ${book} ${chapter}:`, error);
+    }
+  }
+
+  // Try direct public API for verse references (e.g., "John 3:16", "Luke 15:11-32")
   try {
     const response = await fetch(
       `${BIBLE_API_BASE}/${encodeURIComponent(query)}?translation=${translation}`,
