@@ -501,7 +501,7 @@ export const BibleReader = () => {
                   <BookOpen className="h-5 w-5 text-primary-foreground" />
                 </div>
                 <div>
-                  <h2 className="font-serif text-xl md:text-2xl font-bold bg-gradient-palace bg-clip-text text-transparent">
+                  <h2 className="font-serif text-xl md:text-2xl font-bold text-foreground">
                     {book}
                   </h2>
                   <p className="text-sm text-muted-foreground font-medium">Chapter {chapter}</p>
