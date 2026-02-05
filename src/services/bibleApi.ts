@@ -185,27 +185,65 @@ const fetchChapterFromAPI = async (book: string, chapter: number, translation: T
 };
 
 export const searchBible = async (query: string, translation: Translation = "kjv"): Promise<Verse[]> => {
+  // Try direct public API first
   try {
     const response = await fetch(
       `${BIBLE_API_BASE}/${encodeURIComponent(query)}?translation=${translation}`,
-      { signal: AbortSignal.timeout(5000) }
+      { signal: AbortSignal.timeout(10000) }
     );
-    const data = await response.json();
-    
-    if (data.verses) {
-      return data.verses.map((v: any) => ({
-        book: v.book_name,
-        chapter: v.chapter,
-        verse: v.verse,
-        text: v.text
-      }));
+
+    if (response.ok) {
+      const data = await response.json();
+
+      if (data.verses && Array.isArray(data.verses) && data.verses.length > 0) {
+        return data.verses.map((v: any) => ({
+          book: v.book_name,
+          chapter: v.chapter,
+          verse: v.verse,
+          text: v.text?.replace(/\n/g, ' ').trim()
+        }));
+      }
     }
-    
-    return [];
-  } catch (error) {
-    console.error("Error searching Bible:", error);
-    return [];
+  } catch (directError) {
+    console.warn("Direct Bible API failed, trying edge function:", directError);
   }
+
+  // Fallback: Parse the query and use edge function
+  try {
+    // Try to parse verse reference (e.g., "John 3:16" or "Genesis 1:1-5")
+    const verseMatch = query.match(/^([1-3]?\s?[A-Za-z]+)\s+(\d+):(\d+)(?:-(\d+))?$/);
+
+    if (verseMatch) {
+      const [, book, chapter, startVerse, endVerse] = verseMatch;
+
+      const { data, error } = await supabase.functions.invoke("bible-api", {
+        body: { book: book.trim(), chapter: parseInt(chapter), version: translation },
+      });
+
+      if (!error && data?.verses && Array.isArray(data.verses)) {
+        const start = parseInt(startVerse);
+        const end = endVerse ? parseInt(endVerse) : start;
+
+        const filteredVerses = data.verses
+          .filter((v: any) => v.verse >= start && v.verse <= end)
+          .map((v: any) => ({
+            book: v.book ?? book.trim(),
+            chapter: v.chapter ?? parseInt(chapter),
+            verse: v.verse,
+            text: v.text?.replace(/\n/g, ' ').trim()
+          }));
+
+        if (filteredVerses.length > 0) {
+          return filteredVerses;
+        }
+      }
+    }
+  } catch (edgeFunctionError) {
+    console.error("Edge function fallback also failed:", edgeFunctionError);
+  }
+
+  console.error("All search methods failed for:", query);
+  return [];
 };
 
 // Word search across the entire Bible using AI for accurate KJV results
