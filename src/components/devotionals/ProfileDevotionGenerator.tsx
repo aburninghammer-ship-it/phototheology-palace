@@ -195,12 +195,12 @@ export function ProfileDevotionGenerator({ profile, onDevotionGenerated }: Profi
                   value={theme}
                   onChange={(e) => setTheme(e.target.value)}
                 />
-                <div className="flex flex-wrap gap-1 mt-2">
+                <div className="flex flex-wrap gap-1.5 mt-2">
                   {SUGGESTED_THEMES.slice(0, 5).map((t) => (
                     <Badge
                       key={t}
                       variant={theme === t ? "default" : "outline"}
-                      className="cursor-pointer hover:bg-primary/20 transition-colors"
+                      className="cursor-pointer hover:bg-primary/20 transition-colors text-xs py-1.5 px-2.5 active:scale-95"
                       onClick={() => setTheme(t)}
                     >
                       {t}
@@ -482,10 +482,11 @@ export function ProfileDevotionGenerator({ profile, onDevotionGenerated }: Profi
             </div>
 
             {/* Action Buttons */}
-            <div className="flex gap-2 pt-4 border-t">
+            <div className="flex flex-col sm:flex-row gap-2 pt-4 border-t">
               <Button className="flex-1" onClick={copyToClipboard}>
                 <Send className="h-4 w-4 mr-2" />
-                Share with {profile.name}
+                <span className="hidden sm:inline">Share with {profile.name}</span>
+                <span className="sm:hidden">Share</span>
               </Button>
               <Button variant="outline" onClick={() => {
                 setGeneratedDevotion(null);

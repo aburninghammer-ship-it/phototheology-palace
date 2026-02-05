@@ -141,80 +141,80 @@ export default function Devotionals() {
             <HowItWorksDialog title="How to Use Devotionals" steps={devotionalsSteps} />
           </div>
 
-          <div className="grid md:grid-cols-5 gap-4 mt-8">
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 md:gap-4 mt-8">
             {/* Quick Daily Devotion */}
-            <Card 
-              className="bg-white/10 backdrop-blur-sm border-white/20 hover:bg-white/20 transition-all cursor-pointer group shadow-xl" 
+            <Card
+              className="bg-white/10 backdrop-blur-sm border-white/20 hover:bg-white/20 transition-all cursor-pointer group shadow-xl active:scale-95"
               onClick={() => setShowQuickDevotion(true)}
             >
-              <CardContent className="p-6 flex items-center gap-4">
-                <div className="p-4 rounded-full bg-gradient-to-br from-amber-400 to-yellow-400 shadow-lg group-hover:scale-110 transition-transform">
-                  <Sun className="h-6 w-6 text-white" />
+              <CardContent className="p-3 md:p-6 flex flex-col md:flex-row items-center gap-2 md:gap-4">
+                <div className="p-3 md:p-4 rounded-full bg-gradient-to-br from-amber-400 to-yellow-400 shadow-lg group-hover:scale-110 transition-transform">
+                  <Sun className="h-5 w-5 md:h-6 md:w-6 text-white" />
                 </div>
-                <div>
-                  <h3 className="font-bold text-white text-lg">Quick Devotion</h3>
-                  <p className="text-sm text-white/70">One-day themed</p>
+                <div className="text-center md:text-left">
+                  <h3 className="font-bold text-white text-sm md:text-lg">Quick Devotion</h3>
+                  <p className="text-xs md:text-sm text-white/70 hidden sm:block">One-day themed</p>
                 </div>
               </CardContent>
             </Card>
 
             {/* Create New */}
-            <Card 
-              className="bg-white/10 backdrop-blur-sm border-white/20 hover:bg-white/20 transition-all cursor-pointer group shadow-xl" 
+            <Card
+              className="bg-white/10 backdrop-blur-sm border-white/20 hover:bg-white/20 transition-all cursor-pointer group shadow-xl active:scale-95"
               onClick={() => setShowWizard(true)}
             >
-              <CardContent className="p-6 flex items-center gap-4">
-                <div className="p-4 rounded-full bg-gradient-to-br from-emerald-400 to-cyan-400 shadow-lg group-hover:scale-110 transition-transform">
-                  <Plus className="h-6 w-6 text-white" />
+              <CardContent className="p-3 md:p-6 flex flex-col md:flex-row items-center gap-2 md:gap-4">
+                <div className="p-3 md:p-4 rounded-full bg-gradient-to-br from-emerald-400 to-cyan-400 shadow-lg group-hover:scale-110 transition-transform">
+                  <Plus className="h-5 w-5 md:h-6 md:w-6 text-white" />
                 </div>
-                <div>
-                  <h3 className="font-bold text-white text-lg">Create Plan</h3>
-                  <p className="text-sm text-white/70">Multi-day journey</p>
+                <div className="text-center md:text-left">
+                  <h3 className="font-bold text-white text-sm md:text-lg">Create Plan</h3>
+                  <p className="text-xs md:text-sm text-white/70 hidden sm:block">Multi-day journey</p>
                 </div>
               </CardContent>
             </Card>
 
             {/* Devotional Profiles */}
-            <Card 
-              className="bg-white/10 backdrop-blur-sm border-white/20 hover:bg-white/20 transition-all cursor-pointer group shadow-xl" 
+            <Card
+              className="bg-white/10 backdrop-blur-sm border-white/20 hover:bg-white/20 transition-all cursor-pointer group shadow-xl active:scale-95"
               onClick={() => setShowProfileWizard(true)}
             >
-              <CardContent className="p-6 flex items-center gap-4">
-                <div className="p-4 rounded-full bg-gradient-to-br from-pink-400 to-rose-400 shadow-lg group-hover:scale-110 transition-transform">
-                  <UserPlus className="h-6 w-6 text-white" />
+              <CardContent className="p-3 md:p-6 flex flex-col md:flex-row items-center gap-2 md:gap-4">
+                <div className="p-3 md:p-4 rounded-full bg-gradient-to-br from-pink-400 to-rose-400 shadow-lg group-hover:scale-110 transition-transform">
+                  <UserPlus className="h-5 w-5 md:h-6 md:w-6 text-white" />
                 </div>
-                <div>
-                  <h3 className="font-bold text-white text-lg">Create Profile</h3>
-                  <p className="text-sm text-white/70">Minister to loved ones</p>
+                <div className="text-center md:text-left">
+                  <h3 className="font-bold text-white text-sm md:text-lg">Create Profile</h3>
+                  <p className="text-xs md:text-sm text-white/70 hidden sm:block">Minister to loved ones</p>
                 </div>
               </CardContent>
             </Card>
 
             {/* Church Devotionals */}
-            <Card 
-              className="bg-white/10 backdrop-blur-sm border-white/20 hover:bg-white/20 transition-all cursor-pointer group shadow-xl" 
+            <Card
+              className="bg-white/10 backdrop-blur-sm border-white/20 hover:bg-white/20 transition-all cursor-pointer group shadow-xl active:scale-95"
               onClick={() => { setActiveTab("church"); setShowChurchWizard(true); }}
             >
-              <CardContent className="p-6 flex items-center gap-4">
-                <div className="p-4 rounded-full bg-gradient-to-br from-teal-400 to-emerald-400 shadow-lg group-hover:scale-110 transition-transform">
-                  <Church className="h-6 w-6 text-white" />
+              <CardContent className="p-3 md:p-6 flex flex-col md:flex-row items-center gap-2 md:gap-4">
+                <div className="p-3 md:p-4 rounded-full bg-gradient-to-br from-teal-400 to-emerald-400 shadow-lg group-hover:scale-110 transition-transform">
+                  <Church className="h-5 w-5 md:h-6 md:w-6 text-white" />
                 </div>
-                <div>
-                  <h3 className="font-bold text-white text-lg">Church Ministry</h3>
-                  <p className="text-sm text-white/70">Daily for congregation</p>
+                <div className="text-center md:text-left">
+                  <h3 className="font-bold text-white text-sm md:text-lg">Church</h3>
+                  <p className="text-xs md:text-sm text-white/70 hidden sm:block">Daily for congregation</p>
                 </div>
               </CardContent>
             </Card>
 
             {/* Stats */}
-            <Card className="bg-white/10 backdrop-blur-sm border-white/20 shadow-xl">
-              <CardContent className="p-6 flex items-center gap-4">
-                <div className="p-4 rounded-full bg-gradient-to-br from-purple-400 to-violet-400 shadow-lg">
-                  <Star className="h-6 w-6 text-white" />
+            <Card className="bg-white/10 backdrop-blur-sm border-white/20 shadow-xl col-span-2 sm:col-span-1">
+              <CardContent className="p-3 md:p-6 flex flex-col md:flex-row items-center gap-2 md:gap-4">
+                <div className="p-3 md:p-4 rounded-full bg-gradient-to-br from-purple-400 to-violet-400 shadow-lg">
+                  <Star className="h-5 w-5 md:h-6 md:w-6 text-white" />
                 </div>
-                <div>
-                  <h3 className="font-bold text-white text-lg">5 Formats</h3>
-                  <p className="text-sm text-white/70">24FPS, Blueprint & more</p>
+                <div className="text-center md:text-left">
+                  <h3 className="font-bold text-white text-sm md:text-lg">5 Formats</h3>
+                  <p className="text-xs md:text-sm text-white/70 hidden sm:block">24FPS, Blueprint & more</p>
                 </div>
               </CardContent>
             </Card>

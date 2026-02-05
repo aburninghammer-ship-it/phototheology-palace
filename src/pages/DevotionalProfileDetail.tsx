@@ -353,19 +353,29 @@ export default function DevotionalProfileDetail() {
 
         {/* Tabs */}
         <Tabs defaultValue="generate" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-6">
-            <TabsTrigger value="generate" className="flex items-center gap-1">
+          <TabsList className="grid w-full grid-cols-3 md:grid-cols-6 h-auto gap-1">
+            <TabsTrigger value="generate" className="flex items-center gap-1 text-xs md:text-sm py-2">
               <Zap className="h-3 w-3" />
-              Generate
+              <span className="hidden sm:inline">Generate</span>
+              <span className="sm:hidden">Gen</span>
             </TabsTrigger>
-            <TabsTrigger value="devotionals">Devotionals</TabsTrigger>
-            <TabsTrigger value="sms" className="flex items-center gap-1">
+            <TabsTrigger value="devotionals" className="text-xs md:text-sm py-2">
+              <span className="hidden sm:inline">Devotionals</span>
+              <span className="sm:hidden">Devos</span>
+            </TabsTrigger>
+            <TabsTrigger value="sms" className="flex items-center gap-1 text-xs md:text-sm py-2">
               <Phone className="h-3 w-3" />
               SMS
             </TabsTrigger>
-            <TabsTrigger value="notes">Notes</TabsTrigger>
-            <TabsTrigger value="history">History</TabsTrigger>
-            <TabsTrigger value="insights">Insights</TabsTrigger>
+            <TabsTrigger value="notes" className="text-xs md:text-sm py-2">Notes</TabsTrigger>
+            <TabsTrigger value="history" className="text-xs md:text-sm py-2">
+              <span className="hidden sm:inline">History</span>
+              <span className="sm:hidden">Hist</span>
+            </TabsTrigger>
+            <TabsTrigger value="insights" className="text-xs md:text-sm py-2">
+              <span className="hidden sm:inline">Insights</span>
+              <span className="sm:hidden">Info</span>
+            </TabsTrigger>
           </TabsList>
 
           {/* Generate Deep Devotion Tab */}
