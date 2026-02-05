@@ -218,6 +218,11 @@ export default function CardDeck() {
   const [commentaryCard, setCommentaryCard] = useState<PrincipleCard | null>(null);
   const [commentaryOpen, setCommentaryOpen] = useState(false);
 
+  // Difficulty level state
+  const [difficultyLevel, setDifficultyLevel] = useState<"normal" | "master">("normal");
+  const [masterChallenge, setMasterChallenge] = useState<string | null>(null);
+  const [isLoadingMasterChallenge, setIsLoadingMasterChallenge] = useState(false);
+
   useEffect(() => {
     // Build all principle cards from palace data
     const cards: PrincipleCard[] = [];
@@ -537,6 +542,38 @@ export default function CardDeck() {
     broadcastTextSet();
   };
 
+  // Generate master challenge for a card
+  const generateMasterChallenge = async (card: PrincipleCard) => {
+    setIsLoadingMasterChallenge(true);
+    setMasterChallenge(null);
+
+    try {
+      const { data, error } = await supabase.functions.invoke("jeeves", {
+        body: {
+          mode: "master_challenge",
+          roomId: card.id,
+          roomTag: card.code,
+          roomName: card.name,
+          verseText: verseText,
+          cardQuestion: card.question,
+          textType: textType,
+        },
+      });
+
+      if (error) throw error;
+      setMasterChallenge(data.content || null);
+    } catch (error) {
+      console.error("Error generating master challenge:", error);
+      toast({
+        title: "Master challenge unavailable",
+        description: "Using standard challenge instead.",
+      });
+      setMasterChallenge(null);
+    } finally {
+      setIsLoadingMasterChallenge(false);
+    }
+  };
+
   const pickRandomCard = async () => {
     if (!verseText.trim()) {
       toast({
@@ -546,20 +583,21 @@ export default function CardDeck() {
       });
       return;
     }
-    
+
     if (pickMode === "user") {
       // User wants to choose card manually
       setCardPickerOpen(true);
       return;
     }
-    
+
     // Trigger drawing animation
     setIsDrawingCard(true);
     setSelectedCard(null);
-    
+    setMasterChallenge(null);
+
     // Delay to show animation
     await new Promise(resolve => setTimeout(resolve, 1200));
-    
+
     // Jeeves chooses randomly
     const randomCard = allCards[Math.floor(Math.random() * allCards.length)];
     setSelectedCard(randomCard);
@@ -569,12 +607,17 @@ export default function CardDeck() {
     setTimeRemaining(120);
     setIsTimerActive(timerEnabled);
     setIsDrawingCard(false);
-    
+
+    // Generate master challenge if in master mode
+    if (difficultyLevel === "master") {
+      generateMasterChallenge(randomCard);
+    }
+
     // Update streak for daily challenge mode
     if (studyMode === 'daily_challenge' && user) {
       updateStreak();
     }
-    
+
     // Broadcast card selection to all participants in session
     if (isInSession && channelRef.current) {
       channelRef.current.send({
@@ -592,10 +635,16 @@ export default function CardDeck() {
       setCardsUsed(prev => [...prev, card.code]);
       setUserAnswer("");
       setFeedback("");
+      setMasterChallenge(null);
       setTimeRemaining(120);
       setIsTimerActive(timerEnabled);
       setCardPickerOpen(false);
-      
+
+      // Generate master challenge if in master mode
+      if (difficultyLevel === "master") {
+        generateMasterChallenge(card);
+      }
+
       if (isInSession && channelRef.current) {
         channelRef.current.send({
           type: 'broadcast',
@@ -1152,14 +1201,17 @@ export default function CardDeck() {
           verseText: verseText,
           userAnswer: userAnswer,
           textType: textType,
+          // Include master challenge info for grading
+          difficultyLevel: difficultyLevel,
+          masterChallenge: masterChallenge,
         },
       });
 
       if (error) throw error;
-      
+
       // Track the interaction
       trackJeevesInteraction(
-        `Grade submission: ${selectedCard?.name}`,
+        `Grade submission: ${selectedCard?.name}${difficultyLevel === "master" ? " (Master)" : ""}`,
         "card-deck-grade",
         data.content?.substring(0, 200),
         "Card Deck"
@@ -1489,7 +1541,35 @@ export default function CardDeck() {
                     </Button>
                   </div>
                 </div>
-                
+
+                {/* Difficulty Level Selector */}
+                <div className="space-y-2">
+                  <Label className="text-sm font-medium">Difficulty Level</Label>
+                  <div className="flex gap-2">
+                    <Button
+                      variant={difficultyLevel === "normal" ? "default" : "outline"}
+                      onClick={() => setDifficultyLevel("normal")}
+                      className="flex-1 gap-2"
+                    >
+                      <BookOpen className="h-4 w-4" />
+                      Normal
+                    </Button>
+                    <Button
+                      variant={difficultyLevel === "master" ? "default" : "outline"}
+                      onClick={() => setDifficultyLevel("master")}
+                      className="flex-1 gap-2 bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700"
+                    >
+                      <Sparkles className="h-4 w-4" />
+                      Master
+                    </Button>
+                  </div>
+                  <p className="text-xs text-muted-foreground">
+                    {difficultyLevel === "normal"
+                      ? "Standard challenge - you choose how to apply the principle"
+                      : "Master challenge - Jeeves assigns specific constraints (e.g., which parable, which prophecy)"}
+                  </p>
+                </div>
+
                 <div className="flex gap-2">
                   <Button onClick={pickRandomCard} className="flex-1 gradient-palace">
                     <Sparkles className="h-4 w-4 mr-2" />
@@ -1595,12 +1675,44 @@ export default function CardDeck() {
                 <CardContent className="space-y-4">
                   {/* Challenge Question */}
                   <div className="bg-background/50 rounded-lg p-4 border border-white/20">
-                    <div className="text-xs uppercase tracking-wide text-white/70 mb-2 font-semibold">
-                      Challenge
+                    <div className="flex items-center justify-between mb-2">
+                      <div className="text-xs uppercase tracking-wide text-white/70 font-semibold">
+                        {difficultyLevel === "master" ? "Master Challenge" : "Challenge"}
+                      </div>
+                      {difficultyLevel === "master" && (
+                        <Badge className="bg-gradient-to-r from-amber-600 to-orange-600 text-white text-xs">
+                          Master Mode
+                        </Badge>
+                      )}
                     </div>
                     <p className="text-white font-medium leading-relaxed">
                       {selectedCard.question}
                     </p>
+
+                    {/* Master Challenge - Specific Constraint from Jeeves */}
+                    {difficultyLevel === "master" && (
+                      <div className="mt-4 pt-4 border-t border-white/20">
+                        {isLoadingMasterChallenge ? (
+                          <div className="flex items-center gap-2 text-amber-300">
+                            <Loader2 className="h-4 w-4 animate-spin" />
+                            <span className="text-sm">Jeeves is crafting your specific challenge...</span>
+                          </div>
+                        ) : masterChallenge ? (
+                          <div className="space-y-2">
+                            <div className="text-xs uppercase tracking-wide text-amber-300 font-semibold">
+                              Jeeves' Specific Assignment
+                            </div>
+                            <p className="text-amber-100 font-medium leading-relaxed whitespace-pre-wrap">
+                              {masterChallenge}
+                            </p>
+                          </div>
+                        ) : (
+                          <p className="text-white/60 text-sm italic">
+                            Using standard challenge (specific assignment unavailable)
+                          </p>
+                        )}
+                      </div>
+                    )}
                   </div>
 
                   <Textarea

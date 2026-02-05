@@ -728,6 +728,8 @@ FIRST, explain what ${roomTag} (${roomName}) means in 2-3 sentences. THEN, provi
     } else if (mode === "grade") {
       // Card Deck Grade Mode - evaluate student's application
       const textTypeLabel = textType === "story" ? "story" : "verse";
+      const difficultyLevel = body.difficultyLevel || "normal";
+      const masterChallengeText = body.masterChallenge || null;
       
       // Special handling for Room 66 (R66)
       if (roomId === "r66" || roomTag === "R66") {
@@ -762,10 +764,25 @@ Provide warm, insightful feedback that affirms the books and connections they id
 
       } else {
         // Original grade mode logic for other rooms
+        const masterModeInstructions = difficultyLevel === "master" && masterChallengeText ? `
+
+**⚡ MASTER MODE EVALUATION:**
+This student is playing in MASTER mode with a SPECIFIC constraint assigned by Jeeves.
+
+**The Master Challenge was:** ${masterChallengeText}
+
+**ADDITIONAL EVALUATION CRITERIA FOR MASTER MODE:**
+• Did they address the SPECIFIC constraint given? (This is critical!)
+• Did they make the exact connection assigned, not a different one?
+• Is the specific parable/prophecy/element correctly identified and applied?
+
+If they ignored the specific constraint and made a different connection, gently redirect them to the assigned challenge while still affirming any good insights they shared.
+` : "";
+
         systemPrompt = `You are Jeeves, a warm and insightful teacher evaluating how well students APPLY Phototheology principles to biblical texts.
 
 **TASK:** Evaluate this student's application of ${roomTag} (${roomName}) to their ${textTypeLabel}.
-
+${masterModeInstructions}
 **EVALUATION CRITERIA:**
 • Did they actually APPLY the principle (not just identify or categorize)?
 • Is the application biblically sound and relevant?
@@ -789,15 +806,64 @@ Provide warm, insightful feedback that affirms the books and connections they id
 
 ${PALACE_SCHEMA}`;
 
+        const masterChallengeSection = difficultyLevel === "master" && masterChallengeText ? `
+
+**MASTER CHALLENGE ASSIGNED:** ${masterChallengeText}
+
+(Grade whether they addressed this specific assignment!)` : "";
+
         userPrompt = `Evaluate this application of ${roomTag} (${roomName}):
 
 ${textTypeLabel === "verse" ? "Verse:" : "Story:"} ${verseText}
+${masterChallengeSection}
 
 Student's Application:
 ${userAnswer}
 
 Provide warm, honest feedback. If their answer is strong, affirm it and build on it. If it's weak or misses the principle, gently explain why and guide them toward the correct application with a concrete example.`;
       }
+
+    } else if (mode === "master_challenge") {
+      // Master Mode - Generate specific constraints for the card challenge
+      const textTypeLabel = textType === "story" ? "story" : "verse";
+      const cardQuestion = body.cardQuestion || "";
+
+      systemPrompt = `You are Jeeves, crafting a SPECIFIC, CONSTRAINED challenge for Master-level Bible study.
+
+**YOUR TASK:** Given a Phototheology principle card and a Bible passage, generate a SPECIFIC challenge that removes the student's freedom to choose. YOU pick the exact element they must work with.
+
+**EXAMPLES OF WHAT YOU SHOULD DO:**
+
+• If the card is "Connect 6 - Parable": DON'T say "connect to a parable." DO say "Connect this verse to the Parable of the Prodigal Son (Luke 15:11-32). Show how both texts illuminate each other."
+
+• If the card is "Connect 6 - Prophecy": DON'T say "connect to a prophecy." DO say "Connect this passage to Isaiah 53 (the Suffering Servant). How do these texts speak to each other?"
+
+• If the card is "Time Zone - Earth-Future": DON'T say "apply through end-time lens." DO say "Interpret this text as if you're living during the final 7 years before Christ's return. What would this mean during the time of Jacob's trouble?"
+
+• If the card is "Blue Room - Lampstand": DON'T say "connect to the lampstand." DO say "Show how this verse connects specifically to the seven golden lampstands in Revelation 1:12-20 and what Jesus says about them."
+
+• If the card is "Fruit Room - Gentleness": DON'T say "find gentleness." DO say "Compare this passage with Moses striking the rock (Numbers 20:1-13). How does gentleness versus harsh reaction change outcomes?"
+
+• If the card is "Dimensions - 4D (Ecclesiological)": DON'T say "apply to the church." DO say "Explain how this text applies specifically to the early church in Corinth dealing with division (1 Corinthians 1:10-17)."
+
+**FORMATTING:**
+- Be SPECIFIC - name exact passages, parables, prophecies, characters, events
+- Be CHALLENGING but fair - the connection should be possible but not obvious
+- Keep it to 2-3 sentences max
+- Don't explain why - just give the assignment
+- Sound confident and direct: "Your challenge: Connect this to..." or "Apply this passage specifically to..."
+
+${PALACE_SCHEMA}`;
+
+      userPrompt = `Generate a MASTER-LEVEL specific challenge for:
+
+**Card:** ${roomTag} (${roomName})
+**Card's General Question:** ${cardQuestion}
+**${textTypeLabel === "verse" ? "Verse" : "Story"}:** ${verseText}
+
+Your task: Pick a SPECIFIC biblical element (exact parable, specific prophecy, particular character, named event, etc.) that the student MUST use to complete this challenge. Remove their freedom to choose - YOU assign the specific connection they must make.
+
+Give only the specific assignment - no explanations. Be direct: "Your challenge: [specific task]"`;
 
     } else if (mode === "strongs-lookup") {
       // Strong's lookup temporarily disabled due to package configuration
