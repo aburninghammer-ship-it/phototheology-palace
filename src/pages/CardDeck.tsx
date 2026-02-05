@@ -1593,6 +1593,16 @@ export default function CardDeck() {
                   </div>
                 </CardHeader>
                 <CardContent className="space-y-4">
+                  {/* Challenge Question */}
+                  <div className="bg-background/50 rounded-lg p-4 border border-white/20">
+                    <div className="text-xs uppercase tracking-wide text-white/70 mb-2 font-semibold">
+                      Challenge
+                    </div>
+                    <p className="text-white font-medium leading-relaxed">
+                      {selectedCard.question}
+                    </p>
+                  </div>
+
                   <Textarea
                     placeholder={`How does ${selectedCard.code} apply to this ${textType}? Write your application here...`}
                     value={userAnswer}
