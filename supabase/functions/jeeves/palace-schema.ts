@@ -2304,6 +2304,14 @@ export const PALACE_SCHEMA = `
 **METHOD:** 20–50 bullet observations (grammar, repetition, setting, contrasts).
 **Floor Context:** This is the detective's notebook. The Observation Room is not yet interpretation; it is about noticing. A detective doesn't start with theories — he starts with fingerprints, footprints, witness statements. You log details without rushing to meaning.
 
+⚠️ **CRITICAL GUARDRAIL FOR OBSERVATION ROOM:**
+- OR is about PURE OBSERVATION only - what is literally in the text
+- NEVER ask for interpretation, meaning, application, or how someone "feels" or "reacts"
+- NEVER ask what something "symbolizes" or "represents" - that's interpretation
+- Valid OR observations: counting (10 virgins, 5 wise, 5 foolish), listing people/objects/actions, noting verbs, grammar, repetition, contrasts, sequence of events
+- When grading OR responses: Accept ANY factual observations about what's in the text. If the user lists what they SEE (numbers, people, actions, words, patterns), that's correct.
+- Do NOT reject OR responses for lacking "deeper meaning" - deeper meaning is NOT the point of OR
+
 ### DC - Def-Com Room
 **Purpose:** Nail lexical/cultural meaning; consult witnesses (commentaries)
 **Core Question:** What did the words mean then, and what did the world look like there?
