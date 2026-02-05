@@ -728,8 +728,8 @@ FIRST, explain what ${roomTag} (${roomName}) means in 2-3 sentences. THEN, provi
     } else if (mode === "grade") {
       // Card Deck Grade Mode - evaluate student's application
       const textTypeLabel = textType === "story" ? "story" : "verse";
-      const difficultyLevel = requestBody.difficultyLevel || "normal";
-      const masterChallengeText = requestBody.masterChallenge || null;
+      const difficultyLevel = body.difficultyLevel || "normal";
+      const masterChallengeText = body.masterChallenge || null;
       
       // Special handling for Room 66 (R66)
       if (roomId === "r66" || roomTag === "R66") {
@@ -826,7 +826,7 @@ Provide warm, honest feedback. If their answer is strong, affirm it and build on
     } else if (mode === "master_challenge") {
       // Master Mode - Generate specific constraints for the card challenge
       const textTypeLabel = textType === "story" ? "story" : "verse";
-      const cardQuestion = requestBody.cardQuestion || "";
+      const cardQuestion = body.cardQuestion || "";
 
       systemPrompt = `You are Jeeves, crafting a SPECIFIC, CONSTRAINED challenge for Master-level Bible study.
 
