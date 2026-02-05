@@ -13,7 +13,7 @@ import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ScrollArea } from "@/components/ui/scroll-area";
 
-type CampaignType = 'winback' | 'trial' | 'engagement';
+type CampaignType = 'winback' | 'trial' | 'engagement' | 'conversion';
 
 interface CampaignStats {
   total: number;
@@ -28,10 +28,12 @@ export function EmailCampaignManager() {
   const [testEmail, setTestEmail] = useState("");
   const [selectedDay, setSelectedDay] = useState("0");
   const [forceSendWinback, setForceSendWinback] = useState(false);
+  const [forceSendConversion, setForceSendConversion] = useState(false);
   const [lastResults, setLastResults] = useState<Record<CampaignType, { sent: number; failed: number } | null>>({
     winback: null,
     trial: null,
     engagement: null,
+    conversion: null,
   });
 
   // Get win-back eligible users count
@@ -87,6 +89,24 @@ export function EmailCampaignManager() {
     }
   });
 
+  // Get non-paying users count for conversion campaign
+  const { data: conversionCount, isLoading: conversionLoading } = useQuery({
+    queryKey: ['campaign-conversion-count'],
+    queryFn: async () => {
+      const threeDaysAgo = new Date();
+      threeDaysAgo.setDate(threeDaysAgo.getDate() - 3);
+      
+      const { data } = await supabase
+        .from('profiles')
+        .select('id')
+        .or('subscription_status.is.null,subscription_status.eq.none,subscription_status.eq.pending')
+        .eq('has_lifetime_access', false)
+        .lt('created_at', threeDaysAgo.toISOString());
+
+      return data?.length || 0;
+    }
+  });
+
   // Get campaign stats
   const { data: campaignStats } = useQuery({
     queryKey: ['campaign-stats'],
@@ -103,6 +123,7 @@ export function EmailCampaignManager() {
         winback: { total: 0, sent: 0, failed: 0 },
         trial: { total: 0, sent: 0, failed: 0 },
         engagement: { total: 0, sent: 0, failed: 0 },
+        conversion: { total: 0, sent: 0, failed: 0 },
       };
 
       (logs as any[] || []).forEach((log: any) => {
@@ -132,7 +153,7 @@ export function EmailCampaignManager() {
           testMode,
           testEmail: testMode ? testEmail : undefined,
           dayOverride: testMode ? parseInt(selectedDay) : undefined,
-          forceSend: !testMode && campaignType === 'winback' ? forceSendWinback : undefined,
+          forceSend: !testMode && (campaignType === 'winback' ? forceSendWinback : campaignType === 'conversion' ? forceSendConversion : undefined),
         }
       });
 
@@ -173,8 +194,9 @@ export function EmailCampaignManager() {
   const getCampaignName = (type: CampaignType) => {
     switch (type) {
       case 'winback': return 'Win-Back Campaign';
-      case 'trial': return 'Trial Conversion Campaign';
+      case 'trial': return 'Trial Guidance';
       case 'engagement': return 'Subscriber Engagement';
+      case 'conversion': return 'Non-Payer Conversion';
     }
   };
 
@@ -183,11 +205,12 @@ export function EmailCampaignManager() {
       case 'winback': return <UserMinus className="h-5 w-5" />;
       case 'trial': return <Clock className="h-5 w-5" />;
       case 'engagement': return <UserCheck className="h-5 w-5" />;
+      case 'conversion': return <Star className="h-5 w-5" />;
     }
   };
 
   const renderEmailPreview = (campaignType: CampaignType) => {
-    const previews = {
+    const previews: Record<CampaignType, { title: string; emails: { day: string; subject: string; preview: string }[] }> = {
       winback: {
         title: "Win-Back Sequence (7 Emails)",
         emails: [
@@ -218,6 +241,16 @@ export function EmailCampaignManager() {
           { day: "Week 2", subject: "Why Foundational Rooms Still Matter", preview: "Return to basics — integration exercise" },
           { day: "Week 3", subject: "Recalibration Is Part of Maturity", preview: "Step back when needed — not regression" },
           { day: "Week 4", subject: "Prepare for Your Next Level", preview: "Monthly review — mastery is earned" },
+        ]
+      },
+      conversion: {
+        title: "Non-Payer Conversion (5 Emails)",
+        emails: [
+          { day: "Day 0", subject: "What PhotoTheology Users Are Discovering", preview: "Testimonials from real learners" },
+          { day: "Day 2", subject: "Why 800+ Believers Chose the Palace", preview: "8-Floor system overview" },
+          { day: "Day 4", subject: "Meet Jeeves — Your AI Study Partner", preview: "AI trained on PhotoTheology" },
+          { day: "Day 6", subject: "Your Bible Study: Before vs. After", preview: "Side-by-side comparison + pricing" },
+          { day: "Day 8", subject: "Final Invitation", preview: "Last call + special offer" },
         ]
       }
     };
@@ -422,7 +455,14 @@ export function EmailCampaignManager() {
       </Card>
 
       {/* Campaign Cards */}
-      <div className="grid gap-6 lg:grid-cols-3">
+      <div className="grid gap-6 lg:grid-cols-2 xl:grid-cols-4">
+        {renderCampaignCard(
+          'conversion',
+          conversionCount,
+          conversionLoading,
+          "Convert registered users to paying subscribers"
+        )}
+
         {renderCampaignCard(
           'winback',
           winbackCount,
