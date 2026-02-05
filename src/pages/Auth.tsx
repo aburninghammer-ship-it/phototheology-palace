@@ -765,9 +765,9 @@ export default function Auth() {
             <TabsContent value="signup">
               <form onSubmit={handleSignup}>
                 <CardHeader>
-                  <CardTitle>Create Account</CardTitle>
+                  <CardTitle>Start Your 7-Day Free Trial</CardTitle>
                   <CardDescription>
-                    Start your journey through biblical wisdom
+                    Full access to the Phototheology Palace
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
@@ -782,6 +782,22 @@ export default function Auth() {
                       <span className="bg-card px-2 text-muted-foreground">
                         Or sign up with email
                       </span>
+                    </div>
+                  </div>
+
+                  {/* Trial Pricing Banner - Show pricing upfront */}
+                  <div className="bg-gradient-to-r from-primary/10 via-accent/5 to-primary/10 border border-primary/20 rounded-lg p-4">
+                    <div className="flex items-center gap-3 mb-2">
+                      <Crown className="h-5 w-5 text-primary" />
+                      <span className="font-semibold text-foreground">Premium Access</span>
+                    </div>
+                    <div className="space-y-1 text-sm">
+                      <p className="text-muted-foreground">
+                        <span className="font-medium text-foreground">7 days free</span>, then $15/month
+                      </p>
+                      <p className="text-xs text-muted-foreground/80">
+                        Card required to start trial • Cancel anytime • No charge until day 8
+                      </p>
                     </div>
                   </div>
 
@@ -878,7 +894,7 @@ export default function Auth() {
                         Creating account...
                       </>
                     ) : (
-                      "Create Account"
+                      "Start Free Trial →"
                     )}
                   </Button>
                   <AuthSocialProof />
