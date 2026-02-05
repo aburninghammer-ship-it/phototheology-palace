@@ -262,8 +262,9 @@ export const CommentaryPanel = ({ book, chapter, verse, verseText, onClose }: Co
         setAvailableCommentaries(data.available || []);
       } catch (error) {
         console.error("[Commentary] Error checking commentary availability:", error);
-        // Default to all if check fails - don't block the user
-        setAvailableCommentaries(COMMENTARY_OPTIONS.map(c => c.value));
+        // If check fails, show empty array - don't show misleading checkmarks
+        // Users can still try any commentary, it just won't have a ✓ indicator
+        setAvailableCommentaries([]);
       } finally {
         setCheckingAvailability(false);
       }
@@ -375,6 +376,31 @@ export const CommentaryPanel = ({ book, chapter, verse, verseText, onClose }: Co
     } catch (error: any) {
       console.error("[Commentary] Error:", error);
 
+      // Try fallback: Load from pre-generated database cache
+      try {
+        console.log("[Commentary] Trying database fallback...");
+        const { data: cachedCommentary } = await supabase
+          .from("bible_commentaries")
+          .select("commentary_text")
+          .eq("book", book)
+          .eq("chapter", chapter)
+          .eq("verse", verse)
+          .maybeSingle();
+
+        if (cachedCommentary?.commentary_text) {
+          console.log("[Commentary] Found cached commentary in database");
+          setCommentary(cachedCommentary.commentary_text);
+          setUsedPrinciples([]);
+          toast({
+            title: "Loaded Cached Commentary",
+            description: "Using pre-generated commentary (AI service temporarily unavailable)",
+          });
+          return;
+        }
+      } catch (cacheError) {
+        console.error("[Commentary] Database fallback also failed:", cacheError);
+      }
+
       // Provide more helpful error messages
       let errorMessage = "Failed to generate commentary";
       if (error.message?.includes("timeout") || error.message?.includes("timed out")) {
@@ -383,6 +409,8 @@ export const CommentaryPanel = ({ book, chapter, verse, verseText, onClose }: Co
         errorMessage = "Too many requests - please wait a moment and try again.";
       } else if (error.message?.includes("network") || error.message?.includes("fetch")) {
         errorMessage = "Network error - please check your connection.";
+      } else if (error.message?.includes("Edge Function")) {
+        errorMessage = "AI service temporarily unavailable. Please try again in a few minutes.";
       } else if (error.message) {
         errorMessage = error.message;
       }
