@@ -8,6 +8,7 @@ import { Card } from '@/components/ui/card';
 import { useAuth } from '@/hooks/useAuth';
 import { useGatehouseStatus } from '@/hooks/useGatehouseStatus';
 import { useChangeSpine } from '@/hooks/useChangeSpine';
+import { useEventTracking } from '@/hooks/useEventTracking';
 import { Navigation } from '@/components/Navigation';
 import { Footer } from '@/components/Footer';
 import { UserCountBadge } from '@/components/UserCountBadge';
@@ -23,6 +24,7 @@ const Gatehouse = () => {
   const { user } = useAuth();
   const { hasEnteredPalace, isLoading } = useGatehouseStatus();
   const { markOrientationComplete, advanceGuidedPath } = useChangeSpine();
+  const { trackCheckoutCompleted } = useEventTracking();
   const [selectedPath, setSelectedPath] = useState<'surface' | 'palace' | null>(null);
   const [viewState, setViewState] = useState<ViewState>('choice');
 
@@ -30,6 +32,9 @@ const Gatehouse = () => {
   useEffect(() => {
     const trialStatus = searchParams.get('trial');
     if (trialStatus === 'success') {
+      // Track checkout completion - STEP 3 of checkout funnel (SUCCESS!)
+      trackCheckoutCompleted('premium', 'monthly', 7);
+
       // Celebration animation
       const duration = 3000;
       const animationEnd = Date.now() + duration;

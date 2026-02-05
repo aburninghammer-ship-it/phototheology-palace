@@ -75,6 +75,8 @@ export function AnalyticsDashboard() {
 
   // Funnel data
   const [funnelData, setFunnelData] = useState<{step: string; count: number; rate: number}[]>([]);
+  // Checkout funnel data (separate from feature funnel)
+  const [checkoutFunnelData, setCheckoutFunnelData] = useState<{step: string; count: number; rate: number; dropoff?: number}[]>([]);
 
   // Fetch user events and analytics
   const fetchUserEvents = useCallback(async () => {
@@ -177,6 +179,36 @@ export function AnalyticsDashboard() {
         return { step: step.step, count, rate };
       });
       setFunnelData(funnel);
+
+      // Calculate CHECKOUT FUNNEL specifically
+      const checkoutSteps = [
+        { step: "1. Account Created", eventType: "checkout_funnel_account_created" },
+        { step: "2. Redirected to Stripe", eventType: "checkout_funnel_redirect_to_stripe" },
+        { step: "3. Completed Checkout", eventType: "checkout_funnel_completed" },
+        { step: "❌ Abandoned", eventType: "checkout_funnel_abandoned" },
+        { step: "✓ External Member", eventType: "checkout_funnel_external_membership" },
+      ];
+
+      const checkoutFunnel = checkoutSteps.map((step, idx) => {
+        const count = typeCounts[step.eventType] || 0;
+        // For the first 3 steps, calculate conversion from previous step
+        let rate = 100;
+        let dropoff = 0;
+        if (idx === 1) {
+          // Redirect rate from account created
+          const prevCount = typeCounts["checkout_funnel_account_created"] || 1;
+          rate = prevCount > 0 ? Math.round((count / prevCount) * 100) : 0;
+        } else if (idx === 2) {
+          // Completion rate from redirect
+          const prevCount = typeCounts["checkout_funnel_redirect_to_stripe"] || 1;
+          rate = prevCount > 0 ? Math.round((count / prevCount) * 100) : 0;
+          // Calculate dropoff
+          const abandoned = typeCounts["checkout_funnel_abandoned"] || 0;
+          dropoff = prevCount > 0 ? Math.round((abandoned / prevCount) * 100) : 0;
+        }
+        return { step: step.step, count, rate, dropoff };
+      });
+      setCheckoutFunnelData(checkoutFunnel);
 
     } catch (err) {
       console.error("Error fetching user events:", err);
@@ -674,6 +706,75 @@ export function AnalyticsDashboard() {
                   <Target className="h-12 w-12 opacity-20" />
                   <p>No funnel data available yet</p>
                   <p className="text-xs">Events will appear as users progress through the app</p>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+
+          {/* CHECKOUT FUNNEL - Separate Card */}
+          <Card className="border-2 border-amber-500/30">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <DollarSign className="h-5 w-5 text-amber-500" />
+                Checkout Funnel (Signup → Trial)
+              </CardTitle>
+              <CardDescription>Where users drop off during signup-to-trial flow</CardDescription>
+            </CardHeader>
+            <CardContent>
+              {checkoutFunnelData.length > 0 && checkoutFunnelData.some(f => f.count > 0) ? (
+                <>
+                  <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-6">
+                    {checkoutFunnelData.map((step, i) => (
+                      <div
+                        key={step.step}
+                        className={`p-4 rounded-lg text-center ${
+                          step.step.includes('Abandoned')
+                            ? 'bg-red-500/20 border border-red-500/30'
+                            : step.step.includes('External')
+                              ? 'bg-green-500/20 border border-green-500/30'
+                              : 'bg-muted/50'
+                        }`}
+                      >
+                        <div className="text-2xl font-bold">{step.count}</div>
+                        <div className="text-xs text-muted-foreground">{step.step}</div>
+                        {i > 0 && i < 3 && step.rate < 100 && (
+                          <Badge variant={step.rate > 50 ? "default" : "destructive"} className="mt-2 text-xs">
+                            {step.rate}% conv
+                          </Badge>
+                        )}
+                        {step.dropoff !== undefined && step.dropoff > 0 && (
+                          <Badge variant="destructive" className="mt-1 text-xs block">
+                            {step.dropoff}% abandoned
+                          </Badge>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Key Insight */}
+                  {checkoutFunnelData[1]?.count > 0 && checkoutFunnelData[2]?.count < checkoutFunnelData[1]?.count && (
+                    <div className="p-4 rounded-lg bg-amber-500/10 border border-amber-500/30">
+                      <div className="flex items-center gap-2 text-amber-500 font-semibold mb-2">
+                        <AlertCircle className="h-4 w-4" />
+                        Checkout Drop-off Detected
+                      </div>
+                      <p className="text-sm text-muted-foreground">
+                        <strong>{checkoutFunnelData[1]?.count - checkoutFunnelData[2]?.count - (checkoutFunnelData[3]?.count || 0)}</strong> users were redirected to Stripe but neither completed checkout nor explicitly cancelled.
+                        They may have closed the browser or navigated away. Consider:
+                      </p>
+                      <ul className="text-sm text-muted-foreground mt-2 list-disc list-inside">
+                        <li>Adding abandoned checkout email reminders</li>
+                        <li>Offering a truly free tier without card</li>
+                        <li>Simplifying the checkout page</li>
+                      </ul>
+                    </div>
+                  )}
+                </>
+              ) : (
+                <div className="h-40 flex items-center justify-center text-muted-foreground flex-col gap-2">
+                  <DollarSign className="h-12 w-12 opacity-20" />
+                  <p>No checkout funnel data yet</p>
+                  <p className="text-xs">Data will appear as users sign up and go through checkout</p>
                 </div>
               )}
             </CardContent>

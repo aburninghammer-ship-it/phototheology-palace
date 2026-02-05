@@ -44,14 +44,17 @@ export default function Auth() {
     ? redirectParam
     : null;
 
-  // Show message if trial checkout was cancelled
+  const { trackCheckoutAbandoned, trackAccountCreated, trackCheckoutRedirect, trackExternalMembershipDetected } = useEventTracking();
+
+  // Show message if trial checkout was cancelled and track abandonment
   useEffect(() => {
     if (trialCancelled) {
+      trackCheckoutAbandoned('user_cancelled_stripe');
       toast.info("Your trial signup was cancelled. To access the Palace, please complete the signup with your card details.", {
         duration: 8000,
       });
     }
-  }, [trialCancelled]);
+  }, [trialCancelled, trackCheckoutAbandoned]);
 
   // Redirect if already logged in (but NOT if in Patreon mode - let them connect)
   // We defer the gatehouse check to avoid Supabase deadlocks during auth state changes
@@ -329,6 +332,9 @@ export default function Auth() {
 
       // Check if user was created (not just "fake" success for existing email)
       if (data.user && data.session) {
+        // Track account creation - STEP 1 of checkout funnel
+        trackAccountCreated('email', { has_referral: !!referralCode });
+
         // Send signup notification (pending trial - card not yet verified)
         try {
           await supabase.functions.invoke("send-signup-notification", {
@@ -376,6 +382,7 @@ export default function Auth() {
 
           // Grant access if external membership found
           if (patreonResult.data?.is_active_patron && patreonResult.data.entitled_cents >= 1500) {
+            trackExternalMembershipDetected('patreon');
             await supabase.from("profiles").update({
               subscription_status: "active",
               subscription_tier: "premium",
@@ -388,6 +395,7 @@ export default function Auth() {
           }
 
           if (pickaxeResult.data?.is_paid_user) {
+            trackExternalMembershipDetected('pickaxe');
             await supabase.from("profiles").update({
               subscription_status: "active",
               subscription_tier: "premium",
@@ -400,6 +408,7 @@ export default function Auth() {
           }
 
           if (teachableResult.data?.is_active) {
+            trackExternalMembershipDetected('teachable');
             await supabase.from("profiles").update({
               subscription_status: "active",
               subscription_tier: "student",
@@ -412,12 +421,15 @@ export default function Auth() {
           }
 
           // No external membership - redirect to Stripe checkout for 7-day trial
+          // Track checkout redirect - STEP 2 of checkout funnel
+          trackCheckoutRedirect('premium', 'monthly');
+
           const { data: checkoutData, error: checkoutError } = await supabase.functions.invoke('create-trial-checkout', {
             body: { plan: 'premium', billing: 'monthly' },
           });
 
           if (checkoutError) throw checkoutError;
-          
+
           if (checkoutData?.url) {
             // Redirect to Stripe checkout - signup is not complete without payment info
             window.location.href = checkoutData.url;
