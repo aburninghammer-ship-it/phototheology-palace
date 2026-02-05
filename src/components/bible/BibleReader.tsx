@@ -493,8 +493,14 @@ export const BibleReader = () => {
       <div className="grid lg:grid-cols-3 gap-6">
         {/* Main Reading Pane */}
         <div className="lg:col-span-2 space-y-6">
-          <Card variant="glass" className={`p-6 shadow-elegant hover:shadow-hover transition-smooth ${preferences.reading_mode === 'focus' ? 'max-w-3xl mx-auto' : ''}`}>
-            <div className={`space-y-4 ${fontSizeClass}`}>
+          <Card variant="glass" className={`shadow-elegant hover:shadow-hover transition-smooth ${preferences.reading_mode === 'focus' ? 'max-w-3xl mx-auto' : ''}`}>
+            {/* Sticky Book Title Header */}
+            <div className="sticky top-0 z-10 bg-card/95 backdrop-blur-sm border-b border-white/10 px-6 py-3 -mx-0 rounded-t-xl">
+              <h2 className="font-serif text-xl md:text-2xl font-bold bg-gradient-palace bg-clip-text text-transparent">
+                {book} {chapter}
+              </h2>
+            </div>
+            <div className={`space-y-4 p-6 ${fontSizeClass}`}>
               {strongsMode ? (
                 chapterData.verses.map((verse) => (
                   <StrongsVerseView
