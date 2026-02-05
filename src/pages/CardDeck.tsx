@@ -439,7 +439,18 @@ export default function CardDeck() {
       });
       return;
     }
-    
+
+    // Reset game state when new text is chosen
+    setSelectedCard(null);
+    setConversationHistory([]);
+    setFeedback("");
+    setUserAnswer("");
+    setCardsUsed([]);
+    setMasterChallenge(null);
+    setFlippedCards(new Set());
+    setIsTimerActive(false);
+    setTimeRemaining(120);
+
     // Check if input matches a known story
     if (textType === "story") {
       const lowerInput = verseInput.toLowerCase().trim();
