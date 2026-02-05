@@ -22,6 +22,7 @@ import { SubscriptionAnalyticsChart } from "@/components/admin/SubscriptionAnaly
 import { AdminUserManagement } from "@/components/admin/AdminUserManagement";
 import { EmailCampaignHistory } from "@/components/admin/EmailCampaignHistory";
 import { RecentSubscribers } from "@/components/admin/RecentSubscribers";
+import { NewSignupsList } from "@/components/admin/NewSignupsList";
 import { DonationStats } from "@/components/admin/DonationStats";
 import { SubscriptionDatabase } from "@/components/admin/SubscriptionDatabase";
 import { Badge } from "@/components/ui/badge";
@@ -692,7 +693,10 @@ export default function AdminSubscriptions() {
           {/* Donations Section */}
           <DonationStats />
 
-          {/* Recent Subscribers */}
+          {/* New Signups - Prominently displayed */}
+          <NewSignupsList />
+
+          {/* Recent Paid Subscribers */}
           <RecentSubscribers />
 
           {/* Data Sync Status */}
