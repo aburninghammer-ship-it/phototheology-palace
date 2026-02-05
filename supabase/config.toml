@@ -285,3 +285,6 @@ verify_jwt = false
 
 [functions.generate-study-series]
 verify_jwt = false
+
+[functions.generate-daily-cards]
+verify_jwt = false

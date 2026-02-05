@@ -197,6 +197,17 @@ Respond in this exact JSON format:
       }
     }
 
+    // Log the generation
+    await supabase
+      .from("spark_card_generation_log")
+      .insert({
+        generation_date: today,
+        cards_generated: generatedCards.length,
+        success: true,
+      });
+
+    console.log(`Successfully generated ${generatedCards.length} spark cards for ${today}`);
+
     return new Response(
       JSON.stringify({
         success: true,
