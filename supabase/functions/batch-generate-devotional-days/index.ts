@@ -160,6 +160,14 @@ serve(async (req) => {
         // Generate missing days (up to maxDaysPerPlan)
         const daysToGenerate = missingDays.slice(0, maxDaysPerPlan);
         
+        // Get existing titles to avoid duplication
+        const { data: existingTitles } = await supabase
+          .from("devotional_days")
+          .select("title")
+          .eq("plan_id", plan.id);
+
+        const usedTitles = existingTitles?.map((d: any) => d.title).filter(Boolean) || [];
+
         for (const dayNumber of daysToGenerate) {
           try {
             const result = await generateDevotionalDay(
@@ -169,12 +177,17 @@ serve(async (req) => {
               dayNumber,
               personName,
               primaryIssue,
-              issueDescription
+              issueDescription,
+              usedTitles
             );
 
             if (result.success) {
               planResult.daysGenerated++;
               console.log(`Plan ${plan.id}: Generated day ${dayNumber}`);
+              // Add the new title to avoid list for subsequent days
+              if (result.title) {
+                usedTitles.push(result.title);
+              }
             } else {
               planResult.errors.push(`Day ${dayNumber}: ${result.error}`);
             }
@@ -224,8 +237,9 @@ async function generateDevotionalDay(
   dayNumber: number,
   personName: string,
   primaryIssue: string,
-  issueDescription: string
-): Promise<{ success: boolean; error?: string }> {
+  issueDescription: string,
+  usedTitles: string[] = []
+): Promise<{ success: boolean; error?: string; title?: string }> {
   const forPersonNote = personName
     ? `\nThis devotional is written PERSONALLY for: ${personName}. Address ${personName} BY NAME at least 2-3 times throughout the devotional.`
     : "";
@@ -234,10 +248,18 @@ async function generateDevotionalDay(
     ? `\nPRIMARY STRUGGLE: ${primaryIssue}${issueDescription ? ` - ${issueDescription}` : ""}`
     : issueDescription ? `\nSITUATION DETAILS: ${issueDescription}` : "";
 
+  const avoidTitlesNote = usedTitles.length > 0
+    ? `\n\nCRITICAL - TITLE UNIQUENESS REQUIREMENT:
+The following titles have ALREADY been used in this devotional series. You MUST create a COMPLETELY DIFFERENT title:
+${usedTitles.map((t, i) => `  ${i + 1}. "${t}"`).join("\n")}
+
+DO NOT use any of these titles or variations of them. Create something fresh and specific to THIS day's unique insight.`
+    : "";
+
   const systemPrompt = `You are Jeeves, the Phototheology devotional writer. Write devotionals as 3-5 FLOWING PARAGRAPHS of continuous prose.
 
 FORMAT: NO bullet points. NO section headers. NO labeled parts. Just essay-style reading.
-NEVER use "dear" in any form - no "Dear friend", "dear one", "my dear", etc.
+NEVER use "dear" in any form - no "Dear friend", "dear one", "my dear", etc.${avoidTitlesNote}
 
 ${personName ? `CRITICAL PERSONALIZATION RULES:
 - This devotional is for a SPECIFIC PERSON named ${personName}
@@ -347,5 +369,5 @@ Generate ONLY day ${dayNumber} as flowing paragraphs. This day should build on t
     return { success: false, error: "Failed to save devotional day" };
   }
 
-  return { success: true };
+  return { success: true, title: day.title };
 }
