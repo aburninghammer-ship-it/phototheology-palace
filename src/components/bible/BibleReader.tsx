@@ -495,17 +495,12 @@ export const BibleReader = () => {
         <div className="lg:col-span-2 space-y-6">
           <Card variant="glass" className={`shadow-elegant hover:shadow-hover transition-smooth ${preferences.reading_mode === 'focus' ? 'max-w-3xl mx-auto' : ''}`}>
             {/* Sticky Book Title Header */}
-            <div className="sticky top-0 z-20 bg-gradient-to-r from-primary/10 via-accent/5 to-primary/10 backdrop-blur-xl border-b border-primary/30 px-6 py-4 rounded-t-xl shadow-sm">
+            <div className="sticky top-0 z-20 bg-card/95 backdrop-blur-md border-b border-border/50 px-6 py-3 -mx-[1px] -mt-[1px] rounded-t-xl">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-primary to-accent flex items-center justify-center shadow-lg shadow-primary/20">
-                  <BookOpen className="h-5 w-5 text-primary-foreground" />
-                </div>
-                <div>
-                  <h2 className="font-serif text-xl md:text-2xl font-bold text-foreground">
-                    {book}
-                  </h2>
-                  <p className="text-sm text-muted-foreground font-medium">Chapter {chapter}</p>
-                </div>
+                <BookOpen className="h-5 w-5 text-primary" />
+                <h2 className="font-serif text-lg md:text-xl font-semibold text-foreground">
+                  {book} <span className="text-muted-foreground font-normal">· Chapter {chapter}</span>
+                </h2>
               </div>
             </div>
             <div className={`space-y-4 p-6 ${fontSizeClass}`}>
