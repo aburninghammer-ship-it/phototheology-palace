@@ -68,6 +68,9 @@ async function fetchAllStripeSubscriptions(
   const allSubscriptions: Stripe.Subscription[] = [];
   let hasMore = true;
   let startingAfter: string | undefined;
+  
+  // Only these price IDs belong to the Phototheology app
+  const appPriceIdSet = new Set(appPriceIds);
 
   while (hasMore) {
     const params: Stripe.SubscriptionListParams = {
@@ -79,8 +82,15 @@ async function fetchAllStripeSubscriptions(
 
     const batch = await stripe.subscriptions.list(params);
 
-    // Include ALL subscriptions - no filtering by price ID
-    allSubscriptions.push(...batch.data);
+    // IMPORTANT: Only include Phototheology app subscriptions (filter by known price IDs)
+    // This excludes old products, SamCart, and other non-app subscriptions
+    for (const sub of batch.data) {
+      const priceId = sub.items?.data?.[0]?.price?.id;
+      if (priceId && appPriceIdSet.has(priceId)) {
+        allSubscriptions.push(sub);
+      }
+    }
+    
     hasMore = batch.has_more;
     if (batch.data.length > 0) {
       startingAfter = batch.data[batch.data.length - 1].id;
