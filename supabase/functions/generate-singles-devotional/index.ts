@@ -100,7 +100,7 @@ serve(async (req) => {
 
     if (mode === "daily") {
       // Generate a daily devotional
-      const today = new Date().toISOString().split('T')[0];
+      const todayStr = new Date().toISOString().split('T')[0];
 
       // Check cache first
       if (supabaseUrl && supabaseServiceKey) {
@@ -108,11 +108,11 @@ serve(async (req) => {
         const { data: cached } = await supabase
           .from("daily_singles_devotional_cache")
           .select("*")
-          .eq("date_for", today)
+          .eq("date_for", todayStr)
           .maybeSingle();
 
         if (cached) {
-          console.log("[Singles Devotional] Cache hit for", today);
+          console.log("[Singles Devotional] Cache hit for", todayStr);
           return new Response(
             JSON.stringify({ success: true, devotional: cached, cached: true }),
             { headers: { ...corsHeaders, "Content-Type": "application/json" } }
@@ -126,8 +126,8 @@ serve(async (req) => {
         selectedTheme = DAILY_THEMES[dayOfYear % DAILY_THEMES.length];
       }
 
-      const today = new Date();
-      const dateStr = today.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+      const todayDate = new Date();
+      const dateStr = todayDate.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
 
       userPrompt = `Generate a daily devotional for single Christians for ${dateStr}.
 
