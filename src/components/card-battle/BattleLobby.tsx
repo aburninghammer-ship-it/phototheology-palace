@@ -19,16 +19,39 @@ interface Props {
   onBack: () => void;
 }
 
-// All available PT principle cards
+// All available PT principle cards - SPECIFIC cards only, never generic room cards
+// Never include generic cards like @Cy without specifying which cycle
 const ALL_PRINCIPLE_CARDS = [
-  "@Ad", "@No", "@Ab", "@Mo", "@Cy", "@CyC", "@Sp", "@Re",
+  // 8 Cycles - specific cycles only (no generic @Cy)
+  "@Ad", "@No", "@Ab", "@Mo", "@Sp", "@Re",  // Adamic, Noahic, Abrahamic, Mosaic, Spirit, Remnant
+  // Note: @Cy (Cyrusic) and @CyC (Christ Cycle) are specific cycles, keeping them
+  "@Cy", "@CyC",
+  // Three Heavens - specific horizons
   "1H", "2H", "3H",
+  // Dimensions - specific dimensions
   "DR-1D", "DR-2D", "DR-3D", "DR-4D", "DR-5D",
+  // Connect 6 - specific genres
   "C6-Pr", "C6-Pa", "C6-Ep", "C6-Hi", "C6-Go", "C6-Po",
+  // Time Zones - specific zones
   "TZ-HP", "TZ-HN", "TZ-HF", "TZ-EP", "TZ-EN", "TZ-EF",
+  // Blue Room (Sanctuary) - specific articles
   "BL-Gate", "BL-Altar", "BL-Laver", "BL-Lamp", "BL-Table", "BL-Incense", "BL-Veil", "BL-Ark",
+  // Feast Room - specific feasts
   "FR-Pass", "FR-Unlv", "FR-First", "FR-Pent", "FR-Trum", "FR-Aton", "FR-Tab",
-  "FRt-Love", "FRt-Joy", "FRt-Peace", "FRt-Patience", "FRt-Kindness", "FRt-Goodness",
+  // Fruit Room - specific fruits
+  "FRt-Love", "FRt-Joy", "FRt-Peace", "FRt-Patience", "FRt-Kindness", "FRt-Goodness", "FRt-Faithfulness", "FRt-Gentleness", "FRt-SelfControl",
+  // Math Room - specific prophecies
+  "MR-70W", "MR-1260", "MR-2300", "MR-120", "MR-400", "MR-70Y",
+  // Three Angels
+  "3A-1", "3A-2", "3A-3",
+  // Prophet/Priest/King
+  "PPK-Prophet", "PPK-Priest", "PPK-King",
+  // Observation Room (Floor 2)
+  "OR",
+  // Def-Com Room
+  "DC",
+  // Questions Room
+  "QR",
 ];
 
 function shuffleArray<T>(array: T[]): T[] {
