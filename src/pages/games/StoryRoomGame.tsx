@@ -1364,9 +1364,16 @@ export default function StoryRoomGame() {
         {/* Challenge Card */}
         <Card className="mb-6">
           <CardHeader>
-            <CardTitle className="text-xl">{currentQuiz.story}</CardTitle>
-            {settings.showBookReference && (
-              <CardDescription>{currentQuiz.book}</CardDescription>
+            {/* Hide story title for "identify" challenge - that's what the player needs to guess! */}
+            {challengeType === "identify" ? (
+              <CardTitle className="text-xl">Which Story Is This?</CardTitle>
+            ) : (
+              <>
+                <CardTitle className="text-xl">{currentQuiz.story}</CardTitle>
+                {settings.showBookReference && (
+                  <CardDescription>{currentQuiz.book}</CardDescription>
+                )}
+              </>
             )}
           </CardHeader>
           <CardContent className="space-y-6">

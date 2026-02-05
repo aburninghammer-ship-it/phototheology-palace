@@ -83,7 +83,13 @@
       "Bash(supabase/config.toml )",
       "Bash(supabase/functions/send-daily-devotional/index.ts )",
       "Bash(supabase/functions/sms-webhook/ )",
-      "Bash(supabase/migrations/20260129200000_sms_devotional_feature.sql)"
+      "Bash(supabase/migrations/20260129200000_sms_devotional_feature.sql)",
+      "Bash(SUPABASE_ACCESS_TOKEN=\"sbp_1cd5589aa8a0c34a7e25b5c72b8177a50885c191\" npx supabase functions list:*)",
+      "Bash(SUPABASE_ACCESS_TOKEN=\"sbp_1cd5589aa8a0c34a7e25b5c72b8177a50885c191\" npx supabase functions deploy:*)",
+      "Bash(SUPABASE_ACCESS_TOKEN=\"sbp_1cd5589aa8a0c34a7e25b5c72b8177a50885c191\" npx supabase db push:*)",
+      "Bash(SUPABASE_ACCESS_TOKEN=\"sbp_1cd5589aa8a0c34a7e25b5c72b8177a50885c191\" npx supabase link:*)",
+      "Bash(SUPABASE_ACCESS_TOKEN=\"sbp_1cd5589aa8a0c34a7e25b5c72b8177a50885c191\" npx supabase:*)",
+      "Bash(Is This?\" instead.\n\n🤖 Generated with [Claude Code]\\(https://claude.com/claude-code\\)\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>\nEOF\n\\)\")"
     ],
     "deny": [],
     "ask": []
