@@ -613,6 +613,8 @@ export function BattleArena({ battle, currentUserId, onBack }: Props) {
         description: error.message || "Failed to process Jeeves' turn",
         variant: "destructive",
       });
+      // Even on error, switch back to user's turn so they're not stuck
+      setIsUserTurn(true);
     } finally {
       console.log('✅ Jeeves turn complete');
       setIsSubmitting(false);
