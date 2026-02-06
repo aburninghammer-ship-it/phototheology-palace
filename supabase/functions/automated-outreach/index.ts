@@ -237,7 +237,7 @@ serve(async (req) => {
         const emailContent = getPatreonOutreachEmail(member.full_name);
 
         await resend.emails.send({
-          from: "Phototheology <ivor@thephototheologyapp.com>",
+          from: "Phototheology <ivor@phototheologybible.com>",
           to: [member.email],
           subject: emailContent.subject,
           html: emailContent.html,
@@ -295,7 +295,7 @@ serve(async (req) => {
         const emailContent = getTeachableOutreachEmail(student.name, student.course_name);
 
         await resend.emails.send({
-          from: "Phototheology <ivor@thephototheologyapp.com>",
+          from: "Phototheology <ivor@phototheologybible.com>",
           to: [student.email],
           subject: emailContent.subject,
           html: emailContent.html,
@@ -354,7 +354,7 @@ serve(async (req) => {
         const emailContent = getPickaxeOutreachEmail(user.pickaxe_name, isPaid);
 
         await resend.emails.send({
-          from: "Phototheology <ivor@thephototheologyapp.com>",
+          from: "Phototheology <ivor@phototheologybible.com>",
           to: [user.pickaxe_email],
           subject: emailContent.subject,
           html: emailContent.html,

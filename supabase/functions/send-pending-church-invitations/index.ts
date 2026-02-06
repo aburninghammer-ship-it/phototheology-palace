@@ -46,7 +46,7 @@ serve(async (req) => {
     console.log(`Found ${invitations?.length || 0} pending invitations`);
 
     const results = [];
-    const origin = (Deno.env.get('PUBLIC_APP_URL') || 'https://thephototheologyapp.com').replace(/\/$/, '');
+    const origin = (Deno.env.get('PUBLIC_APP_URL') || 'https://phototheologybible.com').replace(/\/$/, '');
 
     for (const invitation of invitations || []) {
       const churchName = (invitation.churches as any)?.name || 'Living Manna';
@@ -120,7 +120,7 @@ serve(async (req) => {
         console.log(`Sending email to ${invitation.invited_email}...`);
         
         const { data: emailData, error: resendError } = await resend.emails.send({
-          from: "Phototheology <noreply@thephototheologyapp.com>",
+          from: "Phototheology <noreply@phototheologybible.com>",
           to: [invitation.invited_email],
           subject: `🙏 You're Invited to Join ${churchName} on Phototheology!`,
           html: emailHtml,

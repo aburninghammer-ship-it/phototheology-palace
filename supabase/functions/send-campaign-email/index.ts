@@ -26,7 +26,7 @@ const sendAdminNotification = async (
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        from: "PhotoTheology <support@thephototheologyapp.com>",
+        from: "PhotoTheology <support@phototheologybible.com>",
         to: [adminEmail],
         subject,
         html,
@@ -126,7 +126,7 @@ const WIN_BACK_EMAILS = [
           </p>
           
           <div style="text-align: center; margin-top: 32px;">
-            <a href="https://thephototheologyapp.com" style="display: inline-block; background: linear-gradient(90deg, #f5d742 0%, #ff6b6b 100%); color: #1a1a2e; padding: 16px 36px; text-decoration: none; font-weight: bold; border-radius: 8px; font-size: 16px;">
+            <a href="https://phototheologybible.com" style="display: inline-block; background: linear-gradient(90deg, #f5d742 0%, #ff6b6b 100%); color: #1a1a2e; padding: 16px 36px; text-decoration: none; font-weight: bold; border-radius: 8px; font-size: 16px;">
               Explore the New PhotoTheology
             </a>
           </div>
@@ -178,7 +178,7 @@ const WIN_BACK_EMAILS = [
           </p>
           
           <div style="text-align: center; margin-top: 32px;">
-            <a href="https://thephototheologyapp.com/palace" style="display: inline-block; background: linear-gradient(90deg, #4ecdc4 0%, #44a08d 100%); color: #1a1a2e; padding: 16px 36px; text-decoration: none; font-weight: bold; border-radius: 8px; font-size: 16px;">
+            <a href="https://phototheologybible.com/palace" style="display: inline-block; background: linear-gradient(90deg, #4ecdc4 0%, #44a08d 100%); color: #1a1a2e; padding: 16px 36px; text-decoration: none; font-weight: bold; border-radius: 8px; font-size: 16px;">
               Take the Palace Tour
             </a>
           </div>
@@ -235,7 +235,7 @@ const WIN_BACK_EMAILS = [
           </p>
           
           <div style="text-align: center; margin-top: 32px;">
-            <a href="https://thephototheologyapp.com/chat" style="display: inline-block; background: linear-gradient(90deg, #ff6b6b 0%, #ee5a24 100%); color: #fff; padding: 16px 36px; text-decoration: none; font-weight: bold; border-radius: 8px; font-size: 16px;">
+            <a href="https://phototheologybible.com/chat" style="display: inline-block; background: linear-gradient(90deg, #ff6b6b 0%, #ee5a24 100%); color: #fff; padding: 16px 36px; text-decoration: none; font-weight: bold; border-radius: 8px; font-size: 16px;">
               Chat with Jeeves Now
             </a>
           </div>
@@ -285,7 +285,7 @@ const WIN_BACK_EMAILS = [
           </p>
           
           <div style="text-align: center; margin-top: 32px;">
-            <a href="https://thephototheologyapp.com/challenges" style="display: inline-block; background: linear-gradient(90deg, #f5d742 0%, #f39c12 100%); color: #1a1a2e; padding: 16px 36px; text-decoration: none; font-weight: bold; border-radius: 8px; font-size: 16px;">
+            <a href="https://phototheologybible.com/challenges" style="display: inline-block; background: linear-gradient(90deg, #f5d742 0%, #f39c12 100%); color: #1a1a2e; padding: 16px 36px; text-decoration: none; font-weight: bold; border-radius: 8px; font-size: 16px;">
               Start Today's Challenge
             </a>
           </div>
@@ -331,7 +331,7 @@ const WIN_BACK_EMAILS = [
           </div>
           
           <div style="text-align: center; margin-top: 32px;">
-            <a href="https://thephototheologyapp.com/study" style="display: inline-block; background: linear-gradient(90deg, #9b59b6 0%, #8e44ad 100%); color: #fff; padding: 16px 36px; text-decoration: none; font-weight: bold; border-radius: 8px; font-size: 16px;">
+            <a href="https://phototheologybible.com/study" style="display: inline-block; background: linear-gradient(90deg, #9b59b6 0%, #8e44ad 100%); color: #fff; padding: 16px 36px; text-decoration: none; font-weight: bold; border-radius: 8px; font-size: 16px;">
               Start Collecting Gems
             </a>
           </div>
@@ -390,7 +390,7 @@ const WIN_BACK_EMAILS = [
           </p>
           
           <div style="text-align: center; margin-top: 32px;">
-            <a href="https://thephototheologyapp.com/palace" style="display: inline-block; background: linear-gradient(90deg, #3498db 0%, #2980b9 100%); color: #fff; padding: 16px 36px; text-decoration: none; font-weight: bold; border-radius: 8px; font-size: 16px;">
+            <a href="https://phototheologybible.com/palace" style="display: inline-block; background: linear-gradient(90deg, #3498db 0%, #2980b9 100%); color: #fff; padding: 16px 36px; text-decoration: none; font-weight: bold; border-radius: 8px; font-size: 16px;">
               Explore the Vision Floor
             </a>
           </div>
@@ -447,7 +447,7 @@ const WIN_BACK_EMAILS = [
           </div>
           
           <div style="text-align: center; margin-top: 32px;">
-            <a href="https://thephototheologyapp.com" style="display: inline-block; background: linear-gradient(90deg, #f5d742 0%, #ff6b6b 50%, #4ecdc4 100%); color: #1a1a2e; padding: 18px 48px; text-decoration: none; font-weight: bold; border-radius: 8px; font-size: 18px;">
+            <a href="https://phototheologybible.com" style="display: inline-block; background: linear-gradient(90deg, #f5d742 0%, #ff6b6b 50%, #4ecdc4 100%); color: #1a1a2e; padding: 18px 48px; text-decoration: none; font-weight: bold; border-radius: 8px; font-size: 18px;">
               Return to PhotoTheology
             </a>
           </div>
@@ -496,7 +496,7 @@ const TRIAL_EMAILS = [
         </p>
         
         <div style="text-align: center; margin-top: 32px;">
-          <a href="https://thephototheologyapp.com/dashboard" style="display: inline-block; background: #f5d742; color: #1a1a2e; padding: 14px 28px; text-decoration: none; font-weight: bold; border-radius: 6px;">
+          <a href="https://phototheologybible.com/dashboard" style="display: inline-block; background: #f5d742; color: #1a1a2e; padding: 14px 28px; text-decoration: none; font-weight: bold; border-radius: 6px;">
             Begin Your Orientation
           </a>
         </div>
@@ -532,7 +532,7 @@ const TRIAL_EMAILS = [
         </p>
         
         <div style="text-align: center; margin-top: 32px;">
-          <a href="https://thephototheologyapp.com/study" style="display: inline-block; background: #f5d742; color: #1a1a2e; padding: 14px 28px; text-decoration: none; font-weight: bold; border-radius: 6px;">
+          <a href="https://phototheologybible.com/study" style="display: inline-block; background: #f5d742; color: #1a1a2e; padding: 14px 28px; text-decoration: none; font-weight: bold; border-radius: 6px;">
             Continue Your Training
           </a>
         </div>
@@ -568,7 +568,7 @@ const TRIAL_EMAILS = [
         </p>
         
         <div style="text-align: center; margin-top: 32px;">
-          <a href="https://thephototheologyapp.com/challenges" style="display: inline-block; background: #f5d742; color: #1a1a2e; padding: 14px 28px; text-decoration: none; font-weight: bold; border-radius: 6px;">
+          <a href="https://phototheologybible.com/challenges" style="display: inline-block; background: #f5d742; color: #1a1a2e; padding: 14px 28px; text-decoration: none; font-weight: bold; border-radius: 6px;">
             Try Today's Challenge
           </a>
         </div>
@@ -608,7 +608,7 @@ const TRIAL_EMAILS = [
         </p>
         
         <div style="text-align: center; margin-top: 32px;">
-          <a href="https://thephototheologyapp.com/study" style="display: inline-block; background: #f5d742; color: #1a1a2e; padding: 14px 28px; text-decoration: none; font-weight: bold; border-radius: 6px;">
+          <a href="https://phototheologybible.com/study" style="display: inline-block; background: #f5d742; color: #1a1a2e; padding: 14px 28px; text-decoration: none; font-weight: bold; border-radius: 6px;">
             Stay With the Structure
           </a>
         </div>
@@ -647,7 +647,7 @@ const TRIAL_EMAILS = [
         </p>
         
         <div style="text-align: center; margin-top: 32px;">
-          <a href="https://thephototheologyapp.com/pricing" style="display: inline-block; background: #f5d742; color: #1a1a2e; padding: 14px 28px; text-decoration: none; font-weight: bold; border-radius: 6px;">
+          <a href="https://phototheologybible.com/pricing" style="display: inline-block; background: #f5d742; color: #1a1a2e; padding: 14px 28px; text-decoration: none; font-weight: bold; border-radius: 6px;">
             View Subscription Options
           </a>
         </div>
@@ -684,7 +684,7 @@ const TRIAL_EMAILS = [
         </div>
         
         <div style="text-align: center; margin-top: 32px;">
-          <a href="https://thephototheologyapp.com/pricing" style="display: inline-block; background: #f5d742; color: #1a1a2e; padding: 14px 28px; text-decoration: none; font-weight: bold; border-radius: 6px;">
+          <a href="https://phototheologybible.com/pricing" style="display: inline-block; background: #f5d742; color: #1a1a2e; padding: 14px 28px; text-decoration: none; font-weight: bold; border-radius: 6px;">
             Extend Your Study
           </a>
         </div>
@@ -724,7 +724,7 @@ const ENGAGEMENT_EMAILS = [
         </div>
         
         <div style="text-align: center; margin-top: 32px;">
-          <a href="https://thephototheologyapp.com/study" style="display: inline-block; background: #f5d742; color: #1a1a2e; padding: 14px 28px; text-decoration: none; font-weight: bold; border-radius: 6px;">
+          <a href="https://phototheologybible.com/study" style="display: inline-block; background: #f5d742; color: #1a1a2e; padding: 14px 28px; text-decoration: none; font-weight: bold; border-radius: 6px;">
             Return to the Structure
           </a>
         </div>
@@ -760,7 +760,7 @@ const ENGAGEMENT_EMAILS = [
         </div>
         
         <div style="text-align: center; margin-top: 32px;">
-          <a href="https://thephototheologyapp.com/study" style="display: inline-block; background: #f5d742; color: #1a1a2e; padding: 14px 28px; text-decoration: none; font-weight: bold; border-radius: 6px;">
+          <a href="https://phototheologybible.com/study" style="display: inline-block; background: #f5d742; color: #1a1a2e; padding: 14px 28px; text-decoration: none; font-weight: bold; border-radius: 6px;">
             Continue Where You Are
           </a>
         </div>
@@ -796,7 +796,7 @@ const ENGAGEMENT_EMAILS = [
         </div>
         
         <div style="text-align: center; margin-top: 32px;">
-          <a href="https://thephototheologyapp.com/dashboard" style="display: inline-block; background: #f5d742; color: #1a1a2e; padding: 14px 28px; text-decoration: none; font-weight: bold; border-radius: 6px;">
+          <a href="https://phototheologybible.com/dashboard" style="display: inline-block; background: #f5d742; color: #1a1a2e; padding: 14px 28px; text-decoration: none; font-weight: bold; border-radius: 6px;">
             Slow Down and Integrate
           </a>
         </div>
@@ -840,7 +840,7 @@ const ENGAGEMENT_EMAILS = [
         </p>
         
         <div style="text-align: center; margin-top: 32px;">
-          <a href="https://thephototheologyapp.com/dashboard" style="display: inline-block; background: #f5d742; color: #1a1a2e; padding: 14px 28px; text-decoration: none; font-weight: bold; border-radius: 6px;">
+          <a href="https://phototheologybible.com/dashboard" style="display: inline-block; background: #f5d742; color: #1a1a2e; padding: 14px 28px; text-decoration: none; font-weight: bold; border-radius: 6px;">
             Prepare for Your Next Level
           </a>
         </div>
@@ -895,7 +895,7 @@ const CONVERSION_EMAILS = [
           </p>
           
           <div style="text-align: center; margin-top: 32px;">
-            <a href="https://thephototheologyapp.com/pricing?trial=true" style="display: inline-block; background: linear-gradient(90deg, #f5d742 0%, #ff6b6b 100%); color: #1a1a2e; padding: 18px 40px; text-decoration: none; font-weight: bold; border-radius: 8px; font-size: 18px;">
+            <a href="https://phototheologybible.com/pricing?trial=true" style="display: inline-block; background: linear-gradient(90deg, #f5d742 0%, #ff6b6b 100%); color: #1a1a2e; padding: 18px 40px; text-decoration: none; font-weight: bold; border-radius: 8px; font-size: 18px;">
               Start Your Free Trial
             </a>
           </div>
@@ -962,7 +962,7 @@ const CONVERSION_EMAILS = [
           </p>
           
           <div style="text-align: center; margin-top: 32px;">
-            <a href="https://thephototheologyapp.com/pricing?trial=true" style="display: inline-block; background: linear-gradient(90deg, #4ecdc4 0%, #44a08d 100%); color: #1a1a2e; padding: 18px 40px; text-decoration: none; font-weight: bold; border-radius: 8px; font-size: 18px;">
+            <a href="https://phototheologybible.com/pricing?trial=true" style="display: inline-block; background: linear-gradient(90deg, #4ecdc4 0%, #44a08d 100%); color: #1a1a2e; padding: 18px 40px; text-decoration: none; font-weight: bold; border-radius: 8px; font-size: 18px;">
               Explore the Palace — Free for 7 Days
             </a>
           </div>
@@ -1010,7 +1010,7 @@ const CONVERSION_EMAILS = [
           </p>
           
           <div style="text-align: center; margin-top: 32px;">
-            <a href="https://thephototheologyapp.com/pricing?trial=true" style="display: inline-block; background: linear-gradient(90deg, #ff6b6b 0%, #ee5a24 100%); color: #fff; padding: 18px 40px; text-decoration: none; font-weight: bold; border-radius: 8px; font-size: 18px;">
+            <a href="https://phototheologybible.com/pricing?trial=true" style="display: inline-block; background: linear-gradient(90deg, #ff6b6b 0%, #ee5a24 100%); color: #fff; padding: 18px 40px; text-decoration: none; font-weight: bold; border-radius: 8px; font-size: 18px;">
               Try Jeeves Free for 7 Days
             </a>
           </div>
@@ -1067,7 +1067,7 @@ const CONVERSION_EMAILS = [
           </div>
           
           <div style="text-align: center; margin-top: 32px;">
-            <a href="https://thephototheologyapp.com/pricing?trial=true" style="display: inline-block; background: linear-gradient(90deg, #f5d742 0%, #4ecdc4 100%); color: #1a1a2e; padding: 18px 40px; text-decoration: none; font-weight: bold; border-radius: 8px; font-size: 18px;">
+            <a href="https://phototheologybible.com/pricing?trial=true" style="display: inline-block; background: linear-gradient(90deg, #f5d742 0%, #4ecdc4 100%); color: #1a1a2e; padding: 18px 40px; text-decoration: none; font-weight: bold; border-radius: 8px; font-size: 18px;">
               Start Your Transformation
             </a>
           </div>
@@ -1118,7 +1118,7 @@ const CONVERSION_EMAILS = [
           </div>
           
           <div style="text-align: center; margin-top: 32px;">
-            <a href="https://thephototheologyapp.com/pricing?trial=true" style="display: inline-block; background: linear-gradient(90deg, #f5d742 0%, #ff6b6b 100%); color: #1a1a2e; padding: 20px 48px; text-decoration: none; font-weight: bold; border-radius: 8px; font-size: 20px;">
+            <a href="https://phototheologybible.com/pricing?trial=true" style="display: inline-block; background: linear-gradient(90deg, #f5d742 0%, #ff6b6b 100%); color: #1a1a2e; padding: 20px 48px; text-decoration: none; font-weight: bold; border-radius: 8px; font-size: 20px;">
               Start Your Free Trial Now
             </a>
           </div>
@@ -1172,7 +1172,7 @@ const LOGIN_REMINDER_EMAIL = {
         </div>
         
         <div style="text-align: center; margin-top: 32px;">
-          <a href="https://thephototheologyapp.com/signup" style="display: inline-block; background: linear-gradient(90deg, #f5d742 0%, #ff6b6b 100%); color: #1a1a2e; padding: 18px 40px; text-decoration: none; font-weight: bold; border-radius: 8px; font-size: 18px;">
+          <a href="https://phototheologybible.com/signup" style="display: inline-block; background: linear-gradient(90deg, #f5d742 0%, #ff6b6b 100%); color: #1a1a2e; padding: 18px 40px; text-decoration: none; font-weight: bold; border-radius: 8px; font-size: 18px;">
             Create Your Account Now
           </a>
         </div>
@@ -1243,8 +1243,8 @@ serve(async (req) => {
     logStep("Request parsed", { campaignType, testMode, forceSend });
 
     // Resend requires a verified sending domain for production sends.
-    // Use a verified domain sender (default: support@thephototheologyapp.com).
-    const defaultFromAddress = "PhotoTheology <support@thephototheologyapp.com>";
+    // Use a verified domain sender (default: support@phototheologybible.com).
+    const defaultFromAddress = "PhotoTheology <support@phototheologybible.com>";
     const customFromEmail = Deno.env.get("RESEND_FROM_EMAIL");
     const fromAddress = customFromEmail
       ? `PhotoTheology <${customFromEmail}>`

@@ -93,7 +93,7 @@ serve(async (req) => {
       const resend = new Resend(RESEND_API_KEY);
       
       const emailResponse = await resend.emails.send({
-        from: "PhotoTheology <noreply@thephototheologyapp.com>",
+        from: "PhotoTheology <noreply@phototheologybible.com>",
         to: [testEmail],
         subject: `[TEST] ${subject}`,
         html: htmlContent,
@@ -170,7 +170,7 @@ serve(async (req) => {
       for (const email of batch) {
         try {
           const emailResponse = await resend.emails.send({
-            from: "PhotoTheology <noreply@thephototheologyapp.com>",
+            from: "PhotoTheology <noreply@phototheologybible.com>",
             to: [email],
             subject,
             html: htmlContent,

@@ -8,7 +8,7 @@ const corsHeaders = {
 };
 
 // Verified sender domain (Resend)
-const FROM_EMAIL = "Phototheology <noreply@thephototheologyapp.com>";
+const FROM_EMAIL = "Phototheology <noreply@phototheologybible.com>";
 
 
 interface EmailRequest {
