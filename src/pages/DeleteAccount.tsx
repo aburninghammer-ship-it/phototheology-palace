@@ -51,7 +51,7 @@ const DeleteAccount = () => {
       console.error('Error submitting deletion request:', error);
       toast({
         title: "Submission failed",
-        description: "Please email us directly at support@thephototheologyapp.com",
+        description: "Please email us directly at support@phototheologybible.com",
         variant: "destructive",
       });
     } finally {

@@ -275,7 +275,7 @@ serve(async (req) => {
         `).join('');
 
         const emailResponse = await resend.emails.send({
-          from: "Phototheology <noreply@thephototheologyapp.com>",
+          from: "Phototheology <noreply@phototheologybible.com>",
           to: [purchase.email],
           subject: `Your ${config.name} is Ready! 📖`,
           html: `
@@ -315,7 +315,7 @@ serve(async (req) => {
                   <h3 style="color: #1a1a2e; margin: 0 0 8px 0; font-size: 16px;">💡 What's Next?</h3>
                   <p style="color: #495057; margin: 0; font-size: 14px; line-height: 1.6;">
                     Ready to explore the entire Phototheology Palace? Start your 7-day free trial 
-                    at <a href="https://thephototheologyapp.com/pricing" style="color: #007bff;">thephototheologyapp.com/pricing</a>
+                    at <a href="https://phototheologybible.com/pricing" style="color: #007bff;">phototheologybible.com/pricing</a>
                   </p>
                 </div>
               </div>
@@ -325,7 +325,7 @@ serve(async (req) => {
                   The Phototheology App
                 </p>
                 <p style="color: #6c757d; margin: 0; font-size: 12px;">
-                  Questions? Reply to this email or contact support@thephototheologyapp.com
+                  Questions? Reply to this email or contact support@phototheologybible.com
                 </p>
               </div>
             </div>

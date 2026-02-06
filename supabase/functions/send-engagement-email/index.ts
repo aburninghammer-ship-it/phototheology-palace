@@ -126,7 +126,7 @@ const handler = async (req: Request): Promise<Response> => {
         const emailContent = generateEmailContent(campaign, profile, customData);
         
         const emailResponse = await resend.emails.send({
-          from: "Phototheology <noreply@thephototheologyapp.com>",
+          from: "Phototheology <noreply@phototheologybible.com>",
           to: [email],
           subject: campaign.subject,
           html: emailContent,

@@ -143,7 +143,7 @@ const handler = async (req: Request): Promise<Response> => {
     const customerName = name || email.split('@')[0];
 
     const emailResponse = await resend.emails.send({
-      from: "Phototheology <noreply@thephototheologyapp.com>",
+      from: "Phototheology <noreply@phototheologybible.com>",
       to: [email],
       subject: `Your ${productConfig.name} is Ready for Download! 📖`,
       html: `
@@ -177,7 +177,7 @@ const handler = async (req: Request): Promise<Response> => {
                 ${downloadLinksHtml}
               </table>
               <p style="color: #adb5bd; font-size: 12px; margin-top: 16px;">
-                Links expire in 7 days. Having trouble? Visit thephototheologyapp.com for support.
+                Links expire in 7 days. Having trouble? Visit phototheologybible.com for support.
               </p>
             </div>
 
@@ -186,7 +186,7 @@ const handler = async (req: Request): Promise<Response> => {
               <p style="color: #495057; margin: 0; font-size: 14px; line-height: 1.6;">
                 Ready to explore the entire Phototheology Palace? Start your 7-day free trial 
                 and unlock all 8 Floors, 40+ Rooms, and AI-guided study tools at 
-                <a href="https://thephototheologyapp.com/pricing" style="color: #007bff;">thephototheologyapp.com/pricing</a>
+                <a href="https://phototheologybible.com/pricing" style="color: #007bff;">phototheologybible.com/pricing</a>
               </p>
             </div>
           </div>
@@ -197,7 +197,8 @@ const handler = async (req: Request): Promise<Response> => {
               The Phototheology App
             </p>
             <p style="color: #6c757d; margin: 0; font-size: 12px;">
-              Questions? Reply to this email or contact support@thephototheologyapp.com
+              Questions? Reply to this email or contact support@phototheologybible.com
+            </p>
             </p>
           </div>
         </div>

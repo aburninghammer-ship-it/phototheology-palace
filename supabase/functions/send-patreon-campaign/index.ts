@@ -147,7 +147,7 @@ serve(async (req) => {
             "Content-Type": "application/json",
           },
           body: JSON.stringify(batch.map(email => ({
-            from: "PhotoTheology <support@thephototheologyapp.com>",
+            from: "PhotoTheology <support@phototheologybible.com>",
             to: [email],
             subject: subject,
             html: htmlContent,
@@ -186,7 +186,7 @@ serve(async (req) => {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            from: "PhotoTheology <support@thephototheologyapp.com>",
+            from: "PhotoTheology <support@phototheologybible.com>",
             to: [adminEmail],
             subject: `✅ Patreon Campaign Sent: "${subject}"`,
             html: `

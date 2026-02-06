@@ -115,7 +115,7 @@ const handler = async (req: Request): Promise<Response> => {
     ).join(" | ");
 
     const emailResponse = await resend.emails.send({
-      from: "Phototheology Notifications <noreply@thephototheologyapp.com>",
+      from: "Phototheology Notifications <noreply@phototheologybible.com>",
       to: ["aburninghammer@gmail.com"],
       subject: `📊 Active Subscriber Summary: ${subscriberDetails.length} Total Subscribers`,
       html: `

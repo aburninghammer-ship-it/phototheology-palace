@@ -212,7 +212,7 @@ serve(async (req) => {
 
       try {
         await resend.emails.send({
-          from: "Phototheology <noreply@thephototheologyapp.com>",
+          from: "Phototheology <noreply@phototheologybible.com>",
           to: [user.email],
           subject,
           html: `

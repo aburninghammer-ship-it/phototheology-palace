@@ -71,7 +71,7 @@ const handler = async (req: Request): Promise<Response> => {
 
       case "daily-challenge":
         emailConfig = {
-          from: "Phototheology <daily@thephototheologyapp.com>",
+          from: "Phototheology <daily@phototheologybible.com>",
           to: data.email,
           subject: `🎯 Your Daily Challenge for ${data.date}`,
           html: `
@@ -90,7 +90,7 @@ const handler = async (req: Request): Promise<Response> => {
 
       case "engagement":
         emailConfig = {
-          from: "Phototheology <hello@thephototheologyapp.com>",
+          from: "Phototheology <hello@phototheologybible.com>",
           to: data.email,
           subject: data.subject || "We miss you at Phototheology!",
           html: `
@@ -110,7 +110,7 @@ const handler = async (req: Request): Promise<Response> => {
 
       case "feedback":
         emailConfig = {
-          from: "Phototheology <feedback@thephototheologyapp.com>",
+          from: "Phototheology <feedback@phototheologybible.com>",
           to: ["aburninghammer@gmail.com"],
           subject: `💬 New Feedback from ${data.userName}`,
           html: `
@@ -141,7 +141,7 @@ const handler = async (req: Request): Promise<Response> => {
         if (authError || !user) throw new Error('Unauthorized');
 
         emailConfig = {
-          from: "Phototheology <invite@thephototheologyapp.com>",
+          from: "Phototheology <invite@phototheologybible.com>",
           to: data.recipientEmail,
           subject: `${data.senderName || 'Someone'} invited you to Phototheology!`,
           html: `
@@ -164,7 +164,7 @@ const handler = async (req: Request): Promise<Response> => {
 
       case "partner-nudge":
         emailConfig = {
-          from: "Phototheology <partners@thephototheologyapp.com>",
+          from: "Phototheology <partners@phototheologybible.com>",
           to: data.email,
           subject: `👥 Your study partner ${data.partnerName} is waiting!`,
           html: `
@@ -183,7 +183,7 @@ const handler = async (req: Request): Promise<Response> => {
 
       case "purchase-notification":
         emailConfig = {
-          from: "Phototheology <billing@thephototheologyapp.com>",
+          from: "Phototheology <billing@phototheologybible.com>",
           to: ["aburninghammer@gmail.com"],
           subject: `💰 New Purchase: ${data.amount} - ${data.userName}`,
           html: `

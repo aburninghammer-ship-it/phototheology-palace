@@ -115,7 +115,7 @@ serve(async (req) => {
        return null;
      };
 
-     const appBaseUrl = (getBaseUrlFromRequest(req) || Deno.env.get('PUBLIC_APP_URL') || 'https://thephototheologyapp.com').replace(/\/$/, '');
+     const appBaseUrl = (getBaseUrlFromRequest(req) || Deno.env.get('PUBLIC_APP_URL') || 'https://phototheologybible.com').replace(/\/$/, '');
      const joinLink = `${appBaseUrl}/join-church?code=${invitationCode}`;
     const expiresDate = new Date(expiresAt).toLocaleDateString('en-US', {
       weekday: 'long',
@@ -189,7 +189,7 @@ serve(async (req) => {
 
     const { data: emailData, error: resendError } = await withTimeout(
       resend.emails.send({
-        from: "Phototheology <noreply@thephototheologyapp.com>",
+        from: "Phototheology <noreply@phototheologybible.com>",
         to: [recipientEmail],
         subject: `🙏 You're Invited to Join ${churchName} on Phototheology!`,
         html: emailHtml,

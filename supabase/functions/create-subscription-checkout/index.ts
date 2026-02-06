@@ -84,7 +84,7 @@ async function sendPurchaseNotification(
       : null;
 
     await resend.emails.send({
-      from: "Phototheology Notifications <noreply@thephototheologyapp.com>",
+      from: "Phototheology Notifications <noreply@phototheologybible.com>",
       to: ["aburninghammer@gmail.com"],
       subject: `${tierEmoji} New Checkout Started: ${userName || userEmail} → ${formattedAmount}/${billingLabel}`,
       html: `
