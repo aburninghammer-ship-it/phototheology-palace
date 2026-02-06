@@ -143,7 +143,7 @@ const handler = async (req: Request): Promise<Response> => {
     const customerName = name || email.split('@')[0];
 
     const emailResponse = await resend.emails.send({
-      from: "Phototheology <noreply@phototheologybible.com>",
+      from: "Phototheology <noreply@thephototheologyapp.com>",
       to: [email],
       subject: `Your ${productConfig.name} is Ready for Download! 📖`,
       html: `

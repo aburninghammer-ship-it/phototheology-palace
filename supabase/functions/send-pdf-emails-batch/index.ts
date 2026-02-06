@@ -275,7 +275,7 @@ serve(async (req) => {
         `).join('');
 
         const emailResponse = await resend.emails.send({
-          from: "Phototheology <noreply@phototheologybible.com>",
+          from: "Phototheology <noreply@thephototheologyapp.com>",
           to: [purchase.email],
           subject: `Your ${config.name} is Ready! 📖`,
           html: `

@@ -86,7 +86,7 @@ async function sendTrialNotification(
       : null;
 
     await resend.emails.send({
-      from: "Phototheology Notifications <noreply@phototheologybible.com>",
+      from: "Phototheology Notifications <noreply@thephototheologyapp.com>",
       to: ["aburninghammer@gmail.com"],
       subject: `🆓 New Trial Started: ${userName || userEmail} → ${tierLabel} (${formattedAmount}/${billingLabel} after trial)`,
       html: `
