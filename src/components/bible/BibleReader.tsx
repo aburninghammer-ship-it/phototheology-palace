@@ -555,7 +555,16 @@ export const BibleReader = () => {
           </Card>
           
           {/* Bottom Navigation */}
-          <div className="flex justify-center pt-4">
+          <div className="flex justify-center gap-3 pt-4">
+            <Button
+              onClick={() => navigateChapter("prev")}
+              disabled={chapter <= 1}
+              variant="outline"
+              className="shadow-lg hover:shadow-xl transition-all"
+            >
+              <ChevronLeft className="h-4 w-4 mr-2" />
+              Previous Chapter
+            </Button>
             <Button
               onClick={() => navigateChapter("next")}
               className="gradient-palace text-white shadow-lg hover:shadow-xl transition-all"

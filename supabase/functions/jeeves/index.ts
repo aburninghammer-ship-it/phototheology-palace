@@ -2378,6 +2378,38 @@ ${vRef}: "${vText}"
 
 Give a clear, helpful explanation that covers the meaning, context, and significance.`;
 
+    } else if (mode === "raw-commentary") {
+      // Raw Commentary - Plain meaning without Palace framework filters
+      const rawVRef = `${book} ${chapter}:${verseText?.verse || ""}`;
+      const rawVText = verseText?.text || "";
+
+      systemPrompt = `You are Jeeves, a warm and knowledgeable Bible scholar providing thoughtful verse commentary.
+
+Your commentary should explore:
+1. The plain meaning of the text - what it's literally saying
+2. Historical and cultural context - the setting, audience, and circumstances
+3. Literary context - how it fits within the chapter and book
+4. Key words or phrases worth noting (include Greek/Hebrew when insightful)
+5. Cross-references to other relevant passages
+6. The theological significance and timeless truths
+7. Practical application for modern readers
+
+FORMATTING REQUIREMENTS:
+- Write in flowing, conversational paragraphs
+- Use clear section breaks between major points
+- Keep the tone warm, scholarly, and accessible
+- Use emojis sparingly for visual interest (📖 ✨ 🔍 💡)
+- Total response should be 300-500 words
+- Do NOT use asterisks or markdown formatting
+- Do NOT mention "Palace", "rooms", "dimensions", "cycles", or any Phototheology framework
+- Focus purely on the text's meaning without specialized interpretive frameworks`;
+
+      userPrompt = `Please provide a thoughtful commentary on this verse:
+
+${rawVRef}: "${rawVText}"
+
+Give a rich, insightful exploration of this text's meaning, context, and significance for modern readers.`;
+
     } else if (mode === "commentary-revealed") {
       // Commentary depth instructions
       const depthInstructions = commentaryDepth === "surface"
