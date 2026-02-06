@@ -26,7 +26,7 @@ const sendAdminNotification = async (
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        from: "PhotoTheology <support@phototheologybible.com>",
+        from: "PhotoTheology <support@thephototheologyapp.com>",
         to: [adminEmail],
         subject,
         html,

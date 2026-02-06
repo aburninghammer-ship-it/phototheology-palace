@@ -155,7 +155,7 @@ serve(async (req) => {
     `;
 
     const { data: emailData, error: resendError } = await resend.emails.send({
-      from: "Phototheology <noreply@phototheologybible.com>",
+      from: "Phototheology <noreply@thephototheologyapp.com>",
       to: recipientEmails,
       subject: isLifetime 
         ? "🎉 You've Been Invited to Phototheology - Lifetime Access!" 
