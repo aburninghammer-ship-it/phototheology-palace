@@ -1,6 +1,7 @@
 import { useLayoutEffect, useRef, useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Building2, Sparkles, Users, User, CreditCard, LogOut, MessageCircle, BookOpen, Calendar, Image, Search, Video, Sword, Crown, Shield, Brain, Lightbulb, Zap, Trophy, MessageSquare, Target, StickyNote, Radio, Church, GraduationCap, Award, Gamepad2, BarChart3, Archive, Library, Layers, Network, Home, Heart, Gem, FileImage, FolderOpen } from "lucide-react";
+import { DraggableNavTabs } from "@/components/navigation/DraggableNavTabs";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
 import { useActiveUsers } from "@/hooks/useActiveUsers";
@@ -390,12 +391,15 @@ export const Navigation = () => {
           </div>
           
           {/* Horizontal Tab Navigation - Second row, only for authenticated users, hidden on mobile */}
-          {user && (
+          {user && <DraggableNavTabs />}
+
+          {/* Legacy static tabs - replaced by DraggableNavTabs above */}
+          {false && user && (
           <div className="border-t border-border/40 hidden md:block">
               <div className="max-w-7xl mx-auto overflow-x-auto touch-pan-x [&::-webkit-scrollbar]:h-1.5 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-primary/40 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:hover:bg-primary/60" style={{ scrollbarWidth: 'thin' }}>
                 <div className="flex items-center gap-1 py-2 px-2 flex-nowrap min-w-max">
-                  <Link 
-                    to="/palace" 
+                  <Link
+                    to="/palace"
                     className={`px-3 py-1.5 text-sm font-medium rounded-md transition-all whitespace-nowrap flex items-center gap-1 bg-gradient-to-r from-amber-500/10 to-orange-500/10 border border-amber-500/20 hover:from-amber-500/20 hover:to-orange-500/20 ${isActiveTab('/palace') ? 'shadow-[0_0_12px_2px_rgba(245,158,11,0.5)] border-amber-400/60' : ''}`}
                   >
                     <Building2 className="h-3.5 w-3.5 text-amber-500" />

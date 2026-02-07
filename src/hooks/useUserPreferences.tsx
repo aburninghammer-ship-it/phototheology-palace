@@ -13,6 +13,8 @@ interface UserPreferences {
   study_buddy_theme: "dark" | "light"; // Study Buddy page theme
   suite_mode: "guest_house" | "full_suite"; // Guest House (simplified) or Full Suite
   has_seen_mode_selector: boolean; // Whether user has seen the mode selection modal
+  pinned_nav_tabs: string[]; // Array of tab IDs that are pinned (shown first)
+  nav_tab_order: string[]; // Custom order of remaining tabs
 }
 
 const defaultPreferences: UserPreferences = {
@@ -26,6 +28,8 @@ const defaultPreferences: UserPreferences = {
   study_buddy_theme: "dark",
   suite_mode: "full_suite",
   has_seen_mode_selector: false,
+  pinned_nav_tabs: [], // No pinned tabs by default
+  nav_tab_order: [], // Use default order
 };
 
 interface UserPreferencesContextValue {
@@ -83,6 +87,8 @@ export const UserPreferencesProvider = ({
             study_buddy_theme: ((data as any).study_buddy_theme as any) ?? defaultPreferences.study_buddy_theme,
             suite_mode: ((data as any).suite_mode as any) ?? defaultPreferences.suite_mode,
             has_seen_mode_selector: ((data as any).has_seen_mode_selector as any) ?? defaultPreferences.has_seen_mode_selector,
+            pinned_nav_tabs: ((data as any).pinned_nav_tabs as string[]) ?? defaultPreferences.pinned_nav_tabs,
+            nav_tab_order: ((data as any).nav_tab_order as string[]) ?? defaultPreferences.nav_tab_order,
           });
         } else {
           // Create default preferences in the backend and use local defaults
@@ -125,6 +131,8 @@ export const UserPreferencesProvider = ({
             study_buddy_theme: next.study_buddy_theme,
             suite_mode: next.suite_mode,
             has_seen_mode_selector: next.has_seen_mode_selector,
+            pinned_nav_tabs: next.pinned_nav_tabs,
+            nav_tab_order: next.nav_tab_order,
             updated_at: new Date().toISOString(),
           },
           {
