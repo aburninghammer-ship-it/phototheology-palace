@@ -155,22 +155,54 @@ export function useSparks({
 
   // Generate spark based on content
   const generateSpark = useCallback(async (content: string, verseReference?: string) => {
-    if (!user?.id || preferences.intensity === 'off') return null;
-    if (sparks.length >= maxSparks) return null;
+    // Debug logging
+    console.log('[Sparks] Attempting generation...', {
+      hasUser: !!user?.id,
+      intensity: preferences.intensity,
+      sparkCount: sparks.length,
+      maxSparks,
+      contentLength: content.length
+    });
+
+    if (!user?.id) {
+      console.log('[Sparks] Skipped: No user');
+      return null;
+    }
+    if (preferences.intensity === 'off') {
+      console.log('[Sparks] Skipped: Intensity is off');
+      return null;
+    }
+    if (sparks.length >= maxSparks) {
+      console.log('[Sparks] Skipped: Max sparks reached');
+      return null;
+    }
 
     // Rate limiting
     const now = Date.now();
-    if (now - lastGenerationTime.current < debounceMs) return null;
+    if (now - lastGenerationTime.current < debounceMs) {
+      console.log('[Sparks] Skipped: Rate limited');
+      return null;
+    }
 
     // Suppress if user dismissed 2+ sparks this session
-    if (dismissedCount.current >= 2) return null;
+    if (dismissedCount.current >= 2) {
+      console.log('[Sparks] Skipped: Too many dismissals');
+      return null;
+    }
 
     // Content length check for notes
-    if (surface === 'notes' && content.length < 280) return null;
+    if (surface === 'notes' && content.length < 280) {
+      console.log('[Sparks] Skipped: Notes content too short');
+      return null;
+    }
 
     // Content length check for study surface
-    if (surface === 'study' && content.length < 100) return null;
+    if (surface === 'study' && content.length < 100) {
+      console.log('[Sparks] Skipped: Study content too short');
+      return null;
+    }
 
+    console.log('[Sparks] Passed all checks, generating...');
     lastGenerationTime.current = now;
     setGenerating(true);
 
@@ -217,7 +249,17 @@ export function useSparks({
         }
       });
 
-      if (error) throw error;
+      if (error) {
+        console.error('[Sparks] Edge function error:', error);
+        // Only show toast for non-rate-limit errors
+        if (!error.message?.includes('rate') && !error.message?.includes('limit')) {
+          toast.error('Spark generation unavailable', {
+            description: 'The AI service may be temporarily down. Try again later.',
+            duration: 5000
+          });
+        }
+        throw error;
+      }
 
       if (data?.spark) {
         // Client-side deduplication check before saving
