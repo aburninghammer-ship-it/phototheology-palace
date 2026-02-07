@@ -50,6 +50,7 @@ import {
 import { StudySimmerWrapper } from "@/components/simmer/StudySimmerWrapper";
 import { formatDistanceToNow, format } from "date-fns";
 import { getCardById, SparkCard } from "@/data/studyIdeasLibrary";
+import { SelectableText } from "@/components/ui/selectable-text";
 import { useGeneratedSparkCards, GeneratedSparkCard } from "@/hooks/useGeneratedSparkCards";
 
 // Types for Jeeves analysis
@@ -1597,12 +1598,17 @@ Jeeves sees your notes and will spark connections, suggest PT rooms, source clai
                                       </Badge>
                                     )}
                                   </div>
-                                  <p className="text-sm text-amber-100">{spark.insight}</p>
-                                  {spark.verses && spark.verses.length > 0 && (
-                                    <p className="text-xs text-amber-200/60 mt-1">
-                                      {spark.verses.join(", ")}
-                                    </p>
-                                  )}
+                                  <SelectableText
+                                    onAddToNotes={(text) => setNotes(prev => prev + (prev ? "\n\n" : "") + text)}
+                                    sourceLabel={`${spark.type} Spark`}
+                                  >
+                                    <p className="text-sm text-amber-100 cursor-text">{spark.insight}</p>
+                                    {spark.verses && spark.verses.length > 0 && (
+                                      <p className="text-xs text-amber-200/60 mt-1">
+                                        {spark.verses.join(", ")}
+                                      </p>
+                                    )}
+                                  </SelectableText>
                                   {spark.explorePrompt && (
                                     <Button
                                       size="sm"

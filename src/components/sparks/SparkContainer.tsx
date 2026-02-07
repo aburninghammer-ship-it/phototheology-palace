@@ -11,6 +11,7 @@ interface SparkContainerProps {
   onSave: (sparkId: string) => void;
   onDismiss: (sparkId: string) => void;
   onExplore: (sparkId: string) => Promise<Spark | undefined>;
+  onAddToNotes?: (text: string) => void;
   position?: 'margin' | 'inline' | 'floating';
   className?: string;
   maxDisplay?: number; // 0 or undefined = show all sparks
@@ -22,6 +23,7 @@ export function SparkContainer({
   onSave,
   onDismiss,
   onExplore,
+  onAddToNotes,
   position = 'floating',
   className,
   maxDisplay
@@ -109,6 +111,7 @@ export function SparkContainer({
               onExplore={() => handleExplore(openSpark.id)}
               onSave={() => handleSave(openSpark.id)}
               onDismiss={() => handleDismiss(openSpark.id)}
+              onAddToNotes={onAddToNotes}
             />
           </div>
         </>
