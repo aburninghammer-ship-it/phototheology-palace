@@ -44,12 +44,11 @@ serve(async (req) => {
 
     const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
 
-    // Find plans that need days generated
+    // Find plans that need days generated - include both active plans AND failed plans for retry
     let query = supabase
       .from("devotional_plans")
-      .select("id, user_id, title, theme, format, duration, study_style, started_at")
-      .eq("status", "active")
-      .not("started_at", "is", null)
+      .select("id, user_id, title, theme, format, duration, study_style, started_at, status")
+      .in("status", ["active", "failed"]) // Also retry failed plans
       .order("created_at", { ascending: false });
 
     // Support both planId (single) and planIds (array)
@@ -98,14 +97,32 @@ serve(async (req) => {
 
         const existingDayNumbers = new Set(existingDays?.map(d => d.day_number) || []);
         const totalDays = plan.duration || 7;
-        
+
+        // For failed plans without started_at, set it now
+        if (!plan.started_at && plan.status === "failed") {
+          const now = new Date().toISOString();
+          await supabase
+            .from("devotional_plans")
+            .update({ started_at: now, status: "active" })
+            .eq("id", plan.id);
+          plan.started_at = now;
+          console.log(`Plan ${plan.id}: Set started_at for failed plan and reset to active`);
+        }
+
+        // Skip plans that still don't have started_at (draft plans that somehow got in)
+        if (!plan.started_at) {
+          console.log(`Plan ${plan.id}: No started_at, skipping`);
+          results.push(planResult);
+          continue;
+        }
+
         // Calculate which day is currently unlocked based on started_at
         const startedAt = new Date(plan.started_at);
         const now = new Date();
         const daysSinceStart = Math.floor((now.getTime() - startedAt.getTime()) / (1000 * 60 * 60 * 24));
         const unlockedDay = Math.min(daysSinceStart + 1, totalDays);
 
-        console.log(`Plan ${plan.id}: ${existingDayNumbers.size} days exist, unlocked up to day ${unlockedDay} of ${totalDays}`);
+        console.log(`Plan ${plan.id}: ${existingDayNumbers.size} days exist, unlocked up to day ${unlockedDay} of ${totalDays}, status: ${plan.status}`);
 
         // Find missing days that should be unlocked
         const missingDays: number[] = [];
@@ -197,6 +214,15 @@ serve(async (req) => {
 
           // Small delay between days to avoid rate limiting
           await new Promise(resolve => setTimeout(resolve, 1000));
+        }
+
+        // If we generated days for a failed plan, mark it as active
+        if (planResult.daysGenerated > 0 && plan.status === "failed") {
+          await supabase
+            .from("devotional_plans")
+            .update({ status: "active" })
+            .eq("id", plan.id);
+          console.log(`Plan ${plan.id}: Recovered from failed status, now active`);
         }
 
       } catch (err: any) {

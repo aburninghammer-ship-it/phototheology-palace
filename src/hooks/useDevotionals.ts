@@ -163,8 +163,8 @@ export function useDevotionals() {
 
         if (error) {
           // Check for specific error types
-          if (error.message?.includes("FunctionsFetchError") || error.message?.includes("Failed to send")) {
-            throw new Error("The devotional is still being generated. This can take 2-5 minutes for longer devotionals. Please check back in a moment.");
+          if (error.message?.includes("FunctionsFetchError") || error.message?.includes("Failed to send") || error.message?.includes("network")) {
+            throw new Error("Day 1 generation timed out. The system will automatically retry. Please check back in a few minutes.");
           }
           throw error;
         }
@@ -172,8 +172,8 @@ export function useDevotionals() {
         return data;
       } catch (err: any) {
         // Handle timeout/network errors more gracefully
-        if (err.name === "FunctionsFetchError" || err.message?.includes("Failed to send")) {
-          throw new Error("Generation is in progress. For 40-day devotionals, this can take several minutes. Please wait and refresh the page.");
+        if (err.name === "FunctionsFetchError" || err.message?.includes("Failed to send") || err.message?.includes("network")) {
+          throw new Error("Day 1 generation timed out. The system will automatically retry. Please check back in a few minutes.");
         }
         throw err;
       }
@@ -181,15 +181,17 @@ export function useDevotionals() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["devotional-plans"] });
       toast({
-        title: "Devotional Generated!",
-        description: "Your personalized devotional is ready.",
+        title: "Day 1 Generated!",
+        description: "Your devotional has started. Subsequent days will unlock daily.",
       });
     },
     onError: (error) => {
+      // Only show error toast for actual failures, not timeouts
+      const isTimeout = error.message?.includes("timed out") || error.message?.includes("retry");
       toast({
-        title: "Generation In Progress",
+        title: isTimeout ? "Generation Started" : "Generation Failed",
         description: error.message,
-        variant: "default",
+        variant: isTimeout ? "default" : "destructive",
       });
     },
   });
