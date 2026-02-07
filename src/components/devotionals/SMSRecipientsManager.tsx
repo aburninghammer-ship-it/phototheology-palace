@@ -1,3 +1,4 @@
+// SMS Recipients Manager - Updated 2026-02-07
 import { useState } from "react";
 import { MessageSquare, Plus, Trash2, Phone, User, ToggleLeft, ToggleRight, Loader2, CheckCircle2, XCircle, Clock, Send } from "lucide-react";
 import { Button } from "@/components/ui/button";
