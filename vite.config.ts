@@ -11,6 +11,8 @@ export default defineConfig(({ mode }) => ({
     host: "::",
     port: 8080,
   },
+  // Reduce build output noise (helps surface the actual error in CI logs)
+  logLevel: "warn",
   plugins: [
     react(),
     mode === "development" && componentTagger(),
@@ -106,6 +108,8 @@ export default defineConfig(({ mode }) => ({
   },
   build: {
     cssCodeSplit: true,
+    // Avoid spending time computing gzip sizes during CI publish builds.
+    reportCompressedSize: false,
     rollupOptions: {
       output: {
         chunkFileNames: 'assets/js/[name]-[hash].js',
