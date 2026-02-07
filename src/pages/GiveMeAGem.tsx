@@ -4,6 +4,7 @@ import { Navigation } from "@/components/Navigation";
 import { SimplifiedNav } from "@/components/SimplifiedNav";
 import { useUserPreferences } from "@/hooks/useUserPreferences";
 import { useAuth } from "@/hooks/useAuth";
+import { useGemLimit } from "@/hooks/useGemLimit";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -155,6 +156,7 @@ export default function GiveMeAGem() {
   const navigate = useNavigate();
   const { user, loading: authLoading } = useAuth();
   const { preferences } = useUserPreferences();
+  const { isSabbath, canCreateGem, getLimitMessage } = useGemLimit();
 
   // Selection state (before generating)
   const [selectedStyle, setSelectedStyle] = useState("random");
@@ -202,6 +204,17 @@ export default function GiveMeAGem() {
   }
 
   const handleGenerateGem = async () => {
+    // Check Sabbath or daily limit before calling the API
+    if (isSabbath) {
+      toast.info(getLimitMessage(), { icon: "🌙" });
+      return;
+    }
+
+    if (!canCreateGem) {
+      toast.info(getLimitMessage());
+      return;
+    }
+
     setIsGenerating(true);
     setGem(null);
     setIsSaved(false);
