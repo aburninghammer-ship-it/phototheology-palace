@@ -3,7 +3,7 @@ import { BubbleMenu } from '@tiptap/react/menus';
 import StarterKit from '@tiptap/starter-kit';
 import Link from '@tiptap/extension-link';
 import Placeholder from '@tiptap/extension-placeholder';
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Badge } from '@/components/ui/badge';
@@ -29,6 +29,52 @@ import {
 } from 'lucide-react';
 import { searchStrongs, StrongsEntry, getStrongsEntry } from '@/services/strongsApi';
 import { StrongsModal } from '@/components/bible/StrongsModal';
+import { toast } from 'sonner';
+
+// Bible verse reference pattern - matches "Book Chapter:Verse" or "Book Chapter:Verse-Verse"
+const VERSE_PATTERN = /\b((?:1|2|3|I|II|III)?\s*[A-Za-z]+)\s+(\d+):(\d+)(?:-(\d+))?\b/g;
+
+// Cache for expanded verses to avoid re-fetching
+const expandedVerseCache = new Map<string, string>();
+
+// Fetch verse text from Bible API
+async function fetchVerseText(book: string, chapter: number, startVerse: number, endVerse?: number): Promise<string | null> {
+  try {
+    const reference = endVerse
+      ? `${book} ${chapter}:${startVerse}-${endVerse}`
+      : `${book} ${chapter}:${startVerse}`;
+
+    const cacheKey = reference.toLowerCase();
+    if (expandedVerseCache.has(cacheKey)) {
+      return expandedVerseCache.get(cacheKey)!;
+    }
+
+    const apiRef = endVerse
+      ? `${book}+${chapter}:${startVerse}-${endVerse}`
+      : `${book}+${chapter}:${startVerse}`;
+
+    const response = await fetch(`https://bible-api.com/${encodeURIComponent(apiRef)}?translation=kjv`);
+    if (!response.ok) return null;
+
+    const data = await response.json();
+
+    let verseText = '';
+    if (data.verses && Array.isArray(data.verses)) {
+      verseText = data.verses.map((v: any) => v.text?.trim()).filter(Boolean).join(' ');
+    } else if (data.text) {
+      verseText = data.text.trim();
+    }
+
+    if (verseText) {
+      expandedVerseCache.set(cacheKey, verseText);
+      return verseText;
+    }
+    return null;
+  } catch (error) {
+    console.error('Error fetching verse:', error);
+    return null;
+  }
+}
 
 interface SermonTextEditorProps {
   content: string;
@@ -49,6 +95,9 @@ export const SermonTextEditor = ({
   const [showStrongsModal, setShowStrongsModal] = useState(false);
   const [selectedStrongsNumber, setSelectedStrongsNumber] = useState('');
   const [lookupPopoverOpen, setLookupPopoverOpen] = useState(false);
+  const [isExpandingVerse, setIsExpandingVerse] = useState(false);
+  const verseExpandTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const lastExpandedRef = useRef<string>(''); // Track last expanded to avoid duplicates
 
   const editor = useEditor({
     extensions: [
@@ -72,6 +121,14 @@ export const SermonTextEditor = ({
     onUpdate: ({ editor }) => {
       const html = editor.getHTML();
       onChange(html);
+
+      // Debounced verse expansion - wait for user to stop typing
+      if (verseExpandTimeoutRef.current) {
+        clearTimeout(verseExpandTimeoutRef.current);
+      }
+      verseExpandTimeoutRef.current = setTimeout(() => {
+        expandVerseReferences(editor);
+      }, 1500); // Wait 1.5 seconds after typing stops
     },
     onSelectionUpdate: ({ editor }) => {
       const { from, to } = editor.state.selection;
@@ -98,6 +155,99 @@ export const SermonTextEditor = ({
       editor.setEditable(!disabled);
     }
   }, [disabled, editor]);
+
+  // Cleanup timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (verseExpandTimeoutRef.current) {
+        clearTimeout(verseExpandTimeoutRef.current);
+      }
+    };
+  }, []);
+
+  // Expand verse references in the editor
+  const expandVerseReferences = useCallback(async (editorInstance: any) => {
+    if (!editorInstance || isExpandingVerse) return;
+
+    const html = editorInstance.getHTML();
+    const textContent = editorInstance.getText();
+
+    // Find all verse references in the text
+    const matches = [...textContent.matchAll(VERSE_PATTERN)];
+    if (matches.length === 0) return;
+
+    // Find verses that aren't already expanded (not followed by a quote)
+    for (const match of matches) {
+      const fullMatch = match[0];
+      const book = match[1].trim();
+      const chapter = parseInt(match[2]);
+      const startVerse = parseInt(match[3]);
+      const endVerse = match[4] ? parseInt(match[4]) : undefined;
+
+      // Create a unique key for this reference
+      const refKey = `${book} ${chapter}:${startVerse}${endVerse ? `-${endVerse}` : ''}`.toLowerCase();
+
+      // Skip if we just expanded this reference
+      if (lastExpandedRef.current === refKey) continue;
+
+      // Check if this reference is already followed by verse text (already expanded)
+      const refIndex = html.indexOf(fullMatch);
+      if (refIndex === -1) continue;
+
+      // Look for a blockquote immediately following the reference
+      const afterRef = html.substring(refIndex + fullMatch.length, refIndex + fullMatch.length + 100);
+      if (afterRef.includes('<blockquote>') || afterRef.includes('—') || afterRef.includes('"')) {
+        continue; // Already expanded
+      }
+
+      // Expand this verse
+      setIsExpandingVerse(true);
+      lastExpandedRef.current = refKey;
+
+      try {
+        const verseText = await fetchVerseText(book, chapter, startVerse, endVerse);
+
+        if (verseText && editorInstance) {
+          // Find the position of this reference in the editor
+          const doc = editorInstance.state.doc;
+          let pos = -1;
+
+          doc.descendants((node: any, nodePos: number) => {
+            if (pos !== -1) return false;
+            if (node.isText && node.text?.includes(fullMatch)) {
+              pos = nodePos + node.text.indexOf(fullMatch);
+              return false;
+            }
+          });
+
+          if (pos !== -1) {
+            const formattedRef = `${book} ${chapter}:${startVerse}${endVerse ? `-${endVerse}` : ''}`;
+
+            // Create the expanded content with blockquote
+            const expandedContent = `<strong>${formattedRef}</strong><blockquote>"${verseText}"</blockquote>`;
+
+            // Replace just the reference with the expanded version
+            editorInstance
+              .chain()
+              .focus()
+              .setTextSelection({ from: pos, to: pos + fullMatch.length })
+              .deleteSelection()
+              .insertContent(expandedContent)
+              .run();
+
+            toast.success(`Populated ${formattedRef}`, { duration: 2000 });
+          }
+        }
+      } catch (error) {
+        console.error('Error expanding verse:', error);
+      } finally {
+        setIsExpandingVerse(false);
+      }
+
+      // Only expand one verse at a time
+      break;
+    }
+  }, [isExpandingVerse]);
 
   // Look up the selected word in Strong's concordance
   const lookupWord = useCallback(async () => {
