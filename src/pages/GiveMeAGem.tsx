@@ -416,6 +416,40 @@ export default function GiveMeAGem() {
             Discover hidden connections in Scripture. Choose your gem type and
             depth, then let Jeeves reveal the treasure.
           </p>
+          
+          {/* Gem Schedule Info */}
+          <div className="mt-4 inline-flex items-center gap-2 px-4 py-2 rounded-full bg-emerald-100/50 dark:bg-emerald-900/30 border border-emerald-200/50 dark:border-emerald-800/50 text-sm">
+            <span className="text-muted-foreground">Weekly rhythm:</span>
+            <div className="flex items-center gap-1">
+              {['S', 'M', 'T', 'W', 'T', 'F', 'S'].map((day, i) => {
+                const gems = i === 5 ? 2 : i === 6 ? 0 : 1;
+                const isToday = i === new Date().getDay();
+                const isSabbathDay = i === 6;
+                return (
+                  <div 
+                    key={i}
+                    className={cn(
+                      "w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-semibold transition-all",
+                      isToday && "ring-2 ring-emerald-500 ring-offset-1 ring-offset-background",
+                      isSabbathDay 
+                        ? "bg-indigo-100 dark:bg-indigo-900/50 text-indigo-600 dark:text-indigo-300" 
+                        : gems === 2 
+                          ? "bg-amber-100 dark:bg-amber-900/50 text-amber-600 dark:text-amber-300"
+                          : "bg-emerald-100 dark:bg-emerald-900/50 text-emerald-600 dark:text-emerald-300"
+                    )}
+                    title={isSabbathDay ? "Sabbath Rest (0 gems)" : gems === 2 ? "Friday (2 gems)" : "1 gem"}
+                  >
+                    {isSabbathDay ? "🌙" : gems}
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+          {isSabbath && (
+            <p className="mt-3 text-indigo-600 dark:text-indigo-400 text-sm font-medium">
+              🌙 It's Sabbath — a day for rest and reflection. Gem discovery resumes tomorrow!
+            </p>
+          )}
         </div>
 
         {/* Options Panel */}
