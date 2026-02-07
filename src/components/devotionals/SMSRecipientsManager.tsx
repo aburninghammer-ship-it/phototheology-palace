@@ -61,7 +61,7 @@ export function SMSRecipientsManager({ planId }: SMSRecipientsManagerProps) {
   const [newSendHour, setNewSendHour] = useState(8);
   const [selectedPlanId, setSelectedPlanId] = useState(planId || "");
 
-  const { recipients, isLoading, addRecipient, deleteRecipient, toggleActive, activeCount, totalSent, todaysSends, todayLoading } = useSMSRecipients(planId);
+  const { recipients, isLoading, addRecipient, deleteRecipient, toggleActive, activeCount, totalSent, todaysSends, todayLoading, sendHistory } = useSMSRecipients(planId);
   const { plans } = useDevotionals();
 
   const activePlans = plans?.filter(p => p.status === "active") || [];
@@ -187,6 +187,72 @@ export function SMSRecipientsManager({ planId }: SMSRecipientsManagerProps) {
                       {send.status === 'delivered' ? 'Delivered' :
                        send.status === 'sent' ? 'Sent' :
                        send.status === 'queued' ? 'Queued' :
+                       send.status === 'failed' ? 'Failed' :
+                       send.status || 'Pending'}
+                    </Badge>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
+        {/* Recent SMS History (shows past sends with dates) */}
+        {sendHistory && sendHistory.length > 0 && (
+          <div className="border rounded-lg overflow-hidden">
+            <div className="px-4 py-3 bg-muted/50 border-b">
+              <h4 className="font-medium flex items-center gap-2">
+                <Clock className="h-4 w-4" />
+                Recent SMS History
+              </h4>
+            </div>
+            <div className="divide-y max-h-[300px] overflow-y-auto">
+              {sendHistory.slice(0, 20).map((send) => {
+                const recipient = recipients?.find(r =>
+                  send.phone_number.includes(r.phone_number) ||
+                  r.phone_number.includes(send.phone_number.slice(-10))
+                );
+                const displayName = recipient?.name || send.phone_number;
+
+                const statusColor =
+                  send.status === 'delivered' ? 'text-emerald-600 dark:text-emerald-400' :
+                  send.status === 'sent' ? 'text-blue-600 dark:text-blue-400' :
+                  send.status === 'failed' || send.status === 'undelivered' ? 'text-red-600 dark:text-red-400' :
+                  'text-muted-foreground';
+
+                const StatusIcon =
+                  send.status === 'delivered' ? CheckCircle2 :
+                  send.status === 'sent' ? CheckCircle2 :
+                  send.status === 'failed' || send.status === 'undelivered' ? XCircle :
+                  Clock;
+
+                return (
+                  <div key={send.id} className="px-4 py-2 flex items-center justify-between hover:bg-muted/30">
+                    <div className="flex items-center gap-3">
+                      <div className={`${statusColor}`}>
+                        <StatusIcon className="h-4 w-4" />
+                      </div>
+                      <div>
+                        <p className="text-sm font-medium">
+                          {displayName}
+                        </p>
+                        <p className="text-xs text-muted-foreground">
+                          {format(new Date(send.sent_at), "MMM d, yyyy 'at' h:mm a")}
+                          {send.day_number && ` • Day ${send.day_number}`}
+                        </p>
+                      </div>
+                    </div>
+                    <Badge
+                      variant="outline"
+                      className={`text-xs ${
+                        send.status === 'delivered' ? 'border-emerald-300 text-emerald-700 dark:border-emerald-700 dark:text-emerald-300' :
+                        send.status === 'sent' ? 'border-blue-300 text-blue-700 dark:border-blue-700 dark:text-blue-300' :
+                        send.status === 'failed' ? 'border-red-300 text-red-700 dark:border-red-700 dark:text-red-300' :
+                        ''
+                      }`}
+                    >
+                      {send.status === 'delivered' ? 'Delivered' :
+                       send.status === 'sent' ? 'Sent' :
                        send.status === 'failed' ? 'Failed' :
                        send.status || 'Pending'}
                     </Badge>
