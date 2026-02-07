@@ -65,10 +65,10 @@ function SortableTab({ tab, isActive, isPinned, onPin, onUnpin, isDragging }: So
       className={cn(
         "px-3 py-1.5 text-sm font-medium rounded-md transition-all whitespace-nowrap flex items-center gap-1",
         `bg-gradient-to-r ${tab.gradient.from} ${tab.gradient.to} border ${tab.gradient.border}`,
-        `hover:${tab.gradient.from.replace('/10', '/20')} hover:${tab.gradient.to.replace('/10', '/20')}`,
-        isActive && `shadow-[0_0_12px_2px_${tab.gradient.glow}] border-opacity-60`,
+        isActive && "border-opacity-60",
         isDragging && "opacity-50 scale-105 shadow-lg z-50"
       )}
+      style={isActive ? { boxShadow: `0 0 12px 2px ${tab.gradient.glow}` } : undefined}
     >
       {!isPinned && (
         <span {...listeners} className="cursor-grab active:cursor-grabbing mr-1 opacity-50 hover:opacity-100">
