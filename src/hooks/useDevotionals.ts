@@ -186,12 +186,14 @@ export function useDevotionals() {
       });
     },
     onError: (error) => {
-      // Only show error toast for actual failures, not timeouts
-      const isTimeout = error.message?.includes("timed out") || error.message?.includes("retry");
+      // For timeouts, show an encouraging message since the system will auto-retry
+      const isTimeout = error.message?.includes("timed out") || error.message?.includes("retry") || error.message?.includes("network");
       toast({
-        title: isTimeout ? "Generation Started" : "Generation Failed",
-        description: error.message,
-        variant: isTimeout ? "default" : "destructive",
+        title: isTimeout ? "Taking Longer Than Expected" : "Generation Issue",
+        description: isTimeout 
+          ? "Your devotional is being prepared. Please wait a moment and try again."
+          : error.message,
+        variant: "default",
       });
     },
   });
