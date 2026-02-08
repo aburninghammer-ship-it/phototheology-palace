@@ -357,10 +357,10 @@ export function BibleStudyConnectionModal({
             </Button>
             <Button
               onClick={handleSubmit}
-              disabled={!explanation.trim() || timeLeft === 0}
+              disabled={!explanation.trim()}
               className="flex-1"
             >
-              {timeLeft === 0 ? "Time's Up!" : 'Submit Explanation'}
+              {explanation.trim() ? 'Submit' : 'Enter an explanation'}
             </Button>
           </div>
         </div>

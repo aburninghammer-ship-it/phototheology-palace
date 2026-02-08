@@ -266,10 +266,10 @@ export function ConnectionModal({
             </Button>
             <Button
               onClick={handleSubmit}
-              disabled={potentialConnections === 0 || timeLeft === 0}
+              disabled={potentialConnections === 0}
               className="flex-1"
             >
-              {timeLeft === 0 ? 'Time\'s Up!' : `Submit (${potentialConnections} connection${potentialConnections !== 1 ? 's' : ''})`}
+              {potentialConnections > 0 ? `Submit (${potentialConnections} connection${potentialConnections !== 1 ? 's' : ''})` : 'Explain a connection'}
             </Button>
           </div>
         </div>
