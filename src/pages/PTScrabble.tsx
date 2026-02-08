@@ -1,5 +1,5 @@
-// PT Scrabble Page - Solo Bible Study + Multiplayer Modes
-// Choose between solo practice mode or real-time multiplayer
+// Scrabble PT - Solo and Multiplayer Modes
+// Play solo or real-time multiplayer with PT principles
 
 import { useState, useCallback, useMemo } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
@@ -286,35 +286,35 @@ export default function PTScrabble() {
 
           <Card className="border-2 border-primary/20">
             <CardHeader className="text-center space-y-4">
-              <div className="text-6xl mx-auto">📖</div>
+              <div className="text-6xl mx-auto">🎮</div>
               <CardTitle className="text-4xl bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent">
-                PT Bible Study Scrabble
+                Scrabble PT
               </CardTitle>
               <CardDescription className="text-lg max-w-2xl mx-auto">
-                Choose a Bible verse, then build connections using Phototheology principles! 
-                Apply the PT Palace framework to understand Scripture more deeply.
+                Build connections using Phototheology principles on a growing board.
+                Place cards, explain connections, and score points!
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
               {/* Rules summary */}
               <div className="grid md:grid-cols-3 gap-4 text-center">
                 <div className="p-4 bg-muted/50 rounded-lg">
-                  <Book className="h-8 w-8 mx-auto mb-2 text-primary" />
-                  <h3 className="font-semibold">1. Choose a Verse</h3>
+                  <Gamepad2 className="h-8 w-8 mx-auto mb-2 text-primary" />
+                  <h3 className="font-semibold">1. Place Cards</h3>
                   <p className="text-sm text-muted-foreground">
-                    Select a Bible passage to study deeply
+                    Select a PT principle card and place it on the board
                   </p>
                 </div>
                 <div className="p-4 bg-muted/50 rounded-lg">
                   <BookOpen className="h-8 w-8 mx-auto mb-2 text-primary" />
-                  <h3 className="font-semibold">2. Apply Principles</h3>
+                  <h3 className="font-semibold">2. Make Connections</h3>
                   <p className="text-sm text-muted-foreground">
-                    Place PT room cards and explain how each applies
+                    Explain how your card connects to adjacent cards
                   </p>
                 </div>
                 <div className="p-4 bg-muted/50 rounded-lg">
                   <Cross className="h-8 w-8 mx-auto mb-2 text-primary" />
-                  <h3 className="font-semibold">3. Find Christ</h3>
+                  <h3 className="font-semibold">3. Score Points</h3>
                   <p className="text-sm text-muted-foreground">
                     Earn bonus points for Christ-centered connections
                   </p>
@@ -329,7 +329,7 @@ export default function PTScrabble() {
                   className="bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600"
                 >
                   <Gamepad2 className="mr-2 h-5 w-5" />
-                  Solo Bible Study
+                  Solo Game
                 </Button>
                 <Button
                   size="lg"
@@ -599,13 +599,13 @@ export default function PTScrabble() {
             <ArrowLeft className="mr-2 h-4 w-4" />
             Menu
           </Button>
-          <h1 className="text-lg font-bold hidden sm:block">PT Bible Study</h1>
+          <h1 className="text-lg font-bold hidden sm:block">Scrabble PT</h1>
           <div className="flex items-center gap-4">
             <div className="text-sm text-muted-foreground">
               Score: <span className="font-bold text-primary">{score}</span>
             </div>
             <Button variant="outline" size="sm" onClick={handleNewGame}>
-              New Study
+              New Game
             </Button>
           </div>
         </div>
