@@ -48,7 +48,7 @@ export function ConnectionModal({
   position,
   adjacentCards,
 }: ConnectionModalProps) {
-  const [timeLeft, setTimeLeft] = useState(SCRABBLE_SCORING.TIMER_SECONDS);
+  const [timeLeft, setTimeLeft] = useState<number>(SCRABBLE_SCORING.TIMER_SECONDS);
   const [connections, setConnections] = useState<Record<string, string>>({});
   const [isChristConnection, setIsChristConnection] = useState(false);
 
