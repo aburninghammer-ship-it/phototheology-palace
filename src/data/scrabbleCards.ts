@@ -1,8 +1,8 @@
 // PT Scrabble Card Database
-// Generated from Palace Principles (rooms + sub-principles)
+// Generated from authentic Palace Principles ONLY
+// NOTE: Sub-principles removed to prevent hallucinated content
 
 import { palaceFloors } from './palaceData';
-import { ROOM_SUB_PRINCIPLES } from '@/components/mind-map/data/roomSubPrinciples';
 import type { ScrabbleCard } from '@/types/scrabble';
 
 // Helper to extract tags from room purpose and method
@@ -46,7 +46,7 @@ function extractTags(purpose: string, method?: string): string[] {
   return [...new Set(tags)]; // Remove duplicates
 }
 
-// Generate room cards from palaceData
+// Generate room cards from palaceData (authentic rooms only)
 function generateRoomCards(): ScrabbleCard[] {
   const cards: ScrabbleCard[] = [];
 
@@ -72,54 +72,17 @@ function generateRoomCards(): ScrabbleCard[] {
   return cards;
 }
 
-// Generate sub-principle cards from roomSubPrinciples
-function generateSubPrincipleCards(): ScrabbleCard[] {
-  const cards: ScrabbleCard[] = [];
-
-  // Find floor number for each room
-  const roomFloorMap: Record<string, { floor: number; category: string }> = {};
-  palaceFloors.forEach(floor => {
-    floor.rooms.forEach(room => {
-      roomFloorMap[room.id] = { floor: floor.number, category: floor.name };
-    });
-  });
-
-  Object.entries(ROOM_SUB_PRINCIPLES).forEach(([roomId, roomData]) => {
-    const floorInfo = roomFloorMap[roomId] || { floor: 0, category: 'Unknown' };
-
-    roomData.subPrinciples.forEach(sp => {
-      cards.push({
-        id: sp.id,
-        code: sp.shortName,
-        name: sp.name,
-        floor: floorInfo.floor,
-        category: roomData.roomName,
-        icon: sp.icon || 'Circle',
-        tags: [
-          floorInfo.category.toLowerCase(),
-          `floor-${floorInfo.floor}`,
-          roomId,
-          ...extractTags(sp.description),
-        ],
-        description: sp.description,
-      });
-    });
-  });
-
-  return cards;
-}
-
-// Additional special cards (dimensions, cycles, etc.)
+// Additional special cards (dimensions, cycles, etc.) - from canonical PT structure
 function generateSpecialCards(): ScrabbleCard[] {
   const cards: ScrabbleCard[] = [];
 
-  // 5 Dimensions
+  // 5 Dimensions (from Dimensions Room - Floor 4)
   const dimensions = [
-    { id: 'dim-1d', code: '1D', name: 'Literal Dimension', description: 'Plain historical/grammatical meaning', tags: ['dimension', 'literal', 'history'] },
-    { id: 'dim-2d', code: '2D', name: 'Christ Dimension', description: 'Points to Christ relationship', tags: ['dimension', 'christology', 'typology'] },
-    { id: 'dim-3d', code: '3D', name: 'Personal Dimension', description: 'Individual application', tags: ['dimension', 'application', 'personal'] },
-    { id: 'dim-4d', code: '4D', name: 'Church Dimension', description: 'Corporate body application', tags: ['dimension', 'ecclesiology', 'church'] },
-    { id: 'dim-5d', code: '5D', name: 'Heaven Dimension', description: 'Celestial realm, throne room', tags: ['dimension', 'heaven', 'eschatology'] },
+    { id: 'dim-literal', code: 'Literal', name: 'Literal Dimension', description: 'Plain historical/grammatical meaning', tags: ['dimension', 'literal', 'history'], icon: 'FileText' },
+    { id: 'dim-christ', code: 'Christ', name: 'Christ Dimension', description: 'Points to Christ relationship', tags: ['dimension', 'christology', 'typology'], icon: 'Cross' },
+    { id: 'dim-me', code: 'Me', name: 'Personal Dimension', description: 'Individual application', tags: ['dimension', 'application', 'personal'], icon: 'User' },
+    { id: 'dim-church', code: 'Church', name: 'Church Dimension', description: 'Corporate body application', tags: ['dimension', 'ecclesiology', 'church'], icon: 'Users' },
+    { id: 'dim-heaven', code: 'Heaven', name: 'Heaven Dimension', description: 'Celestial realm, throne room', tags: ['dimension', 'heaven', 'eschatology'], icon: 'Cloud' },
   ];
 
   dimensions.forEach(d => {
@@ -128,18 +91,18 @@ function generateSpecialCards(): ScrabbleCard[] {
       code: d.code,
       name: d.name,
       floor: 4,
-      category: 'Dimensions',
-      icon: 'Layers',
+      category: 'Dimensions Room',
+      icon: d.icon,
       tags: d.tags,
       description: d.description,
     });
   });
 
-  // 3 Heavens
+  // 3 Heavens (from Three Heavens Floor - Floor 6)
   const heavens = [
-    { id: 'heaven-1h', code: '1H', name: 'First Heaven', description: 'Atmospheric realm', tags: ['heaven', 'atmosphere', 'creation'] },
-    { id: 'heaven-2h', code: '2H', name: 'Second Heaven', description: 'Cosmic realm, stars', tags: ['heaven', 'cosmic', 'stars'] },
-    { id: 'heaven-3h', code: '3H', name: 'Third Heaven', description: 'Divine throne room', tags: ['heaven', 'throne', 'paradise'] },
+    { id: 'heaven-1h', code: '1H', name: 'First Heaven', description: 'DoL¹/NE¹ - Babylon destruction → Cyrusic restoration', tags: ['heaven', 'judgment', 'restoration', 'babylon'], icon: 'CloudSun' },
+    { id: 'heaven-2h', code: '2H', name: 'Second Heaven', description: 'DoL²/NE² - 70 AD → New-Covenant/heavenly order', tags: ['heaven', 'new-covenant', 'church', 'apostolic'], icon: 'Cloud' },
+    { id: 'heaven-3h', code: '3H', name: 'Third Heaven', description: 'DoL³/NE³ - Final judgment → Literal new creation', tags: ['heaven', 'throne', 'paradise', 'new-earth'], icon: 'Sparkles' },
   ];
 
   heavens.forEach(h => {
@@ -149,22 +112,22 @@ function generateSpecialCards(): ScrabbleCard[] {
       name: h.name,
       floor: 6,
       category: 'Three Heavens',
-      icon: 'Cloud',
+      icon: h.icon,
       tags: h.tags,
       description: h.description,
     });
   });
 
-  // 8 Cycles
+  // 8 Cycles (from Cycles - Floor 6)
   const cycles = [
-    { id: 'cycle-ad', code: '@Ad', name: 'Adamic Cycle', description: 'Creation, Fall, Seed promise', tags: ['cycle', 'creation', 'adam', 'fall', 'seed'] },
-    { id: 'cycle-no', code: '@No', name: 'Noahic Cycle', description: 'Judgment, ark, new beginning', tags: ['cycle', 'judgment', 'noah', 'flood', 'covenant'] },
-    { id: 'cycle-ab', code: '@Ab', name: 'Abrahamic Cycle', description: 'Covenant, faith, promised seed', tags: ['cycle', 'covenant', 'abraham', 'faith', 'promise'] },
-    { id: 'cycle-mo', code: '@Mo', name: 'Mosaic Cycle', description: 'Exodus, law, tabernacle', tags: ['cycle', 'exodus', 'moses', 'law', 'sanctuary'] },
-    { id: 'cycle-da', code: '@Da', name: 'Davidic Cycle', description: 'Kingdom, throne, Messiah', tags: ['cycle', 'kingdom', 'david', 'throne', 'messiah'] },
-    { id: 'cycle-cy', code: '@Cy', name: 'Cyrusic Cycle', description: 'Captivity, return, restoration', tags: ['cycle', 'exile', 'cyrus', 'restoration', 'return'] },
-    { id: 'cycle-sp', code: '@Sp', name: 'Spirit Cycle', description: 'Pentecost, church, mission', tags: ['cycle', 'pentecost', 'spirit', 'church', 'mission'] },
-    { id: 'cycle-re', code: '@Re', name: 'Restoration Cycle', description: 'Second Coming, new earth', tags: ['cycle', 'restoration', 'second-coming', 'new-earth', 'eschatology'] },
+    { id: 'cycle-ad', code: '@Ad', name: 'Adamic Cycle', description: 'Creation, Fall, Seed promise (Gen 3:15)', tags: ['cycle', 'creation', 'adam', 'fall', 'seed'], icon: 'Apple' },
+    { id: 'cycle-no', code: '@No', name: 'Noahic Cycle', description: 'Judgment, ark, rainbow covenant', tags: ['cycle', 'judgment', 'noah', 'flood', 'covenant'], icon: 'Ship' },
+    { id: 'cycle-ab', code: '@Ab', name: 'Abrahamic Cycle', description: 'Covenant, faith, promised seed', tags: ['cycle', 'covenant', 'abraham', 'faith', 'promise'], icon: 'Star' },
+    { id: 'cycle-mo', code: '@Mo', name: 'Mosaic Cycle', description: 'Exodus, law, tabernacle nation', tags: ['cycle', 'exodus', 'moses', 'law', 'sanctuary'], icon: 'Mountain' },
+    { id: 'cycle-cy', code: '@Cy', name: 'Cyrusic Cycle', description: 'Exile, return, temple rebuilt', tags: ['cycle', 'exile', 'cyrus', 'restoration', 'return'], icon: 'Building' },
+    { id: 'cycle-cyc', code: '@CyC', name: 'Cyrus-Christ Cycle', description: 'Type meets antitype, shadow meets substance', tags: ['cycle', 'fulfillment', 'christ', 'antitype'], icon: 'Target' },
+    { id: 'cycle-sp', code: '@Sp', name: 'Spirit Cycle', description: 'Pentecost, church age, global mission', tags: ['cycle', 'pentecost', 'spirit', 'church', 'mission'], icon: 'Flame' },
+    { id: 'cycle-re', code: '@Re', name: 'Remnant Cycle', description: 'End-time witness, judgment, Second Coming', tags: ['cycle', 'remnant', 'second-coming', 'revelation', 'eschatology'], icon: 'Crown' },
   ];
 
   cycles.forEach(c => {
@@ -174,20 +137,20 @@ function generateSpecialCards(): ScrabbleCard[] {
       name: c.name,
       floor: 6,
       category: 'Cycles',
-      icon: 'RefreshCw',
+      icon: c.icon,
       tags: c.tags,
       description: c.description,
     });
   });
 
-  // Time Zones
+  // Time Zones (from Time Zone Room - Floor 4)
   const timeZones = [
-    { id: 'tz-hp', code: 'H-Past', name: 'Heaven Past', description: 'What heaven did before', tags: ['timezone', 'heaven', 'past'] },
-    { id: 'tz-hn', code: 'H-Now', name: 'Heaven Now', description: 'What heaven is doing now', tags: ['timezone', 'heaven', 'present'] },
-    { id: 'tz-hf', code: 'H-Future', name: 'Heaven Future', description: 'What heaven will do', tags: ['timezone', 'heaven', 'future', 'eschatology'] },
-    { id: 'tz-ep', code: 'E-Past', name: 'Earth Past', description: 'Earthly events that led to this', tags: ['timezone', 'earth', 'past', 'history'] },
-    { id: 'tz-en', code: 'E-Now', name: 'Earth Now', description: 'Current earthly situation', tags: ['timezone', 'earth', 'present', 'application'] },
-    { id: 'tz-ef', code: 'E-Future', name: 'Earth Future', description: 'Future result on earth', tags: ['timezone', 'earth', 'future', 'eschatology'] },
+    { id: 'tz-hp', code: 'H-Past', name: 'Heaven Past', description: 'What heaven did before', tags: ['timezone', 'heaven', 'past'], icon: 'History' },
+    { id: 'tz-hn', code: 'H-Now', name: 'Heaven Now', description: 'What heaven is doing now', tags: ['timezone', 'heaven', 'present'], icon: 'Clock' },
+    { id: 'tz-hf', code: 'H-Future', name: 'Heaven Future', description: 'What heaven will do', tags: ['timezone', 'heaven', 'future', 'eschatology'], icon: 'Hourglass' },
+    { id: 'tz-ep', code: 'E-Past', name: 'Earth Past', description: 'Earthly events that led to this', tags: ['timezone', 'earth', 'past', 'history'], icon: 'MapPin' },
+    { id: 'tz-en', code: 'E-Now', name: 'Earth Now', description: 'Current earthly situation', tags: ['timezone', 'earth', 'present', 'application'], icon: 'Globe' },
+    { id: 'tz-ef', code: 'E-Future', name: 'Earth Future', description: 'Future result on earth', tags: ['timezone', 'earth', 'future', 'eschatology'], icon: 'Sunrise' },
   ];
 
   timeZones.forEach(tz => {
@@ -196,8 +159,8 @@ function generateSpecialCards(): ScrabbleCard[] {
       code: tz.code,
       name: tz.name,
       floor: 4,
-      category: 'Time Zones',
-      icon: 'Clock',
+      category: 'Time Zone Room',
+      icon: tz.icon,
       tags: tz.tags,
       description: tz.description,
     });
@@ -206,15 +169,15 @@ function generateSpecialCards(): ScrabbleCard[] {
   return cards;
 }
 
-// All Scrabble cards combined
+// All Scrabble cards combined - ONLY authentic Palace principles
 let _allCards: ScrabbleCard[] | null = null;
 
 export function getAllScrabbleCards(): ScrabbleCard[] {
   if (!_allCards) {
     _allCards = [
-      ...generateRoomCards(),
-      ...generateSubPrincipleCards(),
-      ...generateSpecialCards(),
+      ...generateRoomCards(),      // Authentic rooms from palaceData.ts
+      ...generateSpecialCards(),   // Dimensions, Heavens, Cycles, Time Zones
+      // NOTE: Sub-principle cards removed to prevent hallucinated content
     ];
   }
   return _allCards;

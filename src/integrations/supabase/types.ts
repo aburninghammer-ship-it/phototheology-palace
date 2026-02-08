@@ -11632,6 +11632,95 @@ export type Database = {
         }
         Relationships: []
       }
+      scheduled_game_rsvps: {
+        Row: {
+          created_at: string
+          id: string
+          scheduled_game_id: string
+          status: string
+          updated_at: string
+          user_id: string
+          user_name: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          scheduled_game_id: string
+          status?: string
+          updated_at?: string
+          user_id: string
+          user_name: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          scheduled_game_id?: string
+          status?: string
+          updated_at?: string
+          user_id?: string
+          user_name?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "scheduled_game_rsvps_scheduled_game_id_fkey"
+            columns: ["scheduled_game_id"]
+            isOneToOne: false
+            referencedRelation: "scheduled_games"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      scheduled_games: {
+        Row: {
+          actual_game_id: string | null
+          created_at: string
+          description: string | null
+          game_mode: string
+          game_type: string
+          host_name: string
+          host_user_id: string
+          id: string
+          max_players: number
+          room_code: string | null
+          scheduled_at: string
+          status: string
+          title: string | null
+          verse_reference: string | null
+        }
+        Insert: {
+          actual_game_id?: string | null
+          created_at?: string
+          description?: string | null
+          game_mode?: string
+          game_type?: string
+          host_name: string
+          host_user_id: string
+          id?: string
+          max_players?: number
+          room_code?: string | null
+          scheduled_at: string
+          status?: string
+          title?: string | null
+          verse_reference?: string | null
+        }
+        Update: {
+          actual_game_id?: string | null
+          created_at?: string
+          description?: string | null
+          game_mode?: string
+          game_type?: string
+          host_name?: string
+          host_user_id?: string
+          id?: string
+          max_players?: number
+          room_code?: string | null
+          scheduled_at?: string
+          status?: string
+          title?: string | null
+          verse_reference?: string | null
+        }
+        Relationships: []
+      }
       sequence_items: {
         Row: {
           book: string

@@ -6,6 +6,9 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './useAuth';
 import { toast } from 'sonner';
 
+// Type cast for tables not yet in generated types
+const db = supabase as any;
+
 export interface ScheduledGame {
   id: string;
   host_user_id: string;
@@ -74,7 +77,7 @@ export function useScheduledGames(): UseScheduledGamesReturn {
       setIsLoading(true);
 
       // Get scheduled games that haven't passed
-      const { data: games, error: gamesError } = await supabase
+      const { data: games, error: gamesError } = await db
         .from('scheduled_games')
         .select('*')
         .gte('scheduled_at', new Date().toISOString())
@@ -87,14 +90,14 @@ export function useScheduledGames(): UseScheduledGamesReturn {
       const enrichedGames: ScheduledGame[] = await Promise.all(
         (games || []).map(async (game) => {
           // Get RSVP count
-          const { count } = await supabase
+          const { count } = await db
             .from('scheduled_game_rsvps')
             .select('*', { count: 'exact', head: true })
             .eq('scheduled_game_id', game.id)
             .eq('status', 'going');
 
           // Get user's RSVP
-          const { data: myRsvp } = await supabase
+          const { data: myRsvp } = await db
             .from('scheduled_game_rsvps')
             .select('status')
             .eq('scheduled_game_id', game.id)
@@ -157,7 +160,7 @@ export function useScheduledGames(): UseScheduledGamesReturn {
     try {
       const hostName = user.email?.split('@')[0] || 'Player';
 
-      const { data: game, error } = await supabase
+      const { data: game, error } = await db
         .from('scheduled_games')
         .insert({
           host_user_id: user.id,
@@ -176,7 +179,7 @@ export function useScheduledGames(): UseScheduledGamesReturn {
       if (error) throw error;
 
       // Auto-RSVP the host as going
-      await supabase
+      await db
         .from('scheduled_game_rsvps')
         .insert({
           scheduled_game_id: game.id,
@@ -204,7 +207,7 @@ export function useScheduledGames(): UseScheduledGamesReturn {
     try {
       const userName = user.email?.split('@')[0] || 'Player';
 
-      const { error } = await supabase
+      const { error } = await db
         .from('scheduled_game_rsvps')
         .upsert({
           scheduled_game_id: gameId,
@@ -233,7 +236,7 @@ export function useScheduledGames(): UseScheduledGamesReturn {
     if (!user) return false;
 
     try {
-      const { error } = await supabase
+      const { error } = await db
         .from('scheduled_game_rsvps')
         .delete()
         .eq('scheduled_game_id', gameId)
@@ -254,7 +257,7 @@ export function useScheduledGames(): UseScheduledGamesReturn {
     if (!user) return false;
 
     try {
-      const { error } = await supabase
+      const { error } = await db
         .from('scheduled_games')
         .update({ status: 'cancelled' })
         .eq('id', gameId)
@@ -279,7 +282,7 @@ export function useScheduledGames(): UseScheduledGamesReturn {
     if (!user) return false;
 
     try {
-      const { error } = await supabase
+      const { error } = await db
         .from('scheduled_games')
         .update({
           status: 'started',
@@ -301,7 +304,7 @@ export function useScheduledGames(): UseScheduledGamesReturn {
   // Get RSVPs for a specific game
   const getGameRSVPs = useCallback(async (gameId: string): Promise<GameRSVP[]> => {
     try {
-      const { data, error } = await supabase
+      const { data, error } = await db
         .from('scheduled_game_rsvps')
         .select('*')
         .eq('scheduled_game_id', gameId)
