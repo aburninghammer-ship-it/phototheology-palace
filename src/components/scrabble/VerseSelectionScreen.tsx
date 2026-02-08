@@ -1,9 +1,9 @@
 // PT Scrabble Verse Selection Screen
 // Select a seed verse/story to start Bible study scrabble game
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useMemo } from 'react';
 import { motion } from 'framer-motion';
-import { Book, Search, Sparkles, BookOpen, ArrowRight, History, Star } from 'lucide-react';
+import { Book, Search, Sparkles, BookOpen, ArrowRight, Star } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -27,17 +27,84 @@ interface VerseSelectionScreenProps {
   onBack: () => void;
 }
 
-// Popular seed verses for quick selection
-const POPULAR_VERSES = [
+// Large pool of seed verses for randomized selection
+const ALL_POPULAR_VERSES = [
+  // Gospel & Love
   { ref: 'John 3:16', label: 'God\'s Love' },
+  { ref: 'Romans 5:8', label: 'God\'s Love Demonstrated' },
+  { ref: 'John 15:13', label: 'Greatest Love' },
+  { ref: '1 John 4:7-8', label: 'Love from God' },
+  
+  // Creation & Origins
   { ref: 'Genesis 1:1', label: 'Creation' },
+  { ref: 'Genesis 1:26-27', label: 'Image of God' },
+  { ref: 'John 1:1-14', label: 'The Word Made Flesh' },
+  { ref: 'Colossians 1:15-17', label: 'Christ the Creator' },
+  
+  // Types & Shadows
   { ref: 'Exodus 12:1-13', label: 'Passover Lamb' },
+  { ref: 'Genesis 22:1-14', label: 'Abraham\'s Sacrifice' },
+  { ref: 'Numbers 21:4-9', label: 'Bronze Serpent' },
+  { ref: 'Jonah 1:17-2:10', label: 'Sign of Jonah' },
+  
+  // Suffering Servant
   { ref: 'Isaiah 53:5-6', label: 'Suffering Servant' },
+  { ref: 'Isaiah 53:1-12', label: 'Full Suffering Servant' },
+  { ref: 'Psalm 22:1-18', label: 'Messianic Psalm' },
+  { ref: 'Isaiah 9:6-7', label: 'Prince of Peace' },
+  
+  // Shepherd & Refuge
   { ref: 'Psalm 23:1-6', label: 'The Good Shepherd' },
+  { ref: 'John 10:11-18', label: 'I Am the Good Shepherd' },
+  { ref: 'Ezekiel 34:11-16', label: 'God Seeks His Sheep' },
+  { ref: 'Psalm 91:1-4', label: 'Under His Wings' },
+  
+  // Prophecy
   { ref: 'Daniel 2:31-45', label: 'Nebuchadnezzar\'s Dream' },
+  { ref: 'Daniel 7:13-14', label: 'Son of Man' },
   { ref: 'Revelation 14:6-12', label: 'Three Angels' },
+  { ref: 'Daniel 9:24-27', label: 'Seventy Weeks' },
+  
+  // Commission & Mission
   { ref: 'Matthew 28:18-20', label: 'Great Commission' },
+  { ref: 'Acts 1:8', label: 'Witnesses to the Ends' },
+  { ref: 'Isaiah 6:1-8', label: 'Here Am I, Send Me' },
+  { ref: 'Romans 10:13-15', label: 'Beautiful Feet' },
+  
+  // Sanctuary
+  { ref: 'Hebrews 9:11-14', label: 'Greater Tabernacle' },
+  { ref: 'Exodus 25:8-9', label: 'Build Me a Sanctuary' },
+  { ref: 'Hebrews 4:14-16', label: 'Our High Priest' },
+  { ref: 'Revelation 11:19', label: 'Ark in Heaven' },
+  
+  // Faith & Trust
+  { ref: 'Hebrews 11:1-6', label: 'Faith Defined' },
+  { ref: 'Romans 8:28', label: 'All Things Work Together' },
+  { ref: 'Proverbs 3:5-6', label: 'Trust in the Lord' },
+  { ref: 'Jeremiah 29:11', label: 'Plans for Hope' },
+  
+  // Salvation
+  { ref: 'Ephesians 2:8-10', label: 'Saved by Grace' },
+  { ref: 'Titus 3:4-7', label: 'Washing of Regeneration' },
+  { ref: 'Romans 6:23', label: 'Gift of God' },
+  { ref: 'Acts 4:12', label: 'No Other Name' },
+  
+  // Second Coming
+  { ref: 'John 14:1-3', label: 'I Will Come Again' },
+  { ref: '1 Thessalonians 4:16-17', label: 'Caught Up Together' },
+  { ref: 'Revelation 22:12-14', label: 'Behold I Come Quickly' },
+  { ref: 'Matthew 24:30-31', label: 'Coming in Clouds' },
 ];
+
+// Shuffle array using Fisher-Yates algorithm
+function shuffleArray<T>(array: T[]): T[] {
+  const shuffled = [...array];
+  for (let i = shuffled.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+  }
+  return shuffled;
+}
 
 // Parse a scripture reference string
 function parseReference(ref: string): { book: string; chapter: number; verseStart: number; verseEnd?: number } | null {
@@ -63,6 +130,9 @@ export function VerseSelectionScreen({ onVerseSelected, onBack }: VerseSelection
   const [customText, setCustomText] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [fetchedVerse, setFetchedVerse] = useState<SelectedVerse | null>(null);
+
+  // Randomize popular verses on each mount (empty deps = once per component mount)
+  const popularVerses = useMemo(() => shuffleArray(ALL_POPULAR_VERSES).slice(0, 8), []);
 
   const handleFetchVerse = useCallback(async (ref: string) => {
     const parsed = parseReference(ref);
@@ -188,7 +258,7 @@ export function VerseSelectionScreen({ onVerseSelected, onBack }: VerseSelection
                 Select a popular passage to get started quickly
               </p>
               <div className="grid grid-cols-2 gap-2">
-                {POPULAR_VERSES.map(({ ref, label }) => (
+                {popularVerses.map(({ ref, label }) => (
                   <motion.button
                     key={ref}
                     onClick={() => handleQuickSelect(ref)}
