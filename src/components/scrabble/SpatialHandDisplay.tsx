@@ -72,10 +72,10 @@ export function SpatialHandDisplay({
       </div>
 
       {/* Instruction - different for first card vs subsequent */}
-      <div className="text-center text-sm text-muted-foreground mb-2">
+      <div className="text-center text-sm text-muted-foreground mb-2 px-4">
         {cards[0]?.isFirstCard
           ? "Pick any card to start! Explain how it applies to the verse."
-          : "Tap a card to place it and explain the connection"}
+          : "Build on the previous insight — connect your new principle to what was just shared"}
       </div>
 
       {/* Spatial card layout - arranged in an arc */}
