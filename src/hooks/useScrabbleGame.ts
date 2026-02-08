@@ -4,6 +4,7 @@
 
 import { useState, useCallback } from 'react';
 import { toast } from 'sonner';
+import { useAuth } from './useAuth';
 import type {
   ScrabbleGame,
   ScrabblePlayer,
@@ -68,6 +69,7 @@ function generateRoomCode(): string {
  * Note: Multiplayer database tables not yet created
  */
 export function useScrabbleGame(_gameId?: string): UseScrabbleGameReturn {
+  const { user } = useAuth();
   const [game, setGame] = useState<ScrabbleGame | null>(null);
   const [players, setPlayers] = useState<ScrabblePlayer[]>([]);
   const [pendingMoves, setPendingMoves] = useState<ScrabbleMove[]>([]);
@@ -98,7 +100,7 @@ export function useScrabbleGame(_gameId?: string): UseScrabbleGameReturn {
       const newGame: ScrabbleGame = {
         id: gameId,
         roomCode,
-        hostUserId: 'local-user',
+        hostUserId: user?.id || 'local-user',
         status: 'waiting',
         gameMode,
         maxPlayers,
@@ -113,11 +115,11 @@ export function useScrabbleGame(_gameId?: string): UseScrabbleGameReturn {
       };
 
       const localPlayer: ScrabblePlayer = {
-        id: 'local-player',
+        id: `player-${user?.id || 'local'}`,
         gameId,
-        userId: 'local-user',
+        userId: user?.id || 'local-user',
         teamId: null,
-        displayName: 'You',
+        displayName: user?.user_metadata?.full_name || user?.email?.split('@')[0] || 'You',
         avatarUrl: null,
         hand: [],
         score: 0,

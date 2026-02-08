@@ -174,17 +174,17 @@ export function GameLobby({
             {/* Start button (host only) */}
             {isHost && (
               <Button
-                className="w-full"
+                className="w-full bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700"
                 size="lg"
                 onClick={onStartGame}
-                disabled={players.length < 2 || isLoading}
+                disabled={isLoading}
               >
                 {isLoading ? (
                   <Loader2 className="h-4 w-4 animate-spin mr-2" />
                 ) : (
                   <Play className="h-4 w-4 mr-2" />
                 )}
-                {players.length < 2 ? 'Need at least 2 players' : 'Start Game'}
+                Start Game {players.length === 1 ? '(Solo)' : `(${players.length} players)`}
               </Button>
             )}
 
