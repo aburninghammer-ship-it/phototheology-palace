@@ -74,7 +74,7 @@ function SortableTab({ tab, isActive, isPinned, onPin, onUnpin, isDragging, isAn
     }
   };
 
-  // Wrapper style for the sortable container
+  // Wrapper style for sortable container transform
   const wrapperStyle: React.CSSProperties = {
     transform: CSS.Transform.toString(transform),
     transition,
