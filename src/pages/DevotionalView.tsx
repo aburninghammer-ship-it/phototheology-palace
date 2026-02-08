@@ -229,23 +229,31 @@ export default function DevotionalView() {
                 </>
               ) : plan.status === "failed" ? (
                 <>
-                  <div className="mx-auto w-20 h-20 rounded-full bg-gradient-to-br from-rose-400 to-red-400 flex items-center justify-center mb-6 shadow-xl">
-                    <AlertCircle className="h-10 w-10 text-white" />
+                  <div className="mx-auto w-20 h-20 rounded-full bg-gradient-to-br from-amber-400 to-orange-400 flex items-center justify-center mb-6 shadow-xl">
+                    <RefreshCw className="h-10 w-10 text-white" />
                   </div>
-                  <h3 className="text-2xl font-bold mb-2 bg-gradient-to-r from-rose-600 to-red-600 bg-clip-text text-transparent">
-                    Generation Failed
+                  <h3 className="text-2xl font-bold mb-2 bg-gradient-to-r from-amber-600 to-orange-600 bg-clip-text text-transparent">
+                    Generation Timed Out
                   </h3>
-                  <p className="text-muted-foreground mb-6 max-w-md mx-auto">
-                    Something went wrong while generating your devotional. This can happen with longer devotionals. Click below to try again.
+                  <p className="text-muted-foreground mb-4 max-w-md mx-auto">
+                    Day 1 generation took longer than expected. This occasionally happens with longer or more personalized devotionals.
+                  </p>
+                  <p className="text-sm text-muted-foreground mb-6 max-w-md mx-auto">
+                    Click below to try again. The system will retry with optimized settings.
                   </p>
                   <div className="space-y-4">
                     <Button
                       onClick={handleGenerate}
+                      disabled={isGenerating}
                       size="lg"
-                      className="bg-gradient-to-r from-rose-500 to-red-500 hover:from-rose-600 hover:to-red-600"
+                      className="bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600"
                     >
-                      <RefreshCw className="h-5 w-5 mr-2" />
-                      Retry Generation
+                      {isGenerating ? (
+                        <Loader2 className="h-5 w-5 mr-2 animate-spin" />
+                      ) : (
+                        <RefreshCw className="h-5 w-5 mr-2" />
+                      )}
+                      {isGenerating ? "Generating..." : "Retry Generation"}
                     </Button>
                   </div>
                 </>
