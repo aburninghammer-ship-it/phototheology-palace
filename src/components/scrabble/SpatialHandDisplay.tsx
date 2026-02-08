@@ -12,6 +12,7 @@ export interface CardWithPosition {
   card: ScrabbleCard;
   position: BoardPosition;
   direction: string; // For display label
+  isFirstCard?: boolean; // True if board is empty - any card can go first
 }
 
 interface SpatialHandDisplayProps {
@@ -70,9 +71,11 @@ export function SpatialHandDisplay({
         </div>
       </div>
 
-      {/* Instruction */}
+      {/* Instruction - different for first card vs subsequent */}
       <div className="text-center text-sm text-muted-foreground mb-2">
-        Tap a card to place it in its position and explain the connection
+        {cards[0]?.isFirstCard
+          ? "Pick any card to start! Explain how it applies to the verse."
+          : "Tap a card to place it and explain the connection"}
       </div>
 
       {/* Spatial card layout - arranged in an arc */}
@@ -91,11 +94,12 @@ export function SpatialHandDisplay({
               sortedCards.map((cardWithPos, index) => {
                 const layout = DIRECTION_LAYOUT[cardWithPos.direction];
                 const DirectionIcon = layout?.icon || ArrowUp;
+                const isFirstCard = cardWithPos.isFirstCard;
 
-                // Calculate vertical offset based on direction (arc effect)
-                const isTop = cardWithPos.direction.includes('up');
-                const isMiddle = cardWithPos.direction === 'left' || cardWithPos.direction === 'right';
-                const verticalOffset = isTop ? -20 : isMiddle ? -10 : 0;
+                // Calculate vertical offset based on direction (arc effect) - flat for first cards
+                const isTop = !isFirstCard && cardWithPos.direction.includes('up');
+                const isMiddle = !isFirstCard && (cardWithPos.direction === 'left' || cardWithPos.direction === 'right');
+                const verticalOffset = isFirstCard ? 0 : isTop ? -20 : isMiddle ? -10 : 0;
 
                 return (
                   <motion.div
@@ -107,11 +111,13 @@ export function SpatialHandDisplay({
                     layout
                     className="flex flex-col items-center"
                   >
-                    {/* Direction indicator */}
-                    <div className="flex items-center gap-1 mb-1 text-xs text-muted-foreground">
-                      <DirectionIcon className="h-3 w-3" />
-                      <span className="hidden sm:inline">{layout?.label}</span>
-                    </div>
+                    {/* Direction indicator - hidden for first card */}
+                    {!isFirstCard && (
+                      <div className="flex items-center gap-1 mb-1 text-xs text-muted-foreground">
+                        <DirectionIcon className="h-3 w-3" />
+                        <span className="hidden sm:inline">{layout?.label}</span>
+                      </div>
+                    )}
 
                     <ScrabbleTile
                       card={cardWithPos.card}

@@ -43,6 +43,7 @@ interface BibleStudyConnectionModalProps {
   position: BoardPosition;
   adjacentCards: PlacedCard[];
   seedVerse: SelectedVerse;
+  isFirstCard?: boolean; // True if this is the first card on the board
 }
 
 // Generate AI-suggested explanations based on card and verse
@@ -167,12 +168,13 @@ export function BibleStudyConnectionModal({
   position,
   adjacentCards,
   seedVerse,
+  isFirstCard = false,
 }: BibleStudyConnectionModalProps) {
   const [timeLeft, setTimeLeft] = useState<number>(SCRABBLE_SCORING.TIMER_SECONDS); // 2 minutes
   const [explanation, setExplanation] = useState('');
   const [isChristConnection, setIsChristConnection] = useState(false);
   const [showSuggestions, setShowSuggestions] = useState(true);
-  
+
   const suggestions = generateSuggestions(card, seedVerse);
 
   // Timer countdown
@@ -221,7 +223,8 @@ export function BibleStudyConnectionModal({
   };
 
   // Calculate potential score with time bonus
-  const potentialConnections = adjacentCards.length;
+  // First card gets 1 base point (no connections to score from)
+  const potentialConnections = isFirstCard ? 1 : adjacentCards.length;
   const scoreBreakdown = explanation.trim()
     ? calculateScoreWithTimeBonus(potentialConnections, isChristConnection, timeLeft)
     : { baseScore: 0, timeBonus: 0, total: 0 };
@@ -243,7 +246,10 @@ export function BibleStudyConnectionModal({
             </div>
           </DialogTitle>
           <DialogDescription>
-            Explain how the <strong>{card.name}</strong> principle applies to <strong>{seedVerse.reference}</strong>
+            {isFirstCard
+              ? <>You're starting! Explain how <strong>{card.name}</strong> applies to <strong>{seedVerse.reference}</strong></>
+              : <>Explain how <strong>{card.name}</strong> connects to the verse and adjacent cards</>
+            }
           </DialogDescription>
         </DialogHeader>
 
