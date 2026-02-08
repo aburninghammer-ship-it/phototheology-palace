@@ -32,6 +32,7 @@ import {
 } from "@/components/scrabble";
 import { GameInvitationNotification } from "@/components/scrabble/GameInvitationNotification";
 import { CallToPlayButton } from "@/components/scrabble/CallToPlayButton";
+import { ScheduledGamesPanel } from "@/components/scrabble/ScheduledGamesPanel";
 import type { ScrabbleCard, PlacedCard, BoardPosition, Connection } from "@/types/scrabble";
 import { positionKey, isValidPlacement, assignCardsToPositions } from "@/types/scrabble";
 import { getAllScrabbleCards, shuffleCards } from "@/data/scrabbleCards";
@@ -139,7 +140,7 @@ export default function PTScrabble() {
 
   // Direct placement - card is selected AND position is determined
   const handleDirectPlacement = useCallback((card: ScrabbleCard, position: BoardPosition) => {
-    if (!user) return;
+    // Solo play doesn't require login
 
     // First card case - board is empty, any card can go at center
     if (Object.keys(boardState).length === 0) {
@@ -191,11 +192,11 @@ export default function PTScrabble() {
     explanation: string,
     isChristConnection: boolean
   ) => {
-    if (!connectionModal.card || !connectionModal.position || !user) return;
+    if (!connectionModal.card || !connectionModal.position) return;
 
     const key = positionKey(connectionModal.position);
     const adjacentCount = connectionModal.adjacentCards.length;
-    const playerName = user.email?.split("@")[0] || "Player";
+    const playerName = user?.email?.split("@")[0] || "Player";
 
     // Calculate points
     let points = adjacentCount === 1 ? 1 : adjacentCount === 2 ? 3 : adjacentCount === 3 ? 6 : 10;
@@ -209,7 +210,7 @@ export default function PTScrabble() {
       [key]: {
         card: connectionModal.card!,
         position: connectionModal.position!,
-        playerId: user.id,
+        playerId: user?.id || 'solo-player',
         playerName,
         connections,
         timestamp: new Date().toISOString(),
@@ -504,6 +505,16 @@ export default function PTScrabble() {
                   <li>• 4+ connections = 10+ points</li>
                   <li>• <strong>Christ Connection = 2x multiplier!</strong></li>
                 </ul>
+              </div>
+
+              {/* Scheduled Games (Meet Me Later) */}
+              <div className="mt-6 pt-6 border-t">
+                <ScheduledGamesPanel
+                  onJoinGame={(roomCode) => {
+                    setGamePhase("multiplayer-lobby");
+                    // The join will happen automatically when lobby loads with code
+                  }}
+                />
               </div>
             </CardContent>
           </Card>
