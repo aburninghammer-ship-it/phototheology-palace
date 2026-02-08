@@ -147,12 +147,6 @@ function SortableTab({ tab, isActive, isPinned, onPin, onUnpin, isDragging, isAn
     );
   }
 
-  // Wrapper style without pointer-events (allow drag handle to work)
-  const wrapperStyle: React.CSSProperties = {
-    transform: CSS.Transform.toString(transform),
-    transition,
-  };
-
   return (
     <div ref={setNodeRef} style={wrapperStyle} {...attributes}>
       <ContextMenu>
