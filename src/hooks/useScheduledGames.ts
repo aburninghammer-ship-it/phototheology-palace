@@ -50,6 +50,8 @@ interface UseScheduledGamesReturn {
   refreshGames: () => void;
 }
 
+export type ScheduledEventType = 'scrabble-pt' | 'group-study';
+
 interface CreateScheduledGameData {
   title?: string;
   description?: string;
@@ -57,6 +59,7 @@ interface CreateScheduledGameData {
   verse_reference?: string;
   game_mode?: 'ffa' | 'team';
   max_players?: number;
+  game_type?: ScheduledEventType;
 }
 
 export function useScheduledGames(): UseScheduledGamesReturn {
@@ -165,7 +168,7 @@ export function useScheduledGames(): UseScheduledGamesReturn {
         .insert({
           host_user_id: user.id,
           host_name: hostName,
-          game_type: 'scrabble-pt',
+          game_type: data.game_type || 'scrabble-pt',
           title: data.title || null,
           description: data.description || null,
           scheduled_at: data.scheduled_at.toISOString(),

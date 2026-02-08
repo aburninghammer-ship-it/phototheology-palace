@@ -1,5 +1,5 @@
-// Scheduled Games Panel
-// View upcoming games, RSVP, and schedule new games ("Meet me later")
+// Scheduled Games & Group Studies Panel
+// View upcoming games/studies, RSVP, and schedule new sessions
 
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -17,6 +17,8 @@ import {
   Loader2,
   CalendarPlus,
   Bell,
+  BookOpen,
+  Gamepad2,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -37,17 +39,18 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { useScheduledGames, type ScheduledGame } from '@/hooks/useScheduledGames';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { useScheduledGames, type ScheduledGame, type ScheduledEventType } from '@/hooks/useScheduledGames';
 import { useAuth } from '@/hooks/useAuth';
 import { cn } from '@/lib/utils';
 
 interface ScheduledGamesPanelProps {
   onJoinGame?: (roomCode: string) => void;
   className?: string;
+  defaultType?: ScheduledEventType;
 }
 
-export function ScheduledGamesPanel({ onJoinGame, className }: ScheduledGamesPanelProps) {
+export function ScheduledGamesPanel({ onJoinGame, className, defaultType = 'scrabble-pt' }: ScheduledGamesPanelProps) {
   const { user } = useAuth();
   const {
     scheduledGames,
@@ -61,12 +64,18 @@ export function ScheduledGamesPanel({ onJoinGame, className }: ScheduledGamesPan
   const [isCreating, setIsCreating] = useState(false);
 
   // Form state
+  const [eventType, setEventType] = useState<ScheduledEventType>(defaultType);
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [scheduledDate, setScheduledDate] = useState('');
   const [scheduledTime, setScheduledTime] = useState('');
+  const [verseReference, setVerseReference] = useState('');
 
-  const handleCreateGame = async () => {
+  // Filter games by type
+  const games = scheduledGames.filter(g => g.game_type === 'scrabble-pt');
+  const studies = scheduledGames.filter(g => g.game_type === 'group-study');
+
+  const handleCreateEvent = async () => {
     if (!scheduledDate || !scheduledTime) return;
 
     setIsCreating(true);
@@ -77,9 +86,11 @@ export function ScheduledGamesPanel({ onJoinGame, className }: ScheduledGamesPan
       }
 
       await createScheduledGame({
-        title: title || undefined,
+        game_type: eventType,
+        title: title || (eventType === 'group-study' ? 'Group Bible Study' : 'Scrabble PT Game'),
         description: description || undefined,
         scheduled_at: dateTime,
+        verse_reference: verseReference || undefined,
       });
 
       // Reset form
@@ -87,6 +98,7 @@ export function ScheduledGamesPanel({ onJoinGame, className }: ScheduledGamesPan
       setDescription('');
       setScheduledDate('');
       setScheduledTime('');
+      setVerseReference('');
       setShowCreateDialog(false);
     } finally {
       setIsCreating(false);
@@ -98,7 +110,7 @@ export function ScheduledGamesPanel({ onJoinGame, className }: ScheduledGamesPan
   };
 
   const handleCancel = async (gameId: string) => {
-    if (confirm('Are you sure you want to cancel this game?')) {
+    if (confirm('Are you sure you want to cancel this?')) {
       await cancelScheduledGame(gameId);
     }
   };
@@ -113,7 +125,7 @@ export function ScheduledGamesPanel({ onJoinGame, className }: ScheduledGamesPan
       <Card className={cn('bg-muted/50', className)}>
         <CardContent className="py-8 text-center text-muted-foreground">
           <Calendar className="h-8 w-8 mx-auto mb-2 opacity-50" />
-          <p>Sign in to schedule games and RSVP</p>
+          <p>Sign in to schedule games/studies and RSVP</p>
         </CardContent>
       </Card>
     );
@@ -125,32 +137,60 @@ export function ScheduledGamesPanel({ onJoinGame, className }: ScheduledGamesPan
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <CalendarPlus className="h-5 w-5 text-primary" />
-          <h3 className="font-semibold">Meet Me Later</h3>
+          <h3 className="font-semibold">Scheduled Sessions</h3>
         </div>
         <Dialog open={showCreateDialog} onOpenChange={setShowCreateDialog}>
           <DialogTrigger asChild>
-            <Button size="sm" variant="outline" className="gap-1">
+            <Button size="sm" className="gap-1 bg-gradient-to-r from-primary to-blue-500 hover:from-primary/90 hover:to-blue-500/90">
               <Plus className="h-4 w-4" />
-              Schedule Game
+              Schedule New
             </Button>
           </DialogTrigger>
-          <DialogContent>
+          <DialogContent className="max-w-md">
             <DialogHeader>
               <DialogTitle className="flex items-center gap-2">
                 <CalendarPlus className="h-5 w-5" />
-                Schedule a Game
+                Schedule a Session
               </DialogTitle>
               <DialogDescription>
-                Set up a future game time and invite others to RSVP
+                Set up a future game or group study for others to join
               </DialogDescription>
             </DialogHeader>
 
             <div className="space-y-4 pt-2">
+              {/* Event Type Selection */}
+              <div className="grid grid-cols-2 gap-2">
+                <Button
+                  type="button"
+                  variant={eventType === 'scrabble-pt' ? 'default' : 'outline'}
+                  className={cn(
+                    'flex-col h-auto py-3 gap-1',
+                    eventType === 'scrabble-pt' && 'bg-gradient-to-r from-purple-500 to-blue-500'
+                  )}
+                  onClick={() => setEventType('scrabble-pt')}
+                >
+                  <Gamepad2 className="h-5 w-5" />
+                  <span className="text-xs">Scrabble PT Game</span>
+                </Button>
+                <Button
+                  type="button"
+                  variant={eventType === 'group-study' ? 'default' : 'outline'}
+                  className={cn(
+                    'flex-col h-auto py-3 gap-1',
+                    eventType === 'group-study' && 'bg-gradient-to-r from-emerald-500 to-teal-500'
+                  )}
+                  onClick={() => setEventType('group-study')}
+                >
+                  <BookOpen className="h-5 w-5" />
+                  <span className="text-xs">Group Bible Study</span>
+                </Button>
+              </div>
+
               <div>
-                <Label htmlFor="title">Title (optional)</Label>
+                <Label htmlFor="title">Title</Label>
                 <Input
                   id="title"
-                  placeholder="e.g., Friday Night PT Study"
+                  placeholder={eventType === 'group-study' ? 'e.g., Friday Night Bible Study' : 'e.g., Weekend PT Challenge'}
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
                 />
@@ -160,12 +200,24 @@ export function ScheduledGamesPanel({ onJoinGame, className }: ScheduledGamesPan
                 <Label htmlFor="description">Description (optional)</Label>
                 <Textarea
                   id="description"
-                  placeholder="Any details about the game..."
+                  placeholder={eventType === 'group-study' ? 'Topic, passage to study, what to prepare...' : 'Any details about the game...'}
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
                   rows={2}
                 />
               </div>
+
+              {eventType === 'group-study' && (
+                <div>
+                  <Label htmlFor="verse">Passage/Verse Reference (optional)</Label>
+                  <Input
+                    id="verse"
+                    placeholder="e.g., John 3:1-21"
+                    value={verseReference}
+                    onChange={(e) => setVerseReference(e.target.value)}
+                  />
+                </div>
+              )}
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
@@ -191,51 +243,128 @@ export function ScheduledGamesPanel({ onJoinGame, className }: ScheduledGamesPan
               </div>
 
               <Button
-                onClick={handleCreateGame}
+                onClick={handleCreateEvent}
                 disabled={!scheduledDate || !scheduledTime || isCreating}
-                className="w-full"
+                className={cn(
+                  'w-full',
+                  eventType === 'group-study' 
+                    ? 'bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600'
+                    : 'bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600'
+                )}
               >
                 {isCreating ? (
                   <Loader2 className="h-4 w-4 animate-spin mr-2" />
                 ) : (
                   <Calendar className="h-4 w-4 mr-2" />
                 )}
-                Schedule Game
+                Schedule {eventType === 'group-study' ? 'Study' : 'Game'}
               </Button>
             </div>
           </DialogContent>
         </Dialog>
       </div>
 
-      {/* Scheduled Games List */}
-      {isLoading ? (
-        <div className="text-center py-8 text-muted-foreground">
-          <Loader2 className="h-6 w-6 animate-spin mx-auto" />
-        </div>
-      ) : scheduledGames.length === 0 ? (
-        <Card className="bg-muted/30">
-          <CardContent className="py-6 text-center text-muted-foreground">
-            <Calendar className="h-8 w-8 mx-auto mb-2 opacity-50" />
-            <p className="text-sm">No scheduled games yet</p>
-            <p className="text-xs mt-1">Be the first to schedule one!</p>
-          </CardContent>
-        </Card>
-      ) : (
-        <div className="space-y-3">
-          <AnimatePresence>
-            {scheduledGames.map((game) => (
-              <ScheduledGameCard
-                key={game.id}
-                game={game}
-                isHost={game.host_user_id === user.id}
-                onRSVP={handleRSVP}
-                onCancel={handleCancel}
-                onJoin={onJoinGame}
-              />
-            ))}
-          </AnimatePresence>
-        </div>
-      )}
+      {/* Tabs for Games vs Studies */}
+      <Tabs defaultValue="all" className="w-full">
+        <TabsList className="grid w-full grid-cols-3">
+          <TabsTrigger value="all" className="text-xs">
+            All ({scheduledGames.length})
+          </TabsTrigger>
+          <TabsTrigger value="games" className="text-xs gap-1">
+            <Gamepad2 className="h-3 w-3" />
+            Games ({games.length})
+          </TabsTrigger>
+          <TabsTrigger value="studies" className="text-xs gap-1">
+            <BookOpen className="h-3 w-3" />
+            Studies ({studies.length})
+          </TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="all" className="mt-4">
+          <ScheduledList
+            items={scheduledGames}
+            isLoading={isLoading}
+            userId={user.id}
+            onRSVP={handleRSVP}
+            onCancel={handleCancel}
+            onJoin={onJoinGame}
+          />
+        </TabsContent>
+
+        <TabsContent value="games" className="mt-4">
+          <ScheduledList
+            items={games}
+            isLoading={isLoading}
+            userId={user.id}
+            onRSVP={handleRSVP}
+            onCancel={handleCancel}
+            onJoin={onJoinGame}
+            emptyMessage="No games scheduled yet"
+          />
+        </TabsContent>
+
+        <TabsContent value="studies" className="mt-4">
+          <ScheduledList
+            items={studies}
+            isLoading={isLoading}
+            userId={user.id}
+            onRSVP={handleRSVP}
+            onCancel={handleCancel}
+            onJoin={onJoinGame}
+            emptyMessage="No group studies scheduled yet"
+          />
+        </TabsContent>
+      </Tabs>
+    </div>
+  );
+}
+
+// List component
+interface ScheduledListProps {
+  items: ScheduledGame[];
+  isLoading: boolean;
+  userId: string;
+  onRSVP: (gameId: string, status: 'going' | 'maybe' | 'not_going') => void;
+  onCancel: (gameId: string) => void;
+  onJoin?: (roomCode: string) => void;
+  emptyMessage?: string;
+}
+
+function ScheduledList({ items, isLoading, userId, onRSVP, onCancel, onJoin, emptyMessage = 'Nothing scheduled yet' }: ScheduledListProps) {
+  if (isLoading) {
+    return (
+      <div className="text-center py-8 text-muted-foreground">
+        <Loader2 className="h-6 w-6 animate-spin mx-auto" />
+      </div>
+    );
+  }
+
+  if (items.length === 0) {
+    return (
+      <Card className="bg-muted/30">
+        <CardContent className="py-6 text-center text-muted-foreground">
+          <Calendar className="h-8 w-8 mx-auto mb-2 opacity-50" />
+          <p className="text-sm">{emptyMessage}</p>
+          <p className="text-xs mt-1">Be the first to schedule one!</p>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  return (
+    <div className="space-y-3">
+      <AnimatePresence>
+        {items.map((game) => (
+          <ScheduledGameCard
+            key={game.id}
+            game={game}
+            isHost={game.host_user_id === userId}
+            onRSVP={onRSVP}
+            onCancel={onCancel}
+            onJoin={onJoin}
+          />
+        ))}
+      </AnimatePresence>
     </div>
   );
 }
@@ -253,6 +382,7 @@ function ScheduledGameCard({ game, isHost, onRSVP, onCancel, onJoin }: Scheduled
   const scheduledDate = new Date(game.scheduled_at);
   const isStartingSoon = scheduledDate.getTime() - Date.now() < 15 * 60 * 1000; // Within 15 min
   const hasStarted = game.status === 'started' && game.room_code;
+  const isGroupStudy = game.game_type === 'group-study';
 
   return (
     <motion.div
@@ -263,14 +393,22 @@ function ScheduledGameCard({ game, isHost, onRSVP, onCancel, onJoin }: Scheduled
       <Card className={cn(
         'transition-all',
         isStartingSoon && 'border-yellow-500/50 bg-yellow-500/5',
-        hasStarted && 'border-green-500/50 bg-green-500/5'
+        hasStarted && 'border-green-500/50 bg-green-500/5',
+        isGroupStudy && !isStartingSoon && !hasStarted && 'border-emerald-500/30'
       )}>
         <CardHeader className="py-3 px-4">
           <div className="flex items-start justify-between gap-2">
             <div className="flex-1 min-w-0">
-              <CardTitle className="text-base truncate">
-                {game.title || 'Scrabble PT Game'}
-              </CardTitle>
+              <div className="flex items-center gap-2 mb-1">
+                {isGroupStudy ? (
+                  <BookOpen className="h-4 w-4 text-emerald-500 shrink-0" />
+                ) : (
+                  <Gamepad2 className="h-4 w-4 text-purple-500 shrink-0" />
+                )}
+                <CardTitle className="text-base truncate">
+                  {game.title || (isGroupStudy ? 'Group Bible Study' : 'Scrabble PT Game')}
+                </CardTitle>
+              </div>
               <CardDescription className="flex items-center gap-2 text-xs">
                 <span>by {game.host_name}</span>
                 {isHost && (
@@ -317,6 +455,14 @@ function ScheduledGameCard({ game, isHost, onRSVP, onCancel, onJoin }: Scheduled
             )}
           </div>
 
+          {/* Verse reference for studies */}
+          {game.verse_reference && (
+            <div className="flex items-center gap-1.5 text-sm text-emerald-600 dark:text-emerald-400">
+              <BookOpen className="h-3.5 w-3.5" />
+              <span>{game.verse_reference}</span>
+            </div>
+          )}
+
           {/* Description */}
           {game.description && (
             <p className="text-sm text-muted-foreground line-clamp-2">
@@ -338,7 +484,7 @@ function ScheduledGameCard({ game, isHost, onRSVP, onCancel, onJoin }: Scheduled
               size="sm"
             >
               <Play className="h-4 w-4 mr-2" />
-              Join Game ({game.room_code})
+              Join Now ({game.room_code})
             </Button>
           )}
 
