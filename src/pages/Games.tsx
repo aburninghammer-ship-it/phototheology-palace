@@ -416,6 +416,18 @@ const Games = () => {
       difficulties: ["beginner", "intermediate", "master"],
       route: "/games/christ-in-focus"
     },
+    {
+      id: "pt_scrabble",
+      name: "🎯 PT Scrabble",
+      description: "Build theological connections on a shared board! Place Palace room cards adjacent to existing ones and explain your Christ-centered connections.",
+      icon: "🎯",
+      floor: 0,
+      timed: false,
+      rooms: ["All"],
+      modes: ["solo", "multiplayer"],
+      difficulties: ["easy", "medium"],
+      route: "/pt-scrabble"
+    },
   ];
 
   const filteredGames = allGames.filter(game => {

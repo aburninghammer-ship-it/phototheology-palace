@@ -1,299 +1,274 @@
-// PT Scrabble Page
-// Main game page for PT Scrabble
+// PT Scrabble Page - Practice Mode
+// Solo practice mode for PT Scrabble (multiplayer requires database tables)
 
-import { useState, useCallback, useEffect } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowLeft, Trophy, Users } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { useAuth } from '@/contexts/AuthContext';
-import { useScrabbleGame } from '@/hooks/useScrabbleGame';
-import {
-  ScrabbleBoard,
-  PlayerHandBar,
-  GameLobby,
-  ConnectionModal,
-  VotingOverlay,
-} from '@/components/scrabble';
-import type { ScrabbleCard, BoardPosition, Connection, PlacedCard } from '@/types/scrabble';
-import { positionKey } from '@/types/scrabble';
+import { useState, useCallback, useMemo } from "react";
+import { useNavigate } from "react-router-dom";
+import { Navigation } from "@/components/Navigation";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { ArrowLeft, Users, Sparkles, Gamepad2, BookOpen, Cross } from "lucide-react";
+import { useAuth } from "@/hooks/useAuth";
+import { ScrabbleBoard, PlayerHandBar } from "@/components/scrabble";
+import type { ScrabbleCard, PlacedCard, BoardPosition } from "@/types/scrabble";
+import { positionKey } from "@/types/scrabble";
+import { getAllScrabbleCards, shuffleCards } from "@/data/scrabbleCards";
+
+type GamePhase = "menu" | "playing";
 
 export default function PTScrabble() {
+  const { user, loading } = useAuth();
   const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
-  const { user } = useAuth();
-
-  const gameIdFromUrl = searchParams.get('game');
-  const [gameId, setGameId] = useState<string | undefined>(gameIdFromUrl || undefined);
-
-  const {
-    game,
-    players,
-    myPlayer,
-    myHand,
-    currentMove,
-    isLoading,
-    error,
-    createGame,
-    joinGame,
-    startGame,
-    placeCard,
-    vote,
-    getValidPositions,
-    getAdjacentCards,
-  } = useScrabbleGame(gameId);
-
-  // UI State
+  const [gamePhase, setGamePhase] = useState<GamePhase>("menu");
   const [selectedCard, setSelectedCard] = useState<ScrabbleCard | null>(null);
-  const [selectedPosition, setSelectedPosition] = useState<BoardPosition | null>(null);
-  const [showConnectionModal, setShowConnectionModal] = useState(false);
-  const [hasVoted, setHasVoted] = useState(false);
+  const [score, setScore] = useState(0);
+  
+  // Demo board state with seed card
+  const [boardState, setBoardState] = useState<Record<string, PlacedCard>>(() => {
+    const allCards = getAllScrabbleCards();
+    const midFloorCards = allCards.filter(c => c.floor >= 2 && c.floor <= 5);
+    const seedCard = midFloorCards[Math.floor(Math.random() * midFloorCards.length)];
+    
+    if (!seedCard) return {};
+    
+    return {
+      "0,0": {
+        card: seedCard,
+        position: { x: 0, y: 0 },
+        playerId: "system",
+        playerName: "Game Start",
+        connections: [],
+        timestamp: new Date().toISOString(),
+        moveId: "seed",
+      }
+    };
+  });
 
-  // Handle game creation
-  const handleCreateGame = async (mode: 'ffa' | 'team', maxPlayers: number) => {
-    const newGameId = await createGame(mode, maxPlayers);
-    if (newGameId) {
-      setGameId(newGameId);
-      navigate(`/pt-scrabble?game=${newGameId}`, { replace: true });
+  // Demo hand
+  const [playerHand, setPlayerHand] = useState<ScrabbleCard[]>(() => {
+    const allCards = shuffleCards(getAllScrabbleCards());
+    return allCards.slice(0, 7);
+  });
+
+  // Deck for drawing
+  const [deck, setDeck] = useState<ScrabbleCard[]>(() => {
+    const allCards = shuffleCards(getAllScrabbleCards());
+    return allCards.slice(7);
+  });
+
+  const handleCardSelect = useCallback((card: ScrabbleCard) => {
+    setSelectedCard(prev => prev?.id === card.id ? null : card);
+  }, []);
+
+  const handlePositionClick = useCallback((position: BoardPosition) => {
+    if (!selectedCard || !user) return;
+    
+    const key = positionKey(position);
+    
+    // Count adjacent cards for scoring
+    const adjacentKeys = [
+      positionKey({ x: position.x, y: position.y - 1 }),
+      positionKey({ x: position.x, y: position.y + 1 }),
+      positionKey({ x: position.x - 1, y: position.y }),
+      positionKey({ x: position.x + 1, y: position.y }),
+    ];
+    const adjacentCount = adjacentKeys.filter(k => boardState[k]).length;
+    const points = adjacentCount === 1 ? 1 : adjacentCount === 2 ? 3 : adjacentCount === 3 ? 6 : 10;
+    
+    // Add card to board
+    setBoardState(prev => ({
+      ...prev,
+      [key]: {
+        card: selectedCard,
+        position,
+        playerId: user.id,
+        playerName: user.email?.split("@")[0] || "Player",
+        connections: [],
+        timestamp: new Date().toISOString(),
+        moveId: crypto.randomUUID(),
+      }
+    }));
+
+    // Update score
+    setScore(prev => prev + points);
+
+    // Remove from hand
+    setPlayerHand(prev => prev.filter(c => c.id !== selectedCard.id));
+    
+    // Draw a new card if deck has cards
+    if (deck.length > 0) {
+      const [newCard, ...remainingDeck] = deck;
+      setPlayerHand(prev => [...prev, newCard]);
+      setDeck(remainingDeck);
     }
-    return newGameId;
-  };
+    
+    setSelectedCard(null);
+  }, [selectedCard, user, boardState, deck]);
 
-  // Handle joining
-  const handleJoinGame = async (roomCode: string) => {
-    const success = await joinGame(roomCode);
-    if (success && game) {
-      setGameId(game.id);
-      navigate(`/pt-scrabble?game=${game.id}`, { replace: true });
-    }
-    return success;
-  };
+  const handleNewGame = useCallback(() => {
+    const allCards = shuffleCards(getAllScrabbleCards());
+    const midFloorCards = allCards.filter(c => c.floor >= 2 && c.floor <= 5);
+    const seedCard = midFloorCards[Math.floor(Math.random() * midFloorCards.length)];
+    
+    setBoardState({
+      "0,0": {
+        card: seedCard,
+        position: { x: 0, y: 0 },
+        playerId: "system",
+        playerName: "Game Start",
+        connections: [],
+        timestamp: new Date().toISOString(),
+        moveId: "seed",
+      }
+    });
+    setPlayerHand(allCards.slice(0, 7));
+    setDeck(allCards.slice(7));
+    setScore(0);
+    setSelectedCard(null);
+  }, []);
 
-  // Handle card selection
-  const handleCardSelect = (card: ScrabbleCard) => {
-    if (selectedCard?.id === card.id) {
-      setSelectedCard(null);
-    } else {
-      setSelectedCard(card);
-    }
-    setSelectedPosition(null);
-  };
-
-  // Handle position click
-  const handlePositionClick = (position: BoardPosition) => {
-    if (!selectedCard) return;
-
-    setSelectedPosition(position);
-    setShowConnectionModal(true);
-  };
-
-  // Handle connection submission
-  const handleConnectionSubmit = async (
-    connections: Connection[],
-    explanation: string,
-    isChristConnection: boolean
-  ) => {
-    if (!selectedCard || !selectedPosition) return;
-
-    const success = await placeCard(
-      selectedCard,
-      selectedPosition,
-      connections,
-      explanation,
-      isChristConnection
-    );
-
-    if (success) {
-      setSelectedCard(null);
-      setSelectedPosition(null);
-      setShowConnectionModal(false);
-    }
-  };
-
-  // Handle voting
-  const handleVote = async (approve: boolean) => {
-    if (!currentMove) return;
-    const success = await vote(currentMove.id, approve);
-    if (success) {
-      setHasVoted(true);
-    }
-  };
-
-  // Reset vote state when current move changes
-  useEffect(() => {
-    setHasVoted(false);
-  }, [currentMove?.id]);
-
-  // Get adjacent cards for connection modal
-  const adjacentCards: PlacedCard[] = selectedPosition && game
-    ? getAdjacentCards(selectedPosition)
-    : [];
-
-  // Check if current user is host
-  const isHost = user?.id === game?.hostUserId;
-
-  // Show lobby if no game or game is waiting
-  if (!game || game.status === 'waiting') {
+  if (loading) {
     return (
-      <GameLobby
-        game={game}
-        players={players}
-        isHost={isHost}
-        isLoading={isLoading}
-        onCreateGame={handleCreateGame}
-        onJoinGame={handleJoinGame}
-        onStartGame={startGame}
-      />
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+          <p className="text-muted-foreground">Loading...</p>
+        </div>
+      </div>
     );
   }
 
-  // Game completed
-  if (game.status === 'completed') {
-    const sortedPlayers = [...players].sort((a, b) => b.score - a.score);
-    const winner = sortedPlayers[0];
+  if (!user) return null;
 
+  // Main menu view
+  if (gamePhase === "menu") {
     return (
-      <div className="min-h-screen flex items-center justify-center p-4">
-        <motion.div
-          initial={{ scale: 0.9, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          className="text-center space-y-6"
-        >
-          <Trophy className="h-16 w-16 text-yellow-500 mx-auto" />
-          <h1 className="text-3xl font-bold">Game Over!</h1>
-          <div className="space-y-2">
-            <p className="text-xl">
-              Winner: <span className="font-bold text-yellow-500">{winner?.displayName}</span>
-            </p>
-            <p className="text-2xl font-bold">{winner?.score} points</p>
-          </div>
+      <div className="min-h-screen bg-background">
+        <Navigation />
+        <main className="container mx-auto px-4 py-8 max-w-4xl">
+          <Button onClick={() => navigate("/games")} variant="ghost" className="mb-6">
+            <ArrowLeft className="mr-2 h-4 w-4" />
+            Back to Games
+          </Button>
 
-          {/* Leaderboard */}
-          <div className="bg-card border rounded-lg p-4 max-w-sm mx-auto">
-            <h3 className="font-medium mb-3 flex items-center justify-center gap-2">
-              <Users className="h-4 w-4" />
-              Final Standings
-            </h3>
-            <div className="space-y-2">
-              {sortedPlayers.map((player, index) => (
-                <div
-                  key={player.id}
-                  className="flex items-center justify-between p-2 rounded bg-muted"
-                >
-                  <span className="flex items-center gap-2">
-                    <span className="w-6 h-6 rounded-full bg-primary/20 flex items-center justify-center text-xs font-bold">
-                      {index + 1}
-                    </span>
-                    {player.displayName}
-                  </span>
-                  <span className="font-bold">{player.score}</span>
+          <Card className="border-2 border-primary/20">
+            <CardHeader className="text-center space-y-4">
+              <div className="text-6xl mx-auto">🎯</div>
+              <CardTitle className="text-4xl bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent">
+                PT Scrabble
+              </CardTitle>
+              <CardDescription className="text-lg max-w-2xl mx-auto">
+                Build theological connections on a shared board! Place Palace room cards adjacent to existing ones, 
+                and watch your understanding of Phototheology principles grow.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              {/* Rules summary */}
+              <div className="grid md:grid-cols-3 gap-4 text-center">
+                <div className="p-4 bg-muted/50 rounded-lg">
+                  <BookOpen className="h-8 w-8 mx-auto mb-2 text-primary" />
+                  <h3 className="font-semibold">Connect Cards</h3>
+                  <p className="text-sm text-muted-foreground">
+                    Place Palace room cards adjacent to existing cards
+                  </p>
                 </div>
-              ))}
-            </div>
-          </div>
+                <div className="p-4 bg-muted/50 rounded-lg">
+                  <Cross className="h-8 w-8 mx-auto mb-2 text-primary" />
+                  <h3 className="font-semibold">Christ-Centered</h3>
+                  <p className="text-sm text-muted-foreground">
+                    Think about how each connection reveals Christ
+                  </p>
+                </div>
+                <div className="p-4 bg-muted/50 rounded-lg">
+                  <Users className="h-8 w-8 mx-auto mb-2 text-primary" />
+                  <h3 className="font-semibold">Build Together</h3>
+                  <p className="text-sm text-muted-foreground">
+                    Multiplayer mode coming soon!
+                  </p>
+                </div>
+              </div>
 
-          <div className="flex gap-2 justify-center">
-            <Button variant="outline" onClick={() => navigate('/games')}>
-              Back to Games
-            </Button>
-            <Button onClick={() => {
-              setGameId(undefined);
-              navigate('/pt-scrabble', { replace: true });
-            }}>
-              Play Again
-            </Button>
-          </div>
-        </motion.div>
+              {/* Game mode buttons */}
+              <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
+                <Button 
+                  size="lg" 
+                  onClick={() => setGamePhase("playing")}
+                  className="bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600"
+                >
+                  <Gamepad2 className="mr-2 h-5 w-5" />
+                  Practice Mode (Solo)
+                </Button>
+                <Button 
+                  size="lg" 
+                  variant="outline"
+                  disabled
+                  title="Coming soon!"
+                >
+                  <Users className="mr-2 h-5 w-5" />
+                  Multiplayer (Coming Soon)
+                </Button>
+              </div>
+
+              {/* Scoring info */}
+              <div className="bg-gradient-to-r from-amber-50 to-yellow-50 dark:from-amber-950/20 dark:to-yellow-950/20 border border-amber-200 dark:border-amber-800 rounded-lg p-4 mt-6">
+                <h4 className="font-semibold mb-2 flex items-center gap-2">
+                  <Sparkles className="h-4 w-4 text-amber-500" />
+                  Scoring System
+                </h4>
+                <ul className="text-sm text-muted-foreground space-y-1">
+                  <li>• 1 connection = 1 point</li>
+                  <li>• 2 connections = 3 points</li>
+                  <li>• 3 connections = 6 points</li>
+                  <li>• 4+ connections = 10+ points</li>
+                </ul>
+              </div>
+            </CardContent>
+          </Card>
+        </main>
       </div>
     );
   }
 
-  // Active game
+  // Playing view
   return (
-    <div className="h-screen flex flex-col overflow-hidden">
-      {/* Header */}
-      <header className="flex items-center justify-between p-3 border-b bg-background/95 backdrop-blur z-10">
-        <Button variant="ghost" size="icon" onClick={() => navigate('/games')}>
-          <ArrowLeft className="h-5 w-5" />
-        </Button>
-
-        <div className="flex items-center gap-4">
-          <span className="text-sm text-muted-foreground">
-            Room: <span className="font-mono font-bold">{game.roomCode}</span>
-          </span>
-          <div className="flex items-center gap-1">
-            <Users className="h-4 w-4 text-muted-foreground" />
-            <span className="text-sm">{players.length}</span>
+    <div className="min-h-screen bg-background flex flex-col">
+      <Navigation />
+      <main className="flex-1 container mx-auto px-4 py-4 flex flex-col gap-4">
+        <div className="flex items-center justify-between">
+          <Button onClick={() => setGamePhase("menu")} variant="ghost" size="sm">
+            <ArrowLeft className="mr-2 h-4 w-4" />
+            Back to Menu
+          </Button>
+          <h1 className="text-xl font-bold">PT Scrabble - Practice Mode</h1>
+          <div className="flex items-center gap-4">
+            <div className="text-sm text-muted-foreground">
+              Score: <span className="font-bold text-primary">{score}</span>
+            </div>
+            <Button variant="outline" size="sm" onClick={handleNewGame}>
+              New Game
+            </Button>
           </div>
         </div>
 
-        {/* Mini scoreboard */}
-        <div className="flex gap-2">
-          {players.slice(0, 3).map((player, i) => (
-            <div
-              key={player.id}
-              className="text-xs bg-muted px-2 py-1 rounded flex items-center gap-1"
-            >
-              <span className={player.userId === user?.id ? 'font-bold text-primary' : ''}>
-                {player.displayName.slice(0, 8)}
-              </span>
-              <span className="text-yellow-500">{player.score}</span>
-            </div>
-          ))}
-          {players.length > 3 && (
-            <span className="text-xs text-muted-foreground">+{players.length - 3}</span>
-          )}
+        {/* Main game area */}
+        <div className="flex-1 min-h-[400px] border rounded-lg overflow-hidden">
+          <ScrabbleBoard
+            boardState={boardState}
+            selectedCard={selectedCard}
+            onPositionClick={handlePositionClick}
+            className="h-full"
+          />
         </div>
-      </header>
 
-      {/* Game board */}
-      <div className="flex-1 min-h-0 pb-40">
-        <ScrabbleBoard
-          boardState={game.boardState}
-          selectedCard={selectedCard}
-          onPositionClick={handlePositionClick}
-          validPositions={selectedCard ? getValidPositions() : []}
-        />
-      </div>
-
-      {/* Player hand */}
-      <PlayerHandBar
-        cards={myHand}
-        selectedCard={selectedCard}
-        onCardSelect={handleCardSelect}
-        disabled={!!currentMove && currentMove.validationStatus === 'voting'}
-        score={myPlayer?.score || 0}
-      />
-
-      {/* Connection modal */}
-      <AnimatePresence>
-        {showConnectionModal && selectedCard && selectedPosition && (
-          <ConnectionModal
-            isOpen={showConnectionModal}
-            onClose={() => {
-              setShowConnectionModal(false);
-              setSelectedPosition(null);
-            }}
-            onSubmit={handleConnectionSubmit}
-            card={selectedCard}
-            position={selectedPosition}
-            adjacentCards={adjacentCards}
+        {/* Player hand */}
+        <div className="border-t pt-4">
+          <PlayerHandBar
+            cards={playerHand}
+            selectedCard={selectedCard}
+            onCardSelect={handleCardSelect}
+            score={score}
           />
-        )}
-      </AnimatePresence>
-
-      {/* Voting overlay */}
-      <AnimatePresence>
-        {currentMove && currentMove.validationStatus === 'voting' && (
-          <VotingOverlay
-            move={currentMove}
-            players={players}
-            currentPlayerId={myPlayer?.id}
-            onVote={handleVote}
-            hasVoted={hasVoted}
-          />
-        )}
-      </AnimatePresence>
+        </div>
+      </main>
     </div>
   );
 }
