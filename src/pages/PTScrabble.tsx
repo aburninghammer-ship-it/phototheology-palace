@@ -249,6 +249,24 @@ export default function PTScrabble() {
           </div>
         </div>
 
+        {/* How to Play Instructions */}
+        <div className="bg-gradient-to-r from-blue-500/10 to-purple-500/10 border border-blue-500/30 rounded-lg p-4">
+          <h3 className="font-semibold text-sm mb-2 flex items-center gap-2">
+            <BookOpen className="h-4 w-4 text-blue-400" />
+            How to Play
+          </h3>
+          <ol className="text-xs text-muted-foreground space-y-1 list-decimal list-inside">
+            <li><strong>Select a card</strong> from your hand at the bottom (click on it)</li>
+            <li><strong>Click an empty spot</strong> next to an existing card on the board (marked with +)</li>
+            <li><strong>Score points</strong> based on connections: 1→1pt, 2→3pts, 3→6pts, 4+→10pts</li>
+            <li><strong>Think theologically:</strong> How does your card connect to the adjacent card(s)?</li>
+          </ol>
+          <p className="text-xs text-blue-400 mt-2">
+            <Sparkles className="inline h-3 w-3 mr-1" />
+            The <strong>"{Object.values(boardState)[0]?.card.name}"</strong> ({Object.values(boardState)[0]?.card.code}) is your starting card. Build from there!
+          </p>
+        </div>
+
         {/* Main game area */}
         <div className="flex-1 min-h-[400px] border rounded-lg overflow-hidden">
           <ScrabbleBoard
@@ -261,6 +279,11 @@ export default function PTScrabble() {
 
         {/* Player hand */}
         <div className="border-t pt-4">
+          <p className="text-xs text-muted-foreground mb-2 text-center">
+            {selectedCard 
+              ? `✅ Selected: "${selectedCard.name}" (${selectedCard.code}) — Now click a + spot on the board`
+              : "👆 Click a card below to select it, then place it on the board"}
+          </p>
           <PlayerHandBar
             cards={playerHand}
             selectedCard={selectedCard}
