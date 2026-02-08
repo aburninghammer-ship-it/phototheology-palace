@@ -17,10 +17,12 @@ export interface BoardPosition {
   y: number;
 }
 
+export type Direction = 'up' | 'down' | 'left' | 'right' | 'up-left' | 'up-right' | 'down-left' | 'down-right';
+
 export interface Connection {
   targetCardId: string;
   targetPosition: BoardPosition;
-  direction: 'up' | 'down' | 'left' | 'right';
+  direction: Direction;
   explanation: string;
   isChristConnection: boolean;
 }
@@ -134,22 +136,33 @@ export function calculateScore(connectionCount: number, isChristConnection: bool
     : baseScore;
 }
 
-// Helper to get adjacent positions
+// Helper to get adjacent positions (8 directions including diagonals)
 export function getAdjacentPositions(pos: BoardPosition): BoardPosition[] {
   return [
-    { x: pos.x, y: pos.y - 1 },     // up
-    { x: pos.x, y: pos.y + 1 },     // down
-    { x: pos.x - 1, y: pos.y },     // left
-    { x: pos.x + 1, y: pos.y },     // right
+    { x: pos.x, y: pos.y - 1 },       // up
+    { x: pos.x, y: pos.y + 1 },       // down
+    { x: pos.x - 1, y: pos.y },       // left
+    { x: pos.x + 1, y: pos.y },       // right
+    { x: pos.x - 1, y: pos.y - 1 },   // up-left
+    { x: pos.x + 1, y: pos.y - 1 },   // up-right
+    { x: pos.x - 1, y: pos.y + 1 },   // down-left
+    { x: pos.x + 1, y: pos.y + 1 },   // down-right
   ];
 }
 
-// Helper to get direction from one position to another
-export function getDirection(from: BoardPosition, to: BoardPosition): Connection['direction'] | null {
-  if (to.x === from.x && to.y === from.y - 1) return 'up';
-  if (to.x === from.x && to.y === from.y + 1) return 'down';
-  if (to.x === from.x - 1 && to.y === from.y) return 'left';
-  if (to.x === from.x + 1 && to.y === from.y) return 'right';
+// Helper to get direction from one position to another (8 directions)
+export function getDirection(from: BoardPosition, to: BoardPosition): Direction | null {
+  const dx = to.x - from.x;
+  const dy = to.y - from.y;
+
+  if (dx === 0 && dy === -1) return 'up';
+  if (dx === 0 && dy === 1) return 'down';
+  if (dx === -1 && dy === 0) return 'left';
+  if (dx === 1 && dy === 0) return 'right';
+  if (dx === -1 && dy === -1) return 'up-left';
+  if (dx === 1 && dy === -1) return 'up-right';
+  if (dx === -1 && dy === 1) return 'down-left';
+  if (dx === 1 && dy === 1) return 'down-right';
   return null;
 }
 

@@ -6,5 +6,6 @@ export { GameLobby } from './GameLobby';
 export { ConnectionModal } from './ConnectionModal';
 export { BibleStudyConnectionModal } from './BibleStudyConnectionModal';
 export { VotingOverlay } from './VotingOverlay';
+export { VotingPanel } from './VotingPanel';
 export { VerseSelectionScreen, type SelectedVerse } from './VerseSelectionScreen';
 export { SeedVerseDisplay } from './SeedVerseDisplay';

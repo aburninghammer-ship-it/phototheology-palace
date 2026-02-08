@@ -91,7 +91,8 @@
       "Bash(SUPABASE_ACCESS_TOKEN=\"sbp_1cd5589aa8a0c34a7e25b5c72b8177a50885c191\" npx supabase:*)",
       "Bash(Is This?\" instead.\n\n🤖 Generated with [Claude Code]\\(https://claude.com/claude-code\\)\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>\nEOF\n\\)\")",
       "Bash(SUPABASE_ACCESS_TOKEN=\"sbp_1cd5589aa8a0c34a7e25b5c72b8177a50885c191\" npx supabase functions deploy jeeves --project-ref tdjtumtdkjicnhlpqqzd)",
-      "Bash(SUPABASE_ACCESS_TOKEN=\"sbp_fe32d3be189beab600f50a27caea50a09e6ef260\" npx supabase functions deploy jeeves --project-ref tdjtumtdkjicnhlpqqzd)"
+      "Bash(SUPABASE_ACCESS_TOKEN=\"sbp_fe32d3be189beab600f50a27caea50a09e6ef260\" npx supabase functions deploy jeeves --project-ref tdjtumtdkjicnhlpqqzd)",
+      "Bash(timeout 60 npx tsc:*)"
     ],
     "deny": [],
     "ask": []

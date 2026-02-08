@@ -1,43 +1,78 @@
-// PT Scrabble Page - Bible Study Practice Mode
-// Solo practice mode where users study a verse using PT principles
+// PT Scrabble Page - Solo Bible Study + Multiplayer Modes
+// Choose between solo practice mode or real-time multiplayer
 
 import { useState, useCallback, useMemo } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { Navigation } from "@/components/Navigation";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { ArrowLeft, Users, Sparkles, Gamepad2, BookOpen, Cross, Book } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { ArrowLeft, Users, Sparkles, Gamepad2, BookOpen, Cross, Book, Trophy, Layers, Globe } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
-import { 
-  ScrabbleBoard, 
-  PlayerHandBar, 
-  VerseSelectionScreen, 
+import { useScrabbleGame } from "@/hooks/useScrabbleGame";
+import { motion, AnimatePresence } from "framer-motion";
+import {
+  ScrabbleBoard,
+  PlayerHandBar,
+  VerseSelectionScreen,
   SeedVerseDisplay,
   BibleStudyConnectionModal,
-  type SelectedVerse 
+  GameLobby,
+  ConnectionModal,
+  VotingPanel,
+  type SelectedVerse
 } from "@/components/scrabble";
 import type { ScrabbleCard, PlacedCard, BoardPosition, Connection } from "@/types/scrabble";
 import { positionKey, isValidPlacement } from "@/types/scrabble";
 import { getAllScrabbleCards, shuffleCards } from "@/data/scrabbleCards";
 
-type GamePhase = "menu" | "verse-selection" | "playing";
+type GamePhase = "menu" | "verse-selection" | "playing" | "multiplayer-lobby" | "multiplayer-playing";
 
 export default function PTScrabble() {
   const { user, loading } = useAuth();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const [gamePhase, setGamePhase] = useState<GamePhase>("menu");
   const [selectedCard, setSelectedCard] = useState<ScrabbleCard | null>(null);
   const [score, setScore] = useState(0);
   const [seedVerse, setSeedVerse] = useState<SelectedVerse | null>(null);
-  
-  // Modal state for placing cards
+
+  // Multiplayer state
+  const gameIdFromUrl = searchParams.get('game');
+  const [multiplayerGameId, setMultiplayerGameId] = useState<string | undefined>(gameIdFromUrl || undefined);
+
+  // Multiplayer hook
+  const {
+    game: mpGame,
+    players: mpPlayers,
+    myPlayer: mpMyPlayer,
+    myHand: mpMyHand,
+    pendingMoves,
+    myVotes,
+    isLoading: mpLoading,
+    createGame,
+    joinGame,
+    startGame,
+    placeCard: mpPlaceCard,
+    vote,
+    getValidPositions,
+    getAdjacentCards: mpGetAdjacentCards,
+  } = useScrabbleGame(multiplayerGameId);
+
+  // Multiplayer UI state
+  const [mpSelectedCard, setMpSelectedCard] = useState<ScrabbleCard | null>(null);
+  const [mpSelectedPosition, setMpSelectedPosition] = useState<BoardPosition | null>(null);
+  const [showMpConnectionModal, setShowMpConnectionModal] = useState(false);
+
+  // Solo mode state
   const [connectionModal, setConnectionModal] = useState<{
     isOpen: boolean;
     card: ScrabbleCard | null;
     position: BoardPosition | null;
     adjacentCards: PlacedCard[];
   }>({ isOpen: false, card: null, position: null, adjacentCards: [] });
-  
+
   // Board state - seed card placed at center
   const [boardState, setBoardState] = useState<Record<string, PlacedCard>>({});
 
@@ -162,6 +197,69 @@ export default function PTScrabble() {
     setSelectedCard(null);
   }, []);
 
+  // ========== MULTIPLAYER HANDLERS ==========
+
+  const handleCreateMultiplayerGame = useCallback(async (mode: 'ffa' | 'team', maxPlayers: number) => {
+    const newGameId = await createGame(mode, maxPlayers);
+    if (newGameId) {
+      setMultiplayerGameId(newGameId);
+      navigate(`/pt-scrabble?game=${newGameId}`, { replace: true });
+    }
+    return newGameId;
+  }, [createGame, navigate]);
+
+  const handleJoinMultiplayerGame = useCallback(async (roomCode: string) => {
+    const success = await joinGame(roomCode);
+    if (success && mpGame) {
+      setMultiplayerGameId(mpGame.id);
+      navigate(`/pt-scrabble?game=${mpGame.id}`, { replace: true });
+    }
+    return success;
+  }, [joinGame, mpGame, navigate]);
+
+  const handleMpCardSelect = useCallback((card: ScrabbleCard) => {
+    setMpSelectedCard(prev => prev?.id === card.id ? null : card);
+  }, []);
+
+  const handleMpPositionClick = useCallback((position: BoardPosition) => {
+    if (!mpSelectedCard) return;
+    setMpSelectedPosition(position);
+    setShowMpConnectionModal(true);
+  }, [mpSelectedCard]);
+
+  const handleMpConnectionSubmit = useCallback(async (
+    connections: Connection[],
+    explanation: string,
+    isChristConnection: boolean
+  ) => {
+    if (!mpSelectedCard || !mpSelectedPosition) return;
+
+    const success = await mpPlaceCard(
+      mpSelectedCard,
+      mpSelectedPosition,
+      connections,
+      explanation,
+      isChristConnection
+    );
+
+    if (success) {
+      setMpSelectedCard(null);
+      setMpSelectedPosition(null);
+      setShowMpConnectionModal(false);
+    }
+  }, [mpSelectedCard, mpSelectedPosition, mpPlaceCard]);
+
+  const handleMpVote = useCallback(async (moveId: string, approve: boolean) => {
+    await vote(moveId, approve);
+  }, [vote]);
+
+  const mpAdjacentCards: PlacedCard[] = mpSelectedPosition && mpGame
+    ? mpGetAdjacentCards(mpSelectedPosition)
+    : [];
+
+  const isHost = user?.id === mpGame?.hostUserId;
+  const deckCount = mpGame?.deckRemaining?.length ?? 0;
+
   if (loading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
@@ -225,22 +323,22 @@ export default function PTScrabble() {
 
               {/* Game mode buttons */}
               <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
-                <Button 
-                  size="lg" 
+                <Button
+                  size="lg"
                   onClick={() => setGamePhase("verse-selection")}
                   className="bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600"
                 >
                   <Gamepad2 className="mr-2 h-5 w-5" />
-                  Start Bible Study
+                  Solo Bible Study
                 </Button>
-                <Button 
-                  size="lg" 
+                <Button
+                  size="lg"
                   variant="outline"
-                  disabled
-                  title="Coming soon!"
+                  onClick={() => setGamePhase("multiplayer-lobby")}
+                  className="border-green-500/50 hover:bg-green-500/10 text-green-600 dark:text-green-400"
                 >
-                  <Users className="mr-2 h-5 w-5" />
-                  Group Study (Coming Soon)
+                  <Globe className="mr-2 h-5 w-5" />
+                  Multiplayer Game
                 </Button>
               </div>
 
@@ -275,8 +373,8 @@ export default function PTScrabble() {
             <ArrowLeft className="mr-2 h-4 w-4" />
             Back to Menu
           </Button>
-          
-          <VerseSelectionScreen 
+
+          <VerseSelectionScreen
             onVerseSelected={handleVerseSelected}
             onBack={() => setGamePhase("menu")}
           />
@@ -285,7 +383,213 @@ export default function PTScrabble() {
     );
   }
 
-  // Playing view
+  // ========== MULTIPLAYER LOBBY VIEW ==========
+  if (gamePhase === "multiplayer-lobby") {
+    // If we have an active game in waiting status, show GameLobby
+    if (mpGame && mpGame.status === 'waiting') {
+      return (
+        <GameLobby
+          game={mpGame}
+          players={mpPlayers}
+          isHost={isHost}
+          isLoading={mpLoading}
+          onCreateGame={handleCreateMultiplayerGame}
+          onJoinGame={handleJoinMultiplayerGame}
+          onStartGame={startGame}
+        />
+      );
+    }
+
+    // If game started, switch to playing phase
+    if (mpGame && mpGame.status === 'playing') {
+      setGamePhase("multiplayer-playing");
+      return null;
+    }
+
+    // Show create/join UI
+    return (
+      <div className="min-h-screen bg-background">
+        <Navigation />
+        <main className="container mx-auto px-4 py-8 max-w-2xl">
+          <Button onClick={() => setGamePhase("menu")} variant="ghost" className="mb-6">
+            <ArrowLeft className="mr-2 h-4 w-4" />
+            Back to Menu
+          </Button>
+
+          <GameLobby
+            game={null}
+            players={[]}
+            isHost={false}
+            isLoading={mpLoading}
+            onCreateGame={handleCreateMultiplayerGame}
+            onJoinGame={handleJoinMultiplayerGame}
+            onStartGame={startGame}
+          />
+        </main>
+      </div>
+    );
+  }
+
+  // ========== MULTIPLAYER PLAYING VIEW ==========
+  if (gamePhase === "multiplayer-playing" || (mpGame && mpGame.status === 'playing')) {
+    // Game completed
+    if (mpGame?.status === 'completed') {
+      const sortedPlayers = [...mpPlayers].sort((a, b) => b.score - a.score);
+      const winner = sortedPlayers[0];
+
+      return (
+        <div className="min-h-screen flex items-center justify-center p-4">
+          <motion.div
+            initial={{ scale: 0.9, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            className="text-center space-y-6"
+          >
+            <Trophy className="h-16 w-16 text-yellow-500 mx-auto" />
+            <h1 className="text-3xl font-bold">Game Over!</h1>
+            <div className="space-y-2">
+              <p className="text-xl">
+                Winner: <span className="font-bold text-yellow-500">{winner?.displayName}</span>
+              </p>
+              <p className="text-2xl font-bold">{winner?.score} points</p>
+            </div>
+
+            <div className="bg-card border rounded-lg p-4 max-w-sm mx-auto">
+              <h3 className="font-medium mb-3 flex items-center justify-center gap-2">
+                <Users className="h-4 w-4" />
+                Final Standings
+              </h3>
+              <div className="space-y-2">
+                {sortedPlayers.map((player, index) => (
+                  <div
+                    key={player.id}
+                    className="flex items-center justify-between p-2 rounded bg-muted"
+                  >
+                    <span className="flex items-center gap-2">
+                      <span className="w-6 h-6 rounded-full bg-primary/20 flex items-center justify-center text-xs font-bold">
+                        {index + 1}
+                      </span>
+                      {player.displayName}
+                    </span>
+                    <span className="font-bold">{player.score}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="flex gap-2 justify-center">
+              <Button variant="outline" onClick={() => navigate('/games')}>
+                Back to Games
+              </Button>
+              <Button onClick={() => {
+                setMultiplayerGameId(undefined);
+                setGamePhase("menu");
+                navigate('/pt-scrabble', { replace: true });
+              }}>
+                Play Again
+              </Button>
+            </div>
+          </motion.div>
+        </div>
+      );
+    }
+
+    // Active multiplayer game
+    if (mpGame) {
+      return (
+        <div className="h-screen flex flex-col overflow-hidden">
+          {/* Header */}
+          <header className="flex items-center justify-between p-3 border-b bg-background/95 backdrop-blur z-10">
+            <Button variant="ghost" size="icon" onClick={() => {
+              setMultiplayerGameId(undefined);
+              setGamePhase("menu");
+              navigate('/pt-scrabble', { replace: true });
+            }}>
+              <ArrowLeft className="h-5 w-5" />
+            </Button>
+
+            <div className="flex items-center gap-4">
+              <span className="text-sm text-muted-foreground">
+                Room: <span className="font-mono font-bold">{mpGame.roomCode}</span>
+              </span>
+              <div className="flex items-center gap-1">
+                <Users className="h-4 w-4 text-muted-foreground" />
+                <span className="text-sm">{mpPlayers.length}</span>
+              </div>
+              <div className="flex items-center gap-1" title="Cards in deck">
+                <Layers className="h-4 w-4 text-muted-foreground" />
+                <span className="text-sm">{deckCount}</span>
+              </div>
+            </div>
+
+            {/* Mini scoreboard */}
+            <div className="flex gap-2">
+              {mpPlayers.slice(0, 3).map((player) => (
+                <div
+                  key={player.id}
+                  className="text-xs bg-muted px-2 py-1 rounded flex items-center gap-1"
+                >
+                  <span className={player.userId === user?.id ? 'font-bold text-primary' : ''}>
+                    {player.displayName.slice(0, 8)}
+                  </span>
+                  <span className="text-yellow-500">{player.score}</span>
+                </div>
+              ))}
+              {mpPlayers.length > 3 && (
+                <span className="text-xs text-muted-foreground">+{mpPlayers.length - 3}</span>
+              )}
+            </div>
+          </header>
+
+          {/* Game board */}
+          <div className="flex-1 min-h-0 pb-40">
+            <ScrabbleBoard
+              boardState={mpGame.boardState}
+              selectedCard={mpSelectedCard}
+              onPositionClick={handleMpPositionClick}
+              validPositions={mpSelectedCard ? getValidPositions() : []}
+            />
+          </div>
+
+          {/* Player hand - NEVER disabled, can always select cards */}
+          <PlayerHandBar
+            cards={mpMyHand}
+            selectedCard={mpSelectedCard}
+            onCardSelect={handleMpCardSelect}
+            disabled={false}
+            score={mpMyPlayer?.score || 0}
+          />
+
+          {/* Connection modal */}
+          <AnimatePresence>
+            {showMpConnectionModal && mpSelectedCard && mpSelectedPosition && (
+              <ConnectionModal
+                isOpen={showMpConnectionModal}
+                onClose={() => {
+                  setShowMpConnectionModal(false);
+                  setMpSelectedPosition(null);
+                }}
+                onSubmit={handleMpConnectionSubmit}
+                card={mpSelectedCard}
+                position={mpSelectedPosition}
+                adjacentCards={mpAdjacentCards}
+              />
+            )}
+          </AnimatePresence>
+
+          {/* Non-blocking voting panel */}
+          <VotingPanel
+            pendingMoves={pendingMoves}
+            players={mpPlayers}
+            currentPlayerId={mpMyPlayer?.id}
+            myVotes={myVotes}
+            onVote={handleMpVote}
+          />
+        </div>
+      );
+    }
+  }
+
+  // Solo Playing view
   return (
     <div className="min-h-screen bg-background flex flex-col">
       <Navigation />

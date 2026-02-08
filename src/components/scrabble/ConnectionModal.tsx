@@ -11,6 +11,10 @@ import {
   ArrowDown,
   ArrowLeft,
   ArrowRight,
+  ArrowUpLeft,
+  ArrowUpRight,
+  ArrowDownLeft,
+  ArrowDownRight,
   Check,
   Cross,
 } from 'lucide-react';
@@ -74,13 +78,18 @@ export function ConnectionModal({
     return () => clearInterval(timer);
   }, [isOpen]);
 
-  // Get direction icon
+  // Get direction icon (8 directions including diagonals)
   const getDirectionIcon = (dir: Connection['direction']) => {
     switch (dir) {
       case 'up': return <ArrowUp className="h-4 w-4" />;
       case 'down': return <ArrowDown className="h-4 w-4" />;
       case 'left': return <ArrowLeft className="h-4 w-4" />;
       case 'right': return <ArrowRight className="h-4 w-4" />;
+      case 'up-left': return <ArrowUpLeft className="h-4 w-4" />;
+      case 'up-right': return <ArrowUpRight className="h-4 w-4" />;
+      case 'down-left': return <ArrowDownLeft className="h-4 w-4" />;
+      case 'down-right': return <ArrowDownRight className="h-4 w-4" />;
+      default: return <ArrowUp className="h-4 w-4" />;
     }
   };
 
