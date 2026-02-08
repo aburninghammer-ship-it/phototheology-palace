@@ -44,10 +44,11 @@ interface SortableTabProps {
   onPin: () => void;
   onUnpin: () => void;
   isDragging?: boolean;
+  isAnyDragging?: boolean;
   wasDragging?: boolean;
 }
 
-function SortableTab({ tab, isActive, isPinned, onPin, onUnpin, isDragging, wasDragging }: SortableTabProps) {
+function SortableTab({ tab, isActive, isPinned, onPin, onUnpin, isDragging, isAnyDragging, wasDragging }: SortableTabProps) {
   const {
     attributes,
     listeners,
@@ -56,9 +57,9 @@ function SortableTab({ tab, isActive, isPinned, onPin, onUnpin, isDragging, wasD
     transition,
   } = useSortable({ id: tab.id, disabled: isPinned });
 
-  // Prevent navigation if we just finished dragging
+  // Prevent navigation if ANY drag is happening or just finished
   const handleClick = (e: React.MouseEvent) => {
-    if (wasDragging) {
+    if (isAnyDragging || wasDragging) {
       e.preventDefault();
       e.stopPropagation();
     }
@@ -257,6 +258,7 @@ export function DraggableNavTabs() {
                   onPin={() => handlePin(tab.id)}
                   onUnpin={() => handleUnpin(tab.id)}
                   isDragging={activeId === tab.id}
+                  isAnyDragging={activeId !== null}
                   wasDragging={wasDragging}
                 />
               ))}
