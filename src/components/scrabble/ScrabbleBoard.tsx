@@ -15,6 +15,7 @@ interface ScrabbleBoardProps {
   boardState: Record<string, PlacedCard>;
   selectedCard?: ScrabbleCard | null;
   onPositionClick?: (position: BoardPosition) => void;
+  onCardClick?: (placedCard: PlacedCard) => void;
   validPositions?: BoardPosition[];
   className?: string;
 }
@@ -23,6 +24,7 @@ export function ScrabbleBoard({
   boardState,
   selectedCard,
   onPositionClick,
+  onCardClick,
   validPositions: externalValidPositions,
   className,
 }: ScrabbleBoardProps) {
@@ -152,6 +154,7 @@ export function ScrabbleBoard({
                           placedCard={placedCard}
                           size="md"
                           showConnections
+                          onClick={onCardClick ? () => onCardClick(placedCard) : undefined}
                         />
                       ) : isValid ? (
                         <EmptyTile

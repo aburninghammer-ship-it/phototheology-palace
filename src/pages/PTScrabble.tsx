@@ -19,6 +19,7 @@ import {
   SeedVerseDisplay,
   SeedCardInsight,
   BibleStudyConnectionModal,
+  PlacedCardDetailModal,
   GameLobby,
   ConnectionModal,
   VotingPanel,
@@ -80,6 +81,9 @@ export default function PTScrabble() {
     position: BoardPosition | null;
     adjacentCards: PlacedCard[];
   }>({ isOpen: false, card: null, position: null, adjacentCards: [] });
+
+  // Placed card detail modal state (for viewing any card on board)
+  const [viewingCard, setViewingCard] = useState<PlacedCard | null>(null);
 
   // Board state - seed card placed at center
   const [boardState, setBoardState] = useState<Record<string, PlacedCard>>({});
@@ -793,6 +797,7 @@ export default function PTScrabble() {
             boardState={boardState}
             selectedCard={selectedCard}
             onPositionClick={handlePositionClick}
+            onCardClick={(placedCard) => setViewingCard(placedCard)}
             className="h-full"
           />
         </div>
@@ -825,6 +830,15 @@ export default function PTScrabble() {
           seedVerse={seedVerse}
         />
       )}
+
+      {/* Placed Card Detail Modal */}
+      <PlacedCardDetailModal
+        isOpen={viewingCard !== null}
+        onClose={() => setViewingCard(null)}
+        placedCard={viewingCard}
+        isSeedCard={viewingCard?.moveId === 'seed'}
+        seedVerseText={seedVerse?.text}
+      />
     </div>
   );
 }
