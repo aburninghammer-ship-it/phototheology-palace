@@ -387,15 +387,9 @@ In 2-3 sentences, explain how this new insight builds upon or connects to the pr
     setShowSuggestions(false);
   };
 
-  // Handle submit - get Jeeves judgment first
+  // Handle submit - skip Jeeves for first card (race condition - first to submit wins)
   const handleSubmit = async () => {
     if (!explanation.trim()) return;
-
-    setIsJudging(true);
-
-    // Get Jeeves' judgment
-    const judgment = await getJeevesJudgment(explanation);
-    setJeevesJudgment(judgment);
 
     // Create connections to all adjacent cards (or empty for first play)
     const connectionList: Connection[] = adjacentCards.length > 0
@@ -414,8 +408,19 @@ In 2-3 sentences, explain how this new insight builds upon or connects to the pr
           isChristConnection: isChristConnection,
         }];
 
-    setIsJudging(false);
-    onSubmit(connectionList, explanation, isChristConnection, judgment);
+    // For first play: NO Jeeves judgment - first to submit wins!
+    // For subsequent plays: Get Jeeves judgment to validate connection
+    if (isFirstPlay) {
+      // Direct submission - race is on!
+      onSubmit(connectionList, explanation, isChristConnection, undefined);
+    } else {
+      // Get Jeeves judgment for subsequent plays
+      setIsJudging(true);
+      const judgment = await getJeevesJudgment(explanation);
+      setJeevesJudgment(judgment);
+      setIsJudging(false);
+      onSubmit(connectionList, explanation, isChristConnection, judgment);
+    }
   };
 
   // Calculate potential score with time bonus

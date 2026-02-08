@@ -146,7 +146,7 @@ export function StudyLog({ entries, className }: StudyLogProps) {
           {/* Hint */}
           <div className="p-2 border-t">
             <p className="text-xs text-muted-foreground text-center">
-              Each card must build on the previous point while tying in a new principle!
+              First card: race to connect a principle to the verse! Then build on each other's insights.
             </p>
           </div>
         </div>
