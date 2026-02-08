@@ -37,7 +37,7 @@ import type { ScrabbleCard, PlacedCard, BoardPosition, Connection } from "@/type
 import { positionKey, isValidPlacement, assignCardsToPositions } from "@/types/scrabble";
 import { getAllScrabbleCards, shuffleCards } from "@/data/scrabbleCards";
 
-type GamePhase = "menu" | "verse-selection" | "playing" | "completed" | "multiplayer-lobby" | "multiplayer-playing";
+type GamePhase = "menu" | "verse-selection" | "playing" | "completed" | "multiplayer-lobby" | "multiplayer-verse-selection" | "multiplayer-playing";
 
 export default function PTScrabble() {
   const { user, loading } = useAuth();
@@ -556,7 +556,7 @@ export default function PTScrabble() {
           isLoading={mpLoading}
           onCreateGame={handleCreateMultiplayerGame}
           onJoinGame={handleJoinMultiplayerGame}
-          onStartGame={startGame}
+          onStartGame={() => setGamePhase("multiplayer-verse-selection")}
           onlineCount={onlineCount}
           isOnline={isOnline}
           onBroadcastInvitation={handleBroadcastInvitation}
@@ -587,9 +587,49 @@ export default function PTScrabble() {
             isLoading={mpLoading}
             onCreateGame={handleCreateMultiplayerGame}
             onJoinGame={handleJoinMultiplayerGame}
-            onStartGame={startGame}
+            onStartGame={() => setGamePhase("multiplayer-verse-selection")}
             onlineCount={onlineCount}
             isOnline={isOnline}
+          />
+        </main>
+      </div>
+    );
+  }
+
+  // ========== MULTIPLAYER VERSE SELECTION VIEW ==========
+  if (gamePhase === "multiplayer-verse-selection") {
+    const handleMultiplayerVerseSelected = async (verse: SelectedVerse) => {
+      setSeedVerse(verse);
+      // Start the actual game
+      const started = await startGame();
+      if (started) {
+        setGamePhase("multiplayer-playing");
+      }
+    };
+
+    return (
+      <div className="min-h-screen bg-background">
+        <Navigation />
+        <main className="container mx-auto px-4 py-8">
+          <Button onClick={() => setGamePhase("multiplayer-lobby")} variant="ghost" className="mb-6">
+            <ArrowLeft className="mr-2 h-4 w-4" />
+            Back to Lobby
+          </Button>
+
+          {mpGame && (
+            <div className="text-center mb-6 p-4 bg-muted rounded-lg">
+              <p className="text-sm text-muted-foreground">
+                Room Code: <span className="font-mono font-bold text-lg">{mpGame.roomCode}</span>
+              </p>
+              <p className="text-sm text-muted-foreground mt-1">
+                {mpPlayers.length} {mpPlayers.length === 1 ? 'player' : 'players'} ready
+              </p>
+            </div>
+          )}
+
+          <VerseSelectionScreen
+            onVerseSelected={handleMultiplayerVerseSelected}
+            onBack={() => setGamePhase("multiplayer-lobby")}
           />
         </main>
       </div>
