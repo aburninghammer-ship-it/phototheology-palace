@@ -9,5 +9,6 @@ export { VotingOverlay } from './VotingOverlay';
 export { VotingPanel } from './VotingPanel';
 export { VerseSelectionScreen, type SelectedVerse } from './VerseSelectionScreen';
 export { SeedVerseDisplay } from './SeedVerseDisplay';
+export { SeedCardInsight } from './SeedCardInsight';
 export { StudyLog, type StudyLogEntry } from './StudyLog';
 export { StudyTranscript } from './StudyTranscript';

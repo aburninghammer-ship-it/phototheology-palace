@@ -17,6 +17,7 @@ import {
   PlayerHandBar,
   VerseSelectionScreen,
   SeedVerseDisplay,
+  SeedCardInsight,
   BibleStudyConnectionModal,
   GameLobby,
   ConnectionModal,
@@ -30,7 +31,7 @@ import type { ScrabbleCard, PlacedCard, BoardPosition, Connection } from "@/type
 import { positionKey, isValidPlacement } from "@/types/scrabble";
 import { getAllScrabbleCards, shuffleCards } from "@/data/scrabbleCards";
 
-type GamePhase = "menu" | "verse-selection" | "playing" | "completed" | "multiplayer-lobby" | "multiplayer-playing";
+type GamePhase = "menu" | "verse-selection" | "seed-insight" | "playing" | "completed" | "multiplayer-lobby" | "multiplayer-playing";
 
 export default function PTScrabble() {
   const { user, loading } = useAuth();
@@ -40,6 +41,7 @@ export default function PTScrabble() {
   const [selectedCard, setSelectedCard] = useState<ScrabbleCard | null>(null);
   const [score, setScore] = useState(0);
   const [seedVerse, setSeedVerse] = useState<SelectedVerse | null>(null);
+  const [seedCard, setSeedCard] = useState<ScrabbleCard | null>(null);
 
   // Study log entries - tracks all submissions for display and transcript
   const [studyLogEntries, setStudyLogEntries] = useState<StudyLogEntry[]>([]);
@@ -91,26 +93,29 @@ export default function PTScrabble() {
   // Start game with selected verse
   const handleVerseSelected = useCallback((verse: SelectedVerse) => {
     setSeedVerse(verse);
-    
+
     // Initialize game state
     const allCards = shuffleCards(getAllScrabbleCards());
-    
+
     // Pick a seed card - prefer Concentration Room or Story Room for Bible study
-    const preferredSeeds = allCards.filter(c => 
-      ['SR', 'OR', 'CR', 'GR', 'IR'].includes(c.code) || 
+    const preferredSeeds = allCards.filter(c =>
+      ['SR', 'OR', 'CR', 'GR', 'IR'].includes(c.code) ||
       c.tags.includes('christology') ||
       c.tags.includes('narrative')
     );
     const seedCardPool = preferredSeeds.length > 0 ? preferredSeeds : allCards.filter(c => c.floor >= 1 && c.floor <= 4);
-    const seedCard = seedCardPool[Math.floor(Math.random() * seedCardPool.length)];
-    
+    const chosenSeedCard = seedCardPool[Math.floor(Math.random() * seedCardPool.length)];
+
+    // Store seed card for insight screen
+    setSeedCard(chosenSeedCard);
+
     // Remove seed from available cards
-    const remainingCards = allCards.filter(c => c.id !== seedCard.id);
-    
+    const remainingCards = allCards.filter(c => c.id !== chosenSeedCard.id);
+
     // Set up board with seed card
     setBoardState({
       "0,0": {
-        card: seedCard,
+        card: chosenSeedCard,
         position: { x: 0, y: 0 },
         playerId: "system",
         playerName: "Starting Principle",
@@ -119,13 +124,15 @@ export default function PTScrabble() {
         moveId: "seed",
       }
     });
-    
+
     // Deal hand
     setPlayerHand(remainingCards.slice(0, 7));
     setDeck(remainingCards.slice(7));
     setScore(0);
     setSelectedCard(null);
-    setGamePhase("playing");
+
+    // Go to seed insight screen first
+    setGamePhase("seed-insight");
   }, []);
 
   const handleCardSelect = useCallback((card: ScrabbleCard) => {
@@ -217,6 +224,7 @@ export default function PTScrabble() {
   const handleNewGame = useCallback(() => {
     setGamePhase("verse-selection");
     setSeedVerse(null);
+    setSeedCard(null);
     setBoardState({});
     setPlayerHand([]);
     setDeck([]);
@@ -429,6 +437,17 @@ export default function PTScrabble() {
           />
         </main>
       </div>
+    );
+  }
+
+  // Seed card insight view - explains how the starting card connects to the verse
+  if (gamePhase === "seed-insight" && seedCard && seedVerse) {
+    return (
+      <SeedCardInsight
+        seedCard={seedCard}
+        verse={seedVerse}
+        onContinue={() => setGamePhase("playing")}
+      />
     );
   }
 
