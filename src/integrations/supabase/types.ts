@@ -14863,7 +14863,9 @@ export type Database = {
           bible_translation: string | null
           has_seen_mode_selector: boolean | null
           id: string
+          nav_tab_order: string[] | null
           navigation_style: string | null
+          pinned_nav_tabs: string[] | null
           reading_mode: string | null
           study_buddy_theme: string | null
           suite_mode: string | null
@@ -14876,7 +14878,9 @@ export type Database = {
           bible_translation?: string | null
           has_seen_mode_selector?: boolean | null
           id?: string
+          nav_tab_order?: string[] | null
           navigation_style?: string | null
+          pinned_nav_tabs?: string[] | null
           reading_mode?: string | null
           study_buddy_theme?: string | null
           suite_mode?: string | null
@@ -14889,7 +14893,9 @@ export type Database = {
           bible_translation?: string | null
           has_seen_mode_selector?: boolean | null
           id?: string
+          nav_tab_order?: string[] | null
           navigation_style?: string | null
+          pinned_nav_tabs?: string[] | null
           reading_mode?: string | null
           study_buddy_theme?: string | null
           suite_mode?: string | null
