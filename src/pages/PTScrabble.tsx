@@ -6,9 +6,10 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import { Navigation } from "@/components/Navigation";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { ArrowLeft, Users, Sparkles, Gamepad2, BookOpen, Cross, Book, Trophy, Layers, Globe, Megaphone } from "lucide-react";
+import { ArrowLeft, Users, Sparkles, Gamepad2, BookOpen, Cross, Book, Trophy, Layers, Globe, Megaphone, Calendar } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useScrabbleGame } from "@/hooks/useScrabbleGame";
 import { useGamePresence, type GameInvitation } from "@/hooks/useGamePresence";
@@ -446,100 +447,114 @@ export default function PTScrabble() {
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
-              {/* Rules summary */}
-              <div className="grid md:grid-cols-3 gap-4 text-center">
-                <div className="p-4 bg-muted/50 rounded-lg">
-                  <Gamepad2 className="h-8 w-8 mx-auto mb-2 text-primary" />
-                  <h3 className="font-semibold">1. Place Cards</h3>
-                  <p className="text-sm text-muted-foreground">
-                    Select a PT principle card and place it on the board
-                  </p>
-                </div>
-                <div className="p-4 bg-muted/50 rounded-lg">
-                  <BookOpen className="h-8 w-8 mx-auto mb-2 text-primary" />
-                  <h3 className="font-semibold">2. Make Connections</h3>
-                  <p className="text-sm text-muted-foreground">
-                    Explain how your card connects to adjacent cards
-                  </p>
-                </div>
-                <div className="p-4 bg-muted/50 rounded-lg">
-                  <Cross className="h-8 w-8 mx-auto mb-2 text-primary" />
-                  <h3 className="font-semibold">3. Score Points</h3>
-                  <p className="text-sm text-muted-foreground">
-                    Earn bonus points for Christ-centered connections
-                  </p>
-                </div>
-              </div>
+              <Tabs defaultValue="play" className="w-full">
+                <TabsList className="grid w-full grid-cols-2 mb-6">
+                  <TabsTrigger value="play" className="gap-2">
+                    <Gamepad2 className="h-4 w-4" />
+                    Play
+                  </TabsTrigger>
+                  <TabsTrigger value="schedule" className="gap-2">
+                    <Calendar className="h-4 w-4" />
+                    Schedule
+                  </TabsTrigger>
+                </TabsList>
 
-              {/* Online users indicator */}
-              {onlineCount > 0 && (
-                <motion.div
-                  initial={{ opacity: 0, y: -10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className="flex items-center justify-center gap-2 p-3 bg-green-500/10 border border-green-500/30 rounded-lg"
-                >
-                  <motion.div
-                    className="w-2 h-2 rounded-full bg-green-400"
-                    animate={{ scale: [1, 1.3, 1] }}
-                    transition={{ duration: 2, repeat: Infinity }}
-                  />
-                  <span className="text-sm text-green-600 dark:text-green-400">
-                    <strong>{onlineCount}</strong> {onlineCount === 1 ? 'player' : 'players'} online right now
-                  </span>
-                  <Users className="h-4 w-4 text-green-500" />
-                </motion.div>
-              )}
+                <TabsContent value="play" className="space-y-6">
+                  {/* Rules summary */}
+                  <div className="grid md:grid-cols-3 gap-4 text-center">
+                    <div className="p-4 bg-muted/50 rounded-lg">
+                      <Gamepad2 className="h-8 w-8 mx-auto mb-2 text-primary" />
+                      <h3 className="font-semibold">1. Place Cards</h3>
+                      <p className="text-sm text-muted-foreground">
+                        Select a PT principle card and place it on the board
+                      </p>
+                    </div>
+                    <div className="p-4 bg-muted/50 rounded-lg">
+                      <BookOpen className="h-8 w-8 mx-auto mb-2 text-primary" />
+                      <h3 className="font-semibold">2. Make Connections</h3>
+                      <p className="text-sm text-muted-foreground">
+                        Explain how your card connects to adjacent cards
+                      </p>
+                    </div>
+                    <div className="p-4 bg-muted/50 rounded-lg">
+                      <Cross className="h-8 w-8 mx-auto mb-2 text-primary" />
+                      <h3 className="font-semibold">3. Score Points</h3>
+                      <p className="text-sm text-muted-foreground">
+                        Earn bonus points for Christ-centered connections
+                      </p>
+                    </div>
+                  </div>
 
-              {/* Game mode buttons */}
-              <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
-                <Button
-                  size="lg"
-                  onClick={() => setGamePhase("verse-selection")}
-                  className="bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600"
-                >
-                  <Gamepad2 className="mr-2 h-5 w-5" />
-                  Solo Game
-                </Button>
-                <Button
-                  size="lg"
-                  variant="outline"
-                  onClick={() => setGamePhase("multiplayer-lobby")}
-                  className="border-green-500/50 hover:bg-green-500/10 text-green-600 dark:text-green-400"
-                >
-                  <Globe className="mr-2 h-5 w-5" />
-                  Multiplayer Game
+                  {/* Online users indicator */}
                   {onlineCount > 0 && (
-                    <span className="ml-2 px-1.5 py-0.5 text-xs bg-green-500/20 rounded-full">
-                      {onlineCount} online
-                    </span>
+                    <motion.div
+                      initial={{ opacity: 0, y: -10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      className="flex items-center justify-center gap-2 p-3 bg-green-500/10 border border-green-500/30 rounded-lg"
+                    >
+                      <motion.div
+                        className="w-2 h-2 rounded-full bg-green-400"
+                        animate={{ scale: [1, 1.3, 1] }}
+                        transition={{ duration: 2, repeat: Infinity }}
+                      />
+                      <span className="text-sm text-green-600 dark:text-green-400">
+                        <strong>{onlineCount}</strong> {onlineCount === 1 ? 'player' : 'players'} online right now
+                      </span>
+                      <Users className="h-4 w-4 text-green-500" />
+                    </motion.div>
                   )}
-                </Button>
-              </div>
 
-              {/* Scoring info */}
-              <div className="bg-gradient-to-r from-amber-50 to-yellow-50 dark:from-amber-950/20 dark:to-yellow-950/20 border border-amber-200 dark:border-amber-800 rounded-lg p-4 mt-6">
-                <h4 className="font-semibold mb-2 flex items-center gap-2">
-                  <Sparkles className="h-4 w-4 text-amber-500" />
-                  Scoring System
-                </h4>
-                <ul className="text-sm text-muted-foreground space-y-1">
-                  <li>• 1 connection = 1 point</li>
-                  <li>• 2 connections = 3 points</li>
-                  <li>• 3 connections = 6 points</li>
-                  <li>• 4+ connections = 10+ points</li>
-                  <li>• <strong>Christ Connection = 2x multiplier!</strong></li>
-                </ul>
-              </div>
+                  {/* Game mode buttons */}
+                  <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
+                    <Button
+                      size="lg"
+                      onClick={() => setGamePhase("verse-selection")}
+                      className="bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600"
+                    >
+                      <Gamepad2 className="mr-2 h-5 w-5" />
+                      Solo Game
+                    </Button>
+                    <Button
+                      size="lg"
+                      variant="outline"
+                      onClick={() => setGamePhase("multiplayer-lobby")}
+                      className="border-green-500/50 hover:bg-green-500/10 text-green-600 dark:text-green-400"
+                    >
+                      <Globe className="mr-2 h-5 w-5" />
+                      Multiplayer Game
+                      {onlineCount > 0 && (
+                        <span className="ml-2 px-1.5 py-0.5 text-xs bg-green-500/20 rounded-full">
+                          {onlineCount} online
+                        </span>
+                      )}
+                    </Button>
+                  </div>
 
-              {/* Scheduled Games (Meet Me Later) */}
-              <div className="mt-6 pt-6 border-t">
-                <ScheduledGamesPanel
-                  onJoinGame={(roomCode) => {
-                    setGamePhase("multiplayer-lobby");
-                    // The join will happen automatically when lobby loads with code
-                  }}
-                />
-              </div>
+                  {/* Scoring info */}
+                  <div className="bg-gradient-to-r from-amber-50 to-yellow-50 dark:from-amber-950/20 dark:to-yellow-950/20 border border-amber-200 dark:border-amber-800 rounded-lg p-4 mt-6">
+                    <h4 className="font-semibold mb-2 flex items-center gap-2">
+                      <Sparkles className="h-4 w-4 text-amber-500" />
+                      Scoring System
+                    </h4>
+                    <ul className="text-sm text-muted-foreground space-y-1">
+                      <li>• 1 connection = 1 point</li>
+                      <li>• 2 connections = 3 points</li>
+                      <li>• 3 connections = 6 points</li>
+                      <li>• 4+ connections = 10+ points</li>
+                      <li>• <strong>Christ Connection = 2x multiplier!</strong></li>
+                    </ul>
+                  </div>
+                </TabsContent>
+
+                <TabsContent value="schedule" className="space-y-6">
+                  <ScheduledGamesPanel
+                    onJoinGame={(roomCode) => {
+                      setGamePhase("multiplayer-lobby");
+                      // The join will happen automatically when lobby loads with code
+                    }}
+                  />
+                </TabsContent>
+              </Tabs>
             </CardContent>
           </Card>
         </main>
@@ -580,7 +595,7 @@ export default function PTScrabble() {
           isLoading={mpLoading}
           onCreateGame={handleCreateMultiplayerGame}
           onJoinGame={handleJoinMultiplayerGame}
-          onStartGame={() => setGamePhase("multiplayer-verse-selection")}
+          onStartGame={async () => { setGamePhase("multiplayer-verse-selection"); return true; }}
           onlineCount={onlineCount}
           isOnline={isOnline}
           onBroadcastInvitation={handleBroadcastInvitation}
@@ -621,7 +636,7 @@ export default function PTScrabble() {
             isLoading={mpLoading}
             onCreateGame={handleCreateMultiplayerGame}
             onJoinGame={handleJoinMultiplayerGame}
-            onStartGame={() => setGamePhase("multiplayer-verse-selection")}
+            onStartGame={async () => { setGamePhase("multiplayer-verse-selection"); return true; }}
             onlineCount={onlineCount}
             isOnline={isOnline}
           />
