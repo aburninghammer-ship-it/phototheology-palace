@@ -41,8 +41,8 @@ export default defineConfig(({ mode }) => ({
       },
       workbox: {
         // Workbox won't precache assets > 2 MiB by default.
-        // Our main JS bundle is slightly above that, so allow a small headroom.
-        maximumFileSizeToCacheInBytes: 3 * 1024 * 1024, // 3 MiB
+        // Some of our images can exceed 3 MiB, so allow a larger headroom.
+        maximumFileSizeToCacheInBytes: 6 * 1024 * 1024, // 6 MiB
         navigateFallback: '/index.html',
         runtimeCaching: [
           {
