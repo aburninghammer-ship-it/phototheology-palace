@@ -346,11 +346,20 @@ export function VerseSelectionScreen({ onVerseSelected, onBack }: VerseSelection
               <p className="text-sm leading-relaxed italic">
                 "{fetchedVerse.text}"
               </p>
-              <Button onClick={handleStartGame} className="w-full">
-                <ArrowRight className="mr-2 h-4 w-4" />
-                Start Bible Study Game
-              </Button>
             </motion.div>
+          )}
+
+          {/* Start Game Button - Always visible when not on custom tab */}
+          {tab !== 'custom' && (
+            <Button
+              onClick={handleStartGame}
+              disabled={!fetchedVerse}
+              size="lg"
+              className="w-full bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700"
+            >
+              <ArrowRight className="mr-2 h-5 w-5" />
+              {fetchedVerse ? 'Start Bible Study Game' : 'Select a verse above to start'}
+            </Button>
           )}
 
           {/* Back Button */}
