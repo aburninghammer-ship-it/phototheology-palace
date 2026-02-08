@@ -10318,6 +10318,262 @@ export type Database = {
           },
         ]
       }
+      pt_scrabble_games: {
+        Row: {
+          board_state: Json
+          created_at: string
+          current_move_id: string | null
+          deck_remaining: string[]
+          ended_at: string | null
+          game_mode: string
+          host_user_id: string
+          id: string
+          max_players: number
+          room_code: string
+          seed_card_id: string
+          seed_verse: string | null
+          started_at: string | null
+          status: string
+          vote_timeout_seconds: number
+        }
+        Insert: {
+          board_state?: Json
+          created_at?: string
+          current_move_id?: string | null
+          deck_remaining?: string[]
+          ended_at?: string | null
+          game_mode?: string
+          host_user_id: string
+          id?: string
+          max_players?: number
+          room_code: string
+          seed_card_id: string
+          seed_verse?: string | null
+          started_at?: string | null
+          status?: string
+          vote_timeout_seconds?: number
+        }
+        Update: {
+          board_state?: Json
+          created_at?: string
+          current_move_id?: string | null
+          deck_remaining?: string[]
+          ended_at?: string | null
+          game_mode?: string
+          host_user_id?: string
+          id?: string
+          max_players?: number
+          room_code?: string
+          seed_card_id?: string
+          seed_verse?: string | null
+          started_at?: string | null
+          status?: string
+          vote_timeout_seconds?: number
+        }
+        Relationships: []
+      }
+      pt_scrabble_moves: {
+        Row: {
+          card_code: string
+          card_id: string
+          card_name: string
+          connections: Json
+          created_at: string
+          explanation: string | null
+          game_id: string
+          id: string
+          is_christ_connection: boolean
+          player_id: string
+          points_awarded: number
+          points_base: number
+          position_x: number
+          position_y: number
+          validation_status: string
+          votes_approve: number
+          votes_reject: number
+          voting_ends_at: string | null
+        }
+        Insert: {
+          card_code: string
+          card_id: string
+          card_name: string
+          connections?: Json
+          created_at?: string
+          explanation?: string | null
+          game_id: string
+          id?: string
+          is_christ_connection?: boolean
+          player_id: string
+          points_awarded?: number
+          points_base?: number
+          position_x: number
+          position_y: number
+          validation_status?: string
+          votes_approve?: number
+          votes_reject?: number
+          voting_ends_at?: string | null
+        }
+        Update: {
+          card_code?: string
+          card_id?: string
+          card_name?: string
+          connections?: Json
+          created_at?: string
+          explanation?: string | null
+          game_id?: string
+          id?: string
+          is_christ_connection?: boolean
+          player_id?: string
+          points_awarded?: number
+          points_base?: number
+          position_x?: number
+          position_y?: number
+          validation_status?: string
+          votes_approve?: number
+          votes_reject?: number
+          voting_ends_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pt_scrabble_moves_game_id_fkey"
+            columns: ["game_id"]
+            isOneToOne: false
+            referencedRelation: "pt_scrabble_games"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pt_scrabble_moves_player_id_fkey"
+            columns: ["player_id"]
+            isOneToOne: false
+            referencedRelation: "pt_scrabble_players"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      pt_scrabble_players: {
+        Row: {
+          avatar_url: string | null
+          cards_played: number
+          display_name: string
+          game_id: string
+          hand: Json
+          id: string
+          is_connected: boolean
+          joined_at: string
+          last_seen_at: string
+          score: number
+          team_id: string | null
+          user_id: string
+        }
+        Insert: {
+          avatar_url?: string | null
+          cards_played?: number
+          display_name: string
+          game_id: string
+          hand?: Json
+          id?: string
+          is_connected?: boolean
+          joined_at?: string
+          last_seen_at?: string
+          score?: number
+          team_id?: string | null
+          user_id: string
+        }
+        Update: {
+          avatar_url?: string | null
+          cards_played?: number
+          display_name?: string
+          game_id?: string
+          hand?: Json
+          id?: string
+          is_connected?: boolean
+          joined_at?: string
+          last_seen_at?: string
+          score?: number
+          team_id?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pt_scrabble_players_game_id_fkey"
+            columns: ["game_id"]
+            isOneToOne: false
+            referencedRelation: "pt_scrabble_games"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      pt_scrabble_teams: {
+        Row: {
+          game_id: string
+          id: string
+          team_name: string
+          team_number: number
+          total_score: number
+        }
+        Insert: {
+          game_id: string
+          id?: string
+          team_name: string
+          team_number: number
+          total_score?: number
+        }
+        Update: {
+          game_id?: string
+          id?: string
+          team_name?: string
+          team_number?: number
+          total_score?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pt_scrabble_teams_game_id_fkey"
+            columns: ["game_id"]
+            isOneToOne: false
+            referencedRelation: "pt_scrabble_games"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      pt_scrabble_votes: {
+        Row: {
+          created_at: string
+          id: string
+          move_id: string
+          player_id: string
+          vote: boolean
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          move_id: string
+          player_id: string
+          vote: boolean
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          move_id?: string
+          player_id?: string
+          vote?: boolean
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pt_scrabble_votes_move_id_fkey"
+            columns: ["move_id"]
+            isOneToOne: false
+            referencedRelation: "pt_scrabble_moves"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pt_scrabble_votes_player_id_fkey"
+            columns: ["player_id"]
+            isOneToOne: false
+            referencedRelation: "pt_scrabble_players"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       pt_sessions: {
         Row: {
           competency_check_passed: boolean | null
