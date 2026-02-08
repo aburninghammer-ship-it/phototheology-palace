@@ -637,7 +637,7 @@ export default function PTScrabble() {
   }
 
   // ========== MULTIPLAYER PLAYING VIEW ==========
-  if (gamePhase === "multiplayer-playing" || (mpGame && mpGame.status === 'playing')) {
+  if (gamePhase === "multiplayer-playing") {
     // Game completed
     if (mpGame?.status === 'completed') {
       const sortedPlayers = [...mpPlayers].sort((a, b) => b.score - a.score);
