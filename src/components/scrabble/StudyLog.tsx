@@ -120,7 +120,7 @@ export function StudyLog({ entries, className }: StudyLogProps) {
           {/* Hint */}
           <div className="p-2 border-t">
             <p className="text-xs text-muted-foreground text-center">
-              Build on others' insights for deeper connections!
+              Each card must build on the previous point while tying in a new principle!
             </p>
           </div>
         </div>
