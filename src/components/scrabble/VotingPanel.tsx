@@ -204,7 +204,7 @@ export function VotingPanel({
   if (pendingMoves.length === 0) return null;
 
   return (
-    <div className="fixed right-4 top-20 bottom-44 w-72 z-40 flex flex-col gap-2 overflow-y-auto pointer-events-none">
+    <div className="fixed right-2 md:right-4 top-20 bottom-44 w-56 md:w-72 z-30 flex flex-col gap-2 overflow-y-auto pointer-events-none">
       <div className="text-xs font-medium text-muted-foreground bg-background/80 backdrop-blur px-2 py-1 rounded pointer-events-auto">
         {pendingMoves.length} pending vote{pendingMoves.length !== 1 ? 's' : ''}
       </div>

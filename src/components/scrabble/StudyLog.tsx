@@ -24,7 +24,8 @@ interface StudyLogProps {
 }
 
 export function StudyLog({ entries, className }: StudyLogProps) {
-  const [isCollapsed, setIsCollapsed] = useState(false);
+  // Start collapsed by default - less intrusive
+  const [isCollapsed, setIsCollapsed] = useState(true);
 
   if (entries.length === 0) {
     return null;
@@ -33,8 +34,9 @@ export function StudyLog({ entries, className }: StudyLogProps) {
   return (
     <div
       className={cn(
-        'fixed left-0 top-20 bottom-44 z-40 flex transition-all duration-300',
-        isCollapsed ? 'w-10' : 'w-80',
+        'fixed left-0 top-20 bottom-44 z-30 flex transition-all duration-300',
+        // Smaller on mobile, start collapsed
+        isCollapsed ? 'w-10' : 'w-64 md:w-80',
         className
       )}
     >
@@ -60,7 +62,7 @@ export function StudyLog({ entries, className }: StudyLogProps) {
 
       {/* Expanded state */}
       {!isCollapsed && (
-        <div className="w-80 h-full bg-background/95 backdrop-blur border-r flex flex-col">
+        <div className="w-64 md:w-80 h-full bg-background/95 backdrop-blur border-r flex flex-col">
           {/* Header */}
           <div className="p-3 border-b flex items-center gap-2">
             <ScrollText className="h-5 w-5 text-primary" />

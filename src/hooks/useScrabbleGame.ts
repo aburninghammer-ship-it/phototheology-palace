@@ -167,6 +167,7 @@ export function useScrabbleGame(gameId?: string): UseScrabbleGameReturn {
 
   const loadPlayers = async (gameId: string) => {
     try {
+      console.log('[loadPlayers] Loading players for game:', gameId);
       const { data, error: fetchError } = await supabase
         .from('pt_scrabble_players')
         .select('*')
@@ -174,6 +175,7 @@ export function useScrabbleGame(gameId?: string): UseScrabbleGameReturn {
         .order('joined_at');
 
       if (fetchError) throw fetchError;
+      console.log('[loadPlayers] Found', data?.length || 0, 'players');
 
       const mappedPlayers: ScrabblePlayer[] = (data || []).map(p => ({
         id: p.id,
@@ -182,7 +184,22 @@ export function useScrabbleGame(gameId?: string): UseScrabbleGameReturn {
         teamId: p.team_id || undefined,
         displayName: p.display_name,
         avatarUrl: p.avatar_url || undefined,
-        hand: ((p.hand as any[]) || []).map((cardData: any) => getCardById(cardData.id) || cardData).filter(Boolean),
+        hand: ((p.hand as any[]) || []).map((cardData: any) => {
+          // Try to get full card data, fall back to stored data with defaults
+          const fullCard = getCardById(cardData.id);
+          if (fullCard) return fullCard;
+          // Reconstruct card with stored data plus defaults
+          return {
+            id: cardData.id,
+            code: cardData.code || 'UNK',
+            name: cardData.name || 'Unknown Card',
+            floor: cardData.floor || 1,
+            category: cardData.category || 'Unknown',
+            icon: cardData.icon || 'HelpCircle',
+            tags: cardData.tags || [],
+            description: cardData.description || '',
+          };
+        }).filter(Boolean),
         score: p.score,
         cardsPlayed: p.cards_played,
         isConnected: p.is_connected,
@@ -190,12 +207,19 @@ export function useScrabbleGame(gameId?: string): UseScrabbleGameReturn {
         lastSeenAt: p.last_seen_at,
       }));
 
+      console.log('[loadPlayers] Mapped players:', mappedPlayers.map(p => ({
+        name: p.displayName,
+        handSize: p.hand.length,
+        score: p.score,
+      })));
+
       setPlayers(mappedPlayers);
 
       // Find my player
       if (user) {
         const me = mappedPlayers.find(p => p.userId === user.id);
         if (me) {
+          console.log('[loadPlayers] Found my player:', me.displayName, 'with', me.hand.length, 'cards');
           setMyPlayerId(me.id);
         }
       }
@@ -409,12 +433,21 @@ export function useScrabbleGame(gameId?: string): UseScrabbleGameReturn {
       return false;
     }
 
+    // Ensure players are loaded
+    if (players.length === 0) {
+      toast.error('No players in game');
+      return false;
+    }
+
     setIsLoading(true);
 
     try {
+      console.log('[startGame] Starting game with', players.length, 'players');
+
       // Deal cards to all players
       const cardsPerPlayer = 10;
       const { hands, deck, seedCard } = dealCards(players.length, cardsPerPlayer);
+      console.log('[startGame] Dealt', hands.length, 'hands, deck has', deck.length, 'cards, seed:', seedCard.code);
 
       // Create initial board with seed card
       const initialBoard: Record<string, PlacedCard> = {
@@ -455,7 +488,7 @@ export function useScrabbleGame(gameId?: string): UseScrabbleGameReturn {
 
       if (updateError) throw updateError;
 
-      // Update local state
+      // Update local state immediately for responsive UI
       setGame(prev => prev ? {
         ...prev,
         status: 'playing',
@@ -468,6 +501,14 @@ export function useScrabbleGame(gameId?: string): UseScrabbleGameReturn {
         ...p,
         hand: hands[i] || [],
       })));
+
+      // Reload from database to ensure we have the correct state
+      // This prevents race conditions with realtime subscriptions
+      console.log('[startGame] Waiting for DB propagation...');
+      await new Promise(resolve => setTimeout(resolve, 300));
+      console.log('[startGame] Reloading players...');
+      await loadPlayers(game.id);
+      console.log('[startGame] Players reloaded, game started successfully');
 
       toast.success('Game started!');
       return true;
