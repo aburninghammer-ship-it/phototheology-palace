@@ -444,23 +444,13 @@ export function useScrabbleGame(gameId?: string): UseScrabbleGameReturn {
     try {
       console.log('[startGame] Starting game with', players.length, 'players');
 
-      // Deal cards to all players
+      // Deal cards to all players - no seed card, first player places first card
       const cardsPerPlayer = 10;
-      const { hands, deck, seedCard } = dealCards(players.length, cardsPerPlayer);
-      console.log('[startGame] Dealt', hands.length, 'hands, deck has', deck.length, 'cards, seed:', seedCard.code);
+      const { hands, deck } = dealCards(players.length, cardsPerPlayer);
+      console.log('[startGame] Dealt', hands.length, 'hands, deck has', deck.length, 'cards');
 
-      // Create initial board with seed card
-      const initialBoard: Record<string, PlacedCard> = {
-        '0,0': {
-          card: seedCard,
-          position: { x: 0, y: 0 },
-          playerId: 'system',
-          playerName: 'Game Start',
-          connections: [],
-          timestamp: new Date().toISOString(),
-          moveId: 'seed',
-        },
-      };
+      // Start with empty board - first player will place the first card
+      const initialBoard: Record<string, PlacedCard> = {};
 
       // Update each player's hand in database
       for (let i = 0; i < players.length; i++) {
