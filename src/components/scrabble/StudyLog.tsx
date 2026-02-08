@@ -3,7 +3,7 @@
 
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ScrollText, User, ChevronLeft, ChevronRight, Sparkles, Cross } from 'lucide-react';
+import { ScrollText, User, ChevronLeft, ChevronRight, Sparkles, Cross, Bot, Book, Link } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 
@@ -16,6 +16,8 @@ export interface StudyLogEntry {
   isChristConnection: boolean;
   points: number;
   timestamp: string;
+  jeevesJudgment?: string; // Jeeves' explanation of how this connects
+  connectingTo?: 'verse' | 'previous'; // What this entry connects to
 }
 
 interface StudyLogProps {
@@ -103,11 +105,33 @@ export function StudyLog({ entries, className }: StudyLogProps) {
                     </div>
                   </div>
 
-                  {/* Card name */}
-                  <p className="text-xs text-muted-foreground mb-1">{entry.cardName}</p>
+                  {/* Card name and connection type */}
+                  <div className="flex items-center gap-2 mb-1">
+                    <p className="text-xs text-muted-foreground">{entry.cardName}</p>
+                    {entry.connectingTo && (
+                      <span className="text-xs px-1.5 py-0.5 rounded bg-muted flex items-center gap-1">
+                        {entry.connectingTo === 'verse' ? (
+                          <><Book className="h-2.5 w-2.5" /> to verse</>
+                        ) : (
+                          <><Link className="h-2.5 w-2.5" /> to previous</>
+                        )}
+                      </span>
+                    )}
+                  </div>
 
                   {/* Explanation */}
                   <p className="text-sm leading-relaxed">{entry.explanation}</p>
+
+                  {/* Jeeves Judgment */}
+                  {entry.jeevesJudgment && (
+                    <div className="mt-2 p-2 bg-blue-500/10 rounded border border-blue-500/20">
+                      <div className="flex items-center gap-1 mb-1">
+                        <Bot className="h-3 w-3 text-blue-500" />
+                        <span className="text-xs font-medium text-blue-600 dark:text-blue-400">Jeeves</span>
+                      </div>
+                      <p className="text-xs text-muted-foreground leading-relaxed">{entry.jeevesJudgment}</p>
+                    </div>
+                  )}
 
                   {/* Points */}
                   <div className="flex items-center justify-end gap-1 mt-2">

@@ -1,5 +1,5 @@
 // PT Scrabble Bible Study Connection Modal
-// Modal for explaining how a PT principle applies to the central verse
+// Modal for explaining how a PT principle applies to the verse or previous insight
 
 import { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -12,6 +12,10 @@ import {
   Book,
   ChevronDown,
   ChevronUp,
+  Bot,
+  Loader2,
+  Link,
+  User,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
@@ -30,19 +34,22 @@ import {
   CollapsibleContent,
 } from '@/components/ui/collapsible';
 import { ScrabbleTile } from './ScrabbleTile';
+import { supabase } from '@/integrations/supabase/client';
 import type { ScrabbleCard, PlacedCard, Connection, BoardPosition } from '@/types/scrabble';
 import { calculateScoreWithTimeBonus, SCRABBLE_SCORING, getDirection } from '@/types/scrabble';
 import type { SelectedVerse } from './VerseSelectionScreen';
+import type { StudyLogEntry } from './StudyLog';
 import { cn } from '@/lib/utils';
 
 interface BibleStudyConnectionModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSubmit: (connections: Connection[], explanation: string, isChristConnection: boolean) => void;
+  onSubmit: (connections: Connection[], explanation: string, isChristConnection: boolean, jeevesJudgment?: string) => void;
   card: ScrabbleCard;
   position: BoardPosition;
   adjacentCards: PlacedCard[];
   seedVerse: SelectedVerse;
+  previousEntry?: StudyLogEntry; // The previous player's insight to connect to
 }
 
 // Generate suggestions based on actual PT principles from palaceData
@@ -290,12 +297,17 @@ export function BibleStudyConnectionModal({
   position,
   adjacentCards,
   seedVerse,
+  previousEntry,
 }: BibleStudyConnectionModalProps) {
   const [timeLeft, setTimeLeft] = useState<number>(SCRABBLE_SCORING.TIMER_SECONDS); // 2 minutes
   const [explanation, setExplanation] = useState('');
   const [isChristConnection, setIsChristConnection] = useState(false);
   const [showSuggestions, setShowSuggestions] = useState(true);
+  const [isJudging, setIsJudging] = useState(false);
+  const [jeevesJudgment, setJeevesJudgment] = useState<string | null>(null);
 
+  // Determine if this is the first play (connect to verse) or subsequent (connect to previous)
+  const isFirstPlay = !previousEntry;
   const suggestions = generateSuggestions(card, seedVerse);
 
   // Timer countdown
@@ -305,6 +317,8 @@ export function BibleStudyConnectionModal({
       setExplanation('');
       setIsChristConnection(false);
       setShowSuggestions(true);
+      setIsJudging(false);
+      setJeevesJudgment(null);
       return;
     }
 
@@ -321,26 +335,87 @@ export function BibleStudyConnectionModal({
     return () => clearInterval(timer);
   }, [isOpen]);
 
+  // Jeeves judging function
+  const getJeevesJudgment = async (playerExplanation: string): Promise<string> => {
+    try {
+      const prompt = isFirstPlay
+        ? `You are Jeeves, a wise Bible study assistant. A player is connecting the PT principle "${card.name}" to ${seedVerse.reference}.
+
+THE VERSE: "${seedVerse.text}"
+
+THE PRINCIPLE: ${card.name}
+${card.description ? `DESCRIPTION: ${card.description}` : ''}
+
+PLAYER'S EXPLANATION: "${playerExplanation}"
+
+In 2-3 sentences, validate how well their explanation connects the PT principle to the verse. Be encouraging but also insightful - point out what they got right and add a brief additional insight they might have missed. Keep it warm and conversational.`
+        : `You are Jeeves, a wise Bible study assistant. A player is building on the previous insight by connecting a new PT principle.
+
+SEED VERSE: ${seedVerse.reference} - "${seedVerse.text}"
+
+PREVIOUS INSIGHT by ${previousEntry?.playerName}:
+- Principle: ${previousEntry?.cardName} (${previousEntry?.cardCode})
+- Their explanation: "${previousEntry?.explanation}"
+
+NEW PRINCIPLE being applied: ${card.name}
+${card.description ? `DESCRIPTION: ${card.description}` : ''}
+
+PLAYER'S EXPLANATION: "${playerExplanation}"
+
+In 2-3 sentences, explain how this new insight builds upon or connects to the previous one. Show how the chain of understanding is growing. Be encouraging and highlight the connection between the two insights.`;
+
+      const { data, error } = await supabase.functions.invoke('jeeves', {
+        body: {
+          message: prompt,
+          context: 'scrabble_judgment',
+        },
+      });
+
+      if (error) throw error;
+      return data?.response || data?.message || 'Great connection!';
+    } catch (err) {
+      console.error('Error getting Jeeves judgment:', err);
+      return isFirstPlay
+        ? `Good connection of "${card.name}" to the verse!`
+        : `Nice way to build on ${previousEntry?.playerName}'s insight about ${previousEntry?.cardName}!`;
+    }
+  };
+
   // Handle suggestion click
   const handleUseSuggestion = (suggestion: string) => {
     setExplanation(suggestion);
     setShowSuggestions(false);
   };
 
-  // Handle submit
-  const handleSubmit = () => {
+  // Handle submit - get Jeeves judgment first
+  const handleSubmit = async () => {
     if (!explanation.trim()) return;
 
-    // Create connections to all adjacent cards
-    const connectionList: Connection[] = adjacentCards.map(ac => ({
-      targetCardId: ac.card.id,
-      targetPosition: ac.position,
-      direction: getDirection(position, ac.position) || 'up',
-      explanation: explanation,
-      isChristConnection: isChristConnection,
-    }));
+    setIsJudging(true);
 
-    onSubmit(connectionList, explanation, isChristConnection);
+    // Get Jeeves' judgment
+    const judgment = await getJeevesJudgment(explanation);
+    setJeevesJudgment(judgment);
+
+    // Create connections to all adjacent cards (or empty for first play)
+    const connectionList: Connection[] = adjacentCards.length > 0
+      ? adjacentCards.map(ac => ({
+          targetCardId: ac.card.id,
+          targetPosition: ac.position,
+          direction: getDirection(position, ac.position) || 'up',
+          explanation: explanation,
+          isChristConnection: isChristConnection,
+        }))
+      : [{
+          targetCardId: 'verse', // Connect to verse for first play
+          targetPosition: position,
+          direction: 'center' as any,
+          explanation: explanation,
+          isChristConnection: isChristConnection,
+        }];
+
+    setIsJudging(false);
+    onSubmit(connectionList, explanation, isChristConnection, judgment);
   };
 
   // Calculate potential score with time bonus
@@ -358,8 +433,12 @@ export function BibleStudyConnectionModal({
         <DialogHeader>
           <DialogTitle className="flex items-center justify-between">
             <span className="flex items-center gap-2">
-              <Book className="h-5 w-5 text-primary" />
-              Explain Connection
+              {isFirstPlay ? (
+                <Book className="h-5 w-5 text-primary" />
+              ) : (
+                <Link className="h-5 w-5 text-primary" />
+              )}
+              {isFirstPlay ? 'Connect to the Verse' : 'Build on Previous Insight'}
             </span>
             <div className={cn('flex items-center gap-2 font-mono', timerColor)}>
               <Clock className="h-5 w-5" />
@@ -367,19 +446,52 @@ export function BibleStudyConnectionModal({
             </div>
           </DialogTitle>
           <DialogDescription>
-            Explain how <strong>{card.name}</strong> connects to <strong>{seedVerse.reference}</strong>
+            {isFirstPlay ? (
+              <>Explain how <strong>{card.name}</strong> helps you understand <strong>{seedVerse.reference}</strong></>
+            ) : (
+              <>Connect <strong>{card.name}</strong> to {previousEntry?.playerName}'s insight about <strong>{previousEntry?.cardName}</strong></>
+            )}
           </DialogDescription>
         </DialogHeader>
 
         <div className="space-y-5">
-          {/* Seed Verse Display */}
-          <div className="p-4 bg-gradient-to-br from-blue-500/10 to-purple-500/10 border border-primary/30 rounded-lg">
-            <div className="flex items-center gap-2 mb-2">
-              <Book className="h-4 w-4 text-primary" />
-              <span className="font-semibold text-primary">{seedVerse.reference}</span>
+          {/* What to connect to - Verse (first play) or Previous Insight (subsequent) */}
+          {isFirstPlay ? (
+            /* First Play: Show the seed verse */
+            <div className="p-4 bg-gradient-to-br from-blue-500/10 to-purple-500/10 border border-primary/30 rounded-lg">
+              <div className="flex items-center gap-2 mb-2">
+                <Book className="h-4 w-4 text-primary" />
+                <span className="font-semibold text-primary">{seedVerse.reference}</span>
+                <span className="text-xs px-2 py-0.5 bg-blue-500/20 rounded-full text-blue-600 dark:text-blue-400">
+                  Connect to this
+                </span>
+              </div>
+              <p className="text-sm italic leading-relaxed">"{seedVerse.text}"</p>
             </div>
-            <p className="text-sm italic leading-relaxed">"{seedVerse.text}"</p>
-          </div>
+          ) : (
+            /* Subsequent Play: Show the previous insight to build upon */
+            <div className="space-y-3">
+              {/* Small verse reference */}
+              <div className="p-2 bg-muted/50 rounded border text-xs">
+                <span className="text-muted-foreground">Studying: </span>
+                <span className="font-medium">{seedVerse.reference}</span>
+              </div>
+
+              {/* Previous insight to connect to */}
+              <div className="p-4 bg-gradient-to-br from-green-500/10 to-blue-500/10 border border-green-500/30 rounded-lg">
+                <div className="flex items-center gap-2 mb-2">
+                  <User className="h-4 w-4 text-green-600" />
+                  <span className="font-semibold text-green-600 dark:text-green-400">{previousEntry?.playerName}</span>
+                  <span className="text-xs font-mono bg-muted px-1.5 py-0.5 rounded">{previousEntry?.cardCode}</span>
+                  <span className="text-xs px-2 py-0.5 bg-green-500/20 rounded-full text-green-600 dark:text-green-400 ml-auto">
+                    Build on this
+                  </span>
+                </div>
+                <p className="text-xs text-muted-foreground mb-1">{previousEntry?.cardName}</p>
+                <p className="text-sm leading-relaxed">"{previousEntry?.explanation}"</p>
+              </div>
+            </div>
+          )}
 
           {/* Your Card */}
           <div className="flex items-center gap-4 p-4 bg-muted rounded-lg">
@@ -430,11 +542,15 @@ export function BibleStudyConnectionModal({
             </Label>
             <Textarea
               id="explanation"
-              placeholder={`How does the ${card.name} principle help you understand ${seedVerse.reference}?`}
+              placeholder={isFirstPlay
+                ? `How does the ${card.name} principle help you understand ${seedVerse.reference}?`
+                : `How does ${card.name} connect to or build upon ${previousEntry?.playerName}'s insight about ${previousEntry?.cardName}?`
+              }
               value={explanation}
               onChange={(e) => setExplanation(e.target.value)}
               rows={4}
               className="text-sm"
+              disabled={isJudging}
             />
           </div>
 
@@ -479,15 +595,27 @@ export function BibleStudyConnectionModal({
 
           {/* Submit button */}
           <div className="flex gap-2">
-            <Button variant="outline" onClick={onClose} className="flex-1">
+            <Button variant="outline" onClick={onClose} className="flex-1" disabled={isJudging}>
               Cancel
             </Button>
             <Button
               onClick={handleSubmit}
-              disabled={!explanation.trim()}
+              disabled={!explanation.trim() || isJudging}
               className="flex-1"
             >
-              {explanation.trim() ? 'Submit' : 'Enter an explanation'}
+              {isJudging ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Jeeves is judging...
+                </>
+              ) : explanation.trim() ? (
+                <>
+                  <Bot className="mr-2 h-4 w-4" />
+                  Submit for Judgment
+                </>
+              ) : (
+                'Enter an explanation'
+              )}
             </Button>
           </div>
         </div>

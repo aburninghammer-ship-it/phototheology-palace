@@ -215,7 +215,8 @@ export default function PTScrabble() {
   const handleConnectionSubmit = useCallback((
     connections: Connection[],
     explanation: string,
-    isChristConnection: boolean
+    isChristConnection: boolean,
+    jeevesJudgment?: string
   ) => {
     if (!connectionModal.card || !connectionModal.position) return;
 
@@ -243,6 +244,9 @@ export default function PTScrabble() {
       }
     }));
 
+    // Determine if this was connecting to verse (first play) or previous insight
+    const isFirstPlay = studyLogEntries.length === 0;
+
     // Add to study log
     setStudyLogEntries(prev => [...prev, {
       id: moveId,
@@ -253,6 +257,8 @@ export default function PTScrabble() {
       isChristConnection,
       points,
       timestamp: new Date().toISOString(),
+      jeevesJudgment,
+      connectingTo: isFirstPlay ? 'verse' : 'previous',
     }]);
 
     // Update score
@@ -991,6 +997,7 @@ export default function PTScrabble() {
           position={connectionModal.position}
           adjacentCards={connectionModal.adjacentCards}
           seedVerse={seedVerse}
+          previousEntry={studyLogEntries.length > 0 ? studyLogEntries[studyLogEntries.length - 1] : undefined}
         />
       )}
 
