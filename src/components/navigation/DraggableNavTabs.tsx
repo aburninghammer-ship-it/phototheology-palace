@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useRef } from "react";
 import { Link, useLocation } from "react-router-dom";
 import {
   DndContext,
@@ -8,6 +8,7 @@ import {
   useSensor,
   useSensors,
   DragEndEvent,
+  DragStartEvent,
 } from "@dnd-kit/core";
 import {
   arrayMove,
@@ -62,10 +63,19 @@ function SortableTab({ tab, isActive, isPinned, onPin, onUnpin, isDragging, isAn
     if (isAnyDragging || wasDragging) {
       e.preventDefault();
       e.stopPropagation();
+      return false;
     }
   };
 
-  const style = {
+  // Also prevent on mousedown/mouseup during drag
+  const handleMouseDown = (e: React.MouseEvent) => {
+    if (isAnyDragging || wasDragging) {
+      e.preventDefault();
+    }
+  };
+
+  // Wrapper style for the sortable container
+  const wrapperStyle: React.CSSProperties = {
     transform: CSS.Transform.toString(transform),
     transition,
   };
@@ -95,12 +105,17 @@ function SortableTab({ tab, isActive, isPinned, onPin, onUnpin, isDragging, isAn
 
   if (tab.isDropdown && tab.dropdownItems) {
     return (
-      <div ref={setNodeRef} style={style} {...attributes}>
+      <div ref={setNodeRef} style={wrapperStyle} {...attributes}>
         <ContextMenu>
           <ContextMenuTrigger>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <button className="focus:outline-none">{tabContent}</button>
+                <button
+                  className="focus:outline-none"
+                  style={{ pointerEvents: (isAnyDragging || wasDragging) ? 'none' : 'auto' }}
+                >
+                  {tabContent}
+                </button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="start" className="w-56 bg-card border-border z-50">
                 {tab.dropdownItems.map((item) => (
@@ -132,11 +147,24 @@ function SortableTab({ tab, isActive, isPinned, onPin, onUnpin, isDragging, isAn
     );
   }
 
+  // Wrapper style without pointer-events (allow drag handle to work)
+  const wrapperStyle: React.CSSProperties = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+  };
+
   return (
-    <div ref={setNodeRef} style={style} {...attributes}>
+    <div ref={setNodeRef} style={wrapperStyle} {...attributes}>
       <ContextMenu>
         <ContextMenuTrigger>
-          <Link to={tab.to} onClick={handleClick}>{tabContent}</Link>
+          <Link
+            to={tab.to}
+            onClick={handleClick}
+            onMouseDown={handleMouseDown}
+            style={{ pointerEvents: (isAnyDragging || wasDragging) ? 'none' : 'auto' }}
+          >
+            {tabContent}
+          </Link>
         </ContextMenuTrigger>
         <ContextMenuContent>
           {isPinned ? (
@@ -162,11 +190,12 @@ export function DraggableNavTabs() {
   const { isMember: isChurchMember, churchId } = useChurchMembership();
   const [activeId, setActiveId] = useState<string | null>(null);
   const [wasDragging, setWasDragging] = useState(false);
+  const dragTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
       activationConstraint: {
-        distance: 8,
+        distance: 10, // Increase distance to prevent accidental drags
       },
     }),
     useSensor(KeyboardSensor, {
@@ -195,31 +224,44 @@ export function DraggableNavTabs() {
   const isActiveTab = (path: string) =>
     location.pathname === path || location.pathname.startsWith(path + "/");
 
+  const handleDragStart = (event: DragStartEvent) => {
+    // Clear any pending timeout
+    if (dragTimeoutRef.current) {
+      clearTimeout(dragTimeoutRef.current);
+    }
+    setActiveId(event.active.id as string);
+    setWasDragging(true);
+  };
+
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
     setActiveId(null);
 
-    // Mark that we just finished dragging to prevent click navigation
-    setWasDragging(true);
-    setTimeout(() => setWasDragging(false), 100);
+    // Keep wasDragging true for longer to prevent accidental navigation
+    // Clear any existing timeout first
+    if (dragTimeoutRef.current) {
+      clearTimeout(dragTimeoutRef.current);
+    }
+    dragTimeoutRef.current = setTimeout(() => {
+      setWasDragging(false);
+    }, 300); // Increased from 100ms to 300ms
 
     if (!over || active.id === over.id) return;
 
-    const activeId = active.id as string;
-    const overId = over.id as string;
+    const draggedId = active.id as string;
+    const targetId = over.id as string;
 
     // Don't allow dragging pinned tabs
-    if (pinnedTabIds.includes(activeId)) return;
+    if (pinnedTabIds.includes(draggedId)) return;
 
     // Can't drop into the pinned section
-    const overIsInPinned = pinnedTabIds.includes(overId);
-    if (overIsInPinned) return;
+    if (pinnedTabIds.includes(targetId)) return;
 
     // Get just the unpinned tabs in their current order
     const unpinnedTabs = orderedTabs.filter(tab => !pinnedTabIds.includes(tab.id));
 
-    const oldIndex = unpinnedTabs.findIndex(tab => tab.id === activeId);
-    const newIndex = unpinnedTabs.findIndex(tab => tab.id === overId);
+    const oldIndex = unpinnedTabs.findIndex(tab => tab.id === draggedId);
+    const newIndex = unpinnedTabs.findIndex(tab => tab.id === targetId);
 
     // Validate indices
     if (oldIndex === -1 || newIndex === -1) return;
@@ -231,6 +273,17 @@ export function DraggableNavTabs() {
 
     updatePreference("nav_tab_order", newOrder);
     toast.success("Tab order updated");
+  };
+
+  const handleDragCancel = () => {
+    setActiveId(null);
+    // Keep wasDragging true briefly to prevent navigation
+    if (dragTimeoutRef.current) {
+      clearTimeout(dragTimeoutRef.current);
+    }
+    dragTimeoutRef.current = setTimeout(() => {
+      setWasDragging(false);
+    }, 300);
   };
 
   const handlePin = (tabId: string) => {
@@ -251,8 +304,9 @@ export function DraggableNavTabs() {
         <DndContext
           sensors={sensors}
           collisionDetection={closestCenter}
-          onDragStart={(event) => setActiveId(event.active.id as string)}
+          onDragStart={handleDragStart}
           onDragEnd={handleDragEnd}
+          onDragCancel={handleDragCancel}
         >
           <SortableContext
             items={orderedTabs.map(tab => tab.id)}
