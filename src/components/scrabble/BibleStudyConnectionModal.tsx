@@ -31,7 +31,7 @@ import {
 } from '@/components/ui/collapsible';
 import { ScrabbleTile } from './ScrabbleTile';
 import type { ScrabbleCard, PlacedCard, Connection, BoardPosition } from '@/types/scrabble';
-import { calculateScore, SCRABBLE_SCORING, getDirection } from '@/types/scrabble';
+import { calculateScoreWithTimeBonus, SCRABBLE_SCORING, getDirection } from '@/types/scrabble';
 import type { SelectedVerse } from './VerseSelectionScreen';
 import { cn } from '@/lib/utils';
 
@@ -168,7 +168,7 @@ export function BibleStudyConnectionModal({
   adjacentCards,
   seedVerse,
 }: BibleStudyConnectionModalProps) {
-  const [timeLeft, setTimeLeft] = useState<number>(SCRABBLE_SCORING.TIMER_SECONDS + 15); // Extra time for Bible study
+  const [timeLeft, setTimeLeft] = useState<number>(SCRABBLE_SCORING.TIMER_SECONDS); // 2 minutes
   const [explanation, setExplanation] = useState('');
   const [isChristConnection, setIsChristConnection] = useState(false);
   const [showSuggestions, setShowSuggestions] = useState(true);
@@ -178,7 +178,7 @@ export function BibleStudyConnectionModal({
   // Timer countdown
   useEffect(() => {
     if (!isOpen) {
-      setTimeLeft(SCRABBLE_SCORING.TIMER_SECONDS + 15);
+      setTimeLeft(SCRABBLE_SCORING.TIMER_SECONDS);
       setExplanation('');
       setIsChristConnection(false);
       setShowSuggestions(true);
@@ -220,13 +220,13 @@ export function BibleStudyConnectionModal({
     onSubmit(connectionList, explanation, isChristConnection);
   };
 
-  // Calculate potential score
+  // Calculate potential score with time bonus
   const potentialConnections = adjacentCards.length;
-  const potentialScore = explanation.trim()
-    ? calculateScore(potentialConnections, isChristConnection)
-    : 0;
+  const scoreBreakdown = explanation.trim()
+    ? calculateScoreWithTimeBonus(potentialConnections, isChristConnection, timeLeft)
+    : { baseScore: 0, timeBonus: 0, total: 0 };
 
-  const timerColor = timeLeft <= 5 ? 'text-red-500' : timeLeft <= 15 ? 'text-yellow-500' : 'text-green-500';
+  const timerColor = timeLeft <= 10 ? 'text-red-500' : timeLeft <= 30 ? 'text-yellow-500' : 'text-green-500';
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
@@ -235,11 +235,11 @@ export function BibleStudyConnectionModal({
           <DialogTitle className="flex items-center justify-between">
             <span className="flex items-center gap-2">
               <Book className="h-5 w-5 text-primary" />
-              Apply Principle to Scripture
+              Explain Connection
             </span>
             <div className={cn('flex items-center gap-2 font-mono', timerColor)}>
               <Clock className="h-5 w-5" />
-              <span className="text-2xl">{timeLeft}s</span>
+              <span className="text-2xl">{Math.floor(timeLeft / 60)}:{(timeLeft % 60).toString().padStart(2, '0')}</span>
             </div>
           </DialogTitle>
           <DialogDescription>
@@ -338,14 +338,17 @@ export function BibleStudyConnectionModal({
           <div className="flex items-center justify-between p-4 bg-yellow-500/10 rounded-lg">
             <div className="flex items-center gap-2">
               <Sparkles className="h-5 w-5 text-yellow-500" />
-              <span className="font-medium">Points Earned</span>
+              <span className="font-medium">Points</span>
             </div>
             <div className="text-right">
-              <span className="text-2xl font-bold text-yellow-500">{potentialScore}</span>
+              <span className="text-2xl font-bold text-yellow-500">{scoreBreakdown.total}</span>
               <span className="text-sm text-muted-foreground ml-1">points</span>
               <p className="text-xs text-muted-foreground">
-                {potentialConnections} connection{potentialConnections !== 1 ? 's' : ''}
-                {isChristConnection ? ' × 2 (Christ)' : ''}
+                {scoreBreakdown.baseScore} base
+                {isChristConnection ? ' (2× Christ)' : ''}
+                {scoreBreakdown.timeBonus > 0 && (
+                  <span className="text-green-500"> +{scoreBreakdown.timeBonus} speed bonus</span>
+                )}
               </p>
             </div>
           </div>

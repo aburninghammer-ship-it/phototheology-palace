@@ -31,7 +31,7 @@ import {
 } from '@/components/ui/dialog';
 import { ScrabbleTile } from './ScrabbleTile';
 import type { ScrabbleCard, PlacedCard, Connection, BoardPosition } from '@/types/scrabble';
-import { calculateScore, SCRABBLE_SCORING, getDirection } from '@/types/scrabble';
+import { calculateScoreWithTimeBonus, SCRABBLE_SCORING, getDirection } from '@/types/scrabble';
 import { findSharedTags } from '@/data/scrabbleCards';
 import { cn } from '@/lib/utils';
 
@@ -118,13 +118,13 @@ export function ConnectionModal({
     onSubmit(connectionList, mainExplanation, isChristConnection);
   };
 
-  // Calculate potential score
+  // Calculate potential score with time bonus
   const potentialConnections = adjacentCards.filter(ac => connections[ac.moveId]?.trim()).length;
-  const potentialScore = potentialConnections > 0
-    ? calculateScore(potentialConnections, isChristConnection)
-    : 0;
+  const scoreBreakdown = potentialConnections > 0
+    ? calculateScoreWithTimeBonus(potentialConnections, isChristConnection, timeLeft)
+    : { baseScore: 0, timeBonus: 0, total: 0 };
 
-  const timerColor = timeLeft <= 5 ? 'text-red-500' : timeLeft <= 10 ? 'text-yellow-500' : 'text-green-500';
+  const timerColor = timeLeft <= 10 ? 'text-red-500' : timeLeft <= 30 ? 'text-yellow-500' : 'text-green-500';
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
@@ -134,11 +134,11 @@ export function ConnectionModal({
             <span>Explain Your Connections</span>
             <div className={cn('flex items-center gap-2 font-mono', timerColor)}>
               <Clock className="h-5 w-5" />
-              <span className="text-2xl">{timeLeft}s</span>
+              <span className="text-2xl">{Math.floor(timeLeft / 60)}:{(timeLeft % 60).toString().padStart(2, '0')}</span>
             </div>
           </DialogTitle>
           <DialogDescription>
-            Explain how your card connects to adjacent cards. You have {SCRABBLE_SCORING.TIMER_SECONDS} seconds.
+            Explain how your card connects to adjacent cards. Faster = more points!
           </DialogDescription>
         </DialogHeader>
 
@@ -247,14 +247,17 @@ export function ConnectionModal({
           <div className="flex items-center justify-between p-4 bg-yellow-500/10 rounded-lg">
             <div className="flex items-center gap-2">
               <Sparkles className="h-5 w-5 text-yellow-500" />
-              <span className="font-medium">Potential Score</span>
+              <span className="font-medium">Points</span>
             </div>
             <div className="text-right">
-              <span className="text-2xl font-bold text-yellow-500">{potentialScore}</span>
+              <span className="text-2xl font-bold text-yellow-500">{scoreBreakdown.total}</span>
               <span className="text-sm text-muted-foreground ml-1">points</span>
               <p className="text-xs text-muted-foreground">
-                {potentialConnections} connection{potentialConnections !== 1 ? 's' : ''}
-                {isChristConnection ? ' + 2x multiplier' : ''}
+                {scoreBreakdown.baseScore} base
+                {isChristConnection ? ' (2× Christ)' : ''}
+                {scoreBreakdown.timeBonus > 0 && (
+                  <span className="text-green-500"> +{scoreBreakdown.timeBonus} speed</span>
+                )}
               </p>
             </div>
           </div>

@@ -123,10 +123,12 @@ export const SCRABBLE_SCORING = {
   } as Record<number, number>,
   CHRIST_MULTIPLIER: 2,
   VOTE_THRESHOLD: 2/3, // 2/3 majority required
-  TIMER_SECONDS: 15,
+  TIMER_SECONDS: 120, // 2 minutes
+  // Time bonus: faster = more points (percentage of time remaining)
+  TIME_BONUS_MAX: 5, // Max bonus points for speed
 } as const;
 
-// Helper to calculate score
+// Helper to calculate score (without time bonus)
 export function calculateScore(connectionCount: number, isChristConnection: boolean): number {
   const baseScore = SCRABBLE_SCORING.CONNECTIONS[connectionCount] ??
     (10 + (connectionCount - 4) * 5); // Extra connections beyond 4
@@ -134,6 +136,27 @@ export function calculateScore(connectionCount: number, isChristConnection: bool
   return isChristConnection
     ? baseScore * SCRABBLE_SCORING.CHRIST_MULTIPLIER
     : baseScore;
+}
+
+// Helper to calculate score with time bonus
+// timeRemaining: seconds left on the timer when submitted
+export function calculateScoreWithTimeBonus(
+  connectionCount: number,
+  isChristConnection: boolean,
+  timeRemaining: number
+): { baseScore: number; timeBonus: number; total: number } {
+  const baseScore = calculateScore(connectionCount, isChristConnection);
+
+  // Time bonus: percentage of time remaining * max bonus
+  // e.g., 60 seconds left out of 120 = 50% = 2.5 bonus points (rounded)
+  const timePercentage = Math.max(0, timeRemaining / SCRABBLE_SCORING.TIMER_SECONDS);
+  const timeBonus = Math.round(timePercentage * SCRABBLE_SCORING.TIME_BONUS_MAX);
+
+  return {
+    baseScore,
+    timeBonus,
+    total: baseScore + timeBonus,
+  };
 }
 
 // Helper to get adjacent positions (8 directions including diagonals)
