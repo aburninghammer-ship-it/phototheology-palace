@@ -40,11 +40,25 @@ export default defineConfig(({ mode }) => ({
         ]
       },
       workbox: {
-        // Workbox won't precache assets > 2 MiB by default.
-        // Some of our images can exceed 3 MiB, so allow a larger headroom.
+        // ⚠️  Precache only the index page and main JS/CSS.
+        // Large images will be cached at runtime instead.
         maximumFileSizeToCacheInBytes: 6 * 1024 * 1024, // 6 MiB
+        globPatterns: ['**/*.{js,css,html,woff,woff2}'],
         navigateFallback: '/index.html',
+        // Runtime caching for everything else
         runtimeCaching: [
+          {
+            // Images: cache at runtime, not precache
+            urlPattern: /\.(?:png|jpg|jpeg|svg|gif|webp)$/i,
+            handler: 'CacheFirst',
+            options: {
+              cacheName: 'images-cache',
+              expiration: {
+                maxEntries: 100,
+                maxAgeSeconds: 60 * 60 * 24 * 30
+              }
+            }
+          },
           {
             urlPattern: /^https:\/\/fonts\.googleapis\.com\/.*/i,
             handler: 'CacheFirst',
@@ -72,17 +86,6 @@ export default defineConfig(({ mode }) => ({
             handler: 'StaleWhileRevalidate',
             options: {
               cacheName: 'static-resources'
-            }
-          },
-          {
-            urlPattern: /\.(?:png|jpg|jpeg|svg|gif|webp)$/,
-            handler: 'CacheFirst',
-            options: {
-              cacheName: 'images-cache',
-              expiration: {
-                maxEntries: 100,
-                maxAgeSeconds: 60 * 60 * 24 * 30
-              }
             }
           }
         ]
