@@ -279,7 +279,6 @@ export interface CardWithAssignedPosition {
   card: ScrabbleCard;
   position: BoardPosition;
   direction: Direction;
-  isFirstCard?: boolean; // True if this is the first card (empty board)
 }
 
 export function assignCardsToPositions(
@@ -288,13 +287,12 @@ export function assignCardsToPositions(
 ): CardWithAssignedPosition[] {
   const placedPositions = Object.keys(boardState).map(parsePositionKey);
 
-  // EMPTY BOARD: First card goes to center (0,0)
+  // EMPTY BOARD: All cards target center (0,0)
   if (Object.keys(boardState).length === 0) {
-    return cards.map((card, index) => ({
+    return cards.map((card) => ({
       card,
-      position: { x: 0, y: 0 }, // All cards target center for first placement
-      direction: 'up' as Direction, // Direction doesn't matter for first card
-      isFirstCard: true,
+      position: { x: 0, y: 0 },
+      direction: 'up' as Direction,
     }));
   }
 

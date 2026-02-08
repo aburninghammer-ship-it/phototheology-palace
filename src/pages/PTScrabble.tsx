@@ -891,7 +891,6 @@ export default function PTScrabble() {
           position={connectionModal.position}
           adjacentCards={connectionModal.adjacentCards}
           seedVerse={seedVerse}
-          isFirstCard={Object.keys(boardState).length === 0}
         />
       )}
 

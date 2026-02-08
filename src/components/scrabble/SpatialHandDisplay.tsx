@@ -1,9 +1,8 @@
 // PT Scrabble Spatial Hand Display
 // Shows cards arranged spatially to preview their board positions
 
-import { useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Sparkles, ArrowUp, ArrowUpRight, ArrowRight, ArrowDownRight, ArrowDown, ArrowDownLeft, ArrowLeft, ArrowUpLeft } from 'lucide-react';
+import { Sparkles } from 'lucide-react';
 import { ScrabbleTile } from './ScrabbleTile';
 import type { ScrabbleCard, BoardPosition } from '@/types/scrabble';
 import { cn } from '@/lib/utils';
@@ -11,8 +10,7 @@ import { cn } from '@/lib/utils';
 export interface CardWithPosition {
   card: ScrabbleCard;
   position: BoardPosition;
-  direction: string; // For display label
-  isFirstCard?: boolean; // True if board is empty - any card can go first
+  direction: string;
 }
 
 interface SpatialHandDisplayProps {
@@ -23,18 +21,6 @@ interface SpatialHandDisplayProps {
   className?: string;
 }
 
-// Direction to display position mapping (relative to center)
-const DIRECTION_LAYOUT: Record<string, { x: number; y: number; label: string; icon: any }> = {
-  'up': { x: 0, y: -1, label: 'Above', icon: ArrowUp },
-  'up-right': { x: 1, y: -1, label: 'Upper Right', icon: ArrowUpRight },
-  'right': { x: 1, y: 0, label: 'Right', icon: ArrowRight },
-  'down-right': { x: 1, y: 1, label: 'Lower Right', icon: ArrowDownRight },
-  'down': { x: 0, y: 1, label: 'Below', icon: ArrowDown },
-  'down-left': { x: -1, y: 1, label: 'Lower Left', icon: ArrowDownLeft },
-  'left': { x: -1, y: 0, label: 'Left', icon: ArrowLeft },
-  'up-left': { x: -1, y: -1, label: 'Upper Left', icon: ArrowUpLeft },
-};
-
 export function SpatialHandDisplay({
   cards,
   onCardSelect,
@@ -42,15 +28,6 @@ export function SpatialHandDisplay({
   score = 0,
   className,
 }: SpatialHandDisplayProps) {
-  // Sort cards by direction for consistent layout
-  const sortedCards = useMemo(() => {
-    const directionOrder = ['up-left', 'up', 'up-right', 'left', 'right', 'down-left', 'down', 'down-right'];
-    return [...cards].sort((a, b) => {
-      const aIndex = directionOrder.indexOf(a.direction);
-      const bIndex = directionOrder.indexOf(b.direction);
-      return aIndex - bIndex;
-    });
-  }, [cards]);
 
   return (
     <div className={cn(
@@ -71,11 +48,9 @@ export function SpatialHandDisplay({
         </div>
       </div>
 
-      {/* Instruction - different for first card vs subsequent */}
+      {/* Instruction */}
       <div className="text-center text-sm text-muted-foreground mb-2 px-4">
-        {cards[0]?.isFirstCard
-          ? "Pick any card to start! Explain how it applies to the verse."
-          : "Build on the previous insight — connect your new principle to what was just shared"}
+        Tap a card to place it and explain how it connects to the verse
       </div>
 
       {/* Spatial card layout - arranged in an arc */}
@@ -91,34 +66,17 @@ export function SpatialHandDisplay({
                 No cards available. Game complete!
               </motion.div>
             ) : (
-              sortedCards.map((cardWithPos, index) => {
-                const layout = DIRECTION_LAYOUT[cardWithPos.direction];
-                const DirectionIcon = layout?.icon || ArrowUp;
-                const isFirstCard = cardWithPos.isFirstCard;
-
-                // Calculate vertical offset based on direction (arc effect) - flat for first cards
-                const isTop = !isFirstCard && cardWithPos.direction.includes('up');
-                const isMiddle = !isFirstCard && (cardWithPos.direction === 'left' || cardWithPos.direction === 'right');
-                const verticalOffset = isFirstCard ? 0 : isTop ? -20 : isMiddle ? -10 : 0;
-
+              cards.map((cardWithPos, index) => {
                 return (
                   <motion.div
                     key={cardWithPos.card.id}
                     initial={{ scale: 0, y: 20 }}
-                    animate={{ scale: 1, y: verticalOffset }}
+                    animate={{ scale: 1, y: 0 }}
                     exit={{ scale: 0, y: 20 }}
                     transition={{ delay: index * 0.05 }}
                     layout
                     className="flex flex-col items-center"
                   >
-                    {/* Direction indicator - hidden for first card */}
-                    {!isFirstCard && (
-                      <div className="flex items-center gap-1 mb-1 text-xs text-muted-foreground">
-                        <DirectionIcon className="h-3 w-3" />
-                        <span className="hidden sm:inline">{layout?.label}</span>
-                      </div>
-                    )}
-
                     <ScrabbleTile
                       card={cardWithPos.card}
                       size="md"
