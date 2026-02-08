@@ -15,6 +15,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import {
   ScrabbleBoard,
   PlayerHandBar,
+  SpatialHandDisplay,
   VerseSelectionScreen,
   SeedVerseDisplay,
   SeedCardInsight,
@@ -27,9 +28,10 @@ import {
   StudyTranscript,
   type SelectedVerse,
   type StudyLogEntry,
+  type CardWithPosition,
 } from "@/components/scrabble";
 import type { ScrabbleCard, PlacedCard, BoardPosition, Connection } from "@/types/scrabble";
-import { positionKey, isValidPlacement } from "@/types/scrabble";
+import { positionKey, isValidPlacement, assignCardsToPositions } from "@/types/scrabble";
 import { getAllScrabbleCards, shuffleCards } from "@/data/scrabbleCards";
 
 type GamePhase = "menu" | "verse-selection" | "seed-insight" | "playing" | "completed" | "multiplayer-lobby" | "multiplayer-playing";
@@ -139,17 +141,45 @@ export default function PTScrabble() {
     setGamePhase("seed-insight");
   }, []);
 
+  // Compute cards with their pre-assigned positions
+  const cardsWithPositions = useMemo((): CardWithPosition[] => {
+    const assigned = assignCardsToPositions(playerHand, boardState);
+    return assigned.map(a => ({
+      card: a.card,
+      position: a.position,
+      direction: a.direction,
+    }));
+  }, [playerHand, boardState]);
+
+  // Direct placement - card is selected AND position is determined
+  const handleDirectPlacement = useCallback((card: ScrabbleCard, position: BoardPosition) => {
+    if (!user) return;
+
+    // Get adjacent cards for this position
+    const { valid, adjacentCards } = isValidPlacement(position, boardState);
+    if (!valid) return;
+
+    // Open the connection modal directly
+    setConnectionModal({
+      isOpen: true,
+      card,
+      position,
+      adjacentCards,
+    });
+  }, [user, boardState]);
+
+  // Legacy handlers for multiplayer (keep for now)
   const handleCardSelect = useCallback((card: ScrabbleCard) => {
     setSelectedCard(prev => prev?.id === card.id ? null : card);
   }, []);
 
   const handlePositionClick = useCallback((position: BoardPosition) => {
     if (!selectedCard || !user) return;
-    
+
     // Check if valid placement and get adjacent cards
     const { valid, adjacentCards } = isValidPlacement(position, boardState);
     if (!valid) return;
-    
+
     // Open the connection modal
     setConnectionModal({
       isOpen: true,
@@ -781,42 +811,22 @@ export default function PTScrabble() {
           <SeedVerseDisplay verse={seedVerse} />
         )}
 
-        {/* How to Play Instructions */}
-        <div className="bg-gradient-to-r from-blue-500/10 to-purple-500/10 border border-blue-500/30 rounded-lg p-3">
-          <ol className="text-xs text-muted-foreground space-y-1 list-decimal list-inside">
-            <li><strong>Select a card</strong> from your hand below</li>
-            <li><strong>Click a + spot</strong> on the board next to an existing card</li>
-            <li><strong>Explain</strong> how that PT principle applies to the verse</li>
-            <li><strong>Score bonus</strong> for Christ-centered connections!</li>
-          </ol>
-        </div>
-
-        {/* Main game area */}
+        {/* Main game area - click cards to view details */}
         <div className="flex-1 min-h-[350px] border rounded-lg overflow-hidden">
           <ScrabbleBoard
             boardState={boardState}
-            selectedCard={selectedCard}
-            onPositionClick={handlePositionClick}
             onCardClick={(placedCard) => setViewingCard(placedCard)}
             className="h-full"
           />
         </div>
-
-        {/* Player hand */}
-        <div className="border-t pt-4 pb-32">
-          <p className="text-xs text-muted-foreground mb-2 text-center">
-            {selectedCard 
-              ? `✅ Selected: "${selectedCard.name}" (${selectedCard.code}) — Now click a + spot on the board`
-              : "👆 Click a card below to select it, then place it on the board"}
-          </p>
-          <PlayerHandBar
-            cards={playerHand}
-            selectedCard={selectedCard}
-            onCardSelect={handleCardSelect}
-            score={score}
-          />
-        </div>
       </main>
+
+      {/* Spatial Hand Display - cards show their destination positions */}
+      <SpatialHandDisplay
+        cards={cardsWithPositions}
+        onCardSelect={handleDirectPlacement}
+        score={score}
+      />
 
       {/* Connection Modal */}
       {connectionModal.isOpen && connectionModal.card && connectionModal.position && seedVerse && (

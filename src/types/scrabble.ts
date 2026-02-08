@@ -248,6 +248,84 @@ export function getValidPlacements(
   return validPositions;
 }
 
+// Get direction label for a position relative to the board center/reference
+export function getDirectionFromPosition(position: BoardPosition, referencePositions: BoardPosition[]): Direction {
+  // Find the closest reference position and determine direction from it
+  let closestDir: Direction = 'up';
+  let minDist = Infinity;
+
+  for (const ref of referencePositions) {
+    const dx = position.x - ref.x;
+    const dy = position.y - ref.y;
+    const dist = Math.abs(dx) + Math.abs(dy);
+
+    if (dist < minDist && dist === 1) {
+      minDist = dist;
+      const dir = getDirection(ref, position);
+      if (dir) closestDir = dir;
+    } else if (dist < minDist && dist === 2 && Math.abs(dx) === 1 && Math.abs(dy) === 1) {
+      // Diagonal
+      minDist = dist;
+      const dir = getDirection(ref, position);
+      if (dir) closestDir = dir;
+    }
+  }
+
+  return closestDir;
+}
+
+// Assign cards to valid positions, returning cards with their assigned positions
+export interface CardWithAssignedPosition {
+  card: ScrabbleCard;
+  position: BoardPosition;
+  direction: Direction;
+}
+
+export function assignCardsToPositions(
+  cards: ScrabbleCard[],
+  boardState: Record<string, PlacedCard>
+): CardWithAssignedPosition[] {
+  const validPositions = getValidPlacements(boardState);
+  const placedPositions = Object.keys(boardState).map(parsePositionKey);
+
+  // Sort valid positions in a consistent order (clockwise from top-left)
+  const sortedPositions = [...validPositions].sort((a, b) => {
+    // Priority: top-left, top, top-right, left, right, bottom-left, bottom, bottom-right
+    const getScore = (pos: BoardPosition) => {
+      // Find direction from nearest placed card
+      for (const placed of placedPositions) {
+        const dir = getDirection(placed, pos);
+        if (dir) {
+          const order: Record<Direction, number> = {
+            'up-left': 0, 'up': 1, 'up-right': 2,
+            'left': 3, 'right': 4,
+            'down-left': 5, 'down': 6, 'down-right': 7,
+          };
+          return order[dir];
+        }
+      }
+      return 8;
+    };
+    return getScore(a) - getScore(b);
+  });
+
+  // Assign cards to positions
+  const result: CardWithAssignedPosition[] = [];
+
+  for (let i = 0; i < cards.length && i < sortedPositions.length; i++) {
+    const position = sortedPositions[i];
+    const direction = getDirectionFromPosition(position, placedPositions);
+
+    result.push({
+      card: cards[i],
+      position,
+      direction,
+    });
+  }
+
+  return result;
+}
+
 // Floor color gradients for cards
 export const FLOOR_GRADIENTS: Record<number, {
   from: string;

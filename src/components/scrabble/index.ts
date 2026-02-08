@@ -2,6 +2,7 @@
 export { ScrabbleTile, EmptyTile } from './ScrabbleTile';
 export { ScrabbleBoard } from './ScrabbleBoard';
 export { PlayerHandBar } from './PlayerHandBar';
+export { SpatialHandDisplay, type CardWithPosition } from './SpatialHandDisplay';
 export { GameLobby } from './GameLobby';
 export { ConnectionModal } from './ConnectionModal';
 export { BibleStudyConnectionModal } from './BibleStudyConnectionModal';
