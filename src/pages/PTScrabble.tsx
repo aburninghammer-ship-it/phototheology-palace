@@ -43,10 +43,16 @@ export default function PTScrabble() {
   const { user, loading } = useAuth();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const [gamePhase, setGamePhase] = useState<GamePhase>("menu");
+  const [gamePhase, setGamePhaseInternal] = useState<GamePhase>("menu");
   const [selectedCard, setSelectedCard] = useState<ScrabbleCard | null>(null);
   const [score, setScore] = useState(0);
   const [seedVerse, setSeedVerse] = useState<SelectedVerse | null>(null);
+
+  // Wrapper to log gamePhase changes
+  const setGamePhase = useCallback((newPhase: GamePhase) => {
+    console.log('[PTScrabble] Phase change:', gamePhase, '→', newPhase);
+    setGamePhaseInternal(newPhase);
+  }, [gamePhase]);
 
   // Study log entries - tracks all submissions for display and transcript
   const [studyLogEntries, setStudyLogEntries] = useState<StudyLogEntry[]>([]);
@@ -87,6 +93,24 @@ export default function PTScrabble() {
     dismissInvitation,
     onlineCount,
   } = useGamePresence();
+
+  // Handle initial navigation when game is loaded from URL
+  useEffect(() => {
+    if (!mpGame || !multiplayerGameId) return;
+
+    console.log('[PTScrabble] Game loaded from URL:', mpGame.status, 'current phase:', gamePhase);
+
+    // Only auto-navigate if we're on the menu
+    if (gamePhase === 'menu') {
+      if (mpGame.status === 'waiting') {
+        console.log('[PTScrabble] Auto-navigating to lobby for waiting game');
+        setGamePhaseInternal('multiplayer-lobby');
+      } else if (mpGame.status === 'playing') {
+        console.log('[PTScrabble] Auto-navigating to playing for active game');
+        setGamePhaseInternal('multiplayer-playing');
+      }
+    }
+  }, [mpGame, multiplayerGameId, gamePhase]);
 
   // Solo mode state
   const [connectionModal, setConnectionModal] = useState<{
@@ -564,10 +588,20 @@ export default function PTScrabble() {
       );
     }
 
-    // If game started, switch to playing phase
+    // If game already started (non-host player joining late), show playing view
+    // NOTE: This is for players who join AFTER the host started the game
     if (mpGame && mpGame.status === 'playing') {
-      setGamePhase("multiplayer-playing");
-      return null;
+      return (
+        <div className="min-h-screen bg-background flex items-center justify-center">
+          <div className="text-center space-y-4">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
+            <p className="text-muted-foreground">Game in progress, joining...</p>
+            <Button onClick={() => setGamePhase("multiplayer-playing")}>
+              Join Game
+            </Button>
+          </div>
+        </div>
+      );
     }
 
     // Show create/join UI
