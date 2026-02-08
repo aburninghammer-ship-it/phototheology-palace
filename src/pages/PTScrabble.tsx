@@ -21,13 +21,16 @@ import {
   GameLobby,
   ConnectionModal,
   VotingPanel,
-  type SelectedVerse
+  StudyLog,
+  StudyTranscript,
+  type SelectedVerse,
+  type StudyLogEntry,
 } from "@/components/scrabble";
 import type { ScrabbleCard, PlacedCard, BoardPosition, Connection } from "@/types/scrabble";
 import { positionKey, isValidPlacement } from "@/types/scrabble";
 import { getAllScrabbleCards, shuffleCards } from "@/data/scrabbleCards";
 
-type GamePhase = "menu" | "verse-selection" | "playing" | "multiplayer-lobby" | "multiplayer-playing";
+type GamePhase = "menu" | "verse-selection" | "playing" | "completed" | "multiplayer-lobby" | "multiplayer-playing";
 
 export default function PTScrabble() {
   const { user, loading } = useAuth();
@@ -37,6 +40,9 @@ export default function PTScrabble() {
   const [selectedCard, setSelectedCard] = useState<ScrabbleCard | null>(null);
   const [score, setScore] = useState(0);
   const [seedVerse, setSeedVerse] = useState<SelectedVerse | null>(null);
+
+  // Study log entries - tracks all submissions for display and transcript
+  const [studyLogEntries, setStudyLogEntries] = useState<StudyLogEntry[]>([]);
 
   // Multiplayer state
   const gameIdFromUrl = searchParams.get('game');
@@ -143,19 +149,22 @@ export default function PTScrabble() {
   }, [selectedCard, user, boardState]);
 
   const handleConnectionSubmit = useCallback((
-    connections: Connection[], 
-    explanation: string, 
+    connections: Connection[],
+    explanation: string,
     isChristConnection: boolean
   ) => {
     if (!connectionModal.card || !connectionModal.position || !user) return;
-    
+
     const key = positionKey(connectionModal.position);
     const adjacentCount = connectionModal.adjacentCards.length;
-    
+    const playerName = user.email?.split("@")[0] || "Player";
+
     // Calculate points
     let points = adjacentCount === 1 ? 1 : adjacentCount === 2 ? 3 : adjacentCount === 3 ? 6 : 10;
     if (isChristConnection) points *= 2;
-    
+
+    const moveId = crypto.randomUUID();
+
     // Add card to board
     setBoardState(prev => ({
       ...prev,
@@ -163,29 +172,47 @@ export default function PTScrabble() {
         card: connectionModal.card!,
         position: connectionModal.position!,
         playerId: user.id,
-        playerName: user.email?.split("@")[0] || "Player",
+        playerName,
         connections,
         timestamp: new Date().toISOString(),
-        moveId: crypto.randomUUID(),
+        moveId,
       }
     }));
+
+    // Add to study log
+    setStudyLogEntries(prev => [...prev, {
+      id: moveId,
+      playerName,
+      cardCode: connectionModal.card!.code,
+      cardName: connectionModal.card!.name,
+      explanation,
+      isChristConnection,
+      points,
+      timestamp: new Date().toISOString(),
+    }]);
 
     // Update score
     setScore(prev => prev + points);
 
     // Remove from hand
     setPlayerHand(prev => prev.filter(c => c.id !== connectionModal.card!.id));
-    
+
     // Draw a new card if deck has cards
     if (deck.length > 0) {
       const [newCard, ...remainingDeck] = deck;
       setPlayerHand(prev => [...prev, newCard]);
       setDeck(remainingDeck);
     }
-    
+
     setSelectedCard(null);
     setConnectionModal({ isOpen: false, card: null, position: null, adjacentCards: [] });
-  }, [connectionModal, user, deck]);
+
+    // Check for game completion (no cards in hand and deck is empty)
+    if (playerHand.length <= 1 && deck.length === 0) {
+      // Delay to show the last card placement animation
+      setTimeout(() => setGamePhase("completed"), 1500);
+    }
+  }, [connectionModal, user, deck, playerHand.length]);
 
   const handleNewGame = useCallback(() => {
     setGamePhase("verse-selection");
@@ -195,6 +222,7 @@ export default function PTScrabble() {
     setDeck([]);
     setScore(0);
     setSelectedCard(null);
+    setStudyLogEntries([]);
   }, []);
 
   // ========== MULTIPLAYER HANDLERS ==========
@@ -259,6 +287,27 @@ export default function PTScrabble() {
 
   const isHost = user?.id === mpGame?.hostUserId;
   const deckCount = mpGame?.deckRemaining?.length ?? 0;
+
+  // Derive study log entries from multiplayer board state
+  const mpStudyLogEntries = useMemo((): StudyLogEntry[] => {
+    if (!mpGame?.boardState) return [];
+    return Object.values(mpGame.boardState)
+      .filter(placed => placed.moveId !== 'seed') // Exclude seed card
+      .map(placed => ({
+        id: placed.moveId,
+        playerName: placed.playerName,
+        cardCode: placed.card.code,
+        cardName: placed.card.name,
+        explanation: placed.connections.map(c => c.explanation).join(' | ') || '',
+        isChristConnection: placed.connections.some(c => c.isChristConnection),
+        points: placed.connections.length > 0
+          ? (placed.connections.length === 1 ? 1 : placed.connections.length === 2 ? 3 : placed.connections.length === 3 ? 6 : 10)
+            * (placed.connections.some(c => c.isChristConnection) ? 2 : 1)
+          : 0,
+        timestamp: placed.timestamp,
+      }))
+      .sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime());
+  }, [mpGame?.boardState]);
 
   if (loading) {
     return (
@@ -436,24 +485,27 @@ export default function PTScrabble() {
     if (mpGame?.status === 'completed') {
       const sortedPlayers = [...mpPlayers].sort((a, b) => b.score - a.score);
       const winner = sortedPlayers[0];
+      const totalMpScore = sortedPlayers.reduce((sum, p) => sum + p.score, 0);
 
       return (
-        <div className="min-h-screen flex items-center justify-center p-4">
+        <div className="min-h-screen bg-background overflow-y-auto p-4">
           <motion.div
             initial={{ scale: 0.9, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
-            className="text-center space-y-6"
+            className="max-w-2xl mx-auto space-y-6"
           >
-            <Trophy className="h-16 w-16 text-yellow-500 mx-auto" />
-            <h1 className="text-3xl font-bold">Game Over!</h1>
-            <div className="space-y-2">
-              <p className="text-xl">
-                Winner: <span className="font-bold text-yellow-500">{winner?.displayName}</span>
-              </p>
-              <p className="text-2xl font-bold">{winner?.score} points</p>
+            <div className="text-center space-y-4">
+              <Trophy className="h-16 w-16 text-yellow-500 mx-auto" />
+              <h1 className="text-3xl font-bold">Game Over!</h1>
+              <div className="space-y-2">
+                <p className="text-xl">
+                  Winner: <span className="font-bold text-yellow-500">{winner?.displayName}</span>
+                </p>
+                <p className="text-2xl font-bold">{winner?.score} points</p>
+              </div>
             </div>
 
-            <div className="bg-card border rounded-lg p-4 max-w-sm mx-auto">
+            <div className="bg-card border rounded-lg p-4">
               <h3 className="font-medium mb-3 flex items-center justify-center gap-2">
                 <Users className="h-4 w-4" />
                 Final Standings
@@ -476,6 +528,17 @@ export default function PTScrabble() {
               </div>
             </div>
 
+            {/* Study Transcript for multiplayer */}
+            <StudyTranscript
+              entries={mpStudyLogEntries}
+              seedVerse={null}
+              totalScore={totalMpScore}
+              playerCount={mpPlayers.length}
+              onSave={(transcript) => {
+                console.log('Save multiplayer transcript:', transcript);
+              }}
+            />
+
             <div className="flex gap-2 justify-center">
               <Button variant="outline" onClick={() => navigate('/games')}>
                 Back to Games
@@ -497,6 +560,9 @@ export default function PTScrabble() {
     if (mpGame) {
       return (
         <div className="h-screen flex flex-col overflow-hidden">
+          {/* Study Log Sidebar - shows all player submissions */}
+          <StudyLog entries={mpStudyLogEntries} />
+
           {/* Header */}
           <header className="flex items-center justify-between p-3 border-b bg-background/95 backdrop-blur z-10">
             <Button variant="ghost" size="icon" onClick={() => {
@@ -589,10 +655,84 @@ export default function PTScrabble() {
     }
   }
 
+  // Solo game completed view with transcript
+  if (gamePhase === "completed") {
+    return (
+      <div className="min-h-screen bg-background">
+        <Navigation />
+        <main className="container mx-auto px-4 py-8 max-w-4xl">
+          <motion.div
+            initial={{ scale: 0.9, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            className="space-y-6"
+          >
+            {/* Victory header */}
+            <div className="text-center space-y-4">
+              <Trophy className="h-16 w-16 text-yellow-500 mx-auto" />
+              <h1 className="text-3xl font-bold">Study Complete!</h1>
+              <p className="text-xl text-muted-foreground">
+                Final Score: <span className="font-bold text-yellow-500">{score}</span> points
+              </p>
+              {seedVerse && (
+                <p className="text-sm text-muted-foreground">
+                  Studied: {seedVerse.reference}
+                </p>
+              )}
+            </div>
+
+            {/* Study stats */}
+            <div className="grid grid-cols-3 gap-4 text-center">
+              <div className="p-4 bg-muted rounded-lg">
+                <p className="text-2xl font-bold text-primary">{studyLogEntries.length}</p>
+                <p className="text-sm text-muted-foreground">Connections Made</p>
+              </div>
+              <div className="p-4 bg-muted rounded-lg">
+                <p className="text-2xl font-bold text-purple-500">
+                  {studyLogEntries.filter(e => e.isChristConnection).length}
+                </p>
+                <p className="text-sm text-muted-foreground">Christ Connections</p>
+              </div>
+              <div className="p-4 bg-muted rounded-lg">
+                <p className="text-2xl font-bold text-yellow-500">{score}</p>
+                <p className="text-sm text-muted-foreground">Total Points</p>
+              </div>
+            </div>
+
+            {/* Study Transcript */}
+            <StudyTranscript
+              entries={studyLogEntries}
+              seedVerse={seedVerse}
+              totalScore={score}
+              playerCount={1}
+              onSave={(transcript) => {
+                // TODO: Save to user's saved studies in Supabase
+                console.log('Save transcript:', transcript);
+              }}
+            />
+
+            {/* Action buttons */}
+            <div className="flex gap-4 justify-center pt-4">
+              <Button variant="outline" onClick={() => navigate('/games')}>
+                Back to Games
+              </Button>
+              <Button onClick={handleNewGame}>
+                Play Again
+              </Button>
+            </div>
+          </motion.div>
+        </main>
+      </div>
+    );
+  }
+
   // Solo Playing view
   return (
     <div className="min-h-screen bg-background flex flex-col">
       <Navigation />
+
+      {/* Study Log Sidebar */}
+      <StudyLog entries={studyLogEntries} />
+
       <main className="flex-1 container mx-auto px-4 py-4 flex flex-col gap-4">
         <div className="flex items-center justify-between flex-wrap gap-2">
           <Button onClick={() => setGamePhase("menu")} variant="ghost" size="sm">
@@ -604,6 +744,9 @@ export default function PTScrabble() {
             <div className="text-sm text-muted-foreground">
               Score: <span className="font-bold text-primary">{score}</span>
             </div>
+            <Button variant="outline" size="sm" onClick={() => setGamePhase("completed")} disabled={studyLogEntries.length === 0}>
+              End Game
+            </Button>
             <Button variant="outline" size="sm" onClick={handleNewGame}>
               New Game
             </Button>
