@@ -44,9 +44,10 @@ interface SortableTabProps {
   onPin: () => void;
   onUnpin: () => void;
   isDragging?: boolean;
+  wasDragging?: boolean;
 }
 
-function SortableTab({ tab, isActive, isPinned, onPin, onUnpin, isDragging }: SortableTabProps) {
+function SortableTab({ tab, isActive, isPinned, onPin, onUnpin, isDragging, wasDragging }: SortableTabProps) {
   const {
     attributes,
     listeners,
@@ -54,6 +55,14 @@ function SortableTab({ tab, isActive, isPinned, onPin, onUnpin, isDragging }: So
     transform,
     transition,
   } = useSortable({ id: tab.id, disabled: isPinned });
+
+  // Prevent navigation if we just finished dragging
+  const handleClick = (e: React.MouseEvent) => {
+    if (wasDragging) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+  };
 
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -126,7 +135,7 @@ function SortableTab({ tab, isActive, isPinned, onPin, onUnpin, isDragging }: So
     <div ref={setNodeRef} style={style} {...attributes}>
       <ContextMenu>
         <ContextMenuTrigger>
-          <Link to={tab.to}>{tabContent}</Link>
+          <Link to={tab.to} onClick={handleClick}>{tabContent}</Link>
         </ContextMenuTrigger>
         <ContextMenuContent>
           {isPinned ? (
@@ -151,6 +160,7 @@ export function DraggableNavTabs() {
   const { preferences, updatePreference } = useUserPreferences();
   const { isMember: isChurchMember, churchId } = useChurchMembership();
   const [activeId, setActiveId] = useState<string | null>(null);
+  const [wasDragging, setWasDragging] = useState(false);
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -187,6 +197,10 @@ export function DraggableNavTabs() {
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
     setActiveId(null);
+
+    // Mark that we just finished dragging to prevent click navigation
+    setWasDragging(true);
+    setTimeout(() => setWasDragging(false), 100);
 
     if (!over || active.id === over.id) return;
 
@@ -243,6 +257,7 @@ export function DraggableNavTabs() {
                   onPin={() => handlePin(tab.id)}
                   onUnpin={() => handleUnpin(tab.id)}
                   isDragging={activeId === tab.id}
+                  wasDragging={wasDragging}
                 />
               ))}
             </div>
