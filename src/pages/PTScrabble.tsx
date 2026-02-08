@@ -45,6 +45,8 @@ export default function PTScrabble() {
   const [score, setScore] = useState(0);
   const [seedVerse, setSeedVerse] = useState<SelectedVerse | null>(null);
   const [seedCard, setSeedCard] = useState<ScrabbleCard | null>(null);
+  const [seedCardOptions, setSeedCardOptions] = useState<ScrabbleCard[]>([]); // 3 options to choose from
+  const [allCardsPool, setAllCardsPool] = useState<ScrabbleCard[]>([]); // Full shuffled deck for refresh
 
   // Study log entries - tracks all submissions for display and transcript
   const [studyLogEntries, setStudyLogEntries] = useState<StudyLogEntry[]>([]);
@@ -96,32 +98,53 @@ export default function PTScrabble() {
   // Deck for drawing
   const [deck, setDeck] = useState<ScrabbleCard[]>([]);
 
-  // Start game with selected verse
+  // Start game with selected verse - show 3 card options
   const handleVerseSelected = useCallback((verse: SelectedVerse) => {
     setSeedVerse(verse);
 
     // Initialize game state
     const allCards = shuffleCards(getAllScrabbleCards());
+    setAllCardsPool(allCards);
 
-    // Pick a seed card - prefer Concentration Room or Story Room for Bible study
+    // Pick 3 seed card options - prefer good Bible study cards
     const preferredSeeds = allCards.filter(c =>
-      ['SR', 'OR', 'CR', 'GR', 'IR'].includes(c.code) ||
+      ['SR', 'OR', 'CR', 'GR', 'IR', 'BR', 'MR'].includes(c.code) ||
       c.tags.includes('christology') ||
-      c.tags.includes('narrative')
+      c.tags.includes('narrative') ||
+      c.tags.includes('interpretation')
     );
-    const seedCardPool = preferredSeeds.length > 0 ? preferredSeeds : allCards.filter(c => c.floor >= 1 && c.floor <= 4);
-    const chosenSeedCard = seedCardPool[Math.floor(Math.random() * seedCardPool.length)];
+    const seedPool = preferredSeeds.length >= 3 ? preferredSeeds : allCards.filter(c => c.floor >= 1 && c.floor <= 4);
 
-    // Store seed card for insight screen
-    setSeedCard(chosenSeedCard);
+    // Pick 3 different cards
+    const shuffledPool = shuffleCards([...seedPool]);
+    const options = shuffledPool.slice(0, 3);
+    setSeedCardOptions(options);
 
-    // Remove seed from available cards
-    const remainingCards = allCards.filter(c => c.id !== chosenSeedCard.id);
+    // Reset game state
+    setSeedCard(null);
+    setBoardState({});
+    setPlayerHand([]);
+    setDeck([]);
+    setScore(0);
+    setSelectedCard(null);
+
+    // Go to seed insight screen to choose
+    setGamePhase("seed-insight");
+  }, []);
+
+  // User selected a seed card from the options
+  const handleSeedCardSelected = useCallback((chosenCard: ScrabbleCard) => {
+    if (!seedVerse) return;
+
+    setSeedCard(chosenCard);
+
+    // Remove chosen seed from available cards
+    const remainingCards = allCardsPool.filter(c => c.id !== chosenCard.id);
 
     // Set up board with seed card
     setBoardState({
       "0,0": {
-        card: chosenSeedCard,
+        card: chosenCard,
         position: { x: 0, y: 0 },
         playerId: "system",
         playerName: "Starting Principle",
@@ -134,12 +157,35 @@ export default function PTScrabble() {
     // Deal hand
     setPlayerHand(remainingCards.slice(0, 7));
     setDeck(remainingCards.slice(7));
-    setScore(0);
-    setSelectedCard(null);
 
-    // Go to seed insight screen first
-    setGamePhase("seed-insight");
-  }, []);
+    // Start playing
+    setGamePhase("playing");
+  }, [seedVerse, allCardsPool]);
+
+  // Refresh seed card options
+  const handleRefreshSeedOptions = useCallback(() => {
+    const preferredSeeds = allCardsPool.filter(c =>
+      ['SR', 'OR', 'CR', 'GR', 'IR', 'BR', 'MR'].includes(c.code) ||
+      c.tags.includes('christology') ||
+      c.tags.includes('narrative') ||
+      c.tags.includes('interpretation')
+    );
+    const seedPool = preferredSeeds.length >= 3 ? preferredSeeds : allCardsPool.filter(c => c.floor >= 1 && c.floor <= 4);
+
+    // Exclude current options and pick 3 new ones
+    const currentIds = new Set(seedCardOptions.map(c => c.id));
+    const availablePool = seedPool.filter(c => !currentIds.has(c.id));
+    const shuffledPool = shuffleCards([...availablePool]);
+    const newOptions = shuffledPool.slice(0, 3);
+
+    if (newOptions.length >= 3) {
+      setSeedCardOptions(newOptions);
+    } else {
+      // If not enough new options, just reshuffle the whole pool
+      const fullShuffled = shuffleCards([...seedPool]);
+      setSeedCardOptions(fullShuffled.slice(0, 3));
+    }
+  }, [allCardsPool, seedCardOptions]);
 
   // Compute cards with their pre-assigned positions
   const cardsWithPositions = useMemo((): CardWithPosition[] => {
@@ -259,6 +305,8 @@ export default function PTScrabble() {
     setGamePhase("verse-selection");
     setSeedVerse(null);
     setSeedCard(null);
+    setSeedCardOptions([]);
+    setAllCardsPool([]);
     setBoardState({});
     setPlayerHand([]);
     setDeck([]);
@@ -474,13 +522,14 @@ export default function PTScrabble() {
     );
   }
 
-  // Seed card insight view - explains how the starting card connects to the verse
-  if (gamePhase === "seed-insight" && seedCard && seedVerse) {
+  // Seed card selection view - user chooses from 3 principle options
+  if (gamePhase === "seed-insight" && seedCardOptions.length > 0 && seedVerse) {
     return (
       <SeedCardInsight
-        seedCard={seedCard}
+        cardOptions={seedCardOptions}
         verse={seedVerse}
-        onContinue={() => setGamePhase("playing")}
+        onCardSelected={handleSeedCardSelected}
+        onRefreshOptions={handleRefreshSeedOptions}
       />
     );
   }
