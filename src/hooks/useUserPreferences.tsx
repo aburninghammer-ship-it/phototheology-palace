@@ -2,6 +2,31 @@ import { createContext, useContext, useEffect, useState, ReactNode } from "react
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "./useAuth";
 
+// LocalStorage keys for nav tab preferences (works for all users including guests)
+const NAV_TABS_STORAGE_KEY = "pt_nav_tab_order";
+const PINNED_TABS_STORAGE_KEY = "pt_pinned_nav_tabs";
+
+// Helper to get nav preferences from localStorage
+const getLocalNavPrefs = (): { pinned: string[]; order: string[] } => {
+  try {
+    const pinned = JSON.parse(localStorage.getItem(PINNED_TABS_STORAGE_KEY) || "[]");
+    const order = JSON.parse(localStorage.getItem(NAV_TABS_STORAGE_KEY) || "[]");
+    return { pinned, order };
+  } catch {
+    return { pinned: [], order: [] };
+  }
+};
+
+// Helper to save nav preferences to localStorage
+const saveLocalNavPrefs = (pinned: string[], order: string[]) => {
+  try {
+    localStorage.setItem(PINNED_TABS_STORAGE_KEY, JSON.stringify(pinned));
+    localStorage.setItem(NAV_TABS_STORAGE_KEY, JSON.stringify(order));
+  } catch (e) {
+    console.warn("Failed to save nav prefs to localStorage:", e);
+  }
+};
+
 interface UserPreferences {
   bible_font_size: "small" | "medium" | "large";
   bible_translation: string;
@@ -58,8 +83,16 @@ export const UserPreferencesProvider = ({
 
   useEffect(() => {
     const loadPreferences = async () => {
+      // Always load nav prefs from localStorage first (works for guests too)
+      const localNavPrefs = getLocalNavPrefs();
+
       if (!user) {
-        setPreferences(defaultPreferences);
+        // For guests, use localStorage for nav prefs, defaults for everything else
+        setPreferences({
+          ...defaultPreferences,
+          pinned_nav_tabs: localNavPrefs.pinned.length > 0 ? localNavPrefs.pinned : defaultPreferences.pinned_nav_tabs,
+          nav_tab_order: localNavPrefs.order.length > 0 ? localNavPrefs.order : defaultPreferences.nav_tab_order,
+        });
         setLoading(false);
         return;
       }
@@ -76,6 +109,14 @@ export const UserPreferencesProvider = ({
         }
 
         if (data) {
+          // For nav tabs: prefer localStorage (most recent), fallback to DB, then defaults
+          const pinnedTabs = localNavPrefs.pinned.length > 0
+            ? localNavPrefs.pinned
+            : ((data as any).pinned_nav_tabs as string[]) ?? defaultPreferences.pinned_nav_tabs;
+          const tabOrder = localNavPrefs.order.length > 0
+            ? localNavPrefs.order
+            : ((data as any).nav_tab_order as string[]) ?? defaultPreferences.nav_tab_order;
+
           setPreferences({
             bible_font_size: (data.bible_font_size as any) ?? defaultPreferences.bible_font_size,
             bible_translation: data.bible_translation ?? defaultPreferences.bible_translation,
@@ -87,8 +128,8 @@ export const UserPreferencesProvider = ({
             study_buddy_theme: ((data as any).study_buddy_theme as any) ?? defaultPreferences.study_buddy_theme,
             suite_mode: ((data as any).suite_mode as any) ?? defaultPreferences.suite_mode,
             has_seen_mode_selector: ((data as any).has_seen_mode_selector as any) ?? defaultPreferences.has_seen_mode_selector,
-            pinned_nav_tabs: ((data as any).pinned_nav_tabs as string[]) ?? defaultPreferences.pinned_nav_tabs,
-            nav_tab_order: ((data as any).nav_tab_order as string[]) ?? defaultPreferences.nav_tab_order,
+            pinned_nav_tabs: pinnedTabs,
+            nav_tab_order: tabOrder,
           });
         } else {
           // Create default preferences in the backend and use local defaults
@@ -115,6 +156,10 @@ export const UserPreferencesProvider = ({
   }, [user]);
 
   const persistPreferences = async (next: UserPreferences) => {
+    // Always save nav prefs to localStorage (works for everyone, instant)
+    saveLocalNavPrefs(next.pinned_nav_tabs, next.nav_tab_order);
+
+    // For logged-in users, also sync to database
     if (!user) return;
 
     try {
