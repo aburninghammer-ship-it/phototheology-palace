@@ -1,22 +1,16 @@
 // PT Scrabble Connection Modal
-// Modal for explaining connections when placing a card
+// Modal for explaining how card connects to the verse (first play) or previous insight
 
 import { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
-  X,
   Clock,
   Sparkles,
-  ArrowUp,
-  ArrowDown,
-  ArrowLeft,
-  ArrowRight,
-  ArrowUpLeft,
-  ArrowUpRight,
-  ArrowDownLeft,
-  ArrowDownRight,
   Check,
   Cross,
+  Book,
+  User,
+  Link,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
@@ -32,7 +26,8 @@ import {
 import { ScrabbleTile } from './ScrabbleTile';
 import type { ScrabbleCard, PlacedCard, Connection, BoardPosition } from '@/types/scrabble';
 import { calculateScoreWithTimeBonus, SCRABBLE_SCORING, getDirection } from '@/types/scrabble';
-import { findSharedTags } from '@/data/scrabbleCards';
+import type { SelectedVerse } from './VerseSelectionScreen';
+import type { StudyLogEntry } from './StudyLog';
 import { cn } from '@/lib/utils';
 
 interface ConnectionModalProps {
@@ -42,6 +37,8 @@ interface ConnectionModalProps {
   card: ScrabbleCard;
   position: BoardPosition;
   adjacentCards: PlacedCard[];
+  seedVerse?: SelectedVerse; // The verse being studied
+  previousEntry?: StudyLogEntry; // Previous player's insight to connect to
 }
 
 export function ConnectionModal({
@@ -51,16 +48,21 @@ export function ConnectionModal({
   card,
   position,
   adjacentCards,
+  seedVerse,
+  previousEntry,
 }: ConnectionModalProps) {
   const [timeLeft, setTimeLeft] = useState<number>(SCRABBLE_SCORING.TIMER_SECONDS);
-  const [connections, setConnections] = useState<Record<string, string>>({});
+  const [explanation, setExplanation] = useState('');
   const [isChristConnection, setIsChristConnection] = useState(false);
+
+  // Determine if this is first play (connect to verse) or subsequent (connect to previous)
+  const isFirstPlay = !previousEntry;
 
   // Timer countdown
   useEffect(() => {
     if (!isOpen) {
       setTimeLeft(SCRABBLE_SCORING.TIMER_SECONDS);
-      setConnections({});
+      setExplanation('');
       setIsChristConnection(false);
       return;
     }
@@ -78,149 +80,133 @@ export function ConnectionModal({
     return () => clearInterval(timer);
   }, [isOpen]);
 
-  // Get direction icon (8 directions including diagonals)
-  const getDirectionIcon = (dir: Connection['direction']) => {
-    switch (dir) {
-      case 'up': return <ArrowUp className="h-4 w-4" />;
-      case 'down': return <ArrowDown className="h-4 w-4" />;
-      case 'left': return <ArrowLeft className="h-4 w-4" />;
-      case 'right': return <ArrowRight className="h-4 w-4" />;
-      case 'up-left': return <ArrowUpLeft className="h-4 w-4" />;
-      case 'up-right': return <ArrowUpRight className="h-4 w-4" />;
-      case 'down-left': return <ArrowDownLeft className="h-4 w-4" />;
-      case 'down-right': return <ArrowDownRight className="h-4 w-4" />;
-      default: return <ArrowUp className="h-4 w-4" />;
-    }
-  };
-
-  // Get shared tags as hints
-  const getConnectionHints = useCallback((adjacentCard: PlacedCard): string[] => {
-    return findSharedTags(card, adjacentCard.card);
-  }, [card]);
-
   // Handle submit
   const handleSubmit = () => {
-    const connectionList: Connection[] = adjacentCards
-      .filter(ac => connections[ac.moveId]?.trim())
-      .map(ac => ({
-        targetCardId: ac.card.id,
-        targetPosition: ac.position,
-        direction: getDirection(position, ac.position) || 'up',
-        explanation: connections[ac.moveId],
-        isChristConnection: isChristConnection,
-      }));
+    if (!explanation.trim()) return;
 
-    if (connectionList.length === 0) {
-      return; // Must have at least one connection
-    }
+    // Create connection - either to verse (first play) or to previous insight
+    const connectionList: Connection[] = [{
+      targetCardId: isFirstPlay ? 'verse' : (previousEntry?.id || 'previous'),
+      targetPosition: position,
+      direction: 'center' as any,
+      explanation: explanation,
+      isChristConnection: isChristConnection,
+    }];
 
-    const mainExplanation = Object.values(connections).filter(Boolean).join(' | ');
-    onSubmit(connectionList, mainExplanation, isChristConnection);
+    onSubmit(connectionList, explanation, isChristConnection);
   };
 
   // Calculate potential score with time bonus
-  const potentialConnections = adjacentCards.filter(ac => connections[ac.moveId]?.trim()).length;
-  const scoreBreakdown = potentialConnections > 0
-    ? calculateScoreWithTimeBonus(potentialConnections, isChristConnection, timeLeft)
+  const hasExplanation = explanation.trim().length > 0;
+  const scoreBreakdown = hasExplanation
+    ? calculateScoreWithTimeBonus(1, isChristConnection, timeLeft)
     : { baseScore: 0, timeBonus: 0, total: 0 };
 
   const timerColor = timeLeft <= 10 ? 'text-red-500' : timeLeft <= 30 ? 'text-yellow-500' : 'text-green-500';
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="sm:max-w-2xl">
+      <DialogContent className="sm:max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="flex items-center justify-between">
-            <span>Explain Your Connections</span>
+            <span className="flex items-center gap-2">
+              {isFirstPlay ? (
+                <Book className="h-5 w-5 text-primary" />
+              ) : (
+                <Link className="h-5 w-5 text-primary" />
+              )}
+              {isFirstPlay ? 'Connect to the Verse' : 'Build on Previous Insight'}
+            </span>
             <div className={cn('flex items-center gap-2 font-mono', timerColor)}>
               <Clock className="h-5 w-5" />
               <span className="text-2xl">{Math.floor(timeLeft / 60)}:{(timeLeft % 60).toString().padStart(2, '0')}</span>
             </div>
           </DialogTitle>
           <DialogDescription>
-            Explain how your card connects to adjacent cards. Faster = more points!
+            {isFirstPlay ? (
+              <>Explain how <strong>{card.name}</strong> helps you understand the verse</>
+            ) : (
+              <>Connect <strong>{card.name}</strong> to {previousEntry?.playerName}'s insight</>
+            )}
           </DialogDescription>
         </DialogHeader>
 
-        <div className="space-y-6">
+        <div className="space-y-5">
+          {/* What to connect to - Verse (first play) or Previous Insight */}
+          {isFirstPlay && seedVerse ? (
+            /* First Play: Show the seed verse */
+            <div className="p-4 bg-gradient-to-br from-blue-500/10 to-purple-500/10 border border-primary/30 rounded-lg">
+              <div className="flex items-center gap-2 mb-2">
+                <Book className="h-4 w-4 text-primary" />
+                <span className="font-semibold text-primary">{seedVerse.reference}</span>
+                <span className="text-xs px-2 py-0.5 bg-blue-500/20 rounded-full text-blue-600 dark:text-blue-400">
+                  Connect to this
+                </span>
+              </div>
+              <p className="text-sm italic leading-relaxed">"{seedVerse.text}"</p>
+            </div>
+          ) : previousEntry ? (
+            /* Subsequent Play: Show the previous insight */
+            <div className="space-y-3">
+              {/* Small verse reference */}
+              {seedVerse && (
+                <div className="p-2 bg-muted/50 rounded border text-xs">
+                  <span className="text-muted-foreground">Studying: </span>
+                  <span className="font-medium">{seedVerse.reference}</span>
+                </div>
+              )}
+
+              {/* Previous insight to connect to */}
+              <div className="p-4 bg-gradient-to-br from-green-500/10 to-blue-500/10 border border-green-500/30 rounded-lg">
+                <div className="flex items-center gap-2 mb-2">
+                  <User className="h-4 w-4 text-green-600" />
+                  <span className="font-semibold text-green-600 dark:text-green-400">{previousEntry.playerName}</span>
+                  <span className="text-xs font-mono bg-muted px-1.5 py-0.5 rounded">{previousEntry.cardCode}</span>
+                  <span className="text-xs px-2 py-0.5 bg-green-500/20 rounded-full text-green-600 dark:text-green-400 ml-auto">
+                    Build on this
+                  </span>
+                </div>
+                <p className="text-xs text-muted-foreground mb-1">{previousEntry.cardName}</p>
+                <p className="text-sm leading-relaxed">"{previousEntry.explanation}"</p>
+              </div>
+            </div>
+          ) : seedVerse ? (
+            /* Fallback: Show verse if no previous entry */
+            <div className="p-4 bg-gradient-to-br from-blue-500/10 to-purple-500/10 border border-primary/30 rounded-lg">
+              <div className="flex items-center gap-2 mb-2">
+                <Book className="h-4 w-4 text-primary" />
+                <span className="font-semibold text-primary">{seedVerse.reference}</span>
+              </div>
+              <p className="text-sm italic leading-relaxed">"{seedVerse.text}"</p>
+            </div>
+          ) : null}
+
           {/* Your card */}
           <div className="flex items-center gap-4 p-4 bg-muted rounded-lg">
             <ScrabbleTile card={card} size="sm" />
             <div>
-              <p className="font-medium">Placing: {card.name}</p>
+              <p className="font-medium">Applying: {card.name}</p>
               <p className="text-sm text-muted-foreground">{card.description}</p>
             </div>
           </div>
 
-          {/* Adjacent cards to connect to */}
-          <div className="space-y-4">
-            {adjacentCards.map(ac => {
-              const direction = getDirection(position, ac.position);
-              const hints = getConnectionHints(ac);
-              const hasConnection = !!connections[ac.moveId]?.trim();
-
-              return (
-                <motion.div
-                  key={ac.moveId}
-                  className={cn(
-                    'p-4 rounded-lg border transition-colors',
-                    hasConnection ? 'border-green-500 bg-green-500/5' : 'border-border'
-                  )}
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                >
-                  <div className="flex items-start gap-4">
-                    {/* Direction indicator */}
-                    <div className="flex flex-col items-center gap-1">
-                      {getDirectionIcon(direction || 'up')}
-                      <span className="text-xs text-muted-foreground capitalize">
-                        {direction}
-                      </span>
-                    </div>
-
-                    {/* Adjacent card */}
-                    <ScrabbleTile card={ac.card} size="sm" />
-
-                    {/* Connection input */}
-                    <div className="flex-1 space-y-2">
-                      <div className="flex items-center justify-between">
-                        <Label className="text-sm font-medium">
-                          Connect to {ac.card.name}
-                        </Label>
-                        {hasConnection && (
-                          <Check className="h-4 w-4 text-green-500" />
-                        )}
-                      </div>
-
-                      {/* Hints */}
-                      {hints.length > 0 && (
-                        <div className="flex flex-wrap gap-1">
-                          {hints.slice(0, 3).map(hint => (
-                            <span
-                              key={hint}
-                              className="text-xs px-2 py-0.5 bg-primary/10 text-primary rounded-full"
-                            >
-                              {hint}
-                            </span>
-                          ))}
-                        </div>
-                      )}
-
-                      <Textarea
-                        placeholder="How does your card connect to this one?"
-                        value={connections[ac.moveId] || ''}
-                        onChange={(e) => setConnections(prev => ({
-                          ...prev,
-                          [ac.moveId]: e.target.value,
-                        }))}
-                        rows={2}
-                        className="text-sm"
-                      />
-                    </div>
-                  </div>
-                </motion.div>
-              );
-            })}
+          {/* Explanation input */}
+          <div className="space-y-2">
+            <Label htmlFor="explanation" className="flex items-center justify-between">
+              <span>Your Explanation</span>
+              {hasExplanation && <Check className="h-4 w-4 text-green-500" />}
+            </Label>
+            <Textarea
+              id="explanation"
+              placeholder={isFirstPlay
+                ? `How does ${card.name} help you understand the verse?`
+                : `How does ${card.name} connect to ${previousEntry?.playerName}'s insight?`
+              }
+              value={explanation}
+              onChange={(e) => setExplanation(e.target.value)}
+              rows={4}
+              className="text-sm"
+            />
           </div>
 
           {/* Christ Connection toggle */}
@@ -269,10 +255,10 @@ export function ConnectionModal({
             </Button>
             <Button
               onClick={handleSubmit}
-              disabled={potentialConnections === 0}
+              disabled={!hasExplanation}
               className="flex-1"
             >
-              {potentialConnections > 0 ? `Submit (${potentialConnections} connection${potentialConnections !== 1 ? 's' : ''})` : 'Explain a connection'}
+              {hasExplanation ? 'Submit' : 'Enter an explanation'}
             </Button>
           </div>
         </div>

@@ -850,6 +850,8 @@ export default function PTScrabble() {
                 card={mpSelectedCard}
                 position={mpSelectedPosition}
                 adjacentCards={mpAdjacentCards}
+                seedVerse={seedVerse || undefined}
+                previousEntry={mpStudyLogEntries.length > 0 ? mpStudyLogEntries[mpStudyLogEntries.length - 1] : undefined}
               />
             )}
           </AnimatePresence>
