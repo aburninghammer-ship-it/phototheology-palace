@@ -28,11 +28,18 @@ export function SeedCardInsight({ seedCard, verse, onContinue }: SeedCardInsight
   const generateInsight = async () => {
     setIsLoading(true);
     try {
-      const prompt = `In 2-3 sentences, explain how the Phototheology principle "${seedCard.name}" (${seedCard.code}) can be applied to understand ${verse.reference}: "${verse.text}"
+      const prompt = `Apply the Phototheology principle "${seedCard.name}" (${seedCard.code}) directly to ${verse.reference}:
+
+"${verse.text}"
 
 The principle "${seedCard.name}" is about: ${seedCard.description || seedCard.name}
 
-Give a brief, insightful connection that sets the stage for deeper Bible study. Be specific about how this interpretive lens illuminates the verse.`;
+In 2-3 sentences:
+1. Briefly explain what the "${seedCard.name}" principle means
+2. Show specifically how this principle unlocks meaning in the verse text - quote or reference specific words/phrases from the verse
+3. Give one concrete insight that emerges when viewing this verse through this lens
+
+Be specific and tie your explanation directly to the actual words of the scripture.`;
 
       const { data, error } = await supabase.functions.invoke('jeeves', {
         body: {
