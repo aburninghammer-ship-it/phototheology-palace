@@ -1,19 +1,26 @@
-// PT Scrabble Page - Practice Mode
-// Solo practice mode for PT Scrabble (multiplayer requires database tables)
+// PT Scrabble Page - Bible Study Practice Mode
+// Solo practice mode where users study a verse using PT principles
 
 import { useState, useCallback, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { Navigation } from "@/components/Navigation";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { ArrowLeft, Users, Sparkles, Gamepad2, BookOpen, Cross } from "lucide-react";
+import { ArrowLeft, Users, Sparkles, Gamepad2, BookOpen, Cross, Book } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
-import { ScrabbleBoard, PlayerHandBar } from "@/components/scrabble";
-import type { ScrabbleCard, PlacedCard, BoardPosition } from "@/types/scrabble";
-import { positionKey } from "@/types/scrabble";
+import { 
+  ScrabbleBoard, 
+  PlayerHandBar, 
+  VerseSelectionScreen, 
+  SeedVerseDisplay,
+  BibleStudyConnectionModal,
+  type SelectedVerse 
+} from "@/components/scrabble";
+import type { ScrabbleCard, PlacedCard, BoardPosition, Connection } from "@/types/scrabble";
+import { positionKey, isValidPlacement } from "@/types/scrabble";
 import { getAllScrabbleCards, shuffleCards } from "@/data/scrabbleCards";
 
-type GamePhase = "menu" | "playing";
+type GamePhase = "menu" | "verse-selection" | "playing";
 
 export default function PTScrabble() {
   const { user, loading } = useAuth();
@@ -21,39 +28,64 @@ export default function PTScrabble() {
   const [gamePhase, setGamePhase] = useState<GamePhase>("menu");
   const [selectedCard, setSelectedCard] = useState<ScrabbleCard | null>(null);
   const [score, setScore] = useState(0);
+  const [seedVerse, setSeedVerse] = useState<SelectedVerse | null>(null);
   
-  // Demo board state with seed card
-  const [boardState, setBoardState] = useState<Record<string, PlacedCard>>(() => {
-    const allCards = getAllScrabbleCards();
-    const midFloorCards = allCards.filter(c => c.floor >= 2 && c.floor <= 5);
-    const seedCard = midFloorCards[Math.floor(Math.random() * midFloorCards.length)];
+  // Modal state for placing cards
+  const [connectionModal, setConnectionModal] = useState<{
+    isOpen: boolean;
+    card: ScrabbleCard | null;
+    position: BoardPosition | null;
+    adjacentCards: PlacedCard[];
+  }>({ isOpen: false, card: null, position: null, adjacentCards: [] });
+  
+  // Board state - seed card placed at center
+  const [boardState, setBoardState] = useState<Record<string, PlacedCard>>({});
+
+  // Player hand
+  const [playerHand, setPlayerHand] = useState<ScrabbleCard[]>([]);
+
+  // Deck for drawing
+  const [deck, setDeck] = useState<ScrabbleCard[]>([]);
+
+  // Start game with selected verse
+  const handleVerseSelected = useCallback((verse: SelectedVerse) => {
+    setSeedVerse(verse);
     
-    if (!seedCard) return {};
+    // Initialize game state
+    const allCards = shuffleCards(getAllScrabbleCards());
     
-    return {
+    // Pick a seed card - prefer Concentration Room or Story Room for Bible study
+    const preferredSeeds = allCards.filter(c => 
+      ['SR', 'OR', 'CR', 'GR', 'IR'].includes(c.code) || 
+      c.tags.includes('christology') ||
+      c.tags.includes('narrative')
+    );
+    const seedCardPool = preferredSeeds.length > 0 ? preferredSeeds : allCards.filter(c => c.floor >= 1 && c.floor <= 4);
+    const seedCard = seedCardPool[Math.floor(Math.random() * seedCardPool.length)];
+    
+    // Remove seed from available cards
+    const remainingCards = allCards.filter(c => c.id !== seedCard.id);
+    
+    // Set up board with seed card
+    setBoardState({
       "0,0": {
         card: seedCard,
         position: { x: 0, y: 0 },
         playerId: "system",
-        playerName: "Game Start",
+        playerName: "Starting Principle",
         connections: [],
         timestamp: new Date().toISOString(),
         moveId: "seed",
       }
-    };
-  });
-
-  // Demo hand
-  const [playerHand, setPlayerHand] = useState<ScrabbleCard[]>(() => {
-    const allCards = shuffleCards(getAllScrabbleCards());
-    return allCards.slice(0, 7);
-  });
-
-  // Deck for drawing
-  const [deck, setDeck] = useState<ScrabbleCard[]>(() => {
-    const allCards = shuffleCards(getAllScrabbleCards());
-    return allCards.slice(7);
-  });
+    });
+    
+    // Deal hand
+    setPlayerHand(remainingCards.slice(0, 7));
+    setDeck(remainingCards.slice(7));
+    setScore(0);
+    setSelectedCard(null);
+    setGamePhase("playing");
+  }, []);
 
   const handleCardSelect = useCallback((card: ScrabbleCard) => {
     setSelectedCard(prev => prev?.id === card.id ? null : card);
@@ -62,27 +94,42 @@ export default function PTScrabble() {
   const handlePositionClick = useCallback((position: BoardPosition) => {
     if (!selectedCard || !user) return;
     
-    const key = positionKey(position);
+    // Check if valid placement and get adjacent cards
+    const { valid, adjacentCards } = isValidPlacement(position, boardState);
+    if (!valid) return;
     
-    // Count adjacent cards for scoring
-    const adjacentKeys = [
-      positionKey({ x: position.x, y: position.y - 1 }),
-      positionKey({ x: position.x, y: position.y + 1 }),
-      positionKey({ x: position.x - 1, y: position.y }),
-      positionKey({ x: position.x + 1, y: position.y }),
-    ];
-    const adjacentCount = adjacentKeys.filter(k => boardState[k]).length;
-    const points = adjacentCount === 1 ? 1 : adjacentCount === 2 ? 3 : adjacentCount === 3 ? 6 : 10;
+    // Open the connection modal
+    setConnectionModal({
+      isOpen: true,
+      card: selectedCard,
+      position,
+      adjacentCards,
+    });
+  }, [selectedCard, user, boardState]);
+
+  const handleConnectionSubmit = useCallback((
+    connections: Connection[], 
+    explanation: string, 
+    isChristConnection: boolean
+  ) => {
+    if (!connectionModal.card || !connectionModal.position || !user) return;
+    
+    const key = positionKey(connectionModal.position);
+    const adjacentCount = connectionModal.adjacentCards.length;
+    
+    // Calculate points
+    let points = adjacentCount === 1 ? 1 : adjacentCount === 2 ? 3 : adjacentCount === 3 ? 6 : 10;
+    if (isChristConnection) points *= 2;
     
     // Add card to board
     setBoardState(prev => ({
       ...prev,
       [key]: {
-        card: selectedCard,
-        position,
+        card: connectionModal.card!,
+        position: connectionModal.position!,
         playerId: user.id,
         playerName: user.email?.split("@")[0] || "Player",
-        connections: [],
+        connections,
         timestamp: new Date().toISOString(),
         moveId: crypto.randomUUID(),
       }
@@ -92,7 +139,7 @@ export default function PTScrabble() {
     setScore(prev => prev + points);
 
     // Remove from hand
-    setPlayerHand(prev => prev.filter(c => c.id !== selectedCard.id));
+    setPlayerHand(prev => prev.filter(c => c.id !== connectionModal.card!.id));
     
     // Draw a new card if deck has cards
     if (deck.length > 0) {
@@ -102,26 +149,15 @@ export default function PTScrabble() {
     }
     
     setSelectedCard(null);
-  }, [selectedCard, user, boardState, deck]);
+    setConnectionModal({ isOpen: false, card: null, position: null, adjacentCards: [] });
+  }, [connectionModal, user, deck]);
 
   const handleNewGame = useCallback(() => {
-    const allCards = shuffleCards(getAllScrabbleCards());
-    const midFloorCards = allCards.filter(c => c.floor >= 2 && c.floor <= 5);
-    const seedCard = midFloorCards[Math.floor(Math.random() * midFloorCards.length)];
-    
-    setBoardState({
-      "0,0": {
-        card: seedCard,
-        position: { x: 0, y: 0 },
-        playerId: "system",
-        playerName: "Game Start",
-        connections: [],
-        timestamp: new Date().toISOString(),
-        moveId: "seed",
-      }
-    });
-    setPlayerHand(allCards.slice(0, 7));
-    setDeck(allCards.slice(7));
+    setGamePhase("verse-selection");
+    setSeedVerse(null);
+    setBoardState({});
+    setPlayerHand([]);
+    setDeck([]);
     setScore(0);
     setSelectedCard(null);
   }, []);
@@ -152,37 +188,37 @@ export default function PTScrabble() {
 
           <Card className="border-2 border-primary/20">
             <CardHeader className="text-center space-y-4">
-              <div className="text-6xl mx-auto">🎯</div>
+              <div className="text-6xl mx-auto">📖</div>
               <CardTitle className="text-4xl bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent">
-                PT Scrabble
+                PT Bible Study Scrabble
               </CardTitle>
               <CardDescription className="text-lg max-w-2xl mx-auto">
-                Build theological connections on a shared board! Place Palace room cards adjacent to existing ones, 
-                and watch your understanding of Phototheology principles grow.
+                Choose a Bible verse, then build connections using Phototheology principles! 
+                Apply the PT Palace framework to understand Scripture more deeply.
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
               {/* Rules summary */}
               <div className="grid md:grid-cols-3 gap-4 text-center">
                 <div className="p-4 bg-muted/50 rounded-lg">
-                  <BookOpen className="h-8 w-8 mx-auto mb-2 text-primary" />
-                  <h3 className="font-semibold">Connect Cards</h3>
+                  <Book className="h-8 w-8 mx-auto mb-2 text-primary" />
+                  <h3 className="font-semibold">1. Choose a Verse</h3>
                   <p className="text-sm text-muted-foreground">
-                    Place Palace room cards adjacent to existing cards
+                    Select a Bible passage to study deeply
+                  </p>
+                </div>
+                <div className="p-4 bg-muted/50 rounded-lg">
+                  <BookOpen className="h-8 w-8 mx-auto mb-2 text-primary" />
+                  <h3 className="font-semibold">2. Apply Principles</h3>
+                  <p className="text-sm text-muted-foreground">
+                    Place PT room cards and explain how each applies
                   </p>
                 </div>
                 <div className="p-4 bg-muted/50 rounded-lg">
                   <Cross className="h-8 w-8 mx-auto mb-2 text-primary" />
-                  <h3 className="font-semibold">Christ-Centered</h3>
+                  <h3 className="font-semibold">3. Find Christ</h3>
                   <p className="text-sm text-muted-foreground">
-                    Think about how each connection reveals Christ
-                  </p>
-                </div>
-                <div className="p-4 bg-muted/50 rounded-lg">
-                  <Users className="h-8 w-8 mx-auto mb-2 text-primary" />
-                  <h3 className="font-semibold">Build Together</h3>
-                  <p className="text-sm text-muted-foreground">
-                    Multiplayer mode coming soon!
+                    Earn bonus points for Christ-centered connections
                   </p>
                 </div>
               </div>
@@ -191,11 +227,11 @@ export default function PTScrabble() {
               <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
                 <Button 
                   size="lg" 
-                  onClick={() => setGamePhase("playing")}
+                  onClick={() => setGamePhase("verse-selection")}
                   className="bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600"
                 >
                   <Gamepad2 className="mr-2 h-5 w-5" />
-                  Practice Mode (Solo)
+                  Start Bible Study
                 </Button>
                 <Button 
                   size="lg" 
@@ -204,7 +240,7 @@ export default function PTScrabble() {
                   title="Coming soon!"
                 >
                   <Users className="mr-2 h-5 w-5" />
-                  Multiplayer (Coming Soon)
+                  Group Study (Coming Soon)
                 </Button>
               </div>
 
@@ -219,10 +255,31 @@ export default function PTScrabble() {
                   <li>• 2 connections = 3 points</li>
                   <li>• 3 connections = 6 points</li>
                   <li>• 4+ connections = 10+ points</li>
+                  <li>• <strong>Christ Connection = 2x multiplier!</strong></li>
                 </ul>
               </div>
             </CardContent>
           </Card>
+        </main>
+      </div>
+    );
+  }
+
+  // Verse selection view
+  if (gamePhase === "verse-selection") {
+    return (
+      <div className="min-h-screen bg-background">
+        <Navigation />
+        <main className="container mx-auto px-4 py-8">
+          <Button onClick={() => setGamePhase("menu")} variant="ghost" className="mb-6">
+            <ArrowLeft className="mr-2 h-4 w-4" />
+            Back to Menu
+          </Button>
+          
+          <VerseSelectionScreen 
+            onVerseSelected={handleVerseSelected}
+            onBack={() => setGamePhase("menu")}
+          />
         </main>
       </div>
     );
@@ -233,42 +290,39 @@ export default function PTScrabble() {
     <div className="min-h-screen bg-background flex flex-col">
       <Navigation />
       <main className="flex-1 container mx-auto px-4 py-4 flex flex-col gap-4">
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between flex-wrap gap-2">
           <Button onClick={() => setGamePhase("menu")} variant="ghost" size="sm">
             <ArrowLeft className="mr-2 h-4 w-4" />
-            Back to Menu
+            Menu
           </Button>
-          <h1 className="text-xl font-bold">PT Scrabble - Practice Mode</h1>
+          <h1 className="text-lg font-bold hidden sm:block">PT Bible Study</h1>
           <div className="flex items-center gap-4">
             <div className="text-sm text-muted-foreground">
               Score: <span className="font-bold text-primary">{score}</span>
             </div>
             <Button variant="outline" size="sm" onClick={handleNewGame}>
-              New Game
+              New Study
             </Button>
           </div>
         </div>
 
+        {/* Seed Verse Display */}
+        {seedVerse && (
+          <SeedVerseDisplay verse={seedVerse} />
+        )}
+
         {/* How to Play Instructions */}
-        <div className="bg-gradient-to-r from-blue-500/10 to-purple-500/10 border border-blue-500/30 rounded-lg p-4">
-          <h3 className="font-semibold text-sm mb-2 flex items-center gap-2">
-            <BookOpen className="h-4 w-4 text-blue-400" />
-            How to Play
-          </h3>
+        <div className="bg-gradient-to-r from-blue-500/10 to-purple-500/10 border border-blue-500/30 rounded-lg p-3">
           <ol className="text-xs text-muted-foreground space-y-1 list-decimal list-inside">
-            <li><strong>Select a card</strong> from your hand at the bottom (click on it)</li>
-            <li><strong>Click an empty spot</strong> next to an existing card on the board (marked with +)</li>
-            <li><strong>Score points</strong> based on connections: 1→1pt, 2→3pts, 3→6pts, 4+→10pts</li>
-            <li><strong>Think theologically:</strong> How does your card connect to the adjacent card(s)?</li>
+            <li><strong>Select a card</strong> from your hand below</li>
+            <li><strong>Click a + spot</strong> on the board next to an existing card</li>
+            <li><strong>Explain</strong> how that PT principle applies to the verse</li>
+            <li><strong>Score bonus</strong> for Christ-centered connections!</li>
           </ol>
-          <p className="text-xs text-blue-400 mt-2">
-            <Sparkles className="inline h-3 w-3 mr-1" />
-            The <strong>"{Object.values(boardState)[0]?.card.name}"</strong> ({Object.values(boardState)[0]?.card.code}) is your starting card. Build from there!
-          </p>
         </div>
 
         {/* Main game area */}
-        <div className="flex-1 min-h-[400px] border rounded-lg overflow-hidden">
+        <div className="flex-1 min-h-[350px] border rounded-lg overflow-hidden">
           <ScrabbleBoard
             boardState={boardState}
             selectedCard={selectedCard}
@@ -278,7 +332,7 @@ export default function PTScrabble() {
         </div>
 
         {/* Player hand */}
-        <div className="border-t pt-4">
+        <div className="border-t pt-4 pb-32">
           <p className="text-xs text-muted-foreground mb-2 text-center">
             {selectedCard 
               ? `✅ Selected: "${selectedCard.name}" (${selectedCard.code}) — Now click a + spot on the board`
@@ -292,6 +346,19 @@ export default function PTScrabble() {
           />
         </div>
       </main>
+
+      {/* Connection Modal */}
+      {connectionModal.isOpen && connectionModal.card && connectionModal.position && seedVerse && (
+        <BibleStudyConnectionModal
+          isOpen={connectionModal.isOpen}
+          onClose={() => setConnectionModal({ isOpen: false, card: null, position: null, adjacentCards: [] })}
+          onSubmit={handleConnectionSubmit}
+          card={connectionModal.card}
+          position={connectionModal.position}
+          adjacentCards={connectionModal.adjacentCards}
+          seedVerse={seedVerse}
+        />
+      )}
     </div>
   );
 }
