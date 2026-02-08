@@ -144,23 +144,45 @@ export function EmptyTile({ onClick, isHighlighted = false, size = 'md' }: Empty
     lg: 'w-28 h-40',
   };
 
+  const iconSizes = {
+    sm: 'h-4 w-4',
+    md: 'h-8 w-8',
+    lg: 'h-10 w-10',
+  };
+
   return (
     <motion.div
       className={cn(
-        'rounded-lg border-2 border-dashed flex items-center justify-center cursor-pointer transition-all',
+        'rounded-lg border-2 border-dashed flex flex-col items-center justify-center gap-1 cursor-pointer transition-all',
         sizeClasses[size],
         isHighlighted
-          ? 'border-green-400 bg-green-400/10 animate-pulse'
+          ? 'border-green-400 bg-green-400/20 shadow-[0_0_20px_rgba(74,222,128,0.4)]'
           : 'border-border/30 bg-background/20 hover:border-border/60'
       )}
       onClick={onClick}
-      whileHover={{ scale: 1.05 }}
+      whileHover={{ scale: 1.1 }}
       whileTap={{ scale: 0.95 }}
+      animate={isHighlighted ? {
+        scale: [1, 1.05, 1],
+        boxShadow: [
+          '0 0 10px rgba(74,222,128,0.3)',
+          '0 0 25px rgba(74,222,128,0.5)',
+          '0 0 10px rgba(74,222,128,0.3)',
+        ],
+      } : undefined}
+      transition={isHighlighted ? {
+        duration: 1.5,
+        repeat: Infinity,
+        ease: 'easeInOut',
+      } : undefined}
     >
       <LucideIcons.Plus className={cn(
-        'opacity-40',
-        isHighlighted ? 'text-green-400' : 'text-muted-foreground'
+        iconSizes[size],
+        isHighlighted ? 'text-green-400' : 'text-muted-foreground opacity-40'
       )} />
+      {isHighlighted && size !== 'sm' && (
+        <span className="text-[10px] text-green-400 font-medium">Place here</span>
+      )}
     </motion.div>
   );
 }

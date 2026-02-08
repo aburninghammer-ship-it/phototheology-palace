@@ -3,7 +3,8 @@
 
 import { useMemo, useState, useCallback } from 'react';
 import { TransformWrapper, TransformComponent } from 'react-zoom-pan-pinch';
-import { ZoomIn, ZoomOut, Maximize2 } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { ZoomIn, ZoomOut, Maximize2, Hand, MousePointerClick, ArrowDown } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { ScrabbleTile, EmptyTile } from './ScrabbleTile';
 import type { PlacedCard, BoardPosition, ScrabbleCard } from '@/types/scrabble';
@@ -172,6 +173,52 @@ export function ScrabbleBoard({
       <div className="absolute bottom-2 left-2 text-xs text-muted-foreground bg-background/80 px-2 py-1 rounded">
         {Object.keys(boardState).length} cards on board | {validPositions.length} valid positions
       </div>
+
+      {/* Floating instruction overlay */}
+      <AnimatePresence>
+        {!selectedCard && Object.keys(boardState).length === 1 && (
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none z-20"
+          >
+            <div className="bg-background/95 border-2 border-primary/50 rounded-xl p-6 shadow-2xl max-w-xs text-center">
+              <motion.div
+                animate={{ y: [0, 5, 0] }}
+                transition={{ duration: 1.5, repeat: Infinity }}
+                className="mb-4"
+              >
+                <Hand className="h-12 w-12 mx-auto text-primary" />
+              </motion.div>
+              <h3 className="font-bold text-lg mb-2">Step 1: Select a Card</h3>
+              <p className="text-sm text-muted-foreground mb-4">
+                Choose a principle card from your hand at the bottom of the screen
+              </p>
+              <motion.div
+                animate={{ y: [0, 8, 0] }}
+                transition={{ duration: 1, repeat: Infinity }}
+              >
+                <ArrowDown className="h-6 w-6 mx-auto text-primary" />
+              </motion.div>
+            </div>
+          </motion.div>
+        )}
+
+        {selectedCard && (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.9 }}
+            className="absolute top-4 left-1/2 -translate-x-1/2 pointer-events-none z-20"
+          >
+            <div className="bg-green-500/90 text-white rounded-full px-4 py-2 shadow-lg flex items-center gap-2">
+              <MousePointerClick className="h-4 w-4" />
+              <span className="text-sm font-medium">Now click a green + spot to place your card</span>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
