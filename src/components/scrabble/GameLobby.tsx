@@ -12,6 +12,7 @@ import {
   Crown,
   Loader2,
   Gamepad2,
+  Megaphone,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -23,6 +24,7 @@ import { toast } from 'sonner';
 import type { ScrabbleGame, ScrabblePlayer } from '@/types/scrabble';
 import { getTotalCardCount } from '@/data/scrabbleCards';
 import { cn } from '@/lib/utils';
+import { CallToPlayButton } from './CallToPlayButton';
 
 interface GameLobbyProps {
   game?: ScrabbleGame | null;
@@ -32,6 +34,10 @@ interface GameLobbyProps {
   onCreateGame: (mode: 'ffa' | 'team', maxPlayers: number) => Promise<string | null>;
   onJoinGame: (roomCode: string) => Promise<boolean>;
   onStartGame: () => Promise<boolean>;
+  // Presence features for "Call to Play"
+  onlineCount?: number;
+  isOnline?: boolean;
+  onBroadcastInvitation?: () => void;
 }
 
 export function GameLobby({
@@ -42,6 +48,9 @@ export function GameLobby({
   onCreateGame,
   onJoinGame,
   onStartGame,
+  onlineCount = 0,
+  isOnline = false,
+  onBroadcastInvitation,
 }: GameLobbyProps) {
   const [mode, setMode] = useState<'create' | 'join'>('create');
   const [gameMode, setGameMode] = useState<'ffa' | 'team'>('ffa');
@@ -96,6 +105,17 @@ export function GameLobby({
             <p className="text-center text-sm text-muted-foreground">
               Share this code with other players to join
             </p>
+
+            {/* Call to Play button - broadcast to online users */}
+            {isHost && onBroadcastInvitation && (
+              <div className="flex justify-center">
+                <CallToPlayButton
+                  onlineCount={onlineCount}
+                  isOnline={isOnline}
+                  onBroadcast={onBroadcastInvitation}
+                />
+              </div>
+            )}
 
             {/* Players list */}
             <div className="space-y-2">

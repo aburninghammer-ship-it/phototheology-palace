@@ -1,16 +1,17 @@
 // Scrabble PT - Solo and Multiplayer Modes
 // Play solo or real-time multiplayer with PT principles
 
-import { useState, useCallback, useMemo } from "react";
+import { useState, useCallback, useMemo, useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { Navigation } from "@/components/Navigation";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { ArrowLeft, Users, Sparkles, Gamepad2, BookOpen, Cross, Book, Trophy, Layers, Globe } from "lucide-react";
+import { ArrowLeft, Users, Sparkles, Gamepad2, BookOpen, Cross, Book, Trophy, Layers, Globe, Megaphone } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useScrabbleGame } from "@/hooks/useScrabbleGame";
+import { useGamePresence, type GameInvitation } from "@/hooks/useGamePresence";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   ScrabbleBoard,
@@ -29,6 +30,8 @@ import {
   type StudyLogEntry,
   type CardWithPosition,
 } from "@/components/scrabble";
+import { GameInvitationNotification } from "@/components/scrabble/GameInvitationNotification";
+import { CallToPlayButton } from "@/components/scrabble/CallToPlayButton";
 import type { ScrabbleCard, PlacedCard, BoardPosition, Connection } from "@/types/scrabble";
 import { positionKey, isValidPlacement, assignCardsToPositions } from "@/types/scrabble";
 import { getAllScrabbleCards, shuffleCards } from "@/data/scrabbleCards";
@@ -73,6 +76,16 @@ export default function PTScrabble() {
   const [mpSelectedCard, setMpSelectedCard] = useState<ScrabbleCard | null>(null);
   const [mpSelectedPosition, setMpSelectedPosition] = useState<BoardPosition | null>(null);
   const [showMpConnectionModal, setShowMpConnectionModal] = useState(false);
+
+  // Game presence for "Call to Play" feature
+  const {
+    onlineUsers,
+    activeInvitation,
+    isOnline,
+    broadcastInvitation,
+    dismissInvitation,
+    onlineCount,
+  } = useGamePresence();
 
   // Solo mode state
   const [connectionModal, setConnectionModal] = useState<{
@@ -306,6 +319,36 @@ export default function PTScrabble() {
     await vote(moveId, approve);
   }, [vote]);
 
+  // Handle accepting a game invitation
+  const handleAcceptInvitation = useCallback(async (invitation: GameInvitation) => {
+    dismissInvitation();
+    const success = await joinGame(invitation.roomCode);
+    if (success) {
+      setMultiplayerGameId(invitation.gameId);
+      navigate(`/pt-scrabble?game=${invitation.gameId}`, { replace: true });
+      setGamePhase("multiplayer-lobby");
+    }
+  }, [joinGame, dismissInvitation, navigate]);
+
+  // Broadcast game invitation to all online users
+  const handleBroadcastInvitation = useCallback(() => {
+    if (!mpGame || !seedVerse) {
+      // If no seed verse yet, use a default placeholder
+      const defaultVerse = {
+        reference: "John 3:16",
+        text: "For God so loved the world...",
+      };
+      if (mpGame) {
+        broadcastInvitation(mpGame.id, mpGame.roomCode, defaultVerse);
+      }
+    } else {
+      broadcastInvitation(mpGame.id, mpGame.roomCode, {
+        reference: seedVerse.reference,
+        text: seedVerse.text.slice(0, 100) + (seedVerse.text.length > 100 ? '...' : ''),
+      });
+    }
+  }, [mpGame, seedVerse, broadcastInvitation]);
+
   const mpAdjacentCards: PlacedCard[] = mpSelectedPosition && mpGame
     ? mpGetAdjacentCards(mpSelectedPosition)
     : [];
@@ -352,6 +395,14 @@ export default function PTScrabble() {
     return (
       <div className="min-h-screen bg-background">
         <Navigation />
+
+        {/* Game Invitation Notification */}
+        <GameInvitationNotification
+          invitation={activeInvitation}
+          onAccept={handleAcceptInvitation}
+          onDismiss={dismissInvitation}
+        />
+
         <main className="container mx-auto px-4 py-8 max-w-4xl">
           <Button onClick={() => navigate("/games")} variant="ghost" className="mb-6">
             <ArrowLeft className="mr-2 h-4 w-4" />
@@ -395,6 +446,25 @@ export default function PTScrabble() {
                 </div>
               </div>
 
+              {/* Online users indicator */}
+              {onlineCount > 0 && (
+                <motion.div
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="flex items-center justify-center gap-2 p-3 bg-green-500/10 border border-green-500/30 rounded-lg"
+                >
+                  <motion.div
+                    className="w-2 h-2 rounded-full bg-green-400"
+                    animate={{ scale: [1, 1.3, 1] }}
+                    transition={{ duration: 2, repeat: Infinity }}
+                  />
+                  <span className="text-sm text-green-600 dark:text-green-400">
+                    <strong>{onlineCount}</strong> {onlineCount === 1 ? 'player' : 'players'} online right now
+                  </span>
+                  <Users className="h-4 w-4 text-green-500" />
+                </motion.div>
+              )}
+
               {/* Game mode buttons */}
               <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
                 <Button
@@ -413,6 +483,11 @@ export default function PTScrabble() {
                 >
                   <Globe className="mr-2 h-5 w-5" />
                   Multiplayer Game
+                  {onlineCount > 0 && (
+                    <span className="ml-2 px-1.5 py-0.5 text-xs bg-green-500/20 rounded-full">
+                      {onlineCount} online
+                    </span>
+                  )}
                 </Button>
               </div>
 
@@ -471,6 +546,9 @@ export default function PTScrabble() {
           onCreateGame={handleCreateMultiplayerGame}
           onJoinGame={handleJoinMultiplayerGame}
           onStartGame={startGame}
+          onlineCount={onlineCount}
+          isOnline={isOnline}
+          onBroadcastInvitation={handleBroadcastInvitation}
         />
       );
     }
@@ -499,6 +577,8 @@ export default function PTScrabble() {
             onCreateGame={handleCreateMultiplayerGame}
             onJoinGame={handleJoinMultiplayerGame}
             onStartGame={startGame}
+            onlineCount={onlineCount}
+            isOnline={isOnline}
           />
         </main>
       </div>

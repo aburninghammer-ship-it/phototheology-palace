@@ -205,20 +205,30 @@ export function DraggableNavTabs() {
 
     if (!over || active.id === over.id) return;
 
+    const activeId = active.id as string;
+    const overId = over.id as string;
+
     // Don't allow dragging pinned tabs
-    if (pinnedTabIds.includes(active.id as string)) return;
+    if (pinnedTabIds.includes(activeId)) return;
 
-    const oldIndex = orderedTabs.findIndex(tab => tab.id === active.id);
-    const newIndex = orderedTabs.findIndex(tab => tab.id === over.id);
+    // Can't drop into the pinned section
+    const overIsInPinned = pinnedTabIds.includes(overId);
+    if (overIsInPinned) return;
 
-    // Can't drag before pinned tabs
-    if (newIndex < pinnedTabIds.length) return;
-
+    // Get just the unpinned tabs in their current order
     const unpinnedTabs = orderedTabs.filter(tab => !pinnedTabIds.includes(tab.id));
-    const unpinnedOldIndex = unpinnedTabs.findIndex(tab => tab.id === active.id);
-    const unpinnedNewIndex = unpinnedTabs.findIndex(tab => tab.id === over.id);
 
-    const newOrder = arrayMove(unpinnedTabs, unpinnedOldIndex, unpinnedNewIndex).map(tab => tab.id);
+    const oldIndex = unpinnedTabs.findIndex(tab => tab.id === activeId);
+    const newIndex = unpinnedTabs.findIndex(tab => tab.id === overId);
+
+    // Validate indices
+    if (oldIndex === -1 || newIndex === -1) return;
+    if (oldIndex === newIndex) return;
+
+    // Perform the reorder on unpinned tabs
+    const reorderedTabs = arrayMove(unpinnedTabs, oldIndex, newIndex);
+    const newOrder = reorderedTabs.map(tab => tab.id);
+
     updatePreference("nav_tab_order", newOrder);
     toast.success("Tab order updated");
   };
