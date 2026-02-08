@@ -228,6 +228,11 @@ export function isValidPlacement(
 export function getValidPlacements(
   boardState: Record<string, PlacedCard>
 ): BoardPosition[] {
+  // Empty board: first card goes at center
+  if (Object.keys(boardState).length === 0) {
+    return [{ x: 0, y: 0 }];
+  }
+
   const validPositions: BoardPosition[] = [];
   const checked = new Set<string>();
 

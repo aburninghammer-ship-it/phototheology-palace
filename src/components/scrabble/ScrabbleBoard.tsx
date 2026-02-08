@@ -179,7 +179,7 @@ export function ScrabbleBoard({
 
       {/* Floating instruction overlay */}
       <AnimatePresence>
-        {!selectedCard && Object.keys(boardState).length === 1 && (
+        {!selectedCard && Object.keys(boardState).length <= 1 && (
           <motion.div
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
@@ -194,9 +194,14 @@ export function ScrabbleBoard({
               >
                 <Hand className="h-12 w-12 mx-auto text-primary" />
               </motion.div>
-              <h3 className="font-bold text-lg mb-2">Step 1: Select a Card</h3>
+              <h3 className="font-bold text-lg mb-2">
+                {Object.keys(boardState).length === 0 ? 'Start the Study' : 'Select a Card'}
+              </h3>
               <p className="text-sm text-muted-foreground mb-4">
-                Choose a principle card from your hand at the bottom of the screen
+                {Object.keys(boardState).length === 0
+                  ? 'Choose a principle card to connect to the verse'
+                  : 'Choose a principle card from your hand at the bottom of the screen'
+                }
               </p>
               <motion.div
                 animate={{ y: [0, 8, 0] }}
