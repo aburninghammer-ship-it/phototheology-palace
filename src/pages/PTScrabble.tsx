@@ -27,6 +27,7 @@ import {
   VotingPanel,
   StudyLog,
   StudyTranscript,
+  JeevesFeedbackPanel,
   type SelectedVerse,
   type StudyLogEntry,
   type CardWithPosition,
@@ -123,6 +124,10 @@ export default function PTScrabble() {
 
   // Placed card detail modal state (for viewing any card on board)
   const [viewingCard, setViewingCard] = useState<PlacedCard | null>(null);
+
+  // Jeeves feedback panel state - shows after card placement
+  const [lastPlacedEntry, setLastPlacedEntry] = useState<StudyLogEntry | null>(null);
+  const [showFeedbackPanel, setShowFeedbackPanel] = useState(false);
 
   // Board state - seed card placed at center
   const [boardState, setBoardState] = useState<Record<string, PlacedCard>>({});
@@ -247,8 +252,8 @@ export default function PTScrabble() {
     // Determine if this was connecting to verse (first play) or previous insight
     const isFirstPlay = studyLogEntries.length === 0;
 
-    // Add to study log
-    setStudyLogEntries(prev => [...prev, {
+    // Create the new entry for the study log
+    const newEntry: StudyLogEntry = {
       id: moveId,
       playerName,
       cardCode: connectionModal.card!.code,
@@ -259,7 +264,10 @@ export default function PTScrabble() {
       timestamp: new Date().toISOString(),
       jeevesJudgment,
       connectingTo: isFirstPlay ? 'verse' : 'previous',
-    }]);
+    };
+
+    // Add to study log
+    setStudyLogEntries(prev => [...prev, newEntry]);
 
     // Update score
     setScore(prev => prev + points);
@@ -277,12 +285,16 @@ export default function PTScrabble() {
     setSelectedCard(null);
     setConnectionModal({ isOpen: false, card: null, position: null, adjacentCards: [] });
 
+    // Show Jeeves feedback panel with the new entry
+    setLastPlacedEntry(newEntry);
+    setShowFeedbackPanel(true);
+
     // Check for game completion (no cards in hand and deck is empty)
     if (playerHand.length <= 1 && deck.length === 0) {
       // Delay to show the last card placement animation
       setTimeout(() => setGamePhase("completed"), 1500);
     }
-  }, [connectionModal, user, deck, playerHand.length]);
+  }, [connectionModal, user, deck, playerHand.length, studyLogEntries.length]);
 
   const handleNewGame = useCallback(() => {
     setGamePhase("verse-selection");
@@ -293,6 +305,8 @@ export default function PTScrabble() {
     setScore(0);
     setSelectedCard(null);
     setStudyLogEntries([]);
+    setShowFeedbackPanel(false);
+    setLastPlacedEntry(null);
   }, []);
 
   // ========== MULTIPLAYER HANDLERS ==========
@@ -1010,6 +1024,17 @@ export default function PTScrabble() {
         placedCard={viewingCard}
         isSeedCard={viewingCard?.moveId === 'seed'}
         seedVerseText={seedVerse?.text}
+      />
+
+      {/* Jeeves Feedback Panel - shows after card placement */}
+      <JeevesFeedbackPanel
+        entry={lastPlacedEntry}
+        seedVerse={seedVerse}
+        onDismiss={() => {
+          setShowFeedbackPanel(false);
+          setLastPlacedEntry(null);
+        }}
+        isVisible={showFeedbackPanel}
       />
     </div>
   );
