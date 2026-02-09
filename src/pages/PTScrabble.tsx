@@ -567,12 +567,22 @@ export default function PTScrabble() {
                 </TabsContent>
 
                 <TabsContent value="schedule" className="space-y-6">
-                  <ScheduledGamesPanel
-                    onJoinGame={(roomCode) => {
-                      setGamePhase("multiplayer-lobby");
-                      // The join will happen automatically when lobby loads with code
-                    }}
-                  />
+                  <div className="text-center py-8 space-y-4">
+                    <Calendar className="h-12 w-12 mx-auto text-primary opacity-80" />
+                    <div>
+                      <h3 className="text-lg font-semibold">Schedule Games & Studies</h3>
+                      <p className="text-muted-foreground text-sm mt-1">
+                        Plan PT Scrabble, Chain Chess, Group Studies, and more
+                      </p>
+                    </div>
+                    <Button
+                      onClick={() => navigate('/schedule')}
+                      className="gap-2 bg-gradient-to-r from-primary to-blue-500"
+                    >
+                      <Calendar className="h-4 w-4" />
+                      Open Schedule
+                    </Button>
+                  </div>
                 </TabsContent>
               </Tabs>
             </CardContent>
