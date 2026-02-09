@@ -257,7 +257,7 @@ export const DEFAULT_NAV_TABS: NavTab[] = [
   },
   {
     id: "schedule",
-    to: "/pt-scrabble?tab=schedule",
+    to: "/schedule",
     label: "Scheduled Games",
     shortLabel: "Schedule",
     icon: CalendarDays,
