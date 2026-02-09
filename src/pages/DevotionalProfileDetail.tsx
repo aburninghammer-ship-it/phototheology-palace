@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { ArrowLeft, Send, Calendar, MessageSquare, Sparkles, Plus, Pin, Trash2, Clock, History as HistoryIcon, Lightbulb, Zap, Phone, ToggleLeft, ToggleRight } from "lucide-react";
+import { ArrowLeft, Send, Calendar, MessageSquare, Sparkles, Plus, Pin, Trash2, Clock, History as HistoryIcon, Lightbulb, Zap, Phone, ToggleLeft, ToggleRight, RefreshCw, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -190,6 +190,59 @@ export default function DevotionalProfileDetail() {
 
   const [newNote, setNewNote] = useState("");
   const [noteType, setNoteType] = useState("observation");
+  const [isGeneratingDays, setIsGeneratingDays] = useState(false);
+
+  // Calculate missing days
+  const totalDays = plan?.duration || 0;
+  const existingDays = days?.length || 0;
+  const missingDaysCount = totalDays - existingDays;
+
+  const handleGenerateMissingDays = async () => {
+    if (!plan?.id) return;
+
+    setIsGeneratingDays(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("batch-generate-devotional-days", {
+        body: {
+          planId: plan.id,
+          maxDaysPerPlan: 10 // Generate up to 10 days at once
+        },
+      });
+
+      if (error) throw error;
+
+      // Refresh the plan data
+      queryClient.invalidateQueries({ queryKey: ["devotional-days", plan.id] });
+      queryClient.invalidateQueries({ queryKey: ["devotional-plan", plan.id] });
+
+      if (data?.totalDaysGenerated > 0) {
+        toast({
+          title: "Days Generated!",
+          description: `Generated ${data.totalDaysGenerated} new devotional day(s) for ${profile?.name}.`,
+        });
+      } else if (data?.results?.[0]?.errors?.length > 0) {
+        toast({
+          title: "Generation Issue",
+          description: data.results[0].errors[0],
+          variant: "destructive",
+        });
+      } else {
+        toast({
+          title: "All Caught Up",
+          description: "No new days needed to be generated yet.",
+        });
+      }
+    } catch (error: any) {
+      console.error("Error generating days:", error);
+      toast({
+        title: "Generation Failed",
+        description: error?.message || "Could not generate devotional days. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsGeneratingDays(false);
+    }
+  };
 
   const handleGeneratePlan = async () => {
     if (!profile) return;
@@ -385,6 +438,46 @@ export default function DevotionalProfileDetail() {
 
           {/* Devotionals Tab */}
           <TabsContent value="devotionals" className="space-y-4">
+            {/* Missing Days Alert */}
+            {plan && missingDaysCount > 0 && (
+              <Card className="border-amber-400 bg-amber-50/50 dark:bg-amber-950/30">
+                <CardContent className="py-4">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className="p-2 rounded-full bg-amber-100 dark:bg-amber-900/50">
+                        <RefreshCw className="h-5 w-5 text-amber-600" />
+                      </div>
+                      <div>
+                        <p className="font-medium text-amber-800 dark:text-amber-200">
+                          {missingDaysCount} day{missingDaysCount !== 1 ? 's' : ''} not yet generated
+                        </p>
+                        <p className="text-sm text-amber-600 dark:text-amber-400">
+                          Plan has {totalDays} days total, {existingDays} generated so far
+                        </p>
+                      </div>
+                    </div>
+                    <Button
+                      onClick={handleGenerateMissingDays}
+                      disabled={isGeneratingDays}
+                      className="bg-amber-600 hover:bg-amber-700"
+                    >
+                      {isGeneratingDays ? (
+                        <>
+                          <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                          Generating...
+                        </>
+                      ) : (
+                        <>
+                          <RefreshCw className="h-4 w-4 mr-2" />
+                          Generate Now
+                        </>
+                      )}
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+
             {days && days.length > 0 ? (
               <div className="space-y-3">
                 {days.map((day) => {
