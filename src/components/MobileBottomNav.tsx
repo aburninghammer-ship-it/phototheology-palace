@@ -1,4 +1,4 @@
-import { Home, BookOpen, Building2, Lightbulb, Headphones, Calendar } from "lucide-react";
+import { Home, BookOpen, Building2, Lightbulb, MessageCircle } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/hooks/useAuth";
@@ -6,8 +6,8 @@ import { useAuth } from "@/hooks/useAuth";
 const navItems = [
   { icon: Home, label: "Home", path: "/dashboard" },
   { icon: BookOpen, label: "Bible", path: "/bible" },
+  { icon: MessageCircle, label: "Chat", path: "/public-chat" },
   { icon: Lightbulb, label: "Thoughts", path: "/analyze-thoughts" },
-  { icon: Calendar, label: "Schedule", path: "/pt-scrabble?tab=schedule" },
   { icon: Building2, label: "Palace", path: "/palace" },
 ];
 
