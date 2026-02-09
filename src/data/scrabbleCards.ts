@@ -144,13 +144,15 @@ function generateSpecialCards(): ScrabbleCard[] {
   });
 
   // Time Zones (from Time Zone Room - Floor 4)
+  // The 6 Time Zones: Heaven/Earth × Past/Present/Future
+  // Used to locate where a text fits in the cosmic-historical timeline
   const timeZones = [
-    { id: 'tz-hp', code: 'H-Past', name: 'Heaven Past', description: 'What heaven did before', tags: ['timezone', 'heaven', 'past'], icon: 'History' },
-    { id: 'tz-hn', code: 'H-Now', name: 'Heaven Now', description: 'What heaven is doing now', tags: ['timezone', 'heaven', 'present'], icon: 'Clock' },
-    { id: 'tz-hf', code: 'H-Future', name: 'Heaven Future', description: 'What heaven will do', tags: ['timezone', 'heaven', 'future', 'eschatology'], icon: 'Hourglass' },
-    { id: 'tz-ep', code: 'E-Past', name: 'Earth Past', description: 'Earthly events that led to this', tags: ['timezone', 'earth', 'past', 'history'], icon: 'MapPin' },
-    { id: 'tz-en', code: 'E-Now', name: 'Earth Now', description: 'Current earthly situation', tags: ['timezone', 'earth', 'present', 'application'], icon: 'Globe' },
-    { id: 'tz-ef', code: 'E-Future', name: 'Earth Future', description: 'Future result on earth', tags: ['timezone', 'earth', 'future', 'eschatology'], icon: 'Sunrise' },
+    { id: 'tz-hp', code: 'H-Past', name: 'Heaven Past', description: 'How do events in heaven before the fall of man connect with this verse/story?', tags: ['timezone', 'heaven', 'past', 'pre-fall'], icon: 'History' },
+    { id: 'tz-hn', code: 'H-Now', name: 'Heaven Now', description: 'How does Christ\'s current heavenly ministry relate to this text?', tags: ['timezone', 'heaven', 'present', 'sanctuary'], icon: 'Clock' },
+    { id: 'tz-hf', code: 'H-Future', name: 'Heaven Future', description: 'What future heavenly events does this text point toward?', tags: ['timezone', 'heaven', 'future', 'eschatology'], icon: 'Hourglass' },
+    { id: 'tz-ep', code: 'E-Past', name: 'Earth Past', description: 'What historical earthly events connect to this passage?', tags: ['timezone', 'earth', 'past', 'history'], icon: 'MapPin' },
+    { id: 'tz-en', code: 'E-Now', name: 'Earth Now', description: 'How does this text apply to the believer\'s present life on earth?', tags: ['timezone', 'earth', 'present', 'application'], icon: 'Globe' },
+    { id: 'tz-ef', code: 'E-Future', name: 'Earth Future', description: 'What prophesied future events on earth does this foreshadow?', tags: ['timezone', 'earth', 'future', 'prophecy'], icon: 'Sunrise' },
   ];
 
   timeZones.forEach(tz => {
