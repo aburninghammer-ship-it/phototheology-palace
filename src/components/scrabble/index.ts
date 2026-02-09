@@ -14,3 +14,4 @@ export { SeedVerseDisplay } from './SeedVerseDisplay';
 export { SeedCardInsight } from './SeedCardInsight';
 export { StudyLog, type StudyLogEntry } from './StudyLog';
 export { StudyTranscript } from './StudyTranscript';
+export { JeevesFeedbackPanel } from './JeevesFeedbackPanel';
