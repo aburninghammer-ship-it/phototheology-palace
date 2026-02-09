@@ -467,21 +467,20 @@ export default function PTScrabble() {
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
-              <Tabs defaultValue="play" className="w-full" onValueChange={(value) => {
-                if (value === 'schedule') {
-                  navigate('/schedule');
-                }
-              }}>
-                <TabsList className="grid w-full grid-cols-2 mb-6">
-                  <TabsTrigger value="play" className="gap-2">
-                    <Gamepad2 className="h-4 w-4" />
-                    Play
-                  </TabsTrigger>
-                  <TabsTrigger value="schedule" className="gap-2">
-                    <Calendar className="h-4 w-4" />
-                    Schedule
-                  </TabsTrigger>
-                </TabsList>
+              <div className="flex w-full mb-6 rounded-lg bg-muted p-1">
+                <button className="flex-1 flex items-center justify-center gap-2 rounded-md bg-background text-foreground shadow-sm py-2 text-sm font-medium">
+                  <Gamepad2 className="h-4 w-4" />
+                  Play
+                </button>
+                <button
+                  className="flex-1 flex items-center justify-center gap-2 rounded-md py-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+                  onClick={() => navigate('/schedule')}
+                >
+                  <Calendar className="h-4 w-4" />
+                  Schedule
+                </button>
+              </div>
+              <div>
 
                 <TabsContent value="play" className="space-y-6">
                   {/* Rules summary */}
@@ -570,25 +569,7 @@ export default function PTScrabble() {
                   </div>
                 </TabsContent>
 
-                <TabsContent value="schedule" className="space-y-6">
-                  <div className="text-center py-8 space-y-4">
-                    <Calendar className="h-12 w-12 mx-auto text-primary opacity-80" />
-                    <div>
-                      <h3 className="text-lg font-semibold">Schedule Games & Studies</h3>
-                      <p className="text-muted-foreground text-sm mt-1">
-                        Plan PT Scrabble, Chain Chess, Group Studies, and more
-                      </p>
-                    </div>
-                    <Button
-                      onClick={() => navigate('/schedule')}
-                      className="gap-2 bg-gradient-to-r from-primary to-blue-500"
-                    >
-                      <Calendar className="h-4 w-4" />
-                      Open Schedule
-                    </Button>
-                  </div>
-                </TabsContent>
-              </Tabs>
+              </div>
             </CardContent>
           </Card>
         </main>
