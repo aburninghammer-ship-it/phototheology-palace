@@ -275,6 +275,7 @@ const Notes = lazy(() => import("./pages/Notes"));
 const DonationSuccess = lazy(() => import("./pages/DonationSuccess"));
 const LiveDemo = lazy(() => import("./pages/LiveDemo"));
 const PublicChat = lazy(() => import("./pages/PublicChat"));
+const Schedule = lazy(() => import("./pages/Schedule"));
 
 // Gatehouse flow pages (Gatehouse is now imported at top as critical page)
 const Welcome = lazy(() => import("./pages/Welcome"));
@@ -677,6 +678,11 @@ function App() {
             <Route path="/public-chat" element={
               <ProtectedRoute>
                 <PublicChat />
+              </ProtectedRoute>
+            } />
+            <Route path="/schedule" element={
+              <ProtectedRoute>
+                <Schedule />
               </ProtectedRoute>
             } />
 

@@ -50,7 +50,17 @@ interface UseScheduledGamesReturn {
   refreshGames: () => void;
 }
 
-export type ScheduledEventType = 'scrabble-pt' | 'group-study';
+export type ScheduledEventType =
+  | 'scrabble-pt'
+  | 'chain-chess'
+  | 'principle-cards'
+  | 'phototheology-uno'
+  | 'escape-dragon'
+  | 'escape-room'
+  | 'treasure-hunt'
+  | 'group-study'
+  | 'live-study-room'
+  | 'branch-study';
 
 interface CreateScheduledGameData {
   title?: string;
