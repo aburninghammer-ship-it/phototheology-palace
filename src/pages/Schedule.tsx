@@ -15,7 +15,13 @@ import {
   Loader2,
   CalendarPlus,
   Bell,
-  Filter,
+  ChevronDown,
+  Mic,
+  MessageSquare,
+  Sparkles,
+  Layers,
+  Vote,
+  BookOpen,
 } from 'lucide-react';
 import { Navigation } from '@/components/Navigation';
 import { Button } from '@/components/ui/button';
@@ -23,6 +29,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { Checkbox } from '@/components/ui/checkbox';
 import {
   Dialog,
   DialogContent,
@@ -37,6 +44,15 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useScheduledGames, type ScheduledGame, type ScheduledEventType } from '@/hooks/useScheduledGames';
 import { useAuth } from '@/hooks/useAuth';
@@ -48,6 +64,25 @@ import {
   getStudyActivities,
   type ScheduledActivityType,
 } from '@/config/schedulableActivities';
+
+// PT Principle Focus options for Group Studies
+const PT_PRINCIPLE_OPTIONS = [
+  { value: 'CR', label: 'Concentration Room', description: 'Christ-focused study' },
+  { value: 'DR', label: 'Dimensions Room', description: '5-dimension analysis' },
+  { value: 'OR', label: 'Observation Room', description: 'Text analysis' },
+  { value: 'SR', label: 'Story Room', description: 'Narrative focus' },
+  { value: 'BL', label: 'Blue Room', description: 'Sanctuary/blueprint' },
+  { value: 'IR', label: 'Imagination Room', description: 'Visualization' },
+];
+
+// Group Study room features
+interface GroupStudyFeatures {
+  liveAudio: boolean;
+  textFeed: boolean;
+  sparks: boolean;
+  ptCards: boolean;
+  voting: boolean;
+}
 
 const Schedule = () => {
   const navigate = useNavigate();
@@ -65,12 +100,24 @@ const Schedule = () => {
   const [activeTab, setActiveTab] = useState('all');
 
   // Form state
-  const [selectedActivity, setSelectedActivity] = useState<ScheduledActivityType | null>(null);
+  const [selectedActivity, setSelectedActivity] = useState<ScheduledActivityType | ''>('');
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [scheduledDate, setScheduledDate] = useState('');
   const [scheduledTime, setScheduledTime] = useState('');
   const [verseReference, setVerseReference] = useState('');
+
+  // Group Study specific fields
+  const [studyTopic, setStudyTopic] = useState('');
+  const [ptFocus, setPtFocus] = useState('');
+  const [maxParticipants, setMaxParticipants] = useState('12');
+  const [studyFeatures, setStudyFeatures] = useState<GroupStudyFeatures>({
+    liveAudio: true,
+    textFeed: true,
+    sparks: true,
+    ptCards: false,
+    voting: true,
+  });
 
   // Filter games by category
   const gameTypes = getGameActivities().map(a => a.id);
@@ -79,6 +126,28 @@ const Schedule = () => {
   const games = scheduledGames.filter(g => gameTypes.includes(g.game_type as ScheduledActivityType));
   const studies = scheduledGames.filter(g => studyTypes.includes(g.game_type as ScheduledActivityType));
   const mySchedule = scheduledGames.filter(g => g.host_user_id === user?.id || g.my_rsvp === 'going');
+
+  const isGroupStudy = selectedActivity === 'group-study' || selectedActivity === 'live-study-room';
+  const selectedActivityConfig = selectedActivity ? getActivityById(selectedActivity) : null;
+
+  const resetForm = () => {
+    setSelectedActivity('');
+    setTitle('');
+    setDescription('');
+    setScheduledDate('');
+    setScheduledTime('');
+    setVerseReference('');
+    setStudyTopic('');
+    setPtFocus('');
+    setMaxParticipants('12');
+    setStudyFeatures({
+      liveAudio: true,
+      textFeed: true,
+      sparks: true,
+      ptCards: false,
+      voting: true,
+    });
+  };
 
   const handleCreateEvent = async () => {
     if (!scheduledDate || !scheduledTime || !selectedActivity) return;
@@ -91,22 +160,25 @@ const Schedule = () => {
       }
 
       const activity = getActivityById(selectedActivity);
+
+      // Build game options for studies
+      const gameOptions = isGroupStudy ? {
+        features: studyFeatures,
+        ptFocus: ptFocus || undefined,
+        topic: studyTopic || undefined,
+      } : undefined;
+
       await createScheduledGame({
         game_type: selectedActivity as ScheduledEventType,
         title: title || activity?.name || 'Scheduled Session',
-        description: description || undefined,
+        description: description || (studyTopic ? `Topic: ${studyTopic}` : undefined),
         scheduled_at: dateTime,
         verse_reference: verseReference || undefined,
-        max_players: activity?.maxPlayers,
+        max_players: isGroupStudy ? parseInt(maxParticipants) : activity?.maxPlayers,
+        game_options: gameOptions,
       });
 
-      // Reset form
-      setSelectedActivity(null);
-      setTitle('');
-      setDescription('');
-      setScheduledDate('');
-      setScheduledTime('');
-      setVerseReference('');
+      resetForm();
       setShowCreateDialog(false);
     } finally {
       setIsCreating(false);
@@ -126,7 +198,6 @@ const Schedule = () => {
   const handleJoin = (game: ScheduledGame) => {
     const activity = getActivityById(game.game_type);
     if (activity) {
-      // Navigate to the game route with room code if available
       const route = game.room_code
         ? `${activity.route}?room=${game.room_code}`
         : activity.route;
@@ -134,12 +205,14 @@ const Schedule = () => {
     }
   };
 
+  const toggleFeature = (feature: keyof GroupStudyFeatures) => {
+    setStudyFeatures(prev => ({ ...prev, [feature]: !prev[feature] }));
+  };
+
   // Get min date/time for scheduling
   const now = new Date();
   const minDate = format(now, 'yyyy-MM-dd');
   const minTime = format(new Date(now.getTime() + 5 * 60000), 'HH:mm');
-
-  const selectedActivityConfig = selectedActivity ? getActivityById(selectedActivity) : null;
 
   if (!user) {
     return (
@@ -168,7 +241,7 @@ const Schedule = () => {
           <div>
             <h1 className="text-2xl font-bold flex items-center gap-2">
               <CalendarPlus className="h-6 w-6 text-primary" />
-              Schedule
+              Scheduler
             </h1>
             <p className="text-muted-foreground text-sm">Plan games and studies with others</p>
           </div>
@@ -248,123 +321,245 @@ const Schedule = () => {
       </div>
 
       {/* Create Dialog */}
-      <Dialog open={showCreateDialog} onOpenChange={setShowCreateDialog}>
+      <Dialog open={showCreateDialog} onOpenChange={(open) => {
+        setShowCreateDialog(open);
+        if (!open) resetForm();
+      }}>
         <DialogContent className="max-w-lg max-h-[90vh] overflow-hidden flex flex-col">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <CalendarPlus className="h-5 w-5" />
-              Schedule a Session
+              Schedule an Activity
             </DialogTitle>
             <DialogDescription>
-              Choose an activity and set a time for others to join
+              Choose what you'd like to schedule for others to join
             </DialogDescription>
           </DialogHeader>
 
           <ScrollArea className="flex-1 pr-4">
-            <div className="space-y-6 pb-4">
-              {/* Activity Type Selection */}
-              {!selectedActivity ? (
-                <div className="space-y-4">
-                  <Label className="text-base font-semibold">Games</Label>
-                  <div className="grid grid-cols-2 gap-2">
-                    {getGameActivities().map((activity) => {
-                      const Icon = activity.icon;
-                      return (
-                        <Button
-                          key={activity.id}
-                          type="button"
-                          variant="outline"
-                          className={cn(
-                            'flex-col h-auto py-4 gap-2 hover:border-primary/50',
-                            `hover:bg-gradient-to-br hover:${activity.gradient}/10`
-                          )}
-                          onClick={() => setSelectedActivity(activity.id)}
-                        >
-                          <div className={cn('p-2 rounded-lg bg-gradient-to-br', activity.gradient)}>
-                            <Icon className="h-5 w-5 text-white" />
+            <div className="space-y-5 pb-4">
+              {/* Activity Type Dropdown */}
+              <div>
+                <Label className="text-sm font-medium">What would you like to schedule?</Label>
+                <Select value={selectedActivity} onValueChange={(v) => setSelectedActivity(v as ScheduledActivityType)}>
+                  <SelectTrigger className="mt-2">
+                    <SelectValue placeholder="Select activity type..." />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectGroup>
+                      <SelectLabel className="text-xs text-muted-foreground font-semibold">Games</SelectLabel>
+                      {getGameActivities().map((activity) => (
+                        <SelectItem key={activity.id} value={activity.id}>
+                          <div className="flex items-center gap-2">
+                            <div className={cn('p-1 rounded bg-gradient-to-br', activity.gradient)}>
+                              <activity.icon className="h-3 w-3 text-white" />
+                            </div>
+                            <span>{activity.name}</span>
+                            <span className="text-xs text-muted-foreground">
+                              ({activity.minPlayers}-{activity.maxPlayers} players)
+                            </span>
                           </div>
-                          <span className="text-xs font-medium">{activity.name}</span>
-                          <span className="text-[10px] text-muted-foreground">
-                            {activity.minPlayers}-{activity.maxPlayers} players
-                          </span>
-                        </Button>
-                      );
-                    })}
-                  </div>
-
-                  <Label className="text-base font-semibold">Studies</Label>
-                  <div className="grid grid-cols-2 gap-2">
-                    {getStudyActivities().map((activity) => {
-                      const Icon = activity.icon;
-                      return (
-                        <Button
-                          key={activity.id}
-                          type="button"
-                          variant="outline"
-                          className={cn(
-                            'flex-col h-auto py-4 gap-2 hover:border-primary/50',
-                            `hover:bg-gradient-to-br hover:${activity.gradient}/10`
-                          )}
-                          onClick={() => setSelectedActivity(activity.id)}
-                        >
-                          <div className={cn('p-2 rounded-lg bg-gradient-to-br', activity.gradient)}>
-                            <Icon className="h-5 w-5 text-white" />
+                        </SelectItem>
+                      ))}
+                    </SelectGroup>
+                    <SelectGroup>
+                      <SelectLabel className="text-xs text-muted-foreground font-semibold mt-2">Studies</SelectLabel>
+                      {getStudyActivities().map((activity) => (
+                        <SelectItem key={activity.id} value={activity.id}>
+                          <div className="flex items-center gap-2">
+                            <div className={cn('p-1 rounded bg-gradient-to-br', activity.gradient)}>
+                              <activity.icon className="h-3 w-3 text-white" />
+                            </div>
+                            <span>{activity.name}</span>
+                            <span className="text-xs text-muted-foreground">
+                              ({activity.minPlayers}-{activity.maxPlayers} players)
+                            </span>
                           </div>
-                          <span className="text-xs font-medium">{activity.name}</span>
-                          <span className="text-[10px] text-muted-foreground">
-                            {activity.minPlayers}-{activity.maxPlayers} players
-                          </span>
-                        </Button>
-                      );
-                    })}
-                  </div>
-                </div>
-              ) : (
-                <div className="space-y-4">
-                  {/* Selected Activity Header */}
-                  <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/50">
-                    {selectedActivityConfig && (
-                      <>
-                        <div className={cn('p-2 rounded-lg bg-gradient-to-br', selectedActivityConfig.gradient)}>
-                          <selectedActivityConfig.icon className="h-5 w-5 text-white" />
-                        </div>
-                        <div className="flex-1">
-                          <p className="font-medium">{selectedActivityConfig.name}</p>
-                          <p className="text-xs text-muted-foreground">{selectedActivityConfig.description}</p>
-                        </div>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => setSelectedActivity(null)}
-                        >
-                          Change
-                        </Button>
-                      </>
-                    )}
-                  </div>
+                        </SelectItem>
+                      ))}
+                    </SelectGroup>
+                  </SelectContent>
+                </Select>
+              </div>
 
+              {/* Show configuration once activity is selected */}
+              {selectedActivity && (
+                <>
+                  {/* Selected Activity Info */}
+                  {selectedActivityConfig && (
+                    <div className={cn(
+                      'flex items-center gap-3 p-3 rounded-lg bg-gradient-to-r',
+                      selectedActivityConfig.gradient,
+                      'bg-opacity-10'
+                    )} style={{ background: `linear-gradient(to right, hsl(var(--muted)), hsl(var(--muted)))` }}>
+                      <div className={cn('p-2 rounded-lg bg-gradient-to-br', selectedActivityConfig.gradient)}>
+                        <selectedActivityConfig.icon className="h-5 w-5 text-white" />
+                      </div>
+                      <div>
+                        <p className="font-medium">{selectedActivityConfig.name}</p>
+                        <p className="text-xs text-muted-foreground">{selectedActivityConfig.description}</p>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Title */}
                   <div>
                     <Label htmlFor="title">Title</Label>
                     <Input
                       id="title"
-                      placeholder={`e.g., ${selectedActivityConfig?.name} Session`}
+                      placeholder={`e.g., Friday Night ${selectedActivityConfig?.name || 'Session'}`}
                       value={title}
                       onChange={(e) => setTitle(e.target.value)}
                     />
                   </div>
 
-                  <div>
-                    <Label htmlFor="description">Description (optional)</Label>
-                    <Textarea
-                      id="description"
-                      placeholder="Any details about this session..."
-                      value={description}
-                      onChange={(e) => setDescription(e.target.value)}
-                      rows={2}
-                    />
-                  </div>
+                  {/* Group Study Configuration */}
+                  {isGroupStudy && (
+                    <>
+                      {/* Subject/Topic */}
+                      <div>
+                        <Label htmlFor="topic">Subject/Topic of Study</Label>
+                        <Input
+                          id="topic"
+                          placeholder="e.g., The Sanctuary in Hebrews"
+                          value={studyTopic}
+                          onChange={(e) => setStudyTopic(e.target.value)}
+                        />
+                      </div>
 
-                  {selectedActivityConfig?.supportsVerse && (
+                      {/* Passage Reference */}
+                      <div>
+                        <Label htmlFor="verse">Passage Reference</Label>
+                        <Input
+                          id="verse"
+                          placeholder="e.g., Hebrews 9:1-14"
+                          value={verseReference}
+                          onChange={(e) => setVerseReference(e.target.value)}
+                        />
+                      </div>
+
+                      {/* PT Principle Focus */}
+                      <div>
+                        <Label>PT Principle Focus (optional)</Label>
+                        <Select value={ptFocus} onValueChange={setPtFocus}>
+                          <SelectTrigger className="mt-2">
+                            <SelectValue placeholder="Select a room focus..." />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {PT_PRINCIPLE_OPTIONS.map((option) => (
+                              <SelectItem key={option.value} value={option.value}>
+                                <div className="flex items-center gap-2">
+                                  <span className="font-medium">{option.label}</span>
+                                  <span className="text-xs text-muted-foreground">- {option.description}</span>
+                                </div>
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+
+                      {/* Room Features */}
+                      <div>
+                        <Label className="mb-3 block">Room Features</Label>
+                        <div className="space-y-3 bg-muted/30 rounded-lg p-4">
+                          <div className="flex items-start gap-3">
+                            <Checkbox
+                              id="liveAudio"
+                              checked={studyFeatures.liveAudio}
+                              onCheckedChange={() => toggleFeature('liveAudio')}
+                            />
+                            <div className="grid gap-0.5 leading-none">
+                              <label htmlFor="liveAudio" className="text-sm font-medium cursor-pointer flex items-center gap-2">
+                                <Mic className="h-4 w-4 text-blue-500" />
+                                Live Audio Chat
+                              </label>
+                              <p className="text-xs text-muted-foreground">Voice conversations during study</p>
+                            </div>
+                          </div>
+
+                          <div className="flex items-start gap-3">
+                            <Checkbox
+                              id="textFeed"
+                              checked={studyFeatures.textFeed}
+                              onCheckedChange={() => toggleFeature('textFeed')}
+                            />
+                            <div className="grid gap-0.5 leading-none">
+                              <label htmlFor="textFeed" className="text-sm font-medium cursor-pointer flex items-center gap-2">
+                                <MessageSquare className="h-4 w-4 text-green-500" />
+                                Live Text Feed
+                              </label>
+                              <p className="text-xs text-muted-foreground">Real-time chat messages</p>
+                            </div>
+                          </div>
+
+                          <div className="flex items-start gap-3">
+                            <Checkbox
+                              id="sparks"
+                              checked={studyFeatures.sparks}
+                              onCheckedChange={() => toggleFeature('sparks')}
+                            />
+                            <div className="grid gap-0.5 leading-none">
+                              <label htmlFor="sparks" className="text-sm font-medium cursor-pointer flex items-center gap-2">
+                                <Sparkles className="h-4 w-4 text-yellow-500" />
+                                Sparks Integration
+                              </label>
+                              <p className="text-xs text-muted-foreground">AI-generated insights for discussion</p>
+                            </div>
+                          </div>
+
+                          <div className="flex items-start gap-3">
+                            <Checkbox
+                              id="ptCards"
+                              checked={studyFeatures.ptCards}
+                              onCheckedChange={() => toggleFeature('ptCards')}
+                            />
+                            <div className="grid gap-0.5 leading-none">
+                              <label htmlFor="ptCards" className="text-sm font-medium cursor-pointer flex items-center gap-2">
+                                <Layers className="h-4 w-4 text-purple-500" />
+                                PT Principle Cards
+                              </label>
+                              <p className="text-xs text-muted-foreground">Apply Palace principles to the study</p>
+                            </div>
+                          </div>
+
+                          <div className="flex items-start gap-3">
+                            <Checkbox
+                              id="voting"
+                              checked={studyFeatures.voting}
+                              onCheckedChange={() => toggleFeature('voting')}
+                            />
+                            <div className="grid gap-0.5 leading-none">
+                              <label htmlFor="voting" className="text-sm font-medium cursor-pointer flex items-center gap-2">
+                                <Vote className="h-4 w-4 text-orange-500" />
+                                Voting on Insights
+                              </label>
+                              <p className="text-xs text-muted-foreground">Gamified discussion with upvotes</p>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Max Participants */}
+                      <div>
+                        <Label htmlFor="maxParticipants">Max Participants</Label>
+                        <Select value={maxParticipants} onValueChange={setMaxParticipants}>
+                          <SelectTrigger className="mt-2">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {[4, 6, 8, 10, 12, 15, 20].map((num) => (
+                              <SelectItem key={num} value={num.toString()}>
+                                {num} participants
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    </>
+                  )}
+
+                  {/* Non-study verse reference */}
+                  {!isGroupStudy && selectedActivityConfig?.supportsVerse && (
                     <div>
                       <Label htmlFor="verse">Passage/Verse Reference (optional)</Label>
                       <Input
@@ -376,6 +571,19 @@ const Schedule = () => {
                     </div>
                   )}
 
+                  {/* Description */}
+                  <div>
+                    <Label htmlFor="description">Description (optional)</Label>
+                    <Textarea
+                      id="description"
+                      placeholder="Any additional details about this session..."
+                      value={description}
+                      onChange={(e) => setDescription(e.target.value)}
+                      rows={2}
+                    />
+                  </div>
+
+                  {/* Date and Time */}
                   <div className="grid grid-cols-2 gap-4">
                     <div>
                       <Label htmlFor="date">Date</Label>
@@ -399,6 +607,7 @@ const Schedule = () => {
                     </div>
                   </div>
 
+                  {/* Submit Button */}
                   <Button
                     onClick={handleCreateEvent}
                     disabled={!scheduledDate || !scheduledTime || isCreating}
@@ -414,7 +623,7 @@ const Schedule = () => {
                     )}
                     Schedule {selectedActivityConfig?.name}
                   </Button>
-                </div>
+                </>
               )}
             </div>
           </ScrollArea>
@@ -491,6 +700,12 @@ function ScheduledActivityCard({ game, isHost, onRSVP, onCancel, onJoin }: Sched
   const activity = getActivityById(game.game_type);
   const Icon = activity?.icon || Calendar;
 
+  // Parse game_options if present
+  const gameOptions = game.game_options;
+  const features = gameOptions?.features;
+  const ptFocus = gameOptions?.ptFocus;
+  const topic = gameOptions?.topic;
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 10 }}
@@ -564,6 +779,14 @@ function ScheduledActivityCard({ game, isHost, onRSVP, onCancel, onJoin }: Sched
             )}
           </div>
 
+          {/* Topic for studies */}
+          {topic && (
+            <div className="flex items-center gap-1.5 text-sm">
+              <BookOpen className="h-4 w-4 text-emerald-500" />
+              <span className="text-emerald-600 dark:text-emerald-400">{topic}</span>
+            </div>
+          )}
+
           {/* Verse reference */}
           {game.verse_reference && (
             <div className="flex items-center gap-1.5 text-sm text-emerald-600 dark:text-emerald-400">
@@ -571,8 +794,48 @@ function ScheduledActivityCard({ game, isHost, onRSVP, onCancel, onJoin }: Sched
             </div>
           )}
 
+          {/* PT Focus */}
+          {ptFocus && (
+            <div className="text-xs">
+              <span className="bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 px-2 py-0.5 rounded-full">
+                {PT_PRINCIPLE_OPTIONS.find(p => p.value === ptFocus)?.label || ptFocus}
+              </span>
+            </div>
+          )}
+
+          {/* Room features for studies */}
+          {features && (
+            <div className="flex flex-wrap gap-1.5">
+              {features.liveAudio && (
+                <span className="inline-flex items-center gap-1 text-[10px] bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 px-1.5 py-0.5 rounded">
+                  <Mic className="h-3 w-3" /> Audio
+                </span>
+              )}
+              {features.textFeed && (
+                <span className="inline-flex items-center gap-1 text-[10px] bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 px-1.5 py-0.5 rounded">
+                  <MessageSquare className="h-3 w-3" /> Chat
+                </span>
+              )}
+              {features.sparks && (
+                <span className="inline-flex items-center gap-1 text-[10px] bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-300 px-1.5 py-0.5 rounded">
+                  <Sparkles className="h-3 w-3" /> Sparks
+                </span>
+              )}
+              {features.ptCards && (
+                <span className="inline-flex items-center gap-1 text-[10px] bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 px-1.5 py-0.5 rounded">
+                  <Layers className="h-3 w-3" /> Cards
+                </span>
+              )}
+              {features.voting && (
+                <span className="inline-flex items-center gap-1 text-[10px] bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-300 px-1.5 py-0.5 rounded">
+                  <Vote className="h-3 w-3" /> Voting
+                </span>
+              )}
+            </div>
+          )}
+
           {/* Description */}
-          {game.description && (
+          {game.description && !topic && (
             <p className="text-sm text-muted-foreground line-clamp-2">
               {game.description}
             </p>
@@ -584,7 +847,7 @@ function ScheduledActivityCard({ game, isHost, onRSVP, onCancel, onJoin }: Sched
             <span>{game.rsvp_count || 0} going</span>
             {activity && (
               <span className="text-muted-foreground">
-                (max {activity.maxPlayers})
+                (max {game.max_players || activity.maxPlayers})
               </span>
             )}
           </div>
@@ -647,5 +910,11 @@ function ScheduledActivityCard({ game, isHost, onRSVP, onCancel, onJoin }: Sched
     </motion.div>
   );
 }
+
+// PT Principle options for display in cards
+const PT_PRINCIPLE_OPTIONS_MAP = PT_PRINCIPLE_OPTIONS.reduce((acc, opt) => {
+  acc[opt.value] = opt;
+  return acc;
+}, {} as Record<string, typeof PT_PRINCIPLE_OPTIONS[0]>);
 
 export default Schedule;

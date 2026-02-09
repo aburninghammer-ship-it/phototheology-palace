@@ -26,6 +26,17 @@ export interface ScheduledGame {
   created_at: string;
   rsvp_count?: number;
   my_rsvp?: 'going' | 'maybe' | 'not_going' | null;
+  game_options?: {
+    features?: {
+      liveAudio?: boolean;
+      textFeed?: boolean;
+      sparks?: boolean;
+      ptCards?: boolean;
+      voting?: boolean;
+    };
+    ptFocus?: string;
+    topic?: string;
+  } | null;
 }
 
 export interface GameRSVP {
@@ -62,6 +73,19 @@ export type ScheduledEventType =
   | 'live-study-room'
   | 'branch-study';
 
+// Game options for studies (features, PT focus, topic)
+interface GameOptions {
+  features?: {
+    liveAudio?: boolean;
+    textFeed?: boolean;
+    sparks?: boolean;
+    ptCards?: boolean;
+    voting?: boolean;
+  };
+  ptFocus?: string;
+  topic?: string;
+}
+
 interface CreateScheduledGameData {
   title?: string;
   description?: string;
@@ -70,6 +94,7 @@ interface CreateScheduledGameData {
   game_mode?: 'ffa' | 'team';
   max_players?: number;
   game_type?: ScheduledEventType;
+  game_options?: GameOptions;
 }
 
 export function useScheduledGames(): UseScheduledGamesReturn {
@@ -185,6 +210,7 @@ export function useScheduledGames(): UseScheduledGamesReturn {
           verse_reference: data.verse_reference || null,
           game_mode: data.game_mode || 'ffa',
           max_players: data.max_players || 10,
+          game_options: data.game_options || null,
         })
         .select()
         .single();
