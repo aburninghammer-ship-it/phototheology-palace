@@ -467,7 +467,11 @@ export default function PTScrabble() {
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
-              <Tabs defaultValue="play" className="w-full">
+              <Tabs defaultValue="play" className="w-full" onValueChange={(value) => {
+                if (value === 'schedule') {
+                  navigate('/schedule');
+                }
+              }}>
                 <TabsList className="grid w-full grid-cols-2 mb-6">
                   <TabsTrigger value="play" className="gap-2">
                     <Gamepad2 className="h-4 w-4" />
