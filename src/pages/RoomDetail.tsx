@@ -894,8 +894,17 @@ export default function RoomDetail() {
                 )}
               </TabsContent>
 
-              {/* PRACTICE TAB */}
+              {/* PRACTICE TAB - Use Your Own Content */}
               <TabsContent value="practice" className="space-y-6 mt-6">
+                {/* Welcome explanation for new users */}
+                <div className="text-center mb-6 p-4 bg-gradient-to-br from-primary/5 to-accent/5 rounded-xl border border-primary/20">
+                  <h2 className="text-2xl font-bold mb-2">🎯 Your Personal Practice Space</h2>
+                  <p className="text-muted-foreground max-w-2xl mx-auto">
+                    Apply <strong>{room.name}</strong> principles to <em>any scripture, story, or topic</em> you choose. 
+                    This is where you take what you've learned and practice on your own content!
+                  </p>
+                </div>
+                
                 <RoomPracticeSpace
                   floorNumber={floor.number}
                   roomId={room.id}

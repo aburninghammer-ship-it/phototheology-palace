@@ -239,6 +239,58 @@ export function RoomPracticeSpace({ floorNumber, roomId, roomName, roomPrinciple
           onClose={() => setShowAIPractice(false)}
         />
       )}
+
+      {/* Welcome Banner for Users Who Want Custom Content */}
+      {exercises.length === 0 && !showForm && (
+        <Card className="border-2 border-primary/30 bg-gradient-to-br from-primary/10 via-accent/5 to-secondary/10 mb-4">
+          <CardHeader className="pb-3">
+            <div className="flex items-center gap-3">
+              <div className="p-3 rounded-xl bg-gradient-palace shadow-lg">
+                <Sparkles className="h-6 w-6 text-white" />
+              </div>
+              <div>
+                <CardTitle className="text-xl">🎯 Practice With YOUR Content</CardTitle>
+                <CardDescription className="text-sm mt-1">
+                  This is where you apply {roomName} principles to your own scriptures, stories, or topics!
+                </CardDescription>
+              </div>
+            </div>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            <div className="grid gap-3 sm:grid-cols-2">
+              <Button
+                onClick={handleStartAIPractice}
+                size="lg"
+                className="w-full gradient-palace text-white h-auto py-4 flex flex-col items-center gap-1"
+                disabled={loadingBibleText}
+              >
+                {loadingBibleText ? (
+                  <Loader2 className="h-6 w-6 animate-spin" />
+                ) : (
+                  <>
+                    <Sparkles className="h-6 w-6" />
+                    <span className="font-bold">AI-Guided Practice</span>
+                    <span className="text-xs opacity-90">Jeeves walks you through step-by-step</span>
+                  </>
+                )}
+              </Button>
+              <Button
+                onClick={() => setShowForm(true)}
+                size="lg"
+                variant="outline"
+                className="w-full h-auto py-4 flex flex-col items-center gap-1 border-2 hover:border-primary/50"
+              >
+                <Plus className="h-6 w-6" />
+                <span className="font-bold">Write Your Own</span>
+                <span className="text-xs text-muted-foreground">Journal your insights directly</span>
+              </Button>
+            </div>
+            <p className="text-xs text-center text-muted-foreground">
+              💡 <strong>Tip:</strong> Choose any Bible verse, story, or topic you're studying and apply {roomName} principles to it!
+            </p>
+          </CardContent>
+        </Card>
+      )}
       
       <Card>
         <CardHeader>
@@ -293,7 +345,7 @@ export function RoomPracticeSpace({ floorNumber, roomId, roomName, roomPrinciple
             </div>
           </div>
           <CardDescription>
-            Apply the {roomName} principle to any verse or story
+            Apply the {roomName} principle to any verse or story you choose
           </CardDescription>
         </CardHeader>
       <CardContent className="space-y-4">
