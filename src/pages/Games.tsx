@@ -428,6 +428,18 @@ const Games = () => {
       difficulties: ["easy", "medium"],
       route: "/pt-scrabble"
     },
+    {
+      id: "group_study",
+      name: "📖 Group Bible Study",
+      description: "Real-time collaborative Bible study! Share insights, vote on contributions, and earn points for Christ-centered connections.",
+      icon: "📖",
+      floor: 0,
+      timed: true,
+      rooms: ["All"],
+      modes: ["multiplayer"],
+      difficulties: ["easy"],
+      route: "/group-study"
+    },
   ];
 
   const filteredGames = allGames.filter(game => {
