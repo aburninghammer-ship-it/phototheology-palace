@@ -40,6 +40,7 @@ export function NewSignupsList() {
         .from("profiles")
         .select("id, display_name, subscription_tier, subscription_status, payment_source, created_at")
         .gte("created_at", startDate.toISOString())
+        .in("subscription_status", ["active", "trial", "trialing"])
         .order("created_at", { ascending: false });
 
       if (error) throw error;
