@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { THEOLOGICAL_GUARDRAILS } from "../_shared/palace-prompt.ts";
+import { QUALITY_TESTS, OUTPUT_TYPES, GOLDEN_RULE } from "../_shared/palace-output-engine.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -145,6 +146,11 @@ GUARDRAILS
 - Every interpretation must pass the Fruit test (Gal 5:22-23)
 - Static ascension keeps grounding; dynamic ascension allows exploration
 - Types = objects pointing forward; Parallels = mirrored actions across time
+
+QUALITY TESTS (apply to every response):
+${QUALITY_TESTS.map(t => `• ${t.name} (${t.room}): ${t.question}`).join('\n')}
+
+${GOLDEN_RULE}
 
 ${THEOLOGICAL_GUARDRAILS}`;
 

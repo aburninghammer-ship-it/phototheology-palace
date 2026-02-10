@@ -1,6 +1,7 @@
 import "https://deno.land/x/xhr@0.3.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { PALACE_SYSTEM_PROMPT, THEOLOGICAL_GUARDRAILS } from "../_shared/palace-prompt.ts";
+import { QUALITY_TESTS, OUTPUT_TYPES, GOLDEN_RULE } from "../_shared/palace-output-engine.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -54,6 +55,15 @@ MODE ADJUSTMENTS:
 - SCHOLAR: Deep analysis, more cross-references, scholarly connections
 - PREACHER: Focus on teaching hooks, illustrations, sermon-ready content
 - RESEARCH: Academic rigor, exhaustive connections, detailed evidence
+
+OUTPUT TYPE: ${OUTPUT_TYPES.devotional.name}
+${OUTPUT_TYPES.devotional.description}
+${OUTPUT_TYPES.devotional.requirements.map(r => `• ${r}`).join('\n')}
+
+QUALITY TESTS (apply to every output):
+${QUALITY_TESTS.map(t => `• ${t.name} (${t.room}): ${t.question}`).join('\n')}
+
+${GOLDEN_RULE}
 
 MANDATORY RULES:
 - Return ONLY valid JSON

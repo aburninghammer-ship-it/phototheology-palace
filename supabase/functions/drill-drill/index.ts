@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { PALACE_SYSTEM_PROMPT, THEOLOGICAL_GUARDRAILS } from "../_shared/palace-prompt.ts";
+import { QUALITY_TESTS, OUTPUT_TYPES, GOLDEN_RULE } from "../_shared/palace-output-engine.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -62,6 +63,19 @@ STYLE:
 - Always connect back to Christ
 - Use Scripture references to support points
 - Build on previous insights to create a unified study
+
+OUTPUT TYPE: ${OUTPUT_TYPES.fragments.name}
+${OUTPUT_TYPES.fragments.description}
+${OUTPUT_TYPES.fragments.requirements.map(r => `• ${r}`).join('\n')}
+
+QUALITY TESTS (apply to every response):
+${QUALITY_TESTS.map(t => `• ${t.name} (${t.room}): ${t.question}`).join('\n')}
+
+ROOM TAGGING:
+Tag insights with room codes in parentheses: (OR), (ST + CR), (BL + P‖)
+These become clickable links for users to learn each room's methodology.
+
+${GOLDEN_RULE}
 
 CRITICAL: Create a UNIFIED STUDY where each principle naturally flows from and builds upon the previous ones. Reference and connect to earlier discoveries.
 `;
