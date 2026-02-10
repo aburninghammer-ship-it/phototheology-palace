@@ -301,6 +301,24 @@ export function useScheduledGames(): UseScheduledGamesReturn {
 
       const statusText = status === 'going' ? "You're going!" : status === 'maybe' ? 'Marked as maybe' : 'Marked as not going';
       toast.success(statusText);
+
+      // Notify the host about the RSVP
+      const { data: game } = await db
+        .from('scheduled_games')
+        .select('host_user_id, title')
+        .eq('id', gameId)
+        .single();
+
+      if (game && game.host_user_id !== user.id) {
+        const rsvpLabel = status === 'going' ? 'is going to' : status === 'maybe' ? 'might attend' : "can't make";
+        await db.from('notifications').insert({
+          user_id: game.host_user_id,
+          type: 'event_rsvp',
+          title: '🙋 New RSVP',
+          message: `${userName} ${rsvpLabel} "${game.title}"`,
+          link: '/schedule',
+        });
+      }
       return true;
     } catch (err: any) {
       console.error('Error updating RSVP:', err);
