@@ -116,11 +116,14 @@ serve(async (req) => {
           continue;
         }
 
-        // Calculate which day is currently unlocked based on started_at
+        // Calculate which day is currently unlocked based on calendar days since started_at
         const startedAt = new Date(plan.started_at);
         const now = new Date();
-        const daysSinceStart = Math.floor((now.getTime() - startedAt.getTime()) / (1000 * 60 * 60 * 24));
-        const unlockedDay = Math.min(daysSinceStart + 1, totalDays);
+        // Use UTC calendar dates to avoid timezone/hour issues
+        const startDate = new Date(Date.UTC(startedAt.getUTCFullYear(), startedAt.getUTCMonth(), startedAt.getUTCDate()));
+        const todayDate = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));
+        const calendarDaysSinceStart = Math.floor((todayDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
+        const unlockedDay = Math.min(calendarDaysSinceStart + 1, totalDays);
 
         console.log(`Plan ${plan.id}: ${existingDayNumbers.size} days exist, unlocked up to day ${unlockedDay} of ${totalDays}, status: ${plan.status}`);
 

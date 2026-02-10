@@ -53,8 +53,11 @@ const getActualDayNumber = (startedAt: string | null, duration: number): number 
   if (!startedAt) return 1;
   const start = new Date(startedAt);
   const now = new Date();
-  const daysSinceStart = Math.floor((now.getTime() - start.getTime()) / (1000 * 60 * 60 * 24));
-  return Math.min(daysSinceStart + 1, duration);
+  // Use UTC calendar dates to avoid hour-boundary issues
+  const startDate = new Date(Date.UTC(start.getUTCFullYear(), start.getUTCMonth(), start.getUTCDate()));
+  const todayDate = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));
+  const calendarDays = Math.floor((todayDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
+  return Math.min(calendarDays + 1, duration);
 };
 
 export default function Devotionals() {
