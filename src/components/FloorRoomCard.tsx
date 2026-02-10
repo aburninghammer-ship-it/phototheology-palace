@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { ChevronRight, Sparkles, Lock } from "lucide-react";
 import { Room } from "@/data/palaceData";
 import { motion } from "framer-motion";
+import { usePalaceTranslation } from "@/hooks/usePalaceTranslation";
 
 interface FloorRoomCardProps {
   room: Room;
@@ -86,7 +87,9 @@ const roomGradients: Record<string, string> = {
 
 export const FloorRoomCard = ({ room, floorNumber, gradient }: FloorRoomCardProps) => {
   const { t } = useTranslation();
+  const { translateRoom } = usePalaceTranslation();
   const navigate = useNavigate();
+  const tr = translateRoom(room);
 
   const showLocked = false;
   const roomEmoji = roomEmojis[room.id] || "⭐";
@@ -151,14 +154,14 @@ export const FloorRoomCard = ({ room, floorNumber, gradient }: FloorRoomCardProp
                 </div>
 
                 <CardTitle className="text-2xl font-serif mb-2 flex items-center gap-2 group-hover:text-primary transition-colors">
-                  {room.name}
+                  {tr.name}
                   {!showLocked && (
                     <Sparkles className="h-4 w-4 text-accent opacity-0 group-hover:opacity-100 transition-all duration-300 animate-pulse" />
                   )}
                 </CardTitle>
 
                 <CardDescription className="text-base font-medium leading-relaxed">
-                  {room.coreQuestion}
+                  {tr.coreQuestion}
                 </CardDescription>
               </div>
 
@@ -177,7 +180,7 @@ export const FloorRoomCard = ({ room, floorNumber, gradient }: FloorRoomCardProp
 
           <CardContent className="relative">
             <p className="text-sm text-muted-foreground leading-relaxed line-clamp-3 mb-4">
-              {room.purpose}
+              {tr.purpose}
             </p>
 
             {!showLocked && (

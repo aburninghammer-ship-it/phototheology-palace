@@ -332,7 +332,7 @@ const RoomCard = ({ room, floorNumber, gradient }: RoomCardProps) => {
           <div className="absolute top-2 left-2 z-20">
             <Badge className="bg-gradient-to-r from-amber-500 to-orange-500 text-white border-0 text-[10px] px-1.5 py-0.5 animate-pulse shadow-lg">
               <Star className="h-2.5 w-2.5 mr-0.5 fill-current" />
-              Newly Renovated
+              {t('floorRoomCard.newlyRenovated', 'Newly Renovated')}
             </Badge>
           </div>
         )}
