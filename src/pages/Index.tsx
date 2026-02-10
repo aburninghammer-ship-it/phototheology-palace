@@ -4,15 +4,18 @@ import { useUserPreferences } from "@/hooks/useUserPreferences";
 import { Footer } from "@/components/Footer";
 import { SEO } from "@/components/SEO";
 import { Button } from "@/components/ui/button";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { 
   Download,
-  X
+  X,
+  Globe
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { useEffect, useState, lazy, Suspense } from "react";
 import { PWAInstallButton } from "@/components/PWAInstallButton";
 import { PunchyHero } from "@/components/PunchyHero";
+import { LanguageSelector } from "@/components/settings/LanguageSelector";
 import { QuickTestimonialBanner } from "@/components/landing/QuickTestimonialBanner";
 import { LandingPageSkeleton, TestimonialsSkeleton } from "@/components/landing/LandingPageSkeleton";
 import { useSyncEarlyTracking } from "@/hooks/useSyncEarlyTracking";
@@ -177,6 +180,20 @@ const Index = () => {
         {/* 7. Final CTA */}
         <FinalCTA />
       </Suspense>
+
+      {/* Language Selector for public visitors */}
+      <div className="fixed bottom-20 right-4 z-50 md:bottom-6">
+        <Popover>
+          <PopoverTrigger asChild>
+            <Button variant="outline" size="icon" className="rounded-full shadow-lg bg-background/95 backdrop-blur-sm h-10 w-10">
+              <Globe className="h-5 w-5" />
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="w-48 p-2" align="end" side="top">
+            <LanguageSelector showLabel={false} />
+          </PopoverContent>
+        </Popover>
+      </div>
 
       <Footer />
       
