@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { Book, Plus, Sparkles, Clock, Calendar, ChevronRight, Trash2, Gift, Heart, Star, Zap, Users, UserPlus, GraduationCap, Home, HeartHandshake, Sun, Church, GraduationCap as StudyIcon, MessageSquare } from "lucide-react";
 import { TodaysStudy } from "@/components/studies/TodaysStudy";
 import { HowItWorksDialog } from "@/components/HowItWorksDialog";
@@ -61,6 +62,7 @@ const getActualDayNumber = (startedAt: string | null, duration: number): number 
 };
 
 export default function Devotionals() {
+  const { t } = useTranslation();
   const { user } = useAuth();
   const { preferences } = useUserPreferences();
   const navigate = useNavigate();
@@ -138,10 +140,10 @@ export default function Devotionals() {
               <Book className="h-10 w-10 text-white" />
             </div>
             <div>
-              <h1 className="text-4xl font-bold text-white drop-shadow-lg">Phototheology Devotionals</h1>
-              <p className="text-white/80 text-lg">AI-powered, Palace-structured daily encounters with God</p>
+              <h1 className="text-4xl font-bold text-white drop-shadow-lg">{t('devotionals.pageTitle')}</h1>
+              <p className="text-white/80 text-lg">{t('devotionals.pageSubtitle')}</p>
             </div>
-            <HowItWorksDialog title="How to Use Devotionals" steps={devotionalsSteps} />
+            <HowItWorksDialog title={t('devotionals.howToUse')} steps={devotionalsSteps} />
           </div>
 
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 md:gap-4 mt-8">
@@ -155,8 +157,8 @@ export default function Devotionals() {
                   <Sun className="h-5 w-5 md:h-6 md:w-6 text-white" />
                 </div>
                 <div className="text-center md:text-left">
-                  <h3 className="font-bold text-white text-sm md:text-lg">Quick Devotion</h3>
-                  <p className="text-xs md:text-sm text-white/70 hidden sm:block">One-day themed</p>
+                  <h3 className="font-bold text-white text-sm md:text-lg">{t('devotionals.quickDevotion')}</h3>
+                  <p className="text-xs md:text-sm text-white/70 hidden sm:block">{t('devotionals.oneDayThemed')}</p>
                 </div>
               </CardContent>
             </Card>
@@ -171,8 +173,8 @@ export default function Devotionals() {
                   <Plus className="h-5 w-5 md:h-6 md:w-6 text-white" />
                 </div>
                 <div className="text-center md:text-left">
-                  <h3 className="font-bold text-white text-sm md:text-lg">Create Plan</h3>
-                  <p className="text-xs md:text-sm text-white/70 hidden sm:block">Multi-day journey</p>
+                  <h3 className="font-bold text-white text-sm md:text-lg">{t('devotionals.createPlan')}</h3>
+                  <p className="text-xs md:text-sm text-white/70 hidden sm:block">{t('devotionals.multiDayJourney')}</p>
                 </div>
               </CardContent>
             </Card>
@@ -187,8 +189,8 @@ export default function Devotionals() {
                   <UserPlus className="h-5 w-5 md:h-6 md:w-6 text-white" />
                 </div>
                 <div className="text-center md:text-left">
-                  <h3 className="font-bold text-white text-sm md:text-lg">Create Profile</h3>
-                  <p className="text-xs md:text-sm text-white/70 hidden sm:block">Minister to loved ones</p>
+                  <h3 className="font-bold text-white text-sm md:text-lg">{t('devotionals.createProfile')}</h3>
+                  <p className="text-xs md:text-sm text-white/70 hidden sm:block">{t('devotionals.ministerToLovedOnes')}</p>
                 </div>
               </CardContent>
             </Card>
@@ -203,8 +205,8 @@ export default function Devotionals() {
                   <Church className="h-5 w-5 md:h-6 md:w-6 text-white" />
                 </div>
                 <div className="text-center md:text-left">
-                  <h3 className="font-bold text-white text-sm md:text-lg">Church</h3>
-                  <p className="text-xs md:text-sm text-white/70 hidden sm:block">Daily for congregation</p>
+                  <h3 className="font-bold text-white text-sm md:text-lg">{t('devotionals.church')}</h3>
+                  <p className="text-xs md:text-sm text-white/70 hidden sm:block">{t('devotionals.dailyForCongregation')}</p>
                 </div>
               </CardContent>
             </Card>
@@ -216,8 +218,8 @@ export default function Devotionals() {
                   <Star className="h-5 w-5 md:h-6 md:w-6 text-white" />
                 </div>
                 <div className="text-center md:text-left">
-                  <h3 className="font-bold text-white text-sm md:text-lg">5 Formats</h3>
-                  <p className="text-xs md:text-sm text-white/70 hidden sm:block">24FPS, Blueprint & more</p>
+                  <h3 className="font-bold text-white text-sm md:text-lg">{t('devotionals.fiveFormats')}</h3>
+                  <p className="text-xs md:text-sm text-white/70 hidden sm:block">{t('devotionals.formatsDescription')}</p>
                 </div>
               </CardContent>
             </Card>
@@ -232,7 +234,7 @@ export default function Devotionals() {
           <VoiceChatWidget
             roomType="study"
             roomId="devotionals"
-            roomName="Devotionals Voice Chat"
+            roomName={t('devotionals.voiceChatRoom')}
             className="mb-4"
           />
         )}
@@ -248,14 +250,14 @@ export default function Devotionals() {
                   </div>
                   <div>
                     <h3 className="font-semibold text-violet-900 dark:text-violet-100 flex items-center gap-2">
-                      Auto-Text Recipients
+                      {t('devotionals.autoTextRecipients')}
                       <Badge variant="secondary" className="bg-violet-200 text-violet-800 dark:bg-violet-800 dark:text-violet-200">
-                        {smsRecipients.filter(r => r.is_active).length} active
+                        {t('devotionals.activeCount', { count: smsRecipients.filter(r => r.is_active).length })}
                       </Badge>
                     </h3>
                     <p className="text-sm text-violet-700 dark:text-violet-300">
                       {smsRecipients.filter(r => r.is_active).slice(0, 3).map(r => r.name).join(", ")}
-                      {smsRecipients.filter(r => r.is_active).length > 3 && ` +${smsRecipients.filter(r => r.is_active).length - 3} more`}
+                      {smsRecipients.filter(r => r.is_active).length > 3 && ` ${t('devotionals.plusMore', { count: smsRecipients.filter(r => r.is_active).length - 3 })}`}
                     </p>
                   </div>
                 </div>
@@ -265,7 +267,7 @@ export default function Devotionals() {
                   onClick={() => setActiveTab("sms")}
                   className="border-violet-300 text-violet-700 hover:bg-violet-100 dark:border-violet-700 dark:text-violet-300"
                 >
-                  Manage
+                  {t('devotionals.manage')}
                 </Button>
               </div>
             </CardContent>
@@ -277,19 +279,19 @@ export default function Devotionals() {
           <TabsList className="grid w-full max-w-2xl grid-cols-4">
             <TabsTrigger value="personal" className="flex items-center gap-2">
               <Book className="h-4 w-4" />
-              Personal
+              {t('devotionals.tabPersonal')}
             </TabsTrigger>
             <TabsTrigger value="church" className="flex items-center gap-2">
               <Church className="h-4 w-4" />
-              Church
+              {t('devotionals.tabChurch')}
             </TabsTrigger>
             <TabsTrigger value="sms" className="flex items-center gap-2">
               <MessageSquare className="h-4 w-4" />
-              SMS
+              {t('devotionals.tabSMS')}
             </TabsTrigger>
             <TabsTrigger value="study" className="flex items-center gap-2">
               <Sparkles className="h-4 w-4" />
-              Study
+              {t('devotionals.tabStudy')}
             </TabsTrigger>
           </TabsList>
 
@@ -314,7 +316,7 @@ export default function Devotionals() {
                 <Zap className="h-5 w-5 text-white" />
               </div>
               <span className="bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent">
-                Active Devotionals
+                {t('devotionals.activeDevotionals')}
               </span>
             </h2>
             <div className="grid md:grid-cols-2 gap-4">
@@ -339,7 +341,7 @@ export default function Devotionals() {
                     <div className="flex items-center justify-between">
                       <div className="flex flex-col gap-1">
                         <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                          <span className="font-medium">Day {getActualDayNumber(plan.started_at, plan.duration)} of {plan.duration}</span>
+                          <span className="font-medium">{t('devotionals.dayOfTotal', { day: getActualDayNumber(plan.started_at, plan.duration), total: plan.duration })}</span>
                           <div className="h-3 w-32 bg-muted rounded-full overflow-hidden">
                             <div
                               className={`h-full bg-gradient-to-r ${formatLabels[plan.format]?.gradient || "from-blue-500 to-cyan-500"} transition-all`}
@@ -368,7 +370,7 @@ export default function Devotionals() {
                       }}
                     >
                       <Trash2 className="h-4 w-4 mr-1" />
-                      Delete
+                      {t('devotionals.delete')}
                     </Button>
                   </div>
                 </Card>
@@ -389,59 +391,59 @@ export default function Devotionals() {
 
           const categories = [
             { 
-              key: "classroom", 
-              label: "Classroom Devotions", 
+              key: "classroom",
+              label: t('devotionals.classroomDevotions'),
               profiles: classroomProfiles,
               icon: GraduationCap,
               gradient: "from-blue-500 to-cyan-500",
               bgGradient: "from-blue-50/50 to-cyan-50/50 dark:from-blue-950/20 dark:to-cyan-950/20",
               borderColor: "border-blue-200 dark:border-blue-800",
               btnBorder: "border-blue-300 text-blue-700 hover:bg-blue-50 dark:border-blue-700 dark:text-blue-300",
-              description: "Devotionals for your students and classes"
+              description: t('devotionals.classroomDescription')
             },
             { 
-              key: "family", 
-              label: "Family Devotions", 
+              key: "family",
+              label: t('devotionals.familyDevotions'),
               profiles: familyProfiles,
               icon: Home,
               gradient: "from-green-500 to-emerald-500",
               bgGradient: "from-green-50/50 to-emerald-50/50 dark:from-green-950/20 dark:to-emerald-950/20",
               borderColor: "border-green-200 dark:border-green-800",
               btnBorder: "border-green-300 text-green-700 hover:bg-green-50 dark:border-green-700 dark:text-green-300",
-              description: "Family worship and devotional time"
+              description: t('devotionals.familyDescription')
             },
             { 
-              key: "spousal", 
-              label: "Spousal Devotions", 
+              key: "spousal",
+              label: t('devotionals.spousalDevotions'),
               profiles: spousalProfiles,
               icon: HeartHandshake,
               gradient: "from-rose-500 to-pink-500",
               bgGradient: "from-rose-50/50 to-pink-50/50 dark:from-rose-950/20 dark:to-pink-950/20",
               borderColor: "border-rose-200 dark:border-rose-800",
               btnBorder: "border-rose-300 text-rose-700 hover:bg-rose-50 dark:border-rose-700 dark:text-rose-300",
-              description: "Grow together spiritually as a couple"
+              description: t('devotionals.spousalDescription')
             },
             { 
-              key: "dating", 
-              label: "Dating Devotions", 
+              key: "dating",
+              label: t('devotionals.datingDevotions'),
               profiles: datingProfiles,
               icon: Heart,
               gradient: "from-purple-500 to-violet-500",
               bgGradient: "from-purple-50/50 to-violet-50/50 dark:from-purple-950/20 dark:to-violet-950/20",
               borderColor: "border-purple-200 dark:border-purple-800",
               btnBorder: "border-purple-300 text-purple-700 hover:bg-purple-50 dark:border-purple-700 dark:text-purple-300",
-              description: "Build your relationship on Christ"
+              description: t('devotionals.datingDescription')
             },
             { 
-              key: "individual", 
-              label: "Individual Profiles", 
+              key: "individual",
+              label: t('devotionals.individualProfiles'),
               profiles: individualProfiles,
               icon: Users,
               gradient: "from-amber-500 to-orange-500",
               bgGradient: "from-amber-50/50 to-orange-50/50 dark:from-amber-950/20 dark:to-orange-950/20",
               borderColor: "border-amber-200 dark:border-amber-800",
               btnBorder: "border-amber-300 text-amber-700 hover:bg-amber-50 dark:border-amber-700 dark:text-amber-300",
-              description: "Personal ministry to loved ones"
+              description: t('devotionals.individualDescription')
             },
           ];
 
@@ -460,7 +462,7 @@ export default function Devotionals() {
                         <cat.icon className="h-6 w-6 text-white" />
                       </div>
                       <h4 className="font-semibold text-sm">{cat.label}</h4>
-                      <p className="text-xs text-muted-foreground mt-1">{cat.profiles.length} active</p>
+                      <p className="text-xs text-muted-foreground mt-1">{t('devotionals.activeCount', { count: cat.profiles.length })}</p>
                     </CardContent>
                   </Card>
                 ))}
@@ -474,7 +476,7 @@ export default function Devotionals() {
                       <Users className="h-5 w-5 text-white" />
                     </div>
                     <span className="bg-gradient-to-r from-rose-600 to-pink-600 bg-clip-text text-transparent">
-                      All Devotional Profiles
+                      {t('devotionals.allDevotionalProfiles')}
                     </span>
                   </h2>
                   <Button 
@@ -483,7 +485,7 @@ export default function Devotionals() {
                     className="border-rose-300 text-rose-700 hover:bg-rose-50 dark:border-rose-700 dark:text-rose-300"
                   >
                     <UserPlus className="h-4 w-4 mr-2" />
-                    New Profile
+                    {t('devotionals.newProfile')}
                   </Button>
                 </div>
                 
@@ -518,16 +520,16 @@ export default function Devotionals() {
                       <div className="mx-auto w-16 h-16 rounded-full bg-gradient-to-br from-rose-500 to-pink-500 flex items-center justify-center mb-4 shadow-lg">
                         <Users className="h-8 w-8 text-white" />
                       </div>
-                      <h3 className="text-lg font-semibold mb-2">No Profiles Yet</h3>
+                      <h3 className="text-lg font-semibold mb-2">{t('devotionals.noProfilesYet')}</h3>
                       <p className="text-muted-foreground text-sm mb-4 max-w-md mx-auto">
-                        Create devotional profiles for classroom, family, spouse, dating partner, or loved ones.
+                        {t('devotionals.noProfilesDescription')}
                       </p>
                       <Button 
                         onClick={() => setShowProfileWizard(true)}
                         className="bg-gradient-to-r from-rose-500 to-pink-500"
                       >
                         <UserPlus className="h-4 w-4 mr-2" />
-                        Create First Profile
+                        {t('devotionals.createFirstProfile')}
                       </Button>
                     </CardContent>
                   </Card>
@@ -542,7 +544,7 @@ export default function Devotionals() {
           <section>
             <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
               <Clock className="h-5 w-5 text-amber-500" />
-              In Progress
+              {t('devotionals.inProgress')}
             </h2>
             <div className="grid md:grid-cols-2 gap-4">
               {draftPlans.map((plan) => (
@@ -561,13 +563,13 @@ export default function Devotionals() {
                             : "border-amber-400 text-amber-700 dark:text-amber-300 animate-pulse"
                         }
                       >
-                        {plan.status === "generating" ? "✨ Generating..." : plan.status === "failed" ? "❌ Failed" : "Draft"}
+                        {plan.status === "generating" ? t('devotionals.generating') : plan.status === "failed" ? t('devotionals.failed') : t('devotionals.draft')}
                       </Badge>
                     </div>
                   </CardHeader>
                   <CardContent>
                     <div className="flex items-center justify-between">
-                      <span className="text-sm text-muted-foreground">{plan.duration} days • {formatLabels[plan.format]?.label}</span>
+                      <span className="text-sm text-muted-foreground">{t('devotionals.daysCount', { count: plan.duration })} • {formatLabels[plan.format]?.label}</span>
                       <div className="flex items-center gap-2">
                         {(plan.status === "draft" || plan.status === "failed") && (
                           <Button
@@ -582,7 +584,7 @@ export default function Devotionals() {
                             }
                           >
                             <Sparkles className="h-4 w-4 mr-1" />
-                            {plan.status === "failed" ? "Retry" : "Generate"}
+                            {plan.status === "failed" ? t('devotionals.retry') : t('devotionals.generate')}
                           </Button>
                         )}
                         <Button
@@ -609,7 +611,7 @@ export default function Devotionals() {
           <section>
             <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
               <Heart className="h-5 w-5 text-rose-500" />
-              Completed Journeys
+              {t('devotionals.completedJourneys')}
             </h2>
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
               {completedPlans.map((plan) => (
@@ -626,7 +628,7 @@ export default function Devotionals() {
                   <CardContent>
                     <div className="flex items-center justify-between text-sm" onClick={() => navigate(`/devotionals/${plan.id}`)}>
                       <Badge variant="secondary" className="bg-emerald-100 text-emerald-700 dark:bg-emerald-900 dark:text-emerald-300">
-                        {plan.duration} days
+                        {t('devotionals.daysCount', { count: plan.duration })}
                       </Badge>
                       <ChevronRight className="h-4 w-4 text-muted-foreground" />
                     </div>
@@ -649,10 +651,10 @@ export default function Devotionals() {
                 <Book className="h-10 w-10 text-white" />
               </div>
               <h3 className="text-2xl font-bold mb-2 bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
-                No Devotionals Yet
+                {t('devotionals.noDevotionalsYet')}
               </h3>
               <p className="text-muted-foreground mb-6 max-w-md mx-auto">
-                Create your first Phototheology devotional and start your spiritual journey with Christ-centered, Palace-structured daily encounters.
+                {t('devotionals.noDevotionalsDescription')}
               </p>
               <div className="flex gap-4 justify-center flex-wrap">
                 <Button 
@@ -660,7 +662,7 @@ export default function Devotionals() {
                   className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600"
                 >
                   <Plus className="h-4 w-4 mr-2" />
-                  Create Devotional
+                  {t('devotionals.createDevotional')}
                 </Button>
                 <Button 
                   onClick={() => setShowFriendWizard(true)}
@@ -668,7 +670,7 @@ export default function Devotionals() {
                   className="border-pink-300 text-pink-700 hover:bg-pink-50 dark:border-pink-700 dark:text-pink-300 dark:hover:bg-pink-950"
                 >
                   <Gift className="h-4 w-4 mr-2" />
-                  For a Friend
+                  {t('devotionals.forAFriend')}
                 </Button>
               </div>
             </CardContent>
@@ -682,15 +684,15 @@ export default function Devotionals() {
       <AlertDialog open={!!deleteId} onOpenChange={() => setDeleteId(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Delete Devotional?</AlertDialogTitle>
+            <AlertDialogTitle>{t('devotionals.deleteDevotionalTitle')}</AlertDialogTitle>
             <AlertDialogDescription>
-              This will permanently delete this devotional plan and all progress.
+              {t('devotionals.deleteDevotionalDescription')}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogCancel>{t('devotionals.cancel')}</AlertDialogCancel>
             <AlertDialogAction onClick={handleDelete} className="bg-destructive text-destructive-foreground">
-              Delete
+              {t('devotionals.delete')}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
@@ -700,15 +702,15 @@ export default function Devotionals() {
       <AlertDialog open={!!deleteProfileId} onOpenChange={() => setDeleteProfileId(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Delete Profile?</AlertDialogTitle>
+            <AlertDialogTitle>{t('devotionals.deleteProfileTitle')}</AlertDialogTitle>
             <AlertDialogDescription>
-              This will permanently delete this profile and all associated history, notes, and insights.
+              {t('devotionals.deleteProfileDescription')}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogCancel>{t('devotionals.cancel')}</AlertDialogCancel>
             <AlertDialogAction onClick={handleDeleteProfile} className="bg-destructive text-destructive-foreground">
-              Delete
+              {t('devotionals.delete')}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

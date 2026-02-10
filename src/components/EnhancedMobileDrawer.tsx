@@ -1,4 +1,5 @@
 import { Link, useLocation } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import {
   Drawer,
@@ -40,6 +41,7 @@ import { useRecentPages } from "@/hooks/useRecentPages";
 import { usePageBookmarks } from "@/hooks/usePageBookmarks";
 import { useUserPreferences } from "@/hooks/useUserPreferences";
 import { SuiteModeToggle } from "@/components/SuiteModeToggle";
+import { LanguageSelector } from "@/components/settings/LanguageSelector";
 import { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
 
@@ -199,6 +201,7 @@ const guestHouseQuickLinks = [
 ];
 
 export const EnhancedMobileDrawer = () => {
+  const { t } = useTranslation();
   const { user, signOut } = useAuth();
   const location = useLocation();
   const { recentPages, clearRecentPages } = useRecentPages();
@@ -252,7 +255,7 @@ export const EnhancedMobileDrawer = () => {
               </span>
             </Link>
             <DrawerClose asChild>
-              <Button variant="ghost" size="sm" className="h-9 px-3">Close</Button>
+              <Button variant="ghost" size="sm" className="h-9 px-3">{t('common.close')}</Button>
             </DrawerClose>
           </DrawerTitle>
         </DrawerHeader>
@@ -264,7 +267,7 @@ export const EnhancedMobileDrawer = () => {
               <div className="flex items-center justify-between p-3 rounded-xl bg-muted/50 border border-border/50">
                 <div className="flex items-center gap-2">
                   <LayoutGrid className="h-4 w-4 text-muted-foreground" />
-                  <span className="text-sm font-medium">Navigation Mode</span>
+                  <span className="text-sm font-medium">{t('nav.navigationMode')}</span>
                 </div>
                 <div className="flex gap-1">
                   <Button
@@ -273,7 +276,7 @@ export const EnhancedMobileDrawer = () => {
                     className="h-7 text-xs px-3"
                     onClick={() => updatePreference("navigation_style", "full")}
                   >
-                    Full
+                    {t('nav.full')}
                   </Button>
                   <Button
                     variant={isSimplified ? "default" : "outline"}
@@ -281,7 +284,7 @@ export const EnhancedMobileDrawer = () => {
                     className="h-7 text-xs px-3"
                     onClick={() => updatePreference("navigation_style", "simplified")}
                   >
-                    Simple
+                    {t('nav.simple')}
                   </Button>
                 </div>
               </div>
@@ -292,7 +295,7 @@ export const EnhancedMobileDrawer = () => {
                 <div className="space-y-3">
                   <div className="flex items-center gap-2 px-1">
                     <Home className="h-4 w-4 text-amber-600" />
-                    <span className="text-sm font-semibold text-amber-700 dark:text-amber-400">Guest House</span>
+                    <span className="text-sm font-semibold text-amber-700 dark:text-amber-400">{t('nav.guestHouse')}</span>
                   </div>
                   <div className="grid grid-cols-3 gap-3">
                     {guestHouseQuickLinks.map((link) => (
@@ -307,7 +310,7 @@ export const EnhancedMobileDrawer = () => {
                         )}
                       >
                         <link.icon className={cn("h-6 w-6 mb-1.5", link.iconColor)} />
-                        <span className="text-[11px] font-medium text-center text-amber-800 dark:text-amber-200">{link.label}</span>
+                        <span className="text-[11px] font-medium text-center text-amber-800 dark:text-amber-200">{t('navLinks.' + link.to.replace(/^\//, '').replace(/[-/]/g, '_'), { defaultValue: link.label })}</span>
                       </Link>
                     ))}
                   </div>
@@ -327,7 +330,7 @@ export const EnhancedMobileDrawer = () => {
                       )}
                     >
                       <link.icon className={cn("h-6 w-6 mb-1.5", link.iconColor)} />
-                      <span className="text-[11px] font-medium text-center">{link.label}</span>
+                      <span className="text-[11px] font-medium text-center">{t('navLinks.' + link.to.replace(/^\//, '').replace(/[-/]/g, '_'), { defaultValue: link.label })}</span>
                     </Link>
                   ))}
                 </div>
@@ -340,7 +343,7 @@ export const EnhancedMobileDrawer = () => {
                     className="flex flex-col items-center justify-center p-3 rounded-xl bg-gradient-to-br from-primary/10 to-primary/5 border border-primary/20 active:scale-95 transition-transform"
                   >
                     <Home className="h-5 w-5 text-primary mb-1" />
-                    <span className="text-[10px] font-medium text-center">Home</span>
+                    <span className="text-[10px] font-medium text-center">{t('nav.home')}</span>
                   </Link>
                   <Link
                     to="/palace"
@@ -348,7 +351,7 @@ export const EnhancedMobileDrawer = () => {
                     className="flex flex-col items-center justify-center p-3 rounded-xl bg-gradient-to-br from-amber-500/10 to-orange-500/5 border border-amber-500/20 active:scale-95 transition-transform"
                   >
                     <Building2 className="h-5 w-5 text-amber-500 mb-1" />
-                    <span className="text-[10px] font-medium text-center">Palace</span>
+                    <span className="text-[10px] font-medium text-center">{t('nav.palace')}</span>
                   </Link>
                   <Link
                     to="/bible"
@@ -356,7 +359,7 @@ export const EnhancedMobileDrawer = () => {
                     className="flex flex-col items-center justify-center p-3 rounded-xl bg-gradient-to-br from-blue-500/10 to-blue-500/5 border border-blue-500/20 active:scale-95 transition-transform"
                   >
                     <BookOpen className="h-5 w-5 text-blue-500 mb-1" />
-                    <span className="text-[10px] font-medium text-center">Bible</span>
+                    <span className="text-[10px] font-medium text-center">{t('nav.bible')}</span>
                   </Link>
                   <Link
                     to="/games"
@@ -364,7 +367,7 @@ export const EnhancedMobileDrawer = () => {
                     className="flex flex-col items-center justify-center p-3 rounded-xl bg-gradient-to-br from-fuchsia-500/10 to-pink-500/5 border border-fuchsia-500/20 active:scale-95 transition-transform"
                   >
                     <Gamepad2 className="h-5 w-5 text-fuchsia-500 mb-1" />
-                    <span className="text-[10px] font-medium text-center">Games</span>
+                    <span className="text-[10px] font-medium text-center">{t('nav.games')}</span>
                   </Link>
                 </div>
               )}
@@ -377,7 +380,7 @@ export const EnhancedMobileDrawer = () => {
                     <div className="flex items-center justify-between mb-3">
                       <div className="flex items-center gap-2">
                         <Clock className="h-4 w-4 text-muted-foreground" />
-                        <h3 className="text-sm font-semibold text-foreground">Recently Visited</h3>
+                        <h3 className="text-sm font-semibold text-foreground">{t('nav.recentlyVisited')}</h3>
                       </div>
                       <Button
                         variant="ghost"
@@ -438,7 +441,7 @@ export const EnhancedMobileDrawer = () => {
                   <div>
                     <div className="flex items-center gap-2 mb-3">
                       <Star className="h-4 w-4 text-yellow-500 fill-yellow-500" />
-                      <h3 className="text-sm font-semibold text-foreground">Bookmarks</h3>
+                      <h3 className="text-sm font-semibold text-foreground">{t('bible.bookmarks')}</h3>
                     </div>
                     <div className="space-y-1">
                       {bookmarks.map((bookmark) => (
@@ -479,7 +482,7 @@ export const EnhancedMobileDrawer = () => {
               {/* Categorized Navigation - Only show in Full mode (not simplified, not Guest House) */}
               {!isSimplified && !isGuestHouseMode && (
               <div className="space-y-2">
-                <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider px-1">Browse All Features</p>
+                <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider px-1">{t('nav.browseAllFeatures')}</p>
                 {Object.entries(categoryConfig).map(([key, category]) => {
                   const isExpanded = expandedCategories.has(key);
                   return (
@@ -490,7 +493,7 @@ export const EnhancedMobileDrawer = () => {
                       >
                         <div className="flex items-center gap-2">
                           <category.icon className="h-5 w-5 text-primary" />
-                          <span className="font-medium">{category.title}</span>
+                          <span className="font-medium">{t('navCategories.' + key, { defaultValue: category.title })}</span>
                         </div>
                         <svg
                           className={cn(
@@ -519,7 +522,7 @@ export const EnhancedMobileDrawer = () => {
                               )}
                             >
                               <span className="text-base">{link.icon}</span>
-                              <span className="text-sm font-medium flex-1">{link.label}</span>
+                              <span className="text-sm font-medium flex-1">{t('navLinks.' + link.to.replace(/^\//, '').replace(/[-/]/g, '_'), { defaultValue: link.label })}</span>
                               <button
                                 onClick={(e) => {
                                   e.preventDefault();
@@ -549,7 +552,7 @@ export const EnhancedMobileDrawer = () => {
 
               {/* Account Section */}
               <div className="space-y-2 pb-28">
-                <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider px-1">Account</p>
+                <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider px-1">{t('nav.account')}</p>
                 <div className="rounded-xl border border-border/50 overflow-hidden">
                   <Link
                     to="/profile"
@@ -557,11 +560,15 @@ export const EnhancedMobileDrawer = () => {
                     className="flex items-center gap-3 px-4 py-3 hover:bg-muted/50 active:bg-muted transition-colors border-b border-border/30"
                   >
                     <User className="h-5 w-5 text-primary" />
-                    <span className="font-medium">My Profile</span>
+                    <span className="font-medium">{t('nav.myProfile')}</span>
                   </Link>
                   {/* Suite Mode Toggle */}
                   <div className="px-4 py-3 border-b border-border/30">
                     <SuiteModeToggle variant="menu-item" />
+                  </div>
+                  {/* Language Selector */}
+                  <div className="px-4 py-3 border-b border-border/30">
+                    <LanguageSelector showLabel={false} />
                   </div>
                   <Link
                     to="/pricing"
@@ -569,7 +576,7 @@ export const EnhancedMobileDrawer = () => {
                     className="flex items-center gap-3 px-4 py-3 hover:bg-muted/50 active:bg-muted transition-colors border-b border-border/30"
                   >
                     <CreditCard className="h-5 w-5 text-emerald-500" />
-                    <span className="font-medium">Pricing & Plans</span>
+                    <span className="font-medium">{t('nav.pricingPlans')}</span>
                   </Link>
                   <Link
                     to="/manage-subscription"
@@ -577,7 +584,7 @@ export const EnhancedMobileDrawer = () => {
                     className="flex items-center gap-3 px-4 py-3 hover:bg-muted/50 active:bg-muted transition-colors border-b border-border/30"
                   >
                     <CreditCard className="h-5 w-5 text-muted-foreground" />
-                    <span className="text-muted-foreground">Manage Subscription</span>
+                    <span className="text-muted-foreground">{t('nav.manageSubscription')}</span>
                   </Link>
                   <button
                     onClick={() => {
@@ -587,7 +594,7 @@ export const EnhancedMobileDrawer = () => {
                     className="w-full flex items-center gap-3 px-4 py-3 hover:bg-destructive/10 active:bg-destructive/20 transition-colors text-destructive"
                   >
                     <LogOut className="h-5 w-5" />
-                    <span className="font-medium">Sign Out</span>
+                    <span className="font-medium">{t('nav.signOut')}</span>
                   </button>
                 </div>
               </div>
@@ -595,9 +602,9 @@ export const EnhancedMobileDrawer = () => {
           ) : (
             <div className="py-8 space-y-4">
               <div className="text-center">
-                <h3 className="font-serif text-lg font-semibold mb-2">Get Started</h3>
+                <h3 className="font-serif text-lg font-semibold mb-2">{t('nav.getStarted')}</h3>
                 <p className="text-sm text-muted-foreground mb-4">
-                  Begin your Phototheology journey
+                  {t('nav.beginJourney')}
                 </p>
               </div>
               
@@ -607,7 +614,7 @@ export const EnhancedMobileDrawer = () => {
                 className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2 w-full"
               >
                 <BookOpen className="h-4 w-4" />
-                Take a Tour
+                {t('nav.takeTour')}
               </Link>
               <Link
                 to="/auth"
@@ -615,7 +622,7 @@ export const EnhancedMobileDrawer = () => {
                 className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 h-10 px-4 py-2 w-full gradient-palace text-white"
               >
                 <Sparkles className="h-4 w-4" />
-                Get Started Free
+                {t('nav.getStartedFree')}
               </Link>
               <Link
                 to="/pricing"
@@ -623,8 +630,11 @@ export const EnhancedMobileDrawer = () => {
                 className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2 w-full"
               >
                 <CreditCard className="h-4 w-4" />
-                View Pricing
+                {t('nav.viewPricing')}
               </Link>
+              <div className="pt-4">
+                <LanguageSelector showLabel={false} />
+              </div>
             </div>
           )}
         </ScrollArea>

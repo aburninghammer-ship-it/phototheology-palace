@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Navigation } from "@/components/Navigation";
 import { ArrowLeft, RotateCcw, Trophy, Clock } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 
 interface ParallelPair {
@@ -164,6 +165,7 @@ interface GameCard {
 
 export default function ConcentrationGame() {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const [cards, setCards] = useState<GameCard[]>([]);
   const [flippedCards, setFlippedCards] = useState<string[]>([]);
   const [matchedPairs, setMatchedPairs] = useState<string[]>([]);
@@ -257,15 +259,15 @@ export default function ConcentrationGame() {
           setMatchedPairs([...matchedPairs, firstCard.pairId]);
           setFlippedCards([]);
           
-          toast.success("Parallel matched!", {
+          toast.success(t('concentration.parallelMatched'), {
             description: `${firstCard.event} ↔ ${secondCard.event}`
           });
 
           // Check if game is complete
           if (matchedPairs.length + 1 === PARALLEL_PAIRS.length) {
             setGameComplete(true);
-            toast.success("Congratulations!", {
-              description: `You found all ${PARALLEL_PAIRS.length} parallels!`
+            toast.success(t('concentration.congratulations'), {
+              description: t('concentration.foundAllParallels', { count: PARALLEL_PAIRS.length })
             });
           }
         }, 500);
@@ -301,15 +303,15 @@ export default function ConcentrationGame() {
               onClick={() => navigate("/games")}
             >
               <ArrowLeft className="h-4 w-4 mr-2" />
-              Back to Games
+              {t('concentration.backToGames')}
             </Button>
             
             <div className="flex-1">
               <h1 className="text-4xl font-bold bg-gradient-palace bg-clip-text text-transparent">
-                Biblical Parallels Concentration
+                {t('concentration.title')}
               </h1>
               <p className="text-muted-foreground mt-1">
-                Match Old Testament events with their New Testament fulfillments
+                {t('concentration.subtitle')}
               </p>
             </div>
           </div>
@@ -322,7 +324,7 @@ export default function ConcentrationGame() {
                   <Trophy className="h-5 w-5 text-primary" />
                   <div>
                     <div className="text-2xl font-bold">{matchedPairs.length}/{PARALLEL_PAIRS.length}</div>
-                    <div className="text-xs text-muted-foreground">Pairs Found</div>
+                    <div className="text-xs text-muted-foreground">{t('concentration.pairsFound')}</div>
                   </div>
                 </div>
               </CardContent>
@@ -334,7 +336,7 @@ export default function ConcentrationGame() {
                   <RotateCcw className="h-5 w-5 text-primary" />
                   <div>
                     <div className="text-2xl font-bold">{moves}</div>
-                    <div className="text-xs text-muted-foreground">Moves</div>
+                    <div className="text-xs text-muted-foreground">{t('concentration.moves')}</div>
                   </div>
                 </div>
               </CardContent>
@@ -346,7 +348,7 @@ export default function ConcentrationGame() {
                   <Clock className="h-5 w-5 text-primary" />
                   <div>
                     <div className="text-2xl font-bold">{formatTime(elapsedTime)}</div>
-                    <div className="text-xs text-muted-foreground">Time</div>
+                    <div className="text-xs text-muted-foreground">{t('concentration.time')}</div>
                   </div>
                 </div>
               </CardContent>
@@ -360,7 +362,7 @@ export default function ConcentrationGame() {
                   variant="outline"
                 >
                   <RotateCcw className="h-4 w-4 mr-2" />
-                  New Game
+                  {t('concentration.newGame')}
                 </Button>
               </CardContent>
             </Card>
@@ -385,7 +387,7 @@ export default function ConcentrationGame() {
                         variant="outline" 
                         className={card.testament === "old" ? "bg-amber-500/10" : "bg-blue-500/10"}
                       >
-                        {card.testament === "old" ? "OT" : "NT"}
+                        {card.testament === "old" ? t('concentration.ot') : t('concentration.nt')}
                       </Badge>
                       <CardTitle className="text-base mt-2">{card.event}</CardTitle>
                       <CardDescription className="text-xs">{card.reference}</CardDescription>
@@ -411,19 +413,19 @@ export default function ConcentrationGame() {
             <Card className="mt-6 bg-gradient-palace">
               <CardHeader>
                 <CardTitle className="text-white text-center">
-                  🎉 Excellent Work!
+                  {t('concentration.excellentWork')}
                 </CardTitle>
                 <CardDescription className="text-white/90 text-center">
-                  You matched all {PARALLEL_PAIRS.length} biblical parallels in {moves} moves and {formatTime(elapsedTime)}!
+                  {t('concentration.completionMessage', { count: PARALLEL_PAIRS.length, moves, time: formatTime(elapsedTime) })}
                 </CardDescription>
               </CardHeader>
               <CardContent className="flex justify-center gap-4">
                 <Button onClick={initializeGame} variant="secondary">
                   <RotateCcw className="h-4 w-4 mr-2" />
-                  Play Again
+                  {t('concentration.playAgain')}
                 </Button>
                 <Button onClick={() => navigate("/games")} variant="outline">
-                  More Games
+                  {t('concentration.moreGames')}
                 </Button>
               </CardContent>
             </Card>
@@ -432,15 +434,15 @@ export default function ConcentrationGame() {
           {/* Instructions */}
           <Card className="mt-6">
             <CardHeader>
-              <CardTitle>How to Play</CardTitle>
+              <CardTitle>{t('concentration.howToPlay')}</CardTitle>
             </CardHeader>
             <CardContent>
               <ul className="list-disc list-inside space-y-2 text-sm text-muted-foreground">
-                <li>Click cards to flip them and reveal biblical events</li>
-                <li>Find matching parallels between Old Testament and New Testament events</li>
-                <li>Match events that share the same typological pattern (e.g., Moses→Joshua parallels John Baptist→Jesus)</li>
-                <li>All {PARALLEL_PAIRS.length} pairs demonstrate how Christ fulfills OT patterns</li>
-                <li>Complete the game in as few moves as possible!</li>
+                <li>{t('concentration.instruction1')}</li>
+                <li>{t('concentration.instruction2')}</li>
+                <li>{t('concentration.instruction3')}</li>
+                <li>{t('concentration.instruction4', { count: PARALLEL_PAIRS.length })}</li>
+                <li>{t('concentration.instruction5')}</li>
               </ul>
             </CardContent>
           </Card>

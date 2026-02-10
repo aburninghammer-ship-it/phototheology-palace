@@ -1,19 +1,21 @@
 import { Home, BookOpen, Building2, Lightbulb, MessageCircle, CalendarDays } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/hooks/useAuth";
 
-const navItems = [
-  { icon: Home, label: "Home", path: "/dashboard" },
-  { icon: BookOpen, label: "Bible", path: "/bible" },
-  { icon: MessageCircle, label: "Chat", path: "/public-chat" },
-  { icon: CalendarDays, label: "Schedule", path: "/schedule" },
-  { icon: Building2, label: "Palace", path: "/palace" },
+const navItemDefs = [
+  { icon: Home, labelKey: "common.home", path: "/dashboard" },
+  { icon: BookOpen, labelKey: "nav.bible", path: "/bible" },
+  { icon: MessageCircle, labelKey: "nav.chat", path: "/public-chat" },
+  { icon: CalendarDays, labelKey: "nav.schedule", path: "/schedule" },
+  { icon: Building2, labelKey: "nav.palace", path: "/palace" },
 ];
 
 export function MobileBottomNav() {
   const location = useLocation();
   const { user } = useAuth();
+  const { t } = useTranslation();
 
   // Don't show on landing page or auth pages when not logged in
   if (!user) return null;
@@ -31,7 +33,7 @@ export function MobileBottomNav() {
       }}
     >
       <div className="flex items-center justify-around h-[72px] px-1 max-w-md mx-auto">
-        {navItems.map((item) => {
+        {navItemDefs.map((item) => {
           const isActive = location.pathname === item.path ||
             (item.path !== "/dashboard" && location.pathname.startsWith(item.path));
 
@@ -54,7 +56,7 @@ export function MobileBottomNav() {
                 "text-[11px] font-semibold tracking-tight",
                 isActive ? "text-primary" : "text-muted-foreground"
               )}>
-                {item.label}
+                {t(item.labelKey)}
               </span>
             </Link>
           );

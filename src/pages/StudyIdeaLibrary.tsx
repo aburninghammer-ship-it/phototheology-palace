@@ -1,4 +1,5 @@
 import { useState, useMemo } from "react";
+import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { Navigation } from "@/components/Navigation";
 import { SimplifiedNav } from "@/components/SimplifiedNav";
@@ -61,6 +62,7 @@ function convertGeneratedCard(card: GeneratedSparkCard): SparkCard & { isGenerat
 type CategoryFilter = SparkCard["category"] | "all";
 
 export default function StudyIdeaLibrary() {
+  const { t } = useTranslation();
   const { user, loading: authLoading } = useAuth();
   const { preferences } = useUserPreferences();
   const { saveStaticCard, removeFromShelf, isCardSaved, shelfItems } =
@@ -176,10 +178,10 @@ export default function StudyIdeaLibrary() {
           <div>
             <h1 className="text-2xl sm:text-3xl font-bold text-amber-900 dark:text-amber-100 flex items-center gap-2">
               <Lightbulb className="h-7 w-7" />
-              Study Idea Library
+              {t('studyIdeas.pageTitle')}
             </h1>
             <p className="text-muted-foreground mt-1">
-              Curated study ideas to spark your Phototheology journey
+              {t('studyIdeas.pageSubtitle')}
             </p>
           </div>
 
@@ -191,18 +193,18 @@ export default function StudyIdeaLibrary() {
           <TabsList className="grid w-full grid-cols-3 max-w-md">
             <TabsTrigger value="cards" className="gap-2">
               <Sparkles className="h-4 w-4" />
-              <span className="hidden sm:inline">Spark Cards</span>
-              <span className="sm:hidden">Cards</span>
+              <span className="hidden sm:inline">{t('studyIdeas.sparkCards')}</span>
+              <span className="sm:hidden">{t('studyIdeas.cards')}</span>
             </TabsTrigger>
             <TabsTrigger value="paths" className="gap-2">
               <Route className="h-4 w-4" />
-              <span className="hidden sm:inline">Guided Paths</span>
-              <span className="sm:hidden">Paths</span>
+              <span className="hidden sm:inline">{t('studyIdeas.guidedPaths')}</span>
+              <span className="sm:hidden">{t('studyIdeas.paths')}</span>
             </TabsTrigger>
             <TabsTrigger value="generate" className="gap-2">
               <Wand2 className="h-4 w-4" />
-              <span className="hidden sm:inline">Generate</span>
-              <span className="sm:hidden">Generate</span>
+              <span className="hidden sm:inline">{t('studyIdeas.generate')}</span>
+              <span className="sm:hidden">{t('studyIdeas.generate')}</span>
             </TabsTrigger>
           </TabsList>
 
@@ -214,14 +216,14 @@ export default function StudyIdeaLibrary() {
                 <div className="flex items-center gap-2 mb-2">
                   <Calendar className="h-5 w-5 text-amber-600 dark:text-amber-400" />
                   <h3 className="font-semibold text-amber-900 dark:text-amber-100">
-                    New Today!
+                    {t('studyIdeas.newToday')}
                   </h3>
                   <Badge variant="secondary" className="bg-amber-200 dark:bg-amber-800">
-                    {todaysCards.length} cards
+                    {t('studyIdeas.nCards', { count: todaysCards.length })}
                   </Badge>
                 </div>
                 <p className="text-sm text-amber-700 dark:text-amber-300 mb-3">
-                  Fresh study ideas generated just for today
+                  {t('studyIdeas.freshIdeasToday')}
                 </p>
                 <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
                   {todaysCards.slice(0, 3).map((card) => (
@@ -242,7 +244,7 @@ export default function StudyIdeaLibrary() {
                     className="mt-2"
                     onClick={() => setShowSource("daily")}
                   >
-                    See all {todaysCards.length} new cards
+                    {t('studyIdeas.seeAllNewCards', { count: todaysCards.length })}
                   </Button>
                 )}
               </div>
@@ -253,7 +255,7 @@ export default function StudyIdeaLibrary() {
               <div className="relative flex-1 max-w-md">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <Input
-                  placeholder="Search cards, verses, themes..."
+                  placeholder={t('studyIdeas.searchPlaceholder')}
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="pl-9"
@@ -268,7 +270,7 @@ export default function StudyIdeaLibrary() {
                   <SelectValue placeholder="Category" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">All Categories</SelectItem>
+                  <SelectItem value="all">{t('studyIdeas.allCategories')}</SelectItem>
                   {Object.entries(categoryLabels).map(([key, label]) => (
                     <SelectItem key={key} value={key}>
                       {label}
@@ -285,9 +287,9 @@ export default function StudyIdeaLibrary() {
                   <SelectValue placeholder="Source" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">All Cards</SelectItem>
-                  <SelectItem value="curated">Curated Only</SelectItem>
-                  <SelectItem value="daily">Daily Generated</SelectItem>
+                  <SelectItem value="all">{t('studyIdeas.allCards')}</SelectItem>
+                  <SelectItem value="curated">{t('studyIdeas.curatedOnly')}</SelectItem>
+                  <SelectItem value="daily">{t('studyIdeas.dailyGenerated')}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -297,14 +299,14 @@ export default function StudyIdeaLibrary() {
               {generatedLoading ? (
                 <span className="flex items-center gap-2">
                   <Loader2 className="h-4 w-4 animate-spin" />
-                  Loading daily cards...
+                  {t('studyIdeas.loadingDailyCards')}
                 </span>
               ) : (
                 <span>
-                  Showing {filteredCards.length} of {allCards.length} cards
+                  {t('studyIdeas.showingCards', { shown: filteredCards.length, total: allCards.length })}
                   {showSource === "all" && (
                     <span className="text-xs ml-1">
-                      ({sparkCards.length} curated + {generatedCards.length} daily)
+                      ({t('studyIdeas.curatedPlusDaily', { curated: sparkCards.length, daily: generatedCards.length })})
                     </span>
                   )}
                 </span>
@@ -319,7 +321,7 @@ export default function StudyIdeaLibrary() {
                     setShowSource("all");
                   }}
                 >
-                  Clear filters
+                  {t('studyIdeas.clearFilters')}
                 </Button>
               )}
             </div>
@@ -341,9 +343,9 @@ export default function StudyIdeaLibrary() {
             {filteredCards.length === 0 && (
               <div className="text-center py-12">
                 <Search className="h-12 w-12 text-muted-foreground/30 mx-auto mb-4" />
-                <h3 className="text-lg font-medium mb-2">No cards found</h3>
+                <h3 className="text-lg font-medium mb-2">{t('studyIdeas.noCardsFound')}</h3>
                 <p className="text-sm text-muted-foreground">
-                  Try adjusting your search or filter criteria
+                  {t('studyIdeas.tryAdjustingFilters')}
                 </p>
               </div>
             )}
@@ -353,11 +355,10 @@ export default function StudyIdeaLibrary() {
           <TabsContent value="paths" className="space-y-6">
             <div className="space-y-2">
               <h2 className="text-xl font-semibold text-amber-900 dark:text-amber-100">
-                Guided Study Paths
+                {t('studyIdeas.guidedStudyPaths')}
               </h2>
               <p className="text-sm text-muted-foreground">
-                Follow curated sequences of Spark Cards that build on each other
-                for deeper understanding.
+                {t('studyIdeas.guidedStudyPathsDesc')}
               </p>
             </div>
 

@@ -1,5 +1,6 @@
 import { useState, useRef, Suspense, useCallback, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { OrbitControls, Html, Stars, Float, RoundedBox, Sparkles as DreiSparkles, MeshDistortMaterial, GradientTexture, Environment } from "@react-three/drei";
 import * as THREE from "three";
@@ -560,6 +561,7 @@ function ProjectorBeam({ targetX }: { targetX: number }) {
 
 // Info panel for active chapter
 function InfoPanel({ frame, visible }: { frame: ChapterFrame; visible: boolean }) {
+  const { t } = useTranslation();
   if (!visible) return null;
 
   return (
@@ -584,7 +586,7 @@ function InfoPanel({ frame, visible }: { frame: ChapterFrame; visible: boolean }
           {frame.description}
         </p>
         <div style={{ background: `${frame.color}20`, padding: '12px', borderRadius: '8px', border: `1px solid ${frame.color}50` }}>
-          <p style={{ fontSize: '12px', color: '#aaa', marginBottom: '4px' }}>MEMORY TRIGGER:</p>
+          <p style={{ fontSize: '12px', color: '#aaa', marginBottom: '4px' }}>{t('games.room24fps.memoryTrigger').toUpperCase()}:</p>
           <p style={{ fontSize: '14px', fontWeight: 'bold', color: frame.color }}>
             {frame.memoryTrigger}
           </p>
@@ -598,6 +600,7 @@ function InfoPanel({ frame, visible }: { frame: ChapterFrame; visible: boolean }
 
 export default function Room24FPS3D() {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const isMobile = useIsMobile();
   const [currentChapter, setCurrentChapter] = useState(1);
   const [showInfo, setShowInfo] = useState(true);
@@ -691,12 +694,12 @@ export default function Room24FPS3D() {
         <div className="flex items-center justify-between mb-4">
           <Button variant="ghost" onClick={() => navigate("/games")}>
             <ArrowLeft className="mr-2 h-4 w-4" />
-            Back
+            {t('common.back')}
           </Button>
           <div className="flex items-center gap-2">
             <Film className="h-5 w-5 text-primary" />
-            <span className="font-bold text-lg">24FPS Room</span>
-            <Badge variant="secondary">Genesis 1-24</Badge>
+            <span className="font-bold text-lg">{t('games.room24fps.title')}</span>
+            <Badge variant="secondary">{t('games.room24fps.genesisRange')}</Badge>
           </div>
           <Button
             variant="outline"
@@ -704,7 +707,7 @@ export default function Room24FPS3D() {
             onClick={() => setShowInfo(!showInfo)}
           >
             <Info className="h-4 w-4 mr-1" />
-            {showInfo ? "Hide" : "Show"} Info
+            {showInfo ? t('games.room24fps.hideInfo') : t('games.room24fps.showInfo')}
           </Button>
         </div>
 
@@ -724,7 +727,7 @@ export default function Room24FPS3D() {
 
                 <div className="flex-1 text-center">
                   <div className="text-3xl mb-1">{currentFrame.image}</div>
-                  <div className="font-bold">Chapter {currentChapter}</div>
+                  <div className="font-bold">{t('games.room24fps.chapter', { number: currentChapter })}</div>
                   <div className="text-sm text-muted-foreground">{currentFrame.title}</div>
                 </div>
 

@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { motion } from "framer-motion";
 import { Navigation } from "@/components/Navigation";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -18,6 +19,7 @@ import { SeriesProgressTracker } from "@/components/series-builder/SeriesProgres
 import { SeriesShareDialog } from "@/components/series-builder/SeriesShareDialog";
 
 const BibleStudySeriesBuilder = () => {
+  const { t } = useTranslation();
   const { user } = useAuth();
   const { seriesId } = useParams();
   const navigate = useNavigate();
@@ -63,7 +65,7 @@ const BibleStudySeriesBuilder = () => {
       setUserSeries(data || []);
     } catch (error: any) {
       console.error('Error loading series:', error);
-      toast.error('Failed to load your series');
+      toast.error(t('series.errorLoadSeries'));
     } finally {
       setLoading(false);
     }
@@ -115,7 +117,7 @@ const BibleStudySeriesBuilder = () => {
       setLessons(lessonData || []);
     } catch (error) {
       console.error('Error loading series detail:', error);
-      toast.error('Failed to load series');
+      toast.error(t('series.errorLoadSeries'));
     }
   };
 
@@ -165,7 +167,7 @@ const BibleStudySeriesBuilder = () => {
             >
               <Button variant="ghost" onClick={() => navigate('/bible-study-series')} className="backdrop-blur-sm bg-background/50">
                 <ArrowLeft className="h-4 w-4 mr-2" />
-                Back to Series
+                {t('series.backToSeries')}
               </Button>
             </motion.div>
 
@@ -181,7 +183,7 @@ const BibleStudySeriesBuilder = () => {
                 </h1>
                 <p className="text-muted-foreground mt-1">{selectedSeries.description}</p>
                 <div className="flex flex-wrap gap-2 mt-3">
-                  <Badge className="bg-primary/20 text-primary border-primary/30">{selectedSeries.lesson_count} lessons</Badge>
+                  <Badge className="bg-primary/20 text-primary border-primary/30">{t('series.lessonCount', { count: selectedSeries.lesson_count })}</Badge>
                   <Badge variant="outline" className="backdrop-blur-sm">{selectedSeries.audience_type}</Badge>
                   <Badge variant="outline" className="backdrop-blur-sm">{selectedSeries.context}</Badge>
                   <Badge variant={selectedSeries.status === 'published' ? 'default' : 'secondary'}>
@@ -200,7 +202,7 @@ const BibleStudySeriesBuilder = () => {
                   />
                   <Button onClick={() => navigate(`/series/${selectedSeries.id}/present`)} className="gradient-palace">
                     <Presentation className="h-4 w-4 mr-2" />
-                    Present
+                    {t('series.present')}
                   </Button>
                 </div>
               )}
@@ -214,11 +216,11 @@ const BibleStudySeriesBuilder = () => {
                 transition={{ delay: 0.2 }}
                 className="lg:col-span-2 space-y-4"
               >
-                <h2 className="text-xl font-bold">Lessons</h2>
+                <h2 className="text-xl font-bold">{t('series.lessons')}</h2>
                 {lessons.length === 0 ? (
                   <Card variant="glass">
                     <CardContent className="py-8 text-center">
-                      <p className="text-muted-foreground">No lessons yet</p>
+                      <p className="text-muted-foreground">{t('series.noLessonsYet')}</p>
                     </CardContent>
                   </Card>
                 ) : (
@@ -236,7 +238,7 @@ const BibleStudySeriesBuilder = () => {
                               <div className="flex-1">
                                 <div className="flex items-center gap-2">
                                   <Badge variant="outline" className="text-xs bg-primary/10 border-primary/30">
-                                    Lesson {lesson.lesson_number}
+                                    {t('series.lessonNumber', { number: lesson.lesson_number })}
                                   </Badge>
                                   <span className="font-medium">{lesson.title}</span>
                                 </div>
@@ -330,10 +332,10 @@ const BibleStudySeriesBuilder = () => {
               <BookOpen className="h-10 w-10 text-primary" />
             </motion.div>
             <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent">
-              Build a Bible Study Series with the Palace
+              {t('series.buildSeriesTitle')}
             </h1>
             <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-              Create ready-to-teach studies that walk people through Scripture visually—floor by floor, room by room.
+              {t('series.buildSeriesDescription')}
             </p>
           </motion.div>
 
@@ -368,7 +370,7 @@ const BibleStudySeriesBuilder = () => {
                   className="gap-2 gradient-palace shadow-elegant hover:shadow-glow transition-all duration-300"
                 >
                   <Plus className="h-5 w-5" />
-                  Create New Series
+                  {t('series.createNewSeries')}
                 </Button>
                 <Button 
                   size="lg" 
@@ -377,7 +379,7 @@ const BibleStudySeriesBuilder = () => {
                   className="gap-2 backdrop-blur-sm bg-background/50 hover:bg-primary/10 transition-all duration-300"
                 >
                   <FileText className="h-5 w-5" />
-                  Start from a Template
+                  {t('series.startFromTemplate')}
                 </Button>
                 <Button 
                   size="lg" 
@@ -386,7 +388,7 @@ const BibleStudySeriesBuilder = () => {
                   className="gap-2 backdrop-blur-sm bg-background/50 hover:bg-primary/10 transition-all duration-300"
                 >
                   <BookOpen className="h-5 w-5" />
-                  Discover Public Series
+                  {t('series.discoverPublicSeries')}
                 </Button>
               </motion.div>
 
@@ -398,7 +400,7 @@ const BibleStudySeriesBuilder = () => {
                   transition={{ delay: 0.4 }}
                   className="space-y-4"
                 >
-                  <h2 className="text-2xl font-bold">Your Series</h2>
+                  <h2 className="text-2xl font-bold">{t('series.yourSeries')}</h2>
                   <SeriesList series={userSeries} onUpdate={loadUserSeries} />
                 </motion.div>
               )}
@@ -411,7 +413,7 @@ const BibleStudySeriesBuilder = () => {
                   transition={{ delay: 0.5 }}
                   className="space-y-4"
                 >
-                  <h2 className="text-2xl font-bold">Enrolled Series</h2>
+                  <h2 className="text-2xl font-bold">{t('series.enrolledSeries')}</h2>
                   <div className="grid md:grid-cols-2 gap-4">
                     {enrolledSeries.map((s, index) => (
                       <motion.div
@@ -431,8 +433,8 @@ const BibleStudySeriesBuilder = () => {
                           </CardHeader>
                           <CardContent>
                             <div className="flex gap-2">
-                              <Badge variant="outline" className="bg-primary/10 border-primary/30">{s.lesson_count} lessons</Badge>
-                              <Badge variant="secondary">Enrolled</Badge>
+                              <Badge variant="outline" className="bg-primary/10 border-primary/30">{t('series.lessonCount', { count: s.lesson_count })}</Badge>
+                              <Badge variant="secondary">{t('series.enrolled')}</Badge>
                             </div>
                           </CardContent>
                         </Card>

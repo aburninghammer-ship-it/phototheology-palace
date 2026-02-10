@@ -5,6 +5,7 @@
 
 import { useState, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { SimplifiedNav } from "@/components/SimplifiedNav";
 import { Navigation } from "@/components/Navigation";
 import { useUserPreferences } from "@/hooks/useUserPreferences";
@@ -57,6 +58,7 @@ type SelectionMode = "chapter" | "book" | "custom";
 type CommentaryMode = "verse" | "chapter";
 
 export default function AudioBible() {
+  const { t } = useTranslation();
   const [searchParams] = useSearchParams();
   const { preferences } = useUserPreferences();
 
@@ -282,10 +284,10 @@ export default function AudioBible() {
               />
               <div>
                 <h1 className="font-serif text-3xl sm:text-4xl font-bold mb-1 bg-gradient-palace bg-clip-text text-transparent">
-                  Audio Bible & Commentary
+                  {t('audioBible.title')}
                 </h1>
                 <p className="text-muted-foreground">
-                  Listen to Scripture with Phototheology Commentary
+                  {t('audioBible.subtitle')}
                 </p>
               </div>
             </div>
@@ -298,14 +300,14 @@ export default function AudioBible() {
                 <div className="flex items-center justify-between mb-4">
                   <div>
                     <p className="text-sm text-muted-foreground">
-                      {isPlayingCommentary ? "Phototheology Commentary" : "Now Playing"}
+                      {isPlayingCommentary ? t('audioBible.phototheologyCommentary') : t('audioBible.nowPlaying')}
                     </p>
                     <h2 className="text-2xl font-bold">
                       {currentBook} {currentChapter}:{currentVerse}
                     </h2>
                   </div>
                   <Badge variant={isPlayingCommentary ? "secondary" : "default"} className="text-sm px-3 py-1">
-                    {isPlayingCommentary ? `${commentaryTier} commentary` : "Scripture"}
+                    {isPlayingCommentary ? t('audioBible.tierCommentary', { tier: commentaryTier }) : t('audioBible.scripture')}
                   </Badge>
                 </div>
 
@@ -314,7 +316,7 @@ export default function AudioBible() {
                   {isPlayingCommentary ? (
                     <div>
                       <p className="text-xs text-muted-foreground mb-2 uppercase tracking-wide">
-                        Phototheology Commentary
+                        {t('audioBible.phototheologyCommentary')}
                       </p>
                       {currentCommentary ? (
                         <p className="text-base leading-relaxed">
@@ -323,7 +325,7 @@ export default function AudioBible() {
                       ) : (
                         <div className="flex items-center gap-3 text-muted-foreground">
                           <Loader2 className="h-5 w-5 animate-spin" />
-                          <span>Generating commentary...</span>
+                          <span>{t('audioBible.generatingCommentary')}</span>
                         </div>
                       )}
                     </div>
@@ -342,7 +344,7 @@ export default function AudioBible() {
                 {/* Progress */}
                 <div className="mb-6">
                   <div className="flex justify-between text-sm text-muted-foreground mb-2">
-                    <span>Verse {currentVerseIndex + 1} of {totalVerses}</span>
+                    <span>{t('audioBible.verseProgress', { current: currentVerseIndex + 1, total: totalVerses })}</span>
                     <span>{Math.round(progress)}%</span>
                   </div>
                   <div className="h-2 bg-muted rounded-full overflow-hidden">
@@ -406,7 +408,7 @@ export default function AudioBible() {
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <BookOpen className="h-5 w-5 text-primary" />
-                    What to Listen
+                    {t('audioBible.whatToListen')}
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
@@ -414,15 +416,15 @@ export default function AudioBible() {
                     <TabsList className="grid w-full grid-cols-3 mb-4">
                       <TabsTrigger value="chapter">
                         <BookText className="h-4 w-4 mr-1" />
-                        Chapter
+                        {t('audioBible.chapter')}
                       </TabsTrigger>
                       <TabsTrigger value="book">
                         <BookOpen className="h-4 w-4 mr-1" />
-                        Whole Book
+                        {t('audioBible.wholeBook')}
                       </TabsTrigger>
                       <TabsTrigger value="custom">
                         <Layers className="h-4 w-4 mr-1" />
-                        Custom
+                        {t('audioBible.custom')}
                       </TabsTrigger>
                     </TabsList>
 
@@ -430,7 +432,7 @@ export default function AudioBible() {
                     <TabsContent value="chapter" className="space-y-4">
                       <div className="grid grid-cols-2 gap-4">
                         <div className="space-y-2">
-                          <Label>Book</Label>
+                          <Label>{t('audioBible.book')}</Label>
                           <Select value={selectedBook} onValueChange={setSelectedBook}>
                             <SelectTrigger>
                               <SelectValue />
@@ -447,7 +449,7 @@ export default function AudioBible() {
                           </Select>
                         </div>
                         <div className="space-y-2">
-                          <Label>Chapter</Label>
+                          <Label>{t('audioBible.chapter')}</Label>
                           <Select
                             value={selectedChapter.toString()}
                             onValueChange={(v) => setSelectedChapter(parseInt(v, 10))}
@@ -459,7 +461,7 @@ export default function AudioBible() {
                               <ScrollArea className="h-64">
                                 {Array.from({ length: getChapterCount() }, (_, i) => i + 1).map((ch) => (
                                   <SelectItem key={ch} value={ch.toString()}>
-                                    Chapter {ch}
+                                    {t('audioBible.chapterNumber', { number: ch })}
                                   </SelectItem>
                                 ))}
                               </ScrollArea>
@@ -469,14 +471,14 @@ export default function AudioBible() {
                       </div>
                       <Button size="lg" className="w-full" onClick={handlePlayChapter} disabled={isLoading}>
                         {isLoading ? <Loader2 className="h-5 w-5 mr-2 animate-spin" /> : <Play className="h-5 w-5 mr-2" />}
-                        Play {selectedBook} {selectedChapter}
+                        {t('audioBible.playBookChapter', { book: selectedBook, chapter: selectedChapter })}
                       </Button>
                     </TabsContent>
 
                     {/* Whole Book */}
                     <TabsContent value="book" className="space-y-4">
                       <div className="space-y-2">
-                        <Label>Book</Label>
+                        <Label>{t('audioBible.book')}</Label>
                         <Select value={selectedBook} onValueChange={setSelectedBook}>
                           <SelectTrigger>
                             <SelectValue />
@@ -485,7 +487,7 @@ export default function AudioBible() {
                             <ScrollArea className="h-64">
                               {BIBLE_BOOK_METADATA.map((book) => (
                                 <SelectItem key={book.name} value={book.name}>
-                                  {book.name} ({book.chapters} chapters)
+                                  {book.name} ({t('audioBible.chaptersCount', { count: book.chapters })})
                                 </SelectItem>
                               ))}
                             </ScrollArea>
@@ -493,31 +495,31 @@ export default function AudioBible() {
                         </Select>
                       </div>
                       <p className="text-sm text-muted-foreground">
-                        Listen to all {getChapterCount()} chapters of {selectedBook}
+                        {t('audioBible.listenToAllChapters', { count: getChapterCount(), book: selectedBook })}
                       </p>
                       <Button size="lg" className="w-full" onClick={handlePlayBook} disabled={isLoading}>
                         {isLoading ? <Loader2 className="h-5 w-5 mr-2 animate-spin" /> : <Play className="h-5 w-5 mr-2" />}
-                        Play Entire {selectedBook}
+                        {t('audioBible.playEntireBook', { book: selectedBook })}
                       </Button>
                     </TabsContent>
 
                     {/* Custom Selection */}
                     <TabsContent value="custom" className="space-y-4">
                       <p className="text-sm text-muted-foreground">
-                        Build a custom playlist: single chapters, chapter ranges, or book ranges
+                        {t('audioBible.customPlaylistDescription')}
                       </p>
                       
                       {/* Add Mode Selector */}
                       <Tabs value={customAddMode} onValueChange={(v) => setCustomAddMode(v as "single" | "chapter-range" | "book-range")} className="w-full">
                         <TabsList className="grid w-full grid-cols-3 h-auto">
                           <TabsTrigger value="single" className="text-xs py-2">
-                            Single Chapter
+                            {t('audioBible.singleChapter')}
                           </TabsTrigger>
                           <TabsTrigger value="chapter-range" className="text-xs py-2">
-                            Chapter Range
+                            {t('audioBible.chapterRange')}
                           </TabsTrigger>
                           <TabsTrigger value="book-range" className="text-xs py-2">
-                            Book Range
+                            {t('audioBible.bookRange')}
                           </TabsTrigger>
                         </TabsList>
                         
@@ -576,7 +578,7 @@ export default function AudioBible() {
                               <ScrollArea className="h-64">
                                 {BIBLE_BOOK_METADATA.map((book) => (
                                   <SelectItem key={book.name} value={book.name}>
-                                    {book.name} ({book.chapters} ch)
+                                    {book.name} ({t('audioBible.chAbbrev', { count: book.chapters })})
                                   </SelectItem>
                                 ))}
                               </ScrollArea>
@@ -584,7 +586,7 @@ export default function AudioBible() {
                           </Select>
                           <div className="flex gap-2 items-center">
                             <div className="flex-1">
-                              <Label className="text-xs text-muted-foreground">From Chapter</Label>
+                              <Label className="text-xs text-muted-foreground">{t('audioBible.fromChapter')}</Label>
                               <Select
                                 value={rangeStartChapter.toString()}
                                 onValueChange={(v) => {
@@ -609,7 +611,7 @@ export default function AudioBible() {
                             </div>
                             <span className="mt-5 text-muted-foreground">→</span>
                             <div className="flex-1">
-                              <Label className="text-xs text-muted-foreground">To Chapter</Label>
+                              <Label className="text-xs text-muted-foreground">{t('audioBible.toChapter')}</Label>
                               <Select
                                 value={rangeEndChapter.toString()}
                                 onValueChange={(v) => setRangeEndChapter(parseInt(v, 10))}
@@ -633,7 +635,7 @@ export default function AudioBible() {
                             </Button>
                           </div>
                           <p className="text-xs text-muted-foreground">
-                            {rangeEndChapter - rangeStartChapter + 1} chapters will be added
+                            {t('audioBible.chaptersWillBeAdded', { count: rangeEndChapter - rangeStartChapter + 1 })}
                           </p>
                         </TabsContent>
 
@@ -641,7 +643,7 @@ export default function AudioBible() {
                         <TabsContent value="book-range" className="mt-3 space-y-2">
                           <div className="flex gap-2 items-center">
                             <div className="flex-1">
-                              <Label className="text-xs text-muted-foreground">From Book</Label>
+                              <Label className="text-xs text-muted-foreground">{t('audioBible.fromBook')}</Label>
                               <Select
                                 value={rangeStartBook}
                                 onValueChange={(v) => {
@@ -667,7 +669,7 @@ export default function AudioBible() {
                             </div>
                             <span className="mt-5 text-muted-foreground">→</span>
                             <div className="flex-1">
-                              <Label className="text-xs text-muted-foreground">To Book</Label>
+                              <Label className="text-xs text-muted-foreground">{t('audioBible.toBook')}</Label>
                               <Select
                                 value={rangeEndBook}
                                 onValueChange={(v) => setRangeEndBook(v)}
@@ -691,7 +693,7 @@ export default function AudioBible() {
                             </Button>
                           </div>
                           <p className="text-xs text-muted-foreground">
-                            {getBookRangeChapterCount()} chapters across {getBookRangeBookCount()} books
+                            {t('audioBible.chaptersAcrossBooks', { chapters: getBookRangeChapterCount(), books: getBookRangeBookCount() })}
                           </p>
                         </TabsContent>
                       </Tabs>
@@ -700,14 +702,14 @@ export default function AudioBible() {
                       {customChapters.length > 0 && (
                         <div className="space-y-2 pt-2 border-t">
                           <div className="flex items-center justify-between">
-                            <Label>Your Playlist ({customChapters.length} chapters)</Label>
+                            <Label>{t('audioBible.yourPlaylist', { count: customChapters.length })}</Label>
                             <Button 
                               variant="ghost" 
                               size="sm" 
                               className="text-xs text-muted-foreground h-6"
                               onClick={() => setCustomChapters([])}
                             >
-                              Clear All
+                              {t('audioBible.clearAll')}
                             </Button>
                           </div>
                           <ScrollArea className="max-h-32">
@@ -737,7 +739,7 @@ export default function AudioBible() {
                         disabled={isLoading || customChapters.length === 0}
                       >
                         {isLoading ? <Loader2 className="h-5 w-5 mr-2 animate-spin" /> : <Play className="h-5 w-5 mr-2" />}
-                        Play {customChapters.length} Chapter{customChapters.length !== 1 ? "s" : ""}
+                        {t('audioBible.playChapters', { count: customChapters.length })}
                       </Button>
                     </TabsContent>
                   </Tabs>
@@ -749,9 +751,9 @@ export default function AudioBible() {
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <ListMusic className="h-5 w-5 text-primary" />
-                    Pre-Built Series
+                    {t('audioBible.preBuiltSeries')}
                   </CardTitle>
-                  <CardDescription>Curated multi-chapter journeys</CardDescription>
+                  <CardDescription>{t('audioBible.curatedJourneys')}</CardDescription>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-2">
@@ -764,7 +766,7 @@ export default function AudioBible() {
                         <div>
                           <h3 className="font-medium text-sm">{series.name}</h3>
                           <p className="text-xs text-muted-foreground">
-                            {series.description} • {series.items.length} chapters
+                            {series.description} • {t('audioBible.chaptersCount', { count: series.items.length })}
                           </p>
                         </div>
                         <Button variant="ghost" size="sm">
@@ -784,9 +786,9 @@ export default function AudioBible() {
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <Headphones className="h-5 w-5 text-primary" />
-                    Listening Mode
+                    {t('audioBible.listeningMode')}
                   </CardTitle>
-                  <CardDescription>Choose how you want to listen</CardDescription>
+                  <CardDescription>{t('audioBible.chooseHowToListen')}</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   {/* Bible Only vs With Commentary */}
@@ -797,8 +799,8 @@ export default function AudioBible() {
                       onClick={() => setIncludeCommentary(false)}
                     >
                       <BookOpen className="h-6 w-6 mb-1" />
-                      <span className="font-semibold">Bible Only</span>
-                      <span className="text-xs opacity-80">Just Scripture</span>
+                      <span className="font-semibold">{t('audioBible.bibleOnly')}</span>
+                      <span className="text-xs opacity-80">{t('audioBible.justScripture')}</span>
                     </Button>
                     <Button
                       variant={includeCommentary ? "default" : "outline"}
@@ -806,8 +808,8 @@ export default function AudioBible() {
                       onClick={() => setIncludeCommentary(true)}
                     >
                       <MessageSquare className="h-6 w-6 mb-1" />
-                      <span className="font-semibold">With Commentary</span>
-                      <span className="text-xs opacity-80">Phototheology insights</span>
+                      <span className="font-semibold">{t('audioBible.withCommentary')}</span>
+                      <span className="text-xs opacity-80">{t('audioBible.phototheologyInsights')}</span>
                     </Button>
                   </div>
 
@@ -816,7 +818,7 @@ export default function AudioBible() {
                     <>
                       {/* Commentary Mode: Verse by Verse or Chapter Summary */}
                       <div className="space-y-2 pt-2">
-                        <Label>Commentary Style</Label>
+                        <Label>{t('audioBible.commentaryStyle')}</Label>
                         <div className="grid grid-cols-2 gap-2">
                           <Button
                             variant={commentaryMode === "verse" ? "default" : "outline"}
@@ -824,8 +826,8 @@ export default function AudioBible() {
                             className="h-auto py-2 flex-col"
                             onClick={() => setCommentaryMode("verse")}
                           >
-                            <span className="font-medium">Verse by Verse</span>
-                            <span className="text-xs opacity-80">After each verse</span>
+                            <span className="font-medium">{t('audioBible.verseByVerse')}</span>
+                            <span className="text-xs opacity-80">{t('audioBible.afterEachVerse')}</span>
                           </Button>
                           <Button
                             variant={commentaryMode === "chapter" ? "default" : "outline"}
@@ -833,15 +835,15 @@ export default function AudioBible() {
                             className="h-auto py-2 flex-col"
                             onClick={() => setCommentaryMode("chapter")}
                           >
-                            <span className="font-medium">Chapter Summary</span>
-                            <span className="text-xs opacity-80">After whole chapter</span>
+                            <span className="font-medium">{t('audioBible.chapterSummary')}</span>
+                            <span className="text-xs opacity-80">{t('audioBible.afterWholeChapter')}</span>
                           </Button>
                         </div>
                       </div>
 
                       {/* Commentary Depth */}
                       <div className="space-y-2">
-                        <Label>Commentary Depth</Label>
+                        <Label>{t('audioBible.commentaryDepth')}</Label>
                         <Select
                           value={commentaryTier}
                           onValueChange={(v) => setCommentaryTier(v as CommentaryTier)}
@@ -850,9 +852,9 @@ export default function AudioBible() {
                             <SelectValue />
                           </SelectTrigger>
                           <SelectContent>
-                            <SelectItem value="surface">Surface</SelectItem>
-                            <SelectItem value="intermediate">Intermediate</SelectItem>
-                            <SelectItem value="scholarly">Scholarly</SelectItem>
+                            <SelectItem value="surface">{t('audioBible.surface')}</SelectItem>
+                            <SelectItem value="intermediate">{t('audioBible.intermediate')}</SelectItem>
+                            <SelectItem value="scholarly">{t('audioBible.scholarly')}</SelectItem>
                           </SelectContent>
                         </Select>
                       </div>
@@ -866,13 +868,13 @@ export default function AudioBible() {
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <Volume2 className="h-5 w-5 text-primary" />
-                    Audio Settings
+                    {t('audioBible.audioSettings')}
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-5">
                   {/* Bible Voice Selection */}
                   <div className="space-y-2">
-                    <Label>Bible Voice</Label>
+                    <Label>{t('audioBible.bibleVoice')}</Label>
                     <Select value={voice} onValueChange={(v) => setVoice(v as any)}>
                       <SelectTrigger>
                         <SelectValue />
@@ -890,7 +892,7 @@ export default function AudioBible() {
                   {/* Commentary Voice Selection */}
                   {includeCommentary && (
                     <div className="space-y-2">
-                      <Label>Commentary Voice</Label>
+                      <Label>{t('audioBible.commentaryVoice')}</Label>
                       <Select value={commentaryVoice} onValueChange={(v) => setCommentaryVoice(v as any)}>
                         <SelectTrigger>
                           <SelectValue />
@@ -909,7 +911,7 @@ export default function AudioBible() {
                   {/* Speed Control */}
                   <div className="space-y-2">
                     <div className="flex justify-between">
-                      <Label>Playback Speed</Label>
+                      <Label>{t('audioBible.playbackSpeed')}</Label>
                       <span className="text-sm font-medium">{speed}x</span>
                     </div>
                     <Slider
@@ -924,7 +926,7 @@ export default function AudioBible() {
                   {/* Volume Control */}
                   <div className="space-y-2">
                     <div className="flex justify-between">
-                      <Label>Volume</Label>
+                      <Label>{t('audioBible.volume')}</Label>
                       <span className="text-sm font-medium">{Math.round(volume * 100)}%</span>
                     </div>
                     <Slider
@@ -942,8 +944,8 @@ export default function AudioBible() {
               {themes.length > 0 && (
                 <Card className="glass-card">
                   <CardHeader>
-                    <CardTitle>Themes</CardTitle>
-                    <CardDescription>Verses by topic</CardDescription>
+                    <CardTitle>{t('audioBible.themes')}</CardTitle>
+                    <CardDescription>{t('audioBible.versesByTopic')}</CardDescription>
                   </CardHeader>
                   <CardContent>
                     <div className="grid grid-cols-4 gap-2">

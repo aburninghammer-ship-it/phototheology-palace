@@ -1,5 +1,6 @@
 import { useState, useRef, Suspense, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import {
   OrbitControls,
@@ -736,6 +737,7 @@ function CameraController() {
 // Main component
 export default function EscapeRoom3D() {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const { roomId } = useParams();
 
   // Find room data
@@ -768,7 +770,7 @@ export default function EscapeRoom3D() {
   useEffect(() => {
     if (solvedPuzzles.size === room.puzzles.length && room.puzzles.length > 0) {
       setGameComplete(true);
-      toast.success("Room Escaped! You've uncovered all the mysteries!");
+      toast.success(t('games.escapeRoom.roomEscaped'));
     }
   }, [solvedPuzzles, room.puzzles.length]);
 
@@ -796,7 +798,7 @@ export default function EscapeRoom3D() {
       const pointsEarned = showHint ? Math.max(currentPuzzle.points - 5, 5) : currentPuzzle.points;
       setScore(prev => prev + pointsEarned);
       setSolvedPuzzles(prev => new Set([...prev, currentPuzzleIndex]));
-      toast.success(`Correct! +${pointsEarned} points`);
+      toast.success(t('games.common.correctPlusPoints', { points: pointsEarned }));
 
       // Show clue revealed
       setTimeout(() => {
@@ -804,7 +806,7 @@ export default function EscapeRoom3D() {
         setCurrentPuzzleIndex(null);
       }, 1000);
     } else {
-      toast.error("Not quite right. Try again!");
+      toast.error(t('games.common.notQuiteRightTryAgain'));
     }
   };
 
@@ -827,7 +829,7 @@ export default function EscapeRoom3D() {
       <div className="absolute top-0 left-0 right-0 z-10 bg-black/50 backdrop-blur-sm p-4">
         <div className="max-w-6xl mx-auto flex items-center justify-between">
           <Button variant="ghost" onClick={() => navigate('/escape-room')} className="text-white">
-            <ArrowLeft className="h-4 w-4 mr-2" /> Exit Room
+            <ArrowLeft className="h-4 w-4 mr-2" /> {t('games.escapeRoom.exitRoom')}
           </Button>
 
           <div className="flex items-center gap-4">
@@ -838,7 +840,7 @@ export default function EscapeRoom3D() {
               <Trophy className="h-3 w-3 mr-1" /> {score} pts
             </Badge>
             <Badge variant="outline" className="text-purple-400 border-purple-400/30">
-              {solvedPuzzles.size}/{room.puzzles.length} Solved
+              {t('games.escapeRoom.solvedCount', { solved: solvedPuzzles.size, total: room.puzzles.length })}
             </Badge>
           </div>
         </div>
@@ -881,10 +883,10 @@ export default function EscapeRoom3D() {
       <div className="absolute bottom-4 left-4 z-10">
         <Card className="bg-black/70 border-white/20 text-white max-w-xs">
           <CardContent className="p-3 text-sm">
-            <p className="text-purple-300 font-medium mb-1">Controls:</p>
-            <p>• Drag to look around</p>
-            <p>• Scroll to zoom</p>
-            <p>• Click glowing objects to solve puzzles</p>
+            <p className="text-purple-300 font-medium mb-1">{t('games.escapeRoom.controls')}:</p>
+            <p>• {t('games.escapeRoom.dragToLook')}</p>
+            <p>• {t('games.escapeRoom.scrollToZoom')}</p>
+            <p>• {t('games.escapeRoom.clickGlowing')}</p>
           </CardContent>
         </Card>
       </div>
@@ -908,11 +910,11 @@ export default function EscapeRoom3D() {
               }>
                 {room.difficulty}
               </Badge>
-              <span>{room.puzzles.length} puzzles</span>
-              <span>{room.timeLimit} min limit</span>
+              <span>{t('games.escapeRoom.puzzlesCount', { count: room.puzzles.length })}</span>
+              <span>{t('games.escapeRoom.timeLimitMin', { minutes: room.timeLimit })}</span>
             </div>
             <Button onClick={() => setShowIntro(false)} className="w-full bg-purple-600 hover:bg-purple-700">
-              Enter the Room
+              {t('games.escapeRoom.enterTheRoom')}
             </Button>
           </div>
         </DialogContent>
@@ -925,7 +927,7 @@ export default function EscapeRoom3D() {
             <>
               <DialogHeader>
                 <DialogTitle className="text-xl">
-                  Puzzle {(currentPuzzleIndex ?? 0) + 1}: {currentPuzzle.type.replace('-', ' ').toUpperCase()}
+                  {t('games.escapeRoom.puzzleNumber', { number: (currentPuzzleIndex ?? 0) + 1 })}: {currentPuzzle.type.replace('-', ' ').toUpperCase()}
                 </DialogTitle>
               </DialogHeader>
               <div className="space-y-4">
@@ -954,7 +956,7 @@ export default function EscapeRoom3D() {
                   <Input
                     value={answer}
                     onChange={(e) => setAnswer(e.target.value)}
-                    placeholder="Enter your answer..."
+                    placeholder={t('games.escapeRoom.enterYourAnswer')}
                     className="bg-black/50 border-purple-500/50 text-white"
                     onKeyDown={(e) => e.key === 'Enter' && checkAnswer()}
                   />
@@ -978,18 +980,18 @@ export default function EscapeRoom3D() {
 
                 {/* Points info */}
                 <p className="text-sm text-gray-400">
-                  Points: {currentPuzzle.points} {showHint && "(−5 for hint)"}
+                  {t('games.common.points')}: {currentPuzzle.points} {showHint && t('games.escapeRoom.minusForHint')}
                 </p>
 
                 {/* Actions */}
                 <div className="flex gap-2">
                   {!showHint && currentPuzzle.hint && (
                     <Button variant="outline" onClick={useHint} className="border-yellow-500/50 text-yellow-400">
-                      <Lightbulb className="h-4 w-4 mr-2" /> Use Hint (−5 pts)
+                      <Lightbulb className="h-4 w-4 mr-2" /> {t('games.escapeRoom.useHint')}
                     </Button>
                   )}
                   <Button onClick={checkAnswer} className="flex-1 bg-purple-600 hover:bg-purple-700">
-                    <Check className="h-4 w-4 mr-2" /> Submit Answer
+                    <Check className="h-4 w-4 mr-2" /> {t('games.common.submitAnswer')}
                   </Button>
                 </div>
               </div>
@@ -1003,7 +1005,7 @@ export default function EscapeRoom3D() {
         <DialogContent className="bg-slate-900 border-green-500/30 text-white max-w-lg">
           <DialogHeader>
             <DialogTitle className="text-2xl text-center text-green-400">
-              🎉 Room Escaped!
+              {t('games.escapeRoom.roomEscapedTitle')}
             </DialogTitle>
           </DialogHeader>
           <div className="space-y-4 text-center">
@@ -1013,28 +1015,28 @@ export default function EscapeRoom3D() {
             <div className="grid grid-cols-3 gap-4 py-4">
               <div className="bg-black/50 rounded-lg p-3">
                 <p className="text-2xl font-bold text-yellow-400">{score}</p>
-                <p className="text-sm text-gray-400">Points</p>
+                <p className="text-sm text-gray-400">{t('games.common.points')}</p>
               </div>
               <div className="bg-black/50 rounded-lg p-3">
                 <p className="text-2xl font-bold text-blue-400">{formatTime(elapsedTime)}</p>
-                <p className="text-sm text-gray-400">Time</p>
+                <p className="text-sm text-gray-400">{t('games.common.time')}</p>
               </div>
               <div className="bg-black/50 rounded-lg p-3">
                 <p className="text-2xl font-bold text-purple-400">{hintsUsed}</p>
-                <p className="text-sm text-gray-400">Hints Used</p>
+                <p className="text-sm text-gray-400">{t('games.common.hintsUsed')}</p>
               </div>
             </div>
 
             {/* Final answer */}
             <div className="bg-green-900/30 border border-green-500/30 rounded-lg p-4">
-              <p className="text-green-200 font-medium mb-2">The Mystery Revealed:</p>
+              <p className="text-green-200 font-medium mb-2">{t('games.escapeRoom.mysteryRevealed')}:</p>
               <p className="text-white">{room.finalAnswer.explanation}</p>
               <p className="text-green-300 text-sm mt-2 italic">{room.finalAnswer.verse}</p>
             </div>
 
             <div className="flex gap-2">
               <Button variant="outline" onClick={() => navigate('/escape-room')} className="flex-1 border-white/30">
-                Back to Rooms
+                {t('games.escapeRoom.backToRooms')}
               </Button>
               <Button
                 onClick={() => {
@@ -1046,7 +1048,7 @@ export default function EscapeRoom3D() {
                 }}
                 className="flex-1 bg-purple-600 hover:bg-purple-700"
               >
-                Play Again
+                {t('games.common.playAgain')}
               </Button>
             </div>
           </div>

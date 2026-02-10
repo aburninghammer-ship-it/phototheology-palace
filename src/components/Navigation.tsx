@@ -1,5 +1,6 @@
 import { useLayoutEffect, useRef, useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { Building2, Sparkles, Users, User, CreditCard, LogOut, MessageCircle, BookOpen, Calendar, Image, Search, Video, Sword, Crown, Shield, Brain, Lightbulb, Zap, Trophy, MessageSquare, Target, StickyNote, Radio, Church, GraduationCap, Award, Gamepad2, BarChart3, Archive, Library, Layers, Network, Home, Heart, Gem, FileImage, FolderOpen } from "lucide-react";
 import { DraggableNavTabs } from "@/components/navigation/DraggableNavTabs";
 import { Button } from "@/components/ui/button";
@@ -22,6 +23,7 @@ import { SessionModeIndicator } from "@/components/session/SessionModeIndicator"
 import { BackButton } from "@/components/BackButton";
 import { SessionStartButton } from "@/components/session/SessionStartButton";
 import { SuiteModeToggle, SuiteModeBadge } from "@/components/SuiteModeToggle";
+import { LanguageSelector } from "@/components/settings/LanguageSelector";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -31,6 +33,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 
 export const Navigation = () => {
+  const { t } = useTranslation();
   const { user, signOut, loading } = useAuth();
   const { activeCount } = useActiveUsers();
   const { isAdmin } = useIsAdmin();
@@ -155,7 +158,7 @@ export const Navigation = () => {
                 >
                   <Link to="/live-demo">
                     <Radio className="h-4 w-4 mr-1" />
-                    <span>Live</span>
+                    <span>{t('nav.live')}</span>
                   </Link>
                 </Button>
               )}
@@ -170,7 +173,7 @@ export const Navigation = () => {
                 >
                   <Link to="/church-admin">
                     <Building2 className="h-4 w-4 mr-1" />
-                    <span>Church Admin</span>
+                    <span>{t('nav.churchAdmin')}</span>
                   </Link>
                 </Button>
               )}
@@ -183,7 +186,7 @@ export const Navigation = () => {
                 </span>
                 <Users className="h-4 w-4 text-green-600" />
                 <span className="text-sm font-semibold text-green-600">{activeCount}</span>
-                <span className="text-xs text-green-600/80">online</span>
+                <span className="text-xs text-green-600/80">{t('nav.online')}</span>
               </div>
               
               {user && (
@@ -198,7 +201,7 @@ export const Navigation = () => {
                     aria-label="Open chat"
                   >
                     <MessageCircle className="h-4 w-4" />
-                    <span className="ml-1 hidden sm:inline">Chat</span>
+                    <span className="ml-1 hidden sm:inline">{t('nav.chat')}</span>
                     {totalUnread > 0 && (
                       <Badge 
                         variant="destructive"
@@ -231,62 +234,70 @@ export const Navigation = () => {
                     <DropdownMenuTrigger asChild>
                       <Button className="hidden md:flex gradient-palace whitespace-nowrap">
                         <User className="h-4 w-4 mr-2" />
-                        My Account
+                        {t('nav.myAccount')}
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end" className="w-56 bg-card border-border z-50">
                       <DropdownMenuItem asChild>
                         <Link to="/palace" className="cursor-pointer">
                           <Building2 className="h-4 w-4 mr-2" />
-                          Enter Palace
+                          {t('nav.enterPalace')}
                         </Link>
                       </DropdownMenuItem>
                       <DropdownMenuSeparator />
                       <DropdownMenuItem asChild>
                         <Link to="/profile" className="cursor-pointer">
                           <User className="h-4 w-4 mr-2" />
-                          Profile
+                          {t('common.profile')}
                         </Link>
                       </DropdownMenuItem>
                       <DropdownMenuItem asChild>
                         <Link to="/pricing" className="cursor-pointer">
                           <CreditCard className="h-4 w-4 mr-2" />
-                          Subscription
+                          {t('profile.subscription')}
                         </Link>
                       </DropdownMenuItem>
                       <DropdownMenuSeparator />
+                      <div className="px-2 py-2">
+                        <LanguageSelector showLabel={false} />
+                      </div>
+                      <DropdownMenuSeparator />
                       <DropdownMenuItem onClick={() => signOut()} className="cursor-pointer text-destructive focus:text-destructive">
                         <LogOut className="h-4 w-4 mr-2" />
-                        Sign Out
+                        {t('nav.signOut')}
                       </DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>
                 </>
               ) : (
                 <>
+                  {/* Language selector for logged-out users */}
+                  <div className="hidden md:block w-32">
+                    <LanguageSelector showLabel={false} />
+                  </div>
                   {/* Enter App Button for logged-out users */}
                   <Button asChild className="gradient-palace whitespace-nowrap">
-                    <Link to="/auth">Enter App</Link>
+                    <Link to="/auth">{t('nav.enterApp')}</Link>
                   </Button>
                   
                   {/* Desktop Navigation for logged-out users - Horizontal Scroll */}
                   <div className="hidden md:flex items-center gap-2 overflow-x-auto scrollbar-hide max-w-2xl">
                     <Button variant="ghost" asChild size="sm" className="whitespace-nowrap">
-                      <Link to="/palace">Palace</Link>
+                      <Link to="/palace">{t('nav.palace')}</Link>
                     </Button>
-                    
+
                     <Button variant="ghost" asChild size="sm" className="whitespace-nowrap">
-                      <Link to="/bible">Bible</Link>
+                      <Link to="/bible">{t('nav.bible')}</Link>
                     </Button>
-                    
+
                     <Button variant="ghost" asChild size="sm" className="whitespace-nowrap">
-                      <Link to="/games">Games</Link>
+                      <Link to="/games">{t('nav.games')}</Link>
                     </Button>
-                    
+
                     <Button variant="ghost" asChild size="sm" className="whitespace-nowrap">
                       <Link to="/memory">
                         <Brain className="h-4 w-4 mr-1" />
-                        Memory
+                        {t('nav.memory')}
                       </Link>
                     </Button>
                     
@@ -294,43 +305,43 @@ export const Navigation = () => {
                       <DropdownMenuTrigger asChild>
                         <Button variant="ghost" size="sm" className="whitespace-nowrap">
                           <Building2 className="h-4 w-4 mr-1" />
-                          Blueprints
+                          {t('nav.blueprints')}
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end" className="w-56 bg-card border-border z-50">
                         <DropdownMenuItem asChild>
                           <Link to="/blueprint-marriage" className="cursor-pointer">
-                            💍 Dating & Marriage
+                            💍 {t('nav.blueprintMarriage')}
                           </Link>
                         </DropdownMenuItem>
                         <DropdownMenuItem asChild>
                           <Link to="/blueprint-grief" className="cursor-pointer">
-                            💙 Grieving
+                            💙 {t('nav.blueprintGrief')}
                           </Link>
                         </DropdownMenuItem>
                         <DropdownMenuItem asChild>
                           <Link to="/blueprint-stronghold" className="cursor-pointer">
-                            🛡️ Breaking Strongholds
+                            🛡️ {t('nav.blueprintStronghold')}
                           </Link>
                         </DropdownMenuItem>
                         <DropdownMenuItem asChild>
                           <Link to="/blueprint-weight-loss" className="cursor-pointer">
-                            ⚖️ Weight Loss
+                            ⚖️ {t('nav.blueprintWeightLoss')}
                           </Link>
                         </DropdownMenuItem>
                         <DropdownMenuItem asChild>
                           <Link to="/blueprint-mental-health" className="cursor-pointer">
-                            🧠 Mental Health
+                            🧠 {t('nav.blueprintMentalHealth')}
                           </Link>
                         </DropdownMenuItem>
                         <DropdownMenuItem asChild>
                           <Link to="/blueprint-financial" className="cursor-pointer">
-                            💰 Financial Stability
+                            💰 {t('nav.blueprintFinancial')}
                           </Link>
                         </DropdownMenuItem>
                         <DropdownMenuItem asChild>
                           <Link to="/blueprint-stress" className="cursor-pointer">
-                            🧘 Stress Management
+                            🧘 {t('nav.blueprintStress')}
                           </Link>
                         </DropdownMenuItem>
                       </DropdownMenuContent>
@@ -340,49 +351,49 @@ export const Navigation = () => {
                       <DropdownMenuTrigger asChild>
                         <Button variant="ghost" size="sm" className="whitespace-nowrap">
                           <Sparkles className="h-4 w-4 mr-1" />
-                          GPTs
+                          {t('nav.gpts')}
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end" className="w-56 bg-card border-border z-50">
                         <DropdownMenuItem asChild>
                           <Link to="/phototheologygpt" className="cursor-pointer">
                             <Sparkles className="mr-2 h-4 w-4" />
-                            Phototheology GPT
+                            {t('nav.phototheologyGpt')}
                           </Link>
                         </DropdownMenuItem>
                         <DropdownMenuItem asChild>
                           <Link to="/branch-study" className="cursor-pointer">
                             <Sparkles className="mr-2 h-4 w-4" />
-                            BranchStudy
+                            {t('nav.branchStudy')}
                           </Link>
                         </DropdownMenuItem>
                         <DropdownMenuItem asChild>
                           <Link to="/kidgpt" className="cursor-pointer">
                             <Sparkles className="mr-2 h-4 w-4" />
-                            Kid GPT
+                            {t('nav.kidGpt')}
                           </Link>
                         </DropdownMenuItem>
                         <DropdownMenuItem asChild>
                           <Link to="/daniel-revelation-gpt" className="cursor-pointer">
                             <Sparkles className="mr-2 h-4 w-4" />
-                            Daniel & Revelation GPT
+                            {t('nav.danielRevelationGpt')}
                           </Link>
                         </DropdownMenuItem>
                         <DropdownMenuItem asChild>
                           <Link to="/apologetics-gpt" className="cursor-pointer">
                             <Sparkles className="mr-2 h-4 w-4" />
-                            Apologetics GPT
+                            {t('nav.apologeticsGpt')}
                           </Link>
                         </DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
                     
                     <Button variant="ghost" asChild size="sm" className="whitespace-nowrap">
-                      <Link to="/courses">Courses</Link>
+                      <Link to="/courses">{t('nav.courses')}</Link>
                     </Button>
-                    
+
                     <Button variant="ghost" asChild size="sm" className="whitespace-nowrap">
-                      <Link to="/pricing">Pricing</Link>
+                      <Link to="/pricing">{t('nav.pricing')}</Link>
                     </Button>
                   </div>
                 </>
@@ -844,7 +855,7 @@ export const Navigation = () => {
                       <DropdownMenuSeparator />
                       <DropdownMenuItem onClick={() => signOut()}>
                         <LogOut className="h-4 w-4 mr-2" />
-                        Sign Out
+                        {t('nav.signOut')}
                       </DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>

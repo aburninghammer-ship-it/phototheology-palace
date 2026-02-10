@@ -1,5 +1,6 @@
 import { useEffect, useState, useCallback, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { Navigation } from "@/components/Navigation";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -110,6 +111,7 @@ interface PuzzleProps {
 
 // Riddle Puzzle
 const RiddlePuzzle = ({ puzzle, onSolve, showHint }: PuzzleProps) => {
+  const { t } = useTranslation();
   const [answer, setAnswer] = useState("");
 
   const checkAnswer = () => {
@@ -149,12 +151,12 @@ const RiddlePuzzle = ({ puzzle, onSolve, showHint }: PuzzleProps) => {
         <Input
           value={answer}
           onChange={(e) => setAnswer(e.target.value)}
-          placeholder="Enter your answer..."
+          placeholder={t('escapeRoom.renovated.enterAnswerPlaceholder')}
           onKeyDown={(e) => e.key === 'Enter' && checkAnswer()}
           className="flex-1"
         />
         <Button onClick={checkAnswer} disabled={!answer.trim()}>
-          Submit
+          {t('common.submit')}
         </Button>
       </div>
     </div>
@@ -163,6 +165,7 @@ const RiddlePuzzle = ({ puzzle, onSolve, showHint }: PuzzleProps) => {
 
 // Fill in the Blank Puzzle
 const FillBlankPuzzle = ({ puzzle, onSolve, showHint }: PuzzleProps) => {
+  const { t } = useTranslation();
   const [answer, setAnswer] = useState("");
 
   const checkAnswer = () => {
@@ -198,12 +201,12 @@ const FillBlankPuzzle = ({ puzzle, onSolve, showHint }: PuzzleProps) => {
         <Input
           value={answer}
           onChange={(e) => setAnswer(e.target.value)}
-          placeholder="Fill in the blank..."
+          placeholder={t('escapeRoom.renovated.fillBlankPlaceholder')}
           onKeyDown={(e) => e.key === 'Enter' && checkAnswer()}
           className="flex-1"
         />
         <Button onClick={checkAnswer} disabled={!answer.trim()}>
-          Submit
+          {t('common.submit')}
         </Button>
       </div>
     </div>
@@ -212,6 +215,7 @@ const FillBlankPuzzle = ({ puzzle, onSolve, showHint }: PuzzleProps) => {
 
 // Multiple Choice Puzzle
 const MultipleChoicePuzzle = ({ puzzle, onSolve, showHint }: PuzzleProps) => {
+  const { t } = useTranslation();
   const [selected, setSelected] = useState<number | null>(null);
 
   const checkAnswer = () => {
@@ -260,7 +264,7 @@ const MultipleChoicePuzzle = ({ puzzle, onSolve, showHint }: PuzzleProps) => {
         ))}
       </div>
       <Button onClick={checkAnswer} disabled={selected === null} className="w-full">
-        Lock In Answer
+        {t('escapeRoom.renovated.lockInAnswer')}
       </Button>
     </div>
   );
@@ -268,6 +272,7 @@ const MultipleChoicePuzzle = ({ puzzle, onSolve, showHint }: PuzzleProps) => {
 
 // Sequence Puzzle
 const SequencePuzzle = ({ puzzle, onSolve, showHint }: PuzzleProps) => {
+  const { t } = useTranslation();
   const [order, setOrder] = useState<number[]>([]);
   const [available, setAvailable] = useState<number[]>(
     puzzle.items?.map((_, i) => i) || []
@@ -313,11 +318,11 @@ const SequencePuzzle = ({ puzzle, onSolve, showHint }: PuzzleProps) => {
       {/* Your Sequence */}
       <div className="space-y-2">
         <label className="text-sm font-medium flex items-center gap-2">
-          <ArrowRight className="h-4 w-4" /> Your Sequence:
+          <ArrowRight className="h-4 w-4" /> {t('escapeRoom.renovated.yourSequence')}
         </label>
         <div className="min-h-[60px] p-3 border-2 border-dashed border-primary/30 rounded-lg flex flex-wrap gap-2">
           {order.length === 0 ? (
-            <span className="text-muted-foreground text-sm">Click items below to add them in order...</span>
+            <span className="text-muted-foreground text-sm">{t('escapeRoom.renovated.clickToAddInOrder')}</span>
           ) : (
             order.map((itemIndex, position) => (
               <motion.button
@@ -338,7 +343,7 @@ const SequencePuzzle = ({ puzzle, onSolve, showHint }: PuzzleProps) => {
 
       {/* Available Items */}
       <div className="space-y-2">
-        <label className="text-sm font-medium">Available Items:</label>
+        <label className="text-sm font-medium">{t('escapeRoom.renovated.availableItems')}</label>
         <div className="flex flex-wrap gap-2">
           {available.map((itemIndex) => (
             <motion.button
@@ -356,14 +361,14 @@ const SequencePuzzle = ({ puzzle, onSolve, showHint }: PuzzleProps) => {
 
       <div className="flex gap-3">
         <Button variant="outline" onClick={reset} className="flex items-center gap-2">
-          <RotateCcw className="h-4 w-4" /> Reset
+          <RotateCcw className="h-4 w-4" /> {t('common.reset')}
         </Button>
         <Button
           onClick={checkAnswer}
           disabled={order.length !== puzzle.items?.length}
           className="flex-1"
         >
-          Check Order
+          {t('escapeRoom.renovated.checkOrder')}
         </Button>
       </div>
     </div>
@@ -372,6 +377,7 @@ const SequencePuzzle = ({ puzzle, onSolve, showHint }: PuzzleProps) => {
 
 // Match Puzzle
 const MatchPuzzle = ({ puzzle, onSolve, showHint }: PuzzleProps) => {
+  const { t } = useTranslation();
   const [matches, setMatches] = useState<Record<number, number>>({});
   const [selectedLeft, setSelectedLeft] = useState<number | null>(null);
 
@@ -481,14 +487,14 @@ const MatchPuzzle = ({ puzzle, onSolve, showHint }: PuzzleProps) => {
 
       <div className="flex gap-3">
         <Button variant="outline" onClick={reset} className="flex items-center gap-2">
-          <RotateCcw className="h-4 w-4" /> Reset
+          <RotateCcw className="h-4 w-4" /> {t('common.reset')}
         </Button>
         <Button
           onClick={checkAnswer}
           disabled={Object.keys(matches).length !== puzzle.pairs?.length}
           className="flex-1"
         >
-          Check Matches
+          {t('escapeRoom.renovated.checkMatches')}
         </Button>
       </div>
     </div>
@@ -497,6 +503,7 @@ const MatchPuzzle = ({ puzzle, onSolve, showHint }: PuzzleProps) => {
 
 // Cipher Puzzle
 const CipherPuzzle = ({ puzzle, onSolve, showHint }: PuzzleProps) => {
+  const { t } = useTranslation();
   const [answer, setAnswer] = useState("");
 
   const checkAnswer = () => {
@@ -515,7 +522,7 @@ const CipherPuzzle = ({ puzzle, onSolve, showHint }: PuzzleProps) => {
         {puzzle.cipherKey && (
           <div className="text-sm text-muted-foreground flex items-center gap-2">
             <Key className="h-4 w-4" />
-            Key: {puzzle.cipherKey}
+            {t('escapeRoom.renovated.key')}: {puzzle.cipherKey}
           </div>
         )}
       </div>
@@ -533,12 +540,12 @@ const CipherPuzzle = ({ puzzle, onSolve, showHint }: PuzzleProps) => {
         <Input
           value={answer}
           onChange={(e) => setAnswer(e.target.value)}
-          placeholder="Enter decoded message..."
+          placeholder={t('escapeRoom.renovated.decodePlaceholder')}
           onKeyDown={(e) => e.key === 'Enter' && checkAnswer()}
           className="flex-1"
         />
         <Button onClick={checkAnswer} disabled={!answer.trim()}>
-          Decode
+          {t('escapeRoom.renovated.decode')}
         </Button>
       </div>
     </div>
@@ -550,6 +557,7 @@ export default function EscapeRoomPlayRenovated() {
   const { roomId } = useParams();
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { t } = useTranslation();
   const { playSuccess, playError, playUnlock, playVictory, soundEnabled, setSoundEnabled } = useSound();
 
   const [room, setRoom] = useState<EscapeRoom | null>(null);
@@ -574,7 +582,7 @@ export default function EscapeRoomPlayRenovated() {
       if (roomData) {
         setRoom(roomData);
       } else {
-        toast.error("Escape room not found");
+        toast.error(t('escapeRoom.renovated.roomNotFound'));
         navigate('/escape-room');
       }
     }
@@ -637,8 +645,8 @@ export default function EscapeRoomPlayRenovated() {
         <div className="flex items-center gap-2">
           <CheckCircle className="h-5 w-5 text-green-500" />
           <div>
-            <div className="font-bold">Correct! +{currentPuzzle.points} points</div>
-            <div className="text-sm opacity-80">Clue revealed!</div>
+            <div className="font-bold">{t('escapeRoom.renovated.correctPoints', { points: currentPuzzle.points })}</div>
+            <div className="text-sm opacity-80">{t('escapeRoom.renovated.clueRevealed')}</div>
           </div>
         </div>,
         { duration: 3000 }
@@ -665,8 +673,8 @@ export default function EscapeRoomPlayRenovated() {
         <div className="flex items-center gap-2">
           <XCircle className="h-5 w-5 text-red-500" />
           <div>
-            <div className="font-bold">Not quite right</div>
-            <div className="text-sm opacity-80">Try again or use a hint</div>
+            <div className="font-bold">{t('escapeRoom.renovated.notQuiteRight')}</div>
+            <div className="text-sm opacity-80">{t('escapeRoom.renovated.tryAgainOrHint')}</div>
           </div>
         </div>,
         { duration: 2000 }
@@ -676,13 +684,13 @@ export default function EscapeRoomPlayRenovated() {
 
   const requestHint = () => {
     if (hintsUsed >= 3) {
-      toast.error("No hints remaining!");
+      toast.error(t('escapeRoom.renovated.noHintsRemaining'));
       return;
     }
     setHintsUsed(prev => prev + 1);
     setScore(prev => Math.max(0, prev - 5));
     setShowHint(true);
-    toast.info("Hint revealed! (-5 points)");
+    toast.info(t('escapeRoom.renovated.hintRevealedPoints'));
   };
 
   const checkFinalAnswer = () => {
@@ -721,8 +729,8 @@ export default function EscapeRoomPlayRenovated() {
 
       toast.success(
         <div className="text-center">
-          <div className="text-2xl mb-2">You Escaped!</div>
-          <div>Time Bonus: +{timeBonus} | Escape Bonus: +50</div>
+          <div className="text-2xl mb-2">{t('escapeRoom.renovated.youEscaped')}</div>
+          <div>{t('escapeRoom.renovated.timeBonusEscapeBonus', { timeBonus })}</div>
         </div>,
         { duration: 5000 }
       );
@@ -734,13 +742,13 @@ export default function EscapeRoomPlayRenovated() {
       if (attempts >= 2) {
         toast.error(
           <div>
-            <div className="font-bold">Not the answer...</div>
-            <div className="text-sm">Hint: {room.finalAnswer.hint}</div>
+            <div className="font-bold">{t('escapeRoom.renovated.notTheAnswer')}</div>
+            <div className="text-sm">{t('escapeRoom.renovated.hintLabel')}: {room.finalAnswer.hint}</div>
           </div>,
           { duration: 4000 }
         );
       } else {
-        toast.error("That's not it. Review the clues you've gathered!");
+        toast.error(t('escapeRoom.renovated.reviewClues'));
       }
     }
   };
@@ -750,7 +758,7 @@ export default function EscapeRoomPlayRenovated() {
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4" />
-          <p>Loading escape room...</p>
+          <p>{t('escapeRoom.renovated.loading')}</p>
         </div>
       </div>
     );
@@ -776,7 +784,7 @@ export default function EscapeRoomPlayRenovated() {
           >
             <div className="text-6xl mb-4">🎉</div>
             <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-yellow-500 via-amber-500 to-orange-500 bg-clip-text text-transparent">
-              ESCAPED!
+              {t('escapeRoom.renovated.escaped')}
             </h1>
             <p className="text-xl text-muted-foreground">{room.title}</p>
 
@@ -786,27 +794,27 @@ export default function EscapeRoomPlayRenovated() {
                   <div>
                     <Trophy className="h-8 w-8 mx-auto text-yellow-500 mb-2" />
                     <div className="text-2xl font-bold">{score}</div>
-                    <div className="text-xs text-muted-foreground">Points</div>
+                    <div className="text-xs text-muted-foreground">{t('escapeRoom.renovated.points')}</div>
                   </div>
                   <div>
                     <Clock className="h-8 w-8 mx-auto text-blue-500 mb-2" />
                     <div className="text-2xl font-bold">{Math.floor(timeElapsed / 60)}:{(timeElapsed % 60).toString().padStart(2, '0')}</div>
-                    <div className="text-xs text-muted-foreground">Time</div>
+                    <div className="text-xs text-muted-foreground">{t('escapeRoom.renovated.time')}</div>
                   </div>
                   <div>
                     <HelpCircle className="h-8 w-8 mx-auto text-amber-500 mb-2" />
                     <div className="text-2xl font-bold">{hintsUsed}</div>
-                    <div className="text-xs text-muted-foreground">Hints Used</div>
+                    <div className="text-xs text-muted-foreground">{t('escapeRoom.renovated.hintsUsed')}</div>
                   </div>
                 </div>
 
                 <div className="border-t pt-4">
-                  <h3 className="font-bold mb-2">The Answer:</h3>
+                  <h3 className="font-bold mb-2">{t('escapeRoom.renovated.theAnswer')}</h3>
                   <p className="text-lg text-primary font-semibold">{room.finalAnswer.answer}</p>
                 </div>
 
                 <div className="border-t pt-4">
-                  <h3 className="font-bold mb-2">Explanation:</h3>
+                  <h3 className="font-bold mb-2">{t('escapeRoom.renovated.explanation')}</h3>
                   <p className="text-sm text-muted-foreground leading-relaxed">{room.finalAnswer.explanation}</p>
                 </div>
 
@@ -819,10 +827,10 @@ export default function EscapeRoomPlayRenovated() {
 
             <div className="flex justify-center gap-4">
               <Button variant="outline" onClick={() => navigate('/escape-room')}>
-                Back to Rooms
+                {t('escapeRoom.renovated.backToRooms')}
               </Button>
               <Button onClick={() => window.location.reload()}>
-                Play Again
+                {t('escapeRoom.renovated.playAgain')}
               </Button>
             </div>
           </motion.div>
@@ -838,13 +846,13 @@ export default function EscapeRoomPlayRenovated() {
         <Navigation />
         <main className="container mx-auto px-4 pt-24 pb-12 max-w-4xl text-center space-y-8">
           <div className="text-6xl mb-4">⏱️</div>
-          <h1 className="text-4xl font-bold text-destructive">Time's Up!</h1>
-          <p className="text-muted-foreground">You ran out of time in {room.title}</p>
+          <h1 className="text-4xl font-bold text-destructive">{t('escapeRoom.renovated.timesUp')}</h1>
+          <p className="text-muted-foreground">{t('escapeRoom.renovated.ranOutOfTime', { title: room.title })}</p>
 
           <Card className="max-w-md mx-auto">
             <CardContent className="pt-6 space-y-4">
               <div className="text-center">
-                <p className="text-sm text-muted-foreground mb-2">The answer was:</p>
+                <p className="text-sm text-muted-foreground mb-2">{t('escapeRoom.renovated.answerWas')}</p>
                 <p className="text-lg font-bold text-primary">{room.finalAnswer.answer}</p>
               </div>
               <p className="text-sm text-muted-foreground">{room.finalAnswer.explanation}</p>
@@ -853,10 +861,10 @@ export default function EscapeRoomPlayRenovated() {
 
           <div className="flex justify-center gap-4">
             <Button variant="outline" onClick={() => navigate('/escape-room')}>
-              Back to Rooms
+              {t('escapeRoom.renovated.backToRooms')}
             </Button>
             <Button onClick={() => window.location.reload()}>
-              Try Again
+              {t('escapeRoom.renovated.tryAgain')}
             </Button>
           </div>
         </main>
@@ -907,11 +915,11 @@ export default function EscapeRoomPlayRenovated() {
                 </div>
                 <div className="flex items-center gap-2 text-white">
                   <HelpCircle className="h-5 w-5" />
-                  <span>{3 - hintsUsed} hints</span>
+                  <span>{t('escapeRoom.renovated.hintsCount', { count: 3 - hintsUsed })}</span>
                 </div>
               </div>
               <div className="flex items-center gap-2 text-white">
-                <span className="text-sm">Puzzle {currentPuzzleIndex + 1}/{room.puzzles.length}</span>
+                <span className="text-sm">{t('escapeRoom.renovated.puzzleProgress', { current: currentPuzzleIndex + 1, total: room.puzzles.length })}</span>
                 <Progress value={progress} className="w-32 h-2" />
               </div>
             </div>
@@ -934,11 +942,11 @@ export default function EscapeRoomPlayRenovated() {
                       <div className="flex items-center justify-between">
                         <div>
                           <Badge className="mb-2">{currentPuzzle.type.replace('-', ' ').toUpperCase()}</Badge>
-                          <CardTitle className="text-xl">Puzzle {currentPuzzleIndex + 1}</CardTitle>
+                          <CardTitle className="text-xl">{t('escapeRoom.renovated.puzzleNumber', { number: currentPuzzleIndex + 1 })}</CardTitle>
                         </div>
                         <div className="text-right">
                           <div className="text-2xl font-bold text-primary">{currentPuzzle.points}</div>
-                          <div className="text-xs text-muted-foreground">points</div>
+                          <div className="text-xs text-muted-foreground">{t('escapeRoom.renovated.points')}</div>
                         </div>
                       </div>
                     </CardHeader>
@@ -952,7 +960,7 @@ export default function EscapeRoomPlayRenovated() {
                         >
                           <div className="flex items-center gap-2 text-blue-600 dark:text-blue-400 font-semibold text-sm">
                             <AlertTriangle className="h-4 w-4" />
-                            MISSION BRIEFING
+                            {t('escapeRoom.renovated.missionBriefing')}
                           </div>
                           <p className="text-sm text-muted-foreground italic">{room.storyIntro}</p>
                         </motion.div>
@@ -962,18 +970,18 @@ export default function EscapeRoomPlayRenovated() {
                       <div className="bg-gradient-to-r from-emerald-500/10 to-green-500/10 border border-emerald-500/20 rounded-lg p-4 space-y-2">
                         <div className="flex items-center gap-2 text-emerald-600 dark:text-emerald-400 font-semibold text-sm">
                           <Zap className="h-4 w-4" />
-                          YOUR MISSION
+                          {t('escapeRoom.renovated.yourMission')}
                         </div>
                         <p className="text-sm font-medium">
-                          {currentPuzzle.type === 'riddle' && "Solve this riddle by entering your answer. Use the Phototheology principle shown below to guide your thinking."}
-                          {currentPuzzle.type === 'fill-blank' && "Fill in the missing word(s) to complete this biblical truth. The principle below will help you find the answer."}
-                          {currentPuzzle.type === 'multiple-choice' && "Choose the correct answer from the options. Apply the Phototheology principle to identify the right choice."}
-                          {currentPuzzle.type === 'sequence' && "Arrange these items in the correct order. Use the principle to understand the proper sequence."}
-                          {currentPuzzle.type === 'match' && "Match each item on the left with its corresponding pair on the right. The principle reveals the connections."}
-                          {currentPuzzle.type === 'cipher' && "Decode this encrypted message using the key provided. The principle will help you understand the hidden meaning."}
+                          {currentPuzzle.type === 'riddle' && t('escapeRoom.renovated.missionRiddle')}
+                          {currentPuzzle.type === 'fill-blank' && t('escapeRoom.renovated.missionFillBlank')}
+                          {currentPuzzle.type === 'multiple-choice' && t('escapeRoom.renovated.missionMultipleChoice')}
+                          {currentPuzzle.type === 'sequence' && t('escapeRoom.renovated.missionSequence')}
+                          {currentPuzzle.type === 'match' && t('escapeRoom.renovated.missionMatch')}
+                          {currentPuzzle.type === 'cipher' && t('escapeRoom.renovated.missionCipher')}
                         </p>
                         <p className="text-xs text-muted-foreground">
-                          Each correct answer reveals a CLUE. Collect all clues to unlock the final puzzle and escape!
+                          {t('escapeRoom.renovated.collectCluesInstruction')}
                         </p>
                       </div>
 
@@ -1002,15 +1010,15 @@ export default function EscapeRoomPlayRenovated() {
                             <Card className="bg-primary/5 border-primary/20">
                               <CardContent className="pt-4 space-y-3">
                                 <div>
-                                  <h4 className="font-semibold text-sm text-primary mb-1">What is {currentPuzzle.principle.name}?</h4>
+                                  <h4 className="font-semibold text-sm text-primary mb-1">{t('escapeRoom.renovated.whatIs', { name: currentPuzzle.principle.name })}</h4>
                                   <p className="text-sm text-muted-foreground">{currentPuzzle.principle.explanation}</p>
                                 </div>
                                 <div>
-                                  <h4 className="font-semibold text-sm text-primary mb-1">How to Apply:</h4>
+                                  <h4 className="font-semibold text-sm text-primary mb-1">{t('escapeRoom.renovated.howToApply')}</h4>
                                   <p className="text-sm text-muted-foreground">{currentPuzzle.principle.howToApply}</p>
                                 </div>
                                 <Badge variant="outline" className="text-xs">
-                                  From: {currentPuzzle.principle.room}
+                                  {t('escapeRoom.renovated.from')}: {currentPuzzle.principle.room}
                                 </Badge>
                               </CardContent>
                             </Card>
@@ -1042,7 +1050,7 @@ export default function EscapeRoomPlayRenovated() {
                       {!showHint && hintsUsed < 3 && (
                         <Button variant="outline" onClick={requestHint} className="w-full">
                           <Lightbulb className="h-4 w-4 mr-2" />
-                          Use Hint (-5 points) | {3 - hintsUsed} remaining
+                          {t('escapeRoom.renovated.useHint', { remaining: 3 - hintsUsed })}
                         </Button>
                       )}
                     </CardContent>
@@ -1060,17 +1068,16 @@ export default function EscapeRoomPlayRenovated() {
                           <Key className="h-6 w-6 text-primary-foreground" />
                         </div>
                         <div>
-                          <CardTitle className="text-2xl">Final Lock</CardTitle>
-                          <CardDescription>Use your gathered clues to find the answer</CardDescription>
+                          <CardTitle className="text-2xl">{t('escapeRoom.renovated.finalLock')}</CardTitle>
+                          <CardDescription>{t('escapeRoom.renovated.useCluesForAnswer')}</CardDescription>
                         </div>
                       </div>
                     </CardHeader>
                     <CardContent className="space-y-6 pt-6">
                       <div className="bg-gradient-to-r from-amber-500/10 to-orange-500/10 border border-amber-500/20 rounded-lg p-6">
-                        <h3 className="font-bold mb-2">The Question:</h3>
+                        <h3 className="font-bold mb-2">{t('escapeRoom.renovated.theQuestion')}</h3>
                         <p className="text-lg">
-                          Based on all the clues you've gathered, what is the {room.finalAnswer.type}
-                          that unlocks this room?
+                          {t('escapeRoom.renovated.finalQuestion', { type: room.finalAnswer.type })}
                         </p>
                       </div>
 
@@ -1078,13 +1085,13 @@ export default function EscapeRoomPlayRenovated() {
                         <Input
                           value={finalAnswerInput}
                           onChange={(e) => setFinalAnswerInput(e.target.value)}
-                          placeholder="Enter the final answer..."
+                          placeholder={t('escapeRoom.renovated.finalAnswerPlaceholder')}
                           onKeyDown={(e) => e.key === 'Enter' && checkFinalAnswer()}
                           className="flex-1 text-lg"
                         />
                         <Button onClick={checkFinalAnswer} size="lg" disabled={!finalAnswerInput.trim()}>
                           <Unlock className="h-5 w-5 mr-2" />
-                          Escape!
+                          {t('escapeRoom.renovated.escape')}
                         </Button>
                       </div>
 
@@ -1092,7 +1099,7 @@ export default function EscapeRoomPlayRenovated() {
                         <div className="bg-amber-500/10 border border-amber-500/30 rounded-lg p-4 flex items-start gap-3">
                           <AlertTriangle className="h-5 w-5 text-amber-500 flex-shrink-0 mt-0.5" />
                           <p className="text-sm text-amber-600 dark:text-amber-400">
-                            Hint: {room.finalAnswer.hint}
+                            {t('escapeRoom.renovated.hintLabel')}: {room.finalAnswer.hint}
                           </p>
                         </div>
                       )}
@@ -1109,10 +1116,10 @@ export default function EscapeRoomPlayRenovated() {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Sparkles className="h-5 w-5 text-amber-500" />
-                  Clues Gathered
+                  {t('escapeRoom.renovated.cluesGathered')}
                 </CardTitle>
                 <CardDescription>
-                  {cluesRevealed.length}/{room.puzzles.length} clues found
+                  {t('escapeRoom.renovated.cluesFound', { found: cluesRevealed.length, total: room.puzzles.length })}
                 </CardDescription>
               </CardHeader>
               <CardContent>
@@ -1121,7 +1128,7 @@ export default function EscapeRoomPlayRenovated() {
                     {cluesRevealed.length === 0 ? (
                       <div className="text-center py-8 text-muted-foreground">
                         <Lock className="h-8 w-8 mx-auto mb-2 opacity-50" />
-                        <p className="text-sm">Solve puzzles to reveal clues...</p>
+                        <p className="text-sm">{t('escapeRoom.renovated.solvePuzzlesToReveal')}</p>
                       </div>
                     ) : (
                       cluesRevealed.map((clue, index) => (

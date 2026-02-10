@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback, useRef, Suspense } from "react";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { OrbitControls, Html, Stars, Text } from "@react-three/drei";
 import * as THREE from "three";
@@ -274,6 +275,7 @@ function WordBlock({ word, position, isCorrect, isTarget, onClick, speed }: Word
 
 // Score display pillar
 function ScorePillar({ score, streak }: { score: number; streak: number }) {
+  const { t } = useTranslation();
   const height = Math.min(10, 2 + score / 50);
 
   return (
@@ -310,10 +312,10 @@ function ScorePillar({ score, streak }: { score: number; streak: number }) {
           }}
         >
           <div style={{ fontSize: '24px' }}>{score}</div>
-          <div style={{ fontSize: '12px' }}>POINTS</div>
+          <div style={{ fontSize: '12px' }}>{t('games.common.points').toUpperCase()}</div>
           {streak > 1 && (
             <div style={{ fontSize: '14px', color: '#dc2626', marginTop: '4px' }}>
-              x{streak} STREAK
+              x{streak} {t('games.common.streak').toUpperCase()}
             </div>
           )}
         </div>
@@ -464,6 +466,7 @@ interface FallingWord {
 
 export default function SpeedVerse3D() {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const { toast } = useToast();
   const { user } = useAuth();
 
@@ -631,12 +634,12 @@ export default function SpeedVerse3D() {
       setBestStreak(prev => Math.max(prev, streak + 1));
       setCorrectAnswers(prev => prev + 1);
 
-      setFeedback({ type: "correct", message: `+${points} points!` });
+      setFeedback({ type: "correct", message: t('games.common.plusPoints', { points }) });
       setTimeout(() => setFeedback(null), 1000);
 
       toast({
-        title: "Correct!",
-        description: `+${points} points`,
+        title: t('games.common.correct'),
+        description: t('games.common.plusPoints', { points }),
       });
 
       // Check if verse is complete
@@ -658,12 +661,12 @@ export default function SpeedVerse3D() {
     } else {
       setStreak(0);
       setWrongAnswers(prev => prev + 1);
-      setFeedback({ type: "wrong", message: "Wrong word!" });
+      setFeedback({ type: "wrong", message: t('games.speedVerse.wrongWord') });
       setTimeout(() => setFeedback(null), 1000);
 
       toast({
-        title: "Wrong!",
-        description: "That's not the right word",
+        title: t('games.common.wrong'),
+        description: t('games.speedVerse.notRightWord'),
         variant: "destructive",
       });
     }
@@ -712,39 +715,39 @@ export default function SpeedVerse3D() {
             <Card className="text-center">
               <CardHeader>
                 <Trophy className="h-16 w-16 mx-auto text-yellow-500 mb-4" />
-                <CardTitle className="text-3xl">Race Complete!</CardTitle>
+                <CardTitle className="text-3xl">{t('games.speedVerse.raceComplete')}</CardTitle>
                 <CardDescription>
-                  You've finished the Speed Verse 3D challenge!
+                  {t('games.speedVerse.raceCompleteDesc')}
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
                 <div className="grid grid-cols-2 gap-4">
                   <div className="p-4 bg-primary/10 rounded-lg">
                     <div className="text-3xl font-bold text-primary">{score}</div>
-                    <div className="text-sm text-muted-foreground">Total Score</div>
+                    <div className="text-sm text-muted-foreground">{t('games.common.totalScore')}</div>
                   </div>
                   <div className="p-4 bg-green-500/10 rounded-lg">
                     <div className="text-3xl font-bold text-green-600">{accuracy}%</div>
-                    <div className="text-sm text-muted-foreground">Accuracy</div>
+                    <div className="text-sm text-muted-foreground">{t('games.common.accuracy')}</div>
                   </div>
                   <div className="p-4 bg-orange-500/10 rounded-lg">
                     <div className="text-3xl font-bold text-orange-600">{bestStreak}</div>
-                    <div className="text-sm text-muted-foreground">Best Streak</div>
+                    <div className="text-sm text-muted-foreground">{t('games.common.bestStreak')}</div>
                   </div>
                   <div className="p-4 bg-purple-500/10 rounded-lg">
                     <div className="text-3xl font-bold text-purple-600">{currentVerseIndex}</div>
-                    <div className="text-sm text-muted-foreground">Verses</div>
+                    <div className="text-sm text-muted-foreground">{t('games.speedVerse.verses')}</div>
                   </div>
                 </div>
 
                 <div className="flex gap-4 justify-center">
                   <Button onClick={() => navigate("/games")}>
                     <ArrowLeft className="mr-2 h-4 w-4" />
-                    Back to Games
+                    {t('games.common.backToGames')}
                   </Button>
                   <Button onClick={() => setGameState("menu")} variant="outline">
                     <RotateCcw className="mr-2 h-4 w-4" />
-                    Play Again
+                    {t('games.common.playAgain')}
                   </Button>
                 </div>
               </CardContent>
@@ -828,16 +831,16 @@ export default function SpeedVerse3D() {
               <CardHeader>
                 <CardTitle className="text-3xl flex items-center gap-3">
                   <span className="text-4xl">&#x26A1;</span>
-                  Speed Verse 3D
+                  {t('games.speedVerse.title')}
                 </CardTitle>
                 <CardDescription>
-                  Race against time on a heavenly track! Click the correct words as they fly toward you to complete Bible verses.
+                  {t('games.speedVerse.description')}
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
                 {/* Difficulty Selection */}
                 <div>
-                  <h3 className="font-semibold mb-3">Select Difficulty</h3>
+                  <h3 className="font-semibold mb-3">{t('games.common.selectDifficulty')}</h3>
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                     {(Object.keys(DIFFICULTY_SETTINGS) as Difficulty[]).map((d) => {
                       const s = DIFFICULTY_SETTINGS[d];
@@ -864,12 +867,12 @@ export default function SpeedVerse3D() {
                               {d === "hard" && <Zap className="h-5 w-5" />}
                               {d === "expert" && <Trophy className="h-5 w-5" />}
                             </div>
-                            <div className="font-semibold">{s.name}</div>
+                            <div className="font-semibold">{t(`games.common.difficulty.${d}`)}</div>
                             <div className="text-xs text-muted-foreground mt-1">
-                              {s.timeLimit}s limit
+                              {t('games.common.timeLimit', { seconds: s.timeLimit })}
                             </div>
                             <div className="text-xs text-muted-foreground">
-                              {s.pointsMultiplier}x points
+                              {t('games.common.pointsMultiplier', { multiplier: s.pointsMultiplier })}
                             </div>
                           </CardContent>
                         </Card>
@@ -879,7 +882,7 @@ export default function SpeedVerse3D() {
                 </div>
 
                 <Button onClick={startGame} size="lg" className="w-full">
-                  Start Racing
+                  {t('games.speedVerse.startRacing')}
                 </Button>
 
                 <Button
@@ -888,7 +891,7 @@ export default function SpeedVerse3D() {
                   className="w-full"
                 >
                   <ArrowLeft className="mr-2 h-4 w-4" />
-                  Back to Games
+                  {t('games.common.backToGames')}
                 </Button>
               </CardContent>
             </Card>
@@ -919,7 +922,7 @@ export default function SpeedVerse3D() {
                       {timeRemaining}s
                     </div>
                     <Badge variant="outline">
-                      Verse {currentVerseIndex + 1} / {verses.length}
+                      {t('games.speedVerse.verseProgress', { current: currentVerseIndex + 1, total: verses.length })}
                     </Badge>
                   </div>
                 </div>
@@ -947,8 +950,7 @@ export default function SpeedVerse3D() {
               <Card className="bg-background/95 backdrop-blur max-w-2xl mx-auto">
                 <CardContent className="py-3 text-center">
                   <p className="text-sm text-muted-foreground">
-                    Click the <span className="text-green-500 font-semibold">green</span> word blocks to fill in the verse!
-                    Avoid the <span className="text-orange-500 font-semibold">orange</span> decoys.
+                    {t('games.speedVerse.clickGreen')} {t('games.speedVerse.avoidOrange')}
                   </p>
                 </CardContent>
               </Card>

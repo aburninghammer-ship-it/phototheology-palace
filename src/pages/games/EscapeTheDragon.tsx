@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { Navigation } from "@/components/Navigation";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -45,6 +46,7 @@ const CARD_EXPLANATIONS: Record<string, string> = {
 
 export default function EscapeTheDragon() {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const { user } = useAuth();
   const [lives, setLives] = useState(3);
   const [round, setRound] = useState(1);
@@ -98,11 +100,11 @@ export default function EscapeTheDragon() {
 
   const handleSubmit = async () => {
     if (selectedCards.length !== 2) {
-      toast.error("Play exactly 2 cards for defense");
+      toast.error(t('games.escapeTheDragon.errorPlayTwo'));
       return;
     }
     if (!defense.trim()) {
-      toast.error("Explain your theological defense");
+      toast.error(t('games.escapeTheDragon.errorExplainDefense'));
       return;
     }
 
@@ -123,13 +125,13 @@ export default function EscapeTheDragon() {
       const { survived, feedback } = data;
 
       if (survived) {
-        toast.success(`Defense successful! ${feedback}`, {
+        toast.success(t('games.escapeTheDragon.defenseSuccessful', { feedback }), {
           duration: 8000, // 8 seconds to read the feedback
         });
         setRound(prev => prev + 1);
         
         if (round >= 10) {
-          toast.success("🏆 Victory! You survived 10 dragon attacks!", {
+          toast.success(t('games.escapeTheDragon.victory'), {
             duration: 6000,
           });
         } else {
@@ -137,12 +139,12 @@ export default function EscapeTheDragon() {
         }
       } else {
         setLives(prev => prev - 1);
-        toast.error(`Failed defense: ${feedback}`, {
+        toast.error(t('games.escapeTheDragon.failedDefense', { feedback }), {
           duration: 8000, // 8 seconds to read the feedback
         });
         
         if (lives - 1 <= 0) {
-          toast.error("💀 The dragon wins. Game over.", {
+          toast.error(t('games.escapeTheDragon.dragonWins'), {
             duration: 6000,
           });
         } else {
@@ -151,7 +153,7 @@ export default function EscapeTheDragon() {
       }
     } catch (error) {
       console.error(error);
-      toast.error("Failed to validate defense");
+      toast.error(t('games.escapeTheDragon.errorValidation'));
     } finally {
       setIsSubmitting(false);
     }
@@ -167,18 +169,18 @@ export default function EscapeTheDragon() {
               <CardHeader>
                 <Skull className="h-16 w-16 mx-auto text-red-400 mb-4" />
                 <CardTitle className="text-3xl text-red-400">
-                  💀 DRAGON VICTORY
+                  {t('games.escapeTheDragon.dragonVictory')}
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
-                <div className="text-4xl font-bold text-red-400">{round - 1} Rounds</div>
+                <div className="text-4xl font-bold text-red-400">{t('games.common.roundsValue', { rounds: round - 1 })}</div>
                 <p className="text-red-100/80">
-                  You survived {round - 1} rounds before falling
+                  {t('games.escapeTheDragon.survivedRounds', { rounds: round - 1 })}
                 </p>
                 <div className="flex gap-4 justify-center">
                   <Button onClick={() => navigate("/games")}>
                     <ArrowLeft className="mr-2 h-4 w-4" />
-                    Back to Games
+                    {t('games.common.backToGames')}
                   </Button>
                   <Button onClick={() => {
                     setLives(3);
@@ -186,7 +188,7 @@ export default function EscapeTheDragon() {
                     setScoreSaved(false);
                     startRound();
                   }} variant="outline">
-                    Try Again
+                    {t('games.common.tryAgain')}
                   </Button>
                 </div>
               </CardContent>
@@ -208,18 +210,18 @@ export default function EscapeTheDragon() {
               <CardHeader>
                 <Trophy className="h-16 w-16 mx-auto text-yellow-500 mb-4" />
                 <CardTitle className="text-3xl text-emerald-400">
-                  🏆 REMNANT VICTORY!
+                  {t('games.escapeTheDragon.remnantVictory')}
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
-                <div className="text-4xl font-bold text-emerald-400">10 Rounds</div>
+                <div className="text-4xl font-bold text-emerald-400">{t('games.common.roundsValue', { rounds: 10 })}</div>
                 <p className="text-emerald-100/80">
-                  You survived all 10 dragon attacks!
+                  {t('games.escapeTheDragon.survivedAll')}
                 </p>
                 <div className="flex gap-4 justify-center">
                   <Button onClick={() => navigate("/games")}>
                     <ArrowLeft className="mr-2 h-4 w-4" />
-                    Back to Games
+                    {t('games.common.backToGames')}
                   </Button>
                   <Button onClick={() => {
                     setLives(3);
@@ -227,7 +229,7 @@ export default function EscapeTheDragon() {
                     setScoreSaved(false);
                     startRound();
                   }} variant="outline">
-                    Play Again
+                    {t('games.common.playAgain')}
                   </Button>
                 </div>
               </CardContent>
@@ -245,10 +247,10 @@ export default function EscapeTheDragon() {
         <div className="flex justify-between items-center mb-8">
           <Button variant="ghost" onClick={() => navigate("/games")} className="text-white">
             <ArrowLeft className="mr-2" />
-            Back
+            {t('common.back')}
           </Button>
           <h1 className="text-4xl font-bold text-orange-400" style={{ fontFamily: "'Cinzel', serif" }}>
-            🐉 ESCAPE THE DRAGON
+            {t('games.escapeTheDragon.title')}
           </h1>
           <div className="text-right">
             <div className="flex gap-1 mb-1">
@@ -256,7 +258,7 @@ export default function EscapeTheDragon() {
                 <Heart key={i} className={`w-6 h-6 ${i < lives ? 'text-red-500 fill-red-500' : 'text-gray-600'}`} />
               ))}
             </div>
-            <div className="text-orange-200/60 text-sm">Round {round}/10</div>
+            <div className="text-orange-200/60 text-sm">{t('games.common.roundOf', { current: round, total: 10 })}</div>
           </div>
         </div>
 
@@ -265,7 +267,7 @@ export default function EscapeTheDragon() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-red-400">
                 <Skull className="w-6 h-6" />
-                Dragon Attack!
+                {t('games.escapeTheDragon.dragonAttack')}
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -277,7 +279,7 @@ export default function EscapeTheDragon() {
 
           <Card className="bg-black/40 border-orange-500/50">
             <CardHeader>
-              <CardTitle className="text-orange-300">Your Defense Cards</CardTitle>
+              <CardTitle className="text-orange-300">{t('games.escapeTheDragon.defenseCards')}</CardTitle>
             </CardHeader>
             <CardContent>
               <TooltipProvider>
@@ -302,24 +304,24 @@ export default function EscapeTheDragon() {
                 </div>
               </TooltipProvider>
               <p className="text-sm text-muted-foreground mt-2">
-                Select 2 cards to defend (tap cards for explanations)
+                {t('games.escapeTheDragon.selectTwoCards')}
               </p>
             </CardContent>
           </Card>
 
           <Card className="bg-black/40 border-orange-500/50">
             <CardHeader>
-              <CardTitle className="text-orange-300">Theological Defense</CardTitle>
+              <CardTitle className="text-orange-300">{t('games.escapeTheDragon.theologicalDefense')}</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <Textarea
                 value={defense}
                 onChange={(e) => setDefense(e.target.value)}
-                placeholder="Explain how your 2 cards answer this attack with Scripture..."
+                placeholder={t('games.escapeTheDragon.defensePlaceholder')}
                 className="bg-black/60 border-orange-500/30 text-white min-h-32"
               />
               <Button onClick={handleSubmit} disabled={isSubmitting} className="w-full">
-                {isSubmitting ? "Defending..." : "Defend Against Attack"}
+                {isSubmitting ? t('games.escapeTheDragon.defending') : t('games.escapeTheDragon.defendAgainstAttack')}
               </Button>
             </CardContent>
           </Card>

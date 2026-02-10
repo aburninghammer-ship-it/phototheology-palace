@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
@@ -38,6 +39,7 @@ interface TrainingVideo {
 }
 
 const VideoTraining = () => {
+  const { t } = useTranslation();
   const { user } = useAuth();
   const { preferences } = useUserPreferences();
   const queryClient = useQueryClient();
@@ -158,7 +160,7 @@ const VideoTraining = () => {
       return { success: true };
     },
     onSuccess: () => {
-      toast.success("Video uploaded successfully!");
+      toast.success(t('videoTraining.uploadSuccess'));
       queryClient.invalidateQueries({ queryKey: ["training-videos"] });
       setTitle("");
       setDescription("");
@@ -168,7 +170,7 @@ const VideoTraining = () => {
       setIsUploading(false);
     },
     onError: (error) => {
-      toast.error(`Failed to upload video: ${error.message}`);
+      toast.error(t('videoTraining.uploadFailed', { error: error.message }));
       setIsUploading(false);
     },
   });
@@ -184,22 +186,22 @@ const VideoTraining = () => {
       if (error) throw error;
     },
     onSuccess: () => {
-      toast.success("Video deleted successfully!");
+      toast.success(t('videoTraining.deleteSuccess'));
       queryClient.invalidateQueries({ queryKey: ["training-videos"] });
       setSelectedVideo(null);
     },
     onError: (error) => {
-      toast.error(`Failed to delete video: ${error.message}`);
+      toast.error(t('videoTraining.deleteFailed', { error: error.message }));
     },
   });
 
   const categories = [
-    { value: "all", label: "All Videos" },
-    { value: "general", label: "General" },
-    { value: "palace", label: "Palace Training" },
-    { value: "games", label: "Games & Features" },
-    { value: "bible-study", label: "Bible Study" },
-    { value: "advanced", label: "Advanced" },
+    { value: "all", label: t('videoTraining.categories.allVideos') },
+    { value: "general", label: t('videoTraining.categories.general') },
+    { value: "palace", label: t('videoTraining.categories.palaceTraining') },
+    { value: "games", label: t('videoTraining.categories.gamesFeatures') },
+    { value: "bible-study", label: t('videoTraining.categories.bibleStudy') },
+    { value: "advanced", label: t('videoTraining.categories.advanced') },
   ];
 
   // Dynamic meta tags for social sharing
@@ -240,50 +242,50 @@ const VideoTraining = () => {
       {preferences.navigation_style === "simplified" ? <SimplifiedNav /> : <Navigation />}
       <div className="flex justify-between items-center mb-8">
         <div>
-          <h1 className="text-4xl font-bold mb-2">Video Training</h1>
+          <h1 className="text-4xl font-bold mb-2">{t('videoTraining.title')}</h1>
           <p className="text-muted-foreground">
-            Learn how to use Phototheology with step-by-step video tutorials
+            {t('videoTraining.description')}
           </p>
         </div>
         
         <div className="flex gap-2">
-          <HowItWorksDialog title="How to Use Video Training" steps={videoTrainingSteps} />
+          <HowItWorksDialog title={t('videoTraining.howToUseTitle')} steps={videoTrainingSteps} />
           {isVideoAdmin && (
           <Dialog>
             <DialogTrigger asChild>
               <Button>
                 <Upload className="mr-2 h-4 w-4" />
-                Upload Video
+                {t('videoTraining.uploadVideo')}
               </Button>
             </DialogTrigger>
             <DialogContent className="max-w-xl">
               <DialogHeader>
-                <DialogTitle>Upload Training Video</DialogTitle>
+                <DialogTitle>{t('videoTraining.uploadTrainingVideo')}</DialogTitle>
               </DialogHeader>
               <div className="space-y-4">
                 <div>
-                  <Label htmlFor="title">Title</Label>
+                  <Label htmlFor="title">{t('videoTraining.form.title')}</Label>
                   <Input
                     id="title"
                     value={title}
                     onChange={(e) => setTitle(e.target.value)}
-                    placeholder="Getting Started with Phototheology"
+                    placeholder={t('videoTraining.form.titlePlaceholder')}
                   />
                 </div>
                 
                 <div>
-                  <Label htmlFor="description">Description</Label>
+                  <Label htmlFor="description">{t('videoTraining.form.description')}</Label>
                   <Textarea
                     id="description"
                     value={description}
                     onChange={(e) => setDescription(e.target.value)}
-                    placeholder="A comprehensive introduction to..."
+                    placeholder={t('videoTraining.form.descriptionPlaceholder')}
                     rows={3}
                   />
                 </div>
                 
                 <div>
-                  <Label htmlFor="category">Category</Label>
+                  <Label htmlFor="category">{t('videoTraining.form.category')}</Label>
                   <Select value={category} onValueChange={setCategory}>
                     <SelectTrigger>
                       <SelectValue />
@@ -299,7 +301,7 @@ const VideoTraining = () => {
                 </div>
                 
                 <div>
-                  <Label htmlFor="video">Video File</Label>
+                  <Label htmlFor="video">{t('videoTraining.form.videoFile')}</Label>
                   <Input
                     id="video"
                     type="file"
@@ -309,7 +311,7 @@ const VideoTraining = () => {
                 </div>
                 
                 <div>
-                  <Label htmlFor="thumbnail">Thumbnail Image (Optional)</Label>
+                  <Label htmlFor="thumbnail">{t('videoTraining.form.thumbnailLabel')}</Label>
                   <Input
                     id="thumbnail"
                     type="file"
@@ -317,7 +319,7 @@ const VideoTraining = () => {
                     onChange={(e) => setThumbnailFile(e.target.files?.[0] || null)}
                   />
                   <p className="text-xs text-muted-foreground mt-1">
-                    Recommended size: 1280x720 (16:9 ratio)
+                    {t('videoTraining.form.thumbnailHint')}
                   </p>
                 </div>
                 
@@ -326,7 +328,7 @@ const VideoTraining = () => {
                   disabled={!title || !videoFile || isUploading}
                   className="w-full"
                 >
-                  {isUploading ? "Uploading..." : "Upload Video"}
+                  {isUploading ? t('videoTraining.uploading') : t('videoTraining.uploadVideo')}
                 </Button>
               </div>
             </DialogContent>
@@ -346,7 +348,7 @@ const VideoTraining = () => {
 
         <TabsContent value={activeCategory}>
           {isLoading ? (
-            <div className="text-center py-12">Loading videos...</div>
+            <div className="text-center py-12">{t('videoTraining.loadingVideos')}</div>
           ) : videos && videos.length > 0 ? (
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
               {videos.map((video) => (
@@ -387,7 +389,7 @@ const VideoTraining = () => {
             <Card>
               <CardContent className="flex flex-col items-center justify-center py-12">
                 <Video className="h-12 w-12 text-muted-foreground mb-4" />
-                <p className="text-muted-foreground">No videos in this category yet</p>
+                <p className="text-muted-foreground">{t('videoTraining.noVideosInCategory')}</p>
               </CardContent>
             </Card>
           )}

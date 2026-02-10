@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { Navigation } from "@/components/Navigation";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -10,6 +11,7 @@ const KidsGamePlay = () => {
   const { gameId } = useParams<{ gameId: string }>();
   const { user, loading } = useAuth();
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   const gameData: Record<string, { name: string; description: string; icon: string }> = {
     palace_explorer: { name: "🏰 Palace Explorer", description: "Go on an adventure through the 9 rooms!", icon: "🗺️" },
@@ -49,7 +51,7 @@ const KidsGamePlay = () => {
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
-          <p className="text-muted-foreground">Loading...</p>
+          <p className="text-muted-foreground">{t('common.loading')}</p>
         </div>
       </div>
     );
@@ -65,11 +67,11 @@ const KidsGamePlay = () => {
         <Navigation />
         <main className="container mx-auto px-4 py-8">
           <div className="max-w-2xl mx-auto text-center space-y-6">
-            <h1 className="text-4xl font-bold text-destructive">Game Not Found</h1>
-            <p className="text-muted-foreground">The game you're looking for doesn't exist.</p>
+            <h1 className="text-4xl font-bold text-destructive">{t('games.notFound')}</h1>
+            <p className="text-muted-foreground">{t('games.notFoundDescription')}</p>
             <Button onClick={() => navigate("/kids-games")} variant="outline">
               <ArrowLeft className="mr-2 h-4 w-4" />
-              Back to Games
+              {t('games.backToGames')}
             </Button>
           </div>
         </main>
@@ -84,7 +86,7 @@ const KidsGamePlay = () => {
         <div className="max-w-4xl mx-auto space-y-6">
           <Button onClick={() => navigate("/kids-games")} variant="ghost">
             <ArrowLeft className="mr-2 h-4 w-4" />
-            Back to Games
+            {t('games.backToGames')}
           </Button>
 
           <Card className="border-2 border-primary/20">
@@ -96,14 +98,13 @@ const KidsGamePlay = () => {
             <CardContent className="space-y-6">
               <div className="bg-gradient-to-r from-yellow-50 to-orange-50 dark:from-yellow-950/20 dark:to-orange-950/20 border-2 border-yellow-400 dark:border-yellow-600 rounded-lg p-8 text-center space-y-4">
                 <Construction className="h-16 w-16 mx-auto text-yellow-600 dark:text-yellow-500 animate-bounce" />
-                <h3 className="text-2xl font-bold text-foreground">Coming Soon!</h3>
+                <h3 className="text-2xl font-bold text-foreground">{t('kids.comingSoon')}</h3>
                 <p className="text-base text-muted-foreground max-w-md mx-auto">
-                  This game is being built just for you! We're working hard to make it fun and educational. 
-                  Check back soon to play! 🎮
+                  {t('kids.comingSoonDescription')}
                 </p>
                 <div className="flex items-center justify-center gap-2 pt-4">
                   <Sparkles className="h-5 w-5 text-purple-500" />
-                  <p className="text-sm font-medium text-muted-foreground">More games coming every week!</p>
+                  <p className="text-sm font-medium text-muted-foreground">{t('kids.moreGamesEveryWeek')}</p>
                   <Sparkles className="h-5 w-5 text-blue-500" />
                 </div>
               </div>
@@ -114,14 +115,14 @@ const KidsGamePlay = () => {
                   size="lg"
                   className="bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600"
                 >
-                  Try Another Game
+                  {t('kids.tryAnotherGame')}
                 </Button>
                 <Button 
                   onClick={() => navigate("/palace")} 
                   size="lg"
                   variant="outline"
                 >
-                  Explore the Palace
+                  {t('kids.explorePalace')}
                 </Button>
               </div>
             </CardContent>

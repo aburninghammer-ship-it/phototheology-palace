@@ -1,5 +1,6 @@
 import { useEffect, useState, useMemo } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { Navigation } from "@/components/Navigation";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -30,6 +31,7 @@ type SortOption = "latest" | "most_commented" | "needs_feedback";
 type CategoryFilter = "all" | "general" | "prayer" | "study" | "questions";
 
 const Community = () => {
+  const { t } = useTranslation();
   const { user, loading } = useAuth();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
@@ -110,7 +112,7 @@ const Community = () => {
       if (error) {
         console.error('Error fetching posts:', error);
         toast({
-          title: "Error loading posts",
+          title: t('community.errorLoadingPosts'),
           description: error.message,
           variant: "destructive",
         });
@@ -137,7 +139,7 @@ const Community = () => {
         if (commentsError) {
           console.error('Error fetching comments:', commentsError);
           toast({
-            title: "Error loading comments",
+            title: t('community.errorLoadingComments'),
             description: commentsError.message,
             variant: "destructive",
           });
@@ -159,8 +161,8 @@ const Community = () => {
     } catch (error: any) {
       console.error('Unexpected error fetching posts:', error);
       toast({
-        title: "Error",
-        description: "Failed to load community data. Please refresh the page.",
+        title: t('common.error'),
+        description: t('community.failedToLoadData'),
         variant: "destructive",
       });
     }
@@ -194,8 +196,8 @@ const Community = () => {
       if (error) throw error;
 
       toast({
-        title: "Post created!",
-        description: "Your post is now live.",
+        title: t('community.postCreated'),
+        description: t('community.postNowLive'),
       });
 
       setNewTitle("");
@@ -209,13 +211,13 @@ const Community = () => {
     } catch (error: any) {
       if (error.name === "ZodError") {
         toast({
-          title: "Validation Error",
-          description: error.errors[0]?.message || "Invalid input",
+          title: t('community.validationError'),
+          description: error.errors[0]?.message || t('community.invalidInput'),
           variant: "destructive",
         });
       } else {
         toast({
-          title: "Error",
+          title: t('common.error'),
           description: error.message,
           variant: "destructive",
         });
@@ -243,7 +245,7 @@ const Community = () => {
       if (error) throw error;
 
       toast({
-        title: parentCommentId ? "Reply added!" : "Comment added!",
+        title: parentCommentId ? t('community.replyAdded') : t('community.commentAdded'),
       });
 
       setNewComment({ ...newComment, [postId]: "" });
@@ -256,7 +258,7 @@ const Community = () => {
     } catch (error: any) {
       console.error('Error adding comment:', error);
       toast({
-        title: "Error",
+        title: t('common.error'),
         description: error.message,
         variant: "destructive",
       });
@@ -283,15 +285,15 @@ const Community = () => {
       }
 
       toast({
-        title: "Comment deleted",
+        title: t('community.commentDeleted'),
       });
 
       fetchPosts();
     } catch (error: any) {
       console.error('Error deleting comment:', error);
       toast({
-        title: "Error deleting comment",
-        description: error.message || "Failed to delete comment",
+        title: t('community.errorDeletingComment'),
+        description: error.message || t('community.failedToDeleteComment'),
         variant: "destructive",
       });
     }
@@ -312,8 +314,8 @@ const Community = () => {
   const saveEditComment = async (commentId: string) => {
     if (!editContent.trim()) {
       toast({
-        title: "Error",
-        description: "Comment cannot be empty",
+        title: t('common.error'),
+        description: t('community.commentCannotBeEmpty'),
         variant: "destructive",
       });
       return;
@@ -333,7 +335,7 @@ const Community = () => {
       }
 
       toast({
-        title: "Comment updated",
+        title: t('community.commentUpdated'),
       });
 
       setEditingComment(null);
@@ -342,8 +344,8 @@ const Community = () => {
     } catch (error: any) {
       console.error('Error updating comment:', error);
       toast({
-        title: "Error updating comment",
-        description: error.message || "Failed to update comment",
+        title: t('community.errorUpdatingComment'),
+        description: error.message || t('community.failedToUpdateComment'),
         variant: "destructive",
       });
     }
@@ -364,8 +366,8 @@ const Community = () => {
   const saveEditPost = async (postId: string) => {
     if (!editPostTitle.trim() || !editPostContent.trim()) {
       toast({
-        title: "Error",
-        description: "Title and content cannot be empty",
+        title: t('common.error'),
+        description: t('community.titleAndContentRequired'),
         variant: "destructive",
       });
       return;
@@ -388,8 +390,8 @@ const Community = () => {
       if (error) throw error;
 
       toast({
-        title: "Post updated",
-        description: "Your post has been updated successfully.",
+        title: t('community.postUpdated'),
+        description: t('community.postUpdatedDescription'),
       });
 
       setEditingPost(null);
@@ -399,8 +401,8 @@ const Community = () => {
     } catch (error: any) {
       console.error("Error updating post:", error);
       toast({
-        title: "Error updating post",
-        description: error.message || "Failed to update post",
+        title: t('community.errorUpdatingPost'),
+        description: error.message || t('community.failedToUpdatePost'),
         variant: "destructive",
       });
     }
@@ -421,16 +423,16 @@ const Community = () => {
       if (error) throw error;
 
       toast({
-        title: "Post deleted",
-        description: "Your post has been deleted.",
+        title: t('community.postDeleted'),
+        description: t('community.postDeletedDescription'),
       });
 
       fetchPosts();
     } catch (error: any) {
       console.error("Error deleting post:", error);
       toast({
-        title: "Error deleting post",
-        description: error.message || "Failed to delete post",
+        title: t('community.errorDeletingPost'),
+        description: error.message || t('community.failedToDeletePost'),
         variant: "destructive",
       });
     }
@@ -539,21 +541,21 @@ const Community = () => {
                   <div>
                     <h1 className="text-5xl font-bold flex items-center gap-3 mb-2">
                       <Sparkles className="h-10 w-10 text-primary" />
-                      Community Hub
+                      {t('community.title')}
                     </h1>
                   <p className="text-muted-foreground text-lg">
-                    Connect, share insights, and grow together in faith
+                    {t('community.description')}
                   </p>
                   <div className="flex items-center gap-2 mt-3">
                     {needsFeedbackCount > 0 && (
                       <Badge variant="secondary" className="flex items-center gap-1">
                         <Sparkles className="h-3 w-3" />
-                        {needsFeedbackCount} posts need feedback
+                        {t('community.postsNeedFeedback', { count: needsFeedbackCount })}
                       </Badge>
                     )}
                     <Badge variant="outline" className="flex items-center gap-1">
                       <Users className="h-3 w-3" />
-                      {activeCount} active now
+                      {t('community.activeNow', { count: activeCount })}
                     </Badge>
                   </div>
                   </div>
@@ -581,7 +583,7 @@ const Community = () => {
                     className="shadow-lg"
                   >
                     <Plus className="mr-2 h-5 w-5" />
-                    New Post
+                    {t('community.newPost')}
                   </Button>
                 </div>
               </div>
@@ -604,10 +606,10 @@ const Community = () => {
                 <div className="h-2 w-2 bg-green-500 rounded-full animate-pulse" />
                 <CardTitle className="flex items-center gap-2">
                   <Users className="h-5 w-5 text-primary" />
-                  Active Now ({activeCount})
+                  {t('community.activeNowTitle', { count: activeCount })}
                 </CardTitle>
               </div>
-              <CardDescription>Connect with members online</CardDescription>
+              <CardDescription>{t('community.connectWithMembers')}</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="flex flex-wrap gap-2">
@@ -624,8 +626,8 @@ const Community = () => {
                           })
                         );
                         toast({
-                          title: "Opening chat",
-                          description: `Starting conversation with ${activeUser.display_name || activeUser.username}`,
+                          title: t('community.openingChat'),
+                          description: t('community.startingConversation', { name: activeUser.display_name || activeUser.username }),
                         });
                       }}
                       className={`flex items-center gap-2 rounded-full px-4 py-2 transition-all duration-300 border border-primary/10 ${
@@ -663,13 +665,13 @@ const Community = () => {
               <CardHeader className="bg-gradient-to-r from-primary/5 to-accent/5">
                 <CardTitle className="flex items-center gap-2">
                   <Sparkles className="h-5 w-5 text-primary" />
-                  Create New Post
+                  {t('community.createNewPost')}
                 </CardTitle>
-                <CardDescription>Share your insights with the community</CardDescription>
+                <CardDescription>{t('community.shareInsights')}</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4 pt-6">
                 <Input
-                  placeholder="Give your post a title..."
+                  placeholder={t('community.postTitlePlaceholder')}
                   value={newTitle}
                   onChange={(e) => setNewTitle(e.target.value)}
                   maxLength={200}
@@ -677,22 +679,22 @@ const Community = () => {
                 />
                 <Select value={newCategory} onValueChange={setNewCategory}>
                   <SelectTrigger>
-                    <SelectValue placeholder="Select category" />
+                    <SelectValue placeholder={t('community.selectCategory')} />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="general">General Discussion</SelectItem>
-                    <SelectItem value="prayer">Prayer Requests</SelectItem>
-                    <SelectItem value="study">Bible Study</SelectItem>
-                    <SelectItem value="questions">Questions</SelectItem>
+                    <SelectItem value="general">{t('community.categoryGeneralDiscussion')}</SelectItem>
+                    <SelectItem value="prayer">{t('community.categoryPrayerRequests')}</SelectItem>
+                    <SelectItem value="study">{t('community.categoryBibleStudy')}</SelectItem>
+                    <SelectItem value="questions">{t('community.categoryQuestions')}</SelectItem>
                   </SelectContent>
                 </Select>
                 <div>
-                  <label className="text-sm font-medium mb-2 block">Tags (optional)</label>
+                  <label className="text-sm font-medium mb-2 block">{t('community.tagsOptional')}</label>
                   <TagInput tags={newTags} onChange={setNewTags} maxTags={5} />
                 </div>
                 <div className="space-y-2">
                   <Textarea
-                    placeholder="Share your thoughts, insights, or questions... (emojis supported 😊)"
+                    placeholder={t('community.shareThoughtsPlaceholder')}
                     value={newContent}
                     onChange={(e) => setNewContent(e.target.value)}
                     rows={6}
@@ -711,10 +713,10 @@ const Community = () => {
                 <div className="flex gap-2">
                   <Button onClick={createPost} size="lg" className="flex-1">
                     <Send className="mr-2 h-4 w-4" />
-                    Publish Post
+                    {t('community.publishPost')}
                   </Button>
                   <Button variant="outline" size="lg" onClick={() => setShowNewPost(false)}>
-                    Cancel
+                    {t('common.cancel')}
                   </Button>
                 </div>
               </CardContent>
@@ -727,16 +729,16 @@ const Community = () => {
               <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
                 <div className="flex items-center gap-2">
                   <Filter className="h-4 w-4 text-muted-foreground" />
-                  <span className="text-sm font-medium">Filter & Sort</span>
+                  <span className="text-sm font-medium">{t('community.filterAndSort')}</span>
                 </div>
                 <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
                   <Tabs value={categoryFilter} onValueChange={(v) => setCategoryFilter(v as CategoryFilter)} className="w-full sm:w-auto">
                     <TabsList className="grid grid-cols-5 w-full sm:w-auto">
-                      <TabsTrigger value="all" className="text-xs">All</TabsTrigger>
-                      <TabsTrigger value="general" className="text-xs">General</TabsTrigger>
-                      <TabsTrigger value="prayer" className="text-xs">Prayer</TabsTrigger>
-                      <TabsTrigger value="study" className="text-xs">Study</TabsTrigger>
-                      <TabsTrigger value="questions" className="text-xs">Questions</TabsTrigger>
+                      <TabsTrigger value="all" className="text-xs">{t('community.filterAll')}</TabsTrigger>
+                      <TabsTrigger value="general" className="text-xs">{t('community.categoryGeneral')}</TabsTrigger>
+                      <TabsTrigger value="prayer" className="text-xs">{t('community.categoryPrayer')}</TabsTrigger>
+                      <TabsTrigger value="study" className="text-xs">{t('community.categoryStudy')}</TabsTrigger>
+                      <TabsTrigger value="questions" className="text-xs">{t('community.categoryQuestions')}</TabsTrigger>
                     </TabsList>
                   </Tabs>
                   <Select value={sortBy} onValueChange={(v) => setSortBy(v as SortOption)}>
@@ -744,9 +746,9 @@ const Community = () => {
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="latest">Latest First</SelectItem>
-                      <SelectItem value="most_commented">Most Commented</SelectItem>
-                      <SelectItem value="needs_feedback">Needs Feedback</SelectItem>
+                      <SelectItem value="latest">{t('community.sortLatestFirst')}</SelectItem>
+                      <SelectItem value="most_commented">{t('community.sortMostCommented')}</SelectItem>
+                      <SelectItem value="needs_feedback">{t('community.sortNeedsFeedback')}</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -760,18 +762,18 @@ const Community = () => {
               <Card className="border-dashed">
                 <CardContent className="pt-12 pb-12 text-center">
                   <Sparkles className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
-                  <p className="text-lg font-medium mb-2">No posts yet</p>
+                  <p className="text-lg font-medium mb-2">{t('community.noPostsYet')}</p>
                   <p className="text-muted-foreground mb-4">
                     {categoryFilter !== "all"
-                      ? `No posts in the ${categoryFilter} category yet.`
-                      : "Be the first to share something with the community!"}
+                      ? t('community.noPostsInCategory', { category: categoryFilter })
+                      : t('community.beFirstToShare')}
                   </p>
                   {categoryFilter !== "all" && (
                     <Button
                       variant="outline"
                       onClick={() => setCategoryFilter("all")}
                     >
-                      View All Posts
+                      {t('community.viewAllPosts')}
                     </Button>
                   )}
                 </CardContent>
@@ -789,13 +791,13 @@ const Community = () => {
                         <CardHeader className="bg-gradient-to-r from-primary/5 to-accent/5">
                           <CardTitle className="flex items-center gap-2">
                             <Pencil className="h-5 w-5 text-primary" />
-                            Edit Post
+                            {t('community.editPost')}
                           </CardTitle>
-                          <CardDescription>Update your post</CardDescription>
+                          <CardDescription>{t('community.updateYourPost')}</CardDescription>
                         </CardHeader>
                         <CardContent className="space-y-4 pt-6">
                           <Input
-                            placeholder="Post title..."
+                            placeholder={t('community.postTitlePlaceholder')}
                             value={editPostTitle}
                             onChange={(e) => setEditPostTitle(e.target.value)}
                             maxLength={200}
@@ -803,7 +805,7 @@ const Community = () => {
                           />
                           <div className="space-y-2">
                             <Textarea
-                              placeholder="Post content..."
+                              placeholder={t('community.postContentPlaceholder')}
                               value={editPostContent}
                               onChange={(e) => setEditPostContent(e.target.value)}
                               rows={6}
@@ -816,10 +818,10 @@ const Community = () => {
                           </div>
                           <div className="flex gap-2">
                             <Button onClick={() => saveEditPost(post.id)} className="flex-1">
-                              Save Changes
+                              {t('community.saveChanges')}
                             </Button>
                             <Button variant="outline" onClick={cancelEditPost}>
-                              Cancel
+                              {t('common.cancel')}
                             </Button>
                           </div>
                         </CardContent>
@@ -894,14 +896,14 @@ const Community = () => {
                                             saveEditComment(comment.id)
                                           }
                                         >
-                                          Save
+                                          {t('common.save')}
                                         </Button>
                                         <Button
                                           size="sm"
                                           variant="ghost"
                                           onClick={cancelEditComment}
                                         >
-                                          Cancel
+                                          {t('common.cancel')}
                                         </Button>
                                       </div>
                                     </div>
@@ -923,7 +925,7 @@ const Community = () => {
                                           }
                                         >
                                           <Reply className="h-2.5 w-2.5 mr-1" />
-                                          Reply
+                                          {t('community.reply')}
                                         </Button>
                                         {comment.user_id === user?.id && (
                                           <>
@@ -939,7 +941,7 @@ const Community = () => {
                                               }
                                             >
                                               <Pencil className="h-2.5 w-2.5 mr-1" />
-                                              Edit
+                                              {t('common.edit')}
                                             </Button>
                                             <Button
                                               variant="ghost"
@@ -950,7 +952,7 @@ const Community = () => {
                                               }
                                             >
                                               <Trash2 className="h-2.5 w-2.5 mr-1" />
-                                              Delete
+                                              {t('common.delete')}
                                             </Button>
                                           </>
                                         )}
@@ -1020,14 +1022,14 @@ const Community = () => {
                                                   saveEditComment(reply.id)
                                                 }
                                               >
-                                                Save
+                                                {t('common.save')}
                                               </Button>
                                               <Button
                                                 size="sm"
                                                 variant="ghost"
                                                 onClick={cancelEditComment}
                                               >
-                                                Cancel
+                                                {t('common.cancel')}
                                               </Button>
                                             </div>
                                           </div>
@@ -1050,7 +1052,7 @@ const Community = () => {
                                                   }
                                                 >
                                                   <Pencil className="h-2 w-2 mr-0.5" />
-                                                  Edit
+                                                  {t('common.edit')}
                                                 </Button>
                                                 <Button
                                                   variant="ghost"
@@ -1061,7 +1063,7 @@ const Community = () => {
                                                   }
                                                 >
                                                   <Trash2 className="h-2 w-2 mr-0.5" />
-                                                  Delete
+                                                  {t('common.delete')}
                                                 </Button>
                                               </div>
                                             )}
@@ -1127,7 +1129,7 @@ const Community = () => {
                         </Avatar>
                         <div className="flex-1 flex gap-2">
                           <Textarea
-                            placeholder="Share your thoughts..."
+                            placeholder={t('community.shareYourThoughts')}
                             value={newComment[post.id] || ""}
                             onChange={(e) =>
                               setNewComment({
@@ -1160,13 +1162,13 @@ const Community = () => {
             <Card className="text-center py-16 border-dashed">
               <CardContent>
                 <MessageSquare className="h-16 w-16 mx-auto text-muted-foreground/50 mb-4" />
-                <h3 className="text-xl font-semibold mb-2">No posts yet</h3>
+                <h3 className="text-xl font-semibold mb-2">{t('community.noPostsYet')}</h3>
                 <p className="text-muted-foreground mb-6">
-                  Be the first to share your thoughts with the community!
+                  {t('community.beFirstToShareThoughts')}
                 </p>
                 <Button onClick={() => setShowNewPost(true)} size="lg">
                   <Plus className="mr-2 h-5 w-5" />
-                  Create First Post
+                  {t('community.createFirstPost')}
                 </Button>
               </CardContent>
             </Card>

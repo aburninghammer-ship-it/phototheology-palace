@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { Navigation } from '@/components/Navigation';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -43,6 +44,7 @@ interface FallingPiece {
 }
 
 const BibleTetris: React.FC = () => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const { user } = useAuth();
 
@@ -312,7 +314,7 @@ const BibleTetris: React.FC = () => {
     // Check lose (confusion threshold)
     if (confusion >= currentLevel.confusion_threshold) {
       setGameState('gameOver');
-      toast.error('Confusion overwhelmed you!');
+      toast.error(t('games.bibleTetris.confusionOverwhelmed'));
     }
   }, [validClears, confusion, currentLevel, gameState, user, score, unlockLevel]);
 
@@ -413,40 +415,40 @@ const BibleTetris: React.FC = () => {
       <Navigation />
       <div className="container mx-auto px-4 py-8 max-w-2xl">
         <Button onClick={() => navigate('/games')} variant="ghost" className="mb-6">
-          <ArrowLeft className="mr-2 h-4 w-4" /> Back to Games
+          <ArrowLeft className="mr-2 h-4 w-4" /> {t('common.backToGames')}
         </Button>
 
         <div className="text-center mb-8">
           <h1 className="text-4xl font-bold mb-2 bg-gradient-to-r from-yellow-400 via-amber-400 to-orange-500 bg-clip-text text-transparent">
-            Bible Tetris
+            {t('games.bibleTetris.title')}
           </h1>
-          <p className="text-gray-400">Phototheology Edition</p>
+          <p className="text-gray-400">{t('games.bibleTetris.subtitle')}</p>
         </div>
 
         <Card className="bg-gray-900/50 border-gray-700 mb-6">
           <CardHeader>
-            <CardTitle className="text-xl">How to Play</CardTitle>
+            <CardTitle className="text-xl">{t('games.common.howToPlay')}</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4 text-sm">
             <div className="flex items-start gap-3">
               <span className="text-2xl">1.</span>
               <div>
-                <p className="font-semibold text-amber-400">Pieces Fall</p>
-                <p className="text-gray-400">Biblical pieces fall into the grid. Move them left/right, drop with spacebar.</p>
+                <p className="font-semibold text-amber-400">{t('games.bibleTetris.piecesFall')}</p>
+                <p className="text-gray-400">{t('games.bibleTetris.piecesFallDesc')}</p>
               </div>
             </div>
             <div className="flex items-start gap-3">
               <span className="text-2xl">2.</span>
               <div>
-                <p className="font-semibold text-green-400">Match Rules</p>
-                <p className="text-gray-400">Fill a row with pieces that satisfy the level's rules (e.g., STORY + CHRIST_KEY).</p>
+                <p className="font-semibold text-green-400">{t('games.bibleTetris.matchRules')}</p>
+                <p className="text-gray-400">{t('games.bibleTetris.matchRulesDesc')}</p>
               </div>
             </div>
             <div className="flex items-start gap-3">
               <span className="text-2xl">3.</span>
               <div>
-                <p className="font-semibold text-red-400">Avoid Confusion</p>
-                <p className="text-gray-400">Invalid rows and untested deception pieces add confusion. Too much = game over!</p>
+                <p className="font-semibold text-red-400">{t('games.bibleTetris.avoidConfusion')}</p>
+                <p className="text-gray-400">{t('games.bibleTetris.avoidConfusionDesc')}</p>
               </div>
             </div>
           </CardContent>
@@ -458,7 +460,7 @@ const BibleTetris: React.FC = () => {
             size="lg"
             className="bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700"
           >
-            <Play className="mr-2 h-5 w-5" /> Campaign
+            <Play className="mr-2 h-5 w-5" /> {t('games.bibleTetris.campaign')}
           </Button>
         </div>
       </div>
@@ -471,10 +473,10 @@ const BibleTetris: React.FC = () => {
       <Navigation />
       <div className="container mx-auto px-4 py-8 max-w-2xl">
         <Button onClick={() => setGameState('menu')} variant="ghost" className="mb-6">
-          <ArrowLeft className="mr-2 h-4 w-4" /> Back
+          <ArrowLeft className="mr-2 h-4 w-4" /> {t('common.back')}
         </Button>
 
-        <h2 className="text-2xl font-bold mb-6 text-center">Select Level</h2>
+        <h2 className="text-2xl font-bold mb-6 text-center">{t('games.bibleTetris.selectLevel')}</h2>
 
         <div className="space-y-4">
           {LEVELS.map((level, idx) => {
@@ -545,7 +547,7 @@ const BibleTetris: React.FC = () => {
           </div>
           <div className="text-right">
             <div className="text-amber-400 font-bold">{score}</div>
-            <div className="text-xs text-gray-400">{validClears}/{CLEARS_TO_WIN} clears</div>
+            <div className="text-xs text-gray-400">{t('games.bibleTetris.clearsProgress', { current: validClears, total: CLEARS_TO_WIN })}</div>
           </div>
         </div>
 
@@ -553,7 +555,7 @@ const BibleTetris: React.FC = () => {
         <div className="px-2 mb-2">
           <div className="flex items-center gap-2 text-xs">
             <AlertTriangle className="h-3 w-3 text-red-400" />
-            <span className="text-gray-400">Confusion</span>
+            <span className="text-gray-400">{t('games.bibleTetris.confusion')}</span>
             <Progress
               value={(confusion / currentLevel.confusion_threshold) * 100}
               className="flex-1 h-2"
@@ -621,13 +623,13 @@ const BibleTetris: React.FC = () => {
         {/* Next piece preview */}
         <div className="flex justify-center gap-4 mb-4">
           <div className="text-center">
-            <div className="text-xs text-gray-400 mb-1">Next</div>
+            <div className="text-xs text-gray-400 mb-1">{t('games.bibleTetris.next')}</div>
             <div className="w-14 h-14 bg-gray-800/50 rounded border border-gray-700 p-1">
               {nextPiece && renderPieceCell(nextPiece)}
             </div>
           </div>
           <div className="text-center">
-            <div className="text-xs text-gray-400 mb-1">Streak</div>
+            <div className="text-xs text-gray-400 mb-1">{t('games.common.streak')}</div>
             <div className="w-14 h-14 bg-gray-800/50 rounded border border-gray-700 flex items-center justify-center">
               <span className="text-2xl font-bold text-orange-400">{streak}</span>
             </div>
@@ -650,7 +652,7 @@ const BibleTetris: React.FC = () => {
             className="w-16 h-16"
             onClick={dropPiece}
           >
-            Drop
+            {t('games.bibleTetris.drop')}
           </Button>
           <Button
             variant="outline"
@@ -671,7 +673,7 @@ const BibleTetris: React.FC = () => {
       <Card className="bg-gray-900/90 border-gray-700 max-w-sm w-full mx-4">
         <CardContent className="p-8 text-center">
           <Pause className="h-16 w-16 mx-auto mb-4 text-amber-400" />
-          <h2 className="text-2xl font-bold mb-6">Paused</h2>
+          <h2 className="text-2xl font-bold mb-6">{t('games.common.paused')}</h2>
           <div className="space-y-4">
             <Button
               onClick={() => {
@@ -680,14 +682,14 @@ const BibleTetris: React.FC = () => {
               }}
               className="w-full"
             >
-              <Play className="mr-2 h-4 w-4" /> Resume
+              <Play className="mr-2 h-4 w-4" /> {t('games.common.resume')}
             </Button>
             <Button
               variant="outline"
               onClick={() => setGameState('menu')}
               className="w-full"
             >
-              Quit to Menu
+              {t('games.common.quitToMenu')}
             </Button>
           </div>
         </CardContent>
@@ -707,16 +709,16 @@ const BibleTetris: React.FC = () => {
         <Card className="bg-gray-900/90 border-gray-700 max-w-md w-full">
           <CardContent className="p-8 text-center">
             <Trophy className="h-20 w-20 mx-auto mb-4 text-yellow-400" />
-            <h2 className="text-2xl font-bold mb-2">Level Complete!</h2>
+            <h2 className="text-2xl font-bold mb-2">{t('games.common.levelComplete')}</h2>
             <p className="text-gray-400 mb-4">{currentLevel.title}</p>
 
             <div className="bg-gray-800/50 rounded-lg p-4 mb-6">
               <div className="text-4xl font-bold text-amber-400 mb-1">{score}</div>
-              <div className="text-sm text-gray-400">points</div>
+              <div className="text-sm text-gray-400">{t('games.common.points')}</div>
             </div>
 
             <div className="bg-blue-900/30 rounded-lg p-4 mb-6 text-left">
-              <p className="text-sm font-semibold text-blue-400 mb-2">Study Insight:</p>
+              <p className="text-sm font-semibold text-blue-400 mb-2">{t('games.bibleTetris.studyInsight')}:</p>
               <p className="text-sm text-gray-300">{currentLevel.post_level_insight}</p>
             </div>
 
@@ -726,7 +728,7 @@ const BibleTetris: React.FC = () => {
                   onClick={() => startLevel(nextLevel)}
                   className="w-full bg-gradient-to-r from-amber-500 to-orange-600"
                 >
-                  Next Level: {nextLevel.title}
+                  {t('games.common.nextLevel', { name: nextLevel.title })}
                 </Button>
               )}
               <Button
@@ -734,14 +736,14 @@ const BibleTetris: React.FC = () => {
                 onClick={() => startLevel(currentLevel)}
                 className="w-full"
               >
-                <RotateCcw className="mr-2 h-4 w-4" /> Replay
+                <RotateCcw className="mr-2 h-4 w-4" /> {t('games.bibleTetris.replay')}
               </Button>
               <Button
                 variant="ghost"
                 onClick={() => setGameState('menu')}
                 className="w-full"
               >
-                Back to Menu
+                {t('games.common.backToMenu')}
               </Button>
             </div>
           </CardContent>
@@ -756,16 +758,16 @@ const BibleTetris: React.FC = () => {
       <Card className="bg-gray-900/90 border-gray-700 max-w-sm w-full">
         <CardContent className="p-8 text-center">
           <XCircle className="h-16 w-16 mx-auto mb-4 text-red-400" />
-          <h2 className="text-2xl font-bold mb-2">Game Over</h2>
+          <h2 className="text-2xl font-bold mb-2">{t('games.common.gameOver')}</h2>
           <p className="text-gray-400 mb-6">
             {confusion >= (currentLevel?.confusion_threshold || 0)
-              ? 'Confusion overwhelmed you!'
-              : 'Pieces stacked too high!'}
+              ? t('games.bibleTetris.confusionOverwhelmed')
+              : t('games.bibleTetris.piecesStackedTooHigh')}
           </p>
 
           <div className="bg-gray-800/50 rounded-lg p-4 mb-6">
             <div className="text-3xl font-bold text-amber-400 mb-1">{score}</div>
-            <div className="text-sm text-gray-400">points ({validClears} clears)</div>
+            <div className="text-sm text-gray-400">{t('games.bibleTetris.pointsWithClears', { clears: validClears })}</div>
           </div>
 
           <div className="space-y-3">
@@ -774,7 +776,7 @@ const BibleTetris: React.FC = () => {
                 onClick={() => startLevel(currentLevel)}
                 className="w-full"
               >
-                <RotateCcw className="mr-2 h-4 w-4" /> Try Again
+                <RotateCcw className="mr-2 h-4 w-4" /> {t('games.common.tryAgain')}
               </Button>
             )}
             <Button
@@ -782,7 +784,7 @@ const BibleTetris: React.FC = () => {
               onClick={() => setGameState('menu')}
               className="w-full"
             >
-              Back to Menu
+              {t('games.common.backToMenu')}
             </Button>
           </div>
         </CardContent>

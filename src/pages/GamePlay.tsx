@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { Navigation } from "@/components/Navigation";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -10,6 +11,7 @@ const GamePlay = () => {
   const { gameId, mode } = useParams<{ gameId: string; mode?: string }>();
   const { user, loading } = useAuth();
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   useEffect(() => {
     // Redirect to actual implemented games
@@ -72,7 +74,7 @@ const GamePlay = () => {
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
-          <p className="text-muted-foreground">Loading...</p>
+          <p className="text-muted-foreground">{t('common.loading')}</p>
         </div>
       </div>
     );
@@ -89,11 +91,11 @@ const GamePlay = () => {
         <Navigation />
         <main className="container mx-auto px-4 py-8">
           <div className="max-w-2xl mx-auto text-center space-y-6">
-            <h1 className="text-4xl font-bold text-destructive">Game Not Found</h1>
-            <p className="text-muted-foreground">The game you're looking for doesn't exist.</p>
+            <h1 className="text-4xl font-bold text-destructive">{t('games.notFound')}</h1>
+            <p className="text-muted-foreground">{t('games.notFoundDescription')}</p>
             <Button onClick={() => navigate("/games")} variant="outline">
               <ArrowLeft className="mr-2 h-4 w-4" />
-              Back to Games
+              {t('games.backToGames')}
             </Button>
           </div>
         </main>
@@ -108,7 +110,7 @@ const GamePlay = () => {
         <div className="max-w-4xl mx-auto space-y-6">
           <Button onClick={() => navigate("/games")} variant="ghost">
             <ArrowLeft className="mr-2 h-4 w-4" />
-            Back to Games
+            {t('games.backToGames')}
           </Button>
 
           <Card className="border-2 border-primary/20">
@@ -120,29 +122,29 @@ const GamePlay = () => {
               <CardDescription className="text-lg">{game.description}</CardDescription>
               <div className="pt-2">
                 <p className="text-sm text-muted-foreground">
-                  <strong>Skills:</strong> {game.skills}
+                  <strong>{t('games.skills')}:</strong> {game.skills}
                 </p>
               </div>
             </CardHeader>
             <CardContent className="space-y-6">
               <div className="bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-950/20 dark:to-purple-950/20 border-2 border-blue-400 dark:border-blue-600 rounded-lg p-8 text-center space-y-4">
                 <Construction className="h-16 w-16 mx-auto text-blue-600 dark:text-blue-500 animate-bounce" />
-                <h3 className="text-2xl font-bold text-foreground">Game Under Development</h3>
+                <h3 className="text-2xl font-bold text-foreground">{t('games.underDevelopment')}</h3>
                 <p className="text-base text-muted-foreground max-w-md mx-auto">
-                  {isVsJeeves 
-                    ? "This game mode vs Jeeves is being perfected! We're training him to be your worthy opponent."
-                    : "This multiplayer mode is being built! Soon you'll be able to challenge other players."}
+                  {isVsJeeves
+                    ? t('games.vsJeevesInProgress')
+                    : t('games.multiplayerInProgress')}
                 </p>
                 <div className="bg-white/50 dark:bg-gray-900/50 rounded-lg p-4 mt-4">
-                  <p className="text-sm font-medium text-foreground mb-2">Currently Available:</p>
+                  <p className="text-sm font-medium text-foreground mb-2">{t('games.currentlyAvailable')}:</p>
                   <div className="flex items-center justify-center gap-2">
                     <Gamepad2 className="h-4 w-4 text-primary" />
-                    <span className="text-sm">Chain Chess (vs Jeeves or Players)</span>
+                    <span className="text-sm">{t('games.chainChessAvailable')}</span>
                   </div>
                 </div>
                 <div className="flex items-center justify-center gap-2 pt-4">
                   <Sparkles className="h-5 w-5 text-purple-500" />
-                  <p className="text-sm font-medium text-muted-foreground">More games launching soon!</p>
+                  <p className="text-sm font-medium text-muted-foreground">{t('games.moreGamesSoon')}</p>
                   <Sparkles className="h-5 w-5 text-blue-500" />
                 </div>
               </div>
@@ -154,7 +156,7 @@ const GamePlay = () => {
                   className="bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600"
                 >
                   <Gamepad2 className="mr-2 h-4 w-4" />
-                  Play Chain Chess vs Jeeves
+                  {t('games.playChainChessJeeves')}
                 </Button>
                 <Button 
                   onClick={() => navigate("/games/chain-chess/new")} 
@@ -162,7 +164,7 @@ const GamePlay = () => {
                   variant="outline"
                 >
                   <Users className="mr-2 h-4 w-4" />
-                  Play Chain Chess vs Player
+                  {t('games.playChainChessPlayer')}
                 </Button>
                 <Button 
                   onClick={() => navigate("/games")} 
@@ -170,7 +172,7 @@ const GamePlay = () => {
                   variant="outline"
                 >
                   <ArrowLeft className="mr-2 h-4 w-4" />
-                  Browse All Games
+                  {t('games.browseAllGames')}
                 </Button>
               </div>
             </CardContent>

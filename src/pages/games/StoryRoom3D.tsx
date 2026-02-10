@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback, useRef, Suspense } from "react";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { OrbitControls, Html, Stars, Sparkles, Float } from "@react-three/drei";
 import * as THREE from "three";
@@ -651,6 +652,7 @@ function StoryPedestal({ title, book }: { title: string; book: string }) {
 
 export default function StoryRoom3D() {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const { toast } = useToast();
   const { user } = useAuth();
 
@@ -742,10 +744,10 @@ export default function StoryRoom3D() {
 
     if (timeRemaining <= 0) {
       setTimerActive(false);
-      setFeedback("Time's up!");
+      setFeedback(t('games.common.timeUp'));
       toast({
-        title: "Time's Up!",
-        description: "Moving to next story...",
+        title: t('games.common.timeUp'),
+        description: t('games.storyRoom3d.movingToNext'),
         variant: "destructive",
       });
       setTimeout(() => moveToNextQuiz(), 2000);
@@ -780,8 +782,8 @@ export default function StoryRoom3D() {
     setHintsUsed(prev => prev + 1);
     setShowHint(true);
     toast({
-      title: "Hint Used",
-      description: `The story starts with: "${currentQuiz.correct[0]}"`,
+      title: t('games.common.hintUsed'),
+      description: t('games.storyRoom3d.storyStartsWith', { scene: currentQuiz.correct[0] }),
     });
   };
 
@@ -808,20 +810,20 @@ export default function StoryRoom3D() {
       setStreak(prev => prev + 1);
       setBestStreak(prev => Math.max(prev, streak + 1));
       setCorrectAnswers(prev => prev + 1);
-      setFeedback(`Correct! +${pointsEarned} points`);
+      setFeedback(t('games.common.correctPlusPoints', { points: pointsEarned }));
 
       toast({
-        title: "Correct!",
-        description: `+${pointsEarned} points. Streak: ${streak + 1}`,
+        title: t('games.common.correct'),
+        description: t('games.common.plusPointsStreak', { points: pointsEarned, streak: streak + 1 }),
       });
 
       setTimeout(() => moveToNextQuiz(), 2000);
     } else {
       setStreak(0);
-      setFeedback("Incorrect sequence. Try again!");
+      setFeedback(t('games.storyRoom3d.incorrectSequence'));
       toast({
-        title: "Not quite right",
-        description: "Check the order and try again!",
+        title: t('games.common.notQuiteRight'),
+        description: t('games.storyRoom3d.checkOrderTryAgain'),
         variant: "destructive",
       });
     }
@@ -884,39 +886,39 @@ export default function StoryRoom3D() {
             <Card className="text-center">
               <CardHeader>
                 <Trophy className="h-16 w-16 mx-auto text-yellow-500 mb-4" />
-                <CardTitle className="text-3xl">Session Complete!</CardTitle>
+                <CardTitle className="text-3xl">{t('games.common.sessionComplete')}</CardTitle>
                 <CardDescription>
-                  You've mastered the 3D Story Room!
+                  {t('games.storyRoom3d.masteredStoryRoom')}
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
                 <div className="grid grid-cols-2 gap-4">
                   <div className="p-4 bg-primary/10 rounded-lg">
                     <div className="text-3xl font-bold text-primary">{score}</div>
-                    <div className="text-sm text-muted-foreground">Total Score</div>
+                    <div className="text-sm text-muted-foreground">{t('games.common.totalScore')}</div>
                   </div>
                   <div className="p-4 bg-green-500/10 rounded-lg">
                     <div className="text-3xl font-bold text-green-600">{accuracy}%</div>
-                    <div className="text-sm text-muted-foreground">Accuracy</div>
+                    <div className="text-sm text-muted-foreground">{t('games.common.accuracy')}</div>
                   </div>
                   <div className="p-4 bg-orange-500/10 rounded-lg">
                     <div className="text-3xl font-bold text-orange-600">{bestStreak}</div>
-                    <div className="text-sm text-muted-foreground">Best Streak</div>
+                    <div className="text-sm text-muted-foreground">{t('games.common.bestStreak')}</div>
                   </div>
                   <div className="p-4 bg-purple-500/10 rounded-lg">
                     <div className="text-3xl font-bold text-purple-600">{correctAnswers}</div>
-                    <div className="text-sm text-muted-foreground">Correct</div>
+                    <div className="text-sm text-muted-foreground">{t('games.common.correct')}</div>
                   </div>
                 </div>
 
                 <div className="flex gap-4 justify-center">
                   <Button onClick={() => navigate("/games")}>
                     <ArrowLeft className="mr-2 h-4 w-4" />
-                    Back to Games
+                    {t('games.common.backToGames')}
                   </Button>
                   <Button onClick={() => setGameState("menu")} variant="outline">
                     <RotateCcw className="mr-2 h-4 w-4" />
-                    Play Again
+                    {t('games.common.playAgain')}
                   </Button>
                 </div>
               </CardContent>
@@ -1013,16 +1015,16 @@ export default function StoryRoom3D() {
               <CardHeader>
                 <CardTitle className="text-3xl flex items-center gap-3">
                   <span className="text-4xl">📚</span>
-                  Story Room 3D
+                  {t('games.storyRoom3d.title')}
                 </CardTitle>
                 <CardDescription>
-                  Arrange biblical stories in an immersive 3D library! Click floating tablets to build the correct sequence.
+                  {t('games.storyRoom3d.description')}
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
                 {/* Difficulty Selection */}
                 <div>
-                  <h3 className="font-semibold mb-3">Select Difficulty</h3>
+                  <h3 className="font-semibold mb-3">{t('games.common.selectDifficulty')}</h3>
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                     {(Object.keys(DIFFICULTY_SETTINGS) as Difficulty[]).map((d) => {
                       const s = DIFFICULTY_SETTINGS[d];
@@ -1049,12 +1051,12 @@ export default function StoryRoom3D() {
                               {d === "hard" && <Zap className="h-5 w-5" />}
                               {d === "expert" && <Trophy className="h-5 w-5" />}
                             </div>
-                            <div className="font-semibold">{s.name}</div>
+                            <div className="font-semibold">{t(`games.common.difficulty.${d}`)}</div>
                             <div className="text-xs text-muted-foreground mt-1">
-                              {s.hintsAllowed} hints
+                              {t('games.common.hintsCount', { count: s.hintsAllowed })}
                             </div>
                             <div className="text-xs text-muted-foreground">
-                              {s.timeLimit ? `${s.timeLimit}s limit` : "No timer"}
+                              {s.timeLimit ? t('games.common.timeLimit', { seconds: s.timeLimit }) : t('games.common.noTimer')}
                             </div>
                           </CardContent>
                         </Card>
@@ -1064,7 +1066,7 @@ export default function StoryRoom3D() {
                 </div>
 
                 <Button onClick={startGame} size="lg" className="w-full">
-                  Enter the Library
+                  {t('games.storyRoom3d.enterLibrary')}
                 </Button>
 
                 <Button
@@ -1073,7 +1075,7 @@ export default function StoryRoom3D() {
                   className="w-full"
                 >
                   <ArrowLeft className="mr-2 h-4 w-4" />
-                  Back to Games
+                  {t('games.common.backToGames')}
                 </Button>
               </CardContent>
             </Card>
@@ -1140,26 +1142,26 @@ export default function StoryRoom3D() {
                     <div className="mb-4 p-3 bg-amber-100 dark:bg-amber-900/30 rounded-lg border border-amber-300">
                       <div className="flex items-center gap-2 text-amber-800 dark:text-amber-200">
                         <HelpCircle className="h-5 w-5" />
-                        <span className="font-medium">Hint: Start with "{currentQuiz.correct[0]}"</span>
+                        <span className="font-medium">{t('games.storyRoom3d.hintStartWith', { scene: currentQuiz.correct[0] })}</span>
                       </div>
                     </div>
                   )}
 
                   <div className="flex items-center justify-between">
                     <div className="text-sm text-muted-foreground">
-                      Click tablets above to arrange the story sequence ({userSequence.length}/{maxSlots})
+                      {t('games.storyRoom3d.clickTablets', { placed: userSequence.length, total: maxSlots })}
                     </div>
 
                     <div className="flex gap-2">
                       {hintsRemaining > 0 && !showHint && (
                         <Button onClick={useHint} variant="outline" size="sm">
                           <HelpCircle className="mr-2 h-4 w-4" />
-                          Hint ({hintsRemaining})
+                          {t('games.common.hint')} ({hintsRemaining})
                         </Button>
                       )}
 
                       <Button onClick={skipQuiz} variant="ghost" size="sm">
-                        Skip
+                        {t('games.common.skip')}
                       </Button>
 
                       <Button
@@ -1167,7 +1169,7 @@ export default function StoryRoom3D() {
                         disabled={userSequence.length !== maxSlots}
                         size="sm"
                       >
-                        Check Answer
+                        {t('games.common.checkAnswer')}
                       </Button>
                     </div>
                   </div>

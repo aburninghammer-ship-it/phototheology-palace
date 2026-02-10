@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { usePreservePage } from "@/hooks/usePreservePage";
 import { Navigation } from "@/components/Navigation";
 import { supabase } from "@/integrations/supabase/client";
@@ -90,6 +91,7 @@ interface UserGem {
 }
 
 export default function SermonBuilder() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const editId = searchParams.get("id");
@@ -332,7 +334,7 @@ export default function SermonBuilder() {
       }
     } catch (error) {
       console.error("Error loading sermon:", error);
-      toast.error("Failed to load sermon");
+      toast.error(t('sermon.builder.loadError'));
     } finally {
       setLoading(false);
     }
@@ -347,10 +349,10 @@ export default function SermonBuilder() {
 
       if (error) throw error;
       setAiHelp(data.content);
-      toast.success("Jeeves has provided guidance!");
+      toast.success(t('sermon.builder.jeevesGuidance'));
     } catch (error) {
       console.error("Error getting help:", error);
-      toast.error("Failed to get AI assistance");
+      toast.error(t('sermon.builder.aiAssistError'));
     } finally {
       setAsking(false);
     }
@@ -363,7 +365,7 @@ export default function SermonBuilder() {
       const sanitized = sanitizeText(validated);
       setSermon({ ...sermon, smooth_stones: [...sermon.smooth_stones, newStone] });
       setNewStone("");
-      toast.success("Smooth stone added!");
+      toast.success(t('sermon.builder.stoneAdded'));
     } catch (error: any) {
       toast.error(error.errors?.[0]?.message || "Invalid stone format");
     }
@@ -376,7 +378,7 @@ export default function SermonBuilder() {
       const sanitized = sanitizeText(validated);
       setSermon({ ...sermon, bridges: [...sermon.bridges, newBridge] });
       setNewBridge("");
-      toast.success("Bridge added!");
+      toast.success(t('sermon.builder.bridgeAdded'));
     } catch (error: any) {
       toast.error(error.errors?.[0]?.message || "Invalid bridge format");
     }
@@ -399,7 +401,7 @@ export default function SermonBuilder() {
       setGemsDialogOpen(true);
     } catch (error) {
       console.error("Error loading gems:", error);
-      toast.error("Failed to load your gems");
+      toast.error(t('sermon.builder.loadGemsError'));
     } finally {
       setLoadingGems(false);
     }
@@ -407,13 +409,13 @@ export default function SermonBuilder() {
 
   const addGemAsStone = (gem: UserGem) => {
     if (sermon.smooth_stones.length >= 5) {
-      toast.error("You already have 5 smooth stones!");
+      toast.error(t('sermon.builder.maxStonesReached'));
       return;
     }
     const gemContent = `<strong>${gem.title}</strong><br/><em>Verses: ${gem.verse1}, ${gem.verse2}, ${gem.verse3}</em><br/>${gem.connection_explanation}`;
     setSermon({ ...sermon, smooth_stones: [...sermon.smooth_stones, gemContent] });
     setGemsDialogOpen(false);
-    toast.success("Gem added as a smooth stone!");
+    toast.success(t('sermon.builder.gemAddedAsStone'));
   };
 
   const nextStep = () => {
@@ -476,10 +478,10 @@ export default function SermonBuilder() {
         }
       }
 
-      toast.success("Sermon saved successfully!");
+      toast.success(t('sermon.builder.sermonSaved'));
     } catch (error) {
       console.error("Error saving sermon:", error);
-      toast.error("Failed to save sermon");
+      toast.error(t('sermon.builder.saveError'));
     } finally {
       setLoading(false);
     }
@@ -529,7 +531,7 @@ export default function SermonBuilder() {
 
     // Navigate with ?new=true to signal fresh start (prevents state restoration)
     navigate("/sermon-builder?new=true", { replace: true });
-    toast.success("Starting new sermon!");
+    toast.success(t('sermon.builder.startingNew'));
   };
 
   const loadLibrarySermons = async () => {
@@ -548,7 +550,7 @@ export default function SermonBuilder() {
       setLibrarySermons(data || []);
     } catch (error) {
       console.error("Error loading sermons:", error);
-      toast.error("Failed to load sermons");
+      toast.error(t('sermon.builder.loadSermonsError'));
     } finally {
       setLoadingLibrary(false);
     }
@@ -563,10 +565,10 @@ export default function SermonBuilder() {
       if (editId === id) {
         startNewSermon();
       }
-      toast.success("Sermon deleted");
+      toast.success(t('sermon.builder.sermonDeleted'));
     } catch (error) {
       console.error("Error deleting sermon:", error);
-      toast.error("Failed to delete sermon");
+      toast.error(t('sermon.builder.deleteError'));
     }
   };
 
@@ -589,7 +591,7 @@ export default function SermonBuilder() {
       }).select('id').single();
 
       if (error) throw error;
-      toast.success("Sermon duplicated");
+      toast.success(t('sermon.builder.sermonDuplicated'));
       loadLibrarySermons();
       // Open the duplicated sermon
       if (data?.id) {
@@ -597,7 +599,7 @@ export default function SermonBuilder() {
       }
     } catch (error) {
       console.error("Error duplicating sermon:", error);
-      toast.error("Failed to duplicate sermon");
+      toast.error(t('sermon.builder.duplicateError'));
     }
   };
 
@@ -666,18 +668,18 @@ export default function SermonBuilder() {
                 <Film className="w-8 h-8 text-white" />
               </div>
               <div>
-                <h1 className="text-4xl font-bold text-white">Sermon Builder</h1>
+                <h1 className="text-4xl font-bold text-white">{t('sermon.builder.title')}</h1>
                 <div className="flex items-center gap-3">
-                  <p className="text-purple-200 text-lg">Movie-Model Approach with 5 Smooth Stones</p>
+                  <p className="text-purple-200 text-lg">{t('sermon.builder.subtitle')}</p>
                   {isAutoSaving && (
                     <span className="text-xs text-emerald-400 flex items-center gap-1 animate-pulse">
                       <Loader2 className="w-3 h-3 animate-spin" />
-                      Saving...
+                      {t('common.saving')}
                     </span>
                   )}
                   {!isAutoSaving && lastAutoSave && (
                     <span className="text-xs text-purple-300">
-                      Saved {lastAutoSave.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                      {t('common.saved')} {lastAutoSave.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                     </span>
                   )}
                 </div>
@@ -689,7 +691,7 @@ export default function SermonBuilder() {
                 className="bg-white text-purple-900 hover:bg-white/90"
               >
                 <Plus className="w-4 h-4 mr-2" />
-                New Sermon
+                {t('sermon.builder.newSermon')}
               </Button>
               <Button
                 variant="outline"
@@ -700,7 +702,7 @@ export default function SermonBuilder() {
                 className="bg-white/10 border-white/20 text-white hover:bg-white/20 backdrop-blur-sm"
               >
                 <Presentation className="w-4 h-4 mr-2" />
-                PowerPoint
+                {t('sermon.builder.powerPoint')}
               </Button>
             </div>
           </motion.div>
@@ -716,35 +718,35 @@ export default function SermonBuilder() {
               className="data-[state=active]:bg-white data-[state=active]:text-purple-900 text-white"
             >
               <Film className="w-4 h-4 mr-2" />
-              Builder
+              {t('sermon.builder.tabBuilder')}
             </TabsTrigger>
             <TabsTrigger
               value="library"
               className="data-[state=active]:bg-white data-[state=active]:text-purple-900 text-white"
             >
               <Archive className="w-4 h-4 mr-2" />
-              Library
+              {t('sermon.builder.tabLibrary')}
             </TabsTrigger>
             <TabsTrigger
               value="simmer"
               className="data-[state=active]:bg-white data-[state=active]:text-purple-900 text-white"
             >
               <Sparkles className="w-4 h-4 mr-2" />
-              Simmer
+              {t('sermon.builder.tabSimmer')}
             </TabsTrigger>
             <TabsTrigger
               value="myidea"
               className="data-[state=active]:bg-white data-[state=active]:text-purple-900 text-white"
             >
               <Brain className="w-4 h-4 mr-2" />
-              My Idea
+              {t('sermon.builder.tabMyIdea')}
             </TabsTrigger>
             <TabsTrigger
               value="starters"
               className="data-[state=active]:bg-white data-[state=active]:text-purple-900 text-white"
             >
               <Lightbulb className="w-4 h-4 mr-2" />
-              Idea Starters
+              {t('sermon.builder.tabIdeaStarters')}
             </TabsTrigger>
           </TabsList>
 
@@ -754,8 +756,8 @@ export default function SermonBuilder() {
               <CardHeader>
                 <CardTitle className="text-white flex items-center gap-2">
                   <Archive className="w-5 h-5" />
-                  My Sermon Library
-                  <span className="text-sm font-normal text-purple-200">({librarySermons.length} sermons)</span>
+                  {t('sermon.builder.mySermonLibrary')}
+                  <span className="text-sm font-normal text-purple-200">({t('sermon.builder.sermonCount', { count: librarySermons.length })})</span>
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -766,11 +768,11 @@ export default function SermonBuilder() {
                 ) : librarySermons.length === 0 ? (
                   <div className="text-center py-12 text-white/60">
                     <Film className="w-12 h-12 mx-auto mb-4 opacity-50" />
-                    <p className="text-lg">No sermons yet</p>
-                    <p className="text-sm">Start building your first sermon!</p>
+                    <p className="text-lg">{t('sermon.builder.noSermonsYet')}</p>
+                    <p className="text-sm">{t('sermon.builder.startBuildingFirst')}</p>
                     <Button onClick={startNewSermon} className="mt-4 bg-white text-purple-900 hover:bg-white/90">
                       <Plus className="w-4 h-4 mr-2" />
-                      New Sermon
+                      {t('sermon.builder.newSermon')}
                     </Button>
                   </div>
                 ) : (
@@ -782,14 +784,14 @@ export default function SermonBuilder() {
                             <h3 className="font-semibold text-white line-clamp-1">{s.title || "Untitled Sermon"}</h3>
                             <Badge variant={s.status === "complete" ? "default" : "secondary"} className="ml-2 shrink-0">
                               {s.status === "complete" ? (
-                                <><CheckCircle2 className="w-3 h-3 mr-1" />Complete</>
+                                <><CheckCircle2 className="w-3 h-3 mr-1" />{t('sermon.builder.complete')}</>
                               ) : (
-                                <><Clock className="w-3 h-3 mr-1" />In Progress</>
+                                <><Clock className="w-3 h-3 mr-1" />{t('sermon.builder.inProgress')}</>
                               )}
                             </Badge>
                           </div>
                           <p className="text-sm text-white/60 line-clamp-1 mb-2">
-                            {s.theme_passage ? s.theme_passage.replace(/<[^>]*>/g, '') : "No passage set"}
+                            {s.theme_passage ? s.theme_passage.replace(/<[^>]*>/g, '') : t('sermon.builder.noPassageSet')}
                           </p>
                           <div className="flex items-center gap-2 text-xs text-white/40 mb-3">
                             <Calendar className="w-3 h-3" />
@@ -806,7 +808,7 @@ export default function SermonBuilder() {
                               className="flex-1 text-white hover:bg-white/20"
                             >
                               <Edit className="w-3 h-3 mr-1" />
-                              Edit
+                              {t('common.edit')}
                             </Button>
                             <Button
                               size="sm"
@@ -828,18 +830,18 @@ export default function SermonBuilder() {
                               </AlertDialogTrigger>
                               <AlertDialogContent>
                                 <AlertDialogHeader>
-                                  <AlertDialogTitle>Delete Sermon?</AlertDialogTitle>
+                                  <AlertDialogTitle>{t('sermon.builder.deleteConfirmTitle')}</AlertDialogTitle>
                                   <AlertDialogDescription>
-                                    This will permanently delete "{s.title || "Untitled Sermon"}". This action cannot be undone.
+                                    {t('sermon.builder.deleteConfirmDescription', { title: s.title || t('sermon.builder.untitledSermon') })}
                                   </AlertDialogDescription>
                                 </AlertDialogHeader>
                                 <AlertDialogFooter>
-                                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                  <AlertDialogCancel>{t('common.cancel')}</AlertDialogCancel>
                                   <AlertDialogAction
                                     onClick={() => deleteLibrarySermon(s.id)}
                                     className="bg-red-600 hover:bg-red-700"
                                   >
-                                    Delete
+                                    {t('common.delete')}
                                   </AlertDialogAction>
                                 </AlertDialogFooter>
                               </AlertDialogContent>
@@ -860,7 +862,7 @@ export default function SermonBuilder() {
               <CardHeader className="flex flex-row items-center justify-between border-b border-white/10 dark:border-slate-700 pb-4">
                 <CardTitle className="text-foreground flex items-center gap-2">
                   <Sparkles className="w-5 h-5" />
-                  Simmer Engine
+                  {t('sermon.builder.simmerEngine')}
                 </CardTitle>
               </CardHeader>
               <CardContent className="p-4">
@@ -875,7 +877,7 @@ export default function SermonBuilder() {
                     }));
                     setActiveTab("builder");
                     setCurrentStep(5); // Go to writing step
-                    toast.success("Content added to sermon! Moved to Write step.");
+                    toast.success(t('sermon.builder.contentAddedToSermon'));
                   }}
                   sermonId={editId || undefined}
                 />
@@ -934,22 +936,22 @@ export default function SermonBuilder() {
           <Card variant="glass" className={`bg-white/90 dark:bg-white/10 backdrop-blur-xl border-white/20 ${currentStep === 5 ? 'lg:col-span-1' : ''}`}>
             <CardHeader>
               <CardTitle className="text-2xl">
-                {currentStep === 1 && "Start New Sermon"}
-                {currentStep === 2 && "Gather Your 5 Smooth Stones"}
-                {currentStep === 3 && "Build Bridges"}
-                {currentStep === 4 && "Structure Like a Movie"}
-                {currentStep === 5 && "Write Your Sermon"}
-                {currentStep === 6 && "Complete & Review"}
+                {currentStep === 1 && t('sermon.builder.step1Title')}
+                {currentStep === 2 && t('sermon.builder.step2Title')}
+                {currentStep === 3 && t('sermon.builder.step3Title')}
+                {currentStep === 4 && t('sermon.builder.step4Title')}
+                {currentStep === 5 && t('sermon.builder.step5Title')}
+                {currentStep === 6 && t('sermon.builder.step6Title')}
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-6">
               {currentStep === 1 && (
                 <>
                   <div>
-                    <label className="text-sm font-medium mb-2 block">Sermon Title</label>
+                    <label className="text-sm font-medium mb-2 block">{t('sermon.builder.sermonTitle')}</label>
                     <div className="relative">
                       <Input
-                        placeholder="Enter a catchy, movie-like title..."
+                        placeholder={t('sermon.builder.titlePlaceholder')}
                         value={sermon.title}
                         onChange={(e) => setSermon({ ...sermon, title: e.target.value })}
                         className="pr-10"
@@ -960,7 +962,7 @@ export default function SermonBuilder() {
                   </div>
 
                   <div>
-                    <label className="text-sm font-medium mb-2 block">Theme / Main Passage</label>
+                    <label className="text-sm font-medium mb-2 block">{t('sermon.builder.themePassage')}</label>
                     <SermonRichTextArea
                       content={sermon.theme_passage}
                       onChange={(content) => setSermon({ ...sermon, theme_passage: content })}
@@ -972,13 +974,13 @@ export default function SermonBuilder() {
 
                   <div>
                     <label className="text-sm font-medium mb-2 block flex items-center gap-2">
-                      Sermon Style
+                      {t('sermon.builder.sermonStyle')}
                       <Tooltip>
                         <TooltipTrigger asChild>
                           <Info className="w-4 h-4 text-muted-foreground cursor-help" />
                         </TooltipTrigger>
                         <TooltipContent side="right" className="max-w-xs">
-                          <p className="text-sm">Each style shapes how you present truth. Hover over options to learn more.</p>
+                          <p className="text-sm">{t('sermon.builder.styleTooltip')}</p>
                         </TooltipContent>
                       </Tooltip>
                     </label>
@@ -1015,7 +1017,7 @@ export default function SermonBuilder() {
                     className="w-full"
                   >
                     {asking ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-                    Ask Jeeves for Setup Guidance
+                    {t('sermon.builder.askJeevesSetup')}
                   </Button>
                 </>
               )}
@@ -1023,14 +1025,14 @@ export default function SermonBuilder() {
               {currentStep === 2 && (
                 <>
                   <p className="text-sm text-muted-foreground">
-                    Like David selecting 5 smooth stones for Goliath, identify 5 powerful AHA moments that will captivate your audience.
+                    {t('sermon.builder.stonesDescription')}
                   </p>
                   
                   <div className="space-y-2">
                     {sermon.smooth_stones.map((stone, idx) => (
                       <div key={idx} className="p-3 bg-purple-50 rounded-lg border border-purple-200">
                         <div className="flex items-start gap-2">
-                          <span className="font-bold text-purple-900">Stone {idx + 1}:</span>
+                          <span className="font-bold text-purple-900">{t('sermon.builder.stoneNumber', { num: idx + 1 })}:</span>
                           <div className="text-sm text-foreground flex-1 prose prose-sm" dangerouslySetInnerHTML={{ __html: sanitizeHtml(stone) }} />
                         </div>
                       </div>
@@ -1047,7 +1049,7 @@ export default function SermonBuilder() {
                     />
                     <div className="flex gap-2">
                       <Button onClick={addSmoothStone} className="flex-1">
-                        Add Stone ({sermon.smooth_stones.length}/5)
+                        {t('sermon.builder.addStone', { current: sermon.smooth_stones.length, max: 5 })}
                       </Button>
                       <Dialog open={gemsDialogOpen} onOpenChange={setGemsDialogOpen}>
                         <DialogTrigger asChild>
@@ -1058,22 +1060,22 @@ export default function SermonBuilder() {
                             className="gap-2"
                           >
                             {loadingGems ? <Loader2 className="w-4 h-4 animate-spin" /> : <Gem className="w-4 h-4" />}
-                            Pull from My Gems
+                            {t('sermon.builder.pullFromGems')}
                           </Button>
                         </DialogTrigger>
                         <DialogContent className="max-w-2xl max-h-[80vh]">
                           <DialogHeader>
                             <DialogTitle className="flex items-center gap-2">
                               <Gem className="w-5 h-5 text-purple-600" />
-                              Select a Gem as a Smooth Stone
+                              {t('sermon.builder.selectGemAsStone')}
                             </DialogTitle>
                           </DialogHeader>
                           <ScrollArea className="max-h-[60vh] pr-4">
                             {userGems.length === 0 ? (
                               <div className="text-center py-8 text-muted-foreground">
                                 <Gem className="w-12 h-12 mx-auto mb-3 opacity-30" />
-                                <p>No gems found.</p>
-                                <p className="text-sm">Create gems in the Gems Room to use here!</p>
+                                <p>{t('sermon.builder.noGemsFound')}</p>
+                                <p className="text-sm">{t('sermon.builder.createGemsHint')}</p>
                               </div>
                             ) : (
                               <div className="space-y-3">
@@ -1114,7 +1116,7 @@ export default function SermonBuilder() {
                     className="w-full"
                   >
                     {asking ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-                    Ask Jeeves for Stone Ideas
+                    {t('sermon.builder.askJeevesStones')}
                   </Button>
 
                   {/* Scripture Armory Section */}
@@ -1134,7 +1136,7 @@ export default function SermonBuilder() {
               {currentStep === 3 && (
                 <>
                   <p className="text-sm text-muted-foreground">
-                    Create narrative bridges that connect your 5 stones into a flowing story. Each bridge transitions smoothly between insights.
+                    {t('sermon.builder.bridgesDescription')}
                   </p>
                   
                   <div className="space-y-2">
@@ -1157,7 +1159,7 @@ export default function SermonBuilder() {
                       themePassage={sermon.theme_passage}
                     />
                     <Button onClick={addBridge} className="w-full">
-                      Add Bridge ({sermon.bridges.length}/4+)
+                      {t('sermon.builder.addBridge', { current: sermon.bridges.length })}
                     </Button>
                   </div>
 
@@ -1168,7 +1170,7 @@ export default function SermonBuilder() {
                     className="w-full"
                   >
                     {asking ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-                    Ask Jeeves for Bridge Ideas
+                    {t('sermon.builder.askJeevesBridges')}
                   </Button>
                 </>
               )}
@@ -1176,12 +1178,12 @@ export default function SermonBuilder() {
               {currentStep === 4 && (
                 <>
                   <p className="text-sm text-muted-foreground">
-                    Structure your sermon like a movie: Opening Hook → Rising Action → Climax → Resolution → Call to Action
+                    {t('sermon.builder.movieDescription')}
                   </p>
                   
                   <div className="space-y-4">
                     <div>
-                      <label className="text-sm font-medium mb-2 block">Opening Hook</label>
+                      <label className="text-sm font-medium mb-2 block">{t('sermon.builder.openingHook')}</label>
                       <SermonRichTextArea
                         content={sermon.movie_structure.opening || ""}
                         onChange={(content) => setSermon({ ...sermon, movie_structure: { ...sermon.movie_structure, opening: content }})}
@@ -1192,7 +1194,7 @@ export default function SermonBuilder() {
                     </div>
 
                     <div>
-                      <label className="text-sm font-medium mb-2 block">Climax / Main Point</label>
+                      <label className="text-sm font-medium mb-2 block">{t('sermon.builder.climax')}</label>
                       <SermonRichTextArea
                         content={sermon.movie_structure.climax || ""}
                         onChange={(content) => setSermon({ ...sermon, movie_structure: { ...sermon.movie_structure, climax: content }})}
@@ -1203,7 +1205,7 @@ export default function SermonBuilder() {
                     </div>
 
                     <div>
-                      <label className="text-sm font-medium mb-2 block">Resolution</label>
+                      <label className="text-sm font-medium mb-2 block">{t('sermon.builder.resolution')}</label>
                       <SermonRichTextArea
                         content={sermon.movie_structure.resolution || ""}
                         onChange={(content) => setSermon({ ...sermon, movie_structure: { ...sermon.movie_structure, resolution: content }})}
@@ -1214,7 +1216,7 @@ export default function SermonBuilder() {
                     </div>
 
                     <div>
-                      <label className="text-sm font-medium mb-2 block">Call to Action</label>
+                      <label className="text-sm font-medium mb-2 block">{t('sermon.builder.callToAction')}</label>
                       <SermonRichTextArea
                         content={sermon.movie_structure.call_to_action || ""}
                         onChange={(content) => setSermon({ ...sermon, movie_structure: { ...sermon.movie_structure, call_to_action: content }})}
@@ -1232,7 +1234,7 @@ export default function SermonBuilder() {
                     className="w-full"
                   >
                     {asking ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-                    Ask Jeeves for Structure Help
+                    {t('sermon.builder.askJeevesStructure')}
                   </Button>
                 </>
               )}
@@ -1250,29 +1252,29 @@ export default function SermonBuilder() {
                 <div className="space-y-4">
                   <div className="p-4 bg-green-50 rounded-lg border border-green-200">
                     <CheckCircle2 className="w-8 h-8 text-green-600 mb-2" />
-                    <h3 className="font-bold text-green-900 mb-1">Sermon Complete!</h3>
+                    <h3 className="font-bold text-green-900 mb-1">{t('sermon.builder.sermonComplete')}</h3>
                     <p className="text-sm text-green-800">
-                      Your sermon framework is ready. Review all sections and save your work.
+                      {t('sermon.builder.sermonCompleteDescription')}
                     </p>
                   </div>
 
                   <div className="space-y-3">
                     <div className="p-3 bg-card rounded border">
-                      <p className="font-medium text-sm">Title:</p>
+                      <p className="font-medium text-sm">{t('sermon.builder.reviewTitle')}:</p>
                       <p className="text-foreground">{sermon.title}</p>
                     </div>
                     <div className="p-3 bg-card rounded border">
-                      <p className="font-medium text-sm">Smooth Stones: {sermon.smooth_stones.length}</p>
+                      <p className="font-medium text-sm">{t('sermon.builder.reviewStones')}: {sermon.smooth_stones.length}</p>
                     </div>
                     <div className="p-3 bg-card rounded border">
-                      <p className="font-medium text-sm">Bridges: {sermon.bridges.length}</p>
+                      <p className="font-medium text-sm">{t('sermon.builder.reviewBridges')}: {sermon.bridges.length}</p>
                     </div>
                     <div className="p-3 bg-card rounded border">
-                      <p className="font-medium text-sm">Movie Structure: Complete</p>
+                      <p className="font-medium text-sm">{t('sermon.builder.reviewMovieStructure')}: {t('sermon.builder.complete')}</p>
                     </div>
                     {sermon.full_sermon && (
                       <div className="p-3 bg-card rounded border">
-                        <p className="font-medium text-sm">Full Sermon: Written</p>
+                        <p className="font-medium text-sm">{t('sermon.builder.reviewFullSermon')}: {t('sermon.builder.written')}</p>
                       </div>
                     )}
                   </div>
@@ -1280,7 +1282,7 @@ export default function SermonBuilder() {
                   <div className="flex gap-2 flex-wrap">
                     <Button onClick={saveSermon} disabled={loading} className="flex-1 min-w-[120px]" size="lg">
                       {loading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-                      Save Sermon
+                      {t('sermon.builder.saveSermon')}
                     </Button>
                     <SermonPDFExport sermon={sermon} size="lg" variant="secondary" />
                     <SermonPPTExport sermon={sermon} size="lg" variant="secondary" />
@@ -1292,10 +1294,10 @@ export default function SermonBuilder() {
               <div className="flex flex-col gap-3 pt-4 border-t">
                 <div className="flex gap-2">
                   <Button onClick={prevStep} disabled={currentStep === 1} variant="outline" className="flex-1">
-                    Previous
+                    {t('common.previous')}
                   </Button>
                   <Button onClick={nextStep} disabled={currentStep === 6} className="flex-1">
-                    Next Step
+                    {t('sermon.builder.nextStep')}
                   </Button>
                 </div>
                 {currentStep < 5 && (
@@ -1305,7 +1307,7 @@ export default function SermonBuilder() {
                     className="text-sm text-muted-foreground hover:text-foreground"
                   >
                     <PenLine className="w-4 h-4 mr-2" />
-                    Skip to Write Sermon →
+                    {t('sermon.builder.skipToWrite')}
                   </Button>
                 )}
               </div>
@@ -1326,25 +1328,25 @@ export default function SermonBuilder() {
                     <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center">
                       <BookOpen className="w-5 h-5 text-white" />
                     </div>
-                    The 5 Smooth Stones Approach
+                    {t('sermon.builder.smoothStonesApproach')}
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-3 text-white/90">
                   <p>
-                    Like David selecting 5 smooth stones to face Goliath, you'll gather 5 powerful AHA moments that will captivate your audience.
+                    {t('sermon.builder.approachDescription')}
                   </p>
                   <div className="space-y-2">
                     <div className="flex gap-2 items-start">
                       <TrendingUp className="w-5 h-5 flex-shrink-0 mt-0.5 text-blue-300" />
-                      <p className="text-sm">Each stone is a mind-blowing Phototheology insight</p>
+                      <p className="text-sm">{t('sermon.builder.approachStone')}</p>
                     </div>
                     <div className="flex gap-2 items-start">
                       <ArrowRight className="w-5 h-5 flex-shrink-0 mt-0.5 text-cyan-300" />
-                      <p className="text-sm">Bridges connect stones into a flowing narrative</p>
+                      <p className="text-sm">{t('sermon.builder.approachBridge')}</p>
                     </div>
                     <div className="flex gap-2 items-start">
                       <Film className="w-5 h-5 flex-shrink-0 mt-0.5 text-purple-300" />
-                      <p className="text-sm">Structure it like a movie with climax and resolution</p>
+                      <p className="text-sm">{t('sermon.builder.approachMovie')}</p>
                     </div>
                   </div>
                 </CardContent>
@@ -1358,7 +1360,7 @@ export default function SermonBuilder() {
                 >
                   <Card variant="glass" className="bg-gradient-to-br from-purple-500/20 to-fuchsia-500/20 border-purple-400/30 backdrop-blur-xl">
                     <CardHeader>
-                      <CardTitle className="text-white">Jeeves&apos; Guidance</CardTitle>
+                      <CardTitle className="text-white">{t('sermon.builder.jeevesGuidanceTitle')}</CardTitle>
                     </CardHeader>
                     <CardContent>
                       <div className="prose prose-sm max-w-none text-white/90 dark:prose-invert">

@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import { Navigation } from "@/components/Navigation";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -27,6 +28,7 @@ interface PublicImage {
 }
 
 const PublicImageLibrary = () => {
+  const { t } = useTranslation();
   const { toast } = useToast();
   const [images, setImages] = useState<PublicImage[]>([]);
   const [filteredImages, setFilteredImages] = useState<PublicImage[]>([]);
@@ -80,8 +82,8 @@ const PublicImageLibrary = () => {
     } catch (error: any) {
       console.error("Error fetching public images:", error);
       toast({
-        title: "Error",
-        description: "Failed to load public images",
+        title: t('common.error'),
+        description: t('public.failedToLoadImages'),
         variant: "destructive",
       });
     } finally {
@@ -119,10 +121,10 @@ const PublicImageLibrary = () => {
         <div className="text-center mb-8">
           <div className="flex items-center justify-center gap-3 mb-4">
             <Heart className="h-12 w-12 text-primary" />
-            <h1 className="text-4xl font-bold">Public Image Library</h1>
+            <h1 className="text-4xl font-bold">{t('public.imageLibraryTitle')}</h1>
           </div>
           <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-            Browse Bible study images shared by the community. Get inspired and discover new visual insights.
+            {t('public.imageLibrarySubtitle')}
           </p>
         </div>
 
@@ -133,7 +135,7 @@ const PublicImageLibrary = () => {
               <div className="flex-1 relative">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <Input
-                  placeholder="Search by description, verse, creator..."
+                  placeholder={t('public.searchImagesPlaceholder')}
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="pl-10"
@@ -141,10 +143,10 @@ const PublicImageLibrary = () => {
               </div>
               <Select value={roomFilter} onValueChange={setRoomFilter}>
                 <SelectTrigger className="w-full md:w-[200px]">
-                  <SelectValue placeholder="Filter by room" />
+                  <SelectValue placeholder={t('public.filterByRoom')} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">All Rooms</SelectItem>
+                  <SelectItem value="all">{t('public.allRooms')}</SelectItem>
                   {roomTypes.map((room) => (
                     <SelectItem key={room} value={room}>
                       {room}
@@ -154,7 +156,7 @@ const PublicImageLibrary = () => {
               </Select>
             </div>
             <div className="mt-4 flex items-center gap-2 text-sm text-muted-foreground">
-              <span>Showing {filteredImages.length} of {images.length} images</span>
+              <span>{t('public.showingImages', { showing: filteredImages.length, total: images.length })}</span>
             </div>
           </CardContent>
         </Card>
@@ -168,11 +170,11 @@ const PublicImageLibrary = () => {
           <Card>
             <CardContent className="text-center py-20">
               <Heart className="h-16 w-16 mx-auto mb-4 text-muted-foreground opacity-50" />
-              <h3 className="text-xl font-semibold mb-2">No Images Found</h3>
+              <h3 className="text-xl font-semibold mb-2">{t('public.noImagesFound')}</h3>
               <p className="text-muted-foreground">
                 {searchQuery || roomFilter !== "all"
-                  ? "Try adjusting your filters"
-                  : "Be the first to share an image with the community!"}
+                  ? t('public.tryAdjustingFilters')
+                  : t('public.beFirstToShare')}
               </p>
             </CardContent>
           </Card>
@@ -227,7 +229,7 @@ const PublicImageLibrary = () => {
                       className="w-full"
                       onClick={() => window.open(image.image_url, "_blank")}
                     >
-                      View Full Size
+                      {t('public.viewFullSize')}
                     </Button>
                   </CardFooter>
                 </Card>

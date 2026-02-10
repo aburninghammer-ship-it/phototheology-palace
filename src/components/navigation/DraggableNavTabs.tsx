@@ -1,4 +1,5 @@
 import { useState, useMemo, useRef } from "react";
+import { useTranslation } from "react-i18next";
 import { Link, useLocation } from "react-router-dom";
 import {
   DndContext,
@@ -50,6 +51,7 @@ interface SortableTabProps {
 }
 
 function SortableTab({ tab, isActive, isPinned, onPin, onUnpin, isDragging, isAnyDragging, wasDragging }: SortableTabProps) {
+  const { t } = useTranslation();
   const {
     attributes,
     listeners,
@@ -98,7 +100,7 @@ function SortableTab({ tab, isActive, isPinned, onPin, onUnpin, isDragging, isAn
       {isPinned && <Pin className="h-3 w-3 text-yellow-500 mr-1" />}
       <tab.icon className={`h-3.5 w-3.5`} style={{ color: tab.gradient.glow.replace('rgba(', 'rgb(').replace(',0.5)', ')') }} />
       <span className={`bg-gradient-to-r ${tab.gradient.text} bg-clip-text text-transparent font-semibold`}>
-        {tab.shortLabel || tab.label}
+        {t('navTabs.' + tab.id, { defaultValue: tab.shortLabel || tab.label })}
       </span>
     </div>
   );
@@ -122,7 +124,7 @@ function SortableTab({ tab, isActive, isPinned, onPin, onUnpin, isDragging, isAn
                   <DropdownMenuItem key={item.to} asChild>
                     <Link to={item.to}>
                       {item.icon && <item.icon className="h-4 w-4 mr-2" />}
-                      {item.label}
+                      {t('navDropdown.' + item.to.replace(/\//g, '').replace(/-/g, ''), { defaultValue: item.label })}
                     </Link>
                   </DropdownMenuItem>
                 ))}
@@ -133,12 +135,12 @@ function SortableTab({ tab, isActive, isPinned, onPin, onUnpin, isDragging, isAn
             {isPinned ? (
               <ContextMenuItem onClick={onUnpin}>
                 <PinOff className="h-4 w-4 mr-2" />
-                Unpin Tab
+                {t('nav.unpinTab')}
               </ContextMenuItem>
             ) : (
               <ContextMenuItem onClick={onPin}>
                 <Pin className="h-4 w-4 mr-2" />
-                Pin to Start
+                {t('nav.pinToStart')}
               </ContextMenuItem>
             )}
           </ContextMenuContent>
@@ -164,12 +166,12 @@ function SortableTab({ tab, isActive, isPinned, onPin, onUnpin, isDragging, isAn
           {isPinned ? (
             <ContextMenuItem onClick={onUnpin}>
               <PinOff className="h-4 w-4 mr-2" />
-              Unpin Tab
+              {t('nav.unpinTab')}
             </ContextMenuItem>
           ) : (
             <ContextMenuItem onClick={onPin}>
               <Pin className="h-4 w-4 mr-2" />
-              Pin to Start
+              {t('nav.pinToStart')}
             </ContextMenuItem>
           )}
         </ContextMenuContent>
@@ -179,6 +181,7 @@ function SortableTab({ tab, isActive, isPinned, onPin, onUnpin, isDragging, isAn
 }
 
 export function DraggableNavTabs() {
+  const { t } = useTranslation();
   const location = useLocation();
   const { preferences, updatePreference } = useUserPreferences();
   const { isMember: isChurchMember, churchId } = useChurchMembership();
@@ -266,7 +269,7 @@ export function DraggableNavTabs() {
     const newOrder = reorderedTabs.map(tab => tab.id);
 
     updatePreference("nav_tab_order", newOrder);
-    toast.success("Tab order updated");
+    toast.success(t('nav.tabOrderUpdated'));
   };
 
   const handleDragCancel = () => {
@@ -283,13 +286,13 @@ export function DraggableNavTabs() {
   const handlePin = (tabId: string) => {
     const newPinned = [...pinnedTabIds, tabId];
     updatePreference("pinned_nav_tabs", newPinned);
-    toast.success("Tab pinned!");
+    toast.success(t('nav.tabPinned'));
   };
 
   const handleUnpin = (tabId: string) => {
     const newPinned = pinnedTabIds.filter(id => id !== tabId);
     updatePreference("pinned_nav_tabs", newPinned);
-    toast.success("Tab unpinned");
+    toast.success(t('nav.tabUnpinned'));
   };
 
   return (
@@ -325,7 +328,7 @@ export function DraggableNavTabs() {
         </DndContext>
       </div>
       <p className="text-[10px] text-muted-foreground text-center pb-1 hidden lg:block">
-        Right-click tabs to pin/unpin. Drag unpinned tabs to reorder.
+        {t('nav.tabReorderHint')}
       </p>
     </div>
   );

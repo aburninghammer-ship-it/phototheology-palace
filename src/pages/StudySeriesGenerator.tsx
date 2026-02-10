@@ -1,4 +1,5 @@
 import { useState, useMemo } from "react";
+import { useTranslation } from "react-i18next";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { motion } from "framer-motion";
@@ -53,20 +54,21 @@ interface WizardStep {
 }
 
 const WIZARD_STEPS: WizardStep[] = [
-  { id: 1, title: "Select Sources", description: "Choose documents from your library" },
-  { id: 2, title: "Configure", description: "Set title, audience, and lesson count" },
-  { id: 3, title: "Generate", description: "AI creates your study series" },
-  { id: 4, title: "Review", description: "Edit and export your series" },
+  { id: 1, title: "studySeries.stepSelectSources", description: "studySeries.stepSelectSourcesDesc" },
+  { id: 2, title: "studySeries.stepConfigure", description: "studySeries.stepConfigureDesc" },
+  { id: 3, title: "studySeries.stepGenerate", description: "studySeries.stepGenerateDesc" },
+  { id: 4, title: "studySeries.stepReview", description: "studySeries.stepReviewDesc" },
 ];
 
 const AUDIENCE_OPTIONS = [
-  { id: "adults", label: "Adults", icon: Users, description: "Mature theological discussions" },
-  { id: "youth", label: "Youth", icon: GraduationCap, description: "Engaging for teens" },
-  { id: "children", label: "Children", icon: Baby, description: "Simple, visual approach" },
-  { id: "mixed", label: "Mixed Ages", icon: Users, description: "Family-friendly content" },
+  { id: "adults", label: "studySeries.audienceAdults", icon: Users, description: "studySeries.audienceAdultsDesc" },
+  { id: "youth", label: "studySeries.audienceYouth", icon: GraduationCap, description: "studySeries.audienceYouthDesc" },
+  { id: "children", label: "studySeries.audienceChildren", icon: Baby, description: "studySeries.audienceChildrenDesc" },
+  { id: "mixed", label: "studySeries.audienceMixed", icon: Users, description: "studySeries.audienceMixedDesc" },
 ];
 
 export default function StudySeriesGenerator() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const { user } = useAuth();
@@ -114,15 +116,15 @@ export default function StudySeriesGenerator() {
 
     setIsGenerating(true);
     setGenerationProgress(0);
-    setGenerationStatus("Preparing source materials...");
+    setGenerationStatus(t('studySeries.preparingSourceMaterials'));
 
     try {
       // Check if user has enough credits for the full series
       const check = await checkCredits("study-series-outline");
       if (!check.has_credits && !check.user_has_unlimited) {
         toast({
-          title: "Insufficient credits",
-          description: `You need ${totalCost} credits for this series. You have ${check.credits_available}.`,
+          title: t('studySeries.insufficientCredits'),
+          description: t('studySeries.insufficientCreditsDesc', { needed: totalCost, available: check.credits_available }),
           variant: "destructive",
         });
         setIsGenerating(false);
@@ -133,7 +135,7 @@ export default function StudySeriesGenerator() {
       const sourceTexts = selectedSources.map((s) => s.extracted_text || "").filter(Boolean);
 
       setGenerationProgress(10);
-      setGenerationStatus("Generating series outline...");
+      setGenerationStatus(t('studySeries.generatingOutline'));
 
       // Call edge function for full series generation
       const { data, error } = await supabase.functions.invoke("generate-study-series", {
@@ -152,20 +154,20 @@ export default function StudySeriesGenerator() {
 
       // Update progress as we receive the result
       setGenerationProgress(100);
-      setGenerationStatus("Complete!");
+      setGenerationStatus(t('studySeries.complete'));
 
       setGeneratedSeries(data);
       setCurrentStep(4);
 
       toast({
-        title: "Series generated!",
-        description: `Created ${data.lessons?.length || lessonCount} lessons successfully.`,
+        title: t('studySeries.seriesGenerated'),
+        description: t('studySeries.createdLessons', { count: data.lessons?.length || lessonCount }),
       });
     } catch (error: any) {
       console.error("Generation failed:", error);
       toast({
-        title: "Generation failed",
-        description: error.message || "Could not generate study series. Please try again.",
+        title: t('studySeries.generationFailed'),
+        description: error.message || t('studySeries.couldNotGenerate'),
         variant: "destructive",
       });
     } finally {
@@ -188,46 +190,46 @@ export default function StudySeriesGenerator() {
               <div className="w-16 h-16 rounded-full bg-purple-500/10 flex items-center justify-center mx-auto mb-4">
                 <Lock className="h-8 w-8 text-purple-500" />
               </div>
-              <CardTitle className="text-2xl">Premium Feature</CardTitle>
+              <CardTitle className="text-2xl">{t('studySeries.premiumFeature')}</CardTitle>
               <CardDescription>
-                The Bible Study Series Generator is available to premium subscribers.
+                {t('studySeries.premiumDescription')}
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="p-4 rounded-lg bg-muted/50">
-                <h4 className="font-medium mb-2">What you get:</h4>
+                <h4 className="font-medium mb-2">{t('studySeries.whatYouGet')}</h4>
                 <ul className="text-sm text-muted-foreground space-y-1">
                   <li className="flex items-center gap-2">
                     <Check className="h-4 w-4 text-green-500" />
-                    Generate complete multi-lesson Bible studies
+                    {t('studySeries.benefitMultiLesson')}
                   </li>
                   <li className="flex items-center gap-2">
                     <Check className="h-4 w-4 text-green-500" />
-                    AI-powered outline and content creation
+                    {t('studySeries.benefitAiPowered')}
                   </li>
                   <li className="flex items-center gap-2">
                     <Check className="h-4 w-4 text-green-500" />
-                    Export to PDF and Word
+                    {t('studySeries.benefitExport')}
                   </li>
                   <li className="flex items-center gap-2">
                     <Check className="h-4 w-4 text-green-500" />
-                    Unlimited AI credits included
+                    {t('studySeries.benefitUnlimited')}
                   </li>
                 </ul>
               </div>
 
               <div className="text-center">
-                <p className="text-2xl font-bold">$30/month</p>
-                <p className="text-sm text-muted-foreground">Unlimited AI + Premium Features</p>
+                <p className="text-2xl font-bold">{t('studySeries.pricePerMonth')}</p>
+                <p className="text-sm text-muted-foreground">{t('studySeries.unlimitedAiPremium')}</p>
               </div>
             </CardContent>
             <CardFooter className="flex flex-col gap-2">
               <Button className="w-full" onClick={() => navigate("/pricing?tier=unlimited")}>
                 <Crown className="h-4 w-4 mr-2" />
-                Upgrade to Premium
+                {t('studySeries.upgradeToPremium')}
               </Button>
               <Button variant="outline" className="w-full" onClick={() => navigate(-1)}>
-                Go Back
+                {t('studySeries.goBack')}
               </Button>
             </CardFooter>
           </Card>
@@ -242,7 +244,7 @@ export default function StudySeriesGenerator() {
         <title>Study Series Generator | Phototheology Palace</title>
         <meta
           name="description"
-          content="Generate complete Bible study series from your documents with AI."
+          content={t('studySeries.metaDescription')}
         />
       </Helmet>
 
@@ -260,16 +262,16 @@ export default function StudySeriesGenerator() {
                   <BookOpen className="h-8 w-8 text-blue-500" />
                 </div>
                 <div>
-                  <h1 className="text-3xl font-bold">Study Series Generator</h1>
+                  <h1 className="text-3xl font-bold">{t('studySeries.pageTitle')}</h1>
                   <p className="text-muted-foreground">
-                    Create multi-lesson Bible studies from your documents
+                    {t('studySeries.pageSubtitle')}
                   </p>
                 </div>
               </div>
 
               <Badge className="bg-gradient-to-r from-purple-500 to-pink-500">
                 <Crown className="h-3 w-3 mr-1" />
-                Premium Feature
+                {t('studySeries.premiumFeature')}
               </Badge>
             </div>
           </motion.div>
@@ -309,7 +311,7 @@ export default function StudySeriesGenerator() {
             <div className="flex justify-between mt-2">
               {WIZARD_STEPS.map((step) => (
                 <div key={step.id} className="text-center" style={{ width: "25%" }}>
-                  <p className="text-xs font-medium">{step.title}</p>
+                  <p className="text-xs font-medium">{t(step.title)}</p>
                 </div>
               ))}
             </div>
@@ -321,9 +323,9 @@ export default function StudySeriesGenerator() {
             {currentStep === 1 && (
               <>
                 <CardHeader>
-                  <CardTitle>Select Source Documents</CardTitle>
+                  <CardTitle>{t('studySeries.selectSourceDocuments')}</CardTitle>
                   <CardDescription>
-                    Choose one or more documents from your library to generate a study series.
+                    {t('studySeries.selectSourceDescription')}
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
@@ -334,9 +336,9 @@ export default function StudySeriesGenerator() {
                   ) : sources.length === 0 ? (
                     <div className="text-center py-8">
                       <FileText className="h-12 w-12 text-muted-foreground/50 mx-auto mb-4" />
-                      <p className="text-muted-foreground mb-4">No documents in your library yet.</p>
+                      <p className="text-muted-foreground mb-4">{t('studySeries.noDocumentsYet')}</p>
                       <Button onClick={() => navigate("/sources")}>
-                        Upload Documents
+                        {t('studySeries.uploadDocuments')}
                       </Button>
                     </div>
                   ) : (
@@ -361,7 +363,7 @@ export default function StudySeriesGenerator() {
                             <div className="flex-1">
                               <p className="font-medium">{source.title}</p>
                               <p className="text-xs text-muted-foreground">
-                                {source.document_type.toUpperCase()} • {source.extracted_text?.split(/\s+/).length || 0} words
+                                {source.document_type.toUpperCase()} • {t('studySeries.nWords', { count: source.extracted_text?.split(/\s+/).length || 0 })}
                               </p>
                             </div>
                           </div>
@@ -372,13 +374,13 @@ export default function StudySeriesGenerator() {
                 </CardContent>
                 <CardFooter className="justify-between">
                   <Button variant="outline" onClick={() => navigate(-1)}>
-                    Cancel
+                    {t('studySeries.cancel')}
                   </Button>
                   <Button
                     onClick={() => setCurrentStep(2)}
                     disabled={selectedSourceIds.length === 0}
                   >
-                    Next
+                    {t('studySeries.next')}
                     <ArrowRight className="h-4 w-4 ml-2" />
                   </Button>
                 </CardFooter>
@@ -389,25 +391,25 @@ export default function StudySeriesGenerator() {
             {currentStep === 2 && (
               <>
                 <CardHeader>
-                  <CardTitle>Configure Your Series</CardTitle>
+                  <CardTitle>{t('studySeries.configureYourSeries')}</CardTitle>
                   <CardDescription>
-                    Set the title, target audience, and number of lessons.
+                    {t('studySeries.configureDescription')}
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-6">
                   <div className="space-y-2">
-                    <Label>Series Title</Label>
+                    <Label>{t('studySeries.seriesTitle')}</Label>
                     <Input
-                      placeholder="e.g., Journey Through the Psalms"
+                      placeholder={t('studySeries.seriesTitlePlaceholder')}
                       value={title}
                       onChange={(e) => setTitle(e.target.value)}
                     />
                   </div>
 
                   <div className="space-y-2">
-                    <Label>Description (optional)</Label>
+                    <Label>{t('studySeries.descriptionOptional')}</Label>
                     <Textarea
-                      placeholder="Describe what this study series will cover..."
+                      placeholder={t('studySeries.descriptionPlaceholder')}
                       value={description}
                       onChange={(e) => setDescription(e.target.value)}
                       rows={3}
@@ -415,7 +417,7 @@ export default function StudySeriesGenerator() {
                   </div>
 
                   <div className="space-y-2">
-                    <Label>Target Audience</Label>
+                    <Label>{t('studySeries.targetAudience')}</Label>
                     <div className="grid grid-cols-2 gap-3">
                       {AUDIENCE_OPTIONS.map((option) => (
                         <div
@@ -430,16 +432,16 @@ export default function StudySeriesGenerator() {
                         >
                           <div className="flex items-center gap-2">
                             <option.icon className="h-5 w-5" />
-                            <span className="font-medium">{option.label}</span>
+                            <span className="font-medium">{t(option.label)}</span>
                           </div>
-                          <p className="text-xs text-muted-foreground mt-1">{option.description}</p>
+                          <p className="text-xs text-muted-foreground mt-1">{t(option.description)}</p>
                         </div>
                       ))}
                     </div>
                   </div>
 
                   <div className="space-y-2">
-                    <Label>Number of Lessons</Label>
+                    <Label>{t('studySeries.numberOfLessons')}</Label>
                     <Select value={lessonCount.toString()} onValueChange={(v) => setLessonCount(parseInt(v))}>
                       <SelectTrigger>
                         <SelectValue />
@@ -447,7 +449,7 @@ export default function StudySeriesGenerator() {
                       <SelectContent>
                         {[4, 5, 6, 7, 8].map((num) => (
                           <SelectItem key={num} value={num.toString()}>
-                            {num} lessons
+                            {t('studySeries.nLessons', { count: num })}
                           </SelectItem>
                         ))}
                       </SelectContent>
@@ -456,24 +458,24 @@ export default function StudySeriesGenerator() {
 
                   <div className="p-4 rounded-lg bg-muted/50">
                     <div className="flex items-center justify-between">
-                      <span className="text-sm">Estimated AI credits:</span>
+                      <span className="text-sm">{t('studySeries.estimatedCredits')}</span>
                       <Badge variant="secondary">
                         <Zap className="h-3 w-3 mr-1 text-yellow-500" />
-                        {totalCost} credits
+                        {t('studySeries.nCredits', { count: totalCost })}
                       </Badge>
                     </div>
                     <p className="text-xs text-muted-foreground mt-1">
-                      {creditsInfo?.has_unlimited ? "Included with your unlimited plan" : `You have ${creditsInfo?.credits_balance} credits`}
+                      {creditsInfo?.has_unlimited ? t('studySeries.includedWithUnlimited') : t('studySeries.youHaveCredits', { count: creditsInfo?.credits_balance })}
                     </p>
                   </div>
                 </CardContent>
                 <CardFooter className="justify-between">
                   <Button variant="outline" onClick={() => setCurrentStep(1)}>
                     <ArrowLeft className="h-4 w-4 mr-2" />
-                    Back
+                    {t('studySeries.back')}
                   </Button>
                   <Button onClick={() => setCurrentStep(3)}>
-                    Next
+                    {t('studySeries.next')}
                     <ArrowRight className="h-4 w-4 ml-2" />
                   </Button>
                 </CardFooter>
@@ -484,27 +486,27 @@ export default function StudySeriesGenerator() {
             {currentStep === 3 && (
               <>
                 <CardHeader>
-                  <CardTitle>Generate Your Series</CardTitle>
+                  <CardTitle>{t('studySeries.generateYourSeries')}</CardTitle>
                   <CardDescription>
-                    Review your settings and start the AI generation.
+                    {t('studySeries.reviewAndStart')}
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-6">
                   <div className="p-4 rounded-lg border space-y-3">
                     <div className="flex justify-between text-sm">
-                      <span className="text-muted-foreground">Title:</span>
-                      <span className="font-medium">{title || "Untitled Series"}</span>
+                      <span className="text-muted-foreground">{t('studySeries.titleLabel')}:</span>
+                      <span className="font-medium">{title || t('studySeries.untitledSeries')}</span>
                     </div>
                     <div className="flex justify-between text-sm">
-                      <span className="text-muted-foreground">Sources:</span>
-                      <span className="font-medium">{selectedSourceIds.length} document(s)</span>
+                      <span className="text-muted-foreground">{t('studySeries.sourcesLabel')}:</span>
+                      <span className="font-medium">{t('studySeries.nDocuments', { count: selectedSourceIds.length })}</span>
                     </div>
                     <div className="flex justify-between text-sm">
-                      <span className="text-muted-foreground">Audience:</span>
+                      <span className="text-muted-foreground">{t('studySeries.audienceLabel')}:</span>
                       <span className="font-medium capitalize">{targetAudience}</span>
                     </div>
                     <div className="flex justify-between text-sm">
-                      <span className="text-muted-foreground">Lessons:</span>
+                      <span className="text-muted-foreground">{t('studySeries.lessonsLabel')}:</span>
                       <span className="font-medium">{lessonCount}</span>
                     </div>
                   </div>
@@ -513,10 +515,10 @@ export default function StudySeriesGenerator() {
                     <div className="space-y-4">
                       <Progress value={generationProgress} className="h-3" />
                       <p className="text-center text-sm text-muted-foreground">
-                        {generationStatus || "Generating your study series..."}
+                        {generationStatus || t('studySeries.generatingYourSeries')}
                       </p>
                       <p className="text-center text-xs text-muted-foreground">
-                        This may take 1-2 minutes depending on the number of lessons.
+                        {t('studySeries.mayTakeMinutes')}
                       </p>
                     </div>
                   )}
@@ -524,18 +526,18 @@ export default function StudySeriesGenerator() {
                 <CardFooter className="justify-between">
                   <Button variant="outline" onClick={() => setCurrentStep(2)} disabled={isGenerating}>
                     <ArrowLeft className="h-4 w-4 mr-2" />
-                    Back
+                    {t('studySeries.back')}
                   </Button>
                   <Button onClick={handleGenerate} disabled={isGenerating}>
                     {isGenerating ? (
                       <>
                         <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                        Generating...
+                        {t('studySeries.generating')}
                       </>
                     ) : (
                       <>
                         <Sparkles className="h-4 w-4 mr-2" />
-                        Generate Series
+                        {t('studySeries.generateSeries')}
                       </>
                     )}
                   </Button>
@@ -547,9 +549,9 @@ export default function StudySeriesGenerator() {
             {currentStep === 4 && generatedSeries && (
               <>
                 <CardHeader>
-                  <CardTitle>Your Study Series is Ready!</CardTitle>
+                  <CardTitle>{t('studySeries.seriesReady')}</CardTitle>
                   <CardDescription>
-                    Review and export your generated Bible study series.
+                    {t('studySeries.reviewAndExport')}
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-6">
@@ -557,11 +559,11 @@ export default function StudySeriesGenerator() {
                     <div className="flex items-center gap-2 mb-2">
                       <Check className="h-5 w-5 text-green-600" />
                       <span className="font-semibold text-green-700 dark:text-green-400">
-                        Generation Complete!
+                        {t('studySeries.generationComplete')}
                       </span>
                     </div>
                     <p className="text-sm text-green-600 dark:text-green-500">
-                      Created {generatedSeries.lessons.length} lessons with discussion questions and application points.
+                      {t('studySeries.createdLessonsWithDetails', { count: generatedSeries.lessons.length })}
                     </p>
                   </div>
 
@@ -573,7 +575,7 @@ export default function StudySeriesGenerator() {
                           <div>
                             <p className="font-medium">{lesson.title}</p>
                             <p className="text-xs text-muted-foreground">
-                              {lesson.sections.length} sections • {lesson.discussionQuestions.length} questions
+                              {t('studySeries.sectionsAndQuestions', { sections: lesson.sections.length, questions: lesson.discussionQuestions.length })}
                             </p>
                           </div>
                           <Button variant="ghost" size="sm">
@@ -586,16 +588,16 @@ export default function StudySeriesGenerator() {
                 </CardContent>
                 <CardFooter className="justify-between">
                   <Button variant="outline" onClick={() => setCurrentStep(1)}>
-                    Create Another
+                    {t('studySeries.createAnother')}
                   </Button>
                   <div className="flex gap-2">
                     <Button variant="outline">
                       <Download className="h-4 w-4 mr-2" />
-                      Export PDF
+                      {t('studySeries.exportPdf')}
                     </Button>
                     <Button>
                       <Download className="h-4 w-4 mr-2" />
-                      Export DOCX
+                      {t('studySeries.exportDocx')}
                     </Button>
                   </div>
                 </CardFooter>

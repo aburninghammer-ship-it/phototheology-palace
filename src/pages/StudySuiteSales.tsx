@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -28,151 +29,152 @@ import { SEO } from "@/components/SEO";
 import { useTrackedPaymentLinks } from "@/hooks/useTrackedPaymentLinks";
 
 export default function StudySuiteSales() {
+  const { t } = useTranslation();
   const paymentLinks = useTrackedPaymentLinks();
   const floors = [
     {
       number: 1,
-      name: "Story Room Floor",
-      skill: "Narrative observation and recall",
+      name: t('studySuite.floor1Name'),
+      skill: t('studySuite.floor1Skill'),
       icon: BookOpen,
       color: "from-blue-500/20 to-blue-500/5",
     },
     {
       number: 2,
-      name: "Observation Floor",
-      skill: "Disciplined textual attention",
+      name: t('studySuite.floor2Name'),
+      skill: t('studySuite.floor2Skill'),
       icon: Eye,
       color: "from-green-500/20 to-green-500/5",
     },
     {
       number: 3,
-      name: "Interpretation Floor",
-      skill: "Meaning extraction through structure",
+      name: t('studySuite.floor3Name'),
+      skill: t('studySuite.floor3Skill'),
       icon: Brain,
       color: "from-purple-500/20 to-purple-500/5",
     },
     {
       number: 4,
-      name: "Concentration Floor",
-      skill: "Christ-centered reading",
+      name: t('studySuite.floor4Name'),
+      skill: t('studySuite.floor4Skill'),
       icon: Target,
       color: "from-red-500/20 to-red-500/5",
     },
     {
       number: 5,
-      name: "Application Floor",
-      skill: "Truth to life transfer",
+      name: t('studySuite.floor5Name'),
+      skill: t('studySuite.floor5Skill'),
       icon: Hammer,
       color: "from-orange-500/20 to-orange-500/5",
     },
     {
       number: 6,
-      name: "Pattern Floor",
-      skill: "Cross-textual connections",
+      name: t('studySuite.floor6Name'),
+      skill: t('studySuite.floor6Skill'),
       icon: Network,
       color: "from-cyan-500/20 to-cyan-500/5",
     },
     {
       number: 7,
-      name: "Fire Floor",
-      skill: "Emotional and spiritual weight",
+      name: t('studySuite.floor7Name'),
+      skill: t('studySuite.floor7Skill'),
       icon: Flame,
       color: "from-amber-500/20 to-amber-500/5",
     },
     {
       number: 8,
-      name: "Vision Floor",
-      skill: "Prophetic interpretation",
+      name: t('studySuite.floor8Name'),
+      skill: t('studySuite.floor8Skill'),
       icon: Telescope,
       color: "from-indigo-500/20 to-indigo-500/5",
     },
   ];
 
   const outcomes = [
-    "Work within each Room using its specific method and discipline",
-    "Move through the Palace with intention rather than wandering",
-    "Apply observation before interpretation, structure before conclusion",
-    "See Christ emerge through governed study rather than imposed assertion",
-    "Teach others using a transferable, repeatable system",
-    "Interpret prophecy through the sanctuary lens with confidence",
-    "Connect patterns across all 66 books systematically",
-    "Build sermons, studies, and teachings on solid method",
+    t('studySuite.outcome1'),
+    t('studySuite.outcome2'),
+    t('studySuite.outcome3'),
+    t('studySuite.outcome4'),
+    t('studySuite.outcome5'),
+    t('studySuite.outcome6'),
+    t('studySuite.outcome7'),
+    t('studySuite.outcome8'),
   ];
 
   const included = [
     {
-      title: "Complete Floor Training",
-      description: "Method instruction for all 8 Floors with Room-by-Room guidance",
+      title: t('studySuite.includedTitle1'),
+      description: t('studySuite.includedDesc1'),
       icon: Layers,
     },
     {
-      title: "Skill Development Exercises",
-      description: "Practical drills that build competency in each discipline",
+      title: t('studySuite.includedTitle2'),
+      description: t('studySuite.includedDesc2'),
       icon: GraduationCap,
     },
     {
-      title: "Interpretive Framework",
-      description: "Tools for moving from observation to conclusion with integrity",
+      title: t('studySuite.includedTitle3'),
+      description: t('studySuite.includedDesc3'),
       icon: Brain,
     },
     {
-      title: "Christ-Centered Method",
-      description: "How the Concentration Room governs all study without forcing",
+      title: t('studySuite.includedTitle4'),
+      description: t('studySuite.includedDesc4'),
       icon: Target,
     },
     {
-      title: "Pattern Recognition Training",
-      description: "Systematic approach to types, symbols, and cross-references",
+      title: t('studySuite.includedTitle5'),
+      description: t('studySuite.includedDesc5'),
       icon: Network,
     },
     {
-      title: "Prophetic Study Tools",
-      description: "Vision Floor method for Daniel, Revelation, and sanctuary prophecy",
+      title: t('studySuite.includedTitle6'),
+      description: t('studySuite.includedDesc6'),
       icon: Telescope,
     },
   ];
 
   const isFor = [
-    "Those who have completed the Quick-Start Guide or understand the Palace framework",
-    "Bible students ready to move from reading to disciplined study",
-    "Teachers, pastors, and leaders who want a transferable method",
-    "Christians who want to see Christ throughout Scripture without forcing conclusions",
-    "Anyone committed to structure before synthesis in interpretation",
+    t('studySuite.isFor1'),
+    t('studySuite.isFor2'),
+    t('studySuite.isFor3'),
+    t('studySuite.isFor4'),
+    t('studySuite.isFor5'),
   ];
 
   const isNotFor = [
-    "Those seeking devotional content without method training",
-    "Readers who have not oriented to the Palace architecture",
-    "Anyone wanting quick tips rather than systematic skill building",
-    "Those unwilling to practice discipline before application",
+    t('studySuite.isNotFor1'),
+    t('studySuite.isNotFor2'),
+    t('studySuite.isNotFor3'),
+    t('studySuite.isNotFor4'),
   ];
 
   const suiteContents = [
     {
-      title: "Study Suite Part 1",
-      subtitle: "Floors 1-3: Foundation",
-      description: "Story Room, Observation, and Interpretation - the foundational skills of biblical study",
-      floors: "Floors 1-3",
+      title: t('studySuite.part1Title'),
+      subtitle: t('studySuite.part1Subtitle'),
+      description: t('studySuite.part1Description'),
+      floors: t('studySuite.part1Floors'),
     },
     {
-      title: "Study Suite Part 2",
-      subtitle: "Floors 4-5: Application",
-      description: "Concentration and Application - Christ-centered reading and life transformation",
-      floors: "Floors 4-5",
+      title: t('studySuite.part2Title'),
+      subtitle: t('studySuite.part2Subtitle'),
+      description: t('studySuite.part2Description'),
+      floors: t('studySuite.part2Floors'),
     },
     {
-      title: "Study Suite Part 3",
-      subtitle: "Floors 6-8: Mastery",
-      description: "Pattern, Fire, and Vision - advanced connections and prophetic interpretation",
-      floors: "Floors 6-8",
+      title: t('studySuite.part3Title'),
+      subtitle: t('studySuite.part3Subtitle'),
+      description: t('studySuite.part3Description'),
+      floors: t('studySuite.part3Floors'),
     },
   ];
 
   return (
     <div className="min-h-screen bg-background">
       <SEO
-        title="PhotoTheology Study Suite | Master the Method"
-        description="Complete method training for all 8 Floors of the Phototheology Palace. Move from orientation to mastery with Room-by-Room skill development."
+        title={t('studySuite.seoTitle')}
+        description={t('studySuite.seoDescription')}
       />
       <Navigation />
 
@@ -205,10 +207,10 @@ export default function StudySuiteSales() {
             >
               <Badge variant="outline" className="text-primary border-primary/30 px-4 py-1.5 text-sm">
                 <Crown className="w-4 h-4 mr-2" />
-                CORE LEVEL - Complete Training
+                {t('studySuite.coreLevelBadge')}
               </Badge>
               <Badge className="bg-accent/20 text-accent border-accent/30 px-3 py-1.5 text-sm">
-                3 PDFs Included
+                {t('studySuite.pdfsIncluded')}
               </Badge>
             </motion.div>
 
@@ -218,10 +220,10 @@ export default function StudySuiteSales() {
               transition={{ delay: 0.2 }}
               className="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight"
             >
-              Now That You Know the Structure,
+              {t('studySuite.heroTitle1')}
               <br />
               <span className="bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent">
-                Master the Method
+                {t('studySuite.heroTitle2')}
               </span>
             </motion.h1>
 
@@ -231,9 +233,7 @@ export default function StudySuiteSales() {
               transition={{ delay: 0.3 }}
               className="text-xl text-muted-foreground max-w-2xl mx-auto"
             >
-              The PhotoTheology Study Suite provides complete method training for every
-              Floor and Room. You will develop the skills to study Scripture with
-              discipline, confidence, and Christ-centered clarity.
+              {t('studySuite.heroDescription')}
             </motion.p>
 
             <motion.div
@@ -248,12 +248,12 @@ export default function StudySuiteSales() {
                 className="text-lg px-8 py-6 h-auto shadow-lg shadow-primary/25 hover:shadow-xl hover:shadow-primary/30 transition-all bg-gradient-to-r from-primary to-accent hover:from-primary/90 hover:to-accent/90"
               >
                 <a href={paymentLinks.studySuite} target="_blank" rel="noopener noreferrer">
-                  Get the Complete Study Suite - $97
+                  {t('studySuite.getCompleteStudySuitePrice')}
                   <ArrowRight className="ml-2 w-5 h-5" />
                 </a>
               </Button>
               <p className="text-sm text-muted-foreground">
-                Instant access to all 3 PDFs
+                {t('studySuite.instantAccess')}
               </p>
             </motion.div>
           </motion.div>
@@ -291,9 +291,9 @@ export default function StudySuiteSales() {
             className="max-w-5xl mx-auto"
           >
             <div className="text-center mb-12">
-              <Badge variant="secondary" className="mb-4">The Challenge</Badge>
+              <Badge variant="secondary" className="mb-4">{t('studySuite.theChallenge')}</Badge>
               <h2 className="text-3xl md:text-4xl font-bold">
-                The Problem: Knowing the Map Without Walking the Rooms
+                {t('studySuite.problemTitle')}
               </h2>
             </div>
 
@@ -309,28 +309,28 @@ export default function StudySuiteSales() {
                       <div className="p-2 rounded-full bg-destructive/10">
                         <X className="w-5 h-5 text-destructive" />
                       </div>
-                      <h3 className="font-semibold text-lg">Understanding Without Competency</h3>
+                      <h3 className="font-semibold text-lg">{t('studySuite.understandingWithoutCompetency')}</h3>
                     </div>
                     <ul className="space-y-4 text-muted-foreground">
                       <li className="flex items-start gap-3">
                         <X className="w-5 h-5 text-destructive mt-0.5 flex-shrink-0" />
-                        Knowing what each Floor is for but not how to work within it
+                        {t('studySuite.problem1')}
                       </li>
                       <li className="flex items-start gap-3">
                         <X className="w-5 h-5 text-destructive mt-0.5 flex-shrink-0" />
-                        Recognizing Rooms but lacking the skill to use them
+                        {t('studySuite.problem2')}
                       </li>
                       <li className="flex items-start gap-3">
                         <X className="w-5 h-5 text-destructive mt-0.5 flex-shrink-0" />
-                        Reading about method without practicing it
+                        {t('studySuite.problem3')}
                       </li>
                       <li className="flex items-start gap-3">
                         <X className="w-5 h-5 text-destructive mt-0.5 flex-shrink-0" />
-                        Still depending on others for interpretation
+                        {t('studySuite.problem4')}
                       </li>
                       <li className="flex items-start gap-3">
                         <X className="w-5 h-5 text-destructive mt-0.5 flex-shrink-0" />
-                        Unable to transfer the system to teaching or preaching
+                        {t('studySuite.problem5')}
                       </li>
                     </ul>
                   </CardContent>
@@ -348,28 +348,28 @@ export default function StudySuiteSales() {
                       <div className="p-2 rounded-full bg-primary/10">
                         <Check className="w-5 h-5 text-primary" />
                       </div>
-                      <h3 className="font-semibold text-lg">Method Training Provides</h3>
+                      <h3 className="font-semibold text-lg">{t('studySuite.methodTrainingProvides')}</h3>
                     </div>
                     <ul className="space-y-4 text-muted-foreground">
                       <li className="flex items-start gap-3">
                         <Check className="w-5 h-5 text-primary mt-0.5 flex-shrink-0" />
-                        Practical skill for each Room's specific discipline
+                        {t('studySuite.solution1')}
                       </li>
                       <li className="flex items-start gap-3">
                         <Check className="w-5 h-5 text-primary mt-0.5 flex-shrink-0" />
-                        Exercises that build competency through practice
+                        {t('studySuite.solution2')}
                       </li>
                       <li className="flex items-start gap-3">
                         <Check className="w-5 h-5 text-primary mt-0.5 flex-shrink-0" />
-                        Confidence to interpret without commentary dependence
+                        {t('studySuite.solution3')}
                       </li>
                       <li className="flex items-start gap-3">
                         <Check className="w-5 h-5 text-primary mt-0.5 flex-shrink-0" />
-                        A transferable system you can teach to others
+                        {t('studySuite.solution4')}
                       </li>
                       <li className="flex items-start gap-3">
                         <Check className="w-5 h-5 text-primary mt-0.5 flex-shrink-0" />
-                        Christ-centered conclusions that emerge, not force
+                        {t('studySuite.solution5')}
                       </li>
                     </ul>
                   </CardContent>
@@ -392,26 +392,21 @@ export default function StudySuiteSales() {
             <div className="text-center mb-8">
               <Sparkles className="w-12 h-12 text-primary mx-auto mb-4" />
               <h2 className="text-3xl md:text-4xl font-bold mb-6">
-                Method Training, Not More Content
+                {t('studySuite.methodTrainingTitle')}
               </h2>
             </div>
 
             <div className="space-y-6 text-lg text-muted-foreground">
               <p className="leading-relaxed">
-                The Study Suite is not a collection of Bible studies for you to consume.
-                It is <strong className="text-foreground">method training</strong> that develops
-                your ability to conduct your own studies with confidence and integrity.
+                {t('studySuite.methodTrainingPara1')}
               </p>
               <p className="leading-relaxed">
-                Each Floor has specific Rooms. Each Room has a specific discipline. The Study
-                Suite teaches you <strong className="text-foreground">how to work within each Room</strong>—what
-                questions to ask, what to observe, how to interpret, and when to move to the next level.
+                {t('studySuite.methodTrainingPara2')}
               </p>
 
               <Card className="border-primary/20 bg-gradient-to-r from-primary/5 to-accent/5 p-6">
                 <p className="text-center italic text-foreground">
-                  When you complete the Study Suite, you will not merely know more about the Bible.
-                  You will know <strong>how to study</strong> the Bible with a method that serves you for life.
+                  {t('studySuite.methodTrainingQuote')}
                 </p>
               </Card>
             </div>
@@ -431,13 +426,13 @@ export default function StudySuiteSales() {
             <div className="text-center mb-12">
               <Badge variant="secondary" className="mb-4">
                 <FileText className="w-3 h-3 mr-2" />
-                3 Comprehensive PDFs
+                {t('studySuite.comprehensivePdfs')}
               </Badge>
               <h2 className="text-3xl md:text-4xl font-bold">
-                The Complete Study Suite Package
+                {t('studySuite.completePackageTitle')}
               </h2>
               <p className="text-muted-foreground mt-4 max-w-2xl mx-auto">
-                Your purchase includes three comprehensive training manuals, each building on the last
+                {t('studySuite.completePackageDescription')}
               </p>
             </div>
 
@@ -486,13 +481,12 @@ export default function StudySuiteSales() {
             className="max-w-6xl mx-auto"
           >
             <div className="text-center mb-12">
-              <Badge variant="secondary" className="mb-4">Complete Training</Badge>
+              <Badge variant="secondary" className="mb-4">{t('studySuite.completeTraining')}</Badge>
               <h2 className="text-3xl md:text-4xl font-bold mb-4">
-                The 8 Floors You Will Master
+                {t('studySuite.eightFloorsTitle')}
               </h2>
               <p className="text-muted-foreground max-w-2xl mx-auto">
-                The Study Suite provides method training for each Floor, teaching you the specific
-                skill that Floor develops and how to apply it in your own study.
+                {t('studySuite.eightFloorsDescription')}
               </p>
             </div>
 
@@ -525,11 +519,10 @@ export default function StudySuiteSales() {
               <Card className="border-2 border-primary/20 bg-gradient-to-r from-primary/5 to-accent/5">
                 <CardContent className="p-6">
                   <p className="text-center text-muted-foreground">
-                    <strong className="text-foreground">Level:</strong> CORE — Method Training & Skill Development
+                    <strong className="text-foreground">{t('studySuite.levelLabel')}</strong> {t('studySuite.levelDescription')}
                     <br />
                     <span className="text-sm">
-                      This Suite covers all 8 Floors with Room-by-Room instruction. Advanced mastery training
-                      builds upon this foundation.
+                      {t('studySuite.levelDetails')}
                     </span>
                   </p>
                 </CardContent>
@@ -549,9 +542,9 @@ export default function StudySuiteSales() {
             className="max-w-3xl mx-auto"
           >
             <div className="text-center mb-12">
-              <Badge variant="secondary" className="mb-4">Transformation</Badge>
+              <Badge variant="secondary" className="mb-4">{t('studySuite.transformation')}</Badge>
               <h2 className="text-3xl md:text-4xl font-bold">
-                After Completing the Study Suite, You Will Be Able To:
+                {t('studySuite.outcomesTitle')}
               </h2>
             </div>
 
@@ -586,9 +579,9 @@ export default function StudySuiteSales() {
             className="max-w-4xl mx-auto"
           >
             <div className="text-center mb-12">
-              <Badge variant="secondary" className="mb-4">Training Components</Badge>
+              <Badge variant="secondary" className="mb-4">{t('studySuite.trainingComponents')}</Badge>
               <h2 className="text-3xl md:text-4xl font-bold">
-                What Is Included
+                {t('studySuite.whatIsIncluded')}
               </h2>
             </div>
 
@@ -632,7 +625,7 @@ export default function StudySuiteSales() {
           >
             <div className="text-center mb-12">
               <h2 className="text-3xl md:text-4xl font-bold">
-                Is the Study Suite Right for You?
+                {t('studySuite.rightForYouTitle')}
               </h2>
             </div>
 
@@ -643,7 +636,7 @@ export default function StudySuiteSales() {
                     <div className="p-2 rounded-full bg-primary/10">
                       <Check className="w-6 h-6 text-primary" />
                     </div>
-                    The Study Suite Is For You If:
+                    {t('studySuite.isForYouTitle')}
                   </h3>
                   <ul className="space-y-4">
                     {isFor.map((item, index) => (
@@ -662,7 +655,7 @@ export default function StudySuiteSales() {
                     <div className="p-2 rounded-full bg-muted">
                       <X className="w-6 h-6 text-muted-foreground" />
                     </div>
-                    The Study Suite Is Not For You If:
+                    {t('studySuite.isNotForYouTitle')}
                   </h3>
                   <ul className="space-y-4">
                     {isNotFor.map((item, index) => (
@@ -678,13 +671,13 @@ export default function StudySuiteSales() {
 
             <div className="mt-8 text-center">
               <p className="text-muted-foreground">
-                Not sure if you're ready?{" "}
+                {t('studySuite.notSureReady')}{" "}
                 <Button variant="link" asChild className="p-0 h-auto">
                   <Link to="/quick-start">
-                    Start with the Quick-Start Guide ($17)
+                    {t('studySuite.quickStartLink')}
                   </Link>
                 </Button>{" "}
-                to orient yourself first.
+                {t('studySuite.toOrientFirst')}
               </p>
             </div>
           </motion.div>
@@ -706,22 +699,22 @@ export default function StudySuiteSales() {
                 <div className="flex justify-center gap-2">
                   <Badge className="bg-primary/10 text-primary border-primary/20">
                     <Crown className="w-3 h-3 mr-2" />
-                    Complete Method Training
+                    {t('studySuite.completeMethodTrainingBadge')}
                   </Badge>
                   <Badge variant="outline">
-                    3 PDFs
+                    {t('studySuite.threePdfs')}
                   </Badge>
                 </div>
 
-                <h2 className="text-3xl font-bold">PhotoTheology Study Suite</h2>
+                <h2 className="text-3xl font-bold">{t('studySuite.ctaTitle')}</h2>
                 <p className="text-muted-foreground">
-                  All 8 Floors. All Rooms. Complete skill development for disciplined Bible study.
+                  {t('studySuite.ctaDescription')}
                 </p>
 
                 <div className="py-6">
                   <p className="text-6xl font-bold bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent">$97</p>
                   <p className="text-sm text-muted-foreground mt-2">
-                    One-time purchase - Lifetime access to all 3 PDFs
+                    {t('studySuite.oneTimePurchase')}
                   </p>
                 </div>
 
@@ -732,13 +725,12 @@ export default function StudySuiteSales() {
                 >
                   <a href={paymentLinks.studySuite} target="_blank" rel="noopener noreferrer">
                     <Building2 className="w-5 h-5 mr-2" />
-                    Get the Complete Study Suite
+                    {t('studySuite.getCompleteStudySuite')}
                   </a>
                 </Button>
 
                 <p className="text-xs text-muted-foreground">
-                  You are purchasing access to method training—a system you will use for the rest of your
-                  Bible study life. This is not content to consume but skill to develop.
+                  {t('studySuite.ctaDisclaimer')}
                 </p>
               </CardContent>
             </Card>
@@ -758,23 +750,19 @@ export default function StudySuiteSales() {
             <Building2 className="w-16 h-16 text-primary mx-auto opacity-80" />
 
             <h2 className="text-2xl md:text-3xl font-bold font-serif">
-              Truth Deserves Discipline
+              {t('studySuite.finalStatementTitle')}
             </h2>
 
             <p className="text-lg text-muted-foreground leading-relaxed">
-              Scripture is not a book to be skimmed. It is a revelation to be studied with
-              the same discipline its Author used in composing it. The Palace method honors
-              Scripture by meeting it with structure.
+              {t('studySuite.finalStatementPara1')}
             </p>
 
             <p className="text-muted-foreground leading-relaxed">
-              The Study Suite is an invitation to move from casual reading to confident study.
-              When you complete this training, you will not be the same kind of Bible reader
-              you were before. You will be a student who knows the method.
+              {t('studySuite.finalStatementPara2')}
             </p>
 
             <p className="text-sm text-muted-foreground italic pt-4">
-              — Pastor Ivor Myers
+              {t('studySuite.authorAttribution')}
             </p>
           </motion.div>
         </div>

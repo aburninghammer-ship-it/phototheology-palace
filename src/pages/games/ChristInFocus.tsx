@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { motion, AnimatePresence, useAnimation } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -105,6 +106,7 @@ const getDifficultyColor = (difficulty: Difficulty) => {
 };
 
 export default function ChristInFocus() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const gameAreaRef = useRef<HTMLDivElement>(null);
   const animationRef = useRef<number | null>(null);
@@ -571,26 +573,26 @@ export default function ChristInFocus() {
     <div className="min-h-screen bg-gradient-to-b from-slate-900 via-purple-900 to-slate-900 p-4">
       <div className="max-w-md mx-auto">
         <Button variant="ghost" onClick={() => navigate('/games')} className="text-white mb-4">
-          <ArrowLeft className="h-4 w-4 mr-2" /> Back to Games
+          <ArrowLeft className="h-4 w-4 mr-2" /> {t('common.backToGames')}
         </Button>
 
         <div className="text-center mb-8">
           <div className="text-6xl mb-4">✝️</div>
-          <h1 className="text-3xl font-bold text-white mb-2">Christ in Focus</h1>
-          <p className="text-purple-200">Concentration Room Motion Game</p>
-          <p className="text-sm text-purple-300 mt-2 italic">"Every verse must converge on Christ"</p>
+          <h1 className="text-3xl font-bold text-white mb-2">{t('games.christInFocus.title')}</h1>
+          <p className="text-purple-200">{t('games.christInFocus.subtitle')}</p>
+          <p className="text-sm text-purple-300 mt-2 italic">{t('games.christInFocus.motto')}</p>
         </div>
 
         <Card className="bg-white/10 border-purple-500/30 mb-6">
           <CardContent className="p-6 text-center">
             <Target className="h-12 w-12 mx-auto mb-4 text-purple-300" />
-            <h2 className="text-xl font-bold text-white mb-2">How to Play</h2>
+            <h2 className="text-xl font-bold text-white mb-2">{t('games.common.howToPlay')}</h2>
             <ul className="text-purple-200 text-sm space-y-2 text-left">
-              <li>• Verse elements float on screen</li>
-              <li>• Drag elements toward the Christ Anchor</li>
-              <li>• Only Christ-consistent connections lock</li>
-              <li>• Avoid false centers (Law-only, Nation-only, etc.)</li>
-              <li>• Complete all connections to win</li>
+              <li>{t('games.christInFocus.instructions.elementsFloat')}</li>
+              <li>{t('games.christInFocus.instructions.dragElements')}</li>
+              <li>{t('games.christInFocus.instructions.christConnections')}</li>
+              <li>{t('games.christInFocus.instructions.avoidFalseCenters')}</li>
+              <li>{t('games.christInFocus.instructions.completeConnections')}</li>
             </ul>
           </CardContent>
         </Card>
@@ -600,7 +602,7 @@ export default function ChristInFocus() {
             onClick={() => setGameState('categorySelect')}
             className="w-full bg-purple-600 hover:bg-purple-700 text-white py-6 text-lg"
           >
-            <Play className="h-5 w-5 mr-2" /> Start Campaign
+            <Play className="h-5 w-5 mr-2" /> {t('games.christInFocus.startCampaign')}
           </Button>
 
           <Button
@@ -612,16 +614,16 @@ export default function ChristInFocus() {
             }}
             className="w-full border-purple-500 text-purple-200 hover:bg-purple-500/20 py-4"
           >
-            <Zap className="h-4 w-4 mr-2" /> Quick Play (Random Beginner)
+            <Zap className="h-4 w-4 mr-2" /> {t('games.christInFocus.quickPlay')}
           </Button>
         </div>
 
         <div className="mt-8 text-center">
           <p className="text-purple-300 text-sm">
-            Floor 4 - Concentration Room (CR)
+            {t('games.christInFocus.floorLabel')}
           </p>
           <p className="text-purple-400 text-xs mt-1">
-            Trains Christ-centered convergence under pressure
+            {t('games.christInFocus.floorDescription')}
           </p>
         </div>
       </div>
@@ -633,10 +635,10 @@ export default function ChristInFocus() {
     <div className="min-h-screen bg-gradient-to-b from-slate-900 via-purple-900 to-slate-900 p-4">
       <div className="max-w-md mx-auto">
         <Button variant="ghost" onClick={() => setGameState('menu')} className="text-white mb-4">
-          <ArrowLeft className="h-4 w-4 mr-2" /> Back
+          <ArrowLeft className="h-4 w-4 mr-2" /> {t('common.back')}
         </Button>
 
-        <h2 className="text-2xl font-bold text-white text-center mb-6">Select Category</h2>
+        <h2 className="text-2xl font-bold text-white text-center mb-6">{t('games.christInFocus.selectCategory')}</h2>
 
         <div className="grid grid-cols-2 gap-4">
           {(['TORAH', 'PROPHETS', 'GOSPELS', 'REVELATION'] as LevelCategory[]).map(category => {
@@ -656,7 +658,7 @@ export default function ChristInFocus() {
                   <div className="text-4xl mb-2">{getCategoryIcon(category)}</div>
                   <h3 className="text-lg font-bold text-white">{category}</h3>
                   <p className="text-purple-300 text-sm">
-                    {unlockedCount}/{levels.length} unlocked
+                    {t('games.christInFocus.unlockedCount', { unlocked: unlockedCount, total: levels.length })}
                   </p>
                   <div className={`h-1 rounded mt-2 ${getCategoryColor(category)}`}
                        style={{ width: `${(unlockedCount / levels.length) * 100}%` }} />
@@ -678,7 +680,7 @@ export default function ChristInFocus() {
       <div className="min-h-screen bg-gradient-to-b from-slate-900 via-purple-900 to-slate-900 p-4">
         <div className="max-w-md mx-auto">
           <Button variant="ghost" onClick={() => setGameState('categorySelect')} className="text-white mb-4">
-            <ArrowLeft className="h-4 w-4 mr-2" /> Back
+            <ArrowLeft className="h-4 w-4 mr-2" /> {t('common.back')}
           </Button>
 
           <div className="text-center mb-6">
@@ -772,7 +774,7 @@ export default function ChristInFocus() {
 
           {/* Stability meter */}
           <div className="flex items-center gap-2 mb-2">
-            <span className="text-purple-300 text-xs">Stability</span>
+            <span className="text-purple-300 text-xs">{t('games.christInFocus.stability')}</span>
             <Progress value={stability} className="flex-1 h-2" />
             <span className="text-purple-300 text-xs">{stability}%</span>
           </div>
@@ -935,25 +937,25 @@ export default function ChristInFocus() {
       <Card className="bg-white/10 border-purple-500/30 w-full max-w-sm">
         <CardContent className="p-6 text-center">
           <Pause className="h-12 w-12 mx-auto mb-4 text-purple-300" />
-          <h2 className="text-2xl font-bold text-white mb-4">Paused</h2>
+          <h2 className="text-2xl font-bold text-white mb-4">{t('games.common.paused')}</h2>
 
           <div className="space-y-3">
             <Button onClick={() => setGameState('playing')} className="w-full bg-purple-600 hover:bg-purple-700">
-              <Play className="h-4 w-4 mr-2" /> Resume
+              <Play className="h-4 w-4 mr-2" /> {t('games.common.resume')}
             </Button>
             <Button
               variant="outline"
               onClick={() => currentLevel && initializeLevel(currentLevel)}
               className="w-full border-purple-500 text-purple-200"
             >
-              <RotateCcw className="h-4 w-4 mr-2" /> Restart Level
+              <RotateCcw className="h-4 w-4 mr-2" /> {t('games.christInFocus.restartLevel')}
             </Button>
             <Button
               variant="ghost"
               onClick={() => setGameState('menu')}
               className="w-full text-purple-300"
             >
-              Exit to Menu
+              {t('games.common.exitToMenu')}
             </Button>
           </div>
         </CardContent>
@@ -978,24 +980,24 @@ export default function ChristInFocus() {
                 >
                   <Sparkles className="h-16 w-16 mx-auto text-yellow-400 mb-4" />
                 </motion.div>
-                <h2 className="text-2xl font-bold text-white mb-2">Christ is in Focus!</h2>
+                <h2 className="text-2xl font-bold text-white mb-2">{t('games.christInFocus.christIsInFocus')}</h2>
                 <p className="text-purple-200">{currentLevel.reference}</p>
               </div>
 
               {/* Score breakdown */}
               <div className="bg-black/30 rounded-lg p-4 mb-6">
                 <div className="flex justify-between text-purple-200 mb-2">
-                  <span>Connections</span>
+                  <span>{t('games.christInFocus.connections')}</span>
                   <span>{connections.filter(c => c.isCorrect).length}</span>
                 </div>
                 <div className="flex justify-between text-purple-200 mb-2">
-                  <span>False Center Attempts</span>
+                  <span>{t('games.christInFocus.falseCenterAttempts')}</span>
                   <span className={falseCenterAttempts > 0 ? 'text-red-400' : 'text-green-400'}>
                     {falseCenterAttempts}
                   </span>
                 </div>
                 <div className="flex justify-between text-yellow-400 font-bold text-lg border-t border-purple-500/30 pt-2 mt-2">
-                  <span>Total Score</span>
+                  <span>{t('games.common.totalScore')}</span>
                   <span>{score}</span>
                 </div>
               </div>
@@ -1003,14 +1005,14 @@ export default function ChristInFocus() {
               {/* Christ Focus Summary */}
               <div className="bg-amber-900/30 border border-amber-500/30 rounded-lg p-4 mb-6">
                 <h3 className="text-amber-300 font-bold mb-2 flex items-center gap-2">
-                  <BookOpen className="h-4 w-4" /> Christ Focus Summary
+                  <BookOpen className="h-4 w-4" /> {t('games.christInFocus.christFocusSummary')}
                 </h3>
                 <p className="text-amber-100 text-sm italic">{currentLevel.christFocusSummary}</p>
               </div>
 
               {/* Lesson */}
               <div className="bg-purple-900/30 border border-purple-500/30 rounded-lg p-4 mb-6">
-                <h3 className="text-purple-300 font-bold mb-2">Key Insight</h3>
+                <h3 className="text-purple-300 font-bold mb-2">{t('games.christInFocus.keyInsight')}</h3>
                 <p className="text-purple-100 text-sm">{currentLevel.lesson}</p>
               </div>
 
@@ -1027,7 +1029,7 @@ export default function ChristInFocus() {
                         onClick={() => initializeLevel(nextLevel)}
                         className="w-full bg-purple-600 hover:bg-purple-700"
                       >
-                        Next Level: {nextLevel.reference}
+                        {t('games.common.nextLevel', { name: nextLevel.reference })}
                       </Button>
                     );
                   }
@@ -1039,7 +1041,7 @@ export default function ChristInFocus() {
                   onClick={() => currentLevel && initializeLevel(currentLevel)}
                   className="w-full border-purple-500 text-purple-200"
                 >
-                  <RotateCcw className="h-4 w-4 mr-2" /> Play Again
+                  <RotateCcw className="h-4 w-4 mr-2" /> {t('games.common.playAgain')}
                 </Button>
 
                 <Button
@@ -1047,7 +1049,7 @@ export default function ChristInFocus() {
                   onClick={() => setGameState('menu')}
                   className="w-full text-purple-300"
                 >
-                  Back to Menu
+                  {t('games.common.backToMenu')}
                 </Button>
               </div>
             </CardContent>

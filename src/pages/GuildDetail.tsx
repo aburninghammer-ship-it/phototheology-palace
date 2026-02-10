@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { useParams, useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -15,6 +16,7 @@ import { GuildLeaderboard } from "@/components/guilds/GuildLeaderboard";
 import { GuildActivityFeed } from "@/components/guilds/GuildActivityFeed";
 
 const GuildDetail = () => {
+  const { t } = useTranslation();
   const { guildId } = useParams();
   const navigate = useNavigate();
 
@@ -122,7 +124,7 @@ const GuildDetail = () => {
         className="mb-4"
       >
         <ArrowLeft className="w-4 h-4 mr-2" />
-        Back to Guilds
+        {t('guilds.backToGuilds')}
       </Button>
 
       {/* Guild Header */}
@@ -150,7 +152,7 @@ const GuildDetail = () => {
               <Users className="w-5 h-5 text-primary" />
               <div>
                 <div className="text-2xl font-bold">{guild.member_count}/{guild.max_members}</div>
-                <div className="text-xs text-muted-foreground">Members</div>
+                <div className="text-xs text-muted-foreground">{t('guilds.members')}</div>
               </div>
             </div>
 
@@ -158,7 +160,7 @@ const GuildDetail = () => {
               <Trophy className="w-5 h-5 text-yellow-500" />
               <div>
                 <div className="text-2xl font-bold">{guild.total_xp.toLocaleString()}</div>
-                <div className="text-xs text-muted-foreground">Total XP</div>
+                <div className="text-xs text-muted-foreground">{t('guilds.totalXp')}</div>
               </div>
             </div>
 
@@ -166,7 +168,7 @@ const GuildDetail = () => {
               <TrendingUp className="w-5 h-5 text-green-500" />
               <div>
                 <div className="text-2xl font-bold">{guild.current_streak}</div>
-                <div className="text-xs text-muted-foreground">Day Streak</div>
+                <div className="text-xs text-muted-foreground">{t('guilds.dayStreak')}</div>
               </div>
             </div>
 
@@ -174,7 +176,7 @@ const GuildDetail = () => {
               <Target className="w-5 h-5 text-blue-500" />
               <div>
                 <div className="text-2xl font-bold">{challenges?.filter(c => c.is_completed).length || 0}</div>
-                <div className="text-xs text-muted-foreground">Challenges Done</div>
+                <div className="text-xs text-muted-foreground">{t('guilds.challengesDone')}</div>
               </div>
             </div>
           </div>
@@ -184,10 +186,10 @@ const GuildDetail = () => {
       {/* Tabs for different sections */}
       <Tabs defaultValue="overview" className="space-y-6">
         <TabsList className="grid w-full grid-cols-4">
-          <TabsTrigger value="overview">Overview</TabsTrigger>
-          <TabsTrigger value="challenges">Challenges</TabsTrigger>
-          <TabsTrigger value="leaderboard">Leaderboard</TabsTrigger>
-          <TabsTrigger value="activity">Activity</TabsTrigger>
+          <TabsTrigger value="overview">{t('guilds.overview')}</TabsTrigger>
+          <TabsTrigger value="challenges">{t('guilds.challenges')}</TabsTrigger>
+          <TabsTrigger value="leaderboard">{t('guilds.leaderboard')}</TabsTrigger>
+          <TabsTrigger value="activity">{t('guilds.activity')}</TabsTrigger>
         </TabsList>
 
         <TabsContent value="overview" className="space-y-6">
@@ -196,7 +198,7 @@ const GuildDetail = () => {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Users className="w-5 h-5" />
-                Guild Members ({guild.member_count})
+                {t('guilds.guildMembers', { count: guild.member_count })}
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -215,16 +217,16 @@ const GuildDetail = () => {
                         {member.role === "leader" && (
                           <>
                             <Crown className="w-3 h-3" />
-                            Leader
+                            {t('guilds.leader')}
                           </>
                         )}
                         {member.role === "officer" && (
                           <>
                             <Shield className="w-3 h-3" />
-                            Officer
+                            {t('guilds.officer')}
                           </>
                         )}
-                        {member.role === "member" && "Member"}
+                        {member.role === "member" && t('guilds.member')}
                       </div>
                     </div>
                     <Badge variant="outline">
@@ -241,8 +243,8 @@ const GuildDetail = () => {
         <TabsContent value="challenges" className="space-y-6">
           <div className="flex justify-between items-center">
             <div>
-              <h3 className="text-lg font-semibold">Guild Challenges</h3>
-              <p className="text-sm text-muted-foreground">Work together to complete challenges and earn XP</p>
+              <h3 className="text-lg font-semibold">{t('guilds.guildChallenges')}</h3>
+              <p className="text-sm text-muted-foreground">{t('guilds.guildChallengesDescription')}</p>
             </div>
             {userRole === "leader" || userRole === "officer" ? (
               <CreateChallengeDialog
@@ -271,7 +273,7 @@ const GuildDetail = () => {
           ) : (
             <Card>
               <CardContent className="pt-6 text-center text-muted-foreground">
-                No challenges yet. Leaders can create one to get started!
+                {t('guilds.noChallengesYet')}
               </CardContent>
             </Card>
           )}

@@ -12,8 +12,10 @@ import { toast } from "sonner";
 import { useState, useEffect } from "react";
 import confetti from "canvas-confetti";
 import { useTrackedPaymentLinks } from "@/hooks/useTrackedPaymentLinks";
+import { useTranslation } from "react-i18next";
 
 export default function Pricing() {
+  const { t } = useTranslation();
   const { user } = useAuth();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
@@ -76,14 +78,14 @@ export default function Pricing() {
 
     if (trialStatus === 'success') {
       triggerCelebration();
-      toast.success("🎉 Your 7-day free trial has started! Enjoy full Premium access.");
+      toast.success(t('pricing.toasts.trialStarted'));
       // Send notification for trial start
       sendPurchaseNotification(true, 'premium');
       navigate('/palace', { replace: true });
     } else if (trialStatus === 'cancelled') {
-      toast.info("Trial checkout was cancelled. No worries, you can try again anytime!");
+      toast.info(t('pricing.toasts.trialCancelled'));
     } else if (subscriptionStatus === 'cancelled') {
-      toast.info("Subscription checkout was cancelled. No worries, you can try again anytime!");
+      toast.info(t('pricing.toasts.subscriptionCancelled'));
     }
   }, [searchParams, navigate, user, billingPeriod]);
 
@@ -112,19 +114,19 @@ export default function Pricing() {
 
       // Check if user already has access
       if (profile?.has_lifetime_access) {
-        toast.success("You have lifetime access!");
+        toast.success(t('pricing.toasts.lifetimeAccess'));
         navigate("/palace");
         return;
       }
 
       if (profile?.is_student) {
-        toast.success("You already have free student access!");
+        toast.success(t('pricing.toasts.studentAccess'));
         navigate("/palace");
         return;
       }
 
       if (profile?.subscription_status === "active") {
-        toast.success("You already have an active subscription!");
+        toast.success(t('pricing.toasts.activeSubscription'));
         navigate("/palace");
         return;
       }
@@ -146,7 +148,7 @@ export default function Pricing() {
             updated_at: new Date().toISOString(),
           })
           .eq("id", user.id);
-        toast.success("Your Patreon membership has been linked! Enjoy premium access.");
+        toast.success(t('pricing.toasts.patreonLinked'));
         navigate("/palace");
         return;
       }
@@ -169,7 +171,7 @@ export default function Pricing() {
             updated_at: new Date().toISOString(),
           })
           .eq("id", user.id);
-        toast.success("Your Pickaxe membership has been linked! Enjoy premium access.");
+        toast.success(t('pricing.toasts.pickaxeLinked'));
         navigate("/palace");
         return;
       }
@@ -185,7 +187,7 @@ export default function Pricing() {
       }
     } catch (error: any) {
       console.error("Error starting trial:", error);
-      toast.error("Failed to start trial. Please try again.");
+      toast.error(t('pricing.toasts.trialFailed'));
     } finally {
       setIsStartingTrial(false);
     }
@@ -208,13 +210,13 @@ export default function Pricing() {
         .single();
 
       if (profile?.is_student) {
-        toast.success("You already have free student access!");
+        toast.success(t('pricing.toasts.studentAccess'));
         navigate("/palace");
         return;
       }
 
       if (profile?.subscription_status === "active") {
-        toast.success("You already have an active subscription!");
+        toast.success(t('pricing.toasts.activeSubscription'));
         navigate("/palace");
         return;
       }
@@ -230,7 +232,7 @@ export default function Pricing() {
       }
     } catch (error: any) {
       console.error("Error starting subscription:", error);
-      toast.error("Failed to start subscription. Please try again.");
+      toast.error(t('pricing.toasts.subscriptionFailed'));
     } finally {
       setIsSubscribing(false);
     }
@@ -240,81 +242,81 @@ export default function Pricing() {
   const plans = [
     {
       id: "trial",
-      name: "7-Day Free Trial",
+      name: t('pricing.plans.trial.name'),
       icon: Sparkles,
       iconColor: "text-green-600",
       monthlyPrice: "$0",
       annualPrice: "$0",
-      period: "for 7 days",
-      description: "Full Premium access — no restrictions",
-      badge: "Start Free Today",
+      period: t('pricing.plans.trial.period'),
+      description: t('pricing.plans.trial.description'),
+      badge: t('pricing.plans.trial.badge'),
       badgeVariant: "default" as const,
-      ctaText: "Start Free Trial",
+      ctaText: t('pricing.plans.trial.cta'),
       ctaVariant: "default" as const,
       monthlyUrl: "#",
       annualUrl: "#",
       features: [
-        "All 8 Palace Floors unlocked",
-        "Unlimited AI conversations",
-        "All games, courses & tools",
-        "7 days completely free",
-        "Cancel anytime — one click",
+        t('pricing.plans.trial.features.allFloors'),
+        t('pricing.plans.trial.features.unlimitedAI'),
+        t('pricing.plans.trial.features.allGames'),
+        t('pricing.plans.trial.features.sevenDaysFree'),
+        t('pricing.plans.trial.features.cancelAnytime'),
       ],
     },
     {
       id: "essential",
-      name: "Essential",
+      name: t('pricing.plans.essential.name'),
       icon: Zap,
       iconColor: "text-blue-600",
       monthlyPrice: "$9",
       annualPrice: "$90",
       monthlySavings: null,
-      annualSavings: "Save $18/year",
-      period: "per month",
-      description: "Core Bible study tools",
-      badge: "Great Value",
+      annualSavings: t('pricing.plans.essential.annualSavings'),
+      period: t('pricing.plans.essential.period'),
+      description: t('pricing.plans.essential.description'),
+      badge: t('pricing.plans.essential.badge'),
       badgeVariant: "secondary" as const,
-      ctaText: "Get Essential",
+      ctaText: t('pricing.plans.essential.cta'),
       ctaVariant: "default" as const,
       monthlyUrl: paymentLinks.essentialMonthly,
       annualUrl: paymentLinks.essentialAnnual,
       features: [
-        "All 8 Palace Floors + 40+ Rooms",
-        "Bible Reader with Strong's",
-        "Core games & memory tools",
-        "Basic AI conversations",
-        "Email support",
+        t('pricing.plans.essential.features.allFloors'),
+        t('pricing.plans.essential.features.bibleReader'),
+        t('pricing.plans.essential.features.coreGames'),
+        t('pricing.plans.essential.features.basicAI'),
+        t('pricing.plans.essential.features.emailSupport'),
       ],
     },
     {
       id: "premium",
-      name: "Premium",
+      name: t('pricing.plans.premium.name'),
       icon: Crown,
       iconColor: "text-purple-600",
       monthlyPrice: "$15",
       annualPrice: "$150",
       monthlySavings: null,
-      annualSavings: "Save $30/year",
-      period: "per month",
-      description: "Complete mastery system",
-      badge: "Full Access",
+      annualSavings: t('pricing.plans.premium.annualSavings'),
+      period: t('pricing.plans.premium.period'),
+      description: t('pricing.plans.premium.description'),
+      badge: t('pricing.plans.premium.badge'),
       badgeVariant: "default" as const,
-      ctaText: "Get Premium",
+      ctaText: t('pricing.plans.premium.cta'),
       ctaVariant: "default" as const,
       popular: true,
       features: [
-        "All 8 Palace Floors + 40+ Rooms",
-        "Complete Art of War Dojo (30+ lessons)",
-        "All 4 specialized AI GPTs",
-        "Unlimited Treasure Hunts & Escape Rooms",
-        "Priority support + early access",
+        t('pricing.plans.premium.features.allFloors'),
+        t('pricing.plans.premium.features.artOfWar'),
+        t('pricing.plans.premium.features.specializedAI'),
+        t('pricing.plans.premium.features.unlimitedHunts'),
+        t('pricing.plans.premium.features.prioritySupport'),
       ],
     },
   ];
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5">
-      <SEO title="Pricing" description="Choose your Phototheology plan. Free, Premium, and Church options for Bible study using the Palace method." />
+      <SEO title={t('pricing.seo.title')} description={t('pricing.seo.description')} />
       <Navigation />
       
       <div className="container mx-auto px-4 pt-24 pb-12">
@@ -322,16 +324,16 @@ export default function Pricing() {
         <div className="text-center mb-12">
           <Badge className="mb-4 gradient-palace text-white border-0 px-4 py-2 text-sm">
             <Sparkles className="h-3 w-3 mr-1" />
-            7-Day Free Trial • Cancel Anytime • No Charge Until Day 8
+            {t('pricing.hero.badge')}
           </Badge>
           <h1 className="text-5xl md:text-6xl font-bold bg-gradient-palace bg-clip-text text-transparent mb-4">
-            Try Everything Free for 7 Days
+            {t('pricing.hero.title')}
           </h1>
           <p className="text-xl text-muted-foreground max-w-xl mx-auto mb-2">
-            Full Premium access. No restrictions. Cancel before day 8 and pay nothing.
+            {t('pricing.hero.subtitle')}
           </p>
           <p className="text-sm text-muted-foreground">
-            Then just $15/month (or $150/year — save 2 months)
+            {t('pricing.hero.afterTrial')}
           </p>
           
           {/* Billing Period Toggle - Enhanced */}
@@ -345,23 +347,23 @@ export default function Pricing() {
                     : 'text-muted-foreground hover:text-foreground'
                 }`}
               >
-                Monthly
+                {t('pricing.billing.monthly')}
               </button>
               <button
                 onClick={() => setBillingPeriod('annual')}
                 className={`px-6 py-3 rounded-xl font-semibold text-base transition-all ${
-                  billingPeriod === 'annual' 
-                    ? 'bg-primary text-primary-foreground shadow-lg scale-105' 
+                  billingPeriod === 'annual'
+                    ? 'bg-primary text-primary-foreground shadow-lg scale-105'
                     : 'text-muted-foreground hover:text-foreground'
                 }`}
               >
-                Annual
+                {t('pricing.billing.annual')}
               </button>
             </div>
             {billingPeriod === 'annual' && (
               <Badge variant="default" className="gradient-palace text-white border-0 px-4 py-2 text-base animate-pulse">
                 <Sparkles className="h-4 w-4 mr-2" />
-                Save 2 Months Free - Best Value!
+                {t('pricing.billing.annualSavingsBadge')}
               </Badge>
             )}
           </div>
@@ -372,45 +374,45 @@ export default function Pricing() {
           <CardContent className="p-8 text-center">
             <Badge className="mb-4 gradient-palace text-white border-0 px-4 py-2">
               <Sparkles className="h-3 w-3 mr-1" />
-              🎉 Most Popular Choice
+              {t('pricing.trialCta.badge')}
             </Badge>
-            <h3 className="text-2xl font-bold mb-3">Start Your 7-Day Free Trial</h3>
+            <h3 className="text-2xl font-bold mb-3">{t('pricing.trialCta.title')}</h3>
             <p className="text-muted-foreground mb-2">
-              Get <span className="font-semibold text-foreground">instant access</span> to all Premium features — no restrictions.
+              {t('pricing.trialCta.descriptionPrefix')} <span className="font-semibold text-foreground">{t('pricing.trialCta.instantAccess')}</span> {t('pricing.trialCta.descriptionSuffix')}
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-2 mb-6 text-sm">
               <span className="flex items-center gap-1 px-3 py-1 rounded-full bg-primary/10 text-primary">
-                <Check className="h-3 w-3" /> No charge for 7 days
+                <Check className="h-3 w-3" /> {t('pricing.trialCta.noCharge')}
               </span>
               <span className="flex items-center gap-1 px-3 py-1 rounded-full bg-muted text-muted-foreground">
-                <CreditCard className="h-3 w-3" /> Cancel anytime
+                <CreditCard className="h-3 w-3" /> {t('pricing.trialCta.cancelAnytime')}
               </span>
             </div>
-            <Button 
+            <Button
               onClick={startTrialNow}
               className="gradient-palace text-lg px-8 py-6 h-auto"
               disabled={isStartingTrial}
             >
-              {isStartingTrial ? "Starting..." : "Start Free Trial — No Charge Today"}
+              {isStartingTrial ? t('pricing.trialCta.starting') : t('pricing.trialCta.startButton')}
               <ArrowRight className="ml-2 h-5 w-5" />
             </Button>
             <p className="text-xs text-muted-foreground mt-4">
-              We'll remind you 2 days before your trial ends. Cancel with one click.
+              {t('pricing.trialCta.reminder')}
             </p>
           </CardContent>
         </Card>
 
         {/* Access Code Link */}
         <div className="text-center mb-8">
-          <p className="text-sm text-muted-foreground mb-2">Have a special access code?</p>
-          <Button 
+          <p className="text-sm text-muted-foreground mb-2">{t('pricing.accessCode.prompt')}</p>
+          <Button
             asChild
             variant="outline"
             className="gap-2"
           >
             <Link to="/access">
               <Gift className="h-4 w-4" />
-              Redeem Access Code
+              {t('pricing.accessCode.redeem')}
             </Link>
           </Button>
         </div>
@@ -424,14 +426,14 @@ export default function Pricing() {
                   <Building2 className="h-8 w-8 text-primary" />
                 </div>
                 <div>
-                  <h3 className="text-2xl font-bold mb-2">Looking for Church Licensing?</h3>
+                  <h3 className="text-2xl font-bold mb-2">{t('pricing.church.title')}</h3>
                   <p className="text-muted-foreground mb-3">
-                    Unite your entire congregation around one discipleship system. Get bulk pricing for 50-300 members.
+                    {t('pricing.church.description')}
                   </p>
                   <div className="flex flex-wrap gap-2">
-                    <Badge variant="secondary">Church-Wide Campaigns</Badge>
-                    <Badge variant="secondary">Member Management</Badge>
-                    <Badge variant="secondary">Analytics</Badge>
+                    <Badge variant="secondary">{t('pricing.church.campaigns')}</Badge>
+                    <Badge variant="secondary">{t('pricing.church.memberManagement')}</Badge>
+                    <Badge variant="secondary">{t('pricing.church.analytics')}</Badge>
                   </div>
                 </div>
               </div>
@@ -441,7 +443,7 @@ export default function Pricing() {
                 className="whitespace-nowrap gap-2"
               >
                 <Link to="/church-signup">
-                  View Church Plans
+                  {t('pricing.church.viewPlans')}
                   <ArrowRight className="h-4 w-4" />
                 </Link>
               </Button>
@@ -462,7 +464,7 @@ export default function Pricing() {
                 <div className="absolute -top-4 left-1/2 -translate-x-1/2">
                   <Badge className="gradient-palace text-white border-0">
                     <Star className="h-3 w-3 mr-1 fill-current" />
-                    Most Popular
+                    {t('pricing.mostPopular')}
                   </Badge>
                 </div>
               )}
@@ -484,9 +486,9 @@ export default function Pricing() {
                     {plan.id === 'free' ? (
                       `/ ${plan.period}`
                     ) : billingPeriod === 'monthly' ? (
-                      '/ per month'
+                      t('pricing.perMonth')
                     ) : (
-                      '/ per year'
+                      t('pricing.perYear')
                     )}
                   </div>
                   {billingPeriod === 'annual' && plan.annualSavings && (
@@ -517,7 +519,7 @@ export default function Pricing() {
                     size="lg"
                     disabled={isStartingTrial}
                   >
-                    {isStartingTrial ? "Starting..." : plan.ctaText}
+                    {isStartingTrial ? t('pricing.trialCta.starting') : plan.ctaText}
                   </Button>
                 ) : (
                   <Button
@@ -527,7 +529,7 @@ export default function Pricing() {
                     size="lg"
                     disabled={isSubscribing}
                   >
-                    {isSubscribing ? "Processing..." : `${plan.ctaText} ${billingPeriod === 'annual' ? '(Annual)' : '(Monthly)'}`}
+                    {isSubscribing ? t('pricing.processing') : `${plan.ctaText} ${billingPeriod === 'annual' ? t('pricing.annualLabel') : t('pricing.monthlyLabel')}`}
                   </Button>
                 )}
               </CardFooter>
@@ -540,7 +542,7 @@ export default function Pricing() {
           <div className="text-center mb-8">
             <div className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-muted/50">
               <Zap className="h-5 w-5 text-primary" />
-              <span className="font-medium">Feature Comparison</span>
+              <span className="font-medium">{t('pricing.comparison.title')}</span>
             </div>
           </div>
           
@@ -550,59 +552,59 @@ export default function Pricing() {
                 <table className="w-full">
                   <thead>
                     <tr className="border-b">
-                      <th className="text-left p-4 font-semibold">Feature</th>
-                      <th className="text-center p-4 font-semibold">Free Trial</th>
-                      <th className="text-center p-4 font-semibold">Essential</th>
-                      <th className="text-center p-4 font-semibold bg-primary/5">Premium</th>
+                      <th className="text-left p-4 font-semibold">{t('pricing.comparison.feature')}</th>
+                      <th className="text-center p-4 font-semibold">{t('pricing.comparison.freeTrial')}</th>
+                      <th className="text-center p-4 font-semibold">{t('pricing.comparison.essential')}</th>
+                      <th className="text-center p-4 font-semibold bg-primary/5">{t('pricing.comparison.premium')}</th>
                     </tr>
                   </thead>
                   <tbody>
                     <tr className="border-b">
-                      <td className="p-4">The Palace (8 Floors, 40+ Rooms)</td>
+                      <td className="p-4">{t('pricing.comparison.rows.palace')}</td>
                       <td className="text-center p-4"><Check className="h-5 w-5 text-primary mx-auto" /></td>
                       <td className="text-center p-4"><Check className="h-5 w-5 text-primary mx-auto" /></td>
                       <td className="text-center p-4 bg-primary/5"><Check className="h-5 w-5 text-primary mx-auto" /></td>
                     </tr>
                     <tr className="border-b">
-                      <td className="p-4">Bible Reader with Strong's</td>
+                      <td className="p-4">{t('pricing.comparison.rows.bibleReader')}</td>
                       <td className="text-center p-4"><Check className="h-5 w-5 text-primary mx-auto" /></td>
                       <td className="text-center p-4"><Check className="h-5 w-5 text-primary mx-auto" /></td>
                       <td className="text-center p-4 bg-primary/5"><Check className="h-5 w-5 text-primary mx-auto" /></td>
                     </tr>
                     <tr className="border-b">
-                      <td className="p-4">Core Games & Memory Tools</td>
+                      <td className="p-4">{t('pricing.comparison.rows.coreGames')}</td>
                       <td className="text-center p-4"><Check className="h-5 w-5 text-primary mx-auto" /></td>
                       <td className="text-center p-4"><Check className="h-5 w-5 text-primary mx-auto" /></td>
                       <td className="text-center p-4 bg-primary/5"><Check className="h-5 w-5 text-primary mx-auto" /></td>
                     </tr>
                     <tr className="border-b">
-                      <td className="p-4">Basic AI Conversations</td>
+                      <td className="p-4">{t('pricing.comparison.rows.basicAI')}</td>
                       <td className="text-center p-4"><Check className="h-5 w-5 text-primary mx-auto" /></td>
                       <td className="text-center p-4"><Check className="h-5 w-5 text-primary mx-auto" /></td>
                       <td className="text-center p-4 bg-primary/5"><Check className="h-5 w-5 text-primary mx-auto" /></td>
                     </tr>
                     <tr className="border-b bg-yellow-500/5">
-                      <td className="p-4 font-semibold">⚔️ Art of War Dojo (30+ lessons)</td>
+                      <td className="p-4 font-semibold">{t('pricing.comparison.rows.artOfWar')}</td>
                       <td className="text-center p-4"><Check className="h-5 w-5 text-primary mx-auto" /></td>
-                      <td className="text-center p-4 text-muted-foreground">Limited</td>
+                      <td className="text-center p-4 text-muted-foreground">{t('pricing.comparison.limited')}</td>
                       <td className="text-center p-4 bg-primary/5"><Check className="h-5 w-5 text-primary mx-auto" /></td>
                     </tr>
                     <tr className="border-b">
-                      <td className="p-4">All 4 Specialized AI GPTs</td>
+                      <td className="p-4">{t('pricing.comparison.rows.specializedAI')}</td>
                       <td className="text-center p-4"><Check className="h-5 w-5 text-primary mx-auto" /></td>
-                      <td className="text-center p-4 text-muted-foreground">Basic</td>
+                      <td className="text-center p-4 text-muted-foreground">{t('pricing.comparison.basic')}</td>
                       <td className="text-center p-4 bg-primary/5"><Check className="h-5 w-5 text-primary mx-auto" /></td>
                     </tr>
                     <tr className="border-b">
-                      <td className="p-4">Escape Rooms & Treasure Hunts</td>
+                      <td className="p-4">{t('pricing.comparison.rows.escapeRooms')}</td>
                       <td className="text-center p-4"><Check className="h-5 w-5 text-primary mx-auto" /></td>
-                      <td className="text-center p-4 text-muted-foreground">Limited</td>
+                      <td className="text-center p-4 text-muted-foreground">{t('pricing.comparison.limited')}</td>
                       <td className="text-center p-4 bg-primary/5"><Check className="h-5 w-5 text-primary mx-auto" /></td>
                     </tr>
                     <tr className="border-b">
-                      <td className="p-4">Priority Support</td>
+                      <td className="p-4">{t('pricing.comparison.rows.prioritySupport')}</td>
                       <td className="text-center p-4"><Check className="h-5 w-5 text-primary mx-auto" /></td>
-                      <td className="text-center p-4 text-muted-foreground">Email</td>
+                      <td className="text-center p-4 text-muted-foreground">{t('pricing.comparison.email')}</td>
                       <td className="text-center p-4 bg-primary/5"><Check className="h-5 w-5 text-primary mx-auto" /></td>
                     </tr>
                   </tbody>
@@ -619,45 +621,42 @@ export default function Pricing() {
               <div className="p-2 rounded-lg bg-amber-500/20">
                 <CreditCard className="h-6 w-6 text-amber-600" />
               </div>
-              <CardTitle>Why We Ask for a Card Upfront</CardTitle>
+              <CardTitle>{t('pricing.cardUpfront.title')}</CardTitle>
             </div>
           </CardHeader>
           <CardContent className="space-y-4">
             <p className="text-muted-foreground leading-relaxed">
-              We believe in complete transparency. Here's why we require a credit card to start your free trial:
+              {t('pricing.cardUpfront.description')}
             </p>
 
             <div className="grid gap-4 md:grid-cols-2">
               <div className="p-4 rounded-lg bg-background/50 border">
                 <h4 className="font-semibold mb-2 flex items-center gap-2">
                   <Zap className="h-4 w-4 text-primary" />
-                  AI Costs Are Real
+                  {t('pricing.cardUpfront.aiCosts.title')}
                 </h4>
                 <p className="text-sm text-muted-foreground">
-                  Every Jeeves conversation, every Mind Map generation, every AI-powered study costs us real money.
-                  We want to serve serious students, not bots or casual browsers who would drain resources meant for you.
+                  {t('pricing.cardUpfront.aiCosts.description')}
                 </p>
               </div>
 
               <div className="p-4 rounded-lg bg-background/50 border">
                 <h4 className="font-semibold mb-2 flex items-center gap-2">
                   <Building2 className="h-4 w-4 text-primary" />
-                  Ministry Sustainability
+                  {t('pricing.cardUpfront.sustainability.title')}
                 </h4>
                 <p className="text-sm text-muted-foreground">
-                  "The laborer is worthy of his wages" (Luke 10:7). A sustainable platform serves more people long-term
-                  than a generous one that collapses. Your support enables us to keep building and serving.
+                  {t('pricing.cardUpfront.sustainability.description')}
                 </p>
               </div>
 
               <div className="p-4 rounded-lg bg-background/50 border">
                 <h4 className="font-semibold mb-2 flex items-center gap-2">
                   <Check className="h-4 w-4 text-green-500" />
-                  You Won't Be Charged
+                  {t('pricing.cardUpfront.noCharge.title')}
                 </h4>
                 <p className="text-sm text-muted-foreground">
-                  Your card is only charged after 7 days — and only if you don't cancel. We send reminders on Day 3 and Day 6.
-                  Cancel anytime with one click. No tricks, no hidden fees.
+                  {t('pricing.cardUpfront.noCharge.description')}
                 </p>
               </div>
 
@@ -668,36 +667,31 @@ export default function Pricing() {
         {/* FAQ or Additional Info */}
         <Card className="glass-card mt-8 max-w-3xl mx-auto">
           <CardHeader>
-            <CardTitle>Frequently Asked Questions</CardTitle>
+            <CardTitle>{t('pricing.faq.title')}</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <div>
-              <h3 className="font-semibold mb-2">Can I cancel anytime?</h3>
+              <h3 className="font-semibold mb-2">{t('pricing.faq.cancelAnytime.question')}</h3>
               <p className="text-sm text-muted-foreground">
-                Yes! You can cancel your subscription at any time. Your access continues until the end of your billing period.
-                We'll send you reminders before your trial ends — no surprise charges.
+                {t('pricing.faq.cancelAnytime.answer')}
               </p>
             </div>
             <div>
-              <h3 className="font-semibold mb-2">What payment methods do you accept?</h3>
+              <h3 className="font-semibold mb-2">{t('pricing.faq.paymentMethods.question')}</h3>
               <p className="text-sm text-muted-foreground">
-                We accept all major credit cards through our secure Stripe payment processor.
+                {t('pricing.faq.paymentMethods.answer')}
               </p>
             </div>
             <div>
-              <h3 className="font-semibold mb-2">Why do you require a credit card for the free trial?</h3>
+              <h3 className="font-semibold mb-2">{t('pricing.faq.whyCard.question')}</h3>
               <p className="text-sm text-muted-foreground">
-                Our AI features have real per-use costs. Requiring a card helps us serve serious Bible students
-                while protecting the platform from abuse. You won't be charged until after your 7-day trial ends,
-                and you can cancel anytime before then.
+                {t('pricing.faq.whyCard.answer')}
               </p>
             </div>
             <div>
-              <h3 className="font-semibold mb-2">What if I can't afford the subscription?</h3>
+              <h3 className="font-semibold mb-2">{t('pricing.faq.cantAfford.question')}</h3>
               <p className="text-sm text-muted-foreground">
-                We believe cost should never prevent someone from studying God's Word deeply. If you're a missionary,
-                seminary student, or part of an under-resourced ministry, <Link to="/contact" className="text-primary hover:underline">reach out to us</Link> about
-                our scholarship program.
+                {t('pricing.faq.cantAfford.answerPrefix')} <Link to="/contact" className="text-primary hover:underline">{t('pricing.faq.cantAfford.reachOut')}</Link> {t('pricing.faq.cantAfford.answerSuffix')}
               </p>
             </div>
           </CardContent>

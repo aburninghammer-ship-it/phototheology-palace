@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Navigation } from "@/components/Navigation";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -65,6 +66,7 @@ const SAMPLE_GROUPS: StudyGroup[] = [
 ];
 
 export default function StudyGroups() {
+  const { t } = useTranslation();
   const { user } = useAuth();
   const { toast } = useToast();
   const [groups, setGroups] = useState<StudyGroup[]>(SAMPLE_GROUPS);
@@ -84,7 +86,7 @@ export default function StudyGroups() {
 
   const handleCreateGroup = () => {
     if (!newGroup.name.trim()) {
-      toast({ title: "Please enter a group name", variant: "destructive" });
+      toast({ title: t('studyGroups.pleaseEnterGroupName'), variant: "destructive" });
       return;
     }
 
@@ -94,24 +96,24 @@ export default function StudyGroups() {
       description: newGroup.description,
       memberCount: 1,
       maxMembers: newGroup.maxMembers,
-      currentPlan: "Not started",
+      currentPlan: t('studyGroups.notStarted'),
       isPrivate: newGroup.isPrivate,
       leaderId: user?.id || "",
-      leaderName: "You",
+      leaderName: t('studyGroups.you'),
     };
 
     setGroups([group, ...groups]);
     setCreateOpen(false);
     setNewGroup({ name: "", description: "", maxMembers: 12, isPrivate: false });
-    toast({ title: "Group created!", description: "Invite others to join your study group." });
+    toast({ title: t('studyGroups.groupCreated'), description: t('studyGroups.inviteOthers') });
   };
 
   const handleJoinGroup = (group: StudyGroup) => {
     if (group.memberCount >= group.maxMembers) {
-      toast({ title: "Group is full", variant: "destructive" });
+      toast({ title: t('studyGroups.groupIsFull'), variant: "destructive" });
       return;
     }
-    toast({ title: `Joined "${group.name}"`, description: "You're now a member of this study group." });
+    toast({ title: t('studyGroups.joinedGroup', { name: group.name }), description: t('studyGroups.nowAMember') });
   };
 
   return (
@@ -124,42 +126,42 @@ export default function StudyGroups() {
             <div>
               <h1 className="text-3xl font-bold flex items-center gap-2">
                 <Users className="h-8 w-8 text-primary" />
-                Study Groups
+                {t('studyGroups.pageTitle')}
               </h1>
-              <p className="text-muted-foreground">Join or create groups to study Scripture together</p>
+              <p className="text-muted-foreground">{t('studyGroups.pageSubtitle')}</p>
             </div>
             
             <Dialog open={createOpen} onOpenChange={setCreateOpen}>
               <DialogTrigger asChild>
                 <Button className="gap-2">
                   <Plus className="h-4 w-4" />
-                  Create Group
+                  {t('studyGroups.createGroup')}
                 </Button>
               </DialogTrigger>
               <DialogContent>
                 <DialogHeader>
-                  <DialogTitle>Create Study Group</DialogTitle>
+                  <DialogTitle>{t('studyGroups.createStudyGroup')}</DialogTitle>
                 </DialogHeader>
                 <div className="space-y-4">
                   <div>
-                    <Label>Group Name</Label>
+                    <Label>{t('studyGroups.groupName')}</Label>
                     <Input
-                      placeholder="e.g., Sunday Morning Study"
+                      placeholder={t('studyGroups.groupNamePlaceholder')}
                       value={newGroup.name}
                       onChange={(e) => setNewGroup({ ...newGroup, name: e.target.value })}
                     />
                   </div>
                   <div>
-                    <Label>Description</Label>
+                    <Label>{t('studyGroups.description')}</Label>
                     <Textarea
-                      placeholder="What will your group study?"
+                      placeholder={t('studyGroups.descriptionPlaceholder')}
                       value={newGroup.description}
                       onChange={(e) => setNewGroup({ ...newGroup, description: e.target.value })}
                     />
                   </div>
                   <div className="flex gap-4">
                     <div className="flex-1">
-                      <Label>Max Members</Label>
+                      <Label>{t('studyGroups.maxMembers')}</Label>
                       <Input
                         type="number"
                         min={2}
@@ -169,7 +171,7 @@ export default function StudyGroups() {
                       />
                     </div>
                     <div className="flex-1">
-                      <Label>Visibility</Label>
+                      <Label>{t('studyGroups.visibility')}</Label>
                       <div className="flex gap-2 mt-2">
                         <Button
                           type="button"
@@ -178,7 +180,7 @@ export default function StudyGroups() {
                           onClick={() => setNewGroup({ ...newGroup, isPrivate: false })}
                         >
                           <Globe className="h-4 w-4 mr-1" />
-                          Public
+                          {t('studyGroups.public')}
                         </Button>
                         <Button
                           type="button"
@@ -187,13 +189,13 @@ export default function StudyGroups() {
                           onClick={() => setNewGroup({ ...newGroup, isPrivate: true })}
                         >
                           <Lock className="h-4 w-4 mr-1" />
-                          Private
+                          {t('studyGroups.private')}
                         </Button>
                       </div>
                     </div>
                   </div>
                   <Button onClick={handleCreateGroup} className="w-full">
-                    Create Group
+                    {t('studyGroups.createGroup')}
                   </Button>
                 </div>
               </DialogContent>
@@ -204,7 +206,7 @@ export default function StudyGroups() {
           <div className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
-              placeholder="Search groups..."
+              placeholder={t('studyGroups.searchGroups')}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="pl-10"
@@ -230,7 +232,7 @@ export default function StudyGroups() {
                           <Globe className="h-4 w-4 text-emerald-500" />
                         )}
                         <Badge variant="outline">
-                          {group.memberCount}/{group.maxMembers} members
+                          {t('studyGroups.membersCount', { current: group.memberCount, max: group.maxMembers })}
                         </Badge>
                       </div>
                     </div>
@@ -240,13 +242,13 @@ export default function StudyGroups() {
                   <CardContent className="space-y-4">
                     <div className="flex items-center gap-2 text-sm">
                       <BookOpen className="h-4 w-4 text-primary" />
-                      <span>Currently: {group.currentPlan}</span>
+                      <span>{t('studyGroups.currently', { plan: group.currentPlan })}</span>
                     </div>
                     
                     {group.nextMeeting && (
                       <div className="flex items-center gap-2 text-sm text-muted-foreground">
                         <Calendar className="h-4 w-4" />
-                        <span>Next: {group.nextMeeting}</span>
+                        <span>{t('studyGroups.next', { meeting: group.nextMeeting })}</span>
                       </div>
                     )}
 
@@ -272,7 +274,7 @@ export default function StudyGroups() {
                           onClick={() => handleJoinGroup(group)}
                           disabled={group.memberCount >= group.maxMembers}
                         >
-                          Join
+                          {t('studyGroups.join')}
                         </Button>
                       </div>
                     </div>
@@ -286,13 +288,13 @@ export default function StudyGroups() {
             <Card className="text-center py-12">
               <CardContent>
                 <Users className="h-12 w-12 mx-auto mb-4 text-muted-foreground opacity-50" />
-                <h3 className="text-lg font-medium mb-2">No groups found</h3>
+                <h3 className="text-lg font-medium mb-2">{t('studyGroups.noGroupsFound')}</h3>
                 <p className="text-muted-foreground mb-4">
-                  {searchQuery ? "Try a different search term" : "Be the first to create a study group!"}
+                  {searchQuery ? t('studyGroups.tryDifferentSearch') : t('studyGroups.beTheFirst')}
                 </p>
                 <Button onClick={() => setCreateOpen(true)}>
                   <Plus className="h-4 w-4 mr-2" />
-                  Create Group
+                  {t('studyGroups.createGroup')}
                 </Button>
               </CardContent>
             </Card>

@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import { useParams, useNavigate } from "react-router-dom";
 import { Navigation } from "@/components/Navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -115,6 +116,7 @@ const GAME_DATA: Record<string, { title: string; questions: Question[] }> = {
 export default function PTKidsGamePlay() {
   const { gameId } = useParams();
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [score, setScore] = useState(0);
   const [lives, setLives] = useState(3);
@@ -171,9 +173,9 @@ export default function PTKidsGamePlay() {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <Card className="p-8 text-center">
-          <h2 className="text-2xl font-bold mb-4">Game not found!</h2>
+          <h2 className="text-2xl font-bold mb-4">{t('games.notFound')}</h2>
           <Button onClick={() => navigate("/pt-kids-games")}>
-            Back to Games
+            {t('games.backToGames')}
           </Button>
         </Card>
       </div>
@@ -203,22 +205,22 @@ export default function PTKidsGamePlay() {
                   ))}
                 </div>
                 <CardTitle className="text-3xl">
-                  {stars >= 2 ? "Amazing! 🎉" : stars >= 1 ? "Good Job! 👏" : "Keep Trying! 💪"}
+                  {stars >= 2 ? t('kids.amazing') : stars >= 1 ? t('kids.goodJob') : t('kids.keepTrying')}
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
-                <div className="text-4xl font-bold text-primary">{score} Points</div>
+                <div className="text-4xl font-bold text-primary">{t('kids.scorePoints', { score })}</div>
                 <p className="text-muted-foreground">
-                  You got {Math.round(score / 100)} out of {questions.length} correct!
+                  {t('kids.correctCount', { correct: Math.round(score / 100), total: questions.length })}
                 </p>
                 <div className="flex gap-2 justify-center pt-4">
                   <Button variant="outline" onClick={() => navigate("/pt-kids-games")}>
                     <ArrowLeft className="h-4 w-4 mr-2" />
-                    Back to Games
+                    {t('games.backToGames')}
                   </Button>
                   <Button onClick={restartGame}>
                     <Sparkles className="h-4 w-4 mr-2" />
-                    Play Again
+                    {t('kids.playAgain')}
                   </Button>
                 </div>
               </CardContent>
@@ -238,7 +240,7 @@ export default function PTKidsGamePlay() {
           <div className="flex items-center justify-between">
             <Button variant="ghost" onClick={() => navigate("/pt-kids-games")}>
               <ArrowLeft className="h-4 w-4 mr-2" />
-              Back
+              {t('common.back')}
             </Button>
             <h1 className="text-2xl font-bold">{game.title}</h1>
             <div className="flex items-center gap-2">
@@ -256,8 +258,8 @@ export default function PTKidsGamePlay() {
           {/* Progress */}
           <div className="space-y-2">
             <div className="flex justify-between text-sm">
-              <span>Question {currentQuestion + 1} of {questions.length}</span>
-              <span className="font-bold">Score: {score}</span>
+              <span>{t('kids.questionOf', { current: currentQuestion + 1, total: questions.length })}</span>
+              <span className="font-bold">{t('kids.score', { score })}</span>
             </div>
             <Progress value={((currentQuestion + 1) / questions.length) * 100} className="h-3" />
           </div>
@@ -328,7 +330,7 @@ export default function PTKidsGamePlay() {
                       size="lg"
                       onClick={nextQuestion}
                     >
-                      {currentQuestion < questions.length - 1 ? "Next Question" : "See Results"}
+                      {currentQuestion < questions.length - 1 ? t('kids.nextQuestion') : t('kids.seeResults')}
                       <ChevronRight className="h-5 w-5 ml-2" />
                     </Button>
                   )}

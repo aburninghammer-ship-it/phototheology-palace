@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Navigation } from '@/components/Navigation';
 import { useAuth } from '@/hooks/useAuth';
 import { usePublicChat, PublicChatMessage } from '@/hooks/usePublicChat';
@@ -15,6 +16,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 
 const PublicChat = () => {
+  const { t } = useTranslation();
   const { user } = useAuth();
   const {
     rooms,
@@ -104,7 +106,7 @@ const PublicChat = () => {
         {pinnedMessages.length > 0 && (
           <Card className="mb-4 p-3 bg-amber-50 dark:bg-amber-950/20 border-amber-200 dark:border-amber-800">
             <div className="flex items-center gap-2 text-sm font-medium text-amber-700 dark:text-amber-400 mb-2">
-              <Pin className="h-4 w-4" /> Pinned Messages
+              <Pin className="h-4 w-4" /> {t('public.pinnedMessages')}
             </div>
             {pinnedMessages.slice(0, 2).map((msg) => (
               <p key={msg.id} className="text-sm truncate text-amber-900 dark:text-amber-200">
@@ -120,8 +122,8 @@ const PublicChat = () => {
             {messages.length === 0 ? (
               <div className="flex flex-col items-center justify-center py-12 text-muted-foreground">
                 <MessageSquare className="h-12 w-12 mb-4 opacity-50" />
-                <p className="text-lg font-medium">No messages yet</p>
-                <p className="text-sm">Be the first to start the conversation!</p>
+                <p className="text-lg font-medium">{t('public.noMessagesYet')}</p>
+                <p className="text-sm">{t('public.beFirstToConverse')}</p>
               </div>
             ) : (
               <AnimatePresence initial={false}>
@@ -153,7 +155,7 @@ const PublicChat = () => {
                           isOwn && 'flex-row-reverse'
                         )}>
                           <span className="text-sm font-medium truncate">
-                            {message.sender?.display_name || 'Anonymous'}
+                            {message.sender?.display_name || t('public.anonymous')}
                           </span>
                           <span className="text-xs text-muted-foreground shrink-0">
                             {formatDistanceToNow(new Date(message.created_at), { addSuffix: true })}
@@ -202,7 +204,7 @@ const PublicChat = () => {
                             className="mt-1 h-6 text-xs px-2"
                             onClick={() => setReplyTo(message)}
                           >
-                            <Reply className="h-3 w-3 mr-1" /> Reply
+                            <Reply className="h-3 w-3 mr-1" /> {t('public.reply')}
                           </Button>
                         )}
                       </div>
@@ -217,8 +219,9 @@ const PublicChat = () => {
         {/* Typing Indicator */}
         {typingUsers.length > 0 && (
           <div className="text-sm text-muted-foreground italic py-2">
-            {typingUsers.map(u => u.display_name).join(', ')}{' '}
-            {typingUsers.length === 1 ? 'is' : 'are'} typing...
+            {typingUsers.length === 1
+              ? t('public.isTyping', { name: typingUsers[0].display_name })
+              : t('public.areTyping', { names: typingUsers.map(u => u.display_name).join(', ') })}
           </div>
         )}
 
@@ -227,7 +230,7 @@ const PublicChat = () => {
           <div className="flex items-center gap-2 p-3 bg-muted rounded-t-lg border-b">
             <Reply className="h-4 w-4 text-muted-foreground shrink-0" />
             <div className="flex-1 min-w-0">
-              <span className="text-xs text-muted-foreground">Replying to </span>
+              <span className="text-xs text-muted-foreground">{t('public.replyingTo')} </span>
               <span className="text-xs font-medium">{replyTo.sender?.display_name}</span>
               <p className="text-sm truncate">{replyTo.content}</p>
             </div>
@@ -241,7 +244,7 @@ const PublicChat = () => {
         <div className={cn('pt-4 border-t bg-background', replyTo && 'pt-0 border-t-0')}>
           <ChatInput
             onSend={handleSend}
-            placeholder={`Message ${activeRoom?.name || 'public chat'}...`}
+            placeholder={t('public.messagePlaceholder', { room: activeRoom?.name || t('public.publicChat') })}
             disabled={!user}
           />
         </div>

@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -25,6 +26,7 @@ interface DownloadFile {
 }
 
 export default function StudySuiteSuccess() {
+  const { t } = useTranslation();
   const [isDownloading, setIsDownloading] = useState(false);
   const [downloadFiles, setDownloadFiles] = useState<DownloadFile[] | null>(null);
   const [emailSent, setEmailSent] = useState(false);
@@ -86,17 +88,17 @@ export default function StudySuiteSuccess() {
       if (data?.urls && Array.isArray(data.urls)) {
         // Multiple files - show download list
         setDownloadFiles(data.urls);
-        toast.success("Your downloads are ready!");
+        toast.success(t('studySuccess.downloadsReady'));
       } else if (data?.url) {
         // Single file fallback
         window.open(data.url, '_blank');
-        toast.success("Download started!");
+        toast.success(t('studySuccess.downloadStarted'));
       } else {
         throw new Error("No download URL received");
       }
     } catch (error) {
       console.error("Download error:", error);
-      toast.error("Download failed. Please try again or contact support.");
+      toast.error(t('studySuccess.downloadFailed'));
     } finally {
       setIsDownloading(false);
     }
@@ -104,14 +106,14 @@ export default function StudySuiteSuccess() {
 
   const handleFileDownload = (url: string, name: string) => {
     window.open(url, '_blank');
-    toast.success(`Downloading ${name}...`);
+    toast.success(t('studySuccess.downloadingFile', { name }));
   };
 
   return (
     <div className="min-h-screen bg-background">
       <SEO
-        title="Thank You | Study Suite"
-        description="Your PhotoTheology Study Suite is ready for download."
+        title={t('studySuccess.seoTitle')}
+        description={t('studySuccess.seoDescription')}
       />
       <Navigation />
 
@@ -132,15 +134,15 @@ export default function StudySuiteSuccess() {
             </motion.div>
 
             <Badge variant="outline" className="text-green-600 border-green-500/30">
-              Purchase Complete
+              {t('studySuccess.purchaseComplete')}
             </Badge>
 
             <h1 className="text-4xl md:text-5xl font-bold">
-              Thank You for Your Purchase
+              {t('studySuccess.thankYou')}
             </h1>
 
             <p className="text-xl text-muted-foreground">
-              Your PhotoTheology Study Suite is ready for download.
+              {t('studySuccess.readyForDownload')}
             </p>
           </motion.div>
         </div>
@@ -159,9 +161,9 @@ export default function StudySuiteSuccess() {
                 <Building2 className="w-12 h-12 text-primary mx-auto" />
 
                 <div>
-                  <h2 className="text-2xl font-bold mb-2">PhotoTheology Study Suite</h2>
+                  <h2 className="text-2xl font-bold mb-2">{t('studySuccess.studySuiteTitle')}</h2>
                   <p className="text-muted-foreground">
-                    Complete method training for all 8 Floors
+                    {t('studySuccess.completeMethodTraining')}
                   </p>
                 </div>
 
@@ -176,25 +178,24 @@ export default function StudySuiteSuccess() {
                       {isDownloading ? (
                         <>
                           <Loader2 className="w-5 h-5 mr-2 animate-spin" />
-                          Preparing Downloads...
+                          {t('studySuccess.preparingDownloads')}
                         </>
                       ) : (
                         <>
                           <Download className="w-5 h-5 mr-2" />
-                          Get Your PDFs
+                          {t('studySuccess.getYourPdfs')}
                         </>
                       )}
                     </Button>
 
                     <p className="text-xs text-muted-foreground">
-                      Click the button above to access your 3 PDF files.
-                      You can return to this page anytime from your purchase confirmation email.
+                      {t('studySuccess.downloadInstructions')}
                     </p>
                   </>
                 ) : (
                   <div className="space-y-3">
                     <p className="text-sm text-muted-foreground mb-4">
-                      Click each file to download:
+                      {t('studySuccess.clickEachFile')}
                     </p>
                     {downloadFiles.map((file, index) => (
                       <motion.div
@@ -230,14 +231,13 @@ export default function StudySuiteSuccess() {
             transition={{ delay: 0.5 }}
             className="max-w-2xl mx-auto text-center space-y-6"
           >
-            <h2 className="text-2xl font-bold">Begin Your Training</h2>
+            <h2 className="text-2xl font-bold">{t('studySuccess.beginTraining')}</h2>
             <p className="text-muted-foreground">
-              You now have access to the complete Phototheology method. Enter the Palace
-              and begin applying what you learn in the Study Suite to your own Bible study.
+              {t('studySuccess.beginTrainingDescription')}
             </p>
             <Button asChild size="lg">
               <Link to="/palace">
-                Enter the Palace
+                {t('studySuccess.enterThePalace')}
                 <ArrowRight className="w-4 h-4 ml-2" />
               </Link>
             </Button>

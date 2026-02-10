@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate, Link, useSearchParams } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -16,6 +17,7 @@ import { GoogleSignInButton } from "@/components/auth/GoogleSignInButton";
 import { AuthSocialProof } from "@/components/auth/AuthSocialProof";
 import { useEventTracking } from "@/hooks/useEventTracking";
 import { usePaymentGate } from "@/hooks/usePaymentGate";
+import { LanguageSelector } from "@/components/settings/LanguageSelector";
 import { ensureStorageSpace, isQuotaError, getStorageErrorMessage } from "@/utils/storageManager";
 
 const emailSchema = z.string().email("Please enter a valid email address").max(255, "Email is too long");
@@ -29,6 +31,7 @@ const referralCodeSchema = z.string().trim().max(20).regex(/^[A-Z0-9]*$/).option
 
 export default function Auth() {
   const { user } = useAuth();
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const [loading, setLoading] = useState(false);
@@ -50,7 +53,7 @@ export default function Auth() {
   useEffect(() => {
     if (trialCancelled) {
       trackCheckoutAbandoned('user_cancelled_stripe');
-      toast.info("Your trial signup was cancelled. To access the Palace, please complete the signup with your card details.", {
+      toast.info(t('auth.trialCancelled'), {
         duration: 8000,
       });
     }
@@ -184,11 +187,9 @@ export default function Auth() {
 
       if (error) {
         if (error.message.includes("Invalid login credentials")) {
-          setError(
-            "Invalid email or password. If you signed up with Google/Microsoft/Facebook, use that button or reset your password to set one."
-          );
+          setError(t('auth.invalidCredentials'));
         } else if (error.message.includes("Email not confirmed")) {
-          setError("Please confirm your email address before logging in.");
+          setError(t('auth.emailNotConfirmed'));
         } else {
           setError(error.message);
         }
@@ -213,7 +214,7 @@ export default function Auth() {
       // Clean up any legacy password storage
       localStorage.removeItem("rememberedPassword");
 
-      toast.success("Welcome back!");
+      toast.success(t('auth.welcomeBack'));
       // Don't navigate here; once auth state updates, the effect above will route
       // to either the requested redirect target or the normal Gatehouse/Dashboard flow.
     } catch (err: any) {
@@ -222,7 +223,7 @@ export default function Auth() {
         setError(getStorageErrorMessage());
       } else {
         const errorMessage = err?.message || err?.toString() || "Unknown error";
-        setError(`Login failed: ${errorMessage}`);
+        setError(t('auth.loginFailed', { error: errorMessage }));
       }
     } finally {
       setLoading(false);
@@ -247,15 +248,15 @@ export default function Auth() {
       });
 
       if (error) {
-        setError(error.message || "Failed to send reset email");
+        setError(error.message || t('auth.resetFailed'));
         return;
       }
 
-      toast.success("Password reset email sent! Check your inbox.");
+      toast.success(t('auth.resetEmailSent'));
       setShowPasswordReset(false);
       setResetEmail("");
     } catch (err) {
-      setError("An unexpected error occurred. Please try again.");
+      setError(t('errors.tryAgain'));
       console.error("Password reset error:", err);
     } finally {
       setLoading(false);
@@ -286,7 +287,7 @@ export default function Auth() {
         referralCodeSchema.parse(referralCode);
       } catch (e) {
         if (e instanceof z.ZodError) {
-          setError("Invalid referral code format");
+          setError(t('auth.invalidReferralCode'));
           return;
         }
       }
@@ -321,9 +322,9 @@ export default function Auth() {
 
       if (error) {
         if (error.message.includes("already registered") || error.message.includes("User already registered")) {
-          setError("This email is already registered. Please login instead.");
+          setError(t('auth.emailAlreadyRegistered'));
         } else if (error.message.includes("invalid email")) {
-          setError("Please enter a valid email address.");
+          setError(t('auth.invalidEmailAddress'));
         } else {
           setError(error.message);
         }
@@ -357,7 +358,7 @@ export default function Auth() {
           colors: ['#9b87f5', '#7E69AB', '#6E59A5', '#D6BCFA', '#E5DEFF']
         });
 
-        toast.success("Account created! Redirecting to start your free trial...");
+        toast.success(t('auth.accountCreatedRedirecting'));
         
         // UNIFIED SIGNUP + TRIAL FLOW: Immediately redirect to Stripe checkout
         // Users MUST enter credit card to complete signup - it's one process
@@ -389,7 +390,7 @@ export default function Auth() {
               payment_source: "patreon",
               updated_at: new Date().toISOString(),
             }).eq("id", data.user.id);
-            toast.success("Your Patreon membership has been linked!");
+            toast.success(t('auth.patreonLinked'));
             navigate("/gatehouse", { replace: true });
             return;
           }
@@ -402,7 +403,7 @@ export default function Auth() {
               payment_source: "pickaxe" as any,
               updated_at: new Date().toISOString(),
             }).eq("id", data.user.id);
-            toast.success("Your Pickaxe membership has been linked!");
+            toast.success(t('auth.pickaxeLinked'));
             navigate("/gatehouse", { replace: true });
             return;
           }
@@ -415,7 +416,7 @@ export default function Auth() {
               payment_source: "teachable" as any,
               updated_at: new Date().toISOString(),
             }).eq("id", data.user.id);
-            toast.success("Your Teachable membership has been linked!");
+            toast.success(t('auth.teachableLinked'));
             navigate("/gatehouse", { replace: true });
             return;
           }
@@ -438,7 +439,7 @@ export default function Auth() {
         } catch (checkoutErr) {
           console.error("Failed to create checkout session:", checkoutErr);
           // Fallback to pricing page if checkout creation fails
-          toast.error("Could not start trial. Please try again on the pricing page.");
+          toast.error(t('auth.trialStartFailed'));
           navigate("/pricing?trial=true", { replace: true });
         }
       } else if (data.user && !data.session) {
@@ -449,16 +450,16 @@ export default function Auth() {
           origin: { y: 0.6 },
           colors: ['#9b87f5', '#7E69AB', '#6E59A5', '#D6BCFA', '#E5DEFF']
         });
-        toast.success("Account created! Please check your email to verify your account.");
+        toast.success(t('auth.accountCreatedVerify'));
       } else {
-        setError("Account creation failed. This email may already be registered. Please try logging in instead.");
+        setError(t('auth.accountCreationFailed'));
       }
     } catch (err) {
       console.error("Signup error:", err);
       if (isQuotaError(err)) {
         setError(getStorageErrorMessage());
       } else {
-        setError("An unexpected error occurred. Please try again.");
+        setError(t('errors.tryAgain'));
       }
     } finally {
       setLoading(false);
@@ -486,7 +487,7 @@ export default function Auth() {
       }
     } catch (err) {
       console.error("Patreon connect error:", err);
-      setError("Failed to connect to Patreon. Please try again.");
+      setError(t('auth.patreonConnectFailed'));
       setPatreonLoading(false);
     }
   };
@@ -505,7 +506,7 @@ export default function Auth() {
           <h1 className="text-4xl font-serif font-bold bg-gradient-palace bg-clip-text text-transparent mb-2">
             Phototheology
           </h1>
-          <p className="text-muted-foreground">The Palace of Biblical Wisdom</p>
+          <p className="text-muted-foreground">{t('auth.palaceSubtitle')}</p>
         </Link>
 
         {/* Patreon Connection Mode */}
@@ -516,12 +517,12 @@ export default function Auth() {
                 <Crown className="h-10 w-10 text-amber-500" />
               </div>
               <CardTitle className="text-xl">
-                {user ? "Connect Your Patreon" : "Welcome, Patron!"}
+                {user ? t('auth.connectPatreon') : t('auth.welcomePatron')}
               </CardTitle>
               <CardDescription>
-                {user 
-                  ? "Link your Patreon account to unlock your full Patron benefits"
-                  : "Connect your Patreon account to unlock your full access benefits"
+                {user
+                  ? t('auth.linkPatreonBenefits')
+                  : t('auth.connectPatreonAccess')
                 }
               </CardDescription>
             </CardHeader>
@@ -540,18 +541,18 @@ export default function Auth() {
                 {patreonLoading ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Connecting...
+                    {t('auth.connecting')}
                   </>
                 ) : (
                   <>
                     <Crown className="mr-2 h-4 w-4" />
-                    Connect Patreon Account
+                    {t('auth.connectPatreonAccount')}
                   </>
                 )}
               </Button>
               {!user && (
                 <p className="text-xs text-center text-muted-foreground">
-                  Already have an account? Log in first, then connect your Patreon.
+                  {t('auth.logInFirstPatreon')}
                 </p>
               )}
               {user && (
@@ -560,7 +561,7 @@ export default function Auth() {
                   className="w-full"
                   onClick={() => navigate("/dashboard")}
                 >
-                  Back to Dashboard
+                  {t('nav.backToDashboard')}
                 </Button>
               )}
             </CardContent>
@@ -572,8 +573,8 @@ export default function Auth() {
         <Card className="glass-card">
           <Tabs defaultValue="login" className="w-full" onValueChange={() => setShowPasswordReset(false)}>
             <TabsList className="grid w-full grid-cols-2">
-              <TabsTrigger value="login">Login</TabsTrigger>
-              <TabsTrigger value="signup">Sign Up</TabsTrigger>
+              <TabsTrigger value="login">{t('common.login')}</TabsTrigger>
+              <TabsTrigger value="signup">{t('common.signup')}</TabsTrigger>
             </TabsList>
 
             {/* Login Tab */}
@@ -581,9 +582,9 @@ export default function Auth() {
               {showPasswordReset ? (
                 <form onSubmit={handlePasswordReset}>
                   <CardHeader>
-                    <CardTitle>Reset Password</CardTitle>
+                    <CardTitle>{t('auth.resetPassword')}</CardTitle>
                     <CardDescription>
-                      Enter your email to receive a password reset link
+                      {t('auth.resetDescription')}
                     </CardDescription>
                   </CardHeader>
                   <CardContent className="space-y-4">
@@ -595,7 +596,7 @@ export default function Auth() {
                     <div className="space-y-2">
                       <Label htmlFor="reset-email">
                         <Mail className="h-4 w-4 inline mr-2" />
-                        Email
+                        {t('auth.email')}
                       </Label>
                       <Input
                         id="reset-email"
@@ -617,10 +618,10 @@ export default function Auth() {
                       {loading ? (
                         <>
                           <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                          Sending...
+                          {t('auth.sending')}
                         </>
                       ) : (
-                        "Send Reset Link"
+                        t('auth.sendResetLink')
                       )}
                     </Button>
                     <Button
@@ -634,16 +635,16 @@ export default function Auth() {
                       }}
                       disabled={loading}
                     >
-                      Back to Login
+                      {t('auth.backToLogin')}
                     </Button>
                   </CardFooter>
                 </form>
               ) : (
                 <form onSubmit={handleLogin}>
                   <CardHeader>
-                    <CardTitle>Welcome Back</CardTitle>
+                    <CardTitle>{t('auth.welcomeBack')}</CardTitle>
                     <CardDescription>
-                      Login to continue your journey through the Palace
+                      {t('auth.loginDescription')}
                     </CardDescription>
                   </CardHeader>
                   <CardContent className="space-y-4">
@@ -656,7 +657,7 @@ export default function Auth() {
                       </div>
                       <div className="relative flex justify-center text-xs uppercase">
                         <span className="bg-card px-2 text-muted-foreground">
-                          Or continue with email
+                          {t('auth.orContinueWithEmail')}
                         </span>
                       </div>
                     </div>
@@ -669,7 +670,7 @@ export default function Auth() {
                     <div className="space-y-2">
                       <Label htmlFor="login-email">
                         <Mail className="h-4 w-4 inline mr-2" />
-                        Email
+                        {t('auth.email')}
                       </Label>
                       <Input
                         id="login-email"
@@ -684,7 +685,7 @@ export default function Auth() {
                     <div className="space-y-2">
                       <Label htmlFor="login-password">
                         <Lock className="h-4 w-4 inline mr-2" />
-                        Password
+                        {t('auth.password')}
                       </Label>
                       <div className="relative">
                         <Input
@@ -724,7 +725,7 @@ export default function Auth() {
                           disabled={loading}
                         />
                         <Label htmlFor="remember-me" className="text-sm font-normal cursor-pointer">
-                          Remember me
+                          {t('auth.rememberMe')}
                         </Label>
                       </div>
                       <Button
@@ -737,7 +738,7 @@ export default function Auth() {
                         }}
                         disabled={loading}
                       >
-                        Forgot password?
+                        {t('auth.forgotPassword')}
                       </Button>
                     </div>
                   </CardContent>
@@ -750,10 +751,10 @@ export default function Auth() {
                       {loading ? (
                         <>
                           <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                          Logging in...
+                          {t('auth.loggingIn')}
                         </>
                       ) : (
-                        "Login"
+                        t('common.login')
                       )}
                     </Button>
                   </CardFooter>
@@ -765,9 +766,9 @@ export default function Auth() {
             <TabsContent value="signup">
               <form onSubmit={handleSignup}>
                 <CardHeader>
-                  <CardTitle>Start Your 7-Day Free Trial</CardTitle>
+                  <CardTitle>{t('auth.startFreeTrial')}</CardTitle>
                   <CardDescription>
-                    Full access to the Phototheology Palace
+                    {t('auth.fullAccess')}
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
@@ -780,7 +781,7 @@ export default function Auth() {
                     </div>
                     <div className="relative flex justify-center text-xs uppercase">
                       <span className="bg-card px-2 text-muted-foreground">
-                        Or sign up with email
+                        {t('auth.orSignUpWithEmail')}
                       </span>
                     </div>
                   </div>
@@ -789,14 +790,14 @@ export default function Auth() {
                   <div className="bg-gradient-to-r from-primary/10 via-accent/5 to-primary/10 border border-primary/20 rounded-lg p-4">
                     <div className="flex items-center gap-3 mb-2">
                       <Crown className="h-5 w-5 text-primary" />
-                      <span className="font-semibold text-foreground">Premium Access</span>
+                      <span className="font-semibold text-foreground">{t('auth.premiumAccess')}</span>
                     </div>
                     <div className="space-y-1 text-sm">
                       <p className="text-muted-foreground">
-                        <span className="font-medium text-foreground">7 days free</span>, then $15/month
+                        <span className="font-medium text-foreground">{t('auth.sevenDaysFree')}</span>, {t('auth.thenPrice')}
                       </p>
                       <p className="text-xs text-muted-foreground/80">
-                        Card required to start trial • Cancel anytime • No charge until day 8
+                        {t('auth.trialTerms')}
                       </p>
                     </div>
                   </div>
@@ -809,12 +810,12 @@ export default function Auth() {
                   <div className="space-y-2">
                     <Label htmlFor="signup-name">
                       <User className="h-4 w-4 inline mr-2" />
-                      Display Name
+                      {t('profile.displayName')}
                     </Label>
                     <Input
                       id="signup-name"
                       type="text"
-                      placeholder="Your Name"
+                      placeholder={t('auth.yourName')}
                       value={signupDisplayName}
                       onChange={(e) => setSignupDisplayName(e.target.value)}
                       required
@@ -825,7 +826,7 @@ export default function Auth() {
                   <div className="space-y-2">
                     <Label htmlFor="signup-email">
                       <Mail className="h-4 w-4 inline mr-2" />
-                      Email
+                      {t('auth.email')}
                     </Label>
                     <Input
                       id="signup-email"
@@ -840,7 +841,7 @@ export default function Auth() {
                   <div className="space-y-2">
                     <Label htmlFor="signup-password">
                       <Lock className="h-4 w-4 inline mr-2" />
-                      Password
+                      {t('auth.password')}
                     </Label>
                     <div className="relative">
                       <Input
@@ -870,14 +871,14 @@ export default function Auth() {
                       </Button>
                     </div>
                     <p className="text-xs text-muted-foreground">
-                      Must be at least 6 characters
+                      {t('auth.passwordMinHint')}
                     </p>
                   </div>
                   {referralCode && (
                     <Alert>
                       <AlertDescription className="flex items-center gap-2">
                         <Sparkles className="h-4 w-4" />
-                        You're joining with a referral! You'll get 7 days free trial.
+                        {t('auth.referralJoining')}
                       </AlertDescription>
                     </Alert>
                   )}
@@ -891,10 +892,10 @@ export default function Auth() {
                     {loading ? (
                       <>
                         <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                        Creating account...
+                        {t('auth.creatingAccount')}
                       </>
                     ) : (
-                      "Start Free Trial →"
+                      t('auth.startFreeTrialButton')
                     )}
                   </Button>
                   <AuthSocialProof />
@@ -913,10 +914,15 @@ export default function Auth() {
               onClick={() => navigate("/interactive-demo")}
               className="text-muted-foreground hover:text-primary"
             >
-              Want to try first? Explore the free demo →
+              {t('auth.tryDemoLink')}
             </Button>
           </div>
         )}
+
+        {/* Language Selector */}
+        <div className="mt-4 max-w-[200px] mx-auto">
+          <LanguageSelector showLabel={false} />
+        </div>
       </div>
     </div>
   );

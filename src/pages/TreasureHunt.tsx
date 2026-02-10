@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { Navigation } from "@/components/Navigation";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -44,6 +45,7 @@ interface Participation {
 }
 
 const TreasureHunt = () => {
+  const { t } = useTranslation();
   const { user } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -94,20 +96,20 @@ const TreasureHunt = () => {
     if (error) {
       if (error.code === '23505') {
         toast({
-          title: "Already joined",
-          description: "You've already joined this treasure hunt!",
+          title: t('treasureHunt.alreadyJoined'),
+          description: t('treasureHunt.alreadyJoinedDescription'),
         });
       } else {
         toast({
-          title: "Error",
-          description: "Failed to join hunt",
+          title: t('common.error'),
+          description: t('treasureHunt.failedToJoin'),
           variant: "destructive",
         });
       }
     } else {
       toast({
-        title: "Joined!",
-        description: "Good luck on your treasure hunt!",
+        title: t('treasureHunt.joined'),
+        description: t('treasureHunt.goodLuck'),
       });
       navigate(`/treasure-hunt/${huntId}`);
     }
@@ -115,7 +117,7 @@ const TreasureHunt = () => {
 
   const getTimeRemaining = (huntId: string, timeLimit: number) => {
     const participation = getParticipation(huntId);
-    if (!participation) return `${timeLimit}h limit`;
+    if (!participation) return t('treasureHunt.timeLimit', { hours: timeLimit });
 
     const now = new Date().getTime();
     const startTime = new Date(participation.started_at || Date.now()).getTime();
@@ -123,12 +125,12 @@ const TreasureHunt = () => {
     const deadline = startTime + limitMs;
     const remaining = deadline - now;
 
-    if (remaining <= 0) return "Time expired";
+    if (remaining <= 0) return t('treasureHunt.timeExpired');
 
     const hours = Math.floor(remaining / (1000 * 60 * 60));
     const minutes = Math.floor((remaining % (1000 * 60 * 60)) / (1000 * 60));
 
-    return `${hours}h ${minutes}m remaining`;
+    return t('treasureHunt.timeRemaining', { hours, minutes });
   };
 
   const getDifficultyColor = (difficulty: string) => {
@@ -153,7 +155,7 @@ const TreasureHunt = () => {
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
-          <p className="text-muted-foreground">Loading...</p>
+          <p className="text-muted-foreground">{t('common.loading')}</p>
         </div>
       </div>
     );
@@ -169,11 +171,10 @@ const TreasureHunt = () => {
           <div className="text-center space-y-4">
             <h1 className="text-5xl font-bold flex items-center justify-center gap-3">
               <Trophy className="h-12 w-12 text-yellow-500" />
-              Treasure Hunts
+              {t('treasureHunt.title')}
             </h1>
             <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-              Follow Jeeves' reasoning through progressive clues—from theme to Palace room to principle to the final verse treasure. 
-              Understand WHY each step leads to the next in biblical study methodology.
+              {t('treasureHunt.subtitle')}
             </p>
           </div>
 
@@ -182,8 +183,8 @@ const TreasureHunt = () => {
           {/* Difficulty Filter */}
           <Card>
             <CardHeader>
-              <CardTitle>Select Your Challenge</CardTitle>
-              <CardDescription>Choose a difficulty level to join</CardDescription>
+              <CardTitle>{t('treasureHunt.selectChallenge')}</CardTitle>
+              <CardDescription>{t('treasureHunt.chooseDifficulty')}</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-3 gap-4">
@@ -244,7 +245,7 @@ const TreasureHunt = () => {
                       </p>
                       {participation && !participation.completed_at && (
                         <div className="text-xs text-primary font-medium">
-                          Progress: Clue {participation.current_clue_number} of {hunt.clues.length}
+                          {t('treasureHunt.progress', { current: participation.current_clue_number, total: hunt.clues.length })}
                         </div>
                       )}
                     </div>
@@ -257,7 +258,7 @@ const TreasureHunt = () => {
                           variant="outline"
                         >
                           <Trophy className="h-4 w-4 mr-2" />
-                          View Results
+                          {t('treasureHunt.viewResults')}
                         </Button>
                       ) : isActive ? (
                         <Button
@@ -265,7 +266,7 @@ const TreasureHunt = () => {
                           className="flex-1"
                         >
                           <PlayCircle className="h-4 w-4 mr-2" />
-                          Continue Hunt
+                          {t('treasureHunt.continueHunt')}
                         </Button>
                       ) : (
                         <Button
@@ -273,7 +274,7 @@ const TreasureHunt = () => {
                           className="flex-1"
                         >
                           <Target className="h-4 w-4 mr-2" />
-                          Join Hunt
+                          {t('treasureHunt.joinHunt')}
                         </Button>
                       )}
                       <ShareChallenge
@@ -291,8 +292,8 @@ const TreasureHunt = () => {
           {filteredHunts.length === 0 && !loading && (
             <Card>
               <CardContent className="py-12 text-center text-muted-foreground">
-                No treasure hunts available for this difficulty level.
-                {selectedDifficulty && " Try another difficulty!"}
+                {t('treasureHunt.noHuntsAvailable')}
+                {selectedDifficulty && ` ${t('treasureHunt.tryAnotherDifficulty')}`}
               </CardContent>
             </Card>
           )}

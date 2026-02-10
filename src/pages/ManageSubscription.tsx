@@ -3,8 +3,10 @@ import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Loader2 } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 export default function ManageSubscription() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [error, setError] = useState<string | null>(null);
 
@@ -33,7 +35,7 @@ export default function ManageSubscription() {
         }
       } catch (err) {
         console.error('Error opening customer portal:', err);
-        setError(err instanceof Error ? err.message : 'Failed to open billing portal');
+        setError(err instanceof Error ? err.message : t('manageSubscription.failedToOpen'));
       }
     };
 
@@ -45,12 +47,12 @@ export default function ManageSubscription() {
       <div className="min-h-screen bg-background flex items-center justify-center p-4">
         <Card className="w-full max-w-md">
           <CardHeader>
-            <CardTitle>Unable to Access Billing Portal</CardTitle>
+            <CardTitle>{t('manageSubscription.errorTitle')}</CardTitle>
             <CardDescription>{error}</CardDescription>
           </CardHeader>
           <CardContent>
             <p className="text-sm text-muted-foreground">
-              Please contact support if this issue persists.
+              {t('manageSubscription.contactSupport')}
             </p>
           </CardContent>
         </Card>
@@ -62,7 +64,7 @@ export default function ManageSubscription() {
     <div className="min-h-screen bg-background flex items-center justify-center">
       <div className="text-center">
         <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-primary" />
-        <p className="text-muted-foreground">Redirecting to billing portal...</p>
+        <p className="text-muted-foreground">{t('manageSubscription.redirecting')}</p>
       </div>
     </div>
   );

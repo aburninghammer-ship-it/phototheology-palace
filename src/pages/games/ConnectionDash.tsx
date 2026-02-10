@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -86,6 +87,7 @@ const SAMPLE_QUESTIONS: Question[] = [
 
 export default function ConnectionDash() {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const [searchParams] = useSearchParams();
   const pathActivityId = searchParams.get('pathActivityId') || undefined;
   const { user } = useAuth();
@@ -116,7 +118,7 @@ export default function ConnectionDash() {
   }, [gameStarted, gameOver, currentQuestion, showExplanations]);
 
   const handleTimeout = () => {
-    toast.error("Time's up!");
+    toast.error(t('games.common.timesUp'));
     setStreak(0);
     showResults();
   };
@@ -143,16 +145,16 @@ export default function ConnectionDash() {
       const points = 200 + timeBonus + streakBonus;
       setScore((prev) => prev + points);
       setStreak((prev) => prev + 1);
-      toast.success(`Perfect! +${points} points ${streak > 0 ? `${streak + 1}x streak!` : ""}`);
+      toast.success(t('games.connectionDash.perfect', { points, streak: streak > 0 ? `${streak + 1}x` : '' }));
     } else {
       setStreak(0);
       const partial = selectedVerses.filter((idx) => correctIndices.includes(idx)).length;
       if (partial > 0) {
         const points = partial * 50;
         setScore((prev) => prev + points);
-        toast.warning(`Partial credit: +${points} points`);
+        toast.warning(t('games.connectionDash.partialCredit', { points }));
       } else {
-        toast.error("No correct connections");
+        toast.error(t('games.connectionDash.noCorrect'));
       }
     }
 
@@ -205,7 +207,7 @@ export default function ConnectionDash() {
       <div className="min-h-screen bg-gradient-to-b from-background to-secondary/20 p-6">
         <Button variant="ghost" onClick={() => navigate("/games")} className="mb-6">
           <ArrowLeft className="mr-2 h-4 w-4" />
-          Back to Games
+          {t('games.common.backToGames')}
         </Button>
 
         <div className="max-w-2xl mx-auto">
@@ -213,21 +215,21 @@ export default function ConnectionDash() {
             <div className="flex justify-center">
               <Zap className="h-16 w-16 text-primary" />
             </div>
-            <h1 className="text-4xl font-bold">Connection Dash</h1>
+            <h1 className="text-4xl font-bold">{t('games.connectionDash.title')}</h1>
             <p className="text-muted-foreground text-lg">
-              Quickly identify which verses connect to the main verse and explore multiple interpretations!
+              {t('games.connectionDash.description')}
             </p>
             <div className="space-y-2 text-left">
-              <h3 className="font-semibold">How to Play:</h3>
+              <h3 className="font-semibold">{t('games.common.howToPlay')}</h3>
               <ul className="list-disc list-inside space-y-1 text-muted-foreground">
-                <li>Select ALL verses that connect to the main verse</li>
-                <li>You have 15 seconds per question</li>
-                <li>Build streaks for consecutive perfect answers</li>
-                <li>Partial credit for some correct connections</li>
+                <li>{t('games.connectionDash.rule1')}</li>
+                <li>{t('games.connectionDash.rule2')}</li>
+                <li>{t('games.connectionDash.rule3')}</li>
+                <li>{t('games.connectionDash.rule4')}</li>
               </ul>
             </div>
             <Button size="lg" onClick={startGame} className="w-full">
-              Start Game
+              {t('games.common.startGame')}
             </Button>
           </Card>
         </div>
@@ -241,15 +243,15 @@ export default function ConnectionDash() {
         <div className="max-w-2xl mx-auto">
           <Card className="p-8 text-center space-y-6">
             <Trophy className="h-16 w-16 text-primary mx-auto" />
-            <h1 className="text-4xl font-bold">Game Complete!</h1>
+            <h1 className="text-4xl font-bold">{t('games.common.gameComplete')}</h1>
             <div className="text-6xl font-bold text-primary">{score}</div>
-            <p className="text-muted-foreground">Final Score</p>
+            <p className="text-muted-foreground">{t('games.common.finalScore')}</p>
             <div className="flex gap-4">
               <Button onClick={startGame} className="flex-1">
-                Play Again
+                {t('games.common.playAgain')}
               </Button>
               <Button variant="outline" onClick={() => navigate("/games")} className="flex-1">
-                Back to Games
+                {t('games.common.backToGames')}
               </Button>
             </div>
           </Card>
@@ -267,22 +269,22 @@ export default function ConnectionDash() {
         <div className="flex items-center justify-between">
           <Button variant="ghost" onClick={() => navigate("/games")}>
             <ArrowLeft className="mr-2 h-4 w-4" />
-            Exit
+            {t('games.common.exit')}
           </Button>
           <div className="flex items-center gap-4">
             {streak > 0 && (
               <Badge variant="default" className="text-lg">
-                {streak}x Streak! 🔥
+                {t('games.common.streak', { count: streak })}
               </Badge>
             )}
-            <div className="text-2xl font-bold">Score: {score}</div>
+            <div className="text-2xl font-bold">{t('games.common.scoreValue', { score })}</div>
           </div>
         </div>
 
         <Card className="p-6 space-y-4">
           <div className="flex items-center justify-between">
             <div className="text-sm text-muted-foreground">
-              Question {currentQuestion + 1} of {SAMPLE_QUESTIONS.length}
+              {t('games.common.questionOf', { current: currentQuestion + 1, total: SAMPLE_QUESTIONS.length })}
             </div>
             {!showExplanations && (
               <div className={`text-2xl font-bold ${timeLeft <= 5 ? "text-destructive" : ""}`}>
@@ -300,7 +302,7 @@ export default function ConnectionDash() {
           </div>
 
           <div className="space-y-3">
-            <p className="font-semibold">Select ALL verses that connect to the main verse:</p>
+            <p className="font-semibold">{t('games.connectionDash.selectAllVerses')}</p>
             <div className="space-y-3">
               {question.connectionOptions.map((option, index) => (
                 <Card
@@ -348,11 +350,11 @@ export default function ConnectionDash() {
               disabled={selectedVerses.length === 0}
               className="w-full"
             >
-              Submit Answer
+              {t('games.common.submitAnswer')}
             </Button>
           ) : (
             <Button size="lg" onClick={nextQuestion} className="w-full">
-              {currentQuestion < SAMPLE_QUESTIONS.length - 1 ? "Next Question" : "Finish Game"}
+              {currentQuestion < SAMPLE_QUESTIONS.length - 1 ? t('games.common.nextQuestion') : t('games.common.finishGame')}
             </Button>
           )}
         </Card>

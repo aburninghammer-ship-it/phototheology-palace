@@ -3,6 +3,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   ArrowLeft,
@@ -43,6 +44,7 @@ import type { StudyPhase, CreateInsightInput } from '@/types/groupStudy';
 import { getPhaseConfig, STUDY_PHASES, STUDY_SCORING } from '@/types/groupStudy';
 
 export default function GroupStudySession() {
+  const { t } = useTranslation();
   const { user, loading: authLoading } = useAuth();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
@@ -106,7 +108,7 @@ export default function GroupStudySession() {
   // Handle join
   const handleJoin = async () => {
     if (!roomCodeInput.trim()) {
-      toast.error('Please enter a room code');
+      toast.error(t('groupStudy.enterRoomCode'));
       return;
     }
     const success = await joinSession(roomCodeInput.trim().toUpperCase());
@@ -148,7 +150,7 @@ export default function GroupStudySession() {
       navigator.clipboard.writeText(session.roomCode);
       setCopiedCode(true);
       setTimeout(() => setCopiedCode(false), 2000);
-      toast.success('Room code copied!');
+      toast.success(t('groupStudy.roomCodeCopied'));
     }
   };
 
@@ -168,8 +170,8 @@ export default function GroupStudySession() {
       <div className="min-h-screen bg-background">
         <Navigation />
         <main className="container mx-auto px-4 py-8 text-center">
-          <h1 className="text-2xl font-bold mb-4">Please sign in to join a group study</h1>
-          <Button onClick={() => navigate('/auth')}>Sign In</Button>
+          <h1 className="text-2xl font-bold mb-4">{t('groupStudy.signInRequired')}</h1>
+          <Button onClick={() => navigate('/auth')}>{t('groupStudy.signIn')}</Button>
         </main>
       </div>
     );
@@ -183,22 +185,22 @@ export default function GroupStudySession() {
         <main className="container mx-auto px-4 py-8 max-w-md">
           <Button onClick={() => navigate('/games')} variant="ghost" className="mb-6">
             <ArrowLeft className="mr-2 h-4 w-4" />
-            Back to Games
+            {t('groupStudy.backToGames')}
           </Button>
 
           <Card>
             <CardHeader className="text-center">
               <div className="text-5xl mb-4">📖</div>
-              <CardTitle className="text-2xl">Group Bible Study</CardTitle>
+              <CardTitle className="text-2xl">{t('groupStudy.title')}</CardTitle>
               <CardDescription>
-                Join a real-time study session with others
+                {t('groupStudy.joinDescription')}
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-2">
-                <Label>Room Code</Label>
+                <Label>{t('groupStudy.roomCode')}</Label>
                 <Input
-                  placeholder="Enter 6-letter code"
+                  placeholder={t('groupStudy.enterCode')}
                   value={roomCodeInput}
                   onChange={(e) => setRoomCodeInput(e.target.value.toUpperCase())}
                   maxLength={6}
@@ -214,12 +216,12 @@ export default function GroupStudySession() {
                 {isLoading ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Joining...
+                    {t('groupStudy.joining')}
                   </>
                 ) : (
                   <>
                     <Users className="mr-2 h-4 w-4" />
-                    Join Session
+                    {t('groupStudy.joinSession')}
                   </>
                 )}
               </Button>
@@ -245,7 +247,7 @@ export default function GroupStudySession() {
               <LogOut className="h-5 w-5" />
             </Button>
             <div>
-              <h1 className="font-bold">Group Study</h1>
+              <h1 className="font-bold">{t('groupStudy.groupStudy')}</h1>
               <div className="flex items-center gap-2 text-sm text-muted-foreground">
                 <button
                   onClick={copyRoomCode}
@@ -286,14 +288,14 @@ export default function GroupStudySession() {
                 disabled={session.currentPhase === 'recap'}
               >
                 <FastForward className="h-4 w-4 mr-1" />
-                Next Phase
+                {t('groupStudy.nextPhase')}
               </Button>
               <Button
                 variant="destructive"
                 size="sm"
                 onClick={endSession}
               >
-                End
+                {t('groupStudy.end')}
               </Button>
             </div>
           )}
@@ -323,17 +325,17 @@ export default function GroupStudySession() {
               <CardContent className="p-4 space-y-3">
                 <div className="flex items-center gap-2">
                   <Plus className="h-5 w-5 text-primary" />
-                  <span className="font-semibold">Share an Insight</span>
+                  <span className="font-semibold">{t('groupStudy.shareAnInsight')}</span>
                 </div>
                 <Textarea
-                  placeholder="What insight does this passage reveal to you?"
+                  placeholder={t('groupStudy.insightPlaceholder')}
                   value={insightText}
                   onChange={(e) => setInsightText(e.target.value)}
                   rows={3}
                 />
                 <div className="flex items-center justify-between gap-4">
                   <Input
-                    placeholder="Specific verse (optional)"
+                    placeholder={t('groupStudy.versePlaceholder')}
                     value={verseReference}
                     onChange={(e) => setVerseReference(e.target.value)}
                     className="max-w-[200px]"
@@ -345,7 +347,7 @@ export default function GroupStudySession() {
                       onCheckedChange={setIsChristConnection}
                     />
                     <Label htmlFor="christ-connection" className="text-sm">
-                      Christ Connection (+{STUDY_SCORING.CHRIST_CONNECTION_BONUS} pts)
+                      {t('groupStudy.christConnection', { points: STUDY_SCORING.CHRIST_CONNECTION_BONUS })}
                     </Label>
                   </div>
                   <Button
@@ -357,7 +359,7 @@ export default function GroupStudySession() {
                     ) : (
                       <>
                         <Sparkles className="h-4 w-4 mr-1" />
-                        Share
+                        {t('groupStudy.share')}
                       </>
                     )}
                   </Button>
@@ -371,14 +373,14 @@ export default function GroupStudySession() {
             <CardHeader className="py-3 px-4 border-b">
               <CardTitle className="text-base flex items-center gap-2">
                 <Sparkles className="h-4 w-4" />
-                Shared Insights ({insights.length})
+                {t('groupStudy.sharedInsights', { count: insights.length })}
               </CardTitle>
             </CardHeader>
             <ScrollArea className="h-[calc(100%-60px)]">
               <div className="p-4 space-y-3">
                 {insights.length === 0 ? (
                   <p className="text-center text-muted-foreground py-8">
-                    No insights shared yet. Be the first!
+                    {t('groupStudy.noInsightsYet')}
                   </p>
                 ) : (
                   insights.map((insight) => (
@@ -405,7 +407,7 @@ export default function GroupStudySession() {
                           )}
                         </div>
                         <span className="text-xs text-muted-foreground">
-                          +{insight.totalPoints} pts
+                          {t('groupStudy.points', { count: insight.totalPoints })}
                         </span>
                       </div>
 
@@ -460,7 +462,7 @@ export default function GroupStudySession() {
             <CardHeader className="py-3 px-4 border-b">
               <CardTitle className="text-base flex items-center gap-2">
                 <Trophy className="h-4 w-4" />
-                Leaderboard
+                {t('groupStudy.leaderboard')}
               </CardTitle>
             </CardHeader>
             <ScrollArea className="max-h-[200px]">
@@ -498,14 +500,14 @@ export default function GroupStudySession() {
             <CardHeader className="py-3 px-4 border-b shrink-0">
               <CardTitle className="text-base flex items-center gap-2">
                 <MessageSquare className="h-4 w-4" />
-                Chat
+                {t('groupStudy.chat')}
               </CardTitle>
             </CardHeader>
             <ScrollArea className="flex-1">
               <div className="p-2 space-y-2">
                 {chatMessages.length === 0 ? (
                   <p className="text-center text-muted-foreground text-sm py-4">
-                    No messages yet
+                    {t('groupStudy.noMessagesYet')}
                   </p>
                 ) : (
                   chatMessages.map((msg) => (
@@ -528,7 +530,7 @@ export default function GroupStudySession() {
               <div className="p-2 border-t shrink-0">
                 <div className="flex gap-2">
                   <Input
-                    placeholder="Type a message..."
+                    placeholder={t('groupStudy.typeMessage')}
                     value={chatInput}
                     onChange={(e) => setChatInput(e.target.value)}
                     onKeyDown={(e) => e.key === 'Enter' && handleSendChat()}

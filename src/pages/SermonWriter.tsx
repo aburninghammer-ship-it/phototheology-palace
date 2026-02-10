@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { Navigation } from "@/components/Navigation";
 import { useSermonWriter, OUTLINE_TEMPLATES } from "@/hooks/useSermonWriter";
 import { Button } from "@/components/ui/button";
@@ -46,6 +47,7 @@ function NewSessionForm({
   onSubmit: (input: CreateSessionInput) => void;
   isLoading: boolean;
 }) {
+  const { t } = useTranslation();
   const [theme, setTheme] = useState("");
   const [themePassage, setThemePassage] = useState("");
   const [title, setTitle] = useState("");
@@ -67,16 +69,16 @@ function NewSessionForm({
       <CardHeader>
         <CardTitle className="text-white flex items-center gap-2">
           <PenTool className="w-5 h-5 text-emerald-400" />
-          New Sermon Session
+          {t('sermon.writer.newSermonSession')}
         </CardTitle>
         <CardDescription className="text-slate-400">
-          Start with a theme or passage. Jeeves will help you develop it.
+          {t('sermon.writer.newSessionDescription')}
         </CardDescription>
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="theme" className="text-slate-300">Theme or Topic *</Label>
+            <Label htmlFor="theme" className="text-slate-300">{t('sermon.writer.themeOrTopic')}</Label>
             <div className="relative">
               <Textarea
                 id="theme"
@@ -94,7 +96,7 @@ function NewSessionForm({
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="passage" className="text-slate-300">Key Scripture (optional)</Label>
+            <Label htmlFor="passage" className="text-slate-300">{t('sermon.writer.keyScripture')}</Label>
             <div className="relative">
               <Input
                 id="passage"
@@ -111,7 +113,7 @@ function NewSessionForm({
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="title" className="text-slate-300">Working Title (optional)</Label>
+            <Label htmlFor="title" className="text-slate-300">{t('sermon.writer.workingTitle')}</Label>
             <div className="relative">
               <Input
                 id="title"
@@ -128,7 +130,7 @@ function NewSessionForm({
           </div>
 
           <div className="space-y-2">
-            <Label className="text-slate-300">Outline Template</Label>
+            <Label className="text-slate-300">{t('sermon.writer.outlineTemplate')}</Label>
             <Select value={template} onValueChange={(v) => setTemplate(v as OutlineTemplateType)}>
               <SelectTrigger className="bg-slate-800/50 border-slate-600 text-white">
                 <SelectValue />
@@ -154,12 +156,12 @@ function NewSessionForm({
             {isLoading ? (
               <>
                 <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                Creating...
+                {t('sermon.writer.creating')}
               </>
             ) : (
               <>
                 <Plus className="w-4 h-4 mr-2" />
-                Start Session
+                {t('sermon.writer.startSession')}
               </>
             )}
           </Button>
@@ -181,6 +183,7 @@ function SessionList({
   onSelect: (id: string) => void;
   onDelete: (id: string) => void;
 }) {
+  const { t } = useTranslation();
   if (loading) {
     return (
       <div className="flex items-center justify-center h-32">
@@ -194,7 +197,7 @@ function SessionList({
       <Card className="bg-slate-900/50 border-slate-700">
         <CardContent className="py-8 text-center text-slate-400">
           <BookOpen className="w-12 h-12 mx-auto mb-4 opacity-50" />
-          <p>No sessions yet. Create your first sermon session!</p>
+          <p>{t('sermon.writer.noSessionsYet')}</p>
         </CardContent>
       </Card>
     );
@@ -203,7 +206,7 @@ function SessionList({
   return (
     <Card className="bg-slate-900/50 border-slate-700">
       <CardHeader>
-        <CardTitle className="text-white text-lg">Recent Sessions</CardTitle>
+        <CardTitle className="text-white text-lg">{t('sermon.writer.recentSessions')}</CardTitle>
       </CardHeader>
       <CardContent className="p-0">
         <ScrollArea className="h-[300px]">
@@ -265,6 +268,7 @@ function SessionList({
 
 // Main Page Component
 export default function SermonWriter() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const sessionId = searchParams.get("id");
@@ -378,10 +382,10 @@ export default function SermonWriter() {
 
     try {
       await updateOutline(newOutline);
-      toast.success("Outline structure updated");
+      toast.success(t('sermon.writer.outlineUpdated'));
     } catch (error) {
       console.error("Failed to update outline:", error);
-      toast.error("Failed to update outline");
+      toast.error(t('sermon.writer.outlineUpdateFailed'));
     }
   }, [session, updateOutline]);
 
@@ -438,9 +442,9 @@ export default function SermonWriter() {
                 <PenTool className="w-6 h-6 text-white" />
               </div>
               <div>
-                <h1 className="text-2xl font-bold text-white">Sermon Writer</h1>
+                <h1 className="text-2xl font-bold text-white">{t('sermon.writer.title')}</h1>
                 <p className="text-emerald-300 text-sm">
-                  {session ? session.title || session.theme : "Reasoning-first sermon development"}
+                  {session ? session.title || session.theme : t('sermon.writer.subtitle')}
                 </p>
               </div>
             </div>
@@ -454,7 +458,7 @@ export default function SermonWriter() {
                   className="bg-emerald-500/10 border-emerald-500/30 text-white hover:bg-emerald-500/20"
                 >
                   <Plus className="w-4 h-4 mr-2" />
-                  New Session
+                  {t('sermon.writer.newSession')}
                 </Button>
               </div>
             )}
@@ -490,7 +494,7 @@ export default function SermonWriter() {
                   <div className="flex items-center justify-between">
                     <CardTitle className="text-white text-lg flex items-center gap-2">
                       <Sparkles className="w-5 h-5 text-amber-400" />
-                      Sparks
+                      {t('sermon.writer.sparks')}
                     </CardTitle>
                     <Badge variant="outline" className="text-emerald-400 border-emerald-500/30">
                       {sparks?.length || 0}
@@ -593,9 +597,9 @@ export default function SermonWriter() {
                     ) : (
                       <div className="text-center text-slate-400 py-8">
                         <Sparkles className="w-8 h-8 mx-auto mb-3 opacity-50" />
-                        <p className="text-sm">No sparks yet.</p>
+                        <p className="text-sm">{t('sermon.writer.noSparksYet')}</p>
                         <p className="text-xs mt-1 text-slate-500">
-                          Use Explorer mode to generate ideas.
+                          {t('sermon.writer.useExplorerHint')}
                         </p>
                       </div>
                     )}
@@ -615,28 +619,28 @@ export default function SermonWriter() {
                         className="flex-1 data-[state=active]:bg-emerald-500 data-[state=active]:text-white"
                       >
                         <Sparkles className="w-4 h-4 mr-2" />
-                        Sparks
+                        {t('sermon.writer.sparks')}
                       </TabsTrigger>
                       <TabsTrigger
                         value="outline"
                         className="flex-1 data-[state=active]:bg-emerald-500 data-[state=active]:text-white"
                       >
                         <FileText className="w-4 h-4 mr-2" />
-                        Outline
+                        {t('sermon.writer.outline')}
                       </TabsTrigger>
                       <TabsTrigger
                         value="write"
                         className="flex-1 data-[state=active]:bg-emerald-500 data-[state=active]:text-white"
                       >
                         <PenTool className="w-4 h-4 mr-2" />
-                        Write
+                        {t('sermon.writer.write')}
                       </TabsTrigger>
                       <TabsTrigger
                         value="polish"
                         className="flex-1 data-[state=active]:bg-emerald-500 data-[state=active]:text-white"
                       >
                         <Wand2 className="w-4 h-4 mr-2" />
-                        Polish
+                        {t('sermon.writer.polish')}
                       </TabsTrigger>
                     </TabsList>
                   </Tabs>
@@ -653,9 +657,9 @@ export default function SermonWriter() {
                           className="text-center text-slate-400 py-16"
                         >
                           <Sparkles className="w-12 h-12 mx-auto mb-4 opacity-50" />
-                          <h3 className="text-lg font-medium text-white mb-2">Spark Management</h3>
+                          <h3 className="text-lg font-medium text-white mb-2">{t('sermon.writer.sparkManagement')}</h3>
                           <p className="text-sm max-w-md mx-auto">
-                            View, filter, and organize your sparks. Use the Jeeves panel on the right to generate new insights.
+                            {t('sermon.writer.sparkManagementDescription')}
                           </p>
                         </motion.div>
                       )}
@@ -669,10 +673,9 @@ export default function SermonWriter() {
                           className="text-center text-slate-400 py-16"
                         >
                           <FileText className="w-12 h-12 mx-auto mb-4 opacity-50" />
-                          <h3 className="text-lg font-medium text-white mb-2">Outline Builder</h3>
+                          <h3 className="text-lg font-medium text-white mb-2">{t('sermon.writer.outlineBuilder')}</h3>
                           <p className="text-sm max-w-md mx-auto">
-                            Using <strong className="text-emerald-400">{OUTLINE_TEMPLATES[session.outline_template].name}</strong> template.
-                            Drag sparks into outline nodes to build your structure.
+                            {t('sermon.writer.outlineBuilderDescription', { template: OUTLINE_TEMPLATES[session.outline_template].name })}
                           </p>
                           <div className="mt-6 space-y-2 max-w-sm mx-auto">
                             {session.outline_data.nodes.map((node, index) => (
@@ -707,19 +710,19 @@ export default function SermonWriter() {
                             <div className="flex items-center gap-2">
                               <Languages className="w-4 h-4 text-emerald-400" />
                               <span className="text-sm text-slate-400">
-                                Select any word to look up its Greek/Hebrew meaning
+                                {t('sermon.writer.selectWordHint')}
                               </span>
                             </div>
                             {isSaving && (
                               <div className="flex items-center gap-2 text-slate-400">
                                 <Loader2 className="w-3 h-3 animate-spin" />
-                                <span className="text-xs">Saving...</span>
+                                <span className="text-xs">{t('common.saving')}</span>
                               </div>
                             )}
                             {!isSaving && localContent && (
                               <div className="flex items-center gap-2 text-emerald-400">
                                 <Save className="w-3 h-3" />
-                                <span className="text-xs">Saved</span>
+                                <span className="text-xs">{t('common.saved')}</span>
                               </div>
                             )}
                           </div>
@@ -740,9 +743,9 @@ export default function SermonWriter() {
                           className="text-center text-slate-400 py-16"
                         >
                           <Wand2 className="w-12 h-12 mx-auto mb-4 opacity-50" />
-                          <h3 className="text-lg font-medium text-white mb-2">Polish Engine</h3>
+                          <h3 className="text-lg font-medium text-white mb-2">{t('sermon.writer.polishEngine')}</h3>
                           <p className="text-sm max-w-md mx-auto">
-                            Refine your sermon with AI-assisted polish. Every change is validated and can be rolled back.
+                            {t('sermon.writer.polishEngineDescription')}
                           </p>
                         </motion.div>
                       )}
@@ -782,9 +785,9 @@ export default function SermonWriter() {
                   <BookOpen className="w-5 h-5 text-emerald-400" />
                 </div>
                 <div>
-                  <h3 className="text-white font-medium mb-1">This is not a sermon generator.</h3>
+                  <h3 className="text-white font-medium mb-1">{t('sermon.writer.notAGenerator')}</h3>
                   <p className="text-slate-400 text-sm">
-                    This is a <strong className="text-emerald-400">thinking environment</strong>. You build sermons the way serious students build theology: through Scripture, reasoning, testing, and structure.
+                    {t('sermon.writer.thinkingEnvironment')}
                   </p>
                 </div>
               </div>

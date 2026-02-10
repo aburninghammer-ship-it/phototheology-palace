@@ -1,5 +1,6 @@
 import { useState, useEffect, lazy, Suspense } from "react";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { Navigation } from "@/components/Navigation";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -71,6 +72,7 @@ function shuffleArray<T>(array: T[]): T[] {
 
 // 2D Quiz Game Component
 function QuizGame({ onComplete }: { onComplete: (score: number, total: number) => void }) {
+  const { t } = useTranslation();
   const { toast } = useToast();
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [score, setScore] = useState(0);
@@ -92,8 +94,8 @@ function QuizGame({ onComplete }: { onComplete: (score: number, total: number) =
   const handleSubmit = () => {
     if (!selectedAnswer) {
       toast({
-        title: "Select an Answer",
-        description: "Choose the meaning of this sanctuary item!",
+        title: t('games.blueRoom.selectAnswer'),
+        description: t('games.blueRoom.chooseMeaning'),
         variant: "destructive",
       });
       return;
@@ -104,13 +106,13 @@ function QuizGame({ onComplete }: { onComplete: (score: number, total: number) =
     if (isCorrect) {
       setScore(score + 1);
       toast({
-        title: "✓ Correct!",
-        description: "You know the sanctuary blueprint!",
+        title: t('games.blueRoom.correct'),
+        description: t('games.blueRoom.knowBlueprint'),
       });
     } else {
       toast({
-        title: "Not Quite",
-        description: "Study the sanctuary pattern more!",
+        title: t('games.blueRoom.notQuite'),
+        description: t('games.blueRoom.studyMore'),
         variant: "destructive",
       });
     }
@@ -133,14 +135,14 @@ function QuizGame({ onComplete }: { onComplete: (score: number, total: number) =
       <Card className="mb-6">
         <CardHeader>
           <div className="flex items-center justify-between mb-2">
-            <Badge variant="secondary">Floor 5 • Blue Room (BL)</Badge>
+            <Badge variant="secondary">{t('games.blueRoom.floorBadge')}</Badge>
             <Badge variant="outline">
               {currentQuestion + 1} / {quizQuestions.length}
             </Badge>
           </div>
-          <CardTitle className="text-3xl">⛪ Sanctuary Blueprint</CardTitle>
+          <CardTitle className="text-3xl">{t('games.blueRoom.sanctuaryBlueprint')}</CardTitle>
           <CardDescription>
-            Match each sanctuary article to its gospel meaning. The sanctuary is the map of salvation!
+            {t('games.blueRoom.quizDescription')}
           </CardDescription>
           <Progress value={progress} className="mt-4" />
         </CardHeader>
@@ -157,7 +159,7 @@ function QuizGame({ onComplete }: { onComplete: (score: number, total: number) =
           {!revealed && (
             <>
               <p className="text-muted-foreground">
-                What does this sanctuary article represent in the gospel?
+                {t('games.blueRoom.whatDoesRepresent')}
               </p>
 
               <div className="space-y-3">
@@ -180,7 +182,7 @@ function QuizGame({ onComplete }: { onComplete: (score: number, total: number) =
                 className="w-full"
                 size="lg"
               >
-                Submit Answer
+                {t('games.common.submitAnswer')}
               </Button>
             </>
           )}
@@ -193,31 +195,31 @@ function QuizGame({ onComplete }: { onComplete: (score: number, total: number) =
                   : "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400"
               }`}>
                 <h4 className="font-semibold mb-2">
-                  {selectedAnswer === question.correct ? "✓ Correct!" : "✗ Not Quite"}
+                  {selectedAnswer === question.correct ? t('games.blueRoom.correct') : t('games.blueRoom.notQuiteResult')}
                 </h4>
                 {selectedAnswer !== question.correct && (
-                  <p className="text-sm mb-2">You selected: {selectedAnswer}</p>
+                  <p className="text-sm mb-2">{t('games.blueRoom.youSelected', { answer: selectedAnswer })}</p>
                 )}
-                <p className="text-sm">Correct answer: {question.correct}</p>
+                <p className="text-sm">{t('games.blueRoom.correctAnswer', { answer: question.correct })}</p>
               </div>
 
               <div className="bg-blue-50 dark:bg-blue-900/20 p-6 rounded-lg space-y-3">
                 <h4 className="font-semibold text-blue-800 dark:text-blue-400">
-                  📖 Full Explanation:
+                  {t('games.blueRoom.fullExplanation')}
                 </h4>
                 <p className="text-sm">
-                  <strong>Meaning:</strong> {itemData.meaning}
+                  <strong>{t('games.blueRoom.meaning')}</strong> {itemData.meaning}
                 </p>
                 <p className="text-sm">
-                  <strong>Reference:</strong> {itemData.reference}
+                  <strong>{t('games.blueRoom.reference')}</strong> {itemData.reference}
                 </p>
                 <p className="text-sm">
-                  <strong>Gospel Connection:</strong> {itemData.gospel}
+                  <strong>{t('games.blueRoom.gospelConnection')}</strong> {itemData.gospel}
                 </p>
               </div>
 
               <Button onClick={handleNext} className="w-full" size="lg">
-                {currentQuestion < quizQuestions.length - 1 ? "Next Item" : "Finish"}
+                {currentQuestion < quizQuestions.length - 1 ? t('games.blueRoom.nextItem') : t('games.common.finish')}
               </Button>
             </>
           )}
@@ -226,9 +228,9 @@ function QuizGame({ onComplete }: { onComplete: (score: number, total: number) =
 
       <Card className="bg-amber-50 dark:bg-amber-900/20">
         <CardContent className="pt-6">
-          <h4 className="font-semibold mb-2">💡 Blue Room Tip:</h4>
+          <h4 className="font-semibold mb-2">{t('games.blueRoom.tipTitle')}</h4>
           <p className="text-sm text-muted-foreground">
-            The sanctuary is God's blueprint of redemption. Every article points to Christ and the gospel. Nothing is random — it's all "according to the pattern" (Heb 8:5). Master this room and you'll unlock the visual language of salvation!
+            {t('games.blueRoom.tipDescription')}
           </p>
         </CardContent>
       </Card>
@@ -238,17 +240,18 @@ function QuizGame({ onComplete }: { onComplete: (score: number, total: number) =
 
 // 3D Explorer Component
 function Explorer3D() {
+  const { t } = useTranslation();
   return (
     <div className="space-y-6">
       <Card>
         <CardHeader>
           <div className="flex items-center justify-between">
-            <Badge variant="secondary">Floor 5 • Blue Room (BL)</Badge>
-            <Badge className="bg-blue-500">3D Mode</Badge>
+            <Badge variant="secondary">{t('games.blueRoom.floorBadge')}</Badge>
+            <Badge className="bg-blue-500">{t('games.blueRoom.mode3d')}</Badge>
           </div>
-          <CardTitle className="text-3xl">⛪ 3D Sanctuary Explorer</CardTitle>
+          <CardTitle className="text-3xl">{t('games.blueRoom.sanctuaryExplorer3d')}</CardTitle>
           <CardDescription>
-            Walk through the tabernacle and click on each piece of furniture to learn its gospel meaning.
+            {t('games.blueRoom.explorer3dDescription')}
           </CardDescription>
         </CardHeader>
       </Card>
@@ -257,7 +260,7 @@ function Explorer3D() {
         <Card className="h-[600px] flex items-center justify-center">
           <div className="text-center space-y-4">
             <div className="animate-spin h-12 w-12 border-4 border-primary border-t-transparent rounded-full mx-auto" />
-            <p className="text-muted-foreground">Loading 3D Sanctuary...</p>
+            <p className="text-muted-foreground">{t('games.blueRoom.loading3d')}</p>
           </div>
         </Card>
       }>
@@ -266,9 +269,9 @@ function Explorer3D() {
 
       <Card className="bg-blue-50 dark:bg-blue-900/20">
         <CardContent className="pt-6">
-          <h4 className="font-semibold mb-2">🏛️ Sanctuary Journey:</h4>
+          <h4 className="font-semibold mb-2">{t('games.blueRoom.journeyTitle')}</h4>
           <p className="text-sm text-muted-foreground">
-            Follow the path from the Gate through the Outer Court, into the Holy Place, and finally to the Most Holy Place where God's presence dwells. Each step reveals a deeper aspect of Christ's saving work.
+            {t('games.blueRoom.journeyDescription')}
           </p>
         </CardContent>
       </Card>
@@ -277,25 +280,26 @@ function Explorer3D() {
 }
 
 // Completion Screen
-function CompletionScreen({ 
-  score, 
-  total, 
-  onPlayAgain, 
-  onBack 
-}: { 
-  score: number; 
-  total: number; 
+function CompletionScreen({
+  score,
+  total,
+  onPlayAgain,
+  onBack
+}: {
+  score: number;
+  total: number;
   onPlayAgain: () => void;
   onBack: () => void;
 }) {
+  const { t } = useTranslation();
   return (
     <div className="grid md:grid-cols-2 gap-6">
       <Card className="text-center">
         <CardHeader>
           <Trophy className="h-16 w-16 mx-auto text-yellow-500 mb-4" />
-          <CardTitle className="text-3xl">Blue Room Mastered!</CardTitle>
+          <CardTitle className="text-3xl">{t('games.blueRoom.mastered')}</CardTitle>
           <CardDescription>
-            You know the sanctuary blueprint!
+            {t('games.blueRoom.masteredDescription')}
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -303,15 +307,15 @@ function CompletionScreen({
             {score} / {total}
           </div>
           <p className="text-muted-foreground">
-            "Make all things according to the pattern" - Hebrews 8:5
+            {t('games.blueRoom.quoteHebrews85')}
           </p>
           <div className="flex gap-4 justify-center">
             <Button onClick={onBack}>
               <ArrowLeft className="mr-2 h-4 w-4" />
-              Back to Games
+              {t('games.common.backToGames')}
             </Button>
             <Button onClick={onPlayAgain} variant="outline">
-              Play Again
+              {t('games.common.playAgain')}
             </Button>
           </div>
         </CardContent>
@@ -323,6 +327,7 @@ function CompletionScreen({
 
 export default function BlueRoomGame() {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const { user } = useAuth();
   const [viewMode, setViewMode] = useState<'quiz' | '3d'>('quiz');
   const [isComplete, setIsComplete] = useState(false);
@@ -383,7 +388,7 @@ export default function BlueRoomGame() {
           className="mb-4"
         >
           <ArrowLeft className="mr-2 h-4 w-4" />
-          Back to Games
+          {t('games.common.backToGames')}
         </Button>
 
         {/* View Mode Toggle */}
@@ -391,11 +396,11 @@ export default function BlueRoomGame() {
           <TabsList className="grid w-full grid-cols-2 max-w-md mx-auto">
             <TabsTrigger value="quiz" className="flex items-center gap-2">
               <LayoutGrid className="h-4 w-4" />
-              Quiz Mode
+              {t('games.blueRoom.quizMode')}
             </TabsTrigger>
             <TabsTrigger value="3d" className="flex items-center gap-2">
               <Box className="h-4 w-4" />
-              3D Explorer
+              {t('games.blueRoom.explorerMode')}
             </TabsTrigger>
           </TabsList>
         </Tabs>

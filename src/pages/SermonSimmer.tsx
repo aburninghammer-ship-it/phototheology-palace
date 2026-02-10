@@ -1,5 +1,6 @@
 import { useState, useCallback } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { Navigation } from "@/components/Navigation";
 import { useSimmerSession } from "@/hooks/useSimmerSession";
 import { SimmerDayPanel } from "@/components/simmer/SimmerDayPanel";
@@ -18,6 +19,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
 export default function SermonSimmer() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const sessionId = searchParams.get("id");
@@ -101,8 +103,8 @@ export default function SermonSimmer() {
                 <Flame className="w-8 h-8 text-white" />
               </div>
               <div>
-                <h1 className="text-4xl font-bold text-white">Simmer Mode</h1>
-                <p className="text-orange-200 text-lg">6-Day Sermon Forge • Season & Forge</p>
+                <h1 className="text-4xl font-bold text-white">{t('sermon.simmer.title')}</h1>
+                <p className="text-orange-200 text-lg">{t('sermon.simmer.subtitle')}</p>
               </div>
             </div>
             <div className="flex gap-2">
@@ -112,7 +114,7 @@ export default function SermonSimmer() {
                 className="bg-orange-500/10 border-orange-500/30 text-white hover:bg-orange-500/20"
               >
                 <Plus className="w-4 h-4 mr-2" />
-                New Session
+                {t('sermon.simmer.newSession')}
               </Button>
             </div>
           </motion.div>
@@ -146,42 +148,42 @@ export default function SermonSimmer() {
                 className="data-[state=active]:bg-white data-[state=active]:text-purple-900 text-orange-200"
               >
                 <PenLine className="w-4 h-4 mr-2" />
-                My Idea
+                {t('sermon.simmer.tabMyIdea')}
               </TabsTrigger>
-              <TabsTrigger 
-                value="ideas" 
+              <TabsTrigger
+                value="ideas"
                 className="data-[state=active]:bg-orange-500 data-[state=active]:text-white text-orange-200"
               >
                 <Lightbulb className="w-4 h-4 mr-2" />
-                Idea Starters
+                {t('sermon.simmer.tabIdeaStarters')}
               </TabsTrigger>
-              <TabsTrigger 
-                value="chat" 
+              <TabsTrigger
+                value="chat"
                 className="data-[state=active]:bg-orange-500 data-[state=active]:text-white text-orange-200"
               >
                 <MessageCircle className="w-4 h-4 mr-2" />
-                Simmer with Jeeves
+                {t('sermon.simmer.tabSimmerWithJeeves')}
               </TabsTrigger>
-              <TabsTrigger 
-                value="forge" 
+              <TabsTrigger
+                value="forge"
                 className="data-[state=active]:bg-orange-500 data-[state=active]:text-white text-orange-200"
               >
                 <Flame className="w-4 h-4 mr-2" />
-                The Forge
+                {t('sermon.simmer.tabTheForge')}
               </TabsTrigger>
-              <TabsTrigger 
-                value="settings" 
+              <TabsTrigger
+                value="settings"
                 className="data-[state=active]:bg-orange-500 data-[state=active]:text-white text-orange-200"
               >
                 <Settings className="w-4 h-4 mr-2" />
-                Heat Controls
+                {t('sermon.simmer.tabHeatControls')}
               </TabsTrigger>
-              <TabsTrigger 
-                value="archive" 
+              <TabsTrigger
+                value="archive"
                 className="data-[state=active]:bg-orange-500 data-[state=active]:text-white text-orange-200"
               >
                 <Archive className="w-4 h-4 mr-2" />
-                All Sessions
+                {t('sermon.simmer.tabAllSessions')}
               </TabsTrigger>
             </TabsList>
 
@@ -217,7 +219,7 @@ export default function SermonSimmer() {
                 <Card className="bg-black/30 border-orange-500/20 backdrop-blur-xl">
                   <div className="p-6">
                     <h3 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
-                      <span className="text-2xl">💎</span> Discovered Gems
+                      <span className="text-2xl">💎</span> {t('sermon.simmer.discoveredGems')}
                     </h3>
                     {(session.gems as any[])?.length > 0 ? (
                       <div className="space-y-3 max-h-[500px] overflow-y-auto pr-2">
@@ -237,8 +239,7 @@ export default function SermonSimmer() {
                       </div>
                     ) : (
                       <p className="text-orange-200/60 text-sm">
-                        Chat with Jeeves to discover gems from your sermon idea. 
-                        He'll help you uncover insights you didn't know you had.
+                        {t('sermon.simmer.chatWithJeevesHint')}
                       </p>
                     )}
                   </div>
@@ -275,12 +276,12 @@ export default function SermonSimmer() {
         ) : (
           <Card className="bg-black/30 border-orange-500/20">
             <CardContent className="p-8 text-center">
-              <p className="text-orange-200">Session not found</p>
+              <p className="text-orange-200">{t('sermon.simmer.sessionNotFound')}</p>
               <Button
                 onClick={() => setShowNewSession(true)}
                 className="mt-4 bg-orange-500 hover:bg-orange-600"
               >
-                Start New Session
+                {t('sermon.simmer.startNewSession')}
               </Button>
             </CardContent>
           </Card>

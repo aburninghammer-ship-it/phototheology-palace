@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Castle, Eye, Lightbulb, ArrowRight, ArrowLeft, Sparkles, BookOpen } from 'lucide-react';
@@ -7,56 +8,71 @@ import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 
-const FIRST_ROOM_STEPS = [
+const FIRST_ROOM_STEPS_STATIC = [
   {
     id: 'welcome',
-    title: 'Welcome to the Palace',
-    content: 'You have passed through the gatehouse. Before you explore freely, experience one room—one moment of insight.',
+    titleKey: 'palace.firstRoom.welcomeTitle',
+    contentKey: 'palace.firstRoom.welcomeContent',
   },
   {
     id: 'verse',
-    title: 'The Observation Room',
-    subtitle: 'Floor 2 — Investigation',
+    titleKey: 'palace.firstRoom.verseTitle',
+    subtitleKey: 'palace.firstRoom.verseSubtitle',
     verse: 'Genesis 22:8',
-    verseText: '"And Abraham said, My son, God will provide himself a lamb for a burnt offering: so they went both of them together."',
-    instruction: 'Read this verse slowly. What do you notice?',
+    verseTextKey: 'palace.firstRoom.verseText',
+    instructionKey: 'palace.firstRoom.verseInstruction',
   },
   {
     id: 'observe',
-    title: 'What Do You See?',
-    instruction: 'List 3 things you observe in this verse. Not interpretations—just observations.',
-    examples: ['Who is speaking?', 'What is being provided?', 'Who is going together?'],
+    titleKey: 'palace.firstRoom.observeTitle',
+    instructionKey: 'palace.firstRoom.observeInstruction',
+    exampleKeys: ['palace.firstRoom.observeExample1', 'palace.firstRoom.observeExample2', 'palace.firstRoom.observeExample3'],
   },
   {
     id: 'connection',
-    title: 'The Connection',
-    revelation: 'Abraham says "God will provide HIMSELF a lamb." Not "God will provide a lamb for himself" but "God will provide HIMSELF—a lamb."',
-    question: 'Where else in Scripture does God provide Himself as the lamb?',
+    titleKey: 'palace.firstRoom.connectionTitle',
+    revelationKey: 'palace.firstRoom.connectionRevelation',
+    questionKey: 'palace.firstRoom.connectionQuestion',
   },
   {
     id: 'insight',
-    title: 'The Insight',
-    content: 'John 1:29 — "Behold the Lamb of God, which taketh away the sin of the world."',
-    reflection: 'Abraham, 2000 years before Christ, prophesied that God Himself would become the sacrifice. This is what the Palace reveals: connections that transform reading into revelation.',
+    titleKey: 'palace.firstRoom.insightTitle',
+    contentKey: 'palace.firstRoom.insightContent',
+    reflectionKey: 'palace.firstRoom.insightReflection',
   },
   {
     id: 'complete',
-    title: 'You Have Entered',
-    content: 'This was one room. One verse. One connection. There are many more—eight floors, dozens of rooms, thousands of connections waiting.',
-    cta: 'Begin your training',
+    titleKey: 'palace.firstRoom.completeTitle',
+    contentKey: 'palace.firstRoom.completeContent',
+    ctaKey: 'palace.firstRoom.completeCta',
   },
 ];
 
 const FirstRoom = () => {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const [currentStep, setCurrentStep] = useState(0);
   const [observations, setObservations] = useState(['', '', '']);
   const [userConnection, setUserConnection] = useState('');
 
-  const step = FIRST_ROOM_STEPS[currentStep];
+  const stepData = FIRST_ROOM_STEPS_STATIC[currentStep];
+  const step = {
+    id: stepData.id,
+    title: t(stepData.titleKey),
+    content: stepData.contentKey ? t(stepData.contentKey) : undefined,
+    subtitle: stepData.subtitleKey ? t(stepData.subtitleKey) : undefined,
+    verse: stepData.verse,
+    verseText: stepData.verseTextKey ? t(stepData.verseTextKey) : undefined,
+    instruction: stepData.instructionKey ? t(stepData.instructionKey) : undefined,
+    examples: stepData.exampleKeys ? stepData.exampleKeys.map((k: string) => t(k)) : undefined,
+    revelation: stepData.revelationKey ? t(stepData.revelationKey) : undefined,
+    question: stepData.questionKey ? t(stepData.questionKey) : undefined,
+    reflection: stepData.reflectionKey ? t(stepData.reflectionKey) : undefined,
+    cta: stepData.ctaKey ? t(stepData.ctaKey) : undefined,
+  };
 
   const handleNext = () => {
-    if (currentStep < FIRST_ROOM_STEPS.length - 1) {
+    if (currentStep < FIRST_ROOM_STEPS_STATIC.length - 1) {
       setCurrentStep(currentStep + 1);
     } else {
       navigate('/palace');
@@ -84,7 +100,7 @@ const FirstRoom = () => {
       <div className="w-full max-w-2xl">
         {/* Progress indicator */}
         <div className="flex justify-center gap-2 mb-8">
-          {FIRST_ROOM_STEPS.map((_, i) => (
+          {FIRST_ROOM_STEPS_STATIC.map((_, i) => (
             <div
               key={i}
               className={`h-1.5 w-8 rounded-full transition-colors ${
@@ -148,7 +164,7 @@ const FirstRoom = () => {
                     {observations.map((obs, i) => (
                       <div key={i}>
                         <label className="text-sm text-muted-foreground mb-1 block">
-                          Observation {i + 1}
+                          {t('palace.firstRoom.observationLabel', { number: i + 1 })}
                         </label>
                         <Input
                           value={obs}
@@ -184,7 +200,7 @@ const FirstRoom = () => {
                     <Textarea
                       value={userConnection}
                       onChange={(e) => setUserConnection(e.target.value)}
-                      placeholder="Think about where else in Scripture..."
+                      placeholder={t('palace.firstRoom.connectionPlaceholder')}
                       rows={3}
                     />
                   </div>
@@ -239,7 +255,7 @@ const FirstRoom = () => {
                     size="lg"
                   >
                     <ArrowLeft className="mr-2 h-5 w-5" />
-                    Back
+                    {t('common.back')}
                   </Button>
                 ) : (
                   <div />
@@ -258,7 +274,7 @@ const FirstRoom = () => {
                     </>
                   ) : (
                     <>
-                      Continue
+                      {t('common.continue')}
                       <ArrowRight className="ml-2 h-5 w-5" />
                     </>
                   )}

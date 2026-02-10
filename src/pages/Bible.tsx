@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import { Navigation } from "@/components/Navigation";
 import { BibleReader } from "@/components/bible/BibleReader";
 import { BibleNavigation } from "@/components/bible/BibleNavigation";
@@ -13,6 +14,7 @@ import { usePreservePage } from "@/hooks/usePreservePage";
 import { ResearchModeLayout } from "@/components/bible/ResearchModeLayout";
 
 const Bible = () => {
+  const { t } = useTranslation();
   const { user } = useAuth();
   const [demoOpen, setDemoOpen] = useState(false);
   const [searchParams, setSearchParams] = useSearchParams();
@@ -51,10 +53,10 @@ const Bible = () => {
                 />
                 <div>
                   <h1 className="font-serif text-3xl sm:text-4xl md:text-5xl font-bold mb-2 bg-gradient-palace bg-clip-text text-transparent">
-                    Phototheology Study Bible (PSB)
+                    {t('bible.title', 'Phototheology Study Bible (PSB)')}
                   </h1>
                   <p className="text-base sm:text-lg text-muted-foreground">
-                    Scripture through principle lenses
+                    {t('bible.subtitle', 'Scripture through principle lenses')}
                   </p>
                 </div>
               </div>
@@ -65,8 +67,8 @@ const Bible = () => {
                   onClick={() => setResearchMode(true)}
                 >
                   <FlaskConical className="h-4 w-4 mr-2" />
-                  <span className="hidden sm:inline">Research Mode</span>
-                  <span className="sm:hidden">Research</span>
+                  <span className="hidden sm:inline">{t('bible.researchMode', 'Research Mode')}</span>
+                  <span className="sm:hidden">{t('bible.researchModeShort', 'Research')}</span>
                 </Button>
                 <Button
                   variant="outline"
@@ -74,21 +76,21 @@ const Bible = () => {
                   onClick={() => setDemoOpen(true)}
                 >
                   <HelpCircle className="h-4 w-4 mr-2" />
-                  <span className="hidden sm:inline">How to Use</span>
-                  <span className="sm:hidden">Help</span>
+                  <span className="hidden sm:inline">{t('bible.howToUse', 'How to Use')}</span>
+                  <span className="sm:hidden">{t('bible.help', 'Help')}</span>
                 </Button>
                 <Button asChild variant="outline" className="bg-white/10 backdrop-blur-md border-white/20 hover:bg-white/20 whitespace-nowrap">
                   <Link to="/memorization-verses">
                     <BookMarked className="h-4 w-4 mr-2" />
-                    <span className="hidden sm:inline">My Memorization Verses</span>
-                    <span className="sm:hidden">Memorization</span>
+                    <span className="hidden sm:inline">{t('bible.myMemorizationVerses', 'My Memorization Verses')}</span>
+                    <span className="sm:hidden">{t('bible.memorization', 'Memorization')}</span>
                   </Link>
                 </Button>
                 <Button asChild className="bg-primary/90 hover:bg-primary text-primary-foreground whitespace-nowrap">
                   <Link to="/audio-bible">
                     <Headphones className="h-4 w-4 mr-2" />
-                    <span className="hidden sm:inline">Audio Bible & Commentary</span>
-                    <span className="sm:hidden">Listen</span>
+                    <span className="hidden sm:inline">{t('bible.audioBibleCommentary', 'Audio Bible & Commentary')}</span>
+                    <span className="sm:hidden">{t('bible.listen', 'Listen')}</span>
                   </Link>
                 </Button>
               </div>

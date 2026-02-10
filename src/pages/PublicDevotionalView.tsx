@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useParams, Link } from "react-router-dom";
 import { ArrowLeft, ChevronLeft, ChevronRight, BookOpen, Sparkles, Heart, Loader2, Share2, ExternalLink, Gift } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
@@ -25,6 +26,7 @@ const formatGradients: Record<string, string> = {
 };
 
 export default function PublicDevotionalView() {
+  const { t } = useTranslation();
   const { shareToken } = useParams<{ shareToken: string }>();
   const { toast } = useToast();
   const { user } = useAuth();
@@ -34,8 +36,8 @@ export default function PublicDevotionalView() {
   const handleCrossReferenceClick = (ref: string) => {
     navigator.clipboard.writeText(ref);
     toast({
-      title: "Reference Copied",
-      description: `"${ref}" copied to clipboard`,
+      title: t('public.referenceCopied'),
+      description: t('public.copiedToClipboard', { ref }),
     });
   };
 
@@ -77,7 +79,7 @@ export default function PublicDevotionalView() {
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-50 to-pink-50 dark:from-purple-950/20 dark:to-pink-950/20">
         <div className="text-center">
           <Loader2 className="h-12 w-12 animate-spin text-purple-500 mx-auto mb-4" />
-          <p className="text-muted-foreground">Loading devotional...</p>
+          <p className="text-muted-foreground">{t('public.loadingDevotional')}</p>
         </div>
       </div>
     );
@@ -88,14 +90,14 @@ export default function PublicDevotionalView() {
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-50 to-pink-50 dark:from-purple-950/20 dark:to-pink-950/20">
         <Card className="max-w-md mx-auto">
           <CardContent className="py-12 text-center">
-            <h2 className="text-2xl font-bold mb-4">Devotional Not Found</h2>
+            <h2 className="text-2xl font-bold mb-4">{t('public.devotionalNotFound')}</h2>
             <p className="text-muted-foreground mb-6">
-              This devotional may have been removed or the link is invalid.
+              {t('public.devotionalNotFoundDescription')}
             </p>
             <Link to="/auth">
               <Button>
                 <Gift className="h-4 w-4 mr-2" />
-                Get Phototheology Free
+                {t('public.getPhototheologyFree')}
               </Button>
             </Link>
           </CardContent>
@@ -129,11 +131,11 @@ export default function PublicDevotionalView() {
           <div className="max-w-4xl mx-auto flex items-center justify-between gap-4 flex-wrap">
             <div className="flex items-center gap-2">
               <Gift className="h-5 w-5" />
-              <span className="font-medium">Get free access to Phototheology devotionals!</span>
+              <span className="font-medium">{t('public.getFreeAccessBanner')}</span>
             </div>
             <Link to="/auth?plan=devotionals">
               <Button size="sm" variant="secondary" className="bg-white text-purple-700 hover:bg-white/90">
-                Get Started Free
+                {t('public.getStartedFree')}
               </Button>
             </Link>
           </div>
@@ -255,7 +257,7 @@ export default function PublicDevotionalView() {
                   <CardHeader className="pb-2">
                     <CardTitle className="text-sm flex items-center gap-2 text-purple-700 dark:text-purple-300">
                       <Sparkles className="h-5 w-5 text-amber-500" />
-                      Mental Picture
+                      {t('public.mentalPicture')}
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
@@ -279,7 +281,7 @@ export default function PublicDevotionalView() {
               {currentDay.application && (
                 <Card className="border-emerald-200 dark:border-emerald-800 bg-gradient-to-br from-emerald-50 to-teal-50 dark:from-emerald-950/30 dark:to-teal-950/30">
                   <CardHeader className="pb-2">
-                    <CardTitle className="text-sm text-emerald-700 dark:text-emerald-300">📌 Today's Application</CardTitle>
+                    <CardTitle className="text-sm text-emerald-700 dark:text-emerald-300">📌 {t('public.todaysApplication')}</CardTitle>
                   </CardHeader>
                   <CardContent>
                     <p className="text-emerald-900 dark:text-emerald-100">{currentDay.application}</p>
@@ -292,7 +294,7 @@ export default function PublicDevotionalView() {
                 <CardHeader className="pb-2 relative">
                   <CardTitle className="text-lg flex items-center gap-2">
                     <Heart className="h-6 w-6 fill-white" />
-                    Christ Connection
+                    {t('public.christConnection')}
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="relative">
@@ -303,7 +305,7 @@ export default function PublicDevotionalView() {
               {/* Cross References */}
               {currentDay.cross_references && currentDay.cross_references.length > 0 && (
                 <div>
-                  <h4 className="text-sm font-medium mb-2 text-muted-foreground">📖 Cross References</h4>
+                  <h4 className="text-sm font-medium mb-2 text-muted-foreground">📖 {t('public.crossReferences')}</h4>
                   <div className="flex flex-wrap gap-2">
                     {currentDay.cross_references.map((ref, idx) => (
                       <button
@@ -325,7 +327,7 @@ export default function PublicDevotionalView() {
               {currentDay.prayer && (
                 <Card className="border-indigo-200 dark:border-indigo-800 bg-gradient-to-br from-indigo-50 to-violet-50 dark:from-indigo-950/30 dark:to-violet-950/30">
                   <CardHeader className="pb-2">
-                    <CardTitle className="text-sm text-indigo-700 dark:text-indigo-300">🙏 Prayer</CardTitle>
+                    <CardTitle className="text-sm text-indigo-700 dark:text-indigo-300">🙏 {t('public.prayer')}</CardTitle>
                   </CardHeader>
                   <CardContent>
                     <p className="italic text-indigo-900 dark:text-indigo-100">{currentDay.prayer}</p>
@@ -337,7 +339,7 @@ export default function PublicDevotionalView() {
               {currentDay.challenge && (
                 <Card className="border-0 bg-gradient-to-r from-emerald-500 to-teal-500 text-white shadow-lg">
                   <CardHeader className="pb-2">
-                    <CardTitle className="text-sm">🎯 Today's Challenge</CardTitle>
+                    <CardTitle className="text-sm">🎯 {t('public.todaysChallenge')}</CardTitle>
                   </CardHeader>
                   <CardContent>
                     <p>{currentDay.challenge}</p>
@@ -351,7 +353,7 @@ export default function PublicDevotionalView() {
               {currentDay.journal_prompt && (
                 <Card className="border-amber-200 dark:border-amber-800 bg-gradient-to-br from-amber-50 to-yellow-50 dark:from-amber-950/30 dark:to-yellow-950/30">
                   <CardHeader className="pb-2">
-                    <CardTitle className="text-sm text-amber-700 dark:text-amber-300">💭 Reflection Prompt</CardTitle>
+                    <CardTitle className="text-sm text-amber-700 dark:text-amber-300">💭 {t('public.reflectionPrompt')}</CardTitle>
                   </CardHeader>
                   <CardContent>
                     <p className="text-amber-900 dark:text-amber-100">{currentDay.journal_prompt}</p>
@@ -363,18 +365,18 @@ export default function PublicDevotionalView() {
               <Card>
                 <CardHeader className="pb-2">
                   <CardTitle className="text-sm flex items-center gap-2">
-                    📝 My Reflection
+                    📝 {t('public.myReflection')}
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
                   <Textarea
-                    placeholder="Write your thoughts, prayers, and reflections here..."
+                    placeholder={t('public.reflectionPlaceholder')}
                     value={journalEntry}
                     onChange={(e) => setJournalEntry(e.target.value)}
                     className="min-h-[150px] resize-none"
                   />
                   <p className="text-xs text-muted-foreground mt-2">
-                    {user ? "Your journal entries are saved automatically." : "Sign up free to save your journal entries."}
+                    {user ? t('public.journalSavedAuto') : t('public.signUpToSave')}
                   </p>
                 </CardContent>
               </Card>
@@ -390,17 +392,17 @@ export default function PublicDevotionalView() {
                 </div>
               </div>
               <h3 className="text-xl font-bold bg-gradient-to-r from-purple-600 via-pink-600 to-rose-600 bg-clip-text text-transparent">
-                Enjoying this devotional?
+                {t('public.enjoyingDevotional')}
               </h3>
               <p className="text-muted-foreground max-w-md mx-auto">
-                Get free access to create and share your own personalized devotionals with Phototheology.
+                {t('public.getFreeAccessDescription')}
               </p>
               <div className="flex flex-col sm:flex-row gap-3 justify-center">
                 {!user && (
                   <Link to="/auth?plan=devotionals">
                     <Button className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700">
                       <Gift className="h-4 w-4 mr-2" />
-                      Get Started Free
+                      {t('public.getStartedFree')}
                     </Button>
                   </Link>
                 )}
@@ -412,7 +414,7 @@ export default function PublicDevotionalView() {
                     trigger={
                       <Button variant="outline" className="border-purple-300 text-purple-700 hover:bg-purple-50 dark:border-purple-700 dark:text-purple-300 dark:hover:bg-purple-950">
                         <Share2 className="h-4 w-4 mr-2" />
-                        Share This Devotional
+                        {t('public.shareThisDevotional')}
                       </Button>
                     }
                   />

@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -16,6 +17,7 @@ import {
 } from "@/components/ui/accordion";
 
 const BibleRenderedRoom = () => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
 
   return (
@@ -29,17 +31,16 @@ const BibleRenderedRoom = () => {
                 <Home className="h-4 w-4" />
               </Button>
               <h1 className="text-4xl font-bold bg-gradient-palace bg-clip-text text-transparent">
-                Bible Rendered Room
+                {t('bibleRendered.title')}
               </h1>
             </div>
             <p className="text-muted-foreground max-w-2xl">
-              Compress all 1,189 chapters of Scripture into 50 memorable symbols. 
-              Each symbol represents ~24 chapters—one image to hold an entire arc.
+              {t('bibleRendered.subtitle')}
             </p>
           </div>
           <Badge variant="outline" className="hidden md:flex items-center gap-2">
             <BookOpen className="h-3 w-3" />
-            Floor 1: Furnishing
+            {t('bibleRendered.floor1Furnishing')}
           </Badge>
         </div>
 
@@ -48,43 +49,42 @@ const BibleRenderedRoom = () => {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Info className="h-5 w-5 text-primary" />
-              The Bible in 50 Symbols
+              {t('bibleRendered.bibleIn50Symbols')}
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <p className="text-sm text-muted-foreground">
-              The Bible Rendered system divides Scripture into 50 blocks of approximately 24 chapters each.
-              Every block is captured by a single symbolic glyph that encodes its major theme:
+              {t('bibleRendered.systemDescription')}
             </p>
             <div className="grid grid-cols-2 md:grid-cols-5 gap-3 text-center">
               <div className="p-3 rounded-lg bg-background border">
                 <div className="text-2xl mb-1">÷</div>
                 <p className="text-xs font-medium">Gen 1–24</p>
-                <p className="text-xs text-muted-foreground">Division</p>
+                <p className="text-xs text-muted-foreground">{t('bibleRendered.division')}</p>
               </div>
               <div className="p-3 rounded-lg bg-background border">
                 <div className="text-2xl mb-1">×</div>
                 <p className="text-xs font-medium">Gen 25–50</p>
-                <p className="text-xs text-muted-foreground">Multiplication</p>
+                <p className="text-xs text-muted-foreground">{t('bibleRendered.multiplication')}</p>
               </div>
               <div className="p-3 rounded-lg bg-background border">
                 <div className="text-2xl mb-1">🩸</div>
                 <p className="text-xs font-medium">Ex 1–24</p>
-                <p className="text-xs text-muted-foreground">Deliverance</p>
+                <p className="text-xs text-muted-foreground">{t('bibleRendered.deliverance')}</p>
               </div>
               <div className="p-3 rounded-lg bg-background border">
                 <div className="text-2xl mb-1">✝</div>
                 <p className="text-xs font-medium">Luke–John</p>
-                <p className="text-xs text-muted-foreground">The Cross</p>
+                <p className="text-xs text-muted-foreground">{t('bibleRendered.theCross')}</p>
               </div>
               <div className="p-3 rounded-lg bg-background border bg-blue-50/50 dark:bg-blue-950/20">
                 <div className="text-2xl mb-1">🏙✨</div>
                 <p className="text-xs font-medium">Rev 17–22</p>
-                <p className="text-xs text-muted-foreground">Heaven</p>
+                <p className="text-xs text-muted-foreground">{t('bibleRendered.heaven')}</p>
               </div>
             </div>
             <p className="text-xs text-muted-foreground italic">
-              Master all 50 symbols and you can mentally "scan" the entire Bible in under a minute.
+              {t('bibleRendered.masterAllSymbols')}
             </p>
           </CardContent>
         </Card>
@@ -94,11 +94,11 @@ const BibleRenderedRoom = () => {
           <TabsList className="grid w-full grid-cols-2">
             <TabsTrigger value="drill" className="flex items-center gap-2">
               <Brain className="h-4 w-4" />
-              Memorization Drill
+              {t('bibleRendered.memorizationDrill')}
             </TabsTrigger>
             <TabsTrigger value="browse" className="flex items-center gap-2">
               <Search className="h-4 w-4" />
-              Browse Sets
+              {t('bibleRendered.browseSets')}
             </TabsTrigger>
           </TabsList>
           <TabsContent value="drill">
@@ -115,37 +115,34 @@ const BibleRenderedRoom = () => {
             <AccordionTrigger className="px-4 py-3 hover:no-underline">
               <span className="flex items-center gap-2 text-sm font-medium">
                 <Info className="h-4 w-4" />
-                About the Bible Rendered Room
+                {t('bibleRendered.aboutTitle')}
               </span>
             </AccordionTrigger>
             <AccordionContent className="px-4 pb-4">
               <div className="space-y-4 text-sm text-muted-foreground">
                 <p>
-                  The Bible Rendered Room gives you the ultimate macro-view—compressing all 1,189 chapters 
-                  of Scripture into 50 ultra-high-level frames. Each set captures the essence of a major 
-                  biblical arc with a single symbolic glyph.
+                  {t('bibleRendered.aboutDescription')}
                 </p>
                 <div className="grid md:grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <h4 className="font-semibold text-foreground">Core Question:</h4>
-                    <p>"What single symbol captures this section's essence?"</p>
+                    <h4 className="font-semibold text-foreground">{t('bibleRendered.coreQuestion')}</h4>
+                    <p>{t('bibleRendered.coreQuestionText')}</p>
                   </div>
                   <div className="space-y-2">
-                    <h4 className="font-semibold text-foreground">Purpose:</h4>
+                    <h4 className="font-semibold text-foreground">{t('bibleRendered.purpose')}</h4>
                     <p>
-                      Train your mind to hold the WHOLE counsel of God in view, so you can see how 
-                      individual passages fit into the grand narrative.
+                      {t('bibleRendered.purposeText')}
                     </p>
                   </div>
                 </div>
                 <div className="space-y-2">
-                  <h4 className="font-semibold text-foreground">How to Use:</h4>
+                  <h4 className="font-semibold text-foreground">{t('bibleRendered.howToUse')}</h4>
                   <ol className="list-decimal list-inside space-y-1">
-                    <li><strong>Learn Mode:</strong> Flip through all 50 symbols like flashcards</li>
-                    <li><strong>Symbol → Range:</strong> See the symbol, identify the chapters</li>
-                    <li><strong>Range → Symbol:</strong> See the chapters, identify the symbol</li>
-                    <li><strong>Name → Symbol:</strong> See the theme name, identify the symbol</li>
-                    <li><strong>Full Quiz:</strong> Combined drill for mastery</li>
+                    <li><strong>{t('bibleRendered.learnMode')}</strong> {t('bibleRendered.learnModeDesc')}</li>
+                    <li><strong>{t('bibleRendered.symbolToRange')}</strong> {t('bibleRendered.symbolToRangeDesc')}</li>
+                    <li><strong>{t('bibleRendered.rangeToSymbol')}</strong> {t('bibleRendered.rangeToSymbolDesc')}</li>
+                    <li><strong>{t('bibleRendered.nameToSymbol')}</strong> {t('bibleRendered.nameToSymbolDesc')}</li>
+                    <li><strong>{t('bibleRendered.fullQuiz')}</strong> {t('bibleRendered.fullQuizDesc')}</li>
                   </ol>
                 </div>
               </div>

@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Navigation } from "@/components/Navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -33,6 +34,7 @@ interface AnalysisResult {
 }
 
 export default function CriticsAnalysis() {
+  const { t } = useTranslation();
   const [videoUrl, setVideoUrl] = useState("");
   const [loading, setLoading] = useState(false);
   const [analysis, setAnalysis] = useState<AnalysisResult | null>(null);
@@ -62,10 +64,10 @@ export default function CriticsAnalysis() {
         [mode]: data.content
       }));
       
-      toast.success(`${mode === "example" ? "Example" : "Exercise"} loaded!`);
+      toast.success(mode === "example" ? t('critics.exampleLoaded') : t('critics.exerciseLoaded'));
     } catch (error: any) {
       console.error("Jeeves error:", error);
-      toast.error(error.message || "Failed to load content");
+      toast.error(error.message || t('critics.errorLoadContent'));
     } finally {
       setJeevesLoading(false);
     }
@@ -86,13 +88,13 @@ export default function CriticsAnalysis() {
 
   const handleAnalyze = async () => {
     if (!videoUrl.trim()) {
-      toast.error("Please enter a YouTube URL");
+      toast.error(t('critics.errorEnterUrl'));
       return;
     }
 
     const videoId = extractVideoId(videoUrl);
     if (!videoId) {
-      toast.error("Invalid YouTube URL");
+      toast.error(t('critics.errorInvalidUrl'));
       return;
     }
 
@@ -105,10 +107,10 @@ export default function CriticsAnalysis() {
       if (error) throw error;
 
       setAnalysis(data.analysis);
-      toast.success("Analysis complete!");
+      toast.success(t('critics.analysisComplete'));
     } catch (error: any) {
       console.error("Analysis error:", error);
-      toast.error(error.message || "Failed to analyze video");
+      toast.error(error.message || t('critics.errorAnalyzeFailed'));
     } finally {
       setLoading(false);
     }
@@ -122,18 +124,18 @@ export default function CriticsAnalysis() {
         <div className="mb-8">
           <h1 className="text-4xl font-bold mb-2 flex items-center gap-2">
             <Video className="w-8 h-8" />
-            Critics Analysis
+            {t('critics.title')}
           </h1>
           <p className="text-muted-foreground">
-            Jeeves analyzes videos to defend Seventh-day Adventist theology and debunk anti-SDA critics with biblical evidence and sound doctrine.
+            {t('critics.description')}
           </p>
         </div>
 
         <Card className="mb-8">
           <CardHeader>
-            <CardTitle>Analyze Video</CardTitle>
+            <CardTitle>{t('critics.analyzeVideo')}</CardTitle>
             <CardDescription>
-              Enter a YouTube video URL to receive a detailed SDA apologetic analysis defending biblical truth against critics.
+              {t('critics.analyzeVideoDescription')}
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -148,10 +150,10 @@ export default function CriticsAnalysis() {
                 {loading ? (
                   <>
                     <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                    Analyzing...
+                    {t('critics.analyzing')}
                   </>
                 ) : (
-                  "Analyze"
+                  t('critics.analyze')
                 )}
               </Button>
             </div>
@@ -162,24 +164,24 @@ export default function CriticsAnalysis() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Sparkles className="w-5 h-5" />
-              Jeeves Apologetics Assistant
+              {t('critics.jeevesAssistant')}
             </CardTitle>
             <CardDescription>
-              Get examples and practice exercises for defending SDA theology against critics
+              {t('critics.jeevesAssistantDescription')}
             </CardDescription>
           </CardHeader>
           <CardContent>
             <Tabs defaultValue="examples" className="w-full">
               <TabsList className="grid w-full grid-cols-2">
-                <TabsTrigger value="examples">Examples</TabsTrigger>
-                <TabsTrigger value="practice">Practice</TabsTrigger>
+                <TabsTrigger value="examples">{t('critics.examples')}</TabsTrigger>
+                <TabsTrigger value="practice">{t('critics.practice')}</TabsTrigger>
               </TabsList>
               
               <TabsContent value="examples" className="space-y-4">
                 {!jeevesContent.example ? (
                   <div className="text-center py-8">
                     <p className="text-muted-foreground mb-4">
-                      Get a detailed example of how to respond to a common anti-SDA argument
+                      {t('critics.getExampleDescription')}
                     </p>
                     <Button 
                       onClick={() => fetchJeevesContent("example")}
@@ -188,17 +190,17 @@ export default function CriticsAnalysis() {
                       {jeevesLoading ? (
                         <>
                           <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                          Loading...
+                          {t('common.loading')}
                         </>
                       ) : (
-                        "Get Example"
+                        t('critics.getExample')
                       )}
                     </Button>
                   </div>
                 ) : (
                   <div className="prose prose-sm max-w-none">
                     <div className="flex items-center justify-between mb-2">
-                      <span className="text-sm font-medium">Example Response</span>
+                      <span className="text-sm font-medium">{t('critics.exampleResponse')}</span>
                       <QuickAudioButton text={jeevesContent.example || ""} variant="ghost" size="sm" />
                     </div>
                     <div className="whitespace-pre-wrap bg-muted/50 p-4 rounded-lg">
@@ -210,7 +212,7 @@ export default function CriticsAnalysis() {
                       disabled={jeevesLoading}
                       className="mt-4"
                     >
-                      Get Another Example
+                      {t('critics.getAnotherExample')}
                     </Button>
                   </div>
                 )}
@@ -220,7 +222,7 @@ export default function CriticsAnalysis() {
                 {!jeevesContent.exercise ? (
                   <div className="text-center py-8">
                     <p className="text-muted-foreground mb-4">
-                      Practice defending SDA doctrine with a challenging exercise
+                      {t('critics.practiceDescription')}
                     </p>
                     <Button 
                       onClick={() => fetchJeevesContent("exercise")}
@@ -229,17 +231,17 @@ export default function CriticsAnalysis() {
                       {jeevesLoading ? (
                         <>
                           <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                          Loading...
+                          {t('common.loading')}
                         </>
                       ) : (
-                        "Get Exercise"
+                        t('critics.getExercise')
                       )}
                     </Button>
                   </div>
                 ) : (
                   <div className="prose prose-sm max-w-none">
                     <div className="flex items-center justify-between mb-2">
-                      <span className="text-sm font-medium">Practice Exercise</span>
+                      <span className="text-sm font-medium">{t('critics.practiceExercise')}</span>
                       <QuickAudioButton text={jeevesContent.exercise || ""} variant="ghost" size="sm" />
                     </div>
                     <div className="whitespace-pre-wrap bg-muted/50 p-4 rounded-lg">
@@ -251,7 +253,7 @@ export default function CriticsAnalysis() {
                       disabled={jeevesLoading}
                       className="mt-4"
                     >
-                      Get Another Exercise
+                      {t('critics.getAnotherExercise')}
                     </Button>
                   </div>
                 )}
@@ -264,10 +266,10 @@ export default function CriticsAnalysis() {
           <Tabs defaultValue="summary" className="w-full">
             <div className="overflow-x-auto -mx-4 px-4 md:mx-0 md:px-0">
               <TabsList className="inline-flex min-w-full md:w-auto">
-                <TabsTrigger value="summary" className="flex-1 md:flex-initial">Summary</TabsTrigger>
-                <TabsTrigger value="claims" className="flex-1 md:flex-initial">Claims & Rebuttals</TabsTrigger>
-                <TabsTrigger value="fallacies" className="flex-1 md:flex-initial">Logical Fallacies</TabsTrigger>
-                <TabsTrigger value="biblical" className="flex-1 md:flex-initial">Biblical Responses</TabsTrigger>
+                <TabsTrigger value="summary" className="flex-1 md:flex-initial">{t('critics.summary')}</TabsTrigger>
+                <TabsTrigger value="claims" className="flex-1 md:flex-initial">{t('critics.claimsAndRebuttals')}</TabsTrigger>
+                <TabsTrigger value="fallacies" className="flex-1 md:flex-initial">{t('critics.logicalFallacies')}</TabsTrigger>
+                <TabsTrigger value="biblical" className="flex-1 md:flex-initial">{t('critics.biblicalResponses')}</TabsTrigger>
               </TabsList>
             </div>
 
@@ -276,7 +278,7 @@ export default function CriticsAnalysis() {
                 <CardHeader>
                   <CardTitle className="flex items-center justify-between gap-2">
                     <div className="flex items-center gap-2">
-                      Video Summary
+                      {t('critics.videoSummary')}
                       <Badge variant={
                         analysis.videoType === "pro-SDA" ? "default" : "destructive"
                       }>
@@ -295,7 +297,7 @@ export default function CriticsAnalysis() {
                 <Card>
                   <CardHeader>
                     <CardTitle className="flex items-center justify-between">
-                      Additional Notes
+                      {t('critics.additionalNotes')}
                       <QuickAudioButton text={analysis.additionalNotes} variant="ghost" size="sm" />
                     </CardTitle>
                   </CardHeader>
@@ -311,7 +313,7 @@ export default function CriticsAnalysis() {
                 <Card key={idx}>
                   <CardHeader>
                     <div className="flex items-start justify-between">
-                      <CardTitle className="text-lg">Claim #{idx + 1}</CardTitle>
+                      <CardTitle className="text-lg">{t('critics.claim')} #{idx + 1}</CardTitle>
                       {claim.timestamp && (
                         <Badge variant="outline">{claim.timestamp}</Badge>
                       )}
@@ -321,14 +323,14 @@ export default function CriticsAnalysis() {
                     <div>
                       <h4 className="font-semibold mb-2 flex items-center gap-2">
                         <AlertTriangle className="w-4 h-4 text-destructive" />
-                        Claim:
+                        {t('critics.claim')}:
                       </h4>
                       <p className="text-muted-foreground">{claim.claim}</p>
                     </div>
                     <div>
                       <h4 className="font-semibold mb-2 flex items-center gap-2">
                         <CheckCircle className="w-4 h-4 text-primary" />
-                        Rebuttal:
+                        {t('critics.rebuttal')}:
                       </h4>
                       <p className="whitespace-pre-wrap">{claim.rebuttal}</p>
                     </div>
@@ -347,11 +349,11 @@ export default function CriticsAnalysis() {
                   </CardHeader>
                   <CardContent className="space-y-4">
                     <div>
-                      <h4 className="font-semibold mb-2">Explanation:</h4>
+                      <h4 className="font-semibold mb-2">{t('critics.explanation')}:</h4>
                       <p className="text-muted-foreground">{fallacy.explanation}</p>
                     </div>
                     <div>
-                      <h4 className="font-semibold mb-2">Example from Video:</h4>
+                      <h4 className="font-semibold mb-2">{t('critics.exampleFromVideo')}:</h4>
                       <p className="italic">{fallacy.example}</p>
                     </div>
                   </CardContent>
@@ -370,7 +372,7 @@ export default function CriticsAnalysis() {
                       <p className="whitespace-pre-wrap mb-4">{response.response}</p>
                     </div>
                     <div>
-                      <h4 className="font-semibold mb-2">Supporting Verses:</h4>
+                      <h4 className="font-semibold mb-2">{t('critics.supportingVerses')}:</h4>
                       <div className="flex flex-wrap gap-2">
                         {response.verses.map((verse, vIdx) => (
                           <Badge key={vIdx} variant="secondary">

@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { Navigation } from "@/components/Navigation";
 import { BibleReader } from "@/components/bible/BibleReader";
 import { Button } from "@/components/ui/button";
@@ -10,6 +11,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ResearchModeLayout } from "@/components/bible/ResearchModeLayout";
 
 const BibleChapter = () => {
+  const { t } = useTranslation();
   const location = useLocation();
   const [searchParams, setSearchParams] = useSearchParams();
   const { exercises, fromReadingPlan, planName, dayNumber } = location.state || {};
@@ -40,7 +42,7 @@ const BibleChapter = () => {
           <Button variant="ghost" asChild className="mb-6">
             <Link to={fromReadingPlan ? "/daily-reading" : "/bible"}>
               <ArrowLeft className="h-4 w-4 mr-2" />
-              {fromReadingPlan ? "Back to Daily Reading" : "Back to Bible"}
+              {fromReadingPlan ? t('bibleChapter.backToDailyReading', 'Back to Daily Reading') : t('bibleChapter.backToBible', 'Back to Bible')}
             </Link>
           </Button>
 
@@ -50,10 +52,10 @@ const BibleChapter = () => {
                 <div className="flex items-center gap-3">
                   <Building2 className="h-6 w-6 text-primary" />
                   <div>
-                    <h3 className="text-xl font-bold text-foreground">Principles to Apply</h3>
+                    <h3 className="text-xl font-bold text-foreground">{t('bibleChapter.principlesToApply', 'Principles to Apply')}</h3>
                     {planName && (
                       <p className="text-sm text-muted-foreground">
-                        {planName} - Day {dayNumber}
+                        {t('bibleChapter.planDay', '{{planName}} - Day {{dayNumber}}', { planName, dayNumber })}
                       </p>
                     )}
                   </div>
@@ -69,7 +71,7 @@ const BibleChapter = () => {
                       className="flex flex-col items-center gap-1 py-2"
                     >
                       <Building2 className="h-4 w-4" />
-                      <span className="text-xs">Floor {exercise.floorNumber}</span>
+                      <span className="text-xs">{t('bibleChapter.floor', 'Floor {{number}}', { number: exercise.floorNumber })}</span>
                     </TabsTrigger>
                   ))}
                 </TabsList>
@@ -81,10 +83,10 @@ const BibleChapter = () => {
                       <div className="flex-1">
                         <div className="flex items-center justify-between mb-1">
                           <h4 className="font-semibold text-foreground">{exercise.floorName}</h4>
-                          <Badge variant="outline" className="text-xs">Floor {exercise.floorNumber}</Badge>
+                          <Badge variant="outline" className="text-xs">{t('bibleChapter.floor', 'Floor {{number}}', { number: exercise.floorNumber })}</Badge>
                         </div>
                         <p className="text-xs text-muted-foreground mb-2">
-                          Rooms: {Array.isArray(exercise.rooms) ? exercise.rooms.join(" • ") : (exercise.rooms || "Various rooms")}
+                          {t('bibleChapter.rooms', 'Rooms:')} {Array.isArray(exercise.rooms) ? exercise.rooms.join(" • ") : (exercise.rooms || t('bibleChapter.variousRooms', 'Various rooms'))}
                         </p>
                       </div>
                     </div>
@@ -97,7 +99,7 @@ const BibleChapter = () => {
                       <p className="text-sm text-muted-foreground mb-3">{exercise.prompt}</p>
                       
                       <div className="space-y-2">
-                        <p className="text-xs font-medium text-foreground">Guiding Questions:</p>
+                        <p className="text-xs font-medium text-foreground">{t('bibleChapter.guidingQuestions', 'Guiding Questions:')}</p>
                         <ul className="space-y-1.5">
                           {exercise.questions?.map((q: string, qIdx: number) => (
                             <li key={qIdx} className="text-xs text-muted-foreground flex items-start gap-2">

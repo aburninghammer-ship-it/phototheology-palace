@@ -21,8 +21,10 @@ import { SEO } from "@/components/SEO";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Link } from "react-router-dom";
+import { useTranslation } from 'react-i18next';
 
 export default function BibleProphecyGuideSuccess() {
+  const { t } = useTranslation();
   const [isDownloading, setIsDownloading] = useState(false);
   const [emailSent, setEmailSent] = useState(false);
   const { trackPurchaseCompleted } = useEventTracking();
@@ -82,25 +84,25 @@ export default function BibleProphecyGuideSuccess() {
       
       if (data?.url) {
         window.open(data.url, '_blank');
-        toast.success("Your download has started!");
+        toast.success(t('prophecySuccess.downloadStarted'));
       }
     } catch (error) {
       console.error('Download error:', error);
-      toast.error("Download failed. Please contact support.");
+      toast.error(t('prophecySuccess.downloadFailed'));
     } finally {
       setIsDownloading(false);
     }
   };
 
   const palacePreview = [
-    { floor: "1st Floor", name: "Furnishing Floor", description: "Memory & visualization for width" },
-    { floor: "2nd Floor", name: "Investigation Floor", description: "Detective work for precision" },
-    { floor: "3rd Floor", name: "Freestyle Floor", description: "Daily connections for time" },
-    { floor: "4th Floor", name: "Next Level Floor", description: "Christ-centered depth" },
-    { floor: "5th Floor", name: "Vision Floor", description: "Prophecy & sanctuary" },
-    { floor: "6th Floor", name: "Three Heavens Floor", description: "Cycles & cosmic context" },
-    { floor: "7th Floor", name: "Spiritual Floor", description: "Transformation & fire" },
-    { floor: "8th Floor", name: "Master Floor", description: "Reflexive mastery" },
+    { floor: t('prophecySuccess.floor1'), name: t('prophecySuccess.floor1Name'), description: t('prophecySuccess.floor1Desc') },
+    { floor: t('prophecySuccess.floor2'), name: t('prophecySuccess.floor2Name'), description: t('prophecySuccess.floor2Desc') },
+    { floor: t('prophecySuccess.floor3'), name: t('prophecySuccess.floor3Name'), description: t('prophecySuccess.floor3Desc') },
+    { floor: t('prophecySuccess.floor4'), name: t('prophecySuccess.floor4Name'), description: t('prophecySuccess.floor4Desc') },
+    { floor: t('prophecySuccess.floor5'), name: t('prophecySuccess.floor5Name'), description: t('prophecySuccess.floor5Desc') },
+    { floor: t('prophecySuccess.floor6'), name: t('prophecySuccess.floor6Name'), description: t('prophecySuccess.floor6Desc') },
+    { floor: t('prophecySuccess.floor7'), name: t('prophecySuccess.floor7Name'), description: t('prophecySuccess.floor7Desc') },
+    { floor: t('prophecySuccess.floor8'), name: t('prophecySuccess.floor8Name'), description: t('prophecySuccess.floor8Desc') },
   ];
 
   return (
@@ -129,15 +131,15 @@ export default function BibleProphecyGuideSuccess() {
             </motion.div>
 
             <Badge className="bg-green-500/10 text-green-600 border-green-500/20">
-              Purchase Complete
+              {t('prophecySuccess.purchaseComplete')}
             </Badge>
 
             <h1 className="text-3xl md:text-4xl font-bold">
-              Your Genesis Guide is Ready
+              {t('prophecySuccess.guideReady')}
             </h1>
 
             <p className="text-muted-foreground">
-              Thank you for your purchase. Click below to download your PDF.
+              {t('prophecySuccess.thankYou')}
             </p>
 
             <Card className="border-2 border-accent/30 bg-gradient-to-br from-accent/5 to-primary/5">
@@ -147,8 +149,8 @@ export default function BibleProphecyGuideSuccess() {
                     <BookOpen className="w-7 h-7 text-accent" />
                   </div>
                   <div className="text-left">
-                    <h3 className="font-semibold text-lg">Genesis in 6 Days</h3>
-                    <p className="text-sm text-muted-foreground">PDF Study Guide</p>
+                    <h3 className="font-semibold text-lg">{t('prophecySuccess.genesisInSixDays')}</h3>
+                    <p className="text-sm text-muted-foreground">{t('prophecySuccess.pdfStudyGuide')}</p>
                   </div>
                 </div>
 
@@ -161,12 +163,12 @@ export default function BibleProphecyGuideSuccess() {
                   {isDownloading ? (
                     <>
                       <Clock className="w-5 h-5 mr-2 animate-spin" />
-                      Preparing Download...
+                      {t('prophecySuccess.preparingDownload')}
                     </>
                   ) : (
                     <>
                       <Download className="w-5 h-5 mr-2" />
-                      Download Your PDF
+                      {t('prophecySuccess.downloadYourPdf')}
                     </>
                   )}
                 </Button>
@@ -188,17 +190,15 @@ export default function BibleProphecyGuideSuccess() {
             >
               <Badge variant="outline" className="text-primary border-primary/30">
                 <Building2 className="w-3 h-3 mr-2" />
-                You Just Entered One Room
+                {t('prophecySuccess.youJustEntered')}
               </Badge>
-              
+
               <h2 className="text-3xl md:text-4xl font-bold">
-                The Palace Has 8 Floors & 40+ Rooms
+                {t('prophecySuccess.palaceFloorsTitle')}
               </h2>
-              
+
               <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-                Genesis in 6 Days teaches you <strong className="text-foreground">one pattern</strong> from 
-                the <strong className="text-foreground">Story Room</strong> on the 1st Floor. 
-                But the Phototheology system is an entire Palace designed to transform how you study Scripture.
+                {t('prophecySuccess.palaceFloorsDescription')}
               </p>
             </motion.div>
 
@@ -219,7 +219,7 @@ export default function BibleProphecyGuideSuccess() {
                       <p className="text-xs text-muted-foreground mt-1">{floor.description}</p>
                       {index === 0 && (
                         <Badge className="mt-2 text-xs bg-accent/10 text-accent border-accent/20">
-                          You are here
+                          {t('prophecySuccess.youAreHere')}
                         </Badge>
                       )}
                     </CardContent>
@@ -241,30 +241,29 @@ export default function BibleProphecyGuideSuccess() {
                     <div className="space-y-4">
                       <Badge className="bg-primary/10 text-primary border-primary/20">
                         <Sparkles className="w-3 h-3 mr-2" />
-                        7-Day Free Trial
+                        {t('prophecySuccess.sevenDayFreeTrial')}
                       </Badge>
-                      
+
                       <h3 className="text-2xl font-bold">
-                        Ready to Explore the Entire Palace?
+                        {t('prophecySuccess.readyToExplore')}
                       </h3>
-                      
+
                       <p className="text-muted-foreground">
-                        Get unlimited access to all 8 Floors, 40+ Rooms, interactive training, 
-                        AI-guided study, and a community of serious Bible students.
+                        {t('prophecySuccess.getUnlimitedAccess')}
                       </p>
 
                       <ul className="space-y-2 text-sm text-muted-foreground">
                         <li className="flex items-center gap-2">
                           <CheckCircle className="w-4 h-4 text-primary" />
-                          Full Palace access - all Floors unlocked
+                          {t('prophecySuccess.fullPalaceAccess')}
                         </li>
                         <li className="flex items-center gap-2">
                           <CheckCircle className="w-4 h-4 text-primary" />
-                          AI study companion (Jeeves)
+                          {t('prophecySuccess.aiStudyCompanion')}
                         </li>
                         <li className="flex items-center gap-2">
                           <CheckCircle className="w-4 h-4 text-primary" />
-                          Cancel anytime - no obligation
+                          {t('prophecySuccess.cancelAnytime')}
                         </li>
                       </ul>
                     </div>
@@ -272,10 +271,10 @@ export default function BibleProphecyGuideSuccess() {
                     <div className="text-center">
                       <div className="mb-4">
                         <p className="text-4xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-                          Free for 7 Days
+                          {t('prophecySuccess.freeForSevenDays')}
                         </p>
                         <p className="text-sm text-muted-foreground mt-1">
-                          Then $9.99/month or $99/year
+                          {t('prophecySuccess.thenPricing')}
                         </p>
                       </div>
 
@@ -285,14 +284,14 @@ export default function BibleProphecyGuideSuccess() {
                         className="w-full text-lg py-6 h-auto shadow-lg shadow-primary/25"
                       >
                         <Link to="/pricing">
-                          Start Free Trial
+                          {t('prophecySuccess.startFreeTrial')}
                           <ArrowRight className="ml-2 w-5 h-5" />
                         </Link>
                       </Button>
 
                       <p className="text-xs text-muted-foreground mt-3">
                         <Users className="w-3 h-3 inline mr-1" />
-                        Join 2,000+ serious Bible students
+                        {t('prophecySuccess.joinStudents')}
                       </p>
                     </div>
                   </div>
@@ -307,33 +306,33 @@ export default function BibleProphecyGuideSuccess() {
       <section className="py-16">
         <div className="container mx-auto px-4">
           <div className="max-w-2xl mx-auto text-center space-y-6">
-            <h3 className="text-xl font-semibold">What to Do Next</h3>
-            
+            <h3 className="text-xl font-semibold">{t('prophecySuccess.whatToDoNext')}</h3>
+
             <div className="grid md:grid-cols-3 gap-4 text-sm">
               <Card className="border-accent/20">
                 <CardContent className="p-4">
                   <div className="w-8 h-8 bg-accent/10 rounded-full flex items-center justify-center mx-auto mb-2">
                     <span className="text-accent font-bold">1</span>
                   </div>
-                  <p className="text-muted-foreground">Download & read your Genesis guide</p>
+                  <p className="text-muted-foreground">{t('prophecySuccess.step1')}</p>
                 </CardContent>
               </Card>
-              
+
               <Card className="border-accent/20">
                 <CardContent className="p-4">
                   <div className="w-8 h-8 bg-accent/10 rounded-full flex items-center justify-center mx-auto mb-2">
                     <span className="text-accent font-bold">2</span>
                   </div>
-                  <p className="text-muted-foreground">Complete the 6-day study exercises</p>
+                  <p className="text-muted-foreground">{t('prophecySuccess.step2')}</p>
                 </CardContent>
               </Card>
-              
+
               <Card className="border-accent/20">
                 <CardContent className="p-4">
                   <div className="w-8 h-8 bg-accent/10 rounded-full flex items-center justify-center mx-auto mb-2">
                     <span className="text-accent font-bold">3</span>
                   </div>
-                  <p className="text-muted-foreground">Start your 7-day trial to explore all Floors</p>
+                  <p className="text-muted-foreground">{t('prophecySuccess.step3')}</p>
                 </CardContent>
               </Card>
             </div>

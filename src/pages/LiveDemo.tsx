@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react";
+import { useTranslation } from "react-i18next";
 import { motion } from "framer-motion";
 import { Radio, Users, Mic, MicOff, Monitor, MonitorOff, Video, VideoOff, ArrowLeft, MessageCircle, Send, Trash2, History } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -19,6 +20,7 @@ interface ChatMessage {
 }
 
 export default function LiveDemo() {
+  const { t } = useTranslation();
   const { user } = useAuth();
   const navigate = useNavigate();
   const { activeSession, viewers, viewerCount, isHost, loading, pastSessions, startSession, endSession, deleteSession, fetchPastSessions, joinSession, leaveSession } = useLiveDemo();
@@ -257,11 +259,11 @@ export default function LiveDemo() {
         <Card className="max-w-md w-full">
           <CardContent className="p-6 text-center">
             <Radio className="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
-            <h2 className="text-xl font-semibold mb-2">Sign In Required</h2>
+            <h2 className="text-xl font-semibold mb-2">{t('liveDemo.signInRequired')}</h2>
             <p className="text-muted-foreground mb-4">
-              You need to be signed in to watch live demonstrations.
+              {t('liveDemo.signInDescription')}
             </p>
-            <Button onClick={() => navigate('/auth')}>Sign In</Button>
+            <Button onClick={() => navigate('/auth')}>{t('common.signIn')}</Button>
           </CardContent>
         </Card>
       </div>
@@ -275,8 +277,8 @@ export default function LiveDemo() {
         <Card className="max-w-md w-full">
           <CardContent className="p-6 text-center">
             <Radio className="w-12 h-12 mx-auto mb-4 text-muted-foreground animate-pulse" />
-            <h2 className="text-xl font-semibold mb-2">Loading...</h2>
-            <p className="text-muted-foreground">Checking for live sessions...</p>
+            <h2 className="text-xl font-semibold mb-2">{t('common.loading')}</h2>
+            <p className="text-muted-foreground">{t('liveDemo.checkingForSessions')}</p>
           </CardContent>
         </Card>
       </div>
@@ -290,13 +292,13 @@ export default function LiveDemo() {
         <Card className="max-w-md w-full">
           <CardContent className="p-6 text-center">
             <Radio className="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
-            <h2 className="text-xl font-semibold mb-2">No Live Session</h2>
+            <h2 className="text-xl font-semibold mb-2">{t('liveDemo.noLiveSession')}</h2>
             <p className="text-muted-foreground mb-4">
-              There's no live demonstration happening right now. Check back later!
+              {t('liveDemo.noSessionDescription')}
             </p>
             <Button variant="outline" onClick={() => navigate(-1)}>
               <ArrowLeft className="w-4 h-4 mr-2" />
-              Go Back
+              {t('common.goBack')}
             </Button>
           </CardContent>
         </Card>
@@ -318,14 +320,14 @@ export default function LiveDemo() {
                 {activeSession && (
                   <div className="flex items-center gap-1.5 text-red-500">
                     <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse" />
-                    <span className="text-sm font-medium uppercase">Live</span>
+                    <span className="text-sm font-medium uppercase">{t('liveDemo.live')}</span>
                   </div>
                 )}
                 <h1 className="font-semibold">{activeSession?.title || sessionTitle}</h1>
               </div>
               <div className="flex items-center gap-1 text-sm text-muted-foreground">
                 <Users className="w-4 h-4" />
-                <span>{viewerCount} watching</span>
+                <span>{t('liveDemo.watching', { count: viewerCount })}</span>
               </div>
             </div>
           </div>
@@ -335,7 +337,7 @@ export default function LiveDemo() {
               {!activeSession ? (
                 <Button onClick={handleGoLive} className="bg-red-600 hover:bg-red-700">
                   <Radio className="w-4 h-4 mr-2" />
-                  Go Live
+                  {t('liveDemo.goLive')}
                 </Button>
               ) : (
                 <>
@@ -352,7 +354,7 @@ export default function LiveDemo() {
                     size="icon"
                     onClick={isCameraOn ? handleStopCamera : handleStartCamera}
                     className={isCameraOn ? "bg-primary text-primary-foreground" : ""}
-                    title={isCameraOn ? "Stop Camera" : "Start Camera"}
+                    title={isCameraOn ? t('liveDemo.stopCamera') : t('liveDemo.startCamera')}
                   >
                     {isCameraOn ? <Video className="w-4 h-4" /> : <VideoOff className="w-4 h-4" />}
                   </Button>
@@ -361,12 +363,12 @@ export default function LiveDemo() {
                     size="icon"
                     onClick={isScreenSharing ? handleStopScreenShare : handleStartScreenShare}
                     className={isScreenSharing ? "bg-primary text-primary-foreground" : ""}
-                    title={isScreenSharing ? "Stop Screen Share" : "Share Screen"}
+                    title={isScreenSharing ? t('liveDemo.stopScreenShare') : t('liveDemo.shareScreen')}
                   >
                     {isScreenSharing ? <Monitor className="w-4 h-4" /> : <MonitorOff className="w-4 h-4" />}
                   </Button>
                   <Button variant="destructive" onClick={handleEndStream}>
-                    End Stream
+                    {t('liveDemo.endStream')}
                   </Button>
                 </>
               )}
@@ -399,12 +401,12 @@ export default function LiveDemo() {
                     {isHost ? (
                       <>
                         <Video className="w-16 h-16 mx-auto mb-4 opacity-50" />
-                        <p>Click the camera or screen share button to start</p>
+                        <p>{t('liveDemo.clickToStart')}</p>
                       </>
                     ) : (
                       <>
                         <Radio className="w-16 h-16 mx-auto mb-4 opacity-50" />
-                        <p>Waiting for host to share screen...</p>
+                        <p>{t('liveDemo.waitingForHost')}</p>
                       </>
                     )}
                   </div>
@@ -416,25 +418,25 @@ export default function LiveDemo() {
             {isHost && !activeSession && (
               <Card>
                 <CardContent className="p-4">
-                  <h3 className="font-medium mb-3">Session Setup</h3>
+                  <h3 className="font-medium mb-3">{t('liveDemo.sessionSetup')}</h3>
                   <Input
                     value={sessionTitle}
                     onChange={(e) => setSessionTitle(e.target.value)}
-                    placeholder="Session title..."
+                    placeholder={t('liveDemo.sessionTitlePlaceholder')}
                     className="mb-3"
                   />
                   
                   {/* Camera Test Section */}
                   <div className="mb-4">
                     <div className="flex items-center justify-between mb-2">
-                      <span className="text-sm font-medium">Test Camera & Mic</span>
+                      <span className="text-sm font-medium">{t('liveDemo.testCameraMic')}</span>
                       <Button
                         variant={isTestingCamera ? "destructive" : "outline"}
                         size="sm"
                         onClick={handleTestCamera}
                       >
                         <Video className="w-4 h-4 mr-2" />
-                        {isTestingCamera ? "Stop Test" : "Test Camera"}
+                        {isTestingCamera ? t('liveDemo.stopTest') : t('liveDemo.testCamera')}
                       </Button>
                     </div>
                     
@@ -449,14 +451,14 @@ export default function LiveDemo() {
                           style={{ transform: 'scaleX(-1)' }}
                         />
                         <div className="absolute bottom-2 left-2 bg-green-500/80 text-white text-xs px-2 py-1 rounded">
-                          Camera & Mic Active
+                          {t('liveDemo.cameraMicActive')}
                         </div>
                       </div>
                     )}
                   </div>
                   
                   <p className="text-sm text-muted-foreground">
-                    When you go live, all active subscribers will be notified.
+                    {t('liveDemo.goLiveNotice')}
                   </p>
                 </CardContent>
               </Card>
@@ -468,7 +470,7 @@ export default function LiveDemo() {
                 <CardContent className="p-4">
                   <h3 className="font-medium mb-3 flex items-center gap-2">
                     <History className="w-4 h-4" />
-                    Past Sessions
+                    {t('liveDemo.pastSessions')}
                   </h3>
                   <div className="space-y-2">
                     {pastSessions.map((session) => (
@@ -506,7 +508,7 @@ export default function LiveDemo() {
                 <CardContent className="p-4">
                   <h3 className="font-medium mb-3 flex items-center gap-2">
                     <Users className="w-4 h-4" />
-                    Viewers ({viewerCount})
+                    {t('liveDemo.viewers', { count: viewerCount })}
                   </h3>
                   <div className="flex flex-wrap gap-2">
                     {viewers.slice(0, 20).map((viewer, i) => (
@@ -519,7 +521,7 @@ export default function LiveDemo() {
                     ))}
                     {viewerCount > 20 && (
                       <div className="px-3 py-1 bg-muted rounded-full text-sm text-muted-foreground">
-                        +{viewerCount - 20} more
+                        {t('liveDemo.moreViewers', { count: viewerCount - 20 })}
                       </div>
                     )}
                   </div>
@@ -533,7 +535,7 @@ export default function LiveDemo() {
             <div className="p-4 border-b">
               <h3 className="font-medium flex items-center gap-2">
                 <MessageCircle className="w-4 h-4" />
-                Live Chat
+                {t('liveDemo.liveChat')}
               </h3>
             </div>
             
@@ -547,7 +549,7 @@ export default function LiveDemo() {
                 ))}
                 {chatMessages.length === 0 && (
                   <p className="text-center text-muted-foreground text-sm py-8">
-                    No messages yet. Say hi! 👋
+                    {t('liveDemo.noMessages')}
                   </p>
                 )}
               </div>
@@ -564,7 +566,7 @@ export default function LiveDemo() {
                 <Input
                   value={newMessage}
                   onChange={(e) => setNewMessage(e.target.value)}
-                  placeholder="Send a message..."
+                  placeholder={t('liveDemo.sendMessagePlaceholder')}
                   disabled={!activeSession}
                 />
                 <Button type="submit" size="icon" disabled={!activeSession || !newMessage.trim()}>
