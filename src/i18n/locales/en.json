@@ -1703,5 +1703,380 @@
     "failedToUpdateComment": "Failed to update comment",
     "failedToDeletePost": "Failed to delete post",
     "failedToUpdatePost": "Failed to update post"
+  },
+  "pricing": {
+    "seo": {
+      "title": "Pricing — Phototheology Palace",
+      "description": "Choose the plan that fits your journey through the Phototheology Palace."
+    },
+    "hero": {
+      "badge": "Start Your Journey",
+      "title": "Your Palace Awaits",
+      "subtitle": "Unlock the full Phototheology experience with a plan that fits your journey.",
+      "afterTrial": "All plans include a 7-day free trial. Cancel anytime."
+    },
+    "billing": {
+      "monthly": "Monthly",
+      "annual": "Annual",
+      "annualSavingsBadge": "Save up to 17% with annual billing!"
+    },
+    "trialCta": {
+      "badge": "Most Popular",
+      "title": "Start Your 7-Day Free Trial",
+      "descriptionPrefix": "Get",
+      "instantAccess": "instant access",
+      "descriptionSuffix": "to all Palace floors, AI tools, and games.",
+      "noCharge": "No charge for 7 days",
+      "cancelAnytime": "Cancel anytime",
+      "starting": "Starting trial...",
+      "startButton": "Start Free Trial Now",
+      "reminder": "You'll be reminded before your trial ends."
+    },
+    "accessCode": {
+      "prompt": "Have an access code?",
+      "redeem": "Redeem Access Code"
+    },
+    "church": {
+      "title": "Church Plans",
+      "description": "Equip your entire congregation with Phototheology tools, campaigns, and analytics.",
+      "campaigns": "Campaigns",
+      "memberManagement": "Member Management",
+      "analytics": "Analytics",
+      "viewPlans": "View Church Plans"
+    },
+    "mostPopular": "Most Popular",
+    "perMonth": "/ month",
+    "perYear": "/ year",
+    "processing": "Processing...",
+    "annualLabel": "(Annual)",
+    "monthlyLabel": "(Monthly)",
+    "plans": {
+      "trial": {
+        "name": "Free Trial",
+        "period": "7 days",
+        "description": "Experience everything free for 7 days.",
+        "badge": "Try Free",
+        "cta": "Start Free Trial",
+        "features": {
+          "allFloors": "All 8 Palace floors",
+          "unlimitedAI": "Unlimited AI tools",
+          "allGames": "All games & challenges",
+          "sevenDaysFree": "7 days completely free",
+          "cancelAnytime": "Cancel anytime"
+        }
+      },
+      "essential": {
+        "name": "Essential",
+        "period": "month",
+        "description": "Core Palace experience for personal study.",
+        "badge": "Great Value",
+        "cta": "Subscribe",
+        "annualSavings": "Save $18/year",
+        "features": {
+          "allFloors": "All 8 Palace floors",
+          "bibleReader": "Phototheology Study Bible",
+          "coreGames": "Core games & challenges",
+          "basicAI": "Basic AI study tools",
+          "emailSupport": "Email support"
+        }
+      },
+      "premium": {
+        "name": "Premium",
+        "period": "month",
+        "description": "Full access with advanced AI and training.",
+        "badge": "Best Value",
+        "cta": "Subscribe",
+        "annualSavings": "Save $30/year",
+        "features": {
+          "allFloors": "All 8 Palace floors",
+          "artOfWar": "Art of War Spiritual Training",
+          "specializedAI": "Specialized AI tools",
+          "unlimitedHunts": "Unlimited treasure hunts",
+          "prioritySupport": "Priority support"
+        }
+      }
+    },
+    "comparison": {
+      "title": "Compare All Plans",
+      "feature": "Feature",
+      "freeTrial": "Free Trial",
+      "essential": "Essential",
+      "premium": "Premium",
+      "limited": "Limited",
+      "basic": "Basic",
+      "email": "Email",
+      "rows": {
+        "palace": "8 Palace Floors",
+        "bibleReader": "Study Bible",
+        "coreGames": "Core Games",
+        "basicAI": "Basic AI",
+        "artOfWar": "Art of War Training",
+        "specializedAI": "Specialized AI",
+        "escapeRooms": "Escape Rooms",
+        "prioritySupport": "Priority Support"
+      }
+    },
+    "cardUpfront": {
+      "title": "Why We Ask for a Card Upfront",
+      "description": "We believe in full transparency. Here's why we request payment information at the start of your free trial:",
+      "aiCosts": {
+        "title": "AI Costs Are Real",
+        "description": "Every AI interaction costs us money. Your card helps us provide unlimited AI access during the trial."
+      },
+      "sustainability": {
+        "title": "Sustainability",
+        "description": "This model helps us keep the Palace running and continuously improving for everyone."
+      },
+      "noCharge": {
+        "title": "No Charge for 7 Days",
+        "description": "You won't be charged a single cent during your trial. Cancel anytime before it ends."
+      }
+    },
+    "faq": {
+      "title": "Frequently Asked Questions",
+      "cancelAnytime": {
+        "question": "Can I cancel anytime?",
+        "answer": "Yes! You can cancel your subscription at any time. Your access continues until the end of your billing period."
+      },
+      "paymentMethods": {
+        "question": "What payment methods do you accept?",
+        "answer": "We accept all major credit cards through Stripe, our secure payment processor."
+      },
+      "whyCard": {
+        "question": "Why do you need my card for a free trial?",
+        "answer": "The card ensures a seamless transition if you decide to continue. You won't be charged during the trial period."
+      },
+      "cantAfford": {
+        "question": "What if I can't afford a subscription?",
+        "answerPrefix": "We believe everyone should have access to quality Bible study tools.",
+        "reachOut": "Reach out to us",
+        "answerSuffix": "and we'll work something out."
+      }
+    },
+    "toasts": {
+      "trialStarted": "Welcome! Your free trial has started.",
+      "trialCancelled": "Trial was cancelled.",
+      "subscriptionCancelled": "Subscription was cancelled.",
+      "lifetimeAccess": "You already have lifetime access!",
+      "studentAccess": "You have student access!",
+      "activeSubscription": "You already have an active subscription!",
+      "patreonLinked": "Patreon membership linked successfully!",
+      "pickaxeLinked": "Pickaxe membership linked successfully!",
+      "trialFailed": "Failed to start trial. Please try again.",
+      "subscriptionFailed": "Failed to start subscription. Please try again."
+    }
+  },
+  "series": {
+    "buildSeriesTitle": "Bible Study Series Builder",
+    "buildSeriesDescription": "Create engaging, Palace-structured Bible studies that lead people floor by floor through Scripture.",
+    "backToSeries": "Back to Series",
+    "lessonCount": "{{count}} Lessons",
+    "lessonNumber": "Lesson {{number}}",
+    "present": "Present",
+    "lessons": "Lessons",
+    "noLessonsYet": "No lessons have been created yet.",
+    "createNewSeries": "Create New Series",
+    "startFromTemplate": "Start From Template",
+    "discoverPublicSeries": "Discover Public Series",
+    "yourSeries": "Your Series",
+    "enrolledSeries": "Enrolled Series",
+    "enrolled": "Enrolled",
+    "errorLoadSeries": "Failed to load series"
+  },
+  "courses": {
+    "guidedLearningBadge": "Guided Learning",
+    "pageTitle": "Courses",
+    "pageDescription": "Structured, multi-week journeys through the Phototheology Palace — designed for all ages.",
+    "ageGroupCount": "{{count}} Age Groups",
+    "ageGroupsAvailable": "Age Groups Available",
+    "whatYoullLearn": "What You'll Learn",
+    "startCourse": "Start Course",
+    "ageGroups": {
+      "adults": "Adults",
+      "ages5to8": "Ages 5–8",
+      "ages9to12": "Ages 9–12",
+      "ages13to16": "Ages 13–16",
+      "kids6to12": "Kids 6–12",
+      "kids": "Kids"
+    },
+    "phototheology": {
+      "title": "Phototheology 50-Day Course",
+      "description": "A comprehensive 50-day journey through all 8 floors of the Phototheology Palace.",
+      "duration": "50 Days",
+      "level": "Beginner → Advanced",
+      "features": {
+        "dailyLessons": "Daily guided lessons",
+        "progressiveSkills": "Progressive skill building",
+        "allFloors": "All 8 Palace floors covered",
+        "ageAppropriate": "Age-appropriate versions"
+      }
+    },
+    "blueprint": {
+      "title": "The Blueprint Course",
+      "description": "Discover the sanctuary, prophecy, and God's master plan through the Palace lens.",
+      "duration": "30 Days",
+      "level": "Intermediate",
+      "features": {
+        "prophecyFoundations": "Prophecy foundations",
+        "sanctuarySymbolism": "Sanctuary symbolism",
+        "endTimeEvents": "End-time events",
+        "kidFriendly": "Kid-friendly version available"
+      }
+    },
+    "daniel": {
+      "title": "Daniel Course",
+      "description": "Walk through the book of Daniel chapter by chapter using Phototheology principles.",
+      "duration": "42 Days",
+      "level": "Intermediate",
+      "features": {
+        "chapterByChapter": "Chapter-by-chapter study",
+        "prophecyInterpretation": "Prophecy interpretation",
+        "historicalContext": "Historical context",
+        "visualMemoryAids": "Visual memory aids"
+      }
+    },
+    "revelation": {
+      "title": "Revelation Course",
+      "description": "Unveil the symbols and messages of Revelation through the Palace framework.",
+      "duration": "60 Days",
+      "level": "Advanced",
+      "features": {
+        "symbolInterpretation": "Symbol interpretation",
+        "threeAngelsMessages": "Three Angels' Messages",
+        "sanctuaryConnections": "Sanctuary connections",
+        "engagingKidsVersion": "Engaging kids' version"
+      }
+    },
+    "phototheologyCourse": {
+      "pageTitle": "Phototheology 50-Day Course",
+      "pageDescription": "A comprehensive 50-day journey through the Phototheology Palace.",
+      "palaceStructureTitle": "Palace Structure",
+      "floor1Label": "Floor 1: Furnishing",
+      "floor1Description": "Memory & Visualization",
+      "floor2Label": "Floor 2: Investigation",
+      "floor2Description": "Detective Work",
+      "floor3Label": "Floor 3: Freestyle",
+      "floor3Description": "Spontaneous Connections",
+      "floor4Label": "Floor 4: Next Level",
+      "floor4Description": "Christ-Centered Depth",
+      "floors5to6Label": "Floors 5–6: Vision & Heavens",
+      "floors5to6Description": "Prophecy & Cosmic Context",
+      "floors7to8Label": "Floors 7–8: Spiritual & Master",
+      "floors7to8Description": "Transformation & Mastery",
+      "week7Label": "Week 7: Integration",
+      "week7Description": "Putting it all together",
+      "day50Label": "Day 50: Graduation",
+      "day50Description": "Reflexive Phototheology",
+      "activityLabel": "Activity",
+      "dailyTipsTitle": "Daily Tips",
+      "tip1": "Take your time with each day's lesson.",
+      "tip2": "Journal your discoveries and gems.",
+      "tip3": "Practice freestyling throughout the day.",
+      "tip4": "Pray before and after each session.",
+      "congratulationsDay50": "Congratulations! You've completed the 50-Day Course!"
+    },
+    "danielCourse": {
+      "pageTitle": "Daniel Course",
+      "pageDescription": "Walk through Daniel chapter by chapter using Phototheology principles.",
+      "courseStructureTitle": "Course Structure",
+      "week1Label": "Week 1",
+      "week1Description": "Daniel 1–2: Foundations",
+      "week2Label": "Week 2",
+      "week2Description": "Daniel 3–4: Testing & Humbling",
+      "week3Label": "Week 3",
+      "week3Description": "Daniel 5–6: Judgment & Faithfulness",
+      "week4Label": "Week 4",
+      "week4Description": "Daniel 7: Beasts & Kingdom",
+      "week5Label": "Week 5",
+      "week5Description": "Daniel 8–9: Sanctuary & Time",
+      "week6Label": "Week 6",
+      "week6Description": "Daniel 10–12: Final Visions",
+      "selectDayDescription": "Choose a day from the calendar above to begin your study.",
+      "goalsHeading": "Course Goals",
+      "goal1": "Understand Daniel through Phototheology principles",
+      "goal2": "See Christ in every chapter",
+      "goal3": "Map prophecy using the Palace framework",
+      "goal4": "Build visual memory of Daniel's visions"
+    },
+    "faq": {
+      "title": "Frequently Asked Questions",
+      "whichCourseQuestion": "Which course should I start with?",
+      "whichCourseAnswer": "We recommend the Phototheology 50-Day Course for beginners. It covers all 8 floors progressively.",
+      "kidsVersionQuestion": "Are there versions for kids?",
+      "kidsVersionAnswer": "Yes! Most courses include age-appropriate versions for children and teens.",
+      "switchAgeGroupQuestion": "Can I switch age groups mid-course?",
+      "switchAgeGroupAnswer": "Absolutely. You can switch between age groups at any time while keeping your progress.",
+      "courseOrderQuestion": "Do I need to take courses in order?",
+      "courseOrderAnswer": "While we recommend starting with the 50-Day Course, you can begin with any course that interests you."
+    }
+  },
+  "training": {
+    "spiritual": {
+      "title": "Spiritual Training Dojo",
+      "heroQuote": "Put on the whole armor of God, that ye may be able to stand against the wiles of the devil. — Ephesians 6:11",
+      "heroBadge": "Train Like a Warrior of Light",
+      "todaysVictoryThought": "Today's Victory Thought",
+      "dailyEncouragementDesc": "Daily spiritual encouragement to fuel your walk",
+      "getEncouragement": "Get Today's Encouragement",
+      "combatArena": "Combat Arena",
+      "lessons": "Lessons",
+      "thirtyDayChallenge": "30-Day Challenge",
+      "characterTracker": "Character Tracker",
+      "battleScenarios": "Battle Scenarios",
+      "weapons": "Weapons",
+      "artOfWarManual": "Art of War Manual",
+      "artOfWarDesc": "Master the spiritual disciplines one lesson at a time.",
+      "lessonsProgress": "Progress: {{completed}}/{{total}} completed",
+      "whatWouldYouDo": "What Would You Do?",
+      "scenariosDesc": "Test your spiritual readiness with real-life scenarios.",
+      "beginTraining": "Begin Training",
+      "whichFruitsQuestion": "Which fruits, animal style, and weapon would you deploy?",
+      "styleLabel": "Style",
+      "weaponLabel": "Weapon",
+      "chooseAnotherScenario": "Choose Another Scenario",
+      "besettingSinsTitle": "Besetting Sins",
+      "besettingSinsDesc": "Know your enemy. Identify the spiritual weaknesses and their counters.",
+      "counterWith": "Counter with",
+      "animalStyleLabel": "Animal Style",
+      "animalStylesTitle": "Animal Styles of Spiritual Combat",
+      "animalStylesDesc": "Each biblical animal represents a unique combat posture and spiritual trait.",
+      "armorOfGodTitle": "The Armor of God",
+      "armorOfGodDesc": "Equip yourself with the full armor described in Ephesians 6.",
+      "applyWeaponsTitle": "Apply Weapons to Life",
+      "applyWeaponsDesc": "Describe a situation and get AI-guided counsel on applying a specific piece of armor.",
+      "selectWeapon": "Select a Weapon",
+      "chooseWeaponPlaceholder": "Choose a weapon...",
+      "describeSituation": "Describe Your Situation",
+      "situationPlaceholder": "e.g., I'm struggling with anxiety about my future...",
+      "gettingGuidance": "Getting guidance...",
+      "getApplicationGuidance": "Get Application Guidance",
+      "fruitsOfSpiritTitle": "Fruits of the Spirit",
+      "fruitsOfSpiritDesc": "The nine fruits of the Spirit from Galatians 5:22–23.",
+      "phototheologyCourse": "Phototheology Course",
+      "phototheologyCourseDesc": "50-day comprehensive journey through the Palace.",
+      "danielCourse": "Daniel Course",
+      "danielCourseDesc": "Study Daniel chapter by chapter with Phototheology.",
+      "blueprintCourse": "The Blueprint Course",
+      "blueprintCourseDesc": "Discover prophecy and sanctuary through the Palace.",
+      "revelationCourse": "Revelation Course",
+      "revelationCourseDesc": "Unveil Revelation's symbols through the Palace framework.",
+      "startCourse": "Start Course",
+      "adultVersion": "Adult Version",
+      "kidsVersion": "Kids Version",
+      "courseComingSoon": "Coming soon!",
+      "divineObjectiveTitle": "The Divine Objective",
+      "divineObjectiveDesc": "Every warrior has a mission. Yours is twofold:",
+      "contain": "Contain",
+      "containDesc": "Contain the spread of sin through self-control, discipline, and the armor of God.",
+      "destroy": "Destroy",
+      "destroyDesc": "Destroy the works of darkness through the Sword of the Spirit and prayer.",
+      "loginToSave": "Please log in to save progress.",
+      "lessonSaved": "Lesson progress saved!",
+      "failedToSave": "Failed to save lesson progress.",
+      "failedToFetchEncouragement": "Failed to get encouragement.",
+      "selectWeaponAndSituation": "Please select a weapon and describe your situation.",
+      "guidanceReceived": "Guidance received!",
+      "failedToGetGuidance": "Failed to get guidance."
+    }
   }
 }
