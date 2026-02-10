@@ -402,6 +402,38 @@ const Schedule = () => {
                     </div>
                   )}
 
+                  {/* Date and Time - REQUIRED, show first */}
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <Label htmlFor="date" className="flex items-center gap-1">
+                        <Calendar className="h-3 w-3" />
+                        Date <span className="text-red-500">*</span>
+                      </Label>
+                      <Input
+                        id="date"
+                        type="date"
+                        min={minDate}
+                        value={scheduledDate}
+                        onChange={(e) => setScheduledDate(e.target.value)}
+                        className="mt-1"
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="time" className="flex items-center gap-1">
+                        <Clock className="h-3 w-3" />
+                        Time <span className="text-red-500">*</span>
+                      </Label>
+                      <Input
+                        id="time"
+                        type="time"
+                        min={scheduledDate === minDate ? minTime : undefined}
+                        value={scheduledTime}
+                        onChange={(e) => setScheduledTime(e.target.value)}
+                        className="mt-1"
+                      />
+                    </div>
+                  </div>
+
                   {/* Title */}
                   <div>
                     <Label htmlFor="title">Title</Label>
@@ -581,30 +613,6 @@ const Schedule = () => {
                       onChange={(e) => setDescription(e.target.value)}
                       rows={2}
                     />
-                  </div>
-
-                  {/* Date and Time */}
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <Label htmlFor="date">Date</Label>
-                      <Input
-                        id="date"
-                        type="date"
-                        min={minDate}
-                        value={scheduledDate}
-                        onChange={(e) => setScheduledDate(e.target.value)}
-                      />
-                    </div>
-                    <div>
-                      <Label htmlFor="time">Time</Label>
-                      <Input
-                        id="time"
-                        type="time"
-                        min={scheduledDate === minDate ? minTime : undefined}
-                        value={scheduledTime}
-                        onChange={(e) => setScheduledTime(e.target.value)}
-                      />
-                    </div>
                   </div>
 
                 </>
