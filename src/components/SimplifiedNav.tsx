@@ -15,6 +15,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
 import { GlobalSearch } from "./GlobalSearch";
 import { NavigationStyleToggle } from "./NavigationStyleToggle";
+import { NotificationCenter } from "@/components/NotificationCenter";
 import { BackButton } from "@/components/BackButton";
 import { useUserPreferences } from "@/hooks/useUserPreferences";
 
@@ -198,6 +199,8 @@ export const SimplifiedNav = () => {
           <GlobalSearch />
           
           <NavigationStyleToggle />
+          
+          <NotificationCenter />
           
           <Button asChild variant="ghost" size="sm" className="hidden md:flex">
             <Link to="/pricing"><Crown className="h-4 w-4 mr-1" />Upgrade</Link>
