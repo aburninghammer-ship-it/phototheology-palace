@@ -1604,5 +1604,29 @@
       "doctrines": { "name": "Doctrines", "description": "Biblical doctrinal teachings and positions" },
       "animals": { "name": "Animals", "description": "Animals and their biblical significance" }
     }
+  },
+  "devotionals": {
+    "pageTitle": "Devotionals",
+    "pageSubtitle": "Daily spiritual nourishment for you and those you love",
+    "howToUse": "How to Use",
+    "quickDevotion": "Quick Devotion",
+    "oneDayThemed": "One-day themed devotional",
+    "createPlan": "Create Plan",
+    "multiDayJourney": "Multi-day devotional journey",
+    "createProfile": "Create Profile",
+    "ministerToLovedOnes": "Minister to loved ones",
+    "church": "Church",
+    "dailyForCongregation": "Daily for your congregation",
+    "fiveFormats": "5 Formats",
+    "formatsDescription": "Choose your devotional style",
+    "voiceChatRoom": "Devotionals Voice Chat",
+    "autoTextRecipients": "Auto-Text Recipients",
+    "activeCount": "{{count}} active",
+    "plusMore": "+{{count}} more",
+    "manage": "Manage",
+    "tabPersonal": "Personal",
+    "tabChurch": "Church",
+    "tabSMS": "SMS",
+    "tabStudy": "Study"
   }
 }
