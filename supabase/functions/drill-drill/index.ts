@@ -197,7 +197,7 @@ ${isThoughtDrill ? `- Connect the thought to relevant Scripture in each response
 - Show how the thought relates to each room's principles` : ''}
 
 ROOM LIST (each variation covers ALL ${roomCount} rooms):
-${rooms.map((r: any, i: number) => `${i + 1}. ${r.tag} (${r.name}): ${r.coreQuestion}`).join('\n')}
+${rooms.map((r: any, i: number) => `${i + 1}. roomId="${r.id}" ${r.tag} (${r.name}): ${r.coreQuestion}`).join('\n')}
 
 SPECIAL INSTRUCTION FOR QUESTIONS ROOM (QR):
 In EACH variation, generate EXACTLY 15 questions with different focus:
@@ -215,7 +215,7 @@ ${isThoughtDrill ? `\nThis is a THEOLOGICAL THOUGHT/IDEA to analyze through the 
 🎯 Generate THREE DISTINCT DRILL VARIATIONS, each analyzing ALL ${roomCount} rooms with different principle combinations.
 
 ROOMS TO ANALYZE (${roomCount} total, covered in EACH variation):
-${rooms.map((r: any, i: number) => `${i + 1}. [${r.tag}] ${r.name} - "${r.coreQuestion}"`).join('\n')}
+${rooms.map((r: any, i: number) => `${i + 1}. roomId="${r.id}" [${r.tag}] ${r.name} - "${r.coreQuestion}"`).join('\n')}
 
 VARIATION THEMES:
 - Variation 1 (Christ-Centered): Prioritize typology, sanctuary, prophecy, symbols pointing to Christ
@@ -231,6 +231,8 @@ CRITICAL REQUIREMENTS:
 6. DO NOT SKIP ANY ROOM in any variation
 ${isThoughtDrill ? `7. Connect every room's response to relevant Scripture passages` : ""}
 
+IMPORTANT: Use the exact roomId values from the ROOMS TO ANALYZE list above (e.g., "sr", "ir", "or", etc.).
+
 Return JSON format:
 {
   "variations": [
@@ -238,7 +240,7 @@ Return JSON format:
       "theme": "Christ-Centered",
       "description": "Brief description of this variation's focus",
       "responses": [
-        { "roomId": "sr", "response": "..." },
+        { "roomId": "<use exact roomId from list>", "response": "..." },
         ... (ALL ${roomCount} rooms)
       ]
     },
@@ -246,7 +248,7 @@ Return JSON format:
       "theme": "Practical Application",
       "description": "Brief description of this variation's focus",
       "responses": [
-        { "roomId": "sr", "response": "..." },
+        { "roomId": "<use exact roomId from list>", "response": "..." },
         ... (ALL ${roomCount} rooms)
       ]
     },
@@ -254,7 +256,7 @@ Return JSON format:
       "theme": "Cosmic Context",
       "description": "Brief description of this variation's focus",
       "responses": [
-        { "roomId": "sr", "response": "..." },
+        { "roomId": "<use exact roomId from list>", "response": "..." },
         ... (ALL ${roomCount} rooms)
       ]
     }
