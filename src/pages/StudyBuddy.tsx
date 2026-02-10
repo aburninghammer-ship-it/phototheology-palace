@@ -1859,7 +1859,7 @@ Jeeves sees your notes and will spark connections, suggest PT rooms, source clai
                           className="flex justify-center pt-2"
                         >
                           <QuickShareButton
-                            title={`📚 Study Buddy Insight: ${sessionTitle || currentBook + " " + currentChapter}`}
+                            title={`📚 Study Buddy Insight: ${sessionTitle || 'Bible Study'}`}
                             content={`${analysis.overallResponse.slice(0, 200)}${analysis.overallResponse.length > 200 ? '...' : ''}\n\n${analysis.sparks?.length ? `💡 ${analysis.sparks.length} sparks discovered` : ''}`}
                             type="insight"
                             variant="outline"

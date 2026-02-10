@@ -11732,6 +11732,7 @@ export type Database = {
           created_at: string
           description: string | null
           game_mode: string
+          game_options: Json | null
           game_type: string
           host_name: string
           host_user_id: string
@@ -11748,6 +11749,7 @@ export type Database = {
           created_at?: string
           description?: string | null
           game_mode?: string
+          game_options?: Json | null
           game_type?: string
           host_name: string
           host_user_id: string
@@ -11764,6 +11766,7 @@ export type Database = {
           created_at?: string
           description?: string | null
           game_mode?: string
+          game_options?: Json | null
           game_type?: string
           host_name?: string
           host_user_id?: string
