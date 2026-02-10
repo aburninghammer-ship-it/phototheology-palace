@@ -69,7 +69,7 @@ export function useLiveNotifications() {
     });
 
     globalChannel
-      .on('broadcast', { event: 'event-scheduled' }, (payload) => {
+      .on('broadcast', { event: 'event-scheduled' }, async (payload) => {
         const { title, hostName, scheduledAt } = payload.payload;
         const when = new Date(scheduledAt);
         const timeStr = when.toLocaleString(undefined, {
@@ -84,6 +84,18 @@ export function useLiveNotifications() {
           },
           duration: 8000,
         });
+
+        // Persist to notifications table so it shows in the bell
+        if (user) {
+          await supabase.from('notifications').insert({
+            user_id: user.id,
+            type: 'event_scheduled',
+            title: '📅 New Event Scheduled!',
+            message: `"${title}" by ${hostName} — ${timeStr}`,
+            link: '/schedule',
+            is_read: false,
+          });
+        }
       })
       .subscribe();
 
