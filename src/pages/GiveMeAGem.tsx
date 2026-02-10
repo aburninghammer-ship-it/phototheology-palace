@@ -9,6 +9,7 @@ import { useGemLimit } from "@/hooks/useGemLimit";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { Progress } from "@/components/ui/progress";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -63,6 +64,15 @@ const DEPTH_TIERS = [
   { id: "deep", name: "Deep Gem", gems: 3, description: "Multi-layered with cross-references", color: "border-purple-400 bg-purple-500/10" },
 ];
 
+// Gem Prospector Ranks
+const GEM_RANKS = [
+  { name: "Seeker", tier: "ROUGH STONE", minGems: 0, icon: "🪨", color: "bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-100" },
+  { name: "Collector", tier: "POLISHED STONE", minGems: 5, icon: "💎", color: "bg-emerald-100 dark:bg-emerald-900 text-emerald-800 dark:text-emerald-100" },
+  { name: "Prospector", tier: "SILVER VEIN", minGems: 15, icon: "⛏️", color: "bg-slate-200 dark:bg-slate-700 text-slate-800 dark:text-slate-100" },
+  { name: "Jeweler", tier: "GOLD VEIN", minGems: 30, icon: "🏅", color: "bg-amber-100 dark:bg-amber-900 text-amber-800 dark:text-amber-100" },
+  { name: "Gem Master", tier: "DIAMOND CUT", minGems: 50, icon: "👑", color: "bg-gradient-to-r from-yellow-400 to-amber-500 text-black" },
+];
+
 interface GemData {
   title: string;
   content: string;
@@ -84,9 +94,9 @@ export default function GiveMeAGem() {
   const navigate = useNavigate();
   const { user, loading: authLoading } = useAuth();
   const { preferences } = useUserPreferences();
-  const { isSabbath, canCreateGem, getLimitMessage } = useGemLimit();
+  const { isSabbath, canCreateGem, getLimitMessage, gemsRemaining } = useGemLimit();
 
-  // Selection state (before generating)
+  // Selection state
   const [selectedStyle, setSelectedStyle] = useState("random");
   const [selectedDepth, setSelectedDepth] = useState("study");
   const [passageInput, setPassageInput] = useState("");
@@ -107,7 +117,24 @@ export default function GiveMeAGem() {
   const [expansions, setExpansions] = useState<Expansion[]>([]);
   const [showExpansions, setShowExpansions] = useState(true);
 
+  // Gem rank state
+  const [totalGemsSaved, setTotalGemsSaved] = useState(0);
+
   const gemContentRef = useRef<HTMLDivElement>(null);
+
+  // Fetch gem count for rank
+  useEffect(() => {
+    const fetchGemCount = async () => {
+      if (!user) return;
+      const { count } = await supabase
+        .from('deck_studies')
+        .select('*', { count: 'exact', head: true })
+        .eq('user_id', user.id)
+        .eq('is_gem', true);
+      setTotalGemsSaved(count || 0);
+    };
+    fetchGemCount();
+  }, [user, isSaved]);
 
   // Check for Gem of the Day in localStorage
   useEffect(() => {
@@ -124,6 +151,20 @@ export default function GiveMeAGem() {
       }
     }
   }, [gemMode]);
+
+  const getCurrentGemRank = () => [...GEM_RANKS].reverse().find(r => totalGemsSaved >= r.minGems) || GEM_RANKS[0];
+  const getNextGemRank = () => {
+    const idx = GEM_RANKS.findIndex(r => r.name === getCurrentGemRank().name);
+    return GEM_RANKS[idx + 1] || null;
+  };
+  const getGemProgress = () => {
+    const current = getCurrentGemRank();
+    const next = getNextGemRank();
+    if (!next) return 100;
+    const into = totalGemsSaved - current.minGems;
+    const needed = next.minGems - current.minGems;
+    return Math.min((into / needed) * 100, 100);
+  };
 
   // Redirect to auth if not logged in
   if (!authLoading && !user) {
@@ -323,62 +364,101 @@ export default function GiveMeAGem() {
   const selectedStyleInfo = GEM_STYLES.find((s) => s.id === selectedStyle);
   const revealedStyleInfo = GEM_STYLES.find((s) => s.id === revealedStyle);
 
+  const gemRank = getCurrentGemRank();
+  const nextGemRank = getNextGemRank();
+  const gemProgress = getGemProgress();
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-teal-50/30 to-cyan-50/20 dark:from-slate-950 dark:via-emerald-950/10 dark:to-slate-900">
+    <div className="min-h-screen bg-gradient-to-br from-amber-950/30 via-background to-emerald-950/20">
       <NavComponent />
 
       <main className="container mx-auto px-4 py-8 pt-20 pb-24 max-w-4xl">
-        {/* Header */}
-        <div className="text-center mb-8">
-          <motion.div
-            initial={{ scale: 0.9, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            className="inline-flex items-center justify-center p-4 rounded-full bg-gradient-to-br from-emerald-500/20 to-teal-500/20 mb-4"
-          >
-            <Gem className="h-12 w-12 text-emerald-600 dark:text-emerald-400" />
-          </motion.div>
-          <h1 className="text-3xl sm:text-4xl font-bold text-emerald-900 dark:text-emerald-100 mb-2">
-            Give Me A Gem
-          </h1>
-          <p className="text-muted-foreground max-w-xl mx-auto">
-            Discover hidden connections in Scripture. Choose your gem type and
-            depth, then let Jeeves reveal the treasure.
-          </p>
-          
-          {/* Gem Schedule Info */}
-          <div className="mt-4 inline-flex items-center gap-2 px-4 py-2 rounded-full bg-emerald-100/50 dark:bg-emerald-900/30 border border-emerald-200/50 dark:border-emerald-800/50 text-sm">
-            <span className="text-muted-foreground">Weekly rhythm:</span>
-            <div className="flex items-center gap-1">
-              {['S', 'M', 'T', 'W', 'T', 'F', 'S'].map((day, i) => {
-                const gems = i === 5 ? 2 : i === 6 ? 0 : 1;
-                const isToday = i === new Date().getDay();
-                const isSabbathDay = i === 6;
-                return (
-                  <div 
-                    key={i}
-                    className={cn(
-                      "w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-semibold transition-all",
-                      isToday && "ring-2 ring-emerald-500 ring-offset-1 ring-offset-background",
-                      isSabbathDay 
-                        ? "bg-indigo-100 dark:bg-indigo-900/50 text-indigo-600 dark:text-indigo-300" 
-                        : gems === 2 
-                          ? "bg-amber-100 dark:bg-amber-900/50 text-amber-600 dark:text-amber-300"
-                          : "bg-emerald-100 dark:bg-emerald-900/50 text-emerald-600 dark:text-emerald-300"
-                    )}
-                    title={isSabbathDay ? "Sabbath Rest (0 gems)" : gems === 2 ? "Friday (2 gems)" : "1 gem"}
-                  >
-                    {isSabbathDay ? "🌙" : gems}
-                  </div>
-                );
-              })}
-            </div>
+        {/* Warrior-Style Rank Card */}
+        <Card className="border-primary/30 overflow-hidden mb-8 shadow-xl">
+          {/* Rank Banner */}
+          <div className={`${gemRank.color} p-6 text-center`}>
+            <motion.div
+              initial={{ scale: 0.8, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              className="space-y-1"
+            >
+              <span className="text-5xl">{gemRank.icon}</span>
+              <h2 className="text-3xl font-bold">{gemRank.name}</h2>
+              <p className="text-sm opacity-80 tracking-widest">{gemRank.tier}</p>
+            </motion.div>
           </div>
-          {isSabbath && (
-            <p className="mt-3 text-indigo-600 dark:text-indigo-400 text-sm font-medium">
-              🌙 It's Sabbath — a day for rest and reflection. Gem discovery resumes tomorrow!
-            </p>
-          )}
-        </div>
+
+          <CardContent className="p-6 space-y-5 bg-gradient-to-b from-card to-card/80">
+            {/* XP-style Progress */}
+            <div className="space-y-2">
+              <div className="flex justify-between text-sm">
+                <span className="font-semibold flex items-center gap-1.5">
+                  <Zap className="w-4 h-4 text-yellow-500" />
+                  {totalGemsSaved} Gems
+                </span>
+                {nextGemRank && (
+                  <span className="text-muted-foreground">
+                    {nextGemRank.minGems - totalGemsSaved} to {nextGemRank.name}
+                  </span>
+                )}
+              </div>
+              <Progress value={gemProgress} className="h-3 bg-muted" />
+              {nextGemRank && (
+                <p className="text-xs text-center text-muted-foreground">
+                  Next: {nextGemRank.icon} {nextGemRank.name} ({nextGemRank.tier.toLowerCase()})
+                </p>
+              )}
+            </div>
+
+            {/* Stats Grid */}
+            <div className="grid grid-cols-2 gap-3">
+              <motion.div whileHover={{ scale: 1.02 }} className="bg-gradient-to-br from-primary/10 to-primary/5 rounded-lg p-3 text-center">
+                <Crown className="w-6 h-6 mx-auto text-primary mb-1" />
+                <p className="text-2xl font-bold">{totalGemsSaved}</p>
+                <p className="text-xs text-muted-foreground">Gems Saved</p>
+              </motion.div>
+              <motion.div whileHover={{ scale: 1.02 }} className="bg-gradient-to-br from-amber-500/10 to-amber-500/5 rounded-lg p-3 text-center">
+                <Zap className="w-6 h-6 mx-auto text-amber-500 mb-1" />
+                <p className="text-2xl font-bold">{gemsRemaining}</p>
+                <p className="text-xs text-muted-foreground">Gems Today</p>
+              </motion.div>
+            </div>
+
+            {/* Weekly Rhythm (compact) */}
+            <div className="flex items-center justify-center gap-2 pt-2 border-t border-border/50">
+              <span className="text-xs text-muted-foreground">Weekly rhythm:</span>
+              <div className="flex items-center gap-1">
+                {['S', 'M', 'T', 'W', 'T', 'F', 'S'].map((day, i) => {
+                  const gems = i === 5 ? 2 : i === 6 ? 0 : 1;
+                  const isToday = i === new Date().getDay();
+                  const isSabbathDay = i === 6;
+                  return (
+                    <div 
+                      key={i}
+                      className={cn(
+                        "w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-semibold transition-all",
+                        isToday && "ring-2 ring-emerald-500 ring-offset-1 ring-offset-background",
+                        isSabbathDay 
+                          ? "bg-indigo-500/20 text-indigo-300" 
+                          : gems === 2 
+                            ? "bg-amber-500/20 text-amber-300"
+                            : "bg-emerald-500/20 text-emerald-300"
+                      )}
+                      title={isSabbathDay ? "Sabbath Rest (0 gems)" : gems === 2 ? "Friday (2 gems)" : "1 gem"}
+                    >
+                      {isSabbathDay ? "🌙" : gems}
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+            {isSabbath && (
+              <p className="text-center text-indigo-400 text-sm font-medium">
+                🌙 Sabbath — rest and reflection. Discovery resumes tomorrow!
+              </p>
+            )}
+          </CardContent>
+        </Card>
 
         {/* Options Panel */}
         <AnimatePresence>
