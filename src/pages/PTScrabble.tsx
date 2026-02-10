@@ -6,7 +6,7 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import { Navigation } from "@/components/Navigation";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ArrowLeft, Users, Sparkles, Gamepad2, BookOpen, Cross, Book, Trophy, Layers, Globe, Megaphone, Calendar } from "lucide-react";
@@ -480,9 +480,7 @@ export default function PTScrabble() {
                   Schedule
                 </button>
               </div>
-              <div>
-
-                <TabsContent value="play" className="space-y-6">
+              <div className="space-y-6">
                   {/* Rules summary */}
                   <div className="grid md:grid-cols-3 gap-4 text-center">
                     <div className="p-4 bg-muted/50 rounded-lg">
@@ -567,9 +565,7 @@ export default function PTScrabble() {
                       <li>• <strong>Christ Connection = 2x multiplier!</strong></li>
                     </ul>
                   </div>
-                </TabsContent>
-
-              </div>
+                </div>
             </CardContent>
           </Card>
         </main>
