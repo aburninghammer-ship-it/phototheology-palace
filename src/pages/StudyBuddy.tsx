@@ -52,6 +52,7 @@ import { formatDistanceToNow, format } from "date-fns";
 import { getCardById, SparkCard } from "@/data/studyIdeasLibrary";
 import { SelectableText } from "@/components/ui/selectable-text";
 import { useGeneratedSparkCards, GeneratedSparkCard } from "@/hooks/useGeneratedSparkCards";
+import { VoiceInputButton } from "@/components/ui/VoiceInputButton";
 
 // Types for Jeeves analysis
 interface Spark {
@@ -1013,16 +1014,22 @@ export default function StudyBuddy() {
               <Flame className="w-4 h-4 mr-1" />
               New Sermon
             </Button>
-            <Input
-              placeholder="Session title..."
-              value={sessionTitle}
-              onChange={(e) => setSessionTitle(e.target.value)}
-              className={`w-40 h-9 text-sm ${
-                isLightTheme 
-                  ? "bg-white/80 border-orange-300 text-gray-900 placeholder:text-orange-400" 
-                  : "bg-black/30 border-orange-500/30 text-white placeholder:text-orange-200/50"
-              }`}
-            />
+            <div className="relative">
+              <Input
+                placeholder="Session title..."
+                value={sessionTitle}
+                onChange={(e) => setSessionTitle(e.target.value)}
+                className={`w-40 h-9 text-sm pr-8 ${
+                  isLightTheme
+                    ? "bg-white/80 border-orange-300 text-gray-900 placeholder:text-orange-400"
+                    : "bg-black/30 border-orange-500/30 text-white placeholder:text-orange-200/50"
+                }`}
+              />
+              <VoiceInputButton
+                onTranscript={(text) => setSessionTitle(prev => prev + (prev ? ' ' : '') + text)}
+                className="absolute right-1 top-1/2 -translate-y-1/2 h-7 w-7"
+              />
+            </div>
             <Button 
               variant="outline" 
               size="sm" 
@@ -1384,18 +1391,22 @@ export default function StudyBuddy() {
                 </div>
                 <p className={`text-xs mt-1 ${isLightTheme ? "text-teal-700/70" : "text-emerald-200/60"}`}>Write notes or ask questions — Jeeves will auto-respond</p>
               </div>
-              <div className="flex-1 p-4">
+              <div className="flex-1 p-4 relative">
                 <Textarea
                   value={notes}
                   onChange={(e) => setNotes(e.target.value)}
                   placeholder="Write freely here. Click verses to add them.
 
 Jeeves sees your notes and will spark connections, suggest PT rooms, source claims, and help you think Phototheologically."
-                  className={`h-full resize-none border-0 focus-visible:ring-0 text-sm bg-transparent ${
-                    isLightTheme 
-                      ? "text-gray-800 placeholder:text-teal-600/50" 
+                  className={`h-full resize-none border-0 focus-visible:ring-0 text-sm bg-transparent pr-10 ${
+                    isLightTheme
+                      ? "text-gray-800 placeholder:text-teal-600/50"
                       : "text-emerald-100 placeholder:text-emerald-200/40"
                   }`}
+                />
+                <VoiceInputButton
+                  onTranscript={(text) => setNotes(prev => prev + (prev ? ' ' : '') + text)}
+                  className="absolute right-6 top-6"
                 />
               </div>
             </Card>

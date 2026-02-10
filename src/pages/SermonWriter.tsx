@@ -36,6 +36,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { JeevesChat } from "@/components/sermon-writer/jeeves/JeevesChat";
 import { toast } from "sonner";
 import type { JeevesMode, OutlineTemplateType, CreateSessionInput, SermonWriterSpark, SermonOutline } from "@/types/sermonWriter";
+import { VoiceInputButton } from "@/components/ui/VoiceInputButton";
 
 // New Session Form
 function NewSessionForm({
@@ -76,36 +77,54 @@ function NewSessionForm({
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
             <Label htmlFor="theme" className="text-slate-300">Theme or Topic *</Label>
-            <Textarea
-              id="theme"
-              placeholder="e.g., The transforming power of grace in daily life..."
-              value={theme}
-              onChange={(e) => setTheme(e.target.value)}
-              className="bg-slate-800/50 border-slate-600 text-white placeholder:text-slate-500"
-              rows={2}
-            />
+            <div className="relative">
+              <Textarea
+                id="theme"
+                placeholder="e.g., The transforming power of grace in daily life..."
+                value={theme}
+                onChange={(e) => setTheme(e.target.value)}
+                className="bg-slate-800/50 border-slate-600 text-white placeholder:text-slate-500 pr-10"
+                rows={2}
+              />
+              <VoiceInputButton
+                onTranscript={(text) => setTheme(prev => prev + (prev ? ' ' : '') + text)}
+                className="absolute right-2 top-2"
+              />
+            </div>
           </div>
 
           <div className="space-y-2">
             <Label htmlFor="passage" className="text-slate-300">Key Scripture (optional)</Label>
-            <Input
-              id="passage"
-              placeholder="e.g., Romans 12:1-2, John 15:1-8"
-              value={themePassage}
-              onChange={(e) => setThemePassage(e.target.value)}
-              className="bg-slate-800/50 border-slate-600 text-white placeholder:text-slate-500"
-            />
+            <div className="relative">
+              <Input
+                id="passage"
+                placeholder="e.g., Romans 12:1-2, John 15:1-8"
+                value={themePassage}
+                onChange={(e) => setThemePassage(e.target.value)}
+                className="bg-slate-800/50 border-slate-600 text-white placeholder:text-slate-500 pr-10"
+              />
+              <VoiceInputButton
+                onTranscript={(text) => setThemePassage(prev => prev + (prev ? ' ' : '') + text)}
+                className="absolute right-2 top-1/2 -translate-y-1/2"
+              />
+            </div>
           </div>
 
           <div className="space-y-2">
             <Label htmlFor="title" className="text-slate-300">Working Title (optional)</Label>
-            <Input
-              id="title"
-              placeholder="e.g., Living Sacrifices"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              className="bg-slate-800/50 border-slate-600 text-white placeholder:text-slate-500"
-            />
+            <div className="relative">
+              <Input
+                id="title"
+                placeholder="e.g., Living Sacrifices"
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                className="bg-slate-800/50 border-slate-600 text-white placeholder:text-slate-500 pr-10"
+              />
+              <VoiceInputButton
+                onTranscript={(text) => setTitle(prev => prev + (prev ? ' ' : '') + text)}
+                className="absolute right-2 top-1/2 -translate-y-1/2"
+              />
+            </div>
           </div>
 
           <div className="space-y-2">

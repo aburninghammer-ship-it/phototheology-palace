@@ -30,6 +30,7 @@ import {
 import { searchStrongs, StrongsEntry, getStrongsEntry } from '@/services/strongsApi';
 import { StrongsModal } from '@/components/bible/StrongsModal';
 import { toast } from 'sonner';
+import { VoiceInputButton } from '@/components/ui/VoiceInputButton';
 
 // Bible verse reference pattern - matches "Book Chapter:Verse" or "Book Chapter:Verse-Verse"
 const VERSE_PATTERN = /\b((?:1|2|3|I|II|III)?\s*[A-Za-z]+)\s+(\d+):(\d+)(?:-(\d+))?\b/g;
@@ -384,6 +385,17 @@ export const SermonTextEditor = ({
         >
           <Redo className="h-4 w-4" />
         </Button>
+
+        <Separator orientation="vertical" className="h-6 mx-1 bg-slate-700" />
+
+        {/* Voice Input Button */}
+        <VoiceInputButton
+          onTranscript={(text) => {
+            editor.chain().focus().insertContent(text + ' ').run();
+          }}
+          disabled={disabled}
+          className="h-8 w-8 text-slate-400 hover:text-white"
+        />
 
         {/* Hebrew/Greek Lookup Button */}
         <div className="ml-auto">
