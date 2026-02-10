@@ -162,18 +162,18 @@ export default function MindMapToolbar({
           `}
         >
           <GraduationCap className="w-5 h-5" />
-          <span>Jeeves Generate Full Study</span>
+          <span>Jeeves Generate Full Study Mind Map</span>
           <BookOpen className="w-4 h-4 opacity-70" />
         </button>
 
         {/* Helper text */}
         <div className="text-xs text-muted-foreground text-center space-y-1">
           <p>
-            <span className="text-primary">Jeeves Map</span> analyzes across 38+ Palace rooms |
+            <span className="text-primary">Jeeves Map</span> guides you to fill out the mind map |
             <span className="text-foreground"> My Study</span> for manual exploration
           </p>
           <p className="text-amber-400/80">
-            <span className="font-medium">Full Study</span> generates a complete devotional study from your seed text
+            <span className="font-medium">Full Study Mind Map</span> — Jeeves populates the entire mind map for you
           </p>
         </div>
       </div>
