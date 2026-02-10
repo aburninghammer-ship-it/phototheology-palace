@@ -158,17 +158,21 @@ export const BibleReader = () => {
   }, [generateSpark, sparkPreferences?.intensity, book, chapter]);
 
   useEffect(() => {
-    // Get translation from URL parameter or use preference, falling back to language-based default
+    // Get translation from URL parameter, or use language-based default for non-English locales
     const params = new URLSearchParams(window.location.search);
     const urlTranslation = params.get("t");
+    const lang = i18n.language?.slice(0, 2);
     if (urlTranslation) {
       setTranslation(urlTranslation as Translation);
+    } else if (lang && lang !== "en") {
+      // Non-English locale: always use the language-matched Bible translation
+      setTranslation(getDefaultTranslation());
     } else if (!preferencesLoading && preferences.bible_translation) {
       setTranslation(preferences.bible_translation as Translation);
     } else {
       setTranslation(getDefaultTranslation());
     }
-  }, [preferences.bible_translation, preferencesLoading, getDefaultTranslation]);
+  }, [preferences.bible_translation, preferencesLoading, getDefaultTranslation, i18n.language]);
 
   useEffect(() => {
     loadChapter();
