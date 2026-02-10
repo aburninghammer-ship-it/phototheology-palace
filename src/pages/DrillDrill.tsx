@@ -1,6 +1,8 @@
 import { useState, useEffect, useRef } from "react";
 import { useLocation } from "react-router-dom";
 import { Navigation } from "@/components/Navigation";
+import { SimplifiedNav } from "@/components/SimplifiedNav";
+import { useUserPreferences } from "@/hooks/useUserPreferences";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -60,6 +62,7 @@ export interface DrillSession {
 
 const DrillDrill = () => {
   const { user } = useAuth();
+  const { preferences } = useUserPreferences();
   const location = useLocation();
   const autoStartTriggered = useRef(false);
   const [verse, setVerse] = useState("");
@@ -319,7 +322,7 @@ const DrillDrill = () => {
 
   return (
     <div className="min-h-screen bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-primary/20 via-background to-background">
-      <Navigation />
+      {preferences.navigation_style === "simplified" ? <SimplifiedNav /> : <Navigation />}
 
       {/* Sparks Container */}
       {sparks.length > 0 && (
