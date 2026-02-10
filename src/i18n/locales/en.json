@@ -1438,6 +1438,78 @@
     "pathActive": "Path Active",
     "level": "Level {{level}}"
   },
+  "memory": {
+    "title": "Memory Palace",
+    "subtitle": "Master Scripture through visual memory techniques and the Palace method",
+    "howToUse": "How to Use",
+    "signInRequired": "Please sign in to use Memory Palace",
+    "startMemorizing": "Start Memorizing",
+    "practiceGames": "Practice Games",
+    "practiceDrills": "Practice Drills",
+    "createCustomList": "Create Custom List",
+    "discoverPublicLists": "Discover Public Lists",
+    "teamMemorization": "Team Memorization",
+    "tabs": {
+      "learn": "Learn",
+      "drills": "Drills",
+      "templates": "Templates",
+      "myLists": "My Lists",
+      "community": "Community"
+    },
+    "stats": {
+      "versesMemorized": "Verses Memorized",
+      "currentStreak": "Current Streak",
+      "activeLists": "Active Lists",
+      "days": "{{count}} days"
+    },
+    "game": {
+      "backToMemory": "Back to Memory",
+      "failedToLoadList": "Failed to load list",
+      "failedToLoadVerses": "Failed to load verses",
+      "noVersesYet": "No Verses Yet",
+      "noVersesDescription": "Add some verses to this list before playing games.",
+      "addVerses": "Add Verses",
+      "ptInsightsToDiscover": "{{count}} PT insights to discover",
+      "firstLetter": "First Letter",
+      "firstLetterDesc": "Recall each word from its first letter",
+      "firstLetterFullDesc": "See only the first letter of each word and try to recall the full verse from memory.",
+      "fillBlanks": "Fill in the Blanks",
+      "fillBlanksDesc": "Complete the missing words in the verse",
+      "memoryPalace": "Memory Palace",
+      "memoryPalaceDesc": "Build a visual palace to store Scripture in your mind",
+      "rearrange": "Rearrange",
+      "rearrangeDesc": "Put the words back in order",
+      "rearrangeFullDesc": "Drag and drop scrambled words to reconstruct the verse in the correct order.",
+      "typeFirstLetters": "Type First Letters",
+      "finalMasteryTest": "Final mastery test",
+      "typeFirstLettersDesc": "Type the first letter of each word to prove you've memorized the verse.",
+      "select": {
+        "title": "Choose a Game",
+        "subtitle": "Select a memory game to practice with",
+        "playGame": "Play Game",
+        "wordOrderTitle": "Word Order",
+        "wordOrderDesc": "Arrange scrambled words in the correct order",
+        "fillBlankTitle": "Fill in the Blank",
+        "fillBlankDesc": "Complete the verse with missing words",
+        "firstLetterTitle": "First Letter",
+        "firstLetterDesc": "Recall words from their first letters",
+        "difficultyEasy": "Easy",
+        "difficultyMedium": "Medium",
+        "difficultyHard": "Hard"
+      },
+      "complete": {
+        "analyzing": "Analyzing verse with Phototheology...",
+        "unlockingInsights": "Unlocking PT Insights",
+        "analyzingVerse": "Analyzing verse {{current}} of {{total}}...",
+        "greatWork": "Great Work!",
+        "youScored": "You scored {{score}} out of {{total}}",
+        "gameCompleted": "Game completed!",
+        "unlockedInsights": "Unlocked {{count}} new PT insights!",
+        "playAgain": "Play Again",
+        "crossReference": "Cross-reference: {{verseRef}}"
+      }
+    }
+  },
   "studyIdeas": {
     "pageTitle": "Study Ideas",
     "pageSubtitle": "Curated study cards, guided paths, and AI-generated ideas",
