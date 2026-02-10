@@ -622,7 +622,12 @@ const Schedule = () => {
 
           {/* Submit Button - always visible outside ScrollArea */}
           {selectedActivity && (
-            <div className="pt-4 border-t border-border">
+            <div className="pt-4 border-t border-border relative z-50">
+              {(!scheduledDate || !scheduledTime) && (
+                <p className="text-xs text-amber-400 mb-2 text-center">
+                  ⚠️ Please scroll up to set a date and time
+                </p>
+              )}
               <Button
                 onClick={handleCreateEvent}
                 disabled={!scheduledDate || !scheduledTime || isCreating}
