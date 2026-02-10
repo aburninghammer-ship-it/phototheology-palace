@@ -15,7 +15,6 @@ const BlueprintStress = () => {
   const [selectedArticle, setSelectedArticle] = useState<number | null>(null);
   const [notes, setNotes] = useState<{ [key: number]: string }>({});
   const [completedArticles, setCompletedArticles] = useState<number[]>([]);
-  const { t } = useTranslation();
 
   useEffect(() => {
     const savedNotes = localStorage.getItem("blueprintStressNotes");
