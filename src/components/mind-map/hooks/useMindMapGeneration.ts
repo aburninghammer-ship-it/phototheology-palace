@@ -4,7 +4,7 @@ import type { AnalysisMode, AIMapAnalysis, GenerationState, PrincipleData } from
 import { palaceFloors, sanctuaryElements } from '../constants';
 
 interface UseMindMapGenerationReturn {
-  generate: (text: string, mode: AnalysisMode) => Promise<AIMapAnalysis | null>;
+  generate: (text: string, mode: AnalysisMode, fullStudy?: boolean) => Promise<AIMapAnalysis | null>;
   state: GenerationState;
   reset: () => void;
 }
@@ -19,13 +19,13 @@ export function useMindMapGeneration(): UseMindMapGenerationReturn {
     setState({ status: 'idle', progress: 0 });
   }, []);
 
-  const generate = useCallback(async (text: string, mode: AnalysisMode): Promise<AIMapAnalysis | null> => {
-    setState({ status: 'generating', progress: 10, message: 'Preparing analysis...' });
+  const generate = useCallback(async (text: string, mode: AnalysisMode, fullStudy: boolean = false): Promise<AIMapAnalysis | null> => {
+    setState({ status: 'generating', progress: 10, message: fullStudy ? 'Generating full study mind map...' : 'Preparing analysis...' });
 
     try {
       // Call the edge function
       const { data, error } = await supabase.functions.invoke('mind-map-analyze', {
-        body: { text, mode },
+        body: { text, mode, fullStudy },
       });
 
       if (error) {
