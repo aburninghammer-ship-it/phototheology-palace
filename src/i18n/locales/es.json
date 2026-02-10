@@ -376,7 +376,246 @@
     "getStarted": "Comenzar",
     "subscriptionSuccess": "¡Bienvenido a Phototheology! Tu suscripción ya está activa.",
     "badgeEarned": "¡Insignia de Explorador del Palacio obtenida!",
-    "exploreStoryRoom": "Ahora explora la Sala de Historias para comenzar tu viaje."
+    "exploreStoryRoom": "Ahora explora la Sala de Historias para comenzar tu viaje.",
+    "floors": {
+      "1": {
+        "name": "Amueblado",
+        "subtitle": "Memoria y Visualización",
+        "description": "Carga la narrativa del canon en la memoria a largo plazo como escenas vívidas. Construye tu biblioteca fundamental de historias, imágenes y gemas."
+      },
+      "2": {
+        "name": "Investigación",
+        "subtitle": "Trabajo de Detective",
+        "description": "Conviértete en un detective de la Palabra. Recopila datos, define términos, decodifica símbolos e interroga el texto con precisión."
+      },
+      "3": {
+        "name": "Estilo Libre",
+        "subtitle": "Conexiones Espontáneas",
+        "description": "Entrena conexiones espontáneas con las Escrituras durante todo el día. Convierte la naturaleza, la vida, la historia y las conversaciones en lecciones."
+      },
+      "4": {
+        "name": "Siguiente Nivel",
+        "subtitle": "Estructura Cristocéntrica",
+        "description": "Expande la profundidad a través del estudio dimensional centrado en Cristo. Ve el diamante desde cinco cortes, identifica patrones y prueba por frutos."
+      },
+      "5": {
+        "name": "Visión",
+        "subtitle": "Profecía y Santuario",
+        "description": "Abre el telescopio profético. Une la profecía y el santuario para ver el plan maestro de Dios desplegarse a través de la historia."
+      },
+      "6": {
+        "name": "Tres Cielos",
+        "subtitle": "Ciclos y Contexto Cósmico",
+        "description": "Sitúa los textos en los ciclos de la historia y las dimensiones cósmicas. Nunca leas un texto aisladamente sino siempre en contexto cósmico."
+      },
+      "7": {
+        "name": "Espiritual y Emocional",
+        "subtitle": "Fuego, Meditación y Velocidad",
+        "description": "La cámara del corazón del palacio. Si la verdad no llega al corazón, ha fallado su propósito. Aquí la verdad quema, convence, consuela y transforma."
+      },
+      "8": {
+        "name": "Maestro",
+        "subtitle": "Fototheología Reflexiva",
+        "description": "El piso donde el palacio desaparece porque está dentro de ti. Pensamiento fototheológico reflexivo y natural."
+      }
+    },
+    "rooms": {
+      "sr": {
+        "name": "Sala de Historias",
+        "purpose": "Transforma los eventos bíblicos en escenas memorables y secuenciales. Construye tu biblioteca fundamental de historias que puedas recordar al instante.",
+        "coreQuestion": "¿Qué sucedió exactamente y en qué orden?"
+      },
+      "ir": {
+        "name": "Sala de Imaginación",
+        "purpose": "Experimenta las Escrituras con los cinco sentidos. Entra en la historia para crear memoria emocional que perdure.",
+        "coreQuestion": "¿Qué ves, oyes, sientes, hueles y saboreas en este pasaje?"
+      },
+      "24fps": {
+        "name": "Sala 24FPS",
+        "purpose": "Crea un GPS visual para la Biblia—una imagen memorable por capítulo para recuperación instantánea.",
+        "coreQuestion": "¿Qué imagen hará que este capítulo sea inolvidablemente localizable?"
+      },
+      "br": {
+        "name": "Biblia Renderizada",
+        "purpose": "Ve toda la Biblia de un vistazo—comprime los 1,189 capítulos en ~51 glifos simbólicos.",
+        "coreQuestion": "¿Qué símbolo único captura la esencia de este bloque de 24 capítulos?"
+      },
+      "tr": {
+        "name": "Sala de Traducción",
+        "purpose": "Convierte palabras en imágenes. Transforma conceptos abstractos en representaciones visuales concretas que se fijan 6 veces mejor en la memoria.",
+        "coreQuestion": "Traduce este texto en una narrativa visual."
+      },
+      "gr": {
+        "name": "Sala de Gemas",
+        "purpose": "Extrae verdades raras de las Escrituras combinando 2-4 textos no relacionados hasta que se iluminen mutuamente con claridad asombrosa.",
+        "coreQuestion": "¿Qué hermosa verdad emerge cuando combino estos textos aparentemente no relacionados?"
+      },
+      "or": {
+        "name": "Sala de Observación",
+        "purpose": "Conviértete en un detective bíblico. Recopila datos sin interpretar—ve lo que realmente está en la página.",
+        "coreQuestion": "Como detective, observa todo lo que puedas sobre el texto. Comienza con QUÉ ESTÁ PASANDO."
+      },
+      "dc": {
+        "name": "Sala Def-Com",
+        "purpose": "Define términos clave en el idioma original y consulta comentarios de confianza. Párate sobre hombros de gigantes mientras mantienes los pies en el texto.",
+        "coreQuestion": "¿Qué definiciones encuentras relevantes para el texto?"
+      },
+      "st": {
+        "name": "Sala de Símbolos/Tipos",
+        "purpose": "Construye el diccionario de símbolos de Dios. Rastrea la imaginería consistente (Cordero, Roca, Luz) a través de las Escrituras y ve cómo apunta a Cristo.",
+        "coreQuestion": "¿Cuál es el significado bíblico consistente de este símbolo y cómo encuentra su cumplimiento en Cristo?"
+      },
+      "qr": {
+        "name": "Sala de Preguntas",
+        "purpose": "Genera 50-100 preguntas de precisión sobre cualquier texto. La calidad del entendimiento equivale a la calidad de las preguntas.",
+        "coreQuestion": "¿Qué se debe preguntar dentro del texto (INTRA), a través de textos (INTER) y a través del marco del Palacio (PALACIO)?"
+      },
+      "qa": {
+        "name": "Sala de Preguntas y Respuestas",
+        "purpose": "Las Escrituras son su mejor testigo; los versículos responden versículos. Verifica cruzadamente las respuestas como un detective que comprueba coartadas.",
+        "coreQuestion": "¿Qué otros versículos responden directamente a mis preguntas sobre este texto?"
+      },
+      "nf": {
+        "name": "Estilo Libre en la Naturaleza",
+        "purpose": "La naturaleza es el segundo libro de Dios. Cada elemento de la creación puede convertirse en una ilustración de sermón si tus ojos están entrenados.",
+        "coreQuestion": "¿Qué lección espiritual enseña este elemento natural según las Escrituras?"
+      },
+      "pf": {
+        "name": "Estilo Libre Personal",
+        "purpose": "Tus propias experiencias de vida se convierten en lecciones objetivas. Cada alegría, error y retraso se convierte en material para reflexión.",
+        "coreQuestion": "¿Qué paralelo bíblico refleja mi experiencia personal actual?"
+      },
+      "bf": {
+        "name": "Estilo Libre Bíblico",
+        "purpose": "Desarrolla la habilidad de la genética de versículos. Cada versículo de la Biblia está relacionado con todos los demás.",
+        "coreQuestion": "¿Qué otros versículos son 'familia' de este versículo y cómo se iluminan mutuamente?"
+      },
+      "hf": {
+        "name": "Estilo Libre Histórico/Social",
+        "purpose": "Extrae ilustraciones del evangelio de la historia secular, la cultura y los eventos actuales. Deja que las Escrituras interpreten la civilización.",
+        "coreQuestion": "¿Cómo este evento histórico o tendencia social secular ilumina el pasaje bíblico que estoy estudiando?"
+      },
+      "lr": {
+        "name": "Sala de Escucha",
+        "purpose": "Transforma la escucha pasiva en enlace activo con las Escrituras. Captura ecos teológicos en sermones, conversaciones y fragmentos de verdad.",
+        "coreQuestion": "¿Qué versículo o principio bíblico refleja esta cita, punto de sermón o conversación—y qué debo hacer al respecto?"
+      },
+      "cr": {
+        "name": "Sala de Concentración",
+        "purpose": "Entrena para ver a Cristo a través de Su triple oficio—Profeta, Sacerdote y Rey—el marco que desbloquea todo Su ministerio.",
+        "coreQuestion": "Aplica uno de los tres oficios de Cristo (Profeta, Sacerdote o Rey) a este pasaje."
+      },
+      "dr": {
+        "name": "Sala de Dimensiones",
+        "purpose": "Las Escrituras son un diamante multifacético—cada pasaje refracta luz a través de cinco dimensiones distintas pero complementarias.",
+        "coreQuestion": "¿Cómo habla este texto simultáneamente a la historia literal, Cristo, mi vida, la iglesia y el cielo/eternidad?"
+      },
+      "c6": {
+        "name": "Sala Conecta 6",
+        "purpose": "Clasifica textos por género. Cada género tiene sus propias reglas de lenguaje.",
+        "coreQuestion": "¿A qué género pertenece este texto y cómo eso moldea su interpretación?"
+      },
+      "trm": {
+        "name": "Sala Temática",
+        "purpose": "Organiza las Escrituras a lo largo de las grandes paredes y techos de la arquitectura bíblica: Santuario, Vida de Cristo, Gran Conflicto, Profecía del Tiempo, Evangelio y Cielo.",
+        "coreQuestion": "¿En qué muro temático encaja este pasaje dentro de la arquitectura de la redención?"
+      },
+      "tz": {
+        "name": "Sala de Zonas Horarias",
+        "purpose": "Ubica pasajes a través de tres tiempos: pasado, presente y futuro, y dos niveles: Cielo y Tierra.",
+        "coreQuestion": "¿Dónde se ubica este texto en las seis zonas de tiempo (pasado/presente/futuro × cielo/tierra)?"
+      },
+      "prm": {
+        "name": "Sala de Patrones",
+        "purpose": "Los patrones son las huellas dactilares de Dios a través de las Escrituras. Se repiten con variación, como riffs en una sinfonía.",
+        "coreQuestion": "¿Qué patrón recurrente de las Escrituras aparece en este texto?"
+      },
+      "p||": {
+        "name": "Sala de Paralelos",
+        "purpose": "Acciones reflejadas a través del tiempo. Muestra cómo eventos o acciones se reflejan entre sí a través de las épocas.",
+        "coreQuestion": "¿Qué evento bíblico refleja este pasaje y cómo se complementan los paralelos?"
+      },
+      "frt": {
+        "name": "Sala de Frutos",
+        "purpose": "Cada interpretación debe pasar la prueba del fruto: ¿produce amor, gozo, paz, paciencia, bondad, fe, mansedumbre, templanza?",
+        "coreQuestion": "¿Produce esta interpretación frutos del Espíritu o frutos de la carne?"
+      },
+      "cec": {
+        "name": "Cristo en Cada Capítulo",
+        "purpose": "Principio interpretativo innegociable: TODA la Escritura es acerca de Jesús. Como el libro definitivo de '¿Dónde está Waldo?'—Jesús está en cada página.",
+        "coreQuestion": "¿Dónde está Jesús en este capítulo y cómo lo encuentro usando los 5 métodos?"
+      },
+      "r66": {
+        "name": "Sala 66",
+        "purpose": "Un tema debe ser rastreado a través de los sesenta y seis libros con una afirmación clara por libro.",
+        "coreQuestion": "¿Cómo se manifiesta este tema en cada uno de los 66 libros?"
+      },
+      "bl": {
+        "name": "Sala Azul (Santuario)",
+        "purpose": "El plano arquitectónico. Dios le dijo a Moisés que hiciera todo según el patrón. El santuario es el mapa de la historia de la salvación.",
+        "coreQuestion": "¿Qué mueble o servicio del santuario ilumina este pasaje?"
+      },
+      "pr": {
+        "name": "Sala de Profecía",
+        "purpose": "El lente del telescopio. Alinea las estrellas de Daniel y Apocalipsis y ve sus constelaciones.",
+        "coreQuestion": "¿Cómo encaja este texto en la línea de tiempo profética de Daniel y Apocalipsis?"
+      },
+      "3a": {
+        "name": "Sala de los Tres Ángeles",
+        "purpose": "Los Mensajes de los Tres Ángeles (Apocalipsis 14:6-12) son el centro de control de misión del Palacio—muestran cómo la DOCTRINA impulsa la MISIÓN.",
+        "coreQuestion": "¿Cómo proclama o conecta este pasaje con los Mensajes de los Tres Ángeles?"
+      },
+      "fe": {
+        "name": "Sala de las Fiestas",
+        "purpose": "El calendario festivo anual de Israel es el mapa profético de redención de Dios—cada fiesta prefigura una fase específica de la obra de Cristo.",
+        "coreQuestion": "¿Con cuál de las siete fiestas conecta este pasaje y cómo revela la línea de tiempo redentora de Cristo?"
+      },
+      "123h": {
+        "name": "Sala de los Tres Cielos",
+        "purpose": "Sitúa todo en el escenario cósmico de la historia. Ve cómo los textos encajan dentro de las fases celestiales y los ciclos proféticos.",
+        "coreQuestion": "¿A cuál de los Tres Cielos (1H, 2H, 3H) pertenece este texto?"
+      },
+      "cycles": {
+        "name": "Sala de los Ciclos",
+        "purpose": "La historia está estructurada por ocho grandes ciclos, cada uno siguiendo el patrón: Caída → Pacto → Santuario → Enemigo → Restauración.",
+        "coreQuestion": "¿A cuál de los ocho ciclos pertenece este texto (@Ad, @No, @Ab, @Mo, @Cy, @CyC, @Sp, @Re)?"
+      },
+      "jr": {
+        "name": "Sala de Jugo",
+        "purpose": "El laboratorio de ejercicios. Exprime un libro de la Biblia con todos los principios de Fototheología a la vez.",
+        "coreQuestion": "¿Qué se extrae cuando aplico todos los principios del Palacio a este libro completo?"
+      },
+      "math": {
+        "name": "Sala Matemática",
+        "purpose": "Descubre los patrones numéricos que Dios tejió a través de las Escrituras—los números bíblicos no son aleatorios.",
+        "coreQuestion": "¿Qué significado tiene este número en el patrón bíblico más amplio?"
+      },
+      "frm": {
+        "name": "Sala de Fuego",
+        "purpose": "Donde las Escrituras dejan de ser académicas y se vuelven PERSONALES—donde el texto se mueve de tu cabeza a tu corazón, encendiendo convicción, consuelo o adoración.",
+        "coreQuestion": "¿Qué herida (convicción) o esperanza (consuelo) expone o enciende este texto en mi alma, y cómo respondo en oración?"
+      },
+      "mr": {
+        "name": "Sala de Meditación",
+        "purpose": "Te desacelera. La meditación no es vaciar la mente sino marinar en la verdad.",
+        "coreQuestion": "¿Qué palabra o frase de este pasaje necesito hacer pausa, respirar y dejar que sature mi espíritu?"
+      },
+      "srm": {
+        "name": "Sala de Velocidad",
+        "purpose": "El ejercicio opuesto. Practica la aplicación rápida de principios de Fototheología—recorriendo capítulos y haciendo conexiones al instante.",
+        "coreQuestion": "¿Cuántas conexiones puedo hacer con este texto en 60 segundos?"
+      },
+      "infinity": {
+        "name": "Maestría Reflexiva",
+        "purpose": "El piso donde el palacio ya no se siente como un método. La Fototheología se convierte en pensamiento natural.",
+        "coreQuestion": "¿Puedo enseñar este pasaje sin usar etiquetas de salas—dejando que el flujo sea natural?"
+      },
+      "freestyle": {
+        "name": "Estilo Libre",
+        "purpose": "Piensa en las Escrituras en tiempo real—improvisa sobre la naturaleza, la vida, los versículos, la historia y las conversaciones espontáneamente.",
+        "coreQuestion": "¿Qué conexión bíblica puedo hacer con lo que veo, vivo o escucho en este momento?"
+      }
+    }
   },
   "study": {
     "newStudy": "Nuevo Estudio",

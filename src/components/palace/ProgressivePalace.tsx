@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { ChevronDown, ChevronRight, Lock, CheckCircle, Sparkles, Play, BookOpen, Star } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "@/hooks/useAuth";
@@ -28,6 +29,7 @@ interface ProgressivePalaceProps {
 }
 
 export const ProgressivePalace = ({ showStartHere = true }: ProgressivePalaceProps) => {
+  const { t } = useTranslation();
   const { user } = useAuth();
   const { progressPercentage } = usePalaceProgress();
   
@@ -303,6 +305,7 @@ interface RoomCardProps {
 }
 
 const RoomCard = ({ room, floorNumber, gradient }: RoomCardProps) => {
+  const { t } = useTranslation();
   const { isUnlocked, loading } = useRoomUnlock(floorNumber, room.id);
   const { isRenovated } = useNewlyRenovatedRoom(room.id);
   const roomImage = getRoomImage(room.id, floorNumber);
