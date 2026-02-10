@@ -28,6 +28,8 @@ export const BIBLE_TRANSLATIONS = [
   { value: "almeida", label: "Almeida (Portuguese)" },
   { value: "rves", label: "Reina Valera (Spanish)" },
   { value: "rvr", label: "Reina Valera Revisada (Spanish)" },
+  { value: "lsg", label: "Louis Segond (French)" },
+  { value: "luther", label: "Luther Bibel (German)" },
 ] as const;
 
 export type Translation = typeof BIBLE_TRANSLATIONS[number]["value"];

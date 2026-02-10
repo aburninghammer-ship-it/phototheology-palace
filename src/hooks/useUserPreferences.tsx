@@ -1,6 +1,20 @@
 import { createContext, useContext, useEffect, useState, ReactNode } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "./useAuth";
+import { getCurrentLanguage } from "@/i18n";
+
+// Map app language to default Bible translation
+const getDefaultBibleTranslation = (): string => {
+  const lang = getCurrentLanguage().split('-')[0];
+  switch (lang) {
+    case 'es': return 'rves';
+    case 'fr': return 'lsg';
+    case 'de': return 'luther';
+    case 'pt': return 'almeida';
+    case 'ko': return 'kjv';
+    default: return 'kjv';
+  }
+};
 
 // LocalStorage keys for nav tab preferences (works for all users including guests)
 const NAV_TABS_STORAGE_KEY = "pt_nav_tab_order";
@@ -44,7 +58,7 @@ interface UserPreferences {
 
 const defaultPreferences: UserPreferences = {
   bible_font_size: "medium",
-  bible_translation: "kjv",
+  bible_translation: getDefaultBibleTranslation(),
   reading_mode: "default",
   theme_preference: "system",
   navigation_style: "full",
