@@ -227,13 +227,38 @@ export function useScheduledGames(): UseScheduledGamesReturn {
           status: 'going',
         });
 
-      // Broadcast notification to all users
+      // Build notification details
+      const when = new Date(data.scheduled_at);
+      const timeStr = when.toLocaleString(undefined, {
+        month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit',
+      });
+      const eventTitle = data.title || game.game_type;
+
+      // Persist notification for the scheduling user
+      await supabase.from('notifications').insert({
+        user_id: user.id,
+        type: 'event_scheduled',
+        title: '📅 Event Scheduled!',
+        message: `"${eventTitle}" scheduled for ${timeStr}`,
+        link: '/schedule',
+        is_read: false,
+      });
+
+      // Post to community feed
+      await supabase.from('community_posts').insert({
+        user_id: user.id,
+        title: `📅 New Event: ${eventTitle}`,
+        content: `I just scheduled "${eventTitle}" for ${timeStr}. Head to the Schedule page to RSVP!`,
+        category: 'general',
+      });
+
+      // Broadcast notification to other online users
       const globalChannel = supabase.channel('global-notifications');
       await globalChannel.send({
         type: 'broadcast',
         event: 'event-scheduled',
         payload: {
-          title: data.title || game.game_type,
+          title: eventTitle,
           hostName: hostName,
           scheduledAt: data.scheduled_at.toISOString(),
           gameType: game.game_type,
