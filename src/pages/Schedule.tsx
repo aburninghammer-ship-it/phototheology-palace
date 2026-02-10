@@ -16,6 +16,7 @@ import {
   Loader2,
   CalendarPlus,
   Bell,
+  Megaphone,
   ChevronDown,
   Mic,
   MessageSquare,
@@ -717,6 +718,34 @@ function ScheduledActivityCard({ game, isHost, onRSVP, onCancel, onJoin }: Sched
   const scheduledDate = new Date(game.scheduled_at);
   const isStartingSoon = scheduledDate.getTime() - Date.now() < 15 * 60 * 1000;
   const hasStarted = game.status === 'started' && game.room_code;
+  const [notifying, setNotifying] = useState(false);
+
+  const sendReminder = async () => {
+    setNotifying(true);
+    try {
+      const { supabase } = await import('@/integrations/supabase/client');
+      const activity = getActivityById(game.game_type);
+      const timeStr = format(scheduledDate, 'MMM d, h:mm a');
+
+      const globalChannel = supabase.channel('global-notifications');
+      await globalChannel.send({
+        type: 'broadcast',
+        event: 'event-scheduled',
+        payload: {
+          title: game.title || activity?.name || 'Scheduled Session',
+          hostName: game.host_name,
+          scheduledAt: game.scheduled_at,
+          gameType: game.game_type,
+        },
+      });
+      supabase.removeChannel(globalChannel);
+      toast.success('Notification sent to all users!');
+    } catch (err) {
+      toast.error('Failed to send notification');
+    } finally {
+      setNotifying(false);
+    }
+  };
 
   const activity = getActivityById(game.game_type);
   const Icon = activity?.icon || Calendar;
@@ -764,14 +793,26 @@ function ScheduledActivityCard({ game, isHost, onRSVP, onCancel, onJoin }: Sched
               </CardDescription>
             </div>
             {isHost && !hasStarted && (
-              <Button
-                size="icon"
-                variant="ghost"
-                className="h-7 w-7 text-muted-foreground hover:text-destructive"
-                onClick={() => onCancel(game.id)}
-              >
-                <Trash2 className="h-4 w-4" />
-              </Button>
+              <div className="flex gap-1">
+                <Button
+                  size="icon"
+                  variant="ghost"
+                  className="h-7 w-7 text-muted-foreground hover:text-blue-500"
+                  onClick={sendReminder}
+                  disabled={notifying}
+                  title="Send notification to all users"
+                >
+                  {notifying ? <Loader2 className="h-4 w-4 animate-spin" /> : <Megaphone className="h-4 w-4" />}
+                </Button>
+                <Button
+                  size="icon"
+                  variant="ghost"
+                  className="h-7 w-7 text-muted-foreground hover:text-destructive"
+                  onClick={() => onCancel(game.id)}
+                >
+                  <Trash2 className="h-4 w-4" />
+                </Button>
+              </div>
             )}
           </div>
         </CardHeader>
