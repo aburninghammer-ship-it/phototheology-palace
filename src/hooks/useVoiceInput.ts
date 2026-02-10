@@ -1,54 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 
-// TypeScript declarations for Web Speech API
-interface SpeechRecognitionEvent extends Event {
-  results: SpeechRecognitionResultList;
-  resultIndex: number;
-}
-
-interface SpeechRecognitionResultList {
-  length: number;
-  item(index: number): SpeechRecognitionResult;
-  [index: number]: SpeechRecognitionResult;
-}
-
-interface SpeechRecognitionResult {
-  isFinal: boolean;
-  length: number;
-  item(index: number): SpeechRecognitionAlternative;
-  [index: number]: SpeechRecognitionAlternative;
-}
-
-interface SpeechRecognitionAlternative {
-  transcript: string;
-  confidence: number;
-}
-
-interface SpeechRecognitionErrorEvent extends Event {
-  error: string;
-  message: string;
-}
-
-interface SpeechRecognition extends EventTarget {
-  continuous: boolean;
-  interimResults: boolean;
-  lang: string;
-  onresult: ((event: SpeechRecognitionEvent) => void) | null;
-  onerror: ((event: SpeechRecognitionErrorEvent) => void) | null;
-  onend: (() => void) | null;
-  onstart: (() => void) | null;
-  start(): void;
-  stop(): void;
-  abort(): void;
-}
-
-declare global {
-  interface Window {
-    SpeechRecognition: new () => SpeechRecognition;
-    webkitSpeechRecognition: new () => SpeechRecognition;
-  }
-}
-
 export interface UseVoiceInputReturn {
   isListening: boolean;
   isSupported: boolean;
@@ -60,23 +11,28 @@ export interface UseVoiceInputReturn {
   clearTranscript: () => void;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const getSpeechRecognitionAPI = (): (new () => any) | null => {
+  if (typeof window === 'undefined') return null;
+  return (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition || null;
+};
+
 export function useVoiceInput(): UseVoiceInputReturn {
   const [isListening, setIsListening] = useState(false);
   const [transcript, setTranscript] = useState('');
   const [interimTranscript, setInterimTranscript] = useState('');
   const [error, setError] = useState<string | null>(null);
 
-  const recognitionRef = useRef<SpeechRecognition | null>(null);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const recognitionRef = useRef<any>(null);
   const shouldRestartRef = useRef(false);
 
-  // Check for browser support
-  const isSupported = typeof window !== 'undefined' &&
-    ('SpeechRecognition' in window || 'webkitSpeechRecognition' in window);
+  const isSupported = getSpeechRecognitionAPI() !== null;
 
   const createRecognition = useCallback(() => {
-    if (!isSupported) return null;
+    const SpeechRecognitionAPI = getSpeechRecognitionAPI();
+    if (!SpeechRecognitionAPI) return null;
 
-    const SpeechRecognitionAPI = window.SpeechRecognition || window.webkitSpeechRecognition;
     const recognition = new SpeechRecognitionAPI();
 
     recognition.continuous = true;
@@ -88,7 +44,8 @@ export function useVoiceInput(): UseVoiceInputReturn {
       setError(null);
     };
 
-    recognition.onresult = (event: SpeechRecognitionEvent) => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    recognition.onresult = (event: any) => {
       let finalTranscript = '';
       let interim = '';
 
@@ -107,7 +64,8 @@ export function useVoiceInput(): UseVoiceInputReturn {
       setInterimTranscript(interim);
     };
 
-    recognition.onerror = (event: SpeechRecognitionErrorEvent) => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    recognition.onerror = (event: any) => {
       console.error('Speech recognition error:', event.error);
 
       switch (event.error) {
@@ -115,13 +73,11 @@ export function useVoiceInput(): UseVoiceInputReturn {
           setError('Microphone access denied. Please allow microphone permissions.');
           break;
         case 'no-speech':
-          // Don't show error for no speech - just keep listening
           break;
         case 'network':
           setError('Network error. Please check your connection.');
           break;
         case 'aborted':
-          // User aborted, no error needed
           break;
         default:
           setError(`Speech recognition error: ${event.error}`);
@@ -136,12 +92,10 @@ export function useVoiceInput(): UseVoiceInputReturn {
     recognition.onend = () => {
       setInterimTranscript('');
 
-      // Auto-restart if we should still be listening
       if (shouldRestartRef.current && recognitionRef.current) {
         try {
           recognitionRef.current.start();
         } catch (e) {
-          // Ignore errors on restart
           setIsListening(false);
         }
       } else {
@@ -150,7 +104,7 @@ export function useVoiceInput(): UseVoiceInputReturn {
     };
 
     return recognition;
-  }, [isSupported]);
+  }, []);
 
   const startListening = useCallback(() => {
     if (!isSupported) {
@@ -171,7 +125,6 @@ export function useVoiceInput(): UseVoiceInputReturn {
       try {
         recognitionRef.current.start();
       } catch (e) {
-        // Recognition might already be running
         console.error('Failed to start recognition:', e);
       }
     }
@@ -197,7 +150,6 @@ export function useVoiceInput(): UseVoiceInputReturn {
     setInterimTranscript('');
   }, []);
 
-  // Cleanup on unmount
   useEffect(() => {
     return () => {
       shouldRestartRef.current = false;
