@@ -1,112 +1,10 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { PALACE_SYSTEM_PROMPT, THEOLOGICAL_GUARDRAILS } from "../_shared/palace-prompt.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
-
-// CORRECT Phototheology Palace structure per the knowledge bank
-const PALACE_STRUCTURE = `
-## Phototheology Palace Structure (CORRECT)
-
-### Floor 1 - Furnishing (Memory & Visualization)
-- SR (Story Room): What exactly happened—and in what order? Break into beats.
-- IR (Imagination Room): What do you see, hear, feel, smell, taste? Sensory immersion.
-- 24 (24FPS Room): One memorable image per chapter for instant retrieval.
-- BR (Bible Rendered): One glyph per 24-chapter block - compress the canon.
-- TR (Translation Room): Convert words into pictures - verse to icon, book to mural.
-- GR (Gems Room): Combine 2-4 unrelated texts to find rare truths.
-
-### Floor 2 - Investigation (Detective Work)
-- OR (Observation Room): 20-50 observations. Start with WHAT IS HAPPENING before interpretation.
-- DC (Def-Com Room): Define key terms in Greek/Hebrew, consult trusted commentaries.
-- ST (Symbols/Types Room): Track symbols (Lamb, Rock, Light) through Scripture to Christ.
-- QR (Questions Room): Generate 50-100 questions: INTRA, INTER, and PALACE questions.
-- QA (Q&A Room): Let Scripture answer Scripture - cross-reference chains.
-
-### Floor 3 - Freestyle (Connections for Time)
-- NF (Nature Freestyle): See Scripture lessons in nature (Psalm 1's tree, storms, sunrise).
-- PF (Personal Freestyle): Your life becomes the object lesson.
-- BF (Bible Freestyle): Verse genetics - trace relationships between verses.
-- HF (History/Social Freestyle): See lessons in culture, history, current events.
-- LR (Listening Room): Turn conversations and sermons into Scripture connections.
-
-### Floor 4 - Next Level (Christ-Centered Depth)
-- CR (Concentration Room): Every text must reveal Christ. John 5:39, Luke 24:27.
-- DR (Dimensions Room): 5 dimensions - 1D Literal, 2D Christ, 3D Me, 4D Church, 5D Heaven.
-- C6 (Connect 6 Room): Classify by genre - Law, Poetry, Prophecy, Gospel, Epistle, Parable.
-- TRm (Theme Room): Place on walls - Sanctuary, Life of Christ, Great Controversy, Time-Prophecy.
-- TZ (Time Zone Room): 6 zones - Heaven-Past/Now/Future, Earth-Past/Now/Future.
-- PRm (Patterns Room): 40 days, 3 days, deliverer stories - recurring motifs.
-- P‖ (Parallels Room): Mirrored actions - Babel/Pentecost, Exodus/Return from Babylon.
-- FRt (Fruit Room): Does it produce love, joy, peace, patience, kindness, goodness, faith, meekness, temperance?
-
-### Floor 5 - Vision (Prophecy & Sanctuary)
-- BL (Blue/Sanctuary Room): Map to sanctuary furniture - Altar, Laver, Lampstand, Table, Incense, Ark.
-- PR (Prophecy Room): Daniel/Revelation timelines, repeat-and-enlarge patterns.
-- 3A (Three Angels Room): Everlasting Gospel, Babylon Fallen, Warning against the beast.
-
-### Floor 6 - Three Heavens & Cycles
-- Cycles: @Ad (Adamic), @No (Noahic), @Ab (Abrahamic), @Mo (Mosaic), @Cy (Cyrusic), @CyC (Cyrus-Christ), @Sp (Spirit), @Re (Remnant)
-- Heavens: 1H (DoL¹/NE¹), 2H (DoL²/NE²), 3H (DoL³/NE³)
-- JR (Juice Room): Run entire book through all principles.
-
-### Floor 7 - Spiritual & Emotional (Height)
-- FRm (Fire Room): Feel the emotional weight - Gethsemane, Calvary, Pentecost.
-- MR (Meditation Room): Slow marination in truth - Psalm 23, John 15.
-- SRm (Speed Room): Rapid application drills.
-
-### Floor 8 - Master (Reflexive)
-- No rooms - the Palace is inside you. Natural Phototheological thinking.
-`;
-
-const THEOLOGICAL_GUARDRAILS = `
-## CRITICAL THEOLOGICAL GUARDRAILS (NON-NEGOTIABLE)
-
-⚠️ ABSOLUTE PROHIBITIONS - NEVER TEACH:
-1. AZAZEL = SATAN, NOT CHRIST:
-   - In Leviticus 16, Azazel (scapegoat) represents SATAN bearing guilt for sin
-   - NEVER identify Azazel/scapegoat as Jesus - that is heresy
-   - The LORD's goat = Christ; Azazel = Satan
-
-2. LITTLE HORN = ROME/PAPACY, NOT ANTIOCHUS:
-   - Daniel 7 little horn = Papal Rome rising from the 10 divisions
-   - Daniel 8 little horn = Rome (pagan then papal) attacking the sanctuary
-   - NEVER identify little horn as Antiochus Epiphanes - that is preterism
-
-3. TWO-PHASE SANCTUARY MINISTRY:
-   - Christ entered HOLY PLACE (first apartment) at ASCENSION in 31 AD
-   - Christ entered MOST HOLY PLACE (second apartment) in 1844
-   - NEVER say Christ went to Most Holy Place at resurrection/ascension
-   - Hebrews contrasts earthly vs heavenly, NOT Holy vs Most Holy
-
-4. DAY OF ATONEMENT = 1844, NOT THE CROSS:
-   - Christ's death fulfills PASSOVER (spring feast)
-   - Day of Atonement (fall feast) points to 1844 judgment ministry
-   - NEVER equate Christ's death with Day of Atonement fulfillment
-
-5. FEAST TYPOLOGY:
-   - Spring feasts (Passover, Unleavened Bread, Firstfruits, Pentecost) = First Advent
-   - Fall feasts (Trumpets, Atonement, Tabernacles) = Second Advent ministry
-   - Passover = Death, Firstfruits = Resurrection, NOT Day of Atonement!
-
-ALSO NEVER TEACH:
-- Anti-Trinitarian interpretations
-- Feast-keeping as salvific
-- Offshoot SDA doctrines
-- Speculation about secret knowledge
-- Sunday-law date-setting
-- Claims contradicting SDA fundamental beliefs
-
-ALWAYS anchor in:
-- Scripture as final authority
-- The Trinity
-- Salvation by grace through faith
-- Christ's divinity and humanity
-- The heavenly sanctuary
-- The prophetic framework of Daniel & Revelation
-- The 28 Fundamental Beliefs
-`;
 
 serve(async (req) => {
   if (req.method === "OPTIONS") {
@@ -150,7 +48,7 @@ When drilling a thought:
 - Always ground insights in Scripture while exploring the thought
 ` : ''}
 
-${PALACE_STRUCTURE}
+${PALACE_SYSTEM_PROMPT}
 
 ${THEOLOGICAL_GUARDRAILS}
 

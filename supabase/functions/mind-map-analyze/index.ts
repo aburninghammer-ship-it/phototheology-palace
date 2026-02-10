@@ -1,5 +1,6 @@
 import "https://deno.land/x/xhr@0.3.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { THEOLOGICAL_GUARDRAILS } from "../_shared/palace-prompt.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -405,6 +406,8 @@ If you are tempted to invent a principle, STOP. Instead:
 1. Use ONLY the rooms and methodologies explicitly defined above
 2. Use plain language to describe insights if no room applies
 3. When in doubt, use the Gems Room (gr) which allows combining unrelated texts
+
+${THEOLOGICAL_GUARDRAILS}
 
 MANDATORY RULES:
 - Return ONLY valid JSON

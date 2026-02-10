@@ -1,4 +1,5 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { THEOLOGICAL_GUARDRAILS } from "../_shared/palace-prompt.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -143,7 +144,9 @@ GUARDRAILS
 - Never invent new rooms or codes
 - Every interpretation must pass the Fruit test (Gal 5:22-23)
 - Static ascension keeps grounding; dynamic ascension allows exploration
-- Types = objects pointing forward; Parallels = mirrored actions across time`;
+- Types = objects pointing forward; Parallels = mirrored actions across time
+
+${THEOLOGICAL_GUARDRAILS}`;
 
 interface StudyBuddyRequest {
   notes: string;

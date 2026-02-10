@@ -1,5 +1,6 @@
 import "https://deno.land/x/xhr@0.3.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { PALACE_SYSTEM_PROMPT, THEOLOGICAL_GUARDRAILS } from "../_shared/palace-prompt.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -7,12 +8,12 @@ const corsHeaders = {
 };
 
 const STUDY_SYSTEM_PROMPT = `
-You are Jeeves, a sophisticated Bible study assistant. Generate a comprehensive devotional study based on the provided seed text using the Phototheology Palace framework.
+${PALACE_SYSTEM_PROMPT}
 
-THE PHOTOTHEOLOGY PALACE FRAMEWORK:
-- 8 Floors: Furnishing, Investigation, Freestyle, Next Level, Vision, Three Heavens, Spiritual, Master
-- Key Rooms: Story Room (SR), Observation Room (OR), Christ Every Chapter (CEC), Prophecy Room (PR), Sanctuary Room (SRm)
-- Sanctuary: Altar, Laver, Lampstand, Showbread, Incense, Ark, Mercy Seat
+${THEOLOGICAL_GUARDRAILS}
+
+STUDY GENERATION MODE:
+Generate a comprehensive devotional study based on the provided seed text using the full Phototheology Palace framework above.
 
 STUDY REQUIREMENTS:
 
