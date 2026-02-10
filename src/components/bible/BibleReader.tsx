@@ -116,13 +116,10 @@ export const BibleReader = () => {
   
   // Map app language to default Bible translation
   const getDefaultTranslation = useCallback((): Translation => {
-    const langMap: Record<string, Translation> = {
-      es: "rves",
-      fr: "lsg",
-      de: "luther",
-      ko: "kjv", // No Korean available, fallback to KJV
-    };
-    return langMap[i18n.language?.slice(0, 2)] || "kjv";
+    const lang = i18n.language?.slice(0, 2);
+    if (lang === "es") return "rves";
+    if (lang === "pt") return "almeida";
+    return "kjv";
   }, [i18n.language]);
   
   const [translation, setTranslation] = useState<Translation>(getDefaultTranslation);
