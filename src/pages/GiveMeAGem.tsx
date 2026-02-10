@@ -375,16 +375,23 @@ export default function GiveMeAGem() {
       <main className="container mx-auto px-4 py-8 pt-20 pb-24 max-w-4xl">
         {/* Warrior-Style Rank Card */}
         <Card className="border-primary/30 overflow-hidden mb-8 shadow-xl">
-          {/* Rank Banner */}
-          <div className={`${gemRank.color} p-6 text-center`}>
+          {/* Rotating Gem Banner */}
+          <div className={`${gemRank.color} p-8 text-center`}>
             <motion.div
               initial={{ scale: 0.8, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
-              className="space-y-1"
+              className="space-y-3"
             >
-              <span className="text-5xl">{gemRank.icon}</span>
-              <h2 className="text-3xl font-bold">{gemRank.name}</h2>
-              <p className="text-sm opacity-80 tracking-widest">{gemRank.tier}</p>
+              <motion.div
+                animate={{ rotateY: 360 }}
+                transition={{ duration: 4, repeat: Infinity, ease: "linear" }}
+                className="inline-block text-6xl"
+                style={{ perspective: "600px" }}
+              >
+                💎
+              </motion.div>
+              <h2 className="text-3xl font-bold tracking-wide">Give Me a Gem</h2>
+              <p className="text-sm opacity-80 tracking-widest">{gemRank.tier} — {gemRank.name}</p>
             </motion.div>
           </div>
 
