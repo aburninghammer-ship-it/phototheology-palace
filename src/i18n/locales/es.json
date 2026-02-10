@@ -1304,5 +1304,41 @@
       "sermonDuplicated": "¡Sermón duplicado!",
       "duplicateError": "Error al duplicar sermón"
     }
+  },
+  "pathExercises": {
+    "title": "Ejercicios del Camino",
+    "exerciseCount": "{{count}} ejercicios",
+    "completeThese": "Completa estos ejercicios de {{pathName}} en esta sala",
+    "showInstructions": "Mostrar instrucciones",
+    "hideInstructions": "Ocultar instrucciones",
+    "instructions": "Instrucciones",
+    "allComplete": "¡Todos los ejercicios completados!",
+    "returnToPath": "Regresa a tu entrenamiento para continuar",
+    "typeDrill": "práctica",
+    "typeReflection": "reflexión",
+    "typePractice": "ejercicio",
+    "typeChallenge": "desafío"
+  },
+  "exercises": {
+    "sr-v-1": { "title": "Constructor de Escenas", "description": "Crea imágenes mentales vívidas de 3 historias bíblicas" },
+    "sr-v-2": { "title": "Galería de Secuencia", "description": "Construye una línea de tiempo visual de los eventos" },
+    "sr-v-3": { "title": "Retrato de Personaje", "description": "Visualiza personajes bíblicos en detalle" },
+    "sr-v-4": { "title": "Creación de Mapa", "description": "Dibuja un mapa geográfico o conceptual de la historia" },
+    "sr-v-5": { "title": "Temas por Colores", "description": "Asigna colores a temas recurrentes" },
+    "sr-a-1": { "title": "Análisis de Estructura", "description": "Desglosa la estructura narrativa" },
+    "sr-a-2": { "title": "Cazador de Patrones", "description": "Encuentra patrones repetidos en las secuencias" },
+    "sr-a-3": { "title": "Constructor de Cronología", "description": "Construye un marco cronológico" },
+    "sr-a-4": { "title": "Mapa de Relaciones", "description": "Analiza las conexiones entre personajes" },
+    "sr-a-5": { "title": "Cadena Causa-Efecto", "description": "Rastrea la lógica de los eventos narrativos" },
+    "sr-d-1": { "title": "Oración de Inmersión", "description": "Entra en oración en la historia como testigo" },
+    "sr-d-2": { "title": "Examen del Corazón", "description": "Reflexiona sobre el viaje interior de un personaje" },
+    "sr-d-3": { "title": "La Voz de Dios en la Historia", "description": "Escucha lo que Dios dice a través de la narrativa" },
+    "sr-d-4": { "title": "Descubrimiento de Gratitud", "description": "Encuentra razones para agradecer a Dios en la historia" },
+    "sr-d-5": { "title": "Puente de Aplicación", "description": "Conecta la historia antigua con la vida moderna" },
+    "sr-w-1": { "title": "Desafío de Recuerdo Rápido", "description": "Recuerda detalles bajo presión de tiempo" },
+    "sr-w-2": { "title": "Batalla de Secuencia", "description": "Ordena los eventos lo más rápido posible" },
+    "sr-w-3": { "title": "Sprint de Versículos", "description": "Memoriza un versículo clave de la historia" },
+    "sr-w-4": { "title": "Quiz Relámpago", "description": "Responde preguntas rápidas sobre personajes" },
+    "sr-w-5": { "title": "Carrera de Narración", "description": "Vuelve a contar la historia completa en menos de 2 minutos" }
   }
 }
