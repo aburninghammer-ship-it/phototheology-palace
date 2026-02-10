@@ -607,26 +607,31 @@ const Schedule = () => {
                     </div>
                   </div>
 
-                  {/* Submit Button */}
-                  <Button
-                    onClick={handleCreateEvent}
-                    disabled={!scheduledDate || !scheduledTime || isCreating}
-                    className={cn(
-                      'w-full bg-gradient-to-r',
-                      selectedActivityConfig?.gradient || 'from-primary to-blue-500'
-                    )}
-                  >
-                    {isCreating ? (
-                      <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                    ) : (
-                      <Calendar className="h-4 w-4 mr-2" />
-                    )}
-                    Schedule {selectedActivityConfig?.name}
-                  </Button>
                 </>
               )}
             </div>
           </ScrollArea>
+
+          {/* Submit Button - always visible outside ScrollArea */}
+          {selectedActivity && (
+            <div className="pt-4 border-t border-border">
+              <Button
+                onClick={handleCreateEvent}
+                disabled={!scheduledDate || !scheduledTime || isCreating}
+                className={cn(
+                  'w-full bg-gradient-to-r',
+                  selectedActivityConfig?.gradient || 'from-primary to-blue-500'
+                )}
+              >
+                {isCreating ? (
+                  <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                ) : (
+                  <Calendar className="h-4 w-4 mr-2" />
+                )}
+                Schedule {selectedActivityConfig?.name}
+              </Button>
+            </div>
+          )}
         </DialogContent>
       </Dialog>
     </div>
