@@ -188,6 +188,8 @@ export const Navigation = () => {
               
               {user && (
                 <>
+                  <NotificationCenter />
+
                   <Button
                     variant="ghost"
                     size="sm"
@@ -214,8 +216,6 @@ export const Navigation = () => {
                   </div>
 
                   <NavigationStyleToggle />
-
-                  <NotificationCenter />
                 </>
               )}
 
