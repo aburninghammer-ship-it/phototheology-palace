@@ -442,27 +442,50 @@ export function useScrabbleGame(gameId?: string): UseScrabbleGameReturn {
     setIsLoading(true);
 
     try {
-      console.log('[startGame] Starting game with', players.length, 'players');
+      // Reload players from database to ensure we have the latest list
+      console.log('[startGame] Reloading players from database before dealing...');
+      const { data: freshPlayers, error: playersError } = await supabase
+        .from('pt_scrabble_players')
+        .select('*')
+        .eq('game_id', game.id)
+        .order('joined_at');
+
+      if (playersError) throw playersError;
+
+      if (!freshPlayers || freshPlayers.length === 0) {
+        toast.error('No players found in game');
+        return false;
+      }
+
+      console.log('[startGame] Starting game with', freshPlayers.length, 'players:',
+        freshPlayers.map(p => p.display_name).join(', '));
 
       // Deal cards to all players - no seed card, first player places first card
       const cardsPerPlayer = 10;
-      const { hands, deck } = dealCards(players.length, cardsPerPlayer);
-      console.log('[startGame] Dealt', hands.length, 'hands, deck has', deck.length, 'cards');
+      const { hands, deck } = dealCards(freshPlayers.length, cardsPerPlayer);
+      console.log('[startGame] Dealt', hands.length, 'hands with', cardsPerPlayer, 'cards each, deck has', deck.length, 'remaining');
 
       // Start with empty board - first player will place the first card
       const initialBoard: Record<string, PlacedCard> = {};
 
       // Update each player's hand in database
-      for (let i = 0; i < players.length; i++) {
-        const player = players[i];
+      for (let i = 0; i < freshPlayers.length; i++) {
+        const player = freshPlayers[i];
         const playerHand = hands[i] || [];
-        
-        await supabase
+
+        console.log(`[startGame] Dealing ${playerHand.length} cards to ${player.display_name} (${player.id})`);
+
+        const { error: handError } = await supabase
           .from('pt_scrabble_players')
           .update({
             hand: playerHand.map(c => ({ id: c.id, code: c.code, name: c.name, floor: c.floor })),
           })
           .eq('id', player.id);
+
+        if (handError) {
+          console.error(`[startGame] Failed to deal cards to ${player.display_name}:`, handError);
+          throw handError;
+        }
       }
 
       // Update game state
@@ -487,15 +510,27 @@ export function useScrabbleGame(gameId?: string): UseScrabbleGameReturn {
         startedAt: new Date().toISOString(),
       } : null);
 
-      setPlayers(prev => prev.map((p, i) => ({
-        ...p,
+      // Map fresh players with their dealt hands
+      const playersWithHands: ScrabblePlayer[] = freshPlayers.map((p, i) => ({
+        id: p.id,
+        gameId: p.game_id,
+        userId: p.user_id,
+        teamId: p.team_id || undefined,
+        displayName: p.display_name,
+        avatarUrl: p.avatar_url || undefined,
         hand: hands[i] || [],
-      })));
+        score: p.score,
+        cardsPlayed: p.cards_played,
+        isConnected: p.is_connected,
+        joinedAt: p.joined_at,
+        lastSeenAt: p.last_seen_at,
+      }));
+      setPlayers(playersWithHands);
 
       // Reload from database to ensure we have the correct state
       // This prevents race conditions with realtime subscriptions
       console.log('[startGame] Waiting for DB propagation...');
-      await new Promise(resolve => setTimeout(resolve, 300));
+      await new Promise(resolve => setTimeout(resolve, 500));
       console.log('[startGame] Reloading players...');
       await loadPlayers(game.id);
       console.log('[startGame] Players reloaded, game started successfully');
