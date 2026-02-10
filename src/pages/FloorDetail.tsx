@@ -74,10 +74,10 @@ export default function FloorDetail() {
                 title={t('floorDetail.howToUse', { number: floor.number })}
                 steps={[
                   {
-                    title: `${t('floorDetail.floor', { number: floor.number })}: ${floor.name}`,
-                    description: floor.description,
+                    title: `${t('floorDetail.floor', { number: floor.number })}: ${t(`floorDetail.floorName${floor.number}`, floor.name)}`,
+                    description: t(`floorDetail.floorDesc${floor.number}`, floor.description),
                     highlights: [
-                      floor.subtitle,
+                      t(`floorDetail.floorSubtitle${floor.number}`, floor.subtitle),
                       t('floorDetail.roomsToExplore', { count: floor.rooms.length }),
                       t('floorDetail.eachRoomTeaches')
                     ],
@@ -117,9 +117,9 @@ export default function FloorDetail() {
               />
             </div>
 
-            <h1 className="text-5xl md:text-6xl font-serif font-black mb-3 drop-shadow-2xl tracking-tight">{floor.name}</h1>
-            <p className="text-2xl md:text-3xl mb-5 opacity-95 font-medium drop-shadow-lg">{floor.subtitle} ✨</p>
-            <p className="text-lg opacity-90 leading-relaxed max-w-3xl drop-shadow-md">{floor.description}</p>
+            <h1 className="text-5xl md:text-6xl font-serif font-black mb-3 drop-shadow-2xl tracking-tight">{t(`floorDetail.floorName${floor.number}`, floor.name)}</h1>
+            <p className="text-2xl md:text-3xl mb-5 opacity-95 font-medium drop-shadow-lg">{t(`floorDetail.floorSubtitle${floor.number}`, floor.subtitle)} ✨</p>
+            <p className="text-lg opacity-90 leading-relaxed max-w-3xl drop-shadow-md">{t(`floorDetail.floorDesc${floor.number}`, floor.description)}</p>
           </div>
         </div>
 
