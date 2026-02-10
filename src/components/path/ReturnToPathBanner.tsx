@@ -4,6 +4,7 @@
  */
 
 import { usePath, PATH_INFO, PathType } from "@/hooks/usePath";
+import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, Sparkles } from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
@@ -14,6 +15,7 @@ interface ReturnToPathBannerProps {
 }
 
 export function ReturnToPathBanner({ className = "" }: ReturnToPathBannerProps) {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const location = useLocation();
   const { activePath, isLoading } = usePath();
@@ -50,7 +52,7 @@ export function ReturnToPathBanner({ className = "" }: ReturnToPathBannerProps) 
         >
           <Sparkles className="h-3 w-3 text-primary/70 animate-pulse" />
           <span className="text-xs text-muted-foreground">
-            {pathData.icon} Path Active
+            {pathData.icon} {t('path.pathActive')}
           </span>
           <ArrowLeft className="h-3 w-3 text-muted-foreground" />
         </div>

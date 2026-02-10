@@ -1415,5 +1415,27 @@
     "timeQuick": "~5 minutes",
     "timeStandard": "~15 minutes",
     "timeDeep": "30+ minutes"
+  },
+  "identity": {
+    "streak": "Streak",
+    "xp": "XP",
+    "gems": "Gems",
+    "rooms": "Rooms"
+  },
+  "path": {
+    "chooseLearningPath": "Choose Your Learning Path",
+    "personalizeJourney": "Personalize your 2-year Phototheology journey",
+    "getStarted": "Get Started",
+    "year": "Year {{year}}",
+    "month": "Month {{month}}",
+    "weekProgress": "Week Progress: {{completed}}/{{total}} activities",
+    "complete": "Complete!",
+    "week2Premium": "Week 2+ requires Premium",
+    "upgradeToContinue": "Upgrade to Continue",
+    "daysLeftTrial": "{{days}} days left in trial period",
+    "viewWeekOutline": "View Week Outline",
+    "week": "Week {{week}}",
+    "pathActive": "Path Active",
+    "level": "Level {{level}}"
   }
 }

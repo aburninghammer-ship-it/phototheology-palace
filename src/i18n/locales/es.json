@@ -1654,5 +1654,27 @@
     "timeQuick": "~5 minutos",
     "timeStandard": "~15 minutos",
     "timeDeep": "30+ minutos"
+  },
+  "identity": {
+    "streak": "Racha",
+    "xp": "XP",
+    "gems": "Gemas",
+    "rooms": "Salas"
+  },
+  "path": {
+    "chooseLearningPath": "Elige Tu Ruta de Aprendizaje",
+    "personalizeJourney": "Personaliza tu viaje de 2 años en Fototeología",
+    "getStarted": "Comenzar",
+    "year": "Año {{year}}",
+    "month": "Mes {{month}}",
+    "weekProgress": "Progreso Semanal: {{completed}}/{{total}} actividades",
+    "complete": "¡Completo!",
+    "week2Premium": "Semana 2+ requiere Premium",
+    "upgradeToContinue": "Mejorar para Continuar",
+    "daysLeftTrial": "{{days}} días restantes en el período de prueba",
+    "viewWeekOutline": "Ver Esquema Semanal",
+    "week": "Semana {{week}}",
+    "pathActive": "Ruta Activa",
+    "level": "Nivel {{level}}"
   }
 }
