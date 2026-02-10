@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { fetchChapter, Translation } from "@/services/bibleApi";
 import { Chapter } from "@/types/bible";
 import { Card } from "@/components/ui/card";
@@ -111,7 +112,20 @@ export const BibleReader = () => {
   } = useVerseNotes(book, chapter);
   const { logReading } = useReadingStreak();
   
-  const [translation, setTranslation] = useState<Translation>("kjv");
+  const { i18n } = useTranslation();
+  
+  // Map app language to default Bible translation
+  const getDefaultTranslation = useCallback((): Translation => {
+    const langMap: Record<string, Translation> = {
+      es: "rves",
+      fr: "lsg",
+      de: "luther",
+      ko: "kjv", // No Korean available, fallback to KJV
+    };
+    return langMap[i18n.language?.slice(0, 2)] || "kjv";
+  }, [i18n.language]);
+  
+  const [translation, setTranslation] = useState<Translation>(getDefaultTranslation);
   const jeevesRef = useRef<HTMLDivElement>(null);
   const sparkTriggerRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -147,15 +161,17 @@ export const BibleReader = () => {
   }, [generateSpark, sparkPreferences?.intensity, book, chapter]);
 
   useEffect(() => {
-    // Get translation from URL parameter or use preference
+    // Get translation from URL parameter or use preference, falling back to language-based default
     const params = new URLSearchParams(window.location.search);
     const urlTranslation = params.get("t");
     if (urlTranslation) {
       setTranslation(urlTranslation as Translation);
-    } else if (!preferencesLoading) {
+    } else if (!preferencesLoading && preferences.bible_translation) {
       setTranslation(preferences.bible_translation as Translation);
+    } else {
+      setTranslation(getDefaultTranslation());
     }
-  }, [preferences.bible_translation, preferencesLoading]);
+  }, [preferences.bible_translation, preferencesLoading, getDefaultTranslation]);
 
   useEffect(() => {
     loadChapter();
