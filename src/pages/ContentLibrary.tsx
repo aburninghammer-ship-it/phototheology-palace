@@ -252,7 +252,7 @@ export default function ContentLibrary() {
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-2 text-xs text-muted-foreground">
                             {item.duration && <span>{item.duration}</span>}
-                            {item.downloads && <span>{t('content.downloadsCount', { count: item.downloads.toLocaleString() })}</span>}
+                            {item.downloads && <span>{t('content.downloadsCount', { defaultValue: '{{count}} downloads', count: item.downloads })}</span>}
                           </div>
                           <div className="flex gap-2">
                             <Button variant="outline" size="sm" onClick={() => handleDownload(item)}>
@@ -288,7 +288,7 @@ export default function ContentLibrary() {
                         <CardContent>
                           <div className="flex items-center justify-between">
                             <span className="text-xs text-muted-foreground">
-                              {item.duration || t('content.downloadsCount', { count: item.downloads?.toLocaleString() })}
+                              {item.duration || t('content.downloadsCount', { defaultValue: '{{count}} downloads', count: item.downloads || 0 })}
                             </span>
                             <Button size="sm" onClick={() => handleUseTemplate(item)}>
                               {t('content.use')}
