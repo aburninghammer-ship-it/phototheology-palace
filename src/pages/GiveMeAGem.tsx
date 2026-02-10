@@ -80,6 +80,7 @@ interface Expansion {
 }
 
 export default function GiveMeAGem() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const { user, loading: authLoading } = useAuth();
   const { preferences } = useUserPreferences();
