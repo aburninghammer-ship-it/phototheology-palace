@@ -1677,6 +1677,78 @@
     "pathActive": "Ruta Activa",
     "level": "Nivel {{level}}"
   },
+  "memory": {
+    "title": "Palacio de la Memoria",
+    "subtitle": "Domina las Escrituras con técnicas de memoria visual y el método del Palacio",
+    "howToUse": "Cómo Usar",
+    "signInRequired": "Inicia sesión para usar el Palacio de la Memoria",
+    "startMemorizing": "Comenzar a Memorizar",
+    "practiceGames": "Juegos de Práctica",
+    "practiceDrills": "Ejercicios de Práctica",
+    "createCustomList": "Crear Lista Personalizada",
+    "discoverPublicLists": "Descubrir Listas Públicas",
+    "teamMemorization": "Memorización en Equipo",
+    "tabs": {
+      "learn": "Aprender",
+      "drills": "Ejercicios",
+      "templates": "Plantillas",
+      "myLists": "Mis Listas",
+      "community": "Comunidad"
+    },
+    "stats": {
+      "versesMemorized": "Versículos Memorizados",
+      "currentStreak": "Racha Actual",
+      "activeLists": "Listas Activas",
+      "days": "{{count}} días"
+    },
+    "game": {
+      "backToMemory": "Volver a Memoria",
+      "failedToLoadList": "Error al cargar la lista",
+      "failedToLoadVerses": "Error al cargar los versículos",
+      "noVersesYet": "Sin Versículos Aún",
+      "noVersesDescription": "Agrega versículos a esta lista antes de jugar.",
+      "addVerses": "Agregar Versículos",
+      "ptInsightsToDiscover": "{{count}} perspectivas PT por descubrir",
+      "firstLetter": "Primera Letra",
+      "firstLetterDesc": "Recuerda cada palabra por su primera letra",
+      "firstLetterFullDesc": "Ve solo la primera letra de cada palabra e intenta recordar el versículo completo.",
+      "fillBlanks": "Completar Espacios",
+      "fillBlanksDesc": "Completa las palabras faltantes del versículo",
+      "memoryPalace": "Palacio de la Memoria",
+      "memoryPalaceDesc": "Construye un palacio visual para almacenar las Escrituras en tu mente",
+      "rearrange": "Reordenar",
+      "rearrangeDesc": "Coloca las palabras en orden",
+      "rearrangeFullDesc": "Arrastra y suelta las palabras desordenadas para reconstruir el versículo en el orden correcto.",
+      "typeFirstLetters": "Escribe las Primeras Letras",
+      "finalMasteryTest": "Prueba final de dominio",
+      "typeFirstLettersDesc": "Escribe la primera letra de cada palabra para demostrar que memorizaste el versículo.",
+      "select": {
+        "title": "Elige un Juego",
+        "subtitle": "Selecciona un juego de memoria para practicar",
+        "playGame": "Jugar",
+        "wordOrderTitle": "Orden de Palabras",
+        "wordOrderDesc": "Ordena las palabras desordenadas correctamente",
+        "fillBlankTitle": "Completar Espacios",
+        "fillBlankDesc": "Completa el versículo con las palabras faltantes",
+        "firstLetterTitle": "Primera Letra",
+        "firstLetterDesc": "Recuerda las palabras por sus primeras letras",
+        "difficultyEasy": "Fácil",
+        "difficultyMedium": "Medio",
+        "difficultyHard": "Difícil"
+      },
+      "complete": {
+        "analyzing": "Analizando versículo con Phototheology...",
+        "unlockingInsights": "Desbloqueando Perspectivas PT",
+        "analyzingVerse": "Analizando versículo {{current}} de {{total}}...",
+        "greatWork": "¡Excelente Trabajo!",
+        "youScored": "Obtuviste {{score}} de {{total}}",
+        "gameCompleted": "¡Juego completado!",
+        "unlockedInsights": "¡Desbloqueaste {{count}} nuevas perspectivas PT!",
+        "playAgain": "Jugar de Nuevo",
+        "crossReference": "Referencia cruzada: {{verseRef}}"
+      }
+    }
+  },
   "studyIdeas": {
     "pageTitle": "Ideas de Estudio",
     "pageSubtitle": "Tarjetas de estudio curadas, rutas guiadas e ideas generadas por IA",
