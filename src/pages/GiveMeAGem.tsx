@@ -44,23 +44,23 @@ import {
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
 
-// Gem style types - IDs and visual config only (labels come from i18n)
+// Gem style types
 const GEM_STYLES = [
-  { id: "random", icon: Shuffle, color: "from-purple-500 to-pink-500", emoji: "🎲", nameKey: "mysteryGem", descKey: "mysteryGemDesc" },
-  { id: "typology", icon: Layers, color: "from-blue-500 to-cyan-500", emoji: "✝️", nameKey: "typologyGem", descKey: "typologyGemDesc" },
-  { id: "hebrew_greek", icon: Languages, color: "from-amber-500 to-orange-500", emoji: "📜", nameKey: "wordStudyGem", descKey: "wordStudyGemDesc" },
-  { id: "prophecy", icon: ScrollText, color: "from-red-500 to-rose-500", emoji: "🔮", nameKey: "prophecyGem", descKey: "prophecyGemDesc" },
-  { id: "palace", icon: Building2, color: "from-indigo-500 to-purple-500", emoji: "🏛️", nameKey: "palaceGem", descKey: "palaceGemDesc" },
-  { id: "chiasm", icon: AlignCenter, color: "from-teal-500 to-emerald-500", emoji: "🔄", nameKey: "chiasmGem", descKey: "chiasmGemDesc" },
-  { id: "number", icon: Hash, color: "from-violet-500 to-fuchsia-500", emoji: "🔢", nameKey: "numberGem", descKey: "numberGemDesc" },
-  { id: "story", icon: BookMarked, color: "from-green-500 to-lime-500", emoji: "📖", nameKey: "storyGem", descKey: "storyGemDesc" },
+  { id: "random", name: "Mystery Gem", icon: Shuffle, color: "from-purple-500 to-pink-500", description: "Let fate choose your gem type", emoji: "🎲" },
+  { id: "typology", name: "Typology Gem", icon: Layers, color: "from-blue-500 to-cyan-500", description: "Christ-centered OT/NT connections", emoji: "✝️" },
+  { id: "hebrew_greek", name: "Word Study Gem", icon: Languages, color: "from-amber-500 to-orange-500", description: "Hebrew/Greek insights", emoji: "📜" },
+  { id: "prophecy", name: "Prophecy Gem", icon: ScrollText, color: "from-red-500 to-rose-500", description: "Prophetic patterns & fulfillments", emoji: "🔮" },
+  { id: "palace", name: "Palace Gem", icon: Building2, color: "from-indigo-500 to-purple-500", description: "Tied to PT Palace rooms", emoji: "🏛️" },
+  { id: "chiasm", name: "Chiasm Gem", icon: AlignCenter, color: "from-teal-500 to-emerald-500", description: "Literary structures & patterns", emoji: "🔄" },
+  { id: "number", name: "Number Gem", icon: Hash, color: "from-violet-500 to-fuchsia-500", description: "Biblical numerology & symbols", emoji: "🔢" },
+  { id: "story", name: "Story Gem", icon: BookMarked, color: "from-green-500 to-lime-500", description: "Narrative parallels", emoji: "📖" },
 ];
 
 // Depth tiers
 const DEPTH_TIERS = [
-  { id: "quick", gems: 1, color: "border-emerald-400 bg-emerald-500/10", nameKey: "quickGem", descKey: "quickGemDesc" },
-  { id: "study", gems: 2, color: "border-blue-400 bg-blue-500/10", nameKey: "studyGem", descKey: "studyGemDesc" },
-  { id: "deep", gems: 3, color: "border-purple-400 bg-purple-500/10", nameKey: "deepGem", descKey: "deepGemDesc" },
+  { id: "quick", name: "Quick Gem", gems: 1, description: "2-3 sentence insight", color: "border-emerald-400 bg-emerald-500/10" },
+  { id: "study", name: "Study Gem", gems: 2, description: "Fuller exploration with references", color: "border-blue-400 bg-blue-500/10" },
+  { id: "deep", name: "Deep Gem", gems: 3, description: "Multi-layered with cross-references", color: "border-purple-400 bg-purple-500/10" },
 ];
 
 interface GemData {
