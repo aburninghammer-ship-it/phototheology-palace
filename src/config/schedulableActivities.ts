@@ -2,6 +2,7 @@ import {
   Gamepad2,
   BookOpen,
   Video,
+  Radio,
   GitBranch,
   Sword,
   LayoutGrid,
@@ -22,7 +23,8 @@ export type ScheduledActivityType =
   | 'treasure-hunt'
   | 'group-study'
   | 'live-study-room'
-  | 'branch-study';
+  | 'branch-study'
+  | 'live-demo';
 
 export interface SchedulableActivity {
   id: ScheduledActivityType;
@@ -160,6 +162,18 @@ export const SCHEDULABLE_ACTIVITIES: SchedulableActivity[] = [
     maxPlayers: 8,
     supportsVerse: true,
     gradient: 'from-green-500 to-emerald-600',
+  },
+  {
+    id: 'live-demo',
+    name: 'Live',
+    description: 'Go live with camera or screen share for teaching sessions',
+    icon: Radio,
+    category: 'studies',
+    route: '/live-demo',
+    minPlayers: 1,
+    maxPlayers: 100,
+    supportsVerse: false,
+    gradient: 'from-red-500 to-rose-600',
   },
 ];
 
