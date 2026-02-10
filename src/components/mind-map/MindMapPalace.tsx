@@ -96,55 +96,20 @@ export default function MindMapPalace({
     ]);
 
     if (method === 'jeeves-study') {
-      // Full study generation mode
-      setIsGeneratingStudy(true);
-      try {
-      const { data, error } = await supabase.functions.invoke('mind-map-study', {
-          body: { text: resolvedText, mode: selectedMode },
-        });
+      // Full study mind map mode - Jeeves populates the entire mind map automatically
+      reset(resolvedText, selectedMode);
+      const analysis = await generate(resolvedText, selectedMode, true);
 
-        if (error) throw error;
-
-        setGeneratedStudy(data as GeneratedStudy);
-        toast.success('Jeeves has generated your full study!');
-      } catch (err) {
-        console.error('Study generation error:', err);
-        // Generate a mock study for development
-        const mockStudy: GeneratedStudy = {
-          title: 'Study: ' + preview,
-          introduction: 'This study explores the depths of your seed text through the Phototheology framework.',
-          sections: [
-            {
-              title: 'Key Observations',
-              content: 'The text presents several foundational elements that connect to the Palace framework.',
-              palaceConnections: ['Floor 2: Investigation', 'Observation Room'],
-              scriptures: ['Psalm 119:18'],
-            },
-            {
-              title: 'Christ-Centered Insights',
-              content: 'Every passage points to Christ. This text reveals His redemptive work through...',
-              palaceConnections: ['Floor 4: Next Level', 'Christ Every Chapter'],
-              scriptures: ['Colossians 1:16-17'],
-            },
-            {
-              title: 'Sanctuary Connections',
-              content: 'The sanctuary typology illuminates the deeper meaning...',
-              palaceConnections: ['Sanctuary', 'Altar of Burnt Offering'],
-              scriptures: ['Hebrews 9:11-12'],
-            },
-          ],
-          applicationPoints: [
-            'Meditate on how this passage reveals Christ',
-            'Consider the sanctuary imagery and its fulfillment',
-            'Apply these insights to your daily walk',
-          ],
-          closingPrayer: 'Lord, open our eyes to see the wonders in Your Word. Help us apply these truths to our lives. In Jesus\' name, Amen.',
-          relatedPassages: ['John 5:39', 'Luke 24:27', 'Hebrews 10:1'],
-        };
-        setGeneratedStudy(mockStudy);
-        toast.info('Using preview study (edge function not available)');
-      } finally {
-        setIsGeneratingStudy(false);
+      if (analysis) {
+        setCurrentAnalysis(analysis);
+        populateWithAnalysis(analysis);
+        toast.success('Jeeves has populated the entire mind map for you!');
+      } else {
+        // Use mock analysis for development
+        const mockAnalysis = generateMockAnalysis(resolvedText, selectedMode);
+        setCurrentAnalysis(mockAnalysis);
+        populateWithAnalysis(mockAnalysis);
+        toast.info('Using preview mind map (edge function not available)');
       }
     } else if (method === 'manual') {
       // Manual study mode - show all rooms as empty scaffold for user to explore
