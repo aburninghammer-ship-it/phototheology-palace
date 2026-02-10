@@ -1,7 +1,7 @@
 import { useLayoutEffect, useRef, useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { Building2, Sparkles, Users, User, CreditCard, LogOut, MessageCircle, BookOpen, Calendar, Image, Search, Video, Sword, Crown, Shield, Brain, Lightbulb, Zap, Trophy, MessageSquare, Target, StickyNote, Radio, Church, GraduationCap, Award, Gamepad2, BarChart3, Archive, Library, Layers, Network, Home, Heart, Gem, FileImage, FolderOpen } from "lucide-react";
+import { Building2, Sparkles, Users, User, CreditCard, LogOut, MessageCircle, BookOpen, Calendar, Image, Search, Video, Sword, Crown, Shield, Brain, Lightbulb, Zap, Trophy, MessageSquare, Target, StickyNote, Radio, Church, GraduationCap, Award, Gamepad2, BarChart3, Archive, Library, Layers, Network, Home, Heart, Gem, FileImage, FolderOpen, Globe } from "lucide-react";
 import { DraggableNavTabs } from "@/components/navigation/DraggableNavTabs";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
@@ -31,6 +31,11 @@ import {
   DropdownMenuTrigger,
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 
 export const Navigation = () => {
   const { t } = useTranslation();
@@ -217,6 +222,17 @@ export const Navigation = () => {
                     <SessionModeIndicator />
                     <SessionStartButton />
                   </div>
+
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button variant="ghost" size="sm" title="Change language">
+                        <Globe className="h-4 w-4" />
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-48 p-2" align="end">
+                      <LanguageSelector showLabel={false} />
+                    </PopoverContent>
+                  </Popover>
 
                   <NavigationStyleToggle />
                 </>
