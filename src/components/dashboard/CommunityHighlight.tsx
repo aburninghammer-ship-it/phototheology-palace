@@ -171,7 +171,7 @@ export function CommunityHighlight() {
         </div>
 
         <Button 
-          onClick={() => navigate(`/community/post/${trendingPost.id}`)}
+          onClick={() => navigate(`/community`)}
           className="w-full"
           variant="outline"
           size="sm"
