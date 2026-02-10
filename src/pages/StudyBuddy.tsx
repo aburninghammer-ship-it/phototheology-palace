@@ -53,6 +53,7 @@ import { getCardById, SparkCard } from "@/data/studyIdeasLibrary";
 import { SelectableText } from "@/components/ui/selectable-text";
 import { useGeneratedSparkCards, GeneratedSparkCard } from "@/hooks/useGeneratedSparkCards";
 import { VoiceInputButton } from "@/components/ui/VoiceInputButton";
+import { QuickShareButton } from "@/components/social/QuickShareButton";
 
 // Types for Jeeves analysis
 interface Spark {
@@ -1846,6 +1847,24 @@ Jeeves sees your notes and will spark connections, suggest PT rooms, source clai
                           <p className="text-sm text-violet-200 mt-2 italic">
                             "{analysis.nextStep.question}"
                           </p>
+                        </motion.div>
+                      )}
+
+                      {/* Share Button - show when there's meaningful analysis */}
+                      {analysis?.overallResponse && (
+                        <motion.div
+                          key="share"
+                          initial={{ opacity: 0, y: 10 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          className="flex justify-center pt-2"
+                        >
+                          <QuickShareButton
+                            title={`📚 Study Buddy Insight: ${sessionTitle || currentBook + " " + currentChapter}`}
+                            content={`${analysis.overallResponse.slice(0, 200)}${analysis.overallResponse.length > 200 ? '...' : ''}\n\n${analysis.sparks?.length ? `💡 ${analysis.sparks.length} sparks discovered` : ''}`}
+                            type="insight"
+                            variant="outline"
+                            size="sm"
+                          />
                         </motion.div>
                       )}
 

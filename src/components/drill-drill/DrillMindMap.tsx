@@ -7,7 +7,8 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Save, Download, ChevronDown, ChevronRight, BookOpen, Eye, Sparkles, Search, Target, Telescope, Globe, Flame, Book, Loader2, RefreshCw, Cross, Heart, Layers } from "lucide-react";
+import { Save, Download, ChevronDown, ChevronRight, BookOpen, Eye, Sparkles, Search, Target, Telescope, Globe, Flame, Book, Loader2, RefreshCw, Cross, Heart, Layers, Share2 } from "lucide-react";
+import { QuickShareButton } from "@/components/social/QuickShareButton";
 import { DrillSession, DrillVariation, DrillResponse } from "@/pages/DrillDrill";
 import { toast } from "sonner";
 import ReactMarkdown from "react-markdown";
@@ -224,6 +225,11 @@ export const DrillMindMap = ({ session, onSave, onRefresh }: DrillMindMapProps) 
                 <Download className="h-4 w-4 mr-2" />
                 Export
               </Button>
+              <QuickShareButton
+                title={`🔍 Gather the Fragments: ${session.drillType === "thought" ? "Thought Drill" : session.verse}`}
+                content={`I just completed a Phototheology drill on ${session.drillType === "thought" ? `"${session.thought?.slice(0, 100)}${session.thought && session.thought.length > 100 ? '...' : ''}"` : session.verse}!\n\n📊 Explored ${currentResponses.filter(r => r.completed).length} Palace rooms across ${Object.keys(responsesByFloor).length} floors.\n\n"Gather up the fragments that remain, that nothing be lost." - John 6:12`}
+                type="study"
+              />
               {onRefresh && (
                 <Button variant="outline" onClick={onRefresh}>
                   <RefreshCw className="h-4 w-4 mr-2" />
