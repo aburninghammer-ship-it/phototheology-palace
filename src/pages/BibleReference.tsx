@@ -674,20 +674,20 @@ const BibleReference = () => {
                             {item.symbol && (
                               <>
                                 <div className="flex-shrink-0 w-32">
-                                  <Badge variant="outline" className="w-full justify-center bg-primary/10">{t(`bibleRef.symbol.${idx}.${i}.symbol`, item.symbol)}</Badge>
+                                  <Badge variant="outline" className="w-full justify-center bg-primary/10">{String(t(`bibleRef.symbol.${idx}.${i}.symbol`, item.symbol))}</Badge>
                                 </div>
                                 <ChevronRight className="h-4 w-4 text-primary mt-1 flex-shrink-0" />
-                                <div className="text-sm flex-1">{t(`bibleRef.symbol.${idx}.${i}.meaning`, item.meaning)}</div>
+                                <div className="text-sm flex-1">{String(t(`bibleRef.symbol.${idx}.${i}.meaning`, item.meaning))}</div>
                               </>
                             )}
                             {item.event1 && (
                               <div className="flex-1 space-y-1 text-sm">
                                 <div className="flex items-center gap-2">
-                                  <Badge variant="outline" className="text-xs bg-primary/10">{t(`bibleRef.symbol.${idx}.${i}.event1`, item.event1)}</Badge>
+                                  <Badge variant="outline" className="text-xs bg-primary/10">{String(t(`bibleRef.symbol.${idx}.${i}.event1`, item.event1))}</Badge>
                                   <span className="text-muted-foreground">{'\u2194'}</span>
-                                  <Badge variant="outline" className="text-xs bg-primary/10">{t(`bibleRef.symbol.${idx}.${i}.event2`, item.event2)}</Badge>
+                                  <Badge variant="outline" className="text-xs bg-primary/10">{String(t(`bibleRef.symbol.${idx}.${i}.event2`, item.event2))}</Badge>
                                 </div>
-                                <div className="text-muted-foreground">{t(`bibleRef.symbol.${idx}.${i}.parallel`, item.parallel)}</div>
+                                <div className="text-muted-foreground">{String(t(`bibleRef.symbol.${idx}.${i}.parallel`, item.parallel))}</div>
                               </div>
                             )}
                           </div>

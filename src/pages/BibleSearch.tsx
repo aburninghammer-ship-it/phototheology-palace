@@ -101,8 +101,8 @@ const BibleSearch = () => {
             {results.length > 0 && (
               <p className="text-sm text-muted-foreground mt-2">
                 {results.length === 1
-                  ? t('bibleSearch.foundVerse', 'Found {{count}} verse', { count: totalResults > results.length ? `~${totalResults}` : results.length })
-                  : t('bibleSearch.foundVerses', 'Found {{count}} verses', { count: totalResults > results.length ? `~${totalResults}` : results.length })}
+                  ? t('bibleSearch.foundVerse', { defaultValue: 'Found {{count}} verse', count: totalResults > results.length ? totalResults : results.length })
+                  : t('bibleSearch.foundVerses', { defaultValue: 'Found {{count}} verses', count: totalResults > results.length ? totalResults : results.length })}
                 {results.length < totalResults && t('bibleSearch.showing', ' (showing {{count}})', { count: results.length })}
               </p>
             )}
