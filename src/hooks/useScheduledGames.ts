@@ -227,6 +227,20 @@ export function useScheduledGames(): UseScheduledGamesReturn {
           status: 'going',
         });
 
+      // Broadcast notification to all users
+      const globalChannel = supabase.channel('global-notifications');
+      await globalChannel.send({
+        type: 'broadcast',
+        event: 'event-scheduled',
+        payload: {
+          title: data.title || game.game_type,
+          hostName: hostName,
+          scheduledAt: data.scheduled_at.toISOString(),
+          gameType: game.game_type,
+        },
+      });
+      supabase.removeChannel(globalChannel);
+
       toast.success('Game scheduled!');
       return game.id;
     } catch (err: any) {
