@@ -1304,5 +1304,41 @@
       "sermonDuplicated": "Sermon duplicated!",
       "duplicateError": "Error duplicating sermon"
     }
+  },
+  "pathExercises": {
+    "title": "Path Exercises",
+    "exerciseCount": "{{count}} exercises",
+    "completeThese": "Complete these {{pathName}} exercises in this room",
+    "showInstructions": "Show instructions",
+    "hideInstructions": "Hide instructions",
+    "instructions": "Instructions",
+    "allComplete": "All exercises complete!",
+    "returnToPath": "Return to your path training to continue",
+    "typeDrill": "drill",
+    "typeReflection": "reflection",
+    "typePractice": "practice",
+    "typeChallenge": "challenge"
+  },
+  "exercises": {
+    "sr-v-1": { "title": "Scene Builder", "description": "Create vivid mental images of 3 Bible stories" },
+    "sr-v-2": { "title": "Story Sequence Gallery", "description": "Build a visual timeline of story events" },
+    "sr-v-3": { "title": "Character Portrait", "description": "Visualize Bible characters in detail" },
+    "sr-v-4": { "title": "Story Map Creation", "description": "Draw a geographic or conceptual map of the story" },
+    "sr-v-5": { "title": "Color-Coded Themes", "description": "Assign colors to recurring themes" },
+    "sr-a-1": { "title": "Story Structure Analysis", "description": "Break down the narrative structure" },
+    "sr-a-2": { "title": "Pattern Hunter", "description": "Find repeated patterns in story sequences" },
+    "sr-a-3": { "title": "Timeline Constructor", "description": "Build a chronological framework" },
+    "sr-a-4": { "title": "Character Relationship Map", "description": "Analyze character connections" },
+    "sr-a-5": { "title": "Cause-Effect Chain", "description": "Trace the logic of narrative events" },
+    "sr-d-1": { "title": "Story Immersion Prayer", "description": "Prayerfully enter the story as a witness" },
+    "sr-d-2": { "title": "Character Heart Check", "description": "Reflect on a character's inner journey" },
+    "sr-d-3": { "title": "God's Voice in the Story", "description": "Listen for what God is saying through the narrative" },
+    "sr-d-4": { "title": "Gratitude Discovery", "description": "Find reasons to thank God in the story" },
+    "sr-d-5": { "title": "Life Application Bridge", "description": "Connect ancient story to modern life" },
+    "sr-w-1": { "title": "Speed Recall Challenge", "description": "Recall story details under time pressure" },
+    "sr-w-2": { "title": "Story Sequence Battle", "description": "Put events in correct order as fast as possible" },
+    "sr-w-3": { "title": "Memory Verse Sprint", "description": "Memorize a key verse from the story" },
+    "sr-w-4": { "title": "Character Quiz Blitz", "description": "Answer rapid-fire character questions" },
+    "sr-w-5": { "title": "Story Retelling Race", "description": "Retell the complete story in under 2 minutes" }
   }
 }
