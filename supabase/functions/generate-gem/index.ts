@@ -308,7 +308,7 @@ It must be:
 - Unexpected (non-obvious, not a cliché)
 - Deep (rich theology, not superficial)
 - Elegant (simple but profound insight)
-- Grounded in Adventist theology (no offshoot errors)
+- Grounded in sound biblical theology (no offshoot errors)
 - Accurate + defensible (with references)
 
 ═══════════════════════════════════════════════════════════════
@@ -349,7 +349,7 @@ A ${depth === 'quick' ? '2-3' : depth === 'study' ? '3-4' : '4-5'} sentence expl
 A ${depth === 'quick' ? '3-4' : depth === 'study' ? '5-6' : '6-8'} sentence paragraph showing the beauty of the connection with a stunning "hit line" at the end.
 
 🔹 BIBLICAL ALIGNMENT
-2-3 sentences confirming alignment with redemption, sanctuary, and sound Adventist theology.
+2-3 sentences confirming alignment with redemption, sanctuary, and sound biblical theology. NEVER use the word "Adventist" or any denominational label.
 
 FORMATTING: Use emojis sparingly (📖 ✨ 💎). NO markdown bold/italic. Clean, readable format.
 
