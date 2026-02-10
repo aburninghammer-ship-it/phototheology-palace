@@ -61,16 +61,37 @@ export function useLiveNotifications() {
           duration: 8000,
         });
       })
-      .subscribe((status) => {
-        if (status === 'SUBSCRIBED') {
-          console.log('✅ Subscribed to live notifications');
-        }
-      });
+      .subscribe();
+
+    // Global notifications channel (schedule alerts, etc.)
+    const globalChannel = supabase.channel('global-notifications', {
+      config: { broadcast: { self: false } }
+    });
+
+    globalChannel
+      .on('broadcast', { event: 'event-scheduled' }, (payload) => {
+        const { title, hostName, scheduledAt } = payload.payload;
+        const when = new Date(scheduledAt);
+        const timeStr = when.toLocaleString(undefined, {
+          month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit',
+        });
+
+        toast(`📅 New Event Scheduled!`, {
+          description: `"${title}" by ${hostName} — ${timeStr}`,
+          action: {
+            label: 'View',
+            onClick: () => navigate('/schedule'),
+          },
+          duration: 8000,
+        });
+      })
+      .subscribe();
 
     setChannel(liveChannel);
 
     return () => {
       supabase.removeChannel(liveChannel);
+      supabase.removeChannel(globalChannel);
     };
   }, [user?.id]); // Only depend on user.id, not the whole user object or navigate
 
