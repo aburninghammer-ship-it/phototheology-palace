@@ -39,7 +39,7 @@ const websiteJsonLd: JsonLdData = {
 
 export const SEO = ({
   title = "Phototheology Bible Learning Suite",
-  description = "The complete Bible learning suite. Master Scripture through the 8-floor Palace method — store God's Word as images, patterns, and structures with Christ-centered interpretation.",
+  description = "🏛️ Explore the Bible through the 8-floor Palace method. AI-powered study tools, multiplayer games, mind maps, daily challenges, and a Christ-centered approach that turns every verse into a living image. Try it free!",
   canonical,
   noindex = false,
   image = DEFAULT_IMAGE,

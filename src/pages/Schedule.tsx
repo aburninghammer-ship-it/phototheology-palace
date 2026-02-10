@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { toast } from 'sonner';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { format, formatDistanceToNow } from 'date-fns';
@@ -156,6 +157,8 @@ const Schedule = () => {
     try {
       const dateTime = new Date(`${scheduledDate}T${scheduledTime}`);
       if (dateTime <= new Date()) {
+        toast.error('Please select a future date and time');
+        setIsCreating(false);
         return;
       }
 

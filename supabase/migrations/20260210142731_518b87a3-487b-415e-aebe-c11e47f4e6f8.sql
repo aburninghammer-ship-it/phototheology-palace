@@ -1,0 +1,1 @@
+ALTER TABLE public.scheduled_games ADD COLUMN IF NOT EXISTS game_options jsonb DEFAULT null;
