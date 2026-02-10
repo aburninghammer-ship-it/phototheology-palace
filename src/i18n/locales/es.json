@@ -1843,5 +1843,29 @@
       "doctrines": { "name": "Doctrinas", "description": "Enseñanzas y posiciones doctrinales bíblicas" },
       "animals": { "name": "Animales", "description": "Animales y su significado bíblico" }
     }
+  },
+  "devotionals": {
+    "pageTitle": "Devocionales",
+    "pageSubtitle": "Alimento espiritual diario para ti y tus seres queridos",
+    "howToUse": "Cómo Usar",
+    "quickDevotion": "Devocional Rápido",
+    "oneDayThemed": "Devocional temático de un día",
+    "createPlan": "Crear Plan",
+    "multiDayJourney": "Jornada devocional de varios días",
+    "createProfile": "Crear Perfil",
+    "ministerToLovedOnes": "Ministrar a seres queridos",
+    "church": "Iglesia",
+    "dailyForCongregation": "Diario para tu congregación",
+    "fiveFormats": "5 Formatos",
+    "formatsDescription": "Elige tu estilo devocional",
+    "voiceChatRoom": "Chat de Voz Devocional",
+    "autoTextRecipients": "Destinatarios de Texto Automático",
+    "activeCount": "{{count}} activos",
+    "plusMore": "+{{count}} más",
+    "manage": "Administrar",
+    "tabPersonal": "Personal",
+    "tabChurch": "Iglesia",
+    "tabSMS": "SMS",
+    "tabStudy": "Estudio"
   }
 }
