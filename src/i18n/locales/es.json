@@ -1942,5 +1942,380 @@
     "failedToUpdateComment": "Error al actualizar comentario",
     "failedToDeletePost": "Error al eliminar publicación",
     "failedToUpdatePost": "Error al actualizar publicación"
+  },
+  "pricing": {
+    "seo": {
+      "title": "Precios — Palacio de Fototeología",
+      "description": "Elige el plan que se ajuste a tu viaje por el Palacio de Fototeología."
+    },
+    "hero": {
+      "badge": "Comienza Tu Viaje",
+      "title": "Tu Palacio Te Espera",
+      "subtitle": "Desbloquea la experiencia completa de Fototeología con un plan a tu medida.",
+      "afterTrial": "Todos los planes incluyen 7 días de prueba gratis. Cancela cuando quieras."
+    },
+    "billing": {
+      "monthly": "Mensual",
+      "annual": "Anual",
+      "annualSavingsBadge": "¡Ahorra hasta un 17% con facturación anual!"
+    },
+    "trialCta": {
+      "badge": "Más Popular",
+      "title": "Comienza Tu Prueba Gratuita de 7 Días",
+      "descriptionPrefix": "Obtén",
+      "instantAccess": "acceso instantáneo",
+      "descriptionSuffix": "a todos los pisos del Palacio, herramientas de IA y juegos.",
+      "noCharge": "Sin cargo por 7 días",
+      "cancelAnytime": "Cancela cuando quieras",
+      "starting": "Iniciando prueba...",
+      "startButton": "Iniciar Prueba Gratuita",
+      "reminder": "Te recordaremos antes de que termine tu prueba."
+    },
+    "accessCode": {
+      "prompt": "¿Tienes un código de acceso?",
+      "redeem": "Canjear Código de Acceso"
+    },
+    "church": {
+      "title": "Planes para Iglesias",
+      "description": "Equipa a toda tu congregación con herramientas de Fototeología, campañas y análisis.",
+      "campaigns": "Campañas",
+      "memberManagement": "Gestión de Miembros",
+      "analytics": "Análisis",
+      "viewPlans": "Ver Planes para Iglesias"
+    },
+    "mostPopular": "Más Popular",
+    "perMonth": "/ mes",
+    "perYear": "/ año",
+    "processing": "Procesando...",
+    "annualLabel": "(Anual)",
+    "monthlyLabel": "(Mensual)",
+    "plans": {
+      "trial": {
+        "name": "Prueba Gratuita",
+        "period": "7 días",
+        "description": "Experimenta todo gratis durante 7 días.",
+        "badge": "Prueba Gratis",
+        "cta": "Iniciar Prueba",
+        "features": {
+          "allFloors": "Los 8 pisos del Palacio",
+          "unlimitedAI": "Herramientas de IA ilimitadas",
+          "allGames": "Todos los juegos y desafíos",
+          "sevenDaysFree": "7 días completamente gratis",
+          "cancelAnytime": "Cancela cuando quieras"
+        }
+      },
+      "essential": {
+        "name": "Esencial",
+        "period": "mes",
+        "description": "Experiencia básica del Palacio para estudio personal.",
+        "badge": "Gran Valor",
+        "cta": "Suscribirse",
+        "annualSavings": "Ahorra $18/año",
+        "features": {
+          "allFloors": "Los 8 pisos del Palacio",
+          "bibleReader": "Biblia de Estudio Fototeológica",
+          "coreGames": "Juegos y desafíos principales",
+          "basicAI": "Herramientas de IA básicas",
+          "emailSupport": "Soporte por correo"
+        }
+      },
+      "premium": {
+        "name": "Premium",
+        "period": "mes",
+        "description": "Acceso completo con IA avanzada y entrenamiento.",
+        "badge": "Mejor Valor",
+        "cta": "Suscribirse",
+        "annualSavings": "Ahorra $30/año",
+        "features": {
+          "allFloors": "Los 8 pisos del Palacio",
+          "artOfWar": "Entrenamiento Espiritual Arte de la Guerra",
+          "specializedAI": "Herramientas de IA especializadas",
+          "unlimitedHunts": "Búsquedas del tesoro ilimitadas",
+          "prioritySupport": "Soporte prioritario"
+        }
+      }
+    },
+    "comparison": {
+      "title": "Comparar Todos los Planes",
+      "feature": "Característica",
+      "freeTrial": "Prueba Gratis",
+      "essential": "Esencial",
+      "premium": "Premium",
+      "limited": "Limitado",
+      "basic": "Básico",
+      "email": "Correo",
+      "rows": {
+        "palace": "8 Pisos del Palacio",
+        "bibleReader": "Biblia de Estudio",
+        "coreGames": "Juegos Principales",
+        "basicAI": "IA Básica",
+        "artOfWar": "Entrenamiento Arte de la Guerra",
+        "specializedAI": "IA Especializada",
+        "escapeRooms": "Salas de Escape",
+        "prioritySupport": "Soporte Prioritario"
+      }
+    },
+    "cardUpfront": {
+      "title": "¿Por Qué Pedimos Tarjeta por Adelantado?",
+      "description": "Creemos en la transparencia total. He aquí por qué solicitamos información de pago al inicio de tu prueba gratuita:",
+      "aiCosts": {
+        "title": "Los Costos de IA Son Reales",
+        "description": "Cada interacción de IA nos cuesta dinero. Tu tarjeta nos ayuda a brindar acceso ilimitado a IA durante la prueba."
+      },
+      "sustainability": {
+        "title": "Sostenibilidad",
+        "description": "Este modelo nos ayuda a mantener el Palacio funcionando y mejorando continuamente para todos."
+      },
+      "noCharge": {
+        "title": "Sin Cargo por 7 Días",
+        "description": "No se te cobrará ni un centavo durante tu prueba. Cancela cuando quieras antes de que termine."
+      }
+    },
+    "faq": {
+      "title": "Preguntas Frecuentes",
+      "cancelAnytime": {
+        "question": "¿Puedo cancelar en cualquier momento?",
+        "answer": "¡Sí! Puedes cancelar tu suscripción en cualquier momento. Tu acceso continúa hasta el final del período de facturación."
+      },
+      "paymentMethods": {
+        "question": "¿Qué métodos de pago aceptan?",
+        "answer": "Aceptamos todas las tarjetas de crédito principales a través de Stripe, nuestro procesador de pagos seguro."
+      },
+      "whyCard": {
+        "question": "¿Por qué necesitan mi tarjeta para una prueba gratuita?",
+        "answer": "La tarjeta asegura una transición sin problemas si decides continuar. No se te cobrará durante el período de prueba."
+      },
+      "cantAfford": {
+        "question": "¿Qué pasa si no puedo pagar una suscripción?",
+        "answerPrefix": "Creemos que todos deberían tener acceso a herramientas de estudio bíblico de calidad.",
+        "reachOut": "Contáctanos",
+        "answerSuffix": "y encontraremos una solución."
+      }
+    },
+    "toasts": {
+      "trialStarted": "¡Bienvenido! Tu prueba gratuita ha comenzado.",
+      "trialCancelled": "La prueba fue cancelada.",
+      "subscriptionCancelled": "La suscripción fue cancelada.",
+      "lifetimeAccess": "¡Ya tienes acceso de por vida!",
+      "studentAccess": "¡Tienes acceso de estudiante!",
+      "activeSubscription": "¡Ya tienes una suscripción activa!",
+      "patreonLinked": "¡Membresía de Patreon vinculada exitosamente!",
+      "pickaxeLinked": "¡Membresía de Pickaxe vinculada exitosamente!",
+      "trialFailed": "Error al iniciar la prueba. Inténtalo de nuevo.",
+      "subscriptionFailed": "Error al iniciar la suscripción. Inténtalo de nuevo."
+    }
+  },
+  "series": {
+    "buildSeriesTitle": "Constructor de Series Bíblicas",
+    "buildSeriesDescription": "Crea estudios bíblicos atractivos y estructurados por el Palacio que guían a las personas piso a piso a través de las Escrituras.",
+    "backToSeries": "Volver a Series",
+    "lessonCount": "{{count}} Lecciones",
+    "lessonNumber": "Lección {{number}}",
+    "present": "Presentar",
+    "lessons": "Lecciones",
+    "noLessonsYet": "Aún no se han creado lecciones.",
+    "createNewSeries": "Crear Nueva Serie",
+    "startFromTemplate": "Empezar desde Plantilla",
+    "discoverPublicSeries": "Descubrir Series Públicas",
+    "yourSeries": "Tus Series",
+    "enrolledSeries": "Series Inscritas",
+    "enrolled": "Inscrito",
+    "errorLoadSeries": "Error al cargar series"
+  },
+  "courses": {
+    "guidedLearningBadge": "Aprendizaje Guiado",
+    "pageTitle": "Cursos",
+    "pageDescription": "Viajes estructurados de varias semanas a través del Palacio de Fototeología — diseñados para todas las edades.",
+    "ageGroupCount": "{{count}} Grupos de Edad",
+    "ageGroupsAvailable": "Grupos de Edad Disponibles",
+    "whatYoullLearn": "Lo Que Aprenderás",
+    "startCourse": "Iniciar Curso",
+    "ageGroups": {
+      "adults": "Adultos",
+      "ages5to8": "Edades 5–8",
+      "ages9to12": "Edades 9–12",
+      "ages13to16": "Edades 13–16",
+      "kids6to12": "Niños 6–12",
+      "kids": "Niños"
+    },
+    "phototheology": {
+      "title": "Curso de Fototeología de 50 Días",
+      "description": "Un viaje completo de 50 días por los 8 pisos del Palacio de Fototeología.",
+      "duration": "50 Días",
+      "level": "Principiante → Avanzado",
+      "features": {
+        "dailyLessons": "Lecciones diarias guiadas",
+        "progressiveSkills": "Desarrollo progresivo de habilidades",
+        "allFloors": "Los 8 pisos del Palacio",
+        "ageAppropriate": "Versiones apropiadas por edad"
+      }
+    },
+    "blueprint": {
+      "title": "Curso El Plano",
+      "description": "Descubre el santuario, la profecía y el plan maestro de Dios a través del Palacio.",
+      "duration": "30 Días",
+      "level": "Intermedio",
+      "features": {
+        "prophecyFoundations": "Fundamentos proféticos",
+        "sanctuarySymbolism": "Simbolismo del santuario",
+        "endTimeEvents": "Eventos del tiempo del fin",
+        "kidFriendly": "Versión para niños disponible"
+      }
+    },
+    "daniel": {
+      "title": "Curso de Daniel",
+      "description": "Recorre el libro de Daniel capítulo por capítulo usando principios de Fototeología.",
+      "duration": "42 Días",
+      "level": "Intermedio",
+      "features": {
+        "chapterByChapter": "Estudio capítulo por capítulo",
+        "prophecyInterpretation": "Interpretación profética",
+        "historicalContext": "Contexto histórico",
+        "visualMemoryAids": "Ayudas visuales de memoria"
+      }
+    },
+    "revelation": {
+      "title": "Curso de Apocalipsis",
+      "description": "Desvela los símbolos y mensajes del Apocalipsis a través del marco del Palacio.",
+      "duration": "60 Días",
+      "level": "Avanzado",
+      "features": {
+        "symbolInterpretation": "Interpretación de símbolos",
+        "threeAngelsMessages": "Los Tres Mensajes Angélicos",
+        "sanctuaryConnections": "Conexiones con el santuario",
+        "engagingKidsVersion": "Versión atractiva para niños"
+      }
+    },
+    "phototheologyCourse": {
+      "pageTitle": "Curso de Fototeología de 50 Días",
+      "pageDescription": "Un viaje completo de 50 días por el Palacio de Fototeología.",
+      "palaceStructureTitle": "Estructura del Palacio",
+      "floor1Label": "Piso 1: Amoblamiento",
+      "floor1Description": "Memoria y Visualización",
+      "floor2Label": "Piso 2: Investigación",
+      "floor2Description": "Trabajo de Detective",
+      "floor3Label": "Piso 3: Estilo Libre",
+      "floor3Description": "Conexiones Espontáneas",
+      "floor4Label": "Piso 4: Siguiente Nivel",
+      "floor4Description": "Profundidad Cristocéntrica",
+      "floors5to6Label": "Pisos 5–6: Visión y Cielos",
+      "floors5to6Description": "Profecía y Contexto Cósmico",
+      "floors7to8Label": "Pisos 7–8: Espiritual y Maestro",
+      "floors7to8Description": "Transformación y Maestría",
+      "week7Label": "Semana 7: Integración",
+      "week7Description": "Uniendo todo",
+      "day50Label": "Día 50: Graduación",
+      "day50Description": "Fototeología Reflexiva",
+      "activityLabel": "Actividad",
+      "dailyTipsTitle": "Consejos Diarios",
+      "tip1": "Tómate tu tiempo con la lección de cada día.",
+      "tip2": "Escribe tus descubrimientos y gemas.",
+      "tip3": "Practica el estilo libre durante todo el día.",
+      "tip4": "Ora antes y después de cada sesión.",
+      "congratulationsDay50": "¡Felicidades! ¡Has completado el Curso de 50 Días!"
+    },
+    "danielCourse": {
+      "pageTitle": "Curso de Daniel",
+      "pageDescription": "Recorre Daniel capítulo por capítulo usando principios de Fototeología.",
+      "courseStructureTitle": "Estructura del Curso",
+      "week1Label": "Semana 1",
+      "week1Description": "Daniel 1–2: Fundamentos",
+      "week2Label": "Semana 2",
+      "week2Description": "Daniel 3–4: Prueba y Humillación",
+      "week3Label": "Semana 3",
+      "week3Description": "Daniel 5–6: Juicio y Fidelidad",
+      "week4Label": "Semana 4",
+      "week4Description": "Daniel 7: Bestias y Reino",
+      "week5Label": "Semana 5",
+      "week5Description": "Daniel 8–9: Santuario y Tiempo",
+      "week6Label": "Semana 6",
+      "week6Description": "Daniel 10–12: Visiones Finales",
+      "selectDayDescription": "Elige un día del calendario para comenzar tu estudio.",
+      "goalsHeading": "Objetivos del Curso",
+      "goal1": "Entender Daniel a través de principios de Fototeología",
+      "goal2": "Ver a Cristo en cada capítulo",
+      "goal3": "Mapear la profecía usando el marco del Palacio",
+      "goal4": "Construir memoria visual de las visiones de Daniel"
+    },
+    "faq": {
+      "title": "Preguntas Frecuentes",
+      "whichCourseQuestion": "¿Con qué curso debo empezar?",
+      "whichCourseAnswer": "Recomendamos el Curso de Fototeología de 50 Días para principiantes. Cubre los 8 pisos progresivamente.",
+      "kidsVersionQuestion": "¿Hay versiones para niños?",
+      "kidsVersionAnswer": "¡Sí! La mayoría de cursos incluyen versiones apropiadas por edad para niños y adolescentes.",
+      "switchAgeGroupQuestion": "¿Puedo cambiar de grupo de edad a mitad de curso?",
+      "switchAgeGroupAnswer": "Por supuesto. Puedes cambiar entre grupos de edad en cualquier momento manteniendo tu progreso.",
+      "courseOrderQuestion": "¿Necesito tomar los cursos en orden?",
+      "courseOrderAnswer": "Aunque recomendamos empezar con el Curso de 50 Días, puedes comenzar con cualquier curso que te interese."
+    }
+  },
+  "training": {
+    "spiritual": {
+      "title": "Dojo de Entrenamiento Espiritual",
+      "heroQuote": "Vestíos de toda la armadura de Dios, para que podáis estar firmes contra las asechanzas del diablo. — Efesios 6:11",
+      "heroBadge": "Entrena Como un Guerrero de la Luz",
+      "todaysVictoryThought": "Pensamiento de Victoria de Hoy",
+      "dailyEncouragementDesc": "Ánimo espiritual diario para alimentar tu caminar",
+      "getEncouragement": "Obtener Ánimo de Hoy",
+      "combatArena": "Arena de Combate",
+      "lessons": "Lecciones",
+      "thirtyDayChallenge": "Desafío de 30 Días",
+      "characterTracker": "Rastreador de Carácter",
+      "battleScenarios": "Escenarios de Batalla",
+      "weapons": "Armas",
+      "artOfWarManual": "Manual del Arte de la Guerra",
+      "artOfWarDesc": "Domina las disciplinas espirituales una lección a la vez.",
+      "lessonsProgress": "Progreso: {{completed}}/{{total}} completadas",
+      "whatWouldYouDo": "¿Qué Harías Tú?",
+      "scenariosDesc": "Pon a prueba tu preparación espiritual con escenarios de la vida real.",
+      "beginTraining": "Comenzar Entrenamiento",
+      "whichFruitsQuestion": "¿Qué frutos, estilo animal y arma desplegarías?",
+      "styleLabel": "Estilo",
+      "weaponLabel": "Arma",
+      "chooseAnotherScenario": "Elegir Otro Escenario",
+      "besettingSinsTitle": "Pecados Acosadores",
+      "besettingSinsDesc": "Conoce a tu enemigo. Identifica las debilidades espirituales y sus contras.",
+      "counterWith": "Contraatacar con",
+      "animalStyleLabel": "Estilo Animal",
+      "animalStylesTitle": "Estilos Animales de Combate Espiritual",
+      "animalStylesDesc": "Cada animal bíblico representa una postura de combate y rasgo espiritual único.",
+      "armorOfGodTitle": "La Armadura de Dios",
+      "armorOfGodDesc": "Equípate con la armadura completa descrita en Efesios 6.",
+      "applyWeaponsTitle": "Aplica las Armas a la Vida",
+      "applyWeaponsDesc": "Describe una situación y recibe consejo guiado por IA sobre cómo aplicar una pieza específica de la armadura.",
+      "selectWeapon": "Selecciona un Arma",
+      "chooseWeaponPlaceholder": "Elige un arma...",
+      "describeSituation": "Describe Tu Situación",
+      "situationPlaceholder": "ej., Estoy luchando con la ansiedad sobre mi futuro...",
+      "gettingGuidance": "Obteniendo guía...",
+      "getApplicationGuidance": "Obtener Guía de Aplicación",
+      "fruitsOfSpiritTitle": "Frutos del Espíritu",
+      "fruitsOfSpiritDesc": "Los nueve frutos del Espíritu de Gálatas 5:22–23.",
+      "phototheologyCourse": "Curso de Fototeología",
+      "phototheologyCourseDesc": "Viaje completo de 50 días por el Palacio.",
+      "danielCourse": "Curso de Daniel",
+      "danielCourseDesc": "Estudia Daniel capítulo por capítulo con Fototeología.",
+      "blueprintCourse": "Curso El Plano",
+      "blueprintCourseDesc": "Descubre profecía y santuario a través del Palacio.",
+      "revelationCourse": "Curso de Apocalipsis",
+      "revelationCourseDesc": "Desvela los símbolos del Apocalipsis a través del Palacio.",
+      "startCourse": "Iniciar Curso",
+      "adultVersion": "Versión para Adultos",
+      "kidsVersion": "Versión para Niños",
+      "courseComingSoon": "¡Próximamente!",
+      "divineObjectiveTitle": "El Objetivo Divino",
+      "divineObjectiveDesc": "Todo guerrero tiene una misión. La tuya es doble:",
+      "contain": "Contener",
+      "containDesc": "Contener la propagación del pecado a través del dominio propio, la disciplina y la armadura de Dios.",
+      "destroy": "Destruir",
+      "destroyDesc": "Destruir las obras de las tinieblas a través de la Espada del Espíritu y la oración.",
+      "loginToSave": "Inicia sesión para guardar tu progreso.",
+      "lessonSaved": "¡Progreso de lección guardado!",
+      "failedToSave": "Error al guardar el progreso.",
+      "failedToFetchEncouragement": "Error al obtener el ánimo.",
+      "selectWeaponAndSituation": "Selecciona un arma y describe tu situación.",
+      "guidanceReceived": "¡Guía recibida!",
+      "failedToGetGuidance": "Error al obtener la guía."
+    }
   }
 }
