@@ -28,7 +28,7 @@ export default function LiveDemo() {
   const [isMuted, setIsMuted] = useState(true);
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
   const [newMessage, setNewMessage] = useState("");
-  const [sessionTitle, setSessionTitle] = useState("Live Phototheology Demo");
+  const [sessionTitle, setSessionTitle] = useState("Live");
   const [isTestingCamera, setIsTestingCamera] = useState(false);
   
   const testVideoRef = useRef<HTMLVideoElement>(null);
