@@ -61,14 +61,14 @@ export const ProgressivePalace = ({ showStartHere = true }: ProgressivePalacePro
       <div className="flex items-center justify-between">
         <div className="flex gap-2">
           <Button variant="ghost" size="sm" onClick={expandAll}>
-            Expand All
+            {t('palace.expandAll', 'Expand All')}
           </Button>
           <Button variant="ghost" size="sm" onClick={collapseAll}>
-            Collapse All
+            {t('palace.collapseAll', 'Collapse All')}
           </Button>
         </div>
         <Badge variant="outline" className="text-sm">
-          {progressPercentage}% Complete
+          {t('palace.percentComplete', { percent: progressPercentage })}
         </Badge>
       </div>
 
@@ -94,14 +94,14 @@ export const ProgressivePalace = ({ showStartHere = true }: ProgressivePalacePro
                   <span className="text-2xl">{theme.icon}</span>
                   <div className="text-left">
                     <div className="flex items-center gap-2">
-                      <span className="font-bold text-white">Floor {floor.number}</span>
+                      <span className="font-bold text-white">{t('palace.floorNumber', { number: floor.number, defaultValue: `Floor ${floor.number}` })}</span>
                       <span className="text-white/80">•</span>
                       <span className="text-white/90">{floor.name}</span>
                       {hasWarning && (
-                        <span className="text-amber-300 text-xs" title="Recommended: complete earlier floors first">⚠️</span>
+                        <span className="text-amber-300 text-xs" title={t('palace.completeEarlierFirst', 'Recommended: complete earlier floors first')}>⚠️</span>
                       )}
                     </div>
-                    <span className="text-white/70 text-sm">{floor.rooms.length} rooms</span>
+                    <span className="text-white/70 text-sm">{t('palace.roomsCount', { count: floor.rooms.length, defaultValue: `${floor.rooms.length} rooms` })}</span>
                   </div>
                 </div>
                 {isExpanded 
@@ -143,6 +143,7 @@ export const ProgressivePalace = ({ showStartHere = true }: ProgressivePalacePro
 
 // Start Here Guide Component
 const StartHereGuide = () => {
+  const { t } = useTranslation();
   return (
     <motion.div
       initial={{ opacity: 0, y: -20 }}
@@ -154,34 +155,34 @@ const StartHereGuide = () => {
       <div className="relative z-10">
         <div className="flex items-center gap-2 mb-3">
           <Sparkles className="h-5 w-5 text-primary" />
-          <h3 className="font-bold text-lg">Start Your Journey Here</h3>
+          <h3 className="font-bold text-lg">{t('palace.startJourneyHere', 'Start Your Journey Here')}</h3>
         </div>
         
         <p className="text-muted-foreground mb-4">
-          New to Phototheology? Follow this guided path to build your foundation.
+          {t('palace.newToPhototheology', 'New to Phototheology? Follow this guided path to build your foundation.')}
         </p>
 
         <div className="space-y-3">
           <GuidedStep 
             step={1}
-            title="Story Room (SR)"
-            description="Learn to break stories into memorable beats"
+            title={t('palace.storyRoomSR', 'Story Room (SR)')}
+            description={t('palace.storyRoomDesc', 'Learn to break stories into memorable beats')}
             link="/palace/floor/1/room/sr"
-            time="10 min"
+            time={t('palace.tenMin', '10 min')}
           />
           <GuidedStep 
             step={2}
-            title="Imagination Room (IR)"
-            description="Experience Scripture with all 5 senses"
+            title={t('palace.imaginationRoomIR', 'Imagination Room (IR)')}
+            description={t('palace.imaginationRoomDesc', 'Experience Scripture with all 5 senses')}
             link="/palace/floor/1/room/ir"
-            time="5 min"
+            time={t('palace.fiveMin', '5 min')}
           />
           <GuidedStep 
             step={3}
-            title="24FPS Room"
-            description="Create visual anchors for each chapter"
+            title={t('palace.twentyFourFPSRoom', '24FPS Room')}
+            description={t('palace.twentyFourFPSDesc', 'Create visual anchors for each chapter')}
             link="/palace/floor/1/room/24fps"
-            time="5 min"
+            time={t('palace.fiveMin', '5 min')}
           />
         </div>
 
@@ -189,7 +190,7 @@ const StartHereGuide = () => {
           <Button asChild className="w-full gradient-palace">
             <Link to="/palace/floor/1/room/sr">
               <Play className="h-4 w-4 mr-2" />
-              Begin with Story Room
+              {t('palace.beginWithStoryRoom', 'Begin with Story Room')}
             </Link>
           </Button>
         </div>
