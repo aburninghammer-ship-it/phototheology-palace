@@ -177,37 +177,28 @@ export function ScrabbleBoard({
         {Object.keys(boardState).length} cards on board | {validPositions.length} valid positions
       </div>
 
-      {/* Floating instruction overlay */}
+      {/* Compact instruction hint */}
       <AnimatePresence>
         {!selectedCard && Object.keys(boardState).length <= 1 && (
           <motion.div
-            initial={{ opacity: 0, y: -10 }}
+            initial={{ opacity: 0, y: -5 }}
             animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -10 }}
-            className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none z-20"
+            exit={{ opacity: 0, y: -5 }}
+            className="absolute bottom-10 left-1/2 -translate-x-1/2 pointer-events-none z-20"
           >
-            <div className="bg-background/95 border-2 border-primary/50 rounded-xl p-6 shadow-2xl max-w-xs text-center">
-              <motion.div
-                animate={{ y: [0, 5, 0] }}
-                transition={{ duration: 1.5, repeat: Infinity }}
-                className="mb-4"
-              >
-                <Hand className="h-12 w-12 mx-auto text-primary" />
-              </motion.div>
-              <h3 className="font-bold text-lg mb-2">
-                {Object.keys(boardState).length === 0 ? 'Start the Study' : 'Select a Card'}
-              </h3>
-              <p className="text-sm text-muted-foreground mb-4">
+            <div className="bg-background/90 border border-primary/40 rounded-lg px-4 py-2 shadow-lg flex items-center gap-2">
+              <Hand className="h-4 w-4 text-primary shrink-0" />
+              <span className="text-sm text-muted-foreground whitespace-nowrap">
                 {Object.keys(boardState).length === 0
-                  ? 'Choose a principle card to connect to the verse'
-                  : 'Choose a principle card from your hand at the bottom of the screen'
+                  ? 'Tap a card below to start'
+                  : 'Tap a card below to place it'
                 }
-              </p>
+              </span>
               <motion.div
-                animate={{ y: [0, 8, 0] }}
+                animate={{ y: [0, 3, 0] }}
                 transition={{ duration: 1, repeat: Infinity }}
               >
-                <ArrowDown className="h-6 w-6 mx-auto text-primary" />
+                <ArrowDown className="h-3.5 w-3.5 text-primary shrink-0" />
               </motion.div>
             </div>
           </motion.div>
