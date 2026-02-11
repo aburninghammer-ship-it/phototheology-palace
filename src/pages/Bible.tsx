@@ -3,8 +3,9 @@ import { useTranslation } from "react-i18next";
 import { Navigation } from "@/components/Navigation";
 import { BibleReader } from "@/components/bible/BibleReader";
 import { BibleNavigation } from "@/components/bible/BibleNavigation";
+import { AtAGlanceSidebar } from "@/components/bible/AtAGlanceSidebar";
 import { Button } from "@/components/ui/button";
-import { BookMarked, HelpCircle, Headphones, FlaskConical } from "lucide-react";
+import { BookMarked, HelpCircle, Headphones, FlaskConical, PanelLeft } from "lucide-react";
 import { Link, useSearchParams } from "react-router-dom";
 import { StudyBibleDemoDialog } from "@/components/bible/StudyBibleDemoDialog";
 import { VoiceChatWidget } from "@/components/voice/VoiceChatWidget";
@@ -17,6 +18,7 @@ const Bible = () => {
   const { t } = useTranslation();
   const { user } = useAuth();
   const [demoOpen, setDemoOpen] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   const [searchParams, setSearchParams] = useSearchParams();
   const researchMode = searchParams.get("mode") === "research";
 
@@ -64,6 +66,15 @@ const Bible = () => {
                 <Button
                   variant="outline"
                   className="bg-white/10 backdrop-blur-md border-white/20 hover:bg-white/20 whitespace-nowrap"
+                  onClick={() => setSidebarOpen(!sidebarOpen)}
+                >
+                  <PanelLeft className="h-4 w-4 mr-2" />
+                  <span className="hidden sm:inline">{t('bible.atAGlance', 'At a Glance')}</span>
+                  <span className="sm:hidden">{t('bible.atAGlanceShort', 'Books')}</span>
+                </Button>
+                <Button
+                  variant="outline"
+                  className="bg-white/10 backdrop-blur-md border-white/20 hover:bg-white/20 whitespace-nowrap"
                   onClick={() => setResearchMode(true)}
                 >
                   <FlaskConical className="h-4 w-4 mr-2" />
@@ -107,13 +118,25 @@ const Bible = () => {
             />
           )}
 
-          {/* Navigation */}
-          <div className="mb-6 sm:mb-8">
-            <BibleNavigation />
-          </div>
+          {/* Main content with optional sidebar */}
+          <div className="flex gap-0 relative">
+            {/* At a Glance Sidebar */}
+            {sidebarOpen && (
+              <div className="w-56 lg:w-64 shrink-0 h-[calc(100vh-220px)] sticky top-24 rounded-xl border border-border/50 overflow-hidden shadow-lg">
+                <AtAGlanceSidebar onClose={() => setSidebarOpen(false)} />
+              </div>
+            )}
 
-          {/* Bible Reader */}
-          <BibleReader />
+            <div className={`flex-1 min-w-0 ${sidebarOpen ? 'pl-4' : ''}`}>
+              {/* Navigation */}
+              <div className="mb-6 sm:mb-8">
+                <BibleNavigation />
+              </div>
+
+              {/* Bible Reader */}
+              <BibleReader />
+            </div>
+          </div>
         </div>
       </div>
       

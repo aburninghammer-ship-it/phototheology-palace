@@ -454,7 +454,11 @@
     "myMemorizationVerses": "Mis Versículos de Memorización",
     "memorization": "Memorización",
     "audioBibleCommentary": "Biblia en Audio y Comentario",
-    "listen": "Escuchar"
+    "listen": "Escuchar",
+    "atAGlance": "De un Vistazo",
+    "atAGlanceShort": "Libros",
+    "oldTestament": "Antiguo Testamento",
+    "newTestament": "Nuevo Testamento"
   },
   "palace": {
     "floor": "Piso",
