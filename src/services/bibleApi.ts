@@ -26,10 +26,15 @@ export const BIBLE_TRANSLATIONS = [
   { value: "bbe", label: "Bible in Basic English (BBE)" },
   { value: "clementine", label: "Clementine Latin Vulgate" },
   { value: "almeida", label: "Almeida (Portuguese)" },
+  { value: "arc", label: "Almeida Revista e Corrigida (Portuguese)" },
   { value: "rves", label: "Reina Valera (Spanish)" },
   { value: "rvr", label: "Reina Valera Revisada (Spanish)" },
+  { value: "rvr1960", label: "Reina-Valera 1960 (Spanish)" },
+  { value: "nvi", label: "Nueva Versión Internacional (Spanish)" },
   { value: "lsg", label: "Louis Segond (French)" },
   { value: "luther", label: "Luther Bibel (German)" },
+  { value: "lut", label: "Luther Bibel (German)" },
+  { value: "nvi-pt", label: "Nova Versão Internacional (Portuguese)" },
 ] as const;
 
 export type Translation = typeof BIBLE_TRANSLATIONS[number]["value"];
@@ -105,7 +110,12 @@ export const fetchChapter = async (book: string, chapter: number, translation: T
   return fetchChapterFromAPI(book, chapter, translation);
 };
 
+// Translations that bible-api.com doesn't support - skip direct call and go straight to edge function
+const EDGE_FUNCTION_ONLY = ['niv', 'esv', 'nkjv', 'nasb', 'nlt', 'rves', 'rvr', 'rvr1960', 'nvi', 'lsg', 'luther', 'lut', 'arc', 'nvi-pt'];
+
 const fetchChapterFromAPI = async (book: string, chapter: number, translation: Translation = "kjv"): Promise<Chapter> => {
+  // Skip direct bible-api.com for translations it doesn't support (avoids 5s timeout)
+  if (!EDGE_FUNCTION_ONLY.includes(translation)) {
   // Try direct public API first for speed - it's more reliable
   try {
     const directResponse = await fetch(
@@ -141,6 +151,7 @@ const fetchChapterFromAPI = async (book: string, chapter: number, translation: T
   } catch (directError) {
     console.warn("Direct API failed, trying edge function:", directError);
   }
+  } // end EDGE_FUNCTION_ONLY check
 
   // Fallback to edge function if direct API fails
   try {

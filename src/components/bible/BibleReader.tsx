@@ -118,6 +118,8 @@ export const BibleReader = () => {
   const getDefaultTranslation = useCallback((): Translation => {
     const lang = i18n.language?.slice(0, 2);
     if (lang === "es") return "rves";
+    if (lang === "fr") return "lsg";
+    if (lang === "de") return "luther";
     if (lang === "pt") return "almeida";
     return "kjv";
   }, [i18n.language]);

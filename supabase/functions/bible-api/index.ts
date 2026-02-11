@@ -45,7 +45,7 @@ const SINGLE_CHAPTER_BOOKS: Record<string, number> = {
 };
 
 // Translations supported by bible-api.com
-const BIBLE_API_SUPPORTED = ['kjv', 'web', 'bbe', 'asv', 'ylt', 'darby', 'clementine', 'almeida', 'rves'];
+const BIBLE_API_SUPPORTED = ['kjv', 'web', 'bbe', 'asv', 'ylt', 'darby', 'clementine', 'almeida'];
 
 // Map unsupported translations to closest supported alternative
 const TRANSLATION_FALLBACK: Record<string, string> = {
@@ -54,7 +54,6 @@ const TRANSLATION_FALLBACK: Record<string, string> = {
   'nkjv': 'kjv',     // NKJV -> KJV (same family)
   'nasb': 'asv',     // NASB -> ASV (literal translation)
   'nlt': 'web',      // NLT -> WEB (dynamic equivalence)
-  'rvr': 'rves',     // RVR -> RVES (Spanish)
 };
 
 // Primary API: bible-api.com (with timeout)
@@ -181,16 +180,32 @@ async function fetchFromGetBible(book: string, chapter: number): Promise<any> {
 
 // Fallback API 3: bolls.life (supports many translations including NIV, ESV, NASB)
 async function fetchFromBollsLife(book: string, chapter: number, version: string): Promise<any> {
-  // Map our translation codes to bolls.life translation IDs
-  const translationMap: Record<string, number> = {
-    'kjv': 1,
-    'niv': 111,
-    'esv': 59,
-    'nkjv': 114,
-    'nasb': 100,
-    'nlt': 116,
-    'web': 206,
-    'asv': 12,
+  // Map our translation codes to bolls.life short_name or numeric IDs
+  // bolls.life accepts short_name strings directly (e.g., "RV1960", "NVI", "LSG")
+  const translationMap: Record<string, string> = {
+    'kjv': 'KJV',
+    'niv': 'NIV',
+    'esv': 'ESV',
+    'nkjv': 'NKJV',
+    'nasb': 'NASB',
+    'nlt': 'NLT',
+    'web': 'WEB',
+    'asv': 'ASV',
+    // Spanish
+    'rves': 'RV1960',
+    'rvr': 'RV1960',
+    'rv1960': 'RV1960',
+    'rvr1960': 'RV1960',
+    'nvi': 'NVI',
+    // French
+    'lsg': 'LSG',
+    // German
+    'luther': 'LUTH1545',
+    'lut': 'LUTH1545',
+    // Portuguese
+    'almeida': 'ARC',
+    'arc': 'ARC',
+    'nvi-pt': 'NVI-PT',
   };
 
   const bookMap: Record<string, number> = {
@@ -210,7 +225,7 @@ async function fetchFromBollsLife(book: string, chapter: number, version: string
     '3 john': 64, 'jude': 65, 'revelation': 66
   };
 
-  const translationId = translationMap[version.toLowerCase()] || 1; // Default to KJV
+  const translationId = translationMap[version.toLowerCase()] || 'KJV';
   const bookId = bookMap[book.toLowerCase().trim()];
 
   if (!bookId) {
@@ -251,8 +266,8 @@ async function fetchFromBollsLife(book: string, chapter: number, version: string
   }
 }
 
-// Translations that should use bolls.life API (modern translations not in bible-api.com)
-const BOLLS_LIFE_PREFERRED = ['niv', 'esv', 'nkjv', 'nasb', 'nlt'];
+// Translations that should use bolls.life API (modern translations and non-English not in bible-api.com)
+const BOLLS_LIFE_PREFERRED = ['niv', 'esv', 'nkjv', 'nasb', 'nlt', 'rves', 'rvr', 'rv1960', 'rvr1960', 'nvi', 'lsg', 'luther', 'lut', 'almeida', 'arc', 'nvi-pt'];
 
 // Fetch with retry logic and multiple fallbacks - reduced retries for faster response
 async function fetchWithRetry(book: string, chapter: number, version: string, maxRetries = 2): Promise<any> {
@@ -371,7 +386,10 @@ serve(async (req) => {
     let actualVersion = version.toLowerCase();
     let usedFallback = false;
 
-    if (!BIBLE_API_SUPPORTED.includes(actualVersion)) {
+    // Bolls.life-preferred translations bypass the bible-api.com fallback logic
+    if (BOLLS_LIFE_PREFERRED.includes(actualVersion)) {
+      console.log(`[Bible API] Translation '${version}' will be routed to bolls.life`);
+    } else if (!BIBLE_API_SUPPORTED.includes(actualVersion)) {
       const fallback = TRANSLATION_FALLBACK[actualVersion];
       if (fallback) {
         console.log(`[Bible API] Translation '${version}' not supported, using fallback '${fallback}'`);
