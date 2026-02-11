@@ -120,14 +120,14 @@ function generateSpecialCards(): ScrabbleCard[] {
 
   // 8 Cycles (from Cycles - Floor 6)
   const cycles = [
-    { id: 'cycle-ad', code: '@Ad', name: 'Adamic Cycle', description: 'Creation, Fall, Seed promise (Gen 3:15)', tags: ['cycle', 'creation', 'adam', 'fall', 'seed'], icon: 'Apple' },
-    { id: 'cycle-no', code: '@No', name: 'Noahic Cycle', description: 'Judgment, ark, rainbow covenant', tags: ['cycle', 'judgment', 'noah', 'flood', 'covenant'], icon: 'Ship' },
-    { id: 'cycle-ab', code: '@Ab', name: 'Abrahamic Cycle', description: 'Covenant, faith, promised seed', tags: ['cycle', 'covenant', 'abraham', 'faith', 'promise'], icon: 'Star' },
-    { id: 'cycle-mo', code: '@Mo', name: 'Mosaic Cycle', description: 'Exodus, law, tabernacle nation', tags: ['cycle', 'exodus', 'moses', 'law', 'sanctuary'], icon: 'Mountain' },
-    { id: 'cycle-cy', code: '@Cy', name: 'Cyrusic Cycle', description: 'Exile, return, temple rebuilt', tags: ['cycle', 'exile', 'cyrus', 'restoration', 'return'], icon: 'Building' },
-    { id: 'cycle-cyc', code: '@CyC', name: 'Cyrus-Christ Cycle', description: 'Type meets antitype, shadow meets substance', tags: ['cycle', 'fulfillment', 'christ', 'antitype'], icon: 'Target' },
-    { id: 'cycle-sp', code: '@Sp', name: 'Spirit Cycle', description: 'Pentecost, church age, global mission', tags: ['cycle', 'pentecost', 'spirit', 'church', 'mission'], icon: 'Flame' },
-    { id: 'cycle-re', code: '@Re', name: 'Remnant Cycle', description: 'End-time witness, judgment, Second Coming', tags: ['cycle', 'remnant', 'second-coming', 'revelation', 'eschatology'], icon: 'Crown' },
+    { id: 'cycle-ad', code: '@Ad', name: 'Adamic Cycle', description: 'This cycle describes creation through the Fall and the first promise of a Redeemer (Gen 3:15). Apply the text to something in this cycle.', tags: ['cycle', 'creation', 'adam', 'fall', 'seed'], icon: 'Apple' },
+    { id: 'cycle-no', code: '@No', name: 'Noahic Cycle', description: 'This cycle describes the period from the spread of sin to the Flood judgment and God\'s rainbow covenant. Apply the text to something in this cycle.', tags: ['cycle', 'judgment', 'noah', 'flood', 'covenant'], icon: 'Ship' },
+    { id: 'cycle-ab', code: '@Ab', name: 'Abrahamic Cycle', description: 'This cycle describes the period from Abraham\'s call to the sojourn in Egypt—covenant, faith, and the promised seed. Apply the text to something in this cycle.', tags: ['cycle', 'covenant', 'abraham', 'faith', 'promise'], icon: 'Star' },
+    { id: 'cycle-mo', code: '@Mo', name: 'Mosaic Cycle', description: 'This cycle describes the period of history from the Exodus to the Babylonian captivity. Apply the text to something in this cycle.', tags: ['cycle', 'exodus', 'moses', 'law', 'sanctuary'], icon: 'Mountain' },
+    { id: 'cycle-cy', code: '@Cy', name: 'Cyrusic Cycle', description: 'This cycle describes the period from the Babylonian exile through the return and rebuilding of the temple under Cyrus. Apply the text to something in this cycle.', tags: ['cycle', 'exile', 'cyrus', 'restoration', 'return'], icon: 'Building' },
+    { id: 'cycle-cyc', code: '@CyC', name: 'Cyrus-Christ Cycle', description: 'This cycle describes the period where Old Testament types meet their New Testament antitype—shadow meets substance in Christ. Apply the text to something in this cycle.', tags: ['cycle', 'fulfillment', 'christ', 'antitype'], icon: 'Target' },
+    { id: 'cycle-sp', code: '@Sp', name: 'Spirit Cycle', description: 'This cycle describes the period from Pentecost through the church age and global mission. Apply the text to something in this cycle.', tags: ['cycle', 'pentecost', 'spirit', 'church', 'mission'], icon: 'Flame' },
+    { id: 'cycle-re', code: '@Re', name: 'Remnant Cycle', description: 'This cycle describes the end-time period of final witness, judgment, and the Second Coming. Apply the text to something in this cycle.', tags: ['cycle', 'remnant', 'second-coming', 'revelation', 'eschatology'], icon: 'Crown' },
   ];
 
   cycles.forEach(c => {
