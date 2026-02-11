@@ -25,11 +25,6 @@ import {
   DialogTitle,
   DialogDescription,
 } from '@/components/ui/dialog';
-import {
-  Collapsible,
-  CollapsibleTrigger,
-  CollapsibleContent,
-} from '@/components/ui/collapsible';
 import { ScrabbleTile } from './ScrabbleTile';
 import { supabase } from '@/integrations/supabase/client';
 import type { ScrabbleCard, PlacedCard, Connection, BoardPosition } from '@/types/scrabble';
@@ -213,12 +208,6 @@ In 2-3 sentences, explain how this new insight builds upon or connects to the pr
         ? `Good connection of "${card.name}" to the verse!`
         : `Nice way to build on ${previousEntry?.playerName}'s insight about ${previousEntry?.cardName}!`;
     }
-  };
-
-  // Handle suggestion click
-  const handleUseSuggestion = (suggestion: string) => {
-    setExplanation(suggestion);
-    setShowSuggestions(false);
   };
 
   // Handle submit - skip Jeeves for first card (race condition - first to submit wins)

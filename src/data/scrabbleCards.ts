@@ -93,11 +93,11 @@ function generateSpecialCards(): ScrabbleCard[] {
 
   // 5 Dimensions (from Dimensions Room - Floor 4)
   const dimensions = [
-    { id: 'dim-literal', code: 'Literal', name: 'Literal Dimension', description: 'Plain historical/grammatical meaning', tags: ['dimension', 'literal', 'history'], icon: 'FileText' },
-    { id: 'dim-christ', code: 'Christ', name: 'Christ Dimension', description: 'Points to Christ relationship', tags: ['dimension', 'christology', 'typology'], icon: 'Cross' },
-    { id: 'dim-me', code: 'Me', name: 'Personal Dimension', description: 'Individual application', tags: ['dimension', 'application', 'personal'], icon: 'User' },
-    { id: 'dim-church', code: 'Church', name: 'Church Dimension', description: 'Corporate body application', tags: ['dimension', 'ecclesiology', 'church'], icon: 'Users' },
-    { id: 'dim-heaven', code: 'Heaven', name: 'Heaven Dimension', description: 'Celestial realm, throne room', tags: ['dimension', 'heaven', 'eschatology'], icon: 'Cloud' },
+    { id: 'dim-literal', code: 'Literal', name: 'Literal Dimension', description: 'This dimension reads the text at face value in its original historical and grammatical context. What did it mean to the original audience? Apply this lens to the text.', tags: ['dimension', 'literal', 'history'], icon: 'FileText' },
+    { id: 'dim-christ', code: 'Christ', name: 'Christ Dimension', description: 'This dimension looks for Jesus in the text. How does this passage point to Christ — His life, death, resurrection, or ministry? Apply this lens to the text.', tags: ['dimension', 'christology', 'typology'], icon: 'Cross' },
+    { id: 'dim-me', code: 'Me', name: 'Personal Dimension', description: 'This dimension makes it personal. How does this text apply to your individual walk with God — your sins, promises, or daily life? Apply this lens to the text.', tags: ['dimension', 'application', 'personal'], icon: 'User' },
+    { id: 'dim-church', code: 'Church', name: 'Church Dimension', description: 'This dimension thinks corporately. How does this passage apply to the church as a whole — its worship, mission, unity, or discipline? Apply this lens to the text.', tags: ['dimension', 'ecclesiology', 'church'], icon: 'Users' },
+    { id: 'dim-heaven', code: 'Heaven', name: 'Heaven Dimension', description: 'This dimension looks heavenward. How does this text connect to the heavenly realm — the throne room, eternal realities, or final fulfillment? Apply this lens to the text.', tags: ['dimension', 'heaven', 'eschatology'], icon: 'Cloud' },
   ];
 
   dimensions.forEach(d => {
@@ -115,9 +115,9 @@ function generateSpecialCards(): ScrabbleCard[] {
 
   // 3 Heavens (from Three Heavens Floor - Floor 6)
   const heavens = [
-    { id: 'heaven-1h', code: '1H', name: 'First Heaven', description: 'DoL¹/NE¹ - Babylon destruction → Cyrusic restoration', tags: ['heaven', 'judgment', 'restoration', 'babylon'], icon: 'CloudSun' },
-    { id: 'heaven-2h', code: '2H', name: 'Second Heaven', description: 'DoL²/NE² - 70 AD → New-Covenant/heavenly order', tags: ['heaven', 'new-covenant', 'church', 'apostolic'], icon: 'Cloud' },
-    { id: 'heaven-3h', code: '3H', name: 'Third Heaven', description: 'DoL³/NE³ - Final judgment → Literal new creation', tags: ['heaven', 'throne', 'paradise', 'new-earth'], icon: 'Sparkles' },
+    { id: 'heaven-1h', code: '1H', name: 'First Heaven', description: 'The First Heaven horizon covers the Babylonian destruction of Jerusalem and the Cyrusic restoration. Apply the text to this horizon of prophecy.', tags: ['heaven', 'judgment', 'restoration', 'babylon'], icon: 'CloudSun' },
+    { id: 'heaven-2h', code: '2H', name: 'Second Heaven', description: 'The Second Heaven horizon covers 70 AD and the establishment of the New Covenant order. Apply the text to this horizon of prophecy.', tags: ['heaven', 'new-covenant', 'church', 'apostolic'], icon: 'Cloud' },
+    { id: 'heaven-3h', code: '3H', name: 'Third Heaven', description: 'The Third Heaven horizon covers the final judgment and the literal new creation. Apply the text to this horizon of prophecy.', tags: ['heaven', 'throne', 'paradise', 'new-earth'], icon: 'Sparkles' },
   ];
 
   heavens.forEach(h => {
@@ -185,12 +185,12 @@ function generateSpecialCards(): ScrabbleCard[] {
   // The 6 Time Zones: Heaven/Earth × Past/Present/Future
   // Used to locate where a text fits in the cosmic-historical timeline
   const timeZones = [
-    { id: 'tz-hp', code: 'H-Past', name: 'Heaven Past', description: 'How do events in heaven before the fall of man connect with this verse/story?', tags: ['timezone', 'heaven', 'past', 'pre-fall'], icon: 'History' },
-    { id: 'tz-hn', code: 'H-Now', name: 'Heaven Now', description: 'How does Christ\'s current heavenly ministry relate to this text?', tags: ['timezone', 'heaven', 'present', 'sanctuary'], icon: 'Clock' },
-    { id: 'tz-hf', code: 'H-Future', name: 'Heaven Future', description: 'What future heavenly events does this text point toward?', tags: ['timezone', 'heaven', 'future', 'eschatology'], icon: 'Hourglass' },
-    { id: 'tz-ep', code: 'E-Past', name: 'Earth Past', description: 'What historical earthly events connect to this passage?', tags: ['timezone', 'earth', 'past', 'history'], icon: 'MapPin' },
-    { id: 'tz-en', code: 'E-Now', name: 'Earth Now', description: 'How does this text apply to the believer\'s present life on earth?', tags: ['timezone', 'earth', 'present', 'application'], icon: 'Globe' },
-    { id: 'tz-ef', code: 'E-Future', name: 'Earth Future', description: 'What prophesied future events on earth does this foreshadow?', tags: ['timezone', 'earth', 'future', 'prophecy'], icon: 'Sunrise' },
+    { id: 'tz-hp', code: 'H-Past', name: 'Heaven Past', description: 'This time zone covers events in heaven before creation — Lucifer\'s rebellion, the divine counsel, and the war in heaven. Apply the text to something in this zone.', tags: ['timezone', 'heaven', 'past', 'pre-fall'], icon: 'History' },
+    { id: 'tz-hn', code: 'H-Now', name: 'Heaven Now', description: 'This time zone covers what is happening in heaven right now — Christ\'s intercession, His sanctuary ministry, and angelic activity. Apply the text to something in this zone.', tags: ['timezone', 'heaven', 'present', 'sanctuary'], icon: 'Clock' },
+    { id: 'tz-hf', code: 'H-Future', name: 'Heaven Future', description: 'This time zone covers future heavenly realities — the new heaven, the eternal throne, and the end of all tears. Apply the text to something in this zone.', tags: ['timezone', 'heaven', 'future', 'eschatology'], icon: 'Hourglass' },
+    { id: 'tz-ep', code: 'E-Past', name: 'Earth Past', description: 'This time zone covers historical events on earth that have already been fulfilled in Scripture. Apply the text to something in this zone.', tags: ['timezone', 'earth', 'past', 'history'], icon: 'MapPin' },
+    { id: 'tz-en', code: 'E-Now', name: 'Earth Now', description: 'This time zone covers the believer\'s present life on earth — how the text applies to your daily walk today. Apply the text to something in this zone.', tags: ['timezone', 'earth', 'present', 'application'], icon: 'Globe' },
+    { id: 'tz-ef', code: 'E-Future', name: 'Earth Future', description: 'This time zone covers prophesied future events on earth — the Second Coming, the millennium, and the new earth. Apply the text to something in this zone.', tags: ['timezone', 'earth', 'future', 'prophecy'], icon: 'Sunrise' },
   ];
 
   timeZones.forEach(tz => {
