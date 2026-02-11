@@ -7578,5 +7578,55 @@
     "tourComplete": "¡Tour Completo!",
     "tourCompleteDesc": "Estás listo para practicar en {{roomName}}.",
     "remember": "Recuerda:"
+  },
+  "gems": {
+    "giveMeAGem": "Dame una Gema",
+    "gems": "Gemas",
+    "toRank": "para",
+    "gemsSaved": "Gemas Guardadas",
+    "gemsToday": "Gemas Hoy",
+    "weeklyRhythm": "Ritmo semanal"
+  },
+  "analyze": {
+    "title": "Analizar Mis Pensamientos",
+    "subtitle": "Comparte tus ideas bíblicas y recibe retroalimentación integral basada en",
+    "ptPrinciples": "principios de Foteoteología",
+    "shareYourThoughts": "Comparte Tus Pensamientos",
+    "enterConcept": "Ingresa un concepto bíblico, interpretación o idea teológica",
+    "loadStudy": "Cargar Estudio o Nota",
+    "importFile": "Importar PDF/DOCX",
+    "speakThoughts": "Habla tus pensamientos",
+    "placeholder": "Ejemplo: Creo que el santuario en Hebreos representa la obra mediadora de Cristo en el cielo...",
+    "scholarMode": "Modo Académico",
+    "scholarDesc": "Análisis exegético profundo con desglose versículo por versículo, evaluación académica y precisión tipológica",
+    "deepAnalyzing": "Realizando Análisis Profundo...",
+    "analyzing": "Analizando...",
+    "scholarAnalysis": "Análisis Académico"
+  },
+  "sermon": {
+    "steps": {
+      "setup": "Configurar",
+      "smoothStones": "Piedras Lisas",
+      "buildBridges": "Construir Puentes",
+      "movieStructure": "Estructura Fílmica",
+      "writeSermon": "Escribir Sermón",
+      "complete": "Completar"
+    }
+  },
+  "studyIdeas": {
+    "studyPrompts": "Indicaciones de Estudio",
+    "openInStudyBuddy": "Abrir en Compañero de Estudio",
+    "observe": "Observar",
+    "connect": "Conectar",
+    "discover": "Descubrir",
+    "myShelf": "Mi Estante",
+    "myStudyShelf": "Mi Estante de Estudio",
+    "shelfEmpty": "Tu estante está vacío",
+    "shelfEmptyDesc": "Guarda Tarjetas de Inspiración o ideas generadas para estudiar después. Aparecerán aquí para acceso rápido.",
+    "cards": "Tarjetas",
+    "generated": "Generadas"
+  },
+  "path": {
+    "pathActive": "Ruta Activa"
   }
 }

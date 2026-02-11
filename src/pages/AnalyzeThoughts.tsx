@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Navigation } from "@/components/Navigation";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -180,6 +181,7 @@ const normalizeFurtherStudy = (item: string | FurtherStudyItem): FurtherStudyIte
 
 const AnalyzeThoughts = () => {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const [input, setInput] = useState("");
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [result, setResult] = useState<AnalysisResult | null>(null);
@@ -735,12 +737,12 @@ const AnalyzeThoughts = () => {
           <div className="inline-flex items-center justify-center gap-3 mb-4 px-6 py-3 rounded-full bg-gradient-to-r from-purple-500/20 to-blue-500/20 border border-purple-500/30">
             <Lightbulb className="h-8 w-8 text-amber-400 animate-pulse" />
             <h1 className="text-3xl md:text-4xl font-serif font-bold bg-gradient-to-r from-amber-200 via-purple-200 to-blue-200 bg-clip-text text-transparent">
-              Analyze My Thoughts
+              {t('analyze.title', 'Analyze My Thoughts')}
             </h1>
           </div>
           <p className="text-muted-foreground max-w-2xl mx-auto text-lg">
-            Share your biblical ideas and receive comprehensive feedback grounded in 
-            <span className="text-purple-400 font-medium"> Phototheology principles</span>.
+            {t('analyze.subtitle', 'Share your biblical ideas and receive comprehensive feedback grounded in')}
+            <span className="text-purple-400 font-medium"> {t('analyze.ptPrinciples', 'Phototheology principles')}</span>.
           </p>
         </motion.div>
 
@@ -750,9 +752,9 @@ const AnalyzeThoughts = () => {
             <CardHeader className="border-b border-border/50">
               <CardTitle className="flex items-center gap-2 text-xl">
                 <Sparkles className="h-5 w-5 text-amber-400" />
-                <span className="bg-gradient-to-r from-amber-200 to-purple-200 bg-clip-text text-transparent">Share Your Thoughts</span>
+                <span className="bg-gradient-to-r from-amber-200 to-purple-200 bg-clip-text text-transparent">{t('analyze.shareYourThoughts', 'Share Your Thoughts')}</span>
               </CardTitle>
-              <CardDescription>Enter a biblical concept, interpretation, or theological idea</CardDescription>
+              <CardDescription>{t('analyze.enterConcept', 'Enter a biblical concept, interpretation, or theological idea')}</CardDescription>
             </CardHeader>
             <CardContent className="space-y-5 pt-6">
               {/* Load Study/Note + Import File */}
@@ -761,7 +763,7 @@ const AnalyzeThoughts = () => {
                   <DropdownMenuTrigger asChild>
                     <Button variant="outline" size="sm" className="bg-sky-500/10 border-sky-500/30 hover:bg-sky-500/20">
                       <FileText className="h-4 w-4 mr-2 text-sky-400" />
-                      Load Study or Note
+                      {t('analyze.loadStudy', 'Load Study or Note')}
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent className="w-72">
@@ -817,7 +819,7 @@ const AnalyzeThoughts = () => {
                   ) : (
                     <>
                       <FolderOpen className="h-4 w-4 mr-2" />
-                      Import PDF/DOCX
+                      {t('analyze.importFile', 'Import PDF/DOCX')}
                     </>
                   )}
                 </Button>
@@ -832,7 +834,7 @@ const AnalyzeThoughts = () => {
 
               {/* Mobile Voice Input - Prominent */}
               <div className="md:hidden py-4 flex flex-col items-center border-b border-purple-500/20 mb-4">
-                <p className="text-sm text-muted-foreground mb-3">Speak your thoughts</p>
+                <p className="text-sm text-muted-foreground mb-3">{t('analyze.speakThoughts', 'Speak your thoughts')}</p>
                 <VoiceInput 
                   onTranscript={handleVoiceTranscript} 
                   disabled={isAnalyzing} 
@@ -842,7 +844,7 @@ const AnalyzeThoughts = () => {
 
               <div className="relative">
                 <Textarea
-                  placeholder="Example: I believe the sanctuary in Hebrews represents Christ's mediatorial work in heaven..."
+                  placeholder={t('analyze.placeholder', "Example: I believe the sanctuary in Hebrews represents Christ's mediatorial work in heaven...")}
                   value={input}
                   onChange={(e) => { setInput(e.target.value); setLoadedStudyTitle(null); }}
                   className="min-h-[150px] bg-background/50 border-purple-500/20 focus:border-purple-500/50 pr-12"
@@ -905,10 +907,10 @@ const AnalyzeThoughts = () => {
                   </div>
                   <div>
                     <p className={`font-medium transition-colors ${scholarMode ? 'text-amber-200' : 'text-foreground'}`}>
-                      Scholar Mode
+                       {t('analyze.scholarMode', 'Scholar Mode')}
                     </p>
                     <p className="text-xs text-muted-foreground">
-                      Deep exegetical analysis with verse-by-verse breakdown, scholarly assessment, & typological precision
+                      {t('analyze.scholarDesc', 'Deep exegetical analysis with verse-by-verse breakdown, scholarly assessment, & typological precision')}
                     </p>
                   </div>
                 </div>
@@ -937,12 +939,12 @@ const AnalyzeThoughts = () => {
                 {isAnalyzing ? (
                   <>
                     <Loader2 className="h-5 w-5 mr-2 animate-spin" />
-                    {scholarMode ? 'Performing Deep Analysis...' : 'Analyzing...'}
+                     {scholarMode ? t('analyze.deepAnalyzing', 'Performing Deep Analysis...') : t('analyze.analyzing', 'Analyzing...')}
                   </>
                 ) : (
                   <>
                     {scholarMode ? <GraduationCap className="h-5 w-5 mr-2" /> : <Send className="h-5 w-5 mr-2" />}
-                    {scholarMode ? 'Scholar Analysis' : 'Analyze My Thoughts'}
+                    {scholarMode ? t('analyze.scholarAnalysis', 'Scholar Analysis') : t('analyze.title', 'Analyze My Thoughts')}
                   </>
                 )}
               </Button>

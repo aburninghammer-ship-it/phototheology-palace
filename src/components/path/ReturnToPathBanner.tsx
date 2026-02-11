@@ -52,7 +52,7 @@ export function ReturnToPathBanner({ className = "" }: ReturnToPathBannerProps) 
         >
           <Sparkles className="h-3 w-3 text-primary/70 animate-pulse" />
           <span className="text-xs text-muted-foreground">
-            {pathData.icon} {t('path.pathActive')}
+            {pathData.icon} {t('path.pathActive', 'Path Active')}
           </span>
           <ArrowLeft className="h-3 w-3 text-muted-foreground" />
         </div>

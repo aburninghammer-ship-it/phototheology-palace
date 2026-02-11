@@ -43,13 +43,13 @@ import { motion } from "framer-motion";
 import { useSparks } from "@/hooks/useSparks";
 import { SparkContainer } from "@/components/sparks";
 
-const STEPS = [
-  { num: 1, title: "Setup", icon: BookOpen },
-  { num: 2, title: "Smooth Stones", icon: TrendingUp },
-  { num: 3, title: "Build Bridges", icon: ArrowRight },
-  { num: 4, title: "Movie Structure", icon: Film },
-  { num: 5, title: "Write Sermon", icon: PenLine },
-  { num: 6, title: "Complete", icon: CheckCircle2 },
+const STEP_KEYS = [
+  { num: 1, key: "setup", icon: BookOpen },
+  { num: 2, key: "smoothStones", icon: TrendingUp },
+  { num: 3, key: "buildBridges", icon: ArrowRight },
+  { num: 4, key: "movieStructure", icon: Film },
+  { num: 5, key: "writeSermon", icon: PenLine },
+  { num: 6, key: "complete", icon: CheckCircle2 },
 ];
 
 const SERMON_STYLES = [
@@ -907,7 +907,7 @@ export default function SermonBuilder() {
               transition={{ delay: 0.1 }}
               className="flex gap-4 mb-8 mt-6 overflow-x-auto pb-2"
             >
-              {STEPS.map((step, index) => (
+              {STEP_KEYS.map((step, index) => (
                 <motion.div
                   key={step.num}
                   initial={{ opacity: 0, scale: 0.9 }}
@@ -925,7 +925,7 @@ export default function SermonBuilder() {
                     }`}
                     onClick={() => goToStep(step.num)}
                   >
-                    {step.num}. {step.title}
+                    {step.num}. {t(`sermon.steps.${step.key}`, step.key)}
                   </Button>
                 </motion.div>
               ))}

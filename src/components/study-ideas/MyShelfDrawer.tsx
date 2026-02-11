@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import {
   Sheet,
   SheetContent,
@@ -30,6 +31,7 @@ interface MyShelfDrawerProps {
 
 export const MyShelfDrawer = ({ trigger }: MyShelfDrawerProps) => {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const [open, setOpen] = useState(false);
   const {
     shelfItems,
@@ -147,7 +149,7 @@ export const MyShelfDrawer = ({ trigger }: MyShelfDrawerProps) => {
         {trigger || (
           <Button variant="outline" size="sm" className="gap-2">
             <Library className="h-4 w-4" />
-            My Shelf
+            {t('studyIdeas.myShelf', 'My Shelf')}
             {shelfItems.length > 0 && (
               <Badge variant="secondary" className="ml-1">
                 {shelfItems.length}
@@ -160,30 +162,29 @@ export const MyShelfDrawer = ({ trigger }: MyShelfDrawerProps) => {
         <SheetHeader>
           <SheetTitle className="flex items-center gap-2">
             <Library className="h-5 w-5 text-amber-600" />
-            My Study Shelf
+            {t('studyIdeas.myStudyShelf', 'My Study Shelf')}
           </SheetTitle>
         </SheetHeader>
 
         {shelfItems.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-[60vh] text-center px-4">
             <Bookmark className="h-12 w-12 text-muted-foreground/30 mb-4" />
-            <h3 className="font-medium text-lg mb-2">Your shelf is empty</h3>
+            <h3 className="font-medium text-lg mb-2">{t('studyIdeas.shelfEmpty', 'Your shelf is empty')}</h3>
             <p className="text-sm text-muted-foreground">
-              Save Spark Cards or generated ideas to study later. They'll appear
-              here for quick access.
+              {t('studyIdeas.shelfEmptyDesc', "Save Spark Cards or generated ideas to study later. They'll appear here for quick access.")}
             </p>
           </div>
         ) : (
           <Tabs defaultValue="all" className="mt-4">
             <TabsList className="grid w-full grid-cols-3">
               <TabsTrigger value="all">
-                All ({shelfItems.length})
+                {t('common.all', 'All')} ({shelfItems.length})
               </TabsTrigger>
               <TabsTrigger value="cards">
-                Cards ({staticCards.length})
+                {t('studyIdeas.cards', 'Cards')} ({staticCards.length})
               </TabsTrigger>
               <TabsTrigger value="generated">
-                Generated ({generatedIdeas.length})
+                {t('studyIdeas.generated', 'Generated')} ({generatedIdeas.length})
               </TabsTrigger>
             </TabsList>
 

@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -106,6 +107,7 @@ export const SparkCardComponent = ({
   isNew = false,
 }: SparkCardComponentProps) => {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
 
   const handleOpenInStudyBuddy = () => {
@@ -212,7 +214,7 @@ export const SparkCardComponent = ({
               size="sm"
               className="w-full justify-between text-muted-foreground hover:text-foreground"
             >
-              <span className="text-xs">Study Prompts</span>
+              <span className="text-xs">{t('studyIdeas.studyPrompts', 'Study Prompts')}</span>
               <ChevronDown
                 className={cn(
                   "h-4 w-4 transition-transform",
@@ -226,7 +228,7 @@ export const SparkCardComponent = ({
               <Eye className="h-4 w-4 mt-0.5 text-blue-500 shrink-0" />
               <div>
                 <span className="font-medium text-blue-600 dark:text-blue-400">
-                  Observe:
+                  {t('studyIdeas.observe', 'Observe')}:
                 </span>{" "}
                 <span className="text-muted-foreground">
                   {card.prompts.observe}
@@ -237,7 +239,7 @@ export const SparkCardComponent = ({
               <Link2 className="h-4 w-4 mt-0.5 text-emerald-500 shrink-0" />
               <div>
                 <span className="font-medium text-emerald-600 dark:text-emerald-400">
-                  Connect:
+                  {t('studyIdeas.connect', 'Connect')}:
                 </span>{" "}
                 <span className="text-muted-foreground">
                   {card.prompts.connect}
@@ -248,7 +250,7 @@ export const SparkCardComponent = ({
               <Lightbulb className="h-4 w-4 mt-0.5 text-amber-500 shrink-0" />
               <div>
                 <span className="font-medium text-amber-600 dark:text-amber-400">
-                  Discover:
+                  {t('studyIdeas.discover', 'Discover')}:
                 </span>{" "}
                 <span className="text-muted-foreground">
                   {card.prompts.discover}
@@ -265,7 +267,7 @@ export const SparkCardComponent = ({
           size={compact ? "sm" : "default"}
         >
           <BookOpen className="h-4 w-4 mr-2" />
-          Open in Study Buddy
+          {t('studyIdeas.openInStudyBuddy', 'Open in Study Buddy')}
         </Button>
       </CardContent>
     </Card>

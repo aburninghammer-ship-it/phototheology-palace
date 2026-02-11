@@ -390,7 +390,7 @@ export default function GiveMeAGem() {
               >
                 💎
               </motion.div>
-              <h2 className="text-3xl font-bold tracking-wide text-emerald-500">Give Me a Gem</h2>
+              <h2 className="text-3xl font-bold tracking-wide text-emerald-500">{t('gems.giveMeAGem', 'Give Me a Gem')}</h2>
             </motion.div>
           </div>
 
@@ -400,11 +400,11 @@ export default function GiveMeAGem() {
               <div className="flex justify-between text-sm">
                 <span className="font-semibold flex items-center gap-1.5">
                   <Zap className="w-4 h-4 text-yellow-500" />
-                  {totalGemsSaved} Gems
+                  {totalGemsSaved} {t('gems.gems', 'Gems')}
                 </span>
                 {nextGemRank && (
                   <span className="text-muted-foreground">
-                    {nextGemRank.minGems - totalGemsSaved} to {nextGemRank.name}
+                    {nextGemRank.minGems - totalGemsSaved} {t('gems.toRank', 'to')} {nextGemRank.name}
                   </span>
                 )}
               </div>
@@ -421,18 +421,18 @@ export default function GiveMeAGem() {
               <motion.div whileHover={{ scale: 1.02 }} className="bg-gradient-to-br from-primary/10 to-primary/5 rounded-lg p-3 text-center">
                 <Crown className="w-6 h-6 mx-auto text-primary mb-1" />
                 <p className="text-2xl font-bold">{totalGemsSaved}</p>
-                <p className="text-xs text-muted-foreground">Gems Saved</p>
+                <p className="text-xs text-muted-foreground">{t('gems.gemsSaved', 'Gems Saved')}</p>
               </motion.div>
               <motion.div whileHover={{ scale: 1.02 }} className="bg-gradient-to-br from-amber-500/10 to-amber-500/5 rounded-lg p-3 text-center">
                 <Zap className="w-6 h-6 mx-auto text-amber-500 mb-1" />
                 <p className="text-2xl font-bold">{gemsRemaining}</p>
-                <p className="text-xs text-muted-foreground">Gems Today</p>
+                <p className="text-xs text-muted-foreground">{t('gems.gemsToday', 'Gems Today')}</p>
               </motion.div>
             </div>
 
             {/* Weekly Rhythm (compact) */}
             <div className="flex items-center justify-center gap-2 pt-2 border-t border-border/50">
-              <span className="text-xs text-muted-foreground">Weekly rhythm:</span>
+              <span className="text-xs text-muted-foreground">{t('gems.weeklyRhythm', 'Weekly rhythm')}:</span>
               <div className="flex items-center gap-1">
                 {['S', 'M', 'T', 'W', 'T', 'F', 'S'].map((day, i) => {
                   const gems = i === 5 ? 2 : i === 6 ? 0 : 1;
