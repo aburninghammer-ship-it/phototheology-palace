@@ -2,7 +2,8 @@
 // Bottom bar showing player's cards
 
 import { motion, AnimatePresence } from 'framer-motion';
-import { Hand, Sparkles } from 'lucide-react';
+import { Hand, Sparkles, RefreshCw } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 import { ScrabbleTile } from './ScrabbleTile';
 import type { ScrabbleCard } from '@/types/scrabble';
 import { cn } from '@/lib/utils';
@@ -11,6 +12,7 @@ interface PlayerHandBarProps {
   cards: ScrabbleCard[];
   selectedCard?: ScrabbleCard | null;
   onCardSelect: (card: ScrabbleCard) => void;
+  onRefresh?: () => void;
   disabled?: boolean;
   score?: number;
   className?: string;
@@ -20,6 +22,7 @@ export function PlayerHandBar({
   cards,
   selectedCard,
   onCardSelect,
+  onRefresh,
   disabled = false,
   score = 0,
   className,
@@ -34,11 +37,24 @@ export function PlayerHandBar({
     )}>
       {/* Score display */}
       <div className="flex items-center justify-between px-4 py-2">
-        <div className="flex items-center gap-2">
-          <Hand className="h-4 w-4 text-muted-foreground" />
-          <span className="text-sm text-muted-foreground">
-            {cards.length} cards in hand
-          </span>
+        <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2">
+            <Hand className="h-4 w-4 text-muted-foreground" />
+            <span className="text-sm text-muted-foreground">
+              {cards.length} cards in hand
+            </span>
+          </div>
+          {onRefresh && (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={onRefresh}
+              className="h-7 px-2 text-xs gap-1"
+            >
+              <RefreshCw className="h-3 w-3" />
+              Refresh
+            </Button>
+          )}
         </div>
         <div className="flex items-center gap-2">
           <Sparkles className="h-4 w-4 text-yellow-500" />

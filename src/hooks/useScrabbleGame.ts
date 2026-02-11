@@ -21,7 +21,7 @@ import {
   getValidPlacements,
   calculateScore,
 } from '@/types/scrabble';
-import { getCardById, dealCards, getAllScrabbleCards } from '@/data/scrabbleCards';
+import { getCardById, dealCards, getAllScrabbleCards, shuffleCards } from '@/data/scrabbleCards';
 
 interface UseScrabbleGameReturn {
   game: ScrabbleGame | null;
@@ -44,6 +44,7 @@ interface UseScrabbleGameReturn {
     explanation: string,
     isChristConnection: boolean
   ) => Promise<boolean>;
+  refreshHand: () => Promise<boolean>;
   vote: (moveId: string, approve: boolean) => Promise<boolean>;
   leaveGame: () => Promise<void>;
 
@@ -460,10 +461,10 @@ export function useScrabbleGame(gameId?: string): UseScrabbleGameReturn {
       console.log('[startGame] Starting game with', freshPlayers.length, 'players:',
         freshPlayers.map(p => p.display_name).join(', '));
 
-      // Deal cards to all players - no seed card, first player places first card
+      // Deal cards to all players - each gets 10 from the full deck independently
       const cardsPerPlayer = 10;
-      const { hands, deck } = dealCards(freshPlayers.length, cardsPerPlayer);
-      console.log('[startGame] Dealt', hands.length, 'hands with', cardsPerPlayer, 'cards each, deck has', deck.length, 'remaining');
+      const { hands } = dealCards(freshPlayers.length, cardsPerPlayer);
+      console.log('[startGame] Dealt', hands.length, 'hands with', cardsPerPlayer, 'cards each (each player has full deck access)');
 
       // Start with empty board - first player will place the first card
       const initialBoard: Record<string, PlacedCard> = {};
@@ -488,13 +489,13 @@ export function useScrabbleGame(gameId?: string): UseScrabbleGameReturn {
         }
       }
 
-      // Update game state
+      // Update game state (no shared deck - each player has full deck access)
       const { error: updateError } = await supabase
         .from('pt_scrabble_games')
         .update({
           status: 'playing',
           board_state: JSON.parse(JSON.stringify(initialBoard)) as Json,
-          deck_remaining: deck.map(c => c.id),
+          deck_remaining: [],
           started_at: new Date().toISOString(),
         })
         .eq('id', game.id);
@@ -506,7 +507,7 @@ export function useScrabbleGame(gameId?: string): UseScrabbleGameReturn {
         ...prev,
         status: 'playing',
         boardState: initialBoard,
-        deckRemaining: deck.map(c => c.id),
+        deckRemaining: [],
         startedAt: new Date().toISOString(),
       } : null);
 
@@ -618,24 +619,14 @@ export function useScrabbleGame(gameId?: string): UseScrabbleGameReturn {
         [posKey]: placedCard,
       };
 
-      // Draw new card if deck has cards
-      let newHand = myPlayer.hand.filter(c => c.id !== card.id);
-      let newDeck = [...game.deckRemaining];
-      
-      if (newDeck.length > 0) {
-        const newCardId = newDeck.shift()!;
-        const newCard = getCardById(newCardId);
-        if (newCard) {
-          newHand = [...newHand, newCard];
-        }
-      }
+      // Remove played card from hand (no auto-draw; use refresh to get new cards)
+      const newHand = myPlayer.hand.filter(c => c.id !== card.id);
 
       // Update game board
       await supabase
         .from('pt_scrabble_games')
         .update({
           board_state: JSON.parse(JSON.stringify(newBoard)) as Json,
-          deck_remaining: newDeck,
         })
         .eq('id', game.id);
 
@@ -672,6 +663,53 @@ export function useScrabbleGame(gameId?: string): UseScrabbleGameReturn {
       console.error('Error placing card:', err);
       setError(err.message);
       toast.error('Failed to place card');
+      return false;
+    } finally {
+      setIsLoading(false);
+    }
+  }, [game, myPlayer]);
+
+  // Refresh hand - reshuffle remaining deck and draw 10 new cards
+  const refreshHand = useCallback(async (): Promise<boolean> => {
+    if (!game || !myPlayer) {
+      toast.error('Not in a game');
+      return false;
+    }
+
+    setIsLoading(true);
+
+    try {
+      const allCards = getAllScrabbleCards();
+      // Find cards this player has placed on the board
+      const myPlayedCardIds = new Set(
+        Object.values(game.boardState)
+          .filter(p => p.playerId === myPlayer.id)
+          .map(p => p.card.id)
+      );
+
+      const availableCards = allCards.filter(c => !myPlayedCardIds.has(c.id));
+      const shuffled = shuffleCards(availableCards);
+      const newHand = shuffled.slice(0, 10);
+
+      // Update DB
+      await supabase
+        .from('pt_scrabble_players')
+        .update({
+          hand: newHand.map(c => ({ id: c.id, code: c.code, name: c.name, floor: c.floor })),
+        })
+        .eq('id', myPlayer.id);
+
+      // Update local state
+      setPlayers(prev => prev.map(p => {
+        if (p.id !== myPlayer.id) return p;
+        return { ...p, hand: newHand };
+      }));
+
+      toast.success('Hand refreshed!');
+      return true;
+    } catch (err: any) {
+      console.error('Error refreshing hand:', err);
+      toast.error('Failed to refresh hand');
       return false;
     } finally {
       setIsLoading(false);
@@ -775,6 +813,7 @@ export function useScrabbleGame(gameId?: string): UseScrabbleGameReturn {
     joinGame,
     startGame,
     placeCard,
+    refreshHand,
     vote,
     leaveGame,
 

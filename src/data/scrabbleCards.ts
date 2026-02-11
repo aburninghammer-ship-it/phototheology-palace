@@ -425,37 +425,21 @@ export function shuffleCards(cards: ScrabbleCard[]): ScrabbleCard[] {
   return shuffled;
 }
 
-// Deal cards to players
+// Deal cards to players - each player gets their own independent hand from the full deck
 export function dealCards(
   playerCount: number,
   cardsPerPlayer: number = 10
-): { hands: ScrabbleCard[][]; deck: ScrabbleCard[]; seedCard: ScrabbleCard } {
-  const allCards = shuffleCards(getAllScrabbleCards());
+): { hands: ScrabbleCard[][] } {
+  const allCards = getAllScrabbleCards();
 
-  // Pick a random seed card from the middle floors (more connections possible)
-  const midFloorCards = allCards.filter(c => c.floor >= 2 && c.floor <= 5);
-  const seedCard = midFloorCards[Math.floor(Math.random() * midFloorCards.length)];
-
-  // Remove seed card from deck
-  const deck = allCards.filter(c => c.id !== seedCard.id);
-
-  // Deal hands
+  // Each player gets cardsPerPlayer random cards from the full pool independently
   const hands: ScrabbleCard[][] = [];
-  let deckIndex = 0;
-
   for (let i = 0; i < playerCount; i++) {
-    const hand: ScrabbleCard[] = [];
-    for (let j = 0; j < cardsPerPlayer && deckIndex < deck.length; j++) {
-      hand.push(deck[deckIndex]);
-      deckIndex++;
-    }
-    hands.push(hand);
+    const shuffled = shuffleCards(allCards);
+    hands.push(shuffled.slice(0, cardsPerPlayer));
   }
 
-  // Remaining cards become the draw deck
-  const remainingDeck = deck.slice(deckIndex);
-
-  return { hands, deck: remainingDeck, seedCard };
+  return { hands };
 }
 
 // Get total card count

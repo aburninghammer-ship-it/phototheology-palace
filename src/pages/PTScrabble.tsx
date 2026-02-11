@@ -76,6 +76,7 @@ export default function PTScrabble() {
     joinGame,
     startGame,
     placeCard: mpPlaceCard,
+    refreshHand: mpRefreshHand,
     vote,
     getValidPositions,
     getAdjacentCards: mpGetAdjacentCards,
@@ -132,31 +133,35 @@ export default function PTScrabble() {
   // Board state - seed card placed at center
   const [boardState, setBoardState] = useState<Record<string, PlacedCard>>({});
 
-  // Player hand
+  // Player hand (10 visible cards from the full deck)
   const [playerHand, setPlayerHand] = useState<ScrabbleCard[]>([]);
-
-  // Deck for drawing
-  const [deck, setDeck] = useState<ScrabbleCard[]>([]);
 
   // Start game with selected verse - go directly to playing with empty board
   const handleVerseSelected = useCallback((verse: SelectedVerse) => {
     setSeedVerse(verse);
 
-    // Initialize game state
+    // Initialize game state - deal 10 random cards from full deck
     const allCards = shuffleCards(getAllScrabbleCards());
 
     // Empty board - first player places first card
     setBoardState({});
 
-    // Deal hand
-    setPlayerHand(allCards.slice(0, 7));
-    setDeck(allCards.slice(7));
+    // Deal hand of 10 from full deck
+    setPlayerHand(allCards.slice(0, 10));
     setScore(0);
     setSelectedCard(null);
 
     // Go directly to playing
     setGamePhase("playing");
   }, []);
+
+  // Refresh hand - return current hand to pool, reshuffle, draw 10 new cards
+  const handleRefreshHand = useCallback(() => {
+    const playedCardIds = new Set(Object.values(boardState).map(p => p.card.id));
+    const availableCards = getAllScrabbleCards().filter(c => !playedCardIds.has(c.id));
+    const shuffled = shuffleCards(availableCards);
+    setPlayerHand(shuffled.slice(0, 10));
+  }, [boardState]);
 
   // Compute cards with their pre-assigned positions
   const cardsWithPositions = useMemo((): CardWithPosition[] => {
@@ -276,15 +281,8 @@ export default function PTScrabble() {
     // Update score
     setScore(prev => prev + points);
 
-    // Remove from hand
+    // Remove from hand (card is permanently removed from the full deck via boardState)
     setPlayerHand(prev => prev.filter(c => c.id !== connectionModal.card!.id));
-
-    // Draw a new card if deck has cards
-    if (deck.length > 0) {
-      const [newCard, ...remainingDeck] = deck;
-      setPlayerHand(prev => [...prev, newCard]);
-      setDeck(remainingDeck);
-    }
 
     setSelectedCard(null);
     setConnectionModal({ isOpen: false, card: null, position: null, adjacentCards: [] });
@@ -292,20 +290,13 @@ export default function PTScrabble() {
     // Show Jeeves feedback panel with the new entry
     setLastPlacedEntry(newEntry);
     setShowFeedbackPanel(true);
-
-    // Check for game completion (no cards in hand and deck is empty)
-    if (playerHand.length <= 1 && deck.length === 0) {
-      // Delay to show the last card placement animation
-      setTimeout(() => setGamePhase("completed"), 1500);
-    }
-  }, [connectionModal, user, deck, playerHand.length, studyLogEntries.length]);
+  }, [connectionModal, user, studyLogEntries.length]);
 
   const handleNewGame = useCallback(() => {
     setGamePhase("verse-selection");
     setSeedVerse(null);
     setBoardState({});
     setPlayerHand([]);
-    setDeck([]);
     setScore(0);
     setSelectedCard(null);
     setStudyLogEntries([]);
@@ -850,6 +841,7 @@ export default function PTScrabble() {
             cards={mpMyHand}
             selectedCard={mpSelectedCard}
             onCardSelect={handleMpCardSelect}
+            onRefresh={mpRefreshHand}
             disabled={false}
             score={mpMyPlayer?.score || 0}
           />
@@ -1003,6 +995,7 @@ export default function PTScrabble() {
       <SpatialHandDisplay
         cards={cardsWithPositions}
         onCardSelect={handleDirectPlacement}
+        onRefresh={handleRefreshHand}
         score={score}
       />
 

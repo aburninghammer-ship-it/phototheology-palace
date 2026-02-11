@@ -2,7 +2,8 @@
 // Shows cards arranged spatially to preview their board positions
 
 import { motion, AnimatePresence } from 'framer-motion';
-import { Sparkles } from 'lucide-react';
+import { Sparkles, RefreshCw } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 import { ScrabbleTile } from './ScrabbleTile';
 import type { ScrabbleCard, BoardPosition } from '@/types/scrabble';
 import { cn } from '@/lib/utils';
@@ -16,6 +17,7 @@ export interface CardWithPosition {
 interface SpatialHandDisplayProps {
   cards: CardWithPosition[];
   onCardSelect: (card: ScrabbleCard, position: BoardPosition) => void;
+  onRefresh?: () => void;
   disabled?: boolean;
   score?: number;
   className?: string;
@@ -24,6 +26,7 @@ interface SpatialHandDisplayProps {
 export function SpatialHandDisplay({
   cards,
   onCardSelect,
+  onRefresh,
   disabled = false,
   score = 0,
   className,
@@ -37,10 +40,23 @@ export function SpatialHandDisplay({
       'pb-safe',
       className
     )}>
-      {/* Header with score */}
+      {/* Header with score and refresh */}
       <div className="flex items-center justify-between px-4 py-2">
-        <div className="text-sm text-muted-foreground">
-          <span className="font-medium">{cards.length}</span> cards ready to place
+        <div className="flex items-center gap-3">
+          <div className="text-sm text-muted-foreground">
+            <span className="font-medium">{cards.length}</span> cards ready to place
+          </div>
+          {onRefresh && (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={onRefresh}
+              className="h-7 px-2 text-xs gap-1"
+            >
+              <RefreshCw className="h-3 w-3" />
+              Refresh
+            </Button>
+          )}
         </div>
         <div className="flex items-center gap-2">
           <Sparkles className="h-4 w-4 text-yellow-500" />
