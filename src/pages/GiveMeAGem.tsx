@@ -47,21 +47,21 @@ import { cn } from "@/lib/utils";
 
 // Gem style types
 const GEM_STYLES = [
-  { id: "random", name: "Mystery Gem", icon: Shuffle, color: "from-purple-500 to-pink-500", description: "Let fate choose your gem type", emoji: "🎲" },
-  { id: "typology", name: "Typology Gem", icon: Layers, color: "from-blue-500 to-cyan-500", description: "Christ-centered OT/NT connections", emoji: "✝️" },
-  { id: "hebrew_greek", name: "Word Study Gem", icon: Languages, color: "from-amber-500 to-orange-500", description: "Hebrew/Greek insights", emoji: "📜" },
-  { id: "prophecy", name: "Prophecy Gem", icon: ScrollText, color: "from-red-500 to-rose-500", description: "Prophetic patterns & fulfillments", emoji: "🔮" },
-  { id: "palace", name: "Palace Gem", icon: Building2, color: "from-indigo-500 to-purple-500", description: "Tied to PT Palace rooms", emoji: "🏛️" },
-  { id: "chiasm", name: "Chiasm Gem", icon: AlignCenter, color: "from-teal-500 to-emerald-500", description: "Literary structures & patterns", emoji: "🔄" },
-  { id: "number", name: "Number Gem", icon: Hash, color: "from-violet-500 to-fuchsia-500", description: "Biblical numerology & symbols", emoji: "🔢" },
-  { id: "story", name: "Story Gem", icon: BookMarked, color: "from-green-500 to-lime-500", description: "Narrative parallels", emoji: "📖" },
+  { id: "random", nameKey: "gems.styles.mystery", name: "Mystery Gem", icon: Shuffle, color: "from-purple-500 to-pink-500", descKey: "gems.styles.mysteryDesc", description: "Let fate choose your gem type", emoji: "🎲" },
+  { id: "typology", nameKey: "gems.styles.typology", name: "Typology Gem", icon: Layers, color: "from-blue-500 to-cyan-500", descKey: "gems.styles.typologyDesc", description: "Christ-centered OT/NT connections", emoji: "✝️" },
+  { id: "hebrew_greek", nameKey: "gems.styles.wordStudy", name: "Word Study Gem", icon: Languages, color: "from-amber-500 to-orange-500", descKey: "gems.styles.wordStudyDesc", description: "Hebrew/Greek insights", emoji: "📜" },
+  { id: "prophecy", nameKey: "gems.styles.prophecy", name: "Prophecy Gem", icon: ScrollText, color: "from-red-500 to-rose-500", descKey: "gems.styles.prophecyDesc", description: "Prophetic patterns & fulfillments", emoji: "🔮" },
+  { id: "palace", nameKey: "gems.styles.palace", name: "Palace Gem", icon: Building2, color: "from-indigo-500 to-purple-500", descKey: "gems.styles.palaceDesc", description: "Tied to PT Palace rooms", emoji: "🏛️" },
+  { id: "chiasm", nameKey: "gems.styles.chiasm", name: "Chiasm Gem", icon: AlignCenter, color: "from-teal-500 to-emerald-500", descKey: "gems.styles.chiasmDesc", description: "Literary structures & patterns", emoji: "🔄" },
+  { id: "number", nameKey: "gems.styles.number", name: "Number Gem", icon: Hash, color: "from-violet-500 to-fuchsia-500", descKey: "gems.styles.numberDesc", description: "Biblical numerology & symbols", emoji: "🔢" },
+  { id: "story", nameKey: "gems.styles.story", name: "Story Gem", icon: BookMarked, color: "from-green-500 to-lime-500", descKey: "gems.styles.storyDesc", description: "Narrative parallels", emoji: "📖" },
 ];
 
 // Depth tiers
 const DEPTH_TIERS = [
-  { id: "quick", name: "Quick Gem", gems: 1, description: "2-3 sentence insight", color: "border-emerald-400 bg-emerald-500/10" },
-  { id: "study", name: "Study Gem", gems: 2, description: "Fuller exploration with references", color: "border-blue-400 bg-blue-500/10" },
-  { id: "deep", name: "Deep Gem", gems: 3, description: "Multi-layered with cross-references", color: "border-purple-400 bg-purple-500/10" },
+  { id: "quick", nameKey: "gems.depth.quick", name: "Quick Gem", gems: 1, descKey: "gems.depth.quickDesc", description: "2-3 sentence insight", color: "border-emerald-400 bg-emerald-500/10" },
+  { id: "study", nameKey: "gems.depth.study", name: "Study Gem", gems: 2, descKey: "gems.depth.studyDesc", description: "Fuller exploration with references", color: "border-blue-400 bg-blue-500/10" },
+  { id: "deep", nameKey: "gems.depth.deep", name: "Deep Gem", gems: 3, descKey: "gems.depth.deepDesc", description: "Multi-layered with cross-references", color: "border-purple-400 bg-purple-500/10" },
 ];
 
 // Gem Prospector Ranks
@@ -352,10 +352,10 @@ export default function GiveMeAGem() {
   };
 
   const quickQuestions = [
-    "Explain the theological significance",
-    "Show me related verses",
-    "How does this apply to my life?",
-    "Connect this to Christ",
+    t('gems.quickQ.theological', 'Explain the theological significance'),
+    t('gems.quickQ.related', 'Show me related verses'),
+    t('gems.quickQ.apply', 'How does this apply to my life?'),
+    t('gems.quickQ.christ', 'Connect this to Christ'),
   ];
 
   const useSimplifiedNav = preferences.navigation_style === "simplified";
@@ -411,7 +411,7 @@ export default function GiveMeAGem() {
               <Progress value={gemProgress} className="h-3 bg-muted" />
               {nextGemRank && (
                 <p className="text-xs text-center text-muted-foreground">
-                  Next: {nextGemRank.icon} {nextGemRank.name} ({nextGemRank.tier.toLowerCase()})
+                  {t('gems.next', 'Next')}: {nextGemRank.icon} {nextGemRank.name} ({nextGemRank.tier.toLowerCase()})
                 </p>
               )}
             </div>
@@ -460,7 +460,7 @@ export default function GiveMeAGem() {
             </div>
             {isSabbath && (
               <p className="text-center text-indigo-400 text-sm font-medium">
-                🌙 Sabbath — rest and reflection. Discovery resumes tomorrow!
+                🌙 {t('gems.sabbathMessage', 'Sabbath — rest and reflection. Discovery resumes tomorrow!')}
               </p>
             )}
           </CardContent>
@@ -489,7 +489,7 @@ export default function GiveMeAGem() {
                       )}
                     >
                       <Users className="h-4 w-4 mr-2" />
-                      Today's Gem
+                      {t('gems.todaysGem', "Today's Gem")}
                     </Button>
                     <Button
                       variant={gemMode === "personal" ? "default" : "outline"}
@@ -501,13 +501,13 @@ export default function GiveMeAGem() {
                       )}
                     >
                       <User className="h-4 w-4 mr-2" />
-                      My Personal Gem
+                      {t('gems.myPersonalGem', 'My Personal Gem')}
                     </Button>
                   </div>
                   <p className="text-xs text-center text-muted-foreground mt-2">
                     {gemMode === "daily"
-                      ? "Same gem for everyone today — great for discussion!"
-                      : "A unique gem just for you"}
+                      ? t('gems.dailyDesc', 'Same gem for everyone today — great for discussion!')
+                      : t('gems.personalDesc', 'A unique gem just for you')}
                   </p>
                 </CardContent>
               </Card>
@@ -517,7 +517,7 @@ export default function GiveMeAGem() {
                 <div className="bg-gradient-to-r from-emerald-500/10 to-teal-500/10 px-4 py-3 border-b border-emerald-200/50 dark:border-emerald-800/30">
                   <h3 className="font-semibold text-emerald-800 dark:text-emerald-200 flex items-center gap-2">
                     <Sparkles className="h-4 w-4" />
-                    Choose Your Gem Style
+                    {t('gems.chooseStyle', 'Choose Your Gem Style')}
                   </h3>
                 </div>
                 <CardContent className="p-4">
@@ -538,7 +538,7 @@ export default function GiveMeAGem() {
                         <div className="flex flex-col items-center text-center gap-2">
                           <span className="text-2xl">{style.emoji}</span>
                           <span className="font-medium text-sm leading-tight">
-                            {style.name}
+                            {t(style.nameKey, style.name)}
                           </span>
                           <span
                             className={cn(
@@ -548,7 +548,7 @@ export default function GiveMeAGem() {
                                 : "text-muted-foreground"
                             )}
                           >
-                            {style.description}
+                            {t(style.descKey, style.description)}
                           </span>
                         </div>
                         {selectedStyle === style.id && (
@@ -570,7 +570,7 @@ export default function GiveMeAGem() {
                 <div className="bg-gradient-to-r from-emerald-500/10 to-teal-500/10 px-4 py-3 border-b border-emerald-200/50 dark:border-emerald-800/30">
                   <h3 className="font-semibold text-emerald-800 dark:text-emerald-200 flex items-center gap-2">
                     <Mountain className="h-4 w-4" />
-                    Choose Depth Level
+                    {t('gems.chooseDepth', 'Choose Depth Level')}
                   </h3>
                 </div>
                 <CardContent className="p-4">
@@ -602,9 +602,9 @@ export default function GiveMeAGem() {
                               />
                             ))}
                           </div>
-                          <span className="font-medium text-sm">{tier.name}</span>
+                          <span className="font-medium text-sm">{t(tier.nameKey, tier.name)}</span>
                           <span className="text-xs text-muted-foreground">
-                            {tier.description}
+                            {t(tier.descKey, tier.description)}
                           </span>
                         </div>
                       </motion.button>
@@ -618,18 +618,18 @@ export default function GiveMeAGem() {
                 <div className="bg-gradient-to-r from-emerald-500/10 to-teal-500/10 px-4 py-3 border-b border-emerald-200/50 dark:border-emerald-800/30">
                   <h3 className="font-semibold text-emerald-800 dark:text-emerald-200 flex items-center gap-2">
                     <BookOpen className="h-4 w-4" />
-                    Focus on a Passage (Optional)
+                    {t('gems.focusPassage', 'Focus on a Passage (Optional)')}
                   </h3>
                 </div>
                 <CardContent className="p-4">
                   <Input
-                    placeholder="e.g., Genesis 22, Romans 8, Psalm 23..."
+                    placeholder={t('gems.passagePlaceholder', 'e.g., Genesis 22, Romans 8, Psalm 23...')}
                     value={passageInput}
                     onChange={(e) => setPassageInput(e.target.value)}
                     className="bg-background/50"
                   />
                   <p className="text-xs text-muted-foreground mt-2">
-                    Leave empty for a gem from anywhere in Scripture
+                    {t('gems.leaveEmpty', 'Leave empty for a gem from anywhere in Scripture')}
                   </p>
                 </CardContent>
               </Card>
@@ -653,12 +653,12 @@ export default function GiveMeAGem() {
                   {selectedStyle === "random" ? (
                     <>
                       <Shuffle className="h-6 w-6 mr-3" />
-                      Open Mystery Box
+                      {t('gems.openMysteryBox', 'Open Mystery Box')}
                     </>
                   ) : (
                     <>
                       <Sparkles className="h-6 w-6 mr-3" />
-                      Reveal {selectedStyleInfo?.name}
+                      {t('gems.reveal', 'Reveal')} {selectedStyleInfo ? t(selectedStyleInfo.nameKey, selectedStyleInfo.name) : ''}
                     </>
                   )}
                 </Button>
@@ -694,8 +694,8 @@ export default function GiveMeAGem() {
               </div>
               <p className="mt-6 text-lg text-muted-foreground animate-pulse">
                 {selectedStyle === "random"
-                  ? "Opening the mystery box..."
-                  : "Mining the depths of Scripture..."}
+                  ? t('gems.openingMystery', 'Opening the mystery box...')
+                  : t('gems.mining', 'Mining the depths of Scripture...')}
               </p>
             </motion.div>
           )}
@@ -724,9 +724,9 @@ export default function GiveMeAGem() {
                     )}
                   >
                     <span className="mr-2">{revealedStyleInfo.emoji}</span>
-                    {revealedStyleInfo.name}
+                    {t(revealedStyleInfo.nameKey, revealedStyleInfo.name)}
                     {gem.isGemOfDay && (
-                      <span className="ml-2 opacity-80">• Gem of the Day</span>
+                      <span className="ml-2 opacity-80">• {t('gems.gemOfTheDay', 'Gem of the Day')}</span>
                     )}
                   </Badge>
                 </motion.div>
@@ -761,8 +761,8 @@ export default function GiveMeAGem() {
                     <p className="text-sm text-muted-foreground flex items-center gap-2">
                       <MessageCircle className="h-4 w-4" />
                       {selectedText
-                        ? `Selected: "${selectedText.substring(0, 50)}${selectedText.length > 50 ? "..." : ""}"`
-                        : "Highlight any text above to ask Jeeves to expound on it"}
+                        ? `${t('gems.selected', 'Selected')}: "${selectedText.substring(0, 50)}${selectedText.length > 50 ? "..." : ""}"`
+                        : t('gems.highlightHint', 'Highlight any text above to ask Jeeves to expound on it')}
                     </p>
                   </div>
                 </CardContent>
@@ -778,7 +778,7 @@ export default function GiveMeAGem() {
                     <CardContent className="p-4 space-y-4">
                       <div className="flex items-center justify-between">
                         <h3 className="font-semibold text-emerald-800 dark:text-emerald-200">
-                          Ask Jeeves about your selection
+                          {t('gems.askJeeves', 'Ask Jeeves about your selection')}
                         </h3>
                         <Button
                           variant="ghost"
@@ -808,7 +808,7 @@ export default function GiveMeAGem() {
                       {/* Custom Question */}
                       <div className="flex gap-2">
                         <Textarea
-                          placeholder="Or ask your own question..."
+                          placeholder={t('gems.askOwnQuestion', 'Or ask your own question...')}
                           value={customQuestion}
                           onChange={(e) => setCustomQuestion(e.target.value)}
                           className="min-h-[60px] resize-none"
@@ -839,7 +839,7 @@ export default function GiveMeAGem() {
                   >
                     <h3 className="font-semibold text-emerald-800 dark:text-emerald-200 flex items-center gap-2">
                       <MessageCircle className="h-4 w-4" />
-                      Jeeves's Insights ({expansions.length})
+                      {t('gems.jeevesInsights', "Jeeves's Insights")} ({expansions.length})
                     </h3>
                     {showExpansions ? (
                       <ChevronUp className="h-4 w-4" />
@@ -898,17 +898,17 @@ export default function GiveMeAGem() {
                   {isSaved ? (
                     <>
                       <Check className="h-4 w-4 mr-2" />
-                      Saved to Collection
+                      {t('gems.savedToCollection', 'Saved to Collection')}
                     </>
                   ) : isSaving ? (
                     <>
                       <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                      Saving...
+                      {t('gems.saving', 'Saving...')}
                     </>
                   ) : (
                     <>
                       <Save className="h-4 w-4 mr-2" />
-                      Save This Gem
+                      {t('gems.saveThisGem', 'Save This Gem')}
                     </>
                   )}
                 </Button>
@@ -918,7 +918,7 @@ export default function GiveMeAGem() {
                   className="flex-1"
                 >
                   <RefreshCw className="h-4 w-4 mr-2" />
-                  Discover Another
+                  {t('gems.discoverAnother', 'Discover Another')}
                 </Button>
               </div>
             </motion.div>
@@ -936,7 +936,7 @@ export default function GiveMeAGem() {
             >
               <Card className="p-6 flex items-center gap-3">
                 <Loader2 className="h-5 w-5 animate-spin text-emerald-500" />
-                <span>Jeeves is thinking...</span>
+                <span>{t('gems.jeevesThinking', 'Jeeves is thinking...')}</span>
               </Card>
             </motion.div>
           )}

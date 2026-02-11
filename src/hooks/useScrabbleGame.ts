@@ -644,7 +644,6 @@ export function useScrabbleGame(gameId?: string): UseScrabbleGameReturn {
       setGame(prev => prev ? {
         ...prev,
         boardState: newBoard,
-        deckRemaining: newDeck,
       } : null);
 
       setPlayers(prev => prev.map(p => {
