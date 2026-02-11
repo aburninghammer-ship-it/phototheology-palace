@@ -79,8 +79,18 @@ function getPrincipleExplanation(card: ScrabbleCard): string {
   // Floor 4: Dimensions / Time Zones
   if (code === 'DR') return 'Read the text through all 5 dimensions: Literal, Christ, Personal, Church, and Heaven.';
   if (code === 'LR') return 'What is the plain, literal meaning of this text in its original setting?';
-  if (code === 'CR') return 'How does this text point to Christ — His person, work, or offices?';
-  if (code === 'TZ') return 'Place this text on the timeline: is it about Heaven or Earth? Past, Present, or Future?';
+  // Christ's Offices (Concentration Room)
+  if (code === 'CR-PR') return 'Find where Christ is functioning as Prophet — revealing, teaching, proclaiming, or foretelling.';
+  if (code === 'CR-PT') return 'Find where Christ is functioning as Priest — sacrificing, interceding, atoning, or mediating.';
+  if (code === 'CR-KI') return 'Find where Christ is functioning as King — ruling, judging, conquering, or commanding.';
+
+  // Theme Spans (Theme Room)
+  if (code === 'TRM-SA') return 'Identify how this text relates to the Sanctuary — God\'s dwelling, sacrifice, priesthood, or mediation.';
+  if (code === 'TRM-LC') return 'Identify how this text relates to the Life of Christ — His incarnation, ministry, death, or resurrection.';
+  if (code === 'TRM-GC') return 'Identify how this text relates to the Great Controversy — the cosmic conflict between Christ and Satan.';
+  if (code === 'TRM-TP') return 'Identify how this text relates to Time-Prophecy — prophetic timelines and Daniel-Revelation sequences.';
+  if (code === 'TRM-GO') return 'Identify how this text relates to the Gospel Floor — justification, righteousness by faith, grace alone.';
+  if (code === 'TRM-HE') return 'Identify how this text relates to the Heaven Ceiling — eternal realities, new creation, and our ultimate hope.';
   if (code === 'H-PAST') return 'What was happening in heaven before this event? How does heaven\'s past connect here?';
   if (code === 'H-NOW') return 'What is Christ doing in heaven right now that relates to this text?';
   if (code === 'H-FUTURE') return 'What future heavenly event does this text point toward?';
@@ -91,8 +101,27 @@ function getPrincipleExplanation(card: ScrabbleCard): string {
   // Floor 5: Blueprint & Prophecy
   if (code === 'BL') return 'Connect this text to the sanctuary/tabernacle. What article or service does it relate to?';
   if (code === 'PR') return 'What prophetic significance does this text carry? What was or will be fulfilled?';
-  if (code === 'FE') return 'Which of the 7 biblical feasts connects to this passage, and how?';
-  if (code === 'MATH') return 'Find the numbers. What numerical patterns in this text carry biblical significance?';
+  // Feasts (Feasts Room)
+  if (code === 'FE-PA') return 'Connect this text to Passover — the lamb slain, blood applied, and deliverance from death.';
+  if (code === 'FE-UB') return 'Connect this text to Unleavened Bread — the removal of sin and the call to holy living.';
+  if (code === 'FE-FF') return 'Connect this text to Firstfruits — the first sheaf of harvest and Christ\'s resurrection.';
+  if (code === 'FE-PE') return 'Connect this text to Pentecost — the wheat harvest and the outpouring of the Holy Spirit.';
+  if (code === 'FE-TR') return 'Connect this text to Trumpets — the call to awakening, gathering, and preparation for judgment.';
+  if (code === 'FE-DA') return 'Connect this text to the Day of Atonement — the High Priest in the Most Holy Place, judgment, and cleansing.';
+  if (code === 'FE-TA') return 'Connect this text to Tabernacles — the final harvest, God dwelling with His people, and ultimate rejoicing.';
+
+  // Three Angels (Three Angels Room)
+  if (code === '3A-1') return 'Connect this text to the First Angel — the everlasting gospel, worship the Creator, the judgment hour has come.';
+  if (code === '3A-2') return 'Connect this text to the Second Angel — Babylon is fallen, apostate systems collapse.';
+  if (code === '3A-3') return 'Connect this text to the Third Angel — warning against the beast and his mark, patient endurance of the saints.';
+
+  // Time Prophecies (Mathematics Room)
+  if (code === '@120') return 'Apply the @120 pattern: probation before judgment. God gives a grace period before judgment falls.';
+  if (code === '@400') return 'Apply the @400 pattern: affliction before deliverance. Suffering has an exact duration and a promised end.';
+  if (code === '@70Y') return 'Apply the @70y pattern: captivity followed by restoration. Judgment has limits and restoration comes on schedule.';
+  if (code === '@490') return 'Apply the @490 pattern: Messiah and covenant confirmation. Christ arrived exactly on prophetic schedule.';
+  if (code === '@1260') return 'Apply the @1260 pattern: truth suppressed under counterfeit authority. Persecution has God-ordained limits.';
+  if (code === '@2300') return 'Apply the @2300 pattern: cosmic judgment and sanctuary cleansing. We live in the judgment hour.';
 
   // Connect-6 Genres
   if (code === 'C6-PR') return 'Find a prophecy that predicts, foreshadows, or fulfills the truth in this text.';

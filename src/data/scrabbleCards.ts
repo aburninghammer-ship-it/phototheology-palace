@@ -48,7 +48,7 @@ function extractTags(purpose: string, method?: string): string[] {
 
 // Rooms that have individual principle cards in generateSpecialCards() —
 // skip generating a single room-level card for these.
-const MULTI_PRINCIPLE_ROOMS = new Set(['DR', 'TZ', 'C6', '1H/2H/3H', '@']);
+const MULTI_PRINCIPLE_ROOMS = new Set(['DR', 'TZ', 'C6', '1H/2H/3H', '@', 'MATH', 'CR', 'TRm', 'FE', '3A']);
 
 // 2-3 sentence card descriptions for every room, with application instruction.
 const ROOM_DESCRIPTIONS: Record<string, string> = {
@@ -75,8 +75,6 @@ const ROOM_DESCRIPTIONS: Record<string, string> = {
   'LR': 'The Listening Room transforms passive hearing into active Scripture-linking. Find a theological echo from a sermon, conversation, or life experience that connects to this text. Apply this method to the text.',
 
   // Floor 4 — Next Level (non-excluded rooms)
-  'CR': 'The Concentration Room sees Christ through His threefold office — Prophet, Priest, and King. Identify which office Christ is exercising in this text and explain how. Apply this method to the text.',
-  'TRm': 'The Theme Room identifies which of six theological spans your passage occupies: Sanctuary, Life of Christ, Great Controversy, Time-Prophecy, Gospel Floor, or Heaven Ceiling. Apply this method to the text.',
   'PRm': 'The Patterns Room identifies recurring theological motifs that God plays throughout Scripture in different keys. Find a pattern in this text that echoes elsewhere in the Bible. Apply this method to the text.',
   'P\u2016': 'The Parallels Room places two biblical events side by side and asks: what echoes, and what escalates? Find a parallel event in Scripture that mirrors this text. Apply this method to the text.',
   'FRt': 'The Fruit Room is your interpretive conscience — it asks what kind of life your interpretation produces. Does your reading of this text produce good fruit or bad fruit? Apply this test to the text.',
@@ -84,14 +82,11 @@ const ROOM_DESCRIPTIONS: Record<string, string> = {
   // Floor 5 — Vision
   'BL': 'The Blue Room reveals the Sanctuary as God\'s architectural blueprint for understanding Scripture. Connect this text to a piece of tabernacle furniture, a ritual, or a priestly service. Apply this method to the text.',
   'PR': 'The Prophecy Room reads Daniel and Revelation as God\'s cohesive timeline of redemptive history. Find the prophetic significance of this text — what was or will be fulfilled? Apply this method to the text.',
-  '3A': 'The Three Angels Room connects every text to the messages of Revelation 14:6-12 — the everlasting gospel, the judgment hour, and Babylon\'s fall. Apply this method to the text.',
-  'FE': 'The Feasts Room reveals Israel\'s annual festivals (Leviticus 23) as God\'s prophetic roadmap of redemption. Connect this text to one of the seven biblical feasts. Apply this method to the text.',
   'CEC': 'Christ in Every Chapter enforces the principle that ALL Scripture is about Jesus. Find Christ in this text — even where He seems hidden. Apply this method to the text.',
   'R66': 'Room 66 traces a single theme through every book of the Bible, from Genesis to Revelation. Pick a theme from this text and trace it across Scripture. Apply this method to the text.',
 
   // Floor 6 (non-excluded rooms)
   'JR': 'The Juice Room extracts maximum theological, narrative, and practical meaning from Scripture at any scale. Squeeze every drop of meaning from this text without distortion. Apply this method to the text.',
-  'MATH': 'The Mathematics Room recognizes time-prophecy structures and numerical patterns embedded in Scripture. Find numbers or time patterns in this text that carry biblical significance. Apply this method to the text.',
 
   // Floor 7 — Spiritual & Emotional
   'FRm': 'The Fire Room is where Scripture moves from your head to your heart, igniting conviction, comfort, or worship. What in this text sets your soul on fire? Apply this method to the text.',
@@ -223,6 +218,116 @@ function generateSpecialCards(): ScrabbleCard[] {
       icon: g.icon,
       tags: g.tags,
       description: g.description,
+    });
+  });
+
+  // 3 Christ Offices (from Concentration Room - Floor 4)
+  const offices = [
+    { id: 'office-prophet', code: 'CR-Pr', name: 'Christ as Prophet', description: 'In this office Christ reveals God\'s will through teaching, proclaiming, and foretelling. Find where Christ is functioning as Prophet in this text. Apply this lens to the text.', tags: ['office', 'prophet', 'christology', 'teaching'], icon: 'MessageSquare' },
+    { id: 'office-priest', code: 'CR-Pt', name: 'Christ as Priest', description: 'In this office Christ mediates between God and humanity through sacrifice, intercession, and blessing. Find where Christ is functioning as Priest in this text. Apply this lens to the text.', tags: ['office', 'priest', 'christology', 'sacrifice', 'intercession'], icon: 'Heart' },
+    { id: 'office-king', code: 'CR-Ki', name: 'Christ as King', description: 'In this office Christ rules with authority over creation, church, and cosmos — judging, conquering, and commanding. Find where Christ is functioning as King in this text. Apply this lens to the text.', tags: ['office', 'king', 'christology', 'authority', 'judgment'], icon: 'Crown' },
+  ];
+
+  offices.forEach(o => {
+    cards.push({
+      id: o.id,
+      code: o.code,
+      name: o.name,
+      floor: 4,
+      category: 'Concentration Room',
+      icon: o.icon,
+      tags: o.tags,
+      description: o.description,
+    });
+  });
+
+  // 6 Theme Spans (from Theme Room - Floor 4)
+  const spans = [
+    { id: 'span-sanctuary', code: 'TRm-Sa', name: 'Sanctuary Wall', description: 'This span covers passages about God\'s dwelling place, sacrifice, priesthood, and mediation. Identify how this text relates to the sanctuary system. Apply this span to the text.', tags: ['span', 'sanctuary', 'sacrifice', 'priesthood'], icon: 'Church' },
+    { id: 'span-loc', code: 'TRm-LC', name: 'Life of Christ Wall', description: 'This span covers passages about Jesus\' incarnation, ministry, death, resurrection, and ascension. Identify how this text relates to Christ\'s earthly or heavenly life. Apply this span to the text.', tags: ['span', 'christology', 'gospel', 'incarnation'], icon: 'Cross' },
+    { id: 'span-gc', code: 'TRm-GC', name: 'Great Controversy Wall', description: 'This span covers the cosmic conflict between Christ and Satan — good vs. evil, truth vs. error, persecution vs. vindication. Identify this theme in the text. Apply this span to the text.', tags: ['span', 'great-controversy', 'spiritual-warfare', 'deception'], icon: 'Swords' },
+    { id: 'span-tp', code: 'TRm-TP', name: 'Time-Prophecy Wall', description: 'This span covers prophetic timelines, Daniel-Revelation sequences, and eschatological events. Identify how this text fits into God\'s prophetic calendar. Apply this span to the text.', tags: ['span', 'prophecy', 'timeline', 'eschatology'], icon: 'Calendar' },
+    { id: 'span-gospel', code: 'TRm-Go', name: 'Gospel Floor', description: 'This span covers the foundation of salvation — justification, righteousness by faith, and grace alone. Identify how this text proclaims the gospel. Apply this span to the text.', tags: ['span', 'gospel', 'grace', 'faith', 'salvation'], icon: 'Gift' },
+    { id: 'span-heaven', code: 'TRm-He', name: 'Heaven Ceiling', description: 'This span covers eternal realities — the new heavens and earth, resurrection, glorification, and the consummation. Identify how this text points to our ultimate hope. Apply this span to the text.', tags: ['span', 'heaven', 'new-creation', 'eschatology'], icon: 'Sparkles' },
+  ];
+
+  spans.forEach(s => {
+    cards.push({
+      id: s.id,
+      code: s.code,
+      name: s.name,
+      floor: 4,
+      category: 'Theme Room',
+      icon: s.icon,
+      tags: s.tags,
+      description: s.description,
+    });
+  });
+
+  // 3 Angels' Messages (from Three Angels Room - Floor 5)
+  const angels = [
+    { id: 'angel-1', code: '3A-1', name: 'First Angel', description: 'The First Angel proclaims the everlasting gospel, calls all people to worship the Creator, and announces that the hour of judgment has come (Rev 14:6-7). Apply this message to the text.', tags: ['angel', 'gospel', 'creation', 'judgment'], icon: 'Megaphone' },
+    { id: 'angel-2', code: '3A-2', name: 'Second Angel', description: 'The Second Angel announces the fall of Babylon — the collapse of apostate religious systems that have confused and intoxicated the nations (Rev 14:8). Apply this message to the text.', tags: ['angel', 'babylon', 'apostasy', 'fall'], icon: 'AlertTriangle' },
+    { id: 'angel-3', code: '3A-3', name: 'Third Angel', description: 'The Third Angel warns against the beast and his mark, calling God\'s people to patient endurance and faithfulness (Rev 14:9-12). Apply this message to the text.', tags: ['angel', 'beast', 'mark', 'endurance', 'faithfulness'], icon: 'Shield' },
+  ];
+
+  angels.forEach(a => {
+    cards.push({
+      id: a.id,
+      code: a.code,
+      name: a.name,
+      floor: 5,
+      category: 'Three Angels Room',
+      icon: a.icon,
+      tags: a.tags,
+      description: a.description,
+    });
+  });
+
+  // 7 Feasts (from Feasts Room - Floor 5)
+  const feasts = [
+    { id: 'feast-passover', code: 'FE-Pa', name: 'Passover', description: 'Passover commemorates the lamb slain, blood applied, and deliverance from death (Lev 23:5). Christ our Passover Lamb was sacrificed for us. Apply this feast to the text.', tags: ['feast', 'passover', 'lamb', 'deliverance', 'sacrifice'], icon: 'Droplet' },
+    { id: 'feast-unleavened', code: 'FE-UB', name: 'Unleavened Bread', description: 'Unleavened Bread pictures the removal of sin and the call to holy living (Lev 23:6-8). Leaven represents sin that must be purged. Apply this feast to the text.', tags: ['feast', 'unleavened', 'holiness', 'sanctification'], icon: 'Wheat' },
+    { id: 'feast-firstfruits', code: 'FE-FF', name: 'Firstfruits', description: 'Firstfruits celebrates the first sheaf of harvest waved before God (Lev 23:10-11). Christ rose as the firstfruits of those who have fallen asleep. Apply this feast to the text.', tags: ['feast', 'firstfruits', 'resurrection', 'harvest'], icon: 'Sprout' },
+    { id: 'feast-pentecost', code: 'FE-Pe', name: 'Pentecost', description: 'Pentecost marks the wheat harvest and the outpouring of the Holy Spirit fifty days after Firstfruits (Lev 23:15-16). Apply this feast to the text.', tags: ['feast', 'pentecost', 'spirit', 'harvest', 'church'], icon: 'Flame' },
+    { id: 'feast-trumpets', code: 'FE-Tr', name: 'Trumpets', description: 'The Feast of Trumpets sounds a call to awakening, gathering, and preparation for judgment (Lev 23:24). Apply this feast to the text.', tags: ['feast', 'trumpets', 'awakening', 'gathering', 'judgment'], icon: 'Bell' },
+    { id: 'feast-atonement', code: 'FE-DA', name: 'Day of Atonement', description: 'The Day of Atonement pictures the High Priest entering the Most Holy Place for judgment, cleansing, and the removal of sin (Lev 23:27-28). Apply this feast to the text.', tags: ['feast', 'atonement', 'judgment', 'cleansing', 'sanctuary'], icon: 'Scale' },
+    { id: 'feast-tabernacles', code: 'FE-Ta', name: 'Tabernacles', description: 'The Feast of Tabernacles celebrates the final harvest, God dwelling with His people, and ultimate rejoicing (Lev 23:34). Apply this feast to the text.', tags: ['feast', 'tabernacles', 'dwelling', 'harvest', 'joy'], icon: 'Tent' },
+  ];
+
+  feasts.forEach(f => {
+    cards.push({
+      id: f.id,
+      code: f.code,
+      name: f.name,
+      floor: 5,
+      category: 'Feasts Room',
+      icon: f.icon,
+      tags: f.tags,
+      description: f.description,
+    });
+  });
+
+  // 6 Time Prophecies (from Mathematics Room - Floor 6)
+  const timeProphecies = [
+    { id: 'math-120', code: '@120', name: '120 Years', description: 'This time prophecy represents probation before judgment (Gen 6:3). God gives a grace period with a clear deadline before judgment falls. Apply this prophetic pattern to the text.', tags: ['math', 'prophecy', 'probation', 'judgment', 'mercy'], icon: 'Timer' },
+    { id: 'math-400', code: '@400', name: '400 Years', description: 'This time prophecy represents affliction before deliverance (Gen 15:13). God predicts a period of suffering with an exact duration and a promise of deliverance. Apply this prophetic pattern to the text.', tags: ['math', 'prophecy', 'affliction', 'deliverance', 'covenant'], icon: 'Timer' },
+    { id: 'math-70', code: '@70y', name: '70 Years', description: 'This time prophecy represents captivity followed by restoration (Jer 25:11-12). Judgment has limits, and restoration comes on God\'s schedule. Apply this prophetic pattern to the text.', tags: ['math', 'prophecy', 'captivity', 'restoration', 'discipline'], icon: 'Timer' },
+    { id: 'math-490', code: '@490', name: '490 Years', description: 'This time prophecy pinpoints the Messiah\'s arrival and covenant confirmation (Dan 9:24-27). Christ came exactly on prophetic schedule. Apply this prophetic pattern to the text.', tags: ['math', 'prophecy', 'messiah', 'covenant', 'redemption'], icon: 'Timer' },
+    { id: 'math-1260', code: '@1260', name: '1260 Years', description: 'This time prophecy represents truth suppressed under counterfeit authority (Dan 7:25, Rev 11-13). Persecution has God-ordained limits. Apply this prophetic pattern to the text.', tags: ['math', 'prophecy', 'persecution', 'truth', 'authority'], icon: 'Timer' },
+    { id: 'math-2300', code: '@2300', name: '2300 Years', description: 'This time prophecy points to cosmic judgment and sanctuary cleansing (Dan 8:14). We live in the judgment hour. Apply this prophetic pattern to the text.', tags: ['math', 'prophecy', 'judgment', 'sanctuary', 'cleansing'], icon: 'Timer' },
+  ];
+
+  timeProphecies.forEach(tp => {
+    cards.push({
+      id: tp.id,
+      code: tp.code,
+      name: tp.name,
+      floor: 6,
+      category: 'Mathematics Room',
+      icon: tp.icon,
+      tags: tp.tags,
+      description: tp.description,
     });
   });
 
