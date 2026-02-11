@@ -18,7 +18,7 @@ const Bible = () => {
   const { t } = useTranslation();
   const { user } = useAuth();
   const [demoOpen, setDemoOpen] = useState(false);
-  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(true);
   const [searchParams, setSearchParams] = useSearchParams();
   const researchMode = searchParams.get("mode") === "research";
 
