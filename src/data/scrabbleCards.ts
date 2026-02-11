@@ -221,11 +221,12 @@ function generateSpecialCards(): ScrabbleCard[] {
     });
   });
 
-  // 3 Christ Offices (from Concentration Room - Floor 4)
+  // 4 Christ Offices (from Concentration Room - Floor 4)
   const offices = [
     { id: 'office-prophet', code: 'CR-Pr', name: 'Christ as Prophet', description: 'In this office Christ reveals God\'s will through teaching, proclaiming, and foretelling. Find where Christ is functioning as Prophet in this text. Apply this lens to the text.', tags: ['office', 'prophet', 'christology', 'teaching'], icon: 'MessageSquare' },
     { id: 'office-priest', code: 'CR-Pt', name: 'Christ as Priest', description: 'In this office Christ mediates between God and humanity through sacrifice, intercession, and blessing. Find where Christ is functioning as Priest in this text. Apply this lens to the text.', tags: ['office', 'priest', 'christology', 'sacrifice', 'intercession'], icon: 'Heart' },
-    { id: 'office-king', code: 'CR-Ki', name: 'Christ as King', description: 'In this office Christ rules with authority over creation, church, and cosmos — judging, conquering, and commanding. Find where Christ is functioning as King in this text. Apply this lens to the text.', tags: ['office', 'king', 'christology', 'authority', 'judgment'], icon: 'Crown' },
+    { id: 'office-king', code: 'CR-Ki', name: 'Christ as King', description: 'In this office Christ rules with authority over creation, church, and cosmos — conquering, commanding, and reigning. Find where Christ is functioning as King in this text. Apply this lens to the text.', tags: ['office', 'king', 'christology', 'authority', 'sovereignty'], icon: 'Crown' },
+    { id: 'office-judge', code: 'CR-Ju', name: 'Christ as Judge', description: 'In this office Christ evaluates, vindicates, and renders final verdict — separating truth from error, righteous from wicked. Find where Christ is functioning as Judge in this text. Apply this lens to the text.', tags: ['office', 'judge', 'christology', 'judgment', 'justice'], icon: 'Scale' },
   ];
 
   offices.forEach(o => {
