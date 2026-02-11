@@ -390,8 +390,7 @@ export default function GiveMeAGem() {
               >
                 💎
               </motion.div>
-              <h2 className="text-3xl font-bold tracking-wide">Give Me a Gem</h2>
-              <p className="text-sm opacity-80 tracking-widest">{gemRank.tier} — {gemRank.name}</p>
+              <h2 className="text-3xl font-bold tracking-wide text-emerald-500">Give Me a Gem</h2>
             </motion.div>
           </div>
 
