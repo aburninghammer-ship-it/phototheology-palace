@@ -324,18 +324,18 @@ export function assignCardsToPositions(
     return getScore(a) - getScore(b);
   });
 
-  // Assign cards to positions
+  // Assign cards to positions - cards without a valid position still appear in hand
   const result: CardWithAssignedPosition[] = [];
 
-  for (let i = 0; i < cards.length && i < sortedPositions.length; i++) {
-    const position = sortedPositions[i];
-    const direction = getDirectionFromPosition(position, placedPositions);
-
-    result.push({
-      card: cards[i],
-      position,
-      direction,
-    });
+  for (let i = 0; i < cards.length; i++) {
+    if (i < sortedPositions.length) {
+      const position = sortedPositions[i];
+      const direction = getDirectionFromPosition(position, placedPositions);
+      result.push({ card: cards[i], position, direction });
+    } else {
+      // No valid position yet — assign to center as fallback so card still shows in hand
+      result.push({ card: cards[i], position: { x: 0, y: 0 }, direction: 'up' as Direction });
+    }
   }
 
   return result;
