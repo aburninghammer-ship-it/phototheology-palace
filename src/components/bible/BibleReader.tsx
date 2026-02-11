@@ -112,7 +112,7 @@ export const BibleReader = () => {
   } = useVerseNotes(book, chapter);
   const { logReading } = useReadingStreak();
   
-  const { i18n } = useTranslation();
+  const { i18n, t } = useTranslation();
   
   // Map app language to default Bible translation
   const getDefaultTranslation = useCallback((): Translation => {
@@ -252,13 +252,13 @@ export const BibleReader = () => {
         <div className="space-y-4">
           <BookOpen className="h-12 w-12 mx-auto text-muted-foreground" />
           <div>
-            <h3 className="text-lg font-semibold mb-2">Failed to load chapter</h3>
+            <h3 className="text-lg font-semibold mb-2">{t('bible.failedToLoad')}</h3>
             <p className="text-muted-foreground mb-4">
-              {error || "Unable to load the chapter. Please try again."}
+              {error || t('bible.unableToLoad')}
             </p>
           </div>
           <RetryButton onRetry={loadChapter}>
-            Try Again
+            {t('bible.tryAgain')}
           </RetryButton>
         </div>
       </Card>
@@ -282,7 +282,7 @@ export const BibleReader = () => {
                 {book} {chapter}
               </h1>
               <p className="text-muted-foreground mt-1">
-                {chapterData.verses.length} verses
+                {chapterData.verses.length} {t('bible.verses').toLowerCase()}
               </p>
             </div>
 
@@ -307,7 +307,7 @@ export const BibleReader = () => {
                 className="bg-white/10 backdrop-blur-md border-white/20 hover:bg-white/20"
               >
                 <Bookmark className="h-4 w-4 mr-2" />
-                {isBookmarked(book, chapter) ? "Bookmarked" : "Bookmark"}
+                {isBookmarked(book, chapter) ? t('bible.bookmarked') : t('bible.bookmark')}
               </Button>
               <Button
                 variant="outline"
@@ -317,7 +317,7 @@ export const BibleReader = () => {
                 className="bg-white/10 backdrop-blur-md border-white/20 hover:bg-white/20"
               >
                 <ChevronLeft className="h-4 w-4 mr-1" />
-                Previous
+                {t('bible.previous')}
               </Button>
               <Button
                 variant="outline"
@@ -325,7 +325,7 @@ export const BibleReader = () => {
                 onClick={() => navigateChapter("next")}
                 className="bg-white/10 backdrop-blur-md border-white/20 hover:bg-white/20"
               >
-                Next
+                {t('bible.next')}
                 <ChevronRight className="h-4 w-4 ml-1" />
               </Button>
             </div>
@@ -392,7 +392,7 @@ export const BibleReader = () => {
           className={commentaryMode ? "gradient-ocean" : ""}
         >
           <MessageSquare className="h-4 w-4 mr-2" />
-          Study
+          {t('bible.study')}
         </Button>
         <Button
           variant={jeevesMode ? "default" : "outline"}
@@ -413,7 +413,7 @@ export const BibleReader = () => {
           className={jeevesMode ? "bg-gradient-to-r from-purple-600 to-blue-600 text-white shadow-lg" : ""}
         >
           <Bot className="h-4 w-4 mr-2" />
-          Ask Jeeves
+          {t('bible.askJeeves')}
         </Button>
 
         {/* More Tools Dropdown */}
@@ -421,7 +421,7 @@ export const BibleReader = () => {
           <DropdownMenuTrigger asChild>
             <Button variant="outline" size="sm">
               <MoreHorizontal className="h-4 w-4 mr-2" />
-              More
+              {t('bible.more')}
               {(strongsMode || principleMode || chainReferenceMode || sermonIdeasMode) && (
                 <span className="ml-1 h-2 w-2 rounded-full bg-primary" />
               )}
@@ -439,7 +439,7 @@ export const BibleReader = () => {
               className={strongsMode ? "bg-amber-100 dark:bg-amber-900/30" : ""}
             >
               <Sparkles className="h-4 w-4 mr-2" />
-              Strong's Numbers
+              {t('bible.strongsNumbers')}
               {strongsMode && <Check className="h-4 w-4 ml-auto" />}
             </DropdownMenuItem>
             <DropdownMenuItem
@@ -455,7 +455,7 @@ export const BibleReader = () => {
               className={principleMode ? "bg-purple-100 dark:bg-purple-900/30" : ""}
             >
               <BookOpen className="h-4 w-4 mr-2" />
-              Principle Mode
+              {t('bible.principleMode')}
               {principleMode && <Check className="h-4 w-4 ml-auto" />}
             </DropdownMenuItem>
             <DropdownMenuItem
@@ -470,7 +470,7 @@ export const BibleReader = () => {
               className={chainReferenceMode ? "bg-blue-100 dark:bg-blue-900/30" : ""}
             >
               <Link2 className="h-4 w-4 mr-2" />
-              Cross References
+              {t('bible.crossReferencesMode')}
               {chainReferenceMode && <Check className="h-4 w-4 ml-auto" />}
             </DropdownMenuItem>
 
@@ -479,7 +479,7 @@ export const BibleReader = () => {
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={() => setImportDialogOpen(true)}>
                   <Upload className="h-4 w-4 mr-2" />
-                  Import to Lesson
+                  {t('bible.importToLesson')}
                 </DropdownMenuItem>
                 <DropdownMenuItem
                   onClick={() => {
@@ -493,7 +493,7 @@ export const BibleReader = () => {
                   className={sermonIdeasMode ? "bg-orange-100 dark:bg-orange-900/30" : ""}
                 >
                   <Flame className="h-4 w-4 mr-2" />
-                  Sermon Ideas
+                  {t('bible.sermonIdeas')}
                   {sermonIdeasMode && <Check className="h-4 w-4 ml-auto" />}
                 </DropdownMenuItem>
               </>
@@ -520,7 +520,7 @@ export const BibleReader = () => {
                   <BookOpen className="h-5 w-5 text-primary-foreground" />
                 </div>
                 <h2 className="font-serif text-xl md:text-2xl font-bold text-foreground">
-                  {book} <span className="text-muted-foreground font-normal">· Chapter {chapter}</span>
+                  {book} <span className="text-muted-foreground font-normal">· {t('bible.chapterLabel', { chapter })}</span>
                 </h2>
               </div>
             </div>
@@ -582,13 +582,13 @@ export const BibleReader = () => {
               className="shadow-lg hover:shadow-xl transition-all"
             >
               <ChevronLeft className="h-4 w-4 mr-2" />
-              Previous Chapter
+              {t('bible.previousChapter')}
             </Button>
             <Button
               onClick={() => navigateChapter("next")}
               className="gradient-palace text-white shadow-lg hover:shadow-xl transition-all"
             >
-              Next Chapter
+              {t('bible.nextChapter')}
               <ChevronRight className="h-4 w-4 ml-2" />
             </Button>
           </div>
@@ -714,12 +714,12 @@ export const BibleReader = () => {
               <BookOpen className="h-12 w-12 mx-auto mb-3 text-primary/50" />
               <p className="text-sm">
                 {strongsMode
-                  ? "Click on words with ✨ for AI Hebrew/Greek analysis, or click Strong's numbers for definitions"
+                  ? t('bible.selectVerseStrongs')
                   : principleMode
-                  ? "Select one or more verses to analyze with Phototheology principles"
+                  ? t('bible.selectVersePrinciple')
                   : (jeevesMode || commentaryMode)
-                  ? "Select a verse to interact with AI commentary and ask questions"
-                  : "Select a verse to view principles, cross-references, and commentary"}
+                  ? t('bible.selectVerseAI')
+                  : t('bible.selectVerseDefault')}
               </p>
             </Card>
           )}
