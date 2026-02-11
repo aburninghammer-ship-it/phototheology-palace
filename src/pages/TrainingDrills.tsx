@@ -10,7 +10,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { palaceFloors } from "@/data/palaceData";
+import { useTranslatedPalaceData } from "@/hooks/useTranslatedPalaceData";
 import { useMastery } from "@/hooks/useMastery";
 import { useDrills } from "@/hooks/useDrills";
 import { calculateXpReward } from "@/utils/masteryCalculations";
@@ -32,6 +32,7 @@ const TrainingDrills = () => {
   const { user } = useAuth();
   const { toast } = useToast();
   const { t } = useTranslation();
+  const { translatedFloors } = useTranslatedPalaceData();
   const [selectedFloor, setSelectedFloor] = useState<string>("floor-1");
   const [selectedRoom, setSelectedRoom] = useState<string | null>(null);
   const [drills, setDrills] = useState<any[]>([]);
@@ -136,7 +137,7 @@ const TrainingDrills = () => {
   const generateDrillsForRoom = async (roomTag: string, forceRegenerate = false) => {
     setGenerating(true);
     
-    const room = palaceFloors
+    const room = translatedFloors
       .flatMap(f => f.rooms)
       .find(r => r.tag === roomTag);
 
@@ -368,7 +369,7 @@ const TrainingDrills = () => {
   };
 
   const getRoomByTag = (tag: string) => {
-    return palaceFloors.flatMap(f => f.rooms).find(r => r.tag === tag);
+    return translatedFloors.flatMap(f => f.rooms).find(r => r.tag === tag);
   };
 
   const getScoreColor = (score: number) => {
@@ -415,7 +416,7 @@ const TrainingDrills = () => {
               <div className="flex flex-wrap justify-center gap-4 pt-4">
                 <div className="glass-card px-4 py-2 rounded-full flex items-center gap-2">
                   <Target className="h-4 w-4 text-primary" />
-                  <span className="text-sm font-medium">{t('training.totalDrills', { count: palaceFloors.reduce((acc, f) => acc + f.rooms.length, 0) * 10 })}</span>
+                  <span className="text-sm font-medium">{t('training.totalDrills', { count: translatedFloors.reduce((acc, f) => acc + f.rooms.length, 0) * 10 })}</span>
                 </div>
                 <div className="glass-card px-4 py-2 rounded-full flex items-center gap-2">
                   <Trophy className="h-4 w-4 text-amber-500" />
@@ -734,10 +735,10 @@ const TrainingDrills = () => {
               <div className="glass-card backdrop-blur-xl bg-background/80 border border-border/50 rounded-2xl p-4 mb-6">
                 <ScrollArea className="w-full">
                   <TabsList className="inline-flex w-full md:w-auto bg-muted/50">
-                    {palaceFloors.map((floor) => (
-                      <TabsTrigger 
-                        key={floor.number} 
-                        value={`floor-${floor.number}`} 
+                    {translatedFloors.map((floor) => (
+                      <TabsTrigger
+                        key={floor.number}
+                        value={`floor-${floor.number}`}
                         className="flex-shrink-0 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
                       >
                         {t('training.floor', { number: floor.number })}
@@ -747,7 +748,7 @@ const TrainingDrills = () => {
                 </ScrollArea>
               </div>
 
-              {palaceFloors.map((floor) => (
+              {translatedFloors.map((floor) => (
                 <TabsContent key={floor.number} value={`floor-${floor.number}`} className="space-y-6">
                   <div className="glass-card backdrop-blur-xl bg-background/80 border border-border/50 rounded-2xl p-6">
                     <h2 className="text-2xl font-bold mb-2">{floor.name}</h2>

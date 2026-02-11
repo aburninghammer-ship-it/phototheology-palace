@@ -4,7 +4,7 @@ import { useTranslation } from "react-i18next";
 import { ChevronDown, ChevronRight, Lock, CheckCircle, Sparkles, Play, BookOpen, Star } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "@/hooks/useAuth";
-import { palaceFloors } from "@/data/palaceData";
+import { useTranslatedPalaceData } from "@/hooks/useTranslatedPalaceData";
 import { useRoomUnlock } from "@/hooks/useRoomUnlock";
 import { usePalaceProgress } from "@/hooks/usePalaceProgress";
 import { useNewlyRenovatedRoom } from "@/hooks/useNewlyRenovatedRoom";
@@ -31,6 +31,7 @@ interface ProgressivePalaceProps {
 export const ProgressivePalace = ({ showStartHere = true }: ProgressivePalaceProps) => {
   const { t } = useTranslation();
   const { user } = useAuth();
+  const { translatedFloors } = useTranslatedPalaceData();
   const { progressPercentage } = usePalaceProgress();
   
   // Progressive disclosure: only first 2 floors expanded by default for new users
@@ -73,7 +74,7 @@ export const ProgressivePalace = ({ showStartHere = true }: ProgressivePalacePro
 
       {/* Progressive Floor List */}
       <div className="space-y-3">
-        {palaceFloors.map((floor, idx) => {
+        {translatedFloors.map((floor, idx) => {
           const theme = FLOOR_THEMES[idx];
           const isExpanded = expandedFloors.includes(floor.number);
           // Soft lock: show warning but allow access

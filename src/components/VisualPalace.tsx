@@ -2,7 +2,7 @@ import { useTranslation } from 'react-i18next';
 import { Link, useNavigate } from "react-router-dom";
 import { Sparkles, Eye, Search, Zap, BookOpen, Telescope, Globe, Flame, Crown, Lock, CheckCircle } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
-import { palaceFloors } from "@/data/palaceData";
+import { useTranslatedPalaceData } from "@/hooks/useTranslatedPalaceData";
 import { useRoomUnlock } from "@/hooks/useRoomUnlock";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
@@ -52,6 +52,7 @@ const FLOOR_THEMES = [
 
 export const VisualPalace = () => {
   const { t } = useTranslation();
+  const { translatedFloors } = useTranslatedPalaceData();
   const { user } = useAuth();
 
   const floorTaglines = [
@@ -81,7 +82,7 @@ export const VisualPalace = () => {
       </div>
 
       <div className="relative flex flex-col-reverse gap-6">
-        {palaceFloors.map((floor, floorIndex) => {
+        {translatedFloors.map((floor, floorIndex) => {
           const theme = FLOOR_THEMES[floor.number - 1];
           return (
             <FloorSection

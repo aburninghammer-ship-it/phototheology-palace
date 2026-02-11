@@ -1,5 +1,5 @@
 import { useParams, Link, useNavigate, useSearchParams } from "react-router-dom";
-import { palaceFloors } from "@/data/palaceData";
+import { useTranslatedPalaceData } from "@/hooks/useTranslatedPalaceData";
 import { Navigation } from "@/components/Navigation";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -104,12 +104,13 @@ const QUICK_START_ROOMS = new Set([
 
 export default function RoomDetail() {
   const { t } = useTranslation();
+  const { translatedFloors } = useTranslatedPalaceData();
   const { floorNumber, roomId } = useParams();
   const [searchParams] = useSearchParams();
   const pathActivityId = searchParams.get('pathActivityId') || undefined;
   const navigate = useNavigate();
   const { user } = useAuth();
-  const floor = palaceFloors.find(f => f.number === Number(floorNumber));
+  const floor = translatedFloors.find(f => f.number === Number(floorNumber));
   const room = floor?.rooms.find(r => r.id === roomId);
   const [showDrill, setShowDrill] = useState(false);
   const [methodExpanded, setMethodExpanded] = useState(false);

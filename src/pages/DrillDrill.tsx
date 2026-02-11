@@ -15,7 +15,7 @@ import { Target, Sparkles, BookOpen, Loader2, Save, Download, ChevronRight, Chec
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { toast } from "sonner";
-import { palaceFloors } from "@/data/palaceData";
+import { useTranslatedPalaceData } from "@/hooks/useTranslatedPalaceData";
 import { DrillMindMap } from "@/components/drill-drill/DrillMindMap";
 import { DrillChat } from "@/components/drill-drill/DrillChat";
 import { SavedDrills } from "@/components/drill-drill/SavedDrills";
@@ -63,6 +63,7 @@ export interface DrillSession {
 const DrillDrill = () => {
   const { user } = useAuth();
   const { preferences } = useUserPreferences();
+  const { translatedFloors } = useTranslatedPalaceData();
   const location = useLocation();
   const autoStartTriggered = useRef(false);
   const [verse, setVerse] = useState("");
@@ -131,7 +132,7 @@ const DrillDrill = () => {
   }, [session?.completedAt]);
 
   // Get all rooms from all floors (excluding Floor 8 which has no rooms)
-  const allRooms = palaceFloors
+  const allRooms = translatedFloors
     .filter(f => f.number < 8)
     .flatMap(floor => 
       floor.rooms.map(room => ({
@@ -755,7 +756,7 @@ const DrillDrill = () => {
                     </CardHeader>
                     <CardContent>
                       <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
-                        {palaceFloors.filter(f => f.number < 8).map(floor => (
+                        {translatedFloors.filter(f => f.number < 8).map(floor => (
                           <div key={floor.number} className="space-y-2">
                             <h4 className="font-semibold text-sm">
                               Floor {floor.number}: {floor.name}

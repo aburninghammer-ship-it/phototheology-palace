@@ -8,7 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Dumbbell, CheckCircle, XCircle, Clock, Trophy, ArrowRight } from "lucide-react";
 import { DrillQuestion, DrillResult, useDrills } from "@/hooks/useDrills";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { palaceFloors } from "@/data/palaceData";
+import { useTranslatedPalaceData } from "@/hooks/useTranslatedPalaceData";
 import { useNavigate } from "react-router-dom";
 import { SaveDrillButton } from "@/components/drills/SaveDrillButton";
 
@@ -42,12 +42,13 @@ export const PracticeDrill = ({
   
   const { saveDrillResult } = useDrills(floorNumber, roomId);
   const navigate = useNavigate();
+  const { translatedFloors } = useTranslatedPalaceData();
   const currentQuestion = questions[currentQuestionIndex];
   const progress = ((currentQuestionIndex + 1) / questions.length) * 100;
 
   // Find next room in sequence
   const getNextRoom = () => {
-    const currentFloor = palaceFloors.find(f => f.number === floorNumber);
+    const currentFloor = translatedFloors.find(f => f.number === floorNumber);
     if (!currentFloor) return null;
 
     const currentRoomIndex = currentFloor.rooms.findIndex(r => r.id === roomId);
@@ -62,7 +63,7 @@ export const PracticeDrill = ({
     }
 
     // Move to the first room of the next floor
-    const nextFloor = palaceFloors.find(f => f.number === floorNumber + 1);
+    const nextFloor = translatedFloors.find(f => f.number === floorNumber + 1);
     if (nextFloor && nextFloor.rooms.length > 0) {
       return {
         floor: nextFloor.number,

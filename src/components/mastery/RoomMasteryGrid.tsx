@@ -3,7 +3,7 @@ import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useAllRoomMasteries, RoomMastery } from "@/hooks/useMastery";
-import { palaceFloors } from "@/data/palaceData";
+import { useTranslatedPalaceData } from "@/hooks/useTranslatedPalaceData";
 import { Link } from "react-router-dom";
 import { Target, Star, Lock, ChevronRight, Zap } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -27,6 +27,7 @@ export const RoomMasteryGrid: React.FC<RoomMasteryGridProps> = ({
   showTrainButton = true
 }) => {
   const { t } = useTranslation();
+  const { translatedFloors } = useTranslatedPalaceData();
   const { data: masteries, isLoading } = useAllRoomMasteries();
 
   const LEVEL_NAMES = ["", t('masteryGrid.novice'), t('masteryGrid.apprentice'), t('masteryGrid.practitioner'), t('masteryGrid.expert'), t('masteryGrid.master')];
@@ -41,8 +42,8 @@ export const RoomMasteryGrid: React.FC<RoomMasteryGridProps> = ({
   };
 
   const floors = filterFloor
-    ? palaceFloors.filter(f => f.number === filterFloor)
-    : palaceFloors;
+    ? translatedFloors.filter(f => f.number === filterFloor)
+    : translatedFloors;
 
   if (isLoading) {
     return (

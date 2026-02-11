@@ -22,7 +22,7 @@ import {
 import * as THREE from "three";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { palaceFloors as floors } from "@/data/palaceData";
+import { useTranslatedPalaceData } from "@/hooks/useTranslatedPalaceData";
 import { ChevronUp, ChevronDown, Home, Info, Loader2, Smartphone, Monitor, Sparkles as SparklesIcon, Eye } from "lucide-react";
 
 // Detect mobile device for performance optimization
@@ -549,6 +549,7 @@ interface Palace3DViewerProps {
 
 export function Palace3DViewer({ unlockedRooms = new Set(), onClose }: Palace3DViewerProps) {
   const navigate = useNavigate();
+  const { translatedFloors: floors } = useTranslatedPalaceData();
   const [currentFloor, setCurrentFloor] = useState(1);
   const [showHelp, setShowHelp] = useState(true);
   const [dpr, setDpr] = useState(isMobile ? 1 : 1.5);

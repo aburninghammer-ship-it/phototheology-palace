@@ -5,7 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { palaceFloors } from "@/data/palaceData";
+import { useTranslatedPalaceData } from "@/hooks/useTranslatedPalaceData";
 import { Sparkles, HelpCircle, Timer, RefreshCw, Send, BookOpen, Loader2, MessageCircle, Save, Gem, User, Bot, FileDown, FolderOpen, Flame } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { supabase } from "@/integrations/supabase/client";
@@ -212,7 +212,8 @@ export default function CardDeck() {
   const [studyMode, setStudyMode] = useState<StudyMode | null>(null);
   const [isDrawingCard, setIsDrawingCard] = useState(false);
   const { streak, updateStreak } = useMasteryStreak();
-  
+  const { translatedFloors } = useTranslatedPalaceData();
+
   // Filter and commentary state
   const [selectedFloor, setSelectedFloor] = useState<number | null>(null);
   const [commentaryCard, setCommentaryCard] = useState<PrincipleCard | null>(null);
@@ -226,7 +227,7 @@ export default function CardDeck() {
   useEffect(() => {
     // Build all principle cards from palace data
     const cards: PrincipleCard[] = [];
-    palaceFloors.forEach((floor) => {
+    translatedFloors.forEach((floor) => {
       floor.rooms.forEach((room) => {
         // Skip rooms that have individual sub-principle cards
         // c6 = Connect 6 (6 genres), tz = Time Zone (6 zones), dr = Dimensions (5 dimensions)

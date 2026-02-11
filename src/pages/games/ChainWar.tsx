@@ -8,7 +8,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { ArrowLeft, Trophy, Link as LinkIcon, Send } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
-import { palaceFloors } from "@/data/palaceData";
+
 import { useAuth } from "@/hooks/useAuth";
 import { GameLeaderboard } from "@/components/GameLeaderboard";
 

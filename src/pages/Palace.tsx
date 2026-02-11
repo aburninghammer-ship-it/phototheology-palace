@@ -5,6 +5,7 @@ import { Palace3DViewer } from "@/components/palace/Palace3DViewer";
 import { PalaceBreadcrumbs } from "@/components/palace/PalaceBreadcrumbs";
 import { PalaceTour } from "@/components/onboarding/PalaceTour";
 import { palaceFloors } from "@/data/palaceData";
+import { useTranslatedPalaceData } from "@/hooks/useTranslatedPalaceData";
 import { Building2, Award, TrendingUp, BookOpen, Target, LayoutGrid, List, Box } from "lucide-react";
 import { HowItWorksDialog } from "@/components/HowItWorksDialog";
 import { palaceSteps } from "@/config/howItWorksSteps";
@@ -25,6 +26,7 @@ import { useTranslation } from 'react-i18next';
 
 const Palace = () => {
   const { t } = useTranslation();
+  const { translatedFloors } = useTranslatedPalaceData();
   const { user } = useAuth();
   const navigate = useNavigate();
   const { completedRooms, completedRoomIds, totalRooms, progressPercentage, loading } = usePalaceProgress();
@@ -299,7 +301,7 @@ const Palace = () => {
 
                       <div className="mt-8 space-y-4">
                         <h4 className="font-semibold text-lg mb-4">{t('palace.progressByFloor')}</h4>
-                        {palaceFloors.map((floor, index) => {
+                        {translatedFloors.map((floor, index) => {
                           const floorRoomsTotal = floor.rooms.length;
                           const floorRoomsCompleted = floor.rooms.filter(room =>
                             false

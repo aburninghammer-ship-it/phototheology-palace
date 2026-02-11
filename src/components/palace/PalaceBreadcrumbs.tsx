@@ -1,13 +1,15 @@
 import { Link, useLocation } from "react-router-dom";
 import { ChevronRight, Home, Building2 } from "lucide-react";
-import { palaceFloors } from "@/data/palaceData";
+import { useTranslatedPalaceData } from "@/hooks/useTranslatedPalaceData";
+import type { Floor } from "@/data/palaceData";
 
 export const PalaceBreadcrumbs = () => {
   const location = useLocation();
+  const { translatedFloors } = useTranslatedPalaceData();
   const pathParts = location.pathname.split('/').filter(Boolean);
 
   // Build breadcrumb items based on current path
-  const breadcrumbs = buildBreadcrumbs(pathParts);
+  const breadcrumbs = buildBreadcrumbs(pathParts, translatedFloors);
 
   if (breadcrumbs.length <= 1) return null;
 
@@ -39,22 +41,22 @@ interface Breadcrumb {
   icon?: React.ReactNode;
 }
 
-function buildBreadcrumbs(pathParts: string[]): Breadcrumb[] {
+function buildBreadcrumbs(pathParts: string[], floors: Floor[]): Breadcrumb[] {
   const crumbs: Breadcrumb[] = [
     { label: "Home", path: "/", icon: <Home className="h-3 w-3" /> }
   ];
 
   if (pathParts[0] === "palace") {
-    crumbs.push({ 
-      label: "Palace", 
-      path: "/palace", 
-      icon: <Building2 className="h-3 w-3" /> 
+    crumbs.push({
+      label: "Palace",
+      path: "/palace",
+      icon: <Building2 className="h-3 w-3" />
     });
 
     // Floor level
     if (pathParts[1] === "floor" && pathParts[2]) {
       const floorNum = parseInt(pathParts[2]);
-      const floor = palaceFloors.find(f => f.number === floorNum);
+      const floor = floors.find(f => f.number === floorNum);
       if (floor) {
         crumbs.push({
           label: `Floor ${floorNum}: ${floor.name}`,

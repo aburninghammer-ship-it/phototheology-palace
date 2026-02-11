@@ -18,7 +18,7 @@ import {
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
-import { palaceFloors } from "@/data/palaceData";
+import { useTranslatedPalaceData } from "@/hooks/useTranslatedPalaceData";
 import { SocialShareButton } from "@/components/SocialShareButton";
 
 export default function PrincipleCardsGame() {
@@ -27,7 +27,8 @@ export default function PrincipleCardsGame() {
   const { user } = useAuth();
   const { toast } = useToast();
   const navigate = useNavigate();
-  
+  const { translatedFloors } = useTranslatedPalaceData();
+
   const [game, setGame] = useState<any>(null);
   const [players, setPlayers] = useState<any[]>([]);
   const [currentRound, setCurrentRound] = useState<any>(null);
@@ -36,7 +37,7 @@ export default function PrincipleCardsGame() {
   const [submitting, setSubmitting] = useState(false);
 
   // Get all principles from palace data
-  const allPrinciples = palaceFloors.flatMap(floor => 
+  const allPrinciples = translatedFloors.flatMap(floor => 
     floor.rooms.map(room => ({
       principle: room.name,
       tag: room.tag,

@@ -1,6 +1,6 @@
 import { useParams, Link } from "react-router-dom";
 import { useTranslation } from 'react-i18next';
-import { palaceFloors } from "@/data/palaceData";
+import { useTranslatedPalaceData } from "@/hooks/useTranslatedPalaceData";
 import { Navigation } from "@/components/Navigation";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -15,9 +15,10 @@ import { SequentialMasteryNotice } from "@/components/palace/SequentialMasteryNo
 
 export default function FloorDetail() {
   const { t } = useTranslation();
+  const { translatedFloors } = useTranslatedPalaceData();
   const { floorNumber } = useParams();
   const { user } = useAuth();
-  const floor = palaceFloors.find(f => f.number === Number(floorNumber));
+  const floor = translatedFloors.find(f => f.number === Number(floorNumber));
 
   if (!floor) {
     return (

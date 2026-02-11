@@ -9,6 +9,7 @@ import { usePalaceProgress } from "@/hooks/usePalaceProgress";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
 import { palaceFloors } from "@/data/palaceData";
+import { useTranslatedPalaceData } from "@/hooks/useTranslatedPalaceData";
 import {
   Building2,
   Flame,
@@ -197,6 +198,7 @@ const roleRecommendations: Record<string, (completedRooms: Set<string>) => NextR
 
 export function PalaceProgressDashboard() {
   const { t } = useTranslation();
+  const { translatedFloors } = useTranslatedPalaceData();
   const { user } = useAuth();
   const navigate = useNavigate();
   const { completedRooms, totalRooms, progressPercentage, loading: progressLoading } = usePalaceProgress();
@@ -363,7 +365,7 @@ export function PalaceProgressDashboard() {
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
-            {palaceFloors.map((floor) => {
+            {translatedFloors.map((floor) => {
               const floorCompletedCount = floor.rooms.filter((room) =>
                 completedRoomSet.has(`${floor.number}-${room.id}`)
               ).length;
