@@ -1254,5 +1254,27 @@
     "quickStartDesc": "궁전 체계에 대한 안내입니다. 시작하기 전에 구조를 이해하세요.",
     "studySuite": "학습 스위트",
     "studySuiteDesc": "8개 층 전체를 위한 완전한 방법 훈련입니다. Phototheology 시스템을 마스터하세요."
+  },
+  "roomTour": {
+    "welcomeTo": "{{roomName}}에 오신 것을 환영합니다",
+    "floor": "{{number}}층",
+    "coreQuestion": "핵심 질문",
+    "whatYoullDo": "무엇을 할 것인가",
+    "yourTask": "당신의 과제",
+    "deliverable": "결과물",
+    "timeQuick": "빠른 (5-10분)",
+    "timeStandard": "표준 (15-30분)",
+    "timeDeep": "심화 (30-60분)",
+    "seeItInAction": "실제로 보기",
+    "realExamples": "실제 예시",
+    "proTips": "프로 팁",
+    "learnFromMistakes": "실수에서 배우기",
+    "quickModeSteps": "빠른 모드 단계",
+    "avoidPitfalls": "이런 실수를 피하세요",
+    "youreReady": "준비 완료!",
+    "beginPractice": "연습 시작",
+    "tourComplete": "투어 완료!",
+    "tourCompleteDesc": "{{roomName}}에서 연습할 준비가 되었습니다.",
+    "remember": "기억하세요:"
   }
 }

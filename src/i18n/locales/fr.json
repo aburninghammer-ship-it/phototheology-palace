@@ -1254,5 +1254,27 @@
     "quickStartDesc": "Orientation du cadre du Palais. Comprenez la structure avant de commencer.",
     "studySuite": "Suite d'Étude",
     "studySuiteDesc": "Formation complète à la méthode pour les 8 Étages. Maîtrisez le système Phototheology."
+  },
+  "roomTour": {
+    "welcomeTo": "Bienvenue dans {{roomName}}",
+    "floor": "Étage {{number}}",
+    "coreQuestion": "Question Centrale",
+    "whatYoullDo": "Ce Que Vous Ferez",
+    "yourTask": "Votre Tâche",
+    "deliverable": "Livrable",
+    "timeQuick": "Rapide (5-10 min)",
+    "timeStandard": "Standard (15-30 min)",
+    "timeDeep": "Approfondi (30-60 min)",
+    "seeItInAction": "Voir en Action",
+    "realExamples": "Exemples Réels",
+    "proTips": "Conseils Pro",
+    "learnFromMistakes": "Apprenez des Erreurs",
+    "quickModeSteps": "Étapes du Mode Rapide",
+    "avoidPitfalls": "Évitez Ces Pièges",
+    "youreReady": "Vous Êtes Prêt !",
+    "beginPractice": "Commencer la Pratique",
+    "tourComplete": "Visite Terminée !",
+    "tourCompleteDesc": "Vous êtes prêt à pratiquer dans {{roomName}}.",
+    "remember": "N'oubliez pas :"
   }
 }
