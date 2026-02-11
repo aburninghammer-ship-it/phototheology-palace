@@ -430,7 +430,7 @@ export const Navigation = () => {
                     className={`px-3 py-1.5 text-sm font-medium rounded-md transition-all whitespace-nowrap flex items-center gap-1 bg-gradient-to-r from-amber-500/10 to-orange-500/10 border border-amber-500/20 hover:from-amber-500/20 hover:to-orange-500/20 ${isActiveTab('/palace') ? 'shadow-[0_0_12px_2px_rgba(245,158,11,0.5)] border-amber-400/60' : ''}`}
                   >
                     <Building2 className="h-3.5 w-3.5 text-amber-500" />
-                    <span className="bg-gradient-to-r from-amber-600 to-orange-600 bg-clip-text text-transparent font-semibold">Palace</span>
+                    <span className="bg-gradient-to-r from-amber-600 to-orange-600 bg-clip-text text-transparent font-semibold">{t('navTabs.palace', 'Palace')}</span>
                   </Link>
                   {isChurchMember && churchId && (
                     <Link
@@ -438,7 +438,7 @@ export const Navigation = () => {
                       className={`px-3 py-1.5 text-sm font-medium rounded-md transition-all whitespace-nowrap flex items-center gap-1 bg-gradient-to-r from-emerald-500/10 to-green-500/10 border border-emerald-500/20 hover:from-emerald-500/20 hover:to-green-500/20 ${isActiveTab('/living-manna') ? 'shadow-[0_0_12px_2px_rgba(16,185,129,0.5)] border-emerald-400/60' : ''}`}
                     >
                       <Church className="h-3.5 w-3.5 text-emerald-500" />
-                      <span className="bg-gradient-to-r from-emerald-600 to-green-600 bg-clip-text text-transparent font-semibold">My Church Space</span>
+                      <span className="bg-gradient-to-r from-emerald-600 to-green-600 bg-clip-text text-transparent font-semibold">{t('navTabs.church-space', 'My Church Space')}</span>
                     </Link>
                   )}
                   <Link
@@ -446,119 +446,119 @@ export const Navigation = () => {
                     className={`px-3 py-1.5 text-sm font-medium rounded-md transition-all whitespace-nowrap flex items-center gap-1 bg-gradient-to-r from-blue-500/10 to-cyan-500/10 border border-blue-500/20 hover:from-blue-500/20 hover:to-cyan-500/20 ${isActiveTab('/bible') ? 'shadow-[0_0_12px_2px_rgba(59,130,246,0.5)] border-blue-400/60' : ''}`}
                   >
                     <BookOpen className="h-3.5 w-3.5 text-blue-500" />
-                    <span className="bg-gradient-to-r from-blue-600 to-cyan-600 bg-clip-text text-transparent font-semibold">Phototheology Study Bible</span>
+                    <span className="bg-gradient-to-r from-blue-600 to-cyan-600 bg-clip-text text-transparent font-semibold">{t('navTabs.bible', 'Phototheology Study Bible')}</span>
                   </Link>
                   <Link
                     to="/study-buddy"
                     className={`px-3 py-1.5 text-sm font-medium rounded-md transition-all whitespace-nowrap flex items-center gap-1 bg-gradient-to-r from-slate-500/10 to-zinc-500/10 border border-slate-500/20 hover:from-slate-500/20 hover:to-zinc-500/20 ${isActiveTab('/study-buddy') ? 'shadow-[0_0_12px_2px_rgba(100,116,139,0.5)] border-slate-400/60' : ''}`}
                   >
                     <Brain className="h-3.5 w-3.5 text-slate-400" />
-                    <span className="bg-gradient-to-r from-slate-500 to-zinc-500 bg-clip-text text-transparent font-semibold">Study Buddy</span>
+                    <span className="bg-gradient-to-r from-slate-500 to-zinc-500 bg-clip-text text-transparent font-semibold">{t('navTabs.study-buddy', 'Study Buddy')}</span>
                   </Link>
                   <Link
                     to="/study-ideas"
                     className={`px-3 py-1.5 text-sm font-medium rounded-md transition-all whitespace-nowrap flex items-center gap-1 bg-gradient-to-r from-amber-500/10 to-yellow-500/10 border border-amber-500/20 hover:from-amber-500/20 hover:to-yellow-500/20 ${isActiveTab('/study-ideas') ? 'shadow-[0_0_12px_2px_rgba(245,158,11,0.5)] border-amber-400/60' : ''}`}
                   >
                     <Lightbulb className="h-3.5 w-3.5 text-amber-500" />
-                    <span className="bg-gradient-to-r from-amber-600 to-yellow-600 bg-clip-text text-transparent font-semibold">Study Ideas</span>
+                    <span className="bg-gradient-to-r from-amber-600 to-yellow-600 bg-clip-text text-transparent font-semibold">{t('navTabs.study-ideas', 'Study Ideas')}</span>
                   </Link>
                   <Link
                     to="/give-me-a-gem"
                     className={`px-3 py-1.5 text-sm font-medium rounded-md transition-all whitespace-nowrap flex items-center gap-1 bg-gradient-to-r from-emerald-500/10 to-teal-500/10 border border-emerald-500/20 hover:from-emerald-500/20 hover:to-teal-500/20 ${isActiveTab('/give-me-a-gem') ? 'shadow-[0_0_12px_2px_rgba(16,185,129,0.5)] border-emerald-400/60' : ''}`}
                   >
                     <Gem className="h-3.5 w-3.5 text-emerald-500" />
-                    <span className="bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent font-semibold">Give Me A Gem</span>
+                    <span className="bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent font-semibold">{t('navTabs.give-me-a-gem', 'Give Me A Gem')}</span>
                   </Link>
                   <Link
                     to="/mind-map"
                     className={`px-3 py-1.5 text-sm font-medium rounded-md transition-all whitespace-nowrap flex items-center gap-1 bg-gradient-to-r from-indigo-500/10 to-violet-500/10 border border-indigo-500/20 hover:from-indigo-500/20 hover:to-violet-500/20 ${isActiveTab('/mind-map') ? 'shadow-[0_0_12px_2px_rgba(99,102,241,0.5)] border-indigo-400/60' : ''}`}
                   >
                     <Network className="h-3.5 w-3.5 text-indigo-500" />
-                    <span className="bg-gradient-to-r from-indigo-600 to-violet-600 bg-clip-text text-transparent font-semibold">Mind Map Palace</span>
+                    <span className="bg-gradient-to-r from-indigo-600 to-violet-600 bg-clip-text text-transparent font-semibold">{t('navTabs.mind-map', 'Mind Map Palace')}</span>
                   </Link>
                   <Link
                     to="/image-bible"
                     className={`px-3 py-1.5 text-sm font-medium rounded-md transition-all whitespace-nowrap flex items-center gap-1 bg-gradient-to-r from-amber-500/10 to-orange-500/10 border border-amber-500/20 hover:from-amber-500/20 hover:to-orange-500/20 ${isActiveTab('/image-bible') ? 'shadow-[0_0_12px_2px_rgba(245,158,11,0.5)] border-amber-400/60' : ''}`}
                   >
                     <Image className="h-3.5 w-3.5 text-amber-500" />
-                    <span className="bg-gradient-to-r from-amber-600 to-orange-600 bg-clip-text text-transparent font-semibold">PT Image Bible</span>
+                    <span className="bg-gradient-to-r from-amber-600 to-orange-600 bg-clip-text text-transparent font-semibold">{t('navTabs.image-bible', 'PT Image Bible')}</span>
                   </Link>
                   <Link
                     to="/card-deck"
                     className={`px-3 py-1.5 text-sm font-medium rounded-md transition-all whitespace-nowrap flex items-center gap-1 bg-gradient-to-r from-violet-500/10 to-purple-500/10 border border-violet-500/20 hover:from-violet-500/20 hover:to-purple-500/20 ${isActiveTab('/card-deck') ? 'shadow-[0_0_12px_2px_rgba(139,92,246,0.5)] border-violet-400/60' : ''}`}
                   >
                     <Sparkles className="h-3.5 w-3.5 text-violet-500" />
-                    <span className="bg-gradient-to-r from-violet-600 to-purple-600 bg-clip-text text-transparent font-semibold">Phototheology Study Deck</span>
+                    <span className="bg-gradient-to-r from-violet-600 to-purple-600 bg-clip-text text-transparent font-semibold">{t('navTabs.card-deck', 'Phototheology Study Deck')}</span>
                   </Link>
                   <Link
                     to="/reading-plans"
                     className={`px-3 py-1.5 text-sm font-medium rounded-md transition-all whitespace-nowrap flex items-center gap-1 bg-gradient-to-r from-emerald-500/10 to-teal-500/10 border border-emerald-500/20 hover:from-emerald-500/20 hover:to-teal-500/20 ${isActiveTab('/reading-plans') ? 'shadow-[0_0_12px_2px_rgba(16,185,129,0.5)] border-emerald-400/60' : ''}`}
                   >
                     <Calendar className="h-3.5 w-3.5 text-emerald-500" />
-                    <span className="bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent font-semibold">Reading Plans</span>
+                    <span className="bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent font-semibold">{t('navTabs.reading-plans', 'Reading Plans')}</span>
                   </Link>
                   <Link
                     to="/devotionals" 
                     className={`px-3 py-1.5 text-sm font-medium rounded-md transition-all whitespace-nowrap flex items-center gap-1 bg-gradient-to-r from-pink-500/10 to-rose-500/10 border border-pink-500/20 hover:from-pink-500/20 hover:to-rose-500/20 ${isActiveTab('/devotionals') ? 'shadow-[0_0_12px_2px_rgba(236,72,153,0.5)] border-pink-400/60' : ''}`}
                   >
                     <BookOpen className="h-3.5 w-3.5 text-pink-500" />
-                    <span className="bg-gradient-to-r from-pink-600 to-rose-600 bg-clip-text text-transparent font-semibold">Devotionals</span>
+                    <span className="bg-gradient-to-r from-pink-600 to-rose-600 bg-clip-text text-transparent font-semibold">{t('navTabs.devotionals', 'Devotionals')}</span>
                   </Link>
                   <Link
                     to="/encyclopedia"
                     className={`px-3 py-1.5 text-sm font-medium rounded-md transition-all whitespace-nowrap flex items-center gap-1 bg-gradient-to-r from-indigo-500/10 to-blue-500/10 border border-indigo-500/20 hover:from-indigo-500/20 hover:to-blue-500/20 ${isActiveTab('/encyclopedia') ? 'shadow-[0_0_12px_2px_rgba(99,102,241,0.5)] border-indigo-400/60' : ''}`}
                   >
                     <Search className="h-3.5 w-3.5 text-indigo-500" />
-                    <span className="bg-gradient-to-r from-indigo-600 to-blue-600 bg-clip-text text-transparent font-semibold">Encyclopedia</span>
+                    <span className="bg-gradient-to-r from-indigo-600 to-blue-600 bg-clip-text text-transparent font-semibold">{t('navTabs.encyclopedia', 'Encyclopedia')}</span>
                   </Link>
                   <Link
                     to="/video-training"
                     className={`px-3 py-1.5 text-sm font-medium rounded-md transition-all whitespace-nowrap flex items-center gap-1 bg-gradient-to-r from-red-500/10 to-orange-500/10 border border-red-500/20 hover:from-red-500/20 hover:to-orange-500/20 ${isActiveTab('/video-training') ? 'shadow-[0_0_12px_2px_rgba(239,68,68,0.5)] border-red-400/60' : ''}`}
                   >
                     <Video className="h-3.5 w-3.5 text-red-500" />
-                    <span className="bg-gradient-to-r from-red-600 to-orange-600 bg-clip-text text-transparent font-semibold">Video Training</span>
+                    <span className="bg-gradient-to-r from-red-600 to-orange-600 bg-clip-text text-transparent font-semibold">{t('navTabs.video-training', 'Video Training')}</span>
                   </Link>
                   <Link
                     to="/my-studies"
                     className={`px-3 py-1.5 text-sm font-medium rounded-md transition-all whitespace-nowrap flex items-center gap-1 bg-gradient-to-r from-sky-500/10 to-blue-500/10 border border-sky-500/20 hover:from-sky-500/20 hover:to-blue-500/20 ${isActiveTab('/my-studies') ? 'shadow-[0_0_12px_2px_rgba(14,165,233,0.5)] border-sky-400/60' : ''}`}
                   >
                     <BookOpen className="h-3.5 w-3.5 text-sky-500" />
-                    <span className="bg-gradient-to-r from-sky-600 to-blue-600 bg-clip-text text-transparent font-semibold">My Studies</span>
+                    <span className="bg-gradient-to-r from-sky-600 to-blue-600 bg-clip-text text-transparent font-semibold">{t('navTabs.my-studies', 'My Studies')}</span>
                   </Link>
                   <Link
                     to="/notes"
                     className={`px-3 py-1.5 text-sm font-medium rounded-md transition-all whitespace-nowrap flex items-center gap-1 bg-gradient-to-r from-yellow-500/10 to-amber-500/10 border border-yellow-500/20 hover:from-yellow-500/20 hover:to-amber-500/20 ${isActiveTab('/notes') ? 'shadow-[0_0_12px_2px_rgba(234,179,8,0.5)] border-yellow-400/60' : ''}`}
                   >
                     <BookOpen className="h-3.5 w-3.5 text-yellow-500" />
-                    <span className="bg-gradient-to-r from-yellow-600 to-amber-600 bg-clip-text text-transparent font-semibold">Notes</span>
+                    <span className="bg-gradient-to-r from-yellow-600 to-amber-600 bg-clip-text text-transparent font-semibold">{t('navTabs.notes', 'Notes')}</span>
                   </Link>
                   <Link
                     to="/libraries"
                     className={`px-3 py-1.5 text-sm font-medium rounded-md transition-all whitespace-nowrap flex items-center gap-1 bg-gradient-to-r from-indigo-500/10 to-purple-500/10 border border-indigo-500/20 hover:from-indigo-500/20 hover:to-purple-500/20 ${isActiveTab('/libraries') ? 'shadow-[0_0_12px_2px_rgba(99,102,241,0.5)] border-indigo-400/60' : ''}`}
                   >
                     <Library className="h-3.5 w-3.5 text-indigo-500" />
-                    <span className="bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent font-semibold">Libraries</span>
+                    <span className="bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent font-semibold">{t('navTabs.libraries', 'Libraries')}</span>
                   </Link>
                   <Link
                     to="/games" 
                     className={`px-3 py-1.5 text-sm font-medium rounded-md transition-all whitespace-nowrap flex items-center gap-1 bg-gradient-to-r from-fuchsia-500/10 to-pink-500/10 border border-fuchsia-500/20 hover:from-fuchsia-500/20 hover:to-pink-500/20 ${isActiveTab('/games') ? 'shadow-[0_0_12px_2px_rgba(217,70,239,0.5)] border-fuchsia-400/60' : ''}`}
                   >
                     <Zap className="h-3.5 w-3.5 text-fuchsia-500" />
-                    <span className="bg-gradient-to-r from-fuchsia-600 to-pink-600 bg-clip-text text-transparent font-semibold">Games</span>
+                    <span className="bg-gradient-to-r from-fuchsia-600 to-pink-600 bg-clip-text text-transparent font-semibold">{t('navTabs.games', 'Games')}</span>
                   </Link>
                   <Link
                     to="/memory"
                     className={`px-3 py-1.5 text-sm font-medium rounded-md transition-all whitespace-nowrap flex items-center gap-1 bg-gradient-to-r from-cyan-500/10 to-teal-500/10 border border-cyan-500/20 hover:from-cyan-500/20 hover:to-teal-500/20 ${isActiveTab('/memory') ? 'shadow-[0_0_12px_2px_rgba(6,182,212,0.5)] border-cyan-400/60' : ''}`}
                   >
                     <Brain className="h-3.5 w-3.5 text-cyan-500" />
-                    <span className="bg-gradient-to-r from-cyan-600 to-teal-600 bg-clip-text text-transparent font-semibold">Memory Palace</span>
+                    <span className="bg-gradient-to-r from-cyan-600 to-teal-600 bg-clip-text text-transparent font-semibold">{t('navTabs.memory', 'Memory Palace')}</span>
                   </Link>
 
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                       <button className="px-3 py-1.5 text-sm font-medium rounded-md transition-colors whitespace-nowrap flex items-center gap-1 bg-gradient-to-r from-emerald-500/10 to-teal-500/10 border border-emerald-500/20 hover:from-emerald-500/20 hover:to-teal-500/20">
                         <Layers className="h-3.5 w-3.5 text-emerald-500" />
-                        <span className="bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent font-semibold">Study Tools</span>
+                        <span className="bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent font-semibold">{t('navTabs.study-tools', 'Study Tools')}</span>
                       </button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="start" className="w-56 bg-card border-border z-50">
@@ -614,35 +614,35 @@ export const Navigation = () => {
                     className={`px-3 py-1.5 text-sm font-medium rounded-md transition-all whitespace-nowrap flex items-center gap-1 bg-gradient-to-r from-yellow-500/10 to-amber-500/10 border border-yellow-500/20 hover:from-yellow-500/20 hover:to-amber-500/20 ${isActiveTab('/leaderboard') ? 'shadow-[0_0_12px_2px_rgba(234,179,8,0.5)] border-yellow-400/60' : ''}`}
                   >
                     <Trophy className="h-3.5 w-3.5 text-yellow-500" />
-                    <span className="bg-gradient-to-r from-yellow-600 to-amber-600 bg-clip-text text-transparent font-semibold">Leaderboard</span>
+                    <span className="bg-gradient-to-r from-yellow-600 to-amber-600 bg-clip-text text-transparent font-semibold">{t('navTabs.leaderboard', 'Leaderboard')}</span>
                   </Link>
                   <Link
                     to="/drill-drill"
                     className={`px-3 py-1.5 text-sm font-medium rounded-md transition-all whitespace-nowrap flex items-center gap-1 bg-gradient-to-r from-orange-500/10 to-red-500/10 border border-orange-500/20 hover:from-orange-500/20 hover:to-red-500/20 ${isActiveTab('/drill-drill') ? 'shadow-[0_0_12px_2px_rgba(249,115,22,0.5)] border-orange-400/60' : ''}`}
                   >
                     <Target className="h-3.5 w-3.5 text-orange-500" />
-                    <span className="bg-gradient-to-r from-orange-600 to-red-600 bg-clip-text text-transparent font-semibold">Gather Fragments</span>
+                    <span className="bg-gradient-to-r from-orange-600 to-red-600 bg-clip-text text-transparent font-semibold">{t('navTabs.drill-drill', 'Gather Fragments')}</span>
                   </Link>
                   <Link
                     to="/analyze-thoughts"
                     className={`px-3 py-1.5 text-sm font-medium rounded-md transition-all whitespace-nowrap flex items-center gap-1 bg-gradient-to-r from-yellow-500/10 to-amber-500/10 border border-yellow-500/20 hover:from-yellow-500/20 hover:to-amber-500/20 ${isActiveTab('/analyze-thoughts') ? 'shadow-[0_0_12px_2px_rgba(234,179,8,0.5)] border-yellow-400/60' : ''}`}
                   >
                     <Lightbulb className="h-3.5 w-3.5 text-yellow-500" />
-                    <span className="bg-gradient-to-r from-yellow-600 to-amber-600 bg-clip-text text-transparent font-semibold">Analyze My Thoughts</span>
+                    <span className="bg-gradient-to-r from-yellow-600 to-amber-600 bg-clip-text text-transparent font-semibold">{t('navTabs.analyze-thoughts', 'Analyze My Thoughts')}</span>
                   </Link>
                   <Link
                     to="/spiritual-training"
                     className={`px-3 py-1.5 text-sm font-medium rounded-md transition-all whitespace-nowrap flex items-center gap-1 bg-gradient-to-r from-red-500/10 to-rose-500/10 border border-red-500/20 hover:from-red-500/20 hover:to-rose-500/20 ${isActiveTab('/spiritual-training') ? 'shadow-[0_0_12px_2px_rgba(239,68,68,0.5)] border-red-400/60' : ''}`}
                   >
                     <Sword className="h-3.5 w-3.5 text-red-500" />
-                    <span className="bg-gradient-to-r from-red-600 to-rose-600 bg-clip-text text-transparent font-semibold">Christian Art of War Dojo</span>
+                    <span className="bg-gradient-to-r from-red-600 to-rose-600 bg-clip-text text-transparent font-semibold">{t('navTabs.spiritual-training', 'Christian Art of War Dojo')}</span>
                   </Link>
 
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                       <button className="px-3 py-1.5 text-sm font-medium rounded-md transition-colors whitespace-nowrap flex items-center gap-1 bg-gradient-to-r from-violet-500/10 to-purple-500/10 border border-violet-500/20 hover:from-violet-500/20 hover:to-purple-500/20">
                         <Sparkles className="h-3.5 w-3.5 text-violet-500" />
-                        <span className="bg-gradient-to-r from-violet-600 to-purple-600 bg-clip-text text-transparent font-semibold">GPTs</span>
+                        <span className="bg-gradient-to-r from-violet-600 to-purple-600 bg-clip-text text-transparent font-semibold">{t('navTabs.gpts', 'GPTs')}</span>
                       </button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="start" className="w-56 bg-card border-border z-50">
@@ -668,7 +668,7 @@ export const Navigation = () => {
                     <DropdownMenuTrigger asChild>
                       <button className="px-3 py-1.5 text-sm font-medium rounded-md transition-colors whitespace-nowrap flex items-center gap-1 bg-gradient-to-r from-blue-500/10 to-indigo-500/10 border border-blue-500/20 hover:from-blue-500/20 hover:to-indigo-500/20">
                         <Building2 className="h-3.5 w-3.5 text-blue-500" />
-                        <span className="bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent font-semibold">Blueprints</span>
+                        <span className="bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent font-semibold">{t('navTabs.blueprints', 'Blueprints')}</span>
                       </button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="start" className="w-56 bg-card border-border z-50">
@@ -694,13 +694,13 @@ export const Navigation = () => {
                     className="px-3 py-1.5 text-sm font-medium rounded-md transition-colors whitespace-nowrap flex items-center gap-1 bg-gradient-to-r from-emerald-500/10 to-green-500/10 border border-emerald-500/20 hover:from-emerald-500/20 hover:to-green-500/20"
                   >
                     <BookOpen className="h-3.5 w-3.5 text-emerald-500" />
-                    <span className="bg-gradient-to-r from-emerald-600 to-green-600 bg-clip-text text-transparent font-semibold">Courses</span>
+                    <span className="bg-gradient-to-r from-emerald-600 to-green-600 bg-clip-text text-transparent font-semibold">{t('navTabs.courses', 'Courses')}</span>
                   </Link>
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                       <button className="px-3 py-1.5 text-sm font-medium rounded-md transition-colors whitespace-nowrap flex items-center gap-1 bg-gradient-to-r from-orange-500/10 to-red-500/10 border border-orange-500/20 hover:from-orange-500/20 hover:to-red-500/20">
                         <Zap className="h-3.5 w-3.5 text-orange-500" />
-                        <span className="bg-gradient-to-r from-orange-600 to-red-600 bg-clip-text text-transparent font-semibold">Challenges</span>
+                        <span className="bg-gradient-to-r from-orange-600 to-red-600 bg-clip-text text-transparent font-semibold">{t('navTabs.challenges', 'Challenges')}</span>
                       </button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="start" className="w-56 bg-card border-border z-50">
@@ -717,41 +717,41 @@ export const Navigation = () => {
                     className="px-3 py-1.5 text-sm font-medium rounded-md transition-colors whitespace-nowrap flex items-center gap-1 bg-gradient-to-r from-amber-500/10 to-yellow-500/10 border border-amber-500/20 hover:from-amber-500/20 hover:to-yellow-500/20"
                   >
                     <Trophy className="h-3.5 w-3.5 text-amber-500" />
-                    <span className="bg-gradient-to-r from-amber-600 to-yellow-600 bg-clip-text text-transparent font-semibold">Achievements</span>
+                    <span className="bg-gradient-to-r from-amber-600 to-yellow-600 bg-clip-text text-transparent font-semibold">{t('navTabs.achievements', 'Achievements')}</span>
                   </Link>
                   <Link
                     to="/mastery"
                     className="px-3 py-1.5 text-sm font-medium rounded-md transition-colors whitespace-nowrap flex items-center gap-1 bg-gradient-to-r from-rose-500/10 to-pink-500/10 border border-rose-500/20 hover:from-rose-500/20 hover:to-pink-500/20"
                   >
                     <Crown className="h-3.5 w-3.5 text-rose-500" />
-                    <span className="bg-gradient-to-r from-rose-600 to-pink-600 bg-clip-text text-transparent font-semibold">Mastery</span>
+                    <span className="bg-gradient-to-r from-rose-600 to-pink-600 bg-clip-text text-transparent font-semibold">{t('navTabs.mastery', 'Mastery')}</span>
                   </Link>
                   <Link
                     to="/bible-study-series"
                     className="px-3 py-1.5 text-sm font-medium rounded-md transition-colors whitespace-nowrap flex items-center gap-1 bg-gradient-to-r from-sky-500/10 to-blue-500/10 border border-sky-500/20 hover:from-sky-500/20 hover:to-blue-500/20"
                   >
                     <BookOpen className="h-3.5 w-3.5 text-sky-500" />
-                    <span className="bg-gradient-to-r from-sky-600 to-blue-600 bg-clip-text text-transparent font-semibold">Series</span>
+                    <span className="bg-gradient-to-r from-sky-600 to-blue-600 bg-clip-text text-transparent font-semibold">{t('navTabs.series', 'Series')}</span>
                   </Link>
                   <Link
                     to="/sermon-builder"
                     className="px-3 py-1.5 text-sm font-medium rounded-md transition-colors whitespace-nowrap flex items-center gap-1 bg-gradient-to-r from-purple-500/10 to-fuchsia-500/10 border border-purple-500/20 hover:from-purple-500/20 hover:to-fuchsia-500/20"
                   >
                     <MessageSquare className="h-3.5 w-3.5 text-purple-500" />
-                    <span className="bg-gradient-to-r from-purple-600 to-fuchsia-600 bg-clip-text text-transparent font-semibold">Sermon Builder</span>
+                    <span className="bg-gradient-to-r from-purple-600 to-fuchsia-600 bg-clip-text text-transparent font-semibold">{t('navTabs.sermon-builder', 'Sermon Builder')}</span>
                   </Link>
                   <Link
                     to="/pricing"
                     className="px-3 py-1.5 text-sm font-medium rounded-md transition-colors whitespace-nowrap flex items-center gap-1 bg-gradient-to-r from-lime-500/10 to-green-500/10 border border-lime-500/20 hover:from-lime-500/20 hover:to-green-500/20"
                   >
                     <CreditCard className="h-3.5 w-3.5 text-lime-500" />
-                    <span className="bg-gradient-to-r from-lime-600 to-green-600 bg-clip-text text-transparent font-semibold">Pricing</span>
+                    <span className="bg-gradient-to-r from-lime-600 to-green-600 bg-clip-text text-transparent font-semibold">{t('navTabs.pricing', 'Pricing')}</span>
                   </Link>
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                       <button className="px-3 py-1.5 text-sm font-medium rounded-md transition-colors whitespace-nowrap flex items-center gap-1 bg-gradient-to-r from-teal-500/10 to-cyan-500/10 border border-teal-500/20 hover:from-teal-500/20 hover:to-cyan-500/20">
                         <Users className="h-3.5 w-3.5 text-teal-500" />
-                        <span className="bg-gradient-to-r from-teal-600 to-cyan-600 bg-clip-text text-transparent font-semibold">Community</span>
+                        <span className="bg-gradient-to-r from-teal-600 to-cyan-600 bg-clip-text text-transparent font-semibold">{t('navTabs.community', 'Community')}</span>
                       </button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="start" className="w-56 bg-card border-border z-50">
