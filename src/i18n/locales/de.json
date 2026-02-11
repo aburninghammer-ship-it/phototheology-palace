@@ -1254,5 +1254,27 @@
     "quickStartDesc": "Orientierung zum Palast-Rahmenwerk. Verstehe die Struktur, bevor du beginnst.",
     "studySuite": "Studien-Suite",
     "studySuiteDesc": "Vollständiges Methodentraining für alle 8 Etagen. Meistere das Phototheology-System."
+  },
+  "roomTour": {
+    "welcomeTo": "Willkommen in {{roomName}}",
+    "floor": "Etage {{number}}",
+    "coreQuestion": "Kernfrage",
+    "whatYoullDo": "Was Du Tun Wirst",
+    "yourTask": "Deine Aufgabe",
+    "deliverable": "Ergebnis",
+    "timeQuick": "Schnell (5-10 Min.)",
+    "timeStandard": "Standard (15-30 Min.)",
+    "timeDeep": "Vertieft (30-60 Min.)",
+    "seeItInAction": "In Aktion Sehen",
+    "realExamples": "Echte Beispiele",
+    "proTips": "Profi-Tipps",
+    "learnFromMistakes": "Aus Fehlern Lernen",
+    "quickModeSteps": "Schnellmodus-Schritte",
+    "avoidPitfalls": "Diese Fehler Vermeiden",
+    "youreReady": "Du Bist Bereit!",
+    "beginPractice": "Übung Beginnen",
+    "tourComplete": "Tour Abgeschlossen!",
+    "tourCompleteDesc": "Du bist bereit, in {{roomName}} zu üben.",
+    "remember": "Denk daran:"
   }
 }

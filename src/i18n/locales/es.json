@@ -7540,5 +7540,27 @@
         }
       }
     }
+  },
+  "roomTour": {
+    "welcomeTo": "Bienvenido a {{roomName}}",
+    "floor": "Piso {{number}}",
+    "coreQuestion": "Pregunta Central",
+    "whatYoullDo": "Lo Que Harás",
+    "yourTask": "Tu Tarea",
+    "deliverable": "Entregable",
+    "timeQuick": "Rápido (5-10 min)",
+    "timeStandard": "Estándar (15-30 min)",
+    "timeDeep": "Profundo (30-60 min)",
+    "seeItInAction": "Míralo en Acción",
+    "realExamples": "Ejemplos Reales",
+    "proTips": "Consejos Pro",
+    "learnFromMistakes": "Aprende de los Errores",
+    "quickModeSteps": "Pasos del Modo Rápido",
+    "avoidPitfalls": "Evita Estos Errores",
+    "youreReady": "¡Estás Listo!",
+    "beginPractice": "Comenzar Práctica",
+    "tourComplete": "¡Tour Completo!",
+    "tourCompleteDesc": "Estás listo para practicar en {{roomName}}.",
+    "remember": "Recuerda:"
   }
 }
