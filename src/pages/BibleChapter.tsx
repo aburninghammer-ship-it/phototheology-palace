@@ -1,10 +1,12 @@
+import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Navigation } from "@/components/Navigation";
 import { BibleReader } from "@/components/bible/BibleReader";
+import { AtAGlanceSidebar } from "@/components/bible/AtAGlanceSidebar";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { ArrowLeft, Building2, Lightbulb } from "lucide-react";
+import { ArrowLeft, Building2, Lightbulb, PanelLeft } from "lucide-react";
 import { Link, useLocation, useSearchParams } from "react-router-dom";
 import { Footer } from "@/components/Footer";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -14,6 +16,7 @@ const BibleChapter = () => {
   const { t } = useTranslation();
   const location = useLocation();
   const [searchParams, setSearchParams] = useSearchParams();
+  const [sidebarOpen, setSidebarOpen] = useState(true);
   const { exercises, fromReadingPlan, planName, dayNumber } = location.state || {};
 
   // Check for research mode
@@ -37,14 +40,25 @@ const BibleChapter = () => {
     <div className="min-h-screen gradient-subtle">
       <Navigation />
       
-      <div className="pt-24 pb-16 px-4">
+      <div className="pt-24 pb-16 px-3 sm:px-4 md:px-6">
         <div className="container mx-auto max-w-7xl">
-          <Button variant="ghost" asChild className="mb-6">
-            <Link to={fromReadingPlan ? "/daily-reading" : "/bible"}>
-              <ArrowLeft className="h-4 w-4 mr-2" />
-              {fromReadingPlan ? t('bibleChapter.backToDailyReading', 'Back to Daily Reading') : t('bibleChapter.backToBible', 'Back to Bible')}
-            </Link>
-          </Button>
+          <div className="flex items-center gap-2 mb-6">
+            <Button variant="ghost" asChild>
+              <Link to={fromReadingPlan ? "/daily-reading" : "/bible"}>
+                <ArrowLeft className="h-4 w-4 mr-2" />
+                {fromReadingPlan ? t('bibleChapter.backToDailyReading', 'Back to Daily Reading') : t('bibleChapter.backToBible', 'Back to Bible')}
+              </Link>
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              className="bg-white/10 backdrop-blur-md border-white/20 hover:bg-white/20"
+              onClick={() => setSidebarOpen(!sidebarOpen)}
+            >
+              <PanelLeft className="h-4 w-4 mr-2" />
+              {t('bible.atAGlanceShort', 'Books')}
+            </Button>
+          </div>
 
           {fromReadingPlan && exercises && exercises.length > 0 && (
             <Card className="p-6 mb-6 bg-primary/5 border-primary/20">
@@ -116,7 +130,16 @@ const BibleChapter = () => {
             </Card>
           )}
 
-          <BibleReader />
+          <div className="flex gap-0 relative">
+            {sidebarOpen && (
+              <div className="w-56 lg:w-64 shrink-0 h-[calc(100vh-220px)] sticky top-24 rounded-xl border border-border/50 overflow-hidden shadow-lg">
+                <AtAGlanceSidebar onClose={() => setSidebarOpen(false)} />
+              </div>
+            )}
+            <div className={`flex-1 min-w-0 ${sidebarOpen ? 'pl-4' : ''}`}>
+              <BibleReader />
+            </div>
+          </div>
         </div>
       </div>
       <Footer />
