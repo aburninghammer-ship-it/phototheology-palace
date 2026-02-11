@@ -50,13 +50,58 @@ function extractTags(purpose: string, method?: string): string[] {
 // skip generating a single room-level card for these.
 const MULTI_PRINCIPLE_ROOMS = new Set(['DR', 'TZ', 'C6', '1H/2H/3H', '@']);
 
-// Shorten a long purpose string to its first 2 sentences.
-function shortenDescription(text: string): string {
-  // Split on sentence-ending punctuation followed by a space
-  const sentences = text.match(/[^.!?]+[.!?]+/g);
-  if (!sentences || sentences.length <= 2) return text;
-  return sentences.slice(0, 2).join('').trim();
-}
+// 2-3 sentence card descriptions for every room, with application instruction.
+const ROOM_DESCRIPTIONS: Record<string, string> = {
+  // Floor 1 — Furnishing
+  'SR': 'The Story Room trains you to retell biblical events as memorable, sequential scenes. Break the passage into its key story beats and retell them in order. Apply this method to the text.',
+  'IR': 'The Imagination Room trains you to experience Scripture with all five senses. Step inside the scene — what do you see, hear, smell, and feel? Apply this method to the text.',
+  '24': 'The 24FPS Room creates a visual GPS for the Bible — one memorable image per chapter. Pick a single vivid image from this text that captures its essence. Apply this method to the text.',
+  'BR': 'Bible Rendered compresses Scripture into symbolic glyphs — one symbol per 24-chapter block. Identify the central movement of this passage and assign it one simple glyph. Apply this method to the text.',
+  'TR': 'The Translation Room converts abstract biblical concepts into concrete visual pictures. Turn the key idea of this text into a vivid image. Apply this method to the text.',
+  'GR': 'The Gems Room mines Scripture for rare truths by combining unrelated texts until they illuminate each other. Find a hidden gem — a truth most people miss in this passage. Apply this method to the text.',
+
+  // Floor 2 — Investigation
+  'OR': 'The Observation Room trains you to gather raw data before interpreting. Count people, objects, actions, repeated words, and contrasts in the text. Apply this method to the text.',
+  'DC': 'The Def-Com Room defines key terms in their original language and consults trusted commentaries. Identify the most important word in this text and explore its deeper meaning. Apply this method to the text.',
+  'ST': 'The Symbols/Types Room tracks consistent biblical imagery — Lamb, Rock, Light — through Scripture to see how it points to Christ. Find a symbol or type in this text. Apply this method to the text.',
+  'QR': 'The Questions Room generates precision questions using three types: INTRA (inside the passage), INTER (across Scripture), and PALACE (Phototheology framework). Ask penetrating questions of this text. Apply this method to the text.',
+
+  // Floor 3 — Freestyle
+  'QA': 'The Q&A Chains Room lets Scripture interpret Scripture. Take a question about this text and find 2-4 biblical cross-references that answer it. Apply this method to the text.',
+  'NF': 'Nature Freestyle sees God\'s invisible attributes in visible creation. Find a natural element — a tree, storm, or animal — that illustrates a truth in this text. Apply this method to the text.',
+  'PF': 'Personal Freestyle turns your biography into theology. Find a moment in your own life story that echoes or illustrates the truth in this text. Apply this method to the text.',
+  'BF': 'Bible Freestyle trains you to see how every verse connects to other verses — some are siblings, others distant relatives. Find a verse that connects to this text and explain the relationship. Apply this method to the text.',
+  'HF': 'History/Social Freestyle mines secular history, culture, and current events for gospel illustrations. Find something from history or culture that this text illuminates. Apply this method to the text.',
+  'LR': 'The Listening Room transforms passive hearing into active Scripture-linking. Find a theological echo from a sermon, conversation, or life experience that connects to this text. Apply this method to the text.',
+
+  // Floor 4 — Next Level (non-excluded rooms)
+  'CR': 'The Concentration Room sees Christ through His threefold office — Prophet, Priest, and King. Identify which office Christ is exercising in this text and explain how. Apply this method to the text.',
+  'TRm': 'The Theme Room identifies which of six theological spans your passage occupies: Sanctuary, Life of Christ, Great Controversy, Time-Prophecy, Gospel Floor, or Heaven Ceiling. Apply this method to the text.',
+  'PRm': 'The Patterns Room identifies recurring theological motifs that God plays throughout Scripture in different keys. Find a pattern in this text that echoes elsewhere in the Bible. Apply this method to the text.',
+  'P\u2016': 'The Parallels Room places two biblical events side by side and asks: what echoes, and what escalates? Find a parallel event in Scripture that mirrors this text. Apply this method to the text.',
+  'FRt': 'The Fruit Room is your interpretive conscience — it asks what kind of life your interpretation produces. Does your reading of this text produce good fruit or bad fruit? Apply this test to the text.',
+
+  // Floor 5 — Vision
+  'BL': 'The Blue Room reveals the Sanctuary as God\'s architectural blueprint for understanding Scripture. Connect this text to a piece of tabernacle furniture, a ritual, or a priestly service. Apply this method to the text.',
+  'PR': 'The Prophecy Room reads Daniel and Revelation as God\'s cohesive timeline of redemptive history. Find the prophetic significance of this text — what was or will be fulfilled? Apply this method to the text.',
+  '3A': 'The Three Angels Room connects every text to the messages of Revelation 14:6-12 — the everlasting gospel, the judgment hour, and Babylon\'s fall. Apply this method to the text.',
+  'FE': 'The Feasts Room reveals Israel\'s annual festivals (Leviticus 23) as God\'s prophetic roadmap of redemption. Connect this text to one of the seven biblical feasts. Apply this method to the text.',
+  'CEC': 'Christ in Every Chapter enforces the principle that ALL Scripture is about Jesus. Find Christ in this text — even where He seems hidden. Apply this method to the text.',
+  'R66': 'Room 66 traces a single theme through every book of the Bible, from Genesis to Revelation. Pick a theme from this text and trace it across Scripture. Apply this method to the text.',
+
+  // Floor 6 (non-excluded rooms)
+  'JR': 'The Juice Room extracts maximum theological, narrative, and practical meaning from Scripture at any scale. Squeeze every drop of meaning from this text without distortion. Apply this method to the text.',
+  'MATH': 'The Mathematics Room recognizes time-prophecy structures and numerical patterns embedded in Scripture. Find numbers or time patterns in this text that carry biblical significance. Apply this method to the text.',
+
+  // Floor 7 — Spiritual & Emotional
+  'FRm': 'The Fire Room is where Scripture moves from your head to your heart, igniting conviction, comfort, or worship. What in this text sets your soul on fire? Apply this method to the text.',
+  'MR': 'The Meditation Room trains you to marinate in a single verse or phrase until it absorbs into your being. Choose one phrase from this text and dwell on it deeply. Apply this method to the text.',
+  'SRm': 'The Speed Room trains you to retrieve biblical knowledge instantly under time pressure. Quickly connect this text to as many other Scriptures, principles, or applications as you can. Apply this method to the text.',
+
+  // Floor 8 — Master
+  '\u221E': 'Reflexive Mastery is when the Palace structure becomes invisible because it\'s wired into your instincts. Read this text naturally through layered lenses without consciously naming rooms. Apply this method to the text.',
+  'PFS': 'Palace Freestyle is a relational study environment where you think out loud with Scripture, building patterns before concluding. Freely explore connections in this text. Apply this method to the text.',
+};
 
 // Generate room cards from palaceData (authentic rooms only)
 function generateRoomCards(): ScrabbleCard[] {
@@ -79,7 +124,7 @@ function generateRoomCards(): ScrabbleCard[] {
           `floor-${floor.number}`,
           ...extractTags(room.purpose, room.method),
         ],
-        description: shortenDescription(room.purpose),
+        description: ROOM_DESCRIPTIONS[room.tag] || room.purpose,
       });
     });
   });
