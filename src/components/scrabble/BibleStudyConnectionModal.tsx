@@ -8,10 +8,7 @@ import {
   Sparkles,
   Check,
   Cross,
-  Lightbulb,
   Book,
-  ChevronDown,
-  ChevronUp,
   Bot,
   Loader2,
   Link,
@@ -52,241 +49,80 @@ interface BibleStudyConnectionModalProps {
   previousEntry?: StudyLogEntry; // The previous player's insight to connect to
 }
 
-// Generate suggestions based on actual PT principles from palaceData
-function generateSuggestions(card: ScrabbleCard, verse: SelectedVerse): string[] {
-  const suggestions: string[] = [];
-  const cardCode = card.code.toUpperCase();
+// Simple, clear principle explanations for the timed game context
+function getPrincipleExplanation(card: ScrabbleCard): string {
+  const code = card.code.toUpperCase();
 
-  // Floor 1: Furnishing (Memory & Visualization)
-  if (cardCode === 'SR') { // Story Room
-    suggestions.push(
-      `Break ${verse.reference} into 3-7 memorable beats—what's the sequence of events?`,
-      `Identify the story arc: where does it start, what's the turning point, how does it end?`,
-      `Name each beat with a punchy noun or verb to make it stick in memory.`
-    );
-  }
-  if (cardCode === 'IR') { // Imagination Room
-    suggestions.push(
-      `Step into ${verse.reference} using all 5 senses—what do you see, hear, feel, smell, taste?`,
-      `Experience this passage as a lived moment, not just information.`,
-      `What personal resonance emerges when you imagine yourself in this scene?`
-    );
-  }
-  if (cardCode === '24') { // 24FPS Room
-    suggestions.push(
-      `What single visual image captures this chapter's most memorable element?`,
-      `Create a mental "frame" for ${verse.reference}—quirky images stick better than dignified ones.`,
-      `The image should be a trigger for instant recall, not a comprehensive summary.`
-    );
-  }
-  if (cardCode === 'BR') { // Bible Rendered
-    suggestions.push(
-      `What simple glyph or symbol would compress the essence of this passage?`,
-      `Think like a mapmaker—one symbol to represent this text's central movement.`,
-      `Simplicity is power: /, ×, ↑, or a single word like SEED, KING, LAMB.`
-    );
-  }
-  if (cardCode === 'TR') { // Translation Room
-    suggestions.push(
-      `Convert ${verse.reference} into a visual—what concrete image captures the abstract truth?`,
-      `Pictures are remembered 6x better than words. What would you draw?`,
-      `Respect the biblical metaphor—translate what's there, don't invent new imagery.`
-    );
-  }
-  if (cardCode === 'GR') { // Gems Room
-    suggestions.push(
-      `What rare truth emerges when you combine ${verse.reference} with another unrelated text?`,
-      `Mine for a gem—a crystallized truth most readers miss.`,
-      `The best gems are anchored in multiple clear texts and have practical application.`
-    );
-  }
+  // Dimensions
+  if (code === 'LITERAL') return 'Read the text at face value. What does it plainly say in its original historical context?';
+  if (code === 'CHRIST') return 'Find Jesus in this text. How does this passage point to Christ — His life, death, or ministry?';
+  if (code === 'ME') return 'Make it personal. How does this text apply to your own life and walk with God?';
+  if (code === 'CHURCH') return 'Think corporately. How does this passage apply to the church as a body of believers?';
+  if (code === 'HEAVEN') return 'Look heavenward. How does this text connect to what is happening in heaven or the heavenly realm?';
 
-  // Floor 2: Investigation (Detective Work)
-  if (cardCode === 'OR') { // Observation Room
-    suggestions.push(
-      `Be a detective: count people, objects, actions. What exactly is happening in ${verse.reference}?`,
-      `Notice grammar, repetition, contrasts, and what's surprisingly NOT mentioned.`,
-      `Write only what you see—no interpretation yet. Quantity reveals quality.`
-    );
-  }
-  if (cardCode === 'DC') { // Def-Com Room
-    suggestions.push(
-      `What key terms need definition? Look up the original Greek/Hebrew meaning.`,
-      `What cultural context would be obvious to original hearers but obscure to us?`,
-      `What do trusted commentators say about ${verse.reference}?`
-    );
-  }
-  if (cardCode === 'ST') { // Symbols/Types Room
-    suggestions.push(
-      `What symbol or type appears in ${verse.reference}? Track it through Scripture.`,
-      `Build a symbol card: Symbol → Scope (texts) → Sign (meaning) → Christ-locus.`,
-      `How does this symbol find its ultimate fulfillment in Jesus?`
-    );
-  }
-  if (cardCode === 'QR') { // Questions Room
-    suggestions.push(
-      `Generate questions: INTRA (inside the passage), INTER (across Scripture), PALACE (PT framework).`,
-      `Why this word? Why here? Why now? What other texts connect?`,
-      `Good questions expose what you don't know—aim for 50+ questions per text.`
-    );
-  }
+  // Floor 1: Furnishing
+  if (code === 'SR') return 'Break the passage into story beats. What are the key events in order?';
+  if (code === 'IR') return 'Step into the scene with your senses. What do you see, hear, or feel in this text?';
+  if (code === '24' || code === '24FPS') return 'Pick one vivid image from this text that captures its essence — like a movie frame.';
+  if (code === 'BR') return 'Compress this passage into a single symbol or glyph that captures the main idea.';
+  if (code === 'TR') return 'Translate the abstract truth in this text into a concrete, visual picture.';
+  if (code === 'GR') return 'Mine for a gem — a rare truth most people miss when reading this passage.';
 
-  // Floor 3: Principles (Interpretation Lenses)
-  if (cardCode === 'QA') { // Q&A Room
-    suggestions.push(
-      `What fundamental question does ${verse.reference} address about God, humanity, or salvation?`,
-      `Frame the passage as answering a catechism-style question.`,
-      `What doctrinal truth is being established here?`
-    );
-  }
+  // Floor 2: Investigation
+  if (code === 'OR') return 'Be a detective. What do you observe — people, actions, repeated words, contrasts?';
+  if (code === 'DC') return 'Define the key words. What do the original Hebrew/Greek terms mean? What context helps?';
+  if (code === 'ST') return 'Find a symbol or type in this text. What does it represent and how does it point to Christ?';
+  if (code === 'QR') return 'Ask questions of the text. Why this word? Why here? What else connects to it?';
 
-  // Floor 4: Dimensions
-  if (cardCode === 'LR') { // Literal Room
-    suggestions.push(
-      `What is the plain historical/grammatical meaning of ${verse.reference}?`,
-      `Before going deeper, understand the literal foundation.`,
-      `What did this mean to the original audience in their context?`
-    );
-  }
-  if (cardCode === 'CR') { // Christ Room
-    suggestions.push(
-      `How does ${verse.reference} point to Christ—explicitly or typologically?`,
-      `Jesus is the central figure of all Scripture. Where is He here?`,
-      `What aspect of Christ's person, work, or offices is revealed?`
-    );
-  }
-  if (cardCode === 'DR') { // Dimensions Room
-    suggestions.push(
-      `Read ${verse.reference} through all 5 dimensions: Literal, Christ, Personal, Church, Heaven.`,
-      `Each dimension reveals different applications of the same truth.`,
-      `How does this passage speak to you individually and to the corporate body?`
-    );
-  }
+  // Floor 3: Principles
+  if (code === 'QA') return 'What big question about God, humanity, or salvation does this text answer?';
+  if (code === 'PA') return 'What pattern do you see? Does this passage echo or parallel another passage in Scripture?';
+  if (code === 'R66') return 'Trace a theme from this text through all 66 books. Where else does this idea appear?';
+  if (code === '3A') return 'How does this text connect to the Three Angels\' Messages of Revelation 14?';
+  if (code === 'CEC') return 'Find Christ in every chapter. How does this specific chapter reveal Jesus?';
 
-  // Floor 5: Time & Space
-  if (cardCode === 'C6') { // Cycle 6 Room
-    suggestions.push(
-      `Which cycle does ${verse.reference} fit into? (@Ad, @No, @Ab, @Mo, @Cy, @CyC, @Sp, @Re)`,
-      `Identify the cycle pattern: Fall → Covenant → Sanctuary → Enemy → Restoration.`,
-      `How does this passage repeat or escalate a previous cycle?`
-    );
-  }
-  if (cardCode === 'TZ') { // Time Zones Room
-    suggestions.push(
-      `Where does ${verse.reference} fit? Earth-Past, Earth-Now, Earth-Future, Heaven-Past, Heaven-Now, or Heaven-Future?`,
-      `Locate the passage in the 6 time zones of redemptive history.`,
-      `What's happening simultaneously on earth and in heaven?`
-    );
-  }
+  // Floor 4: Dimensions / Time Zones
+  if (code === 'DR') return 'Read the text through all 5 dimensions: Literal, Christ, Personal, Church, and Heaven.';
+  if (code === 'LR') return 'What is the plain, literal meaning of this text in its original setting?';
+  if (code === 'CR') return 'How does this text point to Christ — His person, work, or offices?';
+  if (code === 'TZ') return 'Place this text on the timeline: is it about Heaven or Earth? Past, Present, or Future?';
+  if (code === 'H-PAST') return 'What was happening in heaven before this event? How does heaven\'s past connect here?';
+  if (code === 'H-NOW') return 'What is Christ doing in heaven right now that relates to this text?';
+  if (code === 'H-FUTURE') return 'What future heavenly event does this text point toward?';
+  if (code === 'E-PAST') return 'What historical events on earth connect to this passage?';
+  if (code === 'E-NOW') return 'How does this text apply to life on earth today?';
+  if (code === 'E-FUTURE') return 'What future events on earth does this text foreshadow?';
 
-  // Floor 6: Prophecy & Eschatology
-  if (cardCode === 'BL') { // Blueprint Room
-    suggestions.push(
-      `How does ${verse.reference} connect to the sanctuary pattern?`,
-      `The tabernacle is God's visual aid for salvation. What article or service applies?`,
-      `Trace the sanctuary symbolism: outer court, holy place, most holy place.`
-    );
-  }
-  if (cardCode === 'PR') { // Prophecy Room
-    suggestions.push(
-      `What prophetic significance does ${verse.reference} carry?`,
-      `How does this passage fit into God's revealed timeline?`,
-      `What was fulfilled? What awaits fulfillment?`
-    );
-  }
-  if (cardCode === 'FE') { // Feasts Room
-    suggestions.push(
-      `Which of the 7 feasts (Passover, Unleavened, Firstfruits, Pentecost, Trumpets, Atonement, Tabernacles) connects to ${verse.reference}?`,
-      `The feasts are prophetic markers. How does this text illuminate them?`,
-      `What aspect of Christ's work does this feast/passage reveal?`
-    );
-  }
+  // Floor 5: Blueprint & Prophecy
+  if (code === 'BL') return 'Connect this text to the sanctuary/tabernacle. What article or service does it relate to?';
+  if (code === 'PR') return 'What prophetic significance does this text carry? What was or will be fulfilled?';
+  if (code === 'FE') return 'Which of the 7 biblical feasts connects to this passage, and how?';
+  if (code === 'MATH') return 'Find the numbers. What numerical patterns in this text carry biblical significance?';
 
-  // Cycles
-  if (cardCode.startsWith('@')) {
-    suggestions.push(
-      `${verse.reference} fits within this covenant cycle—identify the Fall, Covenant, Sanctuary, Enemy, and Restoration elements.`,
-      `How does this cycle echo previous cycles and anticipate future ones?`,
-      `Christ is the center of every cycle. Where do you see Him here?`
-    );
-  }
+  // Connect-6 Genres
+  if (code === 'C6-PR') return 'Find a prophecy that predicts, foreshadows, or fulfills the truth in this text.';
+  if (code === 'C6-PA') return 'Find a parable of Jesus that illustrates or echoes the principle in this text.';
+  if (code === 'C6-EP') return 'Find an apostolic letter that explains or applies the doctrine in this text.';
+  if (code === 'C6-HI') return 'Find a biblical narrative or event that demonstrates this truth in action.';
+  if (code === 'C6-GO') return 'Find a moment in Jesus\' life or teaching that embodies this truth.';
+  if (code === 'C6-PO') return 'Find a psalm, proverb, or song that expresses this truth artistically.';
 
-  // Dimensions (1D-5D)
-  if (/^[1-5]D$/i.test(cardCode)) {
-    const dimExplanations: Record<string, string[]> = {
-      '1D': [
-        `What is the literal, historical meaning of ${verse.reference}?`,
-        `Ground yourself in what the text plainly says before going deeper.`
-      ],
-      '2D': [
-        `How does ${verse.reference} reveal Christ—His character, offices, or work?`,
-        `This is the Christ dimension: where is Jesus in this text?`
-      ],
-      '3D': [
-        `How does ${verse.reference} apply to you personally?`,
-        `The Personal dimension: what is God saying to you individually?`
-      ],
-      '4D': [
-        `How does ${verse.reference} apply to the church corporately?`,
-        `The Church dimension: what does this mean for the body of believers?`
-      ],
-      '5D': [
-        `How does ${verse.reference} connect to heavenly realities?`,
-        `The Heaven dimension: what's happening in the throne room that relates to this text?`
-      ],
-    };
-    const dims = dimExplanations[cardCode.toUpperCase()];
-    if (dims) suggestions.push(...dims);
-  }
+  // Floor 6: Cycles & Heavens
+  if (code === '@AD') return 'Adamic Cycle: How does this text echo the Creation, Fall, or Seed promise of Genesis?';
+  if (code === '@NO') return 'Noahic Cycle: How does this text echo judgment, the ark, or the rainbow covenant?';
+  if (code === '@AB') return 'Abrahamic Cycle: How does this text echo covenant, faith, or the promised seed?';
+  if (code === '@MO') return 'Mosaic Cycle: How does this text echo the Exodus, the Law, or the tabernacle?';
+  if (code === '@CY') return 'Cyrusic Cycle: How does this text echo exile, return, or temple rebuilding?';
+  if (code === '@CYC') return 'Cyrus-Christ Cycle: How does type meet antitype here — shadow meeting substance?';
+  if (code === '@SP') return 'Spirit Cycle: How does this text echo Pentecost, the church age, or global mission?';
+  if (code === '@RE') return 'Remnant Cycle: How does this text echo end-time witness, judgment, or the Second Coming?';
+  if (code === '1H') return 'First Heaven: How does this text connect to the Babylonian destruction of Jerusalem and its restoration?';
+  if (code === '2H') return 'Second Heaven: How does this text connect to 70 AD and the New Covenant order?';
+  if (code === '3H') return 'Third Heaven: How does this text connect to the final judgment and new creation?';
 
-  // Heavens (1H-3H)
-  if (/^[1-3]H$/i.test(cardCode)) {
-    const heavenExplanations: Record<string, string[]> = {
-      '1H': [
-        `First Heaven (atmospheric): How does ${verse.reference} speak to earthly, natural realities?`,
-        `Weather, sky, birds—the visible realm around us.`
-      ],
-      '2H': [
-        `Second Heaven (cosmic): How does ${verse.reference} connect to cosmic or spiritual realities?`,
-        `Stars, planets, angelic realm—the cosmic theater.`
-      ],
-      '3H': [
-        `Third Heaven (throne room): How does ${verse.reference} connect to God's throne?`,
-        `Paradise, the divine presence—the ultimate destination.`
-      ],
-    };
-    const heavens = heavenExplanations[cardCode.toUpperCase()];
-    if (heavens) suggestions.push(...heavens);
-  }
-
-  // Math Room
-  if (cardCode === 'MATH') {
-    suggestions.push(
-      `What numerical patterns appear in ${verse.reference}? Numbers in Scripture are often significant.`,
-      `Look for: 7 (completion), 12 (government), 40 (testing), 3 (divine), 4 (earth).`,
-      `How do the numbers in this text reveal deeper meaning?`
-    );
-  }
-
-  // Default suggestions using card's own description
-  if (suggestions.length === 0 && card.description) {
-    suggestions.push(
-      `Apply the ${card.name} principle: ${card.description}`,
-      `How does the ${card.name} (${card.code}) method unlock ${verse.reference}?`,
-      `Use the ${card.name} lens to discover new insights in this passage.`
-    );
-  }
-
-  // Fallback if still empty
-  if (suggestions.length === 0) {
-    suggestions.push(
-      `How does the ${card.name} principle apply to ${verse.reference}?`,
-      `What new insight emerges when viewing this passage through ${card.code}?`,
-      `Connect the ${card.name} method to the truth revealed here.`
-    );
-  }
-
-  return suggestions.slice(0, 3);
+  // Fallback — use the card's own description if available
+  if (card.description) return `${card.name}: ${card.description}. Apply this lens to the text.`;
+  return `Apply the ${card.name} principle to the text. What new insight emerges?`;
 }
 
 export function BibleStudyConnectionModal({
@@ -302,13 +138,12 @@ export function BibleStudyConnectionModal({
   const [timeLeft, setTimeLeft] = useState<number>(SCRABBLE_SCORING.TIMER_SECONDS); // 2 minutes
   const [explanation, setExplanation] = useState('');
   const [isChristConnection, setIsChristConnection] = useState(false);
-  const [showSuggestions, setShowSuggestions] = useState(true);
   const [isJudging, setIsJudging] = useState(false);
   const [jeevesJudgment, setJeevesJudgment] = useState<string | null>(null);
 
   // Determine if this is the first play (connect to verse) or subsequent (connect to previous)
   const isFirstPlay = !previousEntry;
-  const suggestions = generateSuggestions(card, seedVerse);
+  const principleExplanation = getPrincipleExplanation(card);
 
   // Timer countdown
   useEffect(() => {
@@ -316,7 +151,6 @@ export function BibleStudyConnectionModal({
       setTimeLeft(SCRABBLE_SCORING.TIMER_SECONDS);
       setExplanation('');
       setIsChristConnection(false);
-      setShowSuggestions(true);
       setIsJudging(false);
       setJeevesJudgment(null);
       return;
@@ -498,46 +332,14 @@ In 2-3 sentences, explain how this new insight builds upon or connects to the pr
             </div>
           )}
 
-          {/* Your Card */}
-          <div className="flex items-center gap-4 p-4 bg-muted rounded-lg">
+          {/* Principle Explanation */}
+          <div className="flex items-start gap-4 p-4 bg-amber-500/10 border border-amber-500/30 rounded-lg">
             <ScrabbleTile card={card} size="sm" />
             <div className="flex-1">
-              <p className="font-medium">Applying: {card.name} ({card.code})</p>
-              <p className="text-sm text-muted-foreground">{card.description}</p>
+              <p className="font-semibold text-sm mb-1">{card.name} <span className="font-mono text-xs text-muted-foreground">({card.code})</span></p>
+              <p className="text-sm leading-relaxed">{principleExplanation}</p>
             </div>
           </div>
-
-          {/* AI Suggestions */}
-          <Collapsible open={showSuggestions} onOpenChange={setShowSuggestions}>
-            <CollapsibleTrigger asChild>
-              <Button variant="ghost" className="w-full justify-between">
-                <span className="flex items-center gap-2">
-                  <Lightbulb className="h-4 w-4 text-yellow-500" />
-                  Suggested Explanations
-                </span>
-                {showSuggestions ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
-              </Button>
-            </CollapsibleTrigger>
-            <CollapsibleContent className="space-y-2 pt-2">
-              {suggestions.map((suggestion, i) => (
-                <motion.button
-                  key={i}
-                  onClick={() => handleUseSuggestion(suggestion)}
-                  className="w-full p-3 text-left text-sm border rounded-lg hover:border-primary hover:bg-primary/5 transition-colors"
-                  whileHover={{ scale: 1.01 }}
-                  whileTap={{ scale: 0.99 }}
-                >
-                  <div className="flex items-start gap-2">
-                    <Sparkles className="h-4 w-4 text-yellow-500 mt-0.5 shrink-0" />
-                    <span>{suggestion}</span>
-                  </div>
-                </motion.button>
-              ))}
-              <p className="text-xs text-muted-foreground text-center pt-1">
-                Click a suggestion to use it, or write your own below
-              </p>
-            </CollapsibleContent>
-          </Collapsible>
 
           {/* Custom Explanation */}
           <div className="space-y-2">

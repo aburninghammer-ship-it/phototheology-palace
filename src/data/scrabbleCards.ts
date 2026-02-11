@@ -46,12 +46,27 @@ function extractTags(purpose: string, method?: string): string[] {
   return [...new Set(tags)]; // Remove duplicates
 }
 
+// Rooms that have individual principle cards in generateSpecialCards() —
+// skip generating a single room-level card for these.
+const MULTI_PRINCIPLE_ROOMS = new Set(['DR', 'TZ', 'C6', '1H/2H/3H', '@']);
+
+// Shorten a long purpose string to its first 2 sentences.
+function shortenDescription(text: string): string {
+  // Split on sentence-ending punctuation followed by a space
+  const sentences = text.match(/[^.!?]+[.!?]+/g);
+  if (!sentences || sentences.length <= 2) return text;
+  return sentences.slice(0, 2).join('').trim();
+}
+
 // Generate room cards from palaceData (authentic rooms only)
 function generateRoomCards(): ScrabbleCard[] {
   const cards: ScrabbleCard[] = [];
 
   palaceFloors.forEach(floor => {
     floor.rooms.forEach(room => {
+      // Skip rooms whose principles are broken out as individual cards
+      if (MULTI_PRINCIPLE_ROOMS.has(room.tag)) return;
+
       cards.push({
         id: `room-${room.id}`,
         code: room.tag,
@@ -64,7 +79,7 @@ function generateRoomCards(): ScrabbleCard[] {
           `floor-${floor.number}`,
           ...extractTags(room.purpose, room.method),
         ],
-        description: room.purpose,
+        description: shortenDescription(room.purpose),
       });
     });
   });
@@ -140,6 +155,29 @@ function generateSpecialCards(): ScrabbleCard[] {
       icon: c.icon,
       tags: c.tags,
       description: c.description,
+    });
+  });
+
+  // 6 Genres (from Connect-6 Room - Floor 4)
+  const genres = [
+    { id: 'genre-prophecy', code: 'C6-Pr', name: 'Prophecy Genre', description: 'Find a prophecy that predicts, foreshadows, or fulfills the truth in this text.', tags: ['genre', 'prophecy', 'connect-6'], icon: 'Scroll' },
+    { id: 'genre-parable', code: 'C6-Pa', name: 'Parable Genre', description: 'Find a parable of Jesus that illustrates or echoes the principle in this text.', tags: ['genre', 'parable', 'connect-6'], icon: 'MessageCircle' },
+    { id: 'genre-epistle', code: 'C6-Ep', name: 'Epistle Genre', description: 'Find an apostolic letter that explains or applies the doctrine in this text.', tags: ['genre', 'epistle', 'connect-6'], icon: 'Mail' },
+    { id: 'genre-history', code: 'C6-Hi', name: 'History Genre', description: 'Find a biblical narrative or event that demonstrates this truth in action.', tags: ['genre', 'history', 'connect-6', 'narrative'], icon: 'BookOpen' },
+    { id: 'genre-gospel', code: 'C6-Go', name: 'Gospel Genre', description: 'Find a moment in Jesus\' life or teaching that embodies this truth.', tags: ['genre', 'gospel', 'connect-6', 'christology'], icon: 'Cross' },
+    { id: 'genre-poetry', code: 'C6-Po', name: 'Poetry Genre', description: 'Find a psalm, proverb, or song that expresses this truth artistically.', tags: ['genre', 'poetry', 'connect-6', 'wisdom'], icon: 'Music' },
+  ];
+
+  genres.forEach(g => {
+    cards.push({
+      id: g.id,
+      code: g.code,
+      name: g.name,
+      floor: 4,
+      category: 'Connect-6',
+      icon: g.icon,
+      tags: g.tags,
+      description: g.description,
     });
   });
 
