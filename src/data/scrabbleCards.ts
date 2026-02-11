@@ -48,7 +48,7 @@ function extractTags(purpose: string, method?: string): string[] {
 
 // Rooms that have individual principle cards in generateSpecialCards() —
 // skip generating a single room-level card for these.
-const MULTI_PRINCIPLE_ROOMS = new Set(['DR', 'TZ', 'C6', '1H/2H/3H', '@', 'MATH', 'CR', 'TRm', 'FE', '3A']);
+const MULTI_PRINCIPLE_ROOMS = new Set(['DR', 'TZ', 'C6', '1H/2H/3H', '@', 'MATH', 'CR', 'TRm', 'FE', '3A', 'FRt']);
 
 // 2-3 sentence card descriptions for every room, with application instruction.
 const ROOM_DESCRIPTIONS: Record<string, string> = {
@@ -353,6 +353,32 @@ function generateSpecialCards(): ScrabbleCard[] {
       icon: tz.icon,
       tags: tz.tags,
       description: tz.description,
+    });
+  });
+
+  // 9 Fruits of the Spirit (from Fruit Room - Floor 4)
+  const fruits = [
+    { id: 'fruit-love', code: 'FRt-Lo', name: 'Love', description: 'This fruit asks: does your interpretation produce selfless, sacrificial love for God and others (1 Cor 13:4-7)? Test this text by its love-fruit. Apply this test to the text.', tags: ['fruit', 'love', 'character', 'application'], icon: 'Heart' },
+    { id: 'fruit-joy', code: 'FRt-Jo', name: 'Joy', description: 'This fruit asks: does your interpretation produce deep, abiding joy that transcends circumstances (Phil 4:4)? Test this text by its joy-fruit. Apply this test to the text.', tags: ['fruit', 'joy', 'character', 'application'], icon: 'Smile' },
+    { id: 'fruit-peace', code: 'FRt-Pe', name: 'Peace', description: 'This fruit asks: does your interpretation produce peace with God and peace of mind (Phil 4:7)? Test this text by its peace-fruit. Apply this test to the text.', tags: ['fruit', 'peace', 'character', 'application'], icon: 'Leaf' },
+    { id: 'fruit-patience', code: 'FRt-Pa', name: 'Patience', description: 'This fruit asks: does your interpretation cultivate patient endurance under trial and slow-to-anger restraint (James 1:3-4)? Test this text by its patience-fruit. Apply this test to the text.', tags: ['fruit', 'patience', 'character', 'endurance'], icon: 'Clock' },
+    { id: 'fruit-kindness', code: 'FRt-Ki', name: 'Kindness', description: 'This fruit asks: does your interpretation move you toward generous, tender action toward others (Eph 4:32)? Test this text by its kindness-fruit. Apply this test to the text.', tags: ['fruit', 'kindness', 'character', 'compassion'], icon: 'HandHeart' },
+    { id: 'fruit-goodness', code: 'FRt-Go', name: 'Goodness', description: 'This fruit asks: does your interpretation produce moral integrity and active virtue that reflects God\'s character (Mic 6:8)? Test this text by its goodness-fruit. Apply this test to the text.', tags: ['fruit', 'goodness', 'character', 'righteousness'], icon: 'Sun' },
+    { id: 'fruit-faithfulness', code: 'FRt-Fa', name: 'Faithfulness', description: 'This fruit asks: does your interpretation build trustworthy, covenant-keeping loyalty to God and others (Lam 3:22-23)? Test this text by its faithfulness-fruit. Apply this test to the text.', tags: ['fruit', 'faithfulness', 'character', 'covenant'], icon: 'Shield' },
+    { id: 'fruit-gentleness', code: 'FRt-Ge', name: 'Gentleness', description: 'This fruit asks: does your interpretation cultivate meekness — power under control, strength without harshness (Matt 11:29)? Test this text by its gentleness-fruit. Apply this test to the text.', tags: ['fruit', 'gentleness', 'character', 'meekness'], icon: 'Feather' },
+    { id: 'fruit-selfcontrol', code: 'FRt-SC', name: 'Self-Control', description: 'This fruit asks: does your interpretation strengthen mastery over impulse, appetite, and passion (2 Pet 1:5-6)? Test this text by its self-control-fruit. Apply this test to the text.', tags: ['fruit', 'self-control', 'character', 'discipline'], icon: 'Lock' },
+  ];
+
+  fruits.forEach(f => {
+    cards.push({
+      id: f.id,
+      code: f.code,
+      name: f.name,
+      floor: 4,
+      category: 'Fruit Room',
+      icon: f.icon,
+      tags: f.tags,
+      description: f.description,
     });
   });
 
