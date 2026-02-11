@@ -79,9 +79,10 @@ Respond in this exact JSON format:
         if (fetchError) throw fetchError;
 
         // Parse response - handle both direct JSON and string response
+        // Jeeves edge function returns { content: "..." } format
         let parsedFeedback: JeevesFeedback;
-        const response = data?.response || data?.message || data;
-        
+        const response = data?.content || data?.response || data?.message || data;
+
         if (typeof response === 'string') {
           // Try to extract JSON from the response
           const jsonMatch = response.match(/\{[\s\S]*\}/);
