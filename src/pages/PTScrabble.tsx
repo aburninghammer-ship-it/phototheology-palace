@@ -251,6 +251,7 @@ export default function PTScrabble() {
 
     // Determine if this was connecting to verse (first play) or previous insight
     const isFirstPlay = studyLogEntries.length === 0;
+    const previousEntry = studyLogEntries.length > 0 ? studyLogEntries[studyLogEntries.length - 1] : undefined;
 
     // Create the new entry for the study log
     const newEntry: StudyLogEntry = {
@@ -264,6 +265,9 @@ export default function PTScrabble() {
       timestamp: new Date().toISOString(),
       jeevesJudgment,
       connectingTo: isFirstPlay ? 'verse' : 'previous',
+      previousPlayerName: previousEntry?.playerName,
+      previousCardName: previousEntry?.cardName,
+      previousExplanation: previousEntry?.explanation,
     };
 
     // Add to study log
@@ -405,9 +409,13 @@ export default function PTScrabble() {
   // Derive study log entries from multiplayer board state
   const mpStudyLogEntries = useMemo((): StudyLogEntry[] => {
     if (!mpGame?.boardState) return [];
-    return Object.values(mpGame.boardState)
-      .filter(placed => placed.moveId !== 'seed') // Exclude seed card
-      .map(placed => ({
+    const sorted = Object.values(mpGame.boardState)
+      .filter(placed => placed.moveId !== 'seed')
+      .sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime());
+
+    return sorted.map((placed, index) => {
+      const prev = index > 0 ? sorted[index - 1] : undefined;
+      return {
         id: placed.moveId,
         playerName: placed.playerName,
         cardCode: placed.card.code,
@@ -419,8 +427,12 @@ export default function PTScrabble() {
             * (placed.connections.some(c => c.isChristConnection) ? 2 : 1)
           : 0,
         timestamp: placed.timestamp,
-      }))
-      .sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime());
+        connectingTo: index === 0 ? 'verse' as const : 'previous' as const,
+        previousPlayerName: prev?.playerName,
+        previousCardName: prev?.card.name,
+        previousExplanation: prev?.connections.map(c => c.explanation).join(' | ') || undefined,
+      };
+    });
   }, [mpGame?.boardState]);
 
   if (loading) {

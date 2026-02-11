@@ -18,6 +18,9 @@ export interface StudyLogEntry {
   timestamp: string;
   jeevesJudgment?: string; // Jeeves' explanation of how this connects
   connectingTo?: 'verse' | 'previous'; // What this entry connects to
+  previousPlayerName?: string; // Who they're building on
+  previousCardName?: string; // What principle they're building on
+  previousExplanation?: string; // The previous answer they're building on
 }
 
 interface StudyLogProps {
@@ -118,6 +121,19 @@ export function StudyLog({ entries, className }: StudyLogProps) {
                       </span>
                     )}
                   </div>
+
+                  {/* Chain context - show what they're building on */}
+                  {entry.connectingTo === 'previous' && entry.previousPlayerName && (
+                    <div className="mb-2 p-2 bg-green-500/5 border border-green-500/20 rounded text-xs">
+                      <span className="text-muted-foreground">Building on </span>
+                      <span className="font-medium text-green-600 dark:text-green-400">{entry.previousPlayerName}</span>
+                      <span className="text-muted-foreground">'s </span>
+                      <span className="font-mono text-green-600 dark:text-green-400">{entry.previousCardName}</span>
+                      {entry.previousExplanation && (
+                        <p className="mt-1 text-muted-foreground italic truncate">"{entry.previousExplanation}"</p>
+                      )}
+                    </div>
+                  )}
 
                   {/* Explanation */}
                   <p className="text-sm leading-relaxed">{entry.explanation}</p>

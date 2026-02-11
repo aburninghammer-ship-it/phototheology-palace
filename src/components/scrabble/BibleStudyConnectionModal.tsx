@@ -372,7 +372,7 @@ In 2-3 sentences, explain how this new insight builds upon or connects to the pr
       });
 
       if (error) throw error;
-      return data?.response || data?.message || 'Great connection!';
+      return data?.content || data?.response || data?.message || 'Great connection!';
     } catch (err) {
       console.error('Error getting Jeeves judgment:', err);
       return isFirstPlay
