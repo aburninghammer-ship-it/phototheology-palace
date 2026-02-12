@@ -2352,6 +2352,51 @@ export type Database = {
           },
         ]
       }
+      church_preapproved_members: {
+        Row: {
+          church_id: string
+          claimed_at: string | null
+          created_at: string
+          email: string
+          id: string
+          invited_by: string | null
+          role: string
+        }
+        Insert: {
+          church_id: string
+          claimed_at?: string | null
+          created_at?: string
+          email: string
+          id?: string
+          invited_by?: string | null
+          role?: string
+        }
+        Update: {
+          church_id?: string
+          claimed_at?: string | null
+          created_at?: string
+          email?: string
+          id?: string
+          invited_by?: string | null
+          role?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "church_preapproved_members_church_id_fkey"
+            columns: ["church_id"]
+            isOneToOne: false
+            referencedRelation: "churches"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "church_preapproved_members_church_id_fkey"
+            columns: ["church_id"]
+            isOneToOne: false
+            referencedRelation: "churches_public_info"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       church_sermons: {
         Row: {
           church_id: string
