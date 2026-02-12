@@ -125,7 +125,7 @@ serve(async (req) => {
     const { data: preapproved, error: paError } = await supabaseClient
       .from("church_preapproved_members")
       .select("email, churches(name)")
-      .eq("claimed", false);
+      .is("claimed_at", null);
 
     if (paError) throw paError;
 
