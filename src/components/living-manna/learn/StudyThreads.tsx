@@ -85,7 +85,7 @@ export function StudyThreads({ churchId }: StudyThreadsProps) {
         .select("entry_id").eq("user_id", user!.id).in("entry_id", entryIds.length > 0 ? entryIds : ["none"]);
       setLikedEntries(new Set(likes?.map((l: any) => l.entry_id) || []));
 
-      const userIds = [...new Set(data.map((e: any) => e.user_id))];
+      const userIds = [...new Set(data.map((e: any) => e.user_id))] as string[];
       const { data: profiles } = await supabase.from("profiles").select("id, display_name, avatar_url").in("id", userIds.length > 0 ? userIds : ["none"]);
       const profileMap = new Map(profiles?.map((p) => [p.id, p]) || []);
       setEntries(data.map((e: any) => ({ ...e, profile: profileMap.get(e.user_id) })));
@@ -128,7 +128,7 @@ export function StudyThreads({ churchId }: StudyThreadsProps) {
     const { data } = await (supabase as any).from("user_study_entry_comments")
       .select("*").eq("entry_id", entryId).order("created_at");
     if (data) {
-      const userIds = [...new Set(data.map((c: any) => c.user_id))];
+      const userIds = [...new Set(data.map((c: any) => c.user_id))] as string[];
       const { data: profiles } = await supabase.from("profiles").select("id, display_name, avatar_url").in("id", userIds.length > 0 ? userIds : ["none"]);
       const profileMap = new Map(profiles?.map((p) => [p.id, p]) || []);
       setComments((prev) => ({ ...prev, [entryId]: data.map((c: any) => ({ ...c, profile: profileMap.get(c.user_id) })) }));
@@ -142,7 +142,7 @@ export function StudyThreads({ churchId }: StudyThreadsProps) {
       setCommentText("");
       const { data } = await (supabase as any).from("user_study_entry_comments").select("*").eq("entry_id", entryId).order("created_at");
       if (data) {
-        const userIds = [...new Set(data.map((c: any) => c.user_id))];
+        const userIds = [...new Set(data.map((c: any) => c.user_id))] as string[];
         const { data: profiles } = await supabase.from("profiles").select("id, display_name, avatar_url").in("id", userIds.length > 0 ? userIds : ["none"]);
         const profileMap = new Map(profiles?.map((p) => [p.id, p]) || []);
         setComments((prev) => ({ ...prev, [entryId]: data.map((c: any) => ({ ...c, profile: profileMap.get(c.user_id) })) }));
