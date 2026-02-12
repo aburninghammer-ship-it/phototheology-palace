@@ -11,6 +11,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useDirectMessagesContext } from "@/contexts/DirectMessagesContext";
 import { useAuth } from "@/hooks/useAuth";
 import { FollowButton } from "./connect/FollowButton";
+import { MemberProfileView } from "./profile/MemberProfileView";
 
 interface Member {
   id: string;
@@ -38,6 +39,7 @@ export function MemberDirectory({ churchId }: MemberDirectoryProps) {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedRole, setSelectedRole] = useState<string | null>(null);
   const [messagingUserId, setMessagingUserId] = useState<string | null>(null);
+  const [selectedMemberId, setSelectedMemberId] = useState<string | null>(null);
   const { toast } = useToast();
   const { user } = useAuth();
   const { startConversation, setActiveConversationId } = useDirectMessagesContext();
@@ -142,6 +144,17 @@ export function MemberDirectory({ churchId }: MemberDirectoryProps) {
     );
   }
 
+  // Show member profile when a card is clicked
+  if (selectedMemberId) {
+    return (
+      <MemberProfileView
+        userId={selectedMemberId}
+        churchId={churchId}
+        onBack={() => setSelectedMemberId(null)}
+      />
+    );
+  }
+
   return (
     <div className="space-y-4">
       <Card variant="glass">
@@ -192,7 +205,7 @@ export function MemberDirectory({ churchId }: MemberDirectoryProps) {
           <ScrollArea className="h-[500px]">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {filteredMembers.map((member) => (
-                <Card key={member.id} className="hover:shadow-md transition-shadow">
+                <Card key={member.id} className="hover:shadow-md transition-shadow cursor-pointer" onClick={() => setSelectedMemberId(member.user_id)}>
                   <CardContent className="p-4">
                     <div className="flex items-start gap-3">
                       <Avatar className="h-12 w-12 border-2 border-primary/20">
@@ -237,7 +250,7 @@ export function MemberDirectory({ churchId }: MemberDirectoryProps) {
                         variant="outline"
                         size="sm"
                         className="flex-1 text-xs"
-                        onClick={() => handleMessage(member.user_id)}
+                        onClick={(e) => { e.stopPropagation(); handleMessage(member.user_id); }}
                         disabled={messagingUserId === member.user_id || member.user_id === user?.id}
                       >
                         {messagingUserId === member.user_id ? (
@@ -247,10 +260,12 @@ export function MemberDirectory({ churchId }: MemberDirectoryProps) {
                         )}
                         {member.user_id === user?.id ? "You" : "Message"}
                       </Button>
-                      <FollowButton
-                        targetUserId={member.user_id}
-                        isCurrentUser={member.user_id === user?.id}
-                      />
+                      <div onClick={(e) => e.stopPropagation()}>
+                        <FollowButton
+                          targetUserId={member.user_id}
+                          isCurrentUser={member.user_id === user?.id}
+                        />
+                      </div>
                     </div>
                   </CardContent>
                 </Card>
