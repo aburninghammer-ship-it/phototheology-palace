@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { Loader2, Save, CreditCard, ArrowUpRight } from "lucide-react";
+import { Loader2, Save, CreditCard } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 interface Church {
@@ -28,32 +28,9 @@ interface ChurchOverviewProps {
 export function ChurchOverview({ church, usedSeats, onUpdate }: ChurchOverviewProps) {
   const navigate = useNavigate();
   const [saving, setSaving] = useState(false);
-  const [managingBilling, setManagingBilling] = useState(false);
   const [contactPerson, setContactPerson] = useState(church.contact_person || "");
   const [contactPhone, setContactPhone] = useState(church.contact_phone || "");
   const [brandedName, setBrandedName] = useState(church.branded_name || "");
-
-  const handleManageBilling = async () => {
-    setManagingBilling(true);
-    try {
-      const { data, error } = await supabase.functions.invoke('customer-portal');
-
-      if (error) throw error;
-      if (data?.error) throw new Error(data.error);
-
-      if (data?.url) {
-        window.location.href = data.url;
-      } else {
-        throw new Error('No portal URL returned');
-      }
-    } catch (error) {
-      console.error('Error opening billing portal:', error);
-      toast.error("Could not open billing portal. Redirecting to plans page...");
-      navigate("/church-signup");
-    } finally {
-      setManagingBilling(false);
-    }
-  };
 
   const handleSave = async () => {
     setSaving(true);
@@ -157,33 +134,13 @@ export function ChurchOverview({ church, usedSeats, onUpdate }: ChurchOverviewPr
             </div>
           </div>
 
-          <div className="flex flex-col gap-2">
-            <Button
-              className="w-full gap-2"
-              variant="outline"
-              onClick={handleManageBilling}
-              disabled={managingBilling}
-            >
-              {managingBilling ? (
-                <>
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                  Opening...
-                </>
-              ) : (
-                <>
-                  <CreditCard className="h-4 w-4" />
-                  Manage Payments
-                </>
-              )}
-            </Button>
-            <Button
-              className="w-full gap-2"
-              onClick={() => navigate("/church-signup")}
-            >
-              <ArrowUpRight className="h-4 w-4" />
-              Upgrade / Change Plan
-            </Button>
-          </div>
+          <Button
+            className="w-full gap-2"
+            onClick={() => navigate("/church-signup")}
+          >
+            <CreditCard className="h-4 w-4" />
+            Manage Billing
+          </Button>
         </CardContent>
       </Card>
 
