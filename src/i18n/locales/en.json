@@ -7651,5 +7651,21 @@
     "tourComplete": "Tour Complete!",
     "tourCompleteDesc": "You're ready to practice in the {{roomName}}.",
     "remember": "Remember:"
+  },
+  "path": {
+    "chooseLearningPath": "Choose Your Learning Path",
+    "personalizeJourney": "Personalize your Bible study journey with a guided path",
+    "getStarted": "Get Started",
+    "level": "Level {{level}}",
+    "week": "Week {{week}}",
+    "year": "Year {{year}}",
+    "month": "Month {{month}}",
+    "weekProgress": "{{completed}} / {{total}} activities completed",
+    "complete": "Complete",
+    "week2Premium": "Upgrade to continue your path beyond Week 1",
+    "upgradeToContinue": "Upgrade to Continue",
+    "daysLeftTrial": "{{days}} days left in trial",
+    "viewWeekOutline": "View Week Outline",
+    "pathActive": "Path Active"
   }
 }

@@ -5,7 +5,10 @@ import { Input } from "@/components/ui/input";
 import { Gift, BookOpen, Sparkles, X } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
-const STORAGE_KEY = "exitIntentDismissed";
+const DISMISS_COUNT_KEY = "exitIntentDismissCount";
+const ACCEPTED_KEY = "exitIntentAccepted";
+const SESSION_SHOWN_KEY = "exitIntentShownThisSession";
+const MAX_DISMISSALS = 3;
 
 export const ExitIntentPopup = () => {
   const [open, setOpen] = useState(false);
@@ -14,13 +17,21 @@ export const ExitIntentPopup = () => {
   const [hasShown, setHasShown] = useState(false);
 
   useEffect(() => {
-    // Check if already dismissed permanently (accepted or rejected)
-    if (localStorage.getItem(STORAGE_KEY)) return;
+    // Don't show if user already accepted the offer
+    if (localStorage.getItem(ACCEPTED_KEY)) return;
+
+    // Don't show if already dismissed 3+ times
+    const dismissCount = parseInt(localStorage.getItem(DISMISS_COUNT_KEY) || "0", 10);
+    if (dismissCount >= MAX_DISMISSALS) return;
+
+    // Don't show if already shown this session
+    if (sessionStorage.getItem(SESSION_SHOWN_KEY)) return;
 
     const handleMouseLeave = (e: MouseEvent) => {
       if (e.clientY < 10 && !hasShown) {
         setOpen(true);
         setHasShown(true);
+        sessionStorage.setItem(SESSION_SHOWN_KEY, "true");
       }
     };
 
@@ -28,12 +39,12 @@ export const ExitIntentPopup = () => {
     return () => document.removeEventListener("mouseleave", handleMouseLeave);
   }, [hasShown]);
 
-  // Dismiss permanently when closed (whether accepted or rejected)
   const handleOpenChange = (isOpen: boolean) => {
     setOpen(isOpen);
     if (!isOpen) {
-      // User closed the dialog - don't show again
-      localStorage.setItem(STORAGE_KEY, "true");
+      // Increment dismiss count
+      const dismissCount = parseInt(localStorage.getItem(DISMISS_COUNT_KEY) || "0", 10);
+      localStorage.setItem(DISMISS_COUNT_KEY, String(dismissCount + 1));
     }
   };
 
@@ -41,8 +52,8 @@ export const ExitIntentPopup = () => {
     e.preventDefault();
     if (!email.trim()) return;
 
-    // Mark as dismissed permanently
-    localStorage.setItem(STORAGE_KEY, "true");
+    // Mark as accepted permanently
+    localStorage.setItem(ACCEPTED_KEY, "true");
 
     // Trigger the PDF download
     const link = document.createElement('a');

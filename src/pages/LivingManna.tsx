@@ -7,7 +7,7 @@ import { useChurchMembership } from "@/hooks/useChurchMembership";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Loader2, Home, Users, BookOpen, Heart, Flame, ArrowRight, MessagesSquare, Sprout, Sun, Moon, Sparkles, ArrowLeft, BookMarked, Zap, Settings, Droplets } from "lucide-react";
+import { Loader2, Home, Users, BookOpen, Heart, Flame, ArrowRight, MessagesSquare, Sprout, Sun, Moon, Sparkles, ArrowLeft, BookMarked, Zap, Settings, Droplets, ExternalLink } from "lucide-react";
 import { useTheme } from "next-themes";
 import { SmallGroupsHub } from "@/components/living-manna/SmallGroupsHub";
 import { MemberHome } from "@/components/living-manna/MemberHome";
@@ -28,6 +28,8 @@ export default function LivingManna() {
   const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
   const [churchName, setChurchName] = useState<string>("Living Manna Online Church");
+  const [churchLogoUrl, setChurchLogoUrl] = useState<string | null>(null);
+  const [churchWebsiteUrl, setChurchWebsiteUrl] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const { theme, setTheme } = useTheme();
   const isMobile = useIsMobile();
@@ -64,12 +66,14 @@ export default function LivingManna() {
     try {
       const { data } = await supabase
         .from('churches')
-        .select('name, branded_name')
+        .select('name, branded_name, logo_url, website_url')
         .eq('id', churchId)
         .single();
 
       if (data) {
         setChurchName(data.branded_name || data.name || "Living Manna Online Church");
+        setChurchLogoUrl(data.logo_url || null);
+        setChurchWebsiteUrl(data.website_url || null);
       }
     } catch (error) {
       console.error('Error loading church info:', error);
@@ -165,7 +169,11 @@ export default function LivingManna() {
                 <ArrowLeft className="h-5 w-5" />
               </Button>
               <div className="flex items-center gap-2 flex-1 justify-center">
-                <Flame className="h-5 w-5 text-primary" />
+                {churchLogoUrl ? (
+                  <img src={churchLogoUrl} alt="" className="h-6 w-6 rounded-sm object-contain" />
+                ) : (
+                  <Flame className="h-5 w-5 text-primary" />
+                )}
                 <h1 className="text-lg font-bold truncate">{churchName}</h1>
               </div>
               <div className="flex items-center gap-1">
@@ -198,11 +206,29 @@ export default function LivingManna() {
             <Card variant="glass" className="mb-6 p-4 md:p-6">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <Flame className="h-8 w-8 text-primary" />
+                  {churchLogoUrl ? (
+                    <img src={churchLogoUrl} alt="" className="h-10 w-10 rounded-md object-contain" />
+                  ) : (
+                    <Flame className="h-8 w-8 text-primary" />
+                  )}
                   <div>
                     <h1 className="text-2xl md:text-3xl font-bold text-foreground">{churchName}</h1>
                     <p className="text-sm text-muted-foreground">
                       Your discipleship home
+                      {churchWebsiteUrl && (
+                        <>
+                          {' · '}
+                          <a
+                            href={churchWebsiteUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-primary hover:underline inline-flex items-center gap-1"
+                          >
+                            Visit Website
+                            <ExternalLink className="h-3 w-3" />
+                          </a>
+                        </>
+                      )}
                     </p>
                   </div>
                 </div>

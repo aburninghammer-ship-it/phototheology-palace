@@ -98,7 +98,11 @@ function SortableTab({ tab, isActive, isPinned, onPin, onUnpin, isDragging, isAn
         </span>
       )}
       {isPinned && <Pin className="h-3 w-3 text-yellow-500 mr-1" />}
-      <tab.icon className={`h-3.5 w-3.5`} style={{ color: tab.gradient.glow.replace('rgba(', 'rgb(').replace(',0.5)', ')') }} />
+      {tab.logoUrl ? (
+        <img src={tab.logoUrl} alt="" className="h-4 w-4 rounded-sm object-contain" />
+      ) : (
+        <tab.icon className={`h-3.5 w-3.5`} style={{ color: tab.gradient.glow.replace('rgba(', 'rgb(').replace(',0.5)', ')') }} />
+      )}
       <span className={`bg-gradient-to-r ${tab.gradient.text} bg-clip-text text-transparent font-semibold`}>
         {t('navTabs.' + tab.id, { defaultValue: tab.shortLabel || tab.label })}
       </span>
@@ -184,7 +188,7 @@ export function DraggableNavTabs() {
   const { t } = useTranslation();
   const location = useLocation();
   const { preferences, updatePreference } = useUserPreferences();
-  const { isMember: isChurchMember, churchId } = useChurchMembership();
+  const { isMember: isChurchMember, churchId, churchLogoUrl } = useChurchMembership();
   const [activeId, setActiveId] = useState<string | null>(null);
   const [wasDragging, setWasDragging] = useState(false);
   const dragTimeoutRef = useRef<NodeJS.Timeout | null>(null);
@@ -207,13 +211,17 @@ export function DraggableNavTabs() {
       preferences.nav_tab_order || [],
       isChurchMember
     ).map(tab => {
-      // Handle church space tab with churchId
+      // Handle church space tab with churchId and logo
       if (tab.id === "church-space" && churchId) {
-        return { ...tab, to: `/living-manna?church=${churchId}` };
+        return {
+          ...tab,
+          to: `/living-manna?church=${churchId}`,
+          ...(churchLogoUrl ? { logoUrl: churchLogoUrl } : {}),
+        };
       }
       return tab;
     });
-  }, [preferences.pinned_nav_tabs, preferences.nav_tab_order, isChurchMember, churchId]);
+  }, [preferences.pinned_nav_tabs, preferences.nav_tab_order, isChurchMember, churchId, churchLogoUrl]);
 
   const pinnedTabIds = preferences.pinned_nav_tabs || [];
 

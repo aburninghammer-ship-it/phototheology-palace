@@ -12,6 +12,7 @@ export interface NavTab {
   label: string;
   shortLabel?: string; // For mobile/compact display
   icon: LucideIcon;
+  logoUrl?: string; // Optional image URL to display instead of icon
   gradient: {
     from: string;
     to: string;
