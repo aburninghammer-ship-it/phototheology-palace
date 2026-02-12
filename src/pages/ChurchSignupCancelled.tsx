@@ -11,7 +11,7 @@ export default function ChurchSignupCancelled() {
   const navigate = useNavigate();
 
   return (
-    <div className="min-h-screen gradient-dreamy">
+    <div className="min-h-screen bg-background">
       <Navigation />
       
       <div className="container mx-auto max-w-2xl px-4 py-20">
