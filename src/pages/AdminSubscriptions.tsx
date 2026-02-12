@@ -96,6 +96,17 @@ interface SubscriptionStats {
   generated_at: string;
 }
 
+interface ChurchSubscriptionDetail {
+  id: string;
+  name: string;
+  branded_name: string | null;
+  tier: string;
+  max_seats: number;
+  subscription_status: string;
+  member_count: number;
+  monthly_amount: number; // in dollars
+}
+
 interface ChurchStats {
   totalChurches: number;
   churchSeats: {
@@ -103,6 +114,8 @@ interface ChurchStats {
     tier2: number;
     tier3: number;
   };
+  churches: ChurchSubscriptionDetail[];
+  totalChurchMRR: number;
 }
 
 interface PdfStats {
@@ -284,21 +297,63 @@ export default function AdminSubscriptions() {
           .select("tier, max_seats, subscription_status")
           .eq("subscription_status", "active");
 
+        // Church tier pricing map
+        const tierPricing: Record<string, number> = {
+          tier1: 49,
+          tier2: 1000,
+          tier3: 149,
+        };
+
+        // Fetch individual church details with member counts
+        const { data: churchRows } = await supabase
+          .from("churches")
+          .select("id, name, branded_name, tier, max_seats, subscription_status")
+          .eq("subscription_status", "active");
+
+        const churchDetails: ChurchSubscriptionDetail[] = [];
+        if (churchRows) {
+          for (const c of churchRows) {
+            const { count } = await supabase
+              .from("church_members")
+              .select("*", { count: "exact", head: true })
+              .eq("church_id", c.id);
+            churchDetails.push({
+              id: c.id,
+              name: c.name,
+              branded_name: c.branded_name,
+              tier: c.tier as string,
+              max_seats: c.max_seats,
+              subscription_status: c.subscription_status as string,
+              member_count: count || 0,
+              monthly_amount: tierPricing[c.tier as string] || 0,
+            });
+          }
+        }
+
+        // Sort: Living Manna first, then by amount descending
+        churchDetails.sort((a, b) => {
+          if (a.name === "Living Manna") return -1;
+          if (b.name === "Living Manna") return 1;
+          return b.monthly_amount - a.monthly_amount;
+        });
+
         const churchSeats = {
           tier1:
-            churches?.filter((c) => c.tier === "tier1").reduce((sum, c) => sum + c.max_seats, 0) ||
+            churchRows?.filter((c) => c.tier === "tier1").reduce((sum, c) => sum + c.max_seats, 0) ||
             0,
           tier2:
-            churches?.filter((c) => c.tier === "tier2").reduce((sum, c) => sum + c.max_seats, 0) ||
+            churchRows?.filter((c) => c.tier === "tier2").reduce((sum, c) => sum + c.max_seats, 0) ||
             0,
           tier3:
-            churches?.filter((c) => c.tier === "tier3").reduce((sum, c) => sum + c.max_seats, 0) ||
+            churchRows?.filter((c) => c.tier === "tier3").reduce((sum, c) => sum + c.max_seats, 0) ||
             0,
         };
 
         setChurchStats({
-          totalChurches: churches?.length || 0,
+          totalChurches: churchRows?.length || 0,
           churchSeats,
+          churches: churchDetails,
+          totalChurchMRR: churchDetails.reduce((sum, c) => sum + c.monthly_amount, 0),
         });
 
         // Get Teachable users count and details
@@ -830,30 +885,36 @@ export default function AdminSubscriptions() {
           <div className="grid gap-6 md:grid-cols-2">
 
             {/* Church Subscriptions */}
-            <Card>
+            <Card className="md:col-span-2">
               <CardHeader>
-                <CardTitle>Church Subscriptions</CardTitle>
-                <CardDescription>Active church accounts and seats</CardDescription>
+                <CardTitle className="flex items-center justify-between">
+                  <span>Church Subscriptions</span>
+                  <Badge variant="outline" className="text-lg font-bold">
+                    ${churchStats?.totalChurchMRR?.toLocaleString() || 0}/mo
+                  </Badge>
+                </CardTitle>
+                <CardDescription>
+                  {churchStats?.totalChurches || 0} active church{(churchStats?.totalChurches || 0) !== 1 ? 'es' : ''} • {churchStats?.churches?.reduce((s, c) => s + c.member_count, 0) || 0} total members
+                </CardDescription>
               </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="flex justify-between items-center">
-                  <span className="text-muted-foreground">Total Churches</span>
-                  <span className="text-2xl font-bold">{churchStats?.totalChurches || 0}</span>
-                </div>
-                <div className="border-t pt-4 space-y-2">
-                  <div className="flex justify-between text-sm">
-                    <span className="text-muted-foreground">Tier 1 Seats (30)</span>
-                    <span className="font-medium">{churchStats?.churchSeats.tier1 || 0}</span>
+              <CardContent className="space-y-3">
+                {churchStats?.churches?.map((church) => (
+                  <div key={church.id} className="flex items-center justify-between p-3 rounded-lg border bg-muted/30">
+                    <div>
+                      <div className="font-semibold">{church.branded_name || church.name}</div>
+                      <div className="text-sm text-muted-foreground">
+                        {church.member_count} member{church.member_count !== 1 ? 's' : ''} • {church.tier === 'tier1' ? 'Community' : church.tier === 'tier2' ? 'Leadership' : 'Enterprise'} Plan • {church.max_seats} max seats
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <div className="text-xl font-bold text-green-600">${church.monthly_amount.toLocaleString()}</div>
+                      <div className="text-xs text-muted-foreground">per month</div>
+                    </div>
                   </div>
-                  <div className="flex justify-between text-sm">
-                    <span className="text-muted-foreground">Tier 2 Seats (100)</span>
-                    <span className="font-medium">{churchStats?.churchSeats.tier2 || 0}</span>
-                  </div>
-                  <div className="flex justify-between text-sm">
-                    <span className="text-muted-foreground">Tier 3 Seats (Unlimited)</span>
-                    <span className="font-medium">{churchStats?.churchSeats.tier3 || 0}</span>
-                  </div>
-                </div>
+                ))}
+                {(!churchStats?.churches || churchStats.churches.length === 0) && (
+                  <p className="text-sm text-muted-foreground text-center py-4">No active church subscriptions</p>
+                )}
               </CardContent>
             </Card>
           </div>
