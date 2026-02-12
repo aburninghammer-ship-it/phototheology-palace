@@ -132,7 +132,7 @@ export default function ChurchSignup() {
 
   if (step === 'processing') {
     return (
-      <div className="min-h-screen gradient-dreamy flex items-center justify-center p-4">
+      <div className="min-h-screen bg-background flex items-center justify-center p-4">
         <Card className="max-w-md w-full">
           <CardContent className="pt-6">
             <div className="text-center">
@@ -149,7 +149,7 @@ export default function ChurchSignup() {
   }
 
   return (
-    <div className="min-h-screen gradient-dreamy">
+    <div className="min-h-screen bg-background">
       <Navigation />
       
       <div className="container mx-auto max-w-6xl px-4 py-20">

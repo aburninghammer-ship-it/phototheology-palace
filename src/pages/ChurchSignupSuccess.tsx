@@ -66,7 +66,7 @@ export default function ChurchSignupSuccess() {
 
   if (status === "verifying") {
     return (
-      <div className="min-h-screen gradient-dreamy flex items-center justify-center p-4">
+      <div className="min-h-screen bg-background flex items-center justify-center p-4">
         <Card className="max-w-md w-full">
           <CardContent className="pt-6">
             <div className="text-center">
@@ -86,7 +86,7 @@ export default function ChurchSignupSuccess() {
     const redirect = encodeURIComponent(`${location.pathname}${location.search}`);
 
     return (
-      <div className="min-h-screen gradient-dreamy">
+      <div className="min-h-screen bg-background">
         <Navigation />
 
         <div className="container mx-auto max-w-2xl px-4 py-20">
@@ -131,7 +131,7 @@ export default function ChurchSignupSuccess() {
   }
 
   return (
-    <div className="min-h-screen gradient-dreamy">
+    <div className="min-h-screen bg-background">
       <Navigation />
 
       <div className="container mx-auto max-w-2xl px-4 py-20">
