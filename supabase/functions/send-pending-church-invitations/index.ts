@@ -117,6 +117,10 @@ serve(async (req) => {
       `;
 
       try {
+        // Rate limit: wait 600ms between sends to stay under Resend's 2/sec limit
+        if (results.length > 0) {
+          await new Promise(resolve => setTimeout(resolve, 600));
+        }
         console.log(`Sending email to ${invitation.invited_email}...`);
         
         const { data: emailData, error: resendError } = await resend.emails.send({
