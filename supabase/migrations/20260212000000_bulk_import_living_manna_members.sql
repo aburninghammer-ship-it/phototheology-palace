@@ -1,111 +1,78 @@
--- Bulk import members for Living Manna Church
--- Members without existing accounts will be skipped (they need to sign up first, then be invited)
+-- ============================================================
+-- Living Manna Church: Bulk import + auto-join for future signups
+-- ============================================================
 
+-- 1. Create pre-approved members table
+CREATE TABLE IF NOT EXISTS public.church_preapproved_members (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  church_id uuid NOT NULL REFERENCES public.churches(id) ON DELETE CASCADE,
+  email text NOT NULL,
+  role text NOT NULL DEFAULT 'member',
+  claimed boolean NOT NULL DEFAULT false,
+  claimed_at timestamptz,
+  created_at timestamptz NOT NULL DEFAULT now(),
+  UNIQUE(church_id, email)
+);
+
+-- RLS: only church admins can view/manage
+ALTER TABLE public.church_preapproved_members ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Church admins can manage preapproved members"
+  ON public.church_preapproved_members
+  FOR ALL
+  USING (
+    EXISTS (
+      SELECT 1 FROM public.church_members cm
+      WHERE cm.church_id = church_preapproved_members.church_id
+        AND cm.user_id = auth.uid()
+        AND cm.role = 'admin'
+    )
+  );
+
+-- 2. Auto-join trigger: when a new user signs up, check if their email is pre-approved
+CREATE OR REPLACE FUNCTION public.handle_preapproved_church_member()
+RETURNS TRIGGER
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $$
+DECLARE
+  v_preapproved RECORD;
+BEGIN
+  -- Check if the new user's email is in the pre-approved list
+  FOR v_preapproved IN
+    SELECT id, church_id, role
+    FROM public.church_preapproved_members
+    WHERE LOWER(email) = LOWER(NEW.email)
+      AND claimed = false
+  LOOP
+    -- Add them as a church member
+    INSERT INTO public.church_members (church_id, user_id, role, joined_at)
+    VALUES (v_preapproved.church_id, NEW.id, v_preapproved.role, NOW())
+    ON CONFLICT (church_id, user_id) DO NOTHING;
+
+    -- Mark as claimed
+    UPDATE public.church_preapproved_members
+    SET claimed = true, claimed_at = NOW()
+    WHERE id = v_preapproved.id;
+  END LOOP;
+
+  RETURN NEW;
+END;
+$$;
+
+-- Drop if exists to avoid duplicate
+DROP TRIGGER IF EXISTS on_auth_user_preapproved_church ON auth.users;
+
+CREATE TRIGGER on_auth_user_preapproved_church
+  AFTER INSERT ON auth.users
+  FOR EACH ROW
+  EXECUTE FUNCTION public.handle_preapproved_church_member();
+
+-- 3. Insert all 95 emails into the pre-approved list for Living Manna
 DO $$
 DECLARE
   v_church_id uuid;
-  v_user_id uuid;
-  v_email text;
-  v_imported int := 0;
-  v_skipped int := 0;
-  v_already_member int := 0;
-  v_emails text[] := ARRAY[
-    'pprempeh@gmail.com',
-    'silvia927.sa@gmail.com',
-    'gavinanthony1@gmail.com',
-    'norwalksonbeams@yahoo.com',
-    'bautista.phillip@gmail.com',
-    'Breekeys28@gmail.com',
-    'karla.bivens@gmail.com',
-    'jenigx@hotmail.com',
-    'kennethbritt@hotmail.com',
-    'TeamBroden@gmail.com',
-    'jossybroden@gmail.com',
-    'jeannabrower1971@gmail.com',
-    'rjpaint721@gmail.com',
-    'nicolethehealthcoach@gmail.com',
-    'carlson_michelle@hotmail.com',
-    'lovelydolll8dy@comcast.net',
-    'drew.celaya@yahoo.com',
-    'bearssportsfan@yahoo.com',
-    'shacheb@gmail.com',
-    'clark7004@suddenlink.net',
-    'clarkjacqueline13@gmail.com',
-    'pastorcooper@mac.com',
-    'shanecooper94@gmail.com',
-    'lcoppedge@hotmail.com',
-    'crysangel25@gmail.com',
-    'levaina7@live.com',
-    'alonso09@gmail.com',
-    'knicole.curtis@gmail.com',
-    'songstressjoy@hotmail.com',
-    'patrice@livingmanna.live',
-    'marieearlington@gmail.com',
-    'alyssia.plata@gmail.com',
-    'amdegibson@gmail.com',
-    'qpeazy7@yahoo.com',
-    'fit2ahtee@yahoo.com',
-    'Godsrn33@yahoo.com',
-    'johnnyoheasley69@gmail.com',
-    'graham-henry@att.net',
-    'pretty_tigger13@yahoo.com',
-    'mariajosehummel@gmail.com',
-    'terri.humphreys@ashgrove.com',
-    'gnizzard@gmail.com',
-    'sdizzard@gmail.com',
-    'artice3201@gmail.com',
-    'artmon@bellsouth.net',
-    'd2rjohnson77@gmail.com',
-    'sharonfaye191973@gmail.com',
-    'deezinesd9@gmail.com',
-    'gigi@livingmanna.church',
-    'cyntiebevz@gmail.com',
-    'windthinnet@yahoo.com',
-    'james@jak-cpas.com',
-    'mkendrick@puc.edu',
-    'kdonna462@aol.com',
-    'tracylofton2003@yahoo.com',
-    'shellyssnowdogs@gmail.com',
-    'followthecreator@live.com',
-    'McDonaldDonna@msn.com',
-    'nursehmcdonald@icloud.com',
-    'pamc16@aol.com',
-    'kiyana.mckenzie@gmail.com',
-    'pmitchellcsm@gmail.com',
-    'lesanndramorton@yahoo.com',
-    'AMuller@capitalcitysdac.org',
-    'atontemyers@gmail.com',
-    'imyers@northeastern.org',
-    'laurence777nagy@gmail.com',
-    'mae23ann@gmail.com',
-    'leafriser4197@yahoo.com',
-    'jonesgenevia@hotmail.com',
-    'tbumphus82@gmail.com',
-    'tpchurchgirl@gmail.com',
-    'sperkins@smbp.com',
-    'artelle@yahoo.com',
-    'newstart3tv@gmail.com',
-    'regina.d.irector@gmail.com',
-    'lorich84@yahoo.com',
-    'slrvlr6970@gmail.com',
-    'b.roni.sam.roderick@gmail.com',
-    'sandram.silas@gmail.com',
-    'amara_dk@hotmail.com',
-    'bladeofhope17@gmail.com',
-    'randyst.amant@gmail.com',
-    'cstan705@cox.net',
-    'DRMS.My.Email@gmail.com',
-    'kristinakmhomes@msn.com',
-    'mykmhomes@msn.com',
-    'gabrieltuailuuluu@gmail.com',
-    'eelco.vanderveen@gmail.com',
-    'anavan631@gmail.com',
-    'wordink@yahoo.com',
-    'mhamilton144@yahoo.com',
-    'doctorwhyte@gmail.com',
-    'delewonyoung@gmail.com',
-    'lynne.zeigler7@gmail.com'
-  ];
 BEGIN
   -- Find the Living Manna church
   SELECT id INTO v_church_id
@@ -119,42 +86,159 @@ BEGIN
 
   RAISE NOTICE 'Found Living Manna church: %', v_church_id;
 
-  -- Loop through each email and add as member
-  FOREACH v_email IN ARRAY v_emails
+  -- Insert all emails as pre-approved (duplicates ignored)
+  INSERT INTO public.church_preapproved_members (church_id, email, role)
+  VALUES
+    (v_church_id, 'pprempeh@gmail.com', 'member'),
+    (v_church_id, 'silvia927.sa@gmail.com', 'member'),
+    (v_church_id, 'gavinanthony1@gmail.com', 'member'),
+    (v_church_id, 'norwalksonbeams@yahoo.com', 'member'),
+    (v_church_id, 'bautista.phillip@gmail.com', 'member'),
+    (v_church_id, 'breekeys28@gmail.com', 'member'),
+    (v_church_id, 'karla.bivens@gmail.com', 'member'),
+    (v_church_id, 'jenigx@hotmail.com', 'member'),
+    (v_church_id, 'kennethbritt@hotmail.com', 'member'),
+    (v_church_id, 'teambroden@gmail.com', 'member'),
+    (v_church_id, 'jossybroden@gmail.com', 'member'),
+    (v_church_id, 'jeannabrower1971@gmail.com', 'member'),
+    (v_church_id, 'rjpaint721@gmail.com', 'member'),
+    (v_church_id, 'nicolethehealthcoach@gmail.com', 'member'),
+    (v_church_id, 'carlson_michelle@hotmail.com', 'member'),
+    (v_church_id, 'lovelydolll8dy@comcast.net', 'member'),
+    (v_church_id, 'drew.celaya@yahoo.com', 'member'),
+    (v_church_id, 'bearssportsfan@yahoo.com', 'member'),
+    (v_church_id, 'shacheb@gmail.com', 'member'),
+    (v_church_id, 'clark7004@suddenlink.net', 'member'),
+    (v_church_id, 'clarkjacqueline13@gmail.com', 'member'),
+    (v_church_id, 'pastorcooper@mac.com', 'member'),
+    (v_church_id, 'shanecooper94@gmail.com', 'member'),
+    (v_church_id, 'lcoppedge@hotmail.com', 'member'),
+    (v_church_id, 'crysangel25@gmail.com', 'member'),
+    (v_church_id, 'levaina7@live.com', 'member'),
+    (v_church_id, 'alonso09@gmail.com', 'member'),
+    (v_church_id, 'knicole.curtis@gmail.com', 'member'),
+    (v_church_id, 'songstressjoy@hotmail.com', 'member'),
+    (v_church_id, 'patrice@livingmanna.live', 'member'),
+    (v_church_id, 'marieearlington@gmail.com', 'member'),
+    (v_church_id, 'alyssia.plata@gmail.com', 'member'),
+    (v_church_id, 'amdegibson@gmail.com', 'member'),
+    (v_church_id, 'qpeazy7@yahoo.com', 'member'),
+    (v_church_id, 'fit2ahtee@yahoo.com', 'member'),
+    (v_church_id, 'godsrn33@yahoo.com', 'member'),
+    (v_church_id, 'johnnyoheasley69@gmail.com', 'member'),
+    (v_church_id, 'graham-henry@att.net', 'member'),
+    (v_church_id, 'pretty_tigger13@yahoo.com', 'member'),
+    (v_church_id, 'mariajosehummel@gmail.com', 'member'),
+    (v_church_id, 'terri.humphreys@ashgrove.com', 'member'),
+    (v_church_id, 'gnizzard@gmail.com', 'member'),
+    (v_church_id, 'sdizzard@gmail.com', 'member'),
+    (v_church_id, 'artice3201@gmail.com', 'member'),
+    (v_church_id, 'artmon@bellsouth.net', 'member'),
+    (v_church_id, 'd2rjohnson77@gmail.com', 'member'),
+    (v_church_id, 'sharonfaye191973@gmail.com', 'member'),
+    (v_church_id, 'deezinesd9@gmail.com', 'member'),
+    (v_church_id, 'gigi@livingmanna.church', 'member'),
+    (v_church_id, 'cyntiebevz@gmail.com', 'member'),
+    (v_church_id, 'windthinnet@yahoo.com', 'member'),
+    (v_church_id, 'james@jak-cpas.com', 'member'),
+    (v_church_id, 'mkendrick@puc.edu', 'member'),
+    (v_church_id, 'kdonna462@aol.com', 'member'),
+    (v_church_id, 'tracylofton2003@yahoo.com', 'member'),
+    (v_church_id, 'shellyssnowdogs@gmail.com', 'member'),
+    (v_church_id, 'followthecreator@live.com', 'member'),
+    (v_church_id, 'mcdonalddonna@msn.com', 'member'),
+    (v_church_id, 'nursehmcdonald@icloud.com', 'member'),
+    (v_church_id, 'pamc16@aol.com', 'member'),
+    (v_church_id, 'kiyana.mckenzie@gmail.com', 'member'),
+    (v_church_id, 'pmitchellcsm@gmail.com', 'member'),
+    (v_church_id, 'lesanndramorton@yahoo.com', 'member'),
+    (v_church_id, 'amuller@capitalcitysdac.org', 'member'),
+    (v_church_id, 'atontemyers@gmail.com', 'member'),
+    (v_church_id, 'imyers@northeastern.org', 'member'),
+    (v_church_id, 'laurence777nagy@gmail.com', 'member'),
+    (v_church_id, 'mae23ann@gmail.com', 'member'),
+    (v_church_id, 'leafriser4197@yahoo.com', 'member'),
+    (v_church_id, 'jonesgenevia@hotmail.com', 'member'),
+    (v_church_id, 'tbumphus82@gmail.com', 'member'),
+    (v_church_id, 'tpchurchgirl@gmail.com', 'member'),
+    (v_church_id, 'sperkins@smbp.com', 'member'),
+    (v_church_id, 'artelle@yahoo.com', 'member'),
+    (v_church_id, 'newstart3tv@gmail.com', 'member'),
+    (v_church_id, 'regina.d.irector@gmail.com', 'member'),
+    (v_church_id, 'lorich84@yahoo.com', 'member'),
+    (v_church_id, 'slrvlr6970@gmail.com', 'member'),
+    (v_church_id, 'b.roni.sam.roderick@gmail.com', 'member'),
+    (v_church_id, 'sandram.silas@gmail.com', 'member'),
+    (v_church_id, 'amara_dk@hotmail.com', 'member'),
+    (v_church_id, 'bladeofhope17@gmail.com', 'member'),
+    (v_church_id, 'randyst.amant@gmail.com', 'member'),
+    (v_church_id, 'cstan705@cox.net', 'member'),
+    (v_church_id, 'drms.my.email@gmail.com', 'member'),
+    (v_church_id, 'kristinakmhomes@msn.com', 'member'),
+    (v_church_id, 'mykmhomes@msn.com', 'member'),
+    (v_church_id, 'gabrieltuailuuluu@gmail.com', 'member'),
+    (v_church_id, 'eelco.vanderveen@gmail.com', 'member'),
+    (v_church_id, 'anavan631@gmail.com', 'member'),
+    (v_church_id, 'wordink@yahoo.com', 'member'),
+    (v_church_id, 'mhamilton144@yahoo.com', 'member'),
+    (v_church_id, 'doctorwhyte@gmail.com', 'member'),
+    (v_church_id, 'delewonyoung@gmail.com', 'member'),
+    (v_church_id, 'lynne.zeigler7@gmail.com', 'member')
+  ON CONFLICT (church_id, email) DO NOTHING;
+
+  RAISE NOTICE 'Inserted 95 pre-approved emails for Living Manna';
+END $$;
+
+-- 4. Immediately import any who already have accounts
+DO $$
+DECLARE
+  v_church_id uuid;
+  v_preapproved RECORD;
+  v_user_id uuid;
+  v_imported int := 0;
+  v_already int := 0;
+BEGIN
+  SELECT id INTO v_church_id
+  FROM public.churches
+  WHERE name ILIKE '%Living Manna%'
+  LIMIT 1;
+
+  FOR v_preapproved IN
+    SELECT id, email, role
+    FROM public.church_preapproved_members
+    WHERE church_id = v_church_id AND claimed = false
   LOOP
-    -- Look up user by email (case-insensitive)
     SELECT id INTO v_user_id
     FROM auth.users
-    WHERE LOWER(email) = LOWER(v_email)
+    WHERE LOWER(email) = LOWER(v_preapproved.email)
     LIMIT 1;
 
-    IF v_user_id IS NULL THEN
-      RAISE NOTICE 'SKIPPED - No account found for: %', v_email;
-      v_skipped := v_skipped + 1;
-      CONTINUE;
+    IF v_user_id IS NOT NULL THEN
+      -- Check if already a member
+      IF EXISTS (
+        SELECT 1 FROM public.church_members
+        WHERE church_id = v_church_id AND user_id = v_user_id
+      ) THEN
+        -- Mark as claimed since they're already a member
+        UPDATE public.church_preapproved_members
+        SET claimed = true, claimed_at = NOW()
+        WHERE id = v_preapproved.id;
+        v_already := v_already + 1;
+      ELSE
+        -- Add as member
+        INSERT INTO public.church_members (church_id, user_id, role, joined_at)
+        VALUES (v_church_id, v_user_id, v_preapproved.role, NOW());
+
+        UPDATE public.church_preapproved_members
+        SET claimed = true, claimed_at = NOW()
+        WHERE id = v_preapproved.id;
+        v_imported := v_imported + 1;
+      END IF;
     END IF;
-
-    -- Check if already a member
-    IF EXISTS (
-      SELECT 1 FROM public.church_members
-      WHERE church_id = v_church_id AND user_id = v_user_id
-    ) THEN
-      RAISE NOTICE 'ALREADY MEMBER - %', v_email;
-      v_already_member := v_already_member + 1;
-      CONTINUE;
-    END IF;
-
-    -- Insert as member (default role = 'member')
-    INSERT INTO public.church_members (church_id, user_id, role, joined_at)
-    VALUES (v_church_id, v_user_id, 'member', NOW());
-
-    RAISE NOTICE 'IMPORTED - %', v_email;
-    v_imported := v_imported + 1;
   END LOOP;
 
-  RAISE NOTICE '--- IMPORT COMPLETE ---';
-  RAISE NOTICE 'Imported: %', v_imported;
-  RAISE NOTICE 'Already members: %', v_already_member;
-  RAISE NOTICE 'Skipped (no account): %', v_skipped;
-  RAISE NOTICE 'Total processed: %', array_length(v_emails, 1);
+  RAISE NOTICE '--- IMPORT RESULTS ---';
+  RAISE NOTICE 'New members added: %', v_imported;
+  RAISE NOTICE 'Already members: %', v_already;
+  RAISE NOTICE 'Awaiting signup: remaining unclaimed rows in church_preapproved_members';
 END $$;
