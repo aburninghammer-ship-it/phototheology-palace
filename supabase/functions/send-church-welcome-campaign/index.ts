@@ -18,55 +18,96 @@ const generateEmailHtml = (name: string) => `
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
-    body { margin: 0; padding: 0; background-color: #0f0a1e; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
+    body { margin: 0; padding: 0; background-color: #141422; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
     .container { max-width: 600px; margin: 0 auto; padding: 40px 20px; }
     .header { text-align: center; margin-bottom: 32px; }
-    .header h1 { color: #ffffff; font-size: 28px; margin: 0 0 8px 0; }
-    .header p { color: #a78bfa; font-size: 16px; margin: 0; }
-    .card { background: linear-gradient(135deg, #1a1030 0%, #231845 100%); border: 1px solid rgba(139, 92, 246, 0.3); border-radius: 16px; padding: 32px; margin-bottom: 24px; }
-    .greeting { color: #e2e8f0; font-size: 18px; line-height: 1.6; margin-bottom: 24px; }
-    .feature-list { list-style: none; padding: 0; margin: 0 0 24px 0; }
-    .feature-list li { color: #cbd5e1; font-size: 15px; line-height: 1.5; padding: 8px 0; padding-left: 28px; position: relative; }
-    .feature-list li::before { content: "✦"; color: #a78bfa; position: absolute; left: 0; font-size: 14px; }
-    .highlight { color: #a78bfa; font-weight: 600; }
+    .header h1 { color: #ffffff; font-size: 28px; margin: 0 0 8px 0; letter-spacing: -0.5px; }
+    .header .subtitle { color: #2da1c7; font-size: 16px; margin: 0; font-weight: 500; }
+    .header .badge { display: inline-block; background: linear-gradient(135deg, #2563eb, #0d9488); color: #fff; padding: 4px 16px; border-radius: 20px; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; margin-top: 12px; }
+    .card { background: linear-gradient(135deg, #1c1c30 0%, #1e2640 100%); border: 1px solid rgba(37, 99, 235, 0.25); border-radius: 16px; padding: 32px; margin-bottom: 24px; }
+    .greeting { color: #e2e8f0; font-size: 17px; line-height: 1.7; margin-bottom: 24px; }
+    .feature-grid { display: grid; gap: 12px; margin: 0 0 24px 0; }
+    .feature-item { display: flex; align-items: flex-start; gap: 12px; padding: 12px 16px; background: rgba(37, 99, 235, 0.08); border: 1px solid rgba(37, 99, 235, 0.12); border-radius: 10px; }
+    .feature-icon { font-size: 20px; flex-shrink: 0; width: 28px; text-align: center; }
+    .feature-text { color: #cbd5e1; font-size: 14px; line-height: 1.5; }
+    .feature-text strong { color: #ffffff; font-weight: 600; }
+    .highlight { color: #38bdf8; font-weight: 600; }
+    .highlight-teal { color: #2dd4bf; font-weight: 600; }
     .cta-section { text-align: center; margin: 32px 0; }
-    .cta-button { display: inline-block; background: linear-gradient(135deg, #7c3aed, #a855f7); color: #ffffff; text-decoration: none; padding: 16px 40px; border-radius: 12px; font-size: 18px; font-weight: 700; }
-    .note { color: #94a3b8; font-size: 13px; text-align: center; line-height: 1.5; margin-top: 24px; }
-    .divider { height: 1px; background: linear-gradient(to right, transparent, rgba(139, 92, 246, 0.4), transparent); margin: 24px 0; }
-    .footer { text-align: center; color: #64748b; font-size: 12px; margin-top: 32px; line-height: 1.5; }
-    .tagline { color: #a78bfa; font-size: 16px; font-style: italic; text-align: center; margin: 16px 0; }
+    .cta-button { display: inline-block; background: linear-gradient(135deg, #2563eb, #0d9488); color: #ffffff; text-decoration: none; padding: 16px 48px; border-radius: 12px; font-size: 18px; font-weight: 700; letter-spacing: 0.3px; box-shadow: 0 8px 32px -8px rgba(37, 99, 235, 0.5); }
+    .note { color: #94a3b8; font-size: 13px; text-align: center; line-height: 1.6; margin-top: 24px; }
+    .divider { height: 1px; background: linear-gradient(to right, transparent, rgba(37, 99, 235, 0.3), rgba(13, 148, 136, 0.3), transparent); margin: 24px 0; }
+    .footer { text-align: center; color: #475569; font-size: 12px; margin-top: 32px; line-height: 1.6; }
+    .tagline { color: #38bdf8; font-size: 17px; font-style: italic; text-align: center; margin: 16px 0; }
+    .accent-bar { height: 4px; background: linear-gradient(to right, #2563eb, #0d9488, #2dd4bf); border-radius: 2px; margin-bottom: 24px; }
   </style>
 </head>
 <body>
   <div class="container">
+    <div class="accent-bar"></div>
+    
     <div class="header">
-      <h1>🏰 The Phototheology Suite</h1>
-      <p>A Gift from Living Manna to You</p>
+      <h1>📖 The Bible Study Suite</h1>
+      <p class="subtitle">A Gift from Living Manna to You</p>
+      <span class="badge">Full Premium Access</span>
     </div>
 
     <div class="card">
       <div class="greeting">
         Dear ${name},<br><br>
-        As a valued member of <span class="highlight">Living Manna Online Church</span>, Pastor Myers has opened the doors of the <span class="highlight">Phototheology Suite</span> for you — a powerful digital platform designed to take your Bible study to an entirely new level.
+        As a valued member of <span class="highlight">Living Manna Online Church</span>, Pastor Myers has opened the doors of the <span class="highlight-teal">Bible Study Suite</span> for you — a powerful digital platform designed to take your Bible study to an entirely new level.
       </div>
 
       <div class="divider"></div>
 
       <p style="color: #e2e8f0; font-size: 16px; font-weight: 600; margin-bottom: 16px;">Here's what's waiting for you inside:</p>
 
-      <ul class="feature-list">
-        <li><strong style="color: #e2e8f0;">Phototheology Study Bible</strong> — An AI-powered study Bible with verse-by-verse commentary, cross-references, and visual insights</li>
-        <li><strong style="color: #e2e8f0;">Living Manna Church Space</strong> — Your digital home for fellowship, small groups, devotionals, and church announcements</li>
-        <li><strong style="color: #e2e8f0;">Study Buddy AI</strong> — A personal Bible study companion that answers your questions and helps you dig deeper</li>
-        <li><strong style="color: #e2e8f0;">Mind Map Palace</strong> — Visually map and memorize biblical themes, prophecies, and doctrines</li>
-        <li><strong style="color: #e2e8f0;">Daily Devotionals & Reading Plans</strong> — Structured plans to keep you in the Word every single day</li>
-        <li><strong style="color: #e2e8f0;">Christian Art of War Dojo</strong> — Spiritual warfare training grounded in Scripture</li>
-        <li><strong style="color: #e2e8f0;">Bible Games & Challenges</strong> — Fun, engaging ways to test and grow your knowledge</li>
-        <li><strong style="color: #e2e8f0;">Sermon Builder</strong> — Tools for preparing and delivering powerful Bible-based messages</li>
-        <li><strong style="color: #e2e8f0;">Memory Palace</strong> — Memorize Scripture using proven memory techniques</li>
-        <li><strong style="color: #e2e8f0;">Study Deck & Flashcards</strong> — Review and retain what you've learned</li>
-        <li><strong style="color: #e2e8f0;">Courses & Video Training</strong> — In-depth learning modules on key biblical topics</li>
-      </ul>
+      <div class="feature-grid">
+        <div class="feature-item">
+          <span class="feature-icon">📖</span>
+          <span class="feature-text"><strong>Phototheology Study Bible</strong> — AI-powered commentary, cross-references, and visual insights verse by verse</span>
+        </div>
+        <div class="feature-item">
+          <span class="feature-icon">⛪</span>
+          <span class="feature-text"><strong>Living Manna Church Space</strong> — Your digital home for fellowship, small groups, devotionals, and announcements</span>
+        </div>
+        <div class="feature-item">
+          <span class="feature-icon">🤖</span>
+          <span class="feature-text"><strong>Study Buddy AI</strong> — A personal Bible study companion that answers your questions</span>
+        </div>
+        <div class="feature-item">
+          <span class="feature-icon">🧠</span>
+          <span class="feature-text"><strong>Mind Map Palace</strong> — Visually map and memorize biblical themes, prophecies, and doctrines</span>
+        </div>
+        <div class="feature-item">
+          <span class="feature-icon">🗓️</span>
+          <span class="feature-text"><strong>Daily Devotionals & Reading Plans</strong> — Structured plans to keep you in the Word daily</span>
+        </div>
+        <div class="feature-item">
+          <span class="feature-icon">⚔️</span>
+          <span class="feature-text"><strong>Christian Art of War Dojo</strong> — Spiritual warfare training grounded in Scripture</span>
+        </div>
+        <div class="feature-item">
+          <span class="feature-icon">🎮</span>
+          <span class="feature-text"><strong>Bible Games & Challenges</strong> — Engaging ways to test and grow your knowledge</span>
+        </div>
+        <div class="feature-item">
+          <span class="feature-icon">🎤</span>
+          <span class="feature-text"><strong>Sermon Builder</strong> — Tools for preparing powerful Bible-based messages</span>
+        </div>
+        <div class="feature-item">
+          <span class="feature-icon">🏛️</span>
+          <span class="feature-text"><strong>Memory Palace</strong> — Memorize Scripture using proven memory techniques</span>
+        </div>
+        <div class="feature-item">
+          <span class="feature-icon">🃏</span>
+          <span class="feature-text"><strong>Study Deck & Flashcards</strong> — Review and retain what you've learned</span>
+        </div>
+        <div class="feature-item">
+          <span class="feature-icon">🎓</span>
+          <span class="feature-text"><strong>Courses & Video Training</strong> — In-depth learning modules on key biblical topics</span>
+        </div>
+      </div>
 
       <div class="divider"></div>
 
@@ -79,26 +120,25 @@ const generateEmailHtml = (name: string) => `
       <p style="color: #cbd5e1; font-size: 16px; margin-bottom: 20px;">
         All you need to do is <strong style="color: #ffffff;">create your free account</strong> using this email address, and you'll have instant access:
       </p>
-      <a href="https://thephototheologyapp.com/auth" class="cta-button">
+      <a href="https://phototheologybible.com/auth" class="cta-button">
         Create Your Account →
       </a>
     </div>
 
     <div class="card" style="padding: 20px;">
       <p class="note" style="margin: 0;">
-        <strong style="color: #cbd5e1;">Important:</strong> Make sure to sign up with <strong style="color: #a78bfa;">this same email address</strong> so your Living Manna membership is automatically linked to your account. No invitation code needed — just sign up and you're in!
+        <strong style="color: #cbd5e1;">Important:</strong> Make sure to sign up with <strong style="color: #38bdf8;">this same email address</strong> so your Living Manna membership is automatically linked to your account. No invitation code needed — just sign up and you're in!
       </p>
     </div>
 
     <div class="footer">
-      <p>Living Manna Online Church × Phototheology Suite</p>
+      <p>Living Manna Online Church × Bible Study Suite</p>
       <p>If you have questions, reply to this email or reach out to your church leaders.</p>
     </div>
   </div>
 </body>
 </html>
 `;
-
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
