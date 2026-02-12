@@ -43,27 +43,11 @@ serve(async (req) => {
     }> = [];
 
     for (const session of sessions.data) {
-      // Check if this is a donation session (submit_type = 'donate' or matches known donation prices)
-      if (session.submit_type === "donate" || session.mode === "payment") {
-        const lineItems = await stripe.checkout.sessions.listLineItems(session.id);
-        
-        let isDonation = session.submit_type === "donate";
-        
-        // Also check if any line item matches donation price IDs
-        for (const item of lineItems.data) {
-          if (item.price && DONATION_PRICE_IDS.includes(item.price.id)) {
-            isDonation = true;
-            break;
-          }
-          // Check for custom donation amounts with "Phototheology" in the description
-          if (item.description?.toLowerCase().includes("phototheology") || 
-              item.description?.toLowerCase().includes("donation")) {
-            isDonation = true;
-            break;
-          }
-        }
-
-        if (isDonation && session.amount_total) {
+      // Only count sessions explicitly marked as donations (submit_type = 'donate')
+      // Skip subscription sessions entirely - they are NOT donations
+      if (session.mode === "subscription") continue;
+      if (session.submit_type === "donate") {
+        if (session.amount_total) {
           donations.push({
             id: session.id,
             amount: session.amount_total,
