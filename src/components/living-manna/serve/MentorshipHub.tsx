@@ -33,7 +33,7 @@ export function MentorshipHub({ churchId }: MentorshipHubProps) {
         .in("status", ["active", "pending"]);
 
       if (data) {
-        const userIds = [...new Set(data.flatMap((m: any) => [m.mentor_id, m.mentee_id]))];
+        const userIds = [...new Set(data.flatMap((m: any) => [m.mentor_id, m.mentee_id]))] as string[];
         const { data: profiles } = await supabase.from("profiles").select("id, display_name, avatar_url").in("id", userIds);
         const profileMap = new Map(profiles?.map((p) => [p.id, p]) || []);
         setMentorships(data.map((m: any) => ({

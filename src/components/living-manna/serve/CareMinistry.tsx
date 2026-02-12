@@ -38,7 +38,7 @@ export function CareMinistry({ churchId }: CareMinistryProps) {
         .select("*").eq("church_id", churchId).in("status", ["open", "in_progress"]).order("is_urgent", { ascending: false }).order("created_at", { ascending: false });
 
       if (data) {
-        const userIds = [...new Set(data.map((r: any) => r.requester_id))];
+        const userIds = [...new Set(data.map((r: any) => r.requester_id))] as string[];
         const { data: profiles } = await supabase.from("profiles").select("id, display_name").in("id", userIds);
         const profileMap = new Map(profiles?.map((p) => [p.id, p]) || []);
         setRequests(data.map((r: any) => ({ ...r, requester: profileMap.get(r.requester_id) })));
