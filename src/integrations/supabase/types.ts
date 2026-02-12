@@ -1904,6 +1904,57 @@ export type Database = {
           },
         ]
       }
+      church_email_log: {
+        Row: {
+          church_id: string
+          id: string
+          notification_type: string
+          recipient_email: string
+          recipient_user_id: string
+          reference_id: string | null
+          sent_at: string | null
+          status: string | null
+          subject: string
+        }
+        Insert: {
+          church_id: string
+          id?: string
+          notification_type: string
+          recipient_email: string
+          recipient_user_id: string
+          reference_id?: string | null
+          sent_at?: string | null
+          status?: string | null
+          subject: string
+        }
+        Update: {
+          church_id?: string
+          id?: string
+          notification_type?: string
+          recipient_email?: string
+          recipient_user_id?: string
+          reference_id?: string | null
+          sent_at?: string | null
+          status?: string | null
+          subject?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "church_email_log_church_id_fkey"
+            columns: ["church_id"]
+            isOneToOne: false
+            referencedRelation: "churches"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "church_email_log_church_id_fkey"
+            columns: ["church_id"]
+            isOneToOne: false
+            referencedRelation: "churches_public_info"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       church_event_rsvps: {
         Row: {
           created_at: string | null
