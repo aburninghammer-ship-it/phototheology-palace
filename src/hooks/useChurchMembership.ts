@@ -43,8 +43,7 @@ export function useChurchMembership(): ChurchMembership {
             churches (
               id,
               name,
-              logo_url,
-              website_url
+              logo_url
             )
           `)
           .eq("user_id", user.id)

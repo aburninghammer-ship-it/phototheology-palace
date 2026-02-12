@@ -66,14 +66,14 @@ export default function LivingManna() {
     try {
       const { data } = await supabase
         .from('churches')
-        .select('name, branded_name, logo_url, website_url')
+        .select('name, branded_name, logo_url')
         .eq('id', churchId)
         .single();
 
       if (data) {
         setChurchName(data.branded_name || data.name || "Living Manna Online Church");
         setChurchLogoUrl(data.logo_url || null);
-        setChurchWebsiteUrl(data.website_url || null);
+        setChurchWebsiteUrl(null);
       }
     } catch (error) {
       console.error('Error loading church info:', error);
