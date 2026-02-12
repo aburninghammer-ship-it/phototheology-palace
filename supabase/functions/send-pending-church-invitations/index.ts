@@ -24,7 +24,8 @@ serve(async (req) => {
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
     const resend = new Resend(resendApiKey);
 
-    // Get all pending invitations with church info
+    // Get pending invitations in small batches to avoid timeout
+    const batchSize = 10;
     const { data: invitations, error: fetchError } = await supabase
       .from('church_invitations')
       .select(`
@@ -36,7 +37,8 @@ serve(async (req) => {
         church_id,
         churches!inner(name)
       `)
-      .eq('status', 'pending');
+      .eq('status', 'pending')
+      .limit(batchSize);
 
     if (fetchError) {
       console.error('Error fetching invitations:', fetchError);
@@ -117,9 +119,9 @@ serve(async (req) => {
       `;
 
       try {
-        // Rate limit: wait 600ms between sends to stay under Resend's 2/sec limit
+        // Rate limit: wait 1200ms between sends to stay well under Resend's 2/sec limit
         if (results.length > 0) {
-          await new Promise(resolve => setTimeout(resolve, 600));
+          await new Promise(resolve => setTimeout(resolve, 1200));
         }
         console.log(`Sending email to ${invitation.invited_email}...`);
         
@@ -135,6 +137,11 @@ serve(async (req) => {
           results.push({ email: invitation.invited_email, success: false, error: resendError.message });
         } else {
           console.log(`Email sent to ${invitation.invited_email}`, emailData);
+          // Mark as sent so we don't re-send on next batch
+          await supabase
+            .from('church_invitations')
+            .update({ status: 'sent' })
+            .eq('id', invitation.id);
           results.push({ email: invitation.invited_email, success: true, messageId: emailData?.id });
         }
       } catch (emailErr) {
