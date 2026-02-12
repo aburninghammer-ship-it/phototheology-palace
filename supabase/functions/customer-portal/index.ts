@@ -43,7 +43,30 @@ serve(async (req) => {
     logStep("User authenticated", { userId: user.id, email: user.email });
 
     const stripe = new Stripe(stripeKey, { apiVersion: "2025-08-27.basil" });
-    const customers = await stripe.customers.list({ email: user.email, limit: 1 });
+
+    // First try to find Stripe customer by user's email
+    let customers = await stripe.customers.list({ email: user.email, limit: 1 });
+
+    // If not found, check if user is a church admin and try the church billing email
+    if (customers.data.length === 0) {
+      logStep("No Stripe customer found by user email, checking church membership");
+      const { data: membership } = await supabaseClient
+        .from("church_members")
+        .select("church_id, role, churches(billing_email)")
+        .eq("user_id", user.id)
+        .eq("role", "admin")
+        .maybeSingle();
+
+      if (membership?.churches) {
+        // @ts-ignore - nested join
+        const billingEmail = (membership.churches as any)?.billing_email;
+        if (billingEmail && billingEmail !== user.email) {
+          logStep("Trying church billing email", { billingEmail });
+          customers = await stripe.customers.list({ email: billingEmail, limit: 1 });
+        }
+      }
+    }
+
     if (customers.data.length === 0) {
       throw new Error("No Stripe customer found for this user. Please contact support.");
     }
