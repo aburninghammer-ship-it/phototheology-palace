@@ -1,12 +1,13 @@
 import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { MessagesSquare, MessageCircle, Heart, ClipboardList, Users, Calendar } from "lucide-react";
+import { MessagesSquare, MessageCircle, Heart, ClipboardList, Users, Calendar, Cake } from "lucide-react";
 import { ChurchCommunity } from "./ChurchCommunity";
 import { ChurchMessaging } from "./ChurchMessaging";
 import { PrayerMinistryHub } from "./PrayerMinistryHub";
 import { ChurchSurveys } from "./ChurchSurveys";
 import { MemberDirectory } from "./MemberDirectory";
 import { CalendarSyncSettings } from "./CalendarSyncSettings";
+import { BirthdayCelebrations } from "./connect/BirthdayCelebrations";
 
 interface ConnectTabProps {
   churchId: string;
@@ -53,6 +54,10 @@ export function ConnectTab({ churchId }: ConnectTabProps) {
             <Calendar className="h-4 w-4" />
             Calendar Sync
           </TabsTrigger>
+          <TabsTrigger value="birthdays" className="gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
+            <Cake className="h-4 w-4" />
+            Birthdays
+          </TabsTrigger>
         </TabsList>
 
         <TabsContent value="community">
@@ -77,6 +82,10 @@ export function ConnectTab({ churchId }: ConnectTabProps) {
 
         <TabsContent value="calendar-sync">
           <CalendarSyncSettings />
+        </TabsContent>
+
+        <TabsContent value="birthdays">
+          <BirthdayCelebrations churchId={churchId} />
         </TabsContent>
       </Tabs>
     </div>

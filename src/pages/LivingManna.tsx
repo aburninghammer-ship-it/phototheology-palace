@@ -7,7 +7,7 @@ import { useChurchMembership } from "@/hooks/useChurchMembership";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Loader2, Home, Users, BookOpen, Heart, Flame, ArrowRight, MessagesSquare, Sprout, Sun, Moon, Sparkles, ArrowLeft, BookMarked, Zap, Settings, Droplets, ExternalLink } from "lucide-react";
+import { Loader2, Home, Users, BookOpen, Heart, Flame, ArrowRight, MessagesSquare, Sprout, Sun, Moon, Sparkles, ArrowLeft, BookMarked, Zap, Settings, Droplets, ExternalLink, HeartHandshake, DollarSign, Library } from "lucide-react";
 import { useTheme } from "next-themes";
 import { SmallGroupsHub } from "@/components/living-manna/SmallGroupsHub";
 import { MemberHome } from "@/components/living-manna/MemberHome";
@@ -18,6 +18,9 @@ import { YouthSpace } from "@/components/living-manna/YouthSpace";
 import { PersonalDevotionalDiary } from "@/components/living-manna/PersonalDevotionalDiary";
 import { ExploitsHub } from "@/components/living-manna/ExploitsHub";
 import { ChurchAdminTab } from "@/components/living-manna/ChurchAdminTab";
+import { ServeTab } from "@/components/living-manna/ServeTab";
+import { GivingTab } from "@/components/living-manna/GivingTab";
+import { LibraryTab } from "@/components/living-manna/LibraryTab";
 import { BaptismTrack } from "@/components/living-manna/baptism-track/BaptismTrack";
 import { DirectMessagesProvider } from "@/contexts/DirectMessagesContext";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -268,7 +271,7 @@ export default function LivingManna() {
             <Tabs value={activeTab} onValueChange={handleTabChange} className="space-y-4 md:space-y-6">
               {/* Mobile Tab List - Scrollable */}
               <div className="overflow-x-auto -mx-3 px-3 md:mx-0 md:px-0">
-                <TabsList className="bg-card/50 backdrop-blur inline-flex md:grid md:grid-cols-8 w-auto md:w-full h-auto gap-1 p-1 border border-border/50 rounded-lg min-w-max md:min-w-0">
+                <TabsList className="bg-card/50 backdrop-blur inline-flex md:flex md:flex-wrap w-auto md:w-full h-auto gap-1 p-1 border border-border/50 rounded-lg min-w-max md:min-w-0">
                   <TabsTrigger value="home" className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 py-2 px-3 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground min-w-[60px]">
                     <Home className="h-4 w-4" />
                     <span className="text-xs sm:text-sm">Home</span>
@@ -300,6 +303,18 @@ export default function LivingManna() {
                   <TabsTrigger value="youth" className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 py-2 px-3 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground min-w-[60px]">
                     <Sparkles className="h-4 w-4" />
                     <span className="text-xs sm:text-sm">Youth</span>
+                  </TabsTrigger>
+                  <TabsTrigger value="serve" className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 py-2 px-3 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground min-w-[60px]">
+                    <HeartHandshake className="h-4 w-4" />
+                    <span className="text-xs sm:text-sm">Serve</span>
+                  </TabsTrigger>
+                  <TabsTrigger value="giving" className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 py-2 px-3 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground min-w-[60px]">
+                    <DollarSign className="h-4 w-4" />
+                    <span className="text-xs sm:text-sm">Giving</span>
+                  </TabsTrigger>
+                  <TabsTrigger value="library" className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 py-2 px-3 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground min-w-[60px]">
+                    <Library className="h-4 w-4" />
+                    <span className="text-xs sm:text-sm">Library</span>
                   </TabsTrigger>
                   <TabsTrigger value="grow" className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 py-2 px-3 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground min-w-[60px]">
                     <Sprout className="h-4 w-4" />
@@ -344,6 +359,18 @@ export default function LivingManna() {
 
               <TabsContent value="youth">
                 <YouthSpace churchId={effectiveChurchId!} />
+              </TabsContent>
+
+              <TabsContent value="serve">
+                <ServeTab churchId={effectiveChurchId!} />
+              </TabsContent>
+
+              <TabsContent value="giving">
+                <GivingTab churchId={effectiveChurchId!} />
+              </TabsContent>
+
+              <TabsContent value="library">
+                <LibraryTab churchId={effectiveChurchId!} />
               </TabsContent>
 
               <TabsContent value="grow">

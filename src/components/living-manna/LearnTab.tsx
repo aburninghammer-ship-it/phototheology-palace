@@ -1,11 +1,13 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { BookOpen, Calendar, Flame, GraduationCap, Mic } from "lucide-react";
+import { BookOpen, Calendar, Flame, GraduationCap, Mic, Brain, BookMarked } from "lucide-react";
 import { StudyFeed } from "./StudyFeed";
 import { StudyCycles } from "./StudyCycles";
 import { TruthSeries } from "./TruthSeries";
 import { DiscipleshipPackages } from "./DiscipleshipPackages";
 import { SermonStudyUploader } from "./SermonStudyUploader";
+import { WeeklyMemoryVerse } from "./learn/WeeklyMemoryVerse";
+import { StudyThreads } from "./learn/StudyThreads";
 import { useChurchMembership } from "@/hooks/useChurchMembership";
 import { useSubscription } from "@/hooks/useSubscription";
 
@@ -55,6 +57,14 @@ export function LearnTab({ churchId }: LearnTabProps) {
             <Mic className="h-4 w-4" />
             Sermon Study
           </TabsTrigger>
+          <TabsTrigger value="memory-verse" className="gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
+            <Brain className="h-4 w-4" />
+            Memory Verse
+          </TabsTrigger>
+          <TabsTrigger value="study-threads" className="gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
+            <BookMarked className="h-4 w-4" />
+            Study Threads
+          </TabsTrigger>
         </TabsList>
 
         <TabsContent value="weekly-study">
@@ -75,6 +85,14 @@ export function LearnTab({ churchId }: LearnTabProps) {
 
         <TabsContent value="sermon-study">
           <SermonStudyUploader churchId={churchId} userRole={effectiveRole || "member"} />
+        </TabsContent>
+
+        <TabsContent value="memory-verse">
+          <WeeklyMemoryVerse churchId={churchId} />
+        </TabsContent>
+
+        <TabsContent value="study-threads">
+          <StudyThreads churchId={churchId} />
         </TabsContent>
       </Tabs>
     </div>

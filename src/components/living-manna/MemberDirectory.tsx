@@ -6,10 +6,11 @@ import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Search, Users, MapPin, Mail, UserPlus, Loader2 } from "lucide-react";
+import { Search, Users, MapPin, Mail, Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useDirectMessagesContext } from "@/contexts/DirectMessagesContext";
 import { useAuth } from "@/hooks/useAuth";
+import { FollowButton } from "./connect/FollowButton";
 
 interface Member {
   id: string;
@@ -246,10 +247,10 @@ export function MemberDirectory({ churchId }: MemberDirectoryProps) {
                         )}
                         {member.user_id === user?.id ? "You" : "Message"}
                       </Button>
-                      <Button variant="ghost" size="sm" className="text-xs">
-                        <UserPlus className="h-3 w-3 mr-1" />
-                        Follow
-                      </Button>
+                      <FollowButton
+                        targetUserId={member.user_id}
+                        isCurrentUser={member.user_id === user?.id}
+                      />
                     </div>
                   </CardContent>
                 </Card>
