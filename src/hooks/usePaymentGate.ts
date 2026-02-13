@@ -61,6 +61,17 @@ export function usePaymentGate() {
 
         if (churchAccess && churchAccess.length > 0 && churchAccess[0].has_access) {
           console.log("[PaymentGate] User has church membership access, tier:", churchAccess[0].church_tier);
+          // Persist to profile so other hooks pick it up without re-checking
+          await supabase
+            .from("profiles")
+            .update({
+              subscription_status: "active",
+              subscription_tier: churchAccess[0].church_tier || "premium",
+              payment_source: "church" as any,
+              updated_at: new Date().toISOString(),
+            })
+            .eq("id", user.id);
+
           setHasAccess(true);
           hasCheckedRef.current = true;
           setChecking(false);
