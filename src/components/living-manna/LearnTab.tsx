@@ -2,11 +2,12 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { BookOpen, Calendar, Flame, GraduationCap, Mic, Brain, BookMarked } from "lucide-react";
 import { StudyFeed } from "./StudyFeed";
-import { StudyCycles } from "./StudyCycles";
+import { EnhancedStudyCycles } from "./EnhancedStudyCycles";
 import { TruthSeries } from "./TruthSeries";
 import { DiscipleshipPackages } from "./DiscipleshipPackages";
 import { SermonStudyUploader } from "./SermonStudyUploader";
 import { WeeklyMemoryVerse } from "./learn/WeeklyMemoryVerse";
+import { PersonalMemoryVerses } from "./learn/PersonalMemoryVerses";
 import { StudyThreads } from "./learn/StudyThreads";
 import { useChurchMembership } from "@/hooks/useChurchMembership";
 import { useSubscription } from "@/hooks/useSubscription";
@@ -72,7 +73,7 @@ export function LearnTab({ churchId }: LearnTabProps) {
         </TabsContent>
 
         <TabsContent value="cycles">
-          <StudyCycles churchId={churchId} />
+          <EnhancedStudyCycles churchId={churchId} />
         </TabsContent>
 
         <TabsContent value="discipleship">
@@ -88,7 +89,10 @@ export function LearnTab({ churchId }: LearnTabProps) {
         </TabsContent>
 
         <TabsContent value="memory-verse">
-          <WeeklyMemoryVerse churchId={churchId} />
+          <div className="space-y-6">
+            <WeeklyMemoryVerse churchId={churchId} />
+            <PersonalMemoryVerses churchId={churchId} />
+          </div>
         </TabsContent>
 
         <TabsContent value="study-threads">
