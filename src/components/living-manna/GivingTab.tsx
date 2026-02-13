@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { DollarSign, History, Target, CreditCard, Loader2, TrendingUp, Download } from "lucide-react";
+import { DollarSign, History, Target, CreditCard, Loader2, TrendingUp, Download, ExternalLink } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { toast } from "sonner";
@@ -107,9 +107,34 @@ export function GivingTab({ churchId }: GivingTabProps) {
 
         {/* Give Now */}
         <TabsContent value="give">
+          {/* Adventist Giving CTA for Tithe */}
+          <Card variant="glass" className="mb-4 border-primary/30 bg-primary/5">
+            <CardContent className="p-5">
+              <div className="flex items-start gap-3">
+                <div className="rounded-full bg-primary/10 p-2.5 flex-shrink-0">
+                  <DollarSign className="h-5 w-5 text-primary" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <h3 className="font-semibold text-foreground mb-1">Give Tithe & Offerings</h3>
+                  <p className="text-sm text-muted-foreground mb-3">
+                    Submit your tithe and offerings securely through the official Adventist Giving portal — the denomination's trusted platform for faithful stewardship.
+                  </p>
+                  <Button asChild className="gap-2 w-full sm:w-auto" size="lg">
+                    <a href="https://adventistgiving.org/" target="_blank" rel="noopener noreferrer">
+                      <ExternalLink className="h-4 w-4" />
+                      Give at AdventistGiving.org
+                    </a>
+                  </Button>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Local church offering tracker */}
           <Card variant="glass">
             <CardContent className="p-6 space-y-4">
               <div className="text-center mb-4">
+                <p className="text-xs text-muted-foreground uppercase tracking-wide mb-1">Local Church Giving Tracker</p>
                 <p className="text-3xl font-bold text-primary">{formatCents(yearTotal)}</p>
                 <p className="text-sm text-muted-foreground">Your giving this year</p>
               </div>
@@ -154,7 +179,7 @@ export function GivingTab({ churchId }: GivingTabProps) {
 
               <Button onClick={handleGive} disabled={submitting || !amount} className="w-full" size="lg">
                 {submitting ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <CreditCard className="h-4 w-4 mr-2" />}
-                Give {amount ? formatCents(Math.round(parseFloat(amount) * 100)) : ""}
+                Record Giving {amount ? formatCents(Math.round(parseFloat(amount) * 100)) : ""}
               </Button>
             </CardContent>
           </Card>
