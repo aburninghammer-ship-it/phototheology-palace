@@ -84,6 +84,7 @@ interface GameOptions {
   };
   ptFocus?: string;
   topic?: string;
+  churchId?: string;
 }
 
 interface CreateScheduledGameData {
@@ -97,7 +98,7 @@ interface CreateScheduledGameData {
   game_options?: GameOptions;
 }
 
-export function useScheduledGames(): UseScheduledGamesReturn {
+export function useScheduledGames(churchId?: string): UseScheduledGamesReturn {
   const { user } = useAuth();
   const [scheduledGames, setScheduledGames] = useState<ScheduledGame[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -124,9 +125,14 @@ export function useScheduledGames(): UseScheduledGamesReturn {
 
       if (gamesError) throw gamesError;
 
+      // Filter by churchId if provided (client-side, since churchId lives in game_options JSONB)
+      const filteredGames = churchId
+        ? (games || []).filter((g: any) => g.game_options?.churchId === churchId)
+        : (games || []);
+
       // Get RSVP counts and user's RSVP status
       const enrichedGames: ScheduledGame[] = await Promise.all(
-        (games || []).map(async (game) => {
+        filteredGames.map(async (game: any) => {
           // Get RSVP count
           const { count } = await db
             .from('scheduled_game_rsvps')
@@ -158,7 +164,7 @@ export function useScheduledGames(): UseScheduledGamesReturn {
     } finally {
       setIsLoading(false);
     }
-  }, [user]);
+  }, [user, churchId]);
 
   // Initial fetch
   useEffect(() => {
@@ -198,6 +204,11 @@ export function useScheduledGames(): UseScheduledGamesReturn {
     try {
       const hostName = user.email?.split('@')[0] || 'Player';
 
+      // Merge churchId into game_options if provided
+      const gameOptions = churchId
+        ? { ...data.game_options, churchId }
+        : data.game_options || null;
+
       const { data: game, error } = await db
         .from('scheduled_games')
         .insert({
@@ -210,7 +221,7 @@ export function useScheduledGames(): UseScheduledGamesReturn {
           verse_reference: data.verse_reference || null,
           game_mode: data.game_mode || 'ffa',
           max_players: data.max_players || 10,
-          game_options: data.game_options || null,
+          game_options: gameOptions,
         })
         .select()
         .single();
@@ -273,7 +284,7 @@ export function useScheduledGames(): UseScheduledGamesReturn {
       toast.error('Failed to schedule game');
       return null;
     }
-  }, [user]);
+  }, [user, churchId]);
 
   // Update RSVP status
   const updateRSVP = useCallback(async (gameId: string, status: 'going' | 'maybe' | 'not_going'): Promise<boolean> => {
