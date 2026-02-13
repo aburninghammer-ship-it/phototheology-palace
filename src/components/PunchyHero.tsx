@@ -1,10 +1,11 @@
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { ChevronRight, Sparkles, CheckCircle2 } from "lucide-react";
+import { ChevronRight, Sparkles, CheckCircle2, LogIn } from "lucide-react";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import heroCardsDisplay from "@/assets/branding/hero-cards-display.png";
 import { UserCountBadge } from "@/components/UserCountBadge";
+import { useAuth } from "@/hooks/useAuth";
 const socialProof = [
   "Thousands taught over 20 years",
   "Discover Christ in every chapter", 
@@ -13,6 +14,7 @@ const socialProof = [
 
 export const PunchyHero = () => {
   const navigate = useNavigate();
+  const { user, loading } = useAuth();
 
   const scrollToDemo = () => {
     const demoSection = document.getElementById("interactive-demo");
@@ -173,41 +175,73 @@ export const PunchyHero = () => {
           </div>
         </motion.div>
 
-        {/* Single Primary CTA - Reduced choice paralysis */}
+        {/* CTA Section */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.6 }}
           className="flex flex-col items-center justify-center gap-4 px-4"
         >
-          <Button
-            size="lg"
-            onClick={scrollToDemo}
-            className="text-lg sm:text-xl md:text-2xl px-8 sm:px-12 md:px-14 py-6 sm:py-7 md:py-8 gradient-palace shadow-2xl hover:shadow-primary/30 hover:scale-105 transition-all duration-300 w-full sm:w-auto max-w-sm"
-          >
-            Try a 5-Minute Study
-            <ChevronRight className="ml-2 h-6 w-6 sm:h-7 sm:w-7" />
-          </Button>
-          
-          <p className="text-sm text-muted-foreground">
-            No signup required • See how it works instantly
-          </p>
+          {!loading && !user ? (
+            <>
+              {/* Signed-out: Sign In + Try Demo */}
+              <div className="flex flex-col sm:flex-row items-center gap-3 w-full sm:w-auto">
+                <Button
+                  size="lg"
+                  onClick={() => navigate("/auth")}
+                  className="text-lg sm:text-xl px-8 sm:px-12 py-6 sm:py-7 gradient-palace shadow-2xl hover:shadow-primary/30 hover:scale-105 transition-all duration-300 w-full sm:w-auto max-w-sm"
+                >
+                  <LogIn className="mr-2 h-5 w-5 sm:h-6 sm:w-6" />
+                  Sign In
+                </Button>
+                <Button
+                  size="lg"
+                  variant="outline"
+                  onClick={scrollToDemo}
+                  className="text-lg px-8 py-6 hover:scale-105 transition-all duration-300 w-full sm:w-auto max-w-sm"
+                >
+                  Try a 5-Minute Study
+                  <ChevronRight className="ml-2 h-5 w-5" />
+                </Button>
+              </div>
+              <p className="text-sm text-muted-foreground">
+                No signup required to try • Sign in to save progress
+              </p>
+            </>
+          ) : (
+            <>
+              {/* Signed-in or loading: original CTA */}
+              <Button
+                size="lg"
+                onClick={scrollToDemo}
+                className="text-lg sm:text-xl md:text-2xl px-8 sm:px-12 md:px-14 py-6 sm:py-7 md:py-8 gradient-palace shadow-2xl hover:shadow-primary/30 hover:scale-105 transition-all duration-300 w-full sm:w-auto max-w-sm"
+              >
+                Try a 5-Minute Study
+                <ChevronRight className="ml-2 h-6 w-6 sm:h-7 sm:w-7" />
+              </Button>
+              <p className="text-sm text-muted-foreground">
+                No signup required • See how it works instantly
+              </p>
+            </>
+          )}
         </motion.div>
 
         {/* Secondary link - less prominent */}
-        <motion.p
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.6, delay: 0.75 }}
-          className="text-sm text-center mt-6 px-2"
-        >
-          <span 
-            onClick={() => navigate("/auth?patreon=true")} 
-            className="text-muted-foreground hover:text-primary cursor-pointer underline underline-offset-4 decoration-muted-foreground/50 hover:decoration-primary transition-all"
+        {!loading && !user && (
+          <motion.p
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.6, delay: 0.75 }}
+            className="text-sm text-center mt-6 px-2"
           >
-            Already a Patron? Connect here
-          </span>
-        </motion.p>
+            <span 
+              onClick={() => navigate("/auth?patreon=true")} 
+              className="text-muted-foreground hover:text-primary cursor-pointer underline underline-offset-4 decoration-muted-foreground/50 hover:decoration-primary transition-all"
+            >
+              Already a Patron? Connect here
+            </span>
+          </motion.p>
+        )}
 
         {/* Quick Stats */}
         <motion.div
