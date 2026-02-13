@@ -266,7 +266,7 @@ Generate a comprehensive, Christ-centered study that expands on each point while
       // Remove trailing commas before } or ]
       jsonStr = jsonStr.replace(/,(\s*[}\]])/g, '$1');
       // Remove any control characters
-      jsonStr = jsonStr.replace(/[\x00-\x1F\x7F]/g, ' ');
+      jsonStr = jsonStr.replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/g, ' ');
       
       console.log("Cleaned JSON starts with:", jsonStr.substring(0, 80));
       
