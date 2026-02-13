@@ -46,6 +46,7 @@ export default function Auth() {
   const safeRedirect = redirectParam && redirectParam.startsWith('/') && !redirectParam.startsWith('//')
     ? redirectParam
     : null;
+  const isChurchInvite = safeRedirect?.startsWith('/join-church') ?? false;
 
   const { trackCheckoutAbandoned, trackAccountCreated, trackCheckoutRedirect, trackExternalMembershipDetected } = useEventTracking();
 
@@ -781,9 +782,17 @@ export default function Auth() {
             <TabsContent value="signup">
               <form onSubmit={handleSignup}>
                 <CardHeader>
-                  <CardTitle>{t('auth.startFreeTrial')}</CardTitle>
+                  <CardTitle>
+                    {isChurchInvite 
+                      ? t('auth.createYourAccount', { defaultValue: 'Create Your Account' })
+                      : t('auth.startFreeTrial')
+                    }
+                  </CardTitle>
                   <CardDescription>
-                    {t('auth.fullAccess')}
+                    {isChurchInvite
+                      ? t('auth.churchMemberWelcome', { defaultValue: 'Your church has invited you. Create an account to get started.' })
+                      : t('auth.fullAccess')
+                    }
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
@@ -801,21 +810,35 @@ export default function Auth() {
                     </div>
                   </div>
 
-                  {/* Trial Pricing Banner - Show pricing upfront */}
-                  <div className="bg-gradient-to-r from-primary/10 via-accent/5 to-primary/10 border border-primary/20 rounded-lg p-4">
-                    <div className="flex items-center gap-3 mb-2">
-                      <Crown className="h-5 w-5 text-primary" />
-                      <span className="font-semibold text-foreground">{t('auth.premiumAccess')}</span>
+                  {/* Trial Pricing Banner - Show pricing upfront (hidden for church invites) */}
+                  {isChurchInvite ? (
+                    <div className="bg-gradient-to-r from-green-500/10 via-emerald-500/5 to-green-500/10 border border-green-500/20 rounded-lg p-4">
+                      <div className="flex items-center gap-3 mb-2">
+                        <Building2 className="h-5 w-5 text-green-600" />
+                        <span className="font-semibold text-foreground">{t('auth.churchMemberAccess', { defaultValue: 'Church Member Access' })}</span>
+                      </div>
+                      <div className="space-y-1 text-sm">
+                        <p className="text-muted-foreground">
+                          {t('auth.churchMemberNoTrial', { defaultValue: 'Full access included with your church membership. No credit card required.' })}
+                        </p>
+                      </div>
                     </div>
-                    <div className="space-y-1 text-sm">
-                      <p className="text-muted-foreground">
-                        <span className="font-medium text-foreground">{t('auth.sevenDaysFree')}</span>, {t('auth.thenPrice')}
-                      </p>
-                      <p className="text-xs text-muted-foreground/80">
-                        {t('auth.trialTerms')}
-                      </p>
+                  ) : (
+                    <div className="bg-gradient-to-r from-primary/10 via-accent/5 to-primary/10 border border-primary/20 rounded-lg p-4">
+                      <div className="flex items-center gap-3 mb-2">
+                        <Crown className="h-5 w-5 text-primary" />
+                        <span className="font-semibold text-foreground">{t('auth.premiumAccess')}</span>
+                      </div>
+                      <div className="space-y-1 text-sm">
+                        <p className="text-muted-foreground">
+                          <span className="font-medium text-foreground">{t('auth.sevenDaysFree')}</span>, {t('auth.thenPrice')}
+                        </p>
+                        <p className="text-xs text-muted-foreground/80">
+                          {t('auth.trialTerms')}
+                        </p>
+                      </div>
                     </div>
-                  </div>
+                  )}
 
                   {error && (
                     <Alert variant="destructive">
@@ -910,7 +933,9 @@ export default function Auth() {
                         {t('auth.creatingAccount')}
                       </>
                     ) : (
-                      t('auth.startFreeTrialButton')
+                      isChurchInvite
+                        ? t('auth.createAccountButton', { defaultValue: 'Create Account →' })
+                        : t('auth.startFreeTrialButton')
                     )}
                   </Button>
                   <AuthSocialProof />
