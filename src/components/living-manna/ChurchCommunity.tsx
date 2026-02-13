@@ -180,7 +180,7 @@ export function ChurchCommunity({ churchId }: ChurchCommunityProps) {
                   New Post
                 </Button>
               </DialogTrigger>
-              <DialogContent className="glass-card max-h-[85vh] overflow-y-auto">
+              <DialogContent className="bg-card border border-border shadow-xl max-h-[85vh] overflow-y-auto z-[100]">
                 <DialogHeader>
                   <DialogTitle>Share with your Church</DialogTitle>
                 </DialogHeader>
