@@ -58,7 +58,7 @@ export function MemberStudyThreadsList({ userId }: MemberStudyThreadsListProps) 
           .select("entry_id").eq("user_id", user.id).in("entry_id", entryIds);
         setLikedEntries(new Set(likes?.map((l: any) => l.entry_id) || []));
       }
-      const userIds = [...new Set(data.map((e: any) => e.user_id))];
+      const userIds = [...new Set(data.map((e: any) => e.user_id))] as string[];
       let profileMap = new Map();
       if (userIds.length > 0) {
         const { data: profiles } = await supabase.from("profiles").select("id, display_name, avatar_url").in("id", userIds);
@@ -87,7 +87,7 @@ export function MemberStudyThreadsList({ userId }: MemberStudyThreadsListProps) 
     const { data } = await (supabase as any).from("user_study_entry_comments")
       .select("*").eq("entry_id", entryId).order("created_at");
     if (data) {
-      const userIds = [...new Set(data.map((c: any) => c.user_id))];
+      const userIds = [...new Set(data.map((c: any) => c.user_id))] as string[];
       let profileMap = new Map();
       if (userIds.length > 0) {
         const { data: profiles } = await supabase.from("profiles").select("id, display_name, avatar_url").in("id", userIds);
@@ -103,7 +103,7 @@ export function MemberStudyThreadsList({ userId }: MemberStudyThreadsListProps) 
     setCommentText("");
     const { data } = await (supabase as any).from("user_study_entry_comments").select("*").eq("entry_id", entryId).order("created_at");
     if (data) {
-      const userIds = [...new Set(data.map((c: any) => c.user_id))];
+      const userIds = [...new Set(data.map((c: any) => c.user_id))] as string[];
       let profileMap = new Map();
       if (userIds.length > 0) {
         const { data: profiles } = await supabase.from("profiles").select("id, display_name, avatar_url").in("id", userIds);
