@@ -7701,6 +7701,17 @@
       "related": "Muéstrame versículos relacionados",
       "apply": "¿Cómo aplico esto a mi vida?",
       "christ": "Conéctalo con Cristo"
+    },
+    "aPreciousGem": "Una Gema Preciosa",
+    "toast": {
+      "foundStyle": "¡Encontraste una {{style}}!",
+      "newGemRevealed": "¡Una nueva gema ha sido revelada!",
+      "dailyLimit": "Límite diario alcanzado. ¡Regresa mañana por más gemas!",
+      "signInToSave": "Inicia sesión para guardar gemas",
+      "gemSaved": "¡Gema guardada en tu colección!",
+      "selectText": "Selecciona texto de la gema primero",
+      "expoundDefault": "Por favor expande sobre este pasaje",
+      "jeevesExpounded": "¡Jeeves ha expandido tu selección!"
     }
   },
   "analyze": {

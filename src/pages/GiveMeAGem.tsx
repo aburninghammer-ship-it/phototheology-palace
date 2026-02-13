@@ -211,7 +211,7 @@ export default function GiveMeAGem() {
       if (data?.gem) {
         const styleInfo = GEM_STYLES.find((s) => s.id === data.style) || GEM_STYLES[0];
         const gemData: GemData = {
-          title: data.title || "A Precious Gem",
+          title: data.title || t('gems.aPreciousGem', 'A Precious Gem'),
           content: data.gem,
           style: data.style,
           styleName: styleInfo.name,
@@ -235,17 +235,17 @@ export default function GiveMeAGem() {
 
         // Show reveal animation for random gems
         if (selectedStyle === "random") {
-          toast.success(`You found a ${styleInfo.name}!`, {
+          toast.success(t('gems.toast.foundStyle', { style: t(styleInfo.nameKey, styleInfo.name), defaultValue: `You found a ${styleInfo.name}!` }), {
             icon: styleInfo.emoji,
           });
         } else {
-          toast.success("A new gem has been revealed!");
+          toast.success(t('gems.toast.newGemRevealed', 'A new gem has been revealed!'));
         }
       }
     } catch (error: any) {
       console.error("Error generating gem:", error);
       if (error?.message?.includes("limit") || error?.status === 429) {
-        toast.info("Daily limit reached. Return tomorrow for more gems!");
+        toast.info(t('gems.toast.dailyLimit', 'Daily limit reached. Return tomorrow for more gems!'));
       } else {
         toast.error(error.message || "Failed to generate gem");
       }
@@ -256,7 +256,7 @@ export default function GiveMeAGem() {
 
   const handleSaveGem = async () => {
     if (!user || !gem) {
-      toast.error("Please sign in to save gems");
+      toast.error(t('gems.toast.signInToSave', 'Please sign in to save gems'));
       return;
     }
 
@@ -280,7 +280,7 @@ export default function GiveMeAGem() {
       if (error) throw error;
 
       setIsSaved(true);
-      toast.success("Gem saved to your collection!");
+      toast.success(t('gems.toast.gemSaved', 'Gem saved to your collection!'));
     } catch (error: any) {
       console.error("Error saving gem:", error);
       toast.error(error.message || "Failed to save gem");
@@ -301,13 +301,13 @@ export default function GiveMeAGem() {
 
   const handleExpound = async (question?: string) => {
     if (!selectedText && !question) {
-      toast.error("Please select some text from the gem first");
+      toast.error(t('gems.toast.selectText', 'Please select some text from the gem first'));
       return;
     }
 
     const textToExpound = selectedText || "";
     const userQuestion =
-      question || customQuestion || "Please expound on this passage";
+      question || customQuestion || t('gems.toast.expoundDefault', 'Please expound on this passage');
 
     setIsExpanding(true);
 
@@ -333,7 +333,7 @@ export default function GiveMeAGem() {
         ]);
         setSelectedText("");
         setCustomQuestion("");
-        toast.success("Jeeves has expounded on your selection!");
+        toast.success(t('gems.toast.jeevesExpounded', 'Jeeves has expounded on your selection!'));
       }
     } catch (error: any) {
       console.error("Error expounding:", error);
