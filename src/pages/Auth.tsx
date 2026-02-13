@@ -363,8 +363,9 @@ export default function Auth() {
         // UNIFIED SIGNUP + TRIAL FLOW: Immediately redirect to Stripe checkout
         // Users MUST enter credit card to complete signup - it's one process
         try {
-          // Check for external membership first (Patreon, Pickaxe, Teachable)
-          const [patreonResult, pickaxeResult, teachableResult] = await Promise.all([
+          // Check for external membership first (Church, Patreon, Pickaxe, Teachable)
+          const [churchResult, patreonResult, pickaxeResult, teachableResult] = await Promise.all([
+            supabase.rpc("has_church_access", { _user_id: data.user.id }),
             supabase.from("patreon_connections")
               .select("is_active_patron, entitled_cents")
               .eq("user_id", data.user.id)
@@ -380,6 +381,20 @@ export default function Auth() {
               .eq("is_active", true)
               .maybeSingle(),
           ]);
+
+          // Grant access if church membership found (pre-approved member auto-joined by trigger)
+          if (churchResult.data && churchResult.data.length > 0 && churchResult.data[0].has_access) {
+            console.log("[Auth] Church membership detected, granting access");
+            await supabase.from("profiles").update({
+              subscription_status: "active",
+              subscription_tier: churchResult.data[0].church_tier || "premium",
+              payment_source: "church" as any,
+              updated_at: new Date().toISOString(),
+            }).eq("id", data.user.id);
+            toast.success(t('auth.churchMemberLinked', { defaultValue: 'Church membership verified! Welcome aboard.' }));
+            navigate("/gatehouse", { replace: true });
+            return;
+          }
 
           // Grant access if external membership found
           if (patreonResult.data?.is_active_patron && patreonResult.data.entitled_cents >= 1500) {
