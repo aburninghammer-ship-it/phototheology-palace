@@ -36,6 +36,7 @@ import { ShareSermonButton } from "./ShareSermonButton";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { toast } from "sonner";
+import { StyledMarkdown } from "@/components/ui/styled-markdown";
 
 interface StudySection {
   sectionNumber: number;
@@ -338,15 +339,32 @@ export function SermonStudyUploader({ churchId, userRole }: SermonStudyUploaderP
             if (firstBrace !== -1 && lastBrace > firstBrace) {
               raw = raw.substring(firstBrace, lastBrace + 1);
             }
-            // Clean trailing commas and control chars
+            // Clean trailing commas, control chars, and fix common escaping issues
             raw = raw.replace(/,(\s*[}\]])/g, '$1').replace(/[\x00-\x1F\x7F]/g, ' ');
+            // Fix unescaped newlines inside JSON strings
+            raw = raw.replace(/(?<=:\s*"[^"]*)\n([^"]*")/g, '\\n$1');
             const recovered = JSON.parse(raw);
             if (recovered.studyTitle || recovered.sections) {
               study = { ...recovered, parseError: false };
               console.log("Client-side JSON recovery successful");
             }
           } catch (e) {
-            console.warn("Client-side JSON recovery failed:", e);
+            console.warn("Client-side JSON recovery failed, attempting markdown extraction:", e);
+            // Try to extract meaningful content from raw text and present as structured study
+            try {
+              const rawContent = study.rawContent;
+              // Extract studyTitle from the raw JSON-like content
+              const titleMatch = rawContent.match(/"studyTitle"\s*:\s*"([^"]+)"/);
+              const overviewMatch = rawContent.match(/"overview"\s*:\s*"([\s\S]*?)(?:"|$)/);
+              if (titleMatch) {
+                study.studyTitle = titleMatch[1];
+              }
+              if (overviewMatch) {
+                study.overview = overviewMatch[1].replace(/\\n/g, '\n').replace(/\\"/g, '"');
+              }
+            } catch (_) {
+              // Keep as-is
+            }
           }
         }
         
@@ -654,9 +672,40 @@ export function SermonStudyUploader({ churchId, userRole }: SermonStudyUploaderP
                     </Alert>
                     
                     <div className="prose prose-sm max-w-none">
-                      <pre className="whitespace-pre-wrap text-xs bg-muted p-4 rounded overflow-x-auto">
-                        {generatedStudy.rawContent}
-                      </pre>
+                      <StyledMarkdown content={
+                        // Convert raw JSON-like content to readable markdown
+                        (() => {
+                          const raw = generatedStudy.rawContent || '';
+                          // Try to extract readable text from JSON structure
+                          try {
+                            // Extract key fields from JSON-like text
+                            const parts: string[] = [];
+                            const titleMatch = raw.match(/"studyTitle"\s*:\s*"([^"]+)"/);
+                            if (titleMatch) parts.push(`## ${titleMatch[1]}`);
+                            
+                            const overviewMatch = raw.match(/"overview"\s*:\s*"([\s\S]*?)(?:"\s*,|\"\s*$)/);
+                            if (overviewMatch) {
+                              parts.push(overviewMatch[1].replace(/\\n/g, '\n').replace(/\\"/g, '"'));
+                            }
+                            
+                            // Extract sections titles and analysis
+                            const sectionTitleMatches = raw.matchAll(/"title"\s*:\s*"([^"]+)"/g);
+                            const analysisMatches = raw.matchAll(/"analysis"\s*:\s*"([\s\S]*?)(?:"\s*,|\"\s*})/g);
+                            const titles = Array.from(sectionTitleMatches).map(m => m[1]);
+                            const analyses = Array.from(analysisMatches).map(m => m[1].replace(/\\n/g, '\n').replace(/\\"/g, '"'));
+                            
+                            titles.forEach((title, i) => {
+                              parts.push(`\n### ${title}`);
+                              if (analyses[i]) parts.push(analyses[i]);
+                            });
+                            
+                            if (parts.length > 1) return parts.join('\n\n');
+                          } catch (_) {}
+                          
+                          // Fallback: just clean up the raw content
+                          return raw.replace(/\\n/g, '\n').replace(/\\"/g, '"').replace(/```json\s*/g, '').replace(/```\s*/g, '');
+                        })()
+                      } />
                     </div>
 
                     {/* Action buttons for raw content too */}

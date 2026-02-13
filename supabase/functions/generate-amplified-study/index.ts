@@ -207,6 +207,7 @@ Generate a comprehensive, Christ-centered study that expands on each point while
         ],
         temperature: 0.7,
         max_tokens: 16000,
+        response_format: { type: "json_object" },
       }),
     });
 
