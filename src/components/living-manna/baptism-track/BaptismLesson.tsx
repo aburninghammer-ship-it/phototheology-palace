@@ -39,6 +39,58 @@ const parseJsonField = (field: any): any[] => {
   return [];
 };
 
+/**
+ * Sanitize AI response content:
+ * - Strip JSON wrappers like ```json { "overallResponse": "..." }
+ * - Convert literal \n sequences to proper line breaks / <br> tags
+ * - Clean up escaped quotes
+ */
+const sanitizeAIContent = (raw: string): string => {
+  if (!raw) return '';
+  let content = raw;
+
+  // Strip markdown code fences wrapping JSON
+  const jsonFenceMatch = content.match(/```(?:json)?\s*([\s\S]*?)```/);
+  if (jsonFenceMatch) {
+    content = jsonFenceMatch[1].trim();
+  }
+
+  // If the content looks like a JSON object with overallResponse, extract it
+  if (content.trimStart().startsWith('{')) {
+    try {
+      const parsed = JSON.parse(content);
+      if (parsed.overallResponse) {
+        content = parsed.overallResponse;
+      } else if (parsed.content) {
+        content = parsed.content;
+      }
+    } catch {
+      // Not valid JSON, continue with raw content
+    }
+  }
+
+  // Replace literal backslash-n sequences with actual newlines
+  content = content.replace(/\\n/g, '\n');
+
+  // If content has no HTML tags, convert newlines to <br> and wrap paragraphs
+  const hasHtmlTags = /<[a-z][\s\S]*>/i.test(content);
+  if (!hasHtmlTags) {
+    // Convert double newlines to paragraph breaks, single to <br>
+    content = content
+      .split(/\n{2,}/)
+      .map(para => `<p>${para.replace(/\n/g, '<br>')}</p>`)
+      .join('');
+  } else {
+    // Even with HTML, clean up stray \n that aren't inside tags
+    content = content.replace(/\n/g, ' ').replace(/\s{2,}/g, ' ');
+  }
+
+  // Clean up escaped quotes
+  content = content.replace(/\\"/g, '"');
+
+  return content;
+};
+
 // Helper to safely parse JSON object fields
 const parseJsonObject = (field: any): any => {
   if (!field) return {};
@@ -325,7 +377,7 @@ export function BaptismLesson({ lesson, candidateId, progress, onBack }: Baptism
       });
 
       if (data?.guidance?.overallResponse) {
-        setTeachingContent(data.guidance.overallResponse);
+        setTeachingContent(sanitizeAIContent(data.guidance.overallResponse));
       } else {
         setTeachingContent(`<h2>${lesson.title}</h2><p>${lesson.description}</p><p>Content is being prepared. Ask Jeeves below to explore this topic.</p>`);
       }
@@ -352,7 +404,7 @@ export function BaptismLesson({ lesson, candidateId, progress, onBack }: Baptism
       });
 
       if (data?.guidance?.overallResponse) {
-        setObjectionsContent(data.guidance.overallResponse);
+        setObjectionsContent(sanitizeAIContent(data.guidance.overallResponse));
       }
     } catch (error) {
       setObjectionsContent(`## Objections & Answers\n\nContent could not be loaded. Ask Jeeves below to explore common objections.`);
@@ -375,7 +427,7 @@ export function BaptismLesson({ lesson, candidateId, progress, onBack }: Baptism
       });
 
       if (data?.guidance?.overallResponse) {
-        setHistoryContent(data.guidance.overallResponse);
+        setHistoryContent(sanitizeAIContent(data.guidance.overallResponse));
       }
     } catch (error) {
       setHistoryContent(`## Adventist Heritage\n\nContent could not be loaded. Ask Jeeves below to explore the history.`);
@@ -398,7 +450,7 @@ export function BaptismLesson({ lesson, candidateId, progress, onBack }: Baptism
       });
 
       if (data?.guidance?.overallResponse) {
-        setEgwContent(data.guidance.overallResponse);
+        setEgwContent(sanitizeAIContent(data.guidance.overallResponse));
       }
     } catch (error) {
       setEgwContent(`## Spirit of Prophecy Insights\n\nContent could not be loaded. Ask Jeeves below to explore Ellen White's writings.`);
