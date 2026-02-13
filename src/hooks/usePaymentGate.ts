@@ -55,8 +55,19 @@ export function usePaymentGate() {
           setChecking(false);
           return;
         }
+        // 2. Check church membership (church subscription covers member access)
+        const { data: churchAccess } = await supabase
+          .rpc("has_church_access", { _user_id: user.id });
 
-        // 2. Check Patreon connections
+        if (churchAccess && churchAccess.length > 0 && churchAccess[0].has_access) {
+          console.log("[PaymentGate] User has church membership access, tier:", churchAccess[0].church_tier);
+          setHasAccess(true);
+          hasCheckedRef.current = true;
+          setChecking(false);
+          return;
+        }
+
+        // 3. Check Patreon connections
         const { data: patreonConnection } = await supabase
           .from("patreon_connections")
           .select("is_active_patron, entitled_cents")
@@ -83,7 +94,7 @@ export function usePaymentGate() {
           return;
         }
 
-        // 3. Check Pickaxe connections (by email)
+        // 4. Check Pickaxe connections (by email)
         const { data: pickaxeConnection } = await supabase
           .from("pickaxe_connections")
           .select("is_paid_user")
@@ -109,7 +120,7 @@ export function usePaymentGate() {
           return;
         }
 
-        // 4. Check Teachable students (Master Class paying members)
+        // 5. Check Teachable students (Master Class paying members)
         const { data: teachableStudent } = await supabase
           .from("teachable_students")
           .select("is_active")
@@ -135,7 +146,7 @@ export function usePaymentGate() {
           return;
         }
 
-        // 5. Check Stripe directly (fallback)
+        // 6. Check Stripe directly (fallback)
         try {
           const { data: stripeCheck, error: stripeError } = await supabase.functions.invoke(
             "check-stripe-subscription"
@@ -152,7 +163,7 @@ export function usePaymentGate() {
           console.warn("[PaymentGate] Stripe check failed:", stripeErr);
         }
 
-        // 6. Check user_subscriptions for active or trialing status
+        // 7. Check user_subscriptions for active or trialing status
         const { data: userSub } = await supabase
           .from("user_subscriptions")
           .select("subscription_status, trial_ends_at")
