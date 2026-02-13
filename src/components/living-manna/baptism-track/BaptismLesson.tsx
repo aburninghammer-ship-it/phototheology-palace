@@ -49,44 +49,51 @@ const sanitizeAIContent = (raw: string): string => {
   if (!raw) return '';
   let content = raw;
 
-  // Strip markdown code fences wrapping JSON
-  const jsonFenceMatch = content.match(/```(?:json)?\s*([\s\S]*?)```/);
-  if (jsonFenceMatch) {
-    content = jsonFenceMatch[1].trim();
-  }
+  // Strip markdown code fences (with or without closing fence)
+  content = content.replace(/^```(?:json|html)?\s*/i, '').replace(/```\s*$/i, '');
 
-  // If the content looks like a JSON object with overallResponse, extract it
-  if (content.trimStart().startsWith('{')) {
+  // Try to extract overallResponse from JSON wrapper
+  const jsonObjMatch = content.match(/\{\s*"overallResponse"\s*:\s*"([\s\S]*)"\s*\}$/);
+  if (jsonObjMatch) {
+    content = jsonObjMatch[1];
+  } else if (content.trimStart().startsWith('{')) {
     try {
       const parsed = JSON.parse(content);
-      if (parsed.overallResponse) {
-        content = parsed.overallResponse;
-      } else if (parsed.content) {
-        content = parsed.content;
-      }
+      content = parsed.overallResponse || parsed.content || content;
     } catch {
-      // Not valid JSON, continue with raw content
+      // Try partial JSON: find first "overallResponse": " and grab everything after
+      const partialMatch = content.match(/"overallResponse"\s*:\s*"([\s\S]*)/);
+      if (partialMatch) {
+        content = partialMatch[1].replace(/"\s*\}\s*$/, '');
+      }
     }
   }
 
-  // Replace literal backslash-n sequences with actual newlines
-  content = content.replace(/\\n/g, '\n');
+  // Unescape JSON string escapes
+  content = content.replace(/\\n/g, '\n').replace(/\\"/g, '"').replace(/\\\\/g, '\\');
 
-  // If content has no HTML tags, convert newlines to <br> and wrap paragraphs
-  const hasHtmlTags = /<[a-z][\s\S]*>/i.test(content);
+  // If content has no HTML tags, convert to HTML
+  const hasHtmlTags = /<(?:h[1-6]|p|div|blockquote|ul|ol|li|strong|em|br|hr)\b/i.test(content);
   if (!hasHtmlTags) {
-    // Convert double newlines to paragraph breaks, single to <br>
+    // Convert markdown-style headers
+    content = content.replace(/^### (.+)$/gm, '<h3>$1</h3>');
+    content = content.replace(/^## (.+)$/gm, '<h2>$1</h2>');
+    content = content.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+    content = content.replace(/\*(.+?)\*/g, '<em>$1</em>');
+    // Convert > blockquotes
+    content = content.replace(/^> (.+)$/gm, '<blockquote>$1</blockquote>');
+    // Convert paragraphs
     content = content
       .split(/\n{2,}/)
-      .map(para => `<p>${para.replace(/\n/g, '<br>')}</p>`)
-      .join('');
-  } else {
-    // Even with HTML, clean up stray \n that aren't inside tags
-    content = content.replace(/\n/g, ' ').replace(/\s{2,}/g, ' ');
+      .map(para => {
+        const trimmed = para.trim();
+        if (!trimmed) return '';
+        if (/^<(?:h[1-6]|blockquote|ul|ol|hr)/.test(trimmed)) return trimmed;
+        return `<p>${trimmed.replace(/\n/g, '<br>')}</p>`;
+      })
+      .filter(Boolean)
+      .join('\n');
   }
-
-  // Clean up escaped quotes
-  content = content.replace(/\\"/g, '"');
 
   return content;
 };
@@ -988,7 +995,7 @@ export function BaptismLesson({ lesson, candidateId, progress, onBack }: Baptism
               ) : (
                 <ScrollArea className="h-[700px] pr-4">
                   <div 
-                    className="prose prose-sm max-w-none dark:prose-invert prose-headings:text-foreground prose-p:text-foreground/90 prose-blockquote:border-l-primary prose-blockquote:bg-primary/5 prose-blockquote:py-2 prose-blockquote:px-4 prose-blockquote:rounded-r-lg prose-blockquote:italic prose-strong:text-primary prose-li:text-foreground/90 [&_h2]:text-lg [&_h2]:font-bold [&_h2]:mt-6 [&_h2]:mb-3 [&_h3]:text-base [&_h3]:font-semibold [&_h3]:mt-4 [&_h3]:mb-2 [&_blockquote]:my-3 [&_blockquote]:text-foreground/80 [&_p]:mb-3 [&_p]:leading-relaxed [&_hr]:my-6"
+                    className="baptism-study-content rounded-xl border border-primary/20 bg-gradient-to-br from-primary/5 via-background to-amber-500/5 p-6 backdrop-blur-sm shadow-lg shadow-primary/5"
                     dangerouslySetInnerHTML={{ __html: teachingContent || lesson.description || '' }}
                   />
                 </ScrollArea>
@@ -1070,7 +1077,7 @@ export function BaptismLesson({ lesson, candidateId, progress, onBack }: Baptism
               ) : (
                 <ScrollArea className="h-[700px] pr-4">
                   <div 
-                    className="prose prose-sm max-w-none dark:prose-invert prose-headings:text-foreground prose-p:text-foreground/90 prose-blockquote:border-l-primary prose-blockquote:bg-primary/5 prose-blockquote:py-2 prose-blockquote:px-4 prose-blockquote:rounded-r-lg prose-blockquote:italic prose-strong:text-primary [&_h2]:text-lg [&_h2]:font-bold [&_h2]:mt-6 [&_h2]:mb-3 [&_h3]:text-base [&_h3]:font-semibold [&_h3]:mt-4 [&_h3]:mb-2 [&_blockquote]:my-3 [&_p]:mb-3 [&_p]:leading-relaxed [&_hr]:my-6"
+                    className="baptism-study-content rounded-xl border border-blue-500/20 bg-gradient-to-br from-blue-500/5 via-background to-cyan-500/5 p-6 backdrop-blur-sm shadow-lg shadow-blue-500/5"
                     dangerouslySetInnerHTML={{ __html: objectionsContent || "<p>Content is loading...</p>" }}
                   />
                 </ScrollArea>
@@ -1133,7 +1140,7 @@ export function BaptismLesson({ lesson, candidateId, progress, onBack }: Baptism
               ) : (
                 <ScrollArea className="h-[700px] pr-4">
                   <div 
-                    className="prose prose-sm max-w-none dark:prose-invert prose-headings:text-foreground prose-p:text-foreground/90 prose-blockquote:border-l-primary prose-blockquote:bg-primary/5 prose-blockquote:py-2 prose-blockquote:px-4 prose-blockquote:rounded-r-lg prose-blockquote:italic prose-strong:text-primary [&_h2]:text-lg [&_h2]:font-bold [&_h2]:mt-6 [&_h2]:mb-3 [&_h3]:text-base [&_h3]:font-semibold [&_h3]:mt-4 [&_h3]:mb-2 [&_blockquote]:my-3 [&_p]:mb-3 [&_p]:leading-relaxed [&_hr]:my-6"
+                    className="baptism-study-content rounded-xl border border-green-500/20 bg-gradient-to-br from-green-500/5 via-background to-emerald-500/5 p-6 backdrop-blur-sm shadow-lg shadow-green-500/5"
                     dangerouslySetInnerHTML={{ __html: historyContent || "<p>Content is loading...</p>" }}
                   />
                 </ScrollArea>
@@ -1178,7 +1185,7 @@ export function BaptismLesson({ lesson, candidateId, progress, onBack }: Baptism
               ) : (
                 <ScrollArea className="h-[700px] pr-4">
                   <div 
-                    className="prose prose-sm max-w-none dark:prose-invert prose-headings:text-foreground prose-p:text-foreground/90 prose-blockquote:border-l-purple-500 prose-blockquote:bg-purple-500/5 prose-blockquote:py-2 prose-blockquote:px-4 prose-blockquote:rounded-r-lg prose-blockquote:italic prose-strong:text-primary [&_h2]:text-lg [&_h2]:font-bold [&_h2]:mt-6 [&_h2]:mb-3 [&_h3]:text-base [&_h3]:font-semibold [&_h3]:mt-4 [&_h3]:mb-2 [&_blockquote]:my-3 [&_p]:mb-3 [&_p]:leading-relaxed [&_hr]:my-6"
+                    className="baptism-study-content rounded-xl border border-purple-500/20 bg-gradient-to-br from-purple-500/5 via-background to-violet-500/5 p-6 backdrop-blur-sm shadow-lg shadow-purple-500/5"
                     dangerouslySetInnerHTML={{ __html: egwContent || "<p>Content is loading...</p>" }}
                   />
                 </ScrollArea>
