@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -16,6 +17,7 @@ export const GiveGemButton = () => {
   const [gem, setGem] = useState<{ title: string; content: string } | null>(null);
   const { toast } = useToast();
   const { user } = useAuth();
+  const { t } = useTranslation();
   const { isSabbath, canCreateGem, getLimitMessage, gemsRemaining } = useGemLimit();
 
   const handleGenerateGem = async () => {
@@ -152,7 +154,7 @@ export const GiveGemButton = () => {
         ) : (
           <>
             <Sparkles className="h-5 w-5 mr-2 group-hover:animate-pulse" />
-            Give Me A Gem
+            {t('suite.giveGem', 'Give Me A Gem')}
           </>
         )}
       </Button>
