@@ -351,6 +351,7 @@ Generate ONLY day ${dayNumber} as flowing paragraphs. This day should build on t
         },
       ],
       tool_choice: { type: "function", function: { name: "create_devotional_days" } },
+      max_tokens: 8192,
     }),
   });
 
