@@ -86,6 +86,13 @@ export default function JoinChurch() {
       }, 2000);
     } catch (error: any) {
       console.error('Error accepting invitation:', error);
+      // Handle duplicate key = user already in this church
+      if (error.message?.includes('church_members_church_id_user_id_key') || error.message?.includes('duplicate key')) {
+        setSuccess(true);
+        toast.success(t('church.alreadyInChurch', 'You are already a member of this church!'));
+        setTimeout(() => navigate("/living-manna"), 1000);
+        return;
+      }
       toast.error(error.message || t('church.errorFailedToAcceptInvitation'));
     } finally {
       setLoading(false);
