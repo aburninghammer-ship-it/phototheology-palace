@@ -47,30 +47,49 @@ const parseJsonField = (field: any): any[] => {
  */
 const sanitizeAIContent = (raw: string): string => {
   if (!raw) return '';
-  let content = raw;
+  let content = raw.trim();
 
   // Strip markdown code fences (with or without closing fence)
-  content = content.replace(/^```(?:json|html)?\s*/i, '').replace(/```\s*$/i, '');
+  content = content.replace(/^```(?:json|html|markdown)?\s*/i, '');
+  content = content.replace(/\s*```\s*$/i, '');
+  content = content.trim();
 
-  // Try to extract overallResponse from JSON wrapper
-  const jsonObjMatch = content.match(/\{\s*"overallResponse"\s*:\s*"([\s\S]*)"\s*\}$/);
-  if (jsonObjMatch) {
-    content = jsonObjMatch[1];
-  } else if (content.trimStart().startsWith('{')) {
+  // Aggressively strip JSON wrapper: find "overallResponse" key and extract its value
+  if (content.includes('"overallResponse"')) {
+    // Find the start of the value after "overallResponse": "
+    const keyIdx = content.indexOf('"overallResponse"');
+    const colonIdx = content.indexOf(':', keyIdx);
+    if (colonIdx !== -1) {
+      let valueStart = content.indexOf('"', colonIdx + 1);
+      if (valueStart !== -1) {
+        valueStart += 1; // skip opening quote
+        // Find the matching closing quote (not escaped)
+        let valueEnd = -1;
+        for (let i = valueStart; i < content.length; i++) {
+          if (content[i] === '\\') { i++; continue; } // skip escaped chars
+          if (content[i] === '"') { valueEnd = i; break; }
+        }
+        if (valueEnd === -1) {
+          // No closing quote found — take everything after the opening quote
+          content = content.substring(valueStart);
+          // Strip trailing } if present
+          content = content.replace(/\s*\}\s*$/, '');
+        } else {
+          content = content.substring(valueStart, valueEnd);
+        }
+      }
+    }
+  } else if (content.startsWith('{')) {
     try {
       const parsed = JSON.parse(content);
-      content = parsed.overallResponse || parsed.content || content;
+      content = parsed.overallResponse || parsed.content || parsed.response || content;
     } catch {
-      // Try partial JSON: find first "overallResponse": " and grab everything after
-      const partialMatch = content.match(/"overallResponse"\s*:\s*"([\s\S]*)/);
-      if (partialMatch) {
-        content = partialMatch[1].replace(/"\s*\}\s*$/, '');
-      }
+      // Not valid JSON, use as-is
     }
   }
 
   // Unescape JSON string escapes
-  content = content.replace(/\\n/g, '\n').replace(/\\"/g, '"').replace(/\\\\/g, '\\');
+  content = content.replace(/\\n/g, '\n').replace(/\\"/g, '"').replace(/\\\\/g, '\\').replace(/\\t/g, '\t');
 
   // If content has no HTML tags, convert to HTML
   const hasHtmlTags = /<(?:h[1-6]|p|div|blockquote|ul|ol|li|strong|em|br|hr)\b/i.test(content);
