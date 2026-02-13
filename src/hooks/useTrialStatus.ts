@@ -74,6 +74,23 @@ export function useTrialStatus() {
         return;
       }
 
+      // Check church membership — church members are NOT on trial
+      const { data: churchAccess } = await supabase
+        .rpc('has_church_access', { _user_id: user.id });
+
+      if (churchAccess && churchAccess.length > 0 && churchAccess[0].has_access) {
+        setStatus({
+          isOnTrial: false,
+          daysLeft: 0,
+          hoursLeft: 0,
+          isExpired: false,
+          isExpiringSoon: false,
+          trialEndsAt: null,
+        });
+        setLoading(false);
+        return;
+      }
+
       const { data } = await supabase
         .from('user_subscriptions')
         .select('subscription_status, trial_ends_at')
