@@ -33,7 +33,7 @@ export function usePersonalPageFeed(targetUserId: string) {
       const userIds = [...new Set(newEntries.map((e: any) => e.user_id))];
       let profileMap = new Map();
       if (userIds.length > 0) {
-        const { data: profiles } = await supabase.from("profiles").select("id, display_name, avatar_url").in("id", userIds);
+        const { data: profiles } = await supabase.from("profiles").select("id, display_name, avatar_url").in("id", userIds as string[]);
         profileMap = new Map(profiles?.map((p) => [p.id, p]) || []);
       }
       const enriched = newEntries.map((e: any) => ({ ...e, profile: profileMap.get(e.user_id) }));
@@ -89,7 +89,7 @@ export function usePersonalPageFeed(targetUserId: string) {
       const userIds = [...new Set(data.map((c: any) => c.user_id))];
       let profileMap = new Map();
       if (userIds.length > 0) {
-        const { data: profiles } = await supabase.from("profiles").select("id, display_name, avatar_url").in("id", userIds);
+        const { data: profiles } = await supabase.from("profiles").select("id, display_name, avatar_url").in("id", userIds as string[]);
         profileMap = new Map(profiles?.map((p) => [p.id, p]) || []);
       }
       setComments((prev) => ({ ...prev, [entryId]: data.map((c: any) => ({ ...c, profile: profileMap.get(c.user_id) })) }));
