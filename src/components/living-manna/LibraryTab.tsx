@@ -1,9 +1,10 @@
 import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Library, BookOpen, Music, BookHeart } from "lucide-react";
+import { Library, BookOpen, Music, BookHeart, Mic } from "lucide-react";
 import { ResourceLibrary } from "./library/ResourceLibrary";
 import { WorshipPlaylists } from "./library/WorshipPlaylists";
 import { FamilyDevotionals } from "./library/FamilyDevotionals";
+import { SermonStudyLibrary } from "./library/SermonStudyLibrary";
 
 interface LibraryTabProps {
   churchId: string;
@@ -34,9 +35,13 @@ export function LibraryTab({ churchId }: LibraryTabProps) {
             <Music className="h-4 w-4" />
             Worship Playlists
           </TabsTrigger>
-          <TabsTrigger value="family" className="gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
+           <TabsTrigger value="family" className="gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
             <BookHeart className="h-4 w-4" />
             Family Devotionals
+          </TabsTrigger>
+          <TabsTrigger value="sermon-studies" className="gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
+            <Mic className="h-4 w-4" />
+            Sermon Studies
           </TabsTrigger>
         </TabsList>
 
@@ -50,6 +55,10 @@ export function LibraryTab({ churchId }: LibraryTabProps) {
 
         <TabsContent value="family">
           <FamilyDevotionals churchId={churchId} />
+        </TabsContent>
+
+        <TabsContent value="sermon-studies">
+          <SermonStudyLibrary churchId={churchId} />
         </TabsContent>
       </Tabs>
     </div>
