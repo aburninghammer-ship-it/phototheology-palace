@@ -321,12 +321,41 @@ export function SermonStudyUploader({ churchId, userRole }: SermonStudyUploaderP
       if (error) throw error;
 
       if (data?.study) {
-        setGeneratedStudy(data.study);
+        let study = data.study;
+        
+        // If the edge function couldn't parse JSON, try client-side recovery
+        if (study.parseError && study.rawContent) {
+          try {
+            let raw = study.rawContent.trim();
+            // Strip markdown code blocks
+            const codeBlockMatch = raw.match(/```(?:json)?\s*([\s\S]*?)```/);
+            if (codeBlockMatch) {
+              raw = codeBlockMatch[1].trim();
+            }
+            // Find JSON object boundaries
+            const firstBrace = raw.indexOf('{');
+            const lastBrace = raw.lastIndexOf('}');
+            if (firstBrace !== -1 && lastBrace > firstBrace) {
+              raw = raw.substring(firstBrace, lastBrace + 1);
+            }
+            // Clean trailing commas and control chars
+            raw = raw.replace(/,(\s*[}\]])/g, '$1').replace(/[\x00-\x1F\x7F]/g, ' ');
+            const recovered = JSON.parse(raw);
+            if (recovered.studyTitle || recovered.sections) {
+              study = { ...recovered, parseError: false };
+              console.log("Client-side JSON recovery successful");
+            }
+          } catch (e) {
+            console.warn("Client-side JSON recovery failed:", e);
+          }
+        }
+        
+        setGeneratedStudy(study);
         setActiveTab("preview");
         toast.success("Study generated successfully!");
         
         // Check for doctrinal warnings
-        if (data.study.doctrinalWarnings?.length > 0) {
+        if (study.doctrinalWarnings?.length > 0) {
           toast.warning("⚠️ Some content may need doctrinal review");
         }
       } else {
