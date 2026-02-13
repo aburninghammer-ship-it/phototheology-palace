@@ -96,89 +96,110 @@ KEY PRINCIPLES:
 const PHASE_PROMPTS: Record<string, string> = {
   teaching: `You are writing a COMPREHENSIVE DOCTRINAL STUDY for baptism candidates.
 
+CRITICAL: Output MUST be rich HTML (not markdown). This will be rendered directly in the browser.
+
 CRITICAL REQUIREMENTS:
-1. Write AT LEAST 1500-2500 words of structured teaching.
-2. Organize into 4-6 clearly titled sections using ## headers.
-3. For EACH key scripture (at least 8-12 verses), provide:
-   - The full KJV text quoted in a blockquote
-   - A 3-5 sentence verse-by-verse commentary explaining what it means
-   - How it connects to the doctrine being taught
-   - A Phototheology Palace insight (which Floor/Room applies)
-4. Include a "Christ Connection" section showing how this doctrine reveals Jesus.
-5. Include a "Sanctuary Connection" showing how this maps to the sanctuary blueprint.
-6. Include a "Three Angels' Connection" showing relevance to the final message.
-7. Include "Practical Application" with specific, actionable steps.
-8. Use the Phototheology Dimensions (Literal, Christ, Me, Church, Heaven) on at least 2 key passages.
-9. End with "Memory Anchors" - vivid mental images to help remember this truth.
+1. Write AT LEAST 2500-4000 words of structured, deeply rooted teaching.
+2. You MUST use EVERY SINGLE scripture reference provided in the SCRIPTURE CONTEXT below. Do not skip any.
+3. For EACH scripture reference provided:
+   - Quote the full KJV text in a <blockquote> tag
+   - Write a 4-8 sentence verse-by-verse exegetical commentary explaining what each phrase means
+   - Connect it to the doctrine being taught with theological depth
+   - Show how it reveals Christ (Concentration Room principle)
+   - If applicable, show the Phototheology Dimension layers (Literal, Christ, Me, Church, Heaven)
+4. Include these clearly labeled sections:
+   a) <h2>Introduction & Overview</h2> - Set the stage, define terms, show why this matters
+   b) <h2>Scripture Foundation</h2> - Verse-by-verse commentary on ALL provided scriptures
+   c) <h2>Christ Connection</h2> - How this doctrine reveals Jesus Christ specifically
+   d) <h2>Sanctuary Connection</h2> - How this maps to the sanctuary blueprint (altar, laver, lampstand, bread, incense, ark)
+   e) <h2>Three Angels' Connection</h2> - Relevance to the final message of Revelation 14
+   f) <h2>Phototheology Dimensions</h2> - Apply the 5 Dimensions to 2-3 key passages
+   g) <h2>Historical Discovery</h2> - Brief history of how this truth was recovered
+   h) <h2>Practical Application</h2> - Specific, actionable steps for daily life
+   i) <h2>Memory Anchors</h2> - Vivid mental images to remember this truth
 
-FORMAT your response as rich markdown with:
-- ## Section Headers
-- > Blockquotes for Scripture
-- **Bold** for key terms
-- Numbered lists for sequential points
-- Bullet points for details
+FORMAT as rich HTML:
+- <h2> and <h3> for section headers
+- <blockquote> for Scripture quotations with the reference in <strong>
+- <strong> for key theological terms, names of Christ, book names
+- <p> for paragraphs with substantial content (4-8 sentences each, NOT one-liners)
+- <ul><li> for lists with full explanatory sentences, not bare phrases
+- <em> for emphasis
+- <hr> between major sections
+- <div class="bg-amber-500/10 border border-amber-500/20 rounded-lg p-4 my-4"> for Palace insight boxes
+- <div class="bg-primary/10 border border-primary/20 rounded-lg p-4 my-4"> for Christ connection highlights
 
-Do NOT write a single paragraph. Write a FULL STUDY GUIDE.
+NEVER write a single paragraph. NEVER use bullet points without explanation. Each point must be a full teaching thought.
+Every scripture must have COMMENTARY, not just a quote. Explain what it means phrase by phrase.
 Return your content in the "overallResponse" field of the JSON.`,
 
   objections: `You are writing a THOROUGH OBJECTIONS & ANSWERS section for baptism candidates.
 
+CRITICAL: Output MUST be rich HTML (not markdown).
+
 CRITICAL REQUIREMENTS:
-1. Write AT LEAST 1200-1800 words.
+1. Write AT LEAST 1500-2500 words.
 2. Present 5-7 common objections people raise against this doctrine.
 3. For EACH objection:
-   - State the objection clearly and fairly (steelman it)
-   - Provide 2-3 KJV Scripture responses with full text quoted
-   - Give a clear, logical explanation of why the objection fails
-   - Include a Phototheology insight (which Room/Principle applies)
-4. Include a section on "What Other Christians Believe" showing different denominational views.
-5. End with "How to Share This Truth" - practical tips for explaining this to friends/family.
+   - State the objection clearly and fairly in a <h3> tag (steelman it)
+   - Provide 2-3 KJV Scripture responses with full text in <blockquote>
+   - Write a thorough 4-6 sentence explanation of why the objection fails
+   - Include the theological reasoning, not just proof texts
+   - Include a Palace insight (which Room/Principle applies)
+4. Include a section <h2>What Other Christians Believe</h2> showing different denominational views.
+5. End with <h2>How to Share This Truth</h2> - practical tips for explaining this to friends/family.
 
-FORMAT with:
-- ### Objection 1: [Title]
-- > Scripture blockquotes
-- Clear numbered rebuttals
+FORMAT as rich HTML:
+- <h2> for main sections, <h3> for each objection
+- <blockquote> for Scripture with reference in <strong>
+- <p> paragraphs with full explanations (4-6 sentences minimum)
+- <ol><li> for numbered rebuttals with substance
 Return your content in the "overallResponse" field of the JSON.`,
 
   history: `You are writing the ADVENTIST HERITAGE section for baptism candidates.
 
+CRITICAL: Output MUST be rich HTML (not markdown).
+
 CRITICAL REQUIREMENTS:
-1. Write AT LEAST 1200-1800 words of vivid historical narrative.
+1. Write AT LEAST 1500-2500 words of vivid historical narrative.
 2. Tell the story of how Adventist pioneers discovered this truth:
    - Name specific people, dates, and places
-   - Include direct quotes where available
-   - Describe the emotional and spiritual context
-   - Show the Bible study process they went through
-3. Include a "Timeline" section with key dates.
+   - Include direct quotes where available in <blockquote>
+   - Describe the emotional and spiritual context vividly
+   - Show the Bible study process they went through step by step
+3. Include a "Timeline" section with key dates in a styled list.
 4. Connect to the Great Controversy narrative.
 5. Show how this truth emerged from the Millerite movement and post-1844 Bible study.
-6. Include the "Why It Matters Today" section showing relevance.
+6. Include <h2>Why It Matters Today</h2> section showing relevance.
 7. Use vivid, storytelling language: "Imagine standing in that room with..."
 
-FORMAT with:
-- ## Section headers
-- > Blockquotes for historical quotes
-- **Bold** for names and dates
+FORMAT as rich HTML:
+- <h2> for sections, <h3> for subsections
+- <blockquote> for historical quotes with attribution
+- <strong> for names and dates
+- <p> paragraphs with rich narrative (5-8 sentences each)
 Return your content in the "overallResponse" field of the JSON.`,
 
   egw: `You are writing a SPIRIT OF PROPHECY insights section for baptism candidates.
 
+CRITICAL: Output MUST be rich HTML (not markdown).
+
 CRITICAL REQUIREMENTS:
-1. Write AT LEAST 1000-1500 words.
+1. Write AT LEAST 1200-2000 words.
 2. Include 5-8 relevant Ellen G. White quotations with:
-   - Full quote in blockquote format
-   - Book name, chapter, and page number citation
-   - 2-3 sentence explanation of each quote
-3. Organize by theme (e.g., "On the Nature of...", "On the Importance of...", "On the Practice of...")
-4. Begin with the "lesser light / greater light" principle.
-5. Show how EGW's writings illuminate the biblical teaching.
+   - Full quote in <blockquote> format
+   - Book name, chapter, and page number citation in <em> after the quote
+   - 3-5 sentence explanation of each quote showing its theological significance
+3. Organize by theme with <h2> headers (e.g., "On the Nature of...", "On the Importance of...")
+4. Begin with the "lesser light / greater light" principle explanation.
+5. Show how EGW's writings illuminate and expand the biblical teaching.
 6. Include practical counsel that applies to daily life.
 7. End with a devotional reflection.
 
-FORMAT with:
-- ## Thematic headers
-- > Blockquotes for EGW quotes with citations
-- Application paragraphs after each quote
+FORMAT as rich HTML:
+- <h2> for thematic headers
+- <blockquote> for EGW quotes with <em> citations below
+- <p> paragraphs with substantial explanation after each quote (3-5 sentences)
 Return your content in the "overallResponse" field of the JSON.`,
 
   quiz: `Generate exactly 10 quiz questions about the lesson topic. Mix of multiple choice AND fill-in-the-blank.
