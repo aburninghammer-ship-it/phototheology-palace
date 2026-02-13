@@ -7,7 +7,7 @@ import { useChurchMembership } from "@/hooks/useChurchMembership";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Loader2, Home, Users, BookOpen, Heart, Flame, ArrowRight, MessagesSquare, Sprout, Sun, Moon, Sparkles, ArrowLeft, BookMarked, Zap, Settings, Droplets, ExternalLink, HeartHandshake, DollarSign, Library } from "lucide-react";
+import { Loader2, Home, Users, BookOpen, Heart, Flame, ArrowRight, MessagesSquare, Sprout, Sun, Moon, Sparkles, ArrowLeft, BookMarked, Zap, Settings, Droplets, ExternalLink, HeartHandshake, DollarSign, Library, Radio } from "lucide-react";
 import { useTheme } from "next-themes";
 import { SmallGroupsHub } from "@/components/living-manna/SmallGroupsHub";
 import { MemberHome } from "@/components/living-manna/MemberHome";
@@ -21,6 +21,7 @@ import { ChurchAdminTab } from "@/components/living-manna/ChurchAdminTab";
 import { ServeTab } from "@/components/living-manna/ServeTab";
 import { GivingTab } from "@/components/living-manna/GivingTab";
 import { LibraryTab } from "@/components/living-manna/LibraryTab";
+import { LMLiveTab } from "@/components/living-manna/LMLiveTab";
 import { BaptismTrack } from "@/components/living-manna/baptism-track/BaptismTrack";
 import { DirectMessagesProvider } from "@/contexts/DirectMessagesContext";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -284,6 +285,10 @@ export default function LivingManna() {
                     <Users className="h-4 w-4" />
                     <span className="text-xs sm:text-sm">Groups</span>
                   </TabsTrigger>
+                  <TabsTrigger value="live" className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 py-2 px-3 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground min-w-[60px]">
+                    <Radio className="h-4 w-4" />
+                    <span className="text-xs sm:text-sm">Live</span>
+                  </TabsTrigger>
                   <TabsTrigger value="learn" className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 py-2 px-3 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground min-w-[60px]">
                     <BookOpen className="h-4 w-4" />
                     <span className="text-xs sm:text-sm">Learn</span>
@@ -339,6 +344,10 @@ export default function LivingManna() {
 
               <TabsContent value="groups">
                 <SmallGroupsHub churchId={effectiveChurchId!} />
+              </TabsContent>
+
+              <TabsContent value="live">
+                <LMLiveTab churchId={effectiveChurchId!} />
               </TabsContent>
 
               <TabsContent value="learn">
