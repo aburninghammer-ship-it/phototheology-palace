@@ -117,7 +117,7 @@ export const BibleReader = () => {
   // Map app language to default Bible translation
   const getDefaultTranslation = useCallback((): Translation => {
     const lang = i18n.language?.slice(0, 2);
-    if (lang === "es") return "rves";
+    if (lang === "es") return "rvr1960";
     if (lang === "fr") return "lsg";
     if (lang === "de") return "luther";
     if (lang === "pt") return "almeida";
