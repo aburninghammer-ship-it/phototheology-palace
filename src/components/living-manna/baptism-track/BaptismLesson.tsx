@@ -305,10 +305,17 @@ export function BaptismLesson({ lesson, candidateId, progress, onBack }: Baptism
   const loadTeachingContent = async () => {
     setLoadingContent(true);
     try {
-      const scriptureList = scriptures.map((s: any) => `${s.reference}: ${s.why}`).join("\n");
+      // Build a rich scripture context including fetched verse text
+      const scriptureList = scriptures.map((s: any) => {
+        const ref = s.reference || s.ref;
+        const text = verseTexts[ref] || '';
+        const why = s.why || s.meaning || '';
+        return `- ${ref}: "${text}" — ${why}`;
+      }).join("\n");
+
       const { data, error } = await supabase.functions.invoke("baptism-track-guide", {
         body: {
-          notes: `Write a comprehensive, in-depth doctrinal study on "${lesson.title}" (Fundamental Belief #${lesson.fundamental_number}). Include verse-by-verse commentary on every key passage, Christ connections, sanctuary connections, and Phototheology Palace insights.`,
+          notes: `Write a comprehensive, deeply rooted doctrinal study on "${lesson.title}" (Fundamental Belief #${lesson.fundamental_number}). You MUST use ALL ${scriptures.length} scripture references provided below. For each one, quote the full KJV text in a blockquote tag, then write 4-8 sentences of verse-by-verse exegetical commentary explaining what it means phrase by phrase. Include Christ connections, sanctuary connections, Three Angels' connections, Phototheology Dimensions analysis, and practical application. This must be AT LEAST 2500 words of rich HTML content.`,
           lessonId: lesson.id,
           lessonTitle: lesson.title,
           lessonPhase: 'teaching',
@@ -320,11 +327,11 @@ export function BaptismLesson({ lesson, candidateId, progress, onBack }: Baptism
       if (data?.guidance?.overallResponse) {
         setTeachingContent(data.guidance.overallResponse);
       } else {
-        setTeachingContent(`# ${lesson.title}\n\n${lesson.description}\n\nContent is being prepared. Ask Jeeves below to explore this topic.`);
+        setTeachingContent(`<h2>${lesson.title}</h2><p>${lesson.description}</p><p>Content is being prepared. Ask Jeeves below to explore this topic.</p>`);
       }
     } catch (error) {
       console.error("Teaching content error:", error);
-      setTeachingContent(`# ${lesson.title}\n\n${lesson.description}\n\nContent could not be loaded. Ask Jeeves below to explore this topic.`);
+      setTeachingContent(`<h2>${lesson.title}</h2><p>${lesson.description}</p><p>Content could not be loaded. Ask Jeeves below to explore this topic.</p>`);
     } finally {
       setLoadingContent(false);
     }
@@ -927,12 +934,11 @@ export function BaptismLesson({ lesson, candidateId, progress, onBack }: Baptism
                   <p className="text-xs text-muted-foreground mt-2">This may take a moment for thorough content</p>
                 </div>
               ) : (
-                <ScrollArea className="h-[500px] pr-4">
-                  <div className="prose prose-sm max-w-none dark:prose-invert prose-headings:text-foreground prose-p:text-foreground/90 prose-blockquote:border-l-primary prose-blockquote:bg-primary/5 prose-blockquote:py-2 prose-blockquote:px-4 prose-blockquote:rounded-r-lg prose-blockquote:italic prose-strong:text-primary prose-li:text-foreground/90">
-                    <ReactMarkdown>
-                      {teachingContent || lesson.description || ''}
-                    </ReactMarkdown>
-                  </div>
+                <ScrollArea className="h-[700px] pr-4">
+                  <div 
+                    className="prose prose-sm max-w-none dark:prose-invert prose-headings:text-foreground prose-p:text-foreground/90 prose-blockquote:border-l-primary prose-blockquote:bg-primary/5 prose-blockquote:py-2 prose-blockquote:px-4 prose-blockquote:rounded-r-lg prose-blockquote:italic prose-strong:text-primary prose-li:text-foreground/90 [&_h2]:text-lg [&_h2]:font-bold [&_h2]:mt-6 [&_h2]:mb-3 [&_h3]:text-base [&_h3]:font-semibold [&_h3]:mt-4 [&_h3]:mb-2 [&_blockquote]:my-3 [&_blockquote]:text-foreground/80 [&_p]:mb-3 [&_p]:leading-relaxed [&_hr]:my-6"
+                    dangerouslySetInnerHTML={{ __html: teachingContent || lesson.description || '' }}
+                  />
                 </ScrollArea>
               )}
 
@@ -1010,12 +1016,11 @@ export function BaptismLesson({ lesson, candidateId, progress, onBack }: Baptism
                   <p className="text-muted-foreground">Loading objections and answers...</p>
                 </div>
               ) : (
-                <ScrollArea className="h-[500px] pr-4">
-                  <div className="prose prose-sm max-w-none dark:prose-invert prose-headings:text-foreground prose-p:text-foreground/90 prose-blockquote:border-l-primary prose-blockquote:bg-primary/5 prose-blockquote:py-2 prose-blockquote:px-4 prose-blockquote:rounded-r-lg prose-blockquote:italic prose-strong:text-primary">
-                    <ReactMarkdown>
-                      {objectionsContent || "Content is loading..."}
-                    </ReactMarkdown>
-                  </div>
+                <ScrollArea className="h-[700px] pr-4">
+                  <div 
+                    className="prose prose-sm max-w-none dark:prose-invert prose-headings:text-foreground prose-p:text-foreground/90 prose-blockquote:border-l-primary prose-blockquote:bg-primary/5 prose-blockquote:py-2 prose-blockquote:px-4 prose-blockquote:rounded-r-lg prose-blockquote:italic prose-strong:text-primary [&_h2]:text-lg [&_h2]:font-bold [&_h2]:mt-6 [&_h2]:mb-3 [&_h3]:text-base [&_h3]:font-semibold [&_h3]:mt-4 [&_h3]:mb-2 [&_blockquote]:my-3 [&_p]:mb-3 [&_p]:leading-relaxed [&_hr]:my-6"
+                    dangerouslySetInnerHTML={{ __html: objectionsContent || "<p>Content is loading...</p>" }}
+                  />
                 </ScrollArea>
               )}
 
@@ -1074,12 +1079,11 @@ export function BaptismLesson({ lesson, candidateId, progress, onBack }: Baptism
                   <p className="text-muted-foreground">Loading Adventist history...</p>
                 </div>
               ) : (
-                <ScrollArea className="h-[500px] pr-4">
-                  <div className="prose prose-sm max-w-none dark:prose-invert prose-headings:text-foreground prose-p:text-foreground/90 prose-blockquote:border-l-primary prose-blockquote:bg-primary/5 prose-blockquote:py-2 prose-blockquote:px-4 prose-blockquote:rounded-r-lg prose-blockquote:italic prose-strong:text-primary">
-                    <ReactMarkdown>
-                      {historyContent || "Content is loading..."}
-                    </ReactMarkdown>
-                  </div>
+                <ScrollArea className="h-[700px] pr-4">
+                  <div 
+                    className="prose prose-sm max-w-none dark:prose-invert prose-headings:text-foreground prose-p:text-foreground/90 prose-blockquote:border-l-primary prose-blockquote:bg-primary/5 prose-blockquote:py-2 prose-blockquote:px-4 prose-blockquote:rounded-r-lg prose-blockquote:italic prose-strong:text-primary [&_h2]:text-lg [&_h2]:font-bold [&_h2]:mt-6 [&_h2]:mb-3 [&_h3]:text-base [&_h3]:font-semibold [&_h3]:mt-4 [&_h3]:mb-2 [&_blockquote]:my-3 [&_p]:mb-3 [&_p]:leading-relaxed [&_hr]:my-6"
+                    dangerouslySetInnerHTML={{ __html: historyContent || "<p>Content is loading...</p>" }}
+                  />
                 </ScrollArea>
               )}
 
@@ -1120,12 +1124,11 @@ export function BaptismLesson({ lesson, candidateId, progress, onBack }: Baptism
                   <p className="text-muted-foreground">Loading Spirit of Prophecy insights...</p>
                 </div>
               ) : (
-                <ScrollArea className="h-[500px] pr-4">
-                  <div className="prose prose-sm max-w-none dark:prose-invert prose-headings:text-foreground prose-p:text-foreground/90 prose-blockquote:border-l-purple-500 prose-blockquote:bg-purple-500/5 prose-blockquote:py-2 prose-blockquote:px-4 prose-blockquote:rounded-r-lg prose-blockquote:italic prose-strong:text-primary">
-                    <ReactMarkdown>
-                      {egwContent || "Content is loading..."}
-                    </ReactMarkdown>
-                  </div>
+                <ScrollArea className="h-[700px] pr-4">
+                  <div 
+                    className="prose prose-sm max-w-none dark:prose-invert prose-headings:text-foreground prose-p:text-foreground/90 prose-blockquote:border-l-purple-500 prose-blockquote:bg-purple-500/5 prose-blockquote:py-2 prose-blockquote:px-4 prose-blockquote:rounded-r-lg prose-blockquote:italic prose-strong:text-primary [&_h2]:text-lg [&_h2]:font-bold [&_h2]:mt-6 [&_h2]:mb-3 [&_h3]:text-base [&_h3]:font-semibold [&_h3]:mt-4 [&_h3]:mb-2 [&_blockquote]:my-3 [&_p]:mb-3 [&_p]:leading-relaxed [&_hr]:my-6"
+                    dangerouslySetInnerHTML={{ __html: egwContent || "<p>Content is loading...</p>" }}
+                  />
                 </ScrollArea>
               )}
 
