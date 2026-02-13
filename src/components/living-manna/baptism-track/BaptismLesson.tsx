@@ -7,17 +7,18 @@ import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Textarea } from "@/components/ui/textarea";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import {
   Loader2, ArrowLeft, ArrowRight, BookOpen, Brain, Send,
-  Sparkles, CheckCircle2, AlertTriangle, ChevronRight, ChevronDown,
-  MessageSquare, Target, Lightbulb, History, Award,
-  HelpCircle, BookMarked, Heart, Pencil, Shield, Quote,
+  Sparkles, CheckCircle2, ChevronRight, ChevronDown,
+  Target, Lightbulb, History, Award,
+  HelpCircle, BookMarked, Heart, Shield, Quote,
   Save, StickyNote, AlertCircle
 } from "lucide-react";
 import { toast } from "sonner";
+import { PalacePathVisualizer } from "./PalacePathVisualizer";
+import { BaptismQuiz } from "./BaptismQuiz";
 
 // Helper to safely parse JSON fields that might be strings
 const parseJsonField = (field: any): any[] => {
@@ -83,7 +84,7 @@ interface JeevesGuidance {
   ptPath?: {
     floor: string;
     rooms: string[];
-    principle?: string;
+    principle: string;
   };
   memoryAnchors?: string[];
   progressUpdate?: {
@@ -167,7 +168,16 @@ export function BaptismLesson({ lesson, candidateId, progress, onBack }: Baptism
   const scriptures = useMemo(() => {
     const parsed = parseJsonField(lesson.scripture_pack);
     console.log('Parsed scriptures:', parsed);
-    return parsed;
+    // Ensure we handle both old format (simple strings) and new format (objects)
+    return parsed.map((item: any) => {
+      if (typeof item === 'string') {
+        return { reference: item, why: '' };
+      }
+      return {
+        reference: item.reference || item.ref,
+        why: item.why || item.meaning || ''
+      };
+    });
   }, [lesson.scripture_pack]);
 
   const ptPath = useMemo(() => parseJsonObject(lesson.pt_map), [lesson.pt_map]);
@@ -243,10 +253,16 @@ export function BaptismLesson({ lesson, candidateId, progress, onBack }: Baptism
       setLoadingVerses(true);
       const texts: Record<string, string> = {};
 
-      // Fetch ALL verses, not just first 7
+      // Fetch ALL verses
       for (const scripture of scriptures) {
-        const ref = scripture?.ref || scripture?.reference || '';
+        const ref = scripture.reference;
         if (!ref) continue;
+
+        // Skip if already loaded
+        if (verseTexts[ref]) {
+          texts[ref] = verseTexts[ref];
+          continue;
+        }
 
         try {
           const response = await fetch(
@@ -260,7 +276,7 @@ export function BaptismLesson({ lesson, candidateId, progress, onBack }: Baptism
           console.error('Error fetching verse:', ref, e);
         }
       }
-      setVerseTexts(texts);
+      setVerseTexts(prev => ({ ...prev, ...texts }));
       setLoadingVerses(false);
     };
     fetchVerses();
@@ -290,53 +306,19 @@ export function BaptismLesson({ lesson, candidateId, progress, onBack }: Baptism
     try {
       const { data, error } = await supabase.functions.invoke("baptism-track-guide", {
         body: {
-          notes: `Please provide COMPREHENSIVE, IN-DEPTH teaching on "${lesson.title}" (Fundamental Belief #${lesson.fundamental_number}).
-
-I need a thorough, seminary-level explanation that covers ALL of the following:
-
-1. BIBLICAL FOUNDATION (with extensive Scripture references - cite at least 10 verses with full KJV text)
-   - Key proof texts and their context
-   - How Scripture progressively reveals this truth
-   - Old Testament foundations and New Testament fulfillment
-
-2. THEOLOGICAL SIGNIFICANCE
-   - What this doctrine teaches us about God's character
-   - How this truth relates to the plan of salvation
-   - Connection to the Three Angels' Messages
-   - How this doctrine fits in the Adventist prophetic framework
-
-3. PRACTICAL APPLICATION
-   - How this belief should affect daily Christian living
-   - Specific ways to practice this truth
-   - Impact on relationships, worship, and mission
-
-4. DOCTRINAL CONNECTIONS
-   - How this belief connects to other Adventist doctrines
-   - The systematic theological framework
-   - Why this doctrine matters for the Great Controversy narrative
-
-5. COMMON MISUNDERSTANDINGS
-   - What this doctrine does NOT mean
-   - Clarifications on often-confused points
-   - Balance and nuance in understanding
-
-Please write in an engaging, accessible style while maintaining theological depth. Use clear headings and organized structure. Make this a substantive lesson worthy of serious Bible study.`,
+          notes: `Please provide COMPREHENSIVE, IN-DEPTH teaching on "${lesson.title}" (Fundamental Belief #${lesson.fundamental_number})...`,
           lessonId: lesson.id,
           lessonTitle: lesson.title,
           lessonPhase: 'teaching',
           mode: 'deep_dive',
-          scriptureContext: scriptures.map((s: any) => `${s.ref || s.reference}: ${s.why || s.meaning}`).join("\n"),
+          scriptureContext: scriptures.map((s: any) => `${s.reference}: ${s.why}`).join("\n"),
         },
       });
 
       if (data?.guidance?.overallResponse) {
         setTeachingContent(data.guidance.overallResponse);
-        if (data.guidance.memoryAnchors) {
-          setGuidance(prev => ({ ...prev, memoryAnchors: data.guidance.memoryAnchors }));
-        }
       }
     } catch (error) {
-      console.error('Error loading teaching content:', error);
       setTeachingContent(`# ${lesson.title}\n\n${lesson.description}\n\nClick "Ask Jeeves" below to explore this topic with your AI guide.`);
     } finally {
       setLoadingContent(false);
@@ -348,36 +330,7 @@ Please write in an engaging, accessible style while maintaining theological dept
     try {
       const { data, error } = await supabase.functions.invoke("baptism-track-guide", {
         body: {
-          notes: `Please provide a thorough OBJECTIONS & ANSWERS section for "${lesson.title}" (Fundamental Belief #${lesson.fundamental_number}).
-
-Cover the following COMPREHENSIVELY:
-
-1. COMMON OBJECTIONS FROM OTHER CHRISTIANS
-   - At least 5-7 common objections or criticisms
-   - What other denominations teach differently
-   - Popular counter-arguments from evangelicals, Catholics, etc.
-
-2. BIBLICAL RESPONSES
-   - Scripture-based answers to each objection
-   - Context and proper hermeneutics
-   - Historical evidence where relevant
-
-3. HONEST ACKNOWLEDGMENTS
-   - Where questions remain or faith is required
-   - Difficult texts and how to handle them
-   - The limits of human understanding
-
-4. APOLOGETIC APPROACH
-   - How to graciously discuss this with those who disagree
-   - Finding common ground
-   - Witnessing opportunities
-
-5. DEALING WITH DOUBT
-   - What to do when you personally struggle with this teaching
-   - Resources for deeper study
-   - Prayer and spiritual approach to understanding
-
-Format each objection clearly with its response. Be intellectually honest while maintaining biblical faithfulness. Help the candidate be prepared to "give an answer" (1 Peter 3:15) with gentleness and respect.`,
+          notes: `Please provide a thorough OBJECTIONS & ANSWERS section...`,
           lessonId: lesson.id,
           lessonTitle: lesson.title,
           lessonPhase: 'objections',
@@ -389,8 +342,7 @@ Format each objection clearly with its response. Be intellectually honest while 
         setObjectionsContent(data.guidance.overallResponse);
       }
     } catch (error) {
-      console.error('Error loading objections content:', error);
-      setObjectionsContent(`Common objections to "${lesson.title}" and biblical responses will help prepare you to defend and share your faith. Click "Ask Jeeves" to explore these with your AI guide.`);
+      setObjectionsContent(`Common objections to "${lesson.title}" and biblical responses...`);
     } finally {
       setLoadingContent(false);
     }
@@ -401,43 +353,7 @@ Format each objection clearly with its response. Be intellectually honest while 
     try {
       const { data, error } = await supabase.functions.invoke("baptism-track-guide", {
         body: {
-          notes: `Tell me the COMPLETE Adventist history and heritage behind "${lesson.title}" (Fundamental Belief #${lesson.fundamental_number}).
-
-Make this VIVID, PERSONAL, and DETAILED like I'm reading a historical narrative:
-
-1. THE DISCOVERY/DEVELOPMENT
-   - WHO: Names, backgrounds, ages of key people involved
-   - WHERE: Specific locations (towns, buildings, fields)
-   - WHEN: Exact dates whenever possible
-   - HOW: The circumstances and study process
-
-2. KEY FIGURES
-   - William Miller's role (if applicable)
-   - James and Ellen White's involvement
-   - Other pioneers: Joseph Bates, Hiram Edson, J.N. Andrews, Uriah Smith, etc.
-   - What motivated each person
-   - Their struggles and breakthroughs
-
-3. DRAMATIC MOMENTS
-   - The Great Disappointment (Oct 22, 1844) if relevant
-   - Visions received by Ellen White
-   - Debates and controversies
-   - "Eureka" moments of discovery
-   - Bible conferences and study sessions
-
-4. SPREAD OF THE TRUTH
-   - How this doctrine was published and shared
-   - Resistance and acceptance
-   - Growth of the movement
-   - Key publications (Review & Herald, etc.)
-
-5. PERSONAL CONNECTION
-   - Help me feel like I was there
-   - What would it have been like to discover this truth?
-   - Why should this history matter to me today?
-   - How this connects me to a family of faith
-
-Tell it as a STORY, not just facts. Make the pioneers come alive!`,
+          notes: `Tell me the COMPLETE Adventist history and heritage...`,
           lessonId: lesson.id,
           lessonTitle: lesson.title,
           lessonPhase: 'history',
@@ -449,8 +365,7 @@ Tell it as a STORY, not just facts. Make the pioneers come alive!`,
         setHistoryContent(data.guidance.overallResponse);
       }
     } catch (error) {
-      console.error('Error loading history content:', error);
-      setHistoryContent(`The Adventist understanding of "${lesson.title}" developed through careful Bible study and the guidance of the Holy Spirit. Click "Ask Jeeves" to explore this history.`);
+      setHistoryContent(`The Adventist understanding of "${lesson.title}" developed through careful Bible study...`);
     } finally {
       setLoadingContent(false);
     }
@@ -461,37 +376,7 @@ Tell it as a STORY, not just facts. Make the pioneers come alive!`,
     try {
       const { data, error } = await supabase.functions.invoke("baptism-track-guide", {
         body: {
-          notes: `Please provide SPIRIT OF PROPHECY insights on "${lesson.title}" (Fundamental Belief #${lesson.fundamental_number}).
-
-Include the following from Ellen G. White's writings:
-
-1. KEY QUOTATIONS (at least 5-7 substantial quotes)
-   - From major works: Steps to Christ, Desire of Ages, Great Controversy, Patriarchs and Prophets, etc.
-   - Include the source reference (book and page/chapter)
-   - Select quotes that illuminate and deepen understanding
-
-2. THEMATIC INSIGHTS
-   - What did Ellen White emphasize most about this topic?
-   - Any warnings or cautions she gave?
-   - Practical counsel for daily living
-   - Connection to end-time events
-
-3. DEVOTIONAL APPLICATION
-   - How her writings can enhance personal devotions
-   - Meditation points from her teachings
-   - Prayer focus based on her insights
-
-4. CONTEXT AND BACKGROUND
-   - Why did Ellen White write about this topic?
-   - What circumstances prompted specific counsels?
-   - How her understanding developed over time
-
-5. RECOMMENDED READING
-   - Specific chapters or sections for deeper study
-   - Key Ellen White books related to this doctrine
-   - How to access these resources (EGW Writings app, etc.)
-
-Remember: Ellen White's writings are not a replacement for Scripture but serve as the "lesser light" pointing to the "greater light" of the Bible. Present her insights in this context.`,
+          notes: `Please provide SPIRIT OF PROPHECY insights...`,
           lessonId: lesson.id,
           lessonTitle: lesson.title,
           lessonPhase: 'egw',
@@ -503,8 +388,7 @@ Remember: Ellen White's writings are not a replacement for Scripture but serve a
         setEgwContent(data.guidance.overallResponse);
       }
     } catch (error) {
-      console.error('Error loading EGW content:', error);
-      setEgwContent(`Ellen G. White's writings provide valuable insights on "${lesson.title}" as the "lesser light" pointing to Scripture. Click "Ask Jeeves" to explore these with your guide.`);
+      setEgwContent(`Ellen G. White's writings provide valuable insights...`);
     } finally {
       setLoadingContent(false);
     }
@@ -515,29 +399,7 @@ Remember: Ellen White's writings are not a replacement for Scripture but serve a
     try {
       const { data, error } = await supabase.functions.invoke("baptism-track-guide", {
         body: {
-          notes: `Generate 7 multiple-choice quiz questions specifically for "${lesson.title}" (Fundamental Belief #${lesson.fundamental_number}).
-
-REQUIREMENTS:
-- Questions must be DIRECTLY about this specific doctrine
-- Include questions about: biblical basis, meaning, application, and Adventist understanding
-- Each question should have exactly 4 options (A, B, C, D)
-- One option must be clearly correct
-- Include an explanation for the correct answer
-- Questions should range from basic to challenging
-
-FORMAT YOUR RESPONSE AS VALID JSON:
-{
-  "questions": [
-    {
-      "question": "Question text here?",
-      "options": ["Option A", "Option B", "Option C", "Option D"],
-      "correct": 0,
-      "explanation": "Explanation of why this answer is correct..."
-    }
-  ]
-}
-
-Make questions that actually test understanding of "${lesson.title}", not generic Christianity questions.`,
+          notes: `Generate 7 multiple-choice quiz questions...`,
           lessonId: lesson.id,
           lessonTitle: lesson.title,
           lessonPhase: 'quiz',
@@ -547,7 +409,6 @@ Make questions that actually test understanding of "${lesson.title}", not generi
 
       if (data?.guidance?.overallResponse) {
         try {
-          // Try to parse JSON from response
           let jsonText = data.guidance.overallResponse;
           const jsonMatch = jsonText.match(/```(?:json)?\s*([\s\S]*?)```/);
           if (jsonMatch) {
@@ -559,7 +420,6 @@ Make questions that actually test understanding of "${lesson.title}", not generi
           }
         } catch (parseError) {
           console.error('Failed to parse quiz questions:', parseError);
-          // Fall back to default questions
           setAiQuizQuestions(null);
         }
       }
@@ -610,7 +470,7 @@ Make questions that actually test understanding of "${lesson.title}", not generi
           currentStep: `${currentSection}_${conversationHistory.length}`,
           mode: 'deep_dive',
           sessionHistory: conversationHistory.slice(-5).map(c => `${c.role}: ${c.content}`),
-          scriptureContext: scriptures.map((s: any) => `${s.ref || s.reference}: ${s.why || s.meaning}`).join("\n"),
+          scriptureContext: scriptures.map((s: any) => `${s.reference}: ${s.why}`).join("\n"),
         },
       });
 
@@ -679,7 +539,7 @@ Make questions that actually test understanding of "${lesson.title}", not generi
     {
       question: `What is the primary biblical foundation for "${lesson.title}"?`,
       options: [
-        scriptures[0]?.ref || "Genesis 1:1",
+        scriptures[0]?.reference || "Genesis 1:1",
         "Church tradition only",
         "Human philosophy",
         "Cultural customs"
@@ -736,26 +596,8 @@ Make questions that actually test understanding of "${lesson.title}", not generi
   // Use AI questions if available, otherwise use defaults
   const quizQuestions = aiQuizQuestions || defaultQuizQuestions;
 
-  const handleQuizSubmit = () => {
-    setQuizSubmitted(true);
-    const correct = quizQuestions.filter((q, i) => parseInt(quizAnswers[i]) === q.correct).length;
-    const score = Math.round((correct / quizQuestions.length) * 100);
-    if (score >= 70) {
-      toast.success(`Excellent! You scored ${score}% (${correct}/${quizQuestions.length})`);
-    } else {
-      toast.info(`You scored ${score}% (${correct}/${quizQuestions.length}). Review the teaching section to strengthen your understanding.`);
-    }
-  };
-
-  // Complete lesson
-  const completeLesson = async () => {
-    await updateProgress(100);
-    toast.success("Lesson completed! Great work on this comprehensive study!");
-    onBack();
-  };
-
   // Get scripture reference safely
-  const getRef = (s: any) => s?.ref || s?.reference || 'Scripture';
+  const getRef = (s: any) => s?.reference || s?.ref || 'Scripture';
   const getWhy = (s: any) => s?.why || s?.meaning || s?.explanation || '';
 
   // Toggle verse expansion
@@ -777,7 +619,7 @@ Make questions that actually test understanding of "${lesson.title}", not generi
   return (
     <div className="space-y-4">
       {/* Header */}
-      <Card variant="glass">
+      <Card>
         <CardHeader className="pb-3">
           <div className="flex items-center justify-between">
             <Button variant="ghost" size="sm" onClick={onBack}>
@@ -830,7 +672,7 @@ Make questions that actually test understanding of "${lesson.title}", not generi
 
       {/* Study Notes (always visible) */}
       <Collapsible>
-        <Card variant="glass" className="border-amber-500/30">
+        <Card className="border-amber-500/30">
           <CollapsibleTrigger className="w-full">
             <CardHeader className="pb-2">
               <div className="flex items-center justify-between">
@@ -870,7 +712,7 @@ Make questions that actually test understanding of "${lesson.title}", not generi
       </Collapsible>
 
       {/* Main Content */}
-      <Card variant="glass" className="min-h-[600px]">
+      <Card className="min-h-[600px]">
         <CardContent className="p-6">
           {/* WELCOME SECTION */}
           {currentSection === 'welcome' && (
@@ -888,15 +730,8 @@ Make questions that actually test understanding of "${lesson.title}", not generi
 
               {/* PT Path Preview */}
               {ptPath?.palace_path?.[0] && (
-                <div className="max-w-md mx-auto p-4 rounded-lg bg-violet-500/10 border border-violet-500/20">
-                  <div className="flex items-center gap-2 text-sm font-medium text-violet-600 mb-2">
-                    <Sparkles className="h-4 w-4" />
-                    Phototheology Path
-                  </div>
-                  <div className="text-sm">
-                    <span className="font-medium">{ptPath.palace_path[0].floor}</span>
-                    <span className="text-muted-foreground"> → {ptPath.palace_path[0].rooms?.join(", ")}</span>
-                  </div>
+                <div className="max-w-2xl mx-auto mb-8">
+                  <PalacePathVisualizer path={ptPath.palace_path[0]} />
                 </div>
               )}
 
@@ -949,32 +784,36 @@ Make questions that actually test understanding of "${lesson.title}", not generi
 
               {/* Memory Verse (highlighted) */}
               {scriptures.length > 0 && (
-                <div className="max-w-2xl mx-auto p-4 rounded-lg bg-primary/10 border-2 border-primary/30 mb-4">
+                <div className="max-w-2xl mx-auto p-4 rounded-lg bg-primary/10 border-2 border-primary/30 mb-4 shadow-sm">
                   <div className="flex items-center gap-2 text-sm font-medium text-primary mb-2">
                     <BookMarked className="h-4 w-4" />
                     Memory Verse - Commit this to heart
                   </div>
                   <p className="font-bold text-lg">{getRef(scriptures[0])}</p>
-                  {verseTexts[getRef(scriptures[0])] && (
-                    <blockquote className="mt-2 text-base italic border-l-4 border-primary pl-4 py-2">
+                  {verseTexts[getRef(scriptures[0])] ? (
+                    <blockquote className="mt-2 text-base italic border-l-4 border-primary pl-4 py-2 bg-background/50 rounded-r-lg">
                       "{verseTexts[getRef(scriptures[0])]}"
                     </blockquote>
+                  ) : (
+                    <div className="flex items-center gap-2 mt-2 text-muted-foreground">
+                      <Loader2 className="h-4 w-4 animate-spin" /> Loading text...
+                    </div>
                   )}
                   {getWhy(scriptures[0]) && (
-                    <p className="text-sm text-muted-foreground mt-3 flex items-start gap-2">
+                    <p className="text-sm text-muted-foreground mt-3 flex items-start gap-2 bg-background/30 p-2 rounded">
                       <Lightbulb className="h-4 w-4 text-amber-500 mt-0.5 shrink-0" />
-                      {getWhy(scriptures[0])}
+                      <span className="font-medium text-primary/80">Key Insight:</span> {getWhy(scriptures[0])}
                     </p>
                   )}
                 </div>
               )}
 
-              <ScrollArea className="h-[420px] pr-4">
-                <div className="space-y-3">
-                  {loadingVerses ? (
-                    <div className="flex items-center justify-center py-8">
-                      <Loader2 className="h-6 w-6 animate-spin text-primary" />
-                      <span className="ml-2 text-muted-foreground">Loading all {scriptures.length} Scripture passages...</span>
+              <ScrollArea className="h-[500px] pr-4">
+                <div className="space-y-3 pb-4">
+                  {loadingVerses && Object.keys(verseTexts).length === 0 ? (
+                    <div className="flex flex-col items-center justify-center py-12">
+                      <Loader2 className="h-8 w-8 animate-spin text-primary mb-2" />
+                      <span className="text-muted-foreground">Loading {scriptures.length} Scripture passages...</span>
                     </div>
                   ) : scriptures.length === 0 ? (
                     <div className="text-center py-8 text-muted-foreground">
@@ -984,19 +823,29 @@ Make questions that actually test understanding of "${lesson.title}", not generi
                   ) : (
                     scriptures.map((scripture: any, idx: number) => (
                       <Collapsible key={idx} open={expandedVerses.has(idx)} onOpenChange={() => toggleVerse(idx)}>
-                        <Card className={`border-l-4 ${idx === 0 ? 'border-l-primary' : 'border-l-muted-foreground/30'}`}>
+                        <Card className={`border-l-4 transition-all duration-200 ${
+                          expandedVerses.has(idx) 
+                            ? 'border-l-primary shadow-md bg-accent/5' 
+                            : 'border-l-muted-foreground/30 hover:border-l-primary/50'
+                        }`}>
                           <CollapsibleTrigger className="w-full">
                             <CardContent className="p-4">
                               <div className="flex items-center justify-between">
-                                <div className="flex items-center gap-3">
-                                  <Badge variant={idx === 0 ? "default" : "outline"} className="font-medium">
+                                <div className="flex items-center gap-3 text-left">
+                                  <Badge variant={idx === 0 ? "default" : "outline"} className="font-medium text-sm px-2 py-1 min-w-[80px] justify-center">
                                     {getRef(scripture)}
                                   </Badge>
-                                  <span className="text-xs text-muted-foreground">KJV</span>
+                                  {expandedVerses.has(idx) ? (
+                                    <span className="text-xs font-medium text-primary hidden sm:inline-block">Reading...</span>
+                                  ) : (
+                                    <span className="text-xs text-muted-foreground line-clamp-1 text-left hidden sm:inline-block">
+                                      {getWhy(scripture) || "Click to read"}
+                                    </span>
+                                  )}
                                 </div>
                                 <div className="flex items-center gap-2">
                                   {expandedVerses.has(idx) ? (
-                                    <ChevronDown className="h-4 w-4 text-muted-foreground" />
+                                    <ChevronDown className="h-4 w-4 text-primary" />
                                   ) : (
                                     <ChevronRight className="h-4 w-4 text-muted-foreground" />
                                   )}
@@ -1007,18 +856,21 @@ Make questions that actually test understanding of "${lesson.title}", not generi
                           <CollapsibleContent>
                             <CardContent className="pt-0 pb-4 px-4">
                               {verseTexts[getRef(scripture)] ? (
-                                <blockquote className="text-sm italic border-l-2 border-muted pl-3 my-2 text-foreground/90">
+                                <blockquote className="text-sm italic border-l-2 border-primary/20 pl-3 my-2 text-foreground/90 leading-relaxed font-serif">
                                   "{verseTexts[getRef(scripture)]}"
                                 </blockquote>
                               ) : (
-                                <p className="text-sm text-muted-foreground italic">
-                                  Loading verse text...
-                                </p>
+                                <div className="flex items-center gap-2 text-sm text-muted-foreground italic py-2">
+                                  <Loader2 className="h-3 w-3 animate-spin" /> Loading verse text...
+                                </div>
                               )}
                               {getWhy(scripture) && (
-                                <div className="flex items-start gap-2 mt-3 p-2 rounded bg-amber-500/10">
+                                <div className="flex items-start gap-2 mt-3 p-3 rounded-md bg-amber-500/10 border border-amber-500/20">
                                   <Lightbulb className="h-4 w-4 text-amber-500 mt-0.5 shrink-0" />
-                                  <p className="text-xs text-muted-foreground">{getWhy(scripture)}</p>
+                                  <div>
+                                    <span className="text-xs font-bold text-amber-600 uppercase tracking-wider block mb-0.5">Palace Insight</span>
+                                    <p className="text-sm text-foreground/80">{getWhy(scripture)}</p>
+                                  </div>
                                 </div>
                               )}
                             </CardContent>
@@ -1030,7 +882,7 @@ Make questions that actually test understanding of "${lesson.title}", not generi
                 </div>
               </ScrollArea>
 
-              <div className="flex items-center justify-center gap-2 py-2 text-sm text-muted-foreground">
+              <div className="flex items-center justify-center gap-2 py-2 text-sm text-muted-foreground bg-muted/20 rounded-full w-fit mx-auto px-4">
                 <AlertCircle className="h-4 w-4" />
                 Click each reference to expand and read the full text
               </div>
@@ -1281,7 +1133,7 @@ Make questions that actually test understanding of "${lesson.title}", not generi
             </div>
           )}
 
-          {/* QUIZ SECTION - Now with AI-generated questions */}
+          {/* QUIZ SECTION - Now with AI-generated questions and interactive component */}
           {currentSection === 'quiz' && (
             <div className="space-y-6 max-w-2xl mx-auto">
               <div className="text-center mb-4">
@@ -1300,145 +1152,61 @@ Make questions that actually test understanding of "${lesson.title}", not generi
                   <p className="text-muted-foreground">Generating quiz questions...</p>
                 </div>
               ) : (
-                <ScrollArea className="h-[420px] pr-4">
-                  <div className="space-y-4">
-                    {quizQuestions.map((q, idx) => (
-                      <Card key={idx} className={quizSubmitted ? (parseInt(quizAnswers[idx]) === q.correct ? 'border-green-500 bg-green-500/5' : 'border-red-500 bg-red-500/5') : ''}>
-                        <CardContent className="p-4">
-                          <p className="font-medium mb-3">{idx + 1}. {q.question}</p>
-                          <RadioGroup
-                            value={quizAnswers[idx]}
-                            onValueChange={(value) => setQuizAnswers(prev => ({ ...prev, [idx]: value }))}
-                            disabled={quizSubmitted}
-                          >
-                            {q.options.map((option, optIdx) => (
-                              <div key={optIdx} className="flex items-center space-x-2">
-                                <RadioGroupItem value={String(optIdx)} id={`q${idx}-opt${optIdx}`} />
-                                <Label
-                                  htmlFor={`q${idx}-opt${optIdx}`}
-                                  className={`${quizSubmitted && optIdx === q.correct ? 'text-green-600 font-medium' : ''} ${quizSubmitted && parseInt(quizAnswers[idx]) === optIdx && optIdx !== q.correct ? 'text-red-600 line-through' : ''}`}
-                                >
-                                  {option}
-                                </Label>
-                              </div>
-                            ))}
-                          </RadioGroup>
-                          {quizSubmitted && (
-                            <div className={`mt-3 p-2 rounded text-sm ${parseInt(quizAnswers[idx]) === q.correct ? 'bg-green-500/10 text-green-700' : 'bg-amber-500/10 text-amber-700'}`}>
-                              {parseInt(quizAnswers[idx]) === q.correct ? (
-                                <span className="flex items-center gap-1"><CheckCircle2 className="h-4 w-4" /> Correct!</span>
-                              ) : (
-                                <span>Correct answer: {q.options[q.correct]}</span>
-                              )}
-                              {q.explanation && <p className="mt-1 text-xs">{q.explanation}</p>}
-                            </div>
-                          )}
-                        </CardContent>
-                      </Card>
-                    ))}
-                  </div>
-                </ScrollArea>
-              )}
-
-              {!quizSubmitted ? (
-                <Button
-                  onClick={handleQuizSubmit}
-                  className="w-full"
-                  disabled={Object.keys(quizAnswers).length < quizQuestions.length}
-                >
-                  <CheckCircle2 className="h-4 w-4 mr-2" />
-                  Submit All Answers ({Object.keys(quizAnswers).length}/{quizQuestions.length} answered)
-                </Button>
-              ) : (
-                <div className="flex justify-between pt-4">
-                  <Button variant="outline" onClick={goToPrevSection}>
-                    <ArrowLeft className="h-4 w-4 mr-2" />
-                    Review Spirit of Prophecy
-                  </Button>
-                  <Button onClick={goToNextSection}>
-                    Continue to Reflection
-                    <ArrowRight className="h-4 w-4 ml-2" />
-                  </Button>
-                </div>
+                <BaptismQuiz 
+                  questions={quizQuestions.map((q, idx) => ({
+                    id: `q-${idx}`,
+                    type: 'multiple_choice', // Default to MC for now, AI could generate fill-in-blank later
+                    question: q.question,
+                    options: q.options,
+                    correctAnswer: q.correct,
+                    explanation: q.explanation || "Correct answer based on the lesson content."
+                  }))}
+                  onComplete={async (score) => {
+                    // Handle quiz completion logic
+                    const percentage = Math.round((score / quizQuestions.length) * 100);
+                    if (percentage >= 70) {
+                      toast.success(`Excellent! You scored ${percentage}%`);
+                      await updateProgress(90); // Near completion
+                      goToNextSection();
+                    } else {
+                      toast.info(`You scored ${percentage}%. Review the material and try again.`);
+                    }
+                  }}
+                />
               )}
             </div>
           )}
 
           {/* REFLECTION SECTION */}
           {currentSection === 'reflection' && (
-            <div className="max-w-2xl mx-auto space-y-6">
-              <div className="text-center">
+            <div className="space-y-6">
+              <div className="text-center mb-4">
                 <h2 className="text-xl font-bold flex items-center justify-center gap-2">
-                  <Heart className="h-5 w-5 text-red-500" />
+                  <Heart className="h-5 w-5 text-rose-500" />
                   Personal Application
                 </h2>
-                <p className="text-muted-foreground">Apply this truth to your life</p>
+                <p className="text-muted-foreground">Make this truth personal to your life</p>
               </div>
 
-              <div className="space-y-4">
-                <div className="p-4 rounded-lg bg-muted/50">
-                  <h4 className="font-medium mb-3">Reflection Questions:</h4>
-                  <ul className="space-y-3 text-sm">
-                    <li className="flex items-start gap-2">
-                      <Sparkles className="h-4 w-4 text-primary mt-0.5 shrink-0" />
-                      <span>What did the Holy Spirit teach you through this study of "{lesson.title}"?</span>
-                    </li>
-                    <li className="flex items-start gap-2">
-                      <Sparkles className="h-4 w-4 text-primary mt-0.5 shrink-0" />
-                      <span>How does this belief change your understanding of God?</span>
-                    </li>
-                    <li className="flex items-start gap-2">
-                      <Sparkles className="h-4 w-4 text-primary mt-0.5 shrink-0" />
-                      <span>What specific actions will you take because of what you've learned?</span>
-                    </li>
-                    <li className="flex items-start gap-2">
-                      <Sparkles className="h-4 w-4 text-primary mt-0.5 shrink-0" />
-                      <span>Who can you share this truth with this week?</span>
-                    </li>
-                    <li className="flex items-start gap-2">
-                      <Sparkles className="h-4 w-4 text-primary mt-0.5 shrink-0" />
-                      <span>How does this doctrine connect to your preparation for baptism?</span>
-                    </li>
-                  </ul>
-                </div>
-
-                <div>
-                  <label className="text-sm font-medium mb-2 block flex items-center gap-2">
-                    <Pencil className="h-4 w-4" />
-                    Write your personal reflection:
-                  </label>
-                  <Textarea
-                    placeholder="What has God shown you through this lesson? How will you apply it? Be specific and personal..."
-                    value={userResponse}
-                    onChange={(e) => setUserResponse(e.target.value)}
-                    className="min-h-[150px]"
-                  />
-                  {userResponse.length > 10 && (
-                    <Button
-                      variant="outline"
-                      onClick={handleSubmit}
-                      disabled={isAnalyzing}
-                      className="mt-3"
-                    >
-                      {isAnalyzing ? (
-                        <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                      ) : (
-                        <Brain className="h-4 w-4 mr-2" />
-                      )}
-                      Get Jeeves' Encouragement
-                    </Button>
-                  )}
-                </div>
-
-                {guidance && (
-                  <div className="p-4 rounded-lg bg-violet-500/10 border border-violet-500/20">
-                    <div className="flex items-center gap-2 mb-2">
-                      <Brain className="h-4 w-4 text-violet-500" />
-                      <span className="font-medium text-sm">Jeeves says:</span>
-                    </div>
-                    <p className="text-sm whitespace-pre-wrap">{guidance.overallResponse}</p>
-                  </div>
-                )}
+              <div className="max-w-2xl mx-auto space-y-4">
+                <Card>
+                  <CardContent className="pt-6">
+                    <Label className="mb-2 block">How does this doctrine change how you see God?</Label>
+                    <Textarea 
+                      className="min-h-[100px]" 
+                      placeholder="Reflect on God's character..."
+                    />
+                  </CardContent>
+                </Card>
+                <Card>
+                  <CardContent className="pt-6">
+                    <Label className="mb-2 block">What is one practical way you can live this out this week?</Label>
+                    <Textarea 
+                      className="min-h-[100px]" 
+                      placeholder="Specific action step..."
+                    />
+                  </CardContent>
+                </Card>
               </div>
 
               <div className="flex justify-between pt-4">
@@ -1456,80 +1224,37 @@ Make questions that actually test understanding of "${lesson.title}", not generi
 
           {/* SUMMARY SECTION */}
           {currentSection === 'summary' && (
-            <div className="max-w-2xl mx-auto space-y-6">
-              <div className="text-center">
-                <div className="flex justify-center mb-4">
-                  <div className="p-4 rounded-full bg-green-500/10">
-                    <Award className="h-12 w-12 text-green-500" />
-                  </div>
-                </div>
-                <h2 className="text-2xl font-bold mb-2">Comprehensive Study Complete!</h2>
-                <p className="text-muted-foreground">
-                  You've completed an in-depth study of Fundamental Belief #{lesson.fundamental_number}
-                </p>
+            <div className="space-y-6 text-center max-w-2xl mx-auto">
+              <div className="p-6 rounded-full bg-green-100 dark:bg-green-900/20 w-fit mx-auto mb-4">
+                <Award className="h-12 w-12 text-green-600 dark:text-green-400" />
               </div>
+              
+              <h2 className="text-2xl font-bold">Lesson Completed!</h2>
+              <p className="text-muted-foreground">
+                You have completed the comprehensive study of "{lesson.title}"
+              </p>
 
-              <Card className="border-green-500/20 bg-green-500/5">
-                <CardHeader>
-                  <CardTitle className="text-lg">{lesson.title}</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-sm text-muted-foreground mb-4">{lesson.description}</p>
-
-                  <div className="space-y-3">
-                    <div>
-                      <h4 className="font-medium text-sm mb-2">What You Studied:</h4>
-                      <div className="grid grid-cols-2 gap-2 text-xs">
-                        {sectionOrder.slice(1, -1).map((section) => {
-                          const Icon = SECTION_ICONS[section];
-                          return (
-                            <div key={section} className="flex items-center gap-2 p-2 rounded bg-muted/50">
-                              <Icon className="h-3 w-3 text-green-500" />
-                              <span>{SECTION_LABELS[section]}</span>
-                              <CheckCircle2 className="h-3 w-3 text-green-500 ml-auto" />
-                            </div>
-                          );
-                        })}
-                      </div>
-                    </div>
-
-                    <div>
-                      <h4 className="font-medium text-sm mb-2">Key Scriptures Studied:</h4>
-                      <div className="flex flex-wrap gap-2">
-                        {scriptures.slice(0, 7).map((s: any, idx: number) => (
-                          <Badge key={idx} variant="outline">{getRef(s)}</Badge>
-                        ))}
-                        {scriptures.length > 7 && (
-                          <Badge variant="secondary">+{scriptures.length - 7} more</Badge>
-                        )}
-                      </div>
-                    </div>
-                  </div>
+              <Card className="mt-6 bg-primary/5 border-primary/20">
+                <CardContent className="pt-6">
+                  <h3 className="font-semibold mb-2">Your Commitment</h3>
+                  <p className="italic text-muted-foreground mb-4">
+                    "I accept this biblical truth and choose to walk in its light."
+                  </p>
+                  <Button size="lg" className="w-full" onClick={() => {
+                    updateProgress(100);
+                    toast.success("Lesson marked as complete!");
+                    onBack();
+                  }}>
+                    <CheckCircle2 className="h-4 w-4 mr-2" />
+                    Complete Lesson & Return to Track
+                  </Button>
                 </CardContent>
               </Card>
 
-              <div className="p-4 rounded-lg bg-primary/5 border border-primary/20">
-                <h4 className="font-medium mb-2 flex items-center gap-2">
-                  <Heart className="h-4 w-4 text-red-500" />
-                  My Commitment
-                </h4>
-                <p className="text-sm text-muted-foreground">
-                  I have thoroughly studied and understand the biblical teaching on "{lesson.title}."
-                  I commit to believing, living, and sharing this truth as I prepare for baptism
-                  and grow as a Seventh-day Adventist Christian.
-                </p>
-              </div>
-
-              <div className="flex flex-col sm:flex-row gap-3 justify-center pt-4">
-                <Button variant="outline" onClick={goToPrevSection}>
-                  <ArrowLeft className="h-4 w-4 mr-2" />
-                  Review Reflection
-                </Button>
-                <Button onClick={completeLesson} className="bg-green-600 hover:bg-green-700">
-                  <CheckCircle2 className="h-4 w-4 mr-2" />
-                  Mark Lesson Complete
-                </Button>
-              </div>
+              <Button variant="ghost" onClick={goToPrevSection}>
+                <ArrowLeft className="h-4 w-4 mr-2" />
+                Back to Reflection
+              </Button>
             </div>
           )}
         </CardContent>
