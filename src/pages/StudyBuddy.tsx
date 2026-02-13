@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { useTranslation } from "react-i18next";
+import i18n from "@/i18n";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { Navigation } from "@/components/Navigation";
 import { supabase } from "@/integrations/supabase/client";
@@ -386,7 +387,9 @@ export default function StudyBuddy() {
     processedRefsRef.current.add(refKey);
 
     try {
-      const chapter = await fetchChapter(ref.book, ref.chapter, "kjv");
+      const lang = i18n.language?.slice(0, 2);
+      const bibleTranslation = lang === "es" ? "rvr1960" : lang === "fr" ? "lsg" : lang === "de" ? "luther" : "kjv";
+      const chapter = await fetchChapter(ref.book, ref.chapter, bibleTranslation as any);
       const verses = chapter.verses.filter(v =>
         v.verse >= ref.verseStart && v.verse <= (ref.verseEnd || ref.verseStart)
       );
@@ -641,7 +644,9 @@ export default function StudyBuddy() {
   const loadVerses = async () => {
     setLoadingVerses(true);
     try {
-      const chapter = await fetchChapter(selectedBook, selectedChapter, "kjv");
+      const lang = i18n.language?.slice(0, 2);
+      const bibleTranslation = lang === "es" ? "rvr1960" : lang === "fr" ? "lsg" : lang === "de" ? "luther" : "kjv";
+      const chapter = await fetchChapter(selectedBook, selectedChapter, bibleTranslation);
       setVerses(chapter.verses.map(v => ({ verse: v.verse, text: v.text })));
     } catch (error) {
       console.error("Error loading verses:", error);
