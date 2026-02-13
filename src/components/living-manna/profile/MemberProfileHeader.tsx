@@ -2,7 +2,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { MapPin, Globe, Calendar, Trophy, Flame, Mail, Loader2, Users as UsersIcon } from "lucide-react";
+import { MapPin, Globe, Calendar, Trophy, Flame, Mail, Loader2, Gem, Building2 } from "lucide-react";
 import { FollowButton } from "../connect/FollowButton";
 import { useFollow } from "@/hooks/useFollow";
 import { useAuth } from "@/hooks/useAuth";
@@ -13,6 +13,12 @@ interface MemberProfileHeaderProps {
   userId: string;
   onMessage: () => void;
   messagingLoading?: boolean;
+  enhancedStats?: {
+    gemsCount: number;
+    roomsCompleted: number;
+    currentFloor: number;
+    achievementsCount: number;
+  };
 }
 
 const roleColors: Record<string, string> = {
@@ -21,7 +27,7 @@ const roleColors: Record<string, string> = {
   member: "bg-blue-500/10 text-blue-600 border-blue-500/30",
 };
 
-export function MemberProfileHeader({ profile, memberInfo, userId, onMessage, messagingLoading }: MemberProfileHeaderProps) {
+export function MemberProfileHeader({ profile, memberInfo, userId, onMessage, messagingLoading, enhancedStats }: MemberProfileHeaderProps) {
   const { user } = useAuth();
   const { followersCount, followingCount } = useFollow(userId);
   const isOwnProfile = user?.id === userId;
@@ -59,6 +65,11 @@ export function MemberProfileHeader({ profile, memberInfo, userId, onMessage, me
                   {memberInfo.role}
                 </Badge>
               )}
+              {profile.master_title && profile.master_title !== "none" && (
+                <Badge variant="outline" className="text-xs bg-primary/10 text-primary border-primary/30 capitalize">
+                  {profile.master_title} Belt
+                </Badge>
+              )}
             </div>
             {profile.bio && (
               <p className="text-sm text-muted-foreground mt-1 line-clamp-2">{profile.bio}</p>
@@ -82,8 +93,44 @@ export function MemberProfileHeader({ profile, memberInfo, userId, onMessage, me
           )}
         </div>
 
+        {/* Identity Stats Banner */}
+        <div className="flex flex-wrap items-center gap-3 mt-4 p-2.5 rounded-lg bg-card/50 border border-border/50">
+          <span className="flex items-center gap-1.5">
+            <Flame className="h-4 w-4 text-orange-500" />
+            <strong className="text-sm text-foreground">{profile.daily_study_streak || 0}</strong>
+            <span className="text-xs text-muted-foreground">Streak</span>
+          </span>
+          <div className="w-px h-5 bg-border" />
+          <span className="flex items-center gap-1.5">
+            <Trophy className="h-4 w-4 text-amber-500" />
+            <strong className="text-sm text-foreground">{profile.points || 0}</strong>
+            <span className="text-xs text-muted-foreground">XP</span>
+          </span>
+          <div className="w-px h-5 bg-border" />
+          <span className="flex items-center gap-1.5">
+            <Gem className="h-4 w-4 text-primary" />
+            <strong className="text-sm text-foreground">{enhancedStats?.gemsCount || 0}</strong>
+            <span className="text-xs text-muted-foreground">Gems</span>
+          </span>
+          <div className="w-px h-5 bg-border" />
+          <span className="flex items-center gap-1.5">
+            <Building2 className="h-4 w-4 text-purple-500" />
+            <strong className="text-sm text-foreground">{enhancedStats?.roomsCompleted || 0}</strong>
+            <span className="text-xs text-muted-foreground">Rooms</span>
+          </span>
+          {enhancedStats && enhancedStats.currentFloor > 0 && (
+            <>
+              <div className="w-px h-5 bg-border" />
+              <span className="flex items-center gap-1.5">
+                <span className="text-xs text-muted-foreground">Floor</span>
+                <strong className="text-sm text-foreground">{enhancedStats.currentFloor}</strong>
+              </span>
+            </>
+          )}
+        </div>
+
         {/* Info Row */}
-        <div className="flex flex-wrap items-center gap-x-4 gap-y-1 mt-4 text-sm text-muted-foreground">
+        <div className="flex flex-wrap items-center gap-x-4 gap-y-1 mt-3 text-sm text-muted-foreground">
           {profile.location && (
             <span className="flex items-center gap-1">
               <MapPin className="h-3.5 w-3.5" /> {profile.location}
@@ -101,24 +148,10 @@ export function MemberProfileHeader({ profile, memberInfo, userId, onMessage, me
           )}
         </div>
 
-        {/* Stats */}
-        <div className="flex flex-wrap gap-4 mt-3 text-sm">
+        {/* Followers/Following */}
+        <div className="flex flex-wrap gap-4 mt-2 text-sm">
           <span><strong className="text-foreground">{followersCount}</strong> <span className="text-muted-foreground">Followers</span></span>
           <span><strong className="text-foreground">{followingCount}</strong> <span className="text-muted-foreground">Following</span></span>
-          {profile.points > 0 && (
-            <span className="flex items-center gap-1">
-              <Trophy className="h-3.5 w-3.5 text-amber-500" />
-              <strong className="text-foreground">{profile.points}</strong>
-              <span className="text-muted-foreground">Points</span>
-            </span>
-          )}
-          {profile.daily_study_streak > 0 && (
-            <span className="flex items-center gap-1">
-              <Flame className="h-3.5 w-3.5 text-orange-500" />
-              <strong className="text-foreground">{profile.daily_study_streak}</strong>
-              <span className="text-muted-foreground">Day Streak</span>
-            </span>
-          )}
         </div>
 
         {/* Ministry Tags */}
