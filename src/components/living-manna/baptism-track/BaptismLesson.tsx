@@ -17,6 +17,7 @@ import {
   Save, StickyNote, AlertCircle
 } from "lucide-react";
 import { toast } from "sonner";
+import ReactMarkdown from "react-markdown";
 import { PalacePathVisualizer } from "./PalacePathVisualizer";
 import { BaptismQuiz } from "./BaptismQuiz";
 
@@ -304,22 +305,26 @@ export function BaptismLesson({ lesson, candidateId, progress, onBack }: Baptism
   const loadTeachingContent = async () => {
     setLoadingContent(true);
     try {
+      const scriptureList = scriptures.map((s: any) => `${s.reference}: ${s.why}`).join("\n");
       const { data, error } = await supabase.functions.invoke("baptism-track-guide", {
         body: {
-          notes: `Please provide COMPREHENSIVE, IN-DEPTH teaching on "${lesson.title}" (Fundamental Belief #${lesson.fundamental_number})...`,
+          notes: `Write a comprehensive, in-depth doctrinal study on "${lesson.title}" (Fundamental Belief #${lesson.fundamental_number}). Include verse-by-verse commentary on every key passage, Christ connections, sanctuary connections, and Phototheology Palace insights.`,
           lessonId: lesson.id,
           lessonTitle: lesson.title,
           lessonPhase: 'teaching',
           mode: 'deep_dive',
-          scriptureContext: scriptures.map((s: any) => `${s.reference}: ${s.why}`).join("\n"),
+          scriptureContext: scriptureList,
         },
       });
 
       if (data?.guidance?.overallResponse) {
         setTeachingContent(data.guidance.overallResponse);
+      } else {
+        setTeachingContent(`# ${lesson.title}\n\n${lesson.description}\n\nContent is being prepared. Ask Jeeves below to explore this topic.`);
       }
     } catch (error) {
-      setTeachingContent(`# ${lesson.title}\n\n${lesson.description}\n\nClick "Ask Jeeves" below to explore this topic with your AI guide.`);
+      console.error("Teaching content error:", error);
+      setTeachingContent(`# ${lesson.title}\n\n${lesson.description}\n\nContent could not be loaded. Ask Jeeves below to explore this topic.`);
     } finally {
       setLoadingContent(false);
     }
@@ -330,11 +335,12 @@ export function BaptismLesson({ lesson, candidateId, progress, onBack }: Baptism
     try {
       const { data, error } = await supabase.functions.invoke("baptism-track-guide", {
         body: {
-          notes: `Please provide a thorough OBJECTIONS & ANSWERS section...`,
+          notes: `Write a thorough objections & answers section for "${lesson.title}" (Fundamental Belief #${lesson.fundamental_number}). Present 5-7 common objections, steelman each one, then refute with multiple KJV scriptures and logical reasoning. Include what other denominations believe and how to share this truth.`,
           lessonId: lesson.id,
           lessonTitle: lesson.title,
           lessonPhase: 'objections',
           mode: 'deep_dive',
+          scriptureContext: scriptures.map((s: any) => `${s.reference}: ${s.why}`).join("\n"),
         },
       });
 
@@ -342,7 +348,7 @@ export function BaptismLesson({ lesson, candidateId, progress, onBack }: Baptism
         setObjectionsContent(data.guidance.overallResponse);
       }
     } catch (error) {
-      setObjectionsContent(`Common objections to "${lesson.title}" and biblical responses...`);
+      setObjectionsContent(`## Objections & Answers\n\nContent could not be loaded. Ask Jeeves below to explore common objections.`);
     } finally {
       setLoadingContent(false);
     }
@@ -353,7 +359,7 @@ export function BaptismLesson({ lesson, candidateId, progress, onBack }: Baptism
     try {
       const { data, error } = await supabase.functions.invoke("baptism-track-guide", {
         body: {
-          notes: `Tell me the COMPLETE Adventist history and heritage...`,
+          notes: `Write the complete Adventist heritage and history of how pioneers discovered the truth of "${lesson.title}" (Fundamental Belief #${lesson.fundamental_number}). Include specific people, dates, places, quotes, and a timeline. Use vivid storytelling language.`,
           lessonId: lesson.id,
           lessonTitle: lesson.title,
           lessonPhase: 'history',
@@ -365,7 +371,7 @@ export function BaptismLesson({ lesson, candidateId, progress, onBack }: Baptism
         setHistoryContent(data.guidance.overallResponse);
       }
     } catch (error) {
-      setHistoryContent(`The Adventist understanding of "${lesson.title}" developed through careful Bible study...`);
+      setHistoryContent(`## Adventist Heritage\n\nContent could not be loaded. Ask Jeeves below to explore the history.`);
     } finally {
       setLoadingContent(false);
     }
@@ -376,7 +382,7 @@ export function BaptismLesson({ lesson, candidateId, progress, onBack }: Baptism
     try {
       const { data, error } = await supabase.functions.invoke("baptism-track-guide", {
         body: {
-          notes: `Please provide SPIRIT OF PROPHECY insights...`,
+          notes: `Write a Spirit of Prophecy insights section for "${lesson.title}" (Fundamental Belief #${lesson.fundamental_number}). Include 5-8 Ellen G. White quotations with full book/page citations, organized by theme, with explanation paragraphs after each quote and practical application.`,
           lessonId: lesson.id,
           lessonTitle: lesson.title,
           lessonPhase: 'egw',
@@ -388,7 +394,7 @@ export function BaptismLesson({ lesson, candidateId, progress, onBack }: Baptism
         setEgwContent(data.guidance.overallResponse);
       }
     } catch (error) {
-      setEgwContent(`Ellen G. White's writings provide valuable insights...`);
+      setEgwContent(`## Spirit of Prophecy Insights\n\nContent could not be loaded. Ask Jeeves below to explore Ellen White's writings.`);
     } finally {
       setLoadingContent(false);
     }
@@ -399,11 +405,12 @@ export function BaptismLesson({ lesson, candidateId, progress, onBack }: Baptism
     try {
       const { data, error } = await supabase.functions.invoke("baptism-track-guide", {
         body: {
-          notes: `Generate 7 multiple-choice quiz questions...`,
+          notes: `Generate 10 quiz questions about "${lesson.title}" (Fundamental Belief #${lesson.fundamental_number}). Mix of 6 multiple-choice and 4 fill-in-the-blank. Every explanation must quote the relevant KJV verse. Test understanding, not just memory.`,
           lessonId: lesson.id,
           lessonTitle: lesson.title,
           lessonPhase: 'quiz',
           mode: 'normal',
+          scriptureContext: scriptures.map((s: any) => `${s.reference}: ${s.why}`).join("\n"),
         },
       });
 
@@ -411,9 +418,7 @@ export function BaptismLesson({ lesson, candidateId, progress, onBack }: Baptism
         try {
           let jsonText = data.guidance.overallResponse;
           const jsonMatch = jsonText.match(/```(?:json)?\s*([\s\S]*?)```/);
-          if (jsonMatch) {
-            jsonText = jsonMatch[1];
-          }
+          if (jsonMatch) jsonText = jsonMatch[1];
           const parsed = JSON.parse(jsonText.trim());
           if (parsed.questions && Array.isArray(parsed.questions)) {
             setAiQuizQuestions(parsed.questions);
@@ -422,6 +427,10 @@ export function BaptismLesson({ lesson, candidateId, progress, onBack }: Baptism
           console.error('Failed to parse quiz questions:', parseError);
           setAiQuizQuestions(null);
         }
+      }
+      // Also try to parse from guidance.questions directly
+      if (!aiQuizQuestions && data?.guidance?.questions) {
+        setAiQuizQuestions(data.guidance.questions);
       }
     } catch (error) {
       console.error('Error loading quiz questions:', error);
@@ -918,11 +927,11 @@ export function BaptismLesson({ lesson, candidateId, progress, onBack }: Baptism
                   <p className="text-xs text-muted-foreground mt-2">This may take a moment for thorough content</p>
                 </div>
               ) : (
-                <ScrollArea className="h-[400px] pr-4">
-                  <div className="prose prose-sm max-w-none dark:prose-invert">
-                    <div className="whitespace-pre-wrap text-sm leading-relaxed">
-                      {teachingContent || lesson.description}
-                    </div>
+                <ScrollArea className="h-[500px] pr-4">
+                  <div className="prose prose-sm max-w-none dark:prose-invert prose-headings:text-foreground prose-p:text-foreground/90 prose-blockquote:border-l-primary prose-blockquote:bg-primary/5 prose-blockquote:py-2 prose-blockquote:px-4 prose-blockquote:rounded-r-lg prose-blockquote:italic prose-strong:text-primary prose-li:text-foreground/90">
+                    <ReactMarkdown>
+                      {teachingContent || lesson.description || ''}
+                    </ReactMarkdown>
                   </div>
                 </ScrollArea>
               )}
@@ -1001,11 +1010,11 @@ export function BaptismLesson({ lesson, candidateId, progress, onBack }: Baptism
                   <p className="text-muted-foreground">Loading objections and answers...</p>
                 </div>
               ) : (
-                <ScrollArea className="h-[400px] pr-4">
-                  <div className="prose prose-sm max-w-none dark:prose-invert">
-                    <div className="whitespace-pre-wrap text-sm leading-relaxed">
-                      {objectionsContent || "Click 'Ask Jeeves' below to explore common objections and biblical responses."}
-                    </div>
+                <ScrollArea className="h-[500px] pr-4">
+                  <div className="prose prose-sm max-w-none dark:prose-invert prose-headings:text-foreground prose-p:text-foreground/90 prose-blockquote:border-l-primary prose-blockquote:bg-primary/5 prose-blockquote:py-2 prose-blockquote:px-4 prose-blockquote:rounded-r-lg prose-blockquote:italic prose-strong:text-primary">
+                    <ReactMarkdown>
+                      {objectionsContent || "Content is loading..."}
+                    </ReactMarkdown>
                   </div>
                 </ScrollArea>
               )}
@@ -1065,11 +1074,11 @@ export function BaptismLesson({ lesson, candidateId, progress, onBack }: Baptism
                   <p className="text-muted-foreground">Loading Adventist history...</p>
                 </div>
               ) : (
-                <ScrollArea className="h-[450px] pr-4">
-                  <div className="prose prose-sm max-w-none dark:prose-invert">
-                    <div className="whitespace-pre-wrap text-sm leading-relaxed">
-                      {historyContent || "Click 'Ask Jeeves' to explore the Adventist history of this doctrine."}
-                    </div>
+                <ScrollArea className="h-[500px] pr-4">
+                  <div className="prose prose-sm max-w-none dark:prose-invert prose-headings:text-foreground prose-p:text-foreground/90 prose-blockquote:border-l-primary prose-blockquote:bg-primary/5 prose-blockquote:py-2 prose-blockquote:px-4 prose-blockquote:rounded-r-lg prose-blockquote:italic prose-strong:text-primary">
+                    <ReactMarkdown>
+                      {historyContent || "Content is loading..."}
+                    </ReactMarkdown>
                   </div>
                 </ScrollArea>
               )}
@@ -1111,11 +1120,11 @@ export function BaptismLesson({ lesson, candidateId, progress, onBack }: Baptism
                   <p className="text-muted-foreground">Loading Spirit of Prophecy insights...</p>
                 </div>
               ) : (
-                <ScrollArea className="h-[400px] pr-4">
-                  <div className="prose prose-sm max-w-none dark:prose-invert">
-                    <div className="whitespace-pre-wrap text-sm leading-relaxed">
-                      {egwContent || "Click 'Ask Jeeves' to explore Ellen White's writings on this doctrine."}
-                    </div>
+                <ScrollArea className="h-[500px] pr-4">
+                  <div className="prose prose-sm max-w-none dark:prose-invert prose-headings:text-foreground prose-p:text-foreground/90 prose-blockquote:border-l-purple-500 prose-blockquote:bg-purple-500/5 prose-blockquote:py-2 prose-blockquote:px-4 prose-blockquote:rounded-r-lg prose-blockquote:italic prose-strong:text-primary">
+                    <ReactMarkdown>
+                      {egwContent || "Content is loading..."}
+                    </ReactMarkdown>
                   </div>
                 </ScrollArea>
               )}
