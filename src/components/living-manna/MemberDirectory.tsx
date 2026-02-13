@@ -71,7 +71,7 @@ export function MemberDirectory({ churchId }: MemberDirectoryProps) {
     loadMembers();
   }, [churchId]);
 
-  const loadMembers = async () => {
+  const loadMembers = async (attempt = 0) => {
     try {
       // First get church members
       const { data: membersData, error: membersError } = await supabase
@@ -107,6 +107,12 @@ export function MemberDirectory({ churchId }: MemberDirectoryProps) {
 
       setMembers(mergedMembers as any);
     } catch (error: any) {
+      // Retry up to 2 times on network errors
+      if (attempt < 2 && error?.message?.includes("Failed to fetch")) {
+        console.warn(`[MemberDirectory] Retry attempt ${attempt + 1}`);
+        await new Promise(r => setTimeout(r, 1000 * (attempt + 1)));
+        return loadMembers(attempt + 1);
+      }
       toast({
         title: "Error loading members",
         description: error.message,
