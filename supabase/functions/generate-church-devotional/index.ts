@@ -112,6 +112,7 @@ OUTPUT FORMAT (JSON):
           { role: 'user', content: `Generate a ${dayOfWeek} devotional with the theme: "${dayTheme}" for ${dateStr}. Make it powerful, grounded, and mission-focused for ${churchName}. Create a UNIQUE title that hasn't been used before - something fresh and specific to the insight you'll share today.` }
         ],
         temperature: 0.8,
+        max_tokens: 8192,
       }),
     });
 

@@ -196,7 +196,7 @@ Create thoughtful, biblical content that speaks to this specific aspect of the s
           { role: "user", content: userPrompt },
         ],
         temperature: 0.8,
-        max_tokens: 2000,
+        max_tokens: 4096,
         response_format: { type: "json_object" },
       }),
     });

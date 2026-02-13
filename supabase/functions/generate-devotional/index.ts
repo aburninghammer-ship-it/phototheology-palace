@@ -561,6 +561,7 @@ Generate as a JSON array with day_number: 1.`;
               },
             ],
             tool_choice: { type: "function", function: { name: "create_devotional_days" } },
+            max_tokens: 8192,
           }),
         signal: controller.signal,
       });
