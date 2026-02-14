@@ -303,7 +303,7 @@ const QuarterlyStudy = () => {
                       <li>{t('quarterlyStudy.step4PasteBelow')}</li>
                     </ol>
                     <a
-                      href={`https://www.sabbath.school/Lesson?year=2025&quarter=4&lesson=${selectedLesson.index}`}
+                      href={`https://www.sabbath.school/Lesson?year=2026&quarter=1&lesson=${selectedLesson.index}`}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="text-sm text-primary hover:underline font-medium flex items-center gap-2"

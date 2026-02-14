@@ -1,0 +1,347 @@
+import { useState } from "react";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Badge } from "@/components/ui/badge";
+import { Loader2, BookOpen, Calendar, Sparkles, Bot, ChevronRight } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
+import { formatJeevesResponse } from "@/lib/formatJeevesResponse";
+import {
+  Q1_2026_LESSONS,
+  Q1_2026_TITLE,
+  Q1_2026_SUBTITLE,
+  Q1_2026_QUARTER,
+  Q1_2026_DESCRIPTION,
+  type QuarterlyLessonData,
+  type QuarterlyDay,
+} from "@/data/quarterlyQ1_2026";
+
+const ROOMS = [
+  "Room 1: Story Room (SR)", "Room 2: Imagination Room (IR)", "Room 3: 24FPS Room (24)",
+  "Room 4: Bible Rendered (BR)", "Room 5: Translation Room (TR)", "Room 6: Gems Room (GR)",
+  "Room 7: Observation Room (OR)", "Room 8: Def-Com Room (DC)", "Room 9: Symbols/Types (ST)",
+  "Room 10: Questions Room (QR)", "Room 11: Q&A Chains (QA)",
+  "Room 12: Nature Freestyle (NF)", "Room 13: Personal Freestyle (PF)", "Room 14: Bible Freestyle (BF)",
+  "Room 15: History Freestyle (HF)", "Room 16: Listening Room (LR)",
+  "Room 17: Concentration Room (CR)", "Room 18: Dimensions Room (DR)", "Room 19: Connect-6 (C6)",
+  "Room 20: Theme Room (TRm)", "Room 21: Time Zone (TZ)", "Room 22: Patterns Room (PRm)",
+  "Room 23: Parallels Room (P\u2016)", "Room 24: Fruit Room (FRt)",
+  "Room 25: Blue Room - Sanctuary (BL)", "Room 26: Prophecy Room (PR)", "Room 27: Three Angels (3A)",
+  "Room 28: Feasts Room (FE)", "Room 29: Christ in Every Chapter (CEC)", "Room 30: Room 66 (R66)",
+  "Room 31: Three Heavens (1H/2H/3H)", "Room 32: Eight Cycles (@)", "Room 33: Juice Room (JR)",
+  "Room 34: Fire Room (FRm)", "Room 35: Meditation Room (MR)", "Room 36: Speed Room (SRm)",
+  "Room 37: Reflexive Mastery (\u221e)"
+];
+
+const PRINCIPLES = [
+  "Literal Dimension", "Christ Dimension", "Me Dimension", "Church Dimension", "Heaven Dimension",
+  "Repeat and Enlarge", "Chain References", "Christ in All Scripture",
+  "Sanctuary Pattern", "Types and Symbols", "Seven Feasts", "Time Zones",
+  "Day-Year Principle (DY)", "@2300 (1844 IJ)", "@1260 (Papal Supremacy)",
+  "@1844 (Judgment Begins)", "@70 Weeks (Messiah)",
+  "Observation Only", "Questions Room Method", "Scripture Answers Scripture",
+  "Story Beats (3-7)", "Five Senses Imagination", "Chapter Icons",
+  "Great Controversy Wall", "Life of Christ Wall", "Sanctuary Wall",
+  "Time-Prophecy Wall", "Gospel Floor", "Heaven Ceiling",
+  "Prophecy Genre", "Parable Genre", "Epistle Genre", "History Genre",
+  "Nature Parallels", "Personal Testimony", "History Parallels",
+  "Gems (2-4 Text Combo)", "Parallels Comparison", "Fruit Test", "Three Angels' Messages"
+];
+
+interface SabbathSchoolTabProps {
+  churchId: string;
+}
+
+export function SabbathSchoolTab({ churchId }: SabbathSchoolTabProps) {
+  const { toast } = useToast();
+
+  // Find the current week's lesson
+  const getCurrentLesson = (): QuarterlyLessonData => {
+    const today = new Date();
+    const found = Q1_2026_LESSONS.find((l) => {
+      const start = new Date(l.startDate);
+      const end = new Date(l.endDate);
+      end.setHours(23, 59, 59);
+      return today >= start && today <= end;
+    });
+    return found || Q1_2026_LESSONS[0];
+  };
+
+  const [selectedLesson, setSelectedLesson] = useState<QuarterlyLessonData>(getCurrentLesson);
+  const [selectedDay, setSelectedDay] = useState<QuarterlyDay | null>(null);
+  const [selectedRoom, setSelectedRoom] = useState("");
+  const [selectedPrinciple, setSelectedPrinciple] = useState("");
+  const [analyzing, setAnalyzing] = useState(false);
+  const [jeevesResponse, setJeevesResponse] = useState<string | null>(null);
+
+  const handleLessonChange = (lessonId: string) => {
+    const lesson = Q1_2026_LESSONS.find((l) => l.id === lessonId);
+    if (lesson) {
+      setSelectedLesson(lesson);
+      setSelectedDay(null);
+      setJeevesResponse(null);
+    }
+  };
+
+  const handleDaySelect = (day: QuarterlyDay) => {
+    setSelectedDay(day);
+    setJeevesResponse(null);
+  };
+
+  const handleAnalyze = async () => {
+    if (!selectedDay) {
+      toast({ title: "Select a day first", variant: "destructive" });
+      return;
+    }
+    if (!selectedRoom && !selectedPrinciple) {
+      toast({ title: "Select a Palace Room or Principle", variant: "destructive" });
+      return;
+    }
+
+    setAnalyzing(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("jeeves", {
+        body: {
+          mode: "quarterly_analysis",
+          lessonTitle: `${selectedLesson.title} - ${selectedDay.day}: ${selectedDay.title}`,
+          dayTitle: selectedDay.title,
+          lessonContent: `Memory Text: "${selectedLesson.memoryText}" (${selectedLesson.memoryRef})\n\nScriptures: ${selectedDay.scriptures.join(", ")}\n\n${selectedDay.content}\n\nQuarter Theme: ${Q1_2026_TITLE} - ${Q1_2026_SUBTITLE}`,
+          bibleVerses: selectedDay.scriptures,
+          selectedRoom,
+          selectedPrinciple,
+        },
+      });
+
+      if (error) throw error;
+      setJeevesResponse(data?.content || JSON.stringify(data));
+      toast({ title: "Analysis complete" });
+    } catch (err: any) {
+      console.error("Analysis error:", err);
+      toast({ title: "Analysis failed", description: err.message, variant: "destructive" });
+    } finally {
+      setAnalyzing(false);
+    }
+  };
+
+  const isCurrentWeek = () => {
+    const today = new Date();
+    const start = new Date(selectedLesson.startDate);
+    const end = new Date(selectedLesson.endDate);
+    end.setHours(23, 59, 59);
+    return today >= start && today <= end;
+  };
+
+  return (
+    <div className="space-y-4">
+      {/* Quarterly Header */}
+      <Card className="border-2 border-primary/20">
+        <CardHeader className="gradient-palace text-white pb-3">
+          <div className="flex items-center justify-between flex-wrap gap-2">
+            <div>
+              <CardTitle className="font-serif text-xl">{Q1_2026_TITLE}</CardTitle>
+              <CardDescription className="text-white/90">
+                {Q1_2026_QUARTER} &middot; {Q1_2026_SUBTITLE}
+              </CardDescription>
+            </div>
+            <a
+              href="https://www.sabbath.school/LessonBook"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-sm bg-white/20 hover:bg-white/30 px-3 py-1.5 rounded-lg transition-all flex items-center gap-2"
+            >
+              <BookOpen className="h-4 w-4" />
+              Official PDF
+            </a>
+          </div>
+        </CardHeader>
+      </Card>
+
+      {/* Lesson Selector */}
+      <Card>
+        <CardContent className="p-4">
+          <div className="flex items-center gap-3 mb-3">
+            <Calendar className="h-5 w-5 text-primary" />
+            <span className="font-medium">Select Lesson</span>
+            {isCurrentWeek() && (
+              <Badge variant="secondary" className="bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">
+                This Week
+              </Badge>
+            )}
+          </div>
+          <Select value={selectedLesson.id} onValueChange={handleLessonChange}>
+            <SelectTrigger>
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {Q1_2026_LESSONS.map((lesson) => (
+                <SelectItem key={lesson.id} value={lesson.id}>
+                  Lesson {lesson.num}: {lesson.title}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </CardContent>
+      </Card>
+
+      {/* Selected Lesson Overview */}
+      <Card>
+        <CardHeader className="pb-2">
+          <CardTitle className="text-lg font-serif">
+            Lesson {selectedLesson.num}: {selectedLesson.title}
+          </CardTitle>
+          <CardDescription>{selectedLesson.dates}</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          {/* Memory Text */}
+          <div className="p-3 bg-primary/5 rounded-lg border border-primary/20">
+            <p className="text-xs font-medium text-primary mb-1">Memory Text</p>
+            <p className="text-sm italic">"{selectedLesson.memoryText}"</p>
+            <p className="text-xs text-muted-foreground mt-1">&mdash; {selectedLesson.memoryRef}</p>
+          </div>
+
+          {/* Scriptures */}
+          <div>
+            <p className="text-xs font-medium text-muted-foreground mb-1">Key Scriptures</p>
+            <div className="flex flex-wrap gap-1">
+              {selectedLesson.scriptures.map((s, i) => (
+                <Badge key={i} variant="outline" className="text-xs">
+                  {s}
+                </Badge>
+              ))}
+            </div>
+          </div>
+
+          {/* Sabbath Intro */}
+          <p className="text-sm text-muted-foreground">{selectedLesson.sabbathIntro}</p>
+        </CardContent>
+      </Card>
+
+      {/* Daily Studies */}
+      <Card>
+        <CardHeader className="pb-2">
+          <CardTitle className="text-base flex items-center gap-2">
+            <BookOpen className="h-4 w-4" />
+            Daily Study
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-2">
+            {selectedLesson.days.map((day) => (
+              <button
+                key={day.day}
+                onClick={() => handleDaySelect(day)}
+                className={`w-full text-left p-3 rounded-lg border transition-all ${
+                  selectedDay?.day === day.day
+                    ? "border-primary bg-primary/5 ring-1 ring-primary/30"
+                    : "border-border hover:border-primary/40 hover:bg-muted/50"
+                }`}
+              >
+                <div className="flex items-center justify-between">
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs font-medium text-primary">{day.day}</span>
+                      <span className="text-xs text-muted-foreground">{day.date}</span>
+                    </div>
+                    <p className="font-medium text-sm mt-0.5">{day.title}</p>
+                  </div>
+                  <ChevronRight className="h-4 w-4 text-muted-foreground" />
+                </div>
+              </button>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Selected Day Content */}
+      {selectedDay && (
+        <Card className="border-primary/20">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-base">
+              {selectedDay.day}: {selectedDay.title}
+            </CardTitle>
+            <CardDescription>
+              {selectedDay.scriptures.join(", ")}
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <p className="text-sm leading-relaxed">{selectedDay.content}</p>
+
+            {/* Palace Analysis Section */}
+            <div className="border-t pt-4 space-y-3">
+              <div className="flex items-center gap-2">
+                <Bot className="h-5 w-5 text-primary" />
+                <span className="font-medium text-sm">Amplify with Palace Principles</span>
+              </div>
+
+              <div className="grid sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="text-xs font-medium mb-1 block">Palace Room</label>
+                  <Select value={selectedRoom} onValueChange={setSelectedRoom}>
+                    <SelectTrigger className="text-sm">
+                      <SelectValue placeholder="Choose a room..." />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {ROOMS.map((room) => (
+                        <SelectItem key={room} value={room}>{room}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div>
+                  <label className="text-xs font-medium mb-1 block">Principle Lens</label>
+                  <Select value={selectedPrinciple} onValueChange={setSelectedPrinciple}>
+                    <SelectTrigger className="text-sm">
+                      <SelectValue placeholder="Choose a lens..." />
+                    </SelectTrigger>
+                    <SelectContent className="max-h-[300px]">
+                      {PRINCIPLES.map((p) => (
+                        <SelectItem key={p} value={p}>{p}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+
+              <Button
+                onClick={handleAnalyze}
+                disabled={analyzing || (!selectedRoom && !selectedPrinciple)}
+                className="w-full gradient-royal text-white"
+                size="sm"
+              >
+                {analyzing ? (
+                  <>
+                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                    Analyzing...
+                  </>
+                ) : (
+                  <>
+                    <Sparkles className="h-4 w-4 mr-2" />
+                    Apply Framework
+                  </>
+                )}
+              </Button>
+
+              {/* Jeeves Response */}
+              {jeevesResponse && (
+                <ScrollArea className="h-[400px]">
+                  <div className="p-4 bg-gradient-to-br from-primary/5 to-secondary/5 rounded-xl border-2 border-primary/30">
+                    <div className="flex items-center gap-2 mb-3">
+                      <Bot className="h-5 w-5 text-primary" />
+                      <span className="font-semibold text-sm">Jeeves Analysis</span>
+                    </div>
+                    <div className="prose prose-sm max-w-none">
+                      {formatJeevesResponse(jeevesResponse)}
+                    </div>
+                  </div>
+                </ScrollArea>
+              )}
+            </div>
+          </CardContent>
+        </Card>
+      )}
+    </div>
+  );
+}

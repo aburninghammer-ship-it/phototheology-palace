@@ -9,6 +9,7 @@ import { SermonStudyUploader } from "./SermonStudyUploader";
 import { WeeklyMemoryVerse } from "./learn/WeeklyMemoryVerse";
 import { PersonalMemoryVerses } from "./learn/PersonalMemoryVerses";
 import { StudyThreads } from "./learn/StudyThreads";
+import { SabbathSchoolTab } from "./learn/SabbathSchoolTab";
 import { useChurchMembership } from "@/hooks/useChurchMembership";
 import { useSubscription } from "@/hooks/useSubscription";
 
@@ -36,8 +37,12 @@ export function LearnTab({ churchId }: LearnTabProps) {
         </CardHeader>
       </Card>
 
-      <Tabs defaultValue="weekly-study" className="space-y-4">
+      <Tabs defaultValue="sabbath-school" className="space-y-4">
         <TabsList className="bg-card/50 backdrop-blur flex-wrap h-auto gap-1 p-1 border border-border/50">
+          <TabsTrigger value="sabbath-school" className="gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
+            <School className="h-4 w-4" />
+            Sabbath School
+          </TabsTrigger>
           <TabsTrigger value="weekly-study" className="gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
             <BookOpen className="h-4 w-4" />
             Weekly Study
@@ -66,11 +71,11 @@ export function LearnTab({ churchId }: LearnTabProps) {
             <BookMarked className="h-4 w-4" />
             Study Threads
           </TabsTrigger>
-          <TabsTrigger value="sabbath-school" className="gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
-            <School className="h-4 w-4" />
-            Sabbath School
-          </TabsTrigger>
         </TabsList>
+
+        <TabsContent value="sabbath-school">
+          <SabbathSchoolTab churchId={churchId} />
+        </TabsContent>
 
         <TabsContent value="weekly-study">
           <StudyFeed churchId={churchId} />
@@ -103,22 +108,6 @@ export function LearnTab({ churchId }: LearnTabProps) {
           <StudyThreads churchId={churchId} />
         </TabsContent>
 
-        <TabsContent value="sabbath-school">
-          <Card variant="glass">
-            <CardHeader>
-              <div className="flex items-center gap-2">
-                <School className="h-6 w-6 text-primary" />
-                <CardTitle>Sabbath School</CardTitle>
-              </div>
-              <CardDescription>
-                Weekly Sabbath School lessons, discussions, and study materials for your congregation.
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="text-muted-foreground text-sm">
-              Sabbath School content coming soon. This space will host quarterly lessons, discussion guides, and class resources.
-            </CardContent>
-          </Card>
-        </TabsContent>
       </Tabs>
     </div>
   );
