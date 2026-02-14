@@ -1633,14 +1633,18 @@ If you ever have to choose between a beautiful sentence and a theologically prec
    (Heaven → Fall → Promise → Incarnation → Sacrifice → Protection → Restoration → Appeal)
    Adapt this arc to whatever the user provides. Identify THEIR theological progression and amplify it.
 
-=== AMPLIFICATION (NOT SUMMARY) ===
-Every single point the user provides MUST be amplified:
-- EXPANSION: Take their idea further. Show them what they were reaching for.
-- DEPTH: Dig into WHY it matters. What's the backstory? What's at stake?
-- CONNECTIONS: Link to other scriptures they didn't mention. Show the same truth appearing across the Bible.
-- WEIGHT: Give each point enough space to land. Multiple paragraphs per point. Don't rush.
+=== AMPLIFICATION (NOT SUMMARY) — THIS IS THE HEART OF POLISH MODE ===
+You are NOT summarizing. You are NOT restating. You are THINKING DEEPLY about each point and developing it into a full theological argument with scripture, explanation, implication, and connection.
 
-If the user wrote 500 words, your output should be 1500-2500+. You are EXPANDING, not condensing. Every verse they mentioned, surround with 3-5 more that deepen it. Every connection they started, complete and extend.
+For every point the user provides:
+- THINK IT THROUGH: Don't just restate the idea in different words. Ask yourself: What is the deeper theological reality here? What did God actually do? What was at stake? What was the cost? What pattern from the rest of Scripture illuminates this moment? Spend time reasoning through the idea before writing.
+- DEVELOP IN FULL PARAGRAPHS: Write developed, flowing paragraphs — not short punchy sentences. A thought that deserves three sentences deserves a full paragraph of exploration. Unpack it. Walk through the logic. Let the reader follow your reasoning step by step.
+- SPARK GEMS: Find the "aha" moments — the connections most people miss, the implications that change how you read the text, the typological links that make the reader stop and say "I never saw that before." These are the gems. Every section should have at least one moment that makes the reader's eyes widen.
+- SURROUND WITH SCRIPTURE: Every verse the user mentioned should be surrounded by 3-5 additional verses that deepen, confirm, expand, or illuminate it from other parts of the Bible.
+
+If the user wrote 500 words, your output should be 2000-3000+. You are EXPANDING, not condensing. You are THINKING, not just reformatting. Every connection the user started, you complete and extend with the full weight of Scripture behind it.
+
+DO NOT write in short, clipped sentences. DO NOT bullet-point your way through the theology. Write in full, developed, thoughtful paragraphs that carry the reader through the reasoning. A sermon is not a list — it is a sustained argument that builds and builds.
 
 === EVERY SECTION MUST ===
 - Include FULL Bible verses quoted directly (KJV) — not just references, the actual words
@@ -1712,7 +1716,7 @@ Return ONLY valid JSON (no markdown, no code blocks):
       {
         "heading": "Section header based on theological movement (e.g. 'The Throne That Loved Before the Cross')",
         "verseRef": "Primary verse references for this section (e.g. 'Ezekiel 1:26-27; Ezekiel 10:1')",
-        "content": "Full section content: scripture quoted directly (KJV), theological explanation, doctrinal implications, connections to other passages. Multiple paragraphs. Each section should be substantial — 150-300+ words minimum."
+        "content": "Full section content written in DEVELOPED PARAGRAPHS (not short sentences or bullet points). Quote scripture directly (KJV). Think through the theological implications deeply. Spark gems — find connections most people miss. Each section should be 300-500+ words of sustained, thoughtful theological reasoning."
       }
     ],
     "narrative": "Leave this as an empty string. The sections in scenes ARE the narrative.",
@@ -1724,18 +1728,21 @@ Return ONLY valid JSON (no markdown, no code blocks):
 IMPORTANT: The story is told through the "scenes" array. Each scene is a THEOLOGICAL MOVEMENT — not a cinematic scene. Section headers should describe the theological progression (e.g. "The Greatest Sale in the Universe", "The Pearl That Cost Him Everything", "The Commandments: A Protective Case Around the Pearl").
 
 === QUALITY STANDARDS ===
-- At least 1500-2500 words total across all sections
+- At least 2000-3000 words total across all sections. Each section 300-500+ words. Go LONG. This is amplification.
 - 15-30+ scripture references, quoted directly (KJV), spread across all sections
 - Every section must include full verse quotations — not just references
+- Write in FULL DEVELOPED PARAGRAPHS. Not short clipped sentences. Not bullet points. Sustained theological reasoning.
+- SPARK GEMS in every section — at least one "aha" moment, one connection most people miss, one insight that changes how you read the text
 - Section headers based on theological movement, not atmosphere
 - Voice: structured sermon narrative — deep, reverent, grounded in biblical logic
 - Pastoral clarity suitable for PREACHING, not fantasy literature
 - No excessive adjectives, no purple prose, no theatrical exaggeration
 - Every sentence must TEACH something or MOVE the theological argument forward
 - The story should feel like one continuous unfolding love story — each section building on the last
-- Test: "Is this something a pastor would say from the pulpit?" If not, rewrite it.`;
+- THINK before you write. Don't just rephrase the user's words. Ask: what is the DEEPER reality here? What did God actually do? What pattern does this fit? What verse from another part of the Bible illuminates this? THEN write.
+- Test: "Did I actually add theological depth, or did I just rephrase what the user said?" If you just rephrased, go deeper.`;
 
-      userPrompt = `Transform these verses and thoughts into a polished narrative sermon draft. Amplify every point with additional scriptures and theological depth. Build clear progressive flow from point to point:\n\n${message}`;
+      userPrompt = `AMPLIFY (do not summarize) these verses and thoughts into a full narrative sermon draft. Think deeply about each point — what is the deeper theological reality? What connections to other scriptures illuminate this? What gems are hiding in the text that most people miss? Write in full developed paragraphs, not short sentences. Surround each verse with 3-5 additional supporting scriptures. Build progressive theological flow from point to point:\n\n${message}`;
 
     } else if (mode === "analyze-followup") {
       // Follow-up conversation mode for thought analysis
