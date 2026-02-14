@@ -182,7 +182,7 @@ const Polish = () => {
                   ) : (
                     <span className="flex items-center gap-2">
                       <Film className="w-5 h-5" />
-                      Polish My Sermon
+                      Polish
                     </span>
                   )}
                 </Button>
