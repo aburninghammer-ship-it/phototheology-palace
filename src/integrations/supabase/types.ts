@@ -8944,6 +8944,45 @@ export type Database = {
         }
         Relationships: []
       }
+      polish_stories: {
+        Row: {
+          closing_reflection: string | null
+          created_at: string
+          id: string
+          input_text: string
+          narrative: string | null
+          scenes: Json | null
+          tagline: string | null
+          title: string | null
+          user_id: string
+          verses_used: string[] | null
+        }
+        Insert: {
+          closing_reflection?: string | null
+          created_at?: string
+          id?: string
+          input_text: string
+          narrative?: string | null
+          scenes?: Json | null
+          tagline?: string | null
+          title?: string | null
+          user_id: string
+          verses_used?: string[] | null
+        }
+        Update: {
+          closing_reflection?: string | null
+          created_at?: string
+          id?: string
+          input_text?: string
+          narrative?: string | null
+          scenes?: Json | null
+          tagline?: string | null
+          title?: string | null
+          user_id?: string
+          verses_used?: string[] | null
+        }
+        Relationships: []
+      }
       practice_schedules: {
         Row: {
           adjusts_to_progress: boolean | null
