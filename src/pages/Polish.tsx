@@ -131,58 +131,148 @@ const Polish = () => {
     setShowAddition(false);
   };
 
-  /** Render manuscript with rich formatting: **bold**, *italic*, and Scripture blocks */
+  /** Render manuscript with rich formatting: **bold**, *italic*, headings, and Scripture blocks */
   const renderManuscript = (text: string) => {
     const paragraphs = text.split("\n\n").filter(p => p.trim());
-    return paragraphs.map((para, i) => {
-      const isScripture = para.trim().startsWith('"') && para.includes('(') && para.includes(')');
-
-      // Process inline formatting: **bold** and *italic*
-      const formatText = (raw: string) => {
-        // First pass: bold
-        const boldParts = raw.split(/(\*\*[^*]+\*\*)/g);
-        return boldParts.map((part, j) => {
-          if (part.startsWith("**") && part.endsWith("**")) {
+    
+    // Process inline formatting: **bold** and *italic*
+    const formatText = (raw: string) => {
+      const boldParts = raw.split(/(\*\*[^*]+\*\*)/g);
+      return boldParts.map((part, j) => {
+        if (part.startsWith("**") && part.endsWith("**")) {
+          return (
+            <strong key={j} className="text-foreground font-bold">
+              {part.slice(2, -2)}
+            </strong>
+          );
+        }
+        const italicParts = part.split(/(\*[^*]+\*)/g);
+        return italicParts.map((ip, k) => {
+          if (ip.startsWith("*") && ip.endsWith("*")) {
             return (
-              <strong key={j} className="text-foreground font-bold">
-                {part.slice(2, -2)}
-              </strong>
+              <em key={`${j}-${k}`} className="text-primary/80 italic">
+                {ip.slice(1, -1)}
+              </em>
             );
           }
-          // Second pass: italic within non-bold segments
-          const italicParts = part.split(/(\*[^*]+\*)/g);
-          return italicParts.map((ip, k) => {
-            if (ip.startsWith("*") && ip.endsWith("*")) {
-              return (
-                <em key={`${j}-${k}`} className="text-primary/80 italic">
-                  {ip.slice(1, -1)}
-                </em>
-              );
-            }
-            return <span key={`${j}-${k}`}>{ip}</span>;
-          });
+          return <span key={`${j}-${k}`}>{ip}</span>;
         });
-      };
+      });
+    };
 
+    const sectionColors = [
+      'from-palace-purple/10 to-palace-blue/5 border-palace-purple/30',
+      'from-palace-blue/10 to-palace-teal/5 border-palace-blue/30',
+      'from-palace-teal/10 to-palace-green/5 border-palace-teal/30',
+      'from-palace-orange/10 to-palace-pink/5 border-palace-orange/30',
+      'from-palace-pink/10 to-palace-purple/5 border-palace-pink/30',
+      'from-palace-green/10 to-palace-blue/5 border-palace-green/30',
+    ];
+    const sectionEmojis = ['📖', '✝️', '🔥', '💎', '🌟', '⚖️', '🕊️', '👑'];
+
+    let sectionIndex = 0;
+    const elements: JSX.Element[] = [];
+    let currentSectionContent: JSX.Element[] = [];
+    let currentHeading = "";
+
+    const flushSection = () => {
+      if (currentSectionContent.length > 0) {
+        const colorClass = sectionColors[sectionIndex % sectionColors.length];
+        const emoji = sectionEmojis[sectionIndex % sectionEmojis.length];
+        
+        if (currentHeading) {
+          elements.push(
+            <motion.div
+              key={`section-${sectionIndex}`}
+              initial={{ opacity: 0, y: 15 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: sectionIndex * 0.1, duration: 0.4 }}
+              className={`rounded-xl border backdrop-blur-sm overflow-hidden bg-gradient-to-br ${colorClass}`}
+            >
+              <div className="px-5 py-3 bg-background/40 border-b border-inherit">
+                <h3 className="text-lg md:text-xl font-serif font-bold text-foreground flex items-center gap-2.5">
+                  <span className="text-xl">{emoji}</span>
+                  {currentHeading}
+                </h3>
+              </div>
+              <div className="p-5 md:p-6 space-y-4">
+                {currentSectionContent}
+              </div>
+            </motion.div>
+          );
+        } else {
+          elements.push(
+            <div key={`section-${sectionIndex}`} className="space-y-4">
+              {currentSectionContent}
+            </div>
+          );
+        }
+        sectionIndex++;
+        currentSectionContent = [];
+        currentHeading = "";
+      }
+    };
+
+    paragraphs.forEach((para, i) => {
+      const trimmed = para.trim();
+
+      // Detect markdown headings
+      const h2Match = trimmed.match(/^##\s+(.+)/);
+      const h3Match = trimmed.match(/^###\s+(.+)/);
+
+      if (h2Match) {
+        flushSection();
+        currentHeading = h2Match[1].replace(/\*\*/g, '');
+        return;
+      }
+
+      if (h3Match) {
+        currentSectionContent.push(
+          <h4 key={`h3-${i}`} className="text-base font-bold text-primary flex items-center gap-2 mt-2">
+            <span className="w-1.5 h-1.5 rounded-full bg-primary" />
+            {h3Match[1].replace(/\*\*/g, '')}
+          </h4>
+        );
+        return;
+      }
+
+      // Detect scripture blocks
+      const isScripture = trimmed.startsWith('"') && trimmed.includes('(') && trimmed.includes(')');
       if (isScripture) {
-        return (
+        currentSectionContent.push(
           <blockquote
-            key={i}
-            className="my-6 px-5 py-4 rounded-lg border-l-4 border-primary/40 bg-primary/5 backdrop-blur-sm"
+            key={`bq-${i}`}
+            className="my-3 px-5 py-4 rounded-lg border-l-4 border-primary/40 bg-primary/5 backdrop-blur-sm shadow-sm"
           >
-            <p className="text-foreground/90 leading-[1.9] text-base md:text-lg italic">
+            <p className="text-foreground/90 leading-[1.9] text-base italic font-serif">
               {formatText(para)}
             </p>
           </blockquote>
         );
+        return;
       }
 
-      return (
-        <p key={i} className="text-foreground/90 leading-[1.9] mb-5 last:mb-0 text-base md:text-lg">
+      // Detect bullet/list items
+      if (trimmed.startsWith('- ') || trimmed.startsWith('• ')) {
+        currentSectionContent.push(
+          <div key={`li-${i}`} className="flex items-start gap-2.5 pl-1">
+            <span className="mt-2 w-1.5 h-1.5 rounded-full bg-primary/60 shrink-0" />
+            <p className="text-foreground/90 leading-[1.8] text-base">{formatText(trimmed.slice(2))}</p>
+          </div>
+        );
+        return;
+      }
+
+      // Regular paragraph
+      currentSectionContent.push(
+        <p key={`p-${i}`} className="text-foreground/90 leading-[1.9] text-base md:text-lg">
           {formatText(para)}
         </p>
       );
     });
+
+    flushSection();
+    return elements;
   };
 
   return (
@@ -286,23 +376,23 @@ const Polish = () => {
               className="space-y-6"
             >
               {/* Title & Tagline */}
-              <div className="text-center space-y-2">
-                <h2 className="text-3xl md:text-4xl font-serif font-bold text-foreground leading-tight">
+              <div className="text-center space-y-3 mb-2">
+                <div className="inline-block px-4 py-1.5 rounded-full bg-primary/10 border border-primary/20">
+                  <span className="text-xs font-medium text-primary tracking-wider uppercase">Manuscript</span>
+                </div>
+                <h2 className="text-3xl md:text-4xl font-serif font-bold text-foreground leading-tight bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text">
                   {result.title}
                 </h2>
-                <p className="text-lg text-primary italic">
-                  {result.tagline}
+                <p className="text-lg text-primary/80 italic font-serif">
+                  "{result.tagline}"
                 </p>
+                <div className="w-16 h-0.5 mx-auto bg-gradient-to-r from-transparent via-primary/40 to-transparent" />
               </div>
 
-              {/* The Manuscript */}
-              <Card className="border-primary/15 bg-card/40 backdrop-blur-md shadow-lg">
-                <CardContent className="p-6 md:p-10">
-                  <div className="max-w-none">
-                    {renderManuscript(getManuscriptText())}
-                  </div>
-                </CardContent>
-              </Card>
+              {/* The Manuscript — glass sections */}
+              <div className="space-y-5">
+                {renderManuscript(getManuscriptText())}
+              </div>
 
               {/* Add to Manuscript */}
               {showAddition ? (
