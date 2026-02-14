@@ -21,13 +21,28 @@ export default function JoinChurch() {
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
 
-  // Read code from URL on mount
+  const [autoSubmitted, setAutoSubmitted] = useState(false);
+
+  // Read code from URL on mount and auto-submit if user is logged in
   useEffect(() => {
     const codeFromUrl = searchParams.get('code');
     if (codeFromUrl) {
       setInvitationCode(codeFromUrl.toUpperCase());
     }
   }, [searchParams]);
+
+  // Auto-submit when user is logged in and code is present from URL
+  useEffect(() => {
+    const codeFromUrl = searchParams.get('code');
+    if (user && codeFromUrl && !autoSubmitted && !loading && !success) {
+      setAutoSubmitted(true);
+      // Trigger form submission programmatically
+      const form = document.getElementById('join-church-form') as HTMLFormElement;
+      if (form) {
+        form.requestSubmit();
+      }
+    }
+  }, [user, searchParams, autoSubmitted, loading, success]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -164,7 +179,7 @@ export default function JoinChurch() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form id="join-church-form" onSubmit={handleSubmit} className="space-y-4">
             <div>
               <Label htmlFor="invitation-code">{t('church.invitationCode')}</Label>
               <Input

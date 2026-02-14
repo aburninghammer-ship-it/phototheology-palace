@@ -191,7 +191,7 @@ export function SabbathSchoolTab({ churchId }: SabbathSchoolTabProps) {
           <CardTitle className="text-lg font-serif">
             Lesson {selectedLesson.num}: {selectedLesson.title}
           </CardTitle>
-          <CardDescription>{selectedLesson.dates}</CardDescription>
+          <CardDescription>{selectedLesson.startDate} – {selectedLesson.endDate}</CardDescription>
         </CardHeader>
         <CardContent className="space-y-3">
           {/* Memory Text */}
