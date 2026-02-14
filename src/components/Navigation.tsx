@@ -1,7 +1,7 @@
 import { useLayoutEffect, useRef, useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { Building2, Sparkles, Users, User, CreditCard, LogOut, MessageCircle, BookOpen, Calendar, Image, Search, Video, Sword, Crown, Shield, Brain, Lightbulb, Zap, Trophy, MessageSquare, Target, StickyNote, Radio, Church, GraduationCap, Award, Gamepad2, BarChart3, Archive, Library, Layers, Network, Home, Heart, Gem, FileImage, FolderOpen, Globe } from "lucide-react";
+import { Building2, Columns2, Sparkles, Users, User, CreditCard, LogOut, MessageCircle, BookOpen, Calendar, Image, Search, Video, Sword, Crown, Shield, Brain, Lightbulb, Zap, Trophy, MessageSquare, Target, StickyNote, Radio, Church, GraduationCap, Award, Gamepad2, BarChart3, Archive, Library, Layers, Network, Home, Heart, Gem, FileImage, FolderOpen, Globe } from "lucide-react";
 import { DraggableNavTabs } from "@/components/navigation/DraggableNavTabs";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
@@ -172,17 +172,17 @@ export const Navigation = () => {
                 </Button>
               )}
 
-              {/* Church Admin Link - only for church admins */}
-              {user && churchRole === "admin" && (
+              {/* Workspace Link - desktop only */}
+              {user && (
                 <Button
                   variant="ghost"
                   size="sm"
                   asChild
-                  className="hidden md:flex text-emerald-500 hover:text-emerald-600 hover:bg-emerald-500/10"
+                  className="hidden lg:flex text-primary hover:text-primary/80 hover:bg-primary/10"
                 >
-                  <Link to="/church-admin">
-                    <Building2 className="h-4 w-4 mr-1" />
-                    <span>{t('nav.churchAdmin')}</span>
+                  <Link to="/workspace">
+                    <Columns2 className="h-4 w-4 mr-1" />
+                    <span>Workspace</span>
                   </Link>
                 </Button>
               )}
