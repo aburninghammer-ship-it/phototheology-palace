@@ -198,6 +198,32 @@ export function useDevotionals() {
     },
   });
 
+  // Update a plan's title/theme
+  const updatePlan = useMutation({
+    mutationFn: async (params: { planId: string; title: string; theme: string }) => {
+      const { error } = await supabase
+        .from("devotional_plans")
+        .update({ title: params.title, theme: params.theme })
+        .eq("id", params.planId);
+
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["devotional-plans"] });
+      toast({
+        title: "Devotional Updated",
+        description: "Title and theme have been saved.",
+      });
+    },
+    onError: (error) => {
+      toast({
+        title: "Error updating devotional",
+        description: error.message,
+        variant: "destructive",
+      });
+    },
+  });
+
   // Delete a plan
   const deletePlan = useMutation({
     mutationFn: async (planId: string) => {
@@ -268,6 +294,7 @@ export function useDevotionals() {
     plans,
     plansLoading,
     createPlan,
+    updatePlan,
     generateDevotional,
     extendPlan,
     deletePlan,

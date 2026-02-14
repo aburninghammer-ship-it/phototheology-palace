@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { Book, Plus, Sparkles, Clock, Calendar, ChevronRight, Trash2, Gift, Heart, Star, Zap, Users, UserPlus, GraduationCap, Home, HeartHandshake, Sun, Church, GraduationCap as StudyIcon, MessageSquare } from "lucide-react";
+import { Book, Plus, Sparkles, Clock, Calendar, ChevronRight, Trash2, Gift, Heart, Star, Zap, Users, UserPlus, GraduationCap, Home, HeartHandshake, Sun, Church, GraduationCap as StudyIcon, MessageSquare, Pencil } from "lucide-react";
 import { TodaysStudy } from "@/components/studies/TodaysStudy";
 import { HowItWorksDialog } from "@/components/HowItWorksDialog";
 import { devotionalsSteps } from "@/config/howItWorksSteps";
@@ -39,6 +39,15 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { format } from "date-fns";
 
 const formatLabels: Record<string, { label: string; color: string; gradient: string }> = {
@@ -66,7 +75,7 @@ export default function Devotionals() {
   const { user } = useAuth();
   const { preferences } = useUserPreferences();
   const navigate = useNavigate();
-  const { plans, plansLoading, deletePlan } = useDevotionals();
+  const { plans, plansLoading, deletePlan, updatePlan } = useDevotionals();
   const { profiles, isLoading: profilesLoading, deleteProfile } = useDevotionalProfiles();
   const { recipients: smsRecipients } = useSMSRecipients();
   const [showWizard, setShowWizard] = useState(false);
@@ -78,6 +87,7 @@ export default function Devotionals() {
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [deleteProfileId, setDeleteProfileId] = useState<string | null>(null);
   const [editingProfile, setEditingProfile] = useState<DevotionalProfile | null>(null);
+  const [editingPlan, setEditingPlan] = useState<{ id: string; title: string; theme: string } | null>(null);
 
   const activePlans = plans?.filter((p) => p.status === "active") || [];
   const completedPlans = plans?.filter((p) => p.status === "completed") || [];
@@ -358,6 +368,17 @@ export default function Devotionals() {
                     </div>
                   </CardContent>
                   <div className="px-6 pb-4 flex gap-2 flex-wrap">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setEditingPlan({ id: plan.id, title: plan.title, theme: plan.theme });
+                      }}
+                    >
+                      <Pencil className="h-4 w-4 mr-1" />
+                      {t('devotionals.edit', 'Edit')}
+                    </Button>
                     <ShareDevotionalDialog plan={plan} />
                     <ExtendDevotionalDialog plan={plan} />
                     <Button
@@ -715,6 +736,48 @@ export default function Devotionals() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {/* Edit Devotional Dialog */}
+      <Dialog open={!!editingPlan} onOpenChange={() => setEditingPlan(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Edit Devotional</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 py-2">
+            <div className="space-y-2">
+              <Label htmlFor="edit-title">Title</Label>
+              <Input
+                id="edit-title"
+                value={editingPlan?.title ?? ""}
+                onChange={(e) => setEditingPlan(prev => prev ? { ...prev, title: e.target.value } : null)}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="edit-theme">Theme</Label>
+              <Input
+                id="edit-theme"
+                value={editingPlan?.theme ?? ""}
+                onChange={(e) => setEditingPlan(prev => prev ? { ...prev, theme: e.target.value } : null)}
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setEditingPlan(null)}>
+              Cancel
+            </Button>
+            <Button
+              onClick={() => {
+                if (editingPlan) {
+                  updatePlan.mutate({ planId: editingPlan.id, title: editingPlan.title, theme: editingPlan.theme });
+                  setEditingPlan(null);
+                }
+              }}
+            >
+              Save
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       {/* Quick Devotion Modal */}
       {showQuickDevotion && (
