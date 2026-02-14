@@ -12,6 +12,7 @@ import { useDirectMessagesContext } from "@/contexts/DirectMessagesContext";
 import { useAuth } from "@/hooks/useAuth";
 import { FollowButton } from "./connect/FollowButton";
 import { MemberProfileView } from "./profile/MemberProfileView";
+import { useChurchActiveUsers } from "@/hooks/useChurchActiveUsers";
 
 interface Member {
   id: string;
@@ -43,6 +44,8 @@ export function MemberDirectory({ churchId }: MemberDirectoryProps) {
   const { toast } = useToast();
   const { user } = useAuth();
   const { startConversation, setActiveConversationId } = useDirectMessagesContext();
+  const { liveMembers } = useChurchActiveUsers(churchId);
+  const liveUserIds = new Set(liveMembers.map((m) => m.id));
 
   const handleMessage = async (memberId: string) => {
     if (!memberId || memberId === user?.id) return;
@@ -128,13 +131,19 @@ export function MemberDirectory({ churchId }: MemberDirectoryProps) {
     }
   };
 
-  const filteredMembers = members.filter((member) => {
-    const name = member.profiles?.display_name || member.profiles?.username || "";
-    const matchesSearch = name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      member.profiles?.bio?.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesRole = !selectedRole || member.role === selectedRole;
-    return matchesSearch && matchesRole;
-  });
+  const filteredMembers = members
+    .filter((member) => {
+      const name = member.profiles?.display_name || member.profiles?.username || "";
+      const matchesSearch = name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        member.profiles?.bio?.toLowerCase().includes(searchQuery.toLowerCase());
+      const matchesRole = !selectedRole || member.role === selectedRole;
+      return matchesSearch && matchesRole;
+    })
+    .sort((a, b) => {
+      const aOnline = liveUserIds.has(a.user_id) ? 1 : 0;
+      const bOnline = liveUserIds.has(b.user_id) ? 1 : 0;
+      return bOnline - aOnline;
+    });
 
   const roles = ["admin", "leader", "member"];
   const roleColors: Record<string, string> = {
@@ -219,12 +228,17 @@ export function MemberDirectory({ churchId }: MemberDirectoryProps) {
                 <Card key={member.id} className="hover:shadow-md transition-shadow cursor-pointer" onClick={() => setSelectedMemberId(member.user_id)}>
                   <CardContent className="p-4">
                     <div className="flex items-start gap-3">
-                      <Avatar className="h-12 w-12 border-2 border-primary/20">
-                        <AvatarImage src={member.profiles?.avatar_url || undefined} />
-                        <AvatarFallback className="bg-primary/10 text-primary">
-                          {(member.profiles?.display_name || member.profiles?.username || "?")[0]?.toUpperCase()}
-                        </AvatarFallback>
-                      </Avatar>
+                      <div className="relative shrink-0">
+                        <Avatar className="h-12 w-12 border-2 border-primary/20">
+                          <AvatarImage src={member.profiles?.avatar_url || undefined} />
+                          <AvatarFallback className="bg-primary/10 text-primary">
+                            {(member.profiles?.display_name || member.profiles?.username || "?")[0]?.toUpperCase()}
+                          </AvatarFallback>
+                        </Avatar>
+                        {liveUserIds.has(member.user_id) && (
+                          <span className="absolute bottom-0 right-0 h-3 w-3 rounded-full bg-green-500 ring-2 ring-background" />
+                        )}
+                      </div>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2">
                           <h4 className="font-medium truncate">

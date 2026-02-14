@@ -19,6 +19,7 @@ import {
   BookOpen, ArrowRight, Flame, Users, Star, ExternalLink, UserSearch
 } from "lucide-react";
 import { MemberDirectory } from "./MemberDirectory";
+import { LiveMembersStrip } from "./LiveMembersStrip";
 
 interface MemberHomeProps {
   churchId: string;
@@ -106,6 +107,9 @@ export function MemberHome({ churchId, churchName = "Living Manna" }: MemberHome
       
       {/* Activity Pulse - Shows community is alive */}
       <ActivityPulse churchId={churchId} />
+
+      {/* Live Members Strip - Who's online now */}
+      <LiveMembersStrip churchId={churchId} />
 
       {/* Primary Content: This Week's Study */}
       <Card variant="glass" className="border-primary/30 bg-gradient-to-br from-primary/5 to-transparent">

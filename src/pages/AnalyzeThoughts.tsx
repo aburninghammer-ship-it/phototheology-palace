@@ -244,14 +244,14 @@ const AnalyzeThoughts = () => {
     }
   }, [input, isAnalyzing, generateSpark]);
   
-  // Auto-save input to localStorage every 15 seconds
+  // Auto-save input to localStorage every 15 seconds (only when no result yet)
   useEffect(() => {
-    if (input.trim()) {
+    if (input.trim() && !result) {
       // Clear existing timer
       if (autoSaveTimerRef.current) {
         clearTimeout(autoSaveTimerRef.current);
       }
-      
+
       // Set new timer
       autoSaveTimerRef.current = setTimeout(() => {
         try {
@@ -268,13 +268,13 @@ const AnalyzeThoughts = () => {
         }
       }, 15000); // 15 seconds
     }
-    
+
     return () => {
       if (autoSaveTimerRef.current) {
         clearTimeout(autoSaveTimerRef.current);
       }
     };
-  }, [input, loadedStudyTitle]);
+  }, [input, loadedStudyTitle, result]);
   
   // Restore draft on mount
   useEffect(() => {
