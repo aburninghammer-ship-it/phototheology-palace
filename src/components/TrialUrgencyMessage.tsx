@@ -5,6 +5,7 @@ import { X, Clock, Sparkles, ArrowRight, Zap, Star, AlertTriangle } from "lucide
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { useSubscription } from "@/hooks/useSubscription";
+import { useChurchMembership } from "@/hooks/useChurchMembership";
 import { supabase } from "@/integrations/supabase/client";
 import { useEventTracking } from "@/hooks/useEventTracking";
 
@@ -92,6 +93,7 @@ export function TrialUrgencyMessage() {
   const navigate = useNavigate();
   const { user } = useAuth();
   const { subscription, loading: subscriptionLoading } = useSubscription();
+  const { isMember: isChurchMember } = useChurchMembership();
   const { trackPaywallHit, trackUpgradeClick } = useEventTracking();
 
   useEffect(() => {
@@ -212,7 +214,7 @@ export function TrialUrgencyMessage() {
     sessionStorage.setItem("trial_urgency_dismissed", "true");
   };
 
-  if (loading || !message || dismissed) return null;
+  if (loading || !message || dismissed || isChurchMember) return null;
 
   const urgencyColors = {
     low: "border-primary/30 bg-primary/5",
