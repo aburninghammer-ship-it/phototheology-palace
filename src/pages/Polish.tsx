@@ -5,10 +5,11 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { motion, AnimatePresence } from "framer-motion";
-import { Film, Loader2, Copy, RefreshCw, BookOpen, Sparkles, PenLine, Plus, Save } from "lucide-react";
+import { Film, Loader2, Copy, RefreshCw, BookOpen, Sparkles, PenLine, Plus, Save, Trash2, FileText, Clock } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { usePolishHistory } from "@/hooks/usePolishHistory";
+import { usePolishHistory, SavedPolishStory } from "@/hooks/usePolishHistory";
+import { format } from "date-fns";
 
 interface StoryResult {
   title: string;
@@ -27,7 +28,20 @@ const Polish = () => {
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<StoryResult | null>(null);
   const [saving, setSaving] = useState(false);
-  const { saveStory } = usePolishHistory();
+  const { history, isLoading: historyLoading, saveStory, deleteStory } = usePolishHistory();
+
+  const handleLoadStory = (story: SavedPolishStory) => {
+    setResult({
+      title: story.title || "Untitled",
+      tagline: story.tagline || "",
+      manuscript: story.narrative || "",
+      scenes: story.scenes || undefined,
+      versesUsed: story.verses_used || [],
+    });
+    setInput(story.input_text);
+    setShowAddition(false);
+    setAddition("");
+  };
 
   const handleSave = async () => {
     if (!result) return;
@@ -362,6 +376,75 @@ const Polish = () => {
                 </Button>
               </CardContent>
             </Card>
+          </motion.div>
+        )}
+
+        {/* Saved Polishes — show when no result */}
+        {!result && !loading && history.length > 0 && (
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.15, duration: 0.3 }}
+            className="mt-8"
+          >
+            <div className="flex items-center gap-2 mb-4">
+              <FileText className="w-5 h-5 text-primary" />
+              <h2 className="text-lg font-semibold text-foreground">Saved Polishes</h2>
+              <Badge variant="secondary" className="text-xs">{history.length}</Badge>
+            </div>
+            <div className="space-y-3">
+              {history.map((story, i) => (
+                <motion.div
+                  key={story.id}
+                  initial={{ opacity: 0, x: -10 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: i * 0.04 }}
+                >
+                  <Card
+                    className="border-primary/10 bg-card/40 backdrop-blur-sm hover:border-primary/30 transition-colors cursor-pointer group"
+                    onClick={() => handleLoadStory(story)}
+                  >
+                    <CardContent className="p-4 flex items-center gap-4">
+                      <div className="p-2 rounded-lg bg-primary/10 shrink-0">
+                        <BookOpen className="w-4 h-4 text-primary" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <h3 className="text-sm font-semibold text-foreground truncate group-hover:text-primary transition-colors">
+                          {story.title || "Untitled Manuscript"}
+                        </h3>
+                        {story.tagline && (
+                          <p className="text-xs text-muted-foreground italic truncate mt-0.5">
+                            "{story.tagline}"
+                          </p>
+                        )}
+                        <div className="flex items-center gap-2 mt-1.5">
+                          <Clock className="w-3 h-3 text-muted-foreground" />
+                          <span className="text-xs text-muted-foreground">
+                            {format(new Date(story.created_at), "MMM d, yyyy")}
+                          </span>
+                          {story.verses_used && story.verses_used.length > 0 && (
+                            <span className="text-xs text-muted-foreground">
+                              · {story.verses_used.length} verse{story.verses_used.length !== 1 ? 's' : ''}
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="shrink-0 opacity-0 group-hover:opacity-100 transition-opacity text-destructive hover:text-destructive hover:bg-destructive/10"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          deleteStory(story.id);
+                        }}
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </Button>
+                    </CardContent>
+                  </Card>
+                </motion.div>
+              ))}
+            </div>
           </motion.div>
         )}
 
