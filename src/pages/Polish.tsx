@@ -5,43 +5,25 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { motion, AnimatePresence } from "framer-motion";
-import { Film, Loader2, Copy, RefreshCw, BookOpen, Sparkles, Clapperboard, PenLine, Clock, Trash2, ChevronDown, ChevronUp } from "lucide-react";
+import { Film, Loader2, Copy, RefreshCw, BookOpen, Sparkles, PenLine } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { usePolishHistory, SavedPolishStory } from "@/hooks/usePolishHistory";
-
-interface Scene {
-  heading: string;
-  verseRef: string;
-  content: string;
-}
 
 interface StoryResult {
   title: string;
   tagline: string;
-  scenes: Scene[];
-  narrative: string;
-  closingReflection: string;
+  manuscript: string;
+  // Legacy support
+  narrative?: string;
+  scenes?: any[];
+  closingReflection?: string;
   versesUsed: string[];
 }
-
-// Render paragraph text with **bold** support
-const renderParagraph = (text: string) => {
-  const parts = text.split(/(\*\*[^*]+\*\*)/g);
-  return parts.map((part, i) => {
-    if (part.startsWith("**") && part.endsWith("**")) {
-      return <strong key={i} className="font-bold text-foreground">{part.slice(2, -2)}</strong>;
-    }
-    return <span key={i}>{part}</span>;
-  });
-};
 
 const Polish = () => {
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<StoryResult | null>(null);
-  const [showHistory, setShowHistory] = useState(false);
-  const { history, isLoading: historyLoading, saveStory, deleteStory } = usePolishHistory();
 
   const handleSubmit = async () => {
     if (!input.trim()) {
@@ -61,34 +43,34 @@ const Polish = () => {
 
       if (data?.story) {
         setResult(data.story);
-        // Auto-save the story
-        await saveStory(input, data.story);
       } else {
         throw new Error("No story returned");
       }
     } catch (err: any) {
       console.error("[Polish] Error:", err);
-      toast.error("Failed to craft your story. Please try again.");
+      toast.error("Failed to craft your manuscript. Please try again.");
     } finally {
       setLoading(false);
     }
   };
 
+  const getManuscriptText = (): string => {
+    if (!result) return "";
+    // Support new 'manuscript' field or legacy 'narrative' field
+    return result.manuscript || result.narrative || "";
+  };
+
   const handleCopy = async () => {
     if (!result) return;
-    const body = result.narrative || result.scenes?.map(s => s.content).join("\n\n") || "";
     const text = [
-      result.title.toUpperCase(),
+      result.title,
       result.tagline,
       "",
-      body,
-      "",
-      "---",
-      result.closingReflection
+      getManuscriptText(),
     ].join("\n");
 
     await navigator.clipboard.writeText(text);
-    toast.success("Story copied to clipboard");
+    toast.success("Manuscript copied to clipboard");
   };
 
   const handleNewStory = () => {
@@ -96,28 +78,33 @@ const Polish = () => {
     setInput("");
   };
 
-  const handleLoadStory = (saved: SavedPolishStory) => {
-    setResult({
-      title: saved.title || "Untitled Story",
-      tagline: saved.tagline || "",
-      scenes: saved.scenes || [],
-      narrative: saved.narrative || "",
-      closingReflection: saved.closing_reflection || "",
-      versesUsed: saved.verses_used || [],
+  /** Render manuscript text, converting **bold** markers to <strong> for pulpit emphasis */
+  const renderManuscript = (text: string) => {
+    const paragraphs = text.split("\n\n").filter(p => p.trim());
+    return paragraphs.map((para, i) => {
+      // Convert **text** to bold spans
+      const parts = para.split(/(\*\*[^*]+\*\*)/g);
+      return (
+        <p key={i} className="text-foreground/90 leading-[1.9] mb-5 last:mb-0 text-base md:text-lg">
+          {parts.map((part, j) => {
+            if (part.startsWith("**") && part.endsWith("**")) {
+              return (
+                <strong key={j} className="text-foreground font-bold">
+                  {part.slice(2, -2)}
+                </strong>
+              );
+            }
+            return <span key={j}>{part}</span>;
+          })}
+        </p>
+      );
     });
-    setInput(saved.input_text);
-    setShowHistory(false);
-  };
-
-  const handleDeleteStory = async (e: React.MouseEvent, id: string) => {
-    e.stopPropagation();
-    await deleteStory(id);
   };
 
   return (
     <div className="min-h-screen bg-background">
       <Navigation />
-      <div className="container max-w-4xl mx-auto px-4 py-8 pt-24">
+      <div className="container max-w-3xl mx-auto px-4 py-8 pt-24">
         {/* Header */}
         <div className="text-center mb-8">
           <div className="inline-flex items-center gap-3 mb-3">
@@ -129,7 +116,7 @@ const Polish = () => {
             </h1>
           </div>
           <p className="text-muted-foreground text-sm max-w-lg mx-auto">
-            Turn your verses and thoughts into a cinematic story — told like a movie with dramatic tension, sensory detail, and emotional weight.
+            Turn your verses and sermon notes into a Scripture-driven preaching manuscript — epic structure, not epic adjectives.
           </p>
         </div>
 
@@ -141,100 +128,28 @@ const Polish = () => {
                 <PenLine className="w-5 h-5 text-fuchsia-400 mx-auto" />
                 <h3 className="text-sm font-semibold text-foreground">1. Paste Your Material</h3>
                 <p className="text-xs text-muted-foreground leading-relaxed">
-                  Drop in Bible verses, personal reflections, sermon notes, or any combination. The more raw material you give, the richer the story.
+                  Drop in Bible verses, sermon notes, outlines, or any combination. The more raw material, the richer the manuscript.
                 </p>
               </CardContent>
             </Card>
             <Card className="border-purple-500/10 bg-card/30">
               <CardContent className="p-4 text-center space-y-2">
-                <Clapperboard className="w-5 h-5 text-purple-400 mx-auto" />
-                <h3 className="text-sm font-semibold text-foreground">2. Jeeves Crafts the Story</h3>
+                <BookOpen className="w-5 h-5 text-purple-400 mx-auto" />
+                <h3 className="text-sm font-semibold text-foreground">2. Jeeves Builds the Manuscript</h3>
                 <p className="text-xs text-muted-foreground leading-relaxed">
-                  Jeeves weaves your input into an epic cinematic narrative — scene-by-scene drama with sensory detail, emotional weight, and theological depth woven invisibly throughout.
+                  Jeeves expands with MORE Scripture — full KJV quotes, cross-texts, cause-and-effect logic. No purple prose, no filler adjectives.
                 </p>
               </CardContent>
             </Card>
             <Card className="border-amber-500/10 bg-card/30">
               <CardContent className="p-4 text-center space-y-2">
                 <Sparkles className="w-5 h-5 text-amber-400 mx-auto" />
-                <h3 className="text-sm font-semibold text-foreground">3. A Story That Moves</h3>
+                <h3 className="text-sm font-semibold text-foreground">3. Ready to Preach</h3>
                 <p className="text-xs text-muted-foreground leading-relaxed">
-                  Get a cinematic retelling you can share, teach from, or use for devotionals — Scripture brought to life like never before.
+                  One flowing manuscript with Scripture doing the heavy lifting. Copy and preach.
                 </p>
               </CardContent>
             </Card>
-          </div>
-        )}
-
-        {/* Saved Stories Toggle — show before results */}
-        {!result && !loading && history.length > 0 && (
-          <div className="mb-6">
-            <Button
-              variant="ghost"
-              onClick={() => setShowHistory(!showHistory)}
-              className="w-full justify-between text-muted-foreground hover:text-foreground"
-            >
-              <span className="flex items-center gap-2">
-                <Clock className="w-4 h-4" />
-                Saved Stories ({history.length})
-              </span>
-              {showHistory ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
-            </Button>
-
-            <AnimatePresence>
-              {showHistory && (
-                <motion.div
-                  initial={{ opacity: 0, height: 0 }}
-                  animate={{ opacity: 1, height: "auto" }}
-                  exit={{ opacity: 0, height: 0 }}
-                  transition={{ duration: 0.2 }}
-                  className="overflow-hidden"
-                >
-                  <div className="space-y-2 mt-2 max-h-[300px] overflow-y-auto pr-1">
-                    {historyLoading ? (
-                      <div className="text-center py-4 text-muted-foreground text-sm">
-                        <Loader2 className="w-4 h-4 animate-spin mx-auto mb-1" />
-                        Loading...
-                      </div>
-                    ) : (
-                      history.map((saved) => (
-                        <Card
-                          key={saved.id}
-                          className="border-fuchsia-500/10 hover:border-fuchsia-500/30 cursor-pointer transition-colors"
-                          onClick={() => handleLoadStory(saved)}
-                        >
-                          <CardContent className="p-3 flex items-center justify-between">
-                            <div className="flex-1 min-w-0">
-                              <p className="text-sm font-medium text-foreground truncate">
-                                {saved.title || "Untitled Story"}
-                              </p>
-                              <p className="text-xs text-muted-foreground truncate">
-                                {saved.tagline || saved.input_text.substring(0, 80)}
-                              </p>
-                              <p className="text-xs text-muted-foreground/60 mt-0.5">
-                                {new Date(saved.created_at).toLocaleDateString(undefined, {
-                                  month: "short",
-                                  day: "numeric",
-                                  year: "numeric",
-                                })}
-                              </p>
-                            </div>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={(e) => handleDeleteStory(e, saved.id)}
-                              className="text-muted-foreground/40 hover:text-red-400 ml-2 shrink-0"
-                            >
-                              <Trash2 className="w-3.5 h-3.5" />
-                            </Button>
-                          </CardContent>
-                        </Card>
-                      ))
-                    )}
-                  </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
           </div>
         )}
 
@@ -250,7 +165,7 @@ const Polish = () => {
                 <Textarea
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
-                  placeholder={`Paste your verses and thoughts here...\n\nExample:\nJohn 3:16 - God so loved the world\nRomans 8:28 - All things work together\n\nMy thought: These connect because God's love is the thread...`}
+                  placeholder={`Paste your sermon notes, verses, and thoughts here...\n\nExample:\nEzekiel 1:26-27 — throne, sapphire stone, appearance of a man\nMatthew 13:45-46 — merchant sells all for the pearl\nPhilippians 2:5-8 — Christ emptied himself\n\nMy thought: The merchant IS Christ. He sold everything for us. The commandments protect what He purchased...`}
                   className="min-h-[200px] resize-y text-base bg-background/50 border-fuchsia-500/10 focus:border-fuchsia-500/30"
                   disabled={loading}
                 />
@@ -262,12 +177,12 @@ const Polish = () => {
                   {loading ? (
                     <span className="flex items-center gap-2">
                       <Loader2 className="w-5 h-5 animate-spin" />
-                      Jeeves is crafting your story...
+                      Jeeves is building your manuscript...
                     </span>
                   ) : (
                     <span className="flex items-center gap-2">
                       <Film className="w-5 h-5" />
-                      Polish My Story
+                      Polish My Sermon
                     </span>
                   )}
                 </Button>
@@ -276,7 +191,7 @@ const Polish = () => {
           </motion.div>
         )}
 
-        {/* Result Section */}
+        {/* Result Section — One Flowing Manuscript */}
         <AnimatePresence>
           {result && (
             <motion.div
@@ -296,42 +211,14 @@ const Polish = () => {
                 </p>
               </div>
 
-              {/* The Manuscript */}
-              {result.narrative ? (
-                <div className="px-1 md:px-4">
-                  {result.narrative.split("\n\n").map((para, i) => (
-                    <p key={i} className="text-foreground/90 leading-[1.9] mb-6 last:mb-0 text-[1.05rem]">
-                      {renderParagraph(para)}
-                    </p>
-                  ))}
-                </div>
-              ) : result.scenes && result.scenes.length > 0 ? (
-                <div className="px-1 md:px-4">
-                  {result.scenes.map((section, i) => (
-                    <div key={i} className="mb-6">
-                      {section.content.split("\n\n").map((para, j) => (
-                        <p key={j} className="text-foreground/90 leading-[1.9] mb-6 last:mb-0 text-[1.05rem]">
-                          {renderParagraph(para)}
-                        </p>
-                      ))}
-                    </div>
-                  ))}
-                </div>
-              ) : null}
-
-              {/* Closing Reflection */}
-              {result.closingReflection && (
-                <Card className="border-amber-500/20 bg-gradient-to-br from-amber-500/5 to-orange-500/5">
-                  <CardContent className="p-6">
-                    <h3 className="text-sm font-medium text-amber-400 uppercase tracking-wider mb-3">
-                      Final Appeal
-                    </h3>
-                    <p className="text-foreground/85 leading-relaxed">
-                      {result.closingReflection}
-                    </p>
-                  </CardContent>
-                </Card>
-              )}
+              {/* The Manuscript — one steady flow */}
+              <Card className="border-fuchsia-500/15 bg-card/50 backdrop-blur">
+                <CardContent className="p-6 md:p-10">
+                  <div className="prose prose-invert max-w-none">
+                    {renderManuscript(getManuscriptText())}
+                  </div>
+                </CardContent>
+              </Card>
 
               {/* Verses Used */}
               {result.versesUsed && result.versesUsed.length > 0 && (
@@ -352,7 +239,7 @@ const Polish = () => {
                   className="border-fuchsia-500/30 hover:bg-fuchsia-500/10"
                 >
                   <Copy className="w-4 h-4 mr-2" />
-                  Copy to Clipboard
+                  Copy Manuscript
                 </Button>
                 <Button
                   variant="outline"
@@ -360,7 +247,7 @@ const Polish = () => {
                   className="border-purple-500/30 hover:bg-purple-500/10"
                 >
                   <RefreshCw className="w-4 h-4 mr-2" />
-                  New Story
+                  New Manuscript
                 </Button>
               </div>
             </motion.div>
