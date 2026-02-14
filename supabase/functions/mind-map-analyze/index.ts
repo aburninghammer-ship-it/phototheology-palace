@@ -482,12 +482,12 @@ RESPONSE FORMAT (JSON only, no markdown):
         "confidence": 90
       }]
     },
-    "laver": { "applicable": true, "insights": [] },
-    "lampstand": { "applicable": true, "insights": [] },
-    "table-showbread": { "applicable": true, "insights": [] },
-    "altar-incense": { "applicable": true, "insights": [] },
-    "ark-covenant": { "applicable": true, "insights": [] },
-    "mercy-seat": { "applicable": true, "insights": [] }
+    "laver": { "applicable": true, "insights": [{ "id": "laver-1", "content": "How the text speaks to cleansing and purification", "evidence": ["Relevant quote"], "insight": "The deeper washing this passage points to", "application": "Bring your unclean areas to God's Word daily for washing", "visualHook": "Hands plunging into a bronze basin of clear water", "confidence": 85 }] },
+    "lampstand": { "applicable": true, "insights": [{ "id": "lamp-1", "content": "How the text illuminates truth", "evidence": ["Relevant quote"], "insight": "What this passage reveals about walking in light", "application": "Let this truth become a lamp for your daily decisions", "visualHook": "Seven-branched golden lampstand casting warm light on priestly garments", "confidence": 85 }] },
+    "table-showbread": { "applicable": true, "insights": [{ "id": "bread-1", "content": "What spiritual nourishment this text provides", "evidence": ["Relevant quote"], "insight": "How this passage feeds the soul", "application": "Return to this passage as daily bread for your spirit", "visualHook": "Twelve loaves of warm bread arranged on a golden table", "confidence": 85 }] },
+    "altar-incense": { "applicable": true, "insights": [{ "id": "incense-1", "content": "What prayers this text inspires", "evidence": ["Relevant quote"], "insight": "The intercession this passage calls for", "application": "Let this truth shape your prayer life this week", "visualHook": "Fragrant smoke spiraling upward from a golden altar", "confidence": 85 }] },
+    "ark-covenant": { "applicable": true, "insights": [{ "id": "ark-1", "content": "What covenant promise this text reveals", "evidence": ["Relevant quote"], "insight": "The law and covenant principle at the heart of this passage", "application": "Commit to the covenant standard this text calls you to", "visualHook": "Stone tablets resting inside the golden ark beneath cherubim wings", "confidence": 85 }] },
+    "mercy-seat": { "applicable": true, "insights": [{ "id": "mercy-1", "content": "What grace and propitiation this text reveals", "evidence": ["Relevant quote"], "insight": "How this passage reveals God's mercy meeting His justice", "application": "Rest in the mercy this text proclaims over your failures", "visualHook": "Blood sprinkled on the golden mercy seat between two cherubim", "confidence": 85 }] }
   },
   "crossConnections": [{
     "from": "sr",
@@ -514,8 +514,9 @@ serve(async (req) => {
       );
     }
 
-    // Truncate very long texts
-    const truncatedText = text.length > 8000 ? text.substring(0, 8000) + "..." : text;
+    // Truncate very long texts — allow more for full study (sermons, articles)
+    const maxChars = fullStudy ? 20000 : 8000;
+    const truncatedText = text.length > maxChars ? text.substring(0, maxChars) + "..." : text;
 
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) {
@@ -538,13 +539,27 @@ serve(async (req) => {
 
     const fullStudyInstruction = fullStudy
       ? [
-          `⚠️ FULL STUDY MODE ACTIVE — YOU MUST POPULATE EVERY SINGLE ROOM WITH STUDY CONTENT.`,
-          `This is NOT a room description exercise. For EACH room, you must APPLY the seed text ("${truncatedText.substring(0, 80)}...") through that room's methodology.`,
-          `- DO NOT describe what a room does. APPLY the room's method to the actual text.`,
-          `- WRONG: "The Prophecy Room examines prophetic symbols on the historicist timeline"`,
-          `- RIGHT: "John 3:15 echoes Genesis 3:15's promise—the serpent lifted in the wilderness (Numbers 21:8-9) typifies Christ lifted on the cross, fulfilling the Protoevangelium's 'bruise his heel' prophecy"`,
-          `- Every room MUST have at least 1-2 principles with SPECIFIC content drawn from the seed text.`,
-          `- You are generating a COMPLETE Bible study, not a template. Fill ALL rooms with real insights.`,
+          `⚠️ FULL STUDY MODE ACTIVE — YOU MUST POPULATE EVERY SINGLE ROOM WITH SUBSTANTIAL STUDY CONTENT.`,
+          `This is NOT a room description exercise. For EACH room, you must APPLY the seed text through that room's methodology.`,
+          ``,
+          `CONTENT DEPTH REQUIREMENTS (NON-NEGOTIABLE):`,
+          `- "content" field: At least 2-3 full sentences that APPLY the seed text through the room's methodology. Not a label — a developed thought.`,
+          `- "evidence" array: At least 2 direct quotes or paraphrases FROM THE SEED TEXT, plus 1-2 supporting Scripture references.`,
+          `- "insight" field: At least 2-3 sentences explaining the theological significance and WHY this matters.`,
+          `- "application" field: At least 1-2 sentences giving a CONCRETE imperative action the reader should take.`,
+          `- "visualHook" field: A vivid, specific mental image (not a generic phrase).`,
+          ``,
+          `WRONG (too shallow — this will be REJECTED):`,
+          `  { "content": "The Prophecy Room examines prophetic symbols", "evidence": [], "insight": "This is relevant", "application": "Study prophecy" }`,
+          ``,
+          `RIGHT (substantial — this is what EVERY principle must look like):`,
+          `  { "content": "Paul's appeal to the Corinthians echoes Moses lifting the bronze serpent in Numbers 21:8-9. Just as Israel had to LOOK at the lifted serpent to live, Paul urges believers to fix their eyes on the crucified Christ as the only remedy for the serpent's venom of sin.", "evidence": ["'For he hath made him to be sin for us, who knew no sin' (2 Corinthians 5:21)", "'As Moses lifted up the serpent in the wilderness, even so must the Son of man be lifted up' (John 3:14)"], "insight": "The typological connection reveals that Christ on the cross BECAME the embodiment of that which was killing humanity — sin itself — so that by looking to Him in faith, spiritual death is reversed just as physical death was reversed in the wilderness.", "application": "When besetting sins feel unconquerable, do not look inward at your failure — look UP at the One who became sin for you. Fix your gaze daily on the cross, not on the serpent's bite.", "visualHook": "A bronze serpent gleaming on a pole in the desert sun, with hundreds of dying Israelites turning their heads toward it and color returning to their faces" }`,
+          ``,
+          `- Every room MUST have at least 1-3 principles at this depth level.`,
+          `- Multi-sub-principle rooms (ir=5 senses, c6=6 genres, cycles=8 cycles, etc.) MUST have one principle per sub-component, each at this depth.`,
+          `- You are generating a COMPLETE Bible study. Fill ALL rooms with real, deep, text-specific insights.`,
+          `- sanctuaryAnalysis elements MUST each have at least 1 insight with full content — NO EMPTY ARRAYS.`,
+          `- Do NOT return any principle with an empty "content", "evidence", "insight", or "application" field.`,
         ].join("\n")
       : "";
 
@@ -560,8 +575,8 @@ serve(async (req) => {
       `  Provide SEPARATE principles matching each sub-component (e.g., 3 principles for 3a's three angels).`,
     ].join("\n");
 
-    // Full study needs much higher token limit to fill all 35+ rooms
-    const maxTokens = fullStudy ? 32768 : 8192;
+    // Full study needs much higher token limit to fill all 35+ rooms with substantial content
+    const maxTokens = fullStudy ? 65536 : 8192;
 
     const callGateway = async (extraUserInstruction?: string) => {
       const userPrompt = [
@@ -645,17 +660,33 @@ serve(async (req) => {
 
     const roomCount = analysis?.roomAnalysis ? Object.keys(analysis.roomAnalysis).length : 0;
     const sanctuaryCount = analysis?.sanctuaryAnalysis ? Object.keys(analysis.sanctuaryAnalysis).length : 0;
-    // For full study, check that rooms actually have principles (not just empty arrays)
+    // For full study, check that rooms actually have principles with real content (not empty strings)
     const populatedRoomCount = analysis?.roomAnalysis
-      ? Object.values(analysis.roomAnalysis).filter((r: any) => r.principles && r.principles.length > 0).length
+      ? Object.values(analysis.roomAnalysis).filter((r: any) =>
+          r.principles && r.principles.length > 0 &&
+          r.principles.some((p: any) => p.content && p.content.length > 30)
+        ).length
+      : 0;
+    // Check sanctuary elements have actual insights
+    const populatedSanctuaryCount = analysis?.sanctuaryAnalysis
+      ? Object.values(analysis.sanctuaryAnalysis).filter((s: any) =>
+          s.insights && s.insights.length > 0 &&
+          s.insights.some((i: any) => i.content && i.content.length > 20)
+        ).length
       : 0;
     const minRequiredRooms = fullStudy ? Math.max(requiredRooms, 20) : requiredRooms;
 
-    // One retry if the model returns an incomplete/empty map.
-    if (!analysis || roomCount < minRequiredRooms || sanctuaryCount < 1 || (fullStudy && populatedRoomCount < 15)) {
+    // One retry if the model returns an incomplete/empty/shallow map.
+    const needsRetry = !analysis
+      || roomCount < minRequiredRooms
+      || sanctuaryCount < 1
+      || (fullStudy && populatedRoomCount < 15)
+      || (fullStudy && populatedSanctuaryCount < 5);
+
+    if (needsRetry) {
       try {
         const retryInstruction = fullStudy
-          ? `Your last output was incomplete. You MUST populate ALL rooms with ACTUAL study content applied to the text. roomAnalysis must have at least ${minRequiredRooms} room IDs, each with at least 1 principle containing real insights about the text. Do NOT leave rooms empty. Return ONLY JSON.`
+          ? `Your last output was REJECTED because ${populatedRoomCount} rooms had real content but we need at least 15, and ${populatedSanctuaryCount} sanctuary elements had content but we need at least 5. You MUST populate ALL rooms with SUBSTANTIAL study content — each principle needs 2-3 sentences of "content", 2+ "evidence" quotes from the text, 2-3 sentences of "insight", and a concrete "application". NO empty strings, NO placeholder text. roomAnalysis must have at least ${minRequiredRooms} room IDs. ALL 7 sanctuary elements must have insights with full content. Return ONLY JSON.`
           : `Your last output was incomplete. Fix it now: roomAnalysis must have at least ${requiredRooms} room IDs and sanctuaryAnalysis must have at least 1 key. Return ONLY JSON.`;
         const retry = await callGateway(retryInstruction);
         if (retry.ok) {
