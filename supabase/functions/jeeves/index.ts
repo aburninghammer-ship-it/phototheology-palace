@@ -1633,7 +1633,14 @@ The user will paste Bible verses and their personal thoughts/connections. Your j
 === THEOLOGICAL ENRICHMENT (CRITICAL) ===
 Amplify the story with Phototheology Palace principles, sanctuary patterns, typological connections, and cross-Testament echoes — but NEVER name or highlight the principles. Let them flow invisibly through the narrative. The reader should feel the depth without seeing the scaffolding. The focus is the STORY, like watching a movie unfold.
 
-${PALACE_SCHEMA}
+Key Palace principles to weave invisibly:
+- Types/Symbols (ST): lambs, blood, altars, water, fire as pointing to Christ
+- Parallels (P‖): mirrored actions across time (Babel/Pentecost, Exodus/Calvary)
+- Patterns (PRm): recurring numbers (3, 7, 40), deliverer stories, covenant renewals
+- Sanctuary (BL): altar, laver, lampstand, showbread, incense, ark imagery
+- Cycles: Adamic→Noahic→Abrahamic→Mosaic→Cyrusic→Christ→Spirit→Remnant
+- Christ-Centered (CR): every scene must reveal Christ
+- Dimensions (DR): literal, Christ, personal, church, eternal layers
 
 - Weave Palace rooms, cycles, horizons, and sanctuary patterns naturally into the narrative fabric
 - Connect Old and New Testament threads as parallel storylines
