@@ -5,9 +5,10 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { motion, AnimatePresence } from "framer-motion";
-import { Film, Loader2, Copy, RefreshCw, BookOpen, Sparkles, Clapperboard, PenLine } from "lucide-react";
+import { Film, Loader2, Copy, RefreshCw, BookOpen, Sparkles, Clapperboard, PenLine, Clock, Trash2, ChevronDown, ChevronUp } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { usePolishHistory, SavedPolishStory } from "@/hooks/usePolishHistory";
 
 interface Scene {
   heading: string;
@@ -28,6 +29,8 @@ const Polish = () => {
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<StoryResult | null>(null);
+  const [showHistory, setShowHistory] = useState(false);
+  const { history, isLoading: historyLoading, saveStory, deleteStory } = usePolishHistory();
 
   const handleSubmit = async () => {
     if (!input.trim()) {
@@ -47,6 +50,8 @@ const Polish = () => {
 
       if (data?.story) {
         setResult(data.story);
+        // Auto-save the story
+        await saveStory(input, data.story);
       } else {
         throw new Error("No story returned");
       }
@@ -77,6 +82,24 @@ const Polish = () => {
   const handleNewStory = () => {
     setResult(null);
     setInput("");
+  };
+
+  const handleLoadStory = (saved: SavedPolishStory) => {
+    setResult({
+      title: saved.title || "Untitled Story",
+      tagline: saved.tagline || "",
+      scenes: saved.scenes || [],
+      narrative: saved.narrative || "",
+      closingReflection: saved.closing_reflection || "",
+      versesUsed: saved.verses_used || [],
+    });
+    setInput(saved.input_text);
+    setShowHistory(false);
+  };
+
+  const handleDeleteStory = async (e: React.MouseEvent, id: string) => {
+    e.stopPropagation();
+    await deleteStory(id);
   };
 
   return (
@@ -128,6 +151,78 @@ const Polish = () => {
                 </p>
               </CardContent>
             </Card>
+          </div>
+        )}
+
+        {/* Saved Stories Toggle — show before results */}
+        {!result && !loading && history.length > 0 && (
+          <div className="mb-6">
+            <Button
+              variant="ghost"
+              onClick={() => setShowHistory(!showHistory)}
+              className="w-full justify-between text-muted-foreground hover:text-foreground"
+            >
+              <span className="flex items-center gap-2">
+                <Clock className="w-4 h-4" />
+                Saved Stories ({history.length})
+              </span>
+              {showHistory ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+            </Button>
+
+            <AnimatePresence>
+              {showHistory && (
+                <motion.div
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: "auto" }}
+                  exit={{ opacity: 0, height: 0 }}
+                  transition={{ duration: 0.2 }}
+                  className="overflow-hidden"
+                >
+                  <div className="space-y-2 mt-2 max-h-[300px] overflow-y-auto pr-1">
+                    {historyLoading ? (
+                      <div className="text-center py-4 text-muted-foreground text-sm">
+                        <Loader2 className="w-4 h-4 animate-spin mx-auto mb-1" />
+                        Loading...
+                      </div>
+                    ) : (
+                      history.map((saved) => (
+                        <Card
+                          key={saved.id}
+                          className="border-fuchsia-500/10 hover:border-fuchsia-500/30 cursor-pointer transition-colors"
+                          onClick={() => handleLoadStory(saved)}
+                        >
+                          <CardContent className="p-3 flex items-center justify-between">
+                            <div className="flex-1 min-w-0">
+                              <p className="text-sm font-medium text-foreground truncate">
+                                {saved.title || "Untitled Story"}
+                              </p>
+                              <p className="text-xs text-muted-foreground truncate">
+                                {saved.tagline || saved.input_text.substring(0, 80)}
+                              </p>
+                              <p className="text-xs text-muted-foreground/60 mt-0.5">
+                                {new Date(saved.created_at).toLocaleDateString(undefined, {
+                                  month: "short",
+                                  day: "numeric",
+                                  year: "numeric",
+                                })}
+                              </p>
+                            </div>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={(e) => handleDeleteStory(e, saved.id)}
+                              className="text-muted-foreground/40 hover:text-red-400 ml-2 shrink-0"
+                            >
+                              <Trash2 className="w-3.5 h-3.5" />
+                            </Button>
+                          </CardContent>
+                        </Card>
+                      ))
+                    )}
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
           </div>
         )}
 
