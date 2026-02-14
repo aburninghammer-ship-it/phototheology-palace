@@ -11,7 +11,7 @@ import { useLiveKitToken } from "@/hooks/useLiveKitToken";
 import { LiveKitRoom } from "@livekit/components-react";
 import { useLocalParticipant } from "@livekit/components-react";
 import { LiveVideoRenderer } from "./LiveVideoRenderer";
-import "@livekit/components-styles";
+// LiveKit styles handled via Tailwind
 
 interface ChatMessage {
   id: string;
