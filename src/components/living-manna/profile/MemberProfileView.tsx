@@ -37,6 +37,9 @@ export function MemberProfileView({ userId, churchId, onBack }: MemberProfileVie
     try {
       const conversationId = await startConversation(userId);
       setActiveConversationId(conversationId);
+      window.dispatchEvent(new CustomEvent('open-chat-sidebar', {
+        detail: { conversationId, userId }
+      }));
       toast({ title: "Chat opened", description: "You can now message this member" });
     } catch (error: any) {
       toast({ title: "Error", description: "Failed to start conversation", variant: "destructive" });
