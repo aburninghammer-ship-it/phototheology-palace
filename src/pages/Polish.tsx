@@ -392,58 +392,85 @@ const Polish = () => {
               <h2 className="text-lg font-semibold text-foreground">Saved Polishes</h2>
               <Badge variant="secondary" className="text-xs">{history.length}</Badge>
             </div>
-            <div className="space-y-3">
-              {history.map((story, i) => (
-                <motion.div
-                  key={story.id}
-                  initial={{ opacity: 0, x: -10 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: i * 0.04 }}
-                >
-                  <Card
-                    className="border-primary/10 bg-card/40 backdrop-blur-sm hover:border-primary/30 transition-colors cursor-pointer group"
-                    onClick={() => handleLoadStory(story)}
+            <div className="space-y-6">
+              {history.map((story, i) => {
+                const narrativeText = story.narrative || "";
+                return (
+                  <motion.div
+                    key={story.id}
+                    initial={{ opacity: 0, y: 15 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: i * 0.06 }}
+                    className="rounded-xl border border-primary/15 bg-card/40 backdrop-blur-sm overflow-hidden"
                   >
-                    <CardContent className="p-4 flex items-center gap-4">
-                      <div className="p-2 rounded-lg bg-primary/10 shrink-0">
+                    {/* Header bar */}
+                    <div className="px-5 py-3.5 bg-gradient-to-r from-primary/10 to-primary/5 border-b border-primary/10 flex items-center gap-3">
+                      <div className="p-2 rounded-lg bg-primary/15 shrink-0">
                         <BookOpen className="w-4 h-4 text-primary" />
                       </div>
                       <div className="flex-1 min-w-0">
-                        <h3 className="text-sm font-semibold text-foreground truncate group-hover:text-primary transition-colors">
+                        <h3 className="text-base font-serif font-bold text-foreground truncate">
                           {story.title || "Untitled Manuscript"}
                         </h3>
                         {story.tagline && (
-                          <p className="text-xs text-muted-foreground italic truncate mt-0.5">
+                          <p className="text-xs text-primary/70 italic truncate mt-0.5 font-serif">
                             "{story.tagline}"
                           </p>
                         )}
-                        <div className="flex items-center gap-2 mt-1.5">
-                          <Clock className="w-3 h-3 text-muted-foreground" />
-                          <span className="text-xs text-muted-foreground">
-                            {format(new Date(story.created_at), "MMM d, yyyy")}
-                          </span>
-                          {story.verses_used && story.verses_used.length > 0 && (
-                            <span className="text-xs text-muted-foreground">
-                              · {story.verses_used.length} verse{story.verses_used.length !== 1 ? 's' : ''}
-                            </span>
-                          )}
+                      </div>
+                      <div className="flex items-center gap-2 shrink-0">
+                        <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                          <Clock className="w-3 h-3" />
+                          {format(new Date(story.created_at), "MMM d, yyyy")}
                         </div>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-8 w-8 text-destructive hover:text-destructive hover:bg-destructive/10"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            deleteStory(story.id);
+                          }}
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </Button>
+                      </div>
+                    </div>
+
+                    {/* Formatted manuscript body */}
+                    {narrativeText && (
+                      <div className="p-5 md:p-6 space-y-5 cursor-pointer" onClick={() => handleLoadStory(story)}>
+                        {renderManuscript(narrativeText)}
+                      </div>
+                    )}
+
+                    {/* Footer: verses + load action */}
+                    <div className="px-5 py-3 border-t border-primary/10 bg-background/30 flex items-center justify-between">
+                      <div className="flex flex-wrap gap-1.5">
+                        {story.verses_used?.slice(0, 6).map((v, vi) => (
+                          <Badge key={vi} variant="secondary" className="text-[10px] px-1.5 py-0.5">
+                            {v}
+                          </Badge>
+                        ))}
+                        {(story.verses_used?.length || 0) > 6 && (
+                          <Badge variant="secondary" className="text-[10px] px-1.5 py-0.5">
+                            +{(story.verses_used?.length || 0) - 6} more
+                          </Badge>
+                        )}
                       </div>
                       <Button
                         variant="ghost"
-                        size="icon"
-                        className="shrink-0 opacity-0 group-hover:opacity-100 transition-opacity text-destructive hover:text-destructive hover:bg-destructive/10"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          deleteStory(story.id);
-                        }}
+                        size="sm"
+                        className="text-xs text-primary hover:bg-primary/10"
+                        onClick={() => handleLoadStory(story)}
                       >
-                        <Trash2 className="w-4 h-4" />
+                        <PenLine className="w-3 h-3 mr-1" />
+                        Edit
                       </Button>
-                    </CardContent>
-                  </Card>
-                </motion.div>
-              ))}
+                    </div>
+                  </motion.div>
+                );
+              })}
             </div>
           </motion.div>
         )}
