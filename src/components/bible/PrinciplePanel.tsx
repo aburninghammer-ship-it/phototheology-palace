@@ -483,8 +483,8 @@ export const PrinciplePanel = ({ book, chapter, verse, verseText, onClose, onHig
             </TabsList>
           </div>
 
-          {/* Responsive height: shorter on mobile portrait, taller on landscape and desktop */}
-          <ScrollArea className="flex-1 min-h-[200px] max-h-[40vh] sm:max-h-[50vh] lg:max-h-[400px] landscape:max-h-[35vh] mt-2 sm:mt-4">
+          {/* Scrollable content area - fills remaining card space */}
+          <ScrollArea className="flex-1 min-h-[200px] mt-2 sm:mt-4">
             <TabsContent value="lenses" className="space-y-4 mt-0">
               {/* Room Analysis Summary */}
               {annotation.roomsUsed && annotation.roomsUsed.length > 0 && (
