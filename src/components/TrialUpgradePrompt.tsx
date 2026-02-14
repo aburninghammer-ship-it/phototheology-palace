@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { useSubscription } from "@/hooks/useSubscription";
+import { useChurchMembership } from "@/hooks/useChurchMembership";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -17,6 +18,7 @@ interface TrialUpgradePromptProps {
 export function TrialUpgradePrompt({ variant = 'banner', onDismiss }: TrialUpgradePromptProps) {
   const { user } = useAuth();
   const { subscription, loading: subscriptionLoading } = useSubscription();
+  const { isMember: isChurchMember } = useChurchMembership();
   const navigate = useNavigate();
   const [trialInfo, setTrialInfo] = useState<{ daysLeft: number; hoursLeft: number; isExpired: boolean } | null>(null);
   const [dismissed, setDismissed] = useState(false);
@@ -115,8 +117,8 @@ export function TrialUpgradePrompt({ variant = 'banner', onDismiss }: TrialUpgra
     navigate('/pricing');
   };
 
-  // Don't show if loading, no trial, dismissed, or already dismissed this session
-  if (loading || !trialInfo || dismissed || sessionStorage.getItem('trial_prompt_dismissed')) {
+  // Don't show if loading, no trial, dismissed, church member, or already dismissed this session
+  if (loading || !trialInfo || dismissed || isChurchMember || sessionStorage.getItem('trial_prompt_dismissed')) {
     return null;
   }
 
