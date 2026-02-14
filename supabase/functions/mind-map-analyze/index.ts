@@ -505,7 +505,7 @@ serve(async (req) => {
   }
 
   try {
-    const { text, mode = "scholar" } = await req.json();
+    const { text, mode = "scholar", fullStudy = false } = await req.json();
 
     if (!text || typeof text !== "string") {
       return new Response(
@@ -536,6 +536,18 @@ serve(async (req) => {
 
     const requiredRooms = requiredRoomsForMode(String(mode));
 
+    const fullStudyInstruction = fullStudy
+      ? [
+          `⚠️ FULL STUDY MODE ACTIVE — YOU MUST POPULATE EVERY SINGLE ROOM WITH STUDY CONTENT.`,
+          `This is NOT a room description exercise. For EACH room, you must APPLY the seed text ("${truncatedText.substring(0, 80)}...") through that room's methodology.`,
+          `- DO NOT describe what a room does. APPLY the room's method to the actual text.`,
+          `- WRONG: "The Prophecy Room examines prophetic symbols on the historicist timeline"`,
+          `- RIGHT: "John 3:15 echoes Genesis 3:15's promise—the serpent lifted in the wilderness (Numbers 21:8-9) typifies Christ lifted on the cross, fulfilling the Protoevangelium's 'bruise his heel' prophecy"`,
+          `- Every room MUST have at least 1-2 principles with SPECIFIC content drawn from the seed text.`,
+          `- You are generating a COMPLETE Bible study, not a template. Fill ALL rooms with real insights.`,
+        ].join("\n")
+      : "";
+
     const strictOutputInstruction = [
       `STRICT OUTPUT RULES:`,
       `- Return ONLY valid JSON (no markdown).`,
@@ -548,9 +560,14 @@ serve(async (req) => {
       `  Provide SEPARATE principles matching each sub-component (e.g., 3 principles for 3a's three angels).`,
     ].join("\n");
 
+    // Full study needs much higher token limit to fill all 35+ rooms
+    const maxTokens = fullStudy ? 32768 : 8192;
+
     const callGateway = async (extraUserInstruction?: string) => {
       const userPrompt = [
-        `Analyze this text and map it to the Phototheology Palace.`,
+        fullStudy
+          ? `Generate a COMPLETE Bible study for this text, applying it through EVERY room in the Phototheology Palace. Do NOT describe rooms — APPLY the text through each room's methodology with specific insights, evidence, and applications.`
+          : `Analyze this text and map it to the Phototheology Palace.`,
         extraUserInstruction ? `\n${extraUserInstruction}` : "",
         `\nTEXT:\n${truncatedText}`,
       ].join("\n");
@@ -566,7 +583,7 @@ serve(async (req) => {
           messages: [
             {
               role: "system",
-              content: [MIND_MAP_SYSTEM_PROMPT, modeInstruction, strictOutputInstruction].join("\n\n"),
+              content: [MIND_MAP_SYSTEM_PROMPT, modeInstruction, strictOutputInstruction, fullStudyInstruction].filter(Boolean).join("\n\n"),
             },
             {
               role: "user",
@@ -576,7 +593,7 @@ serve(async (req) => {
           // Some models honor this OpenAI field; harmless if ignored.
           response_format: { type: "json_object" },
           temperature: 0.25,
-          max_tokens: 8192,
+          max_tokens: maxTokens,
         }),
       });
     };
@@ -628,13 +645,19 @@ serve(async (req) => {
 
     const roomCount = analysis?.roomAnalysis ? Object.keys(analysis.roomAnalysis).length : 0;
     const sanctuaryCount = analysis?.sanctuaryAnalysis ? Object.keys(analysis.sanctuaryAnalysis).length : 0;
+    // For full study, check that rooms actually have principles (not just empty arrays)
+    const populatedRoomCount = analysis?.roomAnalysis
+      ? Object.values(analysis.roomAnalysis).filter((r: any) => r.principles && r.principles.length > 0).length
+      : 0;
+    const minRequiredRooms = fullStudy ? Math.max(requiredRooms, 20) : requiredRooms;
 
     // One retry if the model returns an incomplete/empty map.
-    if (!analysis || roomCount < requiredRooms || sanctuaryCount < 1) {
+    if (!analysis || roomCount < minRequiredRooms || sanctuaryCount < 1 || (fullStudy && populatedRoomCount < 15)) {
       try {
-        const retry = await callGateway(
-          `Your last output was incomplete. Fix it now: roomAnalysis must have at least ${requiredRooms} room IDs and sanctuaryAnalysis must have at least 1 key. Return ONLY JSON.`
-        );
+        const retryInstruction = fullStudy
+          ? `Your last output was incomplete. You MUST populate ALL rooms with ACTUAL study content applied to the text. roomAnalysis must have at least ${minRequiredRooms} room IDs, each with at least 1 principle containing real insights about the text. Do NOT leave rooms empty. Return ONLY JSON.`
+          : `Your last output was incomplete. Fix it now: roomAnalysis must have at least ${requiredRooms} room IDs and sanctuaryAnalysis must have at least 1 key. Return ONLY JSON.`;
+        const retry = await callGateway(retryInstruction);
         if (retry.ok) {
           analysis = await parseGatewayJson(retry);
         }
