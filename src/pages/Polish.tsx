@@ -284,49 +284,12 @@ const Polish = () => {
                 </p>
               </div>
 
-              {/* Scene Cards */}
-              <div className="space-y-4">
-                {result.scenes.map((scene, i) => (
-                  <motion.div
-                    key={i}
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: i * 0.15, duration: 0.4 }}
-                  >
-                    <Card className="border-fuchsia-500/15 bg-gradient-to-br from-fuchsia-500/5 to-purple-500/5 overflow-hidden">
-                      <CardContent className="p-5">
-                        <div className="flex items-start gap-3 mb-3">
-                          <span className="text-xs font-mono text-fuchsia-500/60 mt-1">
-                            {String(i + 1).padStart(2, "0")}
-                          </span>
-                          <div className="flex-1">
-                            <h3 className="text-lg font-semibold text-foreground mb-1">
-                              {scene.heading}
-                            </h3>
-                            <Badge variant="outline" className="text-xs border-fuchsia-500/30 text-fuchsia-400">
-                              <BookOpen className="w-3 h-3 mr-1" />
-                              {scene.verseRef}
-                            </Badge>
-                          </div>
-                        </div>
-                        <p className="text-muted-foreground leading-relaxed pl-7">
-                          {scene.content}
-                        </p>
-                      </CardContent>
-                    </Card>
-                  </motion.div>
-                ))}
-              </div>
-
-              {/* Full Narrative */}
+              {/* The Story */}
               <Card className="border-purple-500/20 bg-card/50 backdrop-blur">
-                <CardContent className="p-6 md:p-8">
-                  <h3 className="text-sm font-medium text-purple-400 uppercase tracking-wider mb-4">
-                    Full Narrative
-                  </h3>
+                <CardContent className="p-6 md:p-10">
                   <div className="prose prose-invert prose-lg max-w-none">
                     {result.narrative.split("\n\n").map((para, i) => (
-                      <p key={i} className="text-foreground/90 leading-relaxed mb-4 last:mb-0">
+                      <p key={i} className="text-foreground/90 leading-[1.85] mb-5 last:mb-0 text-[1.05rem]">
                         {para}
                       </p>
                     ))}
