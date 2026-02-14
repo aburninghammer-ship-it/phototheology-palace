@@ -1674,7 +1674,12 @@ These are not decorative. They are structural — moments where the sermon lands
 THEOLOGICAL ENRICHMENT:
 Weave Phototheology Palace principles naturally — sanctuary themes, typological connections, redemption arc, Christ-centered interpretation, progressive revelation — but NEVER name the principles. Let the theology speak for itself.
 
-${PALACE_SCHEMA}
+- Types/Symbols: lambs, blood, altars, water, fire pointing to Christ
+- Parallels: mirrored actions across time (Babel/Pentecost, Exodus/Calvary)
+- Patterns: recurring numbers (3, 7, 40), deliverer stories, covenant renewals
+- Sanctuary: altar, laver, lampstand, showbread, incense, ark imagery
+- Christ-Centered: every section must reveal Christ
+- Cross-Testament connections should emerge naturally through the narrative logic
 
 ALL Scripture must be KJV.
 
@@ -1684,14 +1689,10 @@ Return ONLY valid JSON (no markdown, no code blocks):
   "story": {
     "title": "A clear, preachable title",
     "tagline": "One line capturing the core theological idea",
-    "scenes": [],
-    "narrative": "THE ENTIRE MANUSCRIPT. One continuous flowing sermon manuscript. No numbered sections. No headings like 01, 02. No 'Full Narrative' recap. Just one moving document. Scripture quoted verbatim (KJV) in-line or as short blocks. Occasional **bold beat-lines** for pulpit emphasis. At least 2000-3000+ words. Paragraphs separated by double newlines.",
-    "closingReflection": "The final appeal — not 'try harder' but 'respond to love with love.' Direct, pastoral, personal.",
+    "manuscript": "THE ENTIRE MANUSCRIPT. One continuous flowing sermon manuscript. No numbered sections. No headings like 01, 02. No scene breaks. Just one moving document from opening to closing appeal. Scripture quoted verbatim (KJV) in-line or as short blocks. Occasional **bold beat-lines** for pulpit emphasis. At least 2000-3000+ words. Paragraphs separated by double newlines.",
     "versesUsed": ["ALL verse references — the user's originals AND every cross-reference you added"]
   }
 }
-
-"scenes" must be EMPTY []. The entire manuscript goes into "narrative."
 
 QUALITY CHECK BEFORE RETURNING:
 1. Did I add sensory descriptions not from the Bible text? → Remove them.
@@ -8370,11 +8371,9 @@ Style: Professional prophetic chart, clear typography, organized layout, spiritu
           JSON.stringify({
             error: "Story parsing failed - please try again",
             story: {
-              title: "Story Generation Error",
+              title: "Manuscript Error",
               tagline: "Something went wrong — please try again",
-              scenes: [],
-              narrative: "We encountered a technical issue while crafting your story. Your input was received but the response couldn't be parsed. Please try submitting again.",
-              closingReflection: "Every story deserves to be told. Try again and let's bring yours to life.",
+              manuscript: "We encountered a technical issue while crafting your manuscript. Please try submitting again.",
               versesUsed: []
             }
           }),
