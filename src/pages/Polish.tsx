@@ -25,6 +25,17 @@ interface StoryResult {
   versesUsed: string[];
 }
 
+// Render paragraph text with **bold** support
+const renderParagraph = (text: string) => {
+  const parts = text.split(/(\*\*[^*]+\*\*)/g);
+  return parts.map((part, i) => {
+    if (part.startsWith("**") && part.endsWith("**")) {
+      return <strong key={i} className="font-bold text-foreground">{part.slice(2, -2)}</strong>;
+    }
+    return <span key={i}>{part}</span>;
+  });
+};
+
 const Polish = () => {
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
@@ -285,12 +296,12 @@ const Polish = () => {
                 </p>
               </div>
 
-              {/* The Narrative */}
+              {/* The Manuscript */}
               {result.narrative ? (
                 <div className="px-1 md:px-4">
                   {result.narrative.split("\n\n").map((para, i) => (
                     <p key={i} className="text-foreground/90 leading-[1.9] mb-6 last:mb-0 text-[1.05rem]">
-                      {para}
+                      {renderParagraph(para)}
                     </p>
                   ))}
                 </div>
@@ -300,7 +311,7 @@ const Polish = () => {
                     <div key={i} className="mb-6">
                       {section.content.split("\n\n").map((para, j) => (
                         <p key={j} className="text-foreground/90 leading-[1.9] mb-6 last:mb-0 text-[1.05rem]">
-                          {para}
+                          {renderParagraph(para)}
                         </p>
                       ))}
                     </div>
