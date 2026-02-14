@@ -68,8 +68,8 @@ serve(async (req) => {
       canSubscribe: true,
       // Host can publish video + audio; members can only publish audio
       canPublishSources: isHost
-        ? ["camera", "microphone", "screen_share", "screen_share_audio"]
-        : ["microphone"],
+        ? ["camera", "microphone", "screen_share", "screen_share_audio"] as any
+        : ["microphone"] as any,
     });
 
     const jwt = await at.toJwt();
