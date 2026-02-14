@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { motion, AnimatePresence } from "framer-motion";
-import { Film, Loader2, Copy, RefreshCw, BookOpen } from "lucide-react";
+import { Film, Loader2, Copy, RefreshCw, BookOpen, Sparkles, Clapperboard, PenLine } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
@@ -97,6 +97,39 @@ const Polish = () => {
             Turn your verses and thoughts into a cinematic story — told like a movie with dramatic tension, sensory detail, and emotional weight.
           </p>
         </div>
+
+        {/* How It Works — only show before results */}
+        {!result && !loading && (
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+            <Card className="border-fuchsia-500/10 bg-card/30">
+              <CardContent className="p-4 text-center space-y-2">
+                <PenLine className="w-5 h-5 text-fuchsia-400 mx-auto" />
+                <h3 className="text-sm font-semibold text-foreground">1. Paste Your Material</h3>
+                <p className="text-xs text-muted-foreground leading-relaxed">
+                  Drop in Bible verses, personal reflections, sermon notes, or any combination. The more raw material you give, the richer the story.
+                </p>
+              </CardContent>
+            </Card>
+            <Card className="border-purple-500/10 bg-card/30">
+              <CardContent className="p-4 text-center space-y-2">
+                <Clapperboard className="w-5 h-5 text-purple-400 mx-auto" />
+                <h3 className="text-sm font-semibold text-foreground">2. Jeeves Crafts the Story</h3>
+                <p className="text-xs text-muted-foreground leading-relaxed">
+                  Jeeves weaves your input into an epic cinematic narrative — scene-by-scene drama with sensory detail, emotional weight, and theological depth woven invisibly throughout.
+                </p>
+              </CardContent>
+            </Card>
+            <Card className="border-amber-500/10 bg-card/30">
+              <CardContent className="p-4 text-center space-y-2">
+                <Sparkles className="w-5 h-5 text-amber-400 mx-auto" />
+                <h3 className="text-sm font-semibold text-foreground">3. A Story That Moves</h3>
+                <p className="text-xs text-muted-foreground leading-relaxed">
+                  Get a cinematic retelling you can share, teach from, or use for devotionals — Scripture brought to life like never before.
+                </p>
+              </CardContent>
+            </Card>
+          </div>
+        )}
 
         {/* Input Section */}
         {!result && (
