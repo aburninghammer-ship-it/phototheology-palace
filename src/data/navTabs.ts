@@ -2,7 +2,8 @@ import {
   Building2, BookOpen, Brain, Lightbulb, Gem, Network, Image, Sparkles,
   Calendar, Search, Video, StickyNote, Library, Zap, Trophy, Target,
   Sword, MessageSquare, CreditCard, Users, Crown, Church, Layers, Shield, Gamepad2,
-  CalendarDays
+  CalendarDays,
+  Film
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 
@@ -346,6 +347,20 @@ export const DEFAULT_NAV_TABS: NavTab[] = [
       border: "border-yellow-500/20",
       text: "from-yellow-600 to-amber-600",
       glow: "rgba(234,179,8,0.5)"
+    }
+  },
+  {
+    id: "polish",
+    to: "/polish",
+    label: "Polish",
+    shortLabel: "Polish",
+    icon: Film,
+    gradient: {
+      from: "from-fuchsia-500/10",
+      to: "to-purple-500/10",
+      border: "border-fuchsia-500/20",
+      text: "from-fuchsia-600 to-purple-600",
+      glow: "rgba(217,70,239,0.5)"
     }
   },
   {

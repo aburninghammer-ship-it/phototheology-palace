@@ -250,6 +250,7 @@ const CardDeck = lazy(() => import("./pages/CardDeck"));
 const PTMultiplayerLobby = lazy(() => import("./pages/PTMultiplayerLobby"));
 const PTMultiplayerGame = lazy(() => import("./pages/PTMultiplayerGame"));
 const AnalyzeThoughts = lazy(() => import("./pages/AnalyzeThoughts"));
+const Polish = lazy(() => import("./pages/Polish"));
 const SparksLibrary = lazy(() => import("./pages/SparksLibrary"));
 const Libraries = lazy(() => import("./pages/Libraries"));
 const PalaceFreestyle = lazy(() => import("./pages/PalaceFreestyle"));
@@ -436,6 +437,7 @@ function App() {
             <Route path="/pt-multiplayer" element={<ProtectedRoute><PTMultiplayerLobby /></ProtectedRoute>} />
             <Route path="/pt-multiplayer/:gameId" element={<ProtectedRoute><PTMultiplayerGame /></ProtectedRoute>} />
             <Route path="/analyze-thoughts" element={<ProtectedRoute><AnalyzeThoughts /></ProtectedRoute>} />
+            <Route path="/polish" element={<ProtectedRoute><Polish /></ProtectedRoute>} />
             <Route path="/sparks" element={<ProtectedRoute><SparksLibrary /></ProtectedRoute>} />
             <Route path="/libraries" element={<ProtectedRoute><Libraries /></ProtectedRoute>} />
             <Route path="/palace/freestyle" element={<ProtectedRoute><PalaceFreestyle /></ProtectedRoute>} />

@@ -1611,6 +1611,65 @@ CRITICAL: Return ONLY the JSON object. No markdown code blocks. No explanatory t
 
 Your goal: Provide the kind of rigorous, loving, Christ-centered biblical scholarship that would help this student grow into a skilled handler of the Word of Truth.`;
 
+    } else if (mode === "polish-story") {
+      // POLISH MODE: Cinematic Scripture Story Amplifier
+      systemPrompt = `You are Jeeves, a masterful cinematic storyteller who transforms Bible verses and theological thoughts into compelling dramatic narratives.
+
+=== YOUR MISSION ===
+The user will paste Bible verses and their personal thoughts/connections. Your job is to weave them into ONE unified, cinematic story — told like a movie retelling with dramatic tension, sensory detail, and emotional weight.
+
+=== CINEMATIC STORYTELLING RULES ===
+1. SCENE-SETTING: Open every scene with vivid sensory detail — sights, sounds, smells, textures, the feel of the air. Make the reader stand IN the scene.
+2. DRAMATIC TENSION: Build each scene toward a turning point or revelation that hits like a freight train
+3. EMOTIONAL WEIGHT: Make the reader FEEL what the characters feel — the desperation, the awe, the relief, the holy terror, the shattering joy. This should move people to tears, to action, to transformation.
+4. PACING: Vary sentence length. Short punches for impact. Longer flowing sentences for atmosphere. Let silence breathe between moments of intensity.
+5. SHOW, DON'T TELL: Instead of "God loved the world," show what that love looks like in action — the cost, the sacrifice, the moment of surrender. Make abstract theology into flesh-and-blood drama.
+6. DIALOGUE: Give characters voice. Let them speak with weight and urgency. Let their words echo.
+7. CINEMATIC TRANSITIONS: Move between scenes like camera cuts — jump-cuts, fade-ins, parallel timelines, flashbacks that shatter the present moment
+8. EPIC SCALE: Think IMAX, not home video. These are the most consequential events in cosmic history. Write them that way. The stakes are eternal. The drama is real. The sacrifice is unfathomable.
+9. LIFE-CHANGING IMPACT: Every story should leave the reader fundamentally different. They should walk away seeing God, themselves, and the world through new eyes. Make them unable to un-see what you've shown them.
+10. THOUGHT-PROVOKING DEPTH: Plant questions that haunt the reader long after they finish. Surface connections they've never seen. Make the familiar feel astonishingly new.
+
+=== THEOLOGICAL ENRICHMENT (CRITICAL) ===
+Amplify the story with Phototheology Palace principles, sanctuary patterns, typological connections, and cross-Testament echoes — but NEVER name or highlight the principles. Let them flow invisibly through the narrative. The reader should feel the depth without seeing the scaffolding. The focus is the STORY, like watching a movie unfold.
+
+${PALACE_SCHEMA}
+
+- Weave Palace rooms, cycles, horizons, and sanctuary patterns naturally into the narrative fabric
+- Connect Old and New Testament threads as parallel storylines
+- Let typological fulfillments emerge organically through the drama
+- Use sanctuary imagery (courts, veil, mercy seat, incense) as atmosphere, not lecture
+- ALL Scripture must be KJV
+
+=== OUTPUT FORMAT ===
+Return ONLY valid JSON (no markdown, no code blocks):
+{
+  "story": {
+    "title": "A cinematic, evocative title",
+    "tagline": "One-line hook that captures the essence",
+    "scenes": [
+      {
+        "heading": "Scene title (like a chapter heading)",
+        "verseRef": "Primary verse reference for this scene",
+        "content": "The dramatic scene content — vivid, cinematic, emotionally charged"
+      }
+    ],
+    "narrative": "The full flowing story combining all scenes into one seamless cinematic narrative. Multiple paragraphs separated by double newlines.",
+    "closingReflection": "A personal, devotional takeaway — what this story means for the reader today",
+    "versesUsed": ["Array of all verse references used"]
+  }
+}
+
+=== QUALITY STANDARDS ===
+- Each scene should be at least 150 words of rich, immersive prose
+- The narrative should read like an epic film — the kind that wins Oscars and changes lives
+- Theological accuracy is non-negotiable — the drama serves the truth, never distorts it
+- The closing reflection should feel intimate and devastating in the best way — like a voice-over at the end of a film that makes the audience sit in silence as the credits roll
+- Go DEEP. Go BOLD. Write with the conviction that these stories literally changed the course of human history — because they did
+- Make every paragraph earn its place. No filler. Every sentence should hit.`;
+
+      userPrompt = `Transform these verses and thoughts into a cinematic narrative:\n\n${message}`;
+
     } else if (mode === "analyze-followup") {
       // Follow-up conversation mode for thought analysis
       const ctx = requestContext || {};
@@ -8249,6 +8308,42 @@ Style: Professional prophetic chart, clear typography, organized layout, spiritu
               },
               furtherStudy: [],
               encouragement: "Your notes were received! We just had a technical hiccup processing the analysis. Please try again - your insights deserve a proper evaluation!"
+            }
+          }),
+          { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
+    }
+
+    // Handle polish-story mode - parse JSON and return structured story
+    if (mode === "polish-story") {
+      let cleanContent = content.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
+
+      try {
+        const jsonMatch = cleanContent.match(/\{[\s\S]*\}/);
+        if (jsonMatch) {
+          const parsed = JSON.parse(jsonMatch[0]);
+          const story = parsed.story || parsed;
+          return new Response(
+            JSON.stringify({ story }),
+            { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+          );
+        } else {
+          throw new Error("No JSON found in polish-story response");
+        }
+      } catch (parseError) {
+        console.error("Error parsing polish-story JSON:", parseError);
+        console.error("Raw content:", cleanContent.substring(0, 2000));
+        return new Response(
+          JSON.stringify({
+            error: "Story parsing failed - please try again",
+            story: {
+              title: "Story Generation Error",
+              tagline: "Something went wrong — please try again",
+              scenes: [],
+              narrative: "We encountered a technical issue while crafting your story. Your input was received but the response couldn't be parsed. Please try submitting again.",
+              closingReflection: "Every story deserves to be told. Try again and let's bring yours to life.",
+              versesUsed: []
             }
           }),
           { headers: { ...corsHeaders, "Content-Type": "application/json" } }
