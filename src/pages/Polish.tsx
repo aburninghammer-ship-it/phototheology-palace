@@ -145,12 +145,13 @@ const Polish = () => {
     setShowAddition(false);
   };
 
-  /** Render manuscript with rich formatting: **bold**, *italic*, headings, and Scripture blocks */
+  /** Render manuscript with rich formatting — works on both markdown and plain text */
   const renderManuscript = (text: string) => {
-    const paragraphs = text.split("\n\n").filter(p => p.trim());
-    
-    // Process inline formatting: **bold** and *italic*
+    const paragraphs = text.split(/\n\n+/).filter(p => p.trim());
+
+    // Format inline text: **bold**, *italic*, and scripture refs like (John 3:16)
     const formatText = (raw: string) => {
+      // First handle **bold**
       const boldParts = raw.split(/(\*\*[^*]+\*\*)/g);
       return boldParts.map((part, j) => {
         if (part.startsWith("**") && part.endsWith("**")) {
@@ -160,6 +161,7 @@ const Polish = () => {
             </strong>
           );
         }
+        // Then handle *italic*
         const italicParts = part.split(/(\*[^*]+\*)/g);
         return italicParts.map((ip, k) => {
           if (ip.startsWith("*") && ip.endsWith("*")) {
@@ -169,7 +171,14 @@ const Polish = () => {
               </em>
             );
           }
-          return <span key={`${j}-${k}`}>{ip}</span>;
+          // Highlight inline scripture references like (John 3:16) or (1 Corinthians 13:4-7)
+          const refParts = ip.split(/(\(\d?\s?[A-Z][a-z]+(?:\s[A-Z]?[a-z]*)?\s\d+:\d+(?:[–-]\d+)?\))/g);
+          return refParts.map((rp, ri) => {
+            if (/^\(\d?\s?[A-Z][a-z]+/.test(rp)) {
+              return <span key={`${j}-${k}-${ri}`} className="text-primary font-medium">{rp}</span>;
+            }
+            return <span key={`${j}-${k}-${ri}`}>{rp}</span>;
+          });
         });
       });
     };
@@ -184,6 +193,94 @@ const Polish = () => {
     ];
     const sectionEmojis = ['📖', '✝️', '🔥', '💎', '🌟', '⚖️', '🕊️', '👑'];
 
+    // Check if the text has markdown headings — if so, use section-based rendering
+    const hasHeadings = /^##\s+/m.test(text);
+
+    if (!hasHeadings) {
+      // Plain text mode: chunk paragraphs into visual sections of ~3-4 paragraphs
+      const chunkSize = 3;
+      const sections: JSX.Element[] = [];
+
+      for (let i = 0; i < paragraphs.length; i += chunkSize) {
+        const chunk = paragraphs.slice(i, i + chunkSize);
+        const sectionIdx = Math.floor(i / chunkSize);
+        const colorClass = sectionColors[sectionIdx % sectionColors.length];
+        const emoji = sectionEmojis[sectionIdx % sectionEmojis.length];
+
+        const content = chunk.map((para, pi) => {
+          const trimmed = para.trim();
+
+          // Detect scripture block: starts with a quote and contains a book:verse pattern
+          const isScripture = /^[""]/.test(trimmed) && /\d+:\d+/.test(trimmed);
+          // Also detect "Book Chapter:Verse says:" pattern
+          const isScriptureIntro = /^[A-Z1-3]\w+\s+\d+:\d+/.test(trimmed);
+
+          if (isScripture) {
+            return (
+              <blockquote
+                key={`bq-${i + pi}`}
+                className="my-2 px-5 py-4 rounded-lg border-l-4 border-primary/40 bg-primary/5 backdrop-blur-sm shadow-sm"
+              >
+                <p className="text-foreground/90 leading-[1.9] text-base italic font-serif">
+                  {formatText(trimmed)}
+                </p>
+              </blockquote>
+            );
+          }
+
+          if (isScriptureIntro) {
+            return (
+              <blockquote
+                key={`bq-${i + pi}`}
+                className="my-2 px-5 py-4 rounded-lg border-l-4 border-primary/40 bg-primary/5 backdrop-blur-sm shadow-sm"
+              >
+                <p className="text-foreground/90 leading-[1.9] text-base font-serif">
+                  {formatText(trimmed)}
+                </p>
+              </blockquote>
+            );
+          }
+
+          // Bullet items
+          if (trimmed.startsWith('- ') || trimmed.startsWith('• ')) {
+            return (
+              <div key={`li-${i + pi}`} className="flex items-start gap-2.5 pl-1">
+                <span className="mt-2 w-1.5 h-1.5 rounded-full bg-primary/60 shrink-0" />
+                <p className="text-foreground/90 leading-[1.8] text-base">{formatText(trimmed.slice(2))}</p>
+              </div>
+            );
+          }
+
+          return (
+            <p key={`p-${i + pi}`} className="text-foreground/90 leading-[1.9] text-base md:text-lg">
+              {formatText(trimmed)}
+            </p>
+          );
+        });
+
+        sections.push(
+          <motion.div
+            key={`section-${sectionIdx}`}
+            initial={{ opacity: 0, y: 15 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: sectionIdx * 0.08, duration: 0.4 }}
+            className={`rounded-xl border backdrop-blur-sm overflow-hidden bg-gradient-to-br ${colorClass}`}
+          >
+            <div className="px-4 py-2.5 bg-background/40 border-b border-inherit flex items-center gap-2">
+              <span className="text-lg">{emoji}</span>
+              <div className="h-0.5 flex-1 bg-gradient-to-r from-primary/20 to-transparent rounded-full" />
+            </div>
+            <div className="p-5 md:p-6 space-y-4">
+              {content}
+            </div>
+          </motion.div>
+        );
+      }
+
+      return sections;
+    }
+
+    // Markdown heading mode (original logic)
     let sectionIndex = 0;
     const elements: JSX.Element[] = [];
     let currentSectionContent: JSX.Element[] = [];
@@ -229,8 +326,6 @@ const Polish = () => {
 
     paragraphs.forEach((para, i) => {
       const trimmed = para.trim();
-
-      // Detect markdown headings
       const h2Match = trimmed.match(/^##\s+(.+)/);
       const h3Match = trimmed.match(/^###\s+(.+)/);
 
@@ -250,23 +345,16 @@ const Polish = () => {
         return;
       }
 
-      // Detect scripture blocks
-      const isScripture = trimmed.startsWith('"') && trimmed.includes('(') && trimmed.includes(')');
+      const isScripture = /^[""]/.test(trimmed) && /\d+:\d+/.test(trimmed);
       if (isScripture) {
         currentSectionContent.push(
-          <blockquote
-            key={`bq-${i}`}
-            className="my-3 px-5 py-4 rounded-lg border-l-4 border-primary/40 bg-primary/5 backdrop-blur-sm shadow-sm"
-          >
-            <p className="text-foreground/90 leading-[1.9] text-base italic font-serif">
-              {formatText(para)}
-            </p>
+          <blockquote key={`bq-${i}`} className="my-3 px-5 py-4 rounded-lg border-l-4 border-primary/40 bg-primary/5 backdrop-blur-sm shadow-sm">
+            <p className="text-foreground/90 leading-[1.9] text-base italic font-serif">{formatText(para)}</p>
           </blockquote>
         );
         return;
       }
 
-      // Detect bullet/list items
       if (trimmed.startsWith('- ') || trimmed.startsWith('• ')) {
         currentSectionContent.push(
           <div key={`li-${i}`} className="flex items-start gap-2.5 pl-1">
@@ -277,11 +365,8 @@ const Polish = () => {
         return;
       }
 
-      // Regular paragraph
       currentSectionContent.push(
-        <p key={`p-${i}`} className="text-foreground/90 leading-[1.9] text-base md:text-lg">
-          {formatText(para)}
-        </p>
+        <p key={`p-${i}`} className="text-foreground/90 leading-[1.9] text-base md:text-lg">{formatText(para)}</p>
       );
     });
 
