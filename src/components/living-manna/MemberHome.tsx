@@ -16,7 +16,7 @@ import { NotificationAlerts } from "./NotificationAlerts";
 import { PublicAnnouncementsBoard } from "./PublicAnnouncementsBoard";
 import { PersonalDevotionalDiary } from "./PersonalDevotionalDiary";
 import {
-  BookOpen, ArrowRight, Flame, Users, Star, ExternalLink, UserSearch
+  BookOpen, ArrowRight, Flame, Users, Star, ExternalLink, UserSearch, Gamepad2
 } from "lucide-react";
 import { MemberDirectory } from "./MemberDirectory";
 import { LiveMembersStrip } from "./LiveMembersStrip";
@@ -199,6 +199,53 @@ export function MemberHome({ churchId, churchName = "Living Manna" }: MemberHome
       
       {/* Prayer Entry */}
       <PrayerEntry churchId={churchId} />
+
+      {/* Community Games - Quick access */}
+      <Card variant="glass" className="border-purple-500/30 bg-gradient-to-br from-purple-500/5 to-transparent">
+        <CardHeader className="pb-3">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Gamepad2 className="h-5 w-5 text-purple-500" />
+              <CardTitle className="text-base">Community Games</CardTitle>
+            </div>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="text-xs text-muted-foreground"
+              onClick={() => navigate('/games')}
+            >
+              See All 40+
+              <ArrowRight className="h-3 w-3 ml-1" />
+            </Button>
+          </div>
+          <CardDescription className="text-sm">
+            Play and compete with your church family
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+            {[
+              { name: "PT Scrabble", path: "/pt-scrabble", icon: "🎯", gradient: "from-purple-500/10 to-blue-500/10" },
+              { name: "Chain Chess", path: "/chain-chess", icon: "♟️", gradient: "from-amber-500/10 to-orange-500/10" },
+              { name: "Principle Cards", path: "/games/principle-cards", icon: "🃏", gradient: "from-rose-500/10 to-pink-500/10" },
+              { name: "PT Uno", path: "/games/phototheology-uno", icon: "🎴", gradient: "from-red-500/10 to-yellow-500/10" },
+              { name: "Escape Room", path: "/escape-room", icon: "🚪", gradient: "from-indigo-500/10 to-purple-500/10" },
+              { name: "Treasure Hunt", path: "/treasure-hunt", icon: "🗺️", gradient: "from-yellow-500/10 to-amber-500/10" },
+            ].map((game) => (
+              <Button
+                key={game.path}
+                variant="outline"
+                size="sm"
+                className={`text-sm justify-start bg-gradient-to-r ${game.gradient} hover:opacity-80`}
+                onClick={() => navigate(game.path)}
+              >
+                <span className="mr-1.5">{game.icon}</span>
+                {game.name}
+              </Button>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
 
       {/* Phototheology Tools - Compact access */}
       <Card variant="glass">
