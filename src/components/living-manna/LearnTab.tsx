@@ -1,6 +1,6 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { BookOpen, Calendar, Flame, GraduationCap, Mic, Brain, BookMarked } from "lucide-react";
+import { BookOpen, Calendar, Flame, GraduationCap, Mic, Brain, BookMarked, School } from "lucide-react";
 import { StudyFeed } from "./StudyFeed";
 import { EnhancedStudyCycles } from "./EnhancedStudyCycles";
 import { TruthSeries } from "./TruthSeries";
@@ -66,6 +66,10 @@ export function LearnTab({ churchId }: LearnTabProps) {
             <BookMarked className="h-4 w-4" />
             Study Threads
           </TabsTrigger>
+          <TabsTrigger value="sabbath-school" className="gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
+            <School className="h-4 w-4" />
+            Sabbath School
+          </TabsTrigger>
         </TabsList>
 
         <TabsContent value="weekly-study">
@@ -97,6 +101,23 @@ export function LearnTab({ churchId }: LearnTabProps) {
 
         <TabsContent value="study-threads">
           <StudyThreads churchId={churchId} />
+        </TabsContent>
+
+        <TabsContent value="sabbath-school">
+          <Card variant="glass">
+            <CardHeader>
+              <div className="flex items-center gap-2">
+                <School className="h-6 w-6 text-primary" />
+                <CardTitle>Sabbath School</CardTitle>
+              </div>
+              <CardDescription>
+                Weekly Sabbath School lessons, discussions, and study materials for your congregation.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="text-muted-foreground text-sm">
+              Sabbath School content coming soon. This space will host quarterly lessons, discussion guides, and class resources.
+            </CardContent>
+          </Card>
         </TabsContent>
       </Tabs>
     </div>
