@@ -1669,6 +1669,30 @@ serve(async (req) => {
       }
     }
 
+    // Exclude church members from trial/winback/conversion campaigns
+    // Church members have full access through their church and should never receive upgrade emails
+    if (['trial', 'winback', 'conversion'].includes(campaignType) && recipients.length > 0) {
+      const { data: activeChurches } = await supabaseClient
+        .from('churches')
+        .select('id')
+        .eq('subscription_status', 'active');
+
+      if (activeChurches && activeChurches.length > 0) {
+        const { data: churchMembers } = await supabaseClient
+          .from('church_members')
+          .select('user_id')
+          .in('church_id', activeChurches.map(c => c.id));
+
+        const churchMemberIds = new Set((churchMembers || []).map(m => m.user_id));
+        const beforeCount = recipients.length;
+        recipients = recipients.filter(r => !churchMemberIds.has(r.userId));
+        logStep("Church members excluded from campaign", {
+          churchMembers: churchMemberIds.size,
+          removed: beforeCount - recipients.length
+        });
+      }
+    }
+
     logStep("Recipients determined", { count: recipients.length, campaignType });
 
     if (recipients.length === 0) {

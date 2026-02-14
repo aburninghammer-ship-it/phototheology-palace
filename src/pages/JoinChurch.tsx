@@ -77,9 +77,26 @@ export default function JoinChurch() {
       }
 
 
+      // Update profile to reflect church membership access
+      // This prevents stale trial/expired status from triggering upgrade prompts or emails
+      if (result.church_id) {
+        const { data: churchData } = await supabase.rpc('has_church_access', { _user_id: user.id });
+        const churchTier = Array.isArray(churchData) ? churchData[0]?.church_tier : null;
+
+        await supabase
+          .from('profiles')
+          .update({
+            subscription_status: 'active',
+            subscription_tier: churchTier || 'premium',
+            payment_source: 'church' as any,
+            updated_at: new Date().toISOString(),
+          })
+          .eq('id', user.id);
+      }
+
       setSuccess(true);
       toast.success(result.message || t('church.successfullyJoined'));
-      
+
       // Redirect to Living Manna church space after a short delay
       setTimeout(() => {
         navigate("/living-manna");

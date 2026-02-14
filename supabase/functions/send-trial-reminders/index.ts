@@ -43,6 +43,7 @@ serve(async (req) => {
     // 1. Users with lifetime access in profiles
     // 2. Users with active Patreon connections ($15+/month)
     // 3. Users with payment_source = 'patreon' and active status in profiles
+    // 4. Users with active church membership (Living Manna, etc.)
 
     const { data: lifetimeUsers } = await supabase
       .from('profiles')
@@ -67,8 +68,22 @@ serve(async (req) => {
     const patreonProfileUserIds = new Set((patreonProfileUsers || []).map(u => u.id));
     logStep("Users with Patreon in profile", { count: patreonProfileUserIds.size });
 
+    // 4. Users with active church membership (Living Manna, etc.)
+    const { data: churchMembers } = await supabase
+      .from('church_members')
+      .select('user_id, church_id')
+      .in('church_id',
+        (await supabase
+          .from('churches')
+          .select('id')
+          .eq('subscription_status', 'active')
+        ).data?.map(c => c.id) || []
+      );
+    const churchMemberUserIds = new Set((churchMembers || []).map(u => u.user_id));
+    logStep("Users with church membership", { count: churchMemberUserIds.size });
+
     // Combine all excluded users
-    const excludedUserIds = new Set([...lifetimeUserIds, ...patreonUserIds, ...patreonProfileUserIds]);
+    const excludedUserIds = new Set([...lifetimeUserIds, ...patreonUserIds, ...patreonProfileUserIds, ...churchMemberUserIds]);
     logStep("Total excluded users", { count: excludedUserIds.size });
 
     // Get trials expiring in 7 days (Day 7 reminder - halfway through)
