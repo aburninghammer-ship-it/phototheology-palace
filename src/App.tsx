@@ -277,6 +277,7 @@ const DonationSuccess = lazy(() => import("./pages/DonationSuccess"));
 const LiveDemo = lazy(() => import("./pages/LiveDemo"));
 const PublicChat = lazy(() => import("./pages/PublicChat"));
 const Schedule = lazy(() => import("./pages/Schedule"));
+const Workspace = lazy(() => import("./pages/Workspace"));
 
 // Gatehouse flow pages (Gatehouse is now imported at top as critical page)
 const Welcome = lazy(() => import("./pages/Welcome"));
@@ -307,13 +308,16 @@ const queryClient = new QueryClient({
   },
 });
 
+// Detect workspace iframe panes — computed once at module load
+const isWorkspacePane = typeof window !== 'undefined' && new URLSearchParams(window.location.search).has('workspace');
+
 function App() {
   // Capture UTM parameters on app load for ad attribution
   useUTMCapture();
-  
-  // Skip splash for returning users (localStorage check)
+
+  // Skip splash for returning users (localStorage check) or workspace panes
   const isReturningUser = typeof window !== 'undefined' && localStorage.getItem('hasVisited') === 'true';
-  const [showSplash, setShowSplash] = useState(!isReturningUser);
+  const [showSplash, setShowSplash] = useState(!isReturningUser && !isWorkspacePane);
   
   // Mark user as visited after first splash
   const handleSplashComplete = () => {
@@ -351,6 +355,7 @@ function App() {
                     <SidebarProvider defaultOpen={false}>
                     <ChangeManagerProvider>
                       <div className="min-h-screen flex flex-col w-full pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)] pl-[env(safe-area-inset-left)] pr-[env(safe-area-inset-right)]">
+                        {!isWorkspacePane && <>
                         <DonationBanner />
                         <FontSizeControl />
                         <AnnouncementBanner />
@@ -369,6 +374,7 @@ function App() {
                         </div>
                         {/* Change Manager Guided Path Checklist */}
                         <GuidedPathChecklist />
+                        </>}
                         <div className="flex flex-1 w-full">
                           <MessagingSidebar />
                           <main className="flex-1 w-full overflow-x-hidden pb-mobile-nav">
@@ -687,6 +693,11 @@ function App() {
                 <Schedule />
               </ProtectedRoute>
             } />
+            <Route path="/workspace" element={
+              <ProtectedRoute>
+                <Workspace />
+              </ProtectedRoute>
+            } />
 
 
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
@@ -696,7 +707,7 @@ function App() {
                     </Suspense>
                   </main>
                   </div>
-                  <MobileBottomNav />
+                  {!isWorkspacePane && <MobileBottomNav />}
                 </div>
               </ChangeManagerProvider>
               </SidebarProvider>

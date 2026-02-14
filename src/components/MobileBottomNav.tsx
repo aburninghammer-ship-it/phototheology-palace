@@ -20,6 +20,10 @@ export function MobileBottomNav() {
   // Don't show on landing page or auth pages when not logged in
   if (!user) return null;
 
+  // Hide inside workspace iframe panes
+  const isWorkspacePane = new URLSearchParams(window.location.search).has('workspace');
+  if (isWorkspacePane) return null;
+
   // Don't show on certain pages
   const hiddenPaths = ["/auth", "/onboarding", "/interactive-demo"];
   if (hiddenPaths.some(path => location.pathname.startsWith(path))) return null;

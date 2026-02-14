@@ -3,7 +3,8 @@ import {
   Calendar, Search, Video, StickyNote, Library, Zap, Trophy, Target,
   Sword, MessageSquare, CreditCard, Users, Crown, Church, Layers, Shield, Gamepad2,
   CalendarDays,
-  Film
+  Film,
+  LayoutGrid
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 
@@ -514,6 +515,20 @@ export const DEFAULT_NAV_TABS: NavTab[] = [
       border: "border-lime-500/20",
       text: "from-lime-600 to-green-600",
       glow: "rgba(132,204,22,0.5)"
+    }
+  },
+  {
+    id: "workspace",
+    to: "/workspace",
+    label: "Workspace",
+    shortLabel: "Workspace",
+    icon: LayoutGrid,
+    gradient: {
+      from: "from-slate-500/10",
+      to: "to-zinc-500/10",
+      border: "border-slate-500/20",
+      text: "from-slate-600 to-zinc-600",
+      glow: "rgba(100,116,139,0.5)"
     }
   },
   {
