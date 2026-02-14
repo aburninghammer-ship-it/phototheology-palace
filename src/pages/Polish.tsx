@@ -65,14 +65,12 @@ const Polish = () => {
 
   const handleCopy = async () => {
     if (!result) return;
-    const sections = result.scenes && result.scenes.length > 0
-      ? result.scenes.map((s, i) => `${i + 1}. ${s.heading}\n${s.verseRef}\n\n${s.content}`).join("\n\n---\n\n")
-      : result.narrative;
+    const body = result.narrative || result.scenes?.map(s => s.content).join("\n\n") || "";
     const text = [
       result.title.toUpperCase(),
       result.tagline,
       "",
-      sections,
+      body,
       "",
       "---",
       result.closingReflection
@@ -287,56 +285,27 @@ const Polish = () => {
                 </p>
               </div>
 
-              {/* Theological Movements */}
-              {result.scenes && result.scenes.length > 0 ? (
-                <div className="space-y-8">
-                  {result.scenes.map((section, i) => (
-                    <motion.div
-                      key={i}
-                      initial={{ opacity: 0, y: 15 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: i * 0.1, duration: 0.4 }}
-                    >
-                      <div className="space-y-3">
-                        <div className="flex items-baseline gap-3">
-                          <span className="text-sm font-mono text-fuchsia-500/50 shrink-0">
-                            {i + 1}.
-                          </span>
-                          <div>
-                            <h3 className="text-xl font-semibold text-foreground leading-snug">
-                              {section.heading}
-                            </h3>
-                            <p className="text-xs text-muted-foreground/60 mt-0.5">
-                              {section.verseRef}
-                            </p>
-                          </div>
-                        </div>
-                        <div className="pl-7">
-                          {section.content.split("\n\n").map((para, j) => (
-                            <p key={j} className="text-foreground/85 leading-[1.85] mb-4 last:mb-0 text-[1.02rem]">
-                              {para}
-                            </p>
-                          ))}
-                        </div>
-                      </div>
-                      {i < result.scenes.length - 1 && (
-                        <div className="border-b border-border/30 mt-8" />
-                      )}
-                    </motion.div>
+              {/* The Narrative */}
+              {result.narrative ? (
+                <div className="px-1 md:px-4">
+                  {result.narrative.split("\n\n").map((para, i) => (
+                    <p key={i} className="text-foreground/90 leading-[1.9] mb-6 last:mb-0 text-[1.05rem]">
+                      {para}
+                    </p>
                   ))}
                 </div>
-              ) : result.narrative ? (
-                <Card className="border-purple-500/20 bg-card/50 backdrop-blur">
-                  <CardContent className="p-6 md:p-10">
-                    <div className="prose prose-invert prose-lg max-w-none">
-                      {result.narrative.split("\n\n").map((para, i) => (
-                        <p key={i} className="text-foreground/90 leading-[1.85] mb-5 last:mb-0 text-[1.05rem]">
+              ) : result.scenes && result.scenes.length > 0 ? (
+                <div className="px-1 md:px-4">
+                  {result.scenes.map((section, i) => (
+                    <div key={i} className="mb-6">
+                      {section.content.split("\n\n").map((para, j) => (
+                        <p key={j} className="text-foreground/90 leading-[1.9] mb-6 last:mb-0 text-[1.05rem]">
                           {para}
                         </p>
                       ))}
                     </div>
-                  </CardContent>
-                </Card>
+                  ))}
+                </div>
               ) : null}
 
               {/* Closing Reflection */}
