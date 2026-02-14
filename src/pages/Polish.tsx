@@ -5,9 +5,10 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { motion, AnimatePresence } from "framer-motion";
-import { Film, Loader2, Copy, RefreshCw, BookOpen, Sparkles, PenLine, Plus } from "lucide-react";
+import { Film, Loader2, Copy, RefreshCw, BookOpen, Sparkles, PenLine, Plus, Save } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { usePolishHistory } from "@/hooks/usePolishHistory";
 
 interface StoryResult {
   title: string;
@@ -25,6 +26,25 @@ const Polish = () => {
   const [showAddition, setShowAddition] = useState(false);
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<StoryResult | null>(null);
+  const [saving, setSaving] = useState(false);
+  const { saveStory } = usePolishHistory();
+
+  const handleSave = async () => {
+    if (!result) return;
+    setSaving(true);
+    try {
+      await saveStory(input, {
+        title: result.title,
+        tagline: result.tagline,
+        scenes: result.scenes,
+        narrative: result.manuscript || result.narrative,
+        closingReflection: result.closingReflection,
+        versesUsed: result.versesUsed,
+      });
+    } finally {
+      setSaving(false);
+    }
+  };
 
   const handleSubmit = async () => {
     if (!input.trim()) {
@@ -364,11 +384,20 @@ const Polish = () => {
               <div className="flex gap-3 justify-center pt-2">
                 <Button
                   variant="outline"
+                  onClick={handleSave}
+                  disabled={saving}
+                  className="border-primary/30 hover:bg-primary/10"
+                >
+                  {saving ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Save className="w-4 h-4 mr-2" />}
+                  Save Manuscript
+                </Button>
+                <Button
+                  variant="outline"
                   onClick={handleCopy}
                   className="border-primary/30 hover:bg-primary/10"
                 >
                   <Copy className="w-4 h-4 mr-2" />
-                  Copy Manuscript
+                  Copy
                 </Button>
                 <Button
                   variant="outline"
@@ -376,7 +405,7 @@ const Polish = () => {
                   className="border-primary/30 hover:bg-primary/10"
                 >
                   <RefreshCw className="w-4 h-4 mr-2" />
-                  New Manuscript
+                  New
                 </Button>
               </div>
             </motion.div>
