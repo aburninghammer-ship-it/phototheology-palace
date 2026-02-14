@@ -50,11 +50,16 @@ export function MemberDirectory({ churchId }: MemberDirectoryProps) {
     setMessagingUserId(memberId);
     try {
       const conversationId = await startConversation(memberId);
-      setActiveConversationId(conversationId);
-      toast({
-        title: "Chat opened",
-        description: "You can now message this member",
-      });
+      if (conversationId) {
+        setActiveConversationId(conversationId);
+        window.dispatchEvent(new CustomEvent('open-chat-sidebar', {
+          detail: { conversationId, userId: memberId }
+        }));
+        toast({
+          title: "Chat opened",
+          description: "You can now message this member",
+        });
+      }
     } catch (error: any) {
       console.error('Error starting conversation:', error);
       toast({
