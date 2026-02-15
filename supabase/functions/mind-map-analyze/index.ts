@@ -315,72 +315,47 @@ MODE ADJUSTMENTS:
 - PREACHER: 8-15 rooms, focus on teaching hooks, illustrations, sermon applications
 - RESEARCH: Exhaustive analysis, all applicable rooms, academic rigor
 
-CRITICAL RULE - ROOM APPLICABILITY:
-⚠️ ALL ROOMS MUST BE MARKED AS APPLICABLE (applicable: true) EXCEPT:
-- "24fps" (24FPS Room) - This is a mnemonic tool, only applicable for chapter-by-chapter study
-- "br" (Bible Rendered Room) - This is for 24-chapter block compression, not single texts
+CRITICAL RULE - CONNECTION QUALITY OVER QUANTITY:
+⚠️ QUALITY IS MORE IMPORTANT THAN COMPLETENESS. A genuine, well-supported connection is worth far more than a forced, superficial one.
 
-For EVERY OTHER ROOM (sr, ir, tr, gr, or, dc, st, qr, qa, nf, pf, bf, hf, lr, cr, dr, c6, trm, tz, prm, p||, frt, bl, pr, 3a, fe, cec, r66, 123h, cycles, jr, math, frm, mr, srm, infinity, freestyle):
-- ALWAYS set "applicable": true
-- ALWAYS provide at least 1 principle with content, evidence, insight, application, and visualHook
-- If a room seems less relevant, still find a connection and provide an insight
+ROOM APPLICABILITY:
+- "24fps" (24FPS Room) - Only applicable for chapter-by-chapter study
+- "br" (Bible Rendered Room) - Only for 24-chapter block compression
 
-For rooms with MULTIPLE SUB-PRINCIPLES (like 3a with 3 angels, c6 with 6 genres, ir with 5 senses):
-- Provide SEPARATE principles for EACH sub-component
-- Example for 3a: Provide 3 distinct principles (first angel, second angel, third angel)
-- Example for c6: Provide insights for each of the 6 genres
-- Example for ir: Provide sensory insights for all 5 senses
-- Example for dr: Provide insights for all 5 dimensions
+For ALL OTHER ROOMS:
+- Set "applicable": true ONLY when a GENUINE, ORGANIC connection exists between the seed text and the room's methodology
+- Set "applicable": false when the connection would be forced, vague, or stretch the text beyond its natural meaning
+- A room marked applicable MUST have at least 1 principle with substantial content, evidence, insight, application, and visualHook
 
-ANALYSIS REQUIREMENTS (for EACH applicable room):
-1. PRINCIPLE: Identify specific patterns/truths from the text (2-3 per room)
-2. EVIDENCE: Direct quotes or paraphrases supporting the principle
-3. INSIGHT: The "so what" - why this matters theologically
-4. APPLICATION: ⚠️ MANDATORY - Practical, actionable takeaway for the reader's life. This MUST be a STATEMENT of what to DO, not a question! Example: "Live today with eternity in view" NOT "How should this affect your life?"
-5. VISUAL HOOK: A concrete, memorable image (not abstractions)
-6. CONFIDENCE: 0-100 score based on how clearly text demonstrates this
+⚠️ QUALITY TESTS FOR EVERY CONNECTION:
+1. TEXTUAL ANCHOR TEST: Can you point to specific words, phrases, or themes IN THE SEED TEXT that ground this connection? If you're importing meaning that isn't there, it's forced.
+2. EXPLANATORY TEST: Would a careful Bible student naturally see this connection, or does it require mental gymnastics? If it takes excessive explanation to justify, it's stretched.
+3. ILLUMINATION TEST: Does this room's methodology genuinely reveal NEW INSIGHT about the seed text? Or are you just restating the text in the room's vocabulary? If it's just relabeling, skip it.
+4. SPECIFICITY TEST: Is the insight SPECIFIC to THIS text, or could you copy-paste the same insight for any verse? Generic connections = forced connections.
 
-⚠️ CRITICAL APPLICATION RULE:
-- Applications must be IMPERATIVE STATEMENTS, not questions
-- WRONG: "Which horizon is this prophecy addressing?"
-- RIGHT: "Let this text anchor your faith that God's covenant promises will be fulfilled in their appointed time."
-- WRONG: "How does this apply to you?"
-- RIGHT: "Surrender your anxious thoughts daily at the altar of God's faithfulness."
-Every principle MUST have a concrete, actionable application that tells the reader WHAT TO DO.
+WHEN A ROOM GENUINELY DOESN'T APPLY:
+- It is BETTER to mark a room as "applicable": false than to fill it with shallow, stretched content
+- Example: If a text about personal prayer has no natural connection to numerical patterns, mark the Math Room as not applicable rather than inventing a forced number connection
+- The goal is ILLUMINATION, not coverage
 
-======== CRITICAL DIRECTIVE - READ CAREFULLY ========
+MANDATORY MULTI-PRINCIPLE ROOMS (when applicable):
+For rooms with MULTIPLE SUB-PRINCIPLES (3a=3 angels, c6=6 genres, ir=5 senses, etc.):
+- Provide SEPARATE principles for EACH sub-component ONLY where the connection is genuine
+- It is acceptable to provide fewer sub-principles if some don't genuinely connect
+- Example for c6: If the text naturally connects to 4 of 6 genres, provide 4 strong connections rather than 6 weak ones
 
-"NOT APPLICABLE" IS ABSOLUTELY FORBIDDEN FOR ANY ROOM.
-
-Every room in the Palace can illuminate EVERY text. Your job is NOT to evaluate whether a room applies - your job is to FIND THE CONNECTION. There is ALWAYS a connection.
-
-If you find yourself thinking "this room doesn't apply," STOP. That thought is WRONG. The room DOES apply - you just haven't found the connection yet. Keep thinking until you find it.
-
-MANDATORY ROOMS (must ALWAYS have full multi-principle content):
-  * bl (Blue Room): Apply seed to ALL 7 sanctuary elements
-  * c6 (Connect-6): Find connections in ALL 6 genres
-  * cec (Christ Every Chapter): Find Christ through ALL 4 lenses
-  * cycles (Eight Cycles): Connect seed to ALL 8 cycles
-  * dr (Dimensions): Apply seed through ALL 5 dimensions
-  * frt (Fruit Room): Evaluate ALL 4 types of fruit
-  * or (Observation Room): List observations for ALL 5 categories (WHO/WHAT/WHEN/WHERE/HOW)
-  * ir (Imagination): Apply seed to ALL 5 senses
-  * cr (Concentration): Apply seed to ALL 3 offices (Prophet/Priest/King)
-  * trm (Theme Room): Apply seed to ALL 6 theological spans
-  * tz (Time Zone): Apply seed to ALL 6 time-space coordinates
-  * 3a (Three Angels): Apply seed to ALL 3 angels' messages
-  * fe (Feasts): Apply seed to ALL 7 feasts
-  * 123h (Three Heavens): Apply seed to ALL 3 heaven contexts
-  * frm (Fire Room): Apply seed to ALL 4 purification themes
-  * mr (Meditation Room): Apply seed to ALL 4 contemplation aspects
-  * srm (Sanctuary Room): Apply seed to ALL 6 personal sanctuary elements
+ROOMS THAT ALMOST ALWAYS APPLY (but still require genuine connections):
+- cr (Concentration): Christ is in all Scripture, but show HOW specifically
+- dr (Dimensions): Most texts have multiple dimensions, but each must be specific
+- or (Observation): Most texts yield observations, but they must be insightful
+- gr (Gems): Cross-text connections should be surprising and genuine, not obvious
 
 ABSOLUTE RULES:
-1. "NOT APPLICABLE" = FAILURE. Never say it. Never think it. FIND THE CONNECTION.
-2. For multi-principle rooms, provide an insight for EACH sub-principle
+1. GENUINE CONNECTIONS ONLY. A forced connection damages credibility more than a missing room.
+2. For multi-principle rooms, provide insights for each sub-principle WHERE THE CONNECTION IS REAL
 3. Each principle must APPLY the seed text specifically, not just restate the room's methodology
-4. The goal is to ILLUMINATE the seed text through every lens
-5. If a room has 3 sub-principles, return 3 principles. If it has 7, return 7. NO EXCEPTIONS.
+4. The goal is to ILLUMINATE the seed text through each lens — if a lens doesn't illuminate, don't use it
+5. CONFIDENCE SCORES MUST BE HONEST: If a connection is tenuous, either skip it or give it a low confidence (below 50)
 
 Example for Isaiah 26:3 in Blue Room (bl) - EACH element gets a specific application:
 - Altar: Sacrificing anxiety and self-reliance on the altar of trust
@@ -539,7 +514,7 @@ serve(async (req) => {
 
     const fullStudyInstruction = fullStudy
       ? [
-          `⚠️ FULL STUDY MODE ACTIVE — YOU MUST POPULATE EVERY SINGLE ROOM WITH SUBSTANTIAL STUDY CONTENT.`,
+          `⚠️ FULL STUDY MODE ACTIVE — Populate every room WHERE A GENUINE CONNECTION EXISTS with substantial study content. Skip rooms where the connection would be forced.`,
           `This is NOT a room description exercise. For EACH room, you must APPLY the seed text through that room's methodology.`,
           ``,
           `CONTENT DEPTH REQUIREMENTS (NON-NEGOTIABLE):`,
@@ -555,9 +530,9 @@ serve(async (req) => {
           `RIGHT (substantial — this is what EVERY principle must look like):`,
           `  { "content": "Paul's appeal to the Corinthians echoes Moses lifting the bronze serpent in Numbers 21:8-9. Just as Israel had to LOOK at the lifted serpent to live, Paul urges believers to fix their eyes on the crucified Christ as the only remedy for the serpent's venom of sin.", "evidence": ["'For he hath made him to be sin for us, who knew no sin' (2 Corinthians 5:21)", "'As Moses lifted up the serpent in the wilderness, even so must the Son of man be lifted up' (John 3:14)"], "insight": "The typological connection reveals that Christ on the cross BECAME the embodiment of that which was killing humanity — sin itself — so that by looking to Him in faith, spiritual death is reversed just as physical death was reversed in the wilderness.", "application": "When besetting sins feel unconquerable, do not look inward at your failure — look UP at the One who became sin for you. Fix your gaze daily on the cross, not on the serpent's bite.", "visualHook": "A bronze serpent gleaming on a pole in the desert sun, with hundreds of dying Israelites turning their heads toward it and color returning to their faces" }`,
           ``,
-          `- Every room MUST have at least 1-3 principles at this depth level.`,
-          `- Multi-sub-principle rooms (ir=5 senses, c6=6 genres, cycles=8 cycles, etc.) MUST have one principle per sub-component, each at this depth.`,
-          `- You are generating a COMPLETE Bible study. Fill ALL rooms with real, deep, text-specific insights.`,
+          `- Every applicable room MUST have at least 1-3 principles at this depth level. Rooms without genuine connections should be marked applicable: false.`,
+          `- Multi-sub-principle rooms (ir=5 senses, c6=6 genres, cycles=8 cycles, etc.) should provide sub-principles WHERE THE CONNECTION IS GENUINE — skip sub-components that would be forced.`,
+          `- You are generating a COMPLETE Bible study. Fill applicable rooms with real, deep, text-specific insights. Quality over forced coverage.`,
           `- sanctuaryAnalysis elements MUST each have at least 1 insight with full content — NO EMPTY ARRAYS.`,
           `- Do NOT return any principle with an empty "content", "evidence", "insight", or "application" field.`,
         ].join("\n")
@@ -566,13 +541,14 @@ serve(async (req) => {
     const strictOutputInstruction = [
       `STRICT OUTPUT RULES:`,
       `- Return ONLY valid JSON (no markdown).`,
-      `- roomAnalysis MUST contain at least ${requiredRooms} room IDs (keys).`,
+      `- roomAnalysis MUST contain at least ${requiredRooms} room IDs (keys) — but ONLY rooms with GENUINE connections.`,
       `- sanctuaryAnalysis MUST contain at least 1 sanctuary element (key).`,
-      `- For each included room: applicable=true and include 1-3 principles with application + visualHook + KJV cross-refs.`,
+      `- For each included room: set applicable=true ONLY if the connection is genuine and well-supported. Include 1-3 principles with application + visualHook + KJV cross-refs.`,
+      `- Rooms without genuine connections should have applicable=false with an empty principles array.`,
       `- Do not return empty objects for roomAnalysis or sanctuaryAnalysis.`,
-      `- CRITICAL: ALL rooms MUST be "applicable": true EXCEPT "24fps" and "br" which can be false.`,
+      `- QUALITY OVER QUANTITY: It is better to have ${requiredRooms} deeply connected rooms than 35 shallow ones.`,
       `- For multi-principle rooms (3a, c6, ir, dr, trm, tz, frt, bl, fe, cec, 123h, cycles, frm, mr, srm, cr, or):`,
-      `  Provide SEPARATE principles matching each sub-component (e.g., 3 principles for 3a's three angels).`,
+      `  Provide SEPARATE principles for each sub-component WHERE THE CONNECTION IS GENUINE. Skip sub-components that would be forced.`,
     ].join("\n");
 
     // Full study needs much higher token limit to fill all 35+ rooms with substantial content
