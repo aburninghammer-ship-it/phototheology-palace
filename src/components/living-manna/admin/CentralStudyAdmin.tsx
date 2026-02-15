@@ -88,7 +88,7 @@ export function CentralStudyAdmin({ churchId }: CentralStudyAdminProps) {
     mutationFn: async (studyId: string) => {
       const { error } = await supabase
         .from("church_central_studies")
-        .update({ status: "published" })
+        .update({ status: "active" })
         .eq("id", studyId);
       if (error) throw error;
     },
