@@ -85,20 +85,52 @@ Create a Christ-centered, Phototheology-informed weekly study that captures the 
     let studyData;
     try {
       let jsonStr = content.trim();
+      // Remove code block wrappers
       const codeBlockMatch = jsonStr.match(/```(?:json)?\s*([\s\S]*?)```/);
       if (codeBlockMatch) {
         jsonStr = codeBlockMatch[1].trim();
       }
+      // Extract outermost JSON object
       const firstBrace = jsonStr.indexOf('{');
       const lastBrace = jsonStr.lastIndexOf('}');
       if (firstBrace !== -1 && lastBrace !== -1 && lastBrace > firstBrace) {
         jsonStr = jsonStr.substring(firstBrace, lastBrace + 1);
       }
-      jsonStr = jsonStr.replace(/,(\s*[}\]])/g, '$1');
-      studyData = JSON.parse(jsonStr);
+      // Fix common JSON issues
+      jsonStr = jsonStr.replace(/,(\s*[}\]])/g, '$1'); // trailing commas
+      jsonStr = jsonStr.replace(/[\x00-\x1F\x7F]/g, (ch) => {
+        if (ch === '\n' || ch === '\r' || ch === '\t') return ch;
+        return ' ';
+      }); // control chars
+      jsonStr = jsonStr.replace(/\n/g, '\\n').replace(/\r/g, '\\r').replace(/\t/g, '\\t');
+      
+      // Try parsing; if it fails, try a more aggressive cleanup
+      try {
+        studyData = JSON.parse(jsonStr);
+      } catch {
+        // Re-extract: rebuild valid JSON from known fields
+        jsonStr = content.substring(content.indexOf('{'), content.lastIndexOf('}') + 1);
+        jsonStr = jsonStr.replace(/,(\s*[}\]])/g, '$1');
+        // Replace unescaped newlines inside string values
+        jsonStr = jsonStr.replace(/"([^"]*(?:\\.[^"]*)*)"/g, (match) => {
+          return match.replace(/\n/g, '\\n').replace(/\r/g, '\\r').replace(/\t/g, '\\t');
+        });
+        studyData = JSON.parse(jsonStr);
+      }
     } catch (parseError) {
       console.error("JSON parse error:", parseError);
-      throw new Error("Failed to parse AI response");
+      console.error("Raw content preview:", content.substring(0, 500));
+      // Return a fallback study based on what we can extract
+      studyData = {
+        title: "Weekly Study",
+        description: "AI-generated study (formatting issue - please review and edit)",
+        key_passages: [],
+        guided_questions: ["What stood out to you in this week's sermon?", "How does this message point to Christ?", "What practical step can you take this week?"],
+        christ_synthesis: "Review the sermon for Christ-centered themes.",
+        action_challenge: "Reflect on the sermon's key message this week.",
+        prayer_focus: "Pray for deeper understanding of God's Word.",
+        seeker_friendly_framing: "This study explores key biblical themes from this week's message."
+      };
     }
 
     return new Response(
