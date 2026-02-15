@@ -150,7 +150,7 @@ export default function MindMapPalace({
   }, [toggleRoomExpand]);
 
   // Handle make seed - creates a nested map by saving current state to history
-  const handleMakeSeed = useCallback((content: string, label?: string) => {
+  const handleMakeSeed = useCallback(async (content: string, label?: string) => {
     if (onMakeSeed) {
       onMakeSeed(content);
       return;
@@ -189,12 +189,18 @@ export default function MindMapPalace({
 
     // Generate new map from the seed content
     setSidebarOpen(false);
-    handleGenerate(content, mode, studyMethod);
-
-    toast.success('Creating nested map from seed...', {
+    
+    toast.info('Growing new map from seed...', {
       icon: '🌱',
       description: `Exploring: ${preview}`,
     });
+
+    try {
+      await handleGenerate(content, mode, studyMethod);
+    } catch (err) {
+      console.error('Failed to generate nested map:', err);
+      toast.error('Failed to generate nested map. Please try again.');
+    }
   }, [mode, sourceText, currentAnalysis, nodes, edges, breadcrumbs, handleGenerate, onMakeSeed, studyMethod]);
 
   // Navigate back in history
