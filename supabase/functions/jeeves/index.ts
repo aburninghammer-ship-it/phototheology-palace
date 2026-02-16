@@ -23,6 +23,12 @@ import {
   SCRIPTURE_CITATION_PROTOCOL
 } from './palace-schema.ts';
 
+import {
+  CANONICAL_ROOMS as MENTOR_ROOMS,
+  ROOM_CODES as MENTOR_ROOM_CODES,
+  isValidRoomCode as isValidMentorRoom,
+} from './canonical-rooms.ts';
+
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
@@ -3010,8 +3016,7 @@ Remember: plain language, set the scene briefly, explain what's happening, one s
 
     } else if (mode === "preacher-mentor-commentary") {
       // Preacher Mentor Commentary Engine v1
-      // Imports canonical rooms from ./canonical-rooms.ts
-      const { CANONICAL_ROOMS: MENTOR_ROOMS, ROOM_CODES: MENTOR_ROOM_CODES, isValidRoomCode: isValidMentorRoom } = await import('./canonical-rooms.ts');
+      // Uses canonical rooms imported at top of file (static import)
 
       const {
         primary_room: mentorPrimaryRoom,

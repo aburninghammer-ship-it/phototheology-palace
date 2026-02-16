@@ -233,8 +233,8 @@ export async function generatePreacherMentorCommentary(options: CommentaryOption
     );
 
     if (!commentaryRes.ok) {
-      console.error("[Preacher Mentor] Commentary failed:", commentaryRes.status);
-      return null;
+      console.error("[Preacher Mentor] Commentary failed:", commentaryRes.status, "— falling back to standard");
+      return generateCommentary({ ...options, tier: "surface" });
     }
 
     const commentaryData = await commentaryRes.json();
@@ -258,8 +258,8 @@ export async function generatePreacherMentorCommentary(options: CommentaryOption
     }
 
     if (!commentaryText) {
-      console.error("[Preacher Mentor] No commentary content in response");
-      return null;
+      console.error("[Preacher Mentor] No commentary content — falling back to standard");
+      return generateCommentary({ ...options, tier: "surface" });
     }
 
     // Generate audio if requested
@@ -274,8 +274,8 @@ export async function generatePreacherMentorCommentary(options: CommentaryOption
       cached: false,
     };
   } catch (error) {
-    console.error("[Preacher Mentor Commentary] Error:", error);
-    return null;
+    console.error("[Preacher Mentor Commentary] Error:", error, "— falling back to standard");
+    return generateCommentary({ ...options, tier: "surface" });
   }
 }
 
@@ -314,8 +314,8 @@ export async function generateStoryModeCommentary(options: CommentaryOptions): P
     );
 
     if (!commentaryRes.ok) {
-      console.error("[Story Mode] Commentary failed:", commentaryRes.status);
-      return null;
+      console.error("[Story Mode] Commentary failed:", commentaryRes.status, "— falling back to standard");
+      return generateCommentary({ ...options, tier: "surface" });
     }
 
     const commentaryData = await commentaryRes.json();
@@ -324,8 +324,8 @@ export async function generateStoryModeCommentary(options: CommentaryOptions): P
       : commentaryData.content?.narrative || JSON.stringify(commentaryData.content);
 
     if (!commentaryText) {
-      console.error("[Story Mode] No commentary content in response");
-      return null;
+      console.error("[Story Mode] No commentary content — falling back to standard");
+      return generateCommentary({ ...options, tier: "surface" });
     }
 
     // Generate audio if requested — default to "fable" voice for narrative feel
@@ -340,8 +340,8 @@ export async function generateStoryModeCommentary(options: CommentaryOptions): P
       cached: false,
     };
   } catch (error) {
-    console.error("[Story Mode Commentary] Error:", error);
-    return null;
+    console.error("[Story Mode Commentary] Error:", error, "— falling back to standard");
+    return generateCommentary({ ...options, tier: "surface" });
   }
 }
 
