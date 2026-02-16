@@ -79,13 +79,13 @@ export function ChurchCommunity({ churchId }: ChurchCommunityProps) {
       if (postsData.length > 0) {
         const postIds = postsData.map(p => p.id);
         const { data: likeCounts } = await supabase
-          .from('church_community_post_likes')
+          .from('church_community_post_likes' as any)
           .select('post_id')
           .in('post_id', postIds);
 
         // Count likes per post
         const countMap: Record<string, number> = {};
-        (likeCounts || []).forEach(row => {
+        ((likeCounts as any[]) || []).forEach((row: any) => {
           countMap[row.post_id] = (countMap[row.post_id] || 0) + 1;
         });
         postsData.forEach(p => { p.like_count = countMap[p.id] || 0; });
@@ -93,11 +93,11 @@ export function ChurchCommunity({ churchId }: ChurchCommunityProps) {
         // Fetch current user's likes
         if (user) {
           const { data: myLikes } = await supabase
-            .from('church_community_post_likes')
+            .from('church_community_post_likes' as any)
             .select('post_id')
             .eq('user_id', user.id)
             .in('post_id', postIds);
-          setLikedPostIds(new Set((myLikes || []).map(l => l.post_id)));
+          setLikedPostIds(new Set(((myLikes as any[]) || []).map((l: any) => l.post_id)));
         }
       }
 
@@ -153,7 +153,7 @@ export function ChurchCommunity({ churchId }: ChurchCommunityProps) {
       if (alreadyLiked) {
         // Remove like
         const { error } = await supabase
-          .from('church_community_post_likes')
+          .from('church_community_post_likes' as any)
           .delete()
           .eq('post_id', postId)
           .eq('user_id', user.id);
@@ -166,7 +166,7 @@ export function ChurchCommunity({ churchId }: ChurchCommunityProps) {
       } else {
         // Add like
         const { error } = await supabase
-          .from('church_community_post_likes')
+          .from('church_community_post_likes' as any)
           .insert({ post_id: postId, user_id: user.id });
         if (error) throw error;
 

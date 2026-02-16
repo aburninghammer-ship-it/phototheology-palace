@@ -98,7 +98,7 @@ Create a Christ-centered, Phototheology-informed weekly study that captures the 
       }
       // Fix common JSON issues
       jsonStr = jsonStr.replace(/,(\s*[}\]])/g, '$1'); // trailing commas
-      jsonStr = jsonStr.replace(/[\x00-\x1F\x7F]/g, (ch) => {
+      jsonStr = jsonStr.replace(/[\x00-\x1F\x7F]/g, (ch: string) => {
         if (ch === '\n' || ch === '\r' || ch === '\t') return ch;
         return ' ';
       }); // control chars
@@ -112,7 +112,7 @@ Create a Christ-centered, Phototheology-informed weekly study that captures the 
         jsonStr = content.substring(content.indexOf('{'), content.lastIndexOf('}') + 1);
         jsonStr = jsonStr.replace(/,(\s*[}\]])/g, '$1');
         // Replace unescaped newlines inside string values
-        jsonStr = jsonStr.replace(/"([^"]*(?:\\.[^"]*)*)"/g, (match) => {
+        jsonStr = jsonStr.replace(/"([^"]*(?:\\.[^"]*)*)"/g, (match: string) => {
           return match.replace(/\n/g, '\\n').replace(/\r/g, '\\r').replace(/\t/g, '\\t');
         });
         studyData = JSON.parse(jsonStr);
