@@ -5,7 +5,7 @@ import { fetchChapter, Translation } from "@/services/bibleApi";
 import { Chapter } from "@/types/bible";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ChevronLeft, ChevronRight, BookOpen, Loader2, Link2, MessageSquare, Bot, Bookmark, Sparkles, Upload, Volume2, Headphones, Copy, Check, Flame, MoreHorizontal } from "lucide-react";
+import { ChevronLeft, ChevronRight, BookOpen, Loader2, Link2, MessageSquare, Bot, Bookmark, Sparkles, Upload, Volume2, Headphones, Copy, Check, Flame, MoreHorizontal, Crown } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -40,6 +40,7 @@ import { ThemeCrossReference } from "./ThemeCrossReference";
 import { ThemeVerseSearch } from "./ThemeVerseSearch";
 import { MemoryToolsPanel } from "./MemoryToolsPanel";
 import { StudyModeSelector } from "./StudyModeSelector";
+import { PreacherMentorCard } from "./PreacherMentorCard";
 
 import { DimensionFilter } from "./DimensionFilter";
 import { ReadingStreakBadge } from "./ReadingStreakBadge";
@@ -64,7 +65,7 @@ export const BibleReader = () => {
   const [highlightedVerses, setHighlightedVerses] = useState<number[]>([]);
   const [importDialogOpen, setImportDialogOpen] = useState(false);
   const [activeDimensions, setActiveDimensions] = useState<string[]>(["1D", "2D", "3D", "4D", "5D"]);
-  const [studyMode, setStudyMode] = useState<"beginner" | "advanced" | "apologetics">("advanced");
+  const [studyMode, setStudyMode] = useState<"beginner" | "advanced" | "apologetics" | "preacher-mentor">("advanced");
   const [sermonIdeasMode, setSermonIdeasMode] = useState(false);
   
   const toggleDimension = (dimension: string) => {
@@ -88,6 +89,8 @@ export const BibleReader = () => {
     setShowCommentary: setCommentaryMode,
     showAI: jeevesMode,
     setShowAI: setJeevesMode,
+    showPreacherMentor: preacherMentorMode,
+    setShowPreacherMentor: setPreacherMentorMode,
   } = useBibleState(book, chapterParam);
   
   const { trackReading } = useReadingHistory();
@@ -415,6 +418,26 @@ export const BibleReader = () => {
           <Bot className="h-4 w-4 mr-2" />
           {t('bible.askJeeves')}
         </Button>
+        <Button
+          variant={preacherMentorMode ? "default" : "outline"}
+          size="sm"
+          onClick={() => {
+            const newMode = !preacherMentorMode;
+            setPreacherMentorMode(newMode);
+            if (newMode) {
+              setStrongsMode(false);
+              setPrincipleMode(false);
+              setChainReferenceMode(false);
+              setCommentaryMode(false);
+              setJeevesMode(false);
+              setSermonIdeasMode(false);
+            }
+          }}
+          className={preacherMentorMode ? "bg-gradient-to-r from-amber-600 to-orange-500 text-white shadow-lg" : ""}
+        >
+          <Crown className="h-4 w-4 mr-2" />
+          Mentor
+        </Button>
 
         {/* More Tools Dropdown */}
         <DropdownMenu>
@@ -596,7 +619,15 @@ export const BibleReader = () => {
 
         {/* Right Panel - Dynamic based on mode - Floating/Sticky */}
         <div className="lg:col-span-1 space-y-4 lg:space-y-6 lg:sticky lg:top-24 lg:self-start lg:max-h-[calc(100vh-7rem)] lg:overflow-y-auto" ref={jeevesRef}>
-          {chainReferenceMode ? (
+          {preacherMentorMode && selectedVerse ? (
+            <PreacherMentorCard
+              book={book}
+              chapter={chapter}
+              verse={selectedVerse}
+              verseText={chapterData.verses.find(v => v.verse === selectedVerse)?.text || ""}
+              onClose={() => setPreacherMentorMode(false)}
+            />
+          ) : chainReferenceMode ? (
             <div className="space-y-6">
               <PTChainReferenceBox initialVerse={selectedVerse ? `${book} ${chapter}:${selectedVerse}` : `${book} ${chapter}`} />
               <ChainReferencePanel
@@ -717,6 +748,8 @@ export const BibleReader = () => {
                   ? t('bible.selectVerseStrongs')
                   : principleMode
                   ? t('bible.selectVersePrinciple')
+                  : preacherMentorMode
+                  ? "Select a verse for Preacher Mentor analysis"
                   : (jeevesMode || commentaryMode)
                   ? t('bible.selectVerseAI')
                   : t('bible.selectVerseDefault')}

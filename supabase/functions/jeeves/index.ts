@@ -2950,6 +2950,205 @@ Ellen G. White does not appear to have written specific commentary on ${book} ${
         { headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
 
+    } else if (mode === "preacher-mentor-commentary") {
+      // Preacher Mentor Commentary Engine v1
+      // Imports canonical rooms from ./canonical-rooms.ts
+      const { CANONICAL_ROOMS: MENTOR_ROOMS, ROOM_CODES: MENTOR_ROOM_CODES, isValidRoomCode: isValidMentorRoom } = await import('./canonical-rooms.ts');
+
+      const {
+        primary_room: mentorPrimaryRoom,
+        secondary_rooms: mentorSecondaryRooms,
+        genre: mentorGenre,
+        override_room: mentorOverrideRoom,
+      } = requestBody;
+
+      const effectivePrimary = mentorOverrideRoom || mentorPrimaryRoom || 'sr';
+      const primaryRoomData = MENTOR_ROOMS[effectivePrimary] || MENTOR_ROOMS['sr'];
+      const secondaryRoomNames = (mentorSecondaryRooms || [])
+        .filter((code: string) => isValidMentorRoom(code))
+        .map((code: string) => MENTOR_ROOMS[code]?.name || code);
+
+      // Word count targets by genre
+      const wordCountTargets: Record<string, { min: number; max: number }> = {
+        narrative: { min: 260, max: 350 },
+        epistle: { min: 320, max: 420 },
+        prophecy: { min: 380, max: 500 },
+        poetry: { min: 280, max: 360 },
+        wisdom: { min: 300, max: 400 },
+        law: { min: 300, max: 400 },
+        gospel: { min: 280, max: 380 },
+        apocalyptic: { min: 380, max: 500 },
+        doctrinal: { min: 400, max: 520 },
+      };
+      const target = wordCountTargets[mentorGenre] || wordCountTargets['narrative'];
+
+      // Banned sermon phrases
+      const SERMON_BAN_LIST = [
+        "three points", "sermon outline", "illustration", "in conclusion",
+        "let me illustrate", "point one", "point two", "point three",
+        "firstly", "secondly", "thirdly", "my brothers and sisters",
+        "let us pray", "amen", "turn with me to", "open your bibles",
+        "sermon", "homily", "pulpit", "congregation",
+      ];
+
+      // Build valid room codes list for the prompt
+      const validRoomsList = MENTOR_ROOM_CODES.map((code: string) => {
+        const r = MENTOR_ROOMS[code];
+        return `${code.toUpperCase()}: ${r.name}`;
+      }).join(', ');
+
+      systemPrompt = `You are a Preacher Mentor — a scholarly-pastoral Bible study companion. You produce structured, exegesis-first commentary that helps preachers deeply understand a passage BEFORE they ever step into a pulpit.
+
+CRITICAL IDENTITY RULES:
+- You are NOT preaching. You are mentoring a preacher in their study.
+- Your tone is scholarly yet warm, reverent yet accessible — like a seminary professor who genuinely cares about the student.
+- You NEVER produce sermon content. No outlines, no illustrations, no "three points", no rhetorical flourishes.
+
+MANDATORY SECTION ORDER (you must produce exactly these 5 sections in this exact order):
+
+1. MEANING — Exegetical analysis of what the text means in its original context. Historical background, literary context, authorial intent. This is the foundation.
+
+2. LANGUAGE INSIGHT — Identify up to 2 key Hebrew/Greek terms. For each provide:
+   - "original": the word in original language
+   - "transliteration": romanized form
+   - "pronunciation": phonetic guide
+   - "language": "Hebrew" or "Greek"
+   - "definition": core meaning
+   - "interpretiveImpact": how this word shapes understanding of the passage
+   Return as JSON array under "language_insight" key.
+
+3. CROSS-SCRIPTURE — 3-5 cross-references from both testaments that illuminate the passage. For each, give the reference and a 1-sentence explanation of the connection.
+
+4. PALACE FRAMING — Read the passage through the lens of the ${primaryRoomData.name} (${effectivePrimary.toUpperCase()}) room: "${primaryRoomData.method}". ${secondaryRoomNames.length > 0 ? `Also touch on secondary lenses: ${secondaryRoomNames.join(', ')}.` : ''} Connect the exegetical findings to the Palace methodology. Use ONLY these canonical room codes: ${validRoomsList}. NEVER invent room names or codes.
+
+5. PREACHING ORIENTATION — A brief, non-sermonic paragraph that orients the preacher toward the passage's kerygmatic weight. What is the core proclamation? What must the congregation hear? Do NOT write the sermon — just point the direction.
+
+HARD BANS — Your output must NEVER contain any of these phrases: ${SERMON_BAN_LIST.join(', ')}
+
+WORD COUNT: Target ${target.min}-${target.max} words total across all sections.
+
+GENRE CONTEXT: This passage is classified as "${mentorGenre}". Adjust depth accordingly.
+
+OUTPUT FORMAT: Return ONLY valid JSON with this schema:
+{
+  "sections": {
+    "meaning": "<string>",
+    "language_insight": [{"original": "", "transliteration": "", "pronunciation": "", "language": "", "definition": "", "interpretiveImpact": ""}],
+    "cross_scripture": "<string>",
+    "palace_framing": "<string>",
+    "preaching_orientation": "<string>"
+  },
+  "study_buddy_prompts": ["<prompt1>", "<prompt2>", ...],
+  "compliance_report": {
+    "sermon_check_passed": <boolean>,
+    "room_validation_passed": <boolean>,
+    "word_count": <integer>,
+    "banned_phrases_found": [],
+    "invalid_rooms_found": []
+  }
+}
+
+For study_buddy_prompts: Generate 3-6 lens-aware guided questions. The primary room (${primaryRoomData.name}) should contribute 2-3 questions based on its methodology. Each secondary room contributes 1 question. Questions must be specific to this passage, not generic devotional questions.`;
+
+      userPrompt = `Generate Preacher Mentor Commentary for:
+
+Passage: ${book} ${chapter}:${verseText.verse}
+Text: "${verseText.text}"
+Primary Room: ${effectivePrimary.toUpperCase()} — ${primaryRoomData.name}
+Secondary Rooms: ${(mentorSecondaryRooms || []).map((c: string) => c.toUpperCase()).join(', ') || 'None'}
+Genre: ${mentorGenre || 'narrative'}
+${mentorOverrideRoom ? `Note: User has overridden the AI-detected primary lens. The meaning section should remain exegetically neutral; only the Palace Framing section should reflect the override lens.` : ''}
+
+Return the structured JSON response with all 5 sections, study buddy prompts, and compliance report.`;
+
+      const mentorResponse = await fetch(
+        "https://ai.gateway.lovable.dev/v1/chat/completions",
+        {
+          method: "POST",
+          headers: {
+            "Authorization": `Bearer ${LOVABLE_API_KEY}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            model: "google/gemini-2.5-flash",
+            messages: [
+              { role: "system", content: systemPrompt },
+              { role: "user", content: userPrompt },
+            ],
+          }),
+        }
+      );
+
+      if (!mentorResponse.ok) {
+        const errorText = await mentorResponse.text();
+        console.error('AI Gateway error:', mentorResponse.status, errorText);
+        throw new Error(`AI Gateway error: ${mentorResponse.status}`);
+      }
+
+      const mentorData = await mentorResponse.json();
+      let mentorRawContent = mentorData.choices?.[0]?.message?.content || "{}";
+
+      // Strip markdown code fences if present
+      mentorRawContent = mentorRawContent.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
+
+      let mentorParsed;
+      try {
+        mentorParsed = JSON.parse(mentorRawContent);
+      } catch (e) {
+        console.error("Failed to parse mentor response:", mentorRawContent);
+        // Fallback: wrap raw content as meaning section
+        mentorParsed = {
+          sections: {
+            meaning: mentorRawContent,
+            language_insight: [],
+            cross_scripture: "",
+            palace_framing: "",
+            preaching_orientation: "",
+          },
+          study_buddy_prompts: [],
+          compliance_report: {
+            sermon_check_passed: false,
+            room_validation_passed: false,
+            word_count: 0,
+            banned_phrases_found: ["parse_error"],
+            invalid_rooms_found: [],
+          },
+        };
+      }
+
+      // Post-process compliance: check for banned phrases in output
+      const allText = JSON.stringify(mentorParsed.sections || {}).toLowerCase();
+      const foundBanned = SERMON_BAN_LIST.filter(phrase => allText.includes(phrase.toLowerCase()));
+      const compliance = mentorParsed.compliance_report || {};
+      compliance.sermon_check_passed = foundBanned.length === 0;
+      compliance.banned_phrases_found = foundBanned;
+
+      // Validate room codes mentioned in palace_framing
+      const framingText = (mentorParsed.sections?.palace_framing || '').toLowerCase();
+      const mentionedCodes = MENTOR_ROOM_CODES.filter((code: string) =>
+        framingText.includes(code.toLowerCase()) || framingText.includes(code.toUpperCase())
+      );
+      const invalidMentioned: string[] = [];
+      // Check for any capitalized abbreviations that aren't valid
+      const abbrevPattern = /\b[A-Z]{2,4}\b/g;
+      const matches = (mentorParsed.sections?.palace_framing || '').match(abbrevPattern) || [];
+      for (const m of matches) {
+        if (!isValidMentorRoom(m.toLowerCase()) && !['THE', 'AND', 'FOR', 'NOT', 'BUT', 'NOR', 'YET'].includes(m)) {
+          invalidMentioned.push(m);
+        }
+      }
+      compliance.room_validation_passed = invalidMentioned.length === 0;
+      compliance.invalid_rooms_found = invalidMentioned;
+      mentorParsed.compliance_report = compliance;
+
+      return new Response(
+        JSON.stringify({
+          content: mentorParsed,
+          principlesUsed: ["Preacher Mentor Commentary v1"],
+        }),
+        { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+
     } else if (mode === "commentary-sdabc") {
       // SDA Bible Commentary
       systemPrompt = `You are Jeeves, a biblical scholar deeply familiar with the Seventh-day Adventist Bible Commentary (SDABC).

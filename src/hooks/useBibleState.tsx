@@ -7,6 +7,7 @@ interface BibleState {
   showChainRef: boolean;
   showCommentary: boolean;
   showAI: boolean;
+  showPreacherMentor: boolean;
 }
 
 const STORAGE_KEY = "phototheology_bible_state";
@@ -80,6 +81,17 @@ export const useBibleState = (bookId: string, chapter: string) => {
     return false;
   });
 
+  const [showPreacherMentor, setShowPreacherMentor] = useState(() => {
+    try {
+      const stored = localStorage.getItem(stateKey);
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        return parsed.showPreacherMentor || false;
+      }
+    } catch {}
+    return false;
+  });
+
   useEffect(() => {
     const state: BibleState = {
       selectedVerses,
@@ -88,6 +100,7 @@ export const useBibleState = (bookId: string, chapter: string) => {
       showChainRef,
       showCommentary,
       showAI,
+      showPreacherMentor,
     };
     
     try {
@@ -95,7 +108,7 @@ export const useBibleState = (bookId: string, chapter: string) => {
     } catch (e) {
       console.error("Failed to persist Bible state:", e);
     }
-  }, [selectedVerses, showStrongs, showPrinciples, showChainRef, showCommentary, showAI, stateKey]);
+  }, [selectedVerses, showStrongs, showPrinciples, showChainRef, showCommentary, showAI, showPreacherMentor, stateKey]);
 
   return {
     selectedVerses,
@@ -110,5 +123,7 @@ export const useBibleState = (bookId: string, chapter: string) => {
     setShowCommentary,
     showAI,
     setShowAI,
+    showPreacherMentor,
+    setShowPreacherMentor,
   };
 };

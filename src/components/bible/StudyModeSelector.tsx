@@ -5,11 +5,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { BookOpen, Shield, GraduationCap } from "lucide-react";
+import { BookOpen, Shield, GraduationCap, Crown } from "lucide-react";
 
 interface StudyModeSelectorProps {
-  activeMode: "beginner" | "advanced" | "apologetics";
-  onModeChange: (mode: "beginner" | "advanced" | "apologetics") => void;
+  activeMode: "beginner" | "advanced" | "apologetics" | "preacher-mentor";
+  onModeChange: (mode: "beginner" | "advanced" | "apologetics" | "preacher-mentor") => void;
 }
 
 const modes = [
@@ -30,6 +30,12 @@ const modes = [
     name: "Apologetics",
     icon: Shield,
     description: "Defense mode",
+  },
+  {
+    id: "preacher-mentor" as const,
+    name: "Preacher Mentor",
+    icon: Crown,
+    description: "Mentor commentary",
   },
 ];
 
