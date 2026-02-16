@@ -14,6 +14,8 @@ import {
 
 export type CommentaryTier = "surface" | "intermediate" | "scholarly";
 
+export type CommentarySource = "standard" | "preacher-mentor";
+
 export type OpenAIVoice = "alloy" | "ash" | "coral" | "echo" | "fable" | "nova" | "onyx" | "sage" | "shimmer";
 
 export const OPENAI_VOICES: { id: OpenAIVoice; name: string; description: string }[] = [
@@ -159,7 +161,7 @@ export async function generateCommentary(options: CommentaryOptions): Promise<Co
   }
 }
 
-export type CommentarySource = "standard" | "preacher-mentor";
+// CommentarySource type is defined at top of file
 
 /**
  * Generate Preacher Mentor commentary for a verse (2-step pipeline)
